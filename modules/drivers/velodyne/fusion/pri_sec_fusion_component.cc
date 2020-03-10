@@ -64,6 +64,8 @@ bool PriSecFusionComponent::Proc(
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
+  auto diff = Time::Now().ToNanosecond() - target->header().lidar_timestamp();
+  AINFO << "Pointcloud fusion diff: " << diff / 1000000 << "ms";
   fusion_writer_->Write(target);
 
   return true;

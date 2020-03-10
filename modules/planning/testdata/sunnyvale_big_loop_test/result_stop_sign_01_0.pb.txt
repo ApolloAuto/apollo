@@ -12,29 +12,14 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_1017"
       stop_point {
-        x: 586395.29793923616
-        y: 4140150.3724403135
+        x: 586395.24501439068
+        y: 4140150.420841597
       }
-      stop_heading: -1.589762268047104
+      stop_heading: -1.5813726415328468
       change_lane_type: FORWARD
     }
   }
   object_decision {
-    decision {
-      id: "14468_1"
-      perception_id: 14468
-      object_decision {
-        overtake {
-          distance_s: 35.892199589078807
-          fence_point {
-            x: 586398.86749329569
-            y: 4140141.0411835248
-            z: 0
-          }
-          fence_heading: -0.68213803587378719
-        }
-      }
-    }
     decision {
       id: "SS_1017"
       perception_id: -911148558
@@ -43,11 +28,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -1
           stop_point {
-            x: 586395.29793923616
-            y: 4140150.3724403135
+            x: 586395.24501439068
+            y: 4140150.420841597
             z: 0
           }
-          stop_heading: -1.589762268047104
+          stop_heading: -1.5813726415328468
         }
       }
     }
@@ -63,10 +48,10 @@ routing_header {
 }
 right_of_way_status: UNPROTECTED
 lane_id {
-  id: "2855_1_-1"
+  id: "2972_1_-1"
 }
 lane_id {
-  id: "10679a_1_-1"
+  id: "2974_1_-1"
 }
 lane_id {
   id: "2975_1_-1"
@@ -104,10 +89,10 @@ engage_advice {
 trajectory_type: NORMAL
 replan_reason: "replan for no previous trajectory."
 target_lane_id {
-  id: "2855_1_-1"
+  id: "2972_1_-1"
 }
 target_lane_id {
-  id: "10679a_1_-1"
+  id: "2974_1_-1"
 }
 target_lane_id {
   id: "2975_1_-1"

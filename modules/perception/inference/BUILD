@@ -17,7 +17,7 @@ cc_test(
     srcs = ["layer_test.cc"],
     deps = [
         ":layer_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -36,7 +36,7 @@ cc_test(
     srcs = ["inference_test.cc"],
     deps = [
         ":inference_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     srcs = ["inference_factory_test.cc"],
     deps = [
         ":inference_factory_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

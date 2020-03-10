@@ -9,16 +9,17 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/math",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/proto:point_cloud_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
+        "//third_party:boost",
         "//third_party/json",
-        "@boost",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_protobuf//:protobuf",
         "@pcl",
-        "@yaml_cpp//:yaml",
     ],
 )
 

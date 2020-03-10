@@ -31,8 +31,8 @@ message ChassisDetail {
   optional Light light = 13;                // Light
   optional Battery battery = 14;            // Battery info
   optional CheckResponseSignal check_response = 15;
-  optional License license = 16 [deprecated = true];    // License info
-  optional Surround surround = 17;  // Surround information
+  optional License license = 16 [deprecated = true];  // License info
+  optional Surround surround = 17;                    // Surround information
   optional Gem gem = 18;
   optional Lexus lexus = 19;
   optional Transit transit = 20;

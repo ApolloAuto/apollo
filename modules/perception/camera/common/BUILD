@@ -52,12 +52,12 @@ cc_library(
     hdrs = ["object_template_manager.h"],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/perception/base",
         "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

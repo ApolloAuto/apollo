@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,4 +13,10 @@ proto_library(
     deps = ["//modules/common/proto:header_proto_lib"],
 )
 
-cpplint()
+py_proto(
+    name = "latency_record_pb2",
+    src = "latency_record.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)

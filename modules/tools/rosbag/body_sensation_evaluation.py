@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -26,8 +26,8 @@ import math
 import sys
 import time
 
-from cyber_py import cyber
-from cyber_py.record import RecordReader
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.localization.proto import localization_pb2

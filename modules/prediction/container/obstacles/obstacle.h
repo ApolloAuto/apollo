@@ -79,6 +79,10 @@ class Obstacle {
    */
   bool InsertFeature(const Feature& feature);
 
+  void ClearOldInformation();
+
+  void TrimHistory(const size_t remain_size);
+
   /**
    * @brief Get the type of perception obstacle's type.
    * @return The type pf perception obstacle.
@@ -141,19 +145,6 @@ class Obstacle {
    * @return The number of historical features.
    */
   size_t history_size() const;
-
-  /**
-   * @brief Get the motion Kalman filter.
-   * @return The motion Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 6, 2, 0>& kf_motion_tracker() const;
-
-  /**
-   * @brief Get the pedestrian Kalman filter.
-   * @return The pedestrian Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker()
-      const;
 
   /**
    * @brief Check if the obstacle is still.
@@ -221,29 +212,6 @@ class Obstacle {
   void BuildLaneGraphFromLeftToRight();
 
   /**
-   * @brief Set RNN state
-   * @param RNN state matrix
-   */
-  void SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states);
-
-  /**
-   * @brief Get RNN state
-   * @param A pointer to RNN state matrix
-   */
-  void GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states);
-
-  /**
-   * @brief Initialize RNN state
-   */
-  void InitRNNStates();
-
-  /**
-   * @brief Check if RNN is enabled
-   * @return True if RNN is enabled
-   */
-  bool RNNEnabled() const;
-
-  /**
    * @brief Set the obstacle as caution level
    */
   void SetCaution();
@@ -261,8 +229,6 @@ class Obstacle {
  private:
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
                  double timestamp, Feature* feature);
-
-  void UpdateStatus(Feature* feature);
 
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
              Feature* feature, const int prediction_id = -1);
@@ -302,10 +268,6 @@ class Obstacle {
       const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
-  void InitKFMotionTracker(const Feature& feature);
-
-  void UpdateKFMotionTracker(const Feature& feature);
-
   void UpdateLaneBelief(Feature* feature);
 
   void SetCurrentLanes(Feature* feature);
@@ -325,10 +287,6 @@ class Obstacle {
   /** @brief This functions is mainly for lane-sequence kappa calculation.
    */
   void SetLaneSequencePath(LaneGraph* const lane_graph);
-
-  void InitKFPedestrianTracker(const Feature& feature);
-
-  void UpdateKFPedestrianTracker(const Feature& feature);
 
   void SetMotionStatus();
 
@@ -361,15 +319,7 @@ class Obstacle {
 
   std::deque<Feature> feature_history_;
 
-  common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
-
-  common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
-
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
-
-  std::vector<Eigen::MatrixXf> rnn_states_;
-
-  bool rnn_enabled_ = false;
 
   ObstacleConf obstacle_conf_;
 };

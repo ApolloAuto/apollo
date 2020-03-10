@@ -25,12 +25,11 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::hdmap::LaneInfo;
-using ::apollo::prediction::math_util::EvaluateCubicPolynomial;
-using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
-using ::apollo::prediction::math_util::SolveQuadraticEquation;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+using apollo::hdmap::LaneInfo;
+using apollo::prediction::math_util::EvaluateCubicPolynomial;
+using apollo::prediction::math_util::EvaluateQuarticPolynomial;
 
 MoveSequencePredictor::MoveSequencePredictor() {
   predictor_type_ = ObstacleConf::MOVE_SEQUENCE_PREDICTOR;

@@ -16,10 +16,10 @@
 
 #include "cyber/data/data_visitor.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"

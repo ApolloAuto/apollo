@@ -19,7 +19,6 @@
  **/
 
 #include <string>
-#include <vector>
 
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 
@@ -36,6 +35,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 
 OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(

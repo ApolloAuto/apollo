@@ -23,7 +23,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"

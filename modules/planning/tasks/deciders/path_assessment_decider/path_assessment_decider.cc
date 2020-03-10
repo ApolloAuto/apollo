@@ -17,7 +17,6 @@
 #include "modules/planning/tasks/deciders/path_assessment_decider/path_assessment_decider.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 #include <utility>
 
@@ -33,12 +32,9 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
-using apollo::common::math::NormalizeAngle;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::hdmap::HDMapUtil;
 
 namespace {
 // PointDecision contains (s, PathPointType, distance to closest obstacle).
@@ -55,10 +51,7 @@ Status PathAssessmentDecider::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   // skip path_assessment_decider if reused path
-  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_reuse_decider()
-                                          ->reused_path()) {
+  if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
     return Status::OK();
   }
 
@@ -813,8 +806,8 @@ int ContainsOutOnReverseLane(
 
 int GetBackToInLaneIndex(
     const std::vector<PathPointDecision>& path_point_decision) {
-  // CHECK(!path_point_decision.empty());
-  // CHECK(std::get<1>(path_point_decision.back()) ==
+  // ACHECK(!path_point_decision.empty());
+  // ACHECK(std::get<1>(path_point_decision.back()) ==
   //       PathData::PathPointType::IN_LANE);
 
   for (int i = static_cast<int>(path_point_decision.size()) - 1; i >= 0; --i) {

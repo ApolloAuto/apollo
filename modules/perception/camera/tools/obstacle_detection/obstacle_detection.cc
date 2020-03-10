@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
 #include <fstream>
+
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/object_types.h"
@@ -158,7 +159,7 @@ int main() {
   dp_init_options.device_id = 0;
 
   AINFO << "Init DataProvider ...";
-  CHECK(frame.data_provider->Init(dp_init_options));
+  ACHECK(frame.data_provider->Init(dp_init_options));
   AINFO << "Done!";
 
   ObstacleDetectorInitOptions init_options;
@@ -178,7 +179,7 @@ int main() {
       BaseObstacleDetectorRegisterer::GetInstanceByName(FLAGS_detector);
   if (FLAGS_pre_detected_dir == "") {
     CHECK_EQ(detector->Name(), FLAGS_detector);
-    CHECK(detector->Init(init_options));
+    ACHECK(detector->Init(init_options));
   }
   AINFO << "Done!";
 
@@ -190,7 +191,7 @@ int main() {
   BaseObstacleTransformer *transformer =
       BaseObstacleTransformerRegisterer::GetInstanceByName(FLAGS_transformer);
   CHECK_EQ(transformer->Name(), FLAGS_transformer);
-  CHECK(transformer->Init(transformer_init_options));
+  ACHECK(transformer->Init(transformer_init_options));
   AINFO << "Done!";
 
   ObstacleDetectorOptions options;
@@ -228,8 +229,8 @@ int main() {
                image.width_step());
       }
 
-      CHECK(frame.data_provider->FillImageData(cv_img.rows, cv_img.cols,
-                                               image.gpu_data(), "bgr8"));
+      ACHECK(frame.data_provider->FillImageData(cv_img.rows, cv_img.cols,
+                                                image.gpu_data(), "bgr8"));
 
       EXPECT_TRUE(detector->Detect(options, &frame));
     }
@@ -266,7 +267,7 @@ int main() {
             cv::Point(static_cast<int>(box.xmax), static_cast<int>(box.ymax)),
             cv::Scalar(0, 0, 0), 8);
         float xmid = (box.xmin + box.xmax) / 2;
-        CHECK(area_id > 0 && area_id < 9);
+        ACHECK(area_id > 0 && area_id < 9);
         if (area_id & 1) {
           cv::rectangle(
               cv_img,

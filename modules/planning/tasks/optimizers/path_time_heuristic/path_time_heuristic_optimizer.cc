@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 
-#include <vector>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -34,12 +32,10 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::planning_internal::STGraphDebug;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_speed_heuristic_config());
+  ACHECK(config.has_speed_heuristic_config());
   speed_heuristic_config_ = config.speed_heuristic_config();
 }
 

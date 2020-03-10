@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
+
 #include <omp.h>
 #include <algorithm>
 #include <map>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -32,7 +34,7 @@ using Eigen::MatrixXf;
 
 bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
   std::string param_file;
-  CHECK(GetConfigs(&param_file));
+  ACHECK(GetConfigs(&param_file));
   AINFO << "--    param_file: " << param_file;
 
   if (!Configure(param_file)) {
@@ -45,7 +47,7 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
       BaseGroundDetectorRegisterer::GetInstanceByName(ground_detector_str_));
   CHECK_NOTNULL(ground_detector_.get());
   GroundDetectorInitOptions ground_detector_init_options;
-  CHECK(ground_detector_->Init(ground_detector_init_options))
+  ACHECK(ground_detector_->Init(ground_detector_init_options))
       << "Failed to init ground detection.";
 
   // init roi filter
@@ -53,7 +55,7 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
       BaseROIFilterRegisterer::GetInstanceByName(roi_filter_str_));
   CHECK_NOTNULL(roi_filter_.get());
   ROIFilterInitOptions roi_filter_init_options;
-  CHECK(roi_filter_->Init(roi_filter_init_options))
+  ACHECK(roi_filter_->Init(roi_filter_init_options))
       << "Failed to init roi filter.";
 
   _outliers.reset(new std::vector<ObjectPtr>);
@@ -126,7 +128,7 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
 bool NCutSegmentation::Configure(std::string param_file) {
   NCutSegmentationParam seg_param_;
   // get cnnseg params
-  CHECK(GetProtoFromFile(param_file, &seg_param_))
+  ACHECK(GetProtoFromFile(param_file, &seg_param_))
       << "Failed to parse CNNSegParam config file." << param_file;
   grid_radius_ = seg_param_.grid_radius();
   height_threshold_ = seg_param_.height_threshold();
@@ -150,19 +152,19 @@ bool NCutSegmentation::Configure(std::string param_file) {
 bool NCutSegmentation::GetConfigs(std::string* param_file) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig("NCutSegmentation", &model_config))
+  ACHECK(config_manager->GetModelConfig("NCutSegmentation", &model_config))
       << "Failed to get model config: CNNSegmentation";
 
   const std::string& work_root = config_manager->work_root();
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path))
+  ACHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ncut.conf");
 
   NCutConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
   *param_file = GetAbsolutePath(work_root, config.param_file());
   return true;

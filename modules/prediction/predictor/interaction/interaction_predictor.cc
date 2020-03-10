@@ -20,7 +20,6 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/feature_output.h"
@@ -35,9 +34,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
-using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::GetSByConstantAcceleration;
 

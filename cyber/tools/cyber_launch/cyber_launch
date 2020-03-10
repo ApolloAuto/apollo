@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 
@@ -15,19 +15,20 @@
 # limitations under the License.
 # ****************************************************************************
 
-import signal
-import sys
+import argparse
+import atexit
 import logging
 import os
 import os.path
+import signal
 import subprocess
+import sys
 import time
-import atexit
-import argparse
 import threading
 import traceback
 
 import xml.etree.ElementTree as ET
+
 
 g_binary_name = 'mainboard'
 g_pwd = os.getcwd()
@@ -40,7 +41,7 @@ cyber_path = os.getenv('CYBER_PATH')
 """
 colorful logging
 """
-BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = list(range(8))
 RESET_SEQ = "\033[0m"
 COLOR_SEQ = "\033[1;%dm"
 BOLD_SEQ = "\033[1m"
@@ -74,6 +75,7 @@ class ColoredFormatter(logging.Formatter):
                     " " + record.msg.split('#')[-1] + RESET_SEQ
         return logging.Formatter.format(self, record)
 
+
 color_formatter = ColoredFormatter("[%(levelname)-18s] %(message)s")
 console = logging.StreamHandler()
 console.setFormatter(color_formatter)
@@ -85,6 +87,7 @@ def exit_handler():
     stop()
     os.chdir(g_pwd)
     logger.info('cyber_launch exit.')
+
 
 atexit.register(exit_handler)
 
@@ -103,7 +106,7 @@ def module_monitor(mod):
     while True:
         line = mod.popen.stdout.readline()
         if line:
-            logger.debug('%s# %s' % (mod.name, line.strip('\n')))
+            logger.debug('%s# %s' % (mod.name, line.decode('utf8').strip('\n')))
             continue
         time.sleep(0.01)
 
@@ -354,11 +357,11 @@ def start(launch_file=''):
             if process_name is None:
                 process_name = 'mainboard_default_' + str(os.getpid())
             process_name = process_name.strip()
-            if dictionary.has_key(str(process_name)):
+            if str(process_name) in dictionary:
                 dictionary[str(process_name)] += 1
             else:
                 dictionary[str(process_name)] = 1
-            if not dag_dict.has_key(str(process_name)):
+            if str(process_name) not in dag_dict:
                 dag_dict[str(process_name)] = [str(dag_conf)]
             else:
                 dag_dict[str(process_name)].append(str(dag_conf))
@@ -516,6 +519,7 @@ def main():
     else:
         logger.error('Invalid command %s' % command)
         sys.exit(1)
+
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)

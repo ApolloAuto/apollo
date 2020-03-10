@@ -20,17 +20,12 @@
 namespace apollo {
 namespace prediction {
 
-void SubmoduleOutput::InsertObstacle(const Obstacle& obstacle) {
+void SubmoduleOutput::InsertObstacle(const Obstacle&& obstacle) {
   curr_frame_obstacles_.push_back(obstacle);
 }
 
-void SubmoduleOutput::InsertEgoVehicle(const Obstacle& ego_vehicle) {
+void SubmoduleOutput::InsertEgoVehicle(const Obstacle&& ego_vehicle) {
   ego_vehicle_ = ego_vehicle;
-}
-
-void SubmoduleOutput::InsertPerceptionObstacle(
-    const apollo::perception::PerceptionObstacle& perception_obstacle) {
-  curr_frame_perception_obstacles_.push_back(perception_obstacle);
 }
 
 void SubmoduleOutput::set_curr_frame_movable_obstacle_ids(
@@ -48,17 +43,7 @@ void SubmoduleOutput::set_curr_frame_considered_obstacle_ids(
   curr_frame_considered_obstacle_ids_ = curr_frame_considered_obstacle_ids;
 }
 
-void SubmoduleOutput::set_perception_header(
-    const apollo::common::Header& perception_header) {
-  perception_header_ = perception_header;
-}
-
-void SubmoduleOutput::set_perception_error_code(
-    const apollo::common::ErrorCode& perception_error_code) {
-  perception_error_code_ = perception_error_code;
-}
-
-void SubmoduleOutput::set_frame_start_time(const double frame_start_time) {
+void SubmoduleOutput::set_frame_start_time(const absl::Time& frame_start_time) {
   frame_start_time_ = frame_start_time;
 }
 
@@ -67,11 +52,6 @@ const std::vector<Obstacle>& SubmoduleOutput::curr_frame_obstacles() const {
 }
 
 const Obstacle& SubmoduleOutput::GetEgoVehicle() const { return ego_vehicle_; }
-
-const std::vector<apollo::perception::PerceptionObstacle>&
-SubmoduleOutput::curr_frame_perception_obstacles() const {
-  return curr_frame_perception_obstacles_;
-}
 
 std::vector<int> SubmoduleOutput::curr_frame_movable_obstacle_ids() const {
   return curr_frame_movable_obstacle_ids_;
@@ -85,15 +65,9 @@ std::vector<int> SubmoduleOutput::curr_frame_considered_obstacle_ids() const {
   return curr_frame_considered_obstacle_ids_;
 }
 
-apollo::common::Header SubmoduleOutput::perception_header() const {
-  return perception_header_;
+const absl::Time& SubmoduleOutput::frame_start_time() const {
+  return frame_start_time_;
 }
-
-apollo::common::ErrorCode SubmoduleOutput::perception_error_code() const {
-  return perception_error_code_;
-}
-
-double SubmoduleOutput::frame_start_time() const { return frame_start_time_; }
 
 }  // namespace prediction
 }  // namespace apollo

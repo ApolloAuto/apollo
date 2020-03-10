@@ -27,13 +27,12 @@
 #include "cyber/component/component.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/submodules/container_output.h"
-#include "modules/prediction/submodules/evaluator_output.h"
+#include "modules/prediction/submodules/submodule_output.h"
 
 namespace apollo {
 namespace prediction {
 
-class EvaluatorSubmodule : public cyber::Component<ContainerOutput> {
+class EvaluatorSubmodule : public cyber::Component<SubmoduleOutput> {
  public:
   /**
    * @brief Destructor
@@ -56,10 +55,10 @@ class EvaluatorSubmodule : public cyber::Component<ContainerOutput> {
    * @brief Data callback upon receiving a prediction container output.
    * @param Prediction container output.
    */
-  bool Proc(const std::shared_ptr<ContainerOutput>&) override;
+  bool Proc(const std::shared_ptr<SubmoduleOutput>&) override;
 
  private:
-  std::shared_ptr<cyber::Writer<EvaluatorOutput>> evaluator_writer_;
+  std::shared_ptr<cyber::Writer<SubmoduleOutput>> evaluator_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(EvaluatorSubmodule)

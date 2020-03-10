@@ -31,6 +31,7 @@
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
@@ -43,6 +44,7 @@ namespace planning {
 
 constexpr double kADCSafetyLBuffer = 0.1;
 constexpr double kSIgnoreThreshold = 0.01;
+constexpr double kTIgnoreThreshold = 0.1;
 constexpr double kOvertakenObsCautionTime = 0.5;
 
 class STObstaclesProcessor {
@@ -50,7 +52,7 @@ class STObstaclesProcessor {
   STObstaclesProcessor() {}
 
   void Init(const double planning_distance, const double planning_time,
-            const PathData& path_data);
+            const PathData& path_data, PathDecision* const path_decision);
 
   virtual ~STObstaclesProcessor() = default;
 
@@ -197,6 +199,7 @@ class STObstaclesProcessor {
   PathData path_data_;
   common::VehicleParam vehicle_param_;
   double adc_path_init_s_;
+  PathDecision* path_decision_;
 
   // A vector of sorted obstacle's t-edges:
   //  (is_starting_t, t, s_min, s_max, obs_id).
@@ -207,7 +210,15 @@ class STObstaclesProcessor {
   std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
   std::unordered_map<std::string, ObjectDecisionType> obs_id_to_decision_;
 
+  std::vector<std::tuple<std::string, STBoundary, Obstacle*>>
+      candidate_clear_zones_;
+
+  std::unordered_map<std::string, STBoundary>
+      obs_id_to_alternative_st_boundary_;
+
   std::vector<std::pair<double, double>> adc_low_road_right_segments_;
+
+  History* history_ = History::Instance();
 };
 
 }  // namespace planning

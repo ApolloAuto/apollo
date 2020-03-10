@@ -32,15 +32,15 @@ using cyber::common::GetAbsolutePath;
 bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_motion_refiner.conf");
   MlfMotionRefinerConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   // read from proto config
   claping_speed_threshold_ = config.claping_speed_threshold();
   claping_acceleration_threshold_ = config.claping_acceleration_threshold();

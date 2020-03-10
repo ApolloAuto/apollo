@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <functional>
-#include <set>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -30,7 +28,6 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -71,6 +68,9 @@ class PathBoundsDecider : public Decider {
    */
   void InitPathBoundsDecider(const Frame& frame,
                              const ReferenceLineInfo& reference_line_info);
+
+  common::TrajectoryPoint InferFrontAxeCenterFromRearAxeCenter(
+      const common::TrajectoryPoint& traj_point);
 
   /** @brief The regular path boundary generation considers the ADC itself
    *   and other static environments:
@@ -147,9 +147,6 @@ class PathBoundsDecider : public Decider {
 
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called when generating path bounds.
-  //  1. InitPathBoundary
-  //  2. GetBoundaryFromLanesAndADC
-  //  3. GetBoundaryFromStaticObstacles
 
   /** @brief Initializes an empty path boundary.
    */
@@ -197,6 +194,14 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
 
+  /** @brief Update left boundary by lane_left_width
+   *   This is for normal pull-over, which uses lane boundary as left boundary
+   *   and road_boundary for right boundary
+   */
+  void UpdatePullOverBoundaryByLaneBoundary(
+      const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
+
   void ConvertBoundarySAxisFromLaneCenterToRefLine(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
@@ -240,6 +245,18 @@ class PathBoundsDecider : public Decider {
    */
   double GetBufferBetweenADCCenterAndEdge();
 
+  /** @brief Update the path_boundary at "idx"
+   *         It also checks if ADC is blocked (lmax < lmin).
+   *  @param The current index of the path_bounds
+   *  @param The minimum left boundary (l_max)
+   *  @param The maximum right boundary (l_min)
+   *  @param The path_boundaries (its content at idx will be updated)
+   *  @return If path is good, true; if path is blocked, false.
+   */
+  bool UpdatePathBoundaryWithBuffer(
+      size_t idx, double left_bound, double right_bound,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
    *         It also checks if ADC is blocked (lmax < lmin).
    *  @param The current index of the path_bounds
@@ -249,7 +266,7 @@ class PathBoundsDecider : public Decider {
    *  @param The center_line (to be updated)
    *  @return If path is good, true; if path is blocked, false.
    */
-  bool UpdatePathBoundaryAndCenterLine(
+  bool UpdatePathBoundaryAndCenterLineWithBuffer(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
       double* const center_line);

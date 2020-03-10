@@ -16,7 +16,6 @@ limitations under the License.
 #include "modules/map/hdmap/hdmap_util.h"
 
 #include "gtest/gtest.h"
-#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace hdmap {

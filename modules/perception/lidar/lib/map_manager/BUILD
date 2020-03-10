@@ -21,11 +21,10 @@ cc_library(
 
 #cc_test(
 #    name = "map_manager_test",
-#    srcs = [#        "map_manager_test.cc"
-#    ],
+#    srcs = ["map_manager_test.cc"],
 #    deps = [
 #        ":map_manager",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 

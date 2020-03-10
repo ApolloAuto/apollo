@@ -77,14 +77,14 @@ Obstacle::Obstacle(const std::string& id,
       perception_obstacle.polygon_point_size() <= 2) {
     perception_bounding_box_.GetAllCorners(&polygon_points);
   } else {
-    CHECK(perception_obstacle.polygon_point_size() > 2)
+    ACHECK(perception_obstacle.polygon_point_size() > 2)
         << "object " << id << "has less than 3 polygon points";
     for (const auto& point : perception_obstacle.polygon_point()) {
       polygon_points.emplace_back(point.x(), point.y());
     }
   }
-  CHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
-                                                   &perception_polygon_))
+  ACHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
+                                                    &perception_polygon_))
       << "object[" << id << "] polygon is not a valid convex hull.\n"
       << perception_obstacle.DebugString();
 
@@ -671,7 +671,7 @@ void Obstacle::AddLateralDecision(const std::string& decider_tag,
   decider_tags_.push_back(decider_tag);
 }
 
-const std::string Obstacle::DebugString() const {
+std::string Obstacle::DebugString() const {
   std::stringstream ss;
   ss << "Obstacle id: " << id_;
   for (size_t i = 0; i < decisions_.size(); ++i) {
@@ -696,6 +696,7 @@ const SLBoundary& Obstacle::PerceptionSLBoundary() const {
 
 void Obstacle::set_path_st_boundary(const STBoundary& boundary) {
   path_st_boundary_ = boundary;
+  path_st_boundary_initialized_ = true;
 }
 
 void Obstacle::SetStBoundaryType(const STBoundary::BoundaryType type) {

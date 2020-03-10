@@ -41,12 +41,12 @@ class DpStGraphTest : public ::testing::Test {
     FLAGS_scenario_lane_follow_config_file =
         "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
     ScenarioConfig config;
-    CHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
+    ACHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
     FLAGS_planning_config_file =
         "/apollo/modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
-    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+    ACHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
         << "failed to load planning config file " << FLAGS_planning_config_file;
 
     DpStSpeedConfig default_dp_config;

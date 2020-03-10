@@ -20,15 +20,11 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
-#include <algorithm>
-#include <memory>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
+#include <algorithm>
+#include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -53,7 +49,7 @@ PiecewiseJerkSpeedNonlinearOptimizer::PiecewiseJerkSpeedNonlinearOptimizer(
     : SpeedOptimizer(config),
       smoothed_speed_limit_(0.0, 0.0, 0.0),
       smoothed_path_curvature_(0.0, 0.0, 0.0) {
-  CHECK(config_.has_piecewise_jerk_nonlinear_speed_config());
+  ACHECK(config_.has_piecewise_jerk_nonlinear_speed_config());
 }
 
 Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
@@ -204,9 +200,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   s_ddot_max_ = veh_param.max_acceleration();
   s_ddot_min_ = -1.0 * std::abs(veh_param.max_deceleration());
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  s_ddot_max_ = 2.0;
-  s_ddot_min_ = -4.0;
 
   // Set s_dddot boundary
   // TODO(Jinyun): allow the setting of jerk_lower_bound and move jerk config to
@@ -215,58 +208,98 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
   s_dddot_max_ = FLAGS_longitudinal_jerk_upper_bound;
 
   // Set s boundary
-  s_bounds_.clear();
-  s_soft_bounds_.clear();
-  // TODO(Jinyun): move to confs
-  for (int i = 0; i < num_of_knots_; ++i) {
-    double curr_t = i * delta_t_;
-    double s_lower_bound = 0.0;
-    double s_upper_bound = total_length_;
-    double s_soft_lower_bound = 0.0;
-    double s_soft_upper_bound = total_length_;
-    for (const STBoundary* boundary : st_graph_data.st_boundaries()) {
-      double s_lower = 0.0;
-      double s_upper = 0.0;
-      if (!boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
-        continue;
+  if (FLAGS_use_soft_bound_in_nonlinear_speed_opt) {
+    s_bounds_.clear();
+    s_soft_bounds_.clear();
+    // TODO(Jinyun): move to confs
+    for (int i = 0; i < num_of_knots_; ++i) {
+      double curr_t = i * delta_t_;
+      double s_lower_bound = 0.0;
+      double s_upper_bound = total_length_;
+      double s_soft_lower_bound = 0.0;
+      double s_soft_upper_bound = total_length_;
+      for (const STBoundary* boundary : st_graph_data.st_boundaries()) {
+        double s_lower = 0.0;
+        double s_upper = 0.0;
+        if (!boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+          continue;
+        }
+        SpeedPoint sp;
+        switch (boundary->boundary_type()) {
+          case STBoundary::BoundaryType::STOP:
+          case STBoundary::BoundaryType::YIELD:
+            s_upper_bound = std::fmin(s_upper_bound, s_upper);
+            s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
+            break;
+          case STBoundary::BoundaryType::FOLLOW:
+            s_upper_bound =
+                std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
+            if (!speed_data.EvaluateByTime(curr_t, &sp)) {
+              std::string msg(
+                  "rough speed profile estimation for soft follow fence "
+                  "failed");
+              AERROR << msg;
+              return Status(ErrorCode::PLANNING_ERROR, msg);
+            }
+            s_soft_upper_bound =
+                std::fmin(s_soft_upper_bound,
+                          s_upper - FLAGS_follow_min_distance -
+                              std::min(7.0, FLAGS_follow_time_buffer * sp.v()));
+            break;
+          case STBoundary::BoundaryType::OVERTAKE:
+            s_lower_bound = std::fmax(s_lower_bound, s_lower);
+            s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower + 10.0);
+            break;
+          default:
+            break;
+        }
       }
-      SpeedPoint sp;
-      switch (boundary->boundary_type()) {
-        case STBoundary::BoundaryType::STOP:
-        case STBoundary::BoundaryType::YIELD:
-          s_upper_bound = std::fmin(s_upper_bound, s_upper);
-          s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
-          break;
-        case STBoundary::BoundaryType::FOLLOW:
-          s_upper_bound =
-              std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
-          if (!speed_data.EvaluateByTime(curr_t, &sp)) {
-            std::string msg(
-                "rough speed profile estimation for soft follow fence failed");
-            AERROR << msg;
-            return Status(ErrorCode::PLANNING_ERROR, msg);
-          }
-          s_soft_upper_bound =
-              std::fmin(s_soft_upper_bound,
-                        s_upper - FLAGS_follow_min_distance -
-                            std::min(7.0, FLAGS_follow_time_buffer * sp.v()));
-          break;
-        case STBoundary::BoundaryType::OVERTAKE:
-          s_lower_bound = std::fmax(s_lower_bound, s_lower);
-          s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower + 10.0);
-          break;
-        default:
-          break;
+      if (s_lower_bound > s_upper_bound) {
+        std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
       }
+      s_soft_bounds_.emplace_back(s_soft_lower_bound, s_soft_upper_bound);
+      s_bounds_.emplace_back(s_lower_bound, s_upper_bound);
     }
-    if (s_lower_bound > s_upper_bound) {
-      std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+  } else {
+    s_bounds_.clear();
+    // TODO(Jinyun): move to confs
+    for (int i = 0; i < num_of_knots_; ++i) {
+      double curr_t = i * delta_t_;
+      double s_lower_bound = 0.0;
+      double s_upper_bound = total_length_;
+      for (const STBoundary* boundary : st_graph_data.st_boundaries()) {
+        double s_lower = 0.0;
+        double s_upper = 0.0;
+        if (!boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
+          continue;
+        }
+        SpeedPoint sp;
+        switch (boundary->boundary_type()) {
+          case STBoundary::BoundaryType::STOP:
+          case STBoundary::BoundaryType::YIELD:
+            s_upper_bound = std::fmin(s_upper_bound, s_upper);
+            break;
+          case STBoundary::BoundaryType::FOLLOW:
+            s_upper_bound = std::fmin(s_upper_bound, s_upper - 8.0);
+            break;
+          case STBoundary::BoundaryType::OVERTAKE:
+            s_lower_bound = std::fmax(s_lower_bound, s_lower);
+            break;
+          default:
+            break;
+        }
+      }
+      if (s_lower_bound > s_upper_bound) {
+        std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
+      s_bounds_.emplace_back(s_lower_bound, s_upper_bound);
     }
-    s_soft_bounds_.emplace_back(s_soft_lower_bound, s_soft_upper_bound);
-    s_bounds_.emplace_back(s_lower_bound, s_upper_bound);
   }
+
   speed_limit_ = st_graph_data.speed_limit();
   cruise_speed_ = reference_line_info_->GetCruiseSpeed();
   return Status::OK();
@@ -307,7 +340,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
 
-  piecewise_jerk_problem.set_x_ref(1.0, speed_ref);
+  piecewise_jerk_problem.set_x_ref(10.0, speed_ref);
 
   if (!piecewise_jerk_problem.Optimize(4000)) {
     std::string msg("Smoothing speed limit failed");
@@ -400,8 +433,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
                                                    init_states);
   piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_states[1]));
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
+  piecewise_jerk_problem.set_ddx_bounds(s_ddot_min_, s_ddot_max_);
   piecewise_jerk_problem.set_dddx_bound(s_dddot_min_, s_dddot_max_);
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
@@ -447,8 +479,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
 
   ptr_interface->set_safety_bounds(s_bounds_);
 
-  ptr_interface->set_soft_safety_bounds(s_soft_bounds_);
-
   // Set weights and reference values
   const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
 
@@ -481,17 +511,28 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     ptr_interface->set_warm_start(warm_start);
   }
 
-  std::vector<double> spatial_potantial(num_of_knots_, total_length_);
-  ptr_interface->set_reference_spatial_distance(spatial_potantial);
+  if (FLAGS_use_smoothed_dp_guide_line) {
+    ptr_interface->set_reference_spatial_distance(*distance);
+    // TODO(Jinyun): move to confs
+    ptr_interface->set_w_reference_spatial_distance(10.0);
+  } else {
+    std::vector<double> spatial_potantial(num_of_knots_, total_length_);
+    ptr_interface->set_reference_spatial_distance(spatial_potantial);
+    ptr_interface->set_w_reference_spatial_distance(
+        config.s_potential_weight());
+  }
 
-  ptr_interface->set_reference_speed(cruise_speed_);
+  if (FLAGS_use_soft_bound_in_nonlinear_speed_opt) {
+    ptr_interface->set_soft_safety_bounds(s_soft_bounds_);
+    ptr_interface->set_w_soft_s_bound(config.soft_s_bound_weight());
+  }
 
-  ptr_interface->set_w_reference_spatial_distance(config.s_potential_weight());
   ptr_interface->set_w_overall_a(config.acc_weight());
   ptr_interface->set_w_overall_j(config.jerk_weight());
   ptr_interface->set_w_overall_centripetal_acc(config.lat_acc_weight());
+
+  ptr_interface->set_reference_speed(cruise_speed_);
   ptr_interface->set_w_reference_speed(config.ref_v_weight());
-  ptr_interface->set_w_soft_s_bound(config.soft_s_bound_weight());
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptr_interface;
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();

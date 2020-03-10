@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
@@ -59,8 +60,12 @@ class Routing {
                RoutingResponse *const routing_response);
 
  private:
-  RoutingRequest FillLaneInfoIfMissing(const RoutingRequest &routing_request);
+  std::vector<RoutingRequest>
+  FillLaneInfoIfMissing(const RoutingRequest &routing_request);
 
+  double GetRoutingLength(const RoutingResponse& routing_response);
+
+ private:
   std::unique_ptr<Navigator> navigator_ptr_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 

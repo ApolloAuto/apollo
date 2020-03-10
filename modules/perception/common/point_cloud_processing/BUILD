@@ -23,7 +23,7 @@ cc_library(
     ],
     deps = [
         ":point_cloud_processing",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

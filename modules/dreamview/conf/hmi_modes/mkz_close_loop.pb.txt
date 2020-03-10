@@ -1,7 +1,6 @@
 cyber_modules {
   key: "Computer"
   value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
     dag_files: "/apollo/modules/drivers/camera/dag/camera_no_compress.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
@@ -11,6 +10,7 @@ cyber_modules {
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
     dag_files: "/apollo/modules/planning/dag/planning.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
+    dag_files: "/apollo/modules/storytelling/dag/storytelling.dag"
     dag_files: "/apollo/modules/routing/dag/routing.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     process_group: "compute_sched"

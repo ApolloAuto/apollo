@@ -3,11 +3,10 @@ syntax = "proto2";
 package apollo.perception.camera.lane;
 
 message LanePostprocessorParam {
-    optional int32 omit_bottom_line_num = 1 [default = 3];
-    optional float laneline_map_score_thresh = 2 [default = 0.4];
-    optional float laneline_point_score_thresh = 3 [default = 0.6];
-    optional int32 laneline_point_min_num_thresh = 4 [default = 2];
-    optional float cc_valid_pixels_ratio = 5 [default = 2];
-    optional float laneline_reject_dist_thresh = 6 [default = 50];
+  optional int32 omit_bottom_line_num = 1 [default = 3];
+  optional float laneline_map_score_thresh = 2 [default = 0.4];
+  optional float laneline_point_score_thresh = 3 [default = 0.6];
+  optional int32 laneline_point_min_num_thresh = 4 [default = 2];
+  optional float cc_valid_pixels_ratio = 5 [default = 2];
+  optional float laneline_reject_dist_thresh = 6 [default = 50];
 }
-

@@ -170,7 +170,7 @@ class OfflineLidarObstaclePerception {
                       return lhs->id < rhs->id;
                     });
           for (std::size_t j = 0; j < objects.size(); ++j) {
-            CHECK(objects[j]->id == result_objects[j]->id);
+            ACHECK(objects[j]->id == result_objects[j]->id);
             objects[j]->track_id = result_objects[j]->track_id;
             objects[j]->tracking_time = result_objects[j]->tracking_time;
             objects[j]->center =
@@ -204,7 +204,7 @@ class OfflineLidarObstaclePerception {
       }
       if (!WriteObjectsForNewBenchmark(
               i, filtered_objects,
-              absl::StrCat(output_path, "/", file_name, ".pcd"))) {
+              absl::StrCat(output_path, "/", file_name, ".txt"))) {
         return false;
       }
     }

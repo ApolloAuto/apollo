@@ -31,19 +31,19 @@ bool LidarObstacleSegmentation::Init(
   auto& sensor_name = options.sensor_name;
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
 
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
   config_file = cyber::common::GetAbsolutePath(
       config_file, "lidar_obstacle_segmentation.conf");
 
   LidarObstacleSegmentationConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   segmentor_name_ = config.segmentor();
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();
@@ -51,11 +51,11 @@ bool LidarObstacleSegmentation::Init(
   use_map_manager_ = use_map_manager_ && options.enable_hdmap_input;
 
   SceneManagerInitOptions scene_manager_init_options;
-  CHECK(SceneManager::Instance().Init(scene_manager_init_options));
+  ACHECK(SceneManager::Instance().Init(scene_manager_init_options));
 
   PointCloudPreprocessorInitOptions preprocessor_init_options;
   preprocessor_init_options.sensor_name = sensor_name;
-  CHECK(cloud_preprocessor_.Init(preprocessor_init_options));
+  ACHECK(cloud_preprocessor_.Init(preprocessor_init_options));
 
   if (use_map_manager_) {
     MapManagerInitOptions map_manager_init_options;
@@ -70,15 +70,15 @@ bool LidarObstacleSegmentation::Init(
   CHECK_NOTNULL(segmentor_.get());
   SegmentationInitOptions segmentation_init_options;
   segmentation_init_options.sensor_name = sensor_name;
-  CHECK(segmentor_->Init(segmentation_init_options));
+  ACHECK(segmentor_->Init(segmentation_init_options));
 
   ObjectBuilderInitOptions builder_init_options;
-  CHECK(builder_.Init(builder_init_options));
+  ACHECK(builder_.Init(builder_init_options));
 
   if (use_object_filter_bank_) {
     ObjectFilterInitOptions filter_bank_init_options;
     filter_bank_init_options.sensor_name = sensor_name;
-    CHECK(filter_bank_.Init(filter_bank_init_options));
+    ACHECK(filter_bank_.Init(filter_bank_init_options));
   }
 
   return true;

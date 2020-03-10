@@ -17,7 +17,6 @@
 /**
  * @file
  **/
-#include <ctime>
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
@@ -26,6 +25,8 @@
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::math::Vec2d;
 
 class ObstacleContainer {
  public:
@@ -210,7 +211,7 @@ class ResultContainer {
 extern "C" {
 HybridAStar* CreateHybridAPtr() {
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  CHECK(apollo::cyber::common::GetProtoFromFile(
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
@@ -417,7 +418,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
                   double sphi, double ex, double ey, double ephi,
                   double* XYbounds) {
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  CHECK(apollo::cyber::common::GetProtoFromFile(
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;

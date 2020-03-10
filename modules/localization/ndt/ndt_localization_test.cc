@@ -41,8 +41,8 @@ TEST_F(NDTLocalizationTest, Init) {
   FLAGS_local_utm_zone_id = 10;
   FLAGS_online_resolution = 0.25;
   ndt_localization_ptr_->Init();
-  ASSERT_EQ(ndt_localization_ptr_->GetZoneId(), 10);
-  ASSERT_LE(std::abs(ndt_localization_ptr_->GetOnlineResolution() - 0.25),
+  EXPECT_EQ(ndt_localization_ptr_->GetZoneId(), 10);
+  EXPECT_LE(std::abs(ndt_localization_ptr_->GetOnlineResolution() - 0.25),
             0.01);
 }
 

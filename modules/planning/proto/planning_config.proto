@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/planning/proto/decider_config.proto";
+import "modules/planning/proto/creep_decider_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/lane_change_decider_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
@@ -17,7 +17,6 @@ import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/piecewise_jerk_nonlinear_speed_config.proto";
-import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/rule_based_stop_decider_config.proto";
 import "modules/planning/proto/speed_bounds_decider_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
@@ -40,7 +39,6 @@ message TaskConfig {
     NAVI_OBSTACLE_DECIDER = 9;
     CREEP_DECIDER = 11;
     OPEN_SPACE_PRE_STOP_DECIDER = 12;
-    PROCEED_WITH_CAUTION_SPEED = 15;
     DECIDER_RSS = 16;
     SPEED_BOUNDS_PRIORI_DECIDER = 17;
     SPEED_BOUNDS_FINAL_DECIDER = 18;
@@ -63,7 +61,6 @@ message TaskConfig {
   oneof task_config {
     SpeedHeuristicConfig speed_heuristic_config = 3;
     PathDeciderConfig path_decider_config = 7;
-    ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
     CreepDeciderConfig creep_decider_config = 10;
     OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
@@ -95,11 +92,11 @@ message ScenarioBareIntersectionUnprotectedConfig {
       [default = 25.0];  // meter
   // explicit stop while waiting
   optional bool enable_explicit_stop = 2 [default = false];
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
+  optional double min_pass_s_distance = 3 [default = 3.0];       // meter
   optional double approach_cruise_speed = 4 [default = 6.7056];  // m/s (15 mph)
-  optional double stop_distance = 5 [default = 0.5];            // meter
-  optional float stop_timeout_sec = 6 [default = 8.0];          // sec
-  optional float creep_timeout_sec = 7 [default = 10.0];        // sec
+  optional double stop_distance = 5 [default = 0.5];             // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];           // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];         // sec
 }
 
 message ScenarioStopSignUnprotectedConfig {
@@ -122,12 +119,14 @@ message ScenarioTrafficLightProtectedConfig {
 }
 
 message ScenarioTrafficLightUnprotectedLeftTurnConfig {
-  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
-  optional double approach_cruise_speed = 2 [default = 2.78];  // m/s (10km/h)
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];                                          // meter
+  optional double approach_cruise_speed = 2 [default = 2.78];   // m/s (10km/h)
   optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
-  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
-  optional float creep_timeout_sec = 5 [default = 10.0];  // sec
-  optional double max_adc_speed_before_creep = 6 [default = 5.56];  // m/s (20m/h)
+  optional double min_pass_s_distance = 4 [default = 3.0];      // meter
+  optional float creep_timeout_sec = 5 [default = 10.0];        // sec
+  optional double max_adc_speed_before_creep = 6
+      [default = 5.56];  // m/s (20m/h)
 }
 
 message ScenarioTrafficLightUnprotectedRightTurnConfig {
@@ -162,8 +161,8 @@ message ScenarioPullOverConfig {
 message ScenarioEmergencyPullOverConfig {
   optional double max_stop_deceleration = 1 [default = 3.0];
   optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
-  optional double target_slow_down_speed = 3 [default = 2.5];  // m/s
-  optional double stop_distance = 4 [default = 1.5];  // meter
+  optional double target_slow_down_speed = 3 [default = 2.5];       // m/s
+  optional double stop_distance = 4 [default = 1.5];                // meter
 }
 
 message ScenarioEmergencyStopConfig {
@@ -183,6 +182,7 @@ message ScenarioParkAndGoConfig {
   optional double front_obstacle_buffer = 1 [default = 4.0];  // meter
   optional double heading_buffer = 2 [default = 0.5];         // rad
   optional double min_dist_to_dest = 3 [default = 25.0];      // meter
+  optional double max_steering_percentage_when_cruise = 4 [default = 90.0];
 }
 
 message ScenarioYieldSignConfig {
@@ -272,6 +272,7 @@ message ScenarioConfig {
     PARK_AND_GO_CHECK = 800;
     PARK_AND_GO_CRUISE = 801;
     PARK_AND_GO_ADJUST = 802;
+    PARK_AND_GO_PRE_CRUISE = 803;
 
     YIELD_SIGN_APPROACH = 900;
     YIELD_SIGN_CREEP = 901;

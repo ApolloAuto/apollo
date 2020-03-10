@@ -56,6 +56,12 @@ class StoryTellingContainer : public Container {
   std::shared_ptr<const hdmap::JunctionInfo> ADCJunction() const;
 
   /**
+   * @brief Get ADC junction id
+   * @return A reference of ADC_junction_id
+   */
+  const std::string& ADCJunctionId() const;
+
+  /**
    * @brief Compute ADC's distance to junction
    * @return ADC's distance to junction
    */

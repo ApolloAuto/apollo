@@ -20,6 +20,7 @@
 #include "modules/planning/scenarios/park_and_go/stage_adjust.h"
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
+#include "modules/planning/scenarios/park_and_go/stage_pre_cruise.h"
 
 namespace apollo {
 namespace planning {
@@ -59,6 +60,11 @@ void ParkAndGoScenario::RegisterStages() {
       ScenarioConfig::PARK_AND_GO_ADJUST,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new ParkAndGoStageAdjust(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::PARK_AND_GO_PRE_CRUISE,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new ParkAndGoStagePreCruise(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::PARK_AND_GO_CRUISE,

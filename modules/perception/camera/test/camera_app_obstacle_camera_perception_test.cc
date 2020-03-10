@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+#include "gtest/gtest.h"
 
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 
@@ -106,7 +106,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
   data_options.device_id = 0;
   data_options.sensor_name = "front_6mm";
   DataProvider data_provider;
-  CHECK(data_provider.Init(data_options));
+  ACHECK(data_provider.Init(data_options));
   for (auto &frame : frame_list) {
     frame.track_feature_blob.reset(new base::Blob<float>());
     frame.data_provider = &data_provider;

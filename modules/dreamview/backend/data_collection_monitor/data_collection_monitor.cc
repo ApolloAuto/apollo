@@ -16,8 +16,8 @@
 
 #include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/message.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -119,8 +119,8 @@ void DataCollectionMonitor::LoadConfiguration() {
     data_collection_config_path = FLAGS_default_data_collection_config_path;
   }
 
-  CHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
-                                        &data_collection_table_))
+  ACHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
+                                         &data_collection_table_))
       << "Unable to parse data collection configuration from file "
       << data_collection_config_path;
 

@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 

@@ -16,14 +16,10 @@
 
 #pragma once
 
-#include <functional>
-#include <set>
 #include <string>
 #include <tuple>
-#include <unordered_map>
 #include <vector>
 
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 

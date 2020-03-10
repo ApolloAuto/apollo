@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common/util/util.h"
+#include "modules/common/util/future.h"
 #include "modules/planning/common/indexed_queue.h"
 
 namespace apollo {

@@ -15,9 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <grpc++/grpc++.h>
 #include <memory>
 #include <vector>
+
+#include "grpc++/grpc++.h"
 
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/server/alignment.h"

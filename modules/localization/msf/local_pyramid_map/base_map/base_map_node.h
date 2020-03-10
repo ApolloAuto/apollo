@@ -15,10 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "modules/localization/msf/common/util/compression.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
@@ -38,7 +39,7 @@ class BaseMapNode {
   /**@brief Construct a map node. */
   BaseMapNode();
   /**@brief Construct a map node. */
-  explicit BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy);
+  BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy);
   /**@brief Destruct a map node. */
   virtual ~BaseMapNode();
 

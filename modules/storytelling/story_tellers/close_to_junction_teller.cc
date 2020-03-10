@@ -34,7 +34,7 @@ using apollo::prediction::PredictionMap;
 
 bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
   const auto junctions = PredictionMap::GetPNCJunctions(
-      Eigen::Vector2d(point.x(), point.y()), FLAGS_junction_search_radius);
+      {point.x(), point.y()}, FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
@@ -50,7 +50,7 @@ bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
 bool IsPointInRegularJunction(const PathPoint& point,
                               std::string* junction_id) {
   const auto junctions = PredictionMap::GetJunctions(
-      Eigen::Vector2d(point.x(), point.y()), FLAGS_junction_search_radius);
+      {point.x(), point.y()}, FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
@@ -101,6 +101,7 @@ double DistanceToJunction(const ADCTrajectory& adc_trajectory,
 void CloseToJunctionTeller::Init() {
   auto* manager = FrameManager::Instance();
   manager->CreateOrGetReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+  ACHECK(PredictionMap::Ready()) << "PredictionMap not ready";
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {
@@ -113,19 +114,18 @@ void CloseToJunctionTeller::Update(Stories* stories) {
     return;
   }
 
-  auto& logger = manager->LogBuffer();
   std::string junction_id;
   const double distance = DistanceToJunction(*trajectory, &junction_id);
   const bool close_to_junction = distance >= 0;
   if (close_to_junction) {
     if (!stories->has_close_to_junction()) {
-      logger.INFO("Enter CloseToJunction Story");
+      AINFO << "Enter CloseToJunction story";
     }
     auto* story = stories->mutable_close_to_junction();
     story->set_distance(distance);
     story->set_junction_id(junction_id);
   } else if (stories->has_close_to_junction()) {
-    logger.INFO("Exit CloseToJunction Story");
+    AINFO << "Exit CloseToJunction story";
     stories->clear_close_to_junction();
   }
 }

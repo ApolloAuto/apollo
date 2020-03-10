@@ -76,7 +76,7 @@ cc_test(
     srcs = ["sensor_frame_test.cc"],
     deps = [
         ":sensor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -86,7 +86,7 @@ cc_test(
     srcs = ["sensor_test.cc"],
     deps = [
         ":sensor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -96,7 +96,7 @@ cc_test(
     srcs = ["sensor_object_test.cc"],
     deps = [
         ":sensor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -109,6 +109,7 @@ cc_library(
         "//modules/perception/base:frame",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/lib/thread",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -121,7 +122,7 @@ cc_test(
     ],
     deps = [
         ":sensor_data_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -131,6 +132,7 @@ cc_library(
     hdrs = ["track.h"],
     deps = [
         ":sensor",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -140,7 +142,7 @@ cc_test(
     srcs = ["track_test.cc"],
     deps = [
         ":track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

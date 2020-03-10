@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/dp_road_graph.h"
 
-#include <utility>
-
 #include "cyber/task/task.h"
 
 #include "modules/common/proto/error_code.pb.h"
@@ -55,9 +53,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   CHECK_NOTNULL(path_data);
 
   init_point_ = init_point;
-  if (!reference_line_.XYToSL(
-          {init_point_.path_point().x(), init_point_.path_point().y()},
-          &init_sl_point_)) {
+  if (!reference_line_.XYToSL(init_point_.path_point(), &init_sl_point_)) {
     AERROR << "Fail to create init_sl_point from : "
            << init_point.DebugString();
     return false;
@@ -111,7 +107,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
 bool DpRoadGraph::GenerateMinCostPath(
     const std::vector<const Obstacle *> &obstacles,
     std::vector<DpRoadGraphNode> *min_cost_path) {
-  CHECK(min_cost_path != nullptr);
+  ACHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
   if (!waypoint_sampler_->SamplePathWaypoints(init_point_, &path_waypoints) ||
@@ -203,10 +199,10 @@ bool DpRoadGraph::GenerateMinCostPath(
 }
 
 void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
-  DCHECK_NOTNULL(msg);
-  DCHECK_NOTNULL(msg->trajectory_cost);
-  DCHECK_NOTNULL(msg->front);
-  DCHECK_NOTNULL(msg->cur_node);
+  CHECK_NOTNULL(msg);
+  CHECK_NOTNULL(msg->trajectory_cost);
+  CHECK_NOTNULL(msg->front);
+  CHECK_NOTNULL(msg->cur_node);
   for (const auto &prev_dp_node : msg->prev_nodes) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
     const auto &cur_point = msg->cur_node->sl_point;

@@ -1,3 +1,5 @@
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -15,9 +17,10 @@ proto_library(
     ],
 )
 
-filegroup(
-    name = "data",
-    srcs = glob([
-        "hm_tracker_test/**/*",
-    ]),
+py_proto(
+    name = "simple_pb2",
+    src = "simple.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
 )

@@ -20,7 +20,7 @@ cc_test(
     ],
     deps = [
         "//modules/prediction/network/rnn_model",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -16,11 +16,12 @@
 
 #include "cyber/logger/logger.h"
 
-#include <glog/logging.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include <unordered_map>
 #include <utility>
+
+#include "glog/logging.h"
 
 #include "cyber/logger/log_file_object.h"
 #include "cyber/logger/logger_util.h"

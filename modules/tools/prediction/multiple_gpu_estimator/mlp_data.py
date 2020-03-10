@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -28,12 +30,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Prediction data set.
 
-"""
+"""Prediction data set"""
+
 import os
 
 import tensorflow as tf
+
 
 dim_input = 62
 

@@ -9,17 +9,17 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/common:canbus_common",
         "//modules/canbus/vehicle:vehicle_factory",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
+        "//modules/common/status",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/guardian/proto:guardian_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -29,7 +29,8 @@ cc_test(
     srcs = ["canbus_test.cc"],
     deps = [
         ":canbus_lib",
-        "@gtest//:main",
+        "//modules/common/status",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

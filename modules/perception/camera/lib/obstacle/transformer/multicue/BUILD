@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,6 +36,11 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
     ],
+)
+
+py_proto(
+    name = "multicue_pb2",
+    src = "multicue.proto",
 )
 
 cpplint()

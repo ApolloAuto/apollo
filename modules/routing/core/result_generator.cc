@@ -16,6 +16,7 @@
 #include "modules/routing/core/result_generator.h"
 
 #include <algorithm>
+#include <cmath>
 #include <unordered_set>
 
 #include "cyber/common/log.h"
@@ -33,7 +34,7 @@ bool IsCloseEnough(double value_1, double value_2) {
 
 const NodeWithRange& GetLargestRange(
     const std::vector<NodeWithRange>& node_vec) {
-  CHECK(!node_vec.empty());
+  ACHECK(!node_vec.empty());
   size_t result_idx = 0;
   double result_range_length = 0.0;
   for (size_t i = 0; i < node_vec.size(); ++i) {
@@ -48,7 +49,7 @@ const NodeWithRange& GetLargestRange(
 bool ResultGenerator::ExtractBasicPassages(
     const std::vector<NodeWithRange>& nodes,
     std::vector<PassageInfo>* const passages) {
-  CHECK(!nodes.empty());
+  ACHECK(!nodes.empty());
   passages->clear();
   std::vector<NodeWithRange> nodes_of_passage;
   nodes_of_passage.push_back(nodes.at(0));
@@ -348,7 +349,7 @@ void ResultGenerator::AddRoadSegment(
 
 void ResultGenerator::CreateRoadSegments(
     const std::vector<PassageInfo>& passages, RoutingResponse* result) {
-  CHECK(!passages.empty()) << "passages empty";
+  ACHECK(!passages.empty()) << "passages empty";
   NodeWithRange fake_node_range(passages.front().nodes.front());
   bool in_change_lane = false;
   std::pair<std::size_t, std::size_t> start_index(0, 0);

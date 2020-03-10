@@ -15,11 +15,12 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/client/client.h"
 
-#include <yaml-cpp/yaml.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
+
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_alignment.h"

@@ -7,9 +7,13 @@ import "modules/v2x/proto/v2x_traffic_light.proto";
 
 service ObuToCar {
   // for onboard unit send perception obstacles (from rsu) results to car end
-  rpc SendPerceptionObstacles (apollo.perception.PerceptionObstacles) returns (StatusResponse) {}
+  rpc SendPerceptionObstacles(apollo.perception.PerceptionObstacles)
+      returns (StatusResponse) {
+  }
   // for onboard unit send v2x trafficlights (from rsu) results to car end
-  rpc SendV2xTrafficLight (apollo.v2x.IntersectionTrafficLightData) returns (StatusResponse) {}
+  rpc SendV2xTrafficLight(apollo.v2x.IntersectionTrafficLightData)
+      returns (StatusResponse) {
+  }
 }
 
 // The response message containing the status.

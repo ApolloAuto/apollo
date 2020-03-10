@@ -16,11 +16,11 @@
 
 #pragma once
 
+#include <boost/thread.hpp>
 #include <list>
 #include <map>
 #include <utility>
 
-#include "boost/thread.hpp"
 #include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 

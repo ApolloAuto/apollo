@@ -16,21 +16,19 @@
 
 #include "cyber/logger/async_logger.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include <thread>
 #include <unordered_map>
 
 #include "cyber/base/macros.h"
-#include "cyber/logger/log_file_object.h"
 #include "cyber/logger/logger_util.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
-static std::unordered_map<std::string, LogFileObject*> moduleLoggerMap;
-static std::unordered_map<char, int> log_level_map = {
+static const std::unordered_map<char, int> log_level_map = {
     {'F', 3}, {'E', 2}, {'W', 1}, {'I', 0}};
 
 AsyncLogger::AsyncLogger(google::base::Logger* wrapped) : wrapped_(wrapped) {
@@ -38,12 +36,7 @@ AsyncLogger::AsyncLogger(google::base::Logger* wrapped) : wrapped_(wrapped) {
   flushing_buf_.reset(new std::deque<Msg>());
 }
 
-AsyncLogger::~AsyncLogger() {
-  for (auto& logger : moduleLoggerMap) {
-    delete logger.second;
-  }
-  moduleLoggerMap.clear();
-}
+AsyncLogger::~AsyncLogger() { Stop(); }
 
 void AsyncLogger::Start() {
   CHECK_EQ(state_.load(std::memory_order_acquire), INITTED);
@@ -53,36 +46,40 @@ void AsyncLogger::Start() {
 }
 
 void AsyncLogger::Stop() {
-  CHECK_EQ(state_.load(std::memory_order_acquire), RUNNING);
   state_.store(STOPPED, std::memory_order_release);
   if (log_thread_.joinable()) {
     log_thread_.join();
   }
 
   FlushBuffer(active_buf_);
-  CHECK(active_buf_->empty());
-  CHECK(flushing_buf_->empty());
+  ACHECK(active_buf_->empty());
+  ACHECK(flushing_buf_->empty());
   // std::cout << "Async Logger Stop!" << std::endl;
 }
 
 void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
                         int message_len) {
-  (void)force_flush;
   if (cyber_unlikely(state_.load(std::memory_order_acquire) != RUNNING)) {
     // std::cout << "Async Logger not running!" << std::endl;
     return;
   }
-  auto msg_str = std::string(message, message_len);
-  while (flag_.test_and_set(std::memory_order_acquire)) {
-    cpu_relax();
+  if (message_len > 0) {
+    auto msg_str = std::string(message, message_len);
+    while (flag_.test_and_set(std::memory_order_acquire)) {
+      cpu_relax();
+    }
+    active_buf_->emplace_back(timestamp, std::move(msg_str),
+                              log_level_map.at(message[0]));
+    flag_.clear(std::memory_order_release);
   }
-  active_buf_->emplace_back(timestamp, std::move(msg_str),
-                            log_level_map[message[0]]);
-  flag_.clear(std::memory_order_release);
+
+  if (force_flush && timestamp == 0 && message && message_len == 0) {
+    Stop();
+  }
 }
 
 void AsyncLogger::Flush() {
-  for (auto& module_logger : moduleLoggerMap) {
+  for (auto& module_logger : module_logger_map_) {
     module_logger.second->Flush();
   }
 }
@@ -109,23 +106,19 @@ void AsyncLogger::FlushBuffer(const std::unique_ptr<std::deque<Msg>>& buffer) {
     auto& msg = buffer->front();
     FindModuleName(&(msg.message), &module_name);
 
-    LogFileObject* fileobject = nullptr;
-    if (moduleLoggerMap.find(module_name) != moduleLoggerMap.end()) {
-      fileobject = moduleLoggerMap[module_name];
-    } else {
+    if (module_logger_map_.find(module_name) == module_logger_map_.end()) {
       std::string file_name = module_name + ".log.INFO.";
       if (!FLAGS_log_dir.empty()) {
         file_name = FLAGS_log_dir + "/" + file_name;
       }
-      fileobject = new LogFileObject(google::INFO, file_name.c_str());
-      fileobject->SetSymlinkBasename(module_name.c_str());
-      moduleLoggerMap[module_name] = fileobject;
+      module_logger_map_[module_name].reset(
+          new LogFileObject(google::INFO, file_name.c_str()));
+      module_logger_map_[module_name]->SetSymlinkBasename(module_name.c_str());
     }
-    if (fileobject) {
-      const bool force_flush = msg.level > 0;
-      fileobject->Write(force_flush, msg.ts, msg.message.data(),
+    const bool force_flush = msg.level > 0;
+    module_logger_map_.find(module_name)
+        ->second->Write(force_flush, msg.ts, msg.message.data(),
                         static_cast<int>(msg.message.size()));
-    }
     buffer->pop_front();
   }
   Flush();

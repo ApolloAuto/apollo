@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -19,10 +19,13 @@
 """
 This is a bunch of classes to manage cyber record channel FileIO.
 """
-import numpy as np
+
 import os
 import sys
 import struct
+
+import numpy as np
+
 
 class FileObject(object):
     """Wrapper for file object"""
@@ -53,8 +56,10 @@ class FileObject(object):
     def save_to_file(self, data):
         raise NotImplementedError
 
+
 class TimestampFileObject(FileObject):
     """class to handle sensor timestamp for each Apollo sensor channel"""
+
     def __init__(self, file_path, operation='write', file_type='txt'):
         super(TimestampFileObject, self).__init__(file_path,
                                                   operation, file_type)
@@ -64,7 +69,8 @@ class TimestampFileObject(FileObject):
             raise ValueError("timestamps must be in a list")
 
         for i, ts in enumerate(data):
-            self._file_object.write("%05d %.6f\n" %(i + 1, ts))
+            self._file_object.write("%05d %.6f\n" % (i + 1, ts))
+
 
 class OdometryFileObject(FileObject):
     """class to handle gnss/odometry topic"""
@@ -75,15 +81,14 @@ class OdometryFileObject(FileObject):
         s0 = struct.Struct('d')
         s1 = struct.Struct('I')
         s2 = struct.Struct('7d')
-        data = np.zeros((data_size,9), dtype='float64')
-        #, int32, float64, float64, float64, float64, float64, float64, float64')
+        data = np.zeros((data_size, 9), dtype='float64')
+        # , int32, float64, float64, float64, float64, float64, float64, float64')
         for d in data:
             #d[0] = s0.unpack_from(self._file_object.read(s0.size))[0]
             d[0] = s0.unpack(self._file_object.read(s0.size))[0]
             d[1] = s1.unpack_from(self._file_object.read(s1.size))[0]
             d[2:] = np.array(s2.unpack_from(self._file_object.read(s2.size)))
         return data.tolist()
-
 
     def save_to_file(self, data):
         """

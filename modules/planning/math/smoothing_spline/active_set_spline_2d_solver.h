@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include <qpOASES.hpp>
-
 #include <memory>
 #include <vector>
+
+#include "qpOASES.hpp"
 
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_constraint.h"

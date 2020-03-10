@@ -156,18 +156,18 @@ void PlanningTestBase::SetUp() {
     planning_ = std::unique_ptr<PlanningBase>(new OnLanePlanning());
   }
 
-  CHECK(FeedTestData()) << "Failed to feed test data";
+  ACHECK(FeedTestData()) << "Failed to feed test data";
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_planning_config_file, &config_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_planning_config_file, &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
-  CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
+  ACHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
 
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
-    CHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
+    ACHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_->last_publishable_trajectory_.reset(
         new PublishableTrajectory(prev_planning));
   }
@@ -180,13 +180,13 @@ void PlanningTestBase::SetUp() {
 }
 
 void PlanningTestBase::UpdateData() {
-  CHECK(FeedTestData()) << "Failed to feed test data";
+  ACHECK(FeedTestData()) << "Failed to feed test data";
 
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
-    CHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
+    ACHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_->last_publishable_trajectory_.reset(
         new PublishableTrajectory(prev_planning));
   }

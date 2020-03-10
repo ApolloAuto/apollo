@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["pyramid_map_config.h"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
-        "@glog",
+        "@com_google_glog//:glog",
     ],
 )
 
@@ -29,8 +29,8 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_matrix",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -42,8 +42,8 @@ cc_library(
         ":localization_pyramid_map_pyramid_map_config",
         ":localization_pyramid_map_pyramid_map_matrix",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_node",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -53,8 +53,8 @@ cc_library(
     hdrs = ["pyramid_map_node_config.h"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_node_config",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -69,8 +69,8 @@ cc_library(
         ":localization_pyramid_map_pyramid_map_node_config",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_node",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -91,8 +91,8 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_pool",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -105,8 +105,8 @@ cc_library(
         ":localization_pyramid_map_pyramid_map_node",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -117,7 +117,7 @@ cc_test(
     srcs = ["pyramid_map_config_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map_config",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     srcs = ["pyramid_map_matrix_handler_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix_handler",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -140,7 +140,7 @@ cc_test(
     copts = ["-Dprivate=public"],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -151,7 +151,7 @@ cc_test(
     srcs = ["pyramid_map_node_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map_node",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -164,7 +164,7 @@ cc_test(
         ":localization_pyramid_map_pyramid_map",
         ":localization_pyramid_map_pyramid_map_pool",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -176,7 +176,7 @@ cc_test(
     deps = [
         ":localization_pyramid_map_pyramid_map",
         ":localization_pyramid_map_pyramid_map_pool",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

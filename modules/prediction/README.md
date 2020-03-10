@@ -4,6 +4,8 @@
 The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
 Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles.
 
+In **Apollo 5.5**, the Prediction module introduces a new model - **Caution Obstacle**. Together with aggressively emphasizing on caution when proceeding to a junction, this model will now scan all obstacles that have entered the junction as long as computing resources permit. The Semantic LSTM Evaluator and the Extrapolation Predictor have also been introduced in Apolo 5.5 to support the Caution Obstacle model.
+
 ```
 Note:
 The Prediction module only predicts the behavior of obstacles and not the EGO car. The Planning module plans the trajectory of the EGO car.
@@ -64,6 +66,8 @@ There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cr
 
 * **Social Interaction evaluator**: this model is used for pedestrians, for short term trajectory prediction. It uses social LSTM. This evaluator was created for caution level obstacles
 
+* **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM
+
 
 ### Predictor
 
@@ -77,6 +81,7 @@ Predictor generates predicted trajectories for obstacles. Currently, the support
 * **Regional movement**: obstacle moves in a possible region
 * **Junction**: Obstacles move toward junction exits with high probabilities
 * **Interaction predictor**: compute the likelihood to create posterior prediction results after all evaluators have run. This predictor was created for caution level obstacles
+* **Extrapolation predictor**: extends the Semantic LSTM evaluator's results to create an 8 sec trajectory.
 
 ## Prediction Architecture
 
@@ -87,7 +92,3 @@ The prediction module estimates the future motion trajectories for all perceived
 The prediction module also takes messages from both localization and planning as input. The structure is shown below:
 
 ![](images/architecture2.png)
-
-
-
-

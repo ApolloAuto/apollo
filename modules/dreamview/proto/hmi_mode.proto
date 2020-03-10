@@ -19,9 +19,9 @@ message ChannelMonitorConfig {
   // Specify in the format of "a.b.c"
   repeated string mandatory_fields = 3;
 
-  // Maximum latency allowed for this channel
-  // Alert may be triggered if average latency exceeds this value.
-  optional uint64 max_latency_allowed = 4;  // In nano seconds.
+  // Minimum and maximum frequency allowed for this channel
+  optional double min_frequency_allowed = 4 [default = 0.0];
+  optional double max_frequency_allowed = 5 [default = 1000.0];
 }
 
 // For ResourceMonitor.
@@ -37,17 +37,30 @@ message ResourceMonitorConfig {
   message CPUUsage {
     optional float high_cpu_usage_warning = 1;
     optional float high_cpu_usage_error = 2;
+    // The process's dag path, if not set it will check the system's overall CPU
+    // usage
+    optional string process_dag_path = 3;
   }
 
   message MemoryUsage {
     optional int32 high_memory_usage_warning = 1;
     optional int32 high_memory_usage_error = 2;
+    // The process's dag path, if not set it will check the system's overall
+    // memory usage
+    optional string process_dag_path = 3;
+  }
+
+  message DiskLoad {
+    optional int32 high_disk_load_warning = 1;
+    optional int32 high_disk_load_error = 2;
+    // Disk device name, such as sda, sdb and etc
+    optional string device_name = 3;
   }
 
   repeated DiskSpace disk_spaces = 1;
-  optional CPUUsage cpu_usage = 2;
-  optional MemoryUsage memory_usage = 3;
-  optional string process_dag_path = 4;
+  repeated CPUUsage cpu_usages = 2;
+  repeated MemoryUsage memory_usages = 3;
+  repeated DiskLoad disk_load_usages = 4;
 }
 
 // A monitored component will be listed on HMI which only shows its status but

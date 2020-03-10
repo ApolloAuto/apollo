@@ -36,7 +36,7 @@ class MracControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
     lat_controller_conf_ = control_conf_.lat_controller_conf();
     steering_latency_param_.set_dead_time(0.0);
     steering_latency_param_.set_rise_time(0.0);
@@ -57,13 +57,14 @@ TEST_F(MracControllerTest, MracControl) {
   MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();
   MracController mrac_controller;
   mrac_controller.Init(mrac_conf, steering_latency_param_, dt);
-  mrac_controller.Reset();
+  mrac_controller.SetInitialInputAdaptionGain(0.0);
   double limit = 100.0;
   double rate_limit = 100.0 / dt;
   state(0, 0) = 6.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), 0.0,
               1e-6);
   mrac_controller.Reset();
+  mrac_controller.SetInitialInputAdaptionGain(0.0);
   state(0, 0) = 10.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), -8.48,
               1e-6);
@@ -76,6 +77,7 @@ TEST_F(MracControllerTest, MracControl) {
   EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain()(0, 0), -0.2, 1e-6);
   EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain()(0, 0), -0.36, 1e-6);
   mrac_controller.Reset();
+  mrac_controller.SetInitialInputAdaptionGain(0.0);
   state(0, 0) = -10.0;
   double control_value =
       mrac_controller.Control(-18.0, state, limit, rate_limit);
@@ -83,12 +85,14 @@ TEST_F(MracControllerTest, MracControl) {
   // test the bounded conditions of the system output
   dt = 0.01;
   mrac_controller.Init(mrac_conf, steering_latency_param_, dt);
+  mrac_controller.SetInitialInputAdaptionGain(0.0);
   state(0, 0) = 10.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, 100.0, 1.0 / dt), -1.0,
               1e-6);
   EXPECT_EQ(mrac_controller.ReferenceSaturationStatus(), 2);
   EXPECT_EQ(mrac_controller.ControlSaturationStatus(), -2);
   mrac_controller.Reset();
+  mrac_controller.SetInitialInputAdaptionGain(0.0);
   state(0, 0) = 10.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, 10.0, 100.0 / dt), -8.48,
               1e-6);
@@ -135,6 +139,7 @@ TEST_F(MracControllerTest, HighOrderMracControl) {
   mrac_controller.SetInitialReferenceState(reference_init);
   mrac_controller.SetInitialActionState(action_init);
   mrac_controller.SetInitialCommand(command_init);
+  mrac_controller.SetInitialInputAdaptionGain(0.0);
   // 2nd order system test
   EXPECT_NEAR(mrac_controller.Control(15.0, state, limit, rate_limit), 3.738,
               1e-3);

@@ -9,7 +9,7 @@ cc_test(
     deps = [
         ":base_matcher",
         "//modules/perception/radar/lib/tracker/common:radar_track_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

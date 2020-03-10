@@ -27,7 +27,7 @@ from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 
 # init vars
-CYBER_PATH = os.environ['CYBER_PATH']
+CYBER_PATH = os.environ.get('CYBER_PATH', '/apollo/cyber')
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
 sys.path.append(CYBER_PATH + "/third_party/")
 sys.path.append(CYBER_PATH + "/lib/")
@@ -35,6 +35,9 @@ sys.path.append(CYBER_PATH + "/lib/")
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
+wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                '../../py_wrapper'))
+sys.path.insert(0, wrapper_lib_path)
 _CYBER_RECORD = importlib.import_module('_cyber_record_py3')
 PyBagMessage = collections.namedtuple('PyBagMessage',
                                       'topic message data_type timestamp')

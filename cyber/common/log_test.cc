@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "cyber/common/log.h"
-#include <glog/logging.h>
-#include <gtest/gtest.h>
+
+#include "glog/logging.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

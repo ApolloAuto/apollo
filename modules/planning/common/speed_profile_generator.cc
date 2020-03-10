@@ -21,8 +21,6 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include <algorithm>
-#include <limits>
-#include <memory>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"
@@ -33,10 +31,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::SLPoint;
 using apollo::common::SpeedPoint;
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::Vec2d;
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     const double stop_distance) {
@@ -67,19 +62,15 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
                                                    init_s);
 
   std::vector<double> end_state_ref(num_of_knots, stop_distance);
-  piecewise_jerk_problem.set_x_ref(1000.0, end_state_ref);
+  piecewise_jerk_problem.set_x_ref(1.0, end_state_ref);
 
-  // TODO(Hongyi): tune the params and move to a config
-  piecewise_jerk_problem.set_weight_ddx(1.0);
-  piecewise_jerk_problem.set_weight_dddx(0.01);
+  piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
   piecewise_jerk_problem.set_x_bounds(0.0, std::fmax(stop_distance, 100.0));
   piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                         veh_param.max_acceleration());
-  // TODO(Hongyi): Set back to vehicle_params when ready
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
                                         FLAGS_longitudinal_jerk_upper_bound);
 

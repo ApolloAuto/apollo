@@ -10,7 +10,7 @@ cc_binary(
     ],
     deps = [
         "//modules/prediction/common:message_process",
-        "@boost",
+        "//third_party:boost",
         "@com_google_absl//absl/strings",
         "@opencv",
     ],

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
-#include <pcl/io/pcd_io.h>
+#include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
 
 #define private public
 #include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"
@@ -72,7 +72,7 @@ TEST(SpatioTemporalGroundDetectorTest, test_spatio_temporal_ground_detector) {
   //     "ground_detector/spatio_temporal_ground_detector/"
   //     "pcd_data/QB9178_3_1461752790_1461753090_36701.pcd";
   // bool ret = LoadPCDFile(filename, pc_ptr);
-  // CHECK(ret) << "Failed to load " << filename;
+  // ACHECK(ret) << "Failed to load " << filename;
 
   // // test init
   // std::shared_ptr<SpatioTemporalGroundDetector> detector(

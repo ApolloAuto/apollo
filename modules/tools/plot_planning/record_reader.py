@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-from cyber_py.record import RecordReader
+from cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
 
+
 class RecordItemReader:
     def __init__(self, record_file):
         self.record_file = record_file
+
     def read(self, topics):
         reader = RecordReader(self.record_file)
         for msg in reader.read_messages():

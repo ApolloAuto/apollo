@@ -6,14 +6,12 @@ cc_library(
     name = "kv_db",
     srcs = ["kv_db.cc"],
     hdrs = ["kv_db.h"],
-    linkopts = [
-        "-lsqlite3",
-    ],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/util",
         "//modules/common/util:future",
+        "//third_party:sqlite3",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -23,7 +21,7 @@ cc_test(
     srcs = ["kv_db_test.cc"],
     deps = [
         ":kv_db",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

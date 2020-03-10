@@ -20,11 +20,11 @@
 
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
+
 #include <algorithm>
 #include <utility>
-
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -157,7 +157,7 @@ bool SpiralReferenceLineSmoother::Smooth(
     const double dkappa = p.dkappa();
 
     common::SLPoint ref_sl_point;
-    if (!raw_reference_line.XYToSL({p.x(), p.y()}, &ref_sl_point)) {
+    if (!raw_reference_line.XYToSL(p, &ref_sl_point)) {
       return false;
     }
     if (ref_sl_point.s() < 0 ||

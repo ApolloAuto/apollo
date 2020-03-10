@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
@@ -33,7 +33,7 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
       "/apollo/modules/perception/testdata/"
       "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
+  ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   inference::CudaUtil::set_device_id(0);
   cv::Mat cv_img = cv::imread(

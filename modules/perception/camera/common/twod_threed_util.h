@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <float.h>
 #include <algorithm>
+#include <cfloat>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -251,7 +251,7 @@ bool CheckXY(const T &x, const T &y, int width, int height) {
 template <typename T>
 void UpdateOffsetZ(T x_start, T z_start, T x_end, T z_end,
                    const std::pair<T, T> &range, T *z_offset) {
-  CHECK(range.first < range.second);
+  ACHECK(range.first < range.second);
   if (x_start > x_end) {
     std::swap(x_start, x_end);
     std::swap(z_start, z_end);
@@ -283,7 +283,7 @@ void GetDxDzForCenterFromGroundLineSeg(const LineSegment2D<T> &ls,
   const T Z_UNSTABLE_RATIO = static_cast<T>(0.3f);
 
   dx_dz[0] = dx_dz[1] = (T)0;
-  CHECK(ls.pt_start[0] < ls.pt_end[0]);
+  ACHECK(ls.pt_start[0] < ls.pt_end[0]);
   if (!CheckXY(ls.pt_start[0], ls.pt_start[1], width, height) ||
       !CheckXY(ls.pt_end[0], ls.pt_end[1], width, height)) {
     return;

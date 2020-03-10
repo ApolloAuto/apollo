@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-import random
 import argparse
+import random
+
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
-import hybrid_a_star_visualizer
-import distance_approach_visualizer
-import common.proto_utils as proto_utils
+
 from modules.planning.proto import planner_open_space_config_pb2
+import common.proto_utils as proto_utils
+import distance_approach_visualizer
+import hybrid_a_star_visualizer
 
 
 random.seed(99999)
@@ -32,6 +34,7 @@ original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb
 optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config_-8_4.pb.txt"
 # tunning_object = "coarse_trajectory"
 tunning_object = "smooth_trajectory"
+
 
 def load_open_space_protobuf(filename):
     open_space_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()

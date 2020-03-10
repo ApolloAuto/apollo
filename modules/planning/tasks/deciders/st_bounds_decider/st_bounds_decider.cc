@@ -17,10 +17,6 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
 
 #include <limits>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
 
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
@@ -43,7 +39,7 @@ using ObsDecSet = std::vector<std::pair<std::string, ObjectDecisionType>>;
 }  // namespace
 
 STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
-  CHECK(config.has_st_bounds_decider_config());
+  ACHECK(config.has_st_bounds_decider_config());
   st_bounds_config_ = config.st_bounds_decider_config();
 }
 
@@ -91,7 +87,8 @@ void STBoundsDecider::InitSTBoundsDecider(
   // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
   st_obstacles_processor_.Init(path_data.discretized_path().Length(),
-                               st_bounds_config_.total_time(), path_data);
+                               st_bounds_config_.total_time(), path_data,
+                               path_decision);
   st_obstacles_processor_.MapObstaclesToSTBoundaries(path_decision);
   auto time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = time2 - time1;
@@ -101,8 +98,8 @@ void STBoundsDecider::InitSTBoundsDecider(
   // Initialize Guide-Line and Driving-Limits.
   static constexpr double desired_speed = 15.0;
   st_guide_line_.Init(desired_speed);
-  static constexpr double max_acc = 2.0;
-  static constexpr double max_dec = 4.0;
+  static constexpr double max_acc = 2.5;
+  static constexpr double max_dec = 5.0;
   static constexpr double max_v = desired_speed * 1.5;
   st_driving_limits_.Init(max_acc, max_dec, max_v,
                           frame.PlanningStartPoint().v());

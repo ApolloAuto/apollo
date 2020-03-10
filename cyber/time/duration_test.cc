@@ -16,7 +16,7 @@
 
 #include "cyber/time/duration.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/time/time.h"
 

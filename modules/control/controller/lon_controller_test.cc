@@ -50,7 +50,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
 
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
     timestamp_ = Clock::NowInSeconds();
@@ -72,7 +72,7 @@ class LonControllerTest : public ::testing::Test, LonController {
  protected:
   LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization;
-    CHECK(cyber::common::GetProtoFromFile(filename, &localization))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &localization))
         << "Failed to open file " << filename;
     localization.mutable_header()->set_timestamp_sec(timestamp_);
     return localization;
@@ -80,7 +80,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
   ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return chassis_pb;
@@ -88,7 +88,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
   TrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     TrajectoryPb trajectory_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &trajectory_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &trajectory_pb))
         << "Failed to open file " << filename;
 
     trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);

@@ -5,21 +5,23 @@ package apollo.cyber.proto;
 import "cyber/proto/qos_profile.proto";
 
 message ReaderOption {
-    optional string channel = 1;
-    optional QosProfile qos_profile = 2;  // depth: used to define capacity of processed messages
-    optional uint32 pending_queue_size = 3 [default = 1];  // used to define capacity of unprocessed messages
+  optional string channel = 1;
+  optional QosProfile qos_profile =
+      2;  // depth: used to define capacity of processed messages
+  optional uint32 pending_queue_size = 3
+      [default = 1];  // used to define capacity of unprocessed messages
 }
 
 message ComponentConfig {
-    optional string name  = 1;
-    optional string config_file_path = 2;
-    optional string flag_file_path = 3;
-    repeated ReaderOption readers = 4;
+  optional string name = 1;
+  optional string config_file_path = 2;
+  optional string flag_file_path = 3;
+  repeated ReaderOption readers = 4;
 }
 
 message TimerComponentConfig {
-    optional string name = 1;
-    optional string config_file_path = 2;
-    optional string flag_file_path = 3;
-    optional uint32 interval = 4;  // In milliseconds.
+  optional string name = 1;
+  optional string config_file_path = 2;
+  optional string flag_file_path = 3;
+  optional uint32 interval = 4;  // In milliseconds.
 }

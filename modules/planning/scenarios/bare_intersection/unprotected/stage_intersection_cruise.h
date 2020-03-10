@@ -21,8 +21,8 @@
 #pragma once
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
+#include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 
 namespace apollo {
 namespace planning {

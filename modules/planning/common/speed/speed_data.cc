@@ -46,7 +46,7 @@ void SpeedData::AppendSpeedPoint(const double s, const double time,
                                  const double v, const double a,
                                  const double da) {
   if (!empty()) {
-    CHECK(back().t() < time);
+    ACHECK(back().t() < time);
   }
   push_back(common::util::PointFactory::ToSpeedPoint(s, time, v, a, da));
 }

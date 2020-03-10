@@ -28,10 +28,10 @@ using apollo::perception::PerceptionObstacles;
 using grpc::Status;
 
 GrpcServerImpl::GrpcServerImpl() : node_(cyber::CreateNode("v2x_grpc_server")) {
-  CHECK(node_) << "Create v2x grpc server node failed";
+  ACHECK(node_) << "Create v2x grpc server node failed";
   first_flag_writer_ =
       node_->CreateWriter<StatusResponse>("/apollo/v2x/inner/sync_flag");
-  CHECK(first_flag_writer_) << "Create sync flag writer failed";
+  ACHECK(first_flag_writer_) << "Create sync flag writer failed";
   AINFO << "GrpcServerImpl initial success";
   init_flag_ = true;
 }

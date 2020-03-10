@@ -107,15 +107,16 @@ lat_controller_conf {
   }
   steer_mrac_conf {
     mrac_model_order: 1
-    reference_time_constant: 0.07
+    reference_time_constant: 0.09
     reference_natural_frequency: 10
     reference_damping_ratio: 0.9
-    adaption_state_gain: 0.003
-    adaption_desired_gain: 0.003
-    adaption_nonlinear_gain: 0.003
+    adaption_state_gain: 0.0001
+    adaption_desired_gain: 0.0001
+    adaption_nonlinear_gain: 0.0001
     adaption_matrix_p: 1.0
     mrac_saturation_level: 1.0
-    anti_windup_compensation_gain: 0.003
+    anti_windup_compensation_gain: 0.0001
+    clamping_time_constant: 0.08
   }
 }
 lon_controller_conf {

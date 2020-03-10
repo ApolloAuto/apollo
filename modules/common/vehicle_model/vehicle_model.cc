@@ -84,15 +84,15 @@ VehicleState VehicleModel::Predict(const double predicted_time_horizon,
                                    const VehicleState& cur_vehicle_state) {
   VehicleModelConfig vehicle_model_config;
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_vehicle_model_config_filename,
-                                        &vehicle_model_config))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_vehicle_model_config_filename,
+                                         &vehicle_model_config))
       << "Failed to load vehicle model config file "
       << FLAGS_vehicle_model_config_filename;
 
   // Some models not supported for now
-  CHECK(vehicle_model_config.model_type() !=
-        VehicleModelConfig::COM_CENTERED_DYNAMIC_BICYCLE_MODEL);
-  CHECK(vehicle_model_config.model_type() != VehicleModelConfig::MLP_MODEL);
+  ACHECK(vehicle_model_config.model_type() !=
+         VehicleModelConfig::COM_CENTERED_DYNAMIC_BICYCLE_MODEL);
+  ACHECK(vehicle_model_config.model_type() != VehicleModelConfig::MLP_MODEL);
 
   VehicleState predicted_vehicle_state;
   if (vehicle_model_config.model_type() ==

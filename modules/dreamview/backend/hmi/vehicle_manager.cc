@@ -32,7 +32,7 @@ namespace dreamview {
 using cyber::common::GetProtoFromFile;
 
 VehicleManager::VehicleManager() {
-  CHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
+  ACHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
       << "Unable to parse VehicleData config file "
       << FLAGS_vehicle_data_config_filename;
 }

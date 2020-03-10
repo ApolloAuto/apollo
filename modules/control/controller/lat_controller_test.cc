@@ -44,7 +44,7 @@ class LatControllerTest : public ::testing::Test, LatController {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     ControlConf control_conf;
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
     lateral_conf_ = control_conf.lat_controller_conf();
 
     timestamp_ = Clock::NowInSeconds();
@@ -62,7 +62,7 @@ class LatControllerTest : public ::testing::Test, LatController {
  protected:
   LocalizationPb LoadLocalizaionPb(const std::string &filename) {
     LocalizationPb localization_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &localization_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &localization_pb))
         << "Failed to open file " << filename;
     localization_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return localization_pb;
@@ -70,7 +70,7 @@ class LatControllerTest : public ::testing::Test, LatController {
 
   ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return chassis_pb;
@@ -78,7 +78,7 @@ class LatControllerTest : public ::testing::Test, LatController {
 
   PlanningTrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     PlanningTrajectoryPb planning_trajectory_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &planning_trajectory_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &planning_trajectory_pb))
         << "Failed to open file " << filename;
     planning_trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return planning_trajectory_pb;

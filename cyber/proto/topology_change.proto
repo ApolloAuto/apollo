@@ -5,30 +5,30 @@ package apollo.cyber.proto;
 import "cyber/proto/role_attributes.proto";
 
 enum ChangeType {
-    CHANGE_NODE = 1;
-    CHANGE_CHANNEL = 2;
-    CHANGE_SERVICE = 3;
-    CHANGE_PARTICIPANT = 4;
+  CHANGE_NODE = 1;
+  CHANGE_CHANNEL = 2;
+  CHANGE_SERVICE = 3;
+  CHANGE_PARTICIPANT = 4;
 };
 
 enum OperateType {
-    OPT_JOIN = 1;
-    OPT_LEAVE = 2;
+  OPT_JOIN = 1;
+  OPT_LEAVE = 2;
 };
 
 enum RoleType {
-    ROLE_NODE = 1;
-    ROLE_WRITER = 2;
-    ROLE_READER = 3;
-    ROLE_SERVER = 4;
-    ROLE_CLIENT = 5;
-    ROLE_PARTICIPANT = 6;
+  ROLE_NODE = 1;
+  ROLE_WRITER = 2;
+  ROLE_READER = 3;
+  ROLE_SERVER = 4;
+  ROLE_CLIENT = 5;
+  ROLE_PARTICIPANT = 6;
 };
 
 message ChangeMsg {
-    optional uint64 timestamp = 1;
-    optional ChangeType change_type = 2;
-    optional OperateType operate_type = 3;
-    optional RoleType role_type = 4;
-    optional RoleAttributes role_attr = 5;
+  optional uint64 timestamp = 1;
+  optional ChangeType change_type = 2;
+  optional OperateType operate_type = 3;
+  optional RoleType role_type = 4;
+  optional RoleAttributes role_attr = 5;
 };

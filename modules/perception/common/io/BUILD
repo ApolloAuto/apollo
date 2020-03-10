@@ -12,10 +12,10 @@ cc_library(
         "//modules/perception/base:distortion_model",
         "//modules/perception/base:omnidirectional_model",
         "//modules/perception/common/geometry:basic",
-        "@boost",
+        "//third_party:boost",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_absl//absl/strings",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -28,7 +28,7 @@ cc_test(
     ],
     deps = [
         ":io_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

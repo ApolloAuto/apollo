@@ -23,7 +23,7 @@ namespace prediction {
 
 void GetRecordFileNames(const boost::filesystem::path& p,
                         std::vector<std::string>* record_files) {
-  CHECK(record_files);
+  ACHECK(record_files);
   if (!boost::filesystem::exists(p)) {
     return;
   }

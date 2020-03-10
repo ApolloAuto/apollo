@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,16 +22,18 @@ import sys
 import threading
 
 import gflags
-import numpy as np
 import matplotlib.pyplot as plt
-from cyber_py import cyber
-import common.proto_utils as proto_utils
+import numpy as np
+
+from cyber_py3 import cyber
 from item import Item
-from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.canbus.proto.chassis_pb2 import Chassis
+from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from stitem import Stitem
 from xyitem import Xyitem
+import common.proto_utils as proto_utils
+
 
 VehicleLength = 2.85
 HistLine2display = 2  # The number of lines to display
@@ -226,14 +228,14 @@ def main(argv):
     plotter = Plotter(item1, item2, item3, item4, FLAGS.show_st_graph)
     fig.canvas.mpl_connect('key_press_event', plotter.press)
     planning_sub.create_reader('/apollo/planning',
-                                ADCTrajectory, plotter.callback_planning)
+                               ADCTrajectory, plotter.callback_planning)
     if not FLAGS.show_st_graph:
         localization_sub = cyber.Node("localization_sub")
         localization_sub.create_reader('/apollo/localization/pose',
-            LocalizationEstimate, plotter.callback_localization)
+                                       LocalizationEstimate, plotter.callback_localization)
         chassis_sub = cyber.Node("chassis_sub")
         chassis_sub.create_reader('/apollo/canbus/chassis',
-            Chassis, plotter.callback_chassis)
+                                  Chassis, plotter.callback_chassis)
 
     while not cyber.is_shutdown():
         ax1.draw_artist(ax1.patch)

@@ -16,8 +16,7 @@ cc_library(
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/proto:submodule_messages_proto",
-        "//modules/prediction/submodules:container_output",
+        "//modules/prediction/submodules:submodule_output",
     ],
 )
 
@@ -49,7 +48,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -64,7 +63,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -92,7 +91,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacle_clusters",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

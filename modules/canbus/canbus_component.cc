@@ -177,7 +177,7 @@ void CanbusComponent::Clear() {
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
   common::util::FillHeader(node_->Name(), &chassis);
-  chassis_writer_->Write(std::make_shared<Chassis>(chassis));
+  chassis_writer_->Write(chassis);
   ADEBUG << chassis.ShortDebugString();
 }
 
@@ -185,8 +185,7 @@ void CanbusComponent::PublishChassisDetail() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   ADEBUG << chassis_detail.ShortDebugString();
-  chassis_detail_writer_->Write(
-      std::make_shared<ChassisDetail>(chassis_detail));
+  chassis_detail_writer_->Write(chassis_detail);
 }
 
 bool CanbusComponent::Proc() {
@@ -226,9 +225,7 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
 
 void CanbusComponent::OnGuardianCommand(
     const GuardianCommand &guardian_command) {
-  apollo::control::ControlCommand control_command;
-  control_command.CopyFrom(guardian_command.control_command());
-  OnControlCommand(control_command);
+  OnControlCommand(guardian_command.control_command());
 }
 
 common::Status CanbusComponent::OnError(const std::string &error_msg) {

@@ -15,10 +15,10 @@
  *****************************************************************************/
 #include "modules/perception/fusion/common/dst_evidence.h"
 
+#include <boost/format.hpp>
+
 #include <algorithm>
 #include <bitset>
-
-#include "boost/format.hpp"
 
 #include "cyber/common/log.h"
 
@@ -78,16 +78,16 @@ DstCommonDataPtr DstManager::GetAppDataPtr(const std::string &app_name) {
 size_t DstManager::FodSubsetToInd(const std::string &app_name,
                                   const uint64_t &fod_subset) {
   auto iter0 = dst_common_data_.find(app_name);
-  CHECK(iter0 != dst_common_data_.end());
+  ACHECK(iter0 != dst_common_data_.end());
   auto iter = iter0->second.subsets_ind_map_.find(fod_subset);
-  CHECK(iter != iter0->second.subsets_ind_map_.end());
+  ACHECK(iter != iter0->second.subsets_ind_map_.end());
   return iter->second;
 }
 
 uint64_t DstManager::IndToFodSubset(const std::string &app_name,
                                     const size_t &ind) {
   auto iter = dst_common_data_.find(app_name);
-  CHECK(iter != dst_common_data_.end());
+  ACHECK(iter != dst_common_data_.end());
   return iter->second.fod_subsets_[ind];
 }
 
@@ -201,7 +201,7 @@ Dst::Dst(const std::string &app_name) : app_name_(app_name) {
 }
 
 void Dst::SelfCheck() const {
-  CHECK(DstManager::Instance()->IsAppAdded(app_name_));
+  ACHECK(DstManager::Instance()->IsAppAdded(app_name_));
   if (dst_data_ptr_ == nullptr) {
     dst_data_ptr_ = DstManager::Instance()->GetAppDataPtr(app_name_);
     CHECK_NOTNULL(dst_data_ptr_);

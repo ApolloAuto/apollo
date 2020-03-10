@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <tuple>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"

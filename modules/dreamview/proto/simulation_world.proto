@@ -145,7 +145,8 @@ message Object {
   };
 
   optional Type type = 29;  // obstacle type
-  optional apollo.perception.PerceptionObstacle.SubType sub_type = 34; // obstacle sub-type
+  // obstacle sub-type
+  optional apollo.perception.PerceptionObstacle.SubType sub_type = 34;
   repeated Prediction prediction = 30;
 
   // perception confidence level. Range: [0,1]

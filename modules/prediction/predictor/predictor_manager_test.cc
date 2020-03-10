@@ -33,7 +33,7 @@ class PredictorManagerTest : public KMLMapBasedTest {
   void SetUp() override {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
@@ -65,8 +65,8 @@ TEST_F(PredictorManagerTest, General) {
           AdapterConfig::PLANNING_TRAJECTORY);
 
   EvaluatorManager::Instance()->Run(obstacles_container);
-  PredictorManager::Instance()->Run(adc_trajectory_container,
-                                    obstacles_container);
+  PredictorManager::Instance()->Run(
+      perception_obstacles_, adc_trajectory_container, obstacles_container);
 
   const PredictionObstacles& prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();

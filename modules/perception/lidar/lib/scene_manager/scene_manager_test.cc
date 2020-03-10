@@ -214,8 +214,8 @@ void MockData(LidarFrame* frame) {
   point.y = frame->lidar2world_pose.translation()(1);
   point.z = frame->lidar2world_pose.translation()(2);
   frame->hdmap_struct.reset(new base::HdmapStruct);
-  CHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(point, 120.0,
-                                                       frame->hdmap_struct));
+  ACHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(point, 120.0,
+                                                        frame->hdmap_struct));
 
   // d. trans points
   frame->world_cloud = base::PointDCloudPool::Instance().Get();
@@ -262,12 +262,12 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_roi_service_test) {
   MockData(&frame);
 
   HdmapROIFilter roi_filter;
-  CHECK(roi_filter.Init(ROIFilterInitOptions()));
-  CHECK(roi_filter.Filter(ROIFilterOptions(), &frame));
+  ACHECK(roi_filter.Init(ROIFilterInitOptions()));
+  ACHECK(roi_filter.Filter(ROIFilterOptions(), &frame));
 
   auto roi_service = std::dynamic_pointer_cast<ROIService>(
       SceneManager::Instance().Service("ROIService"));
-  CHECK(roi_service);
+  ACHECK(roi_service);
   EXPECT_EQ(roi_service->Name(), "ROIService");
 
   base::PointIndices filter_indices;

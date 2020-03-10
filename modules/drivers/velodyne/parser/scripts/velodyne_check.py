@@ -1,12 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 velodyne check
 """
 
 import time
-from cyber_py import cyber_time
+
+from cyber_py3 import cyber_time
 from sensor_msgs.msg import PointCloud2
+
 
 prev_stamp = 0
 count = 0

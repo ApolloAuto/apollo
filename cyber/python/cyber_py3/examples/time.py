@@ -73,6 +73,7 @@ def test_rate():
     print(rt2)
     print(rt3)
 
+
 if __name__ == '__main__':
     print("test time", "-" * 50)
     test_time()

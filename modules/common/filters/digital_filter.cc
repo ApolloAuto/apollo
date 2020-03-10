@@ -97,8 +97,8 @@ double DigitalFilter::Compute(const std::deque<double> &values,
                               const std::vector<double> &coefficients,
                               const std::size_t coeff_start,
                               const std::size_t coeff_end) {
-  CHECK(coeff_start <= coeff_end && coeff_end < coefficients.size());
-  CHECK((coeff_end - coeff_start + 1) == values.size());
+  ACHECK(coeff_start <= coeff_end && coeff_end < coefficients.size());
+  ACHECK((coeff_end - coeff_start + 1) == values.size());
 
   double sum = 0.0;
   auto i = coeff_start;

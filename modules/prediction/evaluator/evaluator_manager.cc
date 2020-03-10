@@ -17,8 +17,6 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include <algorithm>
-#include <unordered_map>
-#include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/common/feature_output.h"
@@ -38,13 +36,11 @@
 #include "modules/prediction/evaluator/vehicle/lane_aggregating_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 
@@ -102,7 +98,6 @@ EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 
 void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
-  RegisterEvaluator(ObstacleConf::RNN_EVALUATOR);
   RegisterEvaluator(ObstacleConf::COST_EVALUATOR);
   RegisterEvaluator(ObstacleConf::CRUISE_MLP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MLP_EVALUATOR);
@@ -377,10 +372,6 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::JUNCTION_MLP_EVALUATOR: {
       evaluator_ptr.reset(new JunctionMLPEvaluator());
-      break;
-    }
-    case ObstacleConf::RNN_EVALUATOR: {
-      evaluator_ptr.reset(new RNNEvaluator());
       break;
     }
     case ObstacleConf::COST_EVALUATOR: {

@@ -59,7 +59,8 @@ class PredictorManager {
    * @param Adc trajectory container
    * @param Obstacles container
    */
-  void Run(const ADCTrajectoryContainer* adc_trajectory_container,
+  void Run(const apollo::perception::PerceptionObstacles& perception_obstacles,
+           const ADCTrajectoryContainer* adc_trajectory_container,
            ObstaclesContainer* obstacles_container);
 
   /**
@@ -100,10 +101,13 @@ class PredictorManager {
    */
   void RegisterPredictors();
 
-  void PredictObstacles(const ADCTrajectoryContainer* adc_trajectory_container,
-                        ObstaclesContainer* obstacles_container);
+  void PredictObstacles(
+      const apollo::perception::PerceptionObstacles& perception_obstacles,
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      ObstaclesContainer* obstacles_container);
 
   void PredictObstaclesInParallel(
+      const apollo::perception::PerceptionObstacles& perception_obstacles,
       const ADCTrajectoryContainer* adc_trajectory_container,
       ObstaclesContainer* obstacles_container);
 
@@ -152,7 +156,7 @@ class PredictorManager {
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
   ObstacleConf::PredictorType pedestrian_predictor_ =
-      ObstacleConf::REGIONAL_PREDICTOR;
+      ObstacleConf::FREE_MOVE_PREDICTOR;
 
   ObstacleConf::PredictorType default_on_lane_predictor_ =
       ObstacleConf::LANE_SEQUENCE_PREDICTOR;

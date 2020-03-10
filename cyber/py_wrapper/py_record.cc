@@ -14,11 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <Python.h>
+#include "cyber/py_wrapper/py_record.h"
+
+#if PY_MAJOR_VERSION >= 3
+#include <python3.6m/Python.h>
+#else
+#include <python2.7/Python.h>
+#endif
+
 #include <set>
 #include <string>
-
-#include "cyber/py_wrapper/py_record.h"
 
 using apollo::cyber::record::PyRecordReader;
 using apollo::cyber::record::PyRecordWriter;
@@ -107,7 +112,7 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
 #else
       Py_BuildValue("s#", result.data.c_str(), result.data.length());
 #endif
-  CHECK(bld_data) << "Py_BuildValue returns NULL.";
+  ACHECK(bld_data) << "Py_BuildValue returns NULL.";
   PyDict_SetItemString(pyobj_bag_message, "data", bld_data);
   Py_DECREF(bld_data);
 

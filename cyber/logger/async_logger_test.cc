@@ -16,8 +16,8 @@
 
 #include "cyber/logger/async_logger.h"
 
-#include <glog/logging.h>
-#include <gtest/gtest.h>
+#include "glog/logging.h"
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 
@@ -58,14 +58,13 @@ TEST(AsyncLoggerTest, SetLoggerToGlog) {
   google::SetLogDestination(google::ERROR, "");
   google::SetLogDestination(google::WARNING, "");
   google::SetLogDestination(google::FATAL, "");
-  AsyncLogger* logger = new AsyncLogger(google::base::GetLogger(google::INFO));
-  google::base::SetLogger(FLAGS_minloglevel, logger);
-  logger->Start();
+  AsyncLogger logger(google::base::GetLogger(google::INFO));
+  google::base::SetLogger(FLAGS_minloglevel, &logger);
+  logger.Start();
   ALOG_MODULE("AsyncLoggerTest2", INFO) << "test set async logger to glog";
   ALOG_MODULE("AsyncLoggerTest2", WARN) << "test set async logger to glog";
   ALOG_MODULE("AsyncLoggerTest2", ERROR) << "test set async logger to glog";
-  logger->Stop();
-  logger = nullptr;
+  logger.Stop();
   google::ShutdownGoogleLogging();
 }
 

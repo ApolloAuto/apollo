@@ -161,6 +161,7 @@ message SimpleLateralDebug {
 
   // Mrac control status and feedback states for steer control
   optional MracDebug steer_mrac_debug = 32;
+  optional bool steer_mrac_enable_status = 33;
 }
 
 message SimpleMPCDebug {

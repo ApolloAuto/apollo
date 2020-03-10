@@ -4,13 +4,19 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "prediction_gflags",
-    srcs = [
-        "prediction_gflags.cc",
-        "prediction_system_gflags.cc",
+    srcs = ["prediction_gflags.cc"],
+    hdrs = ["prediction_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
     ],
-    hdrs = [
-        "prediction_gflags.h",
-        "prediction_system_gflags.h",
+)
+
+cc_library(
+    name = "prediction_system_gflags",
+    srcs = ["prediction_system_gflags.cc"],
+    hdrs = ["prediction_system_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -33,7 +39,7 @@ cc_test(
     srcs = ["prediction_util_test.cc"],
     deps = [
         ":prediction_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -61,7 +67,7 @@ cc_test(
     deps = [
         ":kml_map_based_test",
         ":prediction_map",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -87,7 +93,7 @@ cc_test(
     srcs = ["feature_output_test.cc"],
     deps = [
         ":feature_output",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -102,6 +108,7 @@ cc_library(
         ":prediction_map",
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_system_gflags",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )
@@ -117,7 +124,7 @@ cc_test(
     deps = [
         ":kml_map_based_test",
         ":road_graph",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -147,7 +154,7 @@ cc_test(
     ],
     deps = [
         ":validation_checker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -167,7 +174,7 @@ cc_test(
     srcs = ["environment_features_test.cc"],
     deps = [
         ":environment_features",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -195,7 +202,7 @@ cc_test(
     deps = [
         ":junction_analyzer",
         ":kml_map_based_test",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -237,7 +244,7 @@ cc_test(
     srcs = ["prediction_thread_pool_test.cc"],
     deps = [
         ":prediction_thread_pool",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -256,7 +263,6 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/pose:pose_container",
         "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/proto:semantic_map_config_proto",
         "@opencv",
     ],
 )

@@ -40,16 +40,16 @@ bool MlfTrackObjectDistance::Init(
     const MlfTrackObjectDistanceInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(
       config_file, "mlf_track_object_distance.conf");
   MlfDistanceConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   foreground_weight_table_.clear();
   background_weight_table_.clear();

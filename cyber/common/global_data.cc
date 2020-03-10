@@ -18,11 +18,11 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include <limits.h>
 #include <netdb.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <climits>
+#include <cstdlib>
 #include <functional>
 
 #include "cyber/common/environment.h"
@@ -55,7 +55,7 @@ char* program_path() {
 
 GlobalData::GlobalData() {
   InitHostInfo();
-  CHECK(InitConfig());
+  ACHECK(InitConfig());
   process_id_ = getpid();
   char* prog_path = program_path();
   if (prog_path) {

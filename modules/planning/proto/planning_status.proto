@@ -2,9 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/geometry.proto";
-import "modules/common/proto/pnc_point.proto";
 import "modules/planning/proto/planning_config.proto";
 import "modules/routing/proto/routing.proto";
 
@@ -88,16 +86,6 @@ message PathDeciderStatus {
   repeated LaneBorrowDirection decided_side_pass_direction = 5;
 }
 
-message PathReuseDeciderStatus {
-  optional bool reused_path = 1 [default = true];
-  // count lane_change optimization failure frames
-  optional int32 lane_change_failure_counter = 2;
-}
-
-message PedestrianStatus {
-  repeated StopTime stop_time = 1;
-}
-
 message PullOverStatus {
   enum PullOverType {
     PULL_OVER = 1;            // pull-over upon destination arrival
@@ -119,19 +107,9 @@ message ReroutingStatus {
   optional apollo.routing.RoutingRequest routing_request = 3;
 }
 
-message RightOfWayStatus {
-  // whether the vehicle has right of way in junction
-  map<string, bool> junction = 1;
-}
-
 message ScenarioStatus {
   optional ScenarioConfig.ScenarioType scenario_type = 1;
   optional ScenarioConfig.StageType stage_type = 2;
-}
-
-message SidePassStatus {
-  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
-  optional bool check_clear_flag = 2;
 }
 
 message StopSignStatus {
@@ -151,24 +129,20 @@ message YieldSignStatus {
   repeated string wait_for_obstacle_id = 3;
 }
 
+// note: please keep this one as minimal as possible. do NOT pollute it.
 message PlanningStatus {
   optional BareIntersectionStatus bare_intersection = 1;
   optional ChangeLaneStatus change_lane = 2;
   optional CrosswalkStatus crosswalk = 3;
   optional DestinationStatus destination = 4;
   optional EmergencyStopStatus emergency_stop = 5;
-  optional apollo.common.EngageAdvice engage_advice = 6;
-  optional OpenSpaceStatus open_space = 7;
-  optional PedestrianStatus pedestrian = 8;
-  optional ParkAndGoStatus park_and_go = 9;
-  optional PathDeciderStatus path_decider = 10;
-  optional PathReuseDeciderStatus path_reuse_decider = 11;
-  optional PullOverStatus pull_over = 12;
-  optional ReroutingStatus rerouting = 13;
-  optional RightOfWayStatus right_of_way = 14;
-  optional ScenarioStatus scenario = 15;
-  optional SidePassStatus side_pass = 16;
-  optional StopSignStatus stop_sign = 17;
-  optional TrafficLightStatus traffic_light = 18;
-  optional YieldSignStatus yield_sign = 19;
+  optional OpenSpaceStatus open_space = 6;
+  optional ParkAndGoStatus park_and_go = 7;
+  optional PathDeciderStatus path_decider = 8;
+  optional PullOverStatus pull_over = 9;
+  optional ReroutingStatus rerouting = 10;
+  optional ScenarioStatus scenario = 11;
+  optional StopSignStatus stop_sign = 12;
+  optional TrafficLightStatus traffic_light = 13;
+  optional YieldSignStatus yield_sign = 14;
 }

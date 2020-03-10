@@ -31,11 +31,10 @@ cc_library(
 #cc_test(
 #    name = "hdmap_input_test",
 #    size = "small",
-#    srcs = [#        "hdmap_input_test.cc"
-#    ],
+#    srcs = ["hdmap_input_test.cc"],
 #    deps = [
 #        ":hdmap_input",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #        "//modules/perception/base:base_type",
 #        "//modules/perception/base:point_cloud",
 #        "//modules/perception/common/geometry:common",

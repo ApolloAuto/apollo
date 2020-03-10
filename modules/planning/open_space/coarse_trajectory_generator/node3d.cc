@@ -25,6 +25,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::Box2d;
+
 Node3d::Node3d(double x, double y, double phi) {
   x_ = x;
   y_ = y;

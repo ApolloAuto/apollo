@@ -17,6 +17,7 @@
 #include "modules/routing/graph/topo_node.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -95,7 +96,7 @@ bool TopoNode::IsOutRangeEnough(const std::vector<NodeSRange>& range_vec,
 
 TopoNode::TopoNode(const Node& node)
     : pb_node_(node), start_s_(0.0), end_s_(pb_node_.length()) {
-  CHECK(pb_node_.length() > kLenghtEpsilon)
+  ACHECK(pb_node_.length() > kLenghtEpsilon)
       << "Node length is invalid in pb: " << pb_node_.DebugString();
   Init();
   origin_node_ = this;

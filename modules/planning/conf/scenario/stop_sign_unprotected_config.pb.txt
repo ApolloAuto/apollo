@@ -22,6 +22,7 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
@@ -62,6 +63,9 @@ stage_config: {
   }
   task_config: {
     task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
   }
 }
 
@@ -74,6 +78,7 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
@@ -114,6 +119,9 @@ stage_config: {
   }
   task_config: {
     task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
   }
 }
 
@@ -127,12 +135,12 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
-  # task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
     task_type: CREEP_DECIDER
     creep_decider_config: {
@@ -166,12 +174,6 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: PROCEED_WITH_CAUTION_SPEED
-    proceed_with_caution_speed_config: {
-      max_distance: 5.0
-    }
-  }
-  task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
   }
   task_config: {
@@ -186,6 +188,9 @@ stage_config: {
   task_config: {
     task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
 }
 
 stage_config: {
@@ -197,6 +202,7 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
@@ -240,5 +246,8 @@ stage_config: {
   }
   task_config: {
     task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
   }
 }

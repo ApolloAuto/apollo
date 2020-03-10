@@ -15,13 +15,13 @@
  *****************************************************************************/
 #pragma once
 
-#include <gtest/gtest_prod.h>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
+#include "gtest/gtest_prod.h"
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"

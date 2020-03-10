@@ -42,7 +42,7 @@ bool FusionComponent::Init() {
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
   // init algorithm plugin
-  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
+  ACHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   writer_ = node_->CreateWriter<PerceptionObstacles>(
       comp_config.output_obstacles_channel_name());
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
@@ -83,11 +83,11 @@ bool FusionComponent::InitAlgorithmPlugin() {
   fusion::ObstacleMultiSensorFusionParam param;
   param.main_sensor = fusion_main_sensor_;
   param.fusion_method = fusion_method_;
-  CHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
+  ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
   if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
     hdmap_input_ = map::HDMapInput::Instance();
-    CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
+    ACHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   AINFO << "Init algorithm successfully, onboard fusion: " << fusion_method_;
   return true;
@@ -104,11 +104,12 @@ bool FusionComponent::InternalProc(
 
   PERCEPTION_PERF_BLOCK_START();
   const double timestamp = in_message->timestamp_;
+  const uint64_t lidar_timestamp = in_message->lidar_timestamp_;
   std::vector<base::ObjectPtr> valid_objects;
   if (in_message->error_code_ != apollo::common::ErrorCode::OK) {
-    if (!MsgSerializer::SerializeMsg(timestamp, in_message->seq_num_,
-                                     valid_objects, in_message->error_code_,
-                                     out_message.get())) {
+    if (!MsgSerializer::SerializeMsg(
+            timestamp, lidar_timestamp, in_message->seq_num_, valid_objects,
+            in_message->error_code_, out_message.get())) {
       AERROR << "Failed to gen PerceptionObstacles object.";
       return false;
     }
@@ -173,9 +174,9 @@ bool FusionComponent::InternalProc(
   }
   // produce pb output msg
   apollo::common::ErrorCode error_code = apollo::common::ErrorCode::OK;
-  if (!MsgSerializer::SerializeMsg(timestamp, in_message->seq_num_,
-                                   valid_objects, error_code,
-                                   out_message.get())) {
+  if (!MsgSerializer::SerializeMsg(timestamp, lidar_timestamp,
+                                   in_message->seq_num_, valid_objects,
+                                   error_code, out_message.get())) {
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }

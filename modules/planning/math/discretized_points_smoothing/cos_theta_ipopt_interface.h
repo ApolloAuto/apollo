@@ -16,22 +16,21 @@
 
 #pragma once
 
+#include <adolc/adolc.h>
+#include <adolc/adolc_sparse.h>
+#include <adolc/adouble.h>
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpIpoptCalculatedQuantities.hpp>
+#include <coin/IpIpoptData.hpp>
+#include <coin/IpOrigIpoptNLP.hpp>
+#include <coin/IpSolveStatistics.hpp>
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTNLPAdapter.hpp>
+#include <coin/IpTypes.hpp>
+
 #include <map>
 #include <utility>
 #include <vector>
-
-#include "adolc/adolc.h"
-#include "adolc/adolc_sparse.h"
-#include "adolc/adouble.h"
-
-#include "IpIpoptApplication.hpp"
-#include "IpIpoptCalculatedQuantities.hpp"
-#include "IpIpoptData.hpp"
-#include "IpOrigIpoptNLP.hpp"
-#include "IpSolveStatistics.hpp"
-#include "IpTNLP.hpp"
-#include "IpTNLPAdapter.hpp"
-#include "IpTypes.hpp"
 
 #define tag_f 1
 #define tag_g 2

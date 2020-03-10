@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -55,6 +56,11 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
     ],
+)
+
+py_proto(
+    name = "detection_pb2",
+    src = "detection.proto",
 )
 
 cpplint()

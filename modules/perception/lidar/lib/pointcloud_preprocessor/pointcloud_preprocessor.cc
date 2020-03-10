@@ -34,16 +34,16 @@ bool PointCloudPreprocessor::Init(
     const PointCloudPreprocessorInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
   PointCloudPreprocessorConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
   box_forward_x_ = config.box_forward_x();

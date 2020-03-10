@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -19,18 +19,22 @@
 """
 This is a bunch of classes to manage cyber record channel extractor.
 """
-import cv2
-import numpy as np
-import os
-import pypcd
-import sys
-import struct
 
+import os
+import struct
+import sys
+
+import cv2
+import pypcd
+import numpy as np
+
+from data_file_object import TimestampFileObject, OdometryFileObject
+from modules.drivers.proto import conti_radar_pb2
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2
 from modules.localization.proto import gps_pb2
+from modules.localization.proto import localization_pb2
 
-from data_file_object import TimestampFileObject, OdometryFileObject
 
 class SensorMessageParser(object):
     """Wrapper for cyber channel message extractor"""
@@ -51,7 +55,7 @@ class SensorMessageParser(object):
         self._timestamp_file = os.path.join(self._output_path, "timestamps")
         self._instance_saving = instance_saving
 
-    #initializing msg and proto parser
+    # initializing msg and proto parser
     def _init_parser(self):
         raise NotImplementedError
 
@@ -68,17 +72,19 @@ class SensorMessageParser(object):
         return self._timestamps
 
     def save_timestamps_to_file(self):
-       timestamp_file_obj = TimestampFileObject(self._timestamp_file,
-                                                operation='write',
-                                                file_type='txt')
-       timestamp_file_obj.save_to_file(self._timestamps)
-       return True
+        timestamp_file_obj = TimestampFileObject(self._timestamp_file,
+                                                 operation='write',
+                                                 file_type='txt')
+        timestamp_file_obj.save_to_file(self._timestamps)
+        return True
+
 
 class GpsParser(SensorMessageParser):
     """
     class to parse GNSS odometry channel.
     saving this small topic as a whole.
     """
+
     def __init__(self, output_path, instance_saving=False):
         super(GpsParser, self).__init__(output_path, instance_saving)
         if not self._instance_saving:
@@ -121,13 +127,51 @@ class GpsParser(SensorMessageParser):
         odometry_file_obj.save_to_file(self._parsed_data)
         return True
 
+
+class PoseParser(GpsParser):
+    """
+    inherit similar data saver and data structure from GpsParser
+    save the ego-localization information same as odometry
+    """
+
+    def _init_parser(self):
+        self._msg_parser = localization_pb2.LocalizationEstimate()
+
+    def parse_sensor_message(self, msg):
+        """ parse localization information from localization estimate channel"""
+        loc_est = self._msg_parser
+        loc_est.ParseFromString(msg.message)
+
+        # all double, except point_type is int32
+        ts = loc_est.header.timestamp_sec
+        self._timestamps.append(ts)
+
+        point_type = 56
+        qw = loc_est.pose.orientation.qw
+        qx = loc_est.pose.orientation.qx
+        qy = loc_est.pose.orientation.qy
+        qz = loc_est.pose.orientation.qz
+        x = loc_est.pose.position.x
+        y = loc_est.pose.position.y
+        z = loc_est.pose.position.z
+        # save 9 values as a tuple, for eaisier struct packing during storage
+        if self._instance_saving:
+            raise ValueError("localization--pseudo odometry-- should be saved in a file")
+        else:
+            self._parsed_data.append((ts, point_type, qw, qx, qy, qz, x, y, z))
+
+        return True
+
+
 class PointCloudParser(SensorMessageParser):
     """
     class to parse apollo/$(lidar)/PointCloud2 channels.
     saving separately each parsed msg
     """
-    def __init__(self, output_path, instance_saving=True):
+
+    def __init__(self, output_path, instance_saving=True, suffix='.pcd'):
         super(PointCloudParser, self).__init__(output_path, instance_saving)
+        self._suffix = suffix
 
     def convert_xyzit_pb_to_array(self, xyz_i_t, data_type):
         arr = np.zeros(len(xyz_i_t), dtype=data_type)
@@ -165,13 +209,13 @@ class PointCloudParser(SensorMessageParser):
             np_type = pypcd.pcd_type_to_numpy_type[(t, s)]
             typenames.append(np_type)
 
-        np_dtype = np.dtype(zip(md['fields'], typenames))
+        np_dtype = np.dtype(list(zip(md['fields'], typenames)))
         pc_data = self.convert_xyzit_pb_to_array(xyz_i_t, data_type=np_dtype)
         pc = pypcd.PointCloud(md, pc_data)
         return pc
 
     def save_pointcloud_meta_to_file(self, pc_meta, pcd_file):
-            pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
+        pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
 
     def _init_parser(self):
         self._msg_parser = pointcloud_pb2.PointCloud()
@@ -189,7 +233,7 @@ class PointCloudParser(SensorMessageParser):
         self._parsed_data = self.make_xyzit_point_cloud(pointcloud.point)
 
         if self._instance_saving:
-            file_name = "%05d.pcd" % self.get_msg_count()
+            file_name = "%05d" % self.get_msg_count() + self._suffix
             output_file = os.path.join(self._output_path, file_name)
             self.save_pointcloud_meta_to_file(pc_meta=self._parsed_data, pcd_file=output_file)
         else:
@@ -203,8 +247,10 @@ class ImageParser(SensorMessageParser):
     class to parse apollo/$(camera)/image channels.
     saving separately each parsed msg
     """
-    def __init__(self, output_path, instance_saving=True):
+
+    def __init__(self, output_path, instance_saving=True, suffix='.jpg'):
         super(ImageParser, self).__init__(output_path, instance_saving)
+        self._suffix = suffix
 
     def _init_parser(self):
         self._msg_parser = sensor_image_pb2.Image()
@@ -237,12 +283,12 @@ class ImageParser(SensorMessageParser):
             print('Unsupported image encoding type: %s.' % image.encoding)
             return False
 
-        channel_num = image.step / image.width
+        channel_num = image.step // image.width
         self._parsed_data = np.fromstring(image.data, dtype=np.uint8).reshape(
             (image.height, image.width, channel_num))
 
         if self._instance_saving:
-            file_name = "%05d.png" % self.get_msg_count()
+            file_name = "%05d" % self.get_msg_count() + self._suffix
             output_file = os.path.join(self._output_path, file_name)
             self.save_image_mat_to_file(image_file=output_file)
         else:
@@ -257,3 +303,94 @@ class ImageParser(SensorMessageParser):
             cv2.imwrite(image_file, cv2.cvtColor(image_mat, cv2.COLOR_RGB2BGR))
         else:
             cv2.imwrite(image_file, image_mat)
+
+
+class ContiRadarParser(SensorMessageParser):
+    """
+    class to parse apollo/sensor/radar/$(position) channels.
+    saving separately each parsed msg
+    """
+
+    def __init__(self, output_path, instance_saving=True, suffix='.pcd'):
+        super(ContiRadarParser, self).__init__(output_path, instance_saving)
+        self._suffix = suffix
+
+    def convert_contiobs_pb_to_array(self, obs, data_type):
+        arr = np.zeros(len(obs), dtype=data_type)
+        for i, ob in enumerate(obs):
+            # change timestamp to timestamp_sec
+            # z value is 0
+            # now using x, y, z, and t. later more information will be added
+            arr[i] = (ob.longitude_dist, ob.lateral_dist, 0, ob.header.timestamp_sec)
+        return arr
+
+    def make_contidata_point_cloud(self, contiobs):
+        """
+        Make a pointcloud object from contiradar message, as conti_radar.proto.
+        message ContiRadarObs {
+          //                x axis  ^
+          //                        | longitude_dist
+          //                        |
+          //                        |
+          //                        |
+          //          lateral_dist  |
+          //          y axis        |
+          //        <----------------
+          //        ooooooooooooo   //radar front surface
+
+          optional apollo.common.Header header = 1;
+          // longitude distance to the radar; (+) = forward; unit = m
+          optional double longitude_dist = 4;
+          // lateral distance to the radar; (+) = left; unit = m
+          optional double lateral_dist = 5;
+          .......
+        }
+        """
+
+        md = {'version': .7,
+              'fields': ['x', 'y', 'z', 'timestamp'],
+              'count': [1, 1, 1, 1],
+              'width': len(contiobs),
+              'height': 1,
+              'viewpoint': [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+              'points': len(contiobs),
+              'type': ['F', 'F', 'F', 'F'],
+              'size': [4, 4, 4, 8],
+              'data': 'binary'}
+
+        typenames = []
+        for t, s in zip(md['type'], md['size']):
+            np_type = pypcd.pcd_type_to_numpy_type[(t, s)]
+            typenames.append(np_type)
+
+        np_dtype = np.dtype(list(zip(md['fields'], typenames)))
+        pc_data = self.convert_contiobs_pb_to_array(contiobs, data_type=np_dtype)
+        pc = pypcd.PointCloud(md, pc_data)
+        return pc
+
+    def save_pointcloud_meta_to_file(self, pc_meta, pcd_file):
+        pypcd.save_point_cloud_bin(pc_meta, pcd_file)
+
+    def _init_parser(self):
+        self._msg_parser = conti_radar_pb2.ContiRadar()
+
+    def parse_sensor_message(self, msg):
+        """
+        Transform protobuf radar message to standard PCL bin_file(*.pcd).
+        """
+        radar_data = self._msg_parser
+        radar_data.ParseFromString(msg.message)
+
+        self._timestamps.append(radar_data.header.timestamp_sec)
+        # self._timestamps.append(pointcloud.header.timestamp_sec)
+
+        self._parsed_data = self.make_contidata_point_cloud(radar_data.contiobs)
+
+        if self._instance_saving:
+            file_name = "%05d" % self.get_msg_count() + self._suffix
+            output_file = os.path.join(self._output_path, file_name)
+            self.save_pointcloud_meta_to_file(pc_meta=self._parsed_data, pcd_file=output_file)
+        else:
+            raise ValueError("not implement multiple message concatenation for COontiRadar topic")
+        # TODO(gchen-Apollo): add saint check
+        return True

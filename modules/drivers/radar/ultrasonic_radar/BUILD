@@ -19,11 +19,10 @@ cc_library(
 #  cc_test(
 #    name = "ultrasonic_radar_message_manager_test",
 #    size = "small",
-#     srcs = [#         "ultrasonic_radar_message_manager_test.cc"
-#     ],
+#     srcs = ["ultrasonic_radar_message_manager_test.cc"],
 #     deps = [
 #         "ultrasonic_radar_message_manager",
-#         "@gtest//:main",
+#         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 
@@ -33,8 +32,8 @@ cc_library(
     hdrs = ["ultrasonic_radar_canbus.h"],
     deps = [
         ":ultrasonic_radar_message_manager",
-        "//modules/common",
         "//modules/common/monitor_log",
+        "//modules/common/status",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
@@ -51,7 +50,7 @@ cc_library(
 #         ":ultrasonic_radar_canbus_lib",
 #         ":ultrasonic_radar_message_manager",
 #         "//modules/drivers/proto:sensor_proto",
-#         "@gtest//:main",
+#         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 

@@ -63,8 +63,8 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
 
     motion_2d.block(0, 0, 2, 2) = rot2d.toRotationMatrix().transpose();
     motion_2d.block(0, 2, 2, 1) = -rot2d.toRotationMatrix().transpose() * trans;
-    CHECK(vehicledata->motion.rows() == motion_2d.rows());
-    CHECK(vehicledata->motion.cols() == motion_2d.cols());
+    ACHECK(vehicledata->motion.rows() == motion_2d.rows());
+    ACHECK(vehicledata->motion.cols() == motion_2d.cols());
     vehicledata->motion = motion_2d;
   } else {
     base::MotionType motion_3d = base::MotionType::Identity();
@@ -90,8 +90,8 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
 
     motion_3d.block(0, 0, 3, 3) = rot3d.transpose();
     motion_3d.block(0, 3, 3, 1) = -rot3d.transpose() * trans;
-    CHECK(vehicledata->motion.rows() == motion_3d.rows());
-    CHECK(vehicledata->motion.cols() == motion_3d.cols());
+    ACHECK(vehicledata->motion.rows() == motion_3d.rows());
+    ACHECK(vehicledata->motion.cols() == motion_3d.cols());
     vehicledata->motion = motion_3d;
   }
 }

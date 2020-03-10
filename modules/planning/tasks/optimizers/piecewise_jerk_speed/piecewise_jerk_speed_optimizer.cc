@@ -20,9 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
-#include <memory>
 #include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -46,7 +44,7 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config_.has_piecewise_jerk_speed_config());
+  ACHECK(config_.has_piecewise_jerk_speed_config());
 }
 
 Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
@@ -56,7 +54,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     return Status::OK();
   }
 
-  CHECK(speed_data != nullptr);
+  ACHECK(speed_data != nullptr);
   SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {
@@ -94,9 +92,6 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
                                         veh_param.max_acceleration());
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
                                         FLAGS_longitudinal_jerk_upper_bound);
-
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
 
   piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
                                     reference_line_info_->GetCruiseSpeed());

@@ -69,7 +69,8 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
   void PrependTrajectoryPoints(
       const std::vector<common::TrajectoryPoint>& trajectory_points) {
     if (!empty() && trajectory_points.size() > 1) {
-      CHECK(trajectory_points.back().relative_time() < front().relative_time());
+      ACHECK(trajectory_points.back().relative_time() <
+             front().relative_time());
     }
     insert(begin(), trajectory_points.begin(), trajectory_points.end());
   }

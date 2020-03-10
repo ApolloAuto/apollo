@@ -19,7 +19,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",
@@ -28,6 +27,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/util:scenario_util_lib",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )
@@ -41,7 +41,7 @@ cc_test(
     ],
     deps = [
         ":emergency_pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_test(
     ],
     deps = [
         ":emergency_pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_test(
     ],
     deps = [
         ":emergency_pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -80,7 +80,7 @@ cc_test(
     ],
     deps = [
         ":emergency_pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

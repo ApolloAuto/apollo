@@ -69,8 +69,8 @@ ReferenceLineProvider::ReferenceLineProvider(
     relative_map_ = relative_map;
   }
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                        &smoother_config_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
+                                         &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
   if (smoother_config_.has_qp_spline()) {
@@ -80,8 +80,8 @@ ReferenceLineProvider::ReferenceLineProvider(
   } else if (smoother_config_.has_discrete_points()) {
     smoother_.reset(new DiscretePointsReferenceLineSmoother(smoother_config_));
   } else {
-    CHECK(false) << "unknown smoother config "
-                 << smoother_config_.DebugString();
+    ACHECK(false) << "unknown smoother config "
+                  << smoother_config_.DebugString();
   }
   is_initialized_ = true;
 }
@@ -197,6 +197,7 @@ void ReferenceLineProvider::GenerateThread() {
     std::list<ReferenceLine> reference_lines;
     std::list<hdmap::RouteSegments> segments;
     if (!CreateReferenceLine(&reference_lines, &segments)) {
+      is_reference_line_updated_ = false;
       AERROR << "Fail to get reference line";
       continue;
     }
@@ -586,11 +587,10 @@ bool ReferenceLineProvider::CreateReferenceLine(
         reference_lines->pop_back();
         iter = segments->erase(iter);
       } else {
-        Vec2d vec2d(vehicle_state.x(), vehicle_state.y());
         common::SLPoint sl;
-        if (!reference_lines->back().XYToSL(vec2d, &sl)) {
-          AWARN << "Failed to project point: " << vec2d.DebugString()
-                << " to stitched reference line";
+        if (!reference_lines->back().XYToSL(vehicle_state, &sl)) {
+          AWARN << "Failed to project point: {" << vehicle_state.x() << ","
+                << vehicle_state.y() << "} to stitched reference line";
         }
         Shrink(sl, &reference_lines->back(), &(*iter));
         ++iter;
@@ -729,8 +729,6 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   if (last_index != ref_points.size() - 1) {
     need_shrink = true;
     common::SLPoint forward_sl;
-    common::math::Vec2d vec2d{ref_points[last_index].x(),
-                              ref_points[last_index].y()};
     reference_line->XYToSL(ref_points[last_index], &forward_sl);
     new_forward_distance = forward_sl.s() - sl.s();
   }
@@ -888,8 +886,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
   // modify anchor points based on prefix_ref
   for (auto &point : anchor_points) {
     common::SLPoint sl_point;
-    Vec2d xy{point.path_point.x(), point.path_point.y()};
-    if (!prefix_ref.XYToSL(xy, &sl_point)) {
+    if (!prefix_ref.XYToSL(point.path_point, &sl_point)) {
       continue;
     }
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {

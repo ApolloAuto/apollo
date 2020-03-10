@@ -43,6 +43,7 @@ class ParkAndGoStageAdjust : public Stage {
   Stage::StageStatus FinishStage();
 
  private:
+  void ResetInitPostion();
   ScenarioParkAndGoConfig scenario_config_;
 };
 

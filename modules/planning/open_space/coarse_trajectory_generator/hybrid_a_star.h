@@ -21,11 +21,9 @@
 #pragma once
 
 #include <algorithm>
-#include <iterator>
 #include <memory>
 #include <queue>
 #include <string>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -46,9 +44,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::Status;
-using apollo::common::math::Box2d;
 
 struct HybridAStartResult {
   std::vector<double> x;

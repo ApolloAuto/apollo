@@ -24,7 +24,7 @@ cc_test(
     srcs = ["pose_container_test.cc"],
     deps = [
         "//modules/prediction/container/pose:pose_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

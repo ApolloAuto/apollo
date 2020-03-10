@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -29,12 +31,10 @@
 # limitations under the License.
 # ==============================================================================
 
-from __future__ import division
-from __future__ import print_function
-
 import tensorflow as tf
 
 import model_base
+
 
 dim_input = 62
 dim_hidden_1 = 30

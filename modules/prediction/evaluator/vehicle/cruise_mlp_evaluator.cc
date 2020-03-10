@@ -32,9 +32,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::cyber::common::GetProtoFromFile;
-
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   int count = 0;

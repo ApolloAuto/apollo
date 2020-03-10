@@ -33,6 +33,7 @@
 #include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 #include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
+#include "modules/planning/tasks/deciders/rss_decider/rss_decider.h"
 #include "modules/planning/tasks/deciders/rule_based_stop_decider/rule_based_stop_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
@@ -43,7 +44,7 @@
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
-#include "modules/planning/tasks/rss/decider_rss.h"
+
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {

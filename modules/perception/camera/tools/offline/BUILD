@@ -32,8 +32,8 @@ cc_library(
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -44,7 +44,6 @@ cc_binary(
         "-lopencv_core",
         "-lopencv_imgproc",
         "-lopencv_highgui",
-        "-lboost_system",
     ],
     linkstatic = False,
     deps = [
@@ -56,6 +55,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
+        "//third_party:boost",
         "@com_google_absl//absl/strings",
     ],
 )

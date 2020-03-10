@@ -46,8 +46,8 @@ cc_library(
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/velodyne/proto:velodyne_proto",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 

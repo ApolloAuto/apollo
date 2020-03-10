@@ -175,12 +175,12 @@ void GatedHungarianMatcher<T>::MatchInit() {
       {OptimizeFlag::OPTMIN, std::greater<T>()},
   };
   auto find_ret = compare_fun_map.find(opt_flag_);
-  CHECK(find_ret != compare_fun_map.end());
+  ACHECK(find_ret != compare_fun_map.end());
   compare_fun_ = find_ret->second;
   is_valid_cost_ = std::bind1st(compare_fun_, cost_thresh_);
 
   /* check the validity of bound_value */
-  CHECK(!is_valid_cost_(bound_value_));
+  ACHECK(!is_valid_cost_(bound_value_));
 }
 
 template <typename T>

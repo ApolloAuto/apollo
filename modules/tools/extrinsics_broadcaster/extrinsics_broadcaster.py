@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,7 +22,9 @@ Broadcaster static transform
 
 from subprocess import call
 import sys
+
 import yaml
+
 
 def main():
     """Main function.
@@ -53,6 +55,7 @@ def main():
         return call(command, shell=True)
     except OSError as e:
         print(e)
+
 
 if __name__ == '__main__':
     main()

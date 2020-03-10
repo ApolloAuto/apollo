@@ -161,7 +161,7 @@ bool MaxPool1d::Load(const LayerParameter& layer_pb) {
 }
 
 bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
-  CHECK(maxpool1d_pb.has_kernel_size());
+  ACHECK(maxpool1d_pb.has_kernel_size());
   CHECK_GT(maxpool1d_pb.has_kernel_size(), 0);
   kernel_size_ = maxpool1d_pb.kernel_size();
   if (maxpool1d_pb.has_stride() && maxpool1d_pb.stride() > 0) {
@@ -201,11 +201,10 @@ bool AvgPool1d::Load(const LayerParameter& layer_pb) {
   }
   AvgPool1dParameter avgpool1d_pb = layer_pb.avgpool1d();
   return Load(avgpool1d_pb);
-  return true;
 }
 
 bool AvgPool1d::Load(const AvgPool1dParameter& avgpool1d_pb) {
-  CHECK(avgpool1d_pb.has_kernel_size());
+  ACHECK(avgpool1d_pb.has_kernel_size());
   CHECK_GT(avgpool1d_pb.has_kernel_size(), 0);
   kernel_size_ = avgpool1d_pb.kernel_size();
   if (avgpool1d_pb.has_stride() && avgpool1d_pb.stride() > 0) {

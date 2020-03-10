@@ -21,7 +21,6 @@
 #include "modules/planning/common/speed_limit.h"
 
 #include <algorithm>
-#include <limits>
 
 #include "cyber/common/log.h"
 

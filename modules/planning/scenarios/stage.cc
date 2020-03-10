@@ -34,7 +34,6 @@ namespace planning {
 namespace scenario {
 
 using apollo::common::time::Clock;
-using apollo::hdmap::PathOverlap;
 
 namespace {
 // constexpr double kPathOptimizationFallbackCost = 2e4;
@@ -58,7 +57,7 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
   }
   for (int i = 0; i < config_.task_type_size(); ++i) {
     auto task_type = config_.task_type(i);
-    CHECK(config_map.find(task_type) != config_map.end())
+    ACHECK(config_map.find(task_type) != config_map.end())
         << "Task: " << TaskConfig::TaskType_Name(task_type)
         << " used but not configured";
     auto iter = tasks_.find(task_type);

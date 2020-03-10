@@ -48,8 +48,8 @@ default_task_config: {
   speed_heuristic_config {
     default_speed_config {
       unit_t: 1.0
-      dense_dimension_s: 21
-      dense_unit_s: 0.25
+      dense_dimension_s: 101
+      dense_unit_s: 0.1
       sparse_unit_s: 1.0
       speed_weight: 0.0
       accel_weight: 10.0
@@ -74,7 +74,7 @@ default_task_config: {
 
       max_acceleration: 2.0
       max_deceleration: -4.0
-      spatial_potential_penalty: 1
+      spatial_potential_penalty: 1.0e2
     }
     lane_change_speed_config {
       unit_t: 1.0
@@ -103,7 +103,7 @@ default_task_config: {
       negative_jerk_coeff: 1.0
 
       max_acceleration: 2.0
-      max_deceleration: -4.0
+      max_deceleration: -2.5
       spatial_potential_penalty: 1.0e5
       is_lane_changing: true
     }
@@ -116,7 +116,7 @@ default_task_config: {
   task_type: RULE_BASED_STOP_DECIDER
   rule_based_stop_decider_config {
     max_adc_stop_speed: 0.5
-    max_valid_stop_distance: 0.5
+    max_valid_stop_distance: 1.0
     search_beam_length: 20.0
     search_beam_radius_intensity: 0.08
     search_range: 3.14
@@ -244,7 +244,7 @@ default_task_config: {
           enable_jacobian_ad: false
           enable_hand_derivative: false
           enable_derivative_check: false
-          distance_approach_mode: DISTANCE_APPROACH_IPOPT
+          distance_approach_mode: DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK
           enable_check_initial_state: false
         }
         iterative_anchoring_smoother_config {
@@ -313,16 +313,17 @@ default_task_config: {
 default_task_config: {
   task_type: OPEN_SPACE_ROI_DECIDER
   open_space_roi_decider_config {
-    roi_longitudinal_range: 15
+    roi_longitudinal_range_start: 15
+    roi_longitudinal_range_end: 15
     parking_start_range: 20.0
     parking_inwards: false
     enable_perception_obstacles: true
     parking_depth_buffer: 0.2
-    roi_linesegment_min_angle: 0.15
-    roi_linesegment_length: 1.0
+    roi_line_segment_min_angle: 0.15
+    roi_line_segment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
-    curb_heading_tangent_change_uppper_limit: 0.4
+    curb_heading_tangent_change_upper_limit: 0.4
   }
 }
 default_task_config: {

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include <fstream>
+#include "gtest/gtest.h"
 
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -103,7 +103,7 @@ TEST_F(LidarLibGroundServiceDetectorTest,
 
   GroundServiceContent ground_service_content;
   auto ground_service = SceneManager::Instance().Service("GroundService");
-  CHECK(ground_service);
+  ACHECK(ground_service);
   ground_service->GetServiceContentCopy(&ground_service_content);
   ground_service->UpdateServiceContent(ground_service_content);
 

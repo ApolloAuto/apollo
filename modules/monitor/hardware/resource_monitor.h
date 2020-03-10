@@ -35,10 +35,13 @@ class ResourceMonitor : public RecurrentRunner {
       const apollo::dreamview::ResourceMonitorConfig& config,
       ComponentStatus* status);
   static void CheckCPUUsage(
-      const int pid, const apollo::dreamview::ResourceMonitorConfig& config,
+      const apollo::dreamview::ResourceMonitorConfig& config,
       ComponentStatus* status);
   static void CheckMemoryUsage(
-      const int pid, const apollo::dreamview::ResourceMonitorConfig& config,
+      const apollo::dreamview::ResourceMonitorConfig& config,
+      ComponentStatus* status);
+  static void CheckDiskLoads(
+      const apollo::dreamview::ResourceMonitorConfig& config,
       ComponentStatus* status);
 };
 

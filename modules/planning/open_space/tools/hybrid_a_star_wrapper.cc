@@ -18,8 +18,6 @@
  * @file
  */
 
-#include <iostream>
-
 #include "cyber/common/file.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
@@ -80,7 +78,7 @@ extern "C" {
 HybridAStar* CreatePlannerPtr() {
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;

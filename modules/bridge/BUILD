@@ -7,7 +7,6 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"bridge\\"'],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/bridge/common:bridge_gflags",
         "//modules/bridge/common:bridge_header",
         "//modules/bridge/common:bridge_proto_diser_buf_factory",
@@ -16,12 +15,12 @@ cc_library(
         "//modules/bridge/common:macro",
         "//modules/bridge/common:util",
         "//modules/bridge/proto:udp_bridge_remote_info_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -84,7 +83,7 @@ cc_test(
     srcs = ["udp_bridge_component_test.cc"],
     deps = [
         ":udp_bridge_sender",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

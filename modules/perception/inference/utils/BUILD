@@ -116,7 +116,7 @@ cc_test(
     ],
     deps = [
         ":inference_util_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -141,7 +141,7 @@ cc_test(
     ],
     deps = [
         ":inference_binary_data_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

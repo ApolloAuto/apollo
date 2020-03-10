@@ -16,7 +16,6 @@
 
 #include "modules/planning/common/util/util.h"
 
-#include <cmath>
 #include <limits>
 #include <vector>
 
@@ -31,7 +30,6 @@ namespace util {
 
 using apollo::common::VehicleState;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
 using apollo::routing::RoutingResponse;
 
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {
@@ -128,6 +126,28 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
          << "] start_s[" << pnc_junction_overlap.start_s << "]";
 
   return distance_adc_pass_intersection < kIntersectionPassDist;
+}
+
+/*
+ * @brief: get files at a path
+ */
+void GetFilesByPath(const boost::filesystem::path& path,
+                    std::vector<std::string>* files) {
+  ACHECK(files);
+  if (!boost::filesystem::exists(path)) {
+    return;
+  }
+  if (boost::filesystem::is_regular_file(path)) {
+    AINFO << "Found record file: " << path.c_str();
+    files->push_back(path.c_str());
+    return;
+  }
+  if (boost::filesystem::is_directory(path)) {
+    for (auto& entry : boost::make_iterator_range(
+             boost::filesystem::directory_iterator(path), {})) {
+      GetFilesByPath(entry.path(), files);
+    }
+  }
 }
 
 }  // namespace util

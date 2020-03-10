@@ -11,7 +11,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder/proto:latency_record_proto",
-        "//modules/common/util",
+        "//modules/common/util:message_util",
     ],
 )
 

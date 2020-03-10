@@ -21,7 +21,6 @@
 #include "modules/planning/common/path/path_data.h"
 
 #include <algorithm>
-#include <vector>
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
@@ -120,8 +119,7 @@ common::PathPoint PathData::GetPathPointWithPathS(const double s) const {
 
 bool PathData::GetPathPointWithRefS(const double ref_s,
                                     common::PathPoint *const path_point) const {
-  DCHECK_NOTNULL(reference_line_);
-  DCHECK_NOTNULL(path_point);
+  ACHECK(reference_line_);
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
   if (ref_s < 0) {
     AERROR << "ref_s[" << ref_s << "] should be > 0";
@@ -178,7 +176,6 @@ std::string PathData::DebugString() const {
 
 bool PathData::SLToXY(const FrenetFramePath &frenet_path,
                       DiscretizedPath *const discretized_path) {
-  DCHECK_NOTNULL(discretized_path);
   std::vector<common::PathPoint> path_points;
   for (const common::FrenetFramePoint &frenet_point : frenet_path) {
     const common::SLPoint sl_point =
@@ -217,8 +214,7 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
 
 bool PathData::XYToSL(const DiscretizedPath &discretized_path,
                       FrenetFramePath *const frenet_path) {
-  CHECK_NOTNULL(frenet_path);
-  CHECK_NOTNULL(reference_line_);
+  ACHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   const double max_len = reference_line_->Length();
   for (const auto &path_point : discretized_path) {
@@ -226,8 +222,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
         reference_line_->GetFrenetPoint(path_point);
     if (!frenet_point.has_s()) {
       SLPoint sl_point;
-      if (!reference_line_->XYToSL({path_point.x(), path_point.y()},
-                                   &sl_point)) {
+      if (!reference_line_->XYToSL(path_point, &sl_point)) {
         AERROR << "Fail to transfer cartesian point to frenet point.";
         return false;
       }
@@ -246,7 +241,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
 }
 
 bool PathData::LeftTrimWithRefS(const common::FrenetFramePoint &frenet_point) {
-  CHECK_NOTNULL(reference_line_);
+  ACHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   frenet_frame_points.emplace_back(frenet_point);
 

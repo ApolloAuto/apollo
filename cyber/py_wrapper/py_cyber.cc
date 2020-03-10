@@ -16,7 +16,12 @@
 
 #include "cyber/py_wrapper/py_cyber.h"
 
-#include <Python.h>
+#if PY_MAJOR_VERSION >= 3
+#include <python3.6m/Python.h>
+#else
+#include <python2.7/Python.h>
+#endif
+
 #include <string>
 #include <vector>
 
@@ -515,7 +520,7 @@ PyObject *cyber_PyNode_create_reader(PyObject *self, PyObject *args) {
 
   PyReader *reader = reinterpret_cast<PyReader *>((node->create_reader(
       (std::string const &)channel_name, (std::string const &)type_name)));
-  CHECK(reader) << "PyReader is NULL!";
+  ACHECK(reader) << "PyReader is NULL!";
 
   PyObject *pyobj_reader =
       PyCapsule_New(reader, "apollo_cyber_pyreader", nullptr);

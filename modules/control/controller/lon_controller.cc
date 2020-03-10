@@ -147,7 +147,7 @@ void LonController::LoadControlCalibrationTable(
                                   calibration.command()));
   }
   control_interpolation_.reset(new Interpolation2D);
-  CHECK(control_interpolation_->Init(xyz))
+  ACHECK(control_interpolation_->Init(xyz))
       << "Fail to load control calibration table";
 }
 

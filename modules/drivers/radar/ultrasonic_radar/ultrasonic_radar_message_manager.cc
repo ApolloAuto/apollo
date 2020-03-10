@@ -57,7 +57,7 @@ void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
     sensor_data_.set_ranges(10, data[1]);
     sensor_data_.set_ranges(11, data[2]);
     common::util::FillHeader("ultrasonic_radar", &sensor_data_);
-    ultrasonic_radar_writer_->Write(std::make_shared<Ultrasonic>(sensor_data_));
+    ultrasonic_radar_writer_->Write(sensor_data_);
   }
 
   received_ids_.insert(message_id);

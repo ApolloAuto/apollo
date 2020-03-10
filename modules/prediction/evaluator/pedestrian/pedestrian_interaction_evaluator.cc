@@ -17,7 +17,6 @@
 #include "modules/prediction/evaluator/pedestrian/pedestrian_interaction_evaluator.h"
 
 #include <utility>
-#include <vector>
 
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
@@ -31,12 +30,7 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
     : device_(torch::kCPU) {
@@ -197,8 +191,8 @@ bool PedestrianInteractionEvaluator::Evaluate(
   for (int i = 1; i <= kShortTermPredictionPointNum; ++i) {
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
-    CHECK(obstacle_id_lstm_state_map_.find(id) !=
-          obstacle_id_lstm_state_map_.end());
+    ACHECK(obstacle_id_lstm_state_map_.find(id) !=
+           obstacle_id_lstm_state_map_.end());
     torch::Tensor torch_position = torch::zeros({1, 2});
     double curr_rel_x = rel_x;
     double curr_rel_y = rel_y;

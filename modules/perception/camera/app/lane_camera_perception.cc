@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/camera/app/lane_camera_perception.h"
 
-#include <gflags/gflags.h>
-#include <yaml-cpp/yaml.h>
-
 #include <algorithm>
 #include <fstream>
 #include <string>
@@ -25,6 +22,9 @@
 #include <vector>
 
 #include "absl/strings/str_cat.h"
+#include "gflags/gflags.h"
+#include "yaml-cpp/yaml.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/object.h"
@@ -50,9 +50,9 @@ bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
       << "Read config failed: " << config_file;
-  CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
+  ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   lane_calibration_working_sensor_name_ =
       options.lane_calibration_working_sensor_name;
@@ -76,7 +76,7 @@ void LaneCameraPerception::InitLane(
   for (int i = 0; i < perception_param.lane_param_size(); ++i) {
     // Initialize lane detector
     const auto &lane_param = perception_param.lane_param(i);
-    CHECK(lane_param.has_lane_detector_param())
+    ACHECK(lane_param.has_lane_detector_param())
         << "Failed to include lane_detector_param.";
     LaneDetectorInitOptions lane_detector_init_options;
     const auto &lane_detector_param = lane_param.lane_detector_param();
@@ -95,8 +95,8 @@ void LaneCameraPerception::InitLane(
     AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
     lane_detector_.reset(BaseLaneDetectorRegisterer::GetInstanceByName(
         lane_detector_plugin_param.name()));
-    CHECK(lane_detector_ != nullptr);
-    CHECK(lane_detector_->Init(lane_detector_init_options))
+    ACHECK(lane_detector_ != nullptr);
+    ACHECK(lane_detector_->Init(lane_detector_init_options))
         << "Failed to init: " << lane_detector_plugin_param.name();
     AINFO << "Detector: " << lane_detector_->Name();
 
@@ -115,8 +115,8 @@ void LaneCameraPerception::InitLane(
     lane_postprocessor_.reset(
         BaseLanePostprocessorRegisterer::GetInstanceByName(
             lane_postprocessor_param.name()));
-    CHECK(lane_postprocessor_ != nullptr);
-    CHECK(lane_postprocessor_->Init(postprocessor_init_options))
+    ACHECK(lane_postprocessor_ != nullptr);
+    ACHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init: " << lane_postprocessor_param.name();
     AINFO << "lane_postprocessor: " << lane_postprocessor_->Name();
 
@@ -141,7 +141,7 @@ void LaneCameraPerception::InitCalibrationService(
     const std::string &work_root, const base::BaseCameraModelPtr model,
     const app::PerceptionParam &perception_param) {
   // Init calibration service
-  CHECK(perception_param.has_calibration_service_param())
+  ACHECK(perception_param.has_calibration_service_param())
       << "Failed to include calibration_service_param";
   {
     auto calibration_service_param =
@@ -159,8 +159,8 @@ void LaneCameraPerception::InitCalibrationService(
     calibration_service_.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(
             calibration_service_param.plugin_param().name()));
-    CHECK(calibration_service_ != nullptr);
-    CHECK(calibration_service_->Init(calibration_service_init_options))
+    ACHECK(calibration_service_ != nullptr);
+    ACHECK(calibration_service_->Init(calibration_service_init_options))
         << "Failed to init " << calibration_service_param.plugin_param().name();
     AINFO << "Calibration service: " << calibration_service_->Name();
   }

@@ -16,10 +16,10 @@
 
 #include "cyber/data/cache_buffer.h"
 
-#include <gtest/gtest.h>
 #include <mutex>
 #include <thread>
 #include <utility>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 

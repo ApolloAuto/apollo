@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <utility>
-#include <vector>
 
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
@@ -29,13 +28,6 @@
 
 namespace apollo {
 namespace prediction {
-
-using apollo::common::Point3D;
-using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 LaneAggregatingEvaluator::LaneAggregatingEvaluator() : device_(torch::kCPU) {
   evaluator_type_ = ObstacleConf::LANE_AGGREGATING_EVALUATOR;
@@ -448,7 +440,7 @@ torch::Tensor LaneAggregatingEvaluator::AggregateLaneEncodings(
 
 torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  CHECK(!lane_encoding_list.empty());
+  ACHECK(!lane_encoding_list.empty());
   torch::Tensor output_tensor = lane_encoding_list[0];
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {
@@ -462,7 +454,7 @@ torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
 
 torch::Tensor LaneAggregatingEvaluator::LaneEncodingAvgPooling(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  CHECK(!lane_encoding_list.empty());
+  ACHECK(!lane_encoding_list.empty());
   torch::Tensor output_tensor = lane_encoding_list[0];
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {

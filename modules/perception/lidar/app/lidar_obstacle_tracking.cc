@@ -30,19 +30,19 @@ bool LidarObstacleTracking::Init(
   auto& sensor_name = options.sensor_name;
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
 
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
   config_file = cyber::common::GetAbsolutePath(config_file,
                                                "lidar_obstacle_tracking.conf");
 
   LidarObstacleTrackingConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   multi_target_tracker_name_ = config.multi_target_tracker();
   fusion_classifier_name_ = config.fusion_classifier();
 
@@ -51,13 +51,13 @@ bool LidarObstacleTracking::Init(
           multi_target_tracker_name_));
   CHECK_NOTNULL(multi_target_tracker_.get());
   MultiTargetTrackerInitOptions tracker_init_options;
-  CHECK(multi_target_tracker_->Init(tracker_init_options));
+  ACHECK(multi_target_tracker_->Init(tracker_init_options));
 
   fusion_classifier_.reset(
       BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name_));
   CHECK_NOTNULL(fusion_classifier_.get());
   ClassifierInitOptions fusion_classifier_init_options;
-  CHECK(fusion_classifier_->Init(fusion_classifier_init_options));
+  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options));
   return true;
 }
 

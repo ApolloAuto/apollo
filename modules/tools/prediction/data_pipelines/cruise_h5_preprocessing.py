@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -20,11 +22,12 @@ This .py file includes functions for data preprocessing:
     - balancing the datasets
 '''
 
-import os
 import argparse
 import datetime
-import numpy as np
+import os
+
 import h5py
+import numpy as np
 
 
 def getListOfFiles(dirName):
@@ -50,16 +53,16 @@ def load_hdf5(filename):
     load training samples from *.hdf5 file
     """
     if not(os.path.exists(filename)):
-        print ("file:", filename, "does not exist")
+        print("file:", filename, "does not exist")
         os._exit(1)
     if os.path.splitext(filename)[1] != '.h5':
-        print ("file:", filename, "is not an hdf5 file")
+        print("file:", filename, "is not an hdf5 file")
         os._exit(1)
 
     h5_file = h5py.File(filename, 'r')
     values = h5_file[list(h5_file.keys())[0]]
     #values = h5_file.values()[0]
-    print ("load data size:", values.shape[0])
+    print("load data size:", values.shape[0])
     return values
 
 
@@ -116,21 +119,21 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     path = args.directory
-    print ("Loading h5 from directory: {}".format(path))
+    print("Loading h5 from directory: {}".format(path))
 
     if not args.merge_files:
 
         if os.path.isdir(path):
 
             h5_files = getListOfFiles(path)
-            print ("Total number of files:", len(h5_files))
+            print("Total number of files:", len(h5_files))
 
             # For each file in the total list of files:
             for i, file in enumerate(h5_files):
-                print ("Process File", i, ":", file)
+                print("Process File", i, ":", file)
                 feature = load_hdf5(file)
                 if np.any(np.isinf(feature)):
-                    print ("inf data found")
+                    print("inf data found")
 
                 if args.split_category:
                     # Split data into two categories:
@@ -153,10 +156,10 @@ if __name__ == '__main__':
                     h5_file.close()
 
                 else:
-                    print (None)
-                    #TODO: implement those non-splitting category
+                    print(None)
+                    # TODO: implement those non-splitting category
         else:
-            print ("Fail to find", path)
+            print("Fail to find", path)
             os._exit(-1)
 
     else:
@@ -168,14 +171,14 @@ if __name__ == '__main__':
             labels = None
 
             h5_files = getListOfFiles(path)
-            print ("Total number of files:", len(h5_files))
+            print("Total number of files:", len(h5_files))
 
             # For each file in the total list of files:
             for i, file in enumerate(h5_files):
-                print ("Process File", i, ":", file)
+                print("Process File", i, ":", file)
                 feature = load_hdf5(file)
                 if np.any(np.isinf(feature)):
-                    print ("inf data found")
+                    print("inf data found")
 
                 if args.split_category:
                     # Split data into two categories:
@@ -190,19 +193,19 @@ if __name__ == '__main__':
                     features_cutin = np.concatenate((features_cutin, fea_cutin), axis=0) if features_cutin is not None \
                         else fea_cutin
         else:
-            print ("Fail to find", path)
+            print("Fail to find", path)
             os._exit(-1)
 
         if args.split_category:
             date = datetime.datetime.now().strftime('%Y-%m-%d')
             sample_file = path + 'merged_go' + date + '.h5'
-            print ("Save samples file to:", sample_file)
+            print("Save samples file to:", sample_file)
             h5_file = h5py.File(sample_file, 'w')
             h5_file.create_dataset('data', data=features_go)
             h5_file.close()
 
             sample_file = path + 'merged_cutin' + date + '.h5'
-            print ("Save samples file to:", sample_file)
+            print("Save samples file to:", sample_file)
             h5_file = h5py.File(sample_file, 'w')
             h5_file.create_dataset('data', data=features_cutin)
             h5_file.close()

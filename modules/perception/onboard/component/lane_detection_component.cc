@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/lane_detection_component.h"
 
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Core>
-#include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
@@ -27,7 +24,11 @@
 #include <string>
 #include <tuple>
 
+#include "Eigen/Core"
+#include "Eigen/Dense"
 #include "absl/strings/str_cat.h"
+#include "yaml-cpp/yaml.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -210,7 +211,7 @@ bool LaneDetectionComponent::Init() {
                  &ex_lidar2imu);
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
-  CHECK(visualize_.Init_all_info_single_camera(
+  ACHECK(visualize_.Init_all_info_single_camera(
       camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
       ex_lidar2imu, pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
       image_height_, image_width_));

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/base/for_each.h"
 #include "cyber/common/global_data.h"

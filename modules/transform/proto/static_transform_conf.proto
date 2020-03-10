@@ -3,12 +3,12 @@ syntax = "proto2";
 package apollo.static_transform;
 
 message ExtrinsicFile {
-    optional string frame_id = 1;
-    optional string child_frame_id = 2;
-    optional string file_path = 3;
-    optional bool enable = 4;
+  optional string frame_id = 1;
+  optional string child_frame_id = 2;
+  optional string file_path = 3;
+  optional bool enable = 4;
 }
 
 message Conf {
-    repeated ExtrinsicFile extrinsic_file = 1;
+  repeated ExtrinsicFile extrinsic_file = 1;
 }

@@ -203,13 +203,13 @@ bool GetNavigationPathFromFile(const std::string& filename,
 
 void CheckConfig(
     const apollo::relative_map::NavigatorConfig& navigator_config) {
-  CHECK(navigator_config.has_sample_param());
+  ACHECK(navigator_config.has_sample_param());
   const auto& sample_param = navigator_config.sample_param();
-  CHECK(sample_param.has_straight_sample_interval());
-  CHECK(sample_param.has_small_kappa_sample_interval());
-  CHECK(sample_param.has_middle_kappa_sample_interval());
-  CHECK(sample_param.has_large_kappa_sample_interval());
-  CHECK(sample_param.has_small_kappa());
-  CHECK(sample_param.has_middle_kappa());
-  CHECK(sample_param.has_large_kappa());
+  ACHECK(sample_param.has_straight_sample_interval());
+  ACHECK(sample_param.has_small_kappa_sample_interval());
+  ACHECK(sample_param.has_middle_kappa_sample_interval());
+  ACHECK(sample_param.has_large_kappa_sample_interval());
+  ACHECK(sample_param.has_small_kappa());
+  ACHECK(sample_param.has_middle_kappa());
+  ACHECK(sample_param.has_large_kappa());
 }

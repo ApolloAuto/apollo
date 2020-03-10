@@ -19,8 +19,6 @@
  **/
 #pragma once
 
-#include <algorithm>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -45,7 +43,6 @@
 
 namespace apollo {
 namespace planning {
-using apollo::planning_internal::Debug;
 
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;
@@ -295,7 +292,16 @@ class OpenSpaceInfo {
     return &debug_instance_;
   }
 
-  void sync_debug_instance() { debug_instance_.MergeFrom(*debug_); }
+  void sync_debug_instance() {
+    // Remove existing obstacle vectors to prevent repeating obstacle
+    // vectors.
+    if (!debug_->planning_data().open_space().obstacles().empty()) {
+      debug_instance_.mutable_planning_data()
+          ->mutable_open_space()
+          ->clear_obstacles();
+    }
+    debug_instance_.MergeFrom(*debug_);
+  }
 
   void RecordDebug(apollo::planning_internal::Debug *ptr_debug);
 

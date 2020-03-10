@@ -700,16 +700,16 @@ bool IterativeAnchoringSmoother::CombinePathAndSpeed(
   CHECK_NOTNULL(discretized_trajectory);
   discretized_trajectory->clear();
   // TODO(Jinyun): move to confs
-  const double kDenseTimeResoltuion = 0.1;
+  const double kDenseTimeResolution = 0.1;
   const double time_horizon =
-      speed_points.TotalTime() + kDenseTimeResoltuion * 1.0e-6;
+      speed_points.TotalTime() + kDenseTimeResolution * 1.0e-6;
   if (path_points.empty()) {
     AERROR << "path data is empty";
     return false;
   }
   ADEBUG << "speed_points.TotalTime() " << speed_points.TotalTime();
   for (double cur_rel_time = 0.0; cur_rel_time < time_horizon;
-       cur_rel_time += kDenseTimeResoltuion) {
+       cur_rel_time += kDenseTimeResolution) {
     common::SpeedPoint speed_point;
     if (!speed_points.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;

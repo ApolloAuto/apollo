@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -17,7 +17,9 @@
 ###############################################################################
 
 import threading
+
 import numpy as np
+
 from modules.planning.proto import planning_internal_pb2
 
 
@@ -109,12 +111,12 @@ class Planning:
                 sl_sampled_s.append(s)
             for l in sl_frame.map_lower_bound:
                 if (l > 10 or l < -10):
-                    sl_map_lower_boundary.append(100 * l / abs(l))
+                    sl_map_lower_boundary.append(100 * l // abs(l))
                 else:
                     sl_map_lower_boundary.append(l)
             for l in sl_frame.map_upper_bound:
                 if (l > 10 or l < -10):
-                    sl_map_upper_boundary.append(100 * l / abs(l))
+                    sl_map_upper_boundary.append(100 * l // abs(l))
                 else:
                     sl_map_upper_boundary.append(l)
             for l in sl_frame.static_obstacle_lower_bound:
@@ -385,7 +387,7 @@ class Planning:
         st_boundary_type = self.st_data_boundary_type[st_graph_name]
         for boundary_name in st_graph_boudnary_s.keys():
             if cnt >= len(boundaries_pool):
-                print("WARNING: number of path lines is more than " \
+                print("WARNING: number of path lines is more than "
                       + len(boundaries_pool))
                 continue
             boundary = boundaries_pool[cnt]
@@ -438,7 +440,7 @@ class Planning:
         self.path_data_lock.acquire()
         for name in self.path_data_x.keys():
             if cnt >= len(path_lines):
-                print("WARNING: number of path lines is more than " \
+                print("WARNING: number of path lines is more than "
                       + len(path_lines))
                 continue
             if len(self.path_data_x[name]) <= 1:
@@ -478,7 +480,7 @@ class Planning:
         self.speed_data_lock.acquire()
         for name in self.speed_data_time.keys():
             if cnt >= len(speed_lines):
-                print("WARNING: number of speed lines is more than " \
+                print("WARNING: number of speed lines is more than "
                       + len(speed_lines))
                 continue
             if len(self.speed_data_time[name]) <= 1:

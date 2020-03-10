@@ -13,9 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
-#include "modules/map/hdmap/hdmap_impl.h"
-#include "cyber/common/file.h"
+#include <chrono>
+
+#include "absl/strings/str_cat.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
+#include "modules/map/hdmap/hdmap_impl.h"
 
 DEFINE_string(output_dir, "/tmp", "output map directory");
 
@@ -414,13 +418,17 @@ TEST_F(HDMapImplTestSuite, GetLocalMap) {
   std::pair<double, double> range{10.0, 10.0};
   ASSERT_EQ(0, hdmap_impl_.GetLocalMap(point, range, &local_map));
 
-  const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(cyber::common::SetProtoToBinaryFile(local_map, output_bin_file))
+  const std::string time_since_epoch = std::to_string(
+      std::chrono::steady_clock::now().time_since_epoch().count());
+  const std::string output_bin_file =
+      absl::StrCat(FLAGS_output_dir, "/base_map_", time_since_epoch, " .bin");
+  ACHECK(cyber::common::SetProtoToBinaryFile(local_map, output_bin_file))
       << "failed to output binary format base map";
 
   local_map.Clear();
-  CHECK(cyber::common::GetProtoFromFile(output_bin_file, &local_map))
+  ACHECK(cyber::common::GetProtoFromFile(output_bin_file, &local_map))
       << "failed to load map";
+  cyber::common::DeleteFile(output_bin_file);
 }
 
 }  // namespace hdmap

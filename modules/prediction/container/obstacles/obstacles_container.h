@@ -23,14 +23,12 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/prediction/proto/submodule_messages.pb.h"
 #include "modules/prediction/submodules/submodule_output.h"
 
 namespace apollo {
@@ -134,7 +132,8 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
-  SubmoduleOutput GetSubmoduleOutput();
+  SubmoduleOutput GetSubmoduleOutput(const size_t history_size,
+                                     const absl::Time& frame_start_time);
 
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
@@ -152,8 +151,6 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
-  std::unordered_map<int, apollo::perception::PerceptionObstacle>
-      curr_frame_id_perception_obstacle_map_;
 };
 
 }  // namespace prediction

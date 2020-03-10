@@ -123,9 +123,6 @@ DECLARE_string(tf_static_topic);
 // Recorder status topic
 DECLARE_string(recorder_status_topic);
 
-// simulation clock topic
-DECLARE_string(tick_topic);
-
 // Latency recording topic
 DECLARE_string(latency_recording_topic);
 // Latency reporting topic

@@ -19,7 +19,8 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <unordered_map>
+
+#include "absl/time/time.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
@@ -32,11 +33,9 @@ class LatencyRecorder {
  public:
   explicit LatencyRecorder(const std::string& module_name);
 
-  void AppendLatencyRecord(const uint64_t message_id, const uint64_t begin_time,
-                           const uint64_t end_time);
-
-  void AppendLatencyRecord(const uint64_t message_id, const double begin_time,
-                           const double end_time);
+  void AppendLatencyRecord(const uint64_t message_id,
+                           const absl::Time& begin_time,
+                           const absl::Time& end_time);
 
  private:
   LatencyRecorder() = default;
@@ -46,10 +45,9 @@ class LatencyRecorder {
 
   std::string module_name_;
   std::mutex mutex_;
-  std::unique_ptr<LatencyRecordMap> records_ = nullptr;
-  uint64_t current_timestamp_ = 0;
-  const double publish_interval_ = 3.0;
-  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
+  std::unique_ptr<LatencyRecordMap> records_;
+  absl::Time current_time_;
+  std::shared_ptr<apollo::cyber::Node> node_;
 };
 
 }  // namespace common

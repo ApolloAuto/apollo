@@ -35,7 +35,7 @@ cc_test(
     srcs = ["brake_control_a4_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -57,7 +57,7 @@ cc_test(
     srcs = ["enable_state_feedback_c3_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -79,7 +79,7 @@ cc_test(
     srcs = ["error_state_e1_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -101,7 +101,7 @@ cc_test(
     srcs = ["gear_control_a1_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -123,7 +123,7 @@ cc_test(
     srcs = ["parking_control_a5_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -145,7 +145,7 @@ cc_test(
     srcs = ["steering_control_a2_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -167,7 +167,7 @@ cc_test(
     srcs = ["torque_control_a3_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -189,7 +189,7 @@ cc_test(
     srcs = ["vehicle_state_feedback_2_c4_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -211,7 +211,7 @@ cc_test(
     srcs = ["vehicle_state_feedback_c1_test.cc"],
     deps = [
         ":canbus_zhongyun_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

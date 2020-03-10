@@ -15,9 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 
+#include <boost/format.hpp>
 #include <limits>
-
-#include "boost/format.hpp"
 
 #include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
@@ -249,11 +248,11 @@ void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
   double in_view_ratio = 0.0;
   // 1.get camera intrinsic and pose
   SensorDataManager *sensor_manager = SensorDataManager::Instance();
-  CHECK(sensor_manager != nullptr) << "Failed to get sensor manager";
+  ACHECK(sensor_manager != nullptr) << "Failed to get sensor manager";
 
   base::BaseCameraModelPtr camera_model =
       sensor_manager->GetCameraIntrinsic(sensor_id);
-  CHECK(camera_model != nullptr)
+  ACHECK(camera_model != nullptr)
       << "Failed to get camera intrinsic for " << sensor_id;
 
   Eigen::Affine3d sensor2world_pose;
@@ -299,7 +298,7 @@ void DstExistanceFusion::UpdateToicWithCameraMeasurement(
 
   base::BaseCameraModelPtr camera_model =
       sensor_manager->GetCameraIntrinsic(sensor_id);
-  CHECK(camera_model != nullptr)
+  ACHECK(camera_model != nullptr)
       << "Failed to get camera intrinsic for " << sensor_id;
 
   Eigen::Affine3d sensor2world_pose;

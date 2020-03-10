@@ -13,8 +13,8 @@ cc_library(
         "//cyber/common",
         "//modules/common/util",
         "//modules/localization/msf/common/util:localization_msf_common_util",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -33,8 +33,8 @@ cc_library(
     ],
     deps = [
         "//cyber/common",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -49,8 +49,8 @@ cc_library(
     deps = [
         ":localization_pyramid_map_base_map_config",
         "//cyber/common",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -61,8 +61,8 @@ cc_library(
     deps = [
         ":localization_pyramid_map_base_map_node_index",
         "//cyber/common",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -83,8 +83,8 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/common/util:localization_msf_common_util_file_utility",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -101,8 +101,8 @@ cc_library(
         ":localization_pyramid_map_base_map_node_index",
         "//cyber/common",
         "//modules/localization/msf/common/util:localization_msf_common_util",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 
@@ -122,8 +122,8 @@ cc_library(
         "//cyber/common",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/common/util:localization_msf_common_util_file_utility",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
     ],
 )
 

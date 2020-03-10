@@ -16,10 +16,10 @@
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <cstdlib>
 #include <thread>
 
 #include "cyber/common/log.h"

@@ -1,19 +1,90 @@
-## How to Add a New External Dependency
+# How to Add a New External Dependency
 
-The design and implementation goal is to minimize the dependency that must be pre-installed in the system. If your target depends on a module for which you have to `apt-get install` first, consider using **Bazel** as the package/dependency management system.
+## 1. Library that supports bazel
 
-For example, if you want to add a workspace rule `foo` that is not originally built with Bazel, do the following:
+For example,
 
-- Add a workspace rule named 'foo' in the WORKSPACE file.
-- Specify the source of `foo` (usually a URL), and the version (usually a commit hash or a git tag).
-- Write a `foo.BUILD` under the third_party directory to build it. The BUILD file will be similar to any other Bazel BUILD file of your own targets.
-- In your target that depends on `foo`, put `@foo://:<foo_target>` in its dependencies.
+* [Abseil](https://github.com/abseil/abseil-cpp)
+* [Google Test](https://github.com/google/googletest)
 
-### Use Bazel to Add an External Dependency
+Simply import it into WORKSPACE:
 
-If you add a workspace rule `foo`  using Bazel to build your target, depending on `foo`, Bazel pulls the source code of `foo` from the source specified, and builds it with `foo.BUILD`. If `foo` was originally built with Bazel, then only the workspace rule is needed.
+```python
+git_repository(
+  name = "com_google_absl",
+  remote = "https://github.com/abseil/abseil-cpp",
+  tag = "20190808",
+)
+```
 
-### References
+## 2. Library that has third-party bazel rule
+
+Some popular libraries don't support bazel natively, but may be resolved by
+other developers.
+
+Try boost as an example:
+
+```python
+git_repository(
+    name = "com_github_nelhage_rules_boost",
+    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
+    remote = "https://github.com/nelhage/rules_boost",
+    shallow_since = "1570056263 -0700",
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+boost_deps()
+```
+
+Now you can refer to it in BUILD files with `@boost//:system`, etc.
+
+## 3. Library with handcrafted BUILD file
+
+It's pretty common to do so. But it needs very solid knowledge with bazel.
+
+```python
+new_http_archive(
+    name = "civetweb",
+    url = "https://github.com/civetweb/civetweb/archive/v1.11.tar.gz",
+    sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
+    build_file = "third_party/civetweb.BUILD",
+    strip_prefix = "civetweb-1.11",
+)
+```
+
+## 4. Library which is pre-installed into the operating system
+
+It's NOT recommended, as it breaks the rule of a self-contained bazel WORKSPACE.
+However, some libraries are very complicated to build with bazel, while the
+operating system, such as Ubuntu, provides easy installation.
+
+For example,
+
+* [OpenCV](https://github.com/opencv/opencv)
+* [Poco](https://github.com/pocoproject/poco)
+
+Please do raise a discussion before doing so. Then we can add it to the docker
+image:
+
+```bash
+sudo apt install libopencv-dev libpoco-dev
+```
+
+Then add it as a third_party library in
+[third_party/BUILD](https://github.com/ApolloAuto/apollo/blob/master/third_party/BUILD).
+
+```python
+cc_library(
+    name = "PocoFoundation",
+    linkopts = ["-lPocoFoundation"],
+)
+```
+
+Note that in such case, you should include the headers like
+`#include <Poco/SharedLibrary.h>` instead of `#include "Poco/SharedLibrary.h"`
+as they are in the system path.
+
+## References
 
 For a detailed description on adding a dependency with Bazel, refer to the following:
 * [Workspace Rules](https://bazel.build/versions/master/docs/be/workspace.html)

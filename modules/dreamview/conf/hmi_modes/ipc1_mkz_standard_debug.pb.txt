@@ -65,12 +65,6 @@ cyber_modules {
     dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
   }
 }
-cyber_modules {
-  key: "Tick"
-  value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
-  }
-}
 modules {
   key: "Recorder"
   value: {

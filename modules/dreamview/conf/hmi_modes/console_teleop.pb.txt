@@ -1,8 +1,8 @@
 modules {
-  key: "Telecine0"
+  key: "Telecine 0"
   value: {
-    start_command: "car1_run_telecine0.bash start"
-    stop_command: "car1_run_telecine0.bash stop"
+    start_command: "run_teleop_telecine0.bash start"
+    stop_command: "run_teleop_telecine0.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "telecine.py"
@@ -11,10 +11,10 @@ modules {
   }
 }
 modules {
-  key: "Telecine1"
+  key: "Telecine 1"
   value: {
-    start_command: "car1_run_telecine1.bash start"
-    stop_command: "car1_run_telecine1.bash stop"
+    start_command: "run_teleop_telecine1.bash start"
+    stop_command: "run_teleop_telecine1.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "telecine.py"
@@ -23,10 +23,10 @@ modules {
   }
 }
 modules {
-  key: "Telecine2"
+  key: "Telecine 2"
   value: {
-    start_command: "car1_run_telecine2.bash start"
-    stop_command: "car1_run_telecine2.bash stop"
+    start_command: "run_teleop_telecine2.bash start"
+    stop_command: "run_teleop_telecine2.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "telecine.py"
@@ -35,46 +35,46 @@ modules {
   }
 }
 modules {
-  key: "Modem_Router"
+  key: "Router"
   value: {
-    start_command: "car1_run_modem_router.bash start"
-    stop_command: "car1_run_modem_router.bash stop"
+    start_command: "run_teleop_router.bash start"
+    stop_command: "run_teleop_router.bash stop"
     process_monitor_config {
       command_keywords: "python"
-      command_keywords: "modem_router"
+      command_keywords: "router.py"
     }
   }
 }
 
 modules {
-  key: "Decoder0"
+  key: "Video Decoder 0"
   value: {
-    start_command: "car1_run_decoder0.bash start"
-    stop_command: "car1_run_decoder0.bash stop"
+    start_command: "run_teleop_video_decoder0.bash start"
+    stop_command: "run_teleop_video_decoder0.bash stop"
     process_monitor_config {
-      command_keywords: "eyevatar_node"
+      command_keywords: "video_decoder"
       command_keywords: "decoder_0"
     }
   }
 }
 modules {
-  key: "Decoder1"
+  key: "Video Decoder 1"
   value: {
-    start_command: "car1_run_decoder1.bash start"
-    stop_command: "car1_run_decoder1.bash stop"
+    start_command: "run_teleop_video_decoder1.bash start"
+    stop_command: "run_teleop_video_decoder1.bash stop"
     process_monitor_config {
-      command_keywords: "eyevatar_node"
+      command_keywords: "video_decoder"
       command_keywords: "decoder_1"
     }
   }
 }
 modules {
-  key: "Decoder2"
+  key: "Video Decoder 2"
   value: {
-    start_command: "car1_run_decoder2.bash start"
-    stop_command: "car1_run_decoder2.bash stop"
+    start_command: "run_teleop_video_decoder2.bash start"
+    stop_command: "run_teleop_video_decoder2.bash stop"
     process_monitor_config {
-      command_keywords: "eyevatar_node"
+      command_keywords: "video_decoder"
       command_keywords: "decoder_2"
     }
   }
@@ -83,31 +83,31 @@ modules {
 modules {
   key: "Daemon"
   value: {
-    start_command: "car1_run_daemon.bash start"
-    stop_command: "car1_run_daemon.bash stop"
+    start_command: "run_teleop_daemon.bash start"
+    stop_command: "run_teleop_daemon.bash stop"
     process_monitor_config {
       command_keywords: "python"
-      command_keywords: "daemon_service.py"
+      command_keywords: "daemon.py"
     }
   }
 }
 
 modules {
-  key: "Teleop"
+  key: "Tele Control"
   value: {
-    start_command: "car1_run_teleop.bash operator start"
-    stop_command: "car1_run_teleop.bash operator stop"
+    start_command: "run_teleop_tele_control.bash operator start"
+    stop_command: "run_teleop_tele_control.bash operator stop"
     process_monitor_config {
       command_keywords: "python"
-      command_keywords: "teleop.py"
+      command_keywords: "tele_control.py"
     }
   }
 }
 modules {
-  key: "Voip decoder"
+  key: "Voip Decoder"
   value: {
-    start_command: "car1_run_voip_decoder.bash start"
-    stop_command: "car1_run_voip_decoder.bash stop"
+    start_command: "run_teleop_voip_decoder.bash start"
+    stop_command: "run_teleop_voip_decoder.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "voip_decoder.py"
@@ -115,10 +115,10 @@ modules {
   }
 }
 modules {
-  key: "Voip encoder"
+  key: "Voip Encoder"
   value: {
-    start_command: "car1_run_voip_encoder.bash start"
-    stop_command: "car1_run_voip_encoder.bash stop"
+    start_command: "run_teleop_voip_encoder.bash start"
+    stop_command: "run_teleop_voip_encoder.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "voip_encoder.py"

@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <thread>
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -52,6 +50,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
 
+    FLAGS_enable_scenario_pull_over = false;
     FLAGS_enable_scenario_stop_sign = false;
     FLAGS_enable_scenario_traffic_light = false;
     FLAGS_enable_rss_info = false;
