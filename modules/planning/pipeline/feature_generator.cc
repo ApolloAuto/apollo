@@ -121,8 +121,8 @@ void FeatureGenerator::OnPrediction(
   }
 
   // erase obstacle history if obstacle not exist in current predictio msg
-  std::unordered_map<int, std::list<ObstacleTrajectoryPoint>> ::iterator it =
-      obstacle_history_map_.begin();
+  std::unordered_map<int, std::list<ObstacleTrajectoryPointFeature>>::iterator
+      it = obstacle_history_map_.begin();
   while (it != obstacle_history_map_.end()) {
     const int obstacle_id = it->first;
     if (prediction_obstacles_map_.count(obstacle_id) == 0) {
@@ -136,7 +136,7 @@ void FeatureGenerator::OnPrediction(
   // add to obstacle history
   for (const auto& m : prediction_obstacles_map_) {
     const auto& perception_obstale = m.second.perception_obstacle();
-    ObstacleTrajectoryPoint obstacle_trajectory_point;
+    ObstacleTrajectoryPointFeature obstacle_trajectory_point;
     obstacle_trajectory_point.set_timestamp_sec(perception_obstale.timestamp());
     obstacle_trajectory_point.mutable_position()->CopyFrom(
         perception_obstale.position());

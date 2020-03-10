@@ -53,7 +53,7 @@ message LocalizationFeature {
   optional apollo.common.Point3D angular_velocity = 5;
 }
 
-message ObstacleTrajectoryPoint {
+message ObstacleTrajectoryPointFeature {
   optional double timestamp_sec = 1;
 
   // obstacle position in the OBJECT coordinate system
@@ -72,11 +72,43 @@ message ObstacleTrajectoryPoint {
   optional apollo.common.Point3D acceleration = 6;
 }
 
-message ObstaclePrediction {
+message PathPointFeature {
+  // coordinates
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+
+  // direction on the x-y plane
+  optional double theta = 4;
+  // accumulated distance from beginning of the path
+  optional double s = 5;
+  // The lane ID where the path point is on
+  optional string lane_id = 6;
+}
+
+message TrajectoryPointFeature {
+  // path point
+  optional PathPointFeature path_point = 1;
+  // linear velocity
+  optional double v = 2;  // in [m/s]
+  // linear acceleration
+  optional double a = 3;
+  // relative time from beginning of the trajectory
+  optional double relative_time = 4;
+  // Gaussian probability information
+  optional apollo.common.GaussianInfo gaussian_info = 5;
+}
+
+message TrajectoryFeature {
+  optional double probability = 1;  // probability of this trajectory
+  repeated TrajectoryPointFeature trajectory_point = 2;
+}
+
+message ObstaclePredictionFeature {
   optional double timestamp_sec = 1;  // GPS time in seconds
   optional double predicted_period = 2;
   // can have multiple trajectories per obstacle
-  repeated apollo.prediction.Trajectory trajectory = 3;
+  repeated TrajectoryFeature trajectory = 3;
 
   // estimated obstacle intent
   optional apollo.prediction.ObstacleIntent intent = 4;
@@ -90,8 +122,8 @@ message ObstacleFeature {
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
   optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
-  repeated ObstacleTrajectoryPoint obstacle_trajectory_point = 6;
-  optional ObstaclePrediction obstacle_prediction = 7;
+  repeated ObstacleTrajectoryPointFeature obstacle_trajectory_point = 6;
+  optional ObstaclePredictionFeature obstacle_prediction = 7;
 }
 
 message RoutingResponseFeature {
