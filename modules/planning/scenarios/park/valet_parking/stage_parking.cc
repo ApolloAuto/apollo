@@ -19,6 +19,8 @@
  **/
 #include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
 
+#include <vector>
+
 namespace apollo {
 namespace planning {
 namespace scenario {

@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
+#include <vector>
+
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 #include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
 
@@ -122,9 +124,10 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
                                 .routing->routing_request()
                                 .parking_info()
                                 .parking_point();
-      constexpr double kDistance = 0.01;  // meter
+      // constexpr double kDistance = 0.01;  // meter
       std::vector<ParkingSpaceInfoConstPtr> parking_lots;
-      if (!hdmap->GetParkingSpaces(target_parking_spot, kDistance,
+      if (!hdmap->GetParkingSpaces(target_parking_spot,
+                                   FLAGS_parking_space_search_range,
                                    &parking_lots)) {
         target_parking_spot_id = parking_lots.front()->id().id();
       }

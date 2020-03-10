@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 
+#include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -58,11 +60,10 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
                                 .routing->routing_request()
                                 .parking_info()
                                 .parking_point();
-      // search within a small range to get one parking lot
-      constexpr double kDistance = 0.01;  // meter
       std::vector<ParkingSpaceInfoConstPtr> parking_lots;
       if (!hdmap::HDMapUtil::BaseMapPtr()->GetParkingSpaces(
-              target_parking_spot, kDistance, &parking_lots)) {
+              target_parking_spot, FLAGS_parking_space_search_range,
+              &parking_lots)) {
         GetContext()->target_parking_spot_id = parking_lots.front()->id().id();
       }
     }

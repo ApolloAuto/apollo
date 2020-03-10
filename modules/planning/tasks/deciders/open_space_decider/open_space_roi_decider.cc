@@ -65,8 +65,8 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
   const auto &roi_type = config_.open_space_roi_decider_config().roi_type();
   if (roi_type == OpenSpaceRoiDeciderConfig::PARKING) {
-    AWARN << "target_parking_spot_id: ["
-          << frame->open_space_info().target_parking_spot_id() << "]";
+    ADEBUG << "target_parking_spot_id: ["
+           << frame->open_space_info().target_parking_spot_id() << "]";
     if (!frame->open_space_info().target_parking_spot_id().empty()) {
       target_parking_spot_id_ =
           frame->open_space_info().target_parking_spot_id();
