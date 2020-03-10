@@ -29,6 +29,8 @@ Stage::StageStatus StageParking::Process(
   // Open space planning doesn't use planning_init_point from upstream because
   // of different stitching strategy
   frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
+  *(frame->mutable_open_space_info()->mutable_target_parking_spot_id()) =
+      GetContext()->target_parking_spot_id;
   bool plan_ok = ExecuteTaskOnOpenSpace(frame);
   if (!plan_ok) {
     AERROR << "StageParking planning error";
