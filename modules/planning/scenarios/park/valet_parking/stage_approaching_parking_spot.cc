@@ -22,28 +22,53 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
 
+using apollo::common::PointENU;
+using apollo::hdmap::ParkingSpaceInfoConstPtr;
+
 Stage::StageStatus StageApproachingParkingSpot::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: StageApproachingParkingSpot";
   CHECK_NOTNULL(frame);
   GetContext()->target_parking_spot_id.clear();
-  if (frame->local_view().routing->routing_request().has_parking_space() &&
-      frame->local_view().routing->routing_request().parking_space().has_id()) {
-    GetContext()->target_parking_spot_id = frame->local_view()
-                                               .routing->routing_request()
-                                               .parking_space()
-                                               .id()
-                                               .id();
-  } else {
-    AERROR << "No parking space id from routing";
-    return StageStatus::ERROR;
+  if (frame->local_view().routing->routing_request().has_parking_info()) {
+    if (frame->local_view()
+            .routing->routing_request()
+            .parking_info()
+            .has_parking_space_id()) {
+      // when parking id is available
+      GetContext()->target_parking_spot_id = frame->local_view()
+                                                 .routing->routing_request()
+                                                 .parking_info()
+                                                 .parking_space_id();
+    } else if (frame->local_view()
+                   .routing->routing_request()
+                   .parking_info()
+                   .has_parking_point()) {
+      // when parking_point is available
+      // get parking id from parking_point
+      PointENU target_parking_spot;
+      target_parking_spot = frame->local_view()
+                                .routing->routing_request()
+                                .parking_info()
+                                .parking_point();
+      // search within a small range to get one parking lot
+      constexpr double kDistance = 0.01;  // meter
+      std::vector<ParkingSpaceInfoConstPtr> parking_lots;
+      if (!hdmap::HDMapUtil::BaseMapPtr()->GetParkingSpaces(
+              target_parking_spot, kDistance, &parking_lots)) {
+        GetContext()->target_parking_spot_id = parking_lots.front()->id().id();
+      }
+    }
   }
+  AWARN << "target_parking_spot_id: [" << GetContext()->target_parking_spot_id
+        << "]";
 
   if (GetContext()->target_parking_spot_id.empty()) {
     return StageStatus::ERROR;
