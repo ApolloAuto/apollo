@@ -6,8 +6,9 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/prediction/proto/feature.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
-import "modules/routing/proto/routing.proto";
 
 message ChassisFeature {
   // Features from chassis
@@ -52,7 +53,7 @@ message LocalizationFeature {
   optional apollo.common.Point3D angular_velocity = 5;
 }
 
-message ObstacleTrajectoryPoint {
+message ObstacleTrajectoryPointFeature {
   optional double timestamp_sec = 1;
 
   // obstacle position in the OBJECT coordinate system
@@ -64,11 +65,54 @@ message ObstacleTrajectoryPoint {
   // obstacle velocity in RELATIVE coordinate to ADC
   optional apollo.common.Point3D velocity = 4;  // obstacle velocity
 
-  // obstacle corner points in RELATIVE coordinate to ADC
-  repeated apollo.common.Point3D polygon_point = 5;
-
   // obstacle acceleration in RELATIVE coordinate to ADC
-  optional apollo.common.Point3D acceleration = 6;
+  optional apollo.common.Point3D acceleration = 5;
+
+  // obstacle corner points in RELATIVE coordinate to ADC
+  repeated apollo.common.Point3D polygon_point = 6;
+}
+
+message PathPointFeature {
+  // coordinates
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+
+  // direction on the x-y plane
+  optional double theta = 4;
+  // accumulated distance from beginning of the path
+  optional double s = 5;
+  // The lane ID where the path point is on
+  optional string lane_id = 6;
+}
+
+message TrajectoryPointFeature {
+  // path point
+  optional PathPointFeature path_point = 1;
+  // linear velocity
+  optional double v = 2;  // in [m/s]
+  // linear acceleration
+  optional double a = 3;
+  // relative time from beginning of the trajectory
+  optional double relative_time = 4;
+  // Gaussian probability information
+  optional apollo.common.GaussianInfo gaussian_info = 5;
+}
+
+message TrajectoryFeature {
+  optional double probability = 1;  // probability of this trajectory
+  repeated TrajectoryPointFeature trajectory_point = 2;
+}
+
+message ObstaclePredictionFeature {
+  optional double timestamp_sec = 1;  // GPS time in seconds
+  optional double predicted_period = 2;
+  optional apollo.prediction.ObstacleIntent intent = 3;
+  optional apollo.prediction.ObstaclePriority priority = 4;
+  optional bool is_static = 5 [default = false];
+
+  // can have multiple trajectories per obstacle
+  repeated TrajectoryFeature trajectory = 6;
 }
 
 message ObstacleFeature {
@@ -77,7 +121,8 @@ message ObstacleFeature {
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
   optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
-  repeated ObstacleTrajectoryPoint obstacle_trajectory_point = 6;
+  repeated ObstacleTrajectoryPointFeature obstacle_trajectory_point = 6;
+  optional ObstaclePredictionFeature obstacle_prediction = 7;
 }
 
 message RoutingResponseFeature {
