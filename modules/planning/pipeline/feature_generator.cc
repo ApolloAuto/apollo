@@ -250,20 +250,6 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
     velocity->set_x(relative_velocity.first);
     velocity->set_y(relative_velocity.second);
 
-    // convert polygon_point(s) to relative coordinate
-    for (int i = 0; i < obj_traj_point.polygon_point_size();
-        ++i) {
-      const auto& relative_point =
-          util::WorldCoordToObjCoord(
-              std::make_pair(obj_traj_point.polygon_point(i).x(),
-                             obj_traj_point.polygon_point(i).y()),
-              adc_curr_info.adc_cur_position_,
-              adc_curr_info.adc_cur_heading_);
-      auto polygon_point = obstacle_trajectory_point->add_polygon_point();
-      polygon_point->set_x(relative_point.first);
-      polygon_point->set_y(relative_point.second);
-    }
-
     // convert acceleration to relative coordinate
     const auto& relative_acc =
         util::WorldCoordToObjCoord(
@@ -274,6 +260,20 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
     auto acceleration = obstacle_trajectory_point->mutable_acceleration();
     acceleration->set_x(relative_acc.first);
     acceleration->set_y(relative_acc.second);
+
+    for (int i = 0; i < obj_traj_point.polygon_point_size();
+        ++i) {
+      // convert polygon_point(s) to relative coordinate
+      const auto& relative_point =
+          util::WorldCoordToObjCoord(
+              std::make_pair(obj_traj_point.polygon_point(i).x(),
+                             obj_traj_point.polygon_point(i).y()),
+              adc_curr_info.adc_cur_position_,
+              adc_curr_info.adc_cur_heading_);
+      auto polygon_point = obstacle_trajectory_point->add_polygon_point();
+      polygon_point->set_x(relative_point.first);
+      polygon_point->set_y(relative_point.second);
+    }
   }
 }
 
@@ -292,27 +292,43 @@ void FeatureGenerator::GenerateObstaclePrediction(
   obstacle_prediction->set_is_static(prediction_obstacle.is_static());
 
   for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
+    const auto& obstacle_trajectory = prediction_obstacle.trajectory(i);
     auto trajectory = obstacle_prediction->add_trajectory();
-    trajectory->CopyFrom(prediction_obstacle.trajectory(i));
+    trajectory->set_probability(obstacle_trajectory.probability());
 
-    // convert to relative coordinate
-    for (int j = 0; j < trajectory->trajectory_point_size(); ++j) {
-      auto trajectory_point = trajectory->mutable_trajectory_point(j);
+    for (int j = 0; j < obstacle_trajectory.trajectory_point_size(); ++j) {
+      const auto& obstacle_trajectory_point =
+          obstacle_trajectory.trajectory_point(j);
+      auto trajectory_point = trajectory->add_trajectory_point();
 
-      // convert path_point to relative coordinate
+      auto path_point = trajectory_point->mutable_path_point();
+
+      // convert path_point position to relative coordinate
       const auto& relative_path_point =
         util::WorldCoordToObjCoord(
-            std::make_pair(trajectory_point->path_point().x(),
-                           trajectory_point->path_point().y()),
+            std::make_pair(obstacle_trajectory_point.path_point().x(),
+                           obstacle_trajectory_point.path_point().y()),
             adc_curr_info.adc_cur_position_,
             adc_curr_info.adc_cur_heading_);
-      trajectory_point->mutable_path_point()->set_x(relative_path_point.first);
-      trajectory_point->mutable_path_point()->set_y(relative_path_point.second);
+      path_point->set_x(relative_path_point.first);
+      path_point->set_y(relative_path_point.second);
 
+      // convert path_point theta to relative coordinate
       const double relative_theta =
-          util::WorldAngleToObjAngle(trajectory_point->path_point().theta(),
-                                     adc_curr_info.adc_cur_heading_);
-      trajectory_point->mutable_path_point()->set_theta(relative_theta);
+          util::WorldAngleToObjAngle(
+              obstacle_trajectory_point.path_point().theta(),
+              adc_curr_info.adc_cur_heading_);
+      path_point->set_theta(relative_theta);
+
+      path_point->set_s(obstacle_trajectory_point.path_point().s());
+      path_point->set_lane_id(obstacle_trajectory_point.path_point().lane_id());
+
+      trajectory_point->set_v(obstacle_trajectory_point.v());
+      trajectory_point->set_a(obstacle_trajectory_point.a());
+      trajectory_point->set_relative_time(
+          obstacle_trajectory_point.relative_time());
+      trajectory_point->mutable_gaussian_info()->CopyFrom(
+          obstacle_trajectory_point.gaussian_info());
     }
   }
 }
