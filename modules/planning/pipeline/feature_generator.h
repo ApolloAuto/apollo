@@ -24,8 +24,8 @@
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -40,16 +40,32 @@ class FeatureGenerator {
   void ProcessOfflineData(const std::string& record_filename);
 
  private:
+  struct ADCCurrentInfo {
+    std::pair<double, double> adc_cur_position_;
+    std::pair<double, double> adc_cur_velocity_;
+    std::pair<double, double> adc_cur_acc_;
+    double adc_cur_heading_;
+  };
+
   void OnChassis(const apollo::canbus::Chassis& chassis);
   void OnLocalization(const apollo::localization::LocalizationEstimate& le);
-  void OnPerceptionObstacle(
-      const apollo::perception::PerceptionObstacles& perception_obstacles);
+  void OnPrediction(
+      const apollo::prediction::PredictionObstacles& prediction_obstacles);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  void GenerateObstacleData(LearningDataFrame* learning_data_frame);
+  void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
+  void GenerateObstacleTrajectoryPoint(
+      const int obstacle_id,
+      const ADCCurrentInfo& adc_curr_info,
+      ObstacleFeature* obstacle_feature);
+  void GenerateObstaclePrediction(
+      const apollo::prediction::PredictionObstacle& prediction_obstacle,
+      const ADCCurrentInfo& adc_curr_info,
+      ObstacleFeature* obstacle_feature);
+  void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
@@ -66,10 +82,12 @@ class FeatureGenerator {
   int learning_data_file_index_ = 0;
   std::list<apollo::localization::LocalizationEstimate>
       localization_for_label_;
-  std::unordered_map<int, apollo::perception::PerceptionObstacle>
-      perception_obstacles_map_;
-  std::unordered_map<int, std::list<ObstacleTrajectoryPoint>>
+
+  std::unordered_map<int, apollo::prediction::PredictionObstacle>
+      prediction_obstacles_map_;
+  std::unordered_map<int, std::list<ObstacleTrajectoryPointFeature>>
       obstacle_history_map_;
+
   ChassisFeature chassis_feature_;
   std::vector<std::string> routing_lane_ids_;
   std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
