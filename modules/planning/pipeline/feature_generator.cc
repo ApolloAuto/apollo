@@ -44,7 +44,8 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacles;
+using apollo::prediction::PredictionObstacle;
+using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
@@ -109,32 +110,33 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
   chassis_feature_.set_gear_location(chassis.gear_location());
 }
 
-void FeatureGenerator::OnPerceptionObstacle(
-    const apollo::perception::PerceptionObstacles& perception_obstacles) {
-  perception_obstacles_map_.clear();
-  for (int i = 0; i < perception_obstacles.perception_obstacle_size(); ++i) {
-    const auto& perception_obstale =
-        perception_obstacles.perception_obstacle(i);
-    const int obstacle_id = perception_obstale.id();
-    perception_obstacles_map_[obstacle_id].CopyFrom(perception_obstale);
+void FeatureGenerator::OnPrediction(
+    const PredictionObstacles& prediction_obstacles) {
+  prediction_obstacles_map_.clear();
+  for (int i = 0; i < prediction_obstacles.prediction_obstacle_size(); ++i) {
+    const auto& prediction_obstacle =
+        prediction_obstacles.prediction_obstacle(i);
+    const int obstacle_id = prediction_obstacle.perception_obstacle().id();
+    prediction_obstacles_map_[obstacle_id].CopyFrom(prediction_obstacle);
   }
 
-  // erase perception obstacle not exist in current perception msg
-  std::unordered_map<int, std::list<ObstacleTrajectoryPoint>> ::iterator it =
-      obstacle_history_map_.begin();
+  // erase obstacle history if obstacle not exist in current predictio msg
+  std::unordered_map<int, std::list<ObstacleTrajectoryPointFeature>>::iterator
+      it = obstacle_history_map_.begin();
   while (it != obstacle_history_map_.end()) {
     const int obstacle_id = it->first;
-    if (perception_obstacles_map_.count(obstacle_id) == 0) {
-      // not exist in current perception
+    if (prediction_obstacles_map_.count(obstacle_id) == 0) {
+      // not exist in current prediction msg
       it = obstacle_history_map_.erase(it);
     } else {
       ++it;
     }
   }
 
-  for (const auto& m : perception_obstacles_map_) {
-    const auto& perception_obstale = m.second;
-    ObstacleTrajectoryPoint obstacle_trajectory_point;
+  // add to obstacle history
+  for (const auto& m : prediction_obstacles_map_) {
+    const auto& perception_obstale = m.second.perception_obstacle();
+    ObstacleTrajectoryPointFeature obstacle_trajectory_point;
     obstacle_trajectory_point.set_timestamp_sec(perception_obstale.timestamp());
     obstacle_trajectory_point.mutable_position()->CopyFrom(
         perception_obstale.position());
@@ -193,83 +195,164 @@ void FeatureGenerator::OnRoutingResponse(
   }
 }
 
-void FeatureGenerator::GenerateObstacleData(
-    LearningDataFrame* learning_data_frame) {
-  for (const auto& m : perception_obstacles_map_) {
-    auto obstacle_feature = learning_data_frame->add_obstacle();
-    obstacle_feature->set_id(m.first);
-    obstacle_feature->set_length(m.second.length());
-    obstacle_feature->set_width(m.second.width());
-    obstacle_feature->set_height(m.second.height());
-    obstacle_feature->set_type(m.second.type());
+void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
+  CHECK_NOTNULL(adc_curr_info);
+  // ADC current position / velocity / acc/ heading
+  const auto& adc_cur_pose = localization_for_label_.back().pose();
+  adc_curr_info->adc_cur_position_ =
+      std::make_pair(adc_cur_pose.position().x(),
+                     adc_cur_pose.position().y());
+  adc_curr_info->adc_cur_velocity_ =
+      std::make_pair(adc_cur_pose.linear_velocity().x(),
+                     adc_cur_pose.linear_velocity().y());
+  adc_curr_info->adc_cur_acc_ =
+      std::make_pair(adc_cur_pose.linear_acceleration().x(),
+                     adc_cur_pose.linear_acceleration().y());
+  adc_curr_info->adc_cur_heading_ = adc_cur_pose.heading();
+}
 
-    // ADC current position / heading
-    const auto& adc_cur_pose = localization_for_label_.back().pose();
-    const auto& adc_cur_position = std::make_pair(adc_cur_pose.position().x(),
-                                                  adc_cur_pose.position().y());
-    const auto& adc_cur_velocity =
-        std::make_pair(adc_cur_pose.linear_velocity().x(),
-                       adc_cur_pose.linear_velocity().y());
-    const auto& adc_cur_acc =
-        std::make_pair(adc_cur_pose.linear_acceleration().x(),
-                       adc_cur_pose.linear_acceleration().y());
-    const auto adc_cur_heading = adc_cur_pose.heading();
+void FeatureGenerator::GenerateObstacleTrajectoryPoint(
+    const int obstacle_id,
+    const ADCCurrentInfo& adc_curr_info,
+    ObstacleFeature* obstacle_feature) {
+  const auto& obstacle_history = obstacle_history_map_[obstacle_id];
+  for (const auto& obj_traj_point : obstacle_history) {
+    auto obstacle_trajectory_point =
+        obstacle_feature->add_obstacle_trajectory_point();
+    obstacle_trajectory_point->set_timestamp_sec(
+        obj_traj_point.timestamp_sec());
 
-    const auto& obstacle_history = obstacle_history_map_[m.first];
-    for (const auto& obj_traj_point : obstacle_history) {
-      auto obstacle_trajectory_point =
-          obstacle_feature->add_obstacle_trajectory_point();
-      obstacle_trajectory_point->set_timestamp_sec(
-          obj_traj_point.timestamp_sec());
+    // convert position to relative coordinate
+    const auto& relative_posistion =
+        util::WorldCoordToObjCoord(
+            std::make_pair(obj_traj_point.position().x(),
+                           obj_traj_point.position().y()),
+            adc_curr_info.adc_cur_position_,
+            adc_curr_info.adc_cur_heading_);
+    auto position = obstacle_trajectory_point->mutable_position();
+    position->set_x(relative_posistion.first);
+    position->set_y(relative_posistion.second);
 
-      // convert position to relative coordinate
-      const auto& relative_posistion =
-          util::WorldCoordToObjCoord(
-              std::make_pair(obj_traj_point.position().x(),
-                             obj_traj_point.position().y()),
-              adc_cur_position, adc_cur_heading);
-      auto position = obstacle_trajectory_point->mutable_position();
-      position->set_x(relative_posistion.first);
-      position->set_y(relative_posistion.second);
+    // convert theta to relative coordinate
+    const double relative_theta =
+        util::WorldAngleToObjAngle(obj_traj_point.theta(),
+                                     adc_curr_info.adc_cur_heading_);
+    obstacle_trajectory_point->set_theta(relative_theta);
 
-      // convert theta to relative coordinate
-      const double relative_theta =
-          util::WorldAngleToObjAngle(obj_traj_point.theta(), adc_cur_heading);
-      obstacle_trajectory_point->set_theta(relative_theta);
+    // convert velocity to relative coordinate
+    const auto& relative_velocity =
+        util::WorldCoordToObjCoord(
+            std::make_pair(obj_traj_point.velocity().x(),
+                           obj_traj_point.velocity().y()),
+            adc_curr_info.adc_cur_velocity_,
+            adc_curr_info.adc_cur_heading_);
+    auto velocity = obstacle_trajectory_point->mutable_velocity();
+    velocity->set_x(relative_velocity.first);
+    velocity->set_y(relative_velocity.second);
 
-      // convert velocity to relative coordinate
-      const auto& relative_velocity =
-          util::WorldCoordToObjCoord(
-              std::make_pair(obj_traj_point.velocity().x(),
-                             obj_traj_point.velocity().y()),
-              adc_cur_velocity, adc_cur_heading);
-      auto velocity = obstacle_trajectory_point->mutable_velocity();
-      velocity->set_x(relative_velocity.first);
-      velocity->set_y(relative_velocity.second);
+    // convert acceleration to relative coordinate
+    const auto& relative_acc =
+        util::WorldCoordToObjCoord(
+            std::make_pair(obj_traj_point.acceleration().x(),
+                           obj_traj_point.acceleration().y()),
+            adc_curr_info.adc_cur_acc_,
+            adc_curr_info.adc_cur_heading_);
+    auto acceleration = obstacle_trajectory_point->mutable_acceleration();
+    acceleration->set_x(relative_acc.first);
+    acceleration->set_y(relative_acc.second);
 
+    for (int i = 0; i < obj_traj_point.polygon_point_size();
+        ++i) {
       // convert polygon_point(s) to relative coordinate
-      for (int i = 0; i < obj_traj_point.polygon_point_size();
-          ++i) {
-        const auto& relative_point =
-            util::WorldCoordToObjCoord(
-                std::make_pair(obj_traj_point.polygon_point(i).x(),
-                               obj_traj_point.polygon_point(i).y()),
-                adc_cur_position, adc_cur_heading);
-        auto polygon_point = obstacle_trajectory_point->add_polygon_point();
-        polygon_point->set_x(relative_point.first);
-        polygon_point->set_y(relative_point.second);
-      }
-
-      // convert acceleration to relative coordinate
-      const auto& relative_acc =
+      const auto& relative_point =
           util::WorldCoordToObjCoord(
-              std::make_pair(obj_traj_point.acceleration().x(),
-                             obj_traj_point.acceleration().y()),
-              adc_cur_acc, adc_cur_heading);
-      auto acceleration = obstacle_trajectory_point->mutable_acceleration();
-      acceleration->set_x(relative_acc.first);
-      acceleration->set_y(relative_acc.second);
+              std::make_pair(obj_traj_point.polygon_point(i).x(),
+                             obj_traj_point.polygon_point(i).y()),
+              adc_curr_info.adc_cur_position_,
+              adc_curr_info.adc_cur_heading_);
+      auto polygon_point = obstacle_trajectory_point->add_polygon_point();
+      polygon_point->set_x(relative_point.first);
+      polygon_point->set_y(relative_point.second);
     }
+  }
+}
+
+void FeatureGenerator::GenerateObstaclePrediction(
+    const PredictionObstacle& prediction_obstacle,
+    const ADCCurrentInfo& adc_curr_info,
+    ObstacleFeature* obstacle_feature) {
+  auto obstacle_prediction = obstacle_feature->mutable_obstacle_prediction();
+  obstacle_prediction->set_timestamp_sec(prediction_obstacle.timestamp());
+  obstacle_prediction->set_predicted_period(
+      prediction_obstacle.predicted_period());
+  obstacle_prediction->mutable_intent()->CopyFrom(
+      prediction_obstacle.intent());
+  obstacle_prediction->mutable_priority()->CopyFrom(
+      prediction_obstacle.priority());
+  obstacle_prediction->set_is_static(prediction_obstacle.is_static());
+
+  for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
+    const auto& obstacle_trajectory = prediction_obstacle.trajectory(i);
+    auto trajectory = obstacle_prediction->add_trajectory();
+    trajectory->set_probability(obstacle_trajectory.probability());
+
+    for (int j = 0; j < obstacle_trajectory.trajectory_point_size(); ++j) {
+      const auto& obstacle_trajectory_point =
+          obstacle_trajectory.trajectory_point(j);
+      auto trajectory_point = trajectory->add_trajectory_point();
+
+      auto path_point = trajectory_point->mutable_path_point();
+
+      // convert path_point position to relative coordinate
+      const auto& relative_path_point =
+        util::WorldCoordToObjCoord(
+            std::make_pair(obstacle_trajectory_point.path_point().x(),
+                           obstacle_trajectory_point.path_point().y()),
+            adc_curr_info.adc_cur_position_,
+            adc_curr_info.adc_cur_heading_);
+      path_point->set_x(relative_path_point.first);
+      path_point->set_y(relative_path_point.second);
+
+      // convert path_point theta to relative coordinate
+      const double relative_theta =
+          util::WorldAngleToObjAngle(
+              obstacle_trajectory_point.path_point().theta(),
+              adc_curr_info.adc_cur_heading_);
+      path_point->set_theta(relative_theta);
+
+      path_point->set_s(obstacle_trajectory_point.path_point().s());
+      path_point->set_lane_id(obstacle_trajectory_point.path_point().lane_id());
+
+      trajectory_point->set_v(obstacle_trajectory_point.v());
+      trajectory_point->set_a(obstacle_trajectory_point.a());
+      trajectory_point->set_relative_time(
+          obstacle_trajectory_point.relative_time());
+      trajectory_point->mutable_gaussian_info()->CopyFrom(
+          obstacle_trajectory_point.gaussian_info());
+    }
+  }
+}
+
+void FeatureGenerator::GenerateObstacleFeature(
+    LearningDataFrame* learning_data_frame) {
+  ADCCurrentInfo adc_curr_info;
+  GetADCCurrentInfo(&adc_curr_info);
+
+  for (const auto& m : prediction_obstacles_map_) {
+    auto obstacle_feature = learning_data_frame->add_obstacle();
+
+    const auto& perception_obstale = m.second.perception_obstacle();
+    obstacle_feature->set_id(m.first);
+    obstacle_feature->set_length(perception_obstale.length());
+    obstacle_feature->set_width(perception_obstale.width());
+    obstacle_feature->set_height(perception_obstale.height());
+    obstacle_feature->set_type(perception_obstale.type());
+
+    // obstacle history trajectory points
+    GenerateObstacleTrajectoryPoint(m.first, adc_curr_info, obstacle_feature);
+
+    // obstacle prediction
+    GenerateObstaclePrediction(m.second, adc_curr_info, obstacle_feature);
   }
 }
 
@@ -346,7 +429,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   }
 
   // add obstacle
-  GenerateObstacleData(learning_data_frame);
+  GenerateObstacleFeature(learning_data_frame);
 
   // add trajectory_points
   GenerateADCTrajectoryPoints(localization_for_label_, learning_data_frame);
@@ -371,10 +454,10 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       if (localization.ParseFromString(message.content)) {
         OnLocalization(localization);
       }
-    } else if (message.channel_name == FLAGS_perception_obstacle_topic) {
-      PerceptionObstacles perception_obstacles;
-      if (perception_obstacles.ParseFromString(message.content)) {
-        OnPerceptionObstacle(perception_obstacles);
+    } else if (message.channel_name == FLAGS_prediction_topic) {
+      PredictionObstacles prediction_obstacles;
+      if (prediction_obstacles.ParseFromString(message.content)) {
+        OnPrediction(prediction_obstacles);
       }
     } else if (message.channel_name == FLAGS_routing_response_topic) {
       RoutingResponse routing_response;
