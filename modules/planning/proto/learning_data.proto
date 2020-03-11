@@ -65,11 +65,11 @@ message ObstacleTrajectoryPointFeature {
   // obstacle velocity in RELATIVE coordinate to ADC
   optional apollo.common.Point3D velocity = 4;  // obstacle velocity
 
-  // obstacle corner points in RELATIVE coordinate to ADC
-  repeated apollo.common.Point3D polygon_point = 5;
-
   // obstacle acceleration in RELATIVE coordinate to ADC
-  optional apollo.common.Point3D acceleration = 6;
+  optional apollo.common.Point3D acceleration = 5;
+
+  // obstacle corner points in RELATIVE coordinate to ADC
+  repeated apollo.common.Point3D polygon_point = 6;
 }
 
 message PathPointFeature {
@@ -107,13 +107,12 @@ message TrajectoryFeature {
 message ObstaclePredictionFeature {
   optional double timestamp_sec = 1;  // GPS time in seconds
   optional double predicted_period = 2;
-  // can have multiple trajectories per obstacle
-  repeated TrajectoryFeature trajectory = 3;
+  optional apollo.prediction.ObstacleIntent intent = 3;
+  optional apollo.prediction.ObstaclePriority priority = 4;
+  optional bool is_static = 5 [default = false];
 
-  // estimated obstacle intent
-  optional apollo.prediction.ObstacleIntent intent = 4;
-  optional apollo.prediction.ObstaclePriority priority = 5;
-  optional bool is_static = 6 [default = false];
+  // can have multiple trajectories per obstacle
+  repeated TrajectoryFeature trajectory = 6;
 }
 
 message ObstacleFeature {
