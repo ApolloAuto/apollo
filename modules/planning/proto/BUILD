@@ -601,6 +601,8 @@ proto_library(
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:feature_proto_lib",
+        "//modules/prediction/proto:prediction_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
     ],
 )
