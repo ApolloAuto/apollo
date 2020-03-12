@@ -60,10 +60,13 @@ class Routing {
                RoutingResponse *const routing_response);
 
  private:
-  std::vector<RoutingRequest>
-  FillLaneInfoIfMissing(const RoutingRequest &routing_request);
+  std::vector<RoutingRequest> FillLaneInfoIfMissing(
+      const RoutingRequest &routing_request);
 
-  double GetRoutingLength(const RoutingResponse& routing_response);
+  bool GetParkingID(const apollo::common::PointENU &parking_point,
+                    std::string &parking_space_id);
+
+  double GetRoutingLength(const RoutingResponse &routing_response);
 
  private:
   std::unique_ptr<Navigator> navigator_ptr_;
