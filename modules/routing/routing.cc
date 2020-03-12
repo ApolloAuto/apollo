@@ -26,6 +26,8 @@ namespace apollo {
 namespace routing {
 
 using apollo::common::ErrorCode;
+using apollo::common::PointENU;
+using apollo::hdmap::ParkingSpaceInfoConstPtr;
 
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
@@ -129,6 +131,18 @@ std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
   return fixed_requests;
 }
 
+bool Routing::FillParkingID(const PointENU& parking_point,
+                            std::string& parking_space_id) {
+  // search current parking space id associated with parking point.
+  constexpr double kDistance = 0.01;  // meter
+  std::vector<ParkingSpaceInfoConstPtr> parking_spaces;
+  if (!hdmap_->GetParkingSpaces(parking_point, kDistance, &parking_spaces)) {
+    parking_space_id = parking_spaces.front()->id().id();
+    return true;
+  }
+  return false;
+}
+
 double Routing::GetRoutingLength(const RoutingResponse& routing_response) {
   double length = 0;
   for (int i = 0; i < routing_response.road_size(); ++i) {
@@ -143,7 +157,6 @@ double Routing::GetRoutingLength(const RoutingResponse& routing_response) {
   }
   return length;
 }
-
 
 bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
                       RoutingResponse* const routing_response) {
