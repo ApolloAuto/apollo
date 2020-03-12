@@ -20,8 +20,6 @@
 
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 
-#include <vector>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -30,9 +28,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
-
-using apollo::common::PointENU;
-using apollo::hdmap::ParkingSpaceInfoConstPtr;
 
 Stage::StageStatus StageApproachingParkingSpot::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -47,11 +42,12 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
   if (has_parking_id) {
     GetContext()->target_parking_spot_id =
         routing_request.parking_info().parking_space_id();
+  } else {
+    AERROR << "No Parking space id from Routing";
+    return StageStatus::ERROR;
   }
-
   ADEBUG << "target_parking_spot_id: [" << GetContext()->target_parking_spot_id
          << "]";
-
   if (GetContext()->target_parking_spot_id.empty()) {
     return StageStatus::ERROR;
   }

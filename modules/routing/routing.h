@@ -64,7 +64,9 @@ class Routing {
       const RoutingRequest &routing_request);
 
   bool GetParkingID(const apollo::common::PointENU &parking_point,
-                    std::string &parking_space_id);
+                    std::string *parking_space_id);
+
+  bool FillParkingID(RoutingResponse *routing_response);
 
   double GetRoutingLength(const RoutingResponse &routing_response);
 

@@ -20,8 +20,6 @@
 
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
-#include <vector>
-
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 #include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
 
@@ -30,7 +28,6 @@ namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-using apollo::common::PointENU;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
@@ -109,7 +106,7 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
     // when parking id is available
     target_parking_spot_id = routing_request.parking_info().parking_space_id();
   } else {
-    AWARN << "No parking ID from routing";
+    AWARN << "No parking space id from routing";
     return false;
   }
   ADEBUG << "target_parking_spot_id: [" << target_parking_spot_id << "]";
