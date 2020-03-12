@@ -39,35 +39,16 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
   ADEBUG << "stage: StageApproachingParkingSpot";
   CHECK_NOTNULL(frame);
   GetContext()->target_parking_spot_id.clear();
-  if (frame->local_view().routing->routing_request().has_parking_info()) {
-    if (frame->local_view()
-            .routing->routing_request()
-            .parking_info()
-            .has_parking_space_id()) {
-      // when parking id is available
-      GetContext()->target_parking_spot_id = frame->local_view()
-                                                 .routing->routing_request()
-                                                 .parking_info()
-                                                 .parking_space_id();
-    } else if (frame->local_view()
-                   .routing->routing_request()
-                   .parking_info()
-                   .has_parking_point()) {
-      // when parking_point is available
-      // get parking id from parking_point
-      PointENU target_parking_spot;
-      target_parking_spot = frame->local_view()
-                                .routing->routing_request()
-                                .parking_info()
-                                .parking_point();
-      std::vector<ParkingSpaceInfoConstPtr> parking_lots;
-      if (!hdmap::HDMapUtil::BaseMapPtr()->GetParkingSpaces(
-              target_parking_spot, FLAGS_parking_space_search_range,
-              &parking_lots)) {
-        GetContext()->target_parking_spot_id = parking_lots.front()->id().id();
-      }
-    }
+
+  const auto& routing_request = frame->local_view().routing->routing_request();
+  const bool has_parking_info = routing_request.has_parking_info();
+  const bool has_parking_id =
+      has_parking_info && routing_request.parking_info().has_parking_space_id();
+  if (has_parking_id) {
+    GetContext()->target_parking_spot_id =
+        routing_request.parking_info().parking_space_id();
   }
+
   ADEBUG << "target_parking_spot_id: [" << GetContext()->target_parking_spot_id
          << "]";
 
