@@ -99,41 +99,17 @@ bool ValetParkingScenario::GetScenarioConfig() {
 bool ValetParkingScenario::IsTransferable(const Frame& frame,
                                           const double parking_start_range) {
   // TODO(all) Implement available parking spot detection by preception results
-  const hdmap::HDMap* hdmap =
-      hdmap::HDMapUtil::BaseMapPtr();  // called before init()
 
   std::string target_parking_spot_id;
-  if (frame.local_view().routing->routing_request().has_parking_info()) {
-    if (frame.local_view()
-            .routing->routing_request()
-            .parking_info()
-            .has_parking_space_id()) {
-      // when parking id is available
-      target_parking_spot_id = frame.local_view()
-                                   .routing->routing_request()
-                                   .parking_info()
-                                   .parking_space_id();
-    } else if (frame.local_view()
-                   .routing->routing_request()
-                   .parking_info()
-                   .has_parking_point()) {
-      // when parking_point is available
-      // get parking id from parking_point
-      PointENU target_parking_spot;
-      target_parking_spot = frame.local_view()
-                                .routing->routing_request()
-                                .parking_info()
-                                .parking_point();
-      // constexpr double kDistance = 0.01;  // meter
-      std::vector<ParkingSpaceInfoConstPtr> parking_lots;
-      if (!hdmap->GetParkingSpaces(target_parking_spot,
-                                   FLAGS_parking_space_search_range,
-                                   &parking_lots)) {
-        target_parking_spot_id = parking_lots.front()->id().id();
-      }
-    }
+  const auto& routing_request = frame.local_view().routing->routing_request();
+  const bool has_parking_info = routing_request.has_parking_info();
+  const bool has_parking_id =
+      has_parking_info && routing_request.parking_info().has_parking_space_id();
+  if (has_parking_id) {
+    // when parking id is available
+    target_parking_spot_id = routing_request.parking_info().parking_space_id();
   } else {
-    AWARN << "No parking info from routing";
+    AWARN << "No parking ID from routing";
     return false;
   }
   ADEBUG << "target_parking_spot_id: [" << target_parking_spot_id << "]";
