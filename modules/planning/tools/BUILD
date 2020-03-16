@@ -14,4 +14,13 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "inference_demo",
+    srcs = ["inference_demo.cc"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+	"//third_party:libtorch",
+    ],
+)
+
 cpplint()
