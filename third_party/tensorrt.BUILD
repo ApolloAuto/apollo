@@ -32,6 +32,7 @@ cc_library(
         "-lnvcaffe_parser",
         "-lnvinfer",
         "-lnvinfer_plugin",
+        "-lnvonnxparser",
         "-lnvparsers",
     ],
     visibility = ["//visibility:public"],
