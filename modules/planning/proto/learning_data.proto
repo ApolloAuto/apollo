@@ -140,6 +140,11 @@ message ADCTrajectoryPoint {
   optional apollo.common.TrajectoryPoint trajectory_point = 2;
 }
 
+message LearningOutput {
+  // ADC future trajectory
+  repeated ADCTrajectoryPoint adc_future_traj_point = 1;
+}
+
 message LearningDataFrame {
   // localization message publishing time in seconds.
   optional double timestamp_sec = 1;
@@ -162,8 +167,11 @@ message LearningDataFrame {
   // Features from traffic_light_detection
   repeated TrafficLightFeature traffic_light = 8;
 
-  // ADC ground-truth label trajectory
+  // ADC past trajectory
   repeated ADCTrajectoryPoint adc_trajectory_point = 9;
+
+  // Learning ouputs
+  optional LearningOutput output = 10;
 }
 
 message LearningData {
