@@ -17,12 +17,15 @@
 #include "modules/planning/pipeline/feature_generator.h"
 
 #include <cmath>
+#include <memory>
 #include <string>
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/point_factory.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/math_util.h"
 
@@ -183,13 +186,16 @@ void FeatureGenerator::OnRoutingResponse(
   const apollo::routing::RoutingResponse& routing_response) {
   AINFO << "routing_response received at frame["
         << total_learning_data_frame_num_ << "]";
-  routing_lane_ids_.clear();
+  routing_lane_segment_.clear();
   for (int i = 0; i < routing_response.road_size(); ++i) {
     for (int j = 0; j < routing_response.road(i).passage_size(); ++j) {
       for (int k = 0; k < routing_response.road(i).passage(j).segment_size();
           ++k) {
-        routing_lane_ids_.push_back(
-            routing_response.road(i).passage(j).segment(k).id());
+        const auto& lane_segment =
+            routing_response.road(i).passage(j).segment(k);
+        routing_lane_segment_.push_back(
+            std::make_pair(lane_segment.id(),
+                lane_segment.end_s() - lane_segment.start_s()));
       }
     }
   }
@@ -356,6 +362,71 @@ void FeatureGenerator::GenerateObstacleFeature(
   }
 }
 
+void FeatureGenerator::GenerateRoutingFeature(
+    LearningDataFrame* learning_data_frame) {
+  auto routing = learning_data_frame->mutable_routing();
+  routing->Clear();
+  for (const auto& lane_segment : routing_lane_segment_) {
+    routing->add_routing_lane_id(lane_segment.first);
+  }
+  constexpr double kRadius = 0.1;
+  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
+  const auto& pose = localization_for_label_.back().pose();
+  const auto& adc_point = common::util::PointFactory::ToPointENU(
+      pose.position().x(), pose.position().y(), pose.position().z());
+  for (int i = 0; i < 10; ++i) {
+    apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
+        adc_point, kRadius + i * kRadius, &lanes);
+    if (lanes.size() > 0) {
+      break;
+    }
+  }
+
+  int index = -1;
+  if (lanes.size() <= 0) {
+    index = 0;
+  } else {
+    for (auto& lane : lanes) {
+      const auto lane_id = lane->id().id();
+      for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
+        if (routing_lane_segment_[i].first == lane_id) {
+          index = i;
+          break;
+        }
+      }
+      if (index >= 0) {
+        break;
+      }
+    }
+  }
+
+  if (index < 0) {
+      return;
+  }
+
+  constexpr double kLocalRoutingLength = 200.0;
+  std::vector<std::string> local_routing_lane_ids;
+  // local routing land_ids behind ADS
+  int i = index;
+  double length = 0.0;
+  while (i-- > 0 && length < kLocalRoutingLength) {
+      local_routing_lane_ids.insert(local_routing_lane_ids.begin(),
+                                    routing_lane_segment_[i].first);
+      length += routing_lane_segment_[i].second;
+  }
+  // local routing lane_ids ahead of ADC
+  i = index;
+  length = 0.0;
+  while (i++ < static_cast<int>(routing_lane_segment_.size()) &&
+      length < kLocalRoutingLength) {
+    local_routing_lane_ids.push_back(routing_lane_segment_[i].first);
+    length += routing_lane_segment_[i].second;
+  }
+  for (const auto& lane_id : local_routing_lane_ids) {
+    routing->add_local_routing_lane_id(lane_id);
+  }
+}
+
 void FeatureGenerator::GenerateADCTrajectoryPoints(
     const std::list<apollo::localization::LocalizationEstimate>&
         localization_for_label,
@@ -422,11 +493,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   }
 
   // add routing
-  auto routing_response = learning_data_frame->mutable_routing_response();
-  routing_response->Clear();
-  for (const auto& lane_id : routing_lane_ids_) {
-    routing_response->add_lane_id(lane_id);
-  }
+  GenerateRoutingFeature(learning_data_frame);
 
   // add obstacle
   GenerateObstacleFeature(learning_data_frame);
