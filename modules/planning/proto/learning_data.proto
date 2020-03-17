@@ -125,8 +125,9 @@ message ObstacleFeature {
   optional ObstaclePredictionFeature obstacle_prediction = 7;
 }
 
-message RoutingResponseFeature {
-  repeated string lane_id = 1;
+message RoutingFeature {
+   repeated string routing_lane_id = 1;
+   repeated string local_routing_lane_id = 2;  // local routing close to ADC
 }
 
 message TrafficLightFeature {
@@ -155,7 +156,7 @@ message LearningDataFrame {
   repeated ObstacleFeature obstacle = 5;
 
   // Features from routing
-  optional RoutingResponseFeature routing_response = 6;
+  optional RoutingFeature routing = 6;
 
   // Features from traffic_light_detection
   repeated TrafficLightFeature traffic_light = 7;
