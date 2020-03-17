@@ -27,7 +27,7 @@ source /apollo/cyber/setup.bash
 sudo mkdir -p ${TARGET_DIR}
 
 if [ -z "$3" ]; then
-    MAP_DIR="sunnyvale"
+    MAP_DIR="sunnyvale_with_two_offices"
 else
     MAP_DIR=$3
 fi
