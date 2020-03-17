@@ -67,6 +67,8 @@ class FeatureGenerator {
       ObstacleFeature* obstacle_feature);
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
+  void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
+
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
@@ -87,9 +89,8 @@ class FeatureGenerator {
       prediction_obstacles_map_;
   std::unordered_map<int, std::list<ObstacleTrajectoryPointFeature>>
       obstacle_history_map_;
-
   ChassisFeature chassis_feature_;
-  std::vector<std::string> routing_lane_ids_;
+  std::vector<std::pair<std::string, double>> routing_lane_segment_;
   std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
         traffic_lights_;
   int total_learning_data_frame_num_ = 0;
