@@ -126,13 +126,13 @@ message ObstacleFeature {
 }
 
 message RoutingFeature {
-   repeated string routing_lane_id = 1;
-   repeated string local_routing_lane_id = 2;  // local routing close to ADC
+  repeated string routing_lane_id = 1;
+  repeated string local_routing_lane_id = 2;  // local routing close to ADC
 }
 
 message TrafficLightFeature {
-    optional string id = 1;
-    optional apollo.perception.TrafficLight.Color color = 2;
+  optional string id = 1;
+  optional apollo.perception.TrafficLight.Color color = 2;
 }
 
 message ADCTrajectoryPoint {
@@ -146,23 +146,24 @@ message LearningDataFrame {
 
   optional uint32 frame_num = 2;
 
+  optional string map_name = 3;
   // Features from chassis
-  optional ChassisFeature chassis = 3;
+  optional ChassisFeature chassis = 4;
 
   // Features from localization
-  optional LocalizationFeature localization = 4;
+  optional LocalizationFeature localization = 5;
 
   // Features from perception obstacles
-  repeated ObstacleFeature obstacle = 5;
+  repeated ObstacleFeature obstacle = 6;
 
   // Features from routing
-  optional RoutingFeature routing = 6;
+  optional RoutingFeature routing = 7;
 
   // Features from traffic_light_detection
-  repeated TrafficLightFeature traffic_light = 7;
+  repeated TrafficLightFeature traffic_light = 8;
 
   // ADC ground-truth label trajectory
-  repeated ADCTrajectoryPoint adc_trajectory_point = 8;
+  repeated ADCTrajectoryPoint adc_trajectory_point = 9;
 }
 
 message LearningData {
