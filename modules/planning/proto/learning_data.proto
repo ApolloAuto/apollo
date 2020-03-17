@@ -53,7 +53,8 @@ message LocalizationFeature {
   optional apollo.common.Point3D angular_velocity = 5;
 }
 
-message ObstacleTrajectoryPointFeature {
+// based on apollo.perception.PerceptionObstacle
+message PerceptionObstacleFeature {
   optional double timestamp_sec = 1;
 
   // obstacle position in the OBJECT coordinate system
@@ -72,6 +73,7 @@ message ObstacleTrajectoryPointFeature {
   repeated apollo.common.Point3D polygon_point = 6;
 }
 
+// based on apollo.common.PathPoint
 message PathPointFeature {
   // coordinates
   optional double x = 1;
@@ -86,6 +88,7 @@ message PathPointFeature {
   optional string lane_id = 6;
 }
 
+// based on apollo.commom.TrajectoryPoint
 message TrajectoryPointFeature {
   // path point
   optional PathPointFeature path_point = 1;
@@ -99,12 +102,14 @@ message TrajectoryPointFeature {
   optional apollo.common.GaussianInfo gaussian_info = 5;
 }
 
-message TrajectoryFeature {
+// based on apollo.prediction.Trajectory
+message PredictionTrajectoryFeature {
   optional double probability = 1;  // probability of this trajectory
   repeated TrajectoryPointFeature trajectory_point = 2;
 }
 
-message ObstaclePredictionFeature {
+// based on apollo.prediction.PredictionObstacle
+message PredictionObstacleFeature {
   optional double timestamp_sec = 1;  // GPS time in seconds
   optional double predicted_period = 2;
   optional apollo.prediction.ObstacleIntent intent = 3;
@@ -112,7 +117,7 @@ message ObstaclePredictionFeature {
   optional bool is_static = 5 [default = false];
 
   // can have multiple trajectories per obstacle
-  repeated TrajectoryFeature trajectory = 6;
+  repeated PredictionTrajectoryFeature trajectory = 6;
 }
 
 message ObstacleFeature {
@@ -121,8 +126,8 @@ message ObstacleFeature {
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
   optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
-  repeated ObstacleTrajectoryPointFeature obstacle_trajectory_point = 6;
-  optional ObstaclePredictionFeature obstacle_prediction = 7;
+  repeated PerceptionObstacleFeature obstacle_trajectory_point = 6;
+  optional PredictionObstacleFeature obstacle_prediction = 7;
 }
 
 message RoutingFeature {
@@ -130,6 +135,7 @@ message RoutingFeature {
   repeated string local_routing_lane_id = 2;  // local routing close to ADC
 }
 
+// based on apollo.perception.TrafficLight
 message TrafficLightFeature {
   optional string id = 1;
   optional apollo.perception.TrafficLight.Color color = 2;
@@ -141,17 +147,15 @@ message ADCTrajectoryPoint {
 }
 
 message LearningOutput {
-  // ADC future trajectory
-  repeated ADCTrajectoryPoint adc_future_traj_point = 1;
+  repeated ADCTrajectoryPoint adc_future_trajectory_point = 1;
 }
 
 message LearningDataFrame {
   // localization message publishing time in seconds.
   optional double timestamp_sec = 1;
-
   optional uint32 frame_num = 2;
-
   optional string map_name = 3;
+
   // Features from chassis
   optional ChassisFeature chassis = 4;
 
