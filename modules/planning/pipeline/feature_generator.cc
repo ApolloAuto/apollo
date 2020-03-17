@@ -46,13 +46,21 @@ namespace planning {
 using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
+using apollo::dreamview::HMIStatus;
 using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
-void FeatureGenerator::Init() {}
+void FeatureGenerator::Init() {
+    map_m_["Sunnyvale"] = "sunnyvale";
+    map_m_["Sunnyvale Big Loop"] = "sunnyvale_big_loop";
+    map_m_["Sunnyvale With Two Offices"] = "sunnyvale_with_two_offices";
+    map_m_["Gomentum"] = "gomentum";
+    map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
+    map_m_["San Mateo"] = "san_mateo";
+}
 
 void FeatureGenerator::WriteOutLearningData(const LearningData& learning_data,
                                             const std::string& file_name) {
@@ -102,6 +110,15 @@ void FeatureGenerator::OnLocalization(
         FLAGS_planning_data_dir, "/learning_data.",
         learning_data_file_index_, ".bin");
     WriteOutLearningData(learning_data_, file_name);
+  }
+}
+
+void FeatureGenerator::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
+  const std::string& current_map = hmi_status.current_map();
+  if (map_m_.count(current_map) > 0) {
+    map_name_ = map_m_[current_map];
+    const std::string& map_base_folder = "/apollo/modules/map/data/";
+    FLAGS_map_dir = map_base_folder + map_name_;
   }
 }
 
@@ -400,10 +417,6 @@ void FeatureGenerator::GenerateRoutingFeature(
     }
   }
 
-  if (index < 0) {
-      return;
-  }
-
   constexpr double kLocalRoutingLength = 200.0;
   std::vector<std::string> local_routing_lane_ids;
   // local routing land_ids behind ADS
@@ -520,6 +533,11 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       LocalizationEstimate localization;
       if (localization.ParseFromString(message.content)) {
         OnLocalization(localization);
+      }
+    } else if (message.channel_name == FLAGS_hmi_status_topic) {
+      HMIStatus hmi_status;
+      if (hmi_status.ParseFromString(message.content)) {
+        OnHMIStatus(hmi_status);
       }
     } else if (message.channel_name == FLAGS_prediction_topic) {
       PredictionObstacles prediction_obstacles;
