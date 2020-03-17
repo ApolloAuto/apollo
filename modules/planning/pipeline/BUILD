@@ -14,6 +14,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
+         "//modules/dreamview/proto:hmi_status_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common/util:math_util_lib",
