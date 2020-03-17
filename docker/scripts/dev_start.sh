@@ -85,7 +85,13 @@ do
   fi
 done
 }
+function set_registry_mirrors()
+{
+sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
+sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
+service docker restart	
 
+}
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
 
 if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
@@ -115,6 +121,7 @@ OTHER_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
+ 
     case "$1" in
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
@@ -137,6 +144,9 @@ do
     -b|--fast-build)
         FAST_BUILD_MODE="yes"
         ;;
+    -c|--china)
+       set_registry_mirrors
+	;;
     -f|--fast-test)
         FAST_TEST_MODE="yes"
         ;;
@@ -254,9 +264,7 @@ function do_docker_pull()
         fi
     fi
 }
-
 function main(){
-
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $APOLLO_DEV_IMAGE"
     else
