@@ -25,7 +25,6 @@ RUN apt update -y && \
         libavcodec-dev \
         libavutil-dev \
         libboost-dev \
-        libcaffe-cuda-dev \
         libncurses5-dev \
         libomp-dev \
         libopencv-dev \
