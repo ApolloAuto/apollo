@@ -54,12 +54,13 @@ using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 void FeatureGenerator::Init() {
-    map_m_["Sunnyvale"] = "sunnyvale";
-    map_m_["Sunnyvale Big Loop"] = "sunnyvale_big_loop";
-    map_m_["Sunnyvale With Two Offices"] = "sunnyvale_with_two_offices";
-    map_m_["Gomentum"] = "gomentum";
-    map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
-    map_m_["San Mateo"] = "san_mateo";
+  map_name_ = "sunnyvale_with_two_offices";
+  map_m_["Sunnyvale"] = "sunnyvale";
+  map_m_["Sunnyvale Big Loop"] = "sunnyvale_big_loop";
+  map_m_["Sunnyvale With Two Offices"] = "sunnyvale_with_two_offices";
+  map_m_["Gomentum"] = "gomentum";
+  map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
+  map_m_["San Mateo"] = "san_mateo";
 }
 
 void FeatureGenerator::WriteOutLearningData(const LearningData& learning_data,
@@ -482,6 +483,9 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   learning_data_frame->set_timestamp_sec(
       localization_for_label_.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
+
+  // map_name
+  learning_data_frame->set_map_name(map_name_);
 
   // add chassis
   auto chassis = learning_data_frame->mutable_chassis();
