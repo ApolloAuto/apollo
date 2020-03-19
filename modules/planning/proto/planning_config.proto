@@ -193,7 +193,11 @@ message ScenarioYieldSignConfig {
   optional float creep_timeout_sec = 4 [default = 10.0];        // sec
 }
 
+message ScenarioTestLearningModelConfig {
+}
+
 // scenario configs
+// next id: 19
 message ScenarioConfig {
   enum ScenarioType {
     LANE_FOLLOW = 0;  // default scenario
@@ -217,6 +221,9 @@ message ScenarioConfig {
     // misc
     NARROW_STREET_U_TURN = 13;
     PARK_AND_GO = 14;
+
+    // test learning model
+    TEST_LEARNING_MODEL = 15;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -306,6 +313,7 @@ message ScenarioConfig {
     ScenarioPullOverConfig pull_over_config = 13;
     ScenarioValetParkingConfig valet_parking_config = 14;
     ScenarioYieldSignConfig yield_sign_config = 15;
+    ScenarioTestLearningModelConfig test_learning_model_config = 18;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 16;
