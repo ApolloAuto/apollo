@@ -20,6 +20,7 @@
 #include "modules/planning/math/curve_math.h"
 
 #include "gtest/gtest.h"
+#include "math.h"
 
 namespace apollo {
 namespace planning {

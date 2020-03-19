@@ -20,8 +20,10 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
+#define HAVE_CSTDDEF
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#undef HAVE_CSTDDEF
 
 #include <algorithm>
 #include <string>

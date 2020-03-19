@@ -17,6 +17,7 @@
 #include "modules/planning/tuning/speed_model/autotuning_speed_feature_builder.h"
 
 #include <string>
+#include "math.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/proto/error_code.pb.h"

@@ -20,8 +20,10 @@
 
 #pragma once
 
+#define HAVE_CSTDDEF
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#undef HAVE_CSTDDEF
 #include <vector>
 
 #include "Eigen/Dense"

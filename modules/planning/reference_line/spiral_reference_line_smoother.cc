@@ -20,8 +20,10 @@
 
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
+#define HAVE_CSTDDEF
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#undef HAVE_CSTDDEF
 
 #include <algorithm>
 #include <utility>

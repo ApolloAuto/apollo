@@ -23,6 +23,8 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 
+#include "math.h"
+
 namespace apollo {
 namespace planning {
 
