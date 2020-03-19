@@ -3,26 +3,27 @@ vehicle_param {
   vehicle_id {
       other_unique_id: "ch"
   }
-  front_edge_to_center: 0.890
-  back_edge_to_center: 0.890
+  front_edge_to_center: 1.385
+  back_edge_to_center: 0.405
   left_edge_to_center: 0.430
   right_edge_to_center: 0.430
 
   length: 1.780
   width: 0.860
   height: 0.480
-  min_turn_radius: 2.50000000
+  min_turn_radius: 2.50
   max_acceleration: 4.0
   max_deceleration: -6.0
-  max_steer_angle: 0.52359877559
-  max_steer_angle_rate: 0.52359877559
+  max_steer_angle: 0.384
+  max_steer_angle_rate: 0.523
   min_steer_angle_rate:0
   steer_ratio: 1
-  wheel_base: 1.000
+  wheel_base: 0.960
   wheel_rolling_radius: 0.202
 
-  brake_deadzone: 7.0
+  brake_deadzone: 3.0
   throttle_deadzone: 5.0
+
   steering_latency_param
   {
       dead_time: 0.0
