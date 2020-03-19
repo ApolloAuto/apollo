@@ -137,7 +137,8 @@ http_archive(
 http_archive(
     name = "ad_rss_lib",
     url = "file:///home/libs/ad-rss-lib-1.1.0.tar.gz",
-    build_file = "external/rss_lib.BUILD",
+    sha256 = "10c161733a06053f79120f389d2d28208c927eb65759799fb8d7142666b61b9f",
+    build_file = "rss_lib.BUILD",
     strip_prefix = "ad-rss-lib-1.1.0",
 )
 

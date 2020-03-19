@@ -19,8 +19,10 @@
  **/
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"
 
+#define HAVE_CSTDDEF
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#undef HAVE_CSTDDEF
 
 #include "gtest/gtest.h"
 

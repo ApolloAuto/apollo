@@ -20,8 +20,11 @@
 
 #pragma once
 
+#define HAVE_CSTDDEF
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
+#undef HAVE_CSTDDEF
+
 #include <vector>
 
 #include "Eigen/Dense"
@@ -106,6 +109,9 @@ class SpiralProblemInterface : public Ipopt::TNLP {
                          const double* g, const double* lambda,
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
+
+
+  //static constexpr size_t get_N();
 
  private:
   void update_piecewise_spiral_paths(const double* x, const int n);

@@ -20,8 +20,10 @@
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
 
+#define HAVE_CSTDDEF
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#undef HAVE_CSTDDEF
 
 #include "cyber/common/log.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_ipopt_interface.h"

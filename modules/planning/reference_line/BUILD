@@ -172,6 +172,9 @@ cc_binary(
         ":spiral_reference_line_smoother",
         "//modules/planning/proto:planning_config_proto",
     ],
+    linkopts = [
+        "-ldl",
+    ],
 )
 
 cc_binary(

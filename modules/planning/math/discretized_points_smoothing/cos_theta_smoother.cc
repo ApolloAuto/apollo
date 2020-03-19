@@ -16,8 +16,10 @@
 
 #include "modules/planning/math/discretized_points_smoothing/cos_theta_smoother.h"
 
+#define HAVE_CSTDDEF
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#undef HAVE_CSTDDEF
 
 #include "cyber/common/log.h"
 #include "modules/planning/math/discretized_points_smoothing/cos_theta_ipopt_interface.h"

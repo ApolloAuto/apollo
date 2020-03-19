@@ -22,8 +22,10 @@
 
 #include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
+#define HAVE_CSTDDEF
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
+#undef HAVE_CSTDDEF
 
 #include <limits>
 #include <vector>

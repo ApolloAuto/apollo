@@ -227,6 +227,7 @@ cc_library(
     deps = [
         ":spline_2d_solver",
         "//modules/common/math:matrix_operations",
+        "@com_google_googletest//:gtest_main",
         "@osqp",
     ],
 )

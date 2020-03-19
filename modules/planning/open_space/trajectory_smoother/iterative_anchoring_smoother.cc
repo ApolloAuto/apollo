@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <bits/stdc++.h>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
