@@ -1,0 +1,2 @@
+scenario_type: TEST_LEARNING_MODEL
+stage_type: TEST_LEARNING_MODEL_STAGE

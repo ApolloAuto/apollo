@@ -40,6 +40,7 @@ DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 DECLARE_string(scenario_valet_parking_config_file);
 DECLARE_string(scenario_yield_sign_config_file);
+DECLARE_string(scenario_test_learning_model_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_emergency_pull_over);
@@ -268,3 +269,5 @@ DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);
 DECLARE_bool(use_front_axe_center_in_path_planning);
 
 DECLARE_bool(use_road_boundary_from_map);
+
+DECLARE_bool(enable_test_learning_model);
