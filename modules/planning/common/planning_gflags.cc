@@ -79,6 +79,10 @@ DEFINE_string(scenario_yield_sign_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/yield_sign_config.pb.txt",
               "yield_sign scenario config file");
+DEFINE_string(scenario_test_learning_model_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/test_learning_model_config.pb.txt",
+              "test_learning_model scenario config file");
 
 DEFINE_bool(enable_scenario_bare_intersection, true,
             "enable bare_intersection scenarios in planning");
@@ -531,3 +535,7 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "more agile.");
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
+
+DEFINE_bool(enable_test_learning_model, false,
+	    "True to enable test learning model to generate "
+	    "planning trajectory.");
