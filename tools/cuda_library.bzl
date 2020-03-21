@@ -22,7 +22,7 @@ cuda_arch = " ".join([
 def cuda_library_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
     output = ctx.outputs.out
-    lib_flags = ["-std=c++17", "--shared", "--compiler-options -fPIC"]
+    lib_flags = ["-std=c++14", "--shared", "--compiler-options -fPIC"]
     args = [f.path for f in ctx.files.srcs]
     deps_flags=[]
     ctx.actions.run_shell(
