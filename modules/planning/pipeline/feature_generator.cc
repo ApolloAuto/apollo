@@ -26,6 +26,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/math_util.h"
 
@@ -47,6 +48,7 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;
+using apollo::hdmap::LaneInfoConstPtr;
 using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
@@ -219,6 +221,36 @@ void FeatureGenerator::OnRoutingResponse(
   }
 }
 
+apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
+    int* routing_index) {
+  constexpr double kRadius = 0.1;
+  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
+  const auto& pose = localization_for_label_.back().pose();
+  const auto& adc_point = common::util::PointFactory::ToPointENU(
+      pose.position().x(), pose.position().y(), pose.position().z());
+  for (int i = 0; i < 10; ++i) {
+    apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
+        adc_point, kRadius + i * kRadius, &lanes);
+    if (lanes.size() > 0) {
+      break;
+    }
+  }
+
+  *routing_index = -1;
+  if (lanes.size() >= 0) {
+    for (auto& lane : lanes) {
+      const auto lane_id = lane->id().id();
+      for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
+        if (routing_lane_segment_[i].first == lane_id) {
+          *routing_index = i;
+          return lane;
+        }
+      }
+    }
+  }
+  return nullptr;
+}
+
 void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
   CHECK_NOTNULL(adc_curr_info);
   // ADC current position / velocity / acc/ heading
@@ -381,47 +413,22 @@ void FeatureGenerator::GenerateObstacleFeature(
 }
 
 void FeatureGenerator::GenerateRoutingFeature(
+    const int routing_index,
     LearningDataFrame* learning_data_frame) {
   auto routing = learning_data_frame->mutable_routing();
   routing->Clear();
   for (const auto& lane_segment : routing_lane_segment_) {
     routing->add_routing_lane_id(lane_segment.first);
   }
-  constexpr double kRadius = 0.1;
-  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
-  const auto& pose = localization_for_label_.back().pose();
-  const auto& adc_point = common::util::PointFactory::ToPointENU(
-      pose.position().x(), pose.position().y(), pose.position().z());
-  for (int i = 0; i < 10; ++i) {
-    apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
-        adc_point, kRadius + i * kRadius, &lanes);
-    if (lanes.size() > 0) {
-      break;
-    }
-  }
 
-  int index = -1;
-  if (lanes.size() <= 0) {
-    index = 0;
-  } else {
-    for (auto& lane : lanes) {
-      const auto lane_id = lane->id().id();
-      for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
-        if (routing_lane_segment_[i].first == lane_id) {
-          index = i;
-          break;
-        }
-      }
-      if (index >= 0) {
-        break;
-      }
-    }
+  if (routing_index < 0) {
+    return;
   }
 
   constexpr double kLocalRoutingLength = 200.0;
   std::vector<std::string> local_routing_lane_ids;
   // local routing land_ids behind ADS
-  int i = index;
+  int i = routing_index;
   double length = 0.0;
   while (i-- > 0 && length < kLocalRoutingLength) {
       local_routing_lane_ids.insert(local_routing_lane_ids.begin(),
@@ -429,7 +436,7 @@ void FeatureGenerator::GenerateRoutingFeature(
       length += routing_lane_segment_[i].second;
   }
   // local routing lane_ids ahead of ADC
-  i = index;
+  i = routing_index;
   length = 0.0;
   while (i++ < static_cast<int>(routing_lane_segment_.size()) &&
       length < kLocalRoutingLength) {
@@ -478,6 +485,9 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
 }
 
 void FeatureGenerator::GenerateLearningDataFrame() {
+  int routing_index;
+  LaneInfoConstPtr cur_lane = GetADCCurrentLane(&routing_index);
+
   auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
   learning_data_frame->set_timestamp_sec(
@@ -486,6 +496,13 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   // map_name
   learning_data_frame->set_map_name(map_name_);
+
+  // lane_turn
+  apollo::hdmap::Lane::LaneTurn lane_turn = apollo::hdmap::Lane::NO_TURN;
+  if (cur_lane != nullptr) {
+    lane_turn = cur_lane->lane().turn();
+  }
+  learning_data_frame->mutable_planning_tag()->set_lane_turn(lane_turn);
 
   // add chassis
   auto chassis = learning_data_frame->mutable_chassis();
@@ -510,7 +527,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   }
 
   // add routing
-  GenerateRoutingFeature(learning_data_frame);
+  GenerateRoutingFeature(routing_index, learning_data_frame);
 
   // add obstacle
   GenerateObstacleFeature(learning_data_frame);
