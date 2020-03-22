@@ -17,11 +17,12 @@
 
 #include <boost/filesystem.hpp>
 
+#include "absl/strings/match.h"
+#include "yaml-cpp/yaml.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 #include "modules/perception/base/camera.h"
-#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace perception {
@@ -169,7 +170,7 @@ bool GetFileList(const std::string &path, const std::string &suffix,
   boost::filesystem::recursive_directory_iterator itr(path);
   while (itr != boost::filesystem::recursive_directory_iterator()) {
     try {
-      if (apollo::common::util::EndWith(itr->path().string(), suffix)) {
+      if (absl::EndsWith(itr->path().string(), suffix)) {
         files->push_back(itr->path().string());
       }
       ++itr;

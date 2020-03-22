@@ -57,6 +57,15 @@ export function drawCircle(radius, material, segments = 32) {
     return circleMesh;
 }
 
+
+export function drawEllipse(aRadius, bRadius, material) {
+    const path = new THREE.Shape();
+    path.absellipse(0, 0, aRadius, bRadius, 0, Math.PI * 2, false, 0);
+    const geometry = new THREE.ShapeBufferGeometry(path);
+    const ellipse = new THREE.Mesh(geometry, material);
+    return ellipse;
+}
+
 export function drawThickBandFromPoints(
     points, thickness = 0.5, color = 0xffffff, opacity = 1, zOffset = 0) {
     const geometry = Line(points.map(p => [p.x, p.y]));
@@ -156,4 +165,26 @@ export function drawShapeFromPoints(points,
         mesh.updateMatrix();
     }
     return mesh;
+}
+
+export function disposeMeshGroup(mesh) {
+    if (!mesh) {
+        return;
+    }
+
+    mesh.traverse((child) => {
+        if (child.geometry !== undefined) {
+            child.geometry.dispose();
+            child.material.dispose();
+        }
+    });
+}
+
+export function disposeMesh(mesh) {
+    if (!mesh) {
+        return;
+    }
+
+    mesh.geometry.dispose();
+    mesh.material.dispose();
 }

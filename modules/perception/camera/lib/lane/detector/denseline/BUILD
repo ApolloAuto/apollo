@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "denseline_lane_detector",
-    srcs = [
-        "denseline_lane_detector.cc",
-    ],
-    hdrs = [
-        "denseline_lane_detector.h",
-    ],
+    srcs = ["denseline_lane_detector.cc"],
+    hdrs = ["denseline_lane_detector.h"],
     deps = [
         "//cyber/common:file",
         "//modules/perception/base",

@@ -1,7 +1,0 @@
-syntax = "proto2";
-
-package apollo.planning;
-
-message ProceedWithCautionSpeedConfig {
-  optional double max_distance = 1 [ default=5.0]; // unit: meters
-}

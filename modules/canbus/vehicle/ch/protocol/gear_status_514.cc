@@ -37,7 +37,7 @@ void Gearstatus514::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'description': 'PRND control(Status)', 'enum': {1:
 // 'GEAR_STS_PARK', 2: 'GEAR_STS_REVERSE', 3: 'GEAR_STS_NEUTRAL', 4:
 // 'GEAR_STS_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'gear_sts',
-// 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
+// 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
 Gear_status_514::Gear_stsType Gearstatus514::gear_sts(const std::uint8_t* bytes,
                                                       int32_t length) const {

@@ -14,14 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
 
-#include <boost/foreach.hpp>
+#include <algorithm>
 #include <string>
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 NdtMapConfig::NdtMapConfig(std::string map_version)
     : BaseMapConfig(map_version) {
@@ -62,14 +63,16 @@ bool NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
   BaseMapConfig::LoadXml(*config);
   map_is_compression_ = config->get<bool>("map.map_config.compression");
   map_resolutions_z_.clear();
-  BOOST_FOREACH (boost::property_tree::ptree::value_type& v,  // NOLINT
-                 config->get_child("map.map_config.resolutions_z")) {
-    map_resolutions_z_.push_back(
-        static_cast<float>(atof(v.second.data().c_str())));
-  }
+  const auto& resolutions_z = config->get_child("map.map_config.resolutions_z");
+  std::for_each(resolutions_z.begin(), resolutions_z.end(),
+                [this](const boost::property_tree::ptree::value_type& v) {
+                  map_resolutions_z_.push_back(
+                      static_cast<float>(atof(v.second.data().c_str())));
+                });
   return true;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

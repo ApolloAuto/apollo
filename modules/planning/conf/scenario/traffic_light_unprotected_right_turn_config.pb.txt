@@ -3,10 +3,10 @@ traffic_light_unprotected_right_turn_config: {
   start_traffic_light_scenario_distance: 5.0
   enable_right_turn_on_red: false
   max_valid_stop_distance: 2.0
-  max_adc_stop_speed: 0.3
   min_pass_s_distance: 3.0
   red_light_right_turn_stop_duration_sec: 3.0
   creep_timeout_sec: 10.0
+  max_adc_speed_before_creep: 3.0
 }
 stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP
 stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP
@@ -21,11 +21,12 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   task_config: {
     task_type: PATH_LANE_BORROW_DECIDER
   }
@@ -59,6 +60,12 @@ stage_config: {
   task_config: {
     task_type: RULE_BASED_STOP_DECIDER
   }
+  task_config: {
+    task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
 }
 
 stage_config: {
@@ -71,11 +78,12 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   task_config: {
     task_type: CREEP_DECIDER
     creep_decider_config: {
@@ -120,6 +128,12 @@ stage_config: {
   task_config: {
     task_type: RULE_BASED_STOP_DECIDER
   }
+  task_config: {
+    task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
 }
 
 stage_config: {
@@ -131,11 +145,12 @@ stage_config: {
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   task_config: {
     task_type: PATH_LANE_BORROW_DECIDER
     path_lane_borrow_decider_config {
@@ -171,5 +186,11 @@ stage_config: {
   }
   task_config: {
     task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
   }
 }

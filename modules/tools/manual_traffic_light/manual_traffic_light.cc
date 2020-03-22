@@ -16,6 +16,8 @@
 
 #include <poll.h>
 
+#include "absl/strings/match.h"
+#include "absl/strings/str_join.h"
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -28,7 +30,6 @@
 using apollo::common::color::ANSI_GREEN;
 using apollo::common::color::ANSI_RED;
 using apollo::common::color::ANSI_RESET;
-using apollo::common::util::PrintIter;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::SignalInfoConstPtr;
 using apollo::localization::LocalizationEstimate;
@@ -96,11 +97,11 @@ class ManualTrafficLight final : public apollo::cyber::TimerComponent {
         }
       } else {
         if (signal_ids.size() < 5) {
-          std::cout << " IDs: "
-                    << PrintIter(signal_ids.begin(), signal_ids.end());
+          std::cout << " IDs: " << absl::StrJoin(signal_ids, " ");
         } else {
           std::cout << " IDs: "
-                    << PrintIter(signal_ids.begin(), signal_ids.begin() + 4)
+                    << absl::StrJoin(signal_ids.begin(), signal_ids.begin() + 4,
+                                     " ")
                     << " ...";
         }
       }
@@ -118,9 +119,9 @@ class ManualTrafficLight final : public apollo::cyber::TimerComponent {
     static auto map_filename = apollo::hdmap::BaseMapFile();
     static apollo::hdmap::Map map_proto;
     static std::vector<SignalInfoConstPtr> map_traffic_lights;
-    if (map_proto.lane_size() == 0 && map_traffic_lights.empty()) {
+    if (map_proto.lane().empty() && map_traffic_lights.empty()) {
       AERROR << "signal size: " << map_proto.signal_size();
-      if (apollo::common::util::EndWith(map_filename, ".xml")) {
+      if (absl::EndsWith(map_filename, ".xml")) {
         if (!apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename,
                                                                 &map_proto)) {
           return false;

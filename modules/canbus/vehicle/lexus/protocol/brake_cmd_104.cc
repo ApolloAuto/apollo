@@ -16,6 +16,8 @@
 
 #include "modules/canbus/vehicle/lexus/protocol/brake_cmd_104.h"
 
+#include <algorithm>
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -121,7 +123,11 @@ Brakecmd104* Brakecmd104::set_brake_cmd(double brake_cmd) {
 // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
 void Brakecmd104::set_p_brake_cmd(uint8_t* data, double brake_cmd) {
+  const double scaling_bias = 0.0;   // estimated from the garage test data
+  const double scaling_gain = 0.80;  // estimated from the garage test data
+  brake_cmd = std::max(0.0, (brake_cmd - scaling_bias) / (scaling_gain * 100));
   brake_cmd = ProtocolData::BoundedValue(0.0, 1.0, brake_cmd);
+  // TODO(AS): fix this scaling.
   int x = static_cast<int>(brake_cmd / 0.001000);
   uint8_t t = 0;
 

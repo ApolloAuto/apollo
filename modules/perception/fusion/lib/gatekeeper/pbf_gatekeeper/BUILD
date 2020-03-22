@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pbf_gatekeeper",
-    srcs = [
-        "pbf_gatekeeper.cc",
-    ],
-    hdrs = [
-        "pbf_gatekeeper.h",
-    ],
+    srcs = ["pbf_gatekeeper.cc"],
+    hdrs = ["pbf_gatekeeper.h"],
     deps = [
         "//modules/common/util",
         "//modules/perception/fusion/base:base_init_options",
@@ -24,15 +20,13 @@ cc_library(
 cc_test(
     name = "pbf_gatekeeper_test",
     size = "small",
-    srcs = [
-        "pbf_gatekeeper_test.cc",
-    ],
+    srcs = ["pbf_gatekeeper_test.cc"],
     deps = [
         ":pbf_gatekeeper",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

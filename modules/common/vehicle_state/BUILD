@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "vehicle_state_provider",
-    srcs = [
-        "vehicle_state_provider.cc",
-    ],
-    hdrs = [
-        "vehicle_state_provider.h",
-    ],
+    srcs = ["vehicle_state_provider.cc"],
+    hdrs = ["vehicle_state_provider.h"],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:config_gflags",
@@ -25,9 +21,7 @@ cc_library(
 cc_test(
     name = "vehicle_state_provider_test",
     size = "small",
-    srcs = [
-        "vehicle_state_provider_test.cc",
-    ],
+    srcs = ["vehicle_state_provider_test.cc"],
     data = [
         "//modules/canbus:canbus_testdata",
         "//modules/localization:localization_testdata",
@@ -35,7 +29,7 @@ cc_test(
     deps = [
         ":vehicle_state_provider",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

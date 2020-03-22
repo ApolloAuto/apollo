@@ -19,9 +19,9 @@ cc_library(
         "//modules/prediction/predictor/junction:junction_predictor",
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
-        "//modules/prediction/predictor/regional:regional_predictor",
         "//modules/prediction/predictor/single_lane:single_lane_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/scenario:scenario_manager",
     ],
 )
 
@@ -50,6 +50,7 @@ cc_library(
     deps = [
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/container/obstacles:obstacles_container",
     ],
 )
 

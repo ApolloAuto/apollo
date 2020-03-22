@@ -26,6 +26,8 @@
 
 #include "boost/math/tools/minima.hpp"
 
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
@@ -94,7 +96,7 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   const auto& accumulated_s = other.map_path().accumulated_s();
   const auto& other_points = other.reference_points();
   auto lower = accumulated_s.begin();
-  constexpr double kStitchingError = 1e-1;
+  static constexpr double kStitchingError = 1e-1;
   if (first_join) {
     if (first_sl.l() > kStitchingError) {
       AERROR << "lateral stitching error on first join of reference line too "
@@ -137,43 +139,44 @@ ReferencePoint ReferenceLine::GetNearestReferencePoint(
   return reference_points_[min_index];
 }
 
-bool ReferenceLine::Shrink(const common::math::Vec2d& point,
-                           double look_backward, double look_forward) {
+bool ReferenceLine::Segment(const common::math::Vec2d& point,
+                            const double look_backward,
+                            const double look_forward) {
   common::SLPoint sl;
   if (!XYToSL(point, &sl)) {
     AERROR << "Failed to project point: " << point.DebugString();
     return false;
   }
-  return Shrink(sl.s(), look_backward, look_forward);
+  return Segment(sl.s(), look_backward, look_forward);
 }
 
-bool ReferenceLine::Shrink(const double s, double look_backward,
-                           double look_forward) {
+bool ReferenceLine::Segment(const double s, const double look_backward,
+                            const double look_forward) {
   const auto& accumulated_s = map_path_.accumulated_s();
-  size_t start_index = 0;
-  if (s > look_backward) {
-    auto it_lower = std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
-                                     s - look_backward);
-    start_index = std::distance(accumulated_s.begin(), it_lower);
-  }
-  size_t end_index = reference_points_.size();
-  if (s + look_forward < Length()) {
-    auto start_it = accumulated_s.begin();
-    std::advance(start_it, start_index);
-    auto it_higher =
-        std::upper_bound(start_it, accumulated_s.end(), s + look_forward);
-    end_index = std::distance(accumulated_s.begin(), it_higher);
-  }
-  reference_points_.erase(reference_points_.begin() + end_index,
-                          reference_points_.end());
-  reference_points_.erase(reference_points_.begin(),
-                          reference_points_.begin() + start_index);
-  if (reference_points_.size() < 2) {
+
+  // inclusive
+  auto start_index =
+      std::distance(accumulated_s.begin(),
+                    std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
+                                     s - look_backward));
+
+  // exclusive
+  auto end_index =
+      std::distance(accumulated_s.begin(),
+                    std::upper_bound(accumulated_s.begin(), accumulated_s.end(),
+                                     s + look_forward));
+
+  if (end_index - start_index < 2) {
     AERROR << "Too few reference points after shrinking.";
     return false;
   }
-  map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
-      reference_points_.begin(), reference_points_.end())));
+
+  reference_points_ =
+      std::vector<ReferencePoint>(reference_points_.begin() + start_index,
+                                  reference_points_.begin() + end_index);
+
+  map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
+      reference_points_.begin(), reference_points_.end()));
   return true;
 }
 
@@ -184,7 +187,7 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   }
 
   common::SLPoint sl_point;
-  XYToSL({path_point.x(), path_point.y()}, &sl_point);
+  XYToSL(path_point, &sl_point);
   common::FrenetFramePoint frenet_frame_point;
   frenet_frame_point.set_s(sl_point.s());
   frenet_frame_point.set_l(sl_point.l());
@@ -211,10 +214,10 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
 
 std::pair<std::array<double, 3>, std::array<double, 3>>
 ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
-  CHECK(!reference_points_.empty());
+  ACHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
-  XYToSL({traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
+  XYToSL(traj_point.path_point(), &sl_point);
 
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;
@@ -374,7 +377,6 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
 
 bool ReferenceLine::SLToXY(const SLPoint& sl_point,
                            common::math::Vec2d* const xy_point) const {
-  CHECK_NOTNULL(xy_point);
   if (map_path_.num_points() < 2) {
     AERROR << "The reference line has too few points.";
     return false;
@@ -389,7 +391,6 @@ bool ReferenceLine::SLToXY(const SLPoint& sl_point,
 
 bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
                            SLPoint* const sl_point) const {
-  DCHECK_NOTNULL(sl_point);
   double s = 0.0;
   double l = 0.0;
   if (!map_path_.GetProjection(xy_point, &s, &l)) {
@@ -493,6 +494,33 @@ bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
     return false;
   }
   return map_path_.GetRoadWidth(s, road_left_width, road_right_width);
+}
+
+hdmap::Road::Type ReferenceLine::GetRoadType(const double s) const {
+  const hdmap::HDMap *hdmap = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap);
+
+  hdmap::Road::Type road_type = hdmap::Road::UNKNOWN;
+
+  SLPoint sl_point;
+  sl_point.set_s(s);
+  sl_point.set_l(0.0);
+  common::math::Vec2d pt;
+  SLToXY(sl_point, &pt);
+
+  common::PointENU point;
+  point.set_x(pt.x());
+  point.set_y(pt.y());
+  point.set_z(0.0);
+  std::vector<hdmap::RoadInfoConstPtr> roads;
+  hdmap->GetRoads(point, 4.0, &roads);
+  for (auto road : roads) {
+    if (road->type() != hdmap::Road::UNKNOWN) {
+      road_type = road->type();
+      break;
+    }
+  }
+  return road_type;
 }
 
 void ReferenceLine::GetLaneFromS(
@@ -758,10 +786,11 @@ std::string ReferenceLine::DebugString() const {
   const auto limit =
       std::min(reference_points_.size(),
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
-  return apollo::common::util::StrCat(
+  return absl::StrCat(
       "point num:", reference_points_.size(),
-      apollo::common::util::PrintDebugStringIter(
-          reference_points_.begin(), reference_points_.begin() + limit, ""));
+      absl::StrJoin(reference_points_.begin(),
+                    reference_points_.begin() + limit, "",
+                    apollo::common::util::DebugStringFormatter()));
 }
 
 double ReferenceLine::GetSpeedLimitFromS(const double s) const {
@@ -771,15 +800,28 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
     }
   }
   const auto& map_path_point = GetReferencePoint(s);
+
   double speed_limit = FLAGS_planning_upper_speed_limit;
+  bool speed_limit_found = false;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
     if (lane_waypoint.lane == nullptr) {
       AWARN << "lane_waypoint.lane is nullptr.";
       continue;
     }
+    speed_limit_found = true;
     speed_limit =
         std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
   }
+
+  if (!speed_limit_found) {
+    // use default speed limit based on road_type
+    speed_limit = FLAGS_default_city_road_speed_limit;
+    hdmap::Road::Type road_type = GetRoadType(s);
+    if (road_type == hdmap::Road::HIGHWAY) {
+      speed_limit = FLAGS_default_highway_speed_limit;
+    }
+  }
+
   return speed_limit;
 }
 

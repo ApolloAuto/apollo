@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -89,7 +89,7 @@ class Configurator(object):
         self.stdscr.addstr(1, 50, "Class", curses.A_BOLD)
         self.stdscr.addstr(1, 65, "Configuration File", curses.A_BOLD)
 
-        for idx in xrange(len(self.moduleconf)):
+        for idx in range(len(self.moduleconf)):
             lidx = idx + 2
             if idx == self.select:
                 self.stdscr.addstr(lidx, 2, self.moduleconf[idx].name,
@@ -128,7 +128,7 @@ class Configurator(object):
         """
         Update Main Screen
         """
-        for idx in xrange(len(self.moduleconf)):
+        for idx in range(len(self.moduleconf)):
             lidx = idx + 2
             if idx == self.select:
                 self.stdscr.addstr(lidx, 2, self.moduleconf[idx].name,
@@ -162,4 +162,4 @@ if __name__ == '__main__':
         curses.wrapper(main)
     except Exception as e:
         tb = traceback.format_exc()
-        print tb
+        print(tb)

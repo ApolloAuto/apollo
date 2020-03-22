@@ -1,14 +1,6 @@
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {
-     scenario_type: LANE_FOLLOW
-     scenario_type: BARE_INTERSECTION_UNPROTECTED
-     scenario_type: PULL_OVER
-     scenario_type: STOP_SIGN_UNPROTECTED
-     scenario_type: TRAFFIC_LIGHT_PROTECTED
-     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
-     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
-     scenario_type: VALET_PARKING
   }
 }
 default_task_config: {
@@ -33,40 +25,88 @@ default_task_config: {
   piecewise_jerk_speed_config {
     acc_weight: 1.0
     jerk_weight: 3.0
-    dkappa_penalty_weight: 2000.0
+    kappa_penalty_weight: 2000.0
     ref_s_weight: 10.0
     ref_v_weight: 10.0
   }
 }
 default_task_config: {
+  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  piecewise_jerk_nonlinear_speed_config {
+    acc_weight: 2.0
+    jerk_weight: 3.0
+    lat_acc_weight: 1000.0
+    s_potential_weight: 0.05
+    ref_v_weight: 5.0
+    ref_s_weight: 100.0
+    soft_s_bound_weight: 1e6
+    use_warm_start: true
+  }
+}
+default_task_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
-  dp_st_speed_config {
-    matrix_dimension_s: 300
-    matrix_dimension_t: 8
+  speed_heuristic_config {
+    default_speed_config {
+      unit_t: 1.0
+      dense_dimension_s: 101
+      dense_unit_s: 0.1
+      sparse_unit_s: 1.0
+      speed_weight: 0.0
+      accel_weight: 10.0
+      jerk_weight: 10.0
+      obstacle_weight: 1.0
+      reference_weight: 0.0
+      go_down_buffer: 5.0
+      go_up_buffer: 5.0
 
-    speed_weight: 0.0
-    accel_weight: 10.0
-    jerk_weight: 10.0
-    obstacle_weight: 1.0
-    reference_weight: 0.0
-    go_down_buffer: 5.0
-    go_up_buffer: 5.0
+      default_obstacle_cost: 1e4
 
-    default_obstacle_cost: 1e4
+      default_speed_cost: 1.0e3
+      exceed_speed_penalty: 1.0e3
+      low_speed_penalty: 10.0
+      reference_speed_penalty: 10.0
+      keep_clear_low_speed_penalty: 10.0
+      accel_penalty: 1.0
+      decel_penalty: 1.0
 
-    default_speed_cost: 1.0e3
-    exceed_speed_penalty: 1.0e3
-    low_speed_penalty: 10.0
-    reference_speed_penalty: 10.0
-    keep_clear_low_speed_penalty: 10.0
-    accel_penalty: 1.0
-    decel_penalty: 1.0
+      positive_jerk_coeff: 1.0
+      negative_jerk_coeff: 1.0
 
-    positive_jerk_coeff: 1.0
-    negative_jerk_coeff: 1.0
+      max_acceleration: 2.0
+      max_deceleration: -4.0
+      spatial_potential_penalty: 1.0e2
+    }
+    lane_change_speed_config {
+      unit_t: 1.0
+      dense_dimension_s: 21
+      dense_unit_s: 0.25
+      sparse_unit_s: 1.0
+      speed_weight: 0.0
+      accel_weight: 10.0
+      jerk_weight: 10.0
+      obstacle_weight: 1.0
+      reference_weight: 0.0
+      go_down_buffer: 5.0
+      go_up_buffer: 5.0
 
-    max_acceleration: 3.0
-    max_deceleration: -4.0
+      default_obstacle_cost: 1e4
+
+      default_speed_cost: 1.0e3
+      exceed_speed_penalty: 1.0e3
+      low_speed_penalty: 10.0
+      reference_speed_penalty: 10.0
+      keep_clear_low_speed_penalty: 10.0
+      accel_penalty: 1.0
+      decel_penalty: 1.0
+
+      positive_jerk_coeff: 1.0
+      negative_jerk_coeff: 1.0
+
+      max_acceleration: 2.0
+      max_deceleration: -2.5
+      spatial_potential_penalty: 1.0e5
+      is_lane_changing: true
+    }
   }
 }
 default_task_config: {
@@ -76,7 +116,7 @@ default_task_config: {
   task_type: RULE_BASED_STOP_DECIDER
   rule_based_stop_decider_config {
     max_adc_stop_speed: 0.5
-    max_valid_stop_distance: 0.5
+    max_valid_stop_distance: 1.0
     search_beam_length: 20.0
     search_beam_radius_intensity: 0.08
     search_range: 3.14
@@ -84,21 +124,21 @@ default_task_config: {
   }
 }
 default_task_config: {
+  task_type: ST_BOUNDS_DECIDER
+  st_bounds_decider_config {
+    total_time: 7.0
+  }
+}
+default_task_config: {
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   speed_bounds_decider_config {
     total_time: 7.0
     boundary_buffer: 0.25
-    high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 1.5
-    high_speed_threshold: 12.58
-    low_speed_threshold: 7.5
-    minimal_kappa: 0.00001
+    max_centric_acceleration_limit: 2.0
     point_extension: 0.0
     lowest_speed: 2.5
-    num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
-    centri_jerk_speed_coeff: 1.0
   }
 }
 default_task_config: {
@@ -106,17 +146,11 @@ default_task_config: {
   speed_bounds_decider_config {
     total_time: 7.0
     boundary_buffer: 0.1
-    high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 1.5
-    high_speed_threshold: 12.58
-    low_speed_threshold: 7.5
-    minimal_kappa: 0.00001
+    max_centric_acceleration_limit: 2.0
     point_extension: 0.0
     lowest_speed: 2.5
-    num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
-    centri_jerk_speed_coeff: 1.0
   }
 }
 default_task_config: {
@@ -159,6 +193,14 @@ default_task_config: {
           }
           qp_format: OSQP
           min_safety_distance: 0.01
+          osqp_config {
+            alpha: 1.0
+            eps_abs: 1.0e-3
+            eps_rel: 1.0e-3
+            max_iter: 10000
+            polish: true
+            osqp_debug_log: false
+          }
         }
         distance_approach_config {
           weight_steer: 0.3
@@ -174,6 +216,7 @@ default_task_config: {
           weight_first_order_time: 4.25
           weight_second_order_time: 13.5
           weight_end_state: 1.0
+          weight_slack: 1.0
           min_safety_distance: 0.01
           max_speed_forward: 2.0
           max_speed_reverse: 1.0
@@ -201,7 +244,7 @@ default_task_config: {
           enable_jacobian_ad: false
           enable_hand_derivative: false
           enable_derivative_check: false
-          distance_approach_mode: DISTANCE_APPROACH_IPOPT
+          distance_approach_mode: DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK
           enable_check_initial_state: false
         }
         iterative_anchoring_smoother_config {
@@ -209,7 +252,7 @@ default_task_config: {
           reanchoring_trails_num: 50
           reanchoring_pos_stddev: 0.25
           reanchoring_length_stddev: 1.0
-          estimate_bound: true
+          estimate_bound: false
           default_bound: 2.0
           vehicle_shortest_dimension: 1.04
           fem_pos_deviation_smoother_config {
@@ -228,11 +271,11 @@ default_task_config: {
           s_curve_config {
             acc_weight: 1.0
             jerk_weight: 1.0
-            dkappa_penalty_weight: 100.0
+            kappa_penalty_weight: 100.0
             ref_s_weight: 10.0
             ref_v_weight: 0.0
           }
-          collision_decrease_ratio: 0.8
+          collision_decrease_ratio: 0.0
           max_forward_v: 1.0
           max_reverse_v: 1.0
           max_forward_acc: 0.5
@@ -270,16 +313,17 @@ default_task_config: {
 default_task_config: {
   task_type: OPEN_SPACE_ROI_DECIDER
   open_space_roi_decider_config {
-    roi_longitudinal_range: 15
+    roi_longitudinal_range_start: 15
+    roi_longitudinal_range_end: 15
     parking_start_range: 20.0
     parking_inwards: false
     enable_perception_obstacles: true
     parking_depth_buffer: 0.2
-    roi_linesegment_min_angle: 0.15
-    roi_linesegment_length: 1.0
+    roi_line_segment_min_angle: 0.15
+    roi_line_segment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
-    curb_heading_tangent_change_uppper_limit: 0.4
+    curb_heading_tangent_change_upper_limit: 0.4
   }
 }
 default_task_config: {
@@ -299,6 +343,7 @@ default_task_config: {
     pull_over_destination_to_adc_buffer: 25.0
     pull_over_destination_to_pathend_buffer: 10.0
     pull_over_road_edge_buffer: 0.15
+    pull_over_approach_lon_distance_adjust_factor: 1.5
   }
 }
 default_task_config: {
@@ -311,5 +356,22 @@ default_task_config: {
   task_type: LANE_CHANGE_DECIDER
   lane_change_decider_config {
     enable_lane_change_urgency_check: false
+    enable_prioritize_change_lane: false
+    enable_remove_change_lane: false
+    reckless_change_lane: false
+    change_lane_success_freeze_time: 1.5
+    change_lane_fail_freeze_time: 1.0
+  }
+}
+default_task_config: {
+  task_type: PATH_REUSE_DECIDER
+  path_reuse_decider_config {
+    reuse_path: false
+  }
+}
+default_task_config: {
+  task_type: PATH_DECIDER
+  path_decider_config{
+    static_obstacle_buffer: 0.3
   }
 }

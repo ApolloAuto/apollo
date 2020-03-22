@@ -20,8 +20,8 @@
 
 #pragma once
 
+#include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
 namespace apollo {

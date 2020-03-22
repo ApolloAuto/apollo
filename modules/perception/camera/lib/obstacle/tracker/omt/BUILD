@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,19 +12,13 @@ cc_proto_library(
 
 proto_library(
     name = "omt_proto_lib",
-    srcs = [
-        "omt.proto",
-    ],
+    srcs = ["omt.proto"],
 )
 
 cc_library(
     name = "track_object",
-    srcs = [
-        "track_object.cc",
-    ],
-    hdrs = [
-        "track_object.h",
-    ],
+    srcs = ["track_object.cc"],
+    hdrs = ["track_object.h"],
     deps = [
         ":frame_list",
         "//modules/perception/base",
@@ -34,12 +29,8 @@ cc_library(
 
 cc_library(
     name = "target",
-    srcs = [
-        "target.cc",
-    ],
-    hdrs = [
-        "target.h",
-    ],
+    srcs = ["target.cc"],
+    hdrs = ["target.h"],
     deps = [
         ":frame_list",
         ":omt_proto",
@@ -52,9 +43,7 @@ cc_library(
 
 cc_library(
     name = "frame_list",
-    hdrs = [
-        "frame_list.h",
-    ],
+    hdrs = ["frame_list.h"],
     deps = [
         "//cyber",
         "//modules/perception/camera/common",
@@ -66,12 +55,8 @@ cc_library(
 
 cc_library(
     name = "omt_obstacle_tracker",
-    srcs = [
-        "omt_obstacle_tracker.cc",
-    ],
-    hdrs = [
-        "omt_obstacle_tracker.h",
-    ],
+    srcs = ["omt_obstacle_tracker.cc"],
+    hdrs = ["omt_obstacle_tracker.h"],
     deps = [
         ":frame_list",
         ":obstacle_reference",
@@ -86,12 +71,8 @@ cc_library(
 
 cc_library(
     name = "obstacle_reference",
-    srcs = [
-        "obstacle_reference.cc",
-    ],
-    hdrs = [
-        "obstacle_reference.h",
-    ],
+    srcs = ["obstacle_reference.cc"],
+    hdrs = ["obstacle_reference.h"],
     deps = [
         ":frame_list",
         ":omt_proto",
@@ -100,6 +81,11 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
     ],
+)
+
+py_proto(
+    name = "omt_pb2",
+    src = "omt.proto",
 )
 
 cpplint()

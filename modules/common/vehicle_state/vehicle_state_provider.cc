@@ -22,10 +22,10 @@
 
 #include "cyber/common/log.h"
 
+#include "absl/strings/str_cat.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/util/string_util.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -38,7 +38,7 @@ Status VehicleStateProvider::Update(
     const canbus::Chassis &chassis) {
   original_localization_ = localization;
   if (!ConstructExceptLinearVelocity(localization)) {
-    std::string msg = util::StrCat(
+    std::string msg = absl::StrCat(
         "Fail to update because ConstructExceptLinearVelocity error.",
         "localization:\n", localization.DebugString());
     return Status(ErrorCode::LOCALIZATION_ERROR, msg);
@@ -67,7 +67,11 @@ Status VehicleStateProvider::Update(
     }
   }
 
-  constexpr double kEpsilon = 1e-6;
+  if (chassis.has_steering_percentage()) {
+    vehicle_state_.set_steering_percentage(chassis.steering_percentage());
+  }
+
+  static constexpr double kEpsilon = 1e-6;
   if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
     vehicle_state_.set_kappa(0.0);
   } else {
@@ -127,10 +131,17 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration_vrf().y());
   } else {
-    CHECK(localization.pose().has_angular_velocity());
+    if (!localization.pose().has_angular_velocity()) {
+      AERROR << "localization.pose() has no angular velocity.";
+      return false;
+    }
     vehicle_state_.set_angular_velocity(
         localization.pose().angular_velocity().z());
-    CHECK(localization.pose().has_linear_acceleration());
+
+    if (!localization.pose().has_linear_acceleration()) {
+      AERROR << "localization.pose() has no linear acceleration.";
+      return false;
+    }
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration().y());
   }
@@ -182,6 +193,10 @@ double VehicleStateProvider::linear_acceleration() const {
 
 double VehicleStateProvider::gear() const { return vehicle_state_.gear(); }
 
+double VehicleStateProvider::steering_percentage() const {
+  return vehicle_state_.steering_percentage();
+}
+
 double VehicleStateProvider::timestamp() const {
   return vehicle_state_.timestamp();
 }
@@ -223,7 +238,8 @@ math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
                                          orientation.qy(), orientation.qz());
     Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
                             vehicle_state_.z());
-    auto future_pos_3d = quaternion.toRotationMatrix() * vec_distance + pos_vec;
+    const Eigen::Vector3d future_pos_3d =
+        quaternion.toRotationMatrix() * vec_distance + pos_vec;
     return math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 

@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,11 +11,10 @@ cc_proto_library(
 
 proto_library(
     name = "ground_service_detector_config_proto_lib",
-    srcs = [
-        "ground_service_detector_config.proto",
-    ],
-    deps = [
-    ],
+    srcs = ["ground_service_detector_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "ground_service_detector_config_pb2",
+    src = "ground_service_detector_config.proto",
+)

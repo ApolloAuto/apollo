@@ -79,192 +79,160 @@ cc_library(
 cc_test(
     name = "accel_rpt_68_test",
     size = "small",
-    srcs = [
-        "accel_rpt_68_test.cc",
-    ],
+    srcs = ["accel_rpt_68_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brake_rpt_6c_test",
     size = "small",
-    srcs = [
-        "brake_rpt_6c_test.cc",
-    ],
+    srcs = ["brake_rpt_6c_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "wheel_speed_rpt_7a_test",
     size = "small",
-    srcs = [
-        "wheel_speed_rpt_7a_test.cc",
-    ],
+    srcs = ["wheel_speed_rpt_7a_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "yaw_rate_rpt_81_test",
     size = "small",
-    srcs = [
-        "yaw_rate_rpt_81_test.cc",
-    ],
+    srcs = ["yaw_rate_rpt_81_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "wiper_rpt_91_test",
     size = "small",
-    srcs = [
-        "wiper_rpt_91_test.cc",
-    ],
+    srcs = ["wiper_rpt_91_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brake_motor_rpt_1_70_test",
     size = "small",
-    srcs = [
-        "brake_motor_rpt_1_70_test.cc",
-    ],
+    srcs = ["brake_motor_rpt_1_70_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brake_motor_rpt_2_71_test",
     size = "small",
-    srcs = [
-        "brake_motor_rpt_2_71_test.cc",
-    ],
+    srcs = ["brake_motor_rpt_2_71_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brake_motor_rpt_3_72_test",
     size = "small",
-    srcs = [
-        "brake_motor_rpt_3_72_test.cc",
-    ],
+    srcs = ["brake_motor_rpt_3_72_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "date_time_rpt_83_test",
     size = "small",
-    srcs = [
-        "date_time_rpt_83_test.cc",
-    ],
+    srcs = ["date_time_rpt_83_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "global_rpt_6a_test",
     size = "small",
-    srcs = [
-        "global_rpt_6a_test.cc",
-    ],
+    srcs = ["global_rpt_6a_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "lat_lon_heading_rpt_82_test",
     size = "small",
-    srcs = [
-        "lat_lon_heading_rpt_82_test.cc",
-    ],
+    srcs = ["lat_lon_heading_rpt_82_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "steering_motor_rpt_1_73_test",
     size = "small",
-    srcs = [
-        "steering_motor_rpt_1_73_test.cc",
-    ],
+    srcs = ["steering_motor_rpt_1_73_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "steering_motor_rpt_2_74_test",
     size = "small",
-    srcs = [
-        "steering_motor_rpt_2_74_test.cc",
-    ],
+    srcs = ["steering_motor_rpt_2_74_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "steering_motor_rpt_3_75_test",
     size = "small",
-    srcs = [
-        "steering_motor_rpt_3_75_test.cc",
-    ],
+    srcs = ["steering_motor_rpt_3_75_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "steering_rpt_1_6e_test",
     size = "small",
-    srcs = [
-        "steering_rpt_1_6e_test.cc",
-    ],
+    srcs = ["steering_rpt_1_6e_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "accel_cmd_67_test",
     size = "small",
-    srcs = [
-        "accel_cmd_67_test.cc",
-    ],
+    srcs = ["accel_cmd_67_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

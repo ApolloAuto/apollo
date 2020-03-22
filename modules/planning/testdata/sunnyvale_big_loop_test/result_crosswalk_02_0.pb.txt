@@ -24,14 +24,14 @@ decision {
       id: "11511_0"
       perception_id: 11511
       object_decision {
-        follow {
-          distance_s: -3
+        yield {
+          distance_s: -5
           fence_point {
-            x: 586260.940854132
-            y: 4141282.23052737
+            x: 586260.355368626
+            y: 4141284.1422478016
             z: 0
           }
-          fence_heading: -1.2301434845598906
+          fence_heading: -1.3338289826636047
         }
       }
     }
@@ -39,24 +39,14 @@ decision {
       id: "11511_1"
       perception_id: 11511
       object_decision {
-        follow {
-          distance_s: -3
+        yield {
+          distance_s: -5
           fence_point {
-            x: 586260.87535046809
-            y: 4141282.4194931639
+            x: 586260.30678834254
+            y: 4141284.3362579974
             z: 0
           }
-          fence_heading: -1.2478322159946527
-        }
-      }
-    }
-    decision {
-      id: "11652"
-      perception_id: 11652
-      object_decision {
-        nudge {
-          type: RIGHT_NUDGE
-          distance_l: -0.3
+          fence_heading: -1.3338289826636047
         }
       }
     }
@@ -136,3 +126,30 @@ engage_advice {
 }
 trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "188_1_-1"
+}
+target_lane_id {
+  id: "2726_1_-1"
+}
+target_lane_id {
+  id: "382_1_-1"
+}
+target_lane_id {
+  id: "10898_1_-1"
+}
+target_lane_id {
+  id: "300_1_-1"
+}
+target_lane_id {
+  id: "10771_1_-1"
+}
+target_lane_id {
+  id: "201_1_-1"
+}
+target_lane_id {
+  id: "2811_1_-1"
+}
+target_lane_id {
+  id: "2813_1_-1"
+}

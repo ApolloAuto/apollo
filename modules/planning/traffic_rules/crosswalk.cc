@@ -298,9 +298,7 @@ bool Crosswalk::CheckStopForObstacle(
   const auto& reference_line = reference_line_info->reference_line();
 
   common::SLPoint obstacle_sl_point;
-  reference_line.XYToSL(
-      {perception_obstacle.position().x(), perception_obstacle.position().y()},
-      &obstacle_sl_point);
+  reference_line.XYToSL(perception_obstacle.position(), &obstacle_sl_point);
   auto& obstacle_sl_boundary = obstacle.PerceptionSLBoundary();
   const double obstacle_l_distance =
       std::min(std::fabs(obstacle_sl_boundary.start_l()),

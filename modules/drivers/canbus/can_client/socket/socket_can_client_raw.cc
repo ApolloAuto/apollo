@@ -22,6 +22,8 @@
 
 #include "modules/drivers/canbus/can_client/socket/socket_can_client_raw.h"
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace drivers {
 namespace canbus {
@@ -38,6 +40,7 @@ bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
   }
 
   port_ = parameter.channel_id();
+  interface_ = parameter.interface();
   return true;
 }
 
@@ -72,18 +75,22 @@ ErrorCode SocketCanClientRaw::Start() {
   }
 
   // init config and state
-  // 1. set receive message_id filter, ie white list
-  struct can_filter filter[2048];
-  for (int i = 0; i < 2048; ++i) {
-    filter[i].can_id = 0x000 + i;
-    filter[i].can_mask = CAN_SFF_MASK;
-  }
+  int ret;
 
-  int ret = setsockopt(dev_handler_, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
-                       sizeof(filter));
-  if (ret < 0) {
-    AERROR << "add receive msg id filter error code: " << ret;
-    return ErrorCode::CAN_CLIENT_ERROR_BASE;
+  // 1. for non virtual busses, set receive message_id filter, ie white list
+  if (interface_ != CANCardParameter::VIRTUAL) {
+    struct can_filter filter[2048];
+    for (int i = 0; i < 2048; ++i) {
+      filter[i].can_id = 0x000 + i;
+      filter[i].can_mask = CAN_SFF_MASK;
+    }
+
+    ret = setsockopt(dev_handler_, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
+                     sizeof(filter));
+    if (ret < 0) {
+      AERROR << "add receive msg id filter error code: " << ret;
+      return ErrorCode::CAN_CLIENT_ERROR_BASE;
+    }
   }
 
   // 2. enable reception of can frames.
@@ -95,7 +102,16 @@ ErrorCode SocketCanClientRaw::Start() {
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
-  std::string can_name("can" + std::to_string(port_));
+  std::string interface_prefix;
+  if (interface_ == CANCardParameter::VIRTUAL) {
+    interface_prefix = "vcan";
+  } else if (interface_ == CANCardParameter::SLCAN) {
+    interface_prefix = "slcan";
+  } else {  // default: CANCardParameter::NATIVE
+    interface_prefix = "can";
+  }
+
+  const std::string can_name = absl::StrCat(interface_prefix, port_);
   std::strncpy(ifr.ifr_name, can_name.c_str(), IFNAMSIZ);
   if (ioctl(dev_handler_, SIOCGIFINDEX, &ifr) < 0) {
     AERROR << "ioctl error";
@@ -142,7 +158,7 @@ ErrorCode SocketCanClientRaw::Send(const std::vector<CanFrame> &frames,
     return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
   for (size_t i = 0; i < frames.size() && i < MAX_CAN_SEND_FRAME_LEN; ++i) {
-    if (frames[i].len != CANBUS_MESSAGE_LENGTH) {
+    if (frames[i].len > CANBUS_MESSAGE_LENGTH || frames[i].len < 0) {
       AERROR << "frames[" << i << "].len = " << frames[i].len
              << ", which is not equal to can message data length ("
              << CANBUS_MESSAGE_LENGTH << ").";
@@ -187,7 +203,8 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
       AERROR << "receive message failed, error code: " << ret;
       return ErrorCode::CAN_CLIENT_ERROR_BASE;
     }
-    if (recv_frames_[i].can_dlc != CANBUS_MESSAGE_LENGTH) {
+    if (recv_frames_[i].can_dlc > CANBUS_MESSAGE_LENGTH ||
+        recv_frames_[i].can_dlc < 0) {
       AERROR << "recv_frames_[" << i
              << "].can_dlc = " << recv_frames_[i].can_dlc
              << ", which is not equal to can message data length ("

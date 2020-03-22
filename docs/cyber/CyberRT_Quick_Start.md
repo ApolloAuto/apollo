@@ -1,4 +1,3 @@
-
 # How to create and run a new component in Apollo Cyber RT
 
 Apollo Cyber RT framework is built based on the concept of component. As a basic building block of Apollo Cyber RT framework, each component contains a specific algorithm module which process a set of data inputs and generate a set of outputs.
@@ -12,10 +11,10 @@ In order to successfully create and launch a new component, there are four essen
 
 The example below demonstrates how to create a simple component, then build, run and watch the final output on screen. If you would like to explore more about Apollo Cyber RT, you can find a couple of examples showing how to use different functionalities of the framework under directory `/apollo/cyber/examples/`.
 
-*Note: the example has to be run within apollo docker environment and it's compiled with Bazel.*
-
+> **Note**: the example has to be run within apollo docker environment and it's compiled with Bazel.
 
 ## Set up the component file structure
+
 Please create the following files, assumed under the directory of `/apollo/cyber/examples/common_component_example/`:
 
 - Header file: common_component_example.h
@@ -27,6 +26,7 @@ Please create the following files, assumed under the directory of `/apollo/cyber
 ## Implement the component class
 
 ### Implement component header file
+
 To implement `common_component_example.h`:
 
 - Inherit the Component class
@@ -80,7 +80,7 @@ bool CommonComponentSample::Proc(const std::shared_ptr<Driver>& msg0,
 
 Create bazel BUILD file.
 
-```bash
+```python
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -108,6 +108,7 @@ cc_library(
 
 cpplint()
 ```
+
 ## Set up the configuration files
 
 ### Configure the DAG dependency file
@@ -118,7 +119,7 @@ To configure the DAG dependency file (common.dag), specify the following items a
  - Library path: library built from component class
  - Class name: the class name of the component
 
-```bash
+```protobuf
 # Define all coms in DAG streaming.
 component_config {
     component_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
@@ -145,7 +146,7 @@ To configure the launch (common.launch) file, specify the following items:
   - The dag file you just created in the previous step.
   - The name of the process which the component runs within
 
-```bash
+```xml
 <cyber>
     <component>
         <name>common</name>

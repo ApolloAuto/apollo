@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -25,6 +25,7 @@ import numpy as np
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 
+
 GPS_X = list()
 GPS_Y = list()
 GPS_LINE = None
@@ -32,6 +33,7 @@ DRIVING_MODE_TEXT = ""
 CHASSIS_TOPIC = "/apollo/canbus/chassis"
 LOCALIZATION_TOPIC = "/apollo/localization/pose"
 IS_AUTO_MODE = False
+
 
 def chassis_callback(chassis_data):
     global IS_AUTO_MODE
@@ -51,6 +53,7 @@ def localization_callback(localization_data):
         GPS_X.append(localization_data.pose.position.x)
         GPS_Y.append(localization_data.pose.position.y)
 
+
 def setup_listener(node):
     node.create_reader(CHASSIS_TOPIC, chassis_pb2.Chassis, chassis_callback)
     node.create_reader(LOCALIZATION_TOPIC,
@@ -59,12 +62,14 @@ def setup_listener(node):
     while not cyber.is_shutdown():
         time.sleep(0.002)
 
+
 def update(frame_number):
     global GPS_X
     global GPS_Y
     if IS_AUTO_MODE and len(GPS_X) > 1:
         min_len = min(len(GPS_X), len(GPS_Y)) - 1
         GPS_LINE.set_data(GPS_X[-min_len:], GPS_Y[-min_len:])
+
 
 if __name__ == '__main__':
     import argparse

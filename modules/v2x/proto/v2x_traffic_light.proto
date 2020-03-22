@@ -5,37 +5,37 @@ package apollo.v2x;
 import "modules/common/proto/header.proto";
 
 message SingleTrafficLight {
-    enum Color {
-        UNKNOWN = 0;
-        RED = 1;
-        YELLOW = 2;
-        GREEN = 3;
-        BLACK = 4;
-        FLASH_GREEN = 5;
-    };
-    enum Type {
-        STRAIGHT = 0;
-        LEFT = 1;
-        RIGHT = 2;
-        U_TURN = 3;
-    };
-    optional Color color = 1;
-    repeated Type trafficlight_type = 2;
-    // Traffic light string-ID in the map data.
-    optional string id = 3;
-    optional int32 color_remaining_time_s = 4;
-    optional bool right_turn_light = 5;
+  enum Color {
+    UNKNOWN = 0;
+    RED = 1;
+    YELLOW = 2;
+    GREEN = 3;
+    BLACK = 4;
+    FLASH_GREEN = 5;
+  };
+  enum Type {
+    STRAIGHT = 0;
+    LEFT = 1;
+    RIGHT = 2;
+    U_TURN = 3;
+  };
+  optional Color color = 1;
+  repeated Type trafficlight_type = 2;
+  // Traffic light string-ID in the map data.
+  optional string id = 3;
+  optional int32 color_remaining_time_s = 4;
+  optional bool right_turn_light = 5;
 }
 
 message CurrentLaneTrafficLight {
-    // Feature points of lane in the map reference frame.
-    optional double gps_x_m = 1;
-    optional double gps_y_m = 2;
-    repeated SingleTrafficLight single_traffic_light = 3;
+  // Feature points of lane in the map reference frame.
+  optional double gps_x_m = 1;
+  optional double gps_y_m = 2;
+  repeated SingleTrafficLight single_traffic_light = 3;
 }
 
 message IntersectionTrafficLightData {
-    optional apollo.common.Header header = 1;
-    optional CurrentLaneTrafficLight current_lane_trafficlight = 2;
-    optional int32 intersection_id = 3;
+  optional apollo.common.Header header = 1;
+  optional CurrentLaneTrafficLight current_lane_trafficlight = 2;
+  optional int32 intersection_id = 3;
 }

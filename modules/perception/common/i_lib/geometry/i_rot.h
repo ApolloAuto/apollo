@@ -24,8 +24,12 @@ inline void i_rot_orthogonalize(
   /*obtain SVD*/
   T Ut[9], w[3], Vt[9];
   i_svd_3x3(R, Ut, w, Vt, true, nr_svd_iter);
-  if (i_determinant_3x3(Ut) < (T)0.0) i_neg9(Ut);
-  if (i_determinant_3x3(Vt) < (T)0.0) i_neg9(Vt);
+  if (i_determinant_3x3(Ut) < (T)0.0) {
+    i_neg9(Ut);
+  }
+  if (i_determinant_3x3(Vt) < (T)0.0) {
+    i_neg9(Vt);
+  }
   i_mult_AtB_3x3_3x3(Ut, Vt, R);
 }
 

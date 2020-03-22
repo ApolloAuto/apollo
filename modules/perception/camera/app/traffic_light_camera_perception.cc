@@ -51,7 +51,7 @@ bool TrafficLightCameraPerception::Init(
   init_options.gpu_id = tl_param_.gpu_id();
   detector_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(
       plugin_param.name()));
-  CHECK(detector_ != nullptr);
+  ACHECK(detector_ != nullptr);
   if (!detector_->Init(init_options)) {
     AERROR << "tl detector init failed";
     return false;
@@ -63,7 +63,7 @@ bool TrafficLightCameraPerception::Init(
   init_options.gpu_id = tl_param_.gpu_id();
   recognizer_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(
       plugin_param.name()));
-  CHECK(recognizer_ != nullptr);
+  ACHECK(recognizer_ != nullptr);
   if (!recognizer_->Init(init_options)) {
     AERROR << "tl recognizer init failed";
     return false;
@@ -76,7 +76,7 @@ bool TrafficLightCameraPerception::Init(
   tracker_init_options.conf_file = tracker_plugin_param.config_file();
   tracker_.reset(BaseTrafficLightTrackerRegisterer::GetInstanceByName(
       tracker_plugin_param.name()));
-  CHECK(tracker_ != nullptr);
+  ACHECK(tracker_ != nullptr);
   AINFO << tracker_init_options.root_dir << " "
         << tracker_init_options.conf_file;
   if (!tracker_->Init(tracker_init_options)) {

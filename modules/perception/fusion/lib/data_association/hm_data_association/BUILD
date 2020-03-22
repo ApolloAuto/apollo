@@ -12,12 +12,8 @@ cc_library(
 
 cc_library(
     name = "hm_tracks_objects_match",
-    srcs = [
-        "hm_tracks_objects_match.cc",
-    ],
-    hdrs = [
-        "hm_tracks_objects_match.h",
-    ],
+    srcs = ["hm_tracks_objects_match.cc"],
+    hdrs = ["hm_tracks_objects_match.h"],
     deps = [
         ":track_object_distance",
         "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
@@ -29,29 +25,19 @@ cc_library(
 
 cc_library(
     name = "probabilities",
-    srcs = [
-        "probabilities.cc",
-    ],
-    hdrs = [
-        "probabilities.h",
-    ],
+    srcs = ["probabilities.cc"],
+    hdrs = ["probabilities.h"],
 )
 
 cc_library(
     name = "projection_cache",
-    hdrs = [
-        "projection_cache.h",
-    ],
+    hdrs = ["projection_cache.h"],
 )
 
 cc_library(
     name = "track_object_distance",
-    srcs = [
-        "track_object_distance.cc",
-    ],
-    hdrs = [
-        "track_object_distance.h",
-    ],
+    srcs = ["track_object_distance.cc"],
+    hdrs = ["track_object_distance.h"],
     deps = [
         ":chi_squared_cdf",
         ":probabilities",
@@ -72,12 +58,8 @@ cc_library(
 
 cc_library(
     name = "track_object_similarity",
-    srcs = [
-        "track_object_similarity.cc",
-    ],
-    hdrs = [
-        "track_object_similarity.h",
-    ],
+    srcs = ["track_object_similarity.cc"],
+    hdrs = ["track_object_similarity.h"],
     deps = [
         ":chi_squared_cdf",
         ":probabilities",
@@ -91,9 +73,7 @@ cc_library(
 cc_test(
     name = "hm_data_association_test",
     size = "small",
-    srcs = [
-        "hm_data_association_test.cc",
-    ],
+    srcs = ["hm_data_association_test.cc"],
     deps = [
         ":probabilities",
         ":projection_cache",
@@ -103,16 +83,14 @@ cc_test(
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "track_object_distance_test",
     size = "small",
-    srcs = [
-        "track_object_distance_test.cc",
-    ],
+    srcs = ["track_object_distance_test.cc"],
     deps = [
         ":projection_cache",
         ":track_object_distance",
@@ -122,16 +100,14 @@ cc_test(
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "track_object_test",
     size = "small",
-    srcs = [
-        "track_object_test.cc",
-    ],
+    srcs = ["track_object_test.cc"],
     deps = [
         ":hm_tracks_objects_match",
         "//modules/perception/base:frame",
@@ -139,7 +115,7 @@ cc_test(
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

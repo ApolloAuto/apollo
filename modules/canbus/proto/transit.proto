@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 message Llc_vehiclelimits_24 {
-// Report Message
+  // Report Message
   // Steering angle feedback [deg] [0|4095]
   optional int32 llc_fbk_maxsteeringangle = 1;
   // Front brake pressure feedback [%] [0|113.8132]
@@ -11,7 +11,7 @@ message Llc_vehiclelimits_24 {
 }
 
 message Adc_motioncontrol1_10 {
-// Control Message
+  // Control Message
   enum Adc_cmd_steeringcontrolmodeType {
     ADC_CMD_STEERINGCONTROLMODE_NONE = 0;
     ADC_CMD_STEERINGCONTROLMODE_ANGLE = 1;
@@ -48,28 +48,31 @@ message Adc_motioncontrol1_10 {
   optional int32 adc_motioncontrol1_checksum = 5;
   // Brake pressure for direct longitudinal control [%] [0|113.8132]
   optional double adc_cmd_brakepercentage = 6;
-  // Throttle pedal position percentage for direct longitudinal control [%] [0|100]
+  // Throttle pedal position percentage for direct longitudinal control [%]
+  // [0|100]
   optional double adc_cmd_throttleposition = 7;
   // Motion control 1 Heartbeat counter [] [0|3]
   optional int32 adc_motioncontrol1_counter = 8;
   // Request from ADC to LLC for autonomy [] [0|3]
   optional Adc_cmd_autonomyrequestType adc_cmd_autonomyrequest = 9;
   // Select longitudinal control mode [] [0|3]
-  optional Adc_cmd_longitudinalcontrolmodeType adc_cmd_longitudinalcontrolmode = 10;
+  optional Adc_cmd_longitudinalcontrolmodeType adc_cmd_longitudinalcontrolmode =
+      10;
 }
 
 message Adc_motioncontrollimits1_12 {
-// Control Message
+  // Control Message
   // Set limit for throttle position [%] [0|100]
   optional double adc_cmd_throttlecommandlimit = 1;
   // Set steering rate [deg/s] [0|3276.75]
   optional double adc_cmd_steeringrate = 2;
-  // Set limit for steering wheel angle. Applies in both positive and negative [deg] [0|1275]
+  // Set limit for steering wheel angle. Applies in both positive and negative
+  // [deg] [0|1275]
   optional double adc_cmd_steerwheelanglelimit = 3;
 }
 
 message Llc_motionfeedback1_20 {
-// Report Message
+  // Report Message
   enum Llc_fbk_gearType {
     LLC_FBK_GEAR_P_PARK = 0;
     LLC_FBK_GEAR_D_DRIVE = 1;
@@ -122,7 +125,8 @@ message Llc_motionfeedback1_20 {
   optional int32 llc_motionfeedback1_counter = 7;
   // Motion feedback 1 checksum [] [0|255]
   optional int32 llc_motionfeedback1_checksum = 8;
-  // Autonomy command aligned with vehicle state according to calibration limits [T/F] [0|1]
+  // Autonomy command aligned with vehicle state according to calibration limits
+  // [T/F] [0|1]
   optional bool llc_fbk_commandaligned = 9;
   // Estop is pressed [T/F] [0|1]
   optional bool llc_fbk_estoppressed = 10;
@@ -131,13 +135,14 @@ message Llc_motionfeedback1_20 {
   // Indicates that LLC is ready to allow autonomy mode [T/F] [0|1]
   optional bool llc_fbk_allowautonomy = 12;
   // Report current longitudinal control mode [] [0|3]
-  optional Llc_fbk_longitudinalcontrolmodeType llc_fbk_longitudinalcontrolmode = 13;
+  optional Llc_fbk_longitudinalcontrolmodeType llc_fbk_longitudinalcontrolmode =
+      13;
   // Current Autonomy State [] [0|15]
   optional Llc_fbk_stateType llc_fbk_state = 14;
 }
 
 message Llc_motionfeedback2_21 {
-// Report Message
+  // Report Message
   // [m/s] [0|655.35]
   optional double llc_fbk_vehiclespeed = 1;
   // Motion feedback 2 heartbeat counter [] [0|3]
@@ -151,7 +156,7 @@ message Llc_motionfeedback2_21 {
 }
 
 message Llc_motioncommandfeedback1_22 {
-// Report Message
+  // Report Message
   // Steering angle setpoint (after limits) [deg] [-1638.4|1638.35]
   optional double llc_fbk_steeringanglesetpoint = 1;
   // Current throttle setpoint (after limits) [%] [0|102.3]
@@ -165,13 +170,13 @@ message Llc_motioncommandfeedback1_22 {
 }
 
 message Llc_vehiclestatus_25 {
-// Report Message
+  // Report Message
   // Vehicle 12V voltage feedback [Volt] [0|25.5]
   optional double llc_fbk_12voltage = 1;
 }
 
 message Llc_auxiliaryfeedback_120 {
-// Report Message
+  // Report Message
   enum Llc_fbk_turnsignalType {
     LLC_FBK_TURNSIGNAL_NONE = 0;
     LLC_FBK_TURNSIGNAL_LEFT = 1;
@@ -217,16 +222,21 @@ message Llc_auxiliaryfeedback_120 {
 }
 
 message Llc_diag_fault_620 {
-// Report Message
-  // Counts the number of times that the driver has disengaged autonomy by applying the brakes since system reset.. [] [0|255]
+  // Report Message
+  // Counts the number of times that the driver has disengaged autonomy by
+  // applying the brakes since system reset.. [] [0|255]
   optional int32 llc_disengagecounter_brake = 1;
-  // Counts the number of times that the driver has disengaged autonomy by moving the steering wheel since system reset. [] [0|255]
+  // Counts the number of times that the driver has disengaged autonomy by
+  // moving the steering wheel since system reset. [] [0|255]
   optional int32 llc_disengagecounter_steer = 2;
-  // Counts the number of times that the driver has disengaged autonomy by applying throttle since system reset. [] [0|255]
+  // Counts the number of times that the driver has disengaged autonomy by
+  // applying throttle since system reset. [] [0|255]
   optional int32 llc_disengagecounter_throttle = 3;
-  // Counts the number of faults that have occurred since system reset. [] [0|255]
+  // Counts the number of faults that have occurred since system reset. []
+  // [0|255]
   optional int32 llc_fbk_faultcounter = 4;
-  // Counts the number of times that the driver has disengaged autonomy by applying the brakes since system reset.. [] [0|255]
+  // Counts the number of times that the driver has disengaged autonomy by
+  // applying the brakes since system reset.. [] [0|255]
   optional int32 llc_disengagecounter_button = 5;
   // Firmware version [g] [2017|2144]
   optional int32 llc_fbk_version_year = 6;
@@ -239,7 +249,7 @@ message Llc_diag_fault_620 {
 }
 
 message Llc_diag_steeringcontrol_722 {
-// Control Message
+  // Control Message
   // Brake control feedforward contribution [rev] [-6.5536|6.5534]
   optional double llc_dbg_steeringsensorposition = 1;
   // Brake control feedforward contribution [counts] [-32768|32767]
@@ -249,7 +259,7 @@ message Llc_diag_steeringcontrol_722 {
 }
 
 message Adc_auxiliarycontrol_110 {
-// Control Message
+  // Control Message
   enum Adc_cmd_turnsignalType {
     ADC_CMD_TURNSIGNAL_NONE = 0;
     ADC_CMD_TURNSIGNAL_LEFT = 1;
@@ -266,7 +276,8 @@ message Adc_auxiliarycontrol_110 {
   optional bool adc_cmd_inverter = 4;
   // (Reserved) Control wiper [] [0|3]
   optional int32 adc_cmd_wiper = 5;
-  // PDU Control Override (all channels default ON if not overridden) [T/F] [0|1]
+  // PDU Control Override (all channels default ON if not overridden) [T/F]
+  // [0|1]
   optional bool adc_cmd_pdu_controlenable = 6;
   // Control PDU Ch 8 (when override enabled) [T/F] [0|1]
   optional bool adc_cmd_pdu_ch8 = 7;
@@ -297,7 +308,7 @@ message Adc_auxiliarycontrol_110 {
 }
 
 message Llc_diag_brakecontrol_721 {
-// Control Message
+  // Control Message
   // Brake control loop P contribution [mrev] [-51.2|51.1]
   optional double llc_dbg_brakepidcontribution_p = 1;
   // Brake control loop I contribution [mrev] [-51.2|51.1]
@@ -313,16 +324,22 @@ message Llc_diag_brakecontrol_721 {
 }
 
 message Transit {
-  optional Llc_vehiclelimits_24 llc_vehiclelimits_24 = 1; // report message
-  optional Adc_motioncontrol1_10 adc_motioncontrol1_10 = 2; // control message
-  optional Adc_motioncontrollimits1_12 adc_motioncontrollimits1_12 = 3; // control message
-  optional Llc_motionfeedback1_20 llc_motionfeedback1_20 = 4; // report message
-  optional Llc_motionfeedback2_21 llc_motionfeedback2_21 = 5; // report message
-  optional Llc_motioncommandfeedback1_22 llc_motioncommandfeedback1_22 = 6; // report message
-  optional Llc_vehiclestatus_25 llc_vehiclestatus_25 = 7; // report message
-  optional Llc_auxiliaryfeedback_120 llc_auxiliaryfeedback_120 = 8; // report message
-  optional Llc_diag_fault_620 llc_diag_fault_620 = 9; // report message
-  optional Llc_diag_steeringcontrol_722 llc_diag_steeringcontrol_722 = 10; // control message
-  optional Adc_auxiliarycontrol_110 adc_auxiliarycontrol_110 = 11; // control message
-  optional Llc_diag_brakecontrol_721 llc_diag_brakecontrol_721 = 12; // control message
+  optional Llc_vehiclelimits_24 llc_vehiclelimits_24 = 1;    // report message
+  optional Adc_motioncontrol1_10 adc_motioncontrol1_10 = 2;  // control message
+  optional Adc_motioncontrollimits1_12 adc_motioncontrollimits1_12 =
+      3;  // control message
+  optional Llc_motionfeedback1_20 llc_motionfeedback1_20 = 4;  // report message
+  optional Llc_motionfeedback2_21 llc_motionfeedback2_21 = 5;  // report message
+  optional Llc_motioncommandfeedback1_22 llc_motioncommandfeedback1_22 =
+      6;                                                   // report message
+  optional Llc_vehiclestatus_25 llc_vehiclestatus_25 = 7;  // report message
+  optional Llc_auxiliaryfeedback_120 llc_auxiliaryfeedback_120 =
+      8;                                               // report message
+  optional Llc_diag_fault_620 llc_diag_fault_620 = 9;  // report message
+  optional Llc_diag_steeringcontrol_722 llc_diag_steeringcontrol_722 =
+      10;  // control message
+  optional Adc_auxiliarycontrol_110 adc_auxiliarycontrol_110 =
+      11;  // control message
+  optional Llc_diag_brakecontrol_721 llc_diag_brakecontrol_721 =
+      12;  // control message
 }

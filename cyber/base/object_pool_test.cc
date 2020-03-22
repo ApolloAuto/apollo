@@ -17,9 +17,9 @@
 #include "cyber/base/object_pool.h"
 
 #include <thread>
+#include "gtest/gtest.h"
 
 #include "cyber/base/concurrent_object_pool.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
@@ -88,27 +88,10 @@ TEST(CCObjectPoolTest, construct_object) {
   std::vector<std::shared_ptr<TestNode>> vec;
 
   FOR_EACH(i, 0, capacity) {
-    auto obj = pool->GetObject();
-    vec.push_back(obj);
-    EXPECT_FALSE(obj->inited);
-    EXPECT_EQ(0, obj->value);
-  }
-  vec.clear();
-
-  FOR_EACH(i, 0, capacity) {
     auto obj = pool->ConstructObject(i);
     vec.push_back(obj);
     EXPECT_TRUE(obj->inited);
     EXPECT_EQ(i, obj->value);
-  }
-  vec.clear();
-
-  // check values after destructor
-  FOR_EACH(i, 0, capacity) {
-    auto obj = pool->GetObject();
-    vec.push_back(obj);
-    EXPECT_FALSE(obj->inited);
-    EXPECT_EQ(1, obj->value);
   }
   vec.clear();
 }

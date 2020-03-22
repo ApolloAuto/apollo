@@ -1,0 +1,183 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+import "modules/prediction/proto/feature.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
+import "modules/perception/proto/traffic_light_detection.proto";
+
+message ChassisFeature {
+  // Features from chassis
+  // Vehicle Speed in meters per second.
+  optional float speed_mps = 1;
+
+  // Real throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage = 2;
+
+  // Real brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage = 3;
+
+  // Real steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
+  optional float steering_percentage = 4;
+
+  optional apollo.canbus.Chassis.GearPosition gear_location = 5;
+}
+
+message LocalizationFeature {
+  // Position of the vehicle reference point (VRP) in the map reference frame.
+  // The VRP is the center of rear axle.
+  optional apollo.common.PointENU position = 1;
+
+  // Heading
+  // The heading is zero when the car is facing East and positive when facing
+  // North.
+  optional double heading = 2;
+
+  // Linear velocity of the VRP in the map reference frame.
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_velocity = 3;
+
+  // Linear acceleration of the VRP in the map reference frame.
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_acceleration = 4;
+
+  // Angular velocity of the vehicle in the map reference frame.
+  // Around east/north/up axes in radians per second.
+  optional apollo.common.Point3D angular_velocity = 5;
+}
+
+// based on apollo.perception.PerceptionObstacle
+message PerceptionObstacleFeature {
+  optional double timestamp_sec = 1;
+
+  // obstacle position in the OBJECT coordinate system
+  optional apollo.common.Point3D position = 2;
+
+  // heading in RELATIVE coordinate to ADC
+  optional double theta = 3;
+
+  // obstacle velocity in RELATIVE coordinate to ADC
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity
+
+  // obstacle acceleration in RELATIVE coordinate to ADC
+  optional apollo.common.Point3D acceleration = 5;
+
+  // obstacle corner points in RELATIVE coordinate to ADC
+  repeated apollo.common.Point3D polygon_point = 6;
+}
+
+// based on apollo.common.PathPoint
+message PathPointFeature {
+  // coordinates
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+
+  // direction on the x-y plane
+  optional double theta = 4;
+  // accumulated distance from beginning of the path
+  optional double s = 5;
+  // The lane ID where the path point is on
+  optional string lane_id = 6;
+}
+
+// based on apollo.commom.TrajectoryPoint
+message TrajectoryPointFeature {
+  // path point
+  optional PathPointFeature path_point = 1;
+  // linear velocity
+  optional double v = 2;  // in [m/s]
+  // linear acceleration
+  optional double a = 3;
+  // relative time from beginning of the trajectory
+  optional double relative_time = 4;
+  // Gaussian probability information
+  optional apollo.common.GaussianInfo gaussian_info = 5;
+}
+
+// based on apollo.prediction.Trajectory
+message PredictionTrajectoryFeature {
+  optional double probability = 1;  // probability of this trajectory
+  repeated TrajectoryPointFeature trajectory_point = 2;
+}
+
+// based on apollo.prediction.PredictionObstacle
+message PredictionObstacleFeature {
+  optional double timestamp_sec = 1;  // GPS time in seconds
+  optional double predicted_period = 2;
+  optional apollo.prediction.ObstacleIntent intent = 3;
+  optional apollo.prediction.ObstaclePriority priority = 4;
+  optional bool is_static = 5 [default = false];
+
+  // can have multiple trajectories per obstacle
+  repeated PredictionTrajectoryFeature trajectory = 6;
+}
+
+message ObstacleFeature {
+  optional int32 id = 1;  // obstacle ID.
+  optional double length = 2;  // obstacle length.
+  optional double width = 3;   // obstacle width.
+  optional double height = 4;  // obstacle height.
+  optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
+  repeated PerceptionObstacleFeature obstacle_trajectory_point = 6;
+  optional PredictionObstacleFeature obstacle_prediction = 7;
+}
+
+message RoutingFeature {
+  repeated string routing_lane_id = 1;
+  repeated string local_routing_lane_id = 2;  // local routing close to ADC
+}
+
+// based on apollo.perception.TrafficLight
+message TrafficLightFeature {
+  optional string id = 1;
+  optional apollo.perception.TrafficLight.Color color = 2;
+}
+
+message ADCTrajectoryPoint {
+  optional double timestamp_sec = 1;  // localization measurement_time
+  optional apollo.common.TrajectoryPoint trajectory_point = 2;
+}
+
+message LearningOutput {
+  repeated ADCTrajectoryPoint adc_future_trajectory_point = 1;
+}
+
+message LearningDataFrame {
+  // localization message publishing time in seconds.
+  optional double timestamp_sec = 1;
+  optional uint32 frame_num = 2;
+  optional string map_name = 3;
+
+  // Features from chassis
+  optional ChassisFeature chassis = 4;
+
+  // Features from localization
+  optional LocalizationFeature localization = 5;
+
+  // Features from perception obstacles
+  repeated ObstacleFeature obstacle = 6;
+
+  // Features from routing
+  optional RoutingFeature routing = 7;
+
+  // Features from traffic_light_detection
+  repeated TrafficLightFeature traffic_light = 8;
+
+  // ADC past trajectory
+  repeated ADCTrajectoryPoint adc_trajectory_point = 9;
+
+  // Learning ouputs
+  optional LearningOutput output = 10;
+}
+
+message LearningData {
+  repeated LearningDataFrame learning_data = 1;
+}

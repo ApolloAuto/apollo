@@ -20,9 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/smoothers/smoother.h"
 #include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/tasks/smoothers/smoother.h"
 
 /**
  * @namespace apollo::planning
@@ -78,6 +78,8 @@ class OnLanePlanning : public PlanningBase {
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);
   void GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb);
+  void ExportFailedLaneChangeSTChart(const planning_internal::Debug& debug_info,
+                                     planning_internal::Debug* debug_chart);
   void ExportOnLaneChart(const planning_internal::Debug& debug_info,
                          planning_internal::Debug* debug_chart);
   void ExportOpenSpaceChart(const planning_internal::Debug& debug_info,

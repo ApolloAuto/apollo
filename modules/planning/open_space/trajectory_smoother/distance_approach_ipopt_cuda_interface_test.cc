@@ -19,9 +19,6 @@
  **/
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 
-#include <fstream>
-#include <iostream>
-
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
@@ -34,7 +31,7 @@ class DistanceApproachIPOPTCUDAInterfaceTest : public ::testing::Test {
     FLAGS_planner_open_space_config_filename =
         "/apollo/modules/planning/testdata/conf/"
         "open_space_standard_parking_lot.pb.txt";
-    CHECK(apollo::cyber::common::GetProtoFromFile(
+    ACHECK(apollo::cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;

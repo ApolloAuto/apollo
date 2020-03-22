@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix_handler.h"
+
+#include <memory>
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 // =================PyramidMapMatrixHandlerSelector=================
 PyramidMapMatrixHandlerSelector::PyramidMapMatrixHandlerSelector() {}
 
@@ -135,9 +139,10 @@ LossyMapFullAltMatrixHandler::LossyMapFullAltMatrixHandler() {}
 
 LossyMapFullAltMatrixHandler::~LossyMapFullAltMatrixHandler() {}
 
-size_t LossyMapFullAltMatrixHandler::LoadBinary(const unsigned char* buf,
-                                                BaseMapMatrix* base_matrix) {
-  PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
+size_t LossyMapFullAltMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 2;
   const unsigned int* uint_p = reinterpret_cast<const unsigned int*>(buf);
@@ -160,7 +165,8 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(const unsigned char* buf,
 
   // alt min max & ground alt min max
   binary_size += sizeof(float) * 4;
-  const float* float_p = reinterpret_cast<const float*>(uint_p);
+  const float* float_p =
+      reinterpret_cast<const float*>(reinterpret_cast<const void*>(uint_p));
   alt_avg_min_ = *float_p;
   ++float_p;
   alt_avg_max_ = *float_p;
@@ -248,9 +254,10 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(const unsigned char* buf,
 }
 
 size_t LossyMapFullAltMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf, size_t buf_size) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t target_size = GetBinarySize(matrix);
   if (buf_size >= target_size) {
@@ -265,7 +272,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
     ++uint_p;
     // buf_size -= sizeof(unsigned int) * 2;
 
-    float* float_p = reinterpret_cast<float*>(uint_p);
+    float* float_p = reinterpret_cast<float*>(reinterpret_cast<void*>(uint_p));
     if (matrix->HasAltitude() && matrix->HasCount()) {
       alt_avg_min_ = 1e8;
       alt_avg_max_ = -1e8;
@@ -405,13 +412,13 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
 }
 
 size_t LossyMapFullAltMatrixHandler::GetBinarySize(
-    const BaseMapMatrix* base_matrix) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
   // assert(matrix->get_resolution_num() > 0);
-  if (matrix->GetResolutionNum() <= 0) {
+  if (matrix->GetResolutionNum() == 0) {
     throw "[LossyMapFullAltMatrixHandler::get_binary_size]"
-        "matrix->get_resolution_num() <= 0";
+        "matrix->get_resolution_num() == 0";
   }
 
   // rows and cols
@@ -429,9 +436,10 @@ LosslessMapMatrixHandler::LosslessMapMatrixHandler() {}
 
 LosslessMapMatrixHandler::~LosslessMapMatrixHandler() {}
 
-size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
-                                            BaseMapMatrix* base_matrix) {
-  PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
+size_t LosslessMapMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 2;  // rows and cols
 
@@ -466,7 +474,8 @@ size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
         if (i == 0) {  // all points layer
           binary_size += sizeof(float) * 4 + sizeof(unsigned int);
 
-          const float* float_p = reinterpret_cast<const float*>(uint_p);
+          const float* float_p = reinterpret_cast<const float*>(
+              reinterpret_cast<const void*>(uint_p));
           matrix->SetIntensitySafe(*float_p, y, x);
           ++float_p;
           matrix->SetIntensityVarSafe(*float_p, y, x);
@@ -475,19 +484,22 @@ size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
           ++float_p;
           matrix->SetAltitudeVarSafe(*float_p, y, x);
           ++float_p;
-          uint_p = reinterpret_cast<const unsigned int*>(float_p);
+          uint_p = reinterpret_cast<const unsigned int*>(
+              reinterpret_cast<const void*>(float_p));
           matrix->SetCountSafe(*uint_p, y, x);
           ++uint_p;
         } else if (i == 1) {  // ground points layer
           binary_size += sizeof(float) * 4 + sizeof(unsigned int);
 
-          const float* float_p = reinterpret_cast<const float*>(uint_p);
+          const float* float_p = reinterpret_cast<const float*>(
+              reinterpret_cast<const void*>(uint_p));
           ++float_p;
           ++float_p;
           matrix->SetGroundAltitudeSafe(*float_p, y, x);
           ++float_p;
           ++float_p;
-          uint_p = reinterpret_cast<const unsigned int*>(float_p);
+          uint_p = reinterpret_cast<const unsigned int*>(
+              reinterpret_cast<const void*>(float_p));
           matrix->SetGroundCountSafe(*uint_p, y, x);
           ++uint_p;
         }
@@ -498,11 +510,11 @@ size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
   return binary_size;
 }
 
-size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
-                                              unsigned char* buf,
-                                              size_t buf_size) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+size_t LosslessMapMatrixHandler::CreateBinary(
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t target_size = GetBinarySize(matrix);
   if (buf_size >= target_size) {
@@ -538,7 +550,8 @@ size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
             const float* altitude_var = matrix->GetAltitudeVarSafe(y, x);
             const unsigned int* count = matrix->GetCountSafe(y, x);
 
-            float* float_p = reinterpret_cast<float*>(uint_p);
+            float* float_p =
+                reinterpret_cast<float*>(reinterpret_cast<void*>(uint_p));
             *float_p = (intensity != nullptr) ? *intensity : 0.0f;
             ++float_p;
             *float_p = (intensity_var != nullptr) ? *intensity_var : 0.0f;
@@ -547,14 +560,16 @@ size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
             ++float_p;
             *float_p = (altitude_var != nullptr) ? *altitude_var : 0.0f;
             ++float_p;
-            uint_p = reinterpret_cast<unsigned int*>(float_p);
+            uint_p = reinterpret_cast<unsigned int*>(
+                reinterpret_cast<void*>(float_p));
             *uint_p = (count != nullptr) ? *count : 0;
             ++uint_p;
           } else if (i == 1) {  // ground points layer
             const float* ground_altitude = matrix->GetGroundAltitudeSafe(y, x);
             const unsigned int* ground_count = matrix->GetGroundCountSafe(y, x);
 
-            float* float_p = reinterpret_cast<float*>(uint_p);
+            float* float_p =
+                reinterpret_cast<float*>(reinterpret_cast<void*>(uint_p));
             *float_p = 0.0f;
             ++float_p;
             *float_p = 0.0f;
@@ -563,7 +578,8 @@ size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
             ++float_p;
             *float_p = 0.0f;
             ++float_p;
-            uint_p = reinterpret_cast<unsigned int*>(float_p);
+            uint_p = reinterpret_cast<unsigned int*>(
+                reinterpret_cast<void*>(float_p));
             *uint_p = (ground_count != nullptr) ? *ground_count : 0;
             ++uint_p;
           }
@@ -582,13 +598,13 @@ size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
 }
 
 size_t LosslessMapMatrixHandler::GetBinarySize(
-    const BaseMapMatrix* base_matrix) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
   // assert(matrix->get_resolution_num() > 0);
-  if (matrix->GetResolutionNum() <= 0) {
+  if (matrix->GetResolutionNum() == 0) {
     throw "[LosslessMapMatrixHandler::get_binary_size]"
-        "matrix->get_resolution_num() <= 0";
+        "matrix->get_resolution_num() == 0";
   }
 
   size_t target_size = sizeof(unsigned int) * 2;  // rows and cols
@@ -613,9 +629,10 @@ PyramidLossyMapMatrixHandler::PyramidLossyMapMatrixHandler() {}
 
 PyramidLossyMapMatrixHandler::~PyramidLossyMapMatrixHandler() {}
 
-size_t PyramidLossyMapMatrixHandler::LoadBinary(const unsigned char* buf,
-                                                BaseMapMatrix* base_matrix) {
-  PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
+size_t PyramidLossyMapMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 4;
   const unsigned int* uint_p =
@@ -665,7 +682,8 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(const unsigned char* buf,
 
   // alt min & ground alt min
   binary_size += sizeof(float) * 2;
-  const float* float_p = reinterpret_cast<const float*>(uc_p);
+  const float* float_p =
+      reinterpret_cast<const float*>(reinterpret_cast<const void*>(uc_p));
   alt_avg_min_ = *float_p;
   ++float_p;
   ground_alt_min_ = *float_p;
@@ -769,9 +787,10 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(const unsigned char* buf,
 }
 
 size_t PyramidLossyMapMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf, size_t buf_size) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t target_size = GetBinarySize(matrix);
   if (buf_size >= target_size) {
@@ -826,7 +845,7 @@ size_t PyramidLossyMapMatrixHandler::CreateBinary(
     // buf_size -= sizeof(unsigned char) * 4;
 
     // altitude min
-    float* float_p = reinterpret_cast<float*>(uc_p);
+    float* float_p = reinterpret_cast<float*>(reinterpret_cast<void*>(uc_p));
     if (matrix->HasAltitude() && matrix->HasCount()) {
       alt_avg_min_ = 1e8;
       for (unsigned int y = 0; y < rows; ++y) {
@@ -974,15 +993,14 @@ size_t PyramidLossyMapMatrixHandler::CreateBinary(
 }
 
 size_t PyramidLossyMapMatrixHandler::GetBinarySize(
-    const BaseMapMatrix* base_matrix) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   unsigned int resolution_num = matrix->GetResolutionNum();
   // assert(resolution_num > 0);
-  if (resolution_num <= 0) {
-    throw "[PyramidLossyMapMatrixHandler::get_binary_size]"
-        "resolution_num <= 0";
+  if (resolution_num == 0) {
+    throw "[PyramidLossyMapMatrixHandler::get_binary_size] resolution_num == 0";
   }
 
   // resolution_num and ratio
@@ -1025,9 +1043,10 @@ PyramidLosslessMapMatrixHandler::PyramidLosslessMapMatrixHandler() {}
 
 PyramidLosslessMapMatrixHandler::~PyramidLosslessMapMatrixHandler() {}
 
-size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
-                                                   BaseMapMatrix* base_matrix) {
-  PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
+size_t PyramidLosslessMapMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 4;
   const unsigned int* uint_p =
@@ -1076,7 +1095,8 @@ size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
   }
 
   // load matrix
-  const float* float_p = reinterpret_cast<const float*>(uc_p);
+  const float* float_p =
+      reinterpret_cast<const float*>(reinterpret_cast<const void*>(uc_p));
   for (unsigned int l = 0; l < resolution_num; ++l) {
     unsigned int matrix_size = matrix->GetRowsSafe(l) * matrix->GetColsSafe(l);
     if (matrix->HasIntensity()) {
@@ -1105,7 +1125,8 @@ size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
       float_p += matrix_size;
     }
 
-    uint_p = reinterpret_cast<const unsigned int*>(float_p);
+    uint_p = reinterpret_cast<const unsigned int*>(
+        reinterpret_cast<const void*>(float_p));
     if (matrix->HasCount()) {
       binary_size += sizeof(unsigned int) * matrix_size;
       matrix->SetCountMatrix(uint_p, matrix_size, 0, l);
@@ -1116,16 +1137,18 @@ size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
       matrix->SetGroundCountMatrix(uint_p, matrix_size, 0, l);
       uint_p += matrix_size;
     }
-    float_p = reinterpret_cast<const float*>(uint_p);
+    float_p =
+        reinterpret_cast<const float*>(reinterpret_cast<const void*>(uint_p));
   }
 
   return binary_size;
 }
 
 size_t PyramidLosslessMapMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf, size_t buf_size) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t target_size = GetBinarySize(matrix);
   if (buf_size >= target_size) {
@@ -1179,7 +1202,7 @@ size_t PyramidLosslessMapMatrixHandler::CreateBinary(
     ++uc_p;
     // buf_size -= sizeof(unsigned char) * 4;
 
-    float* float_p = reinterpret_cast<float*>(uc_p);
+    float* float_p = reinterpret_cast<float*>(reinterpret_cast<void*>(uc_p));
     for (unsigned int l = 0; l < resolution_num; ++l) {
       // unsigned int processed_size = 0;
       unsigned int matrix_size =
@@ -1220,7 +1243,8 @@ size_t PyramidLosslessMapMatrixHandler::CreateBinary(
         // processed_size += matrix_size * sizeof(float);
       }
 
-      uint_p = reinterpret_cast<unsigned int*>(float_p);
+      uint_p =
+          reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(float_p));
       if (matrix->HasCount()) {
         const UIntMatrix* count_matrix = matrix->GetCountMatrixSafe(l);
         memcpy(uint_p, (*count_matrix)[0], matrix_size * sizeof(unsigned int));
@@ -1235,7 +1259,7 @@ size_t PyramidLosslessMapMatrixHandler::CreateBinary(
         uint_p += matrix_size;
         // processed_size += matrix_size * sizeof(unsigned int);
       }
-      float_p = reinterpret_cast<float*>(uint_p);
+      float_p = reinterpret_cast<float*>(reinterpret_cast<void*>(uint_p));
       // assert(buf_size >= processed_size);
       // buf_size -= processed_size;
     }
@@ -1247,15 +1271,15 @@ size_t PyramidLosslessMapMatrixHandler::CreateBinary(
 }
 
 size_t PyramidLosslessMapMatrixHandler::GetBinarySize(
-    const BaseMapMatrix* base_matrix) {
-  const PyramidMapMatrix* matrix =
-      dynamic_cast<const PyramidMapMatrix*>(base_matrix);
+    const std::shared_ptr<BaseMapMatrix> base_matrix) {
+  const std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   unsigned int resolution_num = matrix->GetResolutionNum();
   // assert(resolution_num > 0);
-  if (resolution_num <= 0) {
+  if (resolution_num == 0) {
     throw "[PyramidLosslessMapMatrixHandler::get_binary_size]"
-        "resolution_num <= 0";
+        "resolution_num == 0";
   }
 
   // resolution_num and ratio
@@ -1292,6 +1316,7 @@ size_t PyramidLosslessMapMatrixHandler::GetBinarySize(
   return target_size;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

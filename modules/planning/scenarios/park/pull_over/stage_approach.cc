@@ -36,7 +36,7 @@ namespace planning {
 namespace scenario {
 namespace pull_over {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 PullOverStageApproach::PullOverStageApproach(
     const ScenarioConfig::StageConfig& config)
@@ -65,7 +65,7 @@ Stage::StageStatus PullOverStageApproach::Process(
     return FinishStage(false);
   }
 
-  // chek path_data to fail sooner
+  // check path_data to fail sooner
   bool path_fail = false;
   const auto& candidate_path_data = reference_line_info.GetCandidatePathData();
   if (!candidate_path_data.empty()) {
@@ -74,9 +74,9 @@ Stage::StageStatus PullOverStageApproach::Process(
         break;
       }
 
-      for (size_t i = path_data.discretized_path().size() - 1; i >= 0; --i) {
+      for (size_t i = path_data.discretized_path().size(); i >= 1; --i) {
         if (path_data.frenet_frame_path().back().s() -
-                path_data.frenet_frame_path()[i].s() <
+                path_data.frenet_frame_path()[i - 1].s() <
             kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
           continue;
         }
@@ -102,9 +102,7 @@ Stage::StageStatus PullOverStageApproach::Process(
         pull_over_status.position().has_y()) {
       const auto& reference_line = reference_line_info.reference_line();
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.position().x(), pull_over_status.position().y()},
-          &pull_over_sl);
+      reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
       const double stop_line_s =
           pull_over_sl.s() -
@@ -123,8 +121,8 @@ Stage::StageStatus PullOverStageApproach::Process(
       const double adc_front_edge_s =
           reference_line_info.AdcSlBoundary().end_s();
       double distance = stop_line_s - adc_front_edge_s;
-      constexpr double kPreparkingStopDistance = 1.0;
-      constexpr double kPreparkingAngleDiff = 0.2;
+      static constexpr double kPreparkingStopDistance = 1.0;
+      static constexpr double kPreparkingAngleDiff = 0.2;
       auto ref_point = reference_line.GetReferencePoint(adc_front_edge_s);
       double angle = common::math::AngleDiff(pull_over_status.theta(),
                                              ref_point.heading());

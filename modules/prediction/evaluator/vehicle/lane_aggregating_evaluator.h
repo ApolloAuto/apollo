@@ -21,14 +21,13 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "torch/script.h"
 #include "torch/torch.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator.h"
 
 /**
@@ -53,8 +52,10 @@ class LaneAggregatingEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Get the name of evaluator.
@@ -95,12 +96,9 @@ class LaneAggregatingEvaluator : public Evaluator {
   void LoadModel();
 
  private:
-  std::shared_ptr<torch::jit::script::Module> torch_obstacle_encoding_ptr_ =
-      nullptr;
-  std::shared_ptr<torch::jit::script::Module> torch_lane_encoding_ptr_ =
-      nullptr;
-  std::shared_ptr<torch::jit::script::Module> torch_prediction_layer_ptr_ =
-      nullptr;
+  torch::jit::script::Module torch_obstacle_encoding_;
+  torch::jit::script::Module torch_lane_encoding_;
+  torch::jit::script::Module torch_prediction_layer_;
   torch::Device device_;
 
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;

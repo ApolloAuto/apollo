@@ -93,7 +93,7 @@ bool UsbCam::init(const std::shared_ptr<Config>& cameraconfig) {
 
   // Warning when diff with last > 1.5* interval
   frame_warning_interval_ = static_cast<float>(1.5 / config_->frame_rate());
-  // now max fps 30, we use a appox time 0.9 to drop image.
+  // now max fps 30, we use an appox time 0.9 to drop image.
   frame_drop_interval_ = static_cast<float>(0.9 / config_->frame_rate());
 
   return true;
@@ -184,7 +184,7 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
 #endif
 
   if (!got_picture) {
-    AERROR << "Webcam: expected picture but didn't get it...";
+    AERROR << "Camera: expected picture but didn't get it...";
     return;
   }
 
@@ -213,9 +213,8 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
   int size = avpicture_layout(
-      reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24,
-      xsize, ysize,
-      reinterpret_cast<uint8_t*>(rgb_buffer), avframe_rgb_size_);
+      reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24, xsize,
+      ysize, reinterpret_cast<uint8_t*>(rgb_buffer), avframe_rgb_size_);
 #else
   int size = avpicture_layout(
       reinterpret_cast<AVPicture*>(avframe_rgb_), PIX_FMT_RGB24, xsize, ysize,
@@ -939,8 +938,9 @@ bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
       memcpy(dest->image, src, dest->width * dest->height * 2);
     } else if (config_->output_type() == RGB) {
 #ifdef __aarch64__
-      convert_yuv_to_rgb_buffer((unsigned char*)src, (unsigned char*)dest->image,
-                   dest->width, dest->height);
+      convert_yuv_to_rgb_buffer((unsigned char*)src,
+                                (unsigned char*)dest->image, dest->width,
+                                dest->height);
 #else
       yuyv2rgb_avx((unsigned char*)src, (unsigned char*)dest->image,
                    dest->width * dest->height);
@@ -1065,55 +1065,56 @@ void UsbCam::reconnect() {
 
 #ifdef __aarch64__
 int UsbCam::convert_yuv_to_rgb_pixel(int y, int u, int v) {
-    unsigned int pixel32 = 0;
-    unsigned char *pixel = (unsigned char *)&pixel32;
-    int r, g, b;
-    r = (int)((double)y + (1.370705 * ((double)v-128.0)));
-    g = (int)((double)y - (0.698001 * ((double)v-128.0)) - (0.337633 * ((double)u-128.0)));
-    b = (int)((double)y + (1.732446 * ((double)u-128.0)));
-    if(r > 255) r = 255;
-    if(g > 255) g = 255;
-    if(b > 255) b = 255;
-    if(r < 0) r = 0;
-    if(g < 0) g = 0;
-    if(b < 0) b = 0;
-    pixel[0] = (unsigned char)r ;
-    pixel[1] = (unsigned char)g ;
-    pixel[2] = (unsigned char)b ;
-    return pixel32;
+  unsigned int pixel32 = 0;
+  unsigned char* pixel = (unsigned char*)&pixel32;
+  int r, g, b;
+  r = (int)((double)y + (1.370705 * ((double)v - 128.0)));
+  g = (int)((double)y - (0.698001 * ((double)v - 128.0)) -
+            (0.337633 * ((double)u - 128.0)));
+  b = (int)((double)y + (1.732446 * ((double)u - 128.0)));
+  if (r > 255) r = 255;
+  if (g > 255) g = 255;
+  if (b > 255) b = 255;
+  if (r < 0) r = 0;
+  if (g < 0) g = 0;
+  if (b < 0) b = 0;
+  pixel[0] = (unsigned char)r;
+  pixel[1] = (unsigned char)g;
+  pixel[2] = (unsigned char)b;
+  return pixel32;
 }
 
+int UsbCam::convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
+                                      unsigned int width, unsigned int height) {
+  unsigned int in, out = 0;
+  unsigned int pixel_16;
+  unsigned char pixel_24[3];
+  unsigned int pixel32;
+  int y0, u, y1, v;
 
-int UsbCam::convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width, unsigned int height) {
-    unsigned int in, out = 0;
-    unsigned int pixel_16;
-    unsigned char pixel_24[3];
-    unsigned int pixel32;
-    int y0, u, y1, v;
-
-    for(in = 0; in < width * height * 2; in += 4)
-    {
-        pixel_16 = yuv[in + 3] << 24 | yuv[in + 2] << 16 | yuv[in + 1] <<  8 | yuv[in + 0];
-        y0 = (pixel_16 & 0x000000ff);
-        u  = (pixel_16 & 0x0000ff00) >>  8;
-        y1 = (pixel_16 & 0x00ff0000) >> 16;
-        v  = (pixel_16 & 0xff000000) >> 24;
-        pixel32 = convert_yuv_to_rgb_pixel(y0, u, v);
-        pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
-        pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
-        pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
-        rgb[out++] = pixel_24[0];
-        rgb[out++] = pixel_24[1];
-        rgb[out++] = pixel_24[2];
-        pixel32 = convert_yuv_to_rgb_pixel(y1, u, v);
-        pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
-        pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
-        pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
-        rgb[out++] = pixel_24[0];
-        rgb[out++] = pixel_24[1];
-        rgb[out++] = pixel_24[2];
-     }
-     return 0;
+  for (in = 0; in < width * height * 2; in += 4) {
+    pixel_16 =
+        yuv[in + 3] << 24 | yuv[in + 2] << 16 | yuv[in + 1] << 8 | yuv[in + 0];
+    y0 = (pixel_16 & 0x000000ff);
+    u = (pixel_16 & 0x0000ff00) >> 8;
+    y1 = (pixel_16 & 0x00ff0000) >> 16;
+    v = (pixel_16 & 0xff000000) >> 24;
+    pixel32 = convert_yuv_to_rgb_pixel(y0, u, v);
+    pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
+    pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
+    pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
+    rgb[out++] = pixel_24[0];
+    rgb[out++] = pixel_24[1];
+    rgb[out++] = pixel_24[2];
+    pixel32 = convert_yuv_to_rgb_pixel(y1, u, v);
+    pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
+    pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
+    pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
+    rgb[out++] = pixel_24[0];
+    rgb[out++] = pixel_24[1];
+    rgb[out++] = pixel_24[2];
+  }
+  return 0;
 }
 #endif
 

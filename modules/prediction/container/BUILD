@@ -14,7 +14,8 @@ cc_library(
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
-        "@gtest//:main",
+        "//modules/prediction/container/storytelling:storytelling_container",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -34,8 +35,6 @@ cc_test(
 cc_library(
     name = "container",
     hdrs = ["container.h"],
-    deps = [
-    ],
 )
 
 cpplint()

@@ -32,15 +32,19 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
+#include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
+#include "modules/planning/tasks/deciders/rss_decider/rss_decider.h"
 #include "modules/planning/tasks/deciders/rule_based_stop_decider/rule_based_stop_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
+#include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
-#include "modules/planning/tasks/rss/decider_rss.h"
+
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -68,6 +72,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new PathBoundsDecider(config);
                          });
+  task_factory_.Register(TaskConfig::PATH_REUSE_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathReuseDecider(config);
+                         });
   task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathAssessmentDecider(config);
@@ -80,6 +88,11 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new PiecewiseJerkSpeedOptimizer(config);
                          });
+  task_factory_.Register(
+      TaskConfig::PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER,
+      [](const TaskConfig& config) -> Task* {
+        return new PiecewiseJerkSpeedNonlinearOptimizer(config);
+      });
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathTimeHeuristicOptimizer(config);
@@ -110,6 +123,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::SPEED_BOUNDS_FINAL_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::ST_BOUNDS_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new STBoundsDecider(config);
                          });
   task_factory_.Register(TaskConfig::OPEN_SPACE_ROI_DECIDER,
                          [](const TaskConfig& config) -> Task* {

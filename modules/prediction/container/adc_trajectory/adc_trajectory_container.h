@@ -69,7 +69,7 @@ class ADCTrajectoryContainer : public Container {
    * @brief Has overlap with ADC trajectory
    * @return True if a target lane sequence has overlap with ADC trajectory
    */
-  bool HasOverlap(const LaneSequence& lane_sequence);
+  bool HasOverlap(const LaneSequence& lane_sequence) const;
 
   /**
    * @brief Set ADC position
@@ -100,29 +100,20 @@ class ADCTrajectoryContainer : public Container {
    */
   bool IsLaneIdInReferenceLine(const std::string& lane_id) const;
 
+  bool IsLaneIdInTargetReferenceLine(const std::string& lane_id) const;
+
   const std::vector<std::string>& GetADCLaneIDSequence() const;
+
+  const std::vector<std::string>& GetADCTargetLaneIDSequence() const;
+
+  void SetJunction(const std::string& junction_id, const double distance);
 
  private:
   void SetJunctionPolygon();
 
-  void SetPNCJunctionPolygon();
-
-  /**
-   * @brief Check if a point is in the first junction of the adc trajectory
-   * @param Point
-   * @return True if the point is in the first junction of the adc trajectory
-   */
-  bool IsPointInRegularJunction(const common::PathPoint& point) const;
-
-  /**
-   * @brief Check if a point is in the first PNC junction of the adc trajectory
-   * @param Point
-   * @return True if the point is in the first PNC junction of the adc
-   * trajectory
-   */
-  bool IsPointInPNCJunction(const common::PathPoint& point) const;
-
   void SetLaneSequence();
+
+  void SetTargetLaneSequence();
 
   std::string ToString(const std::unordered_set<std::string>& lane_ids);
 
@@ -131,13 +122,12 @@ class ADCTrajectoryContainer : public Container {
  private:
   planning::ADCTrajectory adc_trajectory_;
   common::math::Polygon2d adc_junction_polygon_;
-  common::math::Polygon2d adc_pnc_junction_polygon_;
   std::shared_ptr<const hdmap::JunctionInfo> adc_junction_info_ptr_;
-  std::shared_ptr<const hdmap::PNCJunctionInfo> adc_pnc_junction_info_ptr_;
   double s_dist_to_junction_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;
-  std::mutex adc_trajectory_mutex_;
+  std::unordered_set<std::string> adc_target_lane_ids_;
+  std::vector<std::string> adc_target_lane_seq_;
 };
 
 }  // namespace prediction

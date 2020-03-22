@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/common/util/util.h"
+
 #include <vector>
 
 #include "gtest/gtest.h"
 #include "modules/common/util/testdata/simple.pb.h"
 
-#include "modules/common/util/util.h"
-
 namespace apollo {
 namespace common {
 namespace util {
-
-TEST(Util, MaxElement) {
-  EXPECT_EQ(3, MaxElement(std::vector<int>{1, 2, 3}));
-  EXPECT_FLOAT_EQ(3.3, MaxElement(std::vector<float>{1.1, 2.2, 3.3}));
-}
-
-TEST(Util, MinElement) {
-  EXPECT_EQ(1, MinElement(std::vector<int>{1, 2, 3}));
-  EXPECT_FLOAT_EQ(1.1, MinElement(std::vector<float>{1.1, 2.2, 3.3}));
-}
 
 TEST(Util, IsProtoEqual) {
   test::SimpleRepeatedMessage sim1;

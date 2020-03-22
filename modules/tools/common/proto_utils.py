@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -46,7 +46,7 @@ def get_pb_from_file(filename, pb_value):
         try:
             return get_pb_from_text_file(filename, pb_value)
         except:
-            print 'Error: Cannot parse %s as binary or text proto' % filename
+            print('Error: Cannot parse %s as binary or text proto' % filename)
     return None
 
 

@@ -22,7 +22,14 @@ message CANCardParameter {
     CHANNEL_ID_THREE = 3;
   }
 
+  enum CANInterface {
+    NATIVE = 0;
+    VIRTUAL = 1;
+    SLCAN = 2;
+  }
+
   optional CANCardBrand brand = 1;
   optional CANCardType type = 2;
   optional CANChannelId channel_id = 3;
+  optional CANInterface interface = 4;
 }

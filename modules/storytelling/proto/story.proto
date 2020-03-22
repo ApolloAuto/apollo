@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.storytelling;
+
+import "modules/common/proto/header.proto";
+
+// TODO(xiaoxq): State triggering conditions.
+message ProceedWithCaution {
+}
+
+// Triggered when we are close to a junction.
+message CloseToJunction {
+  optional double distance = 1 [default = nan];
+  optional string junction_id = 2;
+}
+
+// Usage guide for action modules:
+// 1. Call `stories.has_XXX()` to check if a story you are interested is in
+//    charge.
+// 2. Access the story details if necessary, and take action accordingly.
+message Stories {
+  optional apollo.common.Header header = 1;
+
+  optional ProceedWithCaution proceed_with_caution = 2;
+  optional CloseToJunction close_to_junction = 3;
+}

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_pool.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 PyramidMapNodePool::PyramidMapNodePool(unsigned int pool_size,
                                        unsigned int thread_size)
@@ -29,6 +30,7 @@ BaseMapNode* PyramidMapNodePool::AllocNewMapNode() {
   return new PyramidMapNode();
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

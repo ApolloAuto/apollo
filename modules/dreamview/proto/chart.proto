@@ -5,66 +5,72 @@ package apollo.dreamview;
 import "modules/common/proto/geometry.proto";
 
 message Options {
-    message Axis {
-        optional double min = 1;
-        optional double max = 2;
-        optional string label_string = 3;
+  message Axis {
+    optional double min = 1;
+    optional double max = 2;
+    optional string label_string = 3;
 
-        optional double window_size = 4; //size of the axis of your graph which is then divided into measuring grades
-        optional double step_size = 5;   //size of the smaller measuring grades in the axis found between two larger measuring grades
-        optional double mid_value = 6;   //midpoint taken within the dataset. If it is not specified, we will calculate it for you.
-    }
+    // size of the axis of your graph which is then divided into measuring
+    // grades
+    optional double window_size = 4;
+    // size of the smaller measuring grades in the axis found between two larger
+    // measuring grades
+    optional double step_size = 5;
+    // midpoint taken within the dataset. If it is not specified, we will
+    // calculate it for you.
+    optional double mid_value = 6;
+  }
 
-    optional bool legend_display = 1 [default = true];
-    optional Axis x = 2;
-    optional Axis y = 3;
+  optional bool legend_display = 1 [default = true];
+  optional Axis x = 2;
+  optional Axis y = 3;
 
-    // This is the aspect ratio (width/height) of the entire chart.
-    optional double aspect_ratio = 4;
+  // This is the aspect ratio (width/height) of the entire chart.
+  optional double aspect_ratio = 4;
 
-    // Same window size for x-Axis and y-Axis. It is
-    // effective only if x/y window_size is NOT set.
-    optional bool sync_xy_window_size = 5 [default = false];
+  // Same window size for x-Axis and y-Axis. It is
+  // effective only if x/y window_size is NOT set.
+  optional bool sync_xy_window_size = 5 [default = false];
 }
 
 message Line {
-    optional string label = 1;
-    optional bool hide_label_in_legend = 2  [default = false];
-    repeated apollo.common.Point2D point = 3;
+  optional string label = 1;
+  optional bool hide_label_in_legend = 2 [default = false];
+  repeated apollo.common.Point2D point = 3;
 
-    // If the 'color' property is undefined, a random one will be assigned.
-    // See http://www.chartjs.org/docs/latest/charts/line.html
-    // for all supported properties from chart.js
-    map<string, string> properties = 4;
+  // If the 'color' property is undefined, a random one will be assigned.
+  // See http://www.chartjs.org/docs/latest/charts/line.html
+  // for all supported properties from chart.js
+  map<string, string> properties = 4;
 }
 
 message Polygon {
-    optional string label = 1;
-    optional bool hide_label_in_legend = 2  [default = false];
-    repeated apollo.common.Point2D point = 3;
+  optional string label = 1;
+  optional bool hide_label_in_legend = 2 [default = false];
+  repeated apollo.common.Point2D point = 3;
 
-    // If the 'color' property is undefined, a random one will be assigned.
-    // See http://www.chartjs.org/docs/latest/charts/line.html
-    // for all supported properties from chart.js
-    map<string, string> properties = 4;
+  // If the 'color' property is undefined, a random one will be assigned.
+  // See http://www.chartjs.org/docs/latest/charts/line.html
+  // for all supported properties from chart.js
+  map<string, string> properties = 4;
 }
 
 message Car {
-    optional string label = 1;
-    optional bool hide_label_in_legend = 2  [default = false];
+  optional string label = 1;
+  optional bool hide_label_in_legend = 2 [default = false];
 
-    optional double x = 3;
-    optional double y = 4;
-    optional double heading = 5;
-    optional string color = 6;
+  optional double x = 3;
+  optional double y = 4;
+  optional double heading = 5;
+  optional string color = 6;
 }
 
 message Chart {
-    optional string title = 1;
-    optional Options options = 2;
+  optional string title = 1;
+  optional Options options = 2;
 
-    // data sets
-    repeated Line line = 3;
-    repeated Polygon polygon = 4;
-    repeated Car car = 5;
+  // data sets
+  repeated Line line = 3;
+  repeated Polygon polygon = 4;
+  repeated Car car = 5;
 }

@@ -44,10 +44,10 @@ void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   float roi_ratio = cropped_ratio * static_cast<float>(image_height) /
                     static_cast<float>(image_width);
   width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
-           aligned_pixel;  // TO DO : Suspicious code
+           aligned_pixel;
   height_ = static_cast<int>(static_cast<float>(width_) * roi_ratio +
                              static_cast<float>(aligned_pixel) / 2.0f) /
-            aligned_pixel * aligned_pixel;  // TO DO : Suspicious code
+            aligned_pixel * aligned_pixel;
 
   AINFO << "image_height=" << image_height << ", "
         << "image_width=" << image_width << ", "
@@ -254,7 +254,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
   base_camera_model_ = options.base_camera_model;
-  CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
+  ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
       GetAbsolutePath(options.root_dir, options.conf_file);
   if (!cyber::common::GetProtoFromFile(config_path, &yolo_param_)) {
@@ -283,7 +283,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   if (!LoadExpand(expand_file, &expands_)) {
     return false;
   }
-  CHECK(expands_.size() == types_.size());
+  ACHECK(expands_.size() == types_.size());
   if (!InitNet(yolo_param_, model_root)) {
     return false;
   }

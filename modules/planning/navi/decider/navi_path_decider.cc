@@ -135,9 +135,8 @@ apollo::common::Status NaviPathDecider::Process(
 
   KeepLane(dest_ref_line_y, &path_points);
 
-  DiscretizedPath discretized_path(path_points);
   path_data->SetReferenceLine(&(reference_line_info_->reference_line()));
-  if (!path_data->SetDiscretizedPath(discretized_path)) {
+  if (!path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)))) {
     AERROR << "Set path data failed.";
     return Status(apollo::common::ErrorCode::PLANNING_ERROR,
                   "NaviPathDecider SetDiscretizedPath");
@@ -177,8 +176,6 @@ void NaviPathDecider::MoveToDestLane(
                    new_path_point.set_y(new_path_point_y);
                    return new_path_point;
                  });
-
-  return;
 }
 
 void NaviPathDecider::KeepLane(
@@ -218,8 +215,6 @@ void NaviPathDecider::KeepLane(
           return new_path_point;
         });
   }
-
-  return;
 }
 
 void NaviPathDecider::RecordDebugInfo(const PathData& path_data) {
@@ -266,8 +261,8 @@ bool NaviPathDecider::GetBasicPathData(
 
   // get basic path points form reference_line
   ADEBUG << "Basic path data len ; " << reference_line_len;
-  constexpr double KDenseSampleUnit = 0.50;
-  constexpr double KSparseSmapleUnit = 2.0;
+  static constexpr double KDenseSampleUnit = 0.50;
+  static constexpr double KSparseSmapleUnit = 2.0;
   for (double s = start_plan_point_project_s; s < reference_line_len;
        s += ((s < path_len) ? KDenseSampleUnit : KSparseSmapleUnit)) {
     const auto& ref_point = reference_line.GetReferencePoint(s);
@@ -306,15 +301,15 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
 
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     const auto& sl_boundary = obstacle->PerceptionSLBoundary();
-    constexpr double kLateralShift = 6.0;
+    static constexpr double kLateralShift = 6.0;
     if (sl_boundary.start_l() < -kLateralShift ||
         sl_boundary.end_l() > kLateralShift) {
       continue;
     }
 
-    constexpr double kSafeTime = 3.0;
-    constexpr double kForwardMinSafeDistance = 6.0;
-    constexpr double kBackwardMinSafeDistance = 8.0;
+    static constexpr double kSafeTime = 3.0;
+    static constexpr double kForwardMinSafeDistance = 6.0;
+    static constexpr double kBackwardMinSafeDistance = 8.0;
 
     const double kForwardSafeDistance = std::max(
         kForwardMinSafeDistance,
@@ -341,14 +336,9 @@ double NaviPathDecider::NudgeProcess(
     const common::VehicleState& vehicle_state) {
   double nudge_position_y = 0.0;
 
-  if (!FLAGS_enable_nudge_decision) {
-    nudge_position_y = path_data_points[0].y();
-    return nudge_position_y;
-  }
-
   // get nudge latteral position
   int lane_obstacles_num = 0;
-  constexpr double KNudgeEpsilon = 1e-6;
+  static constexpr double KNudgeEpsilon = 1e-6;
   double nudge_distance = obstacle_decider_.GetNudgeDistance(
       obstacles, reference_line, path_decision, path_data_points, vehicle_state,
       &lane_obstacles_num);

@@ -22,8 +22,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
@@ -44,14 +42,37 @@ class ExtrapolationPredictor : public SequencePredictor {
 
   /**
    * @brief Make prediction
+   * @param ADC trajectory container
    * @param Obstacle pointer
+   * @param Obstacles container
+   * @return If predicted successfully
    */
-  void Predict(Obstacle* obstacle) override;
+  bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+               Obstacle* obstacle,
+               ObstaclesContainer* obstacles_container) override;
 
  private:
-  void DrawShortTermTrajectory(
-      const Feature& feature,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  struct LaneSearchResult {
+    bool found = false;
+    std::string lane_id = "";
+    int point_index = -1;
+  };
+
+  void PostProcess(Trajectory* trajectory_ptr);
+
+  LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
+                                           const int num_tail_point);
+
+  void ExtrapolateByLane(const LaneSearchResult& lane_search_result,
+                         const double extrapolation_speed,
+                         Trajectory* trajectory_ptr);
+
+  void ExtrapolateByFreeMove(const int num_tail_point,
+                             const double extrapolation_speed,
+                             Trajectory* trajectory_ptr);
+
+  double ComputeExtraplationSpeed(const int num_tail_point,
+                                  const Trajectory& trajectory);
 };
 
 }  // namespace prediction

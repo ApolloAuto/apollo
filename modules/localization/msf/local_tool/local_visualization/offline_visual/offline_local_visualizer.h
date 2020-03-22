@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
@@ -93,7 +93,7 @@ class OfflineLocalVisualizer {
   std::map<unsigned int, Eigen::Affine3d> fusion_poses_;
   std::map<unsigned int, Eigen::Vector3d> fusion_stds_;
 
-  BaseMapConfig map_config_;
+  pyramid_map::BaseMapConfig map_config_;
   unsigned int resolution_id_;
   int zone_id_;
 

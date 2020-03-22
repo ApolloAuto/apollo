@@ -40,15 +40,15 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
   // load model config
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "hdmap_roi_filter.conf");
   HDMapRoiFilterConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   range_ = config.range();
   cell_size_ = config.cell_size();
   extend_dist_ = config.extend_dist();
@@ -111,13 +111,12 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
 
   // set roi points label
   if (ret) {
-    /*
-     TODO(all) fix this block
-     for (auto index : frame->roi_indices.indices) {
-        auto& pt_label = frame->cloud->points_label().at(index);
-        pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
+    for (auto index : frame->roi_indices.indices) {
+      frame->cloud->mutable_points_label()->at(index) =
+          static_cast<uint8_t>(LidarPointLabel::ROI);
+      frame->world_cloud->mutable_points_label()->at(index) =
+          static_cast<uint8_t>(LidarPointLabel::ROI);
     }
-    */
   }
 
   // set roi service
@@ -131,6 +130,10 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
       roi_service_content_.major_dir_ =
           static_cast<ROIServiceContent::DirectionMajor>(bitmap_.dir_major());
       roi_service_content_.transform_ = frame->lidar2world_pose.translation();
+      if (!ret) {
+        std::fill(roi_service_content_.bitmap_.begin(),
+                  roi_service_content_.bitmap_.end(), -1);
+      }
       roi_service->UpdateServiceContent(roi_service_content_);
     } else {
       AINFO << "Failed to find roi service and cannot update.";
@@ -175,9 +178,9 @@ bool HdmapROIFilter::FilterWithPolygonMask(
   }
   bitmap_.SetUp(major_dir);
 
-  DrawPolygonsMask<double>(raw_polygons, &bitmap_, extend_dist_,
-                           no_edge_table_);
-  return Bitmap2dFilter(cloud, bitmap_, roi_indices);
+  return DrawPolygonsMask<double>(raw_polygons, &bitmap_, extend_dist_,
+                                  no_edge_table_) &&
+         Bitmap2dFilter(cloud, bitmap_, roi_indices);
 }
 
 void HdmapROIFilter::TransformFrame(

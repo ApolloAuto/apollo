@@ -60,16 +60,19 @@ class EvaluatorManager {
   /**
    * @brief Run evaluators
    */
-  void Run();
+  void Run(ObstaclesContainer* obstacles_container);
 
-  void EvaluateObstacle(Obstacle* obstacle, std::vector<Obstacle*> dynamic_env);
+  void EvaluateObstacle(Obstacle* obstacle,
+                        ObstaclesContainer* obstacles_container,
+                        std::vector<Obstacle*> dynamic_env);
 
-  void EvaluateObstacle(Obstacle* obstacle);
+  void EvaluateObstacle(Obstacle* obstacle,
+                        ObstaclesContainer* obstacles_container);
 
  private:
-  void BuildObstacleIdHistoryMap();
+  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container);
 
-  void DumpCurrentFrameEnv();
+  void DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container);
 
   /**
    * @brief Register an evaluator by type
@@ -104,6 +107,9 @@ class EvaluatorManager {
 
   ObstacleConf::EvaluatorType vehicle_in_junction_caution_evaluator_ =
       ObstacleConf::JUNCTION_MAP_EVALUATOR;
+
+  ObstacleConf::EvaluatorType vehicle_default_caution_evaluator_ =
+      ObstacleConf::SEMANTIC_LSTM_EVALUATOR;
 
   ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
       ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;

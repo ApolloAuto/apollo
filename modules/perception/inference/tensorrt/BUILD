@@ -4,16 +4,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "rt_common",
-    srcs = [
-        "rt_common.cc",
-    ],
-    hdrs = [
-        "rt_common.h",
-    ],
+    srcs = ["rt_common.cc"],
+    hdrs = ["rt_common.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:common",
         "//modules/perception/proto:rt_proto",
+        "@com_google_absl//absl/strings",
         "@tensorrt",
     ],
 )
@@ -24,18 +21,14 @@ cc_test(
     srcs = ["rt_common_test.cc"],
     deps = [
         ":rt_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "rt_utils",
-    srcs = [
-        "rt_utils.cc",
-    ],
-    hdrs = [
-        "rt_utils.h",
-    ],
+    srcs = ["rt_utils.cc"],
+    hdrs = ["rt_utils.h"],
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_proto",
@@ -49,15 +42,13 @@ cc_test(
     srcs = ["rt_utils_test.cc"],
     deps = [
         ":rt_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "rt_net",
-    srcs = [
-        "rt_net.cc",
-    ],
+    srcs = ["rt_net.cc"],
     hdrs = [
         "entropy_calibrator.h",
         "rt_net.h",
@@ -89,15 +80,13 @@ cc_test(
     deps = [
         ":rt_net",
         "//modules/perception/inference:inference_factory_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "entropy_calibrator",
-    hdrs = [
-        "entropy_calibrator.h",
-    ],
+    hdrs = ["entropy_calibrator.h"],
     linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
         ":batch_stream",
@@ -118,23 +107,20 @@ cc_test(
     ],
     deps = [
         ":entropy_calibrator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "batch_stream",
-    srcs = [
-        "batch_stream.cc",
-    ],
-    hdrs = [
-        "batch_stream.h",
-    ],
+    srcs = ["batch_stream.cc"],
+    hdrs = ["batch_stream.h"],
     linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_proto",
         "@caffe",
+        "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",
         "@tensorrt",
     ],
@@ -149,7 +135,7 @@ cc_test(
     ],
     deps = [
         ":batch_stream",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

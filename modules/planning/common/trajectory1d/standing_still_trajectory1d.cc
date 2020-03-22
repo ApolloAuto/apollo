@@ -33,7 +33,7 @@ std::string StandingStillTrajectory1d::ToString() const { return ""; }
 
 double StandingStillTrajectory1d::Evaluate(const std::uint32_t order,
                                            const double param) const {
-  //  CHECK(param <= duration_);
+  //  ACHECK(param <= duration_);
   switch (order) {
     case 0:
       return Evaluate_s(param);

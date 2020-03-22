@@ -15,13 +15,13 @@
  *****************************************************************************/
 #pragma once
 
+#include <boost/circular_buffer.hpp>
 #include <cfloat>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "boost/circular_buffer.hpp"
 #include "cyber/cyber.h"
 #include "gflags/gflags.h"
 
@@ -107,18 +107,16 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
-    AERROR << "Your timestamp (" << std::to_string(timestamp)
-           << ") is earlier than the oldest "
-           << "timestamp (" << std::to_string(buffer_queue_.front().first)
-           << ").";
+    AERROR << "Your timestamp (" << timestamp
+           << ") is earlier than the oldest timestamp ("
+           << buffer_queue_.front().first << ").";
     return false;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
-    AERROR << "Your timestamp (" << std::to_string(timestamp)
-           << ") is newer than the latest "
-           << "timestamp (" << std::to_string(buffer_queue_.back().first)
-           << ").";
+    AERROR << "Your timestamp (" << timestamp
+           << ") is newer than the latest timestamp ("
+           << buffer_queue_.back().first << ").";
     return false;
   }
 

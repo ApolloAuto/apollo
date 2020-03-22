@@ -16,17 +16,14 @@
 
 #include "modules/prediction/common/feature_output.h"
 
-#include <vector>
-
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::util::StrCat;
 
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
@@ -73,8 +70,14 @@ void FeatureOutput::Close() {
 void FeatureOutput::Clear() {
   idx_feature_ = 0;
   idx_learning_ = 0;
+  idx_prediction_result_ = 0;
+  idx_frame_env_ = 0;
+  idx_tuning_ = 0;
   features_.Clear();
   list_data_for_learning_.Clear();
+  list_prediction_result_.Clear();
+  list_frame_env_.Clear();
+  list_data_for_tuning_.Clear();
 }
 
 bool FeatureOutput::Ready() {
@@ -116,16 +119,23 @@ void FeatureOutput::InsertDataForLearning(
 }
 
 void FeatureOutput::InsertPredictionResult(
-    const int obstacle_id, const PredictionObstacle& prediction_obstacle,
-    const ObstacleConf& obstacle_conf) {
+    const Obstacle* obstacle, const PredictionObstacle& prediction_obstacle,
+    const ObstacleConf& obstacle_conf, const Scenario& scenario) {
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
-  prediction_result->set_id(obstacle_id);
+  prediction_result->set_id(obstacle->id());
   prediction_result->set_timestamp(prediction_obstacle.timestamp());
   for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
     prediction_result->add_trajectory()->CopyFrom(
         prediction_obstacle.trajectory(i));
     prediction_result->mutable_obstacle_conf()->CopyFrom(obstacle_conf);
+  }
+  // Insert the scenario that the single obstacle is in
+  if (scenario.type() == Scenario::JUNCTION &&
+      obstacle->IsInJunction(scenario.junction_id())) {
+    prediction_result->mutable_scenario()->set_type(Scenario::JUNCTION);
+  } else if (obstacle->IsOnLane()) {
+    prediction_result->mutable_scenario()->set_type(Scenario::CRUISE);
   }
 }
 
@@ -152,11 +162,11 @@ void FeatureOutput::InsertDataForTuning(
 }
 
 void FeatureOutput::WriteFeatureProto() {
-  if (features_.feature_size() <= 0) {
+  if (features_.feature().empty()) {
     ADEBUG << "Skip writing empty feature.";
   } else {
-    const std::string file_name = StrCat(FLAGS_prediction_data_dir, "/feature.",
-                                         std::to_string(idx_feature_), ".bin");
+    const std::string file_name = absl::StrCat(
+        FLAGS_prediction_data_dir, "/feature.", idx_feature_, ".bin");
     cyber::common::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
     ++idx_feature_;
@@ -167,9 +177,8 @@ void FeatureOutput::WriteDataForLearning() {
   if (list_data_for_learning_.data_for_learning().empty()) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
-    const std::string file_name =
-        StrCat(FLAGS_prediction_data_dir, "/datalearn.",
-               std::to_string(idx_learning_), ".bin");
+    const std::string file_name = absl::StrCat(
+        FLAGS_prediction_data_dir, "/datalearn.", idx_learning_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_data_for_learning_, file_name);
     list_data_for_learning_.Clear();
     ++idx_learning_;
@@ -181,8 +190,8 @@ void FeatureOutput::WritePredictionResult() {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
     const std::string file_name =
-        StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
-               std::to_string(idx_prediction_result_), ".bin");
+        absl::StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
+                     idx_prediction_result_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_prediction_result_, file_name);
     list_prediction_result_.Clear();
     ++idx_prediction_result_;
@@ -193,9 +202,8 @@ void FeatureOutput::WriteFrameEnv() {
   if (list_frame_env_.frame_env().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
-    const std::string file_name =
-        StrCat(FLAGS_prediction_data_dir, "/frame_env.",
-               std::to_string(idx_frame_env_), ".bin");
+    const std::string file_name = absl::StrCat(
+        FLAGS_prediction_data_dir, "/frame_env.", idx_frame_env_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_frame_env_, file_name);
     list_frame_env_.Clear();
     ++idx_frame_env_;
@@ -207,9 +215,8 @@ void FeatureOutput::WriteDataForTuning() {
     ADEBUG << "Skip writing empty data_for_tuning.";
     return;
   }
-  const std::string file_name =
-      StrCat(FLAGS_prediction_data_dir, "/datatuning.",
-             std::to_string(idx_tuning_), ".bin");
+  const std::string file_name = absl::StrCat(
+      FLAGS_prediction_data_dir, "/datatuning.", idx_tuning_, ".bin");
   cyber::common::SetProtoToBinaryFile(list_data_for_tuning_, file_name);
   list_data_for_tuning_.Clear();
   ++idx_tuning_;

@@ -23,57 +23,47 @@ cc_library(
 
 cc_library(
     name = "concurrent_queue",
-    hdrs = [
-        "concurrent_queue.h",
-    ],
+    hdrs = ["concurrent_queue.h"],
 )
 
 cc_test(
     name = "concurrent_queue_test",
     size = "small",
-    srcs = [
-        "concurrent_queue_test.cc",
-    ],
+    srcs = ["concurrent_queue_test.cc"],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "thread_pool_test",
     size = "small",
-    srcs = [
-        "thread_pool_test.cc",
-    ],
+    srcs = ["thread_pool_test.cc"],
     deps = [
         ":thread",
+        "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
-        "@gtest//:main",
     ],
 )
 
 cc_test(
     name = "thread_test",
     size = "small",
-    srcs = [
-        "thread_test.cc",
-    ],
+    srcs = ["thread_test.cc"],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "thread_worker_test",
     size = "small",
-    srcs = [
-        "thread_worker_test.cc",
-    ],
+    srcs = ["thread_worker_test.cc"],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

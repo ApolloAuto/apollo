@@ -23,6 +23,7 @@
 #include "modules/monitor/hardware/socket_can_monitor.h"
 #include "modules/monitor/software/channel_monitor.h"
 #include "modules/monitor/software/functional_safety_monitor.h"
+#include "modules/monitor/software/latency_monitor.h"
 #include "modules/monitor/software/localization_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/recorder_monitor.h"
@@ -48,8 +49,11 @@ bool Monitor::Init() {
   runners_.emplace_back(new LocalizationMonitor());
   // Monitor if processes are running.
   runners_.emplace_back(new ProcessMonitor());
+  // Monitor message processing latencies across modules
+  const std::shared_ptr<LatencyMonitor> latency_monitor(new LatencyMonitor());
+  runners_.emplace_back(latency_monitor);
   // Monitor if channel messages are updated in time.
-  runners_.emplace_back(new ChannelMonitor());
+  runners_.emplace_back(new ChannelMonitor(latency_monitor));
   // Monitor if resources are sufficient.
   runners_.emplace_back(new ResourceMonitor());
 

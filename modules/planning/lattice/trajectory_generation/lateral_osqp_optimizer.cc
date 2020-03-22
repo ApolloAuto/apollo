@@ -51,9 +51,9 @@ bool LateralOSQPOptimizer::optimize(
     columns[pprime_offset + i + 1].emplace_back(constraint_index, 1.0);
 
     lower_bounds[constraint_index] =
-        -FLAGS_lateral_third_order_derivative_max * delta_s;
+        -FLAGS_lateral_third_order_derivative_max * delta_s_;
     upper_bounds[constraint_index] =
-        FLAGS_lateral_third_order_derivative_max * delta_s;
+        FLAGS_lateral_third_order_derivative_max * delta_s_;
     ++constraint_index;
   }
 
@@ -61,9 +61,9 @@ bool LateralOSQPOptimizer::optimize(
   for (int i = 0; i + 1 < num_var; ++i) {
     columns[prime_offset + i].emplace_back(constraint_index, -1.0);
     columns[prime_offset + i + 1].emplace_back(constraint_index, 1.0);
-    columns[pprime_offset + i].emplace_back(constraint_index, -0.5 * delta_s);
+    columns[pprime_offset + i].emplace_back(constraint_index, -0.5 * delta_s_);
     columns[pprime_offset + i + 1].emplace_back(constraint_index,
-                                                -0.5 * delta_s);
+                                                -0.5 * delta_s_);
 
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;
@@ -74,11 +74,11 @@ bool LateralOSQPOptimizer::optimize(
   for (int i = 0; i + 1 < num_var; ++i) {
     columns[i].emplace_back(constraint_index, -1.0);
     columns[i + 1].emplace_back(constraint_index, 1.0);
-    columns[prime_offset + i].emplace_back(constraint_index, -delta_s);
+    columns[prime_offset + i].emplace_back(constraint_index, -delta_s_);
     columns[pprime_offset + i].emplace_back(constraint_index,
-                                            -delta_s * delta_s / 3.0);
+                                            -delta_s_ * delta_s_ / 3.0);
     columns[pprime_offset + i + 1].emplace_back(constraint_index,
-                                                -delta_s * delta_s / 6.0);
+                                                -delta_s_ * delta_s_ / 6.0);
 
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;

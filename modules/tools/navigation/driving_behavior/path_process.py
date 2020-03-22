@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -48,8 +48,8 @@ if __name__ == "__main__":
         new_py.append(p.y)
         f.write(str(p.x) + "," + str(p.y) + "\n")
     f.close()
-    print len(points_x)
-    print len(new_px)
+    print(len(points_x))
+    print(len(new_px))
     plt.figure()
     plt.plot(points_x, points_y, '-r', lw=1, label='raw')
     plt.plot(new_px, new_py, '-g', label='processed')

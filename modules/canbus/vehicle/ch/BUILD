@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ch_vehicle_factory",
-    srcs = [
-        "ch_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "ch_vehicle_factory.h",
-    ],
+    srcs = ["ch_vehicle_factory.cc"],
+    hdrs = ["ch_vehicle_factory.h"],
     deps = [
         ":ch_controller",
         ":ch_message_manager",
@@ -19,12 +15,8 @@ cc_library(
 
 cc_library(
     name = "ch_message_manager",
-    srcs = [
-        "ch_message_manager.cc",
-    ],
-    hdrs = [
-        "ch_message_manager.h",
-    ],
+    srcs = ["ch_message_manager.cc"],
+    hdrs = ["ch_message_manager.h"],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
@@ -35,12 +27,8 @@ cc_library(
 
 cc_library(
     name = "ch_controller",
-    srcs = [
-        "ch_controller.cc",
-    ],
-    hdrs = [
-        "ch_controller.h",
-    ],
+    srcs = ["ch_controller.cc"],
+    hdrs = ["ch_controller.h"],
     deps = [
         ":ch_message_manager",
         "//modules/canbus/proto:canbus_proto",
@@ -55,25 +43,21 @@ cc_library(
 cc_test(
     name = "ch_controller_test",
     size = "small",
-    srcs = [
-        "ch_controller_test.cc",
-    ],
+    srcs = ["ch_controller_test.cc"],
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":ch_controller",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "ch_message_manager_test",
     size = "small",
-    srcs = [
-        "ch_message_manager_test.cc",
-    ],
+    srcs = ["ch_message_manager_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch:ch_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -83,7 +67,7 @@ cc_test(
     srcs = ["ch_vehicle_factory_test.cc"],
     deps = [
         ":ch_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

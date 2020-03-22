@@ -35,15 +35,20 @@ void Throttlestatus510::Parse(const std::uint8_t* bytes, int32_t length,
       ->set_throttle_pedal_en_sts(throttle_pedal_en_sts(bytes, length));
   chassis->mutable_ch()->mutable_throttle_status__510()->set_throttle_pedal_sts(
       throttle_pedal_sts(bytes, length));
+  chassis->mutable_ch()->mutable_throttle_status__510()->set_drive_motor_err(
+      drive_motor_err(bytes, length));
+  chassis->mutable_ch()->mutable_throttle_status__510()->set_battery_bms_err(
+      battery_bms_err(bytes, length));
   chassis->mutable_check_response()->set_is_vcu_online(
       throttle_pedal_en_sts(bytes, length) == 1);
 }
 
 // config detail: {'description': 'throttle pedal enable bit(Status)', 'enum':
-// {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE'},
-// 'precision': 1.0, 'len': 8, 'name': 'throttle_pedal_en_sts', 'is_signed_var':
-// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-// 'order': 'intel', 'physical_unit': ''}
+// {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE', 2:
+// 'THROTTLE_PEDAL_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
+// 'throttle_pedal_en_sts', 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+// 'physical_unit': ''}
 Throttle_status__510::Throttle_pedal_en_stsType
 Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes,
                                          int32_t length) const {
@@ -65,6 +70,35 @@ int Throttlestatus510::throttle_pedal_sts(const std::uint8_t* bytes,
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
+  return ret;
+}
+
+// config detail: {'name': 'drive_motor_err', 'enum': {0:
+// 'DRIVE_MOTOR_ERR_NOERR', 1: 'DRIVE_MOTOR_ERR_DRV_MOTOR_ERR'},
+// 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum', 'order': 'intel',
+// 'physical_unit': ''}
+Throttle_status__510::Drive_motor_errType Throttlestatus510::drive_motor_err(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 2);
+  int32_t x = t0.get_byte(0, 8);
+
+  Throttle_status__510::Drive_motor_errType ret =
+      static_cast<Throttle_status__510::Drive_motor_errType>(x);
+  return ret;
+}
+
+// config detail: {'name': 'battery_bms_err', 'enum': {0:
+// 'BATTERY_BMS_ERR_NOERR', 1: 'BATTERY_BMS_ERR_BATTERY_ERR'}, 'precision': 1.0,
+// 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
+// 'bit': 24, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+Throttle_status__510::Battery_bms_errType Throttlestatus510::battery_bms_err(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 8);
+
+  Throttle_status__510::Battery_bms_errType ret =
+      static_cast<Throttle_status__510::Battery_bms_errType>(x);
   return ret;
 }
 }  // namespace ch

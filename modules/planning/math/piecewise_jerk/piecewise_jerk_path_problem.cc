@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <algorithm>
-
 #include "cyber/common/log.h"
 
 #include "modules/planning/common/planning_gflags.h"

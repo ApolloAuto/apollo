@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <limits>
 #include <memory>
 #include <queue>
@@ -29,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
@@ -82,7 +82,7 @@ class Node2d {
 
  private:
   static std::string ComputeStringIndex(int x_grid, int y_grid) {
-    return std::to_string(x_grid) + "_" + std::to_string(y_grid);
+    return absl::StrCat(x_grid, "_", y_grid);
   }
 
  private:

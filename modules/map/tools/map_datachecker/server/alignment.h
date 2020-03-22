@@ -95,12 +95,12 @@ class Alignment {
     if (pose_info.pose_count == 0) {
       pose_info.start_time = pose.time_stamp;
       ++pose_info.pose_count;
-      AINFO << "update start time: " << std::to_string(pose_info.start_time)
+      AINFO << "update start time: " << pose_info.start_time
             << ",pose count: " << pose_info.pose_count;
     } else {
       pose_info.end_time = pose.time_stamp;
       ++pose_info.pose_count;
-      AINFO << "update start time: " << std::to_string(pose_info.start_time)
+      AINFO << "update start time: " << pose_info.start_time
             << ",pose count: " << pose_info.pose_count;
     }
   }

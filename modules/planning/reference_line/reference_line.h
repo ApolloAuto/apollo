@@ -26,6 +26,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/proto/map_geometry.pb.h"
+#include "modules/map/proto/map.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -41,7 +42,7 @@ class ReferenceLine {
   ReferenceLine() = default;
   explicit ReferenceLine(const ReferenceLine& reference_line) = default;
   template <typename Iterator>
-  explicit ReferenceLine(const Iterator begin, const Iterator end)
+  ReferenceLine(const Iterator begin, const Iterator end)
       : reference_points_(begin, end),
         map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
@@ -71,9 +72,11 @@ class ReferenceLine {
    */
   bool Stitch(const ReferenceLine& other);
 
-  bool Shrink(const common::math::Vec2d& point, double look_backward,
-              double look_forward);
-  bool Shrink(const double s, double look_backward, double look_forward);
+  bool Segment(const common::math::Vec2d& point, const double distance_backward,
+               const double distance_forward);
+
+  bool Segment(const double s, const double distance_backward,
+               const double distance_forward);
 
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;
@@ -124,6 +127,8 @@ class ReferenceLine {
 
   bool GetRoadWidth(const double s, double* const road_left_width,
                     double* const road_right_width) const;
+
+  hdmap::Road::Type GetRoadType(const double s) const;
 
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;

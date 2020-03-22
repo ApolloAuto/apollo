@@ -104,7 +104,7 @@ Ecu_status_1_515::Ctrl_stsType Ecustatus1515::ctrl_sts(
 // 'int', 'order': 'intel', 'physical_unit': ''}
 int Ecustatus1515::chassis_sts(const std::uint8_t* bytes,
                                int32_t length) const {
-  Byte t0(bytes + 4);
+  Byte t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;

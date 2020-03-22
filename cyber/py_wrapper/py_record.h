@@ -34,10 +34,6 @@
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
 
-using ::apollo::cyber::proto::Header;
-using ::apollo::cyber::record::RecordFileWriter;
-using ::apollo::cyber::record::RecordReader;
-
 namespace apollo {
 namespace cyber {
 namespace record {
@@ -55,7 +51,6 @@ class PyRecordReader {
   explicit PyRecordReader(const std::string& file) {
     record_reader_.reset(new RecordReader(file));
   }
-  ~PyRecordReader() {}
 
   BagMessage ReadMessage(uint64_t begin_time = 0,
                          uint64_t end_time = UINT64_MAX) {
@@ -105,10 +100,6 @@ class PyRecordReader {
 
 class PyRecordWriter {
  public:
-  PyRecordWriter() {}
-
-  ~PyRecordWriter() {}
-
   bool Open(const std::string& path) { return record_writer_.Open(path); }
 
   void Close() { record_writer_.Close(); }

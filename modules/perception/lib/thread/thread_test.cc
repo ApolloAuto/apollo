@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 
 #include "modules/perception/lib/thread/thread.h"
+
+#include <thread>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -65,7 +67,7 @@ TEST(TestThread, Test) {
   my_thread3.Start();
   my_thread3.set_joinable(false);
   EXPECT_TRUE(my_thread3.IsAlive());
-  usleep(100000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_FALSE(my_thread3.IsAlive());
 }
 

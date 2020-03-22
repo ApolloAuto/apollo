@@ -36,7 +36,7 @@
   You can set `gnss_mode` in `apollo/localization/conf/localization.conf` to decide which mode you want to use. The default mode is gnss best pose.
 
 ### LiDAR Localization Setting
-  We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost. Futhermore, we provide three yaw optimization methods in LiDAR localization algorithm. You can set the parameter `lidar_yaw_align_mode` in file localization.conf to choose the mode.
+  We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost. Furthermore, we provide three yaw optimization methods in LiDAR localization algorithm. You can set the parameter `lidar_yaw_align_mode` in file localization.conf to choose the mode.
 
 ## Generate Localization Map
   Localization map is used for LiDAR-based localization, which is a grid-cell representation of the environment. Each cell stores the statistics of laser reflection intensity and altitude. The map is organized as a group of map nodes. For more information, please refer to `apollo/modules/localization/msf/local_map`.

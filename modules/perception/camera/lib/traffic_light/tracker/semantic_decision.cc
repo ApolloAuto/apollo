@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
 
-#include <boost/bind.hpp>
 #include <map>
 
+#include "boost/bind.hpp"
 #include "cyber/common/file.h"
 
 namespace apollo {
@@ -217,9 +217,9 @@ void SemanticReviser::ReviseByTimeSeries(
     ADEBUG << "semantic " << semantic_table.semantic << " color "
            << s_color_strs[iter->color] << " blink " << iter->blink << " cur "
            << s_color_strs[cur_color];
-    ADEBUG << "cur ts " << std::to_string(time_stamp);
-    ADEBUG << "bri ts " << std::to_string(iter->last_bright_time_stamp);
-    ADEBUG << "dar ts " << std::to_string(iter->last_dark_time_stamp);
+    ADEBUG << "cur ts " << time_stamp;
+    ADEBUG << "bri ts " << iter->last_bright_time_stamp;
+    ADEBUG << "dar ts " << iter->last_dark_time_stamp;
   } else {
     semantic_table.last_dark_time_stamp = semantic_table.time_stamp;
     semantic_table.last_bright_time_stamp = semantic_table.time_stamp;
@@ -234,7 +234,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
   std::vector<SemanticTable> semantic_table;
   ADEBUG << "start revise ";
 
-  if (lights_ref.size() <= 0) {
+  if (lights_ref.empty()) {
     history_semantic_.clear();
     ADEBUG << "no lights to revise, return";
     return true;

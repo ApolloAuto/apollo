@@ -44,13 +44,14 @@ TEST_F(LaneSequencePredictorTest, OnLaneCase) {
   EXPECT_EQ(perception_obstacle.id(), 1);
   MLPEvaluator mlp_evaluator;
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
+  mlp_evaluator.Evaluate(obstacle_ptr, &container);
   LaneSequencePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 

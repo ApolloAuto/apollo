@@ -26,8 +26,8 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:rtk_config_proto",
         "//modules/transform:transform_broadcaster_lib",
+        "@com_google_googletest//:gtest",
         "@eigen",
-        "@gtest",
     ],
 )
 
@@ -41,16 +41,14 @@ cc_binary(
 cc_test(
     name = "rtk_localization_test",
     size = "small",
-    srcs = [
-        "rtk_localization_test.cc",
-    ],
+    srcs = ["rtk_localization_test.cc"],
     data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/rtk:rtk_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

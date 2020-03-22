@@ -41,18 +41,18 @@ class DpStGraphTest : public ::testing::Test {
     FLAGS_scenario_lane_follow_config_file =
         "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
     ScenarioConfig config;
-    CHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
+    ACHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
     FLAGS_planning_config_file =
         "/apollo/modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
-    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+    ACHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
         << "failed to load planning config file " << FLAGS_planning_config_file;
 
     DpStSpeedConfig default_dp_config;
     for (const auto& cfg : planning_config.default_task_config()) {
       if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
-        default_dp_config = cfg.dp_st_speed_config();
+        default_dp_config = cfg.speed_heuristic_config().default_speed_config();
         break;
       }
     }
@@ -61,7 +61,8 @@ class DpStGraphTest : public ::testing::Test {
     for (const auto& stage : config.stage_config()) {
       for (const auto& cfg : stage.task_config()) {
         if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
-          dp_config_.MergeFrom(cfg.dp_st_speed_config());
+          dp_config_.MergeFrom(
+              cfg.speed_heuristic_config().default_speed_config());
           break;
         }
       }
@@ -123,8 +124,8 @@ TEST_F(DpStGraphTest, simple) {
   planning_internal::STGraphDebug st_graph_debug;
 
   st_graph_data_ = StGraphData();
-  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_, 120.0,
-                          7.0, &st_graph_debug);
+  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_, 5.0,
+                          120.0, 7.0, &st_graph_debug);
 
   GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
                                    init_point_);

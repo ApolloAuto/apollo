@@ -700,16 +700,16 @@ bool IterativeAnchoringSmoother::CombinePathAndSpeed(
   CHECK_NOTNULL(discretized_trajectory);
   discretized_trajectory->clear();
   // TODO(Jinyun): move to confs
-  const double kDenseTimeResoltuion = 0.1;
+  const double kDenseTimeResolution = 0.1;
   const double time_horizon =
-      speed_points.TotalTime() + kDenseTimeResoltuion * 1.0e-6;
+      speed_points.TotalTime() + kDenseTimeResolution * 1.0e-6;
   if (path_points.empty()) {
     AERROR << "path data is empty";
     return false;
   }
   ADEBUG << "speed_points.TotalTime() " << speed_points.TotalTime();
   for (double cur_rel_time = 0.0; cur_rel_time < time_horizon;
-       cur_rel_time += kDenseTimeResoltuion) {
+       cur_rel_time += kDenseTimeResolution) {
     common::SpeedPoint speed_point;
     if (!speed_points.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;
@@ -758,8 +758,8 @@ void IterativeAnchoringSmoother::AdjustPathAndSpeedByGear(
 bool IterativeAnchoringSmoother::GenerateStopProfileFromPolynomial(
     const double init_acc, const double init_speed, const double stop_distance,
     SpeedData* smoothed_speeds) {
-  constexpr double kMaxT = 8.0;
-  constexpr double kUnitT = 0.2;
+  static constexpr double kMaxT = 8.0;
+  static constexpr double kUnitT = 0.2;
   for (double t = 2.0; t <= kMaxT; t += kUnitT) {
     QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, stop_distance,
                                    0.0, 0.0, t);
@@ -786,7 +786,7 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
        evaluate_t += 0.2) {
     const double v = curve.Evaluate(1, evaluate_t);
     const double a = curve.Evaluate(2, evaluate_t);
-    constexpr double kEpsilon = 1e-3;
+    static constexpr double kEpsilon = 1e-3;
     if (v < -kEpsilon || a > 1.0) {
       return false;
     }

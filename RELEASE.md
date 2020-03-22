@@ -1,3 +1,26 @@
+# Release 5.5
+
+Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. 
+The car has complete 360-degree visibility, along with upgraded perception deep learning model a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. New Planning scenarios have been introduced to support curb-side functionality.
+
+## Major Features And Improvements
+* Brand new Data Pipeline Service
+    * Sensor Calibration service
+* Brand new module - Storytelling
+* Scenario - Based Planning with a new planning scenarios to support curb-to-curb driving
+    * Park-and-go
+    * Emergency
+* Prediction Model - Caution Obstacle 
+    * Semantic LSTM evaluator
+    * Extrapolation predictor
+* Control module
+    * Model Reference Adaptive Control (MRAC)
+    * Control profiling service
+* Simulation scenarios
+
+## Autonomous Drive Capabilities
+Vehicles with this version can drive autonomously in complex urban road conditions including both residential and downtown areas. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. URBAN DRIVING INVOLVES NAVIGATING HIGH RISK ZONES LIKE SCHOOLS, PLEASE TEST APOLLO 5.0 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM, PLEASE AVOID DRIVING THE VEHICLE ON THE HIGHWAY OR AT SPEEDS THAT ARE ABOVE OUR SUPPORTED THRESHOLD**.
+
 # Release 5.0
 
 Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous Driving. The car now has 360-degree visibility, along with upgraded perception deep learning model to handle the changing conditions of complex road scenarios, making the car more secure and aware. Scenario-based planning has been enhanced to support additional scenarios like pull over and crossing bare intersections.
@@ -15,6 +38,7 @@ Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous D
 * Simulation web platform - Dreamland
     * Scenario Editor
     * Control-in-loop Simulation
+* Apollo Synthetic Data Set
 
 ## Autonomous Drive Capabilities
 Vehicles with this version can drive autonomously in complex urban road conditions including both residential and downtown areas. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. URBAN DRIVING INVOLVES NAVIGATING HIGH RISK ZONES LIKE SCHOOLS, PLEASE TEST APOLLO 5.0 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM, PLEASE AVOID DRIVING THE VEHICLE ON THE HIGHWAY OR AT SPEEDS THAT ARE ABOVE OUR SUPPORTED THRESHOLD**.

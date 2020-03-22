@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,12 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
 import shutil
 import sys
+
 import yaml
 
 
@@ -217,7 +218,7 @@ def gen_build_file(content, output_dir):
 
 
 def gen_vehicle_controller_and_manager(config_file, output_dir):
-    print "Generating controller and manager"
+    print("Generating controller and manager")
     with open(config_file, 'r') as fp:
         content = yaml.load(fp)
         gen_vehicle_controller_header(content, output_dir)
@@ -239,7 +240,7 @@ if __name__ == "__main__":
     protocol_conf = conf["protocol_conf"]
 
     output_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower() + \
-                 "/"
+        "/"
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)
     gen_vehicle_controller_and_manager(protocol_conf, output_dir)

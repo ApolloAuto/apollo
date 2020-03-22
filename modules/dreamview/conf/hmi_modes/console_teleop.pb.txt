@@ -1,0 +1,127 @@
+modules {
+  key: "Telecine 0"
+  value: {
+    start_command: "run_teleop_telecine0.bash start"
+    stop_command: "run_teleop_telecine0.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "telecine.py"
+      command_keywords: "decoder/c0"
+    }
+  }
+}
+modules {
+  key: "Telecine 1"
+  value: {
+    start_command: "run_teleop_telecine1.bash start"
+    stop_command: "run_teleop_telecine1.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "telecine.py"
+      command_keywords: "decoder/c1"
+    }
+  }
+}
+modules {
+  key: "Telecine 2"
+  value: {
+    start_command: "run_teleop_telecine2.bash start"
+    stop_command: "run_teleop_telecine2.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "telecine.py"
+      command_keywords: "decoder/c2"
+    }
+  }
+}
+modules {
+  key: "Router"
+  value: {
+    start_command: "run_teleop_router.bash start"
+    stop_command: "run_teleop_router.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "router.py"
+    }
+  }
+}
+
+modules {
+  key: "Video Decoder 0"
+  value: {
+    start_command: "run_teleop_video_decoder0.bash start"
+    stop_command: "run_teleop_video_decoder0.bash stop"
+    process_monitor_config {
+      command_keywords: "video_decoder"
+      command_keywords: "decoder_0"
+    }
+  }
+}
+modules {
+  key: "Video Decoder 1"
+  value: {
+    start_command: "run_teleop_video_decoder1.bash start"
+    stop_command: "run_teleop_video_decoder1.bash stop"
+    process_monitor_config {
+      command_keywords: "video_decoder"
+      command_keywords: "decoder_1"
+    }
+  }
+}
+modules {
+  key: "Video Decoder 2"
+  value: {
+    start_command: "run_teleop_video_decoder2.bash start"
+    stop_command: "run_teleop_video_decoder2.bash stop"
+    process_monitor_config {
+      command_keywords: "video_decoder"
+      command_keywords: "decoder_2"
+    }
+  }
+}
+
+modules {
+  key: "Daemon"
+  value: {
+    start_command: "run_teleop_daemon.bash start"
+    stop_command: "run_teleop_daemon.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "daemon.py"
+    }
+  }
+}
+
+modules {
+  key: "Tele Control"
+  value: {
+    start_command: "run_teleop_tele_control.bash operator start"
+    stop_command: "run_teleop_tele_control.bash operator stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "tele_control.py"
+    }
+  }
+}
+modules {
+  key: "Voip Decoder"
+  value: {
+    start_command: "run_teleop_voip_decoder.bash start"
+    stop_command: "run_teleop_voip_decoder.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "voip_decoder.py"
+    }
+  }
+}
+modules {
+  key: "Voip Encoder"
+  value: {
+    start_command: "run_teleop_voip_encoder.bash start"
+    stop_command: "run_teleop_voip_encoder.bash stop"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "voip_encoder.py"
+    }
+  }
+}

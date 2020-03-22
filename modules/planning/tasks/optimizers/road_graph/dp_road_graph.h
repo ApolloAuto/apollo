@@ -20,11 +20,6 @@
 
 #pragma once
 
-#include <limits>
-#include <list>
-#include <memory>
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 
@@ -136,8 +131,6 @@ class DpRoadGraph {
   common::SLPoint init_sl_point_;
   common::FrenetFramePoint init_frenet_frame_point_;
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
-
-  ObjectSidePass sidepass_;
 
   std::unique_ptr<WaypointSampler> waypoint_sampler_;
 };

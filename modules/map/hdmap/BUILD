@@ -17,14 +17,16 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
+        "//cyber/common:file",
+        "//cyber/common:macros",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/math:linear_interpolation",
-        "//modules/common/util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
         "//modules/map/relative_map/proto:navigation_proto",
-        "@glog",
+        "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
     ],
 )
 
@@ -35,10 +37,10 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":hdmap",
+        "//cyber/common:file",
         "//modules/common/configs:config_gflags",
-        "//modules/common/util",
-        "//modules/common/util:string_util",
         "//modules/map/relative_map/proto:navigation_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -63,8 +65,9 @@ cc_test(
     ],
     deps = [
         ":hdmap",
-        "@glog",
-        "@gtest//:main",
+        "//cyber/common:file",
+        "@com_google_glog//:glog",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -72,16 +75,14 @@ cc_test(
     name = "hdmap_util_test",
     size = "small",
     timeout = "short",
-    srcs = [
-        "hdmap_util_test.cc",
-    ],
+    srcs = ["hdmap_util_test.cc"],
     data = [
         ":testdata",
     ],
     deps = [
         ":hdmap_util",
-        "@glog",
-        "@gtest//:main",
+        "@com_google_glog//:glog",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

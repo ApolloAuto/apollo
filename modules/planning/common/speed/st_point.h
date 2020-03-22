@@ -28,6 +28,7 @@ namespace apollo {
 namespace planning {
 
 class STPoint : public common::math::Vec2d {
+  // x-axis: t; y-axis: s.
  public:
   STPoint() = default;
   STPoint(const double s, const double t);

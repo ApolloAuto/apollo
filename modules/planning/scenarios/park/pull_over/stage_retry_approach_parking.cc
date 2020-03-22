@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_retry_approach_parking.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ namespace planning {
 namespace scenario {
 namespace pull_over {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 PullOverStageRetryApproachParking::PullOverStageRetryApproachParking(
     const ScenarioConfig::StageConfig& config)
@@ -61,8 +62,11 @@ bool PullOverStageRetryApproachParking::CheckADCStop(const Frame& frame) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-
-  if (adc_speed > scenario_config_.max_adc_stop_speed()) {
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
+  if (adc_speed > max_adc_stop_speed) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
   }

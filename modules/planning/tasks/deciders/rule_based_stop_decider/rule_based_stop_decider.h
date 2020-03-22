@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/rule_based_stop_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
@@ -65,6 +64,7 @@ class RuleBasedStopDecider : public Decider {
                       const common::PathPoint& stop_point);
 
  private:
+  static constexpr char const* PATH_END_VO_ID_PREFIX = "PATH_END_";
   RuleBasedStopDeciderConfig rule_based_stop_decider_config_;
   bool is_clear_to_change_lane_ = false;
   bool is_change_lane_planning_succeed_ = false;

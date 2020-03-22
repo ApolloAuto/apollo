@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,19 +12,13 @@ cc_proto_library(
 
 proto_library(
     name = "tl_preprocess_proto_lib",
-    srcs = [
-        "tl_preprocess.proto",
-    ],
+    srcs = ["tl_preprocess.proto"],
 )
 
 cc_library(
     name = "multi_camera_projection",
-    srcs = [
-        "multi_camera_projection.cc",
-    ],
-    hdrs = [
-        "multi_camera_projection.h",
-    ],
+    srcs = ["multi_camera_projection.cc"],
+    hdrs = ["multi_camera_projection.h"],
     deps = [
         ":pose",
         "//cyber",
@@ -36,12 +31,8 @@ cc_library(
 
 cc_library(
     name = "pose",
-    srcs = [
-        "pose.cc",
-    ],
-    hdrs = [
-        "pose.h",
-    ],
+    srcs = ["pose.cc"],
+    hdrs = ["pose.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",
@@ -50,28 +41,26 @@ cc_library(
 
 cc_library(
     name = "tl_preprocessor",
-    srcs = [
-        "tl_preprocessor.cc",
-    ],
-    hdrs = [
-        "tl_preprocessor.h",
-    ],
-    linkopts = [
-        "-lboost_thread",
-        "-lboost_system",
-    ],
+    srcs = ["tl_preprocessor.cc"],
+    hdrs = ["tl_preprocessor.h"],
     deps = [
         ":multi_camera_projection",
         "//cyber",
-        "//external:gflags",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/interface:base_init_options",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/utils",
+        "//third_party:boost",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
+)
+
+py_proto(
+    name = "tl_preprocess_pb2",
+    src = "tl_preprocess.proto",
 )
 
 cpplint()

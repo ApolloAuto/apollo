@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "zhongyun_vehicle_factory",
-    srcs = [
-        "zhongyun_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "zhongyun_vehicle_factory.h",
-    ],
+    srcs = ["zhongyun_vehicle_factory.cc"],
+    hdrs = ["zhongyun_vehicle_factory.h"],
     deps = [
         ":zhongyun_controller",
         ":zhongyun_message_manager",
@@ -19,12 +15,8 @@ cc_library(
 
 cc_library(
     name = "zhongyun_message_manager",
-    srcs = [
-        "zhongyun_message_manager.cc",
-    ],
-    hdrs = [
-        "zhongyun_message_manager.h",
-    ],
+    srcs = ["zhongyun_message_manager.cc"],
+    hdrs = ["zhongyun_message_manager.h"],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle/zhongyun/protocol:canbus_zhongyun_protocol",
@@ -35,12 +27,8 @@ cc_library(
 
 cc_library(
     name = "zhongyun_controller",
-    srcs = [
-        "zhongyun_controller.cc",
-    ],
-    hdrs = [
-        "zhongyun_controller.h",
-    ],
+    srcs = ["zhongyun_controller.cc"],
+    hdrs = ["zhongyun_controller.h"],
     deps = [
         ":zhongyun_message_manager",
         "//modules/canbus/proto:canbus_proto",
@@ -55,40 +43,34 @@ cc_library(
 cc_test(
     name = "zhongyun_message_manager_test",
     size = "small",
-    srcs = [
-        "zhongyun_message_manager_test.cc",
-    ],
+    srcs = ["zhongyun_message_manager_test.cc"],
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":zhongyun_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "zhongyun_vehicle_factory_test",
     size = "small",
-    srcs = [
-        "zhongyun_vehicle_factory_test.cc",
-    ],
+    srcs = ["zhongyun_vehicle_factory_test.cc"],
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":zhongyun_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "zhongyun_controller_test",
     size = "small",
-    srcs = [
-        "zhongyun_controller_test.cc",
-    ],
+    srcs = ["zhongyun_controller_test.cc"],
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":zhongyun_controller",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

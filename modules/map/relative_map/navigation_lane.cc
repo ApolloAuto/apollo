@@ -25,13 +25,13 @@
 #include <limits>
 #include <string>
 
-#include "modules/map/proto/map_lane.pb.h"
-
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {
@@ -71,8 +71,8 @@ bool CreateSingleLaneMap(
     return false;
   }
   auto *lane = hdmap->add_lane();
-  lane->mutable_id()->set_id(std::to_string(navi_path->path_priority()) + "_" +
-                             path.name());
+  lane->mutable_id()->set_id(
+      absl::StrCat(navi_path->path_priority(), "_", path.name()));
   (*navigation_path)[lane->id().id()] = *navi_path;
   // lane types
   lane->set_type(Lane::CITY_DRIVING);
@@ -416,7 +416,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
     return path.path_point(size - 1);
   }
 
-  constexpr double kEpsilon = 1e-9;
+  static constexpr double kEpsilon = 1e-9;
   if (std::fabs(path.path_point(start_index).s() - s) < kEpsilon) {
     *matched_index = start_index;
     return path.path_point(start_index);
@@ -831,7 +831,7 @@ void NavigationLane::UpdateStitchIndexInfo() {
     return;
   }
 
-  constexpr int kMinPathPointSize = 10;
+  static constexpr int kMinPathPointSize = 10;
   for (int i = 0; i < navigation_line_num; ++i) {
     const auto &navigation_path = navigation_info_.navigation_path(i).path();
     if (!navigation_info_.navigation_path(i).has_path() ||

@@ -16,11 +16,9 @@
 
 #include "cyber/message/message_traits.h"
 
-#include <gtest/gtest.h>
-#include <string.h>
 #include <string>
+#include "gtest/gtest.h"
 
-#include "cyber/message/intra_message.h"
 #include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
@@ -80,21 +78,21 @@ class PbMessage {
 TEST(MessageTraitsTest, type_trait) {
   EXPECT_FALSE(HasType<Data>::value);
   EXPECT_FALSE(HasSerializer<Data>::value);
-  EXPECT_FALSE(HasDescriptor<Data>::value);
+  EXPECT_FALSE(HasGetDescriptorString<Data>::value);
 
   EXPECT_TRUE(HasType<Message>::value);
   EXPECT_TRUE(HasSerializer<Message>::value);
-  EXPECT_TRUE(HasDescriptor<Message>::value);
+  EXPECT_TRUE(HasGetDescriptorString<Message>::value);
 
   EXPECT_TRUE(HasSerializer<proto::UnitTest>::value);
 
   EXPECT_TRUE(HasType<PyMessageWrap>::value);
   EXPECT_TRUE(HasSerializer<PyMessageWrap>::value);
-  EXPECT_TRUE(HasDescriptor<PyMessageWrap>::value);
+  EXPECT_TRUE(HasGetDescriptorString<PyMessageWrap>::value);
 
   EXPECT_TRUE(HasType<RawMessage>::value);
   EXPECT_TRUE(HasSerializer<RawMessage>::value);
-  EXPECT_TRUE(HasDescriptor<RawMessage>::value);
+  EXPECT_TRUE(HasGetDescriptorString<RawMessage>::value);
 
   Message msg;
   EXPECT_EQ("type", MessageType<Message>(msg));

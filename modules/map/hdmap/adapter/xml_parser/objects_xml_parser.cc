@@ -77,7 +77,7 @@ Status ObjectsXmlParser::ParseClearAreas(
       PbClearArea clear_area;
       clear_area.mutable_id()->set_id(object_id);
       PbPolygon* polygon = clear_area.mutable_polygon();
-      CHECK(polygon != nullptr);
+      ACHECK(polygon != nullptr);
       const tinyxml2::XMLElement* outline_node =
           sub_node->FirstChildElement("outline");
       if (outline_node == nullptr) {
@@ -122,7 +122,7 @@ Status ObjectsXmlParser::ParseSpeedBumps(
         RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
         sub_node = sub_node->NextSiblingElement("geometry");
       }
-      if (speed_bump.position_size() <= 0) {
+      if (speed_bump.position().empty()) {
         std::string err_msg = "Error speed bump miss stop line.";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
       }
@@ -155,7 +155,7 @@ Status ObjectsXmlParser::ParseStopLines(
       StopLineInternal stop_line;
       stop_line.id = object_id;
       PbCurveSegment* curve_segment = stop_line.curve.add_segment();
-      CHECK(curve_segment != nullptr);
+      ACHECK(curve_segment != nullptr);
       const auto sub_node = object_node->FirstChildElement("geometry");
       if (sub_node == nullptr) {
         std::string err_msg = "Error parse stopline geometry";

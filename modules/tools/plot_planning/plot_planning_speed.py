@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -18,12 +18,16 @@
 
 import sys
 import threading
+
 import gflags
-from cyber_py import cyber
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+
+from cyber_py3 import cyber
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
+
+
 LAST_TRAJ_DATA = []
 LAST_TRAJ_T_DATA = []
 CURRENT_TRAJ_DATA = []
@@ -56,7 +60,7 @@ def callback(planning_pb):
         LAST_TRAJ_T_DATA = []
 
         CURRENT_TRAJ_DATA = []
-        CURRENT_TRAJ_T_DATA =[]
+        CURRENT_TRAJ_T_DATA = []
 
         INIT_V_DATA = []
         INIT_T_DATA = []
@@ -81,6 +85,7 @@ def callback(planning_pb):
     lock.release()
 
     last_t = current_t
+
 
 def listener():
     cyber.init()

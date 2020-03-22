@@ -33,14 +33,14 @@
 namespace apollo {
 namespace planning {
 
-using Trajectory1d = Curve1d;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
 using apollo::common::math::PathMatcher;
+
+using Trajectory1d = Curve1d;
+using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 using Trajectory1dPair =
     std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
-
-using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
     const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
@@ -100,7 +100,7 @@ size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
 
 std::pair<PtrTrajectory1d, PtrTrajectory1d>
 TrajectoryEvaluator::next_top_trajectory_pair() {
-  CHECK(has_more_trajectory_pairs());
+  ACHECK(has_more_trajectory_pairs());
   auto top = cost_queue_.top();
   cost_queue_.pop();
   return top.first;
@@ -279,7 +279,7 @@ double TrajectoryEvaluator::CentripetalAccelerationCost(
     double s = lon_trajectory->Evaluate(0, t);
     double v = lon_trajectory->Evaluate(1, t);
     PathPoint ref_point = PathMatcher::MatchToPath(*reference_line_, s);
-    CHECK(ref_point.has_kappa());
+    ACHECK(ref_point.has_kappa());
     double centripetal_acc = v * v * ref_point.kappa();
     centripetal_acc_sum += std::fabs(centripetal_acc);
     centripetal_acc_sqr_sum += centripetal_acc * centripetal_acc;

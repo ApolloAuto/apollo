@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "os_interface",
-    srcs = [
-        "os_interface.cc",
-    ],
-    hdrs = [
-        "os_interface.h",
-    ],
+    srcs = ["os_interface.cc"],
+    hdrs = ["os_interface.h"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -24,12 +20,10 @@ cc_test(
     name = "os_interface_test",
     size = "medium",
     timeout = "moderate",
-    srcs = [
-        "os_interface_test.cc",
-    ],
+    srcs = ["os_interface_test.cc"],
     deps = [
         ":os_interface",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

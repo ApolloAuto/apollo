@@ -14,14 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./general_message_base.h"
-#include "./general_channel_message.h"
-#include "./general_message.h"
-#include "./screen.h"
+#include "cyber/tools/cyber_monitor/general_message_base.h"
 
 #include <iomanip>
 #include <string>
 #include <vector>
+
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/general_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
 namespace {
 constexpr int INT_FLOAT_PRECISION = 6;
@@ -300,9 +301,12 @@ void GeneralMessageBase::PrintField(
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
       if (!jumpLines) {
         const std::string& fieldName = field->name();
-        outStr << fieldName << ": ";
-        if (field->is_repeated()) {
-          outStr << "[" << index << "] ";
+        outStr << fieldName;
+        if (!field->is_map()) {
+          outStr << ": ";
+          if (field->is_repeated()) {
+            outStr << "[" << index << "] ";
+          }
         }
         s->AddStr(indent, lineNo++, outStr.str().c_str());
       } else {

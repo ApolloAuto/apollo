@@ -29,10 +29,9 @@ using std::chrono::milliseconds;
 
 void Timer::Start() { start_time_ = Clock::Now(); }
 
-uint64_t Timer::End(const string &msg) {
+int64_t Timer::End(const string &msg) {
   end_time_ = Clock::Now();
-  uint64_t elapsed_time =
-      duration_cast<milliseconds>(end_time_ - start_time_).count();
+  int64_t elapsed_time = absl::ToInt64Milliseconds(end_time_ - start_time_);
 
   ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
 

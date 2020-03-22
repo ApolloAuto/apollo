@@ -41,16 +41,16 @@ class JsonUtil {
    * @brief Get a string value from the given json[key].
    * @return Whether the field exists and is a valid string.
    */
-  static bool GetStringFromJson(const nlohmann::json &json,
-                                const std::string &key, std::string *value);
+  static bool GetString(const nlohmann::json &json, const std::string &key,
+                        std::string *value);
 
   /**
    * @brief Get a number value from the given json[key].
    * @return Whether the field exists and is a valid number.
    */
   template <class T>
-  static bool GetNumberFromJson(const nlohmann::json &json,
-                                const std::string &key, T *value) {
+  static bool GetNumber(const nlohmann::json &json, const std::string &key,
+                        T *value) {
     const auto iter = json.find(key);
     if (iter == json.end()) {
       AERROR << "The json has no such key: " << key;
@@ -68,16 +68,16 @@ class JsonUtil {
    * @brief Get a boolean value from the given json[key].
    * @return Whether the field exists and is a valid boolean.
    */
-  static bool GetBooleanFromJson(const nlohmann::json &json,
-                                 const std::string &key, bool *value);
+  static bool GetBoolean(const nlohmann::json &json, const std::string &key,
+                         bool *value);
 
   /**
    * @brief Get a string vector from the given json[key].
    * @return Whether the field exists and is a valid string vector.
    */
-  static bool GetStringVectorFromJson(const nlohmann::json &json,
-                                      const std::string &key,
-                                      std::vector<std::string> *value);
+  static bool GetStringVector(const nlohmann::json &json,
+                              const std::string &key,
+                              std::vector<std::string> *value);
 };
 
 }  // namespace util

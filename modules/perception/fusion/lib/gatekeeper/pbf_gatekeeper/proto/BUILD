@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,9 +11,10 @@ cc_proto_library(
 
 proto_library(
     name = "pbf_gatekeeper_config_proto_lib",
-    srcs = [
-        "pbf_gatekeeper_config.proto",
-    ],
+    srcs = ["pbf_gatekeeper_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "pbf_gatekeeper_config_pb2",
+    src = "pbf_gatekeeper_config.proto",
+)

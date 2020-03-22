@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -26,7 +26,7 @@ import sys
 import colored_glog as glog
 import google.protobuf.text_format as text_format
 
-from cyber_py.record import RecordReader
+from cyber_py3.record import RecordReader
 import modules.common.configs.proto.vehicle_config_pb2 as vehicle_config_pb2
 
 import fueling.common.email_utils as email_utils
@@ -142,7 +142,7 @@ def sanity_check(input_folder, email_receivers=None):
         return True
 
     if email_receivers:
-        title = 'Error occured during data sanity check'
+        title = 'Error occurred during data sanity check'
         email_utils.send_email_error(title, {'Error': err_msg}, email_receivers)
 
     glog.error(err_msg)

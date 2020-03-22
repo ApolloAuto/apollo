@@ -2,11 +2,23 @@ workspace(name = "apollo")
 
 # googletest (GTest and GMock)
 new_http_archive(
-    name = "gtest",
+    name = "com_google_googletest",
     build_file = "third_party/gtest.BUILD",
     sha256 = "58a6f4277ca2bc8565222b3bbd58a177609e9c488e8a72649359ba51450db7d8",
     strip_prefix = "googletest-release-1.8.0",
     url = "file:///home/tmp/googletest-release-1.8.0.tar.gz",
+)
+
+# TODO(xiaoxq): Alias to help migrate legacy code in other repos. Will remove
+# very soon.
+new_local_repository(
+    name = "gtest",
+    path = "/home/tmp",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+cc_library(name = "gtest", deps = ["@com_google_googletest//:gtest"])
+cc_library(name = "main", deps = ["@com_google_googletest//:gtest_main"])
+    """,
 )
 
 # gflags
@@ -16,14 +28,9 @@ new_local_repository(
     path = "/usr/local/include/gflags",
 )
 
-bind(
-    name = "gflags",
-    actual = "@com_github_gflags_gflags//:gflags",
-)
-
 # glog
 new_local_repository(
-    name = "glog",
+    name = "com_google_glog",
     build_file = "third_party/glog.BUILD",
     path = "/usr/local/include/glog",
 )
@@ -44,21 +51,20 @@ new_local_repository(
     path = "/home/tmp/google_styleguide",
 )
 
-#ad-rss-lib
-new_git_repository(
+# ad-rss-lib
+new_http_archive(
     name = "ad_rss_lib",
     build_file = "third_party/rss_lib.BUILD",
-    tag = "v1.1.0",
-    remote = "https://github.com/intel/ad-rss-lib",
+    strip_prefix = "ad-rss-lib-1.1.0",
+    url = "file:///home/tmp/ad_rss_lib-1.1.0.tar.gz",
 )
-
 
 # eigen
 new_http_archive(
     name = "eigen",
     build_file = "third_party/eigen.BUILD",
-    sha256 = "04f8a4fa4afedaae721c1a1c756afeea20d3cdef0ce3293982cf1c518f178502",
-    strip_prefix = "eigen-eigen-b9cd8366d4e8",
+    sha256 = "ba4f95f9082ce99012d5ff320472a0e9fd0be921a20f11912f0bf7e6ca93f240",
+    strip_prefix = "eigen-git-mirror-3.2.10",
     url = "file:///home/tmp/eigen-3.2.10.tar.gz",
 )
 
@@ -71,15 +77,6 @@ new_http_archive(
     url = "file:///home/tmp/v1.11.tar.gz",
 )
 
-# curlpp
-new_http_archive(
-    name = "curlpp",
-    build_file = "third_party/curlpp.BUILD",
-    sha256 = "97e3819bdcffc3e4047b6ac57ca14e04af85380bd93afe314bee9dd5c7f46a0a",
-    strip_prefix = "curlpp-0.8.1",
-    url = "file:///home/tmp/curlpp-0.8.1.tar.gz",
-)
-
 #ros
 new_local_repository(
     name = "ros",
@@ -87,13 +84,11 @@ new_local_repository(
     path = "/home/tmp/ros",
 )
 
-# PCL 1.7
-# =======
-# This requires libpcl-dev to be installed in your Ubuntu/Debian.
+# PCL 1.9
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "/usr/local/include/pcl-1.7",
+    path = "/usr/local/include/pcl-1.9",
 )
 
 new_local_repository(
@@ -135,7 +130,7 @@ new_local_repository(
 
 # YAML-CPP
 new_http_archive(
-    name = "yaml_cpp",
+    name = "com_github_jbeder_yaml_cpp",
     build_file = "third_party/yaml_cpp.BUILD",
     strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
     url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
@@ -160,7 +155,7 @@ new_local_repository(
 new_local_repository(
     name = "ipopt",
     build_file = "third_party/ipopt.BUILD",
-    path = "/usr/local/ipopt/include/coin",
+    path = "/usr/local/ipopt/include",
 )
 
 # ADOL-C
@@ -257,13 +252,6 @@ new_http_archive(
     url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
 )
 
-# qt
-new_local_repository(
-    name = "qt",
-    build_file = "third_party/qt.BUILD",
-    path = "/usr/local/Qt5.5.1/5.5/gcc_64",
-)
-
 new_local_repository(
     name = "fastrtps",
     build_file = "third_party/fastrtps.BUILD",
@@ -307,4 +295,17 @@ new_local_repository(
     name = "ffmpeg",
     build_file = "third_party/ffmpeg.BUILD",
     path = "/usr/local/apollo/ffmpeg",
+)
+
+# boost
+new_local_repository(
+    name = "boost",
+    build_file = "third_party/boost.BUILD",
+    path = "/usr/local/apollo/boost/include",
+)
+
+new_local_repository(
+    name = "opencv",
+    build_file = "third_party/opencv.BUILD",
+    path = "/usr/include",
 )

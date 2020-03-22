@@ -26,7 +26,7 @@ namespace routing {
 
 namespace {
 
-using common::ErrorCode;
+using apollo::common::ErrorCode;
 
 bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
   for (const auto& wp : request.waypoint()) {

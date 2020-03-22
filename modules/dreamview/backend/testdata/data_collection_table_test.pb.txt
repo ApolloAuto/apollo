@@ -1,0 +1,163 @@
+frame_threshold: 2
+total_frames: 4
+scenario {
+  key: "Comparison Operator Test"
+  value {
+    feature {
+      name: "comparison operator test"
+      range {
+        name: "mps < 10"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 10
+        }
+      }
+      range {
+        name: "mps >= 10"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 10
+        }
+      }
+      range {
+        name: "Throttle == 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Throttle != 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: NOT_EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Brake <= 30%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN_OR_EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Brake > 30%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN
+          value: 30
+        }
+      }
+      range {
+        name: "Left steering < 20%"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Right steering 20% ~ 40%"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN_OR_EQUAL
+          value: -20
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN
+          value: -40
+        }
+      }
+      range {
+        name: "Throttle deadzone ~ 35%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 35
+        }
+      }
+    }
+  }
+}
+scenario {
+  key: "Category Construction Test"
+  value {
+    feature {
+      name: "Forward"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 1
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "mps < 10"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 10
+        }
+      }
+      range {
+        name: "mps >= 10"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 10
+        }
+      }
+    }
+    feature {
+      name: "Acceleration"
+      range {
+        name: "Throttle == 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Throttle != 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: NOT_EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Throttle deadzone ~ 35%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 35
+        }
+      }
+    }
+  }
+}

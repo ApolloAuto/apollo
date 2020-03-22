@@ -33,10 +33,11 @@ class Throttlestatus510 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   // config detail: {'description': 'throttle pedal enable bit(Status)', 'enum':
-  // {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE'},
-  // 'precision': 1.0, 'len': 8, 'name': 'THROTTLE_PEDAL_EN_STS',
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0,
-  // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  // {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE', 2:
+  // 'THROTTLE_PEDAL_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
+  // 'THROTTLE_PEDAL_EN_STS', 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+  // 'physical_unit': ''}
   Throttle_status__510::Throttle_pedal_en_stsType throttle_pedal_en_sts(
       const std::uint8_t* bytes, const int32_t length) const;
 
@@ -45,6 +46,22 @@ class Throttlestatus510 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type':
   // 'int', 'order': 'intel', 'physical_unit': '%'}
   int throttle_pedal_sts(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'name': 'DRIVE_MOTOR_ERR', 'enum': {0:
+  // 'DRIVE_MOTOR_ERR_NOERR', 1: 'DRIVE_MOTOR_ERR_DRV_MOTOR_ERR'},
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum', 'order': 'intel',
+  // 'physical_unit': ''}
+  Throttle_status__510::Drive_motor_errType drive_motor_err(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'name': 'BATTERY_BMS_ERR', 'enum': {0:
+  // 'BATTERY_BMS_ERR_NOERR', 1: 'BATTERY_BMS_ERR_BATTERY_ERR'},
+  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 24, 'type': 'enum', 'order': 'intel',
+  // 'physical_unit': ''}
+  Throttle_status__510::Battery_bms_errType battery_bms_err(
+      const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

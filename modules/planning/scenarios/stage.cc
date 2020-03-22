@@ -33,8 +33,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using common::time::Clock;
-using hdmap::PathOverlap;
+using apollo::common::time::Clock;
 
 namespace {
 // constexpr double kPathOptimizationFallbackCost = 2e4;
@@ -58,7 +57,7 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
   }
   for (int i = 0; i < config_.task_type_size(); ++i) {
     auto task_type = config_.task_type(i);
-    CHECK(config_map.find(task_type) != config_map.end())
+    ACHECK(config_map.find(task_type) != config_map.end())
         << "Task: " << TaskConfig::TaskType_Name(task_type)
         << " used but not configured";
     auto iter = tasks_.find(task_type);
@@ -146,8 +145,9 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
         std::move(publishable_traj_and_gear);
   } else {
     auto& trajectory =
-        frame->open_space_info().chosen_paritioned_trajectory().first;
-    auto& gear = frame->open_space_info().chosen_paritioned_trajectory().second;
+        frame->open_space_info().chosen_partitioned_trajectory().first;
+    auto& gear =
+        frame->open_space_info().chosen_partitioned_trajectory().second;
     PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
                                                  trajectory);
     auto publishable_traj_and_gear =

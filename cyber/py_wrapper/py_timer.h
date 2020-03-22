@@ -31,7 +31,6 @@ namespace cyber {
 class PyTimer {
  public:
   PyTimer() { timer_ = std::make_shared<Timer>(); }
-  ~PyTimer() {}
 
   PyTimer(uint32_t period, void (*func)(), bool oneshot) {
     std::function<void()> bound_f = std::bind(func);

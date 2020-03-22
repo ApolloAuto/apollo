@@ -12,16 +12,11 @@ cc_library(
 
 cc_library(
     name = "narrow_street_u_turn_scenario",
-    srcs = [
-        "narrow_street_u_turn_scenario.cc",
-    ],
-    hdrs = [
-        "narrow_street_u_turn_scenario.h",
-    ],
+    srcs = ["narrow_street_u_turn_scenario.cc"],
+    hdrs = ["narrow_street_u_turn_scenario.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
     ],
@@ -30,15 +25,13 @@ cc_library(
 cc_test(
     name = "narrow_street_u_turn_scenario_test",
     size = "small",
-    srcs = [
-        "narrow_street_u_turn_scenario_test.cc",
-    ],
+    srcs = ["narrow_street_u_turn_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
         ":narrow_street_u_turn",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

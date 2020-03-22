@@ -2,8 +2,12 @@
 #    sudo apt-get install python-numpy python-scipy python-matplotlib
 #    sudo pip install -r py27_requirements.txt
 
+# system utils
+supervisor
+
 # Google infras.
 glog
+grpcio-tools == 1.2.0
 protobuf == 3.1
 python-gflags
 
@@ -13,13 +17,16 @@ flask-cors
 requests >= 2.18
 simplejson
 
+# ROS env.
+PyYAML
+
 # Python tools
-pyproj == 1.9.6
+pyproj
 shapely
 
 # Data format
-PyYAML
 h5py
-pypcd
-pytz
 utm
+
+# Audio
+pyalsaaudio

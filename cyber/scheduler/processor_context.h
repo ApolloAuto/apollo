@@ -37,8 +37,7 @@ class ProcessorContext {
   virtual void Wait() = 0;
 
  protected:
-  bool stop_ = false;
-  alignas(CACHELINE_SIZE) std::atomic_flag notified_ = ATOMIC_FLAG_INIT;
+  std::atomic<bool> stop_{false};
 };
 
 }  // namespace scheduler

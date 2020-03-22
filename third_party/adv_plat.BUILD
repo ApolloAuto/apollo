@@ -15,6 +15,4 @@ cc_library(
         "include/linux/zynq_api.h",
     ],
     include_prefix = "adv_plat",
-    linkopts = [
-    ],
 )

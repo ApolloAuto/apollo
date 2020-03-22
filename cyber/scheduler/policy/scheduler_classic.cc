@@ -22,7 +22,6 @@
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/policy/classic_context.h"
 #include "cyber/scheduler/processor.h"
 
@@ -38,8 +37,6 @@ using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 SchedulerClassic::SchedulerClassic() {
   std::string conf("conf/");
@@ -104,8 +101,9 @@ void SchedulerClassic::CreateProcessor() {
 
       auto proc = std::make_shared<Processor>();
       proc->BindContext(ctx);
-      proc->SetSchedAffinity(cpuset, affinity, i);
-      proc->SetSchedPolicy(processor_policy, processor_prio);
+      SetSchedAffinity(proc->Thread(), cpuset, affinity, i);
+      SetSchedPolicy(proc->Thread(), processor_policy, processor_prio,
+                     proc->Tid());
       processors_.emplace_back(proc);
     }
   }
@@ -158,14 +156,12 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
         .emplace_back(cr);
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
-                                            cr->processor_id());
   ClassicContext::Notify(cr->group_name());
   return true;
 }
 
 bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_)) {
     return true;
   }
 
@@ -173,7 +169,8 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
     ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(crid) != id_cr_.end()) {
       auto cr = id_cr_[crid];
-      if (cr->state() == RoutineState::DATA_WAIT) {
+      if (cr->state() == RoutineState::DATA_WAIT ||
+          cr->state() == RoutineState::IO_WAIT) {
         cr->SetUpdateFlag();
       }
 
@@ -185,7 +182,7 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
 }
 
 bool SchedulerClassic::RemoveTask(const std::string& name) {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_)) {
     return true;
   }
 
@@ -209,36 +206,17 @@ bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   std::shared_ptr<CRoutine> cr = nullptr;
-  int prio;
-  std::string group_name;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(crid) != id_cr_.end()) {
       cr = id_cr_[crid];
-      prio = cr->priority();
-      group_name = cr->group_name();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
     } else {
       return false;
     }
   }
-
-  WriteLockGuard<AtomicRWLock> lk(
-      ClassicContext::rq_locks_[group_name].at(prio));
-  for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
-       it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
-    if ((*it)->id() == crid) {
-      auto cr = *it;
-
-      (*it)->Stop();
-      it = ClassicContext::cr_group_[group_name].at(prio).erase(it);
-      cr->Release();
-      return true;
-    }
-  }
-
-  return false;
+  return ClassicContext::RemoveCRoutine(cr);
 }
 
 }  // namespace scheduler

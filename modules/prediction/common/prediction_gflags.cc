@@ -25,7 +25,7 @@ DEFINE_double(prediction_trajectory_time_length, 8.0,
               "Time length of predicted trajectory (in seconds)");
 DEFINE_double(prediction_trajectory_time_resolution, 0.1,
               "Time resolution of predicted trajectory (in seconds");
-DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
+DEFINE_double(min_prediction_trajectory_spatial_length, 100.0,
               "Minimal spatial length of predicted trajectory");
 DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");
@@ -54,12 +54,20 @@ DEFINE_double(pedestrian_nearby_lane_search_radius, 5.0,
 DEFINE_int32(road_graph_max_search_horizon, 20,
              "Maximal search depth for building road graph");
 
+// Semantic Map
+DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");
+DEFINE_bool(img_show_semantic_map, false, "If show the image of semantic map.");
+
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0,
               "Distance threshold "
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
+DEFINE_int32(caution_obs_max_nums, 6,
+             "The max number of caution-level obstacles");
+DEFINE_double(caution_distance_threshold, 60.0,
+              "Distance threshold for caution obstacles");
 DEFINE_double(caution_search_distance_ahead, 50.0,
               "The distance ahead to search caution-level obstacles");
 DEFINE_double(caution_search_distance_backward, 50.0,
@@ -143,6 +151,13 @@ DEFINE_string(torch_vehicle_junction_mlp_file,
 DEFINE_string(torch_vehicle_junction_map_file,
               "/apollo/modules/prediction/data/junction_map_vehicle_model.pt",
               "Vehicle junction map model file");
+DEFINE_string(torch_vehicle_semantic_lstm_file,
+              "/apollo/modules/prediction/data/semantic_lstm_vehicle_model.pt",
+              "Vehicle semantic lstm model file, default for gpu");
+DEFINE_string(
+    torch_vehicle_semantic_lstm_cpu_file,
+    "/apollo/modules/prediction/data/semantic_lstm_vehicle_cpu_model.pt",
+    "Vehicle semantic lstm cpu model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
               "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
               "Vehicle cruise go model file");
@@ -231,7 +246,7 @@ DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
               "The default s value if no obstacle in the lane sequence.");
 DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,
               "The default l value if no obstacle in the lane sequence.");
-DEFINE_bool(enable_semantic_map, false, "If enable semantic map on prediction");
+DEFINE_bool(enable_semantic_map, true, "If enable semantic map on prediction");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,

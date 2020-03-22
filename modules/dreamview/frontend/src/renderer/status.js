@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import STORE from "store";
-import { drawSegmentsFromPoints, drawCircle, drawArrow } from "utils/draw";
+import { drawSegmentsFromPoints, drawCircle, drawArrow, disposeMeshGroup } from "utils/draw";
 
-function getPullOverStatus({ lengthFront, lengthBack, widthLeft, widthRight }) {
+function drawPullOverBox({ lengthFront, lengthBack, widthLeft, widthRight }) {
     const pullOverStatus = new THREE.Group();
     const color = 0x006AFF;
     const polygon = drawSegmentsFromPoints(
@@ -36,43 +36,45 @@ function getPullOverStatus({ lengthFront, lengthBack, widthLeft, widthRight }) {
 
 export default class PlanningStatus {
     constructor() {
-        this.pullOverStatus = null;
+        this.pullOverBox = null;
+        this.dimension = {};
     }
 
     update(planningData, coordinates, scene) {
-        // Draw pull over status
-        if (planningData) {
-            const { pullOverStatus } = planningData;
-            if (!STORE.options.customizedToggles.get('pullOverStatus')) {
-                if (this.pullOverStatus) {
-                    this.pullOverStatus.traverse((child) => {
-                        child.visible = false;
-                    });
-                }
-            } else {
-                if (this.pullOverStatus) {
-                    this.pullOverStatus.traverse((child) => {
-                        if (child.geometry !== undefined) {
-                            child.geometry.dispose();
-                            child.material.dispose();
-                        }
-                    });
-                    scene.remove(this.pullOverStatus);
-                    this.pullOverStatus = null;
-                }
-                if (pullOverStatus) {
-                    this.pullOverStatus = getPullOverStatus(pullOverStatus);
-
-                    const position = coordinates.applyOffset({
-                        x: pullOverStatus.position.x,
-                        y: pullOverStatus.position.y,
-                        z: 0.3,
-                    });
-                    this.pullOverStatus.position.set(position.x, position.y, position.z);
-                    this.pullOverStatus.rotation.set(0, 0, pullOverStatus.theta);
-                    scene.add(this.pullOverStatus);
-                }
+        const shouldDrawStatus = STORE.options.customizedToggles.get('pullOver');
+        const pullOver = _.get(planningData, 'pullOver');
+        if (!pullOver || !shouldDrawStatus) {
+            if (this.pullOverBox) {
+                this.pullOverBox.visible = false;
             }
+            return;
         }
+
+        // Dispose old status if dimension is different
+        const isNewDimension =
+            pullOver.lengthFront !== this.dimension.lengthFront ||
+            pullOver.lengthBack !== this.dimension.lengthBack ||
+            pullOver.widthLeft !== this.dimension.widthLeft ||
+            pullOver.widthRight !== this.dimension.widthRight;
+        if (this.pullOverBox && isNewDimension) {
+            disposeMeshGroup(this.pullOverBox);
+            scene.remove(this.pullOverBox);
+            this.pullOverBox = null;
+        }
+
+        // Draw pull over status
+        if (!this.pullOverBox) {
+            this.pullOverBox = drawPullOverBox(pullOver);
+            scene.add(this.pullOverBox);
+        }
+
+        // Set position and theta
+        const position = coordinates.applyOffset({
+            x: pullOver.position.x,
+            y: pullOver.position.y,
+            z: 0.3,
+        });
+        this.pullOverBox.position.set(position.x, position.y, position.z);
+        this.pullOverBox.rotation.set(0, 0, pullOver.theta);
     }
 }

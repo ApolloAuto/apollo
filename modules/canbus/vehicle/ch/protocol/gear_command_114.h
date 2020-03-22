@@ -39,7 +39,7 @@ class Gearcommand114 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'description': 'PRND control(Command)', 'enum': {1:
   // 'GEAR_CMD_PARK', 2: 'GEAR_CMD_REVERSE', 3: 'GEAR_CMD_NEUTRAL', 4:
   // 'GEAR_CMD_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'GEAR_CMD',
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
   Gearcommand114* set_gear_cmd(Gear_command_114::Gear_cmdType gear_cmd);
 
@@ -47,7 +47,7 @@ class Gearcommand114 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'description': 'PRND control(Command)', 'enum': {1:
   // 'GEAR_CMD_PARK', 2: 'GEAR_CMD_REVERSE', 3: 'GEAR_CMD_NEUTRAL', 4:
   // 'GEAR_CMD_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'GEAR_CMD',
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
   // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
   void set_p_gear_cmd(uint8_t* data, Gear_command_114::Gear_cmdType gear_cmd);
 

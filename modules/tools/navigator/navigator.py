@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     navigation_info = navigation_pb2.NavigationInfo()
     priority = 0
     for fdata in navi_files:
-        print "processing " + fdata
+        print("processing " + fdata)
         navigation_path = navigation_info.navigation_path.add()
         navigation_path.path_priority = priority
         priority += 1
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         f.close()
 
     # send navigation info to /apollo/navigation
-    r = rospy.Rate(0.5)  # 0.5hz
+    r = rospy.Rate(0.5)  # 0.5Hz
     while not rospy.is_shutdown():
         r.sleep()
         navigation_pub.publish(navigation_info)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -26,10 +26,10 @@ import os
 import sys
 import time
 
-from cyber_py import cyber
+from cyber_py3 import cyber
 from gflags import FLAGS
 
-from logger import Logger
+from common.logger import Logger
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 

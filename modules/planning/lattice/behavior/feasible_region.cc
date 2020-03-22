@@ -38,7 +38,7 @@ FeasibleRegion::FeasibleRegion(const std::array<double, 3>& init_s) {
 }
 
 double FeasibleRegion::SUpper(const double t) const {
-  CHECK(t >= 0.0);
+  ACHECK(t >= 0.0);
   return init_s_[0] + init_s_[1] * t +
          0.5 * FLAGS_longitudinal_acceleration_upper_bound * t * t;
 }
@@ -62,7 +62,7 @@ double FeasibleRegion::VLower(const double t) const {
 }
 
 double FeasibleRegion::TLower(const double s) const {
-  CHECK(s >= init_s_[0]);
+  ACHECK(s >= init_s_[0]);
 
   double delta_s = s - init_s_[0];
   double v = init_s_[1];

@@ -45,7 +45,7 @@ using apollo::drivers::canbus::SenderMessage;
 
 class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
-  explicit UltrasonicRadarMessageManager(
+  UltrasonicRadarMessageManager(
       const int entrance_num,
       const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> &writer);
   virtual ~UltrasonicRadarMessageManager() = default;

@@ -35,7 +35,7 @@ using apollo::common::time::Clock;
 Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Rerouting::ChangeLaneFailRerouting() {
-  constexpr double kRerouteThresholdToEnd = 20.0;
+  static constexpr double kRerouteThresholdToEnd = 20.0;
   for (const auto& ref_line_info : frame_->reference_line_info()) {
     if (ref_line_info.ReachedDestination() ||
         ref_line_info.SDistanceToDestination() < kRerouteThresholdToEnd) {
@@ -67,7 +67,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
   auto point = route_end_waypoint.lane->GetSmoothPoint(route_end_waypoint.s);
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint sl_point;
-  if (!reference_line.XYToSL({point.x(), point.y()}, &sl_point)) {
+  if (!reference_line.XYToSL(point, &sl_point)) {
     AERROR << "Failed to project point: " << point.ShortDebugString();
     return false;
   }

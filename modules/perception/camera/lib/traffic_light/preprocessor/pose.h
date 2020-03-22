@@ -15,9 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <eigen3/Eigen/Core>
 #include <map>
 #include <string>
+
+#include "Eigen/Core"
 
 #include "modules/perception/base/image_8u.h"
 
@@ -45,11 +46,11 @@ class CarPose {
   void setTimestamp(double ts) { timestamp_ = ts; }
   double getTimestamp() const { return timestamp_; }
 
- private:
   Eigen::Matrix4d pose_;  // car(novatel) to world pose
   std::map<std::string, Eigen::Matrix4d> c2w_poses_;  // camera to world poses
   double timestamp_;
 
+ private:
   friend std::ostream& operator<<(std::ostream& os, const CarPose&);
 };
 

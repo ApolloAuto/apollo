@@ -17,7 +17,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
     ],
@@ -26,45 +25,39 @@ cc_library(
 cc_test(
     name = "valet_parking_scenario_test",
     size = "small",
-    srcs = [
-        "valet_parking_scenario_test.cc",
-    ],
+    srcs = ["valet_parking_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
         ":valet_parking",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "stage_approaching_parking_spot_test",
     size = "small",
-    srcs = [
-        "stage_approaching_parking_spot_test.cc",
-    ],
+    srcs = ["stage_approaching_parking_spot_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
         ":valet_parking",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "stage_parking_test",
     size = "small",
-    srcs = [
-        "stage_parking_test.cc",
-    ],
+    srcs = ["stage_parking_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
         ":valet_parking",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

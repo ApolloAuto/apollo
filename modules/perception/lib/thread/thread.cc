@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lib/thread/thread.h"
 
-#include <signal.h>
+#include <csignal>
 
 #include "cyber/common/log.h"
 
@@ -42,7 +42,7 @@ void Thread::Start() {
 }
 
 void Thread::Join() {
-  CHECK(joinable_) << "Thread is not joinable";
+  ACHECK(joinable_) << "Thread is not joinable";
   int result = pthread_join(tid_, nullptr);
   CHECK_EQ(result, 0) << "Could not join thread (" << tid_ << ", "
                       << thread_name_ << ")";

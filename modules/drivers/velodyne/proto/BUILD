@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -27,4 +27,18 @@ proto_library(
     ],
 )
 
-cpplint()
+py_proto(
+    name = "velodyne_pb2",
+    src = "velodyne.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "config_pb2",
+    src = "config.proto",
+    deps = [
+        "//modules/drivers/velodyne/proto:velodyne_pb2",
+    ],
+)

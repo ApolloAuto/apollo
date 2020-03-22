@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "radar_component_config_proto_lib",
-    srcs = [
-        "radar_component_config.proto",
-    ],
+    srcs = ["radar_component_config.proto"],
 )
 
 cc_proto_library(
@@ -25,9 +23,7 @@ cc_proto_library(
 
 proto_library(
     name = "fusion_component_config_proto_lib",
-    srcs = [
-        "fusion_component_config.proto",
-    ],
+    srcs = ["fusion_component_config.proto"],
 )
 
 cc_proto_library(
@@ -39,9 +35,7 @@ cc_proto_library(
 
 proto_library(
     name = "fusion_camera_detection_proto_lib",
-    srcs = [
-        "fusion_camera_detection_component.proto",
-    ],
+    srcs = ["fusion_camera_detection_component.proto"],
 )
 
 cc_proto_library(
@@ -53,9 +47,7 @@ cc_proto_library(
 
 proto_library(
     name = "trafficlights_perception_component_proto_lib",
-    srcs = [
-        "trafficlights_perception_component.proto",
-    ],
+    srcs = ["trafficlights_perception_component.proto"],
 )
 
 cc_proto_library(
@@ -67,9 +59,7 @@ cc_proto_library(
 
 proto_library(
     name = "lane_perception_component_proto_lib",
-    srcs = [
-        "lane_perception_component.proto",
-    ],
+    srcs = ["lane_perception_component.proto"],
 )
 
 cc_proto_library(
@@ -81,9 +71,7 @@ cc_proto_library(
 
 proto_library(
     name = "motion_service_proto_lib",
-    srcs = [
-        "motion_service.proto",
-    ],
+    srcs = ["motion_service.proto"],
 )
 
 cc_proto_library(
@@ -95,9 +83,41 @@ cc_proto_library(
 
 proto_library(
     name = "lidar_component_config_proto_lib",
-    srcs = [
-        "lidar_component_config.proto",
-    ],
+    srcs = ["lidar_component_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "lane_perception_component_pb2",
+    src = "lane_perception_component.proto",
+)
+
+py_proto(
+    name = "trafficlights_perception_component_pb2",
+    src = "trafficlights_perception_component.proto",
+)
+
+py_proto(
+    name = "motion_service_pb2",
+    src = "motion_service.proto",
+    with_grpc = True,
+)
+
+py_proto(
+    name = "fusion_component_config_pb2",
+    src = "fusion_component_config.proto",
+)
+
+py_proto(
+    name = "lidar_component_config_pb2",
+    src = "lidar_component_config.proto",
+)
+
+py_proto(
+    name = "radar_component_config_pb2",
+    src = "radar_component_config.proto",
+)
+
+py_proto(
+    name = "fusion_camera_detection_component_pb2",
+    src = "fusion_camera_detection_component.proto",
+)

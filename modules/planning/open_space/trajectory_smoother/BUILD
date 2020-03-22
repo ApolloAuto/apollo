@@ -5,28 +5,22 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "dual_variable_warm_start_problem",
-    srcs = [
-        "dual_variable_warm_start_problem.cc",
-    ],
-    hdrs = [
-        "dual_variable_warm_start_problem.h",
-    ],
+    srcs = ["dual_variable_warm_start_problem.cc"],
+    hdrs = ["dual_variable_warm_start_problem.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":dual_variable_warm_start_ipopt_interface",
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
+        ":dual_variable_warm_start_slack_osqp_interface",
+        "//modules/common/time",
     ],
 )
 
 cc_library(
     name = "dual_variable_warm_start_ipopt_interface",
-    srcs = [
-        "dual_variable_warm_start_ipopt_interface.cc",
-    ],
-    hdrs = [
-        "dual_variable_warm_start_ipopt_interface.h",
-    ],
+    srcs = ["dual_variable_warm_start_ipopt_interface.cc"],
+    hdrs = ["dual_variable_warm_start_ipopt_interface.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -35,20 +29,16 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
 cc_library(
     name = "dual_variable_warm_start_ipopt_qp_interface",
-    srcs = [
-        "dual_variable_warm_start_ipopt_qp_interface.cc",
-    ],
-    hdrs = [
-        "dual_variable_warm_start_ipopt_qp_interface.h",
-    ],
+    srcs = ["dual_variable_warm_start_ipopt_qp_interface.cc"],
+    hdrs = ["dual_variable_warm_start_ipopt_qp_interface.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -57,20 +47,33 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
 cc_library(
     name = "dual_variable_warm_start_osqp_interface",
-    srcs = [
-        "dual_variable_warm_start_osqp_interface.cc",
+    srcs = ["dual_variable_warm_start_osqp_interface.cc"],
+    hdrs = ["dual_variable_warm_start_osqp_interface.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+        "@osqp",
     ],
-    hdrs = [
-        "dual_variable_warm_start_osqp_interface.h",
-    ],
+)
+
+cc_library(
+    name = "dual_variable_warm_start_slack_osqp_interface",
+    srcs = ["dual_variable_warm_start_slack_osqp_interface.cc"],
+    hdrs = ["dual_variable_warm_start_slack_osqp_interface.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -86,12 +89,8 @@ cc_library(
 
 cc_library(
     name = "distance_approach_problem",
-    srcs = [
-        "distance_approach_problem.cc",
-    ],
-    hdrs = [
-        "distance_approach_problem.h",
-    ],
+    srcs = ["distance_approach_problem.cc"],
+    hdrs = ["distance_approach_problem.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
@@ -102,8 +101,9 @@ cc_library(
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
         ":distance_approach_ipopt_relax_end_interface",
+        ":distance_approach_ipopt_relax_end_slack_interface",
         "//cyber/common:log",
-        "//modules/common/util",
+        "//modules/common/time",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
     ],
@@ -111,9 +111,7 @@ cc_library(
 
 cc_library(
     name = "distance_approach_ipopt_fixed_ts_interface",
-    srcs = [
-        "distance_approach_ipopt_fixed_ts_interface.cc",
-    ],
+    srcs = ["distance_approach_ipopt_fixed_ts_interface.cc"],
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_fixed_ts_interface.h",
@@ -130,17 +128,15 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
 cc_library(
     name = "distance_approach_ipopt_fixed_dual_interface",
-    srcs = [
-        "distance_approach_ipopt_fixed_dual_interface.cc",
-    ],
+    srcs = ["distance_approach_ipopt_fixed_dual_interface.cc"],
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_fixed_dual_interface.h",
@@ -157,17 +153,15 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
 cc_library(
     name = "distance_approach_ipopt_relax_end_interface",
-    srcs = [
-        "distance_approach_ipopt_relax_end_interface.cc",
-    ],
+    srcs = ["distance_approach_ipopt_relax_end_interface.cc"],
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_relax_end_interface.h",
@@ -184,17 +178,40 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "distance_approach_ipopt_relax_end_slack_interface",
+    srcs = ["distance_approach_ipopt_relax_end_slack_interface.cc"],
+    hdrs = [
+        "distance_approach_interface.h",
+        "distance_approach_ipopt_relax_end_slack_interface.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "//third_party:adolc",
+        "//third_party:ipopt",
+        "@eigen",
     ],
 )
 
 cc_library(
     name = "distance_approach_ipopt_interface",
-    srcs = [
-        "distance_approach_ipopt_interface.cc",
-    ],
+    srcs = ["distance_approach_ipopt_interface.cc"],
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_interface.h",
@@ -211,17 +228,15 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
 cc_library(
     name = "distance_approach_ipopt_cuda_interface",
-    srcs = [
-        "distance_approach_ipopt_cuda_interface.cc",
-    ] + select({
+    srcs = ["distance_approach_ipopt_cuda_interface.cc"] + select({
         "//tools/platforms:use_gpu": [
             "planning_block.h",
             ":planning_block",
@@ -244,20 +259,16 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
 cc_library(
     name = "iterative_anchoring_smoother",
-    srcs = [
-        "iterative_anchoring_smoother.cc",
-    ],
-    hdrs = [
-        "iterative_anchoring_smoother.h",
-    ],
+    srcs = ["iterative_anchoring_smoother.cc"],
+    hdrs = ["iterative_anchoring_smoother.h"],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -273,12 +284,8 @@ cc_library(
 
 cuda_library(
     name = "planning_block",
-    srcs = [
-        "planning_block.cu",
-    ],
-    hdrs = [
-        "planning_block.h",
-    ],
+    srcs = ["planning_block.cu"],
+    hdrs = ["planning_block.h"],
     deps = [
         "@cuda",
     ],
@@ -287,9 +294,7 @@ cuda_library(
 cc_test(
     name = "distance_approach_ipopt_interface_test",
     size = "small",
-    srcs = [
-        "distance_approach_ipopt_interface_test.cc",
-    ],
+    srcs = ["distance_approach_ipopt_interface_test.cc"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
@@ -297,16 +302,14 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "distance_approach_ipopt_cuda_interface_test",
     size = "small",
-    srcs = [
-        "distance_approach_ipopt_cuda_interface_test.cc",
-    ],
+    srcs = ["distance_approach_ipopt_cuda_interface_test.cc"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
@@ -314,16 +317,14 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "distance_approach_problem_test",
     size = "small",
-    srcs = [
-        "distance_approach_problem_test.cc",
-    ],
+    srcs = ["distance_approach_problem_test.cc"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
@@ -331,45 +332,39 @@ cc_test(
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "dual_variable_warm_start_ipopt_interface_test",
     size = "small",
-    srcs = [
-        "dual_variable_warm_start_ipopt_interface_test.cc",
-    ],
+    srcs = ["dual_variable_warm_start_ipopt_interface_test.cc"],
     deps = [
         ":dual_variable_warm_start_ipopt_interface",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "dual_variable_warm_start_osqp_interface_test",
     size = "small",
-    srcs = [
-        "dual_variable_warm_start_osqp_interface_test.cc",
-    ],
+    srcs = ["dual_variable_warm_start_osqp_interface_test.cc"],
     deps = [
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
-        "@gtest//:main",
-        "@ipopt",
+        "//third_party:ipopt",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "dual_variable_warm_start_problem_test",
     size = "small",
-    srcs = [
-        "dual_variable_warm_start_problem_test.cc",
-    ],
+    srcs = ["dual_variable_warm_start_problem_test.cc"],
     deps = [
         ":dual_variable_warm_start_problem",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

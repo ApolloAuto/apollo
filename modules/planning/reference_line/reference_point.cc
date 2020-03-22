@@ -20,13 +20,11 @@
 
 #include "modules/planning/reference_line/reference_point.h"
 
-#include "modules/common/util/string_util.h"
-#include "modules/common/util/util.h"
+#include "absl/strings/str_cat.h"
+#include "modules/common/util/point_factory.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::util::StrCat;
 
 namespace {
 // Minimum distance to remove duplicated points.
@@ -38,10 +36,8 @@ ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
     : hdmap::MapPathPoint(map_path_point), kappa_(kappa), dkappa_(dkappa) {}
 
 common::PathPoint ReferencePoint::ToPathPoint(double s) const {
-  common::PathPoint path_point = common::util::MakePathPoint(
-      x(), y(), 0.0, heading(), kappa_, dkappa_, 0.0);
-  path_point.set_s(s);
-  return path_point;
+  return common::util::PointFactory::ToPathPoint(x(), y(), 0.0, s, heading(),
+                                                 kappa_, dkappa_);
 }
 
 double ReferencePoint::kappa() const { return kappa_; }
@@ -49,9 +45,8 @@ double ReferencePoint::kappa() const { return kappa_; }
 double ReferencePoint::dkappa() const { return dkappa_; }
 
 std::string ReferencePoint::DebugString() const {
-  // StrCat only support 9 parameters
-  return StrCat("{x: ", x(), ", y: ", y(), ", theta: ", heading()) +
-         StrCat(", kappa: ", kappa(), ", dkappa: ", dkappa(), "}");
+  return absl::StrCat("{x: ", x(), ", y: ", y(), ", theta: ", heading(),
+                      ", kappa: ", kappa(), ", dkappa: ", dkappa(), "}");
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {

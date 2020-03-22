@@ -19,18 +19,16 @@
  */
 
 #pragma once
-#include <omp.h>
-#include <algorithm>
-#include <limits>
-#include <vector>
-#include "Eigen/Dense"
-#include "IpTNLP.hpp"
-#include "IpTypes.hpp"
 
-#include "adolc/adolc.h"
-#include "adolc/adolc_openmp.h"
-#include "adolc/adolc_sparse.h"
-#include "adolc/adouble.h"
+#include <adolc/adolc.h>
+#include <adolc/adolc_openmp.h>
+#include <adolc/adolc_sparse.h>
+#include <adolc/adouble.h>
+#include <omp.h>
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
+
+#include "Eigen/Dense"
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
@@ -51,6 +49,8 @@ namespace planning {
 
 class DistanceApproachInterface : public Ipopt::TNLP {
  public:
+  virtual ~DistanceApproachInterface() = default;
+
   /** Method to return some info about the nlp */
   virtual bool get_nlp_info(int& n, int& m, int& nnz_jac_g,    // NOLINT
                             int& nnz_h_lag,                    // NOLINT

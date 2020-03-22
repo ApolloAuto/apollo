@@ -49,11 +49,9 @@ bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
     if (objects->at(i)) {
       objects->at(i)->id = static_cast<int>(i);
       ComputePolygon2D(objects->at(i));
+      ComputePolygonSizeCenter(objects->at(i));
+      ComputeOtherObjectInformation(objects->at(i));
     }
-  }
-  for (size_t i = 0; i < objects->size(); ++i) {
-    ComputePolygonSizeCenter(objects->at(i));
-    ComputeOtherObjectInformation(objects->at(i));
   }
   return true;
 }

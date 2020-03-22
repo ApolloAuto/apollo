@@ -20,11 +20,12 @@
 
 #pragma once
 
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 #include <vector>
 
 #include "Eigen/Dense"
-#include "IpTNLP.hpp"
-#include "IpTypes.hpp"
+
 #include "modules/planning/math/curve1d/quintic_spiral_path_with_derivation.h"
 
 namespace apollo {
@@ -137,7 +138,7 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   std::vector<double> relative_theta_;
 
-  constexpr static size_t N = 10;
+  static constexpr size_t N = 10;
 
   std::vector<QuinticSpiralPathWithDerivation<N>> piecewise_paths_;
 

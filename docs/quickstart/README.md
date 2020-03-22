@@ -1,5 +1,12 @@
 # Quick Start Guides
 
+## Apollo 5.5
+
+- [Apollo 5.5 quick start](apollo_5_5_quick_start.md)
+- [Apollo 3.5 hardware system installation guide](apollo_3_5_hardware_system_installation_guide.md) - Since there are no changes in our Hardware setup, please refer to the Apollo 3.5 guide
+- [Apollo 5.5 technical guide](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_tutorial/apollo_5.5_technical_tutorial.md) - Everything you need to know about Apollo 5.5
+
+
 ## Apollo 5.0
 
 - [Apollo 5.0 quick start](apollo_5_0_quick_start.md)

@@ -16,8 +16,6 @@
 
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h"
 
-#include <algorithm>
-
 #include "cyber/common/log.h"
 
 #include "modules/planning/common/planning_gflags.h"
@@ -251,7 +249,8 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
       ++ind_p;
     }
   }
-  // TODO(all): need this?
+  // We indeed need this line because of
+  // https://github.com/oxfordcontrol/osqp/blob/master/src/cs.c#L255
   A_indptr->push_back(ind_p);
 }
 

@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "bitmap2d",
-    srcs = [
-        "bitmap2d.cc",
-    ],
-    hdrs = [
-        "bitmap2d.h",
-    ],
+    srcs = ["bitmap2d.cc"],
+    hdrs = ["bitmap2d.h"],
     deps = [
         "//cyber",
         "//modules/perception/lidar/common:lidar_log",
@@ -19,12 +15,8 @@ cc_library(
 
 cc_library(
     name = "hdmap_roi_filter",
-    srcs = [
-        "hdmap_roi_filter.cc",
-    ],
-    hdrs = [
-        "hdmap_roi_filter.h",
-    ],
+    srcs = ["hdmap_roi_filter.cc"],
+    hdrs = ["hdmap_roi_filter.h"],
     deps = [
         ":bitmap2d",
         ":polygon_mask",
@@ -39,25 +31,22 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 #cc_test(
 #    name = "hdmap_roi_filter_test",
 #    size = "small",
-#    srcs = [
-#        "hdmap_roi_filter_test.cc",
-#    ],
+#    srcs = ["hdmap_roi_filter_test.cc"],
 #    deps = [
 #        ":hdmap_roi_filter",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 
 cc_library(
     name = "polygon_mask",
-    hdrs = [
-        "polygon_mask.h",
-    ],
+    hdrs = ["polygon_mask.h"],
     deps = [
         ":bitmap2d",
         ":polygon_scan_cvter",
@@ -68,9 +57,7 @@ cc_library(
 
 cc_library(
     name = "polygon_scan_cvter",
-    hdrs = [
-        "polygon_scan_cvter.h",
-    ],
+    hdrs = ["polygon_scan_cvter.h"],
     deps = [
         "//modules/perception/lidar/common:lidar_log",
         "@eigen",

@@ -169,7 +169,9 @@ class EulerAnglesZXY {
     T qx = cr * sp * cy - sr * cp * sy;
     T qy = cr * sp * sy + sr * cp * cy;
     T qz = cr * cp * sy + sr * sp * cy;
-    if (qw < 0.0) return {-qw, -qx, -qy, -qz};
+    if (qw < 0.0) {
+      return {-qw, -qx, -qy, -qz};
+    }
     return {qw, qx, qy, qz};
   }
 

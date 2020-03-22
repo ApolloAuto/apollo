@@ -1,0 +1,66 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/prediction/submodules/prediction_lego.so"
+
+    components {
+        class_name : "PredictionComponent"
+        config {
+            name: "prediction"
+            config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
+            flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
+            readers: [
+                {
+                    channel: "/apollo/perception/obstacles"
+                    qos_profile: {
+                        depth : 1
+                    }
+                }
+            ]
+        }
+    }
+
+    components {
+        class_name : "EvaluatorSubmodule"
+        config {
+            name: "evaluator_submodule"
+            config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
+            flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
+            readers: [
+                {
+                    channel:"/apollo/prediction/container"
+                    qos_profile: {
+                        depth : 1
+                    }
+                }
+            ]
+        }
+    }
+
+    components {
+        class_name : "PredictorSubmodule"
+        config {
+            name: "predictor submodule"
+            config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
+            flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
+            readers: [
+                {
+                    channel: "/apollo/prediction/perception_obstacles"
+                    qos_profile: {
+                        depth : 1
+                    }
+                },
+                {
+                    channel:"/apollo/prediction/adccontainer"
+                    qos_profile: {
+                        depth : 1
+                    }
+                },
+                {
+                    channel:"/apollo/prediction/evaluator"
+                    qos_profile: {
+                        depth : 1
+                    }
+                }
+            ]
+        }
+    }
+}

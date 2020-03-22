@@ -16,8 +16,8 @@
 
 #include "cyber/transport/dispatcher/shm_dispatcher.h"
 
-#include <gtest/gtest.h>
 #include <memory>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"

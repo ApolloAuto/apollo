@@ -15,12 +15,13 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/localization/msf/local_map/base_map/base_map.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMap : public BaseMap {
  public:
@@ -67,6 +68,7 @@ class PyramidMap : public BaseMap {
                                   unsigned int level = 0);
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

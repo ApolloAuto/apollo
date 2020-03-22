@@ -5,15 +5,7 @@ package apollo.prediction;
 import "modules/common/proto/pnc_point.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_conf.proto";
-
-message CNNFeatures {
-  optional uint32 dim0 = 1;
-  optional uint32 dim1 = 2;
-  optional uint32 dim2 = 3;
-  // The arrange of feature values are in the order of dim0, dim1, dim2
-  repeated double feature_value = 4;
-  optional int32 label = 5;
-}
+import "modules/prediction/proto/scenario.proto";
 
 message DataForLearning {
   // The task category of the data for learning
@@ -39,6 +31,7 @@ message PredictionResult {
   optional double timestamp = 2;
   repeated Trajectory trajectory = 3;
   optional ObstacleConf obstacle_conf = 4;
+  optional Scenario scenario = 5;
 }
 
 message ListPredictionResult {

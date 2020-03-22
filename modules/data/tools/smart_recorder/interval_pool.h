@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/macros.h"
 
 namespace apollo {
@@ -45,11 +46,19 @@ class IntervalPool {
   void Reset();
   void PrintIntervals() const;
   Interval GetNextInterval() const;
+  void SetIntervalEventLogFilePath(const std::string& path,
+                                   const std::string& task_id) {
+    interval_event_log_file_path_ = absl::StrCat(path, "_", task_id);
+  }
+  void LogIntervalEvent(const std::string& name, const std::string& description,
+                        const uint64_t msg_time, const uint64_t backward_time,
+                        const uint64_t forward_time) const;
 
  private:
   std::vector<Interval> pool_;
   std::vector<Interval>::iterator pool_iter_;
   std::set<uint64_t> accu_end_values_;
+  std::string interval_event_log_file_path_;
 
   DECLARE_SINGLETON(IntervalPool)
 };

@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "open_space_trajectory_partition",
-    srcs = [
-        "open_space_trajectory_partition.cc",
-    ],
-    hdrs = [
-        "open_space_trajectory_partition.h",
-    ],
+    srcs = ["open_space_trajectory_partition.cc"],
+    hdrs = ["open_space_trajectory_partition.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
@@ -24,12 +20,10 @@ cc_library(
 cc_test(
     name = "open_space_trajectory_partition_test",
     size = "small",
-    srcs = [
-        "open_space_trajectory_partition_test.cc",
-    ],
+    srcs = ["open_space_trajectory_partition_test.cc"],
     deps = [
         ":open_space_trajectory_partition",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

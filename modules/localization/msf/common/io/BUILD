@@ -8,20 +8,9 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//cyber",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
         "@pcl",
-        "@yaml_cpp//:yaml",
-    ],
-)
-
-cc_test(
-    name = "localization_msf_velodyne_utility_test",
-    size = "small",
-    timeout = "short",
-    srcs = ["velodyne_utility_test.cc"],
-    deps = [
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "@gtest//:main",
     ],
 )
 

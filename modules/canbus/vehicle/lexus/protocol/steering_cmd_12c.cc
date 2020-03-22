@@ -116,6 +116,7 @@ void Steeringcmd12c::set_p_clear_faults(uint8_t* data, bool clear_faults) {
 }
 
 Steeringcmd12c* Steeringcmd12c::set_position(double position) {
+  // TODO(AS): fix this direction and scaling.
   position_ = position;
   return this;
 }
@@ -125,7 +126,7 @@ Steeringcmd12c* Steeringcmd12c::set_position(double position) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad'}
 void Steeringcmd12c::set_p_position(uint8_t* data, double position) {
   position = ProtocolData::BoundedValue(-32.768, 32.767, position);
-  int x = static_cast<int>(position / 0.001000);
+  int x = static_cast<int>(position / -0.001000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);

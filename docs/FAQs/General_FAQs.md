@@ -39,9 +39,9 @@ Yes, currently all comments need to be made in Doxygen.
 
 ---
 ## If I cannot solve my build problems, what is the most effective way to ask for help?
-Many build problems are related to the environment settings. 
+Many build problems are related to the environment settings.
 
-1. Run the script to get your environment: `bash scripts/env.sh >& env.txt` 
+1. Run the script to get your environment: `bash scripts/env.sh >& env.txt`
 
 2. Post the content of env.txt to our Github issues page and someone from our team will get in touch with you.
 
@@ -52,10 +52,10 @@ Use these ports for HMI and Dreamview:
 
 ---
 ## Why there is no ROS environment in dev docker?
-The ROS package is downloaded when you start to build apollo: 
-`bash apollo.sh build`. 
+The ROS package is downloaded when you start to build apollo:
+`bash apollo.sh build`.
 
-1. Run the following command inside Docker to set up the ROS environment after the build is complete: 
+1. Run the following command inside Docker to set up the ROS environment after the build is complete:
 `source /apollo/scripts/apollo_base.sh`
 
 2. Run ROS-related commands such as rosbag, rostopic and so on.

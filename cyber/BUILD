@@ -19,31 +19,23 @@ cc_binary(
         "mainboard/module_controller.cc",
         "mainboard/module_controller.h",
     ],
-    copts = [
-        "-pthread",
-    ],
     linkstatic = False,
     deps = [
         ":cyber_core",
         "//cyber/proto:dag_conf_cc_proto",
+        "//third_party:pthread",
     ],
 )
 
 cc_library(
     name = "binary",
-    hdrs = [
-        "binary.h",
-    ],
+    hdrs = ["binary.h"],
 )
 
 cc_library(
     name = "state",
-    srcs = [
-        "state.cc",
-    ],
-    hdrs = [
-        "state.h",
-    ],
+    srcs = ["state.cc"],
+    hdrs = ["state.h"],
     deps = [
         "//cyber/common",
     ],
@@ -51,33 +43,23 @@ cc_library(
 
 cc_library(
     name = "init",
-    srcs = [
-        "init.cc",
-    ],
-    hdrs = [
-        "init.h",
-    ],
+    srcs = ["init.cc"],
+    hdrs = ["init.h"],
     deps = [
         "//cyber:state",
         "//cyber/logger:async_logger",
         "//cyber/node",
+        "//cyber/sysmo",
         "//cyber/timer:timing_wheel",
     ],
 )
 
 cc_library(
     name = "cyber_core",
-    srcs = [
-        "cyber.cc",
-    ],
-    hdrs = [
-        "cyber.h",
-    ],
+    srcs = ["cyber.cc"],
+    hdrs = ["cyber.h"],
     linkopts = [
-        "-lglog",
-        "-lgflags",
         "-lprotobuf",
-        "-luuid",
     ],
     deps = [
         "//cyber:binary",
@@ -110,6 +92,7 @@ cc_library(
         "//cyber/service",
         "//cyber/service:client",
         "//cyber/service_discovery:topology_manager",
+        "//cyber/sysmo",
         "//cyber/task",
         "//cyber/time",
         "//cyber/time:duration",
@@ -118,6 +101,8 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
+        "//third_party:rt",
+        "//third_party:uuid",
         "//third_party/tf2",
         "@fastrtps",
     ],

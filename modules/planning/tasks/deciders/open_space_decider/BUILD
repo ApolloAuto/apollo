@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "open_space_roi_decider",
-    srcs = [
-        "open_space_roi_decider.cc",
-    ],
-    hdrs = [
-        "open_space_roi_decider.h",
-    ],
+    srcs = ["open_space_roi_decider.cc"],
+    hdrs = ["open_space_roi_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:planning_context",
@@ -20,12 +16,8 @@ cc_library(
 
 cc_library(
     name = "open_space_pre_stop_decider",
-    srcs = [
-        "open_space_pre_stop_decider.cc",
-    ],
-    hdrs = [
-        "open_space_pre_stop_decider.h",
-    ],
+    srcs = ["open_space_pre_stop_decider.cc"],
+    hdrs = ["open_space_pre_stop_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:reference_line_info",
@@ -36,12 +28,8 @@ cc_library(
 
 cc_library(
     name = "open_space_fallback_decider",
-    srcs = [
-        "open_space_fallback_decider.cc",
-    ],
-    hdrs = [
-        "open_space_fallback_decider.h",
-    ],
+    srcs = ["open_space_fallback_decider.cc"],
+    hdrs = ["open_space_fallback_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -54,24 +42,20 @@ cc_library(
 cc_test(
     name = "open_space_roi_decider_test",
     size = "small",
-    srcs = [
-        "open_space_roi_decider_test.cc",
-    ],
+    srcs = ["open_space_roi_decider_test.cc"],
     deps = [
         ":open_space_roi_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "open_space_fallback_decider_test",
     size = "small",
-    srcs = [
-        "open_space_fallback_decider_test.cc",
-    ],
+    srcs = ["open_space_fallback_decider_test.cc"],
     deps = [
         ":open_space_fallback_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

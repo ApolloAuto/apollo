@@ -6,13 +6,23 @@ cc_library(
     name = "localization_msf_common_util_compression",
     srcs = ["compression.cc"],
     hdrs = ["compression.h"],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
+        "//third_party:boost",
         "@eigen",
+    ],
+)
+
+cc_library(
+    name = "localization_msf_common_util_file_utility",
+    srcs = ["file_utility.cc"],
+    hdrs = ["file_utility.h"],
+    deps = [
+        "//cyber/common:log",
+        "//third_party:boost",
+        "@com_google_glog//:glog",
+        "@eigen",
+        "@fastrtps",
     ],
 )
 
@@ -20,12 +30,9 @@ cc_library(
     name = "localization_msf_common_util_system_utility",
     srcs = ["system_utility.cc"],
     hdrs = ["system_utility.h"],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
+        "//third_party:boost",
         "@eigen",
     ],
 )
@@ -50,12 +57,9 @@ cc_library(
         "time_conversion.h",
         "voxel_grid_covariance_hdmap.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
+        "//third_party:boost",
         "@eigen",
     ],
 )
@@ -67,7 +71,7 @@ cc_test(
     srcs = ["compression_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -78,7 +82,7 @@ cc_test(
     srcs = ["rect2d_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -95,7 +99,8 @@ cc_test(
     data = ["localization_msf_common_test_data"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
-        "@gtest//:main",
+        "//third_party:boost",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -106,7 +111,7 @@ cc_test(
     srcs = ["frame_transform_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_frame_transform",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -17,7 +17,7 @@ cc_test(
     srcs = ["recurrent_runner_test.cc"],
     deps = [
         ":recurrent_runner",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

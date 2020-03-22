@@ -10,13 +10,12 @@ enum SolutionStatus {
   NO_CONVERGENCE = 2;    // no convergence
   SINGULARITY = 3;       // singularity at parameters matrix
   COV_TRACE = 4;         // covariance trace exceeds maximum (trace > 1000 m)
-  TEST_DIST =
-      5;  // test distance exceeded (max of 3 rejections if distance > 10
-          // km)
-  COLD_START = 6;          // not yet converged from cold start
-  V_H_LIMIT = 7;           // height or velocity limits exceeded
-  VARIANCE = 8;            // variance exceeds limits
-  RESIDUALS = 9;           // residuals are too large
+  TEST_DIST = 5;   // test distance exceeded (max of 3 rejections if distance >
+                   // 10 km)
+  COLD_START = 6;  // not yet converged from cold start
+  V_H_LIMIT = 7;   // height or velocity limits exceeded
+  VARIANCE = 8;    // variance exceeds limits
+  RESIDUALS = 9;   // residuals are too large
   INTEGRITY_WARNING = 13;  // large residuals make position questionable
   PENDING = 18;  // receiver computes its position and determines if the fixed
                  // position is valid

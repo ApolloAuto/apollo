@@ -62,9 +62,8 @@ class VehicleController {
    */
   virtual common::ErrorCode Init(
       const VehicleParameter &params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>
-          *const message_manager) = 0;
+      CanSender<ChassisDetail> *const can_sender,
+      MessageManager<ChassisDetail> *const message_manager) = 0;
 
   /**
    * @brief start the vehicle controller.
@@ -161,8 +160,8 @@ class VehicleController {
  protected:
   canbus::VehicleParameter params_;
   common::VehicleParam vehicle_params_;
-  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
-  MessageManager<::apollo::canbus::ChassisDetail> *message_manager_ = nullptr;
+  CanSender<ChassisDetail> *can_sender_ = nullptr;
+  MessageManager<ChassisDetail> *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
   bool is_reset_ = false;  // reset command from control command

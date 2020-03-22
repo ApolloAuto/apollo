@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,6 +23,8 @@
 #include "torch/torch.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
+
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,8 +44,10 @@ class CruiseMLPEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract feature vector
@@ -74,10 +77,12 @@ class CruiseMLPEvaluator : public Evaluator {
   /**
    * @brief Set interaction feature vector
    * @param Obstacle pointer
-   *        Lane sequence pointer
-   *        Feature container in a vector for receiving the feature values
+   * @param Obstacles container
+   * @param Lane sequence pointer
+   * @param Feature container in a vector for receiving the feature values
    */
   void SetInteractionFeatureValues(Obstacle* obstacle_ptr,
+                                   ObstaclesContainer* obstacles_container,
                                    LaneSequence* lane_sequence_ptr,
                                    std::vector<double>* feature_values);
 
@@ -96,10 +101,9 @@ class CruiseMLPEvaluator : public Evaluator {
    */
   void LoadModels();
 
-  void ModelInference(
-      const std::vector<torch::jit::IValue>& torch_inputs,
-      std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
-      LaneSequence* lane_sequence_ptr);
+  void ModelInference(const std::vector<torch::jit::IValue>& torch_inputs,
+                      torch::jit::script::Module torch_model_ptr,
+                      LaneSequence* lane_sequence_ptr);
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23 + 5 * 9;
@@ -107,8 +111,8 @@ class CruiseMLPEvaluator : public Evaluator {
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
 
-  std::shared_ptr<torch::jit::script::Module> torch_go_model_ptr_ = nullptr;
-  std::shared_ptr<torch::jit::script::Module> torch_cutin_model_ptr_ = nullptr;
+  torch::jit::script::Module torch_go_model_;
+  torch::jit::script::Module torch_cutin_model_;
   torch::Device device_;
 };
 

@@ -30,7 +30,6 @@ using apollo::common::time::Clock;
 MSFLocalizationComponent::MSFLocalizationComponent() {}
 
 bool MSFLocalizationComponent::Init() {
-  Clock::SetMode(Clock::CYBER);
   publisher_.reset(new LocalizationMsgPublisher(this->node_));
 
   if (!InitConfig()) {
@@ -159,25 +158,21 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
   tf2_broadcaster_.SendTransform(tf2_msg);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishLocalizationMsfGnss(
     const LocalizationEstimate& localization) {
   gnss_local_talker_->Write(localization);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishLocalizationMsfLidar(
     const LocalizationEstimate& localization) {
   lidar_local_talker_->Write(localization);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishLocalizationStatus(

@@ -1,6 +1,8 @@
+#!/usr/bin/env python2
+
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -16,25 +18,23 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-import os
 import importlib
-import time
+import os
+import sys
+
 
 # init vars
-CYBER_PATH = os.environ['CYBER_PATH']
+CYBER_PATH = os.environ.get('CYBER_PATH', '/apollo/cyber')
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
 sys.path.append(CYBER_PATH + "/third_party/")
 sys.path.append(CYBER_PATH + "/lib/")
-sys.path.append(CYBER_PATH + "/python/cyber")
-sys.path.append(CYBER_PATH + "/python/cyber_py")
 
 sys.path.append(CYBER_PATH + "/lib/python/")
 
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
-_CYBER_INIT = importlib.import_module('_cyber_init')
+_CYBER = importlib.import_module('_cyber')
 _CYBER_TIME = importlib.import_module('_cyber_time')
 
 
@@ -170,12 +170,13 @@ class Time(object):
         """
         return _CYBER_TIME.PyTime_to_nsec(self.time)
 
-    def sleep_until(self, time):
+    def sleep_until(self, cyber_time):
         """
         sleep until time.
         """
         if isinstance(time, Time):
-            return _CYBER_TIME.PyTime_sleep_until(self.time, time.to_nsec())
+            return _CYBER_TIME.PyTime_sleep_until(self.time,
+                                                  cyber_time.to_nsec())
         return NotImplemented
 
     def __sub__(self, other):

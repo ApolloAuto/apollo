@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <memory>
 
 #include "modules/routing/proto/routing.pb.h"
 
@@ -29,6 +28,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -49,8 +49,10 @@ using apollo::common::math::Polygon2d;
 using apollo::common::time::Clock;
 using apollo::prediction::PredictionObstacles;
 
+DrivingAction Frame::pad_msg_driving_action_ = DrivingAction::NONE;
+
 FrameHistory::FrameHistory()
-    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
+    : IndexedQueue<uint32_t, Frame>(FLAGS_max_frame_history_num) {}
 
 Frame::Frame(uint32_t sequence_num)
     : sequence_num_(sequence_num),
@@ -97,8 +99,7 @@ bool Frame::Rerouting() {
   auto request = local_view_.routing->routing_request();
   request.clear_header();
 
-  auto point = common::util::MakePointENU(
-      vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
+  auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
   double s = 0.0;
   double l = 0.0;
   hdmap::LaneInfoConstPtr lane;
@@ -193,7 +194,6 @@ bool Frame::CreateReferenceLineInfo(
   for (auto &ref_info : reference_line_info_) {
     if (!ref_info.Init(obstacles())) {
       AERROR << "Failed to init reference line";
-      continue;
     } else {
       has_valid_reference_line = true;
     }
@@ -217,7 +217,7 @@ const Obstacle *Frame::CreateStopObstacle(
   const double box_center_s = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
   auto box_center = reference_line.GetReferencePoint(box_center_s);
   double heading = reference_line.GetReferencePoint(obstacle_s).heading();
-  constexpr double kStopWallWidth = 4.0;
+  static constexpr double kStopWallWidth = 4.0;
   Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
                       kStopWallWidth};
 
@@ -373,6 +373,8 @@ Status Frame::InitFrameData() {
 
   ReadTrafficLights();
 
+  ReadPadMsgDrivingAction();
+
   return Status::OK();
 }
 
@@ -497,6 +499,18 @@ perception::TrafficLight Frame::GetSignal(
   return *result;
 }
 
+void Frame::ReadPadMsgDrivingAction() {
+  if (local_view_.pad_msg) {
+    if (local_view_.pad_msg->has_action()) {
+      pad_msg_driving_action_ = local_view_.pad_msg->action();
+    }
+  }
+}
+
+void Frame::ResetPadMsgDrivingAction() {
+  pad_msg_driving_action_ = DrivingAction::NONE;
+}
+
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   double min_cost = std::numeric_limits<double>::infinity();
   drive_reference_line_info_ = nullptr;
@@ -508,6 +522,28 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
     }
   }
   return drive_reference_line_info_;
+}
+
+const ReferenceLineInfo *Frame::FindTargetReferenceLineInfo() {
+  const ReferenceLineInfo *target_reference_line_info = nullptr;
+  for (const auto &reference_line_info : reference_line_info_) {
+    if (reference_line_info.IsChangeLanePath()) {
+      return &reference_line_info;
+    }
+    target_reference_line_info = &reference_line_info;
+  }
+  return target_reference_line_info;
+}
+
+const ReferenceLineInfo *Frame::FindFailedReferenceLineInfo() {
+  for (const auto &reference_line_info : reference_line_info_) {
+    // Find the unsuccessful lane-change path
+    if (!reference_line_info.IsDrivable() &&
+        reference_line_info.IsChangeLanePath()) {
+      return &reference_line_info;
+    }
+  }
+  return nullptr;
 }
 
 const ReferenceLineInfo *Frame::DriveReferenceLineInfo() const {

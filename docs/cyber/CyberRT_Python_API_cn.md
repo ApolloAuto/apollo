@@ -1,31 +1,34 @@
 ## 1. 背景
-   Cyber核心代码是由C++开发，同时为了方便开发者，提供了Python接口。
 
-## 2. CyberRT Python接口实现思路
-   Cyber Python接口的实现思路是在Cyber C++实现的基础上，做了一层Python的封装，由Python来调用C++的实现函数。Cyber Python Wrapper的实现没有使用swig等第三方工具，完全自主实现，以此保证代码的高可维护性和可读性。
+   Cyber 核心代码是由 C++ 开发，同时为了方便开发者，提供了 Python 接口。
+
+## 2. CyberRT Python 接口实现思路
+
+   Cyber Python 接口的实现思路是在 Cyber C++ 实现的基础上，做了一层 Python 的封装，由 Python 来调用 C++ 的实现函数。Cyber Python Wrapper 的实现没有使用 swig 等第三方工具，完全自主实现，以此保证代码的高可维护性和可读性。
 
 ## 3. 主要接口
+
    目前提供的主要接口包括：
 
-* channel读、写
-* server/client通信
-* record信息查询
-* record文件读、写
-* Time/Duration/Rate时间操作
+* channel 读、写
+* server/client 通信
+* record 信息查询
+* record 文件读、写
+* Time/Duration/Rate 时间操作
 * Timer
 
-### 3.1 Channel读写接口
+### 3.1 Channel 读写接口
 
 使用步骤是：
 
-1. 首先创建Node;
-2. 创建对应的reader 或 writer；
-3. 如果是向channel写数据，调用writer的write接口；
-4. 如果是从channel读数据，调用node的spin，对收到的消息进行消费；
+1. 首先创建 Node;
+2. 创建对应的 reader 或 writer；
+3. 如果是向 channel 写数据，调用 writer 的 write 接口；
+4. 如果是从 channel 读数据，调用 node 的 spin，对收到的消息进行消费；
 
 接口定义如下：
 
-```
+```python
 class Node:
     """
     Class for cyber Node wrapper.
@@ -72,21 +75,21 @@ class Writer(object):
         """
 ```
 
-### 3.2 Record接口
+### 3.2 Record 接口
 
-Record读的操作是：
+Record 读的操作是：
 
-1. 创建一个RecordReader;
-2. 对Record进行迭代读;
+1. 创建一个 RecordReader;
+2. 对 Record 进行迭代读；
 
-Record写的操作是：
+Record 写的操作是：
 
-1. 创建一个RecordWriter
-2. 对Record进行写消息；
+1. 创建一个 RecordWriter
+2. 对 Record 进行写消息；
 
 接口定义如下：
 
-```
+```python
 class RecordReader(object):
     """
     Class for cyber RecordReader wrapper.
@@ -171,14 +174,12 @@ class RecordWriter(object):
         """
 ```
 
-### 3.3 Time接口
+### 3.3 Time 接口
 
-```
+```python
 class Time(object):
 	@staticmethod
     def now():
-        # print _CYBER_TIME.PyTime_now()
-        # print type(_CYBER_TIME.PyTime_now())
         time_now = Time(_CYBER_TIME.PyTime_now())
         return time_now
 
@@ -197,8 +198,8 @@ class Time(object):
         return _CYBER_TIME.PyTime_sleep_until(self.time, nanoseconds)
 ```
 
+### 3.4 Timer 接口
 
-### 3.4 Timer接口
 ```
 
 class Timer(object):
@@ -221,9 +222,10 @@ class Timer(object):
 ```
 
 ## 4. 例子
-### 4.1 读channel (参见python/examples/listener.py)
 
-```
+### 4.1 读 channel （参见 python/examples/listener.py)
+
+```python
 import sys
 sys.path.append("../")
 from cyber_py import cyber
@@ -258,9 +260,9 @@ if __name__ == '__main__':
 
 ```
 
-### 4.2 写channel(参见python/examples/talker.py)
+### 4.2 写 channel（参见 python/examples/talker.py)
 
-```
+```python
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 from cyber_py import cyber
 """Module for example of talker."""
@@ -294,9 +296,9 @@ if __name__ == '__main__':
 
 ```
 
-### 4.3 读写消息到Record文件(参见python/examples/record.py)
+### 4.3 读写消息到 Record 文件（参见 python/examples/record.py)
 
-```
+```python
 """Module for example of record."""
 
 import time
@@ -359,7 +361,6 @@ def test_record_reader(reader_path):
         print "msgtime -> %d" % timestamp
         print "msgnum -> %d" % freader.get_messagenumber(channelname)
         print "msgtype -> %s" % datatype
-        # print "pbdesc -> %s" % freader.get_protodesc(channelname)
         count = count + 1
 
 if __name__ == '__main__':

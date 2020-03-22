@@ -1,0 +1,186 @@
+scenario_type: PARK_AND_GO
+park_and_go_config: {
+  front_obstacle_buffer: 10.0
+  heading_buffer: 0.3
+  min_dist_to_dest: 10.0
+  max_steering_percentage_when_cruise: 20.0
+}
+
+stage_type: PARK_AND_GO_CHECK
+stage_type: PARK_AND_GO_ADJUST
+stage_type: PARK_AND_GO_PRE_CRUISE
+stage_type: PARK_AND_GO_CRUISE
+
+stage_config: {
+  stage_type: PARK_AND_GO_CHECK
+  enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+    task_type: OPEN_SPACE_ROI_DECIDER
+    open_space_roi_decider_config {
+      roi_type: PARK_AND_GO
+      perception_obstacle_buffer: 0.0
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  }
+  task_config: {
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
+}
+
+stage_config:{
+  stage_type: PARK_AND_GO_ADJUST
+  enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+    task_type: OPEN_SPACE_ROI_DECIDER
+    open_space_roi_decider_config {
+      roi_type: PARK_AND_GO
+      roi_line_segment_min_angle: 0.15
+      roi_line_segment_length: 0.2
+      perception_obstacle_buffer: 0.5
+      end_pose_s_distance: 10.0
+      roi_longitudinal_range_start : 10.0
+      roi_longitudinal_range_end : 20.0
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+    open_space_trajectory_provider_config {
+      open_space_trajectory_optimizer_config {
+        planner_open_space_config {
+          iterative_anchoring_smoother_config {
+            s_curve_config {
+              acc_weight: 1.0
+              jerk_weight: 1.0
+              kappa_penalty_weight: 100.0
+              ref_s_weight: 100.0
+              ref_v_weight: 0.0
+            }
+          }
+        }
+      }
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  }
+  task_config: {
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
+}
+
+stage_config:{
+  stage_type: PARK_AND_GO_PRE_CRUISE
+  enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+    task_type: OPEN_SPACE_ROI_DECIDER
+    open_space_roi_decider_config {
+      roi_type: PARK_AND_GO
+      perception_obstacle_buffer: 0.5
+      end_pose_s_distance: 5.0
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+    open_space_trajectory_provider_config {
+      open_space_trajectory_optimizer_config {
+        planner_open_space_config {
+          iterative_anchoring_smoother_config {
+            s_curve_config {
+              acc_weight: 1.0
+              jerk_weight: 1.0
+              kappa_penalty_weight: 100.0
+              ref_s_weight: 100.0
+              ref_v_weight: 0.0
+            }
+          }
+        }
+      }
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  }
+  task_config: {
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
+}
+
+stage_config:{
+  stage_type: PARK_AND_GO_CRUISE
+  enabled: true
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
+  task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_type: DECIDER_RSS
+  task_config: {
+    task_type: PATH_LANE_BORROW_DECIDER
+    path_lane_borrow_decider_config {
+      allow_lane_borrowing: true
+    }
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+    path_decider_config{
+      static_obstacle_buffer: 0.2
+    }
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: DP_ST_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: DECIDER_RSS
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
+}

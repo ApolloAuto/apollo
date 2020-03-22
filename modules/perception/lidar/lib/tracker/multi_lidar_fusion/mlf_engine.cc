@@ -32,15 +32,15 @@ using cyber::common::GetAbsolutePath;
 bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_engine.conf");
   MlfEngineConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   main_sensor_.clear();
   for (int i = 0; i < config.main_sensor_size(); ++i) {
@@ -63,11 +63,11 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
 
   matcher_.reset(new MlfTrackObjectMatcher);
   MlfTrackObjectMatcherInitOptions matcher_init_options;
-  CHECK(matcher_->Init(matcher_init_options));
+  ACHECK(matcher_->Init(matcher_init_options));
 
   tracker_.reset(new MlfTracker);
   MlfTrackerInitOptions tracker_init_options;
-  CHECK(tracker_->Init(tracker_init_options));
+  ACHECK(tracker_->Init(tracker_init_options));
   return true;
 }
 
@@ -111,7 +111,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
   RemoveStaleTrackData("background", frame->timestamp, &background_track_data_);
   AINFO << "MlfEngine publish objects: " << frame->tracked_objects.size()
         << " sensor_name: " << frame->sensor_info.name
-        << " at timestamp: " << std::to_string(frame->timestamp);
+        << " at timestamp: " << frame->timestamp;
   return true;
 }
 
@@ -195,8 +195,11 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
       if (!output_predict_objects_ && track_data->is_current_state_predicted_) {
         ++num_predict;
       } else {
-        CHECK(track_data->ToObject(-global_to_local_offset_, frame->timestamp,
-                                   tracked_objects[pos]));
+        if (!track_data->ToObject(-global_to_local_offset_, frame->timestamp,
+                                  tracked_objects[pos])) {
+          AERROR << "Tracking failed";
+          continue;
+        }
         ++pos;
       }
     }
@@ -206,7 +209,10 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   if (num_predict != 0) {
     AINFO << "MlfEngine, num_predict: " << num_predict
           << " num_objects: " << num_objects;
-    CHECK(num_predict <= num_objects);
+    if (num_predict > num_objects) {
+      AERROR << "num_predict > num_objects";
+      return;
+    }
     tracked_objects.resize(num_objects - num_predict);
   }
 }

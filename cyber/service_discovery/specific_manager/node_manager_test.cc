@@ -16,10 +16,9 @@
 
 #include "cyber/service_discovery/specific_manager/node_manager.h"
 
-#include <gtest/gtest.h>
 #include <memory>
-#include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 
@@ -54,13 +53,13 @@ TEST_F(NodeManagerTest, node_change) {
   role_attr.set_node_id(node_id);
 
   EXPECT_FALSE(node_manager_->Join(role_attr, RoleType::ROLE_WRITER));
-  EXPECT_TRUE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
 
   EXPECT_TRUE(node_manager_->HasNode("node"));
 
   // node leave
   EXPECT_FALSE(node_manager_->Leave(role_attr, RoleType::ROLE_WRITER));
-  EXPECT_TRUE(node_manager_->Leave(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Leave(role_attr, RoleType::ROLE_NODE));
 
   EXPECT_FALSE(node_manager_->HasNode("node"));
 }
@@ -73,7 +72,7 @@ TEST_F(NodeManagerTest, topo_module_leave) {
   uint64_t node_id = common::GlobalData::RegisterNode("node");
   role_attr.set_node_id(node_id);
 
-  EXPECT_TRUE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
   EXPECT_TRUE(node_manager_->HasNode("node"));
 }
 
@@ -89,13 +88,13 @@ TEST_F(NodeManagerTest, add_and_remove_change_listener) {
   uint64_t node_id = common::GlobalData::RegisterNode("node");
   role_attr.set_node_id(node_id);
 
-  EXPECT_TRUE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
   EXPECT_TRUE(recv_flag);
 
   node_manager_->RemoveChangeListener(conn);
 
   recv_flag = false;
-  EXPECT_TRUE(node_manager_->Leave(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Leave(role_attr, RoleType::ROLE_NODE));
   EXPECT_FALSE(recv_flag);
 }
 
@@ -107,7 +106,7 @@ TEST_F(NodeManagerTest, has_node) {
   uint64_t node_id = common::GlobalData::RegisterNode("node");
   role_attr.set_node_id(node_id);
 
-  EXPECT_TRUE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
 
   EXPECT_TRUE(node_manager_->HasNode("node"));
   EXPECT_FALSE(node_manager_->HasNode("node11"));
@@ -121,7 +120,7 @@ TEST_F(NodeManagerTest, get_nodes) {
   uint64_t node_id = common::GlobalData::RegisterNode("node_1");
   role_attr.set_node_id(node_id);
 
-  EXPECT_TRUE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
+  EXPECT_FALSE(node_manager_->Join(role_attr, RoleType::ROLE_NODE));
 
   std::vector<RoleAttributes> attr_nodes;
   node_manager_->GetNodes(&attr_nodes);

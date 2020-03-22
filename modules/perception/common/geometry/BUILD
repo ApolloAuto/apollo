@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "basic",
-    hdrs = [
-        "basic.h",
-    ],
+    hdrs = ["basic.h"],
     deps = [
         ":common",
         "@eigen",
@@ -15,9 +13,7 @@ cc_library(
 
 cc_library(
     name = "common",
-    hdrs = [
-        "common.h",
-    ],
+    hdrs = ["common.h"],
     deps = [
         "//modules/perception/base:box",
         "//modules/perception/base:point_cloud",
@@ -26,9 +22,7 @@ cc_library(
 
 cc_library(
     name = "convex_hull_2d",
-    hdrs = [
-        "convex_hull_2d.h",
-    ],
+    hdrs = ["convex_hull_2d.h"],
     deps = [
         "@eigen",
     ],
@@ -36,12 +30,8 @@ cc_library(
 
 cc_library(
     name = "roi_filter",
-    srcs = [
-        "roi_filter.cc",
-    ],
-    hdrs = [
-        "roi_filter.h",
-    ],
+    srcs = ["roi_filter.cc"],
+    hdrs = ["roi_filter.h"],
     deps = [
         ":common",
         "//modules/perception/base:base_type",
@@ -53,12 +43,8 @@ cc_library(
 
 cc_library(
     name = "camera_homography",
-    srcs = [
-        "camera_homography.cc",
-    ],
-    hdrs = [
-        "camera_homography.h",
-    ],
+    srcs = ["camera_homography.cc"],
+    hdrs = ["camera_homography.h"],
     deps = [
         "//modules/perception/base:camera",
         "@eigen",
@@ -68,49 +54,41 @@ cc_library(
 cc_test(
     name = "basic_test",
     size = "small",
-    srcs = [
-        "basic_test.cc",
-    ],
+    srcs = ["basic_test.cc"],
     deps = [
         ":basic",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "camera_homography_test",
     size = "small",
-    srcs = [
-        "camera_homography_test.cc",
-    ],
+    srcs = ["camera_homography_test.cc"],
     deps = [
         ":camera_homography",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "roi_filter_test",
     size = "small",
-    srcs = [
-        "roi_filter_test.cc",
-    ],
+    srcs = ["roi_filter_test.cc"],
     deps = [
         ":roi_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "convex_hull_2d_test",
     size = "small",
-    srcs = [
-        "convex_hull_2d_test.cc",
-    ],
+    srcs = ["convex_hull_2d_test.cc"],
     deps = [
         ":convex_hull_2d",
         "//modules/perception/base:point_cloud",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

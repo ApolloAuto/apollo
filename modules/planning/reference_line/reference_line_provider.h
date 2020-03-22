@@ -84,6 +84,8 @@ class ReferenceLineProvider {
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
 
+  bool UpdatedReferenceLine() { return is_reference_line_updated_.load(); }
+
  private:
   /**
    * @brief Use PncMap to create reference line and the corresponding segments
@@ -181,6 +183,8 @@ class ReferenceLineProvider {
   std::queue<std::list<hdmap::RouteSegments>> route_segments_history_;
 
   std::future<void> task_future_;
+
+  std::atomic<bool> is_reference_line_updated_{true};
 };
 
 }  // namespace planning

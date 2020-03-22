@@ -231,31 +231,40 @@ export default class ScatterGraph extends React.Component {
         this.chart = new Chart(ctx, { type: "scatter", options: chartOptions });
     }
 
-    updateData(idx, name, properties, data) {
-        if (this.chart.data.datasets[idx] === undefined) {
-            // basic properties
-            const config = {
-                label: name, //legend
-                hideLabelInLegend: properties.hideLabelInLegend,
-                showText: properties.showText,
-                text: name, // text in the graph
+    constructDataConfig(properties) {
+        // basic properties
+        const config = {
+            label: null, // legend
+            hideLabelInLegend: properties.hideLabelInLegend,
+            showText: properties.showText,
+            text: null, // text in the graph
 
-                backgroundColor: properties.color,
-                borderColor: properties.color,
+            backgroundColor: properties.color,
+            borderColor: properties.color,
 
-                data: data
-            };
+            data: null
+        };
 
-            // additional properties
-            for (const key in properties) {
-                config[key] = properties[key];
-            }
-
-            this.chart.data.datasets.push(config);
-        } else {
-            this.chart.data.datasets[idx].text = name;
-            this.chart.data.datasets[idx].data = data;
+        // additional properties
+        for (const key in properties) {
+            config[key] = properties[key];
         }
+
+        return config;
+    }
+
+    updateData(idx, name, properties, data) {
+        const datasets = this.chart.data.datasets;
+        const config = this.constructDataConfig(properties);
+        if (datasets[idx] === undefined) {
+            datasets.push(config);
+        } else if (datasets[idx].text !== name) {
+            datasets[idx] = config;
+        }
+
+        datasets[idx].label = name;
+        datasets[idx].text = name;
+        datasets[idx].data = data;
     }
 
     updateCar(name, point, properties) {
@@ -372,8 +381,13 @@ export default class ScatterGraph extends React.Component {
 }
 
 function generateScatterGraph(setting, lineDatasets, carDatasets, polygonsDatasets) {
-    if (!lineDatasets || !setting || !setting.properties || !setting.options) {
-        console.error("Graph setting or data not found:", setting.title);
+    if (!lineDatasets) {
+        console.error("Graph data not found:", setting.title);
+        return null;
+    }
+
+    if (!setting || !setting.properties || !setting.options) {
+        console.error("Graph setting not found:", setting.title);
         return null;
     }
 

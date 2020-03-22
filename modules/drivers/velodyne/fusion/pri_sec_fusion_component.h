@@ -16,13 +16,13 @@
 
 #pragma once
 
-#include <Eigen/Eigen>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "cyber/cyber.h"
+#include "Eigen/Eigen"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/transform/buffer.h"
@@ -38,7 +38,6 @@ using apollo::drivers::PointCloud;
 
 class PriSecFusionComponent : public Component<PointCloud> {
  public:
-  static const int32_t USLEEP_INTERVAL = 5000;
   bool Init() override;
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
 

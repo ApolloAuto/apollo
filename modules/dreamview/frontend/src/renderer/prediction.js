@@ -3,32 +3,43 @@ import * as THREE from "three";
 import STORE from "store";
 
 import { DEFAULT_COLOR, ObstacleColorMapping } from "renderer/obstacles.js";
-import { drawCircle, drawSegmentsFromPoints } from "utils/draw";
+import { drawCircle, drawEllipse, drawSegmentsFromPoints, disposeMesh } from "utils/draw";
 
 const _ = require('lodash');
 const majorThickness = 3;
+
+const EPSILON = 1e-3;
 
 export default class Prediction {
     constructor() {
         this.predLines = []; // Prediction lines to indicate direction
         this.predCircles = []; // Prediction circles to indicate speed
+        this.predGaussian = []; // Prediction ellipse to visualize gaussian
     }
 
-    update(world, coordinates, scene) {
-        // Clear out the preiction lines/circles from last frame.
+    disposeMeshes(scene) {
+        // Clear out the prediction lines/circles from last frame.
         this.predLines.forEach(p => {
             scene.remove(p);
-            p.geometry.dispose();
-            p.material.dispose();
+            disposeMesh(p);
         });
         this.predLines = [];
 
         this.predCircles.forEach(c => {
             scene.remove(c);
-            c.geometry.dispose();
-            c.material.dispose();
+            disposeMesh(c);
         });
         this.predCircles = [];
+
+        this.predGaussian.forEach(g => {
+            scene.remove(g);
+            disposeMesh(g);
+        });
+        this.predGaussian = [];
+    }
+
+    update(world, coordinates, scene) {
+        this.disposeMeshes(scene);
 
         if (!STORE.options.showPredictionMajor && !STORE.options.showPredictionMinor) {
             return;
@@ -61,24 +72,36 @@ export default class Prediction {
                 this.predLines.push(mesh);
                 scene.add(mesh);
 
-                // Downsampling points to draw circles
-                const downsamplingRatio = Math.ceil(predictedTraj.length / 3);
-                for (let j = 0; j < predictedTraj.length; j += downsamplingRatio) {
+                // Draw circles and gaussian
+                for (let j = 0; j < predictedTraj.length; j += 1) {
                     const circleMesh = this.getPredCircle();
                     circleMesh.position.set(predictedTraj[j].x, predictedTraj[j].y, 0.24);
                     circleMesh.material.color.setHex(predictionLineColor);
                     scene.add(circleMesh);
+
+                    this.drawGaussian(
+                        predictionMajor.predictedTrajectory[j].gaussianInfo,
+                        predictionLineColor,
+                        predictedTraj[j],
+                        scene,
+                    );
                 }
             }
 
             let minorThickness = 2.3;
             if (STORE.options.showPredictionMinor) {
                 predictionMinor.forEach(prediction => {
+                    const traj = prediction.predictedTrajectory;
+                    const positions = coordinates.applyOffsetToArray(traj);
                     const mesh = drawSegmentsFromPoints(
-                            coordinates.applyOffsetToArray(prediction.predictedTrajectory),
-                            predictionLineColor, minorThickness, 6);
+                            positions, predictionLineColor, minorThickness, 6);
                     this.predLines.push(mesh);
                     scene.add(mesh);
+
+                    for (let j = 0; j < traj.length; j += 1) {
+                        this.drawGaussian(
+                            traj[j].gaussianInfo, predictionLineColor, positions[j], scene);
+                    }
 
                     // keep thickness the same trajectories with low probabilities
                     if (minorThickness > 0.2) {
@@ -98,5 +121,24 @@ export default class Prediction {
         const circleMesh = drawCircle(0.2, material);
         this.predCircles.push(circleMesh);
         return circleMesh;
+    }
+
+    drawGaussian(gaussian, color, position, scene) {
+        if (!STORE.options.showGaussianInfo) {
+            return;
+        }
+
+        if (gaussian && gaussian.ellipseA > EPSILON && gaussian.ellipseB > EPSILON) {
+            const material = new THREE.MeshBasicMaterial({
+                color, transparent: true, opacity: 0.35
+            });
+            const ellipseMesh = drawEllipse(
+                gaussian.ellipseA, gaussian.ellipseB, material);
+
+            ellipseMesh.position.set(position.x, position.y, 0.25);
+            ellipseMesh.rotation.set(0, 0, gaussian.thetaA);
+            this.predGaussian.push(ellipseMesh);
+            scene.add(ellipseMesh);
+        }
     }
 }

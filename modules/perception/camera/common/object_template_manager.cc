@@ -64,20 +64,20 @@ bool ObjectTemplateManager::Init(
     return false;
   }
 
-  CHECK(proto.has_max_dim_change_ratio());
+  ACHECK(proto.has_max_dim_change_ratio());
 
-  CHECK(proto.has_unknown());
-  CHECK(proto.has_unknown_movable());
-  CHECK(proto.has_unknown_unmovable());
-  CHECK(proto.has_car());
-  CHECK(proto.has_van());
-  CHECK(proto.has_truck());
-  CHECK(proto.has_bus());
-  CHECK(proto.has_cyclist());
-  CHECK(proto.has_motorcyclist());
-  CHECK(proto.has_tricyclist());
-  CHECK(proto.has_pedestrian());
-  CHECK(proto.has_trafficcone());
+  ACHECK(proto.has_unknown());
+  ACHECK(proto.has_unknown_movable());
+  ACHECK(proto.has_unknown_unmovable());
+  ACHECK(proto.has_car());
+  ACHECK(proto.has_van());
+  ACHECK(proto.has_truck());
+  ACHECK(proto.has_bus());
+  ACHECK(proto.has_cyclist());
+  ACHECK(proto.has_motorcyclist());
+  ACHECK(proto.has_tricyclist());
+  ACHECK(proto.has_pedestrian());
+  ACHECK(proto.has_trafficcone());
 
   CHECK_LE(proto.car().dim_size(), 3);
   CHECK_LE(proto.van().dim_size(), 3);
@@ -89,18 +89,18 @@ bool ObjectTemplateManager::Init(
   CHECK_LE(proto.pedestrian().dim_size(), 3);
   CHECK_LE(proto.trafficcone().dim_size(), 3);
 
-  CHECK(proto.unknown().has_speed_limit());
-  CHECK(proto.unknown_movable().has_speed_limit());
-  CHECK(proto.unknown_unmovable().has_speed_limit());
-  CHECK(proto.car().has_speed_limit());
-  CHECK(proto.van().has_speed_limit());
-  CHECK(proto.truck().has_speed_limit());
-  CHECK(proto.bus().has_speed_limit());
-  CHECK(proto.cyclist().has_speed_limit());
-  CHECK(proto.motorcyclist().has_speed_limit());
-  CHECK(proto.tricyclist().has_speed_limit());
-  CHECK(proto.pedestrian().has_speed_limit());
-  CHECK(proto.trafficcone().has_speed_limit());
+  ACHECK(proto.unknown().has_speed_limit());
+  ACHECK(proto.unknown_movable().has_speed_limit());
+  ACHECK(proto.unknown_unmovable().has_speed_limit());
+  ACHECK(proto.car().has_speed_limit());
+  ACHECK(proto.van().has_speed_limit());
+  ACHECK(proto.truck().has_speed_limit());
+  ACHECK(proto.bus().has_speed_limit());
+  ACHECK(proto.cyclist().has_speed_limit());
+  ACHECK(proto.motorcyclist().has_speed_limit());
+  ACHECK(proto.tricyclist().has_speed_limit());
+  ACHECK(proto.pedestrian().has_speed_limit());
+  ACHECK(proto.trafficcone().has_speed_limit());
 
   max_dim_change_ratio_ = proto.max_dim_change_ratio();
 
@@ -221,8 +221,8 @@ void ObjectTemplateManager::LoadVehMinMidMaxTemplates(
 // util for tmplt search
 float ObjectTemplateManager::Get3dDimensionSimilarity(const float *hwl1,
                                                       const float *hwl2) {
-  CHECK(hwl1 != nullptr);
-  CHECK(hwl2 != nullptr);
+  ACHECK(hwl1 != nullptr);
+  ACHECK(hwl2 != nullptr);
 
   float max_h = std::max(hwl1[0], hwl2[0]);
   float min_h = hwl1[0] + hwl2[0] - max_h;
@@ -241,8 +241,8 @@ float ObjectTemplateManager::Get3dDimensionSimilarity(const float *hwl1,
 // for general visual obj
 float ObjectTemplateManager::VehObjHwlBySearchTemplates(float *hwl, int *index,
                                                         bool *is_flip) {
-  CHECK(inited_);
-  CHECK(hwl != nullptr);
+  ACHECK(inited_);
+  ACHECK(hwl != nullptr);
 
   float hwl_flip[3] = {hwl[0], hwl[2], hwl[1]};
   float score_best = -FLT_MAX;

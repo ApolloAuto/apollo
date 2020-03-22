@@ -51,7 +51,7 @@ void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
 }
 
 void DigitalFilter::set_dead_zone(const double deadzone) {
-  dead_zone_ = std::abs(deadzone);
+  dead_zone_ = std::fabs(deadzone);
   AINFO << "Setting digital filter dead zone = " << dead_zone_;
 }
 
@@ -71,7 +71,7 @@ double DigitalFilter::Filter(const double x_insert) {
       Compute(y_values_, denominators_, 1, denominators_.size() - 1);
 
   double y_insert = 0.0;
-  if (std::abs(denominators_.front()) > kDoubleEpsilon) {
+  if (std::fabs(denominators_.front()) > kDoubleEpsilon) {
     y_insert = (xside - yside) / denominators_.front();
   }
   y_values_.push_front(y_insert);
@@ -79,22 +79,26 @@ double DigitalFilter::Filter(const double x_insert) {
   return UpdateLast(y_insert);
 }
 
+void DigitalFilter::reset_values() {
+  std::fill(x_values_.begin(), x_values_.end(), 0.0);
+  std::fill(y_values_.begin(), y_values_.end(), 0.0);
+}
+
 double DigitalFilter::UpdateLast(const double input) {
-  const double diff = std::abs(input - last_);
+  const double diff = std::fabs(input - last_);
   if (diff < dead_zone_) {
     return last_;
-  } else {
-    last_ = input;
-    return input;
   }
+  last_ = input;
+  return input;
 }
 
 double DigitalFilter::Compute(const std::deque<double> &values,
                               const std::vector<double> &coefficients,
                               const std::size_t coeff_start,
                               const std::size_t coeff_end) {
-  CHECK(coeff_start <= coeff_end && coeff_end < coefficients.size());
-  CHECK((coeff_end - coeff_start + 1) == values.size());
+  ACHECK(coeff_start <= coeff_end && coeff_end < coefficients.size());
+  ACHECK((coeff_end - coeff_start + 1) == values.size());
 
   double sum = 0.0;
   auto i = coeff_start;
@@ -114,6 +118,14 @@ const std::vector<double> &DigitalFilter::numerators() const {
 }
 
 double DigitalFilter::dead_zone() const { return dead_zone_; }
+
+const std::deque<double> &DigitalFilter::inputs_queue() const {
+  return x_values_;
+}
+
+const std::deque<double> &DigitalFilter::outputs_queue() const {
+  return y_values_;
+}
 
 }  // namespace common
 }  // namespace apollo

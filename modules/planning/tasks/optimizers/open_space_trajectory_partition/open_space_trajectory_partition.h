@@ -59,7 +59,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
 
   void PartitionTrajectory(const DiscretizedTrajectory& trajectory,
-                           std::vector<TrajGearPair>* paritioned_trajectories);
+                           std::vector<TrajGearPair>* partitioned_trajectories);
 
   void LoadTrajectoryPoint(const common::TrajectoryPoint& trajectory_point,
                            const canbus::Chassis::GearPosition& gear,
@@ -75,13 +75,13 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
                                size_t* current_trajectory_point_index);
 
   bool UseFailSafeSearch(
-      const std::vector<TrajGearPair>& paritioned_trajectories,
+      const std::vector<TrajGearPair>& partitioned_trajectories,
       const std::vector<std::string>& trajectories_encodings,
       size_t* current_trajectory_index, size_t* current_trajectory_point_index);
 
   bool InsertGearShiftTrajectory(
       const bool flag_change_to_next, const size_t current_trajectory_index,
-      const std::vector<TrajGearPair>& paritioned_trajectories,
+      const std::vector<TrajGearPair>& partitioned_trajectories,
       TrajGearPair* gear_switch_idle_time_trajectory);
 
   void GenerateGearShiftTrajectory(
@@ -89,11 +89,11 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
       TrajGearPair* gear_switch_idle_time_trajectory);
 
   void AdjustRelativeTimeAndS(
-      const std::vector<TrajGearPair>& paritioned_trajectories,
+      const std::vector<TrajGearPair>& partitioned_trajectories,
       const size_t current_trajectory_index,
       const size_t closest_trajectory_point_index,
       DiscretizedTrajectory* stitched_trajectory_result,
-      TrajGearPair* current_paritioned_trajectory);
+      TrajGearPair* current_partitioned_trajectory);
 
  private:
   OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config_;

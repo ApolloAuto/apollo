@@ -8,11 +8,11 @@ cc_binary(
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         "//modules/prediction/common:message_process",
+        "//third_party:boost",
+        "@com_google_absl//absl/strings",
+        "@opencv",
     ],
 )
 

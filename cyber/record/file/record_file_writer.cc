@@ -25,6 +25,16 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
+using apollo::cyber::proto::Channel;
+using apollo::cyber::proto::ChannelCache;
+using apollo::cyber::proto::ChunkBody;
+using apollo::cyber::proto::ChunkBodyCache;
+using apollo::cyber::proto::ChunkHeader;
+using apollo::cyber::proto::ChunkHeaderCache;
+using apollo::cyber::proto::Header;
+using apollo::cyber::proto::SectionType;
+using apollo::cyber::proto::SingleIndex;
+
 RecordFileWriter::RecordFileWriter() {}
 
 RecordFileWriter::~RecordFileWriter() { Close(); }
@@ -91,7 +101,6 @@ void RecordFileWriter::Close() {
     if (close(fd_) < 0) {
       AERROR << "Close file failed, file: " << path_ << ", fd: " << fd_
              << ", errno: " << errno;
-      return;
     }
   }
 }
@@ -120,7 +129,7 @@ bool RecordFileWriter::WriteIndex() {
     }
   }
   header_.set_index_position(CurrentPosition());
-  if (!WriteSection<Index>(index_)) {
+  if (!WriteSection<proto::Index>(index_)) {
     AERROR << "Write section fail";
     return false;
   }
@@ -129,6 +138,7 @@ bool RecordFileWriter::WriteIndex() {
 
 bool RecordFileWriter::WriteChannel(const Channel& channel) {
   std::lock_guard<std::mutex> lock(mutex_);
+  uint64_t pos = CurrentPosition();
   if (!WriteSection<Channel>(channel)) {
     AERROR << "Write section fail";
     return false;
@@ -136,7 +146,7 @@ bool RecordFileWriter::WriteChannel(const Channel& channel) {
   header_.set_channel_number(header_.channel_number() + 1);
   SingleIndex* single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHANNEL);
-  single_index->set_position(CurrentPosition());
+  single_index->set_position(pos);
   ChannelCache* channel_cache = new ChannelCache();
   channel_cache->set_name(channel.name());
   channel_cache->set_message_number(0);
@@ -149,19 +159,22 @@ bool RecordFileWriter::WriteChannel(const Channel& channel) {
 bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
                                   const ChunkBody& chunk_body) {
   std::lock_guard<std::mutex> lock(mutex_);
+  uint64_t pos = CurrentPosition();
   if (!WriteSection<ChunkHeader>(chunk_header)) {
     AERROR << "Write chunk header fail";
     return false;
   }
   SingleIndex* single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHUNK_HEADER);
-  single_index->set_position(CurrentPosition());
+  single_index->set_position(pos);
   ChunkHeaderCache* chunk_header_cache = new ChunkHeaderCache();
   chunk_header_cache->set_begin_time(chunk_header.begin_time());
   chunk_header_cache->set_end_time(chunk_header.end_time());
   chunk_header_cache->set_message_number(chunk_header.message_number());
   chunk_header_cache->set_raw_size(chunk_header.raw_size());
   single_index->set_allocated_chunk_header_cache(chunk_header_cache);
+
+  pos = CurrentPosition();
   if (!WriteSection<ChunkBody>(chunk_body)) {
     AERROR << "Write chunk body fail";
     return false;
@@ -175,14 +188,14 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
                              chunk_header.message_number());
   single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHUNK_BODY);
-  single_index->set_position(CurrentPosition());
+  single_index->set_position(pos);
   ChunkBodyCache* chunk_body_cache = new ChunkBodyCache();
   chunk_body_cache->set_message_number(chunk_body.messages_size());
   single_index->set_allocated_chunk_body_cache(chunk_body_cache);
   return true;
 }
 
-bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
+bool RecordFileWriter::WriteMessage(const proto::SingleMessage& message) {
   chunk_active_->add(message);
   auto it = channel_message_number_map_.find(message.channel_name());
   if (it != channel_message_number_map_.end()) {
@@ -228,7 +241,6 @@ void RecordFileWriter::Flush() {
     }
     chunk_flush_->clear();
   }
-  return;
 }
 
 uint64_t RecordFileWriter::GetMessageNumber(

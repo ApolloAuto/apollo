@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,4 +17,12 @@ proto_library(
     ],
 )
 
-cpplint()
+py_proto(
+    name = "lidar_obstacle_tracking_config_pb2",
+    src = "lidar_obstacle_tracking_config.proto",
+)
+
+py_proto(
+    name = "lidar_obstacle_segmentation_config_pb2",
+    src = "lidar_obstacle_segmentation_config.proto",
+)

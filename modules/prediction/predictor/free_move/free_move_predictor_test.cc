@@ -27,7 +27,7 @@ namespace prediction {
 class FreeMovePredictorTest : public KMLMapBasedTest {
  public:
   FreeMovePredictorTest() {
-    CHECK(cyber::common::GetProtoFromFile(
+    ACHECK(cyber::common::GetProtoFromFile(
         "modules/prediction/testdata/single_perception_vehicle_offlane.pb.txt",
         &perception_obstacles_));
     FLAGS_p_var = 0.1;
@@ -46,11 +46,12 @@ TEST_F(FreeMovePredictorTest, General) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 15);
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
   EXPECT_NE(obstacle_ptr, nullptr);
   FreeMovePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
@@ -60,10 +61,11 @@ TEST_F(FreeMovePredictorTest, Pedestrian) {
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
   FreeMovePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 

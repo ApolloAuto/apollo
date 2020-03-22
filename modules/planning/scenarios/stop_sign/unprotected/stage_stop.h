@@ -54,7 +54,6 @@ class StopSignUnprotectedStageStop : public Stage {
           watch_vehicles);
 
  private:
-  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:

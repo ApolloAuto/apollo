@@ -34,7 +34,7 @@ PiecewiseLinearKernel::PiecewiseLinearKernel(const uint32_t dimension,
       offset_matrix_(Eigen::MatrixXd::Zero(dimension_, 1)) {}
 
 void PiecewiseLinearKernel::AddRegularization(const double param) {
-  Eigen::MatrixXd identity_matrix = kernel_matrix_ +=
+  kernel_matrix_ +=
       Eigen::MatrixXd::Identity(kernel_matrix_.rows(), kernel_matrix_.cols()) *
       param;
 }

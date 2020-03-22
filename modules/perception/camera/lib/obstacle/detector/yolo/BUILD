@@ -5,12 +5,8 @@ package(default_visibility = ["//visibility:public"])
 
 cuda_library(
     name = "region_output_cuda",
-    srcs = [
-        "region_output.cu",
-    ],
-    hdrs = [
-        "region_output.h",
-    ],
+    srcs = ["region_output.cu"],
+    hdrs = ["region_output.h"],
     deps = [
         ":object_maintainer",
         "//modules/perception/base",
@@ -26,9 +22,7 @@ cc_library(
         "region_output.cc",
         ":region_output_cuda",
     ],
-    hdrs = [
-        "region_output.h",
-    ],
+    hdrs = ["region_output.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",
@@ -39,12 +33,8 @@ cc_library(
 
 cc_library(
     name = "yolo_obstacle_detector",
-    srcs = [
-        "yolo_obstacle_detector.cc",
-    ],
-    hdrs = [
-        "yolo_obstacle_detector.h",
-    ],
+    srcs = ["yolo_obstacle_detector.cc"],
+    hdrs = ["yolo_obstacle_detector.h"],
     deps = [
         ":region_output",
         "//cyber/common:file",
@@ -65,9 +55,7 @@ cc_library(
 
 cc_library(
     name = "object_maintainer",
-    hdrs = [
-        "object_maintainer.h",
-    ],
+    hdrs = ["object_maintainer.h"],
     deps = [
         "//modules/perception/base",
     ],

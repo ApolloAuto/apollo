@@ -3,10 +3,10 @@ syntax = "proto2";
 package apollo.cyber.proto;
 
 message Perception {
-    message Header {
-        optional uint64 timestamp = 1;
-    }
-    optional Header header = 1;
-    optional uint64 msg_id = 2;
-    optional double result = 3;
+  message Header {
+    optional uint64 timestamp = 1;
+  }
+  optional Header header = 1;
+  optional uint64 msg_id = 2;
+  optional double result = 3;
 };

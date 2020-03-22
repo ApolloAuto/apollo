@@ -21,8 +21,6 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include <algorithm>
-#include <limits>
-#include <memory>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"
@@ -33,10 +31,7 @@
 namespace apollo {
 namespace planning {
 
-using common::SLPoint;
-using common::SpeedPoint;
-using common::TrajectoryPoint;
-using common::math::Vec2d;
+using apollo::common::SpeedPoint;
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     const double stop_distance) {
@@ -57,7 +52,6 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   }
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
-  std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
 
   // TODO(all): dt is too small;
   double delta_t = FLAGS_fallback_time_unit;
@@ -67,19 +61,16 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_s);
+  std::vector<double> end_state_ref(num_of_knots, stop_distance);
+  piecewise_jerk_problem.set_x_ref(1.0, end_state_ref);
 
-  // TODO(Hongyi): tune the params and move to a config
-  piecewise_jerk_problem.set_weight_ddx(1.0);
-  piecewise_jerk_problem.set_weight_dddx(0.01);
+  piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
   piecewise_jerk_problem.set_x_bounds(0.0, std::fmax(stop_distance, 100.0));
   piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                         veh_param.max_acceleration());
-  // TODO(Hongyi): Set back to vehicle_params when ready
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
                                         FLAGS_longitudinal_jerk_upper_bound);
 
@@ -154,8 +145,8 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
 
 SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
     const double distance, const double max_speed) {
-  constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)
-  constexpr double kProceedingSpeed = 2.23;    // (5mph proceeding speed)
+  static constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)
+  static constexpr double kProceedingSpeed = 2.23;    // (5mph proceeding speed)
   const double proceeding_speed = std::fmin(max_speed, kProceedingSpeed);
   const double distance_to_start_deceleration =
       proceeding_speed * proceeding_speed / kConstDeceleration / 2;
@@ -166,7 +157,7 @@ SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
   double s = 0.0;
   double v = proceeding_speed;
 
-  constexpr double kDeltaT = 0.1;
+  static constexpr double kDeltaT = 0.1;
 
   SpeedData speed_data;
   while (s < distance && v > 0) {

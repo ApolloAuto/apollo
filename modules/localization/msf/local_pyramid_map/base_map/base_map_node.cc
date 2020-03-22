@@ -14,18 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/base_map/base_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
 
 #include <cstdio>
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "cyber/common/file.h"
 #include "modules/localization/msf/common/util/file_utility.h"
-#include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 BaseMapNode::BaseMapNode()
     : map_config_(NULL),
@@ -102,7 +105,7 @@ bool BaseMapNode::Save() {
   paths.push_back(buf);
   path = path + buf;
 
-  snprintf(buf, sizeof(buf), "/%08u", abs(map_node_config_->node_index_.m_));
+  snprintf(buf, sizeof(buf), "/%08d", map_node_config_->node_index_.m_);
   paths.push_back(buf);
   path = path + buf;
 
@@ -110,7 +113,7 @@ bool BaseMapNode::Save() {
     return false;
   }
 
-  snprintf(buf, sizeof(buf), "/%08u", abs(map_node_config_->node_index_.n_));
+  snprintf(buf, sizeof(buf), "/%08d", map_node_config_->node_index_.n_);
   path = path + buf;
 
   FILE* file = fopen(path.c_str(), "wb");
@@ -144,13 +147,13 @@ bool BaseMapNode::Load() {
            abs(map_node_config_->node_index_.zone_id_));
   paths.push_back(buf);
   path = path + buf;
-  snprintf(buf, sizeof(buf), "/%08u", abs(map_node_config_->node_index_.m_));
+  snprintf(buf, sizeof(buf), "/%08d", map_node_config_->node_index_.m_);
   paths.push_back(buf);
   path = path + buf;
   if (!CheckMapDirectoryRecursively(paths)) {
     return false;
   }
-  snprintf(buf, sizeof(buf), "/%08u", abs(map_node_config_->node_index_.n_));
+  snprintf(buf, sizeof(buf), "/%08d", map_node_config_->node_index_.n_);
   path = path + buf;
   return Load(path.c_str());
 }
@@ -272,7 +275,11 @@ size_t BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
     return map_matrix_handler_->LoadBinary(&(*buf)[0], map_matrix_);
   }
   std::vector<unsigned char> buf_uncompressed;
-  compression_strategy_->Decode(buf, &buf_uncompressed);
+  int ret = compression_strategy_->Decode(buf, &buf_uncompressed);
+  if (ret < 0) {
+    AERROR << "compression Decode error: " << ret;
+    return 0;
+  }
   uncompressed_file_body_size_ = buf_uncompressed.size();
   AINFO << "map node compress ratio: "
         << static_cast<float>(buf->size()) /
@@ -316,14 +323,13 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
       (coordinate[0] - left_top_corner[0]) / GetMapResolution());
   unsigned int off_y = static_cast<unsigned int>(
       (coordinate[1] - left_top_corner[1]) / GetMapResolution());
-  if (off_x >= 0 && off_x < this->map_config_->map_node_size_x_ && off_y >= 0 &&
+  if (off_x < this->map_config_->map_node_size_x_ &&
       off_y < this->map_config_->map_node_size_y_) {
-    *x = static_cast<unsigned int>(off_x);
-    *y = static_cast<unsigned int>(off_y);
+    *x = off_x;
+    *y = off_y;
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
@@ -445,7 +451,7 @@ bool BaseMapNode::SaveIntensityImage() const {
   paths.push_back(buf);
   path = path + buf;
 
-  snprintf(buf, sizeof(buf), "/%08u", abs(map_node_config_->node_index_.m_));
+  snprintf(buf, sizeof(buf), "/%08d", map_node_config_->node_index_.m_);
   paths.push_back(buf);
   path = path + buf;
 
@@ -453,8 +459,7 @@ bool BaseMapNode::SaveIntensityImage() const {
     return false;
   }
 
-  snprintf(buf, sizeof(buf), "/%08u.png",
-           abs(map_node_config_->node_index_.n_));
+  snprintf(buf, sizeof(buf), "/%08d.png", map_node_config_->node_index_.n_);
   path = path + buf;
 
   bool success = SaveIntensityImage(path);
@@ -494,7 +499,7 @@ bool BaseMapNode::SaveAltitudeImage() const {
   paths.push_back(buf);
   path = path + buf;
 
-  snprintf(buf, sizeof(buf), "/%08u", abs(map_node_config_->node_index_.m_));
+  snprintf(buf, sizeof(buf), "/%08d", map_node_config_->node_index_.m_);
   paths.push_back(buf);
   path = path + buf;
 
@@ -502,8 +507,7 @@ bool BaseMapNode::SaveAltitudeImage() const {
     return false;
   }
 
-  snprintf(buf, sizeof(buf), "/%08u.png",
-           abs(map_node_config_->node_index_.n_));
+  snprintf(buf, sizeof(buf), "/%08d.png", map_node_config_->node_index_.n_);
   path = path + buf;
 
   bool success = SaveAltitudeImage(path);
@@ -517,6 +521,7 @@ bool BaseMapNode::SaveAltitudeImage(const std::string& path) const {
   return success;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

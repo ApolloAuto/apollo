@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
-#include <gtest/gtest.h>
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
+
+#include "gtest/gtest.h"
+
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -26,6 +28,7 @@ int main(int argc, char** argv) {
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMapMatrixTestSuite : public ::testing::Test {
  protected:
@@ -40,7 +43,7 @@ TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(1024, 1024);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 1024);
@@ -56,7 +59,7 @@ TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   EXPECT_EQ(pm_matrix->ratio_, 2);
 
   // check operator =
-  std::unique_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
   config->SetMapNodeSize(2, 2);
   pm_matrix2->Init(*config);
   EXPECT_EQ(pm_matrix2->rows_mr_[0], 2);
@@ -79,7 +82,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetIntensityMatrixSafe(), nullptr);
@@ -132,7 +135,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity_var) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetIntensityVarMatrixSafe(), nullptr);
@@ -178,7 +181,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetAltitudeMatrixSafe(), nullptr);
@@ -244,7 +247,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude_var) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetAltitudeVarMatrixSafe(), nullptr);
@@ -290,7 +293,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_altitude) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetGroundAltitudeMatrixSafe(), nullptr);
@@ -337,7 +340,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_count) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetCountMatrixSafe(), nullptr);
@@ -382,7 +385,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_count) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
   EXPECT_EQ(pm_matrix->GetGroundCountMatrixSafe(), nullptr);
@@ -428,7 +431,7 @@ TEST_F(PyramidMapMatrixTestSuite, set_and_reset_and_roi) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 3);
@@ -533,7 +536,7 @@ TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 3);
@@ -612,7 +615,7 @@ TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
   pm_matrix->SetGroundCountMatrix(uint_data, 9, 0);
   pm_matrix->SetCountMatrix(uint_data, 9, 0);
 
-  std::unique_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
   pm_matrix2->Init(*config);
   pm_matrix2->SetIntensityMatrix(float_data, 9, 0);
   pm_matrix2->SetIntensityVarMatrix(float_data, 9, 0);
@@ -640,7 +643,7 @@ TEST_F(PyramidMapMatrixTestSuite, add_merge_get_base) {
   std::unique_ptr<PyramidMapConfig> config(
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 3);
@@ -684,7 +687,7 @@ TEST_F(PyramidMapMatrixTestSuite, BottomUp) {
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(4, 4);
   config->resolution_num_ = 2;
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 4);
@@ -743,7 +746,7 @@ TEST_F(PyramidMapMatrixTestSuite, flags_are_false_and_resolution_are_two) {
   config->has_ground_altitude_ = false;
   config->has_count_ = false;
   config->has_ground_count_ = false;
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   // bottom up safe
@@ -760,7 +763,7 @@ TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
       new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
-  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   const PyramidMapMatrix const_matrix(*pm_matrix);
@@ -781,7 +784,7 @@ TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   EXPECT_EQ((*const_matrix.GetGroundCountMatrix(0))[0][0], 0);
 
   // bad case 1: resolution is 1024
-  std::unique_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
   pm_matrix2->Init(*config);
   const PyramidMapMatrix const_matrix2(*pm_matrix2);
   EXPECT_EQ(const_matrix2.GetIntensityMatrixSafe(1024), nullptr);
@@ -801,7 +804,7 @@ TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   config->has_ground_altitude_ = false;
   config->has_count_ = false;
   config->has_ground_count_ = false;
-  std::unique_ptr<PyramidMapMatrix> pm_matrix3(new PyramidMapMatrix());
+  std::shared_ptr<PyramidMapMatrix> pm_matrix3(new PyramidMapMatrix());
   pm_matrix3->Init(*config);
   const PyramidMapMatrix const_matrix3(*pm_matrix3);
   EXPECT_EQ(const_matrix3.GetIntensityMatrixSafe(0), nullptr);
@@ -813,6 +816,7 @@ TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   EXPECT_EQ(const_matrix3.GetGroundCountMatrixSafe(0), nullptr);
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

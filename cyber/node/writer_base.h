@@ -18,6 +18,7 @@
 #define CYBER_NODE_WRITER_BASE_H_
 
 #include <atomic>
+#include <mutex>
 #include <string>
 #include <vector>
 

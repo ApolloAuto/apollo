@@ -3,18 +3,18 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "_cyber_init.so",
+    name = "_cyber.so",
     linkshared = True,
     linkstatic = False,
     deps = [
-        ":py_init",
+        ":py_cyber",
     ],
 )
 
 cc_library(
-    name = "py_init",
-    srcs = ["cyber_init_wrap.cc"],
-    hdrs = ["py_init.h"],
+    name = "py_cyber",
+    srcs = ["py_cyber.cc"],
+    hdrs = ["py_cyber.h"],
     deps = [
         "//cyber:cyber_core",
         "@python27",
@@ -22,21 +22,32 @@ cc_library(
 )
 
 cc_binary(
-    name = "_cyber_node.so",
+    name = "_cyber_py3.so",
     linkshared = True,
     linkstatic = False,
     deps = [
-        ":py_node",
+        ":py3_cyber",
     ],
 )
 
 cc_library(
-    name = "py_node",
-    srcs = ["cyber_node_wrap.cc"],
-    hdrs = ["py_node.h"],
+    name = "py3_cyber",
+    srcs = ["py_cyber.cc"],
+    hdrs = ["py_cyber.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
-        "@python27",
+        "//third_party:python3",
+    ],
+)
+
+cc_test(
+    name = "py_cyber_test",
+    srcs = ["py_cyber_test.cc"],
+    deps = [
+        ":py3_cyber",
+        "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -50,12 +61,44 @@ cc_binary(
 
 cc_library(
     name = "py_record",
-    srcs = ["cyber_record_wrap.cc"],
+    srcs = ["py_record.cc"],
     hdrs = ["py_record.h"],
     deps = [
         "//cyber/message:py_message",
         "//cyber/record",
         "@python27",
+    ],
+)
+
+cc_binary(
+    name = "_cyber_record_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_record",
+    ],
+)
+
+cc_library(
+    name = "py3_record",
+    srcs = ["py_record.cc"],
+    hdrs = ["py_record.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber/message:py_message",
+        "//cyber/record",
+        "//third_party:python3",
+    ],
+)
+
+cc_test(
+    name = "py_record_test",
+    srcs = ["py_record_test.cc"],
+    deps = [
+        ":py3_record",
+        "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest_main",
+        "@fastrtps",
     ],
 )
 
@@ -69,12 +112,32 @@ cc_binary(
 
 cc_library(
     name = "py_time",
-    srcs = ["cyber_time_wrap.cc"],
+    srcs = ["py_time.cc"],
     hdrs = ["py_time.h"],
     deps = [
         "//cyber:cyber_core",
         "@fastrtps",
         "@python27",
+    ],
+)
+
+cc_binary(
+    name = "_cyber_time_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_time",
+    ],
+)
+
+cc_library(
+    name = "py3_time",
+    srcs = ["py_time.cc"],
+    hdrs = ["py_time.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber:cyber_core",
+        "//third_party:python3",
+        "@fastrtps",
     ],
 )
 
@@ -88,11 +151,30 @@ cc_binary(
 
 cc_library(
     name = "py_timer",
-    srcs = ["cyber_timer_wrap.cc"],
+    srcs = ["py_timer.cc"],
     hdrs = ["py_timer.h"],
     deps = [
         "//cyber:cyber_core",
         "@python27",
+    ],
+)
+
+cc_binary(
+    name = "_cyber_timer_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_timer",
+    ],
+)
+
+cc_library(
+    name = "py3_timer",
+    srcs = ["py_timer.cc"],
+    hdrs = ["py_timer.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber:cyber_core",
+        "//third_party:python3",
     ],
 )
 
@@ -106,14 +188,32 @@ cc_binary(
 
 cc_library(
     name = "py_parameter",
-    srcs = ["cyber_parameter_wrap.cc"],
-    hdrs = [
-        "py_node.h",
-        "py_parameter.h",
-    ],
+    srcs = ["py_parameter.cc"],
+    hdrs = ["py_parameter.h"],
     deps = [
+        ":py_cyber",
         "//cyber:cyber_core",
         "@python27",
+    ],
+)
+
+cc_binary(
+    name = "_cyber_parameter_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_parameter",
+    ],
+)
+
+cc_library(
+    name = "py3_parameter",
+    srcs = ["py_parameter.cc"],
+    hdrs = ["py_parameter.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        ":py3_cyber",
+        "//cyber:cyber_core",
+        "//third_party:python3",
     ],
 )
 

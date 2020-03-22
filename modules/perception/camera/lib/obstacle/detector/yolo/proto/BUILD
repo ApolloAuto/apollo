@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,9 +11,10 @@ cc_proto_library(
 
 proto_library(
     name = "yolo_proto_lib",
-    srcs = [
-        "yolo.proto",
-    ],
+    srcs = ["yolo.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "yolo_pb2",
+    src = "yolo.proto",
+)

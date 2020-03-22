@@ -29,6 +29,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 class ArgMax1Plugin;
+class ReLUPlugin;
 class SLICEPlugin;
 class SoftmaxPlugin;
 
@@ -99,7 +100,7 @@ class RTNet : public Inference {
                       TensorModifyMap *tensor_modify_map);
 
   void addActiveLayer(const LayerParameter &layer_param,
-                      nvinfer1::ITensor *const *inputs,
+                      nvinfer1::ITensor *const *inputs, int nbInputs,
                       nvinfer1::INetworkDefinition *net, TensorMap *tensor_map,
                       TensorModifyMap *tensor_modify_map);
 
@@ -180,6 +181,7 @@ class RTNet : public Inference {
   std::vector<std::shared_ptr<ArgMax1Plugin>> argmax_plugins_;
   std::vector<std::shared_ptr<SoftmaxPlugin>> softmax_plugins_;
   std::vector<std::shared_ptr<SLICEPlugin>> slice_plugins_;
+  std::vector<std::shared_ptr<ReLUPlugin>> relu_plugins_;
   std::vector<std::string> output_names_;
   std::vector<std::string> input_names_;
   std::map<std::string, std::string> tensor_modify_map_;

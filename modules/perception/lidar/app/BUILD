@@ -12,12 +12,8 @@ cc_library(
 
 cc_library(
     name = "lidar_obstacle_segmentation",
-    srcs = [
-        "lidar_obstacle_segmentation.cc",
-    ],
-    hdrs = [
-        "lidar_obstacle_segmentation.h",
-    ],
+    srcs = ["lidar_obstacle_segmentation.cc"],
+    hdrs = ["lidar_obstacle_segmentation.h"],
     deps = [
         "//cyber",
         "//modules/common/proto:error_code_proto",
@@ -37,12 +33,8 @@ cc_library(
 
 cc_library(
     name = "lidar_obstacle_tracking",
-    srcs = [
-        "lidar_obstacle_tracking.cc",
-    ],
-    hdrs = [
-        "lidar_obstacle_tracking.h",
-    ],
+    srcs = ["lidar_obstacle_tracking.cc"],
+    hdrs = ["lidar_obstacle_tracking.h"],
     deps = [
         "//cyber",
         "//modules/common/util",
@@ -59,14 +51,12 @@ cc_library(
 cc_test(
     name = "lidar_app_lidar_pipeline_test",
     size = "small",
-    srcs = [
-        "lidar_app_lidar_pipeline_test.cc",
-    ],
+    srcs = ["lidar_app_lidar_pipeline_test.cc"],
     deps = [
         ":app",
-        "//external:gflags",
         "//modules/perception/common/io:io_util",
-        "@gtest//:main",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

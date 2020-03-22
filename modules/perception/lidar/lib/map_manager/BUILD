@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "map_manager",
-    srcs = [
-        "map_manager.cc",
-    ],
-    hdrs = [
-        "map_manager.h",
-    ],
+    srcs = ["map_manager.cc"],
+    hdrs = ["map_manager.h"],
     deps = [
         "//cyber",
         "//modules/common/math",
@@ -25,12 +21,10 @@ cc_library(
 
 #cc_test(
 #    name = "map_manager_test",
-#    srcs = [
-#        "map_manager_test.cc",
-#    ],
+#    srcs = ["map_manager_test.cc"],
 #    deps = [
 #        ":map_manager",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 

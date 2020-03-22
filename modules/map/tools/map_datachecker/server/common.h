@@ -97,7 +97,7 @@ struct JSonConf {
   int laps_search_diameter;
   /*loops to check*/
   size_t laps_number;
-  /*addtional loops to check*/
+  /*additional loops to check*/
   int laps_number_additional;
   /*Proportional thresholds for all required points
   in acquisition cycle checking*/

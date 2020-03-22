@@ -36,10 +36,8 @@
 namespace apollo {
 namespace planning {
 
-using common::Status;
-using common::VehicleState;
-using common::math::Vec2d;
-using hdmap::PathOverlap;
+using apollo::common::Status;
+using apollo::hdmap::PathOverlap;
 
 TrafficLight::TrafficLight(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
@@ -96,7 +94,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     }
 
     // work around incorrect s-projection along round routing
-    constexpr double kSDiscrepanceTolerance = 10.0;
+    static constexpr double kSDiscrepanceTolerance = 10.0;
     const auto& reference_line = reference_line_info->reference_line();
     common::SLPoint traffic_light_sl;
     traffic_light_sl.set_s(traffic_light_overlap.start_s);
@@ -139,12 +137,12 @@ void TrafficLight::MakeDecisions(Frame* const frame,
 
     if (signal_color == perception::TrafficLight::GREEN) {
       continue;
-    } else {
-      // Red/Yellow/Unown: check deceleration
-      if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
-        AWARN << "stop_deceleration too big to achieve.  SKIP red light";
-        continue;
-      }
+    }
+
+    // Red/Yellow/Unknown: check deceleration
+    if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
+      AWARN << "stop_deceleration too big to achieve.  SKIP red light";
+      continue;
     }
 
     // build stop decision

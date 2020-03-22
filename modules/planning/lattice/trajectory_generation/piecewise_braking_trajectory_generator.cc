@@ -111,7 +111,7 @@ std::shared_ptr<Curve1d> PiecewiseBrakingTrajectoryGenerator::Generate(
 
 double PiecewiseBrakingTrajectoryGenerator::ComputeStopDistance(
     const double v, const double dec) {
-  CHECK(dec > 0.0);
+  ACHECK(dec > 0.0);
   return v * v / dec * 0.5;
 }
 

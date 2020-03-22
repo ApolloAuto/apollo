@@ -15,4 +15,3 @@ message SmartRecorderStatus {
   optional RecordingState recording_state = 2;
   optional string state_message = 3;
 }
-

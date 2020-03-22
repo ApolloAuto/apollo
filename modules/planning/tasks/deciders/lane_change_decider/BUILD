@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "lane_change_decider",
-    srcs = [
-        "lane_change_decider.cc",
-    ],
-    hdrs = [
-        "lane_change_decider.h",
-    ],
+    srcs = ["lane_change_decider.cc"],
+    hdrs = ["lane_change_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/map/pnc_map:route_segments",

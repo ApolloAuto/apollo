@@ -14,26 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
-
 #include "modules/localization/ndt/ndt_locator/ndt_solver.h"
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_node.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
+#include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl/point_types.h"
+
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
 
 namespace apollo {
 namespace localization {
 namespace ndt {
 
-msf::MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
-  msf::MapNodeIndex index;
+typedef apollo::localization::msf::pyramid_map::NdtMap NdtMap;
+typedef apollo::localization::msf::pyramid_map::NdtMapConfig NdtMapConfig;
+typedef apollo::localization::msf::pyramid_map::NdtMapNode NdtMapNode;
+typedef apollo::localization::msf::pyramid_map::NdtMapCells NdtMapCells;
+typedef apollo::localization::msf::pyramid_map::NdtMapNodePool NdtMapNodePool;
+typedef apollo::localization::msf::pyramid_map::NdtMapMatrix NdtMapMatrix;
+typedef apollo::localization::msf::pyramid_map::MapNodeIndex MapNodeIndex;
+
+MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
+  MapNodeIndex index;
   char buf[100];
   sscanf(map_folder.c_str(), "/%03u/%05s/%02d/%08u/%08u", &index.resolution_id_,
          buf, &index.zone_id_, &index.m_, &index.n_);
@@ -46,7 +53,7 @@ msf::MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
 }
 
 bool GetAllMapIndex(const std::string& src_map_folder,
-                    std::list<msf::MapNodeIndex>* buf) {
+                    std::list<MapNodeIndex>* buf) {
   std::string src_map_path = src_map_folder + "/map";
   buf->clear();
   boost::filesystem::recursive_directory_iterator end_iter;
@@ -89,15 +96,15 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
   // Load input target.
   const std::string map_folder =
       "/apollo/modules/localization/ndt/test_data/ndt_map";
-  std::list<msf::MapNodeIndex> buf;
+  std::list<MapNodeIndex> buf;
   GetAllMapIndex(map_folder, &buf);
   std::cout << "index size: " << buf.size() << std::endl;
 
   // Initialize NDT map and pool.
-  msf::NdtMapConfig ndt_map_config("map_ndt_v01");
-  msf::NdtMap ndt_map(&ndt_map_config);
+  NdtMapConfig ndt_map_config("map_ndt_v01");
+  NdtMap ndt_map(&ndt_map_config);
   ndt_map.SetMapFolderPath(map_folder);
-  msf::NdtMapNodePool ndt_map_node_pool(20, 4);
+  NdtMapNodePool ndt_map_node_pool(20, 4);
   ndt_map_node_pool.Initial(&ndt_map_config);
   ndt_map.InitMapNodeCaches(10, 4);
   ndt_map.AttachMapNodePool(&ndt_map_node_pool);
@@ -110,14 +117,14 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
 
   int index = 0;
   for (auto itr = buf.begin(); itr != buf.end(); ++itr, ++index) {
-    msf::NdtMapNode* ndt_map_node =
-        static_cast<msf::NdtMapNode*>(ndt_map.GetMapNodeSafe(*itr));
+    NdtMapNode* ndt_map_node =
+        static_cast<NdtMapNode*>(ndt_map.GetMapNodeSafe(*itr));
     if (ndt_map_node == nullptr) {
       AERROR << "index: " << index << " is a NULL pointer!" << std::endl;
       continue;
     }
-    msf::NdtMapMatrix& ndt_map_matrix =
-        static_cast<msf::NdtMapMatrix&>(ndt_map_node->GetMapCellMatrix());
+    NdtMapMatrix& ndt_map_matrix =
+        static_cast<NdtMapMatrix&>(ndt_map_node->GetMapCellMatrix());
     const Eigen::Vector2d& left_top_corner = ndt_map_node->GetLeftTopCorner();
     double resolution = ndt_map_node->GetMapResolution();
     double resolution_z = ndt_map_node->GetMapResolutionZ();
@@ -134,7 +141,7 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
     int cols = ndt_map_config.map_node_size_x_;
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
-        const msf::NdtMapCells& cell_ndt = ndt_map_matrix.GetMapCell(row, col);
+        const NdtMapCells& cell_ndt = ndt_map_matrix.GetMapCell(row, col);
         for (auto it = cell_ndt.cells_.begin(); it != cell_ndt.cells_.end();
              ++it) {
           unsigned int cell_count = it->second.count_;

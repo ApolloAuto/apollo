@@ -18,11 +18,12 @@
 
 #include <string>
 #include <vector>
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The options of the reflectance map. */
 class NdtMapConfig : public BaseMapConfig {
@@ -49,6 +50,7 @@ class NdtMapConfig : public BaseMapConfig {
   virtual bool LoadXml(boost::property_tree::ptree* config);
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

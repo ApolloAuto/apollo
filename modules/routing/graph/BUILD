@@ -13,12 +13,8 @@ cc_library(
 
 cc_library(
     name = "routing_topo_range",
-    srcs = [
-        "topo_range.cc",
-    ],
-    hdrs = [
-        "topo_range.h",
-    ],
+    srcs = ["topo_range.cc"],
+    hdrs = ["topo_range.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/common:routing_gflags",
@@ -27,12 +23,8 @@ cc_library(
 
 cc_library(
     name = "routing_topo_range_manager",
-    srcs = [
-        "topo_range_manager.cc",
-    ],
-    hdrs = [
-        "topo_range_manager.h",
-    ],
+    srcs = ["topo_range_manager.cc"],
+    hdrs = ["topo_range_manager.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_topo_node",
@@ -41,22 +33,14 @@ cc_library(
 
 cc_library(
     name = "routing_range_utils",
-    hdrs = [
-        "range_utils.h",
-    ],
+    hdrs = ["range_utils.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
-    deps = [
-    ],
 )
 
 cc_library(
     name = "routing_node_with_range",
-    srcs = [
-        "node_with_range.cc",
-    ],
-    hdrs = [
-        "node_with_range.h",
-    ],
+    srcs = ["node_with_range.cc"],
+    hdrs = ["node_with_range.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_topo_node",
@@ -65,12 +49,8 @@ cc_library(
 
 cc_library(
     name = "routing_topo_node",
-    srcs = [
-        "topo_node.cc",
-    ],
-    hdrs = [
-        "topo_node.h",
-    ],
+    srcs = ["topo_node.cc"],
+    hdrs = ["topo_node.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_range_utils",
@@ -83,12 +63,8 @@ cc_library(
 
 cc_library(
     name = "routing_topo_graph",
-    srcs = [
-        "topo_graph.cc",
-    ],
-    hdrs = [
-        "topo_graph.h",
-    ],
+    srcs = ["topo_graph.cc"],
+    hdrs = ["topo_graph.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_topo_node",
@@ -97,12 +73,8 @@ cc_library(
 
 cc_library(
     name = "routing_sub_topo_graph",
-    srcs = [
-        "sub_topo_graph.cc",
-    ],
-    hdrs = [
-        "sub_topo_graph.h",
-    ],
+    srcs = ["sub_topo_graph.cc"],
+    hdrs = ["sub_topo_graph.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_node_with_range",
@@ -111,12 +83,8 @@ cc_library(
 
 cc_library(
     name = "routing_topo_test_utils",
-    srcs = [
-        "topo_test_utils.cc",
-    ],
-    hdrs = [
-        "topo_test_utils.h",
-    ],
+    srcs = ["topo_test_utils.cc"],
+    hdrs = ["topo_test_utils.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_topo_graph",
@@ -126,49 +94,41 @@ cc_library(
 cc_test(
     name = "topo_node_test",
     size = "small",
-    srcs = [
-        "topo_node_test.cc",
-    ],
+    srcs = ["topo_node_test.cc"],
     deps = [
         ":routing_topo_test_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "topo_range_test",
     size = "small",
-    srcs = [
-        "topo_range_test.cc",
-    ],
+    srcs = ["topo_range_test.cc"],
     deps = [
         ":routing_node_with_range",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "topo_graph_test",
     size = "small",
-    srcs = [
-        "topo_graph_test.cc",
-    ],
+    srcs = ["topo_graph_test.cc"],
     deps = [
         ":routing_topo_test_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "sub_topo_graph_test",
     size = "small",
-    srcs = [
-        "sub_topo_graph_test.cc",
-    ],
+    srcs = ["sub_topo_graph_test.cc"],
     deps = [
         ":routing_sub_topo_graph",
         ":routing_topo_test_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

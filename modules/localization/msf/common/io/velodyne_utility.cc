@@ -16,8 +16,8 @@
 
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
-#include <pcl/io/pcd_io.h>
-#include <yaml-cpp/yaml.h>
+#include "pcl/io/pcd_io.h"
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
@@ -111,7 +111,7 @@ void LoadPcdPoses(const std::string& file_path,
     double timestamp;
     double x, y, z;
     double qx, qy, qz, qr;
-    constexpr int kSize = 9;
+    static constexpr int kSize = 9;
     while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
                   &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
@@ -141,7 +141,7 @@ void LoadPosesAndStds(const std::string& file_path,
     double x, y, z;
     double qx, qy, qz, qr;
     double std_x, std_y, std_z;
-    constexpr int kSize = 12;
+    static constexpr int kSize = 12;
     while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                   &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr, &std_x,
                   &std_y, &std_z) == kSize) {

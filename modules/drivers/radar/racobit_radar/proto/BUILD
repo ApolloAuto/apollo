@@ -1,3 +1,5 @@
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -9,10 +11,16 @@ cc_proto_library(
 
 proto_library(
     name = "racobit_radar_proto_lib",
-    srcs = [
-        "racobit_radar_conf.proto",
-    ],
+    srcs = ["racobit_radar_conf.proto"],
     deps = [
         "//modules/drivers/canbus/proto:canbus_proto_lib",
+    ],
+)
+
+py_proto(
+    name = "racobit_radar_conf_pb2",
+    src = "racobit_radar_conf.proto",
+    deps = [
+        "//modules/drivers/canbus/proto:can_card_parameter_pb2",
     ],
 )

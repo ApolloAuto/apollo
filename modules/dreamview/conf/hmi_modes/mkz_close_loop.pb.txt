@@ -10,6 +10,7 @@ cyber_modules {
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
     dag_files: "/apollo/modules/planning/dag/planning.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
+    dag_files: "/apollo/modules/storytelling/dag/storytelling.dag"
     dag_files: "/apollo/modules/routing/dag/routing.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     process_group: "compute_sched"

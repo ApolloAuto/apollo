@@ -8,12 +8,8 @@
 * [6. Legal Disclaimer](#legal-disclaimer)
 
 ## Install Docker
-The system requirement for building Apollo is Ubuntu 14.04. Using a Docker container is the simplest way to set up the build environment for Apollo project. A Detailed docker tutorial can be found [here](https://docs.docker.com/).
 
-To install docker, you may refer to
-[Official guide to install the Docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
-Don't forget to test it using 
-[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+Please follow the [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md#Set-up-the-Docker-environment).
 
 ## Build Apollo
 
@@ -55,16 +51,16 @@ sudo dpkg -i <file>.deb
 sudo apt-get install -f # Install dependencies
 ```
 ### Start VSCode
-Start VSCode with the following command: 
+Start VSCode with the following command:
 ```bash
 code
 ```
 ### Open the Apollo project in VSCode
-Use the keyboard shortcut **(Ctrl+K Ctrl+O)** to open the Apollo project. 
+Use the keyboard shortcut **(Ctrl+K Ctrl+O)** to open the Apollo project.
 ### Build the Apollo project in VSCode
-Use the keyboard shortcut **(Ctrl+Shift+B)** to build the Apollo project. 
+Use the keyboard shortcut **(Ctrl+Shift+B)** to build the Apollo project.
 ### Run all unit tests for the Apollo project in VSCode
-Select the "Tasks->Run Tasks..." menu command and click "run all unit tests for the apollo project" from a popup menu to check the code style for the Apollo project. 
+Select the "Tasks->Run Tasks..." menu command and click "run all unit tests for the apollo project" from a popup menu to check the code style for the Apollo project.
 
 If you are currently developing on 16.04, you will get a build error.
 As seen in the image below, 2 perception tests. To avoid this build error, refer to the [how to build Apollo using Ubuntu 16](how_to_run_apollo_2.5_with_ubuntu16.md).
@@ -72,9 +68,9 @@ As seen in the image below, 2 perception tests. To avoid this build error, refer
 ![Build error](images/build_fail.png)
 
 ### Run a code style check task for the Apollo project in VSCode
-Select the "Tasks->Run Tasks..." menu command and click "code style check for the apollo project" from a popup menu to check the code style for the Apollo project. 
+Select the "Tasks->Run Tasks..." menu command and click "code style check for the apollo project" from a popup menu to check the code style for the Apollo project.
 ### Clean the Apollo project in VSCode
-Select the "Tasks->Run Tasks..." menu command and click "clean the apollo project" from a popup menu to clean the Apollo project. 
+Select the "Tasks->Run Tasks..." menu command and click "clean the apollo project" from a popup menu to clean the Apollo project.
 ### Change the building option
  You can change the "build" option to another one such as "build_gpu" (refer to the "apollo.sh" file for details) in ".vscode/tasks.json"
 

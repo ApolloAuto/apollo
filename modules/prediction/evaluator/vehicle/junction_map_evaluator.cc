@@ -37,7 +37,8 @@ JunctionMapEvaluator::JunctionMapEvaluator() : device_(torch::kCPU) {
 
 void JunctionMapEvaluator::Clear() {}
 
-bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
 
@@ -92,14 +93,17 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (size_t i = 0; i < feature_values.size(); ++i) {
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
-  torch_inputs.push_back(torch::jit::Tuple::create(
-      {img_tensor.to(device_), junction_exit_mask.to(device_)}));
+
+  torch_inputs.push_back(c10::ivalue::Tuple::create(
+      {std::move(img_tensor.to(device_)),
+       std::move(junction_exit_mask.to(device_))},
+      c10::TupleType::create(
+          std::vector<c10::TypePtr>(2, c10::TensorType::create()))));
 
   // Compute probability
   std::vector<double> probability;
-  CHECK_NOTNULL(torch_model_ptr_);
   at::Tensor torch_output_tensor =
-      torch_model_ptr_->forward(torch_inputs).toTensor().to(torch::kCPU);
+      torch_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
   auto torch_output = torch_output_tensor.accessor<float, 2>();
   for (int i = 0; i < torch_output.size(1); ++i) {
     probability.push_back(static_cast<double>(torch_output[0][i]));
@@ -124,7 +128,7 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return false;
   }
@@ -176,13 +180,12 @@ bool JunctionMapEvaluator::ExtractFeatureValues(
 }
 
 void JunctionMapEvaluator::LoadModel() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available for JunctionMapEvaluator!";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
-  torch_model_ptr_ =
+  torch_model_ =
       torch::jit::load(FLAGS_torch_vehicle_junction_map_file, device_);
 }
 

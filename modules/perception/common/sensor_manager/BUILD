@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "sensor_manager",
-    srcs = [
-        "sensor_manager.cc",
-    ],
-    hdrs = [
-        "sensor_manager.h",
-    ],
+    srcs = ["sensor_manager.cc"],
+    hdrs = ["sensor_manager.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:base_type",
@@ -20,22 +16,20 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",
         "//modules/perception/proto:sensor_meta_schema_proto",
-        "@yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
 cc_test(
     name = "sensor_manager_test",
     size = "small",
-    srcs = [
-        "sensor_manager_test.cc",
-    ],
+    srcs = ["sensor_manager_test.cc"],
     data = [
         "//modules/perception:perception_testdata",
     ],
     deps = [
         ":sensor_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

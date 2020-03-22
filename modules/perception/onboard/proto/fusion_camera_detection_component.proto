@@ -3,36 +3,47 @@ syntax = "proto2";
 package apollo.perception.onboard;
 
 message FusionCameraDetection {
-    optional string camera_names = 1 [default = "front_6mm,front_12mm"];
-    optional string input_camera_channel_names = 2 [default = "/sensor/camera/traffic/image_short,/sensor/camera/obstacle/image_narrow"];
-    optional double timestamp_offset = 3 [default = 0.0];
-    optional string camera_obstacle_perception_conf_dir = 4 [default = "conf/perception/camera"];
-    optional string camera_obstacle_perception_conf_file = 5 [default = "obstacle.pt"];
-    optional int32 frame_capacity = 6 [default = 20];
-    optional int32 image_channel_num = 7 [default = 3];
-    optional bool enable_undistortion = 8 [default = false];
-    optional bool enable_visualization = 9 [default = false];
-    optional string output_obstacles_channel_name = 10 [default = "/perception/obstacles"];
-    optional string camera_perception_viz_message_channel_name = 11 [default = "/perception/inner/camera_viz_msg"];
-    optional string prefused_channel_name = 12 [default = "/perception/inner/PrefusedObjects"];
-    optional double default_camera_pitch = 13 [default = 0.0];
-    optional double default_camera_height = 14 [default = 1.5];
-    optional string lane_calibration_working_sensor_name = 15 [default = "front_6mm"];
-    optional string calibrator_method = 16 [default = "LaneLineCalibrator"];
-    optional string calib_service_name = 17 [default = "OnlineCalibrationService"];
-    optional bool run_calib_service = 18 [default = true];
-    optional bool output_camera_debug_msg = 19 [default = false];
-    optional string camera_debug_channel_name = 20 [default = "/perception/camera_debug"];
-    optional double ts_diff = 21 [default = 0.1];
-    optional bool output_final_obstacles = 22 [default = false];
-    optional string visual_debug_folder = 23 [default = "/apollo/debug_output"];
-    optional string visual_camera = 24 [default = "front_6mm"];
-    optional bool write_visual_img = 25 [default = false];
-    optional double min_laneline_length_for_cipv = 26 [default = 2];
-    optional double average_lane_width_in_meter = 27 [default = 3.7];
-    optional double max_vehicle_width_in_meter = 28 [default = 2.5];
-    optional double average_frame_rate = 29 [default = 0.05];
-    optional bool image_based_cipv = 30 [default = false];
-    optional int32 debug_level = 31 [default = 0];
-    optional bool enable_cipv = 32 [default = false];
+  optional string camera_names = 1 [default = "front_6mm,front_12mm"];
+  optional string input_camera_channel_names = 2
+      [default =
+           "/sensor/camera/traffic/image_short,/sensor/camera/obstacle/"
+           "image_narrow"];
+  optional double timestamp_offset = 3 [default = 0.0];
+  optional string camera_obstacle_perception_conf_dir = 4
+      [default = "conf/perception/camera"];
+  optional string camera_obstacle_perception_conf_file = 5
+      [default = "obstacle.pt"];
+  optional int32 frame_capacity = 6 [default = 20];
+  optional int32 image_channel_num = 7 [default = 3];
+  optional bool enable_undistortion = 8 [default = false];
+  optional bool enable_visualization = 9 [default = false];
+  optional string output_obstacles_channel_name = 10
+      [default = "/perception/obstacles"];
+  optional string camera_perception_viz_message_channel_name = 11
+      [default = "/perception/inner/camera_viz_msg"];
+  optional string prefused_channel_name = 12
+      [default = "/perception/inner/PrefusedObjects"];
+  optional double default_camera_pitch = 13 [default = 0.0];
+  optional double default_camera_height = 14 [default = 1.5];
+  optional string lane_calibration_working_sensor_name = 15
+      [default = "front_6mm"];
+  optional string calibrator_method = 16 [default = "LaneLineCalibrator"];
+  optional string calib_service_name = 17
+      [default = "OnlineCalibrationService"];
+  optional bool run_calib_service = 18 [default = true];
+  optional bool output_camera_debug_msg = 19 [default = false];
+  optional string camera_debug_channel_name = 20
+      [default = "/perception/camera_debug"];
+  optional double ts_diff = 21 [default = 0.1];
+  optional bool output_final_obstacles = 22 [default = false];
+  optional string visual_debug_folder = 23 [default = "/apollo/debug_output"];
+  optional string visual_camera = 24 [default = "front_6mm"];
+  optional bool write_visual_img = 25 [default = false];
+  optional double min_laneline_length_for_cipv = 26 [default = 2];
+  optional double average_lane_width_in_meter = 27 [default = 3.7];
+  optional double max_vehicle_width_in_meter = 28 [default = 2.5];
+  optional double average_frame_rate = 29 [default = 0.05];
+  optional bool image_based_cipv = 30 [default = false];
+  optional int32 debug_level = 31 [default = 0];
+  optional bool enable_cipv = 32 [default = false];
 }

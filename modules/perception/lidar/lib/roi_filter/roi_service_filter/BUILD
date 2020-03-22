@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "roi_service_filter",
-    srcs = [
-        "roi_service_filter.cc",
-    ],
-    hdrs = [
-        "roi_service_filter.h",
-    ],
+    srcs = ["roi_service_filter.cc"],
+    hdrs = ["roi_service_filter.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:base_type",
@@ -36,9 +32,7 @@ cc_library(
 #cc_test(
 #    name = "roi_service_filter_test",
 #    size = "small",
-#    srcs = [
-#        "roi_service_filter_test.cc",
-#    ],
+#    srcs = ["roi_service_filter_test.cc"],
 #    deps = [
 #        ":roi_service_filter",
 #        "//modules/perception/common:perception_gflags",
@@ -47,7 +41,7 @@ cc_library(
 #        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
 #        "//modules/perception/map/hdmap:hdmap_input",
 #        "//modules/perception/lidar/lib/scene_manager/ground_service:ground_service",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 

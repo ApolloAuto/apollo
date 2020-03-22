@@ -78,8 +78,8 @@ bool TransformCache::QueryTransform(double timestamp,
   if (size == 1) {
     (*transform) = transforms_.back();
     transform->timestamp = timestamp;
-    AINFO << "use transform at " << std::to_string(transforms_.back().timestamp)
-          << " for " << std::to_string(timestamp);
+    AINFO << "use transform at " << transforms_.back().timestamp << " for "
+          << timestamp;
   } else {
     double ratio =
         (timestamp - transforms_[size - 2].timestamp) /
@@ -98,10 +98,9 @@ bool TransformCache::QueryTransform(double timestamp,
         transforms_[size - 2].translation.z() * (1 - ratio) +
         transforms_[size - 1].translation.z() * ratio;
 
-    AINFO << "estimate pose at " << std::to_string(timestamp)
-          << " from poses at "
-          << std::to_string(transforms_[size - 2].timestamp) << " and "
-          << std::to_string(transforms_[size - 1].timestamp);
+    AINFO << "estimate pose at " << timestamp << " from poses at "
+          << transforms_[size - 2].timestamp << " and "
+          << transforms_[size - 1].timestamp;
   }
   return true;
 }
@@ -177,8 +176,7 @@ bool TransformWrapper::GetSensor2worldTrans(
   if (novatel2world_trans != nullptr) {
     *novatel2world_trans = novatel2world;
   }
-  AINFO << "Get pose timestamp: " << std::to_string(timestamp)
-        << ", pose: " << std::endl
+  AINFO << "Get pose timestamp: " << timestamp << ", pose: \n"
         << (*sensor2world_trans).matrix();
   return true;
 }
@@ -221,7 +219,7 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  static_cast<float>(FLAGS_obs_tf2_buff_size),
                                  &err_string)) {
-    AERROR << "Can not find transform. " << std::to_string(timestamp)
+    AERROR << "Can not find transform. " << timestamp
            << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
            << " Error info: " << err_string;
     return false;

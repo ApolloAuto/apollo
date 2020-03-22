@@ -20,7 +20,7 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-using common::util::WithinBound;
+using apollo::common::util::WithinBound;
 
 /*
  * @brief: build virtual obstacle of stop wall, and add STOP decision

@@ -21,11 +21,9 @@
 #pragma once
 
 #include <algorithm>
-#include <iterator>
 #include <memory>
 #include <queue>
 #include <string>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -46,9 +44,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::Status;
-using apollo::common::math::Box2d;
 
 struct HybridAStartResult {
   std::vector<double> x;
@@ -93,9 +88,6 @@ class HybridAStar {
   bool GetTemporalProfile(HybridAStartResult* result);
   bool GenerateSpeedAcceleration(HybridAStartResult* result);
   bool GenerateSCurveSpeedAcceleration(HybridAStartResult* result);
-  bool CombinePathAndSpeedProfile(const DiscretizedPath& discretized_path,
-                                  const SpeedData& speed_data,
-                                  HybridAStartResult* result);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;

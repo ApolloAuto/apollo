@@ -16,7 +16,6 @@ limitations under the License.
 #include "modules/map/hdmap/hdmap_util.h"
 
 #include "gtest/gtest.h"
-#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace hdmap {
@@ -52,33 +51,6 @@ void HDMapUtilTestSuite::InitMapProto(Map* map_proto) {
   }
   lane->set_type(Lane::CITY_DRIVING);
 }
-
-// TEST_F(HDMapUtilTestSuite, ReuseMap) {
-//  MapMsg map_msg;
-//  InitMapProto(map_msg.mutable_hdmap());
-//  map_msg.mutable_header()->set_sequence_num(1);
-//  FLAGS_use_navigation_mode = true;
-//  AdapterManagerConfig adapter_config;
-//  adapter_config.set_is_ros(false);
-//  auto* config = adapter_config.add_config();
-//  config->set_type(AdapterConfig::RELATIVE_MAP);
-//  config->set_mode(AdapterConfig::RECEIVE_ONLY);
-//  AdapterManager::Init(adapter_config);
-//  AdapterManager::FeedRelativeMapData(map_msg);
-//  AdapterManager::Observe();
-//
-//  // First time generate map: 4ms dbg / 0.8ms opt
-//  auto* hdmap = HDMapUtil::BaseMapPtr();
-//  ASSERT_TRUE(hdmap != nullptr);
-//  // Second time runtime of reuse a ptr is 1/1000 ms.
-//  auto* hdmap1 = HDMapUtil::BaseMapPtr();
-//  EXPECT_EQ(hdmap, hdmap1);  // should be the same ptr.
-//  map_msg.mutable_header()->set_sequence_num(2);
-//  AdapterManager::FeedRelativeMapData(map_msg);
-//  AdapterManager::Observe();
-//  auto* hdmap2 = HDMapUtil::BaseMapPtr();
-//  EXPECT_NE(hdmap2, hdmap1);  // hdmap should be updated.
-//}
 
 }  // namespace hdmap
 }  // namespace apollo

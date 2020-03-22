@@ -5,12 +5,8 @@ package(default_visibility = ["//visibility:public"])
 
 cuda_library(
     name = "inference_cuda_util_cuda_lib",
-    srcs = [
-        "cuda_util.cu",
-    ],
-    hdrs = [
-        "cuda_util.h",
-    ],
+    srcs = ["cuda_util.cu"],
+    hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
         "@cuda",
@@ -19,25 +15,20 @@ cuda_library(
 
 cc_library(
     name = "inference_cuda_util_lib",
-    srcs = [
-        ":inference_cuda_util_cuda_lib",
-    ],
+    srcs = [":inference_cuda_util_cuda_lib"],
     hdrs = ["cuda_util.h"],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
         "@caffe",
+        "@opencv",
     ],
 )
 
 cuda_library(
     name = "inference_util_cuda_lib",
-    srcs = [
-        "util.cu",
-    ],
-    hdrs = [
-        "util.h",
-    ],
+    srcs = ["util.cu"],
+    hdrs = ["util.h"],
     deps = [
         "//cyber",
         "@cuda",
@@ -52,7 +43,7 @@ cc_library(
         ":inference_util_cuda_lib",
     ],
     hdrs = ["util.h"],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
         "//modules/perception/base:blob",
@@ -60,17 +51,14 @@ cc_library(
         "//modules/perception/base:image",
         "//modules/perception/base:point_cloud",
         "@caffe",
+        "@opencv",
     ],
 )
 
 cuda_library(
     name = "inference_resize_cuda_lib",
-    srcs = [
-        "resize.cu",
-    ],
-    hdrs = [
-        "resize.h",
-    ],
+    srcs = ["resize.cu"],
+    hdrs = ["resize.h"],
     deps = [
         ":inference_cuda_util_lib",
         ":inference_util_lib",
@@ -83,25 +71,20 @@ cuda_library(
 
 cc_library(
     name = "inference_resize_lib",
-    srcs = [
-        ":inference_resize_cuda_lib",
-    ],
+    srcs = [":inference_resize_cuda_lib"],
     hdrs = ["resize.h"],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
         "@caffe",
+        "@opencv",
     ],
 )
 
 cuda_library(
     name = "inference_gemm_cuda_lib",
-    srcs = [
-        "gemm.cu",
-    ],
-    hdrs = [
-        "gemm.h",
-    ],
+    srcs = ["gemm.cu"],
+    hdrs = ["gemm.h"],
     deps = [
         ":inference_cuda_util_lib",
         ":inference_util_lib",
@@ -114,14 +97,13 @@ cuda_library(
 
 cc_library(
     name = "inference_gemm_lib",
-    srcs = [
-        ":inference_gemm_cuda_lib",
-    ],
+    srcs = [":inference_gemm_cuda_lib"],
     hdrs = ["gemm.h"],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
         "@caffe",
+        "@opencv",
     ],
 )
 
@@ -134,20 +116,19 @@ cc_test(
     ],
     deps = [
         ":inference_util_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "inference_binary_data_lib",
-    srcs = [
-        "binary_data.cc",
-    ],
+    srcs = ["binary_data.cc"],
     hdrs = ["binary_data.h"],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkopts = ["-lnvinfer_plugin"],
     deps = [
         "//modules/perception/base:blob",
         "@caffe",
+        "@opencv",
     ],
 )
 
@@ -160,7 +141,7 @@ cc_test(
     ],
     deps = [
         ":inference_binary_data_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

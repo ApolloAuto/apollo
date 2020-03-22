@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ground_service_detector",
-    srcs = [
-        "ground_service_detector.cc",
-    ],
-    hdrs = [
-        "ground_service_detector.h",
-    ],
+    srcs = ["ground_service_detector.cc"],
+    hdrs = ["ground_service_detector.h"],
     deps = [
         "//cyber",
         "//modules/common/util",
@@ -32,14 +28,12 @@ cc_library(
 cc_test(
     name = "ground_service_detector_test",
     size = "small",
-    srcs = [
-        "ground_service_detector_test.cc",
-    ],
+    srcs = ["ground_service_detector_test.cc"],
     deps = [
         ":ground_service_detector",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

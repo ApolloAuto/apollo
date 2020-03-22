@@ -11,7 +11,7 @@ class CommandGroup extends React.Component {
                 extraCommandClass, extraButtonClass} = this.props;
 
         const entries = Object.keys(commands).map((key) => {
-            return <button className={extraButtonClass}
+            return <button className={classNames("command-button", extraButtonClass)}
                            disabled={disabled}
                            key={key}
                            onClick={commands[key]}>{key}</button>;

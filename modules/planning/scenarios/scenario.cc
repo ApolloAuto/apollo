@@ -40,7 +40,7 @@ bool Scenario::LoadConfig(const std::string& config_file,
 }
 
 void Scenario::Init() {
-  CHECK(!config_.stage_type().empty());
+  ACHECK(!config_.stage_type().empty());
 
   // set scenario_type in PlanningContext
   auto* scenario = PlanningContext::Instance()
@@ -54,7 +54,7 @@ void Scenario::Init() {
   }
   for (int i = 0; i < config_.stage_type_size(); ++i) {
     auto stage_type = config_.stage_type(i);
-    CHECK(common::util::ContainsKey(stage_config_map_, stage_type))
+    ACHECK(common::util::ContainsKey(stage_config_map_, stage_type))
         << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
         << " has no config";
   }

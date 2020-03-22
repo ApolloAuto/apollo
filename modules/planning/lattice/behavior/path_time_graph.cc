@@ -215,7 +215,7 @@ bool PathTimeGraph::GetPathTimeObstacle(const std::string& obstacle_id,
 
 std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
     const double t) const {
-  CHECK(time_range_.first <= t && t <= time_range_.second);
+  ACHECK(time_range_.first <= t && t <= time_range_.second);
   std::vector<std::pair<double, double>> intervals;
   for (const auto& pt_obstacle : path_time_obstacles_) {
     if (t > pt_obstacle.max_t() || t < pt_obstacle.min_t()) {
@@ -258,7 +258,7 @@ std::pair<double, double> PathTimeGraph::get_time_range() const {
 std::vector<STPoint> PathTimeGraph::GetObstacleSurroundingPoints(
     const std::string& obstacle_id, const double s_dist,
     const double t_min_density) const {
-  CHECK(t_min_density > 0.0);
+  ACHECK(t_min_density > 0.0);
   std::vector<STPoint> pt_pairs;
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
@@ -287,7 +287,7 @@ std::vector<STPoint> PathTimeGraph::GetObstacleSurroundingPoints(
   }
 
   double time_gap = t1 - t0;
-  CHECK(time_gap > -FLAGS_numerical_epsilon);
+  ACHECK(time_gap > -FLAGS_numerical_epsilon);
   time_gap = std::fabs(time_gap);
 
   size_t num_sections = static_cast<size_t>(time_gap / t_min_density + 1);

@@ -177,7 +177,7 @@ const void* SyncedMemory::cpu_data() {
 
 void SyncedMemory::set_cpu_data(void* data) {
   check_device();
-  CHECK(data);
+  ACHECK(data);
   if (own_cpu_data_) {
     PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_);
   }
@@ -200,7 +200,7 @@ const void* SyncedMemory::gpu_data() {
 void SyncedMemory::set_gpu_data(void* data) {
   check_device();
 #ifndef PERCEPTION_CPU_ONLY
-  CHECK(data);
+  ACHECK(data);
   if (own_gpu_data_) {
     BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
   }

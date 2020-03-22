@@ -22,7 +22,7 @@ cc_test(
     srcs = ["autotuning_speed_feature_builder_test.cc"],
     deps = [
         ":autotuning_speed_feature_builder",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_test(
     srcs = ["autotuning_speed_mlp_model_test.cc"],
     deps = [
         ":autotuning_speed_mlp_model",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -16,6 +16,7 @@
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
 #include "cyber/common/log.h"
+#include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
@@ -183,6 +184,13 @@ void TrackedObject::CopyFrom(TrackedObjectPtr rhs, bool is_deep) {
   }
 }
 
+float TrackedObject::GetVelThreshold(base::ObjectPtr obj) const {
+  if (obj->type == base::ObjectType::VEHICLE) {
+    return 0.99f;
+  }
+  return 0.0f;
+}
+
 void TrackedObject::ToObject(base::ObjectPtr obj) const {
   *obj = *object_ptr;
   // obj id keep default
@@ -194,7 +202,6 @@ void TrackedObject::ToObject(base::ObjectPtr obj) const {
      what a pity!
   */
   obj->direction = output_direction.cast<float>();
-  obj->theta = std::atan2(obj->direction[1], obj->direction[0]);
   // obj theta_variance not calculate in tracker, keep default
   obj->center = output_center;
   // obj center_uncertainty not calculate in tracker, keep default
@@ -209,6 +216,11 @@ void TrackedObject::ToObject(base::ObjectPtr obj) const {
   obj->velocity_uncertainty = output_velocity_uncertainty.cast<float>();
   obj->velocity_converged = converged;
   obj->tracking_time = tracking_time;
+  if (obj->velocity.norm() > GetVelThreshold(obj)) {
+    obj->theta = std::atan2(obj->velocity[1], obj->velocity[0]);
+  } else {
+    obj->theta = std::atan2(obj->direction[1], obj->direction[0]);
+  }
   // obj latest_tracked_time not calculate in tracker, keep default
   // obj car_light not calculate in tracker, keep default
   // obj lidar_supplement cloud_world has passed in *obj = *object_ptr

@@ -40,7 +40,6 @@ ConstantJerkTrajectory1d::ConstantJerkTrajectory1d(const double p0,
 
 double ConstantJerkTrajectory1d::Evaluate(const std::uint32_t order,
                                           const double param) const {
-  CHECK_GT(param, -FLAGS_numerical_epsilon);
   switch (order) {
     case 0: {
       return p0_ + v0_ * param + 0.5 * a0_ * param * param +

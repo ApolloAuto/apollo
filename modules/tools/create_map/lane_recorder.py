@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -30,7 +30,7 @@ import sys
 from gflags import FLAGS
 from std_msgs.msg import String
 
-from logger import Logger
+from common.logger import Logger
 from modules.localization.proto import localization_pb2
 from modules.drivers.proto import mobileye_pb2
 

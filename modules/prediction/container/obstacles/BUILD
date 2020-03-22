@@ -15,6 +15,8 @@ cc_library(
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/submodules:submodule_output",
     ],
 )
 
@@ -38,9 +40,7 @@ cc_library(
 cc_test(
     name = "obstacles_container_test",
     size = "small",
-    srcs = [
-        "obstacles_container_test.cc",
-    ],
+    srcs = ["obstacles_container_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
@@ -48,16 +48,14 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "obstacle_test",
     size = "small",
-    srcs = [
-        "obstacle_test.cc",
-    ],
+    srcs = ["obstacle_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
@@ -65,18 +63,14 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "obstacle_clusters",
-    srcs = [
-        "obstacle_clusters.cc",
-    ],
-    hdrs = [
-        "obstacle_clusters.h",
-    ],
+    srcs = ["obstacle_clusters.cc"],
+    hdrs = ["obstacle_clusters.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -89,9 +83,7 @@ cc_library(
 cc_test(
     name = "obstacle_clusters_test",
     size = "small",
-    srcs = [
-        "obstacle_clusters_test.cc",
-    ],
+    srcs = ["obstacle_clusters_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
@@ -99,7 +91,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacle_clusters",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "scene_manager",
-    srcs = [
-        "scene_manager.cc",
-    ],
-    hdrs = [
-        "scene_manager.h",
-    ],
+    srcs = ["scene_manager.cc"],
+    hdrs = ["scene_manager.h"],
     deps = [
         ":scene_service",
         "//modules/common/util",
@@ -22,9 +18,7 @@ cc_library(
 
 cc_library(
     name = "scene_service",
-    hdrs = [
-        "scene_service.h",
-    ],
+    hdrs = ["scene_service.h"],
     deps = [
         "//modules/perception/lib/registerer",
     ],
@@ -33,9 +27,7 @@ cc_library(
 cc_test(
     name = "scene_manager_test",
     size = "small",
-    srcs = [
-        "scene_manager_test.cc",
-    ],
+    srcs = ["scene_manager_test.cc"],
     deps = [
         ":scene_manager",
         "//modules/map/hdmap",
@@ -49,7 +41,7 @@ cc_test(
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/map/hdmap:hdmap_input",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
         "@pcl",
     ],
 )

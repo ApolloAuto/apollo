@@ -31,7 +31,7 @@ class EvaluatorManagerTest : public KMLMapBasedTest {
   virtual void SetUp() {
     const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
@@ -55,7 +55,7 @@ TEST_F(EvaluatorManagerTest, General) {
   obstacles_container->Insert(perception_obstacles_);
 
   EvaluatorManager::Instance()->Init(prediction_conf_);
-  EvaluatorManager::Instance()->Run();
+  EvaluatorManager::Instance()->Run(obstacles_container);
 
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);

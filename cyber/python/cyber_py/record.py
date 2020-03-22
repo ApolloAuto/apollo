@@ -1,6 +1,8 @@
+#!/usr/bin/env python2
+
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -23,13 +25,12 @@ import sys
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
+
 # init vars
-CYBER_PATH = os.environ['CYBER_PATH']
+CYBER_PATH = os.environ.get('CYBER_PATH', '/apollo/cyber')
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
 sys.path.append(CYBER_PATH + "/third_party/")
 sys.path.append(CYBER_PATH + "/lib/")
-sys.path.append(CYBER_PATH + "/python/cyber")
-sys.path.append(CYBER_PATH + "/python/cyber_py")
 
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
@@ -147,7 +148,7 @@ class RecordWriter(object):
     #
     # @param path the file path.
     #
-    # @return Success is Ture, other False.
+    # @return Success is True, other False.
     def open(self, path):
         return _CYBER_RECORD.PyRecordWriter_Open(self.record_writer, path)
 
@@ -166,7 +167,7 @@ class RecordWriter(object):
     # @param type_name a string of message type name.
     # @param proto_desc the message descriptor.
     #
-    # @return Success is Ture, other False.
+    # @return Success is True, other False.
     def write_channel(self, channel_name, type_name, proto_desc):
         """
         Writer channel by channelname,typename,protodesc
@@ -182,7 +183,7 @@ class RecordWriter(object):
     # @param time message time.
     # @param raw the flag implies data whether or not a rawdata.
     #
-    # @return Success is Ture, other False.
+    # @return Success is True, other False.
     def write_message(self, channel_name, data, time, raw=True):
         """
         Writer msg:channelname,rawmsg,writer time

@@ -18,11 +18,11 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include <limits.h>
 #include <netdb.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <climits>
+#include <cstdlib>
 #include <functional>
 
 #include "cyber/common/environment.h"
@@ -55,7 +55,7 @@ char* program_path() {
 
 GlobalData::GlobalData() {
   InitHostInfo();
-  CHECK(InitConfig());
+  ACHECK(InitConfig());
   process_id_ = getpid();
   char* prog_path = program_path();
   if (prog_path) {
@@ -84,6 +84,11 @@ void GlobalData::SetProcessGroup(const std::string& process_group) {
   process_group_ = process_group;
 }
 const std::string& GlobalData::ProcessGroup() const { return process_group_; }
+
+void GlobalData::SetComponentNums(const int component_nums) {
+  component_nums_ = component_nums;
+}
+int GlobalData::ComponentNums() const { return component_nums_; }
 
 void GlobalData::SetSchedName(const std::string& sched_name) {
   sched_name_ = sched_name;

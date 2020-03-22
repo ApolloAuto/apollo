@@ -28,6 +28,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
@@ -53,6 +54,7 @@ NaviPlanning::~NaviPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
+  History::Instance()->Clear();
   PlanningContext::Instance()->mutable_planning_status()->Clear();
 }
 
@@ -69,10 +71,13 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
+
+  // clear planning history
+  History::Instance()->Clear();
 
   // clear planning status
   PlanningContext::Instance()->mutable_planning_status()->Clear();
@@ -124,11 +129,11 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       std::make_unique<ReferenceLineProvider>(hdmap_, local_view_.relative_map);
 
   // localization
-  ADEBUG << "Get localization:"
+  ADEBUG << "Get localization: "
          << local_view_.localization_estimate->DebugString();
 
   // chassis
-  ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
+  ADEBUG << "Get chassis: " << local_view_.chassis->DebugString();
 
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
@@ -161,8 +166,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   // differs only a small amount (20ms). When the different is too large, the
   // estimation is invalid.
   DCHECK_GE(start_timestamp, vehicle_state.timestamp());
-  if (FLAGS_estimate_current_vehicle_state &&
-      start_timestamp - vehicle_state.timestamp() < 0.020) {
+  if (start_timestamp - vehicle_state.timestamp() <
+      FLAGS_message_latency_threshold) {
     auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());
@@ -250,7 +255,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
   // Use planning pad message to make driving decisions
   if (FLAGS_enable_planning_pad_msg) {
-    ProcessPadMsg(driving_action_);
+    const auto& pad_msg_driving_action = frame_->GetPadMsgDrivingAction();
+    ProcessPadMsg(pad_msg_driving_action);
   }
 
   for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
@@ -305,19 +311,11 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 }
 
-void NaviPlanning::OnPad(const PadMessage& pad) {
-  ADEBUG << "Received Planning Pad Msg:" << pad.DebugString();
-  AERROR_IF(!pad.has_action()) << "pad message check failed!";
-  driving_action_ = pad.action();
-  is_received_pad_msg_ = true;
-}
-
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
   if (config_.has_navigation_planning_config()) {
     std::map<std::string, uint32_t> lane_id_to_priority;
     auto& ref_line_info_group = *frame_->mutable_reference_line_info();
-    if (is_received_pad_msg_) {
-      is_received_pad_msg_ = false;
+    if (drvie_action != DrivingAction::NONE) {
       using LaneInfoPair = std::pair<std::string, double>;
       std::string current_lane_id;
       switch (drvie_action) {
@@ -365,8 +363,8 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
     }
 
     if (!target_lane_id_.empty()) {
-      constexpr uint32_t KTargetRefLinePriority = 0;
-      constexpr uint32_t kOtherRefLinePriority = 10;
+      static constexpr uint32_t KTargetRefLinePriority = 0;
+      static constexpr uint32_t kOtherRefLinePriority = 10;
       for (auto& ref_line_info : ref_line_info_group) {
         auto lane_id = ref_line_info.Lanes().Id();
         ADEBUG << "lane_id : " << lane_id;
@@ -400,7 +398,6 @@ std::string NaviPlanning::GetCurrentLaneId() {
 
 void NaviPlanning::GetLeftNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
-  DCHECK_NOTNULL(lane_info_group);
   auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
@@ -415,7 +412,7 @@ void NaviPlanning::GetLeftNeighborLanesInfo(
     double y = ref_point.y();
     // in FLU positive on the left
     if (y > 0.0) {
-      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+      lane_info_group->emplace_back(lane_id, y);
     }
   }
   // sort neighbor lanes from near to far
@@ -428,7 +425,6 @@ void NaviPlanning::GetLeftNeighborLanesInfo(
 
 void NaviPlanning::GetRightNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
-  DCHECK_NOTNULL(lane_info_group);
   auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
@@ -443,7 +439,7 @@ void NaviPlanning::GetRightNeighborLanesInfo(
     double y = ref_point.y();
     // in FLU negative on the right
     if (y < 0.0) {
-      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+      lane_info_group->emplace_back(lane_id, y);
     }
   }
 
@@ -475,7 +471,6 @@ Status NaviPlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const trajectory_pb) {
-  CHECK_NOTNULL(trajectory_pb);
   auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
@@ -541,7 +536,7 @@ Status NaviPlanning::Plan(
   last_publishable_trajectory_.reset(new PublishableTrajectory(
       current_time_stamp, best_ref_info->trajectory()));
 
-  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+  ADEBUG << "current_time_stamp: " << current_time_stamp;
 
   // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display

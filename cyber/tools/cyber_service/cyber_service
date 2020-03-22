@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 
@@ -15,11 +15,13 @@
 # limitations under the License.
 # ****************************************************************************
 
-import sys
 import os
+import sys
+
+from cyber_py3 import cyber
+
 
 sys.path.append("../")
-from cyber_py import cyber
 
 
 def print_service_info(service_name, sleep_s=2):
@@ -30,13 +32,14 @@ def print_service_info(service_name, sleep_s=2):
         msg.ParseFromString(roleattr_rawdata)
         assert(service_name == msg.service_name)
     except:
-        print "RoleAttributes ParseFromString failed. size is ", len(roleattr_rawdata), ", service name: ", service_name
+        print("RoleAttributes ParseFromString failed. size is ", len(roleattr_rawdata),
+              ", service name: ", service_name)
         return
-    print msg.service_name
-    print "\tprocessid\t", msg.process_id
-    print "\tnodename\t", msg.node_name
-    print "\thostname\t", msg.host_name
-    print ""
+    print(msg.service_name)
+    print("\tprocessid\t", msg.process_id)
+    print("\tnodename\t", msg.node_name)
+    print("\thostname\t", msg.host_name)
+    print("")
 
 
 def _service_cmd_info(argv):
@@ -67,9 +70,9 @@ def _service_cmd_info(argv):
 
 def print_service_list():
     services = sorted(cyber.ServiceUtils.get_services())
-    print "The number of services is: ", len(services)
+    print("The number of services is: ", len(services))
     for service_name in services:
-        print service_name
+        print(service_name)
 
 
 def _service_cmd_list(argv):

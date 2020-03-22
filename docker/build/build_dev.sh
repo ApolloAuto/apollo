@@ -27,7 +27,7 @@ REPO=apolloauto/apollo
 ARCH=$(uname -m)
 TIME=$(date +%Y%m%d_%H%M)
 
-TAG="${REPO}:dev-${ARCH}-${TIME}"
+TAG="${REPO}:dev-18.04-${ARCH}-${TIME}"
 
 # Fail on first error.
 set -e

@@ -18,14 +18,15 @@
  * @file
  **/
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"
-#include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
-#include "cyber/common/file.h"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
+
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 
 namespace apollo {
 namespace planning {
@@ -37,7 +38,7 @@ class DualVariableWarmStartOSQPInterfaceTest : public ::testing::Test {
         "/apollo/modules/planning/testdata/conf/"
         "open_space_standard_parking_lot.pb.txt";
 
-    CHECK(apollo::cyber::common::GetProtoFromFile(
+    ACHECK(apollo::cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;

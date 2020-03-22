@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -16,7 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
+import math
+
 import numpy as np
+
 
 class LatAcceleration:
     def __init__(self):
@@ -28,13 +31,16 @@ class LatAcceleration:
         # centripetal_jerk
         centripetal_jerk = 2 * init_point.v * init_point.a \
             * init_point.path_point.kappa + init_point.v \
-                * init_point.v * init_point.path_point.dkappa
-        self.centripetal_jerk_list.append(centripetal_jerk)
+            * init_point.v * init_point.path_point.dkappa
+        if not math.isnan(centripetal_jerk):
+            self.centripetal_jerk_list.append(centripetal_jerk)
 
         # centripetal_accel
         centripetal_accel = init_point.v * init_point.v \
             * init_point.path_point.kappa
-        self.centripetal_accel_list.append(centripetal_accel)
+
+        if not math.isnan(centripetal_accel):
+            self.centripetal_accel_list.append(centripetal_accel)
 
     def get_acceleration(self):
         # [1, 2) [-2, -1)
@@ -51,10 +57,10 @@ class LatAcceleration:
 
         for centripetal_accel in self.centripetal_accel_list:
             if LAT_ACCEL_M_LB_P <= centripetal_accel < LAT_ACCEL_M_UB_P \
-                or LAT_ACCEL_M_LB_N < centripetal_accel <= LAT_ACCEL_M_UB_N:
+                    or LAT_ACCEL_M_LB_N < centripetal_accel <= LAT_ACCEL_M_UB_N:
                 lat_accel_medium_cnt += 1
             if centripetal_accel >= LAT_ACCEL_H_LB_P \
-                or centripetal_accel <= LAT_ACCEL_H_UB_N:
+                    or centripetal_accel <= LAT_ACCEL_H_UB_N:
                 lat_accel_high_cnt += 1
 
         # centripetal_accel
@@ -86,10 +92,10 @@ class LatAcceleration:
 
         for centripetal_jerk in self.centripetal_jerk_list:
             if LAT_JERK_M_LB_P <= centripetal_jerk < LAT_JERK_M_UB_P \
-                or LAT_JERK_M_LB_N < centripetal_jerk <= LAT_JERK_M_UB_N:
+                    or LAT_JERK_M_LB_N < centripetal_jerk <= LAT_JERK_M_UB_N:
                 lat_jerk_medium_cnt += 1
             if centripetal_jerk >= LAT_JERK_H_LB_P \
-                or centripetal_jerk <= LAT_JERK_H_UB_N:
+                    or centripetal_jerk <= LAT_JERK_H_UB_N:
                 lat_jerk_high_cnt += 1
 
         # centripetal_jerk

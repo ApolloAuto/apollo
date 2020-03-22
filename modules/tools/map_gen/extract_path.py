@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -27,8 +27,8 @@ See the gflags for more optional args.
 """
 
 import sys
-from cyber_py import cyber
-from cyber_py.record import RecordReader
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 if len(sys.argv) < 3:

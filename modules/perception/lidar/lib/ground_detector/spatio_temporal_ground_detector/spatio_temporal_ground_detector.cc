@@ -33,13 +33,13 @@ bool SpatioTemporalGroundDetector::Init(
     const GroundDetectorInitOptions& options) {
   const lib::ModelConfig* model_config = nullptr;
   auto config_manager = lib::ConfigManager::Instance();
-  CHECK(config_manager->GetModelConfig("SpatioTemporalGroundDetector",
-                                       &model_config))
+  ACHECK(config_manager->GetModelConfig("SpatioTemporalGroundDetector",
+                                        &model_config))
       << "Failed to get model config: SpatioTemporalGroundDetector";
 
   const std::string& work_root = config_manager->work_root();
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path))
+  ACHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
   config_file = apollo::cyber::common::GetAbsolutePath(work_root, root_path);
@@ -48,7 +48,7 @@ bool SpatioTemporalGroundDetector::Init(
 
   // get config params
   SpatioTemporalGroundDetectorConfig config_params;
-  CHECK(GetProtoFromFile(config_file, &config_params))
+  ACHECK(GetProtoFromFile(config_file, &config_params))
       << "Failed to parse SpatioTemporalGroundDetectorConfig config file.";
   ground_thres_ = config_params.ground_thres();
   use_roi_ = config_params.use_roi();

@@ -16,10 +16,10 @@
 
 #include "cyber/transport/transmitter/intra_transmitter.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/receiver/intra_receiver.h"

@@ -53,47 +53,47 @@ class ObjectTemplateManager {
   float VehObjHwlBySearchTemplates(float *hwl, int *index = nullptr,
                                    bool *is_flip = nullptr);
   const int NrDimPerTmplt() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return nr_dim_per_tmplt_;
   }
   const std::vector<float> &VehHwl() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return veh_hwl_;
   }
   const std::map<TemplateIndex, int> &LookUpTableMinVolumeIndex() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return look_up_table_min_volume_index_;
   }
   const std::map<base::ObjectSubType, float> &TypeSpeedLimit() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return type_speed_limit_;
   }
   const std::vector<base::ObjectSubType> &TypeRefinedByTemplate() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return type_refined_by_template_;
   }
   const std::vector<base::ObjectSubType> &TypeRefinedByRef() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return type_refined_by_ref_;
   }
   const std::vector<base::ObjectSubType> &TypeCanBeRef() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return type_can_be_ref_;
   }
   const TemplateMap &MinTemplateHWL() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return min_template_hwl_;
   }
   const TemplateMap &MidTemplateHWL() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return mid_template_hwl_;
   }
   const TemplateMap &MaxTemplateHWL() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return max_template_hwl_;
   }
   const std::vector<TemplateMap> &TemplateHWL() {
-    CHECK(inited_);
+    ACHECK(inited_);
     return template_hwl_;
   }
 

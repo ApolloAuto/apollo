@@ -16,19 +16,21 @@
 
 #include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/message.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
 using apollo::common::VehicleConfigHelper;
+using cyber::common::PathExists;
 using google::protobuf::FieldDescriptor;
 using Json = nlohmann::json;
 namespace {
@@ -94,7 +96,7 @@ bool IsCompliedWithCriterion(float actual_value,
 DataCollectionMonitor::DataCollectionMonitor()
     : node_(cyber::CreateNode("data_collection_monitor")) {
   InitReaders();
-  LoadConfiguration(FLAGS_data_collection_config_path);
+  LoadConfiguration();
 }
 
 DataCollectionMonitor::~DataCollectionMonitor() { Stop(); }
@@ -106,28 +108,71 @@ void DataCollectionMonitor::InitReaders() {
                                });
 }
 
-void DataCollectionMonitor::LoadConfiguration(
-    const std::string& data_collection_config_path) {
-  CHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
-                                        &data_collection_table_))
+void DataCollectionMonitor::LoadConfiguration() {
+  const std::string& vehicle_dir =
+      VehicleManager::Instance()->GetVehicleDataPath();
+  std::string data_collection_config_path =
+      vehicle_dir + "/data_collection_table.pb.txt";
+  if (!PathExists(data_collection_config_path)) {
+    AWARN << "No corresponding data collection table file found in "
+          << vehicle_dir << ". Using default one instead.";
+    data_collection_config_path = FLAGS_default_data_collection_config_path;
+  }
+
+  ACHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
+                                         &data_collection_table_))
       << "Unable to parse data collection configuration from file "
       << data_collection_config_path;
+
+  ConstructCategories();
+
+  ADEBUG << "Configuration loaded.";
+}
+
+void DataCollectionMonitor::ConstructCategories() {
+  scenario_to_categories_.clear();
 
   for (const auto& scenario_iter : data_collection_table_.scenario()) {
     const std::string& scenario_name = scenario_iter.first;
     const Scenario& scenario = scenario_iter.second;
 
-    for (const auto& category_iter : scenario.category()) {
-      const std::string& category_name = category_iter.first;
-      const Category& category = category_iter.second;
+    Category category;
+    ConstructCategoriesHelper(scenario_name, scenario, 0, "", category);
+  }
+}
 
-      category_consecutive_frame_count_[scenario_name][category_name] = 0.0;
-      category_frame_count_[scenario_name][category_name] = 0.0;
-      current_progress_json_[scenario_name][category.description()] = 0.0;
-    }
+void DataCollectionMonitor::ConstructCategoriesHelper(
+    const std::string& scenario_name, const Scenario& scenario, int feature_idx,
+    std::string current_category_name, const Category& current_category) {
+  if (feature_idx == scenario.feature_size()) {
+    scenario_to_categories_[scenario_name].insert(
+        {current_category_name, current_category});
+
+    category_consecutive_frame_count_[scenario_name][current_category_name] =
+        0.0;
+    category_frame_count_[scenario_name][current_category_name] = 0.0;
+    current_progress_json_[scenario_name][current_category_name] = 0.0;
+    return;
   }
 
-  ADEBUG << "Configuration loaded.";
+  const Feature& feature = scenario.feature(feature_idx);
+  for (const auto& range : feature.range()) {
+    Category new_category(current_category);
+    new_category.push_back(range);
+
+    // set new category name by appending it with the current range name
+    std::string new_category_name(current_category_name);
+    const std::string& range_name = range.name();
+    if (feature.range().size() > 1 && !range_name.empty()) {
+      if (!new_category_name.empty()) {
+        new_category_name += ", ";
+      }
+      new_category_name += range_name;
+    }
+
+    ConstructCategoriesHelper(scenario_name, scenario, feature_idx + 1,
+                              new_category_name, new_category);
+  }
 }
 
 void DataCollectionMonitor::Start() {
@@ -135,12 +180,17 @@ void DataCollectionMonitor::Start() {
     category_consecutive_frame_count_.clear();
     category_frame_count_.clear();
     current_progress_json_.clear();
-    LoadConfiguration(FLAGS_data_collection_config_path);
+    LoadConfiguration();
   }
   enabled_ = true;
 }
 
 void DataCollectionMonitor::Stop() { enabled_ = false; }
+
+void DataCollectionMonitor::Restart() {
+  Stop();
+  Start();
+}
 
 void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
   if (!enabled_) {
@@ -148,17 +198,17 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
   }
 
   const size_t frame_threshold = data_collection_table_.frame_threshold();
-  for (const auto& scenario_iter : data_collection_table_.scenario()) {
+  const auto total_frames = data_collection_table_.total_frames();
+  for (const auto& scenario_iter : scenario_to_categories_) {
     const std::string& scenario_name = scenario_iter.first;
-    const Scenario& scenario = scenario_iter.second;
+    const auto& categories = scenario_iter.second;
 
-    for (const auto& category_iter : scenario.category()) {
+    for (const auto& category_iter : categories) {
       const std::string& category_name = category_iter.first;
       const Category& category = category_iter.second;
 
       // This category is done, skip
-      if (category_frame_count_[scenario_name][category_name] >=
-          category.total_frames()) {
+      if (category_frame_count_[scenario_name][category_name] >= total_frames) {
         continue;
       }
 
@@ -182,10 +232,10 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
           100.0 *
           static_cast<double>(
               category_frame_count_[scenario_name][category_name]) /
-          static_cast<double>(category.total_frames());
+          static_cast<double>(total_frames);
       {
         boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-        current_progress_json_[scenario_name][category.description()] =
+        current_progress_json_[scenario_name][category_name] =
             progress_percentage;
       }
     }
@@ -201,27 +251,29 @@ bool DataCollectionMonitor::IsCompliedWithCriteria(
   const auto* chassis_descriptor = chassis->GetDescriptor();
   const auto* chassis_reflection = chassis->GetReflection();
 
-  for (const auto& criterion : category.criterion()) {
-    float target_value;
-    if (criterion.has_value()) {
-      target_value = criterion.value();
-    } else if (!GetProtobufFloatByFieldName(
-                   vehicle_param, vehicle_param_descriptor,
-                   vehicle_param_reflection, criterion.vehicle_config(),
-                   &target_value)) {
-      return false;
-    }
+  for (const auto& range : category) {
+    for (const auto& criterion : range.criterion()) {
+      float target_value;
+      if (criterion.has_value()) {
+        target_value = criterion.value();
+      } else if (!GetProtobufFloatByFieldName(
+                     vehicle_param, vehicle_param_descriptor,
+                     vehicle_param_reflection, criterion.vehicle_config(),
+                     &target_value)) {
+        return false;
+      }
 
-    float actual_value;
-    if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
-                                     chassis_reflection, criterion.field(),
-                                     &actual_value)) {
-      return false;
-    }
+      float actual_value;
+      if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
+                                       chassis_reflection, criterion.field(),
+                                       &actual_value)) {
+        return false;
+      }
 
-    if (!IsCompliedWithCriterion(actual_value, criterion.comparison_operator(),
-                                 target_value)) {
-      return false;
+      if (!IsCompliedWithCriterion(
+              actual_value, criterion.comparison_operator(), target_value)) {
+        return false;
+      }
     }
   }
 

@@ -21,7 +21,7 @@
 #include "cyber/init.h"
 #include "cyber/service_discovery/topology_manager.h"
 
-#include <signal.h>
+#include <csignal>
 #include <iostream>
 
 namespace {
@@ -45,12 +45,18 @@ enum COMMAND {
 };
 
 COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
-  if (argc > 4) return TOO_MANY_PARAMETER;
+  if (argc > 4) {
+    return TOO_MANY_PARAMETER;
+  }
   int index = 1;
   while (true) {
     const char *opt = argv[index];
-    if (opt == nullptr) break;
-    if (strcmp(opt, "-h") == 0) return HELP;
+    if (opt == nullptr) {
+      break;
+    }
+    if (strcmp(opt, "-h") == 0) {
+      return HELP;
+    }
     if (strcmp(opt, "-c") == 0) {
       if (argv[index + 1]) {
         commandVal = argv[index + 1];

@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 
-#include <vector>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -34,15 +32,11 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::planning_internal::STGraphDebug;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_dp_st_speed_config());
-  dp_st_speed_config_ = config.dp_st_speed_config();
-  // TODO(all): fix the name
-  SetName("DpStSpeedOptimizer");
+  ACHECK(config.has_speed_heuristic_config());
+  speed_heuristic_config_ = config.speed_heuristic_config();
 }
 
 bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
@@ -62,6 +56,10 @@ Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
     SpeedData* const speed_data) {
   init_point_ = init_point;
+
+  dp_st_speed_config_ = reference_line_info_->IsChangeLanePath()
+                            ? speed_heuristic_config_.lane_change_speed_config()
+                            : speed_heuristic_config_.default_speed_config();
 
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");

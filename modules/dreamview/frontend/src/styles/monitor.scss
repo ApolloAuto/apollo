@@ -1,0 +1,293 @@
+$min-monitor-width: 160px;
+$monitor-header-height: 32px;
+
+.monitor {
+    height: 100%;
+    width: 100%;
+
+    border-left: 1px solid #000000;
+    box-sizing: border-box;
+
+    background-color: #1D2226;
+    overflow: auto;
+
+    .monitor-header {
+        display: flex;
+        height: $monitor-header-height;
+        box-sizing: border-box;
+        min-width: $min-monitor-width;
+        border-bottom: 1px solid #000000;
+        padding: 6px 12px;
+
+        background: #2A3238;
+        color: #FFFFFF;
+
+        .title {
+            flex-grow: 1;
+            margin: auto;
+        }
+    }
+
+    .monitor-content {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - #{$monitor-header-height});
+        min-width: $min-monitor-width;
+
+        .section {
+            flex: 1 1 auto;
+            padding: 5px 10px 5px 10px;
+            border-bottom: 1px solid #000000;
+
+            .section-title {
+                display: flex;
+                width: fit-content;
+                border-bottom: 1px solid #999999;
+                padding: 5px;
+
+                span {
+                    margin-left: 10px;
+                    margin-top: 2px;
+                }
+            }
+
+            .section-subtitle {
+                display: inline-block;
+                margin: 10px 0px 10px 10px;
+                border-bottom: 1px solid #999999;
+                padding-bottom: 2px;
+
+            }
+
+            .section-content {
+                padding: 10px 10px;
+                color: #999999;
+
+                .section-content-row {
+                    display: flex;
+                    padding: 5px;
+
+                    .field {
+                        flex: 1 1 auto;
+                    }
+                }
+            }
+        }
+    }
+
+    .monitor-table-container {
+        padding: 10px;
+        font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        font-weight: normal;
+
+        .monitor-table-title {
+            margin: 5px;
+            border-bottom: 1px solid rgba(153, 153, 153, 0.5);
+            padding-bottom: 5px;
+
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .monitor-table {
+            position: relative;
+            width: 100%;
+
+            .monitor-table-item {
+                position: relative;
+                width: 100%;
+
+                .text {
+                    position: relative;
+                    width: 30%;
+                    padding: 2px 4px;
+
+                    color: #999999;
+                    font-size: 12px;
+                }
+
+                .time {
+                    text-align: center;
+                }
+
+                .active {
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+}
+
+.pnc-monitor {
+    .scatter-graph {
+        margin: 0px;
+
+        &:not(:first-child) {
+            border-top: 1px solid #000000;
+        }
+
+        &:only-child {
+            border-bottom: 1px solid #000000;
+        }
+    }
+}
+
+.data-collection-monitor {
+    position: relative;
+    width: 100%;
+
+    .scenario-container {
+        position: absolute;
+    }
+
+    .section-divider-on-top {
+        border-top: 2px solid #080A0C;
+    }
+
+    .category-container {
+        position: relative;
+        width: 100%;
+        margin-bottom: 15px;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .dummy-category {
+        flex: 1 0 50%;
+        align-self: flex-end;
+        min-width: 130px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .category {
+        flex: 1 0 50%;
+        align-self: flex-end;
+        min-width: 130px;
+        overflow: hidden;
+        position: relative;
+
+        .category-description {
+            position: relative;
+            margin: 15px 0px 0px 10px;
+            font-size: 12px;
+
+            color: #888888;
+        }
+
+        .category-updated {
+            color: #FFFFFF;
+        }
+
+        .category-progress-background {
+            position: relative;
+            height: 6px;
+            margin: 5px 10px;
+            background-color: #333639;
+
+            .category-in-progress {
+                position: absolute;
+                height: 100%;
+                background: #006AFF;
+            }
+
+            .category-completed {
+                position: absolute;
+                height: 100%;
+                background: #113B73;
+            }
+        }
+    }
+}
+
+.camera-param {
+    overflow: auto;
+    user-select: none;
+
+    .actions {
+        display: flex;
+
+        .action {
+            flex: 1 1 auto;
+            text-align: center;
+            cursor: pointer;
+            padding: 2px;
+            width: 24px;
+
+            svg:hover {
+                fill: #FFFFFF;
+            }
+        }
+    }
+
+    .camera-param-row {
+        display: flex;
+        padding-bottom: 5px;
+        height: 24px;
+
+        .field {
+            width: 40px;
+            opacity: 0.6;
+        }
+
+        .value {
+            flex-grow: 1;
+            min-width: 100px;
+            margin-right: 25px;
+            text-align: right;
+        }
+
+        .delta {
+            width: 25%;
+            margin-right: 35px;
+            text-align: center;
+        }
+
+        .action {
+            width: 30px;
+            display: flex;
+            flex-direction: column;
+
+            svg {
+                cursor: pointer;
+
+                &:hover {
+                    fill: #FFFFFF;
+                }
+            }
+        }
+    }
+}
+
+.teleop {
+    .mute-button {
+        width: 20px;
+        border: 1px solid #383838;
+
+        background: #181818;
+        color: #999999;
+        text-align: center;
+
+        outline: none;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    .teleop-command-group {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+
+        .teleop-button {
+            min-height: 90px;
+            font-size: 22px;
+        }
+    }
+}

@@ -30,6 +30,9 @@ DECLARE_string(planning_pad_topic);
 DECLARE_string(monitor_topic);
 DECLARE_string(pad_topic);
 DECLARE_string(control_command_topic);
+DECLARE_string(control_preprocessor_topic);
+DECLARE_string(control_local_view_topic);
+DECLARE_string(control_core_command_topic);
 DECLARE_string(pointcloud_topic);
 DECLARE_string(pointcloud_16_front_up_topic);
 DECLARE_string(pointcloud_64_topic);
@@ -46,6 +49,7 @@ DECLARE_string(lidar_16_fusion_topic);
 DECLARE_string(lidar_16_fusion_compensator_topic);
 DECLARE_string(lidar_128_topic);
 DECLARE_string(prediction_topic);
+DECLARE_string(prediction_container_topic);
 DECLARE_string(perception_obstacle_topic);
 DECLARE_string(drive_event_topic);
 DECLARE_string(traffic_light_detection_topic);
@@ -96,6 +100,7 @@ DECLARE_string(hmi_status_topic);
 DECLARE_string(audio_capture_topic);
 DECLARE_string(v2x_obstacle_topic);
 DECLARE_string(v2x_trafficlight_topic);
+DECLARE_string(storytelling_topic);
 // For pandora.
 DECLARE_string(pandora_pointcloud_topic);
 DECLARE_string(pandora_camera_front_color_topic);
@@ -117,3 +122,8 @@ DECLARE_string(tf_static_topic);
 
 // Recorder status topic
 DECLARE_string(recorder_status_topic);
+
+// Latency recording topic
+DECLARE_string(latency_recording_topic);
+// Latency reporting topic
+DECLARE_string(latency_reporting_topic);

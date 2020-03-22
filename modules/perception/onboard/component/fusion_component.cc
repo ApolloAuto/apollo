@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_component.h"
 
+#include "modules/common/time/time.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/utils/perf.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
 
@@ -33,7 +33,7 @@ bool FusionComponent::Init() {
   if (!GetProtoConfig(&comp_config)) {
     return false;
   }
-  AINFO << "Radarr Component Configs: " << comp_config.DebugString();
+  AINFO << "Fusion Component Configs: " << comp_config.DebugString();
 
   // to load component configs
   fusion_method_ = comp_config.fusion_method();
@@ -42,7 +42,7 @@ bool FusionComponent::Init() {
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
   // init algorithm plugin
-  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
+  ACHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   writer_ = node_->CreateWriter<PerceptionObstacles>(
       comp_config.output_obstacles_channel_name());
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
@@ -51,8 +51,6 @@ bool FusionComponent::Init() {
 }
 
 bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
-  AINFO << "Enter FusionComponent proc. message->sensor_id_: "
-        << message->sensor_id_;
   if (message->process_stage_ == ProcessStage::SENSOR_FUSION) {
     return true;
   }
@@ -64,8 +62,8 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
   if (status) {
     // TODO(conver sensor id)
     if (message->sensor_id_ != fusion_main_sensor_) {
-      AINFO << "Fusion receive non " << fusion_main_sensor_
-            << " message, skip send.";
+      AINFO << "Fusion receive from " << message->sensor_id_ << "not from "
+            << fusion_main_sensor_ << ". Skip send.";
     } else {
       // Send("/apollo/perception/obstacles", out_message);
       writer_->Write(out_message);
@@ -85,11 +83,11 @@ bool FusionComponent::InitAlgorithmPlugin() {
   fusion::ObstacleMultiSensorFusionParam param;
   param.main_sensor = fusion_main_sensor_;
   param.fusion_method = fusion_method_;
-  CHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
+  ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
   if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
     hdmap_input_ = map::HDMapInput::Instance();
-    CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
+    ACHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   AINFO << "Init algorithm successfully, onboard fusion: " << fusion_method_;
   return true;
@@ -106,11 +104,12 @@ bool FusionComponent::InternalProc(
 
   PERCEPTION_PERF_BLOCK_START();
   const double timestamp = in_message->timestamp_;
+  const uint64_t lidar_timestamp = in_message->lidar_timestamp_;
   std::vector<base::ObjectPtr> valid_objects;
   if (in_message->error_code_ != apollo::common::ErrorCode::OK) {
-    if (!MsgSerializer::SerializeMsg(timestamp, in_message->seq_num_,
-                                     valid_objects, in_message->error_code_,
-                                     out_message.get())) {
+    if (!MsgSerializer::SerializeMsg(
+            timestamp, lidar_timestamp, in_message->seq_num_, valid_objects,
+            in_message->error_code_, out_message.get())) {
       AERROR << "Failed to gen PerceptionObstacles object.";
       return false;
     }
@@ -175,20 +174,19 @@ bool FusionComponent::InternalProc(
   }
   // produce pb output msg
   apollo::common::ErrorCode error_code = apollo::common::ErrorCode::OK;
-  if (!MsgSerializer::SerializeMsg(timestamp, in_message->seq_num_,
-                                   valid_objects, error_code,
-                                   out_message.get())) {
+  if (!MsgSerializer::SerializeMsg(timestamp, lidar_timestamp,
+                                   in_message->seq_num_, valid_objects,
+                                   error_code, out_message.get())) {
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
       std::string("fusion_serialize_message"), in_message->sensor_id_);
 
-  const double cur_time = lib::TimeUtil::GetCurrentTime();
+  const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Obstacle:End:msg_time["
-        << std::to_string(timestamp) << "]:cur_time["
-        << std::to_string(cur_time) << "]:cur_latency[" << latency
+  AINFO << "FRAME_STATISTICS:Obstacle:End:msg_time[" << timestamp
+        << "]:cur_time[" << cur_time << "]:cur_latency[" << latency
         << "]:obj_cnt[" << valid_objects.size() << "]";
   AINFO << "publish_number: " << valid_objects.size() << " obj";
   return true;

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+#include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
 #include "modules/perception/base/distortion_model.h"
@@ -33,7 +33,7 @@ TEST(YoloCameraDetectorTest, demo_test) {
   cv::Mat cv_img = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/detector/yolo/img/test.jpg");
-  CHECK(!cv_img.empty()) << "image is empty.";
+  ACHECK(!cv_img.empty()) << "image is empty.";
 
   base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
 
@@ -53,9 +53,9 @@ TEST(YoloCameraDetectorTest, demo_test) {
   dp_init_options.image_height = cv_img.rows;
   dp_init_options.image_width = cv_img.cols;
   dp_init_options.device_id = 0;
-  CHECK(frame.data_provider->Init(dp_init_options));
-  CHECK(frame.data_provider->FillImageData(cv_img.rows, cv_img.cols,
-                                           image.gpu_data(), "bgr8"));
+  ACHECK(frame.data_provider->Init(dp_init_options));
+  ACHECK(frame.data_provider->FillImageData(cv_img.rows, cv_img.cols,
+                                            image.gpu_data(), "bgr8"));
 
   ObstacleDetectorInitOptions init_options;
   init_options.root_dir =
@@ -146,8 +146,7 @@ TEST(YoloCameraDetectorTest, inference_init_test) {
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   cyber::common::GetProtoFromFile(config_path, &yolo_param);
-  yolo::YoloParam origin_yolo_param;
-  origin_yolo_param.CopyFrom(yolo_param);
+  yolo::YoloParam origin_yolo_param = yolo_param;
   yolo_param.mutable_model_param()->set_model_type("Unknownnet");
 
   {

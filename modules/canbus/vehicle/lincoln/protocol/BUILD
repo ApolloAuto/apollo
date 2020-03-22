@@ -65,264 +65,220 @@ cc_library(
 cc_test(
     name = "accel_6b_test",
     size = "small",
-    srcs = [
-        "accel_6b_test.cc",
-    ],
+    srcs = ["accel_6b_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brake_60_test",
     size = "small",
-    srcs = [
-        "brake_60_test.cc",
-    ],
+    srcs = ["brake_60_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brake_61_test",
     size = "small",
-    srcs = [
-        "brake_61_test.cc",
-    ],
+    srcs = ["brake_61_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "brakeinfo_74_test",
     size = "small",
-    srcs = [
-        "brakeinfo_74_test.cc",
-    ],
+    srcs = ["brakeinfo_74_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "fuellevel_72_test",
     size = "small",
-    srcs = [
-        "fuellevel_72_test.cc",
-    ],
+    srcs = ["fuellevel_72_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "gear_66_test",
     size = "small",
-    srcs = [
-        "gear_66_test.cc",
-    ],
+    srcs = ["gear_66_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "gear_67_test",
     size = "small",
-    srcs = [
-        "gear_67_test.cc",
-    ],
+    srcs = ["gear_67_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "gps_6d_test",
     size = "small",
-    srcs = [
-        "gps_6d_test.cc",
-    ],
+    srcs = ["gps_6d_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "gps_6e_test",
     size = "small",
-    srcs = [
-        "gps_6e_test.cc",
-    ],
+    srcs = ["gps_6e_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "gps_6f_test",
     size = "small",
-    srcs = [
-        "gps_6f_test.cc",
-    ],
+    srcs = ["gps_6f_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "gyro_6c_test",
     size = "small",
-    srcs = [
-        "gyro_6c_test.cc",
-    ],
+    srcs = ["gyro_6c_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "misc_69_test",
     size = "small",
-    srcs = [
-        "misc_69_test.cc",
-    ],
+    srcs = ["misc_69_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "steering_64_test",
     size = "small",
-    srcs = [
-        "steering_64_test.cc",
-    ],
+    srcs = ["steering_64_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "steering_65_test",
     size = "small",
-    srcs = [
-        "steering_65_test.cc",
-    ],
+    srcs = ["steering_65_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "throttle_62_test",
     size = "small",
-    srcs = [
-        "throttle_62_test.cc",
-    ],
+    srcs = ["throttle_62_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "throttle_63_test",
     size = "small",
-    srcs = [
-        "throttle_63_test.cc",
-    ],
+    srcs = ["throttle_63_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "throttleinfo_75_test",
     size = "small",
-    srcs = [
-        "throttleinfo_75_test.cc",
-    ],
+    srcs = ["throttleinfo_75_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "tirepressure_71_test",
     size = "small",
-    srcs = [
-        "tirepressure_71_test.cc",
-    ],
+    srcs = ["tirepressure_71_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "turnsignal_68_test",
     size = "small",
-    srcs = [
-        "turnsignal_68_test.cc",
-    ],
+    srcs = ["turnsignal_68_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "version_7f_test",
     size = "small",
-    srcs = [
-        "version_7f_test.cc",
-    ],
+    srcs = ["version_7f_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "wheelspeed_6a_test",
     size = "small",
-    srcs = [
-        "wheelspeed_6a_test.cc",
-    ],
+    srcs = ["wheelspeed_6a_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "surround_73_test",
     size = "small",
-    srcs = [
-        "surround_73_test.cc",
-    ],
+    srcs = ["surround_73_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

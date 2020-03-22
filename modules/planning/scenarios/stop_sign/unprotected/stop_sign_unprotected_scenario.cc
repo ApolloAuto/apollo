@@ -38,9 +38,9 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using hdmap::HDMapUtil;
-using hdmap::StopSignInfo;
-using hdmap::StopSignInfoConstPtr;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::StopSignInfo;
+using apollo::hdmap::StopSignInfoConstPtr;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;

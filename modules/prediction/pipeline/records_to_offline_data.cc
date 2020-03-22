@@ -16,7 +16,7 @@
 
 #include "cyber/common/file.h"
 
-#include "modules/common/util/string_util.h"
+#include "absl/strings/str_split.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -38,8 +38,8 @@ void GenerateDataForLearning() {
   if (!MessageProcess::Init()) {
     return;
   }
-  std::vector<std::string> inputs;
-  common::util::Split(FLAGS_prediction_offline_bags, ':', &inputs);
+  const std::vector<std::string> inputs =
+      absl::StrSplit(FLAGS_prediction_offline_bags, ':');
   for (const auto& input : inputs) {
     std::vector<std::string> offline_bags;
     GetRecordFileNames(boost::filesystem::path(input), &offline_bags);

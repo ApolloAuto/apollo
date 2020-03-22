@@ -26,7 +26,7 @@
 ## Software architecture and algorithms
 > Deep dive into Apollo's modules and algorithms
 
-  * [Apollo 5.0 software architecture](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_5.0_Software_Architecture.md "Apollo software architecture")
+  *  [Apollo 5.0 software architecture](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_3.5_Software_Architecture.md "Apollo software architecture") - The core software architecture for Apollo 5.5 remains the same as Apollo 3.5
   * [3D Obstacle Perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception.md)
   * [Apollo 5.0 Perception](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
   * [Open Space Planner](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Open_Space_Planner.md)

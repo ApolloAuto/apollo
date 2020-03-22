@@ -50,10 +50,10 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
     return false;
   }
 
-  std::string woork_root_config = GetAbsolutePath(
+  std::string work_root_config = GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), options.root_dir);
 
-  std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
+  std::string config = GetAbsolutePath(work_root_config, options.conf_file);
   ProbabilisticFusionConfig params;
 
   if (!cyber::common::GetProtoFromFile(config, &params)) {
@@ -108,19 +108,22 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
 bool ProbabilisticFusion::Fuse(const FusionOptions& options,
                                const base::FrameConstPtr& sensor_frame,
                                std::vector<base::ObjectPtr>* fused_objects) {
-  CHECK(fused_objects != nullptr) << "fusion error: fused_objects is nullptr";
+  if (fused_objects == nullptr) {
+    AERROR << "fusion error: fused_objects is nullptr";
+    return false;
+  }
 
   auto* sensor_data_manager = SensorDataManager::Instance();
   // 1. save frame data
   {
     std::lock_guard<std::mutex> data_lock(data_mutex_);
-    if (sensor_data_manager->IsLidar(sensor_frame) && !params_.use_lidar) {
+    if (!params_.use_lidar && sensor_data_manager->IsLidar(sensor_frame)) {
       return true;
     }
-    if (sensor_data_manager->IsRadar(sensor_frame) && !params_.use_radar) {
+    if (!params_.use_radar && sensor_data_manager->IsRadar(sensor_frame)) {
       return true;
     }
-    if (sensor_data_manager->IsCamera(sensor_frame) && !params_.use_camera) {
+    if (!params_.use_camera && sensor_data_manager->IsCamera(sensor_frame)) {
       return true;
     }
 
@@ -261,8 +264,9 @@ void ProbabilisticFusion::CreateNewTracks(
                     if (sensor_name == frame->GetSensorId())
                       prohibition_sensor_flag = true;
                   });
-    if (prohibition_sensor_flag) continue;
-
+    if (prohibition_sensor_flag) {
+      continue;
+    }
     TrackPtr track = TrackPool::Instance().Get();
     track->Initialize(frame->GetForegroundObjects()[obj_ind]);
     scenes_->AddForegroundTrack(track);

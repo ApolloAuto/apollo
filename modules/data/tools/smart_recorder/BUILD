@@ -48,8 +48,11 @@ cc_library(
     deps = [
         ":drive_event_trigger",
         ":emergency_mode_trigger",
+        ":hard_brake_trigger",
         ":interval_pool",
+        ":regular_interval_trigger",
         ":small_topics_trigger",
+        ":swerve_trigger",
         "//cyber/common:file",
         "//cyber/record:record_writer",
         "//modules/common/util",
@@ -60,7 +63,9 @@ cc_library(
     name = "smart_recorder_gflags",
     srcs = ["smart_recorder_gflags.cc"],
     hdrs = ["smart_recorder_gflags.h"],
-    deps = ["//external:gflags"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(
@@ -87,11 +92,44 @@ cc_library(
 )
 
 cc_library(
+    name = "hard_brake_trigger",
+    srcs = ["hard_brake_trigger.cc"],
+    hdrs = ["hard_brake_trigger.h"],
+    deps = [
+        ":trigger_base",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/control/proto:control_proto",
+    ],
+)
+
+cc_library(
     name = "small_topics_trigger",
     srcs = ["small_topics_trigger.cc"],
     hdrs = ["small_topics_trigger.h"],
     deps = [
         ":channel_pool",
+        ":trigger_base",
+    ],
+)
+
+cc_library(
+    name = "swerve_trigger",
+    srcs = ["swerve_trigger.cc"],
+    hdrs = ["swerve_trigger.h"],
+    deps = [
+        ":trigger_base",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/control/proto:control_proto",
+    ],
+)
+
+cc_library(
+    name = "regular_interval_trigger",
+    srcs = ["regular_interval_trigger.cc"],
+    hdrs = ["regular_interval_trigger.h"],
+    deps = [
         ":trigger_base",
     ],
 )
@@ -113,7 +151,8 @@ cc_library(
     hdrs = ["interval_pool.h"],
     deps = [
         "//cyber/common:log",
-        "//modules/common/util",
+        "//cyber/common:macros",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -122,8 +161,8 @@ cc_library(
     srcs = ["channel_pool.cc"],
     hdrs = ["channel_pool.h"],
     deps = [
+        "//cyber/common:macros",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
     ],
 )
 

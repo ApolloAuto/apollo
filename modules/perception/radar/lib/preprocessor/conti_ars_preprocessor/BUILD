@@ -5,23 +5,17 @@ package(default_visibility = ["//visibility:public"])
 cc_test(
     name = "conti_ars_preprocessor_test",
     size = "small",
-    srcs = [
-        "conti_ars_preprocessor_test.cc",
-    ],
+    srcs = ["conti_ars_preprocessor_test.cc"],
     deps = [
         ":conti_ars_preprocessor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "conti_ars_preprocessor",
-    srcs = [
-        "conti_ars_preprocessor.cc",
-    ],
-    hdrs = [
-        "conti_ars_preprocessor.h",
-    ],
+    srcs = ["conti_ars_preprocessor.cc"],
+    hdrs = ["conti_ars_preprocessor.h"],
     deps = [
         "//modules/drivers/proto:sensor_proto",
         "//modules/perception/base",
@@ -32,6 +26,7 @@ cc_library(
         "//modules/perception/radar/lib/interface:base_preprocessor",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

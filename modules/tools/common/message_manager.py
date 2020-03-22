@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -29,7 +29,7 @@ from modules.common.proto import drive_event_pb2
 from modules.map.relative_map.proto import navigation_pb2
 from modules.guardian.proto import guardian_pb2
 
-import proto_utils
+from . import proto_utils
 
 
 class MessageType:
@@ -115,9 +115,9 @@ class PbMessageManager:
             try:
                 message = meta_msg.parse_file(filename)
                 if message:
-                    print "identified topic %s" % topic
+                    print("identified topic %s" % topic)
                     return (meta_msg, message)
             except text_format.ParseError as e:
-                print "Tried %s, failed" % (topic)
+                print("Tried %s, failed" % (topic))
                 continue
         return (None, None)

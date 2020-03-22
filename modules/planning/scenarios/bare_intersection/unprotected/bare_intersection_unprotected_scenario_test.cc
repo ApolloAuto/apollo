@@ -18,8 +18,6 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 
 #include "gtest/gtest.h"
@@ -41,19 +39,9 @@ class BareIntersectionUnprotectedScenarioTest : public ::testing::Test {
   std::unique_ptr<BareIntersectionUnprotectedScenario> scenario_;
 };
 
-TEST_F(BareIntersectionUnprotectedScenarioTest, VerifyConf) {
-  FLAGS_scenario_bare_intersection_unprotected_config_file =
-      "/apollo/modules/planning/conf/"
-      "scenario/bare_intersection_unprotected_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_bare_intersection_unprotected_config_file, &config));
-}
-
 TEST_F(BareIntersectionUnprotectedScenarioTest, Init) {
   FLAGS_scenario_bare_intersection_unprotected_config_file =
-      "/apollo/modules/planning/testdata/conf/"
+      "/apollo/modules/planning/conf/"
       "scenario/bare_intersection_unprotected_config.pb.txt";
 
   ScenarioConfig config;

@@ -11,12 +11,8 @@ cc_binary(
 
 cc_library(
     name = "timer_component_example_lib",
-    srcs = [
-        "timer_component_example.cc",
-    ],
-    hdrs = [
-        "timer_component_example.h",
-    ],
+    srcs = ["timer_component_example.cc"],
+    hdrs = ["timer_component_example.h"],
     deps = [
         "//cyber",
         "//cyber/examples/proto:examples_cc_proto",

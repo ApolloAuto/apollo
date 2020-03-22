@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#pragma once
+
 #include <string>
 
 #include "pcl/io/pcd_io.h"
@@ -46,7 +48,7 @@ struct PCLPointXYZL {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-static bool LoadPCLPCD(const std::string& file_path,
+inline bool LoadPCLPCD(const std::string& file_path,
                        base::PointFCloud* cloud_out) {
   pcl::PointCloud<PCLPointXYZIT> org_cloud;
   if (pcl::io::loadPCDFile(file_path, org_cloud) < 0) {

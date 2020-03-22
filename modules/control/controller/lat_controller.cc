@@ -23,13 +23,13 @@
 
 #include "Eigen/LU"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -39,7 +39,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::common::util::StrCat;
 using Matrix = Eigen::MatrixXd;
 using apollo::common::time::Clock;
 
@@ -97,7 +96,10 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->lat_controller_conf().ts();
-  CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
+  if (ts_ <= 0.0) {
+    AERROR << "[MPCController] Invalid control update interval.";
+    return false;
+  }
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
@@ -136,19 +138,17 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
 void LatController::ProcessLogs(const SimpleLateralDebug *debug,
                                 const canbus::Chassis *chassis) {
-  // StrCat supports 9 arguments at most.
-  const std::string log_str = StrCat(
-      StrCat(debug->lateral_error(), ",", debug->ref_heading(), ",",
-             debug->heading(), ",", debug->heading_error(), ","),
-      StrCat(debug->heading_error_rate(), ",", debug->lateral_error_rate(), ",",
-             debug->curvature(), ",", debug->steer_angle(), ","),
-      StrCat(debug->steer_angle_feedforward(), ",",
-             debug->steer_angle_lateral_contribution(), ",",
-             debug->steer_angle_lateral_rate_contribution(), ",",
-             debug->steer_angle_heading_contribution(), ","),
-      StrCat(debug->steer_angle_heading_rate_contribution(), ",",
-             debug->steer_angle_feedback(), ",", chassis->steering_percentage(),
-             ",", VehicleStateProvider::Instance()->linear_velocity()));
+  const std::string log_str = absl::StrCat(
+      debug->lateral_error(), ",", debug->ref_heading(), ",", debug->heading(),
+      ",", debug->heading_error(), ",", debug->heading_error_rate(), ",",
+      debug->lateral_error_rate(), ",", debug->curvature(), ",",
+      debug->steer_angle(), ",", debug->steer_angle_feedforward(), ",",
+      debug->steer_angle_lateral_contribution(), ",",
+      debug->steer_angle_lateral_rate_contribution(), ",",
+      debug->steer_angle_heading_contribution(), ",",
+      debug->steer_angle_heading_rate_contribution(), ",",
+      debug->steer_angle_feedback(), ",", chassis->steering_percentage(), ",",
+      VehicleStateProvider::Instance()->linear_velocity());
   if (FLAGS_enable_csv_debug) {
     steer_log_file_ << log_str << std::endl;
   }
@@ -189,7 +189,15 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
-
+  /*
+  A matrix (Gear Drive)
+  [0.0, 1.0, 0.0, 0.0;
+   0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+   (l_r * c_r - l_f * c_f) / m / v;
+   0.0, 0.0, 0.0, 1.0;
+   0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+   (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+  */
   matrix_a_(0, 1) = 1.0;
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
@@ -201,6 +209,9 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
 
+  /*
+  b = [0.0, c_f / m, 0.0, l_f * c_f / i_z]^T
+  */
   matrix_b_ = Matrix::Zero(basic_state_size_, 1);
   matrix_bd_ = Matrix::Zero(basic_state_size_, 1);
   matrix_bdc_ = Matrix::Zero(matrix_size, 1);
@@ -217,11 +228,11 @@ Status LatController::Init(const ControlConf *control_conf) {
   int reverse_q_param_size =
       control_conf_->lat_controller_conf().reverse_matrix_q_size();
   if (matrix_size != q_param_size || matrix_size != reverse_q_param_size) {
-    const auto error_msg =
-        StrCat("lateral controller error: matrix_q size: ", q_param_size,
-               "lateral controller error: reverse_maxtrix_q size: ",
-               reverse_q_param_size,
-               " in parameter file not equal to matrix_size: ", matrix_size);
+    const auto error_msg = absl::StrCat(
+        "lateral controller error: matrix_q size: ", q_param_size,
+        "lateral controller error: reverse_matrix_q size: ",
+        reverse_q_param_size,
+        " in parameter file not equal to matrix_size: ", matrix_size);
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -236,10 +247,17 @@ Status LatController::Init(const ControlConf *control_conf) {
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
 
-  bool enable_leadlag = control_conf_->lat_controller_conf()
-                            .enable_reverse_leadlag_compensation();
-  if (enable_leadlag) {
+  enable_leadlag_ = control_conf_->lat_controller_conf()
+                        .enable_reverse_leadlag_compensation();
+  if (enable_leadlag_) {
     leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
+  }
+
+  enable_mrac_ =
+      control_conf_->lat_controller_conf().enable_steer_mrac_control();
+  if (enable_mrac_) {
+    mrac_controller_.Init(lat_controller_conf.steer_mrac_conf(),
+                          vehicle_param_.steering_latency_param(), ts_);
   }
 
   return Status::OK();
@@ -267,11 +285,11 @@ void LatController::LoadLatGainScheduler(
   }
 
   lat_err_interpolation_.reset(new Interpolation1D);
-  CHECK(lat_err_interpolation_->Init(xy1))
+  ACHECK(lat_err_interpolation_->Init(xy1))
       << "Fail to load lateral error gain scheduler";
 
   heading_err_interpolation_.reset(new Interpolation1D);
-  CHECK(heading_err_interpolation_->Init(xy2))
+  ACHECK(heading_err_interpolation_->Init(xy2))
       << "Fail to load heading error gain scheduler";
 }
 
@@ -344,7 +362,7 @@ Status LatController::ComputeControlCommand(
 
             auto x_new = cos_theta_diff * x - sin_theta_diff * y + tx;
             auto y_new = sin_theta_diff * x + cos_theta_diff * y + ty;
-            auto theta_new = common::math::WrapAngle(theta - theta_diff);
+            auto theta_new = common::math::NormalizeAngle(theta - theta_diff);
 
             p.mutable_path_point()->set_x(x_new);
             p.mutable_path_point()->set_y(y_new);
@@ -370,11 +388,29 @@ Status LatController::ComputeControlCommand(
   // replace the lateral translational motion dynamics with the corresponding
   // kinematic models)
   if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+    /*
+    A matrix (Gear Reverse)
+    [0.0, 0.0, 1.0 * v 0.0;
+     0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+     (l_r * c_r - l_f * c_f) / m / v;
+     0.0, 0.0, 0.0, 1.0;
+     0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+     (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+    */
     cf_ = -control_conf_->lat_controller_conf().cf();
     cr_ = -control_conf_->lat_controller_conf().cr();
     matrix_a_(0, 1) = 0.0;
     matrix_a_coeff_(0, 2) = 1.0;
   } else {
+    /*
+    A matrix (Gear Drive)
+    [0.0, 1.0, 0.0, 0.0;
+     0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+     (l_r * c_r - l_f * c_f) / m / v;
+     0.0, 0.0, 0.0, 1.0;
+     0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+     (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+    */
     cf_ = control_conf_->lat_controller_conf().cf();
     cr_ = control_conf_->lat_controller_conf().cr();
     matrix_a_(0, 1) = 1.0;
@@ -386,6 +422,10 @@ Status LatController::ComputeControlCommand(
   matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
+
+  /*
+  b = [0.0, c_f / m, 0.0, l_f * c_f / i_z]^T
+  */
   matrix_b_(1, 0) = cf_ / mass_;
   matrix_b_(3, 0) = lf_ * cf_ / iz_;
   matrix_bd_ = matrix_b_ * ts_;
@@ -446,13 +486,10 @@ Status LatController::ComputeControlCommand(
 
   const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
 
-  // Clamp the steer angle to -100.0 to 100.0
   double steer_angle = 0.0;
   double steer_angle_feedback_augment = 0.0;
-  bool enable_leadlag = control_conf_->lat_controller_conf()
-                            .enable_reverse_leadlag_compensation();
   // Augment the feedback control on lateral error at the desired speed domain
-  if (enable_leadlag) {
+  if (enable_leadlag_) {
     if (FLAGS_enable_feedback_augment_on_high_speed ||
         std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_) {
       steer_angle_feedback_augment =
@@ -463,23 +500,78 @@ Status LatController::ComputeControlCommand(
   steer_angle = steer_angle_feedback + steer_angle_feedforward +
                 steer_angle_feedback_augment;
 
-  // Limit the steering command with the given maximum lateral acceleration
-  if (FLAGS_set_steer_limit) {
-    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
-                                         (vehicle_state->linear_velocity() *
-                                          vehicle_state->linear_velocity())) *
-                               steer_ratio_ * 180 / M_PI /
-                               steer_single_direction_max_degree_ * 100;
+  // Compute the steering command limit with the given maximum lateral
+  // acceleration
+  const double steer_limit =
+      FLAGS_set_steer_limit ? std::atan(max_lat_acc_ * wheelbase_ /
+                                        (vehicle_state->linear_velocity() *
+                                         vehicle_state->linear_velocity())) *
+                                  steer_ratio_ * 180 / M_PI /
+                                  steer_single_direction_max_degree_ * 100
+                            : 100.0;
 
-    // Clamp the steer angle with steer limitations at current speed
-    double steer_angle_limited =
-        common::math::Clamp(steer_angle, -steer_limit, steer_limit);
-    steer_angle = steer_angle_limited;
-    debug->set_steer_angle_limited(steer_angle_limited);
+  const double steer_diff_with_max_rate =
+      FLAGS_enable_maximum_steer_rate_limit
+          ? vehicle_param_.max_steer_angle_rate() * ts_ * 180 / M_PI /
+                steer_single_direction_max_degree_ * 100
+          : 100.0;
+
+  const double steering_position = chassis->steering_percentage();
+
+  // Re-compute the steering command if the MRAC control is enabled, with steer
+  // angle limitation and steer rate limitation
+  if (enable_mrac_) {
+    const int mrac_model_order = control_conf_->lat_controller_conf()
+                                     .steer_mrac_conf()
+                                     .mrac_model_order();
+    Matrix steer_state = Matrix::Zero(mrac_model_order, 1);
+    steer_state(0, 0) = chassis->steering_percentage();
+    if (mrac_model_order > 1) {
+      steer_state(1, 0) = (steering_position - pre_steering_position_) / ts_;
+    }
+    if (std::fabs(vehicle_state->linear_velocity()) >
+        control_conf_->minimum_speed_resolution()) {
+      mrac_controller_.SetStateAdaptionRate(1.0);
+      mrac_controller_.SetInputAdaptionRate(1.0);
+    } else {
+      mrac_controller_.SetStateAdaptionRate(0.0);
+      mrac_controller_.SetInputAdaptionRate(0.0);
+    }
+    steer_angle = mrac_controller_.Control(
+        steer_angle, steer_state, steer_limit, steer_diff_with_max_rate / ts_);
+    // Set the steer mrac debug message
+    MracDebug *mracdebug = debug->mutable_steer_mrac_debug();
+    Matrix steer_reference = mrac_controller_.CurrentReferenceState();
+    mracdebug->set_mrac_model_order(mrac_model_order);
+    for (int i = 0; i < mrac_model_order; ++i) {
+      mracdebug->add_mrac_reference_state(steer_reference(i, 0));
+      mracdebug->add_mrac_state_error(steer_state(i, 0) -
+                                      steer_reference(i, 0));
+      mracdebug->mutable_mrac_adaptive_gain()->add_state_adaptive_gain(
+          mrac_controller_.CurrentStateAdaptionGain()(i, 0));
+    }
+    mracdebug->mutable_mrac_adaptive_gain()->add_input_adaptive_gain(
+        mrac_controller_.CurrentInputAdaptionGain()(0, 0));
+    mracdebug->set_mrac_reference_saturation_status(
+        mrac_controller_.ReferenceSaturationStatus());
+    mracdebug->set_mrac_control_saturation_status(
+        mrac_controller_.ControlSaturationStatus());
   }
+  pre_steering_position_ = steering_position;
+  debug->set_steer_mrac_enable_status(enable_mrac_);
+
+  // Clamp the steer angle with steer limitations at current speed
+  double steer_angle_limited =
+      common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+  steer_angle = steer_angle_limited;
+  debug->set_steer_angle_limited(steer_angle_limited);
+
+  // Limit the steering command with the designed digital filter
   steer_angle = digital_filter_.Filter(steer_angle);
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
+  // Check if the steer is locked and hence the previous steer angle should be
+  // executed
   if (std::abs(vehicle_state->linear_velocity()) < FLAGS_lock_steer_speed &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
@@ -487,21 +579,13 @@ Status LatController::ComputeControlCommand(
     steer_angle = pre_steer_angle_;
   }
 
-  const double steer_diff_with_max_rate =
-      vehicle_param_.max_steer_angle_rate() * ts_ * 180 / M_PI /
-      steer_single_direction_max_degree_ * 100;
+  // Set the steer commands
+  cmd->set_steering_target(common::math::Clamp(
+      steer_angle, pre_steer_angle_ - steer_diff_with_max_rate,
+      pre_steer_angle_ + steer_diff_with_max_rate));
+  cmd->set_steering_rate(FLAGS_steer_angle_rate);
 
-  if (FLAGS_enable_maximum_steer_rate_limit) {
-    cmd->set_steering_target(common::math::Clamp(
-        steer_angle, pre_steer_angle_ - steer_diff_with_max_rate,
-        pre_steer_angle_ + steer_diff_with_max_rate));
-    pre_steer_angle_ = cmd->steering_target();
-    cmd->set_steering_rate(steer_diff_with_max_rate / ts_);
-  } else {
-    pre_steer_angle_ = steer_angle;
-    cmd->set_steering_target(steer_angle);
-    cmd->set_steering_rate(FLAGS_steer_angle_rate);
-  }
+  pre_steer_angle_ = cmd->steering_target();
 
   // compute extra information for logging and debugging
   const double steer_angle_lateral_contribution =
@@ -531,14 +615,20 @@ Status LatController::ComputeControlCommand(
       steer_angle_heading_rate_contribution);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steer_angle_feedback_augment(steer_angle_feedback_augment);
-  debug->set_steering_position(chassis->steering_percentage());
+  debug->set_steering_position(steering_position);
   debug->set_ref_speed(vehicle_state->linear_velocity());
 
   ProcessLogs(debug, chassis);
   return Status::OK();
 }
 
-Status LatController::Reset() { return Status::OK(); }
+Status LatController::Reset() {
+  matrix_state_.setZero();
+  if (enable_mrac_) {
+    mrac_controller_.Reset();
+  }
+  return Status::OK();
+}
 
 void LatController::UpdateState(SimpleLateralDebug *debug) {
   auto vehicle_state = VehicleStateProvider::Instance();

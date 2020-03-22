@@ -99,7 +99,7 @@ class SpiralSmootherUtil {
                   [&start_point](Eigen::Vector2d& p) { p = p - start_point; });
 
     ReferenceLineSmootherConfig config;
-    CHECK(cyber::common::GetProtoFromFile(
+    ACHECK(cyber::common::GetProtoFromFile(
         "modules/planning/conf/spiral_smoother_config.pb.txt", &config));
 
     std::vector<double> opt_theta;

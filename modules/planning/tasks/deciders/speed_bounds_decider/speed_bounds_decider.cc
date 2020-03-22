@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -35,18 +34,15 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::Vec2d;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
 SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
     : Decider(config) {
-  CHECK(config.has_speed_bounds_decider_config());
+  ACHECK(config.has_speed_bounds_decider_config());
   speed_bounds_config_ = config.speed_bounds_decider_config();
-  SetName("SpeedBoundsDecider");
 }
 
 Status SpeedBoundsDecider::Process(
@@ -58,17 +54,25 @@ Status SpeedBoundsDecider::Process(
   PathDecision *const path_decision = reference_line_info->path_decision();
 
   // 1. Map obstacles into st graph
+  auto time1 = std::chrono::system_clock::now();
   STBoundaryMapper boundary_mapper(
       speed_bounds_config_, reference_line, path_data,
       path_data.discretized_path().Length(), speed_bounds_config_.total_time());
 
-  path_decision->EraseStBoundaries();
+  if (!FLAGS_use_st_drivable_boundary) {
+    path_decision->EraseStBoundaries();
+  }
+
   if (boundary_mapper.ComputeSTBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg = "Mapping obstacle failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  auto time2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = time2 - time1;
+  ADEBUG << "Time for ST Boundary Mapping = " << diff.count() * 1000
+         << " msec.";
 
   std::vector<const STBoundary *> boundaries;
   for (auto *obstacle : path_decision->obstacles().Items()) {
@@ -114,8 +118,8 @@ Status SpeedBoundsDecider::Process(
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
   st_graph_data->LoadData(boundaries, min_s_on_st_boundaries, init_point,
-                          speed_limit, path_data_length, total_time_by_conf,
-                          st_graph_debug);
+                          speed_limit, reference_line_info->GetCruiseSpeed(),
+                          path_data_length, total_time_by_conf, st_graph_debug);
 
   // Create and record st_graph debug info
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
@@ -125,14 +129,10 @@ Status SpeedBoundsDecider::Process(
 
 double SpeedBoundsDecider::SetSpeedFallbackDistance(
     PathDecision *const path_decision) {
-  // Set min_s_on_st_boundaries to guide speed fallback. Different stop distance
-  // is taken when there is an obstacle moving in opposite direction of ADV
-  constexpr double kEpsilon = 1.0e-6;
+  // Set min_s_on_st_boundaries to guide speed fallback.
+  static constexpr double kEpsilon = 1.0e-6;
   double min_s_non_reverse = std::numeric_limits<double>::infinity();
   double min_s_reverse = std::numeric_limits<double>::infinity();
-  // TODO(Jinyun): tmp workaround for side pass capability because of doomed
-  // speed planning failure when side pass creeping
-  double side_pass_stop_s = std::numeric_limits<double>::infinity();
 
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &st_boundary = obstacle->path_st_boundary();
@@ -152,21 +152,11 @@ double SpeedBoundsDecider::SetSpeedFallbackDistance(
     } else if (min_s_non_reverse > lowest_s) {
       min_s_non_reverse = lowest_s;
     }
-
-    if (obstacle->LongitudinalDecision().stop().reason_code() ==
-            StopReasonCode::STOP_REASON_SIDEPASS_SAFETY &&
-        side_pass_stop_s > lowest_s) {
-      side_pass_stop_s = lowest_s;
-    }
   }
 
   min_s_reverse = std::max(min_s_reverse, 0.0);
   min_s_non_reverse = std::max(min_s_non_reverse, 0.0);
-  side_pass_stop_s = std::max(side_pass_stop_s, 0.0);
 
-  if (!std::isinf(side_pass_stop_s)) {
-    return side_pass_stop_s;
-  }
   return min_s_non_reverse > min_s_reverse ? 0.0 : min_s_non_reverse;
 }
 
@@ -212,10 +202,9 @@ void SpeedBoundsDecider::RecordSTGraphDebug(
   }
 
   for (const auto &point : st_graph_data.speed_limit().speed_limit_points()) {
-    common::SpeedPoint speed_point;
-    speed_point.set_s(point.first);
-    speed_point.set_v(point.second);
-    st_graph_debug->add_speed_limit()->CopyFrom(speed_point);
+    common::SpeedPoint *speed_point = st_graph_debug->add_speed_limit();
+    speed_point->set_s(point.first);
+    speed_point->set_v(point.second);
   }
 }
 

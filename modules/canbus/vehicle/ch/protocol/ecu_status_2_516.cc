@@ -45,7 +45,7 @@ void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'description': 'Percentage of battery remaining (BMS
 // status)', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
 // 'battery_remaining_capacity', 'is_signed_var': False, 'physical_range':
-// '[0|0]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
+// '[0|100]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
 int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
                                               int32_t length) const {
   Byte t0(bytes + 1);

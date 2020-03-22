@@ -5,35 +5,27 @@ package(default_visibility = ["//visibility:public"])
 cc_test(
     name = "conti_ars_tracker_test",
     size = "small",
-    srcs = [
-        "conti_ars_tracker_test.cc",
-    ],
+    srcs = ["conti_ars_tracker_test.cc"],
     deps = [
         ":conti_ars_tracker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "conti_ars_tracker_empty_test",
     size = "small",
-    srcs = [
-        "conti_ars_tracker_empty_test.cc",
-    ],
+    srcs = ["conti_ars_tracker_empty_test.cc"],
     deps = [
         ":conti_ars_tracker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "conti_ars_tracker",
-    srcs = [
-        "conti_ars_tracker.cc",
-    ],
-    hdrs = [
-        "conti_ars_tracker.h",
-    ],
+    srcs = ["conti_ars_tracker.cc"],
+    hdrs = ["conti_ars_tracker.h"],
     deps = [
         "//modules/perception/base",
         "//modules/perception/common/graph",
@@ -47,6 +39,7 @@ cc_library(
         "//modules/perception/radar/lib/tracker/matcher:hm_matcher",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

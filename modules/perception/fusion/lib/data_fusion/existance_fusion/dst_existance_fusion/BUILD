@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "dst_existance_fusion",
-    srcs = [
-        "dst_existance_fusion.cc",
-    ],
-    hdrs = [
-        "dst_existance_fusion.h",
-    ],
+    srcs = ["dst_existance_fusion.cc"],
+    hdrs = ["dst_existance_fusion.h"],
     deps = [
         "//modules/common/util",
         "//modules/perception/fusion/base",
@@ -24,12 +20,10 @@ cc_library(
 cc_test(
     name = "dst_existance_fusion_test",
     size = "small",
-    srcs = [
-        "dst_existance_fusion_test.cc",
-    ],
+    srcs = ["dst_existance_fusion_test.cc"],
     deps = [
         ":dst_existance_fusion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

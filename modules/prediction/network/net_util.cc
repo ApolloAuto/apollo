@@ -64,7 +64,7 @@ std::function<float(float)> serialize_to_function(const std::string& str) {
 }
 
 bool LoadTensor(const TensorParameter& tensor_pb, Eigen::MatrixXf* matrix) {
-  if (tensor_pb.data_size() == 0 || tensor_pb.shape_size() == 0) {
+  if (tensor_pb.data().empty() || tensor_pb.shape().empty()) {
     AERROR << "Fail to load the necessary fields!";
     return false;
   }
@@ -90,7 +90,7 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::MatrixXf* matrix) {
 }
 
 bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector) {
-  if (tensor_pb.data_size() == 0 || tensor_pb.shape_size() == 0) {
+  if (tensor_pb.data().empty() || tensor_pb.shape().empty()) {
     AERROR << "Fail to load the necessary fields!";
     return false;
   }
@@ -107,7 +107,7 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector) {
 
 bool LoadTensor(const TensorParameter& tensor_pb,
                 std::vector<Eigen::MatrixXf>* const tensor3d) {
-  if (tensor_pb.data_size() == 0 || tensor_pb.shape_size() != 3) {
+  if (tensor_pb.data().empty() || tensor_pb.shape_size() != 3) {
     AERROR << "Fail to load the necessary fields!";
     return false;
   }

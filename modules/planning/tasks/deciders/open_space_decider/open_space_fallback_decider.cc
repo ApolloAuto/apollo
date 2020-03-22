@@ -68,7 +68,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
          << predicted_bounding_rectangles[0].size()
          << " and : " << predicted_bounding_rectangles.size();
   if (!IsCollisionFreeTrajectory(
-          frame->open_space_info().chosen_paritioned_trajectory(),
+          frame->open_space_info().chosen_partitioned_trajectory(),
           predicted_bounding_rectangles, &fallback_start_index,
           &first_collision_index)) {
     // change flag
@@ -77,7 +77,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // generate fallback trajectory base on current partition trajectory
     // vehicle speed is decreased to zero inside safety distance
     TrajGearPair fallback_trajectory_pair_candidate =
-        frame->open_space_info().chosen_paritioned_trajectory();
+        frame->open_space_info().chosen_partitioned_trajectory();
     // auto* ptr_fallback_trajectory_pair =
     // frame_->mutable_open_space_info()->mutable_fallback_trajectory();
     const auto future_collision_point =
@@ -159,7 +159,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
 
     // If stop_index == fallback_start_index;
     if (fallback_start_index == stop_index) {
-      // 1. Set fallback start speed to 0, accleration to max accleration.
+      // 1. Set fallback start speed to 0, acceleration to max acceleration.
       AINFO << "Stop distance within safety buffer, stop now!";
       fallback_start_point.set_v(0.0);
       fallback_start_point.set_a(0.0);

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -35,9 +35,9 @@ for fn in sys.argv[1:]:
         vals = line.split(",")
         if len(vals) < 3:
             continue
-        print float(vals[-2]), float(vals[-1])
+        print(float(vals[-2]), float(vals[-1]))
         x, y = projector(float(vals[-1]), float(vals[-2]))
-        print x, y
+        print(x, y)
         X.append(x)
         Y.append(y)
     f.close()

@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message MracConf {
+  optional int32 mrac_model_order = 1 [default = 1];
+  optional double reference_time_constant = 2;
+  optional double reference_natural_frequency = 3;
+  optional double reference_damping_ratio = 4;
+  // state gain size must be not higher than the mrac_model_order
+  repeated double adaption_state_gain = 5;
+  optional double adaption_desired_gain = 6;
+  optional double adaption_nonlinear_gain = 7;
+  // adaption matrix size must match the model matrix size based on
+  // mrac_model_order
+  repeated double adaption_matrix_p = 8;
+  optional double mrac_saturation_level = 9 [default = 1.0];
+  // compensation gain size must be not higher than the mrac_model_order
+  repeated double anti_windup_compensation_gain = 10;
+  optional double clamping_time_constant = 11;
+}

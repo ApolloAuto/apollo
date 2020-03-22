@@ -136,7 +136,6 @@ class MapNavigator {
 
         const x = autoDrivingCar.positionX;
         const y = autoDrivingCar.positionY;
-        const heading = autoDrivingCar.heading;
 
         const [longitude, latitude] = this.mapAdapter.applyCoordinateOffset(UTMToWGS84(x, y));
         const latLng = this.mapAdapter.createPoint({

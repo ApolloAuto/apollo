@@ -1,5 +1,5 @@
 header {
-  timestamp_sec: 1517713744.0523665
+  timestamp_sec: 1517713744.0523663
   lidar_timestamp: 0
   camera_timestamp: 0
   radar_timestamp: 0
@@ -56,3 +56,30 @@ engage_advice {
 }
 trajectory_type: NORMAL
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "150_1_-1"
+}
+target_lane_id {
+  id: "149_1_-1"
+}
+target_lane_id {
+  id: "1954_1_-1"
+}
+target_lane_id {
+  id: "1965a_1_-1"
+}
+target_lane_id {
+  id: "71_1_-1"
+}
+target_lane_id {
+  id: "2448_1_-1"
+}
+target_lane_id {
+  id: "66_1_-1"
+}
+target_lane_id {
+  id: "1948_1_-1"
+}
+target_lane_id {
+  id: "1949_1_-1"
+}

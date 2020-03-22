@@ -17,15 +17,16 @@
 #ifndef CYBER_RECORD_FILE_RECORD_FILE_READER_H_
 #define CYBER_RECORD_FILE_RECORD_FILE_READER_H_
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
+
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/message.h"
+#include "google/protobuf/text_format.h"
 
 #include "cyber/common/log.h"
 #include "cyber/record/file/record_file_base.h"
@@ -42,8 +43,8 @@ using google::protobuf::io::ZeroCopyInputStream;
 
 class RecordFileReader : public RecordFileBase {
  public:
-  RecordFileReader();
-  virtual ~RecordFileReader();
+  RecordFileReader() = default;
+  virtual ~RecordFileReader() = default;
   bool Open(const std::string& path) override;
   void Close() override;
   bool Reset();
@@ -56,7 +57,7 @@ class RecordFileReader : public RecordFileBase {
 
  private:
   bool ReadHeader();
-  bool end_of_file_;
+  bool end_of_file_ = false;
 };
 
 template <typename T>

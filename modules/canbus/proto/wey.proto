@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 message Ads_shifter_115 {
-// Control Message
+  // Control Message
   enum Ads_shiftmodeType {
     ADS_SHIFTMODE_INVALID = 0;
     ADS_SHIFTMODE_VALID = 1;
@@ -21,7 +21,7 @@ message Ads_shifter_115 {
 }
 
 message Ads_eps_113 {
-// Control Message
+  // Control Message
   enum Ads_epsmodeType {
     ADS_EPSMODE_DISABLE = 0;
     ADS_EPSMODE_ACTIVE = 2;
@@ -33,7 +33,7 @@ message Ads_eps_113 {
 }
 
 message Status_310 {
-// Report Message
+  // Report Message
   enum LongitudeaccvalidType {
     LONGITUDEACCVALID_INVALID = 0;
     LONGITUDEACCVALID_VALID = 1;
@@ -198,13 +198,15 @@ message Status_310 {
   optional RrwheelspdvalidType rrwheelspdvalid = 7;
   // Quality/fault information to current Vehicle speed information [] [0|1]
   optional VehiclespdvalidType vehiclespdvalid = 8;
-  // This signal indicates if ECM control for  ADS torque request is active or not. [] [0|3]
+  // This signal indicates if ECM control for  ADS torque request is active or
+  // not. [] [0|3]
   optional LongitudedrivingmodeType longitudedrivingmode = 9;
   // Engine speed valid [] [0|2]
   optional EngspdvalidType engspdvalid = 10;
   // Detect Acceleration Pedal Override [] [0|1]
   optional AccepedaloverrideType accepedaloverride = 11;
-  // indicates the brake pedal is pressed or not or incorrect for plausibility check. [] [0|3]
+  // indicates the brake pedal is pressed or not or incorrect for plausibility
+  // check. [] [0|3]
   optional BrakepedalstatusType brakepedalstatus = 12;
   // Brake light lamp(on/off),come from ESP [] [0|1]
   optional EspbrakelightstsType espbrakelightsts = 13;
@@ -253,13 +255,13 @@ message Status_310 {
 }
 
 message Vin_resp3_393 {
-// Report Message
+  // Report Message
   // [] [0|255]
   optional int32 vin16 = 1;
 }
 
 message Vin_resp2_392 {
-// Report Message
+  // Report Message
   // [] [0|255]
   optional int32 vin15 = 1;
   // [] [0|255]
@@ -279,7 +281,7 @@ message Vin_resp2_392 {
 }
 
 message Vin_resp1_391 {
-// Report Message
+  // Report Message
   // [] [0|255]
   optional int32 vin07 = 1;
   // [] [0|255]
@@ -299,7 +301,7 @@ message Vin_resp1_391 {
 }
 
 message Ads_req_vin_390 {
-// Control Message
+  // Control Message
   enum Req_vin_signalType {
     REQ_VIN_SIGNAL_NO_REQUEST = 0;
     REQ_VIN_SIGNAL_REQUEST = 1;
@@ -309,7 +311,7 @@ message Ads_req_vin_390 {
 }
 
 message Ads1_111 {
-// Control Message
+  // Control Message
   enum Ads_dectostopType {
     ADS_DECTOSTOP_NO_DEMAND = 0;
     ADS_DECTOSTOP_DEMAND = 1;
@@ -328,7 +330,8 @@ message Ads1_111 {
   }
   // ADS request ESP/VLC to decelerate until standstill. [] [0|1]
   optional Ads_dectostopType ads_dectostop = 1;
-  // The status of the ADS control unit.The ADS mode should be contained in every message sent by ADS [] [0|31]
+  // The status of the ADS control unit.The ADS mode should be contained in
+  // every message sent by ADS [] [0|31]
   optional Ads_modeType ads_mode = 2;
   // ADS target acceleration for transmission [m/s2] [-7|5.75]
   optional double ads_taracce = 3;
@@ -341,7 +344,7 @@ message Ads1_111 {
 }
 
 message Fbs2_240 {
-// Report Message
+  // Report Message
   enum FlwheeldirectionType {
     FLWHEELDIRECTION_INVALID = 0;
     FLWHEELDIRECTION_FORWARD = 1;
@@ -377,7 +380,7 @@ message Fbs2_240 {
 }
 
 message Fbs1_243 {
-// Report Message
+  // Report Message
   enum FrwheeldirectionType {
     FRWHEELDIRECTION_INVALID = 0;
     FRWHEELDIRECTION_FORWARD = 1;
@@ -397,7 +400,7 @@ message Fbs1_243 {
 }
 
 message Fbs4_235 {
-// Report Message
+  // Report Message
   // angle of steering wheel  [deg] [0|780]
   optional double steerwheelangle = 1;
   // steering wheel rotation speed [deg/s] [0|1016]
@@ -405,7 +408,7 @@ message Fbs4_235 {
 }
 
 message Fail_241 {
-// Report Message
+  // Report Message
   enum EngfailType {
     ENGFAIL_NO_FAIL = 0;
     ENGFAIL_FAIL = 1;
@@ -445,7 +448,7 @@ message Fail_241 {
 }
 
 message Fbs3_237 {
-// Report Message
+  // Report Message
   enum EpbswtichpositionType {
     EPBSWTICHPOSITION_NEUTRAL = 0;
     EPBSWTICHPOSITION_RELEASE = 1;
@@ -496,7 +499,7 @@ message Fbs3_237 {
 }
 
 message Ads3_38e {
-// Control Message
+  // Control Message
   enum Ads_bcm_workstsType {
     ADS_BCM_WORKSTS_DISABLE = 0;
     ADS_BCM_WORKSTS_ENABLE = 1;
@@ -553,7 +556,8 @@ message Ads3_38e {
     RWINDSHIELDWIPER_TURN_OFF = 0;
     RWINDSHIELDWIPER_TURN_ON = 1;
   }
-  // The work status of ADS control unit.This signal should be contained in every message sent by ADS. [] [0|3]
+  // The work status of ADS control unit.This signal should be contained in
+  // every message sent by ADS. [] [0|3]
   optional Ads_bcm_workstsType ads_bcm_worksts = 1;
   // This Signal reflect the ADS_WorkSts Signal is Valid OR not [] [0|1]
   optional Ads_bcmworkstsvalidType ads_bcmworkstsvalid = 2;
@@ -582,18 +586,18 @@ message Ads3_38e {
 }
 
 message Wey {
-  optional Ads_shifter_115 ads_shifter_115 = 1; // control message
-  optional Ads_eps_113 ads_eps_113 = 2; // control message
-  optional Status_310 status_310 = 3; // report message
-  optional Vin_resp3_393 vin_resp3_393 = 4; // report message
-  optional Vin_resp2_392 vin_resp2_392 = 5; // report message
-  optional Vin_resp1_391 vin_resp1_391 = 6; // report message
-  optional Ads_req_vin_390 ads_req_vin_390 = 7; // control message
-  optional Ads1_111 ads1_111 = 8; // control message
-  optional Fbs2_240 fbs2_240 = 9; // report message
-  optional Fbs1_243 fbs1_243 = 10; // report message
-  optional Fbs4_235 fbs4_235 = 11; // report message
-  optional Fail_241 fail_241 = 12; // report message
-  optional Fbs3_237 fbs3_237 = 13; // report message
-  optional Ads3_38e ads3_38e = 14; // control message
+  optional Ads_shifter_115 ads_shifter_115 = 1;  // control message
+  optional Ads_eps_113 ads_eps_113 = 2;          // control message
+  optional Status_310 status_310 = 3;            // report message
+  optional Vin_resp3_393 vin_resp3_393 = 4;      // report message
+  optional Vin_resp2_392 vin_resp2_392 = 5;      // report message
+  optional Vin_resp1_391 vin_resp1_391 = 6;      // report message
+  optional Ads_req_vin_390 ads_req_vin_390 = 7;  // control message
+  optional Ads1_111 ads1_111 = 8;                // control message
+  optional Fbs2_240 fbs2_240 = 9;                // report message
+  optional Fbs1_243 fbs1_243 = 10;               // report message
+  optional Fbs4_235 fbs4_235 = 11;               // report message
+  optional Fail_241 fail_241 = 12;               // report message
+  optional Fbs3_237 fbs3_237 = 13;               // report message
+  optional Ads3_38e ads3_38e = 14;               // control message
 }

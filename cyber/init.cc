@@ -17,11 +17,11 @@
 #include "cyber/init.h"
 
 #include <libgen.h>
-#include <stdio.h>
 #include <sys/types.h>
-#include <time.h>
 #include <unistd.h>
 #include <csignal>
+#include <cstdio>
+#include <ctime>
 #include <string>
 
 #include "cyber/binary.h"
@@ -30,6 +30,7 @@
 #include "cyber/logger/async_logger.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
+#include "cyber/sysmo/sysmo.h"
 #include "cyber/task/task.h"
 #include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
@@ -53,7 +54,6 @@ void InitLogger(const char* binary_name) {
   } else {
     ::apollo::cyber::Binary::SetName(binary_name);
   }
-  CHECK_NOTNULL(common::GlobalData::Instance());
 
   // Init glog
   google::InitGoogleLogging(binary_name);
@@ -63,15 +63,13 @@ void InitLogger(const char* binary_name) {
 
   // Init async logger
   async_logger = new ::apollo::cyber::logger::AsyncLogger(
-      google::base::GetLogger(FLAGS_minloglevel), 2 * 1024 * 1024);
+      google::base::GetLogger(FLAGS_minloglevel));
   google::base::SetLogger(FLAGS_minloglevel, async_logger);
   async_logger->Start();
 }
 
 void StopLogger() {
-  if (async_logger != nullptr) {
-    async_logger->Stop();
-  }
+  delete async_logger;
 }
 
 }  // namespace
@@ -94,6 +92,7 @@ bool Init(const char* binary_name) {
   InitLogger(binary_name);
   auto thread = const_cast<std::thread*>(async_logger->LogThread());
   scheduler::Instance()->SetInnerThreadAttr("async_log", thread);
+  SysMo::Instance();
   std::signal(SIGINT, OnShutdown);
   // Register exit handlers
   if (!g_atexit_registered) {
@@ -113,6 +112,7 @@ void Clear() {
   if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;
   }
+  SysMo::CleanUp();
   TaskManager::CleanUp();
   TimingWheel::CleanUp();
   scheduler::CleanUp();

@@ -17,9 +17,9 @@
 #include "cyber/io/poller.h"
 
 #include <fcntl.h>
-#include <gtest/gtest.h>
 #include <unistd.h>
 #include <thread>
+#include "gtest/gtest.h"
 
 #include "cyber/init.h"
 
@@ -51,7 +51,7 @@ TEST(PollerTest, operation) {
   PollResponse response(123);
   request.callback = [&response](const PollResponse& rsp) { response = rsp; };
   EXPECT_TRUE(poller->Register(request));
-  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
   EXPECT_EQ(response.events, 0);
 
   // timeout_ms is 50

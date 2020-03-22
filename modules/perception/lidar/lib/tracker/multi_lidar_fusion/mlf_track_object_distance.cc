@@ -40,16 +40,16 @@ bool MlfTrackObjectDistance::Init(
     const MlfTrackObjectDistanceInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(
       config_file, "mlf_track_object_distance.conf");
   MlfDistanceConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   foreground_weight_table_.clear();
   background_weight_table_.clear();
@@ -105,15 +105,18 @@ float MlfTrackObjectDistance::ComputeDistance(
       weights = &iter->second;
     }
   }
-  CHECK(weights != nullptr && weights->size() >= 7);
+  if (weights == nullptr || weights->size() < 7) {
+    AERROR << "Invalid weights";
+    return 1e+10f;
+  }
   float distance = 0.f;
   float delta = 1e-10f;
 
   double current_time = object->object_ptr->latest_tracked_time;
   track->PredictState(current_time);
 
-  double time_diff = current_time;
-  // -track->latest_visible_time_;
+  double time_diff =
+      track->age_ ? current_time - track->latest_visible_time_ : 0;
   if (weights->at(0) > delta) {
     distance +=
         weights->at(0) * LocationDistance(latest_object, track->predict_.state,

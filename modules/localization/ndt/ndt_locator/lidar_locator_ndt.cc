@@ -16,17 +16,18 @@
 
 #include "modules/localization/ndt/ndt_locator/lidar_locator_ndt.h"
 
-#include <pcl/common/transforms.h>
-#include <pcl/io/pcd_io.h>
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "pcl/common/transforms.h"
+#include "pcl/io/pcd_io.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
 namespace apollo {
 namespace localization {
@@ -60,7 +61,7 @@ void LidarLocatorNdt::Init(const Eigen::Affine3d& init_location,
   ndt_transformation_epsilon_ = FLAGS_ndt_transformation_epsilon;
 
   if (!is_map_loaded_) {
-    map_preload_node_pool_.Initial(&(map_.GetConfig()));
+    map_preload_node_pool_.Initial(&(map_.GetMapConfig()));
     map_.InitMapNodeCaches(12, 24);
     map_.AttachMapNodePool(&map_preload_node_pool_);
     map_.LoadMapArea(location_.translation(), resolution_id_, zone_id_,
@@ -72,10 +73,10 @@ void LidarLocatorNdt::Init(const Eigen::Affine3d& init_location,
   // set filter
   filter_x_ =
       static_cast<int>(static_cast<float>(FLAGS_ndt_filter_size_x) /
-                       map_.GetConfig().map_resolutions_[resolution_id_]);
+                       map_.GetMapConfig().map_resolutions_[resolution_id_]);
   filter_y_ =
       static_cast<int>(static_cast<float>(FLAGS_ndt_filter_size_y) /
-                       map_.GetConfig().map_resolutions_[resolution_id_]);
+                       map_.GetMapConfig().map_resolutions_[resolution_id_]);
   AINFO << "Filter size: " << filter_x_ << ", " << filter_y_;
 
   // set NDT
@@ -90,7 +91,7 @@ void LidarLocatorNdt::Init(const Eigen::Affine3d& init_location,
 
 void LidarLocatorNdt::LoadMap(const Eigen::Affine3d& init_location,
                               unsigned int resolution_id, int zone_id) {
-  map_preload_node_pool_.Initial(&(map_.GetConfig()));
+  map_preload_node_pool_.Initial(&(map_.GetMapConfig()));
   map_.InitMapNodeCaches(12, 24);
   map_.AttachMapNodePool(&map_preload_node_pool_);
   map_.LoadMapArea(location_.translation(), resolution_id, zone_id, filter_x_,
@@ -152,9 +153,9 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   // Online pointcloud are projected into a ndt map node. (filtered)
   double lt_x = pose.translation()[0];
   double lt_y = pose.translation()[1];
-  double map_resolution = map_.GetConfig().map_resolutions_[resolution_id_];
-  lt_x -= (map_.GetConfig().map_node_size_x_ * map_resolution / 2.0);
-  lt_y -= (map_.GetConfig().map_node_size_y_ * map_resolution / 2.0);
+  double map_resolution = map_.GetMapConfig().map_resolutions_[resolution_id_];
+  lt_x -= (map_.GetMapConfig().map_node_size_x_ * map_resolution / 2.0);
+  lt_y -= (map_.GetMapConfig().map_node_size_y_ * map_resolution / 2.0);
 
   // Start Ndt method
   // Convert online points to pcl pointcloud
@@ -185,7 +186,7 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   map_timer.Start();
   Eigen::Vector2d left_top_coord2d(lt_x, lt_y);
   ComposeMapCells(left_top_coord2d, zone_id_, resolution_id_,
-                  map_.GetConfig().map_resolutions_[resolution_id_],
+                  map_.GetMapConfig().map_resolutions_[resolution_id_],
                   transform.inverse());
 
   // Convert map pointcloud to local corrdinate
@@ -262,8 +263,8 @@ void LidarLocatorNdt::ComposeMapCells(
   apollo::common::time::Timer timer;
   timer.Start();
 
-  unsigned int map_node_size_x = map_.GetConfig().map_node_size_x_;
-  unsigned int map_node_size_y = map_.GetConfig().map_node_size_y_;
+  unsigned int map_node_size_x = map_.GetMapConfig().map_node_size_x_;
+  unsigned int map_node_size_y = map_.GetMapConfig().map_node_size_y_;
   unsigned int filter_size_x = filter_x_;
   unsigned int filter_size_y = filter_y_;
 
@@ -273,8 +274,8 @@ void LidarLocatorNdt::ComposeMapCells(
   coord2d[1] -= map_pixel_resolution * static_cast<float>(filter_size_y / 2);
 
   // get the node index of left top corner and global coordinate
-  msf::MapNodeIndex map_id = msf::MapNodeIndex::GetMapNodeIndex(
-      map_.GetConfig(), coord2d, resolution_id, zone_id);
+  MapNodeIndex map_id = MapNodeIndex::GetMapNodeIndex(
+      map_.GetMapConfig(), coord2d, resolution_id, zone_id);
   NdtMapNode* map_node_lt =
       dynamic_cast<NdtMapNode*>(map_.GetMapNodeSafe(map_id));
   assert(map_.IsMapNodeExist(map_id));
@@ -440,8 +441,8 @@ void LidarLocatorNdt::ComposeMapCells(
               coord2d_center[1] + static_cast<double>(y * map_node_size_y) *
                                       static_cast<double>(map_pixel_resolution);
 
-          msf::MapNodeIndex map_id = msf::MapNodeIndex::GetMapNodeIndex(
-              map_.GetConfig(), coord2d_xy, resolution_id, zone_id);
+          MapNodeIndex map_id = MapNodeIndex::GetMapNodeIndex(
+              map_.GetMapConfig(), coord2d_xy, resolution_id, zone_id);
           NdtMapNode* map_node_xy =
               dynamic_cast<NdtMapNode*>(map_.GetMapNodeSafe(map_id));
           assert(map_.IsMapNodeExist(map_id));
@@ -461,8 +462,7 @@ void LidarLocatorNdt::ComposeMapCells(
              map_y <= map_nodes_zones[y * 3 + x][3]; ++map_y) {
           for (int map_x = map_nodes_zones[y * 3 + x][0];
                map_x <= map_nodes_zones[y * 3 + x][2]; ++map_x) {
-            const msf::NdtMapCells& cell_ndt =
-                map_cells.GetMapCell(map_y, map_x);
+            const NdtMapCells& cell_ndt = map_cells.GetMapCell(map_y, map_x);
             if (cell_ndt.cells_.size() > 0) {
               for (auto it = cell_ndt.cells_.begin();
                    it != cell_ndt.cells_.end(); ++it) {

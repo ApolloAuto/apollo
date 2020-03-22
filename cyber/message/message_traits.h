@@ -21,7 +21,6 @@
 
 #include "cyber/base/macros.h"
 #include "cyber/common/log.h"
-#include "cyber/message/intra_message.h"
 #include "cyber/message/message_header.h"
 #include "cyber/message/protobuf_traits.h"
 #include "cyber/message/py_message_traits.h"
@@ -34,7 +33,9 @@ namespace message {
 DEFINE_TYPE_TRAIT(HasByteSize, ByteSize)
 DEFINE_TYPE_TRAIT(HasType, TypeName)
 DEFINE_TYPE_TRAIT(HasSetType, SetTypeName)
-DEFINE_TYPE_TRAIT(HasDescriptor, GetDescriptorString)
+DEFINE_TYPE_TRAIT(HasGetDescriptorString, GetDescriptorString)
+DEFINE_TYPE_TRAIT(HasDescriptor, descriptor)
+DEFINE_TYPE_TRAIT(HasFullName, full_name)
 DEFINE_TYPE_TRAIT(HasSerializeToString, SerializeToString)
 DEFINE_TYPE_TRAIT(HasParseFromString, ParseFromString)
 DEFINE_TYPE_TRAIT(HasSerializeToArray, SerializeToArray)
@@ -137,7 +138,7 @@ int FullByteSize(const T& message) {
   if (content_size < 0) {
     return content_size;
   }
-  return content_size + sizeof(MessageHeader);
+  return content_size + static_cast<int>(sizeof(MessageHeader));
 }
 
 template <typename T>
@@ -231,15 +232,15 @@ SerializeToHC(const T& message, void* data, int size) {
   return false;
 }
 
-template <typename T,
-          typename std::enable_if<HasDescriptor<T>::value, bool>::type = 0>
+template <typename T, typename std::enable_if<HasGetDescriptorString<T>::value,
+                                              bool>::type = 0>
 void GetDescriptorString(const std::string& type, std::string* desc_str) {
   T::GetDescriptorString(type, desc_str);
 }
 
 template <typename T,
           typename std::enable_if<
-              !HasDescriptor<T>::value &&
+              !HasGetDescriptorString<T>::value &&
                   !std::is_base_of<google::protobuf::Message, T>::value,
               bool>::type = 0>
 void GetDescriptorString(const std::string& type, std::string* desc_str) {}
@@ -249,6 +250,44 @@ template <typename MessageT,
               !std::is_base_of<google::protobuf::Message, MessageT>::value,
               int>::type = 0>
 void GetDescriptorString(const MessageT& message, std::string* desc_str) {}
+
+template <
+    typename T, typename Descriptor,
+    typename std::enable_if<HasFullName<Descriptor>::value, bool>::type = 0>
+std::string GetFullName() {
+  return T::descriptor()->full_name();
+}
+
+template <
+    typename T, typename Descriptor,
+    typename std::enable_if<!HasFullName<Descriptor>::value, bool>::type = 0>
+std::string GetFullName() {
+  return typeid(T).name();
+}
+
+template <typename T,
+          typename std::enable_if<
+              HasDescriptor<T>::value &&
+                  !std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
+std::string GetMessageName() {
+  return GetFullName<T, decltype(*T::descriptor())>();
+}
+
+template <typename T,
+          typename std::enable_if<
+              HasDescriptor<T>::value &&
+                  std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
+std::string GetMessageName() {
+  return T::descriptor()->full_name();
+}
+
+template <typename T,
+          typename std::enable_if<!HasDescriptor<T>::value, bool>::type = 0>
+std::string GetMessageName() {
+  return typeid(T).name();
+}
 
 }  // namespace message
 }  // namespace cyber

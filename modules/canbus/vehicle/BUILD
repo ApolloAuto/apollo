@@ -5,9 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "vehicle_controller_base",
     srcs = ["vehicle_controller.cc"],
-    hdrs = [
-        "vehicle_controller.h",
-    ],
+    hdrs = ["vehicle_controller.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -23,12 +21,8 @@ cc_library(
 
 cc_library(
     name = "abstract_vehicle_factory",
-    srcs = [
-        "abstract_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "abstract_vehicle_factory.h",
-    ],
+    srcs = ["abstract_vehicle_factory.cc"],
+    hdrs = ["abstract_vehicle_factory.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -40,12 +34,8 @@ cc_library(
 
 cc_library(
     name = "vehicle_factory",
-    srcs = [
-        "vehicle_factory.cc",
-    ],
-    hdrs = [
-        "vehicle_factory.h",
-    ],
+    srcs = ["vehicle_factory.cc"],
+    hdrs = ["vehicle_factory.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/vehicle/ch:ch_vehicle_factory",
@@ -66,7 +56,7 @@ cc_test(
     srcs = ["vehicle_factory_test.cc"],
     deps = [
         ":vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

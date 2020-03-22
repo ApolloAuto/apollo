@@ -11,12 +11,10 @@ cc_library(
 cc_test(
     name = "hough_transfer_test",
     size = "small",
-    srcs = [
-        "hough_transfer_test.cc",
-    ],
+    srcs = ["hough_transfer_test.cc"],
     deps = [
         ":hough_transfer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

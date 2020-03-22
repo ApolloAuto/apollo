@@ -14,17 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./cyber_topology_message.h"
-#include "./general_channel_message.h"
-#include "./screen.h"
+#include "cyber/tools/cyber_monitor/cyber_topology_message.h"
+
+#include <iomanip>
+#include <iostream>
 
 #include "cyber/message/message_traits.h"
 #include "cyber/proto/role_attributes.pb.h"
 #include "cyber/proto/topology_change.pb.h"
-
-#include <ncurses.h>
-#include <iomanip>
-#include <iostream>
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
 constexpr int SecondColumnOffset = 4;
 

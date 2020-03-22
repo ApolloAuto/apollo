@@ -2,9 +2,9 @@
 
 Apollo Sensor Unit (ASU) is designed to work with Industrial PC (IPC) to implement sensor fusion, vehicle control and network access in Apollo's autonomous driving platform.
 
-The ASU system provides sensor interfaces to collect data from various sensors, including cameras, Lidars, Radars, and Ultrasonic Sensors. The system also utilizes pulse per second (PPS) and GPRMC signals from GNSS receiver to implement data collection synchronization for the camera and LiDAR sensors. 
+The ASU system provides sensor interfaces to collect data from various sensors, including cameras, Lidars, Radars, and Ultrasonic Sensors. The system also utilizes pulse per second (PPS) and GPRMC signals from GNSS receiver to implement data collection synchronization for the camera and LiDAR sensors.
 
-The communication between the ASU and the IPC is through PCI Express Interface. ASU collects sensor data and passes to IPC via PCI Express Interface, and the IPC uses the ASU to send out Vehicle Control commands in the Controller Area Network (CAN) protocol. 
+The communication between the ASU and the IPC is through PCI Express Interface. ASU collects sensor data and passes to IPC via PCI Express Interface, and the IPC uses the ASU to send out Vehicle Control commands in the Controller Area Network (CAN) protocol.
 
 In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, and WiFi access point via WiFi module will be enabled in the future releases.
 
@@ -14,19 +14,19 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 #### Front Panel Connectors
 
-1. External GPS PPS / GPRMC Input Port 
+1. External GPS PPS / GPRMC Input Port
 2. FAKRA Camera Data Input Port (5 ports)
-3. 100 Base-TX/1000 Base-T Ethernet Port (2 Ports) 
-4. KL-15 (AKA Car Ignition) Signal Input Port 
+3. 100 Base-TX/1000 Base-T Ethernet Port (2 Ports)
+4. KL-15 (AKA Car Ignition) Signal Input Port
 
-#### Rear Panel Connectors 
+#### Rear Panel Connectors
 
-1. General purpose UART port(reserved) 
+1. General purpose UART port(reserved)
 2. External PCI Express Port (Support X4 or X8) For connections to IPC, please use EXTN port.
 3. GPS PPS/GPRMC Output Rectangular Port (3 Ports) for LiDAR
 4. Power and PPS/GPRMC Cylindrical Output Port for Stereo Camera/LiDAR
 5. CAN Bus (4 Ports)
-6. Main Power Input Connector 
+6. Main Power Input Connector
 
 ### Purchase Channels
 
@@ -36,21 +36,21 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 1. Power Cable
 
-   The main power is from vehicle battery, 9V ~ 36V, 120W. 
+   The main power is from vehicle battery, 9V ~ 36V, 120W.
 
    ![conn-DTF13-2P](images/conn-DTF13-2P.jpeg)
 
    |MFR|MPN|Description|
    |---------------|--------|-----------|
    |TE Connectivity|DTF13-2P|DT RECP ASM|
-    
+
 
    | PIN # | NAME | I/O  | Description        |
    | ----- | ---- | ---- | ------------------ |
    | 1     | 12V  | PWR  | 12V (9V~36V, 120W) |
    | 2     | GND  | PWR  | GROUND             |
 
-2. FPD-Link III cameras. 
+2. FPD-Link III cameras.
 
    There are 5 FAKRA connectors for FPD Link III cameras in ASU Front Panel labeled with 1~5, respectively, from right to left. The ASU can support up to 5 cameras by enabling Camera 1 ~ 5 whose deserializers (TI, DS90UB914ATRHSTQ1) convert FPD Link III signals into parallel data signals.
 
@@ -71,7 +71,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | MFR             | MPN       | Description                               |
    | :-------------- | --------- | ----------------------------------------- |
    | TE Connectivity | 1565749-1 | Automotive Connectors 025 CAP ASSY, 4 Pin |
-    
+
 
    | PIN # | NAME  | I/O   | Description                                                  |
    | ----- | ----- | ----- | ------------------------------------------------------------ |
@@ -82,14 +82,14 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 4. GPS synchronization output channels
 
-   ASU forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors that need to be synchronized, such as LiDARs, etc. 
+   ASU forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors that need to be synchronized, such as LiDARs, etc.
 
    ![1376350-2](images/1376350-2.jpeg)
 
    |MFR| MPN| Description|
    | --------------- | --------- | ------------------------------------------------- |
    | TE Connectivity | 1376350-2 | Automotive Connectors 025 I/O CAP HSG ASSY, 8 Pin |
-    
+
 
    | PIN # | NAME   | I/O    | Description                                             |
    | ----- | ------ | ------ | ------------------------------------------------------- |
@@ -111,7 +111,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | MFR             | MPN       | Description                                        |
    | --------------- | --------- | -------------------------------------------------- |
    | TE Connectivity | 1318772-2 | Automotive Connectors 025 I/O CAP HSG ASSY, 12 Pin |
-     
+
 
    | PIN # | NAME   | I/O   | Description     |
    | ----- | ------ | ----- | --------------- |
@@ -128,7 +128,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 11   | CANL-3 | INOUT | Channel 3, CANL |
    | 12   | GND    | PWR   | Ground          |
 
-6. GPS PPS / GPRMC Output Rectangular Port 
+6. GPS PPS / GPRMC Output Rectangular Port
 
     The Connector provides 8 ports for 3 LiDARs
 
@@ -151,7 +151,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 6    | GND    | PWR   | Ground (ASU) -> Pin3 GND (LiDAR 1,3)      |
    | 7    | GND | PWR | Ground (ASU) -> Pin3 GND (LiDAR 2)  |
    | 8    | PPS | OUT | PPS (ASU) -> Pin1 GPS_PULSE_CNT (LiDAR 3)|
-  
+
 
 7. PPS/GPRMC Cylindrical Output Port for Stereo Camera/ LiDAR
 
@@ -164,7 +164,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | --------------- | --------- | -------------------------------------------------- |
    | Digi-Key | APC1735-ND | CONN RCPT FMALE 8POS SOLDER CUP |
 
-   
+
 
     | PIN # | NAME   | I/O   | Description     |
     | ----- | ------ | ----- | --------------- |
@@ -174,7 +174,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 
 
-   
+
 ## Disclaimer
 
 This device is `Apollo Platform Supported`

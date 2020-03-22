@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include <memory>
 
-#include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "cyber/examples/proto/examples.pb.h"
 

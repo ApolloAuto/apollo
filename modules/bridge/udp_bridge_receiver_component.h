@@ -16,9 +16,9 @@
 #pragma once
 
 #include <netinet/in.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>

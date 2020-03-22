@@ -68,12 +68,12 @@ class Transport {
  private:
   void CreateParticipant();
 
-  std::atomic<bool> is_shutdown_;
-  ParticipantPtr participant_;
-  NotifierPtr notifier_;
-  IntraDispatcherPtr intra_dispatcher_;
-  ShmDispatcherPtr shm_dispatcher_;
-  RtpsDispatcherPtr rtps_dispatcher_;
+  std::atomic<bool> is_shutdown_ = {false};
+  ParticipantPtr participant_ = nullptr;
+  NotifierPtr notifier_ = nullptr;
+  IntraDispatcherPtr intra_dispatcher_ = nullptr;
+  ShmDispatcherPtr shm_dispatcher_ = nullptr;
+  RtpsDispatcherPtr rtps_dispatcher_ = nullptr;
 
   DECLARE_SINGLETON(Transport)
 };

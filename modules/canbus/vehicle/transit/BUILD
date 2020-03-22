@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "transit_vehicle_factory",
-    srcs = [
-        "transit_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "transit_vehicle_factory.h",
-    ],
+    srcs = ["transit_vehicle_factory.cc"],
+    hdrs = ["transit_vehicle_factory.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":transit_controller",
@@ -20,12 +16,8 @@ cc_library(
 
 cc_library(
     name = "transit_message_manager",
-    srcs = [
-        "transit_message_manager.cc",
-    ],
-    hdrs = [
-        "transit_message_manager.h",
-    ],
+    srcs = ["transit_message_manager.cc"],
+    hdrs = ["transit_message_manager.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -37,12 +29,8 @@ cc_library(
 
 cc_library(
     name = "transit_controller",
-    srcs = [
-        "transit_controller.cc",
-    ],
-    hdrs = [
-        "transit_controller.h",
-    ],
+    srcs = ["transit_controller.cc"],
+    hdrs = ["transit_controller.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":transit_message_manager",
@@ -62,21 +50,19 @@ cc_test(
     srcs = ["transit_vehicle_factory_test.cc"],
     deps = [
         ":transit_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "transit_controller_test",
     size = "small",
-    srcs = [
-        "transit_controller_test.cc",
-    ],
+    srcs = ["transit_controller_test.cc"],
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":transit_controller",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

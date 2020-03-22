@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hdmap_input",
-    srcs = [
-        "hdmap_input.cc",
-    ],
-    hdrs = [
-        "hdmap_input.h",
-    ],
+    srcs = ["hdmap_input.cc"],
+    hdrs = ["hdmap_input.h"],
     deps = [
         "//modules/common/math:geometry",
         "//modules/common/proto:geometry_proto",
@@ -35,12 +31,10 @@ cc_library(
 #cc_test(
 #    name = "hdmap_input_test",
 #    size = "small",
-#    srcs = [
-#        "hdmap_input_test.cc",
-#    ],
+#    srcs = ["hdmap_input_test.cc"],
 #    deps = [
 #        ":hdmap_input",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #        "//modules/perception/base:base_type",
 #        "//modules/perception/base:point_cloud",
 #        "//modules/perception/common/geometry:common",

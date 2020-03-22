@@ -1,7 +1,9 @@
-import { observable, computed, action, autorun } from "mobx";
+import { observable, computed, action } from "mobx";
 
 import HMI from "store/hmi";
+import CameraData from "store/camera_data";
 import ControlData from "store/control_data";
+import Dimension from 'store/dimension';
 import Latency from "store/latency";
 import Meters from "store/meters";
 import Monitor from "store/monitor";
@@ -9,22 +11,13 @@ import Options from "store/options";
 import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
+import StoryTellers from "store/story_tellers";
+import Teleop from "store/teleop";
 import TrafficSignal from "store/traffic_signal";
 
 class DreamviewStore {
     // Mutable States
     @observable timestamp = 0;
-
-    @observable sceneDimension = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        widthRatio: 1,
-    }
-
-    @observable dimension = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-    };
 
     @observable isInitialized = false;
 
@@ -52,6 +45,14 @@ class DreamviewStore {
 
     @observable moduleDelay = observable.map();
 
+    @observable cameraData = new CameraData();
+
+    @observable storyTellers = new StoryTellers();
+
+    @observable teleop = new Teleop();
+
+    @observable dimension = new Dimension(this.hmi, this.options);
+
     @observable newDisengagementReminder = false;
 
     @observable offlineViewErrorMsg = null;
@@ -64,28 +65,12 @@ class DreamviewStore {
         this.timestamp = newTimestamp;
     }
 
-    @action updateWidthInPercentage(newRatio) {
-        this.sceneDimension.widthRatio = newRatio;
-    }
-
     @action setInitializationStatus(status) {
         this.isInitialized = status;
     }
 
-    @action updatePlanning(newPlanningData) {
-        this.planning.update(newPlanningData);
-    }
-
     @action setGeolocation(newGeolocation) {
         this.geolocation = newGeolocation;
-    }
-
-    @action enableMonitor() {
-        this.updateWidthInPercentage(0.7);
-    }
-
-    @action disableMonitor() {
-        this.updateWidthInPercentage(1.0);
     }
 
     @action setOfflineViewErrorMsg(msg) {
@@ -110,63 +95,38 @@ class DreamviewStore {
     }
 
     handleOptionToggle(option) {
-        const oldShowMonitor =
-            this.options.showPNCMonitor || this.options.showDataCollectionMonitor;
+        const oldShowMonitor = this.options.showMonitor;
+        const oldShowTools = this.options.showTools;
         const oldShowRouteEditingBar = this.options.showRouteEditingBar;
 
         this.options.toggle(option);
 
-        // disable tools turned off after toggling
-        if (oldShowMonitor &&
-            !this.options.showPNCMonitor &&
-            !this.options.showDataCollectionMonitor) {
-            this.disableMonitor();
+        // disable tools after toggling
+        if (oldShowMonitor && !this.options.showMonitor) {
+            this.dimension.disableMonitor();
         }
         if (oldShowRouteEditingBar && !this.options.showRouteEditingBar) {
             this.routeEditingManager.disableRouteEditing();
         }
 
         // enable selected tool
-        if (this.options[option]) {
-            switch (option) {
-                case "showPNCMonitor":
-                    this.options.showDataCollectionMonitor = false;
-                    this.enableMonitor();
-                    break;
-                case 'showDataCollectionMonitor':
-                    this.options.showPNCMonitor = false;
-                    this.enableMonitor();
-                    break;
-                case 'showRouteEditingBar':
-                    this.options.showPOI = false;
-                    this.routeEditingManager.enableRouteEditing();
-                    break;
-            }
+        if (!oldShowMonitor && this.options.showMonitor) {
+            this.dimension.enableMonitor();
+        } else if (oldShowTools !== this.options.showTools) {
+            this.dimension.update();
+        }
+        if (option === "showRouteEditingBar") {
+            this.options.showPOI = false;
+            this.routeEditingManager.enableRouteEditing();
         }
     }
 
     setOptionStatus(option, enabled) {
-        this.options[option] = (enabled || false);
-    }
-
-    // This function is triggered automatically whenever an observable changes
-    updateDimension() {
-        let offsetX = 0;
-        let offsetY = 0;
-        let mainViewHeightRatio = 0.65;
-        if (!OFFLINE_PLAYBACK) {
-            const smallScreen = window.innerHeight < 800.0 || window.innerWidth < 1280.0;
-            offsetX = smallScreen ? 80 : 90; // width of side-bar
-            offsetY = smallScreen ? 55 : 60; // height of header
-            mainViewHeightRatio = 0.60;
+        const oldStatus = this.options[option];
+        const newStatus = (enabled || false);
+        if (oldStatus !== newStatus) {
+            this.handleOptionToggle(option);
         }
-
-        this.dimension.width = window.innerWidth * this.sceneDimension.widthRatio;
-        this.dimension.height = window.innerHeight - offsetY;
-
-        this.sceneDimension.width = this.dimension.width - offsetX;
-        this.sceneDimension.height = this.options.showTools
-                ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 
     updateCustomizedToggles(world) {
@@ -183,9 +143,10 @@ class DreamviewStore {
                     }
                 });
             }
+
             // Add pull over status toggle
-            if (world.planningData.pullOverStatus) {
-                const keyword = 'pullOverStatus';
+            if (world.planningData.pullOver) {
+                const keyword = 'pullOver';
                 if (this.options.customizedToggles.has(keyword)) {
                     newToggles[keyword] = this.options.customizedToggles.get(keyword);
                 } else {
@@ -219,7 +180,7 @@ class DreamviewStore {
     update(world, isNewMode) {
         if (isNewMode) {
             this.options.resetOptions();
-            this.disableMonitor();
+            this.dimension.disableMonitor();
             this.routeEditingManager.disableRouteEditing();
         }
 
@@ -236,18 +197,21 @@ class DreamviewStore {
 
         this.updateCustomizedToggles(world);
         if (this.options.showPNCMonitor) {
+            this.storyTellers.update(world);
             this.planningData.update(world);
             this.controlData.update(world, this.hmi.vehicleParam);
             this.latency.update(world);
+        }
+
+        if (this.hmi.inCarTeleopMode) {
+            this.setOptionStatus('showCarTeleopMonitor', true);
+        } else if (this.hmi.inConsoleTeleopMode) {
+            this.setOptionStatus('showConsoleTeleopMonitor', true);
         }
     }
 }
 
 const STORE = new DreamviewStore();
-
-autorun(() => {
-    STORE.updateDimension();
-});
 
 // For debugging purpose only. When turned on, it will insert a random
 // monitor message into monitor every 10 seconds.

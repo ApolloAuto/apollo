@@ -97,6 +97,12 @@ class DigitalFilter {
   void set_dead_zone(const double deadzone);
 
   /**
+   * @brief re-set the x_values_ and y_values_
+   * @param deadzone The value of deadzone
+   */
+  void reset_values();
+
+  /**
    * @brief get denominators
    * @return vector<double> The denominators of filter
    */
@@ -113,6 +119,18 @@ class DigitalFilter {
    * @return double The dead_zone
    */
   double dead_zone() const;
+
+  /**
+   * @brief get inputs of the filter
+   * @return deque<double> The queue of inputs of filter
+   */
+  const std::deque<double> &inputs_queue() const;
+
+  /**
+   * @brief get outputs of the filter
+   * @return deque<double> The queue of outputs of filter
+   */
+  const std::deque<double> &outputs_queue() const;
 
  private:
   /**

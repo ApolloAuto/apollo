@@ -548,8 +548,6 @@ void VoxelGridXY<T>::Reserve() {
     m = IMax(8, static_cast<int>(s_nr_max_reserved_points_ * kernel[i]));
     voxels_[i].Reserve(m);
   }
-
-  return;
 }
 
 template <typename T>
@@ -1010,7 +1008,6 @@ static void IPushBackVectors(const std::vector<T> &src, std::vector<T> *dst) {
     dst->resize(i + j);
     ICopy(src.data(), dst->data() + j, static_cast<int>(i));
   }
-  return;
 }
 
 // VoxelgridXY downsample functions

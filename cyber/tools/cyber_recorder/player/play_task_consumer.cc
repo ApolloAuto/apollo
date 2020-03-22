@@ -115,7 +115,7 @@ void PlayTaskConsumer::ThreadFunc() {
     }
 
     task->Play();
-    is_playonce_.exchange(false);
+    is_playonce_.store(false);
 
     last_played_msg_real_time_ns_ = task->msg_real_time_ns();
     while (is_paused_.load() && !is_stopped_.load()) {

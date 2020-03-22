@@ -87,8 +87,16 @@ void ObstacleReference::UpdateReference(const CameraFrame *frame,
     if (box.ymax < frame->camera_k_matrix(1, 2) + 1) {
       continue;
     }
-    CHECK(box.ymax < img_height_ + 1) << box.ymax;
-    CHECK(box.xmax < img_width_ + 1) << box.xmax;
+    if (box.ymax >= img_height_ + 1) {
+      AERROR << "box.ymax (" << box.ymax << ") is larger than img_height_ + 1 ("
+             << img_height_ + 1 << ")";
+      return;
+    }
+    if (box.xmax >= img_width_ + 1) {
+      AERROR << "box.xmax (" << box.xmax << ") is larger than img_width_ + 1 ("
+             << img_width_ + 1 << ")";
+      return;
+    }
     float x = box.Center().x;
     float y = box.ymax;
 
@@ -239,7 +247,10 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
         height.push_back(obj->size[2]);
       }
 
-      CHECK_GT(height.size(), 0);
+      if (height.empty()) {
+        AERROR << "height vector is empty";
+        continue;
+      }
       std::sort(height.begin(), height.end());
       int nr_hs = static_cast<int>(height.size());
       float h_updated = height[nr_hs / 2];

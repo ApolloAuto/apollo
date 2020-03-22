@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "spatio_temporal_ground_detector",
-    srcs = [
-        "spatio_temporal_ground_detector.cc",
-    ],
-    hdrs = [
-        "spatio_temporal_ground_detector.h",
-    ],
+    srcs = ["spatio_temporal_ground_detector.cc"],
+    hdrs = ["spatio_temporal_ground_detector.h"],
     copts = ["-msse4.1"],
     deps = [
         "//cyber",
@@ -29,18 +25,17 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/proto:perception_config_schema_proto",
     ],
+    alwayslink = True,
 )
 
 cc_test(
     name = "spatio_temporal_ground_detector_test",
     size = "small",
-    srcs = [
-        "spatio_temporal_ground_detector_test.cc",
-    ],
+    srcs = ["spatio_temporal_ground_detector_test.cc"],
     copts = ["-msse4.1"],
     deps = [
         ":spatio_temporal_ground_detector",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
         "@pcl",
     ],
 )

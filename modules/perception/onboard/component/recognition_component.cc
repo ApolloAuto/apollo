@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/onboard/component/recognition_component.h"
+#include "modules/common/time/time.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 // #include "modules/perception/onboard/component/lidar_common_flags.h"
@@ -45,8 +45,8 @@ bool RecognitionComponent::Init() {
 bool RecognitionComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
   AINFO << "Enter Tracking component, message timestamp: "
-        << std::to_string(message->timestamp_) << " current timestamp: "
-        << std::to_string(lib::TimeUtil::GetCurrentTime());
+        << message->timestamp_ << " current timestamp: "
+        << apollo::common::time::Clock::NowInSeconds();
 
   std::shared_ptr<SensorFrameMessage> out_message =
       std::make_shared<SensorFrameMessage>();
@@ -81,6 +81,7 @@ bool RecognitionComponent::InternalProc(
   auto& sensor_name = in_message->lidar_frame_->sensor_info.name;
   PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name);
   out_message->timestamp_ = in_message->timestamp_;
+  out_message->lidar_timestamp_ = in_message->lidar_timestamp_;
   out_message->seq_num_ = in_message->seq_num_;
   out_message->process_stage_ = ProcessStage::LIDAR_RECOGNITION;
   out_message->sensor_id_ = sensor_name;
@@ -118,11 +119,10 @@ bool RecognitionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name,
                                            "recognition_2::fill_out_message");
 
-  const double end_timestamp = lib::TimeUtil::GetCurrentTime();
+  const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
   const double end_latency = (end_timestamp - in_message->timestamp_) * 1e3;
-  AINFO << "FRAME_STATISTICS:Lidar:End:msg_time["
-        << std::to_string(in_message->timestamp_) << "]:cur_time["
-        << std::to_string(end_timestamp) << "]:cur_latency[" << end_latency
+  AINFO << "FRAME_STATISTICS:Lidar:End:msg_time[" << in_message->timestamp_
+        << "]:cur_time[" << end_timestamp << "]:cur_latency[" << end_latency
         << "]";
   return true;
 }

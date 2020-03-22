@@ -42,7 +42,7 @@ class StopSign : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";
+  static constexpr char const* STOP_SIGN_VO_ID_PREFIX = "SS_";
 };
 
 }  // namespace planning

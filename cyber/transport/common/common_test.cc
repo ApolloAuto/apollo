@@ -17,8 +17,8 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#include <gtest/gtest.h>
 #include <string>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/transport/common/endpoint.h"

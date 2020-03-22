@@ -46,6 +46,9 @@ class PullOverStageRetryParking : public Stage {
   Stage::StageStatus FinishStage();
 
  private:
+  bool CheckADCPullOverOpenSpace();
+
+ private:
   ScenarioPullOverConfig scenario_config_;
 };
 

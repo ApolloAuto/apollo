@@ -1,5 +1,17 @@
 @import "media-queries";
+@import "common";
 
+$min-main-view-width: 600;
+$side-bar-width: ('small': 80, 'large': 90);
+$header-height: ('small': 55, 'large': 60);
+
+:export {
+    MIN_MAIN_VIEW_WIDTH: $min-main-view-width;
+    SIDE_BAR_WIDTH_SMALL: #{map-get($side-bar-width, 'small')};
+    SIDE_BAR_WIDTH_LARGE: #{map-get($side-bar-width, 'large')};
+    HEADER_HEIGHT_SMALL: #{map-get($header-height, 'small')};
+    HEADER_HEIGHT_LARGE: #{map-get($header-height, 'large')};
+}
 
 @mixin monitor-item-common-properties($text-width: calc(100% - 17px)) {
     display: flex;
@@ -110,14 +122,14 @@ body {
     position: relative;
     top: 0;
     left: 0;
-    height: 60px;
+    height: map-get($header-height, 'large') + 0px;
 
     background: #000000;
     color: #ffffff;
     text-align: left;
 
     @include small-screen {
-        height: 55px;
+        height: map-get($header-height, 'small') + 0px;
     }
 
     /* The Apollo logo on the header. */
@@ -138,7 +150,6 @@ body {
             margin-top: 5px;
         }
     }
-
 
     .header-item {
         flex: 0 0 auto;
@@ -199,6 +210,7 @@ body {
         background: #181818;
         color: #ffffff;
         text-align: center;
+        cursor: pointer;
 
         @include small-screen {
             min-width: 110px;
@@ -232,14 +244,17 @@ body {
         .dreamview-body {
             display: flex;
             flex-flow: column nowrap;
-
             flex: 1 1 auto;
             overflow: hidden;
+            background-color: #1D2226;
 
             .main-view {
                 flex: 0 0 auto;
                 position: relative;
-                min-width: 600px;
+                min-width: $min-main-view-width + 0px;
+                #camera-image {
+                    width: 100%;
+                }
             }
         }
     }
@@ -256,6 +271,10 @@ body {
         }
 
         .react-tabs {
+            &:not(:last-child) {
+                border-bottom: 2px solid #000000;
+            }
+
             &__tab-list {
                 display: table;
                 width: 100%;
@@ -296,132 +315,6 @@ body {
             }
         }
 
-        .monitor {
-            height: 100%;
-            width: 100%;
-            border: 1px solid #000000;
-            box-sizing: border-box;
-
-            background-color: #1D2226;
-            overflow: auto;
-        }
-
-        .pnc-monitor {
-            .scatter-graph {
-                margin: 0px;
-                border: 1px #000000;
-                border-style: solid none;
-            }
-
-            .scenario-history-container {
-                padding: 10px;
-                font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-                font-weight: normal;
-
-                .scenario-history-title {
-                    margin: 5px;
-                    border-bottom: 1px solid rgba(153, 153, 153, 0.5);
-                    padding-bottom: 5px;
-
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-align: center;
-                }
-
-                .scenario-history-table {
-                    position: relative;
-                    width: 100%;
-
-                    .scenario-history-item {
-                        position: relative;
-                        width: 100%;
-
-                        .text {
-                            position: relative;
-                            width: 30%;
-                            padding: 2px 4px;
-
-                            color: #999999;
-                            font-size: 12px;
-                        }
-
-                        .time {
-                            text-align: center;
-                        }
-                    }
-                }
-            }
-        }
-
-        .data-collection-monitor {
-            position: relative;
-            width: 100%;
-
-            .scenario-container {
-                position: absolute;
-            }
-
-            .section-divider-on-top {
-                border-top: 2px solid #080A0C;
-            }
-
-            .category-container {
-                position: relative;
-                width: 100%;
-                margin-bottom: 15px;
-
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-start;
-                flex-wrap: wrap;
-            }
-
-            .dummy-category {
-                flex: 1 0 50%;
-                align-self: flex-end;
-                min-width: 130px;
-                overflow: hidden;
-                position: relative;
-            }
-
-            .category {
-                flex: 1 0 50%;
-                align-self: flex-end;
-                min-width: 130px;
-                overflow: hidden;
-                position: relative;
-
-                .category-description {
-                    position: relative;
-                    margin: 15px 0px 0px 10px;
-                    font-size: 12px;
-
-                    color: #888888;
-                }
-                .category-updated {
-                    color: #FFFFFF;
-                }
-
-                .category-progress-background {
-                    position: relative;
-                    height: 6px;
-                    margin: 5px 10px;
-                    background-color: #333639;
-
-                    .category-in-progress {
-                        position: absolute;
-                        height: 100%;
-                        background: #006AFF;
-                    }
-
-                    .category-completed {
-                        position: absolute;
-                        height: 100%;
-                        background: #113B73;
-                    }
-                }
-            }
-        }
     }
 
     .SplitPane {
@@ -508,13 +401,14 @@ body {
 
     flex: 1 1 auto;
 
-    margin-top: 3px;
     overflow: hidden;
+    border-top: 1px solid #000000;
+    background: #000000;
 
     .card {
         flex: 1 1 auto;
 
-        border-right: 3px solid #000000;
+        margin-right: 1px;
         padding: 15px 10px 25px 20px;
         background: #1D2226;
 
@@ -560,91 +454,6 @@ body {
         }
     }
 
-    ul {
-        flex: 0 0 auto;
-
-        margin: 0px 2px 0px 0px;
-        padding-left: 0px;
-        padding-right: 5px;
-
-        background-color: #1D2226;
-        color: #999999;
-        list-style: none;
-        cursor: pointer;
-
-        li {
-            line-height: 40px;
-            white-space: nowrap;
-
-            span {
-                margin-left: 15px;
-            }
-        }
-
-        li:hover {
-            color: #FFFFFF;
-            background-color: #2A3238;
-        }
-    }
-
-
-    /* Toggle switch */
-    .switch {
-        display: inline-block;
-
-        position: relative;
-        width: 40px;
-        transform: translate(10%, 25%);
-
-        .toggle-switch {
-            display: none;
-        }
-
-        .toggle-switch-label {
-            display: block;
-            overflow: hidden;
-            cursor: pointer;
-            height: 20px;
-            padding: 0;
-            line-height: 20px;
-            border: 0px;
-            background-color: #3F4548;
-            transition: background-color 0.2s ease-in;
-        }
-
-        .toggle-switch-label:before {
-            content: "";
-            display: block;
-            width: 16px;
-            margin: 2px;
-            background: #A0A0A0;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 20px;
-            transition: all 0.2s ease-in;
-        }
-
-        .toggle-switch:checked+.toggle-switch-label {
-            background-color: #0E3D62;
-        }
-
-        .toggle-switch:checked+.toggle-switch-label,
-        .toggle-switch:checked+.toggle-switch-label:before {
-            border-color: #0E3D62;
-        }
-
-        .toggle-switch:checked+.toggle-switch-label:before {
-            right: 0px;
-            background-color: #30A5FF;
-        }
-
-        .toggle-switch:disabled+.toggle-switch-label,
-        .toggle-switch:disabled+.toggle-switch-label:before {
-            cursor: not-allowed;
-        }
-    }
-
     .tool-view-menu {
         display: flex;
         flex-flow: row nowrap;
@@ -653,11 +462,10 @@ body {
         flex: 2 1 auto;
 
         z-index: 10 !important;
-        margin-right: 3px;
-
+        margin-left: 1px;
         overflow-y: hidden;
         overflow-x: auto;
-        background: #1D2226;
+        background: #000000;
         color: #FFFFFF;
         text-align: left;
         white-space: nowrap;
@@ -746,7 +554,7 @@ body {
 
     z-index: 100;
     background: #1D2226;
-    border-right: 3px solid #000000;
+    border-right: 1px solid #000000;
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -756,7 +564,7 @@ body {
 
     .button {
         display: block;
-        width: 90px;
+        width: map-get($side-bar-width, 'large') + 0px;
         border: none;
         padding: 20px 10px;
 
@@ -767,7 +575,7 @@ body {
         cursor: pointer;
 
         @include small-screen {
-            width: 80px;
+            width: map-get($side-bar-width, 'small') + 0px;
             padding-top: 10px;
         }
 
@@ -911,6 +719,8 @@ body {
             font-weight: lighter;
             font-size: 35px;
             color: #ffffff;
+
+            cursor: pointer;
         }
 
         .speed-unit {
@@ -920,6 +730,8 @@ body {
 
             color: #ffffff;
             font-size: 15px;
+
+            cursor: pointer;
         }
 
         .brake-panel {
@@ -1008,7 +820,7 @@ body {
             height: 0px;
             border-style: solid;
             border-width: 12px 15px 12px 0px;
-            border-color: transparent;
+            border-color: transparent #30435e transparent transparent;
         }
 
         .right-arrow {
@@ -1018,8 +830,30 @@ body {
             width: 0px;
             height: 0px;
             border-style: solid;
-            border-width: 12px 0 12px 15px;
+            border-width: 12px 0px 12px 15px;
             border-color: transparent transparent transparent #30435e;
+        }
+
+        @mixin blink($name, $property) {
+            animation: $name 0.5s linear infinite alternate;
+            animation-play-state: running;
+
+            @keyframes #{$name} {
+                from {
+                    #{$property}: #006AFF;
+                }
+                to {
+                    #{$property}: #30435E;
+                }
+            }
+        }
+
+        .blink-left {
+            @include blink(left, 'border-right-color');
+        }
+
+        .blink-right {
+            @include blink(right, 'border-left-color');
         }
 
         .wheel {
@@ -1137,7 +971,6 @@ body {
     flex: 1 1 auto;
 
     z-index: 10;
-    margin-right: 3px;
     overflow-x: auto;
     overflow-y: hidden;
 
@@ -1216,41 +1049,6 @@ body {
         min-width: 265px;
     }
 
-    button {
-        flex: 1 1 0;
-
-        margin: 5px;
-        border: 0px;
-
-        min-width: 75px;
-        min-height: 40px;
-        max-height: 60px;
-
-        color: #999999;
-
-        border-bottom: 2px solid #1C9063;
-        background: linear-gradient(#000000, #111F1D);
-
-        outline: none;
-        cursor: pointer;
-    }
-
-    button:hover {
-        color: #FFFFFF;
-        background: #151E1B;
-    }
-
-    button:active {
-        background: rgba(35, 51, 45, 0.6);
-    }
-
-    button:disabled {
-        color: #999999;
-        border-color: #555555;
-        background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(9, 17, 16, 0.8));
-        cursor: not-allowed
-    }
-
     .disabled {
         cursor: not-allowed;
     }
@@ -1264,7 +1062,6 @@ body {
     flex: 1 1 auto;
 
     z-index: 10;
-    margin-right: 3px;
     overflow: hidden;
 
     .controller {
@@ -1429,6 +1226,7 @@ body {
 }
 
 .data-recorder {
+    z-index: 10;
     table {
         width: 100%;
         height: 100%;
@@ -1690,5 +1488,7 @@ body {
         right: 0px;
         width: 30px;
         height: 30px;
+
+        cursor: pointer;
     }
 }
