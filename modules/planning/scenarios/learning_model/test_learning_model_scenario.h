@@ -37,6 +37,11 @@ class TestLearningModelScenario : public Scenario {
                             const ScenarioContext* context)
       : Scenario(config, context) {}
 
+  // TODO(all): continue to refactor scenario framework to
+  //            make output more clear
+  ScenarioStatus Process(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame) override;
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
 };
