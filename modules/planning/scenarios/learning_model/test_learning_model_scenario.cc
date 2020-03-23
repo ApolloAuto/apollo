@@ -21,22 +21,20 @@
 #include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/scenarios/learning_model/test_learning_model_stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
+Scenario::ScenarioStatus TestLearningModelScenario::Process(
+    const common::TrajectoryPoint& planning_init_point,
+    Frame* frame) {
+  return STATUS_DONE;
+}
 std::unique_ptr<Stage> TestLearningModelScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
-  if (stage_config.stage_type() != ScenarioConfig::TEST_LEARNING_MODEL_STAGE) {
-    AERROR << "Test learning model scenario does not support stage type: "
-           << ScenarioConfig::StageType_Name(stage_config.stage_type());
-    return nullptr;
-  }
-  return std::unique_ptr<Stage>(new TestLearningModelStage(stage_config));
+  return nullptr;
 }
-
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
