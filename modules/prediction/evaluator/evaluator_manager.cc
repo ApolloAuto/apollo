@@ -151,7 +151,9 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           break;
         }
         case PerceptionObstacle::PEDESTRIAN: {
-          if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
+          if (FLAGS_prediction_offline_mode ==
+                  PredictionConstants::kDumpDataForLearning ||
+              obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
             pedestrian_evaluator_ = obstacle_conf.evaluator_type();
             break;
           }
@@ -278,8 +280,10 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       break;
     }
     case PerceptionObstacle::PEDESTRIAN: {
-      if (obstacle->latest_feature().priority().priority() ==
-          ObstaclePriority::CAUTION) {
+      if (FLAGS_prediction_offline_mode ==
+              PredictionConstants::kDumpDataForLearning ||
+          obstacle->latest_feature().priority().priority() ==
+              ObstaclePriority::CAUTION) {
         evaluator = GetEvaluator(pedestrian_evaluator_);
         CHECK_NOTNULL(evaluator);
         evaluator->Evaluate(obstacle, obstacles_container);
