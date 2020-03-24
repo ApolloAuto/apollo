@@ -29,6 +29,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/scenarios:scenario",
+	"//third_party:libtorch",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
