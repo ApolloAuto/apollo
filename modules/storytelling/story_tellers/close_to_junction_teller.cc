@@ -47,8 +47,8 @@ bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
   return false;
 }
 
-bool IsPointInRegularJunction(const PathPoint& point,
-                              std::string* junction_id) {
+bool IsPointInJunction(const PathPoint& point,
+                       std::string* junction_id) {
   const auto junctions = PredictionMap::GetJunctions(
       {point.x(), point.y()}, FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
@@ -68,32 +68,46 @@ bool IsPointInRegularJunction(const PathPoint& point,
  * @return negative if no junction ahead, 0 if in junction, or positive which is
  *         the distance to the nearest junction ahead.
  */
-double DistanceToJunction(const ADCTrajectory& adc_trajectory,
-                          std::string* junction_id) {
-  const double s_start = adc_trajectory.trajectory_point(0).path_point().s();
-  // Test for PNCJunction.
+void GetNearestJunction(const ADCTrajectory& adc_trajectory,
+                        std::string* id,
+                        CloseToJunction::JunctionType* type,
+                        double* distance) {
+  *id = "";
+  *distance = -1;
+  static std::string overlapping_junction_id;
+
+  const double s_start =
+      adc_trajectory.trajectory_point(0).path_point().s();
   for (const auto& point : adc_trajectory.trajectory_point()) {
     const auto& path_point = point.path_point();
     if (path_point.s() > FLAGS_adc_trajectory_search_length) {
       break;
     }
-    if (IsPointInPNCJunction(path_point, junction_id)) {
-      return path_point.s() - s_start;
-    }
-  }
-
-  // Test for regular junction.
-  for (const auto& point : adc_trajectory.trajectory_point()) {
-    const auto& path_point = point.path_point();
-    if (path_point.s() > FLAGS_adc_trajectory_search_length) {
+    std::string junction_id;
+    std::string pnc_junction_id;
+    const double junction = IsPointInJunction(path_point, &junction_id);
+    const double pnc_junction = IsPointInPNCJunction(path_point,
+                                                     &pnc_junction_id);
+    if (pnc_junction) {
+      // in PNC_JUNCTION (including overlapping with JUNCTION)
+      *id = pnc_junction_id;
+      *type = CloseToJunction::PNC_JUNCTION;
+      *distance = path_point.s() - s_start;
+      overlapping_junction_id = junction ? junction_id : "";
       break;
-    }
-    if (IsPointInRegularJunction(path_point, junction_id)) {
-      return path_point.s() - s_start;
+    } else if (junction) {
+      // in JUNCTION only
+      if (junction_id != overlapping_junction_id) {
+        // not in JUNCTION overlapping with a PNC_JUNCTION
+        *id = junction_id;
+        *type = CloseToJunction::JUNCTION;
+        *distance = path_point.s() - s_start;
+      }
+      break;
+    } else {
+      overlapping_junction_id.clear();
     }
   }
-
-  return -1;
 }
 
 }  // namespace
@@ -115,15 +129,18 @@ void CloseToJunctionTeller::Update(Stories* stories) {
   }
 
   std::string junction_id;
-  const double distance = DistanceToJunction(*trajectory, &junction_id);
+  CloseToJunction::JunctionType type;
+  double distance;
+  GetNearestJunction(*trajectory, &junction_id, &type, &distance);
   const bool close_to_junction = distance >= 0;
   if (close_to_junction) {
     if (!stories->has_close_to_junction()) {
       AINFO << "Enter CloseToJunction story";
     }
     auto* story = stories->mutable_close_to_junction();
+    story->set_id(junction_id);
+    story->set_type(type);
     story->set_distance(distance);
-    story->set_junction_id(junction_id);
   } else if (stories->has_close_to_junction()) {
     AINFO << "Exit CloseToJunction story";
     stories->clear_close_to_junction();
