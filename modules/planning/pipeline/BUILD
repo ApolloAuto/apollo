@@ -23,6 +23,7 @@ cc_library(
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/util:data_extraction",
         "//modules/routing/proto:routing_proto",
+        "//modules/storytelling/proto:story_proto",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
     ],
