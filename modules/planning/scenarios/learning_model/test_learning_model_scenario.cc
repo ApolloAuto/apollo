@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -35,7 +36,9 @@ TestLearningModelScenario::TestLearningModelScenario(
   : Scenario(scenario_config, context), device_(torch::kCPU) {
   const auto& config = scenario_config.test_learning_model_config();
   AINFO << "Loading learning model:" << config.model_file();
-  model_ = torch::jit::load(config.model_file(), device_);
+  if (apollo::cyber::common::PathExists(config.model_file())) {
+    model_ = torch::jit::load(config.model_file(), device_);
+  }
 
   std::copy(config.input_shape().begin(), config.input_shape().end(),
             std::back_inserter(input_shapes_));
