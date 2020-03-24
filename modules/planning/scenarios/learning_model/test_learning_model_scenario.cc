@@ -20,11 +20,28 @@
 
 #include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
+
+TestLearningModelScenario::TestLearningModelScenario(
+    const ScenarioConfig& scenario_config,
+    const ScenarioContext* context)
+  : Scenario(scenario_config, context), device_(torch::kCPU) {
+  const auto& config = scenario_config.test_learning_model_config();
+  AINFO << "Loading learning model:" << config.model_file();
+  model_ = torch::jit::load(config.model_file(), device_);
+
+  std::copy(config.input_shape().begin(), config.input_shape().end(),
+            std::back_inserter(input_shapes_));
+  std::copy(config.output_shape().begin(), config.output_shape().end(),
+            std::back_inserter(output_shapes_));
+}
 
 Scenario::ScenarioStatus TestLearningModelScenario::Process(
     const common::TrajectoryPoint& planning_init_point,
