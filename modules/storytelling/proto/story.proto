@@ -10,8 +10,13 @@ message ProceedWithCaution {
 
 // Triggered when we are close to a junction.
 message CloseToJunction {
-  optional double distance = 1 [default = nan];
-  optional string junction_id = 2;
+  enum JunctionType {
+    PNC_JUNCTION = 1;
+    JUNCTION = 2;
+  };
+  optional string id = 1;
+  optional JunctionType type = 2;
+  optional double distance = 3 [default = nan];
 }
 
 // Usage guide for action modules:
