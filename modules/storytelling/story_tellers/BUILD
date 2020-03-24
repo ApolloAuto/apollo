@@ -17,9 +17,9 @@ cc_library(
     deps = [
         ":base_teller",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_proto",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_map",
+        "//modules/storytelling/common:storytelling_gflags",
         "//modules/storytelling:frame_manager",
     ],
 )

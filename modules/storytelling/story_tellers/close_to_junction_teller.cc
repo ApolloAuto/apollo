@@ -16,32 +16,42 @@
 
 #include "modules/storytelling/story_tellers/close_to_junction_teller.h"
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
+#include "modules/storytelling/common/storytelling_gflags.h"
 #include "modules/storytelling/frame_manager.h"
 
 namespace apollo {
 namespace storytelling {
 namespace {
 
+using apollo::hdmap::HDMapUtil;
 using apollo::common::PathPoint;
+using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::PNCJunctionInfo;
 using apollo::planning::ADCTrajectory;
-using apollo::prediction::PredictionMap;
 
-bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
-  const auto junctions = PredictionMap::GetPNCJunctions(
-      {point.x(), point.y()}, FLAGS_junction_search_radius);
-  if (junctions.empty() || junctions.front() == nullptr) {
+bool IsPointInPNCJunction(const PathPoint& point,
+                          std::string* pnc_junction_id) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
+  std::vector<std::shared_ptr<const PNCJunctionInfo>> pnc_junctions;
+  HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point,
+                                       FLAGS_search_radius,
+                                       &pnc_junctions);
+  if (pnc_junctions.empty() || pnc_junctions.front() == nullptr) {
     return false;
   }
-  const auto& junction_info = junctions.front();
-  if (junction_info != nullptr &&
-      junction_info->pnc_junction().polygon().point_size() >= 3) {
-    *junction_id = junction_info->id().id();
+  const auto& pnc_junction_info = pnc_junctions.front();
+  if (pnc_junction_info != nullptr &&
+      pnc_junction_info->pnc_junction().polygon().point_size() >= 3) {
+    *pnc_junction_id = pnc_junction_info->id().id();
     return true;
   }
   return false;
@@ -49,8 +59,13 @@ bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
 
 bool IsPointInJunction(const PathPoint& point,
                        std::string* junction_id) {
-  const auto junctions = PredictionMap::GetJunctions(
-      {point.x(), point.y()}, FLAGS_junction_search_radius);
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
+  std::vector<std::shared_ptr<const JunctionInfo>> junctions;
+  HDMapUtil::BaseMap().GetJunctions(hdmap_point,
+                                    FLAGS_search_radius,
+                                    &junctions);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
@@ -80,7 +95,7 @@ void GetNearestJunction(const ADCTrajectory& adc_trajectory,
       adc_trajectory.trajectory_point(0).path_point().s();
   for (const auto& point : adc_trajectory.trajectory_point()) {
     const auto& path_point = point.path_point();
-    if (path_point.s() > FLAGS_adc_trajectory_search_length) {
+    if (path_point.s() > FLAGS_adc_trajectory_search_distance) {
       break;
     }
     std::string junction_id;
@@ -115,7 +130,6 @@ void GetNearestJunction(const ADCTrajectory& adc_trajectory,
 void CloseToJunctionTeller::Init() {
   auto* manager = FrameManager::Instance();
   manager->CreateOrGetReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
-  ACHECK(PredictionMap::Ready()) << "PredictionMap not ready";
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {
