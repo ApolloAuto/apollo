@@ -226,9 +226,11 @@ void FeatureGenerator::OnRoutingResponse(
 void FeatureGenerator::OnStoryTelling(
     const apollo::storytelling::Stories& stories) {
   overlaps_.clear();
-  if (stories.has_close_to_junction()) {
+  if (stories.has_close_to_junction() &&
+      stories.close_to_junction().type() ==
+          CloseToJunction::PNC_JUNCTION) {
     OverlapFeature overlap;
-    overlap.set_id(stories.close_to_junction().junction_id());
+    overlap.set_id(stories.close_to_junction().id());
     overlap.set_type(OverlapFeature::PNC_JUNCTION);
     overlap.set_distance(stories.close_to_junction().distance());
     overlaps_.push_back(overlap);
