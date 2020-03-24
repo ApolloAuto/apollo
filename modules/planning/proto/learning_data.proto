@@ -12,13 +12,23 @@ import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/planning_config.proto";
 
-message Scenario {
-  optional apollo.planning.ScenarioConfig.ScenarioType scenario_type = 1;
-  optional apollo.planning.ScenarioConfig.StageType stage_type = 2;
+message OverlapFeature {
+  enum OverlapType {
+    CLEAR_AREA = 1;
+    CROSSWALK = 2;
+    PNC_JUNCTION = 3;
+    STOP_SIGN = 4;
+    TRAFFIC_LIGHT = 5;
+    YIELD_SIGN = 6;
+  };
+  optional string id = 1;
+  optional OverlapType type = 2;
+  optional double distance = 3;
 }
+
 message PlanningTag {
   optional apollo.hdmap.Lane.LaneTurn lane_turn = 1;
-  optional Scenario scenario = 2;
+  repeated OverlapFeature overlap = 2;
 }
 
 message ChassisFeature {
