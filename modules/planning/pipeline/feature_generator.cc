@@ -54,6 +54,8 @@ using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
+using apollo::storytelling::CloseToJunction;
+using apollo::storytelling::Stories;
 
 void FeatureGenerator::Init() {
   map_name_ = "sunnyvale_with_two_offices";
@@ -218,6 +220,18 @@ void FeatureGenerator::OnRoutingResponse(
                 lane_segment.end_s() - lane_segment.start_s()));
       }
     }
+  }
+}
+
+void FeatureGenerator::OnStoryTelling(
+    const apollo::storytelling::Stories& stories) {
+  overlaps_.clear();
+  if (stories.has_close_to_junction()) {
+    OverlapFeature overlap;
+    overlap.set_id(stories.close_to_junction().junction_id());
+    overlap.set_type(OverlapFeature::PNC_JUNCTION);
+    overlap.set_distance(stories.close_to_junction().distance());
+    overlaps_.push_back(overlap);
   }
 }
 
@@ -484,6 +498,25 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
   // AINFO << "number of trajectory points in one frame: " << cnt;
 }
 
+void FeatureGenerator::GeneratePlanningTag(
+    const LaneInfoConstPtr& cur_lane,
+    LearningDataFrame* learning_data_frame) {
+  auto planning_tag = learning_data_frame->mutable_planning_tag();
+
+  // lane_turn
+  apollo::hdmap::Lane::LaneTurn lane_turn = apollo::hdmap::Lane::NO_TURN;
+  if (cur_lane != nullptr) {
+    lane_turn = cur_lane->lane().turn();
+  }
+  planning_tag->set_lane_turn(lane_turn);
+
+  // overlap
+  for (auto& overlap_feature : overlaps_) {
+    auto overlap = planning_tag->add_overlap();
+    overlap->CopyFrom(overlap_feature);
+  }
+}
+
 void FeatureGenerator::GenerateLearningDataFrame() {
   int routing_index;
   LaneInfoConstPtr cur_lane = GetADCCurrentLane(&routing_index);
@@ -497,12 +530,8 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   // map_name
   learning_data_frame->set_map_name(map_name_);
 
-  // lane_turn
-  apollo::hdmap::Lane::LaneTurn lane_turn = apollo::hdmap::Lane::NO_TURN;
-  if (cur_lane != nullptr) {
-    lane_turn = cur_lane->lane().turn();
-  }
-  learning_data_frame->mutable_planning_tag()->set_lane_turn(lane_turn);
+  // planning_tag
+  GeneratePlanningTag(cur_lane, learning_data_frame);
 
   // add chassis
   auto chassis = learning_data_frame->mutable_chassis();
@@ -569,6 +598,11 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       RoutingResponse routing_response;
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
+      }
+    } else if (message.channel_name == FLAGS_storytelling_topic) {
+      Stories stories;
+      if (stories.ParseFromString(message.content)) {
+        OnStoryTelling(stories);
       }
     } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
       TrafficLightDetection traffic_light_detection;
