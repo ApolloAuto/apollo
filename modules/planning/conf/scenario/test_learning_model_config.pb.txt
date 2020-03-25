@@ -2,11 +2,5 @@ scenario_type: TEST_LEARNING_MODEL
 stage_type: TEST_LEARNING_MODEL_STAGE
 test_learning_model_config: {
   model_file: "/apollo/modules/planning/tools/planning_demo_model.pt"
-  input_shape: 2
-  input_shape: 3
-  input_shape: 224
-  input_shape: 224
-  output_shape: 2
-  output_shape: 80
-  output_shape: 2
+  input_feature_num: 301084
 }

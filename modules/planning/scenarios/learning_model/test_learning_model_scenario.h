@@ -50,10 +50,12 @@ class TestLearningModelScenario : public Scenario {
       const ScenarioConfig::StageConfig& stage_config) override;
 
  private:
+  void ExtractFeatures(Frame* frame,
+                       std::vector<torch::jit::IValue> *input_features);
+
   torch::jit::script::Module model_;
   torch::Device device_;
-  std::vector<int> input_shapes_;
-  std::vector<int> output_shapes_;
+  int input_feature_num_ = 0;
 };
 
 }  // namespace scenario
