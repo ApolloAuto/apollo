@@ -44,4 +44,5 @@ fi
     --prediction_offline_bags=${SRC_DIR} \
     --prediction_data_dir=${TARGET_DIR} \
     --max_num_dump_feature=1000 \
-    --noenable_semantic_map
+    --noenable_semantic_map \
+    --noenable_async_draw_base_image
