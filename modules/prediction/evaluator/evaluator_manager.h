@@ -70,7 +70,9 @@ class EvaluatorManager {
                         ObstaclesContainer* obstacles_container);
 
  private:
-  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container);
+  void BuildObstacleIdHistoryMap(
+      ObstaclesContainer* obstacles_container,
+      size_t max_num_frame);
 
   void DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container);
 
