@@ -18,9 +18,9 @@
  * @file
  **/
 
-#include <string>
-
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
+
+#include <string>
 
 #include "cyber/task/task.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
@@ -233,10 +233,12 @@ Status OpenSpaceTrajectoryProvider::Process() {
     }
 
     // Generate Trajectory;
+    double time_latency;
     Status status = open_space_trajectory_optimizer_->Plan(
         stitching_trajectory, end_pose, XYbounds, rotate_angle,
         translate_origin, obstacles_edges_num, obstacles_A, obstacles_b,
-        obstacles_vertices_vec);
+        obstacles_vertices_vec, &time_latency);
+    frame_->mutable_open_space_info()->set_time_latency(time_latency);
 
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
@@ -257,12 +259,14 @@ void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
         std::lock_guard<std::mutex> lock(open_space_mutex_);
         thread_data = thread_data_;
       }
+      double time_latency;
       Status status = open_space_trajectory_optimizer_->Plan(
           thread_data.stitching_trajectory, thread_data.end_pose,
           thread_data.XYbounds, thread_data.rotate_angle,
           thread_data.translate_origin, thread_data.obstacles_edges_num,
           thread_data.obstacles_A, thread_data.obstacles_b,
-          thread_data.obstacles_vertices_vec);
+          thread_data.obstacles_vertices_vec, &time_latency);
+      frame_->mutable_open_space_info()->set_time_latency(time_latency);
       if (status == Status::OK()) {
         std::lock_guard<std::mutex> lock(open_space_mutex_);
         trajectory_updated_.store(true);

@@ -57,7 +57,8 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
     double rotate_angle, const Vec2d& translate_origin,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec) {
+    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
+    double* time_latency) {
   if (XYbounds.empty() || end_pose.empty() || obstacles_edges_num.cols() == 0 ||
       obstacles_A.cols() == 0 || obstacles_b.cols() == 0) {
     ADEBUG << "OpenSpaceTrajectoryOptimizer input data not ready";
@@ -286,6 +287,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
   std::chrono::duration<double> diff = end_timestamp - start_timestamp;
   ADEBUG << "open space trajectory smoother total time: "
          << diff.count() * 1000.0 << " ms.";
+  *time_latency = diff.count() * 1000.0;
 
   return Status::OK();
 }
