@@ -79,7 +79,7 @@ void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task,
     task->remainder_interval_ms = real_work_wheel_index;
     auto assistant_ticks = work_wheel_index / WORK_WHEEL_SIZE;
     if (assistant_ticks == 1 &&
-        real_work_wheel_index != current_work_wheel_index_) {
+        real_work_wheel_index < current_work_wheel_index_) {
       work_wheel_[real_work_wheel_index].AddTask(task);
       ADEBUG << "add task to work wheel. index :" << real_work_wheel_index;
     } else {
