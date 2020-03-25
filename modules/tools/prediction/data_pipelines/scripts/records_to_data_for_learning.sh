@@ -42,4 +42,5 @@ fi
     --prediction_offline_mode=2 \
     --prediction_offline_bags=${SRC_DIR} \
     --prediction_data_dir=${TARGET_DIR} \
-    --noenable_multi_thread
+    --noenable_multi_thread \
+    --noenable_async_draw_base_image
