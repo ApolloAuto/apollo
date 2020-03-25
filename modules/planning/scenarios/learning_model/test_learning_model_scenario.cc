@@ -40,10 +40,18 @@ TestLearningModelScenario::TestLearningModelScenario(
     model_ = torch::jit::load(config.model_file(), device_);
   }
 
-  std::copy(config.input_shape().begin(), config.input_shape().end(),
-            std::back_inserter(input_shapes_));
-  std::copy(config.output_shape().begin(), config.output_shape().end(),
-            std::back_inserter(output_shapes_));
+  input_feature_num_ = config.input_feature_num();
+}
+
+void TestLearningModelScenario::ExtractFeatures(Frame* frame,
+    std::vector<torch::jit::IValue> *input_features) {
+  // TODO(all): generate learning features.
+  // TODO(all): adapt to new input feature shapes
+  std::vector<torch::jit::IValue> tuple;
+  tuple.push_back(torch::zeros({2, 3, 224, 224}));
+  tuple.push_back(torch::zeros({2, 14}));
+  // assumption: future learning model use one dimension input features.
+  input_features->push_back(torch::ivalue::Tuple::create(tuple));
 }
 
 Scenario::ScenarioStatus TestLearningModelScenario::Process(
