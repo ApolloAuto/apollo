@@ -33,6 +33,7 @@ using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::PNCJunctionInfoConstPtr;
 using apollo::hdmap::SignalInfoConstPtr;
+using apollo::hdmap::StopSignInfoConstPtr;
 
 using apollo::planning::ADCTrajectory;
 
@@ -101,6 +102,23 @@ bool GetSignal(const PathPoint& point, std::string* signal_id) {
   return false;
 }
 
+bool GetStopSign(const PathPoint& point, std::string* stop_sign_id) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
+  std::vector<StopSignInfoConstPtr> stop_signs;
+  if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point,
+                                        FLAGS_search_radius,
+                                        &stop_signs) == 0) {
+    if (stop_signs.size() > 0) {
+      *stop_sign_id = stop_signs.front()->id().id();
+      return true;
+    }
+  }
+  return false;
+}
+
+
 }  // namespace
 
 /**
@@ -166,6 +184,15 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
         signal_distance_ = path_point.s() - s_start;
       }
     }
+
+    // stop_sign
+    if (stop_sign_id_.empty() || stop_sign_distance_ < 0) {
+      std::string stop_sign_id;
+      if (GetStopSign(path_point, &stop_sign_id)) {
+        stop_sign_id_ = stop_sign_id;
+        stop_sign_distance_ = path_point.s() - s_start;
+      }
+    }
   }
 }
 
@@ -225,6 +252,20 @@ void CloseToJunctionTeller::Update(Stories* stories) {
     AINFO << "Exit CloseToSignal story";
     stories->clear_close_to_signal();
   }
+
+  // CloseToStopSign
+  if (!stop_sign_id_.empty() && stop_sign_distance_ >= 0) {
+    if (!stories->has_close_to_stop_sign()) {
+      AINFO << "Enter CloseToStopSign story";
+    }
+    auto* story = stories->mutable_close_to_stop_sign();
+    story->set_id(stop_sign_id_);
+    story->set_distance(stop_sign_distance_);
+  } else if (stories->has_close_to_stop_sign()) {
+    AINFO << "Exit CloseToStopSign story";
+    stories->clear_close_to_stop_sign();
+  }
+
 }
 
 }  // namespace storytelling
