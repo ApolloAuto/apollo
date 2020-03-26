@@ -24,6 +24,11 @@ message CloseToSignal {
   optional double distance = 2  [default = nan];
 }
 
+message CloseToStopSign {
+  optional string id = 1;
+  optional double distance = 2  [default = nan];
+}
+
 // Usage guide for action modules:
 // 1. Call `stories.has_XXX()` to check if a story you are interested is in
 //    charge.
@@ -34,4 +39,6 @@ message Stories {
   optional CloseToCrosswalk close_to_crosswalk = 2;
   optional CloseToJunction close_to_junction = 3;
   optional CloseToSignal close_to_signal = 4;
+  optional CloseToStopSign close_to_stop_sign = 5;
 }
+
