@@ -40,6 +40,8 @@ class CloseToJunctionTeller : public BaseTeller {
   double crosswalk_distance_;
   std::string signal_id_;
   double signal_distance_;
+  std::string stop_sign_id_;
+  double stop_sign_distance_;
 };
 
 }  // namespace storytelling
