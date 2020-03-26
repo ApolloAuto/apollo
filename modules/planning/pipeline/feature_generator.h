@@ -24,11 +24,13 @@
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/storytelling/proto/story.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -55,26 +57,36 @@ class FeatureGenerator {
       const apollo::prediction::PredictionObstacles& prediction_obstacles);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
+  void OnStoryTelling(const apollo::storytelling::Stories& stories);
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
+  apollo::hdmap::LaneInfoConstPtr GetADCCurrentLane(int* routing_index);
+
   void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
+
   void GenerateObstacleTrajectoryPoint(
       const int obstacle_id,
       const ADCCurrentInfo& adc_curr_info,
       ObstacleFeature* obstacle_feature);
+
   void GenerateObstaclePrediction(
       const apollo::prediction::PredictionObstacle& prediction_obstacle,
       const ADCCurrentInfo& adc_curr_info,
       ObstacleFeature* obstacle_feature);
+
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
-  void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
+  void GenerateRoutingFeature(const int routing_index,
+                              LearningDataFrame* learning_data_frame);
 
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
       LearningDataFrame* learning_data_frame);
+
+  void GeneratePlanningTag(const apollo::hdmap::LaneInfoConstPtr& cur_lane,
+                           LearningDataFrame* learning_data_frame);
 
   void GenerateLearningDataFrame();
 
@@ -94,6 +106,7 @@ class FeatureGenerator {
       obstacle_history_map_;
   ChassisFeature chassis_feature_;
   std::string map_name_;
+  std::vector<OverlapFeature> overlaps_;
   std::vector<std::pair<std::string, double>> routing_lane_segment_;
   std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
         traffic_lights_;

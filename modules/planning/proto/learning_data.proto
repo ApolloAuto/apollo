@@ -5,10 +5,31 @@ package apollo.planning;
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/map/proto/map_lane.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
+import "modules/planning/proto/planning_config.proto";
+
+message OverlapFeature {
+  enum OverlapType {
+    CLEAR_AREA = 1;
+    CROSSWALK = 2;
+    PNC_JUNCTION = 3;
+    STOP_SIGN = 4;
+    TRAFFIC_LIGHT = 5;
+    YIELD_SIGN = 6;
+  };
+  optional string id = 1;
+  optional OverlapType type = 2;
+  optional double distance = 3;
+}
+
+message PlanningTag {
+  optional apollo.hdmap.Lane.LaneTurn lane_turn = 1;
+  repeated OverlapFeature overlap = 2;
+}
 
 message ChassisFeature {
   // Features from chassis
@@ -156,26 +177,28 @@ message LearningDataFrame {
   optional uint32 frame_num = 2;
   optional string map_name = 3;
 
+  optional PlanningTag planning_tag = 4;
+
   // Features from chassis
-  optional ChassisFeature chassis = 4;
+  optional ChassisFeature chassis = 5;
 
   // Features from localization
-  optional LocalizationFeature localization = 5;
+  optional LocalizationFeature localization = 6;
 
   // Features from perception obstacles
-  repeated ObstacleFeature obstacle = 6;
+  repeated ObstacleFeature obstacle = 7;
 
   // Features from routing
-  optional RoutingFeature routing = 7;
+  optional RoutingFeature routing = 8;
 
   // Features from traffic_light_detection
-  repeated TrafficLightFeature traffic_light = 8;
+  repeated TrafficLightFeature traffic_light = 9;
 
   // ADC past trajectory
-  repeated ADCTrajectoryPoint adc_trajectory_point = 9;
+  repeated ADCTrajectoryPoint adc_trajectory_point = 10;
 
   // Learning ouputs
-  optional LearningOutput output = 10;
+  optional LearningOutput output = 11;
 }
 
 message LearningData {
