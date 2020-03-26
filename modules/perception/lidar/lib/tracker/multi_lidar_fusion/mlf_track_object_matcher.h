@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <numeric>
 
 #include "cyber/common/macros.h"
 #include "modules/perception/common/graph/secure_matrix.h"

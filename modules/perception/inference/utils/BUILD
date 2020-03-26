@@ -8,6 +8,7 @@ cuda_library(
     srcs = ["cuda_util.cu"],
     hdrs = ["cuda_util.h"],
     deps = [
+        "@com_google_glog//:glog",
         "//cyber",
         "//third_party:cuda",
     ],
@@ -66,6 +67,7 @@ cuda_library(
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "//third_party:cuda",
+        "@com_google_glog//:glog",
     ],
 )
 
@@ -92,6 +94,7 @@ cuda_library(
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "//third_party:cuda",
+        "@com_google_glog//:glog",
     ],
 )
 

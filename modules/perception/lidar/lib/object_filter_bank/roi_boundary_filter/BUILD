@@ -14,6 +14,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_object_filter",
         "//modules/perception/proto:roi_boundary_filter_config_proto",
         "@eigen",
+        "@com_google_googletest//:gtest_prod",
     ],
     alwayslink = True,
 )

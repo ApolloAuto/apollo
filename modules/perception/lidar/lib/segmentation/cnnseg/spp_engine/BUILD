@@ -56,6 +56,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/common/i_lib",
         "//modules/perception/lidar/common",
+        "@com_google_googletest//:gtest_prod",
     ],
 )
 

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <limits>
+#include <math.h>
 
 namespace apollo {
 namespace perception {

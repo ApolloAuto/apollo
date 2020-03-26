@@ -64,6 +64,7 @@ cuda_library(
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
         "//third_party:cuda",
         "@eigen",
+        "@com_google_googletest//:gtest_prod",
     ],
 )
 

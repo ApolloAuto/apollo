@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cfloat>
 #include <vector>
+#include <numeric>
 
 #include "Eigen/Dense"
 

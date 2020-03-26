@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <numeric>
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/blob.h"
