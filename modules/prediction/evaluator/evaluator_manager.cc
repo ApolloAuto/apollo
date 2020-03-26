@@ -178,7 +178,7 @@ void EvaluatorManager::Init(const PredictionConf& config) {
 
   if (FLAGS_enable_semantic_map) {
     SemanticMap::Instance()->Init();
-    AINFO << "Init SemanticMap instance.";
+    ADEBUG << "Init SemanticMap instance.";
   }
 }
 
@@ -329,6 +329,7 @@ void EvaluatorManager::BuildObstacleIdHistoryMap(
       Feature feature;
       feature.set_id(obstacle_feature.id());
       feature.set_timestamp(obstacle_feature.timestamp());
+      feature.set_type(obstacle_feature.type());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
       if (obstacle_feature.id() != FLAGS_ego_vehicle_id) {
