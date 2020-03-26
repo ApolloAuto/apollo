@@ -36,6 +36,8 @@ class CloseToJunctionTeller : public BaseTeller {
   std::string junction_id_;
   CloseToJunction::JunctionType junction_type_;
   double junction_distance_;
+  std::string clear_area_id_;
+  double clear_area_distance_;
   std::string crosswalk_id_;
   double crosswalk_distance_;
   std::string signal_id_;
