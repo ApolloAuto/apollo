@@ -29,6 +29,7 @@ namespace {
 
 using apollo::hdmap::HDMapUtil;
 using apollo::common::PathPoint;
+using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::PNCJunctionInfoConstPtr;
 using apollo::hdmap::SignalInfoConstPtr;
@@ -68,6 +69,22 @@ bool GetJunction(const PathPoint& point, std::string* junction_id) {
   return false;
 }
 
+bool GetCrosswalk(const PathPoint& point, std::string* crosswalk_id) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
+  std::vector<CrosswalkInfoConstPtr> crosswalks;
+  if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point,
+                                         FLAGS_search_radius,
+                                         &crosswalks) == 0) {
+    if (crosswalks.size() > 0) {
+      *crosswalk_id = crosswalks.front()->id().id();
+      return true;
+    }
+  }
+  return false;
+}
+
 bool GetSignal(const PathPoint& point, std::string* signal_id) {
   common::PointENU hdmap_point;
   hdmap_point.set_x(point.x());
@@ -97,6 +114,8 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
 
   junction_id_.clear();
   junction_distance_ = -1;
+  crosswalk_id_.clear();
+  crosswalk_distance_ = -1;
   signal_id_.clear();
   signal_distance_ = -1;
   for (const auto& point : adc_trajectory.trajectory_point()) {
@@ -127,6 +146,15 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
         }
       } else {
         overlapping_junction_id.clear();
+      }
+    }
+
+    // crosswalk
+    if (crosswalk_id_.empty() || crosswalk_distance_ < 0) {
+      std::string crosswalk_id;
+      if (GetCrosswalk(path_point, &crosswalk_id)) {
+        crosswalk_id_ = crosswalk_id;
+        crosswalk_distance_ = path_point.s() - s_start;
       }
     }
 
@@ -172,6 +200,19 @@ void CloseToJunctionTeller::Update(Stories* stories) {
     stories->clear_close_to_junction();
   }
 
+  // CloseToCrosswalk
+  if (!crosswalk_id_.empty() && crosswalk_distance_ >= 0) {
+    if (!stories->has_close_to_crosswalk()) {
+      AINFO << "Enter CloseToCrosswalk story";
+    }
+    auto* story = stories->mutable_close_to_crosswalk();
+    story->set_id(crosswalk_id_);
+    story->set_distance(crosswalk_distance_);
+  } else if (stories->has_close_to_crosswalk()) {
+    AINFO << "Exit CloseToCrosswalk story";
+    stories->clear_close_to_crosswalk();
+  }
+
   // CloseToSignal
   if (!signal_id_.empty() && signal_distance_ >= 0) {
     if (!stories->has_close_to_signal()) {
@@ -181,7 +222,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
     story->set_id(signal_id_);
     story->set_distance(signal_distance_);
   } else if (stories->has_close_to_signal()) {
-    AINFO << "Exit CloseToJunction story";
+    AINFO << "Exit CloseToSignal story";
     stories->clear_close_to_signal();
   }
 }
