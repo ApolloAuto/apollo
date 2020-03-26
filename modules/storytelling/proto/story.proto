@@ -4,11 +4,11 @@ package apollo.storytelling;
 
 import "modules/common/proto/header.proto";
 
-// TODO(xiaoxq): State triggering conditions.
-message ProceedWithCaution {
+message CloseToCrosswalk {
+  optional string id = 1;
+  optional double distance = 2  [default = nan];
 }
 
-// Triggered when we are close to a junction.
 message CloseToJunction {
   enum JunctionType {
     PNC_JUNCTION = 1;
@@ -31,7 +31,7 @@ message CloseToSignal {
 message Stories {
   optional apollo.common.Header header = 1;
 
-  optional ProceedWithCaution proceed_with_caution = 2;
+  optional CloseToCrosswalk close_to_crosswalk = 2;
   optional CloseToJunction close_to_junction = 3;
   optional CloseToSignal close_to_signal = 4;
 }
