@@ -37,14 +37,27 @@ TestLearningModelScenario::TestLearningModelScenario(
   const auto& config = scenario_config.test_learning_model_config();
   AINFO << "Loading learning model:" << config.model_file();
   if (apollo::cyber::common::PathExists(config.model_file())) {
-    model_ = torch::jit::load(config.model_file(), device_);
+    try {
+      model_ = torch::jit::load(config.model_file(), device_);
+    }
+    catch (const c10::Error& e) {
+      AERROR << "error loading the model:" << config.model_file();
+      is_init_ = false;
+      return;
+    }
   }
 
   input_feature_num_ = config.input_feature_num();
+  is_init_ = true;
 }
 
-void TestLearningModelScenario::ExtractFeatures(Frame* frame,
+bool TestLearningModelScenario::ExtractFeatures(Frame* frame,
     std::vector<torch::jit::IValue> *input_features) {
+  if (!is_init_) {
+    AWARN << "scenario is not initialzed successfully.";
+    return false;
+  }
+
   // TODO(all): generate learning features.
   // TODO(all): adapt to new input feature shapes
   std::vector<torch::jit::IValue> tuple;
@@ -52,11 +65,29 @@ void TestLearningModelScenario::ExtractFeatures(Frame* frame,
   tuple.push_back(torch::zeros({2, 14}));
   // assumption: future learning model use one dimension input features.
   input_features->push_back(torch::ivalue::Tuple::create(tuple));
+  return true;
+}
+
+bool TestLearningModelScenario::InferenceModel(
+    const std::vector<torch::jit::IValue> &input_features,
+    Frame* frame) {
+  if (!is_init_) {
+    AWARN << "scenario is not initialzed successfully.";
+    return false;
+  }
+  auto torch_output = model_.forward(input_features);
+  ADEBUG << torch_output;
+
+  return true;
 }
 
 Scenario::ScenarioStatus TestLearningModelScenario::Process(
     const common::TrajectoryPoint& planning_init_point,
     Frame* frame) {
+  std::vector<torch::jit::IValue> input_features;
+  ExtractFeatures(frame, &input_features);
+  InferenceModel(input_features, frame);
+
   return STATUS_DONE;
 }
 std::unique_ptr<Stage> TestLearningModelScenario::CreateStage(
