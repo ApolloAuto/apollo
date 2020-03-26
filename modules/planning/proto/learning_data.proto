@@ -10,7 +10,6 @@ import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
-import "modules/planning/proto/planning_config.proto";
 
 message OverlapFeature {
   enum OverlapType {
