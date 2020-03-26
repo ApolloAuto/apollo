@@ -235,6 +235,15 @@ void FeatureGenerator::OnStoryTelling(
     overlaps_.push_back(overlap);
   }
 
+  // crosswalk
+  if (stories.has_close_to_crosswalk()) {
+    OverlapFeature overlap;
+    overlap.set_id(stories.close_to_crosswalk().id());
+    overlap.set_type(OverlapFeature::CROSSWALK);
+    overlap.set_distance(stories.close_to_crosswalk().distance());
+    overlaps_.push_back(overlap);
+  }
+
   // pnc_junction
   if (stories.has_close_to_junction() &&
       stories.close_to_junction().type() ==
