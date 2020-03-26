@@ -272,6 +272,15 @@ void FeatureGenerator::OnStoryTelling(
     overlap.set_distance(stories.close_to_stop_sign().distance());
     overlaps_.push_back(overlap);
   }
+
+  // yield_sign
+  if (stories.has_close_to_yield_sign()) {
+    OverlapFeature overlap;
+    overlap.set_id(stories.close_to_yield_sign().id());
+    overlap.set_type(OverlapFeature::YIELD_SIGN);
+    overlap.set_distance(stories.close_to_yield_sign().distance());
+    overlaps_.push_back(overlap);
+  }
 }
 
 apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
