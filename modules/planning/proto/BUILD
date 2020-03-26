@@ -597,9 +597,11 @@ proto_library(
     name = "learning_data_proto_lib",
     srcs = ["learning_data.proto"],
     deps = [
+        ":planning_config_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/map/proto:map_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
         "//modules/prediction/proto:feature_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
