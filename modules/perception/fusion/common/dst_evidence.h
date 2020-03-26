@@ -20,6 +20,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <numeric>
 
 namespace apollo {
 namespace perception {

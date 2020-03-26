@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <numeric>
 
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/cloud_mask.h"

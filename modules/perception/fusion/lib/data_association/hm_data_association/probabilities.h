@@ -17,6 +17,8 @@
 
 #include <algorithm>
 #include <vector>
+#include <math.h>
+#include <numeric>
 
 namespace apollo {
 namespace perception {

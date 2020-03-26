@@ -25,6 +25,7 @@ cc_library(
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/tracker/common:radar_track",
         "@eigen",
+        "@com_google_googletest//:gtest_prod",
     ],
 )
 

@@ -16,6 +16,7 @@ cc_library(
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/map/hdmap:hdmap_input",
         "//modules/perception/proto:map_manager_config_proto",
+        "@com_google_googletest//:gtest_prod",
     ],
 )
 
