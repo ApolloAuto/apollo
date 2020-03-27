@@ -84,6 +84,7 @@ cc_test(
     deps = [
         ":point_pillars",
         ":preprocess_points",
+        "//modules/perception/tool/benchmark/lidar/util:benchmark_util",
         "@boost",
         "@com_google_googletest//:gtest_main",
         "@eigen",
