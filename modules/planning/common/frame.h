@@ -168,6 +168,9 @@ class Frame {
     return pad_msg_driving_action_;
   }
 
+  std::list<ReferenceLineInfo>* mutable_reference_line_infos() {
+    return &reference_line_info_;
+  }
  private:
   common::Status InitFrameData();
 
