@@ -171,6 +171,7 @@ class Frame {
   std::list<ReferenceLineInfo>* mutable_reference_line_infos() {
     return &reference_line_info_;
   }
+
  private:
   common::Status InitFrameData();
 
