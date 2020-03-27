@@ -20,7 +20,7 @@
 #include "torch/torch.h"
 
 DEFINE_string(model_file,
-              "/apollo/modules/planning/tools/planning_demo_model.pt.2",
+              "/apollo/modules/planning/tools/planning_demo_model.pt",
               "pytorch model file.");
 
 int main(int argc, char **argv) {
@@ -69,6 +69,12 @@ int main(int argc, char **argv) {
   std::cout << "tensor [0,0,0] element:" << torch_output_tensor[0][0][0]
             << std::endl;
   std::cout << "tensor [0,0,1] element:" << torch_output_tensor[0][0][1]
+            << std::endl;
+  std::cout << "tensor [0,0,0] element:"
+            << double(torch_output_tensor.accessor<float, 3>()[0][0][0])
+            << std::endl;
+  std::cout << "tensor [0,0,1] element:"
+            << double(torch_output_tensor.accessor<float, 3>()[0][0][1])
             << std::endl;
 
   return 0;

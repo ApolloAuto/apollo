@@ -26,9 +26,13 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
+#include "modules/planning/proto/planning.pb.h"
+
 namespace apollo {
 namespace planning {
 namespace scenario {
+
+using apollo::common::TrajectoryPoint;
 
 TestLearningModelScenario::TestLearningModelScenario(
     const ScenarioConfig& scenario_config,
@@ -72,11 +76,50 @@ bool TestLearningModelScenario::InferenceModel(
     const std::vector<torch::jit::IValue> &input_features,
     Frame* frame) {
   if (!is_init_) {
-    AWARN << "scenario is not initialzed successfully.";
+    AERROR << "scenario is not initialzed successfully.";
     return false;
   }
+  if (frame == nullptr) {
+    AERROR << "frame is nullptr";
+    return false;
+  }
+
+  auto reference_line_infos = frame->mutable_reference_line_infos();
+  if (reference_line_infos->empty()) {
+    AERROR << "no reference is found.";
+    return false;
+  }
+  // FIXME(all): current only pick up the first reference line to use
+  // learning model trajectory.
+  for (auto& reference_line_info : *reference_line_infos) {
+    reference_line_info.SetDrivable(false);
+  }
+  auto& picked_reference_line_info = reference_line_infos->front();
+  picked_reference_line_info.SetDrivable(true);
+  picked_reference_line_info.SetCost(0);
+
   auto torch_output = model_.forward(input_features);
   ADEBUG << torch_output;
+  auto torch_output_tensor = torch_output.toTensor();
+  auto output_shapes = torch_output_tensor.sizes();
+  if (output_shapes.empty() || output_shapes.size() < 3) {
+    AWARN << "invalid response from learning model.";
+    return false;
+  }
+
+  // TODO(all): only populate path data from learning model
+  // for initial version
+  std::vector<TrajectoryPoint> trajectory_points;
+  for (int i = 0; i < output_shapes[1]; ++i) {
+    TrajectoryPoint p;
+    p.mutable_path_point()->set_x(
+       torch_output_tensor.accessor<float, 3>()[0][i][0]);
+    p.mutable_path_point()->set_y(
+       torch_output_tensor.accessor<float, 3>()[0][i][1]);
+    trajectory_points.push_back(p);
+  }
+  picked_reference_line_info.SetTrajectory(
+     DiscretizedTrajectory(trajectory_points));
 
   return true;
 }
