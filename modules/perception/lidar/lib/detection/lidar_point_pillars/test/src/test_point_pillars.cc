@@ -37,16 +37,15 @@
 * @date 2019/02/26
 */
 
-// headers in gtest
-#include <gtest/gtest.h>
+#include <vector>
 
-//headers in PCL
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
+#include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl/point_types.h"
 
-//headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/point_pillars.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/preprocess_points.h"
+#include "modules/perception/tool/benchmark/lidar/util/io_util.h"
 
 class TestSuite : public ::testing::Test
 {
@@ -82,7 +81,9 @@ public:
 
   // Make pointcloud for test
   void makePointsForTest(pcl::PointCloud<pcl::PointXYZI>::Ptr in_pcl_pc_ptr);
-  void pclToArray(const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr, float* out_points_array);
+  void pclToArray(const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
+                  float* out_points_array,
+                  const float normalizing_factor = 1.0);
   void preprocess(const float* in_points_array, int in_num_points, int* x_coors, int* y_coors,
                   float* num_points_per_pillar, float* pillar_x, float* pillar_y, float* pillar_z, float* pillar_i,
                   float* x_coors_for_sub_shaped, float* y_coors_for_sub_shaped, float* pillar_feature_mask,
@@ -92,6 +93,9 @@ public:
   void convertAnchors2BoxAnchors(float* anchors_px, float* anchors_py, float* anchors_dx, float* anchors_dy,
                                  float* box_anchors_min_x, float* box_anchors_min_y,
                                  float* box_anchors_max_x, float* box_anchors_max_y);
+  void DoInference(const float* in_points_array,
+                   const int in_num_points,
+                   std::vector<float>& out_detections);
 
 private:
   std::unique_ptr<PreprocessPoints> preprocess_points_ptr_;
@@ -124,13 +128,11 @@ TestClass::TestClass(const int MAX_NUM_PILLARS, const int MAX_NUM_POINTS_PER_PIL
   bool reproduce_result_mode=false;
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
-//  std::string package_path = ros::package::getPath("lidar_point_pillars");
   std::string package_path = "/apollo/modules/perception/lidar/lib/detection/lidar_point_pillars";
-  std::string onnx_path = package_path + "/test/data/dummy.onnx";
-  std::string pfe_onnx_file = onnx_path;
-  std::string rpn_onnx_file = onnx_path;
-//  std::string pfe_onnx_file = package_path + "/test/data/pfe.onnx";
-//  std::string rpn_onnx_file = package_path + "/test/data/rpn.onnx";
+  std::string pfe_onnx_path = "/test/data/pfe.onnx";
+  std::string rpn_onnx_path = "/test/data/rpn.onnx";
+  std::string pfe_onnx_file = package_path + pfe_onnx_path;
+  std::string rpn_onnx_file = package_path + rpn_onnx_path;
 
   point_pillars_ptr_.reset(new PointPillars(reproduce_result_mode, score_threshold, nms_overlap_threshold,
                                             pfe_onnx_file, rpn_onnx_file));
@@ -146,15 +148,16 @@ void TestClass::preprocess(const float* in_points_array, int in_num_points, int*
                                      pillar_feature_mask, sparse_pillar_map, host_pillar_count);
 }
 
-void TestClass::pclToArray(const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr, float* out_points_array)
-{
-  for (size_t i = 0; i < in_pcl_pc_ptr->size(); i++)
-  {
+void TestClass::pclToArray(
+    const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
+    float* out_points_array,
+    const float normalizing_factor) {
+  for (size_t i = 0; i < in_pcl_pc_ptr->size(); ++i) {
     pcl::PointXYZI point = in_pcl_pc_ptr->at(i);
     out_points_array[i * 4 + 0] = point.x;
     out_points_array[i * 4 + 1] = point.y;
     out_points_array[i * 4 + 2] = point.z;
-    out_points_array[i * 4 + 3] = point.intensity;
+    out_points_array[i * 4 + 3] = (float) point.intensity / normalizing_factor;
   }
 }
 
@@ -217,6 +220,14 @@ void TestClass::convertAnchors2BoxAnchors(float* anchors_px, float* anchors_py, 
   return point_pillars_ptr_->convertAnchors2BoxAnchors(anchors_px, anchors_py, anchors_dx, anchors_dy,
                                                        box_anchors_min_x, box_anchors_min_y,
                                                        box_anchors_max_x, box_anchors_max_y);
+}
+
+void TestClass::DoInference(const float *in_points_array,
+                            const int in_num_points,
+                            std::vector<float> &out_detections) {
+  return point_pillars_ptr_->doInference(in_points_array,
+                                         in_num_points,
+                                         out_detections);
 }
 
 TEST(TestSuite, CheckPreprocessPointsCPU)
@@ -414,9 +425,84 @@ TEST(TestSuite, CheckGenerateBoxAnchors)
   delete[] box_anchors_max_y;
 }
 
+TEST(TestSuite, CheckDoInference) {
+  const int MAX_NUM_PILLARS = 12000;
+  const int MAX_NUM_POINTS_PER_PILLAR = 100;
+  const int GRID_X_SIZE = 432;
+  const int GRID_Y_SIZE = 496;
+  const int GRID_Z_SIZE = 1;
+  const float PILLAR_X_SIZE = 0.16;
+  const float PILLAR_Y_SIZE = 0.16;
+  const float PILLAR_Z_SIZE = 4.0;
+  const float MIN_X_RANGE = 0;
+  const float MIN_Y_RANGE = -39.68;
+  const float MIN_Z_RANGE = -3.0;
+  const int NUM_INDS_FOR_SCAN = 512;
+  const int NUM_BOX_CORNERS = 4;
+  const int OUTPUT_NUM_BOX_FEATURE = 7;
+  const float NORMALIZING_FACTOR = 255.0;
+  TestClass test_obj(MAX_NUM_PILLARS,
+                     MAX_NUM_POINTS_PER_PILLAR,
+                     GRID_X_SIZE,
+                     GRID_Y_SIZE,
+                     GRID_Z_SIZE,
+                     PILLAR_X_SIZE,
+                     PILLAR_Y_SIZE,
+                     PILLAR_Z_SIZE,
+                     MIN_X_RANGE,
+                     MIN_Y_RANGE,
+                     MIN_Z_RANGE,
+                     NUM_INDS_FOR_SCAN,
+                     NUM_BOX_CORNERS);
+
+  pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(new pcl::PointCloud<pcl::PointXYZI>);
+  apollo::perception::benchmark::PointCloudPtr org_cloud_ptr(
+      new pcl::PointCloud<apollo::perception::benchmark::PointXYZIL>);
+  std::string file_name =
+      "/apollo/modules/perception/testdata/lidar/app/data/perception/"
+      "lidar/files/0001_00.pcd";
+
+  bool ret = apollo::perception::benchmark::load_pcl_pcds_xyzit(file_name, org_cloud_ptr);
+  ASSERT_TRUE(ret) << "Failed to load pcd file: " << file_name;
+
+  for (size_t i = 0; i < org_cloud_ptr->size(); ++i) {
+    pcl::PointXYZI point;
+    point.x = org_cloud_ptr->at(i).x;
+    point.y = org_cloud_ptr->at(i).y;
+    point.z = org_cloud_ptr->at(i).z;
+    point.intensity = org_cloud_ptr->at(i).intensity;
+    pcl_pc_ptr->push_back(point);
+  }
+
+  float* points_array = new float[pcl_pc_ptr->size() * 4];
+  test_obj.pclToArray(pcl_pc_ptr, points_array, NORMALIZING_FACTOR);
+
+  std::vector<float> out_detections;
+  test_obj.DoInference(points_array, pcl_pc_ptr->size(), out_detections);
+
+  int num_objects = out_detections.size() / OUTPUT_NUM_BOX_FEATURE;
+  EXPECT_GE(num_objects, 4);
+
+  for (int j = 0; j < num_objects; ++j) {
+    float x = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 0];
+    float y = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 1];
+    float z = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 2];
+    float dx = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 4];
+    float dy = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 3];
+    float dz = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 5];
+    float yaw = out_detections[j * OUTPUT_NUM_BOX_FEATURE + 6];
+    yaw += M_PI/2;
+    yaw = std::atan2(std::sin(yaw), std::cos(yaw));
+    yaw = -yaw;
+
+    std::cout << "object id: " << j << ", x: " << x << ", y: " << y
+              << ", z: " << z << ", dx: " << dx << ", dy: " << dy
+              << ", dz: " << dz << ", yaw: " << yaw << std::endl;
+  }
+}
+
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-//  ros::init(argc, argv, "TestNode");
   return RUN_ALL_TESTS();
 }
