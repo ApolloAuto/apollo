@@ -29,6 +29,7 @@ RUN apt update -y && \
         libomp-dev \
         libopencv-dev \
         libpcl-dev \
+        libpcap-dev \
         libpoco-dev \
         libsqlite3-dev \
         libswresample-dev \

@@ -71,6 +71,8 @@ http_archive(
     sha256 = "2fcb7f1ab160d6fd3aaade64520be3e5446fc4c6fa7ba6581afdc4e26094bd81",
     strip_prefix = "grpc-1.26.0",
 )
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+grpc_deps()
 
 http_archive(
     name = "eigen",
