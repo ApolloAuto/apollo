@@ -492,19 +492,22 @@ void FeatureGenerator::GenerateRoutingFeature(
   // local routing land_ids behind ADS
   int i = routing_index;
   double length = 0.0;
-  while (i-- > 0 && length < kLocalRoutingLength) {
+  while (i >= 0 && length < kLocalRoutingLength) {
       local_routing_lane_ids.insert(local_routing_lane_ids.begin(),
                                     routing_lane_segment_[i].first);
       length += routing_lane_segment_[i].second;
+      i--;
   }
   // local routing lane_ids ahead of ADC
   i = routing_index;
   length = 0.0;
-  while (i++ < static_cast<int>(routing_lane_segment_.size()) &&
+  while (i < static_cast<int>(routing_lane_segment_.size()) &&
       length < kLocalRoutingLength) {
     local_routing_lane_ids.push_back(routing_lane_segment_[i].first);
     length += routing_lane_segment_[i].second;
+    i++;
   }
+
   for (const auto& lane_id : local_routing_lane_ids) {
     routing->add_local_routing_lane_id(lane_id);
   }
