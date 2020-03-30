@@ -45,7 +45,7 @@
 #include <iostream>
 
 // headers in local files
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/common.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/common.h"
 
 class NMSCuda {
  private:

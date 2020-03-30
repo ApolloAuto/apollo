@@ -46,7 +46,7 @@
 #include <vector>
 
 // headers in local files
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/nms_cuda.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/nms_cuda.h"
 
 class PostprocessCuda {
  private:
