@@ -6,14 +6,14 @@ package(default_visibility = ["//visibility:public"])
 cuda_library(
     name = "anchor_mask_cuda",
     srcs = ["src/anchor_mask_cuda.cu"],
-    hdrs = ["include/lidar_point_pillars/anchor_mask_cuda.h"],
+    hdrs = ["include/anchor_mask_cuda.h"],
     deps = ["@cuda"],
 )
 
 cuda_library(
     name = "nms_cuda",
     srcs = ["src/nms_cuda.cu"],
-    hdrs = ["include/lidar_point_pillars/nms_cuda.h"],
+    hdrs = ["include/nms_cuda.h"],
     deps = ["@cuda"],
 )
 
@@ -27,12 +27,12 @@ cc_library(
         "scatter_cuda",
     ],
     hdrs = [
-        "include/lidar_point_pillars/common.h",
-        "include/lidar_point_pillars/anchor_mask_cuda.h",
-        "include/lidar_point_pillars/nms_cuda.h",
-        "include/lidar_point_pillars/point_pillars.h",
-        "include/lidar_point_pillars/postprocess_cuda.h",
-        "include/lidar_point_pillars/scatter_cuda.h",
+        "include/common.h",
+        "include/anchor_mask_cuda.h",
+        "include/nms_cuda.h",
+        "include/point_pillars.h",
+        "include/postprocess_cuda.h",
+        "include/scatter_cuda.h",
     ],
     deps = [
         "preprocess_points",
@@ -45,7 +45,7 @@ cc_library(
 cuda_library(
     name = "postprocess_cuda",
     srcs = ["src/postprocess_cuda.cu"],
-    hdrs = ["include/lidar_point_pillars/postprocess_cuda.h"],
+    hdrs = ["include/postprocess_cuda.h"],
     deps = [
         "@cuda",
     ],
@@ -58,22 +58,22 @@ cc_library(
         ":preprocess_points_cuda",
     ],
     hdrs = [
-        "include/lidar_point_pillars/preprocess_points.h",
-        "include/lidar_point_pillars/preprocess_points_cuda.h",
+        "include/preprocess_points.h",
+        "include/preprocess_points_cuda.h",
     ],
 )
 
 cuda_library(
     name = "preprocess_points_cuda",
     srcs = ["src/preprocess_points_cuda.cu"],
-    hdrs = ["include/lidar_point_pillars/preprocess_points_cuda.h"],
+    hdrs = ["include/preprocess_points_cuda.h"],
     deps = ["@cuda"],
 )
 
 cuda_library(
     name = "scatter_cuda",
     srcs = ["src/scatter_cuda.cu"],
-    hdrs = ["include/lidar_point_pillars/scatter_cuda.h"],
+    hdrs = ["include/scatter_cuda.h"],
     deps = ["@cuda"],
 )
 
