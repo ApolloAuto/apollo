@@ -22,7 +22,7 @@
 
 
 //headers in local files
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/nms_cuda.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/nms_cuda.h"
 
 
 __device__ inline float devIoU(float const *const a, float const *const b)
