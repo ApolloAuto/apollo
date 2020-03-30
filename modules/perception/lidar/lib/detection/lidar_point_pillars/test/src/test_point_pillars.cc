@@ -43,9 +43,15 @@
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
 
+<<<<<<< HEAD
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/point_pillars.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/preprocess_points.h"
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
+=======
+//headers in local files
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/point_pillars.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/preprocess_points.h"
+>>>>>>> Perception: modify include dir in lidar_point_pillars.
 
 class TestSuite : public ::testing::Test
 {
