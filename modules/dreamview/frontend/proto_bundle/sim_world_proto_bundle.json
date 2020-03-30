@@ -4164,6 +4164,47 @@
                 }
               }
             },
+            "OverlapFeature": {
+              "fields": {
+                "id": {
+                  "type": "string",
+                  "id": 1
+                },
+                "type": {
+                  "type": "OverlapType",
+                  "id": 2
+                },
+                "distance": {
+                  "type": "double",
+                  "id": 3
+                }
+              },
+              "nested": {
+                "OverlapType": {
+                  "values": {
+                    "CLEAR_AREA": 1,
+                    "CROSSWALK": 2,
+                    "PNC_JUNCTION": 3,
+                    "STOP_SIGN": 4,
+                    "TRAFFIC_LIGHT": 5,
+                    "YIELD_SIGN": 6
+                  }
+                }
+              }
+            },
+            "PlanningTag": {
+              "fields": {
+                "laneTurn": {
+                  "type": "apollo.hdmap.Lane.LaneTurn",
+                  "id": 1
+                },
+                "overlap": {
+                  "rule": "repeated",
+                  "type": "OverlapFeature",
+                  "id": 2
+                }
+              }
+            },
             "ChassisFeature": {
               "fields": {
                 "speedMps": {
@@ -4212,7 +4253,7 @@
                 }
               }
             },
-            "ObstacleTrajectoryPoint": {
+            "PerceptionObstacleFeature": {
               "fields": {
                 "timestampSec": {
                   "type": "double",
@@ -4230,18 +4271,83 @@
                   "type": "apollo.common.Point3D",
                   "id": 4
                 },
-                "polygonPoint": {
-                  "rule": "repeated",
+                "acceleration": {
                   "type": "apollo.common.Point3D",
                   "id": 5
                 },
-                "acceleration": {
+                "polygonPoint": {
+                  "rule": "repeated",
                   "type": "apollo.common.Point3D",
                   "id": 6
                 }
               }
             },
-            "ObstaclePrediction": {
+            "PathPointFeature": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 4
+                },
+                "s": {
+                  "type": "double",
+                  "id": 5
+                },
+                "laneId": {
+                  "type": "string",
+                  "id": 6
+                }
+              }
+            },
+            "TrajectoryPointFeature": {
+              "fields": {
+                "pathPoint": {
+                  "type": "PathPointFeature",
+                  "id": 1
+                },
+                "v": {
+                  "type": "double",
+                  "id": 2
+                },
+                "a": {
+                  "type": "double",
+                  "id": 3
+                },
+                "relativeTime": {
+                  "type": "double",
+                  "id": 4
+                },
+                "gaussianInfo": {
+                  "type": "apollo.common.GaussianInfo",
+                  "id": 5
+                }
+              }
+            },
+            "PredictionTrajectoryFeature": {
+              "fields": {
+                "probability": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPointFeature",
+                  "id": 2
+                }
+              }
+            },
+            "PredictionObstacleFeature": {
               "fields": {
                 "timestampSec": {
                   "type": "double",
@@ -4251,25 +4357,25 @@
                   "type": "double",
                   "id": 2
                 },
-                "trajectory": {
-                  "rule": "repeated",
-                  "type": "apollo.prediction.Trajectory",
-                  "id": 3
-                },
                 "intent": {
                   "type": "apollo.prediction.ObstacleIntent",
-                  "id": 4
+                  "id": 3
                 },
                 "priority": {
                   "type": "apollo.prediction.ObstaclePriority",
-                  "id": 5
+                  "id": 4
                 },
                 "isStatic": {
                   "type": "bool",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": false
                   }
+                },
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "PredictionTrajectoryFeature",
+                  "id": 6
                 }
               }
             },
@@ -4297,21 +4403,26 @@
                 },
                 "obstacleTrajectoryPoint": {
                   "rule": "repeated",
-                  "type": "ObstacleTrajectoryPoint",
+                  "type": "PerceptionObstacleFeature",
                   "id": 6
                 },
                 "obstaclePrediction": {
-                  "type": "ObstaclePrediction",
+                  "type": "PredictionObstacleFeature",
                   "id": 7
                 }
               }
             },
-            "RoutingResponseFeature": {
+            "RoutingFeature": {
               "fields": {
-                "laneId": {
+                "routingLaneId": {
                   "rule": "repeated",
                   "type": "string",
                   "id": 1
+                },
+                "localRoutingLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 2
                 }
               }
             },
@@ -4339,6 +4450,15 @@
                 }
               }
             },
+            "LearningOutput": {
+              "fields": {
+                "adcFutureTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "ADCTrajectoryPoint",
+                  "id": 1
+                }
+              }
+            },
             "LearningDataFrame": {
               "fields": {
                 "timestampSec": {
@@ -4349,32 +4469,44 @@
                   "type": "uint32",
                   "id": 2
                 },
+                "mapName": {
+                  "type": "string",
+                  "id": 3
+                },
+                "planningTag": {
+                  "type": "PlanningTag",
+                  "id": 4
+                },
                 "chassis": {
                   "type": "ChassisFeature",
-                  "id": 3
+                  "id": 5
                 },
                 "localization": {
                   "type": "LocalizationFeature",
-                  "id": 4
+                  "id": 6
                 },
                 "obstacle": {
                   "rule": "repeated",
                   "type": "ObstacleFeature",
-                  "id": 5
+                  "id": 7
                 },
-                "routingResponse": {
-                  "type": "RoutingResponseFeature",
-                  "id": 6
+                "routing": {
+                  "type": "RoutingFeature",
+                  "id": 8
                 },
                 "trafficLight": {
                   "rule": "repeated",
                   "type": "TrafficLightFeature",
-                  "id": 7
+                  "id": 9
                 },
                 "adcTrajectoryPoint": {
                   "rule": "repeated",
                   "type": "ADCTrajectoryPoint",
-                  "id": 8
+                  "id": 10
+                },
+                "output": {
+                  "type": "LearningOutput",
+                  "id": 11
                 }
               }
             },
@@ -7026,6 +7158,18 @@
                 }
               }
             },
+            "ScenarioTestLearningModelConfig": {
+              "fields": {
+                "modelFile": {
+                  "type": "string",
+                  "id": 1
+                },
+                "inputFeatureNum": {
+                  "type": "int32",
+                  "id": 2
+                }
+              }
+            },
             "ScenarioConfig": {
               "oneofs": {
                 "scenarioConfig": {
@@ -7042,7 +7186,8 @@
                     "parkAndGoConfig",
                     "pullOverConfig",
                     "valetParkingConfig",
-                    "yieldSignConfig"
+                    "yieldSignConfig",
+                    "testLearningModelConfig"
                   ]
                 }
               },
@@ -7103,6 +7248,10 @@
                   "type": "ScenarioYieldSignConfig",
                   "id": 15
                 },
+                "testLearningModelConfig": {
+                  "type": "ScenarioTestLearningModelConfig",
+                  "id": 18
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
@@ -7133,7 +7282,8 @@
                     "EMERGENCY_PULL_OVER": 11,
                     "EMERGENCY_STOP": 12,
                     "NARROW_STREET_U_TURN": 13,
-                    "PARK_AND_GO": 14
+                    "PARK_AND_GO": 14,
+                    "TEST_LEARNING_MODEL": 15
                   }
                 },
                 "StageType": {
@@ -7169,7 +7319,8 @@
                     "PARK_AND_GO_ADJUST": 802,
                     "PARK_AND_GO_PRE_CRUISE": 803,
                     "YIELD_SIGN_APPROACH": 900,
-                    "YIELD_SIGN_CREEP": 901
+                    "YIELD_SIGN_CREEP": 901,
+                    "TEST_LEARNING_MODEL_STAGE": 1001
                   }
                 },
                 "StageConfig": {
@@ -9130,6 +9281,10 @@
                 "futureCollisionPoint": {
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 17
+                },
+                "timeLatency": {
+                  "type": "double",
+                  "id": 18
                 }
               }
             },
