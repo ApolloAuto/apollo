@@ -35,7 +35,7 @@
 #include <iostream>
 
 // headers in local files
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/point_pillars.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/point_pillars.h"
 
 // clang-format off
 PointPillars::PointPillars(const bool reproduce_result_mode, const float score_threshold,

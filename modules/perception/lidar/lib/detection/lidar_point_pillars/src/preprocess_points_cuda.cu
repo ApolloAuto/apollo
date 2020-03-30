@@ -34,8 +34,8 @@
 #include <iostream>
 
 //headers in local files
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/common.h"
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/lidar_point_pillars/preprocess_points_cuda.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/common.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/preprocess_points_cuda.h"
 
 __global__ void make_pillar_histo_kernel(
                                      const float* dev_points,
