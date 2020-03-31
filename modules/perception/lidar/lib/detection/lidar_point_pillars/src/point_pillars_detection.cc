@@ -26,6 +26,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using base::Object;
+using base::PointF;
+
 bool PointPillarsDetection::Init(const DetectionInitOptions &options) {
   point_pillars_ptr_.reset(new PointPillars(reproduce_result_mode_,
                                             score_threshold_,
@@ -71,8 +74,8 @@ bool PointPillarsDetection::Detect(const DetectionOptions &options,
   PclToArray(original_cloud_, points_array, kNormalizingFactor);
 
   // inference
-  std::vector<float> out_detections;
-  point_pillars_ptr_.doInference(points_array,
+  std::vector<float>* out_detections(new std::vector<float>());
+  point_pillars_ptr_->doInference(points_array,
                                  original_cloud_->size(),
                                  out_detections);
   inference_time_ = timer.toc(true);
@@ -93,17 +96,18 @@ void PointPillarsDetection::PclToArray(const base::PointFCloudPtr &pc_ptr,
     out_points_array[i * 4 + 0] = point.x;
     out_points_array[i * 4 + 1] = point.y;
     out_points_array[i * 4 + 2] = point.z;
-    out_points_array[i * 4 + 3] = (float) point.intensity / normalizing_factor;
+    out_points_array[i * 4 + 3] =
+        static_cast<float>(point.intensity / normalizing_factor);
   }
 }
 
 void PointPillarsDetection::GetObjects(
-    std::vector<std::shared_ptr<Objects>>* objects,
-    std::vector<float> detections) {
+    std::vector<std::shared_ptr<Object>>* objects,
+    std::vector<float>* detections) {
   Timer timer;
-  int num_objects = detections.size() / kOutputNumBoxFeature;
+  int num_objects = detections->size() / kOutputNumBoxFeature;
 
-  objects.clear();
+  objects->clear();
   base::ObjectPool::Instance().BatchGet(num_objects, objects);
 
   for (int i = 0; num_objects; ++i) {
@@ -111,21 +115,21 @@ void PointPillarsDetection::GetObjects(
     object->id = i;
 
     // read params of bounding box
-    float x = detections[i * kOutputNumBoxFeature + 0];
-    float y = detections[i * kOutputNumBoxFeature + 1];
-    float z = detections[i * kOutputNumBoxFeature + 2];
-    float dx = detections[i * kOutputNumBoxFeature + 4];
-    float dy = detections[i * kOutputNumBoxFeature + 3];
-    float dz = detections[i * kOutputNumBoxFeature + 5];
-    float yaw = detections[i * kOutputNumBoxFeature + 6];
+    float x = detections->at(i * kOutputNumBoxFeature + 0);
+    float y = detections->at(i * kOutputNumBoxFeature + 1);
+    float z = detections->at(i * kOutputNumBoxFeature + 2);
+    float dx = detections->at(i * kOutputNumBoxFeature + 4);
+    float dy = detections->at(i * kOutputNumBoxFeature + 3);
+    float dz = detections->at(i * kOutputNumBoxFeature + 5);
+    float yaw = detections->at(i * kOutputNumBoxFeature + 6);
     yaw += M_PI / 2;
-    yaw = std::atan2(std::sinf(yaw), std::cosf(yaw));
+    yaw = std::atan2(sinf(yaw), cosf(yaw));
     yaw = -yaw;
 
     // directions
     object->theta = yaw;
-    object->direction[0] = std::cosf(yaw);
-    object->direction[1] = std::sinf(yaw);
+    object->direction[0] = cosf(yaw);
+    object->direction[1] = sinf(yaw);
     object->direction[2] = 0;
     object->lidar_supplement.is_orientation_ready = true;
 
@@ -139,7 +143,7 @@ void PointPillarsDetection::GetObjects(
     object->lidar_supplement.is_background = false;
     for (int j = 0; j < 2; ++j) {
       PointF point0, point1, point2, point3;
-      float vz = z + (j==0 ? 0 : dz);
+      float vz = z + (j == 0 ? 0 : dz);
       point0.x = x + dx2cos + dy2sin;
       point0.y = y + dx2sin - dy2cos;
       point0.z = vz;
@@ -175,6 +179,7 @@ void PointPillarsDetection::GetObjects(
 
   collect_time_ = timer.toc(true);
 }
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
