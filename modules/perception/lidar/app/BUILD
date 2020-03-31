@@ -11,6 +11,27 @@ cc_library(
 )
 
 cc_library(
+    name = "lidar_obstacle_detection",
+    srcs = ["lidar_obstacle_detection.cc"],
+    hdrs = ["lidar_obstacle_detection.h"],
+    deps = [
+        "//cyber",
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/perception/lib/utils",
+        "//modules/perception/lidar/app/proto:app_proto",
+        "//modules/perception/lidar/lib/map_manager",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/object_filter_bank",
+        "//modules/perception/lidar/lib/pointcloud_preprocessor",
+        "//modules/perception/lidar/lib/scene_manager",
+        "//modules/perception/proto:perception_config_schema_proto",
+        "@eigen",
+    ],
+)
+
+cc_library(
     name = "lidar_obstacle_segmentation",
     srcs = ["lidar_obstacle_segmentation.cc"],
     hdrs = ["lidar_obstacle_segmentation.h"],

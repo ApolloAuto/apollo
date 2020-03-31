@@ -20,7 +20,7 @@
 
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
+#include "modules/perception/lidar/app/lidar_obstacle_detection.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"
 #include "modules/perception/onboard/proto/lidar_component_config.pb.h"
@@ -54,7 +54,7 @@ class DetectionComponent : public cyber::Component<drivers::PointCloud> {
   std::string output_channel_name_;
   base::SensorInfo sensor_info_;
   TransformWrapper lidar2world_trans_;
-  std::unique_ptr<lidar::LidarObstacleSegmentation> segmentor_;
+  std::unique_ptr<lidar::LidarObstacleDetection> detector_;
   std::shared_ptr<apollo::cyber::Writer<LidarFrameMessage>> writer_;
 };
 

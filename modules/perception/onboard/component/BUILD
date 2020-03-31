@@ -88,6 +88,7 @@ cc_library(
         "radar_detection_component.cc",
         "recognition_component.cc",
         "segmentation_component.cc",
+        "detection_component.cc",
     ],
     hdrs = [
         "fusion_component.h",
@@ -96,6 +97,7 @@ cc_library(
         "radar_detection_component.h",
         "recognition_component.h",
         "segmentation_component.h",
+        "detection_component.h",
     ],
     copts = [
         '-DMODULE_NAME=\\"perception\\"',

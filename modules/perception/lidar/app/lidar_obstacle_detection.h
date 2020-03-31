@@ -22,7 +22,8 @@
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
-#include "modules/perception/lidar/lib/interface/base_segmentation.h"
+//#include "modules/perception/lidar/lib/interface/base_segmentation.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
@@ -51,30 +52,30 @@ class LidarObstacleDetection {
                 LidarObstacleDetectionOptions());
 
   LidarProcessResult Process(
-      const LidarObstacleSegmentationOptions& options,
+      const LidarObstacleDetectionOptions& options,
       const std::shared_ptr<apollo::drivers::PointCloud const>& message,
       LidarFrame* frame);
 
-  LidarProcessResult Process(const LidarObstacleSegmentationOptions& options,
+  LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
                              LidarFrame* frame);
 
-  std::string Name() const { return "LidarObstacleSegmentation"; }
+  std::string Name() const { return "LidarObstacleDetection"; }
 
  private:
   LidarProcessResult ProcessCommon(
-      const LidarObstacleSegmentationOptions& options, LidarFrame* frame);
+      const LidarObstacleDetectionOptions& options, LidarFrame* frame);
 
  private:
   PointCloudPreprocessor cloud_preprocessor_;
   MapManager map_manager_;
-  std::unique_ptr<BaseSegmentation> segmentor_;
+  std::unique_ptr<PointPillarsDetection> detector_;
   ObjectBuilder builder_;
   ObjectFilterBank filter_bank_;
   // params
-  std::string segmentor_name_;
+  std::string detector_name_;
   bool use_map_manager_ = true;
   bool use_object_filter_bank_ = true;
-};  // class LidarObstacleSegmentation
+};  // class LidarObstacleDetection
 
 }  // namespace lidar
 }  // namespace perception

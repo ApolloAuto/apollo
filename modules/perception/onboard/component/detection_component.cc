@@ -46,7 +46,7 @@ bool DetectionComponent::Init() {
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
   if (!InitAlgorithmPlugin()) {
-    AERROR << "Failed to init detectation component algorithm plugin.";
+    AERROR << "Failed to init detection component algorithm plugin.";
     return false;
   }
   return true;
@@ -54,7 +54,7 @@ bool DetectionComponent::Init() {
 
 bool DetectionComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
-  AINFO << "Enter segmentation component, message timestamp: "
+  AINFO << "Enter detection component, message timestamp: "
         << message->measurement_time() << " current timestamp: "
         << apollo::common::time::Clock::NowInSeconds();
 
@@ -64,7 +64,7 @@ bool DetectionComponent::Proc(
   bool status = InternalProc(message, out_message);
   if (status) {
     writer_->Write(out_message);
-    AINFO << "Send lidar segment output message.";
+    AINFO << "Send lidar detect output message.";
   }
   return status;
 }
@@ -73,19 +73,19 @@ bool DetectionComponent::InitAlgorithmPlugin() {
   ACHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_,
                                                           &sensor_info_));
 
-  detector_.reset(new lidar::LidarObstacleSegmentation);
+  detector_.reset(new lidar::LidarObstacleDetection);
   if (detector_ == nullptr) {
     AERROR << "sensor_name_ "
-           << "Failed to get segmentation instance";
+           << "Failed to get detection instance";
     return false;
   }
-  lidar::LidarObstacleSegmentationInitOptions init_options;
+  lidar::LidarObstacleDetectionInitOptions init_options;
   init_options.sensor_name = sensor_name_;
   init_options.enable_hdmap_input =
       FLAGS_obs_enable_hdmap_input && enable_hdmap_;
-  if (!segmentor_->Init(init_options)) {
+  if (!detector_->Init(init_options)) {
     AINFO << "sensor_name_ "
-          << "Failed to init segmentation.";
+          << "Failed to init detection.";
     return false;
   }
 
@@ -112,7 +112,7 @@ bool SegmentationComponent::InternalProc(
   out_message->timestamp_ = timestamp;
   out_message->lidar_timestamp_ = in_message->header().lidar_timestamp();
   out_message->seq_num_ = s_seq_num_;
-  out_message->process_stage_ = ProcessStage::LIDAR_SEGMENTATION;
+  out_message->process_stage_ = ProcessStage::LIDAR_DETECTION;
   out_message->error_code_ = apollo::common::ErrorCode::OK;
 
   auto& frame = out_message->lidar_frame_;
@@ -132,23 +132,23 @@ bool SegmentationComponent::InternalProc(
     return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      sensor_name_, "segmentation_1::get_lidar_to_world_pose");
+      sensor_name_, "detection_1::get_lidar_to_world_pose");
 
   frame->lidar2world_pose = pose;
 
-  lidar::LidarObstacleSegmentationOptions segment_opts;
-  segment_opts.sensor_name = sensor_name_;
-  lidar2world_trans_.GetExtrinsics(&segment_opts.sensor2novatel_extrinsics);
+  lidar::LidarObstacleDetectionOptions detect_opts;
+  detect_opts.sensor_name = sensor_name_;
+  lidar2world_trans_.GetExtrinsics(&detect_opts.sensor2novatel_extrinsics);
   lidar::LidarProcessResult ret =
-      segmentor_->Process(segment_opts, in_message, frame.get());
+      detector_->Process(detect_opts, in_message, frame.get());
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    AERROR << "Lidar segmentation process error, " << ret.log;
+    AERROR << "Lidar detection process error, " << ret.log;
     return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
-                                           "segmentation_2::segment_obstacle");
+                                           "detection_2::detect_obstacle");
 
   return true;
 }
