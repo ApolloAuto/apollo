@@ -52,8 +52,14 @@ using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;
 using apollo::hdmap::ClearAreaInfoConstPtr;
+using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::PNCJunctionInfoConstPtr;
+using apollo::hdmap::SignalInfoConstPtr;
+using apollo::hdmap::StopSignInfoConstPtr;
+using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
@@ -468,6 +474,16 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
 
   std::string clear_area_id;
   double clear_area_distance = 0.0;
+  std::string crosswalk_id;
+  double crosswalk_distance = 0.0;
+  std::string pnc_junction_id;
+  double pnc_junction_distance = 0.0;
+  std::string signal_id;
+  double signal_distance = 0.0;
+  std::string stop_sign_id;
+  double stop_sign_distance = 0.0;
+  std::string yield_sign_id;
+  double yield_sign_distance = 0.0;
 
   int trajectory_point_index = 0;
   int i = -1;
@@ -546,6 +562,97 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     if (!clear_area_id.empty()) {
       planning_tag->mutable_clear_area()->set_id(clear_area_id);
       planning_tag->mutable_clear_area()->set_distance(clear_area_distance);
+    }
+
+    // crosswalk
+    planning_tag->clear_crosswalk();
+    std::vector<CrosswalkInfoConstPtr> crosswalks;
+    if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point,
+                                           kSearchRadius,
+                                           &crosswalks) == 0 &&
+        crosswalks.size() > 0) {
+      crosswalk_id = crosswalks.front()->id().id();
+      crosswalk_distance = 0.0;
+    } else {
+      if (!crosswalk_id.empty()) {
+        crosswalk_distance += point_distance;
+      }
+    }
+    if (!crosswalk_id.empty()) {
+      planning_tag->mutable_crosswalk()->set_id(crosswalk_id);
+      planning_tag->mutable_crosswalk()->set_distance(crosswalk_distance);
+    }
+
+    // pnc_junction
+    std::vector<PNCJunctionInfoConstPtr> pnc_junctions;
+    if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point,
+                                           kSearchRadius,
+                                           &pnc_junctions) == 0 &&
+        pnc_junctions.size() > 0) {
+      pnc_junction_id = pnc_junctions.front()->id().id();
+      pnc_junction_distance = 0.0;
+    } else {
+      if (!pnc_junction_id.empty()) {
+        pnc_junction_distance += point_distance;
+      }
+    }
+    if (!pnc_junction_id.empty()) {
+      planning_tag->mutable_pnc_junction()->set_id(pnc_junction_id);
+      planning_tag->mutable_pnc_junction()->set_distance(pnc_junction_distance);
+    }
+
+    // signal
+    std::vector<SignalInfoConstPtr> signals;
+    if (HDMapUtil::BaseMap().GetSignals(hdmap_point,
+                                        kSearchRadius,
+                                        &signals) == 0 &&
+        signals.size() > 0) {
+      signal_id = signals.front()->id().id();
+      signal_distance = 0.0;
+    } else {
+      if (!signal_id.empty()) {
+        signal_distance += point_distance;
+      }
+    }
+    if (!signal_id.empty()) {
+      planning_tag->mutable_signal()->set_id(signal_id);
+      planning_tag->mutable_signal()->set_distance(signal_distance);
+    }
+
+    // stop sign
+    std::vector<StopSignInfoConstPtr> stop_signs;
+    if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point,
+                                          kSearchRadius,
+                                          &stop_signs) == 0 &&
+        stop_signs.size() > 0) {
+      stop_sign_id = stop_signs.front()->id().id();
+      stop_sign_distance = 0.0;
+    } else {
+      if (!stop_sign_id.empty()) {
+        stop_sign_distance += point_distance;
+      }
+    }
+    if (!stop_sign_id.empty()) {
+      planning_tag->mutable_stop_sign()->set_id(stop_sign_id);
+      planning_tag->mutable_stop_sign()->set_distance(stop_sign_distance);
+    }
+
+    // yield sign
+    std::vector<YieldSignInfoConstPtr> yield_signs;
+    if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point,
+                                         kSearchRadius,
+                                         &yield_signs) == 0 &&
+        yield_signs.size() > 0) {
+      yield_sign_id = yield_signs.front()->id().id();
+      yield_sign_distance = 0.0;
+    } else {
+      if (!yield_sign_id.empty()) {
+        yield_sign_distance += point_distance;
+      }
+    }
+    if (!yield_sign_id.empty()) {
+      planning_tag->mutable_yield_sign()->set_id(yield_sign_id);
+      planning_tag->mutable_yield_sign()->set_distance(yield_sign_distance);
     }
 
     ++trajectory_point_index;
