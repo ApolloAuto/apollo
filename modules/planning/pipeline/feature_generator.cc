@@ -25,6 +25,7 @@
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/point_factory.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -40,6 +41,8 @@ DEFINE_int32(learning_data_obstacle_history_point_cnt, 20,
              "number of history trajectory points for a obstacle");
 DEFINE_bool(enable_binary_learning_data, true,
             "True to generate protobuf binary data file.");
+DEFINE_bool(enable_overlap_tag, true,
+            "True to add overlap tag to planning_tag");
 
 namespace apollo {
 namespace planning {
@@ -48,14 +51,20 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;
+using apollo::hdmap::ClearAreaInfoConstPtr;
+using apollo::hdmap::CrosswalkInfoConstPtr;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::PNCJunctionInfoConstPtr;
+using apollo::hdmap::SignalInfoConstPtr;
+using apollo::hdmap::StopSignInfoConstPtr;
+using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
-using apollo::storytelling::CloseToJunction;
-using apollo::storytelling::Stories;
 
 void FeatureGenerator::Init() {
   map_name_ = "sunnyvale_with_two_offices";
@@ -223,76 +232,14 @@ void FeatureGenerator::OnRoutingResponse(
   }
 }
 
-void FeatureGenerator::OnStoryTelling(
-    const apollo::storytelling::Stories& stories) {
-  overlaps_.clear();
-  // clear area
-  if (stories.has_close_to_clear_area()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_clear_area().id());
-    overlap.set_type(OverlapFeature::CLEAR_AREA);
-    overlap.set_distance(stories.close_to_clear_area().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // crosswalk
-  if (stories.has_close_to_crosswalk()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_crosswalk().id());
-    overlap.set_type(OverlapFeature::CROSSWALK);
-    overlap.set_distance(stories.close_to_crosswalk().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // pnc_junction
-  if (stories.has_close_to_junction() &&
-      stories.close_to_junction().type() ==
-          CloseToJunction::PNC_JUNCTION) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_junction().id());
-    overlap.set_type(OverlapFeature::PNC_JUNCTION);
-    overlap.set_distance(stories.close_to_junction().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // traffic_light
-  if (stories.has_close_to_signal()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_signal().id());
-    overlap.set_type(OverlapFeature::TRAFFIC_LIGHT);
-    overlap.set_distance(stories.close_to_signal().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // stop_sign
-  if (stories.has_close_to_stop_sign()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_stop_sign().id());
-    overlap.set_type(OverlapFeature::STOP_SIGN);
-    overlap.set_distance(stories.close_to_stop_sign().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // yield_sign
-  if (stories.has_close_to_yield_sign()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_yield_sign().id());
-    overlap.set_type(OverlapFeature::YIELD_SIGN);
-    overlap.set_distance(stories.close_to_yield_sign().distance());
-    overlaps_.push_back(overlap);
-  }
-}
-
-apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
+apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetLane(
+    const apollo::common::PointENU& position,
     int* routing_index) {
   constexpr double kRadius = 0.1;
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
-  const auto& pose = localization_for_label_.back().pose();
-  const auto& adc_point = common::util::PointFactory::ToPointENU(
-      pose.position().x(), pose.position().y(), pose.position().z());
   for (int i = 0; i < 10; ++i) {
     apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
-        adc_point, kRadius + i * kRadius, &lanes);
+        position, kRadius + i * kRadius, &lanes);
     if (lanes.size() > 0) {
       break;
     }
@@ -311,6 +258,12 @@ apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
     }
   }
   return nullptr;
+}
+
+apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
+    int* routing_index) {
+  const auto& pose = localization_for_label_.back().pose();
+  return GetLane(pose.position(), routing_index);
 }
 
 void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
@@ -517,9 +470,23 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     const std::list<apollo::localization::LocalizationEstimate>&
         localization_for_label,
     LearningDataFrame* learning_data_frame) {
-  int i = -1;
-  int cnt = 0;
+  constexpr double kSearchRadius = 1.0;
 
+  std::string clear_area_id;
+  double clear_area_distance = 0.0;
+  std::string crosswalk_id;
+  double crosswalk_distance = 0.0;
+  std::string pnc_junction_id;
+  double pnc_junction_distance = 0.0;
+  std::string signal_id;
+  double signal_distance = 0.0;
+  std::string stop_sign_id;
+  double stop_sign_distance = 0.0;
+  std::string yield_sign_id;
+  double yield_sign_distance = 0.0;
+
+  int trajectory_point_index = 0;
+  int i = -1;
   const int localization_sample_interval_for_trajectory_point =
       FLAGS_localization_freq / FLAGS_planning_freq;
   for (const auto& le : localization_for_label) {
@@ -544,28 +511,154 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
         pose.linear_acceleration().y() * pose.linear_acceleration().y());
     trajectory_point->set_a(a);
 
-    ++cnt;
-  }
-  // AINFO << "number of trajectory points in one frame: " << cnt;
-}
+    auto planning_tag = adc_trajectory_point->mutable_planning_tag();
 
-void FeatureGenerator::GeneratePlanningTag(
-    const LaneInfoConstPtr& cur_lane,
-    LearningDataFrame* learning_data_frame) {
-  auto planning_tag = learning_data_frame->mutable_planning_tag();
+    // planning_tag: lane_turn
+    const auto& cur_point = common::util::PointFactory::ToPointENU(
+        pose.position().x(),
+        pose.position().y(),
+        pose.position().z());
+    int routing_index;
+    LaneInfoConstPtr lane = GetLane(cur_point, &routing_index);
+    // lane_turn
+    apollo::hdmap::Lane::LaneTurn lane_turn = apollo::hdmap::Lane::NO_TURN;
+    if (lane != nullptr) {
+      lane_turn = lane->lane().turn();
+    }
+    planning_tag->set_lane_turn(lane_turn);
 
-  // lane_turn
-  apollo::hdmap::Lane::LaneTurn lane_turn = apollo::hdmap::Lane::NO_TURN;
-  if (cur_lane != nullptr) {
-    lane_turn = cur_lane->lane().turn();
-  }
-  planning_tag->set_lane_turn(lane_turn);
 
-  // overlap
-  for (auto& overlap_feature : overlaps_) {
-    auto overlap = planning_tag->add_overlap();
-    overlap->CopyFrom(overlap_feature);
+    if (!FLAGS_enable_overlap_tag) {
+      continue;
+    }
+
+    // planning_tag: overlap tags
+    double point_distance = 0.0;
+    if (trajectory_point_index > 0) {
+      auto& next_point =
+          learning_data_frame->adc_trajectory_point(trajectory_point_index-1)
+                               .trajectory_point().path_point();
+      point_distance = common::util::DistanceXY(next_point, cur_point);
+    }
+
+    common::PointENU hdmap_point;
+    hdmap_point.set_x(cur_point.x());
+    hdmap_point.set_y(cur_point.y());
+
+    // clear area
+    planning_tag->clear_clear_area();
+    std::vector<ClearAreaInfoConstPtr> clear_areas;
+    if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point,
+                                           kSearchRadius,
+                                           &clear_areas) == 0 &&
+        clear_areas.size() > 0) {
+      clear_area_id = clear_areas.front()->id().id();
+      clear_area_distance = 0.0;
+    } else {
+      if (!clear_area_id.empty()) {
+        clear_area_distance += point_distance;
+      }
+    }
+    if (!clear_area_id.empty()) {
+      planning_tag->mutable_clear_area()->set_id(clear_area_id);
+      planning_tag->mutable_clear_area()->set_distance(clear_area_distance);
+    }
+
+    // crosswalk
+    planning_tag->clear_crosswalk();
+    std::vector<CrosswalkInfoConstPtr> crosswalks;
+    if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point,
+                                           kSearchRadius,
+                                           &crosswalks) == 0 &&
+        crosswalks.size() > 0) {
+      crosswalk_id = crosswalks.front()->id().id();
+      crosswalk_distance = 0.0;
+    } else {
+      if (!crosswalk_id.empty()) {
+        crosswalk_distance += point_distance;
+      }
+    }
+    if (!crosswalk_id.empty()) {
+      planning_tag->mutable_crosswalk()->set_id(crosswalk_id);
+      planning_tag->mutable_crosswalk()->set_distance(crosswalk_distance);
+    }
+
+    // pnc_junction
+    std::vector<PNCJunctionInfoConstPtr> pnc_junctions;
+    if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point,
+                                           kSearchRadius,
+                                           &pnc_junctions) == 0 &&
+        pnc_junctions.size() > 0) {
+      pnc_junction_id = pnc_junctions.front()->id().id();
+      pnc_junction_distance = 0.0;
+    } else {
+      if (!pnc_junction_id.empty()) {
+        pnc_junction_distance += point_distance;
+      }
+    }
+    if (!pnc_junction_id.empty()) {
+      planning_tag->mutable_pnc_junction()->set_id(pnc_junction_id);
+      planning_tag->mutable_pnc_junction()->set_distance(pnc_junction_distance);
+    }
+
+    // signal
+    std::vector<SignalInfoConstPtr> signals;
+    if (HDMapUtil::BaseMap().GetSignals(hdmap_point,
+                                        kSearchRadius,
+                                        &signals) == 0 &&
+        signals.size() > 0) {
+      signal_id = signals.front()->id().id();
+      signal_distance = 0.0;
+    } else {
+      if (!signal_id.empty()) {
+        signal_distance += point_distance;
+      }
+    }
+    if (!signal_id.empty()) {
+      planning_tag->mutable_signal()->set_id(signal_id);
+      planning_tag->mutable_signal()->set_distance(signal_distance);
+    }
+
+    // stop sign
+    std::vector<StopSignInfoConstPtr> stop_signs;
+    if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point,
+                                          kSearchRadius,
+                                          &stop_signs) == 0 &&
+        stop_signs.size() > 0) {
+      stop_sign_id = stop_signs.front()->id().id();
+      stop_sign_distance = 0.0;
+    } else {
+      if (!stop_sign_id.empty()) {
+        stop_sign_distance += point_distance;
+      }
+    }
+    if (!stop_sign_id.empty()) {
+      planning_tag->mutable_stop_sign()->set_id(stop_sign_id);
+      planning_tag->mutable_stop_sign()->set_distance(stop_sign_distance);
+    }
+
+    // yield sign
+    std::vector<YieldSignInfoConstPtr> yield_signs;
+    if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point,
+                                         kSearchRadius,
+                                         &yield_signs) == 0 &&
+        yield_signs.size() > 0) {
+      yield_sign_id = yield_signs.front()->id().id();
+      yield_sign_distance = 0.0;
+    } else {
+      if (!yield_sign_id.empty()) {
+        yield_sign_distance += point_distance;
+      }
+    }
+    if (!yield_sign_id.empty()) {
+      planning_tag->mutable_yield_sign()->set_id(yield_sign_id);
+      planning_tag->mutable_yield_sign()->set_distance(yield_sign_distance);
+    }
+
+    ++trajectory_point_index;
   }
+  // AINFO << "number of ADC trajectory points in one frame: "
+  //       << trajectory_point_index;
 }
 
 void FeatureGenerator::GenerateLearningDataFrame() {
@@ -580,9 +673,6 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   // map_name
   learning_data_frame->set_map_name(map_name_);
-
-  // planning_tag
-  GeneratePlanningTag(cur_lane, learning_data_frame);
 
   // add chassis
   auto chassis = learning_data_frame->mutable_chassis();
@@ -649,11 +739,6 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       RoutingResponse routing_response;
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
-      }
-    } else if (message.channel_name == FLAGS_storytelling_topic) {
-      Stories stories;
-      if (stories.ParseFromString(message.content)) {
-        OnStoryTelling(stories);
       }
     } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
       TrafficLightDetection traffic_light_detection;
