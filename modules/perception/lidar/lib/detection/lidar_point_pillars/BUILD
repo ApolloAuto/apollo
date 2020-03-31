@@ -3,20 +3,6 @@ load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
-cuda_library(
-    name = "anchor_mask_cuda",
-    srcs = ["src/anchor_mask_cuda.cu"],
-    hdrs = ["include/anchor_mask_cuda.h"],
-    deps = ["@cuda"],
-)
-
-cuda_library(
-    name = "nms_cuda",
-    srcs = ["src/nms_cuda.cu"],
-    hdrs = ["include/nms_cuda.h"],
-    deps = ["@cuda"],
-)
-
 cc_library(
     name = "point_pillars",
     srcs = [
@@ -35,20 +21,30 @@ cc_library(
         "include/scatter_cuda.h",
     ],
     deps = [
-        "preprocess_points",
+        ":preprocess_points",
         "@cuda",
         "@tensorrt",
     ],
     alwayslink = True,
 )
 
-cuda_library(
-    name = "postprocess_cuda",
-    srcs = ["src/postprocess_cuda.cu"],
-    hdrs = ["include/postprocess_cuda.h"],
-    deps = [
-        "@cuda",
+cc_library(
+    name = "point_pillars_detection",
+    srcs = [
+        "src/point_pillars_detection.cc",
     ],
+    hdrs = [
+        "include/point_pillars_detection.h",
+    ],
+    deps = [
+        ":point_pillars",
+        "//cyber/common:common",
+        "//modules/perception/base",
+        "//modules/perception/lib/thread",
+        "//modules/perception/lidar/common",
+        "@eigen",
+    ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -60,6 +56,29 @@ cc_library(
     hdrs = [
         "include/preprocess_points.h",
         "include/preprocess_points_cuda.h",
+    ],
+)
+
+cuda_library(
+    name = "anchor_mask_cuda",
+    srcs = ["src/anchor_mask_cuda.cu"],
+    hdrs = ["include/anchor_mask_cuda.h"],
+    deps = ["@cuda"],
+)
+
+cuda_library(
+    name = "nms_cuda",
+    srcs = ["src/nms_cuda.cu"],
+    hdrs = ["include/nms_cuda.h"],
+    deps = ["@cuda"],
+)
+
+cuda_library(
+    name = "postprocess_cuda",
+    srcs = ["src/postprocess_cuda.cu"],
+    hdrs = ["include/postprocess_cuda.h"],
+    deps = [
+        "@cuda",
     ],
 )
 
