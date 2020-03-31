@@ -66,11 +66,11 @@ bool LidarObstacleDetection::Init(
   }
 
   detector_.reset(new PointPillarsDetection);
-  //detector_.reset(
+  // detector_.reset(
   //    BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_));
   CHECK_NOTNULL(detector_.get());
   DetectionInitOptions detection_init_options;
-  //segmentation_init_options.sensor_name = sensor_name;
+  // segmentation_init_options.sensor_name = sensor_name;
   ACHECK(detector_->Init(detection_init_options));
 
   return true;
