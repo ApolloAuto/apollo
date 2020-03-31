@@ -59,6 +59,8 @@ class FeatureGenerator {
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
+  apollo::hdmap::LaneInfoConstPtr GetLane(
+      const apollo::common::PointENU& position, int* routing_index);
   apollo::hdmap::LaneInfoConstPtr GetADCCurrentLane(int* routing_index);
 
   void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
@@ -82,9 +84,6 @@ class FeatureGenerator {
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
       LearningDataFrame* learning_data_frame);
-
-  void GeneratePlanningTag(const apollo::hdmap::LaneInfoConstPtr& cur_lane,
-                           LearningDataFrame* learning_data_frame);
 
   void GenerateLearningDataFrame();
 
