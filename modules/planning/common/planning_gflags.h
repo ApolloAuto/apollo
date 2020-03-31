@@ -48,6 +48,7 @@ DECLARE_bool(enable_scenario_emergency_stop);
 DECLARE_bool(enable_scenario_park_and_go);
 DECLARE_bool(enable_scenario_pull_over);
 DECLARE_bool(enable_scenario_stop_sign);
+DECLARE_bool(enable_scenario_test_learning_model);
 DECLARE_bool(enable_scenario_traffic_light);
 DECLARE_bool(enable_scenario_yield_sign);
 
@@ -269,5 +270,3 @@ DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);
 DECLARE_bool(use_front_axe_center_in_path_planning);
 
 DECLARE_bool(use_road_boundary_from_map);
-
-DECLARE_bool(enable_test_learning_model);

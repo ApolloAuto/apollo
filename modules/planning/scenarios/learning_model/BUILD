@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "test_learning_model",
+    name = "learning_model",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":test_learning_model_scenario",
@@ -43,7 +43,7 @@ cc_test(
         "//modules/planning:planning_conf",
     ],
     deps = [
-        ":test_learning_model",
+        ":test_learning_model_scenario",
         "@com_google_googletest//:gtest_main",
     ],
 )
