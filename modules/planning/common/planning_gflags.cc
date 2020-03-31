@@ -538,3 +538,7 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "more agile.");
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
+
+DEFINE_bool(enable_test_learning_model, false,
+            "True to enable test learning model to generate "
+            "planning trajectory.");
