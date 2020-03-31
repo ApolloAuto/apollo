@@ -31,21 +31,24 @@
  */
 
 /**
-* @file nms_cuda.h
-* @brief Non-maximum suppresion for network output
-* @author Modified by Kosuke Murakami
-* @date 2019/02/26
-*/
+ * @file nms_cuda.h
+ * @brief Non-maximum suppresion for network output
+ * @author Modified by Kosuke Murakami
+ * @date 2019/02/26
+ */
 
-#ifndef NMS_CUDA_H
-#define NMS_CUDA_H
+#pragma once
 
 // heders in STL
-#include <vector>
 #include <iostream>
+#include <vector>
 
 // headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/common.h"
+
+namespace apollo {
+namespace perception {
+namespace lidar {
 
 class NMSCuda {
  private:
@@ -55,25 +58,28 @@ class NMSCuda {
 
  public:
   /**
-  * @brief Constructor
-  * @param[in] NUM_THREADS Number of threads when launching cuda kernel
-  * @param[in] NUM_BOX_CORNERS Number of corners for 2D box
-  * @param[in] nms_overlap_threshold IOU threshold for NMS
-  * @details Captital variables never change after the compile, Non-captital variables could be chaned through rosparam
-  */
+   * @brief Constructor
+   * @param[in] NUM_THREADS Number of threads when launching cuda kernel
+   * @param[in] NUM_BOX_CORNERS Number of corners for 2D box
+   * @param[in] nms_overlap_threshold IOU threshold for NMS
+   * @details Captital variables never change after the compile, Non-captital
+   * variables could be chaned through rosparam
+   */
   NMSCuda(const int NUM_THREADS, const int NUM_BOX_CORNERS,
           const float nms_overlap_threshold);
 
   /**
-  * @brief GPU Non-Maximum Suppresion for network output
-  * @param[in] host_filter_count Number of filtered output
-  * @param[in] dev_sorted_box_for_nms Bounding box output sorted by score
-  * @param[out] out_keep_inds Indexes of selected bounding box
-  * @param[out] out_num_to_keep Number of kept bounding boxes
-  * @details NMS in GPU and postprocessing for selecting box in CPU
-  */
+   * @brief GPU Non-Maximum Suppresion for network output
+   * @param[in] host_filter_count Number of filtered output
+   * @param[in] dev_sorted_box_for_nms Bounding box output sorted by score
+   * @param[out] out_keep_inds Indexes of selected bounding box
+   * @param[out] out_num_to_keep Number of kept bounding boxes
+   * @details NMS in GPU and postprocessing for selecting box in CPU
+   */
   void doNMSCuda(const int host_filter_count, float* dev_sorted_box_for_nms,
-                 int* out_keep_inds, int& out_num_to_keep);
+                 int* out_keep_inds, int* out_num_to_keep);
 };
 
-#endif  // NMS_CUDA_H
+}  // namespace lidar
+}  // namespace perception
+}  // namespace apollo

@@ -17,10 +17,13 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
+#include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/point_pillars.h"
 
 namespace apollo {
 namespace perception {
@@ -40,12 +43,11 @@ class PointPillarsDetection {
   bool Detect(const DetectionOptions& options, LidarFrame* frame);
 
  private:
-  void PclToArray(const base::PointFCloudPtr& pc_ptr,
-                  float* out_points_array,
+  void PclToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
                   const float normalizing_factor);
 
-  void GetObjects(std::vector<std::shared_ptr<Objects>>* objects,
-                  std::vector<float> detections);
+  void GetObjects(std::vector<std::shared_ptr<base::Object>>* objects,
+                  std::vector<float>* detections);
 
   // thread worker
   lib::ThreadWorker worker_;
@@ -71,6 +73,7 @@ class PointPillarsDetection {
   const float kNormalizingFactor = 255.0f;
   const int kOutputNumBoxFeature = 7;
 };
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

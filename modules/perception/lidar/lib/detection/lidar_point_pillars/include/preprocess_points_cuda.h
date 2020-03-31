@@ -31,14 +31,17 @@
  */
 
 /**
-* @file preprocess_points_cuda.h
-* @brief GPU version of preprocess points
-* @author Kosuke Murakami
-* @date 2019/02/26
-*/
+ * @file preprocess_points_cuda.h
+ * @brief GPU version of preprocess points
+ * @author Kosuke Murakami
+ * @date 2019/02/26
+ */
 
-#ifndef PREPROCESS_POINTS_CUDA_H
-#define PREPROCESS_POINTS_CUDA_H
+#pragma once
+
+namespace apollo {
+namespace perception {
+namespace lidar {
 
 class PreprocessPointsCuda {
  private:
@@ -72,23 +75,23 @@ class PreprocessPointsCuda {
 
  public:
   /**
-  * @brief Constructor
-  * @param[in] NUM_THREADS Number of threads when launching cuda kernel
-  * @param[in] MAX_NUM_PILLARS Maximum number of pillars
-  * @param[in] MAX_POINTS_PER_PILLAR Maximum number of points per pillar
-  * @param[in] NUM_INDS_FOR_SCAN Number of indexes for scan(cumsum)
-  * @param[in] GRID_X_SIZE Number of pillars in x-coordinate
-  * @param[in] GRID_Y_SIZE Number of pillars in y-coordinate
-  * @param[in] GRID_Z_SIZE Number of pillars in z-coordinate
-  * @param[in] PILLAR_X_SIZE Size of x-dimension for a pillar
-  * @param[in] PILLAR_Y_SIZE Size of y-dimension for a pillar
-  * @param[in] PILLAR_Z_SIZE Size of z-dimension for a pillar
-  * @param[in] MIN_X_RANGE Minimum x value for pointcloud
-  * @param[in] MIN_Y_RANGE Minimum y value for pointcloud
-  * @param[in] MIN_Z_RANGE Minimum z value for pointcloud
-  * @param[in] NUM_BOX_CORNERS Number of corners for 2D box
-  * @details Captital variables never change after the compile
-  */
+   * @brief Constructor
+   * @param[in] NUM_THREADS Number of threads when launching cuda kernel
+   * @param[in] MAX_NUM_PILLARS Maximum number of pillars
+   * @param[in] MAX_POINTS_PER_PILLAR Maximum number of points per pillar
+   * @param[in] NUM_INDS_FOR_SCAN Number of indexes for scan(cumsum)
+   * @param[in] GRID_X_SIZE Number of pillars in x-coordinate
+   * @param[in] GRID_Y_SIZE Number of pillars in y-coordinate
+   * @param[in] GRID_Z_SIZE Number of pillars in z-coordinate
+   * @param[in] PILLAR_X_SIZE Size of x-dimension for a pillar
+   * @param[in] PILLAR_Y_SIZE Size of y-dimension for a pillar
+   * @param[in] PILLAR_Z_SIZE Size of z-dimension for a pillar
+   * @param[in] MIN_X_RANGE Minimum x value for pointcloud
+   * @param[in] MIN_Y_RANGE Minimum y value for pointcloud
+   * @param[in] MIN_Z_RANGE Minimum z value for pointcloud
+   * @param[in] NUM_BOX_CORNERS Number of corners for 2D box
+   * @details Captital variables never change after the compile
+   */
   PreprocessPointsCuda(const int NUM_THREADS, const int MAX_NUM_PILLARS,
                        const int MAX_POINTS_PER_PILLAR,
                        const int NUM_INDS_FOR_SCAN, const int GRID_X_SIZE,
@@ -100,33 +103,38 @@ class PreprocessPointsCuda {
   ~PreprocessPointsCuda();
 
   /**
-  * @brief CUDA preprocessing for input pointcloud
-  * @param[in] dev_points Pointcloud array
-  * @param[in] in_num_points The number of points
-  * @param[in] dev_x_coors X-coordinate indexes for corresponding pillars
-  * @param[in] dev_y_coors Y-coordinate indexes for corresponding pillars
-  * @param[in] dev_num_points_per_pillar Number of points in corresponding pillars
-  * @param[in] dev_pillar_x X-coordinate values for points in each pillar
-  * @param[in] dev_pillar_y Y-coordinate values for points in each pillar
-  * @param[in] dev_pillar_z Z-coordinate values for points in each pillar
-  * @param[in] dev_pillar_i Intensity values for points in each pillar
-  * @param[in] dev_x_coors_for_sub_shaped Array for x substraction in the network
-  * @param[in] dev_y_coors_for_sub_shaped Array for y substraction in the network
-  * @param[in] dev_pillar_feature_mask Mask to make pillars' feature zero where no points in the pillars
-  * @param[in] dev_sparse_pillar_map Grid map representation for pillar-occupancy
-  * @param[in] host_pillar_count The numnber of valid pillars for an input pointcloud
-  * @details Convert pointcloud to pillar representation
-  */
-  void doPreprocessPointsCuda(const float* dev_points, const int in_num_points,
-                              int* dev_x_coors, int* dev_y_coors,
-                              float* dev_num_points_per_pillar,
-                              float* dev_pillar_x, float* dev_pillar_y,
-                              float* dev_pillar_z, float* dev_pillar_i,
-                              float* dev_x_coors_for_sub_shaped,
-                              float* dev_y_coors_for_sub_shaped,
-                              float* dev_pillar_feature_mask,
-                              int* dev_sparse_pillar_map,
-                              int* host_pillar_count);
+   * @brief CUDA preprocessing for input pointcloud
+   * @param[in] dev_points Pointcloud array
+   * @param[in] in_num_points The number of points
+   * @param[in] dev_x_coors X-coordinate indexes for corresponding pillars
+   * @param[in] dev_y_coors Y-coordinate indexes for corresponding pillars
+   * @param[in] dev_num_points_per_pillar Number of points in corresponding
+   * pillars
+   * @param[in] dev_pillar_x X-coordinate values for points in each pillar
+   * @param[in] dev_pillar_y Y-coordinate values for points in each pillar
+   * @param[in] dev_pillar_z Z-coordinate values for points in each pillar
+   * @param[in] dev_pillar_i Intensity values for points in each pillar
+   * @param[in] dev_x_coors_for_sub_shaped Array for x substraction in the
+   * network
+   * @param[in] dev_y_coors_for_sub_shaped Array for y substraction in the
+   * network
+   * @param[in] dev_pillar_feature_mask Mask to make pillars' feature zero where
+   * no points in the pillars
+   * @param[in] dev_sparse_pillar_map Grid map representation for
+   * pillar-occupancy
+   * @param[in] host_pillar_count The numnber of valid pillars for an input
+   * pointcloud
+   * @details Convert pointcloud to pillar representation
+   */
+  void doPreprocessPointsCuda(
+      const float* dev_points, const int in_num_points, int* dev_x_coors,
+      int* dev_y_coors, float* dev_num_points_per_pillar, float* dev_pillar_x,
+      float* dev_pillar_y, float* dev_pillar_z, float* dev_pillar_i,
+      float* dev_x_coors_for_sub_shaped, float* dev_y_coors_for_sub_shaped,
+      float* dev_pillar_feature_mask, int* dev_sparse_pillar_map,
+      int* host_pillar_count);
 };
 
-#endif  // PREPROCESS_POINTS_CUDA_H
+}  // namespace lidar
+}  // namespace perception
+}  // namespace apollo
