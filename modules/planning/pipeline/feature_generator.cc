@@ -54,8 +54,6 @@ using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
-using apollo::storytelling::CloseToJunction;
-using apollo::storytelling::Stories;
 
 void FeatureGenerator::Init() {
   map_name_ = "sunnyvale_with_two_offices";
@@ -220,66 +218,6 @@ void FeatureGenerator::OnRoutingResponse(
                 lane_segment.end_s() - lane_segment.start_s()));
       }
     }
-  }
-}
-
-void FeatureGenerator::OnStoryTelling(
-    const apollo::storytelling::Stories& stories) {
-  overlaps_.clear();
-  // clear area
-  if (stories.has_close_to_clear_area()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_clear_area().id());
-    overlap.set_type(OverlapFeature::CLEAR_AREA);
-    overlap.set_distance(stories.close_to_clear_area().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // crosswalk
-  if (stories.has_close_to_crosswalk()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_crosswalk().id());
-    overlap.set_type(OverlapFeature::CROSSWALK);
-    overlap.set_distance(stories.close_to_crosswalk().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // pnc_junction
-  if (stories.has_close_to_junction() &&
-      stories.close_to_junction().type() ==
-          CloseToJunction::PNC_JUNCTION) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_junction().id());
-    overlap.set_type(OverlapFeature::PNC_JUNCTION);
-    overlap.set_distance(stories.close_to_junction().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // traffic_light
-  if (stories.has_close_to_signal()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_signal().id());
-    overlap.set_type(OverlapFeature::TRAFFIC_LIGHT);
-    overlap.set_distance(stories.close_to_signal().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // stop_sign
-  if (stories.has_close_to_stop_sign()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_stop_sign().id());
-    overlap.set_type(OverlapFeature::STOP_SIGN);
-    overlap.set_distance(stories.close_to_stop_sign().distance());
-    overlaps_.push_back(overlap);
-  }
-
-  // yield_sign
-  if (stories.has_close_to_yield_sign()) {
-    OverlapFeature overlap;
-    overlap.set_id(stories.close_to_yield_sign().id());
-    overlap.set_type(OverlapFeature::YIELD_SIGN);
-    overlap.set_distance(stories.close_to_yield_sign().distance());
-    overlaps_.push_back(overlap);
   }
 }
 
@@ -649,11 +587,6 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       RoutingResponse routing_response;
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
-      }
-    } else if (message.channel_name == FLAGS_storytelling_topic) {
-      Stories stories;
-      if (stories.ParseFromString(message.content)) {
-        OnStoryTelling(stories);
       }
     } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
       TrafficLightDetection traffic_light_detection;
