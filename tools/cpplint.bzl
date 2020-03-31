@@ -42,7 +42,7 @@ def _add_linter_rules(source_labels, source_filenames, name, data=None):
   cpplint_cfg = ["//:CPPLINT.cfg"] + native.glob(['CPPLINT.cfg'])
   native.py_test(
     name = name + "_cpplint",
-    srcs = ["@google_styleguide//:cpplint"],
+    srcs = ["@cpplint//:cpplint"],
     data = data + cpplint_cfg + source_labels,
     args = _EXTENSIONS_ARGS + source_filenames,
     main = "cpplint.py",
