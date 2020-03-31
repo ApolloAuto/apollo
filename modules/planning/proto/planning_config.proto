@@ -286,7 +286,6 @@ message ScenarioConfig {
     YIELD_SIGN_APPROACH = 900;
     YIELD_SIGN_CREEP = 901;
 
-    TEST_LEARNING_MODEL_STAGE = 1001;
   };
 
   message StageConfig {

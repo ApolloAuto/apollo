@@ -1,5 +1,4 @@
 scenario_type: TEST_LEARNING_MODEL
-stage_type: TEST_LEARNING_MODEL_STAGE
 test_learning_model_config: {
   model_file: "/apollo/modules/planning/tools/planning_demo_model.pt"
   input_feature_num: 301084
