@@ -31,20 +31,23 @@
  */
 
 /**
-* @file common.h
-* @brief MACRO for CUDA codes
-* @author Kosuke Murakami
-* @date 2019/02/26
-*/
+ * @file common.h
+ * @brief MACRO for CUDA codes
+ * @author Kosuke Murakami
+ * @date 2019/02/26
+ */
 
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 // headers in STL
 #include <stdio.h>
 
 // headers in CUDA
 #include <cuda_runtime_api.h>
+
+namespace apollo {
+namespace perception {
+namespace lidar {
 
 // using MACRO to allocate memory inside CUDA kernel
 #define NUM_3D_BOX_CORNERS_MACRO 8
@@ -53,18 +56,17 @@
 
 #define DIVUP(m, n) ((m) / (n) + ((m) % (n) > 0))
 
-#define GPU_CHECK(ans)                    \
-  {                                       \
-    GPUAssert((ans), __FILE__, __LINE__); \
-  }
-inline void GPUAssert(cudaError_t code, const char* file,
-                      int line, bool abort = true) {
+#define GPU_CHECK(ans) \
+  { GPUAssert((ans), __FILE__, __LINE__); }
+inline void GPUAssert(cudaError_t code, const char* file, int line,
+                      bool abort = true) {
   if (code != cudaSuccess) {
-    fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code),
-            file, line);
-    if (abort)
-      exit(code);
+    fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file,
+            line);
+    if (abort) exit(code);
   }
 }
 
-#endif  // COMMON_H
+}  // namespace lidar
+}  // namespace perception
+}  // namespace apollo
