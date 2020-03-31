@@ -106,6 +106,9 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
 
+DEFINE_bool(enable_scenario_test_learning_model, false,
+            "enable test learning model scenarios in planning");
+
 DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
 
@@ -535,7 +538,3 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "more agile.");
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
-
-DEFINE_bool(enable_test_learning_model, false,
-            "True to enable test learning model to generate "
-            "planning trajectory.");
