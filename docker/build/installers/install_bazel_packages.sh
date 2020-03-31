@@ -53,8 +53,8 @@ wget -O proj.4-4.9.3.zip \
     https://github.com/OSGeo/proj.4/archive/4.9.3.zip
 wget -O qp-oases-3.2.1-1.zip \
     https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.zip
-wget -O styleguide-159b4c81bbca97a9ca00f1195a37174388398a67.tar.gz \
-    https://github.com/google/styleguide/archive/159b4c81bbca97a9ca00f1195a37174388398a67.tar.gz
+wget -O cpplint-1.4.5.tar.gz \
+    https://github.com/cpplint/cpplint/archive/1.4.5.tar.gz
 wget -O tinyxml2-5.0.1.zip \
     https://github.com/leethomason/tinyxml2/archive/5.0.1.zip
 wget -O yaml-cpp-587b24e2eedea1afa21d79419008ca5f7bda3bf4.tar.gz \

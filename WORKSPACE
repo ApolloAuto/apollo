@@ -27,15 +27,14 @@ load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_
 rules_proto_dependencies()
 rules_proto_toolchains()
 
-# cpplint from google style guide
+# cpplint
 http_archive(
-    name = "google_styleguide",
-    # 2020-01-02
-    url = "file:///home/libs/styleguide-159b4c81bbca97a9ca00f1195a37174388398a67.tar.gz",
-    sha256 = "3ed86946e6e637f0fe21749c0323b086e62c4b8b93694d6cedad615cdc584512",
-    strip_prefix = "styleguide-159b4c81bbca97a9ca00f1195a37174388398a67",
-    build_file = "google_styleguide.BUILD",
-)
+    name = "cpplint",
+    url = "file:///home/libs/cpplint-1.4.5.tar.gz",
+    sha256 = "96db293564624543a2fd3b1a0d23f663b8054c79853a5918523655721a9f6b53",
+    strip_prefix = "cpplint-1.4.5",
+    build_file = "cpplint.BUILD",
+ )
 
 http_archive(
     name = "com_google_absl",
