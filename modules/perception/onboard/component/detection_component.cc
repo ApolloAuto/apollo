@@ -93,7 +93,7 @@ bool DetectionComponent::InitAlgorithmPlugin() {
   return true;
 }
 
-bool SegmentationComponent::InternalProc(
+bool DetectionComponent::InternalProc(
     const std::shared_ptr<const drivers::PointCloud>& in_message,
     const std::shared_ptr<LidarFrameMessage>& out_message) {
   PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name_);

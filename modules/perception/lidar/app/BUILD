@@ -5,6 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "app",
     deps = [
+        ":lidar_obstacle_detection",
         ":lidar_obstacle_segmentation",
         ":lidar_obstacle_tracking",
     ],
@@ -27,6 +28,7 @@ cc_library(
         "//modules/perception/lidar/lib/pointcloud_preprocessor",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_detection",
         "@eigen",
     ],
 )

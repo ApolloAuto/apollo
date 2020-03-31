@@ -48,8 +48,9 @@ class LidarObstacleDetection {
   LidarObstacleDetection() = default;
   ~LidarObstacleDetection() = default;
 
-  bool Init(const LidarObstacleDetectionOptions& options =
-                LidarObstacleDetectionOptions());
+  bool Init(const LidarObstacleDetectionInitOptions& options =
+                LidarObstacleDetectionInitOptions());
+
 
   LidarProcessResult Process(
       const LidarObstacleDetectionOptions& options,

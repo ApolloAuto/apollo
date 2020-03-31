@@ -43,7 +43,8 @@ class DetectionComponent : public cyber::Component<drivers::PointCloud> {
   bool InitAlgorithmPlugin();
   bool InternalProc(
       const std::shared_ptr<const drivers::PointCloud>& in_message,
-      const std::shared_ptr<LidarFrameMessage>& out_message)
+      const std::shared_ptr<LidarFrameMessage>& out_message);
+
  private:
   static std::mutex s_mutex_;
   static uint32_t s_seq_num_;
