@@ -30,7 +30,6 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-#include "modules/storytelling/proto/story.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -57,10 +56,11 @@ class FeatureGenerator {
       const apollo::prediction::PredictionObstacles& prediction_obstacles);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
-  void OnStoryTelling(const apollo::storytelling::Stories& stories);
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
+  apollo::hdmap::LaneInfoConstPtr GetLane(
+      const apollo::common::PointENU& position, int* routing_index);
   apollo::hdmap::LaneInfoConstPtr GetADCCurrentLane(int* routing_index);
 
   void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
@@ -84,9 +84,6 @@ class FeatureGenerator {
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
       LearningDataFrame* learning_data_frame);
-
-  void GeneratePlanningTag(const apollo::hdmap::LaneInfoConstPtr& cur_lane,
-                           LearningDataFrame* learning_data_frame);
 
   void GenerateLearningDataFrame();
 
