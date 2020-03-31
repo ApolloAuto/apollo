@@ -27,10 +27,10 @@ namespace apollo {
 namespace storytelling {
 namespace {
 
-using apollo::hdmap::HDMapUtil;
 using apollo::common::PathPoint;
 using apollo::hdmap::ClearAreaInfoConstPtr;
 using apollo::hdmap::CrosswalkInfoConstPtr;
+using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::PNCJunctionInfoConstPtr;
 using apollo::hdmap::SignalInfoConstPtr;
