@@ -22,7 +22,6 @@
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
-//#include "modules/perception/lidar/lib/interface/base_segmentation.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/include/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
