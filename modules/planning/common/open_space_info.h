@@ -384,7 +384,7 @@ class OpenSpaceInfo {
   // if ADCtrajectory is NULL, blank; else same to ADCtrajectory
   apollo::planning_internal::Debug debug_instance_;
 
-  double time_latency_;
+  double time_latency_ = 0.0;
 };
 
 }  // namespace planning
