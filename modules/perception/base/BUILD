@@ -207,6 +207,7 @@ cc_library(
         ":box",
         ":point_cloud",
         "@eigen",
+        "//modules/prediction/proto:feature_proto",
     ],
 )
 

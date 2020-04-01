@@ -23,6 +23,11 @@
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
+#include "modules/perception/lidar/lib/tracker/semantic_map/evaluator_manager.h"
+#include "modules/perception/onboard/msg_serializer/msg_serializer.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace perception {
@@ -79,6 +84,12 @@ class MlfEngine : public BaseMultiTargetTracker {
   void RemoveStaleTrackData(const std::string& name, double timestamp,
                             std::vector<MlfTrackDataPtr>* tracks);
 
+  void AttachDebugInfo(
+      std::vector<std::shared_ptr<base::Object>>* foreground_objs);
+
+  void AttachSemanticPredictedTrajectory(
+      const std::vector<MlfTrackDataPtr>& tracks);
+
  protected:
   // foreground and background track data
   std::vector<MlfTrackDataPtr> foreground_track_data_;
@@ -101,6 +112,12 @@ class MlfEngine : public BaseMultiTargetTracker {
   bool output_predict_objects_ = false;
   double reserved_invisible_time_ = 0.3;
   bool use_frame_timestamp_ = false;
+  // semantic map
+  apollo::prediction::ObstaclesContainer obstacle_container_;
+  apollo::prediction::PoseContainer pose_container_;
+  apollo::perception::onboard::MsgSerializer serializer_;
+  bool use_semantic_map_ = false;
+  apollo::perception::EvaluatorManager evaluator_;
 };
 
 }  // namespace lidar

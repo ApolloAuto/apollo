@@ -27,6 +27,7 @@ Object::Object() {
   type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   sub_type_probs.resize(static_cast<int>(ObjectSubType::MAX_OBJECT_TYPE), 0.0f);
   b_cipv = false;
+  feature.reset();
 }
 
 void Object::Reset() {
@@ -67,6 +68,7 @@ void Object::Reset() {
   radar_supplement.Reset();
   camera_supplement.Reset();
   fusion_supplement.Reset();
+  feature.reset();
 }
 
 std::string Object::ToString() const {

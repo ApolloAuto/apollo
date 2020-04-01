@@ -24,6 +24,13 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/proto:perception_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/container/pose:pose_container",
+        "//modules/perception/onboard/msg_serializer:msg_serializer",
+        "//modules/perception/lidar/lib/tracker/semantic_map:perception_evaluator_manager",
     ],
     alwayslink = True,
 )
