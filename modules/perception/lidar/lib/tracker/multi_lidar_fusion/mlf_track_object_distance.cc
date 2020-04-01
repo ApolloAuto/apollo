@@ -27,9 +27,9 @@ namespace lidar {
 
 // location dist weight, irection dist weight, bbox size dist weight,
 // point num dist weight, histogram dist weight, centroid shift dist weight
-// bbox iou dist weight
+// bbox iou dist weight, semantic map dist weight
 const std::vector<float> MlfTrackObjectDistance::kForegroundDefaultWeight = {
-    0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f};
+    0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f, 0.6f};
 // location dist weight, irection dist weight, bbox size dist weight,
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
@@ -64,6 +64,7 @@ bool MlfTrackObjectDistance::Init(
     weights[4] = fgws.histogram_dist_weight();
     weights[5] = fgws.centroid_shift_dist_weight();
     weights[6] = fgws.bbox_iou_dist_weight();
+    weights[7] = fgws.semantic_map_dist_weight();
     foreground_weight_table_.emplace(name, weights);
   }
   for (int i = 0; i < config.background_weights_size(); ++i) {
@@ -152,6 +153,11 @@ float MlfTrackObjectDistance::ComputeDistance(
                 BboxIouDistance(latest_object, track->predict_.state, object,
                                 time_diff, background_object_match_threshold_);
   }
+  // for foreground, calculate semantic map based distance
+  if (!is_background) {
+    distance += weights->at(7) * SemanticMapDistance(*track, object);
+  }
+
   return distance;
 }
 

@@ -15,6 +15,8 @@
  *****************************************************************************/
 #pragma once
 
+#include "modules/common/math/vec2d.h"
+#include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
@@ -98,6 +100,13 @@ float BboxIouDistance(const TrackedObjectConstPtr& last_object,
                       const Eigen::VectorXf& track_predict,
                       const TrackedObjectConstPtr& cur_obj,
                       const double time_diff, double match_threshold);
+
+// @brief lidar only: compute semantic map based distance
+// @params [in]: track data contained predicted trajectory feature
+// @params [in]: new detected object for computing distance
+// @return distance
+float SemanticMapDistance(const MlfTrackData& track_dat,
+                          const TrackedObjectConstPtr& cur_obj);
 
 }  // namespace lidar
 }  // namespace perception

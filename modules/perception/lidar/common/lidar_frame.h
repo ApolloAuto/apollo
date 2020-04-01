@@ -39,6 +39,8 @@ struct LidarFrame {
   double timestamp = 0.0;
   // lidar to world pose
   Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
+  // lidar to world pose
+  Eigen::Affine3d novatel2world_pose = Eigen::Affine3d::Identity();
   // hdmap struct
   std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
   // segmented objects
@@ -65,6 +67,7 @@ struct LidarFrame {
     }
     timestamp = 0.0;
     lidar2world_pose = Eigen::Affine3d::Identity();
+    novatel2world_pose = Eigen::Affine3d::Identity();
     if (hdmap_struct) {
       hdmap_struct->road_boundary.clear();
       hdmap_struct->road_polygons.clear();
