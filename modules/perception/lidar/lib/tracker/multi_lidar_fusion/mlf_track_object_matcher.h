@@ -72,6 +72,7 @@ class MlfTrackObjectMatcher {
 
   float bound_value_ = 100.f;
   float max_match_distance_ = 4.0f;
+  bool use_semantic_map = false;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(MlfTrackObjectMatcher);

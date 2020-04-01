@@ -5,6 +5,7 @@ package apollo.perception;
 import "modules/common/proto/error_code.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/header.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/map/proto/map_lane.proto";
 
 message BBox2D {
@@ -39,6 +40,16 @@ message SensorMeasurement {
   optional PerceptionObstacle.SubType sub_type = 10;
   optional double timestamp = 11;
   optional BBox2D box = 12;  // only for camera measurements
+}
+
+message Trajectory {
+  optional double probability = 1;  // probability of this trajectory
+  repeated apollo.common.TrajectoryPoint trajectory_point = 2;
+}
+
+message DebugMessage {
+  // can have multiple trajectories per obstacle
+  repeated Trajectory trajectory = 1;
 }
 
 message PerceptionObstacle {
@@ -123,6 +134,9 @@ message PerceptionObstacle {
 
   // lights of vehicles
   optional LightStatus light_status = 25;
+
+  // Debug Message
+  optional DebugMessage msg = 26;
 }
 
 message LaneMarker {
