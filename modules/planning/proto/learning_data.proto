@@ -11,6 +11,21 @@ import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 
+message OverlapFeature {
+  optional string id = 1;
+  optional double distance = 2;
+}
+
+message PlanningTag {
+  optional apollo.hdmap.Lane.LaneTurn lane_turn = 1;
+  optional OverlapFeature clear_area = 2;
+  optional OverlapFeature crosswalk = 3;
+  optional OverlapFeature pnc_junction = 4;
+  optional OverlapFeature signal = 5;
+  optional OverlapFeature stop_sign = 6;
+  optional OverlapFeature yield_sign = 7;
+}
+
 message ChassisFeature {
   // Features from chassis
   // Vehicle Speed in meters per second.
@@ -142,21 +157,6 @@ message TrafficLightFeature {
   optional apollo.perception.TrafficLight.Color color = 2;
 }
 
-message OverlapFeature {
-  optional string id = 1;
-  optional double distance = 2;
-}
-
-message PlanningTag {
-  optional apollo.hdmap.Lane.LaneTurn lane_turn = 1;
-  optional OverlapFeature clear_area = 2;
-  optional OverlapFeature crosswalk = 3;
-  optional OverlapFeature pnc_junction = 4;
-  optional OverlapFeature signal = 5;
-  optional OverlapFeature stop_sign = 6;
-  optional OverlapFeature yield_sign = 7;
-}
-
 message ADCTrajectoryPoint {
   optional double timestamp_sec = 1;  // localization measurement_time
   optional PlanningTag planning_tag = 2;
@@ -173,26 +173,28 @@ message LearningDataFrame {
   optional uint32 frame_num = 2;
   optional string map_name = 3;
 
+  optional PlanningTag planning_tag = 4;
+
   // Features from chassis
-  optional ChassisFeature chassis = 4;
+  optional ChassisFeature chassis = 5;
 
   // Features from localization
-  optional LocalizationFeature localization = 5;
+  optional LocalizationFeature localization = 6;
 
   // Features from perception obstacles
-  repeated ObstacleFeature obstacle = 6;
+  repeated ObstacleFeature obstacle = 7;
 
   // Features from routing
-  optional RoutingFeature routing = 7;
+  optional RoutingFeature routing = 8;
 
   // Features from traffic_light_detection
-  repeated TrafficLightFeature traffic_light = 8;
+  repeated TrafficLightFeature traffic_light = 9;
 
   // ADC past trajectory
-  repeated ADCTrajectoryPoint adc_trajectory_point = 9;
+  repeated ADCTrajectoryPoint adc_trajectory_point = 10;
 
   // Learning ouputs
-  optional LearningOutput output = 10;
+  optional LearningOutput output = 11;
 }
 
 message LearningData {
