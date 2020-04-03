@@ -75,8 +75,14 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
         ->CopyFrom(future_collision_point_);
   }
 
-  ptr_debug->mutable_planning_data()->mutable_open_space()->set_time_latency(
-      time_latency_);
+  auto open_space = ptr_debug->mutable_planning_data()->mutable_open_space();
+  open_space->set_time_latency(time_latency_);
+
+  open_space->mutable_origin_point()->set_x(origin_point_.x());
+  open_space->mutable_origin_point()->set_y(origin_point_.y());
+  open_space->mutable_origin_point()->set_z(0.0);
+
+  open_space->set_origin_heading_rad(origin_heading_);
 }
 
 }  // namespace planning
