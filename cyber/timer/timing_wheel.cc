@@ -71,9 +71,10 @@ void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task,
   if (!running_) {
     Start();
   }
-
   auto work_wheel_index = current_work_wheel_index +
-                          task->next_fire_duration_ms / TIMER_RESOLUTION_MS;
+                          static_cast<uint64_t>(std::ceil(
+                              static_cast<double>(task->next_fire_duration_ms) /
+                              TIMER_RESOLUTION_MS));
   if (work_wheel_index >= WORK_WHEEL_SIZE) {
     auto real_work_wheel_index = GetWorkWheelIndex(work_wheel_index);
     task->remainder_interval_ms = real_work_wheel_index;
