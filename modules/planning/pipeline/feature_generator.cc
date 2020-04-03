@@ -97,8 +97,7 @@ void FeatureGenerator::Close() {
         << total_learning_data_frame_num_;
 }
 
-void FeatureGenerator::OnLocalization(
-    const apollo::localization::LocalizationEstimate& le) {
+void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
   localization_for_label_.push_back(le);
 
   const int localization_msg_start_cnt =
@@ -467,8 +466,7 @@ void FeatureGenerator::GenerateRoutingFeature(
 }
 
 void FeatureGenerator::GenerateADCTrajectoryPoints(
-    const std::list<apollo::localization::LocalizationEstimate>&
-        localization_for_label,
+    const std::list<LocalizationEstimate>& localization_for_label,
     LearningDataFrame* learning_data_frame) {
   constexpr double kSearchRadius = 1.0;
 
@@ -485,20 +483,29 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
   std::string yield_sign_id;
   double yield_sign_distance = 0.0;
 
-  int trajectory_point_index = 0;
   int i = -1;
   const int localization_sample_interval_for_trajectory_point =
       FLAGS_localization_freq / FLAGS_planning_freq;
+
+  // use a vector to help reverse traverse list of mutable field
+  std::vector<LocalizationEstimate> localization_points;
   for (const auto& le : localization_for_label) {
     ++i;
     if ((i % localization_sample_interval_for_trajectory_point) != 0) {
       continue;
     }
-    auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
-    adc_trajectory_point->set_timestamp_sec(le.measurement_time());
+    localization_points.insert(localization_points.begin(), le);
+  }
+
+  int trajectory_point_index = 0;
+  for (const auto& localization_point : localization_points) {
+     auto adc_trajectory_point =
+         learning_data_frame->add_adc_trajectory_point();
+     adc_trajectory_point->set_timestamp_sec(
+         localization_point.measurement_time());
 
     auto trajectory_point = adc_trajectory_point->mutable_trajectory_point();
-    auto& pose = le.pose();
+    auto& pose = localization_point.pose();
     trajectory_point->mutable_path_point()->set_x(pose.position().x());
     trajectory_point->mutable_path_point()->set_y(pose.position().y());
     trajectory_point->mutable_path_point()->set_z(pose.position().z());
@@ -656,6 +663,13 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     }
 
     ++trajectory_point_index;
+  }
+
+  // planning_tag
+  if (learning_data_frame->adc_trajectory_point_size() >0) {
+    learning_data_frame->mutable_planning_tag()->set_lane_turn(
+        learning_data_frame->adc_trajectory_point(0).planning_tag()
+                                                    .lane_turn());
   }
   // AINFO << "number of ADC trajectory points in one frame: "
   //       << trajectory_point_index;
