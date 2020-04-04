@@ -205,7 +205,7 @@ const std::string& RecordWriter::GetMessageType(
   if (search != channel_message_type_map_.end()) {
     return search->second;
   }
-  return null_type_;
+  return kEmptyString;
 }
 
 const std::string& RecordWriter::GetProtoDesc(
@@ -214,7 +214,7 @@ const std::string& RecordWriter::GetProtoDesc(
   if (search != channel_proto_desc_map_.end()) {
     return search->second;
   }
-  return null_type_;
+  return kEmptyString;
 }
 
 std::set<std::string> RecordWriter::GetChannelList() const {
