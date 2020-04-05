@@ -225,8 +225,8 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
   }
 
   auto iter = all_channels_map_.cbegin();
-  register int tmp = page_index_ * page_item_count_;
-  register int line = 0;
+  int tmp = page_index_ * page_item_count_;
+  int line = 0;
   while (line < tmp) {
     ++iter;
     ++line;
