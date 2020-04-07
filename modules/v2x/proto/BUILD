@@ -36,6 +36,18 @@ proto_library(
 
 cc_grpc_library(
     name = "v2x_service_car_to_obu_grpc",
+    srcs = [":v2x_service_car_to_obu_proto_lib"],
+    deps = [":v2x_service_car_to_obu_proto"],
+    grpc_only = True,
+)
+
+cc_proto_library(
+    name = "v2x_service_car_to_obu_proto",
+    deps = [":v2x_service_car_to_obu_proto_lib"],
+)
+
+proto_library(
+    name = "v2x_service_car_to_obu_proto_lib",
     srcs = ["v2x_service_car_to_obu.proto"],
     deps = [
         ":v2x_carstatus_proto_lib",
@@ -45,6 +57,18 @@ cc_grpc_library(
 
 cc_grpc_library(
     name = "v2x_service_obu_to_car_grpc",
+    srcs = [":v2x_service_obu_to_car_proto_lib"],
+    deps = [":v2x_service_obu_to_car_proto"],
+    grpc_only = True,
+)
+
+cc_proto_library(
+    name = "v2x_service_obu_to_car_proto",
+    deps = [":v2x_service_obu_to_car_proto_lib"],
+)
+
+proto_library(
+    name = "v2x_service_obu_to_car_proto_lib",
     srcs = ["v2x_service_obu_to_car.proto"],
     deps = [
         ":v2x_traffic_light_proto_lib",
