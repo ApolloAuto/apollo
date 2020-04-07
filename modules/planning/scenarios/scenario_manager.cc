@@ -817,6 +817,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       case ScenarioConfig::PARK_AND_GO:
       case ScenarioConfig::STOP_SIGN_PROTECTED:
       case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      case ScenarioConfig::TEST_LEARNING_MODEL:
       case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
       case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
       case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
@@ -828,15 +829,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
           scenario_type = current_scenario_->scenario_type();
         }
         break;
-    case ScenarioConfig::TEST_LEARNING_MODEL:
-      if (FLAGS_enable_scenario_test_learning_model) {
-        // must continue until finish
-        if (current_scenario_->GetStatus() !=
-            Scenario::ScenarioStatus::STATUS_DONE) {
-          scenario_type = current_scenario_->scenario_type();
-        }
-      }
-      break;
       default:
         break;
     }
