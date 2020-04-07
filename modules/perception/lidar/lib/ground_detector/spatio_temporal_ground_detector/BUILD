@@ -32,7 +32,10 @@ cc_test(
     name = "spatio_temporal_ground_detector_test",
     size = "small",
     srcs = ["spatio_temporal_ground_detector_test.cc"],
-    copts = ["-msse4.1"],
+    copts = [
+        "-msse4.1",
+        "-fno-access-control",
+    ],
     deps = [
         ":spatio_temporal_ground_detector",
         "//third_party:pcl",

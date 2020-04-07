@@ -34,7 +34,7 @@ cc_test(
     timeout = "moderate",
     srcs = ["map_pool_test.cc"],
     copts = [
-        "-Dprivate=public",
+        "-fno-access-control",
     ],
     deps = [
         "//cyber",

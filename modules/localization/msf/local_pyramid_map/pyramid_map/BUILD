@@ -129,7 +129,7 @@ cc_test(
     size = "medium",
     timeout = "short",
     srcs = ["pyramid_map_matrix_test.cc"],
-    copts = ["-Dprivate=public"],
+    copts = ["-fno-access-control"],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix",
         "@com_google_googletest//:gtest_main",

@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
-#define private public
-#define protected public
 #include "modules/perception/common/io/io_util.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {

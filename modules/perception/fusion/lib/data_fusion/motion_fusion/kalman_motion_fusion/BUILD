@@ -23,6 +23,7 @@ cc_test(
     name = "kalman_motion_fusion_test",
     size = "small",
     srcs = ["kalman_motion_fusion_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":kalman_motion_fusion",
         "@com_google_googletest//:gtest_main",

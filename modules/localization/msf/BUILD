@@ -61,9 +61,7 @@ cc_test(
     size = "small",
     timeout = "short",
     srcs = ["msf_localization_test.cc"],
-    copts = [
-        "-Dprivate=public",
-    ],
+    copts = ["-fno-access-control"],
     data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",

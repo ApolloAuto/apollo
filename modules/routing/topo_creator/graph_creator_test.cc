@@ -14,10 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
-#define private public
 #include "modules/routing/topo_creator/graph_creator.h"
+
+#include "gtest/gtest.h"
 
 using apollo::hdmap::Lane;
 using apollo::routing::GraphCreator;

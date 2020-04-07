@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define private public
-#define protected public
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {

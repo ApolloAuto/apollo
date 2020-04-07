@@ -14,16 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
+
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
-
-#define private public
-#define protected public
-#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 
 namespace apollo {
 namespace perception {

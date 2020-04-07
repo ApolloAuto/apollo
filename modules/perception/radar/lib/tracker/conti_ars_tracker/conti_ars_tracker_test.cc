@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
+#include "modules/perception/radar/lib/tracker/conti_ars_tracker/conti_ars_tracker.h"
 
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/perception/common/perception_gflags.h"
-
-#define private public
-#define protected public
-#include "modules/perception/radar/lib/tracker/conti_ars_tracker/conti_ars_tracker.h"
 
 namespace apollo {
 namespace perception {

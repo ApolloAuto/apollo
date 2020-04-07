@@ -21,6 +21,7 @@ cc_test(
     name = "pbf_tracker_test",
     size = "small",
     srcs = ["pbf_tracker_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":pbf_tracker",
         "//modules/perception/common:perception_gflags",

@@ -16,6 +16,7 @@
 
 #include "modules/perception/inference/utils/util.h"
 
+#include <cuda_runtime_api.h>
 #include <algorithm>
 
 #include "cyber/common/log.h"

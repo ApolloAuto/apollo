@@ -14,12 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"
-
-#define private public
-
-#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 
 namespace apollo {
 namespace perception {

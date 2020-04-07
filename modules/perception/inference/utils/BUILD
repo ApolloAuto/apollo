@@ -8,9 +8,9 @@ cuda_library(
     srcs = ["cuda_util.cu"],
     hdrs = ["cuda_util.h"],
     deps = [
-        "@com_google_glog//:glog",
         "//cyber",
         "//third_party:cuda",
+        "@com_google_glog//:glog",
     ],
 )
 
