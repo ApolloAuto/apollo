@@ -4170,25 +4170,9 @@
                   "type": "string",
                   "id": 1
                 },
-                "type": {
-                  "type": "OverlapType",
-                  "id": 2
-                },
                 "distance": {
                   "type": "double",
-                  "id": 3
-                }
-              },
-              "nested": {
-                "OverlapType": {
-                  "values": {
-                    "CLEAR_AREA": 1,
-                    "CROSSWALK": 2,
-                    "PNC_JUNCTION": 3,
-                    "STOP_SIGN": 4,
-                    "TRAFFIC_LIGHT": 5,
-                    "YIELD_SIGN": 6
-                  }
+                  "id": 2
                 }
               }
             },
@@ -4198,10 +4182,29 @@
                   "type": "apollo.hdmap.Lane.LaneTurn",
                   "id": 1
                 },
-                "overlap": {
-                  "rule": "repeated",
+                "clearArea": {
                   "type": "OverlapFeature",
                   "id": 2
+                },
+                "crosswalk": {
+                  "type": "OverlapFeature",
+                  "id": 3
+                },
+                "pncJunction": {
+                  "type": "OverlapFeature",
+                  "id": 4
+                },
+                "signal": {
+                  "type": "OverlapFeature",
+                  "id": 5
+                },
+                "stopSign": {
+                  "type": "OverlapFeature",
+                  "id": 6
+                },
+                "yieldSign": {
+                  "type": "OverlapFeature",
+                  "id": 7
                 }
               }
             },
@@ -4444,9 +4447,13 @@
                   "type": "double",
                   "id": 1
                 },
+                "planningTag": {
+                  "type": "PlanningTag",
+                  "id": 2
+                },
                 "trajectoryPoint": {
                   "type": "apollo.common.TrajectoryPoint",
-                  "id": 2
+                  "id": 3
                 }
               }
             },
@@ -7319,8 +7326,7 @@
                     "PARK_AND_GO_ADJUST": 802,
                     "PARK_AND_GO_PRE_CRUISE": 803,
                     "YIELD_SIGN_APPROACH": 900,
-                    "YIELD_SIGN_CREEP": 901,
-                    "TEST_LEARNING_MODEL_STAGE": 1001
+                    "YIELD_SIGN_CREEP": 901
                   }
                 },
                 "StageConfig": {
@@ -9284,7 +9290,18 @@
                 },
                 "timeLatency": {
                   "type": "double",
-                  "id": 18
+                  "id": 18,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "originPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 19
+                },
+                "originHeadingRad": {
+                  "type": "double",
+                  "id": 20
                 }
               }
             },
@@ -9826,6 +9843,28 @@
                 }
               }
             },
+            "Trajectory": {
+              "fields": {
+                "probability": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
+            "DebugMessage": {
+              "fields": {
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "Trajectory",
+                  "id": 1
+                }
+              }
+            },
             "PerceptionObstacle": {
               "fields": {
                 "id": {
@@ -9946,6 +9985,10 @@
                 "lightStatus": {
                   "type": "LightStatus",
                   "id": 25
+                },
+                "msg": {
+                  "type": "DebugMessage",
+                  "id": 26
                 }
               },
               "nested": {
