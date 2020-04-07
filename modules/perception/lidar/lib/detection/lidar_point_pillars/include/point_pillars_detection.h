@@ -42,6 +42,8 @@ class PointPillarsDetection {
 
   bool Detect(const DetectionOptions& options, LidarFrame* frame);
 
+  std::string Name() { return "PointPillarsDetection"; }
+
  private:
   void PclToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
                   const float normalizing_factor);
@@ -55,15 +57,21 @@ class PointPillarsDetection {
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
-  int gpu_id_ = -1;
+  std::shared_ptr<base::AttributePointCloud<base::PointD>>
+      original_world_cloud_;
+  int gpu_id_ = 0;
 
   // PointPillars
   std::unique_ptr<PointPillars> point_pillars_ptr_;
   bool reproduce_result_mode_ = false;
   float score_threshold_ = 0.5;
   float nms_overlap_threshold_ = 0.5;
-  std::string pfe_onnx_file_;
-  std::string rpn_onnx_file_;
+  std::string pfe_onnx_file_ =
+      "/apollo/modules/perception/lidar/lib/detection/lidar_point_pillars/"
+      "test/data/pfe.onnx";
+  std::string rpn_onnx_file_ =
+      "/apollo/modules/perception/lidar/lib/detection/lidar_point_pillars/"
+      "test/data/rpn.onnx";
 
   // time statistics
   double inference_time_ = 0.0;
@@ -72,7 +80,7 @@ class PointPillarsDetection {
   // constants
   const float kNormalizingFactor = 255.0f;
   const int kOutputNumBoxFeature = 7;
-};
+};  // class PointPillarsDetection
 
 }  // namespace lidar
 }  // namespace perception
