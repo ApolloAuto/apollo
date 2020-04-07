@@ -27,19 +27,18 @@ namespace perception {
 namespace lidar {
 
 using base::Object;
+using base::PointD;
 using base::PointF;
 
-bool PointPillarsDetection::Init(const DetectionInitOptions &options) {
-  point_pillars_ptr_.reset(new PointPillars(reproduce_result_mode_,
-                                            score_threshold_,
-                                            nms_overlap_threshold_,
-                                            pfe_onnx_file_,
-                                            rpn_onnx_file_));
+bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
+  point_pillars_ptr_.reset(
+      new PointPillars(reproduce_result_mode_, score_threshold_,
+                       nms_overlap_threshold_, pfe_onnx_file_, rpn_onnx_file_));
   return true;
 }
 
-bool PointPillarsDetection::Detect(const DetectionOptions &options,
-                                   LidarFrame *frame) {
+bool PointPillarsDetection::Detect(const DetectionOptions& options,
+                                   LidarFrame* frame) {
   // check input
   if (frame == nullptr) {
     AERROR << "Input null frame ptr.";
@@ -56,11 +55,12 @@ bool PointPillarsDetection::Detect(const DetectionOptions &options,
 
   // record input cloud and lidar frame
   original_cloud_ = frame->cloud;
+  original_world_cloud_ = frame->world_cloud;
   lidar_frame_ref_ = frame;
 
   // check output
   frame->segmented_objects.clear();
-  worker_.WakeUp();
+  //  worker_.WakeUp();
 
   Timer timer;
 
@@ -74,22 +74,21 @@ bool PointPillarsDetection::Detect(const DetectionOptions &options,
   PclToArray(original_cloud_, points_array, kNormalizingFactor);
 
   // inference
-  std::vector<float>* out_detections(new std::vector<float>());
-  point_pillars_ptr_->doInference(points_array,
-                                 original_cloud_->size(),
-                                 out_detections);
+  std::vector<float> out_detections;
+  point_pillars_ptr_->doInference(points_array, original_cloud_->size(),
+                                  &out_detections);
   inference_time_ = timer.toc(true);
 
   // transfer output bounding boxs to objects
-  GetObjects(&frame->segmented_objects, out_detections);
+  GetObjects(&frame->segmented_objects, &out_detections);
 
   AINFO << "PointPillars: inference: " << inference_time_ << "\t"
         << "collect: " << collect_time_;
   return true;
 }
 
-void PointPillarsDetection::PclToArray(const base::PointFCloudPtr &pc_ptr,
-                                       float *out_points_array,
+void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
+                                       float* out_points_array,
                                        const float normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
     const auto& point = pc_ptr->at(i);
@@ -110,7 +109,7 @@ void PointPillarsDetection::GetObjects(
   objects->clear();
   base::ObjectPool::Instance().BatchGet(num_objects, objects);
 
-  for (int i = 0; num_objects; ++i) {
+  for (int i = 0; i < num_objects; ++i) {
     auto& object = objects->at(i);
     object->id = i;
 
@@ -143,6 +142,7 @@ void PointPillarsDetection::GetObjects(
     object->lidar_supplement.is_background = false;
     for (int j = 0; j < 2; ++j) {
       PointF point0, point1, point2, point3;
+      PointD point0d, point1d, point2d, point3d;
       float vz = z + (j == 0 ? 0 : dz);
       point0.x = x + dx2cos + dy2sin;
       point0.y = y + dx2sin - dy2cos;
@@ -156,25 +156,48 @@ void PointPillarsDetection::GetObjects(
       point3.x = x - dx2cos + dy2sin;
       point3.y = y - dx2sin - dy2cos;
       point3.z = vz;
+
+      point0d.x = point0.x;
+      point0d.y = point0.y;
+      point0d.z = point0.z;
+      point1d.x = point1.x;
+      point1d.y = point1.y;
+      point1d.z = point1.z;
+      point2d.x = point2.x;
+      point2d.y = point2.y;
+      point2d.z = point2.z;
+      point3d.x = point3.x;
+      point3d.y = point3.y;
+      point3d.z = point3.z;
+
       object->lidar_supplement.cloud.push_back(point0);
       object->lidar_supplement.cloud.push_back(point1);
       object->lidar_supplement.cloud.push_back(point2);
       object->lidar_supplement.cloud.push_back(point3);
+
+      // TODO(chenjiahao):
+      //  Need transformation to world coordinate and add to world cloud
+      //
+      //      object->lidar_supplement.cloud_world.push_back(point0d);
+      //      object->lidar_supplement.cloud_world.push_back(point1d);
+      //      object->lidar_supplement.cloud_world.push_back(point2d);
+      //      object->lidar_supplement.cloud_world.push_back(point3d);
     }
 
     // classification (only detect vehicles so far)
+    // TODO(chenjiahao): Fill object types completely
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
-          static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
+        static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
+    object->lidar_supplement.raw_classification_methods.push_back(Name());
     object->lidar_supplement.raw_probs
-          .back()[static_cast<int>(base::ObjectType::VEHICLE)] = 1.0f;
+        .back()[static_cast<int>(base::ObjectType::VEHICLE)] = 1.0f;
     // copy to type
-    object->type_probs.assign(
-          object->lidar_supplement.raw_probs.back().begin(),
-          object->lidar_supplement.raw_probs.back().end());
+    object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
+                              object->lidar_supplement.raw_probs.back().end());
     object->type = static_cast<base::ObjectType>(
-          std::distance(object->type_probs.begin(),
-                        std::max_element(object->type_probs.begin(),
-                                         object->type_probs.end())));
+        std::distance(object->type_probs.begin(),
+                      std::max_element(object->type_probs.begin(),
+                                       object->type_probs.end())));
   }
 
   collect_time_ = timer.toc(true);
