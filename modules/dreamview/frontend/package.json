@@ -72,6 +72,7 @@
         "yaml-loader": "^0.4.0"
     },
     "resolutions": {
-        "js-yaml": "^3.13.1"
+        "js-yaml": "^3.13.1",
+        "**/kind-of": "^6.0.3"
     }
 }
