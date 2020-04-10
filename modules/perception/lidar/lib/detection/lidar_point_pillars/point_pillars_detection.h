@@ -21,7 +21,6 @@
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud.h"
-#include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h"
 
@@ -52,27 +51,17 @@ class PointPillarsDetection {
                   const Eigen::Affine3d& pose,
                   std::vector<float>* detections);
 
-  // thread worker
-  lib::ThreadWorker worker_;
-
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
   std::shared_ptr<base::AttributePointCloud<base::PointD>>
       original_world_cloud_;
-  int gpu_id_ = 0;
 
   // PointPillars
   std::unique_ptr<PointPillars> point_pillars_ptr_;
   bool reproduce_result_mode_ = false;
   float score_threshold_ = 0.5;
   float nms_overlap_threshold_ = 0.5;
-  std::string pfe_onnx_file_ =
-      "/apollo/modules/perception/production/data/perception/lidar/models/"
-      "detection/point_pillars/pfe.onnx";
-  std::string rpn_onnx_file_ =
-      "/apollo/modules/perception/production/data/perception/lidar/models/"
-      "detection/point_pillars/rpn.onnx";
 
   // time statistics
   double inference_time_ = 0.0;

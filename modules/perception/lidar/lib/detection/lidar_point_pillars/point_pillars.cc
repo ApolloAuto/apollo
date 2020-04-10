@@ -654,8 +654,6 @@ void PointPillars::preprocessGPU(const float* in_points_array,
   GPU_CHECK(cudaMemcpy(dev_points, in_points_array,
                        in_num_points * NUM_BOX_CORNERS_ * sizeof(float),
                        cudaMemcpyHostToDevice));
-  // clang-format on
-
   GPU_CHECK(cudaMemset(dev_pillar_count_histo_, 0,
                        GRID_Y_SIZE_ * GRID_X_SIZE_ * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_sparse_pillar_map_, 0,
@@ -739,7 +737,6 @@ void PointPillars::doInference(const float* in_points_array,
       pfe_buffers_[7], dev_pillar_feature_mask_,
       MAX_NUM_PILLARS_ * MAX_NUM_POINTS_PER_PILLAR_ * sizeof(float),
       cudaMemcpyDeviceToDevice, stream));
-  // clang-format on
   pfe_context_->enqueue(BATCH_SIZE_, pfe_buffers_, stream, nullptr);
 
   GPU_CHECK(
