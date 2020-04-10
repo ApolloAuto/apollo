@@ -170,7 +170,7 @@ void LaneInfo::Init() {
     if (lane_.type() == Lane::CITY_DRIVING) {
       for (const auto &p : sampled_left_width_) {
         if (p.second < FLAGS_half_vehicle_width) {
-          AERROR
+          ADEBUG
               << "lane[id = " << lane_.id().DebugString()
               << "]. sampled_left_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
@@ -179,7 +179,7 @@ void LaneInfo::Init() {
       }
       for (const auto &p : sampled_right_width_) {
         if (p.second < FLAGS_half_vehicle_width) {
-          AERROR
+          ADEBUG
               << "lane[id = " << lane_.id().DebugString()
               << "]. sampled_right_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
