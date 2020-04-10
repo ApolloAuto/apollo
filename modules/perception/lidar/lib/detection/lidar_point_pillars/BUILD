@@ -22,6 +22,7 @@ cc_library(
     ],
     deps = [
         ":preprocess_points",
+        "//modules/perception/common:perception_gflags",
         "@cuda",
         "@tensorrt",
     ],

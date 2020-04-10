@@ -43,6 +43,7 @@
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
 
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points.h"
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
@@ -137,16 +138,11 @@ TestClass::TestClass(const int MAX_NUM_PILLARS,
   bool reproduce_result_mode = false;
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
-  std::string package_path =
-      "/apollo/modules/perception/lidar/lib/detection/lidar_point_pillars";
-  std::string pfe_onnx_path = "/data/pfe.onnx";
-  std::string rpn_onnx_path = "/data/rpn.onnx";
-  std::string pfe_onnx_file = package_path + pfe_onnx_path;
-  std::string rpn_onnx_file = package_path + rpn_onnx_path;
 
   point_pillars_ptr_.reset(
       new PointPillars(reproduce_result_mode, score_threshold,
-                       nms_overlap_threshold, pfe_onnx_file, rpn_onnx_file));
+                       nms_overlap_threshold, FLAGS_pfe_onnx_file,
+                       FLAGS_rpn_onnx_file));
 };
 
 void TestClass::preprocess(const float* in_points_array, int in_num_points,
