@@ -76,8 +76,15 @@ void FeatureGenerator::Init() {
   map_m_["San Mateo"] = "san_mateo";
 }
 
-void FeatureGenerator::WriteOutLearningData(const LearningData& learning_data,
-                                            const std::string& file_name) {
+void FeatureGenerator::WriteOutLearningData(
+    const LearningData& learning_data,
+    const int learning_data_file_index) {
+  if (record_file_name_.empty()) {
+    record_file_name_ = "00000";
+  }
+  const std::string file_name = absl::StrCat(
+      FLAGS_planning_data_dir, record_file_name_, ".",
+      learning_data_file_index, ".bin");
   if (FLAGS_enable_binary_learning_data) {
     cyber::common::SetProtoToBinaryFile(learning_data, file_name);
     cyber::common::SetProtoToASCIIFile(learning_data, file_name + ".txt");
@@ -89,10 +96,7 @@ void FeatureGenerator::WriteOutLearningData(const LearningData& learning_data,
 }
 
 void FeatureGenerator::Close() {
-  const std::string file_name = absl::StrCat(
-      FLAGS_planning_data_dir, "/learning_data.",
-      learning_data_file_index_, ".bin");
-  WriteOutLearningData(learning_data_, file_name);
+  WriteOutLearningData(learning_data_, learning_data_file_index_);
   AINFO << "Total learning_data_frame number:"
         << total_learning_data_frame_num_;
 }
@@ -119,10 +123,7 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
   // write frames into a file
   if (learning_data_.learning_data_size() >=
       FLAGS_learning_data_frame_num_per_file) {
-    const std::string file_name = absl::StrCat(
-        FLAGS_planning_data_dir, "/learning_data.",
-        learning_data_file_index_, ".bin");
-    WriteOutLearningData(learning_data_, file_name);
+    WriteOutLearningData(learning_data_, learning_data_file_index_);
   }
 }
 
@@ -721,6 +722,8 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
+  record_file_name_ =
+      record_filename.substr(record_filename.find_last_of("/") + 1);
   RecordReader reader(record_filename);
   if (!reader.IsValid()) {
     AERROR << "Fail to open " << record_filename;
