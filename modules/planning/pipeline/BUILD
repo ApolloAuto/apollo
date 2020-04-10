@@ -29,8 +29,8 @@ cc_library(
 )
 
 cc_binary(
-    name = "records_to_offline_data",
-    srcs = ["records_to_offline_data.cc"],
+    name = "record_to_learning_data",
+    srcs = ["record_to_learning_data.cc"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
