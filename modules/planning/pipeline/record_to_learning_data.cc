@@ -32,7 +32,7 @@ DEFINE_string(
 namespace apollo {
 namespace planning {
 
-void GenerateDataForLearning() {
+void GenerateLearningData() {
   AINFO << "map_dir: " << FLAGS_map_dir;
   const std::vector<std::string> inputs =
       absl::StrSplit(FLAGS_planning_offline_bags, ':');
@@ -58,6 +58,6 @@ void GenerateDataForLearning() {
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::planning::GenerateDataForLearning();
+  apollo::planning::GenerateLearningData();
   return 0;
 }
