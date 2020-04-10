@@ -19,6 +19,7 @@
 #include "cyber/common/log.h"
 
 #include "modules/perception/base/object_pool_types.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 
@@ -33,7 +34,8 @@ using base::PointF;
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(
       new PointPillars(reproduce_result_mode_, score_threshold_,
-                       nms_overlap_threshold_, pfe_onnx_file_, rpn_onnx_file_));
+                       nms_overlap_threshold_, FLAGS_pfe_onnx_file,
+                       FLAGS_rpn_onnx_file));
   return true;
 }
 
@@ -60,12 +62,11 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
 
   // check output
   frame->segmented_objects.clear();
-  //  worker_.WakeUp();
 
   Timer timer;
 
-  if (cudaSetDevice(gpu_id_) != cudaSuccess) {
-    AERROR << "Failed to set device to gpu " << gpu_id_;
+  if (cudaSetDevice(FLAGS_gpu_id) != cudaSuccess) {
+    AERROR << "Failed to set device to gpu " << FLAGS_gpu_id;
     return false;
   }
 
