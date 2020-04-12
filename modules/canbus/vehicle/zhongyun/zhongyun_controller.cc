@@ -56,6 +56,7 @@ ErrorCode ZhongyunController::Init(
   }
 
   if (can_sender == nullptr) {
+    AERROR << "Protocol can sender is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
