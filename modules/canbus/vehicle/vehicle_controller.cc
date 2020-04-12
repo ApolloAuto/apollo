@@ -73,7 +73,7 @@ ErrorCode VehicleController::SetDrivingMode(
     }
     case Chassis::AUTO_STEER_ONLY: {
       if (EnableSteeringOnlyMode() != ErrorCode::OK) {
-        AERROR << "Failed to enable speed only mode.";
+        AERROR << "Failed to enable steer only mode.";
         return ErrorCode::CANBUS_ERROR;
       }
       break;
