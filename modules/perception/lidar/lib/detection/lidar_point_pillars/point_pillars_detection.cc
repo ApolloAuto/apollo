@@ -135,41 +135,36 @@ void PointPillarsDetection::GetObjects(
     object->lidar_supplement.is_orientation_ready = true;
 
     // compute vertexes of bounding box and transform to world coordinate
-    float dx2cos = dx * cosf(yaw) / 2;
-    float dy2sin = dy * sinf(yaw) / 2;
-    float dx2sin = dx * sinf(yaw) / 2;
-    float dy2cos = dy * cosf(yaw) / 2;
     object->lidar_supplement.num_points_in_roi = 8;
     object->lidar_supplement.on_use = true;
     object->lidar_supplement.is_background = false;
-    for (int j = 0; j < 2; ++j) {
-      PointF point0, point1, point2, point3;
-      float vz = z + (j == 0 ? 0 : dz);
-      point0.x = x + dx2cos + dy2sin;
-      point0.y = y + dx2sin - dy2cos;
-      point0.z = vz;
-      point1.x = x + dx2cos - dy2sin;
-      point1.y = y + dx2sin + dy2cos;
-      point1.z = vz;
-      point2.x = x - dx2cos - dy2sin;
-      point2.y = y - dx2sin + dy2cos;
-      point2.z = vz;
-      point3.x = x - dx2cos + dy2sin;
-      point3.y = y - dx2sin - dy2cos;
-      point3.z = vz;
-      object->lidar_supplement.cloud.push_back(point0);
-      object->lidar_supplement.cloud.push_back(point1);
-      object->lidar_supplement.cloud.push_back(point2);
-      object->lidar_supplement.cloud.push_back(point3);
-    }
-    for (auto& pt : object->lidar_supplement.cloud) {
-      Eigen::Vector3d trans_point(pt.x, pt.y, pt.z);
-      trans_point = pose * trans_point;
-      PointD world_point;
-      world_point.x = trans_point(0);
-      world_point.y = trans_point(1);
-      world_point.z = trans_point(2);
-      object->lidar_supplement.cloud_world.push_back(world_point);
+    float roll = 0, pitch = 0;
+    Eigen::Quaternionf quater =
+        Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX()) *
+        Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY()) *
+        Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
+    Eigen::Translation3f translation(x, y, z);
+    Eigen::Affine3f affine3f = translation * quater.toRotationMatrix();
+    for (float vx : std::vector<float>{dx/2, -dx/2}) {
+      for (float vy : std::vector<float>{dy/2, -dy/2}) {
+        for (float vz : std::vector<float>{0, dz}) {
+          Eigen::Vector3f v3f(vx, vy, vz);
+          v3f = affine3f * v3f;
+          PointF point;
+          point.x = v3f.x();
+          point.y = v3f.y();
+          point.z = v3f.z();
+          object->lidar_supplement.cloud.push_back(point);
+
+          Eigen::Vector3d trans_point(point.x, point.y, point.z);
+          trans_point = pose * trans_point;
+          PointD world_point;
+          world_point.x = trans_point(0);
+          world_point.y = trans_point(1);
+          world_point.z = trans_point(2);
+          object->lidar_supplement.cloud_world.push_back(world_point);
+        }
+      }
     }
 
     // classification (only detect vehicles so far)
