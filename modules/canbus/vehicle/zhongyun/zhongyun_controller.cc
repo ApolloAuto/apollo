@@ -297,7 +297,7 @@ ErrorCode ZhongyunController::DisableAutoMode() {
   can_sender_->Update();
   set_driving_mode(Chassis::COMPLETE_MANUAL);
   set_chassis_error_code(Chassis::NO_ERROR);
-  AINFO << "Switch to COMPLETE_MANUAL ok.";
+  AINFO << "Switch to COMPLETE_MANUAL mode ok.";
   return ErrorCode::OK;
 }
 
