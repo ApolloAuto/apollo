@@ -119,7 +119,7 @@ ZhongyunController::~ZhongyunController() {}
 
 bool ZhongyunController::Start() {
   if (!is_initialized_) {
-    AERROR << "ZhongyunController has NOT been initialized.";
+    AERROR << "ZhongyunController has not been initialized.";
     return false;
   }
   const auto& update_func = [this] { SecurityDogThreadFunc(); };
