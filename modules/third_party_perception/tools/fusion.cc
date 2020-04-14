@@ -18,7 +18,7 @@
  * @file
  */
 
-#include "modules/third_party_perception/fusion.h"
+#include "modules/third_party_perception/tools/fusion.h"
 
 #include <vector>
 
@@ -64,26 +64,26 @@ bool HasOverlap(const PerceptionObstacle& obstacle,
   return false;
 }
 
-PerceptionObstacles MobileyeRadarFusion(
-    const PerceptionObstacles& mobileye_obstacles,
+PerceptionObstacles EyeRadarFusion(
+    const PerceptionObstacles& eye_obstacles,
     const PerceptionObstacles& radar_obstacles) {
-  PerceptionObstacles mobileye_obstacles_fusion = mobileye_obstacles;
+  PerceptionObstacles eye_obstacles_fusion = eye_obstacles;
   PerceptionObstacles radar_obstacles_fusion = radar_obstacles;
 
-  for (auto& mobileye_obstacle :
-       *(mobileye_obstacles_fusion.mutable_perception_obstacle())) {
+  for (auto& eye_obstacle :
+       *(eye_obstacles_fusion.mutable_perception_obstacle())) {
     for (auto& radar_obstacle :
          *(radar_obstacles_fusion.mutable_perception_obstacle())) {
-      if (HasOverlap(mobileye_obstacle, radar_obstacle)) {
-        mobileye_obstacle.set_confidence(0.99);
-        mobileye_obstacle.mutable_velocity()->CopyFrom(
+      if (HasOverlap(eye_obstacle, radar_obstacle)) {
+        eye_obstacle.set_confidence(0.99);
+        eye_obstacle.mutable_velocity()->CopyFrom(
             radar_obstacle.velocity());
       }
     }
   }
 
   // mobileye_obstacles_fusion.MergeFrom(radar_obstacles_fusion);
-  return mobileye_obstacles_fusion;
+  return eye_obstacles_fusion;
 }
 
 }  // namespace fusion

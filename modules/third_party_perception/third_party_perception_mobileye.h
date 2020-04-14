@@ -19,19 +19,13 @@
  */
 
 #pragma once
+#include <memory>
 
-#include <mutex>
-#include <string>
+#include "modules/third_party_perception/third_party_perception_base.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
-
-#include "modules/common/status/status.h"
 
 /**
  * @namespace apollo::third_party_perception
@@ -40,35 +34,29 @@
 namespace apollo {
 namespace third_party_perception {
 
-class ThirdPartyPerception {
+class ThirdPartyPerceptionMobileye : public ThirdPartyPerception {
  public:
-  std::string Name() const;
-  apollo::common::Status Init();
-  apollo::common::Status Start();
-  void Stop();
-
+  explicit ThirdPartyPerceptionMobileye(apollo::cyber::Node* const node);
+  ThirdPartyPerceptionMobileye() = default;
+  ~ThirdPartyPerceptionMobileye() = default;
   // Upon receiving mobileye data
   void OnMobileye(const apollo::drivers::Mobileye& message);
-  // Upon receiving esr radar data
-  void OnDelphiESR(const apollo::drivers::DelphiESR& message);
   // Upon receiving conti radar data
   void OnContiRadar(const apollo::drivers::ContiRadar& message);
-  // Upon receiving localization data
-  void OnLocalization(
-      const apollo::localization::LocalizationEstimate& message);
-  // Upon receiving chassis data
-  void OnChassis(const apollo::canbus::Chassis& message);
-  // publish perception obstacles when timer is triggered
-  bool Process(apollo::perception::PerceptionObstacles* const response);
+  // Upon receiving esr radar data
+  void OnDelphiESR(const apollo::drivers::DelphiESR& message);
 
+  bool Process(
+      apollo::perception::PerceptionObstacles* const response) override;
  private:
-  std::mutex third_party_perception_mutex_;
-  apollo::perception::PerceptionObstacles mobileye_obstacles_;
+  std::shared_ptr<apollo::cyber::Reader<apollo::drivers::Mobileye>>
+      mobileye_reader_ = nullptr;
+  std::shared_ptr<apollo::cyber::Reader<apollo::drivers::DelphiESR>>
+      delphi_esr_reader_ = nullptr;
+  std::shared_ptr<apollo::cyber::Reader<apollo::drivers::ContiRadar>>
+      conti_radar_reader_ = nullptr;
   apollo::perception::PerceptionObstacles radar_obstacles_;
-  apollo::localization::LocalizationEstimate localization_;
-  apollo::canbus::Chassis chassis_;
-  RadarObstacles current_radar_obstacles_;
-  RadarObstacles last_radar_obstacles_;
+  apollo::perception::PerceptionObstacles eye_obstacles_;
 };
 
 }  // namespace third_party_perception

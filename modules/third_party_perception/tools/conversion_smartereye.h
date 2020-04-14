@@ -20,20 +20,24 @@
 
 #pragma once
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/drivers/proto/smartereye.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 
 /**
- * @namespace apollo::third_party_perception::fusion
+ * @namespace apollo::third_party_perception::conversion_smartereye
  * @brief apollo::third_party_perception
  */
 namespace apollo {
 namespace third_party_perception {
-namespace fusion {
+namespace conversion_smartereye {
 
-apollo::perception::PerceptionObstacles MobileyeRadarFusion(
-    const apollo::perception::PerceptionObstacles& mobileye_obstacles,
-    const apollo::perception::PerceptionObstacles& radar_obstacles);
+apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
+    const apollo::drivers::SmartereyeObstacles& smartereye_obstacles,
+    const apollo::drivers::SmartereyeLanemark& smartereye_lanemark,
+    const apollo::localization::LocalizationEstimate& localization,
+    const apollo::canbus::Chassis& chassis);
 
-}  // namespace fusion
+}  // namespace conversion_smartereye
 }  // namespace third_party_perception
 }  // namespace apollo
