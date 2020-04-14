@@ -21,7 +21,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
