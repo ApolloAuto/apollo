@@ -15,11 +15,9 @@
  *****************************************************************************/
 
 #include "cyber/cyber.h"
-
 #include <memory>
 #include <string>
 #include <utility>
-
 #include "cyber/common/global_data.h"
 #include "cyber/proto/run_mode_conf.pb.h"
 
