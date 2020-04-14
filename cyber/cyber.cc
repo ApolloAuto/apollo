@@ -20,10 +20,8 @@
 #include <utility>
 #include "cyber/common/global_data.h"
 #include "cyber/proto/run_mode_conf.pb.h"
-
 namespace apollo {
 namespace cyber {
-
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::proto::RunMode;
 
