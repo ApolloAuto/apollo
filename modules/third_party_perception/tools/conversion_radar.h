@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,16 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
-#include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 
 /**
- * @namespace apollo::third_party_perception::conversion
+ * @namespace apollo::third_party_perception::conversion_radar
  * @brief apollo::third_party_perception
  */
 namespace apollo {
 namespace third_party_perception {
-namespace conversion {
-
-apollo::perception::PerceptionObstacles MobileyeToPerceptionObstacles(
-    const apollo::drivers::Mobileye& mobileye,
-    const apollo::localization::LocalizationEstimate& localization,
-    const apollo::canbus::Chassis& chassis);
+namespace conversion_radar {
 
 RadarObstacles DelphiToRadarObstacles(
     const apollo::drivers::DelphiESR& delphi_esr,
@@ -54,6 +48,6 @@ RadarObstacles ContiToRadarObstacles(
 apollo::perception::PerceptionObstacles RadarObstaclesToPerceptionObstacles(
     const RadarObstacles& radar_obstacles);
 
-}  // namespace conversion
+}  // namespace conversion_radar
 }  // namespace third_party_perception
 }  // namespace apollo
