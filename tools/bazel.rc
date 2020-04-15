@@ -19,12 +19,6 @@ startup --host_jvm_args=-XX:-UseParallelGC
 # By default prints output only from failed tests.
 test --test_output=errors
 
-# Work around the sandbox issue.
-test --spawn_strategy=standalone
-
-# Specify protobuf cc toolchain
-test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
-
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
 # +------------------------------------------------------------+
