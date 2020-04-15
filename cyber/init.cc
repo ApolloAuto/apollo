@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "cyber/init.h"
-
 #include <libgen.h>
 #include <sys/types.h>
 #include <unistd.h>
