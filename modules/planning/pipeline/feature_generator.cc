@@ -24,16 +24,17 @@
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/util/math_util.h"
 
 DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
               "Prefix of files to store learning_data_frame data");
-DEFINE_int32(localization_freq, 100, "frequence of localization message");
 DEFINE_int32(planning_freq, 10, "frequence of planning message");
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
@@ -43,6 +44,8 @@ DEFINE_bool(enable_binary_learning_data, true,
             "True to generate protobuf binary data file.");
 DEFINE_bool(enable_overlap_tag, true,
             "True to add overlap tag to planning_tag");
+DEFINE_double(trajectory_delta_t, 0.1,
+             "delta time(sec) between trajectory points");
 
 namespace apollo {
 namespace planning {
@@ -102,23 +105,19 @@ void FeatureGenerator::Close() {
 }
 
 void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
-  localization_for_label_.push_back(le);
-
-  const int localization_msg_start_cnt =
-      FLAGS_localization_freq * FLAGS_trajectory_time_length;
-  if (static_cast<int>(localization_for_label_.size()) <
-      localization_msg_start_cnt) {
+  static double last_localization_timestamp_sec = 0.0;
+  if (last_localization_timestamp_sec == 0.0) {
+    last_localization_timestamp_sec = le.header().timestamp_sec();
+  }
+  recent_localization_.push_back(le);
+  if (le.header().timestamp_sec() - last_localization_timestamp_sec <
+      1.0 / FLAGS_planning_freq) {
     return;
   }
+  last_localization_timestamp_sec = le.header().timestamp_sec();
 
   // generate one frame data
   GenerateLearningDataFrame();
-
-  const int localization_move_window_step =
-      FLAGS_localization_freq / FLAGS_planning_freq;
-  for (int i = 0; i < localization_move_window_step; ++i) {
-    localization_for_label_.pop_front();
-  }
 
   // write frames into a file
   if (learning_data_.learning_data_size() >=
@@ -262,14 +261,14 @@ apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetLane(
 
 apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
     int* routing_index) {
-  const auto& pose = localization_for_label_.back().pose();
+  const auto& pose = recent_localization_.back().pose();
   return GetLane(pose.position(), routing_index);
 }
 
 void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
   CHECK_NOTNULL(adc_curr_info);
   // ADC current position / velocity / acc/ heading
-  const auto& adc_cur_pose = localization_for_label_.back().pose();
+  const auto& adc_cur_pose = recent_localization_.back().pose();
   adc_curr_info->adc_cur_position_ =
       std::make_pair(adc_cur_pose.position().x(),
                      adc_cur_pose.position().y());
@@ -467,8 +466,82 @@ void FeatureGenerator::GenerateRoutingFeature(
 }
 
 void FeatureGenerator::GenerateADCTrajectoryPoints(
-    const std::list<LocalizationEstimate>& localization_for_label,
     LearningDataFrame* learning_data_frame) {
+  // evaluate discretized adc history trajectory by time
+  DiscretizedTrajectory discretized_trajectory;
+  double start_point_timestamp_sec =
+      recent_localization_.front().measurement_time();
+  if (adc_trajectory_points_.size() < 0) {
+    common::TrajectoryPoint tp;
+    tp.CopyFrom(adc_trajectory_points_.back().second);
+    tp.set_relative_time(0.0);
+    discretized_trajectory.AppendTrajectoryPoint(tp);
+    start_point_timestamp_sec = adc_trajectory_points_.back().first;
+  }
+
+  if (recent_localization_.back().measurement_time() - start_point_timestamp_sec
+      >= FLAGS_trajectory_delta_t) {
+    double last_localization_relative_time = start_point_timestamp_sec;
+    for (const auto& le : recent_localization_) {
+      double relative_time = le.measurement_time() - start_point_timestamp_sec;
+      if (relative_time <= 0.0 ||
+          relative_time <= last_localization_relative_time) {
+        last_localization_relative_time = relative_time;
+        continue;
+      }
+      last_localization_relative_time = relative_time;
+
+      common::TrajectoryPoint tp;
+      const auto& pose = le.pose();
+      tp.mutable_path_point()->set_x(pose.position().x());
+      tp.mutable_path_point()->set_y(pose.position().y());
+      tp.mutable_path_point()->set_z(pose.position().z());
+      tp.mutable_path_point()->set_theta(pose.heading());
+      auto v = std::sqrt(
+          pose.linear_velocity().x() * pose.linear_velocity().x() +
+          pose.linear_velocity().y() * pose.linear_velocity().y());
+      tp.set_v(v);
+      auto a = std::sqrt(
+          pose.linear_acceleration().x() * pose.linear_acceleration().x() +
+          pose.linear_acceleration().y() * pose.linear_acceleration().y());
+      tp.set_a(a);
+      tp.set_relative_time(relative_time);
+
+      discretized_trajectory.AppendTrajectoryPoint(tp);
+    }
+
+    double timestamp_sec = start_point_timestamp_sec;
+    double relative_time = 0.0;
+    while (timestamp_sec + FLAGS_trajectory_delta_t
+        < recent_localization_.back().measurement_time()) {
+      timestamp_sec += FLAGS_trajectory_delta_t;
+      relative_time += FLAGS_trajectory_delta_t;
+      auto trajectory_point = discretized_trajectory.Evaluate(relative_time);
+      adc_trajectory_points_.push_back(
+          std::make_pair(timestamp_sec, trajectory_point));
+    }
+    // remove localization being processed
+    for (auto it = recent_localization_.begin();
+        it != recent_localization_.end(); it++) {
+      if (it->measurement_time() <= timestamp_sec) {
+        recent_localization_.erase(it--);
+      }
+    }
+
+    // pop adc_trajectory_points too old
+    while (adc_trajectory_points_.size() > 0) {
+      if (adc_trajectory_points_.back().first -
+          adc_trajectory_points_.front().first < FLAGS_trajectory_time_length) {
+        break;
+      }
+      adc_trajectory_points_.pop_front();
+    }
+  }
+
+  /////////////////////////
+  // update learning_data
+  /////////////////////////
+
   constexpr double kSearchRadius = 1.0;
 
   std::string clear_area_id;
@@ -484,48 +557,30 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
   std::string yield_sign_id;
   double yield_sign_distance = 0.0;
 
-  int i = -1;
-  const int localization_sample_interval_for_trajectory_point =
-      FLAGS_localization_freq / FLAGS_planning_freq;
-
-  // use a vector to help reverse traverse list of mutable field
-  std::vector<LocalizationEstimate> localization_points;
-  for (const auto& le : localization_for_label) {
-    ++i;
-    if ((i % localization_sample_interval_for_trajectory_point) != 0) {
-      continue;
-    }
-    localization_points.insert(localization_points.begin(), le);
-  }
-
   int trajectory_point_index = 0;
-  for (const auto& localization_point : localization_points) {
-     auto adc_trajectory_point =
-         learning_data_frame->add_adc_trajectory_point();
-     adc_trajectory_point->set_timestamp_sec(
-         localization_point.measurement_time());
+  for (std::list<std::pair<double, apollo::common::TrajectoryPoint>>
+      ::reverse_iterator rit = adc_trajectory_points_.rbegin();
+      rit != adc_trajectory_points_.rend(); ++rit) {
+    auto adc_trajectory_point =
+        learning_data_frame->add_adc_trajectory_point();
+    adc_trajectory_point->set_timestamp_sec(rit->first);
 
     auto trajectory_point = adc_trajectory_point->mutable_trajectory_point();
-    auto& pose = localization_point.pose();
-    trajectory_point->mutable_path_point()->set_x(pose.position().x());
-    trajectory_point->mutable_path_point()->set_y(pose.position().y());
-    trajectory_point->mutable_path_point()->set_z(pose.position().z());
-    trajectory_point->mutable_path_point()->set_theta(pose.heading());
-    auto v = std::sqrt(pose.linear_velocity().x() * pose.linear_velocity().x() +
-                       pose.linear_velocity().y() * pose.linear_velocity().y());
-    trajectory_point->set_v(v);
-    auto a = std::sqrt(
-        pose.linear_acceleration().x() * pose.linear_acceleration().x() +
-        pose.linear_acceleration().y() * pose.linear_acceleration().y());
-    trajectory_point->set_a(a);
+    auto& point = rit->second;
+    const auto& path_point = point.path_point();
+    trajectory_point->mutable_path_point()->set_x(path_point.x());
+    trajectory_point->mutable_path_point()->set_y(path_point.y());
+    trajectory_point->mutable_path_point()->set_z(path_point.z());
+    trajectory_point->mutable_path_point()->set_theta(path_point.theta());
+    trajectory_point->set_v(point.v());
+    trajectory_point->set_a(point.a());
 
     auto planning_tag = adc_trajectory_point->mutable_planning_tag();
 
     // planning_tag: lane_turn
     const auto& cur_point = common::util::PointFactory::ToPointENU(
-        pose.position().x(),
-        pose.position().y(),
-        pose.position().z());
+        path_point.x(), path_point.y(), path_point.z());
+
     int routing_index;
     LaneInfoConstPtr lane = GetLane(cur_point, &routing_index);
     // lane_turn
@@ -683,7 +738,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
   learning_data_frame->set_timestamp_sec(
-      localization_for_label_.back().header().timestamp_sec());
+      recent_localization_.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
 
   // map_name
@@ -695,7 +750,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   // add localization
   auto localization = learning_data_frame->mutable_localization();
-  const auto& pose = localization_for_label_.back().pose();
+  const auto& pose = recent_localization_.back().pose();
   localization->mutable_position()->CopyFrom(pose.position());
   localization->set_heading(pose.heading());
   localization->mutable_linear_velocity()->CopyFrom(pose.linear_velocity());
@@ -718,7 +773,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   GenerateObstacleFeature(learning_data_frame);
 
   // add trajectory_points
-  GenerateADCTrajectoryPoints(localization_for_label_, learning_data_frame);
+  GenerateADCTrajectoryPoints(learning_data_frame);
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
