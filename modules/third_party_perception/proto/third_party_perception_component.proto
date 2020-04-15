@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.third_party_perception;
+
+message ThirdPartyPerceptionDevice {
+  optional string device_names = 1 [default = "ThirdPartyPerceptionSmartereye"];
+}
