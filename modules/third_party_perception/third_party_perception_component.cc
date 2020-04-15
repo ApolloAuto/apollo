@@ -16,9 +16,6 @@
 
 #include "modules/third_party_perception/third_party_perception_component.h"
 
-#include "boost/algorithm/string.hpp"
-#include "boost/format.hpp"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/third_party_perception/proto/third_party_perception_component.pb.h"
 
@@ -35,23 +32,16 @@ bool ThirdPartyPerceptionComponent::Init() {
     return false;
   }
 
-  std::string device_names_str = third_party_perception_param.device_names();
-  std::vector<std::string> device_names;
+  ThirdPartyPerceptionDeviceType device_type =
+        third_party_perception_param.device_type();
 
-  boost::algorithm::split(device_names, device_names_str,
-                          boost::algorithm::is_any_of(","));
-  if (device_names.size() != 1) {
-    AERROR << "Now third_party_perception only support one camera device";
-    return false;
+  if (device_type == ThirdPartyPerceptionDeviceType::SMARTEREYE) {
+    perception_ = std::make_shared<ThirdPartyPerceptionSmartereye>(
+                  node_.get());
+  } else if (device_type == ThirdPartyPerceptionDeviceType::MOBILEYE) {
+    perception_ = std::make_shared<ThirdPartyPerceptionMobileye>(node_.get());
   } else {
-    if (device_names.at(0) == "ThirdPartyPerceptionSmartereye") {
-      perception_ = std::make_shared<ThirdPartyPerceptionSmartereye>(
-                    node_.get());
-    } else if (device_names.at(0) == "ThirdPartyPerceptionMobileye") {
-      perception_ = std::make_shared<ThirdPartyPerceptionMobileye>(node_.get());
-    } else {
-      perception_ = std::make_shared<ThirdPartyPerception>(node_.get());
-    }
+    perception_ = std::make_shared<ThirdPartyPerception>(node_.get());
   }
 
   if (!perception_->Init().ok()) {
