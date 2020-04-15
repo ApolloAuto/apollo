@@ -607,6 +607,18 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "planning_semantic_map_config_proto",
+    deps = [
+        ":planning_semantic_map_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_semantic_map_config_proto_lib",
+    srcs = ["planning_semantic_map_config.proto"],
+)
+
 py_proto(
     name = "path_bounds_decider_config_pb2",
     src = "path_bounds_decider_config.proto",
@@ -911,4 +923,9 @@ py_proto(
     deps = [
         "//modules/common/proto:pnc_point_pb2",
     ],
+)
+
+py_proto(
+    name = "planning_semantic_map_config_pb2",
+    src = "planning_semantic_map_config.proto",
 )
