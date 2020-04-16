@@ -26,14 +26,7 @@ source /apollo/cyber/setup.bash
 
 sudo mkdir -p ${TARGET_DIR}
 
-if [ -z "$3" ]; then
-    MAP_DIR="sunnyvale_with_two_offices"
-else
-    MAP_DIR=$3
-fi
-
-/apollo/bazel-bin/modules/planning/pipeline/record_to_learning_data \
+/apollo/bazel-bin/modules/planning/pipeline/evaluate_trajectory \
     --flagfile=/apollo/modules/planning/conf/planning.conf \
-    --map_dir=/apollo/modules/map/data/${MAP_DIR} \
     --planning_source_dirs=${SRC_DIR} \
     --planning_data_dir=${TARGET_DIR} \
