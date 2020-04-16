@@ -21,7 +21,7 @@
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/util/util.h"
-#include "modules/planning/pipeline/feature_generator.h"
+#include "modules/planning/pipeline/evaluator.h"
 #include "modules/prediction/util/data_extraction.h"
 
 DEFINE_string(
@@ -32,25 +32,31 @@ DEFINE_string(
 namespace apollo {
 namespace planning {
 
-void GenerateLearningData() {
-  AINFO << "map_dir: " << FLAGS_map_dir;
+void EvaluateTrajectory() {
   const std::vector<std::string> inputs =
       absl::StrSplit(FLAGS_planning_source_dirs, ':');
-  FeatureGenerator feature_generator;
-  feature_generator.Init();
+  Evaluator evaluator;
+  evaluator.Init();
   for (const auto& input : inputs) {
-    std::vector<std::string> offline_bags;
-    util::GetFilesByPath(boost::filesystem::path(input), &offline_bags);
-    std::sort(offline_bags.begin(), offline_bags.end());
-    AINFO << "For input " << input << ", found " << offline_bags.size()
-          << " rosbags to process";
-    for (std::size_t i = 0; i < offline_bags.size(); ++i) {
-      AINFO << "\tProcessing: [ " << i + 1 << " / " << offline_bags.size()
-            << " ]: " << offline_bags[i];
-      feature_generator.ProcessOfflineData(offline_bags[i]);
+    std::vector<std::string> source_files;
+    util::GetFilesByPath(boost::filesystem::path(input), &source_files);
+    auto it = source_files.begin();
+    while (it != source_files.end()) {
+      if ((*it).substr((*it).size() - 4) != ".bin") {
+        it = source_files.erase(it);
+      } else {
+        ++it;
+      }
+    }
+    AINFO << "For input " << input << ", found " << source_files.size()
+          << " files to process";
+    for (std::size_t i = 0; i < source_files.size(); ++i) {
+      AINFO << "\tProcessing: [ " << i + 1 << " / " << source_files.size()
+            << " ]: " << source_files[i];
+      evaluator.Evaluate(source_files[i]);
     }
   }
-  feature_generator.Close();
+  evaluator.Close();
 }
 
 }  // namespace planning
@@ -58,6 +64,6 @@ void GenerateLearningData() {
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::planning::GenerateLearningData();
+  apollo::planning::EvaluateTrajectory();
   return 0;
 }
