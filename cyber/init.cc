@@ -23,7 +23,6 @@
 #include <cstdio>
 #include <ctime>
 #include <string>
-
 #include "cyber/binary.h"
 #include "cyber/common/global_data.h"
 #include "cyber/data/data_dispatcher.h"
