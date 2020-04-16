@@ -81,6 +81,8 @@ class FeatureGenerator {
                               LearningDataFrame* learning_data_frame);
 
   void GenerateADCTrajectoryPoints(
+      const std::list<apollo::localization::LocalizationEstimate>&
+          localizations,
       LearningDataFrame* learning_data_frame);
 
   void GenerateLearningDataFrame();
@@ -93,11 +95,7 @@ class FeatureGenerator {
   std::unordered_map<std::string, std::string> map_m_;
   LearningData learning_data_;
   int learning_data_file_index_ = 0;
-  std::vector<apollo::localization::LocalizationEstimate>
-      recent_localization_;
-  std::list<std::pair<double, apollo::common::TrajectoryPoint>>
-      adc_trajectory_points_;
-
+  std::list<apollo::localization::LocalizationEstimate> localizations_;
   std::unordered_map<int, apollo::prediction::PredictionObstacle>
       prediction_obstacles_map_;
   std::unordered_map<int, std::list<PerceptionObstacleFeature>>
