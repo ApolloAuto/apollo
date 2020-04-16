@@ -100,8 +100,10 @@ class TestClass {
                                  float* box_anchors_min_y,
                                  float* box_anchors_max_x,
                                  float* box_anchors_max_y);
-  void DoInference(const float* in_points_array, const int in_num_points,
-                   std::vector<float>* out_detections);
+  void DoInference(const float* in_points_array,
+                   const int in_num_points,
+                   std::vector<float>* out_detections,
+                   std::vector<int>* out_labels);
 
  private:
   std::unique_ptr<PreprocessPoints> preprocess_points_ptr_;
@@ -136,11 +138,12 @@ TestClass::TestClass(const int MAX_NUM_PILLARS,
 
   //  bool baselink_support=true;
   bool reproduce_result_mode = false;
+  int num_class = 3;
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
 
   point_pillars_ptr_.reset(
-      new PointPillars(reproduce_result_mode, score_threshold,
+      new PointPillars(reproduce_result_mode, num_class, score_threshold,
                        nms_overlap_threshold, FLAGS_pfe_onnx_file,
                        FLAGS_rpn_onnx_file));
 };
@@ -240,9 +243,10 @@ void TestClass::convertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
 
 void TestClass::DoInference(const float* in_points_array,
                             const int in_num_points,
-                            std::vector<float>* out_detections) {
+                            std::vector<float>* out_detections,
+                            std::vector<int>* out_labels) {
   return point_pillars_ptr_->doInference(in_points_array, in_num_points,
-                                         out_detections);
+                                         out_detections, out_labels);
 }
 
 TEST(TestSuite, CheckPreprocessPointsCPU) {
@@ -469,10 +473,13 @@ TEST(TestSuite, CheckDoInference) {
   test_obj.pclToArray(pcl_pc_ptr, points_array, NORMALIZING_FACTOR);
 
   std::vector<float>* out_detections(new std::vector<float>());
-  test_obj.DoInference(points_array, pcl_pc_ptr->size(), out_detections);
+  std::vector<int>* out_labels(new std::vector<int>());
+  test_obj.DoInference(
+      points_array, pcl_pc_ptr->size(), out_detections, out_labels);
 
   int num_objects = out_detections->size() / OUTPUT_NUM_BOX_FEATURE;
   EXPECT_GE(num_objects, 4);
+  EXPECT_EQ(num_objects, out_labels->size());
 
   for (int j = 0; j < num_objects; ++j) {
     float x = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 0);
@@ -485,10 +492,12 @@ TEST(TestSuite, CheckDoInference) {
     yaw += M_PI / 2;
     yaw = std::atan2(std::sin(yaw), std::cos(yaw));
     yaw = -yaw;
+    int label = out_labels->at(j);
 
     std::cout << "object id: " << j << ", x: " << x << ", y: " << y
               << ", z: " << z << ", dx: " << dx << ", dy: " << dy
-              << ", dz: " << dz << ", yaw: " << yaw << std::endl;
+              << ", dz: " << dz << ", yaw: " << yaw << ", label: "
+              << label << std::endl;
   }
 }
 

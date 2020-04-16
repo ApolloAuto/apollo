@@ -118,6 +118,7 @@ class PointPillars {
   const int NUM_ANCHOR_Y_INDS_;
   const int NUM_ANCHOR_R_INDS_;
   const int NUM_ANCHOR_;
+  const int NUM_CLASS_;
   const int RPN_BOX_OUTPUT_SIZE_;
   const int RPN_CLS_OUTPUT_SIZE_;
   const int RPN_DIR_OUTPUT_SIZE_;
@@ -199,6 +200,7 @@ class PointPillars {
   float* dev_anchors_ro_;
   float* dev_filtered_box_;
   float* dev_filtered_score_;
+  int* dev_filtered_label_;
   int* dev_filtered_dir_;
   float* dev_box_for_nms_;
   int* dev_filter_count_;
@@ -336,7 +338,9 @@ class PointPillars {
    * @param[in] rpn_onnx_file Region Proposal Network ONNX file path
    * @details Variables could be chaned through rosparam
    */
-  PointPillars(const bool reproduce_result_mode, const float score_threshold,
+  PointPillars(const bool reproduce_result_mode,
+               const int num_class,
+               const float score_threshold,
                const float nms_overlap_threshold,
                const std::string pfe_onnx_file,
                const std::string rpn_onnx_file);
@@ -346,11 +350,14 @@ class PointPillars {
    * @brief Call PointPillars for the inference
    * @param[in] in_points_array Pointcloud array
    * @param[in] in_num_points Number of points
-   * @param[in] out_detections Network output bounding box
+   * @param[out] out_detections Network output bounding box
+   * @param[out] out_labels Network output object's label
    * @details This is an interface for the algorithm
    */
-  void doInference(const float* in_points_array, const int in_num_points,
-                   std::vector<float>* out_detections);
+  void doInference(const float* in_points_array,
+                   const int in_num_points,
+                   std::vector<float>* out_detections,
+                   std::vector<int>* out_labels);
 };
 
 }  // namespace lidar

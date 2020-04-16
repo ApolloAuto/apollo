@@ -33,7 +33,7 @@ using base::PointF;
 
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(
-      new PointPillars(reproduce_result_mode_, score_threshold_,
+      new PointPillars(reproduce_result_mode_, num_class_, score_threshold_,
                        nms_overlap_threshold_, FLAGS_pfe_onnx_file,
                        FLAGS_rpn_onnx_file));
   return true;
@@ -76,13 +76,14 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
 
   // inference
   std::vector<float> out_detections;
+  std::vector<int> out_labels;
   point_pillars_ptr_->doInference(points_array, original_cloud_->size(),
-                                  &out_detections);
+                                  &out_detections, &out_labels);
   inference_time_ = timer.toc(true);
 
   // transfer output bounding boxs to objects
   GetObjects(&frame->segmented_objects, frame->lidar2world_pose,
-             &out_detections);
+             &out_detections, &out_labels);
 
   AINFO << "PointPillars: inference: " << inference_time_ << "\t"
         << "collect: " << collect_time_;
@@ -104,7 +105,7 @@ void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
 
 void PointPillarsDetection::GetObjects(
     std::vector<std::shared_ptr<Object>>* objects, const Eigen::Affine3d& pose,
-    std::vector<float>* detections) {
+    std::vector<float>* detections, std::vector<int>* labels) {
   Timer timer;
   int num_objects = detections->size() / kOutputNumBoxFeature;
 
@@ -168,12 +169,12 @@ void PointPillarsDetection::GetObjects(
     }
 
     // classification (only detect vehicles so far)
-    // TODO(chenjiahao): Fill object types completely
+    // TODO(chenjiahao): Complete object type probs
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
         static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
-    object->lidar_supplement.raw_probs
-        .back()[static_cast<int>(base::ObjectType::VEHICLE)] = 1.0f;
+    int type = GetObjectType(labels->at(i));
+    object->lidar_supplement.raw_probs.back()[type] = 1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());
@@ -184,6 +185,22 @@ void PointPillarsDetection::GetObjects(
   }
 
   collect_time_ = timer.toc(true);
+}
+
+int PointPillarsDetection::GetObjectType(const int label) {
+  switch (label) {
+    case 0:
+      return static_cast<int>(base::ObjectType::VEHICLE);
+      break;
+    case 1:
+      return static_cast<int>(base::ObjectType::BICYCLE);
+      break;
+    case 2:
+      return static_cast<int>(base::ObjectType::PEDESTRIAN);
+      break;
+    default:
+      return static_cast<int>(base::ObjectType::UNKNOWN);
+  }
 }
 
 }  // namespace lidar
