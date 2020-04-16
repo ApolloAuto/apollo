@@ -42,6 +42,7 @@ namespace perception {
 namespace lidar {
 
 PointPillars::PointPillars(const bool reproduce_result_mode,
+                           const int num_class,
                            const float score_threshold,
                            const float nms_overlap_threshold,
                            const std::string pfe_onnx_file,
@@ -58,12 +59,15 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
       GRID_Y_SIZE_(496),
       GRID_Z_SIZE_(1),
       RPN_INPUT_SIZE_(64 * GRID_X_SIZE_ * GRID_Y_SIZE_),
+      // TODO(chenjiahao): Enable customizing sizes of multiple anchors
       NUM_ANCHOR_X_INDS_(GRID_X_SIZE_ * 0.5),
       NUM_ANCHOR_Y_INDS_(GRID_Y_SIZE_ * 0.5),
       NUM_ANCHOR_R_INDS_(2),
       NUM_ANCHOR_(NUM_ANCHOR_X_INDS_ * NUM_ANCHOR_Y_INDS_ * NUM_ANCHOR_R_INDS_),
+      // TODO(chenjiahao): Should be defined by the input param num_class
+      NUM_CLASS_(3),
       RPN_BOX_OUTPUT_SIZE_(NUM_ANCHOR_ * 7),
-      RPN_CLS_OUTPUT_SIZE_(NUM_ANCHOR_),
+      RPN_CLS_OUTPUT_SIZE_(NUM_ANCHOR_ * NUM_CLASS_),
       RPN_DIR_OUTPUT_SIZE_(NUM_ANCHOR_ * 2),
       PILLAR_X_SIZE_(0.16f),
       PILLAR_Y_SIZE_(0.16f),
@@ -113,7 +117,8 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
   postprocess_cuda_ptr_.reset(new PostprocessCuda(
       FLOAT_MIN, FLOAT_MAX, NUM_ANCHOR_X_INDS_, NUM_ANCHOR_Y_INDS_,
       NUM_ANCHOR_R_INDS_, score_threshold_, NUM_THREADS_,
-      nms_overlap_threshold_, NUM_BOX_CORNERS_, NUM_OUTPUT_BOX_FEATURE_));
+      nms_overlap_threshold_, NUM_BOX_CORNERS_, NUM_OUTPUT_BOX_FEATURE_,
+      NUM_CLASS_));
 
   deviceMemoryMalloc();
   initTRT();
@@ -188,6 +193,7 @@ PointPillars::~PointPillars() {
   GPU_CHECK(cudaFree(dev_anchors_ro_));
   GPU_CHECK(cudaFree(dev_filtered_box_));
   GPU_CHECK(cudaFree(dev_filtered_score_));
+  GPU_CHECK(cudaFree(dev_filtered_label_));
   GPU_CHECK(cudaFree(dev_filtered_dir_));
   GPU_CHECK(cudaFree(dev_box_for_nms_));
   GPU_CHECK(cudaFree(dev_filter_count_));
@@ -323,6 +329,8 @@ void PointPillars::deviceMemoryMalloc() {
                        NUM_ANCHOR_ * NUM_OUTPUT_BOX_FEATURE_ * sizeof(float)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_filtered_score_),
                        NUM_ANCHOR_ * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_filtered_label_),
+                       NUM_ANCHOR_ * sizeof(int)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_filtered_dir_),
                        NUM_ANCHOR_ * sizeof(int)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_box_for_nms_),
@@ -696,7 +704,8 @@ void PointPillars::preprocess(const float* in_points_array,
 
 void PointPillars::doInference(const float* in_points_array,
                                const int in_num_points,
-                               std::vector<float>* out_detections) {
+                               std::vector<float>* out_detections,
+                               std::vector<int>* out_labels) {
   preprocess(in_points_array, in_num_points);
 
   anchor_mask_cuda_ptr_->doAnchorMaskCuda(
@@ -757,8 +766,8 @@ void PointPillars::doInference(const float* in_points_array,
       reinterpret_cast<float*>(rpn_buffers_[3]), dev_anchor_mask_,
       dev_anchors_px_, dev_anchors_py_, dev_anchors_pz_, dev_anchors_dx_,
       dev_anchors_dy_, dev_anchors_dz_, dev_anchors_ro_, dev_filtered_box_,
-      dev_filtered_score_, dev_filtered_dir_, dev_box_for_nms_,
-      dev_filter_count_, out_detections);
+      dev_filtered_score_, dev_filtered_label_, dev_filtered_dir_,
+      dev_box_for_nms_, dev_filter_count_, out_detections, out_labels);
 
   // release the stream and the buffers
   cudaStreamDestroy(stream);
