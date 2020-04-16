@@ -28,6 +28,7 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
+#include "modules/third_party_perception/tools/conversion_base.h"
 #include "modules/third_party_perception/tools/conversion_mobileye.h"
 
 /**
@@ -38,21 +39,12 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion_mobileye {
 
-using apollo::canbus::Chassis;
 using apollo::drivers::Mobileye;
+using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using Point = apollo::common::Point3D;
-
-std::map<std::int32_t, apollo::hdmap::LaneBoundaryType_Type>
-    lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
-                           {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
-                           {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
-                           {3, apollo::hdmap::LaneBoundaryType::CURB},
-                           {4, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
-                           {5, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
-                           {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
 PerceptionObstacles MobileyeToPerceptionObstacles(
     const Mobileye& mobileye, const LocalizationEstimate& localization,
@@ -68,9 +60,9 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
   std::int32_t mob_right_lane_type = mobileye.lka_768().lane_type();
 
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_lane_type(
-      lane_conversion_map[mob_left_lane_type]);
+      conversion_base::lane_conversion_map[mob_left_lane_type]);
   obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_lane_type(
-      lane_conversion_map[mob_right_lane_type]);
+      conversion_base::lane_conversion_map[mob_right_lane_type]);
 
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_quality(
       mobileye.lka_766().quality() / 4.0);
