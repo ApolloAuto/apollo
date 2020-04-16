@@ -28,6 +28,7 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
+#include "modules/third_party_perception/tools/conversion_base.h"
 #include "modules/third_party_perception/tools/conversion_smartereye.h"
 
 /**
@@ -44,15 +45,6 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using Point = apollo::common::Point3D;
 
-std::map<std::int32_t, apollo::hdmap::LaneBoundaryType_Type>
-    lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
-                           {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
-                           {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
-                           {3, apollo::hdmap::LaneBoundaryType::CURB},
-                           {4, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
-                           {5, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
-                           {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
-
 apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
     const apollo::drivers::SmartereyeObstacles& smartereye_obstacles,
     const apollo::drivers::SmartereyeLanemark& smartereye_lanemark,
@@ -65,15 +57,15 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
   obstacles.mutable_header()->CopyFrom(smartereye_obstacles.header());
 
   // Fullfill lane_type information
-  std::int32_t mob_left_lane_type =
+  std::int32_t sma_left_lane_type =
       smartereye_lanemark.lane_road_data().roadway().left_lane().style();
-  std::int32_t mob_right_lane_type =
+  std::int32_t sma_right_lane_type =
       smartereye_lanemark.lane_road_data().roadway().right_lane().style();
 
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_lane_type(
-      lane_conversion_map[mob_left_lane_type]);
+      conversion_base::lane_conversion_map[sma_left_lane_type]);
   obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_lane_type(
-      lane_conversion_map[mob_right_lane_type]);
+      conversion_base::lane_conversion_map[sma_right_lane_type]);
 
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_quality(
       smartereye_lanemark.lane_road_data().roadway()
@@ -137,53 +129,53 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
   for (int index = 0; index < smartereye_obstacles.num_obstacles() &&
                       index < smartereye_obstacles.output_obstacles_size();
        ++index) {
-    auto* mob = obstacles.add_perception_obstacle();
+    auto* sma = obstacles.add_perception_obstacle();
     const auto& data_obstacle =
         smartereye_obstacles.output_obstacles().at(index);
-    int mob_id = data_obstacle.trackid() + FLAGS_smartereye_id_offset;
+    int sma_id = data_obstacle.trackid() + FLAGS_smartereye_id_offset;
 
-    double mob_x = data_obstacle.avgdistancez();
-    double mob_y = -data_obstacle.real3dcenterx();
-    double mob_z = (data_obstacle.real3dupy() +
+    double sma_x = data_obstacle.avgdistancez();
+    double sma_y = -data_obstacle.real3dcenterx();
+    double sma_z = (data_obstacle.real3dupy() +
         data_obstacle.real3dlowy()) / 2.0;
     // relative speed
-    double mob_vel_x = data_obstacle.fuzzyrelativedistancez();
-    int mob_type = data_obstacle.obstacletype();
+    double sma_vel_x = data_obstacle.fuzzyrelativedistancez();
+    int sma_type = data_obstacle.obstacletype();
 
-    double mob_w = data_obstacle.real3drightx() - data_obstacle.real3dleftx();
-    double mob_l = data_obstacle.real3dlowy() - data_obstacle.real3dupy();
+    double sma_w = data_obstacle.real3drightx() - data_obstacle.real3dleftx();
+    double sma_l = data_obstacle.real3dlowy() - data_obstacle.real3dupy();
 
-    switch (mob_type) {
+    switch (sma_type) {
       case 1:
       case 6:
       case 7: {
-        mob->set_type(PerceptionObstacle::VEHICLE);  // VEHICLE
+        sma->set_type(PerceptionObstacle::VEHICLE);  // VEHICLE
         break;
       }
       case 4:
       case 5: {
-        mob->set_type(PerceptionObstacle::BICYCLE);  // BIKE
+        sma->set_type(PerceptionObstacle::BICYCLE);  // BIKE
         break;
       }
       case 2:
       case 3: {
-        mob->set_type(PerceptionObstacle::PEDESTRIAN);  // PED
+        sma->set_type(PerceptionObstacle::PEDESTRIAN);  // PED
         break;
       }
       default: {
-        mob->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
+        sma->set_type(PerceptionObstacle::UNKNOWN);  // UNKNOWN
         break;
       }
     }
 
-    if (mob_l > FLAGS_max_mobileye_obstacle_length) {
-        mob_l = GetDefaultObjectLength(mob_type);
+    if (sma_l > FLAGS_max_mobileye_obstacle_length) {
+        sma_l = GetDefaultObjectLength(sma_type);
     }
-    if (mob_w > FLAGS_max_mobileye_obstacle_width) {
-      mob_w = GetDefaultObjectWidth(mob_type);
+    if (sma_w > FLAGS_max_mobileye_obstacle_width) {
+      sma_w = GetDefaultObjectWidth(sma_type);
     }
 
-    Point xy_point = SLtoXY(mob_x, mob_y, adc_theta);
+    Point xy_point = SLtoXY(sma_x, sma_y, adc_theta);
 
     // TODO(QiL) : Clean this up after data collection and validation
     double converted_x = 0.0;
@@ -213,24 +205,18 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
     if (!FLAGS_use_navigation_mode) {
       converted_x = adc_x + xy_point.x();
       converted_y = adc_y + xy_point.y();
-      converted_z = adc_z + mob_z;
-      mob->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
-      converted_speed = adc_velocity + mob_vel_x;
-      converted_vx = converted_speed * std::cos(mob->theta());
-      converted_vy = converted_speed * std::sin(mob->theta());
+      converted_z = adc_z + sma_z;
+      sma->set_theta(GetNearestLaneHeading(converted_x, converted_y, adc_z));
+      converted_speed = adc_velocity + sma_vel_x;
+      converted_vx = converted_speed * std::cos(sma->theta());
+      converted_vy = converted_speed * std::sin(sma->theta());
     } else {
-      converted_x = data_obstacle.real3dcenterx() - mob_l / 2.0;
-      converted_y = mob_y;
-      converted_vx = mob_vel_x + chassis.speed_mps();
+      converted_x = data_obstacle.real3dcenterx() - sma_l / 2.0;
+      converted_y = sma_y;
+      converted_vx = sma_vel_x + chassis.speed_mps();
       converted_vy = 0.0;
       converted_z = data_obstacle.avgdistancez();
 
-      mob->set_theta(0.0);
-
-      // if (!FLAGS_overwrite_mobileye_theta) {
-      //   mob->set_theta(mobileye.details_73b(index).obstacle_angle() / 180 *
-      //                   M_PI);
-      // } else {
       double nearest_lane_heading =
           converted_vx > 0
               ? std::atan2(3 * path_c3 * converted_x * converted_x +
@@ -241,28 +227,28 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
                             1) +
                     M_PI;
       AINFO << "nearest lane heading is" << nearest_lane_heading;
-      mob->set_theta(nearest_lane_heading);
+      sma->set_theta(nearest_lane_heading);
     }
 
-    mob->set_id(mob_id);
-    mob->mutable_position()->set_x(converted_x);
-    mob->mutable_position()->set_y(converted_y);
-    mob->mutable_position()->set_z(converted_z);
+    sma->set_id(sma_id);
+    sma->mutable_position()->set_x(converted_x);
+    sma->mutable_position()->set_y(converted_y);
+    sma->mutable_position()->set_z(converted_z);
 
-    mob->mutable_velocity()->set_x(converted_vx);
-    mob->mutable_velocity()->set_y(converted_vy);
-    mob->set_length(mob_l);
-    mob->set_width(mob_w);
-    mob->set_height(FLAGS_default_height);
+    sma->mutable_velocity()->set_x(converted_vx);
+    sma->mutable_velocity()->set_y(converted_vy);
+    sma->set_length(sma_l);
+    sma->set_width(sma_w);
+    sma->set_height(FLAGS_default_height);
 
-    mob->clear_polygon_point();
+    sma->clear_polygon_point();
 
     // create polygon
-    FillPerceptionPolygon(mob, mob->position().x(), mob->position().y(),
-                          mob->position().z(), mob->length(), mob->width(),
-                          mob->height(), mob->theta());
+    FillPerceptionPolygon(sma, sma->position().x(), sma->position().y(),
+                          sma->position().z(), sma->length(), sma->width(),
+                          sma->height(), sma->theta());
 
-    mob->set_confidence(0.5);
+    sma->set_confidence(0.5);
   }
 
   return obstacles;
