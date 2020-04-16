@@ -17,7 +17,10 @@ cc_library(
 cc_library(
     name = "third_party_perception_smartereye_conversion",
     srcs = ["conversion_smartereye.cc"],
-    hdrs = ["conversion_smartereye.h"],
+    hdrs = [
+        "conversion_smartereye.h",
+        "conversion_base.h",
+    ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/proto:sensor_proto",
@@ -29,7 +32,10 @@ cc_library(
 cc_library(
     name = "third_party_perception_mobileye_conversion",
     srcs = ["conversion_mobileye.cc"],
-    hdrs = ["conversion_mobileye.h"],
+    hdrs = [
+        "conversion_mobileye.h",
+        "conversion_base.h",
+    ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/proto:sensor_proto",
