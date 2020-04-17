@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,23 @@
 
 #pragma once
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 
 /**
- * @namespace apollo::third_party_perception::fusion
+ * @namespace apollo::third_party_perception::conversion_mobileye
  * @brief apollo::third_party_perception
  */
 namespace apollo {
 namespace third_party_perception {
-namespace fusion {
+namespace conversion_mobileye {
 
-apollo::perception::PerceptionObstacles MobileyeRadarFusion(
-    const apollo::perception::PerceptionObstacles& mobileye_obstacles,
-    const apollo::perception::PerceptionObstacles& radar_obstacles);
+apollo::perception::PerceptionObstacles MobileyeToPerceptionObstacles(
+    const apollo::drivers::Mobileye& mobileye,
+    const apollo::localization::LocalizationEstimate& localization,
+    const apollo::canbus::Chassis& chassis);
 
-}  // namespace fusion
+}  // namespace conversion_mobileye
 }  // namespace third_party_perception
 }  // namespace apollo
