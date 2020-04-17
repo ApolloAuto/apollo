@@ -158,6 +158,7 @@ void FeatureGenerator::OnPrediction(
   }
 
   // erase obstacle history if obstacle not exist in current predictio msg
+  /* comment out to relax this check for now
   std::unordered_map<int, std::list<PerceptionObstacleFeature>>::iterator
       it = obstacle_history_map_.begin();
   while (it != obstacle_history_map_.end()) {
@@ -169,6 +170,7 @@ void FeatureGenerator::OnPrediction(
       ++it;
     }
   }
+  */
 
   // add to obstacle history
   for (const auto& m : prediction_obstacles_map_) {
