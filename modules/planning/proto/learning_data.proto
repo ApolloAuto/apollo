@@ -69,26 +69,6 @@ message LocalizationFeature {
   optional apollo.common.Point3D angular_velocity = 5;
 }
 
-// based on apollo.perception.PerceptionObstacle
-message PerceptionObstacleFeature {
-  optional double timestamp_sec = 1;
-
-  // obstacle position in the OBJECT coordinate system
-  optional apollo.common.Point3D position = 2;
-
-  // heading in RELATIVE coordinate to ADC
-  optional double theta = 3;
-
-  // obstacle velocity in RELATIVE coordinate to ADC
-  optional apollo.common.Point3D velocity = 4;  // obstacle velocity
-
-  // obstacle acceleration in RELATIVE coordinate to ADC
-  optional apollo.common.Point3D acceleration = 5;
-
-  // obstacle corner points in RELATIVE coordinate to ADC
-  repeated apollo.common.Point3D polygon_point = 6;
-}
-
 // based on apollo.common.PathPoint
 message PathPointFeature {
   // coordinates
@@ -118,6 +98,31 @@ message TrajectoryPointFeature {
   optional apollo.common.GaussianInfo gaussian_info = 5;
 }
 
+// based on apollo.perception.PerceptionObstacle
+message PerceptionObstacleFeature {
+  optional double timestamp_sec = 1;
+
+  // obstacle position in the OBJECT coordinate system
+  optional apollo.common.Point3D position = 2;
+
+  // heading in RELATIVE coordinate to ADC
+  optional double theta = 3;
+
+  // obstacle velocity in RELATIVE coordinate to ADC
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity
+
+  // obstacle acceleration in RELATIVE coordinate to ADC
+  optional apollo.common.Point3D acceleration = 5;
+
+  // obstacle corner points in RELATIVE coordinate to ADC
+  repeated apollo.common.Point3D polygon_point = 6;
+}
+
+message ObstacleTrajectoryFeature {
+  repeated PerceptionObstacleFeature perception_obstacle_history = 1;
+  repeated TrajectoryPointFeature evaluated_trajectory_point = 2;
+}
+
 // based on apollo.prediction.Trajectory
 message PredictionTrajectoryFeature {
   optional double probability = 1;  // probability of this trajectory
@@ -142,7 +147,7 @@ message ObstacleFeature {
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
   optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
-  repeated PerceptionObstacleFeature obstacle_trajectory_point = 6;
+  optional ObstacleTrajectoryFeature obstacle_trajectory = 6;
   optional PredictionObstacleFeature obstacle_prediction = 7;
 }
 
@@ -160,7 +165,7 @@ message TrafficLightFeature {
 message ADCTrajectoryPoint {
   optional double timestamp_sec = 1;  // localization measurement_time
   optional PlanningTag planning_tag = 2;
-  optional apollo.common.TrajectoryPoint trajectory_point = 3;
+  optional TrajectoryPointFeature trajectory_point = 3;
 }
 
 message LearningOutput {

@@ -65,9 +65,10 @@ void Evaluator::Close() {
 }
 
 void Evaluator::EvaluateTrajectoryByTime(
-    const std::vector<std::pair<double, TrajectoryPoint>>& trajectory,
+    const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
     const double delta_time,
-    std::vector<std::pair<double, TrajectoryPoint>>* evaluated_trajectory) {
+    std::vector<std::pair<double, TrajectoryPointFeature>>*
+        evaluated_trajectory) {
   if (trajectory.empty() ||
       fabs(trajectory.front().first - trajectory.back().first) < 1.0) {
     return;
@@ -79,17 +80,28 @@ void Evaluator::EvaluateTrajectoryByTime(
 
   std::vector<TrajectoryPoint> updated_trajectory;
   for (const auto& tp : trajectory) {
+    // TrajectoryPointFeature => common::Trajectory
     TrajectoryPoint trajectory_point;
-    trajectory_point.CopyFrom(tp.second);
+    auto path_point = trajectory_point.mutable_path_point();
+    path_point->set_x(tp.second.path_point().x());
+    path_point->set_y(tp.second.path_point().y());
+    path_point->set_z(tp.second.path_point().z());
+    path_point->set_theta(tp.second.path_point().theta());
+    path_point->set_s(tp.second.path_point().s());
+    path_point->set_lane_id(tp.second.path_point().lane_id());
+    trajectory_point.set_v(tp.second.v());
+    trajectory_point.set_a(tp.second.a());
     double relative_time = tp.first - start_point_timestamp_sec;
     trajectory_point.set_relative_time(relative_time);
+    trajectory_point.mutable_gaussian_info()->CopyFrom(
+        tp.second.gaussian_info());
     updated_trajectory.push_back(trajectory_point);
-  }
-  if (direction < 0) {
-    std::reverse(updated_trajectory.begin(), updated_trajectory.end());
   }
 
   DiscretizedTrajectory discretized_trajectory;
+  if (direction < 0) {
+    std::reverse(updated_trajectory.begin(), updated_trajectory.end());
+  }
   for (const auto& tp : updated_trajectory) {
     discretized_trajectory.AppendTrajectoryPoint(tp);
   }
@@ -98,7 +110,22 @@ void Evaluator::EvaluateTrajectoryByTime(
   double relative_time = 0.0;
   while ((direction > 0 && timestamp_sec < trajectory.back().first) ||
       (direction < 0 && timestamp_sec > trajectory.back().first)) {
-    auto trajectory_point = discretized_trajectory.Evaluate(relative_time);
+    auto tp = discretized_trajectory.Evaluate(relative_time);
+
+    // common::TrajectoryPoint => TrajectoryPointFeature
+    TrajectoryPointFeature trajectory_point;
+    trajectory_point.mutable_path_point()->set_x(tp.path_point().x());
+    trajectory_point.mutable_path_point()->set_y(tp.path_point().y());
+    trajectory_point.mutable_path_point()->set_z(tp.path_point().z());
+    trajectory_point.mutable_path_point()->set_theta(tp.path_point().theta());
+    trajectory_point.mutable_path_point()->set_s(tp.path_point().s());
+    trajectory_point.mutable_path_point()->set_lane_id(
+        tp.path_point().lane_id());
+    trajectory_point.set_v(tp.v());
+    trajectory_point.set_a(tp.a());
+    trajectory_point.set_relative_time(tp.relative_time());
+    trajectory_point.mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
+
     evaluated_trajectory->push_back(
         std::make_pair(timestamp_sec, trajectory_point));
     timestamp_sec += direction * delta_time;
@@ -108,7 +135,7 @@ void Evaluator::EvaluateTrajectoryByTime(
 
 void Evaluator::EvaluateADCTrajectory(
     LearningDataFrame* learning_data_frame) {
-  std::vector<std::pair<double, TrajectoryPoint>> trajectory;
+  std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
   for (int i = 0; i < learning_data_frame->adc_trajectory_point_size(); i++) {
     ADCTrajectoryPoint adc_tp =
         learning_data_frame->adc_trajectory_point(i);
@@ -116,7 +143,7 @@ void Evaluator::EvaluateADCTrajectory(
                                         adc_tp.trajectory_point()));
   }
 
-  std::vector<std::pair<double, TrajectoryPoint>> evaluated_trajectory;
+  std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
                            FLAGS_trajectory_delta_t,
                            &evaluated_trajectory);
@@ -135,7 +162,7 @@ void Evaluator::EvaluateADCTrajectory(
 
 void Evaluator::EvaluateADCFutureTrajectory(
     LearningDataFrame* learning_data_frame) {
-  std::vector<std::pair<double, TrajectoryPoint>> trajectory;
+  std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
   for (int i = 0; i <
       learning_data_frame->output().adc_future_trajectory_point_size(); i++) {
     ADCTrajectoryPoint adc_tp =
@@ -144,7 +171,7 @@ void Evaluator::EvaluateADCFutureTrajectory(
                                         adc_tp.trajectory_point()));
   }
 
-  std::vector<std::pair<double, TrajectoryPoint>> evaluated_trajectory;
+  std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
                             FLAGS_trajectory_delta_t,
                             &evaluated_trajectory);
