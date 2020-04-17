@@ -36,12 +36,17 @@ class Evaluator {
  private:
   void EvaluateTrajectoryByTime(
       const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
-      const double relative_time,
+      const double start_point_timestamp_sec,
+      const double delta_time,
       std::vector<std::pair<double, TrajectoryPointFeature>>*
           evaluated_trajectory);
 
   void EvaluateADCTrajectory(LearningDataFrame* learning_data_frame);
+
   void EvaluateADCFutureTrajectory(LearningDataFrame* learning_data_frame);
+
+  void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
+                                  LearningDataFrame* learning_data_frame);
 
   void WriteOutLearningData(const LearningData& learning_data);
 
