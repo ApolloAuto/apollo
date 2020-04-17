@@ -65,7 +65,7 @@ class FeatureGenerator {
 
   void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
-  void GenerateObstacleTrajectoryPoint(
+  void GenerateObstacleTrajectory(
       const int obstacle_id,
       const ADCCurrentInfo& adc_curr_info,
       ObstacleFeature* obstacle_feature);
