@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 // #include "cyber/common/file.h"
@@ -34,9 +35,14 @@ class Evaluator {
 
  private:
   void EvaluateTrajectoryByTime(
-      const std::vector<common::TrajectoryPoint> &trajectory,
-      const double relative_time);
-  void EvaluateADCTrajectory();
+      const std::vector<std::pair<double, common::TrajectoryPoint>>&
+          trajectory,
+      const double relative_time,
+      std::vector<std::pair<double, common::TrajectoryPoint>>*
+          evaluated_trajectory);
+
+  void EvaluateADCTrajectory(LearningDataFrame* learning_data_frame);
+  void EvaluateADCFutureTrajectory(LearningDataFrame* learning_data_frame);
 
   void WriteOutLearningData(const LearningData& learning_data);
 
