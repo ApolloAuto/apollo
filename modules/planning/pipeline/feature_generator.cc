@@ -81,7 +81,7 @@ void FeatureGenerator::WriteOutLearningData(
     record_file_name_ = "00000";
   }
   const std::string file_name = absl::StrCat(
-      FLAGS_planning_data_dir, record_file_name_, ".",
+      FLAGS_planning_data_dir, "/", record_file_name_, ".",
       learning_data_file_index, ".bin");
   if (FLAGS_enable_binary_learning_data) {
     cyber::common::SetProtoToBinaryFile(learning_data, file_name);
@@ -285,15 +285,16 @@ void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
   adc_curr_info->adc_cur_heading_ = adc_cur_pose.heading();
 }
 
-void FeatureGenerator::GenerateObstacleTrajectoryPoint(
+void FeatureGenerator::GenerateObstacleTrajectory(
     const int obstacle_id,
     const ADCCurrentInfo& adc_curr_info,
     ObstacleFeature* obstacle_feature) {
+  auto obstacle_trajectory = obstacle_feature->mutable_obstacle_trajectory();
   const auto& obstacle_history = obstacle_history_map_[obstacle_id];
   for (const auto& obj_traj_point : obstacle_history) {
-    auto obstacle_trajectory_point =
-        obstacle_feature->add_obstacle_trajectory_point();
-    obstacle_trajectory_point->set_timestamp_sec(
+    auto perception_obstacle_history =
+        obstacle_trajectory->add_perception_obstacle_history();
+    perception_obstacle_history->set_timestamp_sec(
         obj_traj_point.timestamp_sec());
 
     // convert position to relative coordinate
@@ -303,7 +304,7 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
                            obj_traj_point.position().y()),
             adc_curr_info.adc_cur_position_,
             adc_curr_info.adc_cur_heading_);
-    auto position = obstacle_trajectory_point->mutable_position();
+    auto position = perception_obstacle_history->mutable_position();
     position->set_x(relative_posistion.first);
     position->set_y(relative_posistion.second);
 
@@ -311,7 +312,7 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
     const double relative_theta =
         util::WorldAngleToObjAngle(obj_traj_point.theta(),
                                      adc_curr_info.adc_cur_heading_);
-    obstacle_trajectory_point->set_theta(relative_theta);
+    perception_obstacle_history->set_theta(relative_theta);
 
     // convert velocity to relative coordinate
     const auto& relative_velocity =
@@ -320,7 +321,7 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
                            obj_traj_point.velocity().y()),
             adc_curr_info.adc_cur_velocity_,
             adc_curr_info.adc_cur_heading_);
-    auto velocity = obstacle_trajectory_point->mutable_velocity();
+    auto velocity = perception_obstacle_history->mutable_velocity();
     velocity->set_x(relative_velocity.first);
     velocity->set_y(relative_velocity.second);
 
@@ -331,7 +332,7 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
                            obj_traj_point.acceleration().y()),
             adc_curr_info.adc_cur_acc_,
             adc_curr_info.adc_cur_heading_);
-    auto acceleration = obstacle_trajectory_point->mutable_acceleration();
+    auto acceleration = perception_obstacle_history->mutable_acceleration();
     acceleration->set_x(relative_acc.first);
     acceleration->set_y(relative_acc.second);
 
@@ -344,7 +345,7 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
                              obj_traj_point.polygon_point(i).y()),
               adc_curr_info.adc_cur_position_,
               adc_curr_info.adc_cur_heading_);
-      auto polygon_point = obstacle_trajectory_point->add_polygon_point();
+      auto polygon_point = perception_obstacle_history->add_polygon_point();
       polygon_point->set_x(relative_point.first);
       polygon_point->set_y(relative_point.second);
     }
@@ -370,6 +371,7 @@ void FeatureGenerator::GenerateObstaclePrediction(
     auto trajectory = obstacle_prediction->add_trajectory();
     trajectory->set_probability(obstacle_trajectory.probability());
 
+    // TrajectoryPoint
     for (int j = 0; j < obstacle_trajectory.trajectory_point_size(); ++j) {
       const auto& obstacle_trajectory_point =
           obstacle_trajectory.trajectory_point(j);
@@ -423,7 +425,7 @@ void FeatureGenerator::GenerateObstacleFeature(
     obstacle_feature->set_type(perception_obstale.type());
 
     // obstacle history trajectory points
-    GenerateObstacleTrajectoryPoint(m.first, adc_curr_info, obstacle_feature);
+    GenerateObstacleTrajectory(m.first, adc_curr_info, obstacle_feature);
 
     // obstacle prediction
     GenerateObstaclePrediction(m.second, adc_curr_info, obstacle_feature);
