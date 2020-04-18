@@ -16,8 +16,6 @@
 
 #include "modules/planning/pipeline/evaluator.h"
 
-#include <string>
-
 #include "cyber/common/file.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
@@ -25,7 +23,7 @@ DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
               "Prefix of files to store learning_data_frame data");
 DEFINE_double(trajectory_delta_t, 0.2,
              "delta time(sec) between trajectory points");
-DEFINE_bool(enable_obstacle_trajectory, true,
+DEFINE_bool(enable_evaluate_obstacle_trajectory, true,
             "enable obstacle_trajectory evaluation by time");
 
 namespace apollo {
@@ -45,20 +43,23 @@ void Evaluator::Evaluate(const std::string& source_file) {
 
   for (int i = 0; i < learning_data_.learning_data_size(); ++i) {
     auto learning_data_frame = learning_data_.mutable_learning_data(i);
+    if (learning_data_frame->adc_trajectory_point_size() <= 0) {
+      continue;
+    }
+    const double start_point_timestamp_sec =
+        learning_data_frame->adc_trajectory_point(0).timestamp_sec();
 
     // evaluate adc trajectory
-    EvaluateADCTrajectory(learning_data_frame);
+    EvaluateADCTrajectory(start_point_timestamp_sec,
+                          learning_data_frame);
 
     // evaluate adc future trajectory
-    EvaluateADCFutureTrajectory(learning_data_frame);
+    EvaluateADCFutureTrajectory(start_point_timestamp_sec,
+                                learning_data_frame);
 
     // evaluate obstacle trajectory
-    if (learning_data_frame->adc_trajectory_point_size() > 0) {
-      double start_point_timestamp_sec =
-          learning_data_frame->adc_trajectory_point(0).timestamp_sec();
-      EvaluateObstacleTrajectory(start_point_timestamp_sec,
-                                 learning_data_frame);
-    }
+    EvaluateObstacleTrajectory(start_point_timestamp_sec,
+                               learning_data_frame);
   }
 
   WriteOutLearningData(source_filename, learning_data_);
@@ -72,7 +73,6 @@ void Evaluator::WriteOutLearningData(
 
   const std::string file =
       FLAGS_planning_data_dir + source_filename;
-  AERROR << "+++++: " << file;
   cyber::common::SetProtoToBinaryFile(learning_data, file);
   cyber::common::SetProtoToASCIIFile(learning_data, file + ".txt");
   learning_data_.Clear();
@@ -91,9 +91,6 @@ void Evaluator::EvaluateTrajectoryByTime(
       fabs(trajectory.front().first - trajectory.back().first) < 1.0) {
     return;
   }
-
-  int direction =
-      (trajectory.front().first < trajectory.back().first) ? 1 : -1;
 
   std::vector<TrajectoryPoint> updated_trajectory;
   for (const auto& tp : trajectory) {
@@ -115,18 +112,22 @@ void Evaluator::EvaluateTrajectoryByTime(
     updated_trajectory.push_back(trajectory_point);
   }
 
-  DiscretizedTrajectory discretized_trajectory;
-  if (direction < 0) {
+  if (trajectory.front().first > trajectory.back().first) {
     std::reverse(updated_trajectory.begin(), updated_trajectory.end());
   }
+  DiscretizedTrajectory discretized_trajectory;
   for (const auto& tp : updated_trajectory) {
     discretized_trajectory.AppendTrajectoryPoint(tp);
   }
 
-  double timestamp_sec = start_point_timestamp_sec;
-  double relative_time = 0.0;
-  while ((direction > 0 && timestamp_sec < trajectory.back().first) ||
-      (direction < 0 && timestamp_sec > trajectory.back().first)) {
+  const int low_bound =
+      ceil(updated_trajectory.front().relative_time() / delta_time);
+  const int high_bound =
+      floor(updated_trajectory.back().relative_time() / delta_time);
+  ADEBUG << "low[" << low_bound << "] high[" << high_bound << "]";
+  for (int i = low_bound; i <= high_bound; ++i) {
+    double timestamp_sec = start_point_timestamp_sec + i * delta_time;
+    double relative_time = i * delta_time;
     auto tp = discretized_trajectory.Evaluate(relative_time);
 
     // common::TrajectoryPoint => TrajectoryPointFeature
@@ -145,12 +146,11 @@ void Evaluator::EvaluateTrajectoryByTime(
 
     evaluated_trajectory->push_back(
         std::make_pair(timestamp_sec, trajectory_point));
-    timestamp_sec += direction * delta_time;
-    relative_time += direction * delta_time;
   }
 }
 
 void Evaluator::EvaluateADCTrajectory(
+    const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
   std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
   for (int i = 0; i < learning_data_frame->adc_trajectory_point_size(); i++) {
@@ -167,7 +167,7 @@ void Evaluator::EvaluateADCTrajectory(
 
   std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
-                           trajectory.front().first,
+                           start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
                            &evaluated_trajectory);
   ADEBUG << "orig adc_trajectory["
@@ -184,6 +184,7 @@ void Evaluator::EvaluateADCTrajectory(
 }
 
 void Evaluator::EvaluateADCFutureTrajectory(
+    const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
   std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
   for (int i = 0; i <
@@ -201,7 +202,7 @@ void Evaluator::EvaluateADCFutureTrajectory(
 
   std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
-                           trajectory.front().first,
+                           start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
                            &evaluated_trajectory);
 
@@ -224,14 +225,13 @@ void Evaluator::EvaluateADCFutureTrajectory(
 void Evaluator::EvaluateObstacleTrajectory(
     const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
-  if (!FLAGS_enable_obstacle_trajectory) {
+  if (!FLAGS_enable_evaluate_obstacle_trajectory) {
     return;
   }
 
   for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
     const auto obstacle_trajectory =
         learning_data_frame->obstacle(i).obstacle_trajectory();
-
     std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
     for (int j = 0; j <
         obstacle_trajectory.perception_obstacle_history_size(); ++j) {

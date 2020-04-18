@@ -19,8 +19,6 @@
 #include <utility>
 #include <vector>
 
-// #include "cyber/common/file.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 
 namespace apollo {
@@ -41,9 +39,11 @@ class Evaluator {
       std::vector<std::pair<double, TrajectoryPointFeature>>*
           evaluated_trajectory);
 
-  void EvaluateADCTrajectory(LearningDataFrame* learning_data_frame);
+  void EvaluateADCTrajectory(const double start_point_timestamp_sec,
+                             LearningDataFrame* learning_data_frame);
 
-  void EvaluateADCFutureTrajectory(LearningDataFrame* learning_data_frame);
+  void EvaluateADCFutureTrajectory(const double start_point_timestamp_sec,
+                                   LearningDataFrame* learning_data_frame);
 
   void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
                                   LearningDataFrame* learning_data_frame);
