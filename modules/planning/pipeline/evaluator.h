@@ -48,10 +48,10 @@ class Evaluator {
   void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
                                   LearningDataFrame* learning_data_frame);
 
-  void WriteOutLearningData(const LearningData& learning_data);
+  void WriteOutLearningData(const std::string& source_filename,
+                            const LearningData& learning_data);
 
  private:
-  std::string source_filename_;
   LearningData learning_data_;
 };
 

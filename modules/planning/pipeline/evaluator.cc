@@ -37,10 +37,12 @@ void Evaluator::Init() {
 }
 
 void Evaluator::Evaluate(const std::string& source_file) {
-  source_filename_ =
+  const std::string& source_filename =
       source_file.substr(source_file.find_last_of("/") + 1);
+
   cyber::common::GetProtoFromFile(source_file,
                                   &learning_data_);
+
   for (int i = 0; i < learning_data_.learning_data_size(); ++i) {
     auto learning_data_frame = learning_data_.mutable_learning_data(i);
 
@@ -58,19 +60,25 @@ void Evaluator::Evaluate(const std::string& source_file) {
                                  learning_data_frame);
     }
   }
+
+  WriteOutLearningData(source_filename, learning_data_);
 }
 
 void Evaluator::WriteOutLearningData(
+    const std::string& source_filename,
     const LearningData& learning_data) {
   const std::string file_name =
-      FLAGS_planning_data_dir + source_filename_;
-  cyber::common::SetProtoToBinaryFile(learning_data, file_name);
-  cyber::common::SetProtoToASCIIFile(learning_data, file_name + ".txt");
+      FLAGS_planning_data_dir + "/" + source_filename;
+
+  const std::string file =
+      FLAGS_planning_data_dir + source_filename;
+  AERROR << "+++++: " << file;
+  cyber::common::SetProtoToBinaryFile(learning_data, file);
+  cyber::common::SetProtoToASCIIFile(learning_data, file + ".txt");
   learning_data_.Clear();
 }
 
 void Evaluator::Close() {
-  WriteOutLearningData(learning_data_);
 }
 
 void Evaluator::EvaluateTrajectoryByTime(
