@@ -9731,6 +9731,18 @@
                 }
               }
             },
+            "ParkingInfo": {
+              "fields": {
+                "parkingSpaceId": {
+                  "type": "string",
+                  "id": 1
+                },
+                "parkingPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 2
+                }
+              }
+            },
             "RoutingRequest": {
               "fields": {
                 "header": {
@@ -9761,7 +9773,14 @@
                 },
                 "parkingSpace": {
                   "type": "apollo.hdmap.ParkingSpace",
-                  "id": 6
+                  "id": 6,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "parkingInfo": {
+                  "type": "ParkingInfo",
+                  "id": 7
                 }
               }
             },
@@ -11567,6 +11586,155 @@
                   "rule": "required",
                   "type": "double",
                   "id": 2
+                }
+              }
+            },
+            "ObstacleIntent": {
+              "fields": {
+                "type": {
+                  "type": "Type",
+                  "id": 1,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "STOP": 1,
+                    "STATIONARY": 2,
+                    "MOVING": 3,
+                    "CHANGE_LANE": 4,
+                    "LOW_ACCELERATION": 5,
+                    "HIGH_ACCELERATION": 6,
+                    "LOW_DECELERATION": 7,
+                    "HIGH_DECELERATION": 8
+                  }
+                }
+              }
+            },
+            "Intent": {
+              "fields": {
+                "type": {
+                  "type": "Type",
+                  "id": 1,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "STOP": 1,
+                    "CRUISE": 2,
+                    "CHANGE_LANE": 3
+                  }
+                }
+              }
+            },
+            "PredictionObstacle": {
+              "fields": {
+                "perceptionObstacle": {
+                  "type": "apollo.perception.PerceptionObstacle",
+                  "id": 1
+                },
+                "timestamp": {
+                  "type": "double",
+                  "id": 2
+                },
+                "predictedPeriod": {
+                  "type": "double",
+                  "id": 3
+                },
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "Trajectory",
+                  "id": 4
+                },
+                "intent": {
+                  "type": "ObstacleIntent",
+                  "id": 5
+                },
+                "priority": {
+                  "type": "ObstaclePriority",
+                  "id": 6
+                },
+                "isStatic": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "feature": {
+                  "rule": "repeated",
+                  "type": "Feature",
+                  "id": 8
+                }
+              }
+            },
+            "PredictionObstacles": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "predictionObstacle": {
+                  "rule": "repeated",
+                  "type": "PredictionObstacle",
+                  "id": 2
+                },
+                "perceptionErrorCode": {
+                  "type": "apollo.common.ErrorCode",
+                  "id": 3
+                },
+                "startTimestamp": {
+                  "type": "double",
+                  "id": 4
+                },
+                "endTimestamp": {
+                  "type": "double",
+                  "id": 5
+                },
+                "intent": {
+                  "type": "Intent",
+                  "id": 6
+                },
+                "scenario": {
+                  "type": "Scenario",
+                  "id": 7
+                }
+              }
+            },
+            "Scenario": {
+              "fields": {
+                "type": {
+                  "type": "Type",
+                  "id": 1,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                },
+                "junctionId": {
+                  "type": "string",
+                  "id": 2
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "CRUISE": 1000,
+                    "CRUISE_URBAN": 1001,
+                    "CRUISE_HIGHWAY": 1002,
+                    "JUNCTION": 2000,
+                    "JUNCTION_TRAFFIC_LIGHT": 2001,
+                    "JUNCTION_STOP_SIGN": 2002
+                  }
                 }
               }
             }

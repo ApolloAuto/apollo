@@ -1,16 +1,14 @@
-import * as THREE from "three";
 import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
 
 import routingPointPin from "assets/images/routing/pin.png";
 
-import STORE from "store";
 import WS from "store/websocket";
 import { drawImage } from "utils/draw";
 
 export default class RoutingEditor {
     constructor() {
         this.routePoints = [];
-        this.parkingSpaceId = null;
+        this.parkingInfo = null;
         this.inEditingMode = false;
         this.pointId = 0;
     }
@@ -34,7 +32,7 @@ export default class RoutingEditor {
     disableEditingMode(scene) {
         this.inEditingMode = false;
         this.removeAllRoutePoints(scene);
-        this.parkingSpaceId = null;
+        this.parkingInfo = null;
         this.pointId = 0;
     }
 
@@ -49,8 +47,8 @@ export default class RoutingEditor {
         WS.checkRoutingPoint(point);
     }
 
-    setParkingSpaceId(id) {
-        this.parkingSpaceId = id;
+    setParkingInfo(info) {
+        this.parkingInfo = info;
     }
 
     removeInvalidRoutingPoint(pointId, msg, scene) {
@@ -105,7 +103,7 @@ export default class RoutingEditor {
         const start_heading  = (points.length > 1) ? null : carHeading;
         const end      = points[points.length-1];
         const waypoint = (points.length > 1) ? points.slice(1,-1) : [];
-        WS.requestRoute(start, start_heading, waypoint, end, this.parkingSpaceId);
+        WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
 
         return true;
     }

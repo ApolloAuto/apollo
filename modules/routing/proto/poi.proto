@@ -2,12 +2,14 @@ syntax = "proto2";
 
 package apollo.routing;
 
+import "modules/common/proto/geometry.proto";
 import "modules/routing/proto/routing.proto";
 
 message Landmark {
   optional string name = 1;
   repeated LaneWaypoint waypoint = 2;
-  optional string parking_space_id = 3;
+  optional string parking_space_id = 3 [deprecated = true];
+  optional apollo.routing.ParkingInfo parking_info = 4;
 }
 
 message POI {
