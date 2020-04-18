@@ -60,6 +60,10 @@ void Evaluator::Evaluate(const std::string& source_file) {
     // evaluate obstacle trajectory
     EvaluateObstacleTrajectory(start_point_timestamp_sec,
                                learning_data_frame);
+
+    // evaluate obstacle prediction trajectory
+    EvaluateObstaclePredictionTrajectory(start_point_timestamp_sec,
+                                         learning_data_frame);
   }
 
   WriteOutLearningData(source_filename, learning_data_);
@@ -291,6 +295,64 @@ void Evaluator::EvaluateObstacleTrajectory(
                              ->mutable_obstacle_trajectory()
                              ->add_evaluated_trajectory_point();
       evaluated_trajectory_point->CopyFrom(tp.second);
+    }
+  }
+}
+
+void Evaluator::EvaluateObstaclePredictionTrajectory(
+    const double start_point_timestamp_sec,
+    LearningDataFrame* learning_data_frame) {
+  if (!FLAGS_enable_evaluate_obstacle_trajectory) {
+    return;
+  }
+
+  for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
+    const auto obstacle_prediction =
+         learning_data_frame->obstacle(i).obstacle_prediction();
+
+    for (int j = 0; j < obstacle_prediction.trajectory_size(); ++j) {
+      const auto obstacle_prediction_trajectory =
+          obstacle_prediction.trajectory(j);
+
+      std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
+      for (int k = 0; k <
+          obstacle_prediction_trajectory.trajectory_point_size(); ++k) {
+        const double timestamp_sec = obstacle_prediction.timestamp_sec() +
+            obstacle_prediction_trajectory.trajectory_point(k).relative_time();
+        trajectory.push_back(std::make_pair(
+            timestamp_sec,
+            obstacle_prediction_trajectory.trajectory_point(k)));
+      }
+      if (trajectory.size() < 3 ||
+          fabs(trajectory.front().first - trajectory.back().first) <=
+              FLAGS_trajectory_delta_t) {
+        continue;
+      }
+
+      std::vector<std::pair<double, TrajectoryPointFeature>>
+          evaluated_trajectory;
+      EvaluateTrajectoryByTime(trajectory,
+                               start_point_timestamp_sec,
+                               FLAGS_trajectory_delta_t,
+                               &evaluated_trajectory);
+
+      ADEBUG << "orig obstacle_prediction_trajectory["
+             << obstacle_prediction_trajectory.trajectory_point_size()
+             << "] evaluated[" << evaluated_trajectory.size() << "]";
+
+      // update learning_data
+      learning_data_frame->mutable_obstacle(i)
+                         ->mutable_obstacle_prediction()
+                         ->mutable_trajectory(j)
+                         ->clear_trajectory_point();
+      for (const auto& tp : evaluated_trajectory) {
+        auto obstacle_prediction_trajectory_point =
+            learning_data_frame->mutable_obstacle(i)
+                               ->mutable_obstacle_prediction()
+                               ->mutable_trajectory(j)
+                               ->add_trajectory_point();
+        obstacle_prediction_trajectory_point->CopyFrom(tp.second);
+      }
     }
   }
 }
