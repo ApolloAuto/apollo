@@ -47,7 +47,10 @@ void Evaluator::Evaluate(const std::string& source_file) {
       continue;
     }
     const double start_point_timestamp_sec =
-        learning_data_frame->adc_trajectory_point(0).timestamp_sec();
+        learning_data_frame
+            ->adc_trajectory_point(
+                learning_data_frame->adc_trajectory_point_size()-1)
+            .timestamp_sec();
 
     // evaluate adc trajectory
     EvaluateADCTrajectory(start_point_timestamp_sec,
@@ -72,11 +75,8 @@ void Evaluator::Evaluate(const std::string& source_file) {
 void Evaluator::WriteOutLearningData(
     const std::string& source_filename,
     const LearningData& learning_data) {
-  const std::string file_name =
-      FLAGS_planning_data_dir + "/" + source_filename;
-
   const std::string file =
-      FLAGS_planning_data_dir + source_filename;
+      FLAGS_planning_data_dir + "/" + source_filename;
   cyber::common::SetProtoToBinaryFile(learning_data, file);
   cyber::common::SetProtoToASCIIFile(learning_data, file + ".txt");
   learning_data_.Clear();
