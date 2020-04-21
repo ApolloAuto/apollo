@@ -200,20 +200,24 @@ void FeatureGenerator::OnPrediction(
   }
 }
 
-void FeatureGenerator::OnTafficLightDetection(
+void FeatureGenerator::OnTrafficLightDetection(
     const TrafficLightDetection& traffic_light_detection) {
   // AINFO << "traffic_light_detection received at frame["
   //      << total_learning_data_frame_num_ << "]";
+  traffic_light_detection_timestamp_ =
+      traffic_light_detection.header().timestamp_sec();
   traffic_lights_.clear();
   for (int i = 0; i < traffic_light_detection.traffic_light_size(); ++i) {
-    const auto& traffic_light_id =
-        traffic_light_detection.traffic_light(i).id();
-    if (traffic_light_id.empty()) continue;
-
-    // AINFO << "  traffic_light_id[" << traffic_light_id << "] color["
-    //       << traffic_light_detection.traffic_light(i).color() << "]";
-    traffic_lights_[traffic_light_id] =
-        traffic_light_detection.traffic_light(i).color();
+    TrafficLightFeature traffic_light;
+    traffic_light.set_color(traffic_light_detection.traffic_light(i).color());
+    traffic_light.set_id(traffic_light_detection.traffic_light(i).id());
+    traffic_light.set_confidence(
+        traffic_light_detection.traffic_light(i).confidence());
+    traffic_light.set_tracking_time(
+        traffic_light_detection.traffic_light(i).tracking_time());
+    traffic_light.set_remaining_time(
+        traffic_light_detection.traffic_light(i).remaining_time());
+    traffic_lights_.push_back(traffic_light);
   }
 }
 
@@ -473,6 +477,19 @@ void FeatureGenerator::GenerateRoutingFeature(
   }
 }
 
+void FeatureGenerator::GenerateTrafficLightDetectionFeature(
+    LearningDataFrame* learning_data_frame) {
+  auto traffic_light_detection =
+      learning_data_frame->mutable_traffic_light_detection();
+  traffic_light_detection->set_timestamp_sec(
+      traffic_light_detection_timestamp_);
+  traffic_light_detection->clear_traffic_light();
+  for (const auto& tl : traffic_lights_) {
+    auto traffic_light = traffic_light_detection->add_traffic_light();
+    traffic_light->CopyFrom(tl);
+  }
+}
+
 void FeatureGenerator::GenerateADCTrajectoryPoints(
     const std::list<LocalizationEstimate>& localizations,
     LearningDataFrame* learning_data_frame) {
@@ -712,13 +729,9 @@ void FeatureGenerator::GenerateLearningDataFrame() {
       pose.linear_acceleration());
   localization->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
 
+
   // add traffic_light
-  learning_data_frame->clear_traffic_light();
-  for (const auto& tl : traffic_lights_) {
-    auto traffic_light = learning_data_frame->add_traffic_light();
-    traffic_light->set_id(tl.first);
-    traffic_light->set_color(tl.second);
-  }
+  GenerateTrafficLightDetectionFeature(learning_data_frame);
 
   // add routing
   GenerateRoutingFeature(routing_index, learning_data_frame);
@@ -769,7 +782,7 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
     } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
       TrafficLightDetection traffic_light_detection;
       if (traffic_light_detection.ParseFromString(message.content)) {
-        OnTafficLightDetection(traffic_light_detection);
+        OnTrafficLightDetection(traffic_light_detection);
       }
     }
   }

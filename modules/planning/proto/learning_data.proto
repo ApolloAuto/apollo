@@ -162,8 +162,17 @@ message RoutingFeature {
 
 // based on apollo.perception.TrafficLight
 message TrafficLightFeature {
-  optional string id = 1;
-  optional apollo.perception.TrafficLight.Color color = 2;
+  optional apollo.perception.TrafficLight.Color color = 1;
+  optional string id = 2;
+  optional double confidence = 3 [default = 1.0];
+  optional double tracking_time = 4;
+  optional bool blink = 5;
+  optional double remaining_time = 6;
+}
+
+message TrafficLightDetectionFeature {
+  optional double timestamp_sec = 1;
+  repeated TrafficLightFeature traffic_light = 2;
 }
 
 message ADCTrajectoryPoint {
@@ -197,7 +206,7 @@ message LearningDataFrame {
   optional RoutingFeature routing = 8;
 
   // Features from traffic_light_detection
-  repeated TrafficLightFeature traffic_light = 9;
+  optional TrafficLightDetectionFeature traffic_light_detection = 9;
 
   // ADC past trajectory
   repeated ADCTrajectoryPoint adc_trajectory_point = 10;

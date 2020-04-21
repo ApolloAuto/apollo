@@ -56,7 +56,7 @@ class FeatureGenerator {
       const apollo::prediction::PredictionObstacles& prediction_obstacles);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
-  void OnTafficLightDetection(
+  void OnTrafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
   apollo::hdmap::LaneInfoConstPtr GetLane(
@@ -79,6 +79,9 @@ class FeatureGenerator {
 
   void GenerateRoutingFeature(const int routing_index,
                               LearningDataFrame* learning_data_frame);
+
+  void GenerateTrafficLightDetectionFeature(
+      LearningDataFrame* learning_data_frame);
 
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
@@ -104,8 +107,8 @@ class FeatureGenerator {
   std::string map_name_;
   std::vector<OverlapFeature> overlaps_;
   std::vector<std::pair<std::string, double>> routing_lane_segment_;
-  std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
-        traffic_lights_;
+  double traffic_light_detection_timestamp_;
+  std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;
 };
 
