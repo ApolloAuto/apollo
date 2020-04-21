@@ -140,6 +140,7 @@ void FeatureGenerator::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
 }
 
 void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
+  chassis_feature_.set_timestamp_sec(chassis.header().timestamp_sec());
   chassis_feature_.set_speed_mps(chassis.speed_mps());
   chassis_feature_.set_throttle_percentage(chassis.throttle_percentage());
   chassis_feature_.set_brake_percentage(chassis.brake_percentage());
@@ -203,7 +204,6 @@ void FeatureGenerator::OnTafficLightDetection(
     const TrafficLightDetection& traffic_light_detection) {
   // AINFO << "traffic_light_detection received at frame["
   //      << total_learning_data_frame_num_ << "]";
-
   traffic_lights_.clear();
   for (int i = 0; i < traffic_light_detection.traffic_light_size(); ++i) {
     const auto& traffic_light_id =
@@ -702,6 +702,8 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   // add localization
   auto localization = learning_data_frame->mutable_localization();
+  localization->set_timestamp_sec(
+      localizations_.back().header().timestamp_sec());
   const auto& pose = localizations_.back().pose();
   localization->mutable_position()->CopyFrom(pose.position());
   localization->set_heading(pose.heading());
