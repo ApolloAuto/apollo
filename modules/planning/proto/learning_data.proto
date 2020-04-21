@@ -27,46 +27,50 @@ message PlanningTag {
 }
 
 message ChassisFeature {
+  optional double timestamp_sec = 1;
+
   // Features from chassis
   // Vehicle Speed in meters per second.
-  optional float speed_mps = 1;
+  optional float speed_mps = 2;
 
   // Real throttle location in [%], ranging from 0 to 100.
-  optional float throttle_percentage = 2;
+  optional float throttle_percentage = 3;
 
   // Real brake location in [%], ranging from 0 to 100.
-  optional float brake_percentage = 3;
+  optional float brake_percentage = 4;
 
   // Real steering location in [%], ranging from -100 to 100.
   // steering_angle / max_steering_angle
   // Clockwise: negative
   // CountClockwise: positive
-  optional float steering_percentage = 4;
+  optional float steering_percentage = 5;
 
-  optional apollo.canbus.Chassis.GearPosition gear_location = 5;
+  optional apollo.canbus.Chassis.GearPosition gear_location = 6;
 }
 
 message LocalizationFeature {
+  optional double timestamp_sec = 1;
+
   // Position of the vehicle reference point (VRP) in the map reference frame.
   // The VRP is the center of rear axle.
-  optional apollo.common.PointENU position = 1;
+  optional apollo.common.PointENU position = 2;
 
   // Heading
   // The heading is zero when the car is facing East and positive when facing
   // North.
-  optional double heading = 2;
+  optional double heading = 3;
 
   // Linear velocity of the VRP in the map reference frame.
   // East/north/up in meters per second.
-  optional apollo.common.Point3D linear_velocity = 3;
+  optional apollo.common.Point3D linear_velocity = 4;
 
   // Linear acceleration of the VRP in the map reference frame.
   // East/north/up in meters per second.
-  optional apollo.common.Point3D linear_acceleration = 4;
+  optional apollo.common.Point3D linear_acceleration = 5;
 
   // Angular velocity of the vehicle in the map reference frame.
   // Around east/north/up axes in radians per second.
-  optional apollo.common.Point3D angular_velocity = 5;
+  optional apollo.common.Point3D angular_velocity = 6;
 }
 
 // based on apollo.common.PathPoint
