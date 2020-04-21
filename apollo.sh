@@ -107,7 +107,7 @@ function generate_build_targets() {
   *)
 #    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
     # FIXME(all): temporarily disable modules doesn't compile in 18.04
-    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/v2x/... except //modules/map/tools/map_datachecker/... $DISABLE_CYBER_MODULES`
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/v2x/... except //modules/map/tools/map_datachecker/... $DISABLE_CYBER_MODULES`
   esac
 
   if [ $? -ne 0 ]; then
