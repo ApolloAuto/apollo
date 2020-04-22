@@ -21,7 +21,6 @@ FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-#VERSION_X86_64="dev-18.04-x86_64-20191111_1530"
 VERSION_X86_64="dev-18.04-x86_64-20200505_0330"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
@@ -85,6 +84,12 @@ do
     fi
   fi
 done
+}
+function set_registry_mirrors()
+{
+sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
+sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
+service docker restart
 }
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
@@ -417,7 +422,9 @@ function main(){
     fi
     set +x
 
-    if [ "${USER}" != "root" ]; then
+    # User with uid=1000 or username=apollo excluded
+    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
+        && [[ $USER_ID -ne 1000 ]]; then
         docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
