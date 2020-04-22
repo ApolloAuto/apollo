@@ -10,7 +10,7 @@ launch_path="${CYBER_PATH}/tools/cyber_launch"
 channel_path="${CYBER_PATH}/tools/cyber_channel"
 node_path="${CYBER_PATH}/tools/cyber_node"
 service_path="${CYBER_PATH}/tools/cyber_service"
-qt_path=/usr/local/Qt5.5.1/5.5/gcc_64
+qt_path=/usr/local/Qt5.12.2/5.12.2/gcc_64
 rosbag_to_record_path="/apollo/bazel-bin/modules/data/tools/rosbag_to_record"
 
 export LD_LIBRARY_PATH=${qt_path}/lib:$LD_LIBRARY_PATH
