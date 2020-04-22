@@ -104,9 +104,14 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
   if (last_localization_timestamp_sec == 0.0) {
     last_localization_timestamp_sec = le.header().timestamp_sec();
   }
-  if (le.header().timestamp_sec() - last_localization_timestamp_sec <
-      1.0 / FLAGS_planning_freq) {
+  const double time_diff =
+      le.header().timestamp_sec() - last_localization_timestamp_sec;
+  if (time_diff < 1.0 / FLAGS_planning_freq) {
     return;
+  } else if (time_diff >= 1.0 / FLAGS_planning_freq * 2) {
+    AERROR << "missing localization too long: time_stamp["
+           << le.header().timestamp_sec()
+           << "] time_diff[" << time_diff << "]";
   }
   last_localization_timestamp_sec = le.header().timestamp_sec();
   localizations_.push_back(le);
@@ -292,6 +297,7 @@ void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
 }
 
 void FeatureGenerator::GenerateObstacleTrajectory(
+    const int frame_num,
     const int obstacle_id,
     const ADCCurrentInfo& adc_curr_info,
     ObstacleFeature* obstacle_feature) {
@@ -356,6 +362,11 @@ void FeatureGenerator::GenerateObstacleTrajectory(
       polygon_point->set_y(relative_point.second);
     }
   }
+  // if (obstacle_history.size() <= 0) {
+  //  AERROR << "obstacle has no history: frame_num["
+  //         << frame_num << "] obstacle_id[" << obstacle_id
+  //         << "] size[" << obstacle_history.size() << "]";
+  // }
 }
 
 void FeatureGenerator::GenerateObstaclePrediction(
@@ -420,6 +431,7 @@ void FeatureGenerator::GenerateObstacleFeature(
   ADCCurrentInfo adc_curr_info;
   GetADCCurrentInfo(&adc_curr_info);
 
+  const int frame_num = learning_data_frame->frame_num();
   for (const auto& m : prediction_obstacles_map_) {
     auto obstacle_feature = learning_data_frame->add_obstacle();
 
@@ -431,7 +443,8 @@ void FeatureGenerator::GenerateObstacleFeature(
     obstacle_feature->set_type(perception_obstale.type());
 
     // obstacle history trajectory points
-    GenerateObstacleTrajectory(m.first, adc_curr_info, obstacle_feature);
+    GenerateObstacleTrajectory(frame_num, m.first,
+                               adc_curr_info, obstacle_feature);
 
     // obstacle prediction
     GenerateObstaclePrediction(m.second, adc_curr_info, obstacle_feature);
@@ -695,7 +708,11 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
-
+  if (adc_trajectory_points.size() <= 3) {
+    AERROR << "too few adc_trajectory_points: frame_num["
+           << learning_data_frame->frame_num()
+           << "] size[" << adc_trajectory_points.size() << "]";
+  }
   // AINFO << "number of ADC trajectory points in one frame: "
   //      << trajectory_point_index;
 }
