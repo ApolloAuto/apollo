@@ -10,7 +10,7 @@ cc_library(
         "include/QtCore",
     ],
     linkopts = [
-        "-Wl,-rpath,/usr/local/Qt5.5.1/5.5/gcc_64/lib",
+        "-Wl,-rpath,/usr/local/Qt5.12.2/5.12.2/gcc_64/lib",
         "-lQt5Core",
     ],
     visibility = ["//visibility:public"],
@@ -26,7 +26,7 @@ cc_library(
     ],
     includes = ["include/QtWidgets"],
     linkopts = [
-        "-L/usr/local/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/usr/local/Qt5.12.2/5.12.2/gcc_64/lib",
         "-lQt5Widgets",
     ],
     visibility = ["//visibility:public"],
@@ -44,7 +44,7 @@ cc_library(
     ],
     includes = ["include/QtGui"],
     linkopts = [
-        "-L/usr/local/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/usr/local/Qt5.12.2/5.12.2/gcc_64/lib",
         "-lQt5Gui",
     ],
     visibility = ["//visibility:public"],
@@ -66,7 +66,7 @@ cc_library(
     ],
     includes = ["include/QtOpenGL"],
     linkopts = [
-        "-L/usr/local/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/usr/local/Qt5.12.2/5.12.2/gcc_64/lib",
         "-lQt5OpenGL",
     ],
     visibility = ["//visibility:public"],

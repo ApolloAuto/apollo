@@ -101,7 +101,7 @@ function set_lib_path() {
   fi
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/apollo/local_integ/lib
   export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
-  export LD_LIBRARY_PATH=/usr/local/Qt5.5.1/5.5/gcc_64/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/Qt5.12.2/5.12.2/gcc_64/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH
   if [ "$USE_GPU" != "1" ];then
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
