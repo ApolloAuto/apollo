@@ -92,7 +92,8 @@ void Evaluator::EvaluateTrajectoryByTime(
     std::vector<std::pair<double, TrajectoryPointFeature>>*
         evaluated_trajectory) {
   if (trajectory.empty() ||
-      fabs(trajectory.front().first - trajectory.back().first) < 1.0) {
+      fabs(trajectory.front().first - trajectory.back().first) <
+          FLAGS_trajectory_delta_t) {
     return;
   }
 
@@ -163,9 +164,26 @@ void Evaluator::EvaluateADCTrajectory(
     trajectory.push_back(std::make_pair(adc_tp.timestamp_sec(),
                                         adc_tp.trajectory_point()));
   }
-  if (trajectory.size() < 3 ||
-      fabs(trajectory.front().first - trajectory.back().first) <=
-          FLAGS_trajectory_delta_t) {
+
+  if (trajectory.size() <= 1) {
+    AERROR << "too few adc_trajectory_point. frame_num{"
+           << learning_data_frame->frame_num() << "] size["
+           << trajectory.size() << "]";
+    return;
+  }
+
+  learning_data_frame->clear_adc_trajectory_point();
+  if (fabs(trajectory.front().first - start_point_timestamp_sec) <=
+      FLAGS_trajectory_delta_t) {
+    auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
+    adc_trajectory_point->set_timestamp_sec(trajectory.back().first);
+    adc_trajectory_point->mutable_trajectory_point()->CopyFrom(
+        trajectory.back().second);
+
+    AERROR << "too short adc_trajectory. frame_num["
+           << learning_data_frame->frame_num() << "] size["
+           << trajectory.size() << "] timestamp_diff["
+           << start_point_timestamp_sec - trajectory.front().first << "]";
     return;
   }
 
@@ -173,13 +191,11 @@ void Evaluator::EvaluateADCTrajectory(
   EvaluateTrajectoryByTime(trajectory,
                            start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
-                           &evaluated_trajectory);
-  ADEBUG << "orig adc_trajectory["
-         << learning_data_frame->adc_trajectory_point_size()
+                            &evaluated_trajectory);
+  ADEBUG << "frame_num[" << learning_data_frame->frame_num()
+         << "] orig adc_trajectory[" << trajectory.size()
          << "] evaluated[" << evaluated_trajectory.size() << "]";
 
-  // update learning_data
-  learning_data_frame->clear_adc_trajectory_point();
   for (const auto& tp : evaluated_trajectory) {
     auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
     adc_trajectory_point->set_timestamp_sec(tp.first);
@@ -198,9 +214,20 @@ void Evaluator::EvaluateADCFutureTrajectory(
     trajectory.push_back(std::make_pair(adc_tp.timestamp_sec(),
                                         adc_tp.trajectory_point()));
   }
-  if (trajectory.size() < 3 ||
-      fabs(trajectory.front().first - trajectory.back().first) <=
-          FLAGS_trajectory_delta_t) {
+
+  learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
+  if (trajectory.size() <= 1) {
+    AERROR << "too short adc_future_trajectory. frame_num["
+           << learning_data_frame->frame_num() << "] size["
+           << trajectory.size() << "]";
+    return;
+  }
+  if (fabs(trajectory.back().first - start_point_timestamp_sec) <=
+      FLAGS_trajectory_delta_t) {
+    AERROR << "too short adc_future_trajectory. frame_num["
+           << learning_data_frame->frame_num() << "] size["
+           << trajectory.size() << "] timestamp_diff["
+           << trajectory.back().first - start_point_timestamp_sec << "]";
     return;
   }
 
@@ -210,12 +237,10 @@ void Evaluator::EvaluateADCFutureTrajectory(
                            FLAGS_trajectory_delta_t,
                            &evaluated_trajectory);
 
-  ADEBUG << "orig adc_future_trajectory["
-        << learning_data_frame->output().adc_future_trajectory_point_size()
-        << "] evaluated[" << evaluated_trajectory.size() << "]";
+  ADEBUG << "frame_num[" << learning_data_frame->frame_num()
+         << "] orig adc_future_trajectory[" << trajectory.size()
+         << "] evaluated[" << evaluated_trajectory.size() << "]";
 
-  // update learning_data
-  learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
   for (const auto& tp : evaluated_trajectory) {
     auto adc_future_trajectory_point =
         learning_data_frame->mutable_output()
@@ -234,6 +259,7 @@ void Evaluator::EvaluateObstacleTrajectory(
   }
 
   for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
+    const int obstacle_id = learning_data_frame->obstacle(i).id();
     const auto obstacle_trajectory =
         learning_data_frame->obstacle(i).obstacle_trajectory();
     std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
@@ -269,9 +295,13 @@ void Evaluator::EvaluateObstacleTrajectory(
       trajectory.push_back(std::make_pair(perception_obstacle.timestamp_sec(),
                                           trajectory_point));
     }
-    if (trajectory.size() < 3 ||
-        fabs(trajectory.front().first - trajectory.back().first) <=
-            FLAGS_trajectory_delta_t) {
+    if (fabs(trajectory.front().first - start_point_timestamp_sec) <=
+        FLAGS_trajectory_delta_t) {
+      ADEBUG << "too short obstacle_trajectory. frame_num["
+             << learning_data_frame->frame_num()
+             << "] obstacle_id[" << obstacle_id << "] size["
+             << trajectory.size() << "] timestamp_diff["
+             << start_point_timestamp_sec - trajectory.front().first << "]";
       continue;
     }
 
@@ -281,8 +311,9 @@ void Evaluator::EvaluateObstacleTrajectory(
                              FLAGS_trajectory_delta_t,
                              &evaluated_trajectory);
 
-    ADEBUG << "orig obstacle_trajectory["
-           << obstacle_trajectory.perception_obstacle_history_size()
+    ADEBUG << "frame_num[" << learning_data_frame->frame_num()
+           << "] obstacle_id[" << obstacle_id
+           << "] orig obstacle_trajectory[" << trajectory.size()
            << "] evaluated[" << evaluated_trajectory.size() << "]";
 
     // update learning_data
@@ -307,6 +338,7 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
   }
 
   for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
+    const int obstacle_id = learning_data_frame->obstacle(i).id();
     const auto obstacle_prediction =
          learning_data_frame->obstacle(i).obstacle_prediction();
 
@@ -323,9 +355,13 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
             timestamp_sec,
             obstacle_prediction_trajectory.trajectory_point(k)));
       }
-      if (trajectory.size() < 3 ||
-          fabs(trajectory.front().first - trajectory.back().first) <=
-              FLAGS_trajectory_delta_t) {
+      if (fabs(trajectory.back().first - start_point_timestamp_sec) <=
+          FLAGS_trajectory_delta_t) {
+        ADEBUG << "too short obstacle_prediction_trajectory. frame_num["
+               << learning_data_frame->frame_num()
+               << "] obstacle_id[" << obstacle_id << "] size["
+               << trajectory.size() << "] timestamp_diff["
+               << trajectory.back().first - start_point_timestamp_sec << "]";
         continue;
       }
 
@@ -336,8 +372,9 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
                                FLAGS_trajectory_delta_t,
                                &evaluated_trajectory);
 
-      ADEBUG << "orig obstacle_prediction_trajectory["
-             << obstacle_prediction_trajectory.trajectory_point_size()
+      ADEBUG << "frame_num[" << learning_data_frame->frame_num()
+             << "] obstacle_id[" << obstacle_id
+             << "orig obstacle_prediction_trajectory[" << trajectory.size()
              << "] evaluated[" << evaluated_trajectory.size() << "]";
 
       // update learning_data
