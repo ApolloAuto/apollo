@@ -15,11 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+USER_ID=$(id -u)
+DOCKER_USER=apollo
+
+if [[ "$USER" != "apollo" ]] && [[ $USER_ID -ne 1000 ]]; then
+    DOCKER_USER=$USER
+fi
 
 xhost +local:root 1>/dev/null 2>&1
+
 docker exec \
-    -u $USER \
+    -u $DOCKER_USER \
     -e HISTFILE=/apollo/.dev_bash_hist \
     -it apollo_dev_$USER \
     /bin/bash
+
 xhost -local:root 1>/dev/null 2>&1
