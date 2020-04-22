@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ function set_registry_mirrors()
 {
 sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
 sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
-service docker restart	
+service docker restart
 
 }
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
@@ -121,7 +121,7 @@ OTHER_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
- 
+
     case "$1" in
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
@@ -424,8 +424,10 @@ function main(){
     fi
     set +x
 
-    if [ "${USER}" != "root" ]; then
-        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+    # User with uid=1000 or username=apollo excluded
+    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
+        && [[ $USER_ID -ne 1000 ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"

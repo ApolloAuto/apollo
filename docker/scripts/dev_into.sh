@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+USER_ID=$(id -u)
+DOCKER_USER=apollo
+
+if [[ "$USER" != "apollo" ]] && [[ $USER_ID -ne 1000 ]]; then
+    DOCKER_USER=$USER
+fi
 
 xhost +local:root 1>/dev/null 2>&1
+
 docker exec \
-    -u $USER \
+    -u $DOCKER_USER \
     -e HISTFILE=/apollo/.dev_bash_hist \
     -it apollo_dev_$USER \
     /bin/bash
+
 xhost -local:root 1>/dev/null 2>&1

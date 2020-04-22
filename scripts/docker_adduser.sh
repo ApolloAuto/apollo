@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
-
 addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
 adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
     --uid "$DOCKER_USER_ID" --gid "$DOCKER_GRP_ID" 2>/dev/null
 usermod -aG sudo "$DOCKER_USER"
-echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 cp -r /etc/skel/. /home/${DOCKER_USER}
 echo '
 export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda/bin
