@@ -27,7 +27,7 @@ message PlanningTag {
 }
 
 message ChassisFeature {
-  optional double timestamp_sec = 1;
+  optional double message_timestamp_sec = 1;
 
   // Features from chassis
   // Vehicle Speed in meters per second.
@@ -49,7 +49,7 @@ message ChassisFeature {
 }
 
 message LocalizationFeature {
-  optional double timestamp_sec = 1;
+  optional double message_timestamp_sec = 1;
 
   // Position of the vehicle reference point (VRP) in the map reference frame.
   // The VRP is the center of rear axle.
@@ -104,7 +104,7 @@ message TrajectoryPointFeature {
 
 // based on apollo.perception.PerceptionObstacle
 message PerceptionObstacleFeature {
-  optional double timestamp_sec = 1;
+  optional double timestamp_sec = 1;  // GPS time in seconds
 
   // obstacle position in the OBJECT coordinate system
   optional apollo.common.Point3D position = 2;
@@ -171,7 +171,7 @@ message TrafficLightFeature {
 }
 
 message TrafficLightDetectionFeature {
-  optional double timestamp_sec = 1;
+  optional double message_timestamp_sec = 1;
   repeated TrafficLightFeature traffic_light = 2;
 }
 
@@ -187,7 +187,7 @@ message LearningOutput {
 
 message LearningDataFrame {
   // localization message publishing time in seconds.
-  optional double timestamp_sec = 1;
+  optional double message_timestamp_sec = 1;
   optional uint32 frame_num = 2;
   optional string map_name = 3;
 

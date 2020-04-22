@@ -108,7 +108,7 @@ class FeatureGenerator {
   std::string map_name_;
   std::vector<OverlapFeature> overlaps_;
   std::vector<std::pair<std::string, double>> routing_lane_segment_;
-  double traffic_light_detection_timestamp_;
+  double traffic_light_detection_message_timestamp_;
   std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;
 };
