@@ -100,12 +100,12 @@ void FeatureGenerator::Close() {
 }
 
 void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
-  static double last_localization_timestamp_sec = 0.0;
-  if (last_localization_timestamp_sec == 0.0) {
-    last_localization_timestamp_sec = le.header().timestamp_sec();
+  static double last_localization_message_timestamp_sec = 0.0;
+  if (last_localization_message_timestamp_sec == 0.0) {
+    last_localization_message_timestamp_sec = le.header().timestamp_sec();
   }
   const double time_diff =
-      le.header().timestamp_sec() - last_localization_timestamp_sec;
+      le.header().timestamp_sec() - last_localization_message_timestamp_sec;
   if (time_diff < 1.0 / FLAGS_planning_freq) {
     return;
   } else if (time_diff >= 1.0 / FLAGS_planning_freq * 2) {
@@ -113,7 +113,7 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
            << le.header().timestamp_sec()
            << "] time_diff[" << time_diff << "]";
   }
-  last_localization_timestamp_sec = le.header().timestamp_sec();
+  last_localization_message_timestamp_sec = le.header().timestamp_sec();
   localizations_.push_back(le);
 
   // generate one frame data
@@ -145,7 +145,7 @@ void FeatureGenerator::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
 }
 
 void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
-  chassis_feature_.set_timestamp_sec(chassis.header().timestamp_sec());
+  chassis_feature_.set_message_timestamp_sec(chassis.header().timestamp_sec());
   chassis_feature_.set_speed_mps(chassis.speed_mps());
   chassis_feature_.set_throttle_percentage(chassis.throttle_percentage());
   chassis_feature_.set_brake_percentage(chassis.brake_percentage());
@@ -209,7 +209,7 @@ void FeatureGenerator::OnTrafficLightDetection(
     const TrafficLightDetection& traffic_light_detection) {
   // AINFO << "traffic_light_detection received at frame["
   //      << total_learning_data_frame_num_ << "]";
-  traffic_light_detection_timestamp_ =
+  traffic_light_detection_message_timestamp_ =
       traffic_light_detection.header().timestamp_sec();
   traffic_lights_.clear();
   for (int i = 0; i < traffic_light_detection.traffic_light_size(); ++i) {
@@ -494,8 +494,8 @@ void FeatureGenerator::GenerateTrafficLightDetectionFeature(
     LearningDataFrame* learning_data_frame) {
   auto traffic_light_detection =
       learning_data_frame->mutable_traffic_light_detection();
-  traffic_light_detection->set_timestamp_sec(
-      traffic_light_detection_timestamp_);
+  traffic_light_detection->set_message_timestamp_sec(
+      traffic_light_detection_message_timestamp_);
   traffic_light_detection->clear_traffic_light();
   for (const auto& tl : traffic_lights_) {
     auto traffic_light = traffic_light_detection->add_traffic_light();
@@ -723,7 +723,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
-  learning_data_frame->set_timestamp_sec(
+  learning_data_frame->set_message_timestamp_sec(
       localizations_.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
 
@@ -736,7 +736,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   // add localization
   auto localization = learning_data_frame->mutable_localization();
-  localization->set_timestamp_sec(
+  localization->set_message_timestamp_sec(
       localizations_.back().header().timestamp_sec());
   const auto& pose = localizations_.back().pose();
   localization->mutable_position()->CopyFrom(pose.position());
