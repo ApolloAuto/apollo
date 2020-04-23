@@ -102,6 +102,11 @@ message TrajectoryPointFeature {
   optional apollo.common.GaussianInfo gaussian_info = 5;
 }
 
+message TrajectoryPoint {
+  optional double timestamp_sec = 1;
+  optional TrajectoryPointFeature trajectory_point = 2;
+}
+
 // based on apollo.perception.PerceptionObstacle
 message PerceptionObstacleFeature {
   optional double timestamp_sec = 1;  // GPS time in seconds
@@ -124,13 +129,13 @@ message PerceptionObstacleFeature {
 
 message ObstacleTrajectoryFeature {
   repeated PerceptionObstacleFeature perception_obstacle_history = 1;
-  repeated TrajectoryPointFeature evaluated_trajectory_point = 2;
+  repeated TrajectoryPoint evaluated_trajectory_point = 2;
 }
 
 // based on apollo.prediction.Trajectory
 message PredictionTrajectoryFeature {
   optional double probability = 1;  // probability of this trajectory
-  repeated TrajectoryPointFeature trajectory_point = 2;
+  repeated TrajectoryPoint trajectory_point = 2;
 }
 
 // based on apollo.prediction.PredictionObstacle
