@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <chrono>
 #include <list>
 #include <fstream>
 #include <string>
@@ -96,6 +97,7 @@ class FeatureGenerator {
                             const int learning_data_file_index);
 
  private:
+  std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
   std::string record_file_name_;
   std::unordered_map<std::string, std::string> map_m_;
