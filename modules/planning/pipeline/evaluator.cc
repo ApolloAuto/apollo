@@ -16,6 +16,9 @@
 
 #include "modules/planning/pipeline/evaluator.h"
 
+#include <ctime>
+#include <sstream>
+
 #include "cyber/common/file.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
@@ -30,9 +33,17 @@ namespace apollo {
 namespace planning {
 
 void Evaluator::Init() {
+  log_file_.open(FLAGS_planning_data_dir + "/output_data_evaluated.log",
+                 std::ios_base::out | std::ios_base::app);
+  std::time_t now = std::time(nullptr);
+  log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
+            << "Local date and time: "
+            << std::asctime(std::localtime(&now));
 }
 
 void Evaluator::Evaluate(const std::string& source_file) {
+  log_file_ << "Processing: " << source_file << std::endl;
+
   const std::string& source_filename =
       source_file.substr(source_file.find_last_of("/") + 1);
 
@@ -81,6 +92,8 @@ void Evaluator::WriteOutLearningData(
 }
 
 void Evaluator::Close() {
+  log_file_ << std::endl;
+  log_file_.close();
 }
 
 void Evaluator::EvaluateTrajectoryByTime(
@@ -166,9 +179,12 @@ void Evaluator::EvaluateADCTrajectory(
   }
 
   if (trajectory.size() <= 1) {
-    AERROR << "too few adc_trajectory_point. frame_num{"
-           << learning_data_frame->frame_num() << "] size["
-           << trajectory.size() << "]";
+    std::ostringstream msg;
+    msg << "too few adc_trajectory_point. frame_num{"
+        << learning_data_frame->frame_num() << "] size["
+        << trajectory.size() << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
     return;
   }
 
@@ -180,10 +196,13 @@ void Evaluator::EvaluateADCTrajectory(
     adc_trajectory_point->mutable_trajectory_point()->CopyFrom(
         trajectory.back().second);
 
-    AERROR << "too short adc_trajectory. frame_num["
-           << learning_data_frame->frame_num() << "] size["
-           << trajectory.size() << "] timestamp_diff["
-           << start_point_timestamp_sec - trajectory.front().first << "]";
+    std::ostringstream msg;
+    msg << "too short adc_trajectory. frame_num["
+        << learning_data_frame->frame_num() << "] size["
+        << trajectory.size() << "] timestamp_diff["
+        << start_point_timestamp_sec - trajectory.front().first << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
     return;
   }
 
@@ -207,6 +226,15 @@ void Evaluator::EvaluateADCTrajectory(
 void Evaluator::EvaluateADCFutureTrajectory(
     const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
+  const int size =
+      learning_data_frame->output().adc_future_trajectory_point_size();
+  if (size < 60) {
+    std::ostringstream msg;
+    msg << "less adc_future_trajectory_points. frame_num["
+        << learning_data_frame->frame_num() << "] size[" << size << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
+  }
   std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
   for (int i = 0; i <
       learning_data_frame->output().adc_future_trajectory_point_size(); i++) {
@@ -218,17 +246,23 @@ void Evaluator::EvaluateADCFutureTrajectory(
 
   learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
   if (trajectory.size() <= 1) {
-    AERROR << "too short adc_future_trajectory. frame_num["
-           << learning_data_frame->frame_num() << "] size["
-           << trajectory.size() << "]";
+    std::ostringstream msg;
+    msg << "too short adc_future_trajectory. frame_num["
+        << learning_data_frame->frame_num() << "] size["
+        << trajectory.size() << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
     return;
   }
   if (fabs(trajectory.back().first - start_point_timestamp_sec) <=
       FLAGS_trajectory_delta_t) {
-    AERROR << "too short adc_future_trajectory. frame_num["
-           << learning_data_frame->frame_num() << "] size["
-           << trajectory.size() << "] timestamp_diff["
-           << trajectory.back().first - start_point_timestamp_sec << "]";
+    std::ostringstream msg;
+    msg << "too short adc_future_trajectory. frame_num["
+        << learning_data_frame->frame_num() << "] size["
+        << trajectory.size() << "] timestamp_diff["
+        << trajectory.back().first - start_point_timestamp_sec << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
     return;
   }
 
@@ -344,7 +378,6 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
     const int obstacle_id = learning_data_frame->obstacle(i).id();
     const auto obstacle_prediction =
          learning_data_frame->obstacle(i).obstacle_prediction();
-
     for (int j = 0; j < obstacle_prediction.trajectory_size(); ++j) {
       const auto obstacle_prediction_trajectory =
           obstacle_prediction.trajectory(j);
