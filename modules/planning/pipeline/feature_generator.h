@@ -16,6 +16,7 @@
 #pragma once
 
 #include <list>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <utility>
@@ -95,6 +96,7 @@ class FeatureGenerator {
                             const int learning_data_file_index);
 
  private:
+  std::ofstream log_file_;
   std::string record_file_name_;
   std::unordered_map<std::string, std::string> map_m_;
   LearningData learning_data_;

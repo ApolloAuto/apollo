@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -55,6 +56,7 @@ class Evaluator {
                             const LearningData& learning_data);
 
  private:
+  std::ofstream log_file_;
   LearningData learning_data_;
 };
 
