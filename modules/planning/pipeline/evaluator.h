@@ -15,6 +15,8 @@
  *****************************************************************************/
 #pragma once
 
+#include <chrono>
+#include <ctime>
 #include <fstream>
 #include <string>
 #include <utility>
@@ -56,6 +58,7 @@ class Evaluator {
                             const LearningData& learning_data);
 
  private:
+  std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
   LearningData learning_data_;
 };

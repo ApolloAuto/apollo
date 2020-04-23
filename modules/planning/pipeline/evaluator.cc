@@ -16,7 +16,6 @@
 
 #include "modules/planning/pipeline/evaluator.h"
 
-#include <ctime>
 #include <sstream>
 
 #include "cyber/common/file.h"
@@ -35,10 +34,19 @@ namespace planning {
 void Evaluator::Init() {
   log_file_.open(FLAGS_planning_data_dir + "/output_data_evaluated.log",
                  std::ios_base::out | std::ios_base::app);
+  start_time_ = std::chrono::system_clock::now();
   std::time_t now = std::time(nullptr);
   log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
             << "Local date and time: "
             << std::asctime(std::localtime(&now));
+}
+
+void Evaluator::Close() {
+  auto end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end_time - start_time_;
+  log_file_ << "Time elapsed(sec): " << elapsed_seconds.count()
+            << std::endl << std::endl;
+  log_file_.close();
 }
 
 void Evaluator::Evaluate(const std::string& source_file) {
@@ -89,11 +97,6 @@ void Evaluator::WriteOutLearningData(
   cyber::common::SetProtoToBinaryFile(learning_data, file);
   cyber::common::SetProtoToASCIIFile(learning_data, file + ".txt");
   learning_data_.Clear();
-}
-
-void Evaluator::Close() {
-  log_file_ << std::endl;
-  log_file_.close();
 }
 
 void Evaluator::EvaluateTrajectoryByTime(

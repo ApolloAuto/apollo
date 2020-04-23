@@ -68,6 +68,7 @@ using apollo::routing::RoutingResponse;
 void FeatureGenerator::Init() {
   log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
                  std::ios_base::out | std::ios_base::app);
+  start_time_ = std::chrono::system_clock::now();
   std::time_t now = std::time(nullptr);
   log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
             << "Local date and time: "
@@ -80,6 +81,18 @@ void FeatureGenerator::Init() {
   map_m_["Gomentum"] = "gomentum";
   map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
   map_m_["San Mateo"] = "san_mateo";
+}
+
+void FeatureGenerator::Close() {
+  std::ostringstream msg;
+  msg << "Total learning_data_frame number:" << total_learning_data_frame_num_;
+  AINFO << msg.str();
+  log_file_ << msg.str() << std::endl;
+  auto end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end_time - start_time_;
+  log_file_ << "Time elapsed(sec): " << elapsed_seconds.count()
+            << std::endl << std::endl;
+  log_file_.close();
 }
 
 void FeatureGenerator::WriteOutLearningData(
@@ -99,14 +112,6 @@ void FeatureGenerator::WriteOutLearningData(
   }
   learning_data_.Clear();
   ++learning_data_file_index_;
-}
-
-void FeatureGenerator::Close() {
-  std::ostringstream msg;
-  msg << "Total learning_data_frame number:" << total_learning_data_frame_num_;
-  AINFO << msg.str();
-  log_file_ << msg.str() << std::endl << std::endl;
-  log_file_.close();
 }
 
 void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
