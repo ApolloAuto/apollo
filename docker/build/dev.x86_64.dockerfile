@@ -74,7 +74,6 @@ RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_python_modules.sh
 RUN bash /tmp/installers/install_qp_oases.sh
 RUN bash /tmp/installers/install_qt.sh
-RUN bash /tmp/installers/install_supervisor.sh
 RUN bash /tmp/installers/install_undistort.sh
 RUN bash /tmp/installers/install_user.sh
 RUN bash /tmp/installers/install_yarn.sh
