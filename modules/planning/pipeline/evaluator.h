@@ -54,8 +54,8 @@ class Evaluator {
       const double start_point_timestamp_sec,
       LearningDataFrame* learning_data_frame);
 
-  void WriteOutLearningData(const std::string& source_filename,
-                            const LearningData& learning_data);
+  void WriteOutData(const std::string& source_filename,
+                    const LearningData& learning_data);
 
  private:
   std::chrono::time_point<std::chrono::system_clock> start_time_;
