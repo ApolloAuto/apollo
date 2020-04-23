@@ -106,7 +106,7 @@ void FeatureGenerator::WriteOutLearningData(
       learning_data_file_index, ".bin");
   if (FLAGS_enable_binary_learning_data) {
     cyber::common::SetProtoToBinaryFile(learning_data, file_name);
-    cyber::common::SetProtoToASCIIFile(learning_data, file_name + ".txt");
+    // cyber::common::SetProtoToASCIIFile(learning_data, file_name + ".txt");
   } else {
     cyber::common::SetProtoToASCIIFile(learning_data, file_name);
   }
