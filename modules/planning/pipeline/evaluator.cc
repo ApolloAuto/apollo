@@ -29,8 +29,6 @@ DEFINE_bool(enable_evaluate_obstacle_trajectory, true,
 namespace apollo {
 namespace planning {
 
-using apollo::common::TrajectoryPoint;
-
 void Evaluator::Init() {
 }
 
@@ -89,18 +87,17 @@ void Evaluator::EvaluateTrajectoryByTime(
     const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
     const double start_point_timestamp_sec,
     const double delta_time,
-    std::vector<std::pair<double, TrajectoryPointFeature>>*
-        evaluated_trajectory) {
+    std::vector<TrajectoryPoint>* evaluated_trajectory) {
   if (trajectory.empty() ||
       fabs(trajectory.front().first - trajectory.back().first) <
           FLAGS_trajectory_delta_t) {
     return;
   }
 
-  std::vector<TrajectoryPoint> updated_trajectory;
+  std::vector<apollo::common::TrajectoryPoint> updated_trajectory;
   for (const auto& tp : trajectory) {
     // TrajectoryPointFeature => common::Trajectory
-    TrajectoryPoint trajectory_point;
+    apollo::common::TrajectoryPoint trajectory_point;
     auto path_point = trajectory_point.mutable_path_point();
     path_point->set_x(tp.second.path_point().x());
     path_point->set_y(tp.second.path_point().y());
@@ -135,22 +132,25 @@ void Evaluator::EvaluateTrajectoryByTime(
     double relative_time = i * delta_time;
     auto tp = discretized_trajectory.Evaluate(relative_time);
 
-    // common::TrajectoryPoint => TrajectoryPointFeature
-    TrajectoryPointFeature trajectory_point;
-    trajectory_point.mutable_path_point()->set_x(tp.path_point().x());
-    trajectory_point.mutable_path_point()->set_y(tp.path_point().y());
-    trajectory_point.mutable_path_point()->set_z(tp.path_point().z());
-    trajectory_point.mutable_path_point()->set_theta(tp.path_point().theta());
-    trajectory_point.mutable_path_point()->set_s(tp.path_point().s());
-    trajectory_point.mutable_path_point()->set_lane_id(
-        tp.path_point().lane_id());
-    trajectory_point.set_v(tp.v());
-    trajectory_point.set_a(tp.a());
-    trajectory_point.set_relative_time(tp.relative_time());
-    trajectory_point.mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
+    // common::TrajectoryPoint => TrajectoryPoint
+    TrajectoryPoint trajectory_point;
+    trajectory_point.set_timestamp_sec(timestamp_sec);
+    auto path_point =
+        trajectory_point.mutable_trajectory_point()->mutable_path_point();
+    path_point->set_x(tp.path_point().x());
+    path_point->set_y(tp.path_point().y());
+    path_point->set_z(tp.path_point().z());
+    path_point->set_theta(tp.path_point().theta());
+    path_point->set_s(tp.path_point().s());
+    path_point->set_lane_id(tp.path_point().lane_id());
+    trajectory_point.mutable_trajectory_point()->set_v(tp.v());
+    trajectory_point.mutable_trajectory_point()->set_a(tp.a());
+    trajectory_point.mutable_trajectory_point()->set_relative_time(
+        tp.relative_time());
+    trajectory_point.mutable_trajectory_point()->mutable_gaussian_info()
+                                               ->CopyFrom(tp.gaussian_info());
 
-    evaluated_trajectory->push_back(
-        std::make_pair(timestamp_sec, trajectory_point));
+    evaluated_trajectory->push_back(trajectory_point);
   }
 }
 
@@ -187,7 +187,7 @@ void Evaluator::EvaluateADCTrajectory(
     return;
   }
 
-  std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
+  std::vector<TrajectoryPoint> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
                            start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
@@ -198,8 +198,9 @@ void Evaluator::EvaluateADCTrajectory(
 
   for (const auto& tp : evaluated_trajectory) {
     auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
-    adc_trajectory_point->set_timestamp_sec(tp.first);
-    adc_trajectory_point->mutable_trajectory_point()->CopyFrom(tp.second);
+    adc_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
+    adc_trajectory_point->mutable_trajectory_point()
+                        ->CopyFrom(tp.trajectory_point());
   }
 }
 
@@ -231,7 +232,7 @@ void Evaluator::EvaluateADCFutureTrajectory(
     return;
   }
 
-  std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
+  std::vector<TrajectoryPoint> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
                            start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
@@ -245,9 +246,9 @@ void Evaluator::EvaluateADCFutureTrajectory(
     auto adc_future_trajectory_point =
         learning_data_frame->mutable_output()
                            ->add_adc_future_trajectory_point();
-    adc_future_trajectory_point->set_timestamp_sec(tp.first);
+    adc_future_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
     adc_future_trajectory_point->mutable_trajectory_point()
-                               ->CopyFrom(tp.second);
+                               ->CopyFrom(tp.trajectory_point());
   }
 }
 
@@ -305,7 +306,7 @@ void Evaluator::EvaluateObstacleTrajectory(
       continue;
     }
 
-    std::vector<std::pair<double, TrajectoryPointFeature>> evaluated_trajectory;
+    std::vector<TrajectoryPoint> evaluated_trajectory;
     EvaluateTrajectoryByTime(trajectory,
                              start_point_timestamp_sec,
                              FLAGS_trajectory_delta_t,
@@ -325,7 +326,9 @@ void Evaluator::EvaluateObstacleTrajectory(
           learning_data_frame->mutable_obstacle(i)
                              ->mutable_obstacle_trajectory()
                              ->add_evaluated_trajectory_point();
-      evaluated_trajectory_point->CopyFrom(tp.second);
+      evaluated_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
+      evaluated_trajectory_point->mutable_trajectory_point()
+                                ->CopyFrom(tp.trajectory_point());
     }
   }
 }
@@ -350,10 +353,13 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
       for (int k = 0; k <
           obstacle_prediction_trajectory.trajectory_point_size(); ++k) {
         const double timestamp_sec = obstacle_prediction.timestamp_sec() +
-            obstacle_prediction_trajectory.trajectory_point(k).relative_time();
+            obstacle_prediction_trajectory.trajectory_point(k)
+                                          .trajectory_point()
+                                          .relative_time();
         trajectory.push_back(std::make_pair(
             timestamp_sec,
-            obstacle_prediction_trajectory.trajectory_point(k)));
+            obstacle_prediction_trajectory.trajectory_point(k)
+                                          .trajectory_point()));
       }
       if (fabs(trajectory.back().first - start_point_timestamp_sec) <=
           FLAGS_trajectory_delta_t) {
@@ -365,8 +371,7 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
         continue;
       }
 
-      std::vector<std::pair<double, TrajectoryPointFeature>>
-          evaluated_trajectory;
+      std::vector<TrajectoryPoint> evaluated_trajectory;
       EvaluateTrajectoryByTime(trajectory,
                                start_point_timestamp_sec,
                                FLAGS_trajectory_delta_t,
@@ -388,7 +393,9 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
                                ->mutable_obstacle_prediction()
                                ->mutable_trajectory(j)
                                ->add_trajectory_point();
-        obstacle_prediction_trajectory_point->CopyFrom(tp.second);
+        obstacle_prediction_trajectory_point->set_timestamp_sec(
+            tp.timestamp_sec());
+        obstacle_prediction_trajectory_point->CopyFrom(tp.trajectory_point());
       }
     }
   }

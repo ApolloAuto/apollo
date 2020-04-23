@@ -394,7 +394,8 @@ void FeatureGenerator::GenerateObstaclePrediction(
           obstacle_trajectory.trajectory_point(j);
       auto trajectory_point = trajectory->add_trajectory_point();
 
-      auto path_point = trajectory_point->mutable_path_point();
+      auto path_point = trajectory_point->mutable_trajectory_point()
+                                        ->mutable_path_point();
 
       // convert path_point position to relative coordinate
       const auto& relative_path_point =
@@ -416,11 +417,14 @@ void FeatureGenerator::GenerateObstaclePrediction(
       path_point->set_s(obstacle_trajectory_point.path_point().s());
       path_point->set_lane_id(obstacle_trajectory_point.path_point().lane_id());
 
-      trajectory_point->set_v(obstacle_trajectory_point.v());
-      trajectory_point->set_a(obstacle_trajectory_point.a());
-      trajectory_point->set_relative_time(
-          obstacle_trajectory_point.relative_time());
-      trajectory_point->mutable_gaussian_info()->CopyFrom(
+      const double timestamp_sec = prediction_obstacle.timestamp() +
+          obstacle_trajectory_point.relative_time();
+      trajectory_point->set_timestamp_sec(timestamp_sec);
+      auto tp = trajectory_point->mutable_trajectory_point();
+      tp->set_v(obstacle_trajectory_point.v());
+      tp->set_a(obstacle_trajectory_point.a());
+      tp->set_relative_time(obstacle_trajectory_point.relative_time());
+      tp->mutable_gaussian_info()->CopyFrom(
           obstacle_trajectory_point.gaussian_info());
     }
   }
