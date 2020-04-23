@@ -395,7 +395,8 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
                                ->add_trajectory_point();
         obstacle_prediction_trajectory_point->set_timestamp_sec(
             tp.timestamp_sec());
-        obstacle_prediction_trajectory_point->CopyFrom(tp.trajectory_point());
+        obstacle_prediction_trajectory_point->mutable_trajectory_point()
+                                            ->CopyFrom(tp.trajectory_point());
       }
     }
   }
