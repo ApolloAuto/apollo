@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include "cyber/common/file.h"
@@ -65,6 +66,13 @@ using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 void FeatureGenerator::Init() {
+  log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
+                 std::ios_base::out | std::ios_base::app);
+  std::time_t now = std::time(nullptr);
+  log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
+            << "Local date and time: "
+            << std::asctime(std::localtime(&now));
+
   map_name_ = "sunnyvale_with_two_offices";
   map_m_["Sunnyvale"] = "sunnyvale";
   map_m_["Sunnyvale Big Loop"] = "sunnyvale_big_loop";
@@ -94,9 +102,11 @@ void FeatureGenerator::WriteOutLearningData(
 }
 
 void FeatureGenerator::Close() {
-  WriteOutLearningData(learning_data_, learning_data_file_index_);
-  AINFO << "Total learning_data_frame number:"
-        << total_learning_data_frame_num_;
+  std::ostringstream msg;
+  msg << "Total learning_data_frame number:" << total_learning_data_frame_num_;
+  AINFO << msg.str();
+  log_file_ << msg.str() << std::endl << std::endl;
+  log_file_.close();
 }
 
 void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
@@ -109,9 +119,12 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
   if (time_diff < 1.0 / FLAGS_planning_freq) {
     return;
   } else if (time_diff >= 1.0 / FLAGS_planning_freq * 2) {
-    AERROR << "missing localization too long: time_stamp["
-           << le.header().timestamp_sec()
-           << "] time_diff[" << time_diff << "]";
+    std::ostringstream msg;
+    msg << "missing localization too long: time_stamp["
+        << le.header().timestamp_sec()
+        << "] time_diff[" << time_diff << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
   }
   last_localization_message_timestamp_sec = le.header().timestamp_sec();
   localizations_.push_back(le);
@@ -460,6 +473,14 @@ void FeatureGenerator::GenerateRoutingFeature(
     LearningDataFrame* learning_data_frame) {
   auto routing = learning_data_frame->mutable_routing();
   routing->Clear();
+  if (routing_lane_segment_.empty()) {
+    std::ostringstream msg;
+    msg << "no routing. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
+    return;
+  }
   for (const auto& lane_segment : routing_lane_segment_) {
     routing->add_routing_lane_id(lane_segment.first);
   }
@@ -713,9 +734,12 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
   if (adc_trajectory_points.size() <= 3) {
-    AERROR << "too few adc_trajectory_points: frame_num["
-           << learning_data_frame->frame_num()
-           << "] size[" << adc_trajectory_points.size() << "]";
+    std::ostringstream msg;
+    msg << "too few adc_trajectory_points: frame_num["
+        << learning_data_frame->frame_num()
+        << "] size[" << adc_trajectory_points.size() << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
   }
   // AINFO << "number of ADC trajectory points in one frame: "
   //      << trajectory_point_index;
@@ -765,8 +789,10 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
+  log_file_ << "Processing: " << record_filename << std::endl;
   record_file_name_ =
       record_filename.substr(record_filename.find_last_of("/") + 1);
+
   RecordReader reader(record_filename);
   if (!reader.IsValid()) {
     AERROR << "Fail to open " << record_filename;
