@@ -33,6 +33,7 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
+  obstacle_status: MOVING
   evaluator_type: PEDESTRIAN_INTERACTION_EVALUATOR
   predictor_type: FREE_MOVE_PREDICTOR
 }

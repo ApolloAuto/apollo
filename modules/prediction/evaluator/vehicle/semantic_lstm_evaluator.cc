@@ -108,8 +108,14 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
   std::vector<double> pred_traj;
 
   auto start_time = std::chrono::system_clock::now();
-  at::Tensor torch_output_tensor =
-      torch_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  at::Tensor torch_output_tensor = torch_default_output_tensor_;
+  if (obstacle_ptr->IsPedestrian()) {
+    torch_output_tensor = torch_pedestrian_model_.forward(torch_inputs).
+                          toTensor().to(torch::kCPU);
+  } else {
+    torch_output_tensor =
+        torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  }
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
@@ -231,11 +237,15 @@ void SemanticLSTMEvaluator::LoadModel() {
   if (FLAGS_use_cuda && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
-    torch_model_ =
+    torch_vehicle_model_ =
         torch::jit::load(FLAGS_torch_vehicle_semantic_lstm_file, device_);
+    torch_pedestrian_model_ =
+        torch::jit::load(FLAGS_torch_pedestrian_semantic_lstm_file, device_);
   } else {
-    torch_model_ =
+    torch_vehicle_model_ =
         torch::jit::load(FLAGS_torch_vehicle_semantic_lstm_cpu_file, device_);
+    torch_pedestrian_model_ = torch::jit::load(
+        FLAGS_torch_pedestrian_semantic_lstm_cpu_file, device_);
   }
   torch::set_num_threads(1);
 
@@ -249,8 +259,11 @@ void SemanticLSTMEvaluator::LoadModel() {
        std::move(obstacle_pos_step.to(device_))},
       c10::TupleType::create(
           std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
-  at::Tensor torch_output_tensor =
-      torch_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  // Run one inference to avoid very slow first inference later
+  torch_default_output_tensor_ =
+      torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  torch_default_output_tensor_ =
+      torch_pedestrian_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
 }
 
 }  // namespace prediction

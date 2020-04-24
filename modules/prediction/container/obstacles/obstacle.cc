@@ -50,6 +50,10 @@ bool IsClosed(const double x0, const double y0, const double theta0,
 
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
+bool Obstacle::IsPedestrian() {
+  return type_ == PerceptionObstacle::PEDESTRIAN;
+}
+
 int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
