@@ -264,38 +264,43 @@ void FeatureGenerator::OnRoutingResponse(
   }
 }
 
-apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetLane(
-    const apollo::common::PointENU& position,
-    int* routing_index) {
-  constexpr double kRadius = 0.1;
+int FeatureGenerator::GetADCCurrentRoutingIndex() {
+  static constexpr double kRadius = 4.0;
+  const auto& pose = localizations_.back().pose();
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
-  for (int i = 0; i < 10; ++i) {
+  apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
+      pose.position(), kRadius, &lanes);
+
+  for (auto& lane : lanes) {
+    for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
+      if (lane->id().id() == routing_lane_segment_[i].first) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetCurrentLane(
+    const apollo::common::PointENU& position) {
+  constexpr double kRadiusUnit = 0.1;
+  std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
+  for (int i = 1; i <= 10; ++i) {
     apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
-        position, kRadius + i * kRadius, &lanes);
+        position, i * kRadiusUnit, &lanes);
     if (lanes.size() > 0) {
       break;
     }
   }
 
-  *routing_index = -1;
-  if (lanes.size() >= 0) {
-    for (auto& lane : lanes) {
-      const auto lane_id = lane->id().id();
-      for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
-        if (routing_lane_segment_[i].first == lane_id) {
-          *routing_index = i;
-          return lane;
-        }
+  for (auto& lane : lanes) {
+    for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
+      if (lane->id().id() == routing_lane_segment_[i].first) {
+        return lane;
       }
     }
   }
   return nullptr;
-}
-
-apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetADCCurrentLane(
-    int* routing_index) {
-  const auto& pose = localizations_.back().pose();
-  return GetLane(pose.position(), routing_index);
 }
 
 void FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
@@ -491,6 +496,11 @@ void FeatureGenerator::GenerateRoutingFeature(
   }
 
   if (routing_index < 0) {
+    std::ostringstream msg;
+    msg << "no LOCAL routing. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
     return;
   }
 
@@ -515,6 +525,13 @@ void FeatureGenerator::GenerateRoutingFeature(
     i++;
   }
 
+  if (local_routing_lane_ids.empty()) {
+    std::ostringstream msg;
+    msg << "no LOCAL routing. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
+    log_file_ << msg.str() << std::endl;
+  }
   for (const auto& lane_id : local_routing_lane_ids) {
     routing->add_local_routing_lane_id(lane_id);
   }
@@ -588,9 +605,8 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
         pose.position().x(),
         pose.position().y(),
         pose.position().z());
+    LaneInfoConstPtr lane = GetCurrentLane(cur_point);
 
-    int routing_index;
-    LaneInfoConstPtr lane = GetLane(cur_point, &routing_index);
     // lane_turn
     apollo::hdmap::Lane::LaneTurn lane_turn = apollo::hdmap::Lane::NO_TURN;
     if (lane != nullptr) {
@@ -751,8 +767,7 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
 }
 
 void FeatureGenerator::GenerateLearningDataFrame() {
-  int routing_index;
-  LaneInfoConstPtr cur_lane = GetADCCurrentLane(&routing_index);
+  const int routing_index = GetADCCurrentRoutingIndex();
 
   auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
