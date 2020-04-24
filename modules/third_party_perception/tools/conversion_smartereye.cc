@@ -135,11 +135,11 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
     int sma_id = data_obstacle.trackid() + FLAGS_smartereye_id_offset;
 
     double sma_x = data_obstacle.avgdistancez();
-    double sma_y = -data_obstacle.real3dcenterx();
+    double sma_y = data_obstacle.real3dcenterx();
     double sma_z = (data_obstacle.real3dupy() +
         data_obstacle.real3dlowy()) / 2.0;
     // relative speed
-    double sma_vel_x = data_obstacle.fuzzyrelativedistancez();
+    double sma_vel_x = data_obstacle.fuzzyrelativespeedz();
     int sma_type = data_obstacle.obstacletype();
 
     double sma_w = data_obstacle.real3drightx() - data_obstacle.real3dleftx();
