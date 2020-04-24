@@ -61,9 +61,9 @@ class FeatureGenerator {
   void OnTrafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  apollo::hdmap::LaneInfoConstPtr GetLane(
-      const apollo::common::PointENU& position, int* routing_index);
-  apollo::hdmap::LaneInfoConstPtr GetADCCurrentLane(int* routing_index);
+  apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
+      const apollo::common::PointENU& position);
+  int GetADCCurrentRoutingIndex();
 
   void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
