@@ -265,7 +265,7 @@ void FeatureGenerator::OnRoutingResponse(
 }
 
 int FeatureGenerator::GetADCCurrentRoutingIndex() {
-  constexpr double kRadius = 4.0;
+  static constexpr double kRadius = 4.0;
   const auto& pose = localizations_.back().pose();
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
   apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
