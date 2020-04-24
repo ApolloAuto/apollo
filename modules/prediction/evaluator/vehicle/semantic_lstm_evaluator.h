@@ -74,7 +74,9 @@ class SemanticLSTMEvaluator : public Evaluator {
   void LoadModel();
 
  private:
-  torch::jit::script::Module torch_model_;
+  torch::jit::script::Module torch_vehicle_model_;
+  torch::jit::script::Module torch_pedestrian_model_;
+  at::Tensor torch_default_output_tensor_;
   torch::Device device_;
 };
 

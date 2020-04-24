@@ -183,6 +183,14 @@ DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_prediction_layer.pt",
               "pedestrian interaction prediction layer");
+DEFINE_string(
+    torch_pedestrian_semantic_lstm_file,
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_model.pt",
+    "Pedestrian semantic lstm model file, default for gpu");
+DEFINE_string(
+    torch_pedestrian_semantic_lstm_cpu_file,
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_cpu_model.pt",
+    "Pedestrian semantic lstm cpu model file");
 DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
               "/apollo/modules/prediction/data/"
               "traced_online_obs_enc.pt",
