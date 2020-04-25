@@ -213,7 +213,11 @@ void FeatureGenerator::OnPrediction(
     obstacle_trajectory_point.mutable_acceleration()->CopyFrom(
         perception_obstale.acceleration());
 
-    obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
+    if (obstacle_history_map_[m.first].empty() ||
+        obstacle_trajectory_point.timestamp_sec() >
+            obstacle_history_map_[m.first].back().timestamp_sec()) {
+      obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
+    }
 
     auto& obstacle_history = obstacle_history_map_[m.first];
     if (static_cast<int>(obstacle_history.size()) >
