@@ -38,7 +38,7 @@ float PointCloudUpdater::lidar_height_ = kDefaultLidarHeight;
 boost::shared_mutex PointCloudUpdater::mutex_;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket,
-                       SimulationWorldUpdater* simworld_updater)
+                                     SimulationWorldUpdater *simworld_updater)
     : node_(cyber::CreateNode("point_cloud")),
       websocket_(websocket),
       point_cloud_str_(""),
@@ -85,17 +85,18 @@ void PointCloudUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "RequestPointCloud",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        std::string to_send = "";
+        std::string to_send;
+        // If there is no point_cloud data for more than 2 seconds, reset.
+        if (point_cloud_str_ != "" &&
+            std::fabs(last_localization_time_ - last_point_cloud_time_) > 2.0) {
+          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          point_cloud_str_ = "";
+        }
         {
           boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          if (point_cloud_updated_) {
-             to_send = point_cloud_str_;
-             point_cloud_updated_ = false;
-          }
+          to_send = point_cloud_str_;
         }
-        if (!to_send.empty()) {
-           websocket_->SendBinaryData(conn, to_send, true);
-         }
+        websocket_->SendBinaryData(conn, to_send, true);
       });
   websocket_->RegisterMessageHandler(
       "TogglePointCloud",
@@ -119,6 +120,11 @@ void PointCloudUpdater::RegisterMessageHandlers() {
 }
 
 void PointCloudUpdater::Start() {
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      FLAGS_localization_topic,
+      [this](const std::shared_ptr<LocalizationEstimate> &msg) {
+        UpdateLocalizationTime(msg);
+      });
   point_cloud_reader_ = node_->CreateReader<drivers::PointCloud>(
       FLAGS_pointcloud_topic,
       [this](const std::shared_ptr<drivers::PointCloud> &msg) {
@@ -134,29 +140,28 @@ void PointCloudUpdater::Stop() {
   }
 }
 
-pcl::PointCloud<pcl::PointXYZ>::Ptr
-    PointCloudUpdater::ConvertPCLPointCloud(
-       const std::shared_ptr<drivers::PointCloud> &point_cloud) {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
-        new pcl::PointCloud<pcl::PointXYZ>);
-    pcl_ptr->width = point_cloud->width();
-    pcl_ptr->height = point_cloud->height();
-    pcl_ptr->is_dense = false;
+pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudUpdater::ConvertPCLPointCloud(
+    const std::shared_ptr<drivers::PointCloud> &point_cloud) {
+  pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr(
+      new pcl::PointCloud<pcl::PointXYZ>);
+  pcl_ptr->width = point_cloud->width();
+  pcl_ptr->height = point_cloud->height();
+  pcl_ptr->is_dense = false;
 
-    if (point_cloud->width() * point_cloud->height() !=
-        static_cast<unsigned int>(point_cloud->point_size())) {
-      pcl_ptr->width = 1;
-      pcl_ptr->height = point_cloud->point_size();
-    }
-    pcl_ptr->points.resize(point_cloud->point_size());
+  if (point_cloud->width() * point_cloud->height() !=
+      static_cast<unsigned int>(point_cloud->point_size())) {
+    pcl_ptr->width = 1;
+    pcl_ptr->height = point_cloud->point_size();
+  }
+  pcl_ptr->points.resize(point_cloud->point_size());
 
-    for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
-      const auto &point = point_cloud->point(static_cast<int>(i));
-      pcl_ptr->points[i].x = point.x();
-      pcl_ptr->points[i].y = point.y();
-      pcl_ptr->points[i].z = point.z();
-    }
-    return pcl_ptr;
+  for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
+    const auto &point = point_cloud->point(static_cast<int>(i));
+    pcl_ptr->points[i].x = point.x();
+    pcl_ptr->points[i].y = point.y();
+    pcl_ptr->points[i].z = point.z();
+  }
+  return pcl_ptr;
 }
 
 void PointCloudUpdater::UpdatePointCloud(
@@ -166,21 +171,21 @@ void PointCloudUpdater::UpdatePointCloud(
   }
   last_point_cloud_time_ = point_cloud->header().timestamp_sec();
   if (simworld_updater_->LastAdcTimestampSec() == 0.0 ||
-    simworld_updater_->LastAdcTimestampSec() - last_point_cloud_time_ > 0.1) {
-      AWARN << "skipping outdated point cloud data";
-      return;
+      simworld_updater_->LastAdcTimestampSec() - last_point_cloud_time_ > 0.1) {
+    AWARN << "skipping outdated point cloud data";
+    return;
   }
   pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr;
   // Check if last filter process has finished before processing new data.
   if (enable_voxel_filter_) {
     if (future_ready_) {
-       future_ready_ = false;
-       // transform from drivers::PointCloud to pcl::PointCloud
-       pcl_ptr = ConvertPCLPointCloud(point_cloud);
-       std::future<void> f =
-       cyber::Async(&PointCloudUpdater::FilterPointCloud, this, pcl_ptr);
-       async_future_ = std::move(f);
-     }
+      future_ready_ = false;
+      // transform from drivers::PointCloud to pcl::PointCloud
+      pcl_ptr = ConvertPCLPointCloud(point_cloud);
+      std::future<void> f =
+          cyber::Async(&PointCloudUpdater::FilterPointCloud, this, pcl_ptr);
+      async_future_ = std::move(f);
+    }
   } else {
     pcl_ptr = ConvertPCLPointCloud(point_cloud);
     this->FilterPointCloud(pcl_ptr);
@@ -189,13 +194,12 @@ void PointCloudUpdater::UpdatePointCloud(
 
 void PointCloudUpdater::FilterPointCloud(
     pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
-
   pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(
-        new pcl::PointCloud<pcl::PointXYZ>);
+      new pcl::PointCloud<pcl::PointXYZ>);
 
   /*
-      By default, disable voxel filter since it's taking more than 500ms 
-      ideally the most efficient sampling method is to 
+      By default, disable voxel filter since it's taking more than 500ms
+      ideally the most efficient sampling method is to
       use per beam random sample for organized cloud(TODO)
   */
   if (enable_voxel_filter_) {
@@ -206,7 +210,7 @@ void PointCloudUpdater::FilterPointCloud(
                            static_cast<float>(FLAGS_voxel_filter_height));
     voxel_grid.filter(*pcl_filtered_ptr);
   } else {
-     pcl_filtered_ptr = pcl_ptr;
+    pcl_filtered_ptr = pcl_ptr;
   }
 
   float z_offset;
@@ -226,10 +230,13 @@ void PointCloudUpdater::FilterPointCloud(
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     point_cloud_pb.SerializeToString(&point_cloud_str_);
-    point_cloud_updated_ = true;
     future_ready_ = true;
   }
 }
 
+void PointCloudUpdater::UpdateLocalizationTime(
+      const std::shared_ptr<LocalizationEstimate> &localization) {
+    last_localization_time_ = localization->header().timestamp_sec();
+}
 }  // namespace dreamview
 }  // namespace apollo

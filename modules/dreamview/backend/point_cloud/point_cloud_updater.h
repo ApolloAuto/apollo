@@ -56,7 +56,7 @@ class PointCloudUpdater {
    * @param simulationworldupdater pointer
    */
   explicit PointCloudUpdater(WebSocketHandler *websocket,
-    SimulationWorldUpdater *sim_world_updater);
+                             SimulationWorldUpdater *sim_world_updater);
 
   ~PointCloudUpdater();
 
@@ -83,9 +83,11 @@ class PointCloudUpdater {
 
   void FilterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr);
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr
-    ConvertPCLPointCloud(
-    const std::shared_ptr<drivers::PointCloud> &point_cloud);
+  void UpdateLocalizationTime(
+      const std::shared_ptr<apollo::localization::LocalizationEstimate>
+          &localization);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertPCLPointCloud(
+      const std::shared_ptr<drivers::PointCloud> &point_cloud);
 
   constexpr static float kDefaultLidarHeight = 1.91f;
 
@@ -107,9 +109,8 @@ class PointCloudUpdater {
   std::shared_ptr<cyber::Reader<drivers::PointCloud>> point_cloud_reader_;
   double last_point_cloud_time_ = 0.0;
   double last_localization_time_ = 0.0;
-  SimulationWorldUpdater* simworld_updater_;
+  SimulationWorldUpdater *simworld_updater_;
   bool enable_voxel_filter_ = false;
-  volatile bool point_cloud_updated_ = false;
 };
 }  // namespace dreamview
 }  // namespace apollo
