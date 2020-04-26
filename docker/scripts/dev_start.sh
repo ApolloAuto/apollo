@@ -21,7 +21,7 @@ FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-18.04-x86_64-20200316_1730"
+VERSION_X86_64="dev-18.04-x86_64-20200422_2150"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
@@ -89,7 +89,7 @@ function set_registry_mirrors()
 {
 sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
 sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
-service docker restart	
+service docker restart
 
 }
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
@@ -121,7 +121,7 @@ OTHER_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
- 
+
     case "$1" in
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
@@ -406,7 +406,7 @@ function main(){
         -e DOCKER_IMG=$APOLLO_DEV_IMAGE \
         -e USE_GPU=$USE_GPU \
         -e NVIDIA_VISIBLE_DEVICES=all \
-        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         $(local_volumes) \
         --net host \
         -w /apollo \
@@ -424,8 +424,10 @@ function main(){
     fi
     set +x
 
-    if [ "${USER}" != "root" ]; then
-        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+    # User with uid=1000 or username=apollo excluded
+    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
+        && [[ $USER_ID -ne 1000 ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"

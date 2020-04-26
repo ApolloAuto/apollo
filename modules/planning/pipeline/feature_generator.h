@@ -15,7 +15,9 @@
  *****************************************************************************/
 #pragma once
 
+#include <chrono>
 #include <list>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <utility>
@@ -56,16 +58,17 @@ class FeatureGenerator {
       const apollo::prediction::PredictionObstacles& prediction_obstacles);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
-  void OnTafficLightDetection(
+  void OnTrafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  apollo::hdmap::LaneInfoConstPtr GetLane(
-      const apollo::common::PointENU& position, int* routing_index);
-  apollo::hdmap::LaneInfoConstPtr GetADCCurrentLane(int* routing_index);
+  apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
+      const apollo::common::PointENU& position);
+  int GetADCCurrentRoutingIndex();
 
   void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
-  void GenerateObstacleTrajectoryPoint(
+  void GenerateObstacleTrajectory(
+      const int frame_num,
       const int obstacle_id,
       const ADCCurrentInfo& adc_curr_info,
       ObstacleFeature* obstacle_feature);
@@ -80,6 +83,9 @@ class FeatureGenerator {
   void GenerateRoutingFeature(const int routing_index,
                               LearningDataFrame* learning_data_frame);
 
+  void GenerateTrafficLightDetectionFeature(
+      LearningDataFrame* learning_data_frame);
+
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localizations,
@@ -91,6 +97,8 @@ class FeatureGenerator {
                             const int learning_data_file_index);
 
  private:
+  std::chrono::time_point<std::chrono::system_clock> start_time_;
+  std::ofstream log_file_;
   std::string record_file_name_;
   std::unordered_map<std::string, std::string> map_m_;
   LearningData learning_data_;
@@ -104,8 +112,8 @@ class FeatureGenerator {
   std::string map_name_;
   std::vector<OverlapFeature> overlaps_;
   std::vector<std::pair<std::string, double>> routing_lane_segment_;
-  std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
-        traffic_lights_;
+  double traffic_light_detection_message_timestamp_;
+  std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;
 };
 

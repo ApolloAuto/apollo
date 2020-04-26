@@ -94,10 +94,10 @@ DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
 DEFINE_bool(enable_scenario_emergency_pull_over, true,
-            "enable emregency-pull-over scenario in planning");
+            "enable emergency-pull-over scenario in planning");
 
 DEFINE_bool(enable_scenario_emergency_stop, true,
-            "enable emregency-stop scenario in planning");
+            "enable emergency-stop scenario in planning");
 
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"

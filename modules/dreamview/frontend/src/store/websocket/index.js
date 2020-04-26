@@ -41,10 +41,6 @@ function deduceWebsocketServerAddr(type) {
 // invoked in production mode ("-p"). We rely on this to determine which
 // websocket server to use.
 const simWorldServerAddr = deduceWebsocketServerAddr("sim_world");
-const WS = OFFLINE_PLAYBACK
-    ? new OfflinePlaybackWebSocketEndpoint(simWorldServerAddr)
-    : new RealtimeWebSocketEndpoint(simWorldServerAddr);
-export default WS;
 
 const mapServerAddr = deduceWebsocketServerAddr("map");
 export const MAP_WS = new MapDataWebSocketEndpoint(mapServerAddr);
@@ -54,6 +50,13 @@ export const POINT_CLOUD_WS = new PointCloudWebSocketEndpoint(pointCloudServerAd
 
 const cameraServerAddr = deduceWebsocketServerAddr("camera");
 export const CAMERA_WS = new CameraDataWebSocketEndpoint(cameraServerAddr);
+
+const WS = OFFLINE_PLAYBACK
+    ? new OfflinePlaybackWebSocketEndpoint(simWorldServerAddr)
+    : new RealtimeWebSocketEndpoint(simWorldServerAddr);
+
+WS.setPointCloudWS(POINT_CLOUD_WS);
+export default WS;
 
 const teleopServerAddr = deduceWebsocketServerAddr("teleop");
 export const TELEOP_WS = new TeleopWebSocketEndpoint(teleopServerAddr);

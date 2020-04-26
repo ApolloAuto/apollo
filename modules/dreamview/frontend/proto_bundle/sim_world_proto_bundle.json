@@ -4210,76 +4210,55 @@
             },
             "ChassisFeature": {
               "fields": {
-                "speedMps": {
-                  "type": "float",
+                "messageTimestampSec": {
+                  "type": "double",
                   "id": 1
                 },
-                "throttlePercentage": {
+                "speedMps": {
                   "type": "float",
                   "id": 2
                 },
-                "brakePercentage": {
+                "throttlePercentage": {
                   "type": "float",
                   "id": 3
                 },
-                "steeringPercentage": {
+                "brakePercentage": {
                   "type": "float",
                   "id": 4
                 },
+                "steeringPercentage": {
+                  "type": "float",
+                  "id": 5
+                },
                 "gearLocation": {
                   "type": "apollo.canbus.Chassis.GearPosition",
-                  "id": 5
+                  "id": 6
                 }
               }
             },
             "LocalizationFeature": {
               "fields": {
+                "messageTimestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
                 "position": {
                   "type": "apollo.common.PointENU",
-                  "id": 1
+                  "id": 2
                 },
                 "heading": {
                   "type": "double",
-                  "id": 2
+                  "id": 3
                 },
                 "linearVelocity": {
                   "type": "apollo.common.Point3D",
-                  "id": 3
+                  "id": 4
                 },
                 "linearAcceleration": {
                   "type": "apollo.common.Point3D",
-                  "id": 4
+                  "id": 5
                 },
                 "angularVelocity": {
-                  "type": "apollo.common.Point3D",
-                  "id": 5
-                }
-              }
-            },
-            "PerceptionObstacleFeature": {
-              "fields": {
-                "timestampSec": {
-                  "type": "double",
-                  "id": 1
-                },
-                "position": {
-                  "type": "apollo.common.Point3D",
-                  "id": 2
-                },
-                "theta": {
-                  "type": "double",
-                  "id": 3
-                },
-                "velocity": {
-                  "type": "apollo.common.Point3D",
-                  "id": 4
-                },
-                "acceleration": {
-                  "type": "apollo.common.Point3D",
-                  "id": 5
-                },
-                "polygonPoint": {
-                  "rule": "repeated",
                   "type": "apollo.common.Point3D",
                   "id": 6
                 }
@@ -4337,6 +4316,61 @@
                 }
               }
             },
+            "TrajectoryPoint": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "type": "TrajectoryPointFeature",
+                  "id": 2
+                }
+              }
+            },
+            "PerceptionObstacleFeature": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "position": {
+                  "type": "apollo.common.Point3D",
+                  "id": 2
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 3
+                },
+                "velocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "acceleration": {
+                  "type": "apollo.common.Point3D",
+                  "id": 5
+                },
+                "polygonPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point3D",
+                  "id": 6
+                }
+              }
+            },
+            "ObstacleTrajectoryFeature": {
+              "fields": {
+                "perceptionObstacleHistory": {
+                  "rule": "repeated",
+                  "type": "PerceptionObstacleFeature",
+                  "id": 1
+                },
+                "evaluatedTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
             "PredictionTrajectoryFeature": {
               "fields": {
                 "probability": {
@@ -4345,7 +4379,7 @@
                 },
                 "trajectoryPoint": {
                   "rule": "repeated",
-                  "type": "TrajectoryPointFeature",
+                  "type": "TrajectoryPoint",
                   "id": 2
                 }
               }
@@ -4404,9 +4438,8 @@
                   "type": "apollo.perception.PerceptionObstacle.Type",
                   "id": 5
                 },
-                "obstacleTrajectoryPoint": {
-                  "rule": "repeated",
-                  "type": "PerceptionObstacleFeature",
+                "obstacleTrajectory": {
+                  "type": "ObstacleTrajectoryFeature",
                   "id": 6
                 },
                 "obstaclePrediction": {
@@ -4431,12 +4464,44 @@
             },
             "TrafficLightFeature": {
               "fields": {
-                "id": {
-                  "type": "string",
-                  "id": 1
-                },
                 "color": {
                   "type": "apollo.perception.TrafficLight.Color",
+                  "id": 1
+                },
+                "id": {
+                  "type": "string",
+                  "id": 2
+                },
+                "confidence": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "trackingTime": {
+                  "type": "double",
+                  "id": 4
+                },
+                "blink": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "remainingTime": {
+                  "type": "double",
+                  "id": 6
+                }
+              }
+            },
+            "TrafficLightDetectionFeature": {
+              "fields": {
+                "messageTimestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trafficLight": {
+                  "rule": "repeated",
+                  "type": "TrafficLightFeature",
                   "id": 2
                 }
               }
@@ -4452,7 +4517,7 @@
                   "id": 2
                 },
                 "trajectoryPoint": {
-                  "type": "apollo.common.TrajectoryPoint",
+                  "type": "TrajectoryPointFeature",
                   "id": 3
                 }
               }
@@ -4468,7 +4533,7 @@
             },
             "LearningDataFrame": {
               "fields": {
-                "timestampSec": {
+                "messageTimestampSec": {
                   "type": "double",
                   "id": 1
                 },
@@ -4501,9 +4566,8 @@
                   "type": "RoutingFeature",
                   "id": 8
                 },
-                "trafficLight": {
-                  "rule": "repeated",
-                  "type": "TrafficLightFeature",
+                "trafficLightDetection": {
+                  "type": "TrafficLightDetectionFeature",
                   "id": 9
                 },
                 "adcTrajectoryPoint": {

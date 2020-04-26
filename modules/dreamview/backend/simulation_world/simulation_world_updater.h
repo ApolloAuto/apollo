@@ -77,6 +77,10 @@ class SimulationWorldUpdater {
   // frontend.
   static constexpr double kSimWorldTimeIntervalMs = 100;
 
+  double LastAdcTimestampSec() {
+    return last_pushed_adc_timestamp_sec_;
+  }
+
  private:
   /**
    * @brief The callback function to get updates from SimulationWorldService,
@@ -138,6 +142,8 @@ class SimulationWorldUpdater {
   boost::shared_mutex mutex_;
 
   std::unique_ptr<cyber::Timer> timer_;
+
+  volatile double last_pushed_adc_timestamp_sec_ = 0.0f;
 };
 
 }  // namespace dreamview

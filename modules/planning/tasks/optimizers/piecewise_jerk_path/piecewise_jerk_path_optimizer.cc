@@ -147,12 +147,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       // final_path_data might carry info from upper stream
       PathData path_data = *final_path_data;
       path_data.SetReferenceLine(&reference_line);
+      path_data.SetFrenetPath(std::move(frenet_frame_path));
       if (FLAGS_use_front_axe_center_in_path_planning) {
         auto discretized_path = DiscretizedPath(
             ConvertPathPointRefFromFrontAxeToRearAxe(path_data));
+        path_data = *final_path_data;
+        path_data.SetReferenceLine(&reference_line);
         path_data.SetDiscretizedPath(discretized_path);
-      } else {
-        path_data.SetFrenetPath(std::move(frenet_frame_path));
       }
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());

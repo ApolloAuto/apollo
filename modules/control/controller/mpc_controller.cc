@@ -290,11 +290,11 @@ void MPCController::LoadMPCGainScheduler(
       << "Fail to load heading error gain scheduler for MPC controller";
 
   feedforwardterm_interpolation_.reset(new Interpolation1D);
-  ACHECK(feedforwardterm_interpolation_->Init(xy2))
+  ACHECK(feedforwardterm_interpolation_->Init(xy3))
       << "Fail to load feed forward term gain scheduler for MPC controller";
 
   steer_weight_interpolation_.reset(new Interpolation1D);
-  ACHECK(steer_weight_interpolation_->Init(xy2))
+  ACHECK(steer_weight_interpolation_->Init(xy4))
       << "Fail to load steer weight gain scheduler for MPC controller";
 }
 
