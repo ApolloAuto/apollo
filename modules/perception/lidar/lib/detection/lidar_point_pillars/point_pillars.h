@@ -102,44 +102,44 @@ class PointPillars {
  private:
   friend class TestClass;
   // initize in initializer list
-  const bool reproduce_result_mode_;
-  const float score_threshold_;
-  const float nms_overlap_threshold_;
-  const std::string pfe_onnx_file_;
-  const std::string rpn_onnx_file_;
-  const int MAX_NUM_PILLARS_;
-  const int MAX_NUM_POINTS_PER_PILLAR_;
-  const int PFE_OUTPUT_SIZE_;
-  const int GRID_X_SIZE_;
-  const int GRID_Y_SIZE_;
-  const int GRID_Z_SIZE_;
-  const int RPN_INPUT_SIZE_;
-  const int NUM_ANCHOR_X_INDS_;
-  const int NUM_ANCHOR_Y_INDS_;
-  const int NUM_ANCHOR_R_INDS_;
-  const int NUM_ANCHOR_;
-  const int NUM_CLASS_;
-  const int RPN_BOX_OUTPUT_SIZE_;
-  const int RPN_CLS_OUTPUT_SIZE_;
-  const int RPN_DIR_OUTPUT_SIZE_;
-  const float PILLAR_X_SIZE_;
-  const float PILLAR_Y_SIZE_;
-  const float PILLAR_Z_SIZE_;
-  const float MIN_X_RANGE_;
-  const float MIN_Y_RANGE_;
-  const float MIN_Z_RANGE_;
-  const float MAX_X_RANGE_;
-  const float MAX_Y_RANGE_;
-  const float MAX_Z_RANGE_;
-  const int BATCH_SIZE_;
-  const int NUM_INDS_FOR_SCAN_;
-  const int NUM_THREADS_;
-  const float SENSOR_HEIGHT_;
-  const float ANCHOR_DX_SIZE_;
-  const float ANCHOR_DY_SIZE_;
-  const float ANCHOR_DZ_SIZE_;
-  const int NUM_BOX_CORNERS_;
-  const int NUM_OUTPUT_BOX_FEATURE_;
+  const bool kReproduceResultMode;
+  const float kScoreThreshold;
+  const float kNmsOverlapThreshold;
+  const std::string kPfeOnnxFile;
+  const std::string kRpnOnnxFile;
+  const int kMaxNumPillars;
+  const int kMaxNumPointsPerPillar;
+  const int kPfeOutputSize;
+  const int kGridXSize;
+  const int kGridYSize;
+  const int kGridZSize;
+  const int kRpnInputSize;
+  const int kNumAnchorXInds;
+  const int kNumAnchorYInds;
+  const int kNumAnchorRInds;
+  const int kNumAnchor;
+  const int kNumClass;
+  const int kRpnBoxOutputSize;
+  const int kRpnClsOutputSize;
+  const int kRpnDirOutputSize;
+  const float kPillarXSize;
+  const float kPillarYSize;
+  const float kPillarZSize;
+  const float kMinXRange;
+  const float kMinYRange;
+  const float kMinZRange;
+  const float kMaxXRange;
+  const float kMaxYRange;
+  const float kMaxZRange;
+  const int kBatchSize;
+  const int kNumIndsForScan;
+  const int kNumThreads;
+  const float kSensorHeight;
+  const float kAnchorDxSize;
+  const float kAnchorDySize;
+  const float kAnchorDzSize;
+  const int kNumBoxCorners;
+  const int kNumOutputBoxFeature;
   // end initializer list
 
   int host_pillar_count_[1];
@@ -223,19 +223,19 @@ class PointPillars {
    * @brief Memory allocation for device memory
    * @details Called in the constructor
    */
-  void deviceMemoryMalloc();
+  void DeviceMemoryMalloc();
 
   /**
    * @brief Initializing anchor
    * @details Called in the constructor
    */
-  void initAnchors();
+  void InitAnchors();
 
   /**
    * @brief Initializing TensorRT instances
    * @details Called in the constructor
    */
-  void initTRT();
+  void InitTRT();
 
   /**
    * @brief Generate anchors
@@ -255,7 +255,7 @@ class PointPillars {
    * anchor
    * @details Generate anchors for each grid
    */
-  void generateAnchors(float* anchors_px_, float* anchors_py_,
+  void GenerateAnchors(float* anchors_px_, float* anchors_py_,
                        float* anchors_pz_, float* anchors_dx_,
                        float* anchors_dy_, float* anchors_dz_,
                        float* anchors_ro_);
@@ -266,7 +266,7 @@ class PointPillars {
    * @param[out] trt_model_stream TensorRT model made out of ONNX model
    * @details Load ONNX model, and convert it to TensorRT model
    */
-  void onnxToTRTModel(const std::string& model_file,
+  void OnnxToTRTModel(const std::string& model_file,
                       nvinfer1::IHostMemory** trt_model_stream);
 
   /**
@@ -275,7 +275,7 @@ class PointPillars {
    * @param[in] in_num_points Number of points
    * @details Call CPU or GPU preprocess
    */
-  void preprocess(const float* in_points_array, const int in_num_points);
+  void Preprocess(const float* in_points_array, const int in_num_points);
 
   /**
    * @brief Preproces by CPU
@@ -284,7 +284,7 @@ class PointPillars {
    * @details The output from preprocessCPU is reproducible, while preprocessGPU
    * is not
    */
-  void preprocessCPU(const float* in_points_array, const int in_num_points);
+  void PreprocessCPU(const float* in_points_array, const int in_num_points);
 
   /**
    * @brief Preproces by GPU
@@ -292,7 +292,7 @@ class PointPillars {
    * @param[in] in_num_points Number of points
    * @details Faster preprocess comapared with CPU preprocess
    */
-  void preprocessGPU(const float* in_points_array, const int in_num_points);
+  void PreprocessGPU(const float* in_points_array, const int in_num_points);
 
   /**
    * @brief Convert anchors to box form like min_x, min_y, max_x, max_y anchors
@@ -314,7 +314,7 @@ class PointPillars {
    * correspomding anchor
    * @details Make box anchors for nms
    */
-  void convertAnchors2BoxAnchors(float* anchors_px_, float* anchors_py_,
+  void ConvertAnchors2BoxAnchors(float* anchors_px_, float* anchors_py_,
                                  float* anchors_dx_, float* anchors_dy_,
                                  float* box_anchors_min_x_,
                                  float* box_anchors_min_y_,
@@ -325,7 +325,7 @@ class PointPillars {
    * @brief Memory allocation for anchors
    * @details Memory allocation for anchors
    */
-  void putAnchorsInDeviceMemory();
+  void PutAnchorsInDeviceMemory();
 
  public:
   /**
@@ -354,7 +354,7 @@ class PointPillars {
    * @param[out] out_labels Network output object's label
    * @details This is an interface for the algorithm
    */
-  void doInference(const float* in_points_array,
+  void DoInference(const float* in_points_array,
                    const int in_num_points,
                    std::vector<float>* out_detections,
                    std::vector<int>* out_labels);

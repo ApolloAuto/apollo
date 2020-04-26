@@ -39,30 +39,30 @@ namespace lidar {
 
 __global__ void scatter_kernel(int *x_coors, int *y_coors, float *pfe_output,
                                float *scattered_feature,
-                               const int MAX_NUM_PILLARS_,
-                               const int GRID_X_SIZE, const int GRID_Y_SIZE) {
+                               const int kMaxNumPillars,
+                               const int grid_x_size, const int grid_y_size) {
   int i_pillar = blockIdx.x;
   int i_feature = threadIdx.x;
   int x_ind = x_coors[i_pillar];
   int y_ind = y_coors[i_pillar];
-  float feature = pfe_output[i_feature * MAX_NUM_PILLARS_ + i_pillar];
-  scattered_feature[i_feature * GRID_Y_SIZE * GRID_X_SIZE +
-                    y_ind * GRID_X_SIZE + x_ind] = feature;
+  float feature = pfe_output[i_feature * kMaxNumPillars + i_pillar];
+  scattered_feature[i_feature * grid_y_size * grid_x_size +
+                    y_ind * grid_x_size + x_ind] = feature;
 }
 
-ScatterCuda::ScatterCuda(const int NUM_THREADS, const int MAX_NUM_PILLARS,
-                         const int GRID_X_SIZE, const int GRID_Y_SIZE)
-    : NUM_THREADS_(NUM_THREADS),
-      MAX_NUM_PILLARS_(MAX_NUM_PILLARS),
-      GRID_X_SIZE_(GRID_X_SIZE),
-      GRID_Y_SIZE_(GRID_Y_SIZE) {}
+ScatterCuda::ScatterCuda(const int num_threads, const int max_num_pillars,
+                         const int grid_x_size, const int grid_y_size)
+    : kNumThreads(num_threads),
+      kMaxNumPillars(max_num_pillars),
+      kGridXSize(grid_x_size),
+      kGridYSize(grid_y_size) {}
 
-void ScatterCuda::doScatterCuda(const int pillar_count, int *x_coors,
+void ScatterCuda::DoScatterCuda(const int pillar_count, int *x_coors,
                                 int *y_coors, float *pfe_output,
                                 float *scattered_feature) {
-  scatter_kernel<<<pillar_count, NUM_THREADS_>>>(
-      x_coors, y_coors, pfe_output, scattered_feature, MAX_NUM_PILLARS_,
-      GRID_X_SIZE_, GRID_Y_SIZE_);
+  scatter_kernel<<<pillar_count, kNumThreads>>>(
+      x_coors, y_coors, pfe_output, scattered_feature, kMaxNumPillars,
+      kGridXSize, kGridYSize);
 }
 
 }  // namespace lidar

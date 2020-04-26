@@ -45,22 +45,22 @@ namespace lidar {
 
 class ScatterCuda {
  private:
-  const int NUM_THREADS_;
-  const int MAX_NUM_PILLARS_;
-  const int GRID_X_SIZE_;
-  const int GRID_Y_SIZE_;
+  const int kNumThreads;
+  const int kMaxNumPillars;
+  const int kGridXSize;
+  const int kGridYSize;
 
  public:
   /**
    * @brief Constructor
-   * @param[in] NUM_THREADS The number of threads to launch cuda kernel
-   * @param[in] MAX_NUM_PILLARS Maximum number of pillars
-   * @param[in] GRID_X_SIZE Number of pillars in x-coordinate
-   * @param[in] GRID_Y_SIZE Number of pillars in y-coordinate
+   * @param[in] num_threads The number of threads to launch cuda kernel
+   * @param[in] max_num_pillars Maximum number of pillars
+   * @param[in] grid_x_size Number of pillars in x-coordinate
+   * @param[in] grid_y_size Number of pillars in y-coordinate
    * @details Captital variables never change after the compile
    */
-  ScatterCuda(const int NUM_THREADS, const int MAX_NUM_PILLARS,
-              const int GRID_X_SIZE, const int GRID_Y_SIZE);
+  ScatterCuda(const int num_threads, const int max_num_pillars,
+              const int grid_x_size, const int grid_y_size);
 
   /**
    * @brief Call scatter cuda kernel
@@ -72,7 +72,7 @@ class ScatterCuda {
    * @details Allocate pillars in gridmap based on index(coordinates)
    * information
    */
-  void doScatterCuda(const int pillar_count, int* x_coors, int* y_coors,
+  void DoScatterCuda(const int pillar_count, int* x_coors, int* y_coors,
                      float* pfe_output, float* scattered_feature);
 };
 

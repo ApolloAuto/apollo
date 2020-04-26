@@ -135,35 +135,35 @@ __global__ void scan_y(int* g_odata, int* g_idata, int n) {
 __global__ void make_anchor_mask_kernel(
     const float* dev_box_anchors_min_x, const float* dev_box_anchors_min_y,
     const float* dev_box_anchors_max_x, const float* dev_box_anchors_max_y,
-    int* dev_sparse_pillar_map, int* dev_anchor_mask, const float MIN_X_RANGE,
-    const float MIN_Y_RANGE, const float PILLAR_X_SIZE,
-    const float PILLAR_Y_SIZE, const int GRID_X_SIZE, const int GRID_Y_SIZE,
-    const int NUM_INDS_FOR_SCAN) {
+    int* dev_sparse_pillar_map, int* dev_anchor_mask, const float min_x_range,
+    const float min_y_range, const float pillar_x_size,
+    const float pillar_y_size, const int grid_x_size, const int grid_y_size,
+    const int num_inds_for_scan) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   int anchor_coor[NUM_2D_BOX_CORNERS_MACRO] = {0};
-  const int GRID_X_SIZE_1 = GRID_X_SIZE - 1;  // grid_x_size - 1
-  const int GRID_Y_SIZE_1 = GRID_Y_SIZE - 1;  // grid_y_size - 1
+  const int kGridXSize1 = grid_x_size - 1;  // grid_x_size - 1
+  const int kGridYSize1 = grid_y_size - 1;  // grid_y_size - 1
 
   anchor_coor[0] =
-      floor((dev_box_anchors_min_x[tid] - MIN_X_RANGE) / PILLAR_X_SIZE);
+      floor((dev_box_anchors_min_x[tid] - min_x_range) / pillar_x_size);
   anchor_coor[1] =
-      floor((dev_box_anchors_min_y[tid] - MIN_Y_RANGE) / PILLAR_Y_SIZE);
+      floor((dev_box_anchors_min_y[tid] - min_y_range) / pillar_y_size);
   anchor_coor[2] =
-      floor((dev_box_anchors_max_x[tid] - MIN_X_RANGE) / PILLAR_X_SIZE);
+      floor((dev_box_anchors_max_x[tid] - min_x_range) / pillar_x_size);
   anchor_coor[3] =
-      floor((dev_box_anchors_max_y[tid] - MIN_Y_RANGE) / PILLAR_Y_SIZE);
+      floor((dev_box_anchors_max_y[tid] - min_y_range) / pillar_y_size);
   anchor_coor[0] = max(anchor_coor[0], 0);
   anchor_coor[1] = max(anchor_coor[1], 0);
-  anchor_coor[2] = min(anchor_coor[2], GRID_X_SIZE_1);
-  anchor_coor[3] = min(anchor_coor[3], GRID_Y_SIZE_1);
+  anchor_coor[2] = min(anchor_coor[2], kGridXSize1);
+  anchor_coor[3] = min(anchor_coor[3], kGridYSize1);
 
-  int right_top = dev_sparse_pillar_map[anchor_coor[3] * NUM_INDS_FOR_SCAN +
+  int right_top = dev_sparse_pillar_map[anchor_coor[3] * num_inds_for_scan +
                                         anchor_coor[2]];
-  int left_bottom = dev_sparse_pillar_map[anchor_coor[1] * NUM_INDS_FOR_SCAN +
+  int left_bottom = dev_sparse_pillar_map[anchor_coor[1] * num_inds_for_scan +
                                           anchor_coor[0]];
-  int left_top = dev_sparse_pillar_map[anchor_coor[3] * NUM_INDS_FOR_SCAN +
+  int left_top = dev_sparse_pillar_map[anchor_coor[3] * num_inds_for_scan +
                                        anchor_coor[0]];
-  int right_bottom = dev_sparse_pillar_map[anchor_coor[1] * NUM_INDS_FOR_SCAN +
+  int right_bottom = dev_sparse_pillar_map[anchor_coor[1] * num_inds_for_scan +
                                            anchor_coor[2]];
 
   int area = right_top - left_top - right_bottom + left_bottom;
@@ -175,41 +175,41 @@ __global__ void make_anchor_mask_kernel(
 }
 
 AnchorMaskCuda::AnchorMaskCuda(
-    const int NUM_INDS_FOR_SCAN, const int NUM_ANCHOR_X_INDS,
-    const int NUM_ANCHOR_Y_INDS, const int NUM_ANCHOR_R_INDS,
-    const float MIN_X_RANGE, const float MIN_Y_RANGE, const float PILLAR_X_SIZE,
-    const float PILLAR_Y_SIZE, const int GRID_X_SIZE, const int GRID_Y_SIZE)
-    : NUM_INDS_FOR_SCAN_(NUM_INDS_FOR_SCAN),
-      NUM_ANCHOR_X_INDS_(NUM_ANCHOR_X_INDS),
-      NUM_ANCHOR_Y_INDS_(NUM_ANCHOR_Y_INDS),
-      NUM_ANCHOR_R_INDS_(NUM_ANCHOR_R_INDS),
-      MIN_X_RANGE_(MIN_X_RANGE),
-      MIN_Y_RANGE_(MIN_Y_RANGE),
-      PILLAR_X_SIZE_(PILLAR_X_SIZE),
-      PILLAR_Y_SIZE_(PILLAR_Y_SIZE),
-      GRID_X_SIZE_(GRID_X_SIZE),
-      GRID_Y_SIZE_(GRID_Y_SIZE) {}
+    const int num_inds_for_scan, const int num_anchor_x_inds,
+    const int num_anchor_y_inds, const int num_anchor_r_inds,
+    const float min_x_range, const float min_y_range, const float pillar_x_size,
+    const float pillar_y_size, const int grid_x_size, const int grid_y_size)
+    : kNumIndsForScan(num_inds_for_scan),
+      kNumAnchorXInds(num_anchor_x_inds),
+      kNumAnchorYInds(num_anchor_y_inds),
+      kNumAnchorRInds(num_anchor_r_inds),
+      kMinXRange(min_x_range),
+      kMinYRange(min_y_range),
+      kPillarXSize(pillar_x_size),
+      kPillarYSize(pillar_y_size),
+      kGridXSize(grid_x_size),
+      kGridYSize(grid_y_size) {}
 
-void AnchorMaskCuda::doAnchorMaskCuda(
+void AnchorMaskCuda::DoAnchorMaskCuda(
     int* dev_sparse_pillar_map, int* dev_cumsum_along_x,
     int* dev_cumsum_along_y, const float* dev_box_anchors_min_x,
     const float* dev_box_anchors_min_y, const float* dev_box_anchors_max_x,
     const float* dev_box_anchors_max_y, int* dev_anchor_mask) {
-  scan_x<<<NUM_INDS_FOR_SCAN_, NUM_INDS_FOR_SCAN_ / 2,
-           NUM_INDS_FOR_SCAN_ * sizeof(int)>>>(
-      dev_cumsum_along_x, dev_sparse_pillar_map, NUM_INDS_FOR_SCAN_);
-  scan_y<<<NUM_INDS_FOR_SCAN_, NUM_INDS_FOR_SCAN_ / 2,
-           NUM_INDS_FOR_SCAN_ * sizeof(int)>>>(
-      dev_cumsum_along_y, dev_cumsum_along_x, NUM_INDS_FOR_SCAN_);
+  scan_x<<<kNumIndsForScan, kNumIndsForScan / 2,
+           kNumIndsForScan * sizeof(int)>>>(
+      dev_cumsum_along_x, dev_sparse_pillar_map, kNumIndsForScan);
+  scan_y<<<kNumIndsForScan, kNumIndsForScan / 2,
+           kNumIndsForScan * sizeof(int)>>>(
+      dev_cumsum_along_y, dev_cumsum_along_x, kNumIndsForScan);
   GPU_CHECK(cudaMemcpy(dev_sparse_pillar_map, dev_cumsum_along_y,
-                       NUM_INDS_FOR_SCAN_ * NUM_INDS_FOR_SCAN_ * sizeof(int),
+                       kNumIndsForScan * kNumIndsForScan * sizeof(int),
                        cudaMemcpyDeviceToDevice));
-  make_anchor_mask_kernel<<<NUM_ANCHOR_X_INDS_ * NUM_ANCHOR_R_INDS_,
-                            NUM_ANCHOR_Y_INDS_>>>(
+  make_anchor_mask_kernel<<<kNumAnchorXInds * kNumAnchorRInds,
+                            kNumAnchorYInds>>>(
       dev_box_anchors_min_x, dev_box_anchors_min_y, dev_box_anchors_max_x,
       dev_box_anchors_max_y, dev_sparse_pillar_map, dev_anchor_mask,
-      MIN_X_RANGE_, MIN_Y_RANGE_, PILLAR_X_SIZE_, PILLAR_Y_SIZE_, GRID_X_SIZE_,
-      GRID_Y_SIZE_, NUM_INDS_FOR_SCAN_);
+      kMinXRange, kMinYRange, kPillarXSize, kPillarYSize, kGridXSize,
+      kGridYSize, kNumIndsForScan);
 }
 
 }  // namespace lidar

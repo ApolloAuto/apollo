@@ -50,22 +50,22 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class NMSCuda {
+class NmsCuda {
  private:
-  const int NUM_THREADS_;
-  const int NUM_BOX_CORNERS_;
-  const float nms_overlap_threshold_;
+  const int kNumThreads;
+  const int kNumBoxCorners;
+  const float kNmsOverlapThreshold;
 
  public:
   /**
    * @brief Constructor
-   * @param[in] NUM_THREADS Number of threads when launching cuda kernel
-   * @param[in] NUM_BOX_CORNERS Number of corners for 2D box
+   * @param[in] num_threads Number of threads when launching cuda kernel
+   * @param[in] num_box_corners Number of corners for 2D box
    * @param[in] nms_overlap_threshold IOU threshold for NMS
    * @details Captital variables never change after the compile, Non-captital
    * variables could be chaned through rosparam
    */
-  NMSCuda(const int NUM_THREADS, const int NUM_BOX_CORNERS,
+  NmsCuda(const int num_threads, const int num_box_corners,
           const float nms_overlap_threshold);
 
   /**
@@ -76,7 +76,7 @@ class NMSCuda {
    * @param[out] out_num_to_keep Number of kept bounding boxes
    * @details NMS in GPU and postprocessing for selecting box in CPU
    */
-  void doNMSCuda(const int host_filter_count, float* dev_sorted_box_for_nms,
+  void DoNmsCuda(const int host_filter_count, float* dev_sorted_box_for_nms,
                  int* out_keep_inds, int* out_num_to_keep);
 };
 
