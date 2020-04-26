@@ -12,7 +12,7 @@ enum ErrorCode {
   CONTROL_INIT_ERROR = 1001;
   CONTROL_COMPUTE_ERROR = 1002;
   CONTROL_ESTOP_ERROR = 1003;
-
+  PERFECT_CONTROL_ERROR = 1004;
   // Canbus module error codes start from here.
   CANBUS_ERROR = 2000;
   CAN_CLIENT_ERROR_BASE = 2100;
@@ -38,7 +38,7 @@ enum ErrorCode {
 
   // Prediction module error codes start from here.
   PREDICTION_ERROR = 5000;
-
+  PERFECT_PREDICTION_ERROR = 5001;
   // Planning module error codes start from here
   PLANNING_ERROR = 6000;
   PLANNING_ERROR_NOT_READY = 6001;
@@ -69,6 +69,9 @@ enum ErrorCode {
 
   // Storytelling error codes.
   STORYTELLING_ERROR = 14000;
+  AGENT_SERVER_ERROR = 15000;
+  AGGREGATE_TRAFFIC_LIGHT_ERROR = 16000;
+  AGGREGATE_OBSTACLE_ERROR = 17000;
 }
 
 message StatusPb {
