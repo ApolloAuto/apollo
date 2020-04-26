@@ -42,7 +42,7 @@ __device__ inline float devIoU(float const *const a, float const *const b) {
 
 __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
                            const float *dev_boxes, uint64_t *dev_mask,
-                           const int NUM_BOX_CORNERS) {
+                           const int num_box_corners) {
   const int row_start = blockIdx.y;
   const int col_start = blockIdx.x;
 
@@ -53,17 +53,17 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
 
   __shared__ float block_boxes[NUM_THREADS_MACRO * NUM_2D_BOX_CORNERS_MACRO];
   if (threadIdx.x < col_size) {
-    block_boxes[threadIdx.x * NUM_BOX_CORNERS + 0] =
-        dev_boxes[(block_threads * col_start + threadIdx.x) * NUM_BOX_CORNERS +
+    block_boxes[threadIdx.x * num_box_corners + 0] =
+        dev_boxes[(block_threads * col_start + threadIdx.x) * num_box_corners +
                   0];
-    block_boxes[threadIdx.x * NUM_BOX_CORNERS + 1] =
-        dev_boxes[(block_threads * col_start + threadIdx.x) * NUM_BOX_CORNERS +
+    block_boxes[threadIdx.x * num_box_corners + 1] =
+        dev_boxes[(block_threads * col_start + threadIdx.x) * num_box_corners +
                   1];
-    block_boxes[threadIdx.x * NUM_BOX_CORNERS + 2] =
-        dev_boxes[(block_threads * col_start + threadIdx.x) * NUM_BOX_CORNERS +
+    block_boxes[threadIdx.x * num_box_corners + 2] =
+        dev_boxes[(block_threads * col_start + threadIdx.x) * num_box_corners +
                   2];
-    block_boxes[threadIdx.x * NUM_BOX_CORNERS + 3] =
-        dev_boxes[(block_threads * col_start + threadIdx.x) * NUM_BOX_CORNERS +
+    block_boxes[threadIdx.x * num_box_corners + 3] =
+        dev_boxes[(block_threads * col_start + threadIdx.x) * num_box_corners +
                   3];
   }
   __syncthreads();
@@ -71,17 +71,17 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
   if (threadIdx.x < row_size) {
     const int cur_box_idx = block_threads * row_start + threadIdx.x;
     const float cur_box[NUM_2D_BOX_CORNERS_MACRO] = {
-        dev_boxes[cur_box_idx * NUM_BOX_CORNERS + 0],
-        dev_boxes[cur_box_idx * NUM_BOX_CORNERS + 1],
-        dev_boxes[cur_box_idx * NUM_BOX_CORNERS + 2],
-        dev_boxes[cur_box_idx * NUM_BOX_CORNERS + 3]};
+        dev_boxes[cur_box_idx * num_box_corners + 0],
+        dev_boxes[cur_box_idx * num_box_corners + 1],
+        dev_boxes[cur_box_idx * num_box_corners + 2],
+        dev_boxes[cur_box_idx * num_box_corners + 3]};
     uint64_t t = 0;
     int start = 0;
     if (row_start == col_start) {
       start = threadIdx.x + 1;
     }
     for (int i = start; i < col_size; i++) {
-      if (devIoU(cur_box, block_boxes + i * NUM_BOX_CORNERS) >
+      if (devIoU(cur_box, block_boxes + i * num_box_corners) >
           nms_overlap_thresh) {
         t |= 1ULL << i;
       }
@@ -91,27 +91,27 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
   }
 }
 
-NMSCuda::NMSCuda(const int NUM_THREADS, const int NUM_BOX_CORNERS,
+NmsCuda::NmsCuda(const int num_threads, const int num_box_corners,
                  const float nms_overlap_threshold)
-    : NUM_THREADS_(NUM_THREADS),
-      NUM_BOX_CORNERS_(NUM_BOX_CORNERS),
-      nms_overlap_threshold_(nms_overlap_threshold) {}
+    : kNumThreads(num_threads),
+      kNumBoxCorners(num_box_corners),
+      kNmsOverlapThreshold(nms_overlap_threshold) {}
 
-void NMSCuda::doNMSCuda(const int host_filter_count,
+void NmsCuda::DoNmsCuda(const int host_filter_count,
                         float *dev_sorted_box_for_nms, int *out_keep_inds,
                         int *out_num_to_keep) {
-  const int col_blocks = DIVUP(host_filter_count, NUM_THREADS_);
-  dim3 blocks(DIVUP(host_filter_count, NUM_THREADS_),
-              DIVUP(host_filter_count, NUM_THREADS_));
-  dim3 threads(NUM_THREADS_);
+  const int col_blocks = DIVUP(host_filter_count, kNumThreads);
+  dim3 blocks(DIVUP(host_filter_count, kNumThreads),
+              DIVUP(host_filter_count, kNumThreads));
+  dim3 threads(kNumThreads);
 
   uint64_t *dev_mask = NULL;
   GPU_CHECK(cudaMalloc(
       &dev_mask, host_filter_count * col_blocks * sizeof(uint64_t)));
 
-  nms_kernel<<<blocks, threads>>>(host_filter_count, nms_overlap_threshold_,
+  nms_kernel<<<blocks, threads>>>(host_filter_count, kNmsOverlapThreshold,
                                   dev_sorted_box_for_nms, dev_mask,
-                                  NUM_BOX_CORNERS_);
+                                  kNumBoxCorners);
 
   // postprocess for nms output
   std::vector<uint64_t> host_mask(host_filter_count * col_blocks);
@@ -123,8 +123,8 @@ void NMSCuda::doNMSCuda(const int host_filter_count,
   memset(&remv[0], 0, sizeof(uint64_t) * col_blocks);
 
   for (int i = 0; i < host_filter_count; i++) {
-    int nblock = i / NUM_THREADS_;
-    int inblock = i % NUM_THREADS_;
+    int nblock = i / kNumThreads;
+    int inblock = i % kNumThreads;
 
     if (!(remv[nblock] & (1ULL << inblock))) {
       out_keep_inds[(*out_num_to_keep)++] = i;

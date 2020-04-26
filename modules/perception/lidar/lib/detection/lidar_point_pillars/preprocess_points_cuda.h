@@ -46,20 +46,20 @@ namespace lidar {
 class PreprocessPointsCuda {
  private:
   // initialzer list
-  const int NUM_THREADS_;
-  const int MAX_NUM_PILLARS_;
-  const int MAX_NUM_POINTS_PER_PILLAR_;
-  const int NUM_INDS_FOR_SCAN_;
-  const int GRID_X_SIZE_;
-  const int GRID_Y_SIZE_;
-  const int GRID_Z_SIZE_;
-  const float PILLAR_X_SIZE_;
-  const float PILLAR_Y_SIZE_;
-  const float PILLAR_Z_SIZE_;
-  const float MIN_X_RANGE_;
-  const float MIN_Y_RANGE_;
-  const float MIN_Z_RANGE_;
-  const int NUM_BOX_CORNERS_;
+  const int kNumThreads;
+  const int kMaxNumPillars;
+  const int kMaxNumPointsPerPillar;
+  const int kNumIndsForScan;
+  const int kGridXSize;
+  const int kGridYSize;
+  const int kGridZSize;
+  const float kPillarXSize;
+  const float kPillarYSize;
+  const float kPillarZSize;
+  const float kMinXRange;
+  const float kMinYRange;
+  const float kMinZRange;
+  const int kNumBoxCorners;
   // end initalizer list
 
   float* dev_pillar_x_in_coors_;
@@ -76,30 +76,30 @@ class PreprocessPointsCuda {
  public:
   /**
    * @brief Constructor
-   * @param[in] NUM_THREADS Number of threads when launching cuda kernel
-   * @param[in] MAX_NUM_PILLARS Maximum number of pillars
-   * @param[in] MAX_POINTS_PER_PILLAR Maximum number of points per pillar
-   * @param[in] NUM_INDS_FOR_SCAN Number of indexes for scan(cumsum)
-   * @param[in] GRID_X_SIZE Number of pillars in x-coordinate
-   * @param[in] GRID_Y_SIZE Number of pillars in y-coordinate
-   * @param[in] GRID_Z_SIZE Number of pillars in z-coordinate
-   * @param[in] PILLAR_X_SIZE Size of x-dimension for a pillar
-   * @param[in] PILLAR_Y_SIZE Size of y-dimension for a pillar
-   * @param[in] PILLAR_Z_SIZE Size of z-dimension for a pillar
-   * @param[in] MIN_X_RANGE Minimum x value for pointcloud
-   * @param[in] MIN_Y_RANGE Minimum y value for pointcloud
-   * @param[in] MIN_Z_RANGE Minimum z value for pointcloud
-   * @param[in] NUM_BOX_CORNERS Number of corners for 2D box
+   * @param[in] num_threads Number of threads when launching cuda kernel
+   * @param[in] max_num_pillars Maximum number of pillars
+   * @param[in] max_points_per_pillar Maximum number of points per pillar
+   * @param[in] num_inds_for_scan Number of indexes for scan(cumsum)
+   * @param[in] grid_x_size Number of pillars in x-coordinate
+   * @param[in] grid_y_size Number of pillars in y-coordinate
+   * @param[in] grid_z_size Number of pillars in z-coordinate
+   * @param[in] pillar_x_size Size of x-dimension for a pillar
+   * @param[in] pillar_y_size Size of y-dimension for a pillar
+   * @param[in] pillar_z_size Size of z-dimension for a pillar
+   * @param[in] min_x_range Minimum x value for pointcloud
+   * @param[in] min_y_range Minimum y value for pointcloud
+   * @param[in] min_z_range Minimum z value for pointcloud
+   * @param[in] num_box_corners Number of corners for 2D box
    * @details Captital variables never change after the compile
    */
-  PreprocessPointsCuda(const int NUM_THREADS, const int MAX_NUM_PILLARS,
-                       const int MAX_POINTS_PER_PILLAR,
-                       const int NUM_INDS_FOR_SCAN, const int GRID_X_SIZE,
-                       const int GRID_Y_SIZE, const int GRID_Z_SIZE,
-                       const float PILLAR_X_SIZE, const float PILLAR_Y_SIZE,
-                       const float PILLAR_Z_SIZE, const float MIN_X_RANGE,
-                       const float MIN_Y_RANGE, const float MIN_Z_RANGE,
-                       const int NUM_BOX_CORNERS);
+  PreprocessPointsCuda(const int num_threads, const int max_num_pillars,
+                       const int max_points_per_pillar,
+                       const int num_inds_for_scan, const int grid_x_size,
+                       const int grid_y_size, const int grid_z_size,
+                       const float pillar_x_size, const float pillar_y_size,
+                       const float pillar_z_size, const float min_x_range,
+                       const float min_y_range, const float min_z_range,
+                       const int num_box_corners);
   ~PreprocessPointsCuda();
 
   /**
@@ -126,7 +126,7 @@ class PreprocessPointsCuda {
    * pointcloud
    * @details Convert pointcloud to pillar representation
    */
-  void doPreprocessPointsCuda(
+  void DoPreprocessPointsCuda(
       const float* dev_points, const int in_num_points, int* dev_x_coors,
       int* dev_y_coors, float* dev_num_points_per_pillar, float* dev_pillar_x,
       float* dev_pillar_y, float* dev_pillar_z, float* dev_pillar_i,

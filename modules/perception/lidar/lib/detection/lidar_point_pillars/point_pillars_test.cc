@@ -60,41 +60,41 @@ class TestSuite : public ::testing::Test {
 
 class TestClass {
  public:
-  TestClass(const int MAX_NUM_PILLARS, const int MAX_NUM_POINTS_PER_PILLAR,
-            const int GRID_X_SIZE, const int GRID_Y_SIZE, const int GRID_Z_SIZE,
-            const float PILLAR_X_SIZE, const float PILLAR_Y_SIZE,
-            const float PILLAR_Z_SIZE, const float MIN_X_RANGE,
-            const float MIN_Y_RANGE, const float MIN_Z_RANGE,
-            const int NUM_INDS_FOR_SCAN, const int NUM_BOX_CORNERS);
-  const int MAX_NUM_PILLARS_;
-  const int MAX_NUM_POINTS_PER_PILLAR_;
-  const int GRID_X_SIZE_;
-  const int GRID_Y_SIZE_;
-  const int GRID_Z_SIZE_;
-  const float PILLAR_X_SIZE_;
-  const float PILLAR_Y_SIZE_;
-  const float PILLAR_Z_SIZE_;
-  const float MIN_X_RANGE_;
-  const float MIN_Y_RANGE_;
-  const float MIN_Z_RANGE_;
-  const int NUM_INDS_FOR_SCAN_;
-  const int NUM_BOX_CORNERS_;
+  TestClass(const int max_num_pillars, const int max_num_points_per_pillar,
+            const int grid_x_size, const int grid_y_size, const int grid_z_size,
+            const float pillar_x_size, const float pillar_y_size,
+            const float pillar_z_size, const float min_x_range,
+            const float min_y_range, const float min_z_range,
+            const int num_inds_for_scan, const int num_box_corners);
+  const int kMaxNumPillars;
+  const int kMaxNumPointsPerPillar;
+  const int kGridXSize;
+  const int kGridYSize;
+  const int kGridZSize;
+  const float kPillarXSize;
+  const float kPillarYSize;
+  const float kPillarZSize;
+  const float kMinXRange;
+  const float kMinYRange;
+  const float kMinZRange;
+  const int kNumIndsForScan;
+  const int kNumBoxCorners;
 
   // Make pointcloud for test
-  void makePointsForTest(pcl::PointCloud<pcl::PointXYZI>::Ptr in_pcl_pc_ptr);
-  void pclToArray(const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
+  void MakePointsForTest(pcl::PointCloud<pcl::PointXYZI>::Ptr in_pcl_pc_ptr);
+  void PclToArray(const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
                   float* out_points_array,
                   const float normalizing_factor = 1.0);
-  void preprocess(const float* in_points_array, int in_num_points, int* x_coors,
+  void Preprocess(const float* in_points_array, int in_num_points, int* x_coors,
                   int* y_coors, float* num_points_per_pillar, float* pillar_x,
                   float* pillar_y, float* pillar_z, float* pillar_i,
                   float* x_coors_for_sub_shaped, float* y_coors_for_sub_shaped,
                   float* pillar_feature_mask, float* sparse_pillar_map,
                   int* host_pillar_count);
-  void generateAnchors(float* anchors_px, float* anchors_py, float* anchors_pz,
+  void GenerateAnchors(float* anchors_px, float* anchors_py, float* anchors_pz,
                        float* anchors_dx, float* anchors_dy, float* anchors_dz,
                        float* anchors_ro);
-  void convertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
+  void ConvertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
                                  float* anchors_dx, float* anchors_dy,
                                  float* box_anchors_min_x,
                                  float* box_anchors_min_y,
@@ -110,31 +110,31 @@ class TestClass {
   std::unique_ptr<PointPillars> point_pillars_ptr_;
 };
 
-TestClass::TestClass(const int MAX_NUM_PILLARS,
-                     const int MAX_NUM_POINTS_PER_PILLAR, const int GRID_X_SIZE,
-                     const int GRID_Y_SIZE, const int GRID_Z_SIZE,
-                     const float PILLAR_X_SIZE, const float PILLAR_Y_SIZE,
-                     const float PILLAR_Z_SIZE, const float MIN_X_RANGE,
-                     const float MIN_Y_RANGE, const float MIN_Z_RANGE,
-                     const int NUM_INDS_FOR_SCAN, const int NUM_BOX_CORNERS)
-    : MAX_NUM_PILLARS_(MAX_NUM_PILLARS),
-      MAX_NUM_POINTS_PER_PILLAR_(MAX_NUM_POINTS_PER_PILLAR),
-      GRID_X_SIZE_(GRID_X_SIZE),
-      GRID_Y_SIZE_(GRID_Y_SIZE),
-      GRID_Z_SIZE_(GRID_Z_SIZE),
-      PILLAR_X_SIZE_(PILLAR_X_SIZE),
-      PILLAR_Y_SIZE_(PILLAR_Y_SIZE),
-      PILLAR_Z_SIZE_(PILLAR_Z_SIZE),
-      MIN_X_RANGE_(MIN_X_RANGE),
-      MIN_Y_RANGE_(MIN_Y_RANGE),
-      MIN_Z_RANGE_(MIN_Z_RANGE),
-      NUM_INDS_FOR_SCAN_(NUM_INDS_FOR_SCAN),
-      NUM_BOX_CORNERS_(NUM_BOX_CORNERS) {
+TestClass::TestClass(const int max_num_pillars,
+                     const int max_num_points_per_pillar, const int grid_x_size,
+                     const int grid_y_size, const int grid_z_size,
+                     const float pillar_x_size, const float pillar_y_size,
+                     const float pillar_z_size, const float min_x_range,
+                     const float min_y_range, const float min_z_range,
+                     const int num_inds_for_scan, const int num_box_corners)
+    : kMaxNumPillars(max_num_pillars),
+      kMaxNumPointsPerPillar(max_num_points_per_pillar),
+      kGridXSize(grid_x_size),
+      kGridYSize(grid_y_size),
+      kGridZSize(grid_z_size),
+      kPillarXSize(pillar_x_size),
+      kPillarYSize(pillar_y_size),
+      kPillarZSize(pillar_z_size),
+      kMinXRange(min_x_range),
+      kMinYRange(min_y_range),
+      kMinZRange(min_z_range),
+      kNumIndsForScan(num_inds_for_scan),
+      kNumBoxCorners(num_box_corners) {
   preprocess_points_ptr_.reset(new PreprocessPoints(
-      MAX_NUM_PILLARS_, MAX_NUM_POINTS_PER_PILLAR_, GRID_X_SIZE_, GRID_Y_SIZE_,
-      GRID_Z_SIZE_, PILLAR_X_SIZE_, PILLAR_Y_SIZE_, PILLAR_Z_SIZE_,
-      MIN_X_RANGE_, MIN_Y_RANGE_, MIN_Z_RANGE_, NUM_INDS_FOR_SCAN_,
-      NUM_BOX_CORNERS_));
+      kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize, kGridYSize,
+      kGridZSize, kPillarXSize, kPillarYSize, kPillarZSize,
+      kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan,
+      kNumBoxCorners));
 
   //  bool baselink_support=true;
   bool reproduce_result_mode = false;
@@ -146,9 +146,9 @@ TestClass::TestClass(const int MAX_NUM_PILLARS,
       new PointPillars(reproduce_result_mode, num_class, score_threshold,
                        nms_overlap_threshold, FLAGS_pfe_onnx_file,
                        FLAGS_rpn_onnx_file));
-};
+}
 
-void TestClass::preprocess(const float* in_points_array, int in_num_points,
+void TestClass::Preprocess(const float* in_points_array, int in_num_points,
                            int* x_coors, int* y_coors,
                            float* num_points_per_pillar, float* pillar_x,
                            float* pillar_y, float* pillar_z, float* pillar_i,
@@ -156,14 +156,14 @@ void TestClass::preprocess(const float* in_points_array, int in_num_points,
                            float* y_coors_for_sub_shaped,
                            float* pillar_feature_mask, float* sparse_pillar_map,
                            int* host_pillar_count) {
-  preprocess_points_ptr_->preprocess(
+  preprocess_points_ptr_->Preprocess(
       in_points_array, in_num_points, x_coors, y_coors, num_points_per_pillar,
       pillar_x, pillar_y, pillar_z, pillar_i, x_coors_for_sub_shaped,
       y_coors_for_sub_shaped, pillar_feature_mask, sparse_pillar_map,
       host_pillar_count);
 }
 
-void TestClass::pclToArray(
+void TestClass::PclToArray(
     const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
     float* out_points_array, const float normalizing_factor) {
   for (size_t i = 0; i < in_pcl_pc_ptr->size(); ++i) {
@@ -176,7 +176,7 @@ void TestClass::pclToArray(
   }
 }
 
-void TestClass::makePointsForTest(
+void TestClass::MakePointsForTest(
     pcl::PointCloud<pcl::PointXYZI>::Ptr in_pcl_pc_ptr) {
   pcl::PointXYZI point;
   point.x = 12.9892;
@@ -221,22 +221,22 @@ void TestClass::makePointsForTest(
   in_pcl_pc_ptr->push_back(point);
 }
 
-void TestClass::generateAnchors(float* anchors_px, float* anchors_py,
+void TestClass::GenerateAnchors(float* anchors_px, float* anchors_py,
                                 float* anchors_pz, float* anchors_dx,
                                 float* anchors_dy, float* anchors_dz,
                                 float* anchors_ro) {
-  return point_pillars_ptr_->generateAnchors(anchors_px, anchors_py, anchors_pz,
+  return point_pillars_ptr_->GenerateAnchors(anchors_px, anchors_py, anchors_pz,
                                              anchors_dx, anchors_dy, anchors_dz,
                                              anchors_ro);
 }
 
-void TestClass::convertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
+void TestClass::ConvertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
                                           float* anchors_dx, float* anchors_dy,
                                           float* box_anchors_min_x,
                                           float* box_anchors_min_y,
                                           float* box_anchors_max_x,
                                           float* box_anchors_max_y) {
-  return point_pillars_ptr_->convertAnchors2BoxAnchors(
+  return point_pillars_ptr_->ConvertAnchors2BoxAnchors(
       anchors_px, anchors_py, anchors_dx, anchors_dy, box_anchors_min_x,
       box_anchors_min_y, box_anchors_max_x, box_anchors_max_y);
 }
@@ -245,64 +245,64 @@ void TestClass::DoInference(const float* in_points_array,
                             const int in_num_points,
                             std::vector<float>* out_detections,
                             std::vector<int>* out_labels) {
-  return point_pillars_ptr_->doInference(in_points_array, in_num_points,
+  return point_pillars_ptr_->DoInference(in_points_array, in_num_points,
                                          out_detections, out_labels);
 }
 
 TEST(TestSuite, CheckPreprocessPointsCPU) {
-  const int MAX_NUM_PILLARS = 12000;
-  const int MAX_NUM_POINTS_PER_PILLAR = 100;
-  const int GRID_X_SIZE = 432;
-  const int GRID_Y_SIZE = 496;
-  const int GRID_Z_SIZE = 1;
-  const float PILLAR_X_SIZE = 0.16;
-  const float PILLAR_Y_SIZE = 0.16;
-  const float PILLAR_Z_SIZE = 4.0;
-  const float MIN_X_RANGE = 0;
-  const float MIN_Y_RANGE = -39.68;
-  const float MIN_Z_RANGE = -3.0;
-  const int NUM_INDS_FOR_SCAN = 512;
-  const int NUM_BOX_CORNERS = 4;
-  TestClass test_obj(MAX_NUM_PILLARS, MAX_NUM_POINTS_PER_PILLAR, GRID_X_SIZE,
-                     GRID_Y_SIZE, GRID_Z_SIZE, PILLAR_X_SIZE, PILLAR_Y_SIZE,
-                     PILLAR_Z_SIZE, MIN_X_RANGE, MIN_Y_RANGE, MIN_Z_RANGE,
-                     NUM_INDS_FOR_SCAN, NUM_BOX_CORNERS);
+  const int kMaxNumPillars = 12000;
+  const int kMaxNumPointsPerPillar = 100;
+  const int kGridXSize = 432;
+  const int kGridYSize = 496;
+  const int kGridZSize = 1;
+  const float kPillarXSize = 0.16;
+  const float kPillarYSize = 0.16;
+  const float kPillarZSize = 4.0;
+  const float kMinXRange = 0;
+  const float kMinYRange = -39.68;
+  const float kMinZRange = -3.0;
+  const int kNumIndsForScan = 512;
+  const int kNumBoxCorners = 4;
+  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
+                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
+                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
+                     kNumIndsForScan, kNumBoxCorners);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
-  test_obj.makePointsForTest(pcl_pc_ptr);
+  test_obj.MakePointsForTest(pcl_pc_ptr);
 
   float* points_array = new float[pcl_pc_ptr->size() * 4];
-  test_obj.pclToArray(pcl_pc_ptr, points_array);
+  test_obj.PclToArray(pcl_pc_ptr, points_array);
 
-  int x_coors[MAX_NUM_PILLARS];
+  int x_coors[kMaxNumPillars];
   x_coors[0] = 0;
-  int y_coors[MAX_NUM_PILLARS];
+  int y_coors[kMaxNumPillars];
   y_coors[0] = 0;
-  float num_points_per_pillar[MAX_NUM_PILLARS];
+  float num_points_per_pillar[kMaxNumPillars];
   num_points_per_pillar[0] = 0;
-  float* pillar_x = new float[test_obj.MAX_NUM_PILLARS_ *
-                              test_obj.MAX_NUM_POINTS_PER_PILLAR_];
-  float* pillar_y = new float[test_obj.MAX_NUM_PILLARS_ *
-                              test_obj.MAX_NUM_POINTS_PER_PILLAR_];
-  float* pillar_z = new float[test_obj.MAX_NUM_PILLARS_ *
-                              test_obj.MAX_NUM_POINTS_PER_PILLAR_];
-  float* pillar_i = new float[test_obj.MAX_NUM_PILLARS_ *
-                              test_obj.MAX_NUM_POINTS_PER_PILLAR_];
+  float* pillar_x = new float[test_obj.kMaxNumPillars *
+                              test_obj.kMaxNumPointsPerPillar];
+  float* pillar_y = new float[test_obj.kMaxNumPillars *
+                              test_obj.kMaxNumPointsPerPillar];
+  float* pillar_z = new float[test_obj.kMaxNumPillars *
+                              test_obj.kMaxNumPointsPerPillar];
+  float* pillar_i = new float[test_obj.kMaxNumPillars *
+                              test_obj.kMaxNumPointsPerPillar];
 
   float* x_coors_for_sub_shaped =
-      new float[test_obj.MAX_NUM_PILLARS_ *
-                test_obj.MAX_NUM_POINTS_PER_PILLAR_];
+      new float[test_obj.kMaxNumPillars *
+                test_obj.kMaxNumPointsPerPillar];
   float* y_coors_for_sub_shaped =
-      new float[test_obj.MAX_NUM_PILLARS_ *
-                test_obj.MAX_NUM_POINTS_PER_PILLAR_];
-  float* pillar_feature_mask = new float[test_obj.MAX_NUM_PILLARS_ *
-                                         test_obj.MAX_NUM_POINTS_PER_PILLAR_];
+      new float[test_obj.kMaxNumPillars *
+                test_obj.kMaxNumPointsPerPillar];
+  float* pillar_feature_mask = new float[test_obj.kMaxNumPillars *
+                                         test_obj.kMaxNumPointsPerPillar];
 
   float* sparse_pillar_map = new float[512 * 512];
 
   int host_pillar_count[1] = {0};
-  test_obj.preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,
+  test_obj.Preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,
                       num_points_per_pillar, pillar_x, pillar_y, pillar_z,
                       pillar_i, x_coors_for_sub_shaped, y_coors_for_sub_shaped,
                       pillar_feature_mask, sparse_pillar_map,
@@ -325,23 +325,23 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
 }
 
 TEST(TestSuite, CheckGenerateAnchors) {
-  const int MAX_NUM_PILLARS = 12000;
-  const int MAX_NUM_POINTS_PER_PILLAR = 100;
-  const int GRID_X_SIZE = 432;
-  const int GRID_Y_SIZE = 496;
-  const int GRID_Z_SIZE = 1;
-  const float PILLAR_X_SIZE = 0.16;
-  const float PILLAR_Y_SIZE = 0.16;
-  const float PILLAR_Z_SIZE = 4.0;
-  const float MIN_X_RANGE = 0;
-  const float MIN_Y_RANGE = -39.68;
-  const float MIN_Z_RANGE = -3.0;
-  const int NUM_INDS_FOR_SCAN = 512;
-  const int NUM_BOX_CORNERS = 4;
-  TestClass test_obj(MAX_NUM_PILLARS, MAX_NUM_POINTS_PER_PILLAR, GRID_X_SIZE,
-                     GRID_Y_SIZE, GRID_Z_SIZE, PILLAR_X_SIZE, PILLAR_Y_SIZE,
-                     PILLAR_Z_SIZE, MIN_X_RANGE, MIN_Y_RANGE, MIN_Z_RANGE,
-                     NUM_INDS_FOR_SCAN, NUM_BOX_CORNERS);
+  const int kMaxNumPillars = 12000;
+  const int kMaxNumPointsPerPillar = 100;
+  const int kGridXSize = 432;
+  const int kGridYSize = 496;
+  const int kGridZSize = 1;
+  const float kPillarXSize = 0.16;
+  const float kPillarYSize = 0.16;
+  const float kPillarZSize = 4.0;
+  const float kMinXRange = 0;
+  const float kMinYRange = -39.68;
+  const float kMinZRange = -3.0;
+  const int kNumIndsForScan = 512;
+  const int kNumBoxCorners = 4;
+  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
+                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
+                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
+                     kNumIndsForScan, kNumBoxCorners);
 
   const int NUM_ANCHOR = 432 * 0.5 * 496 * 0.5 * 2;
   float* anchors_px = new float[NUM_ANCHOR];
@@ -351,7 +351,7 @@ TEST(TestSuite, CheckGenerateAnchors) {
   float* anchors_dy = new float[NUM_ANCHOR];
   float* anchors_dz = new float[NUM_ANCHOR];
   float* anchors_ro = new float[NUM_ANCHOR];
-  test_obj.generateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
+  test_obj.GenerateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
                            anchors_dy, anchors_dz, anchors_ro);
 
   EXPECT_NEAR(0.48, anchors_px[3], 0.001);
@@ -372,23 +372,23 @@ TEST(TestSuite, CheckGenerateAnchors) {
 }
 
 TEST(TestSuite, CheckGenerateBoxAnchors) {
-  const int MAX_NUM_PILLARS = 12000;
-  const int MAX_NUM_POINTS_PER_PILLAR = 100;
-  const int GRID_X_SIZE = 432;
-  const int GRID_Y_SIZE = 496;
-  const int GRID_Z_SIZE = 1;
-  const float PILLAR_X_SIZE = 0.16;
-  const float PILLAR_Y_SIZE = 0.16;
-  const float PILLAR_Z_SIZE = 4.0;
-  const float MIN_X_RANGE = 0;
-  const float MIN_Y_RANGE = -39.68;
-  const float MIN_Z_RANGE = -3.0;
-  const int NUM_INDS_FOR_SCAN = 512;
-  const int NUM_BOX_CORNERS = 4;
-  TestClass test_obj(MAX_NUM_PILLARS, MAX_NUM_POINTS_PER_PILLAR, GRID_X_SIZE,
-                     GRID_Y_SIZE, GRID_Z_SIZE, PILLAR_X_SIZE, PILLAR_Y_SIZE,
-                     PILLAR_Z_SIZE, MIN_X_RANGE, MIN_Y_RANGE, MIN_Z_RANGE,
-                     NUM_INDS_FOR_SCAN, NUM_BOX_CORNERS);
+  const int kMaxNumPillars = 12000;
+  const int kMaxNumPointsPerPillar = 100;
+  const int kGridXSize = 432;
+  const int kGridYSize = 496;
+  const int kGridZSize = 1;
+  const float kPillarXSize = 0.16;
+  const float kPillarYSize = 0.16;
+  const float kPillarZSize = 4.0;
+  const float kMinXRange = 0;
+  const float kMinYRange = -39.68;
+  const float kMinZRange = -3.0;
+  const int kNumIndsForScan = 512;
+  const int kNumBoxCorners = 4;
+  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
+                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
+                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
+                     kNumIndsForScan, kNumBoxCorners);
 
   const int NUM_ANCHOR = 432 * 0.5 * 496 * 0.5 * 2;
 
@@ -403,9 +403,9 @@ TEST(TestSuite, CheckGenerateBoxAnchors) {
   float* box_anchors_min_y = new float[NUM_ANCHOR];
   float* box_anchors_max_x = new float[NUM_ANCHOR];
   float* box_anchors_max_y = new float[NUM_ANCHOR];
-  test_obj.generateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
+  test_obj.GenerateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
                            anchors_dy, anchors_dz, anchors_ro);
-  test_obj.convertAnchors2BoxAnchors(
+  test_obj.ConvertAnchors2BoxAnchors(
       anchors_px, anchors_py, anchors_dx, anchors_dy, box_anchors_min_x,
       box_anchors_min_y, box_anchors_max_x, box_anchors_max_y);
 
@@ -428,25 +428,25 @@ TEST(TestSuite, CheckGenerateBoxAnchors) {
 }
 
 TEST(TestSuite, CheckDoInference) {
-  const int MAX_NUM_PILLARS = 12000;
-  const int MAX_NUM_POINTS_PER_PILLAR = 100;
-  const int GRID_X_SIZE = 432;
-  const int GRID_Y_SIZE = 496;
-  const int GRID_Z_SIZE = 1;
-  const float PILLAR_X_SIZE = 0.16;
-  const float PILLAR_Y_SIZE = 0.16;
-  const float PILLAR_Z_SIZE = 4.0;
-  const float MIN_X_RANGE = 0;
-  const float MIN_Y_RANGE = -39.68;
-  const float MIN_Z_RANGE = -3.0;
-  const int NUM_INDS_FOR_SCAN = 512;
-  const int NUM_BOX_CORNERS = 4;
-  const int OUTPUT_NUM_BOX_FEATURE = 7;
-  const float NORMALIZING_FACTOR = 255.0;
-  TestClass test_obj(MAX_NUM_PILLARS, MAX_NUM_POINTS_PER_PILLAR, GRID_X_SIZE,
-                     GRID_Y_SIZE, GRID_Z_SIZE, PILLAR_X_SIZE, PILLAR_Y_SIZE,
-                     PILLAR_Z_SIZE, MIN_X_RANGE, MIN_Y_RANGE, MIN_Z_RANGE,
-                     NUM_INDS_FOR_SCAN, NUM_BOX_CORNERS);
+  const int kMaxNumPillars = 12000;
+  const int kMaxNumPointsPerPillar = 100;
+  const int kGridXSize = 432;
+  const int kGridYSize = 496;
+  const int kGridZSize = 1;
+  const float kPillarXSize = 0.16;
+  const float kPillarYSize = 0.16;
+  const float kPillarZSize = 4.0;
+  const float kMinXRange = 0;
+  const float kMinYRange = -39.68;
+  const float kMinZRange = -3.0;
+  const int kNumIndsForScan = 512;
+  const int kNumBoxCorners = 4;
+  const int kOutputNumBoxFeature = 7;
+  const float kNormalizingFactor = 255.0;
+  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
+                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
+                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
+                     kNumIndsForScan, kNumBoxCorners);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
@@ -470,29 +470,29 @@ TEST(TestSuite, CheckDoInference) {
   }
 
   float* points_array = new float[pcl_pc_ptr->size() * 4];
-  test_obj.pclToArray(pcl_pc_ptr, points_array, NORMALIZING_FACTOR);
+  test_obj.PclToArray(pcl_pc_ptr, points_array, kNormalizingFactor);
 
-  std::vector<float>* out_detections(new std::vector<float>());
-  std::vector<int>* out_labels(new std::vector<int>());
+  std::vector<float> out_detections;
+  std::vector<int> out_labels;
   test_obj.DoInference(
-      points_array, pcl_pc_ptr->size(), out_detections, out_labels);
+      points_array, pcl_pc_ptr->size(), &out_detections, &out_labels);
 
-  int num_objects = out_detections->size() / OUTPUT_NUM_BOX_FEATURE;
+  int num_objects = out_detections.size() / kOutputNumBoxFeature;
   EXPECT_GE(num_objects, 4);
-  EXPECT_EQ(num_objects, out_labels->size());
+  EXPECT_EQ(num_objects, out_labels.size());
 
   for (int j = 0; j < num_objects; ++j) {
-    float x = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 0);
-    float y = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 1);
-    float z = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 2);
-    float dx = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 4);
-    float dy = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 3);
-    float dz = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 5);
-    float yaw = out_detections->at(j * OUTPUT_NUM_BOX_FEATURE + 6);
+    float x = out_detections.at(j * kOutputNumBoxFeature + 0);
+    float y = out_detections.at(j * kOutputNumBoxFeature + 1);
+    float z = out_detections.at(j * kOutputNumBoxFeature + 2);
+    float dx = out_detections.at(j * kOutputNumBoxFeature + 4);
+    float dy = out_detections.at(j * kOutputNumBoxFeature + 3);
+    float dz = out_detections.at(j * kOutputNumBoxFeature + 5);
+    float yaw = out_detections.at(j * kOutputNumBoxFeature + 6);
     yaw += M_PI / 2;
     yaw = std::atan2(std::sin(yaw), std::cos(yaw));
     yaw = -yaw;
-    int label = out_labels->at(j);
+    int label = out_labels.at(j);
 
     std::cout << "object id: " << j << ", x: " << x << ", y: " << y
               << ", z: " << z << ", dx: " << dx << ", dy: " << dy

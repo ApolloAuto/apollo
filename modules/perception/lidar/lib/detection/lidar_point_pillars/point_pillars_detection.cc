@@ -33,8 +33,8 @@ using base::PointF;
 
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(
-      new PointPillars(reproduce_result_mode_, num_class_, score_threshold_,
-                       nms_overlap_threshold_, FLAGS_pfe_onnx_file,
+      new PointPillars(reproduce_result_mode_, num_class_, kScoreThreshold,
+                       kNmsOverlapThreshold, FLAGS_pfe_onnx_file,
                        FLAGS_rpn_onnx_file));
   return true;
 }
@@ -77,7 +77,7 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   // inference
   std::vector<float> out_detections;
   std::vector<int> out_labels;
-  point_pillars_ptr_->doInference(points_array, original_cloud_->size(),
+  point_pillars_ptr_->DoInference(points_array, original_cloud_->size(),
                                   &out_detections, &out_labels);
   inference_time_ = timer.toc(true);
 
