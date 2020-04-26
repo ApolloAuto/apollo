@@ -16,7 +16,7 @@ export default class RealtimeWebSocketEndpoint {
         this.routingTime = undefined;
         this.currentMode = null;
         this.worker = new Worker();
-
+        this.pointcloudWS = null;
         this.requestHmiStatus = this.requestHmiStatus.bind(this);
     }
 
@@ -144,7 +144,9 @@ export default class RealtimeWebSocketEndpoint {
                     this.requestDefaultRoutingEndPoint();
                     this.updatePOI = false;
                 }
-
+                if (this.pointcloudWS.isEnabled()) {
+                    this.pointcloudWS.requestPointCloud();
+                }
                 this.requestSimulationWorld(STORE.options.showPNCMonitor);
                 if (STORE.hmi.isCalibrationMode) {
                     this.requestDataCollectionProgress();
@@ -327,5 +329,9 @@ export default class RealtimeWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "RequestDataCollectionProgress",
         }));
+    }
+
+    setPointCloudWS(pointcloudws) {
+        this.pointcloudWS = pointcloudws;
     }
 }
