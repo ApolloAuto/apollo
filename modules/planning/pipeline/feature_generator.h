@@ -43,6 +43,8 @@ class FeatureGenerator {
 
   void ProcessOfflineData(const std::string& record_filename);
 
+  void WriteRemainderData();
+
  private:
   struct ADCCurrentInfo {
     std::pair<double, double> adc_cur_position_;
