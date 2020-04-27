@@ -48,6 +48,7 @@ void GenerateLearningData() {
       AINFO << "\tProcessing: [ " << i + 1 << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
       feature_generator.ProcessOfflineData(offline_bags[i]);
+      feature_generator.WriteRemainderData();
     }
   }
   feature_generator.Close();
