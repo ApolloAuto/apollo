@@ -16,6 +16,7 @@
 
 #include "modules/planning/pipeline/evaluator.h"
 
+#include <limits>
 #include <sstream>
 
 #include "cyber/common/file.h"
@@ -101,6 +102,7 @@ void Evaluator::WriteOutData(
 
 void Evaluator::EvaluateTrajectoryByTime(
     const int frame_num,
+    const std::string& obstacle_id,
     const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
     const double start_point_timestamp_sec,
     const double delta_time,
@@ -135,15 +137,29 @@ void Evaluator::EvaluateTrajectoryByTime(
     std::reverse(updated_trajectory.begin(), updated_trajectory.end());
   }
   DiscretizedTrajectory discretized_trajectory;
+  double last_relative_time = std::numeric_limits<double>::min();
   for (const auto& tp : updated_trajectory) {
-    discretized_trajectory.AppendTrajectoryPoint(tp);
+    // check for abnormal perception data
+    if (tp.relative_time() > last_relative_time) {
+      discretized_trajectory.AppendTrajectoryPoint(tp);
+    } else {
+      std::ostringstream msg;
+      msg << "SKIP: frame_num[" << frame_num << "] obstacle_id[" << obstacle_id
+          << "] last_relative_time[" << last_relative_time
+          << "] relatice_time[" << tp.relative_time()
+          << "] relative_time diff ["
+          << tp.relative_time() - last_relative_time << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
+    last_relative_time = tp.relative_time();
   }
 
   const int low_bound =
       ceil(updated_trajectory.front().relative_time() / delta_time);
   const int high_bound =
       floor(updated_trajectory.back().relative_time() / delta_time);
-  ADEBUG << "frame_num[" << frame_num
+  ADEBUG << "frame_num[" << frame_num << "] obstacle_id[" << obstacle_id
          << "] low[" << low_bound << "] high[" << high_bound << "]";
   for (int i = low_bound; i <= high_bound; ++i) {
     double timestamp_sec = start_point_timestamp_sec + i * delta_time;
@@ -213,6 +229,7 @@ void Evaluator::EvaluateADCTrajectory(
 
   std::vector<TrajectoryPoint> evaluated_trajectory;
   EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
+                           "adc_trajectory",
                            trajectory,
                            start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
@@ -274,6 +291,7 @@ void Evaluator::EvaluateADCFutureTrajectory(
 
   std::vector<TrajectoryPoint> evaluated_trajectory;
   EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
+                           "adc_future_trajectory",
                            trajectory,
                            start_point_timestamp_sec,
                            FLAGS_trajectory_delta_t,
@@ -349,6 +367,7 @@ void Evaluator::EvaluateObstacleTrajectory(
 
     std::vector<TrajectoryPoint> evaluated_trajectory;
     EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
+                             std::to_string(obstacle_id),
                              trajectory,
                              start_point_timestamp_sec,
                              FLAGS_trajectory_delta_t,
@@ -414,6 +433,7 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
 
       std::vector<TrajectoryPoint> evaluated_trajectory;
       EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
+                               std::to_string(obstacle_id),
                                trajectory,
                                start_point_timestamp_sec,
                                FLAGS_trajectory_delta_t,
