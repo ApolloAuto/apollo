@@ -114,6 +114,17 @@ void FeatureGenerator::WriteOutLearningData(
   ++learning_data_file_index_;
 }
 
+void FeatureGenerator::WriteRemainderData() {
+  if (learning_data_.learning_data_size() > 0) {
+    WriteOutLearningData(learning_data_, learning_data_file_index_);
+  }
+  std::ostringstream msg;
+  msg << "record_file[" << record_file_name_
+      << "] frame_num[" << total_learning_data_frame_num_ << "]";
+  AINFO << msg.str();
+  log_file_ << msg.str() << std::endl;
+}
+
 void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
   static double last_localization_message_timestamp_sec = 0.0;
   if (last_localization_message_timestamp_sec == 0.0) {
