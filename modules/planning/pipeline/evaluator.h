@@ -37,6 +37,7 @@ class Evaluator {
  private:
   void EvaluateTrajectoryByTime(
       const int frame_num,
+      const std::string& obstacle_id,
       const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
       const double start_point_timestamp_sec,
       const double delta_time,

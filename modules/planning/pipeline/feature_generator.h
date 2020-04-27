@@ -42,6 +42,7 @@ class FeatureGenerator {
   void Close();
 
   void ProcessOfflineData(const std::string& record_filename);
+
   void WriteRemainderData();
 
  private:
