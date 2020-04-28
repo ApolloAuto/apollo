@@ -236,6 +236,7 @@ void FeatureGenerator::OnPrediction(
       if (!obstacle_history_map_[m.first].empty() &&
           time_diff >= kTimeGapToClearObstacleHistory) {
         obstacle_history_map_.erase(m.first);
+        obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
         std::ostringstream msg;
         msg << "Clear history: obstacle_id[" << m.first
             << "] last_timestamp_sec[" << last_timestamp_sec
