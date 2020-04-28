@@ -141,8 +141,8 @@ __global__ void make_anchor_mask_kernel(
     const int num_inds_for_scan) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   int anchor_coor[NUM_2D_BOX_CORNERS_MACRO] = {0};
-  const int kGridXSize1 = grid_x_size - 1;  // grid_x_size - 1
-  const int kGridYSize1 = grid_y_size - 1;  // grid_y_size - 1
+  const int grid_x_size_1 = grid_x_size - 1;  // grid_x_size - 1
+  const int grid_y_size_1 = grid_y_size - 1;  // grid_y_size - 1
 
   anchor_coor[0] =
       floor((dev_box_anchors_min_x[tid] - min_x_range) / pillar_x_size);
@@ -154,8 +154,8 @@ __global__ void make_anchor_mask_kernel(
       floor((dev_box_anchors_max_y[tid] - min_y_range) / pillar_y_size);
   anchor_coor[0] = max(anchor_coor[0], 0);
   anchor_coor[1] = max(anchor_coor[1], 0);
-  anchor_coor[2] = min(anchor_coor[2], kGridXSize1);
-  anchor_coor[3] = min(anchor_coor[3], kGridYSize1);
+  anchor_coor[2] = min(anchor_coor[2], grid_x_size_1);
+  anchor_coor[3] = min(anchor_coor[3], grid_y_size_1);
 
   int right_top = dev_sparse_pillar_map[anchor_coor[3] * num_inds_for_scan +
                                         anchor_coor[2]];
@@ -179,37 +179,37 @@ AnchorMaskCuda::AnchorMaskCuda(
     const int num_anchor_y_inds, const int num_anchor_r_inds,
     const float min_x_range, const float min_y_range, const float pillar_x_size,
     const float pillar_y_size, const int grid_x_size, const int grid_y_size)
-    : kNumIndsForScan(num_inds_for_scan),
-      kNumAnchorXInds(num_anchor_x_inds),
-      kNumAnchorYInds(num_anchor_y_inds),
-      kNumAnchorRInds(num_anchor_r_inds),
-      kMinXRange(min_x_range),
-      kMinYRange(min_y_range),
-      kPillarXSize(pillar_x_size),
-      kPillarYSize(pillar_y_size),
-      kGridXSize(grid_x_size),
-      kGridYSize(grid_y_size) {}
+    : num_inds_for_scan_(num_inds_for_scan),
+      num_anchor_x_inds_(num_anchor_x_inds),
+      num_anchor_y_inds_(num_anchor_y_inds),
+      num_anchor_r_inds_(num_anchor_r_inds),
+      min_x_range_(min_x_range),
+      min_y_range_(min_y_range),
+      pillar_x_size_(pillar_x_size),
+      pillar_y_size_(pillar_y_size),
+      grid_x_size_(grid_x_size),
+      grid_y_size_(grid_y_size) {}
 
 void AnchorMaskCuda::DoAnchorMaskCuda(
     int* dev_sparse_pillar_map, int* dev_cumsum_along_x,
     int* dev_cumsum_along_y, const float* dev_box_anchors_min_x,
     const float* dev_box_anchors_min_y, const float* dev_box_anchors_max_x,
     const float* dev_box_anchors_max_y, int* dev_anchor_mask) {
-  scan_x<<<kNumIndsForScan, kNumIndsForScan / 2,
-           kNumIndsForScan * sizeof(int)>>>(
-      dev_cumsum_along_x, dev_sparse_pillar_map, kNumIndsForScan);
-  scan_y<<<kNumIndsForScan, kNumIndsForScan / 2,
-           kNumIndsForScan * sizeof(int)>>>(
-      dev_cumsum_along_y, dev_cumsum_along_x, kNumIndsForScan);
+  scan_x<<<num_inds_for_scan_, num_inds_for_scan_ / 2,
+           num_inds_for_scan_ * sizeof(int)>>>(
+      dev_cumsum_along_x, dev_sparse_pillar_map, num_inds_for_scan_);
+  scan_y<<<num_inds_for_scan_, num_inds_for_scan_ / 2,
+           num_inds_for_scan_ * sizeof(int)>>>(
+      dev_cumsum_along_y, dev_cumsum_along_x, num_inds_for_scan_);
   GPU_CHECK(cudaMemcpy(dev_sparse_pillar_map, dev_cumsum_along_y,
-                       kNumIndsForScan * kNumIndsForScan * sizeof(int),
+                       num_inds_for_scan_ * num_inds_for_scan_ * sizeof(int),
                        cudaMemcpyDeviceToDevice));
-  make_anchor_mask_kernel<<<kNumAnchorXInds * kNumAnchorRInds,
-                            kNumAnchorYInds>>>(
+  make_anchor_mask_kernel<<<num_anchor_x_inds_ * num_anchor_r_inds_,
+                            num_anchor_y_inds_>>>(
       dev_box_anchors_min_x, dev_box_anchors_min_y, dev_box_anchors_max_x,
       dev_box_anchors_max_y, dev_sparse_pillar_map, dev_anchor_mask,
-      kMinXRange, kMinYRange, kPillarXSize, kPillarYSize, kGridXSize,
-      kGridYSize, kNumIndsForScan);
+      min_x_range_, min_y_range_, pillar_x_size_, pillar_y_size_, grid_x_size_,
+      grid_y_size_, num_inds_for_scan_);
 }
 
 }  // namespace lidar

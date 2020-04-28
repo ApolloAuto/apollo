@@ -52,9 +52,9 @@ namespace lidar {
 
 class NmsCuda {
  private:
-  const int kNumThreads;
-  const int kNumBoxCorners;
-  const float kNmsOverlapThreshold;
+  const int num_threads_;
+  const int num_box_corners_;
+  const float nms_overlap_threshold_;
 
  public:
   /**

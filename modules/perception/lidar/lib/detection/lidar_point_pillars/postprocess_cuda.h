@@ -53,17 +53,17 @@ namespace lidar {
 
 class PostprocessCuda {
  private:
-  const float kFloatMin;
-  const float kFloatMax;
-  const int kNumAnchorXInds;
-  const int kNumAnchorYInds;
-  const int kNumAnchorRInds;
-  const float kScoreThreshold;
-  const int kNumThreads;
-  const float kNmsOverlapThreshold;
-  const int kNumBoxCorners;
-  const int kNumOutputBoxFeature;
-  const int kNumClass;
+  const float float_min_;
+  const float float_max_;
+  const int num_anchor_x_inds_;
+  const int num_anchor_y_inds_;
+  const int num_anchor_r_inds_;
+  const float score_threshold_;
+  const int num_threads_;
+  const float nms_overlap_threshold_;
+  const int num_box_corners_;
+  const int num_output_box_feature_;
+  const int num_class_;
 
   std::unique_ptr<NmsCuda> nms_cuda_ptr_;
 

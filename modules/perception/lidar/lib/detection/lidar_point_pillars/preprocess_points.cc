@@ -48,19 +48,19 @@ PreprocessPoints::PreprocessPoints(
     const float pillar_z_size, const float min_x_range, const float min_y_range,
     const float min_z_range, const int num_inds_for_scan,
     const int num_box_corners)
-    : kMaxNumPillars(max_num_pillars),
-      kMaxNumPointsPerPillar(max_points_per_pillar),
-      kGridXSize(grid_x_size),
-      kGridYSize(grid_y_size),
-      kGridZSize(grid_z_size),
-      kPillarXSize(pillar_x_size),
-      kPillarYSize(pillar_y_size),
-      kPillarZSize(pillar_z_size),
-      kMinXRange(min_x_range),
-      kMinYRange(min_y_range),
-      kMinZRange(min_z_range),
-      kNumIndsForScan(num_inds_for_scan),
-      kNumBoxCorners(num_box_corners) {}
+    : max_num_pillars_(max_num_pillars),
+      max_num_points_per_pillar_(max_points_per_pillar),
+      grid_x_size_(grid_x_size),
+      grid_y_size_(grid_y_size),
+      grid_z_size_(grid_z_size),
+      pillar_x_size_(pillar_x_size),
+      pillar_y_size_(pillar_y_size),
+      pillar_z_size_(pillar_z_size),
+      min_x_range_(min_x_range),
+      min_y_range_(min_y_range),
+      min_z_range_(min_z_range),
+      num_inds_for_scan_(num_inds_for_scan),
+      num_box_corners_(num_box_corners) {}
 
 void PreprocessPoints::InitializeVariables(int* coor_to_pillaridx,
                                            float* sparse_pillar_map,
@@ -68,19 +68,19 @@ void PreprocessPoints::InitializeVariables(int* coor_to_pillaridx,
                                            float* pillar_z, float* pillar_i,
                                            float* x_coors_for_sub_shaped,
                                            float* y_coors_for_sub_shaped) {
-  for (int i = 0; i < kGridYSize; i++) {
-    for (int j = 0; j < kGridXSize; j++) {
-      coor_to_pillaridx[i * kGridXSize + j] = -1;
+  for (int i = 0; i < grid_y_size_; i++) {
+    for (int j = 0; j < grid_x_size_; j++) {
+      coor_to_pillaridx[i * grid_x_size_ + j] = -1;
     }
   }
 
-  for (int i = 0; i < kNumIndsForScan; i++) {
-    for (int j = 0; j < kNumIndsForScan; j++) {
-      sparse_pillar_map[i * kNumIndsForScan + j] = 0;
+  for (int i = 0; i < num_inds_for_scan_; i++) {
+    for (int j = 0; j < num_inds_for_scan_; j++) {
+      sparse_pillar_map[i * num_inds_for_scan_ + j] = 0;
     }
   }
 
-  for (int i = 0; i < kMaxNumPillars * kMaxNumPointsPerPillar; i++) {
+  for (int i = 0; i < max_num_pillars_ * max_num_points_per_pillar_; i++) {
     pillar_x[i] = 0;
     pillar_y[i] = 0;
     pillar_z[i] = 0;
@@ -97,82 +97,86 @@ void PreprocessPoints::Preprocess(
     float* y_coors_for_sub_shaped, float* pillar_feature_mask,
     float* sparse_pillar_map, int* host_pillar_count) {
   int pillar_count = 0;
-  float x_coors_for_sub[kMaxNumPillars];
-  float y_coors_for_sub[kMaxNumPillars];
+  float* x_coors_for_sub = new float[max_num_pillars_];
+  float* y_coors_for_sub = new float[max_num_pillars_];
   x_coors_for_sub[0] = 0;
   y_coors_for_sub[0] = 0;
   // init variables
-  int coor_to_pillaridx[kGridYSize * kGridXSize];
+  int* coor_to_pillaridx = new int[grid_y_size_ * grid_x_size_];
   InitializeVariables(coor_to_pillaridx, sparse_pillar_map, pillar_x, pillar_y,
                       pillar_z, pillar_i, x_coors_for_sub_shaped,
                       y_coors_for_sub_shaped);
   for (int i = 0; i < in_num_points; i++) {
     int x_coor =
-        std::floor((in_points_array[i * kNumBoxCorners + 0] - kMinXRange) /
-                   kPillarXSize);
+        std::floor((in_points_array[i * num_box_corners_ + 0] - min_x_range_) /
+                   pillar_x_size_);
     int y_coor =
-        std::floor((in_points_array[i * kNumBoxCorners + 1] - kMinYRange) /
-                   kPillarYSize);
+        std::floor((in_points_array[i * num_box_corners_ + 1] - min_y_range_) /
+                   pillar_y_size_);
     int z_coor =
-        std::floor((in_points_array[i * kNumBoxCorners + 2] - kMinZRange) /
-                   kPillarZSize);
-    if (x_coor < 0 || x_coor >= kGridXSize || y_coor < 0 ||
-        y_coor >= kGridYSize || z_coor < 0 || z_coor >= kGridZSize) {
+        std::floor((in_points_array[i * num_box_corners_ + 2] - min_z_range_) /
+                   pillar_z_size_);
+    if (x_coor < 0 || x_coor >= grid_x_size_ || y_coor < 0 ||
+        y_coor >= grid_y_size_ || z_coor < 0 || z_coor >= grid_z_size_) {
       continue;
     }
     // reverse index
-    int pillar_index = coor_to_pillaridx[y_coor * kGridXSize + x_coor];
+    int pillar_index = coor_to_pillaridx[y_coor * grid_x_size_ + x_coor];
     if (pillar_index == -1) {
       pillar_index = pillar_count;
-      if (pillar_count >= kMaxNumPillars) {
+      if (pillar_count >= max_num_pillars_) {
         break;
       }
       pillar_count += 1;
-      coor_to_pillaridx[y_coor * kGridXSize + x_coor] = pillar_index;
+      coor_to_pillaridx[y_coor * grid_x_size_ + x_coor] = pillar_index;
 
       y_coors[pillar_index] = std::floor(y_coor);
       x_coors[pillar_index] = std::floor(x_coor);
 
-      // float y_offset = kPillarYSize/ 2 + kMinYRange;
-      // float x_offset = kPillarXSize/ 2 + kMinXRange;
+      // float y_offset = pillar_y_size_/ 2 + min_y_range_;
+      // float x_offset = pillar_x_size_/ 2 + min_x_range_;
       // TODO(...): Need to be modified after proper training code
       // Will be modified in ver 1.1
       y_coors_for_sub[pillar_index] =
-          std::floor(y_coor) * kPillarYSize + -39.9f;
+          std::floor(y_coor) * pillar_y_size_ + -39.9f;
       x_coors_for_sub[pillar_index] =
-          std::floor(x_coor) * kPillarXSize + 0.1f;
+          std::floor(x_coor) * pillar_x_size_ + 0.1f;
 
-      sparse_pillar_map[y_coor * kNumIndsForScan + x_coor] = 1;
+      sparse_pillar_map[y_coor * num_inds_for_scan_ + x_coor] = 1;
     }
     int num = num_points_per_pillar[pillar_index];
-    if (num < kMaxNumPointsPerPillar) {
-      pillar_x[pillar_index * kMaxNumPointsPerPillar + num] =
-          in_points_array[i * kNumBoxCorners + 0];
-      pillar_y[pillar_index * kMaxNumPointsPerPillar + num] =
-          in_points_array[i * kNumBoxCorners + 1];
-      pillar_z[pillar_index * kMaxNumPointsPerPillar + num] =
-          in_points_array[i * kNumBoxCorners + 2];
-      pillar_i[pillar_index * kMaxNumPointsPerPillar + num] =
-          in_points_array[i * kNumBoxCorners + 3];
+    if (num < max_num_points_per_pillar_) {
+      pillar_x[pillar_index * max_num_points_per_pillar_ + num] =
+          in_points_array[i * num_box_corners_ + 0];
+      pillar_y[pillar_index * max_num_points_per_pillar_ + num] =
+          in_points_array[i * num_box_corners_ + 1];
+      pillar_z[pillar_index * max_num_points_per_pillar_ + num] =
+          in_points_array[i * num_box_corners_ + 2];
+      pillar_i[pillar_index * max_num_points_per_pillar_ + num] =
+          in_points_array[i * num_box_corners_ + 3];
       num_points_per_pillar[pillar_index] += 1;
     }
   }
 
-  for (int i = 0; i < kMaxNumPillars; i++) {
+  for (int i = 0; i < max_num_pillars_; i++) {
     float x = x_coors_for_sub[i];
     float y = y_coors_for_sub[i];
     int num_points_for_a_pillar = num_points_per_pillar[i];
-    for (int j = 0; j < kMaxNumPointsPerPillar; j++) {
-      x_coors_for_sub_shaped[i * kMaxNumPointsPerPillar + j] = x;
-      y_coors_for_sub_shaped[i * kMaxNumPointsPerPillar + j] = y;
+    for (int j = 0; j < max_num_points_per_pillar_; j++) {
+      x_coors_for_sub_shaped[i * max_num_points_per_pillar_ + j] = x;
+      y_coors_for_sub_shaped[i * max_num_points_per_pillar_ + j] = y;
       if (j < num_points_for_a_pillar) {
-        pillar_feature_mask[i * kMaxNumPointsPerPillar + j] = 1.0f;
+        pillar_feature_mask[i * max_num_points_per_pillar_ + j] = 1.0f;
       } else {
-        pillar_feature_mask[i * kMaxNumPointsPerPillar + j] = 0.0f;
+        pillar_feature_mask[i * max_num_points_per_pillar_ + j] = 0.0f;
       }
     }
   }
   host_pillar_count[0] = pillar_count;
+
+  delete[] x_coors_for_sub;
+  delete[] y_coors_for_sub;
+  delete[] coor_to_pillaridx;
 }
 
 }  // namespace lidar

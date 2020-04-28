@@ -41,56 +41,54 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+const int PointPillars::kNumClass = 3;
+const int PointPillars::kMaxNumPillars = 12000;
+const int PointPillars::kMaxNumPointsPerPillar = 100;
+const int PointPillars::kPfeOutputSize = kMaxNumPillars * 64;
+const int PointPillars::kGridXSize = 432;
+const int PointPillars::kGridYSize = 496;
+const int PointPillars::kGridZSize = 1;
+const int PointPillars::kRpnInputSize = 64 * kGridXSize * kGridYSize;
+const int PointPillars::kNumAnchorXInds = kGridXSize * 0.5;
+const int PointPillars::kNumAnchorYInds = kGridYSize * 0.5;
+const int PointPillars::kNumAnchorRInds = 2;
+const int PointPillars::kNumAnchor =
+    kNumAnchorXInds * kNumAnchorYInds * kNumAnchorRInds;
+const int PointPillars::kNumOutputBoxFeature = 7;
+const int PointPillars::kRpnBoxOutputSize = kNumAnchor * kNumOutputBoxFeature;
+const int PointPillars::kRpnClsOutputSize = kNumAnchor * kNumClass;
+const int PointPillars::kRpnDirOutputSize = kNumAnchor * 2;
+const int PointPillars::kBatchSize = 1;
+const int PointPillars::kNumIndsForScan = 512;
+const int PointPillars::kNumThreads = 64;
+// if you change kNumThreads, need to modify NUM_THREADS_MACRO in
+// common.h
+const int PointPillars::kNumBoxCorners = 4;
+const float PointPillars::kPillarXSize = 0.16f;
+const float PointPillars::kPillarYSize = 0.16f;
+const float PointPillars::kPillarZSize = 4.0f;
+const float PointPillars::kMinXRange = 0.0f;
+const float PointPillars::kMinYRange = -39.68f;
+const float PointPillars::kMinZRange = -3.0f;
+const float PointPillars::kMaxXRange = 69.12f;
+const float PointPillars::kMaxYRange = 39.68f;
+const float PointPillars::kMaxZRange = 1.0f;
+const float PointPillars::kSensorHeight = 1.73f;
+const float PointPillars::kAnchorDxSize = 1.6f;
+const float PointPillars::kAnchorDySize = 3.9f;
+const float PointPillars::kAnchorDzSize = 1.56f;
+
 PointPillars::PointPillars(const bool reproduce_result_mode,
-                           const int num_class,
                            const float score_threshold,
                            const float nms_overlap_threshold,
                            const std::string pfe_onnx_file,
                            const std::string rpn_onnx_file)
-    : kReproduceResultMode(reproduce_result_mode),
-      kScoreThreshold(score_threshold),
-      kNmsOverlapThreshold(nms_overlap_threshold),
-      kPfeOnnxFile(pfe_onnx_file),
-      kRpnOnnxFile(rpn_onnx_file),
-      kMaxNumPillars(12000),
-      kMaxNumPointsPerPillar(100),
-      kPfeOutputSize(kMaxNumPillars * 64),
-      kGridXSize(432),
-      kGridYSize(496),
-      kGridZSize(1),
-      kRpnInputSize(64 * kGridXSize * kGridYSize),
-      // TODO(chenjiahao): Enable customizing sizes of multiple anchors
-      kNumAnchorXInds(kGridXSize * 0.5),
-      kNumAnchorYInds(kGridYSize * 0.5),
-      kNumAnchorRInds(2),
-      kNumAnchor(kNumAnchorXInds * kNumAnchorYInds * kNumAnchorRInds),
-      // TODO(chenjiahao): Should be defined by the input param num_class
-      kNumClass(3),
-      kRpnBoxOutputSize(kNumAnchor * 7),
-      kRpnClsOutputSize(kNumAnchor * kNumClass),
-      kRpnDirOutputSize(kNumAnchor * 2),
-      kPillarXSize(0.16f),
-      kPillarYSize(0.16f),
-      kPillarZSize(4.0f),
-      kMinXRange(0.0f),
-      kMinYRange(-39.68f),
-      kMinZRange(-3.0f),
-      kMaxXRange(69.12f),
-      kMaxYRange(39.68f),
-      kMaxZRange(1),
-      kBatchSize(1),
-      kNumIndsForScan(512),
-      kNumThreads(64)
-      // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
-      // common.h
-      ,
-      kSensorHeight(1.73f),
-      kAnchorDxSize(1.6f),
-      kAnchorDySize(3.9f),
-      kAnchorDzSize(1.56f),
-      kNumBoxCorners(4),
-      kNumOutputBoxFeature(7) {
-  if (kReproduceResultMode) {
+    : reproduce_result_mode_(reproduce_result_mode),
+      score_threshold_(score_threshold),
+      nms_overlap_threshold_(nms_overlap_threshold),
+      pfe_onnx_file_(pfe_onnx_file),
+      rpn_onnx_file_(rpn_onnx_file) {
+  if (reproduce_result_mode_) {
     preprocess_points_ptr_.reset(new PreprocessPoints(
         kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
         kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
@@ -116,8 +114,8 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
   const float float_max = std::numeric_limits<float>::max();
   postprocess_cuda_ptr_.reset(new PostprocessCuda(
       float_min, float_max, kNumAnchorXInds, kNumAnchorYInds,
-      kNumAnchorRInds, kScoreThreshold, kNumThreads,
-      kNmsOverlapThreshold, kNumBoxCorners, kNumOutputBoxFeature,
+      kNumAnchorRInds, score_threshold_, kNumThreads,
+      nms_overlap_threshold_, kNumBoxCorners, kNumOutputBoxFeature,
       kNumClass));
 
   DeviceMemoryMalloc();
@@ -488,8 +486,8 @@ void PointPillars::InitTRT() {
   // create a TensorRT model from the onnx model and serialize it to a stream
   nvinfer1::IHostMemory* pfe_trt_model_stream{nullptr};
   nvinfer1::IHostMemory* rpn_trt_model_stream{nullptr};
-  OnnxToTRTModel(kPfeOnnxFile, &pfe_trt_model_stream);
-  OnnxToTRTModel(kRpnOnnxFile, &rpn_trt_model_stream);
+  OnnxToTRTModel(pfe_onnx_file_, &pfe_trt_model_stream);
+  OnnxToTRTModel(rpn_onnx_file_, &rpn_trt_model_stream);
   if (pfe_trt_model_stream == nullptr ||
       rpn_trt_model_stream ==
           nullptr) {  // use std:cerr instead of ROS_ERROR because want to keep
@@ -695,7 +693,7 @@ void PointPillars::PreprocessGPU(const float* in_points_array,
 
 void PointPillars::Preprocess(const float* in_points_array,
                               const int in_num_points) {
-  if (kReproduceResultMode) {
+  if (reproduce_result_mode_) {
     PreprocessCPU(in_points_array, in_num_points);
   } else {
     PreprocessGPU(in_points_array, in_num_points);

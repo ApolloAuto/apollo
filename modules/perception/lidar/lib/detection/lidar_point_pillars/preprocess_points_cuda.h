@@ -46,20 +46,20 @@ namespace lidar {
 class PreprocessPointsCuda {
  private:
   // initialzer list
-  const int kNumThreads;
-  const int kMaxNumPillars;
-  const int kMaxNumPointsPerPillar;
-  const int kNumIndsForScan;
-  const int kGridXSize;
-  const int kGridYSize;
-  const int kGridZSize;
-  const float kPillarXSize;
-  const float kPillarYSize;
-  const float kPillarZSize;
-  const float kMinXRange;
-  const float kMinYRange;
-  const float kMinZRange;
-  const int kNumBoxCorners;
+  const int num_threads_;
+  const int max_num_pillars_;
+  const int max_num_points_per_pillar_;
+  const int num_inds_for_scan_;
+  const int grid_x_size_;
+  const int grid_y_size_;
+  const int grid_z_size_;
+  const float pillar_x_size_;
+  const float pillar_y_size_;
+  const float pillar_z_size_;
+  const float min_x_range_;
+  const float min_y_range_;
+  const float min_z_range_;
+  const int num_box_corners_;
   // end initalizer list
 
   float* dev_pillar_x_in_coors_;

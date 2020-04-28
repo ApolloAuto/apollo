@@ -190,17 +190,17 @@ PostprocessCuda::PostprocessCuda(
     const float score_threshold, const int num_threads,
     const float nms_overlap_threshold, const int num_box_corners,
     const int num_output_box_feature, const int num_class)
-    : kFloatMin(float_min),
-      kFloatMax(float_max),
-      kNumAnchorXInds(num_anchor_x_inds),
-      kNumAnchorYInds(num_anchor_y_inds),
-      kNumAnchorRInds(num_anchor_r_inds),
-      kScoreThreshold(score_threshold),
-      kNumThreads(num_threads),
-      kNmsOverlapThreshold(nms_overlap_threshold),
-      kNumBoxCorners(num_box_corners),
-      kNumOutputBoxFeature(num_output_box_feature),
-      kNumClass(num_class) {
+    : float_min_(float_min),
+      float_max_(float_max),
+      num_anchor_x_inds_(num_anchor_x_inds),
+      num_anchor_y_inds_(num_anchor_y_inds),
+      num_anchor_r_inds_(num_anchor_r_inds),
+      score_threshold_(score_threshold),
+      num_threads_(num_threads),
+      nms_overlap_threshold_(nms_overlap_threshold),
+      num_box_corners_(num_box_corners),
+      num_output_box_feature_(num_output_box_feature),
+      num_class_(num_class) {
   nms_cuda_ptr_.reset(
       new NmsCuda(num_threads, num_box_corners, nms_overlap_threshold));
 }
@@ -216,14 +216,14 @@ void PostprocessCuda::DoPostprocessCuda(
     int* dev_filtered_dir, float* dev_box_for_nms,
     int* dev_filter_count, std::vector<float>* out_detection,
     std::vector<int>* out_label) {
-  filter_kernel<<<kNumAnchorXInds * kNumAnchorRInds,
-                  kNumAnchorYInds>>>(
+  filter_kernel<<<num_anchor_x_inds_ * num_anchor_r_inds_,
+                  num_anchor_y_inds_>>>(
       rpn_box_output, rpn_cls_output, rpn_dir_output, dev_anchor_mask,
       dev_anchors_px, dev_anchors_py, dev_anchors_pz, dev_anchors_dx,
       dev_anchors_dy, dev_anchors_dz, dev_anchors_ro, dev_filtered_box,
       dev_filtered_score, dev_filtered_label, dev_filtered_dir,
-      dev_box_for_nms, dev_filter_count, kFloatMin, kFloatMax,
-      kScoreThreshold, kNumBoxCorners, kNumOutputBoxFeature, kNumClass);
+      dev_box_for_nms, dev_filter_count, float_min_, float_max_,
+      score_threshold_, num_box_corners_, num_output_box_feature_, num_class_);
 
   int host_filter_count[1];
   GPU_CHECK(cudaMemcpy(host_filter_count, dev_filter_count, sizeof(int),
@@ -239,26 +239,26 @@ void PostprocessCuda::DoPostprocessCuda(
                        host_filter_count[0] * sizeof(int)));
   GPU_CHECK(cudaMalloc(
       reinterpret_cast<void**>(&dev_sorted_filtered_box),
-      kNumOutputBoxFeature * host_filter_count[0] * sizeof(float)));
+      num_output_box_feature_ * host_filter_count[0] * sizeof(float)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_sorted_filtered_label),
                        host_filter_count[0] * sizeof(int)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_sorted_filtered_dir),
                        host_filter_count[0] * sizeof(int)));
   GPU_CHECK(
       cudaMalloc(reinterpret_cast<void**>(&dev_sorted_box_for_nms),
-                 kNumBoxCorners * host_filter_count[0] * sizeof(float)));
+                 num_box_corners_ * host_filter_count[0] * sizeof(float)));
   thrust::sequence(thrust::device, dev_indexes,
                    dev_indexes + host_filter_count[0]);
   thrust::sort_by_key(thrust::device, dev_filtered_score,
                       dev_filtered_score + size_t(host_filter_count[0]),
                       dev_indexes, thrust::greater<float>());
 
-  const int num_blocks = DIVUP(host_filter_count[0], kNumThreads);
-  sort_boxes_by_indexes_kernel<<<num_blocks, kNumThreads>>>(
+  const int num_blocks = DIVUP(host_filter_count[0], num_threads_);
+  sort_boxes_by_indexes_kernel<<<num_blocks, num_threads_>>>(
       dev_filtered_box, dev_filtered_label, dev_filtered_dir, dev_box_for_nms,
       dev_indexes, host_filter_count[0], dev_sorted_filtered_box,
       dev_sorted_filtered_label, dev_sorted_filtered_dir,
-      dev_sorted_box_for_nms, kNumBoxCorners, kNumOutputBoxFeature);
+      dev_sorted_box_for_nms, num_box_corners_, num_output_box_feature_);
 
   int keep_inds[host_filter_count[0]];
   keep_inds[0] = 0;
@@ -266,12 +266,12 @@ void PostprocessCuda::DoPostprocessCuda(
   nms_cuda_ptr_->DoNmsCuda(host_filter_count[0], dev_sorted_box_for_nms,
                            keep_inds, &out_num_objects);
 
-  float host_filtered_box[host_filter_count[0] * kNumOutputBoxFeature];
+  float host_filtered_box[host_filter_count[0] * num_output_box_feature_];
   int host_filtered_label[host_filter_count[0]];
   int host_filtered_dir[host_filter_count[0]];
   GPU_CHECK(
       cudaMemcpy(host_filtered_box, dev_sorted_filtered_box,
-                 kNumOutputBoxFeature * host_filter_count[0] * sizeof(float),
+                 num_output_box_feature_ * host_filter_count[0] * sizeof(float),
                  cudaMemcpyDeviceToHost));
   GPU_CHECK(cudaMemcpy(host_filtered_label, dev_sorted_filtered_label,
                        host_filter_count[0] * sizeof(int),
@@ -281,24 +281,24 @@ void PostprocessCuda::DoPostprocessCuda(
                        cudaMemcpyDeviceToHost));
   for (size_t i = 0; i < out_num_objects; i++) {
     out_detection->push_back(
-        host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 0]);
+        host_filtered_box[keep_inds[i] * num_output_box_feature_ + 0]);
     out_detection->push_back(
-        host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 1]);
+        host_filtered_box[keep_inds[i] * num_output_box_feature_ + 1]);
     out_detection->push_back(
-        host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 2]);
+        host_filtered_box[keep_inds[i] * num_output_box_feature_ + 2]);
     out_detection->push_back(
-        host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 3]);
+        host_filtered_box[keep_inds[i] * num_output_box_feature_ + 3]);
     out_detection->push_back(
-        host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 4]);
+        host_filtered_box[keep_inds[i] * num_output_box_feature_ + 4]);
     out_detection->push_back(
-        host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 5]);
+        host_filtered_box[keep_inds[i] * num_output_box_feature_ + 5]);
 
     if (host_filtered_dir[keep_inds[i]] == 0) {
       out_detection->push_back(
-          host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 6] + M_PI);
+          host_filtered_box[keep_inds[i] * num_output_box_feature_ + 6] + M_PI);
     } else {
       out_detection->push_back(
-          host_filtered_box[keep_inds[i] * kNumOutputBoxFeature + 6]);
+          host_filtered_box[keep_inds[i] * num_output_box_feature_ + 6]);
     }
 
     out_label->push_back(host_filtered_label[keep_inds[i]]);

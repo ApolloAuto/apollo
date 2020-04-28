@@ -93,25 +93,25 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
 
 NmsCuda::NmsCuda(const int num_threads, const int num_box_corners,
                  const float nms_overlap_threshold)
-    : kNumThreads(num_threads),
-      kNumBoxCorners(num_box_corners),
-      kNmsOverlapThreshold(nms_overlap_threshold) {}
+    : num_threads_(num_threads),
+      num_box_corners_(num_box_corners),
+      nms_overlap_threshold_(nms_overlap_threshold) {}
 
 void NmsCuda::DoNmsCuda(const int host_filter_count,
                         float *dev_sorted_box_for_nms, int *out_keep_inds,
                         int *out_num_to_keep) {
-  const int col_blocks = DIVUP(host_filter_count, kNumThreads);
-  dim3 blocks(DIVUP(host_filter_count, kNumThreads),
-              DIVUP(host_filter_count, kNumThreads));
-  dim3 threads(kNumThreads);
+  const int col_blocks = DIVUP(host_filter_count, num_threads_);
+  dim3 blocks(DIVUP(host_filter_count, num_threads_),
+              DIVUP(host_filter_count, num_threads_));
+  dim3 threads(num_threads_);
 
   uint64_t *dev_mask = NULL;
   GPU_CHECK(cudaMalloc(
       &dev_mask, host_filter_count * col_blocks * sizeof(uint64_t)));
 
-  nms_kernel<<<blocks, threads>>>(host_filter_count, kNmsOverlapThreshold,
+  nms_kernel<<<blocks, threads>>>(host_filter_count, nms_overlap_threshold_,
                                   dev_sorted_box_for_nms, dev_mask,
-                                  kNumBoxCorners);
+                                  num_box_corners_);
 
   // postprocess for nms output
   std::vector<uint64_t> host_mask(host_filter_count * col_blocks);
@@ -123,8 +123,8 @@ void NmsCuda::DoNmsCuda(const int host_filter_count,
   memset(&remv[0], 0, sizeof(uint64_t) * col_blocks);
 
   for (int i = 0; i < host_filter_count; i++) {
-    int nblock = i / kNumThreads;
-    int inblock = i % kNumThreads;
+    int nblock = i / num_threads_;
+    int inblock = i % num_threads_;
 
     if (!(remv[nblock] & (1ULL << inblock))) {
       out_keep_inds[(*out_num_to_keep)++] = i;

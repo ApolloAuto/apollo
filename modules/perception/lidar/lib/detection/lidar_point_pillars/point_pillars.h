@@ -69,11 +69,11 @@ namespace lidar {
 class Logger : public nvinfer1::ILogger {
  public:
   explicit Logger(Severity severity = Severity::kWARNING)
-      : reportableSeverity(severity) {}
+      : reportable_severity(severity) {}
 
   void log(Severity severity, const char* msg) override {
     // suppress messages with severity enum value greater than the reportable
-    if (severity > reportableSeverity) return;
+    if (severity > reportable_severity) return;
 
     switch (severity) {
       case Severity::kINTERNAL_ERROR:
@@ -95,51 +95,54 @@ class Logger : public nvinfer1::ILogger {
     std::cerr << msg << std::endl;
   }
 
-  Severity reportableSeverity;
+  Severity reportable_severity;
 };
 
 class PointPillars {
  private:
   friend class TestClass;
-  // initize in initializer list
-  const bool kReproduceResultMode;
-  const float kScoreThreshold;
-  const float kNmsOverlapThreshold;
-  const std::string kPfeOnnxFile;
-  const std::string kRpnOnnxFile;
-  const int kMaxNumPillars;
-  const int kMaxNumPointsPerPillar;
-  const int kPfeOutputSize;
-  const int kGridXSize;
-  const int kGridYSize;
-  const int kGridZSize;
-  const int kRpnInputSize;
-  const int kNumAnchorXInds;
-  const int kNumAnchorYInds;
-  const int kNumAnchorRInds;
-  const int kNumAnchor;
-  const int kNumClass;
-  const int kRpnBoxOutputSize;
-  const int kRpnClsOutputSize;
-  const int kRpnDirOutputSize;
-  const float kPillarXSize;
-  const float kPillarYSize;
-  const float kPillarZSize;
-  const float kMinXRange;
-  const float kMinYRange;
-  const float kMinZRange;
-  const float kMaxXRange;
-  const float kMaxYRange;
-  const float kMaxZRange;
-  const int kBatchSize;
-  const int kNumIndsForScan;
-  const int kNumThreads;
-  const float kSensorHeight;
-  const float kAnchorDxSize;
-  const float kAnchorDySize;
-  const float kAnchorDzSize;
-  const int kNumBoxCorners;
-  const int kNumOutputBoxFeature;
+  static const int kNumClass;
+  static const int kMaxNumPillars;
+  static const int kMaxNumPointsPerPillar;
+  static const int kPfeOutputSize;
+  static const int kGridXSize;
+  static const int kGridYSize;
+  static const int kGridZSize;
+  static const int kRpnInputSize;
+  static const int kNumAnchorXInds;
+  static const int kNumAnchorYInds;
+  static const int kNumAnchorRInds;
+  static const int kNumAnchor;
+  static const int kNumOutputBoxFeature;
+  static const int kRpnBoxOutputSize;
+  static const int kRpnClsOutputSize;
+  static const int kRpnDirOutputSize;
+  static const int kBatchSize;
+  static const int kNumIndsForScan;
+  static const int kNumThreads;
+  // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
+  // common.h
+  static const int kNumBoxCorners;
+  static const float kPillarXSize;
+  static const float kPillarYSize;
+  static const float kPillarZSize;
+  static const float kMinXRange;
+  static const float kMinYRange;
+  static const float kMinZRange;
+  static const float kMaxXRange;
+  static const float kMaxYRange;
+  static const float kMaxZRange;
+  static const float kSensorHeight;
+  static const float kAnchorDxSize;
+  static const float kAnchorDySize;
+  static const float kAnchorDzSize;
+
+  // initialize in initializer list
+  const bool reproduce_result_mode_;
+  const float score_threshold_;
+  const float nms_overlap_threshold_;
+  const std::string pfe_onnx_file_;
+  const std::string rpn_onnx_file_;
   // end initializer list
 
   int host_pillar_count_[1];
@@ -339,7 +342,6 @@ class PointPillars {
    * @details Variables could be chaned through rosparam
    */
   PointPillars(const bool reproduce_result_mode,
-               const int num_class,
                const float score_threshold,
                const float nms_overlap_threshold,
                const std::string pfe_onnx_file,

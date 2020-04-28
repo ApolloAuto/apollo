@@ -66,19 +66,19 @@ class TestClass {
             const float pillar_z_size, const float min_x_range,
             const float min_y_range, const float min_z_range,
             const int num_inds_for_scan, const int num_box_corners);
-  const int kMaxNumPillars;
-  const int kMaxNumPointsPerPillar;
-  const int kGridXSize;
-  const int kGridYSize;
-  const int kGridZSize;
-  const float kPillarXSize;
-  const float kPillarYSize;
-  const float kPillarZSize;
-  const float kMinXRange;
-  const float kMinYRange;
-  const float kMinZRange;
-  const int kNumIndsForScan;
-  const int kNumBoxCorners;
+  const int max_num_pillars;
+  const int max_num_points_per_pillar;
+  const int grid_x_size;
+  const int grid_y_size;
+  const int grid_z_size;
+  const float pillar_x_size;
+  const float pillar_y_size;
+  const float pillar_z_size;
+  const float min_x_range;
+  const float min_y_range;
+  const float min_z_range;
+  const int num_inds_for_scan;
+  const int num_box_corners;
 
   // Make pointcloud for test
   void MakePointsForTest(pcl::PointCloud<pcl::PointXYZI>::Ptr in_pcl_pc_ptr);
@@ -117,33 +117,32 @@ TestClass::TestClass(const int max_num_pillars,
                      const float pillar_z_size, const float min_x_range,
                      const float min_y_range, const float min_z_range,
                      const int num_inds_for_scan, const int num_box_corners)
-    : kMaxNumPillars(max_num_pillars),
-      kMaxNumPointsPerPillar(max_num_points_per_pillar),
-      kGridXSize(grid_x_size),
-      kGridYSize(grid_y_size),
-      kGridZSize(grid_z_size),
-      kPillarXSize(pillar_x_size),
-      kPillarYSize(pillar_y_size),
-      kPillarZSize(pillar_z_size),
-      kMinXRange(min_x_range),
-      kMinYRange(min_y_range),
-      kMinZRange(min_z_range),
-      kNumIndsForScan(num_inds_for_scan),
-      kNumBoxCorners(num_box_corners) {
+    : max_num_pillars(max_num_pillars),
+      max_num_points_per_pillar(max_num_points_per_pillar),
+      grid_x_size(grid_x_size),
+      grid_y_size(grid_y_size),
+      grid_z_size(grid_z_size),
+      pillar_x_size(pillar_x_size),
+      pillar_y_size(pillar_y_size),
+      pillar_z_size(pillar_z_size),
+      min_x_range(min_x_range),
+      min_y_range(min_y_range),
+      min_z_range(min_z_range),
+      num_inds_for_scan(num_inds_for_scan),
+      num_box_corners(num_box_corners) {
   preprocess_points_ptr_.reset(new PreprocessPoints(
-      kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize, kGridYSize,
-      kGridZSize, kPillarXSize, kPillarYSize, kPillarZSize,
-      kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan,
-      kNumBoxCorners));
+      max_num_pillars, max_num_points_per_pillar, grid_x_size, grid_y_size,
+      grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size,
+      min_x_range, min_y_range, min_z_range, num_inds_for_scan,
+      num_box_corners));
 
   //  bool baselink_support=true;
   bool reproduce_result_mode = false;
-  int num_class = 3;
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
 
   point_pillars_ptr_.reset(
-      new PointPillars(reproduce_result_mode, num_class, score_threshold,
+      new PointPillars(reproduce_result_mode, score_threshold,
                        nms_overlap_threshold, FLAGS_pfe_onnx_file,
                        FLAGS_rpn_onnx_file));
 }
@@ -281,23 +280,23 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   y_coors[0] = 0;
   float num_points_per_pillar[kMaxNumPillars];
   num_points_per_pillar[0] = 0;
-  float* pillar_x = new float[test_obj.kMaxNumPillars *
-                              test_obj.kMaxNumPointsPerPillar];
-  float* pillar_y = new float[test_obj.kMaxNumPillars *
-                              test_obj.kMaxNumPointsPerPillar];
-  float* pillar_z = new float[test_obj.kMaxNumPillars *
-                              test_obj.kMaxNumPointsPerPillar];
-  float* pillar_i = new float[test_obj.kMaxNumPillars *
-                              test_obj.kMaxNumPointsPerPillar];
+  float* pillar_x = new float[test_obj.max_num_pillars *
+                              test_obj.max_num_points_per_pillar];
+  float* pillar_y = new float[test_obj.max_num_pillars *
+                              test_obj.max_num_points_per_pillar];
+  float* pillar_z = new float[test_obj.max_num_pillars *
+                              test_obj.max_num_points_per_pillar];
+  float* pillar_i = new float[test_obj.max_num_pillars *
+                              test_obj.max_num_points_per_pillar];
 
   float* x_coors_for_sub_shaped =
-      new float[test_obj.kMaxNumPillars *
-                test_obj.kMaxNumPointsPerPillar];
+      new float[test_obj.max_num_pillars *
+                test_obj.max_num_points_per_pillar];
   float* y_coors_for_sub_shaped =
-      new float[test_obj.kMaxNumPillars *
-                test_obj.kMaxNumPointsPerPillar];
-  float* pillar_feature_mask = new float[test_obj.kMaxNumPillars *
-                                         test_obj.kMaxNumPointsPerPillar];
+      new float[test_obj.max_num_pillars *
+                test_obj.max_num_points_per_pillar];
+  float* pillar_feature_mask = new float[test_obj.max_num_pillars *
+                                         test_obj.max_num_points_per_pillar];
 
   float* sparse_pillar_map = new float[512 * 512];
 
