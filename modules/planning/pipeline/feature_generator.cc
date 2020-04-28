@@ -224,36 +224,21 @@ void FeatureGenerator::OnPrediction(
     obstacle_trajectory_point.mutable_acceleration()->CopyFrom(
         perception_obstale.acceleration());
 
-    static constexpr double kTimeGapToClearObstacleHistory = 0.3;  // sec
     const double last_timestamp_sec =
         obstacle_history_map_[m.first].back().timestamp_sec();
     const double timestamp_sec = obstacle_trajectory_point.timestamp_sec();
     const double time_diff = timestamp_sec - last_timestamp_sec;
-    if (obstacle_history_map_[m.first].empty() ||
-        (time_diff > 0 && time_diff <= kTimeGapToClearObstacleHistory)) {
+    if (obstacle_history_map_[m.first].empty() || time_diff > 0) {
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
-      if (!obstacle_history_map_[m.first].empty() &&
-          time_diff >= kTimeGapToClearObstacleHistory) {
-        obstacle_history_map_.erase(m.first);
-        obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
-        std::ostringstream msg;
-        msg << "Clear history: obstacle_id[" << m.first
-            << "] last_timestamp_sec[" << last_timestamp_sec
-            << "] timestamp_sec[" << timestamp_sec
-            << "] time_diff [" << time_diff << "]";
-        AERROR << msg.str();
-        log_file_ << msg.str() << std::endl;
-      } else {
-        // abnormal perception data: time_diff < 0
-        std::ostringstream msg;
-        msg << "SKIP: obstacle_id[" << m.first
-            << "] last_timestamp_sec[" << last_timestamp_sec
-            << "] timestamp_sec[" << timestamp_sec
-            << "] time_diff [" << time_diff << "]";
-        AERROR << msg.str();
-        log_file_ << msg.str() << std::endl;
-      }
+      // abnormal perception data: time_diff <= 0
+      std::ostringstream msg;
+      msg << "SKIP: obstacle_id[" << m.first
+          << "] last_timestamp_sec[" << last_timestamp_sec
+          << "] timestamp_sec[" << timestamp_sec
+          << "] time_diff [" << time_diff << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
     }
 
     auto& obstacle_history = obstacle_history_map_[m.first];
