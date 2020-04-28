@@ -45,10 +45,10 @@ namespace lidar {
 
 class ScatterCuda {
  private:
-  const int kNumThreads;
-  const int kMaxNumPillars;
-  const int kGridXSize;
-  const int kGridYSize;
+  const int num_threads_;
+  const int max_num_pillars_;
+  const int grid_x_size_;
+  const int grid_y_size_;
 
  public:
   /**

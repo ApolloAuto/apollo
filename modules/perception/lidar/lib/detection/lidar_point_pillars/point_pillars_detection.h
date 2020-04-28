@@ -62,8 +62,6 @@ class PointPillarsDetection {
 
   // PointPillars
   std::unique_ptr<PointPillars> point_pillars_ptr_;
-  bool reproduce_result_mode_ = false;
-  int num_class_ = 3;
 
   // time statistics
   double inference_time_ = 0.0;
@@ -72,6 +70,7 @@ class PointPillarsDetection {
   // constants
   const float kNormalizingFactor = 255.0f;
   const int kOutputNumBoxFeature = 7;
+  const bool kReproduceResultMode = false;
   const float kScoreThreshold = 0.5;
   const float kNmsOverlapThreshold = 0.5;
 };  // class PointPillarsDetection

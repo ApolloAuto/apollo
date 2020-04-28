@@ -45,16 +45,16 @@ namespace lidar {
 
 class AnchorMaskCuda {
  private:
-  const int kNumIndsForScan;
-  const int kNumAnchorXInds;
-  const int kNumAnchorYInds;
-  const int kNumAnchorRInds;
-  const float kMinXRange;
-  const float kMinYRange;
-  const float kPillarXSize;
-  const float kPillarYSize;
-  const int kGridXSize;
-  const int kGridYSize;
+  const int num_inds_for_scan_;
+  const int num_anchor_x_inds_;
+  const int num_anchor_y_inds_;
+  const int num_anchor_r_inds_;
+  const float min_x_range_;
+  const float min_y_range_;
+  const float pillar_x_size_;
+  const float pillar_y_size_;
+  const int grid_x_size_;
+  const int grid_y_size_;
 
  public:
   /**

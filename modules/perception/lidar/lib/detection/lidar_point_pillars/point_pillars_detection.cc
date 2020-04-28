@@ -33,7 +33,7 @@ using base::PointF;
 
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(
-      new PointPillars(reproduce_result_mode_, num_class_, kScoreThreshold,
+      new PointPillars(kReproduceResultMode, kScoreThreshold,
                        kNmsOverlapThreshold, FLAGS_pfe_onnx_file,
                        FLAGS_rpn_onnx_file));
   return true;
