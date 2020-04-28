@@ -36,8 +36,8 @@ DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
 DEFINE_int32(planning_freq, 10, "frequence of planning message");
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
-DEFINE_int32(learning_data_obstacle_history_point_cnt, 20,
-             "number of history trajectory points for a obstacle");
+DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
+             "time sec (second) of history trajectory points for a obstacle");
 DEFINE_bool(enable_binary_learning_data, true,
             "True to generate protobuf binary data file.");
 DEFINE_bool(enable_overlap_tag, true,
@@ -224,27 +224,42 @@ void FeatureGenerator::OnPrediction(
     obstacle_trajectory_point.mutable_acceleration()->CopyFrom(
         perception_obstale.acceleration());
 
+    static constexpr double kTimeGapToClearObstacleHistory = 0.3;  // sec
     const double last_timestamp_sec =
         obstacle_history_map_[m.first].back().timestamp_sec();
+    const double timestamp_sec = obstacle_trajectory_point.timestamp_sec();
+    const double time_diff = timestamp_sec - last_timestamp_sec;
     if (obstacle_history_map_[m.first].empty() ||
-        obstacle_trajectory_point.timestamp_sec() > last_timestamp_sec) {
+        (time_diff > 0 && time_diff <= kTimeGapToClearObstacleHistory)) {
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
-      // abnormal perception data
-      std::ostringstream msg;
-      msg << "SKIP: obstacle_id[" << m.first
-          << "] last_timestamp_sec[" << last_timestamp_sec
-          << "] timestamp_sec[" <<  obstacle_trajectory_point.timestamp_sec()
-          << "] time diff ["
-          << obstacle_trajectory_point.timestamp_sec() - last_timestamp_sec
-          << "]";
-      AERROR << msg.str();
-      log_file_ << msg.str() << std::endl;
+      if (!obstacle_history_map_[m.first].empty() &&
+          time_diff >= kTimeGapToClearObstacleHistory) {
+        obstacle_history_map_.erase(m.first);
+        obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
+        std::ostringstream msg;
+        msg << "Clear history: obstacle_id[" << m.first
+            << "] last_timestamp_sec[" << last_timestamp_sec
+            << "] timestamp_sec[" << timestamp_sec
+            << "] time_diff [" << time_diff << "]";
+        AERROR << msg.str();
+        log_file_ << msg.str() << std::endl;
+      } else {
+        // abnormal perception data: time_diff < 0
+        std::ostringstream msg;
+        msg << "SKIP: obstacle_id[" << m.first
+            << "] last_timestamp_sec[" << last_timestamp_sec
+            << "] timestamp_sec[" << timestamp_sec
+            << "] time_diff [" << time_diff << "]";
+        AERROR << msg.str();
+        log_file_ << msg.str() << std::endl;
+      }
     }
 
     auto& obstacle_history = obstacle_history_map_[m.first];
-    if (static_cast<int>(obstacle_history.size()) >
-        FLAGS_learning_data_obstacle_history_point_cnt) {
+    const double time_distance = obstacle_history.back().timestamp_sec() -
+        obstacle_history.front().timestamp_sec();
+    if (time_distance > FLAGS_learning_data_obstacle_history_time_sec) {
       obstacle_history.pop_front();
     }
   }
