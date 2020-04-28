@@ -56,6 +56,7 @@ modules/map/data
 
 # python proto
 py_proto
+*_pb2.py
 
 # calibration files
 modules/calibration/data/

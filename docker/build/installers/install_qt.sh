@@ -51,8 +51,8 @@ cuteci \
     --packages "qt.qt5.${QT_VERSION_Z}.gcc_64" \
     --keep-tools
 
-ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64/include /usr/local/include/qt5
-ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64/lib /usr/local/lib/qt5
+# Hide qt5 version from end users
+ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 /usr/local/qt5
 
 # clean up
 rm -f ${QT_INSTALLER}
