@@ -137,7 +137,7 @@ void Evaluator::EvaluateTrajectoryByTime(
     std::reverse(updated_trajectory.begin(), updated_trajectory.end());
   }
   DiscretizedTrajectory discretized_trajectory;
-  double last_relative_time = std::numeric_limits<double>::min();
+  double last_relative_time = std::numeric_limits<double>::lowest();
   for (const auto& tp : updated_trajectory) {
     // check for abnormal perception data
     if (tp.relative_time() > last_relative_time) {
