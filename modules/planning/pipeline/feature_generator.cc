@@ -277,7 +277,7 @@ void FeatureGenerator::OnTrafficLightDetection(
 
 void FeatureGenerator::OnRoutingResponse(
   const apollo::routing::RoutingResponse& routing_response) {
-  AINFO << "routing_response received at frame["
+  ADEBUG << "routing_response received at frame["
         << total_learning_data_frame_num_ << "]";
   routing_lane_segment_.clear();
   for (int i = 0; i < routing_response.road_size(); ++i) {
@@ -420,11 +420,6 @@ void FeatureGenerator::GenerateObstacleTrajectory(
       polygon_point->set_y(relative_point.second);
     }
   }
-  // if (obstacle_history.size() <= 0) {
-  //  AERROR << "obstacle has no history: frame_num["
-  //         << frame_num << "] obstacle_id[" << obstacle_id
-  //         << "] size[" << obstacle_history.size() << "]";
-  // }
 }
 
 void FeatureGenerator::GenerateObstaclePrediction(
@@ -787,7 +782,7 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
   }
 
   // update learning data
-  if (adc_trajectory_points.size() >0) {
+  if (!adc_trajectory_points.empty()) {
     learning_data_frame->mutable_planning_tag()->set_lane_turn(
         adc_trajectory_points[0].planning_tag().lane_turn());
   }
@@ -796,7 +791,7 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
-  if (adc_trajectory_points.size() <= 3) {
+  if (adc_trajectory_points.size() <= 5) {
     std::ostringstream msg;
     msg << "too few adc_trajectory_points: frame_num["
         << learning_data_frame->frame_num()
@@ -835,7 +830,6 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   localization->mutable_linear_acceleration()->CopyFrom(
       pose.linear_acceleration());
   localization->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
-
 
   // add traffic_light
   GenerateTrafficLightDetectionFeature(learning_data_frame);
