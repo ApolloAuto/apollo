@@ -21,25 +21,14 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Install OpenGL
-echo "deb http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | \
-    sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
-echo "deb-src http://ppa.launchpad.net/keithw/glfw3/ubuntu trusty main" | \
-    sudo tee -a /etc/apt/sources.list.d/fillwave_ext.list
-apt-get update -y
-apt-get install -y --force-yes libglfw3 libglfw3-dev freeglut3-dev
+apt-get -y update && \
+    apt-get -y install \
+    libglfw3-dev \
+    freeglut3-dev \
+    libglew-dev
 
-# Install GLEW
-wget https://github.com/nigels-com/glew/releases/download/glew-2.0.0/glew-2.0.0.zip
-unzip glew-2.0.0.zip
-pushd glew-2.0.0
-make -j8
-make install
-popd
+# NOTES from storypku:
+# libglfw3-dev depends on libglfw3,
+# and libglew-dev have a dependency over libglew2.0
 
-ln -s /usr/lib64/libGLEW.so /usr/lib/libGLEW.so
-ln -s /usr/lib64/libGLEW.so.2.0 /usr/lib/libGLEW.so.2.0
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
-rm -fr glew-2.0.0.zip glew-2.0.0 /etc/apt/sources.list.d/fillwave_ext.list
