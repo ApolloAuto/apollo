@@ -28,6 +28,8 @@
 
 - [循迹搭建--车辆动力学标定](Waypoint_Following--Vehicle_Calibration_cn.md)
 
+- [循迹搭建--车辆动力学云标定](Waypoint_Following--Vehicle_Calibration_Online_cn.md)
+
 - [循迹搭建--车辆循迹演示及常见问题](Waypoint_Following--Operation_And_Questions_cn.md)
 
 **基于激光雷达的封闭园区自动驾驶搭建**
