@@ -152,7 +152,7 @@ if [ "$INCHINA" == "yes" ]; then
 fi
 
 if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
-    VERSION="local_dev"
+    VERSION="local_cyber_dev"
 fi
 
 
@@ -266,9 +266,12 @@ function main(){
         exit 1
     fi
 
+
     if [ ${ARCH} == "x86_64" ]; then
-        if [ "${USER}" != "root" ]; then
-            docker exec $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
+        # User with uid=1000 or username=apollo excluded
+        if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
+            && [[ $USER_ID -ne 1000 ]]; then
+            docker exec -u root $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
         fi
     else
         warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_adduser.sh' for the first time when you get into the docker !!!"

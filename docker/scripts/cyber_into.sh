@@ -17,9 +17,16 @@
 ###############################################################################
 
 ARCH=$(uname -m)
-CMD=""
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+USER_ID=$(id -u)
+DOCKER_USER=apollo
+
+if [[ "$USER" != "apollo" ]] && [[ $USER_ID -ne 1000 ]]; then
+    DOCKER_USER=$USER
+fi
+
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
 
@@ -27,13 +34,13 @@ xhost +local:root 1>/dev/null 2>&1
 
 if [ ${ARCH} == "x86_64" ]; then
     docker exec \
-        -u $USER \
+        -u $DOCKER_USER \
         -it apollo_cyber_$USER \
         /bin/bash
 elif [ ${ARCH} == "aarch64" ]; then
     warning "!!! For the first time after starting the Cyber RT container, please run the following two commands: !!!"
     warning "!!!   1) /apollo/scripts/docker_adduser.sh !!!"
-    warning "!!!   2) su $USER !!!"
+    warning "!!!   2) su $DOCKER_USER !!!"
     warning "! To exit, please use 'ctrl+p ctrl+q' !"
 
     docker attach apollo_cyber_$USER
