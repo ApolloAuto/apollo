@@ -27,13 +27,15 @@ LOCAL_DEV_TAG="${REPO}:local_cyber_dev"
 
 LOCAL_DEV_FLAG="no"
 MODE="download"
+GEOLOC="us"
 DOCKERFILE=""
+TAB="    "
 
 function print_usage() {
     local prog_name=$(basename "$0")
     local tab="    " # 4 spaces
     echo "Usage:"
-    echo "${tab}${prog_name} [-l] -f <cyber_dockerfile> [-m <build|download>]"
+    echo "${tab}${prog_name} [-l] -f <cyber_dockerfile> [-m <build|download>] [-g <us|cn>]"
     echo "${tab}${prog_name} -h/--help    # Show this message"
     echo "E.g.,"
     echo "${tab}${prog_name} -f cyber.x86_64.dockerfile -m build"
@@ -45,7 +47,7 @@ function parse_arguments() {
         print_usage
         exit 0
     fi
-    while getopts "hlf:m:" opt; do
+    while getopts "hlf:m:g:" opt; do
         case $opt in
             l)
                 LOCAL_DEV_FLAG="yes"
@@ -55,6 +57,9 @@ function parse_arguments() {
                 ;;
             m)
                 MODE=$OPTARG
+                ;;
+            g)
+                GEOLOC=$OPTARG
                 ;;
             h)
                 print_usage
@@ -69,7 +74,6 @@ function parse_arguments() {
     done
 }
 
-
 function check_arguments() {
     if [[ "${MODE}" == "build" ]]; then
         echo "Build all dependencies from source code"
@@ -79,6 +83,12 @@ function check_arguments() {
         echo "Installation mode \"$MODE\" not supported"
         exit 1
     fi
+    if [[ "${GEOLOC}" == "cn" ]]; then
+        echo "Docker image built for CN users"
+    else
+        GEOLOC="us"
+    fi
+
     if [[ -z "${DOCKERFILE}" ]]; then
         echo "Dockfile not specified"
         exit 1
@@ -86,7 +96,7 @@ function check_arguments() {
     if [[ "$DOCKERFILE" == *${ARCH}* ]]; then
         echo "Dockerfile to build: ${DOCKERFILE}"
     else
-        echo "Docker file \"$DOCKERFILE\" doesn't match current architecture."
+        echo "Dockerfile \"$DOCKERFILE\" doesn't match current architecture."
         exit 1
     fi
 }
@@ -101,7 +111,15 @@ TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
 # Fail on first error.
 set -e
 
-docker build -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" -f "${DOCKERFILE}" "${CONTEXT}"
+echo "=====.=====.=====.=====  Docker Image Build for Cyber =====.=====.=====.====="
+echo "|  Docker build ${TAG}"
+echo "|  ${TAB}using dockerfile=${DOCKERFILE}"
+echo "|  ${TAB}INSTALL_MODE=${MODE}, GEOLOC=${GEOLOC}"
+echo "=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.====="
+
+docker build -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
+    --build-arg GEOLOC="${GEOLOC}" \
+    -f "${DOCKERFILE}" "${CONTEXT}"
 echo "Built new image ${TAG}"
 
 if [[ "$LOCAL_DEV_FLAG" == "yes" ]]; then

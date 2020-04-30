@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2019 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,27 +21,37 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Ubuntu 14.04 has poco package version 1.3.6
-# if a higher version is required, the below
-# will install from source
 apt-get -y update && \
-    apt-get -y install poco
+    apt-get -y install \
+    libssl-dev \
+    libpoco-dev
+
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+exit 0
+
+. /tmp/installers/installer_base.sh
+
+THREAD_NUM=$(nproc)
 
 # Install from source
-#VERSION=1.9.0
+VERSION=1.10.1
+PKG_NAME="poco-${VERSION}-release.tar.gz"
+CHECKSUM="44592a488d2830c0b4f3bfe4ae41f0c46abbfad49828d938714444e858a00818"
+DOWNLOAD_LINK=https://github.com/pocoproject/poco/archive/poco-${VERSION}-release.tar.gz
 
-#wget https://github.com/pocoproject/poco/archive/poco-${VERSION}-release.tar.gz
-#tar -xf poco-${VERSION}-release.tar.gz
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-# we cant use cmake because poco requires > 3.2
-# and the container is at 2.8
-# but standard ./configure && make works fine
+tar xzf poco-${VERSION}-release.tar.gz
 
-#pushd poco-poco-${VERSION}-release
-  #./configure --omit=Data/ODBC,Data/MySQL && \
-      #    make -s -j`nproc` && \
-      #    make -s -j`nproc` install
-#popd
+pushd poco-poco-${VERSION}-release
+mkdir cmakebuild && cd cmakebuild
+cmake .. -DBUILD_SHARED_LIBS=ON
+make -j${THREAD_NUM}
+make install
+
+popd
 
 # clean up
-#rm -rf poco-${VERSION}-release.tar.gz poco-poco-${VERSION}-release
+rm -rf poco-${VERSION}-release.tar.gz poco-poco-${VERSION}-release

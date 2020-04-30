@@ -44,12 +44,6 @@ cc_library(
     linkopts = ["-lncurses"],
 )
 
-# libpoco-dev
-cc_library(
-    name = "PocoFoundation",
-    linkopts = ["-lPocoFoundation"],
-)
-
 cc_library(
     name = "pthread",
     linkopts = ["-pthread"],

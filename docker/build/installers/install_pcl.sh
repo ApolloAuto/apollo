@@ -27,6 +27,8 @@ if [ "$ARCH" == "aarch64" ]; then
 fi
 
 if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
+  # https://github.com/PointCloudLibrary/pcl/archive/pcl-1.10.1.tar.gz
+
   wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.9.1.tar.gz
 
   tar xzvf pcl-1.9.1.tar.gz

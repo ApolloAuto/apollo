@@ -21,14 +21,35 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz
-tar xzf protobuf-cpp-3.3.0.tar.gz
+. /tmp/installers/installer_base.sh
 
-pushd protobuf-3.3.0
-./configure --prefix=/usr
-make -j8
+VERSION="3.11.2"
+PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
+CHECKSUM="b967f5b667c7041415283705c0ab07f0bcc1ff077854cd29a7e148458a910053"
+DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/protobuf-cpp-${VERSION}.tar.gz"
+
+#https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz
+
+download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
+
+tar xzf ${PKG_NAME}
+
+pushd protobuf-${VERSION}
+mkdir cmake/build && cd cmake/build
+
+# Note(storypku): We install protobuf in /usr/local to avoid
+# conflicts with the system provided version.
+cmake .. -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr/local
+
+# ./configure --prefix=/usr
+make -j`nproc`
 make install
+
 popd
 
+ldconfig
+ok "Successfully installed $protobuf-cpp, VERSION=${VERSION}"
+
 # Clean up.
-rm -fr protobuf-cpp-3.3.0.tar.gz protobuf-3.3.0
+rm -fr ${PKG_NAME}  protobuf-${VERSION}

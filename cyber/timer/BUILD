@@ -41,7 +41,6 @@ cc_library(
 cc_test(
     name = "timer_test",
     size = "small",
-    timeout = "moderate",
     srcs = ["timer_test.cc"],
     deps = [
         "//cyber:cyber_core",

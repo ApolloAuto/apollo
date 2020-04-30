@@ -38,6 +38,7 @@ cc_library(
 cc_test(
     name = "parameter_client_test",
     srcs = ["parameter_client_test.cc"],
+    size = "small",
     deps = [
         "//cyber",
         "@com_google_googletest//:gtest_main",

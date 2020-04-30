@@ -20,15 +20,18 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-git clone --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/Fast-RTPS.git
-pushd Fast-RTPS
-git submodule init
-git submodule update
+apt-get -y update && \
+    apt-get -y install --no-install-recommends \
+    libasio-dev \
+    libtinyxml2-dev
 
-mkdir -p build && cd build
-cmake -DEPROSIMA_BUILD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/fast-rtps ../
-make -j8 fastrtps
-make install
-popd
+tar xzf /tmp/installers/fast-rtps.prebuilt.x86_64.tar.gz
+mv fast-rtps /usr/local
 
-rm -fr Fast-RTPS
+# TODO(storypku)
+# As FastRTPS installer in other branches don't work well, we provided a prebuilt version
+# here.
+# Maybe the `cyber/transport/rtps` section needs a rewrite using a more recent FastRTPS impl.
+
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

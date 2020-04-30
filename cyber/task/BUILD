@@ -24,6 +24,7 @@ cc_library(
     name = "task_manager",
     srcs = ["task_manager.cc"],
     hdrs = ["task_manager.h"],
+    copts = ["-faligned-new"],
     deps = [
         "//cyber/scheduler:scheduler_factory",
     ],
