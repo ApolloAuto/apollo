@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,13 +21,26 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+. /tmp/installers/installer_base.sh
+
 ARCH=$(uname -m)
 
 if [ "$ARCH" == "x86_64" ]; then
-  apt-get update -y
-  apt-get install -y openjdk-8-jdk
-  wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
-  bash bazel-0.5.3-installer-linux-x86_64.sh
+  # https://docs.bazel.build/versions/master/install-ubuntu.html
+  VERSION="3.1.0"
+  PKG_NAME="bazel_${VERSION}-linux-x86_64.deb"
+  SHA256SUM="8fb2fe222c479a24e4d089f30bf30aea36fc8bfa117d81cce1ad9adf1f743bf0"
+  DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}
+
+  download_if_not_cached $PKG_NAME $SHA256SUM $DOWNLOAD_LINK
+
+  apt-get -y update && \
+    apt-get -y install \
+    zlib1g-dev \
+    openjdk-11-jdk
+
+  dpkg -i $PKG_NAME
+
 elif [ "$ARCH" == "aarch64" ]; then
   BUILD=$1
   shift
