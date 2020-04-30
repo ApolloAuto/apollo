@@ -17,40 +17,94 @@
 ###############################################################################
 
 # Usage:
-#   ./build_cyber.sh ./cyber.x86_64.dockerfile [build|download]
-# Or
-#   ./build_cyber.sh ./cyber.aarch64.dockerfile [build|download]
-DOCKERFILE=$1
-INSTALL="download"
-if [ -n "$2" ]; then
-    INSTALL="$2"
-fi
-
-if [[ $INSTALL == "build" ]]; then
-    echo "build all dependencies from source code"
-elif [[ $INSTALL == "download" ]]; then
-    echo "optimize installation of some dependencies from prebuilt package"
-else
-    echo "$INSTALL mode not supported"
-    exit
-fi
-
-CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
+#   ./build_cyber.sh [-l] -f <cyber.dockerfile> [-m <build|download>]
+# E.g.,
+#   ./build_cyber.sh -f ./cyber.aarch64.dockerfile -m download
+ARCH=$(uname -m)
 
 REPO=apolloauto/apollo
-ARCH=$(uname -m)
-TIME=$(date +%Y%m%d_%H%M)
+LOCAL_DEV_TAG="${REPO}:local_cyber_dev"
 
+LOCAL_DEV_FLAG="no"
+MODE="download"
+DOCKERFILE=""
+
+function print_usage() {
+    local prog_name=$(basename "$0")
+    local tab="    " # 4 spaces
+    echo "Usage:"
+    echo "${tab}${prog_name} [-l] -f <cyber_dockerfile> [-m <build|download>]"
+    echo "${tab}${prog_name} -h/--help    # Show this message"
+    echo "E.g.,"
+    echo "${tab}${prog_name} -f cyber.x86_64.dockerfile -m build"
+    echo "${tab}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
+}
+
+function parse_arguments() {
+    if [[ $# -eq 0 ]] || [[ "$1" == "--help" ]]; then
+        print_usage
+        exit 0
+    fi
+    while getopts "hlf:m:" opt; do
+        case $opt in
+            l)
+                LOCAL_DEV_FLAG="yes"
+                ;;
+            f)
+                DOCKERFILE=$OPTARG
+                ;;
+            m)
+                MODE=$OPTARG
+                ;;
+            h)
+                print_usage
+                exit 1
+                ;;
+            *)
+                echo "Unknown option: -$opt"
+                print_usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
+
+function check_arguments() {
+    if [[ "${MODE}" == "build" ]]; then
+        echo "Build all dependencies from source code"
+    elif [[ "${MODE}" == "download" ]]; then
+        echo "Optimize installation of some dependencies from prebuilt packages"
+    else
+        echo "Installation mode \"$MODE\" not supported"
+        exit 1
+    fi
+    if [[ -z "${DOCKERFILE}" ]]; then
+        echo "Dockfile not specified"
+        exit 1
+    fi
+    if [[ "$DOCKERFILE" == *${ARCH}* ]]; then
+        echo "Dockerfile to build: ${DOCKERFILE}"
+    else
+        echo "Docker file \"$DOCKERFILE\" doesn't match current architecture."
+        exit 1
+    fi
+}
+
+parse_arguments "$@"
+check_arguments
+
+CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
+TIME=$(date +%Y%m%d_%H%M)
 TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
 
 # Fail on first error.
 set -e
-if [[ $DOCKERFILE == *$ARCH* ]]; then
-    echo "docker file gets matched"
-    docker build -t ${TAG} --build-arg INSTALL_MODE="$INSTALL" -f ${DOCKERFILE} ${CONTEXT}
-else
-    echo "docker file '$DOCKERFILE' doesn't match"
-    exit
-fi
 
+docker build -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" -f "${DOCKERFILE}" "${CONTEXT}"
 echo "Built new image ${TAG}"
+
+if [[ "$LOCAL_DEV_FLAG" == "yes" ]]; then
+    docker image tag "${TAG}" "${LOCAL_DEV_TAG}"
+    echo "Also tagged as ${LOCAL_DEV_TAG}"
+fi
