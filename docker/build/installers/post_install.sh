@@ -27,3 +27,6 @@ ln -rs /usr/lib/x86_64-linux-gnu/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmal
 # https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
 
 ln -s -f /bin/true /usr/bin/chfn
+
+# Remove tarballs
+rm -rf /tmp/archive
