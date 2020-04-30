@@ -10,7 +10,7 @@
 # +------------------------------------------------------------+
 startup --batch_cpu_scheduling
 
-startup --host_jvm_args=-XX:-UseParallelGC
+startup --host_jvm_args="-XX:-UseParallelGC"
 
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
@@ -18,12 +18,6 @@ startup --host_jvm_args=-XX:-UseParallelGC
 
 # By default prints output only from failed tests.
 test --test_output=errors
-
-# Work around the sandbox issue.
-test --spawn_strategy=standalone
-
-# Specify protobuf cc toolchain
-test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
@@ -35,6 +29,7 @@ test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 # To enable the lint test, the BUILD *must* load the cpplint.bzl by having
 # 'load("//tools:cpplint.bzl", "cpplint")' at the beginning and 'cpplint()'
 # at the end.
+
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
 
@@ -55,19 +50,24 @@ test:coverage --linkopt=-lc
 # +------------------------------------------------------------+
 # | Build Configurations                                       |
 # +------------------------------------------------------------+
-# Do not show warnings from external dependencies.
-build --output_filter="^//"
+
+# build with profiling
+build:cpu_prof --linkopt=-lprofiler
+
+# Specify protobuf cc toolchain
+build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
 build --show_timestamps
 
 # Work around the sandbox issue.
 build --spawn_strategy=standalone
 
-# Specify protobuf cc toolchain
-build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+# Do not show warnings from external dependencies.
+# build --output_filter="^//"
 
-# build with profiling
-build:cpu_prof --linkopt=-lprofiler
+build --show_timestamps
+
+# build --copt="-I/usr/include/python3.6m"
 
 build --copt="-Werror=sign-compare"
 build --copt="-Werror=return-type"
@@ -76,15 +76,11 @@ build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
-# Strict check on type conversion.
-# absl/strings/str_cat.h breaks the rule.
-# build --per_file_copt=^modules/.*\.cc,-modules/tools/visualizer/.*\.cc,^cyber/.*\.cc@-Werror=conversion
-
-
 # Enable C++14
 build --cxxopt="-std=c++1y"
+
 # Enable colorful output of GCC
-# build --cxxopt="-fdiagnostics-color=always"
+build --cxxopt="-fdiagnostics-color=always"
 
 # +------------------------------------------------------------+
 # | Python Configurations                                      |
