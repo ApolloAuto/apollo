@@ -263,7 +263,7 @@ void Evaluator::EvaluateADCFutureTrajectory(
       if (time_gap > 0.3) {
         std::ostringstream msg;
         msg << "too sparse adc_future_trajectory. frame_num["
-            << learning_data_frame->frame_num() << "] i[" << i
+            << learning_data_frame->frame_num() << "] i[" << i << "] size["
             << trajectory.size() << "] time_gap[" << time_gap << "]";
         AERROR << msg.str();
         log_file_ << msg.str() << std::endl;
