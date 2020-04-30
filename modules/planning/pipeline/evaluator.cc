@@ -256,6 +256,19 @@ void Evaluator::EvaluateADCFutureTrajectory(
         learning_data_frame->output().adc_future_trajectory_point(i);
     trajectory.push_back(std::make_pair(adc_tp.timestamp_sec(),
                                         adc_tp.trajectory_point()));
+    if (i > 0) {
+      const double time_gap = adc_tp.timestamp_sec() -
+        learning_data_frame->output().adc_future_trajectory_point(i-1)
+                                     .timestamp_sec();
+      if (time_gap > 0.3) {
+        std::ostringstream msg;
+        msg << "too sparse adc_future_trajectory. frame_num["
+            << learning_data_frame->frame_num() << "] i[" << i
+            << trajectory.size() << "] time_gap[" << time_gap << "]";
+        AERROR << msg.str();
+        log_file_ << msg.str() << std::endl;
+      }
+    }
   }
 
   learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
