@@ -106,7 +106,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
+    load_data("modules/localization/testdata/1_imu_2.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122.70;
