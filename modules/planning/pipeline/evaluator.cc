@@ -239,10 +239,23 @@ void Evaluator::EvaluateADCTrajectory(
          << "] evaluated[" << evaluated_trajectory.size() << "]";
 
   for (const auto& tp : evaluated_trajectory) {
-    auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
-    adc_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
-    adc_trajectory_point->mutable_trajectory_point()
-                        ->CopyFrom(tp.trajectory_point());
+    if (tp.trajectory_point().relative_time() <= 0.0 &&
+        tp.trajectory_point().relative_time() >=
+            -FLAGS_trajectory_time_length) {
+      auto adc_trajectory_point =
+          learning_data_frame->add_adc_trajectory_point();
+      adc_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
+      adc_trajectory_point->mutable_trajectory_point()
+                          ->CopyFrom(tp.trajectory_point());
+    } else {
+      std::ostringstream msg;
+      msg << "DISCARD adc_trajectory_point. frame_num["
+          << learning_data_frame->frame_num()
+          << "] size[" << evaluated_trajectory.size()
+          << "] relative_time[" << tp.trajectory_point().relative_time() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
   }
 }
 
@@ -326,12 +339,24 @@ void Evaluator::EvaluateADCFutureTrajectory(
     }
   }
   for (const auto& tp : evaluated_trajectory) {
-    auto adc_future_trajectory_point =
-        learning_data_frame->mutable_output()
-                           ->add_adc_future_trajectory_point();
-    adc_future_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
-    adc_future_trajectory_point->mutable_trajectory_point()
-                               ->CopyFrom(tp.trajectory_point());
+    if (tp.trajectory_point().relative_time() > 0.0 &&
+        tp.trajectory_point().relative_time() <=
+            FLAGS_trajectory_time_length) {
+      auto adc_future_trajectory_point =
+          learning_data_frame->mutable_output()
+                             ->add_adc_future_trajectory_point();
+      adc_future_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
+      adc_future_trajectory_point->mutable_trajectory_point()
+                                 ->CopyFrom(tp.trajectory_point());
+    } else {
+      std::ostringstream msg;
+      msg << "DISCARD adc_future_trajectory_point. frame_num["
+          << learning_data_frame->frame_num()
+          << "] size[" << evaluated_trajectory.size()
+          << "] relative_time[" << tp.trajectory_point().relative_time() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
   }
 }
 
