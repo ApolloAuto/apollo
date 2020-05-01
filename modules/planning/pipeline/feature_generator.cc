@@ -134,7 +134,7 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
       le.header().timestamp_sec() - last_localization_message_timestamp_sec;
   if (time_diff < 1.0 / FLAGS_planning_freq) {
     return;
-  } else if (time_diff >= 1.0 / FLAGS_planning_freq * 2) {
+  } else if (time_diff >= (1.0 * 2 / FLAGS_planning_freq)) {
     std::ostringstream msg;
     msg << "missing localization too long: time_stamp["
         << le.header().timestamp_sec()
@@ -145,9 +145,6 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
   last_localization_message_timestamp_sec = le.header().timestamp_sec();
   localizations_.push_back(le);
 
-  // generate one frame data
-  GenerateLearningDataFrame();
-
   while (!localizations_.empty()) {
     if (localizations_.back().header().timestamp_sec() -
         localizations_.front().header().timestamp_sec()
@@ -156,6 +153,9 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
     }
     localizations_.pop_front();
   }
+
+  // generate one frame data
+  GenerateLearningDataFrame();
 
   // write frames into a file
   if (learning_data_.learning_data_size() >=
@@ -590,7 +590,6 @@ void FeatureGenerator::GenerateTrafficLightDetectionFeature(
 void FeatureGenerator::GenerateADCTrajectoryPoints(
     const std::list<LocalizationEstimate>& localizations,
     LearningDataFrame* learning_data_frame) {
-
   std::vector<LocalizationEstimate> localization_samples;
   for (const auto& le : localizations) {
     localization_samples.insert(localization_samples.begin(), le);
