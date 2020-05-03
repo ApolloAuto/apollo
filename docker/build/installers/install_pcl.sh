@@ -26,6 +26,11 @@ if [ "$ARCH" == "aarch64" ]; then
   shift
 fi
 
+apt-get -y update && \
+    apt-get -y install \
+    libeigen3-dev \
+    libflann-dev
+
 if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
   # https://github.com/PointCloudLibrary/pcl/archive/pcl-1.10.1.tar.gz
 

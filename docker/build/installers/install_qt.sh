@@ -26,7 +26,12 @@ apt-get -y update && \
     libx11-xcb1 \
     libfreetype6 \
     libdbus-1-3 \
-    libfontconfig1
+    libfontconfig1 \
+    libxkbcommon-x11-dev \
+    libxkbcommon-dev
+
+# Note(storypku)
+# The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
 . /tmp/installers/installer_base.sh
 
@@ -54,6 +59,9 @@ cuteci \
 # Hide qt5 version from end users
 ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 /usr/local/qt5
 
+echo "/usr/local/qt5/lib" > /etc/ld.so.conf.d/qt.conf
+ldconfig
+
 # clean up
 rm -f ${QT_INSTALLER}
 # Keep License files
@@ -62,4 +70,7 @@ rm -rf ${MY_DEST_DIR}/MaintenanceTool* || true
 rm -rf ${MY_DEST_DIR}/{InstallationLog.txt,installer-changelog} || true
 rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
 
+
 pip3 uninstall -y cuteci
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
