@@ -26,7 +26,7 @@ apt-get -y update && \
     libtinyxml2-dev
 
 tar xzf /tmp/installers/fast-rtps.prebuilt.x86_64.tar.gz
-mv fast-rtps /usr/local
+mv fast-rtps /usr/local/fast-rtps
 
 # TODO(storypku)
 # As FastRTPS installer in other branches don't work well, we provided a prebuilt version
@@ -35,3 +35,4 @@ mv fast-rtps /usr/local
 
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
