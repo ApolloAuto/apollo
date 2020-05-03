@@ -72,7 +72,7 @@ new_local_repository(
 
 new_local_repository(
     name = "poco",
-    build_file = "third_party/poco.BUILD",
+    build_file = "external/poco.BUILD",
     path = "/usr/include",
 )
 
@@ -171,11 +171,11 @@ http_archive(
 #    path = "/usr/include",
 #)
 #
-#new_local_repository(
-#    name = "qt",
-#    build_file = "external/qt.BUILD",
-#    path = "/usr/local/qt5/include",
-#)
+new_local_repository(
+    name = "qt",
+    build_file = "external/qt.BUILD",
+    path = "/usr/local/qt5/include",
+)
 
 #new_local_repository(
 #    name = "opengl",
@@ -372,7 +372,8 @@ new_local_repository(
 #    build_file = "third_party/opencv.BUILD",
 #    path = "/usr/include",
 #)
-# Boost
+
+# TODO(storypku) rules_boost
 new_local_repository(
     name = "boost",
     build_file = "external/boost.BUILD",
