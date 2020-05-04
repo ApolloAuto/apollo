@@ -89,7 +89,7 @@ class Obstacle {
    */
   perception::PerceptionObstacle::Type type() const;
 
-  bool IsPedestrian();
+  bool IsPedestrian() const;
 
   /**
    * @brief Get the obstacle's ID.
