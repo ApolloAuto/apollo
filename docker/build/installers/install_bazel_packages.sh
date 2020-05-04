@@ -50,3 +50,6 @@ wget -O v1.14.2.tar.gz \
     https://github.com/grpc/grpc/archive/v1.14.2.tar.gz
 wget -O v1.11.tar.gz \
     https://github.com/civetweb/civetweb/archive/v1.11.tar.gz
+wget -O ad_rss_lib-1.1.0.tar.gz \
+    https://github.com/intel/ad-rss-lib/archive/v1.1.0.tar.gz
+

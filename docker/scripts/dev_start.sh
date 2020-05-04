@@ -21,7 +21,8 @@ FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-18.04-x86_64-20191111_1530"
+#VERSION_X86_64="dev-18.04-x86_64-20191111_1530"
+VERSION_X86_64="dev-18.04-x86_64-20200505_0330"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
@@ -398,7 +399,7 @@ function main(){
         -e DOCKER_IMG=$APOLLO_DEV_IMAGE \
         -e USE_GPU=$USE_GPU \
         -e NVIDIA_VISIBLE_DEVICES=all \
-        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,graphics,video,utility \
         $(local_volumes) \
         --net host \
         -w /apollo \
@@ -417,7 +418,7 @@ function main(){
     set +x
 
     if [ "${USER}" != "root" ]; then
-        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
     docker exec $APOLLO_DEV bash -c '/apollo/docker/scripts/container_setup.sh'

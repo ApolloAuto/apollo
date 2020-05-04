@@ -60,6 +60,9 @@ py_proto
 # calibration files
 modules/calibration/data/
 
+# Package archive
+docker/build/archive/
+
 # Data bag
 docs/demo_guide/*.bag
 docs/demo_guide/*.record
