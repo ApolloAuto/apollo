@@ -44,12 +44,18 @@ new_local_repository(
     path = "/home/tmp/google_styleguide",
 )
 
+new_local_repository(
+    name = "qt",
+    build_file = "third_party/qt.BUILD",
+    path = "/usr/local/qt5/include",
+)
+
 #ad-rss-lib
-new_git_repository(
+new_http_archive(
     name = "ad_rss_lib",
     build_file = "third_party/rss_lib.BUILD",
-    tag = "v1.1.0",
-    remote = "https://github.com/intel/ad-rss-lib",
+    strip_prefix = "ad-rss-lib-1.1.0",
+    url = "file:///home/tmp/ad_rss_lib-1.1.0.tar.gz",
 )
 
 # eigen
@@ -114,6 +120,7 @@ new_local_repository(
     build_file = "third_party/caffe.BUILD",
     path = "/usr/include/caffe",
 )
+
 ## tensorrt
 new_local_repository(
     name = "tensorrt",
@@ -254,8 +261,8 @@ new_local_repository(
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
-    url = "file:///home/tmp/v1.14.2.tar.gz",
     strip_prefix = "grpc-1.14.2",
+    url = "file:///home/tmp/v1.14.2.tar.gz",
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
