@@ -267,7 +267,7 @@ function build_py_proto() {
     rm -rf py_proto
   fi
   mkdir py_proto
-  find modules/ cyber/ -name "*.proto" \
+  find modules/ cyber/ lgsvl_pkgs/ -name "*.proto" \
       | grep -v node_modules \
       | xargs protoc --python_out=py_proto
   find modules/ cyber/ -name "*_service.proto" \

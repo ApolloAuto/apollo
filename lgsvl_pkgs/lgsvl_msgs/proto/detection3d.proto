@@ -1,0 +1,25 @@
+syntax = "proto3";
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+import "lgsvl_pkgs/lgsvl_msgs/proto/detection2d.proto";
+
+package apollo.common;
+
+message Pose {
+  Point3D position = 1;
+  Quaternion orientation = 2;
+}
+
+message BoundingBox3D {
+  Pose position = 1;
+  Vector3 size = 2;
+}
+
+message Detection3D {
+  Header header = 1;
+  uint32 id = 2;
+  string label = 3;
+  double score = 4;
+  BoundingBox3D bbox = 5;
+  Twist velocity = 6;
+}
