@@ -23,8 +23,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
-DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
-              "Prefix of files to store learning_data_frame data");
 DEFINE_double(trajectory_delta_t, 0.2,
              "delta time(sec) between trajectory points");
 

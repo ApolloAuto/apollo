@@ -444,4 +444,30 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "message_process",
+    srcs = ["message_process.cc"],
+    hdrs = ["message_process.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+       "//cyber",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:config_gflags",
+        "//modules/dreamview/proto:hmi_status_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/perception/proto:perception_proto",
+        "//modules/planning/common/util:math_util_lib",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_proto",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/util:data_extraction",
+        "//modules/routing/proto:routing_proto",
+        "//third_party:boost",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
 cpplint()
