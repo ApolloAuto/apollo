@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+/**
+ * @file
+ */
+
 #pragma once
 
 #include <chrono>
@@ -23,7 +28,6 @@
 #include <utility>
 #include <unordered_map>
 
-#include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
@@ -36,14 +40,31 @@
 namespace apollo {
 namespace planning {
 
-class FeatureGenerator {
+class MessageProcess {
  public:
-  void Init();
+  bool Init();
   void Close();
 
-  void ProcessOfflineData(const std::string& record_filename);
+  void OnChassis(const apollo::canbus::Chassis& chassis);
 
-  void WriteRemainderData();
+  void OnHMIStatus(apollo::dreamview::HMIStatus hmi_status);
+
+  void OnLocalization(const apollo::localization::LocalizationEstimate& le);
+
+  void OnPrediction(
+      const apollo::prediction::PredictionObstacles& prediction_obstacles);
+
+  void OnRoutingResponse(
+      const apollo::routing::RoutingResponse& routing_response);
+
+  void OnTrafficLightDetection(
+      const apollo::perception::TrafficLightDetection& traffic_light_detection);
+
+  void ProcessOfflineData(const std::string &record_filename);
+
+  void WriteLearningData();
+
+  void WriteRemainderiLearningData();
 
  private:
   struct ADCCurrentInfo {
@@ -53,17 +74,7 @@ class FeatureGenerator {
     double adc_cur_heading_;
   };
 
-  void OnChassis(const apollo::canbus::Chassis& chassis);
-  void OnHMIStatus(apollo::dreamview::HMIStatus hmi_status);
-  void OnLocalization(const apollo::localization::LocalizationEstimate& le);
-  void OnPrediction(
-      const apollo::prediction::PredictionObstacles& prediction_obstacles);
-  void OnRoutingResponse(
-      const apollo::routing::RoutingResponse& routing_response);
-  void OnTrafficLightDetection(
-      const apollo::perception::TrafficLightDetection& traffic_light_detection);
-
-  apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
+    apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
       const apollo::common::PointENU& position);
   int GetADCCurrentRoutingIndex();
 
@@ -87,16 +98,12 @@ class FeatureGenerator {
 
   void GenerateTrafficLightDetectionFeature(
       LearningDataFrame* learning_data_frame);
-
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localizations,
       LearningDataFrame* learning_data_frame);
 
   void GenerateLearningDataFrame();
-
-  void WriteOutLearningData(const LearningData& learning_data,
-                            const int learning_data_file_index);
 
  private:
   std::chrono::time_point<std::chrono::system_clock> start_time_;
