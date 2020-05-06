@@ -19,6 +19,7 @@ RUN bash /tmp/installers/install_cyber_dependencies.sh
 RUN bash /tmp/installers/install_cmake.sh
 RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
+RUN bash /tmp/installers/install_fast-rtps.sh
 RUN bash /tmp/installers/install_poco.sh
 RUN bash /tmp/installers/install_qt.sh
 
