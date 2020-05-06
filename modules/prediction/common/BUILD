@@ -216,6 +216,7 @@ cc_library(
     deps = [
         ":semantic_map",
         "//cyber/common:file",
+        "//cyber/proto:record_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",

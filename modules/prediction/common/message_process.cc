@@ -17,7 +17,7 @@
 #include "modules/prediction/common/message_process.h"
 
 #include "cyber/common/file.h"
-#include "cyber/record/record_reader.h"
+#include "cyber/record/file/record_file_writer.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/prediction/common/feature_output.h"
@@ -41,6 +41,8 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
+using apollo::cyber::record::RecordFileWriter;
+using apollo::cyber::proto::SingleMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -285,12 +287,27 @@ void MessageProcess::OnStoryTelling(const Stories& story) {
 void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
   RecordReader reader(record_filename);
   RecordMessage message;
+  RecordFileWriter writer;
+  writer.Open(record_filename + ".new_prediction");
   while (reader.ReadMessage(&message)) {
+    if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord &&
+        message.channel_name != FLAGS_prediction_topic) {
+      writer.WriteMessage(RecordMessageToSingleMessage(message));
+    }
     if (message.channel_name == FLAGS_perception_obstacle_topic) {
       PerceptionObstacles perception_obstacles;
       if (perception_obstacles.ParseFromString(message.content)) {
         PredictionObstacles prediction_obstacles;
         OnPerception(perception_obstacles, &prediction_obstacles);
+        if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+          SingleMessage single_message;
+          std::string content = "";
+          prediction_obstacles.SerializeToString(&content);
+          single_message.set_content(content);
+          single_message.set_time(message.time);
+          single_message.set_channel_name(FLAGS_prediction_topic);
+          writer.WriteMessage(RecordMessageToSingleMessage(message));
+        }
       }
     } else if (message.channel_name == FLAGS_localization_topic) {
       LocalizationEstimate localization;
@@ -304,6 +321,16 @@ void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
       }
     }
   }
+  writer.Close();
+}
+
+SingleMessage MessageProcess::RecordMessageToSingleMessage(
+    const RecordMessage& record_message) {
+  SingleMessage single_message;
+  single_message.set_channel_name(record_message.channel_name);
+  single_message.set_time(record_message.time);
+  single_message.set_content(record_message.content);
+  return single_message;
 }
 
 }  // namespace prediction
