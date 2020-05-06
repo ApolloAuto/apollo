@@ -63,7 +63,7 @@ bool MessageProcess::Init() {
   map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
   map_m_["San Mateo"] = "san_mateo";
 
-  if (FLAGS_planning_offline_mode != 0) {
+  if (FLAGS_planning_offline_mode == 2) {
     // offline process logging
     log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
                    std::ios_base::out | std::ios_base::app);
@@ -77,7 +77,7 @@ bool MessageProcess::Init() {
 }
 
 void MessageProcess::Close() {
-  if (FLAGS_planning_offline_mode != 0) {
+  if (FLAGS_planning_offline_mode == 2) {
     // offline process logging
     std::ostringstream msg;
     msg << "Total learning_data_frame number: "
@@ -121,7 +121,7 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     return;
   }
   if (time_diff >= (1.0 * 2 / FLAGS_planning_loop_rate)) {
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       std::ostringstream msg;
       msg << "missing localization too long: time_stamp["
           << le.header().timestamp_sec()
@@ -142,13 +142,20 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     localizations_.pop_front();
   }
 
+  ADEBUG << "OnLocalization: size[" << localizations_.size()
+         << "] time_diff["
+         << localizations_.back().header().timestamp_sec() -
+            localizations_.front().header().timestamp_sec() << "]";
+
   // generate one frame data
   GenerateLearningDataFrame();
 
-  // write frames into a file
-  if (learning_data_.learning_data_size() >=
-    FLAGS_learning_data_frame_num_per_file) {
-    WriteLearningData();
+  if (FLAGS_planning_offline_mode == 2) {
+    // write frames into a file
+    if (learning_data_.learning_data_size() >=
+      FLAGS_learning_data_frame_num_per_file) {
+      WriteLearningData();
+    }
   }
 }
 
@@ -200,7 +207,7 @@ void MessageProcess::OnPrediction(
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
       // abnormal perception data: time_diff <= 0
-      if (FLAGS_planning_offline_mode != 0) {
+      if (FLAGS_planning_offline_mode == 2) {
         const double time_diff = obstacle_trajectory_point.timestamp_sec() -
             obstacle_history_map_[m.first].back().timestamp_sec();
         std::ostringstream msg;
@@ -312,6 +319,9 @@ void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
 }
 
 void MessageProcess::WriteLearningData() {
+  if (FLAGS_planning_offline_mode != 2) {
+    return;
+  }
   if (learning_data_.learning_data_size() <= 0) {
     return;
   }
@@ -328,10 +338,13 @@ void MessageProcess::WriteLearningData() {
 }
 
 void MessageProcess::WriteRemainderiLearningData() {
+  if (FLAGS_planning_offline_mode != 2) {
+    return;
+  }
   if (learning_data_.learning_data_size() > 0) {
     WriteLearningData();
   }
-  if (FLAGS_planning_offline_mode != 0) {
+  if (FLAGS_planning_offline_mode == 2) {
     std::ostringstream msg;
     msg << "record_file[" << record_file_name_
         << "] frame_num[" << total_learning_data_frame_num_ << "]";
@@ -533,7 +546,7 @@ void MessageProcess::GenerateObstacleFeature(
     LearningDataFrame* learning_data_frame) {
   ADCCurrentInfo adc_curr_info;
   if (GetADCCurrentInfo(&adc_curr_info) == -1) {
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       std::ostringstream msg;
       msg << "fail to get ADC current info: frame_num["
           << learning_data_frame->frame_num() << "]";
@@ -569,7 +582,7 @@ void MessageProcess::GenerateRoutingFeature(
   auto routing = learning_data_frame->mutable_routing();
   routing->Clear();
   if (routing_lane_segment_.empty()) {
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       std::ostringstream msg;
       msg << "no routing. frame_num["
           << learning_data_frame->frame_num() << "]";
@@ -583,7 +596,7 @@ void MessageProcess::GenerateRoutingFeature(
   }
 
   if (routing_index < 0) {
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       std::ostringstream msg;
       msg << "no LOCAL routing. frame_num["
           << learning_data_frame->frame_num() << "]";
@@ -615,7 +628,7 @@ void MessageProcess::GenerateRoutingFeature(
   }
 
   if (local_routing_lane_ids.empty()) {
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       std::ostringstream msg;
       msg << "no LOCAL routing. frame_num["
           << learning_data_frame->frame_num() << "]";
@@ -704,7 +717,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
     }
     planning_tag->set_lane_turn(lane_turn);
 
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       // planning_tag: overlap tags
       double point_distance = 0.0;
       if (trajectory_point_index > 0) {
@@ -845,7 +858,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
   if (adc_trajectory_points.size() <= 5) {
-    if (FLAGS_planning_offline_mode != 0) {
+    if (FLAGS_planning_offline_mode == 2) {
       std::ostringstream msg;
       msg << "too few adc_trajectory_points: frame_num["
           << learning_data_frame->frame_num()
