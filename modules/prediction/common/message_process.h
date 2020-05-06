@@ -21,6 +21,8 @@
 #pragma once
 
 #include <string>
+#include "cyber/record/record_reader.h"
+#include "cyber/proto/record.pb.h"
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -57,6 +59,9 @@ class MessageProcess {
   static void OnStoryTelling(const storytelling::Stories &story);
 
   static void ProcessOfflineData(const std::string &record_filename);
+
+  static apollo::cyber::proto::SingleMessage RecordMessageToSingleMessage(
+      const apollo::cyber::record::RecordMessage& record_message);
 };
 
 }  // namespace prediction
