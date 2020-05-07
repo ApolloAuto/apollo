@@ -29,6 +29,7 @@ cc_library(
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
     ) + [
+        "-lmyelin",
         "-lnvcaffe_parser",
         "-lnvinfer",
         "-lnvinfer_plugin",
