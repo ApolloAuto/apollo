@@ -193,7 +193,7 @@ message ScenarioYieldSignConfig {
   optional float creep_timeout_sec = 4 [default = 10.0];        // sec
 }
 
-message ScenarioTestLearningModelConfig {
+message ScenarioLearningModelSampleConfig {
   optional string model_file = 1;
   optional int32 input_feature_num = 2;
 }
@@ -224,8 +224,8 @@ message ScenarioConfig {
     NARROW_STREET_U_TURN = 13;
     PARK_AND_GO = 14;
 
-    // test learning model
-    TEST_LEARNING_MODEL = 15;
+    // learning model sample
+    LEARNING_MODEL_SAMPLE = 15;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -287,8 +287,8 @@ message ScenarioConfig {
     YIELD_SIGN_APPROACH = 900;
     YIELD_SIGN_CREEP = 901;
 
-    // test_learning_model scenario
-    TEST_LEARNING_MODEL_RUN = 1000;
+    // learning_model_sample scenario
+    LEARNING_MODEL_RUN = 1000;
   };
 
   message StageConfig {
@@ -305,21 +305,21 @@ message ScenarioConfig {
   oneof scenario_config {
     ScenarioLaneFollowConfig lane_follow_config = 2;
     ScenarioBareIntersectionUnprotectedConfig
-        bare_intersection_unprotected_config = 4;
-    ScenarioEmergencyPullOverConfig emergency_pull_over_config = 5;
-    ScenarioEmergencyStopConfig emergency_stop_config = 6;
+        bare_intersection_unprotected_config = 3;
+    ScenarioEmergencyPullOverConfig emergency_pull_over_config = 4;
+    ScenarioEmergencyStopConfig emergency_stop_config = 5;
+    ScenarioLearningModelSampleConfig learning_model_sample_config = 6;
     ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 7;
-    ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 8;
-    ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 9;
-    ScenarioTrafficLightUnprotectedRightTurnConfig
-        traffic_light_unprotected_right_turn_config = 10;
+    ScenarioParkAndGoConfig park_and_go_config = 8;
+    ScenarioPullOverConfig pull_over_config = 9;
+    ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 10;
+    ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 11;
     ScenarioTrafficLightUnprotectedLeftTurnConfig
-        traffic_light_unprotected_left_turn_config = 11;
-    ScenarioParkAndGoConfig park_and_go_config = 12;
-    ScenarioPullOverConfig pull_over_config = 13;
+        traffic_light_unprotected_left_turn_config = 12;
+    ScenarioTrafficLightUnprotectedRightTurnConfig
+        traffic_light_unprotected_right_turn_config = 13;
     ScenarioValetParkingConfig valet_parking_config = 14;
     ScenarioYieldSignConfig yield_sign_config = 15;
-    ScenarioTestLearningModelConfig test_learning_model_config = 18;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 16;
