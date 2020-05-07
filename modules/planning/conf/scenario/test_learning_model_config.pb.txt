@@ -3,3 +3,10 @@ test_learning_model_config: {
   model_file: "/apollo/modules/planning/tools/planning_demo_model.pt"
   input_feature_num: 301084
 }
+
+ stage_type: TEST_LEARNING_MODEL_RUN
+
+ stage_config: {
+   stage_type: TEST_LEARNING_MODEL_RUN
+   enabled: true
+ }

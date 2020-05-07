@@ -283,9 +283,12 @@ message ScenarioConfig {
     PARK_AND_GO_ADJUST = 802;
     PARK_AND_GO_PRE_CRUISE = 803;
 
+    // yield_sign scenario
     YIELD_SIGN_APPROACH = 900;
     YIELD_SIGN_CREEP = 901;
 
+    // test_learning_model scenario
+    TEST_LEARNING_MODEL_RUN = 1000;
   };
 
   message StageConfig {
