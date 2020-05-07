@@ -29,6 +29,7 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/math_util.h"
 
@@ -77,6 +78,8 @@ bool MessageProcess::Init() {
 }
 
 void MessageProcess::Close() {
+  FeatureOutput::Clear();
+
   if (FLAGS_planning_offline_mode == 2) {
     // offline process logging
     std::ostringstream msg;
@@ -148,15 +151,11 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
             localizations_.front().header().timestamp_sec() << "]";
 
   // generate one frame data
-  GenerateLearningDataFrame();
+  LearningDataFrame learning_data_frame;
+  GenerateLearningDataFrame(&learning_data_frame);
 
-  if (FLAGS_planning_offline_mode == 2) {
-    // write frames into a file
-    if (learning_data_.learning_data_size() >=
-      FLAGS_learning_data_frame_num_per_file) {
-      WriteLearningData();
-    }
-  }
+  // output
+  FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
 }
 
 void MessageProcess::OnPrediction(
@@ -271,14 +270,13 @@ void MessageProcess::OnTrafficLightDetection(
   }
 }
 
-void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
-  log_file_ << "Processing: " << record_filename << std::endl;
-  record_file_name_ =
-      record_filename.substr(record_filename.find_last_of("/") + 1);
+void MessageProcess::ProcessOfflineData(const std::string& record_file) {
+  log_file_ << "Processing: " << record_file << std::endl;
+  record_file_ = record_file;
 
-  RecordReader reader(record_filename);
+  RecordReader reader(record_file);
   if (!reader.IsValid()) {
-    AERROR << "Fail to open " << record_filename;
+    AERROR << "Fail to open " << record_file;
     return;
   }
 
@@ -315,41 +313,6 @@ void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
         OnTrafficLightDetection(traffic_light_detection);
       }
     }
-  }
-}
-
-void MessageProcess::WriteLearningData() {
-  if (FLAGS_planning_offline_mode != 2) {
-    return;
-  }
-  if (learning_data_.learning_data_size() <= 0) {
-    return;
-  }
-  if (record_file_name_.empty()) {
-    record_file_name_ = "00000";
-  }
-  const std::string file_name = absl::StrCat(
-      FLAGS_planning_data_dir, "/", record_file_name_, ".",
-      learning_data_file_index_, ".bin");
-  cyber::common::SetProtoToBinaryFile(learning_data_, file_name);
-  // cyber::common::SetProtoToASCIIFile(learning_data, file_name + ".txt");
-  learning_data_.Clear();
-  ++learning_data_file_index_;
-}
-
-void MessageProcess::WriteRemainderiLearningData() {
-  if (FLAGS_planning_offline_mode != 2) {
-    return;
-  }
-  if (learning_data_.learning_data_size() > 0) {
-    WriteLearningData();
-  }
-  if (FLAGS_planning_offline_mode == 2) {
-    std::ostringstream msg;
-    msg << "record_file[" << record_file_name_
-        << "] frame_num[" << total_learning_data_frame_num_ << "]";
-    AINFO << msg.str();
-    log_file_ << msg.str() << std::endl;
   }
 }
 
@@ -871,10 +834,10 @@ void MessageProcess::GenerateADCTrajectoryPoints(
   //      << trajectory_point_index;
 }
 
-void MessageProcess::GenerateLearningDataFrame() {
+void MessageProcess::GenerateLearningDataFrame(
+    LearningDataFrame* learning_data_frame) {
   const int routing_index = GetADCCurrentRoutingIndex();
 
-  auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
   learning_data_frame->set_message_timestamp_sec(
       localizations_.back().header().timestamp_sec());

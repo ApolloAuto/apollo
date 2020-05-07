@@ -45,6 +45,7 @@ cc_binary(
     ],
     deps = [
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:feature_output",
         "//modules/planning/common:message_process",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
