@@ -21,44 +21,41 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include "torch/script.h"
-#include "torch/torch.h"
-
-#include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
+// stage context
+struct TestLearningModelContext {
+  ScenarioTestLearningModelConfig scenario_config;
+};
+
 class TestLearningModelScenario : public Scenario {
  public:
   TestLearningModelScenario(const ScenarioConfig& config,
-                            const ScenarioContext* context);
+                            const ScenarioContext* context)
+      : Scenario(config, context) {}
 
-  // TODO(all): continue to refactor scenario framework to
-  //            make output more clear
-  ScenarioStatus Process(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
 
  private:
-  bool ExtractFeatures(Frame* frame,
-                       std::vector<torch::jit::IValue> *input_features);
-  bool InferenceModel(const std::vector<torch::jit::IValue> &input_features,
-                      Frame* frame);
+  static void RegisterStages();
+  bool GetScenarioConfig();
 
-  torch::jit::script::Module model_;
-  torch::Device device_;
-  int input_feature_num_ = 0;
-  bool is_init_ = false;
+ private:
+  static apollo::common::util::Factory<
+      ScenarioConfig::StageType, Stage,
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      s_stage_factory_;
+  bool init_ = false;
+  TestLearningModelContext context_;
 };
 
 }  // namespace scenario
