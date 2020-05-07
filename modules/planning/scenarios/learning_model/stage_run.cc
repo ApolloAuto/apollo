@@ -29,7 +29,7 @@ namespace scenario {
 
 using apollo::common::TrajectoryPoint;
 
-Stage::StageStatus TestLearningModelStageRun::Process(
+Stage::StageStatus LearningModelSampleStageRun::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Run";
   CHECK_NOTNULL(frame);
@@ -55,7 +55,7 @@ Stage::StageStatus TestLearningModelStageRun::Process(
   return FinishStage();
 }
 
-bool TestLearningModelStageRun::ExtractFeatures(Frame* frame,
+bool LearningModelSampleStageRun::ExtractFeatures(Frame* frame,
     std::vector<torch::jit::IValue> *input_features) {
   // TODO(all): generate learning features.
   // TODO(all): adapt to new input feature shapes
@@ -68,7 +68,7 @@ bool TestLearningModelStageRun::ExtractFeatures(Frame* frame,
   return true;
 }
 
-bool TestLearningModelStageRun::InferenceModel(
+bool LearningModelSampleStageRun::InferenceModel(
     const std::vector<torch::jit::IValue> &input_features,
     Frame* frame) {
   auto reference_line_infos = frame->mutable_reference_line_infos();
@@ -111,7 +111,7 @@ bool TestLearningModelStageRun::InferenceModel(
   return true;
 }
 
-Stage::StageStatus TestLearningModelStageRun::FinishStage() {
+Stage::StageStatus LearningModelSampleStageRun::FinishStage() {
   return FinishScenario();
 }
 
