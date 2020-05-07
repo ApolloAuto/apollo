@@ -64,6 +64,8 @@ bool MessageProcess::Init() {
   map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
   map_m_["San Mateo"] = "san_mateo";
 
+  map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
+
   if (FLAGS_planning_offline_mode == 2) {
     // offline process logging
     log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
