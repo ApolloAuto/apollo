@@ -6,19 +6,19 @@ cc_library(
     name = "learning_model",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        ":test_learning_model_scenario",
+        ":learning_model_sample_scenario",
     ],
 )
 
 cc_library(
-    name = "test_learning_model_scenario",
+    name = "learning_model_sample_scenario",
     srcs = [
+        "learning_model_sample_scenario.cc",
         "stage_run.cc",
-        "test_learning_model_scenario.cc",
     ],
     hdrs = [
+        "learning_model_sample_scenario.h",
         "stage_run.h",
-        "test_learning_model_scenario.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -34,14 +34,14 @@ cc_library(
 )
 
 cc_test(
-    name = "test_learning_model_scenario_test",
+    name = "learning_model_sample_scenario_test",
     size = "small",
-    srcs = ["test_learning_model_scenario_test.cc"],
+    srcs = ["learning_model_sample_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
-        ":test_learning_model_scenario",
+        ":learning_model_sample_scenario",
         "@com_google_googletest//:gtest_main",
     ],
 )

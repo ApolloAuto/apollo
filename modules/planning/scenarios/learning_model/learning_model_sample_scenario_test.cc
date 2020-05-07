@@ -18,45 +18,38 @@
  * @file
  **/
 
-#pragma once
+#include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 
-#include <memory>
+#include "gtest/gtest.h"
 
-#include "modules/common/util/factory.h"
-#include "modules/planning/scenarios/scenario.h"
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
-// stage context
-struct TestLearningModelContext {
-  ScenarioTestLearningModelConfig scenario_config;
-};
-
-class TestLearningModelScenario : public Scenario {
+class LearningModelSampleScenarioTest : public ::testing::Test {
  public:
-  TestLearningModelScenario(const ScenarioConfig& config,
-                            const ScenarioContext* context)
-      : Scenario(config, context) {}
+  virtual void SetUp() {}
 
-  void Init() override;
-
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
-
- private:
-  static void RegisterStages();
-  bool GetScenarioConfig();
-
- private:
-  static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-      s_stage_factory_;
-  bool init_ = false;
-  TestLearningModelContext context_;
+ protected:
+  std::unique_ptr<LearningModelSampleScenario> scenario_;
 };
+
+TEST_F(LearningModelSampleScenarioTest, Init) {
+  FLAGS_scenario_learning_model_sample_config_file =
+    "/apollo/modules/planning/conf/scenario/"
+    "learning_model_sample_config.pb.txt";
+
+  ScenarioConfig config;
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
+      FLAGS_scenario_learning_model_sample_config_file, &config));
+  ScenarioContext context;
+  scenario_.reset(new LearningModelSampleScenario(config, &context));
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LEARNING_MODEL_SAMPLE);
+}
 
 }  // namespace scenario
 }  // namespace planning

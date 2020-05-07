@@ -35,6 +35,10 @@ DEFINE_string(scenario_lane_follow_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/lane_follow_config.pb.txt",
               "The lane_follow scenario configuration file");
+DEFINE_string(scenario_learning_model_sample_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/learning_model_sample_config.pb.txt",
+              "learning_model_sample scenario config file");
 DEFINE_string(scenario_narrow_street_u_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/narrow_street_u_turn_config.pb.txt",
@@ -79,10 +83,6 @@ DEFINE_string(scenario_yield_sign_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/yield_sign_config.pb.txt",
               "yield_sign scenario config file");
-DEFINE_string(scenario_test_learning_model_config_file,
-              "/apollo/modules/planning/conf/"
-              "scenario/test_learning_model_config.pb.txt",
-              "test_learning_model scenario config file");
 
 DEFINE_bool(enable_scenario_bare_intersection, true,
             "enable bare_intersection scenarios in planning");
@@ -105,9 +105,6 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
 
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
-
-DEFINE_bool(enable_scenario_test_learning_model, false,
-            "enable test learning model scenarios in planning");
 
 DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");

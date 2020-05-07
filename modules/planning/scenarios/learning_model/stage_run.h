@@ -25,26 +25,26 @@
 #include "torch/script.h"
 #include "torch/torch.h"
 
-#include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
+#include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
-struct TestLearningModelContext;
+struct LearningModelSampleContext;
 
-class TestLearningModelStageRun : public Stage {
+class LearningModelSampleStageRun : public Stage {
  public:
-  explicit TestLearningModelStageRun(
+  explicit LearningModelSampleStageRun(
       const ScenarioConfig::StageConfig& config)
       : Stage(config), device_(torch::kCPU) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
-  TestLearningModelContext* GetContext() {
-    return GetContextAs<TestLearningModelContext>();
+  LearningModelSampleContext* GetContext() {
+    return GetContextAs<LearningModelSampleContext>();
   }
   bool ExtractFeatures(Frame* frame,
                        std::vector<torch::jit::IValue> *input_features);
@@ -53,7 +53,7 @@ class TestLearningModelStageRun : public Stage {
   Stage::StageStatus FinishStage();
 
  private:
-  ScenarioTestLearningModelConfig scenario_config_;
+  ScenarioLearningModelSampleConfig scenario_config_;
   torch::Device device_;
   torch::jit::script::Module model_;
   int input_feature_num_ = 0;

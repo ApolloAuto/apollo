@@ -18,38 +18,45 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
+#pragma once
 
-#include "gtest/gtest.h"
+#include <memory>
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/common/util/factory.h"
+#include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
-class TestLearningModelScenarioTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-
- protected:
-  std::unique_ptr<TestLearningModelScenario> scenario_;
+// stage context
+struct LearningModelSampleContext {
+  ScenarioLearningModelSampleConfig scenario_config;
 };
 
-TEST_F(TestLearningModelScenarioTest, Init) {
-  FLAGS_scenario_test_learning_model_config_file =
-    "/apollo/modules/planning/conf/scenario/"
-    "test_learning_model_config.pb.txt";
+class LearningModelSampleScenario : public Scenario {
+ public:
+  LearningModelSampleScenario(const ScenarioConfig& config,
+                            const ScenarioContext* context)
+      : Scenario(config, context) {}
 
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_test_learning_model_config_file, &config));
-  ScenarioContext context;
-  scenario_.reset(new TestLearningModelScenario(config, &context));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::TEST_LEARNING_MODEL);
-}
+  void Init() override;
+
+  std::unique_ptr<Stage> CreateStage(
+      const ScenarioConfig::StageConfig& stage_config) override;
+
+ private:
+  static void RegisterStages();
+  bool GetScenarioConfig();
+
+ private:
+  static apollo::common::util::Factory<
+      ScenarioConfig::StageType, Stage,
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      s_stage_factory_;
+  bool init_ = false;
+  LearningModelSampleContext context_;
+};
 
 }  // namespace scenario
 }  // namespace planning

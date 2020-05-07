@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
+#include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -31,9 +31,9 @@ namespace scenario {
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-    TestLearningModelScenario::s_stage_factory_;
+    LearningModelSampleScenario::s_stage_factory_;
 
-void TestLearningModelScenario::Init() {
+void LearningModelSampleScenario::Init() {
   if (init_) {
     return;
   }
@@ -48,18 +48,18 @@ void TestLearningModelScenario::Init() {
   init_ = true;
 }
 
-void TestLearningModelScenario::RegisterStages() {
+void LearningModelSampleScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TEST_LEARNING_MODEL_RUN,
+      ScenarioConfig::LEARNING_MODEL_RUN,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TestLearningModelStageRun(config);
+        return new LearningModelSampleStageRun(config);
       });
 }
 
-std::unique_ptr<Stage> TestLearningModelScenario::CreateStage(
+std::unique_ptr<Stage> LearningModelSampleScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
@@ -75,12 +75,12 @@ std::unique_ptr<Stage> TestLearningModelScenario::CreateStage(
 /*
  * read scenario specific configs and set in context_ for stages to read
  */
-bool TestLearningModelScenario::GetScenarioConfig() {
-  if (!config_.has_test_learning_model_config()) {
+bool LearningModelSampleScenario::GetScenarioConfig() {
+  if (!config_.has_learning_model_sample_config()) {
     AERROR << "miss scenario specific config";
     return false;
   }
-  context_.scenario_config.CopyFrom(config_.test_learning_model_config());
+  context_.scenario_config.CopyFrom(config_.learning_model_sample_config());
   return true;
 }
 

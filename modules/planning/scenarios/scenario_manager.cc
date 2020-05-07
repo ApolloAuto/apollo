@@ -31,7 +31,7 @@
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
-#include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
+#include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
@@ -78,6 +78,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
                                                     &scenario_context_));
       break;
+    case ScenarioConfig::LEARNING_MODEL_SAMPLE:
+      ptr.reset(new scenario::LearningModelSampleScenario(
+          config_map_[scenario_type], &scenario_context_));
+    break;
     case ScenarioConfig::PARK_AND_GO:
       ptr.reset(new scenario::park_and_go::ParkAndGoScenario(
           config_map_[scenario_type], &scenario_context_));
@@ -90,10 +94,6 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(new scenario::stop_sign::StopSignUnprotectedScenario(
           config_map_[scenario_type], &scenario_context_));
       break;
-    case ScenarioConfig::TEST_LEARNING_MODEL:
-      ptr.reset(new scenario::TestLearningModelScenario(
-          config_map_[scenario_type], &scenario_context_));
-    break;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
       ptr.reset(new scenario::traffic_light::TrafficLightProtectedScenario(
           config_map_[scenario_type], &scenario_context_));
@@ -160,8 +160,8 @@ void ScenarioManager::RegisterScenarios() {
 
   // learning model
   ACHECK(Scenario::LoadConfig(
-      FLAGS_scenario_test_learning_model_config_file,
-      &config_map_[ScenarioConfig::TEST_LEARNING_MODEL]));
+      FLAGS_scenario_learning_model_sample_config_file,
+      &config_map_[ScenarioConfig::LEARNING_MODEL_SAMPLE]));
 
   // traffic_light
   ACHECK(Scenario::LoadConfig(
@@ -296,7 +296,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     case ScenarioConfig::PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-    case ScenarioConfig::TEST_LEARNING_MODEL:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
@@ -817,7 +816,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       case ScenarioConfig::PARK_AND_GO:
       case ScenarioConfig::STOP_SIGN_PROTECTED:
       case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      case ScenarioConfig::TEST_LEARNING_MODEL:
       case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
       case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
       case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
