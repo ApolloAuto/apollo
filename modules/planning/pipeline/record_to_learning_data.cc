@@ -21,6 +21,7 @@
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/message_process.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/prediction/util/data_extraction.h"
@@ -33,6 +34,12 @@ void GenerateLearningData() {
   if (FLAGS_planning_offline_bags.empty()) {
     return;
   }
+
+  if (!FeatureOutput::Ready()) {
+    AERROR << "Feature output is not ready.";
+    return;
+  }
+
   MessageProcess message_process;
   if (!message_process.Init()) {
     return;
@@ -50,7 +57,7 @@ void GenerateLearningData() {
       AINFO << "\tProcessing: [ " << i + 1 << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
       message_process.ProcessOfflineData(offline_bags[i]);
-      message_process.WriteRemainderiLearningData();
+      FeatureOutput::WriteRemainderiLearningData(offline_bags[i]);
     }
   }
   message_process.Close();

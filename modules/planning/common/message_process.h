@@ -60,11 +60,7 @@ class MessageProcess {
   void OnTrafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  void ProcessOfflineData(const std::string &record_filename);
-
-  void WriteLearningData();
-
-  void WriteRemainderiLearningData();
+  void ProcessOfflineData(const std::string &record_file);
 
  private:
   struct ADCCurrentInfo {
@@ -103,12 +99,12 @@ class MessageProcess {
           localizations,
       LearningDataFrame* learning_data_frame);
 
-  void GenerateLearningDataFrame();
+  void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
-  std::string record_file_name_;
+  std::string record_file_;
   std::unordered_map<std::string, std::string> map_m_;
   LearningData learning_data_;
   int learning_data_file_index_ = 0;
