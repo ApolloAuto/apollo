@@ -20,123 +20,70 @@
 
 #include "modules/planning/scenarios/learning_model/test_learning_model_scenario.h"
 
-#include <algorithm>
-#include <iterator>
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/scenarios/learning_model/stage_run.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
-using apollo::common::TrajectoryPoint;
+apollo::common::util::Factory<
+    ScenarioConfig::StageType, Stage,
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    TestLearningModelScenario::s_stage_factory_;
 
-TestLearningModelScenario::TestLearningModelScenario(
-    const ScenarioConfig& scenario_config,
-    const ScenarioContext* context)
-  : Scenario(scenario_config, context), device_(torch::kCPU) {
-  const auto& config = scenario_config.test_learning_model_config();
-  AINFO << "Loading learning model:" << config.model_file();
-  if (apollo::cyber::common::PathExists(config.model_file())) {
-    try {
-      model_ = torch::jit::load(config.model_file(), device_);
-    }
-    catch (const c10::Error& e) {
-      AERROR << "error loading the model:" << config.model_file();
-      is_init_ = false;
-      return;
-    }
+void TestLearningModelScenario::Init() {
+  if (init_) {
+    return;
   }
 
-  input_feature_num_ = config.input_feature_num();
-  is_init_ = true;
+  Scenario::Init();
+
+  if (!GetScenarioConfig()) {
+    AERROR << "fail to get scenario specific config";
+    return;
+  }
+
+  init_ = true;
 }
 
-bool TestLearningModelScenario::ExtractFeatures(Frame* frame,
-    std::vector<torch::jit::IValue> *input_features) {
-  if (!is_init_) {
-    AWARN << "scenario is not initialzed successfully.";
-    return false;
+void TestLearningModelScenario::RegisterStages() {
+  if (!s_stage_factory_.Empty()) {
+    s_stage_factory_.Clear();
   }
-
-  // TODO(all): generate learning features.
-  // TODO(all): adapt to new input feature shapes
-  std::vector<torch::jit::IValue> tuple;
-  tuple.push_back(torch::zeros({2, 3, 224, 224}));
-  tuple.push_back(torch::zeros({2, 14}));
-  // assumption: future learning model use one dimension input features.
-  input_features->push_back(torch::ivalue::Tuple::create(tuple));
-  return true;
+  s_stage_factory_.Register(
+      ScenarioConfig::TEST_LEARNING_MODEL_RUN,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new TestLearningModelStageRun(config);
+      });
 }
 
-bool TestLearningModelScenario::InferenceModel(
-    const std::vector<torch::jit::IValue> &input_features,
-    Frame* frame) {
-  if (!is_init_) {
-    AERROR << "scenario is not initialzed successfully.";
-    return false;
-  }
-  if (frame == nullptr) {
-    AERROR << "frame is nullptr";
-    return false;
-  }
-
-  auto reference_line_infos = frame->mutable_reference_line_infos();
-  if (reference_line_infos->empty()) {
-    AERROR << "no reference is found.";
-    return false;
-  }
-  // FIXME(all): current only pick up the first reference line to use
-  // learning model trajectory.
-  for (auto& reference_line_info : *reference_line_infos) {
-    reference_line_info.SetDrivable(false);
-  }
-  auto& picked_reference_line_info = reference_line_infos->front();
-  picked_reference_line_info.SetDrivable(true);
-  picked_reference_line_info.SetCost(0);
-
-  auto torch_output = model_.forward(input_features);
-  ADEBUG << torch_output;
-  auto torch_output_tensor = torch_output.toTensor();
-  auto output_shapes = torch_output_tensor.sizes();
-  if (output_shapes.empty() || output_shapes.size() < 3) {
-    AWARN << "invalid response from learning model.";
-    return false;
-  }
-
-  // TODO(all): only populate path data from learning model
-  // for initial version
-  std::vector<TrajectoryPoint> trajectory_points;
-  for (int i = 0; i < output_shapes[1]; ++i) {
-    TrajectoryPoint p;
-    p.mutable_path_point()->set_x(
-       torch_output_tensor.accessor<float, 3>()[0][i][0]);
-    p.mutable_path_point()->set_y(
-       torch_output_tensor.accessor<float, 3>()[0][i][1]);
-    trajectory_points.push_back(p);
-  }
-  picked_reference_line_info.SetTrajectory(
-     DiscretizedTrajectory(trajectory_points));
-
-  return true;
-}
-
-Scenario::ScenarioStatus TestLearningModelScenario::Process(
-    const common::TrajectoryPoint& planning_init_point,
-    Frame* frame) {
-  std::vector<torch::jit::IValue> input_features;
-  ExtractFeatures(frame, &input_features);
-  InferenceModel(input_features, frame);
-
-  return STATUS_DONE;
-}
 std::unique_ptr<Stage> TestLearningModelScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
-  return nullptr;
+  if (s_stage_factory_.Empty()) {
+    RegisterStages();
+  }
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
+                                                 stage_config);
+  if (ptr) {
+    ptr->SetContext(&context_);
+  }
+  return ptr;
 }
+
+/*
+ * read scenario specific configs and set in context_ for stages to read
+ */
+bool TestLearningModelScenario::GetScenarioConfig() {
+  if (!config_.has_test_learning_model_config()) {
+    AERROR << "miss scenario specific config";
+    return false;
+  }
+  context_.scenario_config.CopyFrom(config_.test_learning_model_config());
+  return true;
+}
+
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
