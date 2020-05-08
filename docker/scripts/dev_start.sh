@@ -16,6 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+
 LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
@@ -85,6 +88,7 @@ do
   fi
 done
 }
+
 function set_registry_mirrors()
 {
 sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
@@ -92,7 +96,6 @@ sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/d
 service docker restart
 
 }
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
 
 if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
     sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
@@ -207,8 +210,7 @@ LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-l
 function local_volumes() {
     set +x
     # Apollo root and bazel cache dirs are required.
-    volumes="-v $APOLLO_ROOT_DIR:/apollo \
-             -v $HOME/.cache:${DOCKER_HOME}/.cache"
+    volumes="-v $APOLLO_ROOT_DIR:/apollo"
     APOLLO_TELEOP="${APOLLO_ROOT_DIR}/../apollo-teleop"
     if [ -d ${APOLLO_TELEOP} ]; then
         volumes="-v ${APOLLO_TELEOP}:/apollo/modules/teleop ${volumes}"
@@ -231,8 +233,6 @@ function local_volumes() {
                                 -v /lib/modules:/lib/modules"
             ;;
         Darwin)
-            # MacOS has strict limitations on mapping volumes.
-            chmod -R a+wr ~/.cache/bazel
             ;;
     esac
     echo "${volumes}"
@@ -280,7 +280,7 @@ function main(){
     if [ $? == 0 ]; then
         if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$APOLLO_DEV_IMAGE" ]]; then
             rm -rf $APOLLO_ROOT_DIR/bazel-*
-            rm -rf $HOME/.cache/bazel/*
+            rm -rf ${CACHE_ROOT_DIR}/bazel/*
         fi
         docker stop $APOLLO_DEV 1>/dev/null
         docker rm -v -f $APOLLO_DEV 1>/dev/null
@@ -350,8 +350,8 @@ function main(){
     if [ "$USER" == "root" ];then
         DOCKER_HOME="/root"
     fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
+    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
+        mkdir "${CACHE_ROOT_DIR}"
     fi
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."

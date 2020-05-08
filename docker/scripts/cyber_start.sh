@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P)"
+CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 INCHINA="no"
 LOCAL_IMAGE="no"
@@ -86,7 +88,6 @@ do
 done
 }
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 if [ ! -e /apollo ]; then
     sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
@@ -160,8 +161,7 @@ IMG=${DOCKER_REPO}:$VERSION
 
 function local_volumes() {
     # Apollo root and bazel cache dirs are required.
-    volumes="-v $APOLLO_ROOT_DIR:/apollo \
-             -v $HOME/.cache:${DOCKER_HOME}/.cache"
+    volumes="-v $APOLLO_ROOT_DIR:/apollo"
     case "$(uname -s)" in
         Linux)
             case "$(lsb_release -r | cut -f2)" in
@@ -179,8 +179,6 @@ function local_volumes() {
                                 -v /lib/modules:/lib/modules"
             ;;
         Darwin)
-            # MacOS has strict limitations on mapping volumes.
-            chmod -R a+wr ~/.cache/bazel
             ;;
     esac
     echo "${volumes}"
@@ -223,8 +221,8 @@ function main(){
     if [ "$USER" == "root" ];then
         DOCKER_HOME="/root"
     fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
+    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
+        mkdir "${CACHE_ROOT_DIR}"
     fi
 
     info "Starting docker container \"${APOLLO_CYBER}\" ..."
