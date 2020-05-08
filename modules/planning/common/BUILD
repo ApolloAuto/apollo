@@ -242,6 +242,7 @@ cc_library(
     ],
     deps = [
         ":indexed_queue",
+        ":feature_output",
         ":local_view",
         ":obstacle",
         ":open_space_info",
@@ -255,6 +256,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_proto",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",

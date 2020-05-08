@@ -31,6 +31,7 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -172,6 +173,9 @@ class Frame {
     return &reference_line_info_;
   }
 
+  const LearningDataFrame &learning_data_frame() const {
+      return learning_data_frame_; }
+
  private:
   common::Status InitFrameData();
 
@@ -199,7 +203,10 @@ class Frame {
   void ReadPadMsgDrivingAction();
   void ResetPadMsgDrivingAction();
 
+  void ReadLearningDataFrame();
+
  private:
+  static DrivingAction pad_msg_driving_action_;
   uint32_t sequence_num_ = 0;
   LocalView local_view_;
   const hdmap::HDMap *hdmap_ = nullptr;
@@ -234,7 +241,7 @@ class Frame {
 
   std::tuple<bool, double, double, double> pull_over_info_;
 
-  static DrivingAction pad_msg_driving_action_;
+  LearningDataFrame learning_data_frame_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
