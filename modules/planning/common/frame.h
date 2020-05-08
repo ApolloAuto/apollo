@@ -239,8 +239,6 @@ class Frame {
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
-  std::tuple<bool, double, double, double> pull_over_info_;
-
   LearningDataFrame learning_data_frame_;
 };
 
