@@ -1,0 +1,59 @@
+SIMULATOR SOFTWARE LICENSE AGREEMENT
+
+DO NOT DOWNLOAD, INSTALL ACCESS, COPY, OR USE ANY PORTION OF THE LICENSED MATERIALS (DEFINED BELOW) UNTIL YOU HAVE READ AND ACCEPTED THE TERMS OF THIS AGREEMENT.  BY INSTALLING, COPYING, ACCESSING, OR USING THE LICENSED MATERIALS, YOU ACCEPT AND AGREE TO BE LEGALLY BOUND BY THE TERMS AND CONDITIONS OF THIS AGREEMENT.  If You do not agree to be bound by, or the entity for whose benefit You act has not authorized You to accept these terms and conditions, do not install, access, copy, or use the LG Simulator Software Code and destroy all copies in your possession.
+
+This Software License Agreement (“Agreement”), effective upon your acceptance of this Agreement (“Effective Date”), is between Zenith Electronics, LLC, through its LG Silicon Valley Lab Division, with offices located at 5150 Great America Parkway, Santa Clara, CA 95054 (“LG”) and "You." “You” or “Your” refers to you or your employer or other entity for whose benefit you act, as applicable.  
+
+
+1.	Purpose; License Grant and Restrictions. 
+
+1.1 Purpose.  This Agreement governs the use of the confidential, non-public, pre-release LG Simulator Software (the “Software”) and any accompanying documentation, code, and related materials (collectively, the “LG  Simulator Software Code”) described in more detail in Exhibit A, made available to You by LG, and other content made available to You through the LG Simulator Software Code (collectively, “Content”).  The LG Simulator Software Code and Content are collectively referred to as “Licensed Material.”
+
+1.2 License Grant.  Subject to the terms and conditions of this Agreement, LG grants You a nonexclusive, sublicensable as permitted herein, royalty-free, worldwide, perpetual, irrevocable license solely for the purposes of internally using, testing, evaluation, simulation and validation of the Licensed Material (the “Purpose”) for integration into or from Your goods and services (“Licensee’s Service”).   Notwithstanding the above, Your goods and services (“Product”) integrated with the Licensed Materials may be publicly demonstrated or exhibited for non-commercial purposes provided that public attribution to LG is included with Product.
+
+1.3 Restrictions.  You may not: (a) reverse engineer, decompile, or disassemble the executable or binary builds of Licensed Material, or otherwise attempt to defeat, avoid, by-pass, remove, deactivate or otherwise circumvent any software protection mechanisms in the LG Simulator Software Code including, without limitation, any such mechanism used to restrict or control the functionality of the LG Simulator Software Code; (b) use or reproduce the Licensed Material for any reason other than the Purpose; (c) sell or otherwise transfer or make available the Licensed Material, any copies of the Licensed Material, or any information derived from the Licensed Material in any form to any third parties for commercial purposes; or (d) remove or alter any proprietary notices or marks on the Licensed Material.
+
+1.4 Limitations.  Your use of the Licensed Materials is restricted for use to: (1) build source code or use binaries with ROS1 and ROS2 systems; (2) application to 3D assets; and (3) application only to files created by LG, skipping default assets and code provided by Unity3D as project scaffolding.
+
+1.5 Derivative Works.   You may modify or create derivative works of the Licensed Materials (“Derivatives”).  Any Derivatives created shall have the same restrictions and limitations as listed in Sections 1.2, 1.3, 1.4 and 4.1 herein. Your use of Derivatives outside the scope of this Agreement shall require a separate license agreement.
+
+
+2 Updates.
+You acknowledge that LG may update or modify the LG Simulator Software Code from time to time and that such updates and modifications may adversely affect the manner in which You access or communicate with the LG Simulator Software Code.
+
+
+3 Term; termination. 
+
+3.1 Term.  This Agreement will be effective as of the Effective Date and will remain effective until terminated as set forth below in Section 3.2.  
+
+3.2 Termination.  This Agreement will be terminated immediately by LG at any time, by providing written notice to You (such notice may be via email) upon breach of any term or condition of this Agreement.  Upon termination, You and any Sublicensees will cease access to the Licensed Material, and destroy all copies of the Licensed Material (including all derivatives thereof), Confidential Information (defined below) You have obtained or created.  Sections 4-9 will survive the termination of this Agreement.  
+
+
+4 Ownership; Feedback. 
+
+4.1 Ownership.  As between You and LG, LG owns all right, title and interest in and to the Licensed Material (and any LG modifications or enhancements thereof), including but not limited to all intellectual property rights therein. Any rights not expressly granted herein are withheld.  
+
+4.2 Feedback.  You agree to provide LG with comments concerning the Licensed Material and Your evaluation and use thereof, including bug reports, evaluations, proposed product integrations (and associated metrics and learned knowledge) (“Feedback”).  You agree that LG and its designees will be free to copy, modify, create derivative works, publicly display, disclose, distribute, license and sublicense, incorporate and otherwise use the Feedback, including derivative works thereto, for any and all commercial and non-commercial purposes with no obligation of any kind to You. 
+
+
+5 Representations and Warranties; Disclaimer. 
+
+5.1 Representations and Warranties.  You represent and warrant that: (a) the performance of Your obligations will not constitute a breach or otherwise violate any other agreement or the rights of any third party arising therefrom; and (b) You will maintain throughout the Term all rights and licenses that are required with respect to the Licensee Service, and Your use does and will continue to comply with all applicable foreign, federal, state, and local laws, rules and regulations.
+5.2 Disclaimer. THE LICENSED MATERIAL AND ANY OTHER LG PRODUCTS AND SERVICES PROVIDED HEREUNDER ARE PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND.   LG DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A PARTICULAR PURPOSE, AND ANY WARRANTIES OR CONDITIONS ARISING OUT OF COURSE OF DEALING OR USAGE OF TRADE.  LG DOES NOT WARRANT THAT THE LICENSED MATERIAL AND ANY OTHER LG PRODUCTS AND SERVICES PROVIDED HEREUNDER WILL MEET ALL OF YOUR REQUIREMENTS OR EXPECTATIONS, OR THAT USE OF SUCH LICENSED MATERIAL BE ERROR-FREE UNINTERRUPTED, VIRUS-FREE, OR SECURE. 
+
+
+6 Limitation of Liability. 
+IN NO EVENT SHALL LG BE LIABLE TO YOU OR YOUR SUBLICENSEES FOR ANY SPECIAL, INCIDENTAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES (INCLUDING LOSS OF USE, DATA, BUSINESS OR PROFITS) ARISING OUT OF OR IN CONNECTION WITH THIS AGREEMENT, WHETHER SUCH LIABILITY ARISES FROM ANY CLAIM BASED UPON CONTRACT, WARRANTY, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, AND WHETHER OR NOT LG HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGE.  THE FOREGOING LIMITATIONS WILL SURVIVE AND APPLY EVEN IF ANY LIMITED REMEDY SPECIFIED IN THIS AGREEMENT IS FOUND TO HAVE FAILED OF ITS ESSENTIAL PURPOSE. IN ANY CASE, LG’S AGGREGATE LIABILITY UNDER THIS AGREEMENT WILL NOT EXCEED THE FEE, IF ANY, THAT YOU PAID LG FOR USE OF THE LICENSED MATERIAL.
+
+
+7 Indemnification.  
+You will indemnify, defend, or at its option settle and hold LG, its subsidiaries, affiliates, officers and employees, harmless from any and all claims, damages, losses, liabilities, actions, judgments, costs and expenses (including reasonable attorneys’ fees) brought by a third party arising out of or in connection with: (a) any intentionally tortious or negligent act or omission by You in connection with Your use of the Licensed Material; (b) Your use of the Licensed Material other than as expressly allowed by this Agreement; (c) any claims that Derivatives have infringed third party intellectual property rights; or (d) Your breach or alleged breach of any of the terms, restrictions, obligations or representations under this Agreement.
+
+
+8 Miscellaneous.  
+This Agreement constitutes the entire agreement among the parties with respect to the subject matter and supersedes and merges all prior proposals, understandings and contemporaneous communications.  Any modification to this Agreement must be in a writing duly authorized by LG or pursuant to Section 2 (Updates).  You may not assign any of the rights or obligations granted hereunder, voluntarily or by operation of law (including without limitation in connection with a merger, acquisition, or sale of assets) except with the express written consent of LG, and any attempted asseignment in violation of this paragraph is void.  This Agreement does not create or imply any partnership, agency or joint venture.  This Agreement will be governed by and construed in accordance with the laws of the State of California, without regard to or application of conflicts of law rules or principles. Any controversy arising out of this Agreement shall be heard exclusively in the federal or state courts located in Santa Clara County, CA and You agree to submit to jurisdiction thereof.  No waiver by LG of any covenant or right under this Agreement will be effective unless memorialized in a writing duly authorized by LG.  If any part of this Agreement is determined to be invalid or unenforceable by a court of competent jurisdiction, that provision will be enforced to the maximum extent permissible and the remaining provisions of this Agreement will remain in full force and effect.
+
+
+EXHIBIT A
+
+LG Simulator Software Code
