@@ -28,7 +28,6 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/planning/reference_line",
         "//modules/planning/scenarios:scenario",
-        "//third_party:libtorch",
         "@eigen",
     ],
 )

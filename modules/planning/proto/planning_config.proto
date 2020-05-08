@@ -56,6 +56,7 @@ message TaskConfig {
     PATH_REUSE_DECIDER = 30;
     ST_BOUNDS_DECIDER = 31;
     PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 32;
+    LEARNING_BASED_TASK = 33;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -81,7 +82,13 @@ message TaskConfig {
     STBoundsDeciderConfig st_bounds_decider_config = 28;
     PiecewiseJerkNonlinearSpeedConfig piecewise_jerk_nonlinear_speed_config =
         29;
+    LearningBasedTaskConfig learning_based_task_config = 30;
   }
+}
+
+message LearningBasedTaskConfig {
+  optional string model_file = 1;
+  optional int32 input_feature_num = 2;
 }
 
 message ScenarioLaneFollowConfig {
@@ -194,8 +201,6 @@ message ScenarioYieldSignConfig {
 }
 
 message ScenarioLearningModelSampleConfig {
-  optional string model_file = 1;
-  optional int32 input_feature_num = 2;
 }
 
 // scenario configs
