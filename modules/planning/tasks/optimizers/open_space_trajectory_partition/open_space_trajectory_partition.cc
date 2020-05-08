@@ -441,9 +441,6 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
             : canbus::Chassis::GEAR_REVERSE;
 
     if (cur_gear != *gear) {
-      LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
-                          trajectory);
-
       partitioned_trajectories->emplace_back();
       current_trajectory_gear = &(partitioned_trajectories->back());
       current_trajectory_gear->second = cur_gear;
