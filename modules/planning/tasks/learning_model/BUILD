@@ -20,4 +20,14 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "learning_based_task_test",
+    size = "small",
+    srcs = ["learning_based_task_test.cc"],
+    deps = [
+        "learning_based_task",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cpplint()
