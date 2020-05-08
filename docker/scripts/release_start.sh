@@ -18,6 +18,8 @@
 
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
+CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+
 # the machine type, currently support x86_64, aarch64
 MACHINE_ARCH=$(uname -m)
 
@@ -119,8 +121,8 @@ function main() {
     if [ "$USER" == "root" ];then
         DOCKER_HOME="/root"
     fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
+    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
+        mkdir "${CACHE_ROOT_DIR}"
     fi
 
     determine_gpu_use
@@ -133,7 +135,6 @@ function main() {
         -v ${HOME}/data:/apollo/data \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
-        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -w /apollo \
         -e DISPLAY=${display} \
         -e RELEASE_DOCKER=1 \
