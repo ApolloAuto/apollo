@@ -14,7 +14,7 @@
 #include "modules/contrib/cyber_bridge/server.h"
 
 // bazel build //cyber/bridge:cyber_bridge
-// GLOG_v=4 GLOG_logtostderr=1 \
+// GLOG_v=4 GLOG_logtostderr=1
 // ./bazel-bin/modules/contrib/cyber_bridge/cyber_bridge
 
 int main(int argc, char* argv[]) {

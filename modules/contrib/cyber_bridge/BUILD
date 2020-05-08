@@ -6,21 +6,40 @@ cc_binary(
     name = "cyber_bridge",
     srcs = [
         "bridge.cc",
-        "node.cc",
-        "node.h",
-        "client.cc",
-        "client.h",
-        "clients.cc",
-        "clients.h",
-        "server.cc",
-        "server.h",
     ],
     linkopts = [
         "-lboost_system",
     ],
     deps = [
-        "//cyber",
+        ":bridge_client",
+        ":bridge_server",
         "//external:gflags",
+    ],
+)
+
+cc_library(
+    name = "bridge_server",
+    srcs = ["server.cc"],
+    hdrs = ["server.h"],
+    deps = [
+        ":bridge_client",
+    ],
+)
+
+cc_library(
+    name = "bridge_client",
+    srcs = [
+        "client.cc",
+        "clients.cc",
+        "node.cc",
+    ],
+    hdrs = [
+        "client.h",
+        "clients.h",
+        "node.h",
+    ],    
+    deps = [
+        "//cyber",
     ],
 )
 
