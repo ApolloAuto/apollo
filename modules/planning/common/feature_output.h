@@ -56,6 +56,8 @@ class FeatureOutput {
 
   static void InsertPlanningResult();
 
+  static LearningDataFrame* GetLatestLearningDataFrame();
+
   /**
    * @brief Write LearningData to a file
    */
