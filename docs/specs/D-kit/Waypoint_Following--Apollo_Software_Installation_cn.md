@@ -36,12 +36,26 @@ Apollo系统安装
 
   ![IPC-6108GC-front-side](../images/ipc_hardware_before_cover.jpeg)
   
+  或者：
+
+- Nuvo-8108GC-RTX2070s-i9-9900k
+
+- DDR4-32GB-ECC
+
+- Seagate M.2 2280 NVMe SSD(PCIe Gen3x4)512G
+
+- EMUC-B202 CAN
+
+- 480W适配器
+
+  ![IPC-8108GC-front-side](images/software_installation_look_8108.jpg)
+
 ### 准备IPC
 
 参考下述步骤：
 
 #### 准备好CAN卡并进行安装
-在Nuvo-6108GC中，RTX2060s显卡被预先安装在一个PCI插槽中。如果我们收到的是EMUC-B202 CAN，它已被预装在IPC内，则CAN卡安装这一步，可以跳过。如果我们收到的是ESDCan，我们需要将CAN卡安装在另外一个PCI插槽中，步骤如下：
+在IPC中，显卡被预先安装在一个PCI插槽中。如果我们收到的是EMUC-B202 CAN，它已被预装在IPC内，则CAN卡安装这一步，可以跳过。如果我们收到的是ESDCan，我们需要将CAN卡安装在另外一个PCI插槽中，步骤如下：
 
    a. 找到并拧下机器边上的8个螺丝（显示在棕色方框内或棕色箭头指向的区域）
 
@@ -73,10 +87,22 @@ Apollo系统安装
 
    a. 将电源线接入到为IPC配置的电源连接器（接线板）
    
+- 6108的电源线
+
    ![warning_icon](../images/warning_icon.png)**WARNING**：确保电源线的正极（标记为 **R** 表示红色）和负极（标记为 **B** 表示黑色）接入到了IPC接线板的正确接口，如下图所示：
 
    ![ipc_power_RB](../images/ipc_hardware_rb.png)
    
+- 8108的电源线
+
+8108的电源线是四跟，两正两负，正极的两根电源线是贴有`V+`的白色标签的，如下图所示：
+
+   ![ipc_power_RB](images/software_installation_power_8108_1.jpg)
+
+将接有正极的两根电源线的端子插入`V+`接口，将接有负极的两根电源线的端子插入`GND`接口，如下图所示：
+
+   ![ipc_power_RB](images/software_installation_power_8108_2.jpg)
+
    b. 将显示器、以太网线、键盘和鼠标接入IPC
    
    ![CableConnected-overexposed](../images/ipc_hardware_connection.png)
@@ -334,7 +360,7 @@ cd ~/apollo
 bash docker/scripts/dev_start.sh
 ```
 
-第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；这个过程完成后，请输入以下命令以进入docker环境中：
+第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；如果你确信计算机本地有你需要的image镜像文件或者你不希望更新image镜像时，可以使用`bash docker/scripts/dev_start.sh -n`这个命令代替上面的命令，这样apollo就不会去github的官方网站比较本地image镜像和官方网站image镜像的区别了，这样可以省去二者比较的时间和避免因网络问题而导致的二者比较失败的现象，可以加快启动docker容器的速度。这个过程完成后，请输入以下命令以进入docker环境中：
 ```
 bash docker/scripts/dev_into.sh
 ```
