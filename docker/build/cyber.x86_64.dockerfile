@@ -1,5 +1,4 @@
-#ARG BASE_IMAGE=nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
-ARG BASE_IMAGE=ubuntu:18.04
+ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 ARG GEOLOC
 FROM ${BASE_IMAGE}
 
@@ -11,8 +10,6 @@ COPY installers /tmp/installers
 
 # Pre-downloaded tarballs
 COPY archive /tmp/archive
-# TODO(storypku)
-# Optimize archive management to reduce image size
 
 RUN bash /tmp/installers/install_minimal_environment.sh "${GEOLOC}"
 RUN bash /tmp/installers/install_cyber_dependencies.sh

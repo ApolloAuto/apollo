@@ -27,8 +27,8 @@ apt-get -y update && \
     libfreetype6 \
     libdbus-1-3 \
     libfontconfig1 \
-    libxkbcommon-x11-dev \
-    libxkbcommon-dev
+    libxkbcommon0   \
+    libxkbcommon-x11-0
 
 # Note(storypku)
 # The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`

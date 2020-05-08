@@ -61,6 +61,7 @@ apt-get -y install -y --no-install-recommends \
     python3-pip \
     shellcheck \
     cppcheck \
+    openssh-client \
     software-properties-common \
     unzip \
     zip
