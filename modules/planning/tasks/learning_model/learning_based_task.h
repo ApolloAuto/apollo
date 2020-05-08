@@ -20,33 +20,38 @@
 
 #pragma once
 
-#include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
-#include "modules/planning/scenarios/stage.h"
+#include <vector>
+
+#include "torch/script.h"
+#include "torch/torch.h"
+
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
 
-struct LearningModelSampleContext;
-
-class LearningModelSampleStageRun : public Stage {
+class LearningBasedTask : public Task {
  public:
-  explicit LearningModelSampleStageRun(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+  explicit LearningBasedTask(const TaskConfig &config)
+      : Task(config), device_(torch::kCPU) {}
+
+  apollo::common::Status Execute(
+      Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-  LearningModelSampleContext* GetContext() {
-    return GetContextAs<LearningModelSampleContext>();
-  }
+  apollo::common::Status Process(Frame *frame);
 
-  Stage::StageStatus FinishStage();
-
+  bool ExtractFeatures(Frame* frame,
+                       std::vector<torch::jit::IValue> *input_features);
+  bool InferenceModel(const std::vector<torch::jit::IValue> &input_features,
+                      Frame* frame);
  private:
-  ScenarioLearningModelSampleConfig scenario_config_;
+  LearningBasedTaskConfig config_;
+  torch::Device device_;
+  torch::jit::script::Module model_;
+  int input_feature_num_ = 0;
 };
 
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
