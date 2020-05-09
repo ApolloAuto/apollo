@@ -264,7 +264,47 @@ function do_docker_pull()
         fi
     fi
 }
-function main(){
+
+DOCKER_RUN="docker run"
+USE_GPU=0
+
+function determine_gpu_use() {
+  # Check nvidia-driver and GPU device
+  local nv_driver="nvidia-smi"
+  if [ ! -x "$(command -v ${nv_driver} )" ]; then
+    warning "No nvidia-driver found. CPU will be used"
+  elif [ -z "$(eval ${nv_driver} )" ]; then
+    warning "No GPU device found. CPU will be used."
+  else
+    USE_GPU=1
+  fi
+
+  # Try to use GPU inside container
+  local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
+  if [ ${USE_GPU} -eq 1 ]; then
+    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+    if [ ! -z "$(which nvidia-docker)" ]; then
+      DOCKER_RUN="nvidia-docker run"
+      warning "nvidia-docker is deprecated. Please install latest docker " \
+              "and nvidia-container-toolkit as described by:"
+      warning "  ${nv_docker_doc}"
+    elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+      if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+        DOCKER_RUN="docker run --gpus all"
+      else
+        warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+        USE_GPU=0
+      fi
+    else
+      USE_GPU=0
+      warning "Cannot access GPU from within container. Please install latest docker " \
+              "and nvidia-container-toolkit as described by: "
+      warning "  ${nv_docker_doc}"
+    fi
+  fi
+}
+
+function main() {
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $APOLLO_DEV_IMAGE"
     else
@@ -356,38 +396,7 @@ function main(){
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
-    # Check nvidia-driver and GPU device.
-    USE_GPU=0
-    if [ -z "$(which nvidia-smi)" ]; then
-      warning "No nvidia-driver found! Use CPU."
-    elif [ -z "$(nvidia-smi)" ]; then
-      warning "No GPU device found! Use CPU."
-    else
-      USE_GPU=1
-    fi
-
-    # Try to use GPU in container.
-    DOCKER_RUN="docker run"
-    NVIDIA_DOCKER_DOC="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [ ${USE_GPU} -eq 1 ]; then
-      DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-      if ! [ -z "$(which nvidia-docker)" ]; then
-        DOCKER_RUN="nvidia-docker run"
-        warning "nvidia-docker is in deprecation!"
-        warning "Please install latest docker and nvidia-container-toolkit: ${NVIDIA_DOCKER_DOC}"
-      elif ! [ -z "$(which nvidia-container-toolkit)" ]; then
-        if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
-          DOCKER_RUN="docker run --gpus all"
-        else
-          warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
-          USE_GPU=0
-        fi
-      else
-        USE_GPU=0
-        warning "Cannot access GPU from container."
-        warning "Please install latest docker and nvidia-container-toolkit: ${NVIDIA_DOCKER_DOC}"
-      fi
-    fi
+    determine_gpu_use
 
     set -x
 

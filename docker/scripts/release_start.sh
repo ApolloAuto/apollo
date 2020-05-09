@@ -47,6 +47,45 @@ if [ ! -e "${DATA_DIR}/core" ]; then
   mkdir -p "${DATA_DIR}/core"
 fi
 
+DOCKER_RUN="docker run"
+USE_GPU=0
+
+function determine_gpu_use() {
+  # Check nvidia-driver and GPU device
+  local nv_driver="nvidia-smi"
+  if [ ! -x "$(command -v ${nv_driver} )" ]; then
+    warning "No nvidia-driver found. CPU will be used"
+  elif [ -z "$(eval ${nv_driver} )" ]; then
+    warning "No GPU device found. CPU will be used."
+  else
+    USE_GPU=1
+  fi
+
+  # Try to use GPU inside container
+  local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
+  if [ ${USE_GPU} -eq 1 ]; then
+    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+    if [ ! -z "$(which nvidia-docker)" ]; then
+      DOCKER_RUN="nvidia-docker run"
+      warning "nvidia-docker is deprecated. Please install latest docker " \
+              "and nvidia-container-toolkit as described by:"
+      warning "  ${nv_docker_doc}"
+    elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+      if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+        DOCKER_RUN="docker run --gpus all"
+      else
+        warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+        USE_GPU=0
+      fi
+    else
+      USE_GPU=0
+      warning "Cannot access GPU from within container. Please install latest docker " \
+              "and nvidia-container-toolkit as described by: "
+      warning "  ${nv_docker_doc}"
+    fi
+  fi
+}
+
 function main() {
     echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
     read -t 10 -n 1 INCHINA
@@ -84,11 +123,9 @@ function main() {
         mkdir "$HOME/.cache"
     fi
 
-    DOCKER_CMD="nvidia-docker"
-    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
-        DOCKER_CMD="docker"
-    fi
-    ${DOCKER_CMD} run -it \
+    determine_gpu_use
+
+    ${DOCKER_RUN} -it \
         -d --privileged \
         --name apollo_release \
         --net host \
