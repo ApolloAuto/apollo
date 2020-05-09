@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="cyber-x86_64-18.04-20200503_0750"
+VERSION_X86_64="cyber-x86_64-18.04-20200509_0514"
 VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
 VERSION_OPT=""
 
@@ -270,6 +270,8 @@ function main(){
     info "Starting docker container \"${APOLLO_CYBER}\" ..."
 
     determine_gpu_use
+
+    info "DockerRun: ${DOCKER_RUN}"
 
     ${DOCKER_RUN} -it \
         -d \

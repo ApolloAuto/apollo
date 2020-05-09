@@ -20,7 +20,11 @@
 set -e
 
 apt-get -y update && \
-    apt-get -y install sudo
+    apt-get -y install \
+    sudo && \
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 
 USER_NAME=apollo
 
@@ -32,4 +36,6 @@ sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 echo """
 ulimit -c unlimited
 source /apollo/scripts/apollo_base.sh
+alias bb="bazel build"
+alias bt=\"bazel test\"
 """ >> /home/${USER_NAME}/.bashrc

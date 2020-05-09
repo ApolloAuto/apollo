@@ -21,13 +21,13 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-GEOLOC=$1; shift
+MY_GEO=$1; shift
 
 ##----------------------------##
 ##  APT sources.list settings |
 ##----------------------------##
 
-if [[ "$GEOLOC" == "cn" ]]; then
+if [ "$MY_GEO" == "cn" ]; then
     cp -f /tmp/installers/sources.list.cn /etc/apt/sources.list
 else
     sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
@@ -37,13 +37,14 @@ apt-get -y update && \
     apt-get install -y --no-install-recommends \
     apt-utils
 
-apt-get -y install -y --no-install-recommends \
+apt-get -y update && \
+    apt-get -y install -y --no-install-recommends \
     build-essential \
     autotools-dev \
     apt-file \
     bc \
-    gcc \
-    g++ \
+    gcc-7 \
+    g++-7 \
     gdb \
     wget \
     curl \
@@ -72,7 +73,7 @@ apt-get -y install -y --no-install-recommends \
 
 if [[ "$GEOLOC" == "cn" ]]; then
     # Mirror from Tsinghua Univ.
-    local mirror="https://pypi.tuna.tsinghua.edu.cn/simple"
+    PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
     pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
     pip config set global.index-url "$PYPI_MIRROR"
     python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
