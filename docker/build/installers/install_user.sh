@@ -36,6 +36,6 @@ sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 echo """
 ulimit -c unlimited
 source /apollo/scripts/apollo_base.sh
-alias bb="bazel build"
+alias bb=\"bazel build\"
 alias bt=\"bazel test\"
 """ >> /home/${USER_NAME}/.bashrc
