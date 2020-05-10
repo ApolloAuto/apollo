@@ -78,7 +78,7 @@ enable_sender_log: true
 
 在命令行中执行
 ```
-bash bootstrap.sh
+bash bootstrap.sh start
 ```
 启动`dreamview`,浏览器中输入`ｈttp://localhost:8888`进入`dreamview`界面，在`dreamview`顶部下拉菜单中选择`dev-kit`车辆（表示选择酷黑车型）, `rtk_record_play`表示选择循迹。点击左侧的`task`标签，点击页面中的`reset all` ，接着点击`setup`，将会启动apollo中相应的模块。点击页面左侧的`modules controllers`，然后在右侧查看各个模块的打开情况，蓝色表示处于开启状态，灰色表示模块处于关闭状态，确保`GPS`，`CAN Bus`， `Control`，`Localization`模块是开启的，其他的`Gardian`和`Record Bag`处于关闭状态。
 运行`cyber_monitor`命令，通过以下channel查看`gps`，` imu`，`localization`信号和状态：
@@ -128,8 +128,8 @@ bash scripts/rtk_player.sh start （ 这个命令敲完，车还不会反应 ）
 
 ```
 cd /apollo/scripts 
-bash bootstrap.sh
-bash canbus.sh  启动canbus模块 
+bash bootstrap.sh start
+bash canbus.sh start  //启动canbus模块 
 cyber_monitor
 ```
 
@@ -219,9 +219,9 @@ M2 GPS首先需要保证M2硬件设备配置好，默认出厂的M2已经配置�
 
 ```
 cd /apollo/scripts 
-bash bootstrap.sh
-bash gps.sh                启动gps 
-bash localization.sh       启动localization 
+bash bootstrap.sh start
+bash gps.sh start              //启动gps 
+bash localization.sh start     //启动localization 
 ```
 
  运行cyber_monitor列出topic，应该可以得出以下结果：
