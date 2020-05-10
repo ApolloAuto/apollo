@@ -175,10 +175,10 @@
 ### 准备
 
 完成配置文件修改后，将车辆移动至适合标定的场地后，启动apollo，并执行以下命令：
-
+```
     bash apollo.sh build
-    bash scripts/bootstrap.sh
-
+    bash scripts/bootstrap.sh start
+```
 在浏览器打开`DreamView`，进行下述步骤：
 
 1、在`--setup mode--`内，选择`vehicle calibration`（车辆标定）选项，在`--vehicle--`选择`Dev_Kit`；
@@ -200,11 +200,11 @@
 
 
 为获取上述channel，在命令提示行内启动`canbus`模块、`GPS`模块、`localization`模块，并检查相关数据反馈正常。
-
-    bash scripts/canbus.sh
-    bash scripts/gps.sh
-    bash scripts/localization.sh
-
+```
+    bash scripts/canbus.sh start
+    bash scripts/gps.sh start
+    bash scripts/localization.sh start
+```
 在`DreamView`界面点击左侧边栏，选择`Module Controller`，可以看到`Canbus`开关已经打开，这时开始点击`Recorder`开关，**（请务必切记先打开<Recorder>开关，再进行标定数据采集操作，实际情况常常会因未打开<Recorder>开关造成数据未记录保存，影响效率）**，这时Apollo系统就开始录制记录`canbus` 和`localization` 数据了。
 
 ![vehicle_calibration_online_dreamview2](images/vehicle_calibration_online_dreamview2.png)
