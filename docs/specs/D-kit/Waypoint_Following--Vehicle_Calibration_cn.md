@@ -52,9 +52,9 @@ Apollo系统为开发套件提供了一份默认的标定表。如用户期望�
 
 1. 在采集数据之前，请先进入docker在终端中打开canbus模块，gps模块和localization模块，命令如下：
 ```
-bash /scripts/canbus.sh
-bash /scripts/gps.sh
-bash /scripts/localization.sh
+bash /scripts/canbus.sh start
+bash /scripts/gps.sh start
+bash /scripts/localization.sh start
 ```
 在依次输入完以上三个命令后，可用遥控器开着车走一小段距离，过两分钟之后，在`cyber_monitor`中可以看到以上三者都有信号时，便可以进行下面的操作了。
 
