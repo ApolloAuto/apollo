@@ -23,7 +23,21 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 apt-get -y update && \
     apt-get -y install \
-    libnvidia-gl-440
+    freeglut3-dev \
+    libglvnd-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libgles2-mesa-dev
+
+# See Ref:
+# https://gitlab.com/nvidia/container-images/opengl/blob/ubuntu18.04/glvnd/devel/Dockerfile
+# https://www.pugetsystems.com/labs/hpc/NVIDIA-Docker2-with-OpenGL-and-X-Display-Output-1527/
+
+# DON'T INSTALL THESE!!!
+# libnvidia-gl-440 # trouble maker for `nvidia-smi`
+
+# For test run
+# /usr/local/cuda/samples/5_Simulations/nbody
 
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*

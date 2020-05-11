@@ -26,6 +26,7 @@ apt-get -y update && \
     libpocofoundation50 \
     libpoco-dev \
     ncurses-dev \
+    libuuid1 \
     uuid-dev \
     libboost-all-dev \
     libxml2-dev
