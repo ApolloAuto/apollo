@@ -60,62 +60,55 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
+  ///////////////////////////
+  // deciders
+  task_factory_.Register(TaskConfig::CREEP_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new CreepDecider(config);
+                         });
   task_factory_.Register(TaskConfig::LANE_CHANGE_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new LaneChangeDecider(config);
                          });
-  task_factory_.Register(TaskConfig::PATH_LANE_BORROW_DECIDER,
+  task_factory_.Register(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER,
                          [](const TaskConfig& config) -> Task* {
-                           return new PathLaneBorrowDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::PATH_BOUNDS_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PathBoundsDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::PATH_REUSE_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PathReuseDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PathAssessmentDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::PIECEWISE_JERK_PATH_OPTIMIZER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PiecewiseJerkPathOptimizer(config);
-                         });
-  task_factory_.Register(TaskConfig::PIECEWISE_JERK_SPEED_OPTIMIZER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PiecewiseJerkSpeedOptimizer(config);
-                         });
-  task_factory_.Register(
-      TaskConfig::PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER,
-      [](const TaskConfig& config) -> Task* {
-        return new PiecewiseJerkSpeedNonlinearOptimizer(config);
-      });
-  task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PathTimeHeuristicOptimizer(config);
-                         });
-  task_factory_.Register(TaskConfig::PATH_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PathDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::SPEED_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new SpeedDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::CREEP_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new CreepDecider(config);
+                           return new OpenSpaceFallbackDecider(config);
                          });
   task_factory_.Register(TaskConfig::OPEN_SPACE_PRE_STOP_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpacePreStopDecider(config);
                          });
-  task_factory_.Register(
-      TaskConfig::DECIDER_RSS,
-      [](const TaskConfig& config) -> Task* { return new RssDecider(config); });
+  task_factory_.Register(TaskConfig::OPEN_SPACE_ROI_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new OpenSpaceRoiDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathAssessmentDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_BOUNDS_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_LANE_BORROW_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathLaneBorrowDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_REUSE_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathReuseDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::RSS_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new RssDecider(config); });
+  task_factory_.Register(TaskConfig::RULE_BASED_STOP_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new RuleBasedStopDecider(config);
+                         });
   task_factory_.Register(TaskConfig::SPEED_BOUNDS_PRIORI_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedBoundsDecider(config);
@@ -124,33 +117,40 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedBoundsDecider(config);
                          });
+  task_factory_.Register(TaskConfig::SPEED_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new SpeedDecider(config);
+                         });
   task_factory_.Register(TaskConfig::ST_BOUNDS_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new STBoundsDecider(config);
                          });
-  task_factory_.Register(TaskConfig::OPEN_SPACE_ROI_DECIDER,
+  ///////////////////////////
+  // optimizers
+  task_factory_.Register(TaskConfig::OPEN_SPACE_TRAJECTORY_PARTITION,
                          [](const TaskConfig& config) -> Task* {
-                           return new OpenSpaceRoiDecider(config);
+                           return new OpenSpaceTrajectoryPartition(config);
                          });
   task_factory_.Register(TaskConfig::OPEN_SPACE_TRAJECTORY_PROVIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpaceTrajectoryProvider(config);
                          });
-  task_factory_.Register(TaskConfig::OPEN_SPACE_TRAJECTORY_PARTITION,
+  task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
-                           return new OpenSpaceTrajectoryPartition(config);
+                           return new PathTimeHeuristicOptimizer(config);
                          });
-  task_factory_.Register(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER,
+  task_factory_.Register(TaskConfig::PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
-                           return new OpenSpaceFallbackDecider(config);
+                           return new PiecewiseJerkSpeedNonlinearOptimizer(
+                               config);
                          });
-  task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
+  task_factory_.Register(TaskConfig::PIECEWISE_JERK_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
-                           return new PathAssessmentDecider(config);
+                           return new PiecewiseJerkPathOptimizer(config);
                          });
-  task_factory_.Register(TaskConfig::RULE_BASED_STOP_DECIDER,
+  task_factory_.Register(TaskConfig::PIECEWISE_JERK_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
-                           return new RuleBasedStopDecider(config);
+                           return new PiecewiseJerkSpeedOptimizer(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
