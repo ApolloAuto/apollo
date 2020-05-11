@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
