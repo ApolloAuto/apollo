@@ -20,12 +20,19 @@
 #                   Utils
 #=================================================
 
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+
+MACHINE_ARCH=$(uname -m)
+BUILD_CMD="bazel build --distdir=${APOLLO_CACHE_DIR}"
+TEST_CMD="bazel test --distdir=${APOLLO_CACHE_DIR}"
+
 DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
 
 function apollo_check_system_config() {
   # check docker environment
   if [ ${MACHINE_ARCH} == "x86_64" ] && [ ${APOLLO_IN_DOCKER} != "true" ]; then
-    echo -e "${RED}Must run $0 in dev docker or release docker${NO_COLOR}"
+    echo -e "${RED}Must run $0 in cyber or dev docker${NO_COLOR}"
     exit 0
   fi
 
@@ -34,10 +41,9 @@ function apollo_check_system_config() {
   case $OP_SYSTEM in
     "Linux")
       echo "System check passed. Build continue ..."
-
       # check system configuration
       DEFAULT_MEM_SIZE="2.0"
-      MEM_SIZE=$(free | grep Mem | awk '{printf("%0.2f", $2 / 1024.0 / 1024.0)}')
+      MEM_SIZE=$(free -m | grep Mem | awk '{printf("%0.2f", $2 / 1024.0)}')
       if (( $(echo "$MEM_SIZE < $DEFAULT_MEM_SIZE" | bc -l) )); then
          warning "System memory [${MEM_SIZE}G] is lower than minimum required memory size [2.0G]. Apollo build could fail."
       fi
@@ -47,20 +53,19 @@ function apollo_check_system_config() {
       ;;
     *)
       error "Unsupported system: ${OP_SYSTEM}."
-      error "Please use Linux, we recommend Ubuntu 14.04."
+      error "Please use Linux, we recommend Ubuntu 18.04."
       exit 1
       ;;
   esac
 }
 
 function check_machine_arch() {
-  # the machine type, currently support x86_64, aarch64
-  MACHINE_ARCH=$(uname -m)
   if [ "${MACHINE_ARCH}" != "x86_64" ] && [ "${MACHINE_ARCH}" != "aarch64" ]; then
-    fail "Unknown machine architecture $MACHINE_ARCH"
+    fail "Machine architecture $MACHINE_ARCH currently not supported yet."
     exit 1
   fi
 
+  #TODO(ALL): checks whether still in use
   #setup vtk folder name for different systems.
   VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | tail -n1 | cut -d '-' -f 2)
   sed "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE.in > WORKSPACE
@@ -130,21 +135,21 @@ function build() {
   if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
   else
-    echo -e "${YELLOW}Running build under CPU mode. No GPU is required to run the build.${NO_COLOR}"
+    echo -e "${YELLOW}Running build under CPU mode. GPU is not required to run the build.${NO_COLOR}"
   fi
   info "Start building, please wait ..."
 
   generate_build_targets
+
   info "Building on $MACHINE_ARCH..."
 
-  MACHINE_ARCH=$(uname -m)
   JOB_ARG="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.8" # --ram_utilization_factor 80
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     JOB_ARG="--jobs=3"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
-  bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
+  ${BUILD_CMD} $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -156,7 +161,7 @@ function build() {
   if [ "$BUILD_FILTER" == 'cyber' ] || [ "$BUILD_FILTER" == 'drivers' ]; then
     info "Skipping revision recording"
   else
-    bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
+    ${BUILD_CMD} $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
     if [ ${PIPESTATUS[0]} -ne 0 ]; then
       fail 'Build failed!'
     fi
@@ -166,6 +171,7 @@ function build() {
         --key="apollo:data:commit_id" --value="$REVISION"
   fi
 
+  # TODO(ALL): check whether still in public use.
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
     if [ $? -ne 0 ]; then
@@ -182,7 +188,7 @@ function build() {
 function cibuild_extended() {
   info "Building framework ..."
 
-  cd /apollo
+  cd ${APOLLO_ROOT_DIR}
   info "Building modules ..."
 
   JOB_ARG="--jobs=12"
@@ -210,7 +216,7 @@ function cibuild_extended() {
     except //modules/map/tools/map_datachecker/...
     `
 
-  bazel build $JOB_ARG $DEFINES $@ $BUILD_TARGETS
+  ${BUILD_CMD} $JOB_ARG $DEFINES $@ $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
     success 'Build passed!'
@@ -218,9 +224,10 @@ function cibuild_extended() {
     fail 'Build failed!'
   fi
 }
+
 function cibuild() {
   info "Building framework ..."
-  cd /apollo
+  cd "${APOLLO_ROOT_DIR}"
 
   info "Building modules ..."
 
@@ -242,9 +249,8 @@ function cibuild() {
   # The data module is lightweight and rarely changed. If it fails, it's
   # most-likely an environment mess. So we try `bazel clean` and then initial
   # the building process.
-  bazel build $JOB_ARG $DEFINES $@ "//modules/data/..." || bazel clean
-
-  bazel build $JOB_ARG $DEFINES $@ $BUILD_TARGETS
+  ${BUILD_CMD} $JOB_ARG $DEFINES $@ "//modules/data/..." || bazel clean
+  ${BUILD_CMD} $JOB_ARG $DEFINES $@ $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
     success 'Build passed!'
@@ -288,146 +294,10 @@ function check() {
   fi
 }
 
-function warn_proprietary_sw() {
-  echo -e "${RED}The release built contains proprietary software provided by other parties.${NO_COLOR}"
-  echo -e "${RED}Make sure you have obtained proper licensing agreement for redistribution${NO_COLOR}"
-  echo -e "${RED}if you intend to publish the release package built.${NO_COLOR}"
-  echo -e "${RED}Such licensing agreement is solely between you and the other parties,${NO_COLOR}"
-  echo -e "${RED}and is not covered by the license terms of the apollo project${NO_COLOR}"
-  echo -e "${RED}(see file license).${NO_COLOR}"
-}
-
-function release() {
-  CACHE_DIR="/apollo/.cache"
-  RELEASE_DIR="${CACHE_DIR}/apollo_release"
-  if [ -d "${RELEASE_DIR}" ]; then
-    rm -rf "${RELEASE_DIR}"
-  fi
-  APOLLO_RELEASE_DIR="${RELEASE_DIR}/apollo"
-  mkdir -p "${APOLLO_RELEASE_DIR}"
-
-  # cp built dynamic libraries
-  LIBS=$(find bazel-out/* -name "*.so" )
-  for LIB in ${LIBS}; do
-    cp -a --parent ${LIB} ${APOLLO_RELEASE_DIR}
-  done
-  mkdir ${APOLLO_RELEASE_DIR}/bazel-bin
-  mv ${APOLLO_RELEASE_DIR}/bazel-out/local-opt/bin/* ${APOLLO_RELEASE_DIR}/bazel-bin/
-  rm -rf ${APOLLO_RELEASE_DIR}/bazel-out
-
-  # reset softlinks
-  cd ${APOLLO_RELEASE_DIR}/bazel-bin
-  LIST=("_solib_k8")
-  for DIR in "${LIST[@]}"; do
-    LINKS=$(find ${DIR}/* -name "*.so" -type l | sed '/.*@.*/d')
-    for LINK in $LINKS; do
-      LIB=$(echo $LINK | sed 's/_S/\//g' | sed 's/_U/_/g')
-      if [[ $LIB == *"_solib_k8/lib"* ]]; then
-        LIB="/apollo/bazel-bin/$(echo $LIB | awk -F "_solib_k8/lib" '{print $NF}')"
-      elif [[ $LIB == *"___"* ]]; then
-        LIB="/apollo/bazel-bin/$(echo $LIB | awk -F "___" '{print $NF}')"
-      else
-        LIB="/apollo/bazel-bin/$(echo $LIB | awk -F "apollo/" '{print $NF}')"
-      fi
-      ln -sf $LIB $LINK
-    done
-  done
-  cd -
-
-  # setup cyber binaries and convert from //path:target to path/target
-  CYBERBIN=$(bazel query "kind(cc_binary, //cyber/... //modules/tools/visualizer/...)" | sed 's/^\/\///' | sed 's/:/\//' | sed '/.*.so$/d')
-  for BIN in ${CYBERBIN}; do
-    cp -P --parent "bazel-bin/${BIN}" ${APOLLO_RELEASE_DIR}
-  done
-  cp --parent "cyber/setup.bash" "${APOLLO_RELEASE_DIR}"
-  cp --parent -a "cyber/tools/cyber_launch" "${APOLLO_RELEASE_DIR}"
-  cp --parent -a "cyber/tools/cyber_tools_auto_complete.bash" "${APOLLO_RELEASE_DIR}"
-  cp --parent -a "cyber/python" "${APOLLO_RELEASE_DIR}"
-
-
-  # setup tools
-  TOOLSBIN=$(bazel query "kind(cc_binary, //modules/tools/...)" | sed 's/^\/\///' | sed 's/:/\//' | sed '/.*.so$/d')
-  for BIN in ${TOOLSBIN}; do
-    cp -P --parent "bazel-bin/${BIN}" ${APOLLO_RELEASE_DIR}
-  done
-  TOOLSPY=$(find modules/tools/* -name "*.py")
-  for PY in ${TOOLSPY}; do
-    cp -P --parent "${PY}" "${APOLLO_RELEASE_DIR}/bazel-bin"
-  done
-
-  # modules data, conf and dag
-  CONFS=$(find modules/ cyber/ -name "conf")
-  DATAS=$(find modules/ -name "data" | grep -v "testdata")
-  DAGS=$(find modules/ -name "dag")
-  LAUNCHS=$(find modules/ -name "launch")
-  PARAMS=$(find modules/ -name "params" | grep -v "testdata")
-
-  rm -rf test/*
-  for CONF in $CONFS; do
-    cp -P --parent -a "${CONF}" "${APOLLO_RELEASE_DIR}"
-  done
-  for DATA in $DATAS; do
-    if [[ $DATA != *"map"* ]]; then
-        cp -P --parent -a "${DATA}" "${APOLLO_RELEASE_DIR}"
-    fi
-  done
-  for DAG in $DAGS; do
-    cp -P --parent -a "${DAG}" "${APOLLO_RELEASE_DIR}"
-  done
-  for LAUNCH in $LAUNCHS; do
-    cp -P --parent -a "${LAUNCH}" "${APOLLO_RELEASE_DIR}"
-  done
-  for PARAM in $PARAMS; do
-    cp -P --parent -a "${PARAM}" "${APOLLO_RELEASE_DIR}"
-  done
-  # perception model
-  MODEL="modules/perception/model"
-  cp -P --parent -a "${MODEL}" "${APOLLO_RELEASE_DIR}"
-
-  # dreamview frontend
-  cp -a modules/dreamview/frontend $APOLLO_RELEASE_DIR/modules/dreamview
-
-  # remove all pyc file in modules/
-  find modules/ -name "*.pyc" | xargs -I {} rm {}
-
-  # scripts
-  cp -r scripts ${APOLLO_RELEASE_DIR}
-
-  # manual traffic light tool
-  mkdir -p ${APOLLO_RELEASE_DIR}/modules/tools
-  cp -r modules/tools/manual_traffic_light ${APOLLO_RELEASE_DIR}/modules/tools
-
-  # remove mounted models
-  rm -rf ${APOLLO_RELEASE_DIR}/modules/perception/model/yolo_camera_detector/
-
-  # lib
-  LIB_DIR="${APOLLO_RELEASE_DIR}/lib"
-  mkdir "${LIB_DIR}"
-  if $USE_ESD_CAN; then
-    warn_proprietary_sw
-  fi
-  THIRDLIBS=$(find third_party/* -name "*.so*")
-  for LIB in ${THIRDLIBS}; do
-    cp -a "${LIB}" $LIB_DIR
-  done
-  cp -r py_proto/modules $LIB_DIR
-
-  # doc
-  cp LICENSE "${APOLLO_RELEASE_DIR}"
-  cp third_party/ACKNOWLEDGEMENT.txt "${APOLLO_RELEASE_DIR}"
-
-  # release info
-  META="${APOLLO_RELEASE_DIR}/meta.ini"
-  echo "git_commit: $(get_revision)" >> $META
-  echo "git_branch: $(get_branch)" >> $META
-  echo "car_type: LINCOLN.MKZ" >> $META
-  echo "arch: ${MACHINE_ARCH}" >> $META
-}
-
 function gen_coverage() {
   bazel clean
   generate_build_targets
-  echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs bazel test $DEFINES -c dbg --config=coverage $@
+  echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test" | xargs ${TEST_CMD} $DEFINES -c dbg --config=coverage $@
   if [ $? -ne 0 ]; then
     fail 'run test failed!'
   fi
@@ -466,11 +336,11 @@ function run_test() {
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
     echo -e "${YELLOW}Running tests under GPU mode. GPU is required to run the tests.${NO_COLOR}"
-    bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+    ${TEST_CMD} $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   else
     echo -e "${YELLOW}Running tests under CPU mode. No GPU is required to run the tests.${NO_COLOR}"
     BUILD_TARGETS="`echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test"`"
-    bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+    ${TEST_CMD} $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'
@@ -512,7 +382,7 @@ function citest_basic() {
           | grep -v "cuda_util_test" \
           | grep -v "modules\/perception"`"
 
-  bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+  ${TEST_CMD} $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -539,7 +409,7 @@ function citest_extended() {
 
   BUILD_TARGETS="`echo "$BUILD_TARGETS" | grep "test"`"
 
-  bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
+  ${TEST_CMD} $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@ $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -568,7 +438,7 @@ function citest() {
 
 function run_cpp_lint() {
   BUILD_TARGETS="`bazel query //modules/... except //modules/tools/visualizer/... union //cyber/...`"
-  bazel test --config=cpplint -c dbg $BUILD_TARGETS
+  ${TEST_CMD} --config=cpplint -c dbg $BUILD_TARGETS
 }
 
 function run_bash_lint() {
@@ -716,8 +586,6 @@ function print_usage() {
 }
 
 function main() {
-  cd "$( dirname "${BASH_SOURCE[0]}" )"
-  source scripts/apollo_base.sh
 
   check_machine_arch
   apollo_check_system_config
@@ -872,12 +740,6 @@ function main() {
     test_gpu)
       set_use_gpu
       run_test $@
-      ;;
-    release)
-      release 1
-      ;;
-    release_noproprietary)
-      release 0
       ;;
     coverage)
       gen_coverage $@
