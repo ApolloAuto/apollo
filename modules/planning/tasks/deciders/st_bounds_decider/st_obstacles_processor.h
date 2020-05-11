@@ -28,7 +28,6 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/decision.pb.h"
-#include "modules/planning/proto/st_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/history.h"
