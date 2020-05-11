@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P)"
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 INCHINA="no"
@@ -28,7 +28,7 @@ VERSION_OPT=""
 
 # Check whether user has agreed license agreement
 function check_agreement() {
-  agreement_record="${HOME}/.apollo_agreement.txt"
+  local agreement_record="${HOME}/.apollo_agreement.txt"
   if [ -e "$agreement_record" ]; then
     return
   fi
@@ -39,9 +39,9 @@ function check_agreement() {
     exit 1
   fi
 
-  cat $AGREEMENT_FILE
-  tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-  echo $tip
+  cat "${AGREEMENT_FILE}"
+  local tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+  echo "${tip}"
   read -n 1 user_agreed
   if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
     cp $AGREEMENT_FILE $agreement_record
@@ -78,8 +78,7 @@ for i in ${running_containers[*]}
 do
   if [[ "$i" =~ apollo_* ]];then
     printf %-*s 70 "stopping container: $i ..."
-    docker stop $i > /dev/null
-    if [ $? -eq 0 ];then
+    if docker stop "$i" >/dev/null ; then
       printf "\033[32m[DONE]\033[0m\n"
     else
       printf "\033[31m[FAILED]\033[0m\n"
@@ -90,7 +89,7 @@ done
 
 
 if [ ! -e /apollo ]; then
-    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
+    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
 fi
 
 if [ -e /proc/sys/kernel ]; then
@@ -112,7 +111,7 @@ do
         [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $VAR with $VERSION_OPT, only the last one will take effect.\n"
         shift
         VERSION_OPT=$1
-        [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
+        [ -z "${VERSION_OPT// /}" ] && echo -e "Missing parameter for $VAR" && exit 2
         [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
         ;;
     -h|--help)
@@ -135,9 +134,9 @@ done
 
 if [ ! -z "$VERSION_OPT" ]; then
     VERSION=$VERSION_OPT
-elif [ ${ARCH} == "x86_64" ]; then
+elif [ "${ARCH}" == "x86_64" ]; then
     VERSION=${VERSION_X86_64}
-elif [ ${ARCH} == "aarch64" ]; then
+elif [ "${ARCH}" == "aarch64" ]; then
     VERSION=${VERSION_AARCH64}
 else
     echo "Unknown architecture: ${ARCH}"
@@ -230,7 +229,7 @@ function main(){
         info "Start docker container based on local image : $IMG"
     else
         info "Start pulling docker image $IMG ..."
-        docker pull $IMG
+        docker pull "${IMG}"
         if [ $? -ne 0 ];then
             error "Failed to pull docker image."
             exit 1
@@ -240,8 +239,8 @@ function main(){
     APOLLO_CYBER="apollo_cyber_${USER}"
     docker ps -a --format "{{.Names}}" | grep "$APOLLO_CYBER" 1>/dev/null
     if [ $? == 0 ]; then
-        docker stop $APOLLO_CYBER 1>/dev/null
-        docker rm -v -f $APOLLO_CYBER 1>/dev/null
+        docker stop ${APOLLO_CYBER} 1>/dev/null
+        docker rm -v -f ${APOLLO_CYBER} 1>/dev/null
     fi
 
     local display=""
@@ -256,11 +255,7 @@ function main(){
     USER_ID=$(id -u)
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
-    LOCAL_HOST=`hostname`
-    DOCKER_HOME="/home/$USER"
-    if [ "$USER" == "root" ];then
-        DOCKER_HOME="/root"
-    fi
+    LOCAL_HOST=$(hostname)
     if [ ! -d "${CACHE_ROOT_DIR}" ]; then
         mkdir "${CACHE_ROOT_DIR}"
     fi
@@ -304,11 +299,11 @@ function main(){
     fi
 
 
-    if [ ${ARCH} == "x86_64" ]; then
+    if [ "${ARCH}" == "x86_64" ]; then
         # User with uid=1000 or username=apollo excluded
         if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
             && [[ $USER_ID -ne 1000 ]]; then
-            docker exec -u root $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
+            docker exec -u root "${APOLLO_CYBER}" bash -c '/apollo/scripts/docker_adduser.sh'
         fi
     else
         warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_adduser.sh' for the first time when you get into the docker !!!"
