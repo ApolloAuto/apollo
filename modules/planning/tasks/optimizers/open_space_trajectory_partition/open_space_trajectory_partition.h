@@ -65,7 +65,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
                            const canbus::Chassis::GearPosition& gear,
                            common::math::Vec2d* last_pos_vec,
                            double* distance_s,
-                           DiscretizedTrajectory* current_trajectory);
+                           DiscretizedTrajectory* current_trajectory, bool is_trajectory_last_point=false);
 
   bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
                                const canbus::Chassis::GearPosition& gear,

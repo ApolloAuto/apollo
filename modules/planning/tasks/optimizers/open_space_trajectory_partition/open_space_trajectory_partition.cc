@@ -441,6 +441,8 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
             : canbus::Chassis::GEAR_REVERSE;
 
     if (cur_gear != *gear) {
+      LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
+                          trajectory, true);
       partitioned_trajectories->emplace_back();
       current_trajectory_gear = &(partitioned_trajectories->back());
       current_trajectory_gear->second = cur_gear;
@@ -462,7 +464,8 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
 void OpenSpaceTrajectoryPartition::LoadTrajectoryPoint(
     const TrajectoryPoint& trajectory_point,
     const canbus::Chassis::GearPosition& gear, Vec2d* last_pos_vec,
-    double* distance_s, DiscretizedTrajectory* current_trajectory) {
+    double* distance_s, DiscretizedTrajectory* current_trajectory,
+    bool is_trajectory_last_point) {
   current_trajectory->emplace_back();
   TrajectoryPoint* point = &(current_trajectory->back());
   point->set_relative_time(trajectory_point.relative_time());
@@ -476,7 +479,8 @@ void OpenSpaceTrajectoryPartition::LoadTrajectoryPoint(
   *distance_s += (gear == canbus::Chassis::GEAR_REVERSE ? -1.0 : 1.0) *
                  (cur_pos_vec.DistanceTo(*last_pos_vec));
   *last_pos_vec = cur_pos_vec;
-  point->mutable_path_point()->set_kappa(std::tan(trajectory_point.steer()) /
+  point->mutable_path_point()->set_kappa((is_trajectory_last_point ? -1 : 1) *
+                                         std::tan(trajectory_point.steer()) /
                                          wheel_base_);
   point->set_a(trajectory_point.a());
 }
