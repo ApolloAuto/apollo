@@ -544,9 +544,10 @@ DEFINE_string(
     "a list of source files or directories for offline mode. "
     "The items need to be separated by colon ':'. ");
 DEFINE_int32(planning_offline_mode, 0,
-             "0: no learning"
-             "1: online mode, no dump file"
-             "2: dump learning_data to <record file>.<n>.bin");
+             "0: no learning "
+             "1: online learning, no dump file "
+             "2: offline learning. read record files and dump learning_data "
+             "   to <record file>.<n>.bin");
 DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
              "time sec (second) of history trajectory points for a obstacle");
 DEFINE_int32(learning_data_frame_num_per_file, 100,

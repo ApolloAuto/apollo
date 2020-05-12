@@ -38,6 +38,7 @@
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
+#include "modules/planning/tasks/learning_model/learning_based_task.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
@@ -152,6 +153,13 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new PiecewiseJerkSpeedOptimizer(config);
                          });
+  ///////////////////////////
+  // other tasks
+  task_factory_.Register(TaskConfig::LEARNING_BASED_TASK,
+                         [](const TaskConfig& config) -> Task* {
+                           return new LearningBasedTask(config);
+                         });
+
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
         default_task_config;

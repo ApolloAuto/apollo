@@ -29,6 +29,11 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
+LearningBasedTask::LearningBasedTask(const TaskConfig &config)
+    : Task(config), device_(torch::kCPU) {
+  ACHECK(config.has_learning_based_task_config());
+}
+
 Status LearningBasedTask::Execute(Frame *frame,
                                   ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
@@ -36,7 +41,8 @@ Status LearningBasedTask::Execute(Frame *frame,
 }
 
 Status LearningBasedTask::Process(Frame *frame) {
-  const auto model_file = config_.model_file();
+  auto& config = config_.learning_based_task_config();
+  const auto model_file = config.model_file();
   if (apollo::cyber::common::PathExists(model_file)) {
     try {
       model_ = torch::jit::load(model_file, device_);
@@ -47,7 +53,7 @@ Status LearningBasedTask::Process(Frame *frame) {
                     "learning based task model file not exist");
     }
   }
-  input_feature_num_ = config_.input_feature_num();
+  input_feature_num_ = config.input_feature_num();
 
   std::vector<torch::jit::IValue> input_features;
   ExtractFeatures(frame, &input_features);
