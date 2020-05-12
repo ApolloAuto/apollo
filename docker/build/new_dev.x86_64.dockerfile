@@ -7,14 +7,7 @@ WORKDIR /apollo
 USER root
 
 COPY installers /tmp/installers
-RUN bash /tmp/installers/install_us2cn_adjustment.sh ${GEOLOC}
-
-
-RUN apt-get -y update && \
-    apt-get -y install \
-    silversearcher-ag && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN bash /tmp/installers/install_geo_adjustment.sh ${GEOLOC}
 
 COPY archive /tmp/archive
 RUN bash /tmp/installers/install_tensorrt.sh
