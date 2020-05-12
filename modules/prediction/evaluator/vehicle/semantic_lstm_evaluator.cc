@@ -166,7 +166,8 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
       rotation_matrix(1, 1) = std::cos(heading);
 
       Eigen::Matrix2d cov_matrix;
-      cov_matrix = rotation_matrix * cov_matrix_r * (rotation_matrix.transpose());
+      cov_matrix = rotation_matrix * cov_matrix_r *
+                   (rotation_matrix.transpose());
       double sigma_x = std::sqrt(std::abs(cov_matrix(0, 0)));
       double sigma_y = std::sqrt(std::abs(cov_matrix(1, 1)));
       double corr = cov_matrix(0, 1) / (sigma_x + FLAGS_double_precision) /
