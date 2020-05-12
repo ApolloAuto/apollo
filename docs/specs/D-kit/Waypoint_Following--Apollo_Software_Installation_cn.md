@@ -48,7 +48,7 @@ Apollo系统安装
 
 - 480W适配器
 
-  ![IPC-8108GC-front-side](images/software_installation_look_8108.jpg)
+  ![IPC-8108GC-front-side](images/software_installation_look_8108.PNG)
 
 ### 准备IPC
 
