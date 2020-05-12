@@ -64,10 +64,10 @@ message TaskConfig {
     OpenSpaceTrajectoryProviderConfig
         open_space_trajectory_provider_config = 16;
     SpeedHeuristicConfig speed_heuristic_config = 17;
-    PiecewiseJerkNonlinearSpeedConfig
-        piecewise_jerk_nonlinear_speed_config = 18;
-    PiecewiseJerkPathConfig piecewise_jerk_path_config = 19;
-    PiecewiseJerkSpeedConfig piecewise_jerk_speed_config = 20;
+    PiecewiseJerkNonlinearSpeedOptimizerConfig
+        piecewise_jerk_nonlinear_speed_optimizer_config = 18;
+    PiecewiseJerkPathOptimizerConfig piecewise_jerk_path_optimizer_config = 19;
+    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config = 20;
     // other tasks
     LearningBasedTaskConfig learning_based_task_config = 21;
   }

@@ -37,7 +37,7 @@ using apollo::common::VehicleConfigHelper;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
     : PathOptimizer(config) {
-  ACHECK(config_.has_piecewise_jerk_path_config());
+  ACHECK(config_.has_piecewise_jerk_path_optimizer_config());
 }
 
 common::Status PiecewiseJerkPathOptimizer::Process(
@@ -61,18 +61,21 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   // Choose lane_change_path_config for lane-change cases
   // Otherwise, choose default_path_config for normal path planning
-  const auto& piecewise_jerk_path_config =
+  const auto& config =
       reference_line_info_->IsChangeLanePath()
-          ? config_.piecewise_jerk_path_config().lane_change_path_config()
-          : config_.piecewise_jerk_path_config().default_path_config();
+          ? config_.piecewise_jerk_path_optimizer_config()
+                   .lane_change_path_config()
+          : config_.piecewise_jerk_path_optimizer_config()
+                   .default_path_config();
 
   std::array<double, 5> w = {
-      piecewise_jerk_path_config.l_weight(),
-      piecewise_jerk_path_config.dl_weight() *
+      config.l_weight(),
+      config.dl_weight() *
           std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
                     5.0),
-      piecewise_jerk_path_config.ddl_weight(),
-      piecewise_jerk_path_config.dddl_weight(), 0.0};
+      config.ddl_weight(),
+      config.dddl_weight(),
+      0.0};
 
   const auto& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
