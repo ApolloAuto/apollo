@@ -33,8 +33,7 @@ namespace planning {
 
 class LearningBasedTask : public Task {
  public:
-  explicit LearningBasedTask(const TaskConfig &config)
-      : Task(config), device_(torch::kCPU) {}
+  explicit LearningBasedTask(const TaskConfig &config);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
@@ -47,7 +46,6 @@ class LearningBasedTask : public Task {
   bool InferenceModel(const std::vector<torch::jit::IValue> &input_features,
                       Frame* frame);
  private:
-  LearningBasedTaskConfig config_;
   torch::Device device_;
   torch::jit::script::Module model_;
   int input_feature_num_ = 0;

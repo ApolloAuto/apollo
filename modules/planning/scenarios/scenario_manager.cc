@@ -145,6 +145,11 @@ void ScenarioManager::RegisterScenarios() {
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
                               &config_map_[ScenarioConfig::EMERGENCY_STOP]));
 
+  // learning model
+  ACHECK(Scenario::LoadConfig(
+      FLAGS_scenario_learning_model_sample_config_file,
+      &config_map_[ScenarioConfig::LEARNING_MODEL_SAMPLE]));
+
   // park_and_go
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
                               &config_map_[ScenarioConfig::PARK_AND_GO]));
@@ -157,11 +162,6 @@ void ScenarioManager::RegisterScenarios() {
   ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
-
-  // learning model
-  ACHECK(Scenario::LoadConfig(
-      FLAGS_scenario_learning_model_sample_config_file,
-      &config_map_[ScenarioConfig::LEARNING_MODEL_SAMPLE]));
 
   // traffic_light
   ACHECK(Scenario::LoadConfig(
@@ -790,19 +790,46 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
 
   Observe(frame);
 
-  ScenarioDispatch(ego_point, frame);
+  ScenarioDispatch(frame);
 }
 
-void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
-                                       const Frame& frame) {
+void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   ACHECK(!frame.reference_line_info().empty());
 
+  ScenarioConfig::ScenarioType scenario_type;
+  if (FLAGS_planning_offline_mode == 1) {
+    scenario_type = ScenarioDispatchLearning();
+  } else {
+    scenario_type = ScenarioDispatchNonLearning(frame);
+  }
+
+  ADEBUG << "select scenario: "
+         << ScenarioConfig::ScenarioType_Name(scenario_type);
+
+  // update PlanningContext
+  UpdatePlanningContext(frame, scenario_type);
+
+  if (current_scenario_->scenario_type() != scenario_type) {
+    current_scenario_ = CreateScenario(scenario_type);
+  }
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchLearning() {
+  ////////////////////////////////////////
+  // learning model scenario
+  ScenarioConfig::ScenarioType scenario_type =
+      ScenarioConfig::LEARNING_MODEL_SAMPLE;
+  return scenario_type;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
+    const Frame& frame) {
   ////////////////////////////////////////
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
   ////////////////////////////////////////
-  // Pad Msg Scenario
+  // Pad Msg scenario
   scenario_type = SelectPadMsgScenario(frame);
 
   if (scenario_type == default_scenario_type_) {
@@ -860,15 +887,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     scenario_type = SelectValetParkingScenario(frame);
   }
 
-  ADEBUG << "select scenario: "
-         << ScenarioConfig::ScenarioType_Name(scenario_type);
-
-  // update PlanningContext
-  UpdatePlanningContext(frame, scenario_type);
-
-  if (current_scenario_->scenario_type() != scenario_type) {
-    current_scenario_ = CreateScenario(scenario_type);
-  }
+  return scenario_type;
 }
 
 bool ScenarioManager::IsBareIntersectionScenario(
