@@ -1,5 +1,6 @@
-load("//tools:grpc_library.bzl", "cc_grpc_library")
+load("@com_github_grpc_grpc//bazel:cc_proto_library.bzl", "cc_grpc_library")
 load("//tools:py_proto.bzl", "py_proto")
+#load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_grpc_library", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 

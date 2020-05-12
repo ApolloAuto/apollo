@@ -20,18 +20,38 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
 
-wget https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.tar.gz
-tar xzf v3.2.1-1.tar.gz
+VERSION="3.2.1-1"
+PKG_NAME="qp-oases-${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://github.com/ApolloAuto/qp-oases/archive/v${VERSION}.tar.gz"
+CHECKSUM="2cf87de73c9987efe9458e41c3c8782e26fac1560db565a8695f78d7ccdec38a"
 
-pushd qp-oases-3.2.1-1
+download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
+
+tar xzf "${PKG_NAME}"
+
+pushd qp-oases-${VERSION}
 mkdir bin
-make -j8 CPPFLAGS="-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion \
-                   -Wsign-conversion -fPIC -DLINUX -DSOLVER_NONE \
-                   -D__NO_COPYRIGHT__"
+
+cat << MYFLAGS
+-Wall -pedantic -Wshadow \
+-Wfloat-equal -O3 -Wconversion \
+-Wsign-conversion -fPIC -DLINUX -DSOLVER_NONE \
+-D__NO_COPYRIGHT__
+MYFLAGS
+
+THREAD_NUM=$(nproc)
+make -j${THREAD_NUM} CXXFLAGS="${MYFLAGS}"
+
 cp bin/libqpOASES.so /usr/local/lib
 cp -r include/* /usr/local/include
 popd
 
+ok "Successfully build qp-oases-${VERSION}"
+
 # Clean up.
-rm -fr v3.2.1-1.tar.gz qp-oases-3.2.1-1
+rm -fr ${PKG_NAME} qp-oases-${VERSION}
+
+# https://github.com/coin-or/qpOASES
+

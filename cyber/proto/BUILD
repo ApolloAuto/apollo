@@ -1,4 +1,9 @@
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load(
+    "@com_github_grpc_grpc//bazel:python_rules.bzl",
+    "py_proto_library",
+)
 
 package(default_visibility = ["//visibility:public"])
 
@@ -121,9 +126,11 @@ proto_library(
     srcs = ["record.proto"],
 )
 
-py_proto(
+py_proto_library(
     name = "record_pb2",
-    src = "record.proto",
+    deps = [
+        ":record_proto",
+    ],
 )
 
 cc_proto_library(
@@ -234,104 +241,108 @@ proto_library(
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "perf_conf_pb2",
-    src = "perf_conf.proto",
+    deps = [
+        ":perf_conf_proto",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "run_mode_conf_pb2",
-    src = "run_mode_conf.proto",
+    deps = [
+        ":run_mode_conf_proto",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "dag_conf_pb2",
-    src = "dag_conf.proto",
     deps = [
-        "//cyber/proto:component_conf_pb2",
+        ":dag_conf_proto",
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "unit_test_pb2",
-    src = "unit_test.proto",
+    deps = [
+        ":unit_test_proto",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "choreography_conf_pb2",
-    src = "choreography_conf.proto",
+    deps = [":choreography_conf_proto"],
 )
 
-py_proto(
+py_proto_library(
     name = "role_attributes_pb2",
-    src = "role_attributes.proto",
     deps = [
-        "//cyber/proto:qos_profile_pb2",
+        ":role_attributes_proto",
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "proto_desc_pb2",
-    src = "proto_desc.proto",
+    deps = [":proto_desc_proto"],
 )
 
-py_proto(
+py_proto_library(
     name = "perception_pb2",
-    src = "perception.proto",
+    deps = [":perception_proto"],
 )
 
-py_proto(
+py_proto_library(
     name = "scheduler_conf_pb2",
-    src = "scheduler_conf.proto",
     deps = [
-        "//cyber/proto:choreography_conf_pb2",
-        "//cyber/proto:classic_conf_pb2",
+        ":scheduler_conf_proto",
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "parameter_pb2",
-    src = "parameter.proto",
+    deps = [
+        ":parameter_proto",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "classic_conf_pb2",
-    src = "classic_conf.proto",
+    deps = [
+        ":classic_conf_proto",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "component_conf_pb2",
-    src = "component_conf.proto",
     deps = [
-        "//cyber/proto:qos_profile_pb2",
+        ":component_conf_proto",
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "transport_conf_pb2",
-    src = "transport_conf.proto",
-)
-
-py_proto(
-    name = "qos_profile_pb2",
-    src = "qos_profile.proto",
-)
-
-py_proto(
-    name = "cyber_conf_pb2",
-    src = "cyber_conf.proto",
     deps = [
-        "//cyber/proto:perf_conf_pb2",
-        "//cyber/proto:run_mode_conf_pb2",
-        "//cyber/proto:scheduler_conf_pb2",
-        "//cyber/proto:transport_conf_pb2",
+        ":transport_conf_proto",
     ],
 )
 
-py_proto(
-    name = "topology_change_pb2",
-    src = "topology_change.proto",
+py_proto_library(
+    name = "qos_profile_pb2",
     deps = [
-        "//cyber/proto:role_attributes_pb2",
+        ":qos_profile_proto",
+    ],
+)
+
+py_proto_library(
+    name = "cyber_conf_pb2",
+    deps = [
+        ":cyber_conf_proto",
+    ],
+)
+
+py_proto_library(
+    name = "topology_change_pb2",
+    deps = [
+        ":topology_change_proto",
     ],
 )

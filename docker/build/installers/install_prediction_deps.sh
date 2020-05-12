@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,23 +19,22 @@
 # Fail on first error.
 set -e
 
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
 apt-get -y update && \
     apt-get -y install \
-    sudo && \
+    libopencv-core-dev \
+    libopencv-imgproc-dev \
+    libopencv-imgcodecs-dev \
+    libopencv-highgui-dev \
+
+# osqp
+# libtorch
+# qp-oases
+
+# Cleanup
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 
-USER_NAME=apollo
 
-adduser --disabled-password --gecos '' ${USER_NAME}
-usermod -aG sudo ${USER_NAME}
-
-sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
-
-echo """
-ulimit -c unlimited
-source /apollo/scripts/apollo_base.sh
-alias bb=\"bazel build --distdir=/apollo/.cache/distdir\"
-alias bt=\"bazel test  --distdir=/apollo/.cache/distdir\"
-""" >> /home/${USER_NAME}/.bashrc

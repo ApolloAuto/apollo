@@ -1,9 +1,18 @@
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
     name = "navigation_proto",
+    deps = [
+        ":navigation_proto_lib",
+    ],
+)
+
+py_proto_library(
+    name = "navigation_pb2",
     deps = [
         ":navigation_proto_lib",
     ],
@@ -28,6 +37,13 @@ cc_proto_library(
     ],
 )
 
+py_proto_library(
+    name = "relative_map_config_pb2",
+    deps = [
+        ":relative_map_config_proto_lib",
+    ],
+)
+
 proto_library(
     name = "relative_map_config_proto_lib",
     srcs = ["relative_map_config.proto"],
@@ -40,29 +56,14 @@ cc_proto_library(
     ],
 )
 
+py_proto_library(
+    name = "navigator_config_pb2",
+    deps = [
+        ":navigator_config_proto_lib",
+    ],
+)
+
 proto_library(
     name = "navigator_config_proto_lib",
     srcs = ["navigator_config.proto"],
-)
-
-py_proto(
-    name = "navigator_config_pb2",
-    src = "navigator_config.proto",
-)
-
-py_proto(
-    name = "relative_map_config_pb2",
-    src = "relative_map_config.proto",
-)
-
-py_proto(
-    name = "navigation_pb2",
-    src = "navigation.proto",
-    deps = [
-        "//modules/common/proto:header_pb2",
-        "//modules/common/proto:pnc_point_pb2",
-        "//modules/localization/proto:localization_pb2",
-        "//modules/map/proto:map_pb2",
-        "//modules/perception/proto:perception_obstacle_pb2",
-    ],
 )

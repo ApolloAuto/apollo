@@ -35,21 +35,28 @@ cc_library(name = "main", deps = ["@com_google_googletest//:gtest_main"])
     path = "/usr/include",
 )
 
-#http_archive(
-#    name = "rules_proto",
-#    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
-#    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
-#    urls = [
-#        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-#        "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-#    ],
-#)
-#
-#load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-#
-#rules_proto_dependencies()
-#
-#rules_proto_toolchains()
+http_archive(
+    name = "rules_proto",
+    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
+    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+        "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+    ],
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
+http_archive(
+    name = "com_google_absl",
+    sha256 = "f41868f7a938605c92936230081175d1eae87f6ea2c248f41077c8f88316f111",
+    strip_prefix = "abseil-cpp-20200225.2",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/20200225.2.tar.gz"],
+)
 
 # gflags
 new_local_repository(
@@ -97,7 +104,7 @@ http_archive(
     name = "com_github_grpc_grpc",
     sha256 = "2fcb7f1ab160d6fd3aaade64520be3e5446fc4c6fa7ba6581afdc4e26094bd81",
     strip_prefix = "grpc-1.26.0",
-    url = "https://github.com/grpc/grpc/archive/v1.26.0.tar.gz",
+    urls = ["https://github.com/grpc/grpc/archive/v1.26.0.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -133,14 +140,15 @@ http_archive(
     urls = ["https://github.com/intel/ad-rss-lib/archive/v1.1.0.tar.gz"],
 )
 
-## eigen
-#http_archive(
-#    name = "eigen",
-#    build_file = "third_party/eigen.BUILD",
-#    sha256 = "ba4f95f9082ce99012d5ff320472a0e9fd0be921a20f11912f0bf7e6ca93f240",
-#    strip_prefix = "eigen-git-mirror-3.2.10",
-#    url = "file:///home/tmp/eigen-3.2.10.tar.gz",
-#)
+# eigen
+http_archive(
+    name = "eigen",
+    build_file = "eigen.BUILD",
+    sha256 = "a8d87c8df67b0404e97bcef37faf3b140ba467bc060e2b883192165b319cea8d",
+    strip_prefix = "eigen-git-mirror-3.3.7",
+    urls = ["https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz"],
+)
+
 #
 ## CivetWeb (web server)
 #http_archive(
@@ -217,20 +225,21 @@ new_local_repository(
 #    url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
 #)
 #
-#http_archive(
-#    name = "qpOASES",
-#    build_file = "third_party/qpOASES.BUILD",
-#    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
-#    strip_prefix = "qp-oases-3.2.1-1",
-#    url = "file:///home/tmp/qp-oases-3.2.1-1.zip",
-#)
-#
-## OSQP
-#new_local_repository(
-#    name = "osqp",
-#    build_file = "third_party/osqp.BUILD",
-#    path = "/usr/local/include/osqp/include",
-#)
+http_archive(
+    name = "qpOASES",
+    build_file = "external/qpOASES.BUILD",
+    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
+    strip_prefix = "qp-oases-3.2.1-1",
+    urls = ["https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.tar.gz"],
+)
+
+# OSQP
+new_local_repository(
+    name = "osqp",
+    build_file = "external/osqp.BUILD",
+    path = "/usr/local/include/osqp",
+)
+
 #
 ## IpOpt
 #new_local_repository(
@@ -282,21 +291,18 @@ new_local_repository(
 #)
 #
 ## Proj.4
-#http_archive(
-#    name = "proj4",
-#    build_file = "third_party/proj4.BUILD",
-#    strip_prefix = "proj.4-4.9.3",
-#    url = "file:///home/tmp/proj.4-4.9.3.zip",
-#)
-#
-## tinyxml2
-#http_archive(
-#    name = "tinyxml2",
-#    build_file = "third_party/tinyxml2.BUILD",
-#    strip_prefix = "tinyxml2-5.0.1",
-#    url = "file:///home/tmp/tinyxml2-5.0.1.zip",
-#)
-#
+new_local_repository(
+    name = "proj4",
+    build_file = "external/proj4.BUILD",
+    path = "/usr/include",
+)
+
+new_local_repository(
+    name = "tinyxml2",
+    build_file = "external/tinyxml2.BUILD",
+    path = "/usr/include",
+)
+
 ##jsoncpp .so for adv_plat
 #new_local_repository(
 #    name = "jsoncpp",
@@ -345,19 +351,20 @@ new_local_repository(
     path = "/usr",
 )
 
-## PyTorch
-#new_local_repository(
-#    name = "pytorch",
-#    build_file = "third_party/pytorch.BUILD",
-#    path = "/usr/local/apollo/libtorch",
-#)
-#
-## PyTorch GPU
-#new_local_repository(
-#    name = "pytorch_gpu",
-#    build_file = "third_party/pytorch_gpu.BUILD",
-#    path = "/usr/local/apollo/libtorch_gpu",
-#)
+## libtorch
+new_local_repository(
+    name = "libtorch_cpu",
+    build_file = "external/libtorch_cpu.BUILD",
+    path = "/usr/local/libtorch_cpu/include",
+)
+
+# libtorch GPU
+new_local_repository(
+    name = "libtorch_gpu",
+    build_file = "external/libtorch_gpu.BUILD",
+    path = "/usr/local/libtorch_gpu/include",
+)
+
 #
 ## ffmpeg
 #new_local_repository(
@@ -367,11 +374,11 @@ new_local_repository(
 #)
 #
 #
-#new_local_repository(
-#    name = "opencv",
-#    build_file = "third_party/opencv.BUILD",
-#    path = "/usr/include",
-#)
+new_local_repository(
+    name = "opencv",
+    build_file = "external/opencv.BUILD",
+    path = "/usr/include",
+)
 
 # TODO(storypku) rules_boost
 new_local_repository(

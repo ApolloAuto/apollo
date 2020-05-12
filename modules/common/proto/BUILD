@@ -1,4 +1,9 @@
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load(
+    "@com_github_grpc_grpc//bazel:python_rules.bzl",
+    "py_proto_library",
+)
 
 package(default_visibility = ["//visibility:public"])
 
@@ -93,44 +98,51 @@ cc_proto_library(
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "pnc_point_pb2",
-    src = "pnc_point.proto",
+    deps = [
+        ":pnc_point_proto_lib",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "drive_state_pb2",
-    src = "drive_state.proto",
+    deps = [
+        ":drive_state_proto_lib",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "vehicle_signal_pb2",
-    src = "vehicle_signal.proto",
+    deps = [
+        ":vehicle_signal_proto_lib",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "drive_event_pb2",
-    src = "drive_event.proto",
     deps = [
-        "//modules/common/proto:header_pb2",
-        "//modules/localization/proto:pose_pb2",
+        ":drive_event_proto_lib",
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "header_pb2",
-    src = "header.proto",
     deps = [
-        "//modules/common/proto:error_code_pb2",
+        ":header_proto_lib",
     ],
 )
 
-py_proto(
+py_proto_library(
     name = "geometry_pb2",
-    src = "geometry.proto",
+    deps = [
+        ":geometry_proto_lib",
+    ],
 )
 
-py_proto(
+py_proto_library(
     name = "error_code_pb2",
-    src = "error_code.proto",
+    deps = [
+        ":error_code_proto_lib",
+    ],
 )

@@ -30,10 +30,10 @@ cc_library(
     name = "libtorch",
     deps = select({
         "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
+            "@libtorch_gpu",
         ],
         "//conditions:default": [
-            "@pytorch",
+            "@libtorch_cpu",
         ],
     }),
 )

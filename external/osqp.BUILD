@@ -10,7 +10,6 @@ cc_library(
     ],
     linkopts = [
         "-L/usr/local/lib",
-        "-Wl,-rpath,/usr/lib/x86_64-linux-gnu/",
         "-losqp",
     ],
 )
