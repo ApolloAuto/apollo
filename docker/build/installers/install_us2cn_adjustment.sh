@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,21 +18,22 @@
 
 # Fail on first error.
 set -e
-build_stage="$1"; shift
 
-[ -d /tmp/archive ] && rm -rf /tmp/archive
-[ -d /tmp/installers ] && rm -rf /tmp/installers
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
+MY_GEO=$1; shift
 
-if [[ "${build_stage}" == "cyber" ]]; then
-    # Create required soft links.
-    ln -rs /usr/lib/x86_64-linux-gnu/libprofiler.so.0 /usr/lib/libprofiler.so
-    ln -rs /usr/lib/x86_64-linux-gnu/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmalloc_and_profiler.so
+##----------------------------##
+##  APT sources.list settings |
+##----------------------------##
+echo "My geolocation is ${MY_GEO}"
 
-# https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
-    ln -s -f /bin/true /usr/bin/chfn
-
-else
-    echo "Nothing else need to be done in stage ${build_stage}"
+if [ "$MY_GEO" == "cn" ]; then
+    cp -f /tmp/installers/sources.list.cn /etc/apt/sources.list
+    sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
+    # Mirror from Tsinghua Univ.
+    PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
+    pip config set global.index-url "$PYPI_MIRROR"
+    python3 -m pip config set global.index-url "$PYPI_MIRROR"
 fi
 

@@ -1,6 +1,7 @@
 ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 FROM ${BASE_IMAGE}
 
+ARG BUILD_STAGE
 ARG GEOLOC
 
 LABEL version="1.2"
@@ -21,7 +22,7 @@ RUN bash /tmp/installers/install_poco.sh
 RUN bash /tmp/installers/install_visualizer_dependencies.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_user.sh
-RUN bash /tmp/installers/post_install.sh
+RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
 
 WORKDIR /apollo
 USER apollo

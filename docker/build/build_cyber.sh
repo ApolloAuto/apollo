@@ -25,6 +25,8 @@ ARCH=$(uname -m)
 REPO=apolloauto/apollo
 LOCAL_DEV_TAG="${REPO}:local_cyber_dev"
 
+STAGE="cyber"
+
 LOCAL_DEV_FLAG="no"
 MODE="download"
 GEOLOC="us"
@@ -33,13 +35,12 @@ TAB="    "
 
 function print_usage() {
     local prog_name=$(basename "$0")
-    local tab="    " # 4 spaces
     echo "Usage:"
-    echo "${tab}${prog_name} [-l] -f <cyber_dockerfile> [-m <build|download>] [-g <us|cn>]"
-    echo "${tab}${prog_name} -h/--help    # Show this message"
+    echo "${TAB}${prog_name} [-l] -f <cyber_dockerfile> [-m <build|download>] [-g <us|cn>]"
+    echo "${TAB}${prog_name} -h/--help    # Show this message"
     echo "E.g.,"
-    echo "${tab}${prog_name} -f cyber.x86_64.dockerfile -m build"
-    echo "${tab}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
+    echo "${TAB}${prog_name} -f cyber.x86_64.dockerfile -m build"
+    echo "${TAB}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
 }
 
 function parse_arguments() {
@@ -119,6 +120,7 @@ echo "=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.==
 
 docker build -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
     --build-arg GEOLOC="${GEOLOC}" \
+    --build-arg BUILD_STAGE="${STAGE}" \
     -f "${DOCKERFILE}" "${CONTEXT}"
 echo "Built new image ${TAG}"
 
