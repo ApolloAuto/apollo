@@ -22,7 +22,7 @@ import sys
 
 from cyber_py3 import cyber
 from cyber_py3 import record
-from cyber.proto import record_pb2
+from cyber.proto import record_py_pb2
 
 
 def print_channel_info(file_path):
@@ -30,7 +30,7 @@ def print_channel_info(file_path):
     channels = freader.get_channellist()
 
     header_msg = freader.get_headerstring()
-    header = record_pb2.Header()
+    header = record_py_pb2.Header()
     header.ParseFromString(header_msg)
 
     print('\n++++++++++++Begin Channel Info Statistics++++++++++++++')

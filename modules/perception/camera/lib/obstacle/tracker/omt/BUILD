@@ -1,17 +1,18 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "omt_proto",
+    name = "omt_cc_proto",
     deps = [
-        ":omt_proto_lib",
+        ":omt_proto",
     ],
 )
 
 proto_library(
-    name = "omt_proto_lib",
+    name = "omt_proto",
     srcs = ["omt.proto"],
 )
 
@@ -33,7 +34,7 @@ cc_library(
     hdrs = ["target.h"],
     deps = [
         ":frame_list",
-        ":omt_proto",
+        ":omt_cc_proto",
         ":track_object",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -75,7 +76,7 @@ cc_library(
     hdrs = ["obstacle_reference.h"],
     deps = [
         ":frame_list",
-        ":omt_proto",
+        ":omt_cc_proto",
         ":target",
         "//cyber",
         "//modules/perception/camera/common",
@@ -84,8 +85,10 @@ cc_library(
 )
 
 py_proto(
-    name = "omt_pb2",
-    src = "omt.proto",
+    name = "omt_py_pb2",
+    deps = [
+        ":omt_proto",
+    ],
 )
 
 cpplint()

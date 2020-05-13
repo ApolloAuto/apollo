@@ -1,17 +1,18 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "darkSCNN_postprocessor_proto",
+    name = "darkSCNN_postprocessor_cc_proto",
     deps = [
-        ":darkSCNN_postprocessor_proto_lib",
+        ":darkSCNN_postprocessor_proto",
     ],
 )
 
 proto_library(
-    name = "darkSCNN_postprocessor_proto_lib",
+    name = "darkSCNN_postprocessor_proto",
     srcs = ["darkSCNN_postprocessor.proto"],
 )
 
@@ -20,7 +21,7 @@ cc_library(
     srcs = ["darkSCNN_lane_postprocessor.cc"],
     hdrs = ["darkSCNN_lane_postprocessor.h"],
     deps = [
-        ":darkSCNN_postprocessor_proto",
+        ":darkSCNN_postprocessor_cc_proto",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -33,7 +34,7 @@ cc_library(
 
 py_proto(
     name = "darkSCNN_postprocessor_pb2",
-    src = "darkSCNN_postprocessor.proto",
+    deps = [":darkSCNN_postprocessor_proto"],
 )
 
 cpplint()

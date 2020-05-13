@@ -1,17 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "trafficlight_tracker_semantic_proto",
+    name = "semantic_cc_proto",
     deps = [
-        ":trafficlight_tracker_semantic_lib",
+        ":semantic_proto",
     ],
 )
 
 proto_library(
-    name = "trafficlight_tracker_semantic_lib",
+    name = "semantic_proto",
     srcs = ["semantic.proto"],
 )
 
@@ -20,16 +22,16 @@ cc_library(
     srcs = ["semantic_decision.cc"],
     hdrs = ["semantic_decision.h"],
     deps = [
-        ":trafficlight_tracker_semantic_proto",
+        ":semantic_cc_proto",
         "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
     ],
     alwayslink = True,
 )
 
-py_proto(
-    name = "semantic_pb2",
-    src = "semantic.proto",
+py_proto_library(
+    name = "semantic_py_pb2",
+    deps = ["semantic_proto"],
 )
 
 cpplint()

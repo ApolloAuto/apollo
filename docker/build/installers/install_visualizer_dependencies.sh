@@ -24,10 +24,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt-get -y update && \
     apt-get -y install \
     freeglut3-dev \
+    mesa-common-dev \
     libglvnd-dev \
     libgl1-mesa-dev \
     libegl1-mesa-dev \
-    libgles2-mesa-dev
+    libgles2-mesa-dev \
+    libconsole-bridge-dev
 
 # See Ref:
 # https://hub.docker.com/r/nvidia/cudagl

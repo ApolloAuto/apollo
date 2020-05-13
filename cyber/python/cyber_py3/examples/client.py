@@ -21,7 +21,7 @@
 import time
 
 from cyber_py3 import cyber
-from cyber.proto.unit_test_pb2 import ChatterBenchmark
+from cyber.proto.unit_test_py_pb2 import ChatterBenchmark
 
 
 def test_client_class():

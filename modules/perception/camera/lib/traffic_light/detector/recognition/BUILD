@@ -1,17 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "trafficlight_detector_recognition_proto",
+    name = "recognition_cc_proto",
     deps = [
-        ":trafficlight_detector_recognition_lib",
+        ":recognition_proto",
     ],
 )
 
 proto_library(
-    name = "trafficlight_detector_recognition_lib",
+    name = "recognition_proto",
     srcs = ["recognition.proto"],
 )
 
@@ -20,7 +22,7 @@ cc_library(
     srcs = ["classify.cc"],
     hdrs = ["classify.h"],
     deps = [
-        ":trafficlight_detector_recognition_proto",
+        ":recognition_cc_proto",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -37,7 +39,7 @@ cc_library(
     hdrs = ["recognition.h"],
     deps = [
         ":classify",
-        ":trafficlight_detector_recognition_proto",
+        ":recognition_cc_proto",
         "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_lib",
@@ -45,9 +47,9 @@ cc_library(
     alwayslink = True,
 )
 
-py_proto(
-    name = "recognition_pb2",
-    src = "recognition.proto",
+py_proto_library(
+    name = "recognition_py_pb2",
+    deps = ["recognition_proto"],
 )
 
 cpplint()

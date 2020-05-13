@@ -217,14 +217,16 @@ new_local_repository(
 #    path = "/usr/include/tensorrt",
 #)
 #
-## YAML-CPP
-#http_archive(
-#    name = "com_github_jbeder_yaml_cpp",
-#    build_file = "third_party/yaml_cpp.BUILD",
-#    strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
-#    url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
-#)
-#
+
+# YAML-CPP
+http_archive(
+    name = "com_github_jbeder_yaml_cpp",
+    build_file = "third_party/yaml_cpp.BUILD",
+    sha256 = "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed",
+    strip_prefix = "yaml-cpp-yaml-cpp-0.6.3",
+    urls = ["https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz"],
+)
+
 http_archive(
     name = "qpOASES",
     build_file = "external/qpOASES.BUILD",
@@ -254,14 +256,14 @@ new_local_repository(
 #    build_file = "third_party/adolc.BUILD",
 #    path = "/usr/local/adolc/include",
 #)
-#
-## Cuda
-#new_local_repository(
-#    name = "cuda",
-#    build_file = "third_party/cuda.BUILD",
-#    path = "/usr/local/cuda",
-#)
-#
+
+# Cuda
+new_local_repository(
+    name = "cuda",
+    build_file = "external/cuda.BUILD",
+    path = "/usr/local/cuda",
+)
+
 ## Local-integ
 #new_local_repository(
 #    name = "local_integ",

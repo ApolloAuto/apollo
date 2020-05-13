@@ -1,17 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "tl_preprocess_proto",
+    name = "tl_preprocess_cc_proto",
     deps = [
-        ":tl_preprocess_proto_lib",
+        ":tl_preprocess_proto",
     ],
 )
 
 proto_library(
-    name = "tl_preprocess_proto_lib",
+    name = "tl_preprocess_proto",
     srcs = ["tl_preprocess.proto"],
 )
 
@@ -58,9 +60,9 @@ cc_library(
     ],
 )
 
-py_proto(
-    name = "tl_preprocess_pb2",
-    src = "tl_preprocess.proto",
+py_proto_library(
+    name = "tl_preprocess_py_pb2",
+    deps = ["tl_preprocess_proto"],
 )
 
 cpplint()

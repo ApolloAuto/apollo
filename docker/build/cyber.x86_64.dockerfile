@@ -13,8 +13,9 @@ COPY installers /tmp/installers
 # Pre-downloaded tarballs
 COPY archive /tmp/archive
 RUN bash /tmp/installers/install_minimal_environment.sh ${GEOLOC}
-RUN bash /tmp/installers/install_cyber_dependencies.sh
 RUN bash /tmp/installers/install_cmake.sh
+RUN bash /tmp/installers/install_lint_perftools.sh
+RUN bash /tmp/installers/install_cyber_dependencies.sh
 RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_fast-rtps.sh

@@ -1,17 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "tracking_feature_proto",
+    name = "tracking_feature_cc_proto",
     deps = [
-        ":tracking_feature_proto_lib",
+        ":tracking_feature_proto",
     ],
 )
 
 proto_library(
-    name = "tracking_feature_proto_lib",
+    name = "tracking_feature_proto",
     srcs = ["tracking_feature.proto"],
 )
 
@@ -20,7 +22,7 @@ cc_library(
     srcs = ["external_feature_extractor.cc"],
     hdrs = ["external_feature_extractor.h"],
     deps = [
-        ":tracking_feature_proto",
+        ":tracking_feature_cc_proto",
         "//cyber/common:file",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -36,7 +38,7 @@ cc_library(
     srcs = ["project_feature.cc"],
     hdrs = ["project_feature.h"],
     deps = [
-        ":tracking_feature_proto",
+        ":tracking_feature_cc_proto",
         "//cyber/common:file",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -51,7 +53,7 @@ cc_library(
     srcs = ["tracking_feat_extractor.cc"],
     hdrs = ["tracking_feat_extractor.h"],
     deps = [
-        ":tracking_feature_proto",
+        ":tracking_feature_cc_proto",
         "//cyber/common:file",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -63,9 +65,11 @@ cc_library(
     ],
 )
 
-py_proto(
-    name = "tracking_feature_pb2",
-    src = "tracking_feature.proto",
+py_proto_library(
+    name = "tracking_feature_py_pb2",
+    deps = [
+        ":tracking_feature_proto",
+    ],
 )
 
 cpplint()

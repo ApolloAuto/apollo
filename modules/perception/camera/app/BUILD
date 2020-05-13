@@ -1,17 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "camera_app_lib_proto",
+    name = "perception_cc_proto",
     deps = [
-        ":camera_app_lib",
+        ":perception_proto",
     ],
 )
 
 proto_library(
-    name = "camera_app_lib",
+    name = "perception_proto",
     srcs = ["perception.proto"],
 )
 
@@ -32,8 +34,8 @@ cc_library(
     srcs = ["obstacle_camera_perception.cc"],
     hdrs = ["obstacle_camera_perception.h"],
     deps = [
-        ":camera_app_lib_proto",
         ":debug_info",
+        ":perception_cc_proto",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -62,7 +64,7 @@ cc_library(
     srcs = ["traffic_light_camera_perception.cc"],
     hdrs = ["traffic_light_camera_perception.h"],
     deps = [
-        ":camera_app_lib_proto",
+        ":perception_cc_proto",
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -79,8 +81,8 @@ cc_library(
     srcs = ["lane_camera_perception.cc"],
     hdrs = ["lane_camera_perception.h"],
     deps = [
-        ":camera_app_lib_proto",
         ":debug_info",
+        ":perception_cc_proto",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -104,7 +106,7 @@ cc_library(
     srcs = ["cipv_camera.cc"],
     hdrs = ["cipv_camera.h"],
     deps = [
-        ":camera_app_lib_proto",
+        ":perception_cc_proto",
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
@@ -120,9 +122,11 @@ cc_library(
     ],
 )
 
-py_proto(
-    name = "perception_pb2",
-    src = "perception.proto",
+py_proto_library(
+    name = "perception_pb_pb2",
+    deps = [
+        ":perception_proto",
+    ],
 )
 
 cpplint()

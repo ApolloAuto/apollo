@@ -53,7 +53,6 @@ apt-get -y update && \
     vim \
     lsof \
     tree \
-    lcov \
     pkg-config \
     python \
     python-dev \
@@ -61,8 +60,6 @@ apt-get -y update && \
     python3 \
     python3-dev \
     python3-pip \
-    shellcheck \
-    cppcheck \
     openssh-client \
     software-properties-common \
     unzip \

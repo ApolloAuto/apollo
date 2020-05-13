@@ -1,17 +1,19 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "denseline_postprocessor_proto",
+    name = "denseline_postprocessor_cc_proto",
     deps = [
-        ":denseline_postprocessor_proto_lib",
+        ":denseline_postprocessor_proto",
     ],
 )
 
 proto_library(
-    name = "denseline_postprocessor_proto_lib",
+    name = "denseline_postprocessor_proto",
     srcs = ["denseline_postprocessor.proto"],
 )
 
@@ -20,7 +22,7 @@ cc_library(
     srcs = ["denseline_lane_postprocessor.cc"],
     hdrs = ["denseline_lane_postprocessor.h"],
     deps = [
-        ":denseline_postprocessor_proto",
+        ":denseline_postprocessor_cc_proto",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -32,9 +34,9 @@ cc_library(
     ],
 )
 
-py_proto(
-    name = "denseline_postprocessor_pb2",
-    src = "denseline_postprocessor.proto",
+py_proto_library(
+    name = "denseline_postprocessor_py_pb2",
+    deps = ["denseline_postprocessor_proto"],
 )
 
 cpplint()

@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,3 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
+# Fail on first error.
+set -e
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+apt-get -y update && \
+    apt-get -y install \
+    cppcheck \
+    shellcheck \
+    lcov
+
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

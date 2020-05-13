@@ -34,13 +34,6 @@ apt-get -y update && \
 python3 -m pip install --no-cache-dir grpcio-tools
 pip2 install --no-cache-dir grpcio-tools
 
-# cyber_visualizer
-# -lGL && #include <GL/gl.h>
-apt-get -y update && \
-    apt-get -y install \
-    libconsole-bridge-dev \
-    mesa-common-dev \
-    libglvnd-dev
 
 # clean up
 apt-get clean && \
