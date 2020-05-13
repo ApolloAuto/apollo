@@ -197,9 +197,14 @@ void ObstaclesPrioritizer::AssignCautionLevel() {
   AssignCautionLevelCruiseKeepLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelCruiseChangeLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelByEgoReferenceLine(*ego_vehicle, obstacles_container);
-
-  // Ranking Caution Obstacles
-  RankingCautionLevelObstacles(*ego_vehicle, obstacles_container);
+  AssignCautionLevelPedestrianByEgoReferenceLine(*ego_vehicle,
+                                                 obstacles_container);
+  if (FLAGS_enable_all_pedestrian_caution_in_front) {
+    AssignCautionLevelPedestrianInFront(*ego_vehicle, obstacles_container);
+  }
+  if (FLAGS_enable_rank_caution_obstacles) {
+    RankingCautionLevelObstacles(*ego_vehicle, obstacles_container);
+  }
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelInJunction(
@@ -366,8 +371,17 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
       break;
     }
   }
+}
 
-  // finally loop through all pedestrian to AssignCaution
+void ObstaclesPrioritizer::AssignCautionLevelPedestrianByEgoReferenceLine(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
+  ADCTrajectoryContainer* adc_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  if (adc_trajectory_container == nullptr) {
+    AERROR << "adc_trajectory_container is nullptr";
+    return;
+  }
   for (const int obstacle_id :
        obstacles_container->curr_frame_movable_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
@@ -420,6 +434,33 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
         }
       }
     }
+  }
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelPedestrianInFront(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
+  const Point3D& ego_position = ego_vehicle.latest_feature().position();
+  double ego_heading = ego_vehicle.latest_feature().theta();
+  const auto& obstacle_ids =
+      obstacles_container->curr_frame_movable_obstacle_ids();
+  for (const int obstacle_id : obstacle_ids) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (!obstacle_ptr->IsPedestrian() ||
+        obstacle_ptr->history_size() == 0) {
+      continue;
+    }
+    const Feature& obs_feature = obstacle_ptr->latest_feature();
+    double obs_x = obs_feature.position().x();
+    double obs_y = obs_feature.position().y();
+    double diff_x = obs_x - ego_position.x();
+    double diff_y = obs_y - ego_position.y();
+    double inner_prod = std::cos(ego_heading) * diff_x +
+                        std::sin(ego_heading) * diff_y;
+    if (inner_prod < 0.0) {
+      continue;
+    }
+    SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                           obstacle_ptr);
   }
 }
 

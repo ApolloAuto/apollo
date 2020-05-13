@@ -48,6 +48,12 @@ class ObstaclesPrioritizer {
   void AssignCautionLevelByEgoReferenceLine(
       const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
 
+  void AssignCautionLevelPedestrianByEgoReferenceLine(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
+
+  void AssignCautionLevelPedestrianInFront(
+      const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
+
   void RankingCautionLevelObstacles(const Obstacle& ego_vehicle,
                                     ObstaclesContainer* obstacles_container);
 
