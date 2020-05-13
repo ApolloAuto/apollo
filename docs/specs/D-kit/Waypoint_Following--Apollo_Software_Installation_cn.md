@@ -139,6 +139,8 @@ Apollo系统安装
 
 ## 工控机软件系统安装
 
+![tip_icon](../images/tip_icon.png) 在本步骤中，若工控机已经安装了Ubuntu18.04LTS操作系统且在当前账户的home目录下有apollo文件夹，请直接移步至文末的运行DreamView部分，检查apollo是否可以直接运行；否则，请按照下述步骤一步一步进行工控机软件系统的安装。
+
 工控机软件系统安装包括计算机操作系统的安装，硬件驱动的安装，应用软件的安装和Apollo软件系统的安装。
 
 ### 安装Ubuntu Linux
@@ -373,7 +375,15 @@ bash apollo.sh build
 
 ### 运行DreamView
 
-a.启动apollo
+a.若您已经在docker环境中，请忽略此步骤，否则请执行以下命令进入docker环境：
+
+````
+cd ~/apollo
+bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_into.sh
+````
+
+b.启动apollo
 在终端输入以下命令：
 
 ```
@@ -398,15 +408,17 @@ http://localhost:8888
 
 可以访问DreamView。
 
-b.回放数据包
+c.回放数据包
 在终端输入以下命令下载数据包：
 
 ```
 python docs/demo_guide/rosbag_helper.py demo_3.5.record
 ```
 
-输入以下命令可以回放数据包，在浏览器DreamView中可以看到回放画面。
+输入以下命令可以回放数据包，在浏览器DreamView中应该可以看到回放画面。
 
 ```
 cyber_recorder play -l -f demo_3.5.record
 ```
+
+如果成功在浏览器中看到回放画面，则表明您的apollo系统已经部署成功！
