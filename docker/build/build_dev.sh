@@ -128,4 +128,3 @@ if [[ "$LOCAL_DEV_FLAG" == "yes" ]]; then
     docker image tag "${TAG}" "${LOCAL_DEV_TAG}"
     echo "Also tagged as ${LOCAL_DEV_TAG}"
 fi
-
