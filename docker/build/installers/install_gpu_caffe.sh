@@ -21,26 +21,67 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-apt-get update -y && apt-get install -y \
-    libatlas-base-dev \
-    libflann-dev \
-    libhdf5-serial-dev \
-    libicu-dev \
-    liblmdb-dev \
-    libopenblas-dev \
-    libopencv-dev \
-    libopenni-dev \
-    libqhull-dev \
-    libsnappy-dev \
-    libvtk5-dev \
-    libvtk5-qt4-dev \
-    mpi-default-dev
+# http://caffe.berkeleyvision.org/install_apt.html
+# apt-get -y update && \
+#    apt-get -y install \
+#    caffe-cuda && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
 
-wget https://apollocache.blob.core.windows.net/apollo-docker/caffe_x86.tar.gz
-tar xzf caffe_x86.tar.gz
-mv caffe_x86/output-GPU/include/caffe /usr/include/
-mv caffe_x86/output-GPU/lib/* /usr/lib/x86_64-linux-gnu/
+#Note(storypku): Build Caffe from source
+apt-get -y update && \
+    apt-get -y install \
+    libleveldb-dev \
+    libsnappy-dev \
+    libopencv-dev \
+    libhdf5-serial-dev \
+    libboost-all-dev \
+    liblmdb-dev \
+    libatlas-base-dev \
+    libopenblas-dev \
+
+# And...
+# protobuf/gflags/glog
+
+## packages not used in building
+# libflann-dev \
+# libopenni-dev \
+# libqhull-dev \
+# mpi-default-dev
+# libvtk6-dev
+# libvtk6-qt-dev
+
+# BLAS: install ATLAS by sudo apt-get install libatlas-base-dev or install
+# OpenBLAS by sudo apt-get install libopenblas-dev or MKL for better CPU performance.
+
+. /tmp/installers/installer_base.sh
+
+VERSION="1.0"
+PKG_NAME="caffe-1.0.tar.gz"
+CHECKSUM="71d3c9eb8a183150f965a465824d01fe82826c22505f7aa314f700ace03fa77f"
+DOWNLOAD_LINK="https://github.com/BVLC/caffe/archive/1.0.tar.gz"
+
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf "${PKG_NAME}"
+
+MY_DEST_DIR=/usr/local/caffe
+
+#TODO(storypku): More GPU arch support (sm_61 on my GTX 1070)
+# And...        -DUSE_NCCL=ON
+pushd caffe-${VERSION}
+    mkdir build && cd build
+    cmake .. \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_python=OFF \
+        -DBUILD_docs=OFF \
+        -DCMAKE_INSTALL_PREFIX=${MY_DEST_DIR}
+    make -j$(nproc)
+    make install
+popd
+
+rm -rf "${MY_DEST_DIR}/{bin,python}"
 
 # Clean up.
+rm -rf ${PKG_NAME} caffe-${VERSION}
 apt-get clean && rm -rf /var/lib/apt/lists/*
-rm -fr caffe_x86.tar.gz caffe_x86

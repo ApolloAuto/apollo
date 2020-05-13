@@ -28,9 +28,7 @@ apt-get -y update && \
 
 ## Other dependencies
 # gflags/glog/protobuf
-# absl, grpc, gtest
-
-# tinyxml2
+# absl, grpc, gtest, cuda
 # json?
 # yaml-cpp
 

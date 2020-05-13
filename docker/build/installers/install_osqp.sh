@@ -20,17 +20,22 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
 
 ARCH=$(uname -m)
 
 if [ "$ARCH" == "x86_64" ]; then
-  wget https://github.com/ApolloAuto/osqp-contrib/archive/master.zip
-  unzip master.zip
+  PKG_NAME="osqp-contrib-master.zip"
+  CHECKSUM="3e431342bbe3bd578f1ef768e8dff1f89d2809d8195aa15f8ed72628ca92f6d8"
+  DOWNLOAD_LINK="https://github.com/ApolloAuto/osqp-contrib/archive/master.zip"
+  download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+  unzip ${PKG_NAME}
   pushd osqp-contrib-master
   mkdir -p /usr/local/include/osqp
   cp -r osqp/include /usr/local/include/osqp/
   cp osqp/libosqp.so /usr/local/lib/
   popd
+  rm -rf libosqp-contrib-master ${PKG_NAME}
 elif [ "$ARCH" == "aarch64" ]; then
   BUILD=$1
   shift
