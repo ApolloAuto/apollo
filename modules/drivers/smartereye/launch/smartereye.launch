@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>smartereye</name>
+        <dag_conf>/apollo/modules/drivers/smartereye/dag/smartereye.dag</dag_conf>
+        <process_name>smartereye</process_name>
+    </module>
+</cyber>
