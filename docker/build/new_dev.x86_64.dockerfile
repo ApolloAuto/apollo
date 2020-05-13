@@ -12,5 +12,3 @@ RUN bash /tmp/installers/install_geo_adjustment.sh ${GEOLOC}
 COPY archive /tmp/archive
 RUN bash /tmp/installers/install_tensorrt.sh
 RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
-
-
