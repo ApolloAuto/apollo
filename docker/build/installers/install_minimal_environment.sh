@@ -54,9 +54,6 @@ apt-get -y update && \
     lsof \
     tree \
     pkg-config \
-    python \
-    python-dev \
-    python-pip \
     python3 \
     python3-dev \
     python3-pip \
@@ -72,16 +69,16 @@ apt-get -y update && \
 if [[ "$GEOLOC" == "cn" ]]; then
     # Mirror from Tsinghua Univ.
     PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
-    pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
-    pip config set global.index-url "$PYPI_MIRROR"
+    #pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
+    #pip config set global.index-url "$PYPI_MIRROR"
     python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
     python3 -m pip config set global.index-url "$PYPI_MIRROR"
 else
-    pip install --no-cache-dir pip -U
+    #pip install --no-cache-dir pip -U
     python3 -m pip install --no-cache-dir pip -U
 fi
 
-pip install --no-cache-dir setuptools
+#pip install --no-cache-dir setuptools
 python3 -m pip install --no-cache-dir setuptools
 
 # Clean up.
