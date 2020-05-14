@@ -20,24 +20,33 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/feature_output.h"
+#include "modules/planning/common/message_process.h"
 #include "modules/planning/common/util/util.h"
-#include "modules/planning/pipeline/feature_generator.h"
 #include "modules/prediction/util/data_extraction.h"
-
-DEFINE_string(
-    planning_source_dirs, "",
-    "a list of source files or directories for offline mode. "
-    "The items need to be separated by colon ':'. ");
 
 namespace apollo {
 namespace planning {
 
 void GenerateLearningData() {
   AINFO << "map_dir: " << FLAGS_map_dir;
+  if (FLAGS_planning_offline_bags.empty()) {
+    return;
+  }
+
+  if (!FeatureOutput::Ready()) {
+    AERROR << "Feature output is not ready.";
+    return;
+  }
+
+  MessageProcess message_process;
+  if (!message_process.Init()) {
+    return;
+  }
+
   const std::vector<std::string> inputs =
-      absl::StrSplit(FLAGS_planning_source_dirs, ':');
-  FeatureGenerator feature_generator;
-  feature_generator.Init();
+      absl::StrSplit(FLAGS_planning_offline_bags, ':');
   for (const auto& input : inputs) {
     std::vector<std::string> offline_bags;
     util::GetFilesByPath(boost::filesystem::path(input), &offline_bags);
@@ -47,11 +56,11 @@ void GenerateLearningData() {
     for (std::size_t i = 0; i < offline_bags.size(); ++i) {
       AINFO << "\tProcessing: [ " << i + 1 << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
-      feature_generator.ProcessOfflineData(offline_bags[i]);
-      feature_generator.WriteRemainderData();
+      message_process.ProcessOfflineData(offline_bags[i]);
+      FeatureOutput::WriteRemainderiLearningData(offline_bags[i]);
     }
   }
-  feature_generator.Close();
+  message_process.Close();
 }
 
 }  // namespace planning

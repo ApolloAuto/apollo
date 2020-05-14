@@ -73,8 +73,9 @@ class Scenario {
     return true;
   }
 
-  ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
-                         Frame* frame);
+  virtual ScenarioStatus Process(
+      const common::TrajectoryPoint& planning_init_point,
+      Frame* frame);
 
   const ScenarioStatus& GetStatus() const { return scenario_status_; }
 

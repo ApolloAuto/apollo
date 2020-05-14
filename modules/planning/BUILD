@@ -19,6 +19,7 @@ cc_library(
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:history",
+        "//modules/planning/common:message_process",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
     ],

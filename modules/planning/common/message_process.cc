@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/pipeline/feature_generator.h"
+#include "modules/planning/common/message_process.h"
 
 #include <cmath>
 #include <memory>
@@ -23,25 +23,15 @@
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_lane.pb.h"
+#include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/math_util.h"
-
-DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
-              "Prefix of files to store learning_data_frame data");
-DEFINE_int32(planning_freq, 10, "frequence of planning message");
-DEFINE_int32(learning_data_frame_num_per_file, 100,
-             "number of learning_data_frame to write out in one data file.");
-DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
-             "time sec (second) of history trajectory points for a obstacle");
-DEFINE_bool(enable_binary_learning_data, true,
-            "True to generate protobuf binary data file.");
-DEFINE_bool(enable_overlap_tag, true,
-            "True to add overlap tag to planning_tag");
 
 namespace apollo {
 namespace planning {
@@ -65,82 +55,85 @@ using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
-void FeatureGenerator::Init() {
-  log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
-                 std::ios_base::out | std::ios_base::app);
-  start_time_ = std::chrono::system_clock::now();
-  std::time_t now = std::time(nullptr);
-  log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
-            << "Local date and time: "
-            << std::asctime(std::localtime(&now));
 
-  map_name_ = "sunnyvale_with_two_offices";
+bool MessageProcess::Init() {
   map_m_["Sunnyvale"] = "sunnyvale";
   map_m_["Sunnyvale Big Loop"] = "sunnyvale_big_loop";
   map_m_["Sunnyvale With Two Offices"] = "sunnyvale_with_two_offices";
   map_m_["Gomentum"] = "gomentum";
   map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
   map_m_["San Mateo"] = "san_mateo";
-}
 
-void FeatureGenerator::Close() {
-  std::ostringstream msg;
-  msg << "Total learning_data_frame number:" << total_learning_data_frame_num_;
-  AINFO << msg.str();
-  log_file_ << msg.str() << std::endl;
-  auto end_time = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end_time - start_time_;
-  log_file_ << "Time elapsed(sec): " << elapsed_seconds.count()
-            << std::endl << std::endl;
-  log_file_.close();
-}
+  map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
 
-void FeatureGenerator::WriteOutLearningData(
-    const LearningData& learning_data,
-    const int learning_data_file_index) {
-  if (record_file_name_.empty()) {
-    record_file_name_ = "00000";
+  if (FLAGS_planning_offline_mode == 2) {
+    // offline process logging
+    log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
+                   std::ios_base::out | std::ios_base::app);
+    start_time_ = std::chrono::system_clock::now();
+    std::time_t now = std::time(nullptr);
+    log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
+              << "Local date and time: "
+              << std::asctime(std::localtime(&now));
   }
-  const std::string file_name = absl::StrCat(
-      FLAGS_planning_data_dir, "/", record_file_name_, ".",
-      learning_data_file_index, ".bin");
-  if (FLAGS_enable_binary_learning_data) {
-    cyber::common::SetProtoToBinaryFile(learning_data, file_name);
-    // cyber::common::SetProtoToASCIIFile(learning_data, file_name + ".txt");
-  } else {
-    cyber::common::SetProtoToASCIIFile(learning_data, file_name);
-  }
-  learning_data_.Clear();
-  ++learning_data_file_index_;
+  return true;
 }
 
-void FeatureGenerator::WriteRemainderData() {
-  if (learning_data_.learning_data_size() > 0) {
-    WriteOutLearningData(learning_data_, learning_data_file_index_);
+void MessageProcess::Close() {
+  FeatureOutput::Clear();
+
+  if (FLAGS_planning_offline_mode == 2) {
+    // offline process logging
+    std::ostringstream msg;
+    msg << "Total learning_data_frame number: "
+        << total_learning_data_frame_num_;
+    AINFO << msg.str();
+    log_file_ << msg.str() << std::endl;
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end_time - start_time_;
+    log_file_ << "Time elapsed(sec): " << elapsed_seconds.count()
+              << std::endl << std::endl;
+    log_file_.close();
   }
-  std::ostringstream msg;
-  msg << "record_file[" << record_file_name_
-      << "] frame_num[" << total_learning_data_frame_num_ << "]";
-  AINFO << msg.str();
-  log_file_ << msg.str() << std::endl;
 }
 
-void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
+void MessageProcess::OnChassis(const apollo::canbus::Chassis& chassis) {
+  chassis_feature_.set_message_timestamp_sec(chassis.header().timestamp_sec());
+  chassis_feature_.set_speed_mps(chassis.speed_mps());
+  chassis_feature_.set_throttle_percentage(chassis.throttle_percentage());
+  chassis_feature_.set_brake_percentage(chassis.brake_percentage());
+  chassis_feature_.set_steering_percentage(chassis.steering_percentage());
+  chassis_feature_.set_gear_location(chassis.gear_location());
+}
+
+void MessageProcess::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
+  const std::string& current_map = hmi_status.current_map();
+  if (map_m_.count(current_map) > 0) {
+    map_name_ = map_m_[current_map];
+    const std::string& map_base_folder = "/apollo/modules/map/data/";
+    FLAGS_map_dir = map_base_folder + map_name_;
+  }
+}
+
+void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   static double last_localization_message_timestamp_sec = 0.0;
   if (last_localization_message_timestamp_sec == 0.0) {
     last_localization_message_timestamp_sec = le.header().timestamp_sec();
   }
   const double time_diff =
       le.header().timestamp_sec() - last_localization_message_timestamp_sec;
-  if (time_diff < 1.0 / FLAGS_planning_freq) {
+  if (time_diff < 1.0 / FLAGS_planning_loop_rate) {
     return;
-  } else if (time_diff >= (1.0 * 2 / FLAGS_planning_freq)) {
-    std::ostringstream msg;
-    msg << "missing localization too long: time_stamp["
-        << le.header().timestamp_sec()
-        << "] time_diff[" << time_diff << "]";
-    AERROR << msg.str();
-    log_file_ << msg.str() << std::endl;
+  }
+  if (time_diff >= (1.0 * 2 / FLAGS_planning_loop_rate)) {
+    if (FLAGS_planning_offline_mode == 2) {
+      std::ostringstream msg;
+      msg << "missing localization too long: time_stamp["
+          << le.header().timestamp_sec()
+          << "] time_diff[" << time_diff << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
   }
   last_localization_message_timestamp_sec = le.header().timestamp_sec();
   localizations_.push_back(le);
@@ -154,35 +147,20 @@ void FeatureGenerator::OnLocalization(const LocalizationEstimate& le) {
     localizations_.pop_front();
   }
 
+  ADEBUG << "OnLocalization: size[" << localizations_.size()
+         << "] time_diff["
+         << localizations_.back().header().timestamp_sec() -
+            localizations_.front().header().timestamp_sec() << "]";
+
   // generate one frame data
-  GenerateLearningDataFrame();
+  LearningDataFrame learning_data_frame;
+  GenerateLearningDataFrame(&learning_data_frame);
 
-  // write frames into a file
-  if (learning_data_.learning_data_size() >=
-      FLAGS_learning_data_frame_num_per_file) {
-    WriteOutLearningData(learning_data_, learning_data_file_index_);
-  }
+  // output
+  FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
 }
 
-void FeatureGenerator::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
-  const std::string& current_map = hmi_status.current_map();
-  if (map_m_.count(current_map) > 0) {
-    map_name_ = map_m_[current_map];
-    const std::string& map_base_folder = "/apollo/modules/map/data/";
-    FLAGS_map_dir = map_base_folder + map_name_;
-  }
-}
-
-void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
-  chassis_feature_.set_message_timestamp_sec(chassis.header().timestamp_sec());
-  chassis_feature_.set_speed_mps(chassis.speed_mps());
-  chassis_feature_.set_throttle_percentage(chassis.throttle_percentage());
-  chassis_feature_.set_brake_percentage(chassis.brake_percentage());
-  chassis_feature_.set_steering_percentage(chassis.steering_percentage());
-  chassis_feature_.set_gear_location(chassis.gear_location());
-}
-
-void FeatureGenerator::OnPrediction(
+void MessageProcess::OnPrediction(
     const PredictionObstacles& prediction_obstacles) {
   prediction_obstacles_map_.clear();
   for (int i = 0; i < prediction_obstacles.prediction_obstacle_size(); ++i) {
@@ -230,17 +208,18 @@ void FeatureGenerator::OnPrediction(
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
       // abnormal perception data: time_diff <= 0
-      const double time_diff = obstacle_trajectory_point.timestamp_sec() -
-          obstacle_history_map_[m.first].back().timestamp_sec();
-      std::ostringstream msg;
-      msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
-          << obstacle_history_map_[m.first].back().timestamp_sec()
-          << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
-          << "] time_diff [" << time_diff << "]";
-      AERROR << msg.str();
-      log_file_ << msg.str() << std::endl;
+      if (FLAGS_planning_offline_mode == 2) {
+        const double time_diff = obstacle_trajectory_point.timestamp_sec() -
+            obstacle_history_map_[m.first].back().timestamp_sec();
+        std::ostringstream msg;
+        msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
+            << obstacle_history_map_[m.first].back().timestamp_sec()
+            << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
+            << "] time_diff [" << time_diff << "]";
+        AERROR << msg.str();
+        log_file_ << msg.str() << std::endl;
+      }
     }
-
     auto& obstacle_history = obstacle_history_map_[m.first];
     while (!obstacle_history.empty()) {
       const double time_distance = obstacle_history.back().timestamp_sec() -
@@ -253,7 +232,26 @@ void FeatureGenerator::OnPrediction(
   }
 }
 
-void FeatureGenerator::OnTrafficLightDetection(
+void MessageProcess::OnRoutingResponse(
+  const apollo::routing::RoutingResponse& routing_response) {
+  ADEBUG << "routing_response received at frame["
+        << total_learning_data_frame_num_ << "]";
+  routing_lane_segment_.clear();
+  for (int i = 0; i < routing_response.road_size(); ++i) {
+    for (int j = 0; j < routing_response.road(i).passage_size(); ++j) {
+      for (int k = 0; k < routing_response.road(i).passage(j).segment_size();
+          ++k) {
+        const auto& lane_segment =
+            routing_response.road(i).passage(j).segment(k);
+        routing_lane_segment_.push_back(
+            std::make_pair(lane_segment.id(),
+                lane_segment.end_s() - lane_segment.start_s()));
+      }
+    }
+  }
+}
+
+void MessageProcess::OnTrafficLightDetection(
     const TrafficLightDetection& traffic_light_detection) {
   // AINFO << "traffic_light_detection received at frame["
   //      << total_learning_data_frame_num_ << "]";
@@ -274,27 +272,53 @@ void FeatureGenerator::OnTrafficLightDetection(
   }
 }
 
+void MessageProcess::ProcessOfflineData(const std::string& record_file) {
+  log_file_ << "Processing: " << record_file << std::endl;
+  record_file_ = record_file;
 
-void FeatureGenerator::OnRoutingResponse(
-  const apollo::routing::RoutingResponse& routing_response) {
-  ADEBUG << "routing_response received at frame["
-        << total_learning_data_frame_num_ << "]";
-  routing_lane_segment_.clear();
-  for (int i = 0; i < routing_response.road_size(); ++i) {
-    for (int j = 0; j < routing_response.road(i).passage_size(); ++j) {
-      for (int k = 0; k < routing_response.road(i).passage(j).segment_size();
-          ++k) {
-        const auto& lane_segment =
-            routing_response.road(i).passage(j).segment(k);
-        routing_lane_segment_.push_back(
-            std::make_pair(lane_segment.id(),
-                lane_segment.end_s() - lane_segment.start_s()));
+  RecordReader reader(record_file);
+  if (!reader.IsValid()) {
+    AERROR << "Fail to open " << record_file;
+    return;
+  }
+
+  RecordMessage message;
+  while (reader.ReadMessage(&message)) {
+    if (message.channel_name == FLAGS_chassis_topic) {
+      Chassis chassis;
+      if (chassis.ParseFromString(message.content)) {
+        OnChassis(chassis);
+      }
+    } else if (message.channel_name == FLAGS_localization_topic) {
+      LocalizationEstimate localization;
+      if (localization.ParseFromString(message.content)) {
+        OnLocalization(localization);
+      }
+    } else if (message.channel_name == FLAGS_hmi_status_topic) {
+      HMIStatus hmi_status;
+      if (hmi_status.ParseFromString(message.content)) {
+        OnHMIStatus(hmi_status);
+      }
+    } else if (message.channel_name == FLAGS_prediction_topic) {
+      PredictionObstacles prediction_obstacles;
+      if (prediction_obstacles.ParseFromString(message.content)) {
+        OnPrediction(prediction_obstacles);
+      }
+    } else if (message.channel_name == FLAGS_routing_response_topic) {
+      RoutingResponse routing_response;
+      if (routing_response.ParseFromString(message.content)) {
+        OnRoutingResponse(routing_response);
+      }
+    } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
+      TrafficLightDetection traffic_light_detection;
+      if (traffic_light_detection.ParseFromString(message.content)) {
+        OnTrafficLightDetection(traffic_light_detection);
       }
     }
   }
 }
 
-int FeatureGenerator::GetADCCurrentRoutingIndex() {
+int MessageProcess::GetADCCurrentRoutingIndex() {
   if (localizations_.empty()) return -1;
 
   static constexpr double kRadius = 4.0;
@@ -313,7 +337,7 @@ int FeatureGenerator::GetADCCurrentRoutingIndex() {
   return -1;
 }
 
-apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetCurrentLane(
+apollo::hdmap::LaneInfoConstPtr MessageProcess::GetCurrentLane(
     const apollo::common::PointENU& position) {
   constexpr double kRadiusUnit = 0.1;
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
@@ -335,7 +359,7 @@ apollo::hdmap::LaneInfoConstPtr FeatureGenerator::GetCurrentLane(
   return nullptr;
 }
 
-int FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
+int MessageProcess::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
   CHECK_NOTNULL(adc_curr_info);
   if (localizations_.empty()) return -1;
 
@@ -354,7 +378,7 @@ int FeatureGenerator::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
   return 1;
 }
 
-void FeatureGenerator::GenerateObstacleTrajectory(
+void MessageProcess::GenerateObstacleTrajectory(
     const int frame_num,
     const int obstacle_id,
     const ADCCurrentInfo& adc_curr_info,
@@ -422,7 +446,7 @@ void FeatureGenerator::GenerateObstacleTrajectory(
   }
 }
 
-void FeatureGenerator::GenerateObstaclePrediction(
+void MessageProcess::GenerateObstaclePrediction(
     const PredictionObstacle& prediction_obstacle,
     const ADCCurrentInfo& adc_curr_info,
     ObstacleFeature* obstacle_feature) {
@@ -483,15 +507,17 @@ void FeatureGenerator::GenerateObstaclePrediction(
   }
 }
 
-void FeatureGenerator::GenerateObstacleFeature(
+void MessageProcess::GenerateObstacleFeature(
     LearningDataFrame* learning_data_frame) {
   ADCCurrentInfo adc_curr_info;
   if (GetADCCurrentInfo(&adc_curr_info) == -1) {
-    std::ostringstream msg;
-    msg << "fail to get ADC current info: frame_num["
-        << learning_data_frame->frame_num() << "]";
-    AERROR << msg.str();
-    log_file_ << msg.str() << std::endl;
+    if (FLAGS_planning_offline_mode == 2) {
+      std::ostringstream msg;
+      msg << "fail to get ADC current info: frame_num["
+          << learning_data_frame->frame_num() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
     return;
   }
 
@@ -515,17 +541,19 @@ void FeatureGenerator::GenerateObstacleFeature(
   }
 }
 
-void FeatureGenerator::GenerateRoutingFeature(
+void MessageProcess::GenerateRoutingFeature(
     const int routing_index,
     LearningDataFrame* learning_data_frame) {
   auto routing = learning_data_frame->mutable_routing();
   routing->Clear();
   if (routing_lane_segment_.empty()) {
-    std::ostringstream msg;
-    msg << "no routing. frame_num["
-        << learning_data_frame->frame_num() << "]";
-    AERROR << msg.str();
-    log_file_ << msg.str() << std::endl;
+    if (FLAGS_planning_offline_mode == 2) {
+      std::ostringstream msg;
+      msg << "no routing. frame_num["
+          << learning_data_frame->frame_num() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
     return;
   }
   for (const auto& lane_segment : routing_lane_segment_) {
@@ -533,11 +561,13 @@ void FeatureGenerator::GenerateRoutingFeature(
   }
 
   if (routing_index < 0) {
-    std::ostringstream msg;
-    msg << "no LOCAL routing. frame_num["
-        << learning_data_frame->frame_num() << "]";
-    AERROR << msg.str();
-    log_file_ << msg.str() << std::endl;
+    if (FLAGS_planning_offline_mode == 2) {
+      std::ostringstream msg;
+      msg << "no LOCAL routing. frame_num["
+          << learning_data_frame->frame_num() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
     return;
   }
 
@@ -563,18 +593,20 @@ void FeatureGenerator::GenerateRoutingFeature(
   }
 
   if (local_routing_lane_ids.empty()) {
-    std::ostringstream msg;
-    msg << "no LOCAL routing. frame_num["
-        << learning_data_frame->frame_num() << "]";
-    AERROR << msg.str();
-    log_file_ << msg.str() << std::endl;
+    if (FLAGS_planning_offline_mode == 2) {
+      std::ostringstream msg;
+      msg << "no LOCAL routing. frame_num["
+          << learning_data_frame->frame_num() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
   }
   for (const auto& lane_id : local_routing_lane_ids) {
     routing->add_local_routing_lane_id(lane_id);
   }
 }
 
-void FeatureGenerator::GenerateTrafficLightDetectionFeature(
+void MessageProcess::GenerateTrafficLightDetectionFeature(
     LearningDataFrame* learning_data_frame) {
   auto traffic_light_detection =
       learning_data_frame->mutable_traffic_light_detection();
@@ -587,7 +619,7 @@ void FeatureGenerator::GenerateTrafficLightDetectionFeature(
   }
 }
 
-void FeatureGenerator::GenerateADCTrajectoryPoints(
+void MessageProcess::GenerateADCTrajectoryPoints(
     const std::list<LocalizationEstimate>& localizations,
     LearningDataFrame* learning_data_frame) {
   std::vector<LocalizationEstimate> localization_samples;
@@ -650,7 +682,7 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     }
     planning_tag->set_lane_turn(lane_turn);
 
-    if (FLAGS_enable_overlap_tag) {
+    if (FLAGS_planning_offline_mode == 2) {
       // planning_tag: overlap tags
       double point_distance = 0.0;
       if (trajectory_point_index > 0) {
@@ -791,21 +823,23 @@ void FeatureGenerator::GenerateADCTrajectoryPoints(
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
   if (adc_trajectory_points.size() <= 5) {
-    std::ostringstream msg;
-    msg << "too few adc_trajectory_points: frame_num["
-        << learning_data_frame->frame_num()
-        << "] size[" << adc_trajectory_points.size() << "]";
-    AERROR << msg.str();
-    log_file_ << msg.str() << std::endl;
+    if (FLAGS_planning_offline_mode == 2) {
+      std::ostringstream msg;
+      msg << "too few adc_trajectory_points: frame_num["
+          << learning_data_frame->frame_num()
+          << "] size[" << adc_trajectory_points.size() << "]";
+      AERROR << msg.str();
+      log_file_ << msg.str() << std::endl;
+    }
   }
   // AINFO << "number of ADC trajectory points in one frame: "
   //      << trajectory_point_index;
 }
 
-void FeatureGenerator::GenerateLearningDataFrame() {
+void MessageProcess::GenerateLearningDataFrame(
+    LearningDataFrame* learning_data_frame) {
   const int routing_index = GetADCCurrentRoutingIndex();
 
-  auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
   learning_data_frame->set_message_timestamp_sec(
       localizations_.back().header().timestamp_sec());
@@ -841,53 +875,6 @@ void FeatureGenerator::GenerateLearningDataFrame() {
 
   // add trajectory_points
   GenerateADCTrajectoryPoints(localizations_, learning_data_frame);
-}
-
-void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
-  log_file_ << "Processing: " << record_filename << std::endl;
-  record_file_name_ =
-      record_filename.substr(record_filename.find_last_of("/") + 1);
-
-  RecordReader reader(record_filename);
-  if (!reader.IsValid()) {
-    AERROR << "Fail to open " << record_filename;
-    return;
-  }
-
-  RecordMessage message;
-  while (reader.ReadMessage(&message)) {
-    if (message.channel_name == FLAGS_chassis_topic) {
-      Chassis chassis;
-      if (chassis.ParseFromString(message.content)) {
-        OnChassis(chassis);
-      }
-    } else if (message.channel_name == FLAGS_localization_topic) {
-      LocalizationEstimate localization;
-      if (localization.ParseFromString(message.content)) {
-        OnLocalization(localization);
-      }
-    } else if (message.channel_name == FLAGS_hmi_status_topic) {
-      HMIStatus hmi_status;
-      if (hmi_status.ParseFromString(message.content)) {
-        OnHMIStatus(hmi_status);
-      }
-    } else if (message.channel_name == FLAGS_prediction_topic) {
-      PredictionObstacles prediction_obstacles;
-      if (prediction_obstacles.ParseFromString(message.content)) {
-        OnPrediction(prediction_obstacles);
-      }
-    } else if (message.channel_name == FLAGS_routing_response_topic) {
-      RoutingResponse routing_response;
-      if (routing_response.ParseFromString(message.content)) {
-        OnRoutingResponse(routing_response);
-      }
-    } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
-      TrafficLightDetection traffic_light_detection;
-      if (traffic_light_detection.ParseFromString(message.content)) {
-        OnTrafficLightDetection(traffic_light_detection);
-      }
-    }
-  }
 }
 
 }  // namespace planning
