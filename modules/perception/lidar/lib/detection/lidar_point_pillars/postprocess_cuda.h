@@ -74,13 +74,13 @@ class PostprocessCuda {
    * @param[in] float_max The maximum float value
    * @param[in] num_anchor_x_inds Number of x-indexes for anchors
    * @param[in] num_anchor_y_inds Number of y-indexes for anchors
+   * @param[in] num_class Number of object's classes
    * @param[in] num_anchor_r_inds Number of rotation-indexes for anchors
    * @param[in] score_threshold Score threshold for filtering output
    * @param[in] num_threads Number of threads when launching cuda kernel
    * @param[in] nms_overlap_threshold IOU threshold for NMS
    * @param[in] num_box_corners Number of box's corner
    * @param[in] num_output_box_feature Number of output box's feature
-   * @param[in] num_class Number of object's classes
    * @details Captital variables never change after the compile, non-capital
    * variables could be changed through rosparam
    */

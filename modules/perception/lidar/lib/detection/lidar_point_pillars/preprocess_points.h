@@ -48,6 +48,7 @@ class PreprocessPoints {
   friend class TestClass;
   const int max_num_pillars_;
   const int max_num_points_per_pillar_;
+  const int num_point_feature_;
   const int grid_x_size_;
   const int grid_y_size_;
   const int grid_z_size_;
@@ -65,6 +66,7 @@ class PreprocessPoints {
    * @brief Constructor
    * @param[in] max_num_pillars Maximum number of pillars
    * @param[in] max_points_per_pillar Maximum number of points per pillar
+   * @param[in] num_point_feature Number of features in a point
    * @param[in] grid_x_size Number of pillars in x-coordinate
    * @param[in] grid_y_size Number of pillars in y-coordinate
    * @param[in] grid_z_size Number of pillars in z-coordinate
@@ -79,12 +81,12 @@ class PreprocessPoints {
    * @details Captital variables never change after the compile
    */
   PreprocessPoints(const int max_num_pillars, const int max_points_per_pillar,
-                   const int grid_x_size, const int grid_y_size,
-                   const int grid_z_size, const float pillar_x_size,
-                   const float pillar_y_size, const float pillar_z_size,
-                   const float min_x_range, const float min_y_range,
-                   const float min_z_range, const int num_inds_for_scan,
-                   const int num_box_corners);
+                   const int num_point_feature, const int grid_x_size,
+                   const int grid_y_size, const int grid_z_size,
+                   const float pillar_x_size, const float pillar_y_size,
+                   const float pillar_z_size, const float min_x_range,
+                   const float min_y_range, const float min_z_range,
+                   const int num_inds_for_scan, const int num_box_corners);
 
   /**
    * @brief CPU preprocessing for input pointcloud
@@ -93,43 +95,31 @@ class PreprocessPoints {
    * @param[in] x_coors X-coordinate indexes for corresponding pillars
    * @param[in] y_coors Y-coordinate indexes for corresponding pillars
    * @param[in] num_points_per_pillar Number of points in corresponding pillars
-   * @param[in] pillar_x X-coordinate values for points in each pillar
-   * @param[in] pillar_y Y-coordinate values for points in each pillar
-   * @param[in] pillar_z Z-coordinate values for points in each pillar
-   * @param[in] pillar_i Intensity values for points in each pillar
-   * @param[in] x_coors_for_sub_shaped Array for x substraction in the network
-   * @param[in] y_coors_for_sub_shaped Array for y substraction in the network
-   * @param[in] pillar_feature_mask Mask to make pillars' feature zero where no
-   * points in the pillars
+   * @param[in] pillar_point_feature Values for features of points in each
+   * pillar
+   * @param[in] pillar_coors Array for coors of pillars
    * @param[in] sparse_pillar_map Grid map representation for pillar-occupancy
    * @param[in] host_pillar_count The numnber of valid pillars for the input
    * pointcloud
    * @details Convert pointcloud to pillar representation
    */
   void Preprocess(const float* in_points_array, int in_num_points, int* x_coors,
-                  int* y_coors, float* num_points_per_pillar, float* pillar_x,
-                  float* pillar_y, float* pillar_z, float* pillar_i,
-                  float* x_coors_for_sub_shaped, float* y_coors_for_sub_shaped,
-                  float* pillar_feature_mask, float* sparse_pillar_map,
-                  int* host_pillar_count);
+                  int* y_coors, float* num_points_per_pillar,
+                  float* pillar_point_feature, float* pillar_coors,
+                  float* sparse_pillar_map, int* host_pillar_count);
 
   /**
    * @brief Initializing variables for preprocessing
    * @param[in] coor_to_pillaridx Map for converting one set of coordinate to a
    * pillar
    * @param[in] sparse_pillar_map Grid map representation for pillar-occupancy
-   * @param[in] pillar_x X-coordinate values for points in each pillar
-   * @param[in] pillar_y Y-coordinate values for points in each pillar
-   * @param[in] pillar_z Z-coordinate values for points in each pillar
-   * @param[in] pillar_i Intensity values for points in each pillar
-   * @param[in] x_coors_for_sub_shaped Array for x substraction in the network
-   * @param[in] y_coors_for_sub_shaped Array for y substraction in the network
+   * @param[in] pillar_point_feature Values for features of points in each
+   * pillar
+   * @param[in] pillar_coors Array for coors of pillars
    * @details Initializeing input arguments with certain values
    */
   void InitializeVariables(int* coor_to_pillaridx, float* sparse_pillar_map,
-                           float* pillar_x, float* pillar_y, float* pillar_z,
-                           float* pillar_i, float* x_coors_for_sub_shaped,
-                           float* y_coors_for_sub_shaped);
+                           float* pillar_point_feature, float* pillar_coors);
 };
 
 }  // namespace lidar
