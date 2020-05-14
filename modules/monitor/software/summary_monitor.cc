@@ -24,7 +24,7 @@
 DEFINE_string(summary_monitor_name, "SummaryMonitor",
               "Name of the summary monitor.");
 
-DEFINE_double(system_status_publish_interval, 10,
+DEFINE_double(system_status_publish_interval, 1,
               "SystemStatus publish interval.");
 
 namespace apollo {
