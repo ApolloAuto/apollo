@@ -1254,7 +1254,7 @@ void PathBoundsDecider::UpdatePullOverBoundaryByLaneBoundary(
     }
     ADEBUG << "left_bound[" << left_bound
            << "] right_bound[" << right_bound << "]";
-    if (pull_over_type != PullOverStatus::PULL_OVER) {
+    if (pull_over_type == PullOverStatus::PULL_OVER) {
       std::get<2>((*path_bound)[i]) = left_bound;
     } else if (pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER) {
       // TODO(all): use left/right lane boundary accordingly

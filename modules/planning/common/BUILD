@@ -242,6 +242,7 @@ cc_library(
     ],
     deps = [
         ":indexed_queue",
+        ":feature_output",
         ":local_view",
         ":obstacle",
         ":open_space_info",
@@ -255,6 +256,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_proto",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
@@ -441,6 +443,48 @@ cc_test(
         "//modules/common/time",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "feature_output",
+    srcs = ["feature_output.cc"],
+    hdrs = ["feature_output.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:learning_data_proto",
+    ],
+)
+
+cc_library(
+    name = "message_process",
+    srcs = ["message_process.cc"],
+    hdrs = ["message_process.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+       "//cyber",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:config_gflags",
+        "//modules/dreamview/proto:hmi_status_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:feature_output",
+        "//modules/planning/common/util:math_util_lib",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_proto",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/util:data_extraction",
+        "//modules/routing/proto:routing_proto",
+        "//third_party:boost",
+        "@com_google_absl//absl/strings",
     ],
 )
 

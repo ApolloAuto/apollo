@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "modules/planning/proto/open_space_fallback_decider_config.pb.h"
-
 #include <algorithm>
 #include <utility>
 #include <vector>

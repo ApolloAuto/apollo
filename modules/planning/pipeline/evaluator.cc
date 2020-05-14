@@ -23,8 +23,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
-DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
-              "Prefix of files to store learning_data_frame data");
 DEFINE_double(trajectory_delta_t, 0.2,
              "delta time(sec) between trajectory points");
 
@@ -102,10 +100,11 @@ void Evaluator::WriteOutData(
 void Evaluator::EvaluateTrajectoryByTime(
     const int frame_num,
     const std::string& obstacle_id,
-    const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
+    const std::vector<std::pair<double, CommonTrajectoryPointFeature>>&
+        trajectory,
     const double start_point_timestamp_sec,
     const double delta_time,
-    std::vector<TrajectoryPoint>* evaluated_trajectory) {
+    std::vector<TrajectoryPointFeature>* evaluated_trajectory) {
   if (trajectory.empty() ||
       fabs(trajectory.front().first - trajectory.back().first) <
           FLAGS_trajectory_delta_t) {
@@ -114,7 +113,7 @@ void Evaluator::EvaluateTrajectoryByTime(
 
   std::vector<apollo::common::TrajectoryPoint> updated_trajectory;
   for (const auto& tp : trajectory) {
-    // TrajectoryPointFeature => common::Trajectory
+    // CommonTrajectoryPointFeature => common::TrajectoryPoint
     apollo::common::TrajectoryPoint trajectory_point;
     auto path_point = trajectory_point.mutable_path_point();
     path_point->set_x(tp.second.path_point().x());
@@ -166,8 +165,8 @@ void Evaluator::EvaluateTrajectoryByTime(
     double relative_time = i * delta_time;
     auto tp = discretized_trajectory.Evaluate(relative_time);
 
-    // common::TrajectoryPoint => TrajectoryPoint
-    TrajectoryPoint trajectory_point;
+    // common::TrajectoryPoint => TrajectoryPointFeature
+    TrajectoryPointFeature trajectory_point;
     trajectory_point.set_timestamp_sec(timestamp_sec);
     auto path_point =
         trajectory_point.mutable_trajectory_point()->mutable_path_point();
@@ -191,7 +190,7 @@ void Evaluator::EvaluateTrajectoryByTime(
 void Evaluator::EvaluateADCTrajectory(
     const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
-  std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
+  std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
   for (int i = 0; i < learning_data_frame->adc_trajectory_point_size(); i++) {
     ADCTrajectoryPoint adc_tp =
         learning_data_frame->adc_trajectory_point(i);
@@ -227,7 +226,7 @@ void Evaluator::EvaluateADCTrajectory(
     return;
   }
 
-  std::vector<TrajectoryPoint> evaluated_trajectory;
+  std::vector<TrajectoryPointFeature> evaluated_trajectory;
   EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
                            "adc_trajectory",
                            trajectory,
@@ -262,10 +261,10 @@ void Evaluator::EvaluateADCTrajectory(
 void Evaluator::EvaluateADCFutureTrajectory(
     const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
-  std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
+  std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
   for (int i = 0; i <
       learning_data_frame->output().adc_future_trajectory_point_size(); i++) {
-    ADCTrajectoryPoint adc_tp =
+    TrajectoryPointFeature adc_tp =
         learning_data_frame->output().adc_future_trajectory_point(i);
     trajectory.push_back(std::make_pair(adc_tp.timestamp_sec(),
                                         adc_tp.trajectory_point()));
@@ -306,7 +305,7 @@ void Evaluator::EvaluateADCFutureTrajectory(
     return;
   }
 
-  std::vector<TrajectoryPoint> evaluated_trajectory;
+  std::vector<TrajectoryPointFeature> evaluated_trajectory;
   EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
                            "adc_future_trajectory",
                            trajectory,
@@ -367,13 +366,13 @@ void Evaluator::EvaluateObstacleTrajectory(
     const int obstacle_id = learning_data_frame->obstacle(i).id();
     const auto obstacle_trajectory =
         learning_data_frame->obstacle(i).obstacle_trajectory();
-    std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
+    std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
     for (int j = 0; j <
         obstacle_trajectory.perception_obstacle_history_size(); ++j) {
       const auto perception_obstacle =
           obstacle_trajectory.perception_obstacle_history(j);
 
-      TrajectoryPointFeature trajectory_point;
+      CommonTrajectoryPointFeature trajectory_point;
       trajectory_point.mutable_path_point()->set_x(
           perception_obstacle.position().x());
       trajectory_point.mutable_path_point()->set_y(
@@ -410,7 +409,7 @@ void Evaluator::EvaluateObstacleTrajectory(
       continue;
     }
 
-    std::vector<TrajectoryPoint> evaluated_trajectory;
+    std::vector<TrajectoryPointFeature> evaluated_trajectory;
     EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
                              std::to_string(obstacle_id),
                              trajectory,
@@ -450,7 +449,7 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
       const auto obstacle_prediction_trajectory =
           obstacle_prediction.trajectory(j);
 
-      std::vector<std::pair<double, TrajectoryPointFeature>> trajectory;
+      std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
       for (int k = 0; k <
           obstacle_prediction_trajectory.trajectory_point_size(); ++k) {
         const double timestamp_sec = obstacle_prediction.timestamp_sec() +
@@ -472,7 +471,7 @@ void Evaluator::EvaluateObstaclePredictionTrajectory(
         continue;
       }
 
-      std::vector<TrajectoryPoint> evaluated_trajectory;
+      std::vector<TrajectoryPointFeature> evaluated_trajectory;
       EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
                                std::to_string(obstacle_id),
                                trajectory,

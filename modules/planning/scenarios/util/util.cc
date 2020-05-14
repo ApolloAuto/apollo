@@ -254,6 +254,9 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   // obstacle boxes
   auto obstacles = frame->obstacles();
   for (const auto& obstacle : obstacles) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
     const Polygon2d& nudge_polygon = obstacle_polygon.ExpandByDistance(
         std::fabs(FLAGS_static_obstacle_nudge_l_buffer));
