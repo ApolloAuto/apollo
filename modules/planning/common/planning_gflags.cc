@@ -35,6 +35,10 @@ DEFINE_string(scenario_lane_follow_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/lane_follow_config.pb.txt",
               "The lane_follow scenario configuration file");
+DEFINE_string(scenario_learning_model_sample_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/learning_model_sample_config.pb.txt",
+              "learning_model_sample scenario config file");
 DEFINE_string(scenario_narrow_street_u_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/narrow_street_u_turn_config.pb.txt",
@@ -90,10 +94,10 @@ DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
 DEFINE_bool(enable_scenario_emergency_pull_over, true,
-            "enable emregency-pull-over scenario in planning");
+            "enable emergency-pull-over scenario in planning");
 
 DEFINE_bool(enable_scenario_emergency_stop, true,
-            "enable emregency-stop scenario in planning");
+            "enable emergency-stop scenario in planning");
 
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
@@ -531,3 +535,20 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "more agile.");
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
+
+DEFINE_string(planning_data_dir,
+              "/apollo/modules/planning/data/",
+              "Prefix of files to store feature data");
+DEFINE_string(
+    planning_offline_bags, "",
+    "a list of source files or directories for offline mode. "
+    "The items need to be separated by colon ':'. ");
+DEFINE_int32(planning_offline_mode, 0,
+             "0: no learning "
+             "1: online learning, no dump file "
+             "2: offline learning. read record files and dump learning_data "
+             "   to <record file>.<n>.bin");
+DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
+             "time sec (second) of history trajectory points for a obstacle");
+DEFINE_int32(learning_data_frame_num_per_file, 100,
+             "number of learning_data_frame to write out in one data file.");

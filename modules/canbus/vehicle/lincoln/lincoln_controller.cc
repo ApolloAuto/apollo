@@ -64,6 +64,7 @@ ErrorCode LincolnController::Init(
   }
 
   if (can_sender == nullptr) {
+    AERROR << "Canbus sender is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;

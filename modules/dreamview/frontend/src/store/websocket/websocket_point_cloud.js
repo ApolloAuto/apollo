@@ -7,6 +7,7 @@ export default class PointCloudWebSocketEndpoint {
         this.serverAddr = serverAddr;
         this.websocket = null;
         this.worker = new Worker();
+        this.enabled = false;
     }
 
     initialize() {
@@ -40,19 +41,23 @@ export default class PointCloudWebSocketEndpoint {
                 RENDERER.updatePointCloud(event.data);
             }
         };
-        // Request point cloud every 100ms.
-        clearInterval(this.timer);
-        this.timer = setInterval(() => {
-            if (this.websocket.readyState === this.websocket.OPEN
-                && STORE.options.showPointCloud === true) {
-                this.websocket.send(JSON.stringify({
-                    type : "RequestPointCloud"
-                }));
-            }
-        }, 200);
+    }
+
+    requestPointCloud() {
+        if (this.websocket.readyState === this.websocket.OPEN
+            && STORE.options.showPointCloud === true) {
+            this.websocket.send(JSON.stringify({
+                type : "RequestPointCloud"
+            }));
+        }
+    }
+
+    isEnabled() {
+        return this.enabled;
     }
 
     togglePointCloud(enable) {
+        this.enabled = enable;
         this.websocket.send(JSON.stringify({
             type: "TogglePointCloud",
             enable: enable,

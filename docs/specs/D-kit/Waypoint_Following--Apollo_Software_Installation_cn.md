@@ -36,12 +36,26 @@ Apollo系统安装
 
   ![IPC-6108GC-front-side](../images/ipc_hardware_before_cover.jpeg)
   
+  或者：
+
+- Nuvo-8108GC-RTX2070s-i9-9900k
+
+- DDR4-32GB-ECC
+
+- Seagate M.2 2280 NVMe SSD(PCIe Gen3x4)512G
+
+- EMUC-B202 CAN
+
+- 480W适配器
+
+  ![IPC-8108GC-front-side](images/software_installation_look_8108.PNG)
+
 ### 准备IPC
 
 参考下述步骤：
 
 #### 准备好CAN卡并进行安装
-在Nuvo-6108GC中，RTX2060s显卡被预先安装在一个PCI插槽中。如果我们收到的是EMUC-B202 CAN，它已被预装在IPC内，则CAN卡安装这一步，可以跳过。如果我们收到的是ESDCan，我们需要将CAN卡安装在另外一个PCI插槽中，步骤如下：
+在IPC中，显卡被预先安装在一个PCI插槽中。如果我们收到的是EMUC-B202 CAN，它已被预装在IPC内，则CAN卡安装这一步，可以跳过。如果我们收到的是ESDCan，我们需要将CAN卡安装在另外一个PCI插槽中，步骤如下：
 
    a. 找到并拧下机器边上的8个螺丝（显示在棕色方框内或棕色箭头指向的区域）
 
@@ -73,10 +87,22 @@ Apollo系统安装
 
    a. 将电源线接入到为IPC配置的电源连接器（接线板）
    
+- 6108的电源线
+
    ![warning_icon](../images/warning_icon.png)**WARNING**：确保电源线的正极（标记为 **R** 表示红色）和负极（标记为 **B** 表示黑色）接入到了IPC接线板的正确接口，如下图所示：
 
    ![ipc_power_RB](../images/ipc_hardware_rb.png)
    
+- 8108的电源线
+
+8108的电源线是四跟，两正两负，正极的两根电源线是贴有`V+`的白色标签的，如下图所示：
+
+   ![ipc_power_RB](images/software_installation_power_8108_1.jpg)
+
+将接有正极的两根电源线的端子插入`V+`接口，将接有负极的两根电源线的端子插入`GND`接口，如下图所示：
+
+   ![ipc_power_RB](images/software_installation_power_8108_2.jpg)
+
    b. 将显示器、以太网线、键盘和鼠标接入IPC
    
    ![CableConnected-overexposed](../images/ipc_hardware_connection.png)
@@ -112,6 +138,8 @@ Apollo系统安装
 
 
 ## 工控机软件系统安装
+
+![tip_icon](../images/tip_icon.png) 在本步骤中，若工控机已经安装了Ubuntu18.04LTS操作系统且在当前账户的home目录下有apollo文件夹，请直接移步至文末的运行DreamView部分，检查apollo是否可以直接运行；否则，请按照下述步骤一步一步进行工控机软件系统的安装。
 
 工控机软件系统安装包括计算机操作系统的安装，硬件驱动的安装，应用软件的安装和Apollo软件系统的安装。
 
@@ -334,7 +362,7 @@ cd ~/apollo
 bash docker/scripts/dev_start.sh
 ```
 
-第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；这个过程完成后，请输入以下命令以进入docker环境中：
+第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；如果你确信计算机本地有你需要的image镜像文件或者你不希望更新image镜像时，可以使用`bash docker/scripts/dev_start.sh -n`这个命令代替上面的命令，这样apollo就不会去github的官方网站比较本地image镜像和官方网站image镜像的区别了，这样可以省去二者比较的时间和避免因网络问题而导致的二者比较失败的现象，可以加快启动docker容器的速度。这个过程完成后，请输入以下命令以进入docker环境中：
 ```
 bash docker/scripts/dev_into.sh
 ```
@@ -347,7 +375,15 @@ bash apollo.sh build
 
 ### 运行DreamView
 
-a.启动apollo
+a.若您已经在docker环境中，请忽略此步骤，否则请执行以下命令进入docker环境：
+
+````
+cd ~/apollo
+bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_into.sh
+````
+
+b.启动apollo
 在终端输入以下命令：
 
 ```
@@ -372,15 +408,17 @@ http://localhost:8888
 
 可以访问DreamView。
 
-b.回放数据包
+c.回放数据包
 在终端输入以下命令下载数据包：
 
 ```
 python docs/demo_guide/rosbag_helper.py demo_3.5.record
 ```
 
-输入以下命令可以回放数据包，在浏览器DreamView中可以看到回放画面。
+输入以下命令可以回放数据包，在浏览器DreamView中应该可以看到回放画面。
 
 ```
 cyber_recorder play -l -f demo_3.5.record
 ```
+
+如果成功在浏览器中看到回放画面，则表明您的apollo系统已经部署成功！

@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "modules/planning/proto/open_space_pre_stop_decider_config.pb.h"
-
 #include "cyber/common/macros.h"
 
 #include "modules/planning/common/frame.h"

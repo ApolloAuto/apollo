@@ -305,6 +305,8 @@ class OpenSpaceInfo {
 
   void RecordDebug(apollo::planning_internal::Debug *ptr_debug);
 
+  void set_time_latency(double time_latency) { time_latency_ = time_latency; }
+
  private:
   std::string target_parking_spot_id_;
 
@@ -381,6 +383,8 @@ class OpenSpaceInfo {
   // the instance inside debug,
   // if ADCtrajectory is NULL, blank; else same to ADCtrajectory
   apollo::planning_internal::Debug debug_instance_;
+
+  double time_latency_ = 0.0;
 };
 
 }  // namespace planning

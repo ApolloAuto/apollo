@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "online_visualizer_compenont_lib",
+    name = "online_visualizer_component_lib",
     srcs = ["online_visualizer_component.cc"],
     hdrs = ["online_visualizer_component.h"],
     copts = [
@@ -34,7 +34,7 @@ cc_binary(
     name = "online_visualizer_compenont.so",
     linkopts = ["-shared"],
     linkstatic = False,
-    deps = [":online_visualizer_compenont_lib"],
+    deps = [":online_visualizer_component_lib"],
 )
 
 cpplint()

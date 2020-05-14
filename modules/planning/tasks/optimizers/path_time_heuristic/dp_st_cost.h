@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"

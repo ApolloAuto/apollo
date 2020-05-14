@@ -70,7 +70,9 @@ class EvaluatorManager {
                         ObstaclesContainer* obstacles_container);
 
  private:
-  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container);
+  void BuildObstacleIdHistoryMap(
+      ObstaclesContainer* obstacles_container,
+      size_t max_num_frame);
 
   void DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container);
 
@@ -115,7 +117,7 @@ class EvaluatorManager {
       ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
 
   ObstacleConf::EvaluatorType pedestrian_evaluator_ =
-      ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR;
+      ObstacleConf::SEMANTIC_LSTM_EVALUATOR;
 
   ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;

@@ -46,6 +46,14 @@ bool PlanningComponent::Init() {
   ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
                                                  &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
+
+  if (FLAGS_planning_offline_mode > 0) {
+    if (!message_process_.Init()) {
+      AERROR << "failed to init MessageProcess";
+      return false;
+    }
+  }
+
   planning_base_->Init(config_);
 
   routing_reader_ = node_->CreateReader<RoutingResponse>(
@@ -127,6 +135,15 @@ bool PlanningComponent::Proc(
   if (!CheckInput()) {
     AERROR << "Input check failed";
     return false;
+  }
+
+  if (FLAGS_planning_offline_mode == 1) {
+    // data process for online training
+    message_process_.OnChassis(*local_view_.chassis);
+    message_process_.OnPrediction(*local_view_.prediction_obstacles);
+    message_process_.OnRoutingResponse(*local_view_.routing);
+    message_process_.OnTrafficLightDetection(*local_view_.traffic_light);
+    message_process_.OnLocalization(*local_view_.localization_estimate);
   }
 
   ADCTrajectory adc_trajectory_pb;

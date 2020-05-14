@@ -4,6 +4,7 @@ module_config {
         class_name : "ThirdPartyPerceptionComponent"
         config {
             name: "third_party_perception"
+            config_file_path: "/apollo/modules/third_party_perception/conf/third_party_perception_component.pb.txt"
             flag_file_path:  "/apollo/modules/third_party_perception/conf/third_party_perception.conf"
             interval: 100
       }

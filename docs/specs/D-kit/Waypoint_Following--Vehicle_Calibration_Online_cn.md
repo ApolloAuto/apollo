@@ -36,31 +36,39 @@
 
 在开始标定前，需要根据实际车辆的参数配置，进行车辆标定文件的配置。目前车辆踏板标定默认支持的是MKZ乘用车，而对于教学小车，我们需要根据其最大速度、速度、油门、刹车踏板的限制，针对性的修改标定文件，以适配小车的踏板标定。需要修改标定配置文件，在目录`apollo/modules/dreamview/conf/data_collection_table.pb.txt`，设计小车的标定条件如下：
 
-- 车辆前进模型
+车辆前进模型
 
 - 速度条件
 
-低速 0 ～ 2.5m/s
-高速 >= 2.5m/s
+  - 低速 0 ～ 2.5m/s
+  - 高速 >= 2.5m/s
 
 - 油门条件
 
-小油门 Throttle deadzone ~ 24%
-大油门 Throttle >= 24%
+  - 小油门 Throttle deadzone ~ 24%
+  - 大油门 Throttle >= 24%
 
 - 刹车条件
 
-缓刹车 Brake deadzone ~ 28%
-急刹车 Brake >= 28%
+  - 缓刹车 Brake deadzone ~ 28%
+  - 急刹车 Brake >= 28%
+
+上述的`Throttle deadzone`表示车辆油门踏板的不产生加速度的无效区段，一般设在车辆刚能起步的附近，开发套件给出的默认值是5%，开发者可以根据实际车辆的情况修改此参数；`Brake deadzone`表示车辆刹车踏板的不产生减速度的无效区段，一般设在较低的踏板开度时，开发套件给出的默认值是3%，开发者可以根据实际车辆的情况修改此参数。此参数设置在`apollo/modules/calition/data/dev_kit/vehicle_param.pb.txt`文件内`throttle_deadzone`和`brake_deadzone`，在标定开始前，就要先把改参数确定好，后面进行数据训练时上传的配置文件，也需要对应使用该参数。
 
 根据如上标定条件，即可匹配出车辆的所有标定条件，共8种条件，分别为：
-低速小油门、低速大油门、高速小油门、高速大油门、
-低速缓刹车、低速急刹车、高速缓刹车、高速急刹车。
+- 低速小油门
+- 低速大油门
+- 高速小油门
+- 高速大油门
+- 低速缓刹车
+- 低速急刹车
+- 高速缓刹车
+- 高速急刹车
 
-请将`apollo/modules/dreamview/conf/data_collection_table.pb.txt` 中`Go Straight`部分配置进行修改，其它部分配置代码无需修改，无需删除，具体修改代码如下：
+确认好上述标定条件后，下一步将`apollo/modules/dreamview/conf/data_collection_table.pb.txt` 中`Go Straight`部分配置进行修改，其它部分配置代码无需修改，无需删除，具体修改代码如下：
 
     frame_threshold: 20 //设置数据帧周期，当前为20ms
-    total_frames: 4000  //设置每一个标定case数据帧总量当前为4000帧
+    total_frames: 4000  //设置每一个标定case数据帧总量，当前设置为4000帧，可根据实际情况调整，数据量越大采集标定数据时间越长
     scenario {
       key: "Go Straight"
       value {
@@ -167,10 +175,10 @@
 ### 准备
 
 完成配置文件修改后，将车辆移动至适合标定的场地后，启动apollo，并执行以下命令：
-
+```
     bash apollo.sh build
-    bash scripts/bootstrap.sh
-
+    bash scripts/bootstrap.sh start
+```
 在浏览器打开`DreamView`，进行下述步骤：
 
 1、在`--setup mode--`内，选择`vehicle calibration`（车辆标定）选项，在`--vehicle--`选择`Dev_Kit`；
@@ -182,11 +190,21 @@
 
 ### 开始采集
 
-在命令提示行内启动车辆`canbus`模块，`localization`（定位）模块，并检查相关数据反馈正常。
+准备所需channel：
+车辆标定，需要录制包含车辆底盘信息、定位信息的数据作为输入，所需要的channel如下表所示：
 
-    bash scripts/canbus.sh
-    bash scripts/localization.sh
+| 模块 | channel名称 |
+|---|---|
+| Canbus | /apollo/canbus/chassis |
+| Localization | /apollo/localization/pose |
 
+
+为获取上述channel，在命令提示行内启动`canbus`模块、`GPS`模块、`localization`模块，并检查相关数据反馈正常。
+```
+    bash scripts/canbus.sh start
+    bash scripts/gps.sh start
+    bash scripts/localization.sh start
+```
 在`DreamView`界面点击左侧边栏，选择`Module Controller`，可以看到`Canbus`开关已经打开，这时开始点击`Recorder`开关，**（请务必切记先打开<Recorder>开关，再进行标定数据采集操作，实际情况常常会因未打开<Recorder>开关造成数据未记录保存，影响效率）**，这时Apollo系统就开始录制记录`canbus` 和`localization` 数据了。
 
 ![vehicle_calibration_online_dreamview2](images/vehicle_calibration_online_dreamview2.png)
@@ -215,7 +233,7 @@
 
 ![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure.png)
 
-2）`Origin Folder`可以是BOS的根目录或者其他自建目录；
+2）`Origin Folder`建议为**BOS的根目录**，确保`task001`目录是在BOS根目录下创建的；
 
 3）`task001、task002...`代表一次车辆标定任务文件夹，即每次标定任务提交时，会训练一个`task文件夹`内的车辆数据；`task文件夹`上一层（`Origin Folder`）可以是BOS根目录或其他目录；
 
@@ -228,7 +246,7 @@
  
 6）总结上述文件夹结构：
 
-    BOS根目录或其他目录 -> Task Folder ->Vehicle Folder -> Records + vehicle_param.pb.txt
+    BOS根目录 -> Task Folder ->Vehicle Folder -> Records + vehicle_param.pb.txt
 
 
 #### 4. 提交标定任务据至BOS
@@ -243,7 +261,33 @@
 
 #### 5. 获取标定结果及标定表
 
-云标定任务完成后，将在注册的邮箱（请与商务联系）中收到一封标定结果邮件。如果标定任务成功，将包含标定表及标定结果图片。
+- 云标定任务完成后，将在注册的邮箱（请与商务联系）中收到一封标定结果邮件。如果标定任务成功，将包含标定表及标定结果图片。
+
+- 生成的标定表以 `车型_calibration_table.pb.txt`命名，将标定表内的标定数据为calibration_table字段，把全部数据拷贝替换至`apollo/modules/calibration/data/dev_kit/control_conf.pb.txt`下对应的`lon_controller_conf`字段下面的`calibration_table`段内。
+
+注：云标定数据片段示例（截取了前4段）
+
+    calibration {
+      speed: 0.0
+      acceleration: -1.3040223121643066
+      command: -69.0
+    }
+    calibration {
+      speed: 0.0
+      acceleration: -1.2989914417266846
+      command: -65.63157894736842
+    }
+    calibration {
+      speed: 0.0
+      acceleration: -1.2903447151184082
+      command: -62.26315789473684
+    }
+    calibration {
+      speed: 0.0
+      acceleration: -1.2760969400405884
+      command: -58.89473684210526
+    }
+
 
 ## 结果显示
 
@@ -257,4 +301,3 @@
 
 ![vehicle_calibration_online_brake](images/vehicle_calibration_online_brake.png)
 
-生成的标定表以 `车型_calibration_table.pb.txt`命名，将标定表内的标定数据拷贝至`apollo/modules/calibration/data/dev_kit/control_conf.pb.txt`相应字段内。

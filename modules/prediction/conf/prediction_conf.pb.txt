@@ -33,7 +33,8 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
-  evaluator_type: PEDESTRIAN_INTERACTION_EVALUATOR
+  obstacle_status: MOVING
+  evaluator_type: SEMANTIC_LSTM_EVALUATOR
   predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {

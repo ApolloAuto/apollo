@@ -4164,55 +4164,171 @@
                 }
               }
             },
-            "ChassisFeature": {
+            "OverlapFeature": {
               "fields": {
-                "speedMps": {
-                  "type": "float",
+                "id": {
+                  "type": "string",
                   "id": 1
                 },
-                "throttlePercentage": {
+                "distance": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "PlanningTag": {
+              "fields": {
+                "laneTurn": {
+                  "type": "apollo.hdmap.Lane.LaneTurn",
+                  "id": 1
+                },
+                "clearArea": {
+                  "type": "OverlapFeature",
+                  "id": 2
+                },
+                "crosswalk": {
+                  "type": "OverlapFeature",
+                  "id": 3
+                },
+                "pncJunction": {
+                  "type": "OverlapFeature",
+                  "id": 4
+                },
+                "signal": {
+                  "type": "OverlapFeature",
+                  "id": 5
+                },
+                "stopSign": {
+                  "type": "OverlapFeature",
+                  "id": 6
+                },
+                "yieldSign": {
+                  "type": "OverlapFeature",
+                  "id": 7
+                }
+              }
+            },
+            "ChassisFeature": {
+              "fields": {
+                "messageTimestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "speedMps": {
                   "type": "float",
                   "id": 2
                 },
-                "brakePercentage": {
+                "throttlePercentage": {
                   "type": "float",
                   "id": 3
                 },
-                "steeringPercentage": {
+                "brakePercentage": {
                   "type": "float",
                   "id": 4
                 },
+                "steeringPercentage": {
+                  "type": "float",
+                  "id": 5
+                },
                 "gearLocation": {
                   "type": "apollo.canbus.Chassis.GearPosition",
-                  "id": 5
+                  "id": 6
                 }
               }
             },
             "LocalizationFeature": {
               "fields": {
+                "messageTimestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
                 "position": {
                   "type": "apollo.common.PointENU",
-                  "id": 1
+                  "id": 2
                 },
                 "heading": {
                   "type": "double",
-                  "id": 2
+                  "id": 3
                 },
                 "linearVelocity": {
                   "type": "apollo.common.Point3D",
-                  "id": 3
+                  "id": 4
                 },
                 "linearAcceleration": {
                   "type": "apollo.common.Point3D",
-                  "id": 4
+                  "id": 5
                 },
                 "angularVelocity": {
                   "type": "apollo.common.Point3D",
+                  "id": 6
+                }
+              }
+            },
+            "PathPointFeature": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 4
+                },
+                "s": {
+                  "type": "double",
+                  "id": 5
+                },
+                "laneId": {
+                  "type": "string",
+                  "id": 6
+                }
+              }
+            },
+            "TrajectoryPointFeature": {
+              "fields": {
+                "pathPoint": {
+                  "type": "PathPointFeature",
+                  "id": 1
+                },
+                "v": {
+                  "type": "double",
+                  "id": 2
+                },
+                "a": {
+                  "type": "double",
+                  "id": 3
+                },
+                "relativeTime": {
+                  "type": "double",
+                  "id": 4
+                },
+                "gaussianInfo": {
+                  "type": "apollo.common.GaussianInfo",
                   "id": 5
                 }
               }
             },
-            "ObstacleTrajectoryPoint": {
+            "TrajectoryPoint": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "type": "TrajectoryPointFeature",
+                  "id": 2
+                }
+              }
+            },
+            "PerceptionObstacleFeature": {
               "fields": {
                 "timestampSec": {
                   "type": "double",
@@ -4230,18 +4346,45 @@
                   "type": "apollo.common.Point3D",
                   "id": 4
                 },
-                "polygonPoint": {
-                  "rule": "repeated",
+                "acceleration": {
                   "type": "apollo.common.Point3D",
                   "id": 5
                 },
-                "acceleration": {
+                "polygonPoint": {
+                  "rule": "repeated",
                   "type": "apollo.common.Point3D",
                   "id": 6
                 }
               }
             },
-            "ObstaclePrediction": {
+            "ObstacleTrajectoryFeature": {
+              "fields": {
+                "perceptionObstacleHistory": {
+                  "rule": "repeated",
+                  "type": "PerceptionObstacleFeature",
+                  "id": 1
+                },
+                "evaluatedTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
+            "PredictionTrajectoryFeature": {
+              "fields": {
+                "probability": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
+            "PredictionObstacleFeature": {
               "fields": {
                 "timestampSec": {
                   "type": "double",
@@ -4251,25 +4394,25 @@
                   "type": "double",
                   "id": 2
                 },
-                "trajectory": {
-                  "rule": "repeated",
-                  "type": "apollo.prediction.Trajectory",
-                  "id": 3
-                },
                 "intent": {
                   "type": "apollo.prediction.ObstacleIntent",
-                  "id": 4
+                  "id": 3
                 },
                 "priority": {
                   "type": "apollo.prediction.ObstaclePriority",
-                  "id": 5
+                  "id": 4
                 },
                 "isStatic": {
                   "type": "bool",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": false
                   }
+                },
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "PredictionTrajectoryFeature",
+                  "id": 6
                 }
               }
             },
@@ -4295,34 +4438,70 @@
                   "type": "apollo.perception.PerceptionObstacle.Type",
                   "id": 5
                 },
-                "obstacleTrajectoryPoint": {
-                  "rule": "repeated",
-                  "type": "ObstacleTrajectoryPoint",
+                "obstacleTrajectory": {
+                  "type": "ObstacleTrajectoryFeature",
                   "id": 6
                 },
                 "obstaclePrediction": {
-                  "type": "ObstaclePrediction",
+                  "type": "PredictionObstacleFeature",
                   "id": 7
                 }
               }
             },
-            "RoutingResponseFeature": {
+            "RoutingFeature": {
               "fields": {
-                "laneId": {
+                "routingLaneId": {
                   "rule": "repeated",
                   "type": "string",
                   "id": 1
+                },
+                "localRoutingLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 2
                 }
               }
             },
             "TrafficLightFeature": {
               "fields": {
-                "id": {
-                  "type": "string",
-                  "id": 1
-                },
                 "color": {
                   "type": "apollo.perception.TrafficLight.Color",
+                  "id": 1
+                },
+                "id": {
+                  "type": "string",
+                  "id": 2
+                },
+                "confidence": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "trackingTime": {
+                  "type": "double",
+                  "id": 4
+                },
+                "blink": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "remainingTime": {
+                  "type": "double",
+                  "id": 6
+                }
+              }
+            },
+            "TrafficLightDetectionFeature": {
+              "fields": {
+                "messageTimestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trafficLight": {
+                  "rule": "repeated",
+                  "type": "TrafficLightFeature",
                   "id": 2
                 }
               }
@@ -4333,15 +4512,28 @@
                   "type": "double",
                   "id": 1
                 },
-                "trajectoryPoint": {
-                  "type": "apollo.common.TrajectoryPoint",
+                "planningTag": {
+                  "type": "PlanningTag",
                   "id": 2
+                },
+                "trajectoryPoint": {
+                  "type": "TrajectoryPointFeature",
+                  "id": 3
+                }
+              }
+            },
+            "LearningOutput": {
+              "fields": {
+                "adcFutureTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "ADCTrajectoryPoint",
+                  "id": 1
                 }
               }
             },
             "LearningDataFrame": {
               "fields": {
-                "timestampSec": {
+                "messageTimestampSec": {
                   "type": "double",
                   "id": 1
                 },
@@ -4349,32 +4541,43 @@
                   "type": "uint32",
                   "id": 2
                 },
+                "mapName": {
+                  "type": "string",
+                  "id": 3
+                },
+                "planningTag": {
+                  "type": "PlanningTag",
+                  "id": 4
+                },
                 "chassis": {
                   "type": "ChassisFeature",
-                  "id": 3
+                  "id": 5
                 },
                 "localization": {
                   "type": "LocalizationFeature",
-                  "id": 4
+                  "id": 6
                 },
                 "obstacle": {
                   "rule": "repeated",
                   "type": "ObstacleFeature",
-                  "id": 5
-                },
-                "routingResponse": {
-                  "type": "RoutingResponseFeature",
-                  "id": 6
-                },
-                "trafficLight": {
-                  "rule": "repeated",
-                  "type": "TrafficLightFeature",
                   "id": 7
+                },
+                "routing": {
+                  "type": "RoutingFeature",
+                  "id": 8
+                },
+                "trafficLightDetection": {
+                  "type": "TrafficLightDetectionFeature",
+                  "id": 9
                 },
                 "adcTrajectoryPoint": {
                   "rule": "repeated",
                   "type": "ADCTrajectoryPoint",
-                  "id": 8
+                  "id": 10
+                },
+                "output": {
+                  "type": "LearningOutput",
+                  "id": 11
                 }
               }
             },
@@ -7026,6 +7229,18 @@
                 }
               }
             },
+            "ScenarioTestLearningModelConfig": {
+              "fields": {
+                "modelFile": {
+                  "type": "string",
+                  "id": 1
+                },
+                "inputFeatureNum": {
+                  "type": "int32",
+                  "id": 2
+                }
+              }
+            },
             "ScenarioConfig": {
               "oneofs": {
                 "scenarioConfig": {
@@ -7042,7 +7257,8 @@
                     "parkAndGoConfig",
                     "pullOverConfig",
                     "valetParkingConfig",
-                    "yieldSignConfig"
+                    "yieldSignConfig",
+                    "testLearningModelConfig"
                   ]
                 }
               },
@@ -7103,6 +7319,10 @@
                   "type": "ScenarioYieldSignConfig",
                   "id": 15
                 },
+                "testLearningModelConfig": {
+                  "type": "ScenarioTestLearningModelConfig",
+                  "id": 18
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
@@ -7133,7 +7353,8 @@
                     "EMERGENCY_PULL_OVER": 11,
                     "EMERGENCY_STOP": 12,
                     "NARROW_STREET_U_TURN": 13,
-                    "PARK_AND_GO": 14
+                    "PARK_AND_GO": 14,
+                    "TEST_LEARNING_MODEL": 15
                   }
                 },
                 "StageType": {
@@ -9130,6 +9351,21 @@
                 "futureCollisionPoint": {
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 17
+                },
+                "timeLatency": {
+                  "type": "double",
+                  "id": 18,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "originPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 19
+                },
+                "originHeadingRad": {
+                  "type": "double",
+                  "id": 20
                 }
               }
             },
@@ -9671,6 +9907,28 @@
                 }
               }
             },
+            "Trajectory": {
+              "fields": {
+                "probability": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
+            "DebugMessage": {
+              "fields": {
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "Trajectory",
+                  "id": 1
+                }
+              }
+            },
             "PerceptionObstacle": {
               "fields": {
                 "id": {
@@ -9791,6 +10049,10 @@
                 "lightStatus": {
                   "type": "LightStatus",
                   "id": 25
+                },
+                "msg": {
+                  "type": "DebugMessage",
+                  "id": 26
                 }
               },
               "nested": {

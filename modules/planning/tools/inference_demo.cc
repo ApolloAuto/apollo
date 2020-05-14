@@ -27,10 +27,23 @@ int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   torch::jit::script::Module model;
+  std::cout << "is_optimized:" << model.is_optimized() << std::endl;
+  std::cout << "parameter size:" << model.get_parameters().size() << std::endl;
+
   torch::Device device(torch::kCPU);
 
   torch::set_num_threads(1);
-  model = torch::jit::load(FLAGS_model_file, device);
+  try {
+    // Deserialize the ScriptModule from a file using torch::jit::load().
+    model = torch::jit::load(FLAGS_model_file, device);
+  }
+  catch (const c10::Error& e) {
+    std::cerr << "error loading the model\n";
+    return -1;
+  }
+  std::cout << "is_optimized:" << model.is_optimized() << std::endl;
+  std::cout << "after loading parameter size:"
+            << model.get_parameters().size() << std::endl;
 
   std::vector<torch::jit::IValue> torch_inputs;
 
@@ -56,6 +69,12 @@ int main(int argc, char **argv) {
   std::cout << "tensor [0,0,0] element:" << torch_output_tensor[0][0][0]
             << std::endl;
   std::cout << "tensor [0,0,1] element:" << torch_output_tensor[0][0][1]
+            << std::endl;
+  std::cout << "tensor [0,0,0] element:"
+            << double(torch_output_tensor.accessor<float, 3>()[0][0][0])
+            << std::endl;
+  std::cout << "tensor [0,0,1] element:"
+            << double(torch_output_tensor.accessor<float, 3>()[0][0][1])
             << std::endl;
 
   return 0;

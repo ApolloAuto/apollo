@@ -21,6 +21,7 @@
 #pragma once
 
 #include <string>
+#include "cyber/proto/record.pb.h"
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -56,7 +57,7 @@ class MessageProcess {
 
   static void OnStoryTelling(const storytelling::Stories &story);
 
-  static void ProcessOfflineData(const std::string &record_filename);
+  static void ProcessOfflineData(const std::string &record_filepath);
 };
 
 }  // namespace prediction

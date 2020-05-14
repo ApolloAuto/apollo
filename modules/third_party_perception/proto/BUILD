@@ -11,7 +11,10 @@ cc_proto_library(
 
 proto_library(
     name = "third_party_perception_proto_lib",
-    srcs = ["radar_obstacle.proto"],
+    srcs = [
+        "radar_obstacle.proto",
+        "third_party_perception_component.proto",
+    ],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:geometry_proto_lib",

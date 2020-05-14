@@ -31,5 +31,10 @@ DECLARE_bool(enable_base_object_pool);
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
+// lidar_point_pillars
+DECLARE_int32(gpu_id);
+DECLARE_string(pfe_onnx_file);
+DECLARE_string(rpn_onnx_file);
+
 }  // namespace perception
 }  // namespace apollo

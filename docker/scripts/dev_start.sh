@@ -16,12 +16,15 @@
 # limitations under the License.
 ###############################################################################
 
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+
 LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-18.04-x86_64-20191111_1530"
+VERSION_X86_64="dev-18.04-x86_64-20200507_0633"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
@@ -86,7 +89,13 @@ do
 done
 }
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
+function set_registry_mirrors()
+{
+sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
+sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
+service docker restart
+
+}
 
 if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
     sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
@@ -115,6 +124,7 @@ OTHER_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
+
     case "$1" in
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
@@ -137,6 +147,9 @@ do
     -b|--fast-build)
         FAST_BUILD_MODE="yes"
         ;;
+    -c|--china)
+       set_registry_mirrors
+	;;
     -f|--fast-test)
         FAST_TEST_MODE="yes"
         ;;
@@ -197,8 +210,7 @@ LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-l
 function local_volumes() {
     set +x
     # Apollo root and bazel cache dirs are required.
-    volumes="-v $APOLLO_ROOT_DIR:/apollo \
-             -v $HOME/.cache:${DOCKER_HOME}/.cache"
+    volumes="-v $APOLLO_ROOT_DIR:/apollo"
     APOLLO_TELEOP="${APOLLO_ROOT_DIR}/../apollo-teleop"
     if [ -d ${APOLLO_TELEOP} ]; then
         volumes="-v ${APOLLO_TELEOP}:/apollo/modules/teleop ${volumes}"
@@ -221,8 +233,6 @@ function local_volumes() {
                                 -v /lib/modules:/lib/modules"
             ;;
         Darwin)
-            # MacOS has strict limitations on mapping volumes.
-            chmod -R a+wr ~/.cache/bazel
             ;;
     esac
     echo "${volumes}"
@@ -254,9 +264,7 @@ function do_docker_pull()
         fi
     fi
 }
-
 function main(){
-
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $APOLLO_DEV_IMAGE"
     else
@@ -272,7 +280,7 @@ function main(){
     if [ $? == 0 ]; then
         if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$APOLLO_DEV_IMAGE" ]]; then
             rm -rf $APOLLO_ROOT_DIR/bazel-*
-            rm -rf $HOME/.cache/bazel/*
+            rm -rf ${CACHE_ROOT_DIR}/bazel/*
         fi
         docker stop $APOLLO_DEV 1>/dev/null
         docker rm -v -f $APOLLO_DEV 1>/dev/null
@@ -342,8 +350,8 @@ function main(){
     if [ "$USER" == "root" ];then
         DOCKER_HOME="/root"
     fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
+    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
+        mkdir "${CACHE_ROOT_DIR}"
     fi
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
@@ -398,7 +406,7 @@ function main(){
         -e DOCKER_IMG=$APOLLO_DEV_IMAGE \
         -e USE_GPU=$USE_GPU \
         -e NVIDIA_VISIBLE_DEVICES=all \
-        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         $(local_volumes) \
         --net host \
         -w /apollo \
@@ -416,8 +424,10 @@ function main(){
     fi
     set +x
 
-    if [ "${USER}" != "root" ]; then
-        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+    # User with uid=1000 or username=apollo excluded
+    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
+        && [[ $USER_ID -ne 1000 ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"

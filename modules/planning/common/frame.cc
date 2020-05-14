@@ -34,6 +34,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
@@ -375,6 +376,8 @@ Status Frame::InitFrameData() {
 
   ReadPadMsgDrivingAction();
 
+  ReadLearningDataFrame();
+
   return Status::OK();
 }
 
@@ -481,6 +484,17 @@ void Frame::ReadTrafficLights() {
   }
   for (const auto &traffic_light : traffic_light_detection->traffic_light()) {
     traffic_lights_[traffic_light.id()] = &traffic_light;
+  }
+}
+
+void Frame::ReadLearningDataFrame() {
+  learning_data_frame_.Clear();
+  if (FLAGS_planning_offline_mode != 1) {
+    return;
+  }
+  auto learning_data_frame = FeatureOutput::GetLatestLearningDataFrame();
+  if (learning_data_frame != nullptr) {
+    learning_data_frame_.CopyFrom(*learning_data_frame);
   }
 }
 

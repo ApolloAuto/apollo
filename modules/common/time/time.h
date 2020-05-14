@@ -63,7 +63,7 @@ class Clock {
                 "microsecond.");
 
   // The clock mode can either be a system clock time, a user mocked time (for
-  // test only) or read from ROS.
+  // test only) or read from CyberRT.
   enum ClockMode {
     SYSTEM = 0,
     MOCK = 1,

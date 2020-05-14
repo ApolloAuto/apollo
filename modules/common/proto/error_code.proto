@@ -12,6 +12,7 @@ enum ErrorCode {
   CONTROL_INIT_ERROR = 1001;
   CONTROL_COMPUTE_ERROR = 1002;
   CONTROL_ESTOP_ERROR = 1003;
+  PERFECT_CONTROL_ERROR = 1004;
 
   // Canbus module error codes start from here.
   CANBUS_ERROR = 2000;

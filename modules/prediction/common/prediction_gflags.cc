@@ -64,6 +64,10 @@ DEFINE_double(junction_distance_threshold, 10.0,
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
+DEFINE_bool(enable_all_pedestrian_caution_in_front, false,
+            "If true, then all pedestrian in front of ADC are marked caution.");
+DEFINE_bool(enable_rank_caution_obstacles, true,
+            "Rank the caution-level obstacles.");
 DEFINE_int32(caution_obs_max_nums, 6,
              "The max number of caution-level obstacles");
 DEFINE_double(caution_distance_threshold, 60.0,
@@ -183,6 +187,14 @@ DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_prediction_layer.pt",
               "pedestrian interaction prediction layer");
+DEFINE_string(
+    torch_pedestrian_semantic_lstm_file,
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_model.pt",
+    "Pedestrian semantic lstm model file, default for gpu");
+DEFINE_string(
+    torch_pedestrian_semantic_lstm_cpu_file,
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_cpu_model.pt",
+    "Pedestrian semantic lstm cpu model file");
 DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
               "/apollo/modules/prediction/data/"
               "traced_online_obs_enc.pt",

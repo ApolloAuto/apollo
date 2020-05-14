@@ -54,8 +54,12 @@ third_party/can_card_library/esd_can/lib
 # Map data files
 modules/map/data
 
+#dockerfile tarballs
+docker/build/archive/
+
 # python proto
 py_proto
+*_pb2.py
 
 # calibration files
 modules/calibration/data/
@@ -66,3 +70,6 @@ docs/demo_guide/*.record
 
 # Bash Environment
 .dev_bash_hist
+
+# bazel cache and others
+.cache/

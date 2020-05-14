@@ -24,6 +24,10 @@ set -e
 source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash
 
+if [ ! -z "$4" ]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$4
+fi
+
 sudo mkdir -p ${TARGET_DIR}
 
 if [ -z "$3" ]; then
@@ -40,4 +44,5 @@ fi
     --prediction_offline_bags=${SRC_DIR} \
     --prediction_data_dir=${TARGET_DIR} \
     --max_num_dump_feature=1000 \
-    --noenable_semantic_map
+    --noenable_semantic_map \
+    --noenable_async_draw_base_image

@@ -22,8 +22,6 @@
 
 #include "cyber/common/macros.h"
 
-#include "modules/planning/proto/creep_decider_config.pb.h"
-
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"

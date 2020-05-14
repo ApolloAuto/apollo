@@ -18,6 +18,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
+#include "cyber/record/record_writer.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/prediction/common/feature_output.h"
@@ -41,6 +42,8 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
+using apollo::cyber::record::RecordWriter;
+using apollo::cyber::proto::SingleMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -282,19 +285,36 @@ void MessageProcess::OnStoryTelling(const Stories& story) {
          << "].";
 }
 
-void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
-  RecordReader reader(record_filename);
+void MessageProcess::ProcessOfflineData(const std::string& record_filepath) {
+  RecordReader reader(record_filepath);
   RecordMessage message;
+  RecordWriter writer;
+  if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+    writer.Open(record_filepath + ".new_prediction");
+  }
   while (reader.ReadMessage(&message)) {
     if (message.channel_name == FLAGS_perception_obstacle_topic) {
       PerceptionObstacles perception_obstacles;
       if (perception_obstacles.ParseFromString(message.content)) {
+        if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+          writer.WriteMessage<PerceptionObstacles>(message.channel_name,
+              perception_obstacles, message.time);
+        }
         PredictionObstacles prediction_obstacles;
         OnPerception(perception_obstacles, &prediction_obstacles);
+        if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+          writer.WriteMessage<PredictionObstacles>(FLAGS_prediction_topic,
+              prediction_obstacles, message.time);
+          AINFO << "Generated a new prediction message.";
+        }
       }
     } else if (message.channel_name == FLAGS_localization_topic) {
       LocalizationEstimate localization;
       if (localization.ParseFromString(message.content)) {
+        if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+          writer.WriteMessage<LocalizationEstimate>(message.channel_name,
+              localization, message.time);
+        }
         OnLocalization(localization);
       }
     } else if (message.channel_name == FLAGS_planning_trajectory_topic) {
@@ -303,6 +323,9 @@ void MessageProcess::ProcessOfflineData(const std::string& record_filename) {
         OnPlanning(adc_trajectory);
       }
     }
+  }
+  if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+    writer.Close();
   }
 }
 

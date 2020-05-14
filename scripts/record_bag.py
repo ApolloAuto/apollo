@@ -78,10 +78,12 @@ SMALL_TOPICS = [
     '/apollo/sensor/gnss/ins_stat',
     '/apollo/sensor/gnss/odometry',
     '/apollo/sensor/gnss/raw_data',
+    '/apollo/sensor/gnss/rtcm_data',
     '/apollo/sensor/gnss/rtk_eph',
     '/apollo/sensor/gnss/rtk_obs',
     '/apollo/sensor/gnss/heading',
     '/apollo/sensor/mobileye',
+    '/apollo/storytelling',
     '/tf',
     '/tf_static',
 ]
@@ -109,7 +111,6 @@ LARGE_TOPICS = [
     '/apollo/sensor/lidar128/PointCloud2',
     '/apollo/sensor/lidar128/compensator/PointCloud2',
 ]
-
 
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""

@@ -49,6 +49,8 @@ DECLARE_bool(img_show_semantic_map);
 // Scenario
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_all_junction);
+DECLARE_bool(enable_all_pedestrian_caution_in_front);
+DECLARE_bool(enable_rank_caution_obstacles);
 DECLARE_int32(caution_obs_max_nums);
 DECLARE_double(caution_distance_threshold);
 DECLARE_double(caution_search_distance_ahead);
@@ -105,6 +107,8 @@ DECLARE_string(torch_pedestrian_interaction_position_embedding_file);
 DECLARE_string(torch_pedestrian_interaction_social_embedding_file);
 DECLARE_string(torch_pedestrian_interaction_single_lstm_file);
 DECLARE_string(torch_pedestrian_interaction_prediction_layer_file);
+DECLARE_string(torch_pedestrian_semantic_lstm_file);
+DECLARE_string(torch_pedestrian_semantic_lstm_cpu_file);
 DECLARE_string(torch_lane_aggregating_obstacle_encoding_file);
 DECLARE_string(torch_lane_aggregating_lane_encoding_file);
 DECLARE_string(torch_lane_aggregating_prediction_layer_file);
