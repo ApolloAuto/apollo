@@ -18,6 +18,7 @@
 
 # Fail on first error.
 set -e
+INSTALL_MODE=$1; shift
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -62,6 +63,14 @@ apt-get -y update && \
 
 # BLAS: install ATLAS by sudo apt-get install libatlas-base-dev or install
 # OpenBLAS by sudo apt-get install libopenblas-dev or MKL for better CPU performance.
+
+if [[ "${INSTALL_MODE}" != "build" ]]; then
+    PKG_NAME="caffe-1.0-x86_64.tar.gz"
+    info "Extracting ${PKG_NAME} to /usr/local/caffe ..."
+    tar xzf /tmp/archive/${PKG_NAME} -C /usr/local
+    rm -rf /tmp/archive/${PKG_NAME}
+    exit 0
+fi
 
 VERSION="1.0"
 PKG_NAME="caffe-1.0.tar.gz"

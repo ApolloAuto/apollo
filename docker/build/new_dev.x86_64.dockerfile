@@ -1,6 +1,7 @@
 FROM apolloauto/apollo:cyber-x86_64-18.04-20200510_2227
 ARG GEOLOC
 ARG BUILD_STAGE
+ARG INSTALL_MODE
 
 WORKDIR /apollo
 USER root
@@ -12,7 +13,7 @@ COPY archive /tmp/archive
 
 # Better put tensorrt before caffe
 RUN bash /tmp/installers/install_tensorrt.sh
-RUN bash /tmp/installers/install_gpu_caffe.sh
+RUN bash /tmp/installers/install_gpu_caffe.sh ${INSTALL_MODE}
 
 RUN bash /tmp/installers/install_map_deps.sh
 RUN bash /tmp/installers/install_prediction_deps.sh
