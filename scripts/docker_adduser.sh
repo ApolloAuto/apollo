@@ -22,6 +22,8 @@ adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
 usermod -aG sudo "$DOCKER_USER"
 
 cp -r /etc/skel/. /home/${DOCKER_USER}
+
+# TODO(all): unified .bashrc/.bash_aliases for all users
 echo '
 export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda/bin
 

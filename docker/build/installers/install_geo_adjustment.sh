@@ -42,14 +42,14 @@ fi
 
 # us->cn
 if [ "$MY_GEO" == "cn" ]; then
-    cp -f /tmp/installers/sources.list.cn /etc/apt/sources.list
+    cp -f /etc/misc/sources.list.cn /etc/apt/sources.list
     sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
     # Mirror from Tsinghua Univ.
     PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
     #pip config set global.index-url "$PYPI_MIRROR"
     python3 -m pip config set global.index-url "$PYPI_MIRROR"
 elif [ "$MY_GEO" == "us" ]; then
-    cp -f /tmp/installers/sources.list.us /etc/apt/sources.list
+    cp -f /etc/misc/sources.list.us /etc/apt/sources.list
     sed -i 's/nvidia.cn/nvidia.com/g' /etc/apt/sources.list.d/nvidia-ml.list
     PYPI_MIRROR="https://pypi.org/simple"
     #pip config set global.index-url "$PYPI_MIRROR"

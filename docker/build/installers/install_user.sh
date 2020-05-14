@@ -33,6 +33,6 @@ usermod -aG sudo ${USER_NAME}
 
 sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 
-cp -f /etc/installers/user.bash_aliases /home/${USER_NAME}/.bash_aliases
+cp -f /etc/misc/user.bash_aliases /home/${USER_NAME}/.bash_aliases
 
 chown -R ${USER_NAME}:${USER_NAME} /home/${USER_NAME}

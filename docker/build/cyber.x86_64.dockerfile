@@ -9,9 +9,11 @@ LABEL version="1.2"
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY installers /tmp/installers
+COPY misc /etc/misc
 
 # Pre-downloaded tarballs
 COPY archive /tmp/archive
+
 RUN bash /tmp/installers/install_minimal_environment.sh ${GEOLOC}
 RUN bash /tmp/installers/install_cmake.sh
 RUN bash /tmp/installers/install_qa_tools.sh
