@@ -58,6 +58,12 @@ class GlobalData {
   void EnableSimulationMode();
   void DisableSimulationMode();
 
+  void EnableOctopusMode();
+  bool IsOctopusMode() const;
+
+  void SetADCId(const int& adc_id);
+  int ADCId() const;
+
   bool IsRealityMode() const;
 
   static uint64_t GenerateHashId(const std::string& name) {
@@ -98,6 +104,10 @@ class GlobalData {
 
   // run mode
   bool is_reality_mode_;
+
+  // used for octopus-engine
+  bool is_octopus_mode_;
+  int adc_id_;
 
   static AtomicHashMap<uint64_t, std::string, 512> node_id_map_;
   static AtomicHashMap<uint64_t, std::string, 256> channel_id_map_;

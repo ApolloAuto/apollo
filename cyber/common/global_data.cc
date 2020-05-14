@@ -67,6 +67,8 @@ GlobalData::GlobalData() {
   is_reality_mode_ =
       config_.run_mode_conf().run_mode() == proto::RunMode::MODE_REALITY;
 
+  is_octopus_mode_ = false;
+
   const char* run_mode_val = ::getenv("CYBER_RUN_MODE");
   if (run_mode_val != nullptr) {
     std::string run_mode_str(run_mode_val);
@@ -102,6 +104,14 @@ const std::string& GlobalData::HostName() const { return host_name_; }
 void GlobalData::EnableSimulationMode() { is_reality_mode_ = false; }
 
 void GlobalData::DisableSimulationMode() { is_reality_mode_ = true; }
+
+void GlobalData::EnableOctopusMode() { is_octopus_mode_ = true; }
+
+bool GlobalData::IsOctopusMode() const { return is_octopus_mode_; }
+
+int GlobalData::ADCId() const { return adc_id_; }
+
+void GlobalData::SetADCId(const int& adc_id) { adc_id_ = adc_id; }
 
 bool GlobalData::IsRealityMode() const { return is_reality_mode_; }
 
