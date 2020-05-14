@@ -1,0 +1,439 @@
+diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0.apollo/cmake/Cuda.cmake
+--- caffe-1.0.orig/cmake/Cuda.cmake	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/cmake/Cuda.cmake	2020-05-14 21:38:04.499145046 +0800
+@@ -1,10 +1,6 @@
+-if(CPU_ONLY)
+-  return()
+-endif()
+-
+ # Known NVIDIA GPU achitectures Caffe can be compiled for.
+ # This list will be used for CUDA_ARCH_NAME = All option
+-set(Caffe_known_gpu_archs "20 21(20) 30 35 50 60 61")
++set(Caffe_known_gpu_archs "30 35 50 52 60 61 70 75")
+ 
+ ################################################################################################
+ # A function for automatic detection of GPUs installed  (if autodetection is enabled)
+@@ -36,8 +32,7 @@
+                     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+ 
+     if(__nvcc_res EQUAL 0)
+-      string(REPLACE "2.1" "2.1(2.0)" __nvcc_out "${__nvcc_out}")
+-      set(CUDA_gpu_detect_output ${__nvcc_out} CACHE INTERNAL "Returned GPU architetures from caffe_detect_gpus tool" FORCE)
++      set(CUDA_gpu_detect_output ${__nvcc_out} CACHE INTERNAL "Returned GPU architectures from caffe_detect_gpus tool" FORCE)
+     endif()
+   endif()
+ 
+@@ -56,7 +51,7 @@
+ #   caffe_select_nvcc_arch_flags(out_variable)
+ function(caffe_select_nvcc_arch_flags out_variable)
+   # List of arch names
+-  set(__archs_names "Fermi" "Kepler" "Maxwell" "Pascal" "All" "Manual")
++  set(__archs_names "Kepler" "Maxwell" "Pascal" "Volta" "Turing" "All" "Manual")
+   set(__archs_name_default "All")
+   if(NOT CMAKE_CROSSCOMPILING)
+     list(APPEND __archs_names "Auto")
+@@ -64,14 +59,14 @@
+   endif()
+ 
+   # set CUDA_ARCH_NAME strings (so it will be seen as dropbox in CMake-Gui)
+-  set(CUDA_ARCH_NAME ${__archs_name_default} CACHE STRING "Select target NVIDIA GPU achitecture.")
++  set(CUDA_ARCH_NAME ${__archs_name_default} CACHE STRING "Select target NVIDIA GPU architecture.")
+   set_property( CACHE CUDA_ARCH_NAME PROPERTY STRINGS "" ${__archs_names} )
+   mark_as_advanced(CUDA_ARCH_NAME)
+ 
+   # verify CUDA_ARCH_NAME value
+   if(NOT ";${__archs_names};" MATCHES ";${CUDA_ARCH_NAME};")
+     string(REPLACE ";" ", " __archs_names "${__archs_names}")
+-    message(FATAL_ERROR "Only ${__archs_names} architeture names are supported.")
++    message(FATAL_ERROR "Only ${__archs_names} architecture names are supported.")
+   endif()
+ 
+   if(${CUDA_ARCH_NAME} STREQUAL "Manual")
+@@ -83,14 +78,16 @@
+     unset(CUDA_ARCH_PTX CACHE)
+   endif()
+ 
+-  if(${CUDA_ARCH_NAME} STREQUAL "Fermi")
+-    set(__cuda_arch_bin "20 21(20)")
+-  elseif(${CUDA_ARCH_NAME} STREQUAL "Kepler")
++  if(${CUDA_ARCH_NAME} STREQUAL "Kepler")
+     set(__cuda_arch_bin "30 35")
+   elseif(${CUDA_ARCH_NAME} STREQUAL "Maxwell")
+-    set(__cuda_arch_bin "50")
++    set(__cuda_arch_bin "50 52")
+   elseif(${CUDA_ARCH_NAME} STREQUAL "Pascal")
+     set(__cuda_arch_bin "60 61")
++  elseif(${CUDA_ARCH_NAME} STREQUAL "Volta")
++    set(__cuda_arch_bin "70")
++  elseif(${CUDA_ARCH_NAME} STREQUAL "Turing")
++    set(__cuda_arch_bin "75")
+   elseif(${CUDA_ARCH_NAME} STREQUAL "All")
+     set(__cuda_arch_bin ${Caffe_known_gpu_archs})
+   elseif(${CUDA_ARCH_NAME} STREQUAL "Auto")
+@@ -146,14 +143,6 @@
+ 
+   endforeach()
+ 
+-  if(UNIX OR APPLE)
+-    list(APPEND CUDA_NVCC_FLAGS -Xcompiler -fPIC)
+-  endif()
+-
+-  if(APPLE)
+-    list(APPEND CUDA_NVCC_FLAGS -Xcompiler -Wno-unused-function)
+-  endif()
+-
+   cuda_compile(cuda_objcs ${ARGN})
+ 
+   foreach(var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)
+@@ -176,18 +165,11 @@
+             PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT} ${CUDA_TOOLKIT_INCLUDE}
+             DOC "Path to cuDNN include directory." )
+ 
+-  # dynamic libs have different suffix in mac and linux
+-  if(APPLE)
+-    set(CUDNN_LIB_NAME "libcudnn.dylib")
+-  else()
+-    set(CUDNN_LIB_NAME "libcudnn.so")
+-  endif()
+-
+   get_filename_component(__libpath_hist ${CUDA_CUDART_LIBRARY} PATH)
+-  find_library(CUDNN_LIBRARY NAMES ${CUDNN_LIB_NAME}
+-   PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT} ${CUDNN_INCLUDE} ${__libpath_hist} ${__libpath_hist}/../lib
+-   DOC "Path to cuDNN library.")
+-  
++  find_library(CUDNN_LIBRARY NAMES libcudnn.so # libcudnn_static.a
++                             PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT} ${CUDNN_INCLUDE} ${__libpath_hist}
++                             DOC "Path to cuDNN library.")
++
+   if(CUDNN_INCLUDE AND CUDNN_LIBRARY)
+     set(HAVE_CUDNN  TRUE PARENT_SCOPE)
+     set(CUDNN_FOUND TRUE PARENT_SCOPE)
+@@ -231,7 +213,7 @@
+ ###  Non macro section
+ ################################################################################################
+ 
+-find_package(CUDA 5.5 QUIET)
++find_package(CUDA QUIET)
+ find_cuda_helper_libs(curand)  # cmake 2.8.7 compartibility which doesn't search for curand
+ 
+ if(NOT CUDA_FOUND)
+@@ -240,20 +222,52 @@
+ 
+ set(HAVE_CUDA TRUE)
+ message(STATUS "CUDA detected: " ${CUDA_VERSION})
+-list(APPEND Caffe_INCLUDE_DIRS PUBLIC ${CUDA_INCLUDE_DIRS})
+-list(APPEND Caffe_LINKER_LIBS PUBLIC ${CUDA_CUDART_LIBRARY}
+-                                     ${CUDA_curand_LIBRARY} ${CUDA_CUBLAS_LIBRARIES})
++
++if(NOT CUDA_VERSION VERSION_LESS "10.0")
++  STRING(REGEX REPLACE "CUDA_cublas_device_LIBRARY-NOTFOUND" "" CUDA_CUBLAS_LIBRARIES ${CUDA_CUBLAS_LIBRARIES})
++endif()
++
++message(STATUS "CUDA_CUDART_LIBRARY: ${CUDA_CUDART_LIBRARY}")
++include_directories(SYSTEM ${CUDA_INCLUDE_DIRS})
++list(APPEND Caffe_LINKER_LIBS ${CUDA_CUDART_LIBRARY}
++                              ${CUDA_curand_LIBRARY} ${CUDA_CUBLAS_LIBRARIES})
+ 
+ # cudnn detection
+ if(USE_CUDNN)
+-  detect_cuDNN()
++    #detect_cuDNN()
++
++#  FIND_PACKAGE(CUDNN 6.0 EXACT)
++   FIND_PACKAGE(CUDNN)
++
++#  IF(NOT CUDNN_FOUND)
++#    CUDNN_INSTALL(6.0-rc ${CMAKE_INSTALL_PREFIX})
++#  ENDIF()
++
++  if(CUDNN_FOUND)
++   set(HAVE_CUDNN ${CUDNN_FOUND})
++  endif()
++
+   if(HAVE_CUDNN)
+-    list(APPEND Caffe_DEFINITIONS PUBLIC -DUSE_CUDNN)
+-    list(APPEND Caffe_INCLUDE_DIRS PUBLIC ${CUDNN_INCLUDE})
+-    list(APPEND Caffe_LINKER_LIBS PUBLIC ${CUDNN_LIBRARY})
++    add_definitions(-DUSE_CUDNN)
++    include_directories(SYSTEM ${CUDNN_INCLUDE})
++    list(APPEND Caffe_LINKER_LIBS ${CUDNN_LIBRARY})
+   endif()
+ endif()
+ 
++if(UNIX OR APPLE)
++  list(APPEND CUDA_NVCC_FLAGS -std=c++11;-Xcompiler;-fPIC)
++endif()
++
++if(APPLE)
++  list(APPEND CUDA_NVCC_FLAGS -Xcompiler;-Wno-unused-function)
++endif()
++
++if(CMAKE_BUILD_TYPE MATCHES "Debug")
++  list(APPEND CUDA_NVCC_FLAGS -G -g)
++endif()
++
++SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
++
+ # setting nvcc arch flags
+ caffe_select_nvcc_arch_flags(NVCC_FLAGS_EXTRA)
+ list(APPEND CUDA_NVCC_FLAGS ${NVCC_FLAGS_EXTRA})
+@@ -284,7 +298,7 @@
+ if(APPLE)
+   caffe_detect_darwin_version(OSX_VERSION)
+ 
+-  # OSX 10.9 and higher uses clang/libc++ by default which is incompatible with old CUDA toolkits
++  # OSX 10.9 and higher uses clang/libc++ by default which is incompartible with old CUDA toolkits
+   if(OSX_VERSION VERSION_GREATER 10.8)
+     # enabled by default if and only if CUDA version is less than 7.0
+     caffe_option(USE_libstdcpp "Use libstdc++ instead of libc++" (CUDA_VERSION VERSION_LESS 7.0))
+diff -aruN caffe-1.0.orig/cmake/Dependencies.cmake caffe-1.0.apollo/cmake/Dependencies.cmake
+--- caffe-1.0.orig/cmake/Dependencies.cmake	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/cmake/Dependencies.cmake	2020-05-14 21:35:45.916540790 +0800
+@@ -5,7 +5,7 @@
+ set(Caffe_COMPILE_OPTIONS "")
+ 
+ # ---[ Boost
+-find_package(Boost 1.55 REQUIRED COMPONENTS system thread filesystem)
++find_package(Boost REQUIRED COMPONENTS system thread filesystem)
+ list(APPEND Caffe_INCLUDE_DIRS PUBLIC ${Boost_INCLUDE_DIRS})
+ list(APPEND Caffe_LINKER_LIBS PUBLIC ${Boost_LIBRARIES})
+ 
+diff -aruN caffe-1.0.orig/cmake/Modules/FindCUDNN.cmake caffe-1.0.apollo/cmake/Modules/FindCUDNN.cmake
+--- caffe-1.0.orig/cmake/Modules/FindCUDNN.cmake	1970-01-01 08:00:00.000000000 +0800
++++ caffe-1.0.apollo/cmake/Modules/FindCUDNN.cmake	2020-05-14 20:39:07.602688344 +0800
+@@ -0,0 +1,159 @@
++# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
++# file Copyright.txt or https://cmake.org/licensing for details.
++#.rst:
++# FindCUDNN
++# -------
++#
++# Find CUDNN library
++#
++# Valiables that affect result:
++# <VERSION>, <REQUIRED>, <QUIETLY>: as usual
++#
++# <EXACT> : as usual, plus we do find '5.1' version if you wanted '5' 
++#           (not if you wanted '5.0', as usual)   
++#
++# Result variables
++# ^^^^^^^^^^^^^^^^
++#
++# This module will set the following variables in your project:
++#
++# ``CUDNN_INCLUDE``
++#   where to find cudnn.h.
++# ``CUDNN_LIBRARY``
++#   the libraries to link against to use CUDNN.
++# ``CUDNN_FOUND``
++#   If false, do not try to use CUDNN.
++# ``CUDNN_VERSION``
++#   Version of the CUDNN library we looked for 
++#
++# Exported functions
++# ^^^^^^^^^^^^^^^^
++# function(CUDNN_INSTALL version dest_dir)
++#  This function will try to download and install CUDNN.
++#
++#
++
++function(CUDNN_INSTALL version dest_dir)
++  string(REGEX REPLACE "-rc$" "" version_base "${version}")
++
++  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
++    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
++      set(__url_arch_name linux-x64 )
++    elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "ppc")
++      set(__url_arch_name linux-ppc64le ) 
++      #  TX1 has to be installed via JetPack
++    endif()
++  elseif  (APPLE)
++    set(__url_arch_name osx-x64)
++  elseif(WIN32)
++    if(CMAKE_SYSTEM_VERSION MATCHES "10")
++      set(__url_arch_name windows10)
++    else()
++      set(__url_arch_name windows7)
++    endif()
++  endif()
++  
++  # Download and install CUDNN locally if not found on the system
++  if(__url_arch_name) 
++    set(__download_dir ${CMAKE_CURRENT_BINARY_DIR}/downloads)
++    file(MAKE_DIRECTORY ${__download_dir})
++    set(__cudnn_filename cudnn-${CUDA_VERSION}-${__url_arch_name}-v${version}.tgz)
++    set(__base_url http://developer.download.nvidia.com/compute/redist/cudnn)
++    set(__cudnn_url ${__base_url}/v${version_base}/${__cudnn_filename})
++    set(__cudnn_tgz ${__download_dir}/${__cudnn_filename})
++    
++    if(NOT EXISTS ${__cudnn_tgz})
++      message("Downloading CUDNN library from NVIDIA...")
++      file(DOWNLOAD ${__cudnn_url} ${__cudnn_tgz}
++	SHOW_PROGRESS STATUS CUDNN_STATUS
++	)
++      if("${CUDNN_STATUS}" MATCHES "0")
++	execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf "${__cudnn_tgz}" WORKING_DIRECTORY "${__download_dir}")
++      else()
++	message("Was not able to download CUDNN from ${__cudnn_url}. Please install CuDNN manually from https://developer.nvidia.com/cuDNN")
++	file(REMOVE ${__cudnn_tgz})
++      endif()
++    endif()
++    
++    if(WIN32)
++      file(GLOB __cudnn_binfiles ${__download_dir}/cuda/bin*/*)
++      install(FILES ${__cudnn_binfiles} 
++	DESTINATION  "${dest_dir}/bin")
++    endif()
++    
++    file(GLOB __cudnn_incfiles ${__download_dir}/cuda/include/*)
++    install(FILES ${__cudnn_incfiles} 
++      DESTINATION  "${dest_dir}/include")
++
++    file(GLOB __cudnn_libfiles ${__download_dir}/cuda/lib*/*)
++    install(FILES ${__cudnn_libfiles} 
++      DESTINATION  "${dest_dir}/lib")
++
++  endif(__url_arch_name)
++endfunction()
++
++#####################################################
++
++get_filename_component(__libpath_cudart ${CUDA_CUDART_LIBRARY} PATH)
++unset(CUDNN_LIBRARY CACHE)
++
++find_path(CUDNN_INCLUDE cudnn.h PATHS
++    ${CUDNN_DIR}/cuda/include $ENV{CUDNN_DIR}/cuda/include 
++    ${CUDNN_DIR}/include $ENV{CUDNN_DIR}/include 
++    ${CUDNN_DIR} $ENV{CUDNN_DIR} 
++    ${CUDNN_PATH} $ENV{CUDNN_PATH} ${CUDA_TOOLKIT_INCLUDE} ENV{CMAKE_INCLUDE_PATH}
++  DOC "Path to CUDNN include directory." )
++# We use major only in library search as major/minor is not entirely consistent among platforms.
++# Also, looking for exact minor version of .so is in general not a good idea.
++# More strict enforcement of minor/patch version is done if/when the header file is examined.
++if(CUDNN_FIND_VERSION_EXACT)
++  SET(__cudnn_ver_suffix ".${CUDNN_FIND_VERSION_MAJOR}")
++  SET(__cudnn_lib_win_name cudnn64_${CUDNN_FIND_VERSION_MAJOR}.dll)
++  SET(CUDNN_MAJOR_VERSION ${CUDNN_FIND_MAJOR_VERSION})
++else()
++  SET(__cudnn_lib_win_name cudnn64.dll)
++endif()
++
++find_library(CUDNN_LIBRARY NAMES libcudnn.so${__cudnn_ver_suffix} libcudnn${__cudnn_ver_suffix}.dylib ${__cudnn_lib_win_name}
++  PATHS ${CUDNN_DIR}/cuda/lib64 $ENV{CUDNN_DIR}/cuda/lib64 ${CUDNN_DIR}/lib64 $ENV{CUDNN_DIR}/lib64 ${CUDNN_DIR} $ENV{CUDNN_DIR} 
++  ${CUDNN_PATH} $ENV{CUDNN_PATH} $ENV{LD_LIBRARY_PATH} ${__libpath_cudart}
++  DOC "CUDNN library." )
++
++mark_as_advanced(CUDNN_INCLUDE CUDNN_LIBRARY )
++
++if(CUDNN_INCLUDE)
++  file(READ ${CUDNN_INCLUDE}/cudnn.h CUDNN_VERSION_FILE_CONTENTS)
++  string(REGEX MATCH "define CUDNN_MAJOR * +([0-9]+)"
++    CUDNN_MAJOR_VERSION "${CUDNN_VERSION_FILE_CONTENTS}")
++  string(REGEX REPLACE "define CUDNN_MAJOR * +([0-9]+)" "\\1"
++    CUDNN_MAJOR_VERSION "${CUDNN_MAJOR_VERSION}")
++  string(REGEX MATCH "define CUDNN_MINOR * +([0-9]+)"
++    CUDNN_MINOR_VERSION "${CUDNN_VERSION_FILE_CONTENTS}")
++  string(REGEX REPLACE "define CUDNN_MINOR * +([0-9]+)" "\\1"
++    CUDNN_MINOR_VERSION "${CUDNN_MINOR_VERSION}")
++  string(REGEX MATCH "define CUDNN_PATCHLEVEL * +([0-9]+)"
++    CUDNN_PATCH_VERSION "${CUDNN_VERSION_FILE_CONTENTS}")
++  string(REGEX REPLACE "define CUDNN_PATCHLEVEL * +([0-9]+)" "\\1"
++    CUDNN_PATCH_VERSION "${CUDNN_PATCH_VERSION}")  
++endif()
++
++if(NOT CUDNN_MAJOR_VERSION)
++  set(CUDNN_VERSION "???")
++else()
++## Fixing the case where 5.1 does not fit 'exact' 5.
++  set(CUDNN_VERSION ${CUDNN_MAJOR_VERSION}.${CUDNN_MINOR_VERSION})
++  if(CUDNN_FIND_VERSION_EXACT AND "x${CUDNN_FIND_VERSION_MINOR}" STREQUAL "x")
++    if(CUDNN_MAJOR_VERSION EQUAL CUDNN_FIND_VERSION_MAJOR)
++      set(CUDNN_VERSION ${CUDNN_FIND_VERSION})
++    endif()
++  endif()
++    math(EXPR CUDNN_VERSION_NUM "${CUDNN_MAJOR_VERSION} * 1000 + ${CUDNN_MINOR_VERSION} * 100 + ${CUDNN_PATCH_VERSION}")
++endif()
++
++
++  
++find_package_handle_standard_args(CUDNN
++                                  REQUIRED_VARS CUDNN_LIBRARY 
++                                  VERSION_VAR   CUDNN_VERSION)
++
++
+diff -aruN caffe-1.0.orig/CMakeLists.txt caffe-1.0.apollo/CMakeLists.txt
+--- caffe-1.0.orig/CMakeLists.txt	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/CMakeLists.txt	2020-05-14 21:50:43.095191423 +0800
+@@ -8,6 +8,8 @@
+ 
+ # ---[ Caffe project
+ project(Caffe C CXX)
++set(CMAKE_CXX_STANDARD 11)
++#set(CMAKE_VERBOSE_MAKEFILE ON)
+ 
+ # ---[ Caffe version
+ set(CAFFE_TARGET_VERSION "1.0.0" CACHE STRING "Caffe logical version")
+diff -aruN caffe-1.0.orig/Makefile.config.example caffe-1.0.apollo/Makefile.config.example
+--- caffe-1.0.orig/Makefile.config.example	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/Makefile.config.example	2020-05-14 19:36:51.637430151 +0800
+@@ -31,17 +31,13 @@
+ # CUDA_DIR := /usr
+ 
+ # CUDA architecture setting: going with all of them.
+-# For CUDA < 6.0, comment the *_50 through *_61 lines for compatibility.
+-# For CUDA < 8.0, comment the *_60 and *_61 lines for compatibility.
+-CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
+-		-gencode arch=compute_20,code=sm_21 \
+-		-gencode arch=compute_30,code=sm_30 \
+-		-gencode arch=compute_35,code=sm_35 \
+-		-gencode arch=compute_50,code=sm_50 \
+-		-gencode arch=compute_52,code=sm_52 \
+-		-gencode arch=compute_60,code=sm_60 \
+-		-gencode arch=compute_61,code=sm_61 \
+-		-gencode arch=compute_61,code=compute_61
++CUDA_ARCH :=    -gencode arch=compute_50,code=sm_50 \
++        -gencode arch=compute_52,code=sm_52 \
++        -gencode arch=compute_60,code=sm_60 \
++        -gencode arch=compute_61,code=sm_61 \
++        -gencode arch=compute_70,code=sm_70 \
++        -gencode arch=compute_75,code=sm_75 \
++        -gencode arch=compute_75,code=compute_75
+ 
+ # BLAS choice:
+ # atlas for ATLAS (default)
+diff -aruN caffe-1.0.orig/src/caffe/CMakeLists.txt caffe-1.0.apollo/src/caffe/CMakeLists.txt
+--- caffe-1.0.orig/src/caffe/CMakeLists.txt	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/src/caffe/CMakeLists.txt	2020-05-14 21:42:26.880426465 +0800
+@@ -22,7 +22,10 @@
+ 
+ add_library(caffe ${srcs})
+ caffe_default_properties(caffe)
+-target_link_libraries(caffe ${Caffe_LINKER_LIBS})
++target_link_libraries(caffe
++    ${Caffe_LINKER_LIBS}
++    ${CUDA_CUDART_LIBRARY}
++)
+ target_include_directories(caffe ${Caffe_INCLUDE_DIRS}
+                                  PUBLIC
+                                  $<BUILD_INTERFACE:${Caffe_INCLUDE_DIR}>
+diff -aruN caffe-1.0.orig/src/caffe/util/io.cpp caffe-1.0.apollo/src/caffe/util/io.cpp
+--- caffe-1.0.orig/src/caffe/util/io.cpp	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/src/caffe/util/io.cpp	2020-05-14 21:52:23.538148280 +0800
+@@ -54,7 +54,7 @@
+   CHECK_NE(fd, -1) << "File not found: " << filename;
+   ZeroCopyInputStream* raw_input = new FileInputStream(fd);
+   CodedInputStream* coded_input = new CodedInputStream(raw_input);
+-  coded_input->SetTotalBytesLimit(kProtoReadBytesLimit, 536870912);
++  coded_input->SetTotalBytesLimit(kProtoReadBytesLimit);
+ 
+   bool success = proto->ParseFromCodedStream(coded_input);
+ 
+diff -aruN caffe-1.0.orig/src/caffe/util/math_functions.cu caffe-1.0.apollo/src/caffe/util/math_functions.cu
+--- caffe-1.0.orig/src/caffe/util/math_functions.cu	2017-04-16 00:17:48.000000000 +0800
++++ caffe-1.0.apollo/src/caffe/util/math_functions.cu	2020-05-14 19:38:10.732709237 +0800
+@@ -1,4 +1,4 @@
+-#include <math_functions.h>  // CUDA's, not caffe's, for fabs, signbit
++#include <cuda_runtime_api.h>
+ #include <thrust/device_vector.h>
+ #include <thrust/functional.h>  // thrust::plus
+ #include <thrust/reduce.h>

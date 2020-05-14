@@ -41,5 +41,10 @@ apt-get -y update && \
     libnvparsers-dev \
     libnvinfer-plugin-dev
 
+# Make caffe-1.0 compilation pass
+CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
+[[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ]] || \
+    ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
+
 apt-get clean && \
 	rm -rf /var/lib/apt/lists/*

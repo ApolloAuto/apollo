@@ -21,6 +21,14 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+. /tmp/installers/installer_base.sh
+warning "Caffe 1.0 support will be abandoned after Apollo 6.0 release!"
+
+# Make caffe-1.0 compilation pass
+CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
+[[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ]] || \
+    ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
+
 # http://caffe.berkeleyvision.org/install_apt.html
 # apt-get -y update && \
 #    apt-get -y install \
@@ -35,10 +43,12 @@ apt-get -y update && \
     libsnappy-dev \
     libopencv-dev \
     libhdf5-serial-dev \
+    libhdf5-dev \
     libboost-all-dev \
     liblmdb-dev \
     libatlas-base-dev \
     libopenblas-dev \
+    libqhull-dev
 
 # And...
 # protobuf/gflags/glog
@@ -46,15 +56,12 @@ apt-get -y update && \
 ## packages not used in building
 # libflann-dev \
 # libopenni-dev \
-# libqhull-dev \
 # mpi-default-dev
 # libvtk6-dev
 # libvtk6-qt-dev
 
 # BLAS: install ATLAS by sudo apt-get install libatlas-base-dev or install
 # OpenBLAS by sudo apt-get install libopenblas-dev or MKL for better CPU performance.
-
-. /tmp/installers/installer_base.sh
 
 VERSION="1.0"
 PKG_NAME="caffe-1.0.tar.gz"
@@ -67,14 +74,14 @@ tar xzf "${PKG_NAME}"
 
 MY_DEST_DIR=/usr/local/caffe
 
-#TODO(storypku): More GPU arch support (sm_61 on my GTX 1070)
-# And...        -DUSE_NCCL=ON
 pushd caffe-${VERSION}
+    patch -p1 < "/tmp/installers/caffe-${VERSION}.apollo.patch"
     mkdir build && cd build
     cmake .. \
         -DBUILD_SHARED_LIBS=ON \
         -DBUILD_python=OFF \
         -DBUILD_docs=OFF \
+        -DUSE_NCCL=ON \
         -DCMAKE_INSTALL_PREFIX=${MY_DEST_DIR}
     make -j$(nproc)
     make install

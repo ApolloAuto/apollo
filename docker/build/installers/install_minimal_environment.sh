@@ -52,6 +52,7 @@ apt-get -y update && \
     git \
     vim \
     lsof \
+    patch \
     tree \
     pkg-config \
     python3 \
