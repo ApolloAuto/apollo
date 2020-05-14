@@ -32,8 +32,6 @@ apt-get -y update && \
     libxml2-dev
 
 python3 -m pip install --no-cache-dir grpcio-tools
-pip2 install --no-cache-dir grpcio-tools
-
 
 # clean up
 apt-get clean && \
