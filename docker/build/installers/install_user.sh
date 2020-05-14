@@ -33,9 +33,6 @@ usermod -aG sudo ${USER_NAME}
 
 sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 
-echo """
-ulimit -c unlimited
-source /apollo/scripts/apollo_base.sh
-alias bb=\"bazel build --distdir=/apollo/.cache/distdir\"
-alias bt=\"bazel test  --distdir=/apollo/.cache/distdir\"
-""" >> /home/${USER_NAME}/.bashrc
+cp -f /etc/installers/user.bash_aliases /home/${USER_NAME}/.bash_aliases
+
+chown -R ${USER_NAME}:${USER_NAME} /home/${USER_NAME}
