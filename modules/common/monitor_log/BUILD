@@ -15,8 +15,8 @@ cc_library(
     deps = [
         "//cyber",
         "//cyber/proto:component_conf_cc_proto",
-        "//modules/common/monitor_log/proto:monitor_log_proto",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/monitor_log/proto:monitor_log_cc_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
         "@com_google_googletest//:gtest",

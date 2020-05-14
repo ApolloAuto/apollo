@@ -80,7 +80,7 @@ cc_library(
     deps = [
         ":euler_angles_zxy",
         ":geometry",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "@eigen",
     ],
 )
@@ -135,7 +135,7 @@ cc_library(
     hdrs = ["path_matcher.h"],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
@@ -172,7 +172,7 @@ cc_library(
     hdrs = ["linear_interpolation.h"],
     deps = [
         ":geometry",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
