@@ -638,7 +638,8 @@ void ReferenceLineInfo::ExportVehicleSignal(
 
 bool ReferenceLineInfo::ReachedDestination() const {
   static constexpr double kDestinationDeltaS = 0.05;
-  return SDistanceToDestination() <= kDestinationDeltaS;
+  const  double distance_destination = SDistanceToDestination();
+  return distance_destination <= kDestinationDeltaS;
 }
 
 double ReferenceLineInfo::SDistanceToDestination() const {
@@ -693,7 +694,8 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
     return;
   }
   auto main_stop = decision_result->main_decision().stop();
-  if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
+  if (main_stop.reason_code() != STOP_REASON_DESTINATION &&
+      main_stop.reason_code() != STOP_REASON_PULL_OVER) {
     return;
   }
   const auto& adc_pos = adc_planning_point_.path_point();
