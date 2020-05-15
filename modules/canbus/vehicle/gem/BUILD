@@ -11,6 +11,8 @@ cc_library(
         ":gem_controller",
         ":gem_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
     ],
 )
 

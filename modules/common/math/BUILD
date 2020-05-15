@@ -199,9 +199,9 @@ cc_library(
     name = "mpc",
     srcs = ["mpc_solver.cc"],
     hdrs = ["mpc_solver.h"],
+    copts = ["-Iexternal/eigen"],
     deps = [
         "//cyber/common:log",
-        "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen",
     ],
@@ -233,8 +233,7 @@ cc_test(
     deps = [
         ":mpc",
         ":mpc_osqp",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
+        "//cyber/common:log",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -245,8 +244,6 @@ cc_test(
     srcs = ["mpc_solver_test.cc"],
     deps = [
         ":mpc",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
         "@com_google_googletest//:gtest_main",
     ],
 )

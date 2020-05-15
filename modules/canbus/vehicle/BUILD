@@ -12,6 +12,8 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
@@ -46,6 +48,7 @@ cc_library(
         "//modules/canbus/vehicle/transit:transit_vehicle_factory",
         "//modules/canbus/vehicle/wey:wey_vehicle_factory",
         "//modules/canbus/vehicle/zhongyun:zhongyun_vehicle_factory",
+        ":abstract_vehicle_factory",
         "//modules/common/util:factory",
     ],
 )

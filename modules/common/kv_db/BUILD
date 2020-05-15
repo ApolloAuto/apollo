@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["kv_db.h"],
     deps = [
         "//cyber/common:log",
+        "@com_google_absl//absl/strings",
         "//modules/common/util",
         "//modules/common/util:future",
         "//third_party:sqlite3",

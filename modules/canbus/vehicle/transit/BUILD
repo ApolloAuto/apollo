@@ -34,12 +34,10 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":transit_message_manager",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "//modules/common/proto:vehicle_signal_cc_proto",
         "//modules/common/kv_db",
         "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
 )

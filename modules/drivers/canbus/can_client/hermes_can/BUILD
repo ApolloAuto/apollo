@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/drivers/canbus/can_client",
+        "//modules/common/proto:error_code_cc_proto",
         "//third_party/can_card_library/hermes_can",
     ],
 )

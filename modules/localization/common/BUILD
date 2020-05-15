@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/dreamview/backend/hmi:vehicle_manager",
-        "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:localization_cc_proto",
     ],
 )
 

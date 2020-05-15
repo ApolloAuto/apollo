@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["fake_can_client.h"],
     deps = [
         "//modules/drivers/canbus/can_client",
+        "//modules/common/proto:error_code_cc_proto",
     ],
 )
 

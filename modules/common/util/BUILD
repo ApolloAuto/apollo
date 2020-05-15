@@ -8,7 +8,9 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber/common:types",
-        "//modules/common/math",
+        "//cyber/common:log",
+        "//modules/common/math:geometry",
+        "//modules/common/proto:geometry_cc_proto",
         "//modules/common/proto:pnc_point_cc_proto",
     ],
 )

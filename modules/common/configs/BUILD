@@ -26,8 +26,8 @@ cc_library(
         "//cyber/common:file",
         "//cyber/common:macros",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
-        "//modules/common/util",
-        "@com_google_glog//:glog",
+        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/math:geometry",
     ],
 )
 

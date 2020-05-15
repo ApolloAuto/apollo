@@ -9,6 +9,7 @@ cc_library(
     deps = [
         ":ge3_controller",
         ":ge3_message_manager",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
 )
