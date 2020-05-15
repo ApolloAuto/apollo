@@ -21,6 +21,7 @@
 DECLARE_bool(planning_test_mode);
 
 DECLARE_string(planning_config_file);
+DECLARE_string(additional_planning_config_file);
 
 DECLARE_int32(history_max_record_num);
 DECLARE_int32(max_frame_history_num);
