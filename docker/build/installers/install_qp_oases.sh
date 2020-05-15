@@ -20,7 +20,24 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+
 . /tmp/installers/installer_base.sh
+
+warning "Currently libqpOASES.so built from source can't work properly, so we" \
+        "provide pre-built x86_64 version here. " \
+        "Will be removed once we are ready."
+
+VERSION="3.2.1-1"
+PKG_NAME="qp-oases-${VERSION}.x86_64.tar.gz"
+
+tar xzvf "/tmp/installers/${PKG_NAME}"
+pushd qp-oases-${VERSION}
+mv include/qpOASES{,.hpp} /usr/local/include
+mv lib/libqpOASES.so /usr/local/lib
+popd
+rm -rf qp-oases-${VERSION} /tmp/installers/${PKG_NAME}
+
+exit 0
 
 VERSION="3.2.1-1"
 PKG_NAME="qp-oases-${VERSION}.tar.gz"
