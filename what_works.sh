@@ -16,10 +16,17 @@
 # limitations under the License.
 ###############################################################################
 # For development only! Will remove before merging to master!
+# Testing steps:
+# 1. Start container: ./docker/scripts/dev_start.sh
+# 2. Login to container: ./docker/scripts/dev_into.sh
+# 3. Run this script.
 ###############################################################################
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 cp WORKSPACE.in WORKSPACE
+
+# Fail on first failure.
+set -e
 
 # Working parts.
 bazel build //cyber/...
