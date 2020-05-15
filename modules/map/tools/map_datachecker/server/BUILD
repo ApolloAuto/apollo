@@ -18,7 +18,7 @@ cc_library(
     deps = [
         ":common",
         "//cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
         "//third_party:boost",
     ],
 )
@@ -67,7 +67,7 @@ cc_library(
     hdrs = ["laps_checker.h"],
     deps = [
         ":common",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
         "//third_party:boost",
     ],
 )
@@ -100,9 +100,6 @@ cc_library(
     hdrs = ["pose_collection.h"],
     deps = [
         ":common",
-        ":pj_transformer",
-        "//cyber",
-        "//modules/drivers/gnss/proto:gnss_proto",
     ],
 )
 
@@ -115,7 +112,7 @@ cc_library(
         ":pj_transformer",
         ":pose_collection",
         "//cyber",
-        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
     ],
 )
 
@@ -128,7 +125,7 @@ cc_library(
     ],
     deps = [
         ":common",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
     ],
 )
 
