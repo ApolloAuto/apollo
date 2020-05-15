@@ -14,9 +14,9 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-#include <vector>
+#include <tinyxml2.h>
 
-#include "tinyxml2/tinyxml2.h"
+#include <vector>
 
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"

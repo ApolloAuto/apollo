@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cyber/common:types",
         "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
@@ -39,7 +39,7 @@ cc_test(
     srcs = ["util_test.cc"],
     deps = [
         ":util",
-        "//modules/common/util/testdata:simple_proto",
+        "//modules/common/util/testdata:simple_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

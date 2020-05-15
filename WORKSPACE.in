@@ -229,8 +229,8 @@ http_archive(
 
 http_archive(
     name = "qpOASES",
-    build_file = "external/qpOASES.BUILD",
-    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
+    build_file = "qpOASES.BUILD",
+    sha256 = "2cf87de73c9987efe9458e41c3c8782e26fac1560db565a8695f78d7ccdec38a",
     strip_prefix = "qp-oases-3.2.1-1",
     urls = ["https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.tar.gz"],
 )

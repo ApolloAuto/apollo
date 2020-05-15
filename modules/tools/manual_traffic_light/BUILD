@@ -12,6 +12,7 @@ cc_library(
         "//modules/common/util:color",
         "//modules/common/util:message_util",
         "//modules/map/hdmap:hdmap_util",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
     ],
 )
 

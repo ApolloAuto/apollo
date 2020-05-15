@@ -16,8 +16,6 @@ limitations under the License.
 
 #include <string>
 
-#include "tinyxml2/tinyxml2.h"
-
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
