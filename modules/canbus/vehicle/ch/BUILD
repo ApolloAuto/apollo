@@ -18,7 +18,7 @@ cc_library(
     srcs = ["ch_message_manager.cc"],
     hdrs = ["ch_message_manager.h"],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -31,7 +31,7 @@ cc_library(
     hdrs = ["ch_controller.h"],
     deps = [
         ":ch_message_manager",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
         "//modules/drivers/canbus/can_comm:can_sender",

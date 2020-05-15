@@ -26,7 +26,7 @@ cc_library(
     hdrs = ["adc_auxiliarycontrol_110.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -50,7 +50,7 @@ cc_library(
     hdrs = ["adc_motioncontrol1_10.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -74,7 +74,7 @@ cc_library(
     hdrs = ["adc_motioncontrollimits1_12.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -98,7 +98,7 @@ cc_library(
     hdrs = ["llc_auxiliaryfeedback_120.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -122,7 +122,7 @@ cc_library(
     hdrs = ["llc_diag_brakecontrol_721.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -146,7 +146,7 @@ cc_library(
     hdrs = ["llc_diag_fault_620.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -170,7 +170,7 @@ cc_library(
     hdrs = ["llc_diag_steeringcontrol_722.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -194,7 +194,7 @@ cc_library(
     hdrs = ["llc_motioncommandfeedback1_22.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -218,7 +218,7 @@ cc_library(
     hdrs = ["llc_motionfeedback1_20.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -242,7 +242,7 @@ cc_library(
     hdrs = ["llc_motionfeedback2_21.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -266,7 +266,7 @@ cc_library(
     hdrs = ["llc_vehiclelimits_24.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",
@@ -290,7 +290,7 @@ cc_library(
     hdrs = ["llc_vehiclestatus_25.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest",

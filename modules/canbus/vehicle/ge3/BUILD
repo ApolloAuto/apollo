@@ -28,7 +28,7 @@ cc_library(
     srcs = ["ge3_message_manager.cc"],
     hdrs = ["ge3_message_manager.h"],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -51,7 +51,7 @@ cc_library(
     hdrs = ["ge3_controller.h"],
     deps = [
         ":ge3_message_manager",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "//modules/drivers/canbus/can_comm:can_sender",

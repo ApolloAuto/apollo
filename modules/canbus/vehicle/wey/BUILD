@@ -28,7 +28,7 @@ cc_library(
     srcs = ["wey_message_manager.cc"],
     hdrs = ["wey_message_manager.h"],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -51,7 +51,7 @@ cc_library(
     hdrs = ["wey_controller.h"],
     deps = [
         ":wey_message_manager",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
         "//modules/drivers/canbus/can_comm:can_sender",
