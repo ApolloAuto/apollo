@@ -61,7 +61,7 @@ __global__ void scan_x(int* g_odata, int* g_idata, int n) {
   }
   if (thid == 0) {
     temp[n - 1] = 0;
-  }                               // clear the last element
+  }                                 // clear the last element
   for (int d = 1; d < n; d *= 2) {  // traverse down tree & build scan
     offset >>= 1;
     __syncthreads();
@@ -108,7 +108,7 @@ __global__ void scan_y(int* g_odata, int* g_idata, int n) {
   }
   if (thid == 0) {
     temp[n - 1] = 0;
-  }                               // clear the last element
+  }                                 // clear the last element
   for (int d = 1; d < n; d *= 2) {  // traverse down tree & build scan
     offset >>= 1;
     __syncthreads();
@@ -174,14 +174,21 @@ __global__ void make_anchor_mask_kernel(
   }
 }
 
-AnchorMaskCuda::AnchorMaskCuda(
-    const int num_inds_for_scan, const int num_anchor_x_inds,
-    const int num_anchor_y_inds, const int num_anchor_r_inds,
-    const float min_x_range, const float min_y_range, const float pillar_x_size,
-    const float pillar_y_size, const int grid_x_size, const int grid_y_size)
+AnchorMaskCuda::AnchorMaskCuda(const int num_inds_for_scan,
+                               const int num_anchor_x_inds,
+                               const int num_anchor_y_inds,
+                               const int num_class,
+                               const int num_anchor_r_inds,
+                               const float min_x_range,
+                               const float min_y_range,
+                               const float pillar_x_size,
+                               const float pillar_y_size,
+                               const int grid_x_size,
+                               const int grid_y_size)
     : num_inds_for_scan_(num_inds_for_scan),
       num_anchor_x_inds_(num_anchor_x_inds),
       num_anchor_y_inds_(num_anchor_y_inds),
+      num_class_(num_class),
       num_anchor_r_inds_(num_anchor_r_inds),
       min_x_range_(min_x_range),
       min_y_range_(min_y_range),
@@ -204,7 +211,8 @@ void AnchorMaskCuda::DoAnchorMaskCuda(
   GPU_CHECK(cudaMemcpy(dev_sparse_pillar_map, dev_cumsum_along_y,
                        num_inds_for_scan_ * num_inds_for_scan_ * sizeof(int),
                        cudaMemcpyDeviceToDevice));
-  make_anchor_mask_kernel<<<num_anchor_x_inds_ * num_anchor_r_inds_,
+  make_anchor_mask_kernel<<<num_anchor_x_inds_ * num_class_ *
+                                num_anchor_r_inds_,
                             num_anchor_y_inds_>>>(
       dev_box_anchors_min_x, dev_box_anchors_min_y, dev_box_anchors_max_x,
       dev_box_anchors_max_y, dev_sparse_pillar_map, dev_anchor_mask,

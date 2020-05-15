@@ -118,23 +118,18 @@ class TestClass {
 };
 
 TestClass::TestClass()
-    : num_class(1),
+    : num_class(3),
       max_num_pillars(12000),
       max_num_points_per_pillar(100),
       num_point_feature(4),
-      //      grid_x_size(280),
-      //      grid_y_size(320),
-      grid_x_size(432),
-      grid_y_size(496),
+      grid_x_size(280),
+      grid_y_size(320),
       grid_z_size(1),
-      //      pillar_x_size(0.25),
-      //      pillar_y_size(0.25),
-      pillar_x_size(0.16),
-      pillar_y_size(0.16),
+      pillar_x_size(0.25),
+      pillar_y_size(0.25),
       pillar_z_size(4.0),
       min_x_range(0),
-      //      min_y_range(-40.0),
-      min_y_range(-39.68),
+      min_y_range(-40.0),
       min_z_range(-3.0),
       num_inds_for_scan(512),
       num_threads(64),
@@ -518,7 +513,7 @@ TEST(TestSuite, CheckPreprocessGPU) {
   delete[] pillar_point_feature;
   delete[] pillar_coors;
 }
-
+/*
 // TODO(chenjiahao): should be changed to multi-anchor for multi-class
 TEST(TestSuite, CheckGenerateAnchors) {
   const int kNumClass = 1;
@@ -629,7 +624,7 @@ TEST(TestSuite, CheckGenerateBoxAnchors) {
   delete[] box_anchors_min_y;
   delete[] box_anchors_max_x;
   delete[] box_anchors_max_y;
-}
+}*/
 
 TEST(TestSuite, CheckDoInference) {
   const int kOutputNumBoxFeature = 7;
@@ -679,6 +674,7 @@ TEST(TestSuite, CheckDoInference) {
     yaw += M_PI / 2;
     yaw = std::atan2(std::sin(yaw), std::cos(yaw));
     yaw = -yaw;
+
     int label = out_labels.at(j);
     std::cout << "object id: " << j << ", x: " << x << ", y: " << y
               << ", z: " << z << ", dx: " << dx << ", dy: " << dy

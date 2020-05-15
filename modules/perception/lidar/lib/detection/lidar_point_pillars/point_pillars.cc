@@ -42,20 +42,20 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-const int PointPillars::kNumClass = 1;
+const int PointPillars::kNumClass = 3;
 const int PointPillars::kMaxNumPillars = 12000;
 const int PointPillars::kMaxNumPointsPerPillar = 100;
 const int PointPillars::kNumPointFeature = 4;
 const int PointPillars::kPfeOutputSize = kMaxNumPillars * 64;
-const int PointPillars::kGridXSize = 432;
-const int PointPillars::kGridYSize = 496;
+const int PointPillars::kGridXSize = 280;
+const int PointPillars::kGridYSize = 320;
 const int PointPillars::kGridZSize = 1;
 const int PointPillars::kRpnInputSize = 64 * kGridXSize * kGridYSize;
 const int PointPillars::kNumAnchorXInds = kGridXSize * 0.5;
 const int PointPillars::kNumAnchorYInds = kGridYSize * 0.5;
 const int PointPillars::kNumAnchorRInds = 2;
 const int PointPillars::kNumAnchor =
-    kNumAnchorXInds * kNumAnchorYInds * kNumAnchorRInds;
+    kNumAnchorXInds * kNumAnchorYInds * kNumClass * kNumAnchorRInds;
 const int PointPillars::kNumOutputBoxFeature = 7;
 const int PointPillars::kRpnBoxOutputSize = kNumAnchor * kNumOutputBoxFeature;
 const int PointPillars::kRpnClsOutputSize = kNumAnchor * kNumClass;
@@ -67,20 +67,20 @@ const int PointPillars::kNumThreads = 64;
 // common.h
 const int PointPillars::kNumBoxCorners = 4;
 // TODO(chenjiahao): kNumBoxCorners is actually used as kNumPointFeature
-const float PointPillars::kPillarXSize = 0.16f;
-const float PointPillars::kPillarYSize = 0.16f;
+const float PointPillars::kPillarXSize = 0.25f;
+const float PointPillars::kPillarYSize = 0.25f;
 const float PointPillars::kPillarZSize = 4.0f;
 const float PointPillars::kMinXRange = 0.0f;
-const float PointPillars::kMinYRange = -39.68f;
+const float PointPillars::kMinYRange = -40.0f;
 const float PointPillars::kMinZRange = -3.0f;
-const float PointPillars::kMaxXRange = 69.12f;
-const float PointPillars::kMaxYRange = 39.68f;
+const float PointPillars::kMaxXRange = 70.0f;
+const float PointPillars::kMaxYRange = 40.0f;
 const float PointPillars::kMaxZRange = 1.0f;
 const float PointPillars::kSensorHeight = 1.73f;
-// TODO(chenjiahao): get kSensorHeight's value from sensor's height param
-const float PointPillars::kAnchorDxSize = 1.6f;
-const float PointPillars::kAnchorDySize = 3.9f;
-const float PointPillars::kAnchorDzSize = 1.56f;
+// TODO(chenjiahao): kSensorHeight need to get from sensor's height param
+const std::vector<float> PointPillars::kAnchorDxSizes{1.6f, 0.6f, 0.6f};
+const std::vector<float> PointPillars::kAnchorDySizes{3.9f, 1.76f, 0.8f};
+const std::vector<float> PointPillars::kAnchorDzSizes{1.56f, 1.73f, 1.73f};
 
 PointPillars::PointPillars(const bool reproduce_result_mode,
                            const float score_threshold,
@@ -107,8 +107,8 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
 
   anchor_mask_cuda_ptr_.reset(
       new AnchorMaskCuda(kNumIndsForScan, kNumAnchorXInds, kNumAnchorYInds,
-                         kNumAnchorRInds, kMinXRange, kMinYRange, kPillarXSize,
-                         kPillarYSize, kGridXSize, kGridYSize));
+                         kNumClass, kNumAnchorRInds, kMinXRange, kMinYRange,
+                         kPillarXSize, kPillarYSize, kGridXSize, kGridYSize));
 
   scatter_cuda_ptr_.reset(
       new ScatterCuda(kNumThreads, kMaxNumPillars, kGridXSize, kGridYSize));
@@ -116,9 +116,9 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
   const float float_min = std::numeric_limits<float>::lowest();
   const float float_max = std::numeric_limits<float>::max();
   postprocess_cuda_ptr_.reset(new PostprocessCuda(
-      float_min, float_max, kNumAnchorXInds, kNumAnchorYInds, kNumAnchorRInds,
-      score_threshold_, kNumThreads, nms_overlap_threshold_, kNumBoxCorners,
-      kNumOutputBoxFeature, kNumClass));
+      float_min, float_max, kNumAnchorXInds, kNumAnchorYInds, kNumClass,
+      kNumAnchorRInds, score_threshold_, kNumThreads,
+      nms_overlap_threshold_, kNumBoxCorners, kNumOutputBoxFeature));
 
   DeviceMemoryMalloc();
   InitTRT();
@@ -334,16 +334,18 @@ void PointPillars::GenerateAnchors(float* anchors_px_, float* anchors_py_,
 
   for (int y = 0; y < kNumAnchorYInds; ++y) {
     for (int x = 0; x < kNumAnchorXInds; ++x) {
-      for (int r = 0; r < kNumAnchorRInds; ++r) {
-        int ind =
-            y * kNumAnchorXInds * kNumAnchorRInds + x * kNumAnchorRInds + r;
-        anchors_px_[ind] = anchor_x_count[x];
-        anchors_py_[ind] = anchor_y_count[y];
-        anchors_ro_[ind] = anchor_r_count[r];
-        anchors_pz_[ind] = -1 * kSensorHeight;
-        anchors_dx_[ind] = kAnchorDxSize;
-        anchors_dy_[ind] = kAnchorDySize;
-        anchors_dz_[ind] = kAnchorDzSize;
+      for (int c = 0; c < kNumClass; ++c) {
+        for (int r = 0; r < kNumAnchorRInds; ++r) {
+          int ind = y * kNumAnchorXInds * kNumClass * kNumAnchorRInds +
+              x * kNumClass * kNumAnchorRInds + c * kNumAnchorRInds + r;
+          anchors_px_[ind] = anchor_x_count[x];
+          anchors_py_[ind] = anchor_y_count[y];
+          anchors_ro_[ind] = anchor_r_count[r];
+          anchors_pz_[ind] = -1 * kSensorHeight;
+          anchors_dx_[ind] = kAnchorDxSizes[c];
+          anchors_dy_[ind] = kAnchorDySizes[c];
+          anchors_dz_[ind] = kAnchorDzSizes[c];
+        }
       }
     }
   }
@@ -381,34 +383,38 @@ void PointPillars::ConvertAnchors2BoxAnchors(float* anchors_px,
                                              float* box_anchors_min_y_,
                                              float* box_anchors_max_x_,
                                              float* box_anchors_max_y_) {
-  // flipping box's dimension at direction that rotates 90 degree
+  // flipping box's dimension
   float flipped_anchors_dx[kNumAnchor];
-  flipped_anchors_dx[0] = 0;
   float flipped_anchors_dy[kNumAnchor];
-  flipped_anchors_dy[0] = 0;
+  memset(flipped_anchors_dx, 0, kNumAnchor * sizeof(float));
+  memset(flipped_anchors_dy, 0, kNumAnchor * sizeof(float));
   for (int x = 0; x < kNumAnchorXInds; ++x) {
     for (int y = 0; y < kNumAnchorYInds; ++y) {
-      int base_ind =
-          x * kNumAnchorYInds * kNumAnchorRInds + y * kNumAnchorRInds;
-      flipped_anchors_dx[base_ind + 0] = kAnchorDxSize;
-      flipped_anchors_dy[base_ind + 0] = kAnchorDySize;
-      flipped_anchors_dx[base_ind + 1] = kAnchorDySize;
-      flipped_anchors_dy[base_ind + 1] = kAnchorDxSize;
+      for (int c = 0; c < kNumClass; ++c) {
+        int base_ind = x * kNumAnchorYInds * kNumClass * kNumAnchorRInds +
+            y * kNumClass * kNumAnchorRInds + c * kNumAnchorRInds;
+        flipped_anchors_dx[base_ind + 0] = kAnchorDxSizes[c];
+        flipped_anchors_dy[base_ind + 0] = kAnchorDySizes[c];
+        flipped_anchors_dx[base_ind + 1] = kAnchorDySizes[c];
+        flipped_anchors_dy[base_ind + 1] = kAnchorDxSizes[c];
+      }
     }
   }
   for (int x = 0; x < kNumAnchorXInds; ++x) {
     for (int y = 0; y < kNumAnchorYInds; ++y) {
-      for (int r = 0; r < kNumAnchorRInds; ++r) {
-        int ind =
-            x * kNumAnchorYInds * kNumAnchorRInds + y * kNumAnchorRInds + r;
-        box_anchors_min_x_[ind] =
-            anchors_px[ind] - flipped_anchors_dx[ind] / 2.0f;
-        box_anchors_min_y_[ind] =
-            anchors_py[ind] - flipped_anchors_dy[ind] / 2.0f;
-        box_anchors_max_x_[ind] =
-            anchors_px[ind] + flipped_anchors_dx[ind] / 2.0f;
-        box_anchors_max_y_[ind] =
-            anchors_py[ind] + flipped_anchors_dy[ind] / 2.0f;
+      for (int c = 0; c < kNumClass; ++c) {
+        for (int r = 0; r < kNumAnchorRInds; ++r) {
+          int ind = x * kNumAnchorYInds * kNumClass * kNumAnchorRInds +
+              y * kNumClass * kNumAnchorRInds + c * kNumAnchorRInds + r;
+          box_anchors_min_x_[ind] =
+              anchors_px[ind] - flipped_anchors_dx[ind] / 2.0f;
+          box_anchors_min_y_[ind] =
+              anchors_py[ind] - flipped_anchors_dy[ind] / 2.0f;
+          box_anchors_max_x_[ind] =
+              anchors_px[ind] + flipped_anchors_dx[ind] / 2.0f;
+          box_anchors_max_y_[ind] =
+              anchors_py[ind] + flipped_anchors_dy[ind] / 2.0f;
+        }
       }
     }
   }
