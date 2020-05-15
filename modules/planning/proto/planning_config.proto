@@ -354,4 +354,6 @@ message PlanningConfig {
   // default task config, it will be used if there is no scenario-specific
   // task config.
   repeated TaskConfig default_task_config = 5;
+  
+  optional int32 adc_id = 6;    // used in multi-adc simulation
 }
