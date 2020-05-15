@@ -150,9 +150,7 @@ TestClass::TestClass()
       grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size, min_x_range,
       min_y_range, min_z_range, num_box_corners));
 
-  //  bool reproduce_result_mode = false;
-  bool reproduce_result_mode = true;
-  // TODO(chenjiahao): set false after fixing PreprocessGPU
+  bool reproduce_result_mode = false;
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
 
@@ -342,21 +340,23 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   test_obj.PclToArray(pcl_pc_ptr, points_array);
 
   int x_coors[kMaxNumPillars];
-  x_coors[0] = 0;
   int y_coors[kMaxNumPillars];
-  y_coors[0] = 0;
   float num_points_per_pillar[kMaxNumPillars];
-  num_points_per_pillar[0] = 0;
+  memset(x_coors, 0, kMaxNumPillars * sizeof(int));
+  memset(y_coors, 0, kMaxNumPillars * sizeof(int));
+  memset(num_points_per_pillar, 0, kMaxNumPillars * sizeof(float));
+
   float* pillar_point_feature =
       new float[test_obj.max_num_pillars * test_obj.max_num_points_per_pillar *
                 test_obj.num_point_feature];
   float* pillar_coors = new float[test_obj.max_num_pillars * 4];
-  float* sparse_pillar_map = new float[512 * 512];
+  float* sparse_pillar_map = new float[test_obj.num_inds_for_scan *
+                                       test_obj.num_inds_for_scan];
 
   int host_pillar_count[1] = {0};
   test_obj.Preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,
-                      num_points_per_pillar, pillar_point_feature, pillar_coors,
-                      sparse_pillar_map, host_pillar_count);
+                      num_points_per_pillar, pillar_point_feature,
+                      pillar_coors, sparse_pillar_map, host_pillar_count);
   EXPECT_EQ(1, num_points_per_pillar[0]);
   EXPECT_FLOAT_EQ(12.9892, pillar_point_feature[0]);
   EXPECT_EQ(74, x_coors[1]);
@@ -370,7 +370,6 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   delete[] sparse_pillar_map;
 }
 
-/*// TODO(chenjiahao): uncomment this after fixing PreprocessGPU
 TEST(TestSuite, CheckPreprocessGPU) {
   const int kNumClass = 1;
   const int kMaxNumPillars = 12000;
@@ -378,34 +377,22 @@ TEST(TestSuite, CheckPreprocessGPU) {
   const int kNumPointFeature = 4;
   const int kGridXSize = 432;
   const int kGridYSize = 496;
-//  const int kGridXSize = 280;
-//  const int kGridYSize = 320;
   const int kGridZSize = 1;
   const float kPillarXSize = 0.16;
   const float kPillarYSize = 0.16;
-//  const float kPillarXSize = 0.25;
-//  const float kPillarYSize = 0.25;
   const float kPillarZSize = 4.0;
   const float kMinXRange = 0;
   const float kMinYRange = -39.68;
-//  const float kMinYRange = -40.0;
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
   const int kNumThreads = 64;
   const int kNumBoxCorners = 4;
   const float kNormalizingFactor = 255.0;
   TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
-kNumPointFeature, kGridXSize, kGridYSize, kGridZSize, kPillarXSize,
-kPillarYSize, kPillarZSize, kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan,
-kNumThreads, kNumBoxCorners);
-
-//  pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
-//      new pcl::PointCloud<pcl::PointXYZI>);
-//  test_obj.MakePointsForTest(pcl_pc_ptr);
-//
-//  int in_num_points = pcl_pc_ptr->size();
-//  float* points_array = new float[in_num_points * 4];
-//  test_obj.PclToArray(pcl_pc_ptr, points_array);
+                     kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
+                     kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
+                     kNumBoxCorners);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
@@ -430,24 +417,6 @@ kNumThreads, kNumBoxCorners);
   int in_num_points = pcl_pc_ptr->size();
   float* points_array = new float[pcl_pc_ptr->size() * 4];
   test_obj.PclToArray(pcl_pc_ptr, points_array, kNormalizingFactor);
-
-  int cpu_x_coors[kMaxNumPillars];
-  cpu_x_coors[0] = 0;
-  int cpu_y_coors[kMaxNumPillars];
-  cpu_y_coors[0] = 0;
-  float cpu_num_points_per_pillar[kMaxNumPillars];
-  cpu_num_points_per_pillar[0] = 0;
-  float* cpu_pillar_point_feature = new float[test_obj.max_num_pillars
-      * test_obj.max_num_points_per_pillar
-      * test_obj.num_point_feature];
-  float* cpu_pillar_coors = new float[test_obj.max_num_pillars * 4];
-  float* cpu_sparse_pillar_map = new float[512 * 512];
-
-  int cpu_host_pillar_count[1] = {0};
-  test_obj.Preprocess(points_array, pcl_pc_ptr->size(), cpu_x_coors,
-cpu_y_coors, cpu_num_points_per_pillar, cpu_pillar_point_feature,
-                      cpu_pillar_coors, cpu_sparse_pillar_map,
-cpu_host_pillar_count);
 
   float* dev_points;
   int* dev_x_coors;
@@ -482,15 +451,18 @@ cpu_host_pillar_count);
   GPU_CHECK(cudaMemset(dev_y_coors, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_num_points_per_pillar, 0,
                        kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_pillar_point_feature, 0,
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_pillar_coors, 0,
+                       kMaxNumPillars * 4 * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_sparse_pillar_map, 0,
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
-  GPU_CHECK(cudaMemset(dev_pillar_point_feature, 0, kMaxNumPillars *
-kMaxNumPointsPerPillar * kNumPointFeature * sizeof(float)));
 
   test_obj.PreprocessGPU(dev_points, in_num_points, dev_x_coors, dev_y_coors,
-                      dev_num_points_per_pillar, dev_pillar_point_feature,
-                      dev_pillar_coors, dev_sparse_pillar_map,
-host_pillar_count);
+                        dev_num_points_per_pillar, dev_pillar_point_feature,
+                        dev_pillar_coors, dev_sparse_pillar_map,
+                        host_pillar_count);
 
   int* x_coors = new int[kMaxNumPillars];
   int* y_coors = new int[kMaxNumPillars];
@@ -513,31 +485,22 @@ host_pillar_count);
                        kNumIndsForScan * kNumIndsForScan * sizeof(int),
                        cudaMemcpyDeviceToHost));
   GPU_CHECK(cudaMemcpy(pillar_point_feature, dev_pillar_point_feature,
-kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature * sizeof(float),
-cudaMemcpyDeviceToHost)); GPU_CHECK(cudaMemcpy(pillar_coors, dev_pillar_coors,
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float),
+                       cudaMemcpyDeviceToHost));
+  GPU_CHECK(cudaMemcpy(pillar_coors, dev_pillar_coors,
                        kMaxNumPillars * 4 * sizeof(float),
                        cudaMemcpyDeviceToHost));
 
-//  EXPECT_EQ(74, x_coors[1]);
-//  EXPECT_EQ(178, y_coors[1]);
-//  EXPECT_EQ(1, sparse_pillar_map[178 * 512 + 74]);
-//  EXPECT_EQ(1, num_points_per_pillar[0]);
-//  EXPECT_FLOAT_EQ(12.9892, pillar_point_feature[0]);
-//  EXPECT_EQ(8, host_pillar_count[0]);
-  EXPECT_EQ(cpu_x_coors[1], x_coors[1]);
-  EXPECT_EQ(cpu_x_coors[16], x_coors[16]);
-  EXPECT_EQ(cpu_y_coors[1], y_coors[1]);
-  EXPECT_EQ(cpu_y_coors[222], y_coors[222]);
-  EXPECT_EQ(cpu_sparse_pillar_map[10000], sparse_pillar_map[10000]);
-  EXPECT_EQ(cpu_sparse_pillar_map[1001], sparse_pillar_map[1001]);
-  EXPECT_EQ(cpu_num_points_per_pillar[0], num_points_per_pillar[0]);
-  EXPECT_EQ(cpu_num_points_per_pillar[20], num_points_per_pillar[20]);
-  EXPECT_FLOAT_EQ(cpu_pillar_point_feature[0], pillar_point_feature[0]);
-  EXPECT_FLOAT_EQ(cpu_pillar_point_feature[3000], pillar_point_feature[3000]);
-  EXPECT_FLOAT_EQ(cpu_pillar_coors[2], pillar_coors[2]);
-  EXPECT_FLOAT_EQ(cpu_pillar_coors[122], pillar_coors[122]);
-  EXPECT_EQ(cpu_host_pillar_count[0], host_pillar_count[0]);
-
+  EXPECT_EQ(x_coors[320], static_cast<int>(pillar_coors[1283]));
+  EXPECT_EQ(y_coors[44], static_cast<int>(pillar_coors[178]));
+  EXPECT_GT(pillar_coors[10930 * 4 + 2], 0.9);
+  EXPECT_GT(pillar_coors[10930 * 4 + 3], 0.9);
+  EXPECT_EQ(pillar_coors[10931 * 4 + 2], 0);
+  EXPECT_EQ(pillar_coors[10931 * 4 + 3], 0);
+  EXPECT_GT(num_points_per_pillar[10930], 0.9);
+  EXPECT_EQ(num_points_per_pillar[10931], 0);
+  EXPECT_EQ(host_pillar_count[0], 10931);
 
   GPU_CHECK(cudaFree(dev_points));
   GPU_CHECK(cudaFree(dev_x_coors));
@@ -554,10 +517,7 @@ cudaMemcpyDeviceToHost)); GPU_CHECK(cudaMemcpy(pillar_coors, dev_pillar_coors,
   delete[] sparse_pillar_map;
   delete[] pillar_point_feature;
   delete[] pillar_coors;
-  delete[] cpu_sparse_pillar_map;
-  delete[] cpu_pillar_point_feature;
-  delete[] cpu_pillar_coors;
-}*/
+}
 
 // TODO(chenjiahao): should be changed to multi-anchor for multi-class
 TEST(TestSuite, CheckGenerateAnchors) {

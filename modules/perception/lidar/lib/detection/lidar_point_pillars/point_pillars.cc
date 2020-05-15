@@ -538,7 +538,6 @@ void PointPillars::PreprocessCPU(const float* in_points_array,
   delete[] sparse_pillar_map;
 }
 
-// TODO(chenjiahao): fix this function
 void PointPillars::PreprocessGPU(const float* in_points_array,
                                  const int in_num_points) {
   float* dev_points;
@@ -548,15 +547,19 @@ void PointPillars::PreprocessGPU(const float* in_points_array,
                        in_num_points * kNumBoxCorners * sizeof(float),
                        cudaMemcpyHostToDevice));
 
-  GPU_CHECK(cudaMemset(dev_sparse_pillar_map_, 0,
-                       kNumIndsForScan * kNumIndsForScan * sizeof(int)));
-  GPU_CHECK(cudaMemset(dev_pillar_point_feature_, 0,
-                       kMaxNumPillars * kMaxNumPointsPerPillar *
-                           kNumPointFeature * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_x_coors_, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_y_coors_, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_num_points_per_pillar_, 0,
                        kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_pillar_point_feature_, 0,
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_pillar_coors_, 0,
+                       kMaxNumPillars * 4 * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_sparse_pillar_map_, 0,
+                       kNumIndsForScan * kNumIndsForScan * sizeof(int)));
+  host_pillar_count_[0] = 0;
+
   GPU_CHECK(cudaMemset(dev_anchor_mask_, 0, kNumAnchor * sizeof(int)));
 
   preprocess_points_cuda_ptr_->DoPreprocessPointsCuda(

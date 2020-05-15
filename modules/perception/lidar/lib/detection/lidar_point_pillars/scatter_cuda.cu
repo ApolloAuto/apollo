@@ -61,7 +61,7 @@ void ScatterCuda::DoScatterCuda(const int pillar_count, int *x_coors,
                                 int *y_coors, float *pfe_output,
                                 float *scattered_feature) {
   // TODO(chenjiahao): num_threads is used as feature size, so it need to be
-  // renamed
+  //  renamed
   scatter_kernel<<<pillar_count, num_threads_>>>(
       x_coors, y_coors, pfe_output, scattered_feature, max_num_pillars_,
       grid_x_size_, grid_y_size_);
