@@ -307,7 +307,8 @@ function warn_proprietary_sw() {
 }
 
 function release() {
-  RELEASE_DIR="${HOME}/.cache/apollo_release"
+  CACHE_DIR="/apollo/.cache"
+  RELEASE_DIR="${CACHE_DIR}/apollo_release"
   if [ -d "${RELEASE_DIR}" ]; then
     rm -rf "${RELEASE_DIR}"
   fi
