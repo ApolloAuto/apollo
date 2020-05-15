@@ -123,7 +123,7 @@ __global__ void filter_kernel(
     float ymin = float_max;
     float xmax = float_min;
     float ymax = float_min;
-    for (size_t i = 0; i < num_box_corners; i++) {
+    for (size_t i = 0; i < num_box_corners; ++i) {
       rotated_corners[i * 2 + 0] =
           cos_yaw * corners[i * 2 + 0] - sin_yaw * corners[i * 2 + 1];
       rotated_corners[i * 2 + 1] =
@@ -279,7 +279,7 @@ void PostprocessCuda::DoPostprocessCuda(
   GPU_CHECK(cudaMemcpy(host_filtered_dir, dev_sorted_filtered_dir,
                        host_filter_count[0] * sizeof(int),
                        cudaMemcpyDeviceToHost));
-  for (size_t i = 0; i < out_num_objects; i++) {
+  for (size_t i = 0; i < out_num_objects; ++i) {
     out_detection->push_back(
         host_filtered_box[keep_inds[i] * num_output_box_feature_ + 0]);
     out_detection->push_back(

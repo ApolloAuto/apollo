@@ -80,7 +80,7 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
     if (row_start == col_start) {
       start = threadIdx.x + 1;
     }
-    for (int i = start; i < col_size; i++) {
+    for (int i = start; i < col_size; ++i) {
       if (devIoU(cur_box, block_boxes + i * num_box_corners) >
           nms_overlap_thresh) {
         t |= 1ULL << i;
@@ -122,14 +122,14 @@ void NmsCuda::DoNmsCuda(const int host_filter_count,
   std::vector<uint64_t> remv(col_blocks);
   memset(&remv[0], 0, sizeof(uint64_t) * col_blocks);
 
-  for (int i = 0; i < host_filter_count; i++) {
+  for (int i = 0; i < host_filter_count; ++i) {
     int nblock = i / num_threads_;
     int inblock = i % num_threads_;
 
     if (!(remv[nblock] & (1ULL << inblock))) {
       out_keep_inds[(*out_num_to_keep)++] = i;
       uint64_t *p = &host_mask[0] + i * col_blocks;
-      for (int j = nblock; j < col_blocks; j++) {
+      for (int j = nblock; j < col_blocks; ++j) {
         remv[j] |= p[j];
       }
     }

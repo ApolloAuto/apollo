@@ -60,14 +60,19 @@ class TestSuite : public ::testing::Test {
 
 class TestClass {
  public:
-  TestClass(const int max_num_pillars, const int max_num_points_per_pillar,
+  TestClass();
+  TestClass(const int num_class, const int max_num_pillars,
+            const int max_num_points_per_pillar, const int num_point_feature,
             const int grid_x_size, const int grid_y_size, const int grid_z_size,
             const float pillar_x_size, const float pillar_y_size,
             const float pillar_z_size, const float min_x_range,
             const float min_y_range, const float min_z_range,
-            const int num_inds_for_scan, const int num_box_corners);
+            const int num_inds_for_scan, const int num_threads,
+            const int num_box_corners);
+  const int num_class;
   const int max_num_pillars;
   const int max_num_points_per_pillar;
+  const int num_point_feature;
   const int grid_x_size;
   const int grid_y_size;
   const int grid_z_size;
@@ -78,6 +83,7 @@ class TestClass {
   const float min_y_range;
   const float min_z_range;
   const int num_inds_for_scan;
+  const int num_threads;
   const int num_box_corners;
 
   // Make pointcloud for test
@@ -86,39 +92,88 @@ class TestClass {
                   float* out_points_array,
                   const float normalizing_factor = 1.0);
   void Preprocess(const float* in_points_array, int in_num_points, int* x_coors,
-                  int* y_coors, float* num_points_per_pillar, float* pillar_x,
-                  float* pillar_y, float* pillar_z, float* pillar_i,
-                  float* x_coors_for_sub_shaped, float* y_coors_for_sub_shaped,
-                  float* pillar_feature_mask, float* sparse_pillar_map,
-                  int* host_pillar_count);
+                  int* y_coors, float* num_points_per_pillar,
+                  float* pillar_point_feature, float* pillar_coors,
+                  float* sparse_pillar_map, int* host_pillar_count);
+  void PreprocessGPU(const float* in_points_array, int in_num_points,
+                     int* x_coors, int* y_coors, float* num_points_per_pillar,
+                     float* pillar_point_feature, float* pillar_coors,
+                     int* sparse_pillar_map, int* host_pillar_count);
   void GenerateAnchors(float* anchors_px, float* anchors_py, float* anchors_pz,
                        float* anchors_dx, float* anchors_dy, float* anchors_dz,
                        float* anchors_ro);
   void ConvertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
-                                 float* anchors_dx, float* anchors_dy,
                                  float* box_anchors_min_x,
                                  float* box_anchors_min_y,
                                  float* box_anchors_max_x,
                                  float* box_anchors_max_y);
-  void DoInference(const float* in_points_array,
-                   const int in_num_points,
+  void DoInference(const float* in_points_array, const int in_num_points,
                    std::vector<float>* out_detections,
                    std::vector<int>* out_labels);
 
  private:
   std::unique_ptr<PreprocessPoints> preprocess_points_ptr_;
+  std::unique_ptr<PreprocessPointsCuda> preprocess_points_cuda_ptr_;
   std::unique_ptr<PointPillars> point_pillars_ptr_;
 };
 
-TestClass::TestClass(const int max_num_pillars,
-                     const int max_num_points_per_pillar, const int grid_x_size,
+TestClass::TestClass()
+    : num_class(1),
+      max_num_pillars(12000),
+      max_num_points_per_pillar(100),
+      num_point_feature(4),
+      //      grid_x_size(280),
+      //      grid_y_size(320),
+      grid_x_size(432),
+      grid_y_size(496),
+      grid_z_size(1),
+      //      pillar_x_size(0.25),
+      //      pillar_y_size(0.25),
+      pillar_x_size(0.16),
+      pillar_y_size(0.16),
+      pillar_z_size(4.0),
+      min_x_range(0),
+      //      min_y_range(-40.0),
+      min_y_range(-39.68),
+      min_z_range(-3.0),
+      num_inds_for_scan(512),
+      num_threads(64),
+      num_box_corners(4) {
+  preprocess_points_ptr_.reset(new PreprocessPoints(
+      max_num_pillars, max_num_points_per_pillar, num_point_feature,
+      grid_x_size, grid_y_size, grid_z_size, pillar_x_size, pillar_y_size,
+      pillar_z_size, min_x_range, min_y_range, min_z_range, num_inds_for_scan,
+      num_box_corners));
+  preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
+      num_threads, max_num_pillars, max_num_points_per_pillar,
+      num_point_feature, num_inds_for_scan, grid_x_size, grid_y_size,
+      grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size, min_x_range,
+      min_y_range, min_z_range, num_box_corners));
+
+  //  bool reproduce_result_mode = false;
+  bool reproduce_result_mode = true;
+  // TODO(chenjiahao): set false after fixing PreprocessGPU
+  float score_threshold = 0.5;
+  float nms_overlap_threshold = 0.5;
+
+  point_pillars_ptr_.reset(new PointPillars(
+      reproduce_result_mode, score_threshold, nms_overlap_threshold,
+      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
+}
+
+TestClass::TestClass(const int num_class, const int max_num_pillars,
+                     const int max_num_points_per_pillar,
+                     const int num_point_feature, const int grid_x_size,
                      const int grid_y_size, const int grid_z_size,
                      const float pillar_x_size, const float pillar_y_size,
                      const float pillar_z_size, const float min_x_range,
                      const float min_y_range, const float min_z_range,
-                     const int num_inds_for_scan, const int num_box_corners)
-    : max_num_pillars(max_num_pillars),
+                     const int num_inds_for_scan, const int num_threads,
+                     const int num_box_corners)
+    : num_class(num_class),
+      max_num_pillars(max_num_pillars),
       max_num_points_per_pillar(max_num_points_per_pillar),
+      num_point_feature(num_point_feature),
       grid_x_size(grid_x_size),
       grid_y_size(grid_y_size),
       grid_z_size(grid_z_size),
@@ -129,37 +184,46 @@ TestClass::TestClass(const int max_num_pillars,
       min_y_range(min_y_range),
       min_z_range(min_z_range),
       num_inds_for_scan(num_inds_for_scan),
+      num_threads(num_threads),
       num_box_corners(num_box_corners) {
   preprocess_points_ptr_.reset(new PreprocessPoints(
-      max_num_pillars, max_num_points_per_pillar, grid_x_size, grid_y_size,
-      grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size,
-      min_x_range, min_y_range, min_z_range, num_inds_for_scan,
+      max_num_pillars, max_num_points_per_pillar, num_point_feature,
+      grid_x_size, grid_y_size, grid_z_size, pillar_x_size, pillar_y_size,
+      pillar_z_size, min_x_range, min_y_range, min_z_range, num_inds_for_scan,
       num_box_corners));
+  preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
+      num_threads, max_num_pillars, max_num_points_per_pillar,
+      num_point_feature, num_inds_for_scan, grid_x_size, grid_y_size,
+      grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size, min_x_range,
+      min_y_range, min_z_range, num_box_corners));
 
-  //  bool baselink_support=true;
   bool reproduce_result_mode = false;
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
 
-  point_pillars_ptr_.reset(
-      new PointPillars(reproduce_result_mode, score_threshold,
-                       nms_overlap_threshold, FLAGS_pfe_onnx_file,
-                       FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(new PointPillars(
+      reproduce_result_mode, score_threshold, nms_overlap_threshold,
+      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
 }
 
 void TestClass::Preprocess(const float* in_points_array, int in_num_points,
                            int* x_coors, int* y_coors,
-                           float* num_points_per_pillar, float* pillar_x,
-                           float* pillar_y, float* pillar_z, float* pillar_i,
-                           float* x_coors_for_sub_shaped,
-                           float* y_coors_for_sub_shaped,
-                           float* pillar_feature_mask, float* sparse_pillar_map,
-                           int* host_pillar_count) {
+                           float* num_points_per_pillar,
+                           float* pillar_point_feature, float* pillar_coors,
+                           float* sparse_pillar_map, int* host_pillar_count) {
   preprocess_points_ptr_->Preprocess(
       in_points_array, in_num_points, x_coors, y_coors, num_points_per_pillar,
-      pillar_x, pillar_y, pillar_z, pillar_i, x_coors_for_sub_shaped,
-      y_coors_for_sub_shaped, pillar_feature_mask, sparse_pillar_map,
-      host_pillar_count);
+      pillar_point_feature, pillar_coors, sparse_pillar_map, host_pillar_count);
+}
+
+void TestClass::PreprocessGPU(const float* in_points_array, int in_num_points,
+                              int* x_coors, int* y_coors,
+                              float* num_points_per_pillar,
+                              float* pillar_point_feature, float* pillar_coors,
+                              int* sparse_pillar_map, int* host_pillar_count) {
+  preprocess_points_cuda_ptr_->DoPreprocessPointsCuda(
+      in_points_array, in_num_points, x_coors, y_coors, num_points_per_pillar,
+      pillar_point_feature, pillar_coors, sparse_pillar_map, host_pillar_count);
 }
 
 void TestClass::PclToArray(
@@ -230,14 +294,13 @@ void TestClass::GenerateAnchors(float* anchors_px, float* anchors_py,
 }
 
 void TestClass::ConvertAnchors2BoxAnchors(float* anchors_px, float* anchors_py,
-                                          float* anchors_dx, float* anchors_dy,
                                           float* box_anchors_min_x,
                                           float* box_anchors_min_y,
                                           float* box_anchors_max_x,
                                           float* box_anchors_max_y) {
   return point_pillars_ptr_->ConvertAnchors2BoxAnchors(
-      anchors_px, anchors_py, anchors_dx, anchors_dy, box_anchors_min_x,
-      box_anchors_min_y, box_anchors_max_x, box_anchors_max_y);
+      anchors_px, anchors_py, box_anchors_min_x, box_anchors_min_y,
+      box_anchors_max_x, box_anchors_max_y);
 }
 
 void TestClass::DoInference(const float* in_points_array,
@@ -249,8 +312,10 @@ void TestClass::DoInference(const float* in_points_array,
 }
 
 TEST(TestSuite, CheckPreprocessPointsCPU) {
+  const int kNumClass = 1;
   const int kMaxNumPillars = 12000;
   const int kMaxNumPointsPerPillar = 100;
+  const int kNumPointFeature = 4;
   const int kGridXSize = 432;
   const int kGridYSize = 496;
   const int kGridZSize = 1;
@@ -261,11 +326,13 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   const float kMinYRange = -39.68;
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
+  const int kNumThreads = 64;
   const int kNumBoxCorners = 4;
-  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
-                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
-                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-                     kNumIndsForScan, kNumBoxCorners);
+  TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
+                     kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
+                     kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
+                     kNumBoxCorners);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
@@ -280,172 +347,65 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   y_coors[0] = 0;
   float num_points_per_pillar[kMaxNumPillars];
   num_points_per_pillar[0] = 0;
-  float* pillar_x = new float[test_obj.max_num_pillars *
-                              test_obj.max_num_points_per_pillar];
-  float* pillar_y = new float[test_obj.max_num_pillars *
-                              test_obj.max_num_points_per_pillar];
-  float* pillar_z = new float[test_obj.max_num_pillars *
-                              test_obj.max_num_points_per_pillar];
-  float* pillar_i = new float[test_obj.max_num_pillars *
-                              test_obj.max_num_points_per_pillar];
-
-  float* x_coors_for_sub_shaped =
-      new float[test_obj.max_num_pillars *
-                test_obj.max_num_points_per_pillar];
-  float* y_coors_for_sub_shaped =
-      new float[test_obj.max_num_pillars *
-                test_obj.max_num_points_per_pillar];
-  float* pillar_feature_mask = new float[test_obj.max_num_pillars *
-                                         test_obj.max_num_points_per_pillar];
-
+  float* pillar_point_feature =
+      new float[test_obj.max_num_pillars * test_obj.max_num_points_per_pillar *
+                test_obj.num_point_feature];
+  float* pillar_coors = new float[test_obj.max_num_pillars * 4];
   float* sparse_pillar_map = new float[512 * 512];
 
   int host_pillar_count[1] = {0};
   test_obj.Preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,
-                      num_points_per_pillar, pillar_x, pillar_y, pillar_z,
-                      pillar_i, x_coors_for_sub_shaped, y_coors_for_sub_shaped,
-                      pillar_feature_mask, sparse_pillar_map,
-                      host_pillar_count);
+                      num_points_per_pillar, pillar_point_feature, pillar_coors,
+                      sparse_pillar_map, host_pillar_count);
   EXPECT_EQ(1, num_points_per_pillar[0]);
-  EXPECT_FLOAT_EQ(12.9892, pillar_x[0]);
+  EXPECT_FLOAT_EQ(12.9892, pillar_point_feature[0]);
   EXPECT_EQ(74, x_coors[1]);
   EXPECT_EQ(178, y_coors[1]);
   EXPECT_EQ(1, sparse_pillar_map[178 * 512 + 74]);
   EXPECT_EQ(8, host_pillar_count[0]);
+
   delete[] points_array;
-  delete[] pillar_x;
-  delete[] pillar_y;
-  delete[] pillar_z;
-  delete[] pillar_i;
-  delete[] x_coors_for_sub_shaped;
-  delete[] y_coors_for_sub_shaped;
-  delete[] pillar_feature_mask;
+  delete[] pillar_point_feature;
+  delete[] pillar_coors;
   delete[] sparse_pillar_map;
 }
 
-TEST(TestSuite, CheckGenerateAnchors) {
+/*// TODO(chenjiahao): uncomment this after fixing PreprocessGPU
+TEST(TestSuite, CheckPreprocessGPU) {
+  const int kNumClass = 1;
   const int kMaxNumPillars = 12000;
   const int kMaxNumPointsPerPillar = 100;
+  const int kNumPointFeature = 4;
   const int kGridXSize = 432;
   const int kGridYSize = 496;
+//  const int kGridXSize = 280;
+//  const int kGridYSize = 320;
   const int kGridZSize = 1;
   const float kPillarXSize = 0.16;
   const float kPillarYSize = 0.16;
+//  const float kPillarXSize = 0.25;
+//  const float kPillarYSize = 0.25;
   const float kPillarZSize = 4.0;
   const float kMinXRange = 0;
   const float kMinYRange = -39.68;
+//  const float kMinYRange = -40.0;
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
+  const int kNumThreads = 64;
   const int kNumBoxCorners = 4;
-  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
-                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
-                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-                     kNumIndsForScan, kNumBoxCorners);
-
-  const int NUM_ANCHOR = 432 * 0.5 * 496 * 0.5 * 2;
-  float* anchors_px = new float[NUM_ANCHOR];
-  float* anchors_py = new float[NUM_ANCHOR];
-  float* anchors_pz = new float[NUM_ANCHOR];
-  float* anchors_dx = new float[NUM_ANCHOR];
-  float* anchors_dy = new float[NUM_ANCHOR];
-  float* anchors_dz = new float[NUM_ANCHOR];
-  float* anchors_ro = new float[NUM_ANCHOR];
-  test_obj.GenerateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
-                           anchors_dy, anchors_dz, anchors_ro);
-
-  EXPECT_NEAR(0.48, anchors_px[3], 0.001);
-  EXPECT_NEAR(-39.52, anchors_py[109], 0.001);
-  EXPECT_NEAR(-1.73, anchors_pz[76], 0.001);
-  EXPECT_NEAR(1.6, anchors_dx[338], 0.001);
-  EXPECT_NEAR(3.9, anchors_dy[22], 0.001);
-  EXPECT_NEAR(1.56, anchors_dz[993], 0.001);
-  EXPECT_NEAR(1.5708, anchors_ro[1765], 0.001);
-
-  delete[] anchors_px;
-  delete[] anchors_py;
-  delete[] anchors_pz;
-  delete[] anchors_dx;
-  delete[] anchors_dy;
-  delete[] anchors_dz;
-  delete[] anchors_ro;
-}
-
-TEST(TestSuite, CheckGenerateBoxAnchors) {
-  const int kMaxNumPillars = 12000;
-  const int kMaxNumPointsPerPillar = 100;
-  const int kGridXSize = 432;
-  const int kGridYSize = 496;
-  const int kGridZSize = 1;
-  const float kPillarXSize = 0.16;
-  const float kPillarYSize = 0.16;
-  const float kPillarZSize = 4.0;
-  const float kMinXRange = 0;
-  const float kMinYRange = -39.68;
-  const float kMinZRange = -3.0;
-  const int kNumIndsForScan = 512;
-  const int kNumBoxCorners = 4;
-  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
-                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
-                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-                     kNumIndsForScan, kNumBoxCorners);
-
-  const int NUM_ANCHOR = 432 * 0.5 * 496 * 0.5 * 2;
-
-  float* anchors_px = new float[NUM_ANCHOR];
-  float* anchors_py = new float[NUM_ANCHOR];
-  float* anchors_pz = new float[NUM_ANCHOR];
-  float* anchors_dx = new float[NUM_ANCHOR];
-  float* anchors_dy = new float[NUM_ANCHOR];
-  float* anchors_dz = new float[NUM_ANCHOR];
-  float* anchors_ro = new float[NUM_ANCHOR];
-  float* box_anchors_min_x = new float[NUM_ANCHOR];
-  float* box_anchors_min_y = new float[NUM_ANCHOR];
-  float* box_anchors_max_x = new float[NUM_ANCHOR];
-  float* box_anchors_max_y = new float[NUM_ANCHOR];
-  test_obj.GenerateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
-                           anchors_dy, anchors_dz, anchors_ro);
-  test_obj.ConvertAnchors2BoxAnchors(
-      anchors_px, anchors_py, anchors_dx, anchors_dy, box_anchors_min_x,
-      box_anchors_min_y, box_anchors_max_x, box_anchors_max_y);
-
-  EXPECT_NEAR(53.25, box_anchors_min_x[345], 0.001);
-  EXPECT_NEAR(-41.47, box_anchors_min_y[22], 0.001);
-  EXPECT_NEAR(38.4, box_anchors_max_x[1098], 0.001);
-  EXPECT_NEAR(-38.4, box_anchors_max_y[675], 0.001);
-
-  delete[] anchors_px;
-  delete[] anchors_py;
-  delete[] anchors_pz;
-  delete[] anchors_dx;
-  delete[] anchors_dy;
-  delete[] anchors_dz;
-  delete[] anchors_ro;
-  delete[] box_anchors_min_x;
-  delete[] box_anchors_min_y;
-  delete[] box_anchors_max_x;
-  delete[] box_anchors_max_y;
-}
-
-TEST(TestSuite, CheckDoInference) {
-  const int kMaxNumPillars = 12000;
-  const int kMaxNumPointsPerPillar = 100;
-  const int kGridXSize = 432;
-  const int kGridYSize = 496;
-  const int kGridZSize = 1;
-  const float kPillarXSize = 0.16;
-  const float kPillarYSize = 0.16;
-  const float kPillarZSize = 4.0;
-  const float kMinXRange = 0;
-  const float kMinYRange = -39.68;
-  const float kMinZRange = -3.0;
-  const int kNumIndsForScan = 512;
-  const int kNumBoxCorners = 4;
-  const int kOutputNumBoxFeature = 7;
   const float kNormalizingFactor = 255.0;
-  TestClass test_obj(kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
-                     kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
-                     kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-                     kNumIndsForScan, kNumBoxCorners);
+  TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
+kNumPointFeature, kGridXSize, kGridYSize, kGridZSize, kPillarXSize,
+kPillarYSize, kPillarZSize, kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan,
+kNumThreads, kNumBoxCorners);
+
+//  pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
+//      new pcl::PointCloud<pcl::PointXYZI>);
+//  test_obj.MakePointsForTest(pcl_pc_ptr);
+//
+//  int in_num_points = pcl_pc_ptr->size();
+//  float* points_array = new float[in_num_points * 4];
+//  test_obj.PclToArray(pcl_pc_ptr, points_array);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
@@ -467,14 +427,282 @@ TEST(TestSuite, CheckDoInference) {
     point.intensity = org_cloud_ptr->at(i).intensity;
     pcl_pc_ptr->push_back(point);
   }
+  int in_num_points = pcl_pc_ptr->size();
+  float* points_array = new float[pcl_pc_ptr->size() * 4];
+  test_obj.PclToArray(pcl_pc_ptr, points_array, kNormalizingFactor);
 
+  int cpu_x_coors[kMaxNumPillars];
+  cpu_x_coors[0] = 0;
+  int cpu_y_coors[kMaxNumPillars];
+  cpu_y_coors[0] = 0;
+  float cpu_num_points_per_pillar[kMaxNumPillars];
+  cpu_num_points_per_pillar[0] = 0;
+  float* cpu_pillar_point_feature = new float[test_obj.max_num_pillars
+      * test_obj.max_num_points_per_pillar
+      * test_obj.num_point_feature];
+  float* cpu_pillar_coors = new float[test_obj.max_num_pillars * 4];
+  float* cpu_sparse_pillar_map = new float[512 * 512];
+
+  int cpu_host_pillar_count[1] = {0};
+  test_obj.Preprocess(points_array, pcl_pc_ptr->size(), cpu_x_coors,
+cpu_y_coors, cpu_num_points_per_pillar, cpu_pillar_point_feature,
+                      cpu_pillar_coors, cpu_sparse_pillar_map,
+cpu_host_pillar_count);
+
+  float* dev_points;
+  int* dev_x_coors;
+  int* dev_y_coors;
+  float* dev_num_points_per_pillar;
+  int* dev_sparse_pillar_map;
+  float* dev_pillar_point_feature;
+  float* dev_pillar_coors;
+  int host_pillar_count[1] = {0};
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_points),
+                       in_num_points * kNumBoxCorners * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_x_coors),
+                       kMaxNumPillars * sizeof(int)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_y_coors),
+                       kMaxNumPillars * sizeof(int)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_num_points_per_pillar),
+                       kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_sparse_pillar_map),
+                       kNumIndsForScan * kNumIndsForScan * sizeof(int)));
+  GPU_CHECK(cudaMalloc(
+      reinterpret_cast<void**>(&dev_pillar_point_feature),
+      kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature
+          * sizeof(float)));
+  GPU_CHECK(cudaMalloc(
+      reinterpret_cast<void**>(&dev_pillar_coors),
+      kMaxNumPillars * 4 * sizeof(float)));
+
+  GPU_CHECK(cudaMemcpy(dev_points, points_array,
+                       in_num_points * kNumBoxCorners * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemset(dev_x_coors, 0, kMaxNumPillars * sizeof(int)));
+  GPU_CHECK(cudaMemset(dev_y_coors, 0, kMaxNumPillars * sizeof(int)));
+  GPU_CHECK(cudaMemset(dev_num_points_per_pillar, 0,
+                       kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_sparse_pillar_map, 0,
+                       kNumIndsForScan * kNumIndsForScan * sizeof(int)));
+  GPU_CHECK(cudaMemset(dev_pillar_point_feature, 0, kMaxNumPillars *
+kMaxNumPointsPerPillar * kNumPointFeature * sizeof(float)));
+
+  test_obj.PreprocessGPU(dev_points, in_num_points, dev_x_coors, dev_y_coors,
+                      dev_num_points_per_pillar, dev_pillar_point_feature,
+                      dev_pillar_coors, dev_sparse_pillar_map,
+host_pillar_count);
+
+  int* x_coors = new int[kMaxNumPillars];
+  int* y_coors = new int[kMaxNumPillars];
+  float* num_points_per_pillar = new float[kMaxNumPillars];
+  int* sparse_pillar_map = new int[kNumIndsForScan * kNumIndsForScan];
+  float* pillar_point_feature = new float[kMaxNumPillars
+                                          * kMaxNumPointsPerPillar
+                                          * kNumPointFeature];
+  float* pillar_coors = new float[kMaxNumPillars * 4];
+  GPU_CHECK(cudaMemcpy(x_coors, dev_x_coors,
+                       kMaxNumPillars * sizeof(int),
+                       cudaMemcpyDeviceToHost));
+  GPU_CHECK(cudaMemcpy(y_coors, dev_y_coors,
+                       kMaxNumPillars * sizeof(int),
+                       cudaMemcpyDeviceToHost));
+  GPU_CHECK(cudaMemcpy(num_points_per_pillar, dev_num_points_per_pillar,
+                       kMaxNumPillars * sizeof(float),
+                       cudaMemcpyDeviceToHost));
+  GPU_CHECK(cudaMemcpy(sparse_pillar_map, dev_sparse_pillar_map,
+                       kNumIndsForScan * kNumIndsForScan * sizeof(int),
+                       cudaMemcpyDeviceToHost));
+  GPU_CHECK(cudaMemcpy(pillar_point_feature, dev_pillar_point_feature,
+kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature * sizeof(float),
+cudaMemcpyDeviceToHost)); GPU_CHECK(cudaMemcpy(pillar_coors, dev_pillar_coors,
+                       kMaxNumPillars * 4 * sizeof(float),
+                       cudaMemcpyDeviceToHost));
+
+//  EXPECT_EQ(74, x_coors[1]);
+//  EXPECT_EQ(178, y_coors[1]);
+//  EXPECT_EQ(1, sparse_pillar_map[178 * 512 + 74]);
+//  EXPECT_EQ(1, num_points_per_pillar[0]);
+//  EXPECT_FLOAT_EQ(12.9892, pillar_point_feature[0]);
+//  EXPECT_EQ(8, host_pillar_count[0]);
+  EXPECT_EQ(cpu_x_coors[1], x_coors[1]);
+  EXPECT_EQ(cpu_x_coors[16], x_coors[16]);
+  EXPECT_EQ(cpu_y_coors[1], y_coors[1]);
+  EXPECT_EQ(cpu_y_coors[222], y_coors[222]);
+  EXPECT_EQ(cpu_sparse_pillar_map[10000], sparse_pillar_map[10000]);
+  EXPECT_EQ(cpu_sparse_pillar_map[1001], sparse_pillar_map[1001]);
+  EXPECT_EQ(cpu_num_points_per_pillar[0], num_points_per_pillar[0]);
+  EXPECT_EQ(cpu_num_points_per_pillar[20], num_points_per_pillar[20]);
+  EXPECT_FLOAT_EQ(cpu_pillar_point_feature[0], pillar_point_feature[0]);
+  EXPECT_FLOAT_EQ(cpu_pillar_point_feature[3000], pillar_point_feature[3000]);
+  EXPECT_FLOAT_EQ(cpu_pillar_coors[2], pillar_coors[2]);
+  EXPECT_FLOAT_EQ(cpu_pillar_coors[122], pillar_coors[122]);
+  EXPECT_EQ(cpu_host_pillar_count[0], host_pillar_count[0]);
+
+
+  GPU_CHECK(cudaFree(dev_points));
+  GPU_CHECK(cudaFree(dev_x_coors));
+  GPU_CHECK(cudaFree(dev_y_coors));
+  GPU_CHECK(cudaFree(dev_num_points_per_pillar));
+  GPU_CHECK(cudaFree(dev_sparse_pillar_map));
+  GPU_CHECK(cudaFree(dev_pillar_point_feature));
+  GPU_CHECK(cudaFree(dev_pillar_coors));
+
+  delete[] points_array;
+  delete[] x_coors;
+  delete[] y_coors;
+  delete[] num_points_per_pillar;
+  delete[] sparse_pillar_map;
+  delete[] pillar_point_feature;
+  delete[] pillar_coors;
+  delete[] cpu_sparse_pillar_map;
+  delete[] cpu_pillar_point_feature;
+  delete[] cpu_pillar_coors;
+}*/
+
+// TODO(chenjiahao): should be changed to multi-anchor for multi-class
+TEST(TestSuite, CheckGenerateAnchors) {
+  const int kNumClass = 1;
+  const int kMaxNumPillars = 12000;
+  const int kMaxNumPointsPerPillar = 100;
+  const int kNumPointFeature = 4;
+  const int kGridXSize = 432;
+  const int kGridYSize = 496;
+  const int kGridZSize = 1;
+  const float kPillarXSize = 0.16;
+  const float kPillarYSize = 0.16;
+  const float kPillarZSize = 4.0;
+  const float kMinXRange = 0;
+  const float kMinYRange = -39.68;
+  const float kMinZRange = -3.0;
+  const int kNumIndsForScan = 512;
+  const int kNumThreads = 64;
+  const int kNumBoxCorners = 4;
+  TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
+                     kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
+                     kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
+                     kNumBoxCorners);
+
+  const int kNumAnchor = 432 * 0.5 * 496 * 0.5 * 2;
+  float* anchors_px = new float[kNumAnchor];
+  float* anchors_py = new float[kNumAnchor];
+  float* anchors_pz = new float[kNumAnchor];
+  float* anchors_dx = new float[kNumAnchor];
+  float* anchors_dy = new float[kNumAnchor];
+  float* anchors_dz = new float[kNumAnchor];
+  float* anchors_ro = new float[kNumAnchor];
+  test_obj.GenerateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
+                           anchors_dy, anchors_dz, anchors_ro);
+
+  EXPECT_NEAR(0.48, anchors_px[3], 0.001);
+  EXPECT_NEAR(-39.52, anchors_py[109], 0.001);
+  EXPECT_NEAR(-1.73, anchors_pz[76], 0.001);
+  EXPECT_NEAR(1.6, anchors_dx[338], 0.001);
+  EXPECT_NEAR(3.9, anchors_dy[22], 0.001);
+  EXPECT_NEAR(1.56, anchors_dz[993], 0.001);
+  EXPECT_NEAR(1.5708, anchors_ro[1765], 0.001);
+
+  delete[] anchors_px;
+  delete[] anchors_py;
+  delete[] anchors_pz;
+  delete[] anchors_dx;
+  delete[] anchors_dy;
+  delete[] anchors_dz;
+  delete[] anchors_ro;
+}
+
+TEST(TestSuite, CheckGenerateBoxAnchors) {
+  const int kNumClass = 1;
+  const int kMaxNumPillars = 12000;
+  const int kMaxNumPointsPerPillar = 100;
+  const int kNumPointFeature = 4;
+  const int kGridXSize = 432;
+  const int kGridYSize = 496;
+  const int kGridZSize = 1;
+  const float kPillarXSize = 0.16;
+  const float kPillarYSize = 0.16;
+  const float kPillarZSize = 4.0;
+  const float kMinXRange = 0;
+  const float kMinYRange = -39.68;
+  const float kMinZRange = -3.0;
+  const int kNumIndsForScan = 512;
+  const int kNumThreads = 64;
+  const int kNumBoxCorners = 4;
+  TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
+                     kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
+                     kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
+                     kNumBoxCorners);
+
+  const int kNumAnchor = 432 * 0.5 * 496 * 0.5 * 2;
+
+  float* anchors_px = new float[kNumAnchor];
+  float* anchors_py = new float[kNumAnchor];
+  float* anchors_pz = new float[kNumAnchor];
+  float* anchors_dx = new float[kNumAnchor];
+  float* anchors_dy = new float[kNumAnchor];
+  float* anchors_dz = new float[kNumAnchor];
+  float* anchors_ro = new float[kNumAnchor];
+  float* box_anchors_min_x = new float[kNumAnchor];
+  float* box_anchors_min_y = new float[kNumAnchor];
+  float* box_anchors_max_x = new float[kNumAnchor];
+  float* box_anchors_max_y = new float[kNumAnchor];
+  test_obj.GenerateAnchors(anchors_px, anchors_py, anchors_pz, anchors_dx,
+                           anchors_dy, anchors_dz, anchors_ro);
+  test_obj.ConvertAnchors2BoxAnchors(anchors_px, anchors_py, box_anchors_min_x,
+                                     box_anchors_min_y, box_anchors_max_x,
+                                     box_anchors_max_y);
+
+  EXPECT_NEAR(53.25, box_anchors_min_x[345], 0.001);
+  EXPECT_NEAR(-41.47, box_anchors_min_y[22], 0.001);
+  EXPECT_NEAR(38.4, box_anchors_max_x[1098], 0.001);
+  EXPECT_NEAR(-38.4, box_anchors_max_y[675], 0.001);
+
+  delete[] anchors_px;
+  delete[] anchors_py;
+  delete[] anchors_pz;
+  delete[] anchors_dx;
+  delete[] anchors_dy;
+  delete[] anchors_dz;
+  delete[] anchors_ro;
+  delete[] box_anchors_min_x;
+  delete[] box_anchors_min_y;
+  delete[] box_anchors_max_x;
+  delete[] box_anchors_max_y;
+}
+
+TEST(TestSuite, CheckDoInference) {
+  const int kOutputNumBoxFeature = 7;
+  const float kNormalizingFactor = 255.0;
+  TestClass test_obj;
+
+  pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
+      new pcl::PointCloud<pcl::PointXYZI>);
+  apollo::perception::benchmark::PointCloudPtr org_cloud_ptr(
+      new pcl::PointCloud<apollo::perception::benchmark::PointXYZIL>);
+  std::string file_name =
+      "/apollo/modules/perception/testdata/lidar/app/data/perception/"
+      "lidar/files/0001_00.pcd";
+
+  bool ret = apollo::perception::benchmark::load_pcl_pcds_xyzit(file_name,
+                                                                org_cloud_ptr);
+  ASSERT_TRUE(ret) << "Failed to load pcd file: " << file_name;
+
+  for (size_t i = 0; i < org_cloud_ptr->size(); ++i) {
+    pcl::PointXYZI point;
+    point.x = org_cloud_ptr->at(i).x;
+    point.y = org_cloud_ptr->at(i).y;
+    point.z = org_cloud_ptr->at(i).z;
+    point.intensity = org_cloud_ptr->at(i).intensity;
+    pcl_pc_ptr->push_back(point);
+  }
   float* points_array = new float[pcl_pc_ptr->size() * 4];
   test_obj.PclToArray(pcl_pc_ptr, points_array, kNormalizingFactor);
 
   std::vector<float> out_detections;
   std::vector<int> out_labels;
-  test_obj.DoInference(
-      points_array, pcl_pc_ptr->size(), &out_detections, &out_labels);
+  test_obj.DoInference(points_array, pcl_pc_ptr->size(), &out_detections,
+                       &out_labels);
 
   int num_objects = out_detections.size() / kOutputNumBoxFeature;
   EXPECT_GE(num_objects, 4);
@@ -492,11 +720,10 @@ TEST(TestSuite, CheckDoInference) {
     yaw = std::atan2(std::sin(yaw), std::cos(yaw));
     yaw = -yaw;
     int label = out_labels.at(j);
-
     std::cout << "object id: " << j << ", x: " << x << ", y: " << y
               << ", z: " << z << ", dx: " << dx << ", dy: " << dy
-              << ", dz: " << dz << ", yaw: " << yaw << ", label: "
-              << label << std::endl;
+              << ", dz: " << dz << ", yaw: " << yaw << ", label: " << label
+              << std::endl;
   }
 }
 

@@ -32,6 +32,7 @@
 
 // headers in STL
 #include <chrono>
+#include <cstring>
 #include <iostream>
 
 // headers in local files
@@ -41,9 +42,10 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-const int PointPillars::kNumClass = 3;
+const int PointPillars::kNumClass = 1;
 const int PointPillars::kMaxNumPillars = 12000;
 const int PointPillars::kMaxNumPointsPerPillar = 100;
+const int PointPillars::kNumPointFeature = 4;
 const int PointPillars::kPfeOutputSize = kMaxNumPillars * 64;
 const int PointPillars::kGridXSize = 432;
 const int PointPillars::kGridYSize = 496;
@@ -64,6 +66,7 @@ const int PointPillars::kNumThreads = 64;
 // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
 // common.h
 const int PointPillars::kNumBoxCorners = 4;
+// TODO(chenjiahao): kNumBoxCorners is actually used as kNumPointFeature
 const float PointPillars::kPillarXSize = 0.16f;
 const float PointPillars::kPillarYSize = 0.16f;
 const float PointPillars::kPillarZSize = 4.0f;
@@ -74,6 +77,7 @@ const float PointPillars::kMaxXRange = 69.12f;
 const float PointPillars::kMaxYRange = 39.68f;
 const float PointPillars::kMaxZRange = 1.0f;
 const float PointPillars::kSensorHeight = 1.73f;
+// TODO(chenjiahao): get kSensorHeight's value from sensor's height param
 const float PointPillars::kAnchorDxSize = 1.6f;
 const float PointPillars::kAnchorDySize = 3.9f;
 const float PointPillars::kAnchorDzSize = 1.56f;
@@ -90,33 +94,31 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
       rpn_onnx_file_(rpn_onnx_file) {
   if (reproduce_result_mode_) {
     preprocess_points_ptr_.reset(new PreprocessPoints(
-        kMaxNumPillars, kMaxNumPointsPerPillar, kGridXSize,
-        kGridYSize, kGridZSize, kPillarXSize, kPillarYSize,
-        kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-        kNumIndsForScan, kNumBoxCorners));
+        kMaxNumPillars, kMaxNumPointsPerPillar, kNumPointFeature, kGridXSize,
+        kGridYSize, kGridZSize, kPillarXSize, kPillarYSize, kPillarZSize,
+        kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan, kNumBoxCorners));
   } else {
     preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
-        kNumThreads, kMaxNumPillars, kMaxNumPointsPerPillar,
-        kNumIndsForScan, kGridXSize, kGridYSize, kGridZSize,
-        kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
-        kMinYRange, kMinZRange, kNumBoxCorners));
+        kNumThreads, kMaxNumPillars, kMaxNumPointsPerPillar, kNumPointFeature,
+        kNumIndsForScan, kGridXSize, kGridYSize, kGridZSize, kPillarXSize,
+        kPillarYSize, kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
+        kNumBoxCorners));
   }
 
-  anchor_mask_cuda_ptr_.reset(new AnchorMaskCuda(
-      kNumIndsForScan, kNumAnchorXInds, kNumAnchorYInds,
-      kNumAnchorRInds, kMinXRange, kMinYRange, kPillarXSize,
-      kPillarYSize, kGridXSize, kGridYSize));
+  anchor_mask_cuda_ptr_.reset(
+      new AnchorMaskCuda(kNumIndsForScan, kNumAnchorXInds, kNumAnchorYInds,
+                         kNumAnchorRInds, kMinXRange, kMinYRange, kPillarXSize,
+                         kPillarYSize, kGridXSize, kGridYSize));
 
-  scatter_cuda_ptr_.reset(new ScatterCuda(kNumThreads, kMaxNumPillars,
-                                          kGridXSize, kGridYSize));
+  scatter_cuda_ptr_.reset(
+      new ScatterCuda(kNumThreads, kMaxNumPillars, kGridXSize, kGridYSize));
 
   const float float_min = std::numeric_limits<float>::lowest();
   const float float_max = std::numeric_limits<float>::max();
   postprocess_cuda_ptr_.reset(new PostprocessCuda(
-      float_min, float_max, kNumAnchorXInds, kNumAnchorYInds,
-      kNumAnchorRInds, score_threshold_, kNumThreads,
-      nms_overlap_threshold_, kNumBoxCorners, kNumOutputBoxFeature,
-      kNumClass));
+      float_min, float_max, kNumAnchorXInds, kNumAnchorYInds, kNumAnchorRInds,
+      score_threshold_, kNumThreads, nms_overlap_threshold_, kNumBoxCorners,
+      kNumOutputBoxFeature, kNumClass));
 
   DeviceMemoryMalloc();
   InitTRT();
@@ -136,25 +138,12 @@ PointPillars::~PointPillars() {
   delete[] box_anchors_max_x_;
   delete[] box_anchors_max_y_;
 
-  GPU_CHECK(cudaFree(dev_pillar_x_in_coors_));
-  GPU_CHECK(cudaFree(dev_pillar_y_in_coors_));
-  GPU_CHECK(cudaFree(dev_pillar_z_in_coors_));
-  GPU_CHECK(cudaFree(dev_pillar_i_in_coors_));
-  GPU_CHECK(cudaFree(dev_pillar_count_histo_));
-
   GPU_CHECK(cudaFree(dev_x_coors_));
   GPU_CHECK(cudaFree(dev_y_coors_));
   GPU_CHECK(cudaFree(dev_num_points_per_pillar_));
   GPU_CHECK(cudaFree(dev_sparse_pillar_map_));
-
-  GPU_CHECK(cudaFree(dev_pillar_x_));
-  GPU_CHECK(cudaFree(dev_pillar_y_));
-  GPU_CHECK(cudaFree(dev_pillar_z_));
-  GPU_CHECK(cudaFree(dev_pillar_i_));
-
-  GPU_CHECK(cudaFree(dev_x_coors_for_sub_shaped_));
-  GPU_CHECK(cudaFree(dev_y_coors_for_sub_shaped_));
-  GPU_CHECK(cudaFree(dev_pillar_feature_mask_));
+  GPU_CHECK(cudaFree(dev_pillar_point_feature_));
+  GPU_CHECK(cudaFree(dev_pillar_coors_));
 
   GPU_CHECK(cudaFree(dev_cumsum_along_x_));
   GPU_CHECK(cudaFree(dev_cumsum_along_y_));
@@ -169,11 +158,6 @@ PointPillars::~PointPillars() {
   GPU_CHECK(cudaFree(pfe_buffers_[1]));
   GPU_CHECK(cudaFree(pfe_buffers_[2]));
   GPU_CHECK(cudaFree(pfe_buffers_[3]));
-  GPU_CHECK(cudaFree(pfe_buffers_[4]));
-  GPU_CHECK(cudaFree(pfe_buffers_[5]));
-  GPU_CHECK(cudaFree(pfe_buffers_[6]));
-  GPU_CHECK(cudaFree(pfe_buffers_[7]));
-  GPU_CHECK(cudaFree(pfe_buffers_[8]));
 
   GPU_CHECK(cudaFree(rpn_buffers_[0]));
   GPU_CHECK(cudaFree(rpn_buffers_[1]));
@@ -206,21 +190,6 @@ PointPillars::~PointPillars() {
 }
 
 void PointPillars::DeviceMemoryMalloc() {
-  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_x_in_coors_),
-                       kGridYSize * kGridXSize *
-                           kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_y_in_coors_),
-                       kGridYSize * kGridXSize *
-                           kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_z_in_coors_),
-                       kGridYSize * kGridXSize *
-                           kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_i_in_coors_),
-                       kGridYSize * kGridXSize *
-                           kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_count_histo_),
-                       kGridYSize * kGridXSize * sizeof(int)));
-
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_x_coors_),
                        kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_y_coors_),
@@ -230,28 +199,11 @@ void PointPillars::DeviceMemoryMalloc() {
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_sparse_pillar_map_),
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
 
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_x_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_y_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_z_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_i_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_x_coors_for_sub_shaped_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_y_coors_for_sub_shaped_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_feature_mask_),
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_point_feature_),
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_coors_),
+                       kMaxNumPillars * 4 * sizeof(float)));
 
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_cumsum_along_x_),
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
@@ -272,31 +224,12 @@ void PointPillars::DeviceMemoryMalloc() {
 
   // for trt inference
   // create GPU buffers and a stream
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[0],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[1],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[2],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[3],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[4],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[5],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[6],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      &pfe_buffers_[7],
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMalloc(&pfe_buffers_[8], kPfeOutputSize * sizeof(float)));
+  GPU_CHECK(
+      cudaMalloc(&pfe_buffers_[0], kMaxNumPillars * kMaxNumPointsPerPillar *
+                                       kNumPointFeature * sizeof(float)));
+  GPU_CHECK(cudaMalloc(&pfe_buffers_[1], kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(cudaMalloc(&pfe_buffers_[2], kMaxNumPillars * 4 * sizeof(float)));
+  GPU_CHECK(cudaMalloc(&pfe_buffers_[3], kPfeOutputSize * sizeof(float)));
 
   GPU_CHECK(cudaMalloc(&rpn_buffers_[0], kRpnInputSize * sizeof(float)));
   GPU_CHECK(cudaMalloc(&rpn_buffers_[1], kRpnBoxOutputSize * sizeof(float)));
@@ -304,9 +237,8 @@ void PointPillars::DeviceMemoryMalloc() {
   GPU_CHECK(cudaMalloc(&rpn_buffers_[3], kRpnDirOutputSize * sizeof(float)));
 
   // for scatter kernel
-  GPU_CHECK(
-      cudaMalloc(reinterpret_cast<void**>(&dev_scattered_feature_),
-                 kNumThreads * kGridYSize * kGridXSize * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_scattered_feature_),
+                       kNumThreads * kGridYSize * kGridXSize * sizeof(float)));
 
   // for filter
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_anchors_px_),
@@ -355,9 +287,9 @@ void PointPillars::InitAnchors() {
   GenerateAnchors(anchors_px_, anchors_py_, anchors_pz_, anchors_dx_,
                   anchors_dy_, anchors_dz_, anchors_ro_);
 
-  ConvertAnchors2BoxAnchors(anchors_px_, anchors_py_, anchors_dx_, anchors_dy_,
-                            box_anchors_min_x_, box_anchors_min_y_,
-                            box_anchors_max_x_, box_anchors_max_y_);
+  ConvertAnchors2BoxAnchors(anchors_px_, anchors_py_, box_anchors_min_x_,
+                            box_anchors_min_y_, box_anchors_max_x_,
+                            box_anchors_max_y_);
 
   PutAnchorsInDeviceMemory();
 }
@@ -366,8 +298,7 @@ void PointPillars::GenerateAnchors(float* anchors_px_, float* anchors_py_,
                                    float* anchors_pz_, float* anchors_dx_,
                                    float* anchors_dy_, float* anchors_dz_,
                                    float* anchors_ro_) {
-  // zero clear
-  for (int i = 0; i < kNumAnchor; i++) {
+  for (int i = 0; i < kNumAnchor; ++i) {
     anchors_px_[i] = 0;
     anchors_py_[i] = 0;
     anchors_pz_[i] = 0;
@@ -388,12 +319,12 @@ void PointPillars::GenerateAnchors(float* anchors_px_, float* anchors_py_,
 
   float anchor_x_count[kNumAnchorXInds];
   anchor_x_count[0] = 0;
-  for (int i = 0; i < kNumAnchorXInds; i++) {
+  for (int i = 0; i < kNumAnchorXInds; ++i) {
     anchor_x_count[i] = static_cast<float>(i) * x_stride + x_offset;
   }
   float anchor_y_count[kNumAnchorYInds];
   anchor_y_count[0] = 0;
-  for (int i = 0; i < kNumAnchorYInds; i++) {
+  for (int i = 0; i < kNumAnchorYInds; ++i) {
     anchor_y_count[i] = static_cast<float>(i) * y_stride + y_offset;
   }
 
@@ -401,12 +332,11 @@ void PointPillars::GenerateAnchors(float* anchors_px_, float* anchors_py_,
   anchor_r_count[0] = 0;
   anchor_r_count[1] = M_PI / 2;
 
-  // np.meshgrid
-  for (int y = 0; y < kNumAnchorYInds; y++) {
-    for (int x = 0; x < kNumAnchorXInds; x++) {
-      for (int r = 0; r < kNumAnchorRInds; r++) {
-        int ind = y * kNumAnchorXInds * kNumAnchorRInds +
-                  x * kNumAnchorRInds + r;
+  for (int y = 0; y < kNumAnchorYInds; ++y) {
+    for (int x = 0; x < kNumAnchorXInds; ++x) {
+      for (int r = 0; r < kNumAnchorRInds; ++r) {
+        int ind =
+            y * kNumAnchorXInds * kNumAnchorRInds + x * kNumAnchorRInds + r;
         anchors_px_[ind] = anchor_x_count[x];
         anchors_py_[ind] = anchor_y_count[y];
         anchors_ro_[ind] = anchor_r_count[r];
@@ -429,33 +359,35 @@ void PointPillars::PutAnchorsInDeviceMemory() {
   GPU_CHECK(cudaMemcpy(dev_box_anchors_max_y_, box_anchors_max_y_,
                        kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
 
-  GPU_CHECK(cudaMemcpy(dev_anchors_px_, anchors_px_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_anchors_py_, anchors_py_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_anchors_pz_, anchors_pz_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_anchors_dx_, anchors_dx_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_anchors_dy_, anchors_dy_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_anchors_dz_, anchors_dz_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_anchors_ro_, anchors_ro_,
-                       kNumAnchor * sizeof(float), cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_px_, anchors_px_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_py_, anchors_py_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_pz_, anchors_pz_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_dx_, anchors_dx_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_dy_, anchors_dy_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_dz_, anchors_dz_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_anchors_ro_, anchors_ro_, kNumAnchor * sizeof(float),
+                       cudaMemcpyHostToDevice));
 }
 
-void PointPillars::ConvertAnchors2BoxAnchors(
-    float* anchors_px, float* anchors_py, float* anchors_dx, float* anchors_dy,
-    float* box_anchors_min_x_, float* box_anchors_min_y_,
-    float* box_anchors_max_x_, float* box_anchors_max_y_) {
-  // flipping box's dimension
+void PointPillars::ConvertAnchors2BoxAnchors(float* anchors_px,
+                                             float* anchors_py,
+                                             float* box_anchors_min_x_,
+                                             float* box_anchors_min_y_,
+                                             float* box_anchors_max_x_,
+                                             float* box_anchors_max_y_) {
+  // flipping box's dimension at direction that rotates 90 degree
   float flipped_anchors_dx[kNumAnchor];
   flipped_anchors_dx[0] = 0;
   float flipped_anchors_dy[kNumAnchor];
   flipped_anchors_dy[0] = 0;
-  for (int x = 0; x < kNumAnchorXInds; x++) {
-    for (int y = 0; y < kNumAnchorYInds; y++) {
+  for (int x = 0; x < kNumAnchorXInds; ++x) {
+    for (int y = 0; y < kNumAnchorYInds; ++y) {
       int base_ind =
           x * kNumAnchorYInds * kNumAnchorRInds + y * kNumAnchorRInds;
       flipped_anchors_dx[base_ind + 0] = kAnchorDxSize;
@@ -464,11 +396,11 @@ void PointPillars::ConvertAnchors2BoxAnchors(
       flipped_anchors_dy[base_ind + 1] = kAnchorDxSize;
     }
   }
-  for (int x = 0; x < kNumAnchorXInds; x++) {
-    for (int y = 0; y < kNumAnchorYInds; y++) {
-      for (int r = 0; r < kNumAnchorRInds; r++) {
-        int ind = x * kNumAnchorYInds * kNumAnchorRInds +
-                  y * kNumAnchorRInds + r;
+  for (int x = 0; x < kNumAnchorXInds; ++x) {
+    for (int y = 0; y < kNumAnchorYInds; ++y) {
+      for (int r = 0; r < kNumAnchorRInds; ++r) {
+        int ind =
+            x * kNumAnchorYInds * kNumAnchorRInds + y * kNumAnchorRInds + r;
         box_anchors_min_x_[ind] =
             anchors_px[ind] - flipped_anchors_dx[ind] / 2.0f;
         box_anchors_min_y_[ind] =
@@ -488,10 +420,7 @@ void PointPillars::InitTRT() {
   nvinfer1::IHostMemory* rpn_trt_model_stream{nullptr};
   OnnxToTRTModel(pfe_onnx_file_, &pfe_trt_model_stream);
   OnnxToTRTModel(rpn_onnx_file_, &rpn_trt_model_stream);
-  if (pfe_trt_model_stream == nullptr ||
-      rpn_trt_model_stream ==
-          nullptr) {  // use std:cerr instead of ROS_ERROR because want to keep
-                      // this fille ros-agnostics
+  if (pfe_trt_model_stream == nullptr || rpn_trt_model_stream == nullptr) {
     std::cerr << "Failed to load ONNX file " << std::endl;
   }
 
@@ -524,11 +453,15 @@ void PointPillars::OnnxToTRTModel(
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kWARNING);
 
   // create the builder
+  // TODO(chenjiahao): assign value from constant param 'kBatchSize'
+  const auto explicit_batch =
+      1U << static_cast<uint32_t>(
+          nvinfer1::NetworkDefinitionCreationFlag::kEXPLICIT_BATCH);
   nvinfer1::IBuilder* builder = nvinfer1::createInferBuilder(g_logger_);
-  nvinfer1::INetworkDefinition* network = builder->createNetwork();
+  nvinfer1::INetworkDefinition* network =
+      builder->createNetworkV2(explicit_batch);
 
   auto parser = nvonnxparser::createParser(*network, g_logger_);
-
   if (!parser->parseFromFile(model_file.c_str(), verbosity)) {
     std::string msg("failed to parse onnx file");
     g_logger_.log(nvinfer1::ILogger::Severity::kERROR, msg.c_str());
@@ -537,9 +470,10 @@ void PointPillars::OnnxToTRTModel(
 
   // Build the engine
   builder->setMaxBatchSize(kBatchSize);
-  builder->setMaxWorkspaceSize(1 << 20);
-
-  nvinfer1::ICudaEngine* engine = builder->buildCudaEngine(*network);
+  nvinfer1::IBuilderConfig* config = builder->createBuilderConfig();
+  config->setMaxWorkspaceSize(1 << 20);
+  nvinfer1::ICudaEngine* engine =
+      builder->buildEngineWithConfig(*network, *config);
 
   parser->destroy();
 
@@ -547,57 +481,36 @@ void PointPillars::OnnxToTRTModel(
   *trt_model_stream = engine->serialize();
   engine->destroy();
   network->destroy();
+  config->destroy();
   builder->destroy();
 }
 
 void PointPillars::PreprocessCPU(const float* in_points_array,
                                  const int in_num_points) {
   int x_coors[kMaxNumPillars];
-  x_coors[0] = 0;
   int y_coors[kMaxNumPillars];
-  y_coors[0] = 0;
   float num_points_per_pillar[kMaxNumPillars];
-  num_points_per_pillar[0] = 0;
-  float* pillar_x = new float[kMaxNumPillars * kMaxNumPointsPerPillar];
-  float* pillar_y = new float[kMaxNumPillars * kMaxNumPointsPerPillar];
-  float* pillar_z = new float[kMaxNumPillars * kMaxNumPointsPerPillar];
-  float* pillar_i = new float[kMaxNumPillars * kMaxNumPointsPerPillar];
+  memset(x_coors, 0, kMaxNumPillars * sizeof(int));
+  memset(y_coors, 0, kMaxNumPillars * sizeof(int));
+  memset(num_points_per_pillar, 0, kMaxNumPillars * sizeof(float));
 
-  float* x_coors_for_sub_shaped =
-      new float[kMaxNumPillars * kMaxNumPointsPerPillar];
-  float* y_coors_for_sub_shaped =
-      new float[kMaxNumPillars * kMaxNumPointsPerPillar];
-  float* pillar_feature_mask =
-      new float[kMaxNumPillars * kMaxNumPointsPerPillar];
-
+  float* pillar_point_feature =
+      new float[kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature];
+  float* pillar_coors = new float[kMaxNumPillars * 4];
   float* sparse_pillar_map = new float[kNumIndsForScan * kNumIndsForScan];
 
-  preprocess_points_ptr_->Preprocess(
-      in_points_array, in_num_points, x_coors, y_coors, num_points_per_pillar,
-      pillar_x, pillar_y, pillar_z, pillar_i, x_coors_for_sub_shaped,
-      y_coors_for_sub_shaped, pillar_feature_mask, sparse_pillar_map,
-      host_pillar_count_);
+  preprocess_points_ptr_->Preprocess(in_points_array, in_num_points, x_coors,
+                                     y_coors, num_points_per_pillar,
+                                     pillar_point_feature, pillar_coors,
+                                     sparse_pillar_map, host_pillar_count_);
 
   GPU_CHECK(cudaMemset(dev_x_coors_, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_y_coors_, 0, kMaxNumPillars * sizeof(int)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_x_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_y_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_z_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_i_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_x_coors_for_sub_shaped_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_y_coors_for_sub_shaped_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_pillar_point_feature_, 0,
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
+  GPU_CHECK(
+      cudaMemset(dev_pillar_coors_, 0, kMaxNumPillars * 4 * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_num_points_per_pillar_, 0,
                        kMaxNumPillars * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_sparse_pillar_map_, 0,
@@ -607,51 +520,25 @@ void PointPillars::PreprocessCPU(const float* in_points_array,
                        cudaMemcpyHostToDevice));
   GPU_CHECK(cudaMemcpy(dev_y_coors_, y_coors, kMaxNumPillars * sizeof(int),
                        cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_pillar_x_, pillar_x,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_pillar_y_, pillar_y,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_pillar_z_, pillar_z,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_pillar_i_, pillar_i,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_x_coors_for_sub_shaped_, x_coors_for_sub_shaped,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_y_coors_for_sub_shaped_, y_coors_for_sub_shaped,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemcpy(dev_num_points_per_pillar_, num_points_per_pillar,
-                       kMaxNumPillars * sizeof(float),
+  GPU_CHECK(cudaMemcpy(dev_pillar_point_feature_, pillar_point_feature,
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float),
                        cudaMemcpyHostToDevice));
-  GPU_CHECK(
-      cudaMemcpy(dev_pillar_feature_mask_, pillar_feature_mask,
-                 kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-                 cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_pillar_coors_, pillar_coors,
+                       kMaxNumPillars * 4 * sizeof(float),
+                       cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(dev_num_points_per_pillar_, num_points_per_pillar,
+                       kMaxNumPillars * sizeof(float), cudaMemcpyHostToDevice));
   GPU_CHECK(cudaMemcpy(dev_sparse_pillar_map_, sparse_pillar_map,
                        kNumIndsForScan * kNumIndsForScan * sizeof(float),
                        cudaMemcpyHostToDevice));
 
-  delete[] pillar_x;
-  delete[] pillar_y;
-  delete[] pillar_z;
-  delete[] pillar_i;
-  delete[] x_coors_for_sub_shaped;
-  delete[] y_coors_for_sub_shaped;
-  delete[] pillar_feature_mask;
+  delete[] pillar_point_feature;
+  delete[] pillar_coors;
   delete[] sparse_pillar_map;
 }
 
+// TODO(chenjiahao): fix this function
 void PointPillars::PreprocessGPU(const float* in_points_array,
                                  const int in_num_points) {
   float* dev_points;
@@ -660,22 +547,12 @@ void PointPillars::PreprocessGPU(const float* in_points_array,
   GPU_CHECK(cudaMemcpy(dev_points, in_points_array,
                        in_num_points * kNumBoxCorners * sizeof(float),
                        cudaMemcpyHostToDevice));
-  GPU_CHECK(cudaMemset(dev_pillar_count_histo_, 0,
-                       kGridYSize * kGridXSize * sizeof(int)));
+
   GPU_CHECK(cudaMemset(dev_sparse_pillar_map_, 0,
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_x_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_y_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_z_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
-  GPU_CHECK(cudaMemset(
-      dev_pillar_i_, 0,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float)));
+  GPU_CHECK(cudaMemset(dev_pillar_point_feature_, 0,
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_x_coors_, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_y_coors_, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_num_points_per_pillar_, 0,
@@ -684,9 +561,8 @@ void PointPillars::PreprocessGPU(const float* in_points_array,
 
   preprocess_points_cuda_ptr_->DoPreprocessPointsCuda(
       dev_points, in_num_points, dev_x_coors_, dev_y_coors_,
-      dev_num_points_per_pillar_, dev_pillar_x_, dev_pillar_y_, dev_pillar_z_,
-      dev_pillar_i_, dev_x_coors_for_sub_shaped_, dev_y_coors_for_sub_shaped_,
-      dev_pillar_feature_mask_, dev_sparse_pillar_map_, host_pillar_count_);
+      dev_num_points_per_pillar_, dev_pillar_point_feature_, dev_pillar_coors_,
+      dev_sparse_pillar_map_, host_pillar_count_);
 
   GPU_CHECK(cudaFree(dev_points));
 }
@@ -713,49 +589,29 @@ void PointPillars::DoInference(const float* in_points_array,
 
   cudaStream_t stream;
   GPU_CHECK(cudaStreamCreate(&stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[0], dev_pillar_x_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[1], dev_pillar_y_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[2], dev_pillar_z_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[3], dev_pillar_i_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(pfe_buffers_[4], dev_num_points_per_pillar_,
+  GPU_CHECK(cudaMemcpyAsync(pfe_buffers_[0], dev_pillar_point_feature_,
+                            kMaxNumPillars * kMaxNumPointsPerPillar *
+                                kNumPointFeature * sizeof(float),
+                            cudaMemcpyDeviceToDevice, stream));
+  GPU_CHECK(cudaMemcpyAsync(pfe_buffers_[1], dev_num_points_per_pillar_,
                             kMaxNumPillars * sizeof(float),
                             cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[5], dev_x_coors_for_sub_shaped_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[6], dev_y_coors_for_sub_shaped_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  GPU_CHECK(cudaMemcpyAsync(
-      pfe_buffers_[7], dev_pillar_feature_mask_,
-      kMaxNumPillars * kMaxNumPointsPerPillar * sizeof(float),
-      cudaMemcpyDeviceToDevice, stream));
-  pfe_context_->enqueue(kBatchSize, pfe_buffers_, stream, nullptr);
+  GPU_CHECK(cudaMemcpyAsync(pfe_buffers_[2], dev_pillar_coors_,
+                            kMaxNumPillars * 4 * sizeof(float),
+                            cudaMemcpyDeviceToDevice, stream));
+
+  pfe_context_->enqueueV2(pfe_buffers_, stream, nullptr);
 
   GPU_CHECK(
       cudaMemset(dev_scattered_feature_, 0, kRpnInputSize * sizeof(float)));
   scatter_cuda_ptr_->DoScatterCuda(
       host_pillar_count_[0], dev_x_coors_, dev_y_coors_,
-      reinterpret_cast<float*>(pfe_buffers_[8]), dev_scattered_feature_);
+      reinterpret_cast<float*>(pfe_buffers_[3]), dev_scattered_feature_);
 
   GPU_CHECK(cudaMemcpyAsync(rpn_buffers_[0], dev_scattered_feature_,
                             kBatchSize * kRpnInputSize * sizeof(float),
                             cudaMemcpyDeviceToDevice, stream));
-  rpn_context_->enqueue(kBatchSize, rpn_buffers_, stream, nullptr);
+  rpn_context_->enqueueV2(rpn_buffers_, stream, nullptr);
 
   GPU_CHECK(cudaMemset(dev_filter_count_, 0, sizeof(int)));
   postprocess_cuda_ptr_->DoPostprocessCuda(
