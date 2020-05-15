@@ -1,4 +1,5 @@
-FROM apolloauto/apollo:cyber-x86_64-18.04-20200510_2227
+FROM apolloauto/apollo:cyber-x86_64-18.04-20200514_1653
+
 ARG GEOLOC
 ARG BUILD_STAGE
 ARG INSTALL_MODE
