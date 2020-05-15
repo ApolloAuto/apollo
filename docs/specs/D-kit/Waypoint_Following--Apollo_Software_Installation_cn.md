@@ -377,7 +377,7 @@ bash docker/scripts/dev_into.sh
 e.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时25分钟：
 
 ```
-bash apollo.sh build
+bash apollo.sh build_opt
 ```
 
 ### 运行DreamView

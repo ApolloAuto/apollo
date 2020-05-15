@@ -17,7 +17,7 @@
         cd /apollo
         bash docker/scripts/dev_start.sh
         bash docker/scripts/dev_into.sh
-        bash apollo.sh build_gpu
+        bash apollo.sh build_opt_gpu
         bash scripts/bootstrap.sh 
  
 2. 在浏览器中打开(http://localhost:8888), 选择`dev_kit`并选择相应高精地图，在module Controller标签页启动GPS、Localization、Camera、Transform模块。
