@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/storytelling/proto:story_proto",
     ],
 )
 
