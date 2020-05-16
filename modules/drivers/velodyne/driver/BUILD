@@ -35,14 +35,10 @@ cc_library(
         "socket_input.h",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
-    linkopts = [
-        "-lpcap",
-    ],
     deps = [
         "//cyber",
         "//modules/common/util",
         "//modules/drivers/velodyne/proto:velodyne_proto",
-        "@pcl",
     ],
 )
 
