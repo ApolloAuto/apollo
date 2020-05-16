@@ -51,9 +51,11 @@ apt-get -y update && \
     curl \
     git \
     vim \
-    lsof \
+    sed \
+    gawk \
     patch \
     tree \
+    lsof \
     pkg-config \
     python3 \
     python3-dev \
