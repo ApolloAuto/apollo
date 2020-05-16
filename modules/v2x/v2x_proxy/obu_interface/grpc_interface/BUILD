@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,7 +10,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/v2x/common:v2x_proxy_gflags",
-        "//modules/v2x/proto:v2x_service_car_to_obu_grpc",
+        "//modules/v2x/proto:v2x_service_car_to_obu_cc_grpc",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -20,7 +21,7 @@ cc_library(
     hdrs = ["grpc_server.h"],
     deps = [
         "//cyber",
-        "//modules/v2x/proto:v2x_service_obu_to_car_grpc",
+        "//modules/v2x/proto:v2x_service_obu_to_car_cc_grpc",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
