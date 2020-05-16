@@ -153,7 +153,7 @@ cc_test(
         ":interpolation_1d",
         "//cyber",
         "//modules/common/util",
-        "//modules/control/proto:control_proto",
+        "//modules/control/proto:control_cmd_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

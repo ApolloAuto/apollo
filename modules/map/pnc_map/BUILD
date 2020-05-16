@@ -38,8 +38,7 @@ cc_library(
         "//modules/common/math",
         "//modules/map/hdmap",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/proto:routing_proto",
+        "//modules/map/proto:map_lane_cc_proto",
     ],
 )
 
@@ -49,7 +48,7 @@ cc_library(
     hdrs = ["route_segments.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
         "//modules/routing/common:routing_gflags",
@@ -65,7 +64,7 @@ cc_library(
         ":path",
         ":route_segments",
         "//modules/common/util:point_factory",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",

@@ -11,8 +11,8 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//cyber",
-        "//modules/prediction/proto:network_model_proto",
+        "//cyber/common:log",
+        "//modules/prediction/proto:network_layers_cc_proto",
         "@eigen",
     ],
 )

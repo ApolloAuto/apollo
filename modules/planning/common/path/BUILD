@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 

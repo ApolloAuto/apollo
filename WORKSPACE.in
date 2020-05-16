@@ -23,18 +23,6 @@ http_archive(
     url = "https://github.com/google/googletest/archive/release-1.10.0.tar.gz",
 )
 
-# TODO(xiaoxq): Alias to help migrate legacy code in other repos. Will remove
-# very soon.
-new_local_repository(
-    name = "gtest",
-    build_file_content = """
-package(default_visibility = ["//visibility:public"])
-cc_library(name = "gtest", deps = ["@com_google_googletest//:gtest"])
-cc_library(name = "main", deps = ["@com_google_googletest//:gtest_main"])
-    """,
-    path = "/usr/include",
-)
-
 http_archive(
     name = "rules_proto",
     sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
@@ -63,11 +51,6 @@ new_local_repository(
     name = "com_github_gflags_gflags",
     build_file = "external/gflags.BUILD",
     path = "/usr/local/include/gflags",
-)
-
-bind(
-    name = "gflags",
-    actual = "@com_github_gflags_gflags//:gflags",
 )
 
 # glog
@@ -150,15 +133,15 @@ http_archive(
 )
 
 #
-## CivetWeb (web server)
-#http_archive(
-#    name = "civetweb",
-#    build_file = "third_party/civetweb.BUILD",
-#    sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
-#    strip_prefix = "civetweb-1.11",
-#    urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz",],
-#)
-#
+# CivetWeb (web server)
+http_archive(
+    name = "civetweb",
+    build_file = "third_party/civetweb.BUILD",
+    sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
+    strip_prefix = "civetweb-1.11",
+    urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz",],
+)
+
 ##ros
 #new_local_repository(
 #    name = "ros",
