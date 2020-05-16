@@ -380,6 +380,13 @@ new_local_repository(
     path = "/usr/include",
 )
 
+# Needed by modules/transform
+new_local_repository(
+    name = "tf2",
+    build_file = "external/tf2.BUILD",
+    path = "/usr/local/tf2/include",
+)
+
 # TODO(storypku) rules_boost
 new_local_repository(
     name = "boost",

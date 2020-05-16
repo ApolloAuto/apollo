@@ -12,6 +12,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
+  	"//modules/transform/proto:transform_cc_proto",
+  	"//modules/common/proto:header_cc_proto",
+  	"//modules/common/proto:error_code_cc_proto",
+  	"//modules/common/proto:geometry_cc_proto",
+	"@tf2",
         "@com_google_absl//absl/strings",
     ],
 )
