@@ -31,13 +31,9 @@ APOLLO_LIB_PATH=/usr/local/apollo
 mkdir -p ${APOLLO_LIB_PATH}
 cd ${APOLLO_LIB_PATH}
 
-# Install jsoncpp.
-wget https://apollocache.blob.core.windows.net/apollo-cache/jsoncpp.zip
-unzip jsoncpp.zip
-
 # Install adv plat.
 wget https://apollocache.blob.core.windows.net/apollo-cache/adv_plat.zip
 unzip adv_plat.zip
 
 # Clean up.
-rm -fr jsoncpp.zip adv_plat.zip
+rm -fr adv_plat.zip

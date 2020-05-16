@@ -57,7 +57,9 @@ cc_library(
         ":routing_topo_range",
         "//cyber",
         "//modules/common/util:map_util",
-        "//modules/routing/proto:routing_proto",
+        "//modules/routing/proto:routing_cc_proto",
+	"//modules/routing/proto:topo_graph_cc_proto",
+
     ],
 )
 
