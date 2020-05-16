@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -35,8 +36,8 @@ cc_library(
     deps = [
         ":transit_message_manager",
         "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/common/proto:vehicle_signal_cc_proto",
         "//modules/common/kv_db",
+        "//modules/common/proto:vehicle_signal_cc_proto",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
     ],

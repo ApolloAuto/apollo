@@ -67,6 +67,7 @@ py_proto_library(
         ":parameter_proto",
     ],
 )
+
 cc_proto_library(
     name = "classic_conf_cc_proto",
     deps = [
@@ -85,6 +86,7 @@ py_proto_library(
         ":classic_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "cyber_conf_cc_proto",
     deps = [
@@ -96,10 +98,10 @@ proto_library(
     name = "cyber_conf_proto",
     srcs = ["cyber_conf.proto"],
     deps = [
+        ":perf_conf_proto",
+        ":run_mode_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
-        ":run_mode_conf_proto",
-        ":perf_conf_proto",
     ],
 )
 
@@ -128,6 +130,7 @@ py_proto_library(
         ":choreography_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "dag_conf_cc_proto",
     deps = [
@@ -161,8 +164,8 @@ proto_library(
     name = "scheduler_conf_proto",
     srcs = ["scheduler_conf.proto"],
     deps = [
-        ":classic_conf_proto",
         ":choreography_conf_proto",
+        ":classic_conf_proto",
     ],
 )
 
@@ -191,6 +194,7 @@ py_proto_library(
         ":perception_proto",
     ],
 )
+
 cc_proto_library(
     name = "component_conf_cc_proto",
     deps = [
@@ -231,6 +235,7 @@ py_proto_library(
         ":run_mode_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "proto_desc_cc_proto",
     deps = [
@@ -249,6 +254,7 @@ py_proto_library(
         ":proto_desc_proto",
     ],
 )
+
 cc_proto_library(
     name = "transport_conf_cc_proto",
     deps = [
@@ -267,6 +273,7 @@ py_proto_library(
         ":transport_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "qos_profile_cc_proto",
     deps = [
@@ -285,6 +292,7 @@ py_proto_library(
         ":qos_profile_proto",
     ],
 )
+
 cc_proto_library(
     name = "perf_conf_cc_proto",
     deps = [
@@ -303,6 +311,7 @@ py_proto_library(
         ":perf_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "unit_test_cc_proto",
     deps = [
@@ -321,6 +330,7 @@ py_proto_library(
         ":unit_test_proto",
     ],
 )
+
 cc_proto_library(
     name = "record_cc_proto",
     deps = [

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -42,15 +43,15 @@ cc_binary(
     name = "sim_map_generator",
     srcs = ["sim_map_generator.cc"],
     deps = [
-        "//cyber/common:log",
         "//cyber/common:file",
+        "//cyber/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/util:points_downsampler",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_cc_proto",
-        "@com_google_absl//absl/strings",
         "@com_github_gflags_gflags//:gflags",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -71,8 +72,8 @@ cc_binary(
     name = "bin_map_generator",
     srcs = ["bin_map_generator.cc"],
     deps = [
-        "//cyber/common:log",
         "//cyber/common:file",
+        "//cyber/common:log",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "@com_github_gflags_gflags//:gflags",

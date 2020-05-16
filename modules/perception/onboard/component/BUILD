@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -83,21 +84,21 @@ cc_binary(
 cc_library(
     name = "perception_component_inner_lidar",
     srcs = [
+        "detection_component.cc",
         "fusion_component.cc",
         "lidar_output_component.cc",
         "radar_detection_component.cc",
         "recognition_component.cc",
         "segmentation_component.cc",
-        "detection_component.cc",
     ],
     hdrs = [
+        "detection_component.h",
         "fusion_component.h",
         "lidar_inner_component_messages.h",
         "lidar_output_component.h",
         "radar_detection_component.h",
         "recognition_component.h",
         "segmentation_component.h",
-        "detection_component.h",
     ],
     copts = [
         '-DMODULE_NAME=\\"perception\\"',

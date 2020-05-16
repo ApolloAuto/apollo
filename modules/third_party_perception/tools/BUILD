@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,8 +19,8 @@ cc_library(
     name = "third_party_perception_smartereye_conversion",
     srcs = ["conversion_smartereye.cc"],
     hdrs = [
-        "conversion_smartereye.h",
         "conversion_base.h",
+        "conversion_smartereye.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -33,8 +34,8 @@ cc_library(
     name = "third_party_perception_mobileye_conversion",
     srcs = ["conversion_mobileye.cc"],
     hdrs = [
-        "conversion_mobileye.h",
         "conversion_base.h",
+        "conversion_mobileye.h",
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",

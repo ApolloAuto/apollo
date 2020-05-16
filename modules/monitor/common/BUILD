@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -26,6 +27,8 @@ cc_library(
     srcs = ["monitor_manager.cc"],
     hdrs = ["monitor_manager.h"],
     deps = [
+        "//cyber/common:file",
+        "//cyber/common:macros",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
@@ -39,8 +42,6 @@ cc_library(
         "//modules/dreamview/proto:hmi_status_cc_proto",
         "//modules/localization/proto:pose_cc_proto",
         "//modules/monitor/proto:system_status_cc_proto",
-        "//cyber/common:macros",
-        "//cyber/common:file",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

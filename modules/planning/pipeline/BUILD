@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -44,9 +45,9 @@ cc_binary(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/common:feature_output",
         "//modules/planning/common:message_process",
+        "//modules/planning/common:planning_gflags",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
     ],

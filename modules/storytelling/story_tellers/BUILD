@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -19,8 +20,8 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_cc_proto",
-        "//modules/storytelling/common:storytelling_gflags",
         "//modules/storytelling:frame_manager",
+        "//modules/storytelling/common:storytelling_gflags",
     ],
 )
 

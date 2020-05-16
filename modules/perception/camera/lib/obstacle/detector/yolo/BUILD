@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:cuda_library.bzl", "cuda_library")
 
@@ -13,7 +14,7 @@ cuda_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
         "//modules/prediction/proto:feature_proto",
-	"@cuda",
+        "@cuda",
     ],
 )
 

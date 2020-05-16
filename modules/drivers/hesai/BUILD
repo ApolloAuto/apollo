@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -14,21 +15,21 @@ cc_library(
     srcs = [
         "component.cc",
         "driver.cc",
-        "udp_input.cc",
         "hesai40_parser.cc",
         "hesai64_parser.cc",
         "parser.cc",
         "tcp_cmd_client.cc",
+        "udp_input.cc",
     ],
     hdrs = [
         "const_var.h",
         "driver.h",
-        "hesai_driver_component.h",
         "hesai_convert_component.h",
-        "udp_input.h",
+        "hesai_driver_component.h",
         "parser.h",
         "tcp_cmd_client.h",
         "type_defs.h",
+        "udp_input.h",
     ],
     copts = ['-DMODULE_NAME=\\"hesai\\"'],
     deps = [

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,8 +8,8 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        "//cyber/common:types",
         "//cyber/common:log",
+        "//cyber/common:types",
         "//modules/common/math:geometry",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/proto:pnc_point_cc_proto",

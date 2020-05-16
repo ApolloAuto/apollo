@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:cuda_library.bzl", "cuda_library")
 
@@ -39,7 +40,7 @@ cc_library(
     ],
     deps = [
         ":point_pillars",
-        "//cyber/common:common",
+        "//cyber/common",
         "//modules/perception/base",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,9 +11,9 @@ cc_library(
     deps = [
         ":gem_controller",
         ":gem_message_manager",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/canbus/proto:canbus_conf_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
+        "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
 )
 

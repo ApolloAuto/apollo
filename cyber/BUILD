@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -100,9 +101,9 @@ cc_library(
         "//cyber/transport:sub_listener",
         "//third_party:rt",
         "//third_party:uuid",
+        "@com_google_glog//:glog",
         "@com_google_protobuf//:protobuf",
         "@fastrtps",
-	"@com_google_glog//:glog",
     ],
 )
 

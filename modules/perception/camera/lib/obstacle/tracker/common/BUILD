@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:cuda_library.bzl", "cuda_library")
 
@@ -11,8 +12,8 @@ cuda_library(
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
         "//modules/perception/inference/utils:inference_gemm_lib",
-	"//modules/prediction/proto:feature_proto",
-	"@cuda",
+        "//modules/prediction/proto:feature_proto",
+        "@cuda",
     ],
 )
 

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -204,9 +205,9 @@ cc_library(
         "vehicle_struct.h",
     ],
     deps = [
-        "//modules/prediction/proto:feature_proto",
         ":box",
         ":point_cloud",
+        "//modules/prediction/proto:feature_proto",
         "@eigen",
     ],
 )
