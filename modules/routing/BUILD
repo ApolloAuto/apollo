@@ -13,6 +13,7 @@ cc_library(
         "//modules/common/util:point_factory",
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/core",
+	"//modules/routing/proto:routing_config_cc_proto",
     ],
 )
 
