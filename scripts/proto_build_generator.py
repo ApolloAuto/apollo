@@ -75,10 +75,10 @@ def autorun(build_file_path):
         return
 
     workdir = os.path.dirname(build_file_path)
-    files_all = [ f for f in os.listdir(workdir) if \
+    files_all = [f for f in os.listdir(workdir) if \
                   os.path.isfile(os.path.join(workdir, f)) \
                   and f != "BUILD" \
-                  and f != "CMakeLists.txt" ]
+                  and f != "CMakeLists.txt"]
     ok = all(f.endswith(".proto") for f in files_all)
     if not ok:
         print(
@@ -91,8 +91,7 @@ def autorun(build_file_path):
 
     for protofile in files_all:
         dependency_text = generate_dependency_text(workdir, protofile)
-        rules = generate_rule_for_protofile(workdir, protofile,
-                                            dependency_text)
+        rules = generate_rule_for_protofile(protofile, dependency_text)
         fout.write(rules)
 
     fout.close()
@@ -100,7 +99,7 @@ def autorun(build_file_path):
         build_file_path))
 
 
-def generate_rule_for_protofile(workdir, protofile, dependency_text):
+def generate_rule_for_protofile(protofile, dependency_text):
     cc_name = cc_proto_name(protofile)
     py_name = py_proto_name(protofile)
     pb_name = proto_name(protofile)
@@ -109,12 +108,11 @@ def generate_rule_for_protofile(workdir, protofile, dependency_text):
                                         py_name=py_name, \
                                         pb_name=pb_name, \
                                         protofile=protofile)
-    else:
-        return TEMPLATE_DEPS.format(cc_name=cc_name, \
-                                    py_name=py_name, \
-                                    pb_name=pb_name, \
-                                    protofile=protofile, \
-                                    context=dependency_text)
+    return TEMPLATE_DEPS.format(cc_name=cc_name, \
+                                py_name=py_name, \
+                                pb_name=pb_name, \
+                                protofile=protofile, \
+                                context=dependency_text)
 
 
 def cc_proto_name(protofile):

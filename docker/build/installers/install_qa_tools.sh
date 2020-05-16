@@ -39,5 +39,8 @@ apt-get -y update && \
     shellcheck \
     lcov
 
+## Pylint
+python3 -m pip install pylint
+
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
