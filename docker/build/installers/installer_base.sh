@@ -48,6 +48,21 @@ function package_schema {
   echo "$schema"
 }
 
+function create_so_symlink() {
+    local mydir="$1"
+    for mylib in $(find "${mydir}" -name "lib*.so.*" -type f); do
+        mylib=$(basename "${mylib}")
+        ver="${mylib##*.so.}"
+        if [ -z "$ver" ]; then
+            continue
+        fi
+        libX="${mylib%%.so*}"
+        IFS='.' read -ra arr <<< "${ver}"
+        IFS=" " # restore IFS
+        ln -s "${mylib}" "${mydir}/${libX}.so.${arr[0]}"
+        ln -s "${mylib}" "${mydir}/${libX}.so"
+    done
+}
 
 ARCHIVE_DIR=/tmp/archive
 
@@ -94,3 +109,4 @@ function download_if_not_cached {
     fi
   fi
 }
+

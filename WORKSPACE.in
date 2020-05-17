@@ -307,14 +307,14 @@ new_local_repository(
 #    path = "/usr/local/apollo/paddlepaddle_dep/snappystream",
 #)
 #
-##adv_plat
-#http_archive(
-#    name = "adv_plat",
-#    build_file = "third_party/adv_plat.BUILD",
-#    sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
-#    url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
-#)
-#
+#adv_plat
+http_archive(
+    name = "adv_plat",
+    build_file = "adv_plat.BUILD",
+    sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
+    urls = [ "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip" ],
+)
+
 new_local_repository(
     name = "fastrtps",
     build_file = "third_party/fastrtps.BUILD",
