@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
-#include <string>
-
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
@@ -32,7 +30,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::cyber::common::GlobalData;
+using apollo::cyber::ComponentBase;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
@@ -46,21 +44,9 @@ bool PlanningComponent::Init() {
     planning_base_ = std::make_unique<OnLanePlanning>();
   }
 
-  ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
-                                                 &config_))
-      << "failed to load planning config file " << FLAGS_planning_config_file;
-
-  if (!GlobalData::Instance()->IsRealityMode() &&
-      apollo::cyber::common::PathExists(
-          FLAGS_additional_planning_config_file)) {
-    PlanningConfig additional_config;
-    ACHECK(apollo::cyber::common::GetProtoFromFile(
-        FLAGS_additional_planning_config_file, &additional_config))
-        << "failed to load additional planning config file "
-        << FLAGS_additional_planning_config_file;
-    config_.MergeFrom(additional_config);
-    apollo::cyber::common::DeleteFile(FLAGS_additional_planning_config_file);
-  }
+  ACHECK(ComponentBase::GetProtoConfig(&config_))
+      << "failed to load planning config file "
+      << ComponentBase::ConfigFilePath();
 
   if (FLAGS_planning_offline_mode > 0) {
     if (!message_process_.Init()) {
@@ -71,89 +57,45 @@ bool PlanningComponent::Init() {
 
   planning_base_->Init(config_);
 
-  if (config_.has_adc_id()) {
-    std::string channel_id = "/" + std::to_string(config_.adc_id());
+  routing_reader_ = node_->CreateReader<RoutingResponse>(
+      config_.routing_response_topic(),
+      [this](const std::shared_ptr<RoutingResponse>& routing) {
+        AINFO << "Received routing data: run routing callback."
+              << routing->header().DebugString();
+        std::lock_guard<std::mutex> lock(mutex_);
+        routing_.CopyFrom(*routing);
+      });
 
-    routing_reader_ = node_->CreateReader<RoutingResponse>(
-        FLAGS_routing_response_topic + channel_id,
-        [this](const std::shared_ptr<RoutingResponse>& routing) {
-          AINFO << "Received routing data: run routing callback."
-                << routing->header().DebugString();
+  traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
+      config_.traffic_light_detection_topic(),
+      [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
+        ADEBUG << "Received traffic light data: run traffic light callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        traffic_light_.CopyFrom(*traffic_light);
+      });
+
+  pad_msg_reader_ = node_->CreateReader<PadMessage>(
+      config_.planning_pad_topic(),
+      [this](const std::shared_ptr<PadMessage>& pad_msg) {
+        ADEBUG << "Received pad data: run pad callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        pad_msg_.CopyFrom(*pad_msg);
+      });
+
+  if (FLAGS_use_navigation_mode) {
+    relative_map_reader_ = node_->CreateReader<MapMsg>(
+        config_.relative_map_topic(),
+        [this](const std::shared_ptr<MapMsg>& map_message) {
+          ADEBUG << "Received relative map data: run relative map callback.";
           std::lock_guard<std::mutex> lock(mutex_);
-          routing_.CopyFrom(*routing);
+          relative_map_.CopyFrom(*map_message);
         });
-
-    traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
-        FLAGS_traffic_light_detection_topic + channel_id,
-        [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
-          ADEBUG << "Received traffic light data: run traffic light callback.";
-          std::lock_guard<std::mutex> lock(mutex_);
-          traffic_light_.CopyFrom(*traffic_light);
-        });
-
-    pad_msg_reader_ = node_->CreateReader<PadMessage>(
-        FLAGS_planning_pad_topic + channel_id,
-        [this](const std::shared_ptr<PadMessage>& pad_msg) {
-          ADEBUG << "Received pad data: run pad callback.";
-          std::lock_guard<std::mutex> lock(mutex_);
-          pad_msg_.CopyFrom(*pad_msg);
-        });
-
-    if (FLAGS_use_navigation_mode) {
-      relative_map_reader_ = node_->CreateReader<MapMsg>(
-          FLAGS_relative_map_topic + channel_id,
-          [this](const std::shared_ptr<MapMsg>& map_message) {
-            ADEBUG << "Received relative map data: run relative map callback.";
-            std::lock_guard<std::mutex> lock(mutex_);
-            relative_map_.CopyFrom(*map_message);
-          });
-    }
-    planning_writer_ = node_->CreateWriter<ADCTrajectory>(
-        FLAGS_planning_trajectory_topic + channel_id);
-
-    rerouting_writer_ = node_->CreateWriter<RoutingRequest>(
-        FLAGS_routing_request_topic + channel_id);
-  } else {
-    routing_reader_ = node_->CreateReader<RoutingResponse>(
-        FLAGS_routing_response_topic,
-        [this](const std::shared_ptr<RoutingResponse>& routing) {
-          AINFO << "Received routing data: run routing callback."
-                << routing->header().DebugString();
-          std::lock_guard<std::mutex> lock(mutex_);
-          routing_.CopyFrom(*routing);
-        });
-
-    traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
-        FLAGS_traffic_light_detection_topic,
-        [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
-          ADEBUG << "Received traffic light data: run traffic light callback.";
-          std::lock_guard<std::mutex> lock(mutex_);
-          traffic_light_.CopyFrom(*traffic_light);
-        });
-
-    pad_msg_reader_ = node_->CreateReader<PadMessage>(
-        FLAGS_planning_pad_topic,
-        [this](const std::shared_ptr<PadMessage>& pad_msg) {
-          ADEBUG << "Received pad data: run pad callback.";
-          std::lock_guard<std::mutex> lock(mutex_);
-          pad_msg_.CopyFrom(*pad_msg);
-        });
-
-    if (FLAGS_use_navigation_mode) {
-      relative_map_reader_ = node_->CreateReader<MapMsg>(
-          FLAGS_relative_map_topic,
-          [this](const std::shared_ptr<MapMsg>& map_message) {
-            ADEBUG << "Received relative map data: run relative map callback.";
-            std::lock_guard<std::mutex> lock(mutex_);
-            relative_map_.CopyFrom(*map_message);
-          });
-    }
-    planning_writer_ =
-        node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
-
-    rerouting_writer_ =
-        node_->CreateWriter<RoutingRequest>(FLAGS_routing_request_topic);
   }
+  planning_writer_ =
+      node_->CreateWriter<ADCTrajectory>(config_.planning_trajectory_topic());
+
+  rerouting_writer_ =
+      node_->CreateWriter<RoutingRequest>(config_.routing_request_topic());
 
   return true;
 }

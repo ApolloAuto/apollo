@@ -293,11 +293,6 @@ DEFINE_string(planning_config_file,
               "/apollo/modules/planning/conf/planning_config.pb.txt",
               "planning config file");
 
-DEFINE_string(
-    additional_planning_config_file,
-    "/apollo-simulator/octopus_engine/conf/additional_planning_config.pb.txt",
-    "additional planning config file used by octopus-engine");
-
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
