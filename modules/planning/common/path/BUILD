@@ -37,7 +37,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
     ],
 )
 

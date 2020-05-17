@@ -1,27 +1,24 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
-load(
-    "@com_github_grpc_grpc//bazel:python_rules.bzl",
-    "py_proto_library",
-)
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "udp_bridge_remote_info_proto",
+    name = "udp_bridge_remote_info_cc_proto",
     deps = [
-        ":udp_bridge_remote_info_proto_lib",
+        ":udp_bridge_remote_info_proto",
     ],
 )
 
 proto_library(
-    name = "udp_bridge_remote_info_proto_lib",
+    name = "udp_bridge_remote_info_proto",
     srcs = ["udp_bridge_remote_info.proto"],
 )
 
 py_proto_library(
-    name = "udp_bridge_remote_info_pb2",
+    name = "udp_bridge_remote_info_py_pb2",
     deps = [
-        ":udp_bridge_remote_info_proto_lib",
+        ":udp_bridge_remote_info_proto",
     ],
 )

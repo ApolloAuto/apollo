@@ -8,12 +8,12 @@ cc_library(
     srcs = ["autotuning_raw_feature_generator.cc"],
     hdrs = ["autotuning_raw_feature_generator.h"],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:speed_limit",
-        "//modules/planning/proto:auto_tuning_raw_feature_proto",
+        "//modules/planning/proto:auto_tuning_raw_feature_cc_proto",
     ],
 )
 
@@ -32,8 +32,8 @@ cc_library(
     hdrs = ["autotuning_feature_builder.h"],
     deps = [
         "//modules/common/status",
-        "//modules/planning/proto:auto_tuning_model_input_proto",
-        "//modules/planning/proto:auto_tuning_raw_feature_proto",
+        "//modules/planning/proto:auto_tuning_model_input_cc_proto",
+        "//modules/planning/proto:auto_tuning_raw_feature_cc_proto",
     ],
 )
 
@@ -63,7 +63,7 @@ cc_library(
         ":autotuning_feature_builder",
         ":autotuning_mlp_net_model",
         "//modules/common/status",
-        "//modules/planning/proto:auto_tuning_model_input_proto",
+        "//modules/planning/proto:auto_tuning_model_input_cc_proto",
     ],
 )
 
