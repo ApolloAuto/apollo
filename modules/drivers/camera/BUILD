@@ -27,7 +27,6 @@ cc_library(
     deps = [
         ":camera",
         "//cyber",
-        "//modules/drivers/proto:sensor_proto",
     ],
 )
 
@@ -36,14 +35,11 @@ cc_library(
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
     copts = ['-DMODULE_NAME=\\"camera\\"'],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
         "//modules/drivers/camera/proto:camera_proto",
         "//modules/drivers/proto:sensor_proto",
+	"@opencv",
     ],
 )
 
@@ -81,12 +77,10 @@ cc_library(
         {
             ":x86_mode": [
                 "//cyber",
-                "//modules/drivers/camera/proto:camera_proto",
                 "@adv_plat",
             ],
             ":arm_mode": [
                 "//cyber",
-                "//modules/drivers/camera/proto:camera_proto",
             ],
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
