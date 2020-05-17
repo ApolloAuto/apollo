@@ -1,18 +1,23 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
 cc_library(
     name = "adv_plat",
-    srcs = [
-        "lib/libadv_bcan.so.1",
-        "lib/libadv_trigger.so.1",
-    ],
     hdrs = [
-        "include/adv_trigger.h",
-        "include/bcan.h",
-        "include/linux/bcan_defs.h",
-        "include/linux/zynq_api.h",
+        "adv_trigger.h",
+        "bcan.h",
+        "linux/bcan_defs.h",
+        "linux/zynq_api.h",
     ],
-    include_prefix = "adv_plat",
+    includes = [
+        ".",
+    ],
+    linkopts = [
+        "-L/usr/local/adv_plat/lib",
+        "-ladv_trigger",
+        "-ladv_bcan",
+    ],
 )

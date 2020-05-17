@@ -1,7 +1,6 @@
 workspace(name = "apollo")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 maybe(
@@ -132,17 +131,16 @@ http_archive(
     urls = ["https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz"],
 )
 
-#
 # CivetWeb (web server)
 http_archive(
     name = "civetweb",
     build_file = "third_party/civetweb.BUILD",
     sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
     strip_prefix = "civetweb-1.11",
-    urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz",],
+    urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz"],
 )
 
-##ros
+#ros
 #new_local_repository(
 #    name = "ros",
 #    build_file = "third_party/ros.BUILD",
@@ -308,11 +306,10 @@ new_local_repository(
 #)
 #
 #adv_plat
-http_archive(
+new_local_repository(
     name = "adv_plat",
-    build_file = "adv_plat.BUILD",
-    sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
-    urls = [ "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip" ],
+    build_file = "external/adv_plat.BUILD",
+    path = "/usr/local/adv_plat/include",
 )
 
 new_local_repository(
