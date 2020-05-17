@@ -41,7 +41,7 @@ if [[ "${MY_MODE}" == "download" ]]; then
 fi
 
 git clone https://github.com/ApolloAuto/apollo-contrib.git
-BAIDU_DIR="/apollo/apollo-contrib/baidu"
+BAIDU_DIR="apollo-contrib/baidu"
 SRC_DIR="${BAIDU_DIR}/src/lib"
 OUT_DIR="${BAIDU_DIR}/output"
 
