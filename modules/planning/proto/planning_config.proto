@@ -356,5 +356,10 @@ message PlanningConfig {
   // task config.
   repeated TaskConfig default_task_config = 5;
   
-  optional int32 adc_id = 6;    // used in multi-adc simulation
+  optional string planning_pad_topic = 6;
+  optional string planning_trajectory_topic = 7;
+  optional string relative_map_topic = 8;
+  optional string routing_request_topic = 9;
+  optional string routing_response_topic = 10;
+  optional string traffic_light_detection_topic = 11; 
 }

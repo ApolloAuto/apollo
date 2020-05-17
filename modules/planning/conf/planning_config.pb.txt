@@ -375,3 +375,9 @@ default_task_config: {
     static_obstacle_buffer: 0.3
   }
 }
+planning_pad_topic: "/apollo/planning/pad"
+planning_trajectory_topic: "/apollo/planning"
+relative_map_topic: "/apollo/relative_map"
+routing_request_topic: "/apollo/routing_request"
+routing_response_topic: "/apollo/routing_response"
+traffic_light_detection_topic: "/apollo/perception/traffic_light"
