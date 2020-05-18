@@ -57,13 +57,13 @@ class PostprocessCuda {
   const float float_max_;
   const int num_anchor_x_inds_;
   const int num_anchor_y_inds_;
+  const int num_class_;
   const int num_anchor_r_inds_;
   const float score_threshold_;
   const int num_threads_;
   const float nms_overlap_threshold_;
   const int num_box_corners_;
   const int num_output_box_feature_;
-  const int num_class_;
 
   std::unique_ptr<NmsCuda> nms_cuda_ptr_;
 
@@ -86,10 +86,10 @@ class PostprocessCuda {
    */
   PostprocessCuda(const float float_min, const float float_max,
                   const int num_anchor_x_inds, const int num_anchor_y_inds,
-                  const int num_anchor_r_inds, const float score_threshold,
-                  const int num_threads, const float nms_overlap_threshold,
-                  const int num_box_corners, const int num_output_box_feature,
-                  const int num_class);
+                  const int num_class, const int num_anchor_r_inds,
+                  const float score_threshold, const int num_threads,
+                  const float nms_overlap_threshold, const int num_box_corners,
+                  const int num_output_box_feature);
 
   /**
    * @brief Postprocessing for the network output

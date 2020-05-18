@@ -68,8 +68,6 @@ class PreprocessPointsCuda {
 
   int* dev_counter_;
   int* dev_pillar_count_;
-  float* dev_x_coors_for_sub_;
-  float* dev_y_coors_for_sub_;
 
  public:
   /**
@@ -109,8 +107,8 @@ class PreprocessPointsCuda {
    * @param[in] dev_y_coors Y-coordinate indexes for corresponding pillars
    * @param[in] dev_num_points_per_pillar
    *   Number of points in corresponding pillars
-   * @param[in] pillar_point_feature Values for features of points in each
-   * pillar
+   * @param[in] pillar_point_feature
+   *   Values of point feature in each pillar
    * @param[in] pillar_coors Array for coors of pillars
    * @param[in] dev_sparse_pillar_map
    *   Grid map representation for pillar-occupancy
