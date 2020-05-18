@@ -44,8 +44,8 @@ default_task_config: {
   }
 }
 default_task_config: {
-  task_type: DP_ST_SPEED_OPTIMIZER
-  speed_heuristic_config {
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  speed_heuristic_optimizer_config {
     default_speed_config {
       unit_t: 1.0
       dense_dimension_s: 101
