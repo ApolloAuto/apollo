@@ -39,7 +39,7 @@
     cd /apollo
     bash docker/scripts/dev_start.sh
     bash docker/scripts/dev_into.sh
-    bash apollo.sh build_gpu
+    bash apollo.sh build_opt_gpu
     bash scripts/bootstrap.sh
 
 3、在浏览器中打开(http://localhost:8888), 选择`dev_kit`并选择相应虚拟车道线，在Module Controller标签页启动GPS、Localization、Radar、Transform、Canbus模块。
