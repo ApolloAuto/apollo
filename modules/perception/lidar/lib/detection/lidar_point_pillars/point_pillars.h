@@ -112,7 +112,8 @@ class PointPillars {
   static const int kRpnInputSize;
   static const int kNumAnchorXInds;
   static const int kNumAnchorYInds;
-  static const int kNumAnchorRInds;
+//  static const int kNumAnchorRInds;
+  static const int kNumAnchorPerLoc;
   static const int kNumAnchor;
   static const int kNumOutputBoxFeature;
   static const int kRpnBoxOutputSize;
@@ -137,6 +138,8 @@ class PointPillars {
   static const std::vector<float> kAnchorDxSizes;
   static const std::vector<float> kAnchorDySizes;
   static const std::vector<float> kAnchorDzSizes;
+  static const std::vector<int> kNumAnchorRo;
+  static const std::vector<float> kAnchorRo;
 
   // initialize in initializer list
   const bool reproduce_result_mode_;

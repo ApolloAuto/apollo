@@ -187,7 +187,7 @@ __global__ void sort_boxes_by_indexes_kernel(
 PostprocessCuda::PostprocessCuda(
     const float float_min, const float float_max, const int num_anchor_x_inds,
     const int num_anchor_y_inds, const int num_class,
-    const int num_anchor_r_inds, const float score_threshold,
+    const int num_anchor_per_loc, const float score_threshold,
     const int num_threads, const float nms_overlap_threshold,
     const int num_box_corners, const int num_output_box_feature)
     : float_min_(float_min),
@@ -195,7 +195,7 @@ PostprocessCuda::PostprocessCuda(
       num_anchor_x_inds_(num_anchor_x_inds),
       num_anchor_y_inds_(num_anchor_y_inds),
       num_class_(num_class),
-      num_anchor_r_inds_(num_anchor_r_inds),
+      num_anchor_per_loc_(num_anchor_per_loc),
       score_threshold_(score_threshold),
       num_threads_(num_threads),
       nms_overlap_threshold_(nms_overlap_threshold),
@@ -216,7 +216,7 @@ void PostprocessCuda::DoPostprocessCuda(
     int* dev_filtered_dir, float* dev_box_for_nms,
     int* dev_filter_count, std::vector<float>* out_detection,
     std::vector<int>* out_label) {
-  filter_kernel<<<num_anchor_x_inds_ * num_class_ * num_anchor_r_inds_,
+  filter_kernel<<<num_anchor_x_inds_ * num_anchor_per_loc_,
                   num_anchor_y_inds_>>>(
       rpn_box_output, rpn_cls_output, rpn_dir_output, dev_anchor_mask,
       dev_anchors_px, dev_anchors_py, dev_anchors_pz, dev_anchors_dx,

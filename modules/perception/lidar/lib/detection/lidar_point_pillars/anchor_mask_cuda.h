@@ -49,7 +49,7 @@ class AnchorMaskCuda {
   const int num_anchor_x_inds_;
   const int num_anchor_y_inds_;
   const int num_class_;
-  const int num_anchor_r_inds_;
+  const int num_anchor_per_loc_;
   const float min_x_range_;
   const float min_y_range_;
   const float pillar_x_size_;
@@ -64,9 +64,9 @@ class AnchorMaskCuda {
    * @param[in] num_anchor_x_inds Number of x-indexes for anchors
    * @param[in] num_anchor_y_inds Number of y-indexes for anchors
    * @param[in] num_class Number of classes
-   * @param[in] num_anchor_r_inds Number of rotation-indexes for anchors
-   * @param[in] min_x_range Minimum x value for pointcloud
-   * @param[in] min_y_range Minimum y value for pointcloud
+   * @param[in] num_anchor_per_loc Number of anchors per location
+   * @param[in] min_x_range Minimum x value for point cloud
+   * @param[in] min_y_range Minimum y value for point cloud
    * @param[in] pillar_x_size Size of x-dimension for a pillar
    * @param[in] pillar_y_size Size of y-dimension for a pillar
    * @param[in] grid_x_size Number of pillars in x-coordinate
@@ -75,7 +75,7 @@ class AnchorMaskCuda {
    */
   AnchorMaskCuda(const int num_inds_for_scan, const int num_anchor_x_inds,
                  const int num_anchor_y_inds, const int num_class,
-                 const int num_anchor_r_inds, const float min_x_range,
+                 const int num_anchor_per_loc, const float min_x_range,
                  const float min_y_range, const float pillar_x_size,
                  const float pillar_y_size, const int grid_x_size,
                  const int grid_y_size);
