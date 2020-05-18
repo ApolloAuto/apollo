@@ -20,9 +20,8 @@
 
 #include "modules/planning/tasks/task_factory.h"
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/status/status.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
@@ -32,6 +31,7 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
+#include "modules/planning/tasks/deciders/path_reference_decider/path_reference_decider.h"
 #include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
 #include "modules/planning/tasks/deciders/rss_decider/rss_decider.h"
 #include "modules/planning/tasks/deciders/rule_based_stop_decider/rule_based_stop_decider.h"
@@ -45,7 +45,6 @@
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
-
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -98,6 +97,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::PATH_LANE_BORROW_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathLaneBorrowDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_REFERENCE_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathReferenceDecider(config);
                          });
   task_factory_.Register(TaskConfig::PATH_REUSE_DECIDER,
                          [](const TaskConfig& config) -> Task* {

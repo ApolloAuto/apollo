@@ -37,6 +37,7 @@ cc_library(
         "//modules/planning/tasks/deciders/path_bounds_decider",
         "//modules/planning/tasks/deciders/path_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
+        "//modules/planning/tasks/deciders/path_reference_decider",
         "//modules/planning/tasks/deciders/path_reuse_decider",
         "//modules/planning/tasks/deciders/rss_decider",
         "//modules/planning/tasks/deciders/rule_based_stop_decider",
