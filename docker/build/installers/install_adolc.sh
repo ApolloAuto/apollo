@@ -21,50 +21,14 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-#apt-get install autoconf automake libtool
+# Related projects
+# https://github.com/CSCsw/ColPack.git
+# https://github.com/coin-or/ADOL-C
 
-echo "Build and install ColPack"
+apt-get -y update && \
+    apt-get -y install \
+    libcolpack-dev \
+    libadolc-dev
 
-git clone https://github.com/CSCsw/ColPack.git
-
-# works
-pushd ColPack
-pushd build/automake      # automake folder
-autoreconf -vif        # generate configure files based on the machince
-mkdir mywork && cd mywork
-fullpath=$(pwd)        # modify fullpath to your destination folder if need
-../configure --prefix=${fullpath}
-make -j$(nproc)        # Where "4" is the number of cores on your machine
-make install           # install lib and include/ColPack to destination
-
-mkdir -p /usr/local/colpack
-cp -r include /usr/local/colpack/ && cp -r lib /usr/local/colpack/
-popd
-cp LICENSE /usr/local/colpack/
-popd
-
-echo "colpack done."
-echo "Build and install ADOL-C"
-
-wget https://www.coin-or.org/download/source/ADOL-C/ADOL-C-2.6.3.zip -O ADOL-C-2.6.3.zip
-unzip ADOL-C-2.6.3.zip
-
-pushd ADOL-C-2.6.3
-autoreconf --install
-automake
-./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --enable-addexa --with-openmp-flag="-fopenmp" --with-colpack="/usr/local/colpack" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC"
-
-make -j8 all
-make install
-
-echo "Build ADOL-C done."
-mkdir -p /usr/local/adolc
-cp -r include /usr/local/adolc/ && cp -r lib64 /usr/local/adolc/
-cp LICENSE /usr/local/adolc/
-popd
-
-export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
-
-# Clean up.
+# clean up
 apt-get clean && rm -rf /var/lib/apt/lists/*
-rm -fr ADOL-C-2.6.3.zip ADOL-C-2.6.3 ColPack

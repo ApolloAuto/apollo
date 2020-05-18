@@ -221,20 +221,19 @@ new_local_repository(
     path = "/usr/local/include/osqp",
 )
 
-#
-## IpOpt
-#new_local_repository(
-#    name = "ipopt",
-#    build_file = "third_party/ipopt.BUILD",
-#    path = "/usr/local/ipopt/include",
-#)
-#
-## ADOL-C
-#new_local_repository(
-#    name = "adolc",
-#    build_file = "third_party/adolc.BUILD",
-#    path = "/usr/local/adolc/include",
-#)
+# ipopt
+new_local_repository(
+    name = "ipopt",
+    build_file = "third_party/ipopt.BUILD",
+    path = "/usr/include",
+)
+
+# ADOL-C
+new_local_repository(
+    name = "adolc",
+    build_file = "third_party/adolc.BUILD",
+    path = "/usr/include",
+)
 
 # Cuda
 new_local_repository(
@@ -318,7 +317,7 @@ new_local_repository(
     path = "/usr/local/fast-rtps",
 )
 
-# python
+#TODO(storypku): retire python2
 new_local_repository(
     name = "python27",
     build_file = "external/python27.BUILD",
@@ -345,15 +344,13 @@ new_local_repository(
     path = "/usr/local/libtorch_gpu/include",
 )
 
-#
-## ffmpeg
-#new_local_repository(
-#    name = "ffmpeg",
-#    build_file = "third_party/ffmpeg.BUILD",
-#    path = "/usr/local/apollo/ffmpeg",
-#)
-#
-#
+# ffmpeg
+new_local_repository(
+    name = "ffmpeg",
+    build_file = "external/ffmpeg.BUILD",
+    path = "/usr/local/ffmpeg4/include",
+)
+
 new_local_repository(
     name = "opencv",
     build_file = "external/opencv.BUILD",

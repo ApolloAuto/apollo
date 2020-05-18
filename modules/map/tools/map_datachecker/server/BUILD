@@ -30,8 +30,8 @@ cc_library(
     hdrs = ["channel_verify_agent.h"],
     deps = [
         ":channel_verify",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:map_datachecker_cc_grpc",
+        "//modules/map/tools/map_datachecker/proto:map_datachecker_cc_proto",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -57,7 +57,7 @@ cc_library(
         ":common",
         ":worker_gflags",
         "//cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:map_datachecker_cc_proto",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )

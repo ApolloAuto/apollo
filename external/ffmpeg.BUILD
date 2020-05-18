@@ -4,16 +4,11 @@ licenses(["notice"])
 
 cc_library(
     name = "ffmpeg",
-    srcs = glob(["lib/*.so"]),
-    hdrs = glob(["*"]),
-    copts = [
-        "-Iinclude",
-    ],
     includes = [
-        "include",
+        ".",
     ],
     linkopts = [
-        "-Llib",
+        "-L/usr/local/ffmpeg4/lib",
         "-lavcodec",
         "-lavutil",
         "-lswresample",
