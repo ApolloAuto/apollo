@@ -50,6 +50,8 @@ Apollo系统安装
 
   ![IPC-8108GC-front-side](images/software_installation_look_8108.PNG)
 
+注意，在较早版本的8108工控机中，CAN口的标号为从右向左分别为CAN1、CAN2，文档中将统一按照上图所示，分别称为CAN0、CAN1，请使用较早版本8108的用户注意。新用户可以忽略。
+
 ### 准备IPC
 
 参考下述步骤：
@@ -118,12 +120,17 @@ Apollo系统安装
 - 设置 [Fan Start Trip Temp] 为 20
 ```
 
-![tip_icon](../images/tip_icon.png)建议使用者使用数字视频接口（DVI）连接器连接显卡和显示器。设置投影到主板的DVI接口，参考下述的设置步骤：
+![tip_icon](../images/tip_icon.png)如果用户使用的是已经提前预装好显卡驱动及Apollo镜像的工控机版本，则使用HDMI线连接显示器与工控机的HDMI接口即可；
+
+![graphic_config](../images/graphic_config.jpg)
+
+如果使用的是较早没有预装显卡驱动及Apollo镜像的工控机版本，则需使用DVI线或AGV线将显示器与工控机集成显卡接口相连，按照如下步骤将显示模式设置为AUTO，设置成功后，使用HMDI线连接显示器与工控机的HDMI接口，并重启工控机：
 
 ```
 - 计算机启动时按F2进入BIOS设置菜单
-- 进入 [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> 设置为 "PEG"
+- 进入 [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> 设置为 "AUTO"
 ```
+
 
 ![tip_icon](../images/tip_icon.png)建议设置IPC的运行状态为一直以最佳性能状态运行：
 
@@ -370,7 +377,7 @@ bash docker/scripts/dev_into.sh
 e.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时25分钟：
 
 ```
-bash apollo.sh build
+bash apollo.sh build_opt
 ```
 
 ### 运行DreamView

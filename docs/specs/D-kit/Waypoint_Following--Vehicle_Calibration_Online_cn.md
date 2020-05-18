@@ -175,10 +175,17 @@
 ### 准备
 
 完成配置文件修改后，将车辆移动至适合标定的场地后，启动apollo，并执行以下命令：
+<<<<<<< HEAD
 
     bash apollo.sh build
     bash scripts/bootstrap.sh
 
+=======
+```
+    bash apollo.sh build_opt
+    bash scripts/bootstrap.sh start
+```
+>>>>>>> 3b65fc8dca... [Docs]update docs for D-kit (#11270)
 在浏览器打开`DreamView`，进行下述步骤：
 
 1、在`--setup mode--`内，选择`vehicle calibration`（车辆标定）选项，在`--vehicle--`选择`Dev_Kit`；
