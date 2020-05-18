@@ -21,6 +21,12 @@
 
 #include "Eigen/Eigen"
 
+// Eigen 3.3.7: #define ALIVE (0)
+// fastrtps: enum ChangeKind_t { ALIVE, ... };
+#if defined(ALIVE)
+#   undef ALIVE
+#endif
+
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/transform/buffer.h"
@@ -30,7 +36,6 @@ namespace drivers {
 namespace velodyne {
 
 using apollo::drivers::PointCloud;
-using apollo::transform::Buffer;
 
 class Compensator {
  public:
@@ -66,7 +71,7 @@ class Compensator {
 
   bool IsValid(const Eigen::Vector3d& point);
 
-  Buffer* tf2_buffer_ptr_ = transform::Buffer::Instance();
+  transform::Buffer* tf2_buffer_ptr_ = transform::Buffer::Instance();
   CompensatorConfig config_;
 };
 

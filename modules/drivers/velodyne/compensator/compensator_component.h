@@ -22,7 +22,6 @@
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
 
-#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/compensator/compensator.h"
 
 namespace apollo {

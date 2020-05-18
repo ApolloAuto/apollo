@@ -28,6 +28,7 @@ cc_test(
     deps = [
         ":image_decompress_lib",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 
