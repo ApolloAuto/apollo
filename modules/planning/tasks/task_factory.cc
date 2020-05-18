@@ -136,10 +136,6 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpaceTrajectoryProvider(config);
                          });
-  task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PathTimeHeuristicOptimizer(config);
-                         });
   task_factory_.Register(TaskConfig::PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new PiecewiseJerkSpeedNonlinearOptimizer(
@@ -152,6 +148,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::PIECEWISE_JERK_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new PiecewiseJerkSpeedOptimizer(config);
+                         });
+  task_factory_.Register(TaskConfig::SPEED_HEURISTIC_OPTIMIZER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathTimeHeuristicOptimizer(config);
                          });
   ///////////////////////////
   // other tasks

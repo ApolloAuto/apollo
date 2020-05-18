@@ -34,10 +34,10 @@ message TaskConfig {
     // optimizers
     OPEN_SPACE_TRAJECTORY_PARTITION = 20;
     OPEN_SPACE_TRAJECTORY_PROVIDER = 21;
-    DP_ST_SPEED_OPTIMIZER = 22;
-    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 23;
-    PIECEWISE_JERK_PATH_OPTIMIZER = 24;
-    PIECEWISE_JERK_SPEED_OPTIMIZER = 25;
+    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 22;
+    PIECEWISE_JERK_PATH_OPTIMIZER = 23;
+    PIECEWISE_JERK_SPEED_OPTIMIZER = 24;
+    SPEED_HEURISTIC_OPTIMIZER = 25;
     // other tasks
     LEARNING_BASED_TASK = 26;
   };
@@ -63,11 +63,11 @@ message TaskConfig {
         open_space_trajectory_partition_config = 15;
     OpenSpaceTrajectoryProviderConfig
         open_space_trajectory_provider_config = 16;
-    SpeedHeuristicConfig speed_heuristic_config = 17;
     PiecewiseJerkNonlinearSpeedOptimizerConfig
-        piecewise_jerk_nonlinear_speed_optimizer_config = 18;
-    PiecewiseJerkPathOptimizerConfig piecewise_jerk_path_optimizer_config = 19;
-    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config = 20;
+        piecewise_jerk_nonlinear_speed_optimizer_config = 17;
+    PiecewiseJerkPathOptimizerConfig piecewise_jerk_path_optimizer_config = 18;
+    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config = 19;
+    SpeedHeuristicOptimizerConfig speed_heuristic_optimizer_config = 20;
     // other tasks
     LearningBasedTaskConfig learning_based_task_config = 21;
   }
