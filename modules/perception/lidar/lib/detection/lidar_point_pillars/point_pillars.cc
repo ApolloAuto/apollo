@@ -53,9 +53,10 @@ const int PointPillars::kGridZSize = 1;
 const int PointPillars::kRpnInputSize = 64 * kGridXSize * kGridYSize;
 const int PointPillars::kNumAnchorXInds = kGridXSize * 0.5;
 const int PointPillars::kNumAnchorYInds = kGridYSize * 0.5;
-const int PointPillars::kNumAnchorRInds = 2;
+const int PointPillars::kNumAnchorPerLoc = 6;
+// kNumAnchorPerLoc need to be equal to length of kAnchorRo
 const int PointPillars::kNumAnchor =
-    kNumAnchorXInds * kNumAnchorYInds * kNumClass * kNumAnchorRInds;
+    kNumAnchorXInds * kNumAnchorYInds * kNumAnchorPerLoc;
 const int PointPillars::kNumOutputBoxFeature = 7;
 const int PointPillars::kRpnBoxOutputSize = kNumAnchor * kNumOutputBoxFeature;
 const int PointPillars::kRpnClsOutputSize = kNumAnchor * kNumClass;
@@ -81,6 +82,11 @@ const float PointPillars::kSensorHeight = 1.73f;
 const std::vector<float> PointPillars::kAnchorDxSizes{1.6f, 0.6f, 0.6f};
 const std::vector<float> PointPillars::kAnchorDySizes{3.9f, 1.76f, 0.8f};
 const std::vector<float> PointPillars::kAnchorDzSizes{1.56f, 1.73f, 1.73f};
+const std::vector<int> PointPillars::kNumAnchorRo{2, 2, 2};
+// kNumAnchorRo's length equal to kNumClass
+const std::vector<float> PointPillars::kAnchorRo{0, M_PI/2,
+                                                 0, M_PI/2,
+                                                 0, M_PI/2};
 
 PointPillars::PointPillars(const bool reproduce_result_mode,
                            const float score_threshold,
@@ -107,7 +113,7 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
 
   anchor_mask_cuda_ptr_.reset(
       new AnchorMaskCuda(kNumIndsForScan, kNumAnchorXInds, kNumAnchorYInds,
-                         kNumClass, kNumAnchorRInds, kMinXRange, kMinYRange,
+                         kNumClass, kNumAnchorPerLoc, kMinXRange, kMinYRange,
                          kPillarXSize, kPillarYSize, kGridXSize, kGridYSize));
 
   scatter_cuda_ptr_.reset(
@@ -117,7 +123,7 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
   const float float_max = std::numeric_limits<float>::max();
   postprocess_cuda_ptr_.reset(new PostprocessCuda(
       float_min, float_max, kNumAnchorXInds, kNumAnchorYInds, kNumClass,
-      kNumAnchorRInds, score_threshold_, kNumThreads,
+      kNumAnchorPerLoc, score_threshold_, kNumThreads,
       nms_overlap_threshold_, kNumBoxCorners, kNumOutputBoxFeature));
 
   DeviceMemoryMalloc();
@@ -328,23 +334,21 @@ void PointPillars::GenerateAnchors(float* anchors_px_, float* anchors_py_,
     anchor_y_count[i] = static_cast<float>(i) * y_stride + y_offset;
   }
 
-  float anchor_r_count[kNumAnchorRInds];
-  anchor_r_count[0] = 0;
-  anchor_r_count[1] = M_PI / 2;
-
   for (int y = 0; y < kNumAnchorYInds; ++y) {
     for (int x = 0; x < kNumAnchorXInds; ++x) {
+      int ro_count = 0;
       for (int c = 0; c < kNumClass; ++c) {
-        for (int r = 0; r < kNumAnchorRInds; ++r) {
-          int ind = y * kNumAnchorXInds * kNumClass * kNumAnchorRInds +
-              x * kNumClass * kNumAnchorRInds + c * kNumAnchorRInds + r;
+        for (int i = 0; i < kNumAnchorRo[c]; ++i) {
+          int ind = y * kNumAnchorXInds * kNumAnchorPerLoc +
+              x * kNumAnchorPerLoc + ro_count;
           anchors_px_[ind] = anchor_x_count[x];
           anchors_py_[ind] = anchor_y_count[y];
-          anchors_ro_[ind] = anchor_r_count[r];
+          anchors_ro_[ind] = kAnchorRo[ro_count];
           anchors_pz_[ind] = -1 * kSensorHeight;
           anchors_dx_[ind] = kAnchorDxSizes[c];
           anchors_dy_[ind] = kAnchorDySizes[c];
           anchors_dz_[ind] = kAnchorDzSizes[c];
+          ro_count++;
         }
       }
     }
@@ -390,31 +394,36 @@ void PointPillars::ConvertAnchors2BoxAnchors(float* anchors_px,
   memset(flipped_anchors_dy, 0, kNumAnchor * sizeof(float));
   for (int x = 0; x < kNumAnchorXInds; ++x) {
     for (int y = 0; y < kNumAnchorYInds; ++y) {
+      int ro_count = 0;
       for (int c = 0; c < kNumClass; ++c) {
-        int base_ind = x * kNumAnchorYInds * kNumClass * kNumAnchorRInds +
-            y * kNumClass * kNumAnchorRInds + c * kNumAnchorRInds;
-        flipped_anchors_dx[base_ind + 0] = kAnchorDxSizes[c];
-        flipped_anchors_dy[base_ind + 0] = kAnchorDySizes[c];
-        flipped_anchors_dx[base_ind + 1] = kAnchorDySizes[c];
-        flipped_anchors_dy[base_ind + 1] = kAnchorDxSizes[c];
+        for (int i = 0; i < kNumAnchorRo[c]; ++i) {
+          int base_ind = x * kNumAnchorYInds * kNumAnchorPerLoc +
+              y * kNumAnchorPerLoc + ro_count;
+          if (kAnchorRo[ro_count] <= 0.78) {
+            flipped_anchors_dx[base_ind] = kAnchorDxSizes[c];
+            flipped_anchors_dy[base_ind] = kAnchorDySizes[c];
+          } else {
+            flipped_anchors_dx[base_ind] = kAnchorDySizes[c];
+            flipped_anchors_dy[base_ind] = kAnchorDxSizes[c];
+          }
+          ro_count++;
+        }
       }
     }
   }
   for (int x = 0; x < kNumAnchorXInds; ++x) {
     for (int y = 0; y < kNumAnchorYInds; ++y) {
-      for (int c = 0; c < kNumClass; ++c) {
-        for (int r = 0; r < kNumAnchorRInds; ++r) {
-          int ind = x * kNumAnchorYInds * kNumClass * kNumAnchorRInds +
-              y * kNumClass * kNumAnchorRInds + c * kNumAnchorRInds + r;
-          box_anchors_min_x_[ind] =
-              anchors_px[ind] - flipped_anchors_dx[ind] / 2.0f;
-          box_anchors_min_y_[ind] =
-              anchors_py[ind] - flipped_anchors_dy[ind] / 2.0f;
-          box_anchors_max_x_[ind] =
-              anchors_px[ind] + flipped_anchors_dx[ind] / 2.0f;
-          box_anchors_max_y_[ind] =
-              anchors_py[ind] + flipped_anchors_dy[ind] / 2.0f;
-        }
+      for (int i = 0; i < kNumAnchorPerLoc; ++i) {
+        int ind = x * kNumAnchorYInds * kNumAnchorPerLoc +
+            y * kNumAnchorPerLoc + i;
+        box_anchors_min_x_[ind] =
+            anchors_px[ind] - flipped_anchors_dx[ind] / 2.0f;
+        box_anchors_min_y_[ind] =
+            anchors_py[ind] - flipped_anchors_dy[ind] / 2.0f;
+        box_anchors_max_x_[ind] =
+            anchors_px[ind] + flipped_anchors_dx[ind] / 2.0f;
+        box_anchors_max_y_[ind] =
+            anchors_py[ind] + flipped_anchors_dy[ind] / 2.0f;
       }
     }
   }

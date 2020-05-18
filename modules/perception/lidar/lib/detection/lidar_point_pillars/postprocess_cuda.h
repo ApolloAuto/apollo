@@ -58,7 +58,7 @@ class PostprocessCuda {
   const int num_anchor_x_inds_;
   const int num_anchor_y_inds_;
   const int num_class_;
-  const int num_anchor_r_inds_;
+  const int num_anchor_per_loc_;
   const float score_threshold_;
   const int num_threads_;
   const float nms_overlap_threshold_;
@@ -75,7 +75,7 @@ class PostprocessCuda {
    * @param[in] num_anchor_x_inds Number of x-indexes for anchors
    * @param[in] num_anchor_y_inds Number of y-indexes for anchors
    * @param[in] num_class Number of object's classes
-   * @param[in] num_anchor_r_inds Number of rotation-indexes for anchors
+   * @param[in] num_anchor_per_loc Number of anchors per location
    * @param[in] score_threshold Score threshold for filtering output
    * @param[in] num_threads Number of threads when launching cuda kernel
    * @param[in] nms_overlap_threshold IOU threshold for NMS
@@ -86,7 +86,7 @@ class PostprocessCuda {
    */
   PostprocessCuda(const float float_min, const float float_max,
                   const int num_anchor_x_inds, const int num_anchor_y_inds,
-                  const int num_class, const int num_anchor_r_inds,
+                  const int num_class, const int num_anchor_per_loc,
                   const float score_threshold, const int num_threads,
                   const float nms_overlap_threshold, const int num_box_corners,
                   const int num_output_box_feature);
