@@ -37,6 +37,8 @@ apt-get -y update && \
     libx265-dev \
     libnuma-dev
 
+. /etc/installers/installer_base.sh
+
 VERSION="4.2.2"
 PKG_NAME="ffmpeg-${VERSION}.tar.gz"
 CHECKSUM="5447ca061444e574dc0d5e6da1657f49a64a0e660403995c7744beee3e69b2b8"

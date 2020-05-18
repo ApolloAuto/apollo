@@ -33,13 +33,16 @@ DEST_DIR="${CURR_DIR}/../third_party/can_card_library/esd_can"
 if [[ "${action}" == "install" ]]; then
     mkdir -p "${DEST_DIR}/include"
     mkdir -p "${DEST_DIR}/lib"
-    git clone https://github.com/ApolloAuto/apollo-contrib.git
-    pushd apollo-contrib
-        cp esd/include/* ${DEST_DIR}/include/
-        cp esd/lib64/libntcan.so.4.0.1 ${DEST_DIR}/lib
-    popd
-
-    rm -rf apollo-contrib
+    CONTRIB_REPO_DIR="${CURR_DIR}/../../apollo-contrib"
+    if [[ -d "${CONTRIB_REPO_DIR}" ]]; then
+        echo "apollo-contrib found."
+    else
+        sudo git clone https://github.com/ApolloAuto/apollo-contrib.git ${CONTRIB_REPO_DIR}
+        pushd "${CONTRIB_REPO_DIR}"
+            cp esd/include/* ${DEST_DIR}/include/
+            cp esd/lib64/libntcan.so.4.0.1 ${DEST_DIR}/lib
+        popd
+    fi
 
     pushd ${DEST_DIR}/lib
         ln -s libntcan.so.4.0.1 libntcan.so.4.0

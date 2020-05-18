@@ -33,6 +33,20 @@ apt-get -y update && \
 
 python3 -m pip install --no-cache-dir grpcio-tools
 
+. /tmp/installers/installer_base.sh
+
+info "Install Protobuf ..."
+bash /tmp/installers/install_protobuf.sh
+
+info "Install GFlags & GLog..."
+bash /tmp/installers/install_gflags_glog.sh
+
+info "Install Fast-RTPS ..."
+bash /tmp/installers/install_fast-rtps.sh
+
+info "Install Poco ..."
+bash /tmp/installers/install_poco.sh
+
 # clean up
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*

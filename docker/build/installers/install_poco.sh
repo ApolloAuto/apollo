@@ -26,9 +26,6 @@ apt-get -y update && \
     libssl-dev \
     libpoco-dev
 
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 exit 0
 
 . /tmp/installers/installer_base.sh
@@ -46,11 +43,10 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf poco-${VERSION}-release.tar.gz
 
 pushd poco-poco-${VERSION}-release
-mkdir cmakebuild && cd cmakebuild
-cmake .. -DBUILD_SHARED_LIBS=ON
-make -j${THREAD_NUM}
-make install
-
+    mkdir cmakebuild && cd cmakebuild
+    cmake .. -DBUILD_SHARED_LIBS=ON
+    make -j${THREAD_NUM}
+    make install
 popd
 
 # clean up

@@ -37,15 +37,15 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf "${PKG_NAME}"
 
 pushd gflags-${VERSION}
-mkdir build && cd build
-cmake -DBUILD_SHARED_LIBS=ON ..
-make -j${THREAD_NUM}
-make install
+    mkdir build && cd build
+    cmake -DBUILD_SHARED_LIBS=ON ..
+    make -j${THREAD_NUM}
+    make install
 popd
 
 ldconfig
 
-# Cleanup
+# cleanup
 rm -rf $PKG_NAME gflags-$VERSION
 
 # Install glog which also depends on gflags.
@@ -61,20 +61,20 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_NAME}
 
 pushd glog-${VERSION}
+    if [ "$ARCH" == "x86_64" ]; then
+        mkdir build && cd build
+        cmake -DBUILD_SHARED_LIBS=ON ..
+    elif [ "$ARCH" == "aarch64" ]; then
+        ./configure --build=armv8-none-linux --enable-shared
+    else
+        echo "not support $ARCH"
+    fi
 
-if [ "$ARCH" == "x86_64" ]; then
-    mkdir build && cd build
-    cmake -DBUILD_SHARED_LIBS=ON ..
-elif [ "$ARCH" == "aarch64" ]; then
-    ./configure --build=armv8-none-linux --enable-shared
-else
-    echo "not support $ARCH"
-fi
-
-make -j${THREAD_NUM}
-make install
-
+    make -j${THREAD_NUM}
+    make install
 popd
+
 ldconfig
-# Clean up.
+
+# clean up.
 rm -fr ${PKG_NAME} glog-${VERSION}
