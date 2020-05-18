@@ -94,7 +94,34 @@ rtk_from {
 }
 
 ```
-这是RTK基站信息相关的配置，请依据自己的实际情况进行配置。注意：RTK基站信息需要同时配置在M2的IMU主机中和apollo的开发套件的`gnss_conf.pb.txt`配置文件中。
+这是RTK基站信息相关的配置，请依据自己的实际情况进行配置。假如您购买了一个千寻知寸账号，账号信息如下：
+
+```
+ip:203.107.45.154
+port:8002
+mount_point:RTCM32_GGB
+user:qianxun1234
+password:abc123
+```
+
+则修改后的内容如下所示：
+```
+rtk_from {
+    format: RTCM_V3
+    ntrip {
+        address: "203.107.45.154"
+        port: 8002
+        mount_point: "RTCM32_GGB"
+        user: "qianxun1234"
+        password: "abc123"
+        timeout_s: 5
+    }
+    push_location: true
+}
+
+```
+
+注意：RTK基站信息需要同时配置在M2的IMU主机中和apollo的开发套件的`gnss_conf.pb.txt`配置文件中。
 
 ### 检查GPS信号
 
