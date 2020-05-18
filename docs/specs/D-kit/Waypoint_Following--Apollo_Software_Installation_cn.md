@@ -179,7 +179,7 @@ a.安装完成，重启进入Linux。
 b.在终端执行以下命令完成最新软件包的更新：
 
 ```
-sudo apt-get update
+sudo apt update
 ```
 
 ![tip_icon](../images/tip_icon.png)IPC必须接入网络以便更新与安装软件，所以请确认网线插入并连接，如果连接网络没有使用动态分配（DHCP），需要更改网络配置。
@@ -299,7 +299,7 @@ c.启动can卡
 
 d.测试can卡发送接收
 
-将can卡can1和can2口用Can线连接起来。从 https://github.com/linux-can/can-utils 上下载测试代码到home下，将当前目录设置到can-utils下并执行`make`，如下图所示
+将can卡can0和can1口用Can线连接起来。从 https://github.com/linux-can/can-utils 上下载测试代码到当前用户的home目录下，将当前目录设置到can-utils下并执行`make`，如下图所示
 ![图片](https://agroup-bos.cdn.bcebos.com/99b98e5ade3c0b6a2a6b0f94d2e081e035075268)
 然后执行命令`./cansend can0 1FF#1122334455667788`，在另开一个终端执行以下命令：
 ```
@@ -309,7 +309,9 @@ cd can-utils/
 循环发送cansend命令，能够在candump中收到发送的数据，如下图所示 ：
 ![图片](https://agroup-bos.cdn.bcebos.com/0d1f81329fa9f84ad143af20166b8adf38c95d91)
 则表示Can驱动安装成功。
-d.注意事项：
+
+e.注意事项
+
 在后续启动apollo的canbus模块时，需要先在docker外运行start.sh脚本。
 
 ### 安装Docker
