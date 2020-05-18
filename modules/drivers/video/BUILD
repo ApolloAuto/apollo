@@ -32,9 +32,8 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/util",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/drivers/video/proto:video_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/drivers/video/proto:video_h265cfg_cc_proto",
     ],
 )
 
@@ -47,8 +46,10 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
         "//modules/common/util",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
     ],
 )
 

@@ -10,9 +10,6 @@ cc_library(
         "macros.h",
         "time_conversion.h",
     ],
-    deps = [
-        "//modules/drivers/gnss/proto:gnss_proto",
-    ],
 )
 
 cpplint()

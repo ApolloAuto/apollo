@@ -26,10 +26,10 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"camera\\"'],
     deps = [
         ":camera",
-  "//modules/drivers/proto:sensor_image_cc_proto",
-  "//modules/common/proto:header_cc_proto",
-  "//modules/common/proto:error_code_cc_proto",
         "//cyber",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
     ],
 )
 
@@ -40,11 +40,11 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"camera\\"'],
     deps = [
         "//cyber",
-  "//modules/drivers/camera/proto:config_cc_proto",
-  "//modules/drivers/proto:sensor_image_cc_proto",
-  "//modules/common/proto:header_cc_proto",
-  "//modules/common/proto:error_code_cc_proto",
-	"@opencv",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
+        "//modules/drivers/camera/proto:config_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "@opencv",
     ],
 )
 
@@ -82,12 +82,12 @@ cc_library(
         {
             ":x86_mode": [
                 "//cyber",
-		"//modules/drivers/camera/proto:config_cc_proto",
+                "//modules/drivers/camera/proto:config_cc_proto",
                 "@adv_plat",
             ],
             ":arm_mode": [
                 "//cyber",
-		"//modules/drivers/camera/proto:config_cc_proto",
+                "//modules/drivers/camera/proto:config_cc_proto",
             ],
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",

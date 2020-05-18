@@ -23,7 +23,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util",
     ],
 )
@@ -37,11 +37,11 @@ cc_library(
         ":serial_stream",
         ":stream",
         "//cyber",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
         "//modules/drivers/gnss/parser:gnss_parser",
-        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/proto:heading_cc_proto",
+        "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/drivers/gnss/util:gnss_util",
     ],
 )

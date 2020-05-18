@@ -13,6 +13,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/proto:racobit_radar_cc_proto",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
 )
@@ -42,7 +43,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/canbus/proto:sensor_canbus_conf_cc_proto",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
 )

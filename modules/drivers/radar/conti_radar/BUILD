@@ -30,8 +30,8 @@ cc_library(
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
-        "//modules/localization/proto:localization_proto",
-        "//modules/localization/proto:pose_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/localization/proto:pose_cc_proto",
         "@eigen",
     ],
 )

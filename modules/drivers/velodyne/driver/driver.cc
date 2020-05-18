@@ -211,7 +211,8 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
     return;
   }
   if (last_gps_time_ > current_time) {
-    if (std::abs(last_gps_time_ - current_time) > 3599000000) {
+    int32_t time_diff = static_cast<int32_t>(last_gps_time_ - current_time);
+    if (time_diff > 3599000000) {
       basetime_ += static_cast<uint64_t>(3600 * 1e6);
       AINFO << "Base time plus 3600s. Model: " << config_.model() << std::fixed
             << ". current:" << current_time << ", last time:" << last_gps_time_;

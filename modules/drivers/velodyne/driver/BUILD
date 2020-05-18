@@ -39,7 +39,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-        "//modules/drivers/velodyne/proto:velodyne_proto",
+        "//modules/drivers/velodyne/proto:config_cc_proto",
     ],
 )
 

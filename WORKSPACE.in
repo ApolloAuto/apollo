@@ -313,7 +313,7 @@ new_local_repository(
 
 new_local_repository(
     name = "fastrtps",
-    build_file = "third_party/fastrtps.BUILD",
+    build_file = "external/fastrtps.BUILD",
     path = "/usr/local/fast-rtps",
 )
 

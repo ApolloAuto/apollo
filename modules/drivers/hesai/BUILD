@@ -35,9 +35,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-  	"//modules/drivers/proto:pointcloud_cc_proto",
-        "//modules/drivers/hesai/proto:hesai_cc_proto",
         "//modules/drivers/hesai/proto:config_cc_proto",
+        "//modules/drivers/hesai/proto:hesai_cc_proto",
+        "//modules/drivers/proto:pointcloud_cc_proto",
     ],
 )
 
