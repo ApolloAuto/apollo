@@ -23,19 +23,24 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
+# Reference: https://github.com/coin-or/qpOASES
 warning "Currently libqpOASES.so built from source can't work properly, so we" \
         "provide pre-built x86_64 version here. " \
         "Will be removed once we are ready."
 
 VERSION="3.2.1-1"
 PKG_NAME="qp-oases-${VERSION}.x86_64.tar.gz"
+CHECKSUM="225f6e19ae4498cccaeba464b672f33c4582f3bf2d6bb66c6693a7136003c8d5"
+DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
 
-tar xzvf "/tmp/installers/${PKG_NAME}"
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf ${PKG_NAME}
 pushd qp-oases-${VERSION}
-mv include/qpOASES{,.hpp} /usr/local/include
-mv lib/libqpOASES.so /usr/local/lib
+    mv include/qpOASES{,.hpp} /usr/local/include
+    mv lib/libqpOASES.so /usr/local/lib
 popd
-rm -rf qp-oases-${VERSION} /tmp/installers/${PKG_NAME}
+rm -rf qp-oases-${VERSION} ${PKG_NAME}
 
 exit 0
 
@@ -69,6 +74,3 @@ ok "Successfully build qp-oases-${VERSION}"
 
 # Clean up.
 rm -fr ${PKG_NAME} qp-oases-${VERSION}
-
-# https://github.com/coin-or/qpOASES
-

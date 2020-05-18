@@ -34,10 +34,11 @@ cd $( dirname "${BASH_SOURCE[0]}")
 apt-get -y update && \
     apt-get -y install \
     nasm \
+    yasm \
     libx265-dev \
     libnuma-dev
 
-. /etc/installers/installer_base.sh
+. /tmp/installers/installer_base.sh
 
 VERSION="4.2.2"
 PKG_NAME="ffmpeg-${VERSION}.tar.gz"
@@ -72,9 +73,11 @@ ldconfig
 
 rm -fr ${PKG_NAME} ffmpeg
 
-apt-get autoremove nasm libx265-dev
-# Don't remove libnuma-dev!
+apt-get -y update && \
+    apt-get -y autoremove \
+    nasm \
+    yasm \
+    libx265-dev
 
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Don't remove libnuma-dev!
 

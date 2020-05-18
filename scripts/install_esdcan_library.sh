@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-set -e
+set -ex
 
 action="install"
 
@@ -24,8 +24,10 @@ if [[ $# -ge 1 ]]; then
     action="$1"
 fi
 
+DEST_DIR_BASE="third_party/can_card_library/esd_can"
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DEST_DIR="${CURR_DIR}/../third_party/can_card_library/esd_can"
+
+DEST_DIR="${CURR_DIR}/../${DEST_DIR_BASE}"
 
 [[ -d ${DEST_DIR}/include ]] && rm -rf ${DEST_DIR}/include
 [[ -d ${DEST_DIR}/lib ]] && rm -rf ${DEST_DIR}/lib
@@ -33,16 +35,16 @@ DEST_DIR="${CURR_DIR}/../third_party/can_card_library/esd_can"
 if [[ "${action}" == "install" ]]; then
     mkdir -p "${DEST_DIR}/include"
     mkdir -p "${DEST_DIR}/lib"
-    CONTRIB_REPO_DIR="${CURR_DIR}/../../apollo-contrib"
-    if [[ -d "${CONTRIB_REPO_DIR}" ]]; then
+    CONTRIB_REPO="${CURR_DIR}/../../apollo-contrib"
+    if [[ -d "${CONTRIB_REPO}" ]]; then
         echo "apollo-contrib found."
     else
-        sudo git clone https://github.com/ApolloAuto/apollo-contrib.git ${CONTRIB_REPO_DIR}
-        pushd "${CONTRIB_REPO_DIR}"
-            cp esd/include/* ${DEST_DIR}/include/
-            cp esd/lib64/libntcan.so.4.0.1 ${DEST_DIR}/lib
-        popd
+        sudo git clone https://github.com/ApolloAuto/apollo-contrib.git ${CONTRIB_REPO}
     fi
+    pushd "${CONTRIB_REPO}"
+        cp esd/include/* ${DEST_DIR}/include/
+        cp esd/lib64/libntcan.so.4.0.1 ${DEST_DIR}/lib
+    popd
 
     pushd ${DEST_DIR}/lib
         ln -s libntcan.so.4.0.1 libntcan.so.4.0

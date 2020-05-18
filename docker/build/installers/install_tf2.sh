@@ -28,7 +28,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 VERSION="0.5.16-1"
 PKG_NAME="tf2-apollo-${VERSION}.tar.gz"
-DOWNLOAD_LINK="https://apollo.example.com/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
 CHECKSUM="ec23f028381779246a8e51fc0f0f84a6177d296337a16a4facdefdc557d3f6d1"
 
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"

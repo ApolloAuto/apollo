@@ -21,6 +21,8 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+. /tmp/installers/installer_base.sh
+
 #Install the TensorRT package that fits your particular needs.
 #For only running TensorRT C++ applications:
 #sudo apt-get install libnvinfer7 libnvonnxparsers7 libnvparsers7 libnvinfer-plugin7
@@ -46,5 +48,8 @@ CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
 [[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ]] || \
     ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
 
-apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+# disable nvidia apt source to speed to build process
+sed -i 's/^/# /g' /etc/apt/sources.list.d/nvidia-ml.list
+
+info "nVidia machine learning repo disabled after successful TensorRT-7 installation"
+info "$(cat /etc/apt/sources.list.d/nvidia-ml.list)"

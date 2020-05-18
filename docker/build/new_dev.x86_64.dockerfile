@@ -16,11 +16,12 @@ COPY archive /tmp/archive
 RUN bash /tmp/installers/install_tensorrt.sh
 RUN bash /tmp/installers/install_gpu_caffe.sh ${INSTALL_MODE}
 
+RUN bash /tmp/installers/install_drivers_deps.sh
+
 RUN bash /tmp/installers/install_map_deps.sh
 RUN bash /tmp/installers/install_prediction_deps.sh
 RUN bash /tmp/installers/install_adolc.sh
 RUN bash /tmp/installers/install_ffmpeg.sh
-RUN bash /tmp/installers/install_adv_plat.sh
 RUN bash /tmp/installers/install_proj4.sh
 RUN bash /tmp/installers/install_tf2.sh
 RUN bash /tmp/installers/install_osqp.sh

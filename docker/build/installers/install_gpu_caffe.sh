@@ -18,12 +18,13 @@
 
 # Fail on first error.
 set -e
+
 INSTALL_MODE=$1; shift
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
-warning "Caffe 1.0 support will be abandoned after Apollo 6.0 release!"
+warning "Caffe 1.0 support will be abandoned before Apollo 6.0 release!"
 
 # Make caffe-1.0 compilation pass
 CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
@@ -36,6 +37,19 @@ CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
 #    caffe-cuda && \
 #    apt-get clean && \
 #    rm -rf /var/lib/apt/lists/*
+
+if [[ "${INSTALL_MODE}" != "build" ]]; then
+    PKG_NAME="caffe-1.0-x86_64.tar.gz"
+    CHECKSUM="aa46ad0b263ca461e18f3b424e147efd6e95ed9dd55dae200cc63f214e5e2772"
+    DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
+
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+    info "Extracting ${PKG_NAME} to /usr/local/caffe ..."
+    tar xzf ${PKG_NAME} -C /usr/local
+    rm -rf ${PKG_NAME}
+    exit 0
+fi
 
 #Note(storypku): Build Caffe from source
 apt-get -y update && \
@@ -63,14 +77,6 @@ apt-get -y update && \
 
 # BLAS: install ATLAS by sudo apt-get install libatlas-base-dev or install
 # OpenBLAS by sudo apt-get install libopenblas-dev or MKL for better CPU performance.
-
-if [[ "${INSTALL_MODE}" != "build" ]]; then
-    PKG_NAME="caffe-1.0-x86_64.tar.gz"
-    info "Extracting ${PKG_NAME} to /usr/local/caffe ..."
-    tar xzf /tmp/archive/${PKG_NAME} -C /usr/local
-    rm -rf /tmp/archive/${PKG_NAME}
-    exit 0
-fi
 
 VERSION="1.0"
 PKG_NAME="caffe-1.0.tar.gz"
@@ -100,4 +106,3 @@ rm -rf "${MY_DEST_DIR}/{bin,python}"
 
 # Clean up.
 rm -rf ${PKG_NAME} caffe-${VERSION}
-apt-get clean && rm -rf /var/lib/apt/lists/*

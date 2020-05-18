@@ -25,14 +25,20 @@ apt-get -y update && \
     libasio-dev \
     libtinyxml2-dev
 
-tar xzf /tmp/installers/fast-rtps.prebuilt.x86_64.tar.gz
-mv fast-rtps /usr/local/fast-rtps
+. /tmp/installers/installer_base.sh
+
+PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
+CHECKSUM="ca0534db4f757cb41a9feaebac07a13dd4b63af0a217b2cb456e20b0836bc797"
+DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
+
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf fast-rtps.prebuilt.x86_64.tar.gz
+mv fast-rtps-1.5.0 /usr/local/fast-rtps
 
 # TODO(storypku)
 # As FastRTPS installer in other branches don't work well, we provided a prebuilt version
 # here.
 # Maybe the `cyber/transport/rtps` section needs a rewrite using a more recent FastRTPS impl.
 
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
+rm -rf ${PKG_NAME}
