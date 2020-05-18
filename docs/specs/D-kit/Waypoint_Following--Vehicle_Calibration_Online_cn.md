@@ -176,7 +176,7 @@
 
 完成配置文件修改后，将车辆移动至适合标定的场地后，启动apollo，并执行以下命令：
 ```
-    bash apollo.sh build
+    bash apollo.sh build_opt
     bash scripts/bootstrap.sh start
 ```
 在浏览器打开`DreamView`，进行下述步骤：
