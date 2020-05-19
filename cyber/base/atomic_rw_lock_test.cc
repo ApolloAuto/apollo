@@ -19,7 +19,6 @@
 #include <thread>
 #include "gtest/gtest.h"
 
-#include "cyber/base/reentrant_rw_lock.h"
 
 namespace apollo {
 namespace cyber {
