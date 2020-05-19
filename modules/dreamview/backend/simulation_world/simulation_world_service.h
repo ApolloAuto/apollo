@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
-
 #include <algorithm>
 #include <list>
 #include <memory>
@@ -30,6 +27,9 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest_prod.h"

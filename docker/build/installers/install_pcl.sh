@@ -20,34 +20,47 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+
+apt-get -y update && \
+    apt-get -y install \
+    libeigen3-dev \
+    libflann-dev \
+    libvtk6-dev
+
+. /tmp/installers/installer_base.sh
+
+THREAD_NUM=$(nproc)
+
+# Install from source
+VERSION="1.11.0"
+PKG_NAME="pcl-${VERSION}.tar.gz"
+CHECKSUM="4255c3d3572e9774b5a1dccc235711b7a723197b79430ef539c2044e9ce65954"
+DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
+
 ARCH=$(uname -m)
 if [ "$ARCH" == "aarch64" ]; then
   BUILD=$1
   shift
 fi
 
-apt-get -y update && \
-    apt-get -y install \
-    libeigen3-dev \
-    libflann-dev
-
 if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
-  # https://github.com/PointCloudLibrary/pcl/archive/pcl-1.10.1.tar.gz
+  download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-  wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.9.1.tar.gz
+  tar xzvf ${PKG_NAME}
 
-  tar xzvf pcl-1.9.1.tar.gz
-
-  pushd pcl-pcl-1.9.1/
+  pushd pcl-pcl-${VERSION}/
   echo "add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)" > temp
   cat CMakeLists.txt >> temp
   mv temp CMakeLists.txt
   mkdir build
   cd build
   cmake ..
-  make -j2
+  make -j${THREAD_NUM}
   make install
   popd
+
+  #clean up
+  rm -fr pcl-${VERSION}.tar.gz pcl-pcl-${VERSION}
 else
   # aarch64 prebuilt package
   wget https://apollocache.blob.core.windows.net/apollo-cache/pcl.zip
@@ -60,4 +73,7 @@ else
   cd ../
   cp -r lib /usr/local/
   popd
+
+  #clean up
+  rm -fr pcl.zip pcl
 fi

@@ -52,7 +52,7 @@ apt-get -y update && \
     libopencv-core-dev \
     libopencv-imgproc-dev \
     libopencv-imgcodecs-dev \
-    libopencv-highgui-dev
+    libopencv-highgui-dev \
     libboost-all-dev
 
 #######################################################
