@@ -21,17 +21,18 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
-        "//modules/drivers/gnss/proto:gnss_proto",
-        "//modules/drivers/gnss/proto:ins_proto",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/gnss/proto:gnss_cc_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
+        "//modules/drivers/gnss/proto:ins_cc_proto",
+        "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
-        "//modules/localization/proto:gps_proto",
-        "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:gps_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
         "//third_party:boost",
@@ -57,6 +58,9 @@ cc_test(
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
+        "@lz4",
+        "@tf2"
     ],
 )
 
@@ -69,6 +73,8 @@ cc_test(
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
+        "@lz4",
     ],
 )
 

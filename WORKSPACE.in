@@ -169,7 +169,7 @@ http_archive(
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "/usr/local/include/pcl-1.11",
+    path = "/usr/local/include/pcl-1.9",
 )
 
 new_local_repository(
@@ -388,4 +388,11 @@ new_local_repository(
     name = "boost",
     build_file = "external/boost.BUILD",
     path = "/usr/include",
+)
+
+# lz4 
+new_local_repository(
+    name = "lz4",
+    build_file = "third_party/lz4.BUILD",
+    path = "/usr/include/",
 )
