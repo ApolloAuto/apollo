@@ -31,7 +31,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
         "@civetweb//:civetweb++",
     ],
 )

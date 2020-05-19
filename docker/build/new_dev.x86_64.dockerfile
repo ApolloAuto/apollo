@@ -16,5 +16,7 @@ RUN bash /tmp/installers/install_gpu_support.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_common_modules.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_perception_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_drivers_deps.sh ${INSTALL_MODE}
+RUN bash /tmp/installers/install_glew.sh
+RUN bash /tmp/installers/install_pcl.sh
 
 RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}

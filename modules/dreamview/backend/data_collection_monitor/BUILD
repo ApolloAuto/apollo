@@ -10,12 +10,12 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/hmi:vehicle_manager",
-        "//modules/dreamview/proto:data_collection_table_proto",
+        "//modules/dreamview/proto:data_collection_table_cc_proto",
         "//third_party/json",
         "@com_google_googletest//:gtest",
     ],
@@ -32,6 +32,7 @@ cc_test(
         ":data_collection_monitor",
         "//modules/common/util:json_util",
         "@com_google_googletest//:gtest_main",
+        "@boost",
     ],
 )
 
