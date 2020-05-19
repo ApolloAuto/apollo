@@ -53,7 +53,7 @@ class TrajectoryConvRnnInference : public ModelInference {
   /**
    * @brief inference a learned model
    */
-  bool Inference() override;
+  bool Inference(LearningDataFrame* learning_data_frame) override;
 };
 
 }  // namespace planning

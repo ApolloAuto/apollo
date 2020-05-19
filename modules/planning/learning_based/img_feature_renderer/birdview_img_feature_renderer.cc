@@ -26,16 +26,15 @@ namespace planning {
 
 BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {}
 
+// TODO(Jinyun): take map name from upstream and move to conf
+static const char ROADMAP_IMG_PATH[] =
+    "/apollo/modules/planning/data/sunnyvale_with_two_offices.png";
+static const char SPEEDLIMITMAP_IMG_PATH[] =
+    "/apollo/modules/planning/data/sunnyvale_with_two_offices_speedlimit.png";
+
 bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   config_ = config;
 
-  // TODO(Jinyun): take map name from upstream and move to conf
-  std::string ROADMAP_IMG_PATH =
-      "/apollo/modules/planning/data/"
-      "sunnyvale_with_two_offices.png";
-  std::string SPEEDLIMITMAP_IMG_PATH =
-      "/apollo/modules/planning/data/"
-      "sunnyvale_with_two_offices_speedlimit.png";
   bool roadmap_img_status = LoadRoadMap(ROADMAP_IMG_PATH);
   bool speedlimit_img_status = LoadSpeedlimitMap(SPEEDLIMITMAP_IMG_PATH);
 
