@@ -30,7 +30,6 @@ namespace common {
 
 TEST(FileTest, proto_set_get_test) {
   apollo::cyber::proto::UnitTest message;
-  message.set_class_name("FileTest");
   apollo::cyber::proto::UnitTest read_message;
   EXPECT_FALSE(SetProtoToASCIIFile(message, -1));
   EXPECT_FALSE(SetProtoToASCIIFile(message, "not_exists_dir/message.proto"));
