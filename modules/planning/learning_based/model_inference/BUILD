@@ -6,6 +6,9 @@ cc_library(
     name = "model_inference",
     hdrs = ["model_inference.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/planning/proto:learning_data_proto"
+    ],
 )
 
 cc_library(

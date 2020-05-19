@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "modules/planning/proto/learning_data.pb.h"
+
 namespace apollo {
 namespace planning {
 
@@ -51,7 +53,7 @@ class ModelInference {
   /**
    * @brief inference a learned model
    */
-  virtual bool Inference() = 0;
+  virtual bool Inference(LearningDataFrame* learning_data_frame) = 0;
 };
 
 }  // namespace planning
