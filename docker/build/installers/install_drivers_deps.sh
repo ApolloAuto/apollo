@@ -25,6 +25,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 bash /tmp/installers/install_adv_plat.sh "${MY_MODE}"
 bash /tmp/installers/install_ffmpeg.sh
+bash /tmp/installers/install_proj4.sh
 
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+apt-get -y update && \
+    apt-get -y install \
+    libopencv-dev

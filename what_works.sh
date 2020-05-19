@@ -38,6 +38,7 @@ bazel build \
     //modules/monitor/... \
     //modules/routing/... \
     //modules/storytelling/... \
+    //modules/transform/... \
     //modules/v2x/...
 
 bazel test \
@@ -49,18 +50,17 @@ bazel test \
     //modules/monitor/... \
     //modules/routing/... \
     //modules/storytelling/... \
+    //modules/transform/... \
     //modules/v2x/...
 
-# bazel build //modules/transform/...
-# bazel test //modules/transform/...
-# bash scripts/install_esdcan_library.sh install
-# bazel build //modules/drivers/...
-# bazel test //modules/drivers/...
-# bash scripts/install_esdcan_library.sh uninstall
+bash scripts/install_esdcan_library.sh install
+bazel build //modules/drivers/...
+bazel test //modules/drivers/...
+bash scripts/install_esdcan_library.sh uninstall
 
 bazel build //modules/tools/...
 # Note(storypku): bazel test works except some lint errors in cyber_visualizer.
-# Will re-check if cyber_visualizer work correctly once it becomes stable
+# Check cyber_visualizer's functionality once stablized.
 bazel test $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
 
 # TODO(storypku): Add grpc support in proto_build_generator.py
@@ -90,3 +90,5 @@ bazel test $(bazel query //modules/tools/... except //modules/tools/visualizer/.
 #          See https://pypi.org/project/pycodestyle/
 # TODO(?): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
+
+# TODO(storypku): cyber.aarch64 docker image

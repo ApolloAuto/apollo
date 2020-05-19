@@ -19,22 +19,17 @@
 # Fail on first error.
 set -e
 
+INSTALL_MODE="$1"; shift
+
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-apt-get -y update && \
-    apt-get -y install \
-    libtinyxml2-dev \
-    libboost-all-dev
+. /tmp/installers/installer_base.sh
 
-## Other dependencies
-# gflags/glog/protobuf
-# absl, grpc, gtest, cuda
-# json?
-# yaml-cpp
+info "Install TensorRT 7 ..."
+bash /tmp/installers/install_tensorrt.sh
 
-# Cleanup
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+info "Install Caffe 1.0 ..."
+bash /tmp/installers/install_gpu_caffe.sh ${INSTALL_MODE}
 
-
-
+info "Install libtorch ..."
+bash /tmp/installers/install_libtorch.sh

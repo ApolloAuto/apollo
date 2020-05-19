@@ -22,6 +22,7 @@ set -e
 MY_MODE="$1"
 
 DEST_DIR="/usr/local/adv_plat"
+[[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
 
 . /tmp/installers/installer_base.sh
 
@@ -33,7 +34,8 @@ if [[ "${MY_MODE}" == "download" ]]; then
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-    tar xzf adv_plat
+    tar xzf ${PKG_NAME}
+
     mv adv_plat/include ${DEST_DIR}/include
     mv adv_plat/lib     ${DEST_DIR}/lib
 

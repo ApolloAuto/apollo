@@ -18,23 +18,4 @@
 
 # Fail on first error.
 set -e
-
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-apt-get -y update && \
-    apt-get -y install \
-    libopencv-core-dev \
-    libopencv-imgproc-dev \
-    libopencv-imgcodecs-dev \
-    libopencv-highgui-dev
-
-# osqp
-# libtorch
-# qp-oases
-
-# Cleanup
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-
-
