@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include <vector>
 
 #include "cyber/common/file.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"

@@ -16,8 +16,8 @@
 
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
-#include <exception>
 #include <iostream>
+#include <exception>
 
 #include "cyber/common/log.h"
 

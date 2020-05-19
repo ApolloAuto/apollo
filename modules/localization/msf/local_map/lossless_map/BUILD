@@ -13,16 +13,12 @@ cc_library(
         "lossless_map_pool.cc",
     ],
     hdrs = glob(["*.h"]),
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen",
+        "@opencv",
     ],
 )
 
@@ -39,7 +35,7 @@ cc_test(
     timeout = "moderate",
     srcs = ["map_pool_test.cc"],
     copts = [
-        "-Dprivate=public",
+        "-fno-access-control",
     ],
     deps = [
         "//cyber",
@@ -48,6 +44,7 @@ cc_test(
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 
@@ -64,6 +61,7 @@ cc_test(
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 

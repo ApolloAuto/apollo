@@ -6,9 +6,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "lossless_map_creator",
     srcs = ["lossless_map_creator.cc"],
-    linkopts = [
-        "-llz4",
-    ],
     linkstatic = 0,
     deps = [
         "//cyber",
@@ -19,6 +16,8 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
         "//third_party:boost",
         "@eigen",
+        "@opencv",
+        "@lz4",
     ],
 )
 
@@ -33,6 +32,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
         "//third_party:boost",
         "@eigen",
+        "@opencv",
     ],
 )
 
@@ -43,6 +43,7 @@ cc_binary(
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
         "@eigen",
+        "@opencv",
     ],
 )
 

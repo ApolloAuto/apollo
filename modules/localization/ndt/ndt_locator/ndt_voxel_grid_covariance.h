@@ -201,13 +201,13 @@ class VoxelGridCovariance {
    * structure */
   inline LeafConstPtr GetLeaf(Eigen::Vector3f *p) {
     // Generate index associated with p
-    int ijk0 = static_cast<int>((p->x - map_left_top_corner_(0)) *
+    int ijk0 = static_cast<int>((p->x() - map_left_top_corner_(0)) *
                                 inverse_leaf_size_[0]) -
                min_b_[0];
-    int ijk1 = static_cast<int>((p->y - map_left_top_corner_(1)) *
+    int ijk1 = static_cast<int>((p->y() - map_left_top_corner_(1)) *
                                 inverse_leaf_size_[1]) -
                min_b_[1];
-    int ijk2 = static_cast<int>((p->z - map_left_top_corner_(2)) *
+    int ijk2 = static_cast<int>((p->z() - map_left_top_corner_(2)) *
                                 inverse_leaf_size_[2]) -
                min_b_[2];
 

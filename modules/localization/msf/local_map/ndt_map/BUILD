@@ -40,6 +40,7 @@ cc_test(
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
         "@com_google_googletest//:gtest_main",
         "@eigen",
+        "@opencv",
     ],
 )
 
@@ -53,6 +54,7 @@ cc_test(
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
         "@com_google_googletest//:gtest_main",
         "@eigen",
+        "@opencv",
     ],
 )
 

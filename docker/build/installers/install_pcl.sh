@@ -32,9 +32,9 @@ apt-get -y update && \
 THREAD_NUM=$(nproc)
 
 # Install from source
-VERSION="1.11.0"
+VERSION="1.9.1"
 PKG_NAME="pcl-${VERSION}.tar.gz"
-CHECKSUM="4255c3d3572e9774b5a1dccc235711b7a723197b79430ef539c2044e9ce65954"
+CHECKSUM="0add34d53cd27f8c468a59b8e931a636ad3174b60581c0387abb98a9fc9cddb6"
 DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
 
 ARCH=$(uname -m)

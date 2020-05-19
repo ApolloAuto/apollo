@@ -16,10 +16,9 @@
 
 #include "modules/localization/ndt/ndt_locator/lidar_locator_ndt.h"
 
-#include <boost/filesystem.hpp>
 #include <iostream>
 #include <sstream>
-
+#include <boost/filesystem.hpp>
 #include "gtest/gtest.h"
 #include "pcl/io/pcd_io.h"
 
