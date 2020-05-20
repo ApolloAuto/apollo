@@ -250,11 +250,12 @@ new_local_repository(
 )
 
 ## Local-integ
-#new_local_repository(
-#    name = "local_integ",
-#    build_file = "third_party/local_integ.BUILD",
-#    path = "/usr/local/apollo/local_integ",
-#)
+new_local_repository(
+    name = "local_integ",
+    build_file = "third_party/local_integ.BUILD",
+    path = "/usr/local/apollo/local_integ",
+)
+
 #
 ## paddlepaddle
 #new_local_repository(
