@@ -40,6 +40,7 @@ apt-get -y update && \
     lcov
 
 ## Pylint
+python3 -m pip install pycodestyle
 python3 -m pip install pylint
 
 apt-get clean && \
