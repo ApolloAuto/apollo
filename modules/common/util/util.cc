@@ -24,7 +24,6 @@ namespace common {
 namespace util {
 
 PointENU operator+(const PointENU enu, const math::Vec2d& xy) {
-  PointENU point;
   point.set_x(enu.x() + xy.x());
   point.set_y(enu.y() + xy.y());
   point.set_z(enu.z());
