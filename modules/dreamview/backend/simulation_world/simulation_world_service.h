@@ -294,8 +294,8 @@ class SimulationWorldService {
       return;
     }
 
-    for (size_t i = 0; i + 1 < points.size(); i += downsampleInterval) {
-      *downsampled_points->Add() = points[static_cast<int>(i)];
+    for (int i = 0; i + 1 < points.size(); i += downsampleInterval) {
+      *downsampled_points->Add() = points[i];
     }
 
     // add the last point
