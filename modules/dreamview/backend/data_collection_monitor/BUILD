@@ -31,8 +31,8 @@ cc_test(
     deps = [
         ":data_collection_monitor",
         "//modules/common/util:json_util",
-        "@com_google_googletest//:gtest_main",
         "@boost",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

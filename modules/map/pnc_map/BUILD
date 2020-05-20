@@ -49,10 +49,10 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
-        "//modules/routing/proto:routing_cc_proto",
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
         "//modules/routing/common:routing_gflags",
+        "//modules/routing/proto:routing_cc_proto",
     ],
 )
 
