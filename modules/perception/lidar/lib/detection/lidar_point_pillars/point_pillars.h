@@ -101,6 +101,16 @@ class Logger : public nvinfer1::ILogger {
 class PointPillars {
  private:
   friend class TestClass;
+  static const float kPillarXSize;
+  static const float kPillarYSize;
+  static const float kPillarZSize;
+  static const float kMinXRange;
+  static const float kMinYRange;
+  static const float kMinZRange;
+  static const float kMaxXRange;
+  static const float kMaxYRange;
+  static const float kMaxZRange;
+  static const float kSensorHeight;
   static const int kNumClass;
   static const int kMaxNumPillars;
   static const int kMaxNumPointsPerPillar;
@@ -110,10 +120,9 @@ class PointPillars {
   static const int kGridYSize;
   static const int kGridZSize;
   static const int kRpnInputSize;
-  static const int kNumAnchorXInds;
-  static const int kNumAnchorYInds;
-//  static const int kNumAnchorRInds;
-  static const int kNumAnchorPerLoc;
+//  static const int kNumAnchorXInds;
+//  static const int kNumAnchorYInds;
+//  static const int kNumAnchorPerLoc;
   static const int kNumAnchor;
   static const int kNumOutputBoxFeature;
   static const int kRpnBoxOutputSize;
@@ -125,21 +134,14 @@ class PointPillars {
   // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
   // common.h
   static const int kNumBoxCorners;
-  static const float kPillarXSize;
-  static const float kPillarYSize;
-  static const float kPillarZSize;
-  static const float kMinXRange;
-  static const float kMinYRange;
-  static const float kMinZRange;
-  static const float kMaxXRange;
-  static const float kMaxYRange;
-  static const float kMaxZRange;
-  static const float kSensorHeight;
-  static const std::vector<float> kAnchorDxSizes;
-  static const std::vector<float> kAnchorDySizes;
-  static const std::vector<float> kAnchorDzSizes;
-  static const std::vector<int> kNumAnchorRo;
-  static const std::vector<float> kAnchorRo;
+  static const std::vector<int> kAnchorStrides;
+  static const std::vector<int> kAnchorRanges;
+  static const std::vector<int> kNumAnchorSets;
+  static const std::vector<std::vector<float>> kAnchorDxSizes;
+  static const std::vector<std::vector<float>> kAnchorDySizes;
+  static const std::vector<std::vector<float>> kAnchorDzSizes;
+  static const std::vector<std::vector<int>> kNumAnchorRo;
+  static const std::vector<std::vector<float>> kAnchorRo;
 
   // initialize in initializer list
   const bool reproduce_result_mode_;
