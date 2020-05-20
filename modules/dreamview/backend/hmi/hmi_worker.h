@@ -101,8 +101,8 @@ class HMIWorker {
 
   // HMI status maintenance.
   HMIStatus status_;
-  // gcc 4 doesnt support std::atomic<std::chrono::steady_clock::time_point>
   std::atomic<double> last_status_received_s_;
+  bool monitor_timed_out_{true};
   HMIMode current_mode_;
   bool status_changed_ = false;
   size_t last_status_fingerprint_{};

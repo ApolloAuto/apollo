@@ -52,6 +52,7 @@ bool GuardianComponent::Init() {
       [this](const std::shared_ptr<SystemStatus>& status) {
         ADEBUG << "Received system status data: run system status callback.";
         std::lock_guard<std::mutex> lock(mutex_);
+        last_status_received_s_ = cyber::Time::Now().ToSecond();
         system_status_.CopyFrom(*status);
       });
 
@@ -65,7 +66,13 @@ bool GuardianComponent::Proc() {
   bool safety_mode_triggered = false;
   if (guardian_conf_.guardian_enable()) {
     std::lock_guard<std::mutex> lock(mutex_);
-    safety_mode_triggered = system_status_.has_safety_mode_trigger_time();
+    static constexpr double kSecondsTillTimeout(2.5);
+    if (cyber::Time::Now().ToSecond() - last_status_received_s_ >
+        kSecondsTillTimeout) {
+      safety_mode_triggered = true;
+    }
+    safety_mode_triggered =
+        safety_mode_triggered || system_status_.has_safety_mode_trigger_time();
   }
 
   if (safety_mode_triggered) {

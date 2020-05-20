@@ -574,15 +574,29 @@ void HMIWorker::ResetComponentStatusTimer() {
 }
 
 void HMIWorker::UpdateComponentStatus() {
-  static constexpr uint64_t kSecondsTillComponentReset(2.5);
-  if (cyber::Time::Now().ToSecond() - last_status_received_s_.load() >
-      kSecondsTillComponentReset) {
-    WLock wlock(status_mutex_);
-    for (auto& monitored_component : *status_.mutable_monitored_components()) {
-      monitored_component.second.set_status(ComponentStatus::UNKNOWN);
-      monitored_component.second.set_message("Status not reported by Monitor.");
+  static constexpr double kSecondsTillTimeout(2.5);
+  const double now = cyber::Time::Now().ToSecond();
+  if (now - last_status_received_s_.load() > kSecondsTillTimeout) {
+    if (!monitor_timed_out_) {
+      WLock wlock(status_mutex_);
+
+      const uint64_t now_ms = static_cast<uint64_t>(now * 2e3);
+      static constexpr bool kIsReportable = true;
+      SubmitDriveEvent(now_ms, "Monitor timed out", {"PROBLEM"}, kIsReportable);
+      AWARN << "System fault. Auto disengage.";
+      Trigger(HMIAction::DISENGAGE);
+
+      for (auto& monitored_component :
+           *status_.mutable_monitored_components()) {
+        monitored_component.second.set_status(ComponentStatus::UNKNOWN);
+        monitored_component.second.set_message(
+            "Status not reported by Monitor.");
+      }
+      status_changed_ = true;
     }
-    status_changed_ = true;
+    monitor_timed_out_ = true;
+  } else {
+    monitor_timed_out_ = false;
   }
 }
 
