@@ -45,7 +45,6 @@ PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
   p.set_s(p1.s() * w1 + p2.s() * w2);
   return p;
 }
-
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
