@@ -8,7 +8,10 @@ cc_library(
     srcs = ["birdview_img_feature_renderer.cc"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:learning_data_proto",
         "//modules/planning/proto:planning_semantic_map_config_proto",
         "@opencv",
