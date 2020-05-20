@@ -36,8 +36,10 @@ if [ "$ARCH" == "x86_64" ]; then
 
   apt-get -y update && \
     apt-get -y install \
-    zlib1g-dev \
-    openjdk-11-jdk
+    zlib1g-dev
+
+  # https://docs.bazel.build/versions/master/install-ubuntu.html#step-3-install-a-jdk-optional
+  # openjdk-11-jdk
 
   dpkg -i $PKG_NAME
 
