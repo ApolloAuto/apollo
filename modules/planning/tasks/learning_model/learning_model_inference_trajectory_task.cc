@@ -20,7 +20,11 @@
 
 #include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
 
+<<<<<<< HEAD
 #include <vector>
+=======
+#include "modules/planning/common/planning_gflags.h"
+>>>>>>> planning: add task to convert inference learning data to trajectory
 
 namespace apollo {
 namespace planning {
@@ -46,6 +50,7 @@ Status LearningModelInferenceTrajectoryTask::Process(Frame *frame) {
   CHECK_NOTNULL(frame);
 
   WriteTrajectory(frame);
+<<<<<<< HEAD
 
   return Status::OK();
 }
@@ -53,6 +58,20 @@ Status LearningModelInferenceTrajectoryTask::Process(Frame *frame) {
 bool LearningModelInferenceTrajectoryTask::WriteTrajectory(Frame* frame) {
   CHECK_NOTNULL(frame);
 
+=======
+  return Status::OK();
+}
+
+bool LearningModelInferenceTrajectoryTask::GenerateTrajectory(
+    Frame *frame,
+    std::vector<TrajectoryPoint>* trajectory_points) {
+
+  // TODO(all)
+  return true;
+}
+
+bool LearningModelInferenceTrajectoryTask::WriteTrajectory(Frame* frame) {
+>>>>>>> planning: add task to convert inference learning data to trajectory
   auto reference_line_infos = frame->mutable_reference_line_infos();
   if (reference_line_infos->empty()) {
     AERROR << "no reference is found.";
@@ -67,8 +86,15 @@ bool LearningModelInferenceTrajectoryTask::WriteTrajectory(Frame* frame) {
   picked_reference_line_info.SetDrivable(true);
   picked_reference_line_info.SetCost(0);
 
+<<<<<<< HEAD
   std::vector<TrajectoryPoint> trajectory_points
       = frame->learning_data_adc_future_trajectory_points();
+=======
+  // TODO(all): only populate path data from learning model
+  // for initial version
+  std::vector<TrajectoryPoint> trajectory_points;
+  GenerateTrajectory(frame, &trajectory_points);
+>>>>>>> planning: add task to convert inference learning data to trajectory
 
   picked_reference_line_info.SetTrajectory(
      DiscretizedTrajectory(trajectory_points));
