@@ -74,7 +74,6 @@ class Routing {
   std::unique_ptr<Navigator> navigator_ptr_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
-  RoutingConfig routing_conf_;
   const hdmap::HDMap *hdmap_ = nullptr;
 };
 
