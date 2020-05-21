@@ -13,8 +13,8 @@ cc_library(
 
 cc_library(
     name = "trajectory_imitation_inference",
-    hdrs = ["trajectory_imitation_inference.h"],
     srcs = ["trajectory_imitation_inference.cc"],
+    hdrs = ["trajectory_imitation_inference.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":model_inference",
