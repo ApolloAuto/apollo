@@ -21,6 +21,7 @@
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
@@ -35,7 +36,18 @@ void GenerateDataForLearning() {
   if (FLAGS_prediction_offline_bags.empty()) {
     return;
   }
-  if (!MessageProcess::Init()) {
+
+  PredictionConf prediction_conf;
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                       &prediction_conf)) {
+    AERROR << "Unable to load adapter conf file: "
+           << FLAGS_prediction_adapter_config_filename;
+    return;
+  }
+  ADEBUG << "Adapter config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+
+  if (!MessageProcess::Init(prediction_conf)) {
     return;
   }
   const std::vector<std::string> inputs =

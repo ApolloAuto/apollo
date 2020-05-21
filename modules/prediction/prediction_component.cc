@@ -29,6 +29,7 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/offline_features.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -66,31 +67,40 @@ void PredictionComponent::OfflineProcessFeatureProtoFile(
 bool PredictionComponent::Init() {
   component_start_time_ = Clock::NowInSeconds();
 
-  if (!MessageProcess::Init()) {
+  PredictionConf prediction_conf;
+  if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << ComponentBase::ConfigFilePath();
+    return false;
+  }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+
+  if (!MessageProcess::Init(prediction_conf)) {
     return false;
   }
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic, nullptr);
+      prediction_conf.topic_conf().planning_trajectory_topic(), nullptr);
 
   localization_reader_ =
       node_->CreateReader<localization::LocalizationEstimate>(
-          FLAGS_localization_topic, nullptr);
+          prediction_conf.topic_conf().localization_topic(), nullptr);
 
   storytelling_reader_ = node_->CreateReader<storytelling::Stories>(
-      FLAGS_storytelling_topic, nullptr);
+      prediction_conf.topic_conf().storytelling_topic(), nullptr);
 
-  prediction_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  prediction_writer_ = node_->CreateWriter<PredictionObstacles>(
+      prediction_conf.topic_conf().prediction_topic());
 
-  container_writer_ =
-      node_->CreateWriter<SubmoduleOutput>(FLAGS_container_topic_name);
+  container_writer_ = node_->CreateWriter<SubmoduleOutput>(
+      prediction_conf.topic_conf().container_topic_name());
 
   adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
-      FLAGS_adccontainer_topic_name);
+      prediction_conf.topic_conf().adccontainer_topic_name());
 
   perception_obstacles_writer_ = node_->CreateWriter<PerceptionObstacles>(
-      FLAGS_perception_obstacles_topic_name);
+      prediction_conf.topic_conf().perception_obstacles_topic_name());
 
   return true;
 }

@@ -33,12 +33,20 @@ std::string EvaluatorSubmodule::Name() const {
 }
 
 bool EvaluatorSubmodule::Init() {
-  if (!MessageProcess::InitEvaluators()) {
+  PredictionConf prediction_conf;
+  if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << ComponentBase::ConfigFilePath();
+    return false;
+  }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+  if (!MessageProcess::InitEvaluators(prediction_conf)) {
     return false;
   }
   // TODO(kechxu) change topic name when finalized
-  evaluator_writer_ =
-      node_->CreateWriter<SubmoduleOutput>(FLAGS_evaluator_topic_name);
+  evaluator_writer_ = node_->CreateWriter<SubmoduleOutput>(
+      prediction_conf.topic_conf().evaluator_topic_name());
   return true;
 }
 
