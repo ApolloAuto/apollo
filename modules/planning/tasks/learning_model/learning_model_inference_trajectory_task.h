@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <vector>
-
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -37,9 +34,6 @@ class LearningModelInferenceTrajectoryTask : public Task {
 
  private:
   apollo::common::Status Process(Frame *frame);
-  bool GenerateTrajectory(
-      Frame *frame,
-      std::vector<common::TrajectoryPoint>* trajectory_points);
   bool WriteTrajectory(Frame* frame);
 };
 

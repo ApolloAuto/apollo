@@ -23,7 +23,7 @@
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
-#include "modules/planning/learning_based/model_inference/trajectory_conv_rnn_inference.h"
+#include "modules/planning/learning_based/model_inference/trajectory_imitation_inference.h"
 
 namespace apollo {
 namespace planning {
