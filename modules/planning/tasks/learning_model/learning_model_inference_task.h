@@ -22,7 +22,6 @@
 
 #include <vector>
 
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -37,6 +36,9 @@ class LearningModelInferenceTask : public Task {
 
  private:
   apollo::common::Status Process(Frame *frame);
+  void ConvertTrajectory(
+      const LearningOutput& learning_out_put,
+      std::vector<common::TrajectoryPoint>* trajectory_points);
 };
 
 }  // namespace planning

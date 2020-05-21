@@ -12,6 +12,8 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/learning_based/model_inference:trajectory_conv_rnn_inference",
+        "//modules/planning/proto:learning_data_proto",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",

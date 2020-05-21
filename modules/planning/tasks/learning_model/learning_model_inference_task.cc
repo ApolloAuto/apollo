@@ -20,7 +20,10 @@
 
 #include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
 
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/learning_data.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/planning/learning_based/model_inference/trajectory_conv_rnn_inference.h"
 
 namespace apollo {
 namespace planning {
@@ -50,9 +53,51 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   const auto model_file = config.model_file();
   ADEBUG << model_file;
 
-  // TODO(all): call Inference()
+  LearningDataFrame learning_data_frame;
+  learning_data_frame.CopyFrom(frame->learning_data_frame());
+
+  TrajectoryConvRnnInference trajectory_conv_rnn_inference;
+  trajectory_conv_rnn_inference.Inference(&learning_data_frame);
+
+  std::vector<common::TrajectoryPoint> trajectory_points;
+  ConvertTrajectory(learning_data_frame.output(), &trajectory_points);
+
+  frame->set_learning_data_adc_future_trajectory_points(trajectory_points);
 
   return Status::OK();
+}
+
+void LearningModelInferenceTask::ConvertTrajectory(
+    const LearningOutput& learning_out_put,
+    std::vector<common::TrajectoryPoint>* trajectory_points) {
+  for (int i = 0; i < learning_out_put.adc_future_trajectory_point_size();
+      ++i) {
+    // CommonTrajectoryPointFeature => common::TrajectoryPoint
+    apollo::common::TrajectoryPoint trajectory_point;
+    CommonTrajectoryPointFeature tpf
+        = learning_out_put.adc_future_trajectory_point(i).trajectory_point();
+    auto path_point = trajectory_point.mutable_path_point();
+    path_point->set_x(tpf.path_point().x());
+    path_point->set_y(tpf.path_point().y());
+    path_point->set_z(tpf.path_point().z());
+    path_point->set_theta(tpf.path_point().theta());
+    // path_point->set_kappa();
+    path_point->set_s(tpf.path_point().s());
+    // path_point->set_dkappa();
+    // path_point->set_ddkappa();
+    path_point->set_lane_id(tpf.path_point().lane_id());
+    // path_point->set_x_derivative();
+    // path_point->set_y_derivative();
+
+    trajectory_point.set_v(tpf.v());
+    trajectory_point.set_a(tpf.a());
+    trajectory_point.set_relative_time(tpf.relative_time());
+    // trajectory_point.set_da();
+    // trajectory_point.set_steer();
+    trajectory_point.mutable_gaussian_info()->CopyFrom(tpf.gaussian_info());
+
+    trajectory_points->push_back(trajectory_point);
+  }
 }
 
 }  // namespace planning
