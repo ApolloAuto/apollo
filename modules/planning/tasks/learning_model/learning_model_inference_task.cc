@@ -37,11 +37,15 @@ LearningModelInferenceTask::LearningModelInferenceTask(
 Status LearningModelInferenceTask::Execute(
     Frame *frame,
     ReferenceLineInfo *reference_line_info) {
+  CHECK_NOTNULL(frame);
+
   Task::Execute(frame, reference_line_info);
   return Process(frame);
 }
 
 Status LearningModelInferenceTask::Process(Frame *frame) {
+  CHECK_NOTNULL(frame);
+
   const auto& config = config_.learning_model_inference_task_config();
   const auto model_file = config.model_file();
   ADEBUG << model_file;

@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/learning_model/learning_based_task.h"
+#include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
 
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -26,11 +26,12 @@
 namespace apollo {
 namespace planning {
 
-class LearningBasedTaskTest : public ::testing::Test {
+class LearningModelInferenceTrajectoryTaskTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_task_type(TaskConfig::LEARNING_BASED_TASK);
-    config_.mutable_learning_based_task_config();
+    config_.set_task_type(
+        TaskConfig::LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK);
+    config_.mutable_learning_model_inference_trajectory_task_config();
   }
 
   virtual void TearDown() {}
@@ -39,9 +40,10 @@ class LearningBasedTaskTest : public ::testing::Test {
   TaskConfig config_;
 };
 
-TEST_F(LearningBasedTaskTest, Init) {
-  LearningBasedTask learning_based_task(config_);
-  EXPECT_EQ(learning_based_task.Name(),
+TEST_F(LearningModelInferenceTrajectoryTaskTest, Init) {
+  LearningModelInferenceTrajectoryTask
+      learning_model_inference_trajectory_task(config_);
+  EXPECT_EQ(learning_model_inference_trajectory_task.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }
 
