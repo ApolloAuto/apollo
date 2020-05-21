@@ -40,11 +40,10 @@ message LaneChangeDeciderConfig {
 }
 
 //////////////////////////////////
-// LearningBasedTaskConfig
+// LearningModelInferenceTaskConfig
 
-message LearningBasedTaskConfig {
+message LearningModelInferenceTaskConfig {
   optional string model_file = 1;
-  optional int32 input_feature_num = 2;
 }
 
 //////////////////////////////////

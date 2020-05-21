@@ -7,12 +7,11 @@ stage_type: LEARNING_MODEL_RUN
 stage_config: {
   stage_type: LEARNING_MODEL_RUN
   enabled: true
-  task_type: LEARNING_BASED_TASK
+  task_type: LEARNING_MODEL_INFERENCE_TASK
   task_config: {
-    task_type: LEARNING_BASED_TASK
-    learning_based_task_config {
+    task_type: LEARNING_MODEL_INFERENCE_TASK
+    learning_model_inference_task_config {
       model_file: "/apollo/modules/planning/tools/planning_demo_model.pt"
-      input_feature_num: 301084
     }
   }
 }

@@ -3,9 +3,9 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "learning_based_task",
-    srcs = ["learning_based_task.cc"],
-    hdrs = ["learning_based_task.h"],
+    name = "learning_model_inference_task",
+    srcs = ["learning_model_inference_task.cc"],
+    hdrs = ["learning_model_inference_task.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -21,11 +21,11 @@ cc_library(
 )
 
 cc_test(
-    name = "learning_based_task_test",
+    name = "learning_model_inference_task_test",
     size = "small",
-    srcs = ["learning_based_task_test.cc"],
+    srcs = ["learning_model_inference_task_test.cc"],
     deps = [
-        "learning_based_task",
+        "learning_model_inference_task",
         "@com_google_googletest//:gtest_main",
     ],
 )
