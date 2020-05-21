@@ -20,6 +20,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_proto",
         "//modules/storytelling/common:storytelling_gflags",
+        "//modules/storytelling/proto:storytelling_config_proto",
         "//modules/storytelling:frame_manager",
     ],
 )

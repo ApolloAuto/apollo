@@ -26,7 +26,7 @@ namespace storytelling {
 
 class CloseToJunctionTeller : public BaseTeller {
  public:
-  void Init() override;
+  void Init(const StorytellingConfig& storytelling_conf) override;
   void Update(Stories* stories) override;
 
  private:
@@ -46,6 +46,7 @@ class CloseToJunctionTeller : public BaseTeller {
   double stop_sign_distance_;
   std::string yield_sign_id_;
   double yield_sign_distance_;
+  StorytellingConfig config_;
 };
 
 }  // namespace storytelling
