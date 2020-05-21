@@ -44,18 +44,18 @@ namespace lidar {
 
 const float PointPillars::kPillarXSize = 0.25f;
 const float PointPillars::kPillarYSize = 0.25f;
-const float PointPillars::kPillarZSize = 4.0f;
-const float PointPillars::kMinXRange = 0.0f;
-const float PointPillars::kMinYRange = -40.0f;
-const float PointPillars::kMinZRange = -3.0f;
-const float PointPillars::kMaxXRange = 70.0f;
-const float PointPillars::kMaxYRange = 40.0f;
-const float PointPillars::kMaxZRange = 1.0f;
+const float PointPillars::kPillarZSize = 8.0f;
+const float PointPillars::kMinXRange = -50.0f;
+const float PointPillars::kMinYRange = -50.0f;
+const float PointPillars::kMinZRange = -5.0f;
+const float PointPillars::kMaxXRange = 50.0f;
+const float PointPillars::kMaxYRange = 50.0f;
+const float PointPillars::kMaxZRange = 3.0f;
 const float PointPillars::kSensorHeight = 1.73f;
 // TODO(chenjiahao): kSensorHeight need to get from sensor's height param
-const int PointPillars::kNumClass = 3;
-const int PointPillars::kMaxNumPillars = 12000;
-const int PointPillars::kMaxNumPointsPerPillar = 100;
+const int PointPillars::kNumClass = 10;
+const int PointPillars::kMaxNumPillars = 30000;
+const int PointPillars::kMaxNumPointsPerPillar = 60;
 const int PointPillars::kNumPointFeature = 4;
 const int PointPillars::kPfeOutputSize = kMaxNumPillars * 64;
 const int PointPillars::kGridXSize =
@@ -65,8 +65,7 @@ const int PointPillars::kGridYSize =
 const int PointPillars::kGridZSize =
     static_cast<int>((kMaxZRange - kMinZRange) / kPillarZSize);
 const int PointPillars::kRpnInputSize = 64 * kGridXSize * kGridYSize;
-const int PointPillars::kNumAnchor = 160 * 140 * 6;
-//    100 * 100 * 12 + 160 * 160 * 8;
+const int PointPillars::kNumAnchor = 100 * 100 * 12 + 160 * 160 * 8;
 const int PointPillars::kNumOutputBoxFeature = 7;
 const int PointPillars::kRpnBoxOutputSize = kNumAnchor * kNumOutputBoxFeature;
 const int PointPillars::kRpnClsOutputSize = kNumAnchor * kNumClass;
@@ -78,22 +77,41 @@ const int PointPillars::kNumThreads = 64;
 // common.h
 const int PointPillars::kNumBoxCorners = 4;
 // TODO(chenjiahao): kNumBoxCorners is actually used as kNumPointFeature
-const std::vector<int> PointPillars::kAnchorStrides{2};
+const std::vector<int> PointPillars::kAnchorStrides{4, 2};
 const std::vector<int> PointPillars::kAnchorRanges{
-    0, kGridXSize, 0, kGridYSize};
-const std::vector<int> PointPillars::kNumAnchorSets{3};
+    0, kGridXSize, 0, kGridYSize,
+    static_cast<int>(kGridXSize * 0.1), static_cast<int>(kGridXSize * 0.9),
+    static_cast<int>(kGridYSize * 0.1), static_cast<int>(kGridYSize * 0.9)};
+const std::vector<int> PointPillars::kNumAnchorSets{12, 8};
 const std::vector<std::vector<float>> PointPillars::kAnchorDxSizes{
-    std::vector<float>{1.6f, 0.6f, 0.6f}};
+    std::vector<float>{2.94046906f, 1.95017717f, 2.73050468f,
+                       3.0f, 2.0f, 2.4560939f},
+    std::vector<float>{2.49008838f, 0.60058911f, 0.76279481f,
+                       0.66344886f, 0.39694519f}};
 const std::vector<std::vector<float>> PointPillars::kAnchorDySizes{
-    std::vector<float>{3.9f, 1.76f, 0.8f}};
+    std::vector<float>{11.1885991, 4.60718145f, 6.38352896f,
+                       15.0f, 3.0f, 6.73778078f},
+    std::vector<float>{0.48578221f, 1.68452161f, 2.09973778f,
+                       0.7256437f, 0.40359262f}};
 const std::vector<std::vector<float>> PointPillars::kAnchorDzSizes{
-    std::vector<float>{1.56f, 1.73f, 1.73f}};
+    std::vector<float>{3.47030982f, 1.72270761f, 3.13312415f,
+                       3.8f, 3.8f, 2.73004906f},
+    std::vector<float>{0.98297065f, 1.27192197f, 1.44403034f,
+                       1.75748069f, 1.06232151f}};
 const std::vector<std::vector<int>> PointPillars::kNumAnchorRo{
-    std::vector<int>{2, 2, 2}};
+    std::vector<int>{2, 2, 2, 2, 2, 2}, std::vector<int>{2, 2, 2, 1, 1}};
 const std::vector<std::vector<float>> PointPillars::kAnchorRo{
     std::vector<float>{0, M_PI / 2,
                        0, M_PI / 2,
-                       0, M_PI / 2}};
+                       0, M_PI / 2,
+                       0, M_PI / 2,
+                       0, M_PI / 2,
+                       0, M_PI / 2},
+    std::vector<float>{0, M_PI / 2,
+                       0, M_PI / 2,
+                       0, M_PI / 2,
+                       0,
+                       0}};
 
 PointPillars::PointPillars(const bool reproduce_result_mode,
                            const float score_threshold,
@@ -294,7 +312,7 @@ void PointPillars::InitAnchors() {
   box_anchors_min_y_ = new float[kNumAnchor];
   box_anchors_max_x_ = new float[kNumAnchor];
   box_anchors_max_y_ = new float[kNumAnchor];
-  // deallocate these memories in deconstructor
+  // deallocate these memories in destructor
 
   GenerateAnchors(anchors_px_, anchors_py_, anchors_pz_, anchors_dx_,
                   anchors_dy_, anchors_dz_, anchors_ro_);
