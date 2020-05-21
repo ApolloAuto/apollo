@@ -25,6 +25,7 @@
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/storytelling/proto/story.pb.h"
 
@@ -35,13 +36,13 @@ class MessageProcess {
  public:
   MessageProcess() = delete;
 
-  static bool Init();
+  static bool Init(const PredictionConf &prediction_conf);
 
   static bool InitContainers();
 
-  static bool InitEvaluators();
+  static bool InitEvaluators(const PredictionConf &prediction_conf);
 
-  static bool InitPredictors();
+  static bool InitPredictors(const PredictionConf &prediction_conf);
 
   static void ContainerProcess(
       const perception::PerceptionObstacles &perception_obstacles);

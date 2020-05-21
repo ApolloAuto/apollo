@@ -50,10 +50,10 @@ using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
 using apollo::storytelling::Stories;
 
-bool MessageProcess::Init() {
+bool MessageProcess::Init(const PredictionConf &prediction_conf) {
   InitContainers();
-  InitEvaluators();
-  InitPredictors();
+  InitEvaluators(prediction_conf);
+  InitPredictors(prediction_conf);
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Map cannot be loaded.";
@@ -78,32 +78,12 @@ bool MessageProcess::InitContainers() {
   return true;
 }
 
-bool MessageProcess::InitEvaluators() {
-  PredictionConf prediction_conf;
-  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                       &prediction_conf)) {
-    AERROR << "Unable to load prediction conf file: "
-           << FLAGS_prediction_conf_file;
-    return false;
-  }
-  ADEBUG << "Prediction config file is loaded into: "
-         << prediction_conf.ShortDebugString();
-
+bool MessageProcess::InitEvaluators(const PredictionConf &prediction_conf) {
   EvaluatorManager::Instance()->Init(prediction_conf);
   return true;
 }
 
-bool MessageProcess::InitPredictors() {
-  PredictionConf prediction_conf;
-  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                       &prediction_conf)) {
-    AERROR << "Unable to load prediction conf file: "
-           << FLAGS_prediction_conf_file;
-    return false;
-  }
-  ADEBUG << "Prediction config file is loaded into: "
-         << prediction_conf.ShortDebugString();
-
+bool MessageProcess::InitPredictors(const PredictionConf &prediction_conf) {
   PredictorManager::Instance()->Init(prediction_conf);
   return true;
 }

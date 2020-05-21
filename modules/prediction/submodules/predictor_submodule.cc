@@ -36,11 +36,19 @@ std::string PredictorSubmodule::Name() const {
 }
 
 bool PredictorSubmodule::Init() {
-  if (!MessageProcess::InitPredictors()) {
+  PredictionConf prediction_conf;
+  if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << ComponentBase::ConfigFilePath();
     return false;
   }
-  predictor_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+  if (!MessageProcess::InitPredictors(prediction_conf)) {
+    return false;
+  }
+  predictor_writer_ = node_->CreateWriter<PredictionObstacles>(
+      prediction_conf.topic_conf().prediction_topic());
   return true;
 }
 
