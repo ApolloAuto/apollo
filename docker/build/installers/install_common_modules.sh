@@ -89,6 +89,14 @@ else
         linux-libc-dev
 fi
 
+#######################################################
+COMPONENT="modules/localization"
+info "Install support for [${COMPONENT}] ..."
+
+apt-get -y update && \
+    apt-get -y install \
+    liblz4-dev
+
 # Modules that DON'T need pre-installed dependencies
 # modules/v2x
 # modules/third_party_perception
