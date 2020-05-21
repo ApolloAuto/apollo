@@ -56,7 +56,9 @@ using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 
-bool MessageProcess::Init() {
+bool MessageProcess::Init(const PlanningConfig& planning_config) {
+  planning_config_.CopyFrom(planning_config);
+
   map_m_["Sunnyvale"] = "sunnyvale";
   map_m_["Sunnyvale Big Loop"] = "sunnyvale_big_loop";
   map_m_["Sunnyvale With Two Offices"] = "sunnyvale_with_two_offices";
@@ -284,32 +286,38 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
 
   RecordMessage message;
   while (reader.ReadMessage(&message)) {
-    if (message.channel_name == FLAGS_chassis_topic) {
+    if (message.channel_name ==
+        planning_config_.topic_config().chassis_topic()) {
       Chassis chassis;
       if (chassis.ParseFromString(message.content)) {
         OnChassis(chassis);
       }
-    } else if (message.channel_name == FLAGS_localization_topic) {
+    } else if (message.channel_name ==
+               planning_config_.topic_config().localization_topic()) {
       LocalizationEstimate localization;
       if (localization.ParseFromString(message.content)) {
         OnLocalization(localization);
       }
-    } else if (message.channel_name == FLAGS_hmi_status_topic) {
+    } else if (message.channel_name ==
+               planning_config_.topic_config().hmi_status_topic()) {
       HMIStatus hmi_status;
       if (hmi_status.ParseFromString(message.content)) {
         OnHMIStatus(hmi_status);
       }
-    } else if (message.channel_name == FLAGS_prediction_topic) {
+    } else if (message.channel_name ==
+               planning_config_.topic_config().prediction_topic()) {
       PredictionObstacles prediction_obstacles;
       if (prediction_obstacles.ParseFromString(message.content)) {
         OnPrediction(prediction_obstacles);
       }
-    } else if (message.channel_name == FLAGS_routing_response_topic) {
+    } else if (message.channel_name ==
+               planning_config_.topic_config().routing_response_topic()) {
       RoutingResponse routing_response;
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
       }
-    } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
+    } else if (message.channel_name ==planning_config_.topic_config()
+                                       .traffic_light_detection_topic()) {
       TrafficLightDetection traffic_light_detection;
       if (traffic_light_detection.ParseFromString(message.content)) {
         OnTrafficLightDetection(traffic_light_detection);

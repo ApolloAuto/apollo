@@ -20,10 +20,11 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/message_process.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
@@ -40,8 +41,13 @@ void GenerateLearningData() {
     return;
   }
 
+  PlanningConfig planning_config;
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+                                         &planning_config))
+      << "failed to load planning config file " << FLAGS_planning_config_file;
+
   MessageProcess message_process;
-  if (!message_process.Init()) {
+  if (!message_process.Init(planning_config)) {
     return;
   }
 

@@ -344,21 +344,28 @@ message NavigationPlanningConfig {
   optional PlannerNaviConfig planner_navi_config = 4;
 }
 
+message TopicConfig {
+  optional string chassis_topic = 1;
+  optional string hmi_status_topic = 2;
+  optional string localization_topic = 3;
+  optional string planning_pad_topic = 4;
+  optional string planning_trajectory_topic = 5;
+  optional string prediction_topic = 6;
+  optional string relative_map_topic = 7;
+  optional string routing_request_topic = 8;
+  optional string routing_response_topic = 9;
+  optional string traffic_light_detection_topic = 10;
+}
+
 message PlanningConfig {
+  optional TopicConfig topic_config = 1;
   oneof planning_config {
-    RtkPlanningConfig rtk_planning_config = 1;
-    StandardPlanningConfig standard_planning_config = 2;
-    NavigationPlanningConfig navigation_planning_config = 3;
+    RtkPlanningConfig rtk_planning_config = 2;
+    StandardPlanningConfig standard_planning_config = 3;
+    NavigationPlanningConfig navigation_planning_config = 4;
   }
 
   // default task config, it will be used if there is no scenario-specific
   // task config.
   repeated TaskConfig default_task_config = 5;
-  
-  optional string planning_pad_topic = 6;
-  optional string planning_trajectory_topic = 7;
-  optional string relative_map_topic = 8;
-  optional string routing_request_topic = 9;
-  optional string routing_response_topic = 10;
-  optional string traffic_light_detection_topic = 11; 
 }
