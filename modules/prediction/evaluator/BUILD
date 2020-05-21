@@ -26,7 +26,8 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:semantic_lstm_evaluator",
-        "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//third_party:libtorch",
     ],
 )
 
@@ -37,6 +38,9 @@ cc_test(
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
+    ],
+    linkopts = [
+        "-lgomp",
     ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",

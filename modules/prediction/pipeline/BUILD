@@ -9,6 +9,9 @@ cc_binary(
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
+    linkopts = [
+        "-lgomp",
+    ],
     deps = [
         "//modules/prediction/common:message_process",
         "//third_party:boost",

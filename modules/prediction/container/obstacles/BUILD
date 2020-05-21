@@ -16,7 +16,7 @@ cc_library(
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/prediction/submodules:submodule_output",
     ],
 )
@@ -33,8 +33,8 @@ cc_library(
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
-        "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
     ],
 )
 
@@ -77,7 +77,7 @@ cc_library(
     ],
     deps = [
         "//modules/prediction/common:road_graph",
-        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:feature_cc_proto",
     ],
 )
 

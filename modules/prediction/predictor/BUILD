@@ -21,7 +21,7 @@ cc_library(
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
         "//modules/prediction/predictor/single_lane:single_lane_predictor",
-        "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
         "//modules/prediction/scenario:scenario_manager",
     ],
 )
@@ -33,6 +33,9 @@ cc_test(
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
+    ],
+    linkopts = [
+        "-lgomp",
     ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",

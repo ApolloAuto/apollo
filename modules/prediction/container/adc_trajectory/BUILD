@@ -11,9 +11,10 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/container",
+        "//modules/prediction/proto:lane_graph_cc_proto",
     ],
 )
 
