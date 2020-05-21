@@ -16,23 +16,26 @@
 
 /**
  * @file
- */
+ **/
 
-#include "modules/planning/learning_based/model_inference/trajectory_conv_rnn_inference.h"
+#pragma once
+
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
 
-bool TrajectoryConvRnnInference::LoadModel() {
-  // TODO(all)
-  return true;
-}
+class LearningModelInferenceTrajectoryTask : public Task {
+ public:
+  explicit LearningModelInferenceTrajectoryTask(const TaskConfig &config);
 
-bool TrajectoryConvRnnInference::Inference(
-    LearningDataFrame* learning_data_frame) {
-  // TODO(all)
-  return true;
-}
+  apollo::common::Status Execute(
+      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+
+ private:
+  apollo::common::Status Process(Frame *frame);
+  bool WriteTrajectory(Frame* frame);
+};
 
 }  // namespace planning
 }  // namespace apollo
