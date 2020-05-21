@@ -24,3 +24,15 @@ py_proto(
         "//modules/common/proto:header_pb2",
     ],
 )
+
+cc_proto_library(
+    name = "storytelling_config_proto",
+    deps = [
+        ":storytelling_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "storytelling_config_proto_lib",
+    srcs = ["storytelling_config.proto"],
+)

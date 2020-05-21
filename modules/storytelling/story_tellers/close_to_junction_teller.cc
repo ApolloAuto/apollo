@@ -253,15 +253,17 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
   }
 }
 
-void CloseToJunctionTeller::Init() {
+void CloseToJunctionTeller::Init(const StorytellingConfig& storytelling_conf) {
+  config_.CopyFrom(storytelling_conf);
   auto* manager = FrameManager::Instance();
-  manager->CreateOrGetReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+  manager->CreateOrGetReader<ADCTrajectory>(
+      config_.topic_config().planning_trajectory_topic());
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {
   auto* manager = FrameManager::Instance();
   static auto planning_reader = manager->CreateOrGetReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic);
+      config_.topic_config().planning_trajectory_topic());
   const auto trajectory = planning_reader->GetLatestObserved();
   if (trajectory == nullptr || trajectory->trajectory_point().empty()) {
     AERROR << "Planning trajectory not ready.";

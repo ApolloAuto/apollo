@@ -1,0 +1,4 @@
+topic_config {
+  planning_trajectory_topic: "/apollo/planning"
+  storytelling_topic: "/apollo/storytelling"
+}

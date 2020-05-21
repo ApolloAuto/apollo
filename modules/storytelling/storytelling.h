@@ -21,6 +21,7 @@
 #include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/storytelling/proto/storytelling_config.pb.h"
 #include "modules/storytelling/story_tellers/base_teller.h"
 
 namespace apollo {
@@ -38,6 +39,7 @@ class Storytelling final : public apollo::cyber::TimerComponent {
  private:
   std::vector<std::unique_ptr<BaseTeller>> story_tellers_;
   Stories stories_;
+  StorytellingConfig config_;
 };
 
 CYBER_REGISTER_COMPONENT(Storytelling)
