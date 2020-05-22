@@ -168,14 +168,14 @@ void PointPillarsDetection::GetObjects(
       }
     }
 
-    // classification (only detect vehicles so far)
-    // TODO(chenjiahao): Complete object type probs
+    // classification
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
         static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
     object->sub_type = GetObjectSubType(labels->at(i));
     object->type = base::kSubType2TypeMap.at(object->sub_type);
-    object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] = 1.0f;
+    object->lidar_supplement.raw_probs.back()[
+        static_cast<int>(object->type)] = 1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());
@@ -184,6 +184,7 @@ void PointPillarsDetection::GetObjects(
   collect_time_ = timer.toc(true);
 }
 
+// TODO(chenjiahao): update the base ObjectSubType with more fine-grained types
 base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
   switch (label) {
     case 0:
