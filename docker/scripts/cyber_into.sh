@@ -32,7 +32,7 @@ if [ ${ARCH} == "x86_64" ]; then
         /bin/bash
 elif [ ${ARCH} == "aarch64" ]; then
     warning "!!! For the first time after starting the Cyber RT container, please run the following two commands: !!!"
-    warning "!!!   1) /apollo/scripts/docker_adduser.sh !!!"
+    warning "!!!   1) /apollo/scripts/docker_start_user.sh # with root or sudo permissions!!!"
     warning "!!!   2) su $USER !!!"
     warning "! To exit, please use 'ctrl+p ctrl+q' !"
 
