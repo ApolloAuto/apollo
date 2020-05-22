@@ -266,10 +266,10 @@ function main(){
 
     if [ ${ARCH} == "x86_64" ]; then
         if [ "${USER}" != "root" ]; then
-            docker exec $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
+            docker exec -u root $APOLLO_CYBER bash -c '/apollo/scripts/docker_start_user.sh'
         fi
     else
-        warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_adduser.sh' for the first time when you get into the docker !!!"
+        warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_start_user.sh' for the first time when you get into the docker !!!"
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/cyber_into.sh"
