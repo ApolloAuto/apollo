@@ -28,13 +28,12 @@
 namespace apollo {
 namespace planning {
 
-BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {}
-
 // TODO(Jinyun): take map name from upstream and move to conf
 static const char ROADMAP_IMG_PATH[] =
-    "/apollo/modules/planning/data/sunnyvale_with_two_offices.png";
+    "/apollo/modules/planning/data/semantic_map/sunnyvale_with_two_offices.png";
 static const char SPEEDLIMITMAP_IMG_PATH[] =
-    "/apollo/modules/planning/data/sunnyvale_with_two_offices_speedlimit.png";
+    "/apollo/modules/planning/data/semantic_map/"
+    "sunnyvale_with_two_offices_speedlimit.png";
 
 bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   config_ = config;
@@ -153,6 +152,18 @@ bool BirdviewImgFeatureRenderer::RenderBGREnv(
 bool BirdviewImgFeatureRenderer::RenderCurrentEgoStatus(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
   stacked_ego_cur_status_img_.copyTo(*img_feature);
+  return true;
+}
+
+bool BirdviewImgFeatureRenderer::RenderCurrentEgoPoint(
+    const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
+  ego_cur_point_img_.copyTo(*img_feature);
+  return true;
+}
+
+bool BirdviewImgFeatureRenderer::RenderCurrentEgoBox(
+    const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
+  ego_cur_box_img_.copyTo(*img_feature);
   return true;
 }
 

@@ -275,3 +275,5 @@ DECLARE_string(planning_offline_bags);
 DECLARE_int32(planning_offline_mode);
 DECLARE_int32(learning_data_obstacle_history_time_sec);
 DECLARE_int32(learning_data_frame_num_per_file);
+DECLARE_bool(planning_use_cuda);
+DECLARE_string(test_model_path);

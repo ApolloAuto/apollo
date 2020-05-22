@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_semantic_map_config.pb.h"
@@ -35,11 +36,6 @@ namespace planning {
 
 class BirdviewImgFeatureRenderer {
  public:
-  /**
-   * @brief Constructor
-   */
-  BirdviewImgFeatureRenderer();
-
   /**
    * @brief Destructor
    */
@@ -74,6 +70,22 @@ class BirdviewImgFeatureRenderer {
    */
   bool RenderCurrentEgoStatus(const LearningDataFrame& learning_data_frame,
                               cv::Mat* img_feature);
+
+  /**
+   * @brief generate a single channel img
+   * @param learning_data_frame a proto message containing info for renderering
+   * @param img_feature a pointer to opencv img to render on
+   */
+  bool RenderCurrentEgoPoint(const LearningDataFrame& learning_data_frame,
+                             cv::Mat* img_feature);
+
+  /**
+   * @brief generate a single channel img
+   * @param learning_data_frame a proto message containing info for renderering
+   * @param img_feature a pointer to opencv img to render on
+   */
+  bool RenderCurrentEgoBox(const LearningDataFrame& learning_data_frame,
+                           cv::Mat* img_feature);
 
  private:
   /**
@@ -281,6 +293,8 @@ class BirdviewImgFeatureRenderer {
   cv::Mat ego_cur_point_img_;
   cv::Mat ego_cur_box_img_;
   cv::Mat stacked_ego_cur_status_img_;
+
+  DECLARE_SINGLETON(BirdviewImgFeatureRenderer)
 };
 }  // namespace planning
 }  // namespace apollo
