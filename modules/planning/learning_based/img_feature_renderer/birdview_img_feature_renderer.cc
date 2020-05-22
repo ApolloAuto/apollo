@@ -35,6 +35,9 @@ static const char SPEEDLIMITMAP_IMG_PATH[] =
     "/apollo/modules/planning/data/semantic_map/"
     "sunnyvale_with_two_offices_speedlimit.png";
 
+BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {
+}
+
 bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   config_ = config;
   ego_vehicle_config_ = common::VehicleConfigHelper::GetConfig();

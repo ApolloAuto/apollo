@@ -18,32 +18,28 @@
  * @file
  **/
 
-#include "modules/planning/tasks/learning_model/learning_based_task.h"
+#pragma once
 
-#include "gtest/gtest.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include <vector>
+
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
 
-class LearningBasedTaskTest : public ::testing::Test {
+class LearningModelInferenceTask : public Task {
  public:
-  virtual void SetUp() {
-    config_.set_task_type(TaskConfig::LEARNING_BASED_TASK);
-    config_.mutable_learning_based_task_config();
-  }
+  explicit LearningModelInferenceTask(const TaskConfig &config);
 
-  virtual void TearDown() {}
+  apollo::common::Status Execute(
+      Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
- protected:
-  TaskConfig config_;
+ private:
+  apollo::common::Status Process(Frame *frame);
+  void ConvertTrajectory(
+      const LearningOutput& learning_out_put,
+      std::vector<common::TrajectoryPoint>* trajectory_points);
 };
-
-TEST_F(LearningBasedTaskTest, Init) {
-  LearningBasedTask learning_based_task(config_);
-  EXPECT_EQ(learning_based_task.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
-}
 
 }  // namespace planning
 }  // namespace apollo

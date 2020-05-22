@@ -20,35 +20,21 @@
 
 #pragma once
 
-#include <vector>
-
-#include "torch/script.h"
-#include "torch/torch.h"
-
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
 
-class LearningBasedTask : public Task {
+class LearningModelInferenceTrajectoryTask : public Task {
  public:
-  explicit LearningBasedTask(const TaskConfig &config);
+  explicit LearningModelInferenceTrajectoryTask(const TaskConfig &config);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
   apollo::common::Status Process(Frame *frame);
-
-  bool ExtractFeatures(Frame* frame,
-                       std::vector<torch::jit::IValue> *input_features);
-  bool InferenceModel(const std::vector<torch::jit::IValue> &input_features,
-                      Frame* frame);
- private:
-  torch::Device device_;
-  torch::jit::script::Module model_;
-  int input_feature_num_ = 0;
+  bool WriteTrajectory(Frame* frame);
 };
 
 }  // namespace planning

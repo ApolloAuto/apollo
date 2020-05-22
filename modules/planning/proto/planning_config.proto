@@ -40,7 +40,8 @@ message TaskConfig {
     PIECEWISE_JERK_SPEED_OPTIMIZER = 25;
     SPEED_HEURISTIC_OPTIMIZER = 26;
     // other tasks
-    LEARNING_BASED_TASK = 27;
+    LEARNING_MODEL_INFERENCE_TASK = 27;
+    LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK = 28;
   };
 
   optional TaskType task_type = 1;
@@ -70,7 +71,9 @@ message TaskConfig {
     PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config = 19;
     SpeedHeuristicOptimizerConfig speed_heuristic_optimizer_config = 20;
     // other tasks
-    LearningBasedTaskConfig learning_based_task_config = 21;
+    LearningModelInferenceTaskConfig learning_model_inference_task_config = 21;
+    LearningModelInferenceTrajectoryTaskConfig
+        learning_model_inference_trajectory_task_config = 22;
   }
 }
 
