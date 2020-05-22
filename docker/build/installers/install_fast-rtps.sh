@@ -33,7 +33,7 @@ DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-tar xzf fast-rtps.prebuilt.x86_64.tar.gz
+tar xzf ${PKG_NAME}
 mv fast-rtps-1.5.0 /usr/local/fast-rtps
 
 # TODO(storypku)
