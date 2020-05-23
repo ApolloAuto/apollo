@@ -41,10 +41,12 @@ void GenerateLearningData() {
     return;
   }
 
+  const std::string planning_config_file =
+      "/apollo/modules/planning/conf/planning_config.pb.txt";
   PlanningConfig planning_config;
-  ACHECK(cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+  ACHECK(cyber::common::GetProtoFromFile(planning_config_file,
                                          &planning_config))
-      << "failed to load planning config file " << FLAGS_planning_config_file;
+      << "failed to load planning config file " << planning_config_file;
 
   MessageProcess message_process;
   if (!message_process.Init(planning_config)) {

@@ -43,11 +43,11 @@ class DpStGraphTest : public ::testing::Test {
     ScenarioConfig config;
     ACHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
-    FLAGS_planning_config_file =
-        "/apollo/modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
-    ACHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
-        << "failed to load planning config file " << FLAGS_planning_config_file;
+    const std::string planning_config_file =
+        "/apollo/modules/planning/conf/planning_config.pb.txt";
+    ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
+        << "failed to load planning config file " << planning_config_file;
 
     DpStSpeedOptimizerConfig default_dp_config;
     for (const auto& cfg : planning_config.default_task_config()) {

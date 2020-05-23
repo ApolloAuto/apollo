@@ -106,7 +106,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   reference_line_provider_->Start();
 
   // dispatch planner
-  planner_ = planner_dispatcher_->DispatchPlanner();
+  planner_ = planner_dispatcher_->DispatchPlanner(config_);
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,

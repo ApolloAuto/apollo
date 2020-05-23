@@ -44,7 +44,8 @@ class PlannerDispatcher {
     return common::Status::OK();
   }
 
-  virtual std::unique_ptr<Planner> DispatchPlanner() = 0;
+  virtual std::unique_ptr<Planner> DispatchPlanner(
+      const PlanningConfig& planning_config) = 0;
 
  protected:
   void RegisterPlanners();

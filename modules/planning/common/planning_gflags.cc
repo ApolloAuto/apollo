@@ -288,11 +288,6 @@ DEFINE_double(
     turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
 
-// planning config file
-DEFINE_string(planning_config_file,
-              "/apollo/modules/planning/conf/planning_config.pb.txt",
-              "planning config file");
-
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
