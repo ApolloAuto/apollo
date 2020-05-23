@@ -41,9 +41,11 @@ class PadTerminal {
  public:
   PadTerminal() : node_(CreateNode("planning_pad_terminal")) {}
   void init() {
+    const std::string planning_config_file =
+        "/apollo/modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
-    ACHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
-        << "failed to load planning config file " << FLAGS_planning_config_file;
+    ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
+        << "failed to load planning config file " << planning_config_file;
 
     pad_writer_ = node_->CreateWriter<PadMessage>(
         planning_config.topic_config().planning_pad_topic());
