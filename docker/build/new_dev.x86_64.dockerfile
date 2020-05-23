@@ -5,7 +5,6 @@ ARG BUILD_STAGE
 ARG INSTALL_MODE
 
 WORKDIR /apollo
-USER root
 
 COPY installers /tmp/installers
 RUN bash /tmp/installers/install_geo_adjustment.sh ${GEOLOC}

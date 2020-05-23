@@ -49,14 +49,10 @@ if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
   tar xzvf ${PKG_NAME}
 
   pushd pcl-pcl-${VERSION}/
-  echo "add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)" > temp
-  cat CMakeLists.txt >> temp
-  mv temp CMakeLists.txt
-  mkdir build
-  cd build
-  cmake ..
-  make -j${THREAD_NUM}
-  make install
+    mkdir build && cd build
+    cmake ..
+    make -j${THREAD_NUM}
+    make install
   popd
 
   #clean up

@@ -43,7 +43,7 @@ apt-get -y update && \
     build-essential \
     autotools-dev \
     apt-file \
-    bc \
+    sudo \
     gcc-7 \
     g++-7 \
     gdb \
@@ -65,6 +65,12 @@ apt-get -y update && \
     unzip \
     zip
 
+##----------------##
+##    SUDO        ##
+##----------------##
+sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
+
+##
 ##----------------##
 ## Python Setings |
 ##----------------##

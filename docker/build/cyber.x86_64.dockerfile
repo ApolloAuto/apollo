@@ -20,8 +20,6 @@ RUN bash /tmp/installers/install_qa_tools.sh
 RUN bash /tmp/installers/install_cyber_deps.sh
 RUN bash /tmp/installers/install_visualizer_deps.sh
 RUN bash /tmp/installers/install_bazel.sh
-RUN bash /tmp/installers/install_user.sh
 RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
 
 WORKDIR /apollo
-USER apollo
