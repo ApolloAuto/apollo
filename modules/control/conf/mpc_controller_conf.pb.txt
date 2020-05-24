@@ -54,6 +54,8 @@ lat_controller_conf {
   enable_look_ahead_back_control: true
   lookahead_station: 1.4224
   lookback_station: 2.8448
+  lookahead_station_high_speed: 1.4224
+  lookback_station_high_speed: 2.8448
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0
@@ -147,7 +149,8 @@ lon_controller_conf {
     ki: 0.3
     kd: 0.0
   }
-  switch_speed: 2.5
+  switch_speed: 3.0
+  switch_speed_window: 1.0
   reverse_station_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.5
