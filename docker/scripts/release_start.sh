@@ -115,7 +115,7 @@ function main() {
         --shm-size 2G \
         $IMG
     if [ "${USER}" != "root" ]; then
-      docker exec apollo_release bash -c "/apollo/scripts/docker_start_user.sh"
+      docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
       docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
       docker exec apollo_release bash -c "chmod a+w /apollo"
 
