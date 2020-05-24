@@ -94,7 +94,7 @@ function setup_user_bashrc() {
     # TODO(storypku): perform copy operations in `installers/install_user.sh`
     # for user `apollo` when docker build image
     # TODO-BEGIN
-    cp -r /etc/skel/* "${user_home}"
+    cp -rf /etc/skel/.* "${user_home}"
     # Set user files ownership to current user, such as .bashrc, .profile, etc.
     echo "${BASHRC_TEXT}" >> ${user_home}/.bashrc
     echo "${LCOVRC_TEXT}" > ${user_home}/.lcovrc
