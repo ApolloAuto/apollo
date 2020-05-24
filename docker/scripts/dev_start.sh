@@ -424,8 +424,10 @@ function main(){
     fi
     set +x
 
-    if [[ "${USER}" != "root" ]]; then
-        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_start_user.sh'
+    # User with uid=1000 or username=apollo excluded
+    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
+        && [[ $USER_ID -ne 1000 ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
