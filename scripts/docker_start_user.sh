@@ -35,7 +35,7 @@ function user_name_by_uid() {
 
 # TODO(storypku):
 # Save these rc files to /opt/apollo/misc when docker build image
-# and copied to user's `$HOME` directory from there.
+# and copied to user's `$HOME` directory when docker_start_user.sh
 # Ref: https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 IFS='' read -r -d '' BASHRC_TEXT << EOF
 export PATH="\$PATH:/apollo/scripts:/usr/local/miniconda/bin"
@@ -88,18 +88,14 @@ function _create_user_account_if_none_exist() {
 }
 
 function setup_user_bashrc() {
-    local user_name="$1"
-    local group_name="$2"
-    local user_home="/home/$1"
-    # TODO(storypku): perform copy operations in `installers/install_user.sh`
-    # for user `apollo` when docker build image
-    # TODO-BEGIN
-    cp -rf /etc/skel/.* "${user_home}"
+    local uid="$1"
+    local gid="$2"
+    local user_home="/home/$3"
+    cp -rf /etc/skel/.{profile,bash*} "${user_home}"
     # Set user files ownership to current user, such as .bashrc, .profile, etc.
     echo "${BASHRC_TEXT}" >> ${user_home}/.bashrc
     echo "${LCOVRC_TEXT}" > ${user_home}/.lcovrc
-    # TODO-END
-    chown -R ${user_name}:${group_name} "${user_home}"
+    chown -R ${uid}:${gid} "${user_home}"
 }
 
 function setup_user_account() {
@@ -109,7 +105,7 @@ function setup_user_account() {
     local gid="$4"
     # USER apollo has already been created by `installers/install_user.sh`
     _create_user_account_if_none_exist "$@"
-    setup_user_bashrc "${user_name}" "${group_name}"
+    setup_user_bashrc "${uid}" "${gid}" "${user_name}"
 }
 
 function grant_device_permissions() {
@@ -138,7 +134,6 @@ function main() {
     if [ "${user_name}" != "${group_name}" ]; then
         echo "Warning: user_name(${user_name}) != group_name(${group_name}) found."
     fi
-
     setup_user_account "$@"
     grant_device_permissions
 }
