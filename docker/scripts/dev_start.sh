@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 LOCAL_IMAGE="no"
@@ -24,7 +24,7 @@ FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-18.04-x86_64-20200507_0633"
+VERSION_X86_64="dev-18.04-x86_64-20200524_1125"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
@@ -346,10 +346,7 @@ function main(){
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
-    DOCKER_HOME="/home/$USER"
-    if [ "$USER" == "root" ];then
-        DOCKER_HOME="/root"
-    fi
+
     if [ ! -d "${CACHE_ROOT_DIR}" ]; then
         mkdir "${CACHE_ROOT_DIR}"
     fi
@@ -424,10 +421,8 @@ function main(){
     fi
     set +x
 
-    # User with uid=1000 or username=apollo excluded
-    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
-        && [[ $USER_ID -ne 1000 ]]; then
-        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+    if [[ "${USER}" != "root" ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_start_user.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"

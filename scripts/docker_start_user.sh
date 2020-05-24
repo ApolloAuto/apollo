@@ -16,26 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
-##========= General Purpose Functions ======================##
-function gid_by_group_name() {
-    local group_name="$1"
-    awk -v grp="${group_name}"  -F':'   '{
-        if ($1 == grp) printf("%s", $3);
-    }' /etc/group
-}
-
-function user_name_by_uid() {
-    local uid="$1"
-    awk -v uid="${uid}" -F':'   '{
-        if ($3 == uid) printf("%s", $1);
-    }' /etc/passwd
-}
-
 ##===========================================================##
 
 # TODO(storypku):
-# Save these rc files to /opt/apollo/misc when docker build image
-# and copied to user's `$HOME` directory when docker_start_user.sh
+# Save these rc files to /opt/apollo/rcfiles in docker build stage.
+# and copied to user's `$HOME` directory with docker_start_user.sh
 # Ref: https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 IFS='' read -r -d '' BASHRC_TEXT << EOF
 export PATH="\$PATH:/apollo/scripts:/usr/local/miniconda/bin"
@@ -52,36 +37,15 @@ EOF
 
 ##===========================================================##
 
-function _create_user_account_if_none_exist() {
+function _create_user_account() {
     local user_name="$1"
     local uid="$2"
     local group_name="$3"
     local gid="$4"
-    # man 5 passwd
-    if grep -q "^${user_name}:x:" /etc/passwd ; then
-        echo "Oops, USER ${user_name} already exist. Exiting..."
-        return 1
-    fi
-    # man 5 group
-    if grep -q "^${group_name}:x:" /etc/group; then # group name already exist
-        echo "Group ${group_name} already exist."
-    elif grep -q ":x:${gid}:" /etc/group; then # gid taken while group_name available
-        echo "Group id ${gid} already taken. Create group without gid specified."
-        addgroup "${group_name}"
-        gid=$(gid_by_group_name "${group_name}")
-    else
-        addgroup --gid "${gid}" "${group_name}"
-    fi
+    addgroup --gid "${gid}" "${group_name}"
 
-    # Create user
-    somebody=$(user_name_by_uid "${uid}")
-    if [ -z "${somebody}" ]; then # uid not taken
-        adduser --disabled-password --force-badname --gecos '' \
+    adduser --disabled-password --force-badname --gecos '' \
             "${user_name}" --uid "${uid}" --gid "${gid}" # 2>/dev/null
-    else # uid already taken
-        adduser --disabled-password --force-badname --gecos '' \
-            "${user_name}" --gid "${gid}" # 2>/dev/null
-    fi
 
     usermod -aG sudo "${user_name}"
     return 0
@@ -93,9 +57,9 @@ function setup_user_bashrc() {
     local user_home="/home/$3"
     cp -rf /etc/skel/.{profile,bash*} "${user_home}"
     # Set user files ownership to current user, such as .bashrc, .profile, etc.
-    echo "${BASHRC_TEXT}" >> ${user_home}/.bashrc
-    echo "${LCOVRC_TEXT}" > ${user_home}/.lcovrc
-    chown -R ${uid}:${gid} "${user_home}"
+    echo "${BASHRC_TEXT}" >> "${user_home}/.bashrc"
+    echo "${LCOVRC_TEXT}" > "${user_home}/.lcovrc"
+    chown -R "${uid}:${gid}" "${user_home}"
 }
 
 function setup_user_account() {
@@ -103,8 +67,7 @@ function setup_user_account() {
     local uid="$2"
     local group_name="$3"
     local gid="$4"
-    # USER apollo has already been created by `installers/install_user.sh`
-    _create_user_account_if_none_exist "$@"
+    _create_user_account "$@"
     setup_user_bashrc "${uid}" "${gid}" "${user_name}"
 }
 
