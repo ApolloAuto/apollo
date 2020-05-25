@@ -16,15 +16,19 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+APOLLO_ROOT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P)"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+
+DOCKER_REPO="apolloauto/apollo"
+
+## TODO(storypku): differentiate HOST_ARCH WITH TARGET_ARCH
+ARCH="$(uname -m)"
 
 LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
-ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-18.04-20200519_0522"
+VERSION_X86_64="dev-x86_64-18.04-20200525_0533"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
@@ -71,12 +75,9 @@ EOF
 exit 0
 }
 
-function stop_containers()
-{
+function stop_containers() {
 running_containers=$(docker ps --format "{{.Names}}")
-
-for i in ${running_containers[*]}
-do
+for i in ${running_containers[*]} ; do
   if [[ "$i" =~ apollo_* ]];then
     printf %-*s 70 "stopping container: $i ..."
     docker stop $i > /dev/null
@@ -89,12 +90,10 @@ do
 done
 }
 
-function set_registry_mirrors()
-{
-sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
-sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
-service docker restart
-
+function set_registry_mirrors() {
+    sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
+    sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
+    service docker restart
 }
 
 if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
@@ -122,9 +121,7 @@ DEFAULT_TEST_MAPS=(
 MAP_VOLUME_CONF=""
 OTHER_VOLUME_CONF=""
 
-while [ $# -gt 0 ]
-do
-
+while [ $# -gt 0 ] ; do
     case "$1" in
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
@@ -148,7 +145,7 @@ do
         FAST_BUILD_MODE="yes"
         ;;
     -c|--china)
-       set_registry_mirrors
+        set_registry_mirrors
 	;;
     -f|--fast-test)
         FAST_TEST_MODE="yes"
@@ -170,9 +167,9 @@ do
         info "running without pulling docker image"
         ;;
     stop)
-	stop_containers
-	exit 0
-	;;
+	    stop_containers
+	    exit 0
+	    ;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -192,14 +189,9 @@ else
     exit 0
 fi
 
-if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
-fi
-
 if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
     VERSION="local_dev"
 fi
-
 
 APOLLO_DEV_IMAGE=${DOCKER_REPO}:$VERSION
 LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
@@ -239,8 +231,7 @@ function local_volumes() {
 }
 
 ## customized docker cmd
-function do_docker_image_inspect()
-{
+function do_docker_image_inspect() {
     docker image inspect -f {{.Config.Image}} $1 &> /dev/null
     if [ $? -ne 0 ];then
         error "Failed to find local docker image : $1"
@@ -248,8 +239,7 @@ function do_docker_image_inspect()
     fi
 }
 
-function do_docker_pull()
-{
+function do_docker_pull() {
     IMG=$1
     if [ "$NO_PULL_IMAGE" = "yes" ];then
         echo "Skipping pull docker image for $IMG"
@@ -374,7 +364,7 @@ function main() {
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
 
     local display=""
-    if [[ -z ${DISPLAY} ]];then
+    if [[ -z "${DISPLAY}" ]];then
         display=":0"
     else
         display="${DISPLAY}"
@@ -386,12 +376,9 @@ function main() {
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
-    DOCKER_HOME="/home/$USER"
-    if [ "$USER" == "root" ];then
-        DOCKER_HOME="/root"
-    fi
+
     if [ ! -d "${CACHE_ROOT_DIR}" ]; then
-        mkdir "${CACHE_ROOT_DIR}"
+        mkdir -p "${CACHE_ROOT_DIR}"
     fi
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
@@ -408,7 +395,7 @@ function main() {
         ${OTHER_VOLUME_CONF} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
-        -e USER=$USER \
+        -e USER="${USER}" \
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
@@ -433,14 +420,12 @@ function main() {
     fi
     set +x
 
-    # User with uid=1000 or username=apollo excluded
-    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
-        && [[ $USER_ID -ne 1000 ]]; then
-        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+    if [[ "${USER}" != "root" ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_start_user.sh'
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }
 
-main
+main "$@"

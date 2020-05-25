@@ -9,7 +9,7 @@ LABEL version="1.2"
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY installers /tmp/installers
-COPY misc /etc/misc
+COPY rcfiles /opt/apollo/rcfiles
 
 # Pre-downloaded tarballs
 COPY archive /tmp/archive

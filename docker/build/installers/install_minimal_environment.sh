@@ -53,6 +53,7 @@ apt-get -y update && \
     vim \
     sed \
     gawk \
+    bc \
     patch \
     tree \
     lsof \

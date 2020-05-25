@@ -15,14 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="cyber-x86_64-18.04-20200519_2255"
+VERSION_X86_64="cyber-x86_64-18.04-20200525_0253"
 VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
 VERSION_OPT=""
 
@@ -53,12 +53,11 @@ function check_agreement() {
 }
 
 function check_host_environment() {
-  echo 'Host environment checking done.'
+    echo 'Host environment checking done.'
 }
 
-function show_usage()
-{
-cat <<EOF
+function show_usage() {
+cat <EOF
 Usage: $(basename $0) [options] ...
 OPTIONS:
     -C                     Pull docker image from China mirror.
@@ -70,23 +69,20 @@ EOF
 exit 0
 }
 
-function stop_containers()
-{
-running_containers=$(docker ps --format "{{.Names}}")
-
-for i in ${running_containers[*]}
-do
-  if [[ "$i" =~ apollo_* ]];then
-    printf %-*s 70 "stopping container: $i ..."
-    if docker stop "$i" >/dev/null ; then
-      printf "\033[32m[DONE]\033[0m\n"
-    else
-      printf "\033[31m[FAILED]\033[0m\n"
-    fi
-  fi
-done
+function stop_containers() {
+    local running_containers
+    running_containers=$(docker ps --format "{{.Names}}")
+    for i in ${running_containers[*]} ; do
+        if [[ "$i" =~ apollo_* ]];then
+            printf %-*s 70 "stopping container: $i ..."
+            if docker stop "$i" >/dev/null ; then
+                printf "\033[32m[DONE]\033[0m\n"
+            else
+                printf "\033[31m[FAILED]\033[0m\n"
+            fi
+        fi
+    done
 }
-
 
 if [ ! -e /apollo ]; then
     sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
@@ -96,7 +92,7 @@ if [ -e /proc/sys/kernel ]; then
     echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
 fi
 
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
+source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
 check_agreement
 check_host_environment
 
@@ -155,8 +151,7 @@ if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
     VERSION="local_cyber_dev"
 fi
 
-
-IMG=${DOCKER_REPO}:$VERSION
+IMG="${DOCKER_REPO}:$VERSION"
 
 function local_volumes() {
     # Apollo root and bazel cache dirs are required.
@@ -224,7 +219,6 @@ function determine_gpu_use() {
 }
 
 function main(){
-
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $IMG"
     else
@@ -300,17 +294,15 @@ function main(){
 
 
     if [ "${ARCH}" == "x86_64" ]; then
-        # User with uid=1000 or username=apollo excluded
-        if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
-            && [[ $USER_ID -ne 1000 ]]; then
-            docker exec -u root "${APOLLO_CYBER}" bash -c '/apollo/scripts/docker_adduser.sh'
+        if [[ "${USER}" != "root" ]]; then
+            docker exec -u root "${APOLLO_CYBER}" bash -c '/apollo/scripts/docker_start_user.sh'
         fi
     else
-        warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_adduser.sh' for the first time when you get into the docker !!!"
+        warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_start_user.sh' for the first time when you get into the docker !!!"
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/cyber_into.sh"
     ok "Enjoy!"
 }
 
-main
+main "$@"
