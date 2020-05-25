@@ -424,7 +424,8 @@ function main() {
         docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_start_user.sh'
     fi
 
-    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
+    ok "Finished setting up Apollo docker environment. " \
+       "Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }
 

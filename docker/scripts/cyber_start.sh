@@ -15,12 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
+DOCKER_REPO="apolloauto/apollo"
+
+DOCKER_RUN="docker run"
+USE_GPU=0
+
 INCHINA="no"
 LOCAL_IMAGE="no"
-VERSION=""
+VERSION=
 ARCH=$(uname -m)
 VERSION_X86_64="cyber-x86_64-18.04-20200525_0253"
 VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
@@ -28,45 +34,48 @@ VERSION_OPT=""
 
 # Check whether user has agreed license agreement
 function check_agreement() {
-  local agreement_record="${HOME}/.apollo_agreement.txt"
-  if [ -e "$agreement_record" ]; then
-    return
-  fi
+    local agreement_record="${HOME}/.apollo_agreement.txt"
+    if [[ -e "${agreement_record}" ]]; then
+        return 0
+    fi
+    local agreement_file
+    agreement_file="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
+    if [[ ! -f "${agreement_file}" ]]; then
+        error "AGREEMENT ${agreement_file} does not exist."
+        exit 1
+    fi
 
-  AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
-  if [ ! -e "$AGREEMENT_FILE" ]; then
-    error "AGREEMENT $AGREEMENT_FILE does not exist."
-    exit 1
-  fi
-
-  cat "${AGREEMENT_FILE}"
-  local tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-  echo "${tip}"
-  read -n 1 user_agreed
-  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
-    cp $AGREEMENT_FILE $agreement_record
-    echo "$tip" >> $agreement_record
-    echo "$user_agreed" >> $agreement_record
-  else
-    exit 1
-  fi
+    cat "${agreement_file}"
+    local tip="Type 'y' or 'Y' to agree to the license agreement above, \
+or type any other key to exit:"
+    echo -n "${tip}"
+    read -r -n 1 user_agreed
+    echo
+    if [[ "${user_agreed}" == "y" || "${user_agreed}" == "Y" ]]; then
+        cp -f "${agreement_file}" "${agreement_record}"
+        echo
+        echo "${tip}" >> "${agreement_record}"
+        echo "${user_agreed}" >> "${agreement_record}"
+    else
+        exit 1
+    fi
 }
 
 function check_host_environment() {
-    echo 'Host environment checking done.'
+    echo "Done checking host environment."
 }
 
 function show_usage() {
-cat <EOF
-Usage: $(basename $0) [options] ...
+cat <<EOF
+Usage: $0 [options] ...
 OPTIONS:
-    -C                     Pull docker image from China mirror.
+    -g <us|cn>             Pull docker image from mirror registry based on geolocation.
     -h, --help             Display this help and exit.
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
+    -m <arch>              Specify docker image for a different CPU arch.
     stop                   Stop all running Apollo containers.
 EOF
-exit 0
 }
 
 function stop_containers() {
@@ -74,7 +83,7 @@ function stop_containers() {
     running_containers=$(docker ps --format "{{.Names}}")
     for i in ${running_containers[*]} ; do
         if [[ "$i" =~ apollo_* ]];then
-            printf %-*s 70 "stopping container: $i ..."
+            printf %-*s 70 "Now stopc ontainer: $i ..."
             if docker stop "$i" >/dev/null ; then
                 printf "\033[32m[DONE]\033[0m\n"
             else
@@ -84,13 +93,13 @@ function stop_containers() {
     done
 }
 
-if [ ! -e /apollo ]; then
-    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
-fi
-
-if [ -e /proc/sys/kernel ]; then
-    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
-fi
+# TODO(storypku): What does these do with apollo inside container
+# if [ ! -e /apollo ]; then
+#    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
+# fi
+# if [ -e /proc/sys/kernel ]; then
+#    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+# fi
 
 source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
 check_agreement
@@ -112,14 +121,15 @@ do
         ;;
     -h|--help)
         show_usage
+        exit 0
         ;;
     -l|--local)
         LOCAL_IMAGE="yes"
         ;;
     stop)
-	stop_containers
-	exit 0
-	;;
+        stop_containers
+        exit 0
+        ;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -139,9 +149,6 @@ else
     exit 0
 fi
 
-if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
-fi
 
 if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
@@ -179,43 +186,41 @@ function local_volumes() {
 }
 
 
-DOCKER_RUN="docker run"
-USE_GPU=0
-
 function determine_gpu_use() {
-  # Check nvidia-driver and GPU device
-  local nv_driver="nvidia-smi"
-  if [ ! -x "$(command -v ${nv_driver} )" ]; then
-    warning "No nvidia-driver found. CPU will be used"
-  elif [ -z "$(eval ${nv_driver} )" ]; then
-    warning "No GPU device found. CPU will be used."
-  else
-    USE_GPU=1
-  fi
-
-  # Try to use GPU inside container
-  local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-  if [ ${USE_GPU} -eq 1 ]; then
-    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-    if [ ! -z "$(which nvidia-docker)" ]; then
-      DOCKER_RUN="nvidia-docker run"
-      warning "nvidia-docker is deprecated. Please install latest docker " \
-              "and nvidia-container-toolkit as described by:"
-      warning "  ${nv_docker_doc}"
-    elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
-      if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
-        DOCKER_RUN="docker run --gpus all"
-      else
-        warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
-        USE_GPU=0
-      fi
+    # Check nvidia-driver and GPU device
+    local nv_driver="nvidia-smi"
+    if [ ! -x "$(command -v ${nv_driver} )" ]; then
+        warning "No nvidia-driver found. CPU will be used"
+    elif [ -z "$(eval ${nv_driver} )" ]; then
+        warning "No GPU device found. CPU will be used."
     else
-      USE_GPU=0
-      warning "Cannot access GPU from within container. Please install latest docker " \
-              "and nvidia-container-toolkit as described by: "
-      warning "  ${nv_docker_doc}"
+        USE_GPU=1
     fi
-  fi
+
+    # Try to use GPU inside container
+    local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
+    if [ ${USE_GPU} -eq 1 ]; then
+        if [ ! -z "$(which nvidia-docker)" ]; then
+            DOCKER_RUN="nvidia-docker run"
+            warning "nvidia-docker is deprecated. Please install latest docker " \
+                    "and nvidia-container-toolkit as described by:"
+            warning "  ${nv_docker_doc}"
+        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+            local docker_version
+            docker_version="$(docker version --format '{{.Server.Version}}')"
+            if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+                DOCKER_RUN="docker run --gpus all"
+            else
+                warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+                USE_GPU=0
+            fi
+        else
+            USE_GPU=0
+            warning "Cannot access GPU from within container. Please install latest docker " \
+                    "and nvidia-container-toolkit as described by: "
+            warning "  ${nv_docker_doc}"
+        fi
+    fi
 }
 
 function main(){
@@ -250,9 +255,10 @@ function main(){
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=$(hostname)
-    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
-        mkdir "${CACHE_ROOT_DIR}"
-    fi
+
+    # if [ ! -d "${CACHE_ROOT_DIR}" ]; then
+    #    mkdir "${CACHE_ROOT_DIR}"
+    # fi
 
     info "Starting docker container \"${APOLLO_CYBER}\" ..."
 
