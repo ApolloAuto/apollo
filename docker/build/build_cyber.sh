@@ -15,17 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 # Usage:
 #   ./build_cyber.sh [-l] -f <cyber.dockerfile> [-m <build|download>]
 # E.g.,
 #   ./build_cyber.sh -f ./cyber.aarch64.dockerfile -m download
-ARCH=$(uname -m)
 
+# Fail on first error.
+set -euo pipefail
+
+SUPPORTED_ARCHS=" x86_64 aarch64 "
 REPO=apolloauto/apollo
+UBT_LTS="18.04"
 LOCAL_DEV_TAG="${REPO}:local_cyber_dev"
 
 STAGE="cyber"
+HOST_ARCH="$(uname -m)"
+TARGET_ARCH=
 
 LOCAL_DEV_FLAG="no"
 MODE="download"
@@ -41,6 +46,25 @@ function print_usage() {
     echo "E.g.,"
     echo "${TAB}${prog_name} -f cyber.x86_64.dockerfile -m build"
     echo "${TAB}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
+}
+
+function determine_target_arch() {
+    local dockfile="$1"
+    IFS='.' read -ra __arr <<< "${dockfile}"
+    if [[ ${#__arr[@]} -ne 3 ]]; then
+        echo "Expected dockerfile with name [prefix_]<target>.<arch>.dockerfile"
+        echo "Got ${dockfile}. Exiting..."
+        exit 1
+    fi
+    IFS=' '
+
+    local arch="${__arr[1]}"
+    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
+        echo "Unsupported architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
+        exit 1
+    fi
+    TARGET_ARCH="${arch}"
+    return 0
 }
 
 function parse_arguments() {
@@ -94,11 +118,12 @@ function check_arguments() {
         echo "Dockfile not specified"
         exit 1
     fi
-    if [[ "$DOCKERFILE" == *${ARCH}* ]]; then
-        echo "Dockerfile to build: ${DOCKERFILE}"
-    else
-        echo "Dockerfile \"$DOCKERFILE\" doesn't match current architecture."
-        exit 1
+
+    # Set and check target arch
+    determine_target_arch "${DOCKERFILE}}"
+    if [[ "${TARGET_ARCH}" != "${HOST_ARCH}" ]]; then
+        echo "[WARNING] Host arch (${HOST_ARCH}) != Target Arch (${TARGET_ARCH}) " \
+             "for dockerfile \"$DOCKERFILE\""
     fi
 }
 
@@ -107,14 +132,12 @@ check_arguments
 
 CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
 TIME=$(date +%Y%m%d_%H%M)
-TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
-
-# Fail on first error.
-set -e
+TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
 
 echo "=====.=====.=====.=====  Docker Image Build for Cyber =====.=====.=====.====="
 echo "|  Docker build ${TAG}"
 echo "|  ${TAB}using dockerfile=${DOCKERFILE}"
+echo "|  ${TAB}TARGET_ARCH=${TARGET_ARCH}, HOST_ARCH=${HOST_ARCH}"
 echo "|  ${TAB}INSTALL_MODE=${MODE}, GEOLOC=${GEOLOC}"
 echo "=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.====="
 

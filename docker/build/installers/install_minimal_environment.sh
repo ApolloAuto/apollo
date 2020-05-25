@@ -22,16 +22,26 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 MY_GEO=$1; shift
+ARCH="$(uname -m)"
 
 ##----------------------------##
 ##  APT sources.list settings |
 ##----------------------------##
+. /tmp/installers/installer_base.sh
 
-if [ "$MY_GEO" == "cn" ]; then
-    cp -f /etc/misc/sources.list.cn /etc/apt/sources.list
-    sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
-else
-    sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+if [[ "${ARCH}" == "x86_64" ]]; then
+    if [[ "${MY_GEO}" == "cn" ]]; then
+        cp -f "${RCFILES_DIR}/sources.list.cn" /etc/apt/sources.list
+        # sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
+    else
+        sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+    fi
+else # us
+    if [[ "${MY_GEO}" == "cn" ]]; then
+        cp -f "${RCFILES_DIR}/sources.list.cn.aarch64" /etc/apt/sources.list
+    else
+        warning "TODO: /etc/apt/sources.list for ${MY_GEO}"
+    fi
 fi
 
 apt-get -y update && \
@@ -76,19 +86,20 @@ sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 ## Python Setings |
 ##----------------##
 
-if [[ "$GEOLOC" == "cn" ]]; then
-    # Mirror from Tsinghua Univ.
-    PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
-    #pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
-    #pip config set global.index-url "$PYPI_MIRROR"
-    python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
-    python3 -m pip config set global.index-url "$PYPI_MIRROR"
+if [[ "${MY_GEO}" == "cn" ]]; then
+    if [[ "${ARCH}" == "x86_64" ]]; then
+        # Mirror from Tsinghua Univ.
+        PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
+        python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
+        python3 -m pip config set global.index-url "$PYPI_MIRROR"
+    else
+        warning "TODO: PYPI_MIRROR for ${ARCH} for ${MY_GEO}"
+        python3 -m pip install --no-cache-dir pip -U
+    fi
 else
-    #pip install --no-cache-dir pip -U
     python3 -m pip install --no-cache-dir pip -U
 fi
 
-#pip install --no-cache-dir setuptools
 python3 -m pip install --no-cache-dir setuptools
 
 # Clean up.

@@ -64,6 +64,8 @@ function create_so_symlink() {
     done
 }
 
+export RCFILES_DIR="/opt/apollo/rcfiles"
+
 ARCHIVE_DIR=/tmp/archive
 
 # sha256sum was provided by coreutils
