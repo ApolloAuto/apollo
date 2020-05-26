@@ -101,26 +101,35 @@ OPTIONS:
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
     -m <arch>              Specify docker image for a different CPU arch.
-    stop                   Stop all running Apollo containers.
+    stop [-f|--force]      Stop all running Apollo containers. Use "-f" to force removal.
 EOF
 }
 
 function stop_all_apollo_containers_for_user() {
+    local force="$1"
     local running_containers
-    running_containers="$(docker ps --format '{{.Names}}')"
+    running_containers="$(docker ps -a --format '{{.Names}}')"
     for container in ${running_containers[*]} ; do
         if [[ "${container}" =~ apollo_.*_${USER} ]] ; then
             #printf %-*s 70 "Now stop container: ${container} ..."
             #printf "\033[32m[DONE]\033[0m\n"
             #printf "\033[31m[FAILED]\033[0m\n"
             info "Now stop container ${container} ..."
-            if docker stop "${container}"; then
+            if docker stop "${container}" >/dev/null; then
+                if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
+                    docker rm -f "${container}" >/dev/null
+                fi
                 info "Done."
             else
                 warning "Failed."
             fi
         fi
     done
+    if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
+        info "OK. Done stop and removal"
+    else
+        info "OK. Done stop."
+    fi
 }
 
 function parse_arguments() {
@@ -156,8 +165,9 @@ function parse_arguments() {
             _target_arch_check "${target_arch}"
             ;;
         stop)
+            local force="$1"; shift
             info "Now, stop all apollo containers created by ${USER} ..."
-            stop_all_apollo_containers_for_user
+            stop_all_apollo_containers_for_user "${force}"
             exit 0
             ;;
         *)
@@ -324,7 +334,7 @@ function setup_devices_and_mount_volumes() {
         16.04|18.04|20.04|*)
             ## Question(storypku): Any special considerations here ?
             if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-                volumes="${volumes} -v /dev:/dev "
+                volumes="${volumes} -v /dev:/dev"
             fi
             ;;
     esac
@@ -356,8 +366,9 @@ function determine_display() {
 
 function remove_existing_cyber_container() {
     if docker ps -a --format '{{.Names}}' | grep -q "${CYBER_CONTAINER}"; then
-        docker stop "${CYBER_CONTAINER}"
-        docker rm -v -f "${CYBER_CONTAINER}"
+        info "Removing existing cyber container ${CYBER_CONTAINER}"
+        docker stop "${CYBER_CONTAINER}" >/dev/null
+        docker rm -v -f "${CYBER_CONTAINER}" >/dev/null
     fi
 }
 
@@ -392,12 +403,16 @@ function check_multi_arch_support() {
 
     local qemu="multiarch/qemu-user-static"
     local refer="https://github.com/multiarch/qemu-user-static"
+    local qemu_cmd="docker run --rm --privileged ${qemu} --reset -p yes"
     if docker images --format "{{.Repository}}" |grep -q "${qemu}" ; then
+        info "Run: ${qemu_cmd}"
+        ## docker run --rm --privileged "${qemu}" --reset -p yes >/dev/null
+        eval "${qemu_cmd}" >/dev/null
         info "Multiarch support has been enabled. Ref: ${refer}"
     else
         warning "Multiarch support hasn't been enabled. Please make sure the"
-        warning "following command has been executed ONCE before continuing:"
-        warning "  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes"
+        warning "following command has been executed before continuing:"
+        warning "  ${qemu_cmd}"
         warning "Refer to ${refer} for more."
         exit 1
     fi
@@ -423,7 +438,8 @@ function start_cyber_container() {
     local display="$(determine_display)"
 
     set -x
-    ${DOCKER_RUN_CMD} -itd \
+    ${DOCKER_RUN_CMD} -it \
+        -d \
         --privileged \
         --name "${CYBER_CONTAINER}" \
         -e DISPLAY="${display}" \
