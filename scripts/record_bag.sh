@@ -28,7 +28,7 @@ function start() {
   # Start recording.
   record_bag_env_log
   LOG="/tmp/apollo_record.out"
-  NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
+  NUM_PROCESSES="$(pgrep -c -f "cyber_recorder record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup cyber_recorder record -a -i 60 -m 2048\
         /apollo/sensor/camera/obstacle/front_6mm \
