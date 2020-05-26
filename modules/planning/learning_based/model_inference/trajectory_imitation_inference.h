@@ -35,7 +35,8 @@ class TrajectoryConvRnnInference : public ModelInference {
   /**
    * @brief Constructor
    */
-  TrajectoryConvRnnInference();
+  explicit TrajectoryConvRnnInference(
+      const LearningModelInferenceTaskConfig& config);
 
   /**
    * @brief Destructor
@@ -50,7 +51,7 @@ class TrajectoryConvRnnInference : public ModelInference {
   /**
    * @brief load a learned model
    */
-  bool LoadModel() override;
+  bool LoadModel(const LearningModelInferenceTaskConfig& config) override;
 
   /**
    * @brief inference a learned model

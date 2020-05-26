@@ -50,13 +50,11 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   CHECK_NOTNULL(frame);
 
   const auto& config = config_.learning_model_inference_task_config();
-  const auto model_file = config.model_file();
-  ADEBUG << model_file;
 
   LearningDataFrame learning_data_frame;
   learning_data_frame.CopyFrom(frame->learning_data_frame());
 
-  TrajectoryConvRnnInference trajectory_conv_rnn_inference;
+  TrajectoryConvRnnInference trajectory_conv_rnn_inference(config);
   trajectory_conv_rnn_inference.Inference(&learning_data_frame);
 
   std::vector<common::TrajectoryPoint> trajectory_points;
