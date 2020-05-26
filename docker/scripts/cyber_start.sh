@@ -21,7 +21,7 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 VERSION_X86_64="cyber-x86_64-18.04-20200525_0253"
-VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
+VERSION_AARCH64="cyber-aarch64-18.04-20200525_0656"
 VERSION_LOCAL_CYBER="local_cyber_dev"
 CYBER_CONTAINER="apollo_cyber_${USER}"
 CYBER_INSIDE="in_cyber_docker"
@@ -456,12 +456,11 @@ function start_cyber_container() {
 }
 
 function after_run_setup() {
-    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-        if [[ "${USER}" != "root" ]]; then
-            docker exec -u root "${CYBER_CONTAINER}" \
-                bash -c '/apollo/scripts/docker_start_user.sh'
-        fi
-    else
+    if [[ "${USER}" != "root" ]]; then
+        docker exec -u root "${CYBER_CONTAINER}" \
+            bash -c '/apollo/scripts/docker_start_user.sh'
+    fi
+    if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
         warning "!!! Due to problem with 'docker exec' on Drive PX2 platform," \
                 "please run '/apollo/scripts/docker_start_user.sh' the first" \
                 "time you login into cyber docker !!!"
