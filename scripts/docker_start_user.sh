@@ -73,6 +73,12 @@ function grant_device_permissions() {
     [ -e /dev/camera/trafficlights ] && chmod a+rw /dev/camera/trafficlights
 }
 
+function setup_apollo_directories() {
+    local apollo_dir="/opt/apollo"
+    [[ -d "${apollo_dir}" ]] || mkdir -p "${apollo_dir}"
+    chown -R "${uid}:${gid}" "${apollo_dir}"
+}
+
 ##===================== Main ==============================##
 function main() {
     local user_name="$1"
@@ -87,6 +93,7 @@ function main() {
         echo "Warning: user_name(${user_name}) != group_name(${group_name}) found."
     fi
     setup_user_account "$@"
+    setup_apollo_directories "${uid}" "${gid}"
     grant_device_permissions
 }
 
