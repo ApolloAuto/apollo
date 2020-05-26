@@ -545,7 +545,3 @@ DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
              "time sec (second) of history trajectory points for a obstacle");
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
-DEFINE_bool(planning_use_cuda, true, "whether use cuda for model inference");
-DEFINE_string(test_model_path,
-              "/apollo/modules/planning/data/semantic_map/test_model.pt",
-              "testing model");
