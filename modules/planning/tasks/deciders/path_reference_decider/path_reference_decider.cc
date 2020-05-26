@@ -30,7 +30,8 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+using common::Status;
+using common::TrajectoryPoint;
 
 PathReferenceDecider::PathReferenceDecider(const TaskConfig &config)
     : Task(config) {}
@@ -63,6 +64,27 @@ Status PathReferenceDecider::Process(
 
   // use learning model output
   return Status::OK();
+}
+
+bool PathReferenceDecider::isValidPathReference(
+    const std::vector<TrajectoryPoint> &path_reference,
+    const std::vector<PathBoundary> &path_bounds) {
+  // choose only regular path_bound
+  const PathBoundary *regular_path_bound;
+  for (const auto path_bound : path_bounds) {
+    if (path_bound.label() == "regular") {
+      regular_path_bound = &path_bound;
+      break;
+    }
+  }
+  ADEBUG << regular_path_bound->label();
+  // loop over output trajectory points
+  // check if path reference point is valid or not
+  // 1. line segment formed by two adjacent boundary point
+  // has intersection with
+  // 2. ADC bounding box at trajectory point
+
+  return true;
 }
 
 }  // namespace planning

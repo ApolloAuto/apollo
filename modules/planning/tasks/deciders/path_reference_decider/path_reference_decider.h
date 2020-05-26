@@ -21,7 +21,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
+#include "modules/planning/common/path_boundary.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
@@ -37,6 +39,18 @@ class PathReferenceDecider : public Task {
  private:
   apollo::common::Status Process(const Frame *frame,
                                  const ReferenceLineInfo *reference_line_info);
+
+  /**
+   * @brief
+   *
+   * @param path_reference learning model output
+   * @param path_bound path boundaries for rule-based model
+   * @return true using learning model output as path reference
+   * @return false
+   */
+  bool isValidPathReference(
+      const std::vector<common::TrajectoryPoint> &path_reference,
+      const std::vector<PathBoundary> &path_bound);
 };
 
 }  // namespace planning
