@@ -41,7 +41,7 @@ class PathReferenceDecider : public Task {
                                  const ReferenceLineInfo *reference_line_info);
 
   /**
-   * @brief
+   * @brief check is learning model output is within path bounds
    *
    * @param path_reference learning model output
    * @param path_bound path boundaries for rule-based model
@@ -51,6 +51,14 @@ class PathReferenceDecider : public Task {
   bool isValidPathReference(
       const std::vector<common::TrajectoryPoint> &path_reference,
       const std::vector<PathBoundary> &path_bound);
+  /**
+   * @brief convert discrete path bounds to line segments
+   *
+   */
+  void PathBoundToLineSegments(
+      const PathBoundary *path_bound,
+      std::vector<std::vector<common::math::LineSegment2d>>
+          &path_bound_segments);
 };
 
 }  // namespace planning
