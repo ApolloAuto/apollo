@@ -17,8 +17,10 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/storytelling/frame_manager.h"
 #include "modules/storytelling/story_tellers/base_teller.h"
 
 namespace apollo {
@@ -26,6 +28,10 @@ namespace storytelling {
 
 class CloseToJunctionTeller : public BaseTeller {
  public:
+  CloseToJunctionTeller() = delete;
+  explicit CloseToJunctionTeller(
+      const std::shared_ptr<FrameManager>& frame_manager)
+      : frame_manager_(frame_manager) {}
   void Init(const StorytellingConfig& storytelling_conf) override;
   void Update(Stories* stories) override;
 
@@ -47,6 +53,7 @@ class CloseToJunctionTeller : public BaseTeller {
   std::string yield_sign_id_;
   double yield_sign_distance_;
   StorytellingConfig config_;
+  std::shared_ptr<FrameManager> frame_manager_;
 };
 
 }  // namespace storytelling

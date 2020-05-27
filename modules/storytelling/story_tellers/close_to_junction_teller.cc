@@ -21,7 +21,6 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/storytelling/common/storytelling_gflags.h"
-#include "modules/storytelling/frame_manager.h"
 
 namespace apollo {
 namespace storytelling {
@@ -255,15 +254,14 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
 
 void CloseToJunctionTeller::Init(const StorytellingConfig& storytelling_conf) {
   config_.CopyFrom(storytelling_conf);
-  auto* manager = FrameManager::Instance();
-  manager->CreateOrGetReader<ADCTrajectory>(
+  frame_manager_->CreateOrGetReader<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {
-  auto* manager = FrameManager::Instance();
-  static auto planning_reader = manager->CreateOrGetReader<ADCTrajectory>(
-      config_.topic_config().planning_trajectory_topic());
+  static auto planning_reader =
+      frame_manager_->CreateOrGetReader<ADCTrajectory>(
+          config_.topic_config().planning_trajectory_topic());
   const auto trajectory = planning_reader->GetLatestObserved();
   if (trajectory == nullptr || trajectory->trajectory_point().empty()) {
     AERROR << "Planning trajectory not ready.";
