@@ -35,6 +35,7 @@ bazel build \
     //modules/canbus/... \
     //modules/common/... \
     //modules/control/... \
+    //modules/data/... \
     //modules/monitor/... \
     //modules/routing/... \
     //modules/storytelling/... \
@@ -48,6 +49,7 @@ bazel test \
     //modules/canbus/... \
     //modules/common/... \
     //modules/control/... \
+    //modules/data/... \
     //modules/monitor/... \
     //modules/routing/... \
     //modules/storytelling/... \
@@ -69,7 +71,6 @@ bazel test $(bazel query //modules/tools/... except //modules/tools/visualizer/.
 # above when you finish.
 
 # TODO(?): bazel build //modules/contrib/...
-# TODO(xiaoxq): bazel build //modules/data/...
 # TODO(storypku): bazel build //modules/guardian/...
 # TODO(storypku): bazel build //modules/planning/...
 # TODO(storypku): bazel build //modules/map/...
