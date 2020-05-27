@@ -14,6 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#pragma once
+
+#include "modules/prediction/container/container_manager.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -28,7 +32,7 @@ class RightOfWay {
    * @brief Set right_of_way for all lane_sequence
    * @return Scenario features
    */
-  static void Analyze();
+  static void Analyze(ContainerManager* container_manager);
 };
 
 }  // namespace prediction

@@ -23,8 +23,9 @@ namespace prediction {
 
 ScenarioManager::ScenarioManager() {}
 
-void ScenarioManager::Run() {
-  auto environment_features = FeatureExtractor::ExtractEnvironmentFeatures();
+void ScenarioManager::Run(ContainerManager* container_manager) {
+  auto environment_features =
+      FeatureExtractor::ExtractEnvironmentFeatures(container_manager);
 
   auto ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
 

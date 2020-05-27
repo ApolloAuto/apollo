@@ -23,10 +23,13 @@ using apollo::common::adapter::AdapterConfig;
 
 class ScenarioManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() { manager_ = ScenarioManager::Instance(); }
+  virtual void SetUp() {
+    manager_ = ScenarioManager::Instance();
+    container_manager_.reset(new ContainerManager()); }
 
  protected:
   ScenarioManager* manager_ = nullptr;
+  std::unique_ptr<ContainerManager> container_manager_ = nullptr;
 };
 
 TEST_F(ScenarioManagerTest, init) {
@@ -37,14 +40,14 @@ TEST_F(ScenarioManagerTest, init) {
 
 TEST_F(ScenarioManagerTest, run) {
   // TODO(kechxu) add unit tests with concrete contents
-  ContainerManager::Instance()->RegisterContainers();
+  container_manager_->RegisterContainers();
   std::unique_ptr<Container> adc_traj_container =
-      ContainerManager::Instance()->CreateContainer(
+      container_manager_->CreateContainer(
           AdapterConfig::PLANNING_TRAJECTORY);
   std::unique_ptr<Container> pose_container =
-      ContainerManager::Instance()->CreateContainer(
+      container_manager_->CreateContainer(
           AdapterConfig::LOCALIZATION);
-  manager_->Run();
+  manager_->Run(container_manager_.get());
   const auto& scenario = manager_->scenario();
   EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
