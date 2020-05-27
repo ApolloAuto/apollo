@@ -169,10 +169,6 @@ class Frame {
     return pad_msg_driving_action_;
   }
 
-  std::list<ReferenceLineInfo>* mutable_reference_line_infos() {
-    return &reference_line_info_;
-  }
-
   const LearningDataFrame &learning_data_frame() const {
       return learning_data_frame_; }
 
