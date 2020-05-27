@@ -20,8 +20,12 @@
 #include "modules/planning/tasks/deciders/path_reference_decider/path_reference_decider.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/line_segment2d.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -30,8 +34,12 @@
 namespace apollo {
 namespace planning {
 
+using common::SLPoint;
 using common::Status;
 using common::TrajectoryPoint;
+using common::math::Box2d;
+using common::math::LineSegment2d;
+using common::math::Vec2d;
 
 PathReferenceDecider::PathReferenceDecider(const TaskConfig &config)
     : Task(config) {}
@@ -82,9 +90,76 @@ bool PathReferenceDecider::isValidPathReference(
   // check if path reference point is valid or not
   // 1. line segment formed by two adjacent boundary point
   // has intersection with
-  // 2. ADC bounding box at trajectory point
+  for (const auto path_reference_point : path_reference) {
+    // add ADC box to current path_reference_point
+    const auto &path_point = path_reference_point.path_point();
+    Box2d vehicle_box =
+        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+    std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
+    for (const Vec2d &corner_point : ABCDpoints) {
+      // For each corner point, project it onto reference_line
+      ADEBUG << "[" << corner_point.x() << "," << corner_point.y() << "]";
+    }
+  }
 
+  // TODO(SHU) check intersection of linesegments and adc boxes
   return true;
+}
+
+void PathReferenceDecider::PathBoundToLineSegments(
+    const PathBoundary *path_bound,
+    std::vector<std::vector<LineSegment2d>> &path_bound_segments) {
+  const double start_s = path_bound->start_s();
+  const double delta_s = path_bound->delta_s();
+  const size_t path_bound_size = path_bound->boundary().size();
+  std::vector<LineSegment2d> cur_left_bound_segments;
+  std::vector<LineSegment2d> cur_right_bound_segments;
+  const std::vector<std::pair<double, double>> &path_bound_points =
+      path_bound->boundary();
+  // setup the init path bound point
+  SLPoint prev_left_sl_point;
+  SLPoint prev_right_sl_point;
+  prev_left_sl_point.set_l(std::get<0>(path_bound_points[0]));
+  prev_left_sl_point.set_s(start_s);
+  prev_right_sl_point.set_l(std::get<1>(path_bound_points[0]));
+  prev_right_sl_point.set_s(start_s);
+  // slpoint to cartesion point
+  Vec2d prev_left_cartesian_point;
+  Vec2d prev_right_cartesian_point;
+  reference_line_info_->reference_line().SLToXY(prev_left_sl_point,
+                                                &prev_left_cartesian_point);
+  reference_line_info_->reference_line().SLToXY(prev_right_sl_point,
+                                                &prev_right_cartesian_point);
+  for (size_t i = 1; i < path_bound_size; ++i) {
+    // s = start_s + i * delta_s
+    double current_s = start_s + i * delta_s;
+    SLPoint left_sl_point;
+    Vec2d left_cartesian_point;
+    SLPoint right_sl_point;
+    Vec2d right_cartesian_point;
+
+    left_sl_point.set_l(std::get<0>(path_bound_points[i]));
+    left_sl_point.set_s(current_s);
+    right_sl_point.set_l(std::get<1>(path_bound_points[i]));
+    right_sl_point.set_s(current_s);
+
+    reference_line_info_->reference_line().SLToXY(left_sl_point,
+                                                  &left_cartesian_point);
+    reference_line_info_->reference_line().SLToXY(right_sl_point,
+                                                  &right_cartesian_point);
+
+    // together with previous point form line segment
+    LineSegment2d cur_left_segment(prev_left_cartesian_point,
+                                   left_cartesian_point);
+    LineSegment2d cur_right_segment(prev_right_cartesian_point,
+                                    right_cartesian_point);
+    prev_left_cartesian_point = left_cartesian_point;
+    prev_right_cartesian_point = right_cartesian_point;
+    cur_left_bound_segments.emplace_back(cur_left_segment);
+    cur_right_bound_segments.emplace_back(cur_right_segment);
+  }
+  path_bound_segments.emplace_back(cur_left_bound_segments);
+  path_bound_segments.emplace_back(cur_right_bound_segments);
 }
 
 }  // namespace planning
