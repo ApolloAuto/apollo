@@ -56,6 +56,7 @@
 // headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/anchor_mask_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/common.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/params.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/postprocess_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points_cuda.h"
@@ -120,9 +121,6 @@ class PointPillars {
   static const int kGridYSize;
   static const int kGridZSize;
   static const int kRpnInputSize;
-//  static const int kNumAnchorXInds;
-//  static const int kNumAnchorYInds;
-//  static const int kNumAnchorPerLoc;
   static const int kNumAnchor;
   static const int kNumOutputBoxFeature;
   static const int kRpnBoxOutputSize;

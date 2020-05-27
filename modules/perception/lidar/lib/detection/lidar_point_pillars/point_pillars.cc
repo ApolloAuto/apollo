@@ -42,21 +42,21 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-const float PointPillars::kPillarXSize = 0.25f;
-const float PointPillars::kPillarYSize = 0.25f;
-const float PointPillars::kPillarZSize = 8.0f;
-const float PointPillars::kMinXRange = -50.0f;
-const float PointPillars::kMinYRange = -50.0f;
-const float PointPillars::kMinZRange = -5.0f;
-const float PointPillars::kMaxXRange = 50.0f;
-const float PointPillars::kMaxYRange = 50.0f;
-const float PointPillars::kMaxZRange = 3.0f;
-const float PointPillars::kSensorHeight = 1.73f;
+const float PointPillars::kPillarXSize = Params::kPillarXSize;
+const float PointPillars::kPillarYSize = Params::kPillarYSize;
+const float PointPillars::kPillarZSize = Params::kPillarZSize;
+const float PointPillars::kMinXRange = Params::kMinXRange;
+const float PointPillars::kMinYRange = Params::kMinYRange;
+const float PointPillars::kMinZRange = Params::kMinZRange;
+const float PointPillars::kMaxXRange = Params::kMaxXRange;
+const float PointPillars::kMaxYRange = Params::kMaxYRange;
+const float PointPillars::kMaxZRange = Params::kMaxZRange;
+const float PointPillars::kSensorHeight = Params::kSensorHeight;
 // TODO(chenjiahao): kSensorHeight need to get from sensor's height param
-const int PointPillars::kNumClass = 10;
-const int PointPillars::kMaxNumPillars = 30000;
-const int PointPillars::kMaxNumPointsPerPillar = 60;
-const int PointPillars::kNumPointFeature = 4;
+const int PointPillars::kNumClass = Params::kNumClass;
+const int PointPillars::kMaxNumPillars = Params::kMaxNumPillars;
+const int PointPillars::kMaxNumPointsPerPillar = Params::kMaxNumPointsPerPillar;
+const int PointPillars::kNumPointFeature = Params::kNumPointFeature;
 const int PointPillars::kPfeOutputSize = kMaxNumPillars * 64;
 const int PointPillars::kGridXSize =
     static_cast<int>((kMaxXRange - kMinXRange) / kPillarXSize);
@@ -65,53 +65,34 @@ const int PointPillars::kGridYSize =
 const int PointPillars::kGridZSize =
     static_cast<int>((kMaxZRange - kMinZRange) / kPillarZSize);
 const int PointPillars::kRpnInputSize = 64 * kGridXSize * kGridYSize;
-const int PointPillars::kNumAnchor = 100 * 100 * 12 + 160 * 160 * 8;
-const int PointPillars::kNumOutputBoxFeature = 7;
+const int PointPillars::kNumAnchor = Params::kNumAnchor;
+const int PointPillars::kNumOutputBoxFeature = Params::kNumOutputBoxFeature;
 const int PointPillars::kRpnBoxOutputSize = kNumAnchor * kNumOutputBoxFeature;
 const int PointPillars::kRpnClsOutputSize = kNumAnchor * kNumClass;
 const int PointPillars::kRpnDirOutputSize = kNumAnchor * 2;
-const int PointPillars::kBatchSize = 1;
-const int PointPillars::kNumIndsForScan = 512;
-const int PointPillars::kNumThreads = 64;
+const int PointPillars::kBatchSize = Params::kBatchSize;
+const int PointPillars::kNumIndsForScan = Params::kNumIndsForScan;
+const int PointPillars::kNumThreads = Params::kNumThreads;
 // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
 // common.h
-const int PointPillars::kNumBoxCorners = 4;
+const int PointPillars::kNumBoxCorners = Params::kNumBoxCorners;
 // TODO(chenjiahao): kNumBoxCorners is actually used as kNumPointFeature
-const std::vector<int> PointPillars::kAnchorStrides{4, 2};
+const std::vector<int> PointPillars::kAnchorStrides = Params::AnchorStrides();
 const std::vector<int> PointPillars::kAnchorRanges{
     0, kGridXSize, 0, kGridYSize,
     static_cast<int>(kGridXSize * 0.1), static_cast<int>(kGridXSize * 0.9),
     static_cast<int>(kGridYSize * 0.1), static_cast<int>(kGridYSize * 0.9)};
-const std::vector<int> PointPillars::kNumAnchorSets{12, 8};
-const std::vector<std::vector<float>> PointPillars::kAnchorDxSizes{
-    std::vector<float>{2.94046906f, 1.95017717f, 2.73050468f,
-                       3.0f, 2.0f, 2.4560939f},
-    std::vector<float>{2.49008838f, 0.60058911f, 0.76279481f,
-                       0.66344886f, 0.39694519f}};
-const std::vector<std::vector<float>> PointPillars::kAnchorDySizes{
-    std::vector<float>{11.1885991, 4.60718145f, 6.38352896f,
-                       15.0f, 3.0f, 6.73778078f},
-    std::vector<float>{0.48578221f, 1.68452161f, 2.09973778f,
-                       0.7256437f, 0.40359262f}};
-const std::vector<std::vector<float>> PointPillars::kAnchorDzSizes{
-    std::vector<float>{3.47030982f, 1.72270761f, 3.13312415f,
-                       3.8f, 3.8f, 2.73004906f},
-    std::vector<float>{0.98297065f, 1.27192197f, 1.44403034f,
-                       1.75748069f, 1.06232151f}};
-const std::vector<std::vector<int>> PointPillars::kNumAnchorRo{
-    std::vector<int>{2, 2, 2, 2, 2, 2}, std::vector<int>{2, 2, 2, 1, 1}};
-const std::vector<std::vector<float>> PointPillars::kAnchorRo{
-    std::vector<float>{0, M_PI / 2,
-                       0, M_PI / 2,
-                       0, M_PI / 2,
-                       0, M_PI / 2,
-                       0, M_PI / 2,
-                       0, M_PI / 2},
-    std::vector<float>{0, M_PI / 2,
-                       0, M_PI / 2,
-                       0, M_PI / 2,
-                       0,
-                       0}};
+const std::vector<int> PointPillars::kNumAnchorSets = Params::NumAnchorSets();
+const std::vector<std::vector<float>> PointPillars::kAnchorDxSizes =
+    Params::AnchorDxSizes();
+const std::vector<std::vector<float>> PointPillars::kAnchorDySizes =
+    Params::AnchorDySizes();
+const std::vector<std::vector<float>> PointPillars::kAnchorDzSizes =
+    Params::AnchorDzSizes();
+const std::vector<std::vector<int>> PointPillars::kNumAnchorRo =
+    Params::NumAnchorRo();
+const std::vector<std::vector<float>> PointPillars::kAnchorRo =
+    Params::AnchorRo();
 
 PointPillars::PointPillars(const bool reproduce_result_mode,
                            const float score_threshold,
