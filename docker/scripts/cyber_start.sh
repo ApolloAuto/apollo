@@ -401,6 +401,10 @@ function check_multi_arch_support() {
     fi
     info "Cyber ${TARGET_ARCH} container running on ${HOST_ARCH} host."
 
+    # Note(storypku):
+    # ubuntu 18.04: apt-get -y install qemu-user-static
+    # with sudo-no-suid problem
+
     local qemu="multiarch/qemu-user-static"
     local refer="https://github.com/multiarch/qemu-user-static"
     local qemu_cmd="docker run --rm --privileged ${qemu} --reset -p yes"
