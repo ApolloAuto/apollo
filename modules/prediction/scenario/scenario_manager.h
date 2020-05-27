@@ -29,7 +29,7 @@ class ScenarioManager {
   /**
    * @brief Run scenario analysis
    */
-  void Run();
+  void Run(ContainerManager* container_manager);
 
   /**
    * @brief Get scenario analysis result

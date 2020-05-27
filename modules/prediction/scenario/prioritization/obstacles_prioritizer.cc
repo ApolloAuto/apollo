@@ -24,7 +24,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
-#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/container/storytelling/storytelling_container.h"
@@ -89,11 +88,13 @@ int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
 
 }  // namespace
 
-ObstaclesPrioritizer::ObstaclesPrioritizer() {}
+ObstaclesPrioritizer::ObstaclesPrioritizer(
+    const std::shared_ptr<ContainerManager>& container_manager)
+    : container_manager_(container_manager) {}
 
 void ObstaclesPrioritizer::AssignIgnoreLevel() {
   auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager_->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   if (obstacles_container == nullptr) {
     AERROR << "Obstacles container pointer is a null pointer.";
@@ -170,7 +171,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
   auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager_->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   if (obstacles_container == nullptr) {
     AERROR << "Obstacles container pointer is a null pointer.";
@@ -187,7 +188,7 @@ void ObstaclesPrioritizer::AssignCautionLevel() {
     return;
   }
   auto storytelling_container =
-      ContainerManager::Instance()->GetContainer<StoryTellingContainer>(
+      container_manager_->GetContainer<StoryTellingContainer>(
           AdapterConfig::STORYTELLING);
   if (storytelling_container->ADCDistanceToJunction() <
       FLAGS_junction_distance_threshold) {
@@ -250,7 +251,7 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane(
 void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane(
     const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
   ADCTrajectoryContainer* ego_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+      container_manager_->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
   const Feature& ego_latest_feature = ego_vehicle.latest_feature();
   for (const LaneSequence& lane_sequence :
@@ -298,7 +299,7 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane(
 void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
     const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
   ADCTrajectoryContainer* adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+      container_manager_->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
   if (adc_trajectory_container == nullptr) {
     AERROR << "adc_trajectory_container is nullptr";
@@ -376,7 +377,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
 void ObstaclesPrioritizer::AssignCautionLevelPedestrianByEgoReferenceLine(
     const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
   ADCTrajectoryContainer* adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+      container_manager_->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
   if (adc_trajectory_container == nullptr) {
     AERROR << "adc_trajectory_container is nullptr";
@@ -445,8 +446,7 @@ void ObstaclesPrioritizer::AssignCautionLevelPedestrianInFront(
       obstacles_container->curr_frame_movable_obstacle_ids();
   for (const int obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
-    if (!obstacle_ptr->IsPedestrian() ||
-        obstacle_ptr->history_size() == 0) {
+    if (!obstacle_ptr->IsPedestrian() || obstacle_ptr->history_size() == 0) {
       continue;
     }
     const Feature& obs_feature = obstacle_ptr->latest_feature();
@@ -454,8 +454,8 @@ void ObstaclesPrioritizer::AssignCautionLevelPedestrianInFront(
     double obs_y = obs_feature.position().y();
     double diff_x = obs_x - ego_position.x();
     double diff_y = obs_y - ego_position.y();
-    double inner_prod = std::cos(ego_heading) * diff_x +
-                        std::sin(ego_heading) * diff_y;
+    double inner_prod =
+        std::cos(ego_heading) * diff_x + std::sin(ego_heading) * diff_y;
     if (inner_prod < 0.0) {
       continue;
     }

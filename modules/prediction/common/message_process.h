@@ -21,10 +21,15 @@
 #pragma once
 
 #include <string>
+#include <memory>
+
 #include "cyber/proto/record.pb.h"
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/evaluator/evaluator_manager.h"
+#include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/storytelling/proto/story.pb.h"
@@ -36,29 +41,44 @@ class MessageProcess {
  public:
   MessageProcess() = delete;
 
-  static bool Init(const PredictionConf &prediction_conf);
+  static bool Init(ContainerManager *container_manager,
+                   EvaluatorManager *evaluator_manager,
+                   PredictorManager *predictor_manager,
+                   const PredictionConf &prediction_conf);
 
-  static bool InitContainers();
+  static bool InitContainers(ContainerManager *container_manager);
 
-  static bool InitEvaluators(const PredictionConf &prediction_conf);
+  static bool InitEvaluators(EvaluatorManager *evaluator_manager,
+                             const PredictionConf &prediction_conf);
 
-  static bool InitPredictors(const PredictionConf &prediction_conf);
+  static bool InitPredictors(PredictorManager *predictor_manager,
+                             const PredictionConf &prediction_conf);
 
   static void ContainerProcess(
+      const std::shared_ptr<ContainerManager> &container_manager,
       const perception::PerceptionObstacles &perception_obstacles);
 
   static void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles,
+      const std::shared_ptr<ContainerManager> &container_manager,
+      EvaluatorManager *evaluator_manager, PredictorManager *predictor_manager,
       PredictionObstacles *const prediction_obstacles);
 
   static void OnLocalization(
+      ContainerManager *container_manager,
       const localization::LocalizationEstimate &localization);
 
-  static void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+  static void OnPlanning(ContainerManager *container_manager,
+                         const planning::ADCTrajectory &adc_trajectory);
 
-  static void OnStoryTelling(const storytelling::Stories &story);
+  static void OnStoryTelling(ContainerManager *container_manager,
+                             const storytelling::Stories &story);
 
-  static void ProcessOfflineData(const std::string &record_filepath);
+  static void ProcessOfflineData(
+      const PredictionConf &prediction_conf,
+      const std::shared_ptr<ContainerManager> &container_manager,
+      EvaluatorManager *evaluator_manager, PredictorManager *predictor_manager,
+      const std::string &record_filepath);
 };
 
 }  // namespace prediction
