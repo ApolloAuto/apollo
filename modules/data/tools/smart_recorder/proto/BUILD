@@ -6,6 +6,25 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "smart_recorder_triggers_cc_proto",
+    deps = [
+        ":smart_recorder_triggers_proto",
+    ],
+)
+
+proto_library(
+    name = "smart_recorder_triggers_proto",
+    srcs = ["smart_recorder_triggers.proto"],
+)
+
+py_proto_library(
+    name = "smart_recorder_triggers_py_pb2",
+    deps = [
+        ":smart_recorder_triggers_proto",
+    ],
+)
+
+cc_proto_library(
     name = "smart_recorder_status_cc_proto",
     deps = [
         ":smart_recorder_status_proto",
@@ -24,24 +43,5 @@ py_proto_library(
     name = "smart_recorder_status_py_pb2",
     deps = [
         ":smart_recorder_status_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "smart_recorder_triggers_cc_proto",
-    deps = [
-        ":smart_recorder_triggers_proto",
-    ],
-)
-
-proto_library(
-    name = "smart_recorder_triggers_proto",
-    srcs = ["smart_recorder_triggers.proto"],
-)
-
-py_proto_library(
-    name = "smart_recorder_triggers_py_pb2",
-    deps = [
-        ":smart_recorder_triggers_proto",
     ],
 )
