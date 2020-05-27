@@ -12,7 +12,7 @@ stage_config: {
   task_config: {
     task_type: LEARNING_MODEL_INFERENCE_TASK
     learning_model_inference_task_config {
-      model_file: "/apollo/modules/planning/data/semantic_map/test_model.pt"
+      model_file: "/apollo/modules/planning/data/model/test_model.pt"
       use_cuda: true
     }
   }
