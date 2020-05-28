@@ -73,7 +73,7 @@ class MessageProcess {
 
     apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
       const apollo::common::PointENU& position);
-  int GetADCCurrentRoutingIndex();
+  bool GetADCCurrentRoutingIndex(int* road_index, double* road_s);
 
   int GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
@@ -90,8 +90,11 @@ class MessageProcess {
 
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
-  void GenerateRoutingFeature(const int routing_index,
-                              LearningDataFrame* learning_data_frame);
+  bool GenerateLocalRoutingPassages(
+      std::vector<std::vector<std::pair<std::string, double>>>*
+          local_routing_passages);
+
+  void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
 
   void GenerateTrafficLightDetectionFeature(
       LearningDataFrame* learning_data_frame);
@@ -118,7 +121,7 @@ class MessageProcess {
   ChassisFeature chassis_feature_;
   std::string map_name_;
   std::vector<OverlapFeature> overlaps_;
-  std::vector<std::pair<std::string, double>> routing_lane_segment_;
+  apollo::routing::RoutingResponse routing_response_;
   double traffic_light_detection_message_timestamp_;
   std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;
