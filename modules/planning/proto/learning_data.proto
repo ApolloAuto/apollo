@@ -10,6 +10,7 @@ import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
+import "modules/routing/proto/routing.proto";
 
 message OverlapFeature {
   optional string id = 1;
@@ -160,8 +161,14 @@ message ObstacleFeature {
   optional PredictionObstacleFeature obstacle_prediction = 7;
 }
 
+// based on apollo.routing.RoutingResponse
+message RoutingResponseFeature {
+  repeated apollo.routing.RoadSegment road = 1;
+  optional apollo.routing.Measurement measurement = 2;
+}
+
 message RoutingFeature {
-  repeated string routing_lane_id = 1;
+  optional RoutingResponseFeature routing_response = 1;
   repeated string local_routing_lane_id = 2;  // local routing close to ADC
 }
 
