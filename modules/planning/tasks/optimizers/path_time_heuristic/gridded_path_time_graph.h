@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
@@ -44,7 +44,7 @@ namespace planning {
 class GriddedPathTimeGraph {
  public:
   GriddedPathTimeGraph(const StGraphData& st_graph_data,
-                       const DpStSpeedConfig& dp_config,
+                       const DpStSpeedOptimizerConfig& dp_config,
                        const std::vector<const Obstacle*>& obstacles,
                        const common::TrajectoryPoint& init_point);
 
@@ -90,7 +90,7 @@ class GriddedPathTimeGraph {
   std::vector<double> spatial_distance_by_index_;
 
   // dp st configuration
-  DpStSpeedConfig gridded_path_time_graph_config_;
+  DpStSpeedOptimizerConfig gridded_path_time_graph_config_;
 
   // obstacles based on the current reference line
   const std::vector<const Obstacle*>& obstacles_;

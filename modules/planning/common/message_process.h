@@ -35,6 +35,7 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
@@ -42,7 +43,7 @@ namespace planning {
 
 class MessageProcess {
  public:
-  bool Init();
+  bool Init(const PlanningConfig& planning_config);
   void Close();
 
   void OnChassis(const apollo::canbus::Chassis& chassis);
@@ -102,6 +103,7 @@ class MessageProcess {
   void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
+  PlanningConfig planning_config_;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
   std::string record_file_;

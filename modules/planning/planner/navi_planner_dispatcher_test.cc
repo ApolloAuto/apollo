@@ -18,11 +18,11 @@
  * @file
  **/
 
-#include "modules/planning/planner/navi_planner_dispatcher.h"
-
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "modules/planning/planner/planner_dispatcher.h"
+#include "modules/planning/planner/navi_planner_dispatcher.h"
 
 namespace apollo {
 namespace planning {
@@ -38,7 +38,14 @@ class NaviPlannerDispatcherTest : public ::testing::Test {
 TEST_F(NaviPlannerDispatcherTest, Simple) {
   pd_.reset(new NaviPlannerDispatcher());
   pd_->Init();
-  auto planner = pd_->DispatchPlanner();
+
+  const std::string planning_config_file =
+      "/apollo/modules/planning/conf/planning_config.pb.txt";
+  PlanningConfig planning_config;
+  apollo::cyber::common::GetProtoFromFile(planning_config_file,
+                                          &planning_config);
+  auto planner = pd_->DispatchPlanner(planning_config);
+
   EXPECT_EQ(planner->Name(), "NAVI");
 }
 

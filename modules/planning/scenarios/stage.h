@@ -84,6 +84,9 @@ class Stage {
   bool ExecuteTaskOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool ExecuteTaskOnReferenceLineForOnlineLearning(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
   bool ExecuteTaskOnOpenSpace(Frame* frame);
 
   virtual Stage::StageStatus FinishScenario();

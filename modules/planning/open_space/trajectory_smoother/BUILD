@@ -1,5 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
+# TODO(xiaoxq): Disable CUDA in planning temporarily.
+# load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -96,7 +97,8 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
-        ":distance_approach_ipopt_cuda_interface",
+        # TODO(xiaoxq): Disable CUDA in planning temporarily.
+        # ":distance_approach_ipopt_cuda_interface",
         ":distance_approach_ipopt_fixed_dual_interface",
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
@@ -240,37 +242,38 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "distance_approach_ipopt_cuda_interface",
-    srcs = ["distance_approach_ipopt_cuda_interface.cc"] + select({
-        "//tools/platforms:use_gpu": [
-            "planning_block.h",
-            ":planning_block",
-        ],
-        "//conditions:default": [],
-    }),
-    hdrs = [
-        "distance_approach_interface.h",
-        "distance_approach_ipopt_cuda_interface.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math",
-        "//modules/common/util",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
-        "//third_party:openmp",
-        "@eigen",
-    ],
-)
+# TODO(xiaoxq): Disable CUDA in planning temporarily.
+# cc_library(
+#     name = "distance_approach_ipopt_cuda_interface",
+#     srcs = ["distance_approach_ipopt_cuda_interface.cc"] + select({
+#         "//tools/platforms:use_gpu": [
+#             "planning_block.h",
+#             ":planning_block",
+#         ],
+#        "//conditions:default": [],
+#    }),
+#    hdrs = [
+#        "distance_approach_interface.h",
+#        "distance_approach_ipopt_cuda_interface.h",
+#    ],
+#    copts = [
+#        "-DMODULE_NAME=\\\"planning\\\"",
+#        "-fopenmp",
+#    ],
+#    deps = [
+#        "//cyber/common:log",
+#        "//modules/common/configs:vehicle_config_helper",
+#        "//modules/common/math",
+#        "//modules/common/util",
+#        "//modules/planning/common:planning_gflags",
+#        "//modules/planning/proto:planner_open_space_config_proto",
+#        "//modules/planning/proto:planning_proto",
+#        "//third_party:adolc",
+#        "//third_party:ipopt",
+#        "//third_party:openmp",
+#        "@eigen",
+#    ],
+#)
 
 cc_library(
     name = "iterative_anchoring_smoother",
@@ -289,14 +292,15 @@ cc_library(
     ],
 )
 
-cuda_library(
-    name = "planning_block",
-    srcs = ["planning_block.cu"],
-    hdrs = ["planning_block.h"],
-    deps = [
-        "//third_party:cuda",
-    ],
-)
+# TODO(xiaoxq): Disable CUDA in planning temporarily.
+# cuda_library(
+#     name = "planning_block",
+#     srcs = ["planning_block.cu"],
+#     hdrs = ["planning_block.h"],
+#     deps = [
+#         "//third_party:cuda",
+#     ],
+# )
 
 cc_test(
     name = "distance_approach_ipopt_interface_test",
@@ -314,21 +318,21 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "distance_approach_ipopt_cuda_interface_test",
-    size = "small",
-    srcs = ["distance_approach_ipopt_cuda_interface_test.cc"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
-    deps = [
-        ":distance_approach_ipopt_cuda_interface",
-        "//cyber/common:log",
-        "//third_party:openmp",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
+# TODO(xiaoxq): Disable CUDA in planning temporarily.
+# cc_test(
+#     name = "distance_approach_ipopt_cuda_interface_test",
+#     size = "small",
+#     srcs = ["distance_approach_ipopt_cuda_interface_test.cc"],
+#     copts = [
+#         "-DMODULE_NAME=\\\"planning\\\"",
+#         "-fopenmp",
+#     ],
+#    deps = [
+#        ":distance_approach_ipopt_cuda_interface",
+#        "//cyber/common:log",
+#        "@com_google_googletest//:gtest_main",
+#     ],
+#)
 
 cc_test(
     name = "distance_approach_problem_test",

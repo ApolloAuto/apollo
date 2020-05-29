@@ -82,7 +82,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
   // clear planning status
   PlanningContext::Instance()->mutable_planning_status()->Clear();
 
-  planner_ = planner_dispatcher_->DispatchPlanner();
+  planner_ = planner_dispatcher_->DispatchPlanner(config_);
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,

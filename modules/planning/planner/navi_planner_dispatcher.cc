@@ -16,19 +16,13 @@
 
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-std::unique_ptr<Planner> NaviPlannerDispatcher::DispatchPlanner() {
-  PlanningConfig planning_config;
-  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &planning_config)) {
-    return nullptr;
-  }
-
+std::unique_ptr<Planner> NaviPlannerDispatcher::DispatchPlanner(
+    const PlanningConfig& planning_config) {
   auto planner_type = PlannerType::NAVI;
   if (planning_config.has_navigation_planning_config()) {
     planner_type = planning_config.navigation_planning_config().planner_type(0);
