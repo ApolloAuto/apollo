@@ -486,11 +486,11 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   static constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
-  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+  for (const auto& overlap : traffic_light_overlaps) {
     const double dist =
-        traffic_light_overlap.start_s - traffic_light_overlap.start_s;
+        overlap.start_s - traffic_light_overlap.start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      next_traffic_lights.push_back(traffic_light_overlap);
+      next_traffic_lights.push_back(overlap);
     }
   }
 

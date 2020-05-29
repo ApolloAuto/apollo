@@ -186,8 +186,9 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                 &time_result_ds_vec[i])) {
           ADEBUG << "Smoother fail at " << i << "th trajectory";
           ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "distance approach smoothing problem failed to solve");
+          return Status(
+              ErrorCode::PLANNING_ERROR,
+              "iterative anchoring smoothing problem failed to solve");
         }
       } else {
         const double start_system_timestamp =

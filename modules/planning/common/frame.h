@@ -169,12 +169,18 @@ class Frame {
     return pad_msg_driving_action_;
   }
 
-  std::list<ReferenceLineInfo>* mutable_reference_line_infos() {
-    return &reference_line_info_;
-  }
-
   const LearningDataFrame &learning_data_frame() const {
       return learning_data_frame_; }
+
+  void set_learning_data_adc_future_trajectory_points(
+      const std::vector<common::TrajectoryPoint>& trajectory_points) {
+    learning_data_adc_future_trajectory_points_ = trajectory_points;
+  }
+
+  const std::vector<common::TrajectoryPoint>
+      &learning_data_adc_future_trajectory_points() const {
+          return learning_data_adc_future_trajectory_points_;
+      }
 
  private:
   common::Status InitFrameData();
@@ -240,6 +246,8 @@ class Frame {
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   LearningDataFrame learning_data_frame_;
+  std::vector<common::TrajectoryPoint>
+      learning_data_adc_future_trajectory_points_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
