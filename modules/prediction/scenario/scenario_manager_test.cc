@@ -24,17 +24,15 @@ using apollo::common::adapter::AdapterConfig;
 class ScenarioManagerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    manager_ = ScenarioManager::Instance();
     container_manager_.reset(new ContainerManager()); }
 
  protected:
-  ScenarioManager* manager_ = nullptr;
+  ScenarioManager manager_;
   std::unique_ptr<ContainerManager> container_manager_ = nullptr;
 };
 
 TEST_F(ScenarioManagerTest, init) {
-  auto scenario_manager = ScenarioManager::Instance();
-  const auto& scenario = scenario_manager->scenario();
+  const auto& scenario = manager_.scenario();
   EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
 
@@ -47,8 +45,8 @@ TEST_F(ScenarioManagerTest, run) {
   std::unique_ptr<Container> pose_container =
       container_manager_->CreateContainer(
           AdapterConfig::LOCALIZATION);
-  manager_->Run(container_manager_.get());
-  const auto& scenario = manager_->scenario();
+  manager_.Run(container_manager_.get());
+  const auto& scenario = manager_.scenario();
   EXPECT_EQ(scenario.type(), Scenario::UNKNOWN);
 }
 

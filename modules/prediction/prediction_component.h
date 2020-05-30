@@ -102,6 +102,8 @@ class PredictionComponent
   std::unique_ptr<EvaluatorManager> evaluator_manager_;
 
   std::unique_ptr<PredictorManager> predictor_manager_;
+
+  std::unique_ptr<ScenarioManager> scenario_manager_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)

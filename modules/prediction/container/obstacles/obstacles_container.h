@@ -135,6 +135,11 @@ class ObstaclesContainer : public Container {
   SubmoduleOutput GetSubmoduleOutput(const size_t history_size,
                                      const absl::Time& frame_start_time);
 
+  /**
+   * @brief Get current scenario
+   */
+  const Scenario& curr_scenario() const;
+
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
 
@@ -151,6 +156,7 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
+  Scenario curr_scenario_;
 };
 
 }  // namespace prediction

@@ -69,6 +69,7 @@ bool PredictionComponent::Init() {
   container_manager_ = std::make_shared<ContainerManager>();
   evaluator_manager_.reset(new EvaluatorManager());
   predictor_manager_.reset(new PredictorManager());
+  scenario_manager_.reset(new ScenarioManager());
 
   PredictionConf prediction_conf;
   if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
@@ -149,7 +150,8 @@ bool PredictionComponent::ContainerSubmoduleProcess(
                                    *ptr_storytelling_msg);
   }
 
-  MessageProcess::ContainerProcess(container_manager_, *perception_obstacles);
+  MessageProcess::ContainerProcess(container_manager_, *perception_obstacles,
+                                   scenario_manager_.get());
 
   auto obstacles_container_ptr =
       container_manager_->GetContainer<ObstaclesContainer>(
@@ -164,6 +166,7 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   SubmoduleOutput submodule_output =
       obstacles_container_ptr->GetSubmoduleOutput(kHistorySize,
                                                   frame_start_time);
+  submodule_output.set_curr_scenario(scenario_manager_->scenario());
   container_writer_->Write(submodule_output);
   adc_container_writer_->Write(*adc_trajectory_container_ptr);
   perception_obstacles_writer_->Write(*perception_obstacles);
@@ -227,9 +230,9 @@ bool PredictionComponent::PredictionEndToEndProc(
   // process them all.
   auto perception_msg = *perception_obstacles;
   PredictionObstacles prediction_obstacles;
-  MessageProcess::OnPerception(perception_msg, container_manager_,
-                               evaluator_manager_.get(),
-                               predictor_manager_.get(), &prediction_obstacles);
+  MessageProcess::OnPerception(
+      perception_msg, container_manager_, evaluator_manager_.get(),
+      predictor_manager_.get(), scenario_manager_.get(), &prediction_obstacles);
   auto end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
   ADEBUG << "Time for updating PerceptionContainer: " << diff.count() * 1000
