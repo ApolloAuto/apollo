@@ -35,7 +35,6 @@
 #include "modules/prediction/proto/offline_features.pb.h"
 #include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
 #include "modules/prediction/scenario/right_of_way/right_of_way.h"
-#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
@@ -97,7 +96,8 @@ bool MessageProcess::InitPredictors(PredictorManager* predictor_manager,
 
 void MessageProcess::ContainerProcess(
     const std::shared_ptr<ContainerManager>& container_manager,
-    const perception::PerceptionObstacles& perception_obstacles) {
+    const perception::PerceptionObstacles& perception_obstacles,
+    ScenarioManager* scenario_manager) {
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
@@ -155,10 +155,10 @@ void MessageProcess::ContainerProcess(
   obstacles_prioritizer.AssignIgnoreLevel();
 
   // Scenario analysis
-  ScenarioManager::Instance()->Run(container_manager.get());
+  scenario_manager->Run(container_manager.get());
 
   // Build junction feature for the obstacles in junction
-  const Scenario& scenario = ScenarioManager::Instance()->scenario();
+  const Scenario scenario = scenario_manager->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
     JunctionAnalyzer::Init(scenario.junction_id());
     ptr_obstacles_container->BuildJunctionFeature();
@@ -178,8 +178,9 @@ void MessageProcess::OnPerception(
     const perception::PerceptionObstacles& perception_obstacles,
     const std::shared_ptr<ContainerManager>& container_manager,
     EvaluatorManager* evaluator_manager, PredictorManager* predictor_manager,
+    ScenarioManager* scenario_manager,
     PredictionObstacles* const prediction_obstacles) {
-  ContainerProcess(container_manager, perception_obstacles);
+  ContainerProcess(container_manager, perception_obstacles, scenario_manager);
 
   auto ptr_obstacles_container =
       container_manager->GetContainer<ObstaclesContainer>(
@@ -280,7 +281,7 @@ void MessageProcess::ProcessOfflineData(
     const PredictionConf& prediction_conf,
     const std::shared_ptr<ContainerManager>& container_manager,
     EvaluatorManager* evaluator_manager, PredictorManager* predictor_manager,
-    const std::string& record_filepath) {
+    ScenarioManager* scenario_manager, const std::string& record_filepath) {
   RecordReader reader(record_filepath);
   RecordMessage message;
   RecordWriter writer;
@@ -298,7 +299,8 @@ void MessageProcess::ProcessOfflineData(
         }
         PredictionObstacles prediction_obstacles;
         OnPerception(perception_obstacles, container_manager, evaluator_manager,
-                     predictor_manager, &prediction_obstacles);
+                     predictor_manager, scenario_manager,
+                     &prediction_obstacles);
         if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
           writer.WriteMessage<PredictionObstacles>(
               prediction_conf.topic_conf().perception_obstacle_topic(),

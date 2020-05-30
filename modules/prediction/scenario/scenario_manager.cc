@@ -21,8 +21,6 @@
 namespace apollo {
 namespace prediction {
 
-ScenarioManager::ScenarioManager() {}
-
 void ScenarioManager::Run(ContainerManager* container_manager) {
   auto environment_features =
       FeatureExtractor::ExtractEnvironmentFeatures(container_manager);
@@ -34,7 +32,7 @@ void ScenarioManager::Run(ContainerManager* container_manager) {
   // TODO(all) other functionalities including lane, junction filters
 }
 
-const Scenario& ScenarioManager::scenario() const { return current_scenario_; }
+const Scenario ScenarioManager::scenario() const { return current_scenario_; }
 
 }  // namespace prediction
 }  // namespace apollo

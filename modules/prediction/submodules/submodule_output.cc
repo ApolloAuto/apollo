@@ -47,6 +47,10 @@ void SubmoduleOutput::set_frame_start_time(const absl::Time& frame_start_time) {
   frame_start_time_ = frame_start_time;
 }
 
+void SubmoduleOutput::set_curr_scenario(const Scenario& scenario) {
+  curr_scenario_ = scenario;
+}
+
 const std::vector<Obstacle>& SubmoduleOutput::curr_frame_obstacles() const {
   return curr_frame_obstacles_;
 }

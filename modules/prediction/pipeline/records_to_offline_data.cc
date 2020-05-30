@@ -50,6 +50,7 @@ void GenerateDataForLearning() {
   auto container_manager = std::make_shared<ContainerManager>();
   EvaluatorManager evaluator_manager;
   PredictorManager predictor_manager;
+  ScenarioManager scenario_manager;
 
   if (!MessageProcess::Init(container_manager.get(), &evaluator_manager,
                             &predictor_manager, prediction_conf)) {
@@ -66,9 +67,9 @@ void GenerateDataForLearning() {
     for (std::size_t i = 0; i < offline_bags.size(); ++i) {
       AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
-      MessageProcess::ProcessOfflineData(
-          prediction_conf, container_manager, &evaluator_manager,
-          &predictor_manager, offline_bags[i]);
+      MessageProcess::ProcessOfflineData(prediction_conf, container_manager,
+                                         &evaluator_manager, &predictor_manager,
+                                         &scenario_manager, offline_bags[i]);
     }
   }
   FeatureOutput::Close();

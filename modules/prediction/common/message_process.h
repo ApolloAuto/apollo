@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "cyber/proto/record.pb.h"
 
@@ -32,6 +32,7 @@
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/storytelling/proto/story.pb.h"
 
 namespace apollo {
@@ -56,12 +57,14 @@ class MessageProcess {
 
   static void ContainerProcess(
       const std::shared_ptr<ContainerManager> &container_manager,
-      const perception::PerceptionObstacles &perception_obstacles);
+      const perception::PerceptionObstacles &perception_obstacles,
+      ScenarioManager *scenario_manger);
 
   static void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles,
       const std::shared_ptr<ContainerManager> &container_manager,
       EvaluatorManager *evaluator_manager, PredictorManager *predictor_manager,
+      ScenarioManager *scenario_manager,
       PredictionObstacles *const prediction_obstacles);
 
   static void OnLocalization(
@@ -78,7 +81,7 @@ class MessageProcess {
       const PredictionConf &prediction_conf,
       const std::shared_ptr<ContainerManager> &container_manager,
       EvaluatorManager *evaluator_manager, PredictorManager *predictor_manager,
-      const std::string &record_filepath);
+      ScenarioManager *scenario_manager, const std::string &record_filepath);
 };
 
 }  // namespace prediction
