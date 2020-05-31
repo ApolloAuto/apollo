@@ -16,8 +16,6 @@
 # limitations under the License.
 #
 ###############################################################################
-# Ref: https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
-##===========================================================##
 
 function _create_user_account() {
     local user_name="$1"

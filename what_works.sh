@@ -28,8 +28,16 @@ cp WORKSPACE.in WORKSPACE
 # Fail on first failure.
 set -e
 
+function bazel_build_with_dist_cache() {
+    bazel build --distdir=/apollo/.cache/distdir $@
+}
+
+function bazel_test_with_dist_cache() {
+    bazel test --distdir=/apollo/.cache/distdir $@
+}
+
 # Working parts.
-bazel build \
+bazel_build_with_dist_cache \
     //cyber/... \
     //modules/bridge/... \
     //modules/canbus/... \
@@ -43,7 +51,7 @@ bazel build \
     //modules/v2x/... \
     //modules/dreamview/...
 
-bazel test \
+bazel_test_with_dist_cache \
     //cyber/... \
     //modules/bridge/... \
     //modules/canbus/... \
@@ -58,14 +66,14 @@ bazel test \
     //modules/dreamview/...
 
 bash scripts/install_esdcan_library.sh install
-bazel build //modules/drivers/...
-bazel test //modules/drivers/...
+bazel_build_with_dist_cache //modules/drivers/...
+bazel_test_with_dist_cache //modules/drivers/...
 bash scripts/install_esdcan_library.sh uninstall
 
-bazel build //modules/tools/...
+bazel_build_with_dist_cache //modules/tools/...
 # Note(storypku): bazel test works except some lint errors in cyber_visualizer.
 # Check cyber_visualizer's functionality once stablized.
-bazel test $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
+bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 # above when you finish.
