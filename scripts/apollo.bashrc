@@ -83,7 +83,7 @@ function file_ext() {
 function c_family_ext() {
   local __ext
   __ext="$(file_ext $1)"
-  for ext in "h" "hxx" "hpp" "cxx" "cc" "cpp" "cu"; do
+  for ext in "h" "hh" "hxx" "hpp" "cxx" "cc" "cpp" "cu"; do
     if [ "${ext}" == "${__ext}" ]; then
       return 0
     fi
@@ -93,10 +93,12 @@ function c_family_ext() {
 
 function find_c_cpp_srcs() {
   find "$@" -type f -name "*.h"   \
+                 -o -name "*.c"   \
                  -o -name "*.hpp" \
-                 -o -name "*.hxx" \
-                 -o -name "*.cc"  \
                  -o -name "*.cpp" \
+                 -o -name "*.hh"  \
+                 -o -name "*.cc"  \
                  -o -name "*.hxx" \
+                 -o -name "*.cxx" \
                  -o -name "*.cu"
 }
