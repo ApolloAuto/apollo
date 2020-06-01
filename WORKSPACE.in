@@ -115,6 +115,14 @@ new_local_repository(
     path = "/usr/include",
 )
 
+http_archive(
+    name = "com_google_absl",
+    sha256 = "794d483dd9a19c43dc1fbbe284ce8956eb7f2600ef350dac4c602f9b4eb26e90",
+    strip_prefix = "abseil-cpp-20180600",
+    # url = "https://github.com/abseil/abseil-cpp/archive/20180600.tar.gz",
+    url = "file:///home/tmp/abseil-cpp-20180600.tar.gz",
+)
+
 new_local_repository(
     name = "vtk",
     build_file = "third_party/vtk.BUILD",
