@@ -30,8 +30,8 @@ cc_library(
     hdrs = ["channel_verify_agent.h"],
     deps = [
         ":channel_verify",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_cc_grpc",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_cc_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_service_cc_grpc",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )

@@ -17,7 +17,7 @@ cc_library(
         "//modules/drivers/canbus/common:canbus_common",
         "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
     ] + select({
-        "//tools/platforms:use_esd_can": [
+        "//tools/platform:use_esd_can": [
             "//modules/drivers/canbus/can_client/esd:esd_can_client",
         ],
         "//conditions:default": [],
