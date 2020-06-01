@@ -20,6 +20,10 @@
 
 #include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
 
+#include <string>
+
+#include "absl/strings/str_cat.h"
+
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -54,12 +58,36 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   LearningDataFrame learning_data_frame;
   learning_data_frame.CopyFrom(frame->learning_data_frame());
 
+  ADEBUG << "LearningModelInferenceTask: frame_num["
+         << learning_data_frame.frame_num()
+         << "] adc_trajectory_point_size["
+         << learning_data_frame.adc_trajectory_point_size() << "]";
+
+  if (learning_data_frame.adc_trajectory_point_size() <= 0) {
+    const std::string msg = "learning_data adc_trajectory_point empty";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   TrajectoryConvRnnInference trajectory_conv_rnn_inference(config);
-  trajectory_conv_rnn_inference.Inference(&learning_data_frame);
+  if (!trajectory_conv_rnn_inference.Inference(&learning_data_frame)) {
+    const std::string msg = "TrajectoryConvRnnInference Inference failed";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  const int adc_future_trajectory_point_size =
+      learning_data_frame.output().adc_future_trajectory_point_size();
+  ADEBUG << "   adc_future_trajectory_point_size["
+         << adc_future_trajectory_point_size << "]";
+  if (adc_future_trajectory_point_size <= 0) {
+    const std::string msg = "adc_future_trajectory_point empty";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
   std::vector<common::TrajectoryPoint> trajectory_points;
   ConvertTrajectory(learning_data_frame.output(), &trajectory_points);
-
   frame->set_learning_data_adc_future_trajectory_points(trajectory_points);
 
   return Status::OK();
