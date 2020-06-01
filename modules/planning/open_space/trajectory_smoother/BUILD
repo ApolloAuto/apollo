@@ -240,7 +240,7 @@ cc_library(
 # cc_library(
 #     name = "distance_approach_ipopt_cuda_interface",
 #     srcs = ["distance_approach_ipopt_cuda_interface.cc"] + select({
-#         "//tools/platforms:use_gpu": [
+#         "//tools/platform:use_gpu": [
 #             "planning_block.h",
 #             ":planning_block",
 #         ],
