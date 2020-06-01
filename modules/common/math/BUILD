@@ -109,6 +109,7 @@ cc_test(
     name = "matrix_operations_test",
     size = "small",
     srcs = ["matrix_operations_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":matrix_operations",
         "@com_google_googletest//:gtest_main",
@@ -155,6 +156,9 @@ cc_test(
     name = "angle_test",
     size = "small",
     srcs = ["angle_test.cc"],
+    linkopts = [
+        "-lm",
+    ],
     deps = [
         ":angle",
         "@com_google_googletest//:gtest_main",
@@ -275,6 +279,9 @@ cc_test(
     name = "search_test",
     size = "small",
     srcs = ["search_test.cc"],
+    linkopts = [
+        "-lm",
+    ],
     deps = [
         ":search",
         "@com_google_googletest//:gtest_main",
@@ -285,6 +292,9 @@ cc_test(
     name = "integral_test",
     size = "small",
     srcs = ["integral_test.cc"],
+    linkopts = [
+        "-lm",
+    ],
     deps = [
         ":integral",
         "@com_google_googletest//:gtest_main",
@@ -375,6 +385,7 @@ cc_test(
     name = "kalman_filter_test",
     size = "small",
     srcs = ["kalman_filter_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":kalman_filter",
         "@com_google_googletest//:gtest_main",
