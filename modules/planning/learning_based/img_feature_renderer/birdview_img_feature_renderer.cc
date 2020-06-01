@@ -35,8 +35,7 @@ static const char SPEEDLIMITMAP_IMG_PATH[] =
     "/apollo/modules/planning/data/semantic_map/"
     "sunnyvale_with_two_offices_speedlimit.png";
 
-BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {
-}
+BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {}
 
 bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   config_ = config;
@@ -48,6 +47,7 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
     AERROR << "Mapsother than sunnyvale_with_two_offices are not supported";
     return false;
   }
+
   // TODO(Jinyun): move to a more managable place
   map_bottom_left_point_x_ = 585875.3316302994;
   map_bottom_left_point_y_ = 4139916.6342316796;
@@ -59,11 +59,22 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
     return false;
   }
 
+  ego_cur_point_img_ =
+      cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
+  ego_cur_box_img_ =
+      cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
+
   bool render_ego_point_status = RenderEgoCurrentPoint(&ego_cur_point_img_);
   bool render_ego_box_status = RenderEgoCurrentBox(&ego_cur_box_img_);
 
   if (!render_ego_point_status || !render_ego_box_status) {
     AERROR << "Ego point or box img rendering failed";
+    return false;
+  }
+
+  if (base_roadmap_img_.size[0] != base_speedlimit_img_.size[0] ||
+      base_roadmap_img_.size[1] != base_speedlimit_img_.size[1]) {
+    AERROR << "base map sizes doesn't match";
     return false;
   }
 
@@ -523,9 +534,9 @@ bool BirdviewImgFeatureRenderer::CropByPose(const double ego_x,
                                             const double ego_heading,
                                             const cv::Mat& base_map,
                                             cv::Mat* img_feature) {
-  cv::Point2i ego_img_idx = GetPointImgIdx(
-      ego_x - map_bottom_left_point_x_, ego_y - map_bottom_left_point_y_,
-      map_bottom_left_point_x_, map_bottom_left_point_y_);
+  cv::Point2i ego_img_idx = GetPointImgIdx(ego_x - map_bottom_left_point_x_,
+                                           ego_y - map_bottom_left_point_y_, 0,
+                                           base_roadmap_img_.size[0]);
   const int rough_radius = static_cast<int>(sqrt(
       config_.height() * config_.height() + config_.width() * config_.width()));
   cv::Rect rough_rect(ego_img_idx.x - rough_radius,
