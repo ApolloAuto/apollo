@@ -479,16 +479,12 @@ function clean() {
 }
 
 function buildify() {
-  local buildifier_url=https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier
-  wget $buildifier_url -O ~/.buildifier
-  chmod +x ~/.buildifier
-  find . -name '*BUILD' -type f -exec ~/.buildifier -showlog -mode=fix {} +
+  find . -name '*BUILD' -or -name '*.bzl' -type f -exec buildifier -showlog -mode=fix {} +
   if [ $? -eq 0 ]; then
     success 'Buildify worked!'
   else
     fail 'Buildify failed!'
   fi
-  rm ~/.buildifier
 }
 
 function build_fe() {
@@ -585,10 +581,27 @@ function print_usage() {
   "
 }
 
+function bootstrap() {
+  if [ -z "$PYTHON_BIN_PATH" ]; then
+    PYTHON_BIN_PATH=$(which python3 || true)
+  fi
+  if [[ -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]]; then
+    return
+  fi
+  cp -f "${TOP_DIR}/tools/sample.bazelrc" "${APOLLO_ROOT_DIR}/.apollo.bazelrc"
+  # Set all env variables
+  # TODO(storypku): enable bootstrap.py inside docker
+  # $PYTHON_BIN_PATH ${APOLLO_ROOT_DIR}/tools/bootstrap.py $@
+  echo "bootstrap done"
+}
+
 function main() {
 
   check_machine_arch
   apollo_check_system_config
+
+  bootstrap
+
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"

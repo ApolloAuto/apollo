@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,7 +10,8 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber/common:log",
-        "@cuda",
+        "//modules/common/math:geometry",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -87,6 +88,7 @@ cc_test(
     deps = [
         ":path",
         "//modules/common/util",
+        "//modules/routing/proto:routing_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )
