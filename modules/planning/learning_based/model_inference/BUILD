@@ -27,4 +27,20 @@ cc_library(
     ],
 )
 
+# TODO(Jinyun): temporarily disable unit test until testdata is updated
+#cc_test(
+#    name = "model_inference_test",
+#    size = "small",
+#    srcs = ["model_inference_test.cc"],
+#    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+#    deps = [
+#        ":model_inference",
+#        ":trajectory_imitation_inference",
+#        "//modules/common/configs:config_gflags",
+#        "//modules/planning/common:planning_gflags",
+#        "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
+#        "@com_google_googletest//:gtest",
+#    ],
+#)
+
 cpplint()
