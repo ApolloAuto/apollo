@@ -43,9 +43,13 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
 
   const std::string map_name =
       FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
-  if (map_name != "sunnyvale_with_two_offices") {
-    AERROR << "Mapsother than sunnyvale_with_two_offices are not supported";
+  if (map_name != "sunnyvale_with_two_offices" && map_name != "sunnyvale") {
+    AERROR << "Map other than sunnyvale_with_two_offices are not supported";
     return false;
+  }
+  // TODO(Jinyun): add sunnyvale map or draw basemap online
+  if (map_name == "sunnyvale") {
+    AWARN << "use sunnyvale_with_two_offices for sunnyvale for now";
   }
 
   // TODO(Jinyun): move to a more managable place
