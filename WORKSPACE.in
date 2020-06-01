@@ -2,8 +2,8 @@ workspace(name = "apollo")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-
 load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
+
 cuda_configure(name = "local_config_cuda")
 
 maybe(
@@ -88,7 +88,7 @@ maybe(
     http_archive,
     name = "boringssl",
     sha256 = "fb236ae74676dba515e1230aef4cc69ab265af72fc08784a6755a319dd013ca6",
-    urls = ["http://182.92.10.148:8310/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
+    urls = ["https://apollo-platform-system.bj.bcebos.com/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
 )
 
 # grpc

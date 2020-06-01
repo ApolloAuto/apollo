@@ -41,7 +41,7 @@ CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
 if [[ "${INSTALL_MODE}" != "build" ]]; then
     PKG_NAME="caffe-1.0-x86_64.tar.gz"
     CHECKSUM="aa46ad0b263ca461e18f3b424e147efd6e95ed9dd55dae200cc63f214e5e2772"
-    DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

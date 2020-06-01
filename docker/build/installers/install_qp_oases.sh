@@ -31,7 +31,7 @@ warning "Currently libqpOASES.so built from source can't work properly, so we" \
 VERSION="3.2.1-1"
 PKG_NAME="qp-oases-${VERSION}.x86_64.tar.gz"
 CHECKSUM="225f6e19ae4498cccaeba464b672f33c4582f3bf2d6bb66c6693a7136003c8d5"
-DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

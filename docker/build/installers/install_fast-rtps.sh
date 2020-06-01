@@ -29,7 +29,7 @@ apt-get -y update && \
 
 PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
 CHECKSUM="ca0534db4f757cb41a9feaebac07a13dd4b63af0a217b2cb456e20b0836bc797"
-DOWNLOAD_LINK="http://182.92.10.148:8310/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
