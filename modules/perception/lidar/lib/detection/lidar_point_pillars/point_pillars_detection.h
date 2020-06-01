@@ -52,7 +52,7 @@ class PointPillarsDetection {
                   std::vector<float>* detections,
                   std::vector<int>* labels);
 
-  int GetObjectType(const int label);
+  base::ObjectSubType GetObjectSubType(const int label);
 
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;

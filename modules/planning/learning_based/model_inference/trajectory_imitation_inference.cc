@@ -23,28 +23,27 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
 #include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace planning {
 
-TrajectoryConvRnnInference::TrajectoryConvRnnInference()
-    : device_(torch::kCPU) {
-  LoadModel();
+TrajectoryConvRnnInference::TrajectoryConvRnnInference(
+    const LearningModelInferenceTaskConfig& config)
+    : ModelInference(config), device_(torch::kCPU) {
+  LoadModel(config);
 }
 
 // TODO(Jinyun): evaluate whether use fake input in load model speed up the
 // loading process
-bool TrajectoryConvRnnInference::LoadModel() {
-  if (FLAGS_planning_use_cuda && torch::cuda::is_available()) {
+bool TrajectoryConvRnnInference::LoadModel(
+    const LearningModelInferenceTaskConfig& config) {
+  if (config.use_cuda() && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
-    model_ = torch::jit::load(FLAGS_test_model_path, device_);
-  } else {
-    model_ = torch::jit::load(FLAGS_test_model_path, device_);
   }
+  model_ = torch::jit::load(config.model_file(), device_);
   torch::set_num_threads(1);
   return true;
 }

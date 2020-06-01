@@ -90,9 +90,8 @@ bool Stage::ExecuteTaskOnReferenceLine(
       return false;
     }
 
-    auto ret = common::Status::OK();
     for (auto* task : task_list_) {
-      ret = task->Execute(frame, &reference_line_info);
+      const auto ret = task->Execute(frame, &reference_line_info);
       if (!ret.ok()) {
         AERROR << "Failed to run tasks[" << task->Name()
                << "], Error message: " << ret.error_message();
@@ -119,6 +118,32 @@ bool Stage::ExecuteTaskOnReferenceLine(
     reference_line_info.SetDrivable(true);
     return true;
   }
+  return true;
+}
+
+bool Stage::ExecuteTaskOnReferenceLineForOnlineLearning(
+    const common::TrajectoryPoint& planning_start_point, Frame* frame) {
+  // online learning mode
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
+    reference_line_info.SetDrivable(false);
+  }
+
+  // FIXME(all): current only pick up the first reference line to use
+  // learning model trajectory
+  auto& picked_reference_line_info =
+      frame->mutable_reference_line_info()->front();
+  for (auto* task : task_list_) {
+    const auto ret = task->Execute(frame, &picked_reference_line_info);
+    if (!ret.ok()) {
+      AERROR << "Failed to run tasks[" << task->Name()
+             << "], Error message: " << ret.error_message();
+      break;
+    }
+  }
+
+  picked_reference_line_info.SetDrivable(true);
+  picked_reference_line_info.SetCost(0);
+
   return true;
 }
 

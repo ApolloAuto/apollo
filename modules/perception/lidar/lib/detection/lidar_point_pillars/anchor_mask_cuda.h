@@ -45,11 +45,9 @@ namespace lidar {
 
 class AnchorMaskCuda {
  private:
+  const int num_threads_;
   const int num_inds_for_scan_;
-  const int num_anchor_x_inds_;
-  const int num_anchor_y_inds_;
-  const int num_class_;
-  const int num_anchor_per_loc_;
+  const int num_anchor_;
   const float min_x_range_;
   const float min_y_range_;
   const float pillar_x_size_;
@@ -60,11 +58,9 @@ class AnchorMaskCuda {
  public:
   /**
    * @brief Constructor
+   * @param[in] num_threads Number of threads per block
    * @param[in] num_inds_for_scan Number of indexes for scan(cumsum)
-   * @param[in] num_anchor_x_inds Number of x-indexes for anchors
-   * @param[in] num_anchor_y_inds Number of y-indexes for anchors
-   * @param[in] num_class Number of classes
-   * @param[in] num_anchor_per_loc Number of anchors per location
+   * @param[in] num_anchor Number of anchors in total
    * @param[in] min_x_range Minimum x value for point cloud
    * @param[in] min_y_range Minimum y value for point cloud
    * @param[in] pillar_x_size Size of x-dimension for a pillar
@@ -73,11 +69,14 @@ class AnchorMaskCuda {
    * @param[in] grid_y_size Number of pillars in y-coordinate
    * @details Captital variables never change after the compile
    */
-  AnchorMaskCuda(const int num_inds_for_scan, const int num_anchor_x_inds,
-                 const int num_anchor_y_inds, const int num_class,
-                 const int num_anchor_per_loc, const float min_x_range,
-                 const float min_y_range, const float pillar_x_size,
-                 const float pillar_y_size, const int grid_x_size,
+  AnchorMaskCuda(const int num_threads,
+                 const int num_inds_for_scan,
+                 const int num_anchor,
+                 const float min_x_range,
+                 const float min_y_range,
+                 const float pillar_x_size,
+                 const float pillar_y_size,
+                 const int grid_x_size,
                  const int grid_y_size);
 
   /**
@@ -102,7 +101,8 @@ class AnchorMaskCuda {
    * @details dev_* means device memory. Make a mask for filtering pillar
    * occupancy area
    */
-  void DoAnchorMaskCuda(int* dev_sparse_pillar_map, int* dev_cumsum_along_x,
+  void DoAnchorMaskCuda(int* dev_sparse_pillar_map,
+                        int* dev_cumsum_along_x,
                         int* dev_cumsum_along_y,
                         const float* dev_box_anchors_min_x,
                         const float* dev_box_anchors_min_y,

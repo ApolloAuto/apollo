@@ -7,7 +7,8 @@ cc_library(
     hdrs = ["model_inference.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/proto:learning_data_proto"
+        "//modules/planning/proto:learning_data_proto",
+        "//modules/planning/proto:task_config_proto",
     ],
 )
 
@@ -20,7 +21,6 @@ cc_library(
         ":model_inference",
         "//modules/common/math",
         "//modules/common/util",
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
         "//third_party:libtorch",
         "@opencv",

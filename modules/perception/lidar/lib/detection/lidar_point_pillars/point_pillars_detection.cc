@@ -168,38 +168,47 @@ void PointPillarsDetection::GetObjects(
       }
     }
 
-    // classification (only detect vehicles so far)
-    // TODO(chenjiahao): Complete object type probs
+    // classification
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
         static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
-    int type = GetObjectType(labels->at(i));
-    object->lidar_supplement.raw_probs.back()[type] = 1.0f;
+    object->sub_type = GetObjectSubType(labels->at(i));
+    object->type = base::kSubType2TypeMap.at(object->sub_type);
+    object->lidar_supplement.raw_probs.back()[
+        static_cast<int>(object->type)] = 1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());
-    object->type = static_cast<base::ObjectType>(
-        std::distance(object->type_probs.begin(),
-                      std::max_element(object->type_probs.begin(),
-                                       object->type_probs.end())));
   }
 
   collect_time_ = timer.toc(true);
 }
 
-int PointPillarsDetection::GetObjectType(const int label) {
+// TODO(chenjiahao): update the base ObjectSubType with more fine-grained types
+base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
   switch (label) {
     case 0:
-      return static_cast<int>(base::ObjectType::VEHICLE);
-      break;
+      return base::ObjectSubType::BUS;
     case 1:
-      return static_cast<int>(base::ObjectType::BICYCLE);
-      break;
-    case 2:
-      return static_cast<int>(base::ObjectType::PEDESTRIAN);
-      break;
+      return base::ObjectSubType::CAR;
+    case 2:  // construction vehicle
+      return base::ObjectSubType::UNKNOWN_MOVABLE;
+    case 3:  // trailer
+      return base::ObjectSubType::UNKNOWN_MOVABLE;
+    case 4:
+      return base::ObjectSubType::TRUCK;
+    case 5:  // barrier
+      return base::ObjectSubType::UNKNOWN_UNMOVABLE;
+    case 6:
+      return base::ObjectSubType::CYCLIST;
+    case 7:
+      return base::ObjectSubType::MOTORCYCLIST;
+    case 8:
+      return base::ObjectSubType::PEDESTRIAN;
+    case 9:
+      return base::ObjectSubType::TRAFFICCONE;
     default:
-      return static_cast<int>(base::ObjectType::UNKNOWN);
+      return base::ObjectSubType::UNKNOWN;
   }
 }
 

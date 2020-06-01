@@ -37,43 +37,24 @@ Status LearningModelInferenceTrajectoryTask::Execute(
     Frame *frame,
     ReferenceLineInfo *reference_line_info) {
   CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
 
   Task::Execute(frame, reference_line_info);
-  return Process(frame);
+  return Process(frame, reference_line_info);
 }
 
-Status LearningModelInferenceTrajectoryTask::Process(Frame *frame) {
+Status LearningModelInferenceTrajectoryTask::Process(
+    Frame *frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
-
-  WriteTrajectory(frame);
-
-  return Status::OK();
-}
-
-bool LearningModelInferenceTrajectoryTask::WriteTrajectory(Frame* frame) {
-  CHECK_NOTNULL(frame);
-
-  auto reference_line_infos = frame->mutable_reference_line_infos();
-  if (reference_line_infos->empty()) {
-    AERROR << "no reference is found.";
-    return false;
-  }
-  // FIXME(all): current only pick up the first reference line to use
-  // learning model trajectory.
-  for (auto& reference_line_info : *reference_line_infos) {
-    reference_line_info.SetDrivable(false);
-  }
-  auto& picked_reference_line_info = reference_line_infos->front();
-  picked_reference_line_info.SetDrivable(true);
-  picked_reference_line_info.SetCost(0);
+  CHECK_NOTNULL(reference_line_info);
 
   std::vector<TrajectoryPoint> trajectory_points
       = frame->learning_data_adc_future_trajectory_points();
 
-  picked_reference_line_info.SetTrajectory(
-     DiscretizedTrajectory(trajectory_points));
+  reference_line_info->SetTrajectory(
+  DiscretizedTrajectory(trajectory_points));
 
-  return true;
+  return Status::OK();
 }
 
 }  // namespace planning
