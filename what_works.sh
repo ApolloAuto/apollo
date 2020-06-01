@@ -42,6 +42,7 @@ bazel_build_with_dist_cache \
     //modules/bridge/... \
     //modules/canbus/... \
     //modules/common/... \
+    //modules/map/...    \
     //modules/control/... \
     //modules/data/... \
     //modules/monitor/... \
@@ -57,6 +58,7 @@ bazel_test_with_dist_cache \
     //modules/bridge/... \
     //modules/canbus/... \
     //modules/common/... \
+    //modules/map/...    \
     //modules/control/... \
     //modules/data/... \
     //modules/monitor/... \
@@ -78,11 +80,9 @@ bazel_build_with_dist_cache //modules/tools/...
 bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
-# above when you finish.
 
 # TODO(?): bazel build //modules/contrib/...
 # TODO(storypku): bazel build //modules/planning/...
-# TODO(storypku): bazel build //modules/map/...
 # TODO(liufeng): bazel build //modules/localization/...
 # TODO(?): bazel build //modules/perception/...
 # TODO(changsh726): bazel build //modules/prediction/...

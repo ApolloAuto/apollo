@@ -15,10 +15,11 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/client/client_common.h"
 
-#include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include <boost/algorithm/string.hpp>
 
 #include "grpc++/grpc++.h"
 

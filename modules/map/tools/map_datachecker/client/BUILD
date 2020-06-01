@@ -42,7 +42,7 @@ cc_library(
         ":client_gflags",
         ":exception_handler",
         "//cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "//modules/map/tools/map_datachecker/proto:collection_service_cc_grpc",
         "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
@@ -78,7 +78,7 @@ cc_library(
         ":client_gflags",
         ":exception_handler",
         "//cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "//modules/map/tools/map_datachecker/proto:collection_service_cc_grpc",
         "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
@@ -92,7 +92,7 @@ cc_library(
     deps = [
         ":client_common",
         "//cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
     ],
 )
 

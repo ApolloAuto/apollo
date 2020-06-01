@@ -57,7 +57,7 @@ cc_library(
         ":common",
         ":worker_gflags",
         "//cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_cc_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -80,7 +80,7 @@ cc_library(
     deps = [
         ":laps_checker",
         ":pose_collection_agent",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "//modules/map/tools/map_datachecker/proto:collection_service_cc_grpc",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -159,8 +159,8 @@ cc_library(
         ":loops_verify_agent",
         ":pose_collection",
         ":static_align",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_service_cc_grpc",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -173,9 +173,9 @@ cc_library(
         ":worker_agent",
         ":worker_gflags",
         "//cyber",
-        "//modules/drivers/gnss/proto:gnss_proto",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
+        "//modules/map/tools/map_datachecker/proto:collection_service_cc_grpc",
     ],
 )
 

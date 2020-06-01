@@ -46,8 +46,8 @@ proto_library(
     name = "v2x_service_obu_to_car_proto",
     srcs = ["v2x_service_obu_to_car.proto"],
     deps = [
-        "//modules/perception/proto:perception_obstacle_proto",
         ":v2x_traffic_light_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
     ],
 )
 
@@ -63,6 +63,7 @@ py_proto_library(
         ":v2x_service_obu_to_car_proto",
     ],
 )
+
 cc_proto_library(
     name = "v2x_carstatus_cc_proto",
     deps = [
@@ -74,8 +75,8 @@ proto_library(
     name = "v2x_carstatus_proto",
     srcs = ["v2x_carstatus.proto"],
     deps = [
-        "//modules/localization/proto:localization_proto",
         "//modules/canbus/proto:chassis_detail_proto",
+        "//modules/localization/proto:localization_proto",
     ],
 )
 
@@ -104,8 +105,8 @@ proto_library(
     name = "v2x_service_car_to_obu_proto",
     srcs = ["v2x_service_car_to_obu.proto"],
     deps = [
-        "//modules/perception/proto:perception_obstacle_proto",
         ":v2x_carstatus_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
     ],
 )
 

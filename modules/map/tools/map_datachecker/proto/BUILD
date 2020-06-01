@@ -40,6 +40,7 @@ py_proto_library(
         ":collection_service_proto",
     ],
 )
+
 cc_proto_library(
     name = "collection_check_message_cc_proto",
     deps = [
