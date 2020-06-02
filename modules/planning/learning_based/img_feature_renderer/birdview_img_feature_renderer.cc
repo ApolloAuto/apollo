@@ -90,6 +90,13 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
 
 bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
+  int ego_trajectory_point_history_size =
+      learning_data_frame.adc_trajectory_point_size();
+  if (ego_trajectory_point_history_size < 1) {
+    AERROR << "Ego past history is empty";
+    return false;
+  }
+
   cv::Mat ego_past =
       cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
   cv::Mat obs_past =
@@ -104,13 +111,6 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
       cv::Mat(config_.height(), config_.width(), CV_8UC3, cv::Scalar(0, 0, 0));
   cv::Mat traffic_light =
       cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
-
-  int ego_trajectory_point_history_size =
-      learning_data_frame.adc_trajectory_point_size();
-  if (ego_trajectory_point_history_size < 1) {
-    AERROR << "Ego past history is empty";
-    return false;
-  }
 
   const auto& current_traj_point = learning_data_frame.adc_trajectory_point(
       ego_trajectory_point_history_size - 1);
@@ -164,7 +164,60 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
 // TODO(Jinyun): implement for debugging purpose
 bool BirdviewImgFeatureRenderer::RenderBGREnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
-  return false;
+  int ego_trajectory_point_history_size =
+      learning_data_frame.adc_trajectory_point_size();
+  if (ego_trajectory_point_history_size < 1) {
+    AERROR << "Ego past history is empty";
+    return false;
+  }
+
+  cv::Mat bgr_canvas =
+      cv::Mat(config_.height(), config_.width(), CV_8UC3, cv::Scalar(0, 0, 0));
+
+  const auto& current_traj_point = learning_data_frame.adc_trajectory_point(
+      ego_trajectory_point_history_size - 1);
+  const double current_time_sec = current_traj_point.timestamp_sec();
+  const auto& current_path_point =
+      current_traj_point.trajectory_point().path_point();
+  const double current_x = current_path_point.x();
+  const double current_y = current_path_point.y();
+  const double current_heading = current_path_point.theta();
+
+  if (!RenderLocalRoadMap(current_x, current_y, current_heading, &bgr_canvas)) {
+    AERROR << "RenderLocalRoadMap failed";
+    return false;
+  }
+  if (!RenderRouting(learning_data_frame, current_x, current_y, current_heading,
+                     &bgr_canvas)) {
+    AERROR << "RenderRouting failed";
+    return false;
+  }
+  if (!RenderTrafficLight(learning_data_frame, current_x, current_y,
+                          current_heading, &bgr_canvas)) {
+    AERROR << "RenderTrafficLight failed";
+    return false;
+  }
+  if (!RenderObsPastBox(learning_data_frame, current_time_sec, &bgr_canvas)) {
+    AERROR << "RenderObsPastBox failed";
+    return false;
+  }
+  if (!RenderObsFutureBox(learning_data_frame, current_time_sec, &bgr_canvas)) {
+    AERROR << "RenderObsFutureBox failed";
+    return false;
+  }
+  if (!RenderEgoCurrentBox(&bgr_canvas)) {
+    AERROR << "RenderEgoCurrentBox failed";
+    return false;
+  }
+  if (!RenderEgoPastPoint(learning_data_frame, current_time_sec, current_x,
+                          current_y, current_heading, &bgr_canvas)) {
+    AERROR << "RenderEgoPastPoint failed";
+    return false;
+  }
+
+  bgr_canvas.copyTo(*img_feature);
+
+  return true;
 }
 
 bool BirdviewImgFeatureRenderer::RenderCurrentEgoStatus(
