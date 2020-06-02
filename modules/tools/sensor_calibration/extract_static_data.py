@@ -32,7 +32,7 @@ import sys
 from google.protobuf import text_format
 import numpy as np
 
-from cyber_py3.record import RecordReader
+from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
 from configuration_yaml_generator import ConfigYaml
 from data_file_object import TimestampFileObject, OdometryFileObject
