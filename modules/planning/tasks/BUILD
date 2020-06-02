@@ -9,6 +9,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common/trajectory:discretized_trajectory",

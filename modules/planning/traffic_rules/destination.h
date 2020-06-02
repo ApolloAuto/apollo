@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/common/proto/geometry.pb.h"
@@ -34,7 +35,8 @@ namespace planning {
  */
 class Destination : public TrafficRule {
  public:
-  explicit Destination(const TrafficRuleConfig& config);
+  Destination(const TrafficRuleConfig& config,
+              const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Destination() = default;
 
   common::Status ApplyRule(Frame* const frame,

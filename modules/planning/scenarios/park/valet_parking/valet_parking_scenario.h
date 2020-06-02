@@ -44,13 +44,15 @@ struct ValetParkingContext {
 class ValetParkingScenario : public Scenario {
  public:
   ValetParkingScenario(const ScenarioConfig& config,
-                       const ScenarioContext* context)
-      : Scenario(config, context) {}
+                       const ScenarioContext* context,
+                       const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector) override;
 
   static bool IsTransferable(const Frame& frame,
                              const double parking_start_range);
@@ -72,7 +74,8 @@ class ValetParkingScenario : public Scenario {
   bool init_ = false;
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   ValetParkingContext context_;
   const hdmap::HDMap* hdmap_ = nullptr;

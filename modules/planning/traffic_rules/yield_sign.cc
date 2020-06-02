@@ -20,6 +20,8 @@
 
 #include "modules/planning/traffic_rules/yield_sign.h"
 
+#include <memory>
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -31,7 +33,9 @@ namespace planning {
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-YieldSign::YieldSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
+YieldSign::YieldSign(const TrafficRuleConfig& config,
+                     const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status YieldSign::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
@@ -49,7 +53,7 @@ void YieldSign::MakeDecisions(Frame* const frame,
   }
 
   const auto& yield_sign_status =
-      PlanningContext::Instance()->planning_status().yield_sign();
+      injector_->planning_context()->planning_status().yield_sign();
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
   const std::vector<PathOverlap>& yield_sign_overlaps =

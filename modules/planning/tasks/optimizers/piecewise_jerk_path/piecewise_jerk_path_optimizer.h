@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -30,7 +31,9 @@ namespace planning {
 
 class PiecewiseJerkPathOptimizer : public PathOptimizer {
  public:
-  explicit PiecewiseJerkPathOptimizer(const TaskConfig& config);
+  PiecewiseJerkPathOptimizer(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~PiecewiseJerkPathOptimizer() = default;
 

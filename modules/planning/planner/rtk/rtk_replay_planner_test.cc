@@ -31,7 +31,8 @@ namespace planning {
 TEST(RTKReplayPlannerTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage.csv";
   FLAGS_enable_map_reference_unify = false;
-  RTKReplayPlanner planner;
+  auto injector = std::make_shared<DependencyInjector>();
+  RTKReplayPlanner planner(injector);
 
   TrajectoryPoint start_point;
   common::PointENU point;
@@ -78,9 +79,10 @@ TEST(RTKReplayPlannerTest, ErrorTest) {
   FLAGS_rtk_trajectory_filename =
       "modules/planning/testdata/garage_no_file.csv";
   FLAGS_enable_map_reference_unify = false;
-  RTKReplayPlanner planner;
+  auto injector = std::make_shared<DependencyInjector>();
+  RTKReplayPlanner planner(injector);
   FLAGS_rtk_trajectory_filename = "modules/planning/testdata/garage_error.csv";
-  RTKReplayPlanner planner_with_error_csv;
+  RTKReplayPlanner planner_with_error_csv(injector);
   TrajectoryPoint start_point;
   start_point.mutable_path_point()->set_x(586385.782842);
   start_point.mutable_path_point()->set_y(4140674.76063);

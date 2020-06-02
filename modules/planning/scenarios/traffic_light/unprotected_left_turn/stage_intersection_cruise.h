@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
@@ -33,9 +35,10 @@ struct TrafficLightUnprotectedLeftTurnContext;
 
 class TrafficLightUnprotectedLeftTurnStageIntersectionCruise : public Stage {
  public:
-  explicit TrafficLightUnprotectedLeftTurnStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  TrafficLightUnprotectedLeftTurnStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

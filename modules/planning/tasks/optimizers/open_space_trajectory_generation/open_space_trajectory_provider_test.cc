@@ -30,10 +30,12 @@ class OpenSpaceTrajectoryProviderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::OPEN_SPACE_TRAJECTORY_PROVIDER);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   TaskConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 // TEST_F(OpenSpaceTrajectoryProviderTest, Init) {

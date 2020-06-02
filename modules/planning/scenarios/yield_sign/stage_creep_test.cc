@@ -31,14 +31,16 @@ class YieldSignStageCreepTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::YIELD_SIGN_CREEP);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(YieldSignStageCreepTest, Init) {
-  YieldSignStageCreep yield_sign_stage_creep(config_);
+  YieldSignStageCreep yield_sign_stage_creep(config_, injector_);
   EXPECT_EQ(yield_sign_stage_creep.Name(),
             ScenarioConfig::StageType_Name(ScenarioConfig::YIELD_SIGN_CREEP));
 }

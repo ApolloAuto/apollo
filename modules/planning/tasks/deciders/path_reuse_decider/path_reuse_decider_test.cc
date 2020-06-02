@@ -27,16 +27,18 @@ class PathReuseDeciderTest : public ::testing::Test {
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::PATH_REUSE_DECIDER);
     config_.mutable_path_reuse_decider_config();
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   virtual void TearDown() {}
 
  protected:
   TaskConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(PathReuseDeciderTest, Init) {
-  PathReuseDecider path_reuse_decider(config_);
+  PathReuseDecider path_reuse_decider(config_, injector_);
   EXPECT_EQ(path_reuse_decider.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

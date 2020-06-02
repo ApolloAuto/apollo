@@ -42,7 +42,9 @@ namespace planning {
  */
 class NaviPlanning : public PlanningBase {
  public:
-  NaviPlanning() {
+  explicit NaviPlanning(
+      const std::shared_ptr<DependencyInjector>& injector)
+      : PlanningBase(injector) {
     planner_dispatcher_ = std::make_unique<NaviPlannerDispatcher>();
   }
   virtual ~NaviPlanning();

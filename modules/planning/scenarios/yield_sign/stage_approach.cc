@@ -131,7 +131,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
           continue;
         }
 
-        PlanningContext::Instance()
+        injector_->planning_context()
             ->mutable_planning_status()
             ->mutable_yield_sign()
             ->add_wait_for_obstacle_id(obstacle->Id());
@@ -150,7 +150,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
 
 Stage::StageStatus YieldSignStageApproach::FinishStage() {
   // update PlanningContext
-  auto* yield_sign_status = PlanningContext::Instance()
+  auto* yield_sign_status = injector_->planning_context()
                                 ->mutable_planning_status()
                                 ->mutable_yield_sign();
 

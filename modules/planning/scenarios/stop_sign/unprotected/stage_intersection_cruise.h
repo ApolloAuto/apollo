@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
@@ -33,9 +35,10 @@ struct StopSignUnprotectedContext;
 
 class StopSignUnprotectedStageIntersectionCruise : public Stage {
  public:
-  explicit StopSignUnprotectedStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  StopSignUnprotectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

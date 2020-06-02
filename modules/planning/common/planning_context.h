@@ -33,6 +33,8 @@ namespace planning {
 
 class PlanningContext {
  public:
+  PlanningContext() = default;
+
   void Clear();
   void Init();
 
@@ -40,14 +42,11 @@ class PlanningContext {
    * please put all status info inside PlanningStatus for easy maintenance.
    * do NOT create new struct at this level.
    * */
-  const PlanningStatus& planning_status() { return planning_status_; }
+  const PlanningStatus& planning_status() const { return planning_status_; }
   PlanningStatus* mutable_planning_status() { return &planning_status_; }
 
  private:
   PlanningStatus planning_status_;
-
-  // this is a singleton class
-  DECLARE_SINGLETON(PlanningContext)
 };
 
 }  // namespace planning

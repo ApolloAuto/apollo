@@ -24,10 +24,11 @@ namespace planning {
 
 class HistoryTest : public ::testing::Test {
  public:
+  virtual void SetUp() { history_.reset(new History()); }
   HistoryTest() { history_->Clear(); }
 
  protected:
-  History* history_ = History::Instance();
+  std::unique_ptr<History> history_;
 };
 
 TEST_F(HistoryTest, Add) {

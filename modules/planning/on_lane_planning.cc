@@ -66,11 +66,11 @@ OnLanePlanning::~OnLanePlanning() {
     reference_line_provider_->Stop();
   }
   planner_->Stop();
-  FrameHistory::Instance()->Clear();
-  History::Instance()->Clear();
-  PlanningContext::Instance()->mutable_planning_status()->Clear();
+  injector_->frame_history()->Clear();
+  injector_->history()->Clear();
+  injector_->planning_context()->mutable_planning_status()->Clear();
   last_routing_.Clear();
-  EgoInfo::Instance()->Clear();
+  injector_->ego_info()->Clear();
 }
 
 std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
@@ -92,10 +92,10 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning history
-  History::Instance()->Clear();
+  injector_->history()->Clear();
 
   // clear planning status
-  PlanningContext::Instance()->mutable_planning_status()->Clear();
+  injector_->planning_context()->mutable_planning_status()->Clear();
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -106,7 +106,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   reference_line_provider_->Start();
 
   // dispatch planner
-  planner_ = planner_dispatcher_->DispatchPlanner(config_);
+  planner_ = planner_dispatcher_->DispatchPlanner(config_, injector_);
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
@@ -166,7 +166,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   }
 
   auto status = frame_->Init(reference_lines, segments,
-                             reference_line_provider_->FutureRouteWaypoints());
+                             reference_line_provider_->FutureRouteWaypoints(),
+                             injector_->ego_info());
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
@@ -251,8 +252,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
     ADEBUG << "last_routing_:" << last_routing_.ShortDebugString();
-    History::Instance()->Clear();
-    PlanningContext::Instance()->mutable_planning_status()->Clear();
+    injector_->history()->Clear();
+    injector_->planning_context()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
     planner_->Init(config_);
   }
@@ -290,12 +291,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
           FLAGS_trajectory_stitching_preserved_length, true,
           last_publishable_trajectory_.get(), &replan_reason);
 
-  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
+  injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (status.ok()) {
-    EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
+    injector_->ego_info()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
   }
 
@@ -330,14 +331,15 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
-    FrameHistory::Instance()->Add(n, std::move(frame_));
+    injector_->frame_history()->Add(n, std::move(frame_));
     return;
   }
 
   for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
     TrafficDecider traffic_decider;
     traffic_decider.Init(traffic_rule_configs_);
-    auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
+    auto traffic_status =
+        traffic_decider.Execute(frame_.get(), &ref_line_info, injector_);
     if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
       ref_line_info.SetDrivable(false);
       AWARN << "Reference line " << ref_line_info.Lanes().Id()
@@ -398,13 +400,13 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
     frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     if (FLAGS_enable_planning_smoother) {
-      planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
+      planning_smoother_.Smooth(injector_->frame_history(), frame_.get(),
                                 ptr_trajectory_pb);
     }
   }
 
   const uint32_t n = frame_->SequenceNum();
-  FrameHistory::Instance()->Add(n, std::move(frame_));
+  injector_->frame_history()->Add(n, std::move(frame_));
 }
 
 void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
@@ -495,7 +497,7 @@ Status OnLanePlanning::Plan(
                                ptr_trajectory_pb);
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
-      EgoInfo::Instance()->front_clear_distance());
+      injector_->ego_info()->front_clear_distance());
 
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
     frame_->mutable_open_space_info()->sync_debug_instance();
@@ -587,7 +589,8 @@ Status OnLanePlanning::Plan(
       *ptr_trajectory_pb->mutable_rss_info() = best_ref_info->rss_info();
     }
 
-    best_ref_info->ExportDecision(ptr_trajectory_pb->mutable_decision());
+    best_ref_info->ExportDecision(ptr_trajectory_pb->mutable_decision(),
+                                  injector_->planning_context());
 
     // Add debug information.
     if (FLAGS_enable_record_debug) {
@@ -632,7 +635,8 @@ Status OnLanePlanning::Plan(
     last_publishable_trajectory_->PopulateTrajectoryProtobuf(ptr_trajectory_pb);
 
     best_ref_info->ExportEngageAdvice(
-        ptr_trajectory_pb->mutable_engage_advice());
+        ptr_trajectory_pb->mutable_engage_advice(),
+        injector_->planning_context());
   }
 
   return status;
@@ -1012,7 +1016,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
 
 void OnLanePlanning::AddStitchSpeedProfile(
     planning_internal::Debug* debug_chart) {
-  if (!FrameHistory::Instance()->Latest()) {
+  if (!injector_->frame_history()->Latest()) {
     AINFO << "Planning frame is empty!";
     return;
   }
@@ -1036,7 +1040,7 @@ void OnLanePlanning::AddStitchSpeedProfile(
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
   const auto& last_trajectory =
-      FrameHistory::Instance()->Latest()->current_frame_planned_trajectory();
+      injector_->frame_history()->Latest()->current_frame_planned_trajectory();
   for (const auto& point : last_trajectory.trajectory_point()) {
     auto* point_debug = speed_profile->add_point();
     point_debug->set_x(point.relative_time() +

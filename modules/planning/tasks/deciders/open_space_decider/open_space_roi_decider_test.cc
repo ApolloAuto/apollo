@@ -29,14 +29,16 @@ class OpenSpaceRoiDeciderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::OPEN_SPACE_ROI_DECIDER);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   TaskConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(OpenSpaceRoiDeciderTest, Init) {
-  OpenSpaceRoiDecider open_space_roi_decider(config_);
+  OpenSpaceRoiDecider open_space_roi_decider(config_, injector_);
   EXPECT_EQ(open_space_roi_decider.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

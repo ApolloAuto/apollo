@@ -44,7 +44,8 @@ namespace lane_follow {
 
 class LaneFollowStage : public Stage {
  public:
-  explicit LaneFollowStage(const ScenarioConfig::StageConfig& config);
+  LaneFollowStage(const ScenarioConfig::StageConfig& config,
+                  const std::shared_ptr<DependencyInjector>& injector);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;

@@ -29,7 +29,8 @@ namespace apollo {
 namespace planning {
 
 TEST(PublicRoadPlannerTest, Simple) {
-  PublicRoadPlanner public_road_planner;
+  auto injector = std::make_shared<DependencyInjector>();
+  PublicRoadPlanner public_road_planner(injector);
   PlanningConfig config;
   EXPECT_EQ(public_road_planner.Name(), "PUBLIC_ROAD");
   EXPECT_EQ(public_road_planner.Init(config), common::Status::OK());

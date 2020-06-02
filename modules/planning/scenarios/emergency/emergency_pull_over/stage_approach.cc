@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,8 +43,9 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 
 EmergencyPullOverStageApproach::EmergencyPullOverStageApproach(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus EmergencyPullOverStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -61,7 +63,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
 
   // add a stop fence
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
     const auto& reference_line = reference_line_info.reference_line();

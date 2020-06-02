@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/common/planning_context.h"
@@ -35,8 +36,10 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 
-PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
-    : PathOptimizer(config) {
+PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : PathOptimizer(config, injector) {
   ACHECK(config_.has_piecewise_jerk_path_optimizer_config());
 }
 
@@ -61,21 +64,18 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   // Choose lane_change_path_config for lane-change cases
   // Otherwise, choose default_path_config for normal path planning
-  const auto& config =
-      reference_line_info_->IsChangeLanePath()
-          ? config_.piecewise_jerk_path_optimizer_config()
-                   .lane_change_path_config()
-          : config_.piecewise_jerk_path_optimizer_config()
-                   .default_path_config();
+  const auto& config = reference_line_info_->IsChangeLanePath()
+                           ? config_.piecewise_jerk_path_optimizer_config()
+                                 .lane_change_path_config()
+                           : config_.piecewise_jerk_path_optimizer_config()
+                                 .default_path_config();
 
   std::array<double, 5> w = {
       config.l_weight(),
       config.dl_weight() *
           std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
                     5.0),
-      config.ddl_weight(),
-      config.dddl_weight(),
-      0.0};
+      config.ddl_weight(), config.dddl_weight(), 0.0};
 
   const auto& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
@@ -108,7 +108,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       // pull over scenario
       // set end lateral to be at the desired pull over destination
       const auto& pull_over_status =
-          PlanningContext::Instance()->planning_status().pull_over();
+          injector_->planning_context()->planning_status().pull_over();
       if (pull_over_status.has_position() &&
           pull_over_status.position().has_x() &&
           pull_over_status.position().has_y() &&
@@ -217,7 +217,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
   if (end_state[0] != 0) {
     std::vector<double> x_ref(lat_boundaries.size(), end_state[0]);
-    const auto& pull_over_type = PlanningContext::Instance()
+    const auto& pull_over_type = injector_->planning_context()
                                      ->planning_status()
                                      .pull_over()
                                      .pull_over_type();

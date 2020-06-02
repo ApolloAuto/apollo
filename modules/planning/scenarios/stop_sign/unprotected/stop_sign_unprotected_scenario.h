@@ -51,14 +51,16 @@ struct StopSignUnprotectedContext {
 
 class StopSignUnprotectedScenario : public Scenario {
  public:
-  StopSignUnprotectedScenario(const ScenarioConfig& config,
-                              const ScenarioContext* context)
-      : Scenario(config, context) {}
+  StopSignUnprotectedScenario(
+      const ScenarioConfig& config, const ScenarioContext* context,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config);
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   StopSignUnprotectedContext* GetContext() { return &context_; }
 
@@ -70,7 +72,8 @@ class StopSignUnprotectedScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   StopSignUnprotectedContext context_;

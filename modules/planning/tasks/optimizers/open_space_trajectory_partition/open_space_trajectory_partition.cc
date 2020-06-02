@@ -19,6 +19,7 @@
  **/
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 
+#include <memory>
 #include <queue>
 
 #include "absl/strings/str_cat.h"
@@ -40,8 +41,9 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 
 OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
-    const TaskConfig& config)
-    : TrajectoryOptimizer(config) {
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : TrajectoryOptimizer(config, injector) {
   open_space_trajectory_partition_config_ =
       config_.open_space_trajectory_partition_config();
   heading_search_range_ =
@@ -100,10 +102,10 @@ Status OpenSpaceTrajectoryPartition::Process() {
                       partitioned_trajectories);
 
   const auto& open_space_status =
-      PlanningContext::Instance()->planning_status().open_space();
+      injector_->planning_context()->planning_status().open_space();
   if (!open_space_status.position_init() &&
       frame_->open_space_info().open_space_provider_success()) {
-    auto* open_space_status = PlanningContext::Instance()
+    auto* open_space_status = injector_->planning_context()
                                   ->mutable_planning_status()
                                   ->mutable_open_space();
     open_space_status->set_position_init(true);
@@ -351,7 +353,7 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
 bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
     const std::string& trajectory_encoding_to_check) {
   const auto& open_space_status =
-      PlanningContext::Instance()->planning_status().open_space();
+      injector_->planning_context()->planning_status().open_space();
   const int index_history_size =
       open_space_status.partitioned_trajectories_index_history_size();
 
@@ -370,12 +372,12 @@ bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
 
 void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
     const std::string& chosen_trajectory_encoding) {
-  auto* open_space_status = PlanningContext::Instance()
+  auto* open_space_status = injector_->planning_context()
                                 ->mutable_planning_status()
                                 ->mutable_open_space();
 
   const auto& trajectory_history =
-      PlanningContext::Instance()
+      injector_->planning_context()
           ->planning_status()
           .open_space()
           .partitioned_trajectories_index_history();
@@ -640,7 +642,7 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
     const bool flag_change_to_next, const size_t current_trajectory_index,
     const std::vector<TrajGearPair>& partitioned_trajectories,
     TrajGearPair* gear_switch_idle_time_trajectory) {
-  const auto* last_frame = FrameHistory::Instance()->Latest();
+  const auto* last_frame = injector_->frame_history()->Latest();
   const auto& last_gear_status =
       last_frame->open_space_info().gear_switch_states();
   auto* current_gear_status =

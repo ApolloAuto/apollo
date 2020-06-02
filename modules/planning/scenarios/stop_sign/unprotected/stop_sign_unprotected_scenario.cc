@@ -47,7 +47,8 @@ using StopSignLaneVehicles =
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     StopSignUnprotectedScenario::s_stage_factory_;
 
 void StopSignUnprotectedScenario::Init() {
@@ -62,7 +63,7 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  const std::string stop_sign_overlap_id = PlanningContext::Instance()
+  const std::string stop_sign_overlap_id = injector_->planning_context()
                                                ->planning_status()
                                                .stop_sign()
                                                .current_stop_sign_overlap_id();
@@ -91,33 +92,38 @@ void StopSignUnprotectedScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedStagePreStop(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new StopSignUnprotectedStagePreStop(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedStageStop(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new StopSignUnprotectedStageStop(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedStageCreep(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new StopSignUnprotectedStageCreep(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedStageIntersectionCruise(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new StopSignUnprotectedStageIntersectionCruise(config, injector);
       });
 }
 
 std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+  auto ptr = s_stage_factory_.CreateObjectOrNull(
+      stage_config.stage_type(), stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }
