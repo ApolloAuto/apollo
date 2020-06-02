@@ -17,7 +17,7 @@ common --color=yes
 # | Build Configurations                                       |
 # +------------------------------------------------------------+
 # Make Bazel print out all options from rc files.
-build --announce_rc
+# build --announce_rc
 build --show_timestamps
 
 # Work around the sandbox issue.
