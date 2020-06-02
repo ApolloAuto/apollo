@@ -50,7 +50,7 @@ fi
 
 __mytext="""# shellcheck shell=sh
 
-if [[ -d \"${CLANG_INSTALL_DIR}/bin\" ]]; then
+if [ -d \"${CLANG_INSTALL_DIR}/bin\" ]; then
     export PATH=${CLANG_INSTALL_DIR}/bin:\$PATH
 fi
 """
