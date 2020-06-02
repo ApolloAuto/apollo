@@ -20,6 +20,7 @@
 
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 
+#include <random>
 #include <algorithm>
 #include <limits>
 

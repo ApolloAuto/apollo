@@ -47,7 +47,7 @@ cc_library(
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
-        "//third_party:ipopt",
+        "@ipopt",
     ],
 )
 

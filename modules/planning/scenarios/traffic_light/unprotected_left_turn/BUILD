@@ -28,6 +28,7 @@ cc_library(
         "//modules/planning/tasks/deciders/creep_decider",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

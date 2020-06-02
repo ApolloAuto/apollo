@@ -78,16 +78,17 @@ bazel_build_with_dist_cache //modules/tools/...
 # Note(storypku): bazel test works except some lint errors in cyber_visualizer.
 # Check cyber_visualizer's functionality once stablized.
 bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
+# bazel_build_with_dist_cache $(bazel query //modules/planning/... except //modules/planning/tools:inference_demo)
+
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
 # TODO(?): bazel build //modules/contrib/...
-# TODO(storypku): bazel build //modules/planning/...
+# TODO(storypku): bazel test //modules/planning/...
 # TODO(liufeng): bazel build //modules/localization/...
 # TODO(?): bazel build //modules/perception/...
 # TODO(changsh726): bazel build //modules/prediction/...
 # TODO(?): bazel build //modules/third_party_perception/...
-
 # TODO(?): apollo.sh build
 # TODO(?): apollo.sh test
 # TODO(?): apollo.sh lint
@@ -98,5 +99,6 @@ bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/to
 #          See https://pypi.org/project/pycodestyle/
 # TODO(?): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
-
+# TODO(storypku): no break for cpu only build
 # TODO(storypku): cyber.aarch64 docker image
+# TODO(storypku): tools/workspace.bzl to re-org WORKSPACE.in

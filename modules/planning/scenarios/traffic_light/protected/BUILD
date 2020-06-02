@@ -26,6 +26,7 @@ cc_library(
         "//modules/planning/scenarios/util:scenario_util_lib",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

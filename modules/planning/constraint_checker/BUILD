@@ -51,6 +51,7 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/behavior:path_time_graph",
+        "//modules/planning/proto:st_drivable_boundary_cc_proto",
         "//modules/prediction/proto:prediction_obstacle_cc_proto",
     ],
 )

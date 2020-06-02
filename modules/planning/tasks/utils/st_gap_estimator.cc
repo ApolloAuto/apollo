@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/utils/st_gap_estimator.h"
 
+#include <cmath>
 #include <algorithm>
 
 #include "modules/planning/common/planning_gflags.h"

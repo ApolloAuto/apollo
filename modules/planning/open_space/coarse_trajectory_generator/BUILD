@@ -32,7 +32,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/open_space/coarse_trajectory_generator:node3d",
         "//modules/planning/proto:planner_open_space_config_cc_proto",
-        "//third_party:adolc",
+        "@adolc",
     ],
 )
 

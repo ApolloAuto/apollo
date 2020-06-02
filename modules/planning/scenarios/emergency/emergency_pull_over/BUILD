@@ -43,6 +43,7 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -56,6 +57,7 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -69,6 +71,7 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -82,6 +85,7 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

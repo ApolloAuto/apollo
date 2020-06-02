@@ -20,6 +20,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers:trajectory_optimizer",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -71,6 +72,7 @@ cc_test(
     deps = [
         ":open_space_trajectory_optimizer",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

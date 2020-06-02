@@ -88,6 +88,7 @@ cc_test(
     deps = [
         ":lane_follow",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

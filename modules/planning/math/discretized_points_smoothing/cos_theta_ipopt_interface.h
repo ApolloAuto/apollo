@@ -16,6 +16,12 @@
 
 #pragma once
 
+#include <cstddef>
+
+#include <map>
+#include <utility>
+#include <vector>
+
 #include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
@@ -27,10 +33,6 @@
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTNLPAdapter.hpp>
 #include <coin/IpTypes.hpp>
-
-#include <map>
-#include <utility>
-#include <vector>
 
 #define tag_f 1
 #define tag_g 2

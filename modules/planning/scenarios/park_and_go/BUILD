@@ -44,6 +44,7 @@ cc_test(
     deps = [
         ":park_and_go_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -62,6 +63,7 @@ cc_test(
     deps = [
         ":park_and_go_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

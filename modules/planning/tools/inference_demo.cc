@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
   torch::jit::script::Module model;
   std::cout << "is_optimized:" << model.is_optimized() << std::endl;
-  std::cout << "parameter size:" << model.get_parameters().size() << std::endl;
+  std::cout << "parameter size:" << model.parameters().size() << std::endl;
 
   torch::Device device(torch::kCPU);
 
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
   }
   std::cout << "is_optimized:" << model.is_optimized() << std::endl;
   std::cout << "after loading parameter size:"
-            << model.get_parameters().size() << std::endl;
+            << model.parameters().size() << std::endl;
 
   std::vector<torch::jit::IValue> torch_inputs;
 

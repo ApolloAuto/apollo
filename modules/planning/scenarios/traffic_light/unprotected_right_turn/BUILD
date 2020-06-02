@@ -29,6 +29,7 @@ cc_library(
         "//modules/planning/tasks/deciders/creep_decider",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -40,6 +41,7 @@ cc_test(
     deps = [
         ":traffic_light_unprotected_right_turn_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -53,6 +55,7 @@ cc_test(
     deps = [
         ":traffic_light_unprotected_right_turn_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

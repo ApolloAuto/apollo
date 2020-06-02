@@ -228,6 +228,7 @@ cc_library(
     deps = [
         ":spline_2d_solver",
         "//modules/common/math:matrix_operations",
+        "@com_google_googletest//:gtest",
         "@osqp",
     ],
 )
@@ -286,6 +287,7 @@ cc_test(
     name = "spline_1d_kernel_test",
     size = "small",
     srcs = ["spline_1d_kernel_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":spline_1d_kernel",
         "@com_google_googletest//:gtest_main",

@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools/platform:build_defs.bzl", "if_use_gpu")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -29,9 +30,11 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/planning/reference_line",
         "//modules/planning/scenarios:scenario",
-        "//third_party:libtorch",
         "@eigen",
-    ],
+    ] + if_use_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    ),
 )
 
 cc_test(

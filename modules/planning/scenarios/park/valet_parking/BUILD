@@ -33,6 +33,7 @@ cc_test(
     deps = [
         ":valet_parking",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -46,6 +47,7 @@ cc_test(
     deps = [
         ":valet_parking",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -59,6 +61,7 @@ cc_test(
     deps = [
         ":valet_parking",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

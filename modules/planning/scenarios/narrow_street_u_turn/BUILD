@@ -33,6 +33,7 @@ cc_test(
     deps = [
         ":narrow_street_u_turn",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

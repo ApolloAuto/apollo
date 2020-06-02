@@ -70,6 +70,11 @@ cc_library(
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/reference_line",
+        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/prediction/proto:prediction_point_cc_proto",
+        "//modules/prediction/proto:scenario_cc_proto",
     ],
 )
 
@@ -344,6 +349,11 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/planning/reference_line",
+        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/prediction/proto:prediction_point_cc_proto",
+        "//modules/prediction/proto:scenario_cc_proto",
         "@eigen",
     ],
 )
@@ -430,6 +440,7 @@ cc_library(
         ":planning_gflags",
         ":speed_limit",
         "//modules/planning/common/speed:st_boundary",
+        "//modules/planning/proto:st_drivable_boundary_cc_proto",
     ],
 )
 

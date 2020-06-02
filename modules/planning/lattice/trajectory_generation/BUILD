@@ -133,6 +133,7 @@ cc_library(
     deps = [
         ":lateral_qp_optimizer",
         "//cyber/common:log",
+        "//modules/common/math:matrix_operations",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",
