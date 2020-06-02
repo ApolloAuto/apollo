@@ -27,11 +27,10 @@ ARCH=$(uname -m)
 
 if [ "$ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
-  VERSION="3.1.0"
+  VERSION="3.2.0"
   PKG_NAME="bazel_${VERSION}-linux-x86_64.deb"
-  SHA256SUM="8fb2fe222c479a24e4d089f30bf30aea36fc8bfa117d81cce1ad9adf1f743bf0"
   DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}
-
+  SHA256SUM="215b160b363fb88dd8b73035bf842819f147c6a7d81e4f0bde89310328712973"
   download_if_not_cached $PKG_NAME $SHA256SUM $DOWNLOAD_LINK
 
   apt-get -y update && \

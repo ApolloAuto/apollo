@@ -1,6 +1,12 @@
+#!/usr/bin/env bash
+
 export PS1="\[\e[31m\][\[\e[m\]\[\e[32m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[35m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[31m\]]\[\e[m\]\[\e[1;32m\]\\$\[\e[m\] "
 
 export PATH="$PATH:/apollo/scripts"
+
+for script in /etc/profile.d/*.sh ; do
+    . "${script}"
+done
 
 ulimit -c unlimited
 
@@ -21,7 +27,12 @@ function inc() {
 }
 
 function show_line() {
-    local sed_cmd="$(command -v sed)"
+    if [[ -z "$1" ]]; then
+        error "No file specified"
+        return
+    fi
+    local sed_cmd
+    sed_cmd="$(command -v sed)"
     if [[ -z "${sed_cmd}" ]]; then
         error "sed not found in PATH"
         return

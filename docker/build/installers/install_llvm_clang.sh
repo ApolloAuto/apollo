@@ -25,7 +25,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 ARCH=$(uname -m)
 
-DEST_DIR_CLANG="${DEST_DIR_BASE}/clang"
+CLANG_INSTALL_DIR="/opt/clang"
 
 if [[ "${ARCH}" == "x86_64" ]]; then
     VERSION="10.0.0"
@@ -38,10 +38,9 @@ if [[ "${ARCH}" == "x86_64" ]]; then
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
     tar xJf "${PKG_NAME}"
-    mv -f "${DECOMPRESS_NAME}" "${DEST_DIR_CLANG}"
+    mv -f "${DECOMPRESS_NAME}" "${CLANG_INSTALL_DIR}"
 
     rm -rf "${PKG_NAME}"
-    # PATH SETTINGS
 fi
 
 if [[ "${ARCH}" == "aarch64" ]]; then
@@ -51,8 +50,8 @@ fi
 
 __mytext="""# shellcheck shell=sh
 
-if [[ -d \"${DEST_DIR_CLANG}/bin\" ]]; then
-    export PATH=${DEST_DIR_CLANG}/bin:\$PATH
+if [[ -d \"${CLANG_INSTALL_DIR}/bin\" ]]; then
+    export PATH=${CLANG_INSTALL_DIR}/bin:\$PATH
 fi
 """
 
