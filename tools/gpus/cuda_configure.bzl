@@ -22,6 +22,7 @@
   * `PYTHON_BIN_PATH`: The python binary path
 """
 
+# @unused  # Hint to buildifier
 load(
     "@bazel_tools//tools/cpp:lib_cc_configure.bzl",
     "escape_string",
@@ -561,14 +562,14 @@ def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
         out = tpl.replace(":", "/")
     repository_ctx.template(
         out,
-        Label("//tools/%s.tpl" % tpl),
+        Label("//tools/gpus/%s.tpl" % tpl),
         substitutions,
     )
 
 def _file(repository_ctx, label):
     repository_ctx.template(
         label.replace(":", "/"),
-        Label("//tools/%s.tpl" % label),
+        Label("//tools/gpus/%s.tpl" % label),
         {},
     )
 
