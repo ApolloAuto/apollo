@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/proto/planning_config.pb.h"
@@ -30,7 +31,8 @@ namespace planning {
 
 class PathDecider : public Task {
  public:
-  explicit PathDecider(const TaskConfig &config);
+  PathDecider(const TaskConfig &config,
+              const std::shared_ptr<DependencyInjector>& injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

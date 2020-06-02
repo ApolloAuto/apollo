@@ -152,8 +152,6 @@ bool HistoryStatus::GetObjectStatus(const std::string& id,
 ////////////////////////////////////////////////
 // History
 
-History::History() {}
-
 const HistoryFrame* History::GetLastFrame() const {
   if (history_frames_.empty()) {
     return nullptr;

@@ -36,14 +36,16 @@ class ParkAndGoStagePreCruiseTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::PARK_AND_GO_PRE_CRUISE);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(ParkAndGoStagePreCruiseTest, Init) {
-  ParkAndGoStagePreCruise park_and_go_stage_pre_cruise(config_);
+  ParkAndGoStagePreCruise park_and_go_stage_pre_cruise(config_, injector_);
   EXPECT_EQ(
       park_and_go_stage_pre_cruise.Name(),
       ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_PRE_CRUISE));

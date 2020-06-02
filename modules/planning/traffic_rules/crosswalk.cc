@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <unordered_map>
 #include <utility>
 
@@ -54,7 +55,9 @@ using CrosswalkToStop =
 using CrosswalkStopTimer =
     std::unordered_map<std::string, std::unordered_map<std::string, double>>;
 
-Crosswalk::Crosswalk(const TrafficRuleConfig& config) : TrafficRule(config) {}
+Crosswalk::Crosswalk(const TrafficRuleConfig& config,
+                     const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status Crosswalk::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
@@ -62,7 +65,7 @@ Status Crosswalk::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindCrosswalks(reference_line_info)) {
-    PlanningContext::Instance()->mutable_planning_status()->clear_crosswalk();
+    injector_->planning_context()->mutable_planning_status()->clear_crosswalk();
     return Status::OK();
   }
 
@@ -75,7 +78,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  auto* mutable_crosswalk_status = PlanningContext::Instance()
+  auto* mutable_crosswalk_status = injector_->planning_context()
                                        ->mutable_planning_status()
                                        ->mutable_crosswalk();
 
@@ -200,8 +203,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
            << "] start_s[" << crosswalk_overlap->start_s << "]";
     std::string virtual_obstacle_id =
         CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
-    util::BuildStopDecision(virtual_obstacle_id,
-                            crosswalk_overlap->start_s,
+    util::BuildStopDecision(virtual_obstacle_id, crosswalk_overlap->start_s,
                             config_.crosswalk().stop_distance(),
                             StopReasonCode::STOP_REASON_CROSSWALK,
                             crosswalk_to_stop.second,
@@ -256,8 +258,7 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
 
 bool Crosswalk::CheckStopForObstacle(
     ReferenceLineInfo* const reference_line_info,
-    const CrosswalkInfoConstPtr crosswalk_ptr,
-    const Obstacle& obstacle,
+    const CrosswalkInfoConstPtr crosswalk_ptr, const Obstacle& obstacle,
     const double stop_deceleration) {
   CHECK_NOTNULL(reference_line_info);
 
@@ -354,8 +355,8 @@ bool Crosswalk::CheckStopForObstacle(
         const auto obstacle_v = Vec2d(perception_obstacle.velocity().x(),
                                       perception_obstacle.velocity().y());
         const auto adc_path_point =
-            Vec2d(EgoInfo::Instance()->start_point().path_point().x(),
-                  EgoInfo::Instance()->start_point().path_point().y());
+            Vec2d(injector_->ego_info()->start_point().path_point().x(),
+                  injector_->ego_info()->start_point().path_point().y());
         const auto ovstacle_position =
             Vec2d(perception_obstacle.position().x(),
                   perception_obstacle.position().y());
@@ -390,8 +391,8 @@ bool Crosswalk::CheckStopForObstacle(
         // SKIP when stop_deceleration is too big but safe to ignore
         stop = false;
       }
-      AWARN << "crosswalk_id[" << crosswalk_id
-            << "] stop_deceleration[" << stop_deceleration << "]";
+      AWARN << "crosswalk_id[" << crosswalk_id << "] stop_deceleration["
+            << stop_deceleration << "]";
     }
   }
 

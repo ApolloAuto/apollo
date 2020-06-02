@@ -47,7 +47,9 @@ struct OpenSpaceTrajectoryThreadData {
 
 class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
  public:
-  explicit OpenSpaceTrajectoryProvider(const TaskConfig& config);
+  OpenSpaceTrajectoryProvider(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   ~OpenSpaceTrajectoryProvider();
 

@@ -48,7 +48,8 @@ TEST_F(NarrowStreetUTurnTest, Init) {
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_narrow_street_u_turn_config_file, &config));
   ScenarioContext context;
-  scenario_.reset(new NarrowStreetUTurnScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(new NarrowStreetUTurnScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::NARROW_STREET_U_TURN);
 }
 }  // namespace narrow_street_u_turn

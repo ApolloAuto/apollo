@@ -16,6 +16,7 @@
 
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 
+#include <memory>
 #include <utility>
 
 #include "absl/strings/str_split.h"
@@ -30,7 +31,9 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
-RTKReplayPlanner::RTKReplayPlanner() {
+RTKReplayPlanner::RTKReplayPlanner(
+    const std::shared_ptr<DependencyInjector>& injector)
+    : PlannerWithReferenceLine(injector) {
   ReadTrajectoryFile(FLAGS_rtk_trajectory_filename);
 }
 

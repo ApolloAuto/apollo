@@ -57,8 +57,10 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-LaneFollowStage::LaneFollowStage(const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+LaneFollowStage::LaneFollowStage(
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 void LaneFollowStage::RecordObstacleDebugInfo(
     ReferenceLineInfo* reference_line_info) {
@@ -144,12 +146,13 @@ Stage::StageStatus LaneFollowStage::Process(
           // under smart lane-change or IsClearToChangeLane under older version
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
-          LaneChangeDecider::UpdatePreparationDistance(true, frame,
-                                                       &reference_line_info);
+          LaneChangeDecider::UpdatePreparationDistance(
+              true, frame, &reference_line_info, injector_->planning_context());
           ADEBUG << "\tclear for lane change";
         } else {
-          LaneChangeDecider::UpdatePreparationDistance(false, frame,
-                                                       &reference_line_info);
+          LaneChangeDecider::UpdatePreparationDistance(
+              false, frame, &reference_line_info,
+              injector_->planning_context());
           reference_line_info.SetDrivable(false);
           ADEBUG << "\tlane change failed";
         }
@@ -302,7 +305,7 @@ void LaneFollowStage::PlanFallbackTrajectory(
 
   AERROR << "Speed fallback due to algorithm failure";
   *reference_line_info->mutable_speed_data() =
-      SpeedProfileGenerator::GenerateFallbackSpeed();
+      SpeedProfileGenerator::GenerateFallbackSpeed(injector_->ego_info());
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
@@ -315,7 +318,7 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   const double unit_s = 1.0;
   const auto& reference_line = reference_line_info->reference_line();
 
-  auto adc_point = EgoInfo::Instance()->start_point();
+  auto adc_point = injector_->ego_info()->start_point();
   DCHECK(adc_point.has_path_point());
   const auto adc_point_x = adc_point.path_point().x();
   const auto adc_point_y = adc_point.path_point().y();
@@ -364,7 +367,7 @@ void LaneFollowStage::GenerateFallbackPathProfile(
 bool LaneFollowStage::RetrieveLastFramePathProfile(
     const ReferenceLineInfo* reference_line_info, const Frame* frame,
     PathData* path_data) {
-  const auto* ptr_last_frame = FrameHistory::Instance()->Latest();
+  const auto* ptr_last_frame = injector_->frame_history()->Latest();
   if (ptr_last_frame == nullptr) {
     AERROR
         << "Last frame doesn't succeed, fail to retrieve last frame path data";

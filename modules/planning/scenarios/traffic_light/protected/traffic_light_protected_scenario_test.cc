@@ -49,7 +49,9 @@ TEST_F(TrafficLightProtectedScenarioTest, Init) {
       FLAGS_scenario_traffic_light_protected_config_file, &config));
 
   ScenarioContext context;
-  scenario_.reset(new TrafficLightProtectedScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(new TrafficLightProtectedScenario(config, &context,
+                                                    injector));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
 }

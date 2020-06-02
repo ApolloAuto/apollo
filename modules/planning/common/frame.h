@@ -34,6 +34,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
@@ -78,9 +79,10 @@ class Frame {
   common::Status Init(
       const std::list<ReferenceLine> &reference_lines,
       const std::list<hdmap::RouteSegments> &segments,
-      const std::vector<routing::LaneWaypoint> &future_route_waypoints);
+      const std::vector<routing::LaneWaypoint> &future_route_waypoints,
+      const EgoInfo *ego_info);
 
-  common::Status InitForOpenSpace();
+  common::Status InitForOpenSpace(const EgoInfo *ego_info);
 
   uint32_t SequenceNum() const;
 
@@ -118,7 +120,7 @@ class Frame {
       const std::string &obstacle_id, const double obstacle_start_s,
       const double obstacle_end_s);
 
-  bool Rerouting();
+  bool Rerouting(PlanningContext *planning_context);
 
   const common::VehicleState &vehicle_state() const;
 
@@ -190,7 +192,7 @@ class Frame {
   }
 
  private:
-  common::Status InitFrameData();
+  common::Status InitFrameData(const EgoInfo *ego_info);
 
   bool CreateReferenceLineInfo(const std::list<ReferenceLine> &reference_lines,
                                const std::list<hdmap::RouteSegments> &segments);
@@ -201,7 +203,7 @@ class Frame {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const Obstacle *FindCollisionObstacle() const;
+  const Obstacle *FindCollisionObstacle(const EgoInfo *ego_info) const;
 
   /**
    * @brief create a static virtual obstacle
@@ -259,8 +261,8 @@ class Frame {
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
- private:
-  DECLARE_SINGLETON(FrameHistory)
+ public:
+  FrameHistory();
 };
 
 }  // namespace planning

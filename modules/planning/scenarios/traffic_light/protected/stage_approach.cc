@@ -101,7 +101,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 }
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishStage() {
-  auto* traffic_light = PlanningContext::Instance()
+  auto* traffic_light = injector_->planning_context()
                             ->mutable_planning_status()
                             ->mutable_traffic_light();
   traffic_light->clear_done_traffic_light_overlap_id();

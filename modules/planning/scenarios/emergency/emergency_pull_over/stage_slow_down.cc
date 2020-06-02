@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
 
+#include <memory>
+
 #include "cyber/common/log.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -37,8 +39,9 @@ namespace emergency_pull_over {
 using apollo::common::TrajectoryPoint;
 
 EmergencyPullOverStageSlowDown::EmergencyPullOverStageSlowDown(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -75,7 +78,7 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
 }
 
 Stage::StageStatus EmergencyPullOverStageSlowDown::FinishStage() {
-  auto* pull_over_status = PlanningContext::Instance()
+  auto* pull_over_status = injector_->planning_context()
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   pull_over_status->set_plan_pull_over_path(true);

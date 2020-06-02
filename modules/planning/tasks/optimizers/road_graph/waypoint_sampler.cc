@@ -111,7 +111,7 @@ bool WaypointSampler::SamplePathWaypoints(
     static constexpr double kTwentyMilesPerHour = 8.94;
     if (reference_line_info_->IsChangeLanePath() ||
         std::fabs(init_sl_point_.l()) > kLargeDeviationL) {
-      if (EgoInfo::Instance()->start_point().v() > kTwentyMilesPerHour) {
+      if (injector_->ego_info()->start_point().v() > kTwentyMilesPerHour) {
         sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
         sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
 

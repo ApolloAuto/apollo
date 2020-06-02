@@ -38,6 +38,7 @@ cc_library(
         "//modules/common/status",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",

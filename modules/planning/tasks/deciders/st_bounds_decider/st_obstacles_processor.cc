@@ -51,13 +51,15 @@ using ObsTEdge = std::tuple<int, double, double, double, std::string>;
 void STObstaclesProcessor::Init(const double planning_distance,
                                 const double planning_time,
                                 const PathData& path_data,
-                                PathDecision* const path_decision) {
+                                PathDecision* const path_decision,
+                                History* const history) {
   planning_time_ = planning_time;
   planning_distance_ = planning_distance;
   path_data_ = path_data;
   vehicle_param_ = common::VehicleConfigHelper::GetConfig().vehicle_param();
   adc_path_init_s_ = path_data_.discretized_path().front().s();
   path_decision_ = path_decision;
+  history_ = history;
 
   obs_t_edges_.clear();
   obs_t_edges_idx_ = 0;

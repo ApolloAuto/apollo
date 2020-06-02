@@ -14,36 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/scenarios/learning_model/stage_run.h"
+#pragma once
 
-#include "gtest/gtest.h"
-
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
+#include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/history.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
 
-class StageRunTest : public ::testing::Test {
+class DependencyInjector {
  public:
-  virtual void SetUp() {
-    config_.set_stage_type(
-        ScenarioConfig::LEARNING_MODEL_RUN);
-    injector_ = std::make_shared<DependencyInjector>();
-  }
+  DependencyInjector() = default;
 
- protected:
-  ScenarioConfig::StageConfig config_;
-  std::shared_ptr<DependencyInjector> injector_;
+  ~DependencyInjector() = default;
+
+  PlanningContext* planning_context() { return &planning_context_; }
+  FrameHistory* frame_history() { return &frame_history_; }
+  History* history() { return &history_; }
+  EgoInfo* ego_info() { return &ego_info_; }
+
+ private:
+  PlanningContext planning_context_;
+  FrameHistory frame_history_;
+  History history_;
+  EgoInfo ego_info_;
 };
 
-TEST_F(StageRunTest, Init) {
-  LearningModelSampleStageRun learning_model_stage_run(config_, injector_);
-  EXPECT_EQ(learning_model_stage_run.Name(),
-            ScenarioConfig::StageType_Name(ScenarioConfig::LEARNING_MODEL_RUN));
-}
-
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

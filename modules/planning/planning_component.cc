@@ -38,10 +38,12 @@ using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
+  injector_ = std::make_shared<DependencyInjector>();
+
   if (FLAGS_use_navigation_mode) {
-    planning_base_ = std::make_unique<NaviPlanning>();
+    planning_base_ = std::make_unique<NaviPlanning>(injector_);
   } else {
-    planning_base_ = std::make_unique<OnLanePlanning>();
+    planning_base_ = std::make_unique<OnLanePlanning>(injector_);
   }
 
   ACHECK(ComponentBase::GetProtoConfig(&config_))
@@ -161,14 +163,14 @@ bool PlanningComponent::Proc(
   planning_writer_->Write(adc_trajectory_pb);
 
   // record in history
-  auto* history = History::Instance();
+  auto* history = injector_->history();
   history->Add(adc_trajectory_pb);
 
   return true;
 }
 
 void PlanningComponent::CheckRerouting() {
-  auto* rerouting = PlanningContext::Instance()
+  auto* rerouting = injector_->planning_context()
                         ->mutable_planning_status()
                         ->mutable_rerouting();
   if (!rerouting->need_rerouting()) {

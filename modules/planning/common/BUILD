@@ -501,6 +501,19 @@ cc_library(
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_proto",
     ],
+
+cc_library(
+    name = "dependency_injector",
+    hdrs = ["dependency_injector.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":ego_info",
+        ":frame",
+        ":history",
+        ":planning_context",
+    ],
 )
 
 cpplint()
