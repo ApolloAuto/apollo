@@ -5,7 +5,11 @@ build --python_path="/usr/bin/python3"
 build --action_env CUDA_TOOLKIT_PATH="/usr/local/cuda-10.2"
 build --action_env TF_CUDA_COMPUTE_CAPABILITIES="6.0,6.1,7.0,7.2,7.5"
 build --action_env GCC_HOST_COMPILER_PATH="/usr/bin/x86_64-linux-gnu-gcc-7"
-build --config=cuda
+
+build --config=gpu
+build:gpu --config=cuda
+build:gpu --define=USE_GPU=true
+#build:gpu --action_env USE_GPU=1
 
 ## The following was adapted from tensorflow/.bazelrc
 
