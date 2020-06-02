@@ -234,7 +234,7 @@ new_local_repository(
 # ipopt
 new_local_repository(
     name = "ipopt",
-    build_file = "third_party/ipopt.BUILD",
+    build_file = "external/ipopt.BUILD",
     path = "/usr/include",
 )
 

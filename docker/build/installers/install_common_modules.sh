@@ -62,7 +62,7 @@ info "Install support for [${COMPONENT}] ..."
 
 # bash /tmp/installers/install_libtorch.sh
 bash /tmp/installers/install_adolc.sh
-
+bash /tmp/installers/install_ipopt.sh
 # [TO-BE-CONTINUED]
 
 #######################################################
