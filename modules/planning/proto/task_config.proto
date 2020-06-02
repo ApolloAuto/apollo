@@ -44,13 +44,14 @@ message LaneChangeDeciderConfig {
 
 message LearningModelInferenceTaskConfig {
   optional string model_file = 1;
-  optional bool use_cuda = 2;
+  optional bool use_cuda = 2 [default = true];
 }
 
 //////////////////////////////////
 // LearningModelInferenceTrajectoryTaskConfig
 
 message LearningModelInferenceTrajectoryTaskConfig {
+  optional double min_adc_future_trajectory_time_length = 1 [default = 2.0];  // second
 }
 
 //////////////////////////////////
