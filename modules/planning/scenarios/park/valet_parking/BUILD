@@ -18,7 +18,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
     ],
 )

@@ -21,7 +21,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/planning/common/util:common_lib",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/common:stage_intersection_cruise_impl",
         "//modules/planning/tasks/deciders/creep_decider",

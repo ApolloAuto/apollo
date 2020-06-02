@@ -22,7 +22,7 @@ cc_library(
         "//modules/planning/lattice/trajectory_generation:trajectory_combiner",
         "//modules/planning/lattice/trajectory_generation:trajectory_evaluator",
         "//modules/planning/planner",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
     ],
 )
 

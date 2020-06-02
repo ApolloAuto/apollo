@@ -9,8 +9,8 @@ cc_library(
     hdrs = ["discretized_trajectory.h"],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/planning/common:planning_context",
         "@eigen",
     ],
@@ -36,7 +36,7 @@ cc_library(
     hdrs = ["publishable_trajectory.h"],
     deps = [
         ":discretized_trajectory",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
     ],
 )
 

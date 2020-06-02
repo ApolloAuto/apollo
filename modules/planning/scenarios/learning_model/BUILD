@@ -24,7 +24,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/common/util:factory",
         "//modules/planning/reference_line",

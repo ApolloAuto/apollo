@@ -10,7 +10,7 @@ cc_binary(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:pad_msg_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

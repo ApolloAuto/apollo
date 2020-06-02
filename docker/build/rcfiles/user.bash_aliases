@@ -20,7 +20,7 @@ function inc() {
     fi
 }
 
-function cat_file_from_line() {
+function show_line() {
     local sed_cmd="$(command -v sed)"
     if [[ -z "${sed_cmd}" ]]; then
         error "sed not found in PATH"

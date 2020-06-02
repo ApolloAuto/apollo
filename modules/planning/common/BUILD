@@ -83,7 +83,7 @@ cc_test(
     deps = [
         ":obstacle",
         "//modules/common/util",
-        "//modules/perception/proto:perception_cc_proto",
+        "//modules/perception/proto:perception_lane_cc_proto",
         "//third_party:boost",
         "@com_google_googletest//:gtest_main",
     ],
@@ -226,11 +226,13 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/map/relative_map/proto:navigation_cc_proto",
-        "//modules/perception/proto:perception_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
-        "//modules/prediction/proto:prediction_cc_proto",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/planning/proto:pad_msg_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/routing/proto:routing_cc_proto",
     ],
 )
 
@@ -314,7 +316,6 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -474,12 +475,13 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/dreamview/proto:hmi_status_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
-        "//modules/perception/proto:perception_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
         "//modules/planning/common:feature_output",
         "//modules/planning/common/util:math_util_lib",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_cc_proto",
-        "//modules/prediction/proto:prediction_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/prediction/util:data_extraction",
         "//modules/routing/proto:routing_cc_proto",
         "//third_party:boost",

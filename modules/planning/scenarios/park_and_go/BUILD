@@ -27,7 +27,7 @@ cc_library(
         "//modules/planning/common:planning_common",
         "//modules/planning/common/util:common_lib",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/util:scenario_util_lib",
         "@com_github_gflags_gflags//:gflags",
