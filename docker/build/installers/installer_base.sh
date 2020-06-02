@@ -64,9 +64,13 @@ function create_so_symlink() {
     done
 }
 
-export RCFILES_DIR="/opt/apollo/rcfiles"
+RCFILES_DIR="/opt/apollo/rcfiles"
+DEST_DIR_BASE="/opt/apollo/pkgs"
+ARCHIVE_DIR="/tmp/archive"
 
-ARCHIVE_DIR=/tmp/archive
+if [[ ! -d "${DEST_DIR_BASE}" ]]; then
+    mkdir -p "${DEST_DIR_BASE}"
+fi
 
 # sha256sum was provided by coreutils
 function download_if_not_cached {
