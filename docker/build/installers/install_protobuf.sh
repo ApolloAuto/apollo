@@ -25,7 +25,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 VERSION="3.11.2"
 PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
-CHECKSUM="b967f5b667c7041415283705c0ab07f0bcc1ff077854cd29a7e148458a910053"
+CHECKSUM="f2f180e9343cbb2b9a8482255bfec2176a2cc7fa22de496535a0a0cf38797495"
+https://github.com/protocolbuffers/protobuf/releases/download/v3.12.2/protobuf-cpp-3.12.2.tar.gz
 DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/protobuf-cpp-${VERSION}.tar.gz"
 
 #https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz

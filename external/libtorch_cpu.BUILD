@@ -5,7 +5,8 @@ licenses(["notice"])
 cc_library(
     name = "libtorch_cpu",
     includes = [
-        "."
+        ".",
+        "torch/csrc/api/include",
     ],
     linkstatic = False,
     linkopts = [

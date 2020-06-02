@@ -26,6 +26,21 @@ http_archive(
 )
 
 http_archive(
+    name = "six",
+    build_file = "six.BUILD",
+    sha256 = "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73",
+    strip_prefix = "six-1.12.0",
+    urls = ["https://pypi.python.org/packages/source/s/six/six-1.12.0.tar.gz"],
+)
+
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "e8c7601439dbd4489fe5069c33d374804990a56c2f710e00227ee5d8fd650e67",
+    strip_prefix = "protobuf-3.11.2",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.11.2.tar.gz"],
+)
+
+http_archive(
     name = "rules_proto",
     sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
     strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
@@ -114,13 +129,6 @@ http_archive(
     sha256 = "96db293564624543a2fd3b1a0d23f663b8054c79853a5918523655721a9f6b53",
     strip_prefix = "cpplint-1.4.5",
     urls = ["https://github.com/cpplint/cpplint/archive/1.4.5.tar.gz"],
-)
-
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "b967f5b667c7041415283705c0ab07f0bcc1ff077854cd29a7e148458a910053",
-    strip_prefix = "protobuf-3.11.2",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.11.2.tar.gz"],
 )
 
 # ad-rss-lib
