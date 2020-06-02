@@ -28,6 +28,8 @@ cp WORKSPACE.in WORKSPACE
 # Fail on first failure.
 set -e
 
+./bootstrap.sh --noninteractive
+
 function bazel_build_with_dist_cache() {
     bazel build --distdir=/apollo/.cache/distdir $@
 }

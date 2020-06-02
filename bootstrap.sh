@@ -4,7 +4,7 @@ set -eo pipefail
 TOP_DIR=$(dirname "$0")
 
 if [[ "$1" == "--noninteractive" ]]; then
-    cp -f "${TOP_DIR}/tools/sample.bazelrc" "${TOP_DIR}/.storydev.bazelrc"
+    cp -f "${TOP_DIR}/tools/sample.bazelrc" "${TOP_DIR}/.apollo.bazelrc"
     exit 0
 fi
 
