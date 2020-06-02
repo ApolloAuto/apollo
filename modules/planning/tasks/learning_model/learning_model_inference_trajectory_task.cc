@@ -32,6 +32,7 @@ using apollo::common::TrajectoryPoint;
 
 LearningModelInferenceTrajectoryTask::LearningModelInferenceTrajectoryTask(
     const TaskConfig &config) : Task(config) {
+  ACHECK(config.has_learning_model_inference_trajectory_task_config());
 }
 
 Status LearningModelInferenceTrajectoryTask::Execute(
@@ -49,10 +50,12 @@ Status LearningModelInferenceTrajectoryTask::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  const auto& config =
+      config_.learning_model_inference_trajectory_task_config();
+
   const std::vector<TrajectoryPoint> adc_future_trajectory_points
       = frame->learning_data_adc_future_trajectory_points();
 
-  constexpr int kLearningDataADCFutureTrajectoryTimeLength = 2.0;  // sec
   const double first_point_relative_time =
       adc_future_trajectory_points.front().relative_time();
   const double last_point_relative_time =
@@ -65,7 +68,8 @@ Status LearningModelInferenceTrajectoryTask::Process(
          << "] last_point_relative_time[" << last_point_relative_time << "]";
   if (adc_future_trajectory_points.size() < 0 ||
       first_point_relative_time < 0.0 ||
-      last_point_relative_time < kLearningDataADCFutureTrajectoryTimeLength) {
+      last_point_relative_time <
+          config.min_adc_future_trajectory_time_length()) {
     const std::string msg =
         absl::StrCat(
             "adc_future_trajectory_point issue. size[",

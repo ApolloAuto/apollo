@@ -19,6 +19,7 @@ stage_config: {
   task_config: {
     task_type: LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK
     learning_model_inference_trajectory_task_config {
+      min_adc_future_trajectory_time_length: 2.0
     }
   }
 }
