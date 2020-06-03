@@ -55,6 +55,10 @@ class LearningModelInferenceTask : public Task {
 
   void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
                                   LearningDataFrame* learning_data_frame);
+
+  void EvaluateObstaclePredictionTrajectory(
+      const double start_point_timestamp_sec,
+      LearningDataFrame* learning_data_frame);
 };
 
 }  // namespace planning
