@@ -26,7 +26,7 @@ message IoConfig {
 };
 
 message ChannelConfig {
-  optional string descriptor = 1 [default = ""];
+  optional string description = 1 [default = ""];
   required string name = 2;
   required uint32 extraction_rate = 3 [default = 1];
 };
