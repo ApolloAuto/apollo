@@ -48,7 +48,7 @@ class PathReferenceDecider : public Task {
    * @return true using learning model output as path reference
    * @return false
    */
-  bool isValidPathReference(
+  bool IsValidPathReference(
       const std::vector<common::TrajectoryPoint> &path_reference,
       const std::vector<PathBoundary> &path_bound);
   /**
