@@ -23,15 +23,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
-## buildifier ##
-PKG_NAME="buildifier"
-CHECKSUM="e92a6793c7134c5431c58fbc34700664f101e5c9b1c1fcd93b97978e8b7f88db"
-DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/3.0.0/buildifier"
-download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-chmod a+x ${PKG_NAME}
-cp ${PKG_NAME} /usr/local/bin/
-rm -rf ${PKG_NAME}
+## NOTE:
+## buildifier/buildozer was moved into install_bazel.sh.
 
 apt-get -y update && \
     apt-get -y install \
