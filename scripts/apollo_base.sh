@@ -39,6 +39,7 @@ function set_lib_path() {
   export LD_LIBRARY_PATH="${APOLLO_CACHE_DIR}/apollolibs:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/qt5/lib:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH"
+  export LD_LIBRARY_PATH="/usr/local/tf2/lib:$LD_LIBRARY_PATH"
   # TODO(storypku):
   # /apollo/bazel-genfiles/external/caffe/lib
   # /usr/local/apollo/local_integ/lib

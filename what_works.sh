@@ -31,11 +31,11 @@ set -e
 ./bootstrap.sh --noninteractive
 
 function bazel_build_with_dist_cache() {
-    bazel build --distdir=/apollo/.cache/distdir $@
+    bazel build --distdir=/apollo/.cache/distdir "$@"
 }
 
 function bazel_test_with_dist_cache() {
-    bazel test --distdir=/apollo/.cache/distdir $@
+    bazel test --distdir=/apollo/.cache/distdir "$@"
 }
 
 # Working parts.
@@ -80,13 +80,13 @@ bash scripts/install_esdcan_library.sh uninstall
 bazel_build_with_dist_cache //modules/tools/...
 # Note(storypku): bazel test works except some lint errors in cyber_visualizer.
 # Check cyber_visualizer's functionality once stablized.
-bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
+bazel_test_with_dist_cache "$(bazel query //modules/tools/... except //modules/tools/visualizer/...)"
 # bazel_build_with_dist_cache $(bazel query //modules/planning/... except //modules/planning/tools:inference_demo)
 
-bazel_test_with_dist_cache $(bazel query //modules/localization/... \
+bazel_test_with_dist_cache "$(bazel query //modules/localization/... \
   except //modules/localization/ndt/ndt_locator/... \
   except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
-  )
+  )"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
