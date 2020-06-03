@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,9 +17,8 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "libmanual_traffic_light_component.so",
-    linkshared = True,
     linkstatic = False,
     deps = [":manual_traffic_light"],
 )
