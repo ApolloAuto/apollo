@@ -287,7 +287,7 @@ bool BirdviewImgFeatureRenderer::RenderEgoCurrentBox(
   }
   const auto& param = ego_vehicle_config_.vehicle_param();
   const std::vector<cv::Point2i> box_corner_points =
-      GetAffinedBoxImgIdx(0.0, 0.0, M_PI / 2,
+      GetAffinedBoxImgIdx(0.0, 0.0, M_PI_2,
                           {
                               std::make_pair(param.front_edge_to_center(),
                                              param.left_edge_to_center()),
@@ -329,7 +329,7 @@ bool BirdviewImgFeatureRenderer::RenderEgoPastPoint(
                GetAffinedPointImgIdx(
                    ego_past_point.trajectory_point().path_point().x(),
                    ego_past_point.trajectory_point().path_point().y(),
-                   ego_current_x, ego_current_y, M_PI - ego_current_heading),
+                   ego_current_x, ego_current_y, M_PI_2 - ego_current_heading),
                2, color, -1);
   }
   return true;
@@ -363,14 +363,14 @@ bool BirdviewImgFeatureRenderer::RenderObsPastBox(
       color = color - color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -410,14 +410,14 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       const auto& path_point =
           last_past_traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -454,14 +454,14 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       color = color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -522,11 +522,11 @@ bool BirdviewImgFeatureRenderer::RenderTrafficLight(
             const auto& p0 = GetAffinedPointImgIdx(
                 segment.line_segment().point(i).x(),
                 segment.line_segment().point(i).y(), ego_current_x,
-                ego_current_y, M_PI - ego_current_heading);
+                ego_current_y, M_PI_2 - ego_current_heading);
             const auto& p1 = GetAffinedPointImgIdx(
                 segment.line_segment().point(i + 1).x(),
                 segment.line_segment().point(i + 1).y(), ego_current_x,
-                ego_current_y, M_PI - ego_current_heading);
+                ego_current_y, M_PI_2 - ego_current_heading);
             cv::line(*img_feature, p0, p1, color, 4);
           }
         }
@@ -574,11 +574,11 @@ bool BirdviewImgFeatureRenderer::RenderRouting(
         const auto& p0 = GetAffinedPointImgIdx(
             segment.line_segment().point(i).x(),
             segment.line_segment().point(i).y(), ego_current_x, ego_current_y,
-            M_PI - ego_current_heading);
+            M_PI_2 - ego_current_heading);
         const auto& p1 = GetAffinedPointImgIdx(
             segment.line_segment().point(i + 1).x(),
             segment.line_segment().point(i + 1).y(), ego_current_x,
-            ego_current_y, M_PI - ego_current_heading);
+            ego_current_y, M_PI_2 - ego_current_heading);
         cv::line(*img_feature, p0, p1, routing_color, 12);
       }
     }
