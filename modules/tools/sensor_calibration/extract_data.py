@@ -36,7 +36,7 @@ from cyber_py3.record import RecordReader
 from cyber.proto import record_pb2
 from configuration_yaml_generator import ConfigYaml
 from extract_static_data import get_subfolder_list, select_static_image_pcd
-from modules.tools.sensor_calibration.proto import extractor_config_pb2
+from modules.tools.sensor_calibration.proto import extractor_config_py_pb2
 from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
 
 
@@ -494,7 +494,7 @@ def main():
                         help="protobuf text format configuration file abosolute path")
     args = parser.parse_args()
 
-    config = extractor_config_pb2.DataExtractionConfig()
+    config = extractor_config_py_pb2.DataExtractionConfig()
     with open(args.config, "r") as f:
         proto_block = f.read()
         text_format.Merge(proto_block, config)
