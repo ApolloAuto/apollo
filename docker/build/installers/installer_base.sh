@@ -73,6 +73,10 @@ if [[ ! -d "${DEST_DIR_BASE}" ]]; then
     mkdir -p "${DEST_DIR_BASE}"
 fi
 
+if [[ ! -d "${SYSROOT_DIR}" ]]; then
+    mkdir -p "${SYSROOT_DIR}"
+fi
+
 # sha256sum was provided by coreutils
 function download_if_not_cached {
   local pkg_name=$1

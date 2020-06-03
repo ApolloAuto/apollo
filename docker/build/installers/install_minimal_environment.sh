@@ -91,7 +91,7 @@ if [[ "${MY_GEO}" == "cn" ]]; then
         python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
         python3 -m pip config set global.index-url "$PYPI_MIRROR"
     else
-        warning "TODO: PYPI_MIRROR for ${ARCH} for ${MY_GEO}"
+        info "Use default PYPI mirror: https://pypi.org/simple for ${ARCH} for ${MY_GEO}"
         python3 -m pip install --no-cache-dir pip -U
     fi
 else
