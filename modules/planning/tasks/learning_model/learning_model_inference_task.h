@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "modules/planning/tasks/task.h"
@@ -36,9 +37,21 @@ class LearningModelInferenceTask : public Task {
 
  private:
   apollo::common::Status Process(Frame *frame);
-  void ConvertTrajectory(
-      const LearningOutput& learning_out_put,
-      std::vector<common::TrajectoryPoint>* trajectory_points);
+
+  void GenerateADCFutureTrajectory(
+      const LearningOutput& learning_output,
+      const double start_point_timestamp_sec,
+      std::vector<common::TrajectoryPoint>* adc_future_trajectory);
+
+  void EvaluateTrajectoryByTime(
+      const std::vector<std::pair<double, CommonTrajectoryPointFeature>>&
+          trajectory,
+      const double start_point_timestamp_sec,
+      const double delta_time,
+      std::vector<TrajectoryPointFeature>* evaluated_trajectory);
+
+  void EvaluateADCTrajectory(const double start_point_timestamp_sec,
+                             LearningDataFrame* learning_data_frame);
 };
 
 }  // namespace planning

@@ -45,6 +45,7 @@ message LaneChangeDeciderConfig {
 message LearningModelInferenceTaskConfig {
   optional string model_file = 1;
   optional bool use_cuda = 2 [default = true];
+  optional double trajectory_delta_t = 3 [default = 0.2];  // second
 }
 
 //////////////////////////////////
