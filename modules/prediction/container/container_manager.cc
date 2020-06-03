@@ -27,8 +27,6 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManagerConfig;
 
-ContainerManager::ContainerManager() {}
-
 void ContainerManager::Init(const AdapterManagerConfig& config) {
   config_.CopyFrom(config);
   RegisterContainers();

@@ -40,6 +40,11 @@ namespace prediction {
 class ContainerManager {
  public:
   /**
+   * @brief Constructor
+   */
+  ContainerManager() = default;
+
+  /**
    * @brief Container manager initialization
    * @param Adapter config
    */
@@ -59,6 +64,14 @@ class ContainerManager {
     return nullptr;
   }
 
+  /**
+   * @brief Create a container
+   * @param Container type
+   * @return Container pointer
+   */
+  std::unique_ptr<Container> CreateContainer(
+      const common::adapter::AdapterConfig::MessageType &type);
+
   FRIEND_TEST(FeatureExtractorTest, junction);
   FRIEND_TEST(ScenarioManagerTest, run);
 
@@ -71,14 +84,6 @@ class ContainerManager {
       const common::adapter::AdapterConfig::MessageType &type);
 
   /**
-   * @brief Create a container
-   * @param Container type
-   * @return Container pointer
-   */
-  std::unique_ptr<Container> CreateContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
-
-  /**
    * @brief Register all containers
    */
   void RegisterContainers();
@@ -87,8 +92,6 @@ class ContainerManager {
   std::unordered_map<int, std::unique_ptr<Container>> containers_;
 
   common::adapter::AdapterManagerConfig config_;
-
-  DECLARE_SINGLETON(ContainerManager)
 };
 
 }  // namespace prediction

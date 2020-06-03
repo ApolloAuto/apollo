@@ -38,14 +38,12 @@ using apollo::hdmap::YieldSignInfoConstPtr;
 
 using apollo::planning::ADCTrajectory;
 
-bool GetPNCJunction(const PathPoint& point,
-                    std::string* pnc_junction_id) {
+bool GetPNCJunction(const PathPoint& point, std::string* pnc_junction_id) {
   common::PointENU hdmap_point;
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<PNCJunctionInfoConstPtr> pnc_junctions;
-  if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point,
-                                           FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point, FLAGS_search_radius,
                                            &pnc_junctions) == 0) {
     if (pnc_junctions.size() > 0) {
       *pnc_junction_id = pnc_junctions.front()->id().id();
@@ -60,8 +58,7 @@ bool GetJunction(const PathPoint& point, std::string* junction_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<JunctionInfoConstPtr> junctions;
-  if (HDMapUtil::BaseMap().GetJunctions(hdmap_point,
-                                        FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetJunctions(hdmap_point, FLAGS_search_radius,
                                         &junctions) == 0) {
     if (junctions.size() > 0) {
       *junction_id = junctions.front()->id().id();
@@ -76,8 +73,7 @@ bool GetClearArea(const PathPoint& point, std::string* clear_area_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<ClearAreaInfoConstPtr> clear_areas;
-  if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point,
-                                         FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point, FLAGS_search_radius,
                                          &clear_areas) == 0) {
     if (clear_areas.size() > 0) {
       *clear_area_id = clear_areas.front()->id().id();
@@ -92,8 +88,7 @@ bool GetCrosswalk(const PathPoint& point, std::string* crosswalk_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<CrosswalkInfoConstPtr> crosswalks;
-  if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point,
-                                         FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point, FLAGS_search_radius,
                                          &crosswalks) == 0) {
     if (crosswalks.size() > 0) {
       *crosswalk_id = crosswalks.front()->id().id();
@@ -108,8 +103,7 @@ bool GetSignal(const PathPoint& point, std::string* signal_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<SignalInfoConstPtr> signals;
-  if (HDMapUtil::BaseMap().GetSignals(hdmap_point,
-                                      FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetSignals(hdmap_point, FLAGS_search_radius,
                                       &signals) == 0) {
     if (signals.size() > 0) {
       *signal_id = signals.front()->id().id();
@@ -124,8 +118,7 @@ bool GetStopSign(const PathPoint& point, std::string* stop_sign_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<StopSignInfoConstPtr> stop_signs;
-  if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point,
-                                        FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point, FLAGS_search_radius,
                                         &stop_signs) == 0) {
     if (stop_signs.size() > 0) {
       *stop_sign_id = stop_signs.front()->id().id();
@@ -140,8 +133,7 @@ bool GetYieldSign(const PathPoint& point, std::string* yield_sign_id) {
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());
   std::vector<YieldSignInfoConstPtr> yield_signs;
-  if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point,
-                                         FLAGS_search_radius,
+  if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point, FLAGS_search_radius,
                                          &yield_signs) == 0) {
     if (yield_signs.size() > 0) {
       *yield_sign_id = yield_signs.front()->id().id();
@@ -159,8 +151,7 @@ bool GetYieldSign(const PathPoint& point, std::string* yield_sign_id) {
 void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
   static std::string overlapping_junction_id;
 
-  const double s_start =
-      adc_trajectory.trajectory_point(0).path_point().s();
+  const double s_start = adc_trajectory.trajectory_point(0).path_point().s();
 
   junction_id_.clear();
   junction_distance_ = -1;

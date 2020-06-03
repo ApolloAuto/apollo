@@ -41,6 +41,11 @@ namespace prediction {
 class EvaluatorManager {
  public:
   /**
+   * @brief Constructor
+   */
+  EvaluatorManager();
+
+  /**
    * @brief Destructor
    */
   virtual ~EvaluatorManager() = default;
@@ -123,8 +128,6 @@ class EvaluatorManager {
       ObstacleConf::MLP_EVALUATOR;
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
-
-  DECLARE_SINGLETON(EvaluatorManager)
 };
 
 }  // namespace prediction

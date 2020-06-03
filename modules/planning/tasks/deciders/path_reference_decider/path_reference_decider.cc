@@ -51,7 +51,7 @@ Status PathReferenceDecider::Execute(Frame *frame,
 }
 
 Status PathReferenceDecider::Process(
-    const Frame *frame, const ReferenceLineInfo *reference_line_info) {
+    Frame *frame, const ReferenceLineInfo *reference_line_info) {
   // get path bounds info from reference line info
   const std::vector<PathBoundary> &path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
@@ -65,16 +65,15 @@ Status PathReferenceDecider::Process(
   // check if trajectory points are within path bounds
   // if yes: use learning model output
   // otherwise: use previous path planning method
-  // IsValidPathReference();
+  if (IsValidPathReference(path_reference, path_boundaries)) {
+    // mark learning trajectory as path reference
+    frame->set_learning_trajectory_valid(true);
+  }
 
-  // mark learning trajectory as path reference
-  // MarkValidPathReference():
-
-  // use learning model output
   return Status::OK();
 }
 
-bool PathReferenceDecider::isValidPathReference(
+bool PathReferenceDecider::IsValidPathReference(
     const std::vector<TrajectoryPoint> &path_reference,
     const std::vector<PathBoundary> &path_bounds) {
   // choose only regular path_bound
@@ -89,20 +88,34 @@ bool PathReferenceDecider::isValidPathReference(
   // loop over output trajectory points
   // check if path reference point is valid or not
   // 1. line segment formed by two adjacent boundary point
+  std::vector<std::vector<LineSegment2d>> segmented_path_bounds;
+  PathBoundToLineSegments(regular_path_bound, segmented_path_bounds);
   // has intersection with
+  std::vector<Box2d> vehicle_boxes;
   for (const auto path_reference_point : path_reference) {
     // add ADC box to current path_reference_point
     const auto &path_point = path_reference_point.path_point();
     Box2d vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
-    std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
-    for (const Vec2d &corner_point : ABCDpoints) {
-      // For each corner point, project it onto reference_line
-      ADEBUG << "[" << corner_point.x() << "," << corner_point.y() << "]";
+    vehicle_boxes.emplace_back(vehicle_box);
+  }
+
+  // check intersection of linesegments and adc boxes
+  // left & right path bounds
+  for (auto segmented_path_bound : segmented_path_bounds) {
+    // line segment for each bound
+    for (auto line_segment : segmented_path_bound) {
+      // check if all vehicle boxes along learning model outputhas overlap with
+      // ADC box
+      // TODO(Shu): early stop when vehicle box is far away.
+      for (auto vehicle_box : vehicle_boxes) {
+        if (vehicle_box.HasOverlap(line_segment)) {
+          return false;
+        }
+      }
     }
   }
 
-  // TODO(SHU) check intersection of linesegments and adc boxes
   return true;
 }
 

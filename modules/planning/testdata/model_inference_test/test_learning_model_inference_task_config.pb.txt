@@ -1,0 +1,2 @@
+model_file: "/apollo/modules/planning/data/model/test_model.pt"
+use_cuda: true

@@ -143,7 +143,7 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   while (!localizations_.empty()) {
     if (localizations_.back().header().timestamp_sec() -
         localizations_.front().header().timestamp_sec()
-        < FLAGS_trajectory_time_length) {
+        <= FLAGS_trajectory_time_length) {
       break;
     }
     localizations_.pop_front();
