@@ -37,7 +37,7 @@ class PathReferenceDecider : public Task {
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
-  apollo::common::Status Process(const Frame *frame,
+  apollo::common::Status Process(Frame *frame,
                                  const ReferenceLineInfo *reference_line_info);
 
   /**
