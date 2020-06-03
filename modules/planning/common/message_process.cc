@@ -193,7 +193,8 @@ void MessageProcess::OnPrediction(
   // add to obstacle history
   // for (const auto& m : obstacle_history_map_) {
   //  for (const auto& p :  m.second) {
-  //    AERROR << "obstacle_history_map_: " << m.first << "; " << p.DebugString();
+  //    AERROR << "obstacle_history_map_: " << m.first << "; "
+  //           << p.DebugString();
   //  }
   // }
 

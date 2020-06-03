@@ -97,6 +97,10 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   EvaluateObstacleTrajectory(start_point_timestamp_sec,
                              &learning_data_frame);
 
+  // evaluate obstacle prediction trajectory
+  EvaluateObstaclePredictionTrajectory(start_point_timestamp_sec,
+                                       &learning_data_frame);
+
   TrajectoryConvRnnInference trajectory_conv_rnn_inference(config);
   if (!trajectory_conv_rnn_inference.Inference(&learning_data_frame)) {
     const std::string msg =
@@ -333,9 +337,10 @@ void LearningModelInferenceTask::EvaluateADCTrajectory(
 void LearningModelInferenceTask::EvaluateObstacleTrajectory(
     const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
+  const auto& config = config_.learning_model_inference_task_config();
   for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
-   const int obstacle_id = learning_data_frame->obstacle(i).id();
-   const auto obstacle_trajectory =
+    const int obstacle_id = learning_data_frame->obstacle(i).id();
+    const auto obstacle_trajectory =
         learning_data_frame->obstacle(i).obstacle_trajectory();
 
     std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
@@ -369,8 +374,6 @@ void LearningModelInferenceTask::EvaluateObstacleTrajectory(
                                           trajectory_point));
     }
 
-    const auto& config = config_.learning_model_inference_task_config();
-
     if (fabs(trajectory.front().first - start_point_timestamp_sec) <=
         config.trajectory_delta_t()) {
       ADEBUG << "too short obstacle_trajectory. frame_num["
@@ -387,7 +390,7 @@ void LearningModelInferenceTask::EvaluateObstacleTrajectory(
                              config.trajectory_delta_t(),
                              &evaluated_trajectory);
 
-    ADEBUG << "frame[" << learning_data_frame.frame_num()
+    ADEBUG << "frame[" << learning_data_frame->frame_num()
            << "] orig obstacle_trajectory[" << trajectory.size()
            << "] evaluated size[" << evaluated_trajectory.size() << "]";
 
@@ -403,6 +406,67 @@ void LearningModelInferenceTask::EvaluateObstacleTrajectory(
       evaluated_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
       evaluated_trajectory_point->mutable_trajectory_point()
                                 ->CopyFrom(tp.trajectory_point());
+    }
+  }
+}
+
+void LearningModelInferenceTask::EvaluateObstaclePredictionTrajectory(
+    const double start_point_timestamp_sec,
+    LearningDataFrame* learning_data_frame) {
+  const auto& config = config_.learning_model_inference_task_config();
+  for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
+    const int obstacle_id = learning_data_frame->obstacle(i).id();
+    const auto obstacle_prediction =
+         learning_data_frame->obstacle(i).obstacle_prediction();
+    for (int j = 0; j < obstacle_prediction.trajectory_size(); ++j) {
+      const auto obstacle_prediction_trajectory =
+          obstacle_prediction.trajectory(j);
+      std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
+      for (const auto& trajectory_point:
+          obstacle_prediction_trajectory.trajectory_point()) {
+        const double timestamp_sec = obstacle_prediction.timestamp_sec() +
+            trajectory_point.trajectory_point().relative_time();
+        trajectory.push_back(std::make_pair(
+            timestamp_sec,
+            trajectory_point.trajectory_point()));
+      }
+      if (fabs(trajectory.back().first - start_point_timestamp_sec) <=
+          config.trajectory_delta_t()) {
+        ADEBUG << "too short obstacle_prediction_trajectory. frame_num["
+               << learning_data_frame->frame_num()
+               << "] obstacle_id[" << obstacle_id << "] size["
+               << trajectory.size() << "] timestamp_diff["
+               << trajectory.back().first - start_point_timestamp_sec << "]";
+        continue;
+      }
+
+      std::vector<TrajectoryPointFeature> evaluated_trajectory;
+      EvaluateTrajectoryByTime(trajectory,
+                               start_point_timestamp_sec,
+                               config.trajectory_delta_t(),
+                               &evaluated_trajectory);
+
+      ADEBUG << "frame_num[" << learning_data_frame->frame_num()
+             << "] obstacle_id[" << obstacle_id
+             << "orig obstacle_prediction_trajectory[" << trajectory.size()
+             << "] evaluated size[" << evaluated_trajectory.size() << "]";
+
+      // update learning_data
+      learning_data_frame->mutable_obstacle(i)
+                         ->mutable_obstacle_prediction()
+                         ->mutable_trajectory(j)
+                         ->clear_trajectory_point();
+      for (const auto& tp : evaluated_trajectory) {
+        auto obstacle_prediction_trajectory_point =
+            learning_data_frame->mutable_obstacle(i)
+                               ->mutable_obstacle_prediction()
+                               ->mutable_trajectory(j)
+                               ->add_trajectory_point();
+        obstacle_prediction_trajectory_point->set_timestamp_sec(
+            tp.timestamp_sec());
+        obstacle_prediction_trajectory_point->mutable_trajectory_point()
+                                            ->CopyFrom(tp.trajectory_point());
+      }
     }
   }
 }
