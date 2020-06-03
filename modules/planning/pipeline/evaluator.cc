@@ -106,8 +106,7 @@ void Evaluator::EvaluateTrajectoryByTime(
     const double delta_time,
     std::vector<TrajectoryPointFeature>* evaluated_trajectory) {
   if (trajectory.empty() ||
-      fabs(trajectory.front().first - trajectory.back().first) <
-          FLAGS_trajectory_delta_t) {
+      fabs(trajectory.front().first - trajectory.back().first) < delta_time) {
     return;
   }
 
