@@ -66,6 +66,7 @@ function create_so_symlink() {
 
 RCFILES_DIR="/opt/apollo/rcfiles"
 DEST_DIR_BASE="/opt/apollo/pkgs"
+SYSROOT_DIR="/opt/apollo/sysroot"
 ARCHIVE_DIR="/tmp/archive"
 
 if [[ ! -d "${DEST_DIR_BASE}" ]]; then
@@ -81,10 +82,10 @@ function download_if_not_cached {
   if [ -e "$ARCHIVE_DIR/$pkg_name" ]; then
     checksum_actual=$(sha256sum "$ARCHIVE_DIR/$pkg_name" | awk '{print $1}')
     if [ x"$checksum_actual" = x"$checksum_expected" ]; then
-      info "package $pkg_name found in cache, will use it."
+      info "package $pkg_name found in fscache, will use it."
       use_cache=1
     else
-      warning "package $pkg_name found, but checksum mismatch."
+      warning "package $pkg_name found in fscache, but checksum mismatch."
       warning "    expecting $checksum_expected, got $checksum_actual."
     fi
   fi
