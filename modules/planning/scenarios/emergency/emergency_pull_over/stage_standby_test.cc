@@ -30,6 +30,7 @@ class StageStandbyTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
