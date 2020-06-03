@@ -20,7 +20,7 @@ DOCKER_USER="${USER}"
 CYBER_CONTAINER="apollo_cyber_${USER}"
 
 APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
+source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 xhost +local:root 1>/dev/null 2>&1
 
