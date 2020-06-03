@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -24,8 +24,8 @@ cc_library(
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
-        "//modules/drivers/gnss/proto:gnss_cc_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
+        "//modules/drivers/gnss/proto:gnss_cc_proto",
         "//modules/drivers/gnss/proto:ins_cc_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/localization/common:localization_common",
@@ -42,7 +42,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "libndt_localization_component.so",
     linkopts = ["-shared"],
     linkstatic = False,
@@ -58,9 +58,9 @@ cc_test(
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
         "@lz4",
-        "@tf2"
+        "@opencv",
+        "@tf2",
     ],
 )
 
@@ -73,8 +73,8 @@ cc_test(
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
         "@lz4",
+        "@opencv",
     ],
 )
 

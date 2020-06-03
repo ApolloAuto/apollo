@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -21,9 +21,9 @@ cc_library(
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
+        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/drivers/gnss/proto:gnss_cc_proto",
         "//modules/drivers/gnss/proto:ins_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/localization/proto:gps_cc_proto",
         "//modules/localization/proto:imu_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
@@ -34,7 +34,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "librtk_localization_component.so",
     linkopts = ["-shared"],
     linkstatic = False,

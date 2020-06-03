@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -22,12 +22,12 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/math",
         "//modules/common/monitor_log",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/common/math",
         "//modules/drivers/gnss/proto:config_cc_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/drivers/gnss/proto:gnss_cc_proto",
@@ -39,8 +39,8 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
         "//modules/localization/proto:gnss_pnt_result_cc_proto",
-        "//modules/localization/proto:localization_config_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
+        "//modules/localization/proto:localization_config_cc_proto",
         "//modules/localization/proto:localization_status_cc_proto",
         "//modules/localization/proto:measure_cc_proto",
         "//modules/localization/proto:sins_pva_cc_proto",
@@ -52,7 +52,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "libmsf_localization_component.so",
     linkopts = ["-shared"],
     linkstatic = False,
