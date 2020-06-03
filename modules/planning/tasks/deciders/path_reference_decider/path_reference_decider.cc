@@ -51,7 +51,7 @@ Status PathReferenceDecider::Execute(Frame *frame,
 }
 
 Status PathReferenceDecider::Process(
-    const Frame *frame, const ReferenceLineInfo *reference_line_info) {
+    Frame *frame, const ReferenceLineInfo *reference_line_info) {
   // get path bounds info from reference line info
   const std::vector<PathBoundary> &path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
@@ -67,8 +67,7 @@ Status PathReferenceDecider::Process(
   // otherwise: use previous path planning method
   if (IsValidPathReference(path_reference, path_boundaries)) {
     // mark learning trajectory as path reference
-    // MarkValidPathReference():
-    AERROR << "pass";
+    frame->set_learning_trajectory_valid(true);
   }
 
   return Status::OK();
