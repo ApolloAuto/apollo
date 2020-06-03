@@ -63,6 +63,9 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
          << learning_data_frame.frame_num()
          << "] adc_trajectory_point_size["
          << learning_data_frame.adc_trajectory_point_size() << "]";
+  // for (const auto& ob : learning_data_frame.obstacle()) {
+  //  AERROR << ob.DebugString();
+  // }
 
   if (learning_data_frame.adc_trajectory_point_size() <= 0) {
     const std::string msg =
@@ -77,8 +80,22 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
           learning_data_frame.adc_trajectory_point_size() - 1)
       .timestamp_sec();
 
+  ADEBUG << "start_point_timestamp_sec: " << start_point_timestamp_sec;
+  // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
+  //   ADEBUG << "BEFORE: " << t.timestamp_sec();
+  // }
+
+  // evaluate adc trajectory
   EvaluateADCTrajectory(start_point_timestamp_sec,
                         &learning_data_frame);
+
+  // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
+  //   ADEBUG << "AFTER: " << t.timestamp_sec();
+  // }
+
+  // evaluate obstacle trajectory
+  EvaluateObstacleTrajectory(start_point_timestamp_sec,
+                             &learning_data_frame);
 
   TrajectoryConvRnnInference trajectory_conv_rnn_inference(config);
   if (!trajectory_conv_rnn_inference.Inference(&learning_data_frame)) {
@@ -107,6 +124,10 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   GenerateADCFutureTrajectory(learning_data_frame.output(),
                               start_point_timestamp_sec,
                               &adc_future_trajectory);
+  // for (const auto& t : adc_future_trajectory) {
+  //   ADEBUG << "FUTURE: " << t.relative_time();
+  // }
+
   frame->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
 
   return Status::OK();
@@ -126,12 +147,11 @@ void LearningModelInferenceTask::GenerateADCFutureTrajectory(
         adc_future_trajectory_point.trajectory_point()));
   }
 
-  // const auto& config = config_.learning_model_inference_task_config();
-
+  constexpr double kADCFutureTrajectoryDeltaT = 0.05;
   std::vector<TrajectoryPointFeature> evaluated_trajectory;
   EvaluateTrajectoryByTime(trajectory,
                            start_point_timestamp_sec,
-                           0.1,
+                           kADCFutureTrajectoryDeltaT,
                            &evaluated_trajectory);
 
   ADEBUG << "orig adc_future_trajectory_point size["
@@ -140,7 +160,7 @@ void LearningModelInferenceTask::GenerateADCFutureTrajectory(
 
   for (const auto& evaluated_trajectory_point : evaluated_trajectory) {
     const auto& tp = evaluated_trajectory_point.trajectory_point();
-    // CommonTrajectoryPointFeature => common::TrajectoryPoint
+    // TrajectoryPointFeature => common::TrajectoryPoint
     apollo::common::TrajectoryPoint trajectory_point;
     auto path_point = trajectory_point.mutable_path_point();
     path_point->set_x(tp.path_point().x());
@@ -247,19 +267,9 @@ void LearningModelInferenceTask::EvaluateADCTrajectory(
     const double start_point_timestamp_sec,
     LearningDataFrame* learning_data_frame) {
   std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
-  // temp fix
-  double timestamp_sec = -0.1 *
-      learning_data_frame->adc_trajectory_point_size();
-
-  for (int i = 0; i < learning_data_frame->adc_trajectory_point_size(); i++) {
-    ADCTrajectoryPoint adc_tp =
-        learning_data_frame->adc_trajectory_point(i);
-    // TODO(all): temp fix, to be removed soon
-    trajectory.push_back(std::make_pair(timestamp_sec,
+  for (const auto& adc_tp : learning_data_frame->adc_trajectory_point()) {
+    trajectory.push_back(std::make_pair(adc_tp.timestamp_sec(),
                                         adc_tp.trajectory_point()));
-    timestamp_sec += 0.1;
-    // trajectory.push_back(std::make_pair(adc_tp.timestamp_sec(),
-    //                                    adc_tp.trajectory_point()));
   }
 
   if (trajectory.size() <= 1) {
@@ -296,7 +306,7 @@ void LearningModelInferenceTask::EvaluateADCTrajectory(
                            start_point_timestamp_sec,
                            config.trajectory_delta_t(),
                            &evaluated_trajectory);
-  AERROR << "frame_num[" << learning_data_frame->frame_num()
+  ADEBUG << "frame_num[" << learning_data_frame->frame_num()
          << "] orig adc_trajectory_point size[" << trajectory.size()
          << "] evaluated size[" << evaluated_trajectory.size() << "]";
 
@@ -316,6 +326,83 @@ void LearningModelInferenceTask::EvaluateADCTrajectory(
                        evaluated_trajectory.size(), "] relative_time[",
                        tp.trajectory_point().relative_time() , "]");
       AERROR << msg;
+    }
+  }
+}
+
+void LearningModelInferenceTask::EvaluateObstacleTrajectory(
+    const double start_point_timestamp_sec,
+    LearningDataFrame* learning_data_frame) {
+  for (int i = 0; i < learning_data_frame->obstacle_size(); ++i) {
+   const int obstacle_id = learning_data_frame->obstacle(i).id();
+   const auto obstacle_trajectory =
+        learning_data_frame->obstacle(i).obstacle_trajectory();
+
+    std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
+    for (const auto& perception_obstacle :
+        obstacle_trajectory.perception_obstacle_history()) {
+      CommonTrajectoryPointFeature trajectory_point;
+      trajectory_point.mutable_path_point()->set_x(
+          perception_obstacle.position().x());
+      trajectory_point.mutable_path_point()->set_y(
+          perception_obstacle.position().y());
+      trajectory_point.mutable_path_point()->set_z(
+          perception_obstacle.position().z());
+      trajectory_point.mutable_path_point()->set_theta(
+          perception_obstacle.theta());
+
+      const double v = std::sqrt(
+          perception_obstacle.velocity().x() *
+          perception_obstacle.velocity().x() +
+          perception_obstacle.velocity().y() *
+          perception_obstacle.velocity().y());
+      trajectory_point.set_v(v);
+
+      const double a = std::sqrt(
+          perception_obstacle.acceleration().x() *
+          perception_obstacle.acceleration().x() +
+          perception_obstacle.acceleration().y() *
+          perception_obstacle.acceleration().y());
+      trajectory_point.set_a(a);
+
+      trajectory.push_back(std::make_pair(perception_obstacle.timestamp_sec(),
+                                          trajectory_point));
+    }
+
+    const auto& config = config_.learning_model_inference_task_config();
+
+    if (fabs(trajectory.front().first - start_point_timestamp_sec) <=
+        config.trajectory_delta_t()) {
+      ADEBUG << "too short obstacle_trajectory. frame_num["
+             << learning_data_frame->frame_num()
+             << "] obstacle_id[" << obstacle_id << "] size["
+             << trajectory.size() << "] timestamp_diff["
+             << start_point_timestamp_sec - trajectory.front().first << "]";
+      continue;
+    }
+
+    std::vector<TrajectoryPointFeature> evaluated_trajectory;
+    EvaluateTrajectoryByTime(trajectory,
+                             start_point_timestamp_sec,
+                             config.trajectory_delta_t(),
+                             &evaluated_trajectory);
+
+    ADEBUG << "frame[" << learning_data_frame.frame_num()
+           << "] orig obstacle_trajectory[" << trajectory.size()
+           << "] evaluated size[" << evaluated_trajectory.size() << "]";
+
+    // update learning_data
+    learning_data_frame->mutable_obstacle(i)
+                       ->mutable_obstacle_trajectory()
+                       ->clear_evaluated_trajectory_point();
+    for (const auto& tp : evaluated_trajectory) {
+      auto evaluated_trajectory_point =
+          learning_data_frame->mutable_obstacle(i)
+                             ->mutable_obstacle_trajectory()
+                             ->add_evaluated_trajectory_point();
+      evaluated_trajectory_point->set_timestamp_sec(tp.timestamp_sec());
+      evaluated_trajectory_point->mutable_trajectory_point()
+                                ->CopyFrom(tp.trajectory_point());
     }
   }
 }
