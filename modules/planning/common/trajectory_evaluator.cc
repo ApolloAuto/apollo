@@ -23,24 +23,15 @@
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/pipeline/evaluator_logger.h"
 
 namespace apollo {
 namespace planning {
 
-void TrajectoryEvaluator::InitLogFile(const std::string& log_file) {
-  log_file_.open(log_file, std::ios_base::out | std::ios_base::app);
-}
-
-void TrajectoryEvaluator::CloseLogFile() {
-  log_file_.close();
-}
-
-void TrajectoryEvaluator::WriteLog(const std::string msg) {
+void TrajectoryEvaluator::WriteLog(const std::string& msg) {
   AERROR << msg;
   if (FLAGS_planning_offline_mode == 2) {
-    if (log_file_.is_open()) {
-      log_file_ << msg << std::endl;
-    }
+    EvaluatorLogger::GetStream() <<  msg << std::endl;
   }
 }
 

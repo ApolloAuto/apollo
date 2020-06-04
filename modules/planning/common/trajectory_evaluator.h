@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -28,9 +27,6 @@ namespace planning {
 class TrajectoryEvaluator {
  public:
   ~TrajectoryEvaluator() = default;
-
-  void InitLogFile(const std::string& log_file);
-  void CloseLogFile();
 
   void EvaluateADCTrajectory(const double start_point_timestamp_sec,
                              const double delta_time,
@@ -61,10 +57,7 @@ class TrajectoryEvaluator {
       const double delta_time,
       std::vector<TrajectoryPointFeature>* evaluated_trajectory);
 
-  void WriteLog(const std::string msg);
-
- private:
-  std::ofstream log_file_;
+  void WriteLog(const std::string& msg);
 };
 
 }  // namespace planning

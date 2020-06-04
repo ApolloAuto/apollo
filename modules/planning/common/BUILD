@@ -499,6 +499,7 @@ cc_library(
         "//cyber",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/util:util_lib",
+        "//modules/planning/pipeline:evaluator_logger",
         "//modules/planning/proto:learning_data_proto",
     ],
 )

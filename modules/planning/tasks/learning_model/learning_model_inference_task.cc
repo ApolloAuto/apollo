@@ -82,23 +82,28 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   //   AERROR << "BEFORE: " << t.timestamp_sec();
   // }
 
+  TrajectoryEvaluator trajectory_evaluator;
+
   // evaluate adc trajectory
-  trajectory_evaluator_.EvaluateADCTrajectory(start_point_timestamp_sec,
-                                              config.trajectory_delta_t(),
-                                              &learning_data_frame);
+  trajectory_evaluator.EvaluateADCTrajectory(
+      start_point_timestamp_sec,
+      config.trajectory_delta_t(),
+      &learning_data_frame);
 
   // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
   //   AERROR << "AFTER: " << t.timestamp_sec();
   // }
 
   // evaluate obstacle trajectory
-  trajectory_evaluator_.EvaluateObstacleTrajectory(start_point_timestamp_sec,
-                                                   config.trajectory_delta_t(),
-                                                   &learning_data_frame);
+  trajectory_evaluator.EvaluateObstacleTrajectory(
+      start_point_timestamp_sec,
+      config.trajectory_delta_t(),
+      &learning_data_frame);
 
   // evaluate obstacle prediction trajectory
-  trajectory_evaluator_.EvaluateObstaclePredictionTrajectory(
-      start_point_timestamp_sec, config.trajectory_delta_t(),
+  trajectory_evaluator.EvaluateObstaclePredictionTrajectory(
+      start_point_timestamp_sec,
+      config.trajectory_delta_t(),
       &learning_data_frame);
 
   TrajectoryConvRnnInference trajectory_conv_rnn_inference(config);
@@ -125,9 +130,11 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
 
   constexpr double kADCFutureTrajectoryDeltaTime = 0.02;
   std::vector<TrajectoryPointFeature> evaluated_trajectory;
-  trajectory_evaluator_.EvaluateADCFutureTrajectory(
-      learning_data_frame, start_point_timestamp_sec,
-      kADCFutureTrajectoryDeltaTime, &evaluated_trajectory);
+  trajectory_evaluator.EvaluateADCFutureTrajectory(
+      learning_data_frame,
+      start_point_timestamp_sec,
+      kADCFutureTrajectoryDeltaTime,
+      &evaluated_trajectory);
 
   std::vector<common::TrajectoryPoint> adc_future_trajectory;
   ConvertADCFutureTrajectory(evaluated_trajectory, &adc_future_trajectory);
