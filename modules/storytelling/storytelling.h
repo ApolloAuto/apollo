@@ -42,6 +42,7 @@ class Storytelling final : public apollo::cyber::TimerComponent {
   Stories stories_;
   StorytellingConfig config_;
   std::shared_ptr<FrameManager> frame_manager_;
+  std::shared_ptr<::apollo::cyber::Writer<Stories>> story_writer_ = nullptr;
 };
 
 CYBER_REGISTER_COMPONENT(Storytelling)
