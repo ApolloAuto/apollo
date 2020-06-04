@@ -6,20 +6,16 @@
   - [配置文件的修改](#配置文件的修改)
   - [启动流程](#启动流程)
       - [1. 拍下车辆尾部的急停开关](#1-拍下车辆尾部的急停开关)
-      - [2. 启动can卡](#2-启动can卡)
-      - [3. 编译项目，启动Dreamview](#3-编译项目启动dreamview)
-      - [4. 启动所需模块](#4-启动所需模块)
-      - [5. 检查各模块channel是否正确](#5-检查各模块channel是否正确)
-      - [6. 启动Lidar感知](#6-启动lidar感知)
-      - [7. 验证Lidar感知](#7-验证lidar感知)
-      - [8. 启动 Planning、Prediction、Routing、Control模块](#8-启动-planningpredictionroutingcontrol模块)
-      - [9. 验证Planning、Prediction、Routing、Control模块是否启动成功](#9-验证planningpredictionroutingcontrol模块是否启动成功)
+      - [2. 启动感知](#2-启动感知)
+      - [3. 启动 Planning、Prediction、Routing、Control模块](#3-启动-planningpredictionroutingcontrol模块)
+      - [4. 验证Planning、Prediction、Routing、Control模块是否启动成功](#4-验证planningpredictionroutingcontrol模块是否启动成功)
   - [NEXT](#next)
+
 ## 概览
-该用户手册旨在帮助用户完成规划模块的配置和开环验证
+该用户手册旨在帮助用户完成规划模块的配置和开环验证。规划模块需要上游的感知数据，目前有Lidar感知和Camera感知两种方案，用户可以选择其中任意一种感知方案。
 ## 前提条件
 
-  - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)
+  - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)
 
 ## 配置文件的修改
 
@@ -48,81 +44,30 @@
 
 #### 1. 拍下车辆尾部的急停开关
 本文档目的是进行规划的适配，并完规划模块的开环验证，不需要车辆行驶，为了安全起见，将车开到室外调试场后，请全程确保急停开关处于按下状态
-#### 2. 启动can卡
-进入can卡目录启动can卡，用以下命令启动
-
-    cd ~/SocketCan/
-    bash start.sh
 
 
-####  3. 编译项目，启动Dreamview
-进入docker环境，用gpu编译项目，启动DreamView 
+#### 2. 启动感知
+- 如果用户使用Lidar感知方案，请参照[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)启动Lidar感知
+- 如果用户使用Camera感知方案，请参照[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)启动Camera感知
 
-    cd /apollo
-    bash docker/scripts/dev_start.sh
-    bash docker/scripts/dev_into.sh
-    bash apollo.sh build_opt_gpu
-    bash scripts/bootstrap.sh
-
-####  4. 启动所需模块
-
-在浏览器中打开(http://localhost:8888),选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
-
-![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview4.png)
-
-使用如下命令启动16线激光雷达
-
-    budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch
-
-####  5. 检查各模块channel是否正确
-
-在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
-	
-|channel_name | 检查项目 | 
-|---|---|
-| `/apollo/localization/pose`| 确保能正常输出数据 | 
-|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据、`sol_type:` 选项显示为`NARROW_INT`   |
-|`/apollo/sensor/lidar16/PointCloud2` | 确保能正常输出数据|
-|`/apollo/sensor/lidar16/Scan`| 确保能正常输出数据|
-| `/apollo/sensor/lidar16/compensator/PointCloud2`  | 确保能正常输出数据 |
-|`/tf`|确保能正常输出数据|
-|`/tf_static`|确保能正常输出数据|
-|`/apollo/canbus/chassis`|确保能正常输出数据|
-|`/apollo/canbus/chassis_detail`|确保能正常输出数据|
-
-
-#### 6. 启动Lidar感知
-确认各模块正常启动且channel输出正常后，在DreamView上启动Lidar感知模块(Perception模块)，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
-![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview5.png)
-
-
-#### 7. 验证Lidar感知
-在DreamView上启动Perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，查看车前方10米处运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，行人黄色，车辆绿色），如下图所示：
-
-![lidar_demonstration_dreamview2](images/lidar_demonstration_dreamview2.png)
-
-`/apollo/perception/obstacles`的数据如下图所示：
-
-![lidar_demonstration_obstacles1](images/lidar_demonstration_obstacles1.png)
-
-![lidar_demonstration_obstacles2](images/lidar_demonstration_obstacles2.png)
-
-确保在DreamView上能看到障碍物且`/apollo/perception/obstacles`有障碍物信息。
-
-#### 8. 启动 Planning、Prediction、Routing、Control模块
-在Module Controller标签页启动Planning、Prediction、Routing、Control模块。
+#### 3. 启动 Planning、Prediction、Routing、Control模块
+确保感知模块启动成功后，在Module Controller标签页启动Planning、Prediction、Routing、Control模块。
+- 对于Lidar感知方案，DreamView上显示启动的模块如下图所示：
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview7.png)
 
+- 对于Camera感知方案，DreamView上显示启动的模块如下图所示：
+![camera_demonstration_dreamview](../Camera_Based_Auto_Driving/images/camera_demonstration_dreamview.png)
+
+
 在Routing Editor标签中点击Add Point of Interest按钮添加一个point, 然后选择Send Routing Request按钮发送添加的routing点
-
-![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview6.png)
-
+![lidar_adaptation_dreamview6](images/lidar_adaptation_dreamview6.png)
 
 
-####  9. 验证Planning、Prediction、Routing、Control模块是否启动成功
+
+####  4. 验证Planning、Prediction、Routing、Control模块是否启动成功
 从DreamView中查看会出现一个蓝色的线 以及一个红色的stop标志。如下图所示：
 ![lidar_demonstration_routing1](images/lidar_demonstration_routing1.png)
-在车前方存在人或者自行车（车上有人）时，在task标签页查看planning轨迹线，如下图所示：
+在车前方存在人或者自行车（车上有人）时，在task标签页查看planning轨迹线，正常情况下planning会重新规划轨迹，如下图所示：
 
 ![lidar_demonstration_routing2](images/lidar_demonstration_routing2.png)
 
@@ -133,4 +78,4 @@
 如果出现上图所示轨迹线和topic信息，表示规划模块适配和开环测试通过，否则继续查看log信息进行调试。
 
 ## NEXT
-现在，您已经完成规划适配，接下来可以开始[封闭园区自动驾驶搭建--自动驾驶演示](Start_Auto_Driving_cn.md)
+现在，您已经完成规划适配，根据您适配的是Lidar感知方案还是Camera感知方案，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--自动驾驶演示](Start_Auto_Driving_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--自动驾驶演示](../Camera_Based_Auto_Driving/Start_Auto_Driving_cn.md)

@@ -55,9 +55,9 @@
     bash scripts/bootstrap.sh
  
 #### 3. 启动所需模块
-在浏览器中打开(http://localhost:8888),选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在module Controller标签页启动GPS、Localization、Camera、Transform模块。
+在浏览器中打开`(http://localhost:8888)`,选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在module Controller标签页启动Camera、GPS、Localization、Transform模块。
 
-![camera_demonstration_dreamview](images/camera_demonstration_dreamview.jpeg)
+![camera_adaptation_dreamview](images/camera_adaptation_dreamview.png)
 
 ####  4. 检查各模块channel是否正确
 在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
