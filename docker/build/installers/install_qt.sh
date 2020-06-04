@@ -43,7 +43,7 @@ QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
 CHECKSUM="384c833bfbccf596a00bb02bbad14b53201854c287daf2d99c23a93b8de4062a"
 DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
 
-pip3 install cuteci
+pip3_install cuteci
 
 download_if_not_cached $QT_INSTALLER $CHECKSUM $DOWLOAD_LINK
 chmod +x $QT_INSTALLER
@@ -72,5 +72,3 @@ rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
 
 
 pip3 uninstall -y cuteci
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*

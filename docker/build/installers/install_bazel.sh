@@ -49,8 +49,8 @@ if [ "$ARCH" == "x86_64" ]; then
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
-  cp ${PKG_NAME} /usr/local/bin/
-  rm -rf ${PKG_NAME}
+  cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
+  rm -f ${PKG_NAME}
 
   ## buildozer
   PKG_NAME="buildozer"
@@ -59,7 +59,7 @@ if [ "$ARCH" == "x86_64" ]; then
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
-  cp ${PKG_NAME} /usr/local/bin/
+  cp ${PKG_NAME} "${SYSROOT_DIR}/bin"
   rm -rf ${PKG_NAME}
   info "Done installing bazel ${VERSION} with buildifier and buildozer"
 

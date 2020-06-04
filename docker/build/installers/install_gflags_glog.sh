@@ -38,7 +38,8 @@ tar xzf "${PKG_NAME}"
 
 pushd gflags-${VERSION}
     mkdir build && cd build
-    cmake -DBUILD_SHARED_LIBS=ON ..
+    cmake .. -DBUILD_SHARED_LIBS=ON \
+             -DCMAKE_BUILD_TYPE=Release
     make -j${THREAD_NUM}
     make install
 popd
@@ -63,11 +64,13 @@ tar xzf ${PKG_NAME}
 pushd glog-${VERSION}
     if [ "$ARCH" == "x86_64" ]; then
         mkdir build && cd build
-        cmake -DBUILD_SHARED_LIBS=ON ..
+        cmake .. \
+             -DBUILD_SHARED_LIBS=ON \
+             -DCMAKE_BUILD_TYPE=Release
     elif [ "$ARCH" == "aarch64" ]; then
         ./configure --build=armv8-none-linux --enable-shared
     else
-        echo "not support $ARCH"
+        echo "$ARCH not supported"
     fi
 
     make -j${THREAD_NUM}
