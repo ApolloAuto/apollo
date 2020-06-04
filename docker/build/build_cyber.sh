@@ -49,11 +49,11 @@ function print_usage() {
 }
 
 function determine_target_arch() {
-    local dockfile="$1"
-    IFS='.' read -ra __arr <<< "${dockfile}"
+    local dockerfile="$( basename "$1" )"
+    IFS='.' read -ra __arr <<< "${dockerfile}"
     if [[ ${#__arr[@]} -ne 3 ]]; then
         echo "Expected dockerfile with name [prefix_]<target>.<arch>.dockerfile"
-        echo "Got ${dockfile}. Exiting..."
+        echo "Got ${dockerfile}. Exiting..."
         exit 1
     fi
     IFS=' '
@@ -120,7 +120,7 @@ function check_arguments() {
     fi
 
     # Set and check target arch
-    determine_target_arch "${DOCKERFILE}}"
+    determine_target_arch "${DOCKERFILE}"
     if [[ "${TARGET_ARCH}" != "${HOST_ARCH}" ]]; then
         echo "[WARNING] Host arch (${HOST_ARCH}) != Target Arch (${TARGET_ARCH}) " \
              "for dockerfile \"$DOCKERFILE\""
