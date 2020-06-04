@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"
@@ -39,7 +39,7 @@ namespace planning {
 
 class DpStCost {
  public:
-  DpStCost(const DpStSpeedConfig& config, const double total_t,
+  DpStCost(const DpStSpeedOptimizerConfig& config, const double total_t,
            const double total_s, const std::vector<const Obstacle*>& obstacles,
            const STDrivableBoundary& st_drivable_boundary,
            const common::TrajectoryPoint& init_point);
@@ -80,7 +80,7 @@ class DpStCost {
       std::vector<std::pair<double, double>>* keep_clear_range_);
   bool InKeepClearRange(double s) const;
 
-  const DpStSpeedConfig& config_;
+  const DpStSpeedOptimizerConfig& config_;
   const std::vector<const Obstacle*>& obstacles_;
 
   STDrivableBoundary st_drivable_boundary_;

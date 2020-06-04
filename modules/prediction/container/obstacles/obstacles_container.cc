@@ -54,6 +54,7 @@ ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
       submodule_output.curr_frame_unmovable_obstacle_ids();
   curr_frame_considered_obstacle_ids_ =
       submodule_output.curr_frame_considered_obstacle_ids();
+  curr_scenario_ = submodule_output.curr_scenario();
 }
 
 void ObstaclesContainer::CleanUp() {
@@ -361,6 +362,10 @@ SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput(
   container_output.set_frame_start_time(frame_start_time);
 
   return container_output;
+}
+
+const Scenario& ObstaclesContainer::curr_scenario() const {
+  return curr_scenario_;
 }
 
 }  // namespace prediction

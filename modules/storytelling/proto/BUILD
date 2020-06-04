@@ -6,6 +6,25 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "storytelling_config_cc_proto",
+    deps = [
+        ":storytelling_config_proto",
+    ],
+)
+
+proto_library(
+    name = "storytelling_config_proto",
+    srcs = ["storytelling_config.proto"],
+)
+
+py_proto_library(
+    name = "storytelling_config_py_pb2",
+    deps = [
+        ":storytelling_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "story_cc_proto",
     deps = [
         ":story_proto",

@@ -26,7 +26,9 @@ cc_test(
     deps = [
         "//modules/common/math",
         "@com_google_googletest//:gtest_main",
-        "@cuda",
+        "@local_config_cuda//cuda:cublas",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

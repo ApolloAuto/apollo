@@ -209,13 +209,6 @@ new_local_repository(
 #    path = "/usr/include/caffe",
 #)
 #
-### tensorrt
-#new_local_repository(
-#    name = "tensorrt",
-#    build_file = "third_party/tensorrt.BUILD",
-#    path = "/usr/include/tensorrt",
-#)
-#
 
 # YAML-CPP
 http_archive(
@@ -251,13 +244,6 @@ new_local_repository(
     name = "adolc",
     build_file = "third_party/adolc.BUILD",
     path = "/usr/include",
-)
-
-# Cuda
-new_local_repository(
-    name = "cuda",
-    build_file = "external/cuda.BUILD",
-    path = "/usr/local/cuda",
 )
 
 ## Local-integ
@@ -390,7 +376,7 @@ new_local_repository(
     path = "/usr/include",
 )
 
-# lz4 
+# lz4
 new_local_repository(
     name = "lz4",
     build_file = "third_party/lz4.BUILD",

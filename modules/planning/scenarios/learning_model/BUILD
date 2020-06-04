@@ -50,4 +50,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stage_run_test",
+    size = "small",
+    srcs = ["stage_run_test.cc"],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":learning_model_sample_scenario",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cpplint()

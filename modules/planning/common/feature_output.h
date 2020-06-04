@@ -51,10 +51,12 @@ class FeatureOutput {
    * @param A feature in proto
    */
   static void InsertLearningDataFrame(
-       const std::string& record_filename,
+      const std::string& record_filename,
       const LearningDataFrame& learning_data_frame);
 
   static void InsertPlanningResult();
+
+  static LearningDataFrame* GetLatestLearningDataFrame();
 
   /**
    * @brief Write LearningData to a file

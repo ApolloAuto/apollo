@@ -36,7 +36,6 @@ function set_lib_path() {
   [[ -e "${CYBER_SETUP}" ]] && . "${CYBER_SETUP}"
 
   export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib:/usr/lib/$(uname -m)-linux-gnu"
-  export LD_LIBRARY_PATH="${APOLLO_CACHE_DIR}/apollolibs:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/qt5/lib:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/tf2/lib:$LD_LIBRARY_PATH"

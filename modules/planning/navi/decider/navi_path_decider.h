@@ -29,8 +29,8 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/navi_path_decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"

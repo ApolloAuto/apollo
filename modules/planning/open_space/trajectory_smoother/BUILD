@@ -97,7 +97,8 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
-        ":distance_approach_ipopt_cuda_interface",
+        # TODO(xiaoxq): Disable CUDA in planning temporarily.
+        # ":distance_approach_ipopt_cuda_interface",
         ":distance_approach_ipopt_fixed_dual_interface",
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
@@ -288,7 +289,7 @@ cuda_library(
     srcs = ["planning_block.cu"],
     hdrs = ["planning_block.h"],
     deps = [
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

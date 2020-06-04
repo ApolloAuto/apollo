@@ -22,6 +22,7 @@ cc_library(
         "//modules/planning/proto:planning_cc_proto",
         "//modules/storytelling:frame_manager",
         "//modules/storytelling/common:storytelling_gflags",
+        "//modules/storytelling/proto:storytelling_config_cc_proto",
     ],
 )
 

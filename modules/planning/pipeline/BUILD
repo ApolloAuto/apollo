@@ -45,9 +45,15 @@ cc_binary(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+<<<<<<< HEAD
         "//modules/planning/common:feature_output",
         "//modules/planning/common:message_process",
         "//modules/planning/common:planning_gflags",
+=======
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:feature_output",
+        "//modules/planning/common:message_process",
+>>>>>>> master
         "//third_party:boost",
         "@com_google_absl//absl/strings",
     ],

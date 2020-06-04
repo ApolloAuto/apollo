@@ -23,7 +23,6 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
-#include "modules/prediction/predictor/predictor_manager.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,11 +35,22 @@ std::string PredictorSubmodule::Name() const {
 }
 
 bool PredictorSubmodule::Init() {
-  if (!MessageProcess::InitPredictors()) {
+  predictor_manager_.reset(new PredictorManager());
+
+  PredictionConf prediction_conf;
+  if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << ComponentBase::ConfigFilePath();
     return false;
   }
-  predictor_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+  if (!MessageProcess::InitPredictors(predictor_manager_.get(),
+                                      prediction_conf)) {
+    return false;
+  }
+  predictor_writer_ = node_->CreateWriter<PredictionObstacles>(
+      prediction_conf.topic_conf().prediction_topic());
   return true;
 }
 
@@ -54,11 +64,10 @@ bool PredictorSubmodule::Proc(
       perception_obstacles->error_code();
   const absl::Time& frame_start_time = submodule_output->frame_start_time();
   ObstaclesContainer obstacles_container(*submodule_output);
-  PredictorManager::Instance()->Run(*perception_obstacles,
-                                    adc_trajectory_container.get(),
-                                    &obstacles_container);
+  predictor_manager_->Run(*perception_obstacles, adc_trajectory_container.get(),
+                          &obstacles_container);
   PredictionObstacles prediction_obstacles =
-      PredictorManager::Instance()->prediction_obstacles();
+      predictor_manager_->prediction_obstacles();
 
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
   prediction_obstacles.mutable_header()->set_lidar_timestamp(

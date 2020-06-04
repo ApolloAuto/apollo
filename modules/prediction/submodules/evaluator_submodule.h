@@ -27,6 +27,7 @@
 #include "cyber/component/component.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/submodules/submodule_output.h"
 
 namespace apollo {
@@ -59,6 +60,8 @@ class EvaluatorSubmodule : public cyber::Component<SubmoduleOutput> {
 
  private:
   std::shared_ptr<cyber::Writer<SubmoduleOutput>> evaluator_writer_;
+
+  std::unique_ptr<EvaluatorManager> evaluator_manager_;
 };
 
 CYBER_REGISTER_COMPONENT(EvaluatorSubmodule)

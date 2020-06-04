@@ -10,6 +10,7 @@ import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
+import "modules/routing/proto/routing.proto";
 
 message OverlapFeature {
   optional string id = 1;
@@ -74,7 +75,7 @@ message LocalizationFeature {
 }
 
 // based on apollo.common.PathPoint
-message PathPointFeature {
+message CommonPathPointFeature {
   // coordinates
   optional double x = 1;
   optional double y = 2;
@@ -89,9 +90,9 @@ message PathPointFeature {
 }
 
 // based on apollo.commom.TrajectoryPoint
-message TrajectoryPointFeature {
+message CommonTrajectoryPointFeature {
   // path point
-  optional PathPointFeature path_point = 1;
+  optional CommonPathPointFeature path_point = 1;
   // linear velocity
   optional double v = 2;  // in [m/s]
   // linear acceleration
@@ -102,9 +103,9 @@ message TrajectoryPointFeature {
   optional apollo.common.GaussianInfo gaussian_info = 5;
 }
 
-message TrajectoryPoint {
+message TrajectoryPointFeature {
   optional double timestamp_sec = 1;
-  optional TrajectoryPointFeature trajectory_point = 2;
+  optional CommonTrajectoryPointFeature trajectory_point = 2;
 }
 
 // based on apollo.perception.PerceptionObstacle
@@ -129,13 +130,13 @@ message PerceptionObstacleFeature {
 
 message ObstacleTrajectoryFeature {
   repeated PerceptionObstacleFeature perception_obstacle_history = 1;
-  repeated TrajectoryPoint evaluated_trajectory_point = 2;
+  repeated TrajectoryPointFeature evaluated_trajectory_point = 2;
 }
 
 // based on apollo.prediction.Trajectory
 message PredictionTrajectoryFeature {
   optional double probability = 1;  // probability of this trajectory
-  repeated TrajectoryPoint trajectory_point = 2;
+  repeated TrajectoryPointFeature trajectory_point = 2;
 }
 
 // based on apollo.prediction.PredictionObstacle
@@ -160,8 +161,14 @@ message ObstacleFeature {
   optional PredictionObstacleFeature obstacle_prediction = 7;
 }
 
+// based on apollo.routing.RoutingResponse
+message RoutingResponseFeature {
+  repeated apollo.routing.RoadSegment road = 1;
+  optional apollo.routing.Measurement measurement = 2;
+}
+
 message RoutingFeature {
-  repeated string routing_lane_id = 1;
+  optional RoutingResponseFeature routing_response = 1;
   repeated string local_routing_lane_id = 2;  // local routing close to ADC
 }
 
@@ -183,11 +190,11 @@ message TrafficLightDetectionFeature {
 message ADCTrajectoryPoint {
   optional double timestamp_sec = 1;  // localization measurement_time
   optional PlanningTag planning_tag = 2;
-  optional TrajectoryPointFeature trajectory_point = 3;
+  optional CommonTrajectoryPointFeature trajectory_point = 3;
 }
 
 message LearningOutput {
-  repeated ADCTrajectoryPoint adc_future_trajectory_point = 1;
+  repeated TrajectoryPointFeature adc_future_trajectory_point = 1;
 }
 
 message LearningDataFrame {

@@ -84,18 +84,9 @@ bool HMMatcher::RefinedTrack(const base::ObjectPtr &track_object,
                              double track_timestamp,
                              const base::ObjectPtr &radar_object,
                              double radar_timestamp) {
-  auto compute_distance = [](const base::ObjectPtr &object1, double timestamp1,
-                             const base::ObjectPtr &object2,
-                             double timestamp2) -> double {
-    double time_diff = timestamp2 - timestamp1;
-    return (object2->center - object1->center -
-            object1->velocity.cast<double>() * time_diff)
-        .head(2)
-        .norm();
-  };
-  double dist = 0.5 * compute_distance(track_object, track_timestamp,
+  double dist = 0.5 * DistanceBetweenObs(track_object, track_timestamp,
                                        radar_object, radar_timestamp) +
-                0.5 * compute_distance(radar_object, radar_timestamp,
+                0.5 * DistanceBetweenObs(radar_object, radar_timestamp,
                                        track_object, track_timestamp);
 
   return dist < BaseMatcher::GetMaxMatchDistance();

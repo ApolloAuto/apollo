@@ -25,9 +25,6 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gtest/gtest_prod.h"
-
-#include "modules/routing/proto/routing.pb.h"
-
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -38,11 +35,14 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/proto/planning_semantic_map_config.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/task_factory.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -106,11 +106,22 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   reference_line_provider_->Start();
 
   // dispatch planner
-  planner_ = planner_dispatcher_->DispatchPlanner();
+  planner_ = planner_dispatcher_->DispatchPlanner(config_);
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
         "planning is not initialized with config : " + config_.DebugString());
+  }
+
+  if (FLAGS_planning_offline_mode == 1) {
+    PlanningSemanticMapConfig renderer_config;
+    ACHECK(apollo::cyber::common::GetProtoFromFile(
+        FLAGS_planning_birdview_img_feature_renderer_config_file,
+        &renderer_config))
+        << "Failed to load renderer config"
+        << FLAGS_planning_birdview_img_feature_renderer_config_file;
+
+    BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
   }
 
   start_time_ = Clock::NowInSeconds();

@@ -49,6 +49,8 @@ DECLARE_bool(img_show_semantic_map);
 // Scenario
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_all_junction);
+DECLARE_bool(enable_all_pedestrian_caution_in_front);
+DECLARE_bool(enable_rank_caution_obstacles);
 DECLARE_int32(caution_obs_max_nums);
 DECLARE_double(caution_distance_threshold);
 DECLARE_double(caution_search_distance_ahead);

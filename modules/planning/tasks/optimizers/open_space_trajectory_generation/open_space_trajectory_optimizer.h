@@ -38,7 +38,7 @@
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
-#include "modules/planning/proto/open_space_trajectory_provider_config.pb.h"
+#include "modules/planning/proto/open_space_task_config.pb.h"
 
 namespace apollo {
 namespace planning {

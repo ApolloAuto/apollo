@@ -68,8 +68,9 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
 
-  void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
-                        const Frame& frame);
+  void ScenarioDispatch(const Frame& frame);
+  ScenarioConfig::ScenarioType ScenarioDispatchLearning();
+  ScenarioConfig::ScenarioType ScenarioDispatchNonLearning(const Frame& frame);
 
   bool IsBareIntersectionScenario(
       const ScenarioConfig::ScenarioType& scenario_type);

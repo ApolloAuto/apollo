@@ -6,6 +6,47 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "sl_boundary_cc_proto",
+    deps = [
+        ":sl_boundary_proto",
+    ],
+)
+
+proto_library(
+    name = "sl_boundary_proto",
+    srcs = ["sl_boundary.proto"],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+    ],
+)
+
+py_proto_library(
+    name = "sl_boundary_py_pb2",
+    deps = [
+        ":sl_boundary_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_structure_cc_proto",
+    deps = [
+        ":lattice_structure_proto",
+    ],
+)
+
+proto_library(
+    name = "lattice_structure_proto",
+    srcs = ["lattice_structure.proto"],
+)
+
+py_proto_library(
+    name = "lattice_structure_py_pb2",
+    deps = [
+        ":lattice_structure_proto",
+    ],
+)
+
+cc_proto_library(
     name = "decision_cc_proto",
     deps = [
         ":decision_proto",
@@ -26,29 +67,6 @@ py_proto_library(
     name = "decision_py_pb2",
     deps = [
         ":decision_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "planner_open_space_config_cc_proto",
-    deps = [
-        ":planner_open_space_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planner_open_space_config_proto",
-    srcs = ["planner_open_space_config.proto"],
-    deps = [
-        ":fem_pos_deviation_smoother_config_proto",
-        ":piecewise_jerk_speed_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planner_open_space_config_py_pb2",
-    deps = [
-        ":planner_open_space_config_proto",
     ],
 )
 
@@ -77,192 +95,25 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "sl_boundary_cc_proto",
-    deps = [
-        ":sl_boundary_proto",
-    ],
-)
-
-proto_library(
-    name = "sl_boundary_proto",
-    srcs = ["sl_boundary.proto"],
-    deps = [
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-py_proto_library(
-    name = "sl_boundary_py_pb2",
-    deps = [
-        ":sl_boundary_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "navi_obstacle_decider_config_cc_proto",
-    deps = [
-        ":navi_obstacle_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "navi_obstacle_decider_config_proto",
-    srcs = ["navi_obstacle_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "navi_obstacle_decider_config_py_pb2",
-    deps = [
-        ":navi_obstacle_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "rule_based_stop_decider_config_cc_proto",
-    deps = [
-        ":rule_based_stop_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "rule_based_stop_decider_config_proto",
-    srcs = ["rule_based_stop_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "rule_based_stop_decider_config_py_pb2",
-    deps = [
-        ":rule_based_stop_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "piecewise_jerk_nonlinear_speed_config_cc_proto",
-    deps = [
-        ":piecewise_jerk_nonlinear_speed_config_proto",
-    ],
-)
-
-proto_library(
-    name = "piecewise_jerk_nonlinear_speed_config_proto",
-    srcs = ["piecewise_jerk_nonlinear_speed_config.proto"],
-)
-
-py_proto_library(
-    name = "piecewise_jerk_nonlinear_speed_config_py_pb2",
-    deps = [
-        ":piecewise_jerk_nonlinear_speed_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "navi_path_decider_config_cc_proto",
-    deps = [
-        ":navi_path_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "navi_path_decider_config_proto",
-    srcs = ["navi_path_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "navi_path_decider_config_py_pb2",
-    deps = [
-        ":navi_path_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "learning_data_cc_proto",
-    deps = [
-        ":learning_data_proto",
-    ],
-)
-
-proto_library(
-    name = "learning_data_proto",
-    srcs = ["learning_data.proto"],
-    deps = [
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/map/proto:map_lane_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
-        "//modules/perception/proto:traffic_light_detection_proto",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/proto:prediction_obstacle_proto",
-    ],
-)
-
-py_proto_library(
-    name = "learning_data_py_pb2",
-    deps = [
-        ":learning_data_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "open_space_trajectory_provider_config_cc_proto",
-    deps = [
-        ":open_space_trajectory_provider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "open_space_trajectory_provider_config_proto",
-    srcs = ["open_space_trajectory_provider_config.proto"],
+    name = "planner_open_space_config_cc_proto",
     deps = [
         ":planner_open_space_config_proto",
     ],
 )
 
-py_proto_library(
-    name = "open_space_trajectory_provider_config_py_pb2",
-    deps = [
-        ":open_space_trajectory_provider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "auto_tuning_raw_feature_cc_proto",
-    deps = [
-        ":auto_tuning_raw_feature_proto",
-    ],
-)
-
 proto_library(
-    name = "auto_tuning_raw_feature_proto",
-    srcs = ["auto_tuning_raw_feature.proto"],
+    name = "planner_open_space_config_proto",
+    srcs = ["planner_open_space_config.proto"],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
+        ":fem_pos_deviation_smoother_config_proto",
+        ":task_config_proto",
     ],
 )
 
 py_proto_library(
-    name = "auto_tuning_raw_feature_py_pb2",
+    name = "planner_open_space_config_py_pb2",
     deps = [
-        ":auto_tuning_raw_feature_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "open_space_fallback_decider_config_cc_proto",
-    deps = [
-        ":open_space_fallback_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "open_space_fallback_decider_config_proto",
-    srcs = ["open_space_fallback_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "open_space_fallback_decider_config_py_pb2",
-    deps = [
-        ":open_space_fallback_decider_config_proto",
+        ":planner_open_space_config_proto",
     ],
 )
 
@@ -286,81 +137,59 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "piecewise_jerk_speed_config_cc_proto",
+    name = "auto_tuning_model_input_cc_proto",
     deps = [
-        ":piecewise_jerk_speed_config_proto",
+        ":auto_tuning_model_input_proto",
     ],
 )
 
 proto_library(
-    name = "piecewise_jerk_speed_config_proto",
-    srcs = ["piecewise_jerk_speed_config.proto"],
+    name = "auto_tuning_model_input_proto",
+    srcs = ["auto_tuning_model_input.proto"],
 )
 
 py_proto_library(
-    name = "piecewise_jerk_speed_config_py_pb2",
+    name = "auto_tuning_model_input_py_pb2",
     deps = [
-        ":piecewise_jerk_speed_config_proto",
+        ":auto_tuning_model_input_proto",
     ],
 )
 
 cc_proto_library(
-    name = "spiral_curve_config_cc_proto",
+    name = "planning_semantic_map_config_cc_proto",
     deps = [
-        ":spiral_curve_config_proto",
+        ":planning_semantic_map_config_proto",
     ],
 )
 
 proto_library(
-    name = "spiral_curve_config_proto",
-    srcs = ["spiral_curve_config.proto"],
+    name = "planning_semantic_map_config_proto",
+    srcs = ["planning_semantic_map_config.proto"],
 )
 
 py_proto_library(
-    name = "spiral_curve_config_py_pb2",
+    name = "planning_semantic_map_config_py_pb2",
     deps = [
-        ":spiral_curve_config_proto",
+        ":planning_semantic_map_config_proto",
     ],
 )
 
 cc_proto_library(
-    name = "pad_msg_cc_proto",
+    name = "traffic_rule_config_cc_proto",
     deps = [
-        ":pad_msg_proto",
+        ":traffic_rule_config_proto",
     ],
 )
 
 proto_library(
-    name = "pad_msg_proto",
-    srcs = ["pad_msg.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
+    name = "traffic_rule_config_proto",
+    srcs = ["traffic_rule_config.proto"],
 )
 
 py_proto_library(
-    name = "pad_msg_py_pb2",
+    name = "traffic_rule_config_py_pb2",
     deps = [
-        ":pad_msg_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "path_bounds_decider_config_cc_proto",
-    deps = [
-        ":path_bounds_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "path_bounds_decider_config_proto",
-    srcs = ["path_bounds_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "path_bounds_decider_config_py_pb2",
-    deps = [
-        ":path_bounds_decider_config_proto",
+        ":traffic_rule_config_proto",
     ],
 )
 
@@ -384,21 +213,153 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "dp_st_speed_config_cc_proto",
+    name = "planning_stats_cc_proto",
     deps = [
-        ":dp_st_speed_config_proto",
+        ":planning_stats_proto",
     ],
 )
 
 proto_library(
-    name = "dp_st_speed_config_proto",
-    srcs = ["dp_st_speed_config.proto"],
+    name = "planning_stats_proto",
+    srcs = ["planning_stats.proto"],
 )
 
 py_proto_library(
-    name = "dp_st_speed_config_py_pb2",
+    name = "planning_stats_py_pb2",
     deps = [
-        ":dp_st_speed_config_proto",
+        ":planning_stats_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_task_config_cc_proto",
+    deps = [
+        ":open_space_task_config_proto",
+    ],
+)
+
+proto_library(
+    name = "open_space_task_config_proto",
+    srcs = ["open_space_task_config.proto"],
+    deps = [
+        ":planner_open_space_config_proto",
+    ],
+)
+
+py_proto_library(
+    name = "open_space_task_config_py_pb2",
+    deps = [
+        ":open_space_task_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "reference_line_smoother_config_cc_proto",
+    deps = [
+        ":reference_line_smoother_config_proto",
+    ],
+)
+
+proto_library(
+    name = "reference_line_smoother_config_proto",
+    srcs = ["reference_line_smoother_config.proto"],
+    deps = [
+        ":cos_theta_smoother_config_proto",
+        ":fem_pos_deviation_smoother_config_proto",
+    ],
+)
+
+py_proto_library(
+    name = "reference_line_smoother_config_py_pb2",
+    deps = [
+        ":reference_line_smoother_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "task_config_cc_proto",
+    deps = [
+        ":task_config_proto",
+    ],
+)
+
+proto_library(
+    name = "task_config_proto",
+    srcs = ["task_config.proto"],
+)
+
+py_proto_library(
+    name = "task_config_py_pb2",
+    deps = [
+        ":task_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "cos_theta_smoother_config_cc_proto",
+    deps = [
+        ":cos_theta_smoother_config_proto",
+    ],
+)
+
+proto_library(
+    name = "cos_theta_smoother_config_proto",
+    srcs = ["cos_theta_smoother_config.proto"],
+)
+
+py_proto_library(
+    name = "cos_theta_smoother_config_py_pb2",
+    deps = [
+        ":cos_theta_smoother_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "learning_data_cc_proto",
+    deps = [
+        ":learning_data_proto",
+    ],
+)
+
+proto_library(
+    name = "learning_data_proto",
+    srcs = ["learning_data.proto"],
+    deps = [
+        "//modules/canbus/proto:chassis_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/map/proto:map_lane_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+        "//modules/perception/proto:traffic_light_detection_proto",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:prediction_obstacle_proto",
+        "//modules/routing/proto:routing_proto",
+    ],
+)
+
+py_proto_library(
+    name = "learning_data_py_pb2",
+    deps = [
+        ":learning_data_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "spiral_curve_config_cc_proto",
+    deps = [
+        ":spiral_curve_config_proto",
+    ],
+)
+
+proto_library(
+    name = "spiral_curve_config_proto",
+    srcs = ["spiral_curve_config.proto"],
+)
+
+py_proto_library(
+    name = "spiral_curve_config_py_pb2",
+    deps = [
+        ":spiral_curve_config_proto",
     ],
 )
 
@@ -428,471 +389,6 @@ py_proto_library(
     name = "planning_py_pb2",
     deps = [
         ":planning_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "auto_tuning_model_input_cc_proto",
-    deps = [
-        ":auto_tuning_model_input_proto",
-    ],
-)
-
-proto_library(
-    name = "auto_tuning_model_input_proto",
-    srcs = ["auto_tuning_model_input.proto"],
-)
-
-py_proto_library(
-    name = "auto_tuning_model_input_py_pb2",
-    deps = [
-        ":auto_tuning_model_input_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "path_decider_config_cc_proto",
-    deps = [
-        ":path_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "path_decider_config_proto",
-    srcs = ["path_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "path_decider_config_py_pb2",
-    deps = [
-        ":path_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "open_space_pre_stop_decider_config_cc_proto",
-    deps = [
-        ":open_space_pre_stop_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "open_space_pre_stop_decider_config_proto",
-    srcs = ["open_space_pre_stop_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "open_space_pre_stop_decider_config_py_pb2",
-    deps = [
-        ":open_space_pre_stop_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "lane_change_decider_config_cc_proto",
-    deps = [
-        ":lane_change_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "lane_change_decider_config_proto",
-    srcs = ["lane_change_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "lane_change_decider_config_py_pb2",
-    deps = [
-        ":lane_change_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_semantic_map_config_cc_proto",
-    deps = [
-        ":planning_semantic_map_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_semantic_map_config_proto",
-    srcs = ["planning_semantic_map_config.proto"],
-)
-
-py_proto_library(
-    name = "planning_semantic_map_config_py_pb2",
-    deps = [
-        ":planning_semantic_map_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "open_space_trajectory_partition_config_cc_proto",
-    deps = [
-        ":open_space_trajectory_partition_config_proto",
-    ],
-)
-
-proto_library(
-    name = "open_space_trajectory_partition_config_proto",
-    srcs = ["open_space_trajectory_partition_config.proto"],
-)
-
-py_proto_library(
-    name = "open_space_trajectory_partition_config_py_pb2",
-    deps = [
-        ":open_space_trajectory_partition_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "reference_line_smoother_config_cc_proto",
-    deps = [
-        ":reference_line_smoother_config_proto",
-    ],
-)
-
-proto_library(
-    name = "reference_line_smoother_config_proto",
-    srcs = ["reference_line_smoother_config.proto"],
-    deps = [
-        ":cos_theta_smoother_config_proto",
-        ":fem_pos_deviation_smoother_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "reference_line_smoother_config_py_pb2",
-    deps = [
-        ":reference_line_smoother_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "path_lane_borrow_decider_config_cc_proto",
-    deps = [
-        ":path_lane_borrow_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "path_lane_borrow_decider_config_proto",
-    srcs = ["path_lane_borrow_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "path_lane_borrow_decider_config_py_pb2",
-    deps = [
-        ":path_lane_borrow_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "path_reuse_decider_config_cc_proto",
-    deps = [
-        ":path_reuse_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "path_reuse_decider_config_proto",
-    srcs = ["path_reuse_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "path_reuse_decider_config_py_pb2",
-    deps = [
-        ":path_reuse_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "lattice_structure_cc_proto",
-    deps = [
-        ":lattice_structure_proto",
-    ],
-)
-
-proto_library(
-    name = "lattice_structure_proto",
-    srcs = ["lattice_structure.proto"],
-)
-
-py_proto_library(
-    name = "lattice_structure_py_pb2",
-    deps = [
-        ":lattice_structure_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "qp_problem_cc_proto",
-    deps = [
-        ":qp_problem_proto",
-    ],
-)
-
-proto_library(
-    name = "qp_problem_proto",
-    srcs = ["qp_problem.proto"],
-)
-
-py_proto_library(
-    name = "qp_problem_py_pb2",
-    deps = [
-        ":qp_problem_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "st_bounds_decider_config_cc_proto",
-    deps = [
-        ":st_bounds_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "st_bounds_decider_config_proto",
-    srcs = ["st_bounds_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "st_bounds_decider_config_py_pb2",
-    deps = [
-        ":st_bounds_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "traffic_rule_config_cc_proto",
-    deps = [
-        ":traffic_rule_config_proto",
-    ],
-)
-
-proto_library(
-    name = "traffic_rule_config_proto",
-    srcs = ["traffic_rule_config.proto"],
-)
-
-py_proto_library(
-    name = "traffic_rule_config_py_pb2",
-    deps = [
-        ":traffic_rule_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "navi_speed_decider_config_cc_proto",
-    deps = [
-        ":navi_speed_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "navi_speed_decider_config_proto",
-    srcs = ["navi_speed_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "navi_speed_decider_config_py_pb2",
-    deps = [
-        ":navi_speed_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "st_drivable_boundary_cc_proto",
-    deps = [
-        ":st_drivable_boundary_proto",
-    ],
-)
-
-proto_library(
-    name = "st_drivable_boundary_proto",
-    srcs = ["st_drivable_boundary.proto"],
-)
-
-py_proto_library(
-    name = "st_drivable_boundary_py_pb2",
-    deps = [
-        ":st_drivable_boundary_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "open_space_roi_decider_config_cc_proto",
-    deps = [
-        ":open_space_roi_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "open_space_roi_decider_config_proto",
-    srcs = ["open_space_roi_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "open_space_roi_decider_config_py_pb2",
-    deps = [
-        ":open_space_roi_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "cos_theta_smoother_config_cc_proto",
-    deps = [
-        ":cos_theta_smoother_config_proto",
-    ],
-)
-
-proto_library(
-    name = "cos_theta_smoother_config_proto",
-    srcs = ["cos_theta_smoother_config.proto"],
-)
-
-py_proto_library(
-    name = "cos_theta_smoother_config_py_pb2",
-    deps = [
-        ":cos_theta_smoother_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "creep_decider_config_cc_proto",
-    deps = [
-        ":creep_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "creep_decider_config_proto",
-    srcs = ["creep_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "creep_decider_config_py_pb2",
-    deps = [
-        ":creep_decider_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_stats_cc_proto",
-    deps = [
-        ":planning_stats_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_stats_proto",
-    srcs = ["planning_stats.proto"],
-)
-
-py_proto_library(
-    name = "planning_stats_py_pb2",
-    deps = [
-        ":planning_stats_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_config_cc_proto",
-    deps = [
-        ":planning_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_config_proto",
-    srcs = ["planning_config.proto"],
-    deps = [
-        ":creep_decider_config_proto",
-        ":dp_st_speed_config_proto",
-        ":lane_change_decider_config_proto",
-        ":navi_obstacle_decider_config_proto",
-        ":navi_path_decider_config_proto",
-        ":navi_speed_decider_config_proto",
-        ":open_space_fallback_decider_config_proto",
-        ":open_space_pre_stop_decider_config_proto",
-        ":open_space_roi_decider_config_proto",
-        ":open_space_trajectory_partition_config_proto",
-        ":open_space_trajectory_provider_config_proto",
-        ":path_assessment_decider_config_proto",
-        ":path_bounds_decider_config_proto",
-        ":path_decider_config_proto",
-        ":path_lane_borrow_decider_config_proto",
-        ":path_reuse_decider_config_proto",
-        ":piecewise_jerk_nonlinear_speed_config_proto",
-        ":piecewise_jerk_path_config_proto",
-        ":piecewise_jerk_speed_config_proto",
-        ":rule_based_stop_decider_config_proto",
-        ":speed_bounds_decider_config_proto",
-        ":st_bounds_decider_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planning_config_py_pb2",
-    deps = [
-        ":planning_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "ipopt_return_status_cc_proto",
-    deps = [
-        ":ipopt_return_status_proto",
-    ],
-)
-
-proto_library(
-    name = "ipopt_return_status_proto",
-    srcs = ["ipopt_return_status.proto"],
-)
-
-py_proto_library(
-    name = "ipopt_return_status_py_pb2",
-    deps = [
-        ":ipopt_return_status_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "piecewise_jerk_path_config_cc_proto",
-    deps = [
-        ":piecewise_jerk_path_config_proto",
-    ],
-)
-
-proto_library(
-    name = "piecewise_jerk_path_config_proto",
-    srcs = ["piecewise_jerk_path_config.proto"],
-)
-
-py_proto_library(
-    name = "piecewise_jerk_path_config_py_pb2",
-    deps = [
-        ":piecewise_jerk_path_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "speed_bounds_decider_config_cc_proto",
-    deps = [
-        ":speed_bounds_decider_config_proto",
-    ],
-)
-
-proto_library(
-    name = "speed_bounds_decider_config_proto",
-    srcs = ["speed_bounds_decider_config.proto"],
-)
-
-py_proto_library(
-    name = "speed_bounds_decider_config_py_pb2",
-    deps = [
-        ":speed_bounds_decider_config_proto",
     ],
 )
 
@@ -930,20 +426,125 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "path_assessment_decider_config_cc_proto",
+    name = "planning_config_cc_proto",
     deps = [
-        ":path_assessment_decider_config_proto",
+        ":planning_config_proto",
     ],
 )
 
 proto_library(
-    name = "path_assessment_decider_config_proto",
-    srcs = ["path_assessment_decider_config.proto"],
+    name = "planning_config_proto",
+    srcs = ["planning_config.proto"],
+    deps = [
+        ":open_space_task_config_proto",
+        ":task_config_proto",
+    ],
 )
 
 py_proto_library(
-    name = "path_assessment_decider_config_py_pb2",
+    name = "planning_config_py_pb2",
     deps = [
-        ":path_assessment_decider_config_proto",
+        ":planning_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "pad_msg_cc_proto",
+    deps = [
+        ":pad_msg_proto",
+    ],
+)
+
+proto_library(
+    name = "pad_msg_proto",
+    srcs = ["pad_msg.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "pad_msg_py_pb2",
+    deps = [
+        ":pad_msg_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "auto_tuning_raw_feature_cc_proto",
+    deps = [
+        ":auto_tuning_raw_feature_proto",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_raw_feature_proto",
+    srcs = ["auto_tuning_raw_feature.proto"],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+    ],
+)
+
+py_proto_library(
+    name = "auto_tuning_raw_feature_py_pb2",
+    deps = [
+        ":auto_tuning_raw_feature_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "ipopt_return_status_cc_proto",
+    deps = [
+        ":ipopt_return_status_proto",
+    ],
+)
+
+proto_library(
+    name = "ipopt_return_status_proto",
+    srcs = ["ipopt_return_status.proto"],
+)
+
+py_proto_library(
+    name = "ipopt_return_status_py_pb2",
+    deps = [
+        ":ipopt_return_status_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "qp_problem_cc_proto",
+    deps = [
+        ":qp_problem_proto",
+    ],
+)
+
+proto_library(
+    name = "qp_problem_proto",
+    srcs = ["qp_problem.proto"],
+)
+
+py_proto_library(
+    name = "qp_problem_py_pb2",
+    deps = [
+        ":qp_problem_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "st_drivable_boundary_cc_proto",
+    deps = [
+        ":st_drivable_boundary_proto",
+    ],
+)
+
+proto_library(
+    name = "st_drivable_boundary_proto",
+    srcs = ["st_drivable_boundary.proto"],
+)
+
+py_proto_library(
+    name = "st_drivable_boundary_py_pb2",
+    deps = [
+        ":st_drivable_boundary_proto",
     ],
 )

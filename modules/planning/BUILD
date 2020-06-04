@@ -26,7 +26,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "libplanning_component.so",
     linkshared = True,
     linkstatic = False,
@@ -90,6 +90,7 @@ cc_library(
     deps = [
         ":planning_base",
         "//cyber/common:log",
+        "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
     ],
 )
 

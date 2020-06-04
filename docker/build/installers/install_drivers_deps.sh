@@ -18,7 +18,6 @@
 
 # Fail on first error.
 set -e
-
 MY_MODE="$1"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"

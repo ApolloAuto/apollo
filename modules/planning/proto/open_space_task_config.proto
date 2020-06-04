@@ -1,0 +1,207 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/planner_open_space_config.proto";
+
+//////////////////////////////////
+// OpenSpaceFallBackDeciderConfig
+
+message OpenSpaceFallBackDeciderConfig {
+  // prediction time horizon for prediction obstacles
+  optional double open_space_prediction_time_period = 1 [default = 5.0];
+  // fallback collision check distance
+  optional double open_space_fallback_collision_distance = 2 [default = 5.0];
+  // fallback stop trajectory safety gap to obstacles
+  optional double open_space_fallback_stop_distance = 3 [default = 2.0];
+  // fallback collision time buffer (s)
+  optional double open_space_fallback_collision_time_buffer = 4
+      [default = 10.0];
+}
+
+//////////////////////////////////
+// OpenSpacePreStopDeciderConfig
+
+message OpenSpacePreStopDeciderConfig {
+  // roi scenario definitions
+  enum StopType {
+    NOT_DEFINED = 0;
+    PARKING = 1;
+    PULL_OVER = 2;
+    NARROW_STREET_U_TURN = 3;
+  }
+  optional StopType stop_type = 1;
+  optional double rightaway_stop_distance = 2 [default = 2.0];  // meter
+  optional double stop_distance_to_target = 3 [default = 5.0];  // second
+}
+
+//////////////////////////////////
+// OpenSpaceRoiDeciderConfig
+
+message OpenSpaceRoiDeciderConfig {
+  // roi scenario definitions
+  enum RoiType {
+    NOT_DEFINED = 0;
+    PARKING = 1;
+    PULL_OVER = 2;
+    PARK_AND_GO = 3;
+    NARROW_STREET_U_TURN = 4;
+  }
+  optional RoiType roi_type = 1;
+  // longitudinal range of parking roi start
+  optional double roi_longitudinal_range_start = 2 [default = 10.0];
+  // longitudinal range of parking roi end
+  optional double roi_longitudinal_range_end = 3 [default = 10.0];
+  // parking spot range detection threshold
+  optional double parking_start_range = 4 [default = 7.0];
+  // Parking orientation for reverse parking
+  optional bool parking_inwards = 5 [default = false];
+  // wrap previous gflags
+  optional bool enable_perception_obstacles = 6;
+  // buffer distance from vehicle's edge to parking spot end line
+  optional double parking_depth_buffer = 7 [default = 0.1];
+  // min angle difference to stitch a new segment in roi representation
+  optional double roi_line_segment_min_angle = 8 [default = 0.3];
+  optional double roi_line_segment_length = 9 [default = 1.0];
+  // roi line segment length when getting road boundary from map
+  optional double roi_line_segment_length_from_map = 10 [default = 10.0];
+  // relative distance threshold to filter out ignored obstacle
+  optional double perception_obstacle_filtering_distance = 11
+      [default = 1000.0];
+  // buffer distance for perception obstacle
+  optional double perception_obstacle_buffer = 12;
+  // tolerance limit for road_bound_width abnormal changes
+  optional double curb_heading_tangent_change_upper_limit = 13 [default = 1.0];
+  // end pose s distance to current vehicle
+  optional double end_pose_s_distance = 14 [default = 10.0];
+}
+
+//////////////////////////////////
+// OpenSpaceTrajectoryPartitionConfig
+
+message OpenSpaceTrajectoryPartitionConfig {
+  // Gear shift trajectory parameter
+  optional double gear_shift_max_t = 1;
+  optional double gear_shift_unit_t = 2;
+  optional double gear_shift_period_duration = 3;
+  optional uint64 interpolated_pieces_num = 4;
+  optional uint64 initial_gear_check_horizon = 5;
+  // @brief heading search range is the range to filter out too large
+  // angle difference between vehicle heading and pathpoint heading
+  optional double heading_search_range = 6;
+  // @brief heading_track_range is the range to filter out too large
+  // angle difference between vehicle heading and vehicle to pathpoint vector
+  optional double heading_track_range = 7;
+  optional double distance_search_range = 8 [default = 1.0e-6];
+  // @brief IOU, intersection over union
+  optional double heading_offset_to_midpoint = 9;
+  optional double lateral_offset_to_midpoint = 10 [default = 0.1];
+  optional double longitudinal_offset_to_midpoint = 11 [default = 0.1];
+  optional double vehicle_box_iou_threshold_to_midpoint = 12 [default = 0.95];
+  optional double linear_velocity_threshold_on_ego = 13 [default = 0.2];
+}
+
+//////////////////////////////////
+// OpenSpaceTrajectoryProviderConfig
+
+message OpenSpaceTrajectoryProviderConfig {
+  // TODO(Jinyun) Move PlannerOpenSpaceConfig to
+  // OpenSpaceTrajectoryOptimizerConfig
+  optional OpenSpaceTrajectoryOptimizerConfig
+      open_space_trajectory_optimizer_config = 1;
+}
+
+message OpenSpaceTrajectoryOptimizerConfig {
+  // Hybrid a star warm start configs
+  optional HybridAStarConfig hybrid_a_star_config = 1;
+  // Dual variable configs
+  optional DualVariableConfig dual_variable_warm_start_config = 2;
+  // Distance approach trajectory smoothing configs
+  optional DistanceApproachTrajectorySmootherConfig
+      distance_approach_trajectory_smoother_config = 3;
+  optional float delta_t = 4 [default = 0.5];
+  optional double is_near_destination_threshold = 5 [default = 0.001];
+  // (TODO:(QiL) tmp message during refactoring, deprecate when all tuning done.
+  optional PlannerOpenSpaceConfig planner_open_space_config = 6;
+}
+
+// Hybrid a star as warm start for later smoothing
+message HybridAStarConfig {
+  optional double xy_grid_resolution = 1 [default = 0.2];
+  optional double phi_grid_resolution = 2 [default = 0.05];
+  optional uint64 next_node_num = 3 [default = 10];
+  optional double step_size = 4 [default = 0.5];
+  optional double traj_forward_penalty = 5 [default = 0.0];
+  optional double traj_back_penalty = 6 [default = 0.0];
+  optional double traj_gear_switch_penalty = 7 [default = 10.0];
+  optional double traj_steer_penalty = 8 [default = 100.0];
+  optional double traj_steer_change_penalty = 9 [default = 10.0];
+  optional double grid_a_star_xy_resolution = 15 [default = 0.1];
+  optional double node_radius = 16 [default = 0.5];
+}
+
+enum DualVariableMode {
+  DUAL_VARIABLE_IPOPT = 0;
+  DUAL_VARIABLE_IPOPTQP = 1;
+  DUAL_VARIABLE_OSQP = 2;
+  DUAL_VARIABLE_DEBUG = 3;
+}
+
+// Dual variable configs for warm starting distance approach trajectory
+// smoothing
+message DualVariableConfig {
+  optional double weight_d = 1 [default = 1.0];
+  optional IpoptSolverConfig ipopt_config = 2;
+  optional DualVariableMode qp_format = 3;
+  optional double min_safety_distance = 4 [default = 0.0];
+  optional bool debug_osqp = 5 [default = false];
+  optional double beta = 6 [default = 1.0];
+}
+
+// Distance approach trajectory smoothing configs
+message DistanceApproachTrajectorySmootherConfig {
+  optional double weight_steer = 1;
+  optional double weight_a = 2;
+  optional double weight_steer_rate = 3;
+  optional double weight_a_rate = 4;
+  optional double weight_x = 5;
+  optional double weight_y = 6;
+  optional double weight_phi = 7;
+  optional double weight_v = 8;
+  optional double weight_steer_stitching = 9;
+  optional double weight_a_stitching = 10;
+  optional double weight_first_order_time = 11;
+  optional double weight_second_order_time = 12;
+  optional double min_safety_distance = 13 [default = 0.0];
+  optional double max_speed_forward = 14 [default = 3.0];
+  optional double max_speed_reverse = 15 [default = 2.0];
+  optional double max_acceleration_forward = 16 [default = 2.0];
+  optional double max_acceleration_reverse = 17 [default = 2.0];
+  optional double min_time_sample_scaling = 18 [default = 0.1];
+  optional double max_time_sample_scaling = 19 [default = 10.0];
+  optional bool use_fix_time = 20 [default = false];
+  optional IpoptSolverConfig ipopt_config = 21;
+  optional bool enable_constraint_check = 22;
+  optional bool enable_hand_derivative = 23;
+  // True to enable hand derived derivative inside open space planner
+  optional bool enable_derivative_check = 24;
+  // True to enable derivative check inside open space planner
+  optional bool enable_initial_final_check = 25 [default = false];
+}
+
+// Ipopt configs
+message IpoptSolverConfig {
+  optional int32 ipopt_print_level = 1;
+  optional int32 mumps_mem_percent = 2;
+  optional double mumps_pivtol = 3;
+  optional int32 ipopt_max_iter = 4;
+  optional double ipopt_tol = 5;
+  optional double ipopt_acceptable_constr_viol_tol = 6;
+  optional double ipopt_min_hessian_perturbation = 7;
+  optional double ipopt_jacobian_regularization_value = 8;
+  optional string ipopt_print_timing_statistics = 9;
+  optional string ipopt_alpha_for_y = 10;
+  optional string ipopt_recalc_y = 11;
+  optional double ipopt_mu_init = 12 [default = 0.1];
+  // ipopt barrier parameter, default 0.1
+}
