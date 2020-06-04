@@ -501,6 +501,7 @@ cc_library(
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_proto",
     ],
+)
 
 cc_library(
     name = "dependency_injector",
