@@ -2,7 +2,7 @@
 
 ## 前提条件
 
- - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Waypoint_Following/Start_Waypoint_Following_cn.md)
+ - 完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/Start_Waypoint_Following_cn.md)
  
 ## 主要步骤
 

@@ -40,7 +40,7 @@
 ## 百度云对象存储BOS注册
 注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/Apply_BOS_Account_cn.md) 
 ## 开通云服务账号
-请与商务部门联系开通云服务账号，需要提供上一步骤中注册的`Bucket名称`、`所属地域`
+请与商务部门联系开通云服务账号，需要提供上一步骤中注册的`Bucket名称`、`所属地域`和用户邮箱信息
 ## 修改配置文件
 
 |修改文件名称 | 修改内容 | 
@@ -105,7 +105,7 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 | VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
 | Localization       | /apollo/localization/pose             | 100           |
 
-为获取上述`channel`，需要启动`GPS`、`Localization`、`16线激光雷达`三个模块，`GPS`、`Localization`模块在DreamView上直接启动，`16线激光雷达`使用命令`cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch`启动，详情可参考[循迹搭建--定位模块配置](../Waypoint_Following/Localization_Configuration_cn.md)、`16线激光雷达`模块的启动请参考[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/Sensor_Integration_cn.md)
+为获取上述`channel`，需要启动`GPS`、`Localization`、`16线激光雷达`三个模块，`GPS`、`Localization`模块在DreamView上直接启动，`16线激光雷达`使用命令`cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch`启动，详情可分别参考[循迹搭建--定位模块配置](../Waypoint_Following/Localization_Configuration_cn.md)、[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/Sensor_Integration_cn.md)
 
 **注意**：在正式开始录制前，务必确保以上channel能正常输出数据。
 
@@ -209,7 +209,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 #### 3. 获取标定结果验证及标定外参文件
 
-云标定任务完成后，将在注册的邮箱（请与商务联系）中收到一封标定结果邮件。如果标定任务成功，将包含标定外参文件。
+云标定任务完成后，将在注册的邮箱中收到一封标定结果邮件。如果标定任务成功，将包含标定外参文件。
 
 **Lidar-GNSS标定结果验证**：
 

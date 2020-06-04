@@ -50,7 +50,7 @@
 
 
 #### 2. 启动所需模块
-在浏览器中打开(http://localhost:8888),选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Transform模块。
+在浏览器中打开`(http://localhost:8888)`，选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Transform模块。
 
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview1.png)
 
@@ -72,7 +72,7 @@
 |`/tf_static`|确保能正常输出数据|
 
 #### 4. 启动Lidar感知
-确认各模块正常启动且channel输出正常后，在DreamView上启动Lidar感知模块(Perception模块)，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+确认各模块正常启动且channel输出正常后，在DreamView上启动Lidar感知模块(Perception模块)，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出
 ![lidar_adaptation_dreamview3](images/lidar_adaptation_dreamview3.png)
 
 ## 验证Lidar感知效果
