@@ -1,4 +1,4 @@
-FROM apolloauto/apollo:cyber-x86_64-18.04-20200602_2144
+FROM apolloauto/apollo:cyber-x86_64-18.04-20200604_1305
 
 ARG GEOLOC
 ARG BUILD_STAGE
@@ -21,5 +21,8 @@ RUN bash /tmp/installers/install_3rdparty_pept_deps.sh ${INSTALL_MODE}
 
 RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_pcl.sh
+
+# TODO(xiaoxq): Not needed for docker_dev, but should enable before release.
+# RUN bash /tmp/installers/install_bosfs.sh
 
 RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}

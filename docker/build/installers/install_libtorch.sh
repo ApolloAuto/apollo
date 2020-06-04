@@ -52,6 +52,6 @@ pushd libtorch
     mv lib     /usr/local/libtorch_cpu/lib
     mv share   /usr/local/libtorch_cpu/share
 popd
+
 # Cleanup
 rm -rf libtorch ${PKG_NAME}
-

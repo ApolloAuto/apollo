@@ -88,18 +88,18 @@ if [[ "${MY_GEO}" == "cn" ]]; then
     if [[ "${ARCH}" == "x86_64" ]]; then
         # Mirror from Tsinghua Univ.
         PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
-        python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
+        pip3_install -i "$PYPI_MIRROR" pip -U
         python3 -m pip config set global.index-url "$PYPI_MIRROR"
     else
         info "Use default PYPI mirror: https://pypi.org/simple for ${ARCH} for ${MY_GEO}"
-        python3 -m pip install --no-cache-dir pip -U
+        pip3_install pip -U
     fi
 else
-    python3 -m pip install --no-cache-dir pip -U
+    pip3_install pip -U
 fi
 
-python3 -m pip install --no-cache-dir setuptools
+pip3_install setuptools
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
-
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

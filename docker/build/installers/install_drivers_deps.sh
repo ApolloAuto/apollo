@@ -29,3 +29,7 @@ bash /tmp/installers/install_proj4.sh
 apt-get -y update && \
     apt-get -y install \
     libopencv-dev
+
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

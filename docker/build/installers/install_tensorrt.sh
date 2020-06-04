@@ -49,7 +49,4 @@ CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
     ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
 
 # disable nvidia apt source to speed to build process
-sed -i 's/^/# /g' /etc/apt/sources.list.d/nvidia-ml.list
-
-info "nVidia machine learning repo disabled after successful TensorRT-7 installation"
-info "$(cat /etc/apt/sources.list.d/nvidia-ml.list)"
+rm -f /etc/apt/sources.list.d/nvidia-ml.list
