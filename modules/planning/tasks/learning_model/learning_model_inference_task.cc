@@ -24,11 +24,9 @@
 #include <string>
 
 #include "absl/strings/str_cat.h"
-
+#include "modules/planning/learning_based/model_inference/trajectory_imitation_inference.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/planning/learning_based/model_inference/trajectory_imitation_inference.h"
 
 namespace apollo {
 namespace planning {
@@ -37,21 +35,20 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
-LearningModelInferenceTask::LearningModelInferenceTask(
-    const TaskConfig &config) : Task(config) {
+LearningModelInferenceTask::LearningModelInferenceTask(const TaskConfig& config)
+    : Task(config) {
   ACHECK(config.has_learning_model_inference_task_config());
 }
 
 Status LearningModelInferenceTask::Execute(
-    Frame *frame,
-    ReferenceLineInfo *reference_line_info) {
+    Frame* frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
 
   Task::Execute(frame, reference_line_info);
   return Process(frame);
 }
 
-Status LearningModelInferenceTask::Process(Frame *frame) {
+Status LearningModelInferenceTask::Process(Frame* frame) {
   CHECK_NOTNULL(frame);
 
   const auto& config = config_.learning_model_inference_task_config();
@@ -60,8 +57,7 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   learning_data_frame.CopyFrom(frame->learning_data_frame());
 
   ADEBUG << "LearningModelInferenceTask: frame_num["
-         << learning_data_frame.frame_num()
-         << "] adc_trajectory_point_size["
+         << learning_data_frame.frame_num() << "] adc_trajectory_point_size["
          << learning_data_frame.adc_trajectory_point_size() << "]";
   // for (const auto& ob : learning_data_frame.obstacle()) {
   //   AERROR << ob.DebugString();
@@ -76,9 +72,10 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   }
 
   const double start_point_timestamp_sec =
-      learning_data_frame.adc_trajectory_point(
-          learning_data_frame.adc_trajectory_point_size() - 1)
-      .timestamp_sec();
+      learning_data_frame
+          .adc_trajectory_point(
+              learning_data_frame.adc_trajectory_point_size() - 1)
+          .timestamp_sec();
 
   ADEBUG << "start_point_timestamp_sec: " << start_point_timestamp_sec;
   // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
@@ -86,25 +83,22 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   // }
 
   // evaluate adc trajectory
-  trajectory_evaluator_.EvaluateADCTrajectory(
-      start_point_timestamp_sec,
-      config.trajectory_delta_t(),
-      &learning_data_frame);
+  trajectory_evaluator_.EvaluateADCTrajectory(start_point_timestamp_sec,
+                                              config.trajectory_delta_t(),
+                                              &learning_data_frame);
 
   // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
   //   AERROR << "AFTER: " << t.timestamp_sec();
   // }
 
   // evaluate obstacle trajectory
-  trajectory_evaluator_.EvaluateObstacleTrajectory(
-      start_point_timestamp_sec,
-      config.trajectory_delta_t(),
-      &learning_data_frame);
+  trajectory_evaluator_.EvaluateObstacleTrajectory(start_point_timestamp_sec,
+                                                   config.trajectory_delta_t(),
+                                                   &learning_data_frame);
 
   // evaluate obstacle prediction trajectory
   trajectory_evaluator_.EvaluateObstaclePredictionTrajectory(
-      start_point_timestamp_sec,
-      config.trajectory_delta_t(),
+      start_point_timestamp_sec, config.trajectory_delta_t(),
       &learning_data_frame);
 
   TrajectoryConvRnnInference trajectory_conv_rnn_inference(config);
@@ -121,11 +115,10 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   ADEBUG << "   adc_future_trajectory_point_size["
          << adc_future_trajectory_point_size << "]";
   if (adc_future_trajectory_point_size < 10) {
-    const std::string msg =
-        absl::StrCat("too short adc_future_trajectory_point. frame_num[",
-                     learning_data_frame.frame_num(),
-                     "] adc_future_trajectory_point_size[",
-                     adc_future_trajectory_point_size, "]");
+    const std::string msg = absl::StrCat(
+        "too short adc_future_trajectory_point. frame_num[",
+        learning_data_frame.frame_num(), "] adc_future_trajectory_point_size[",
+        adc_future_trajectory_point_size, "]");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -133,14 +126,11 @@ Status LearningModelInferenceTask::Process(Frame *frame) {
   constexpr double kADCFutureTrajectoryDeltaTime = 0.02;
   std::vector<TrajectoryPointFeature> evaluated_trajectory;
   trajectory_evaluator_.EvaluateADCFutureTrajectory(
-      learning_data_frame,
-      start_point_timestamp_sec,
-      kADCFutureTrajectoryDeltaTime,
-      &evaluated_trajectory);
+      learning_data_frame, start_point_timestamp_sec,
+      kADCFutureTrajectoryDeltaTime, &evaluated_trajectory);
 
   std::vector<common::TrajectoryPoint> adc_future_trajectory;
-  ConvertADCFutureTrajectory(evaluated_trajectory,
-                             &adc_future_trajectory);
+  ConvertADCFutureTrajectory(evaluated_trajectory, &adc_future_trajectory);
   // for (const auto& t : adc_future_trajectory) {
   //   AERROR << "FUTURE: " << t.relative_time();
   // }
@@ -164,10 +154,7 @@ void LearningModelInferenceTask::ConvertADCFutureTrajectory(
     path_point->set_y(tp.path_point().y());
     path_point->set_z(tp.path_point().z());
     path_point->set_theta(tp.path_point().theta());
-    // path_point->set_kappa();
     path_point->set_s(tp.path_point().s());
-    // path_point->set_dkappa();
-    // path_point->set_ddkappa();
     path_point->set_lane_id(tp.path_point().lane_id());
     // path_point->set_x_derivative();
     // path_point->set_y_derivative();
@@ -175,12 +162,44 @@ void LearningModelInferenceTask::ConvertADCFutureTrajectory(
     trajectory_point.set_v(tp.v());
     trajectory_point.set_a(tp.a());
     trajectory_point.set_relative_time(tp.relative_time());
+    // Note: gaussian_info is empty at tp.gaussian_info()
+    trajectory_point.mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
     // trajectory_point.set_da();
     // trajectory_point.set_steer();
-    trajectory_point.mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
 
     adc_future_trajectory->push_back(trajectory_point);
   }
+
+  for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
+    auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
+    const auto& next_path_point = (*adc_future_trajectory)[i + 1].path_point();
+    double cur_kappa = apollo::common::math::NormalizeAngle(
+                           next_path_point.theta() - cur_path_point->theta()) /
+                       (next_path_point.s() - cur_path_point->s());
+    cur_path_point->set_kappa(cur_kappa);
+  }
+  // assuming last point has zero kappa
+  adc_future_trajectory->back().mutable_path_point()->set_kappa(0.0);
+
+  for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
+    auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
+    const auto& next_path_point = (*adc_future_trajectory)[i + 1].path_point();
+    double cur_dkappa = (next_path_point.kappa() - cur_path_point->kappa()) /
+                        (next_path_point.s() - cur_path_point->s());
+    cur_path_point->set_kappa(cur_dkappa);
+  }
+  // assuming last point going straight with the last heading
+  adc_future_trajectory->back().mutable_path_point()->set_dkappa(0.0);
+
+  for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
+    auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
+    const auto& next_path_point = (*adc_future_trajectory)[i + 1].path_point();
+    double cur_ddkappa = (next_path_point.dkappa() - cur_path_point->dkappa()) /
+                         (next_path_point.s() - cur_path_point->s());
+    cur_path_point->set_kappa(cur_ddkappa);
+  }
+  // assuming last point going straight with the last heading
+  adc_future_trajectory->back().mutable_path_point()->set_ddkappa(0.0);
 }
 
 }  // namespace planning

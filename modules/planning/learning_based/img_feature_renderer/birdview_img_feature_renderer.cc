@@ -324,7 +324,8 @@ bool BirdviewImgFeatureRenderer::RenderEgoPastPoint(
     if (relative_time > config_.max_ego_past_horizon()) {
       continue;
     }
-    gradual_change_color = color * ( 1 - relative_time / config_.max_ego_past_horizon());
+    gradual_change_color =
+        color * (1 - relative_time / config_.max_ego_past_horizon());
     cv::circle(*img_feature,
                GetAffinedPointImgIdx(
                    ego_past_point.trajectory_point().path_point().x(),
@@ -361,7 +362,8 @@ bool BirdviewImgFeatureRenderer::RenderObsPastBox(
       if (relative_time > config_.max_obs_past_horizon()) {
         continue;
       }
-      gradual_change_color = color * (1 - relative_time / config_.max_obs_past_horizon());
+      gradual_change_color =
+          color * (1 - relative_time / config_.max_obs_past_horizon());
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
@@ -453,7 +455,8 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       if (relative_time > config_.max_obs_future_horizon()) {
         break;
       }
-      gradual_change_color = color * relative_time / config_.max_obs_past_horizon();
+      gradual_change_color =
+          color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
