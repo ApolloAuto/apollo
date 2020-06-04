@@ -17,11 +17,12 @@
 #include "modules/planning/pipeline/evaluator.h"
 
 #include <limits>
-#include <sstream>
+#include <vector>
 
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_evaluator.h"
+#include "modules/planning/pipeline/evaluator_logger.h"
 
 DEFINE_double(trajectory_delta_t, 0.2,
              "delta time(sec) between trajectory points");
@@ -30,30 +31,24 @@ namespace apollo {
 namespace planning {
 
 void Evaluator::Init() {
-  const std::string log_file =
-      FLAGS_planning_data_dir + "/output_data_evaluated.log";
-  log_file_.open(log_file, std::ios_base::out | std::ios_base::app);
   start_time_ = std::chrono::system_clock::now();
   std::time_t now = std::time(nullptr);
-  log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
-            << "Local date and time: "
-            << std::asctime(std::localtime(&now));
-
-  trajectory_evaluator_.InitLogFile(log_file);
+  EvaluatorLogger::GetStream() << "UTC date and time: "
+                               << std::asctime(std::gmtime(&now))
+                               << "Local date and time: "
+                               << std::asctime(std::localtime(&now));
 }
 
 void Evaluator::Close() {
-  trajectory_evaluator_.CloseLogFile();
-
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end_time - start_time_;
-  log_file_ << "Time elapsed(sec): " << elapsed_seconds.count()
-            << std::endl << std::endl;
-  log_file_.close();
+  EvaluatorLogger::GetStream() <<"Time elapsed(sec): "
+                            << elapsed_seconds.count()
+                            << std::endl << std::endl;
 }
 
 void Evaluator::Evaluate(const std::string& source_file) {
-  log_file_ << "Processing: " << source_file << std::endl;
+  EvaluatorLogger::GetStream() << "Processing: " << source_file << std::endl;
 
   const std::string& source_filename =
       source_file.substr(source_file.find_last_of("/") + 1);
