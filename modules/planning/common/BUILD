@@ -488,4 +488,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_evaluator",
+    srcs = ["trajectory_evaluator.cc"],
+    hdrs = ["trajectory_evaluator.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_proto",
+    ],
+)
+
 cpplint()
