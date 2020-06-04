@@ -61,7 +61,6 @@ bazel_test_with_dist_cache \
     //modules/bridge/... \
     //modules/canbus/... \
     //modules/common/... \
-    //modules/map/...    \
     //modules/control/... \
     //modules/data/... \
     //modules/monitor/... \
@@ -88,8 +87,11 @@ bazel_test_with_dist_cache $(bazel query //modules/localization/... \
   except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
   )
 
+echo "########################### All check passed! ###########################"
+
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
+# TODO(?): bazel test //modules/map/...
 # TODO(?): bazel build //modules/contrib/...
 # TODO(?): bazel build //modules/perception/...
 # TODO(changsh726): bazel build //modules/prediction/...
