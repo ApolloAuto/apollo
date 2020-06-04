@@ -32,7 +32,6 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -638,7 +637,7 @@ void ReferenceLineInfo::ExportVehicleSignal(
 
 bool ReferenceLineInfo::ReachedDestination() const {
   static constexpr double kDestinationDeltaS = 0.05;
-  const  double distance_destination = SDistanceToDestination();
+  const double distance_destination = SDistanceToDestination();
   return distance_destination <= kDestinationDeltaS;
 }
 
@@ -659,8 +658,9 @@ double ReferenceLineInfo::SDistanceToDestination() const {
   return stop_s - adc_sl_boundary_.end_s();
 }
 
-void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
-  MakeDecision(decision_result);
+void ReferenceLineInfo::ExportDecision(
+    DecisionResult* decision_result, PlanningContext* planning_context) const {
+  MakeDecision(decision_result, planning_context);
   ExportVehicleSignal(decision_result->mutable_vehicle_signal());
   auto* main_decision = decision_result->mutable_main_decision();
   if (main_decision->has_stop()) {
@@ -672,7 +672,8 @@ void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
   }
 }
 
-void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result) const {
+void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result,
+                                     PlanningContext* planning_context) const {
   CHECK_NOTNULL(decision_result);
   decision_result->Clear();
 
@@ -684,12 +685,12 @@ void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result) const {
   if (error_code < 0) {
     MakeEStopDecision(decision_result);
   }
-  MakeMainMissionCompleteDecision(decision_result);
+  MakeMainMissionCompleteDecision(decision_result, planning_context);
   SetObjectDecisions(decision_result->mutable_object_decision());
 }
 
 void ReferenceLineInfo::MakeMainMissionCompleteDecision(
-    DecisionResult* decision_result) const {
+    DecisionResult* decision_result, PlanningContext* planning_context) const {
   if (!decision_result->main_decision().has_stop()) {
     return;
   }
@@ -707,8 +708,7 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
   if (ReachedDestination()) {
-    PlanningContext::Instance()
-        ->mutable_planning_status()
+    planning_context->mutable_planning_status()
         ->mutable_destination()
         ->set_has_passed_destination(true);
   } else {
@@ -791,7 +791,8 @@ void ReferenceLineInfo::SetObjectDecisions(
   }
 }
 
-void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
+void ReferenceLineInfo::ExportEngageAdvice(
+    EngageAdvice* engage_advice, PlanningContext* planning_context) const {
   static EngageAdvice prev_advice;
   static constexpr double kMaxAngleDiff = M_PI / 6.0;
 
@@ -799,10 +800,8 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   if (!IsDrivable()) {
     prev_advice.set_reason("Reference line not drivable");
   } else if (!is_on_reference_line_) {
-    const auto& scenario_type = PlanningContext::Instance()
-                                    ->planning_status()
-                                    .scenario()
-                                    .scenario_type();
+    const auto& scenario_type =
+        planning_context->planning_status().scenario().scenario_type();
     if (scenario_type == ScenarioConfig::PARK_AND_GO || IsChangeLanePath()) {
       // note: when is_on_reference_line_ is FALSE
       //   (1) always engage while in PARK_AND_GO scenario

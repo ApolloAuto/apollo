@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/stage.h"
@@ -34,9 +36,10 @@ struct TrafficLightUnprotectedLeftTurnContext;
 
 class TrafficLightUnprotectedLeftTurnStageCreep : public Stage {
  public:
-  explicit TrafficLightUnprotectedLeftTurnStageCreep(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  TrafficLightUnprotectedLeftTurnStageCreep(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

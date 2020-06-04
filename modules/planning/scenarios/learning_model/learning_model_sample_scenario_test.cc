@@ -40,14 +40,15 @@ class LearningModelSampleScenarioTest : public ::testing::Test {
 
 TEST_F(LearningModelSampleScenarioTest, Init) {
   FLAGS_scenario_learning_model_sample_config_file =
-    "/apollo/modules/planning/conf/scenario/"
-    "learning_model_sample_config.pb.txt";
+      "/apollo/modules/planning/conf/scenario/"
+      "learning_model_sample_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_learning_model_sample_config_file, &config));
   ScenarioContext context;
-  scenario_.reset(new LearningModelSampleScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(new LearningModelSampleScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LEARNING_MODEL_SAMPLE);
 }
 

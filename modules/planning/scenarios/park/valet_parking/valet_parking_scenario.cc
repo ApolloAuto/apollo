@@ -36,7 +36,8 @@ using apollo::hdmap::PathOverlap;
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     ValetParkingScenario::s_stage_factory_;
 
 void ValetParkingScenario::Init() {
@@ -61,23 +62,26 @@ void ValetParkingScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageApproachingParkingSpot(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new StageApproachingParkingSpot(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::VALET_PARKING_PARKING,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageParking(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new StageParking(config, injector);
       });
 }
 
 std::unique_ptr<Stage> ValetParkingScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+                                                 stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

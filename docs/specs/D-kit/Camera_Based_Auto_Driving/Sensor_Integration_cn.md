@@ -17,8 +17,7 @@
 			- [5. 验证camera是否工作正常](#5-验证camera是否工作正常)
 	- [NEXT](#next)
 	- [常见问题](#常见问题)
-			- [1. 规则文件修改后不显示软连接](#1-规则文件修改后不显示软连接)
-
+		- [1. 规则文件修改后不显示软连接](#1-规则文件修改后不显示软连接)
 
 ## 前提条件
 
@@ -42,19 +41,19 @@
 ### 相机的安装固定
 - 牢固安装在小车结构架前端横梁处，水平安装，俯仰角向下0-2度（向下倾斜小于2度，不能上仰），翻滚角误差±1度（左右两侧的平齐程度），航向角误差±2度，镜头保持清洁，避免影响图像采集。安装位置如下图所示：
 
-![camera_integration_installation](images/camera_integration_installation.png)
+	![camera_integration_installation](images/camera_integration_installation.png)
 
 - 注意摄像头不要装反(usb接口应该在下方)，正确的放置方向如下图所示：
 
-![camera_integration_look](images/camera_integration_look.jpeg)
+	![camera_integration_look](images/camera_integration_look.jpeg)
 
 ### 摄像头与工控机连接
  
  - 直接用数据线将设备连接在IPC的USB3.0接口。接口顺序无固定顺序，用户可自行指定。
  
-![camera_integration_background](images/camera_integration_background.jpeg)
+	![camera_integration_background](images/camera_integration_background.jpeg)
 
-![camera_integration_line](images/camera_integration_line.jpeg)
+	![camera_integration_line](images/camera_integration_line.jpeg)
 
 ### 摄像头规则文件的配置
  
@@ -74,19 +73,19 @@
 其中，第一条代表连接到USB端口号为`2-1:1.0`的摄像头对应的软链接文件为`camera/front_6mm`；第二条代表连接到USB端口号为`2-2:1.0`的摄像头对应的软链接文件为`camera/front_12mm`。
 
  - 查看摄像头所接的USB端口对应的端口号方法：在docker环境外执行如下命令
- ```
- ll /sys/class/video4linux/video* 
- ```
+	```
+	ll /sys/class/video4linux/video* 
+	```
  
  摄像头端口号如下图所示
- ![camera_integration_io_number](images/camera_integration_io_number.png)
+ 	![camera_integration_io_number](images/camera_integration_io_number.png)
 
  - 在docker环境外，执行如下命令，使配置的规则文件在本地系统生效:
  
- ```
-  bash ~/apollo/docker/setup_host/setup_host.sh  
-  sudo reboot  //重启工控机
- ```
+	```
+	bash ~/apollo/docker/setup_host/setup_host.sh  
+	sudo reboot  //重启工控机
+	```
  
 ### Apollo配置的修改
 将`modules/drivers/camera/dag/dev_kit_camera.dag` 文件重命名为`modules/drivers/camera/dag/camera.dag`并替换原有的`camera.dag`文件。
@@ -112,11 +111,11 @@
 #### 4. 启动camera模块
  - 在`Module Controller`标签栏下，打开`Camera`开关，开关位置如下图所示：
  
-![camera_integration_dreamview1](images/camera_integration_dreamview1.png)
+	![camera_integration_dreamview1](images/camera_integration_dreamview1.png)
 
  - 首先选择`Mkz Standard Debug`模式，之后在`Tasks`标签栏下依次打开`SimControl`和`Camera Sensor`开关，`Camera Sensor`打开后，务必关闭`SimControl`。开关在dreamview界面的位置如下图所示：
  
-![camera_integration_dreamview2](images/camera_integration_dreamview2.png)
+	![camera_integration_dreamview2](images/camera_integration_dreamview2.png)
 #### 5. 验证camera是否工作正常
  - 如果一切正常，则会在`dreamview`右下角出现摄像头采集的图像。
  
@@ -129,7 +128,6 @@
 ## NEXT
 现在，您已经完成摄像头感知设备集成，接下来可以开始[基于摄像头的封闭园区自动驾驶搭建--感知设备标定](Sensor_Calibration_cn.md)
 ## 常见问题
-
 #### 1. 规则文件修改后不显示软连接
 规则文件修改后需要重启工控机才能生效
 	

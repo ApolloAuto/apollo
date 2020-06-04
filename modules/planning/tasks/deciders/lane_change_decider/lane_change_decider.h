@@ -21,6 +21,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <string>
 
 #include "modules/planning/proto/planning_status.pb.h"
@@ -34,7 +35,8 @@ namespace planning {
 
 class LaneChangeDecider : public Decider {
  public:
-  explicit LaneChangeDecider(const TaskConfig& config);
+  LaneChangeDecider(const TaskConfig& config,
+                    const std::shared_ptr<DependencyInjector>& injector);
 
   /**
    * @brief A static function to check if the ChangeLanePath type of reference
@@ -61,7 +63,8 @@ class LaneChangeDecider : public Decider {
 
   static void UpdatePreparationDistance(
       const bool is_opt_succeed, const Frame* frame,
-      const ReferenceLineInfo* const reference_line_info);
+      const ReferenceLineInfo* const reference_line_info,
+      PlanningContext* planning_context);
 
  private:
   common::Status Process(

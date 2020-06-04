@@ -17,6 +17,7 @@
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
@@ -31,8 +32,10 @@ using apollo::common::Status;
 constexpr double kIntersectionClearanceDist = 20.0;
 constexpr double kJunctionClearanceDist = 15.0;
 
-PathLaneBorrowDecider::PathLaneBorrowDecider(const TaskConfig& config)
-    : Decider(config) {}
+PathLaneBorrowDecider::PathLaneBorrowDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 Status PathLaneBorrowDecider::Process(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
@@ -60,7 +63,7 @@ Status PathLaneBorrowDecider::Process(
 
 bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  auto* mutable_path_decider_status = PlanningContext::Instance()
+  auto* mutable_path_decider_status = injector_->planning_context()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
   if (mutable_path_decider_status->is_in_path_lane_borrow_scenario()) {
@@ -101,7 +104,7 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     // switch to lane-borrowing
     // set side-pass direction
     const auto& path_decider_status =
-        PlanningContext::Instance()->planning_status().path_decider();
+        injector_->planning_context()->planning_status().path_decider();
     if (path_decider_status.decided_side_pass_direction().empty()) {
       // first time init decided_side_pass_direction
       bool left_borrowable;
@@ -140,7 +143,7 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  if (PlanningContext::Instance()
+  if (injector_->planning_context()
           ->planning_status()
           .path_decider()
           .front_static_obstacle_cycle_counter() >=
@@ -156,7 +159,7 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
-      PlanningContext::Instance()->planning_status().path_decider();
+      injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
@@ -188,7 +191,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
-      PlanningContext::Instance()->planning_status().path_decider();
+      injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
@@ -243,7 +246,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
-      PlanningContext::Instance()->planning_status().path_decider();
+      injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {

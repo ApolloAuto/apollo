@@ -31,14 +31,16 @@ class StageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::PULL_OVER_APPROACH);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageApproachTest, Init) {
-  PullOverStageApproach pull_over_stage_approach(config_);
+  PullOverStageApproach pull_over_stage_approach(config_, injector_);
   EXPECT_EQ(pull_over_stage_approach.Name(),
             ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_APPROACH));
 }

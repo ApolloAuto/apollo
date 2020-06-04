@@ -68,6 +68,8 @@ bool MessageProcess::Init(const PlanningConfig& planning_config) {
 
   map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
 
+  obstacle_history_map_.clear();
+
   if (FLAGS_planning_offline_mode == 2) {
     // offline process logging
     log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
@@ -128,12 +130,12 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     return;
   }
   if (time_diff >= (1.0 * 2 / FLAGS_planning_loop_rate)) {
+    std::ostringstream msg;
+    msg << "missing localization too long: time_stamp["
+        << le.header().timestamp_sec()
+        << "] time_diff[" << time_diff << "]";
+    AERROR << msg.str();
     if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "missing localization too long: time_stamp["
-          << le.header().timestamp_sec()
-          << "] time_diff[" << time_diff << "]";
-      AERROR << msg.str();
       log_file_ << msg.str() << std::endl;
     }
   }
@@ -187,6 +189,15 @@ void MessageProcess::OnPrediction(
   }
   */
 
+  // debug
+  // add to obstacle history
+  // for (const auto& m : obstacle_history_map_) {
+  //  for (const auto& p :  m.second) {
+  //    AERROR << "obstacle_history_map_: " << m.first << "; "
+  //           << p.DebugString();
+  //  }
+  // }
+
   // add to obstacle history
   for (const auto& m : prediction_obstacles_map_) {
     const auto& perception_obstale = m.second.perception_obstacle();
@@ -204,21 +215,22 @@ void MessageProcess::OnPrediction(
     obstacle_trajectory_point.mutable_acceleration()->CopyFrom(
         perception_obstale.acceleration());
 
+    obstacle_history_map_[m.first].back().timestamp_sec();
     if (obstacle_history_map_[m.first].empty() ||
         obstacle_trajectory_point.timestamp_sec() -
             obstacle_history_map_[m.first].back().timestamp_sec() > 0) {
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
       // abnormal perception data: time_diff <= 0
+      const double time_diff = obstacle_trajectory_point.timestamp_sec() -
+          obstacle_history_map_[m.first].back().timestamp_sec();
+      std::ostringstream msg;
+      msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
+          << obstacle_history_map_[m.first].back().timestamp_sec()
+          << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
+          << "] time_diff[" << time_diff << "]";
+      AERROR << msg.str();
       if (FLAGS_planning_offline_mode == 2) {
-        const double time_diff = obstacle_trajectory_point.timestamp_sec() -
-            obstacle_history_map_[m.first].back().timestamp_sec();
-        std::ostringstream msg;
-        msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
-            << obstacle_history_map_[m.first].back().timestamp_sec()
-            << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
-            << "] time_diff [" << time_diff << "]";
-        AERROR << msg.str();
         log_file_ << msg.str() << std::endl;
       }
     }
@@ -527,11 +539,11 @@ void MessageProcess::GenerateObstacleFeature(
     LearningDataFrame* learning_data_frame) {
   ADCCurrentInfo adc_curr_info;
   if (GetADCCurrentInfo(&adc_curr_info) == -1) {
+    std::ostringstream msg;
+    msg << "fail to get ADC current info: frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
     if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "fail to get ADC current info: frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -709,11 +721,11 @@ void MessageProcess::GenerateRoutingFeature(
   if (routing_response_.road_size() == 0 ||
       routing_response_.road(0).passage_size() == 0 ||
       routing_response_.road(0).passage(0).segment_size() == 0) {
+    std::ostringstream msg;
+    msg << "SKIP: invalid routing_response. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
     if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "SKIP: invalid routing_response. frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -733,11 +745,11 @@ void MessageProcess::GenerateRoutingFeature(
       local_routing_passages;
   if (!GenerateLocalRoutingPassages(&local_routing_passages) ||
       local_routing_passages.empty()) {
+    std::ostringstream msg;
+    msg << "failed generate local_routing. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
     if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "failed generate local_routing. frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -970,12 +982,12 @@ void MessageProcess::GenerateADCTrajectoryPoints(
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
   if (adc_trajectory_points.size() <= 5) {
+    std::ostringstream msg;
+    msg << "too few adc_trajectory_points: frame_num["
+        << learning_data_frame->frame_num()
+        << "] size[" << adc_trajectory_points.size() << "]";
+    AERROR << msg.str();
     if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "too few adc_trajectory_points: frame_num["
-          << learning_data_frame->frame_num()
-          << "] size[" << adc_trajectory_points.size() << "]";
-      AERROR << msg.str();
       log_file_ << msg.str() << std::endl;
     }
   }

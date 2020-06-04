@@ -38,13 +38,16 @@ struct PullOverContext {
 
 class PullOverScenario : public Scenario {
  public:
-  PullOverScenario(const ScenarioConfig& config, const ScenarioContext* context)
-      : Scenario(config, context) {}
+  PullOverScenario(const ScenarioConfig& config,
+                   const ScenarioContext* scenario_context,
+                   const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, scenario_context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config);
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   PullOverContext* GetContext() { return &context_; }
 
@@ -55,7 +58,8 @@ class PullOverScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   PullOverContext context_;

@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 
+#include <memory>
+
 namespace apollo {
 namespace planning {
 
@@ -27,6 +29,11 @@ using apollo::common::Status;
 
 TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
     : Task(config) {}
+
+TrajectoryOptimizer::TrajectoryOptimizer(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Task(config, injector) {}
 
 Status TrajectoryOptimizer::Execute(Frame* frame) {
   Task::Execute(frame);

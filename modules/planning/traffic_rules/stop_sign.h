@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -30,7 +31,8 @@ namespace planning {
 
 class StopSign : public TrafficRule {
  public:
-  explicit StopSign(const TrafficRuleConfig& config);
+  StopSign(const TrafficRuleConfig& config,
+           const std::shared_ptr<DependencyInjector> &injector);
 
   virtual ~StopSign() = default;
 

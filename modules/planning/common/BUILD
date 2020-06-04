@@ -488,4 +488,33 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_evaluator",
+    srcs = ["trajectory_evaluator.cc"],
+    hdrs = ["trajectory_evaluator.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_proto",
+    ],
+)
+
+cc_library(
+    name = "dependency_injector",
+    hdrs = ["dependency_injector.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":ego_info",
+        ":frame",
+        ":history",
+        ":planning_context",
+    ],
+)
+
 cpplint()

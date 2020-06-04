@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -45,7 +46,9 @@ using apollo::perception::PerceptionObstacle;
 
 std::unordered_map<std::string, double> SpeedDecider::pedestrian_stop_timer_;
 
-SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {}
+SpeedDecider::SpeedDecider(const TaskConfig& config,
+                           const std::shared_ptr<DependencyInjector>& injector)
+    : Task(config, injector) {}
 
 common::Status SpeedDecider::Execute(Frame* frame,
                                      ReferenceLineInfo* reference_line_info) {
@@ -187,7 +190,7 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
       obstacle.path_st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
   static constexpr double lane_follow_max_decel = 3.0;
   static constexpr double lane_change_max_decel = 3.0;
-  auto* planning_status = PlanningContext::Instance()
+  auto* planning_status = injector_->planning_context()
                               ->mutable_planning_status()
                               ->mutable_change_lane();
   double distance_numerator = std::pow((ego_speed - obs_speed), 2) * 0.5;

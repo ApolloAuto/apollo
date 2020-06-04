@@ -39,7 +39,8 @@ class OnLanePlannerDispatcher final : public PlannerDispatcher {
   virtual ~OnLanePlannerDispatcher() = default;
 
   std::unique_ptr<Planner> DispatchPlanner(
-      const PlanningConfig& planning_config) override;
+      const PlanningConfig& planning_config,
+      const std::shared_ptr<DependencyInjector>& injector) override;
 };
 
 }  // namespace planning

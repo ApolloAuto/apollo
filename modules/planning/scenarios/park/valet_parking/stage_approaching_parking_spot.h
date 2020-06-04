@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -31,8 +33,9 @@ namespace valet_parking {
 class StageApproachingParkingSpot : public Stage {
  public:
   explicit StageApproachingParkingSpot(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

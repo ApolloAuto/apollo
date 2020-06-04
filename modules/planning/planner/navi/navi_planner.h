@@ -56,7 +56,9 @@ namespace planning {
  */
 class NaviPlanner : public PlannerWithReferenceLine {
  public:
-  NaviPlanner() = default;
+  NaviPlanner() = delete;
+  explicit NaviPlanner(const std::shared_ptr<DependencyInjector>& injector)
+      : PlannerWithReferenceLine(injector) {}
 
   virtual ~NaviPlanner() = default;
 

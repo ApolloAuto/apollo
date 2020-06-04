@@ -29,7 +29,8 @@ namespace park_and_go {
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     ParkAndGoScenario::s_stage_factory_;
 
 void ParkAndGoScenario::Init() {
@@ -53,33 +54,38 @@ void ParkAndGoScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::PARK_AND_GO_CHECK,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new ParkAndGoStageCheck(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new ParkAndGoStageCheck(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::PARK_AND_GO_ADJUST,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new ParkAndGoStageAdjust(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new ParkAndGoStageAdjust(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::PARK_AND_GO_PRE_CRUISE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new ParkAndGoStagePreCruise(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new ParkAndGoStagePreCruise(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::PARK_AND_GO_CRUISE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new ParkAndGoStageCruise(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new ParkAndGoStageCruise(config, injector);
       });
 }
 
 std::unique_ptr<Stage> ParkAndGoScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+                                                 stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

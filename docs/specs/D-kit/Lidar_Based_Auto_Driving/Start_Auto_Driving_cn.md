@@ -46,7 +46,7 @@
 
 ####  3. 启动所需模块
 
-在浏览器中打开(http://localhost:8888),选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
+在浏览器中打开`(http://localhost:8888)`，选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
 
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview4.png)
 
@@ -72,7 +72,7 @@
 
 
 #### 5. 启动Lidar感知
-确认各模块正常启动且channel输出正常后，在DreamView上启动Lidar感知模块(Perception模块)，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+确认各模块正常启动且channel输出正常后，在DreamView上启动Lidar感知模块(Perception模块)，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview5.png)
 
 
@@ -93,7 +93,7 @@
 在Module Controller标签页启动Planning、Prediction、Routing、Control模块。
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview7.png)
 
-在Routing Editor标签中点击Add Point of Interest按钮添加一个point 然后选择Send Routing Request按钮发送添加的routing点
+在Routing Editor标签中点击Add Point of Interest按钮添加一个point， 然后选择Send Routing Request按钮发送添加的routing点
 
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview6.png)
 
@@ -102,7 +102,7 @@
 ####  8. 验证Planning、Prediction、Routing、Control模块是否启动成功
 从DreamView中查看会出现一个蓝色的线 以及一个红色的stop标志。如下图所示：
 ![lidar_demonstration_routing1](images/lidar_demonstration_routing1.png)
-在车前方存在人或者自行车（车上有人）时，在task标签页查看planning轨迹线，如下图所示：
+在车前方存在人或者自行车（车上有人）时，在task标签页查看planning轨迹线，正常情况下planning会重新规划轨迹，如下图所示：
 
 ![lidar_demonstration_routing2](images/lidar_demonstration_routing2.png)
 

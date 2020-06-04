@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
@@ -33,8 +35,9 @@ struct TrafficLightProtectedContext;
 class TrafficLightProtectedStageApproach : public Stage {
  public:
   explicit TrafficLightProtectedStageApproach(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

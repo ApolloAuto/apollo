@@ -34,6 +34,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -53,7 +54,9 @@ namespace planning {
  */
 class PlanningBase {
  public:
-  PlanningBase() = default;
+  PlanningBase() = delete;
+
+  explicit PlanningBase(const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~PlanningBase();
 
@@ -88,6 +91,7 @@ class PlanningBase {
   std::unique_ptr<Planner> planner_;
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
   std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace planning

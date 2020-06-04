@@ -20,6 +20,8 @@
 
 #include "modules/planning/traffic_rules/rerouting.h"
 
+#include <memory>
+
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/time/time.h"
@@ -32,7 +34,9 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::time::Clock;
 
-Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
+Rerouting::Rerouting(const TrafficRuleConfig& config,
+                     const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 bool Rerouting::ChangeLaneFailRerouting() {
   static constexpr double kRerouteThresholdToEnd = 20.0;
@@ -88,7 +92,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
     return true;
   }
   // 6. Check if we have done rerouting before
-  auto* rerouting = PlanningContext::Instance()
+  auto* rerouting = injector_->planning_context()
                         ->mutable_planning_status()
                         ->mutable_rerouting();
   if (rerouting == nullptr) {
@@ -102,7 +106,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
     ADEBUG << "Skip rerouting and wait for previous rerouting result";
     return true;
   }
-  if (!frame_->Rerouting()) {
+  if (!frame_->Rerouting(injector_->planning_context())) {
     AERROR << "Failed to send rerouting request";
     return false;
   }
