@@ -103,3 +103,6 @@ apt-get -y update && \
 # modules/storytelling
 # modules/routing
 
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

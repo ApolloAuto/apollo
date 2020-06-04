@@ -73,3 +73,7 @@ else
   #clean up
   rm -fr pcl.zip pcl
 fi
+
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

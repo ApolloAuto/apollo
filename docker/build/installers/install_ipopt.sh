@@ -30,6 +30,3 @@ sed -i '/#define __IPSMARTPTR_HPP__/a\#define HAVE_CSTDDEF' \
     /usr/include/coin/IpSmartPtr.hpp
 
 # Source Code Package Link: https://github.com/coin-or/Ipopt/releases
-
-# Clean up.
-# apt-get clean && rm -rf /var/lib/apt/lists/*

@@ -42,7 +42,8 @@ apt-get -y update && \
 # For test run
 # /usr/local/cuda/samples/5_Simulations/nbody
 
+bash /tmp/installers/install_qt.sh
+
+# Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-bash /tmp/installers/install_qt.sh

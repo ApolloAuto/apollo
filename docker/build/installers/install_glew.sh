@@ -31,4 +31,6 @@ apt-get -y update && \
 # libglfw3-dev depends on libglfw3,
 # and libglew-dev have a dependency over libglew2.0
 
-
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

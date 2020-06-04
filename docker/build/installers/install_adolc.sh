@@ -30,5 +30,6 @@ apt-get -y update && \
     libcolpack-dev \
     libadolc-dev
 
-# clean up
-apt-get clean && rm -rf /var/lib/apt/lists/*
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

@@ -56,4 +56,3 @@ fi
 """
 
 echo "${__mytext}" > /etc/profile.d/llvm-clang-path.sh
-

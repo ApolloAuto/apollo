@@ -21,6 +21,8 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+. /tmp/installers/installer_base.sh
+
 apt update -y && apt install -y \
     libgeos-dev \
     python3-matplotlib \
@@ -29,7 +31,8 @@ apt update -y && apt install -y \
     python3-scipy \
     software-properties-common
 
-pip3 install --no-cache-dir -r py3_requirements.txt
+pip3_install -r py3_requirements.txt
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

@@ -36,5 +36,6 @@ apt-get -y update && \
 pip3_install pycodestyle
 pip3_install pylint
 
+# Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*

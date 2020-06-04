@@ -33,3 +33,7 @@ bash /tmp/installers/install_gpu_caffe.sh ${INSTALL_MODE}
 
 info "Install libtorch ..."
 bash /tmp/installers/install_libtorch.sh
+
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
