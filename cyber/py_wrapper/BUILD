@@ -4,25 +4,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "_cyber.so",
-    linkshared = True,
-    linkstatic = False,
-    deps = [
-        ":py_cyber",
-    ],
-)
-
-cc_library(
-    name = "py_cyber",
-    srcs = ["py_cyber.cc"],
-    hdrs = ["py_cyber.h"],
-    deps = [
-        "//cyber:cyber_core",
-        "@python27",
-    ],
-)
-
-cc_binary(
     name = "_cyber_py3.so",
     linkshared = True,
     linkstatic = False,
@@ -50,25 +31,6 @@ cc_test(
         ":py3_cyber",
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest",
-    ],
-)
-
-cc_binary(
-    name = "_cyber_record.so",
-    linkshared = True,
-    deps = [
-        ":py_record",
-    ],
-)
-
-cc_library(
-    name = "py_record",
-    srcs = ["py_record.cc"],
-    hdrs = ["py_record.h"],
-    deps = [
-        "//cyber/message:py_message",
-        "//cyber/record",
-        "@python27",
     ],
 )
 
@@ -106,25 +68,6 @@ cc_test(
 )
 
 cc_binary(
-    name = "_cyber_time.so",
-    linkshared = True,
-    deps = [
-        ":py_time",
-    ],
-)
-
-cc_library(
-    name = "py_time",
-    srcs = ["py_time.cc"],
-    hdrs = ["py_time.h"],
-    deps = [
-        "//cyber:cyber_core",
-        "@fastrtps",
-        "@python27",
-    ],
-)
-
-cc_binary(
     name = "_cyber_time_py3.so",
     linkshared = True,
     deps = [
@@ -145,24 +88,6 @@ cc_library(
 )
 
 cc_binary(
-    name = "_cyber_timer.so",
-    linkshared = True,
-    deps = [
-        ":py_timer",
-    ],
-)
-
-cc_library(
-    name = "py_timer",
-    srcs = ["py_timer.cc"],
-    hdrs = ["py_timer.h"],
-    deps = [
-        "//cyber:cyber_core",
-        "@python27",
-    ],
-)
-
-cc_binary(
     name = "_cyber_timer_py3.so",
     linkshared = True,
     deps = [
@@ -178,25 +103,6 @@ cc_library(
     deps = [
         "//cyber:cyber_core",
         "//third_party:python3",
-    ],
-)
-
-cc_binary(
-    name = "_cyber_parameter.so",
-    linkshared = True,
-    deps = [
-        ":py_parameter",
-    ],
-)
-
-cc_library(
-    name = "py_parameter",
-    srcs = ["py_parameter.cc"],
-    hdrs = ["py_parameter.h"],
-    deps = [
-        ":py_cyber",
-        "//cyber:cyber_core",
-        "@python27",
     ],
 )
 
