@@ -86,9 +86,6 @@ bool TrajectoryConvRnnInference::Inference(
                        {1, initial_point_float.rows, initial_point_float.cols,
                         initial_point_float.channels()});
   initial_point_tensor = initial_point_tensor.permute({0, 3, 1, 2});
-  for (int i = 0; i < initial_point_float.channels(); ++i) {
-    initial_point_tensor[0][i] = initial_point_tensor[0][i].sub(0.5).div(0.5);
-  }
 
   cv::Mat initial_box;
   if (!BirdviewImgFeatureRenderer::Instance()->RenderCurrentEgoBox(
@@ -103,9 +100,6 @@ bool TrajectoryConvRnnInference::Inference(
                        {1, initial_box_float.rows, initial_box_float.cols,
                         initial_box_float.channels()});
   initial_box_tensor = initial_box_tensor.permute({0, 3, 1, 2});
-  for (int i = 0; i < initial_box_float.channels(); ++i) {
-    initial_box_tensor[0][i] = initial_box_tensor[0][i].sub(0.5).div(0.5);
-  }
 
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
@@ -135,7 +129,6 @@ bool TrajectoryConvRnnInference::Inference(
   const double cur_heading = cur_path_point.theta();
 
   learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
-
   // TODO(Jinyun): move delta_t to conf or deduce it somehow
   const double delta_t = 0.2;
   auto torch_output = torch_output_tensor.accessor<float, 3>();
