@@ -124,6 +124,8 @@ function check_arguments() {
     if [[ "${TARGET_ARCH}" != "${HOST_ARCH}" ]]; then
         echo "[WARNING] Host arch (${HOST_ARCH}) != Target Arch (${TARGET_ARCH}) " \
              "for dockerfile \"$DOCKERFILE\""
+        echo "[WARNING] Make sure you have executed the following command:"
+        echo "docker run --rm --privileged multiarch/qemu-user-static --reset -p yes"
     fi
 }
 
