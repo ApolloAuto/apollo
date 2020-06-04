@@ -34,6 +34,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/common/util:map_util",
         "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",

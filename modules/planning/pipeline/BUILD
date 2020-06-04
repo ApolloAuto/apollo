@@ -12,16 +12,10 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/util:math_util_lib",
+        "//modules/planning/common:trajectory_evaluator",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_cc_proto",
-        "//modules/prediction/proto:prediction_obstacle_cc_proto",
-        "//modules/prediction/util:data_extraction",
-        "//third_party:boost",
-        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -33,8 +27,6 @@ cc_binary(
     ],
     deps = [
         ":evaluator",
-        "//third_party:boost",
-        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -45,17 +37,9 @@ cc_binary(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-<<<<<<< HEAD
         "//modules/planning/common:feature_output",
         "//modules/planning/common:message_process",
         "//modules/planning/common:planning_gflags",
-=======
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:feature_output",
-        "//modules/planning/common:message_process",
->>>>>>> master
-        "//third_party:boost",
-        "@com_google_absl//absl/strings",
     ],
 )
 

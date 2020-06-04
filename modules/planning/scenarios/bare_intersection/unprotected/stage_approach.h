@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
@@ -34,9 +35,10 @@ struct BareIntersectionUnprotectedContext;
 
 class BareIntersectionUnprotectedStageApproach : public Stage {
  public:
-  explicit BareIntersectionUnprotectedStageApproach(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  BareIntersectionUnprotectedStageApproach(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_standby.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -58,7 +59,7 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
 
   // add a stop fence
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
     const auto& reference_line_info = frame->reference_line_info().front();

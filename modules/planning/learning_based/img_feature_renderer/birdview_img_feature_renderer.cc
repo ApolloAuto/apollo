@@ -90,6 +90,13 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
 
 bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
+  int ego_trajectory_point_history_size =
+      learning_data_frame.adc_trajectory_point_size();
+  if (ego_trajectory_point_history_size < 1) {
+    AERROR << "Ego past history is empty";
+    return false;
+  }
+
   cv::Mat ego_past =
       cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
   cv::Mat obs_past =
@@ -104,13 +111,6 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
       cv::Mat(config_.height(), config_.width(), CV_8UC3, cv::Scalar(0, 0, 0));
   cv::Mat traffic_light =
       cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
-
-  int ego_trajectory_point_history_size =
-      learning_data_frame.adc_trajectory_point_size();
-  if (ego_trajectory_point_history_size < 1) {
-    AERROR << "Ego past history is empty";
-    return false;
-  }
 
   const auto& current_traj_point = learning_data_frame.adc_trajectory_point(
       ego_trajectory_point_history_size - 1);
@@ -164,7 +164,60 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
 // TODO(Jinyun): implement for debugging purpose
 bool BirdviewImgFeatureRenderer::RenderBGREnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
-  return false;
+  int ego_trajectory_point_history_size =
+      learning_data_frame.adc_trajectory_point_size();
+  if (ego_trajectory_point_history_size < 1) {
+    AERROR << "Ego past history is empty";
+    return false;
+  }
+
+  cv::Mat bgr_canvas =
+      cv::Mat(config_.height(), config_.width(), CV_8UC3, cv::Scalar(0, 0, 0));
+
+  const auto& current_traj_point = learning_data_frame.adc_trajectory_point(
+      ego_trajectory_point_history_size - 1);
+  const double current_time_sec = current_traj_point.timestamp_sec();
+  const auto& current_path_point =
+      current_traj_point.trajectory_point().path_point();
+  const double current_x = current_path_point.x();
+  const double current_y = current_path_point.y();
+  const double current_heading = current_path_point.theta();
+
+  if (!RenderLocalRoadMap(current_x, current_y, current_heading, &bgr_canvas)) {
+    AERROR << "RenderLocalRoadMap failed";
+    return false;
+  }
+  if (!RenderRouting(learning_data_frame, current_x, current_y, current_heading,
+                     &bgr_canvas)) {
+    AERROR << "RenderRouting failed";
+    return false;
+  }
+  if (!RenderTrafficLight(learning_data_frame, current_x, current_y,
+                          current_heading, &bgr_canvas)) {
+    AERROR << "RenderTrafficLight failed";
+    return false;
+  }
+  if (!RenderObsPastBox(learning_data_frame, current_time_sec, &bgr_canvas)) {
+    AERROR << "RenderObsPastBox failed";
+    return false;
+  }
+  if (!RenderObsFutureBox(learning_data_frame, current_time_sec, &bgr_canvas)) {
+    AERROR << "RenderObsFutureBox failed";
+    return false;
+  }
+  if (!RenderEgoCurrentBox(&bgr_canvas)) {
+    AERROR << "RenderEgoCurrentBox failed";
+    return false;
+  }
+  if (!RenderEgoPastPoint(learning_data_frame, current_time_sec, current_x,
+                          current_y, current_heading, &bgr_canvas)) {
+    AERROR << "RenderEgoPastPoint failed";
+    return false;
+  }
+
+  bgr_canvas.copyTo(*img_feature);
+
+  return true;
 }
 
 bool BirdviewImgFeatureRenderer::RenderCurrentEgoStatus(
@@ -234,7 +287,7 @@ bool BirdviewImgFeatureRenderer::RenderEgoCurrentBox(
   }
   const auto& param = ego_vehicle_config_.vehicle_param();
   const std::vector<cv::Point2i> box_corner_points =
-      GetAffinedBoxImgIdx(0.0, 0.0, M_PI / 2,
+      GetAffinedBoxImgIdx(0.0, 0.0, M_PI_2,
                           {
                               std::make_pair(param.front_edge_to_center(),
                                              param.left_edge_to_center()),
@@ -276,7 +329,7 @@ bool BirdviewImgFeatureRenderer::RenderEgoPastPoint(
                GetAffinedPointImgIdx(
                    ego_past_point.trajectory_point().path_point().x(),
                    ego_past_point.trajectory_point().path_point().y(),
-                   ego_current_x, ego_current_y, M_PI - ego_current_heading),
+                   ego_current_x, ego_current_y, M_PI_2 - ego_current_heading),
                2, color, -1);
   }
   return true;
@@ -310,14 +363,14 @@ bool BirdviewImgFeatureRenderer::RenderObsPastBox(
       color = color - color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -357,14 +410,14 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       const auto& path_point =
           last_past_traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -401,14 +454,14 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       color = color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -469,11 +522,11 @@ bool BirdviewImgFeatureRenderer::RenderTrafficLight(
             const auto& p0 = GetAffinedPointImgIdx(
                 segment.line_segment().point(i).x(),
                 segment.line_segment().point(i).y(), ego_current_x,
-                ego_current_y, M_PI - ego_current_heading);
+                ego_current_y, M_PI_2 - ego_current_heading);
             const auto& p1 = GetAffinedPointImgIdx(
                 segment.line_segment().point(i + 1).x(),
                 segment.line_segment().point(i + 1).y(), ego_current_x,
-                ego_current_y, M_PI - ego_current_heading);
+                ego_current_y, M_PI_2 - ego_current_heading);
             cv::line(*img_feature, p0, p1, color, 4);
           }
         }
@@ -521,11 +574,11 @@ bool BirdviewImgFeatureRenderer::RenderRouting(
         const auto& p0 = GetAffinedPointImgIdx(
             segment.line_segment().point(i).x(),
             segment.line_segment().point(i).y(), ego_current_x, ego_current_y,
-            M_PI - ego_current_heading);
+            M_PI_2 - ego_current_heading);
         const auto& p1 = GetAffinedPointImgIdx(
             segment.line_segment().point(i + 1).x(),
             segment.line_segment().point(i + 1).y(), ego_current_x,
-            ego_current_y, M_PI - ego_current_heading);
+            ego_current_y, M_PI_2 - ego_current_heading);
         cv::line(*img_feature, p0, p1, routing_color, 12);
       }
     }

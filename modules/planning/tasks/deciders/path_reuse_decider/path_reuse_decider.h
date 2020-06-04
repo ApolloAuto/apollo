@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -35,7 +36,8 @@ namespace planning {
 
 class PathReuseDecider : public Decider {
  public:
-  explicit PathReuseDecider(const TaskConfig& config);
+  PathReuseDecider(const TaskConfig& config,
+                   const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   common::Status Process(Frame* frame,
@@ -71,7 +73,6 @@ class PathReuseDecider : public Decider {
                        ReferenceLineInfo* const reference_line_info);
 
  private:
-  History* history_ = History::Instance();
   static int reusable_path_counter_;  // count reused path
   static int total_path_counter_;     // count total path
   static bool path_reusable_;

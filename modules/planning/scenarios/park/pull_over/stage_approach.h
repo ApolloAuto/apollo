@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
@@ -34,7 +36,8 @@ struct PullOverContext;
 
 class PullOverStageApproach : public Stage {
  public:
-  explicit PullOverStageApproach(const ScenarioConfig::StageConfig& config);
+  PullOverStageApproach(const ScenarioConfig::StageConfig& config,
+                        const std::shared_ptr<DependencyInjector>& injector);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;

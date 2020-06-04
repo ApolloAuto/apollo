@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -32,8 +34,9 @@ struct PullOverContext;
 
 class PullOverStageRetryApproachParking : public Stage {
  public:
-  explicit PullOverStageRetryApproachParking(
-      const ScenarioConfig::StageConfig& config);
+  PullOverStageRetryApproachParking(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;

@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 
+#include <memory>
+
 #include "cyber/common/log.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -35,8 +37,9 @@ namespace pull_over {
 using apollo::common::TrajectoryPoint;
 
 PullOverStageRetryParking::PullOverStageRetryParking(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageRetryParking::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -56,7 +59,7 @@ Stage::StageStatus PullOverStageRetryParking::Process(
 
   // set debug info in planning_data
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   auto* pull_over_debug = frame->mutable_open_space_info()
                               ->mutable_debug()
                               ->mutable_planning_data()
@@ -82,7 +85,7 @@ Stage::StageStatus PullOverStageRetryParking::FinishStage() {
 
 bool PullOverStageRetryParking::CheckADCPullOverOpenSpace() {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {

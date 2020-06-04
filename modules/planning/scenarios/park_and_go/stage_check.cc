@@ -48,7 +48,7 @@ Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
   } else {
     next_stage_ = ScenarioConfig::PARK_AND_GO_ADJUST;
   }
-  PlanningContext::Instance()
+  injector_->planning_context()
       ->mutable_planning_status()
       ->mutable_park_and_go()
       ->set_in_check_stage(false);
@@ -56,7 +56,7 @@ Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
 }
 
 void ParkAndGoStageCheck::ADCInitStatus() {
-  auto* park_and_go_status = PlanningContext::Instance()
+  auto* park_and_go_status = injector_->planning_context()
                                  ->mutable_planning_status()
                                  ->mutable_park_and_go();
   park_and_go_status->Clear();

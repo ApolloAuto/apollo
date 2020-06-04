@@ -25,8 +25,8 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/message_process.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -77,6 +77,7 @@ class PlanningComponent final
   LocalView local_view_;
 
   std::unique_ptr<PlanningBase> planning_base_;
+  std::shared_ptr<DependencyInjector> injector_;
 
   PlanningConfig config_;
   MessageProcess message_process_;

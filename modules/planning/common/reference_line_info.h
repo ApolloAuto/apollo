@@ -39,6 +39,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
@@ -56,10 +57,10 @@ class ReferenceLineInfo {
   enum class LaneType { LeftForward, LeftReverse, RightForward, RightReverse };
   ReferenceLineInfo() = default;
 
-  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
-                             const common::TrajectoryPoint& adc_planning_point,
-                             const ReferenceLine& reference_line,
-                             const hdmap::RouteSegments& segments);
+  ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                    const common::TrajectoryPoint& adc_planning_point,
+                    const ReferenceLine& reference_line,
+                    const hdmap::RouteSegments& segments);
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
@@ -149,12 +150,14 @@ class ReferenceLineInfo {
   void SetDrivable(bool drivable);
   bool IsDrivable() const;
 
-  void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
+  void ExportEngageAdvice(common::EngageAdvice* engage_advice,
+                          PlanningContext* planning_context) const;
 
   const hdmap::RouteSegments& Lanes() const;
   std::list<hdmap::Id> TargetLaneId() const;
 
-  void ExportDecision(DecisionResult* decision_result) const;
+  void ExportDecision(DecisionResult* decision_result,
+                      PlanningContext* planning_context) const;
 
   void SetJunctionRightOfWay(const double junction_s,
                              const bool is_protected) const;
@@ -251,11 +254,13 @@ class ReferenceLineInfo {
 
   bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
-  void MakeDecision(DecisionResult* decision_result) const;
+  void MakeDecision(DecisionResult* decision_result,
+                    PlanningContext* planning_context) const;
 
   int MakeMainStopDecision(DecisionResult* decision_result) const;
 
-  void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
+  void MakeMainMissionCompleteDecision(DecisionResult* decision_result,
+                                       PlanningContext* planning_context) const;
 
   void MakeEStopDecision(DecisionResult* decision_result) const;
 

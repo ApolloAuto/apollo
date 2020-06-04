@@ -31,14 +31,17 @@ class StopSignUnprotectedStageCreepTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StopSignUnprotectedStageCreepTest, Init) {
-  StopSignUnprotectedStageCreep stop_sign_unprotected_stage_creep(config_);
+  StopSignUnprotectedStageCreep stop_sign_unprotected_stage_creep(config_,
+                                                                  injector_);
   EXPECT_EQ(stop_sign_unprotected_stage_creep.Name(),
             ScenarioConfig::StageType_Name(
                 ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP));

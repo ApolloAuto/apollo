@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -31,6 +33,8 @@ namespace planning {
 class PathOptimizer : public Task {
  public:
   explicit PathOptimizer(const TaskConfig &config);
+  PathOptimizer(const TaskConfig &config,
+                const std::shared_ptr<DependencyInjector>& injector);
   virtual ~PathOptimizer() = default;
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

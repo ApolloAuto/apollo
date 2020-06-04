@@ -20,11 +20,13 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 
@@ -34,6 +36,9 @@ namespace planning {
 class Task {
  public:
   explicit Task(const TaskConfig& config);
+
+  Task(const TaskConfig& config,
+       const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~Task() = default;
 
@@ -52,6 +57,8 @@ class Task {
 
   TaskConfig config_;
   std::string name_;
+
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace planning

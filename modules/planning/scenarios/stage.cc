@@ -41,9 +41,11 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 // constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
+Stage::Stage(const ScenarioConfig::StageConfig& config,
+             const std::shared_ptr<DependencyInjector>& injector)
+    : config_(config), injector_(injector) {
   // set stage_type in PlanningContext
-  PlanningContext::Instance()
+  injector->planning_context()
       ->mutable_planning_status()
       ->mutable_scenario()
       ->set_stage_type(stage_type());
@@ -62,7 +64,7 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
         << " used but not configured";
     auto iter = tasks_.find(task_type);
     if (iter == tasks_.end()) {
-      auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
+      auto ptr = TaskFactory::CreateTask(*config_map[task_type], injector_);
       task_list_.push_back(ptr.get());
       tasks_[task_type] = std::move(ptr);
     } else {
@@ -101,7 +103,7 @@ bool Stage::ExecuteTaskOnReferenceLine(
 
     if (reference_line_info.speed_data().empty()) {
       *reference_line_info.mutable_speed_data() =
-          SpeedProfileGenerator::GenerateFallbackSpeed();
+          SpeedProfileGenerator::GenerateFallbackSpeed(injector_->ego_info());
       reference_line_info.AddCost(kSpeedOptimizationFallbackCost);
       reference_line_info.set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
     } else {

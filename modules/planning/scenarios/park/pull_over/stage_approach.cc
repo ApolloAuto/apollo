@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,8 +40,9 @@ namespace pull_over {
 using apollo::common::TrajectoryPoint;
 
 PullOverStageApproach::PullOverStageApproach(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -55,8 +57,8 @@ Stage::StageStatus PullOverStageApproach::Process(
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
-  scenario::util::PullOverStatus status =
-      scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
+  scenario::util::PullOverStatus status = scenario::util::CheckADCPullOver(
+      reference_line_info, scenario_config_, injector_->planning_context());
 
   if (status == scenario::util::PASS_DESTINATION ||
       status == scenario::util::PARK_COMPLETE) {
@@ -84,7 +86,8 @@ Stage::StageStatus PullOverStageApproach::Process(
         const auto& path_point = path_data.discretized_path()[i];
         scenario::util::PullOverStatus status =
             scenario::util::CheckADCPullOverPathPoint(
-                reference_line_info, scenario_config_, path_point);
+                reference_line_info, scenario_config_, path_point,
+                injector_->planning_context());
         if (status == scenario::util::PARK_FAIL) {
           path_fail = true;
         }
@@ -96,7 +99,7 @@ Stage::StageStatus PullOverStageApproach::Process(
   // add a stop fence for adc to pause at a better position
   if (path_fail) {
     const auto& pull_over_status =
-        PlanningContext::Instance()->planning_status().pull_over();
+        injector_->planning_context()->planning_status().pull_over();
     if (pull_over_status.has_position() &&
         pull_over_status.position().has_x() &&
         pull_over_status.position().has_y()) {
