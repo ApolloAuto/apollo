@@ -75,14 +75,21 @@ void Evaluator::Evaluate(const std::string& source_file) {
 
     // evaluate adc future trajectory
     std::vector<TrajectoryPointFeature> adc_future_trajectory;
+    for (const auto& tp :
+        learning_data_.learning_data(i).output()
+                                       .adc_future_trajectory_point()) {
+      adc_future_trajectory.push_back(tp);
+    }
+    std::vector<TrajectoryPointFeature> evaluated_adc_future_trajectory;
     trajectory_evaluator_.EvaluateADCFutureTrajectory(
-        learning_data_.learning_data(i),
+        learning_data_.learning_data(i).frame_num(),
+        adc_future_trajectory,
         start_point_timestamp_sec,
         FLAGS_trajectory_delta_t,
-        &adc_future_trajectory);
+        &evaluated_adc_future_trajectory);
     learning_data_frame->mutable_output()
                        ->clear_adc_future_trajectory_point();
-    for (const auto& tp : adc_future_trajectory) {
+    for (const auto& tp : evaluated_adc_future_trajectory) {
       auto adc_future_trajectory_point =
           learning_data_frame->mutable_output()
                              ->add_adc_future_trajectory_point();
