@@ -80,6 +80,9 @@ Status LearningModelInferenceTrajectoryTask::Process(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  reference_line_info->SetTrajectory(
+  DiscretizedTrajectory(adc_future_trajectory_points));
+
   return Status::OK();
 }
 
