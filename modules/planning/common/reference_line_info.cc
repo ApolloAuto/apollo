@@ -549,8 +549,15 @@ bool ReferenceLineInfo::AdjustTrajectoryWhichStartsFromCurrentPos(
   const double start_point_heading = planning_start_point.path_point().theta();
   const double start_point_x = planning_start_point.path_point().x();
   const double start_point_y = planning_start_point.path_point().y();
+  const double start_point_relative_time = planning_start_point.relative_time();
+
   int insert_idx = -1;
   for (size_t i = 0; i < trajectory.size(); ++i) {
+    // skip trajectory_points early than planning_start_point
+    if (trajectory[i].relative_time() <= start_point_relative_time) {
+      continue;
+    }
+
     const double cur_point_x = trajectory[i].path_point().x();
     const double cur_point_y = trajectory[i].path_point().y();
     const double tracking_heading =
@@ -580,8 +587,10 @@ bool ReferenceLineInfo::AdjustTrajectoryWhichStartsFromCurrentPos(
   // cause.
   if (cut_trajectory.size() > 1 && cut_trajectory.front().relative_time() >=
                                        cut_trajectory[1].relative_time()) {
-    AERROR << "planning init point relative time larger than that of its next "
-              "point";
+    AERROR << "planning init point relative_time["
+           << cut_trajectory.front().relative_time()
+           << "] larger than its next point's relative_time["
+           << cut_trajectory[1].relative_time() << "]";
     return false;
   }
 
