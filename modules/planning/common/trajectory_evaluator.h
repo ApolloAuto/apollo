@@ -33,10 +33,11 @@ class TrajectoryEvaluator {
                              LearningDataFrame* learning_data_frame);
 
   void EvaluateADCFutureTrajectory(
-      const LearningDataFrame& learning_data_frame,
+      const int frame_num,
+      const std::vector<TrajectoryPointFeature>& adc_future_trajectory,
       const double start_point_timestamp_sec,
       const double delta_time,
-      std::vector<TrajectoryPointFeature>* adc_future_trajectory);
+      std::vector<TrajectoryPointFeature>* evaluated_adc_future_trajectory);
 
   void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
                                   const double delta_time,

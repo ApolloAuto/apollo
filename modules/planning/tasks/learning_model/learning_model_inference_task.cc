@@ -128,18 +128,46 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // for (const auto& t :
+  //    learning_data_frame.output().adc_future_trajectory_point()) {
+  //   AERROR << "FUTURE orig: " << t.trajectory_point().relative_time();
+  // }
+
+  // evaluate adc future trajectory
   constexpr double kADCFutureTrajectoryDeltaTime = 0.02;
-  std::vector<TrajectoryPointFeature> evaluated_trajectory;
+  std::vector<TrajectoryPointFeature> future_trajectory;
+  for (const auto& tp :
+      learning_data_frame.output().adc_future_trajectory_point()) {
+    future_trajectory.push_back(tp);
+  }
+  // stitching if start_point_relative_time from model data is too large
+  /* TODO(all): to be added soon
+  TrajectoryPointFeature tp;
+  const int last = learning_data_frame.adc_trajectory_point_size() - 1;
+  tp.set_timestamp_sec(
+      learning_data_frame.adc_trajectory_point(last).timestamp_sec());
+  tp.mutable_trajectory_point()->CopyFrom(
+      learning_data_frame.adc_trajectory_point(last).trajectory_point());
+  future_trajectory.insert(future_trajectory.begin(), tp);
+  */
+  // for (const auto& t : future_trajectory) {
+  //   AERROR << "FUTURE stitched: " << t.trajectory_point().relative_time();
+  // }
+  std::vector<TrajectoryPointFeature> evaluated_future_trajectory;
   trajectory_evaluator.EvaluateADCFutureTrajectory(
-      learning_data_frame,
+      learning_data_frame.frame_num(),
+      future_trajectory,
       start_point_timestamp_sec,
       kADCFutureTrajectoryDeltaTime,
-      &evaluated_trajectory);
+      &evaluated_future_trajectory);
 
+  // convert to common::TrajectoryPoint
   std::vector<common::TrajectoryPoint> adc_future_trajectory;
-  ConvertADCFutureTrajectory(evaluated_trajectory, &adc_future_trajectory);
+  ConvertADCFutureTrajectory(evaluated_future_trajectory,
+                             &adc_future_trajectory);
+  ADEBUG << "adc_future_trajectory_size: " << adc_future_trajectory.size();
   // for (const auto& t : adc_future_trajectory) {
-  //   AERROR << "FUTURE: " << t.relative_time();
+  //   AERROR << "FUTURE After: " << t.relative_time();
   // }
 
   frame->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
