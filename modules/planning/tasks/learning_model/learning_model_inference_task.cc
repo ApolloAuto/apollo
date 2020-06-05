@@ -135,14 +135,14 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   // }
 
   // evaluate adc future trajectory
+  // TODO(all): move to conf
   constexpr double kADCFutureTrajectoryDeltaTime = 0.02;
   std::vector<TrajectoryPointFeature> future_trajectory;
   for (const auto& tp :
       learning_data_frame.output().adc_future_trajectory_point()) {
     future_trajectory.push_back(tp);
   }
-  // stitching if start_point_relative_time from model data is too large
-  /* TODO(all): to be added soon
+
   TrajectoryPointFeature tp;
   const int last = learning_data_frame.adc_trajectory_point_size() - 1;
   tp.set_timestamp_sec(
@@ -150,10 +150,11 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   tp.mutable_trajectory_point()->CopyFrom(
       learning_data_frame.adc_trajectory_point(last).trajectory_point());
   future_trajectory.insert(future_trajectory.begin(), tp);
-  */
+
   // for (const auto& t : future_trajectory) {
   //   AERROR << "FUTURE stitched: " << t.trajectory_point().relative_time();
   // }
+
   std::vector<TrajectoryPointFeature> evaluated_future_trajectory;
   trajectory_evaluator.EvaluateADCFutureTrajectory(
       learning_data_frame.frame_num(),
@@ -190,7 +191,7 @@ void LearningModelInferenceTask::ConvertADCFutureTrajectory(
     path_point->set_y(tp.path_point().y());
     // path_point->set_z(tp.path_point().z());
     path_point->set_theta(tp.path_point().theta());
-    path_point->set_s(tp.path_point().s());
+    // path_point->set_s(tp.path_point().s());
     // path_point->set_lane_id(tp.path_point().lane_id());
     // path_point->set_x_derivative();
     // path_point->set_y_derivative();

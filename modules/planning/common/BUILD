@@ -162,6 +162,7 @@ cc_library(
         ":planning_gflags",
         ":st_graph_data",
         "//cyber/common:log",
+        "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:point_factory",
         "//modules/common/vehicle_state:vehicle_state_provider",

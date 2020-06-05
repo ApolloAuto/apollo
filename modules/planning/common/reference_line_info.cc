@@ -22,16 +22,15 @@
 
 #include <algorithm>
 
-#include "cyber/task/task.h"
-#include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
-
 #include "absl/strings/str_cat.h"
+#include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/proto/planning_status.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -532,6 +531,86 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(speed_point.t() + relative_time);
     ptr_discretized_trajectory->AppendTrajectoryPoint(trajectory_point);
+  }
+  return true;
+}
+
+// TODO(all): It is a brutal way to insert the planning init point, one elegant
+// way would be bypassing trajectory stitching logics somehow, or use planing
+// init point from trajectory stitching to compute the trajectory at the very
+// start
+bool ReferenceLineInfo::AdjustTrajectoryWhichStartsFromCurrentPos(
+    const common::TrajectoryPoint& planning_start_point,
+    const std::vector<common::TrajectoryPoint>& trajectory,
+    DiscretizedTrajectory* adjusted_trajectory) {
+  ACHECK(adjusted_trajectory != nullptr);
+  // find insert index by check heading
+  static constexpr double kMaxAngleDiff = M_PI_2;
+  const double start_point_heading = planning_start_point.path_point().theta();
+  const double start_point_x = planning_start_point.path_point().x();
+  const double start_point_y = planning_start_point.path_point().y();
+  int insert_idx = -1;
+  for (size_t i = 0; i < trajectory.size(); ++i) {
+    const double cur_point_x = trajectory[i].path_point().x();
+    const double cur_point_y = trajectory[i].path_point().y();
+    const double tracking_heading =
+        std::atan2(cur_point_y - start_point_y, cur_point_x - start_point_x);
+    if (std::fabs(common::math::AngleDiff(start_point_heading,
+                                          tracking_heading)) < kMaxAngleDiff) {
+      insert_idx = i;
+      break;
+    }
+  }
+  if (insert_idx == -1) {
+    AERROR << "All points are behind of planning init point";
+    return false;
+  }
+
+  DiscretizedTrajectory cut_trajectory(trajectory);
+  cut_trajectory.erase(cut_trajectory.begin(),
+                       cut_trajectory.begin() + insert_idx);
+  cut_trajectory.insert(cut_trajectory.begin(), planning_start_point);
+
+  // In class TrajectoryStitcher, the stitched point which is also the planning
+  // init point is supposed have one planning_cycle_time ahead respect to
+  // current timestamp as its relative time. So the relative timelines
+  // of planning init point and the trajectory which start from current
+  // position(relative time = 0) are the same. Therefore any conflicts on the
+  // relative time including the one below should return false and inspected its
+  // cause.
+  if (cut_trajectory.size() > 1 && cut_trajectory.front().relative_time() >=
+                                       cut_trajectory[1].relative_time()) {
+    AERROR << "planning init point relative time larger than that of its next "
+              "point";
+    return false;
+  }
+
+  // In class TrajectoryStitcher, the planing_init_point is set to have s as 0,
+  // so adjustment is needed to be done on the other points
+  double accumulated_s = 0.0;
+  for (size_t i = 1; i < cut_trajectory.size(); ++i) {
+    const auto& pre_path_point = cut_trajectory[i - 1].path_point();
+    auto* cur_path_point = cut_trajectory[i].mutable_path_point();
+    accumulated_s += std::sqrt((cur_path_point->x() - pre_path_point.x()) *
+                                   (cur_path_point->x() - pre_path_point.x()) +
+                               (cur_path_point->y() - pre_path_point.y()) *
+                                   (cur_path_point->y() - pre_path_point.y()));
+    cur_path_point->set_s(accumulated_s);
+  }
+
+  // reevaluate relative_time to make delta t the same
+  adjusted_trajectory->clear();
+  // use varied resolution to reduce data load but also provide enough data
+  // point for control module
+  const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
+  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
+  const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
+  for (double cur_rel_time = cut_trajectory.front().relative_time();
+       cur_rel_time <= cut_trajectory.back().relative_time();
+       cur_rel_time += (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion
+                                                     : kSparseTimeResolution)) {
+    adjusted_trajectory->AppendTrajectoryPoint(
+        cut_trajectory.Evaluate(cur_rel_time));
   }
   return true;
 }
