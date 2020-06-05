@@ -24,7 +24,7 @@ VERSION_X86_64="cyber-x86_64-18.04-20200604_1305"
 VERSION_AARCH64="cyber-aarch64-18.04-20200525_0656"
 VERSION_LOCAL_CYBER="local_cyber_dev"
 CYBER_CONTAINER="apollo_cyber_${USER}"
-CYBER_INSIDE="in_cyber_docker"
+CYBER_INSIDE="in-cyber-docker"
 
 DOCKER_REPO="apolloauto/apollo"
 DOCKER_RUN_CMD="docker run"

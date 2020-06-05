@@ -21,6 +21,8 @@ CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 DOCKER_REPO="apolloauto/apollo"
 
+DEV_INSIDE="in-dev-docker"
+
 ## TODO(storypku): differentiate HOST_ARCH WITH TARGET_ARCH
 ARCH="$(uname -m)"
 
@@ -406,9 +408,9 @@ function main() {
         $(local_volumes) \
         --net host \
         -w /apollo \
-        --add-host in_dev_docker:127.0.0.1 \
-        --add-host ${LOCAL_HOST}:127.0.0.1 \
-        --hostname in_dev_docker \
+        --add-host "{DEV_INSIDE}:127.0.0.1" \
+        --add-host "${LOCAL_HOST}:127.0.0.1" \
+        --hostname "${DEV_INSIDE}" \
         --shm-size 2G \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
