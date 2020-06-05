@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
 
+#include <cmath>
 #include <limits>
 #include <string>
 
@@ -159,30 +160,66 @@ void LearningModelInferenceTask::ConvertADCFutureTrajectory(
     auto path_point = trajectory_point.mutable_path_point();
     path_point->set_x(tp.path_point().x());
     path_point->set_y(tp.path_point().y());
-    path_point->set_z(tp.path_point().z());
+    // path_point->set_z(tp.path_point().z());
     path_point->set_theta(tp.path_point().theta());
     path_point->set_s(tp.path_point().s());
-    path_point->set_lane_id(tp.path_point().lane_id());
+    // path_point->set_lane_id(tp.path_point().lane_id());
     // path_point->set_x_derivative();
     // path_point->set_y_derivative();
 
     trajectory_point.set_v(tp.v());
-    trajectory_point.set_a(tp.a());
     trajectory_point.set_relative_time(tp.relative_time());
-    // Note: gaussian_info is empty at tp.gaussian_info()
-    trajectory_point.mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
-    // trajectory_point.set_da();
+    // trajectory_point.mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
     // trajectory_point.set_steer();
 
     adc_future_trajectory->push_back(trajectory_point);
   }
 
+  double accumulated_s = 0.0;
+  adc_future_trajectory->front().mutable_path_point()->set_s(0.0);
+  for (size_t i = 1; i < adc_future_trajectory->size(); ++i) {
+    auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
+    const auto& pre_path_point = (*adc_future_trajectory)[i - 1].path_point();
+    accumulated_s += std::sqrt((cur_path_point->x() - pre_path_point.x()) *
+                                   (cur_path_point->x() - pre_path_point.x()) +
+                               (cur_path_point->y() - pre_path_point.y()) *
+                                   (cur_path_point->y() - pre_path_point.y()));
+    cur_path_point->set_s(accumulated_s);
+  }
+
+  for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
+    const auto& cur_v = (*adc_future_trajectory)[i].v();
+    const auto& cur_relative_time = (*adc_future_trajectory)[i].relative_time();
+    const auto& next_v = (*adc_future_trajectory)[i + 1].v();
+    const auto& next_relative_time =
+        (*adc_future_trajectory)[i + 1].relative_time();
+    const double cur_a =
+        (next_v - cur_v) / (next_relative_time - cur_relative_time);
+    (*adc_future_trajectory)[i].set_a(cur_a);
+  }
+  // assuming last point keeps zero acceleration
+  adc_future_trajectory->back().set_a(0.0);
+
+  for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
+    const auto& cur_a = (*adc_future_trajectory)[i].a();
+    const auto& cur_relative_time = (*adc_future_trajectory)[i].relative_time();
+    const auto& next_a = (*adc_future_trajectory)[i + 1].a();
+    const auto& next_relative_time =
+        (*adc_future_trajectory)[i + 1].relative_time();
+    const double cur_da =
+        (next_a - cur_a) / (next_relative_time - cur_relative_time);
+    (*adc_future_trajectory)[i].set_da(cur_da);
+  }
+  // assuming last point keeps zero acceleration
+  adc_future_trajectory->back().set_da(0.0);
+
   for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
     auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
     const auto& next_path_point = (*adc_future_trajectory)[i + 1].path_point();
-    double cur_kappa = apollo::common::math::NormalizeAngle(
-                           next_path_point.theta() - cur_path_point->theta()) /
-                       (next_path_point.s() - cur_path_point->s());
+    const double cur_kappa =
+        apollo::common::math::NormalizeAngle(next_path_point.theta() -
+                                             cur_path_point->theta()) /
+        (next_path_point.s() - cur_path_point->s());
     cur_path_point->set_kappa(cur_kappa);
   }
   // assuming last point has zero kappa
@@ -191,9 +228,10 @@ void LearningModelInferenceTask::ConvertADCFutureTrajectory(
   for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
     auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
     const auto& next_path_point = (*adc_future_trajectory)[i + 1].path_point();
-    double cur_dkappa = (next_path_point.kappa() - cur_path_point->kappa()) /
-                        (next_path_point.s() - cur_path_point->s());
-    cur_path_point->set_kappa(cur_dkappa);
+    const double cur_dkappa =
+        (next_path_point.kappa() - cur_path_point->kappa()) /
+        (next_path_point.s() - cur_path_point->s());
+    cur_path_point->set_dkappa(cur_dkappa);
   }
   // assuming last point going straight with the last heading
   adc_future_trajectory->back().mutable_path_point()->set_dkappa(0.0);
@@ -201,9 +239,10 @@ void LearningModelInferenceTask::ConvertADCFutureTrajectory(
   for (size_t i = 0; i + 1 < adc_future_trajectory->size(); ++i) {
     auto* cur_path_point = (*adc_future_trajectory)[i].mutable_path_point();
     const auto& next_path_point = (*adc_future_trajectory)[i + 1].path_point();
-    double cur_ddkappa = (next_path_point.dkappa() - cur_path_point->dkappa()) /
-                         (next_path_point.s() - cur_path_point->s());
-    cur_path_point->set_kappa(cur_ddkappa);
+    const double cur_ddkappa =
+        (next_path_point.dkappa() - cur_path_point->dkappa()) /
+        (next_path_point.s() - cur_path_point->s());
+    cur_path_point->set_ddkappa(cur_ddkappa);
   }
   // assuming last point going straight with the last heading
   adc_future_trajectory->back().mutable_path_point()->set_ddkappa(0.0);
