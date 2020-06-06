@@ -408,7 +408,7 @@ function main() {
         $(local_volumes) \
         --net host \
         -w /apollo \
-        --add-host "{DEV_INSIDE}:127.0.0.1" \
+        --add-host "${DEV_INSIDE}:127.0.0.1" \
         --add-host "${LOCAL_HOST}:127.0.0.1" \
         --hostname "${DEV_INSIDE}" \
         --shm-size 2G \
