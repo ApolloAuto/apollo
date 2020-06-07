@@ -1,0 +1,62 @@
+# 基于双目感知的封闭园区自动驾驶搭建--感知适配
+
+## 前提条件
+
+ 1. 正确完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/Start_Waypoint_Following_cn.md)。
+
+ 2. 正确完成了[基于双目感知的封闭园区自动驾驶搭建--设备集成](Sensor_Integration_cn.md)。
+
+## 配置文件的修改
+
+|序号 | 待修改文件 | 修改内容 | 
+|---|---|---|
+|  1 | `modules/common/data/global_flagfile.txt` |  添加`--half_vehicle_width=0.43` |
+|  2 | `modules/perception/production/launch/dev_kit_perception_camera.launch` |重命名为`perception_camera.launch ` 并替换原`perception_camera.launch`文件  |
+|  3 | `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt` | 文件中`output_obstacles_channel_name`对应的内容修改为 `/apollo/perception/smartereyeobstacles` |
+|  4 | `/apollo/modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt` | 文件中第二行`input_camera_channel_names : "/apollo/sensor/camera/front_6mm/image,/apollo/sensor/camera/front_12mm/image"`修改为`input_camera_channel_names : "/apollo/sensor/smartereye/image"` |
+
+## 感知开环验证及测试
+
+把车辆开到户外，手动控制车辆，看感知是否有数据。
+
+ 1. 进入docker环境，用gpu编译项目，编译项目，启动DreamView。
+
+    ```
+    cd /apollo  
+    bash docker/scripts/dev_start.sh  
+    bash docker/scripts/dev_into.sh  
+    bash apollo.sh build_opt_gpu  
+    bash scripts/bootstrap.sh  
+    ```
+
+ 2. 在浏览器中打开(http://localhost:8888), 选择`Dev_Kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Camera、Transform模块。
+ 
+![camera_adaption_dreamview](images/camera_adaption_dreamview.jpeg)
+
+ 3. 在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
+	
+	| channel_name | 检查项目 | 
+	|---|---|
+	|`/apollo/localization/pose`| 确保能正常输出数据 | 
+	|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据、`sol_type:` 选项显示为`NARROW_INT` |
+	|`/apollo/sensor/smartereye/image` | 确保能正常输出数据，帧率稳定在15HZ左右 |
+	|`/apollo/sensor/smartereye/image/compressed` | 确保能正常输出数据，帧率稳定在15HZ左右 |
+	|`/tf`| 确保能正常输出数据 |
+	|`/tf_static` | 确保能正常输出数据 |
+	
+ 4.  使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/smartereyeobstacles`是否正常输出，并在dreamview上查看障碍物信息：
+
+```
+budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/perception_camera.launch
+```
+查看车前方运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，行人黄色，车辆绿色），如下图所示：
+
+![camera_adaption_dreamview_vehicle](images/camera_adaption_dreamview_vehicle.png)
+
+`/apollo/perception/obstacles`的数据如下图所示：
+
+![camera_adaption_dreamview_obstacle1](images/camera_adaption_dreamview_obstacle1.png)
+
+![camera_adaption_dreamview_obstacle2](images/camera_adaption_dreamview_obstacle2.png)
+
+如果在dreamview上能看到障碍物并且`/apollo/perception/smartereyeobstacles`有障碍物信息，则开环测试通过。
