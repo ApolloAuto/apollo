@@ -14,7 +14,7 @@ cc_library(
         "//modules/perception/fusion/common:dst_evidence",
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/lib/registerer",
-        "//modules/perception/proto:dst_existance_fusion_config_proto",
+        "//modules/perception/proto:dst_existance_fusion_config_cc_proto",
     ],
 )
 
