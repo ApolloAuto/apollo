@@ -26,23 +26,29 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 ## Prereq
 # apt-get -y update && apt-get -y install libboost-all-dev
 
-VERSION="0.5.16-1"
+VERSION="0.5.16-2"
 PKG_NAME="tf2-apollo-${VERSION}.tar.gz"
 DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-CHECKSUM="ec23f028381779246a8e51fc0f0f84a6177d296337a16a4facdefdc557d3f6d1"
+CHECKSUM="486a708950319e8e6f85c4778056a30f3d9733e5cf20f37224580af1ef7937bf"
 
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 
 tar xzf ${PKG_NAME}
 
+# There is a top-level README.md file, so install seperately
 pushd tf2-apollo-${VERSION}
-mkdir build && cd build
-cmake .. -DBUILD_TESTS=OFF \
-	 -DCMAKE_INSTALL_PREFIX=/usr/local/tf2
-make -j$(nproc)
-make install
-
+    mkdir build && cd build
+    cmake .. \
+        -DBUILD_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX="${PKGS_DIR}/tf2" \
+        -DCMAKE_BUILD_TYPE=Release
+    make -j$(nproc)
+    make install
 popd
+
+echo "${PKGS}/tf2/lib" >> "${APOLLO_LD_FILE}"
+ldconfig
 
 ok "Successfully installed tf2-apollo, VERSION=${VERSION}"
 

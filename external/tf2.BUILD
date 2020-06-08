@@ -8,7 +8,7 @@ cc_library(
         ".",
     ],
     linkopts = [
-        "-L/usr/local/tf2/lib",
+        "-L/opt/apollo/pkgs/tf2/lib",
         "-ltf2",
     ],
 )
