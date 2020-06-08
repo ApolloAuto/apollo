@@ -21,31 +21,27 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-apt-get -y update && \
-    apt-get -y install \
-    libpocofoundation50 \
-    libpoco-dev \
-    ncurses-dev \
-    libuuid1 \
-    uuid-dev \
-    libboost-all-dev \
-    libxml2-dev
-
-python3 -m pip install --no-cache-dir grpcio-tools
-
 . /tmp/installers/installer_base.sh
 
-info "Install Protobuf ..."
-bash /tmp/installers/install_protobuf.sh
+info "Install poco ..."
+bash /tmp/installers/install_poco.sh
 
-info "Install GFlags & GLog..."
+apt-get -y update && \
+    apt-get -y install \
+    ncurses-dev \
+    libuuid1 \
+    uuid-dev
+
+info "Install gflags & glog..."
 bash /tmp/installers/install_gflags_glog.sh
 
-info "Install Fast-RTPS ..."
-bash /tmp/installers/install_fast-rtps.sh
+pip3_install grpcio-tools
 
-info "Install Poco ..."
-bash /tmp/installers/install_poco.sh
+info "Install protobuf ..."
+bash /tmp/installers/install_protobuf.sh
+
+info "Install fast-rtps ..."
+bash /tmp/installers/install_fast-rtps.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
