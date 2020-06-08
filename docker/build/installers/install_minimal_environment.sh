@@ -46,33 +46,40 @@ apt-get -y update && \
     apt-get install -y --no-install-recommends \
     apt-utils
 
+# Disabled:
+#   apt-file
+
 apt-get -y update && \
     apt-get -y install -y --no-install-recommends \
     build-essential \
-    autotools-dev \
-    apt-file \
-    sudo \
-    gcc-7 \
-    g++-7 \
-    gdb \
-    wget \
-    curl \
-    git \
-    vim \
-    sed \
-    gawk \
-    bc \
-    patch \
-    tree \
-    lsof \
-    pkg-config \
-    python3 \
+    autoconf \
+    automake \
+    bc      \
+    curl    \
+    file    \
+    gawk    \
+    gcc-7   \
+    g++-7   \
+    gdb     \
+    git     \
+    libtool \
+    lsof    \
+    openssh-client \
+    patch   \
+    pkg-config  \
+    python3     \
     python3-dev \
     python3-pip \
-    openssh-client \
+    sed         \
+    silversearcher-ag          \
     software-properties-common \
-    unzip \
-    zip
+    sudo    \
+    tree    \
+    unzip   \
+    vim     \
+    wget    \
+    zip     \
+    xz-utils
 
 ##----------------##
 ##    SUDO        ##
@@ -99,6 +106,9 @@ else
 fi
 
 pip3_install setuptools
+
+# Kick down the ladder
+apt-get -y autoremove python3-pip
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
