@@ -39,8 +39,6 @@ USE_LOCAL_IMAGE=0
 CUSTOM_VERSION=
 GEOLOC=
 
-ARCH=$(uname -m)
-
 # Check whether user has agreed license agreement
 function check_agreement() {
     local agreement_record="${HOME}/.apollo_agreement.txt"
