@@ -202,13 +202,12 @@ new_local_repository(
 #    path = "/usr/include/vtk-VTK_VERSION",
 #)
 #
-## Caffe
-#new_local_repository(
-#    name = "caffe",
-#    build_file = "third_party/caffe.BUILD",
-#    path = "/usr/include/caffe",
-#)
-#
+# Caffe
+new_local_repository(
+    name = "caffe",
+    build_file = "external/caffe.BUILD",
+    path = "/opt/apollo/pkgs/caffe/include",
+)
 
 # YAML-CPP
 http_archive(
@@ -268,13 +267,14 @@ new_local_repository(
 #    path = "/usr/local/apollo/local_third_party/mkldnn",
 #)
 #
-## mklml
-#new_local_repository(
-#    name = "mklml",
-#    build_file = "third_party/mklml.BUILD",
-#    path = "/usr/local/apollo/local_third_party/mklml",
-#)
-#
+
+# mklml
+new_local_repository(
+    name = "mklml",
+    build_file = "third_party/mklml.BUILD",
+    path = "/usr/local/apollo/local_third_party/mklml",
+)
+
 ## Proj.4
 new_local_repository(
     name = "proj4",

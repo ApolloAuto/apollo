@@ -94,7 +94,7 @@ cc_library(
         ":rt_utils",
         "@caffe",
         "@com_google_protobuf//:protobuf",
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
         "@tensorrt",
     ],
 )

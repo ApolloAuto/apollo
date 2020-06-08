@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -63,8 +63,8 @@ cuda_library(
         ":util",
         "//modules/perception/base",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
-        "@cuda",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

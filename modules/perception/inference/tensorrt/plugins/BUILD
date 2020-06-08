@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,8 +26,8 @@ cuda_library(
     hdrs = ["slice_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
-        "@cuda",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
         "@tensorrt",
     ],
 )
@@ -38,8 +38,8 @@ cuda_library(
     hdrs = ["argmax_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
-        "@cuda",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
         "@tensorrt",
     ],
 )
@@ -50,8 +50,8 @@ cuda_library(
     hdrs = ["softmax_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
-        "@cuda",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
         "@tensorrt",
     ],
 )
@@ -62,8 +62,8 @@ cuda_library(
     hdrs = ["leakyReLU_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
-        "@cuda",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
         "@tensorrt",
     ],
 )

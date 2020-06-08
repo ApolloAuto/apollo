@@ -1,20 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
-
-cc_proto_library(
-    name = "omt_cc_proto",
-    deps = [
-        ":omt_proto",
-    ],
-)
-
-proto_library(
-    name = "omt_proto",
-    srcs = ["omt.proto"],
-)
 
 cc_library(
     name = "track_object",
@@ -81,13 +68,6 @@ cc_library(
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-    ],
-)
-
-py_proto(
-    name = "omt_py_pb2",
-    deps = [
-        ":omt_proto",
     ],
 )
 
