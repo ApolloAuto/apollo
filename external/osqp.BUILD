@@ -9,7 +9,7 @@ cc_library(
         ".",
     ],
     linkopts = [
-        "-L/usr/local/lib",
+        "-L/opt/apollo/sysroot/lib",
         "-losqp",
     ],
 )

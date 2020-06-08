@@ -23,8 +23,9 @@
 #include <vector>
 
 #include "Eigen/Eigen"
+#include "osqp/osqp.h"
+
 #include "cyber/common/log.h"
-#include "osqp/include/osqp.h"
 
 namespace apollo {
 namespace common {
