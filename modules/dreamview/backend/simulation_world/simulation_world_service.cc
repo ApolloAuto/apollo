@@ -59,6 +59,7 @@ using apollo::localization::Gps;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::perception::SensorMeasurement;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
 using apollo::planning::ADCTrajectory;
@@ -551,8 +552,47 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     SetObstacleInfo(obstacle, &world_obj);
     SetObstaclePolygon(obstacle, &world_obj);
     SetObstacleType(obstacle, &world_obj);
+    SetObstacleSensor(obstacle,&world_obj);
   }
   return obj_map_[id];
+}
+
+Object &SimulationWorldService::CreateWorldObjectBySensor(
+  const SensorMeasurement &sensor) {
+  // Create a new world object and put it into object map to store sensor measurement info
+  //sensor measurement theta——>object heading
+  Object sensor_object;
+  sensor_object.set_id(std::to_string(sensor.id()));
+  Point3D pos = sensor.position();
+  sensor_object.set_allocated_position(&pos);
+  sensor_object.set_heading(sensor.theta());
+  sensor_object.set_length(sensor.length());
+  sensor_object.set_width(sensor.width());
+  sensor_object.set_height(sensor.height());
+  sensor_object.set_sub_type(sensor.sub_type());
+  switch (sensor.type()) {
+    case PerceptionObstacle::UNKNOWN:
+      sensor_object.set_type(Object_Type_UNKNOWN);
+      break;
+    case PerceptionObstacle::UNKNOWN_MOVABLE:
+      sensor_object.set_type(Object_Type_UNKNOWN_MOVABLE);
+      break;
+    case PerceptionObstacle::UNKNOWN_UNMOVABLE:
+      sensor_object.set_type(Object_Type_UNKNOWN_UNMOVABLE);
+      break;
+    case PerceptionObstacle::PEDESTRIAN:
+      sensor_object.set_type(Object_Type_PEDESTRIAN);
+      break;
+    case PerceptionObstacle::BICYCLE:
+      sensor_object.set_type(Object_Type_BICYCLE);
+      break;
+    case PerceptionObstacle::VEHICLE:
+      sensor_object.set_type(Object_Type_VEHICLE);
+      break;
+    default:
+      sensor_object.set_type(Object_Type_VIRTUAL);
+  }
+  return sensor_object;
 }
 
 void SimulationWorldService::SetObstacleInfo(const PerceptionObstacle &obstacle,
@@ -597,6 +637,17 @@ void SimulationWorldService::SetObstaclePolygon(
       poly_pt->set_y(point.y() + map_service_->GetYOffset());
       seen_points.insert(xy_pair);
     }
+  }
+}
+
+void SimulationWorldService::SetObstacleSensor(const PerceptionObstacle &obstacle,
+                                             Object *world_object) {
+  if (world_object == nullptr) {
+    return;
+  }
+  for(const auto &sensor : obstacle.measurements()) {
+  (*(world_object->mutable_sensors()))[sensor.sensor_id()]=CreateWorldObjectBySensor(sensor);
+   //CreateWorldObjectBySensor(sensor);
   }
 }
 

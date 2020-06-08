@@ -19,6 +19,7 @@ proto_library(
         "//modules/planning/proto:planning_internal_proto_lib",
         "//modules/prediction/proto:feature_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
     ],
 )
 
