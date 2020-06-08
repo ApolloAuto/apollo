@@ -37,19 +37,21 @@ tar xzf ${PKG_NAME}
 pushd protobuf-${VERSION}
 mkdir cmake/build && cd cmake/build
 
-# Note(storypku): We install protobuf in /usr/local to avoid
+# Note(storypku): We install protobuf in /opt/apollo/sysroot to avoid
 # conflicts with the system provided version.
-cmake .. -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_INSTALL_PREFIX:PATH=/usr/local
+cmake .. \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX:PATH="${SYSROOT_DIR}" \
+    -DCMAKE_BUILD_TYPE=Release
 
-# ./configure --prefix=/usr
-make -j`nproc`
+# ./configure --prefix=${SYSROOT_DIR}
+make -j$(nproc)
 make install
 
 popd
 
 ldconfig
-ok "Successfully installed $protobuf-cpp, VERSION=${VERSION}"
+ok "Successfully installed protobuf-cpp, VERSION=${VERSION}"
 
 # Clean up.
 rm -fr ${PKG_NAME}  protobuf-${VERSION}
