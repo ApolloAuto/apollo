@@ -23,8 +23,13 @@
 ###############################################################################
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
-sudo apt-get -y update
-sudo apt-get -y install libpython2.7-dev
+
+if dpkg -l |grep -q "libpython2.7-dev"; then
+	echo "libpython2.7-dev is already installed"
+else
+	sudo apt-get -y update
+	sudo apt-get -y install libpython2.7-dev
+fi
 
 cp WORKSPACE.in WORKSPACE
 
@@ -58,7 +63,8 @@ bazel_build_with_dist_cache \
     //modules/dreamview/... \
     //modules/guardian/... \
     //modules/localization/... \
-    //modules/prediction/...
+    //modules/prediction/... \
+    //modules/third_party_perception/...
 
 bazel_test_with_dist_cache \
     //cyber/... \
@@ -74,7 +80,8 @@ bazel_test_with_dist_cache \
     //modules/v2x/... \
     //modules/dreamview/... \
     //modules/guardian/... \
-    //modules/map/...
+    //modules/map/... \
+    //modules/third_party_perception/...
 
 bash scripts/install_esdcan_library.sh install
 bazel_build_with_dist_cache //modules/drivers/...
@@ -100,7 +107,6 @@ echo "########################### All check passed! ###########################"
 # TODO(?): bazel build //modules/contrib/...
 # TODO(?): bazel build //modules/perception/...
 # TODO(?): bazel test //modules/prediction/...
-# TODO(?): bazel build //modules/third_party_perception/...
 # TODO(?): apollo.sh build
 # TODO(?): apollo.sh test
 # TODO(?): apollo.sh lint

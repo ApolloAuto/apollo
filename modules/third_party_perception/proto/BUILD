@@ -6,25 +6,6 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "third_party_perception_component_cc_proto",
-    deps = [
-        ":third_party_perception_component_proto",
-    ],
-)
-
-proto_library(
-    name = "third_party_perception_component_proto",
-    srcs = ["third_party_perception_component.proto"],
-)
-
-py_proto_library(
-    name = "third_party_perception_component_py_pb2",
-    deps = [
-        ":third_party_perception_component_proto",
-    ],
-)
-
-cc_proto_library(
     name = "radar_obstacle_cc_proto",
     deps = [
         ":radar_obstacle_proto",
@@ -46,5 +27,24 @@ py_proto_library(
     name = "radar_obstacle_py_pb2",
     deps = [
         ":radar_obstacle_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "third_party_perception_component_cc_proto",
+    deps = [
+        ":third_party_perception_component_proto",
+    ],
+)
+
+proto_library(
+    name = "third_party_perception_component_proto",
+    srcs = ["third_party_perception_component.proto"],
+)
+
+py_proto_library(
+    name = "third_party_perception_component_py_pb2",
+    deps = [
+        ":third_party_perception_component_proto",
     ],
 )

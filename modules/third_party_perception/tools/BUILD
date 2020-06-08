@@ -8,10 +8,16 @@ cc_library(
     srcs = ["conversion_radar.cc"],
     hdrs = ["conversion_radar.h"],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common/proto:drive_state_cc_proto",
+        "//modules/common/proto:vehicle_signal_cc_proto",
+        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
+        "//modules/drivers/proto:conti_radar_cc_proto",
+        "//modules/drivers/proto:delphi_esr_cc_proto",
+        "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
         "//modules/third_party_perception/common:third_party_perception_util",
-        "//modules/third_party_perception/proto:third_party_perception_proto",
+        "//modules/third_party_perception/proto:radar_obstacle_cc_proto",
     ],
 )
 
@@ -23,10 +29,12 @@ cc_library(
         "conversion_smartereye.h",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common/proto:drive_state_cc_proto",
+        "//modules/common/proto:vehicle_signal_cc_proto",
+        "//modules/drivers/proto:smartereye_cc_proto",
         "//modules/third_party_perception/common:third_party_perception_util",
-        "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
 )
 
@@ -38,10 +46,13 @@ cc_library(
         "conversion_mobileye.h",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common/proto:drive_state_cc_proto",
+        "//modules/common/proto:vehicle_signal_cc_proto",
+        "//modules/drivers/proto:mobileye_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/third_party_perception/common:third_party_perception_util",
-        "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
 )
 
@@ -51,7 +62,8 @@ cc_library(
     hdrs = ["fusion.h"],
     deps = [
         "//modules/common/math:geometry",
-        "//modules/perception/proto:perception_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/third_party_perception/proto:third_party_perception_component_cc_proto",
     ],
 )
 
@@ -61,7 +73,7 @@ cc_library(
     hdrs = ["filter.h"],
     deps = [
         "//modules/third_party_perception/common:third_party_perception_util",
-        "//modules/third_party_perception/proto:third_party_perception_proto",
+        "//modules/third_party_perception/proto:radar_obstacle_cc_proto",
     ],
 )
 
