@@ -16,7 +16,7 @@ cc_library(
         "//modules/prediction/common:validation_checker",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//modules/prediction/proto:fnn_vehicle_model_proto",
+        "//modules/prediction/proto:fnn_vehicle_model_cc_proto",
     ],
 )
 
@@ -70,6 +70,7 @@ cc_library(
     hdrs = ["junction_mlp_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-fopenmp",
     ],
     deps = [
         "//modules/common/math:geometry",
@@ -90,6 +91,9 @@ cc_test(
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
+    linkopts = [
+        "-lgomp",
+    ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
@@ -103,6 +107,7 @@ cc_library(
     hdrs = ["junction_map_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-fopenmp",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -119,6 +124,7 @@ cc_library(
     hdrs = ["cruise_mlp_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-fopenmp",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -137,6 +143,9 @@ cc_test(
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
+    linkopts = [
+        "-lgomp",
+    ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
@@ -149,6 +158,7 @@ cc_library(
     hdrs = ["lane_scanning_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-fopenmp",
     ],
     deps = [
         "//modules/prediction/container:container_manager",
@@ -179,6 +189,7 @@ cc_library(
     hdrs = ["semantic_lstm_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-fopenmp",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",

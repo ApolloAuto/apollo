@@ -11,6 +11,11 @@ cc_library(
     linkstatic = False,
     linkopts = [
         "-L/usr/local/libtorch_cpu/lib",
+        "-lc10",
         "-ltorch",
+        "-ltorch_cpu",
+    ],
+    deps = [
+        "@python3",
     ],
 )

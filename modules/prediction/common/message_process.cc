@@ -21,6 +21,7 @@
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
@@ -297,51 +298,38 @@ void MessageProcess::ProcessOfflineData(
               message.channel_name, perception_obstacles, message.time);
         }
         PredictionObstacles prediction_obstacles;
-        OnPerception(perception_obstacles, &prediction_obstacles);
+        OnPerception(perception_obstacles, container_manager, evaluator_manager,
+                     predictor_manager, scenario_manager,
+                     &prediction_obstacles);
         if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
-          SingleMessage single_message;
-          std::string content = "";
-          prediction_obstacles.SerializeToString(&content);
-          single_message.set_content(content);
-          single_message.set_time(message.time);
-          single_message.set_channel_name(FLAGS_prediction_topic);
-          writer.WriteMessage(RecordMessageToSingleMessage(message));
-=======
-          OnPerception(perception_obstacles, container_manager,
-                       evaluator_manager, predictor_manager, scenario_manager,
-                       &prediction_obstacles);
-          if (FLAGS_prediction_offline_mode ==
-              PredictionConstants::kDumpRecord) {
-            writer.WriteMessage<PredictionObstacles>(
-                prediction_conf.topic_conf().perception_obstacle_topic(),
-                prediction_obstacles, message.time);
-            AINFO << "Generated a new prediction message.";
->>>>>>> master
-          }
-        }
-      } else if (message.channel_name ==
-                 prediction_conf.topic_conf().localization_topic()) {
-        LocalizationEstimate localization;
-        if (localization.ParseFromString(message.content)) {
-          if (FLAGS_prediction_offline_mode ==
-              PredictionConstants::kDumpRecord) {
-            writer.WriteMessage<LocalizationEstimate>(
-                message.channel_name, localization, message.time);
-          }
-          OnLocalization(container_manager.get(), localization);
-        }
-      } else if (message.channel_name ==
-                 prediction_conf.topic_conf().planning_trajectory_topic()) {
-        ADCTrajectory adc_trajectory;
-        if (adc_trajectory.ParseFromString(message.content)) {
-          OnPlanning(container_manager.get(), adc_trajectory);
+          writer.WriteMessage<PredictionObstacles>(
+              prediction_conf.topic_conf().perception_obstacle_topic(),
+              prediction_obstacles, message.time);
+          AINFO << "Generated a new prediction message.";
         }
       }
-    }
-    if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
-      writer.Close();
+    } else if (message.channel_name ==
+               prediction_conf.topic_conf().localization_topic()) {
+      LocalizationEstimate localization;
+      if (localization.ParseFromString(message.content)) {
+        if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+          writer.WriteMessage<LocalizationEstimate>(message.channel_name,
+                                                    localization, message.time);
+        }
+        OnLocalization(container_manager.get(), localization);
+      }
+    } else if (message.channel_name ==
+               prediction_conf.topic_conf().planning_trajectory_topic()) {
+      ADCTrajectory adc_trajectory;
+      if (adc_trajectory.ParseFromString(message.content)) {
+        OnPlanning(container_manager.get(), adc_trajectory);
+      }
     }
   }
+  if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
+    writer.Close();
+  }
+}
 
 }  // namespace prediction
-}  // namespace prediction
+}  // namespace apollo

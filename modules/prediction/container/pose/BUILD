@@ -12,8 +12,8 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:quaternion",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container",
     ],

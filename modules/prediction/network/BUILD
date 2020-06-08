@@ -39,7 +39,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/prediction/network:net_layer",
-	"//modules/prediction/proto:network_model_cc_proto",
+        "//modules/prediction/proto:network_model_cc_proto",
     ],
 )
 

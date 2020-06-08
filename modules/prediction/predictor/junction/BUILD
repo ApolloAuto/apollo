@@ -24,6 +24,9 @@ cc_test(
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
+    linkopts = [
+        "-lgomp",
+    ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",

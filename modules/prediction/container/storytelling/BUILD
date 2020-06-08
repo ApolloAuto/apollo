@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/container",
-        "//modules/storytelling/proto:story_proto",
+        "//modules/storytelling/proto:story_cc_proto",
     ],
 )
 
