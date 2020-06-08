@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "osqp/include/osqp.h"
+#include "osqp/osqp.h"
 
 namespace apollo {
 namespace common {
@@ -174,7 +174,7 @@ TEST(MathUtilsTest, QPSTTest) {
       reinterpret_cast<OSQPSettings *>(c_malloc(sizeof(OSQPSettings)));
 
   // Structures
-  OSQPWorkspace *work;  // Workspace
+  OSQPWorkspace *work = NULL;  // Workspace
   OSQPData *data;       // OSQPData
 
   // Populate data
@@ -191,7 +191,7 @@ TEST(MathUtilsTest, QPSTTest) {
   osqp_set_default_settings(settings);
 
   // Setup workspace
-  work = osqp_setup(data, settings);
+  osqp_setup(&work, data, settings);
 
   // Solve Problem
   osqp_solve(work);
