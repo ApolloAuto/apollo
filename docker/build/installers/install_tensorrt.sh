@@ -48,5 +48,6 @@ CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
 [[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ]] || \
     ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
 
-# disable nvidia apt source to speed to build process
+# Disable nvidia apt sources.list settings to speed up build process
 rm -f /etc/apt/sources.list.d/nvidia-ml.list
+rm -f /etc/apt/sources.list.d/cuda.list
