@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -20,58 +19,84 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
 
+# Install system-provided pcl
+# apt-get -y update && \
+#   apt-get -y install \
+#   libpcl-dev
+# exit 0
+if ldconfig -p | grep -q libpcl_common ; then
+    info "Found existing PCL installation. Skipp re-installation."
+    exit 0
+fi
+
+# libpcap-dev
+# libboost-all-dev
 apt-get -y update && \
     apt-get -y install \
     libeigen3-dev \
     libflann-dev \
-    libvtk6-dev
+    libglew-dev \
+    libglfw3-dev \
+    freeglut3-dev \
+    libusb-1.0-0-dev \
+    libopenmpi-dev \
+    libpng-dev \
+    libjpeg-dev
 
-. /tmp/installers/installer_base.sh
+# NOTE(storypku)
+# libglfw3-dev depends on libglfw3,
+# and libglew-dev have a dependency over libglew2.0
 
 THREAD_NUM=$(nproc)
 
-# Install from source
-VERSION="1.9.1"
+# VERSION="1.11.0"
+# CHECKSUM="4255c3d3572e9774b5a1dccc235711b7a723197b79430ef539c2044e9ce65954" # 1.11.0
+
+VERSION="1.10.1"
+CHECKSUM="61ec734ec7c786c628491844b46f9624958c360012c173bbc993c5ff88b4900e" # 1.10.1
 PKG_NAME="pcl-${VERSION}.tar.gz"
-CHECKSUM="0add34d53cd27f8c468a59b8e931a636ad3174b60581c0387abb98a9fc9cddb6"
+
 DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
 
 ARCH=$(uname -m)
-if [ "$ARCH" == "aarch64" ]; then
-  BUILD=$1
-  shift
-fi
 
-if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
-  download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+if [[ "$ARCH" == "x86_64" ]]; then
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+    tar xzf ${PKG_NAME}
 
-  tar xzvf ${PKG_NAME}
+    pushd pcl-pcl-${VERSION}/
+        mkdir build && cd build
 
-  pushd pcl-pcl-${VERSION}/
-    mkdir build && cd build
-    cmake ..
-    make -j${THREAD_NUM}
-    make install
-  popd
+        cmake .. \
+            -DCUDA_ARCH_BIN="${SUPPORTED_NVIDIA_SMS}" \
+            -DBoost_NO_SYSTEM_PATHS=TRUE \
+            -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
+            -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+            -DCMAKE_BUILD_TYPE=Release
+        make -j${THREAD_NUM}
+        make install
+    popd
 
-  #clean up
-  rm -fr pcl-${VERSION}.tar.gz pcl-pcl-${VERSION}
+    ldconfig
+    #clean up
+    rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
 else
-  # aarch64 prebuilt package
-  wget https://apollocache.blob.core.windows.net/apollo-cache/pcl.zip
-  unzip pcl.zip
+    # aarch64 prebuilt package
+    wget https://apollocache.blob.core.windows.net/apollo-cache/pcl.zip
+    unzip pcl.zip
 
-  pushd pcl/
-  mkdir -p /usr/local/include/pcl-1.7/
-  cd include
-  cp -r pcl /usr/local/include/pcl-1.7/
-  cd ../
-  cp -r lib /usr/local/
-  popd
-
-  #clean up
-  rm -fr pcl.zip pcl
+    pushd pcl/
+        mkdir -p /usr/local/include/pcl-1.7/
+        cd include
+        cp -r pcl /usr/local/include/pcl-1.7/
+        cd ../
+        cp -r lib /usr/local/
+    popd
+    #clean up
+    rm -fr pcl.zip pcl
 fi
 
 # Clean up cache to reduce layer size.

@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
@@ -8,8 +10,7 @@ cc_library(
     defines = ["PCL_NO_PRECOMPILE"],
     includes = ["."],
     linkopts = [
-        "-L/usr/local/lib",
-        "-lboost_system",
+        "-L/opt/apollo/sysroot/lib",
         "-lpcl_common",
         "-lpcl_features",
         "-lpcl_filters",
@@ -28,5 +29,8 @@ cc_library(
         "-lpcl_surface",
         "-lpcl_tracking",
         "-lpcl_visualization",
+    ],
+    deps = [
+        "@boost",
     ],
 )
