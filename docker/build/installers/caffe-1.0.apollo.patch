@@ -1,11 +1,50 @@
-diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
---- caffe-1.0.orig/cmake/Cuda.cmake	2020-06-05 19:54:00.866888345 +0800
-+++ caffe-1.0/cmake/Cuda.cmake	2020-06-05 20:05:36.186847965 +0800
-@@ -1,10 +1,6 @@
--if(CPU_ONLY)
--  return()
--endif()
--
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 08f56a3..f324bc9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -8,6 +8,8 @@ endif()
+ 
+ # ---[ Caffe project
+ project(Caffe C CXX)
++set(CMAKE_CXX_STANDARD 11)
++#set(CMAKE_VERBOSE_MAKEFILE ON)
+ 
+ # ---[ Caffe version
+ set(CAFFE_TARGET_VERSION "1.0.0" CACHE STRING "Caffe logical version")
+diff --git a/Makefile.config.example b/Makefile.config.example
+index d552b38..80bf6c1 100644
+--- a/Makefile.config.example
++++ b/Makefile.config.example
+@@ -31,17 +31,12 @@ CUDA_DIR := /usr/local/cuda
+ # CUDA_DIR := /usr
+ 
+ # CUDA architecture setting: going with all of them.
+-# For CUDA < 6.0, comment the *_50 through *_61 lines for compatibility.
+-# For CUDA < 8.0, comment the *_60 and *_61 lines for compatibility.
+-CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
+-		-gencode arch=compute_20,code=sm_21 \
+-		-gencode arch=compute_30,code=sm_30 \
+-		-gencode arch=compute_35,code=sm_35 \
+-		-gencode arch=compute_50,code=sm_50 \
+-		-gencode arch=compute_52,code=sm_52 \
+-		-gencode arch=compute_60,code=sm_60 \
+-		-gencode arch=compute_61,code=sm_61 \
+-		-gencode arch=compute_61,code=compute_61
++CUDA_ARCH :=    -gencode arch=compute_60,code=sm_60 \
++        -gencode arch=compute_61,code=sm_61 \
++        -gencode arch=compute_70,code=sm_70 \
++        -gencode arch=compute_72,code=sm_72 \
++        -gencode arch=compute_75,code=sm_75 \
++        -gencode arch=compute_75,code=compute_75
+ 
+ # BLAS choice:
+ # atlas for ATLAS (default)
+diff --git a/cmake/Cuda.cmake b/cmake/Cuda.cmake
+index b2b19e8..4e6c298 100644
+--- a/cmake/Cuda.cmake
++++ b/cmake/Cuda.cmake
+@@ -4,7 +4,7 @@ endif()
+ 
  # Known NVIDIA GPU achitectures Caffe can be compiled for.
  # This list will be used for CUDA_ARCH_NAME = All option
 -set(Caffe_known_gpu_archs "20 21(20) 30 35 50 60 61")
@@ -13,7 +52,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
  
  ################################################################################################
  # A function for automatic detection of GPUs installed  (if autodetection is enabled)
-@@ -36,8 +32,7 @@
+@@ -36,8 +36,7 @@ function(caffe_detect_installed_gpus out_variable)
                      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
  
      if(__nvcc_res EQUAL 0)
@@ -23,7 +62,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
      endif()
    endif()
  
-@@ -56,7 +51,7 @@
+@@ -56,7 +55,7 @@ endfunction()
  #   caffe_select_nvcc_arch_flags(out_variable)
  function(caffe_select_nvcc_arch_flags out_variable)
    # List of arch names
@@ -32,7 +71,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
    set(__archs_name_default "All")
    if(NOT CMAKE_CROSSCOMPILING)
      list(APPEND __archs_names "Auto")
-@@ -64,14 +59,14 @@
+@@ -64,33 +63,35 @@ function(caffe_select_nvcc_arch_flags out_variable)
    endif()
  
    # set CUDA_ARCH_NAME strings (so it will be seen as dropbox in CMake-Gui)
@@ -49,7 +88,12 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
    endif()
  
    if(${CUDA_ARCH_NAME} STREQUAL "Manual")
-@@ -83,14 +78,16 @@
+     set(CUDA_ARCH_BIN ${Caffe_known_gpu_archs} CACHE STRING "Specify 'real' GPU architectures to build binaries for, BIN(PTX) format is supported")
+-    set(CUDA_ARCH_PTX "50"                     CACHE STRING "Specify 'virtual' PTX architectures to build PTX intermediate code for")
++    set(CUDA_ARCH_PTX "60"                     CACHE STRING "Specify 'virtual' PTX architectures to build PTX intermediate code for")
+     mark_as_advanced(CUDA_ARCH_BIN CUDA_ARCH_PTX)
+   else()
+     unset(CUDA_ARCH_BIN CACHE)
      unset(CUDA_ARCH_PTX CACHE)
    endif()
  
@@ -64,13 +108,13 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
    elseif(${CUDA_ARCH_NAME} STREQUAL "Pascal")
      set(__cuda_arch_bin "60 61")
 +  elseif(${CUDA_ARCH_NAME} STREQUAL "Volta")
-+    set(__cuda_arch_bin "70")
++    set(__cuda_arch_bin "70 72")
 +  elseif(${CUDA_ARCH_NAME} STREQUAL "Turing")
 +    set(__cuda_arch_bin "75")
    elseif(${CUDA_ARCH_NAME} STREQUAL "All")
      set(__cuda_arch_bin ${Caffe_known_gpu_archs})
    elseif(${CUDA_ARCH_NAME} STREQUAL "Auto")
-@@ -146,14 +143,6 @@
+@@ -146,14 +147,6 @@ macro(caffe_cuda_compile objlist_variable)
  
    endforeach()
  
@@ -85,7 +129,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
    cuda_compile(cuda_objcs ${ARGN})
  
    foreach(var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)
-@@ -176,18 +165,11 @@
+@@ -176,18 +169,11 @@ function(detect_cuDNN)
              PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT} ${CUDA_TOOLKIT_INCLUDE}
              DOC "Path to cuDNN include directory." )
  
@@ -108,7 +152,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
    if(CUDNN_INCLUDE AND CUDNN_LIBRARY)
      set(HAVE_CUDNN  TRUE PARENT_SCOPE)
      set(CUDNN_FOUND TRUE PARENT_SCOPE)
-@@ -231,7 +213,7 @@
+@@ -231,7 +217,7 @@ endfunction()
  ###  Non macro section
  ################################################################################################
  
@@ -117,7 +161,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
  find_cuda_helper_libs(curand)  # cmake 2.8.7 compartibility which doesn't search for curand
  
  if(NOT CUDA_FOUND)
-@@ -240,20 +222,52 @@
+@@ -240,20 +226,52 @@ endif()
  
  set(HAVE_CUDA TRUE)
  message(STATUS "CUDA detected: " ${CUDA_VERSION})
@@ -177,7 +221,7 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
  # setting nvcc arch flags
  caffe_select_nvcc_arch_flags(NVCC_FLAGS_EXTRA)
  list(APPEND CUDA_NVCC_FLAGS ${NVCC_FLAGS_EXTRA})
-@@ -284,7 +298,7 @@
+@@ -284,7 +302,7 @@ mark_as_advanced(CUDA_SDK_ROOT_DIR CUDA_SEPARABLE_COMPILATION)
  if(APPLE)
    caffe_detect_darwin_version(OSX_VERSION)
  
@@ -186,10 +230,11 @@ diff -aruN caffe-1.0.orig/cmake/Cuda.cmake caffe-1.0/cmake/Cuda.cmake
    if(OSX_VERSION VERSION_GREATER 10.8)
      # enabled by default if and only if CUDA version is less than 7.0
      caffe_option(USE_libstdcpp "Use libstdc++ instead of libc++" (CUDA_VERSION VERSION_LESS 7.0))
-diff -aruN caffe-1.0.orig/cmake/Dependencies.cmake caffe-1.0/cmake/Dependencies.cmake
---- caffe-1.0.orig/cmake/Dependencies.cmake	2020-06-05 19:54:00.866888345 +0800
-+++ caffe-1.0/cmake/Dependencies.cmake	2020-06-05 19:54:09.626775454 +0800
-@@ -5,7 +5,7 @@
+diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
+index 4a5bac4..b90e70f 100644
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -5,7 +5,7 @@ set(Caffe_DEFINITIONS "")
  set(Caffe_COMPILE_OPTIONS "")
  
  # ---[ Boost
@@ -198,9 +243,11 @@ diff -aruN caffe-1.0.orig/cmake/Dependencies.cmake caffe-1.0/cmake/Dependencies.
  list(APPEND Caffe_INCLUDE_DIRS PUBLIC ${Boost_INCLUDE_DIRS})
  list(APPEND Caffe_LINKER_LIBS PUBLIC ${Boost_LIBRARIES})
  
-diff -aruN caffe-1.0.orig/cmake/Modules/FindCUDNN.cmake caffe-1.0/cmake/Modules/FindCUDNN.cmake
---- caffe-1.0.orig/cmake/Modules/FindCUDNN.cmake	1970-01-01 08:00:00.000000000 +0800
-+++ caffe-1.0/cmake/Modules/FindCUDNN.cmake	2020-06-05 19:54:09.626775454 +0800
+diff --git a/cmake/Modules/FindCUDNN.cmake b/cmake/Modules/FindCUDNN.cmake
+new file mode 100644
+index 0000000..a8ca7e8
+--- /dev/null
++++ b/cmake/Modules/FindCUDNN.cmake
 @@ -0,0 +1,159 @@
 +# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
 +# file Copyright.txt or https://cmake.org/licensing for details.
@@ -361,49 +408,11 @@ diff -aruN caffe-1.0.orig/cmake/Modules/FindCUDNN.cmake caffe-1.0/cmake/Modules/
 +                                  VERSION_VAR   CUDNN_VERSION)
 +
 +
-diff -aruN caffe-1.0.orig/CMakeLists.txt caffe-1.0/CMakeLists.txt
---- caffe-1.0.orig/CMakeLists.txt	2020-06-05 19:54:00.866888345 +0800
-+++ caffe-1.0/CMakeLists.txt	2020-06-05 19:54:09.626775454 +0800
-@@ -8,6 +8,8 @@
- 
- # ---[ Caffe project
- project(Caffe C CXX)
-+set(CMAKE_CXX_STANDARD 11)
-+#set(CMAKE_VERBOSE_MAKEFILE ON)
- 
- # ---[ Caffe version
- set(CAFFE_TARGET_VERSION "1.0.0" CACHE STRING "Caffe logical version")
-diff -aruN caffe-1.0.orig/Makefile.config.example caffe-1.0/Makefile.config.example
---- caffe-1.0.orig/Makefile.config.example	2020-06-05 19:54:00.866888345 +0800
-+++ caffe-1.0/Makefile.config.example	2020-06-05 20:06:21.534364209 +0800
-@@ -31,17 +31,12 @@
- # CUDA_DIR := /usr
- 
- # CUDA architecture setting: going with all of them.
--# For CUDA < 6.0, comment the *_50 through *_61 lines for compatibility.
--# For CUDA < 8.0, comment the *_60 and *_61 lines for compatibility.
--CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
--		-gencode arch=compute_20,code=sm_21 \
--		-gencode arch=compute_30,code=sm_30 \
--		-gencode arch=compute_35,code=sm_35 \
--		-gencode arch=compute_50,code=sm_50 \
--		-gencode arch=compute_52,code=sm_52 \
--		-gencode arch=compute_60,code=sm_60 \
--		-gencode arch=compute_61,code=sm_61 \
--		-gencode arch=compute_61,code=compute_61
-+CUDA_ARCH :=    -gencode arch=compute_60,code=sm_60 \
-+        -gencode arch=compute_61,code=sm_61 \
-+        -gencode arch=compute_70,code=sm_70 \
-+        -gencode arch=compute_72,code=sm_72 \
-+        -gencode arch=compute_75,code=sm_75 \
-+        -gencode arch=compute_75,code=compute_75
- 
- # BLAS choice:
- # atlas for ATLAS (default)
-diff -aruN caffe-1.0.orig/scripts/travis/configure-cmake.sh caffe-1.0/scripts/travis/configure-cmake.sh
---- caffe-1.0.orig/scripts/travis/configure-cmake.sh	2020-06-05 19:54:00.902887880 +0800
-+++ caffe-1.0/scripts/travis/configure-cmake.sh	2020-06-05 20:08:54.764749042 +0800
-@@ -16,8 +16,8 @@
+diff --git a/scripts/travis/configure-cmake.sh b/scripts/travis/configure-cmake.sh
+index 772f1e2..c8b6d2c 100644
+--- a/scripts/travis/configure-cmake.sh
++++ b/scripts/travis/configure-cmake.sh
+@@ -16,8 +16,8 @@ else
  fi
  
  if $WITH_CUDA ; then
@@ -414,10 +423,11 @@ diff -aruN caffe-1.0.orig/scripts/travis/configure-cmake.sh caffe-1.0/scripts/tr
  else
    ARGS="$ARGS -DCPU_ONLY=On"
  fi
-diff -aruN caffe-1.0.orig/scripts/travis/configure-make.sh caffe-1.0/scripts/travis/configure-make.sh
---- caffe-1.0.orig/scripts/travis/configure-make.sh	2020-06-05 19:54:00.902887880 +0800
-+++ caffe-1.0/scripts/travis/configure-make.sh	2020-06-05 20:07:49.521433379 +0800
-@@ -24,8 +24,8 @@
+diff --git a/scripts/travis/configure-make.sh b/scripts/travis/configure-make.sh
+index ddc40ff..19445e7 100644
+--- a/scripts/travis/configure-make.sh
++++ b/scripts/travis/configure-make.sh
+@@ -24,8 +24,8 @@ if ! $WITH_IO ; then
  fi
  
  if $WITH_CUDA ; then
@@ -428,10 +438,11 @@ diff -aruN caffe-1.0.orig/scripts/travis/configure-make.sh caffe-1.0/scripts/tra
  else
    LINE "CPU_ONLY := 1"
  fi
-diff -aruN caffe-1.0.orig/src/caffe/CMakeLists.txt caffe-1.0/src/caffe/CMakeLists.txt
---- caffe-1.0.orig/src/caffe/CMakeLists.txt	2020-06-05 19:54:00.902887880 +0800
-+++ caffe-1.0/src/caffe/CMakeLists.txt	2020-06-05 19:54:09.626775454 +0800
-@@ -22,7 +22,10 @@
+diff --git a/src/caffe/CMakeLists.txt b/src/caffe/CMakeLists.txt
+index b9152e9..282d297 100644
+--- a/src/caffe/CMakeLists.txt
++++ b/src/caffe/CMakeLists.txt
+@@ -22,7 +22,10 @@ endif()
  
  add_library(caffe ${srcs})
  caffe_default_properties(caffe)
@@ -443,10 +454,11 @@ diff -aruN caffe-1.0.orig/src/caffe/CMakeLists.txt caffe-1.0/src/caffe/CMakeList
  target_include_directories(caffe ${Caffe_INCLUDE_DIRS}
                                   PUBLIC
                                   $<BUILD_INTERFACE:${Caffe_INCLUDE_DIR}>
-diff -aruN caffe-1.0.orig/src/caffe/util/io.cpp caffe-1.0/src/caffe/util/io.cpp
---- caffe-1.0.orig/src/caffe/util/io.cpp	2020-06-05 19:54:00.910887778 +0800
-+++ caffe-1.0/src/caffe/util/io.cpp	2020-06-05 19:54:09.626775454 +0800
-@@ -54,7 +54,7 @@
+diff --git a/src/caffe/util/io.cpp b/src/caffe/util/io.cpp
+index 835d2d4..0033317 100644
+--- a/src/caffe/util/io.cpp
++++ b/src/caffe/util/io.cpp
+@@ -54,7 +54,7 @@ bool ReadProtoFromBinaryFile(const char* filename, Message* proto) {
    CHECK_NE(fd, -1) << "File not found: " << filename;
    ZeroCopyInputStream* raw_input = new FileInputStream(fd);
    CodedInputStream* coded_input = new CodedInputStream(raw_input);
@@ -455,9 +467,10 @@ diff -aruN caffe-1.0.orig/src/caffe/util/io.cpp caffe-1.0/src/caffe/util/io.cpp
  
    bool success = proto->ParseFromCodedStream(coded_input);
  
-diff -aruN caffe-1.0.orig/src/caffe/util/math_functions.cu caffe-1.0/src/caffe/util/math_functions.cu
---- caffe-1.0.orig/src/caffe/util/math_functions.cu	2020-06-05 19:54:00.910887778 +0800
-+++ caffe-1.0/src/caffe/util/math_functions.cu	2020-06-05 19:54:09.626775454 +0800
+diff --git a/src/caffe/util/math_functions.cu b/src/caffe/util/math_functions.cu
+index 314e6ba..ab97d11 100644
+--- a/src/caffe/util/math_functions.cu
++++ b/src/caffe/util/math_functions.cu
 @@ -1,4 +1,4 @@
 -#include <math_functions.h>  // CUDA's, not caffe's, for fabs, signbit
 +#include <cuda_runtime_api.h>
