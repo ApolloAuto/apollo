@@ -35,6 +35,8 @@ bash /tmp/installers/install_osqp.sh
 info "Install qpOASES ..."
 bash /tmp/installers/install_qp_oases.sh
 
+apt-get -y update && \
+    apt-get -y install libsqlite3-dev
 
 #######################################################
 
@@ -47,13 +49,7 @@ bash /tmp/installers/install_tf2.sh
 COMPONENT="modules/prediction"
 info "Install support for [${COMPONENT}] ..."
 # bash /tmp/installers/install_libtorch.sh
-apt-get -y update && \
-    apt-get -y install \
-    libopencv-core-dev \
-    libopencv-imgproc-dev \
-    libopencv-imgcodecs-dev \
-    libopencv-highgui-dev \
-    libboost-all-dev
+bash /tmp/installers/install_opencv.sh
 
 #######################################################
 
@@ -72,8 +68,8 @@ info "Install support for [${COMPONENT}] ..."
 
 apt-get -y update && \
     apt-get -y install \
-    libtinyxml2-dev \
-    libboost-all-dev
+    libtinyxml2-dev
+
 # CUDA & nlohmann/json
 
 #######################################################
@@ -99,7 +95,6 @@ apt-get -y update && \
 
 # Modules that DON'T need pre-installed dependencies
 # modules/v2x
-# modules/third_party_perception
 # modules/storytelling
 # modules/routing
 
