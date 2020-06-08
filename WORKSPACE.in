@@ -80,7 +80,7 @@ new_local_repository(
 new_local_repository(
     name = "poco",
     build_file = "external/poco.BUILD",
-    path = "/usr/include",
+    path = "/opt/apollo/sysroot/include",
 )
 
 #http_archive(
@@ -168,8 +168,8 @@ http_archive(
 # PCL 1.11
 new_local_repository(
     name = "pcl",
-    build_file = "third_party/pcl.BUILD",
-    path = "/usr/local/include/pcl-1.9",
+    build_file = "external/pcl.BUILD",
+    path = "/opt/apollo/sysroot/include/pcl-1.10",
 )
 
 new_local_repository(
@@ -222,14 +222,14 @@ http_archive(
 new_local_repository(
     name = "qpOASES",
     build_file = "external/qpOASES.BUILD",
-    path = "/usr/local/include",
+    path = "/opt/apollo/sysroot/include",
 )
 
 # OSQP
 new_local_repository(
     name = "osqp",
     build_file = "external/osqp.BUILD",
-    path = "/usr/local/include/osqp",
+    path = "/opt/apollo/sysroot/include",
 )
 
 # ipopt
@@ -313,7 +313,7 @@ new_local_repository(
 new_local_repository(
     name = "adv_plat",
     build_file = "external/adv_plat.BUILD",
-    path = "/usr/local/adv_plat/include",
+    path = "/opt/apollo/pkgs/adv_plat/include",
 )
 
 new_local_repository(
@@ -353,7 +353,7 @@ new_local_repository(
 new_local_repository(
     name = "ffmpeg",
     build_file = "external/ffmpeg.BUILD",
-    path = "/usr/local/ffmpeg4/include",
+    path = "/opt/apollo/sysroot/include",
 )
 
 new_local_repository(
@@ -366,14 +366,14 @@ new_local_repository(
 new_local_repository(
     name = "tf2",
     build_file = "external/tf2.BUILD",
-    path = "/usr/local/tf2/include",
+    path = "/opt/apollo/pkgs/tf2/include",
 )
 
 # TODO(storypku) rules_boost
 new_local_repository(
     name = "boost",
     build_file = "external/boost.BUILD",
-    path = "/usr/include",
+    path = "/opt/apollo/sysroot/include",
 )
 
 # lz4

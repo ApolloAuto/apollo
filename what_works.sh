@@ -23,6 +23,9 @@
 ###############################################################################
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
+sudo apt-get -y update
+sudo apt-get -y install libpython2.7-dev
+
 cp WORKSPACE.in WORKSPACE
 
 # Fail on first failure.
@@ -85,9 +88,9 @@ bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/to
 # bazel_build_with_dist_cache $(bazel query //modules/planning/... except //modules/planning/tools:inference_demo)
 
 bazel_test_with_dist_cache $(bazel query //modules/localization/... \
-  except //modules/localization/ndt/ndt_locator/... \
-  except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
-  )
+    except //modules/localization/ndt/ndt_locator/... \
+    except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
+)
 
 echo "########################### All check passed! ###########################"
 
