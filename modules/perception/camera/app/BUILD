@@ -1,21 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
-load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
-
-cc_proto_library(
-    name = "perception_cc_proto",
-    deps = [
-        ":perception_proto",
-    ],
-)
-
-proto_library(
-    name = "perception_proto",
-    srcs = ["perception.proto"],
-)
 
 cc_library(
     name = "debug_info",
@@ -35,7 +21,6 @@ cc_library(
     hdrs = ["obstacle_camera_perception.h"],
     deps = [
         ":debug_info",
-        ":perception_cc_proto",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -64,7 +49,6 @@ cc_library(
     srcs = ["traffic_light_camera_perception.cc"],
     hdrs = ["traffic_light_camera_perception.h"],
     deps = [
-        ":perception_cc_proto",
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -82,7 +66,6 @@ cc_library(
     hdrs = ["lane_camera_perception.h"],
     deps = [
         ":debug_info",
-        ":perception_cc_proto",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -106,26 +89,13 @@ cc_library(
     srcs = ["cipv_camera.cc"],
     hdrs = ["cipv_camera.h"],
     deps = [
-        ":perception_cc_proto",
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math:geometry",
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:pnc_point_proto",
         "//modules/perception/base",
         "//modules/perception/camera/common:lane_object",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/lib/utils",
-    ],
-)
-
-py_proto_library(
-    name = "perception_pb_pb2",
-    deps = [
-        ":perception_proto",
     ],
 )
 

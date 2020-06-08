@@ -12,8 +12,6 @@ cuda_library(
         ":object_maintainer",
         "//modules/perception/base",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
-        "//modules/prediction/proto:feature_proto",
         "@local_config_cuda//cuda:cudart",
     ],
 )
@@ -29,7 +27,6 @@ cc_library(
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
     ],
 )
 
@@ -46,7 +43,6 @@ cc_library(
         "//modules/perception/camera/lib/feature_extractor/tfe:project_feature",
         "//modules/perception/camera/lib/feature_extractor/tfe:tracking_feat_extractor",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",

@@ -304,12 +304,12 @@ new_local_repository(
 #    path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
 #)
 #
-##snappystream
-#new_local_repository(
-#    name = "snappystream",
-#    build_file = "third_party/snappystream.BUILD",
-#    path = "/usr/local/apollo/paddlepaddle_dep/snappystream",
-#)
+#snappystream
+new_local_repository(
+    name = "snappystream",
+    build_file = "external/snappystream.BUILD",
+    path = "/usr/local/apollo/paddlepaddle_dep/snappystream",
+)
 #
 #adv_plat
 new_local_repository(
