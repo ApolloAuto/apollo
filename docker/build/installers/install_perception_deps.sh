@@ -19,3 +19,6 @@
 # Fail on first error.
 set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
+
+warning "Pre-installed packages for pept not-ready."
