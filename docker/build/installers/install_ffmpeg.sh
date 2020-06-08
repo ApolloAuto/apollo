@@ -51,11 +51,10 @@ tar xzf ${PKG_NAME} && mv "FFmpeg-n${VERSION}" ffmpeg
 
 # Unused options
 # --pkg-config-flags="--static"
-DEST_DIR=/usr/local/ffmpeg4
 
 pushd ffmpeg
     ./configure \
-    --prefix=${DEST_DIR} \
+    --prefix=${SYSROOT_DIR} \
     --extra-libs="-lpthread -lm" \
     --enable-shared \
     --enable-pic \
@@ -66,9 +65,6 @@ pushd ffmpeg
     make install
 popd
 
-rm -rf ${DEST_DIR}/share/man
-
-echo "${DEST_DIR}/lib" > /etc/ld.so.conf.d/ffmpeg4.conf
 ldconfig
 
 rm -fr ${PKG_NAME} ffmpeg

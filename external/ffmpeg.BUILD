@@ -8,7 +8,7 @@ cc_library(
         ".",
     ],
     linkopts = [
-        "-L/usr/local/ffmpeg4/lib",
+        "-L/opt/apollo/sysroot/lib",
         "-lavcodec",
         "-lavutil",
         "-lswresample",
