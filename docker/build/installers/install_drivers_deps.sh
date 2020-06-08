@@ -22,13 +22,9 @@ MY_MODE="$1"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+bash /tmp/installers/install_opencv.sh
 bash /tmp/installers/install_adv_plat.sh "${MY_MODE}"
-bash /tmp/installers/install_ffmpeg.sh
 bash /tmp/installers/install_proj4.sh
-
-apt-get -y update && \
-    apt-get -y install \
-    libopencv-dev
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
