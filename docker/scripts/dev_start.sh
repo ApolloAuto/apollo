@@ -30,7 +30,7 @@ LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
-VERSION_X86_64="dev-x86_64-18.04-20200604_1359"
+VERSION_X86_64="dev-x86_64-18.04-20200606_2115"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
@@ -277,7 +277,7 @@ function determine_gpu_use() {
     DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
     if [ ! -z "$(which nvidia-docker)" ]; then
       DOCKER_RUN="nvidia-docker run"
-      warning "nvidia-docker is deprecated. Please install latest docker " \
+      warning "nvidia-docker is deprecated. Please install latest docker" \
               "and nvidia-container-toolkit as described by:"
       warning "  ${nv_docker_doc}"
     elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
