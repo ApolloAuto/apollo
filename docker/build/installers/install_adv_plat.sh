@@ -19,17 +19,15 @@
 # Fail on first error.
 set -e
 
-MY_MODE="$1"
-
-DEST_DIR="/usr/local/adv_plat"
-[[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
-
+MY_MODE="$1" ; shift
 . /tmp/installers/installer_base.sh
+
+DEST_DIR="${PKGS_DIR}/adv_plat"
+[[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
 
 if [[ "${MY_MODE}" == "download" ]]; then
     PKG_NAME="adv_plat-3.0-x86_64.tar.gz"
     CHECKSUM="1c4a0e205ab2940fc547e5c61b2e181688d4396db2a699f65539add6e10b8150"
-    #TODO(storypku): Aliyun permenant download link
     DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
@@ -38,6 +36,9 @@ if [[ "${MY_MODE}" == "download" ]]; then
 
     mv adv_plat/include ${DEST_DIR}/include
     mv adv_plat/lib     ${DEST_DIR}/lib
+
+    echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    ldconfig
 
     rm -r ${PKG_NAME} adv_plat
     exit 0
@@ -82,6 +83,9 @@ pushd ${OUT_DIR}
     mkdir -p "${DEST_DIR}"
     mv include ${DEST_DIR}
     mv lib ${DEST_DIR}
+
+    echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    ldconfig
 popd
 
 rm -rf ${PKG_NAME} apollo-contrib

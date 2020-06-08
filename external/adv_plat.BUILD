@@ -16,7 +16,7 @@ cc_library(
         ".",
     ],
     linkopts = [
-        "-L/usr/local/adv_plat/lib",
+        "-L/opt/apollo/pkgs/adv_plat/lib",
         "-ladv_trigger",
         "-ladv_bcan",
     ],
