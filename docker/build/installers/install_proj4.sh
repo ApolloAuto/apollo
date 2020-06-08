@@ -37,23 +37,21 @@ apt-get -y update && \
 #
 #unzip $PKG_NAME
 #
-#MY_DEST_DIR=/usr/local/proj4
-#
 ## works
 #pushd PROJ-${VERSION}
-#mkdir build && cd build
+#   mkdir build && cd build
+#   cmake .. \
+#       -DBUILD_SHARED_LIBS=ON \
+#       -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+#       -DCMAKE_BUILD_TYPE=Release
 #
-#cmake .. -DCMAKE_INSTALL_PREFIX=$MY_DEST_DIR
-#make -j`nproc`
-#make install
-#cd ..
-#
-#cp COPYING $MY_DEST_DIR/
+#   make -j`nproc`
+#   make install
 #popd
 #
 #ok "Successfully built proj4. version=$VERSION"
 #
-#export LD_LIBRARY_PATH=$MY_DEST_DIR/lib:$LD_LIBRARY_PATH
+#ldconfig
 #
 ## clean up.
 #rm -fr $PKG_NAME PROJ-$VERSION
