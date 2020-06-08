@@ -26,16 +26,18 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 VERSION=3.16.8
 
 TARGET_ARCH="$(uname -m)"
+
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     CMAKE_SH="cmake-${VERSION}-Linux-x86_64.sh"
     SHA256SUM="0241a05bee0dcdf60e912057cc86cbedba21b9b0d67ec11bc67ad4834f182a23"
     DOWLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v${VERSION}/${CMAKE_SH}
     download_if_not_cached $CMAKE_SH $SHA256SUM $DOWLOAD_LINK
     chmod a+x ${CMAKE_SH}
-    mkdir -p /opt/cmake
     ./${CMAKE_SH} --skip-license --prefix="${SYSROOT_DIR}"
     rm -fr ${CMAKE_SH}
+
 elif [[ "${ARCH}" == "aarch64" ]]; then
+    # PreReq for source build
     apt-get -y update && \
         apt-get -y install \
         libssl-dev \
@@ -48,7 +50,7 @@ elif [[ "${ARCH}" == "aarch64" ]]; then
     tar xzf ${PKG_NAME}
 
     pushd CMake-${VERSION}
-        ./bootstrap --prefix=/opt/apollo/sysroot
+        ./bootstrap --prefix="${SYSROOT_DIR}"
         make -j$(nproc)
         make install
     popd

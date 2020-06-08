@@ -25,7 +25,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 ARCH=$(uname -m)
 
-CLANG_INSTALL_DIR="/opt/clang"
+CLANG_INSTALL_DIR="${PKGS_DIR}/llvm.clang"
 
 if [[ "${ARCH}" == "x86_64" ]]; then
     VERSION="10.0.0"
@@ -48,11 +48,10 @@ if [[ "${ARCH}" == "aarch64" ]]; then
     exit 0
 fi
 
-__mytext="""# shellcheck shell=sh
-
+__mytext="""
 if [ -d \"${CLANG_INSTALL_DIR}/bin\" ]; then
     export PATH=${CLANG_INSTALL_DIR}/bin:\$PATH
 fi
 """
 
-echo "${__mytext}" > /etc/profile.d/llvm-clang-path.sh
+echo "${__mytext}" >> "${APOLLO_PROFILE}"
