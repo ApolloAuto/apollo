@@ -211,7 +211,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 #### 1. 上传预处理后的数据至BOS
 
-**注意：**必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
+**注意：** 必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
 
 在BOS bucket中新建目录sensor_calibration，作为后续云标定服务读取数据的`Input Data Path`，把前面预处理生成的数据拷贝至该目录。目录结构如下：
 
