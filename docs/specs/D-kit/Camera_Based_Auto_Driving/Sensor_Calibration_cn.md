@@ -246,7 +246,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
  
  - 默认使用1个6mm、1个12mm摄像头，用户如需要使用第二个6mm摄像头时，需要自行指定文件名，并进行相应修改。
 ## NEXT
-现在，您已经完成摄像头感知设备标定，接下来可以开始[基于摄像头的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)
+现在，您已经完成摄像头感知设备标定， 接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](../Lidar_Based_Auto_Driving/Virtual_Lane_Generation_cn.md)(如果在适配基于激光雷达的自动驾驶过程中已经制作了虚拟车道线文件，则可以跳过此步骤，进行[基于摄像头的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md))
 ## 常见问题
 #### 1. 提交后，显示`UNAUTHORIZED`
 ![lidar_calibration_unauthorized](images/lidar_calibration_unauthorized.png)
