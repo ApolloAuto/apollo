@@ -29,15 +29,13 @@
 namespace apollo {
 namespace planning {
 
-TrajectoryConvRnnInference::TrajectoryConvRnnInference(
+TrajectoryImitationInference::TrajectoryImitationInference(
     const LearningModelInferenceTaskConfig& config)
     : ModelInference(config), device_(torch::kCPU) {
   LoadModel(config);
 }
 
-// TODO(Jinyun): evaluate whether use fake input in load model speed up the
-// loading process
-bool TrajectoryConvRnnInference::LoadModel(
+bool TrajectoryImitationInference::LoadModel(
     const LearningModelInferenceTaskConfig& config) {
   if (config.use_cuda() && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
@@ -45,10 +43,24 @@ bool TrajectoryConvRnnInference::LoadModel(
   }
   model_ = torch::jit::load(config.model_file(), device_);
   torch::set_num_threads(1);
+
+  // run a fake inference at init time as first inference is relative slow
+  torch::Tensor input_feature_tensor = torch::zeros({1, 12, 200, 200});
+  torch::Tensor initial_point_tensor = torch::zeros({1, 1, 200, 200});
+  torch::Tensor initial_box_tensor = torch::zeros({1, 1, 200, 200});
+  std::vector<torch::jit::IValue> torch_inputs;
+  torch_inputs.push_back(c10::ivalue::Tuple::create(
+      {std::move(input_feature_tensor.to(device_)),
+       std::move(initial_point_tensor.to(device_)),
+       std::move(initial_box_tensor.to(device_))},
+      c10::TupleType::create(
+          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+  auto torch_output_tensor =
+      model_.forward(torch_inputs).toTensor().to(torch::kCPU);
   return true;
 }
 
-bool TrajectoryConvRnnInference::Inference(
+bool TrajectoryImitationInference::Inference(
     LearningDataFrame* learning_data_frame) {
   const int past_points_size = learning_data_frame->adc_trajectory_point_size();
   if (past_points_size == 0) {
@@ -122,11 +134,8 @@ bool TrajectoryConvRnnInference::Inference(
          << prepration_diff.count() * 1000 << " ms.";
 
   auto inference_start_time = std::chrono::system_clock::now();
-  at::Tensor torch_output_tensor = model_.forward(torch_inputs)
-                                       .toTuple()
-                                       ->elements()[2]
-                                       .toTensor()
-                                       .to(torch::kCPU);
+  at::Tensor torch_output_tensor =
+      model_.forward(torch_inputs).toTensor().to(torch::kCPU);
   auto inference_end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> inference_diff =
       inference_end_time - inference_start_time;
@@ -150,7 +159,8 @@ bool TrajectoryConvRnnInference::Inference(
     const double dy = static_cast<double>(torch_output[0][i][1]);
     const double dtheta = static_cast<double>(torch_output[0][i][2]);
     const double v = static_cast<double>(torch_output[0][i][3]);
-
+    ADEBUG << "dx[" << dx << "], dy[" << dy << "], dtheta[" << dtheta << "], v["
+           << v << "]";
     const double time_sec = cur_time_sec + delta_t * (i + 1);
     apollo::common::math::Vec2d offset(dx, dy);
     apollo::common::math::Vec2d rotated_offset = offset.rotate(cur_heading);
