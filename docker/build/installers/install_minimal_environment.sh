@@ -63,6 +63,7 @@ apt-get -y update && \
     gdb     \
     git     \
     libtool \
+    less    \
     lsof    \
     openssh-client \
     patch   \
