@@ -6,84 +6,6 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "map_cc_proto",
-    deps = [
-        ":map_proto",
-    ],
-)
-
-proto_library(
-    name = "map_proto",
-    srcs = ["map.proto"],
-    deps = [
-        ":map_clear_area_proto",
-        ":map_crosswalk_proto",
-        ":map_junction_proto",
-        ":map_lane_proto",
-        ":map_overlap_proto",
-        ":map_parking_space_proto",
-        ":map_pnc_junction_proto",
-        ":map_road_proto",
-        ":map_signal_proto",
-        ":map_speed_bump_proto",
-        ":map_stop_sign_proto",
-        ":map_yield_sign_proto",
-    ],
-)
-
-py_proto_library(
-    name = "map_py_pb2",
-    deps = [
-        ":map_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "map_geometry_cc_proto",
-    deps = [
-        ":map_geometry_proto",
-    ],
-)
-
-proto_library(
-    name = "map_geometry_proto",
-    srcs = ["map_geometry.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "map_geometry_py_pb2",
-    deps = [
-        ":map_geometry_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "map_yield_sign_cc_proto",
-    deps = [
-        ":map_yield_sign_proto",
-    ],
-)
-
-proto_library(
-    name = "map_yield_sign_proto",
-    srcs = ["map_yield_sign.proto"],
-    deps = [
-        ":map_geometry_proto",
-        ":map_id_proto",
-    ],
-)
-
-py_proto_library(
-    name = "map_yield_sign_py_pb2",
-    deps = [
-        ":map_yield_sign_proto",
-    ],
-)
-
-cc_proto_library(
     name = "map_stop_sign_cc_proto",
     deps = [
         ":map_stop_sign_proto",
@@ -107,15 +29,15 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "map_crosswalk_cc_proto",
+    name = "map_junction_cc_proto",
     deps = [
-        ":map_crosswalk_proto",
+        ":map_junction_proto",
     ],
 )
 
 proto_library(
-    name = "map_crosswalk_proto",
-    srcs = ["map_crosswalk.proto"],
+    name = "map_junction_proto",
+    srcs = ["map_junction.proto"],
     deps = [
         ":map_geometry_proto",
         ":map_id_proto",
@@ -123,78 +45,28 @@ proto_library(
 )
 
 py_proto_library(
-    name = "map_crosswalk_py_pb2",
+    name = "map_junction_py_pb2",
     deps = [
-        ":map_crosswalk_proto",
+        ":map_junction_proto",
     ],
 )
 
 cc_proto_library(
-    name = "map_lane_cc_proto",
+    name = "map_id_cc_proto",
     deps = [
-        ":map_lane_proto",
-    ],
-)
-
-proto_library(
-    name = "map_lane_proto",
-    srcs = ["map_lane.proto"],
-    deps = [
-        ":map_geometry_proto",
         ":map_id_proto",
     ],
 )
 
-py_proto_library(
-    name = "map_lane_py_pb2",
-    deps = [
-        ":map_lane_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "map_parking_space_cc_proto",
-    deps = [
-        ":map_parking_space_proto",
-    ],
-)
-
 proto_library(
-    name = "map_parking_space_proto",
-    srcs = ["map_parking_space.proto"],
-    deps = [
-        ":map_geometry_proto",
-        ":map_id_proto",
-    ],
+    name = "map_id_proto",
+    srcs = ["map_id.proto"],
 )
 
 py_proto_library(
-    name = "map_parking_space_py_pb2",
+    name = "map_id_py_pb2",
     deps = [
-        ":map_parking_space_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "map_overlap_cc_proto",
-    deps = [
-        ":map_overlap_proto",
-    ],
-)
-
-proto_library(
-    name = "map_overlap_proto",
-    srcs = ["map_overlap.proto"],
-    deps = [
-        ":map_geometry_proto",
         ":map_id_proto",
-    ],
-)
-
-py_proto_library(
-    name = "map_overlap_py_pb2",
-    deps = [
-        ":map_overlap_proto",
     ],
 )
 
@@ -222,15 +94,15 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "map_junction_cc_proto",
+    name = "map_road_cc_proto",
     deps = [
-        ":map_junction_proto",
+        ":map_road_proto",
     ],
 )
 
 proto_library(
-    name = "map_junction_proto",
-    srcs = ["map_junction.proto"],
+    name = "map_road_proto",
+    srcs = ["map_road.proto"],
     deps = [
         ":map_geometry_proto",
         ":map_id_proto",
@@ -238,9 +110,32 @@ proto_library(
 )
 
 py_proto_library(
-    name = "map_junction_py_pb2",
+    name = "map_road_py_pb2",
     deps = [
-        ":map_junction_proto",
+        ":map_road_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "map_parking_space_cc_proto",
+    deps = [
+        ":map_parking_space_proto",
+    ],
+)
+
+proto_library(
+    name = "map_parking_space_proto",
+    srcs = ["map_parking_space.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+    ],
+)
+
+py_proto_library(
+    name = "map_parking_space_py_pb2",
+    deps = [
+        ":map_parking_space_proto",
     ],
 )
 
@@ -292,21 +187,25 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "map_id_cc_proto",
+    name = "map_yield_sign_cc_proto",
     deps = [
-        ":map_id_proto",
+        ":map_yield_sign_proto",
     ],
 )
 
 proto_library(
-    name = "map_id_proto",
-    srcs = ["map_id.proto"],
+    name = "map_yield_sign_proto",
+    srcs = ["map_yield_sign.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+    ],
 )
 
 py_proto_library(
-    name = "map_id_py_pb2",
+    name = "map_yield_sign_py_pb2",
     deps = [
-        ":map_id_proto",
+        ":map_yield_sign_proto",
     ],
 )
 
@@ -334,6 +233,97 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "map_crosswalk_cc_proto",
+    deps = [
+        ":map_crosswalk_proto",
+    ],
+)
+
+proto_library(
+    name = "map_crosswalk_proto",
+    srcs = ["map_crosswalk.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+    ],
+)
+
+py_proto_library(
+    name = "map_crosswalk_py_pb2",
+    deps = [
+        ":map_crosswalk_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "map_overlap_cc_proto",
+    deps = [
+        ":map_overlap_proto",
+    ],
+)
+
+proto_library(
+    name = "map_overlap_proto",
+    srcs = ["map_overlap.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+    ],
+)
+
+py_proto_library(
+    name = "map_overlap_py_pb2",
+    deps = [
+        ":map_overlap_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "map_lane_cc_proto",
+    deps = [
+        ":map_lane_proto",
+    ],
+)
+
+proto_library(
+    name = "map_lane_proto",
+    srcs = ["map_lane.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+    ],
+)
+
+py_proto_library(
+    name = "map_lane_py_pb2",
+    deps = [
+        ":map_lane_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "map_geometry_cc_proto",
+    deps = [
+        ":map_geometry_proto",
+    ],
+)
+
+proto_library(
+    name = "map_geometry_proto",
+    srcs = ["map_geometry.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto",
+    ],
+)
+
+py_proto_library(
+    name = "map_geometry_py_pb2",
+    deps = [
+        ":map_geometry_proto",
+    ],
+)
+
+cc_proto_library(
     name = "map_speed_control_cc_proto",
     deps = [
         ":map_speed_control_proto",
@@ -356,24 +346,34 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "map_road_cc_proto",
+    name = "map_cc_proto",
     deps = [
-        ":map_road_proto",
+        ":map_proto",
     ],
 )
 
 proto_library(
-    name = "map_road_proto",
-    srcs = ["map_road.proto"],
+    name = "map_proto",
+    srcs = ["map.proto"],
     deps = [
-        ":map_geometry_proto",
-        ":map_id_proto",
+        ":map_clear_area_proto",
+        ":map_crosswalk_proto",
+        ":map_junction_proto",
+        ":map_lane_proto",
+        ":map_overlap_proto",
+        ":map_parking_space_proto",
+        ":map_pnc_junction_proto",
+        ":map_road_proto",
+        ":map_signal_proto",
+        ":map_speed_bump_proto",
+        ":map_stop_sign_proto",
+        ":map_yield_sign_proto",
     ],
 )
 
 py_proto_library(
-    name = "map_road_py_pb2",
+    name = "map_py_pb2",
     deps = [
-        ":map_road_proto",
+        ":map_proto",
     ],
 )

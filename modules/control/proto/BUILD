@@ -30,28 +30,27 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "local_view_cc_proto",
+    name = "preprocessor_cc_proto",
     deps = [
-        ":local_view_proto",
+        ":preprocessor_proto",
     ],
 )
 
 proto_library(
-    name = "local_view_proto",
-    srcs = ["local_view.proto"],
+    name = "preprocessor_proto",
+    srcs = ["preprocessor.proto"],
     deps = [
-        ":pad_msg_proto",
-        "//modules/canbus/proto:chassis_proto",
+        ":input_debug_proto",
+        ":local_view_proto",
+        "//modules/common/proto:drive_state_proto",
         "//modules/common/proto:header_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
 py_proto_library(
-    name = "local_view_py_pb2",
+    name = "preprocessor_py_pb2",
     deps = [
-        ":local_view_proto",
+        ":preprocessor_proto",
     ],
 )
 
@@ -71,116 +70,6 @@ py_proto_library(
     name = "calibration_table_py_pb2",
     deps = [
         ":calibration_table_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "mpc_controller_conf_cc_proto",
-    deps = [
-        ":mpc_controller_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "mpc_controller_conf_proto",
-    srcs = ["mpc_controller_conf.proto"],
-    deps = [
-        ":calibration_table_proto",
-        ":gain_scheduler_conf_proto",
-    ],
-)
-
-py_proto_library(
-    name = "mpc_controller_conf_py_pb2",
-    deps = [
-        ":mpc_controller_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "control_conf_cc_proto",
-    deps = [
-        ":control_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "control_conf_proto",
-    srcs = ["control_conf.proto"],
-    deps = [
-        ":lat_controller_conf_proto",
-        ":lon_controller_conf_proto",
-        ":mpc_controller_conf_proto",
-        ":pad_msg_proto",
-        "//modules/canbus/proto:chassis_proto",
-    ],
-)
-
-py_proto_library(
-    name = "control_conf_py_pb2",
-    deps = [
-        ":control_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pid_conf_cc_proto",
-    deps = [
-        ":pid_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "pid_conf_proto",
-    srcs = ["pid_conf.proto"],
-)
-
-py_proto_library(
-    name = "pid_conf_py_pb2",
-    deps = [
-        ":pid_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pad_msg_cc_proto",
-    deps = [
-        ":pad_msg_proto",
-    ],
-)
-
-proto_library(
-    name = "pad_msg_proto",
-    srcs = ["pad_msg.proto"],
-    deps = [
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "pad_msg_py_pb2",
-    deps = [
-        ":pad_msg_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "leadlag_conf_cc_proto",
-    deps = [
-        ":leadlag_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "leadlag_conf_proto",
-    srcs = ["leadlag_conf.proto"],
-)
-
-py_proto_library(
-    name = "leadlag_conf_py_pb2",
-    deps = [
-        ":leadlag_conf_proto",
     ],
 )
 
@@ -213,27 +102,132 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "preprocessor_cc_proto",
+    name = "mpc_controller_conf_cc_proto",
     deps = [
-        ":preprocessor_proto",
+        ":mpc_controller_conf_proto",
     ],
 )
 
 proto_library(
-    name = "preprocessor_proto",
-    srcs = ["preprocessor.proto"],
+    name = "mpc_controller_conf_proto",
+    srcs = ["mpc_controller_conf.proto"],
     deps = [
-        ":input_debug_proto",
-        ":local_view_proto",
-        "//modules/common/proto:drive_state_proto",
-        "//modules/common/proto:header_proto",
+        ":calibration_table_proto",
+        ":gain_scheduler_conf_proto",
     ],
 )
 
 py_proto_library(
-    name = "preprocessor_py_pb2",
+    name = "mpc_controller_conf_py_pb2",
     deps = [
-        ":preprocessor_proto",
+        ":mpc_controller_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "lat_controller_conf_cc_proto",
+    deps = [
+        ":lat_controller_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "lat_controller_conf_proto",
+    srcs = ["lat_controller_conf.proto"],
+    deps = [
+        ":gain_scheduler_conf_proto",
+        ":leadlag_conf_proto",
+        ":mrac_conf_proto",
+    ],
+)
+
+py_proto_library(
+    name = "lat_controller_conf_py_pb2",
+    deps = [
+        ":lat_controller_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "gain_scheduler_conf_cc_proto",
+    deps = [
+        ":gain_scheduler_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "gain_scheduler_conf_proto",
+    srcs = ["gain_scheduler_conf.proto"],
+)
+
+py_proto_library(
+    name = "gain_scheduler_conf_py_pb2",
+    deps = [
+        ":gain_scheduler_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "local_view_cc_proto",
+    deps = [
+        ":local_view_proto",
+    ],
+)
+
+proto_library(
+    name = "local_view_proto",
+    srcs = ["local_view.proto"],
+    deps = [
+        ":pad_msg_proto",
+        "//modules/canbus/proto:chassis_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+py_proto_library(
+    name = "local_view_py_pb2",
+    deps = [
+        ":local_view_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "pid_conf_cc_proto",
+    deps = [
+        ":pid_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "pid_conf_proto",
+    srcs = ["pid_conf.proto"],
+)
+
+py_proto_library(
+    name = "pid_conf_py_pb2",
+    deps = [
+        ":pid_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "leadlag_conf_cc_proto",
+    deps = [
+        ":leadlag_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "leadlag_conf_proto",
+    srcs = ["leadlag_conf.proto"],
+)
+
+py_proto_library(
+    name = "leadlag_conf_py_pb2",
+    deps = [
+        ":leadlag_conf_proto",
     ],
 )
 
@@ -257,6 +251,32 @@ py_proto_library(
     name = "control_common_conf_py_pb2",
     deps = [
         ":control_common_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "control_conf_cc_proto",
+    deps = [
+        ":control_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "control_conf_proto",
+    srcs = ["control_conf.proto"],
+    deps = [
+        ":lat_controller_conf_proto",
+        ":lon_controller_conf_proto",
+        ":mpc_controller_conf_proto",
+        ":pad_msg_proto",
+        "//modules/canbus/proto:chassis_proto",
+    ],
+)
+
+py_proto_library(
+    name = "control_conf_py_pb2",
+    deps = [
+        ":control_conf_proto",
     ],
 )
 
@@ -302,44 +322,24 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "lat_controller_conf_cc_proto",
+    name = "pad_msg_cc_proto",
     deps = [
-        ":lat_controller_conf_proto",
+        ":pad_msg_proto",
     ],
 )
 
 proto_library(
-    name = "lat_controller_conf_proto",
-    srcs = ["lat_controller_conf.proto"],
+    name = "pad_msg_proto",
+    srcs = ["pad_msg.proto"],
     deps = [
-        ":gain_scheduler_conf_proto",
-        ":leadlag_conf_proto",
-        ":mrac_conf_proto",
+        "//modules/canbus/proto:chassis_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
-    name = "lat_controller_conf_py_pb2",
+    name = "pad_msg_py_pb2",
     deps = [
-        ":lat_controller_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "gain_scheduler_conf_cc_proto",
-    deps = [
-        ":gain_scheduler_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "gain_scheduler_conf_proto",
-    srcs = ["gain_scheduler_conf.proto"],
-)
-
-py_proto_library(
-    name = "gain_scheduler_conf_py_pb2",
-    deps = [
-        ":gain_scheduler_conf_proto",
+        ":pad_msg_proto",
     ],
 )

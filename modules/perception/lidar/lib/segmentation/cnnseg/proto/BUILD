@@ -6,6 +6,25 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "spp_engine_config_cc_proto",
+    deps = [
+        ":spp_engine_config_proto",
+    ],
+)
+
+proto_library(
+    name = "spp_engine_config_proto",
+    srcs = ["spp_engine_config.proto"],
+)
+
+py_proto_library(
+    name = "spp_engine_config_py_pb2",
+    deps = [
+        ":spp_engine_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "cnnseg_param_cc_proto",
     deps = [
         ":cnnseg_param_proto",
@@ -40,24 +59,5 @@ py_proto_library(
     name = "cnnseg_config_py_pb2",
     deps = [
         ":cnnseg_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "spp_engine_config_cc_proto",
-    deps = [
-        ":spp_engine_config_proto",
-    ],
-)
-
-proto_library(
-    name = "spp_engine_config_proto",
-    srcs = ["spp_engine_config.proto"],
-)
-
-py_proto_library(
-    name = "spp_engine_config_py_pb2",
-    deps = [
-        ":spp_engine_config_proto",
     ],
 )

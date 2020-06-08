@@ -28,6 +28,29 @@ py_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "v2x_carstatus_cc_proto",
+    deps = [
+        ":v2x_carstatus_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_carstatus_proto",
+    srcs = ["v2x_carstatus.proto"],
+    deps = [
+        "//modules/canbus/proto:chassis_detail_proto",
+        "//modules/localization/proto:localization_proto",
+    ],
+)
+
+py_proto_library(
+    name = "v2x_carstatus_py_pb2",
+    deps = [
+        ":v2x_carstatus_proto",
+    ],
+)
+
 cc_grpc_library(
     name = "v2x_service_obu_to_car_cc_grpc",
     srcs = [":v2x_service_obu_to_car_proto"],
@@ -61,29 +84,6 @@ py_proto_library(
     name = "v2x_service_obu_to_car_py_pb2",
     deps = [
         ":v2x_service_obu_to_car_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "v2x_carstatus_cc_proto",
-    deps = [
-        ":v2x_carstatus_proto",
-    ],
-)
-
-proto_library(
-    name = "v2x_carstatus_proto",
-    srcs = ["v2x_carstatus.proto"],
-    deps = [
-        "//modules/canbus/proto:chassis_detail_proto",
-        "//modules/localization/proto:localization_proto",
-    ],
-)
-
-py_proto_library(
-    name = "v2x_carstatus_py_pb2",
-    deps = [
-        ":v2x_carstatus_proto",
     ],
 )
 

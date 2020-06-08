@@ -6,112 +6,21 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "data_collection_table_cc_proto",
+    name = "hmi_mode_cc_proto",
     deps = [
-        ":data_collection_table_proto",
+        ":hmi_mode_proto",
     ],
 )
 
 proto_library(
-    name = "data_collection_table_proto",
-    srcs = ["data_collection_table.proto"],
+    name = "hmi_mode_proto",
+    srcs = ["hmi_mode.proto"],
 )
 
 py_proto_library(
-    name = "data_collection_table_py_pb2",
+    name = "hmi_mode_py_pb2",
     deps = [
-        ":data_collection_table_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "hmi_config_cc_proto",
-    deps = [
-        ":hmi_config_proto",
-    ],
-)
-
-proto_library(
-    name = "hmi_config_proto",
-    srcs = ["hmi_config.proto"],
-)
-
-py_proto_library(
-    name = "hmi_config_py_pb2",
-    deps = [
-        ":hmi_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "chart_cc_proto",
-    deps = [
-        ":chart_proto",
-    ],
-)
-
-proto_library(
-    name = "chart_proto",
-    srcs = ["chart.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "chart_py_pb2",
-    deps = [
-        ":chart_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "simulation_world_cc_proto",
-    deps = [
-        ":simulation_world_proto",
-    ],
-)
-
-proto_library(
-    name = "simulation_world_proto",
-    srcs = ["simulation_world.proto"],
-    deps = [
-        "//modules/common/monitor_log/proto:monitor_log_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
-        "//modules/planning/proto:planning_internal_proto",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "simulation_world_py_pb2",
-    deps = [
-        ":simulation_world_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "hmi_status_cc_proto",
-    deps = [
-        ":hmi_status_proto",
-    ],
-)
-
-proto_library(
-    name = "hmi_status_proto",
-    srcs = ["hmi_status.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-        "//modules/monitor/proto:system_status_proto",
-    ],
-)
-
-py_proto_library(
-    name = "hmi_status_py_pb2",
-    deps = [
-        ":hmi_status_proto",
+        ":hmi_mode_proto",
     ],
 )
 
@@ -154,20 +63,111 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "hmi_mode_cc_proto",
+    name = "data_collection_table_cc_proto",
     deps = [
-        ":hmi_mode_proto",
+        ":data_collection_table_proto",
     ],
 )
 
 proto_library(
-    name = "hmi_mode_proto",
-    srcs = ["hmi_mode.proto"],
+    name = "data_collection_table_proto",
+    srcs = ["data_collection_table.proto"],
 )
 
 py_proto_library(
-    name = "hmi_mode_py_pb2",
+    name = "data_collection_table_py_pb2",
     deps = [
-        ":hmi_mode_proto",
+        ":data_collection_table_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "simulation_world_cc_proto",
+    deps = [
+        ":simulation_world_proto",
+    ],
+)
+
+proto_library(
+    name = "simulation_world_proto",
+    srcs = ["simulation_world.proto"],
+    deps = [
+        "//modules/common/monitor_log/proto:monitor_log_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+        "//modules/planning/proto:planning_internal_proto",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/routing/proto:routing_proto",
+    ],
+)
+
+py_proto_library(
+    name = "simulation_world_py_pb2",
+    deps = [
+        ":simulation_world_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "chart_cc_proto",
+    deps = [
+        ":chart_proto",
+    ],
+)
+
+proto_library(
+    name = "chart_proto",
+    srcs = ["chart.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto",
+    ],
+)
+
+py_proto_library(
+    name = "chart_py_pb2",
+    deps = [
+        ":chart_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "hmi_status_cc_proto",
+    deps = [
+        ":hmi_status_proto",
+    ],
+)
+
+proto_library(
+    name = "hmi_status_proto",
+    srcs = ["hmi_status.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+        "//modules/monitor/proto:system_status_proto",
+    ],
+)
+
+py_proto_library(
+    name = "hmi_status_py_pb2",
+    deps = [
+        ":hmi_status_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "hmi_config_cc_proto",
+    deps = [
+        ":hmi_config_proto",
+    ],
+)
+
+proto_library(
+    name = "hmi_config_proto",
+    srcs = ["hmi_config.proto"],
+)
+
+py_proto_library(
+    name = "hmi_config_py_pb2",
+    deps = [
+        ":hmi_config_proto",
     ],
 )

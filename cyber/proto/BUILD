@@ -28,62 +28,103 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "role_attributes_cc_proto",
+    name = "dag_conf_cc_proto",
     deps = [
-        ":role_attributes_proto",
+        ":dag_conf_proto",
     ],
 )
 
 proto_library(
-    name = "role_attributes_proto",
-    srcs = ["role_attributes.proto"],
+    name = "dag_conf_proto",
+    srcs = ["dag_conf.proto"],
+    deps = [
+        ":component_conf_proto",
+    ],
+)
+
+py_proto_library(
+    name = "dag_conf_py_pb2",
+    deps = [
+        ":dag_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "proto_desc_cc_proto",
+    deps = [
+        ":proto_desc_proto",
+    ],
+)
+
+proto_library(
+    name = "proto_desc_proto",
+    srcs = ["proto_desc.proto"],
+)
+
+py_proto_library(
+    name = "proto_desc_py_pb2",
+    deps = [
+        ":proto_desc_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "choreography_conf_cc_proto",
+    deps = [
+        ":choreography_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "choreography_conf_proto",
+    srcs = ["choreography_conf.proto"],
+)
+
+py_proto_library(
+    name = "choreography_conf_py_pb2",
+    deps = [
+        ":choreography_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "record_cc_proto",
+    deps = [
+        ":record_proto",
+    ],
+)
+
+proto_library(
+    name = "record_proto",
+    srcs = ["record.proto"],
+)
+
+py_proto_library(
+    name = "record_py_pb2",
+    deps = [
+        ":record_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "component_conf_cc_proto",
+    deps = [
+        ":component_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "component_conf_proto",
+    srcs = ["component_conf.proto"],
     deps = [
         ":qos_profile_proto",
     ],
 )
 
 py_proto_library(
-    name = "role_attributes_py_pb2",
+    name = "component_conf_py_pb2",
     deps = [
-        ":role_attributes_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "parameter_cc_proto",
-    deps = [
-        ":parameter_proto",
-    ],
-)
-
-proto_library(
-    name = "parameter_proto",
-    srcs = ["parameter.proto"],
-)
-
-py_proto_library(
-    name = "parameter_py_pb2",
-    deps = [
-        ":parameter_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "classic_conf_cc_proto",
-    deps = [
-        ":classic_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "classic_conf_proto",
-    srcs = ["classic_conf.proto"],
-)
-
-py_proto_library(
-    name = "classic_conf_py_pb2",
-    deps = [
-        ":classic_conf_proto",
+        ":component_conf_proto",
     ],
 )
 
@@ -113,43 +154,97 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "choreography_conf_cc_proto",
+    name = "perception_cc_proto",
     deps = [
-        ":choreography_conf_proto",
+        ":perception_proto",
     ],
 )
 
 proto_library(
-    name = "choreography_conf_proto",
-    srcs = ["choreography_conf.proto"],
+    name = "perception_proto",
+    srcs = ["perception.proto"],
 )
 
 py_proto_library(
-    name = "choreography_conf_py_pb2",
+    name = "perception_py_pb2",
     deps = [
-        ":choreography_conf_proto",
+        ":perception_proto",
     ],
 )
 
 cc_proto_library(
-    name = "dag_conf_cc_proto",
+    name = "perf_conf_cc_proto",
     deps = [
-        ":dag_conf_proto",
+        ":perf_conf_proto",
     ],
 )
 
 proto_library(
-    name = "dag_conf_proto",
-    srcs = ["dag_conf.proto"],
-    deps = [
-        ":component_conf_proto",
-    ],
+    name = "perf_conf_proto",
+    srcs = ["perf_conf.proto"],
 )
 
 py_proto_library(
-    name = "dag_conf_py_pb2",
+    name = "perf_conf_py_pb2",
     deps = [
-        ":dag_conf_proto",
+        ":perf_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "classic_conf_cc_proto",
+    deps = [
+        ":classic_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "classic_conf_proto",
+    srcs = ["classic_conf.proto"],
+)
+
+py_proto_library(
+    name = "classic_conf_py_pb2",
+    deps = [
+        ":classic_conf_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "parameter_cc_proto",
+    deps = [
+        ":parameter_proto",
+    ],
+)
+
+proto_library(
+    name = "parameter_proto",
+    srcs = ["parameter.proto"],
+)
+
+py_proto_library(
+    name = "parameter_py_pb2",
+    deps = [
+        ":parameter_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "unit_test_cc_proto",
+    deps = [
+        ":unit_test_proto",
+    ],
+)
+
+proto_library(
+    name = "unit_test_proto",
+    srcs = ["unit_test.proto"],
+)
+
+py_proto_library(
+    name = "unit_test_py_pb2",
+    deps = [
+        ":unit_test_proto",
     ],
 )
 
@@ -173,85 +268,6 @@ py_proto_library(
     name = "scheduler_conf_py_pb2",
     deps = [
         ":scheduler_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "perception_cc_proto",
-    deps = [
-        ":perception_proto",
-    ],
-)
-
-proto_library(
-    name = "perception_proto",
-    srcs = ["perception.proto"],
-)
-
-py_proto_library(
-    name = "perception_py_pb2",
-    deps = [
-        ":perception_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "component_conf_cc_proto",
-    deps = [
-        ":component_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "component_conf_proto",
-    srcs = ["component_conf.proto"],
-    deps = [
-        ":qos_profile_proto",
-    ],
-)
-
-py_proto_library(
-    name = "component_conf_py_pb2",
-    deps = [
-        ":component_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "run_mode_conf_cc_proto",
-    deps = [
-        ":run_mode_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "run_mode_conf_proto",
-    srcs = ["run_mode_conf.proto"],
-)
-
-py_proto_library(
-    name = "run_mode_conf_py_pb2",
-    deps = [
-        ":run_mode_conf_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "proto_desc_cc_proto",
-    deps = [
-        ":proto_desc_proto",
-    ],
-)
-
-proto_library(
-    name = "proto_desc_proto",
-    srcs = ["proto_desc.proto"],
-)
-
-py_proto_library(
-    name = "proto_desc_py_pb2",
-    deps = [
-        ":proto_desc_proto",
     ],
 )
 
@@ -294,58 +310,42 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "perf_conf_cc_proto",
+    name = "run_mode_conf_cc_proto",
     deps = [
-        ":perf_conf_proto",
+        ":run_mode_conf_proto",
     ],
 )
 
 proto_library(
-    name = "perf_conf_proto",
-    srcs = ["perf_conf.proto"],
+    name = "run_mode_conf_proto",
+    srcs = ["run_mode_conf.proto"],
 )
 
 py_proto_library(
-    name = "perf_conf_py_pb2",
+    name = "run_mode_conf_py_pb2",
     deps = [
-        ":perf_conf_proto",
+        ":run_mode_conf_proto",
     ],
 )
 
 cc_proto_library(
-    name = "unit_test_cc_proto",
+    name = "role_attributes_cc_proto",
     deps = [
-        ":unit_test_proto",
+        ":role_attributes_proto",
     ],
 )
 
 proto_library(
-    name = "unit_test_proto",
-    srcs = ["unit_test.proto"],
-)
-
-py_proto_library(
-    name = "unit_test_py_pb2",
+    name = "role_attributes_proto",
+    srcs = ["role_attributes.proto"],
     deps = [
-        ":unit_test_proto",
+        ":qos_profile_proto",
     ],
 )
 
-cc_proto_library(
-    name = "record_cc_proto",
-    deps = [
-        ":record_proto",
-    ],
-)
-
-proto_library(
-    name = "record_proto",
-    srcs = ["record.proto"],
-)
-
 py_proto_library(
-    name = "record_py_pb2",
+    name = "role_attributes_py_pb2",
     deps = [
-        ":record_proto",
+        ":role_attributes_proto",
     ],
 )

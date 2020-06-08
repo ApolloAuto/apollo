@@ -6,27 +6,24 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "routing_cc_proto",
+    name = "topo_graph_cc_proto",
     deps = [
-        ":routing_proto",
+        ":topo_graph_proto",
     ],
 )
 
 proto_library(
-    name = "routing_proto",
-    srcs = ["routing.proto"],
+    name = "topo_graph_proto",
+    srcs = ["topo_graph.proto"],
     deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/map/proto:map_parking_space_proto",
+        "//modules/map/proto:map_geometry_proto",
     ],
 )
 
 py_proto_library(
-    name = "routing_py_pb2",
+    name = "topo_graph_py_pb2",
     deps = [
-        ":routing_proto",
+        ":topo_graph_proto",
     ],
 )
 
@@ -53,28 +50,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "topo_graph_cc_proto",
-    deps = [
-        ":topo_graph_proto",
-    ],
-)
-
-proto_library(
-    name = "topo_graph_proto",
-    srcs = ["topo_graph.proto"],
-    deps = [
-        "//modules/map/proto:map_geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "topo_graph_py_pb2",
-    deps = [
-        ":topo_graph_proto",
-    ],
-)
-
-cc_proto_library(
     name = "routing_config_cc_proto",
     deps = [
         ":routing_config_proto",
@@ -90,5 +65,30 @@ py_proto_library(
     name = "routing_config_py_pb2",
     deps = [
         ":routing_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "routing_cc_proto",
+    deps = [
+        ":routing_proto",
+    ],
+)
+
+proto_library(
+    name = "routing_proto",
+    srcs = ["routing.proto"],
+    deps = [
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/map/proto:map_parking_space_proto",
+    ],
+)
+
+py_proto_library(
+    name = "routing_py_pb2",
+    deps = [
+        ":routing_proto",
     ],
 )

@@ -6,6 +6,25 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "guardian_conf_cc_proto",
+    deps = [
+        ":guardian_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "guardian_conf_proto",
+    srcs = ["guardian_conf.proto"],
+)
+
+py_proto_library(
+    name = "guardian_conf_py_pb2",
+    deps = [
+        ":guardian_conf_proto",
+    ],
+)
+
+cc_proto_library(
     name = "guardian_cc_proto",
     deps = [
         ":guardian_proto",
@@ -25,24 +44,5 @@ py_proto_library(
     name = "guardian_py_pb2",
     deps = [
         ":guardian_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "guardian_conf_cc_proto",
-    deps = [
-        ":guardian_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "guardian_conf_proto",
-    srcs = ["guardian_conf.proto"],
-)
-
-py_proto_library(
-    name = "guardian_conf_py_pb2",
-    deps = [
-        ":guardian_conf_proto",
     ],
 )

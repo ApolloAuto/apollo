@@ -6,25 +6,6 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "frame_cc_proto",
-    deps = [
-        ":frame_proto",
-    ],
-)
-
-proto_library(
-    name = "frame_proto",
-    srcs = ["frame.proto"],
-)
-
-py_proto_library(
-    name = "frame_py_pb2",
-    deps = [
-        ":frame_proto",
-    ],
-)
-
-cc_proto_library(
     name = "static_info_cc_proto",
     deps = [
         ":static_info_proto",
@@ -47,5 +28,24 @@ py_proto_library(
     name = "static_info_py_pb2",
     deps = [
         ":static_info_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "frame_cc_proto",
+    deps = [
+        ":frame_proto",
+    ],
+)
+
+proto_library(
+    name = "frame_proto",
+    srcs = ["frame.proto"],
+)
+
+py_proto_library(
+    name = "frame_py_pb2",
+    deps = [
+        ":frame_proto",
     ],
 )

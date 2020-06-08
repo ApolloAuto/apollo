@@ -6,21 +6,43 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "fnn_model_base_cc_proto",
+    name = "fnn_vehicle_model_cc_proto",
+    deps = [
+        ":fnn_vehicle_model_proto",
+    ],
+)
+
+proto_library(
+    name = "fnn_vehicle_model_proto",
+    srcs = ["fnn_vehicle_model.proto"],
     deps = [
         ":fnn_model_base_proto",
     ],
 )
 
+py_proto_library(
+    name = "fnn_vehicle_model_py_pb2",
+    deps = [
+        ":fnn_vehicle_model_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "scenario_cc_proto",
+    deps = [
+        ":scenario_proto",
+    ],
+)
+
 proto_library(
-    name = "fnn_model_base_proto",
-    srcs = ["fnn_model_base.proto"],
+    name = "scenario_proto",
+    srcs = ["scenario.proto"],
 )
 
 py_proto_library(
-    name = "fnn_model_base_py_pb2",
+    name = "scenario_py_pb2",
     deps = [
-        ":fnn_model_base_proto",
+        ":scenario_proto",
     ],
 )
 
@@ -44,32 +66,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "prediction_obstacle_cc_proto",
-    deps = [
-        ":prediction_obstacle_proto",
-    ],
-)
-
-proto_library(
-    name = "prediction_obstacle_proto",
-    srcs = ["prediction_obstacle.proto"],
-    deps = [
-        ":feature_proto",
-        ":scenario_proto",
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
-    ],
-)
-
-py_proto_library(
-    name = "prediction_obstacle_py_pb2",
-    deps = [
-        ":prediction_obstacle_proto",
-    ],
-)
-
-cc_proto_library(
     name = "network_layers_cc_proto",
     deps = [
         ":network_layers_proto",
@@ -89,24 +85,24 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "fnn_vehicle_model_cc_proto",
+    name = "network_model_cc_proto",
     deps = [
-        ":fnn_vehicle_model_proto",
+        ":network_model_proto",
     ],
 )
 
 proto_library(
-    name = "fnn_vehicle_model_proto",
-    srcs = ["fnn_vehicle_model.proto"],
+    name = "network_model_proto",
+    srcs = ["network_model.proto"],
     deps = [
-        ":fnn_model_base_proto",
+        ":network_layers_proto",
     ],
 )
 
 py_proto_library(
-    name = "fnn_vehicle_model_py_pb2",
+    name = "network_model_py_pb2",
     deps = [
-        ":fnn_vehicle_model_proto",
+        ":network_model_proto",
     ],
 )
 
@@ -187,28 +183,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "network_model_cc_proto",
-    deps = [
-        ":network_model_proto",
-    ],
-)
-
-proto_library(
-    name = "network_model_proto",
-    srcs = ["network_model.proto"],
-    deps = [
-        ":network_layers_proto",
-    ],
-)
-
-py_proto_library(
-    name = "network_model_py_pb2",
-    deps = [
-        ":network_model_proto",
-    ],
-)
-
-cc_proto_library(
     name = "prediction_conf_cc_proto",
     deps = [
         ":prediction_conf_proto",
@@ -232,20 +206,46 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "scenario_cc_proto",
+    name = "fnn_model_base_cc_proto",
     deps = [
-        ":scenario_proto",
+        ":fnn_model_base_proto",
     ],
 )
 
 proto_library(
-    name = "scenario_proto",
-    srcs = ["scenario.proto"],
+    name = "fnn_model_base_proto",
+    srcs = ["fnn_model_base.proto"],
 )
 
 py_proto_library(
-    name = "scenario_py_pb2",
+    name = "fnn_model_base_py_pb2",
     deps = [
+        ":fnn_model_base_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "prediction_obstacle_cc_proto",
+    deps = [
+        ":prediction_obstacle_proto",
+    ],
+)
+
+proto_library(
+    name = "prediction_obstacle_proto",
+    srcs = ["prediction_obstacle.proto"],
+    deps = [
+        ":feature_proto",
         ":scenario_proto",
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+    ],
+)
+
+py_proto_library(
+    name = "prediction_obstacle_py_pb2",
+    deps = [
+        ":prediction_obstacle_proto",
     ],
 )

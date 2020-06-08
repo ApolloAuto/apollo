@@ -6,24 +6,90 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "smartereye_cc_proto",
+    name = "delphi_esr_cc_proto",
     deps = [
-        ":smartereye_proto",
+        ":delphi_esr_proto",
     ],
 )
 
 proto_library(
-    name = "smartereye_proto",
-    srcs = ["smartereye.proto"],
+    name = "delphi_esr_proto",
+    srcs = ["delphi_esr.proto"],
     deps = [
         "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
-    name = "smartereye_py_pb2",
+    name = "delphi_esr_py_pb2",
     deps = [
-        ":smartereye_proto",
+        ":delphi_esr_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "sensor_image_cc_proto",
+    deps = [
+        ":sensor_image_proto",
+    ],
+)
+
+proto_library(
+    name = "sensor_image_proto",
+    srcs = ["sensor_image.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "sensor_image_py_pb2",
+    deps = [
+        ":sensor_image_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "mobileye_cc_proto",
+    deps = [
+        ":mobileye_proto",
+    ],
+)
+
+proto_library(
+    name = "mobileye_proto",
+    srcs = ["mobileye.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "mobileye_py_pb2",
+    deps = [
+        ":mobileye_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "ultrasonic_radar_cc_proto",
+    deps = [
+        ":ultrasonic_radar_proto",
+    ],
+)
+
+proto_library(
+    name = "ultrasonic_radar_proto",
+    srcs = ["ultrasonic_radar.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "ultrasonic_radar_py_pb2",
+    deps = [
+        ":ultrasonic_radar_proto",
     ],
 )
 
@@ -51,118 +117,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "radar_cc_proto",
-    deps = [
-        ":radar_proto",
-    ],
-)
-
-proto_library(
-    name = "radar_proto",
-    srcs = ["radar.proto"],
-    deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "radar_py_pb2",
-    deps = [
-        ":radar_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "mobileye_cc_proto",
-    deps = [
-        ":mobileye_proto",
-    ],
-)
-
-proto_library(
-    name = "mobileye_proto",
-    srcs = ["mobileye.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "mobileye_py_pb2",
-    deps = [
-        ":mobileye_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "delphi_esr_cc_proto",
-    deps = [
-        ":delphi_esr_proto",
-    ],
-)
-
-proto_library(
-    name = "delphi_esr_proto",
-    srcs = ["delphi_esr.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "delphi_esr_py_pb2",
-    deps = [
-        ":delphi_esr_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "ultrasonic_radar_cc_proto",
-    deps = [
-        ":ultrasonic_radar_proto",
-    ],
-)
-
-proto_library(
-    name = "ultrasonic_radar_proto",
-    srcs = ["ultrasonic_radar.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "ultrasonic_radar_py_pb2",
-    deps = [
-        ":ultrasonic_radar_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "sensor_image_cc_proto",
-    deps = [
-        ":sensor_image_proto",
-    ],
-)
-
-proto_library(
-    name = "sensor_image_proto",
-    srcs = ["sensor_image.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "sensor_image_py_pb2",
-    deps = [
-        ":sensor_image_proto",
-    ],
-)
-
-cc_proto_library(
     name = "conti_radar_cc_proto",
     deps = [
         ":conti_radar_proto",
@@ -186,6 +140,28 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "smartereye_cc_proto",
+    deps = [
+        ":smartereye_proto",
+    ],
+)
+
+proto_library(
+    name = "smartereye_proto",
+    srcs = ["smartereye.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "smartereye_py_pb2",
+    deps = [
+        ":smartereye_proto",
+    ],
+)
+
+cc_proto_library(
     name = "pointcloud_cc_proto",
     deps = [
         ":pointcloud_proto",
@@ -204,5 +180,29 @@ py_proto_library(
     name = "pointcloud_py_pb2",
     deps = [
         ":pointcloud_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "radar_cc_proto",
+    deps = [
+        ":radar_proto",
+    ],
+)
+
+proto_library(
+    name = "radar_proto",
+    srcs = ["radar.proto"],
+    deps = [
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "radar_py_pb2",
+    deps = [
+        ":radar_proto",
     ],
 )

@@ -6,25 +6,6 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "probabilistic_fusion_config_cc_proto",
-    deps = [
-        ":probabilistic_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "probabilistic_fusion_config_proto",
-    srcs = ["probabilistic_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "probabilistic_fusion_config_py_pb2",
-    deps = [
-        ":probabilistic_fusion_config_proto",
-    ],
-)
-
-cc_proto_library(
     name = "roi_boundary_filter_config_cc_proto",
     deps = [
         ":roi_boundary_filter_config_proto",
@@ -40,6 +21,47 @@ py_proto_library(
     name = "roi_boundary_filter_config_py_pb2",
     deps = [
         ":roi_boundary_filter_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "traffic_light_detection_cc_proto",
+    deps = [
+        ":traffic_light_detection_proto",
+    ],
+)
+
+proto_library(
+    name = "traffic_light_detection_proto",
+    srcs = ["traffic_light_detection.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "traffic_light_detection_py_pb2",
+    deps = [
+        ":traffic_light_detection_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "map_manager_config_cc_proto",
+    deps = [
+        ":map_manager_config_proto",
+    ],
+)
+
+proto_library(
+    name = "map_manager_config_proto",
+    srcs = ["map_manager_config.proto"],
+)
+
+py_proto_library(
+    name = "map_manager_config_py_pb2",
+    deps = [
+        ":map_manager_config_proto",
     ],
 )
 
@@ -63,21 +85,49 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "ccrf_type_fusion_config_cc_proto",
+    name = "perception_camera_cc_proto",
     deps = [
-        ":ccrf_type_fusion_config_proto",
+        ":perception_camera_proto",
     ],
 )
 
 proto_library(
-    name = "ccrf_type_fusion_config_proto",
-    srcs = ["ccrf_type_fusion_config.proto"],
+    name = "perception_camera_proto",
+    srcs = ["perception_camera.proto"],
+    deps = [
+        ":perception_obstacle_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+    ],
 )
 
 py_proto_library(
-    name = "ccrf_type_fusion_config_py_pb2",
+    name = "perception_camera_py_pb2",
     deps = [
-        ":ccrf_type_fusion_config_proto",
+        ":perception_camera_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "perception_ultrasonic_cc_proto",
+    deps = [
+        ":perception_ultrasonic_proto",
+    ],
+)
+
+proto_library(
+    name = "perception_ultrasonic_proto",
+    srcs = ["perception_ultrasonic.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "perception_ultrasonic_py_pb2",
+    deps = [
+        ":perception_ultrasonic_proto",
     ],
 )
 
@@ -120,6 +170,44 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "perception_config_schema_cc_proto",
+    deps = [
+        ":perception_config_schema_proto",
+    ],
+)
+
+proto_library(
+    name = "perception_config_schema_proto",
+    srcs = ["perception_config_schema.proto"],
+)
+
+py_proto_library(
+    name = "perception_config_schema_py_pb2",
+    deps = [
+        ":perception_config_schema_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "dst_existance_fusion_config_cc_proto",
+    deps = [
+        ":dst_existance_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "dst_existance_fusion_config_proto",
+    srcs = ["dst_existance_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "dst_existance_fusion_config_py_pb2",
+    deps = [
+        ":dst_existance_fusion_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "perception_lane_cc_proto",
     deps = [
         ":perception_lane_proto",
@@ -143,63 +231,81 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "perception_config_schema_cc_proto",
+    name = "motion_service_cc_proto",
     deps = [
-        ":perception_config_schema_proto",
+        ":motion_service_proto",
     ],
 )
 
 proto_library(
-    name = "perception_config_schema_proto",
-    srcs = ["perception_config_schema.proto"],
-)
-
-py_proto_library(
-    name = "perception_config_schema_py_pb2",
+    name = "motion_service_proto",
+    srcs = ["motion_service.proto"],
     deps = [
-        ":perception_config_schema_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "perception_ultrasonic_cc_proto",
-    deps = [
-        ":perception_ultrasonic_proto",
-    ],
-)
-
-proto_library(
-    name = "perception_ultrasonic_proto",
-    srcs = ["perception_ultrasonic.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
-    name = "perception_ultrasonic_py_pb2",
+    name = "motion_service_py_pb2",
     deps = [
-        ":perception_ultrasonic_proto",
+        ":motion_service_proto",
     ],
 )
 
 cc_proto_library(
-    name = "dst_existance_fusion_config_cc_proto",
+    name = "pbf_tracker_config_cc_proto",
     deps = [
-        ":dst_existance_fusion_config_proto",
+        ":pbf_tracker_config_proto",
     ],
 )
 
 proto_library(
-    name = "dst_existance_fusion_config_proto",
-    srcs = ["dst_existance_fusion_config.proto"],
+    name = "pbf_tracker_config_proto",
+    srcs = ["pbf_tracker_config.proto"],
 )
 
 py_proto_library(
-    name = "dst_existance_fusion_config_py_pb2",
+    name = "pbf_tracker_config_py_pb2",
     deps = [
-        ":dst_existance_fusion_config_proto",
+        ":pbf_tracker_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "rt_cc_proto",
+    deps = [
+        ":rt_proto",
+    ],
+)
+
+proto_library(
+    name = "rt_proto",
+    srcs = ["rt.proto"],
+)
+
+py_proto_library(
+    name = "rt_py_pb2",
+    deps = [
+        ":rt_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "probabilistic_fusion_config_cc_proto",
+    deps = [
+        ":probabilistic_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "probabilistic_fusion_config_proto",
+    srcs = ["probabilistic_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "probabilistic_fusion_config_py_pb2",
+    deps = [
+        ":probabilistic_fusion_config_proto",
     ],
 )
 
@@ -230,108 +336,21 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "motion_service_cc_proto",
+    name = "ccrf_type_fusion_config_cc_proto",
     deps = [
-        ":motion_service_proto",
+        ":ccrf_type_fusion_config_proto",
     ],
 )
 
 proto_library(
-    name = "motion_service_proto",
-    srcs = ["motion_service.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
+    name = "ccrf_type_fusion_config_proto",
+    srcs = ["ccrf_type_fusion_config.proto"],
 )
 
 py_proto_library(
-    name = "motion_service_py_pb2",
+    name = "ccrf_type_fusion_config_py_pb2",
     deps = [
-        ":motion_service_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "rt_cc_proto",
-    deps = [
-        ":rt_proto",
-    ],
-)
-
-proto_library(
-    name = "rt_proto",
-    srcs = ["rt.proto"],
-)
-
-py_proto_library(
-    name = "rt_py_pb2",
-    deps = [
-        ":rt_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "traffic_light_detection_cc_proto",
-    deps = [
-        ":traffic_light_detection_proto",
-    ],
-)
-
-proto_library(
-    name = "traffic_light_detection_proto",
-    srcs = ["traffic_light_detection.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "traffic_light_detection_py_pb2",
-    deps = [
-        ":traffic_light_detection_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "perception_camera_cc_proto",
-    deps = [
-        ":perception_camera_proto",
-    ],
-)
-
-proto_library(
-    name = "perception_camera_proto",
-    srcs = ["perception_camera.proto"],
-    deps = [
-        ":perception_obstacle_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "perception_camera_py_pb2",
-    deps = [
-        ":perception_camera_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pbf_tracker_config_cc_proto",
-    deps = [
-        ":pbf_tracker_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pbf_tracker_config_proto",
-    srcs = ["pbf_tracker_config.proto"],
-)
-
-py_proto_library(
-    name = "pbf_tracker_config_py_pb2",
-    deps = [
-        ":pbf_tracker_config_proto",
+        ":ccrf_type_fusion_config_proto",
     ],
 )
 
@@ -351,24 +370,5 @@ py_proto_library(
     name = "sensor_meta_schema_py_pb2",
     deps = [
         ":sensor_meta_schema_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "map_manager_config_cc_proto",
-    deps = [
-        ":map_manager_config_proto",
-    ],
-)
-
-proto_library(
-    name = "map_manager_config_proto",
-    srcs = ["map_manager_config.proto"],
-)
-
-py_proto_library(
-    name = "map_manager_config_py_pb2",
-    deps = [
-        ":map_manager_config_proto",
     ],
 )
