@@ -37,8 +37,8 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xzf ${PKG_NAME}
 pushd qp-oases-${VERSION}
-    mv include/qpOASES{,.hpp} /usr/local/include
-    mv lib/libqpOASES.so /usr/local/lib
+    mv include/qpOASES{,.hpp} "${SYSROOT_DIR}/include"
+    mv lib/libqpOASES.so "${SYSROOT_DIR}/lib"
 popd
 rm -rf qp-oases-${VERSION} ${PKG_NAME}
 
