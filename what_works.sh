@@ -64,6 +64,7 @@ bazel_build_with_dist_cache \
     //modules/guardian/... \
     //modules/localization/... \
     //modules/prediction/... \
+    //modules/contrib/... \
     //modules/third_party_perception/...
 
 bazel_test_with_dist_cache \
@@ -81,6 +82,7 @@ bazel_test_with_dist_cache \
     //modules/dreamview/... \
     //modules/guardian/... \
     //modules/map/... \
+    //modules/contrib/... \
     //modules/third_party_perception/...
 
 bash scripts/install_esdcan_library.sh install
@@ -104,7 +106,6 @@ echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
-# TODO(?): bazel build //modules/contrib/...
 # TODO(?): bazel build //modules/perception/...
 # TODO(?): bazel test //modules/prediction/...
 # TODO(?): apollo.sh build
