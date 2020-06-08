@@ -196,12 +196,14 @@ new_local_repository(
 #    path = "/usr/include",
 #)
 #
-#new_local_repository(
-#    name = "vtk",
-#    build_file = "third_party/vtk.BUILD",
-#    path = "/usr/include/vtk-VTK_VERSION",
-#)
-#
+# FIXME(all): hide vtk version from end users
+new_local_repository(
+    name = "vtk",
+    build_file = "external/vtk.BUILD",
+    #path = "/opt/apollo/sysroot/include/vtk-VTK_VERSION",
+    path = "/opt/apollo/sysroot/include/vtk-8.2",
+)
+
 # Caffe
 new_local_repository(
     name = "caffe",
