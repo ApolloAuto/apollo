@@ -35,6 +35,8 @@ function apollo_environ_setup() {
     export DOWNLOAD_LOG="/opt/apollo/build.log"
     export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 
+    export SUPPORTED_NVIDIA_SMS="6.0 6.1 7.0 7.2 7.5"
+
     if [[ ! -d "${PKGS_DIR}" ]]; then
         mkdir -p "${PKGS_DIR}"
     fi
