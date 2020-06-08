@@ -8,6 +8,7 @@ import "modules/perception/proto/perception_obstacle.proto";
 import "modules/planning/proto/planning_internal.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/routing/proto/routing.proto";
+import "modules/common/proto/geometry.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -152,6 +153,12 @@ message Object {
   // perception confidence level. Range: [0,1]
   optional double confidence = 31 [default = 1];
   optional apollo.prediction.ObstaclePriority obstacle_priority = 33;
+
+  //map for sensor measurement
+  map<string, Object> sensors= 36;
+
+  //field for sensor measurement
+  optional apollo.common.Point3D position = 37;
 }
 
 message DelaysInMs {
