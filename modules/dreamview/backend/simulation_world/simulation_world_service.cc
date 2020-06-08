@@ -552,15 +552,15 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     SetObstacleInfo(obstacle, &world_obj);
     SetObstaclePolygon(obstacle, &world_obj);
     SetObstacleType(obstacle, &world_obj);
-    SetObstacleSensor(obstacle,&world_obj);
+    SetObstacleSensor(obstacle, &world_obj);
   }
   return obj_map_[id];
 }
 
 Object &SimulationWorldService::CreateWorldObjectBySensor(
   const SensorMeasurement &sensor) {
-  // Create a new world object and put it into object map to store sensor measurement info
-  //sensor measurement theta——>object heading
+  // Create a new world object and put it into object map to store sensor
+  // measurement info , sensor measurement theta——>object heading
   Object sensor_object;
   sensor_object.set_id(std::to_string(sensor.id()));
   Point3D pos = sensor.position();
@@ -640,14 +640,14 @@ void SimulationWorldService::SetObstaclePolygon(
   }
 }
 
-void SimulationWorldService::SetObstacleSensor(const PerceptionObstacle &obstacle,
-                                             Object *world_object) {
+void SimulationWorldService::SetObstacleSensor(
+    const PerceptionObstacle &obstacle, Object *world_object) {
   if (world_object == nullptr) {
     return;
   }
-  for(const auto &sensor : obstacle.measurements()) {
-  (*(world_object->mutable_sensors()))[sensor.sensor_id()]=CreateWorldObjectBySensor(sensor);
-   //CreateWorldObjectBySensor(sensor);
+  for (const auto &sensor : obstacle.measurements()) {
+  (*(world_object->mutable_sensors()))[sensor.sensor_id()] =
+  CreateWorldObjectBySensor(sensor);
   }
 }
 

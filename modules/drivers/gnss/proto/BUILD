@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
@@ -207,3 +209,5 @@ py_proto(
     name = "gnss_raw_observation_pb2",
     src = "gnss_raw_observation.proto",
 )
+
+cpplint()
