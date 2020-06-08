@@ -16,7 +16,8 @@ cc_library(
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",
-        "//modules/perception/proto:sensor_meta_schema_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
+        "//modules/perception/proto:sensor_meta_schema_cc_proto",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )

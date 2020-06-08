@@ -124,6 +124,7 @@ cc_test(
     name = "conditional_clustering_test",
     size = "small",
     srcs = ["conditional_clustering_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":conditional_clustering",
         "@com_google_googletest//:gtest_main",
