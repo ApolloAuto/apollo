@@ -106,7 +106,7 @@ echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
-# TODO(?): bazel build //modules/perception/...
+# TODO(storypku): bazel build //modules/perception/...
 # TODO(?): bazel test //modules/prediction/...
 # TODO(?): apollo.sh build
 # TODO(?): apollo.sh test
@@ -118,6 +118,6 @@ echo "########################### All check passed! ###########################"
 #          See https://pypi.org/project/pycodestyle/
 # TODO(?): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
-# TODO(storypku): no break for cpu only build
 # TODO(storypku): cyber.aarch64 docker image
 # TODO(storypku): tools/workspace.bzl to re-org WORKSPACE.in
+# TODO(?): no break for cpu only build
