@@ -21,3 +21,6 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
+ok "Greate! modules/third_party_perception has no extra dependencies that" \
+   "should be pre-installed."
+
