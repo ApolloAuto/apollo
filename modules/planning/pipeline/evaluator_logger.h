@@ -15,30 +15,21 @@
  *****************************************************************************/
 #pragma once
 
-#include <chrono>
-#include <string>
+#include <fstream>
 
-#include "modules/planning/proto/learning_data.pb.h"
-#include "modules/planning/common/trajectory_evaluator.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-class Evaluator {
+class EvaluatorLogger {
  public:
-  void Init();
-  void Close();
-
-  void Evaluate(const std::string& source_file);
-
- private:
-  void WriteOutData(const std::string& source_filename,
-                    const LearningData& learning_data);
-
- private:
-  std::chrono::time_point<std::chrono::system_clock> start_time_;
-  LearningData learning_data_;
-  TrajectoryEvaluator trajectory_evaluator_;
+  static std::ofstream& GetStream() {
+    static std::ofstream log_file(
+        FLAGS_planning_data_dir + "/output_data_evaluated.log",
+        std::ios_base::out | std::ios_base::app);
+    return log_file;
+  }
 };
 
 }  // namespace planning

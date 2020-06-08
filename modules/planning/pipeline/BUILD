@@ -11,11 +11,24 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        ":evaluator_logger",
         "//cyber",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:trajectory_evaluator",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "evaluator_logger",
+    hdrs = ["evaluator_logger.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/planning/common:planning_gflags",
     ],
 )
 

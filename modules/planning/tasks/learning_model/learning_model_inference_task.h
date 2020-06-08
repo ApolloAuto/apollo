@@ -42,9 +42,6 @@ class LearningModelInferenceTask : public Task {
   void ConvertADCFutureTrajectory(
       const std::vector<TrajectoryPointFeature>& trajectory,
       std::vector<common::TrajectoryPoint>* adc_future_trajectory);
-
- private:
-  TrajectoryEvaluator trajectory_evaluator_;
 };
 
 }  // namespace planning

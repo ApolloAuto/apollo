@@ -168,7 +168,8 @@ cc_library(
         ":planning_gflags",
         ":st_graph_data",
         "//cyber/common:log",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/math",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:point_factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
@@ -513,6 +514,7 @@ cc_library(
         "//cyber",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/util:util_lib",
+        "//modules/planning/pipeline:evaluator_logger",
         "//modules/planning/proto:learning_data_cc_proto",
     ],
 )

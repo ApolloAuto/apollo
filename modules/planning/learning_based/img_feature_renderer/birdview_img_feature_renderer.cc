@@ -161,7 +161,6 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
   return true;
 }
 
-// TODO(Jinyun): implement for debugging purpose
 bool BirdviewImgFeatureRenderer::RenderBGREnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
   int ego_trajectory_point_history_size =
@@ -318,19 +317,21 @@ bool BirdviewImgFeatureRenderer::RenderEgoPastPoint(
     color = gray_scale;
   }
   const auto& ego_past = learning_data_frame.adc_trajectory_point();
+  cv::Scalar gradual_change_color;
   for (const auto& ego_past_point : ego_past) {
     const double relative_time =
         current_time_sec - ego_past_point.timestamp_sec();
     if (relative_time > config_.max_ego_past_horizon()) {
       continue;
     }
-    color = color - color * relative_time / config_.max_ego_past_horizon();
+    gradual_change_color =
+        color * (1 - relative_time / config_.max_ego_past_horizon());
     cv::circle(*img_feature,
                GetAffinedPointImgIdx(
                    ego_past_point.trajectory_point().path_point().x(),
                    ego_past_point.trajectory_point().path_point().y(),
                    ego_current_x, ego_current_y, M_PI_2 - ego_current_heading),
-               2, color, -1);
+               2, gradual_change_color, -1);
   }
   return true;
 }
@@ -354,13 +355,15 @@ bool BirdviewImgFeatureRenderer::RenderObsPastBox(
     const double obstacle_box_width = obstacle.width();
     const auto& past_traj =
         obstacle.obstacle_trajectory().evaluated_trajectory_point();
+    cv::Scalar gradual_change_color;
     for (const auto& traj_point : past_traj) {
       const double relative_time =
           current_time_sec - traj_point.timestamp_sec();
       if (relative_time > config_.max_obs_past_horizon()) {
         continue;
       }
-      color = color - color * relative_time / config_.max_obs_past_horizon();
+      gradual_change_color =
+          color * (1 - relative_time / config_.max_obs_past_horizon());
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
@@ -445,13 +448,15 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
     const auto& predicted_traj = obstacle.obstacle_prediction()
                                      .trajectory(max_prob_idx)
                                      .trajectory_point();
+    cv::Scalar gradual_change_color;
     for (const auto& traj_point : predicted_traj) {
       const double relative_time =
           traj_point.timestamp_sec() - current_time_sec;
       if (relative_time > config_.max_obs_future_horizon()) {
         break;
       }
-      color = color * relative_time / config_.max_obs_past_horizon();
+      gradual_change_color =
+          color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),

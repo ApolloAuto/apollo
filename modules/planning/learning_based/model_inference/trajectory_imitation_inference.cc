@@ -56,12 +56,32 @@ bool TrajectoryConvRnnInference::Inference(
     return false;
   }
 
+  auto input_renderering_start_time = std::chrono::system_clock::now();
   cv::Mat input_feature;
   if (!BirdviewImgFeatureRenderer::Instance()->RenderMultiChannelEnv(
           *learning_data_frame, &input_feature)) {
     AERROR << "Render multi-channel input image failed";
     return false;
   }
+  cv::Mat initial_point;
+  if (!BirdviewImgFeatureRenderer::Instance()->RenderCurrentEgoPoint(
+          *learning_data_frame, &initial_point)) {
+    AERROR << "Render initial states image failed";
+    return false;
+  }
+  cv::Mat initial_box;
+  if (!BirdviewImgFeatureRenderer::Instance()->RenderCurrentEgoBox(
+          *learning_data_frame, &initial_box)) {
+    AERROR << "Render initial states image failed";
+    return false;
+  }
+  auto input_renderering_end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> rendering_diff =
+      input_renderering_end_time - input_renderering_start_time;
+  ADEBUG << "trajectory imitation model input renderer used time: "
+         << rendering_diff.count() * 1000 << " ms.";
+
+  auto input_prepration_start_time = std::chrono::system_clock::now();
   cv::Mat input_feature_float;
   input_feature.convertTo(input_feature_float, CV_32F, 1.0 / 255);
   torch::Tensor input_feature_tensor =
@@ -72,13 +92,6 @@ bool TrajectoryConvRnnInference::Inference(
   for (int i = 0; i < input_feature_float.channels(); ++i) {
     input_feature_tensor[0][i] = input_feature_tensor[0][i].sub(0.5).div(0.5);
   }
-
-  cv::Mat initial_point;
-  if (!BirdviewImgFeatureRenderer::Instance()->RenderCurrentEgoPoint(
-          *learning_data_frame, &initial_point)) {
-    AERROR << "Render initial states image failed";
-    return false;
-  }
   cv::Mat initial_point_float;
   initial_point.convertTo(initial_point_float, CV_32F, 1.0 / 255);
   torch::Tensor initial_point_tensor =
@@ -86,16 +99,6 @@ bool TrajectoryConvRnnInference::Inference(
                        {1, initial_point_float.rows, initial_point_float.cols,
                         initial_point_float.channels()});
   initial_point_tensor = initial_point_tensor.permute({0, 3, 1, 2});
-  for (int i = 0; i < initial_point_float.channels(); ++i) {
-    initial_point_tensor[0][i] = initial_point_tensor[0][i].sub(0.5).div(0.5);
-  }
-
-  cv::Mat initial_box;
-  if (!BirdviewImgFeatureRenderer::Instance()->RenderCurrentEgoBox(
-          *learning_data_frame, &initial_box)) {
-    AERROR << "Render initial states image failed";
-    return false;
-  }
   cv::Mat initial_box_float;
   initial_box.convertTo(initial_box_float, CV_32F, 1.0 / 255);
   torch::Tensor initial_box_tensor =
@@ -103,9 +106,6 @@ bool TrajectoryConvRnnInference::Inference(
                        {1, initial_box_float.rows, initial_box_float.cols,
                         initial_box_float.channels()});
   initial_box_tensor = initial_box_tensor.permute({0, 3, 1, 2});
-  for (int i = 0; i < initial_box_float.channels(); ++i) {
-    initial_box_tensor[0][i] = initial_box_tensor[0][i].sub(0.5).div(0.5);
-  }
 
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
@@ -115,16 +115,23 @@ bool TrajectoryConvRnnInference::Inference(
       c10::TupleType::create(
           std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
 
-  auto start_time = std::chrono::system_clock::now();
+  auto input_prepration_end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> prepration_diff =
+      input_prepration_end_time - input_prepration_start_time;
+  ADEBUG << "trajectory imitation model input prepration used time: "
+         << prepration_diff.count() * 1000 << " ms.";
+
+  auto inference_start_time = std::chrono::system_clock::now();
   at::Tensor torch_output_tensor = model_.forward(torch_inputs)
                                        .toTuple()
                                        ->elements()[2]
                                        .toTensor()
                                        .to(torch::kCPU);
-  auto end_time = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time - start_time;
+  auto inference_end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> inference_diff =
+      inference_end_time - inference_start_time;
   ADEBUG << "trajectory imitation model inference used time: "
-         << diff.count() * 1000 << " ms.";
+         << inference_diff.count() * 1000 << " ms.";
 
   const auto& cur_traj_point =
       learning_data_frame->adc_trajectory_point(past_points_size - 1);
@@ -135,7 +142,6 @@ bool TrajectoryConvRnnInference::Inference(
   const double cur_heading = cur_path_point.theta();
 
   learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
-
   // TODO(Jinyun): move delta_t to conf or deduce it somehow
   const double delta_t = 0.2;
   auto torch_output = torch_output_tensor.accessor<float, 3>();
