@@ -27,7 +27,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #    libssl-dev
 #    libpoco-dev
 
-
 . /tmp/installers/installer_base.sh
 
 THREAD_NUM=$(nproc)

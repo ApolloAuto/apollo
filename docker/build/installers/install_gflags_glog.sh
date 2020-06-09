@@ -62,16 +62,14 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_NAME}
 
 pushd glog-${VERSION}
-    if [ "$ARCH" == "x86_64" ]; then
-        mkdir build && cd build
-        cmake .. \
-             -DBUILD_SHARED_LIBS=ON \
-             -DCMAKE_BUILD_TYPE=Release
-    elif [ "$ARCH" == "aarch64" ]; then
-        ./configure --build=armv8-none-linux --enable-shared
-    else
-        echo "$ARCH not supported"
-    fi
+    mkdir build && cd build
+    cmake .. \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release
+
+    # if [ "$ARCH" == "aarch64" ]; then
+    #    ./configure --build=armv8-none-linux --enable-shared
+    # fi
 
     make -j${THREAD_NUM}
     make install
