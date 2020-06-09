@@ -48,6 +48,8 @@ cmake .. \
 make -j$(nproc)
 make install
 
+ldconfig
+
 popd
 
 ldconfig
