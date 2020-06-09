@@ -106,7 +106,8 @@ else
     pip3_install pip -U
 fi
 
-pip3_install setuptools
+pip3_install -U setuptools
+pip3_install -U wheel
 
 # Kick down the ladder
 apt-get -y autoremove python3-pip

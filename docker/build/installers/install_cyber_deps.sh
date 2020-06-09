@@ -20,8 +20,9 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
 . /tmp/installers/installer_base.sh
+
+TARGET_ARCH="$(uname -m)"
 
 info "Install poco ..."
 bash /tmp/installers/install_poco.sh
@@ -35,7 +36,16 @@ apt-get -y update && \
 info "Install gflags & glog..."
 bash /tmp/installers/install_gflags_glog.sh
 
-pip3_install grpcio-tools
+if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+    pip3_install grpcio grpcio-tools
+    pip3_install grpcio-reflection
+else # aarch64
+    # Ref: https://github.com/grpc/grpc/issues/12992
+    # Ref: https://github.com/grpc/grpc/issues/20493
+    python3 -m pip install grpcio grpcio-tools
+    python3 -m pip install grpcio-reflection
+fi
+
 
 info "Install protobuf ..."
 bash /tmp/installers/install_protobuf.sh
