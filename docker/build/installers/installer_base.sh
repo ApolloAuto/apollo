@@ -23,6 +23,15 @@ function ok() {
     (>&2 echo -e "[${GREEN}${BOLD} OK ${NO_COLOR}] $*")
 }
 
+# Ref: https://reproducible-builds.org/docs/source-date-epoch
+function source_date_epoch_setup() {
+    DATE_FMT="+%Y-%m-%d"
+    export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date +%s)}"
+    export BUILD_DATE=$(date -u -d "@$SOURCE_DATE_EPOCH" "$DATE_FMT" 2>/dev/null \
+        || date -u -r "$SOURCE_DATE_EPOCH" "$DATE_FMT" 2>/dev/null \
+        || date -u "$DATE_FMT")
+}
+
 function apollo_environ_setup() {
     export ARCHIVE_DIR="/tmp/archive"
     export RCFILES_DIR="/opt/apollo/rcfiles"
@@ -37,11 +46,15 @@ function apollo_environ_setup() {
 
     export SUPPORTED_NVIDIA_SMS="6.0 6.1 7.0 7.2 7.5"
 
+    if [[ -z "${SOURCE_DATE_EPOCH}" ]]; then
+        source_date_epoch_setup
+    fi
+
     if [[ ! -d "${PKGS_DIR}" ]]; then
         mkdir -p "${PKGS_DIR}"
     fi
     if [[ ! -d "${SYSROOT_DIR}" ]]; then
-        mkdir -p "${SYSROOT_DIR}/bin"
+        mkdir -p ${SYSROOT_DIR}/{bin,include,lib,share}
     fi
     if [[ ! -d "${APOLLO_LD_FILE}" ]]; then
         echo "${SYSROOT_DIR}/lib" > "${APOLLO_LD_FILE}"
@@ -102,7 +115,7 @@ function pip3_install() {
     python3 -m pip install --no-cache-dir $@
 }
 
-function local_http_cached() {
+function _local_http_cached() {
     if /usr/bin/curl -sfI "${LOCAL_HTTP_ADDR}/$1"; then
         return
     fi
@@ -131,7 +144,7 @@ function download_if_not_cached {
 
     echo -e "${pkg_name}\t${expected_cs}\t${url}" >> "${DOWNLOAD_LOG}"
 
-    if local_http_cached "${pkg_name}" ; then
+    if _local_http_cached "${pkg_name}" ; then
         use_cache=2
         local local_addr="${LOCAL_HTTP_ADDR}/${pkg_name}"
         info "Local http cache hit ${pkg_name}..."
