@@ -20,6 +20,14 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
+
+TARGET_ARCH="$(uname -m)"
+
+if [[ "${TARGET_ARCH}" != "x86_64" ]]; then
+    error "Qt installer for ${TARGET_ARCH} not ready."
+    exit 0
+fi
 
 apt-get -y update && \
     apt-get -y install \
@@ -32,8 +40,6 @@ apt-get -y update && \
 
 # Note(storypku)
 # The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
-
-. /tmp/installers/installer_base.sh
 
 QT_VERSION_A=5.12
 QT_VERSION_B=5.12.2
