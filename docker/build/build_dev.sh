@@ -30,6 +30,7 @@ LOCAL_DEV_TAG="${REPO}:local_dev"
 LOCAL_DEV_FLAG="no"
 MODE="download"
 GEOLOC="us"
+CLEAN_MODE="no"
 STAGE="dev"
 DOCKERFILE=""
 TAB="    "
@@ -37,7 +38,7 @@ TAB="    "
 function print_usage() {
     local prog_name=$(basename "$0")
     echo "Usage:"
-    echo "${TAB}${prog_name} [-l] -f <dev_dockerfile> [-m <build|download>] [-g <us|cn>]"
+    echo "${TAB}${prog_name} [-l] [-c] -f <dev_dockerfile> [-m <build|download>] [-g <us|cn>]"
     echo "${TAB}${prog_name} -h/--help    # Show this message"
     echo "E.g.,"
     echo "${TAB}${prog_name} -f dev.x86_64.dockerfile -m build"
@@ -49,7 +50,7 @@ function parse_arguments() {
         print_usage
         exit 0
     fi
-    while getopts "hlf:m:g:" opt; do
+    while getopts "hlcf:m:g:" opt; do
         case $opt in
             l)
                 LOCAL_DEV_FLAG="yes"
@@ -62,6 +63,9 @@ function parse_arguments() {
                 ;;
             g)
                 GEOLOC=$OPTARG
+                ;;
+            c)
+                CLEAN_MODE="yes"
                 ;;
             h)
                 print_usage
@@ -113,12 +117,18 @@ TAG="${REPO}:dev-${ARCH}-18.04-${TIME}"
 # Fail on first error.
 set -e
 echo "=====.=====.=====.=====  Docker Image Build for Devel =====.=====.=====.====="
-echo "|  Docker build ${TAG}"
+echo "|  Docker build ${TAG} CLEAN_MODE=${CLEAN_MODE}"
 echo "|  ${TAB}using dockerfile=${DOCKERFILE}"
 echo "|  ${TAB}INSTALL_MODE=${MODE}, GEOLOC=${GEOLOC}"
 echo "=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.====="
 
-docker build -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
+EXTRA_ARGS=""
+
+if [[ "${CLEAN_MODE}" == "yes" ]]; then
+    EXTRA_ARGS="--no-cache"
+fi
+
+docker build ${EXTRA_ARGS} -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
     --build-arg GEOLOC="${GEOLOC}" \
     --build-arg BUILD_STAGE="${STAGE}" \
     -f "${DOCKERFILE}" "${CONTEXT}"
