@@ -23,6 +23,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
+# Ref: https://releases.llvm.org/download.html
 ARCH=$(uname -m)
 
 CLANG_INSTALL_DIR="${PKGS_DIR}/llvm.clang"
