@@ -168,14 +168,16 @@ class SimulationWorldService {
   Object &CreateWorldObjectIfAbsent(
       const apollo::perception::PerceptionObstacle &obstacle);
   void CreateWorldObjectFromSensorMeasurement(
-      const apollo::perception::SensorMeasurement &sensor, Object *world_object);
+      const apollo::perception::SensorMeasurement &sensor,
+      Object *world_object);
   void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
                        Object *world_object);
   void SetObstaclePolygon(
       const apollo::perception::PerceptionObstacle &obstacle,
       Object *world_object);
-  void SetObstacleSensorMeasurements(const apollo::perception::PerceptionObstacle &obstacle,
-                       Object *world_object);
+  void SetObstacleSensorMeasurements(
+      const apollo::perception::PerceptionObstacle &obstacle,
+      Object *world_object);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
   void UpdateRSSInfo(const apollo::planning::ADCTrajectory &trajectory);
