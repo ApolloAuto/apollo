@@ -23,11 +23,11 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
-ARCH=$(uname -m)
+TARGET_ARCH=$(uname -m)
+VERSION="3.2.0"
 
-if [ "$ARCH" == "x86_64" ]; then
+if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
-  VERSION="3.2.0"
   PKG_NAME="bazel_${VERSION}-linux-x86_64.deb"
   DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}
   SHA256SUM="215b160b363fb88dd8b73035bf842819f147c6a7d81e4f0bde89310328712973"
@@ -63,27 +63,49 @@ if [ "$ARCH" == "x86_64" ]; then
   rm -rf ${PKG_NAME}
   info "Done installing bazel ${VERSION} with buildifier and buildozer"
 
-elif [ "$ARCH" == "aarch64" ]; then
-  BUILD=$1
-  shift
-  if [ "$BUILD" == "build" ]; then
-    mkdir -p bazel
-    pushd bazel
-    wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-dist.zip
-    unzip bazel-0.5.3-dist.zip
-    chmod a+w src/java_tools/buildjar/java/com/google/devtools/build/buildjar/javac/plugins/errorprone/ErrorPronePlugin.java
-    wget https://apollocache.blob.core.windows.net/apollo-cache/ErrorPronePlugin.java.patch
-    patch -p0 < ./ErrorPronePlugin.java.patch
-    env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
-    mv /tmp/installers/bazel/output/bazel /usr/local/bin/
+elif [ "$TARGET_ARCH" == "aarch64" ]; then
+  INSTALL_MODE="$1" ; shift
+
+  # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
+  # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
+  if [[ "${INSTALL_MODE}" == "build" ]]; then
+    apt-get -y update && \
+      apt-get -y install \
+      build-essential openjdk-11-jdk python3 zip unzip
+
+    if [[ ! -e /usr/bin/python ]]; then
+        ln -s /usr/bin/python3 /usr/local/bin/python
+    fi
+
+    PKG_NAME="bazel-${VERSION}-dist.zip"
+    CHECKSUM="44ec129436f6de45f2230e14100104919443a1364c2491f5601666b358738bfa"
+    DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}"
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+    BBUILD_DIR="${PKG_NAME%.zip}"
+    unzip "${PKG_NAME}" -d "${BBUILD_DIR}"
+
+    pushd ${BBUILD_DIR}
+      # env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+      env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH}" bash ./compile.sh
+      cp -f output/bazel ${SYSROOT_DIR}/bin/
+      chmod a+x ${SYSROOT_DIR}/bin
     popd
-  else
-    wget https://apollocache.blob.core.windows.net/apollo-cache/bazel
-    cp bazel /usr/local/bin/
-    chmod a+x /usr/local/bin/bazel
+    rm -rf "${PKG_NAME}" "${BBUILD_DIR}"
+  else # Download Mode
+    PKG_NAME="bazel-${VERSION}-aarch64-linux-gnu.tar.gz"
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+    CHECKSUM="5441854177a7ca08a57adcdc02984fa40bb53667b89c89dc57383e57f77a20cc"
+
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+    tar xzvf "${PKG_NAME}"
+    pushd "bazel-${VERSION}-aarch64-linux-gnu"
+        DEST=${SYSROOT_DIR} bash install.sh
+    popd
+    rm -rf "bazel-${VERSION}-aarch64-linux-gnu" "${PKG_NAME}"
   fi
 else
-    echo "not support $ARCH"
+  error "Target arch ${TARGET_ARCH} not supported yet"
 fi
 
 # Clean up cache to reduce layer size.
