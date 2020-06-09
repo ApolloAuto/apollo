@@ -154,11 +154,8 @@ message Object {
   optional double confidence = 31 [default = 1];
   optional apollo.prediction.ObstaclePriority obstacle_priority = 33;
 
-  //map for sensor measurement
-  map<string, Object> sensors= 36;
-
   //field for sensor measurement
-  optional apollo.common.Point3D position = 37;
+  optional apollo.common.Point3D position = 36;
 }
 
 message DelaysInMs {
@@ -206,6 +203,10 @@ message ControlData {
 message Notification {
   optional double timestamp_sec = 1;
   optional apollo.common.monitor.MonitorMessageItem item = 2;
+}
+
+message SensorMeasurements{
+  repeated Object sensor_measurement = 1;
 }
 
 // Next-id: 29
@@ -284,4 +285,7 @@ message SimulationWorld {
 
   // A map from a story name to whether it is on
   map<string, bool> stories = 28;
+
+  // A map from a string(sensor_id) to a grouo of sensormeasurement(object)
+  map<string, SensorMeasurements> sensormeasurements = 29;
 }
