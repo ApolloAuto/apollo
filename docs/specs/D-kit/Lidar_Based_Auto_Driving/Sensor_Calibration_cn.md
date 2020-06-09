@@ -193,7 +193,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 #### 1. 上传预处理后的数据至BOS
 
-**注意：**必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
+**注意：** 必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
 
 在BOS bucket中新建目录sensor_calibration，作为后续云标定服务读取数据的`Input Data Path`，把前面预处理生成的数据拷贝至该目录。目录结构如下：
 
@@ -229,7 +229,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 确认邮件得到的外参文件合理后，将邮件发送的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/dev_kit/velodyne_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`、不要直接替换文件。
 
 ## NEXT
-现在，您已经完成激光雷达感知设备标定，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)
+现在，您已经完成激光雷达感知设备标定，接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](Virtual_Lane_Generation_cn.md)
 
 ## 常见问题
 #### 1. 提交后，显示`UNAUTHORIZED`,如下图所示
