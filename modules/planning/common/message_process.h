@@ -37,6 +37,7 @@
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/storytelling/proto/story.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -57,6 +58,8 @@ class MessageProcess {
 
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
+
+  void OnStoryTelling(const apollo::storytelling::Stories& stories);
 
   void OnTrafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
@@ -103,6 +106,8 @@ class MessageProcess {
           localizations,
       LearningDataFrame* learning_data_frame);
 
+  void GeneratePlanningTag(LearningDataFrame* learning_data_frame);
+
   void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
@@ -120,7 +125,7 @@ class MessageProcess {
       obstacle_history_map_;
   ChassisFeature chassis_feature_;
   std::string map_name_;
-  std::vector<OverlapFeature> overlaps_;
+  PlanningTag planning_tag_;
   apollo::routing::RoutingResponse routing_response_;
   double traffic_light_detection_message_timestamp_;
   std::vector<TrafficLightFeature> traffic_lights_;

@@ -22,6 +22,7 @@ cc_library(
         "//modules/planning/common:message_process",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/storytelling/proto:story_proto",
     ],
 )
 
