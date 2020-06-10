@@ -153,12 +153,14 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
 
   const double s_start = adc_trajectory.trajectory_point(0).path_point().s();
 
-  junction_id_.clear();
-  junction_distance_ = -1;
   clear_area_id_.clear();
   clear_area_distance_ = -1;
   crosswalk_id_.clear();
   crosswalk_distance_ = -1;
+  junction_id_.clear();
+  junction_distance_ = -1;
+  pnc_junction_id_.clear();
+  pnc_junction_distance_ = -1;
   signal_id_.clear();
   signal_distance_ = -1;
   stop_sign_id_.clear();
@@ -169,31 +171,6 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
     const auto& path_point = point.path_point();
     if (path_point.s() > FLAGS_adc_trajectory_search_distance) {
       break;
-    }
-
-    // junction
-    if (junction_id_.empty() || junction_distance_ < 0) {
-      std::string junction_id;
-      std::string pnc_junction_id;
-      const double junction = GetJunction(path_point, &junction_id);
-      const double pnc_junction = GetPNCJunction(path_point, &pnc_junction_id);
-      if (pnc_junction) {
-        // in PNC_JUNCTION (including overlapping with JUNCTION)
-        junction_id_ = pnc_junction_id;
-        junction_type_ = CloseToJunction::PNC_JUNCTION;
-        junction_distance_ = path_point.s() - s_start;
-        overlapping_junction_id = junction ? junction_id : "";
-      } else if (junction) {
-        // in JUNCTION only
-        if (junction_id != overlapping_junction_id) {
-          // not in JUNCTION overlapping with a PNC_JUNCTION
-          junction_id_ = junction_id;
-          junction_type_ = CloseToJunction::JUNCTION;
-          junction_distance_ = path_point.s() - s_start;
-        }
-      } else {
-        overlapping_junction_id.clear();
-      }
     }
 
     // clear_area
@@ -211,6 +188,24 @@ void CloseToJunctionTeller::GetOverlaps(const ADCTrajectory& adc_trajectory) {
       if (GetCrosswalk(path_point, &crosswalk_id)) {
         crosswalk_id_ = crosswalk_id;
         crosswalk_distance_ = path_point.s() - s_start;
+      }
+    }
+
+    // junction
+    if (junction_id_.empty() || junction_distance_ < 0) {
+      std::string junction_id;
+      if (GetJunction(path_point, &junction_id)) {
+        junction_id_ = junction_id;
+        junction_distance_ = path_point.s() - s_start;
+      }
+    }
+
+    // pnc_junction
+    if (pnc_junction_id_.empty() || pnc_junction_distance_ < 0) {
+      std::string pnc_junction_id;
+      if (GetPNCJunction(path_point, &pnc_junction_id)) {
+        pnc_junction_id_ = pnc_junction_id;
+        pnc_junction_distance_ = path_point.s() - s_start;
       }
     }
 
@@ -288,14 +283,21 @@ void CloseToJunctionTeller::Update(Stories* stories) {
   }
 
   // CloseToJunction
-  if (!junction_id_.empty() && junction_distance_ >= 0) {
+  if ((!junction_id_.empty() && junction_distance_ >= 0) ||
+      (!pnc_junction_id_.empty() && pnc_junction_distance_ >=0)) {
     if (!stories->has_close_to_junction()) {
       AINFO << "Enter CloseToJunction story";
     }
     auto* story = stories->mutable_close_to_junction();
-    story->set_id(junction_id_);
-    story->set_type(junction_type_);
-    story->set_distance(junction_distance_);
+    if (!pnc_junction_id_.empty() && pnc_junction_distance_ >=0) {
+      story->set_id(pnc_junction_id_);
+      story->set_type(CloseToJunction::PNC_JUNCTION);
+      story->set_distance(pnc_junction_distance_);
+    } else {
+      story->set_id(junction_id_);
+      story->set_type(CloseToJunction::JUNCTION);
+      story->set_distance(junction_distance_);
+    }
   } else if (stories->has_close_to_junction()) {
     AINFO << "Exit CloseToJunction story";
     stories->clear_close_to_junction();
