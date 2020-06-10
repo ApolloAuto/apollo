@@ -54,7 +54,8 @@ using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
-
+using apollo::storytelling::CloseToJunction;
+using apollo::storytelling::Stories;
 
 bool MessageProcess::Init(const PlanningConfig& planning_config) {
   planning_config_.CopyFrom(planning_config);
@@ -253,6 +254,55 @@ void MessageProcess::OnRoutingResponse(
   routing_response_.CopyFrom(routing_response);
 }
 
+void MessageProcess::OnStoryTelling(
+    const apollo::storytelling::Stories& stories) {
+  // clear area
+  if (stories.has_close_to_clear_area()) {
+    auto clear_area_tag = planning_tag_.mutable_clear_area();
+    clear_area_tag->set_id(stories.close_to_clear_area().id());
+    clear_area_tag->set_distance(stories.close_to_clear_area().distance());
+  }
+
+  // crosswalk
+  if (stories.has_close_to_crosswalk()) {
+    auto crosswalk_tag = planning_tag_.mutable_crosswalk();
+    crosswalk_tag->set_id(stories.close_to_crosswalk().id());
+    crosswalk_tag->set_distance(stories.close_to_crosswalk().distance());
+  }
+
+  // pnc_junction
+  if (stories.has_close_to_junction() &&
+      stories.close_to_junction().type() ==
+          CloseToJunction::PNC_JUNCTION) {
+    auto pnc_junction_tag = planning_tag_.mutable_pnc_junction();
+    pnc_junction_tag->set_id(stories.close_to_junction().id());
+    pnc_junction_tag->set_distance(stories.close_to_junction().distance());
+  }
+
+  // traffic_light
+  if (stories.has_close_to_signal()) {
+    auto signal_tag = planning_tag_.mutable_signal();
+    signal_tag->set_id(stories.close_to_signal().id());
+    signal_tag->set_distance(stories.close_to_signal().distance());
+  }
+
+  // stop_sign
+  if (stories.has_close_to_stop_sign()) {
+    auto stop_sign_tag = planning_tag_.mutable_stop_sign();
+    stop_sign_tag->set_id(stories.close_to_stop_sign().id());
+    stop_sign_tag->set_distance(stories.close_to_stop_sign().distance());
+  }
+
+  // yield_sign
+  if (stories.has_close_to_yield_sign()) {
+    auto yield_sign_tag = planning_tag_.mutable_yield_sign();
+    yield_sign_tag->set_id(stories.close_to_yield_sign().id());
+    yield_sign_tag->set_distance(stories.close_to_yield_sign().distance());
+  }
+
+  ADEBUG << planning_tag_.DebugString();
+}
+
 void MessageProcess::OnTrafficLightDetection(
     const TrafficLightDetection& traffic_light_detection) {
   // AINFO << "traffic_light_detection received at frame["
@@ -315,6 +365,12 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
       RoutingResponse routing_response;
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
+      }
+    } else if (message.channel_name ==
+               planning_config_.topic_config().story_telling_topic()) {
+      Stories stories;
+      if (stories.ParseFromString(message.content)) {
+        OnStoryTelling(stories);
       }
     } else if (message.channel_name ==planning_config_.topic_config()
                                        .traffic_light_detection_topic()) {
@@ -840,6 +896,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
       lane_turn = lane->lane().turn();
     }
     planning_tag->set_lane_turn(lane_turn);
+    planning_tag_.set_lane_turn(lane_turn);
 
     if (FLAGS_planning_offline_mode == 2) {
       // planning_tag: overlap tags
@@ -972,10 +1029,6 @@ void MessageProcess::GenerateADCTrajectoryPoints(
   }
 
   // update learning data
-  if (!adc_trajectory_points.empty()) {
-    learning_data_frame->mutable_planning_tag()->set_lane_turn(
-        adc_trajectory_points[0].planning_tag().lane_turn());
-  }
   std::reverse(adc_trajectory_points.begin(), adc_trajectory_points.end());
   for (const auto& trajectory_point : adc_trajectory_points) {
     auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
@@ -995,6 +1048,14 @@ void MessageProcess::GenerateADCTrajectoryPoints(
   //      << trajectory_point_index;
 }
 
+void MessageProcess::GeneratePlanningTag(
+    LearningDataFrame* learning_data_frame) {
+  if (FLAGS_planning_offline_mode == 1) {
+    auto planning_tag = learning_data_frame->mutable_planning_tag();
+    planning_tag->CopyFrom(planning_tag_);
+  }
+}
+
 void MessageProcess::GenerateLearningDataFrame(
     LearningDataFrame* learning_data_frame) {
   // add timestamp_sec & frame_num
@@ -1004,6 +1065,9 @@ void MessageProcess::GenerateLearningDataFrame(
 
   // map_name
   learning_data_frame->set_map_name(map_name_);
+
+  // planning_tag
+  GeneratePlanningTag(learning_data_frame);
 
   // add chassis
   auto chassis = learning_data_frame->mutable_chassis();
