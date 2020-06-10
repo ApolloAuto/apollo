@@ -31,10 +31,14 @@ bool Storytelling::Init() {
     return false;
   }
 
+  story_writer_ =
+      node_->CreateWriter<Stories>(config_.topic_config().storytelling_topic());
+
   // Init all tellers.
   for (const auto& teller : story_tellers_) {
     teller->Init(config_);
   }
+
   return true;
 }
 
@@ -47,10 +51,8 @@ bool Storytelling::Proc() {
   }
 
   // Send stories.
-  static auto writer = frame_manager_->CreateWriter<Stories>(
-      config_.topic_config().storytelling_topic());
   apollo::common::util::FillHeader("Storytelling", &stories_);
-  writer->Write(stories_);
+  story_writer_->Write(stories_);
 
   frame_manager_->EndFrame();
   return true;

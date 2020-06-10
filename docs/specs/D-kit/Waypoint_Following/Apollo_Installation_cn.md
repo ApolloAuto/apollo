@@ -57,6 +57,7 @@
 参考下述步骤：
 
 #### 准备好CAN卡并进行安装
+
 在IPC中，显卡被预先安装在一个PCI插槽中。如果我们收到的是EMUC-B202 CAN，它已被预装在IPC内，则CAN卡安装这一步，可以跳过。如果我们收到的是ESDCan，我们需要将CAN卡安装在另外一个PCI插槽中，步骤如下：
 
    a. 找到并拧下机器边上的8个螺丝（显示在棕色方框内或棕色箭头指向的区域）
@@ -120,7 +121,7 @@
 - 设置 [Fan Start Trip Temp] 为 20
 ```
 
-![tip_icon](images/tip_icon.png)如果用户使用的是已经提前预装好显卡驱动及Apollo镜像的工控机版本，则使用HDMI线连接显示器与工控机的HDMI接口即可：
+![tip_icon](images/tip_icon.png)如果用户使用的是已经提前预装好显卡驱动及Apollo镜像的工控机版本，则使用HDMI线连接显示器与工控机的独立显卡的HDMI接口即可：
 
 ![graphic_config](images/graphic_config.jpg)
 
@@ -146,13 +147,18 @@
 
 ## 工控机软件系统安装
 
-![tip_icon](images/tip_icon.png) 在本步骤中，若工控机已经安装了Ubuntu18.04LTS操作系统且在当前账户的home目录下有apollo文件夹，请直接移步至文末的运行DreamView部分，检查apollo是否可以直接运行；否则，请按照下述步骤一步一步进行工控机软件系统的安装。
+![tip_icon](images/tip_icon.png) 在本步骤中，工控机已经预装了Ubuntu18.04LTS操作系统和apollo运行所需的环境，我们只需要逐一对相关的模块做个检查，确认无误后就可以编译apollo开启我们的自动驾驶之旅了。若您是自己重装系统的话，请严格按照下面的步骤操作执行。
 
 工控机软件系统安装包括计算机操作系统的安装，硬件驱动的安装，应用软件的安装和Apollo软件系统的安装。
 
 ### 安装Ubuntu Linux
+
+已经预装了Ubuntu18.04LTS操作系统的客户可以直接跳过这个步骤，需要自己安装操作系统的客户请参考此步骤。
+
 Apollo软件系统依赖于Linux操作系统而运行，而Linux操作系统种类繁多，且又分为服务器版本和桌面版本，这里我们选择当下比较流行的Ubuntu桌面操作系统的64位版本。安装Ubuntu Linux的操作系统的步骤如下：
+
 #### 创建引导盘
+
 创建一个可以引导启动的Ubuntu Linux USB闪存驱动器，下载Ubuntu，并按照在线说明创建可引导启动的USB闪存驱动器。
 
 ![tip_icon](images/tip_icon.png) 推荐使用 **Ubuntu 18.04.3**.
@@ -174,7 +180,7 @@ b.按照屏幕上的说明安装Linux。
 
 ![warning_icon](images/warning_icon.png)**WARNING**：在整个Apollo系统的安装和操作的过程中，全程禁用root账户，皆用普通账户进行操作，切记！
 
-a.安装完成，重启进入Linux。
+a.安装完成，重启进入Linux。已经预装了Ubuntu18.04LTS操作系统的客户请在引导界面出现时按向下方向键选择Ubuntu高级选项并按回车键进入该选项，请选择倒数第二项的apollo内核来引导系统。重新安装操作系统的客户请选用默认的内核进入系统即可。
 
 b.在终端执行以下命令完成最新软件包的更新：
 
@@ -186,20 +192,23 @@ sudo apt update
 
 #### 安装并降级GCC和G++
 
-执行以下两条命令安装4.8.5版本的gcc和g++，命令如下：
-```
-sudo apt-get install g++-4.8 g++-4.8-multilib gcc-4.8 gcc-4.8-multilib
-sudo /usr/bin/update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 99 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
-```
-安装完成后，使用以下命令检查是否安装成功：
+请先用以下命令检查gcc和g++的版本：
 ```
 gcc --version
 g++ --version
 ```
 
+若输出的gcc和g++的版本是4.8版本的，则跳过此步骤；否则，请执行以下两条命令安装4.8版本的gcc和g++，命令如下：
+```
+sudo apt-get install g++-4.8 g++-4.8-multilib gcc-4.8 gcc-4.8-multilib
+sudo /usr/bin/update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 99 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+```
+安装完成后，用以上命令检查gcc和g++的版本以确认安装成功；若安装未成功，请重新安装直到成功为止。
+
 ### 安装Apollo内核
 
-车上运行Apollo需要[Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel)。你可以依照如下步骤获取、安装预编译的内核：
+车上运行Apollo需要[Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel)。
+若是预装了Ubuntu18.04LTS操作系统的客户，请跳过此步骤；重新安装操作系统的客户，请依照如下步骤获取、安装预编译的内核：
 
 a.从releases文件夹下载发布的包
 
@@ -219,6 +228,10 @@ d.重启ubuntu系统进入grub引导界面，在引导界面选择高级选项�
 
 ### 安装GPU驱动
 
+若是预装了Ubuntu18.04LTS系统的IPC，请直接检查驱动，检查通过则可跳过此步骤；若是自己安装系统，请先安装驱动，然后再检查驱动以确认驱动已装好。
+
+#### 安装驱动
+
 下载apollo-kernel官网上的脚本[install-nvidia.sh](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/install-nvidia.sh)至当前用户的`home`目录下，输入以下命令完成显卡驱动内核模块的安装：
 
 ```
@@ -235,6 +248,9 @@ sudo bash ./NVIDIA-Linux-x86_64-430.50.run --no-x-check -a -s --no-kernel-module
 ```
 
 完成显卡驱动用户库的安装后，重新启动工控机。    
+
+#### 检查驱动
+
 在终端中输入以下命令来检查显卡驱动内核模块是否安装成功：
 
 ```
@@ -253,7 +269,12 @@ sudo dpkg --list | grep nvidia*
 在终端中输入`nvidia-smi`，能看到显卡的信息且最下面没有出现No running processes found的相关字样，输入`nvidia-settings`能调出显卡的配置界面，则表示显卡驱动安装成功。 
 
 ### 安装Can驱动
-- 在Nuvo-6108GC中，若系统搭配的是ESDCan卡，其驱动安装步骤如下所示：
+
+若是灰色的6108的IPC，请执行安装ESDCan驱动和检查ESDCan驱动。若是蓝色的8108的IPC，预装了Ubuntu18.04LTS的客户请直接检查EmucCan驱动；自己安装系统的客户请先安装EmucCan驱动然后再检查EmucCan驱动。
+
+#### 安装ESDCan驱动
+
+在Nuvo-6108GC中，若系统搭配的是ESDCan卡，其驱动安装步骤如下所示：
 
 a.从CAN卡供应商那里或者ESDCan卡的包装袋里拿到CAN卡的驱动安装包，名字形如esdcan-pcie4.2-linux-2.6.x-x86_64-3.10.3.tgz。
 
@@ -265,9 +286,13 @@ cd src/
 make -C /lib/modules/`uname -r`/build M=`pwd`
 sudo make -C /lib/modules/`uname -r`/build M=`pwd` modules_install
 ```
-d.CAN卡驱动esdcan-pcie402.ko可以在/lib/modules/4.4.32-apollo-2-RT/extra/文件夹下找到。
+#### 检查ESDCan驱动
 
-- 在Nuvo-6108GC中，系统搭配的是EmucCan卡，其驱动安装步骤如下所示：
+若CAN卡驱动esdcan-pcie402.ko可以在/lib/modules/4.4.32-apollo-2-RT/extra/文件夹下找到，则CAN卡驱动安装成功；否则，请重新安装。
+
+#### 安装EmucCan驱动
+
+在Nuvo-6108GC中，系统搭配的是EmucCan卡，其驱动安装步骤如下所示：
 
 a.安装EmucCan并添加rules文件
 
@@ -297,7 +322,9 @@ c.启动can卡
 将`start.sh`中`sudo ./emuc_64 -s9 ttyACM0 can0 can1`修改为`sudo ./emuc_64 -s7 ttyACM10 can0 can1`，其中-s表示波特率，-s9表示为1k，-s7表示为500，apollo中采用500。在当前目录下执行`bash start.sh`命令，如下图所示：
 ![图片](images/software_installation_emuc2.png)
 
-d.测试can卡发送接收
+#### 检查EmucCan驱动
+
+a.测试can卡发送接收
 
 将can卡can0和can1口用Can线连接起来。从 https://github.com/linux-can/can-utils 上下载测试代码到当前用户的home目录下，将当前目录设置到can-utils下并执行`make`，如下图所示
 ![图片](images/software_installation_emuc3.png)
@@ -310,32 +337,43 @@ cd can-utils/
 ![图片](images/software_installation_emuc4.png)
 则表示Can驱动安装成功。
 
-e.注意事项
+b.注意事项
 
 在后续启动apollo的canbus模块时，需要先在docker外运行start.sh脚本。
 
-### 安装Docker
+### 安装docker软件
+
+预装了Ubuntu18.04LTS的客户请直接检查docker；自己安装的客户请先安装docker，然后再检查docker。
+
+#### 安装docker
 
 使用apollo官网上的[install_nvidia_docker.sh](https://github.com/ApolloAuto/apollo/blob/master/docker/setup_host/install_nvidia_docker.sh)来安装docker。工控机在联网情况下在终端中输入以下命令来完成安装：
+
 ```
 sudo apt update
 sudo apt install curl
 sudo bash install_nvidia_docker.sh
 ```
 
-完成安装后，在终端中输入以下命令来验证docker是否安装成功：
+#### 检查docker
+
+在终端中输入以下命令来验证docker是否安装成功：
+
 ```
 sudo docker run hello-world
 ```
+
 若能看到helloworld的相关信息，则表示docker安装成功。
 
 
-### 编译Apollo源代码
+![warning_icon](images/warning_icon.png)**WARNING**：在以下模块的操作中，如非本文档或操作系统要求，禁用一切`sudo`操作，切记！
 
-![warning_icon](images/warning_icon.png)**WARNING**：在本模块及以下的操作中，如非本文档或操作系统要求，禁用一切`sudo`操作，切记！
+### 下载Apollo源代码
 
-a.获取Apollo源代码
-可以在github上下载，在终端中输入以下命令：
+预装了Ubuntu18.04LTS的客户的当前home目录下已有apollo代码，可以跳过此步骤；自己安装的客户请参考以下操作来下载apollo源代码。
+
+在终端中输入以下命令：
+
 ```
 cd ~
 sudo apt update
@@ -343,10 +381,13 @@ sudo apt install git -y
 git init
 git clone https://github.com/ApolloAuto/apollo.git
 ```
+
 代码下载的时间视网速的快慢而有所区别，请耐心等待；
 下载完成后的代码在~/apollo目录下，然后执行`git checkout -b r5.5.0 origin/r5.5.0`将代码切换到我们所需要的工作分支r5.5.0上。
 
-b.设置环境变量，在终端输入以下命令：
+### 设置Apollo编译环境
+
+a.设置环境变量，在终端输入以下命令：
 
 ```
 cd ~
@@ -354,7 +395,7 @@ echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
 source ~/.bashrc
 ```
 
-c.将当前账户加入docker账户组中并赋予其相应权限，在终端输入以下命令：
+b.将当前账户加入docker账户组中并赋予其相应权限，在终端输入以下命令：
 
 ```
 sudo gpasswd -a $USER docker  
@@ -364,7 +405,16 @@ sudo chmod 777 /var/run/docker.sock
 
 命令执行完成后，重新启动一下计算机。
 
-d.启动并进入docker容器，在终端输入以下命令：
+c.若是自己安装系统的客户，请直接跳过此步骤，开始编译Apollo源代码；若是预装了Ubuntu18.04LTS的客户，请输入以下命令加载docker的image镜像：
+
+```
+cd ~/images_r5.5.0
+sudo bash LoadImages.sh
+```
+
+### 编译Apollo源代码
+
+a.启动并进入docker容器，在终端输入以下命令：
 
 ```
 cd ~/apollo
@@ -376,7 +426,7 @@ bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 ```
 
-e.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时25分钟：
+b.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时25分钟：
 
 ```
 bash apollo.sh build_opt
@@ -431,3 +481,9 @@ cyber_recorder play -l -f demo_3.5.record
 ```
 
 如果成功在浏览器中看到回放画面，则表明您的apollo系统已经部署成功！
+
+### 常见问题
+
+a.显卡的驱动没有安装成功
+
+请参考显卡的驱动安装的部分重新安装，注意需要在apollo内核中安装GPU的驱动并且安装后需要重新启动计算机。

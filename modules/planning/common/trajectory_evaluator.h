@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,18 +28,16 @@ class TrajectoryEvaluator {
  public:
   ~TrajectoryEvaluator() = default;
 
-  void InitLogFile(const std::string& log_file);
-  void CloseLogFile();
-
   void EvaluateADCTrajectory(const double start_point_timestamp_sec,
                              const double delta_time,
                              LearningDataFrame* learning_data_frame);
 
   void EvaluateADCFutureTrajectory(
-      const LearningDataFrame& learning_data_frame,
+      const int frame_num,
+      const std::vector<TrajectoryPointFeature>& adc_future_trajectory,
       const double start_point_timestamp_sec,
       const double delta_time,
-      std::vector<TrajectoryPointFeature>* adc_future_trajectory);
+      std::vector<TrajectoryPointFeature>* evaluated_adc_future_trajectory);
 
   void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
                                   const double delta_time,
@@ -61,10 +58,7 @@ class TrajectoryEvaluator {
       const double delta_time,
       std::vector<TrajectoryPointFeature>* evaluated_trajectory);
 
-  void WriteLog(const std::string msg);
-
- private:
-  std::ofstream log_file_;
+  void WriteLog(const std::string& msg);
 };
 
 }  // namespace planning

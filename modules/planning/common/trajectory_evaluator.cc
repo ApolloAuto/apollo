@@ -23,24 +23,15 @@
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/pipeline/evaluator_logger.h"
 
 namespace apollo {
 namespace planning {
 
-void TrajectoryEvaluator::InitLogFile(const std::string& log_file) {
-  log_file_.open(log_file, std::ios_base::out | std::ios_base::app);
-}
-
-void TrajectoryEvaluator::CloseLogFile() {
-  log_file_.close();
-}
-
-void TrajectoryEvaluator::WriteLog(const std::string msg) {
+void TrajectoryEvaluator::WriteLog(const std::string& msg) {
   AERROR << msg;
   if (FLAGS_planning_offline_mode == 2) {
-    if (log_file_.is_open()) {
-      log_file_ << msg << std::endl;
-    }
+    EvaluatorLogger::GetStream() <<  msg << std::endl;
   }
 }
 
@@ -206,15 +197,15 @@ void TrajectoryEvaluator::EvaluateADCTrajectory(
 }
 
 void TrajectoryEvaluator::EvaluateADCFutureTrajectory(
-    const LearningDataFrame& learning_data_frame,
+    const int frame_num,
+    const std::vector<TrajectoryPointFeature>& adc_future_trajectory,
     const double start_point_timestamp_sec,
     const double delta_time,
-    std::vector<TrajectoryPointFeature>* adc_future_trajectory) {
-  adc_future_trajectory->clear();
+    std::vector<TrajectoryPointFeature>* evaluated_adc_future_trajectory) {
+  evaluated_adc_future_trajectory->clear();
 
   std::vector<std::pair<double, CommonTrajectoryPointFeature>> trajectory;
-  for (const auto& adc_future_trajectory_point:
-      learning_data_frame.output().adc_future_trajectory_point()) {
+  for (const auto& adc_future_trajectory_point : adc_future_trajectory) {
     trajectory.push_back(
         std::make_pair(adc_future_trajectory_point.timestamp_sec(),
                        adc_future_trajectory_point.trajectory_point()));
@@ -222,9 +213,8 @@ void TrajectoryEvaluator::EvaluateADCFutureTrajectory(
 
   if (trajectory.size() <= 1) {
     const std::string msg =
-        absl::StrCat("too short adc_future_trajectory. frame_num[",
-                     learning_data_frame.frame_num(), "] size[",
-                      trajectory.size(), "]");
+        absl::StrCat("too short adc_future_trajectory. frame_num[", frame_num,
+                     "] size[", trajectory.size(), "]");
     WriteLog(msg);
     return;
   }
@@ -232,23 +222,22 @@ void TrajectoryEvaluator::EvaluateADCFutureTrajectory(
   if (fabs(trajectory.back().first - start_point_timestamp_sec) <=
       delta_time) {
     const std::string msg =
-        absl::StrCat("too short adc_future_trajectory. frame_num[",
-                     learning_data_frame.frame_num(), "] size[",
-                     trajectory.size(), "] time_range[",
+        absl::StrCat("too short adc_future_trajectory. frame_num[", frame_num,
+                     "] size[", trajectory.size(), "] time_range[",
                      trajectory.back().first - start_point_timestamp_sec, "]");
     WriteLog(msg);
     return;
   }
 
   std::vector<TrajectoryPointFeature> evaluated_trajectory;
-  EvaluateTrajectoryByTime(learning_data_frame.frame_num(),
+  EvaluateTrajectoryByTime(frame_num,
                            "adc_future_trajectory",
                            trajectory,
                            start_point_timestamp_sec,
                            delta_time,
                            &evaluated_trajectory);
 
-  ADEBUG << "frame_num[" << learning_data_frame.frame_num()
+  ADEBUG << "frame_num[" << frame_num
          << "] orig adc_future_trajectory[" << trajectory.size()
          << "] evaluated_trajectory_size[" << evaluated_trajectory.size()
          << "]";
@@ -256,7 +245,7 @@ void TrajectoryEvaluator::EvaluateADCFutureTrajectory(
   if (evaluated_trajectory.empty()) {
     const std::string msg =
         absl::StrCat("WARNING: adc_future_trajectory not long enough. ",
-                     "frame_num[", learning_data_frame.frame_num(),
+                     "frame_num[", frame_num,
                      "] size[", evaluated_trajectory.size(), "]");
     WriteLog(msg);
   } else {
@@ -265,7 +254,7 @@ void TrajectoryEvaluator::EvaluateADCFutureTrajectory(
     if (time_range < FLAGS_trajectory_time_length) {
       const std::string msg =
           absl::StrCat("WARNING: adc_future_trajectory not long enough. ",
-                       "frame_num[", learning_data_frame.frame_num(),
+                       "frame_num[", frame_num,
                        "] size[", evaluated_trajectory.size(), "] time_range[",
                        time_range, "]");
       WriteLog(msg);
@@ -276,11 +265,11 @@ void TrajectoryEvaluator::EvaluateADCFutureTrajectory(
     if (tp.trajectory_point().relative_time() > 0.0 &&
         tp.trajectory_point().relative_time() <=
             FLAGS_trajectory_time_length) {
-      adc_future_trajectory->push_back(tp);
+      evaluated_adc_future_trajectory->push_back(tp);
     } else {
       const std::string msg =
            absl::StrCat("DISCARD adc_future_trajectory_point. frame_num[",
-                        learning_data_frame.frame_num(), "] size[",
+                        frame_num, "] size[",
                         evaluated_trajectory.size(), "] relative_time[",
                         tp.trajectory_point().relative_time(), "]");
       WriteLog(msg);

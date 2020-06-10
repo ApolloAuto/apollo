@@ -143,8 +143,15 @@ bool Stage::ExecuteTaskOnReferenceLineForOnlineLearning(
     }
   }
 
-  picked_reference_line_info.SetDrivable(true);
-  picked_reference_line_info.SetCost(0);
+  const std::vector<common::TrajectoryPoint>& adc_future_trajectory_points =
+      picked_reference_line_info.trajectory();
+  DiscretizedTrajectory trajectory;
+  if (picked_reference_line_info.AdjustTrajectoryWhichStartsFromCurrentPos(
+      planning_start_point, adc_future_trajectory_points, &trajectory)) {
+    picked_reference_line_info.SetTrajectory(trajectory);
+    picked_reference_line_info.SetDrivable(true);
+    picked_reference_line_info.SetCost(0);
+  }
 
   return true;
 }

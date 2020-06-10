@@ -16,11 +16,7 @@
 #pragma once
 
 #include <chrono>
-#include <ctime>
-#include <fstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/common/trajectory_evaluator.h"
@@ -41,7 +37,6 @@ class Evaluator {
 
  private:
   std::chrono::time_point<std::chrono::system_clock> start_time_;
-  std::ofstream log_file_;
   LearningData learning_data_;
   TrajectoryEvaluator trajectory_evaluator_;
 };
