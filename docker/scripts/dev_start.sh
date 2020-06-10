@@ -178,6 +178,8 @@ do
         NO_PULL_IMAGE="yes"
         info "running without pulling docker image"
         ;;
+    -y)
+        ;;
     stop)
 	stop_containers
 	exit 0
