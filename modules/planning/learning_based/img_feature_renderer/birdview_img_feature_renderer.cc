@@ -45,7 +45,6 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
       FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
   if (map_name != "sunnyvale_with_two_offices" && map_name != "sunnyvale") {
     AERROR << "Map other than sunnyvale_with_two_offices are not supported";
-    return false;
   }
   // TODO(Jinyun): add sunnyvale map or draw basemap online
   if (map_name == "sunnyvale") {
