@@ -28,6 +28,7 @@ VERSION_X86_64="dev-18.04-x86_64-20200601_0507"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
+USER_AGREE="no"
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -45,13 +46,19 @@ function check_agreement() {
   cat $AGREEMENT_FILE
   tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
   echo $tip
-  read -n 1 user_agreed
-  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+  if [ "$USER_AGREE" == "yes" ]; then
     cp $AGREEMENT_FILE $agreement_record
     echo "$tip" >> $agreement_record
     echo "$user_agreed" >> $agreement_record
   else
-    exit 1
+    read -n 1 user_agreed
+    if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+      cp $AGREEMENT_FILE $agreement_record
+      echo "$tip" >> $agreement_record
+      echo "$user_agreed" >> $agreement_record
+    else
+      exit 1
+    fi
   fi
 }
 
@@ -101,6 +108,10 @@ fi
 
 if [ -e /proc/sys/kernel ]; then
     echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+fi
+
+if [ "$1" == "-y" ]; then
+    USER_AGREE="yes"
 fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
