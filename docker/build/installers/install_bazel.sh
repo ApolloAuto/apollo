@@ -64,8 +64,7 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   info "Done installing bazel ${VERSION} with buildifier and buildozer"
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
-  INSTALL_MODE="$1" ; shift
-
+  INSTALL_MODE="$1"
   # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
   # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
   if [[ "${INSTALL_MODE}" == "build" ]]; then
@@ -95,10 +94,9 @@ elif [ "$TARGET_ARCH" == "aarch64" ]; then
   else # Download Mode
     PKG_NAME="bazel-${VERSION}-aarch64-linux-gnu.tar.gz"
     DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-    CHECKSUM="5441854177a7ca08a57adcdc02984fa40bb53667b89c89dc57383e57f77a20cc"
-
+    CHECKSUM="56b904a06a809da59c0a20ccd570f51d0b9d9daa4cf551a73357ffd0a09d61d0"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-    tar xzvf "${PKG_NAME}"
+    tar xvf "${PKG_NAME}"
     pushd "bazel-${VERSION}-aarch64-linux-gnu"
         DEST=${SYSROOT_DIR} bash install.sh
     popd
