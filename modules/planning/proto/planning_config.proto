@@ -358,7 +358,8 @@ message TopicConfig {
   optional string relative_map_topic = 7;
   optional string routing_request_topic = 8;
   optional string routing_response_topic = 9;
-  optional string traffic_light_detection_topic = 10;
+  optional string storry_telling_topic = 10;
+  optional string traffic_light_detection_topic = 11;
 }
 
 message PlanningConfig {
