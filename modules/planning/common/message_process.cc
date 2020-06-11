@@ -25,6 +25,7 @@
 #include "cyber/record/record_reader.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -37,6 +38,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::canbus::Chassis;
+using apollo::common::time::Clock;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;
@@ -1066,6 +1068,8 @@ void MessageProcess::GeneratePlanningTag(
 
 void MessageProcess::GenerateLearningDataFrame(
     LearningDataFrame* learning_data_frame) {
+  const double start_timestamp = Clock::NowInSeconds();
+
   // add timestamp_sec & frame_num
   learning_data_frame->set_message_timestamp_sec(
       localizations_.back().header().timestamp_sec());
@@ -1104,6 +1108,12 @@ void MessageProcess::GenerateLearningDataFrame(
 
   // add trajectory_points
   GenerateADCTrajectoryPoints(localizations_, learning_data_frame);
+
+  const double end_timestamp = Clock::NowInSeconds();
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  ADEBUG << "MessageProcess: start_timestamp[" << start_timestamp
+         << "] end_timestamp[" << end_timestamp
+         << "] time_diff_ms[" << time_diff_ms << "]";
 }
 
 }  // namespace planning
