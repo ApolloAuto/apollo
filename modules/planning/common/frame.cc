@@ -490,7 +490,7 @@ void Frame::ReadTrafficLights() {
 
 void Frame::ReadLearningDataFrame() {
   learning_data_frame_.Clear();
-  if (FLAGS_planning_offline_mode != 1) {
+  if (FLAGS_planning_learning_mode != 2 && FLAGS_planning_learning_mode != 3) {
     return;
   }
   auto learning_data_frame = FeatureOutput::GetLatestLearningDataFrame();

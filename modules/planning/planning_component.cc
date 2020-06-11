@@ -51,7 +51,7 @@ bool PlanningComponent::Init() {
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
 
-  if (FLAGS_planning_offline_mode > 0) {
+  if (FLAGS_planning_learning_mode > 0) {
     if (!message_process_.Init(config_)) {
       AERROR << "failed to init MessageProcess";
       return false;
@@ -154,7 +154,7 @@ bool PlanningComponent::Proc(
     return false;
   }
 
-  if (FLAGS_planning_offline_mode == 1) {
+  if (FLAGS_planning_learning_mode == 2 || FLAGS_planning_learning_mode == 3) {
     // data process for online training
     message_process_.OnChassis(*local_view_.chassis);
     message_process_.OnPrediction(*local_view_.prediction_obstacles);
