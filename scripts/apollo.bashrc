@@ -93,11 +93,6 @@ function c_family_ext() {
 
 function find_c_cpp_srcs() {
   find "$@" -type f -name "*.h"   \
-                 -o -name "*.hpp" \
-                 -o -name "*.hxx" \
-                 -o -name "*.cc"  \
-                 -o -name "*.cpp" \
-                 -o -name "*.hxx" \
                  -o -name "*.c"   \
                  -o -name "*.hpp" \
                  -o -name "*.cpp" \
