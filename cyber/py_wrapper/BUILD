@@ -16,7 +16,6 @@ cc_library(
     name = "py3_cyber",
     srcs = ["py_cyber.cc"],
     hdrs = ["py_cyber.h"],
-    defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
         "//third_party:python3",
@@ -46,7 +45,6 @@ cc_library(
     name = "py3_record",
     srcs = ["py_record.cc"],
     hdrs = ["py_record.h"],
-    defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber/message:py_message",
         "//cyber/record",
@@ -79,7 +77,6 @@ cc_library(
     name = "py3_time",
     srcs = ["py_time.cc"],
     hdrs = ["py_time.h"],
-    defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
         "//third_party:python3",
@@ -99,7 +96,6 @@ cc_library(
     name = "py3_timer",
     srcs = ["py_timer.cc"],
     hdrs = ["py_timer.h"],
-    defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
         "//third_party:python3",
@@ -118,7 +114,6 @@ cc_library(
     name = "py3_parameter",
     srcs = ["py_parameter.cc"],
     hdrs = ["py_parameter.h"],
-    defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         ":py3_cyber",
         "//cyber:cyber_core",

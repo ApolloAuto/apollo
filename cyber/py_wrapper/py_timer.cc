@@ -16,20 +16,14 @@
 
 #include "cyber/py_wrapper/py_timer.h"
 
-#if PY_MAJOR_VERSION >= 3
 #include <python3.6m/Python.h>
-#else
-#include <python2.7/Python.h>
-#endif
 
 #include <set>
 #include <string>
 
 using apollo::cyber::PyTimer;
 
-#if PY_MAJOR_VERSION >= 3
 #define PyInt_AsLong PyLong_AsLong
-#endif
 
 template <typename T>
 T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
@@ -164,7 +158,6 @@ static PyMethodDef _cyber_timer_methods[] = {
 };
 
 /// Init function of this module
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__cyber_timer_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
@@ -180,9 +173,3 @@ PyMODINIT_FUNC PyInit__cyber_timer_py3(void) {
 
   return PyModule_Create(&module_def);
 }
-#else
-PyMODINIT_FUNC init_cyber_timer(void) {
-  AINFO << "init _cyber_timer";
-  Py_InitModule("_cyber_timer", _cyber_timer_methods);
-}
-#endif
