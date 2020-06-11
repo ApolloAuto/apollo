@@ -746,7 +746,7 @@ bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
   int start_interpolation_index = GetIndexFromS(hueristic_start_s).id;
   int end_interpolation_index = static_cast<int>(
       std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1));
-  int min_index = start_interpolation_index;
+  int min_index = std::min(start_interpolation_index, num_segments_ - 1);
   for (int i = start_interpolation_index; i < end_interpolation_index; ++i) {
     const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < *min_distance) {
