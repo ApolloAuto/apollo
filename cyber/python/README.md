@@ -1,11 +1,11 @@
-# Python Wrapper for Cyber RT
+# Python3 Wrapper for Cyber RT
 
 ## Usage
 
 Make sure you have built Apollo successfully, which should also have added
 `/apollo/cyber/python` to the PYTHONPATH for you. Then in Python code:
 
-```python
+```python3
 import sys
 
 from cyber_py3 import cyber
