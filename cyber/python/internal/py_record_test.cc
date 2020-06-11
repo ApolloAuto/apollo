@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/py_wrapper/py_record.h"
+#include "cyber/python/internal/py_record.h"
 
 #include <set>
 #include <string>

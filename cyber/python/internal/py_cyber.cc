@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/py_wrapper/py_cyber.h"
+#include "cyber/python/internal/py_cyber.h"
 
 #include <python3.6m/Python.h>
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_PY_WRAPPER_PY_CYBER_H_
-#define CYBER_PY_WRAPPER_PY_CYBER_H_
+#ifndef CYBER_PYTHON_INTERNAL_PY_CYBER_H_
+#define CYBER_PYTHON_INTERNAL_PY_CYBER_H_
 
 #include <unistd.h>
 
@@ -561,4 +561,4 @@ class PyServiceUtils {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_PY_WRAPPER_PY_CYBER_H_
+#endif  // CYBER_PYTHON_INTERNAL_PY_CYBER_H_
