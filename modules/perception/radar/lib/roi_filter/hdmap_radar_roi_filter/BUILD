@@ -22,7 +22,7 @@ cc_library(
         "//modules/perception/common/geometry:roi_filter",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/registerer",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
         "//modules/perception/radar/lib/interface:base_roi_filter",
         "@eigen",
     ],
