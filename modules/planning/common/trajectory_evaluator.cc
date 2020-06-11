@@ -30,7 +30,7 @@ namespace planning {
 
 void TrajectoryEvaluator::WriteLog(const std::string& msg) {
   AERROR << msg;
-  if (FLAGS_planning_offline_mode == 2) {
+  if (FLAGS_planning_learning_mode == 1) {
     EvaluatorLogger::GetStream() <<  msg << std::endl;
   }
 }
