@@ -72,7 +72,8 @@ bazel_build_with_dist_cache \
 	//modules/perception/lib/... \
 	//modules/perception/tool/... \
 	//modules/perception/map/...  \
-	//modules/perception/proto/...
+	//modules/perception/proto/... \
+	//modules/perception/radar/...
 
 
 bazel_test_with_dist_cache \
@@ -97,7 +98,8 @@ bazel_test_with_dist_cache \
 	//modules/perception/fusion/... \
 	//modules/perception/lib/... \
 	//modules/perception/tool/... \
-	//modules/perception/map/...
+	//modules/perception/map/... \
+	//modules/perception/radar/...
 
 bash scripts/install_esdcan_library.sh install
 bazel_build_with_dist_cache //modules/drivers/...
@@ -120,7 +122,6 @@ echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
-# TODO(?): bazel build //modules/perception/radar/...
 # TODO(?): bazel build //modules/perception/production/...
 # TODO(?): bazel build //modules/perception/onboard/...
 
