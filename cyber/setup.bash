@@ -6,26 +6,29 @@ fi
 
 export CYBER_PATH="${APOLLO_ROOT_DIR}/cyber"
 
+export QT5_PATH="/usr/local/qt5"
+export LD_LIBRARY_PATH=${QT5_PATH}/lib:$LD_LIBRARY_PATH
+export QT_QPA_PLATFORM_PLUGIN_PATH=${QT5_PATH}/plugins
+add_to_path "${QT5_PATH}/bin"
+
 bazel_bin_path="${APOLLO_ROOT_DIR}/bazel-bin"
-cyber_tool_path="${bazel_bin_path}/cyber/tools"
 apollo_tool_path="${bazel_bin_path}/modules/tools"
+visualizer_path="${apollo_tool_path}/visualizer"
+
+cyber_tool_path="${bazel_bin_path}/cyber/tools"
 recorder_path="${cyber_tool_path}/cyber_recorder"
 monitor_path="${cyber_tool_path}/cyber_monitor"
-visualizer_path="${apollo_tool_path}/visualizer"
+
 launch_path="${CYBER_PATH}/tools/cyber_launch"
 channel_path="${CYBER_PATH}/tools/cyber_channel"
 node_path="${CYBER_PATH}/tools/cyber_node"
 service_path="${CYBER_PATH}/tools/cyber_service"
-qt_path=/usr/local/Qt5.12.2/5.12.2/gcc_64
 rosbag_to_record_path="${bazel_bin_path}/modules/data/tools/rosbag_to_record"
 
-export LD_LIBRARY_PATH=${qt_path}/lib:$LD_LIBRARY_PATH
-export QT_QPA_PLATFORM_PLUGIN_PATH=${qt_path}/plugins
 
 # TODO(all): place all these in one place and add_to_path
 for entry in "${recorder_path}" "${monitor_path}" "${launch_path}" \
     "${channel_path}" "${node_path}" "${service_path}" \
-    "${qt_path}/bin" \
     "${visualizer_path}" \
     "${rosbag_to_record_path}" ; do
     add_to_path "${entry}"
