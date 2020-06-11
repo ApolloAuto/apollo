@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/py_wrapper/py_parameter.h"
+#include "cyber/python/internal/py_parameter.h"
 
 #include <python3.6m/Python.h>
 
 #include <set>
 #include <string>
 
-#include "cyber/py_wrapper/py_cyber.h"
+#include "cyber/python/internal/py_cyber.h"
 
 using apollo::cyber::Parameter;
 using apollo::cyber::PyNode;

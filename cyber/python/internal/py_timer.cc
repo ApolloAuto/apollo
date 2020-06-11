@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/py_wrapper/py_timer.h"
+#include "cyber/python/internal/py_timer.h"
 
 #include <python3.6m/Python.h>
 

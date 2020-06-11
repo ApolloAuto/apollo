@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//cyber/python/cyber_py3:__pkg__"])
 
 cc_binary(
     name = "_cyber_py3.so",
