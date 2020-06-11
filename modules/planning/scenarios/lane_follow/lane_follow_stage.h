@@ -70,9 +70,6 @@ class LaneFollowStage : public Stage {
 
   void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
 
-  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
-                       const std::string& name, const double time_diff_ms);
-
  private:
   ScenarioConfig config_;
   std::unique_ptr<Stage> stage_;
