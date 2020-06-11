@@ -16,11 +16,7 @@
 
 #include "cyber/py_wrapper/py_cyber.h"
 
-#if PY_MAJOR_VERSION >= 3
 #include <python3.6m/Python.h>
-#else
-#include <python2.7/Python.h>
-#endif
 
 #include <string>
 #include <vector>
@@ -34,17 +30,11 @@ using apollo::cyber::PyService;
 using apollo::cyber::PyServiceUtils;
 using apollo::cyber::PyWriter;
 
-#if PY_MAJOR_VERSION >= 3
 #define PyInt_AsLong PyLong_AsLong
 #define PyInt_FromLong PyLong_FromLong
 #define PYOBJECT_NULL_STRING PyBytes_FromStringAndSize("", 0)
 #define C_STR_TO_PY_BYTES(cstr) \
   PyBytes_FromStringAndSize(cstr.c_str(), cstr.size())
-#else
-#define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
-#define C_STR_TO_PY_BYTES(cstr) \
-  PyString_FromStringAndSize(cstr.c_str(), cstr.size())
-#endif
 
 google::protobuf::Message *PyChannelUtils::raw_msg_class_ = nullptr;
 
@@ -911,7 +901,6 @@ static PyMethodDef _cyber_methods[] = {
 };
 
 /// Init function of this module
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__cyber_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
@@ -927,6 +916,3 @@ PyMODINIT_FUNC PyInit__cyber_py3(void) {
 
   return PyModule_Create(&module_def);
 }
-#else
-PyMODINIT_FUNC init_cyber(void) { Py_InitModule("_cyber", _cyber_methods); }
-#endif

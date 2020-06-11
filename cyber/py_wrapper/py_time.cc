@@ -16,11 +16,7 @@
 
 #include "cyber/py_wrapper/py_time.h"
 
-#if PY_MAJOR_VERSION >= 3
 #include <python3.6m/Python.h>
-#else
-#include <python2.7/Python.h>
-#endif
 
 #include <set>
 #include <string>
@@ -336,7 +332,6 @@ static PyMethodDef _cyber_time_methods[] = {
 };
 
 /// Init function of this module
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__cyber_time_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
@@ -352,9 +347,3 @@ PyMODINIT_FUNC PyInit__cyber_time_py3(void) {
 
   return PyModule_Create(&module_def);
 }
-#else
-PyMODINIT_FUNC init_cyber_time(void) {
-  AINFO << "init _cyber_time";
-  Py_InitModule("_cyber_time", _cyber_time_methods);
-}
-#endif

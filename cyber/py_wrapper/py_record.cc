@@ -16,11 +16,7 @@
 
 #include "cyber/py_wrapper/py_record.h"
 
-#if PY_MAJOR_VERSION >= 3
 #include <python3.6m/Python.h>
-#else
-#include <python2.7/Python.h>
-#endif
 
 #include <set>
 #include <string>
@@ -28,15 +24,9 @@
 using apollo::cyber::record::PyRecordReader;
 using apollo::cyber::record::PyRecordWriter;
 
-#if PY_MAJOR_VERSION >= 3
 #define PYOBJECT_NULL_STRING PyBytes_FromStringAndSize("", 0)
 #define C_STR_TO_PY_BYTES(cstr) \
   PyBytes_FromStringAndSize(cstr.c_str(), cstr.size())
-#else
-#define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
-#define C_STR_TO_PY_BYTES(cstr) \
-  PyString_FromStringAndSize(cstr.c_str(), cstr.size())
-#endif
 
 template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
@@ -107,11 +97,8 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   Py_DECREF(bld_name);
 
   PyObject *bld_data =
-#if PY_MAJOR_VERSION >= 3
       Py_BuildValue("y#", result.data.c_str(), result.data.length());
-#else
-      Py_BuildValue("s#", result.data.c_str(), result.data.length());
-#endif
+
   ACHECK(bld_data) << "Py_BuildValue returns NULL.";
   PyDict_SetItemString(pyobj_bag_message, "data", bld_data);
   Py_DECREF(bld_data);
@@ -571,7 +558,6 @@ static PyMethodDef _cyber_record_methods[] = {
 };
 
 /// Init function of this module
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
@@ -588,9 +574,3 @@ PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
   AINFO << "init _cyber_record_py3";
   return PyModule_Create(&module_def);
 }
-#else
-PyMODINIT_FUNC init_cyber_record(void) {
-  AINFO << "init _cyber_record";
-  Py_InitModule("_cyber_record", _cyber_record_methods);
-}
-#endif

@@ -16,11 +16,7 @@
 
 #include "cyber/py_wrapper/py_parameter.h"
 
-#if PY_MAJOR_VERSION >= 3
 #include <python3.6m/Python.h>
-#else
-#include <python2.7/Python.h>
-#endif
 
 #include <set>
 #include <string>
@@ -33,15 +29,9 @@ using apollo::cyber::PyParameter;
 using apollo::cyber::PyParameterClient;
 using apollo::cyber::PyParameterServer;
 
-#if PY_MAJOR_VERSION >= 3
 #define PYOBJECT_NULL_STRING PyBytes_FromStringAndSize("", 0)
 #define C_STR_TO_PY_BYTES(cstr) \
   PyBytes_FromStringAndSize(cstr.c_str(), cstr.size())
-#else
-#define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
-#define C_STR_TO_PY_BYTES(cstr) \
-  PyString_FromStringAndSize(cstr.c_str(), cstr.size())
-#endif
 
 template <typename T>
 T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
@@ -609,7 +599,6 @@ static PyMethodDef _cyber_parameter_methods[] = {
 };
 
 /// Init function of this module
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__cyber_parameter_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
@@ -625,9 +614,3 @@ PyMODINIT_FUNC PyInit__cyber_parameter_py3(void) {
 
   return PyModule_Create(&module_def);
 }
-#else
-PyMODINIT_FUNC init_cyber_parameter(void) {
-  AINFO << "init _cyber_parameter";
-  Py_InitModule("_cyber_parameter", _cyber_parameter_methods);
-}
-#endif
