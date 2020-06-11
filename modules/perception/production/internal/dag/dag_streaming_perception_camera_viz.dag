@@ -1,0 +1,14 @@
+module_config {
+  module_library : "/apollo/modules/perception/production/internal/lib/libperception_component_camera_visualization.so"
+  components {
+    class_name : "CameraVisualizationComponent"
+    config {
+      name: "CameraVisualization"
+      config_file_path: "/apollo/modules/perception/production/internal/conf/perception/visualization/camera_visualization_component_config.pb.txt"
+      readers {
+          channel: "/perception/inner/camera_viz_msg"
+      }
+      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+    }
+  }
+}

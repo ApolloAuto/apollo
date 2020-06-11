@@ -1,0 +1,4 @@
+main_camera_name: "front_6mm"
+visualizer_conf_model_name: "GLFusionVisualizer_camera_onboard"
+show_hdmap: false
+hdmap_search_distance: 150.0

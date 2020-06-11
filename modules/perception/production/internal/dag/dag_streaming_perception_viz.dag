@@ -1,0 +1,14 @@
+module_config {
+  module_library : "/apollo/modules/perception/production/internal/lib/libperception_component_visualization.so"
+  components {
+    class_name : "VisualizationComponent"
+    config {
+      name: "PerceptionOnboardVisualization"
+      config_file_path: ""
+      readers {
+          channel: "/perception/inner/PrefusedObjects"
+      }
+      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+    }
+  }
+}
