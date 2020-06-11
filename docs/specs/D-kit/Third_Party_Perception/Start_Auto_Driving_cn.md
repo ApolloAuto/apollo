@@ -12,15 +12,15 @@
 
 ## 启动流程
 
-1. 进入docker环境，用gpu编译项目，编译项目，启动DreamView。
+1. 进入docker环境，编译apollo，启动DreamView。
 
         cd /apollo
         bash docker/scripts/dev_start.sh
         bash docker/scripts/dev_into.sh
-        bash apollo.sh build_opt_gpu
+        bash apollo.sh build_opt
         bash scripts/bootstrap.sh 
  
-2. 在浏览器中打开(http://localhost:8888), 选择`Dev_Kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Camera、Transform模块。
+2. 在浏览器中打开(http://localhost:8888), 选择`Dev_Kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Camera、Transform模块。
 
 ![camera_demonstration_dreamview](images/camera_demonstration_dreamview.jpeg)
 
@@ -34,7 +34,7 @@
 	|`/tf`|确保能正常输出数据|
 	|`/tf_static`|确保能正常输出数据|
 
-4.  使用`cyber_launch start modules/perception/production/launch/perception_camera.launch`命令启动摄像头感知，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在DreamView上查看障碍物信息：查看车前方10米处运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，行人黄色，车辆绿色），如下图所示：
+4.  在`DreamView`的`Module Controller`界面点击`ThirdPartyPerception`按钮启动双目相机感知，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在DreamView上查看障碍物信息：查看车前方10米处运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，行人黄色，车辆绿色），如下图所示：
 
 ![camera_demonstration_dreamview_obstacle](images/camera_demonstration_dreamview_obstacle.png)
 
@@ -44,7 +44,7 @@
 
 ![camera_demonstration_perception_obstacle2](images/camera_demonstration_perception_obstacle2.png)
 
-确保在Dreamview上能看到障碍物并且`/apollo/perception/smartereyeobstacles`有障碍物信息。
+确保在Dreamview上能看到障碍物并且`/apollo/perception/obstacles`有障碍物信息。
 
 5. 在Module Controller标签页启动Planning、Prediction、Routing、Control模块确保这些模块能够正常启动。
 
