@@ -102,3 +102,14 @@ function find_c_cpp_srcs() {
                  -o -name "*.cxx" \
                  -o -name "*.cu"
 }
+
+## Prevent multiple entries of my_bin_path in PATH
+function add_to_path() {
+    if [ -z "$1" ]; then
+        return
+    fi
+    local my_bin_path="$1"
+    if [ -n "${PATH##*${my_bin_path}}" ] && [ -n "${PATH##*${my_bin_path}:*}" ]; then
+        export PATH=$PATH:${my_bin_path}
+    fi
+}
