@@ -16,6 +16,7 @@
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 
 #include <cuda_runtime_api.h>
+
 #include <algorithm>
 #include <cstring>
 #include <numeric>
@@ -140,14 +141,14 @@ void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
                                        const std::vector<int>& indexes,
                                        const float normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
-    int index = indexes.at(i);
-    if (index >= kMaxNumPoints) continue;
+    int point_pos = indexes.at(i);
+    if (point_pos >= kMaxNumPoints) continue;
     const auto& point = pc_ptr->at(i);
-    out_points_array[index * kNumPointFeature + 0] = point.x;
-    out_points_array[index * kNumPointFeature + 1] = point.y;
-    out_points_array[index * kNumPointFeature + 2] = point.z;
+    out_points_array[point_pos * kNumPointFeature + 0] = point.x;
+    out_points_array[point_pos * kNumPointFeature + 1] = point.y;
+    out_points_array[point_pos * kNumPointFeature + 2] = point.z;
     // delta of timestamp between prev and cur frames
-    out_points_array[index * kNumPointFeature + 3] = 0;
+    out_points_array[point_pos * kNumPointFeature + 3] = 0;
   }
 }
 
@@ -157,24 +158,24 @@ void PointPillarsDetection::FusePointCloudToArray(
     const std::vector<int>& indexes, const float normalizing_factor) {
   PclToArray(pc_ptr, out_points_array, indexes, normalizing_factor);
 
-  int index_counter = pc_ptr->size();
+  int point_counter = pc_ptr->size();
   for (auto iter = prev_point_clouds_.rbegin();
       iter != prev_point_clouds_.rend(); ++iter) {
     base::PointDCloudPtr& prev_pc_ptr = iter->first;
     // transform prev world point cloud to current sensor's coordinates
     for (size_t i = 0; i < prev_pc_ptr->size(); ++i) {
-      int index = indexes.at(index_counter);
-      if (index >= kMaxNumPoints) continue;
+      int point_pos = indexes.at(point_counter);
+      if (point_pos >= kMaxNumPoints) continue;
       const auto& point = prev_pc_ptr->at(i);
       Eigen::Vector3d trans_point(point.x, point.y, point.z);
       trans_point = lidar_frame_ref_->lidar2world_pose.inverse() * trans_point;
-      out_points_array[index * kNumPointFeature + 0] =
+      out_points_array[point_pos * kNumPointFeature + 0] =
           static_cast<float>(trans_point(0));
-      out_points_array[index * kNumPointFeature + 1] =
+      out_points_array[point_pos * kNumPointFeature + 1] =
           static_cast<float>(trans_point(1));
-      out_points_array[index * kNumPointFeature + 2] =
+      out_points_array[point_pos * kNumPointFeature + 2] =
           static_cast<float>(trans_point(2));
-      out_points_array[index * kNumPointFeature + 3] =
+      out_points_array[point_pos * kNumPointFeature + 3] =
           static_cast<float>(lidar_frame_ref_->timestamp - iter->second);
       index_counter++;
     }
