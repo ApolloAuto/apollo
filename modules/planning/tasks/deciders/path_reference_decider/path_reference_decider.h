@@ -59,6 +59,18 @@ class PathReferenceDecider : public Task {
       const PathBoundary *path_bound,
       std::vector<std::vector<common::math::LineSegment2d>>
           &path_bound_segments);
+
+  /**
+   * @brief convert path points from evenly dt to evenly ds distribution
+   *
+   * @param path_bound
+   * @param path_reference
+   * @param evaluated_path_reference
+   */
+  void EvaluatePathReference(
+      const PathBoundary *path_bound,
+      const std::vector<common::TrajectoryPoint> &path_reference,
+      std::vector<common::PathPoint> *evaluated_path_reference);
 };
 
 }  // namespace planning
