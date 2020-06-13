@@ -15,6 +15,7 @@ bazel_bin_path="${APOLLO_ROOT_DIR}/bazel-bin"
 apollo_tool_path="${bazel_bin_path}/modules/tools"
 visualizer_path="${apollo_tool_path}/visualizer"
 
+cyber_bin_path="${bazel_bin_path}/cyber"
 cyber_tool_path="${bazel_bin_path}/cyber/tools"
 recorder_path="${cyber_tool_path}/cyber_recorder"
 monitor_path="${cyber_tool_path}/cyber_monitor"
@@ -27,7 +28,7 @@ rosbag_to_record_path="${bazel_bin_path}/modules/data/tools/rosbag_to_record"
 
 
 # TODO(all): place all these in one place and add_to_path
-for entry in "${recorder_path}" "${monitor_path}" "${launch_path}" \
+for entry in "${cyber_bin_path}" "${recorder_path}" "${monitor_path}" "${launch_path}" \
     "${channel_path}" "${node_path}" "${service_path}" \
     "${visualizer_path}" \
     "${rosbag_to_record_path}" ; do
