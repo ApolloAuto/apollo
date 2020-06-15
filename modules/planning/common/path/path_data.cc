@@ -33,6 +33,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::PointENU;
 using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::PointFactory;
@@ -265,6 +266,16 @@ bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
 void PathData::set_path_label(const std::string &label) { path_label_ = label; }
 
 const std::string &PathData::path_label() const { return path_label_; }
+
+void PathData::set_trimmed_path_bound_size(
+    const size_t trimmed_path_bound_size) {
+  trimmed_path_bound_size_ = trimmed_path_bound_size;
+}
+
+void PathData::set_path_reference_end_pose(
+    const PointENU &path_reference_end_pose) {
+  path_reference_end_pos_ = path_reference_end_pose;
+}
 
 }  // namespace planning
 }  // namespace apollo
