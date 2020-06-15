@@ -239,6 +239,7 @@ cc_library(
         "//modules/planning/proto:pad_msg_cc_proto",
         "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/routing/proto:routing_cc_proto",
+        "//modules/storytelling/proto:story_cc_proto",
     ],
 )
 
@@ -498,6 +499,7 @@ cc_library(
         "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/prediction/util:data_extraction",
         "//modules/routing/proto:routing_cc_proto",
+        "//modules/storytelling/proto:story_cc_proto",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
     ],

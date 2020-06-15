@@ -800,7 +800,7 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   ACHECK(!frame.reference_line_info().empty());
 
   ScenarioConfig::ScenarioType scenario_type;
-  if (FLAGS_planning_offline_mode == 1) {
+  if (FLAGS_planning_learning_mode == 2) {
     scenario_type = ScenarioDispatchLearning();
   } else {
     scenario_type = ScenarioDispatchNonLearning(frame);

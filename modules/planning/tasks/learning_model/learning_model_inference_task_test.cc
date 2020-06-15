@@ -30,7 +30,11 @@ class LearningModelInferenceTaskTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::LEARNING_MODEL_INFERENCE_TASK);
-    config_.mutable_learning_model_inference_task_config();
+    auto* inference_config =
+        config_.mutable_learning_model_inference_task_config();
+    inference_config->set_model_file(
+        "/apollo/modules/planning/data/model/test_model_conv_rnn.pt");
+    inference_config->set_use_cuda(true);
   }
 
   virtual void TearDown() {}
