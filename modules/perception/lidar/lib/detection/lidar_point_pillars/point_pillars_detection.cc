@@ -32,10 +32,9 @@ using base::PointD;
 using base::PointF;
 
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
-  point_pillars_ptr_.reset(
-      new PointPillars(kReproduceResultMode, kScoreThreshold,
-                       kNmsOverlapThreshold, FLAGS_pfe_onnx_file,
-                       FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(new PointPillars(
+      kReproduceResultMode, kScoreThreshold, kNmsOverlapThreshold,
+      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
   return true;
 }
 
@@ -146,8 +145,8 @@ void PointPillarsDetection::GetObjects(
         Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
     Eigen::Translation3f translation(x, y, z);
     Eigen::Affine3f affine3f = translation * quater.toRotationMatrix();
-    for (float vx : std::vector<float>{dx/2, -dx/2}) {
-      for (float vy : std::vector<float>{dy/2, -dy/2}) {
+    for (float vx : std::vector<float>{dx / 2, -dx / 2}) {
+      for (float vy : std::vector<float>{dy / 2, -dy / 2}) {
         for (float vz : std::vector<float>{0, dz}) {
           Eigen::Vector3f v3f(vx, vy, vz);
           v3f = affine3f * v3f;
@@ -174,8 +173,8 @@ void PointPillarsDetection::GetObjects(
     object->lidar_supplement.raw_classification_methods.push_back(Name());
     object->sub_type = GetObjectSubType(labels->at(i));
     object->type = base::kSubType2TypeMap.at(object->sub_type);
-    object->lidar_supplement.raw_probs.back()[
-        static_cast<int>(object->type)] = 1.0f;
+    object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
+        1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());

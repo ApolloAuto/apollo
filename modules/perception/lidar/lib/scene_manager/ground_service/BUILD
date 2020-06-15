@@ -19,7 +19,7 @@ cc_library(
         ":ground_struct",
         "//modules/perception/common/i_lib",
         "//modules/perception/lidar/lib/scene_manager",
-        "//modules/perception/lidar/lib/scene_manager/ground_service/proto:ground_service_config_proto",
+        "//modules/perception/lidar/lib/scene_manager/ground_service/proto:ground_service_config_cc_proto",
     ],
 )
 

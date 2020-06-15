@@ -19,6 +19,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/lib/utils",
+        "//modules/perception/lidar/app/proto:lidar_obstacle_detection_config_cc_proto",
         "//modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_detection",
         "//modules/perception/lidar/lib/map_manager",
         "//modules/perception/lidar/lib/object_builder",
@@ -36,6 +37,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/lib/utils",
+        "//modules/perception/lidar/app/proto:lidar_obstacle_segmentation_config_cc_proto",
         "//modules/perception/lidar/lib/map_manager",
         "//modules/perception/lidar/lib/object_builder",
         "//modules/perception/lidar/lib/object_filter_bank",
@@ -55,6 +57,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/utils",
+        "//modules/perception/lidar/app/proto:lidar_obstacle_tracking_config_cc_proto",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
         "@eigen",

@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
-#include <opencv2/opencv.hpp>
-
 #include <fstream>
 #include <memory>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_split.h"
 #include "pcl/io/pcd_io.h"

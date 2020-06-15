@@ -48,8 +48,7 @@ class PointPillarsDetection {
                   const float normalizing_factor);
 
   void GetObjects(std::vector<std::shared_ptr<base::Object>>* objects,
-                  const Eigen::Affine3d& pose,
-                  std::vector<float>* detections,
+                  const Eigen::Affine3d& pose, std::vector<float>* detections,
                   std::vector<int>* labels);
 
   base::ObjectSubType GetObjectSubType(const int label);

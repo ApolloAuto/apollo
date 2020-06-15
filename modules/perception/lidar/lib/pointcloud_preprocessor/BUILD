@@ -11,9 +11,11 @@ cc_library(
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util",
+        "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/pointcloud_preprocessor/proto:pointcloud_preprocessor_config_cc_proto",
         "@eigen",
     ],
 )

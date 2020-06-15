@@ -106,8 +106,8 @@ void NmsCuda::DoNmsCuda(const int host_filter_count,
   dim3 threads(num_threads_);
 
   uint64_t *dev_mask = NULL;
-  GPU_CHECK(cudaMalloc(
-      &dev_mask, host_filter_count * col_blocks * sizeof(uint64_t)));
+  GPU_CHECK(
+      cudaMalloc(&dev_mask, host_filter_count * col_blocks * sizeof(uint64_t)));
 
   nms_kernel<<<blocks, threads>>>(host_filter_count, nms_overlap_threshold_,
                                   dev_sorted_box_for_nms, dev_mask,
@@ -115,10 +115,9 @@ void NmsCuda::DoNmsCuda(const int host_filter_count,
 
   // postprocess for nms output
   std::vector<uint64_t> host_mask(host_filter_count * col_blocks);
-  GPU_CHECK(
-      cudaMemcpy(&host_mask[0], dev_mask,
-                 sizeof(uint64_t) * host_filter_count * col_blocks,
-                 cudaMemcpyDeviceToHost));
+  GPU_CHECK(cudaMemcpy(&host_mask[0], dev_mask,
+                       sizeof(uint64_t) * host_filter_count * col_blocks,
+                       cudaMemcpyDeviceToHost));
   std::vector<uint64_t> remv(col_blocks);
   memset(&remv[0], 0, sizeof(uint64_t) * col_blocks);
 

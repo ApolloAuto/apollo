@@ -11,7 +11,7 @@ cc_library(
         "//modules/common/util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/scene_manager:scene_service",
-        "//modules/perception/lidar/lib/scene_manager/roi_service/proto:roi_service_proto",
+        "//modules/perception/lidar/lib/scene_manager/roi_service/proto:roi_service_cc_proto",
         "@eigen",
     ],
 )

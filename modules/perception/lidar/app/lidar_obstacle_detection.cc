@@ -39,8 +39,8 @@ bool LidarObstacleDetection::Init(
   ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
-  config_file = cyber::common::GetAbsolutePath(
-      config_file, "lidar_obstacle_detection.conf");
+  config_file = cyber::common::GetAbsolutePath(config_file,
+                                               "lidar_obstacle_detection.conf");
 
   LidarObstacleDetectionConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));

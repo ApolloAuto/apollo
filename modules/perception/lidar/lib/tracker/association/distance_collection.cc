@@ -271,7 +271,7 @@ float SemanticMapDistance(const MlfTrackData& track_dat,
     }
     float min_dist = *(std::min_element(dist_vec.begin(), dist_vec.end()));
     ADEBUG << "min_dist calculated for track id " << track_dat.track_id_
-          << " object id " << cur_obj->track_id << " distance " << min_dist;
+           << " object id " << cur_obj->track_id << " distance " << min_dist;
     return min_dist;
   }
 

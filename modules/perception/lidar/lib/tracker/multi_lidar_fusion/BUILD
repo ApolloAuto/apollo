@@ -68,6 +68,7 @@ cc_library(
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -82,6 +83,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_object_util",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -96,6 +98,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/association:distance_collection",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )

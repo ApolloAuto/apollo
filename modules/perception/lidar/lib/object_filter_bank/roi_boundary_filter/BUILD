@@ -13,6 +13,8 @@ cc_library(
         "//modules/perception/common/geometry:common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_object_filter",
+        "//modules/perception/proto:roi_boundary_filter_config_cc_proto",
+        "@com_google_googletest//:gtest",
         "@eigen",
     ],
     alwayslink = True,

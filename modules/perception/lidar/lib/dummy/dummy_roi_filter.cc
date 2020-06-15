@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/dummy/dummy_roi_filter.h"
+#include <numeric>
 
 namespace apollo {
 namespace perception {

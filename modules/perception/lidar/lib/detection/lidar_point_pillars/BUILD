@@ -5,28 +5,29 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "params",
+    hdrs = ["params.h"],
+)
+
+cc_library(
     name = "point_pillars",
     srcs = [
         "point_pillars.cc",
-        ":anchor_mask_cuda",
-        ":nms_cuda",
-        ":postprocess_cuda",
-        ":scatter_cuda",
     ],
     hdrs = [
-        "anchor_mask_cuda.h",
-        "common.h",
-        "nms_cuda.h",
-        "params.h",
         "point_pillars.h",
-        "postprocess_cuda.h",
-        "scatter_cuda.h",
     ],
     deps = [
+        ":anchor_mask_cuda",
+        ":common",
+        ":nms_cuda",
+        ":params",
+        ":postprocess_cuda",
         ":preprocess_points",
+        ":scatter_cuda",
         "//modules/perception/common:perception_gflags",
         "@local_config_cuda//cuda:cudart",
-        "@tensorrt",
+        "@local_config_tensorrt//:tensorrt",
     ],
     alwayslink = True,
 )
@@ -54,26 +55,39 @@ cc_library(
     name = "preprocess_points",
     srcs = [
         "preprocess_points.cc",
-        ":preprocess_points_cuda",
     ],
     hdrs = [
         "preprocess_points.h",
-        "preprocess_points_cuda.h",
     ],
+    deps = [
+        "preprocess_points_cuda",
+        ":common",
+    ],
+)
+
+cc_library(
+    name = "common",
+    hdrs = ["common.h"],
 )
 
 cuda_library(
     name = "anchor_mask_cuda",
     srcs = ["anchor_mask_cuda.cu"],
     hdrs = ["anchor_mask_cuda.h"],
-    deps = ["@local_config_cuda//cuda:cudart"],
+    deps = [
+        ":common",
+        "@local_config_cuda//cuda:cudart",
+    ],
 )
 
 cuda_library(
     name = "nms_cuda",
     srcs = ["nms_cuda.cu"],
     hdrs = ["nms_cuda.h"],
-    deps = ["@local_config_cuda//cuda:cudart"],
+    deps = [
+        ":common",
+        "@local_config_cuda//cuda:cudart",
+    ],
 )
 
 cuda_library(
@@ -81,6 +95,8 @@ cuda_library(
     srcs = ["postprocess_cuda.cu"],
     hdrs = ["postprocess_cuda.h"],
     deps = [
+        ":common",
+        ":nms_cuda",
         "@local_config_cuda//cuda:cudart",
     ],
 )
@@ -89,14 +105,20 @@ cuda_library(
     name = "preprocess_points_cuda",
     srcs = ["preprocess_points_cuda.cu"],
     hdrs = ["preprocess_points_cuda.h"],
-    deps = ["@local_config_cuda//cuda:cudart"],
+    deps = [
+        ":common",
+        "@local_config_cuda//cuda:cudart",
+    ],
 )
 
 cuda_library(
     name = "scatter_cuda",
     srcs = ["scatter_cuda.cu"],
     hdrs = ["scatter_cuda.h"],
-    deps = ["@local_config_cuda//cuda:cudart"],
+    deps = [
+        ":common",
+        "@local_config_cuda//cuda:cudart",
+    ],
 )
 
 cc_test(

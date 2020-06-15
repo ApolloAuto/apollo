@@ -345,13 +345,12 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
       new float[test_obj.max_num_pillars * test_obj.max_num_points_per_pillar *
                 test_obj.num_point_feature];
   float* pillar_coors = new float[test_obj.max_num_pillars * 4];
-  float* sparse_pillar_map = new float[test_obj.num_inds_for_scan *
-                                       test_obj.num_inds_for_scan];
+  float* sparse_pillar_map = new float[kNumIndsForScan * kNumIndsForScan];
 
   int host_pillar_count[1] = {0};
   test_obj.Preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,
-                      num_points_per_pillar, pillar_point_feature,
-                      pillar_coors, sparse_pillar_map, host_pillar_count);
+                      num_points_per_pillar, pillar_point_feature, pillar_coors,
+                      sparse_pillar_map, host_pillar_count);
   EXPECT_EQ(1, num_points_per_pillar[0]);
   EXPECT_FLOAT_EQ(12.9892, pillar_point_feature[0]);
   EXPECT_EQ(74, x_coors[1]);
@@ -431,51 +430,45 @@ TEST(TestSuite, CheckPreprocessGPU) {
                        kMaxNumPillars * sizeof(float)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_sparse_pillar_map),
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_point_feature),
-      kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature
-          * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_coors),
-      kMaxNumPillars * 4 * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_point_feature),
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_coors),
+                       kMaxNumPillars * 4 * sizeof(float)));
 
   GPU_CHECK(cudaMemcpy(dev_points, points_array,
                        in_num_points * kNumBoxCorners * sizeof(float),
                        cudaMemcpyHostToDevice));
   GPU_CHECK(cudaMemset(dev_x_coors, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_y_coors, 0, kMaxNumPillars * sizeof(int)));
-  GPU_CHECK(cudaMemset(dev_num_points_per_pillar, 0,
-                       kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(
+      cudaMemset(dev_num_points_per_pillar, 0, kMaxNumPillars * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_pillar_point_feature, 0,
                        kMaxNumPillars * kMaxNumPointsPerPillar *
                            kNumPointFeature * sizeof(float)));
-  GPU_CHECK(cudaMemset(dev_pillar_coors, 0,
-                       kMaxNumPillars * 4 * sizeof(float)));
+  GPU_CHECK(
+      cudaMemset(dev_pillar_coors, 0, kMaxNumPillars * 4 * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_sparse_pillar_map, 0,
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
 
   test_obj.PreprocessGPU(dev_points, in_num_points, dev_x_coors, dev_y_coors,
-                        dev_num_points_per_pillar, dev_pillar_point_feature,
-                        dev_pillar_coors, dev_sparse_pillar_map,
-                        host_pillar_count);
+                         dev_num_points_per_pillar, dev_pillar_point_feature,
+                         dev_pillar_coors, dev_sparse_pillar_map,
+                         host_pillar_count);
 
   int* x_coors = new int[kMaxNumPillars];
   int* y_coors = new int[kMaxNumPillars];
   float* num_points_per_pillar = new float[kMaxNumPillars];
   int* sparse_pillar_map = new int[kNumIndsForScan * kNumIndsForScan];
-  float* pillar_point_feature = new float[kMaxNumPillars
-                                          * kMaxNumPointsPerPillar
-                                          * kNumPointFeature];
+  float* pillar_point_feature =
+      new float[kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature];
   float* pillar_coors = new float[kMaxNumPillars * 4];
-  GPU_CHECK(cudaMemcpy(x_coors, dev_x_coors,
-                       kMaxNumPillars * sizeof(int),
+  GPU_CHECK(cudaMemcpy(x_coors, dev_x_coors, kMaxNumPillars * sizeof(int),
                        cudaMemcpyDeviceToHost));
-  GPU_CHECK(cudaMemcpy(y_coors, dev_y_coors,
-                       kMaxNumPillars * sizeof(int),
+  GPU_CHECK(cudaMemcpy(y_coors, dev_y_coors, kMaxNumPillars * sizeof(int),
                        cudaMemcpyDeviceToHost));
   GPU_CHECK(cudaMemcpy(num_points_per_pillar, dev_num_points_per_pillar,
-                       kMaxNumPillars * sizeof(float),
-                       cudaMemcpyDeviceToHost));
+                       kMaxNumPillars * sizeof(float), cudaMemcpyDeviceToHost));
   GPU_CHECK(cudaMemcpy(sparse_pillar_map, dev_sparse_pillar_map,
                        kNumIndsForScan * kNumIndsForScan * sizeof(int),
                        cudaMemcpyDeviceToHost));
