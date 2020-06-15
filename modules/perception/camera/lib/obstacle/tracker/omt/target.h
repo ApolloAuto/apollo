@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <vector>
+
+#include <boost/circular_buffer.hpp>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/object_template_manager.h"
