@@ -25,10 +25,10 @@
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 if dpkg -l |grep -q "libpython2.7-dev"; then
-	echo "libpython2.7-dev is already installed"
+    echo "libpython2.7-dev is already installed"
 else
-	sudo apt-get -y update
-	sudo apt-get -y install libpython2.7-dev
+    sudo apt-get -y update
+    sudo apt-get -y install libpython2.7-dev libatlas-base-dev
 fi
 
 cp WORKSPACE.in WORKSPACE
@@ -65,16 +65,7 @@ bazel_build_with_dist_cache \
     //modules/localization/... \
     //modules/prediction/... \
     //modules/contrib/... \
-    //modules/third_party_perception/... \
-	//modules/perception/base/... \
-	//modules/perception/common/... \
-	//modules/perception/fusion/... \
-	//modules/perception/lib/... \
-	//modules/perception/tool/... \
-	//modules/perception/map/...  \
-	//modules/perception/proto/... \
-	//modules/perception/radar/...
-
+    //modules/third_party_perception/...
 
 bazel_test_with_dist_cache \
     //cyber/... \
@@ -92,19 +83,15 @@ bazel_test_with_dist_cache \
     //modules/guardian/... \
     //modules/map/... \
     //modules/contrib/... \
-    //modules/third_party_perception/... \
-	//modules/perception/base/... \
-	//modules/perception/common/... \
-	//modules/perception/fusion/... \
-	//modules/perception/lib/... \
-	//modules/perception/tool/... \
-	//modules/perception/map/... \
-	//modules/perception/radar/...
+    //modules/third_party_perception/...
 
 bash scripts/install_esdcan_library.sh install
 bazel_build_with_dist_cache //modules/drivers/...
 bazel_test_with_dist_cache //modules/drivers/...
 bash scripts/install_esdcan_library.sh uninstall
+
+bazel_build_with_dist_cache $(bazel query //modules/perception/... except //modules/perception/camera/...)
+bazel_test_with_dist_cache $(bazel query //modules/perception/... except //modules/perception/camera/...)
 
 bazel_build_with_dist_cache //modules/tools/...
 bazel build //modules/tools/...
@@ -122,12 +109,7 @@ echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
-# TODO(?): bazel build //modules/perception/production/...
-# TODO(?): bazel build //modules/perception/onboard/...
-
 # The following three is TensorRT related
-# TODO(storypku): bazel build //modules/perception/lidar/...
-# TODO(storypku): bazel build //modules/perception/inference/...
 # TODO(storypku): bazel build //modules/perception/camera/...
 
 # TODO(?): bazel test //modules/prediction/...
