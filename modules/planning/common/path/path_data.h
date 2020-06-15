@@ -141,7 +141,7 @@ class PathData {
    *
    */
   // use path reference for optimization target
-  bool is_valid_path_reference_;
+  bool is_valid_path_reference_ = false;
   // path bound size after trimmed according to the learning model output
   size_t trimmed_path_bound_size_{0};
   // end pose of the reference
