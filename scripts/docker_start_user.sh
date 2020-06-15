@@ -34,7 +34,7 @@ function setup_user_bashrc() {
     local uid="$1"
     local gid="$2"
     local user_home="/home/$3"
-    cp -rf /etc/skel/.{profile,bash*} "${user_home}"
+    # cp -rf /etc/skel/.{profile,bash*} "${user_home}"
     local RCFILES_DIR="/opt/apollo/rcfiles"
     local rc
     if [[ -d "${RCFILES_DIR}" ]]; then
@@ -46,7 +46,8 @@ function setup_user_bashrc() {
         done
     fi
     # Set user files ownership to current user, such as .bashrc, .profile, etc.
-    chown -R "${uid}:${gid}" "${user_home}"
+    # chown -R "${uid}:${gid}" "${user_home}"
+    chown -R "${uid}:${gid}" ${user_home}/.*
 }
 
 function setup_user_account_if_not_exist() {
@@ -78,7 +79,7 @@ function grant_device_permissions() {
 function setup_apollo_directories() {
     local apollo_dir="/opt/apollo"
     [[ -d "${apollo_dir}" ]] || mkdir -p "${apollo_dir}"
-    chown -R "${uid}:${gid}" "${apollo_dir}"
+    # chown -R "${uid}:${gid}" "${apollo_dir}"
 }
 
 ##===================== Main ==============================##
