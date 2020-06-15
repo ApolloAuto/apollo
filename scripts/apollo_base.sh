@@ -45,7 +45,7 @@ function set_lib_path() {
   export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
 
   if [ -e /usr/local/cuda/ ];then
-    export PATH=/usr/local/cuda/bin:$PATH
+    add_to_path "/usr/local/cuda/bin"
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
     export C_INCLUDE_PATH=/usr/local/cuda/include:$C_INCLUDE_PATH
     export CPLUS_INCLUDE_PATH=/usr/local/cuda/include:$CPLUS_INCLUDE_PATH
@@ -65,7 +65,7 @@ function set_lib_path() {
 
   # Set teleop paths
   export PYTHONPATH="${APOLLO_ROOT_DIR}/modules/teleop/common:${PYTHONPATH}"
-  export PATH="${APOLLO_ROOT_DIR}/modules/teleop/common/scripts:${PATH}"
+  add_to_path "/apollo/modules/teleop/common/scripts"
 }
 
 function create_data_dir() {

@@ -92,6 +92,9 @@ class Stage {
 
   virtual Stage::StageStatus FinishScenario();
 
+  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                       const std::string& name, const double time_diff_ms);
+
  protected:
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
   std::vector<Task*> task_list_;

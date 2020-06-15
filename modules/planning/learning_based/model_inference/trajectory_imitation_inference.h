@@ -30,23 +30,23 @@
 namespace apollo {
 namespace planning {
 
-class TrajectoryConvRnnInference : public ModelInference {
+class TrajectoryImitationInference : public ModelInference {
  public:
   /**
    * @brief Constructor
    */
-  explicit TrajectoryConvRnnInference(
+  explicit TrajectoryImitationInference(
       const LearningModelInferenceTaskConfig& config);
 
   /**
    * @brief Destructor
    */
-  virtual ~TrajectoryConvRnnInference() = default;
+  virtual ~TrajectoryImitationInference() = default;
 
   /**
    * @brief Get the name of model inference
    */
-  std::string GetName() override { return "TRAJECTORY_CONV_RNN_INFERENCE"; };
+  std::string GetName() override { return "TRAJECTORY_IMITATION_INFERENCE"; };
 
   /**
    * @brief load a learned model

@@ -45,7 +45,6 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
       FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
   if (map_name != "sunnyvale_with_two_offices" && map_name != "sunnyvale") {
     AERROR << "Map other than sunnyvale_with_two_offices are not supported";
-    return false;
   }
   // TODO(Jinyun): add sunnyvale map or draw basemap online
   if (map_name == "sunnyvale") {
@@ -596,11 +595,24 @@ bool BirdviewImgFeatureRenderer::CropByPose(const double ego_x,
                                             const double ego_heading,
                                             const cv::Mat& base_map,
                                             cv::Mat* img_feature) {
+  // use dimension of base_roadmap_img as it's assumed that all base maps have
+  // the same size
   cv::Point2i ego_img_idx = GetPointImgIdx(ego_x - map_bottom_left_point_x_,
                                            ego_y - map_bottom_left_point_y_, 0,
                                            base_roadmap_img_.size[0]);
+  if (ego_img_idx.x < 0 || ego_img_idx.x + 1 > base_roadmap_img_.size[1] ||
+      ego_img_idx.y < 0 || ego_img_idx.y + 1 > base_roadmap_img_.size[0]) {
+    AERROR << "ego vehicle position out of bound of base map";
+    return false;
+  }
+
   const int rough_radius = static_cast<int>(sqrt(
       config_.height() * config_.height() + config_.width() * config_.width()));
+  if (ego_img_idx.x - rough_radius < 0 || ego_img_idx.y - rough_radius < 0) {
+    AERROR << "cropping out of bound of base map";
+    return false;
+  }
+
   cv::Rect rough_rect(ego_img_idx.x - rough_radius,
                       ego_img_idx.y - rough_radius, 2 * rough_radius,
                       2 * rough_radius);
