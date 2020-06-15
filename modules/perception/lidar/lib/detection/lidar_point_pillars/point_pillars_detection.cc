@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 
-#include <cuda_runtime_api.h>
-
 #include <algorithm>
 #include <cstring>
 #include <numeric>
@@ -24,6 +22,7 @@
 #include <vector>
 
 #include "cyber/common/log.h"
+#include "include/cuda_runtime_api.h"
 
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -79,8 +78,8 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   // transform point cloud into an array
   float* points_array;
   int num_points = original_cloud_->size();
-  int num_indexes;
-  std::vector<int> indexes;
+  int num_point_indexes;
+  std::vector<int> point_indexes;
   if (kFuseFrames && kNumFuseFrames > 1) {
     // before fusing
     while (!prev_point_clouds_.empty() &&
@@ -92,12 +91,12 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
     for (auto& pc_timestamp : prev_point_clouds_) {
       num_points += pc_timestamp.first->size();
     }
-    num_indexes = num_points;
-    indexes = GenerateIndexes(0, num_indexes, kShufflePoints);
+    num_point_indexes = num_points;
+    point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
     num_points = std::min(num_points, kMaxNumPoints);
     points_array = new float[num_points * kNumPointFeature];
     memset(points_array, 0, num_points * kNumPointFeature * sizeof(float));
-    FusePointCloudToArray(original_cloud_, points_array, indexes,
+    FusePointCloudToArray(original_cloud_, points_array, point_indexes,
                           kNormalizingFactor);
 
     // after fusing
@@ -107,12 +106,13 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
     prev_point_clouds_.emplace_back(
         std::make_pair(original_world_cloud_, frame->timestamp));
   } else {
-    num_indexes = num_points;
-    indexes = GenerateIndexes(0, num_indexes, kShufflePoints);
+    num_point_indexes = num_points;
+    point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
     num_points = std::min(num_points, kMaxNumPoints);
     points_array = new float[num_points * kNumPointFeature];
     memset(points_array, 0, num_points * kNumPointFeature * sizeof(float));
-    PclToArray(original_cloud_, points_array, indexes, kNormalizingFactor);
+    PclToArray(original_cloud_, points_array, point_indexes,
+               kNormalizingFactor);
   }
   pcl_to_array_time_ = timer.toc(true);
 
@@ -138,10 +138,10 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
 
 void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
                                        float* out_points_array,
-                                       const std::vector<int>& indexes,
+                                       const std::vector<int>& point_indexes,
                                        const float normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
-    int point_pos = indexes.at(i);
+    int point_pos = point_indexes.at(i);
     if (point_pos >= kMaxNumPoints) continue;
     const auto& point = pc_ptr->at(i);
     out_points_array[point_pos * kNumPointFeature + 0] = point.x;
@@ -155,8 +155,8 @@ void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
 // TODO(chenjiahao): write a cuda version to accelerate
 void PointPillarsDetection::FusePointCloudToArray(
     const base::PointFCloudPtr& pc_ptr, float* out_points_array,
-    const std::vector<int>& indexes, const float normalizing_factor) {
-  PclToArray(pc_ptr, out_points_array, indexes, normalizing_factor);
+    const std::vector<int>& point_indexes, const float normalizing_factor) {
+  PclToArray(pc_ptr, out_points_array, point_indexes, normalizing_factor);
 
   int point_counter = pc_ptr->size();
   for (auto iter = prev_point_clouds_.rbegin();
@@ -164,7 +164,7 @@ void PointPillarsDetection::FusePointCloudToArray(
     base::PointDCloudPtr& prev_pc_ptr = iter->first;
     // transform prev world point cloud to current sensor's coordinates
     for (size_t i = 0; i < prev_pc_ptr->size(); ++i) {
-      int point_pos = indexes.at(point_counter);
+      int point_pos = point_indexes.at(point_counter);
       if (point_pos >= kMaxNumPoints) continue;
       const auto& point = prev_pc_ptr->at(i);
       Eigen::Vector3d trans_point(point.x, point.y, point.z);
@@ -177,7 +177,7 @@ void PointPillarsDetection::FusePointCloudToArray(
           static_cast<float>(trans_point(2));
       out_points_array[point_pos * kNumPointFeature + 3] =
           static_cast<float>(lidar_frame_ref_->timestamp - iter->second);
-      index_counter++;
+      point_counter++;
     }
   }
 }

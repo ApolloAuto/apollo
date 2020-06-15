@@ -46,12 +46,14 @@ class PointPillarsDetection {
   std::string Name() const { return "PointPillarsDetection"; }
 
  private:
-  void PclToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
-                  const std::vector<int>& indexes, float normalizing_factor);
+  void PclToArray(const base::PointFCloudPtr& pc_ptr,
+                  float* out_points_array,
+                  const std::vector<int>& point_indexes,
+                  float normalizing_factor);
 
   void FusePointCloudToArray(const base::PointFCloudPtr& pc_ptr,
                              float* out_points_array,
-                             const std::vector<int>& indexes,
+                             const std::vector<int>& point_indexes,
                              float normalizing_factor);
 
   std::vector<int> GenerateIndexes(int start_index, int size, bool shuffle);
