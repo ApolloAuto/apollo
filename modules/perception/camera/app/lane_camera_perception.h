@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"

@@ -1,21 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
-load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
-
-cc_proto_library(
-    name = "detection_cc_proto",
-    deps = [
-        ":detection_proto",
-    ],
-)
-
-proto_library(
-    name = "detection_proto",
-    srcs = ["detection.proto"],
-)
 
 cc_library(
     name = "detection",
@@ -23,13 +9,13 @@ cc_library(
     hdrs = ["detection.h"],
     deps = [
         ":cropbox",
-        ":detection_cc_proto",
         ":select",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/camera/lib/traffic_light/proto:detection_cc_proto",
+        "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
@@ -58,11 +44,6 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
     ],
-)
-
-py_proto_library(
-    name = "detection_py_pb2",
-    deps = ["detection_proto"],
 )
 
 cpplint()

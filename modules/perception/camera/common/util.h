@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <fstream>
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 

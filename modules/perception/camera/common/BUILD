@@ -31,6 +31,7 @@ cc_library(
     deps = [
         ":undistortion_handler",
         "//modules/perception/base",
+        "//third_party:nppi",
     ],
 )
 
@@ -54,6 +55,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/base",
+        "//modules/perception/camera/common/proto:object_template_meta_schema_cc_proto",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",

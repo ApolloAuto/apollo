@@ -12,6 +12,8 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/lane/common:common_functions",
+        "//modules/perception/camera/lib/lane/common/proto:darkSCNN_cc_proto",
+        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN/proto:darkSCNN_postprocessor_cc_proto",
         "//modules/perception/lib/registerer",
         "//modules/perception/lib/utils",
     ],

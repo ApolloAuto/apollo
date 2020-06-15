@@ -22,7 +22,7 @@
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
 
 namespace apollo {
 namespace perception {

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
-#include "modules/perception/camera/lib/traffic_light/tracker/semantic.pb.h"
+#include "modules/perception/camera/lib/traffic_light/tracker/proto/semantic.pb.h"
 
 namespace apollo {
 namespace perception {

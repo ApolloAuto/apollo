@@ -21,11 +21,11 @@ cc_library(
     hdrs = ["target.h"],
     deps = [
         ":frame_list",
-        ":omt_cc_proto",
         ":track_object",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/common",
+        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
     ],
 )
 
@@ -48,12 +48,12 @@ cc_library(
     deps = [
         ":frame_list",
         ":obstacle_reference",
-        ":omt_proto",
         ":target",
         "//cyber/common:file",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/obstacle/tracker/common",
+        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
     ],
 )
 
@@ -63,11 +63,11 @@ cc_library(
     hdrs = ["obstacle_reference.h"],
     deps = [
         ":frame_list",
-        ":omt_cc_proto",
         ":target",
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
+        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
     ],
 )
 

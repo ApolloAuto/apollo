@@ -11,6 +11,7 @@ cuda_library(
     deps = [
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
+        "//modules/perception/camera/common:util",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "@local_config_cuda//cuda:cudart",
     ],

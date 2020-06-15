@@ -20,6 +20,7 @@ cc_library(
         ":transform_server",
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
+        "//modules/perception/proto:motion_service_cc_proto",
     ],
 )
 
@@ -39,23 +40,21 @@ cc_library(
 cc_binary(
     name = "offline_obstacle_pipeline",
     srcs = ["offline_obstacle_pipeline.cc"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     linkstatic = False,
     deps = [
         ":transform_server",
         ":visualizer",
         "//modules/perception/base",
         "//modules/perception/camera/app:obstacle_camera_perception",
+        "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
+        "@opencv",
     ],
 )
 

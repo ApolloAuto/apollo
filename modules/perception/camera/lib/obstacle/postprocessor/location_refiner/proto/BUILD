@@ -6,20 +6,20 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "perception_cc_proto",
+    name = "location_refiner_cc_proto",
     deps = [
-        ":perception_proto",
+        ":location_refiner_proto",
     ],
 )
 
 proto_library(
-    name = "perception_proto",
-    srcs = ["perception.proto"],
+    name = "location_refiner_proto",
+    srcs = ["location_refiner.proto"],
 )
 
 py_proto_library(
-    name = "perception_py_pb2",
+    name = "location_refiner_py_pb2",
     deps = [
-        ":perception_proto",
+        ":location_refiner_proto",
     ],
 )

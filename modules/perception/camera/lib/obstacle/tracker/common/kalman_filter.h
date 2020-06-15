@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 #include "Eigen/Core"
@@ -205,9 +206,10 @@ void KalmanFilterConstState<N>::Correct(const VectorNd &measurement) {
 
     // compute likelihood
     residual_ = measurement - predict_state_;
-    likelihood_ = std::exp(-0.5 * residual_.transpose() *
-                           measurements_cov.inverse() * residual_) /
-                  std::sqrt(2 * M_PI * measurements_cov.determinant());
+    double kval =
+        -0.5 * residual_.transpose() * measurements_cov.inverse() * residual_;
+    likelihood_ =
+        std::exp(kval) / std::sqrt(2 * M_PI * measurements_cov.determinant());
   }
 }
 // [END] KalmanFilterConstState

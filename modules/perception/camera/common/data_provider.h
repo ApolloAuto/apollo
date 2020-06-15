@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <nppi.h>
-
 #include <memory>
 #include <string>
 

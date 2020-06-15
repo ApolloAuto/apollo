@@ -6,20 +6,20 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "perception_cc_proto",
+    name = "tracking_feature_cc_proto",
     deps = [
-        ":perception_proto",
+        ":tracking_feature_proto",
     ],
 )
 
 proto_library(
-    name = "perception_proto",
-    srcs = ["perception.proto"],
+    name = "tracking_feature_proto",
+    srcs = ["tracking_feature.proto"],
 )
 
 py_proto_library(
-    name = "perception_py_pb2",
+    name = "tracking_feature_py_pb2",
     deps = [
-        ":perception_proto",
+        ":tracking_feature_proto",
     ],
 )
