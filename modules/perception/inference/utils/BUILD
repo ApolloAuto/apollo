@@ -32,6 +32,7 @@ cuda_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
+        "//modules/perception/base",
         "@eigen",
         "@local_config_cuda//cuda:cudart",
     ],

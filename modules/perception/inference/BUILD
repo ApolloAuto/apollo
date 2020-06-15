@@ -42,7 +42,7 @@ cc_test(
 )
 
 cc_library(
-    name = "inference_factory_lib",
+    name = "inference_factory",
     srcs = ["inference_factory.cc"],
     hdrs = ["inference_factory.h"],
     deps = [
@@ -59,8 +59,9 @@ cc_test(
     size = "small",
     srcs = ["inference_factory_test.cc"],
     deps = [
-        ":inference_factory_lib",
+        ":inference_factory",
         "@com_google_googletest//:gtest_main",
+        "@paddlepaddle",
     ],
 )
 

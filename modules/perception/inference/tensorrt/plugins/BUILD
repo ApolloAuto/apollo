@@ -18,6 +18,11 @@ cc_library(
         "*.h",
     ]),
     linkstatic = True,
+    deps = [
+        "@local_config_cuda//cuda:cublas",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_cuda//cuda:cudnn",
+    ],
 )
 
 cuda_library(
@@ -28,7 +33,7 @@ cuda_library(
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
         "@local_config_cuda//cuda:cudart",
-        "@tensorrt",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 
@@ -40,7 +45,7 @@ cuda_library(
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
         "@local_config_cuda//cuda:cudart",
-        "@tensorrt",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 
@@ -52,7 +57,7 @@ cuda_library(
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
         "@local_config_cuda//cuda:cudart",
-        "@tensorrt",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 
@@ -64,7 +69,8 @@ cuda_library(
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
         "@local_config_cuda//cuda:cudart",
-        "@tensorrt",
+        "@local_config_cuda//cuda:cudnn",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 
@@ -87,6 +93,7 @@ cc_test(
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cublas",
     ],
 )
 

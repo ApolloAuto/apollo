@@ -22,7 +22,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-template<typename Dtype>
+template <typename Dtype>
 __global__ void ReLU(const int nthreads, const Dtype *in_data,
                      const float negative_slope, Dtype *out_data) {
   int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -34,21 +34,19 @@ __global__ void ReLU(const int nthreads, const Dtype *in_data,
   }
 }
 
-int ReLUPlugin::enqueue(int batchSize,
-                         const void *const *inputs,
-                         void **outputs,
-                         void *workspace,
-                         cudaStream_t stream) {
+int ReLUPlugin::enqueue(int batchSize, const void *const *inputs,
+                        void **outputs, void *workspace, cudaStream_t stream) {
   const int thread_size = 512;
   const int block_size =
-      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize
-          + thread_size - 1) / thread_size;
-  const int nthreads = input_dims_.d[0] * input_dims_.d[1]
-                       * input_dims_.d[2] * batchSize;
+      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize +
+       thread_size - 1) /
+      thread_size;
+  const int nthreads =
+      input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize;
 
-  ReLU<< < block_size, thread_size, 0, stream >> > (
-          nthreads, (const float *) (inputs[0]),
-          negative_slope_,  reinterpret_cast<float *>(outputs[0]));
+  ReLU<<<block_size, thread_size, 0, stream>>>(
+      nthreads, (const float *)(inputs[0]), negative_slope_,
+      reinterpret_cast<float *>(outputs[0]));
   return 1;
 }
 }  // namespace inference

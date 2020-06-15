@@ -33,7 +33,11 @@ PaddleNet::PaddleNet(const std::string &model_file,
 
 bool PaddleNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   paddle::AnalysisConfig config;
-  config.SetModel(model_file_, param_file_);
+  // TODO(storypku):
+  // paddle::AnalysisConfig seems to have no such method:
+  // SetModel(const string&, const string&)
+  // config.SetModel(model_file_, param_file_);
+  config.SetModel(model_file_);
   config.SwitchUseFeedFetchOps(false);
   if (gpu_id_ >= 0) {
     config.EnableUseGpu(MemoryPoolInitSizeMb, gpu_id_);

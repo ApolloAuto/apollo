@@ -19,7 +19,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/inference.h"
-#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
@@ -67,13 +66,11 @@ int main(int argc, char **argv) {
   if (FLAGS_int8) {
     apollo::perception::inference::BatchStream stream(2, 50, "./batches/");
     nvinfer1::Int8EntropyCalibrator calibrator(stream, 0, true, "./");
-    std::cout << "int8" << std::endl;
-    rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNetInt8", proto_file, weight_file, outputs, inputs, model_root);
+    rt_net = new apollo::perception::inference::RTNet(
+        proto_file, weight_file, outputs, inputs, model_root);
   } else {
-    std::cout << "fp32" << std::endl;
-    rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNet", proto_file, weight_file, outputs, inputs);
+    rt_net = new apollo::perception::inference::RTNet(proto_file, weight_file,
+                                                      outputs, inputs);
   }
   const int height = 608;
   const int width = 1024;

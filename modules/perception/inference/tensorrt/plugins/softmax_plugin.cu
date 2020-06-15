@@ -21,10 +21,8 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-int SoftmaxPlugin::enqueue(int batch_size,
-                           const void *const *inputs,
-                           void **outputs,
-                           void *workspace,
+int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
+                           void **outputs, void *workspace,
                            cudaStream_t stream) {
   const float *in_data = reinterpret_cast<const float *>(inputs[0]);
   float *out_data = reinterpret_cast<float *>(outputs[0]);
@@ -37,37 +35,18 @@ int SoftmaxPlugin::enqueue(int batch_size,
   int c_stride = h * h_stride;
   int n_stride = c * c_stride;
 
-  cudnnSetTensor4dDescriptorEx(input_desc_,
-                               CUDNN_DATA_FLOAT,
-                               n,
-                               c,
-                               h,
-                               w,
-                               n_stride,
-                               c_stride,
-                               h_stride,
-                               w_stride);
-  cudnnSetTensor4dDescriptorEx(output_desc_,
-                               CUDNN_DATA_FLOAT,
-                               n,
-                               c,
-                               h,
-                               w,
-                               n_stride,
-                               c_stride,
-                               h_stride,
-                               w_stride);
+  cudnnSetTensor4dDescriptorEx(input_desc_, CUDNN_DATA_FLOAT, n, c, h, w,
+                               n_stride, c_stride, h_stride, w_stride);
+  cudnnSetTensor4dDescriptorEx(output_desc_, CUDNN_DATA_FLOAT, n, c, h, w,
+                               n_stride, c_stride, h_stride, w_stride);
 
   float a = 1.0;
   float b = 0.0;
   cudnnSetStream(cudnn_, stream);
-  cudnnSoftmaxForward(cudnn_, \
-                        CUDNN_SOFTMAX_ACCURATE, \
-                        CUDNN_SOFTMAX_MODE_CHANNEL, \
-                      (const void *) (&a), \
-                        input_desc_, in_data, \
-                        (const void *) (&b), \
-                        output_desc_, out_data);
+  cudnnSoftmaxForward(cudnn_, CUDNN_SOFTMAX_ACCURATE,
+                      CUDNN_SOFTMAX_MODE_CHANNEL, (const void *)(&a),
+                      input_desc_, in_data, (const void *)(&b), output_desc_,
+                      out_data);
 
   return 1;
 }

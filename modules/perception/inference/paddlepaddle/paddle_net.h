@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "paddle/paddle_analysis_config.h"
 #include "paddle/paddle_inference_api.h"
 
 #include "modules/perception/inference/inference.h"
