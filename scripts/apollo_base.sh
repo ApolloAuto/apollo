@@ -58,6 +58,8 @@ function set_lib_path() {
     export LD_LIBRARY_PATH=/usr/local/libtorch_gpu/lib:$LD_LIBRARY_PATH
   fi
   export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle_dep/mkldnn/lib/:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle/lib:$LD_LIBRARY_PATH
+
 
   local PY_LIB_PATH="${APOLLO_ROOT_DIR}/py_proto"
   local PY_TOOLS_PATH="${APOLLO_ROOT_DIR}/modules/tools"
