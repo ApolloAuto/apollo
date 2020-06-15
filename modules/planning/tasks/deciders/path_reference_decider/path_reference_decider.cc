@@ -95,8 +95,10 @@ Status PathReferenceDecider::Process(Frame *frame,
 
   // write path reference end pose to PathData
   common::PointENU path_reference_end_pos;
-  path_reference_end_pos.set_x(evaluated_path_reference.back().x());
-  path_reference_end_pos.set_y(evaluated_path_reference.back().y());
+  path_reference_end_pos.set_x(
+      evaluated_path_reference.at(trimmed_path_bound_size_ - 1).x());
+  path_reference_end_pos.set_y(
+      evaluated_path_reference.at(trimmed_path_bound_size_ - 1).y());
   reference_line_info->mutable_path_data()->set_path_reference_end_pose(
       path_reference_end_pos);
 

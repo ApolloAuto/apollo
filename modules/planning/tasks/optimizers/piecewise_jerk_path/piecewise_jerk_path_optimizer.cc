@@ -80,25 +80,12 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
   ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
+  const auto& path_data = reference_line_info_->path_data();
 
   std::vector<PathData> candidate_path_data;
   for (const auto& path_boundary : path_boundaries) {
-    // when path reference is ready
-    // set end lateral to be at the path reference
-    // TODO: 3 parameters (trimmed_path_boundary_size, is learning output
-    // valid, end path position)
     size_t path_boundary_size = path_boundary.boundary().size();
-    bool test_learning_output_valid = true;
-    if (path_boundary.label().find("regular") != std::string::npos &&
-        test_learning_output_valid) {
-      common::SLPoint path_reference_end_sl;
-      reference_line.XYToSL(path_reference_end_sl.position(),
-                            &path_reference_end_sl);
-      end_state[0] = path_reference_end_sl.l();
 
-      // trim path bounds
-      path_boundary_size = trimmed_path_boundary_size;
-    }
     // if the path_boundary is normal, it is possible to have less than 2 points
     // skip path boundary of this kind
     if (path_boundary.label().find("regular") != std::string::npos &&
@@ -135,6 +122,19 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       }
     }
 
+    if (path_boundary.label().find("regular") != std::string::npos &&
+        path_data.is_valid_path_reference()) {
+      // when path reference is ready
+      // set end lateral to be at the path reference
+      common::SLPoint path_reference_end_sl;
+      reference_line.XYToSL(path_data.path_reference_end_pose(),
+                            &path_reference_end_sl);
+      end_state[0] = path_reference_end_sl.l();
+
+      // trim path bounds
+      path_boundary_size = path_data.trimmed_path_bound_size();
+    }
+
     const auto& veh_param =
         common::VehicleConfigHelper::GetConfig().vehicle_param();
     const double lat_acc_bound =
@@ -148,10 +148,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       ddl_bounds.emplace_back(-lat_acc_bound - kappa, lat_acc_bound - kappa);
     }
 
+    std::vector<std::pair<double, double>> trimmed_path_boundary(
+        path_boundary.boundary().begin(),
+        path_boundary.boundary().begin() + path_boundary_size);
+
     bool res_opt =
         OptimizePath(init_frenet_state.second, end_state,
-                     path_boundary.delta_s(), path_boundary.boundary(),
-                     ddl_bounds, w, &opt_l, &opt_dl, &opt_ddl, max_iter);
+                     path_boundary.delta_s(), trimmed_path_boundary, ddl_bounds,
+                     w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
       for (size_t i = 0; i < path_boundary_size; i += 4) {
