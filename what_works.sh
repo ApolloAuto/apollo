@@ -67,6 +67,7 @@ bazel_build_with_dist_cache \
     //modules/localization/... \
     //modules/prediction/... \
     //modules/contrib/... \
+    //modules/perception/... \
     //modules/third_party_perception/...
 
 bazel_test_with_dist_cache \
@@ -92,8 +93,7 @@ bazel_build_with_dist_cache //modules/drivers/...
 bazel_test_with_dist_cache //modules/drivers/...
 bash scripts/install_esdcan_library.sh uninstall
 
-bazel_build_with_dist_cache $(bazel query //modules/perception/... except //modules/perception/camera/...)
-bazel_test_with_dist_cache $(bazel query //modules/perception/... except //modules/perception/camera/...)
+bazel_test_with_dist_cache $(bazel query //modules/perception/... except //modules/perception/camera/test/...)
 
 bazel_build_with_dist_cache //modules/tools/...
 bazel build //modules/tools/...
