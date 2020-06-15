@@ -24,7 +24,7 @@ _TF_TENSORRT_CONFIG_REPO = "TF_TENSORRT_CONFIG_REPO"
 _TF_TENSORRT_VERSION = "TF_TENSORRT_VERSION"
 _TF_NEED_TENSORRT = "TF_NEED_TENSORRT"
 
-_TF_TENSORRT_LIBS = ["nvinfer", "nvinfer_plugin", "nvparsers"]
+_TF_TENSORRT_LIBS = ["nvinfer", "nvinfer_plugin", "nvparsers", "nvonnxparser"]
 _TF_TENSORRT_HEADERS = ["NvInfer.h", "NvUtils.h", "NvInferPlugin.h"]
 _TF_TENSORRT_HEADERS_V6 = [
     "NvInfer.h",
