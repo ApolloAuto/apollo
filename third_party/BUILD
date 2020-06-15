@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 # Libs provided by the system.
@@ -100,7 +102,6 @@ cc_library(
 # atlas-cblas
 cc_library(
     name = "cblas",
-    includes = ["/usr/include"],
     linkopts = [
         "-lcblas",
     ],
