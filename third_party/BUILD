@@ -71,3 +71,37 @@ cc_library(
     name = "uuid",
     linkopts = ["-luuid"],
 )
+
+#TODO(storypku): Merge this into @local_config_cuda
+cc_library(
+    name = "nppi",
+    includes = select({
+        "//tools/platform:x86_mode": ["/usr/local/cuda/targets/x86_64-linux/include"],
+        "//tools/platform:aarch64_mode": ["/usr/local/cuda/targets/aarch64-linux/include"],
+        "//conditions:default": [],
+    }),
+    linkopts = [
+        "-L/usr/local/cuda/lib64",
+        "-lnppc",
+        "-lnppial",
+        "-lnppicc",
+        "-lnppicom",
+        "-lnppidei",
+        "-lnppif",
+        "-lnppig",
+        "-lnppim",
+        "-lnppist",
+        "-lnppisu",
+        "-lnppitc",
+        "-lnpps",
+    ],
+)
+
+# atlas-cblas
+cc_library(
+    name = "cblas",
+    includes = ["/usr/include"],
+    linkopts = [
+        "-lcblas",
+    ],
+)
