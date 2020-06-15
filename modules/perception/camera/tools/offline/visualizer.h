@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
-
 #include <map>
 #include <string>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
