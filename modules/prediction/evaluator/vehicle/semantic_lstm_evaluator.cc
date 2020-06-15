@@ -100,11 +100,9 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
   std::vector<torch::jit::IValue> torch_inputs;
 
   at::Tensor torch_input_tensor;
-  torch_inputs.push_back(c10::ivalue::Tuple::createNamed(
+  torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
-       std::move(obstacle_pos_step.to(device_))},
-      c10::TupleType::create(std::vector<c10::TypePtr>(
-          3, c10::TensorType::create(torch_input_tensor)))));
+       std::move(obstacle_pos_step.to(device_))}));
 
   // Compute pred_traj
   std::vector<double> pred_traj;
@@ -263,11 +261,9 @@ void SemanticLSTMEvaluator::LoadModel() {
   std::vector<torch::jit::IValue> torch_inputs;
 
   at::Tensor torch_input_tensor;
-  torch_inputs.push_back(c10::ivalue::Tuple::createNamed(
+  torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
-       std::move(obstacle_pos_step.to(device_))},
-      c10::TupleType::create(std::vector<c10::TypePtr>(
-          3, c10::TensorType::create(torch_input_tensor)))));
+       std::move(obstacle_pos_step.to(device_))}));
   // Run one inference to avoid very slow first inference later
   torch_default_output_tensor_ =
       torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
