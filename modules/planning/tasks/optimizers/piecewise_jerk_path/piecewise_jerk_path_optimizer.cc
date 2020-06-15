@@ -83,10 +83,26 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   std::vector<PathData> candidate_path_data;
   for (const auto& path_boundary : path_boundaries) {
+    // when path reference is ready
+    // set end lateral to be at the path reference
+    // TODO: 3 parameters (trimmed_path_boundary_size, is learning output
+    // valid, end path position)
+    size_t path_boundary_size = path_boundary.boundary().size();
+    bool test_learning_output_valid = true;
+    if (path_boundary.label().find("regular") != std::string::npos &&
+        test_learning_output_valid) {
+      common::SLPoint path_reference_end_sl;
+      reference_line.XYToSL(path_reference_end_sl.position(),
+                            &path_reference_end_sl);
+      end_state[0] = path_reference_end_sl.l();
+
+      // trim path bounds
+      path_boundary_size = trimmed_path_boundary_size;
+    }
     // if the path_boundary is normal, it is possible to have less than 2 points
     // skip path boundary of this kind
     if (path_boundary.label().find("regular") != std::string::npos &&
-        path_boundary.boundary().size() < 2) {
+        path_boundary_size < 2) {
       continue;
     }
 
@@ -96,7 +112,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       max_iter = 4000;
     }
 
-    CHECK_GT(path_boundary.boundary().size(), 1);
+    CHECK_GT(path_boundary_size, 1);
 
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
@@ -125,7 +141,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         std::tan(veh_param.max_steer_angle() / veh_param.steer_ratio()) /
         veh_param.wheel_base();
     std::vector<std::pair<double, double>> ddl_bounds;
-    for (size_t i = 0; i < path_boundary.boundary().size(); ++i) {
+    for (size_t i = 0; i < path_boundary_size; ++i) {
       double s = static_cast<double>(i) * path_boundary.delta_s() +
                  path_boundary.start_s();
       double kappa = reference_line.GetNearestReferencePoint(s).kappa();
@@ -138,7 +154,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                      ddl_bounds, w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
-      for (size_t i = 0; i < path_boundary.boundary().size(); i += 4) {
+      for (size_t i = 0; i < path_boundary_size; i += 4) {
         ADEBUG << "for s[" << static_cast<double>(i) * path_boundary.delta_s()
                << "], l = " << opt_l[i] << ", dl = " << opt_dl[i];
       }
