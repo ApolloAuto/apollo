@@ -4,11 +4,9 @@ licenses(["notice"])
 
 cc_library(
     name = "paddlepaddle",
-    srcs = [
-        "lib/libpaddle_fluid.so",
-    ],
-    hdrs = glob([
-        "include/*.h",
-    ]),
-    includes = ["include"],
+    includes = ["."],
+    linkopts = [
+        "-L/usr/local/apollo/paddlepaddle/lib",
+        "-lpaddle_fluid",
+],
 )

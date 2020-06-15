@@ -258,12 +258,12 @@ new_local_repository(
 )
 
 #
-## paddlepaddle
-#new_local_repository(
-#    name = "paddlepaddle",
-#    build_file = "third_party/paddlepaddle.BUILD",
-#    path = "/usr/local/apollo/paddlepaddle",
-#)
+# paddlepaddle
+new_local_repository(
+    name = "paddlepaddle",
+    build_file = "third_party/paddlepaddle.BUILD",
+    path = "/usr/local/apollo/paddlepaddle/include",
+)
 #
 ## mkldnn
 #new_local_repository(
@@ -300,14 +300,14 @@ new_local_repository(
 #    path = "/usr/local/apollo/jsoncpp/",
 #)
 #
-##xxhash
-#new_local_repository(
-#    name = "xxhash",
-#    build_file = "third_party/xxhash.BUILD",
-#    path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
-#)
-#
-#snappystream
+#xxhash
+new_local_repository(
+    name = "xxhash",
+    build_file = "third_party/xxhash.BUILD",
+    path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
+)
+
+# snappystream
 new_local_repository(
     name = "snappystream",
     build_file = "external/snappystream.BUILD",
