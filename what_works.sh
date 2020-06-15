@@ -30,6 +30,8 @@ else
     sudo apt-get -y update
     sudo apt-get -y install libpython2.7-dev libatlas-base-dev
 fi
+echo "/opt/apollo/pkgs/caffe/lib" | sudo tee -a /etc/ld.so.conf.d/apollo.conf
+sudo ldconfig
 
 cp WORKSPACE.in WORKSPACE
 
