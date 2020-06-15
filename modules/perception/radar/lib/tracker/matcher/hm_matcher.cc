@@ -85,9 +85,9 @@ bool HMMatcher::RefinedTrack(const base::ObjectPtr &track_object,
                              const base::ObjectPtr &radar_object,
                              double radar_timestamp) {
   double dist = 0.5 * DistanceBetweenObs(track_object, track_timestamp,
-                                       radar_object, radar_timestamp) +
+                                         radar_object, radar_timestamp) +
                 0.5 * DistanceBetweenObs(radar_object, radar_timestamp,
-                                       track_object, track_timestamp);
+                                         track_object, track_timestamp);
 
   return dist < BaseMatcher::GetMaxMatchDistance();
 }

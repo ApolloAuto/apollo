@@ -25,8 +25,8 @@ cc_library(
         "//modules/perception/proto:perception_config_schema_cc_proto",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/tracker/common:radar_track",
-        "@eigen",
         "@com_google_googletest//:gtest_main",
+        "@eigen",
     ],
 )
 
@@ -39,20 +39,20 @@ cc_library(
     name = "base_detector",
     hdrs = ["base_detector.h"],
     deps = [
+        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
         "//modules/drivers/proto:conti_radar_cc_proto",
         "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
-        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
-    ]
+    ],
 )
 
 cc_library(
     name = "base_preprocessor",
     hdrs = ["base_preprocessor.h"],
     deps = [
+        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
         "//modules/drivers/proto:conti_radar_cc_proto",
         "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
-        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
-    ]
+    ],
 )
 
 cc_library(
