@@ -536,11 +536,12 @@ DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
 DEFINE_string(planning_offline_bags, "",
               "a list of source files or directories for offline mode. "
               "The items need to be separated by colon ':'. ");
-DEFINE_int32(planning_offline_mode, 0,
+DEFINE_int32(planning_learning_mode, 0,
              "0: no learning "
-             "1: online learning, no dump file "
-             "2: offline learning. read record files and dump learning_data "
-             "   to <record file>.<n>.bin");
+             "1: offline learning. read record files and dump learning_data "
+             "   to <record file>.<n>.bin "
+             "2: online learning(e2e) "
+             "3: online learning(hybrid)");
 DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
              "time sec (second) of history trajectory points for a obstacle");
 DEFINE_int32(learning_data_frame_num_per_file, 100,

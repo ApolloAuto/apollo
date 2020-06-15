@@ -78,7 +78,7 @@ TEST_F(ModelInferenceTest, trajectory_imitation) {
   BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
 
   std::unique_ptr<ModelInference> trajectory_imitation_inference =
-      std::unique_ptr<ModelInference>(new TrajectoryConvRnnInference(config));
+      std::unique_ptr<ModelInference>(new TrajectoryImitationInference(config));
 
   ACHECK(trajectory_imitation_inference->Inference(&test_data_frame))
       << "Failed to inference trajectory_imitation_model";

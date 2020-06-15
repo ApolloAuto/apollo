@@ -51,7 +51,7 @@
  
  - 直接用数据线将设备连接在IPC的USB3.0接口。接口顺序无固定顺序，用户可自行指定。
  
-	![camera_integration_background](images/camera_integration_background.jpeg)
+	![camera_integration_background](images/camera_integration_background.PNG)
 
 	![camera_integration_line](images/camera_integration_line.jpeg)
 

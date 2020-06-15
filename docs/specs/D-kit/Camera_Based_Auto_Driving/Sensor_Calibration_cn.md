@@ -211,7 +211,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 #### 1. 上传预处理后的数据至BOS
 
-**注意：**必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
+**注意：** 必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
 
 在BOS bucket中新建目录sensor_calibration，作为后续云标定服务读取数据的`Input Data Path`，把前面预处理生成的数据拷贝至该目录。目录结构如下：
 
@@ -246,7 +246,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
  
  - 默认使用1个6mm、1个12mm摄像头，用户如需要使用第二个6mm摄像头时，需要自行指定文件名，并进行相应修改。
 ## NEXT
-现在，您已经完成摄像头感知设备标定，接下来可以开始[基于摄像头的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)
+现在，您已经完成摄像头感知设备标定， 接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](../Lidar_Based_Auto_Driving/Virtual_Lane_Generation_cn.md)(如果在适配基于激光雷达的自动驾驶过程中已经制作了虚拟车道线文件，则可以跳过此步骤，进行[基于摄像头的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md))
 ## 常见问题
 #### 1. 提交后，显示`UNAUTHORIZED`
 ![lidar_calibration_unauthorized](images/lidar_calibration_unauthorized.png)

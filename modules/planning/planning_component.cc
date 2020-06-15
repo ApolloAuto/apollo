@@ -36,6 +36,7 @@ using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
+using apollo::storytelling::Stories;
 
 bool PlanningComponent::Init() {
   injector_ = std::make_shared<DependencyInjector>();
@@ -50,7 +51,7 @@ bool PlanningComponent::Init() {
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
 
-  if (FLAGS_planning_offline_mode > 0) {
+  if (FLAGS_planning_learning_mode > 0) {
     if (!message_process_.Init(config_)) {
       AERROR << "failed to init MessageProcess";
       return false;
@@ -82,6 +83,14 @@ bool PlanningComponent::Init() {
         ADEBUG << "Received pad data: run pad callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         pad_msg_.CopyFrom(*pad_msg);
+      });
+
+  story_telling_reader_ = node_->CreateReader<Stories>(
+      config_.topic_config().story_telling_topic(),
+      [this](const std::shared_ptr<Stories>& stories) {
+        ADEBUG << "Received story_telling data: run story_telling callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        stories_.CopyFrom(*stories);
       });
 
   if (FLAGS_use_navigation_mode) {
@@ -135,17 +144,22 @@ bool PlanningComponent::Proc(
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.pad_msg = std::make_shared<PadMessage>(pad_msg_);
   }
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    local_view_.stories = std::make_shared<Stories>(stories_);
+  }
 
   if (!CheckInput()) {
     AERROR << "Input check failed";
     return false;
   }
 
-  if (FLAGS_planning_offline_mode == 1) {
+  if (FLAGS_planning_learning_mode == 2 || FLAGS_planning_learning_mode == 3) {
     // data process for online training
     message_process_.OnChassis(*local_view_.chassis);
     message_process_.OnPrediction(*local_view_.prediction_obstacles);
     message_process_.OnRoutingResponse(*local_view_.routing);
+    message_process_.OnStoryTelling(*local_view_.stories);
     message_process_.OnTrafficLightDetection(*local_view_.traffic_light);
     message_process_.OnLocalization(*local_view_.localization_estimate);
   }
