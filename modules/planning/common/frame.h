@@ -147,9 +147,7 @@ class Frame {
     return current_frame_planned_path_;
   }
 
-  const bool is_near_destination() const {
-    return is_near_destination_;
-  }
+  const bool is_near_destination() const { return is_near_destination_; }
 
   const bool is_valid_learning_trajectory() const {
     return is_valid_learning_trajectory_;
@@ -165,21 +163,13 @@ class Frame {
   void UpdateReferenceLinePriority(
       const std::map<std::string, uint32_t> &id_to_priority);
 
-  const LocalView &local_view() const {
-    return local_view_;
-  }
+  const LocalView &local_view() const { return local_view_; }
 
-  ThreadSafeIndexedObstacles *GetObstacleList() {
-    return &obstacles_;
-  }
+  ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
-  const OpenSpaceInfo &open_space_info() const {
-    return open_space_info_;
-  }
+  const OpenSpaceInfo &open_space_info() const { return open_space_info_; }
 
-  OpenSpaceInfo *mutable_open_space_info() {
-    return &open_space_info_;
-  }
+  OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
@@ -268,10 +258,6 @@ class Frame {
   std::vector<common::TrajectoryPoint>
       learning_data_adc_future_trajectory_points_;
   bool is_valid_learning_trajectory_ = false;
-
-  // hybrid model related parameters
-  double path_reference_end_pose;
-  size_t trimmed_path_bound_size;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
