@@ -388,3 +388,9 @@ new_local_repository(
     build_file = "third_party/lz4.BUILD",
     path = "/usr/include/",
 )
+
+new_local_repository(
+    name = "npp",
+    build_file = "external/npp.BUILD",
+    path = "/usr/local/cuda",
+)

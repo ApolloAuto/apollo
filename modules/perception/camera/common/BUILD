@@ -31,7 +31,7 @@ cc_library(
     deps = [
         ":undistortion_handler",
         "//modules/perception/base",
-        "//third_party:nppi",
+        "@npp",
     ],
 )
 
