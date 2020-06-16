@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/time/rate.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"

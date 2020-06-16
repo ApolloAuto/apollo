@@ -16,6 +16,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
+#include "cyber/init.h"
 
 using apollo::cyber::examples::proto::Driver;
 

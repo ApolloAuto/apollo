@@ -20,11 +20,11 @@
 #include <thread>
 #include <vector>
 
-#include "gtest/gtest.h"
-
 #include "cyber/class_loader/class_loader_manager.h"
 #include "cyber/class_loader/test/base.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
+#include "gtest/gtest.h"
 
 const char LIBRARY_1[] =
     "/apollo/bazel-bin/cyber/class_loader/test/libplugin1.so";

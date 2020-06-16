@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
 

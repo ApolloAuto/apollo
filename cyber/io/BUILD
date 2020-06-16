@@ -50,7 +50,7 @@ cc_test(
     srcs = ["poller_test.cc"],
     deps = [
         ":poller",
-        "//cyber:cyber_core",
+        "//cyber:init",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -69,7 +69,7 @@ cc_binary(
     name = "tcp_echo_client",
     srcs = ["example/tcp_echo_client.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:init",
     ],
 )
 
@@ -77,7 +77,7 @@ cc_binary(
     name = "tcp_echo_server",
     srcs = ["example/tcp_echo_server.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:init",
     ],
 )
 
@@ -85,7 +85,7 @@ cc_binary(
     name = "udp_echo_client",
     srcs = ["example/udp_echo_client.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:init",
     ],
 )
 
@@ -93,7 +93,7 @@ cc_binary(
     name = "udp_echo_server",
     srcs = ["example/udp_echo_server.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:init",
     ],
 )
 

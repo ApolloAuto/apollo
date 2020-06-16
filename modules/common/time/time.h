@@ -26,14 +26,14 @@
 #include <atomic>
 #include <chrono>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
+#include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/time/time.h"
-
-#include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 
 /**
@@ -113,7 +113,7 @@ class Clock {
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock.
    */
-  static void SetNow(const absl::Time &now) {
+  static void SetNow(const absl::Time& now) {
     auto clock = Instance();
     if (clock->mode_ != ClockMode::MOCK) {
       AFATAL << "Cannot set now when clock mode is not MOCK!";
@@ -147,6 +147,14 @@ class Clock {
 
 inline Clock::Clock() {
   mode_ = FLAGS_use_cyber_time ? ClockMode::CYBER : ClockMode::SYSTEM;
+  // Force to use Cyber time is USE_SIM_TIME is set
+  const char* use_sim_time = ::getenv("USE_SIM_TIME");
+  if (use_sim_time != nullptr) {
+    std::string use_sim_time_str(use_sim_time);
+    if (use_sim_time_str == "true") {
+      mode_ = ClockMode::CYBER;
+    }
+  }
 }
 
 // Measure run time of a code block, mostly for debugging purpose.

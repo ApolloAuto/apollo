@@ -17,7 +17,6 @@ cc_library(
         "utility/class_loader_utility.h",
     ],
     deps = [
-        "//cyber:init",
         "//cyber/common:log",
         "@poco//:PocoFoundation",
     ],

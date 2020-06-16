@@ -20,6 +20,7 @@
 #include "absl/strings/str_split.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
 namespace apollo {

@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"

@@ -30,6 +30,9 @@ using std::chrono::high_resolution_clock;
 using std::chrono::steady_clock;
 using std::chrono::system_clock;
 
+static bool g_use_sim_time(false);
+static Time g_sim_time(0);
+
 const Time Time::MAX = Time(std::numeric_limits<uint64_t>::max());
 const Time Time::MIN = Time(1);
 
@@ -54,7 +57,14 @@ Time& Time::operator=(const Time& other) {
   return *this;
 }
 
+void Time::SetSimTime(const Time& sim_time) {
+  g_sim_time = sim_time;
+  g_use_sim_time = true;
+}
+
 Time Time::Now() {
+  if (g_use_sim_time) return g_sim_time;
+
   auto now = high_resolution_clock::now();
   auto nano_time_point =
       std::chrono::time_point_cast<std::chrono::nanoseconds>(now);

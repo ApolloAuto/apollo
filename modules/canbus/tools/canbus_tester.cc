@@ -19,8 +19,8 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/time/rate.h"
-
 #include "gflags/gflags.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"

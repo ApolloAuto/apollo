@@ -19,6 +19,7 @@
 #include "cyber/base/for_each.h"
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/scheduler/policy/classic_context.h"
 #include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/processor.h"

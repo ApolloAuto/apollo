@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/init.h"
 #include "gtest/gtest.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 

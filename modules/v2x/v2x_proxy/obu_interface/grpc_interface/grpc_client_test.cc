@@ -22,6 +22,7 @@
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_client.h"
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

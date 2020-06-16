@@ -20,6 +20,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 
 class MainWindow;
 

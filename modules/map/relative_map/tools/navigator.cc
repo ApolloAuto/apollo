@@ -19,17 +19,17 @@
 #include <thread>
 #include <vector>
 
-#include "nlohmann/json.hpp"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/time/rate.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/navigator_config.pb.h"
+#include "nlohmann/json.hpp"
 
 using apollo::cyber::Rate;
 using apollo::relative_map::NavigationInfo;

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/examples/proto/examples.pb.h"
 
 void MessageCallback(

@@ -7,7 +7,7 @@ cc_library(
     name = "cyber",
     linkstatic = False,
     deps = [
-        "//cyber:cyber_core",
+        ":init",
     ],
 )
 
@@ -23,7 +23,7 @@ cc_binary(
     linkopts = ["-pthread"],
     linkstatic = False,
     deps = [
-        ":cyber_core",
+        ":init",
         "//cyber/proto:dag_conf_cc_proto",
     ],
 )
@@ -47,11 +47,13 @@ cc_library(
     srcs = ["init.cc"],
     hdrs = ["init.h"],
     deps = [
+        "//cyber:cyber_core",
         "//cyber:state",
         "//cyber/logger:async_logger",
         "//cyber/node",
         "//cyber/sysmo",
         "//cyber/timer:timing_wheel",
+        "//cyber/proto:clock_cc_proto",
     ],
 )
 
@@ -62,7 +64,6 @@ cc_library(
     linkopts = ["-lrt"],
     deps = [
         "//cyber:binary",
-        "//cyber:init",
         "//cyber:state",
         "//cyber/base",
         "//cyber/blocker:blocker_manager",

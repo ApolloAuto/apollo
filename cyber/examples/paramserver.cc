@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/parameter/parameter_client.h"
 #include "cyber/parameter/parameter_server.h"
 

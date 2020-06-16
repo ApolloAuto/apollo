@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "modules/v2x/proto/v2x_service_obu_to_car.grpc.pb.h"
 
 namespace apollo {

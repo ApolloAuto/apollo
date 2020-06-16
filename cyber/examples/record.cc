@@ -17,6 +17,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/message/raw_message.h"
 #include "cyber/proto/record.pb.h"
 #include "cyber/record/record_message.h"

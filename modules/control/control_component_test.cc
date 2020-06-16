@@ -21,8 +21,8 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "gtest/gtest.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"

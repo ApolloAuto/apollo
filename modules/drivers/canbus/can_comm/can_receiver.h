@@ -32,9 +32,8 @@
 
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
-
+#include "cyber/init.h"
 #include "modules/common/proto/error_code.pb.h"
-
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"

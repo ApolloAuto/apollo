@@ -19,6 +19,7 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/scheduler/policy/choreography_context.h"
 #include "cyber/scheduler/policy/classic_context.h"
 #include "cyber/scheduler/policy/scheduler_choreography.h"

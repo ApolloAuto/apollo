@@ -17,9 +17,9 @@
 
 #include <memory>
 
-#include "grpc++/grpc++.h"
-
 #include "cyber/cyber.h"
+#include "cyber/init.h"
+#include "grpc++/grpc++.h"
 #include "modules/map/tools/map_datachecker/server/worker_agent.h"
 #include "modules/map/tools/map_datachecker/server/worker_cyber_node.h"
 #include "modules/map/tools/map_datachecker/server/worker_gflags.h"

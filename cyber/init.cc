@@ -19,15 +19,19 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <csignal>
 #include <cstdio>
 #include <ctime>
+#include <memory>
 #include <string>
 
 #include "cyber/binary.h"
 #include "cyber/common/global_data.h"
+#include "cyber/cyber.h"
 #include "cyber/data/data_dispatcher.h"
 #include "cyber/logger/async_logger.h"
+#include "cyber/proto/clock.pb.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/sysmo/sysmo.h"
@@ -46,6 +50,8 @@ namespace {
 bool g_atexit_registered = false;
 std::mutex g_mutex;
 logger::AsyncLogger* async_logger = nullptr;
+
+std::unique_ptr<apollo::cyber::Node> clock_node;
 
 void InitLogger(const char* binary_name) {
   const char* slash = strrchr(binary_name, '/');
@@ -68,9 +74,7 @@ void InitLogger(const char* binary_name) {
   async_logger->Start();
 }
 
-void StopLogger() {
-  delete async_logger;
-}
+void StopLogger() { delete async_logger; }
 
 }  // namespace
 
@@ -104,6 +108,24 @@ bool Init(const char* binary_name) {
     g_atexit_registered = true;
   }
   SetState(STATE_INITIALIZED);
+
+  const char* use_sim_time = ::getenv("USE_SIM_TIME");
+  if (use_sim_time != nullptr) {
+    std::string use_sim_time_str(use_sim_time);
+    if (use_sim_time_str == "true") {
+      clock_node = apollo::cyber::CreateNode("cyber_clock_node" +
+                                             std::to_string(getpid()));
+
+      auto cb =
+          [](const std::shared_ptr<const apollo::cyber::proto::Clock>& msg) {
+            if (msg->has_clock()) {
+              Time::SetSimTime(Time(msg->clock()));
+            }
+          };
+
+      clock_node->CreateReader<apollo::cyber::proto::Clock>("/clock", cb);
+    }
+  }
   return true;
 }
 
