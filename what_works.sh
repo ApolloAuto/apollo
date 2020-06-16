@@ -41,11 +41,11 @@ set -e
 ./bootstrap.sh --noninteractive
 
 function bazel_build_with_dist_cache() {
-    bazel build --distdir=/apollo/.cache/distdir "$@"
+    bazel build --config=opt --distdir=/apollo/.cache/distdir "$@"
 }
 
 function bazel_test_with_dist_cache() {
-    bazel test --distdir=/apollo/.cache/distdir "$@"
+    bazel test --config=opt --distdir=/apollo/.cache/distdir "$@"
 }
 
 # Working parts.
