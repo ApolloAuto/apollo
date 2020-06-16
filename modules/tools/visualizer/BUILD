@@ -40,6 +40,7 @@ qt_cc_library(
     copts = [
         "-Imodules/drivers/proto",
         "-Iexternal/qt",
+        "-fPIC",
     ],
     hdr = glob([
         "*.h",

@@ -328,13 +328,6 @@ new_local_repository(
     path = "/usr/local/fast-rtps",
 )
 
-#TODO(storypku): retire python2
-new_local_repository(
-    name = "python27",
-    build_file = "external/python27.BUILD",
-    path = "/usr",
-)
-
 new_local_repository(
     name = "python3",
     build_file = "external/python3.BUILD",
