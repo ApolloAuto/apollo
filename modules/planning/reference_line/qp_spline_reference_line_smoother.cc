@@ -22,10 +22,9 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"

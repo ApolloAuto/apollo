@@ -16,10 +16,9 @@
 
 #include "modules/planning/common/speed/st_boundary.h"
 
+#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {

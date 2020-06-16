@@ -23,7 +23,7 @@ DEFINE_string(model_file,
               "/apollo/modules/planning/tools/planning_demo_model.pt",
               "pytorch model file.");
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   torch::jit::script::Module model;
@@ -36,14 +36,13 @@ int main(int argc, char **argv) {
   try {
     // Deserialize the ScriptModule from a file using torch::jit::load().
     model = torch::jit::load(FLAGS_model_file, device);
-  }
-  catch (const c10::Error& e) {
+  } catch (const c10::Error& e) {
     std::cerr << "error loading the model\n";
     return -1;
   }
   std::cout << "is_optimized:" << model.is_optimized() << std::endl;
-  std::cout << "after loading parameter size:"
-            << model.parameters().size() << std::endl;
+  std::cout << "after loading parameter size:" << model.parameters().size()
+            << std::endl;
 
   std::vector<torch::jit::IValue> torch_inputs;
 

@@ -20,10 +20,9 @@
 
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
+#include <algorithm>
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
-
-#include <algorithm>
 #include <utility>
 
 #include "modules/common/time/time.h"

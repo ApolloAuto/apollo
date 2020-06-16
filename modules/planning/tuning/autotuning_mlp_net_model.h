@@ -19,7 +19,6 @@
 #include <vector>
 
 #include "cyber/common/macros.h"
-
 #include "modules/prediction/network/net_model.h"
 
 namespace apollo {

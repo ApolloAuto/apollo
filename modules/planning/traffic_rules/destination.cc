@@ -17,10 +17,10 @@
 /**
  * @file
  **/
+#include "modules/planning/traffic_rules/destination.h"
+
 #include <memory>
 #include <vector>
-
-#include "modules/planning/traffic_rules/destination.h"
 
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"

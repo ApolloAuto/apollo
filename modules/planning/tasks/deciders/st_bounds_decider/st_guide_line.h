@@ -21,7 +21,6 @@
 #pragma once
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"

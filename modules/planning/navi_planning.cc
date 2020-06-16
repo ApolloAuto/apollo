@@ -22,7 +22,6 @@
 
 #include "cyber/common/file.h"
 #include "google/protobuf/repeated_field.h"
-
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

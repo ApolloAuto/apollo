@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "Eigen/Dense"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -48,7 +47,7 @@ namespace planning {
 class OpenSpaceRoiDecider : public Decider {
  public:
   OpenSpaceRoiDecider(const TaskConfig &config,
-                      const std::shared_ptr<DependencyInjector>& injector);
+                      const std::shared_ptr<DependencyInjector> &injector);
 
  private:
   apollo::common::Status Process(Frame *frame) override;

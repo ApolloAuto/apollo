@@ -16,10 +16,9 @@
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

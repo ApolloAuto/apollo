@@ -20,13 +20,12 @@
 
 #pragma once
 
-/* Workaround for coin/IpSmartPtr.hpp:18:4: error: #error "don't have header file for stddef" */
-#include <cstddef>
-
-#include <vector>
-
+/* Workaround for coin/IpSmartPtr.hpp:18:4: error: #error "don't have header
+ * file for stddef" */
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
+#include <cstddef>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "modules/planning/math/curve1d/quintic_spiral_path_with_derivation.h"
@@ -112,6 +111,7 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
  public:
   static constexpr size_t N = 10;
+
  private:
   void update_piecewise_spiral_paths(const double* x, const int n);
 
@@ -142,7 +142,6 @@ class SpiralProblemInterface : public Ipopt::TNLP {
   const int num_of_internal_points_ = 5;
 
   std::vector<double> relative_theta_;
-
 
   std::vector<QuinticSpiralPathWithDerivation<N>> piecewise_paths_;
 

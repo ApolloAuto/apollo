@@ -36,8 +36,7 @@ std::pair<double, double> WorldCoordToObjCoord(
   return std::make_pair(std::cos(theta) * rho, std::sin(theta) * rho);
 }
 
-double WorldAngleToObjAngle(double input_world_angle,
-                            double obj_world_angle) {
+double WorldAngleToObjAngle(double input_world_angle, double obj_world_angle) {
   return common::math::NormalizeAngle(input_world_angle - obj_world_angle);
 }
 

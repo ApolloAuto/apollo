@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "Eigen/Dense"
-
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.h"

@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "gtest/gtest.h"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"

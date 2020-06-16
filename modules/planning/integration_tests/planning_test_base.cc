@@ -18,7 +18,6 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"

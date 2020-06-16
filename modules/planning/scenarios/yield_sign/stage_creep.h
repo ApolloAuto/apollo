@@ -23,7 +23,6 @@
 #include <memory>
 
 #include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 

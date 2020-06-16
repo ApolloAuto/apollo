@@ -30,16 +30,14 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/discrete_points_reference_line_smoother.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"

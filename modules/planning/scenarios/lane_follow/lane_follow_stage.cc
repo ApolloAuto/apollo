@@ -168,8 +168,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
     const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-    ADEBUG << "after task[" << task->Name() << "]:"
-           << reference_line_info->PathSpeedDebugString();
+    ADEBUG << "after task[" << task->Name()
+           << "]:" << reference_line_info->PathSpeedDebugString();
     ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
     RecordDebugInfo(reference_line_info, task->Name(), time_diff_ms);
 

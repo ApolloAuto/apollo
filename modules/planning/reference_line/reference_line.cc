@@ -24,10 +24,9 @@
 #include <limits>
 #include <unordered_set>
 
-#include "boost/math/tools/minima.hpp"
-
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+#include "boost/math/tools/minima.hpp"
 #include "cyber/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
@@ -497,7 +496,7 @@ bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
 }
 
 hdmap::Road::Type ReferenceLine::GetRoadType(const double s) const {
-  const hdmap::HDMap *hdmap = hdmap::HDMapUtil::BaseMapPtr();
+  const hdmap::HDMap* hdmap = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap);
 
   hdmap::Road::Type road_type = hdmap::Road::UNKNOWN;

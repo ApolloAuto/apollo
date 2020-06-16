@@ -23,12 +23,11 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/decision.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/decision.pb.h"
 
 namespace apollo {
 namespace planning {

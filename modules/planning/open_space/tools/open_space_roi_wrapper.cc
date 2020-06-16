@@ -20,7 +20,6 @@
 
 #include "Eigen/Dense"
 #include "cyber/common/file.h"
-
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"

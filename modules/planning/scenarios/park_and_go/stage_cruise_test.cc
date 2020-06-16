@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
 

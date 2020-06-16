@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
-
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
+
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

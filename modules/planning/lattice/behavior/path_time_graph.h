@@ -25,16 +25,14 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/proto/geometry.pb.h"
-
 #include "modules/common/math/polygon2d.h"
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/reference_line/reference_line.h"
-
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {

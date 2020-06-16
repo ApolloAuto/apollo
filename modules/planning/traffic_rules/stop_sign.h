@@ -32,7 +32,7 @@ namespace planning {
 class StopSign : public TrafficRule {
  public:
   StopSign(const TrafficRuleConfig& config,
-           const std::shared_ptr<DependencyInjector> &injector);
+           const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~StopSign() = default;
 

@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

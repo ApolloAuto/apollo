@@ -23,7 +23,6 @@
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
@@ -52,9 +51,9 @@ using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
 using apollo::localization::LocalizationEstimate;
+using apollo::perception::TrafficLightDetection;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
-using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::CloseToJunction;
 using apollo::storytelling::Stories;
@@ -80,8 +79,7 @@ bool MessageProcess::Init(const PlanningConfig& planning_config) {
     start_time_ = std::chrono::system_clock::now();
     std::time_t now = std::time(nullptr);
     log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
-              << "Local date and time: "
-              << std::asctime(std::localtime(&now));
+              << "Local date and time: " << std::asctime(std::localtime(&now));
   }
   return true;
 }
@@ -98,8 +96,8 @@ void MessageProcess::Close() {
     log_file_ << msg.str() << std::endl;
     auto end_time = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end_time - start_time_;
-    log_file_ << "Time elapsed(sec): " << elapsed_seconds.count()
-              << std::endl << std::endl;
+    log_file_ << "Time elapsed(sec): " << elapsed_seconds.count() << std::endl
+              << std::endl;
     log_file_.close();
   }
 }
@@ -135,8 +133,7 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   if (time_diff >= (1.0 * 2 / FLAGS_planning_loop_rate)) {
     std::ostringstream msg;
     msg << "missing localization too long: time_stamp["
-        << le.header().timestamp_sec()
-        << "] time_diff[" << time_diff << "]";
+        << le.header().timestamp_sec() << "] time_diff[" << time_diff << "]";
     AERROR << msg.str();
     if (FLAGS_planning_learning_mode == 1) {
       log_file_ << msg.str() << std::endl;
@@ -147,17 +144,17 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
 
   while (!localizations_.empty()) {
     if (localizations_.back().header().timestamp_sec() -
-        localizations_.front().header().timestamp_sec()
-        <= FLAGS_trajectory_time_length) {
+            localizations_.front().header().timestamp_sec() <=
+        FLAGS_trajectory_time_length) {
       break;
     }
     localizations_.pop_front();
   }
 
-  ADEBUG << "OnLocalization: size[" << localizations_.size()
-         << "] time_diff["
+  ADEBUG << "OnLocalization: size[" << localizations_.size() << "] time_diff["
          << localizations_.back().header().timestamp_sec() -
-            localizations_.front().header().timestamp_sec() << "]";
+                localizations_.front().header().timestamp_sec()
+         << "]";
 
   // generate one frame data
   LearningDataFrame learning_data_frame;
@@ -221,11 +218,13 @@ void MessageProcess::OnPrediction(
     obstacle_history_map_[m.first].back().timestamp_sec();
     if (obstacle_history_map_[m.first].empty() ||
         obstacle_trajectory_point.timestamp_sec() -
-            obstacle_history_map_[m.first].back().timestamp_sec() > 0) {
+                obstacle_history_map_[m.first].back().timestamp_sec() >
+            0) {
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
       // abnormal perception data: time_diff <= 0
-      const double time_diff = obstacle_trajectory_point.timestamp_sec() -
+      const double time_diff =
+          obstacle_trajectory_point.timestamp_sec() -
           obstacle_history_map_[m.first].back().timestamp_sec();
       std::ostringstream msg;
       msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
@@ -240,7 +239,7 @@ void MessageProcess::OnPrediction(
     auto& obstacle_history = obstacle_history_map_[m.first];
     while (!obstacle_history.empty()) {
       const double time_distance = obstacle_history.back().timestamp_sec() -
-          obstacle_history.front().timestamp_sec();
+                                   obstacle_history.front().timestamp_sec();
       if (time_distance < FLAGS_learning_data_obstacle_history_time_sec) {
         break;
       }
@@ -250,9 +249,9 @@ void MessageProcess::OnPrediction(
 }
 
 void MessageProcess::OnRoutingResponse(
-  const apollo::routing::RoutingResponse& routing_response) {
+    const apollo::routing::RoutingResponse& routing_response) {
   ADEBUG << "routing_response received at frame["
-        << total_learning_data_frame_num_ << "]";
+         << total_learning_data_frame_num_ << "]";
   routing_response_.CopyFrom(routing_response);
 }
 
@@ -274,8 +273,7 @@ void MessageProcess::OnStoryTelling(
 
   // pnc_junction
   if (stories.has_close_to_junction() &&
-      stories.close_to_junction().type() ==
-          CloseToJunction::PNC_JUNCTION) {
+      stories.close_to_junction().type() == CloseToJunction::PNC_JUNCTION) {
     auto pnc_junction_tag = planning_tag_.mutable_pnc_junction();
     pnc_junction_tag->set_id(stories.close_to_junction().id());
     pnc_junction_tag->set_distance(stories.close_to_junction().distance());
@@ -374,8 +372,8 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
       if (stories.ParseFromString(message.content)) {
         OnStoryTelling(stories);
       }
-    } else if (message.channel_name ==planning_config_.topic_config()
-                                       .traffic_light_detection_topic()) {
+    } else if (message.channel_name == planning_config_.topic_config()
+                                           .traffic_light_detection_topic()) {
       TrafficLightDetection traffic_light_detection;
       if (traffic_light_detection.ParseFromString(message.content)) {
         OnTrafficLightDetection(traffic_light_detection);
@@ -384,25 +382,24 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
   }
 }
 
-bool MessageProcess::GetADCCurrentRoutingIndex(
-    int* road_index, double* road_s) {
+bool MessageProcess::GetADCCurrentRoutingIndex(int* road_index,
+                                               double* road_s) {
   if (localizations_.empty()) return false;
 
   static constexpr double kRadius = 4.0;
   const auto& pose = localizations_.back().pose();
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
-  apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
-      pose.position(), kRadius, &lanes);
+  apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(pose.position(), kRadius,
+                                                   &lanes);
 
   for (auto& lane : lanes) {
     for (int i = 0; i < routing_response_.road_size(); ++i) {
       *road_s = 0;
       for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
         double passage_s = 0;
-        for (int k = 0;
-            k < routing_response_.road(i).passage(j).segment_size(); ++k) {
-          const auto& segment =
-              routing_response_.road(i).passage(j).segment(k);
+        for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
+             ++k) {
+          const auto& segment = routing_response_.road(i).passage(j).segment(k);
           passage_s += (segment.end_s() - segment.start_s());
           if (lane->id().id() == segment.id()) {
             *road_index = i;
@@ -421,8 +418,8 @@ apollo::hdmap::LaneInfoConstPtr MessageProcess::GetCurrentLane(
   constexpr double kRadiusUnit = 0.1;
   std::vector<std::shared_ptr<const apollo::hdmap::LaneInfo>> lanes;
   for (int i = 1; i <= 10; ++i) {
-    apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(
-        position, i * kRadiusUnit, &lanes);
+    apollo::hdmap::HDMapUtil::BaseMapPtr()->GetLanes(position, i * kRadiusUnit,
+                                                     &lanes);
     if (lanes.size() > 0) {
       break;
     }
@@ -431,8 +428,8 @@ apollo::hdmap::LaneInfoConstPtr MessageProcess::GetCurrentLane(
   for (auto& lane : lanes) {
     for (int i = 0; i < routing_response_.road_size(); ++i) {
       for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
-        for (int k = 0;
-            k < routing_response_.road(i).passage(j).segment_size(); ++k) {
+        for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
+             ++k) {
           if (lane->id().id() ==
               routing_response_.road(i).passage(j).segment(k).id()) {
             return lane;
@@ -452,11 +449,9 @@ int MessageProcess::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
   // ADC current position / velocity / acc/ heading
   const auto& adc_cur_pose = localizations_.back().pose();
   adc_curr_info->adc_cur_position_ =
-      std::make_pair(adc_cur_pose.position().x(),
-                     adc_cur_pose.position().y());
-  adc_curr_info->adc_cur_velocity_ =
-      std::make_pair(adc_cur_pose.linear_velocity().x(),
-                     adc_cur_pose.linear_velocity().y());
+      std::make_pair(adc_cur_pose.position().x(), adc_cur_pose.position().y());
+  adc_curr_info->adc_cur_velocity_ = std::make_pair(
+      adc_cur_pose.linear_velocity().x(), adc_cur_pose.linear_velocity().y());
   adc_curr_info->adc_cur_acc_ =
       std::make_pair(adc_cur_pose.linear_acceleration().x(),
                      adc_cur_pose.linear_acceleration().y());
@@ -465,10 +460,8 @@ int MessageProcess::GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info) {
 }
 
 void MessageProcess::GenerateObstacleTrajectory(
-    const int frame_num,
-    const int obstacle_id,
-    const ADCCurrentInfo& adc_curr_info,
-    ObstacleFeature* obstacle_feature) {
+    const int frame_num, const int obstacle_id,
+    const ADCCurrentInfo& adc_curr_info, ObstacleFeature* obstacle_feature) {
   auto obstacle_trajectory = obstacle_feature->mutable_obstacle_trajectory();
   const auto& obstacle_history = obstacle_history_map_[obstacle_id];
   for (const auto& obj_traj_point : obstacle_history) {
@@ -478,53 +471,43 @@ void MessageProcess::GenerateObstacleTrajectory(
         obj_traj_point.timestamp_sec());
 
     // convert position to relative coordinate
-    const auto& relative_posistion =
-        util::WorldCoordToObjCoord(
-            std::make_pair(obj_traj_point.position().x(),
-                           obj_traj_point.position().y()),
-            adc_curr_info.adc_cur_position_,
-            adc_curr_info.adc_cur_heading_);
+    const auto& relative_posistion = util::WorldCoordToObjCoord(
+        std::make_pair(obj_traj_point.position().x(),
+                       obj_traj_point.position().y()),
+        adc_curr_info.adc_cur_position_, adc_curr_info.adc_cur_heading_);
     auto position = perception_obstacle_history->mutable_position();
     position->set_x(relative_posistion.first);
     position->set_y(relative_posistion.second);
 
     // convert theta to relative coordinate
-    const double relative_theta =
-        util::WorldAngleToObjAngle(obj_traj_point.theta(),
-                                     adc_curr_info.adc_cur_heading_);
+    const double relative_theta = util::WorldAngleToObjAngle(
+        obj_traj_point.theta(), adc_curr_info.adc_cur_heading_);
     perception_obstacle_history->set_theta(relative_theta);
 
     // convert velocity to relative coordinate
-    const auto& relative_velocity =
-        util::WorldCoordToObjCoord(
-            std::make_pair(obj_traj_point.velocity().x(),
-                           obj_traj_point.velocity().y()),
-            adc_curr_info.adc_cur_velocity_,
-            adc_curr_info.adc_cur_heading_);
+    const auto& relative_velocity = util::WorldCoordToObjCoord(
+        std::make_pair(obj_traj_point.velocity().x(),
+                       obj_traj_point.velocity().y()),
+        adc_curr_info.adc_cur_velocity_, adc_curr_info.adc_cur_heading_);
     auto velocity = perception_obstacle_history->mutable_velocity();
     velocity->set_x(relative_velocity.first);
     velocity->set_y(relative_velocity.second);
 
     // convert acceleration to relative coordinate
-    const auto& relative_acc =
-        util::WorldCoordToObjCoord(
-            std::make_pair(obj_traj_point.acceleration().x(),
-                           obj_traj_point.acceleration().y()),
-            adc_curr_info.adc_cur_acc_,
-            adc_curr_info.adc_cur_heading_);
+    const auto& relative_acc = util::WorldCoordToObjCoord(
+        std::make_pair(obj_traj_point.acceleration().x(),
+                       obj_traj_point.acceleration().y()),
+        adc_curr_info.adc_cur_acc_, adc_curr_info.adc_cur_heading_);
     auto acceleration = perception_obstacle_history->mutable_acceleration();
     acceleration->set_x(relative_acc.first);
     acceleration->set_y(relative_acc.second);
 
-    for (int i = 0; i < obj_traj_point.polygon_point_size();
-        ++i) {
+    for (int i = 0; i < obj_traj_point.polygon_point_size(); ++i) {
       // convert polygon_point(s) to relative coordinate
-      const auto& relative_point =
-          util::WorldCoordToObjCoord(
-              std::make_pair(obj_traj_point.polygon_point(i).x(),
-                             obj_traj_point.polygon_point(i).y()),
-              adc_curr_info.adc_cur_position_,
-              adc_curr_info.adc_cur_heading_);
+      const auto& relative_point = util::WorldCoordToObjCoord(
+          std::make_pair(obj_traj_point.polygon_point(i).x(),
+                         obj_traj_point.polygon_point(i).y()),
+          adc_curr_info.adc_cur_position_, adc_curr_info.adc_cur_heading_);
       auto polygon_point = perception_obstacle_history->add_polygon_point();
       polygon_point->set_x(relative_point.first);
       polygon_point->set_y(relative_point.second);
@@ -534,14 +517,12 @@ void MessageProcess::GenerateObstacleTrajectory(
 
 void MessageProcess::GenerateObstaclePrediction(
     const PredictionObstacle& prediction_obstacle,
-    const ADCCurrentInfo& adc_curr_info,
-    ObstacleFeature* obstacle_feature) {
+    const ADCCurrentInfo& adc_curr_info, ObstacleFeature* obstacle_feature) {
   auto obstacle_prediction = obstacle_feature->mutable_obstacle_prediction();
   obstacle_prediction->set_timestamp_sec(prediction_obstacle.timestamp());
   obstacle_prediction->set_predicted_period(
       prediction_obstacle.predicted_period());
-  obstacle_prediction->mutable_intent()->CopyFrom(
-      prediction_obstacle.intent());
+  obstacle_prediction->mutable_intent()->CopyFrom(prediction_obstacle.intent());
   obstacle_prediction->mutable_priority()->CopyFrom(
       prediction_obstacle.priority());
   obstacle_prediction->set_is_static(prediction_obstacle.is_static());
@@ -557,31 +538,28 @@ void MessageProcess::GenerateObstaclePrediction(
           obstacle_trajectory.trajectory_point(j);
       auto trajectory_point = trajectory->add_trajectory_point();
 
-      auto path_point = trajectory_point->mutable_trajectory_point()
-                                        ->mutable_path_point();
+      auto path_point =
+          trajectory_point->mutable_trajectory_point()->mutable_path_point();
 
       // convert path_point position to relative coordinate
-      const auto& relative_path_point =
-        util::WorldCoordToObjCoord(
-            std::make_pair(obstacle_trajectory_point.path_point().x(),
-                           obstacle_trajectory_point.path_point().y()),
-            adc_curr_info.adc_cur_position_,
-            adc_curr_info.adc_cur_heading_);
+      const auto& relative_path_point = util::WorldCoordToObjCoord(
+          std::make_pair(obstacle_trajectory_point.path_point().x(),
+                         obstacle_trajectory_point.path_point().y()),
+          adc_curr_info.adc_cur_position_, adc_curr_info.adc_cur_heading_);
       path_point->set_x(relative_path_point.first);
       path_point->set_y(relative_path_point.second);
 
       // convert path_point theta to relative coordinate
-      const double relative_theta =
-          util::WorldAngleToObjAngle(
-              obstacle_trajectory_point.path_point().theta(),
-              adc_curr_info.adc_cur_heading_);
+      const double relative_theta = util::WorldAngleToObjAngle(
+          obstacle_trajectory_point.path_point().theta(),
+          adc_curr_info.adc_cur_heading_);
       path_point->set_theta(relative_theta);
 
       path_point->set_s(obstacle_trajectory_point.path_point().s());
       path_point->set_lane_id(obstacle_trajectory_point.path_point().lane_id());
 
       const double timestamp_sec = prediction_obstacle.timestamp() +
-          obstacle_trajectory_point.relative_time();
+                                   obstacle_trajectory_point.relative_time();
       trajectory_point->set_timestamp_sec(timestamp_sec);
       auto tp = trajectory_point->mutable_trajectory_point();
       tp->set_v(obstacle_trajectory_point.v());
@@ -619,8 +597,8 @@ void MessageProcess::GenerateObstacleFeature(
     obstacle_feature->set_type(perception_obstale.type());
 
     // obstacle history trajectory points
-    GenerateObstacleTrajectory(frame_num, m.first,
-                               adc_curr_info, obstacle_feature);
+    GenerateObstacleTrajectory(frame_num, m.first, adc_curr_info,
+                               obstacle_feature);
 
     // obstacle prediction
     GenerateObstaclePrediction(m.second, adc_curr_info, obstacle_feature);
@@ -646,10 +624,9 @@ bool MessageProcess::GenerateLocalRoutingPassages(
       ADEBUG << "   passage: segment_size["
              << routing_response_.road(i).passage(j).segment_size() << "]";
       double passage_length = 0;
-      for (int k = 0;
-          k < routing_response_.road(i).passage(j).segment_size(); ++k) {
-        const auto& segment =
-            routing_response_.road(i).passage(j).segment(k);
+      for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
+           ++k) {
+        const auto& segment = routing_response_.road(i).passage(j).segment(k);
         passage_length += (segment.end_s() - segment.start_s());
       }
       ADEBUG << "      passage_length[" << passage_length << "]";
@@ -657,21 +634,22 @@ bool MessageProcess::GenerateLocalRoutingPassages(
         road_length += passage_length;
       }
     }
-    road_lengths.push_back(std::make_pair(routing_response_.road(i).id(),
-                                          road_length));
+    road_lengths.push_back(
+        std::make_pair(routing_response_.road(i).id(), road_length));
     ADEBUG << "   road_length[" << road_length << "]";
   }
 
   /* debug
   for (size_t i = 0; i < road_lengths.size(); ++i) {
-    AERROR << i << ": " << road_lengths[i].first << "; " << road_lengths[i].second;
+    AERROR << i << ": " << road_lengths[i].first << "; " <<
+  road_lengths[i].second;
   }
   */
 
   int road_index;
   double road_s;
-  if (!GetADCCurrentRoutingIndex(&road_index, &road_s) ||
-      road_index < 0 ||  road_s < 0) {
+  if (!GetADCCurrentRoutingIndex(&road_index, &road_s) || road_index < 0 ||
+      road_s < 0) {
     return false;
   }
 
@@ -736,7 +714,7 @@ bool MessageProcess::GenerateLocalRoutingPassages(
 
   bool local_routing_end = false;
   for (int i = local_routing_start_road_index + 1;
-      i <= local_routing_end_road_index; ++i) {
+       i <= local_routing_end_road_index; ++i) {
     if (local_routing_end) break;
 
     // grow local_routing_passages
@@ -750,7 +728,7 @@ bool MessageProcess::GenerateLocalRoutingPassages(
     for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
       double road_s = 0;
       for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
-          ++k) {
+           ++k) {
         const auto& lane_segment =
             routing_response_.road(i).passage(j).segment(k);
         road_s += (lane_segment.end_s() - lane_segment.start_s());
@@ -873,9 +851,9 @@ void MessageProcess::GenerateADCTrajectoryPoints(
     trajectory_point->mutable_path_point()->set_z(pose.position().z());
     trajectory_point->mutable_path_point()->set_theta(pose.heading());
 
-    const double v = std::sqrt(
-        pose.linear_velocity().x() * pose.linear_velocity().x() +
-        pose.linear_velocity().y() * pose.linear_velocity().y());
+    const double v =
+        std::sqrt(pose.linear_velocity().x() * pose.linear_velocity().x() +
+                  pose.linear_velocity().y() * pose.linear_velocity().y());
     trajectory_point->set_v(v);
 
     const double a = std::sqrt(
@@ -887,9 +865,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
 
     // planning_tag: lane_turn
     const auto& cur_point = common::util::PointFactory::ToPointENU(
-        pose.position().x(),
-        pose.position().y(),
-        pose.position().z());
+        pose.position().x(), pose.position().y(), pose.position().z());
     LaneInfoConstPtr lane = GetCurrentLane(cur_point);
 
     // lane_turn
@@ -904,9 +880,9 @@ void MessageProcess::GenerateADCTrajectoryPoints(
       // planning_tag: overlap tags
       double point_distance = 0.0;
       if (trajectory_point_index > 0) {
-        auto& next_point =
-            adc_trajectory_points[trajectory_point_index-1]
-                                 .trajectory_point().path_point();
+        auto& next_point = adc_trajectory_points[trajectory_point_index - 1]
+                               .trajectory_point()
+                               .path_point();
         point_distance = common::util::DistanceXY(next_point, cur_point);
       }
 
@@ -917,8 +893,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
       // clear area
       planning_tag->clear_clear_area();
       std::vector<ClearAreaInfoConstPtr> clear_areas;
-      if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point,
-                                             kSearchRadius,
+      if (HDMapUtil::BaseMap().GetClearAreas(hdmap_point, kSearchRadius,
                                              &clear_areas) == 0 &&
           clear_areas.size() > 0) {
         clear_area_id = clear_areas.front()->id().id();
@@ -936,8 +911,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
       // crosswalk
       planning_tag->clear_crosswalk();
       std::vector<CrosswalkInfoConstPtr> crosswalks;
-      if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point,
-                                             kSearchRadius,
+      if (HDMapUtil::BaseMap().GetCrosswalks(hdmap_point, kSearchRadius,
                                              &crosswalks) == 0 &&
           crosswalks.size() > 0) {
         crosswalk_id = crosswalks.front()->id().id();
@@ -954,9 +928,8 @@ void MessageProcess::GenerateADCTrajectoryPoints(
 
       // pnc_junction
       std::vector<PNCJunctionInfoConstPtr> pnc_junctions;
-      if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point,
-                                             kSearchRadius,
-                                             &pnc_junctions) == 0 &&
+      if (HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point, kSearchRadius,
+                                               &pnc_junctions) == 0 &&
           pnc_junctions.size() > 0) {
         pnc_junction_id = pnc_junctions.front()->id().id();
         pnc_junction_distance = 0.0;
@@ -973,8 +946,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
 
       // signal
       std::vector<SignalInfoConstPtr> signals;
-      if (HDMapUtil::BaseMap().GetSignals(hdmap_point,
-                                          kSearchRadius,
+      if (HDMapUtil::BaseMap().GetSignals(hdmap_point, kSearchRadius,
                                           &signals) == 0 &&
           signals.size() > 0) {
         signal_id = signals.front()->id().id();
@@ -991,8 +963,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
 
       // stop sign
       std::vector<StopSignInfoConstPtr> stop_signs;
-      if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point,
-                                            kSearchRadius,
+      if (HDMapUtil::BaseMap().GetStopSigns(hdmap_point, kSearchRadius,
                                             &stop_signs) == 0 &&
           stop_signs.size() > 0) {
         stop_sign_id = stop_signs.front()->id().id();
@@ -1009,9 +980,8 @@ void MessageProcess::GenerateADCTrajectoryPoints(
 
       // yield sign
       std::vector<YieldSignInfoConstPtr> yield_signs;
-      if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point,
-                                           kSearchRadius,
-                                           &yield_signs) == 0 &&
+      if (HDMapUtil::BaseMap().GetYieldSigns(hdmap_point, kSearchRadius,
+                                             &yield_signs) == 0 &&
           yield_signs.size() > 0) {
         yield_sign_id = yield_signs.front()->id().id();
         yield_sign_distance = 0.0;
@@ -1039,8 +1009,8 @@ void MessageProcess::GenerateADCTrajectoryPoints(
   if (adc_trajectory_points.size() <= 5) {
     std::ostringstream msg;
     msg << "too few adc_trajectory_points: frame_num["
-        << learning_data_frame->frame_num()
-        << "] size[" << adc_trajectory_points.size() << "]";
+        << learning_data_frame->frame_num() << "] size["
+        << adc_trajectory_points.size() << "]";
     AERROR << msg.str();
     if (FLAGS_planning_learning_mode == 1) {
       log_file_ << msg.str() << std::endl;
@@ -1112,8 +1082,8 @@ void MessageProcess::GenerateLearningDataFrame(
   const double end_timestamp = Clock::NowInSeconds();
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   ADEBUG << "MessageProcess: start_timestamp[" << start_timestamp
-         << "] end_timestamp[" << end_timestamp
-         << "] time_diff_ms[" << time_diff_ms << "]";
+         << "] end_timestamp[" << end_timestamp << "] time_diff_ms["
+         << time_diff_ms << "]";
 }
 
 }  // namespace planning

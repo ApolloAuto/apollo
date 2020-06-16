@@ -21,13 +21,12 @@
 #pragma once
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
-
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/tasks/optimizers/road_graph/comparable_cost.h"
 

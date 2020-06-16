@@ -24,7 +24,6 @@
 #include <vector>
 
 #include "Eigen/Eigen"
-
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"

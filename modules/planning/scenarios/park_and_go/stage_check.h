@@ -18,9 +18,6 @@
 
 #include <memory>
 
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -30,6 +27,8 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/util/util.h"
 

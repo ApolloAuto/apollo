@@ -23,7 +23,6 @@
 #include <memory>
 
 #include "cyber/common/macros.h"
-
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"

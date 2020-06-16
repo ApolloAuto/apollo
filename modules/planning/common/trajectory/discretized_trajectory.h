@@ -22,10 +22,9 @@
 
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {

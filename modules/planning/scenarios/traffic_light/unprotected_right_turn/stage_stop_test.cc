@@ -16,10 +16,9 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_stop.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

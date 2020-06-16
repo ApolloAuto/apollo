@@ -43,7 +43,7 @@ class TrajectoryConvRnnInference : public ModelInference {
   /**
    * @brief Get the name of model inference
    */
-  std::string GetName() override { return "TRAJECTORY_CONV_RNN_INFERENCE";};
+  std::string GetName() override { return "TRAJECTORY_CONV_RNN_INFERENCE"; };
 
   /**
    * @brief load a learned model

@@ -67,8 +67,8 @@ std::unique_ptr<Stage> LearningModelSampleScenario::CreateStage(
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(
-      stage_config.stage_type(), stage_config, injector);
+  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
+                                                 stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }
