@@ -14,8 +14,9 @@ if [[ -e "/apollo/scripts/apollo_base.sh" ]]; then
     . /apollo/scripts/apollo_base.sh
 fi
 
-export EDITOR="vim"
-alias v="vim"
+# export EDITOR="vim"
+# alias v="vim"
+
 alias bb="bazel build --distdir=/apollo/.cache/distdir"
 alias bt="bazel test  --distdir=/apollo/.cache/distdir"
 
