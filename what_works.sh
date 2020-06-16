@@ -107,14 +107,17 @@ bazel_test_with_dist_cache $(bazel query //modules/localization/... \
     except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
 )
 
+bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
+    except //modules/prediction/predictor/single_lane:single_lane_predictor_test \
+    except //modules/prediction/container/obstacles:obstacle_test \
+    except //modules/prediction/container/obstacles:obstacle_clusters_test \
+    except //modules/prediction/common:road_graph_test \
+)
+
 echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 
-# The following three is TensorRT related
-# TODO(storypku): bazel build //modules/perception/camera/...
-
-# TODO(?): bazel test //modules/prediction/...
 # TODO(?): apollo.sh build
 # TODO(?): apollo.sh test
 # TODO(?): apollo.sh lint
