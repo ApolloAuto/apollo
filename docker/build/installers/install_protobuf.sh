@@ -20,15 +20,15 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
 . /tmp/installers/installer_base.sh
 
-VERSION="3.11.2"
+VERSION="3.12.3"
+
 PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
-CHECKSUM="f2f180e9343cbb2b9a8482255bfec2176a2cc7fa22de496535a0a0cf38797495"
+CHECKSUM="4ef97ec6a8e0570d22ad8c57c99d2055a61ea2643b8e1a0998d2c844916c4968"
 DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/protobuf-cpp-${VERSION}.tar.gz"
 
-#https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz
+# https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protobuf-cpp-3.12.3.tar.gz
 
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 
