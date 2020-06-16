@@ -130,7 +130,9 @@ bazel_test_with_dist_cache $(bazel query //modules/planning/... \
     except //modules/planning/learning_based/model_inference:model_inference_test   \
     except //modules/planning/integration_tests:sunnyvale_big_loop_test \
 )
-# bazel_build_with_dist_cache $(bazel query //modules/planning/... except //modules/planning/tools:inference_demo)
+
+# FIXME(all): inference_demo crashed
+# bazel run //modules/planning/tools:inference_demo
 
 echo "########################### All check passed! ###########################"
 
