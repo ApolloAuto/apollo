@@ -74,18 +74,16 @@ cc_library(
     hdrs = ["util.h"],
 )
 
-#TODO(storypku): Disable it temporarily
-#cc_test(
-#    name = "cnn_segmentation_test",
-#    size = "small",
-#    srcs = ["cnn_segmentation_test.cc"],
-#    deps = [
-#        ":cnn_segmentation",
-#        "@paddlepaddle",
-#        "//modules/perception/common:perception_gflags",
-#        "@com_google_googletest//:gtest_main",
-#    ],
-#)
+cc_test(
+    name = "cnn_segmentation_test",
+    size = "small",
+    srcs = ["cnn_segmentation_test.cc"],
+    deps = [
+        ":cnn_segmentation",
+        "//modules/perception/common:perception_gflags",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
 #cc_test(
 #    name = "feature_generator_test",
