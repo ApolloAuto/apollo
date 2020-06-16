@@ -28,13 +28,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 apt-get -y update && \
     apt-get -y install \
-    cppcheck \
-    shellcheck \
-    lcov
+    cppcheck    \
+    shellcheck  \
+    lcov        \
+    valgrind    \
+    libgoogle-perftools4  # gperftools
 
 ## Pylint
 pip3_install pycodestyle
-pip3_install pylint
+pip3_install pyflakes
+# pip3_install pylint
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

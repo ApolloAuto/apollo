@@ -24,10 +24,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 apt-get -y update && \
     apt-get -y install \
-    vim \
-    git \
-    openssh-client \
-    lrzsz
+    git
+
+# More
+# openssh-client
+# silversearcher-ag
+# tree
+# vim
+# lrzsz
 
 bash /tmp/installers/install_bosfs.sh
 

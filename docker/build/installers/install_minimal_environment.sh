@@ -65,19 +65,15 @@ apt-get -y update && \
     libtool \
     less    \
     lsof    \
-    openssh-client \
     patch   \
     pkg-config  \
     python3     \
     python3-dev \
     python3-pip \
     sed         \
-    silversearcher-ag          \
     software-properties-common \
     sudo    \
-    tree    \
     unzip   \
-    vim     \
     wget    \
     zip     \
     xz-utils
