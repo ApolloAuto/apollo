@@ -27,12 +27,13 @@
 #include <omp.h>
 
 #include <algorithm>
-#include <coin/IpTNLP.hpp>
-#include <coin/IpTypes.hpp>
 #include <limits>
 #include <vector>
-
 #include "Eigen/Dense"
+
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"

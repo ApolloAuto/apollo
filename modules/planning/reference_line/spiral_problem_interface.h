@@ -22,10 +22,11 @@
 
 /* Workaround for coin/IpSmartPtr.hpp:18:4: error: #error "don't have header
  * file for stddef" */
-#include <coin/IpTNLP.hpp>
-#include <coin/IpTypes.hpp>
 #include <cstddef>
 #include <vector>
+
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 
 #include "Eigen/Dense"
 #include "modules/planning/math/curve1d/quintic_spiral_path_with_derivation.h"

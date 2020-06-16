@@ -67,6 +67,7 @@ bazel_build_with_dist_cache \
     //modules/localization/... \
     //modules/prediction/... \
     //modules/contrib/... \
+    //modules/planning/... \
     //modules/perception/... \
     //modules/third_party_perception/...
 
@@ -107,11 +108,23 @@ bazel_test_with_dist_cache $(bazel query //modules/localization/... \
     except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
 )
 
+# Prediction: 4 test failures
 bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
     except //modules/prediction/predictor/single_lane:single_lane_predictor_test \
     except //modules/prediction/container/obstacles:obstacle_test \
     except //modules/prediction/container/obstacles:obstacle_clusters_test \
     except //modules/prediction/common:road_graph_test \
+)
+
+# Planning: 7 test failures
+bazel_test_with_dist_cache $(bazel query //modules/planning/... \
+    except //modules/planning/tasks/learning_model:learning_model_inference_task_test \
+    except //modules/planning/reference_line:qp_spline_reference_line_smoother_test   \
+    except //modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_osqp_interface_test \
+    except //modules/planning/math/smoothing_spline:osqp_spline_2d_solver_test  \
+    except //modules/planning/math/smoothing_spline:osqp_spline_1d_solver_test  \
+    except //modules/planning/learning_based/model_inference:model_inference_test   \
+    except //modules/planning/integration_tests:sunnyvale_big_loop_test \
 )
 
 echo "########################### All check passed! ###########################"

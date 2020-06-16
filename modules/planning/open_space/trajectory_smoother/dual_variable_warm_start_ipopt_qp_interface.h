@@ -20,15 +20,17 @@
 
 #pragma once
 
-#include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
+#include <adolc/adolc.h>
 
-#include <coin/IpTNLP.hpp>
-#include <coin/IpTypes.hpp>
 #include <limits>
 #include <vector>
 
 #include "Eigen/Dense"
+
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
+
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"

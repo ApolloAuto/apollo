@@ -21,9 +21,10 @@
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 #include <algorithm>
+#include <utility>
+
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
-#include <utility>
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"

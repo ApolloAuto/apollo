@@ -24,11 +24,13 @@
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
+
 #include <omp.h>
+
+#include <vector>
 
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
-#include <vector>
 
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
