@@ -26,10 +26,10 @@ import time
 
 import numpy
 import simplejson
-from cyber_py3 import cyber
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber
+from cyber.pyhton.cyber_py3 import cyber_time
 
-from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
+from modules.prediction.proto.prediction_obstacle_py_pb2 import PredictionObstacles
 
 
 def prediction_publisher(prediction_channel, rate):
