@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+INSTALL_MODE="$1"; shift
 
 # Fail on first error.
 set -e
-
-INSTALL_MODE="$1"; shift
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
