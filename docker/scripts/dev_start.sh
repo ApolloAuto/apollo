@@ -210,7 +210,6 @@ fi
 
 APOLLO_DEV_IMAGE=${DOCKER_REPO}:$VERSION
 LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
 LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
 
 
@@ -360,12 +359,6 @@ function main() {
     do_docker_pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
-    PADDLE_VOLUME=apollo_paddlepaddle_volume_$USER
-    docker stop ${PADDLE_VOLUME} > /dev/null 2>&1
-
-    PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
-    do_docker_pull ${PADDLE_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
 
     LOCAL_THIRD_PARTY_VOLUME=apollo_local_third_party_volume_$USER
     docker stop ${LOCAL_THIRD_PARTY_VOLUME} > /dev/null 2>&1
@@ -375,7 +368,6 @@ function main() {
     docker run -it -d --rm --name ${LOCAL_THIRD_PARTY_VOLUME} ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
 
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
 
     local display=""

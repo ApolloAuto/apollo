@@ -478,15 +478,9 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   CNNSegConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
-  if (config.use_paddle()) {
-    *proto_file = GetAbsolutePath(work_root, config.paddle_proto_file());
-    *weight_file = GetAbsolutePath(work_root, config.paddle_weight_file());
-    *param_file = GetAbsolutePath(work_root, config.paddle_param_file());
-  } else {
-    *proto_file = GetAbsolutePath(work_root, config.proto_file());
-    *weight_file = GetAbsolutePath(work_root, config.weight_file());
-    *param_file = GetAbsolutePath(work_root, config.param_file());
-  }
+  *proto_file = GetAbsolutePath(work_root, config.proto_file());
+  *weight_file = GetAbsolutePath(work_root, config.weight_file());
+  *param_file = GetAbsolutePath(work_root, config.param_file());
   *engine_file = GetAbsolutePath(work_root, config.engine_file());
 
   return true;
