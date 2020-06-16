@@ -25,7 +25,6 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common/speed:st_boundary",
-        "//modules/planning/proto:dp_st_speed_config_cc_proto",
         "//modules/planning/tasks/utils:st_gap_estimator",
     ],
 )
@@ -64,7 +63,6 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:st_graph_data",
-        "//modules/planning/proto:dp_st_speed_config_cc_proto",
         "//modules/planning/proto:planning_internal_cc_proto",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
         "//modules/planning/tasks/optimizers:speed_optimizer",

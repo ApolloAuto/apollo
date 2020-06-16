@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "osqp/include/osqp.h"
+#include "osqp/osqp.h"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_solver.h"

@@ -52,9 +52,7 @@ bool TrajectoryImitationInference::LoadModel(
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(input_feature_tensor.to(device_)),
        std::move(initial_point_tensor.to(device_)),
-       std::move(initial_box_tensor.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+       std::move(initial_box_tensor.to(device_))}));
   auto torch_output_tensor =
       model_.forward(torch_inputs).toTensor().to(torch::kCPU);
   return true;
@@ -123,9 +121,7 @@ bool TrajectoryImitationInference::Inference(
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(input_feature_tensor.to(device_)),
        std::move(initial_point_tensor.to(device_)),
-       std::move(initial_box_tensor.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+       std::move(initial_box_tensor.to(device_))}));
 
   auto input_prepration_end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> prepration_diff =

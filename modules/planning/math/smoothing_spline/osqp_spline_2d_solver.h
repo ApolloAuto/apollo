@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "gtest/gtest_prod.h"
-#include "osqp/include/osqp.h"
+#include "osqp/osqp.h"
 
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"

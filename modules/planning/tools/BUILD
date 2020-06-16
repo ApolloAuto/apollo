@@ -7,6 +7,11 @@ cc_binary(
     name = "pad_terminal",
     srcs = ["pad_terminal.cc"],
     deps = [
+	  "//modules/planning/proto:planning_config_cc_proto",
+  "//modules/planning/proto:open_space_task_config_cc_proto",
+  "//modules/planning/proto:planner_open_space_config_cc_proto",
+  "//modules/planning/proto:fem_pos_deviation_smoother_config_cc_proto",
+  "//modules/planning/proto:task_config_cc_proto",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
