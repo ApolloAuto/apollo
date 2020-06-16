@@ -15,14 +15,14 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 
+#include <cuda_runtime_api.h>
+
 #include <algorithm>
-#include <cstring>
 #include <numeric>
 #include <random>
 #include <vector>
 
 #include "cyber/common/log.h"
-#include "include/cuda_runtime_api.h"
 
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -94,8 +94,7 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
     num_point_indexes = num_points;
     point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
     num_points = std::min(num_points, kMaxNumPoints);
-    points_array = new float[num_points * kNumPointFeature];
-    memset(points_array, 0, num_points * kNumPointFeature * sizeof(float));
+    points_array = new float[num_points * kNumPointFeature]();
     FusePointCloudToArray(original_cloud_, points_array, point_indexes,
                           kNormalizingFactor);
 
@@ -109,8 +108,7 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
     num_point_indexes = num_points;
     point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
     num_points = std::min(num_points, kMaxNumPoints);
-    points_array = new float[num_points * kNumPointFeature];
-    memset(points_array, 0, num_points * kNumPointFeature * sizeof(float));
+    points_array = new float[num_points * kNumPointFeature]();
     PclToArray(original_cloud_, points_array, point_indexes,
                kNormalizingFactor);
   }
