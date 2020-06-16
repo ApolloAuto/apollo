@@ -89,23 +89,27 @@ bazel_test_with_dist_cache \
     //modules/contrib/... \
     //modules/third_party_perception/...
 
+# Drivers: OK
 bash scripts/install_esdcan_library.sh install
 bazel_build_with_dist_cache //modules/drivers/...
 bazel_test_with_dist_cache //modules/drivers/...
 bash scripts/install_esdcan_library.sh uninstall
 
-bazel_test_with_dist_cache $(bazel query //modules/perception/... except //modules/perception/camera/test/...)
+# Perception
+bazel_test_with_dist_cache $(bazel query //modules/perception/... \
+    except //modules/perception/camera/test/... \
+)
 
 bazel_build_with_dist_cache //modules/tools/...
-bazel build //modules/tools/...
-# Note(storypku): bazel test works except some lint errors in cyber_visualizer.
-# Check cyber_visualizer's functionality once stablized.
-bazel_test_with_dist_cache $(bazel query //modules/tools/... except //modules/tools/visualizer/...)
-# bazel_build_with_dist_cache $(bazel query //modules/planning/... except //modules/planning/tools:inference_demo)
+bazel_test_with_dist_cache $(bazel query //modules/tools/... \
+    except //modules/tools/visualizer/... \
+)
 
+# Localization: 3 test failures
 bazel_test_with_dist_cache $(bazel query //modules/localization/... \
-    except //modules/localization/ndt/ndt_locator/... \
-    except //modules/localization/msf/local_pyramid_map/pyramid_map/... \
+    except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
+    except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
+    except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
 )
 
 # Prediction: 4 test failures
@@ -126,6 +130,7 @@ bazel_test_with_dist_cache $(bazel query //modules/planning/... \
     except //modules/planning/learning_based/model_inference:model_inference_test   \
     except //modules/planning/integration_tests:sunnyvale_big_loop_test \
 )
+# bazel_build_with_dist_cache $(bazel query //modules/planning/... except //modules/planning/tools:inference_demo)
 
 echo "########################### All check passed! ###########################"
 
