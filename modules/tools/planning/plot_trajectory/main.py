@@ -20,10 +20,10 @@ import sys
 
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
-import mkz_polygon
-from modules.planning.proto.planning_pb2 import ADCTrajectory
-from modules.localization.proto.localization_pb2 import LocalizationEstimate
+import modules.tools.common.proto_utils as proto_utils
+from modules.tools.planning.plot_trajectory import mkz_polygon
+from modules.planning.proto.planning_py_pb2 import ADCTrajectory
+from modules.localization.proto.localization_py_pb2 import LocalizationEstimate
 
 
 def plot_trajectory(planning_pb, ax):

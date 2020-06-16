@@ -25,8 +25,8 @@ import sys
 
 import numpy
 
-import common.proto_utils as proto_utils
-from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
+import modules.tools.common.proto_utils as proto_utils
+from modules.prediction.proto.prediction_obstacle_py_pb2 import PredictionObstacles
 
 
 def distance(p1, p2):
