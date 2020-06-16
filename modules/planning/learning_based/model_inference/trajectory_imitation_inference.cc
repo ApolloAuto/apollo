@@ -32,16 +32,14 @@ namespace planning {
 TrajectoryImitationInference::TrajectoryImitationInference(
     const LearningModelInferenceTaskConfig& config)
     : ModelInference(config), device_(torch::kCPU) {
-  LoadModel(config);
 }
 
-bool TrajectoryImitationInference::LoadModel(
-    const LearningModelInferenceTaskConfig& config) {
-  if (config.use_cuda() && torch::cuda::is_available()) {
+bool TrajectoryImitationInference::LoadModel() {
+  if (config_.use_cuda() && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
   }
-  model_ = torch::jit::load(config.model_file(), device_);
+  model_ = torch::jit::load(config_.model_file(), device_);
   torch::set_num_threads(1);
 
   // run a fake inference at init time as first inference is relative slow

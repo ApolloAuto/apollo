@@ -107,6 +107,13 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
       start_point_timestamp_sec, config.trajectory_delta_t(),
       &learning_data_frame);
 
+  if (!trajectory_imitation_inference_->LoadModel()) {
+    const std::string msg = absl::StrCat(
+        "TrajectoryImitationInference LoadModel() failed. frame_num[",
+        learning_data_frame.frame_num(), "]");
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
   if (!trajectory_imitation_inference_->Inference(&learning_data_frame)) {
     const std::string msg = absl::StrCat(
         "TrajectoryImitationInference Inference failed. frame_num[",
