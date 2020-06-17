@@ -32,7 +32,7 @@ enum class VirtualObjectType {
   // REROUTE = 4,
   // DECISION_JUMP = 5,
   // PRIORITY = 6
-};
+// };
 
 struct EnumClassHash {
   template <typename T>
