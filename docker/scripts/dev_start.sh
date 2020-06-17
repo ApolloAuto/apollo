@@ -32,7 +32,7 @@ USER_AGREE="no"
 
 # Check whether user has agreed license agreement
 #function check_agreement() {
-  agreement_record="${HOME}/.apollo_agreement.txt"
+#   agreement_record="${HOME}/.apollo_agreement.txt"
   if [ -e "$agreement_record" ]; then
     return
   fi
