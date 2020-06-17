@@ -151,6 +151,9 @@ function main() {
     fi
     local cmd="$1"; shift
     case "${cmd}" in
+        doc)
+            ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
+            ;;
         buildify)
             run_buildifier
             ;;

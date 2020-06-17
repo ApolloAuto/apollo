@@ -53,6 +53,12 @@ function get_now() {
     date +%s
 }
 
+function time_elapsed_s() {
+    local start="${1:-$(get_now)}"
+    local end="$(get_now)"
+    echo "$end - $start" | bc -l
+}
+
 function success() {
   print_delim
   ok "$1"
@@ -146,4 +152,11 @@ function git_branch() {
   else
     echo "@non-git"
   fi
+}
+
+function read_one_char_from_stdin() {
+    local answer
+    read -r -n1 answer
+    # Bash 4.x+: ${answer,,} to lowercase, ${answer^^} to uppercase
+    echo "${answer}" | tr '[:upper:]' '[:lower:]'
 }
