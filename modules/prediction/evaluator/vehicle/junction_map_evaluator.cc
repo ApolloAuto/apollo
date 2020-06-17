@@ -94,7 +94,6 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
 
-  at::Tensor torch_input_tensor;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)),
        std::move(junction_exit_mask.to(device_))}));
