@@ -16,8 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+APOLLO_ROOT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 export APOLLO_ROOT_DIR
+
+: ${VERBOSE:=yes}
+export TAB="    " # 4 spaces
 
 BOLD='\033[1m'
 RED='\033[0;31m'
@@ -47,29 +50,20 @@ function print_delim() {
 }
 
 function get_now() {
-  echo "$(date +%s)"
-}
-
-function print_time() {
-  END_TIME=$(get_now)
-  ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc -l)
-  MESSAGE="Took ${ELAPSED_TIME} seconds"
-  info "${MESSAGE}"
+    date +%s
 }
 
 function success() {
   print_delim
   ok "$1"
-  print_time
   print_delim
 }
 
 function fail() {
   print_delim
   error "$1"
-  print_time
   print_delim
-  exit -1
+  exit 1
 }
 
 function file_ext() {
@@ -105,11 +99,51 @@ function find_c_cpp_srcs() {
 
 ## Prevent multiple entries of my_bin_path in PATH
 function add_to_path() {
-    if [ -z "$1" ]; then
-        return
+  if [ -z "$1" ]; then
+    return
+  fi
+  local my_bin_path="$1"
+  if [ -n "${PATH##*${my_bin_path}}" ] && [ -n "${PATH##*${my_bin_path}:*}" ]; then
+    export PATH=$PATH:${my_bin_path}
+  fi
+}
+
+# Exits the script if the command fails.
+function run() {
+  if [ "${VERBOSE}" = yes ]; then
+    echo "${@}"
+    "${@}" || exit $?
+  else
+    local errfile="${APOLLO_ROOT_DIR}/.errors.log"
+    echo "${@}" >"${errfile}"
+    if ! "${@}" >>"${errfile}" 2>&1; then
+      local exitcode=$?
+      cat "${errfile}" 1>&2
+      exit $exitcode
     fi
-    local my_bin_path="$1"
-    if [ -n "${PATH##*${my_bin_path}}" ] && [ -n "${PATH##*${my_bin_path}:*}" ]; then
-        export PATH=$PATH:${my_bin_path}
-    fi
+  fi
+}
+
+#commit_id=$(git log -1 --pretty=%H)
+function git_sha1() {
+  if [ -x "$(which git 2>/dev/null)" ] && \
+     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+    git rev-parse --short HEAD 2>/dev/null || true
+  fi
+}
+
+function git_date() {
+  if [ -x "$(which git 2>/dev/null)" ] && \
+     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+    git log -1 --pretty=%ai | cut -d " " -f 1 || true
+  fi
+}
+
+function git_branch() {
+  if [ -x "$(which git 2>/dev/null)" ] && \
+     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+    git rev-parse --abbrev-ref HEAD
+  else
+    echo "@non-git"
+  fi
 }

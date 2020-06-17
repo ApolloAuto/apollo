@@ -58,7 +58,6 @@ modules/map/data
 docker/build/archive/
 
 # python proto
-py_proto
 *_pb2.py
 
 # calibration files
@@ -75,3 +74,4 @@ docs/demo_guide/*.record
 .cache/
 tools/python_bin_path.sh
 .apollo.bazelrc
+.errors.log
