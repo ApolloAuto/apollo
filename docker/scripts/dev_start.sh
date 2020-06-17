@@ -34,7 +34,7 @@ USER_AGREE="no"
 #function check_agreement() {
 #   agreement_record="${HOME}/.apollo_agreement.txt"
   #if [ -e "$agreement_record" ]; then
-    return
+ #   return
   fi
 
   AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
