@@ -1,17 +1,30 @@
-循迹搭建--定位模块配置
-===================
-
-## 目录
-      
- - [概览](#概览)
-	
- - [导航设备配置](#导航设备配置)
- 
- - [系统文件配置](#系统文件配置)
+# 循迹搭建--定位模块配置
+- [循迹搭建--定位模块配置](#循迹搭建--定位模块配置)
+  - [概览](#概览)
+  - [前提条件](#前提条件)
+  - [导航设备配置](#导航设备配置)
+    - [杆臂配置](#杆臂配置)
+    - [GNSS航向配置](#GNSS航向配置)
+    - [导航模式配置](#导航模式配置)
+    - [USB接口输出设置](#USB接口输出设置)
+    - [网口配置](#网口配置)
+    - [PPS授时接口输出](#PPS授时接口输出)
+  - [系统文件配置](#系统文件配置)
+    - [GNSS配置](#GNSS配置)
+    - [检查GPS信号](#检查GPS信号)
+    - [关闭点云定位](#关闭点云定位)
+    - [定位模式配置](#定位模式配置)
+    - [检查定位信号](#检查定位信号)
+  - [NEXT](#NEXT)
+  - [常见问题](#常见问题)
 
 ## 概览
 
 该手册旨在帮助用户在自动驾驶开发套件上配置定位模块。在定位模块配置环节，将完成导航设备配置。
+
+## 前提条件
+
+ - 完成了[循迹搭建--车辆集成](Vehicle_Integration_cn.md)
 
 ## 导航设备配置
 
@@ -63,6 +76,19 @@ $cmd,set,netuser,username:password*ff
 $cmd,set,mountpoint,XMJL*ff
 ```
 这里我们假设您所使用的无线路由器的IP地址为192.168.0.1,那么我们将M2主机的IP地址设置为192.168.0.123，子网掩码为255.255.255.0，网关为192.168.0.1，netipport设置的是RTK基站的IP地址和端口，netuser设置的是RTK基站的用户名和密码，mountpoint是RTK基站的挂载点。网络配置请依据自己所使用的路由器的实际情况自行更改为相应的配置，RTK基站信息请以自己的实际情况为准。注意：在M2的网络模块配置完成后，在IPC主机中应该是可以ping通IMU的ip地址的；否则，IMU无法正常联网，在后续的GNSS信号检查中会一直显示SINGLE而不是我们期望的NARROW_INT。
+
+**注意**：当您升级了IMU的固件版本时，请用以下命令来查看IMU的网络相关的配置：
+
+```
+$cmd,get,netpara*ff
+```
+
+若输出的内容有`$cmd,set,ntrip,disable,disable*ff`相关的字样，则将以下命令输入IMU：
+
+```
+$cmd,set,ntrip,enable,enable*ff
+$cmd,save,config*ff
+```
 
 ### PPS授时接口输出
 ```
@@ -133,10 +159,17 @@ rtk_from {
 
 ### 定位模式配置
 
-在`apollo/modules/localization/conf/localization_config.pb.txt`文件中这个配置应为`localization_type:MSF`，M2不支持`RTK`模式。    
 将`apollo/modules/localization/launch/localization.launch`文件中的`dag_streaming_rtk_localization.dag`修改为`dag_streaming_msf_localization.dag`。
 
-### 常见问题
+### 检查定位信号
+
+将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh和localization.sh脚本打开gps模块和localization模块。确认GPS模块已成功启动并且GPS信号良好。输入命令`cyber_monotor`，进入`/apollo/localization/pose`条目下，等待两分钟，直到有数据刷新即表明定位模块配置成功。
+
+## NEXT
+
+现在，您已经完成定位模块配置，接下来可以开始[循迹搭建--车辆动力学云标定](Vehicle_Calibration_Online_cn.md)
+
+## 常见问题
 系统无法生成驱动设备`ttyACM0`，在`/apollo/data/log/gnss.INFO`里面会有类似报错提示：
 
 ```
@@ -150,7 +183,3 @@ cd /apollo/docker/setup_host
 bash setup_host.sh
 ```
 重启工控机，然后在/docker/外，/dev/下，就有`ttyACM0`，再进docker，再试gps，可以了。
-
-### 检查定位信号
-
-将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh和localization.sh脚本打开gps模块和localization模块。确认GPS模块已成功启动并且GPS信号良好。输入命令`cyber_monotor`，进入`/apollo/localization/pose`条目下，等待两分钟，直到有数据刷新即表明定位模块配置成功。
