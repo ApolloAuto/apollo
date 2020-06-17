@@ -456,7 +456,7 @@ function clean() {
 }
 
 function buildify() {
-  find . -name '*BUILD' -or -name '*.bzl' -type f -exec buildifier -showlog -mode=fix {} +
+  find . -name '*BUILD' -or -name '*.bzl' -type f -exec buildifier -mode=fix {} +
   if [ $? -eq 0 ]; then
     success 'Buildify worked!'
   else
