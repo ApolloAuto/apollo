@@ -99,7 +99,6 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
   // Build input features for torch
   std::vector<torch::jit::IValue> torch_inputs;
 
-  at::Tensor torch_input_tensor;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
        std::move(obstacle_pos_step.to(device_))}));
@@ -260,7 +259,6 @@ void SemanticLSTMEvaluator::LoadModel() {
   torch::Tensor obstacle_pos_step = torch::zeros({1, 20, 2});
   std::vector<torch::jit::IValue> torch_inputs;
 
-  at::Tensor torch_input_tensor;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
        std::move(obstacle_pos_step.to(device_))}));
