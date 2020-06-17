@@ -24,11 +24,12 @@
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-if dpkg -l |grep -q "libpython2.7-dev"; then
-    echo "libpython2.7-dev is already installed"
+FLAG_PKG="libatlas-base-dev"
+if dpkg -l |grep -q "${FLAG_PKG}"; then
+    echo "${FLAG_PKG} already installed"
 else
     sudo apt-get -y update
-    sudo apt-get -y install libpython2.7-dev libatlas-base-dev
+    sudo apt-get -y install ${FLAG_PKG}
 fi
 echo "/opt/apollo/pkgs/caffe/lib" | sudo tee -a /etc/ld.so.conf.d/apollo.conf
 sudo ldconfig
@@ -95,10 +96,19 @@ bazel_build_with_dist_cache //modules/drivers/...
 bazel_test_with_dist_cache //modules/drivers/...
 bash scripts/install_esdcan_library.sh uninstall
 
-# Perception
+# Perception: 7 test failures + 2 flaky
 bazel_test_with_dist_cache $(bazel query //modules/perception/... \
-    except //modules/perception/camera/test/... \
+	except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
+	except //modules/perception/camera/test:camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test \
+	except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test \
+	except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_region_output_test \
+	except //modules/perception/camera/test:camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test \
+	except //modules/perception/camera/test:camera_lib_lane_detector_darkscnn_lane_detector_test \
+	except //modules/perception/camera/test:camera_app_obstacle_camera_perception_test \
 )
+# Flaky
+# //modules/perception/camera/test:camera_lib_lane_postprocessor_denseline_lane_postprocessor_test
+# //modules/perception/camera/test:camera_lib_lane_detector_denseline_lane_detector_test
 
 bazel_build_with_dist_cache //modules/tools/...
 bazel_test_with_dist_cache $(bazel query //modules/tools/... \
