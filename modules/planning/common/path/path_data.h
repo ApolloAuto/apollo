@@ -94,23 +94,15 @@ class PathData {
     return blocking_obstacle_id_;
   }
 
-  const size_t trimmed_path_bound_size() const {
-    return trimmed_path_bound_size_;
-  }
-  void set_trimmed_path_bound_size(const size_t trimmed_path_bound_size);
-
-  const common::PointENU path_reference_end_pose() const {
-    return path_reference_end_pos_;
-  }
-  void set_path_reference_end_pose(
-      const common::PointENU &path_reference_end_pose);
-
   const bool is_valid_path_reference() const {
     return is_valid_path_reference_;
   }
-  void set_valid_path_reference(bool is_valid_path_reference) {
+  void set_is_valid_path_reference(bool is_valid_path_reference) {
     is_valid_path_reference_ = is_valid_path_reference;
   }
+
+  const std::vector<common::PathPoint> &path_reference() const;
+  void set_path_reference(const std::vector<common::PathPoint> &path_reference);
 
  private:
   /*
@@ -142,10 +134,8 @@ class PathData {
    */
   // use path reference for optimization target
   bool is_valid_path_reference_ = false;
-  // path bound size after trimmed according to the learning model output
-  size_t trimmed_path_bound_size_{0};
-  // end pose of the reference
-  common::PointENU path_reference_end_pos_;
+  // path reference
+  std::vector<common::PathPoint> path_reference_;
 };
 
 }  // namespace planning

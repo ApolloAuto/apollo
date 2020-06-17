@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 
+#include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/speed_data.h"
@@ -122,17 +123,23 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       }
     }
 
-    if (path_boundary.label().find("regular") != std::string::npos &&
-        path_data.is_valid_path_reference()) {
-      // when path reference is ready
-      // set end lateral to be at the path reference
-      common::SLPoint path_reference_end_sl;
-      reference_line.XYToSL(path_data.path_reference_end_pose(),
-                            &path_reference_end_sl);
-      end_state[0] = path_reference_end_sl.l();
+    // updated cost function for path reference
+    std::vector<double> path_reference_l(path_boundary_size, 0.0);
+    bool is_valid_path_reference = path_data.is_valid_path_reference();
+    size_t path_reference_size = path_data.path_reference().size();
 
-      // trim path bounds
-      path_boundary_size = path_data.trimmed_path_bound_size();
+    if (path_boundary.label().find("regular") != std::string::npos &&
+        is_valid_path_reference) {
+      // when path reference is ready
+      for (size_t i = 0; i < path_reference_size; ++i) {
+        common::SLPoint path_reference_sl;
+        reference_line.XYToSL(common::util::PointFactory::ToPointENU(
+                                  path_data.path_reference().at(i).x(),
+                                  path_data.path_reference().at(i).y()),
+                              &path_reference_sl);
+        path_reference_l[i] = path_reference_sl.l();
+      }
+      end_state[0] = path_reference_l.back();
     }
 
     const auto& veh_param =
@@ -148,14 +155,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       ddl_bounds.emplace_back(-lat_acc_bound - kappa, lat_acc_bound - kappa);
     }
 
-    std::vector<std::pair<double, double>> trimmed_path_boundary(
-        path_boundary.boundary().begin(),
-        path_boundary.boundary().begin() + path_boundary_size);
-
     bool res_opt =
-        OptimizePath(init_frenet_state.second, end_state,
-                     path_boundary.delta_s(), trimmed_path_boundary, ddl_bounds,
-                     w, &opt_l, &opt_dl, &opt_ddl, max_iter);
+        OptimizePath(init_frenet_state.second, end_state, path_reference_l,
+                     path_boundary.delta_s(), is_valid_path_reference,
+                     path_boundary.boundary(), ddl_bounds, w, &opt_l, &opt_dl,
+                     &opt_ddl, max_iter);
 
     if (res_opt) {
       for (size_t i = 0; i < path_boundary_size; i += 4) {
@@ -225,7 +229,9 @@ PiecewiseJerkPathOptimizer::ConvertPathPointRefFromFrontAxeToRearAxe(
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(
     const std::array<double, 3>& init_state,
-    const std::array<double, 3>& end_state, const double delta_s,
+    const std::array<double, 3>& end_state,
+    const std::vector<double>& path_reference_l_ref, const double delta_s,
+    const bool is_valid_path_reference,
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::vector<std::pair<double, double>>& ddl_bounds,
     const std::array<double, 5>& w, std::vector<double>* x,
@@ -235,7 +241,10 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
 
   // TODO(Hongyi): update end_state settings
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
-  if (end_state[0] != 0) {
+  // pull over scenarios
+  // Because path reference might also make the end_state != 0
+  // we have to exclude this condition here
+  if (end_state[0] != 0 && !is_valid_path_reference) {
     std::vector<double> x_ref(lat_boundaries.size(), end_state[0]);
     const auto& pull_over_type = injector_->planning_context()
                                      ->planning_status()
@@ -243,6 +252,16 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                      .pull_over_type();
     const double weight_x_ref =
         pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER ? 200.0 : 10.0;
+    piecewise_jerk_problem.set_x_ref(weight_x_ref, x_ref);
+  }
+  // use path reference as a optimization cost function
+  if (is_valid_path_reference) {
+    std::vector<double> x_ref = std::move(path_reference_l_ref);
+    for (size_t i = 0; i < 10; ++i) {
+      ADEBUG << path_reference_l_ref.at(i);
+    }
+
+    const double weight_x_ref = 10.0;
     piecewise_jerk_problem.set_x_ref(weight_x_ref, x_ref);
   }
 
