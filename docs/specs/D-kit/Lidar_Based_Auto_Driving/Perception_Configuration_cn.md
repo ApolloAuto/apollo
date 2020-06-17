@@ -30,8 +30,6 @@
 |序号 | 待修改文件 | 修改内容 | 
 |---|---|---|
 |  1 | `modules/common/data/global_flagfile.txt` |  添加`--half_vehicle_width=0.43` |
-|  2 | `modules/perception/production/launch/dev_kit_perception.launch` |重命名为`perception.launch` 并替换原`perception.launch`文件  |
-|  3 | `modules/perception/production/dag/dev_kit_dag_streaming_perception.dag` | 重命名为`dag_streaming_perception.dag` 并替换原`dag_streaming_perception.dag`文件|
 
 ## 启动Lidar感知
 
@@ -72,7 +70,11 @@
 |`/tf_static`|确保能正常输出数据|
 
 #### 4. 启动Lidar感知
-确认各模块正常启动且channel输出正常后，在DreamView上启动Lidar感知模块(Perception模块)，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出
+使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+
+```
+budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/dev_kit_perception_lidar.launch
+```
 ![lidar_adaptation_dreamview3](images/lidar_adaptation_dreamview3.png)
 
 ## 验证Lidar感知效果
