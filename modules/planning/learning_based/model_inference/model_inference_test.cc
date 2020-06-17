@@ -79,11 +79,11 @@ TEST_F(ModelInferenceTest, trajectory_imitation) {
 
   std::unique_ptr<ModelInference> trajectory_imitation_inference =
       std::unique_ptr<ModelInference>(new TrajectoryImitationInference(config));
-      
-//   TODO:this test needs to be fix 
-//   trajectory_imitation_inference->LoadModel();
-//   ACHECK(trajectory_imitation_inference->Inference(&test_data_frame))
-//       << "Failed to inference trajectory_imitation_model";
+
+  //   TODO:this test needs to be fix
+  //   trajectory_imitation_inference->LoadModel();
+  //   ACHECK(trajectory_imitation_inference->Inference(&test_data_frame))
+  //       << "Failed to inference trajectory_imitation_model";
 }
 
 }  // namespace planning
