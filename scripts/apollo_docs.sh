@@ -6,7 +6,7 @@ source "${TOPDIR}/scripts/apollo.bashrc"
 
 APOLLO_DOCS_CFG="${APOLLO_ROOT_DIR}/apollo.doxygen"
 APOLLO_DOCS_DIR="${APOLLO_ROOT_DIR}/.cache/docs"
-APOLLO_DOCS_PORT=9527 # Unused for now
+# APOLLO_DOCS_PORT=9527 # Unused for now
 
 function determine_docs_dir() {
     local doxygen_cfg="${APOLLO_DOCS_CFG}"
@@ -58,8 +58,8 @@ function generate_docs() {
         mkdir -p "${output_dir}"
     fi
 
-    local start_time=$(get_now)
-    pushd ${APOLLO_ROOT_DIR} >/dev/null
+    local start_time="$(get_now)"
+    pushd "${APOLLO_ROOT_DIR}" >/dev/null
         run "${doxygen_cmd}" "${doxygen_cfg}" >/dev/null
     popd  >/dev/null
 
