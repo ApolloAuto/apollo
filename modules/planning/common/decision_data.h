@@ -27,11 +27,11 @@ namespace planning {
 enum class VirtualObjectType {
   DESTINATION = 0,
   CROSSWALK = 1,
-  TRAFFIC_LIGHT = 2,
-  CLEAR_ZONE = 3,
-  REROUTE = 4,
-  DECISION_JUMP = 5,
-  PRIORITY = 6
+  // TRAFFIC_LIGHT = 2,
+  // CLEAR_ZONE = 3,
+  // REROUTE = 4,
+  // DECISION_JUMP = 5,
+  // PRIORITY = 6
 };
 
 struct EnumClassHash {
