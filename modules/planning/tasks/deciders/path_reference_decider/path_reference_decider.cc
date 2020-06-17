@@ -55,6 +55,14 @@ Status PathReferenceDecider::Execute(Frame *frame,
 
 Status PathReferenceDecider::Process(Frame *frame,
                                      ReferenceLineInfo *reference_line_info) {
+  // skip using path reference during lane changing
+  // There are two reference line during change lane
+  if (frame->reference_line_info().size() > 1) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
+    ADEBUG << "Skip path reference when changing lane.";
+    return Status::OK();
+  }
   // get path bounds info from reference line info
   const std::vector<PathBoundary> &path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
@@ -62,13 +70,14 @@ Status PathReferenceDecider::Process(Frame *frame,
 
   // get learning model output (trajectory) from frame
   const std::vector<common::TrajectoryPoint> &path_reference =
-      frame->learning_based_data()
-           .learning_data_adc_future_trajectory_points();
+      frame->learning_based_data().learning_data_adc_future_trajectory_points();
   ADEBUG << "There are " << path_reference.size() << " path points.";
 
   // get regular path bound
   size_t regular_path_bound_idx = GetRegularPathBound(path_boundaries);
   if (regular_path_bound_idx == path_boundaries.size()) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
     const std::string msg = "No regular path boundary";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -78,7 +87,9 @@ Status PathReferenceDecider::Process(Frame *frame,
   if (!IsValidPathReference(reference_line_info,
                             path_boundaries[regular_path_bound_idx],
                             path_reference)) {
-    AINFO << "Learning model output violates path bounds. Not a validated "
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
+    ADEBUG << "Learning model output violates path bounds. Not a validated "
               "path reference";
     return Status::OK();
   }
@@ -86,29 +97,12 @@ Status PathReferenceDecider::Process(Frame *frame,
   // evaluate path reference
   EvaluatePathReference(&path_boundaries[regular_path_bound_idx],
                         path_reference, &evaluated_path_reference);
-  ADEBUG << "trimmed_path_bound_size: " << trimmed_path_bound_size_;
-  if (trimmed_path_bound_size_ <
-      config_.path_reference_decider_config().min_path_reference_length()) {
-    AINFO
-        << "Learning model output is too shot. Not a validated path reference";
-    return Status::OK();
-  }
+
   // mark learning trajectory as path reference
-  frame->mutable_learning_based_data()->set_is_learning_trajectory_valid(true);
+  reference_line_info->mutable_path_data()->set_is_valid_path_reference(true);
 
-  reference_line_info->mutable_path_data()->set_trimmed_path_bound_size(
-      trimmed_path_bound_size_);
-
-  reference_line_info->mutable_path_data()->set_valid_path_reference(true);
-
-  // write path reference end pose to PathData
-  common::PointENU path_reference_end_pos;
-  path_reference_end_pos.set_x(
-      evaluated_path_reference.at(trimmed_path_bound_size_ - 1).x());
-  path_reference_end_pos.set_y(
-      evaluated_path_reference.at(trimmed_path_bound_size_ - 1).y());
-  reference_line_info->mutable_path_data()->set_path_reference_end_pose(
-      path_reference_end_pos);
+  reference_line_info->mutable_path_data()->set_path_reference(
+      evaluated_path_reference);
 
   return Status::OK();
 }
@@ -292,7 +286,6 @@ void PathReferenceDecider::EvaluatePathReference(
     evaluated_path_reference->emplace_back(
         discrete_path_reference.Evaluate(cur_s));
   }
-  trimmed_path_bound_size_ = idx;
 }
 
 }  // namespace planning
