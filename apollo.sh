@@ -15,11 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
-#=================================================
-#                   Utils
-#=================================================
-
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
@@ -37,23 +32,23 @@ function apollo_check_system_config() {
   fi
 
   # check operating system
-  OP_SYSTEM=$(uname -s)
-  case $OP_SYSTEM in
+  HOST_OS=$(uname -s)
+  case $HOST_OS in
     "Linux")
       echo "System check passed. Build continue ..."
       # check system configuration
       DEFAULT_MEM_SIZE="2.0"
-      MEM_SIZE=$(free -m | grep Mem | awk '{printf("%0.2f", $2 / 1024.0)}')
+      MEM_SIZE=$(free -m | awk '/Mem:/ {printf("%0.2f", $2 / 1024.0)}')
       if (( $(echo "$MEM_SIZE < $DEFAULT_MEM_SIZE" | bc -l) )); then
          warning "System memory [${MEM_SIZE}G] is lower than minimum required memory size [2.0G]. Apollo build could fail."
       fi
       ;;
     "Darwin")
-      warning "Mac OS is not officially supported in the current version. Build could fail. We recommend using Ubuntu 14.04."
+      warning "MacOS is UNSUPPORTED currently."
+      exit 1
       ;;
     *)
-      error "Unsupported system: ${OP_SYSTEM}."
-      error "Please use Linux, we recommend Ubuntu 18.04."
+      error "Apollo is UNTESTED on ${HOST_OS} systems. Linux systems expected."
       exit 1
       ;;
   esac
