@@ -114,3 +114,15 @@ data_files {
   source_path: "transform_conf/static_transform_conf.pb.txt"
   dest_path: "/apollo/modules/transform/conf/static_transform_conf.pb.txt"
 }
+data_files {
+  source_path: "planning_conf"
+  dest_path: "/apollo/modules/planning/conf"
+}
+data_files {
+  source_path: "localization_conf"
+  dest_path: "/apollo/modules/localization/conf"
+}
+data_files {
+  source_path: "perception_dag"
+  dest_path: "/apollo/modules/perception/production/dag"
+}
