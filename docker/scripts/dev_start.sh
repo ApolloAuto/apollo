@@ -40,7 +40,7 @@ USER_AGREE="no"
 #   AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
   if [ ! -e "$AGREEMENT_FILE" ]; then
     error "AGREEMENT $AGREEMENT_FILE does not exist."
-    exit 1
+    # exit 1
   fi
 
   cat $AGREEMENT_FILE
