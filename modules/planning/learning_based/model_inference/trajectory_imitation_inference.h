@@ -51,7 +51,7 @@ class TrajectoryImitationInference : public ModelInference {
   /**
    * @brief load a learned model
    */
-  bool LoadModel(const LearningModelInferenceTaskConfig& config) override;
+  bool LoadModel() override;
 
   /**
    * @brief inference a learned model
