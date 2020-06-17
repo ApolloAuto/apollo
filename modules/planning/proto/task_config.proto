@@ -52,7 +52,8 @@ message LearningModelInferenceTaskConfig {
 // LearningModelInferenceTrajectoryTaskConfig
 
 message LearningModelInferenceTrajectoryTaskConfig {
-  optional double min_adc_future_trajectory_time_length = 1 [default = 2.0];  // second
+  optional double min_adc_future_trajectory_time_length = 1
+      [default = 2.0];  // second
 }
 
 //////////////////////////////////
@@ -154,6 +155,13 @@ message PathDeciderConfig {
 
 message PathLaneBorrowDeciderConfig {
   optional bool allow_lane_borrowing = 1;
+}
+
+//////////////////////////////////
+// PathReferenceDeciderConfig
+
+message PathReferenceDeciderConfig {
+  optional uint32 min_path_reference_length = 1 [default = 20];
 }
 
 //////////////////////////////////
