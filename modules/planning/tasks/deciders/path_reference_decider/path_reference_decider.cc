@@ -77,14 +77,21 @@ Status PathReferenceDecider::Process(Frame *frame,
   if (!IsValidPathReference(reference_line_info,
                             path_boundaries[regular_path_bound_idx],
                             path_reference)) {
-    AERROR << "Learning model output is not a validated path reference";
+    AINFO << "Learning model output violates path bounds. Not a validated "
+              "path reference";
     return Status::OK();
   }
   std::vector<PathPoint> evaluated_path_reference;
   // evaluate path reference
   EvaluatePathReference(&path_boundaries[regular_path_bound_idx],
                         path_reference, &evaluated_path_reference);
-
+  ADEBUG << "trimmed_path_bound_size: " << trimmed_path_bound_size_;
+  if (trimmed_path_bound_size_ <
+      config_.path_reference_decider_config().min_path_reference_length()) {
+    AINFO
+        << "Learning model output is too shot. Not a validated path reference";
+    return Status::OK();
+  }
   // mark learning trajectory as path reference
   frame->set_learning_trajectory_valid(true);
 
