@@ -55,7 +55,7 @@ class ModelInference {
   /**
    * @brief inference a learned model
    */
-  virtual bool Inference(LearningDataFrame* learning_data_frame) = 0;
+  virtual bool DoInference(LearningDataFrame* learning_data_frame) = 0;
 
  protected:
   LearningModelInferenceTaskConfig config_;
