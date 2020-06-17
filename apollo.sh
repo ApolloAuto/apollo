@@ -154,9 +154,6 @@ function build() {
     fail 'Build failed!'
   fi
 
-  # Build python proto
-  build_py_proto
-
   # Clear KV DB and update commit_id after compiling.
   if [ "$BUILD_FILTER" == 'cyber' ] || [ "$BUILD_FILTER" == 'drivers' ]; then
     info "Skipping revision recording"
@@ -265,21 +262,6 @@ function apollo_build_dbg() {
 
 function apollo_build_opt() {
   build "opt" $@
-}
-
-function build_py_proto() {
-  # TODO(xiaoxq): Retire this as we are using bazel to compile protos into bazel-genfiles.
-  if [ -d "./py_proto" ];then
-    rm -rf py_proto
-  fi
-  mkdir py_proto
-  find modules/ cyber/ -name "*.proto" \
-      | grep -v node_modules \
-      | xargs protoc --python_out=py_proto
-  find modules/ cyber/ -name "*_service.proto" \
-      | grep -v node_modules \
-      | xargs python -m grpc_tools.protoc --proto_path=. --python_out=py_proto --grpc_python_out=py_proto
-  find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
 function check() {
@@ -717,9 +699,6 @@ function main() {
       ;;
     buildify)
       buildify
-      ;;
-    build_py)
-      build_py_proto
       ;;
     config)
       config
