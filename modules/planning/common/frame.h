@@ -179,9 +179,11 @@ class Frame {
   }
 
   const LearningBasedData &learning_based_data() const {
-      return learning_based_data_; }
+    return learning_based_data_;
+  }
   LearningBasedData *mutable_learning_based_data() {
-      return &learning_based_data_; }
+    return &learning_based_data_;
+  }
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
