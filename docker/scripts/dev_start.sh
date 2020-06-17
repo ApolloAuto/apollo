@@ -31,11 +31,11 @@ NO_PULL_IMAGE=""
 USER_AGREE="no"
 
 # Check whether user has agreed license agreement
-function check_agreement() {
-  agreement_record="${HOME}/.apollo_agreement.txt"
-  if [ -e "$agreement_record" ]; then
-    return
-  fi
+# function check_agreement() {
+#   agreement_record="${HOME}/.apollo_agreement.txt"
+#   if [ -e "$agreement_record" ]; then
+#     return
+#   fi
 
   AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
   if [ ! -e "$AGREEMENT_FILE" ]; then
