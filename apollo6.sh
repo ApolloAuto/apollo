@@ -108,6 +108,9 @@ function main() {
         doc)
             ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
             ;;
+        configurator) # Consult Kecheng Xu
+            ${APOLLO_ROOT_DIR}/scripts/configurator.sh "$@"
+            ;;
         usage)
             _usage
             ;;
