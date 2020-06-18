@@ -18,19 +18,6 @@
 TOP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
 source ${TOP_DIR}/scripts/apollo.bashrc
 
-APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
-
-function check_in_docker() {
-  if [ -f /.dockerenv ]; then
-    APOLLO_IN_DOCKER=true
-    APOLLO_ROOT_DIR="/apollo"
-  else
-    APOLLO_IN_DOCKER=false
-  fi
-  export APOLLO_IN_DOCKER
-  APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
-}
-
 function set_lib_path() {
   local CYBER_SETUP="${APOLLO_ROOT_DIR}/cyber/setup.bash"
   [[ -e "${CYBER_SETUP}" ]] && . "${CYBER_SETUP}"

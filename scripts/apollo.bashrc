@@ -17,10 +17,20 @@
 ###############################################################################
 
 APOLLO_ROOT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-export APOLLO_ROOT_DIR
+APOLLO_IN_DOCKER=false
 
-: ${VERBOSE:=yes}
+# If inside docker container
+if [ -f /.dockerenv ]; then
+  APOLLO_IN_DOCKER=true
+  APOLLO_ROOT_DIR="/apollo"
+fi
+
+export APOLLO_ROOT_DIR
+export APOLLO_IN_DOCKER
+export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
+
 export TAB="    " # 4 spaces
+: ${VERBOSE:=yes}
 
 BOLD='\033[1m'
 RED='\033[0;31m'
@@ -50,13 +60,13 @@ function print_delim() {
 }
 
 function get_now() {
-    date +%s
+  date +%s
 }
 
 function time_elapsed_s() {
-    local start="${1:-$(get_now)}"
-    local end="$(get_now)"
-    echo "$end - $start" | bc -l
+  local start="${1:-$(get_now)}"
+  local end="$(get_now)"
+  echo "$end - $start" | bc -l
 }
 
 function success() {
@@ -155,8 +165,9 @@ function git_branch() {
 }
 
 function read_one_char_from_stdin() {
-    local answer
-    read -r -n1 answer
-    # Bash 4.x+: ${answer,,} to lowercase, ${answer^^} to uppercase
-    echo "${answer}" | tr '[:upper:]' '[:lower:]'
+  local answer
+  read -r -n1 answer
+  # Bash 4.x+: ${answer,,} to lowercase, ${answer^^} to uppercase
+  echo "${answer}" | tr '[:upper:]' '[:lower:]'
 }
+

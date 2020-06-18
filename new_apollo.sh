@@ -1,21 +1,15 @@
 #! /usr/bin/env bash
 set -e
 
-APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-APOLLO_IN_DOCKER=false
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
+
 ARCH="$(uname -m)"
 SUPPORTED_ARCHS=" x86_64 aarch64 "
 APOLLO_VERSION="@non-git"
 
 : ${USE_GPU:=0}
 : ${STAGE:=dev}
-
-function check_if_in_docker() {
-    if [ -f /.dockerenv ]; then
-        APOLLO_IN_DOCKER=true
-        APOLLO_ROOT_DIR="/apollo"
-    fi
-}
 
 function check_architecture_support() {
     if [[ "${SUPPORTED_ARCHS}" != *" ${ARCH} "* ]]; then
@@ -74,10 +68,6 @@ function check_apollo_version() {
 }
 
 function apollo_env_setup() {
-    check_if_in_docker
-    APOLLO_CACHE_DIR="${APOLLO_CACHE_DIR:-${APOLLO_ROOT_DIR}/.cache}"
-    source ${APOLLO_ROOT_DIR}/scripts/apollo.bashrc
-
     check_architecture_support
     check_platform_support
     check_minimal_memory_requirement
@@ -125,7 +115,7 @@ function main() {
             ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
             ;;
         buildify)
-            ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh "$@"
+            ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh "${STAGE}"
             ;;
         clean)
             run_cleanup
