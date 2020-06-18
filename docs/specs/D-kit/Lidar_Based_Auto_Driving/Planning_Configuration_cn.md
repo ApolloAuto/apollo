@@ -18,23 +18,24 @@
   - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)
 
 ## 配置文件的修改
+对`/apollo/modules/planning/conf/planning.conf`和`/apollo/modules/planning/conf/planning_config.pb.txt`两个配置文件进行以下修改：
 
-|修改文件名称 | 修改内容 | 对应的gflag参数 | 作用 | 
-|---|---|---|---|
-|`planning.conf` | 修改`defaut_cruise_speed`数值| 比如1.5 | 默认巡航速度|
-|`planning.conf` | 修改`planning_upper_speed_limit`数值| 比如1.5 |车planning最大速度 |
-|`planning.conf` | 修改`planning_lower_speed_limit`数值| 比如0.5 |车planning最小速度 |
-|`planning.conf` |添加`speed_upper_bound`数值| 比如1.5 | 车最大速度|
-|`planning.conf` |添加`max_stop_distance_obstacle`数值| 比如10 | 障碍物最大停止距离|
-|`planning.conf` |修改`min_stop_distance_obstacle`数值| 比如5 | 障碍物最小停止距离|
-|`planning.conf` |添加`destination_check_distance`数值| 比如1.0 | 认为车已经到达目的地时，车与目的地距离|
-|`planning.conf` |添加`lon_collision_buffer`数值| 比如0.3 | 车与障碍物的默认碰撞距离|
-|`planning.conf` |添加`noenable_scenario_park_and_go`配置项|  | 使起步停车场景失效|
-|`planning_config.pb.txt` |修改`total_time`数值| 比如15.0 | planning规划多长时间的路线|
-|`planning_config.pb.txt` |修改`max_acceleration`数值| 比如1.0 | 车辆最大加速度|
-|`planning_config.pb.txt` |修改`lowest_speed`数值| 比如0.5 | planning时车的最低速度|
-|`planning_config.pb.txt` |修改`max_speed_forward`数值| 比如1.5 | 车前进的最大速度|
-|`planning_config.pb.txt` |修改`max_acceleration_forward`数值| 比如1.0 | 车前进的最大加速度|
+|修改文件名称 | 修改内容 | 对应的gflag参数 | 单位 | 作用 | 
+|---|---|---|---|---|
+|`planning.conf` | 修改`defaut_cruise_speed`数值| 比如1.5 |m/s | 默认巡航速度|
+|`planning.conf` | 修改`planning_upper_speed_limit`数值| 比如1.5 |m/s |车planning最大速度 |
+|`planning.conf` | 添加`planning_lower_speed_limit`数值| 比如0.5 |m/s |车planning最小速度 |
+|`planning.conf` |添加`speed_upper_bound`数值| 比如1.5 | m/s |车最大速度|
+|`planning.conf` |添加`max_stop_distance_obstacle`数值| 比如10 |m | 障碍物最大停止距离|
+|`planning.conf` |添加`min_stop_distance_obstacle`数值| 比如5 |m| 障碍物最小停止距离|
+|`planning.conf` |添加`destination_check_distance`数值| 比如1.0 |m | 认为车已经到达目的地时，车与目的地距离|
+|`planning.conf` |添加`lon_collision_buffer`数值| 比如0.3 | m|车与障碍物的默认碰撞距离|
+|`planning.conf` |添加`enable_scenario_park_and_go`配置项| false | | 使起步停车场景失效|
+|`planning_config.pb.txt` |修改`total_time`数值| 比如15.0 |s | planning规划多长时间的路线|
+|`planning_config.pb.txt` |修改`max_acceleration`数值| 比如1.0 |m/s^2 | 车辆最大加速度|
+|`planning_config.pb.txt` |修改`lowest_speed`数值| 比如0.5 |m/s | planning时车的最低速度|
+|`planning_config.pb.txt` |修改`max_speed_forward`数值| 比如1.5 |m/s | 车前进的最大速度|
+|`planning_config.pb.txt` |修改`max_acceleration_forward`数值| 比如1.0 |m/s^2 | 车前进的最大加速度|
 
 **注意**：这些配置重新启动planning模块即可生效。为了安全起见，车planning速度一定要设置得比较小，建议按照上面的给出的值来设置相应的配置参数。
 
