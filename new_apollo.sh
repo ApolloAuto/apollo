@@ -84,21 +84,6 @@ function apollo_env_setup() {
     info "${TAB}STAGE: ${STAGE}"
 }
 
-function run_cleanup() {
-    if ! "${APOLLO_IN_DOCKER}" ; then
-        error "The clean operation must be run from within docker container"
-        exit 1
-    fi
-    bazel clean --async
-
-    # Remove bazel cache in associated directories
-    if [ -d /apollo-simulator ]; then
-        pushd /apollo-simulator >/dev/null
-            bazel clean --async
-        popd >/dev/null
-    fi
-}
-
 function _usage() {
     warning "Usage: Not implemented yet"
 }
@@ -111,9 +96,6 @@ function main() {
     fi
     local cmd="$1"; shift
     case "${cmd}" in
-        doc)
-            ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
-            ;;
         buildify)
             ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh "${STAGE}"
             ;;
@@ -121,7 +103,10 @@ function main() {
             ${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh "${STAGE}"
             ;;
         clean)
-            run_cleanup
+            ${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh "${STAGE}"
+            ;;
+        doc)
+            ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
             ;;
         usage)
             _usage

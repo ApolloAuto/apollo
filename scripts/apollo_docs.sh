@@ -44,7 +44,7 @@ function generate_docs() {
     if ! $gendoc ; then
         return
     fi
-    info "Generating Apollo Docs..."
+    info "Generating Apollo docs..."
     local doxygen_cmd="$(command -v doxygen)"
     if [ -z "${doxygen_cmd}" ]; then
         error "Command 'doxygen' not found. Please install it manually."
@@ -72,7 +72,7 @@ function clean_docs() {
         rm -rf "${APOLLO_DOCS_DIR}"
         success "Done cleanup apollo docs in ${APOLLO_DOCS_DIR}"
     else
-        success "Docs directory '${APOLLO_DOCS_DIR}' empty. Do nothing."
+        success "Nothing to do for empty directory '${APOLLO_DOCS_DIR}'."
     fi
 }
 
