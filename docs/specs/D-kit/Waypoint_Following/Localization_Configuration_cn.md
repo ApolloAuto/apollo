@@ -4,18 +4,19 @@
   - [前提条件](#前提条件)
   - [导航设备配置](#导航设备配置)
     - [杆臂配置](#杆臂配置)
-    - [GNSS航向配置](#GNSS航向配置)
+    - [GNSS航向配置](#gnss航向配置)
     - [导航模式配置](#导航模式配置)
-    - [USB接口输出设置](#USB接口输出设置)
+    - [USB接口输出设置](#usb接口输出设置)
     - [网口配置](#网口配置)
-    - [PPS授时接口输出](#PPS授时接口输出)
+    - [PPS授时接口输出](#pps授时接口输出)
   - [系统文件配置](#系统文件配置)
-    - [GNSS配置](#GNSS配置)
-    - [检查GPS信号](#检查GPS信号)
+    - [GNSS配置](#gnss配置)
+    - [检查GPS信号](#检查gps信号)
     - [关闭点云定位](#关闭点云定位)
     - [定位模式配置](#定位模式配置)
     - [检查定位信号](#检查定位信号)
-  - [NEXT](#NEXT)
+  - [`Localization.conf`文件的配置](#localizationconf文件的配置)
+  - [NEXT](#next)
   - [常见问题](#常见问题)
 
 ## 概览
@@ -164,6 +165,22 @@ rtk_from {
 ### 检查定位信号
 
 将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh和localization.sh脚本打开gps模块和localization模块。确认GPS模块已成功启动并且GPS信号良好。输入命令`cyber_monotor`，进入`/apollo/localization/pose`条目下，等待两分钟，直到有数据刷新即表明定位模块配置成功。
+
+
+## `Localization.conf`文件的配置
+对`modules/localization/conf/localization.conf` 文件进行配置。**如果该配置文件没有进行正确配置，可能会对之后的传感器标定、虚拟车道线制作等功能产生影响**
+
+
+| 参数 | 说明 |
+| --  |-- |
+|lidar_height_default|参数值修改为lidar中心到地面的距离 单位m|
+|local_utm_zone_id|  需要用户查询所在地区的utm_zone，并进行修改。例如，北京地区utm_zone为50 |
+|lidar_topic| 参数值修改为`/apollo/sensor/lidar16/compensator/PointCloud2` |
+|lidar_extrinsics_file|参数值修改为`/apollo/modules/localization/msf/params/velodyne_params/velodyne16_novatel_extrinsics.yaml`|
+|imu_to_ant_offset_x|x轴方向杆臂值，单位m，杆臂值测量方法参看`循迹搭建--车辆集成`文档|
+|imu_to_ant_offset_y|y轴方向杆臂值，单位m，杆臂值测量方法参看`循迹搭建--车辆集成`文档|
+|imu_to_ant_offset_z|z轴方向杆臂值，单位m，杆臂值测量方法参看`循迹搭建--车辆集成`文档|
+
 
 ## NEXT
 
