@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 set -e
 
-TOPDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOPDIR}/scripts/apollo.bashrc"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
 
 APOLLO_DOCS_CFG="${APOLLO_ROOT_DIR}/apollo.doxygen"
 APOLLO_DOCS_DIR="${APOLLO_ROOT_DIR}/.cache/docs"

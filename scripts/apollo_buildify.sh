@@ -2,8 +2,8 @@
 
 set -e
 
-TOPDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOPDIR}/scripts/apollo.bashrc"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
 
 function buildify() {
     local stage="${1:-dev}"

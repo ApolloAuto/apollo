@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 set -e
 
-TOPDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOPDIR}/scripts/apollo.bashrc"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
 
 function clean() {
     local stage="$1"; shift
@@ -13,7 +13,7 @@ function clean() {
     fi
     bazel clean --async
 
-    docs_sh="${TOPDIR}/scripts/apollo_docs.sh"
+    docs_sh="${TOP_DIR}/scripts/apollo_docs.sh"
     if [ -f "${docs_sh}" ]; then
         bash "${docs_sh}" clean "${stage}"
     fi

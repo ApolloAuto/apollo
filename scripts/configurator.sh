@@ -16,11 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
+set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
 
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
-
-python modules/tools/configurator/configurator.py
+python3 "${TOP_DIR}/modules/tools/configurator/configurator.py"

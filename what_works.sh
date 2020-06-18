@@ -159,6 +159,7 @@ echo "########################### All check passed! ###########################"
 #          See https://pypi.org/project/pycodestyle/
 # TODO(?): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
+# TODO(Kecheng Xu): modules/tools/configurator/configurator.py: 2to3
 # TODO(storypku): cyber.aarch64 docker image
 # TODO(storypku): tools/workspace.bzl to re-org WORKSPACE.in
 # TODO(?): no break for cpu only build

@@ -92,6 +92,6 @@ function run_lint() {
       run_bash_lint
       ;;
   esac
-  
+
 }
 run_lint $@
