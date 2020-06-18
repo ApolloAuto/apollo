@@ -44,7 +44,7 @@ function determine_gpu_use() {
         return
     fi
 
-local use_gpu=0
+    local use_gpu=0
     # Check nvidia-driver and GPU device
     local nv_driver="nvidia-smi"
     if [ ! -x "$(command -v ${nv_driver} )" ]; then

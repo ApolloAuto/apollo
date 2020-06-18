@@ -368,7 +368,6 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
-check_in_docker
 unset OMP_NUM_THREADS
 
 if [ $APOLLO_IN_DOCKER = "true" ]; then
