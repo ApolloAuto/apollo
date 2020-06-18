@@ -20,7 +20,7 @@ function buildify() {
     buildifier_cmd="${buildifier_cmd} -mode=fix"
 
     local build_dirs="cyber third_party tools external"
-    if [ "${STAGE}" == "dev" ]; then
+    if [ "${stage}" == "dev" ]; then
         build_dirs="modules ${build_dirs}"
     fi
     build_dirs=$(printf "${APOLLO_ROOT_DIR}/%s " $build_dirs)
