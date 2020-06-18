@@ -117,6 +117,9 @@ function main() {
         buildify)
             ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh "${STAGE}"
             ;;
+        lint)
+            ${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh "${STAGE}"
+            ;;
         clean)
             run_cleanup
             ;;
