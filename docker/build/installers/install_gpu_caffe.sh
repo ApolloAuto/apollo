@@ -48,14 +48,14 @@ CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
 #    libopenni-dev
 #    libvtk6-dev
 #    libvtk6-qt-dev
-#    libatlas-base-dev
 
 apt-get -y update && \
     apt-get -y install \
     libsnappy-dev \
     libhdf5-dev \
     libflann-dev \
-    libopenblas-dev
+    libopenblas-dev \
+    libatlas-base-dev
 
 # BLAS: install ATLAS by sudo apt-get install libatlas-base-dev or install
 # OpenBLAS by sudo apt-get install libopenblas-dev or MKL for better CPU performance.
@@ -111,6 +111,9 @@ pushd caffe-${VERSION}
     make -j$(nproc)
     make install
 popd
+
+echo "${PKGS_DIR}/caffe/lib" >> "${APOLLO_LD_FILE}"
+ldconfig
 
 # Clean up.
 rm -rf ${PKG_NAME} caffe-${VERSION}
