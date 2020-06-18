@@ -7,6 +7,7 @@ source "${TOP_DIR}/scripts/apollo.bashrc"
 ARCH="$(uname -m)"
 SUPPORTED_ARCHS=" x86_64 aarch64 "
 APOLLO_VERSION="@non-git"
+APOLLO_ENV=""
 
 : ${USE_GPU:=0}
 : ${STAGE:=dev}
@@ -74,20 +75,21 @@ function apollo_env_setup() {
     determine_gpu_use
     check_apollo_version
 
+    APOLLO_ENV="${APOLLO_ENV} USE_GPU=${USE_GPU}"
+    APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"
+    # Add more here ...
+
     info "Apollo Environment Settings:"
     info "${TAB}APOLLO_ROOT_DIR: ${APOLLO_ROOT_DIR}"
     info "${TAB}APOLLO_CACHE_DIR: ${APOLLO_CACHE_DIR}"
     info "${TAB}APOLLO_IN_DOCKER: ${APOLLO_IN_DOCKER}"
     info "${TAB}APOLLO_VERSION: ${APOLLO_VERSION}"
-
-    info "${TAB}USE_GPU=${USE_GPU}"
-    info "${TAB}STAGE: ${STAGE}"
+    info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
 }
 
 function _usage() {
     warning "Usage: Not implemented yet"
 }
-
 
 function main() {
     apollo_env_setup
@@ -96,17 +98,20 @@ function main() {
     fi
     local cmd="$1"; shift
     case "${cmd}" in
+        build)
+            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_build.sh "$@"
+            ;;
         buildify)
-            ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh "${STAGE}"
+            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh
             ;;
         lint)
-            ${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh "${STAGE}"
+            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh
             ;;
         clean)
-            ${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh "${STAGE}"
+            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh "$@"
             ;;
         doc)
-            ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
+            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
             ;;
         configurator) # Consult Kecheng Xu
             ${APOLLO_ROOT_DIR}/scripts/configurator.sh "$@"

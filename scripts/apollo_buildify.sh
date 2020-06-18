@@ -5,8 +5,11 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
+# STAGE="${STAGE:-dev}"
+: ${STAGE:=dev}
+
 function buildify() {
-    local stage="${1:-dev}"
+    local stage="${STAGE}"
 
     local buildifier_cmd="$(command -v buildifier)"
     if [ -z "${buildifier_cmd}" ]; then
@@ -17,7 +20,7 @@ function buildify() {
         exit 1
     fi
 
-    buildifier_cmd="${buildifier_cmd} -mode=fix"
+    buildifier_cmd="${buildifier_cmd} -lint=fix"
 
     local build_dirs="cyber third_party tools external"
     if [ "${stage}" == "dev" ]; then
@@ -25,8 +28,11 @@ function buildify() {
     fi
     build_dirs=$(printf "${APOLLO_ROOT_DIR}/%s " $build_dirs)
 
-    run find ${build_dirs} -name "*BUILD" -or -name "*.bzl" -exec \
-        ${buildifier_cmd} {} +
+    set -x
+    find ${build_dirs} -type f \
+        \( -name "BUILD" -or -name "*.BUILD" -or -name "*.bzl" \) \
+        -exec ${buildifier_cmd} {} +
+    set +x
 
     success "buildifier run finished successfully."
     if [ -f "${APOLLO_ROOT_DIR}/BUILD" ]; then

@@ -1,8 +1,11 @@
 #! /usr/bin/env bash
-set -e
-
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
+
+set -e
+
+# STAGE="${STAGE:-dev}"
+: ${STAGE:=dev}
 
 APOLLO_DOCS_CFG="${APOLLO_ROOT_DIR}/apollo.doxygen"
 APOLLO_DOCS_DIR="${APOLLO_ROOT_DIR}/.cache/docs"

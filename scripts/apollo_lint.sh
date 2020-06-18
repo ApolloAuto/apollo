@@ -4,6 +4,9 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
+# STAGE="${STAGE:-dev}"
+: ${STAGE:=dev}
+
 function cpp_lint() {
     info "running cpp_lint ..."
 }
@@ -17,8 +20,8 @@ function py_lint() {
 }
 
 function main() {
-    local stage="${1:-dev}"
-    echo "===${stage}"
+    local stage="${STAGE}"
+    echo "$stage"
     cpp_lint "${stage}"
     bash_lint "${stage}"
     py_lint "${stage}"
