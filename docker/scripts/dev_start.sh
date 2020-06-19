@@ -17,7 +17,7 @@
 ###############################################################################
 
 #APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+#CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
