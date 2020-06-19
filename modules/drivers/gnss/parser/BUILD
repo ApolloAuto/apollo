@@ -20,6 +20,7 @@ cc_library(
         "data_parser.h",
         "parser.h",
     ],
+    copts = ["-Ithird_party/rtklib"],
     deps = [
         ":newtonm2_parser",
         ":novatel_parser",
@@ -46,6 +47,7 @@ cc_library(
         "parser.h",
         "rtcm_decode.h",
     ],
+    copts = ["-Ithird_party/rtklib"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -59,8 +61,8 @@ cc_library(
         "//modules/drivers/gnss/proto:heading_cc_proto",
         "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/drivers/gnss/proto:ins_cc_proto",
-        "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
+        "//third_party/rtklib",
     ],
 )
 
@@ -73,6 +75,7 @@ cc_library(
         "parser.h",
         "rtcm_decode.h",
     ],
+    copts = ["-Ithird_party/rtklib"],
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
@@ -83,8 +86,8 @@ cc_library(
         "//modules/drivers/gnss/proto:heading_cc_proto",
         "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/drivers/gnss/proto:ins_cc_proto",
-        "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
+        "//third_party/rtklib",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -101,13 +104,14 @@ cc_library(
         "rtcm_decode.h",
         "rtcm_parser.h",
     ],
+    copts = ["-Ithird_party/rtklib"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/drivers/gnss/proto:config_cc_proto",
         "//modules/drivers/gnss/proto:gnss_raw_observation_cc_proto",
-        "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
+        "//third_party/rtklib",
     ],
 )
 
