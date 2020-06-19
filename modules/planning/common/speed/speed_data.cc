@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 
 #include <algorithm>
+#include <mutex>
 #include <utility>
 
 #include "absl/strings/str_cat.h"
@@ -45,10 +46,13 @@ SpeedData::SpeedData(std::vector<SpeedPoint> speed_points)
 void SpeedData::AppendSpeedPoint(const double s, const double time,
                                  const double v, const double a,
                                  const double da) {
+  static std::mutex mutex_speedpoint;
+  std::unique_lock<std::mutex> lock(mutex_speedpoint);
   if (!empty()) {
     ACHECK(back().t() < time);
   }
-  push_back(common::util::PointFactory::ToSpeedPoint(s, time, v, a, da));
+  auto ret_value = common::util::PointFactory::ToSpeedPoint(s, time, v, a, da);
+  push_back(ret_value);
 }
 
 bool SpeedData::EvaluateByTime(const double t,

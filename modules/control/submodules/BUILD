@@ -42,6 +42,7 @@ cc_library(
         "//modules/control/proto:preprocessor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/control/common:dependency_injector",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

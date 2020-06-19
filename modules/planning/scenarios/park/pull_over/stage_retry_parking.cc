@@ -95,15 +95,15 @@ bool PullOverStageRetryParking::CheckADCPullOverOpenSpace() {
   }
 
   const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+      injector_->vehicle_state()->x(),
+      injector_->vehicle_state()->y()};
   const common::math::Vec2d target_position = {pull_over_status.position().x(),
                                                pull_over_status.position().y()};
 
   const double distance_diff = adc_position.DistanceTo(target_position);
   const double theta_diff = std::fabs(common::math::NormalizeAngle(
       pull_over_status.theta() -
-      common::VehicleStateProvider::Instance()->heading()));
+      injector_->vehicle_state()->heading()));
   ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
          << "]";
   // check distance/theta diff

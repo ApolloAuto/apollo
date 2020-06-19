@@ -7,6 +7,9 @@ cc_library(
     srcs = [],
     hdrs = ["controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
+    deps = [
+        "//modules/control/common:dependency_injector",
+    ],
 )
 
 cc_library(
@@ -118,6 +121,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/control/common:dependency_injector",
         "@osqp",
     ],
 )

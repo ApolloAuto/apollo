@@ -37,8 +37,8 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
     return StageStatus::ERROR;
   }
 
-  bool ready_to_cruise =
-      scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
+  bool ready_to_cruise = scenario::util::CheckADCReadyToCruise(
+      injector_->vehicle_state(), frame, scenario_config_);
   return FinishStage(ready_to_cruise);
 }
 
@@ -61,12 +61,12 @@ void ParkAndGoStageCheck::ADCInitStatus() {
                                  ->mutable_park_and_go();
   park_and_go_status->Clear();
   park_and_go_status->mutable_adc_init_position()->set_x(
-      common::VehicleStateProvider::Instance()->x());
+      injector_->vehicle_state()->x());
   park_and_go_status->mutable_adc_init_position()->set_y(
-      common::VehicleStateProvider::Instance()->y());
+      injector_->vehicle_state()->y());
   park_and_go_status->mutable_adc_init_position()->set_z(0.0);
   park_and_go_status->set_adc_init_heading(
-      common::VehicleStateProvider::Instance()->heading());
+      injector_->vehicle_state()->heading());
   park_and_go_status->set_in_check_stage(true);
 }
 
