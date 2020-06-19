@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planning_internal.pb.h"
-
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
@@ -33,6 +31,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -73,7 +72,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
           ->mutable_signal_light();
   signal_light_debug->set_adc_front_s(adc_front_edge_s);
   signal_light_debug->set_adc_speed(
-      common::VehicleStateProvider::Instance()->linear_velocity());
+      injector_->vehicle_state()->linear_velocity());
 
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info->reference_line().map_path().signal_overlaps();
@@ -103,9 +102,8 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     traffic_light_sl.set_l(0);
     common::math::Vec2d traffic_light_point;
     reference_line.SLToXY(traffic_light_sl, &traffic_light_point);
-    common::math::Vec2d adc_position = {
-        common::VehicleStateProvider::Instance()->x(),
-        common::VehicleStateProvider::Instance()->y()};
+    common::math::Vec2d adc_position = {injector_->vehicle_state()->x(),
+                                        injector_->vehicle_state()->y()};
     const double distance =
         common::util::DistanceXY(traffic_light_point, adc_position);
     const double s_distance = traffic_light_overlap.start_s - adc_front_edge_s;
@@ -122,7 +120,8 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     auto signal_color =
         frame->GetSignal(traffic_light_overlap.object_id).color();
     const double stop_deceleration = util::GetADCStopDeceleration(
-        adc_front_edge_s, traffic_light_overlap.start_s);
+        injector_->vehicle_state(), adc_front_edge_s,
+        traffic_light_overlap.start_s);
     ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s << "] color["
            << signal_color << "] stop_deceleration[" << stop_deceleration

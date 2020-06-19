@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
@@ -86,8 +87,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // Fallback starts from current location but with vehicle velocity
     auto fallback_start_point =
         fallback_trajectory_pair_candidate.first[fallback_start_index];
-    const auto& vehicle_state =
-        apollo::common::VehicleStateProvider::Instance()->vehicle_state();
+    const auto& vehicle_state = injector_->vehicle_state()->vehicle_state();
     fallback_start_point.set_v(vehicle_state.linear_velocity());
 
     *(frame_->mutable_open_space_info()->mutable_future_collision_point()) =

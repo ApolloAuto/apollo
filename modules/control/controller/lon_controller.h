@@ -64,7 +64,8 @@ class LonController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf) override;
+  common::Status Init(std::shared_ptr<DependencyInjector> injector,
+                      const ControlConf *control_conf) override;
 
   /**
    * @brief compute brake / throttle values based on current vehicle status
@@ -142,6 +143,8 @@ class LonController : public Controller {
 
   // vehicle parameter
   common::VehicleParam vehicle_param_;
+
+  std::shared_ptr<DependencyInjector> injector_;
 };
 }  // namespace control
 }  // namespace apollo

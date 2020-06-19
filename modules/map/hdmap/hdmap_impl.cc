@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <algorithm>
 #include <limits>
+#include <mutex>
 #include <set>
 #include <unordered_set>
 
@@ -1296,6 +1297,8 @@ template <class KDTree>
 int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
                              const KDTree& kdtree,
                              std::vector<std::string>* const results) {
+  static std::mutex mutex_search_object;
+  std::unique_lock<std::mutex> lock(mutex_search_object);
   if (results == nullptr) {
     return -1;
   }

@@ -48,13 +48,17 @@ bool IsClosed(const double x0, const double y0, const double theta0,
 
 }  // namespace
 
-PerceptionObstacle::Type Obstacle::type() const { return type_; }
+PerceptionObstacle::Type Obstacle::type() const {
+  return type_;
+}
 
 bool Obstacle::IsPedestrian() const {
   return type_ == PerceptionObstacle::PEDESTRIAN;
 }
 
-int Obstacle::id() const { return id_; }
+int Obstacle::id() const {
+  return id_;
+}
 
 double Obstacle::timestamp() const {
   ACHECK(!feature_history_.empty());
@@ -87,7 +91,9 @@ Feature* Obstacle::mutable_latest_feature() {
   return &(feature_history_.front());
 }
 
-size_t Obstacle::history_size() const { return feature_history_.size(); }
+size_t Obstacle::history_size() const {
+  return feature_history_.size();
+}
 
 bool Obstacle::IsStill() {
   if (feature_history_.size() > 0) {
@@ -1382,6 +1388,8 @@ void Obstacle::InsertFeatureToHistory(const Feature& feature) {
 std::unique_ptr<Obstacle> Obstacle::Create(
     const PerceptionObstacle& perception_obstacle, const double timestamp,
     const int prediction_id) {
+  static std::mutex mutex_createobstacle;
+  std::unique_lock<std::mutex> lock(mutex_createobstacle);
   std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle());
   if (!ptr_obstacle->Insert(perception_obstacle, timestamp, prediction_id)) {
     return nullptr;

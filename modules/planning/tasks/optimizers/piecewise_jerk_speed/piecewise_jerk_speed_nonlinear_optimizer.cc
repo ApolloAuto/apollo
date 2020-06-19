@@ -20,10 +20,9 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
+#include <algorithm>
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
-
-#include <algorithm>
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -472,6 +471,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
 Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     std::vector<double>* distance, std::vector<double>* velocity,
     std::vector<double>* acceleration) {
+  static std::mutex mutex_tnlp;
+  std::unique_lock<std::mutex> lock(mutex_tnlp);
   // Set optimizer instance
   auto ptr_interface = new PiecewiseJerkSpeedNonlinearIpoptInterface(
       s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
@@ -552,7 +553,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
   }
 
   const auto start_timestamp = std::chrono::system_clock::now();
-
   status = app->OptimizeTNLP(problem);
 
   const auto end_timestamp = std::chrono::system_clock::now();

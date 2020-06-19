@@ -22,8 +22,6 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/routing/proto/routing.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
@@ -38,6 +36,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -319,12 +318,13 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 }
 
 Status Frame::Init(
+    const common::VehicleStateProvider *vehicle_state_provider,
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
     const std::vector<routing::LaneWaypoint> &future_route_waypoints,
     const EgoInfo *ego_info) {
   // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
-  auto status = InitFrameData(ego_info);
+  auto status = InitFrameData(vehicle_state_provider, ego_info);
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
@@ -338,14 +338,18 @@ Status Frame::Init(
   return Status::OK();
 }
 
-Status Frame::InitForOpenSpace(const EgoInfo *ego_info) {
-  return InitFrameData(ego_info);
+Status Frame::InitForOpenSpace(
+    const common::VehicleStateProvider *vehicle_state_provider,
+    const EgoInfo *ego_info) {
+  return InitFrameData(vehicle_state_provider, ego_info);
 }
 
-Status Frame::InitFrameData(const EgoInfo *ego_info) {
+Status Frame::InitFrameData(
+    const common::VehicleStateProvider *vehicle_state_provider,
+    const EgoInfo *ego_info) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
-  vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
+  vehicle_state_ = vehicle_state_provider->vehicle_state();
   if (!util::IsVehicleStateValid(vehicle_state_)) {
     AERROR << "Adc init point is not set";
     return Status(ErrorCode::PLANNING_ERROR, "Adc init point is not set");
@@ -401,7 +405,9 @@ const Obstacle *Frame::FindCollisionObstacle(const EgoInfo *ego_info) const {
   return nullptr;
 }
 
-uint32_t Frame::SequenceNum() const { return sequence_num_; }
+uint32_t Frame::SequenceNum() const {
+  return sequence_num_;
+}
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
@@ -463,7 +469,9 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   }
 }
 
-Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
+Obstacle *Frame::Find(const std::string &id) {
+  return obstacles_.Find(id);
+}
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
