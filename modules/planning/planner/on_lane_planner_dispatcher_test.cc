@@ -36,6 +36,7 @@ class OnLanePlannerDispatcherTest : public ::testing::Test {
 };
 
 TEST_F(OnLanePlannerDispatcherTest, Simple) {
+  auto injector = std::make_shared<DependencyInjector>();
   pd_.reset(new OnLanePlannerDispatcher());
   pd_->Init();
 
@@ -44,7 +45,7 @@ TEST_F(OnLanePlannerDispatcherTest, Simple) {
   PlanningConfig planning_config;
   apollo::cyber::common::GetProtoFromFile(planning_config_file,
                                           &planning_config);
-  auto planner = pd_->DispatchPlanner(planning_config);
+  auto planner = pd_->DispatchPlanner(planning_config, injector);
 
   EXPECT_EQ(planner->Name(), "PUBLIC_ROAD");
 }

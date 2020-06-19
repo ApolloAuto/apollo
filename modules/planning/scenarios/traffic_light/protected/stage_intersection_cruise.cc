@@ -37,8 +37,9 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
     AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";
   }
 
-  bool stage_done = stage_impl_.CheckDone(
-      *frame, ScenarioConfig::TRAFFIC_LIGHT_PROTECTED, config_, true);
+  bool stage_done =
+      stage_impl_.CheckDone(*frame, ScenarioConfig::TRAFFIC_LIGHT_PROTECTED,
+                            config_, injector_->planning_context(), true);
   if (stage_done) {
     return FinishStage();
   }

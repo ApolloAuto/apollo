@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
 
+#include <string>
 #include <vector>
 
 namespace apollo {
@@ -31,49 +32,58 @@ using apollo::common::TrajectoryPoint;
 
 LearningModelInferenceTrajectoryTask::LearningModelInferenceTrajectoryTask(
     const TaskConfig &config) : Task(config) {
+  ACHECK(config.has_learning_model_inference_trajectory_task_config());
 }
 
 Status LearningModelInferenceTrajectoryTask::Execute(
     Frame *frame,
     ReferenceLineInfo *reference_line_info) {
   CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
 
   Task::Execute(frame, reference_line_info);
-  return Process(frame);
+  return Process(frame, reference_line_info);
 }
 
-Status LearningModelInferenceTrajectoryTask::Process(Frame *frame) {
+Status LearningModelInferenceTrajectoryTask::Process(
+    Frame *frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
 
-  WriteTrajectory(frame);
+  const auto& config =
+      config_.learning_model_inference_trajectory_task_config();
 
-  return Status::OK();
-}
-
-bool LearningModelInferenceTrajectoryTask::WriteTrajectory(Frame* frame) {
-  CHECK_NOTNULL(frame);
-
-  auto reference_line_infos = frame->mutable_reference_line_infos();
-  if (reference_line_infos->empty()) {
-    AERROR << "no reference is found.";
-    return false;
-  }
-  // FIXME(all): current only pick up the first reference line to use
-  // learning model trajectory.
-  for (auto& reference_line_info : *reference_line_infos) {
-    reference_line_info.SetDrivable(false);
-  }
-  auto& picked_reference_line_info = reference_line_infos->front();
-  picked_reference_line_info.SetDrivable(true);
-  picked_reference_line_info.SetCost(0);
-
-  std::vector<TrajectoryPoint> trajectory_points
+  const std::vector<TrajectoryPoint> adc_future_trajectory_points
       = frame->learning_data_adc_future_trajectory_points();
 
-  picked_reference_line_info.SetTrajectory(
-     DiscretizedTrajectory(trajectory_points));
+  const double first_point_relative_time =
+      adc_future_trajectory_points.front().relative_time();
+  const double last_point_relative_time =
+      adc_future_trajectory_points.back().relative_time();
+  ADEBUG << "LearningModelInferenceTrajectoryTask: frame_num["
+         <<  frame->learning_data_frame().frame_num()
+         << "] adc_future_trajectory_points_size["
+         << adc_future_trajectory_points.size()
+         << "] first_point_relative_time[" << first_point_relative_time
+         << "] last_point_relative_time[" << last_point_relative_time << "]";
+  if (adc_future_trajectory_points.size() < 0 ||
+      first_point_relative_time < 0.0 ||
+      last_point_relative_time <
+          config.min_adc_future_trajectory_time_length()) {
+    const std::string msg =
+        absl::StrCat(
+            "adc_future_trajectory_point issue. size[",
+            adc_future_trajectory_points.size(),
+            "] first_point_relative_time[", first_point_relative_time,
+            "] last_point_relative_time[", last_point_relative_time);
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
-  return true;
+  reference_line_info->SetTrajectory(
+  DiscretizedTrajectory(adc_future_trajectory_points));
+
+  return Status::OK();
 }
 
 }  // namespace planning

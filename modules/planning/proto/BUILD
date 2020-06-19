@@ -342,6 +342,7 @@ proto_library(
         "//modules/perception/proto:perception_proto_lib",
         "//modules/prediction/proto:feature_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 

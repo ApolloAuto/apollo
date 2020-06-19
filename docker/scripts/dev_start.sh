@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+#APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 LOCAL_IMAGE="no"
@@ -24,10 +24,11 @@ FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-18.04-x86_64-20200507_0633"
+VERSION_X86_64="dev-18.04-x86_64-20200601_0507"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
+USER_AGREE="no"
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -45,13 +46,19 @@ function check_agreement() {
   cat $AGREEMENT_FILE
   tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
   echo $tip
-  read -n 1 user_agreed
-  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+  if [ "$USER_AGREE" == "yes" ]; then
     cp $AGREEMENT_FILE $agreement_record
     echo "$tip" >> $agreement_record
     echo "$user_agreed" >> $agreement_record
   else
-    exit 1
+    read -n 1 user_agreed
+    if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+      cp $AGREEMENT_FILE $agreement_record
+      echo "$tip" >> $agreement_record
+      echo "$user_agreed" >> $agreement_record
+    else
+      exit 1
+    fi
   fi
 }
 
@@ -93,7 +100,6 @@ function set_registry_mirrors()
 {
 sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
 service docker restart
-
 }
 
 if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
@@ -102,6 +108,10 @@ fi
 
 if [ -e /proc/sys/kernel ]; then
     echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+fi
+
+if [ "$1" == "-y" ]; then
+    USER_AGREE="yes"
 fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
@@ -167,6 +177,8 @@ do
     -n)
         NO_PULL_IMAGE="yes"
         info "running without pulling docker image"
+        ;;
+    -y)
         ;;
     stop)
 	stop_containers

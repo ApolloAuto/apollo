@@ -35,19 +35,26 @@ static const char SPEEDLIMITMAP_IMG_PATH[] =
     "/apollo/modules/planning/data/semantic_map/"
     "sunnyvale_with_two_offices_speedlimit.png";
 
-BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {
-}
+BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {}
 
 bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   config_ = config;
   ego_vehicle_config_ = common::VehicleConfigHelper::GetConfig();
 
+  // a redundant call to HDMapUtil::BaseMap() to save time for renderering when
+  // the basemap is not yet initialized in HDMapUtil
+  apollo::hdmap::HDMapUtil::BaseMap();
+
   const std::string map_name =
       FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
-  if (map_name != "sunnyvale_with_two_offices") {
-    AERROR << "Mapsother than sunnyvale_with_two_offices are not supported";
-    return false;
+  if (map_name != "sunnyvale_with_two_offices" && map_name != "sunnyvale") {
+    AERROR << "Map other than sunnyvale_with_two_offices are not supported";
   }
+  // TODO(Jinyun): add sunnyvale map or draw basemap online
+  if (map_name == "sunnyvale") {
+    AWARN << "use sunnyvale_with_two_offices for sunnyvale for now";
+  }
+
   // TODO(Jinyun): move to a more managable place
   map_bottom_left_point_x_ = 585875.3316302994;
   map_bottom_left_point_y_ = 4139916.6342316796;
@@ -59,11 +66,22 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
     return false;
   }
 
+  ego_cur_point_img_ =
+      cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
+  ego_cur_box_img_ =
+      cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
+
   bool render_ego_point_status = RenderEgoCurrentPoint(&ego_cur_point_img_);
   bool render_ego_box_status = RenderEgoCurrentBox(&ego_cur_box_img_);
 
   if (!render_ego_point_status || !render_ego_box_status) {
     AERROR << "Ego point or box img rendering failed";
+    return false;
+  }
+
+  if (base_roadmap_img_.size[0] != base_speedlimit_img_.size[0] ||
+      base_roadmap_img_.size[1] != base_speedlimit_img_.size[1]) {
+    AERROR << "base map sizes doesn't match";
     return false;
   }
 
@@ -75,6 +93,13 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
 
 bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
+  int ego_trajectory_point_history_size =
+      learning_data_frame.adc_trajectory_point_size();
+  if (ego_trajectory_point_history_size < 1) {
+    AERROR << "Ego past history is empty";
+    return false;
+  }
+
   cv::Mat ego_past =
       cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
   cv::Mat obs_past =
@@ -89,13 +114,6 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
       cv::Mat(config_.height(), config_.width(), CV_8UC3, cv::Scalar(0, 0, 0));
   cv::Mat traffic_light =
       cv::Mat(config_.height(), config_.width(), CV_8UC1, cv::Scalar(0));
-
-  int ego_trajectory_point_history_size =
-      learning_data_frame.adc_trajectory_point_size();
-  if (ego_trajectory_point_history_size < 1) {
-    AERROR << "Ego past history is empty";
-    return false;
-  }
 
   const auto& current_traj_point = learning_data_frame.adc_trajectory_point(
       ego_trajectory_point_history_size - 1);
@@ -146,10 +164,62 @@ bool BirdviewImgFeatureRenderer::RenderMultiChannelEnv(
   return true;
 }
 
-// TODO(Jinyun): implement for debugging purpose
 bool BirdviewImgFeatureRenderer::RenderBGREnv(
     const LearningDataFrame& learning_data_frame, cv::Mat* img_feature) {
-  return false;
+  int ego_trajectory_point_history_size =
+      learning_data_frame.adc_trajectory_point_size();
+  if (ego_trajectory_point_history_size < 1) {
+    AERROR << "Ego past history is empty";
+    return false;
+  }
+
+  cv::Mat bgr_canvas =
+      cv::Mat(config_.height(), config_.width(), CV_8UC3, cv::Scalar(0, 0, 0));
+
+  const auto& current_traj_point = learning_data_frame.adc_trajectory_point(
+      ego_trajectory_point_history_size - 1);
+  const double current_time_sec = current_traj_point.timestamp_sec();
+  const auto& current_path_point =
+      current_traj_point.trajectory_point().path_point();
+  const double current_x = current_path_point.x();
+  const double current_y = current_path_point.y();
+  const double current_heading = current_path_point.theta();
+
+  if (!RenderLocalRoadMap(current_x, current_y, current_heading, &bgr_canvas)) {
+    AERROR << "RenderLocalRoadMap failed";
+    return false;
+  }
+  if (!RenderRouting(learning_data_frame, current_x, current_y, current_heading,
+                     &bgr_canvas)) {
+    AERROR << "RenderRouting failed";
+    return false;
+  }
+  if (!RenderTrafficLight(learning_data_frame, current_x, current_y,
+                          current_heading, &bgr_canvas)) {
+    AERROR << "RenderTrafficLight failed";
+    return false;
+  }
+  if (!RenderObsPastBox(learning_data_frame, current_time_sec, &bgr_canvas)) {
+    AERROR << "RenderObsPastBox failed";
+    return false;
+  }
+  if (!RenderObsFutureBox(learning_data_frame, current_time_sec, &bgr_canvas)) {
+    AERROR << "RenderObsFutureBox failed";
+    return false;
+  }
+  if (!RenderEgoCurrentBox(&bgr_canvas)) {
+    AERROR << "RenderEgoCurrentBox failed";
+    return false;
+  }
+  if (!RenderEgoPastPoint(learning_data_frame, current_time_sec, current_x,
+                          current_y, current_heading, &bgr_canvas)) {
+    AERROR << "RenderEgoPastPoint failed";
+    return false;
+  }
+
+  bgr_canvas.copyTo(*img_feature);
+
+  return true;
 }
 
 bool BirdviewImgFeatureRenderer::RenderCurrentEgoStatus(
@@ -219,7 +289,7 @@ bool BirdviewImgFeatureRenderer::RenderEgoCurrentBox(
   }
   const auto& param = ego_vehicle_config_.vehicle_param();
   const std::vector<cv::Point2i> box_corner_points =
-      GetAffinedBoxImgIdx(0.0, 0.0, M_PI / 2,
+      GetAffinedBoxImgIdx(0.0, 0.0, M_PI_2,
                           {
                               std::make_pair(param.front_edge_to_center(),
                                              param.left_edge_to_center()),
@@ -250,19 +320,21 @@ bool BirdviewImgFeatureRenderer::RenderEgoPastPoint(
     color = gray_scale;
   }
   const auto& ego_past = learning_data_frame.adc_trajectory_point();
+  cv::Scalar gradual_change_color;
   for (const auto& ego_past_point : ego_past) {
     const double relative_time =
         current_time_sec - ego_past_point.timestamp_sec();
     if (relative_time > config_.max_ego_past_horizon()) {
       continue;
     }
-    color = color - color * relative_time / config_.max_ego_past_horizon();
+    gradual_change_color =
+        color * (1 - relative_time / config_.max_ego_past_horizon());
     cv::circle(*img_feature,
                GetAffinedPointImgIdx(
                    ego_past_point.trajectory_point().path_point().x(),
                    ego_past_point.trajectory_point().path_point().y(),
-                   ego_current_x, ego_current_y, M_PI - ego_current_heading),
-               2, color, -1);
+                   ego_current_x, ego_current_y, M_PI_2 - ego_current_heading),
+               2, gradual_change_color, -1);
   }
   return true;
 }
@@ -286,23 +358,25 @@ bool BirdviewImgFeatureRenderer::RenderObsPastBox(
     const double obstacle_box_width = obstacle.width();
     const auto& past_traj =
         obstacle.obstacle_trajectory().evaluated_trajectory_point();
+    cv::Scalar gradual_change_color;
     for (const auto& traj_point : past_traj) {
       const double relative_time =
           current_time_sec - traj_point.timestamp_sec();
       if (relative_time > config_.max_obs_past_horizon()) {
         continue;
       }
-      color = color - color * relative_time / config_.max_obs_past_horizon();
+      gradual_change_color =
+          color * (1 - relative_time / config_.max_obs_past_horizon());
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -342,14 +416,14 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       const auto& path_point =
           last_past_traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -377,23 +451,25 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
     const auto& predicted_traj = obstacle.obstacle_prediction()
                                      .trajectory(max_prob_idx)
                                      .trajectory_point();
+    cv::Scalar gradual_change_color;
     for (const auto& traj_point : predicted_traj) {
       const double relative_time =
           traj_point.timestamp_sec() - current_time_sec;
       if (relative_time > config_.max_obs_future_horizon()) {
         break;
       }
-      color = color * relative_time / config_.max_obs_past_horizon();
+      gradual_change_color =
+          color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
       const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
-          path_point.x(), path_point.y(), M_PI / 2 + path_point.theta(),
+          path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
               std::make_pair(obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, -obstacle_box_width / 2),
               std::make_pair(-obstacle_box_length / 2, obstacle_box_width / 2),
           },
-          0.0, 0.0, M_PI / 2);
+          0.0, 0.0, M_PI_2);
       cv::fillPoly(
           *img_feature,
           std::vector<std::vector<cv::Point>>({std::move(box_corner_points)}),
@@ -454,11 +530,11 @@ bool BirdviewImgFeatureRenderer::RenderTrafficLight(
             const auto& p0 = GetAffinedPointImgIdx(
                 segment.line_segment().point(i).x(),
                 segment.line_segment().point(i).y(), ego_current_x,
-                ego_current_y, M_PI - ego_current_heading);
+                ego_current_y, M_PI_2 - ego_current_heading);
             const auto& p1 = GetAffinedPointImgIdx(
                 segment.line_segment().point(i + 1).x(),
                 segment.line_segment().point(i + 1).y(), ego_current_x,
-                ego_current_y, M_PI - ego_current_heading);
+                ego_current_y, M_PI_2 - ego_current_heading);
             cv::line(*img_feature, p0, p1, color, 4);
           }
         }
@@ -506,11 +582,11 @@ bool BirdviewImgFeatureRenderer::RenderRouting(
         const auto& p0 = GetAffinedPointImgIdx(
             segment.line_segment().point(i).x(),
             segment.line_segment().point(i).y(), ego_current_x, ego_current_y,
-            M_PI - ego_current_heading);
+            M_PI_2 - ego_current_heading);
         const auto& p1 = GetAffinedPointImgIdx(
             segment.line_segment().point(i + 1).x(),
             segment.line_segment().point(i + 1).y(), ego_current_x,
-            ego_current_y, M_PI - ego_current_heading);
+            ego_current_y, M_PI_2 - ego_current_heading);
         cv::line(*img_feature, p0, p1, routing_color, 12);
       }
     }
@@ -523,11 +599,24 @@ bool BirdviewImgFeatureRenderer::CropByPose(const double ego_x,
                                             const double ego_heading,
                                             const cv::Mat& base_map,
                                             cv::Mat* img_feature) {
-  cv::Point2i ego_img_idx = GetPointImgIdx(
-      ego_x - map_bottom_left_point_x_, ego_y - map_bottom_left_point_y_,
-      map_bottom_left_point_x_, map_bottom_left_point_y_);
+  // use dimension of base_roadmap_img as it's assumed that all base maps have
+  // the same size
+  cv::Point2i ego_img_idx = GetPointImgIdx(ego_x - map_bottom_left_point_x_,
+                                           ego_y - map_bottom_left_point_y_, 0,
+                                           base_roadmap_img_.size[0]);
+  if (ego_img_idx.x < 0 || ego_img_idx.x + 1 > base_roadmap_img_.size[1] ||
+      ego_img_idx.y < 0 || ego_img_idx.y + 1 > base_roadmap_img_.size[0]) {
+    AERROR << "ego vehicle position out of bound of base map";
+    return false;
+  }
+
   const int rough_radius = static_cast<int>(sqrt(
       config_.height() * config_.height() + config_.width() * config_.width()));
+  if (ego_img_idx.x - rough_radius < 0 || ego_img_idx.y - rough_radius < 0) {
+    AERROR << "cropping out of bound of base map";
+    return false;
+  }
+
   cv::Rect rough_rect(ego_img_idx.x - rough_radius,
                       ego_img_idx.y - rough_radius, 2 * rough_radius,
                       2 * rough_radius);

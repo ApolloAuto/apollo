@@ -83,7 +83,7 @@ function file_ext() {
 function c_family_ext() {
   local __ext
   __ext="$(file_ext $1)"
-  for ext in "h" "hxx" "hpp" "cxx" "cc" "cpp" "cu"; do
+  for ext in "h" "hh" "hxx" "hpp" "cxx" "cc" "cpp" "cu"; do
     if [ "${ext}" == "${__ext}" ]; then
       return 0
     fi
@@ -93,10 +93,23 @@ function c_family_ext() {
 
 function find_c_cpp_srcs() {
   find "$@" -type f -name "*.h"   \
+                 -o -name "*.c"   \
                  -o -name "*.hpp" \
-                 -o -name "*.hxx" \
-                 -o -name "*.cc"  \
                  -o -name "*.cpp" \
+                 -o -name "*.hh"  \
+                 -o -name "*.cc"  \
                  -o -name "*.hxx" \
+                 -o -name "*.cxx" \
                  -o -name "*.cu"
+}
+
+## Prevent multiple entries of my_bin_path in PATH
+function add_to_path() {
+    if [ -z "$1" ]; then
+        return
+    fi
+    local my_bin_path="$1"
+    if [ -n "${PATH##*${my_bin_path}}" ] && [ -n "${PATH##*${my_bin_path}:*}" ]; then
+        export PATH=$PATH:${my_bin_path}
+    fi
 }

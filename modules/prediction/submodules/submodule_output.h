@@ -59,6 +59,8 @@ class SubmoduleOutput {
 
   void set_frame_start_time(const absl::Time& frame_start_time);
 
+  void set_curr_scenario(const Scenario& scenario);
+
   const std::vector<Obstacle>& curr_frame_obstacles() const;
 
   const Obstacle& GetEgoVehicle() const;
@@ -74,6 +76,8 @@ class SubmoduleOutput {
 
   const absl::Time& frame_start_time() const;
 
+  const Scenario& curr_scenario() const { return curr_scenario_; }
+
  protected:
   std::vector<Obstacle> curr_frame_obstacles_;
   Obstacle ego_vehicle_;
@@ -81,6 +85,7 @@ class SubmoduleOutput {
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
   absl::Time frame_start_time_;
+  Scenario curr_scenario_;
 };
 
 }  // namespace prediction

@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 
@@ -46,13 +48,15 @@ class TrafficDecider {
   TrafficDecider() = default;
   bool Init(const TrafficRuleConfigs &config);
   virtual ~TrafficDecider() = default;
-  apollo::common::Status Execute(Frame *frame,
-                                 ReferenceLineInfo *reference_line_info);
+  apollo::common::Status Execute(
+      Frame *frame, ReferenceLineInfo *reference_line_info,
+      const std::shared_ptr<DependencyInjector> &injector);
 
  private:
   static apollo::common::util::Factory<
       TrafficRuleConfig::RuleId, TrafficRule,
-      TrafficRule *(*)(const TrafficRuleConfig &config)>
+      TrafficRule *(*)(const TrafficRuleConfig &config,
+                       const std::shared_ptr<DependencyInjector> &injector)>
       s_rule_factory;
 
   void RegisterRules();

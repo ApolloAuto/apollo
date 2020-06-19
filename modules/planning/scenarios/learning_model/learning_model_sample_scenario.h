@@ -36,14 +36,16 @@ struct LearningModelSampleContext {
 
 class LearningModelSampleScenario : public Scenario {
  public:
-  LearningModelSampleScenario(const ScenarioConfig& config,
-                            const ScenarioContext* context)
-      : Scenario(config, context) {}
+  LearningModelSampleScenario(
+      const ScenarioConfig& config, const ScenarioContext* context,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector) override;
 
  private:
   static void RegisterStages();
@@ -52,7 +54,8 @@ class LearningModelSampleScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   LearningModelSampleContext context_;

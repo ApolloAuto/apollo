@@ -27,10 +27,10 @@ using apollo::common::adapter::AdapterConfig;
 
 class ContainerManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() { manager_ = ContainerManager::Instance(); }
+  virtual void SetUp() { manager_.reset(new ContainerManager()); }
 
  protected:
-  ContainerManager* manager_ = nullptr;
+  std::unique_ptr<ContainerManager> manager_ = nullptr;
   common::adapter::AdapterManagerConfig conf_;
 };
 

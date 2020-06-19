@@ -47,7 +47,9 @@ TEST_F(PullOverScenarioTest, Init) {
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_pull_over_config_file, &config));
   ScenarioContext context;
-  scenario_.reset(new PullOverScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(
+      new PullOverScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::PULL_OVER);
 }
 

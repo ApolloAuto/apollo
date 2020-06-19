@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -42,7 +43,8 @@ constexpr double kSTPassableThreshold = 3.0;
 
 class STBoundsDecider : public Decider {
  public:
-  explicit STBoundsDecider(const TaskConfig& config);
+  STBoundsDecider(const TaskConfig& config,
+                  const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   common::Status Process(Frame* const frame,

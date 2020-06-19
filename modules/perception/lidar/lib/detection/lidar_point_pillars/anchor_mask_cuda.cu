@@ -174,22 +174,18 @@ __global__ void make_anchor_mask_kernel(
   }
 }
 
-AnchorMaskCuda::AnchorMaskCuda(const int num_inds_for_scan,
-                               const int num_anchor_x_inds,
-                               const int num_anchor_y_inds,
-                               const int num_class,
-                               const int num_anchor_per_loc,
+AnchorMaskCuda::AnchorMaskCuda(const int num_threads,
+                               const int num_inds_for_scan,
+                               const int num_anchor,
                                const float min_x_range,
                                const float min_y_range,
                                const float pillar_x_size,
                                const float pillar_y_size,
                                const int grid_x_size,
                                const int grid_y_size)
-    : num_inds_for_scan_(num_inds_for_scan),
-      num_anchor_x_inds_(num_anchor_x_inds),
-      num_anchor_y_inds_(num_anchor_y_inds),
-      num_class_(num_class),
-      num_anchor_per_loc_(num_anchor_per_loc),
+    : num_threads_(num_threads),
+      num_inds_for_scan_(num_inds_for_scan),
+      num_anchor_(num_anchor),
       min_x_range_(min_x_range),
       min_y_range_(min_y_range),
       pillar_x_size_(pillar_x_size),
@@ -211,8 +207,9 @@ void AnchorMaskCuda::DoAnchorMaskCuda(
   GPU_CHECK(cudaMemcpy(dev_sparse_pillar_map, dev_cumsum_along_y,
                        num_inds_for_scan_ * num_inds_for_scan_ * sizeof(int),
                        cudaMemcpyDeviceToDevice));
-  make_anchor_mask_kernel<<<num_anchor_x_inds_ * num_anchor_per_loc_,
-                            num_anchor_y_inds_>>>(
+
+  int num_blocks = DIVUP(num_anchor_, num_threads_);
+  make_anchor_mask_kernel<<<num_blocks, num_threads_>>>(
       dev_box_anchors_min_x, dev_box_anchors_min_y, dev_box_anchors_max_x,
       dev_box_anchors_max_y, dev_sparse_pillar_map, dev_anchor_mask,
       min_x_range_, min_y_range_, pillar_x_size_, pillar_y_size_, grid_x_size_,

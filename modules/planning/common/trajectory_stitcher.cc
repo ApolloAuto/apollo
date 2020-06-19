@@ -39,7 +39,7 @@ using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 
 TrajectoryPoint TrajectoryStitcher::ComputeTrajectoryPointFromVehicleState(
-    const VehicleState& vehicle_state) {
+    const double planning_cycle_time, const VehicleState& vehicle_state) {
   TrajectoryPoint point;
   point.mutable_path_point()->set_s(0.0);
   point.mutable_path_point()->set_x(vehicle_state.x());
@@ -49,7 +49,7 @@ TrajectoryPoint TrajectoryStitcher::ComputeTrajectoryPointFromVehicleState(
   point.mutable_path_point()->set_kappa(vehicle_state.kappa());
   point.set_v(vehicle_state.linear_velocity());
   point.set_a(vehicle_state.linear_acceleration());
-  point.set_relative_time(0.0);
+  point.set_relative_time(planning_cycle_time);
   return point;
 }
 
@@ -62,13 +62,14 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
   // TODO(Jinyun/Yu): adjust kEpsilon if corrected IMU acceleration provided
   if (std::abs(vehicle_state.linear_velocity()) < kEpsilon_v &&
       std::abs(vehicle_state.linear_acceleration()) < kEpsilon_a) {
-    reinit_point = ComputeTrajectoryPointFromVehicleState(vehicle_state);
+    reinit_point = ComputeTrajectoryPointFromVehicleState(planning_cycle_time,
+                                                          vehicle_state);
   } else {
     VehicleState predicted_vehicle_state;
     predicted_vehicle_state =
         VehicleModel::Predict(planning_cycle_time, vehicle_state);
-    reinit_point =
-        ComputeTrajectoryPointFromVehicleState(predicted_vehicle_state);
+    reinit_point = ComputeTrajectoryPointFromVehicleState(
+        planning_cycle_time, predicted_vehicle_state);
   }
 
   return std::vector<TrajectoryPoint>(1, reinit_point);

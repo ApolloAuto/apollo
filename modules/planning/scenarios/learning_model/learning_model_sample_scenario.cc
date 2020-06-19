@@ -30,7 +30,8 @@ namespace scenario {
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     LearningModelSampleScenario::s_stage_factory_;
 
 void LearningModelSampleScenario::Init() {
@@ -54,18 +55,20 @@ void LearningModelSampleScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::LEARNING_MODEL_RUN,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new LearningModelSampleStageRun(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new LearningModelSampleStageRun(config, injector);
       });
 }
 
 std::unique_ptr<Stage> LearningModelSampleScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+  auto ptr = s_stage_factory_.CreateObjectOrNull(
+      stage_config.stage_type(), stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

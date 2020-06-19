@@ -33,8 +33,8 @@ class LearningModelInferenceTrajectoryTask : public Task {
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
-  apollo::common::Status Process(Frame *frame);
-  bool WriteTrajectory(Frame* frame);
+  apollo::common::Status Process(
+      Frame *frame, ReferenceLineInfo* reference_line_info);
 };
 
 }  // namespace planning

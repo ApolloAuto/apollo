@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -32,7 +33,8 @@ namespace planning {
 
 class SpeedDecider : public Task {
  public:
-  explicit SpeedDecider(const TaskConfig& config);
+  SpeedDecider(const TaskConfig& config,
+               const std::shared_ptr<DependencyInjector>& injector);
 
   common::Status Execute(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;

@@ -20,6 +20,8 @@
 
 #include "modules/planning/traffic_rules/stop_sign.h"
 
+#include <memory>
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -31,7 +33,9 @@ namespace planning {
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
+StopSign::StopSign(const TrafficRuleConfig& config,
+                   const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status StopSign::ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info) {
@@ -49,7 +53,7 @@ void StopSign::MakeDecisions(Frame* const frame,
   }
 
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
 
   const std::vector<PathOverlap>& stop_sign_overlaps =
@@ -72,8 +76,7 @@ void StopSign::MakeDecisions(Frame* const frame,
     const std::vector<std::string> wait_for_obstacle_ids(
         stop_sign_status.wait_for_obstacle_id().begin(),
         stop_sign_status.wait_for_obstacle_id().end());
-    util::BuildStopDecision(virtual_obstacle_id,
-                            stop_sign_overlap.start_s,
+    util::BuildStopDecision(virtual_obstacle_id, stop_sign_overlap.start_s,
                             config_.stop_sign().stop_distance(),
                             StopReasonCode::STOP_REASON_STOP_SIGN,
                             wait_for_obstacle_ids,

@@ -48,7 +48,9 @@ TEST_F(EmergencyStopScenarioTest, Init) {
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_emergency_stop_config_file, &config));
   ScenarioContext context;
-  scenario_.reset(new EmergencyStopScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(
+      new EmergencyStopScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::EMERGENCY_STOP);
 }
 

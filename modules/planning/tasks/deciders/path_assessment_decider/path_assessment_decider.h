@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -28,7 +29,9 @@ namespace planning {
 
 class PathAssessmentDecider : public Decider {
  public:
-  explicit PathAssessmentDecider(const TaskConfig& config);
+  PathAssessmentDecider(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   /** @brief Every time when Process function is called, it will:

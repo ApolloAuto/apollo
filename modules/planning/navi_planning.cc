@@ -53,9 +53,9 @@ NaviPlanning::~NaviPlanning() {
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
-  FrameHistory::Instance()->Clear();
-  History::Instance()->Clear();
-  PlanningContext::Instance()->mutable_planning_status()->Clear();
+  injector_->frame_history()->Clear();
+  injector_->history()->Clear();
+  injector_->planning_context()->mutable_planning_status()->Clear();
 }
 
 std::string NaviPlanning::Name() const { return "navi_planning"; }
@@ -77,12 +77,12 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning history
-  History::Instance()->Clear();
+  injector_->history()->Clear();
 
   // clear planning status
-  PlanningContext::Instance()->mutable_planning_status()->Clear();
+  injector_->planning_context()->mutable_planning_status()->Clear();
 
-  planner_ = planner_dispatcher_->DispatchPlanner(config_);
+  planner_ = planner_dispatcher_->DispatchPlanner(config_, injector_);
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
@@ -107,7 +107,8 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
   }
 
   auto status = frame_->Init(reference_lines, segments,
-                             reference_line_provider_->FutureRouteWaypoints());
+                             reference_line_provider_->FutureRouteWaypoints(),
+                             injector_->ego_info());
 
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
@@ -213,7 +214,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
+  injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
 
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
@@ -248,7 +249,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
     frame_->set_current_frame_planned_trajectory(*trajectory_pb);
     auto seq_num = frame_->SequenceNum();
-    FrameHistory::Instance()->Add(seq_num, std::move(frame_));
+    injector_->frame_history()->Add(seq_num, std::move(frame_));
 
     return;
   }
@@ -262,7 +263,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
     TrafficDecider traffic_decider;
     traffic_decider.Init(traffic_rule_configs_);
-    auto traffic_status = traffic_decider.Execute(frame_.get(), &ref_line_info);
+    auto traffic_status =
+        traffic_decider.Execute(frame_.get(), &ref_line_info, injector_);
     if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
       ref_line_info.SetDrivable(false);
       AWARN << "Reference line " << ref_line_info.Lanes().Id()
@@ -308,7 +310,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   auto seq_num = frame_->SequenceNum();
-  FrameHistory::Instance()->Add(seq_num, std::move(frame_));
+  injector_->frame_history()->Add(seq_num, std::move(frame_));
 }
 
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
@@ -500,7 +502,8 @@ Status NaviPlanning::Plan(
     trajectory_pb->add_lane_id()->CopyFrom(id);
   }
 
-  best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
+  best_ref_info->ExportDecision(trajectory_pb->mutable_decision(),
+                                injector_->planning_context());
 
   // Add debug information.
   if (FLAGS_enable_record_debug) {
@@ -561,7 +564,8 @@ Status NaviPlanning::Plan(
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 
-  best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
+  best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice(),
+                                    injector_->planning_context());
 
   return status;
 }
@@ -571,8 +575,8 @@ Status NaviPlanning::Plan(
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
-  FrameHistory::Instance()->Clear();
- PlanningContext::Instance()->mutable_planning_status()->Clear();
+  frame_history_->Clear();
+  injector_->planning()->mutable_planning_status()->Clear();
 }*/
 
 NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(

@@ -20,8 +20,12 @@
 
 #pragma once
 
+#include <memory>
+#include <utility>
 #include <vector>
 
+#include "modules/planning/common/trajectory_evaluator.h"
+#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -36,9 +40,13 @@ class LearningModelInferenceTask : public Task {
 
  private:
   apollo::common::Status Process(Frame *frame);
-  void ConvertTrajectory(
-      const LearningOutput& learning_out_put,
-      std::vector<common::TrajectoryPoint>* trajectory_points);
+
+  void ConvertADCFutureTrajectory(
+      const std::vector<TrajectoryPointFeature> &trajectory,
+      std::vector<common::TrajectoryPoint> *adc_future_trajectory);
+
+  std::unique_ptr<TrajectoryImitationLibtorchInference>
+      trajectory_imitation_inference_;
 };
 
 }  // namespace planning

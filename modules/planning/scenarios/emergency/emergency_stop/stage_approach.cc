@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/emergency/emergency_stop/stage_approach.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -40,8 +41,9 @@ namespace emergency_stop {
 using apollo::common::TrajectoryPoint;
 
 EmergencyStopStageApproach::EmergencyStopStageApproach(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus EmergencyStopStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -64,7 +66,7 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
   bool stop_fence_exist = false;
   double stop_line_s;
   const auto& emergency_stop_status =
-      PlanningContext::Instance()->planning_status().emergency_stop();
+      injector_->planning_context()->planning_status().emergency_stop();
   if (emergency_stop_status.has_stop_fence_point()) {
     common::SLPoint stop_fence_sl;
     reference_line.XYToSL(emergency_stop_status.stop_fence_point(),
@@ -87,7 +89,7 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
            << stop_line_s << "]";
     const auto& stop_fence_point =
         reference_line.GetReferencePoint(stop_line_s);
-    auto* emergency_stop_fence_point = PlanningContext::Instance()
+    auto* emergency_stop_fence_point = injector_->planning_context()
                                            ->mutable_planning_status()
                                            ->mutable_emergency_stop()
                                            ->mutable_stop_fence_point();

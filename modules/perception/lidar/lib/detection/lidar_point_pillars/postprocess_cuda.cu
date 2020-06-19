@@ -185,17 +185,14 @@ __global__ void sort_boxes_by_indexes_kernel(
 }
 
 PostprocessCuda::PostprocessCuda(
-    const float float_min, const float float_max, const int num_anchor_x_inds,
-    const int num_anchor_y_inds, const int num_class,
-    const int num_anchor_per_loc, const float score_threshold,
-    const int num_threads, const float nms_overlap_threshold,
-    const int num_box_corners, const int num_output_box_feature)
+    const float float_min, const float float_max, const int num_anchor,
+    const int num_class, const float score_threshold, const int num_threads,
+    const float nms_overlap_threshold, const int num_box_corners,
+    const int num_output_box_feature)
     : float_min_(float_min),
       float_max_(float_max),
-      num_anchor_x_inds_(num_anchor_x_inds),
-      num_anchor_y_inds_(num_anchor_y_inds),
+      num_anchor_(num_anchor),
       num_class_(num_class),
-      num_anchor_per_loc_(num_anchor_per_loc),
       score_threshold_(score_threshold),
       num_threads_(num_threads),
       nms_overlap_threshold_(nms_overlap_threshold),
@@ -216,8 +213,8 @@ void PostprocessCuda::DoPostprocessCuda(
     int* dev_filtered_dir, float* dev_box_for_nms,
     int* dev_filter_count, std::vector<float>* out_detection,
     std::vector<int>* out_label) {
-  filter_kernel<<<num_anchor_x_inds_ * num_anchor_per_loc_,
-                  num_anchor_y_inds_>>>(
+  const int num_blocks_filter_kernel = DIVUP(num_anchor_, num_threads_);
+  filter_kernel<<<num_blocks_filter_kernel, num_threads_>>>(
       rpn_box_output, rpn_cls_output, rpn_dir_output, dev_anchor_mask,
       dev_anchors_px, dev_anchors_py, dev_anchors_pz, dev_anchors_dx,
       dev_anchors_dy, dev_anchors_dz, dev_anchors_ro, dev_filtered_box,
@@ -261,7 +258,7 @@ void PostprocessCuda::DoPostprocessCuda(
       dev_sorted_box_for_nms, num_box_corners_, num_output_box_feature_);
 
   int keep_inds[host_filter_count[0]];
-  keep_inds[0] = 0;
+  memset(keep_inds, 0, host_filter_count[0] * sizeof(int));
   int out_num_objects = 0;
   nms_cuda_ptr_->DoNmsCuda(host_filter_count[0], dev_sorted_box_for_nms,
                            keep_inds, &out_num_objects);

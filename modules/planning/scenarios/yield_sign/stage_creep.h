@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/stage.h"
@@ -34,8 +36,10 @@ struct YieldSignContext;
 
 class YieldSignStageCreep : public Stage {
  public:
-  explicit YieldSignStageCreep(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  explicit YieldSignStageCreep(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

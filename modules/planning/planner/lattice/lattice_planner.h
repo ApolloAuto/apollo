@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/common/status/status.h"
@@ -33,7 +34,11 @@ namespace planning {
 
 class LatticePlanner : public PlannerWithReferenceLine {
  public:
-  LatticePlanner() = default;
+  LatticePlanner() = delete;
+
+  explicit LatticePlanner(
+      const std::shared_ptr<DependencyInjector>& injector)
+      : PlannerWithReferenceLine(injector) {}
 
   virtual ~LatticePlanner() = default;
 

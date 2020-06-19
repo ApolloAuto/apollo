@@ -12,12 +12,14 @@ stage_config: {
   task_config: {
     task_type: LEARNING_MODEL_INFERENCE_TASK
     learning_model_inference_task_config {
-      model_file: "/apollo/modules/planning/tools/planning_demo_model.pt"
+      model_file: "/apollo/modules/planning/data/model/test_model_conv_rnn.pt"
+      use_cuda: true
     }
   }
   task_config: {
     task_type: LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK
     learning_model_inference_trajectory_task_config {
+      min_adc_future_trajectory_time_length: 1.8
     }
   }
 }

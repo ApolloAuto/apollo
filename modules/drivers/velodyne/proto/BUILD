@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
@@ -42,3 +44,5 @@ py_proto(
         "//modules/drivers/velodyne/proto:velodyne_pb2",
     ],
 )
+
+cpplint()

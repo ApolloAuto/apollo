@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/traffic_rules/traffic_rule.h"
@@ -32,7 +33,8 @@ namespace planning {
  */
 class KeepClear : public TrafficRule {
  public:
-  explicit KeepClear(const TrafficRuleConfig& config);
+  KeepClear(const TrafficRuleConfig& config,
+            const std::shared_ptr<DependencyInjector>& injector);
   virtual ~KeepClear() = default;
 
   common::Status ApplyRule(Frame* const frame,

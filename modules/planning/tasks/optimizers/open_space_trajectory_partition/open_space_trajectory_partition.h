@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -36,7 +37,9 @@ namespace apollo {
 namespace planning {
 class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  public:
-  explicit OpenSpaceTrajectoryPartition(const TaskConfig& config);
+  OpenSpaceTrajectoryPartition(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   ~OpenSpaceTrajectoryPartition() = default;
 

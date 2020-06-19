@@ -22,7 +22,6 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/pipeline/evaluator.h"
-#include "modules/prediction/util/data_extraction.h"
 
 DEFINE_string(
     planning_source_dirs, "",

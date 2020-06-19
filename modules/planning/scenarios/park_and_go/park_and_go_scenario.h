@@ -36,13 +36,15 @@ struct ParkAndGoContext {
 class ParkAndGoScenario : public Scenario {
  public:
   ParkAndGoScenario(const ScenarioConfig& config,
-                    const ScenarioContext* context)
-      : Scenario(config, context) {}
+                    const ScenarioContext* context,
+                    const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector) override;
 
   ParkAndGoContext* GetContext() { return &context_; }
 
@@ -53,7 +55,8 @@ class ParkAndGoScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   ParkAndGoContext context_;

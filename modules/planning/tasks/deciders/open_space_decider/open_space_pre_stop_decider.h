@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "cyber/common/macros.h"
 
 #include "modules/planning/common/frame.h"
@@ -31,7 +33,9 @@ namespace planning {
 
 class OpenSpacePreStopDecider : public Decider {
  public:
-  explicit OpenSpacePreStopDecider(const TaskConfig& config);
+  OpenSpacePreStopDecider(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   apollo::common::Status Process(

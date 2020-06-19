@@ -1,3 +1,5 @@
+load("//tools:cpplint.bzl", "cpplint")
+
 load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
@@ -25,3 +27,5 @@ py_proto(
     name = "config_pb2",
     src = "config.proto",
 )
+
+cpplint()

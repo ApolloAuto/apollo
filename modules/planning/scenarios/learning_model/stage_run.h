@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -32,7 +34,9 @@ struct LearningModelSampleContext;
 class LearningModelSampleStageRun : public Stage {
  public:
   explicit LearningModelSampleStageRun(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

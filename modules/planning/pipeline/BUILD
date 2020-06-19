@@ -10,17 +10,24 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        ":evaluator_logger",
         "//cyber",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/util:math_util_lib",
         "//modules/planning/common/util:util_lib",
+        "//modules/planning/common:trajectory_evaluator",
         "//modules/planning/proto:learning_data_proto",
-        "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/util:data_extraction",
-        "//third_party:boost",
-        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "evaluator_logger",
+    hdrs = ["evaluator_logger.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/planning/common:planning_gflags",
     ],
 )
 
@@ -32,8 +39,6 @@ cc_binary(
     ],
     deps = [
         ":evaluator",
-        "//third_party:boost",
-        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -47,8 +52,6 @@ cc_binary(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:feature_output",
         "//modules/planning/common:message_process",
-        "//third_party:boost",
-        "@com_google_absl//absl/strings",
     ],
 )
 

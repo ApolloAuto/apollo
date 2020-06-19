@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/proto/planning.pb.h"
@@ -26,6 +27,10 @@ namespace storytelling {
 
 class CloseToJunctionTeller : public BaseTeller {
  public:
+  CloseToJunctionTeller() = delete;
+  explicit CloseToJunctionTeller(
+      const std::shared_ptr<FrameManager>& frame_manager)
+      : BaseTeller(frame_manager) {}
   void Init(const StorytellingConfig& storytelling_conf) override;
   void Update(Stories* stories) override;
 
@@ -33,13 +38,14 @@ class CloseToJunctionTeller : public BaseTeller {
   void GetOverlaps(const apollo::planning::ADCTrajectory& adc_trajectory);
 
  private:
-  std::string junction_id_;
-  CloseToJunction::JunctionType junction_type_;
-  double junction_distance_;
   std::string clear_area_id_;
   double clear_area_distance_;
   std::string crosswalk_id_;
   double crosswalk_distance_;
+  std::string junction_id_;
+  double junction_distance_;
+  std::string pnc_junction_id_;
+  double pnc_junction_distance_;
   std::string signal_id_;
   double signal_distance_;
   std::string stop_sign_id_;

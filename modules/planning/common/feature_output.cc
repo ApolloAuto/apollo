@@ -48,7 +48,7 @@ void FeatureOutput::InsertLearningDataFrame(
     const LearningDataFrame& learning_data_frame) {
   learning_data_.add_learning_data()->CopyFrom(learning_data_frame);
 
-  if (FLAGS_planning_offline_mode == 2) {
+  if (FLAGS_planning_learning_mode == 1) {
     // write frames into a file
     if (learning_data_.learning_data_size() >=
         FLAGS_learning_data_frame_num_per_file) {
@@ -71,7 +71,7 @@ void FeatureOutput::InsertPlanningResult() {
 
 void FeatureOutput::WriteLearningData(
     const std::string& record_file) {
-  if (FLAGS_planning_offline_mode != 2) {
+  if (FLAGS_planning_learning_mode != 1) {
     return;
   }
   std::string src_file_name =
@@ -88,7 +88,7 @@ void FeatureOutput::WriteLearningData(
 
 void FeatureOutput::WriteRemainderiLearningData(
     const std::string& record_file) {
-  if (FLAGS_planning_offline_mode != 2) {
+  if (FLAGS_planning_learning_mode != 1) {
     return;
   }
 

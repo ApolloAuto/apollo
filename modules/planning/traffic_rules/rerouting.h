@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -31,7 +33,8 @@ namespace planning {
  */
 class Rerouting : public TrafficRule {
  public:
-  explicit Rerouting(const TrafficRuleConfig& config);
+  Rerouting(const TrafficRuleConfig& config,
+            const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Rerouting() = default;
 
   common::Status ApplyRule(Frame* const frame,

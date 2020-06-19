@@ -25,6 +25,7 @@
 #include "cyber/record/record_reader.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -37,6 +38,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::canbus::Chassis;
+using apollo::common::time::Clock;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;
@@ -54,7 +56,8 @@ using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
-
+using apollo::storytelling::CloseToJunction;
+using apollo::storytelling::Stories;
 
 bool MessageProcess::Init(const PlanningConfig& planning_config) {
   planning_config_.CopyFrom(planning_config);
@@ -68,7 +71,9 @@ bool MessageProcess::Init(const PlanningConfig& planning_config) {
 
   map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
 
-  if (FLAGS_planning_offline_mode == 2) {
+  obstacle_history_map_.clear();
+
+  if (FLAGS_planning_learning_mode == 1) {
     // offline process logging
     log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
                    std::ios_base::out | std::ios_base::app);
@@ -84,7 +89,7 @@ bool MessageProcess::Init(const PlanningConfig& planning_config) {
 void MessageProcess::Close() {
   FeatureOutput::Clear();
 
-  if (FLAGS_planning_offline_mode == 2) {
+  if (FLAGS_planning_learning_mode == 1) {
     // offline process logging
     std::ostringstream msg;
     msg << "Total learning_data_frame number: "
@@ -128,12 +133,12 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     return;
   }
   if (time_diff >= (1.0 * 2 / FLAGS_planning_loop_rate)) {
-    if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "missing localization too long: time_stamp["
-          << le.header().timestamp_sec()
-          << "] time_diff[" << time_diff << "]";
-      AERROR << msg.str();
+    std::ostringstream msg;
+    msg << "missing localization too long: time_stamp["
+        << le.header().timestamp_sec()
+        << "] time_diff[" << time_diff << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_learning_mode == 1) {
       log_file_ << msg.str() << std::endl;
     }
   }
@@ -143,7 +148,7 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   while (!localizations_.empty()) {
     if (localizations_.back().header().timestamp_sec() -
         localizations_.front().header().timestamp_sec()
-        < FLAGS_trajectory_time_length) {
+        <= FLAGS_trajectory_time_length) {
       break;
     }
     localizations_.pop_front();
@@ -187,6 +192,15 @@ void MessageProcess::OnPrediction(
   }
   */
 
+  // debug
+  // add to obstacle history
+  // for (const auto& m : obstacle_history_map_) {
+  //  for (const auto& p :  m.second) {
+  //    AERROR << "obstacle_history_map_: " << m.first << "; "
+  //           << p.DebugString();
+  //  }
+  // }
+
   // add to obstacle history
   for (const auto& m : prediction_obstacles_map_) {
     const auto& perception_obstale = m.second.perception_obstacle();
@@ -204,21 +218,22 @@ void MessageProcess::OnPrediction(
     obstacle_trajectory_point.mutable_acceleration()->CopyFrom(
         perception_obstale.acceleration());
 
+    obstacle_history_map_[m.first].back().timestamp_sec();
     if (obstacle_history_map_[m.first].empty() ||
         obstacle_trajectory_point.timestamp_sec() -
             obstacle_history_map_[m.first].back().timestamp_sec() > 0) {
       obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
     } else {
       // abnormal perception data: time_diff <= 0
-      if (FLAGS_planning_offline_mode == 2) {
-        const double time_diff = obstacle_trajectory_point.timestamp_sec() -
-            obstacle_history_map_[m.first].back().timestamp_sec();
-        std::ostringstream msg;
-        msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
-            << obstacle_history_map_[m.first].back().timestamp_sec()
-            << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
-            << "] time_diff [" << time_diff << "]";
-        AERROR << msg.str();
+      const double time_diff = obstacle_trajectory_point.timestamp_sec() -
+          obstacle_history_map_[m.first].back().timestamp_sec();
+      std::ostringstream msg;
+      msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
+          << obstacle_history_map_[m.first].back().timestamp_sec()
+          << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
+          << "] time_diff[" << time_diff << "]";
+      AERROR << msg.str();
+      if (FLAGS_planning_learning_mode == 1) {
         log_file_ << msg.str() << std::endl;
       }
     }
@@ -238,19 +253,56 @@ void MessageProcess::OnRoutingResponse(
   const apollo::routing::RoutingResponse& routing_response) {
   ADEBUG << "routing_response received at frame["
         << total_learning_data_frame_num_ << "]";
-  routing_lane_segment_.clear();
-  for (int i = 0; i < routing_response.road_size(); ++i) {
-    for (int j = 0; j < routing_response.road(i).passage_size(); ++j) {
-      for (int k = 0; k < routing_response.road(i).passage(j).segment_size();
-          ++k) {
-        const auto& lane_segment =
-            routing_response.road(i).passage(j).segment(k);
-        routing_lane_segment_.push_back(
-            std::make_pair(lane_segment.id(),
-                lane_segment.end_s() - lane_segment.start_s()));
-      }
-    }
+  routing_response_.CopyFrom(routing_response);
+}
+
+void MessageProcess::OnStoryTelling(
+    const apollo::storytelling::Stories& stories) {
+  // clear area
+  if (stories.has_close_to_clear_area()) {
+    auto clear_area_tag = planning_tag_.mutable_clear_area();
+    clear_area_tag->set_id(stories.close_to_clear_area().id());
+    clear_area_tag->set_distance(stories.close_to_clear_area().distance());
   }
+
+  // crosswalk
+  if (stories.has_close_to_crosswalk()) {
+    auto crosswalk_tag = planning_tag_.mutable_crosswalk();
+    crosswalk_tag->set_id(stories.close_to_crosswalk().id());
+    crosswalk_tag->set_distance(stories.close_to_crosswalk().distance());
+  }
+
+  // pnc_junction
+  if (stories.has_close_to_junction() &&
+      stories.close_to_junction().type() ==
+          CloseToJunction::PNC_JUNCTION) {
+    auto pnc_junction_tag = planning_tag_.mutable_pnc_junction();
+    pnc_junction_tag->set_id(stories.close_to_junction().id());
+    pnc_junction_tag->set_distance(stories.close_to_junction().distance());
+  }
+
+  // traffic_light
+  if (stories.has_close_to_signal()) {
+    auto signal_tag = planning_tag_.mutable_signal();
+    signal_tag->set_id(stories.close_to_signal().id());
+    signal_tag->set_distance(stories.close_to_signal().distance());
+  }
+
+  // stop_sign
+  if (stories.has_close_to_stop_sign()) {
+    auto stop_sign_tag = planning_tag_.mutable_stop_sign();
+    stop_sign_tag->set_id(stories.close_to_stop_sign().id());
+    stop_sign_tag->set_distance(stories.close_to_stop_sign().distance());
+  }
+
+  // yield_sign
+  if (stories.has_close_to_yield_sign()) {
+    auto yield_sign_tag = planning_tag_.mutable_yield_sign();
+    yield_sign_tag->set_id(stories.close_to_yield_sign().id());
+    yield_sign_tag->set_distance(stories.close_to_yield_sign().distance());
+  }
+
+  ADEBUG << planning_tag_.DebugString();
 }
 
 void MessageProcess::OnTrafficLightDetection(
@@ -316,6 +368,12 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
       }
+    } else if (message.channel_name ==
+               planning_config_.topic_config().story_telling_topic()) {
+      Stories stories;
+      if (stories.ParseFromString(message.content)) {
+        OnStoryTelling(stories);
+      }
     } else if (message.channel_name ==planning_config_.topic_config()
                                        .traffic_light_detection_topic()) {
       TrafficLightDetection traffic_light_detection;
@@ -326,8 +384,9 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
   }
 }
 
-int MessageProcess::GetADCCurrentRoutingIndex() {
-  if (localizations_.empty()) return -1;
+bool MessageProcess::GetADCCurrentRoutingIndex(
+    int* road_index, double* road_s) {
+  if (localizations_.empty()) return false;
 
   static constexpr double kRadius = 4.0;
   const auto& pose = localizations_.back().pose();
@@ -336,13 +395,25 @@ int MessageProcess::GetADCCurrentRoutingIndex() {
       pose.position(), kRadius, &lanes);
 
   for (auto& lane : lanes) {
-    for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
-      if (lane->id().id() == routing_lane_segment_[i].first) {
-        return i;
+    for (int i = 0; i < routing_response_.road_size(); ++i) {
+      *road_s = 0;
+      for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
+        double passage_s = 0;
+        for (int k = 0;
+            k < routing_response_.road(i).passage(j).segment_size(); ++k) {
+          const auto& segment =
+              routing_response_.road(i).passage(j).segment(k);
+          passage_s += (segment.end_s() - segment.start_s());
+          if (lane->id().id() == segment.id()) {
+            *road_index = i;
+            *road_s += passage_s;
+            return true;
+          }
+        }
       }
     }
   }
-  return -1;
+  return false;
 }
 
 apollo::hdmap::LaneInfoConstPtr MessageProcess::GetCurrentLane(
@@ -358,12 +429,19 @@ apollo::hdmap::LaneInfoConstPtr MessageProcess::GetCurrentLane(
   }
 
   for (auto& lane : lanes) {
-    for (size_t i = 0; i < routing_lane_segment_.size(); ++i) {
-      if (lane->id().id() == routing_lane_segment_[i].first) {
-        return lane;
+    for (int i = 0; i < routing_response_.road_size(); ++i) {
+      for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
+        for (int k = 0;
+            k < routing_response_.road(i).passage(j).segment_size(); ++k) {
+          if (lane->id().id() ==
+              routing_response_.road(i).passage(j).segment(k).id()) {
+            return lane;
+          }
+        }
       }
     }
   }
+
   return nullptr;
 }
 
@@ -519,11 +597,11 @@ void MessageProcess::GenerateObstacleFeature(
     LearningDataFrame* learning_data_frame) {
   ADCCurrentInfo adc_curr_info;
   if (GetADCCurrentInfo(&adc_curr_info) == -1) {
-    if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "fail to get ADC current info: frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
+    std::ostringstream msg;
+    msg << "fail to get ADC current info: frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_learning_mode == 1) {
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -549,68 +627,199 @@ void MessageProcess::GenerateObstacleFeature(
   }
 }
 
+bool MessageProcess::GenerateLocalRoutingPassages(
+    std::vector<std::vector<std::pair<std::string, double>>>*
+        local_routing_passages) {
+  if (routing_response_.road_size() == 0 ||
+      routing_response_.road(0).passage_size() == 0 ||
+      routing_response_.road(0).passage(0).segment_size() == 0) {
+    return false;
+  }
+
+  // calculate road_length
+  std::vector<std::pair<std::string, double>> road_lengths;
+  for (int i = 0; i < routing_response_.road_size(); ++i) {
+    ADEBUG << "road_id[" << routing_response_.road(i).id() << "] passage_size["
+           << routing_response_.road(i).passage_size() << "]";
+    double road_length = 0;
+    for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
+      ADEBUG << "   passage: segment_size["
+             << routing_response_.road(i).passage(j).segment_size() << "]";
+      double passage_length = 0;
+      for (int k = 0;
+          k < routing_response_.road(i).passage(j).segment_size(); ++k) {
+        const auto& segment =
+            routing_response_.road(i).passage(j).segment(k);
+        passage_length += (segment.end_s() - segment.start_s());
+      }
+      ADEBUG << "      passage_length[" << passage_length << "]";
+      if (j == 0) {
+        road_length += passage_length;
+      }
+    }
+    road_lengths.push_back(std::make_pair(routing_response_.road(i).id(),
+                                          road_length));
+    ADEBUG << "   road_length[" << road_length << "]";
+  }
+
+  /* debug
+  for (size_t i = 0; i < road_lengths.size(); ++i) {
+    AERROR << i << ": " << road_lengths[i].first << "; " << road_lengths[i].second;
+  }
+  */
+
+  int road_index;
+  double road_s;
+  if (!GetADCCurrentRoutingIndex(&road_index, &road_s) ||
+      road_index < 0 ||  road_s < 0) {
+    return false;
+  }
+
+  constexpr double kLocalRoutingForwardLength = 200.0;
+  constexpr double kLocalRoutingBackwardLength = 100.0;
+
+  // local_routing start point
+  int local_routing_start_road_index = 0;
+  double local_routing_start_road_s = 0;
+  double backward_length = kLocalRoutingBackwardLength;
+  for (int i = road_index; i >= 0; --i) {
+    const double road_length =
+        (i == road_index ? road_s : road_lengths[i].second);
+    if (backward_length > road_length) {
+      backward_length -= road_length;
+    } else {
+      local_routing_start_road_index = i;
+      local_routing_start_road_s = road_length - backward_length;
+      break;
+    }
+  }
+
+  // local routing end point
+  int local_routing_end_road_index = routing_response_.road_size() - 1;
+  double local_routing_end_road_s =
+      road_lengths[local_routing_end_road_index].second;
+  double forwardward_length = kLocalRoutingForwardLength;
+  for (int i = road_index; i < routing_response_.road_size(); ++i) {
+    const double road_length =
+        (i == road_index ? road_lengths[i].second - road_s
+                         : road_lengths[i].second);
+    if (forwardward_length > road_length) {
+      forwardward_length -= road_length;
+    } else {
+      local_routing_end_road_index = i;
+      local_routing_end_road_s =
+          (i == road_index ? road_s + forwardward_length : forwardward_length);
+      break;
+    }
+  }
+
+  ADEBUG << "local_routing: start_road_index[" << local_routing_start_road_index
+         << "] start_road_s[" << local_routing_start_road_s
+         << "] end_road_index[" << local_routing_end_road_index
+         << "] end_road_s[" << local_routing_end_road_s << "]";
+
+  // init with passage(s) at local_routing_start_road_index + start_road_s
+  std::vector<std::pair<std::string, double>> local_routing_passage;
+  const auto road = routing_response_.road(local_routing_start_road_index);
+  for (int i = 0; i < road.passage_size(); ++i) {
+    double road_s = 0.0;
+    for (int j = 0; j < road.passage(i).segment_size(); ++j) {
+      const auto& segment = road.passage(i).segment(j);
+      road_s += (segment.end_s() - segment.start_s());
+      if (road_s > local_routing_start_road_s) {
+        local_routing_passage.push_back(
+            std::make_pair(segment.id(), segment.end_s() - segment.start_s()));
+      }
+    }
+    local_routing_passages->push_back(local_routing_passage);
+  }
+
+  bool local_routing_end = false;
+  for (int i = local_routing_start_road_index + 1;
+      i <= local_routing_end_road_index; ++i) {
+    if (local_routing_end) break;
+
+    // grow local_routing_passages
+    const size_t local_routing_passages_size = local_routing_passages->size();
+    for (int j = 1; j < routing_response_.road(i).passage_size(); ++j) {
+      for (size_t p = 0; p < local_routing_passages_size; ++p) {
+        local_routing_passages->push_back((*local_routing_passages)[p]);
+      }
+    }
+
+    for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
+      double road_s = 0;
+      for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
+          ++k) {
+        const auto& lane_segment =
+            routing_response_.road(i).passage(j).segment(k);
+        road_s += (lane_segment.end_s() - lane_segment.start_s());
+
+        // cut off last road based on local_routing_end_road_s
+        if (i == local_routing_end_road_index &&
+            road_s >= local_routing_end_road_s) {
+          local_routing_end = true;
+          break;
+        }
+
+        for (auto& routing_passage : *local_routing_passages) {
+          routing_passage.push_back(
+              std::make_pair(lane_segment.id(),
+                             lane_segment.end_s() - lane_segment.start_s()));
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 void MessageProcess::GenerateRoutingFeature(
-    const int routing_index,
     LearningDataFrame* learning_data_frame) {
+  if (routing_response_.road_size() == 0 ||
+      routing_response_.road(0).passage_size() == 0 ||
+      routing_response_.road(0).passage(0).segment_size() == 0) {
+    std::ostringstream msg;
+    msg << "SKIP: invalid routing_response. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_learning_mode == 1) {
+      log_file_ << msg.str() << std::endl;
+    }
+    return;
+  }
+
   auto routing = learning_data_frame->mutable_routing();
   routing->Clear();
-  if (routing_lane_segment_.empty()) {
-    if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "no routing. frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
+
+  routing->mutable_routing_response()->mutable_measurement()->set_distance(
+      routing_response_.measurement().distance());
+  for (int i = 0; i < routing_response_.road_size(); ++i) {
+    routing->mutable_routing_response()->add_road()->CopyFrom(
+        routing_response_.road(i));
+  }
+
+  std::vector<std::vector<std::pair<std::string, double>>>
+      local_routing_passages;
+  if (!GenerateLocalRoutingPassages(&local_routing_passages) ||
+      local_routing_passages.empty()) {
+    std::ostringstream msg;
+    msg << "failed generate local_routing. frame_num["
+        << learning_data_frame->frame_num() << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_learning_mode == 1) {
       log_file_ << msg.str() << std::endl;
     }
     return;
   }
-  for (const auto& lane_segment : routing_lane_segment_) {
-    routing->add_routing_lane_id(lane_segment.first);
-  }
 
-  if (routing_index < 0) {
-    if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "no LOCAL routing. frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
-      log_file_ << msg.str() << std::endl;
+  // NOTE:
+  // serialize into one-dimension vector to output for now
+  // but we do have two-dimention vector support routing with paralle pasages
+  for (const auto& passage : local_routing_passages) {
+    for (const auto& lane_segment : passage) {
+      routing->add_local_routing_lane_id(lane_segment.first);
     }
-    return;
-  }
-
-  constexpr double kLocalRoutingLength = 200.0;
-  std::vector<std::string> local_routing_lane_ids;
-  // local routing land_ids behind ADS
-  int i = routing_index;
-  double length = 0.0;
-  while (i >= 0 && length < kLocalRoutingLength) {
-      local_routing_lane_ids.insert(local_routing_lane_ids.begin(),
-                                    routing_lane_segment_[i].first);
-      length += routing_lane_segment_[i].second;
-      i--;
-  }
-  // local routing lane_ids ahead of ADC
-  i = routing_index;
-  length = 0.0;
-  while (i < static_cast<int>(routing_lane_segment_.size()) &&
-      length < kLocalRoutingLength) {
-    local_routing_lane_ids.push_back(routing_lane_segment_[i].first);
-    length += routing_lane_segment_[i].second;
-    i++;
-  }
-
-  if (local_routing_lane_ids.empty()) {
-    if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "no LOCAL routing. frame_num["
-          << learning_data_frame->frame_num() << "]";
-      AERROR << msg.str();
-      log_file_ << msg.str() << std::endl;
-    }
-  }
-  for (const auto& lane_id : local_routing_lane_ids) {
-    routing->add_local_routing_lane_id(lane_id);
   }
 }
 
@@ -689,8 +898,9 @@ void MessageProcess::GenerateADCTrajectoryPoints(
       lane_turn = lane->lane().turn();
     }
     planning_tag->set_lane_turn(lane_turn);
+    planning_tag_.set_lane_turn(lane_turn);
 
-    if (FLAGS_planning_offline_mode == 2) {
+    if (FLAGS_planning_learning_mode == 1) {
       // planning_tag: overlap tags
       double point_distance = 0.0;
       if (trajectory_point_index > 0) {
@@ -821,22 +1031,18 @@ void MessageProcess::GenerateADCTrajectoryPoints(
   }
 
   // update learning data
-  if (!adc_trajectory_points.empty()) {
-    learning_data_frame->mutable_planning_tag()->set_lane_turn(
-        adc_trajectory_points[0].planning_tag().lane_turn());
-  }
   std::reverse(adc_trajectory_points.begin(), adc_trajectory_points.end());
   for (const auto& trajectory_point : adc_trajectory_points) {
     auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
     adc_trajectory_point->CopyFrom(trajectory_point);
   }
   if (adc_trajectory_points.size() <= 5) {
-    if (FLAGS_planning_offline_mode == 2) {
-      std::ostringstream msg;
-      msg << "too few adc_trajectory_points: frame_num["
-          << learning_data_frame->frame_num()
-          << "] size[" << adc_trajectory_points.size() << "]";
-      AERROR << msg.str();
+    std::ostringstream msg;
+    msg << "too few adc_trajectory_points: frame_num["
+        << learning_data_frame->frame_num()
+        << "] size[" << adc_trajectory_points.size() << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_learning_mode == 1) {
       log_file_ << msg.str() << std::endl;
     }
   }
@@ -844,9 +1050,25 @@ void MessageProcess::GenerateADCTrajectoryPoints(
   //      << trajectory_point_index;
 }
 
+void MessageProcess::GeneratePlanningTag(
+    LearningDataFrame* learning_data_frame) {
+  auto planning_tag = learning_data_frame->mutable_planning_tag();
+  switch (FLAGS_planning_learning_mode) {
+    case 0:
+      break;
+    case 1:
+      planning_tag->set_lane_turn(planning_tag_.lane_turn());
+      break;
+    case 2:
+    case 3:
+      planning_tag->CopyFrom(planning_tag_);
+      break;
+  }
+}
+
 void MessageProcess::GenerateLearningDataFrame(
     LearningDataFrame* learning_data_frame) {
-  const int routing_index = GetADCCurrentRoutingIndex();
+  const double start_timestamp = Clock::NowInSeconds();
 
   // add timestamp_sec & frame_num
   learning_data_frame->set_message_timestamp_sec(
@@ -855,6 +1077,9 @@ void MessageProcess::GenerateLearningDataFrame(
 
   // map_name
   learning_data_frame->set_map_name(map_name_);
+
+  // planning_tag
+  GeneratePlanningTag(learning_data_frame);
 
   // add chassis
   auto chassis = learning_data_frame->mutable_chassis();
@@ -876,13 +1101,19 @@ void MessageProcess::GenerateLearningDataFrame(
   GenerateTrafficLightDetectionFeature(learning_data_frame);
 
   // add routing
-  GenerateRoutingFeature(routing_index, learning_data_frame);
+  GenerateRoutingFeature(learning_data_frame);
 
   // add obstacle
   GenerateObstacleFeature(learning_data_frame);
 
   // add trajectory_points
   GenerateADCTrajectoryPoints(localizations_, learning_data_frame);
+
+  const double end_timestamp = Clock::NowInSeconds();
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  ADEBUG << "MessageProcess: start_timestamp[" << start_timestamp
+         << "] end_timestamp[" << end_timestamp
+         << "] time_diff_ms[" << time_diff_ms << "]";
 }
 
 }  // namespace planning

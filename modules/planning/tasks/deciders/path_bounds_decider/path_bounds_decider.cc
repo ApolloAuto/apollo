@@ -49,8 +49,10 @@ using PathBound = std::vector<PathBoundPoint>;
 using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
 }  // namespace
 
-PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
-    : Decider(config) {}
+PathBoundsDecider::PathBoundsDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 Status PathBoundsDecider::Process(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
@@ -98,7 +100,7 @@ Status PathBoundsDecider::Process(
   candidate_path_boundaries.back().set_label("fallback");
 
   // If pull-over is requested, generate pull-over path boundary.
-  auto* pull_over_status = PlanningContext::Instance()
+  auto* pull_over_status = injector_->planning_context()
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   const bool plan_pull_over_path = pull_over_status->plan_pull_over_path();
@@ -186,7 +188,7 @@ Status PathBoundsDecider::Process(
 
   if (reference_line_info->is_path_lane_borrow()) {
     const auto& path_decider_status =
-        PlanningContext::Instance()->planning_status().path_decider();
+        injector_->planning_context()->planning_status().path_decider();
     for (const auto& lane_borrow_direction :
          path_decider_status.decided_side_pass_direction()) {
       if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
@@ -455,7 +457,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
   }
   // PathBoundsDebugString(*path_bound);
 
-  auto* pull_over_status = PlanningContext::Instance()
+  auto* pull_over_status = injector_->planning_context()
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
@@ -589,8 +591,8 @@ bool PathBoundsDecider::FindDestinationPullOverS(
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
 
   // Check if destination is some distance away from ADC.
-  ADEBUG << "Destination s[" << destination_s
-         << "] adc_end_s[" << adc_end_s << "]";
+  ADEBUG << "Destination s[" << destination_s << "] adc_end_s[" << adc_end_s
+         << "]";
   if (destination_s - adc_end_s < config_.path_bounds_decider_config()
                                       .pull_over_destination_to_adc_buffer()) {
     AERROR << "Destination is too close to ADC. distance["
@@ -633,7 +635,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
     const std::vector<std::tuple<double, double, double>>& path_bound,
     std::tuple<double, double, double, int>* const pull_over_configuration) {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
 
   // search direction
   bool search_backward = false;  // search FORWARD by default
@@ -732,9 +734,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double curr_road_right_width = 0;
       reference_line_info.reference_line().GetRoadWidth(
           curr_s, &curr_road_left_width, &curr_road_right_width);
-      ADEBUG << "s[" << curr_s
-             << "] curr_road_left_width[" << curr_road_left_width
-             << "] curr_road_right_width[" << curr_road_right_width << "]";
+      ADEBUG << "s[" << curr_s << "] curr_road_left_width["
+             << curr_road_left_width << "] curr_road_right_width["
+             << curr_road_right_width << "]";
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
           config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
         AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
@@ -743,8 +745,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
       }
       const double right_bound = std::get<1>(path_bound[j]);
       const double left_bound = std::get<2>(path_bound[j]);
-      ADEBUG << "left_bound[" << left_bound
-             << "] right_bound[" << right_bound << "]";
+      ADEBUG << "left_bound[" << left_bound << "] right_bound[" << right_bound
+             << "]";
       if (left_bound - right_bound < pull_over_space_width) {
         AERROR << "Not wide enough to fit ADC. Not feasible for pull-over.";
         is_feasible_window = false;
@@ -1232,7 +1234,7 @@ void PathBoundsDecider::UpdatePullOverBoundaryByLaneBoundary(
     const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   const auto pull_over_type = pull_over_status.pull_over_type();
   if (pull_over_type != PullOverStatus::PULL_OVER &&
       pull_over_type != PullOverStatus::EMERGENCY_PULL_OVER) {
@@ -1252,8 +1254,8 @@ void PathBoundsDecider::UpdatePullOverBoundaryByLaneBoundary(
       left_bound = curr_lane_left_width + offset_to_lane_center;
       right_bound = curr_lane_right_width + offset_to_lane_center;
     }
-    ADEBUG << "left_bound[" << left_bound
-           << "] right_bound[" << right_bound << "]";
+    ADEBUG << "left_bound[" << left_bound << "] right_bound[" << right_bound
+           << "]";
     if (pull_over_type == PullOverStatus::PULL_OVER) {
       std::get<2>((*path_bound)[i]) = left_bound;
     } else if (pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER) {
@@ -1284,7 +1286,7 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
 
   // If there is a pre-determined lane-change starting position, then use it;
   // otherwise, decide one.
-  auto* lane_change_status = PlanningContext::Instance()
+  auto* lane_change_status = injector_->planning_context()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
   if (lane_change_status->is_clear_to_change_lane()) {
@@ -1413,8 +1415,8 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
             left_bounds.insert(curr_obstacle_l_min);
           }
           if (!UpdatePathBoundaryAndCenterLineWithBuffer(
-              i, *left_bounds.begin(), *right_bounds.begin(),
-              path_boundaries, &center_line)) {
+                  i, *left_bounds.begin(), *right_bounds.begin(),
+                  path_boundaries, &center_line)) {
             path_blocked_idx = static_cast<int>(i);
             *blocking_obstacle_id = curr_obstacle_id;
             break;
@@ -1770,8 +1772,7 @@ bool PathBoundsDecider::UpdatePathBoundaryWithBuffer(
 bool PathBoundsDecider::UpdatePathBoundaryAndCenterLineWithBuffer(
     size_t idx, double left_bound, double right_bound,
     PathBound* const path_boundaries, double* const center_line) {
-  UpdatePathBoundaryWithBuffer(idx, left_bound, right_bound,
-                               path_boundaries);
+  UpdatePathBoundaryWithBuffer(idx, left_bound, right_bound, path_boundaries);
   *center_line = (std::get<1>((*path_boundaries)[idx]) +
                   std::get<2>((*path_boundaries)[idx])) /
                  2.0;

@@ -43,7 +43,8 @@ using StopSignLaneVehicles =
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     YieldSignScenario::s_stage_factory_;
 
 void YieldSignScenario::Init() {
@@ -59,7 +60,7 @@ void YieldSignScenario::Init() {
   }
 
   const auto& yield_sign_status =
-      PlanningContext::Instance()->planning_status().yield_sign();
+      injector_->planning_context()->planning_status().yield_sign();
 
   if (yield_sign_status.current_yield_sign_overlap_id().empty()) {
     AERROR << "Could not find yield-sign(s)";
@@ -90,23 +91,26 @@ void YieldSignScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::YIELD_SIGN_APPROACH,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new YieldSignStageApproach(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new YieldSignStageApproach(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::YIELD_SIGN_CREEP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new YieldSignStageCreep(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new YieldSignStageCreep(config, injector);
       });
 }
 
 std::unique_ptr<Stage> YieldSignScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+                                                 stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

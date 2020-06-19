@@ -50,11 +50,11 @@ cc_library(
     name = "camera",
     srcs = select(
         {
-            ":x86_mode": [
+            "//tools/platform:x86_mode": [
                 "usb_cam.cc",
                 "util.cc",
             ],
-            ":arm_mode": [
+            "//tools/platform:aarch64_mode": [
                 "usb_cam.cc",
             ],
         },
@@ -62,44 +62,34 @@ cc_library(
     ),
     hdrs = select(
         {
-            ":x86_mode": [
+            "//tools/platform:x86_mode": [
                 "usb_cam.h",
                 "util.h",
             ],
-            ":arm_mode": [
+            "//tools/platform:aarch64_mode": [
                 "usb_cam.h",
             ],
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
     ),
     copts = select({
-        ":x86_mode": ["-mavx2"],
-        ":arm_mode": [""],
+        "//tools/platform:x86_mode": ["-mavx2"],
+        "//tools/platform:aarch64_mode": [""],
     }),
     deps = select(
         {
-            ":x86_mode": [
+            "//tools/platform:x86_mode": [
                 "//cyber",
                 "//modules/drivers/camera/proto:camera_proto",
                 "@adv_plat",
             ],
-            ":arm_mode": [
+            "//tools/platform:aarch64_mode": [
                 "//cyber",
                 "//modules/drivers/camera/proto:camera_proto",
             ],
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
     ),
-)
-
-config_setting(
-    name = "x86_mode",
-    values = {"cpu": "k8"},
-)
-
-config_setting(
-    name = "arm_mode",
-    values = {"cpu": "arm"},
 )
 
 cpplint()

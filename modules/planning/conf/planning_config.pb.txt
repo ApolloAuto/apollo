@@ -8,6 +8,7 @@ topic_config {
   relative_map_topic: "/apollo/relative_map"
   routing_request_topic: "/apollo/routing_request"
   routing_response_topic: "/apollo/routing_response"
+  story_telling_topic: "/apollo/storytelling"
   traffic_light_detection_topic: "/apollo/perception/traffic_light"
 }
 standard_planning_config {

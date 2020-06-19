@@ -28,27 +28,27 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/localization/proto/pose.pb.h"
-#include "modules/planning/proto/learning_data.pb.h"
-#include "modules/planning/proto/pad_msg.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/routing/proto/routing.pb.h"
-
 #include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/common/status/status.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/open_space_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/proto/learning_data.pb.h"
+#include "modules/planning/proto/pad_msg.pb.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -79,9 +79,10 @@ class Frame {
   common::Status Init(
       const std::list<ReferenceLine> &reference_lines,
       const std::list<hdmap::RouteSegments> &segments,
-      const std::vector<routing::LaneWaypoint> &future_route_waypoints);
+      const std::vector<routing::LaneWaypoint> &future_route_waypoints,
+      const EgoInfo *ego_info);
 
-  common::Status InitForOpenSpace();
+  common::Status InitForOpenSpace(const EgoInfo *ego_info);
 
   uint32_t SequenceNum() const;
 
@@ -119,7 +120,7 @@ class Frame {
       const std::string &obstacle_id, const double obstacle_start_s,
       const double obstacle_end_s);
 
-  bool Rerouting();
+  bool Rerouting(PlanningContext *planning_context);
 
   const common::VehicleState &vehicle_state() const;
 
@@ -148,6 +149,13 @@ class Frame {
 
   const bool is_near_destination() const { return is_near_destination_; }
 
+  const bool is_valid_learning_trajectory() const {
+    return is_valid_learning_trajectory_;
+  }
+  void set_learning_trajectory_valid(bool is_valid) {
+    is_valid_learning_trajectory_ = is_valid;
+  }
+
   /**
    * @brief Adjust reference line priority according to actual road conditions
    * @id_to_priority lane id and reference line priority mapping relationship
@@ -169,25 +177,22 @@ class Frame {
     return pad_msg_driving_action_;
   }
 
-  std::list<ReferenceLineInfo>* mutable_reference_line_infos() {
-    return &reference_line_info_;
+  const LearningDataFrame &learning_data_frame() const {
+    return learning_data_frame_;
   }
 
-  const LearningDataFrame &learning_data_frame() const {
-      return learning_data_frame_; }
-
   void set_learning_data_adc_future_trajectory_points(
-      const std::vector<common::TrajectoryPoint>& trajectory_points) {
+      const std::vector<common::TrajectoryPoint> &trajectory_points) {
     learning_data_adc_future_trajectory_points_ = trajectory_points;
   }
 
   const std::vector<common::TrajectoryPoint>
       &learning_data_adc_future_trajectory_points() const {
-          return learning_data_adc_future_trajectory_points_;
-      }
+    return learning_data_adc_future_trajectory_points_;
+  }
 
  private:
-  common::Status InitFrameData();
+  common::Status InitFrameData(const EgoInfo *ego_info);
 
   bool CreateReferenceLineInfo(const std::list<ReferenceLine> &reference_lines,
                                const std::list<hdmap::RouteSegments> &segments);
@@ -198,7 +203,7 @@ class Frame {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const Obstacle *FindCollisionObstacle() const;
+  const Obstacle *FindCollisionObstacle(const EgoInfo *ego_info) const;
 
   /**
    * @brief create a static virtual obstacle
@@ -252,11 +257,12 @@ class Frame {
   LearningDataFrame learning_data_frame_;
   std::vector<common::TrajectoryPoint>
       learning_data_adc_future_trajectory_points_;
+  bool is_valid_learning_trajectory_ = false;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
- private:
-  DECLARE_SINGLETON(FrameHistory)
+ public:
+  FrameHistory();
 };
 
 }  // namespace planning

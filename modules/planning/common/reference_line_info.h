@@ -31,18 +31,18 @@
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/lattice_structure.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -56,10 +56,10 @@ class ReferenceLineInfo {
   enum class LaneType { LeftForward, LeftReverse, RightForward, RightReverse };
   ReferenceLineInfo() = default;
 
-  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
-                             const common::TrajectoryPoint& adc_planning_point,
-                             const ReferenceLine& reference_line,
-                             const hdmap::RouteSegments& segments);
+  ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                    const common::TrajectoryPoint& adc_planning_point,
+                    const ReferenceLine& reference_line,
+                    const hdmap::RouteSegments& segments);
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
@@ -127,6 +127,13 @@ class ReferenceLineInfo {
       const double relative_time, const double start_s,
       DiscretizedTrajectory* discretized_trajectory);
 
+  // adjust trajectory if it starts from cur_vehicle postion rather planning
+  // init point from upstream
+  bool AdjustTrajectoryWhichStartsFromCurrentPos(
+      const common::TrajectoryPoint& planning_start_point,
+      const std::vector<common::TrajectoryPoint>& trajectory,
+      DiscretizedTrajectory* adjusted_trajectory);
+
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
@@ -149,12 +156,14 @@ class ReferenceLineInfo {
   void SetDrivable(bool drivable);
   bool IsDrivable() const;
 
-  void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
+  void ExportEngageAdvice(common::EngageAdvice* engage_advice,
+                          PlanningContext* planning_context) const;
 
   const hdmap::RouteSegments& Lanes() const;
   std::list<hdmap::Id> TargetLaneId() const;
 
-  void ExportDecision(DecisionResult* decision_result) const;
+  void ExportDecision(DecisionResult* decision_result,
+                      PlanningContext* planning_context) const;
 
   void SetJunctionRightOfWay(const double junction_s,
                              const bool is_protected) const;
@@ -251,11 +260,13 @@ class ReferenceLineInfo {
 
   bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
-  void MakeDecision(DecisionResult* decision_result) const;
+  void MakeDecision(DecisionResult* decision_result,
+                    PlanningContext* planning_context) const;
 
   int MakeMainStopDecision(DecisionResult* decision_result) const;
 
-  void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
+  void MakeMainMissionCompleteDecision(DecisionResult* decision_result,
+                                       PlanningContext* planning_context) const;
 
   void MakeEStopDecision(DecisionResult* decision_result) const;
 

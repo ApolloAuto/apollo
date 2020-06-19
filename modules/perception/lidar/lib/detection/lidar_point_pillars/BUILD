@@ -16,6 +16,7 @@ cc_library(
         "anchor_mask_cuda.h",
         "common.h",
         "nms_cuda.h",
+        "params.h",
         "point_pillars.h",
         "postprocess_cuda.h",
         "scatter_cuda.h",

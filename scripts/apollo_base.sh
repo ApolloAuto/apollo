@@ -63,10 +63,10 @@ function set_lib_path() {
   # Set teleop paths
   export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   export PYTHONPATH=/apollo/modules/teleop/common:${PYTHONPATH}
-  export PATH=/apollo/modules/teleop/common/scripts:${PATH}
+  add_to_path "/apollo/modules/teleop/common/scripts"
 
   if [ -e /usr/local/cuda/ ];then
-    export PATH=/usr/local/cuda/bin:$PATH
+    add_to_path "/usr/local/cuda/bin"
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
     export C_INCLUDE_PATH=/usr/local/cuda/include:$C_INCLUDE_PATH
     export CPLUS_INCLUDE_PATH=/usr/local/cuda/include:$CPLUS_INCLUDE_PATH
@@ -149,9 +149,6 @@ function setup_device() {
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
   fi
 
-  if [ ! -e /dev/nvidia-uvm-tools ];then
-    sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
-  fi
 }
 
 function decide_task_dir() {

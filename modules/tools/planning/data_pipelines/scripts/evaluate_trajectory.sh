@@ -28,5 +28,6 @@ sudo mkdir -p ${TARGET_DIR}
 
 /apollo/bazel-bin/modules/planning/pipeline/evaluate_trajectory \
     --flagfile=/apollo/modules/planning/conf/planning.conf \
+    --planning_learning_mode=1 \
     --planning_source_dirs=${SRC_DIR} \
     --planning_data_dir=${TARGET_DIR} \

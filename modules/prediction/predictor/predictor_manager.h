@@ -38,6 +38,11 @@ namespace prediction {
 class PredictorManager {
  public:
   /**
+   * @brief Constructor
+   */
+  PredictorManager();
+
+  /**
    * @brief Destructor
    */
   virtual ~PredictorManager() = default;
@@ -174,8 +179,6 @@ class PredictorManager {
       ObstacleConf::EXTRAPOLATION_PREDICTOR;
 
   PredictionObstacles prediction_obstacles_;
-
-  DECLARE_SINGLETON(PredictorManager)
 };
 
 }  // namespace prediction

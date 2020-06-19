@@ -51,7 +51,8 @@ class STObstaclesProcessor {
   STObstaclesProcessor() {}
 
   void Init(const double planning_distance, const double planning_time,
-            const PathData& path_data, PathDecision* const path_decision);
+            const PathData& path_data, PathDecision* const path_decision,
+            History* const history);
 
   virtual ~STObstaclesProcessor() = default;
 
@@ -217,7 +218,7 @@ class STObstaclesProcessor {
 
   std::vector<std::pair<double, double>> adc_low_road_right_segments_;
 
-  History* history_ = History::Instance();
+  History* history_ = nullptr;
 };
 
 }  // namespace planning

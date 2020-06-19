@@ -52,10 +52,11 @@ message TopicConf {
   optional string container_topic_name = 2;
   optional string evaluator_topic_name = 3;
   optional string localization_topic = 4;
-  optional string perception_obstacles_topic_name = 5;
-  optional string planning_trajectory_topic = 6;
-  optional string prediction_topic = 7;
-  optional string storytelling_topic = 8;
+  optional string perception_obstacle_topic = 5;
+  optional string perception_obstacles_topic_name = 6;
+  optional string planning_trajectory_topic = 7;
+  optional string prediction_topic = 8;
+  optional string storytelling_topic = 9;
 }
 
 message PredictionConf {

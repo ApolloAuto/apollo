@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/planning/proto/learning_data.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -33,7 +34,8 @@ class ModelInference {
   /**
    * @brief Constructor
    */
-  ModelInference() = default;
+  explicit ModelInference(const LearningModelInferenceTaskConfig& config) :
+      config_(config) {}
 
   /**
    * @brief Destructor
@@ -53,7 +55,10 @@ class ModelInference {
   /**
    * @brief inference a learned model
    */
-  virtual bool Inference(LearningDataFrame* learning_data_frame) = 0;
+  virtual bool DoInference(LearningDataFrame* learning_data_frame) = 0;
+
+ protected:
+  LearningModelInferenceTaskConfig config_;
 };
 
 }  // namespace planning

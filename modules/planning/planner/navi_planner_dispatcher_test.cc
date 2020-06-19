@@ -21,8 +21,8 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
-#include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planner/navi_planner_dispatcher.h"
+#include "modules/planning/planner/planner_dispatcher.h"
 
 namespace apollo {
 namespace planning {
@@ -36,6 +36,7 @@ class NaviPlannerDispatcherTest : public ::testing::Test {
 };
 
 TEST_F(NaviPlannerDispatcherTest, Simple) {
+  auto injector = std::make_shared<DependencyInjector>();
   pd_.reset(new NaviPlannerDispatcher());
   pd_->Init();
 
@@ -44,7 +45,7 @@ TEST_F(NaviPlannerDispatcherTest, Simple) {
   PlanningConfig planning_config;
   apollo::cyber::common::GetProtoFromFile(planning_config_file,
                                           &planning_config);
-  auto planner = pd_->DispatchPlanner(planning_config);
+  auto planner = pd_->DispatchPlanner(planning_config, injector);
 
   EXPECT_EQ(planner->Name(), "NAVI");
 }

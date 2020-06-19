@@ -27,7 +27,8 @@ namespace storytelling {
 
 class FrameManager {
  public:
-  void Init(const std::shared_ptr<cyber::Node>& node);
+  FrameManager() = delete;
+  explicit FrameManager(const std::shared_ptr<cyber::Node>& node);
 
   void StartFrame();
   void EndFrame();
@@ -51,8 +52,6 @@ class FrameManager {
  private:
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
   std::shared_ptr<cyber::Node> node_;
-
-  DECLARE_SINGLETON(FrameManager)
 };
 
 }  // namespace storytelling

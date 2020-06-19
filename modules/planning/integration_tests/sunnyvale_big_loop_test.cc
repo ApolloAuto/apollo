@@ -82,7 +82,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 
   // check PlanningContext content
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -107,7 +107,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 
   // check PlanningContext content
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -133,7 +133,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   // check PlanningContext content
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -145,7 +145,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   // check PlanningContext content
   const auto& stop_sign_status_2 =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status_2.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status_2.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status_2.wait_for_obstacle_id_size(), 0);
@@ -251,7 +251,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value
-  auto* crosswalk_status = PlanningContext::Instance()
+  auto* crosswalk_status = injector_->planning_context()
                                ->mutable_planning_status()
                                ->mutable_crosswalk();
   EXPECT_EQ("2832", crosswalk_status->crosswalk_id());

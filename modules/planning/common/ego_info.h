@@ -35,6 +35,8 @@ namespace planning {
 
 class EgoInfo {
  public:
+  EgoInfo();
+
   ~EgoInfo() = default;
 
   bool Update(const common::TrajectoryPoint& start_point,
@@ -82,8 +84,6 @@ class EgoInfo {
   common::VehicleConfig ego_vehicle_config_;
 
   common::math::Box2d ego_box_;
-
-  DECLARE_SINGLETON(EgoInfo)
 };
 
 }  // namespace planning

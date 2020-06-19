@@ -33,7 +33,6 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -84,7 +83,7 @@ const common::VehicleState &Frame::vehicle_state() const {
   return vehicle_state_;
 }
 
-bool Frame::Rerouting() {
+bool Frame::Rerouting(PlanningContext *planning_context) {
   if (FLAGS_use_navigation_mode) {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
@@ -124,9 +123,8 @@ bool Frame::Rerouting() {
     return false;
   }
 
-  auto *rerouting = PlanningContext::Instance()
-                        ->mutable_planning_status()
-                        ->mutable_rerouting();
+  auto *rerouting =
+      planning_context->mutable_planning_status()->mutable_rerouting();
   rerouting->set_need_rerouting(true);
   *rerouting->mutable_routing_request() = request;
 
@@ -323,9 +321,10 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 Status Frame::Init(
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
-    const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
+    const std::vector<routing::LaneWaypoint> &future_route_waypoints,
+    const EgoInfo *ego_info) {
   // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
-  auto status = InitFrameData();
+  auto status = InitFrameData(ego_info);
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
@@ -339,9 +338,11 @@ Status Frame::Init(
   return Status::OK();
 }
 
-Status Frame::InitForOpenSpace() { return InitFrameData(); }
+Status Frame::InitForOpenSpace(const EgoInfo *ego_info) {
+  return InitFrameData(ego_info);
+}
 
-Status Frame::InitFrameData() {
+Status Frame::InitFrameData(const EgoInfo *ego_info) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
@@ -362,7 +363,7 @@ Status Frame::InitFrameData() {
     AddObstacle(*ptr);
   }
   if (planning_start_point_.v() < 1e-3) {
-    const auto *collision_obstacle = FindCollisionObstacle();
+    const auto *collision_obstacle = FindCollisionObstacle(ego_info);
     if (collision_obstacle != nullptr) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
@@ -381,12 +382,12 @@ Status Frame::InitFrameData() {
   return Status::OK();
 }
 
-const Obstacle *Frame::FindCollisionObstacle() const {
+const Obstacle *Frame::FindCollisionObstacle(const EgoInfo *ego_info) const {
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
 
-  const auto &adc_polygon = Polygon2d(EgoInfo::Instance()->ego_box());
+  const auto &adc_polygon = Polygon2d(ego_info->ego_box());
   for (const auto &obstacle : obstacles_.Items()) {
     if (obstacle->IsVirtual()) {
       continue;
@@ -489,7 +490,7 @@ void Frame::ReadTrafficLights() {
 
 void Frame::ReadLearningDataFrame() {
   learning_data_frame_.Clear();
-  if (FLAGS_planning_offline_mode != 1) {
+  if (FLAGS_planning_learning_mode != 2 && FLAGS_planning_learning_mode != 3) {
     return;
   }
   auto learning_data_frame = FeatureOutput::GetLatestLearningDataFrame();

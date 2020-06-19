@@ -112,8 +112,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::Instance()
-        ->mutable_planning_status()
+    injector_->planning_context()->mutable_planning_status()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
@@ -144,8 +143,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
       obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
       obstacle_type != PerceptionObstacle::BICYCLE &&
       obstacle_type != PerceptionObstacle::VEHICLE) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name << "]. skip";
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "]. skip";
     return 0;
   }
 
@@ -157,11 +156,11 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
           point, 5.0, perception_obstacle.theta(), M_PI / 3.0, &obstacle_lane,
           &obstacle_s, &obstacle_l) != 0) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name
            << "]: Failed to find nearest lane from map for position: "
-           << point.DebugString()
-           << "; heading[" << perception_obstacle.theta() << "]";
+           << point.DebugString() << "; heading[" << perception_obstacle.theta()
+           << "]";
     return -1;
   }
 
@@ -175,9 +174,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
         return assc_lane.first.get()->id().id() == obstable_lane_id;
       });
   if (assoc_lane_it == GetContext()->associated_lanes.end()) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name
-           << "] lane_id[" << obstable_lane_id
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "] lane_id[" << obstable_lane_id
            << "] not associated with current stop_sign. skip";
     return -1;
   }
@@ -195,11 +193,11 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
 
   if (distance_to_stop_line >
       scenario_config_.watch_vehicle_max_valid_stop_distance()) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name
-           << "] distance_to_stop_line[" << distance_to_stop_line
-           << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
-           << obstacle_end_s << "] too far from stop line. skip";
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "] distance_to_stop_line["
+           << distance_to_stop_line << "]; stop_line_s" << stop_line_s
+           << "]; obstacle_end_s[" << obstacle_end_s
+           << "] too far from stop line. skip";
     return -1;
   }
 

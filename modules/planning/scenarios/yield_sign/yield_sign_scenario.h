@@ -46,13 +46,15 @@ struct YieldSignContext {
 class YieldSignScenario : public Scenario {
  public:
   YieldSignScenario(const ScenarioConfig& config,
-                    const ScenarioContext* context)
-      : Scenario(config, context) {}
+                    const ScenarioContext* context,
+                    const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config);
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   YieldSignContext* GetContext() { return &context_; }
 
@@ -63,7 +65,8 @@ class YieldSignScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   YieldSignContext context_;

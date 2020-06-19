@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
@@ -34,8 +36,9 @@ struct EmergencyStopContext;
 
 class EmergencyStopStageApproach : public Stage {
  public:
-  explicit EmergencyStopStageApproach(
-      const ScenarioConfig::StageConfig& config);
+  EmergencyStopStageApproach(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;

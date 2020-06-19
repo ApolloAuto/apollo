@@ -20,6 +20,7 @@
 
 #include "modules/planning/traffic_rules/keep_clear.h"
 
+#include <memory>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -35,7 +36,9 @@ namespace planning {
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-KeepClear::KeepClear(const TrafficRuleConfig& config) : TrafficRule(config) {}
+KeepClear::KeepClear(const TrafficRuleConfig& config,
+                     const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status KeepClear::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
@@ -160,7 +163,7 @@ bool KeepClear::IsCreeping(const double pnc_junction_start_s,
   // check if in scenario creep stage
   // while creeping, no need create keep clear obstacle
   const auto& stage_type =
-      PlanningContext::Instance()->planning_status().scenario().stage_type();
+      injector_->planning_context()->planning_status().scenario().stage_type();
   if (stage_type != ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP &&
       stage_type !=
           ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP &&

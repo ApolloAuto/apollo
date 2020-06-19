@@ -39,6 +39,8 @@ class StBoundaryMapperTest : public ::testing::Test {
     }
     ReferenceLineSmootherConfig config;
 
+    injector_ = std::make_shared<DependencyInjector>();
+
     std::vector<ReferencePoint> ref_points;
     const auto& points = lane_info_ptr->points();
     const auto& headings = lane_info_ptr->headings();
@@ -74,6 +76,7 @@ class StBoundaryMapperTest : public ::testing::Test {
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
   PathData path_data_;
   FrenetFramePath frenet_frame_path_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StBoundaryMapperTest, check_overlap_test) {
@@ -81,7 +84,7 @@ TEST_F(StBoundaryMapperTest, check_overlap_test) {
   double planning_distance = 70.0;
   double planning_time = 10.0;
   STBoundaryMapper mapper(config, *reference_line_, path_data_,
-                          planning_distance, planning_time);
+                          planning_distance, planning_time, injector_);
   common::PathPoint path_point;
   path_point.set_x(1.0);
   path_point.set_y(1.0);
