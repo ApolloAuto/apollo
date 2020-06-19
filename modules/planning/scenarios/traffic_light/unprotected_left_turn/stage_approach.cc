@@ -119,8 +119,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
 Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
     Frame* frame) {
   // check speed at stop_stage
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_speed_before_creep()) {
     // skip creep
     next_stage_ = ScenarioConfig ::

@@ -78,9 +78,11 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
 /**
  * @brief: check adc parked properly
  */
-PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
-                                const ScenarioPullOverConfig& scenario_config,
-                                const PlanningContext* planning_context) {
+PullOverStatus CheckADCPullOver(
+    const common::VehicleStateProvider* vehicle_state_provider,
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioPullOverConfig& scenario_config,
+    const PlanningContext* planning_context) {
   const auto& pull_over_status =
       planning_context->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
@@ -102,8 +104,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return PASS_DESTINATION;
   }
 
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = vehicle_state_provider->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
@@ -119,15 +120,14 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return APPROACHING;
   }
 
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  const common::math::Vec2d adc_position = {vehicle_state_provider->x(),
+                                            vehicle_state_provider->y()};
   const common::math::Vec2d target_position = {pull_over_status.position().x(),
                                                pull_over_status.position().y()};
 
   const bool position_check = CheckPullOverPositionBySL(
       reference_line_info, scenario_config, adc_position,
-      common::VehicleStateProvider::Instance()->heading(), target_position,
+      vehicle_state_provider->heading(), target_position,
       pull_over_status.theta(), true);
 
   return position_check ? PARK_COMPLETE : PARK_FAIL;
@@ -194,9 +194,10 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
   return ret;
 }
 
-bool CheckADCReadyToCruise(Frame* frame,
-                           const ScenarioParkAndGoConfig& scenario_config) {
-  auto vehicle_status = common::VehicleStateProvider::Instance();
+bool CheckADCReadyToCruise(
+    const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
+    const ScenarioParkAndGoConfig& scenario_config) {
+  auto vehicle_status = vehicle_state_provider;
   common::math::Vec2d adc_position = {vehicle_status->x(), vehicle_status->y()};
   const double adc_heading = vehicle_status->heading();
 

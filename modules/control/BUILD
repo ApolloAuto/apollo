@@ -38,6 +38,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":control_lib",
+        "//modules/control/common:dependency_injector",
     ],
 )
 

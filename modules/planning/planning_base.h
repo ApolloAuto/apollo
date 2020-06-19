@@ -53,7 +53,7 @@ namespace planning {
  */
 class PlanningBase {
  public:
-  PlanningBase() = delete;
+  // PlanningBase() = delete;
 
   explicit PlanningBase(const std::shared_ptr<DependencyInjector>& injector);
 

@@ -13,6 +13,7 @@ cc_library(
         "//modules/control/proto:control_conf_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/planning/proto:planning_cc_proto",
+        "//modules/control/common:dependency_injector",
     ],
 )
 
@@ -153,6 +154,9 @@ cc_library(
         "//cyber",
         "//modules/common/time",
         "//modules/common/util:factory",
+        "//modules/control/proto:control_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "//modules/control/common:dependency_injector",
         "@osqp",
     ],
 )

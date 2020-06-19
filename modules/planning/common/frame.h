@@ -78,12 +78,15 @@ class Frame {
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
   common::Status Init(
+      const common::VehicleStateProvider *vehicle_state_provider,
       const std::list<ReferenceLine> &reference_lines,
       const std::list<hdmap::RouteSegments> &segments,
       const std::vector<routing::LaneWaypoint> &future_route_waypoints,
       const EgoInfo *ego_info);
 
-  common::Status InitForOpenSpace(const EgoInfo *ego_info);
+  common::Status InitForOpenSpace(
+      const common::VehicleStateProvider *vehicle_state_provider,
+      const EgoInfo *ego_info);
 
   uint32_t SequenceNum() const;
 
@@ -148,7 +151,9 @@ class Frame {
     return current_frame_planned_path_;
   }
 
-  const bool is_near_destination() const { return is_near_destination_; }
+  const bool is_near_destination() const {
+    return is_near_destination_;
+  }
 
   /**
    * @brief Adjust reference line priority according to actual road conditions
@@ -157,13 +162,21 @@ class Frame {
   void UpdateReferenceLinePriority(
       const std::map<std::string, uint32_t> &id_to_priority);
 
-  const LocalView &local_view() const { return local_view_; }
+  const LocalView &local_view() const {
+    return local_view_;
+  }
 
-  ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
+  ThreadSafeIndexedObstacles *GetObstacleList() {
+    return &obstacles_;
+  }
 
-  const OpenSpaceInfo &open_space_info() const { return open_space_info_; }
+  const OpenSpaceInfo &open_space_info() const {
+    return open_space_info_;
+  }
 
-  OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
+  OpenSpaceInfo *mutable_open_space_info() {
+    return &open_space_info_;
+  }
 
   const LearningBasedData &learning_based_data() const {
       return learning_based_data_; }
@@ -177,7 +190,9 @@ class Frame {
   }
 
  private:
-  common::Status InitFrameData(const EgoInfo *ego_info);
+  common::Status InitFrameData(
+      const common::VehicleStateProvider *vehicle_state_provider,
+      const EgoInfo *ego_info);
 
   bool CreateReferenceLineInfo(const std::list<ReferenceLine> &reference_lines,
                                const std::list<hdmap::RouteSegments> &segments);

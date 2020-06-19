@@ -39,17 +39,17 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
       case ControlConf::MPC_CONTROLLER:
         controller_factory_.Register(
             ControlConf::MPC_CONTROLLER,
-            []() -> Controller * { return new MPCController(); });
+            []() -> Controller * { return new MPCController; });
         break;
       case ControlConf::LAT_CONTROLLER:
         controller_factory_.Register(
             ControlConf::LAT_CONTROLLER,
-            []() -> Controller * { return new LatController(); });
+            []() -> Controller * { return new LatController; });
         break;
       case ControlConf::LON_CONTROLLER:
         controller_factory_.Register(
             ControlConf::LON_CONTROLLER,
-            []() -> Controller * { return new LonController(); });
+            []() -> Controller * { return new LonController; });
         break;
       default:
         AERROR << "Unknown active controller type:" << active_controller;
@@ -77,20 +77,22 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
   return Status::OK();
 }
 
-Status ControllerAgent::Init(const ControlConf *control_conf) {
+Status ControllerAgent::Init(std::shared_ptr<DependencyInjector> injector,
+                             const ControlConf *control_conf) {
   RegisterControllers(control_conf);
   ACHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
   for (auto &controller : controller_list_) {
     if (controller == nullptr) {
       return Status(ErrorCode::CONTROL_INIT_ERROR, "Controller is null.");
     }
-    if (!controller->Init(control_conf_).ok()) {
+    if (!controller->Init(injector, control_conf_).ok()) {
       AERROR << "Controller <" << controller->Name() << "> init failed!";
       return Status(ErrorCode::CONTROL_INIT_ERROR,
                     "Failed to init Controller:" + controller->Name());
     }
     AINFO << "Controller <" << controller->Name() << "> init done!";
   }
+  injector_ = injector;
   return Status::OK();
 }
 

@@ -221,8 +221,7 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
  */
 bool StopSignUnprotectedStagePreStop::CheckADCStop(
     const double adc_front_edge_s, const double stop_line_s) {
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()

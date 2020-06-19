@@ -73,7 +73,9 @@ OnLanePlanning::~OnLanePlanning() {
   injector_->ego_info()->Clear();
 }
 
-std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
+std::string OnLanePlanning::Name() const {
+  return "on_lane_planning";
+}
 
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   config_ = config;
@@ -102,7 +104,8 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   ACHECK(hdmap_) << "Failed to load map";
 
   // instantiate reference line provider
-  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
+  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(
+      injector_->vehicle_state(), hdmap_);
   reference_line_provider_->Start();
 
   // dispatch planner
@@ -165,9 +168,9 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
     }
   }
 
-  auto status = frame_->Init(reference_lines, segments,
-                             reference_line_provider_->FutureRouteWaypoints(),
-                             injector_->ego_info());
+  auto status = frame_->Init(
+      injector_->vehicle_state(), reference_lines, segments,
+      reference_line_provider_->FutureRouteWaypoints(), injector_->ego_info());
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
@@ -179,7 +182,7 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
   ptr_trajectory_pb->clear_trajectory_point();
 
-  const auto& vehicle_state = VehicleStateProvider::Instance()->vehicle_state();
+  const auto& vehicle_state = injector_->vehicle_state()->vehicle_state();
   const double max_t = FLAGS_fallback_total_time;
   const double unit_t = FLAGS_fallback_time_unit;
 
@@ -217,11 +220,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   // chassis
   ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
 
-  Status status = VehicleStateProvider::Instance()->Update(
+  Status status = injector_->vehicle_state()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
-  VehicleState vehicle_state =
-      VehicleStateProvider::Instance()->vehicle_state();
+  VehicleState vehicle_state = injector_->vehicle_state()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
   DCHECK_GE(start_timestamp, vehicle_state_timestamp)
       << "start_timestamp is behind vehicle_state_timestamp by "
@@ -512,7 +514,7 @@ Status OnLanePlanning::Plan(
     auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
 
     // enable start auto from open_space planner.
-    if (VehicleStateProvider::Instance()->vehicle_state().driving_mode() !=
+    if (injector_->vehicle_state()->vehicle_state().driving_mode() !=
         Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
       engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
       engage_advice->set_reason(
@@ -1118,7 +1120,7 @@ VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
                                             const double curr_timestamp) const {
   // TODO(Jinyun): use the same method in trajectory stitching
   //               for forward prediction
-  auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
+  auto future_xy = injector_->vehicle_state()->EstimateFuturePosition(
       curr_timestamp - vehicle_state.timestamp());
 
   VehicleState aligned_vehicle_state = vehicle_state;

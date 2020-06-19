@@ -38,6 +38,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
+        "//modules/control/common:dependency_injector",
         "//modules/control/proto:control_cmd_cc_proto",
         "//modules/control/proto:control_common_conf_cc_proto",
         "//modules/control/proto:pad_msg_cc_proto",

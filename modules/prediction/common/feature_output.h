@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -165,6 +166,7 @@ class FeatureOutput {
   static std::size_t idx_frame_env_;
   static ListDataForTuning list_data_for_tuning_;
   static std::size_t idx_tuning_;
+  static std::mutex mutex_feature_;
 };
 
 }  // namespace prediction
