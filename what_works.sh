@@ -29,7 +29,7 @@ if dpkg -l |grep -q "${FLAG_PKG}"; then
     echo "${FLAG_PKG} already installed"
 else
     sudo apt-get -y update
-    sudo apt-get -y install ${FLAG_PKG}
+    sudo apt-get -y install ${FLAG_PKG} libpython2.7-dev
 fi
 echo "/opt/apollo/pkgs/caffe/lib" | sudo tee -a /etc/ld.so.conf.d/apollo.conf
 sudo ldconfig
