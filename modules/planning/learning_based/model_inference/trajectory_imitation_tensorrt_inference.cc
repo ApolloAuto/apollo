@@ -58,8 +58,7 @@ static const double DELTA_T = 0.2;
 
 TrajectoryImitationTensorRTInference::TrajectoryImitationTensorRTInference(
     const LearningModelInferenceTaskConfig& config)
-    : ModelInference(config) {
-}
+    : ModelInference(config) {}
 
 TrajectoryImitationTensorRTInference::~TrajectoryImitationTensorRTInference() {
   GPU_CHECK(cudaFree(trt_buffers_[0]));
@@ -176,20 +175,20 @@ bool TrajectoryImitationTensorRTInference::DoInference(
   // method from torch::Tensor
   cv::Mat input_feature_float;
   input_feature.convertTo(input_feature_float, CV_32F, 1.0 / 255);
-  torch::Tensor input_feature_tensor =
-      torch::from_blob(input_feature_float.data,
-                       {1, input_feature_float.rows, input_feature_float.cols,
-                        input_feature_float.channels()});
+  torch::Tensor input_feature_tensor = torch::from_blob(
+      input_feature_float.data,
+      {BATCH_SIZE, input_feature_float.rows, input_feature_float.cols,
+       input_feature_float.channels()});
   input_feature_tensor = input_feature_tensor.permute({0, 3, 1, 2});
   for (int i = 0; i < input_feature_float.channels(); ++i) {
     input_feature_tensor[0][i] = input_feature_tensor[0][i].sub(0.5).div(0.5);
   }
   cv::Mat initial_point_float;
   initial_point.convertTo(initial_point_float, CV_32F, 1.0 / 255);
-  torch::Tensor initial_point_tensor =
-      torch::from_blob(initial_point_float.data,
-                       {1, initial_point_float.rows, initial_point_float.cols,
-                        initial_point_float.channels()});
+  torch::Tensor initial_point_tensor = torch::from_blob(
+      initial_point_float.data,
+      {BATCH_SIZE, initial_point_float.rows, initial_point_float.cols,
+       initial_point_float.channels()});
   initial_point_tensor = initial_point_tensor.permute({0, 3, 1, 2});
   cv::Mat initial_box_float;
   initial_box.convertTo(initial_box_float, CV_32F, 1.0 / 255);
@@ -220,8 +219,8 @@ bool TrajectoryImitationTensorRTInference::DoInference(
                                 IMG_SIZE * IMG_SIZE * sizeof(float),
                             cudaMemcpyHostToDevice, stream));
   trt_context_->enqueueV2(trt_buffers_, stream, nullptr);
-  float pred_point[1 * PREDICTION_HORIZON * PREDICTION_STATES_NUM *
-                   sizeof(float)] = {0};
+  float pred_point[BATCH_SIZE * PREDICTION_HORIZON * PREDICTION_STATES_NUM] = {
+      0};
   GPU_CHECK(cudaMemcpyAsync(
       pred_point, trt_buffers_[3],
       BATCH_SIZE * PREDICTION_HORIZON * PREDICTION_STATES_NUM * sizeof(float),
