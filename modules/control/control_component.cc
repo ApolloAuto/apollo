@@ -39,6 +39,7 @@ ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 bool ControlComponent::Init() {
+  injector_ = std::make_shared<DependencyInjector>();
   init_time_ = Clock::Now();
 
   AINFO << "Control init, starting ...";
@@ -54,7 +55,7 @@ bool ControlComponent::Init() {
   // initial controller agent when not using control submodules
   ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
   if (!FLAGS_use_control_submodules &&
-      !controller_agent_.Init(&control_conf_).ok()) {
+      !controller_agent_.Init(injector_, &control_conf_).ok()) {
     // set controller
     ADEBUG << "original control";
     monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
@@ -444,8 +445,8 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
     }
   }
 
-  VehicleStateProvider::Instance()->Update(local_view->localization(),
-                                           local_view->chassis());
+  injector_->vehicle_state()->Update(local_view->localization(),
+                                     local_view->chassis());
 
   return Status::OK();
 }

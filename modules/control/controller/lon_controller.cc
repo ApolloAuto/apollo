@@ -87,11 +87,16 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() { CloseLogFile(); }
+void LonController::Stop() {
+  CloseLogFile();
+}
 
-LonController::~LonController() { CloseLogFile(); }
+LonController::~LonController() {
+  CloseLogFile();
+}
 
-Status LonController::Init(const ControlConf *control_conf) {
+Status LonController::Init(std::shared_ptr<DependencyInjector> injector,
+                           const ControlConf *control_conf) {
   control_conf_ = control_conf;
   if (control_conf_ == nullptr) {
     controller_initialized_ = false;
@@ -99,6 +104,7 @@ Status LonController::Init(const ControlConf *control_conf) {
     return Status(ErrorCode::CONTROL_INIT_ERROR,
                   "Failed to load LonController conf");
   }
+  injector_ = injector;
   const LonControllerConf &lon_controller_conf =
       control_conf_->lon_controller_conf();
   double ts = lon_controller_conf.ts();
@@ -214,7 +220,7 @@ Status LonController::ComputeControlCommand(
       speed_leadlag_controller_.SetLeadlag(
           lon_controller_conf.reverse_speed_leadlag_conf());
     }
-  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
+  } else if (injector_->vehicle_state()->linear_velocity() <=
              lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
   } else {
@@ -254,7 +260,7 @@ Status LonController::ComputeControlCommand(
   }
 
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
-      GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
+      GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
   if (std::isnan(slope_offset_compenstaion)) {
     slope_offset_compenstaion = 0;
@@ -355,7 +361,7 @@ Status LonController::ComputeControlCommand(
   cmd->set_brake(brake_cmd);
   cmd->set_acceleration(acceleration_cmd);
 
-  if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
+  if (std::fabs(injector_->vehicle_state()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
       chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
@@ -373,7 +379,9 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const { return name_; }
+std::string LonController::Name() const {
+  return name_;
+}
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
@@ -389,15 +397,13 @@ void LonController::ComputeLongitudinalErrors(
   double d_dot_matched = 0.0;
 
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      VehicleStateProvider::Instance()->x(),
-      VehicleStateProvider::Instance()->y());
+      injector_->vehicle_state()->x(), injector_->vehicle_state()->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      VehicleStateProvider::Instance()->x(),
-      VehicleStateProvider::Instance()->y(),
-      VehicleStateProvider::Instance()->heading(),
-      VehicleStateProvider::Instance()->linear_velocity(), matched_point,
-      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
+      injector_->vehicle_state()->x(), injector_->vehicle_state()->y(),
+      injector_->vehicle_state()->heading(),
+      injector_->vehicle_state()->linear_velocity(), matched_point, &s_matched,
+      &s_dot_matched, &d_matched, &d_dot_matched);
 
   double current_control_time = Clock::NowInSeconds();
   double preview_control_time = current_control_time + preview_time;
@@ -427,15 +433,14 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "preview point:" << preview_point.DebugString();
 
   double heading_error = common::math::NormalizeAngle(
-      VehicleStateProvider::Instance()->heading() - matched_point.theta());
-  double lon_speed = VehicleStateProvider::Instance()->linear_velocity() *
-                     std::cos(heading_error);
-  double lon_acceleration =
-      VehicleStateProvider::Instance()->linear_acceleration() *
-      std::cos(heading_error);
+      injector_->vehicle_state()->heading() - matched_point.theta());
+  double lon_speed =
+      injector_->vehicle_state()->linear_velocity() * std::cos(heading_error);
+  double lon_acceleration = injector_->vehicle_state()->linear_acceleration() *
+                            std::cos(heading_error);
   double one_minus_kappa_lat_error =
       1 - reference_point.path_point().kappa() *
-              VehicleStateProvider::Instance()->linear_velocity() *
+              injector_->vehicle_state()->linear_velocity() *
               std::sin(heading_error);
 
   debug->set_station_reference(reference_point.path_point().s());

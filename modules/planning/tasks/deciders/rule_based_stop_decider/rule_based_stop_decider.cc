@@ -253,8 +253,7 @@ bool RuleBasedStopDecider::CheckADCStop(
     return false;
   }
 
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   if (adc_speed > rule_based_stop_decider_config_.max_adc_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;

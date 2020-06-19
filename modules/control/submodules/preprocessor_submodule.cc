@@ -49,6 +49,7 @@ std::string PreprocessorSubmodule::Name() const {
 }
 
 bool PreprocessorSubmodule::Init() {
+  injector_ = std::make_shared<DependencyInjector>();
   ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
                                          &control_common_conf_))
       << "Unable to load control common conf file: "
@@ -231,8 +232,8 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
       }
     }
   }
-  VehicleStateProvider::Instance()->Update(local_view->localization(),
-                                           local_view->chassis());
+  injector_->vehicle_state()->Update(local_view->localization(),
+                                     local_view->chassis());
 
   return Status::OK();
 }

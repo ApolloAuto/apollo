@@ -33,6 +33,7 @@
 #include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/common/indexed_queue.h"
@@ -59,6 +60,7 @@ class ReferenceLineProvider {
  public:
   ReferenceLineProvider() = default;
   explicit ReferenceLineProvider(
+      const common::VehicleStateProvider* vehicle_state_provider,
       const hdmap::HDMap* base_map,
       const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
 
@@ -82,7 +84,9 @@ class ReferenceLineProvider {
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
 
-  bool UpdatedReferenceLine() { return is_reference_line_updated_.load(); }
+  bool UpdatedReferenceLine() {
+    return is_reference_line_updated_.load();
+  }
 
  private:
   /**
@@ -183,6 +187,8 @@ class ReferenceLineProvider {
   std::future<void> task_future_;
 
   std::atomic<bool> is_reference_line_updated_{true};
+
+  const common::VehicleStateProvider* vehicle_state_provider_ = nullptr;
 };
 
 }  // namespace planning
