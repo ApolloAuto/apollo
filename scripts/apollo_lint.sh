@@ -16,9 +16,8 @@ function run_cpp_lint() {
         if [[ "${STAGE}" == "dev" ]]; then
             cpp_dirs="${cpp_dirs} modules"
         fi
-        for prey in $(find ${cpp_dirs} \
-                -not \( -path "modules/drivers/gnss/third_party" -prune \) \
-                -name BUILD \
+        # -not \( -path "modules/drivers/gnss/third_party" -prune \) \
+        for prey in $(find ${cpp_dirs} -name BUILD \
                 | xargs grep -l -E 'cc_library|cc_test|cc_binary|cuda_library' \
                 | xargs grep -L 'cpplint()' ); do
             warning "unattended BUILD file found: ${prey}. Add cpplint() automatically."
@@ -51,7 +50,7 @@ function run_sh_lint() {
     fi
     local sh_dirs="cyber scripts docker tools"
     if [[ "${STAGE}" == "dev" ]]; then
-        sh_dirs="modules third_party ${sh_dirs}"
+        sh_dirs="modules ${sh_dirs}"
     fi
 
     sh_dirs=$(printf "${APOLLO_ROOT_DIR}/%s " ${sh_dirs})
@@ -71,7 +70,7 @@ function run_py_lint() {
         exit 1
     fi
 
-    local py_dirs="cyber docker tools third_party"
+    local py_dirs="cyber docker tools"
     if [[ "${STAGE}" == "dev" ]]; then
         py_dirs="modules ${py_dirs}"
     fi
