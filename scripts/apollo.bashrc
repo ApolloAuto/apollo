@@ -171,3 +171,8 @@ function read_one_char_from_stdin() {
   echo "${answer}" | tr '[:upper:]' '[:lower:]'
 }
 
+function optarg_check_for_opt() {
+    local opt="$1"
+    local optarg="$2"
+    ! [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]
+}

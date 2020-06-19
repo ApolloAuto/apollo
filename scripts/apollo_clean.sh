@@ -4,8 +4,11 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
+# STAGE="${STAGE:-dev}"
+: ${STAGE:=dev}
+
 function clean() {
-    local stage="$1"; shift
+    local stage="${STAGE}"
 
     if ! "${APOLLO_IN_DOCKER}" ; then
         error "The clean operation must be run from within docker container"
@@ -15,7 +18,7 @@ function clean() {
 
     docs_sh="${TOP_DIR}/scripts/apollo_docs.sh"
     if [ -f "${docs_sh}" ]; then
-        bash "${docs_sh}" clean "${stage}"
+        env STAGE="${stage}" bash "${docs_sh}" clean
     fi
 
     if [ "${stage}" != "dev" ]; then
@@ -33,8 +36,7 @@ function clean() {
 }
 
 function main() {
-    local stage="${1:-dev}"
-    clean "${stage}"
+    clean
 }
 
 main "$@"
