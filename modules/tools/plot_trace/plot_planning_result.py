@@ -26,9 +26,9 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-from modules.canbus.proto import chassis_pb2
-from modules.localization.proto import localization_pb2
-from modules.planning.proto import planning_pb2
+from modules.canbus.proto import chassis_py_pb2
+from modules.localization.proto import localization_py_pb2
+from modules.planning.proto import planning_py_pb2
 
 
 g_args = None
@@ -56,7 +56,7 @@ def get_debug_paths(planning_pb):
 
 def plot_planning(ax, planning_file):
     with open(planning_file, 'r') as fp:
-        planning_pb = planning_pb2.ADCTrajectory()
+        planning_pb = planning_py_pb2.ADCTrajectory()
         text_format.Merge(fp.read(), planning_pb)
         trajectory = get_3d_trajectory(planning_pb)
         ax.plot(trajectory[0], trajectory[1], trajectory[2],
