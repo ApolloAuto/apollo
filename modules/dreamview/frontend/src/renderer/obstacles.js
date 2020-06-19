@@ -36,6 +36,7 @@ export default class PerceptionObstacles {
 
     update(world, coordinates, scene, isBirdView) {
         this.updateObjects(world, coordinates, scene, isBirdView);
+        this.updateSensorMeasurements(world, coordinates, scene, isBirdView);
         this.updateLaneMarkers(world, coordinates, scene);
     }
 
@@ -43,6 +44,7 @@ export default class PerceptionObstacles {
         // Id meshes need to be recreated every time.
         // Each text mesh needs to be removed from the scene,
         // and its char meshes need to be hidden for reuse purpose.
+        //console.log(this.ids);
         if (!_.isEmpty(this.ids)) {
             this.ids.forEach(t => {
                 t.children.forEach(c => c.visible = false);
@@ -53,6 +55,7 @@ export default class PerceptionObstacles {
         this.textRender.reset();
 
         const objects = world.object;
+        //console.log(world);
         if (_.isEmpty(objects)) {
             hideArrayObjects(this.arrows);
             hideArrayObjects(this.solidCubes);
@@ -139,6 +142,120 @@ export default class PerceptionObstacles {
         hideArrayObjects(this.extrusionDashedFaces, extrusionFaceIdx);
         hideArrayObjects(this.icons, iconIdx);
         hideArrayObjects(this.trafficCones, trafficConeIdx);
+    }
+
+    updateSensorMeasurements(world, coordinates, scene, isBirdView) {
+        const sensorMeasures = world.sensorMeasurements;
+        //console.log(sensorMeasures);
+        if(!STORE.options['showObstaclesLidarSensor']||!STORE.options['showObstaclesRadarSensor']
+        ||!STORE.options['showObstaclesCameraSensor'])
+        {
+            return;
+        }
+        let arrowIdx = this.arrows.length;
+        let trafficConeIdx = this.trafficCones.length;
+        let cubeIdx = this.solidCubes.length;//两个数组装立方体，一个立方体两边都画，有实心有点，齐头并进
+        //共用arrows存箭头！！！更新过object以后就不是从0开始了，基于objects的基础,暂时先这么写，很有可能会出bug
+        for(const key in sensorMeasures){
+            const sensorType = this.judgeSensorType(key);
+            //console.log(sensorType);
+            //console.log(STORE.options['showObstacles' + sensorType]);
+            //console.log(sensorMeasures[key]);
+            if(!sensorType||!STORE.options['showObstacles' + sensorType]){
+                //console.log("not show");
+                //console.log(STORE.options["showObstaclesRadarSensor"]);
+                continue;//跳过不理这个组！！！
+            }
+            //先判断选项让话了吗，判断key属于哪个+options情况
+            //然后遍历整个array去画他，就可以参照objects了！！！
+            //console.log(sensorMeasures[key]["sensorMeasurement"].length);
+            for (let i = 0; i < sensorMeasures[key]["sensorMeasurement"].length; i++) {
+                const sensorMeasure = sensorMeasures[key]["sensorMeasurement"][i];
+                //console.log(sensorMeasure);
+                if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(sensorMeasure.type))]
+                    || !_.isNumber(sensorMeasure.positionX)
+                    || !_.isNumber(sensorMeasure.positionY)) {
+                    continue;
+                }//type这部分保留，因为sensor measure本来就是对不同type障碍物的检测，不要求画这个type的obsatcle，那么
+                //对应sensor measure必然不需要
+                const position = coordinates.applyOffset(
+                        new THREE.Vector3(sensorMeasure.positionX,
+                                          sensorMeasure.positionY,
+                                          (sensorMeasure.height || DEFAULT_HEIGHT) / 2));
+                const color = ObstacleColorMapping[sensorMeasure.type] || DEFAULT_COLOR;
+                /*if (STORE.options.showObstaclesVelocity && obstacle.type &&
+                        obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
+                    const arrowMesh = this.updateArrow(position,
+                            obstacle.speedHeading, color, arrowIdx++, scene);
+                    const scale = 1 + Math.log2(obstacle.speed);
+                    arrowMesh.scale.set(scale, scale, scale);
+                    arrowMesh.visible = true;
+                }*/ //sensor measure并无速度
+                //task要求显示heading
+                if (STORE.options.showObstaclesHeading) {
+                    const arrowMesh = this.updateArrow(position, sensorMeasure.heading,
+                            0xFFFFFF, arrowIdx++, scene);
+                    arrowMesh.scale.set(1, 1, 1);
+                    arrowMesh.visible = true;
+                }
+                //this.updateTexts(adc, obstacle, position, scene, isBirdView);
+                //不需要展示text
+                // get the confidence and validate its range
+                //let confidence = obstacle.confidence;
+               // confidence = Math.max(0.0, confidence);
+                //confidence = Math.min(1.0, confidence);
+                //const polygon = obstacle.polygonPoint;
+                if (sensorMeasure.subType === "ST_TRAFFICCONE") {
+                    this.updateTrafficCone(position, trafficConeIdx, scene);
+                    trafficConeIdx++;
+                    console.log("sensor");
+                }else if (sensorMeasure.length && sensorMeasure.width && sensorMeasure.height) {
+                    this.updateCube(sensorMeasure.length, sensorMeasure.width,
+                        sensorMeasure.height, position,
+                            sensorMeasure.heading, color, 0.5, cubeIdx++, scene);
+                        //console.log("MAKE sensor cube");
+                } //把confidence直接写成了0.5肯定有问题，再说，updatecube里面要乘这个confidence，所以confidence怎么设置！！！
+                /*else if (polygon !== undefined && polygon.length > 0) {
+                    this.updatePolygon(polygon, obstacle.height, color, coordinates, confidence,
+                            extrusionFaceIdx, scene);
+                    extrusionFaceIdx += polygon.length;
+                }else if (obstacle.length && obstacle.width && obstacle.height) {
+                    this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
+                            obstacle.heading, color, confidence, cubeIdx++, scene);
+                }*/
+                // draw a yield sign to indicate ADC is yielding to this obstacle
+                /*if (obstacle.yieldedObstacle) {
+                    const iconPosition = {
+                        x: position.x,
+                        y: position.y,
+                        z: position.z + obstacle.height + 0.5,
+                    };
+                    this.updateIcon(iconPosition, world.autoDrivingCar.heading, iconIdx, scene);
+                    iconIdx++;
+                }*/
+                //也没管yield obstacle
+            }
+        }
+        hideArrayObjects(this.arrows, arrowIdx);
+        hideArrayObjects(this.solidCubes, cubeIdx);
+        hideArrayObjects(this.dashedCubes, cubeIdx);
+        //hideArrayObjects(this.extrusionSolidFaces, extrusionFaceIdx);
+        //hideArrayObjects(this.extrusionDashedFaces, extrusionFaceIdx);
+        //hideArrayObjects(this.icons, iconIdx);
+        hideArrayObjects(this.trafficCones, trafficConeIdx);
+    }
+
+    judgeSensorType(key){
+        if(key.search("radar")!==-1){
+            return "RadarSensor";
+        }
+        if(key.search("lidar")!==-1){
+            return "LidarSensor";
+        }
+        if(key.search("camera")!==-1){
+            return "CameraSensor";
+        }
+        return "";
     }
 
     updateArrow(position, heading, color, arrowIdx, scene) {

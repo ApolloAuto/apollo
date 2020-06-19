@@ -103,6 +103,8 @@ export default class Options {
             this.customizedToggles.set(option, !this.customizedToggles.get(option));
         } else {
             this[option] = !this[option];
+            //console.log("toggle the   "+option);
+            //console.log(this["showObstaclesRadarSensor"]);
         }
 
         // Disable other mutually exclusive options
