@@ -9,6 +9,7 @@ SUPPORTED_ARCHS=" x86_64 aarch64 "
 APOLLO_VERSION="@non-git"
 APOLLO_ENV=""
 
+USE_ESD_CAN=false
 : ${USE_GPU:=0}
 : ${STAGE:=dev}
 
@@ -58,6 +59,16 @@ function determine_gpu_use() {
     USE_GPU="${use_gpu}"
 }
 
+function determine_esdcan_use() {
+    local esdcan_dir="${APOLLO_ROOT_DIR}/third_party/can_card_library/esd_can"
+    local use_esd=false
+    if [ -f "${esdcan_dir}/include/ntcan.h" -a \
+         -f "${esdcan_dir}/lib/libntcan.so.4" ]; then
+        use_esd=true
+    fi
+    USE_ESD_CAN="${use_esd}"
+}
+
 function check_apollo_version() {
     local branch="$(git_branch)"
     if [ "${branch}" == "${APOLLO_VERSION}" ]; then
@@ -69,14 +80,17 @@ function check_apollo_version() {
 }
 
 function apollo_env_setup() {
+    check_apollo_version
+
     check_architecture_support
     check_platform_support
     check_minimal_memory_requirement
     determine_gpu_use
-    check_apollo_version
+    determine_esdcan_use
 
     APOLLO_ENV="${APOLLO_ENV} USE_GPU=${USE_GPU}"
     APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"
+    APOLLO_ENV="${APOLLO_ENV} USE_ESD_CAN=${USE_ESD_CAN}"
     # Add more here ...
 
     info "Apollo Environment Settings:"
@@ -96,10 +110,26 @@ function main() {
     if [ "$#" -eq 0 ]; then
         exit 0
     fi
+    local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
     local cmd="$1"; shift
     case "${cmd}" in
         build)
-            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_build.sh "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" "$@"
+            ;;
+        build_opt)
+            env ${APOLLO_ENV} bash "${build_sh}" -c opt "$@"
+            ;;
+        build_dbg)
+            env ${APOLLO_ENV} bash "${build_sh}" -c dbg "$@"
+            ;;
+        build_cpu)
+            env ${APOLLO_ENV} bash "${build_sh}" --mode build_cpu "$@"
+            ;;
+        build_gpu)
+            env ${APOLLO_ENV} bash "${build_sh}" --mode build_gpu "$@"
+            ;;
+        build_opt_gpu)
+            env ${APOLLO_ENV} bash "${build_sh}" --mode build_gpu -c opt "$@"
             ;;
         buildify)
             env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh
