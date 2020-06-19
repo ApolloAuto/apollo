@@ -22,9 +22,9 @@ import datetime
 import os
 import sys
 
-from cyber_py3 import cyber
-from modules.canbus.proto import chassis_pb2
-from modules.localization.proto import localization_pb2
+from cyber.python.cyber_py3 import cyber
+from modules.canbus.proto import chassis_py_pb2
+from modules.localization.proto import localization_py_pb2
 
 
 SmoothParam = 9
@@ -90,6 +90,6 @@ if __name__ == '__main__':
     rttest.acclimit = args.acc
     cyber_node = cyber.Node("RealTimeTest")
     cyber_node.create_reader("/apollo/canbus/chassis",
-                             chassis_pb2.Chassis, rttest.chassis_callback)
+                             chassis_py_pb2.Chassis, rttest.chassis_callback)
     cyber_node.spin()
     cyber.shutdown()

@@ -21,10 +21,10 @@ import sys
 
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
-import debug_topo
-from modules.routing.proto.routing_pb2 import RoutingResponse
-from modules.routing.proto.topo_graph_pb2 import Graph
+import modules.tools.common.proto_utils as proto_utils
+import modules.tools.routing.debug_topo as debug_topo
+from modules.routing.proto.routing_py_pb2 import RoutingResponse
+from modules.routing.proto.topo_graph_py_pb2 import Graph
 
 
 color_iter = itertools.cycle(

@@ -26,12 +26,12 @@ import os
 import sys
 import time
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from gflags import FLAGS
 
-from common.logger import Logger
-from modules.canbus.proto import chassis_pb2
-from modules.localization.proto import localization_pb2
+from modules.tools.common.logger import Logger
+from modules.canbus.proto import chassis_py_pb2
+from modules.localization.proto import localization_py_pb2
 
 
 class RtkRecord(object):
@@ -60,8 +60,8 @@ class RtkRecord(object):
         self.write("x,y,z,speed,acceleration,curvature,"
                    "curvature_change_rate,time,theta,gear,s,throttle,brake,steering\n")
 
-        self.localization = localization_pb2.LocalizationEstimate()
-        self.chassis = chassis_pb2.Chassis()
+        self.localization = localization_py_pb2.LocalizationEstimate()
+        self.chassis = chassis_py_pb2.Chassis()
         self.chassis_received = False
 
         self.cars = 0.0
@@ -185,11 +185,11 @@ def main(argv):
     recorder = RtkRecord(record_file)
     atexit.register(recorder.shutdown)
     node.create_reader('/apollo/canbus/chassis',
-                       chassis_pb2.Chassis,
+                       chassis_py_pb2.Chassis,
                        recorder.chassis_callback)
 
     node.create_reader('/apollo/localization/pose',
-                       localization_pb2.LocalizationEstimate,
+                       localization_py_pb2.LocalizationEstimate,
                        recorder.localization_callback)
 
     while not cyber.is_shutdown():

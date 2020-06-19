@@ -21,8 +21,8 @@ import sys
 
 import matplotlib.pyplot as plt
 
-from cyber_py3.record import RecordReader
-from modules.canbus.proto import chassis_pb2
+from cyber.python.cyber_py3.record import RecordReader
+from modules.canbus.proto import chassis_py_pb2
 
 
 def process(reader):
@@ -34,14 +34,14 @@ def process(reader):
 
     for msg in reader.read_messages():
         if msg.topic == "/apollo/canbus/chassis":
-            chassis = chassis_pb2.Chassis()
+            chassis = chassis_py_pb2.Chassis()
             chassis.ParseFromString(msg.message)
 
             steering_percentage = chassis.steering_percentage
             speed_mps = chassis.speed_mps
             timestamp_sec = chassis.header.timestamp_sec
 
-            if chassis.driving_mode != chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
+            if chassis.driving_mode != chassis_py_pb2.Chassis.COMPLETE_AUTO_DRIVE:
                 last_steering_percentage = steering_percentage
                 last_speed_mps = speed_mps
                 last_timestamp_sec = timestamp_sec

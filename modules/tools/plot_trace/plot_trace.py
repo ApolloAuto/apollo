@@ -22,8 +22,9 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-from modules.canbus.proto import chassis_pb2
-from modules.localization.proto import localization_pb2
+from cyber.python.cyber_py3 import cyber
+from modules.canbus.proto import chassis_py_pb2
+from modules.localization.proto import localization_py_pb2
 
 
 GPS_X = list()
@@ -37,7 +38,7 @@ IS_AUTO_MODE = False
 
 def chassis_callback(chassis_data):
     global IS_AUTO_MODE
-    if chassis_data.driving_mode == chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
+    if chassis_data.driving_mode == chassis_py_pb2.Chassis.COMPLETE_AUTO_DRIVE:
         IS_AUTO_MODE = True
     else:
         IS_AUTO_MODE = False
@@ -55,9 +56,9 @@ def localization_callback(localization_data):
 
 
 def setup_listener(node):
-    node.create_reader(CHASSIS_TOPIC, chassis_pb2.Chassis, chassis_callback)
+    node.create_reader(CHASSIS_TOPIC, chassis_py_pb2.Chassis, chassis_callback)
     node.create_reader(LOCALIZATION_TOPIC,
-                       localization_pb2.LocalizationEstimate,
+                       localization_py_pb2.LocalizationEstimate,
                        localization_callback)
     while not cyber.is_shutdown():
         time.sleep(0.002)
