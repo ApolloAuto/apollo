@@ -1,4 +1,11 @@
 cyber_modules {
+  key: "Camera"
+  value: {
+    dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
+    dag_files: "/apollo/modules/drivers/video/dag/video.dag"
+  }
+}
+cyber_modules {
   key: "Lidar"
   value: {
     dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne16.dag"
@@ -41,10 +48,15 @@ cyber_modules {
   }
 }
 cyber_modules {
+  key: "Camera Perception"
+  value: {
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_dev_kit_camera.dag"
+  }
+}
+cyber_modules {
   key: "Traffic Light"
   value: {
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
-    required_for_safety: false
   }
 }
 cyber_modules {
@@ -60,6 +72,12 @@ cyber_modules {
   }
 }
 cyber_modules {
+  key: "Radar"
+  value: {
+    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
+  }
+}
+cyber_modules {
   key: "Routing"
   value: {
     dag_files: "/apollo/modules/routing/dag/routing.dag"
@@ -69,6 +87,19 @@ cyber_modules {
   key: "Transform"
   value: {
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
+  }
+}
+
+cyber_modules {
+  key: "SmarterEye"
+  value: {
+    dag_files: "/apollo/modules/drivers/smartereye/dag/smartereye.dag"
+  }
+}
+cyber_modules {
+  key: "Third Party Perception"
+  value: {
+    dag_files: "/apollo/modules/third_party_perception/dag/third_party_perception.dag"
   }
 }
 modules {
