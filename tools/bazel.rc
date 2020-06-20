@@ -5,7 +5,6 @@
 # +------------------------------------------------------------+
 startup --batch_cpu_scheduling
 startup --host_jvm_args="-XX:-UseParallelGC"
-startup --output_user_root="/apollo/.cache/bazel"
 
 # +------------------------------------------------------------+
 # | Common Options                                             |
