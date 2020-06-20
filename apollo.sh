@@ -59,11 +59,6 @@ function check_machine_arch() {
     fail "Machine architecture $MACHINE_ARCH currently not supported yet."
     exit 1
   fi
-
-  #TODO(ALL): checks whether still in use
-  #setup vtk folder name for different systems.
-  VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | tail -n1 | cut -d '-' -f 2)
-  sed "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE.in > WORKSPACE
 }
 
 function check_esd_files() {

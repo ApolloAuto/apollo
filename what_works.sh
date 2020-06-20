@@ -34,8 +34,6 @@ fi
 echo "/opt/apollo/pkgs/caffe/lib" | sudo tee -a /etc/ld.so.conf.d/apollo.conf
 sudo ldconfig
 
-cp WORKSPACE.in WORKSPACE
-
 # Fail on first failure.
 set -e
 

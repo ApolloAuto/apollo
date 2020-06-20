@@ -4,10 +4,13 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
 load("//tools/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
+load("//third_party:vtk_configure.bzl", "vtk_configure")
 
 cuda_configure(name = "local_config_cuda")
 
 tensorrt_configure(name = "local_config_tensorrt")
+
+vtk_configure(name = "local_config_vtk")
 
 maybe(
     http_archive,
@@ -192,20 +195,11 @@ new_local_repository(
 #    build_file = "third_party/opengl.BUILD",
 #    path = "/usr/include",
 #)
-#
 #new_local_repository(
 #    name = "glfw",
 #    build_file = "third_party/glfw.BUILD",
 #    path = "/usr/include",
 #)
-#
-# FIXME(all): hide vtk version from end users
-new_local_repository(
-    name = "vtk",
-    build_file = "external/vtk.BUILD",
-    #path = "/opt/apollo/sysroot/include/vtk-VTK_VERSION",
-    path = "/opt/apollo/sysroot/include/vtk-8.2",
-)
 
 # Caffe
 new_local_repository(
