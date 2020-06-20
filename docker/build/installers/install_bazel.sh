@@ -21,7 +21,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-. /tmp/installers/installer_base.sh
+. installer_base.sh
 
 TARGET_ARCH=$(uname -m)
 VERSION="3.2.0"

@@ -159,7 +159,7 @@ while [ $# -gt 0 ] ; do
         ;;
     -c|--china)
         set_registry_mirrors
-	;;
+        ;;
     -f|--fast-test)
         FAST_TEST_MODE="yes"
         ;;
@@ -182,9 +182,9 @@ while [ $# -gt 0 ] ; do
     -y)
         ;;
     stop)
-	    stop_containers
-	    exit 0
-	    ;;
+        stop_containers
+        exit 0
+        ;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -273,39 +273,39 @@ DOCKER_RUN="docker run"
 USE_GPU=0
 
 function determine_gpu_use() {
-  # Check nvidia-driver and GPU device
-  local nv_driver="nvidia-smi"
-  if [ ! -x "$(command -v ${nv_driver} )" ]; then
-    warning "No nvidia-driver found. CPU will be used"
-  elif [ -z "$(eval ${nv_driver} )" ]; then
-    warning "No GPU device found. CPU will be used."
-  else
-    USE_GPU=1
-  fi
-
-  # Try to use GPU inside container
-  local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-  if [ ${USE_GPU} -eq 1 ]; then
-    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-    if [ ! -z "$(which nvidia-docker)" ]; then
-      DOCKER_RUN="nvidia-docker run"
-      warning "nvidia-docker is deprecated. Please install latest docker" \
-              "and nvidia-container-toolkit as described by:"
-      warning "  ${nv_docker_doc}"
-    elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
-      if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
-        DOCKER_RUN="docker run --gpus all"
-      else
-        warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
-        USE_GPU=0
-      fi
+    # Check nvidia-driver and GPU device
+    local nv_driver="nvidia-smi"
+    if [ ! -x "$(command -v ${nv_driver} )" ]; then
+        warning "No nvidia-driver found. CPU will be used"
+    elif [ -z "$(eval ${nv_driver} )" ]; then
+        warning "No GPU device found. CPU will be used."
     else
-      USE_GPU=0
-      warning "Cannot access GPU from within container. Please install latest docker " \
-              "and nvidia-container-toolkit as described by: "
-      warning "  ${nv_docker_doc}"
+        USE_GPU=1
     fi
-  fi
+
+    # Try to use GPU inside container
+    local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
+    if [ ${USE_GPU} -eq 1 ]; then
+        DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+        if [ ! -z "$(which nvidia-docker)" ]; then
+            DOCKER_RUN="nvidia-docker run"
+            warning "nvidia-docker is deprecated. Please install latest docker " \
+                    "and nvidia-container-toolkit as described by:"
+            warning "  ${nv_docker_doc}"
+        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+            if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+                DOCKER_RUN="docker run --gpus all"
+            else
+                warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+                USE_GPU=0
+            fi
+        else
+            USE_GPU=0
+            warning "Cannot access GPU from within container. Please install " \
+                    "latest docker and nvidia-container-toolkit as described by: "
+            warning "  ${nv_docker_doc}"
+        fi
+    fi
 }
 
 function main() {
@@ -334,7 +334,7 @@ function main() {
         if [ "$FAST_TEST_MODE" == "no" ]; then
             # Included default maps.
             for map_name in ${DEFAULT_MAPS[@]}; do
-              source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+                source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
             done
             YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
             docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
@@ -347,7 +347,7 @@ function main() {
         else
             # Included default maps.
             for map_name in ${DEFAULT_TEST_MAPS[@]}; do
-              source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+                source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
             done
         fi
     fi
