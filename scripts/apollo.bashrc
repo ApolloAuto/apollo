@@ -28,6 +28,7 @@ fi
 export APOLLO_ROOT_DIR
 export APOLLO_IN_DOCKER
 export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
+export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
 export TAB="    " # 4 spaces
 : ${VERBOSE:=yes}
