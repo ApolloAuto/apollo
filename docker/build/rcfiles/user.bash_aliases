@@ -17,8 +17,8 @@ fi
 # export EDITOR="vim"
 # alias v="vim"
 
-alias bb="bazel build --distdir=/apollo/.cache/distdir"
-alias bt="bazel test  --distdir=/apollo/.cache/distdir"
+alias bb="bazel build"
+alias bt="bazel test"
 
 function inc() {
     local _path="$1"
@@ -57,4 +57,3 @@ function show_line() {
     # '10,33p' print line 10 to line 33
     ${sed_cmd} -n "${start_ln},+${line_cnt}p" "${fname}"
 }
-

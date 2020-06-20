@@ -105,10 +105,6 @@ sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mi
 service docker restart
 }
 
-if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
-    sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
-fi
-
 if [ -e /proc/sys/kernel ]; then
     echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
 fi
@@ -216,7 +212,14 @@ LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-l
 function local_volumes() {
     set +x
     # Apollo root and bazel cache dirs are required.
-    volumes="-v $APOLLO_ROOT_DIR:/apollo"
+    volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
+    # Map host cache dir to the identical path in container, so that alias links
+    # work the same for both host and container.
+    volumes="${volumes} -v ${CACHE_ROOT_DIR}:${CACHE_ROOT_DIR}"
+    echo "startup --output_user_root=${CACHE_ROOT_DIR}/bazel" > "${CACHE_ROOT_DIR}/user.bazelrc"
+    echo "build --distdir=${CACHE_ROOT_DIR}/distdir" >> "${CACHE_ROOT_DIR}/user.bazelrc"
+    echo "test --distdir=${CACHE_ROOT_DIR}/distdir" >> "${CACHE_ROOT_DIR}/user.bazelrc"
+
     APOLLO_TELEOP="${APOLLO_ROOT_DIR}/../apollo-teleop"
     if [ -d ${APOLLO_TELEOP} ]; then
         volumes="-v ${APOLLO_TELEOP}:/apollo/modules/teleop ${volumes}"

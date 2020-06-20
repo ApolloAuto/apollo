@@ -41,17 +41,8 @@ set -e
 
 ./bootstrap.sh --noninteractive
 
-function bazel_build_with_dist_cache() {
-    # bazel build -c opt --distdir=/apollo/.cache/distdir "$@"
-    bazel build --distdir=/apollo/.cache/distdir "$@"
-}
-
-function bazel_test_with_dist_cache() {
-    bazel test --distdir=/apollo/.cache/distdir "$@"
-}
-
 # Working parts.
-bazel_build_with_dist_cache \
+bazel build \
     //cyber/... \
     //modules/bridge/... \
     //modules/canbus/... \
@@ -73,7 +64,7 @@ bazel_build_with_dist_cache \
     //modules/perception/... \
     //modules/third_party_perception/...
 
-bazel_test_with_dist_cache \
+bazel test \
     //cyber/... \
     //modules/bridge/... \
     //modules/canbus/... \
@@ -93,12 +84,12 @@ bazel_test_with_dist_cache \
 
 # Drivers: OK
 bash scripts/install_esdcan_library.sh install
-bazel_build_with_dist_cache //modules/drivers/...
-bazel_test_with_dist_cache //modules/drivers/...
+bazel build //modules/drivers/...
+bazel test //modules/drivers/...
 bash scripts/install_esdcan_library.sh uninstall
 
 # Perception: 7 test failures + 2 flaky
-bazel_test_with_dist_cache $(bazel query //modules/perception/... \
+bazel test $(bazel query //modules/perception/... \
 	except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
 	except //modules/perception/camera/test:camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test \
 	except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test \
@@ -111,20 +102,20 @@ bazel_test_with_dist_cache $(bazel query //modules/perception/... \
 # //modules/perception/camera/test:camera_lib_lane_postprocessor_denseline_lane_postprocessor_test
 # //modules/perception/camera/test:camera_lib_lane_detector_denseline_lane_detector_test
 
-bazel_build_with_dist_cache //modules/tools/...
-bazel_test_with_dist_cache $(bazel query //modules/tools/... \
+bazel build //modules/tools/...
+bazel test $(bazel query //modules/tools/... \
     except //modules/tools/visualizer/... \
 )
 
 # Localization: 3 test failures
-bazel_test_with_dist_cache $(bazel query //modules/localization/... \
+bazel test $(bazel query //modules/localization/... \
     except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
     except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
     except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
 )
 
 # Prediction: 4 test failures
-bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
+bazel test $(bazel query //modules/prediction/... \
     except //modules/prediction/predictor/single_lane:single_lane_predictor_test \
     except //modules/prediction/container/obstacles:obstacle_test \
     except //modules/prediction/container/obstacles:obstacle_clusters_test \
@@ -132,7 +123,7 @@ bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
 )
 
 # Planning: 7 test failures
-bazel_test_with_dist_cache $(bazel query //modules/planning/... \
+bazel test $(bazel query //modules/planning/... \
     except //modules/planning/tasks/learning_model:learning_model_inference_task_test \
     except //modules/planning/reference_line:qp_spline_reference_line_smoother_test   \
     except //modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_osqp_interface_test \
