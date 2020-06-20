@@ -2,4 +2,3 @@
 # as recommended in https://github.com/bazelbuild/bazel/issues/6319
 try-import %workspace%/tools/bazel.rc
 try-import %workspace%/.apollo.bazelrc
-
