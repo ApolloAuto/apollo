@@ -27,11 +27,13 @@ class DependencyInjector {
 
   ~DependencyInjector() = default;
 
-  apollo::common::VehicleStateProvider* vehicle_state() { return &vehicle_state_; }
+  apollo::common::VehicleStateProvider* vehicle_state() {
+    return &vehicle_state_;
+  }
 
  private:
   apollo::common::VehicleStateProvider vehicle_state_;
 };
 
-}  // namespace planning
+}  // namespace control
 }  // namespace apollo
