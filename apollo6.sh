@@ -113,6 +113,10 @@ function main() {
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
     local cmd="$1"; shift
     case "${cmd}" in
+        config)
+            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_config.sh "$@"
+            ;;
+
         build)
             env ${APOLLO_ENV} bash "${build_sh}" "$@"
             ;;
