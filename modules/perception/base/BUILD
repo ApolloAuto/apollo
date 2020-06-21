@@ -315,14 +315,11 @@ cc_library(
     name = "point_cloud_util",
     srcs = ["point_cloud_util.cc"],
     hdrs = ["point_cloud_util.h"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         ":point_cloud",
         "//cyber",
         "@eigen",
+        "@opencv",
     ],
 )
 

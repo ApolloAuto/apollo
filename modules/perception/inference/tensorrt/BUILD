@@ -54,7 +54,6 @@ cc_library(
         "entropy_calibrator.h",
         "rt_net.h",
     ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
         ":batch_stream",
         ":entropy_calibrator",
@@ -66,6 +65,8 @@ cc_library(
         "//modules/perception/inference/tensorrt/plugins:perception_inference_tensorrt_plugins",
         "@caffe",
         "@com_google_protobuf//:protobuf",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv",
     ],
 )
 

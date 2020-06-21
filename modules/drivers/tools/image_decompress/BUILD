@@ -8,16 +8,13 @@ cc_library(
     srcs = ["image_decompress.cc"],
     hdrs = ["image_decompress.h"],
     copts = ['-DMODULE_NAME=\\"image_decompress\\"'],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/common/proto:header_cc_proto",
         "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/drivers/tools/image_decompress/proto:config_cc_proto",
+        "@opencv",
     ],
 )
 
