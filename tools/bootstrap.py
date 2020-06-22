@@ -42,11 +42,11 @@ _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '6.0,6.1,7.0,7.2,7.5'
 
 _DEFAULT_PROMPT_ASK_ATTEMPTS = 10
 
-_TF_WORKSPACE_ROOT = ''
-_TF_BAZELRC = ''
-_TF_CURRENT_BAZEL_VERSION = None
-_TF_MIN_BAZEL_VERSION = '2.0.0'
-_TF_MAX_BAZEL_VERSION = '3.99.0'
+_APOLLO_ROOT_DIR = ''
+_APOLLO_BAZELRC = ''
+_APOLLO_CURRENT_BAZEL_VERSION = None
+_APOLLO_MIN_BAZEL_VERSION = '2.0.0'
+_APOLLO_MAX_BAZEL_VERSION = '3.99.0'
 
 
 class UserInputError(Exception):
@@ -101,7 +101,7 @@ def sed_in_place(filename, old, new):
 
 
 def write_to_bazelrc(line):
-    with open(_TF_BAZELRC, 'a') as f:
+    with open(_APOLLO_BAZELRC, 'a') as f:
         f.write(line + '\n')
 
 
@@ -218,15 +218,14 @@ def setup_python(environ_cp):
             write_action_env_to_bazelrc('PYTHONPATH',
                                         environ_cp.get('PYTHONPATH'))
     # Write tools/python_bin_path.sh
-    with open(
-            os.path.join(_TF_WORKSPACE_ROOT, 'tools', 'python_bin_path.sh'),
-            'w') as f:
+    with open(os.path.join(_APOLLO_ROOT_DIR, 'tools', 'python_bin_path.sh'),
+              'w') as f:
         f.write('export PYTHON_BIN_PATH="{}"'.format(python_bin_path))
 
 
 def reset_tf_configure_bazelrc():
     """Reset file that contains customized config settings."""
-    open(_TF_BAZELRC, 'w').close()
+    open(_APOLLO_BAZELRC, 'w').close()
 
 
 def get_var(environ_cp,
@@ -920,18 +919,6 @@ def config_info_line(name, help_text):
 def validate_cuda_config(environ_cp):
     """Run find_cuda_config.py and return cuda_toolkit_path, or None."""
 
-    def maybe_encode_env(env):
-        """Encodes unicode in env to str on Windows python 2.x."""
-        if sys.version_info[0] != 2:
-            return env
-        for k, v in env.items():
-            if isinstance(k, unicode):
-                k = k.encode('ascii')
-            if isinstance(v, unicode):
-                v = v.encode('ascii')
-            env[k] = v
-        return env
-
     cuda_libraries = ['cuda', 'cudnn']
     if int(environ_cp.get('TF_NEED_TENSORRT', False)):
         cuda_libraries.append('tensorrt')
@@ -943,7 +930,7 @@ def validate_cuda_config(environ_cp):
         [environ_cp['PYTHON_BIN_PATH'], 'tools/gpus/find_cuda_config.py'] +
         cuda_libraries,
         stdout=subprocess.PIPE,
-        env=maybe_encode_env(environ_cp))
+        env=environ_cp)
 
     if proc.wait():
         # Errors from find_cuda_config.py were sent to stderr.
@@ -1001,7 +988,7 @@ build:cuda_clang --action_env TF_CUDA_CLANG=1
 build:tensorrt --action_env TF_NEED_TENSORRT=1
 build:nonccl --define=no_nccl_support=true
 """
-    with open(_TF_BAZELRC, 'a') as f:
+    with open(_APOLLO_BAZELRC, 'a') as f:
         f.write(overall_text)
 
 
@@ -1016,9 +1003,9 @@ def main():
     if not is_linux():
         raise ValueError("Currently ONLY Linux platform is supported.")
 
-    global _TF_WORKSPACE_ROOT
-    global _TF_BAZELRC
-    global _TF_CURRENT_BAZEL_VERSION
+    global _APOLLO_ROOT_DIR
+    global _APOLLO_BAZELRC
+    global _APOLLO_CURRENT_BAZEL_VERSION
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1034,22 +1021,23 @@ def main():
 
     args = parser.parse_args()
 
-    _TF_WORKSPACE_ROOT = args.workspace
-    _TF_BAZELRC = os.path.join(_TF_WORKSPACE_ROOT, args.output_file)
+    _APOLLO_ROOT_DIR = args.workspace
+    _APOLLO_BAZELRC = os.path.join(_APOLLO_ROOT_DIR, args.output_file)
 
     # Make a copy of os.environ to be clear when functions and getting and setting
     # environment variables.
     environ_cp = dict(os.environ)
 
     try:
-        current_bazel_version = check_bazel_version(_TF_MIN_BAZEL_VERSION,
-                                                    _TF_MAX_BAZEL_VERSION)
+        current_bazel_version = check_bazel_version(_APOLLO_MIN_BAZEL_VERSION,
+                                                    _APOLLO_MAX_BAZEL_VERSION)
     except subprocess.CalledProcessError as e:
         print("Error checking bazel version: ",
               e.output.decode('UTF-8').strip())
         raise e
 
-    _TF_CURRENT_BAZEL_VERSION = convert_version_to_int(current_bazel_version)
+    _APOLLO_CURRENT_BAZEL_VERSION = convert_version_to_int(
+        current_bazel_version)
 
     reset_tf_configure_bazelrc()
     setup_python(environ_cp)
