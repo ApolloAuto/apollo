@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/control/integration_tests/control_test_base.h"
+
 #include <memory>
 
 #include "cyber/common/file.h"
 #include "google/protobuf/text_format.h"
 #include "modules/common/util/util.h"
-#include "modules/control/integration_tests/control_test_base.h"
+#include "modules/control/common/dependency_injector.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
@@ -50,7 +52,10 @@ bool ControlTestBase::test_control() {
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
   // set controller
-  if (!control_.controller_agent_.Init(&(control_.control_conf_)).ok()) {
+  control_.injector_ = std::make_shared<DependencyInjector>();
+  if (!control_.controller_agent_
+           .Init(control_.injector_, &(control_.control_conf_))
+           .ok()) {
     AERROR << "Control init controller failed! Stopping...";
     exit(EXIT_FAILURE);
   }

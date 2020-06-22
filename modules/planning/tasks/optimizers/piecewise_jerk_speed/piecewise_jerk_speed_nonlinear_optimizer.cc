@@ -20,9 +20,9 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
-#include <algorithm>
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
+#include <algorithm>
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -34,6 +34,7 @@
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/proto/ipopt_return_status.pb.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -472,7 +473,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     std::vector<double>* distance, std::vector<double>* velocity,
     std::vector<double>* acceleration) {
   static std::mutex mutex_tnlp;
-  std::unique_lock<std::mutex> lock(mutex_tnlp);
+  UNIQUE_LOCK_MULTITHREAD(mutex_tnlp);
   // Set optimizer instance
   auto ptr_interface = new PiecewiseJerkSpeedNonlinearIpoptInterface(
       s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
