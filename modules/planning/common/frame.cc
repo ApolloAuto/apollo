@@ -489,13 +489,12 @@ void Frame::ReadTrafficLights() {
 }
 
 void Frame::ReadLearningDataFrame() {
-  learning_data_frame_.Clear();
   if (FLAGS_planning_learning_mode != 2 && FLAGS_planning_learning_mode != 3) {
     return;
   }
   auto learning_data_frame = FeatureOutput::GetLatestLearningDataFrame();
   if (learning_data_frame != nullptr) {
-    learning_data_frame_.CopyFrom(*learning_data_frame);
+    learning_based_data_.set_learning_data_frame(*learning_data_frame);
   }
 }
 
