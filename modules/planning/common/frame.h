@@ -36,6 +36,7 @@
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/indexed_queue.h"
+#include "modules/planning/common/learning_based_data.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/open_space_info.h"
@@ -149,13 +150,6 @@ class Frame {
 
   const bool is_near_destination() const { return is_near_destination_; }
 
-  const bool is_valid_learning_trajectory() const {
-    return is_valid_learning_trajectory_;
-  }
-  void set_learning_trajectory_valid(bool is_valid) {
-    is_valid_learning_trajectory_ = is_valid;
-  }
-
   /**
    * @brief Adjust reference line priority according to actual road conditions
    * @id_to_priority lane id and reference line priority mapping relationship
@@ -171,24 +165,15 @@ class Frame {
 
   OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
 
+  const LearningBasedData &learning_based_data() const {
+      return learning_based_data_; }
+  LearningBasedData *mutable_learning_based_data() {
+      return &learning_based_data_; }
+
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
   const DrivingAction &GetPadMsgDrivingAction() const {
     return pad_msg_driving_action_;
-  }
-
-  const LearningDataFrame &learning_data_frame() const {
-    return learning_data_frame_;
-  }
-
-  void set_learning_data_adc_future_trajectory_points(
-      const std::vector<common::TrajectoryPoint> &trajectory_points) {
-    learning_data_adc_future_trajectory_points_ = trajectory_points;
-  }
-
-  const std::vector<common::TrajectoryPoint>
-      &learning_data_adc_future_trajectory_points() const {
-    return learning_data_adc_future_trajectory_points_;
   }
 
  private:
@@ -237,6 +222,7 @@ class Frame {
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
   ThreadSafeIndexedObstacles obstacles_;
+
   std::unordered_map<std::string, const perception::TrafficLight *>
       traffic_lights_;
 
@@ -250,14 +236,11 @@ class Frame {
 
   OpenSpaceInfo open_space_info_;
 
+  LearningBasedData learning_based_data_;
+
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-
-  LearningDataFrame learning_data_frame_;
-  std::vector<common::TrajectoryPoint>
-      learning_data_adc_future_trajectory_points_;
-  bool is_valid_learning_trajectory_ = false;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
