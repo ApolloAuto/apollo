@@ -67,7 +67,6 @@ build --host_cxxopt="-std=c++14"
 # build with profiling
 build:cpu_prof --linkopt=-lprofiler
 
-startup --output_user_root=/apollo/.cache/bazel
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
@@ -86,6 +85,7 @@ test:coverage --linkopt=-coverage
 test:coverage --linkopt=-lgcov
 test:coverage --linkopt=-lgcc
 test:coverage --linkopt=-lc
+test:unit_test -c dbg --test_verbose_timeout_warnings
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
