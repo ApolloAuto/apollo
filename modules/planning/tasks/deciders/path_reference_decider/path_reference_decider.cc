@@ -53,8 +53,8 @@ Status PathReferenceDecider::Execute(Frame *frame,
   return Process(frame, reference_line_info);
 }
 
-Status PathReferenceDecider::Process(
-    Frame *frame, const ReferenceLineInfo *reference_line_info) {
+Status PathReferenceDecider::Process(Frame *frame,
+                                     ReferenceLineInfo *reference_line_info) {
   // get path bounds info from reference line info
   const std::vector<PathBoundary> &path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
@@ -77,16 +77,37 @@ Status PathReferenceDecider::Process(
   if (!IsValidPathReference(reference_line_info,
                             path_boundaries[regular_path_bound_idx],
                             path_reference)) {
-    AERROR << "Learning model output is not a validated path reference";
+    AINFO << "Learning model output violates path bounds. Not a validated "
+              "path reference";
     return Status::OK();
   }
   std::vector<PathPoint> evaluated_path_reference;
   // evaluate path reference
   EvaluatePathReference(&path_boundaries[regular_path_bound_idx],
                         path_reference, &evaluated_path_reference);
-
+  ADEBUG << "trimmed_path_bound_size: " << trimmed_path_bound_size_;
+  if (trimmed_path_bound_size_ <
+      config_.path_reference_decider_config().min_path_reference_length()) {
+    AINFO
+        << "Learning model output is too shot. Not a validated path reference";
+    return Status::OK();
+  }
   // mark learning trajectory as path reference
   frame->set_learning_trajectory_valid(true);
+
+  reference_line_info->mutable_path_data()->set_trimmed_path_bound_size(
+      trimmed_path_bound_size_);
+
+  reference_line_info->mutable_path_data()->set_valid_path_reference(true);
+
+  // write path reference end pose to PathData
+  common::PointENU path_reference_end_pos;
+  path_reference_end_pos.set_x(
+      evaluated_path_reference.at(trimmed_path_bound_size_ - 1).x());
+  path_reference_end_pos.set_y(
+      evaluated_path_reference.at(trimmed_path_bound_size_ - 1).y());
+  reference_line_info->mutable_path_data()->set_path_reference_end_pose(
+      path_reference_end_pos);
 
   return Status::OK();
 }
@@ -260,7 +281,8 @@ void PathReferenceDecider::EvaluatePathReference(
   for (auto trajectory_point : path_reference) {
     discrete_path_reference.emplace_back(trajectory_point.path_point());
   }
-  for (size_t idx = 0; idx < path_bound->boundary().size(); ++idx) {
+  size_t idx;
+  for (idx = 0; idx < path_bound->boundary().size(); ++idx) {
     // relative s
     double cur_s = static_cast<double>(idx) * delta_s;
     if (cur_s > path_reference_end_s) {
@@ -269,6 +291,7 @@ void PathReferenceDecider::EvaluatePathReference(
     evaluated_path_reference->emplace_back(
         discrete_path_reference.Evaluate(cur_s));
   }
+  trimmed_path_bound_size_ = idx;
 }
 
 }  // namespace planning

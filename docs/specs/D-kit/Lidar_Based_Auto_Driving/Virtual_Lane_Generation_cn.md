@@ -11,6 +11,10 @@
       - [2. 提交虚拟车道线生成任务](#2-提交虚拟车道线生成任务)
       - [3. 获取虚拟车道线并添加到apollo中](#3-获取虚拟车道线并添加到apollo中)
   - [NEXT](#next)
+  - [常见问题](#常见问题)
+    - [1. 在BOS中没有生成local_map文件夹](#1-在bos中没有生成local_map文件夹)
+    - [2. 在BOS中生成的地图有问题](#2-在bos中生成的地图有问题)
+    - [3. 在BOS没有生成任何地图数据](#3-在bos没有生成任何地图数据)
 
 ## 前提条件
 
@@ -58,7 +62,7 @@
 ![virtual_lane_fuel](images/virtual_lane_fuel.png)
 
 在New Job下拉框中选择Virtual Lane Generation选项，填写Partner ID、Access Key、Secret Key、Input Data Path（在本例中为"virtual_lane"）、Output Data Path（地图生成路径此例中为"result"）、Zone ID（根据当地实际情况填写，本例中所在地方为北京应填50）、Lidar Type（是配置的/apollo/sensor/lidar16/compensator/PointCloud2这个channel的雷达类型，此例中是lidar16）、Lane Width(车道线的宽度，此例中为3.3)、Extra ROI Extension(车道线的边界到真实道路边缘的距离，此例中为0.5)，最后点击Submit Job按钮提交。
-**注意**：bos需要有写权限。
+**注意**：bos需要有写权限,并且传入的zone_id应和录制数据包时localiztion.conf配置文件中的local_utm_zone_id配置项的值一致才行。
 
 #### 3. 获取虚拟车道线并添加到apollo中
 
@@ -73,3 +77,11 @@
 将上图中的2020-01-16-08-08-42整个文件夹拷贝到/apollo/modules/map/data/下，重命名为自己的地图名字（例如gongyuan），重启DreamView即可在地图下拉框中看到自己刚添加的地图。
 ## NEXT
 现在，您已经完成虚拟车道线制作，根据您使用的是基于Lidar的感知方案还是基于Camera的感知方案，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)
+
+## 常见问题
+### 1. 在BOS中没有生成local_map文件夹
+* 确认/apollo/modules/localization/conf/localization.conf文件中`--local_utm_zone_id` 选项和提交虚拟车道线云服务的时传入的zone_id一致。
+### 2. 在BOS中生成的地图有问题
+* 在虚拟车道线数据包录制过程中，车只能沿着预定道路走一遍且不能闭环。
+### 3. 在BOS没有生成任何地图数据
+* 确认提交商务申请时给的BOS bucket name和现在上传数据的BOS bucket name一致。

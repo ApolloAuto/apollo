@@ -32,7 +32,6 @@
 
 // headers in STL
 #include <chrono>
-#include <cstring>
 #include <iostream>
 
 // headers in local files
@@ -287,17 +286,17 @@ void PointPillars::DeviceMemoryMalloc() {
 
 void PointPillars::InitAnchors() {
   // allocate memory for anchors
-  anchors_px_ = new float[kNumAnchor];
-  anchors_py_ = new float[kNumAnchor];
-  anchors_pz_ = new float[kNumAnchor];
-  anchors_dx_ = new float[kNumAnchor];
-  anchors_dy_ = new float[kNumAnchor];
-  anchors_dz_ = new float[kNumAnchor];
-  anchors_ro_ = new float[kNumAnchor];
-  box_anchors_min_x_ = new float[kNumAnchor];
-  box_anchors_min_y_ = new float[kNumAnchor];
-  box_anchors_max_x_ = new float[kNumAnchor];
-  box_anchors_max_y_ = new float[kNumAnchor];
+  anchors_px_ = new float[kNumAnchor]();
+  anchors_py_ = new float[kNumAnchor]();
+  anchors_pz_ = new float[kNumAnchor]();
+  anchors_dx_ = new float[kNumAnchor]();
+  anchors_dy_ = new float[kNumAnchor]();
+  anchors_dz_ = new float[kNumAnchor]();
+  anchors_ro_ = new float[kNumAnchor]();
+  box_anchors_min_x_ = new float[kNumAnchor]();
+  box_anchors_min_y_ = new float[kNumAnchor]();
+  box_anchors_max_x_ = new float[kNumAnchor]();
+  box_anchors_max_y_ = new float[kNumAnchor]();
   // deallocate these memories in destructor
 
   GenerateAnchors(anchors_px_, anchors_py_, anchors_pz_, anchors_dx_,
@@ -404,10 +403,8 @@ void PointPillars::ConvertAnchors2BoxAnchors(float* anchors_px,
                                              float* box_anchors_max_x_,
                                              float* box_anchors_max_y_) {
   // flipping box's dimension
-  float flipped_anchors_dx[kNumAnchor];
-  float flipped_anchors_dy[kNumAnchor];
-  memset(flipped_anchors_dx, 0, kNumAnchor * sizeof(float));
-  memset(flipped_anchors_dy, 0, kNumAnchor * sizeof(float));
+  float flipped_anchors_dx[kNumAnchor] = {};
+  float flipped_anchors_dy[kNumAnchor] = {};
   int ind = 0;
   for (size_t head = 0; head < kNumAnchorSets.size(); ++head) {
     int num_x_inds =
@@ -527,12 +524,9 @@ void PointPillars::OnnxToTRTModel(
 
 void PointPillars::PreprocessCPU(const float* in_points_array,
                                  const int in_num_points) {
-  int x_coors[kMaxNumPillars];
-  int y_coors[kMaxNumPillars];
-  float num_points_per_pillar[kMaxNumPillars];
-  memset(x_coors, 0, kMaxNumPillars * sizeof(int));
-  memset(y_coors, 0, kMaxNumPillars * sizeof(int));
-  memset(num_points_per_pillar, 0, kMaxNumPillars * sizeof(float));
+  int x_coors[kMaxNumPillars] = {};
+  int y_coors[kMaxNumPillars] = {};
+  float num_points_per_pillar[kMaxNumPillars] = {};
 
   float* pillar_point_feature =
       new float[kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature];
