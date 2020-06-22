@@ -37,7 +37,7 @@ class Params {
   static constexpr int kNumClass = 10;
   static constexpr int kMaxNumPillars = 30000;
   static constexpr int kMaxNumPointsPerPillar = 60;
-  static constexpr int kNumPointFeature = 4;
+  static constexpr int kNumPointFeature = 5;  // x, y, z, i, delta of time
   static constexpr int kNumAnchor = 100 * 100 * 12 + 160 * 160 * 8;
   static constexpr int kNumOutputBoxFeature = 7;
   static constexpr int kBatchSize = 1;

@@ -51,7 +51,7 @@ const float PointPillars::kMaxXRange = Params::kMaxXRange;
 const float PointPillars::kMaxYRange = Params::kMaxYRange;
 const float PointPillars::kMaxZRange = Params::kMaxZRange;
 const float PointPillars::kSensorHeight = Params::kSensorHeight;
-// TODO(chenjiahao): kSensorHeight need to get from sensor's height param
+// TODO(chenjiahao): replace kSensorHeight with anchor's z-coor
 const int PointPillars::kNumClass = Params::kNumClass;
 const int PointPillars::kMaxNumPillars = Params::kMaxNumPillars;
 const int PointPillars::kMaxNumPointsPerPillar = Params::kMaxNumPointsPerPillar;
@@ -75,7 +75,6 @@ const int PointPillars::kNumThreads = Params::kNumThreads;
 // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
 // common.h
 const int PointPillars::kNumBoxCorners = Params::kNumBoxCorners;
-// TODO(chenjiahao): kNumBoxCorners is actually used as kNumPointFeature
 const std::vector<int> PointPillars::kAnchorStrides = Params::AnchorStrides();
 const std::vector<int> PointPillars::kAnchorRanges{
     0, kGridXSize, 0, kGridYSize,
@@ -107,13 +106,13 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
     preprocess_points_ptr_.reset(new PreprocessPoints(
         kMaxNumPillars, kMaxNumPointsPerPillar, kNumPointFeature, kGridXSize,
         kGridYSize, kGridZSize, kPillarXSize, kPillarYSize, kPillarZSize,
-        kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan, kNumBoxCorners));
+        kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan, kNumPointFeature));
   } else {
     preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
         kNumThreads, kMaxNumPillars, kMaxNumPointsPerPillar, kNumPointFeature,
         kNumIndsForScan, kGridXSize, kGridYSize, kGridZSize, kPillarXSize,
         kPillarYSize, kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-        kNumBoxCorners));
+        kNumPointFeature));
   }
 
   anchor_mask_cuda_ptr_.reset(new AnchorMaskCuda(
@@ -571,9 +570,9 @@ void PointPillars::PreprocessGPU(const float* in_points_array,
                                  const int in_num_points) {
   float* dev_points;
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_points),
-                       in_num_points * kNumBoxCorners * sizeof(float)));
+                       in_num_points * kNumPointFeature * sizeof(float)));
   GPU_CHECK(cudaMemcpy(dev_points, in_points_array,
-                       in_num_points * kNumBoxCorners * sizeof(float),
+                       in_num_points * kNumPointFeature * sizeof(float),
                        cudaMemcpyHostToDevice));
 
   GPU_CHECK(cudaMemset(dev_x_coors_, 0, kMaxNumPillars * sizeof(int)));
