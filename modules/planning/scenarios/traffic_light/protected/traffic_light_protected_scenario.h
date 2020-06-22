@@ -24,9 +24,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/common/util/factory.h"
+#include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -42,14 +41,16 @@ struct TrafficLightProtectedContext {
 
 class TrafficLightProtectedScenario : public Scenario {
  public:
-  TrafficLightProtectedScenario(const ScenarioConfig& config,
-                                const ScenarioContext* context)
-      : Scenario(config, context) {}
+  TrafficLightProtectedScenario(
+      const ScenarioConfig& config, const ScenarioContext* context,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config);
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   TrafficLightProtectedContext* GetContext() { return &context_; }
 
@@ -60,7 +61,8 @@ class TrafficLightProtectedScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   TrafficLightProtectedContext context_;

@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -12,8 +13,8 @@ cuda_library(
     deps = [
         "//modules/perception/base:blob",
         "//modules/perception/inference:layer_lib",
-        "@cuda",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

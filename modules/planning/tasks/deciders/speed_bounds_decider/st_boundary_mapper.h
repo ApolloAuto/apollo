@@ -20,18 +20,19 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
-
 #include "modules/common/status/status.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed_limit.h"
+#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -42,7 +43,8 @@ class STBoundaryMapper {
   STBoundaryMapper(const SpeedBoundsDeciderConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
-                   const double planning_time);
+                   const double planning_time,
+                   const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~STBoundaryMapper() = default;
 
@@ -97,6 +99,7 @@ class STBoundaryMapper {
   const common::VehicleParam& vehicle_param_;
   const double planning_max_distance_;
   const double planning_max_time_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace planning

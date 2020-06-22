@@ -21,7 +21,6 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
-
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/future.h"
 #include "modules/common/util/util.h"

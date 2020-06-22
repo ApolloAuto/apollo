@@ -21,6 +21,7 @@
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
@@ -35,7 +36,24 @@ void GenerateDataForLearning() {
   if (FLAGS_prediction_offline_bags.empty()) {
     return;
   }
-  if (!MessageProcess::Init()) {
+
+  PredictionConf prediction_conf;
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                       &prediction_conf)) {
+    AERROR << "Unable to load adapter conf file: "
+           << FLAGS_prediction_adapter_config_filename;
+    return;
+  }
+  ADEBUG << "Adapter config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+
+  auto container_manager = std::make_shared<ContainerManager>();
+  EvaluatorManager evaluator_manager;
+  PredictorManager predictor_manager;
+  ScenarioManager scenario_manager;
+
+  if (!MessageProcess::Init(container_manager.get(), &evaluator_manager,
+                            &predictor_manager, prediction_conf)) {
     return;
   }
   const std::vector<std::string> inputs =
@@ -49,7 +67,9 @@ void GenerateDataForLearning() {
     for (std::size_t i = 0; i < offline_bags.size(); ++i) {
       AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
-      MessageProcess::ProcessOfflineData(offline_bags[i]);
+      MessageProcess::ProcessOfflineData(prediction_conf, container_manager,
+                                         &evaluator_manager, &predictor_manager,
+                                         &scenario_manager, offline_bags[i]);
     }
   }
   FeatureOutput::Close();

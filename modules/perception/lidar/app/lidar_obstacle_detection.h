@@ -21,8 +21,8 @@
 #include "Eigen/Dense"
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lidar/lib/interface/base_classifier.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
+#include "modules/perception/lidar/lib/interface/base_classifier.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
@@ -50,7 +50,6 @@ class LidarObstacleDetection {
   bool Init(const LidarObstacleDetectionInitOptions& options =
                 LidarObstacleDetectionInitOptions());
 
-
   LidarProcessResult Process(
       const LidarObstacleDetectionOptions& options,
       const std::shared_ptr<apollo::drivers::PointCloud const>& message,
@@ -62,8 +61,8 @@ class LidarObstacleDetection {
   std::string Name() const { return "LidarObstacleDetection"; }
 
  private:
-  LidarProcessResult ProcessCommon(
-      const LidarObstacleDetectionOptions& options, LidarFrame* frame);
+  LidarProcessResult ProcessCommon(const LidarObstacleDetectionOptions& options,
+                                   LidarFrame* frame);
 
  private:
   PointCloudPreprocessor cloud_preprocessor_;

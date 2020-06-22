@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -14,7 +15,7 @@ cc_binary(
     name = "routing_dump",
     srcs = ["routing_dump.cc"],
     deps = [
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/routing:routing_lib",
     ],
 )

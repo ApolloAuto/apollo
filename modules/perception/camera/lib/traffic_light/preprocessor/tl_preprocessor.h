@@ -15,11 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/circular_buffer.hpp>
 
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/base/traffic_light.h"

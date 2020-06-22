@@ -39,12 +39,14 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo::OverlapType& overlap_type);
 
 PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
-                                const ScenarioPullOverConfig& scenario_config);
+                                const ScenarioPullOverConfig& scenario_config,
+                                const PlanningContext* planning_context);
 
 PullOverStatus CheckADCPullOverPathPoint(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioPullOverConfig& scenario_config,
-    const common::PathPoint& path_point);
+    const common::PathPoint& path_point,
+    const PlanningContext* planning_context);
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,

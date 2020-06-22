@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-
 #include <fstream>
 #include <iomanip>
+
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"

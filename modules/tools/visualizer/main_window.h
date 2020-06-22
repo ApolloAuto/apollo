@@ -19,6 +19,9 @@
 #include <QtCore/QMutex>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
+#include <map>
+#include <memory>
+#include <string>
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/proto/radar.pb.h"

@@ -1,2 +1,6 @@
-# directory for cache predownloaded tarballs
+## This directory is used as filesystem cache for user pre-downloaded tarballs
 
+* For test only *
+
+Note that the cached tarballs' size will fully sum up to the final image, which
+would be inefficient for production use.

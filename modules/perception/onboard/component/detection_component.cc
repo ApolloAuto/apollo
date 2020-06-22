@@ -54,7 +54,8 @@ bool DetectionComponent::Init() {
 
 bool DetectionComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
-  AINFO << "Enter detection component, message timestamp: "
+  AINFO << std::setprecision(16)
+        << "Enter detection component, message timestamp: "
         << message->measurement_time() << " current timestamp: "
         << apollo::common::time::Clock::NowInSeconds();
 
@@ -104,9 +105,11 @@ bool DetectionComponent::InternalProc(
   const double timestamp = in_message->measurement_time();
   const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << timestamp << sensor_name_
-        << ":Start:msg_time["
-        << "]:cur_time[" << cur_time << "]:cur_latency[" << start_latency
+  AINFO << std::setprecision(16)
+        << "FRAME_STATISTICS:Lidar:Start:msg_time[" << timestamp
+        << "]:sensor[" << sensor_name_
+        << "]:cur_time[" << cur_time
+        << "]:cur_latency[" << start_latency
         << "]";
 
   out_message->timestamp_ = timestamp;

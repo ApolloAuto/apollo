@@ -21,11 +21,11 @@
 #pragma once
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "Eigen/Dense"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -46,7 +46,8 @@ namespace apollo {
 namespace planning {
 class OpenSpaceRoiDecider : public Decider {
  public:
-  explicit OpenSpaceRoiDecider(const TaskConfig &config);
+  OpenSpaceRoiDecider(const TaskConfig &config,
+                      const std::shared_ptr<DependencyInjector> &injector);
 
  private:
   apollo::common::Status Process(Frame *frame) override;

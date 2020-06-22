@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +11,7 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//modules/common/adapters/proto:adapter_config_proto",
+        "//modules/common/adapters/proto:adapter_config_cc_proto",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor/sequence:sequence_predictor",

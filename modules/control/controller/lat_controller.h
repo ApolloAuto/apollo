@@ -168,8 +168,10 @@ class LatController : public Controller {
   // longitudial length for look-ahead lateral error estimation during forward
   // driving and look-back lateral error estimation during backward driving
   // (look-ahead controller)
-  double lookahead_station_ = 0.0;
-  double lookback_station_ = 0.0;
+  double lookahead_station_low_speed_ = 0.0;
+  double lookback_station_low_speed_ = 0.0;
+  double lookahead_station_high_speed_ = 0.0;
+  double lookback_station_high_speed_ = 0.0;
 
   // number of states without previews, includes
   // lateral error, lateral error rate, heading error, heading error rate
@@ -222,6 +224,9 @@ class LatController : public Controller {
   bool enable_mrac_ = false;
   MracController mrac_controller_;
 
+  // Look-ahead controller
+  bool enable_look_ahead_back_control_ = false;
+
   // for compute the differential valute to estimate acceleration/lon_jerk
   double previous_lateral_acceleration_ = 0.0;
 
@@ -253,6 +258,8 @@ class LatController : public Controller {
   double init_vehicle_heading_ = 0.0;
 
   double low_speed_bound_ = 0.0;
+
+  double low_speed_window_ = 0.0;
 
   double driving_orientation_ = 0.0;
 };

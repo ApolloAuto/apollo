@@ -23,8 +23,8 @@ import sys
 import gflags
 import matplotlib.pyplot as plt
 
-import debug_topo
-import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
+import modules.tools.routing.debug_topo as debug_topo
+import modules.routing.proto.topo_graph_py_pb2 as topo_graph_py_pb2
 import util
 
 

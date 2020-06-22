@@ -63,8 +63,6 @@ class Routing {
   std::vector<RoutingRequest> FillLaneInfoIfMissing(
       const RoutingRequest &routing_request);
 
-  double GetRoutingLength(const RoutingResponse &routing_response);
-
   bool GetParkingID(const apollo::common::PointENU &parking_point,
                     std::string *parking_space_id);
 
@@ -74,7 +72,6 @@ class Routing {
   std::unique_ptr<Navigator> navigator_ptr_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
-  RoutingConfig routing_conf_;
   const hdmap::HDMap *hdmap_ = nullptr;
 };
 

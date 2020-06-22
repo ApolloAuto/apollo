@@ -24,12 +24,10 @@
 #include <limits>
 #include <string>
 
-#include "cyber/task/task.h"
-
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "cyber/common/log.h"
+#include "cyber/task/task.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -66,7 +64,7 @@ bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
 }  // namespace
 
 GriddedPathTimeGraph::GriddedPathTimeGraph(
-    const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
+    const StGraphData& st_graph_data, const DpStSpeedOptimizerConfig& dp_config,
     const std::vector<const Obstacle*>& obstacles,
     const common::TrajectoryPoint& init_point)
     : st_graph_data_(st_graph_data),

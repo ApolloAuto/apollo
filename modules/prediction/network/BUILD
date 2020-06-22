@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,8 +11,8 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//cyber",
-        "//modules/prediction/proto:network_model_proto",
+        "//cyber/common:log",
+        "//modules/prediction/proto:network_layers_cc_proto",
         "@eigen",
     ],
 )
@@ -38,6 +39,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/prediction/network:net_layer",
+        "//modules/prediction/proto:network_model_cc_proto",
     ],
 )
 

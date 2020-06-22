@@ -15,14 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/filesystem.hpp>
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <boost/filesystem.hpp>
 
 #include "modules/perception/tool/benchmark/lidar/loader/string_compare.h"
 

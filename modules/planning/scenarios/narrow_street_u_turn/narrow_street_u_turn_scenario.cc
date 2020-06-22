@@ -25,7 +25,8 @@ namespace scenario {
 namespace narrow_street_u_turn {
 
 std::unique_ptr<Stage> NarrowStreetUTurnScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   return nullptr;
 }
 

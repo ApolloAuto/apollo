@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,7 +10,9 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/common:routing_gflags",
-        "//modules/routing/proto:routing_proto",
+        "//modules/routing/proto:routing_cc_proto",
+        "//modules/routing/proto:routing_config_cc_proto",
+        "//modules/routing/proto:topo_graph_cc_proto",
     ],
 )
 
@@ -42,7 +45,10 @@ cc_library(
     hdrs = ["node_creator.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
-        "//modules/routing/proto:routing_proto",
+        "//modules/map/proto:map_lane_cc_proto",
+        "//modules/routing/proto:routing_cc_proto",
+        "//modules/routing/proto:routing_config_cc_proto",
+        "//modules/routing/proto:topo_graph_cc_proto",
     ],
 )
 

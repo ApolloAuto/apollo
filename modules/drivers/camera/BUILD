@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -26,7 +27,9 @@ cc_library(
     deps = [
         ":camera",
         "//cyber",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
     ],
 )
 
@@ -35,14 +38,13 @@ cc_library(
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
     copts = ['-DMODULE_NAME=\\"camera\\"'],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
-        "//modules/drivers/camera/proto:camera_proto",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
+        "//modules/drivers/camera/proto:config_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "@opencv",
     ],
 )
 
@@ -50,11 +52,11 @@ cc_library(
     name = "camera",
     srcs = select(
         {
-            ":x86_mode": [
+            "//tools/platform:x86_mode": [
                 "usb_cam.cc",
                 "util.cc",
             ],
-            ":arm_mode": [
+            "//tools/platform:aarch64_mode": [
                 "usb_cam.cc",
             ],
         },
@@ -62,44 +64,34 @@ cc_library(
     ),
     hdrs = select(
         {
-            ":x86_mode": [
+            "//tools/platform:x86_mode": [
                 "usb_cam.h",
                 "util.h",
             ],
-            ":arm_mode": [
+            "//tools/platform:aarch64_mode": [
                 "usb_cam.h",
             ],
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
     ),
     copts = select({
-        ":x86_mode": ["-mavx2"],
-        ":arm_mode": [""],
+        "//tools/platform:x86_mode": ["-mavx2"],
+        "//tools/platform:aarch64_mode": [""],
     }),
     deps = select(
         {
-            ":x86_mode": [
+            "//tools/platform:x86_mode": [
                 "//cyber",
-                "//modules/drivers/camera/proto:camera_proto",
+                "//modules/drivers/camera/proto:config_cc_proto",
                 "@adv_plat",
             ],
-            ":arm_mode": [
+            "//tools/platform:aarch64_mode": [
                 "//cyber",
-                "//modules/drivers/camera/proto:camera_proto",
+                "//modules/drivers/camera/proto:config_cc_proto",
             ],
         },
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
     ),
-)
-
-config_setting(
-    name = "x86_mode",
-    values = {"cpu": "k8"},
-)
-
-config_setting(
-    name = "arm_mode",
-    values = {"cpu": "arm"},
 )
 
 cpplint()

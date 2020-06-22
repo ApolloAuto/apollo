@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,7 +9,7 @@ cc_library(
     hdrs = ["map_service.h"],
     deps = [
         "//modules/common/util:json_util",
-        "//modules/dreamview/proto:simulation_world_proto",
+        "//modules/dreamview/proto:simulation_world_cc_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//third_party:boost",

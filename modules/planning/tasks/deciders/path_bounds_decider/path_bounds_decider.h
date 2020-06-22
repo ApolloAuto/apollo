@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -27,7 +28,6 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -50,7 +50,8 @@ class PathBoundsDecider : public Decider {
     NO_BORROW,
     RIGHT_BORROW,
   };
-  explicit PathBoundsDecider(const TaskConfig& config);
+  PathBoundsDecider(const TaskConfig& config,
+                    const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   /** @brief Every time when Process function is called, it will:

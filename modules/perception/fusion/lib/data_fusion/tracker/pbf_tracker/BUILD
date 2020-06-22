@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,7 +14,7 @@ cc_library(
         "//modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion",
         "//modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion",
         "//modules/perception/fusion/lib/interface",
-        "//modules/perception/proto:pbf_tracker_config_proto",
+        "//modules/perception/proto:pbf_tracker_config_cc_proto",
     ],
 )
 

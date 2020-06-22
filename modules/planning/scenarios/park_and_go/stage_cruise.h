@@ -16,8 +16,9 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include <memory>
 
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -38,8 +39,10 @@ class ParkAndGoStageCruise : public Stage {
     FAIL = 5,
   };
 
-  explicit ParkAndGoStageCruise(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  explicit ParkAndGoStageCruise(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;

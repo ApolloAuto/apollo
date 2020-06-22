@@ -17,16 +17,15 @@
 /**
  * @file
  **/
-#include <string>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include <string>
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"

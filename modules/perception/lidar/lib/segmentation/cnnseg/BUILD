@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,7 +14,7 @@ cc_library(
         ":util",
         "//cyber",
         "//modules/perception/base",
-        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/caffe:caffe_net_lib",
         "//modules/perception/inference/tensorrt:rt_net",
@@ -22,12 +23,12 @@ cc_library(
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_proto",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_proto",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_cc_proto",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_cc_proto",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_cc_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/spp_engine",
         "//modules/perception/lidar/lib/segmentation/ncut:ncut_segmentation",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
         "@com_google_absl//absl/strings",
     ],
     alwayslink = True,
@@ -48,7 +49,7 @@ cc_library(
     deps = [
         ":util",
         "//modules/perception/base",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_cc_proto",
         "@com_google_googletest//:gtest",
         "@eigen",
     ],
@@ -61,9 +62,10 @@ cuda_library(
     deps = [
         ":util",
         "//modules/perception/base",
-        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
-        "@cuda",
+        "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_cc_proto",
+        "@com_google_googletest//:gtest",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

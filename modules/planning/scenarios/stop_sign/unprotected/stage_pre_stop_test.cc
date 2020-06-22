@@ -16,10 +16,9 @@
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -31,14 +30,17 @@ class StopSignUnprotectedStagePreStopTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StopSignUnprotectedStagePreStopTest, Init) {
-  StopSignUnprotectedStagePreStop stop_sign_unprotected_stage_pre_stop(config_);
+  StopSignUnprotectedStagePreStop stop_sign_unprotected_stage_pre_stop(
+      config_, injector_);
   EXPECT_EQ(stop_sign_unprotected_stage_pre_stop.Name(),
             ScenarioConfig::StageType_Name(
                 ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP));

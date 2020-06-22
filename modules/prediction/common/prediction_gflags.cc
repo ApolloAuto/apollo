@@ -64,6 +64,10 @@ DEFINE_double(junction_distance_threshold, 10.0,
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
+DEFINE_bool(enable_all_pedestrian_caution_in_front, false,
+            "If true, then all pedestrian in front of ADC are marked caution.");
+DEFINE_bool(enable_rank_caution_obstacles, true,
+            "Rank the caution-level obstacles.");
 DEFINE_int32(caution_obs_max_nums, 6,
              "The max number of caution-level obstacles");
 DEFINE_double(caution_distance_threshold, 60.0,

@@ -32,22 +32,24 @@ class PathBoundsDeciderTest : public ::testing::Test {
     config_.set_task_type(TaskConfig::PATH_BOUNDS_DECIDER);
     config_.mutable_path_bounds_decider_config();
     config_.mutable_path_bounds_decider_config()->set_is_lane_borrowing(false);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   virtual void TearDown() {}
 
  protected:
   TaskConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(PathBoundsDeciderTest, Init) {
-  PathBoundsDecider path_bounds_decider(config_);
+  PathBoundsDecider path_bounds_decider(config_, injector_);
   EXPECT_EQ(path_bounds_decider.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 TEST_F(PathBoundsDeciderTest, InitPathBoundary) {
-  PathBoundsDecider path_bounds_decider(config_);
+  PathBoundsDecider path_bounds_decider(config_, injector_);
   path_bounds_decider.adc_frenet_s_ = 10.0;
 
   // TODO(all): implement this unit test.
@@ -59,13 +61,13 @@ TEST_F(PathBoundsDeciderTest, InitPathBoundary) {
 }
 
 TEST_F(PathBoundsDeciderTest, GetBoundaryFromLanesAndADC) {
-  PathBoundsDecider path_bounds_decider(config_);
+  PathBoundsDecider path_bounds_decider(config_, injector_);
   path_bounds_decider.adc_frenet_s_ = 10.0;
   // TODO(all): implement this unit test.
 }
 
 TEST_F(PathBoundsDeciderTest, GetBoundaryFromStaticObstacles) {
-  PathBoundsDecider path_bounds_decider(config_);
+  PathBoundsDecider path_bounds_decider(config_, injector_);
   std::vector<std::tuple<double, double, double>> path_bound;
   PathDecision path_decision;
 }

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#pragma once
+
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -21,6 +23,7 @@
 
 #include "cyber/common/macros.h"
 
+#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 #include "modules/prediction/scenario/scenario_features/scenario_features.h"
@@ -30,6 +33,11 @@ namespace prediction {
 
 class ObstaclesPrioritizer {
  public:
+  ObstaclesPrioritizer() = delete;
+
+  explicit ObstaclesPrioritizer(
+      const std::shared_ptr<ContainerManager>& container_manager);
+
   void AssignIgnoreLevel();
 
   void AssignCautionLevel();
@@ -46,6 +54,12 @@ class ObstaclesPrioritizer {
       const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
 
   void AssignCautionLevelByEgoReferenceLine(
+      const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
+
+  void AssignCautionLevelPedestrianByEgoReferenceLine(
+      const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
+
+  void AssignCautionLevelPedestrianInFront(
       const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
 
   void RankingCautionLevelObstacles(const Obstacle& ego_vehicle,
@@ -76,11 +90,11 @@ class ObstaclesPrioritizer {
  private:
   std::unordered_set<std::string> ego_back_lane_id_set_;
 
+  std::shared_ptr<ContainerManager> container_manager_;
+
   std::string ego_lane_id_ = "";
 
   double ego_lane_s_ = 0.0;
-
-  DECLARE_SINGLETON(ObstaclesPrioritizer)
 };
 
 }  // namespace prediction

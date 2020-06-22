@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -49,7 +48,9 @@ TEST_F(BareIntersectionUnprotectedScenarioTest, Init) {
       FLAGS_scenario_bare_intersection_unprotected_config_file, &config));
 
   ScenarioContext context;
-  scenario_.reset(new BareIntersectionUnprotectedScenario(config, &context));
+  auto planning_context = std::make_shared<DependencyInjector>();
+  scenario_.reset(new BareIntersectionUnprotectedScenario(config, &context,
+                                                          planning_context));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::BARE_INTERSECTION_UNPROTECTED);
 }

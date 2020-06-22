@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,11 +8,11 @@ cc_library(
     hdrs = ["planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios:scenario_manager",
     ],
@@ -40,7 +41,7 @@ cc_library(
         "//modules/planning/planner/navi:navi_planner",
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
     ],
 )
 

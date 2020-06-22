@@ -19,14 +19,9 @@
 namespace apollo {
 namespace perception {
 namespace inference {
-__global__ void
-cmp(const int nthreads,
-    const float *in_data,
-    const int channels,
-    const int height,
-    const int width,
-    const bool out_max_val,
-    float *out_data) {
+__global__ void cmp(const int nthreads, const float *in_data,
+                    const int channels, const int height, const int width,
+                    const bool out_max_val, float *out_data) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < nthreads) {
     int w = idx % width;
@@ -55,21 +50,18 @@ cmp(const int nthreads,
     }
   }
 }
-int
-ArgMax1Plugin::enqueue(int batchSize,
-                       const void *const *inputs,
-                       void **outputs,
-                       void *workspace,
-                       cudaStream_t stream) {
+int ArgMax1Plugin::enqueue(int batchSize, const void *const *inputs,
+                           void **outputs, void *workspace,
+                           cudaStream_t stream) {
   const int thread_size = 512;
   int block_size =
-      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize
-          + thread_size - 1) / thread_size;
-  cmp << < block_size, thread_size >> >
-      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] *
-          batchSize, (const float *) inputs[0], input_dims_.d[0],
-          input_dims_.d[1], input_dims_.d[2], out_max_val_,
-          reinterpret_cast<float *>(outputs[0]));
+      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize +
+       thread_size - 1) /
+      thread_size;
+  cmp<<<block_size, thread_size>>>(
+      input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize,
+      (const float *)inputs[0], input_dims_.d[0], input_dims_.d[1],
+      input_dims_.d[2], out_max_val_, reinterpret_cast<float *>(outputs[0]));
   return 0;
 }
 

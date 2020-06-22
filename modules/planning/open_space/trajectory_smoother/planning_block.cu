@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "planning_block.h"
 #include <iostream>
+
+#include "planning_block.h"
 
 namespace apollo {
 namespace planning {
@@ -28,8 +29,8 @@ bool InitialCuda() {
   return true;
 }
 
-__global__ void fill_lower_left_gpu(int *iRow, int *jCol,
-  unsigned int *rind_L, unsigned int *cind_L, const int  nnz_L) {
+__global__ void fill_lower_left_gpu(int *iRow, int *jCol, unsigned int *rind_L,
+                                    unsigned int *cind_L, const int nnz_L) {
   int i = threadIdx.x;
 
   if (i < nnz_L) {
@@ -38,38 +39,36 @@ __global__ void fill_lower_left_gpu(int *iRow, int *jCol,
   }
 }
 
-template<typename T>
-__global__ void data_transfer_gpu(T *dst, const T* src,
-  const int size) {
-  int  i = threadIdx.x;
+template <typename T>
+__global__ void data_transfer_gpu(T *dst, const T *src, const int size) {
+  int i = threadIdx.x;
 
-  if ( i < size) {
+  if (i < size) {
     dst[i] = src[i];
   }
 }
 
-bool fill_lower_left(int *iRow, int *jCol,
-  unsigned int *rind_L, unsigned int *cind_L, const int nnz_L) {
-  if (!InitialCuda())
-    return false;
+bool fill_lower_left(int *iRow, int *jCol, unsigned int *rind_L,
+                     unsigned int *cind_L, const int nnz_L) {
+  if (!InitialCuda()) return false;
   int *d_iRow, *d_jCol;
   unsigned int *d_rind_L, *d_cind_L;
 
   unsigned int nBytes = nnz_L * sizeof(int);
   unsigned int nUBytes = nnz_L * sizeof(unsigned int);
-  cudaMalloc((void**)&d_iRow, nBytes);
-  cudaMalloc((void**)&d_jCol, nBytes);
-  cudaMalloc((void**)&d_rind_L, nUBytes);
-  cudaMalloc((void**)&d_cind_L, nUBytes);
+  cudaMalloc((void **)&d_iRow, nBytes);
+  cudaMalloc((void **)&d_jCol, nBytes);
+  cudaMalloc((void **)&d_rind_L, nUBytes);
+  cudaMalloc((void **)&d_cind_L, nUBytes);
 
   cudaMemcpy(d_iRow, iRow, nBytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_jCol, jCol, nBytes, cudaMemcpyHostToDevice);
 
   dim3 block(BLOCK_1);
-  dim3 grid((nnz_L + block.x - 1)/block.x);
+  dim3 grid((nnz_L + block.x - 1) / block.x);
 
-  fill_lower_left_gpu<<<grid, block>>>(d_iRow, d_jCol,
-      d_rind_L, d_cind_L, nnz_L);
+  fill_lower_left_gpu<<<grid, block>>>(d_iRow, d_jCol, d_rind_L, d_cind_L,
+                                       nnz_L);
   cudaDeviceSynchronize();
 
   cudaMemcpy(rind_L, d_rind_L, nUBytes, cudaMemcpyDeviceToHost);
@@ -83,19 +82,18 @@ bool fill_lower_left(int *iRow, int *jCol,
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool data_transfer(T *dst, const T *src, const int size) {
-  if (!InitialCuda())
-    return false;
+  if (!InitialCuda()) return false;
   T *d_dst, *d_src;
   size_t nBytes = size * sizeof(T);
-  cudaMalloc((void**)&d_dst, nBytes);
-  cudaMalloc((void**)&d_src, nBytes);
+  cudaMalloc((void **)&d_dst, nBytes);
+  cudaMalloc((void **)&d_src, nBytes);
   cudaMemcpy(d_src, src, nBytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_dst, dst, nBytes, cudaMemcpyHostToDevice);
 
   dim3 block(BLOCK_1);
-  dim3 grid((size + block.x -1) / block.x);
+  dim3 grid((size + block.x - 1) / block.x);
 
   data_transfer_gpu<<<grid, block>>>(dst, src, size);
   cudaDeviceSynchronize();

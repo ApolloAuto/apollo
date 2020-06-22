@@ -16,38 +16,50 @@
 # limitations under the License.
 ###############################################################################
 
-ARCH=$(uname -m)
+DOCKER_USER="${USER}"
+CYBER_CONTAINER="apollo_cyber_${USER}"
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-
-USER_ID=$(id -u)
-DOCKER_USER=apollo
-
-if [[ "$USER" != "apollo" ]] && [[ $USER_ID -ne 1000 ]]; then
-    DOCKER_USER=$USER
-fi
-
-
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
+APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 xhost +local:root 1>/dev/null 2>&1
 
-if [ ${ARCH} == "x86_64" ]; then
+HOST_ARCH="$(uname -m)"
+TARGET_ARCH="$(docker exec "${CYBER_CONTAINER}" uname -m)"
+
+
+IFS='' read -r -d '' NONROOT_SUDO_ERRMSG << EOF
+"sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the \
+'nosuid' option set or an NFS file system without root privileges?"
+EOF
+
+if [[ "${HOST_ARCH}" != "${TARGET_ARCH}" ]]; then
+    warning "We only tested aarch containers running on x86_64 hosts." \
+            "And after we changed from ROOT to NON-ROOT users, executing" \
+            "sudo operations complains:\n  " \
+            "${NONROOT_SUDO_ERRMSG}"
+fi
+
+if [ "${TARGET_ARCH}" == "x86_64" ]; then
     docker exec \
-        -u $DOCKER_USER \
-        -it apollo_cyber_$USER \
+        -u "${DOCKER_USER}" \
+        -it "${CYBER_CONTAINER}" \
         /bin/bash
-elif [ ${ARCH} == "aarch64" ]; then
-    warning "!!! For the first time after starting the Cyber RT container, please run the following two commands: !!!"
-    warning "!!!   1) /apollo/scripts/docker_adduser.sh !!!"
-    warning "!!!   2) su $DOCKER_USER !!!"
-    warning "! To exit, please use 'ctrl+p ctrl+q' !"
+elif [ "${TARGET_ARCH}" == "aarch64" ]; then
+    info "For the first time after CyberRT container starts, you can running" \
+         "the following two commands to su to a non-root user:"
+    info "1) /apollo/scripts/docker_start_user.sh"
+    info "2) su - ${DOCKER_USER}"
 
-    docker attach apollo_cyber_$USER
-
+    # warning "! To exit, please use 'ctrl+p ctrl+q' !"
+    # docker attach "${CYBER_CONTAINER}"
+    docker exec \
+        -u root \
+        -it "${CYBER_CONTAINER}" \
+        /bin/bash
 else
-    echo "Unknown architecture: ${ARCH}"
-    exit 0
+    error "Unsupported architecture: ${TARGET_ARCH}"
+    exit 1
 fi
 
 xhost -local:root 1>/dev/null 2>&1

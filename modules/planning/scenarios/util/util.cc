@@ -79,9 +79,10 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
  * @brief: check adc parked properly
  */
 PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
-                                const ScenarioPullOverConfig& scenario_config) {
+                                const ScenarioPullOverConfig& scenario_config,
+                                const PlanningContext* planning_context) {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      planning_context->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
@@ -138,9 +139,10 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 PullOverStatus CheckADCPullOverPathPoint(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioPullOverConfig& scenario_config,
-    const common::PathPoint& path_point) {
+    const common::PathPoint& path_point,
+    const PlanningContext* planning_context) {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      planning_context->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
@@ -254,6 +256,9 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   // obstacle boxes
   auto obstacles = frame->obstacles();
   for (const auto& obstacle : obstacles) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
     const Polygon2d& nudge_polygon = obstacle_polygon.ExpandByDistance(
         std::fabs(FLAGS_static_obstacle_nudge_l_buffer));

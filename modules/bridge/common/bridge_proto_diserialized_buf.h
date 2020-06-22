@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "cyber/cyber.h"
 #include "modules/bridge/common/bridge_header.h"
 #include "modules/bridge/common/macro.h"
@@ -105,7 +106,8 @@ void BridgeProtoDiserializedBuf<T>::UpdateStatus(uint32_t frame_index) {
   status_list_[status_index] |= (1 << (frame_index % INT_BITS));
   for (size_t i = 0; i < status_size; i++) {
     if (i == status_size - 1) {
-      if (status_list_[i] == ((1 << total_frames_ % INT_BITS) - 1)) {
+      if (static_cast<int>(status_list_[i]) ==
+          (1 << total_frames_ % INT_BITS) - 1) {
         AINFO << "diserialized is ready";
         is_ready_diser = true;
       } else {

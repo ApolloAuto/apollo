@@ -17,20 +17,50 @@
 ###############################################################################
 
 # Usage:
-#   clang-format.sh </some/path>
+#   clang-format.sh <path/to/src/dir/or/file>
+
+# Fail on error
+set -euo pipefail
+
+TOP_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
 
 TARGET=$1
+if [[ -z "${TARGET}" ]]; then
+  echo "No path specified. Exiting..."
+  exit 1
+fi
 
 # Check tool.
-if [ ! -x "$(command -v clang-format)" ]; then
-  echo "Installing clang-format..."
-  sudo apt-get install -y clang-format
+CLANG_FORMAT_CMD="$(command -v clang-format)"
+
+if [[ -z "${CLANG_FORMAT_CMD}" ]]; then
+  error "Oops, clang-format missing..."
+  error "Please make sure clang-format is installed and check your PATH" \
+        "settings. For Debian/Ubuntu, you can run the following command:"
+  error "  sudo apt-get -y update && sudo apt-get -y install clang-format"
+  exit 1
 fi
+
+function clang_format_run() {
+  ${CLANG_FORMAT_CMD} -i -style=Google "$@"
+}
 
 # Format.
 if [ -f "${TARGET}" ]; then
-  clang-format -i -style=Google "${TARGET}"
+  if c_family_ext "${TARGET}"; then
+    clang_format_run "${TARGET}"
+    info "Done formatting ${TARGET}"
+  else
+    warning "Do nothing. ${TARGET} is not a c/c++/cuda header/source file."
+  fi
 else
-  clang-format -i -style=Google \
-      $(find "${TARGET}" -type f | grep -e '\.h$' -e '\.cc$')
+  srcs="$(find_c_cpp_srcs ${TARGET})"
+  if [[ -z "${srcs}" ]]; then
+      warning "Do nothing. No c/c++/cuda header/source" \
+              "files found under ${TARGET} ."
+      exit 0
+  fi
+  clang_format_run ${srcs}
+  info "Done formatting c/cpp/cuda source files under ${TARGET}"
 fi

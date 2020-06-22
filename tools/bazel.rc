@@ -1,24 +1,91 @@
-# bazelrc file
-# https://docs.bazel.build/versions/master/user-manual.html
-
-# bazel >= 0.18 looks for %workspace%/.bazelrc (which redirects here)
-# Older bazel versions look for %workspace%/tools/bazel.rc (this file)
-# See https://github.com/bazelbuild/bazel/issues/6319
-
+# Apollo Bazel configuration file.
+# This file tries to group and simplify build options for Apollo
 # +------------------------------------------------------------+
 # | Startup Options                                            |
 # +------------------------------------------------------------+
 startup --batch_cpu_scheduling
-
 startup --host_jvm_args="-XX:-UseParallelGC"
+
+# +------------------------------------------------------------+
+# | Common Options                                             |
+# +------------------------------------------------------------+
+# Force bazel output to use colors (good for jenkins) and print useful errors.
+common --color=yes
+
+# +------------------------------------------------------------+
+# | Build Configurations                                       |
+# +------------------------------------------------------------+
+# Make Bazel print out all options from rc files.
+# build --announce_rc
+build --show_timestamps
+
+# Work around the sandbox issue.
+build --spawn_strategy=standalone
+
+# Enable colorful output of GCC
+build --cxxopt="-fdiagnostics-color=always"
+
+# Do not show warnings from external dependencies.
+# build --output_filter="^//"
+
+# TODO(storypku): disable the following line temporarily as
+# external/upb/upb/decode.c:164 can't compile
+#build --copt="-Werror=sign-compare"
+build --copt="-Werror=return-type"
+build --copt="-Werror=unused-variable"
+build --copt="-Werror=unused-but-set-variable"
+build --copt="-Werror=switch"
+build --cxxopt="-Werror=reorder"
+
+# Default paths for SYSTEM LIBRARIES
+build --define=PREFIX=/usr
+build --define=LIBDIR=$(PREFIX)/lib
+build --define=INCLUDEDIR=$(PREFIX)/include
+
+# build --enable_platform_specific_config
+
+# dbg config, as a shorthand for '--config=opt -c dbg'
+build:dbg --config=opt -c dbg
+
+## build -c opt
+build:opt --copt=-march=native
+build:opt --host_copt=-march=native
+build:opt --define with_default_optimizations=true
+
+# Instruction set optimizations
+build:native_arch_linux --copt=-march=native
+
+# Build Apollo with C++ 17 features.
+build:c++17 --cxxopt=-std=c++1z
+build:c++17 --cxxopt=-stdlib=libc++
+build:c++1z --config=c++17
+
+# Enable C++14 (aka c++1y) by default
+build --cxxopt="-std=c++14"
+build --host_cxxopt="-std=c++14"
+
+# build with profiling
+build:cpu_prof --linkopt=-lprofiler
 
 startup --output_user_root=/apollo/.cache/bazel
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
+test --flaky_test_attempts=3
+test --test_size_filters=small,medium
+test --test_env=LD_LIBRARY_PATH
 
 # By default prints output only from failed tests.
 test --test_output=errors
+
+test:coverage --copt=--coverage
+test:coverage --cxxopt=--coverage
+test:coverage --cxxopt=-fprofile-arcs
+test:coverage --cxxopt=-ftest-coverage
+test:coverage --linkopt=-coverage
+test:coverage --linkopt=-lgcov
+test:coverage --linkopt=-lgcc
+test:coverage --linkopt=-lc
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
@@ -30,60 +97,14 @@ test --test_output=errors
 # To enable the lint test, the BUILD *must* load the cpplint.bzl by having
 # 'load("//tools:cpplint.bzl", "cpplint")' at the beginning and 'cpplint()'
 # at the end.
-
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
-
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
-
 # Coverage tests
 test:coverage --test_tag_filters=-cpplint
-test:coverage --copt=--coverage
-test:coverage --cxxopt=--coverage
-test:coverage --cxxopt=-fprofile-arcs
-test:coverage --cxxopt=-ftest-coverage
-test:coverage --linkopt=-coverage
-test:coverage --linkopt=-lgcov
-test:coverage --linkopt=-lgcc
-test:coverage --linkopt=-lc
-
-# +------------------------------------------------------------+
-# | Build Configurations                                       |
-# +------------------------------------------------------------+
-
-# build with profiling
-build:cpu_prof --linkopt=-lprofiler
-
-# Specify protobuf cc toolchain
-build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
-
-build --show_timestamps
-
-# Work around the sandbox issue.
-build --spawn_strategy=standalone
-
-# Do not show warnings from external dependencies.
-# build --output_filter="^//"
-
-build --show_timestamps
-
-# build --copt="-I/usr/include/python3.6m"
-
-build --copt="-Werror=sign-compare"
-build --copt="-Werror=return-type"
-build --copt="-Werror=reorder"
-build --copt="-Werror=unused-variable"
-build --copt="-Werror=unused-but-set-variable"
-build --copt="-Werror=switch"
-
-# Enable C++14
-build --cxxopt="-std=c++1y"
-
-# Enable colorful output of GCC
-build --cxxopt="-fdiagnostics-color=always"
 
 # +------------------------------------------------------------+
 # | Python Configurations                                      |
 # +------------------------------------------------------------+
-run --python_path=/usr/bin/python3
+# build --copt="-I/usr/include/python3.6m"

@@ -44,12 +44,17 @@ class PlannerDispatcher {
     return common::Status::OK();
   }
 
-  virtual std::unique_ptr<Planner> DispatchPlanner() = 0;
+  virtual std::unique_ptr<Planner> DispatchPlanner(
+      const PlanningConfig& planning_config,
+      const std::shared_ptr<DependencyInjector>& injector) = 0;
 
  protected:
   void RegisterPlanners();
 
-  common::util::Factory<PlannerType, Planner> planner_factory_;
+  common::util::Factory<
+      PlannerType, Planner,
+      Planner* (*)(const std::shared_ptr<DependencyInjector>& injector)>
+      planner_factory_;
 };
 
 }  // namespace planning

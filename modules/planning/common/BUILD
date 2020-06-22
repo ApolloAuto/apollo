@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -67,8 +68,13 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:map_util",
         "//modules/planning/common/speed:st_boundary",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/reference_line",
+        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/prediction/proto:prediction_point_cc_proto",
+        "//modules/prediction/proto:scenario_cc_proto",
     ],
 )
 
@@ -82,7 +88,7 @@ cc_test(
     deps = [
         ":obstacle",
         "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
+        "//modules/perception/proto:perception_lane_cc_proto",
         "//third_party:boost",
         "@com_google_googletest//:gtest_main",
     ],
@@ -118,7 +124,7 @@ cc_library(
     deps = [
         "//cyber/common",
         "//modules/planning/common/path:path_data",
-        "//modules/planning/proto:planning_status_proto",
+        "//modules/planning/proto:planning_status_cc_proto",
         "@eigen",
     ],
 )
@@ -162,16 +168,17 @@ cc_library(
         ":planning_gflags",
         ":st_graph_data",
         "//cyber/common:log",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/math",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util:point_factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
-        "//modules/map/proto:map_proto",
+        "//modules/map/proto:map_cc_proto",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/proto:lattice_structure_cc_proto",
         "//modules/planning/reference_line",
         "@eigen",
     ],
@@ -197,14 +204,14 @@ cc_library(
     deps = [
         ":frame",
         ":reference_line_info",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/math/curve1d",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 
@@ -225,11 +232,14 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//modules/localization/proto:localization_proto",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/planning/proto:planning_proto",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/planning/proto:pad_msg_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/routing/proto:routing_cc_proto",
+        "//modules/storytelling/proto:story_cc_proto",
     ],
 )
 
@@ -241,6 +251,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        ":feature_output",
         ":indexed_queue",
         ":local_view",
         ":obstacle",
@@ -255,8 +266,9 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/proto:planning_config_proto",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:learning_data_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/reference_line:reference_line_provider",
         "@eigen",
     ],
@@ -273,7 +285,7 @@ cc_test(
         ":frame",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -288,8 +300,8 @@ cc_library(
     deps = [
         ":planning_gflags",
         "//cyber/common",
-        "//modules/planning/proto:decision_proto",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:decision_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "@eigen",
     ],
 )
@@ -313,7 +325,6 @@ cc_library(
     ],
     deps = [
         "//modules/common/math",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -338,10 +349,15 @@ cc_library(
         ":obstacle",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/math:geometry",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/planning/reference_line",
+        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/prediction/proto:prediction_point_cc_proto",
+        "//modules/prediction/proto:scenario_cc_proto",
         "@eigen",
     ],
 )
@@ -370,7 +386,7 @@ cc_library(
         ":st_graph_data",
         "//cyber/common:log",
         "//modules/localization/common:localization_common",
-        "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:localization_cc_proto",
         "@eigen",
     ],
 )
@@ -381,7 +397,7 @@ cc_library(
     hdrs = ["trajectory_stitcher.h"],
     deps = [
         "//cyber/common:log",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/vehicle_model",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:publishable_trajectory",
@@ -396,7 +412,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//modules/planning/common:indexed_queue",
@@ -428,6 +444,7 @@ cc_library(
         ":planning_gflags",
         ":speed_limit",
         "//modules/planning/common/speed:st_boundary",
+        "//modules/planning/proto:st_drivable_boundary_cc_proto",
     ],
 )
 
@@ -455,7 +472,7 @@ cc_library(
         "//cyber",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:learning_data_proto",
+        "//modules/planning/proto:learning_data_cc_proto",
     ],
 )
 
@@ -467,22 +484,54 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-       "//cyber",
-        "//modules/canbus/proto:canbus_proto",
+        "//cyber",
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/dreamview/proto:hmi_status_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
+        "//modules/dreamview/proto:hmi_status_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
         "//modules/planning/common:feature_output",
         "//modules/planning/common/util:math_util_lib",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/proto:learning_data_proto",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/planning/proto:learning_data_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/prediction/util:data_extraction",
-        "//modules/routing/proto:routing_proto",
+        "//modules/routing/proto:routing_cc_proto",
+        "//modules/storytelling/proto:story_cc_proto",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "trajectory_evaluator",
+    srcs = ["trajectory_evaluator.cc"],
+    hdrs = ["trajectory_evaluator.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/pipeline:evaluator_logger",
+        "//modules/planning/proto:learning_data_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "dependency_injector",
+    hdrs = ["dependency_injector.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":ego_info",
+        ":frame",
+        ":history",
+        ":planning_context",
     ],
 )
 

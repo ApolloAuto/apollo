@@ -22,21 +22,21 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <utility>
-
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/decision.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/decision.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -47,17 +47,18 @@ using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-STBoundaryMapper::STBoundaryMapper(const SpeedBoundsDeciderConfig& config,
-                                   const ReferenceLine& reference_line,
-                                   const PathData& path_data,
-                                   const double planning_distance,
-                                   const double planning_time)
+STBoundaryMapper::STBoundaryMapper(
+    const SpeedBoundsDeciderConfig& config, const ReferenceLine& reference_line,
+    const PathData& path_data, const double planning_distance,
+    const double planning_time,
+    const std::shared_ptr<DependencyInjector>& injector)
     : speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
       planning_max_distance_(planning_distance),
-      planning_max_time_(planning_time) {}
+      planning_max_time_(planning_time),
+      injector_(injector) {}
 
 Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   // Sanity checks.
@@ -199,7 +200,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     return false;
   }
 
-  const auto* planning_status = PlanningContext::Instance()
+  const auto* planning_status = injector_->planning_context()
                                     ->mutable_planning_status()
                                     ->mutable_change_lane();
 

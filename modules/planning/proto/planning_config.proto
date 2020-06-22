@@ -2,28 +2,8 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/planning/proto/creep_decider_config.proto";
-import "modules/planning/proto/dp_st_speed_config.proto";
-import "modules/planning/proto/lane_change_decider_config.proto";
-import "modules/planning/proto/open_space_fallback_decider_config.proto";
-import "modules/planning/proto/open_space_pre_stop_decider_config.proto";
-import "modules/planning/proto/open_space_roi_decider_config.proto";
-import "modules/planning/proto/open_space_trajectory_provider_config.proto";
-import "modules/planning/proto/open_space_trajectory_partition_config.proto";
-import "modules/planning/proto/path_assessment_decider_config.proto";
-import "modules/planning/proto/path_bounds_decider_config.proto";
-import "modules/planning/proto/path_decider_config.proto";
-import "modules/planning/proto/path_lane_borrow_decider_config.proto";
-import "modules/planning/proto/piecewise_jerk_path_config.proto";
-import "modules/planning/proto/piecewise_jerk_speed_config.proto";
-import "modules/planning/proto/piecewise_jerk_nonlinear_speed_config.proto";
-import "modules/planning/proto/rule_based_stop_decider_config.proto";
-import "modules/planning/proto/speed_bounds_decider_config.proto";
-import "modules/planning/proto/navi_path_decider_config.proto";
-import "modules/planning/proto/navi_speed_decider_config.proto";
-import "modules/planning/proto/navi_obstacle_decider_config.proto";
-import "modules/planning/proto/path_reuse_decider_config.proto";
-import "modules/planning/proto/st_bounds_decider_config.proto";
+import "modules/planning/proto/open_space_task_config.proto";
+import "modules/planning/proto/task_config.proto";
 
 // Planning's configuration is based on the following architecture
 // * Scenario has one more multiple stages
@@ -31,60 +11,71 @@ import "modules/planning/proto/st_bounds_decider_config.proto";
 // tasks are shared among all scenarios and stages.
 message TaskConfig {
   enum TaskType {
-    DP_ST_SPEED_OPTIMIZER = 1;
-    PATH_DECIDER = 4;
-    SPEED_DECIDER = 5;
-    NAVI_PATH_DECIDER = 7;
-    NAVI_SPEED_DECIDER = 8;
-    NAVI_OBSTACLE_DECIDER = 9;
-    CREEP_DECIDER = 11;
-    OPEN_SPACE_PRE_STOP_DECIDER = 12;
-    DECIDER_RSS = 16;
+    // deciders
+    CREEP_DECIDER = 1;
+    LANE_CHANGE_DECIDER = 2;
+    NAVI_OBSTACLE_DECIDER = 3;
+    NAVI_PATH_DECIDER = 4;
+    NAVI_SPEED_DECIDER = 5;
+    OPEN_SPACE_FALLBACK_DECIDER = 6;
+    OPEN_SPACE_PRE_STOP_DECIDER = 7;
+    OPEN_SPACE_ROI_DECIDER = 8;
+    PATH_ASSESSMENT_DECIDER = 9;
+    PATH_BOUNDS_DECIDER = 10;
+    PATH_DECIDER = 11;
+    PATH_LANE_BORROW_DECIDER = 12;
+    PATH_REFERENCE_DECIDER = 13;
+    PATH_REUSE_DECIDER = 14;
+    RSS_DECIDER = 15;
+    RULE_BASED_STOP_DECIDER = 16;
     SPEED_BOUNDS_PRIORI_DECIDER = 17;
     SPEED_BOUNDS_FINAL_DECIDER = 18;
-    PIECEWISE_JERK_PATH_OPTIMIZER = 19;
-    PATH_BOUNDS_DECIDER = 20;
-    OPEN_SPACE_ROI_DECIDER = 21;
+    SPEED_DECIDER = 19;
+    ST_BOUNDS_DECIDER = 20;
+    // optimizers
+    OPEN_SPACE_TRAJECTORY_PARTITION = 21;
     OPEN_SPACE_TRAJECTORY_PROVIDER = 22;
-    OPEN_SPACE_TRAJECTORY_PARTITION = 23;
-    OPEN_SPACE_FALLBACK_DECIDER = 24;
-    PATH_ASSESSMENT_DECIDER = 25;
-    PATH_LANE_BORROW_DECIDER = 26;
-    PIECEWISE_JERK_SPEED_OPTIMIZER = 27;
-    LANE_CHANGE_DECIDER = 28;
-    RULE_BASED_STOP_DECIDER = 29;
-    PATH_REUSE_DECIDER = 30;
-    ST_BOUNDS_DECIDER = 31;
-    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 32;
+    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 23;
+    PIECEWISE_JERK_PATH_OPTIMIZER = 24;
+    PIECEWISE_JERK_SPEED_OPTIMIZER = 25;
+    SPEED_HEURISTIC_OPTIMIZER = 26;
+    // other tasks
+    LEARNING_MODEL_INFERENCE_TASK = 27;
+    LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK = 28;
   };
+
   optional TaskType task_type = 1;
   oneof task_config {
-    SpeedHeuristicConfig speed_heuristic_config = 3;
-    PathDeciderConfig path_decider_config = 7;
-    CreepDeciderConfig creep_decider_config = 10;
-    OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
-    SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
-    PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
-    PathBoundsDeciderConfig path_bounds_decider_config = 17;
-    OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
-    OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
-    OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config =
-        20;
-    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config =
-        21;
-    PathAssessmentDeciderConfig path_assessment_decider_config = 22;
-    PiecewiseJerkSpeedConfig piecewise_jerk_speed_config = 23;
-    PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 24;
-    LaneChangeDeciderConfig lane_change_decider_config = 25;
-    RuleBasedStopDeciderConfig rule_based_stop_decider_config = 26;
-    PathReuseDeciderConfig path_reuse_decider_config = 27;
-    STBoundsDeciderConfig st_bounds_decider_config = 28;
-    PiecewiseJerkNonlinearSpeedConfig piecewise_jerk_nonlinear_speed_config =
-        29;
+    // deciders
+    CreepDeciderConfig creep_decider_config = 2;
+    LaneChangeDeciderConfig lane_change_decider_config = 3;
+    OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 4;
+    OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 5;
+    OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 6;
+    PathAssessmentDeciderConfig path_assessment_decider_config = 7;
+    PathBoundsDeciderConfig path_bounds_decider_config = 8;
+    PathDeciderConfig path_decider_config = 9;
+    PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 10;
+    PathReferenceDeciderConfig path_reference_decider_config = 11;
+    PathReuseDeciderConfig path_reuse_decider_config = 12;
+    RuleBasedStopDeciderConfig rule_based_stop_decider_config = 13;
+    SpeedBoundsDeciderConfig speed_bounds_decider_config = 14;
+    STBoundsDeciderConfig st_bounds_decider_config = 15;
+    // optimizers
+    OpenSpaceTrajectoryPartitionConfig
+        open_space_trajectory_partition_config = 16;
+    OpenSpaceTrajectoryProviderConfig
+        open_space_trajectory_provider_config = 17;
+    PiecewiseJerkNonlinearSpeedOptimizerConfig
+        piecewise_jerk_nonlinear_speed_optimizer_config = 18;
+    PiecewiseJerkPathOptimizerConfig piecewise_jerk_path_optimizer_config = 19;
+    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config = 20;
+    SpeedHeuristicOptimizerConfig speed_heuristic_optimizer_config = 21;
+    // other tasks
+    LearningModelInferenceTaskConfig learning_model_inference_task_config = 22;
+    LearningModelInferenceTrajectoryTaskConfig
+        learning_model_inference_trajectory_task_config = 23;
   }
-}
-
-message ScenarioLaneFollowConfig {
 }
 
 message ScenarioBareIntersectionUnprotectedConfig {
@@ -97,6 +88,48 @@ message ScenarioBareIntersectionUnprotectedConfig {
   optional double stop_distance = 5 [default = 0.5];             // meter
   optional float stop_timeout_sec = 6 [default = 8.0];           // sec
   optional float creep_timeout_sec = 7 [default = 10.0];         // sec
+}
+
+message ScenarioEmergencyPullOverConfig {
+  optional double max_stop_deceleration = 1 [default = 3.0];
+  optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
+  optional double target_slow_down_speed = 3 [default = 2.5];       // m/s
+  optional double stop_distance = 4 [default = 1.5];                // meter
+}
+
+message ScenarioEmergencyStopConfig {
+  optional double max_stop_deceleration = 1 [default = 6.0];
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}
+
+message ScenarioLaneFollowConfig {}
+
+message ScenarioLearningModelSampleConfig {}
+
+message ScenarioNarrowStreetUTurnConfig {}
+
+message ScenarioParkAndGoConfig {
+  optional double front_obstacle_buffer = 1 [default = 4.0];  // meter
+  optional double heading_buffer = 2 [default = 0.5];         // rad
+  optional double min_dist_to_dest = 3 [default = 25.0];      // meter
+  optional double max_steering_percentage_when_cruise = 4 [default = 90.0];
+}
+
+message ScenarioPullOverConfig {
+  optional double start_pull_over_scenario_distance = 1
+      [default = 50.0];                                                // meter
+  optional double pull_over_min_distance_buffer = 2 [default = 10.0];  // meter
+  // keep the same value as pull_over_destination_to_adc_buffer in
+  // PathBoundsDeciderConfig
+  optional double max_distance_stop_search = 3 [default = 25.0];  // meter
+  optional double max_s_error_to_end_point = 4 [default = 0.2];
+  optional double max_l_error_to_end_point = 5 [default = 0.5];
+  optional double max_theta_error_to_end_point = 6 [default = 0.2];
+  optional double max_distance_error_to_end_point = 7 [default = 0.2];
+  optional double pass_destination_threshold = 8 [default = 10.0];
+  optional double max_valid_stop_distance = 9 [default = 1.0];
+  optional double s_distance_to_stop_for_open_space_parking = 10
+      [default = 7.0];
 }
 
 message ScenarioStopSignUnprotectedConfig {
@@ -141,48 +174,9 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional double max_adc_speed_before_creep = 7 [default = 3.0];  // m/s
 }
 
-message ScenarioPullOverConfig {
-  optional double start_pull_over_scenario_distance = 1
-      [default = 50.0];                                                // meter
-  optional double pull_over_min_distance_buffer = 2 [default = 10.0];  // meter
-  // keep the same value as pull_over_destination_to_adc_buffer in
-  // PathBoundsDeciderConfig
-  optional double max_distance_stop_search = 3 [default = 25.0];  // meter
-  optional double max_s_error_to_end_point = 4 [default = 0.2];
-  optional double max_l_error_to_end_point = 5 [default = 0.5];
-  optional double max_theta_error_to_end_point = 6 [default = 0.2];
-  optional double max_distance_error_to_end_point = 7 [default = 0.2];
-  optional double pass_destination_threshold = 8 [default = 10.0];
-  optional double max_valid_stop_distance = 9 [default = 1.0];
-  optional double s_distance_to_stop_for_open_space_parking = 10
-      [default = 7.0];
-}
-
-message ScenarioEmergencyPullOverConfig {
-  optional double max_stop_deceleration = 1 [default = 3.0];
-  optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
-  optional double target_slow_down_speed = 3 [default = 2.5];       // m/s
-  optional double stop_distance = 4 [default = 1.5];                // meter
-}
-
-message ScenarioEmergencyStopConfig {
-  optional double max_stop_deceleration = 1 [default = 6.0];
-  optional double stop_distance = 2 [default = 1.0];  // meter
-}
-
 message ScenarioValetParkingConfig {
   optional double parking_spot_range_to_start = 1 [default = 20.0];
   optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
-}
-
-message ScenarioNarrowStreetUTurnConfig {
-}
-
-message ScenarioParkAndGoConfig {
-  optional double front_obstacle_buffer = 1 [default = 4.0];  // meter
-  optional double heading_buffer = 2 [default = 0.5];         // rad
-  optional double min_dist_to_dest = 3 [default = 25.0];      // meter
-  optional double max_steering_percentage_when_cruise = 4 [default = 90.0];
 }
 
 message ScenarioYieldSignConfig {
@@ -193,13 +187,7 @@ message ScenarioYieldSignConfig {
   optional float creep_timeout_sec = 4 [default = 10.0];        // sec
 }
 
-message ScenarioLearningModelSampleConfig {
-  optional string model_file = 1;
-  optional int32 input_feature_num = 2;
-}
-
 // scenario configs
-// next id: 19
 message ScenarioConfig {
   enum ScenarioType {
     LANE_FOLLOW = 0;  // default scenario
@@ -294,8 +282,8 @@ message ScenarioConfig {
   message StageConfig {
     optional StageType stage_type = 1;
     optional bool enabled = 2 [default = true];
-    // an ordered list of tasks that are used at runtime. Its order determines
-    // the runtime order of the tasks.
+    // an ordered list of tasks that are used at runtime.
+    // the order determines the runtime order of the tasks.
     repeated TaskConfig.TaskType task_type = 3;
     // an unordered task configurations
     repeated TaskConfig task_config = 4;
@@ -327,8 +315,7 @@ message ScenarioConfig {
   repeated StageConfig stage_config = 17;
 }
 
-message PlannerPublicRoadConfig {
-}
+message PlannerPublicRoadConfig {}
 
 message PlannerNaviConfig {
   repeated TaskConfig.TaskType task = 1;
@@ -358,11 +345,26 @@ message NavigationPlanningConfig {
   optional PlannerNaviConfig planner_navi_config = 4;
 }
 
+message TopicConfig {
+  optional string chassis_topic = 1;
+  optional string hmi_status_topic = 2;
+  optional string localization_topic = 3;
+  optional string planning_pad_topic = 4;
+  optional string planning_trajectory_topic = 5;
+  optional string prediction_topic = 6;
+  optional string relative_map_topic = 7;
+  optional string routing_request_topic = 8;
+  optional string routing_response_topic = 9;
+  optional string story_telling_topic = 10;
+  optional string traffic_light_detection_topic = 11;
+}
+
 message PlanningConfig {
+  optional TopicConfig topic_config = 1;
   oneof planning_config {
-    RtkPlanningConfig rtk_planning_config = 1;
-    StandardPlanningConfig standard_planning_config = 2;
-    NavigationPlanningConfig navigation_planning_config = 3;
+    RtkPlanningConfig rtk_planning_config = 2;
+    StandardPlanningConfig standard_planning_config = 3;
+    NavigationPlanningConfig navigation_planning_config = 4;
   }
 
   // default task config, it will be used if there is no scenario-specific

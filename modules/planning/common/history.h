@@ -98,6 +98,7 @@ class HistoryStatus {
 
 class History {
  public:
+  History() = default;
   const HistoryFrame* GetLastFrame() const;
   int Add(const ADCTrajectory& adc_trajectory_pb);
   void Clear();
@@ -107,9 +108,6 @@ class History {
  private:
   std::list<HistoryFrame> history_frames_;
   HistoryStatus history_status_;
-
-  // this is a singleton class
-  DECLARE_SINGLETON(History)
 };
 
 }  // namespace planning

@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -47,7 +46,8 @@ TEST_F(ValetParkingScenarioTest, Init) {
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_valet_parking_config_file, &config));
   ScenarioContext context;
-  scenario_.reset(new ValetParkingScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(new ValetParkingScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::VALET_PARKING);
 }
 

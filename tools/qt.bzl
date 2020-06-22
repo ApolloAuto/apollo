@@ -1,4 +1,4 @@
-#load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 def _file_name(filePathName):
     if "/" in filePathName:
@@ -48,7 +48,7 @@ def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = N
         srcs.append("res_%s.cpp" % base_name)
 
     hdrs = hdr + normal_hdrs
-    native.cc_library(
+    cc_library(
         name = name,
         srcs = srcs,
         hdrs = hdrs,

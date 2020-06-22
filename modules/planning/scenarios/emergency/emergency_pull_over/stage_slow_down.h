@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include <memory>
 
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -34,8 +35,9 @@ struct EmergencyPullOverContext;
 
 class EmergencyPullOverStageSlowDown : public Stage {
  public:
-  explicit EmergencyPullOverStageSlowDown(
-      const ScenarioConfig::StageConfig& config);
+  EmergencyPullOverStageSlowDown(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;

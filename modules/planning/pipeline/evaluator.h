@@ -16,12 +16,9 @@
 #pragma once
 
 #include <chrono>
-#include <ctime>
-#include <fstream>
 #include <string>
-#include <utility>
-#include <vector>
 
+#include "modules/planning/common/trajectory_evaluator.h"
 #include "modules/planning/proto/learning_data.pb.h"
 
 namespace apollo {
@@ -35,34 +32,13 @@ class Evaluator {
   void Evaluate(const std::string& source_file);
 
  private:
-  void EvaluateTrajectoryByTime(
-      const int frame_num,
-      const std::string& obstacle_id,
-      const std::vector<std::pair<double, TrajectoryPointFeature>>& trajectory,
-      const double start_point_timestamp_sec,
-      const double delta_time,
-      std::vector<TrajectoryPoint>* evaluated_trajectory);
-
-  void EvaluateADCTrajectory(const double start_point_timestamp_sec,
-                             LearningDataFrame* learning_data_frame);
-
-  void EvaluateADCFutureTrajectory(const double start_point_timestamp_sec,
-                                   LearningDataFrame* learning_data_frame);
-
-  void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
-                                  LearningDataFrame* learning_data_frame);
-
-  void EvaluateObstaclePredictionTrajectory(
-      const double start_point_timestamp_sec,
-      LearningDataFrame* learning_data_frame);
-
   void WriteOutData(const std::string& source_filename,
                     const LearningData& learning_data);
 
  private:
   std::chrono::time_point<std::chrono::system_clock> start_time_;
-  std::ofstream log_file_;
   LearningData learning_data_;
+  TrajectoryEvaluator trajectory_evaluator_;
 };
 
 }  // namespace planning

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -23,7 +24,7 @@ cc_library(
     hdrs = ["brake_control_a4.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -45,7 +46,7 @@ cc_library(
     hdrs = ["enable_state_feedback_c3.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -67,7 +68,7 @@ cc_library(
     hdrs = ["error_state_e1.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -89,7 +90,7 @@ cc_library(
     hdrs = ["gear_control_a1.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -111,7 +112,7 @@ cc_library(
     hdrs = ["parking_control_a5.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -133,7 +134,7 @@ cc_library(
     hdrs = ["steering_control_a2.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -155,7 +156,7 @@ cc_library(
     hdrs = ["torque_control_a3.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -177,7 +178,7 @@ cc_library(
     hdrs = ["vehicle_state_feedback_2_c4.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -199,7 +200,7 @@ cc_library(
     hdrs = ["vehicle_state_feedback_c1.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],

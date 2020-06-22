@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -30,7 +31,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
         "@civetweb//:civetweb++",
     ],
 )

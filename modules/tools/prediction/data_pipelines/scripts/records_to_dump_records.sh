@@ -38,4 +38,7 @@ fi
     --map_dir=/apollo/modules/map/data/${MAP_DIR} \
     --prediction_offline_mode=6 \
     --prediction_offline_bags=${SRC_DIR} \
-    --noenable_multi_thread
+    --noenable_multi_thread \
+    --noenable_async_draw_base_image \
+    --enable_all_pedestrian_caution_in_front \
+    --noenable_rank_caution_obstacles

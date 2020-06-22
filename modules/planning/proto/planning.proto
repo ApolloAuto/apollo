@@ -11,18 +11,6 @@ import "modules/map/proto/map_id.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
-message ADCSignals {
-  enum SignalType {
-    LEFT_TURN = 1;
-    RIGHT_TURN = 2;
-    LOW_BEAM_LIGHT = 3;
-    HIGH_BEAM_LIGHT = 4;
-    FOG_LIGHT = 5;
-    EMERGENCY_LIGHT = 6;
-  }
-  repeated SignalType signal = 1;
-}
-
 message EStop {
   // is_estop == true when emergency stop is required
   optional bool is_estop = 1;

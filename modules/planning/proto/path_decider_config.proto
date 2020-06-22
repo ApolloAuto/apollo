@@ -1,8 +1,0 @@
-syntax = "proto2";
-
-package apollo.planning;
-
-message PathDeciderConfig {
-  // buffer for static obstacles (meter)
-  optional double static_obstacle_buffer = 1 [default = 0.3];
-}

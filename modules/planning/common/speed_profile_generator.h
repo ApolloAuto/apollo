@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
@@ -35,7 +35,8 @@ class SpeedProfileGenerator {
  public:
   SpeedProfileGenerator() = delete;
 
-  static SpeedData GenerateFallbackSpeed(const double stop_distance = 0.0);
+  static SpeedData GenerateFallbackSpeed(const EgoInfo* ego_info,
+                                         const double stop_distance = 0.0);
 
   static void FillEnoughSpeedPoints(SpeedData* const speed_data);
 

@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
+
 #include <cuda_runtime_api.h>
+
+#include <algorithm>
+#include <numeric>
+#include <random>
 #include <vector>
 
 #include "cyber/common/log.h"
@@ -21,7 +27,6 @@
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 
 namespace apollo {
 namespace perception {
@@ -32,10 +37,9 @@ using base::PointD;
 using base::PointF;
 
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
-  point_pillars_ptr_.reset(
-      new PointPillars(kReproduceResultMode, kScoreThreshold,
-                       kNmsOverlapThreshold, FLAGS_pfe_onnx_file,
-                       FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(new PointPillars(
+      kReproduceResultMode, kScoreThreshold, kNmsOverlapThreshold,
+      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
   return true;
 }
 
@@ -71,42 +75,129 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   }
 
   // transform point cloud into an array
-  float* points_array = new float[original_cloud_->size() * 4];
-  PclToArray(original_cloud_, points_array, kNormalizingFactor);
+  float* points_array;
+  int num_points = original_cloud_->size();
+  int num_point_indexes;
+  std::vector<int> point_indexes;
+  if (kFuseFrames && kNumFuseFrames > 1) {
+    // before fusing
+    while (!prev_point_clouds_.empty() &&
+        frame->timestamp - prev_point_clouds_.front().second > kTimeInterval) {
+      prev_point_clouds_.pop_front();
+    }
+
+    // fusing
+    for (auto& pc_timestamp : prev_point_clouds_) {
+      num_points += pc_timestamp.first->size();
+    }
+    num_point_indexes = num_points;
+    point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
+    num_points = std::min(num_points, kMaxNumPoints);
+    points_array = new float[num_points * kNumPointFeature]();
+    FusePointCloudToArray(original_cloud_, points_array, point_indexes,
+                          kNormalizingFactor);
+
+    // after fusing
+    while (static_cast<int>(prev_point_clouds_.size()) >= kNumFuseFrames - 1) {
+      prev_point_clouds_.pop_front();
+    }
+    prev_point_clouds_.emplace_back(
+        std::make_pair(original_world_cloud_, frame->timestamp));
+  } else {
+    num_point_indexes = num_points;
+    point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
+    num_points = std::min(num_points, kMaxNumPoints);
+    points_array = new float[num_points * kNumPointFeature]();
+    PclToArray(original_cloud_, points_array, point_indexes,
+               kNormalizingFactor);
+  }
+  pcl_to_array_time_ = timer.toc(true);
 
   // inference
   std::vector<float> out_detections;
   std::vector<int> out_labels;
-  point_pillars_ptr_->DoInference(points_array, original_cloud_->size(),
+  point_pillars_ptr_->DoInference(points_array, num_points,
                                   &out_detections, &out_labels);
   inference_time_ = timer.toc(true);
 
-  // transfer output bounding boxs to objects
+  // transfer output bounding boxes to objects
   GetObjects(&frame->segmented_objects, frame->lidar2world_pose,
              &out_detections, &out_labels);
+  collect_time_ = timer.toc(true);
 
-  AINFO << "PointPillars: inference: " << inference_time_ << "\t"
+  AINFO << "PointPillars: " << "pcl_to_array: " << pcl_to_array_time_ << "\t"
+        << "inference: " << inference_time_ << "\t"
         << "collect: " << collect_time_;
+
+  delete[] points_array;
   return true;
 }
 
 void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
                                        float* out_points_array,
+                                       const std::vector<int>& point_indexes,
                                        const float normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
+    int point_pos = point_indexes.at(i);
+    if (point_pos >= kMaxNumPoints) continue;
     const auto& point = pc_ptr->at(i);
-    out_points_array[i * 4 + 0] = point.x;
-    out_points_array[i * 4 + 1] = point.y;
-    out_points_array[i * 4 + 2] = point.z;
-    out_points_array[i * 4 + 3] =
-        static_cast<float>(point.intensity / normalizing_factor);
+    out_points_array[point_pos * kNumPointFeature + 0] = point.x;
+    out_points_array[point_pos * kNumPointFeature + 1] = point.y;
+    out_points_array[point_pos * kNumPointFeature + 2] = point.z;
+    // delta of timestamp between prev and cur frames
+    out_points_array[point_pos * kNumPointFeature + 3] = 0;
   }
+}
+
+// TODO(chenjiahao): write a cuda version to accelerate
+void PointPillarsDetection::FusePointCloudToArray(
+    const base::PointFCloudPtr& pc_ptr, float* out_points_array,
+    const std::vector<int>& point_indexes, const float normalizing_factor) {
+  PclToArray(pc_ptr, out_points_array, point_indexes, normalizing_factor);
+
+  int point_counter = pc_ptr->size();
+  for (auto iter = prev_point_clouds_.rbegin();
+      iter != prev_point_clouds_.rend(); ++iter) {
+    base::PointDCloudPtr& prev_pc_ptr = iter->first;
+    // transform prev world point cloud to current sensor's coordinates
+    for (size_t i = 0; i < prev_pc_ptr->size(); ++i) {
+      int point_pos = point_indexes.at(point_counter);
+      if (point_pos >= kMaxNumPoints) continue;
+      const auto& point = prev_pc_ptr->at(i);
+      Eigen::Vector3d trans_point(point.x, point.y, point.z);
+      trans_point = lidar_frame_ref_->lidar2world_pose.inverse() * trans_point;
+      out_points_array[point_pos * kNumPointFeature + 0] =
+          static_cast<float>(trans_point(0));
+      out_points_array[point_pos * kNumPointFeature + 1] =
+          static_cast<float>(trans_point(1));
+      out_points_array[point_pos * kNumPointFeature + 2] =
+          static_cast<float>(trans_point(2));
+      out_points_array[point_pos * kNumPointFeature + 3] =
+          static_cast<float>(lidar_frame_ref_->timestamp - iter->second);
+      point_counter++;
+    }
+  }
+}
+
+std::vector<int> PointPillarsDetection::GenerateIndexes(int start_index,
+                                                        int size,
+                                                        bool shuffle) {
+  // create a range number array
+  std::vector<int> indexes(size);
+  std::iota(indexes.begin(), indexes.end(), start_index);
+
+  // shuffle the index array
+  if (shuffle) {
+    unsigned seed = 0;
+    std::shuffle(indexes.begin(), indexes.end(),
+                 std::default_random_engine(seed));
+  }
+  return indexes;
 }
 
 void PointPillarsDetection::GetObjects(
     std::vector<std::shared_ptr<Object>>* objects, const Eigen::Affine3d& pose,
     std::vector<float>* detections, std::vector<int>* labels) {
-  Timer timer;
   int num_objects = detections->size() / kOutputNumBoxFeature;
 
   objects->clear();
@@ -146,8 +237,8 @@ void PointPillarsDetection::GetObjects(
         Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
     Eigen::Translation3f translation(x, y, z);
     Eigen::Affine3f affine3f = translation * quater.toRotationMatrix();
-    for (float vx : std::vector<float>{dx/2, -dx/2}) {
-      for (float vy : std::vector<float>{dy/2, -dy/2}) {
+    for (float vx : std::vector<float>{dx / 2, -dx / 2}) {
+      for (float vy : std::vector<float>{dy / 2, -dy / 2}) {
         for (float vz : std::vector<float>{0, dz}) {
           Eigen::Vector3f v3f(vx, vy, vz);
           v3f = affine3f * v3f;
@@ -168,38 +259,45 @@ void PointPillarsDetection::GetObjects(
       }
     }
 
-    // classification (only detect vehicles so far)
-    // TODO(chenjiahao): Complete object type probs
+    // classification
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
         static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
-    int type = GetObjectType(labels->at(i));
-    object->lidar_supplement.raw_probs.back()[type] = 1.0f;
+    object->sub_type = GetObjectSubType(labels->at(i));
+    object->type = base::kSubType2TypeMap.at(object->sub_type);
+    object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
+        1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());
-    object->type = static_cast<base::ObjectType>(
-        std::distance(object->type_probs.begin(),
-                      std::max_element(object->type_probs.begin(),
-                                       object->type_probs.end())));
   }
-
-  collect_time_ = timer.toc(true);
 }
 
-int PointPillarsDetection::GetObjectType(const int label) {
+// TODO(chenjiahao): update the base ObjectSubType with more fine-grained types
+base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
   switch (label) {
     case 0:
-      return static_cast<int>(base::ObjectType::VEHICLE);
-      break;
+      return base::ObjectSubType::BUS;
     case 1:
-      return static_cast<int>(base::ObjectType::BICYCLE);
-      break;
-    case 2:
-      return static_cast<int>(base::ObjectType::PEDESTRIAN);
-      break;
+      return base::ObjectSubType::CAR;
+    case 2:  // construction vehicle
+      return base::ObjectSubType::UNKNOWN_MOVABLE;
+    case 3:  // trailer
+      return base::ObjectSubType::UNKNOWN_MOVABLE;
+    case 4:
+      return base::ObjectSubType::TRUCK;
+    case 5:  // barrier
+      return base::ObjectSubType::UNKNOWN_UNMOVABLE;
+    case 6:
+      return base::ObjectSubType::CYCLIST;
+    case 7:
+      return base::ObjectSubType::MOTORCYCLIST;
+    case 8:
+      return base::ObjectSubType::PEDESTRIAN;
+    case 9:
+      return base::ObjectSubType::TRAFFICCONE;
     default:
-      return static_cast<int>(base::ObjectType::UNKNOWN);
+      return base::ObjectSubType::UNKNOWN;
   }
 }
 

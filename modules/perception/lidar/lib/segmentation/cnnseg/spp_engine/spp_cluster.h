@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <numeric>
 #include <vector>
 
 #include "modules/perception/base/point_cloud.h"

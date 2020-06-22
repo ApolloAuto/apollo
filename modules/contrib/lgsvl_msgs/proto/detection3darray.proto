@@ -1,0 +1,10 @@
+syntax = "proto3";
+import "modules/common/proto/header.proto";
+import "modules/contrib/lgsvl_msgs/proto/detection3d.proto";
+
+package apollo.contrib.lgsvl_msgs;
+
+message Detection3DArray {
+  apollo.common.Header header = 1;
+  repeated Detection3D detections = 2;
+}

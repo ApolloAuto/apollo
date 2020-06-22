@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,6 +11,8 @@ cc_library(
     deps = [
         ":gem_controller",
         ":gem_message_manager",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
 )
@@ -30,7 +33,7 @@ cc_library(
     hdrs = ["gem_message_manager.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -54,7 +57,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":gem_message_manager",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
         "//modules/drivers/canbus/can_comm:can_sender",

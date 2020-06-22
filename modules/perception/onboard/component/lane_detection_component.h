@@ -31,7 +31,7 @@
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/lane_camera_perception.h"
-#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/lib/motion_service/motion_service.h"

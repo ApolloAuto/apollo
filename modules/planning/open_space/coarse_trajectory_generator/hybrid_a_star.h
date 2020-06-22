@@ -28,10 +28,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"
-#include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
-#include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
-
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -40,6 +36,9 @@
 #include "modules/common/time/time.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -123,6 +124,7 @@ cc_test(
     name = "conditional_clustering_test",
     size = "small",
     srcs = ["conditional_clustering_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":conditional_clustering",
         "@com_google_googletest//:gtest_main",

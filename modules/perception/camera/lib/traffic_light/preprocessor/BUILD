@@ -1,19 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:py_proto.bzl", "py_proto")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
-
-cc_proto_library(
-    name = "tl_preprocess_proto",
-    deps = [
-        ":tl_preprocess_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "tl_preprocess_proto_lib",
-    srcs = ["tl_preprocess.proto"],
-)
 
 cc_library(
     name = "multi_camera_projection",
@@ -56,11 +44,6 @@ cc_library(
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
-)
-
-py_proto(
-    name = "tl_preprocess_pb2",
-    src = "tl_preprocess.proto",
 )
 
 cpplint()

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,11 +10,12 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 
@@ -27,7 +29,7 @@ cc_library(
     ],
     deps = [
         ":task",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/tasks/deciders/creep_decider",
         "//modules/planning/tasks/deciders/lane_change_decider",
         "//modules/planning/tasks/deciders/open_space_decider:open_space_fallback_decider",
@@ -37,12 +39,15 @@ cc_library(
         "//modules/planning/tasks/deciders/path_bounds_decider",
         "//modules/planning/tasks/deciders/path_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
+        "//modules/planning/tasks/deciders/path_reference_decider",
         "//modules/planning/tasks/deciders/path_reuse_decider",
         "//modules/planning/tasks/deciders/rss_decider",
         "//modules/planning/tasks/deciders/rule_based_stop_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_decider",
         "//modules/planning/tasks/deciders/st_bounds_decider",
+        "//modules/planning/tasks/learning_model:learning_model_inference_task",
+        "//modules/planning/tasks/learning_model:learning_model_inference_trajectory_task",
         "//modules/planning/tasks/optimizers/open_space_trajectory_generation:open_space_trajectory_provider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",

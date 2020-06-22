@@ -16,13 +16,13 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 #include "modules/planning/scenarios/scenario_manager.h"
 
@@ -44,7 +44,10 @@ class Planner {
   /**
    * @brief Constructor
    */
-  Planner() = default;
+  Planner() = delete;
+
+  explicit Planner(const std::shared_ptr<DependencyInjector>& injector)
+      : scenario_manager_(injector) {}
 
   /**
    * @brief Destructor
@@ -77,7 +80,11 @@ class PlannerWithReferenceLine : public Planner {
   /**
    * @brief Constructor
    */
-  PlannerWithReferenceLine() = default;
+  PlannerWithReferenceLine() = delete;
+
+  explicit PlannerWithReferenceLine(
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Planner(injector) {}
 
   /**
    * @brief Destructor

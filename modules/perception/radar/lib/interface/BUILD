@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -21,9 +22,10 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/registerer",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/tracker/common:radar_track",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
     ],
 )
@@ -36,11 +38,21 @@ cc_library(
 cc_library(
     name = "base_detector",
     hdrs = ["base_detector.h"],
+    deps = [
+        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
+        "//modules/drivers/proto:conti_radar_cc_proto",
+        "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
+    ],
 )
 
 cc_library(
     name = "base_preprocessor",
     hdrs = ["base_preprocessor.h"],
+    deps = [
+        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
+        "//modules/drivers/proto:conti_radar_cc_proto",
+        "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
+    ],
 )
 
 cc_library(

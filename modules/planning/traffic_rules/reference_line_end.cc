@@ -20,9 +20,10 @@
 
 #include "modules/planning/traffic_rules/reference_line_end.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include <memory>
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -30,8 +31,10 @@ namespace planning {
 
 using apollo::common::Status;
 
-ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
-    : TrafficRule(config) {}
+ReferenceLineEnd::ReferenceLineEnd(
+    const TrafficRuleConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status ReferenceLineEnd::ApplyRule(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {

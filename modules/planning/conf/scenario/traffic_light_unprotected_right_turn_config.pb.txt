@@ -23,7 +23,7 @@ stage_config: {
   task_type: RULE_BASED_STOP_DECIDER
   task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
@@ -43,7 +43,7 @@ stage_config: {
     task_type: PATH_DECIDER
   }
   task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
+    task_type: SPEED_HEURISTIC_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -80,7 +80,7 @@ stage_config: {
   task_type: RULE_BASED_STOP_DECIDER
   task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
@@ -111,7 +111,7 @@ stage_config: {
     task_type: PATH_DECIDER
   }
   task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
+    task_type: SPEED_HEURISTIC_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -147,7 +147,7 @@ stage_config: {
   task_type: RULE_BASED_STOP_DECIDER
   task_type: ST_BOUNDS_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
@@ -170,7 +170,7 @@ stage_config: {
     task_type: PATH_DECIDER
   }
   task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
+    task_type: SPEED_HEURISTIC_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER

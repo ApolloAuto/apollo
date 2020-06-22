@@ -15,31 +15,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 # Usage:
 #   ./build_cyber.sh [-l] -f <cyber.dockerfile> [-m <build|download>]
 # E.g.,
 #   ./build_cyber.sh -f ./cyber.aarch64.dockerfile -m download
-ARCH=$(uname -m)
 
+# Fail on first error.
+set -euo pipefail
+
+SUPPORTED_ARCHS=" x86_64 aarch64 "
 REPO=apolloauto/apollo
+UBT_LTS="18.04"
 LOCAL_DEV_TAG="${REPO}:local_cyber_dev"
+
+STAGE="cyber"
+HOST_ARCH="$(uname -m)"
+TARGET_ARCH=
 
 LOCAL_DEV_FLAG="no"
 MODE="download"
 GEOLOC="us"
+CLEAN_MODE="no"
 DOCKERFILE=""
 TAB="    "
 
 function print_usage() {
     local prog_name=$(basename "$0")
-    local tab="    " # 4 spaces
     echo "Usage:"
-    echo "${tab}${prog_name} [-l] -f <cyber_dockerfile> [-m <build|download>] [-g <us|cn>]"
-    echo "${tab}${prog_name} -h/--help    # Show this message"
+    echo "${TAB}${prog_name} [-l] [-c] -f <cyber_dockerfile> [-m <build|download>] [-g <us|cn>]"
+    echo "${TAB}${prog_name} -h/--help    # Show this message"
     echo "E.g.,"
-    echo "${tab}${prog_name} -f cyber.x86_64.dockerfile -m build"
-    echo "${tab}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
+    echo "${TAB}${prog_name} -f cyber.x86_64.dockerfile -m build"
+    echo "${TAB}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
+}
+
+function determine_target_arch() {
+    local dockerfile="$( basename "$1" )"
+    IFS='.' read -ra __arr <<< "${dockerfile}"
+    if [[ ${#__arr[@]} -ne 3 ]]; then
+        echo "Expected dockerfile with name [prefix_]<target>.<arch>.dockerfile"
+        echo "Got ${dockerfile}. Exiting..."
+        exit 1
+    fi
+    IFS=' '
+
+    local arch="${__arr[1]}"
+    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
+        echo "Unsupported architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
+        exit 1
+    fi
+    TARGET_ARCH="${arch}"
+    return 0
 }
 
 function parse_arguments() {
@@ -47,7 +73,7 @@ function parse_arguments() {
         print_usage
         exit 0
     fi
-    while getopts "hlf:m:g:" opt; do
+    while getopts "hlcf:m:g:" opt; do
         case $opt in
             l)
                 LOCAL_DEV_FLAG="yes"
@@ -60,6 +86,9 @@ function parse_arguments() {
                 ;;
             g)
                 GEOLOC=$OPTARG
+                ;;
+            c)
+                CLEAN_MODE="yes"
                 ;;
             h)
                 print_usage
@@ -93,11 +122,14 @@ function check_arguments() {
         echo "Dockfile not specified"
         exit 1
     fi
-    if [[ "$DOCKERFILE" == *${ARCH}* ]]; then
-        echo "Dockerfile to build: ${DOCKERFILE}"
-    else
-        echo "Dockerfile \"$DOCKERFILE\" doesn't match current architecture."
-        exit 1
+
+    # Set and check target arch
+    determine_target_arch "${DOCKERFILE}"
+    if [[ "${TARGET_ARCH}" != "${HOST_ARCH}" ]]; then
+        echo "[WARNING] Host arch (${HOST_ARCH}) != Target Arch (${TARGET_ARCH}) " \
+             "for dockerfile \"$DOCKERFILE\""
+        echo "[WARNING] Make sure you have executed the following command:"
+        echo "docker run --rm --privileged multiarch/qemu-user-static --reset -p yes"
     fi
 }
 
@@ -106,19 +138,24 @@ check_arguments
 
 CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
 TIME=$(date +%Y%m%d_%H%M)
-TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
-
-# Fail on first error.
-set -e
+TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
 
 echo "=====.=====.=====.=====  Docker Image Build for Cyber =====.=====.=====.====="
-echo "|  Docker build ${TAG}"
+echo "|  Docker build ${TAG} CLEAN_MODE=${CLEAN_MODE}"
 echo "|  ${TAB}using dockerfile=${DOCKERFILE}"
+echo "|  ${TAB}TARGET_ARCH=${TARGET_ARCH}, HOST_ARCH=${HOST_ARCH}"
 echo "|  ${TAB}INSTALL_MODE=${MODE}, GEOLOC=${GEOLOC}"
 echo "=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.====="
 
-docker build -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
+EXTRA_ARGS=""
+
+if [[ "${CLEAN_MODE}" == "yes" ]]; then
+    EXTRA_ARGS="--no-cache"
+fi
+
+docker build ${EXTRA_ARGS} -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
     --build-arg GEOLOC="${GEOLOC}" \
+    --build-arg BUILD_STAGE="${STAGE}" \
     -f "${DOCKERFILE}" "${CONTEXT}"
 echo "Built new image ${TAG}"
 

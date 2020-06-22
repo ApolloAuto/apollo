@@ -21,7 +21,7 @@
 #include "cyber/common/log.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
-#include "modules/perception/camera/lib/lane/common/denseline.pb.h"
+#include "modules/perception/camera/lib/lane/common/proto/denseline.pb.h"
 #include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {

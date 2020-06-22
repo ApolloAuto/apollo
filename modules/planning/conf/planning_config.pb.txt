@@ -1,3 +1,16 @@
+topic_config {
+  chassis_topic: "/apollo/canbus/chassis"
+  hmi_status_topic: "/apollo/hmi/status"
+  localization_topic: "/apollo/localization/pose"
+  planning_pad_topic: "/apollo/planning/pad"
+  planning_trajectory_topic: "/apollo/planning"
+  prediction_topic: "/apollo/prediction"
+  relative_map_topic: "/apollo/relative_map"
+  routing_request_topic: "/apollo/routing_request"
+  routing_response_topic: "/apollo/routing_response"
+  story_telling_topic: "/apollo/storytelling"
+  traffic_light_detection_topic: "/apollo/perception/traffic_light"
+}
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {
@@ -5,7 +18,7 @@ standard_planning_config {
 }
 default_task_config: {
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
-  piecewise_jerk_path_config {
+  piecewise_jerk_path_optimizer_config {
     default_path_config {
       l_weight: 1.0
       dl_weight: 20.0
@@ -22,7 +35,7 @@ default_task_config: {
 }
 default_task_config: {
   task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
-  piecewise_jerk_speed_config {
+  piecewise_jerk_speed_optimizer_config {
     acc_weight: 1.0
     jerk_weight: 3.0
     kappa_penalty_weight: 2000.0
@@ -32,7 +45,7 @@ default_task_config: {
 }
 default_task_config: {
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
-  piecewise_jerk_nonlinear_speed_config {
+  piecewise_jerk_nonlinear_speed_optimizer_config {
     acc_weight: 2.0
     jerk_weight: 3.0
     lat_acc_weight: 1000.0
@@ -44,8 +57,8 @@ default_task_config: {
   }
 }
 default_task_config: {
-  task_type: DP_ST_SPEED_OPTIMIZER
-  speed_heuristic_config {
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  speed_heuristic_optimizer_config {
     default_speed_config {
       unit_t: 1.0
       dense_dimension_s: 101
@@ -341,7 +354,7 @@ default_task_config: {
     is_lane_borrowing: false
     is_pull_over: false
     pull_over_destination_to_adc_buffer: 25.0
-    pull_over_destination_to_pathend_buffer: 10.0
+    pull_over_destination_to_pathend_buffer: 4.0
     pull_over_road_edge_buffer: 0.15
     pull_over_approach_lon_distance_adjust_factor: 1.5
   }

@@ -15,23 +15,19 @@
  *****************************************************************************/
 
 #include "modules/planning/planner/on_lane_planner_dispatcher.h"
-#include "cyber/common/file.h"
-#include "modules/planning/common/planning_gflags.h"
+
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-std::unique_ptr<Planner> OnLanePlannerDispatcher::DispatchPlanner() {
-  PlanningConfig planning_config;
-  bool res_load_config = apollo::cyber::common::GetProtoFromFile(
-      FLAGS_planning_config_file, &planning_config);
-  if (!res_load_config) {
-    return nullptr;
-  }
-
+std::unique_ptr<Planner> OnLanePlannerDispatcher::DispatchPlanner(
+    const PlanningConfig& planning_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   return planner_factory_.CreateObject(
-      planning_config.standard_planning_config().planner_type(0));
+      planning_config.standard_planning_config().planner_type(0), injector);
 }
 
 }  // namespace planning

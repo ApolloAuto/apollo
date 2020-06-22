@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,7 +10,8 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber/common:log",
-        "@cuda",
+        "//modules/common/math:geometry",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -24,7 +26,9 @@ cc_test(
     deps = [
         "//modules/common/math",
         "@com_google_googletest//:gtest_main",
-        "@cuda",
+        "@local_config_cuda//cuda:cublas",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -37,8 +41,7 @@ cc_library(
         "//modules/common/math",
         "//modules/map/hdmap",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/proto:routing_proto",
+        "//modules/map/proto:map_lane_cc_proto",
     ],
 )
 
@@ -48,10 +51,11 @@ cc_library(
     hdrs = ["route_segments.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap",
         "//modules/map/pnc_map:path",
         "//modules/routing/common:routing_gflags",
+        "//modules/routing/proto:routing_cc_proto",
     ],
 )
 
@@ -64,7 +68,7 @@ cc_library(
         ":path",
         ":route_segments",
         "//modules/common/util:point_factory",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",
@@ -86,6 +90,7 @@ cc_test(
     deps = [
         ":path",
         "//modules/common/util",
+        "//modules/routing/proto:routing_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:qt.bzl", "qt_cc_library")
 
@@ -39,6 +40,7 @@ qt_cc_library(
     copts = [
         "-Imodules/drivers/proto",
         "-Iexternal/qt",
+        "-fPIC",
     ],
     hdr = glob([
         "*.h",
@@ -55,7 +57,9 @@ qt_cc_library(
     ]),
     deps = [
         "//cyber",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/drivers/proto:radar_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_opengl",

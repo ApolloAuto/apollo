@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -27,11 +28,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -45,11 +46,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -63,8 +64,8 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "@eigen",
         "@osqp",
     ],
@@ -80,8 +81,8 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "@eigen",
         "@osqp",
     ],
@@ -96,7 +97,8 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
-        ":distance_approach_ipopt_cuda_interface",
+        # TODO(xiaoxq): Disable CUDA in planning temporarily.
+        # ":distance_approach_ipopt_cuda_interface",
         ":distance_approach_ipopt_fixed_dual_interface",
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
@@ -105,7 +107,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
     ],
 )
 
@@ -126,11 +128,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -151,11 +153,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -176,11 +178,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -201,11 +203,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -226,18 +228,18 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
 cc_library(
     name = "distance_approach_ipopt_cuda_interface",
     srcs = ["distance_approach_ipopt_cuda_interface.cc"] + select({
-        "//tools/platforms:use_gpu": [
+        "//tools/platform:use_gpu": [
             "planning_block.h",
             ":planning_block",
         ],
@@ -257,11 +259,11 @@ cc_library(
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "@adolc",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -287,7 +289,7 @@ cuda_library(
     srcs = ["planning_block.cu"],
     hdrs = ["planning_block.h"],
     deps = [
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -318,6 +320,7 @@ cc_test(
         ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -333,6 +336,7 @@ cc_test(
         ":distance_approach_problem",
         "//cyber/common:log",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -353,8 +357,8 @@ cc_test(
     deps = [
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
-        "//third_party:ipopt",
         "@com_google_googletest//:gtest_main",
+        "@ipopt",
     ],
 )
 

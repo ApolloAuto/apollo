@@ -21,28 +21,30 @@
 #pragma once
 
 #include <chrono>
-#include <list>
 #include <fstream>
+#include <list>
 #include <string>
-#include <vector>
-#include <utility>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/storytelling/proto/story.pb.h"
 
 namespace apollo {
 namespace planning {
 
 class MessageProcess {
  public:
-  bool Init();
+  bool Init(const PlanningConfig& planning_config);
   void Close();
 
   void OnChassis(const apollo::canbus::Chassis& chassis);
@@ -57,10 +59,12 @@ class MessageProcess {
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
 
+  void OnStoryTelling(const apollo::storytelling::Stories& stories);
+
   void OnTrafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  void ProcessOfflineData(const std::string &record_file);
+  void ProcessOfflineData(const std::string& record_file);
 
  private:
   struct ADCCurrentInfo {
@@ -70,27 +74,27 @@ class MessageProcess {
     double adc_cur_heading_;
   };
 
-    apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
+  apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
       const apollo::common::PointENU& position);
-  int GetADCCurrentRoutingIndex();
+  bool GetADCCurrentRoutingIndex(int* road_index, double* road_s);
 
   int GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
-  void GenerateObstacleTrajectory(
-      const int frame_num,
-      const int obstacle_id,
-      const ADCCurrentInfo& adc_curr_info,
-      ObstacleFeature* obstacle_feature);
+  void GenerateObstacleTrajectory(const int frame_num, const int obstacle_id,
+                                  const ADCCurrentInfo& adc_curr_info,
+                                  ObstacleFeature* obstacle_feature);
 
   void GenerateObstaclePrediction(
       const apollo::prediction::PredictionObstacle& prediction_obstacle,
-      const ADCCurrentInfo& adc_curr_info,
-      ObstacleFeature* obstacle_feature);
+      const ADCCurrentInfo& adc_curr_info, ObstacleFeature* obstacle_feature);
 
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
-  void GenerateRoutingFeature(const int routing_index,
-                              LearningDataFrame* learning_data_frame);
+  bool GenerateLocalRoutingPassages(
+      std::vector<std::vector<std::pair<std::string, double>>>*
+          local_routing_passages);
+
+  void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
 
   void GenerateTrafficLightDetectionFeature(
       LearningDataFrame* learning_data_frame);
@@ -99,9 +103,12 @@ class MessageProcess {
           localizations,
       LearningDataFrame* learning_data_frame);
 
+  void GeneratePlanningTag(LearningDataFrame* learning_data_frame);
+
   void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
+  PlanningConfig planning_config_;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
   std::string record_file_;
@@ -115,8 +122,8 @@ class MessageProcess {
       obstacle_history_map_;
   ChassisFeature chassis_feature_;
   std::string map_name_;
-  std::vector<OverlapFeature> overlaps_;
-  std::vector<std::pair<std::string, double>> routing_lane_segment_;
+  PlanningTag planning_tag_;
+  apollo::routing::RoutingResponse routing_response_;
   double traffic_light_detection_message_timestamp_;
   std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;

@@ -7,5 +7,8 @@ licenses(["notice"])
 cc_library(
     name = "PocoFoundation",
     includes = ["."],
-    linkopts = ["-lPocoFoundation"],
+    linkopts = [
+        "-L/opt/apollo/sysroot/lib",
+        "-lPocoFoundation",
+    ],
 )

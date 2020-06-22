@@ -17,9 +17,7 @@
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"

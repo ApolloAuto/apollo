@@ -21,6 +21,8 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+. /tmp/installers/installer_base.sh
+
 #Install the TensorRT package that fits your particular needs.
 #For only running TensorRT C++ applications:
 #sudo apt-get install libnvinfer7 libnvonnxparsers7 libnvparsers7 libnvinfer-plugin7
@@ -41,5 +43,11 @@ apt-get -y update && \
     libnvparsers-dev \
     libnvinfer-plugin-dev
 
-apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+# Make caffe-1.0 compilation pass
+CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
+[[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ]] || \
+    ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
+
+# Disable nvidia apt sources.list settings to speed up build process
+rm -f /etc/apt/sources.list.d/nvidia-ml.list
+rm -f /etc/apt/sources.list.d/cuda.list

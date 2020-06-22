@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,7 +10,7 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -31,8 +32,9 @@ cuda_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
-        "@cuda",
+        "//modules/perception/base",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -65,7 +67,7 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -91,7 +93,7 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

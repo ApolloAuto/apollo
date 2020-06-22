@@ -15,100 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
-
-BOLD='\033[1m'
-RED='\033[0;31m'
-GREEN='\033[32m'
-WHITE='\033[34m'
-YELLOW='\033[33m'
-NO_COLOR='\033[0m'
-
-function info() {
-  (>&2 echo -e "[${WHITE}${BOLD}INFO${NO_COLOR}] $*")
-}
-
-function error() {
-  (>&2 echo -e "[${RED}ERROR${NO_COLOR}] $*")
-}
-
-function warning() {
-  (>&2 echo -e "${YELLOW}[WARNING] $*${NO_COLOR}")
-}
-
-function ok() {
-  (>&2 echo -e "[${GREEN}${BOLD} OK ${NO_COLOR}] $*")
-}
-
-function print_delim() {
-  echo '============================'
-}
-
-function get_now() {
-  echo $(date +%s)
-}
-
-function print_time() {
-  END_TIME=$(get_now)
-  ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc -l)
-  MESSAGE="Took ${ELAPSED_TIME} seconds"
-  info "${MESSAGE}"
-}
-
-function success() {
-  print_delim
-  ok "$1"
-  print_time
-  print_delim
-}
-
-function fail() {
-  print_delim
-  error "$1"
-  print_time
-  print_delim
-  exit -1
-}
-
-function check_in_docker() {
-  if [ -f /.dockerenv ]; then
-    APOLLO_IN_DOCKER=true
-    APOLLO_ROOT_DIR="/apollo"
-  else
-    APOLLO_IN_DOCKER=false
-  fi
-  export APOLLO_IN_DOCKER
-  APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
-}
+TOP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+source ${TOP_DIR}/scripts/apollo.bashrc
 
 function set_lib_path() {
   local CYBER_SETUP="${APOLLO_ROOT_DIR}/cyber/setup.bash"
   [[ -e "${CYBER_SETUP}" ]] && . "${CYBER_SETUP}"
 
   export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib:/usr/lib/$(uname -m)-linux-gnu"
-  export LD_LIBRARY_PATH="${APOLLO_CACHE_DIR}/apollolibs:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/qt5/lib:$LD_LIBRARY_PATH"
   export LD_LIBRARY_PATH="/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH"
+  export LD_LIBRARY_PATH="/usr/local/tf2/lib:$LD_LIBRARY_PATH"
   # TODO(storypku):
   # /apollo/bazel-genfiles/external/caffe/lib
   # /usr/local/apollo/local_integ/lib
   export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
 
   if [ -e /usr/local/cuda/ ];then
-    export PATH=/usr/local/cuda/bin:$PATH
+    add_to_path "/usr/local/cuda/bin"
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
     export C_INCLUDE_PATH=/usr/local/cuda/include:$C_INCLUDE_PATH
     export CPLUS_INCLUDE_PATH=/usr/local/cuda/include:$CPLUS_INCLUDE_PATH
   fi
 
+  # TODO(storypku): Remove this!
   if [ "$USE_GPU" != "1" ];then
-    export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/local/libtorch_cpu/lib:$LD_LIBRARY_PATH
   else
-    export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/local/libtorch_gpu/lib:$LD_LIBRARY_PATH
   fi
-  export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle_dep/mkldnn/lib/:$LD_LIBRARY_PATH
 
   local PY_LIB_PATH="${APOLLO_ROOT_DIR}/py_proto"
   local PY_TOOLS_PATH="${APOLLO_ROOT_DIR}/modules/tools"
@@ -116,7 +51,7 @@ function set_lib_path() {
 
   # Set teleop paths
   export PYTHONPATH="${APOLLO_ROOT_DIR}/modules/teleop/common:${PYTHONPATH}"
-  export PATH="${APOLLO_ROOT_DIR}/modules/teleop/common/scripts:${PATH}"
+  add_to_path "/apollo/modules/teleop/common/scripts"
 }
 
 function create_data_dir() {
@@ -184,10 +119,6 @@ function setup_device() {
   if [ ! -e /dev/nvidia-uvm ];then
     sudo mknod -m 666 /dev/nvidia-uvm c 243 0
   fi
-  if [ ! -e /dev/nvidia-uvm-tools ];then
-    sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
-  fi
-
   if [ ! -e /dev/nvidia-uvm-tools ];then
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
   fi
@@ -437,7 +368,6 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
-check_in_docker
 unset OMP_NUM_THREADS
 
 if [ $APOLLO_IN_DOCKER = "true" ]; then

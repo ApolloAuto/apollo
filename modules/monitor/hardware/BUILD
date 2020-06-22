@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,7 +9,8 @@ cc_library(
     hdrs = ["gps_monitor.h"],
     deps = [
         "//cyber",
-        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/proto:gnss_status_cc_proto",
+        "//modules/drivers/gnss/proto:ins_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",
@@ -21,7 +23,7 @@ cc_library(
     hdrs = ["resource_monitor.h"],
     deps = [
         "//modules/common/util",
-        "//modules/dreamview/proto:hmi_mode_proto",
+        "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",
@@ -39,7 +41,7 @@ cc_library(
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",
     ] + select({
-        "//tools/platforms:use_esd_can": [
+        "//tools/platform:use_esd_can": [
             "//third_party/can_card_library/esd_can",
         ],
         "//conditions:default": [],

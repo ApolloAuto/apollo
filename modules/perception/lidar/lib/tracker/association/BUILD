@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -38,8 +39,8 @@ cc_library(
         "//modules/perception/common/geometry:basic",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lidar/common:lidar_log",
-        "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
     ],
     alwayslink = True,

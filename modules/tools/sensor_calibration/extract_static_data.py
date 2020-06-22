@@ -36,7 +36,7 @@ from cyber_py3.record import RecordReader
 from cyber.proto import record_pb2
 from configuration_yaml_generator import ConfigYaml
 from data_file_object import TimestampFileObject, OdometryFileObject
-from modules.tools.sensor_calibration.proto import extractor_config_pb2
+from modules.tools.sensor_calibration.proto import extractor_config_py_pb2
 
 
 CYBER_PATH = os.environ['CYBER_PATH']

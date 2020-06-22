@@ -38,11 +38,6 @@ apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
-  ACHECK(
-      cyber::common::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
-      << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
-
-  AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
 
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
   ACHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
@@ -131,21 +126,6 @@ std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
   return fixed_requests;
 }
 
-double Routing::GetRoutingLength(const RoutingResponse& routing_response) {
-  double length = 0;
-  for (int i = 0; i < routing_response.road_size(); ++i) {
-    const auto& road = routing_response.road(i);
-    for (int j = 0; j < road.passage_size(); ++j) {
-      const auto& passage = routing_response.road(i).passage(j);
-      for (int k = 0; k < passage.segment_size(); ++k) {
-        const auto& segment = passage.segment(k);
-        length += (segment.end_s() - segment.start_s());
-      }
-    }
-  }
-  return length;
-}
-
 bool Routing::GetParkingID(const PointENU& parking_point,
                            std::string* parking_space_id) {
   // search current parking space id associated with parking point.
@@ -196,7 +176,8 @@ bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
   for (const auto& fixed_request : fixed_requests) {
     RoutingResponse routing_response_temp;
     if (navigator_ptr_->SearchRoute(fixed_request, &routing_response_temp)) {
-      const double routing_length = GetRoutingLength(routing_response_temp);
+      const double routing_length =
+          routing_response_temp.measurement().distance();
       if (routing_length < min_routing_length) {
         routing_response->CopyFrom(routing_response_temp);
         min_routing_length = routing_length;

@@ -31,7 +31,7 @@
  */
 
 // headers in CUDA
-#include <include/thrust/sort.h>
+#include <thrust/sort.h>
 
 // headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/postprocess_cuda.h"
@@ -123,7 +123,7 @@ __global__ void filter_kernel(
     float ymin = float_max;
     float xmax = float_min;
     float ymax = float_min;
-    for (size_t i = 0; i < num_box_corners; i++) {
+    for (size_t i = 0; i < num_box_corners; ++i) {
       rotated_corners[i * 2 + 0] =
           cos_yaw * corners[i * 2 + 0] - sin_yaw * corners[i * 2 + 1];
       rotated_corners[i * 2 + 1] =
@@ -184,23 +184,22 @@ __global__ void sort_boxes_by_indexes_kernel(
   }
 }
 
-PostprocessCuda::PostprocessCuda(
-    const float float_min, const float float_max, const int num_anchor_x_inds,
-    const int num_anchor_y_inds, const int num_anchor_r_inds,
-    const float score_threshold, const int num_threads,
-    const float nms_overlap_threshold, const int num_box_corners,
-    const int num_output_box_feature, const int num_class)
+PostprocessCuda::PostprocessCuda(const float float_min, const float float_max,
+                                 const int num_anchor, const int num_class,
+                                 const float score_threshold,
+                                 const int num_threads,
+                                 const float nms_overlap_threshold,
+                                 const int num_box_corners,
+                                 const int num_output_box_feature)
     : float_min_(float_min),
       float_max_(float_max),
-      num_anchor_x_inds_(num_anchor_x_inds),
-      num_anchor_y_inds_(num_anchor_y_inds),
-      num_anchor_r_inds_(num_anchor_r_inds),
+      num_anchor_(num_anchor),
+      num_class_(num_class),
       score_threshold_(score_threshold),
       num_threads_(num_threads),
       nms_overlap_threshold_(nms_overlap_threshold),
       num_box_corners_(num_box_corners),
-      num_output_box_feature_(num_output_box_feature),
-      num_class_(num_class) {
+      num_output_box_feature_(num_output_box_feature) {
   nms_cuda_ptr_.reset(
       new NmsCuda(num_threads, num_box_corners, nms_overlap_threshold));
 }
@@ -212,20 +211,19 @@ void PostprocessCuda::DoPostprocessCuda(
     const float* dev_anchors_pz, const float* dev_anchors_dx,
     const float* dev_anchors_dy, const float* dev_anchors_dz,
     const float* dev_anchors_ro, float* dev_filtered_box,
-    float* dev_filtered_score, int* dev_filtered_label,
-    int* dev_filtered_dir, float* dev_box_for_nms,
-    int* dev_filter_count, std::vector<float>* out_detection,
-    std::vector<int>* out_label) {
-  filter_kernel<<<num_anchor_x_inds_ * num_anchor_r_inds_,
-                  num_anchor_y_inds_>>>(
+    float* dev_filtered_score, int* dev_filtered_label, int* dev_filtered_dir,
+    float* dev_box_for_nms, int* dev_filter_count,
+    std::vector<float>* out_detection, std::vector<int>* out_label) {
+  const int num_blocks_filter_kernel = DIVUP(num_anchor_, num_threads_);
+  filter_kernel<<<num_blocks_filter_kernel, num_threads_>>>(
       rpn_box_output, rpn_cls_output, rpn_dir_output, dev_anchor_mask,
       dev_anchors_px, dev_anchors_py, dev_anchors_pz, dev_anchors_dx,
       dev_anchors_dy, dev_anchors_dz, dev_anchors_ro, dev_filtered_box,
-      dev_filtered_score, dev_filtered_label, dev_filtered_dir,
-      dev_box_for_nms, dev_filter_count, float_min_, float_max_,
-      score_threshold_, num_box_corners_, num_output_box_feature_, num_class_);
+      dev_filtered_score, dev_filtered_label, dev_filtered_dir, dev_box_for_nms,
+      dev_filter_count, float_min_, float_max_, score_threshold_,
+      num_box_corners_, num_output_box_feature_, num_class_);
 
-  int host_filter_count[1];
+  int host_filter_count[1] = {0};
   GPU_CHECK(cudaMemcpy(host_filter_count, dev_filter_count, sizeof(int),
                        cudaMemcpyDeviceToHost));
   if (host_filter_count[0] == 0) {
@@ -261,7 +259,7 @@ void PostprocessCuda::DoPostprocessCuda(
       dev_sorted_box_for_nms, num_box_corners_, num_output_box_feature_);
 
   int keep_inds[host_filter_count[0]];
-  keep_inds[0] = 0;
+  memset(keep_inds, 0, host_filter_count[0] * sizeof(int));
   int out_num_objects = 0;
   nms_cuda_ptr_->DoNmsCuda(host_filter_count[0], dev_sorted_box_for_nms,
                            keep_inds, &out_num_objects);
@@ -279,7 +277,7 @@ void PostprocessCuda::DoPostprocessCuda(
   GPU_CHECK(cudaMemcpy(host_filtered_dir, dev_sorted_filtered_dir,
                        host_filter_count[0] * sizeof(int),
                        cudaMemcpyDeviceToHost));
-  for (size_t i = 0; i < out_num_objects; i++) {
+  for (size_t i = 0; i < out_num_objects; ++i) {
     out_detection->push_back(
         host_filtered_box[keep_inds[i] * num_output_box_feature_ + 0]);
     out_detection->push_back(

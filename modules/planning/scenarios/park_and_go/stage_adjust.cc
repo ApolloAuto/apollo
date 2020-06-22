@@ -17,7 +17,6 @@
 #include "modules/planning/scenarios/park_and_go/stage_adjust.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -49,7 +48,7 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
       scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
 
   bool is_end_of_trajectory = false;
-  const auto& history_frame = FrameHistory::Instance()->Latest();
+  const auto& history_frame = injector_->frame_history()->Latest();
   if (history_frame) {
     const auto& trajectory_points =
         history_frame->current_frame_planned_trajectory().trajectory_point();
@@ -79,7 +78,7 @@ Stage::StageStatus ParkAndGoStageAdjust::FinishStage() {
 }
 
 void ParkAndGoStageAdjust::ResetInitPostion() {
-  auto* park_and_go_status = PlanningContext::Instance()
+  auto* park_and_go_status = injector_->planning_context()
                                  ->mutable_planning_status()
                                  ->mutable_park_and_go();
   park_and_go_status->mutable_adc_init_position()->set_x(

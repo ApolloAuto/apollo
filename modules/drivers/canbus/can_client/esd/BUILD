@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,6 +8,7 @@ cc_library(
     srcs = ["esd_can_client.cc"],
     hdrs = ["esd_can_client.h"],
     deps = [
+        "//modules/common/proto:error_code_cc_proto",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client",
         "//third_party/can_card_library/esd_can",

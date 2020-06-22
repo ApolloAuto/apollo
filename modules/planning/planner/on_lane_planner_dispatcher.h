@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 
@@ -39,7 +38,9 @@ class OnLanePlannerDispatcher final : public PlannerDispatcher {
   OnLanePlannerDispatcher() = default;
   virtual ~OnLanePlannerDispatcher() = default;
 
-  std::unique_ptr<Planner> DispatchPlanner() override;
+  std::unique_ptr<Planner> DispatchPlanner(
+      const PlanningConfig& planning_config,
+      const std::shared_ptr<DependencyInjector>& injector) override;
 };
 
 }  // namespace planning

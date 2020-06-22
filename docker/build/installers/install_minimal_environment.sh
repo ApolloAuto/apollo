@@ -22,71 +22,92 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 MY_GEO=$1; shift
+ARCH="$(uname -m)"
 
 ##----------------------------##
 ##  APT sources.list settings |
 ##----------------------------##
+. /tmp/installers/installer_base.sh
 
-if [ "$MY_GEO" == "cn" ]; then
-    cp -f /tmp/installers/sources.list.cn /etc/apt/sources.list
-    sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
-else
-    sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+if [[ "${ARCH}" == "x86_64" ]]; then
+    if [[ "${MY_GEO}" == "cn" ]]; then
+        cp -f "${RCFILES_DIR}/sources.list.cn.x86_64" /etc/apt/sources.list
+        # sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
+    else
+        sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+    fi
+else # aarch64
+    if [[ "${MY_GEO}" == "cn" ]]; then
+        cp -f "${RCFILES_DIR}/sources.list.cn.aarch64" /etc/apt/sources.list
+    fi
 fi
 
 apt-get -y update && \
     apt-get install -y --no-install-recommends \
     apt-utils
 
+# Disabled:
+#   apt-file
+
 apt-get -y update && \
     apt-get -y install -y --no-install-recommends \
     build-essential \
-    autotools-dev \
-    apt-file \
-    bc \
-    gcc-7 \
-    g++-7 \
-    gdb \
-    wget \
-    curl \
-    git \
-    vim \
-    lsof \
-    tree \
-    lcov \
-    pkg-config \
-    python \
-    python-dev \
-    python-pip \
-    python3 \
+    autoconf \
+    automake \
+    bc      \
+    curl    \
+    file    \
+    gawk    \
+    gcc-7   \
+    g++-7   \
+    gdb     \
+    git     \
+    libtool \
+    less    \
+    lsof    \
+    patch   \
+    pkg-config  \
+    python3     \
     python3-dev \
     python3-pip \
-    shellcheck \
-    cppcheck \
-    openssh-client \
+    sed         \
     software-properties-common \
-    unzip \
-    zip
+    sudo    \
+    unzip   \
+    wget    \
+    zip     \
+    xz-utils
 
+##----------------##
+##    SUDO        ##
+##----------------##
+sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
+
+##
 ##----------------##
 ## Python Setings |
 ##----------------##
 
-if [[ "$GEOLOC" == "cn" ]]; then
-    # Mirror from Tsinghua Univ.
-    PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
-    pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
-    pip config set global.index-url "$PYPI_MIRROR"
-    python3 -m pip install --no-cache-dir -i "$PYPI_MIRROR" pip -U
-    python3 -m pip config set global.index-url "$PYPI_MIRROR"
+if [[ "${MY_GEO}" == "cn" ]]; then
+    if [[ "${ARCH}" == "x86_64" ]]; then
+        # Mirror from Tsinghua Univ.
+        PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
+        pip3_install -i "$PYPI_MIRROR" pip -U
+        python3 -m pip config set global.index-url "$PYPI_MIRROR"
+    else
+        info "Use default PYPI mirror: https://pypi.org/simple for ${ARCH} for ${MY_GEO}"
+        pip3_install pip -U
+    fi
 else
-    pip install --no-cache-dir pip -U
-    python3 -m pip install --no-cache-dir pip -U
+    pip3_install pip -U
 fi
 
-pip install --no-cache-dir setuptools
-python3 -m pip install --no-cache-dir setuptools
+pip3_install -U setuptools
+pip3_install -U wheel
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
+# Kick down the ladder
+apt-get -y autoremove python3-pip
 
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

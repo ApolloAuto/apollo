@@ -20,8 +20,6 @@
 
 DECLARE_bool(planning_test_mode);
 
-DECLARE_string(planning_config_file);
-
 DECLARE_int32(history_max_record_num);
 DECLARE_int32(max_frame_history_num);
 
@@ -270,8 +268,9 @@ DECLARE_bool(use_front_axe_center_in_path_planning);
 DECLARE_bool(use_road_boundary_from_map);
 
 // learning related
+DECLARE_int32(planning_learning_mode);
 DECLARE_string(planning_data_dir);
 DECLARE_string(planning_offline_bags);
-DECLARE_int32(planning_offline_mode);
 DECLARE_int32(learning_data_obstacle_history_time_sec);
 DECLARE_int32(learning_data_frame_num_per_file);
+DECLARE_string(planning_birdview_img_feature_renderer_config_file);

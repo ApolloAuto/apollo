@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/planning/tuning/autotuning_raw_feature_generator.h"
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

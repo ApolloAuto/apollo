@@ -113,12 +113,9 @@ bool Visualizer::Init_all_info_single_camera(
     const std::string &visual_camera,
     const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
     const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const Eigen::Matrix4d &ex_lidar2imu,
-    const double pitch_adj_degree,
-    const double yaw_adj_degree,
-    const double roll_adj_degree,
-    const int image_height,
-    const int image_width) {
+    const Eigen::Matrix4d &ex_lidar2imu, const double pitch_adj_degree,
+    const double yaw_adj_degree, const double roll_adj_degree,
+    const int image_height, const int image_width) {
   image_height_ = image_height;
   image_width_ = image_width;
   intrinsic_map_ = intrinsic_map;
@@ -169,9 +166,9 @@ bool Visualizer::Init_all_info_single_camera(
     // rotate 90 degree around z axis to make x point forward
     // double imu_height = 0;  // imu height should be considred later
     ex_imu2car_ << 0, 1, 0, 0,  // cos(90), sin(90), 0,
-                  -1, 0, 0, 0,  // -sin(90),  cos(90), 0,
-                  0, 0, 1, 0,  // 0,              0, 1
-                  0, 0, 0, 1;
+        -1, 0, 0, 0,            // -sin(90),  cos(90), 0,
+        0, 0, 1, 0,             // 0,              0, 1
+        0, 0, 0, 1;
 
     // 3. transform camera->lidar->imu->car
     ex_camera2car_ = ex_imu2car_ * ex_camera2imu_;
@@ -252,20 +249,14 @@ bool Visualizer::adjust_angles(const std::string &camera_name,
   //  V
   //  Y
   Eigen::Matrix4d Rx;  // pitch
-  Rx << 1, 0, 0, 0,
-        0, cos(pitch_adj_radian), -sin(pitch_adj_radian), 0,
-        0, sin(pitch_adj_radian), cos(pitch_adj_radian), 0,
-        0, 0, 0, 1;
+  Rx << 1, 0, 0, 0, 0, cos(pitch_adj_radian), -sin(pitch_adj_radian), 0, 0,
+      sin(pitch_adj_radian), cos(pitch_adj_radian), 0, 0, 0, 0, 1;
   Eigen::Matrix4d Ry;  // yaw
-  Ry << cos(yaw_adj_radian), 0, sin(yaw_adj_radian), 0,
-        0, 1, 0, 0,
-        -sin(yaw_adj_radian), 0, cos(yaw_adj_radian), 0,
-        0, 0, 0, 1;
+  Ry << cos(yaw_adj_radian), 0, sin(yaw_adj_radian), 0, 0, 1, 0, 0,
+      -sin(yaw_adj_radian), 0, cos(yaw_adj_radian), 0, 0, 0, 0, 1;
   Eigen::Matrix4d Rz;  // roll
-  Rz << cos(roll_adj_radian), -sin(roll_adj_radian), 0, 0,
-        sin(roll_adj_radian), cos(roll_adj_radian), 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1;
+  Rz << cos(roll_adj_radian), -sin(roll_adj_radian), 0, 0, sin(roll_adj_radian),
+      cos(roll_adj_radian), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
   adjusted_camera2car_ = ex_camera2car_ * Rz * Ry * Rx;
   AWARN << "adjusted_camera2car_: " << adjusted_camera2car_;
@@ -434,17 +425,14 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quaternion,
 
   // Option 2. Rotation matrix to quaternion
   Eigen::Matrix3d Rx;  // pitch
-  Rx << 1, 0, 0,
-        0, cos(pitch_radian), -sin(pitch_radian),
-        0, sin(pitch_radian), cos(pitch_radian);
+  Rx << 1, 0, 0, 0, cos(pitch_radian), -sin(pitch_radian), 0, sin(pitch_radian),
+      cos(pitch_radian);
   Eigen::Matrix3d Ry;  // roll
-  Ry << cos(roll_radian), 0, sin(roll_radian),
-        0, 1, 0,
-        -sin(roll_radian), 0, cos(roll_radian);
+  Ry << cos(roll_radian), 0, sin(roll_radian), 0, 1, 0, -sin(roll_radian), 0,
+      cos(roll_radian);
   Eigen::Matrix3d Rz;  // yaw
-  Rz << cos(yaw_radian), -sin(yaw_radian), 0,
-        sin(yaw_radian), cos(yaw_radian), 0,
-        0, 0, 1;
+  Rz << cos(yaw_radian), -sin(yaw_radian), 0, sin(yaw_radian), cos(yaw_radian),
+      0, 0, 0, 1;
   Eigen::Matrix3d R;
   R = Rz * Ry * Rx;
   AINFO << "Rotation matrix R: " << R;
@@ -453,11 +441,9 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quaternion,
     (*quaternion)(0) = 0.25 * (R(2, 1) - R(1, 2)) / qw;  // Q.x
     (*quaternion)(1) = 0.25 * (R(0, 2) - R(2, 0)) / qw;  // Q.y
     (*quaternion)(2) = 0.25 * (R(1, 0) - R(0, 1)) / qw;  // Q.z
-    (*quaternion)(3) = qw;  // Q.w
-    AINFO << "quaternion(x, y, z, w): ("
-          << (*quaternion)(0) << ", "
-          << (*quaternion)(1) << ", "
-          << (*quaternion)(2) << ", "
+    (*quaternion)(3) = qw;                               // Q.w
+    AINFO << "quaternion(x, y, z, w): (" << (*quaternion)(0) << ", "
+          << (*quaternion)(1) << ", " << (*quaternion)(2) << ", "
           << (*quaternion)(3) << ")";
   } else {
     double qx = 0.5 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
@@ -469,10 +455,8 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quaternion,
     (*quaternion)(1) = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
     (*quaternion)(2) = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
     (*quaternion)(3) = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
-    AINFO << "second quaternion(x, y, z, w): ("
-          << (*quaternion)(0) << ", "
-          << (*quaternion)(1) << ", "
-          << (*quaternion)(2) << ", "
+    AINFO << "second quaternion(x, y, z, w): (" << (*quaternion)(0) << ", "
+          << (*quaternion)(1) << ", " << (*quaternion)(2) << ", "
           << (*quaternion)(3) << ")";
   }
   return true;
@@ -640,55 +624,72 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     case KEY_3:
       show_camera_box3d_ = !show_camera_box3d_;
       break;
-    case KEY_UPPER_A: case KEY_LOWER_A:
+    case KEY_UPPER_A:
+    case KEY_LOWER_A:
       capture_video_ = !capture_video_;
       break;
-    case KEY_UPPER_B: case KEY_LOWER_B:
+    case KEY_UPPER_B:
+    case KEY_LOWER_B:
       show_box_ = (show_box_ + 1) % 2;
       break;
-    case KEY_UPPER_C: case KEY_LOWER_C:
+    case KEY_UPPER_C:
+    case KEY_LOWER_C:
       use_class_color_ = !use_class_color_;
       break;
-    case KEY_UPPER_D: case KEY_LOWER_D:
+    case KEY_UPPER_D:
+    case KEY_LOWER_D:
       show_radar_pc_ = !show_radar_pc_;
       break;
-    case KEY_UPPER_E: case KEY_LOWER_E:
+    case KEY_UPPER_E:
+    case KEY_LOWER_E:
       draw_lane_objects_ = !draw_lane_objects_;
       break;
-    case KEY_UPPER_F: case KEY_LOWER_F:
+    case KEY_UPPER_F:
+    case KEY_LOWER_F:
       show_fusion_ = !show_fusion_;
       break;
-    case KEY_UPPER_G: case KEY_LOWER_G:
+    case KEY_UPPER_G:
+    case KEY_LOWER_G:
       show_vp_grid_ = !show_vp_grid_;
       break;
-    case KEY_UPPER_H: case KEY_LOWER_H:
+    case KEY_UPPER_H:
+    case KEY_LOWER_H:
       show_help_text_ = !show_help_text_;
       break;
-    case KEY_UPPER_I: case KEY_LOWER_I:
+    case KEY_UPPER_I:
+    case KEY_LOWER_I:
       show_type_id_label_ = !show_type_id_label_;
       break;
-    case KEY_UPPER_L: case KEY_LOWER_L:
+    case KEY_UPPER_L:
+    case KEY_LOWER_L:
       show_verbose_ = !show_verbose_;
       break;
-    case KEY_UPPER_O: case KEY_LOWER_O:
+    case KEY_UPPER_O:
+    case KEY_LOWER_O:
       show_camera_bdv_ = !show_camera_bdv_;
       break;
-    case KEY_UPPER_Q: case KEY_LOWER_Q:
+    case KEY_UPPER_Q:
+    case KEY_LOWER_Q:
       show_lane_count_ = (show_lane_count_ + 1) % 3;
       break;
-    case KEY_UPPER_R: case KEY_LOWER_R:
+    case KEY_UPPER_R:
+    case KEY_LOWER_R:
       reset_key();
       break;
-    case KEY_UPPER_S: case KEY_LOWER_S:
+    case KEY_UPPER_S:
+    case KEY_LOWER_S:
       capture_screen_ = true;
       break;
-    case KEY_UPPER_T: case KEY_LOWER_T:
+    case KEY_UPPER_T:
+    case KEY_LOWER_T:
       show_trajectory_ = !show_trajectory_;
       break;
-    case KEY_UPPER_V: case KEY_LOWER_V:
+    case KEY_UPPER_V:
+    case KEY_LOWER_V:
       show_velocity_ = (show_velocity_ + 1) % 2;
       break;
-    case KEY_UP_NUM_LOCK_ON: case KEY_UP:
+    case KEY_UP_NUM_LOCK_ON:
+    case KEY_UP:
       if (manual_calibration_mode_ &&
           pitch_adj_degree_[camera_name] + 0.05 <= max_pitch_degree_) {
         pitch_adj_degree_[camera_name] -= 0.05;
@@ -697,7 +698,8 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
       }
       AINFO << "Current pitch: " << pitch_adj_degree_[camera_name];
       break;
-    case KEY_DOWN_NUM_LOCK_ON: case KEY_DOWN:
+    case KEY_DOWN_NUM_LOCK_ON:
+    case KEY_DOWN:
       if (manual_calibration_mode_ &&
           pitch_adj_degree_[camera_name] - 0.05 >= min_pitch_degree_) {
         pitch_adj_degree_[camera_name] += 0.05;
@@ -706,48 +708,52 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
       }
       AINFO << "Current pitch: " << pitch_adj_degree_[camera_name];
       break;
-    case KEY_RIGHT_NUM_LOCK_ON: case KEY_RIGHT:
+    case KEY_RIGHT_NUM_LOCK_ON:
+    case KEY_RIGHT:
       if (manual_calibration_mode_ &&
           yaw_adj_degree_[camera_name] + 0.05 <= max_yaw_degree_) {
         yaw_adj_degree_[camera_name] -= 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_[camera_name];
       break;
-    case KEY_LEFT_NUM_LOCK_ON: case KEY_LEFT:
+    case KEY_LEFT_NUM_LOCK_ON:
+    case KEY_LEFT:
       if (manual_calibration_mode_ &&
           yaw_adj_degree_[camera_name] - 0.05 >= min_yaw_degree_) {
         yaw_adj_degree_[camera_name] += 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_[camera_name];
       break;
-    case KEY_SHIFT_LEFT_NUM_LOCK_ON: case KEY_SHIFT_RIGHT:
+    case KEY_SHIFT_LEFT_NUM_LOCK_ON:
+    case KEY_SHIFT_RIGHT:
       if (manual_calibration_mode_ &&
           roll_adj_degree_[camera_name] + 0.05 <= max_roll_degree_) {
         roll_adj_degree_[camera_name] -= 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_[camera_name];
       break;
-    case KEY_SHIFT_RIGHT_NUM_LOCK_ON: case KEY_SHIFT_LEFT:
+    case KEY_SHIFT_RIGHT_NUM_LOCK_ON:
+    case KEY_SHIFT_LEFT:
       if (manual_calibration_mode_ &&
           roll_adj_degree_[camera_name] - 0.05 >= min_roll_degree_) {
         roll_adj_degree_[camera_name] += 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_[camera_name];
       break;
-    case KEY_CTRL_S_NUM_LOCK_ON:  case KEY_CTRL_S:
+    case KEY_CTRL_S_NUM_LOCK_ON:
+    case KEY_CTRL_S:
       if (manual_calibration_mode_) {
         save_manual_calibration_parameter(
-            visual_camera_,
-            pitch_adj_degree_[camera_name],
-            yaw_adj_degree_[camera_name],
-            roll_adj_degree_[camera_name]);
+            visual_camera_, pitch_adj_degree_[camera_name],
+            yaw_adj_degree_[camera_name], roll_adj_degree_[camera_name]);
         AINFO << "Saved calibration parameters(pyr): ("
-              << pitch_adj_degree_[camera_name]
-              << ", " << yaw_adj_degree_[camera_name] << ", "
+              << pitch_adj_degree_[camera_name] << ", "
+              << yaw_adj_degree_[camera_name] << ", "
               << roll_adj_degree_[camera_name] << ")";
       }
       break;
-    case KEY_ALT_C_NUM_LOCK_ON: case KEY_ALT_C:
+    case KEY_ALT_C_NUM_LOCK_ON:
+    case KEY_ALT_C:
       manual_calibration_mode_ = !manual_calibration_mode_;
 
     default:
@@ -833,8 +839,7 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     case KEY_SHIFT_LEFT:
     case KEY_SHIFT_RIGHT:
       if (manual_calibration_mode_) {
-        adjust_angles(camera_name,
-                      pitch_adj_degree_[camera_name],
+        adjust_angles(camera_name, pitch_adj_degree_[camera_name],
                       yaw_adj_degree_[camera_name],
                       roll_adj_degree_[camera_name]);
         if (show_help_text_) {
@@ -1001,12 +1006,9 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
 }
 
 void Visualizer::Draw2Dand3D_all_info_single_camera(
-    const std::string &camera_name,
-    const cv::Mat &img,
-    const CameraFrame &frame,
-    const Eigen::Matrix3d &intrinsic,
-    const Eigen::Matrix4d &extrinsic,
-    const Eigen::Affine3d &world2camera,
+    const std::string &camera_name, const cv::Mat &img,
+    const CameraFrame &frame, const Eigen::Matrix3d &intrinsic,
+    const Eigen::Matrix4d &extrinsic, const Eigen::Affine3d &world2camera,
     const base::MotionBufferPtr motion_buffer) {
   cv::Mat image_2D = img.clone();  // All clone should be replaced with global
 
@@ -1161,9 +1163,8 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
 
     if (show_camera_box3d_) {
       Eigen::Matrix3d rotate_ry;
-      rotate_ry << cos(theta), 0, sin(theta),
-                   0, 1, 0,
-                   -sin(theta), 0, cos(theta);
+      rotate_ry << cos(theta), 0, sin(theta), 0, 1, 0, -sin(theta), 0,
+          cos(theta);
       std::vector<Eigen::Vector3d> p(8);
       std::vector<Eigen::Vector3d> proj(8);
       std::vector<cv::Point> p_proj(8);
@@ -1306,11 +1307,10 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       cipv_options.velocity = motion_buffer->back().velocity;
       cipv_options.yaw_rate = motion_buffer->back().yaw_rate;
     }
-    Cipv::MakeVirtualEgoLaneFromYawRate(cipv_options.yaw_rate,
-                                        cipv_options.velocity,
-                                        kMaxVehicleWidthInMeter * 0.5,
-                                        &virtual_egolane_ground.left_line,
-                                        &virtual_egolane_ground.right_line);
+    Cipv::MakeVirtualEgoLaneFromYawRate(
+        cipv_options.yaw_rate, cipv_options.velocity,
+        kMaxVehicleWidthInMeter * 0.5, &virtual_egolane_ground.left_line,
+        &virtual_egolane_ground.right_line);
     // Left ego lane
     Eigen::Vector2d p_prev_ground;
     p_prev_ground(0) = virtual_egolane_ground.left_line.line_point[0](0);

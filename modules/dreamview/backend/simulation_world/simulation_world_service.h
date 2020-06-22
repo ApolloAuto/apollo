@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
-
 #include <algorithm>
 #include <list>
 #include <memory>
@@ -30,6 +27,9 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest_prod.h"
@@ -167,9 +167,15 @@ class SimulationWorldService {
 
   Object &CreateWorldObjectIfAbsent(
       const apollo::perception::PerceptionObstacle &obstacle);
+  void CreateWorldObjectFromSensorMeasurement(
+      const apollo::perception::SensorMeasurement &sensor,
+      Object *world_object);
   void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
                        Object *world_object);
   void SetObstaclePolygon(
+      const apollo::perception::PerceptionObstacle &obstacle,
+      Object *world_object);
+  void SetObstacleSensorMeasurements(
       const apollo::perception::PerceptionObstacle &obstacle,
       Object *world_object);
   void UpdatePlanningTrajectory(
@@ -294,8 +300,8 @@ class SimulationWorldService {
       return;
     }
 
-    for (size_t i = 0; i + 1 < points.size(); i += downsampleInterval) {
-      *downsampled_points->Add() = points[static_cast<int>(i)];
+    for (int i = 0; i + 1 < points.size(); i += downsampleInterval) {
+      *downsampled_points->Add() = points[i];
     }
 
     // add the last point

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 cc_library(
@@ -6,10 +7,10 @@ cc_library(
     hdrs = ["msg_exporter.h"],
     deps = [
         "//cyber",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/perception/lidar/common:pcl_util",
         "//modules/perception/onboard/transform_wrapper",
-        "//modules/transform/proto:transform_proto",
         "@com_google_absl//absl/strings",
         "@opencv",
     ],
@@ -20,6 +21,8 @@ cc_binary(
     srcs = ["msg_exporter_main.cc"],
     deps = [
         ":msgexporterlib",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
         "@com_google_absl//absl/strings",
     ],
 )

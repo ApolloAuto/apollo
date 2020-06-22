@@ -283,7 +283,7 @@ bool FemPosDeviationOsqpInterface::OptimizeWithOsqp(
   data->l = lower_bounds->data();
   data->u = upper_bounds->data();
 
-  *work = osqp_setup(data, settings);
+  osqp_setup(work, data, settings);
 
   osqp_warm_start_x(*work, primal_warm_start->data());
 

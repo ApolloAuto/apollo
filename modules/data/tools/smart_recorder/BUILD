@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -36,7 +37,7 @@ cc_library(
         "//cyber/record:record_reader",
         "//cyber/record:record_viewer",
         "//cyber/tools/cyber_recorder:recorder",
-        "//modules/data/tools/smart_recorder/proto:smart_recorder_status_proto",
+        "//modules/data/tools/smart_recorder/proto:smart_recorder_status_cc_proto",
         "//modules/monitor/common:monitor_manager",
     ],
 )
@@ -75,7 +76,7 @@ cc_library(
     deps = [
         ":trigger_base",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/proto:drive_event_proto",
+        "//modules/common/proto:drive_event_cc_proto",
     ],
 )
 
@@ -85,9 +86,9 @@ cc_library(
     hdrs = ["emergency_mode_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/control/proto:control_proto",
+        "//modules/control/proto:control_cmd_cc_proto",
     ],
 )
 
@@ -97,9 +98,9 @@ cc_library(
     hdrs = ["hard_brake_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/control/proto:control_proto",
+        "//modules/control/proto:control_cmd_cc_proto",
     ],
 )
 
@@ -119,9 +120,9 @@ cc_library(
     hdrs = ["swerve_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/control/proto:control_proto",
+        "//modules/control/proto:control_cmd_cc_proto",
     ],
 )
 
@@ -141,7 +142,7 @@ cc_library(
     deps = [
         ":interval_pool",
         "//cyber/record:record_message",
-        "//modules/data/tools/smart_recorder/proto:smart_recorder_triggers_proto",
+        "//modules/data/tools/smart_recorder/proto:smart_recorder_triggers_cc_proto",
     ],
 )
 

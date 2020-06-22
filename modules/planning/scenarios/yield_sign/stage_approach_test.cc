@@ -16,10 +16,9 @@
 
 #include "modules/planning/scenarios/yield_sign/stage_approach.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -31,14 +30,16 @@ class YieldSignStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::YIELD_SIGN_APPROACH);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(YieldSignStageApproachTest, Init) {
-  YieldSignStageApproach yield_sign_stage_approach(config_);
+  YieldSignStageApproach yield_sign_stage_approach(config_, injector_);
   EXPECT_EQ(
       yield_sign_stage_approach.Name(),
       ScenarioConfig::StageType_Name(ScenarioConfig::YIELD_SIGN_APPROACH));

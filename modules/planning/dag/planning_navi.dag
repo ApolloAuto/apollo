@@ -5,6 +5,7 @@ module_config {
     class_name : "PlanningComponent"
     config {
       name: "planning"
+      config_file_path:  "/apollo/modules/planning/conf/planning_config_navi.pb.txt"
       flag_file_path:  "/apollo/modules/planning/conf/planning_navi.conf"
       readers: [
         {

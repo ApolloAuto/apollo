@@ -1,7 +1,7 @@
 syntax = "proto2";
 
-import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/fem_pos_deviation_smoother_config.proto";
+import "modules/planning/proto/task_config.proto";
 
 package apollo.planning;
 
@@ -67,7 +67,7 @@ message WarmStartConfig {
   // Grid a star for heuristic
   optional double grid_a_star_xy_resolution = 15 [default = 0.1];
   optional double node_radius = 16 [default = 0.5];
-  optional PiecewiseJerkSpeedConfig s_curve_config = 17;
+  optional PiecewiseJerkSpeedOptimizerConfig s_curve_config = 17;
 }
 
 message DualVariableWarmStartConfig {
@@ -162,7 +162,7 @@ message IterativeAnchoringConfig {
   optional double max_reverse_acc = 13 [default = 2.0];
   optional double max_acc_jerk = 14 [default = 4.0];
   optional double delta_t = 15 [default = 0.2];
-  optional PiecewiseJerkSpeedConfig s_curve_config = 16;
+  optional PiecewiseJerkSpeedOptimizerConfig s_curve_config = 16;
 }
 
 message TrajectoryPartitionConfig {

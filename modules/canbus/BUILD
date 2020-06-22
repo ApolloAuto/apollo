@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,7 +19,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/guardian/proto:guardian_proto",
+        "//modules/guardian/proto:guardian_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

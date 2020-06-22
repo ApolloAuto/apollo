@@ -98,11 +98,10 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   // Build input features for torch
   std::vector<torch::jit::IValue> torch_inputs;
+
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
-       std::move(obstacle_pos_step.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+       std::move(obstacle_pos_step.to(device_))}));
 
   // Compute pred_traj
   std::vector<double> pred_traj;
@@ -110,8 +109,9 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
   auto start_time = std::chrono::system_clock::now();
   at::Tensor torch_output_tensor = torch_default_output_tensor_;
   if (obstacle_ptr->IsPedestrian()) {
-    torch_output_tensor = torch_pedestrian_model_.forward(torch_inputs).
-                          toTensor().to(torch::kCPU);
+    torch_output_tensor = torch_pedestrian_model_.forward(torch_inputs)
+                              .toTensor()
+                              .to(torch::kCPU);
   } else {
     torch_output_tensor =
         torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
@@ -140,9 +140,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double dx = static_cast<double>(torch_output[0][i][0]);
     double dy = static_cast<double>(torch_output[0][i][1]);
-    double sigma_xr = std::abs(static_cast<double>(torch_output[0][i][2]));
-    double sigma_yr = std::abs(static_cast<double>(torch_output[0][i][3]));
-    double corr_r = static_cast<double>(torch_output[0][i][4]);
+
     double heading = latest_feature_ptr->velocity_heading();
     Vec2d offset(dx, dy);
     Vec2d rotated_offset = offset.rotate(heading);
@@ -151,41 +149,47 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     point->mutable_path_point()->set_x(point_x);
     point->mutable_path_point()->set_y(point_y);
 
-    Eigen::Matrix2d cov_matrix_r;
-    cov_matrix_r(0, 0) = sigma_xr * sigma_xr;
-    cov_matrix_r(0, 1) = corr_r * sigma_xr * sigma_yr;
-    cov_matrix_r(1, 0) = corr_r * sigma_xr * sigma_yr;
-    cov_matrix_r(1, 1) = sigma_yr * sigma_yr;
+    if (torch_output_tensor.sizes()[2] == 5) {
+      double sigma_xr = std::abs(static_cast<double>(torch_output[0][i][2]));
+      double sigma_yr = std::abs(static_cast<double>(torch_output[0][i][3]));
+      double corr_r = static_cast<double>(torch_output[0][i][4]);
+      Eigen::Matrix2d cov_matrix_r;
+      cov_matrix_r(0, 0) = sigma_xr * sigma_xr;
+      cov_matrix_r(0, 1) = corr_r * sigma_xr * sigma_yr;
+      cov_matrix_r(1, 0) = corr_r * sigma_xr * sigma_yr;
+      cov_matrix_r(1, 1) = sigma_yr * sigma_yr;
 
-    Eigen::Matrix2d rotation_matrix;
-    rotation_matrix(0, 0) = std::cos(heading);
-    rotation_matrix(0, 1) = -std::sin(heading);
-    rotation_matrix(1, 0) = std::sin(heading);
-    rotation_matrix(1, 1) = std::cos(heading);
+      Eigen::Matrix2d rotation_matrix;
+      rotation_matrix(0, 0) = std::cos(heading);
+      rotation_matrix(0, 1) = -std::sin(heading);
+      rotation_matrix(1, 0) = std::sin(heading);
+      rotation_matrix(1, 1) = std::cos(heading);
 
-    Eigen::Matrix2d cov_matrix;
-    cov_matrix = rotation_matrix * cov_matrix_r * (rotation_matrix.transpose());
-    double sigma_x = std::sqrt(std::abs(cov_matrix(0, 0)));
-    double sigma_y = std::sqrt(std::abs(cov_matrix(1, 1)));
-    double corr = cov_matrix(0, 1) / (sigma_x + FLAGS_double_precision) /
-                  (sigma_y + FLAGS_double_precision);
+      Eigen::Matrix2d cov_matrix;
+      cov_matrix =
+          rotation_matrix * cov_matrix_r * (rotation_matrix.transpose());
+      double sigma_x = std::sqrt(std::abs(cov_matrix(0, 0)));
+      double sigma_y = std::sqrt(std::abs(cov_matrix(1, 1)));
+      double corr = cov_matrix(0, 1) / (sigma_x + FLAGS_double_precision) /
+                    (sigma_y + FLAGS_double_precision);
 
-    point->mutable_gaussian_info()->set_sigma_x(sigma_x);
-    point->mutable_gaussian_info()->set_sigma_y(sigma_y);
-    point->mutable_gaussian_info()->set_correlation(corr);
+      point->mutable_gaussian_info()->set_sigma_x(sigma_x);
+      point->mutable_gaussian_info()->set_sigma_y(sigma_y);
+      point->mutable_gaussian_info()->set_correlation(corr);
 
-    if (i > 0) {
-      Eigen::EigenSolver<Eigen::Matrix2d> eigen_solver(cov_matrix);
-      const auto& eigen_values = eigen_solver.eigenvalues();
-      const auto& eigen_vectors = eigen_solver.eigenvectors();
-      point->mutable_gaussian_info()->set_ellipse_a(
-          std::sqrt(std::abs(eigen_values(0).real())));
-      point->mutable_gaussian_info()->set_ellipse_b(
-          std::sqrt(std::abs(eigen_values(1).real())));
-      double cos_theta_a = eigen_vectors(0, 0).real();
-      double sin_theta_a = eigen_vectors(1, 0).real();
-      point->mutable_gaussian_info()->set_theta_a(
-          std::atan2(sin_theta_a, cos_theta_a));
+      if (i > 0) {
+        Eigen::EigenSolver<Eigen::Matrix2d> eigen_solver(cov_matrix);
+        const auto& eigen_values = eigen_solver.eigenvalues();
+        const auto& eigen_vectors = eigen_solver.eigenvectors();
+        point->mutable_gaussian_info()->set_ellipse_a(
+            std::sqrt(std::abs(eigen_values(0).real())));
+        point->mutable_gaussian_info()->set_ellipse_b(
+            std::sqrt(std::abs(eigen_values(1).real())));
+        double cos_theta_a = eigen_vectors(0, 0).real();
+        double sin_theta_a = eigen_vectors(1, 0).real();
+        point->mutable_gaussian_info()->set_theta_a(
+            std::atan2(sin_theta_a, cos_theta_a));
+      }
     }
 
     if (i < 10) {  // use origin heading for the first second
@@ -254,11 +258,10 @@ void SemanticLSTMEvaluator::LoadModel() {
   torch::Tensor obstacle_pos = torch::zeros({1, 20, 2});
   torch::Tensor obstacle_pos_step = torch::zeros({1, 20, 2});
   std::vector<torch::jit::IValue> torch_inputs;
+
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
-       std::move(obstacle_pos_step.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+       std::move(obstacle_pos_step.to(device_))}));
   // Run one inference to avoid very slow first inference later
   torch_default_output_tensor_ =
       torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);

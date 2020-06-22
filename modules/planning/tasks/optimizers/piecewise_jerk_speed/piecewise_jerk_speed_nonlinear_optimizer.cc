@@ -20,11 +20,11 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
-#include <coin/IpIpoptApplication.hpp>
-#include <coin/IpSolveStatistics.hpp>
-
 #include <algorithm>
 #include <string>
+
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -49,7 +49,7 @@ PiecewiseJerkSpeedNonlinearOptimizer::PiecewiseJerkSpeedNonlinearOptimizer(
     : SpeedOptimizer(config),
       smoothed_speed_limit_(0.0, 0.0, 0.0),
       smoothed_path_curvature_(0.0, 0.0, 0.0) {
-  ACHECK(config_.has_piecewise_jerk_nonlinear_speed_config());
+  ACHECK(config_.has_piecewise_jerk_nonlinear_speed_optimizer_config());
 }
 
 Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
@@ -438,7 +438,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
   // TODO(Jinyun): parameter tunnings
-  const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
+  const auto& config =
+      config_.piecewise_jerk_nonlinear_speed_optimizer_config();
   piecewise_jerk_problem.set_weight_x(0.0);
   piecewise_jerk_problem.set_weight_dx(0.0);
   piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
@@ -480,7 +481,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
   ptr_interface->set_safety_bounds(s_bounds_);
 
   // Set weights and reference values
-  const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
+  const auto& config =
+      config_.piecewise_jerk_nonlinear_speed_optimizer_config();
 
   ptr_interface->set_curvature_curve(smoothed_path_curvature_);
 

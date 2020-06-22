@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,6 +14,7 @@ cc_library(
         "//modules/common/util:point_factory",
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/core",
+        "//modules/routing/proto:routing_config_cc_proto",
     ],
 )
 

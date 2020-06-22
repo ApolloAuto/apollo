@@ -56,6 +56,7 @@
 // headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/anchor_mask_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/common.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/params.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/postprocess_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points_cuda.h"
@@ -101,17 +102,25 @@ class Logger : public nvinfer1::ILogger {
 class PointPillars {
  private:
   friend class TestClass;
+  static const float kPillarXSize;
+  static const float kPillarYSize;
+  static const float kPillarZSize;
+  static const float kMinXRange;
+  static const float kMinYRange;
+  static const float kMinZRange;
+  static const float kMaxXRange;
+  static const float kMaxYRange;
+  static const float kMaxZRange;
+  static const float kSensorHeight;
   static const int kNumClass;
   static const int kMaxNumPillars;
   static const int kMaxNumPointsPerPillar;
+  static const int kNumPointFeature;
   static const int kPfeOutputSize;
   static const int kGridXSize;
   static const int kGridYSize;
   static const int kGridZSize;
   static const int kRpnInputSize;
-  static const int kNumAnchorXInds;
-  static const int kNumAnchorYInds;
-  static const int kNumAnchorRInds;
   static const int kNumAnchor;
   static const int kNumOutputBoxFeature;
   static const int kRpnBoxOutputSize;
@@ -123,19 +132,14 @@ class PointPillars {
   // if you change kNumThreads, need to modify NUM_THREADS_MACRO in
   // common.h
   static const int kNumBoxCorners;
-  static const float kPillarXSize;
-  static const float kPillarYSize;
-  static const float kPillarZSize;
-  static const float kMinXRange;
-  static const float kMinYRange;
-  static const float kMinZRange;
-  static const float kMaxXRange;
-  static const float kMaxYRange;
-  static const float kMaxZRange;
-  static const float kSensorHeight;
-  static const float kAnchorDxSize;
-  static const float kAnchorDySize;
-  static const float kAnchorDzSize;
+  static const std::vector<int> kAnchorStrides;
+  static const std::vector<int> kAnchorRanges;
+  static const std::vector<int> kNumAnchorSets;
+  static const std::vector<std::vector<float>> kAnchorDxSizes;
+  static const std::vector<std::vector<float>> kAnchorDySizes;
+  static const std::vector<std::vector<float>> kAnchorDzSizes;
+  static const std::vector<std::vector<int>> kNumAnchorRo;
+  static const std::vector<std::vector<float>> kAnchorRo;
 
   // initialize in initializer list
   const bool reproduce_result_mode_;
@@ -160,13 +164,6 @@ class PointPillars {
   float* box_anchors_max_x_;
   float* box_anchors_max_y_;
 
-  // cuda malloc
-  float* dev_pillar_x_in_coors_;
-  float* dev_pillar_y_in_coors_;
-  float* dev_pillar_z_in_coors_;
-  float* dev_pillar_i_in_coors_;
-  int* dev_pillar_count_histo_;
-
   int* dev_x_coors_;
   int* dev_y_coors_;
   float* dev_num_points_per_pillar_;
@@ -174,14 +171,8 @@ class PointPillars {
   int* dev_cumsum_along_x_;
   int* dev_cumsum_along_y_;
 
-  float* dev_pillar_x_;
-  float* dev_pillar_y_;
-  float* dev_pillar_z_;
-  float* dev_pillar_i_;
-
-  float* dev_x_coors_for_sub_shaped_;
-  float* dev_y_coors_for_sub_shaped_;
-  float* dev_pillar_feature_mask_;
+  float* dev_pillar_point_feature_;
+  float* dev_pillar_coors_;
 
   float* dev_box_anchors_min_x_;
   float* dev_box_anchors_min_y_;
@@ -189,7 +180,7 @@ class PointPillars {
   float* dev_box_anchors_max_y_;
   int* dev_anchor_mask_;
 
-  void* pfe_buffers_[9];
+  void* pfe_buffers_[4];
   void* rpn_buffers_[4];
 
   float* dev_scattered_feature_;
@@ -274,7 +265,7 @@ class PointPillars {
 
   /**
    * @brief Preproces points
-   * @param[in] in_points_array pointcloud array
+   * @param[in] in_points_array Point cloud array
    * @param[in] in_num_points Number of points
    * @details Call CPU or GPU preprocess
    */
@@ -282,7 +273,7 @@ class PointPillars {
 
   /**
    * @brief Preproces by CPU
-   * @param[in] in_points_array pointcloud array
+   * @param[in] in_points_array Point cloud array
    * @param[in] in_num_points Number of points
    * @details The output from preprocessCPU is reproducible, while preprocessGPU
    * is not
@@ -291,34 +282,29 @@ class PointPillars {
 
   /**
    * @brief Preproces by GPU
-   * @param[in] in_points_array pointcloud array
+   * @param[in] in_points_array Point cloud array
    * @param[in] in_num_points Number of points
-   * @details Faster preprocess comapared with CPU preprocess
+   * @details Faster preprocess compared with CPU preprocess
    */
   void PreprocessGPU(const float* in_points_array, const int in_num_points);
 
   /**
    * @brief Convert anchors to box form like min_x, min_y, max_x, max_y anchors
-   * @param[in] anchors_px_ Represents x-coordinate value for a corresponding
-   * anchor
-   * @param[in] anchors_py_ Represents y-coordinate value for a corresponding
-   * anchor
-   * @param[in] anchors_dx_ Represents x-dimension value for a corresponding
-   * anchor
-   * @param[in] anchors_dy_ Represents y-dimension value for a corresponding
-   * anchor
-   * @param[in] box_anchors_min_x_ Represents minimum x value for a
-   * correspomding anchor
-   * @param[in] box_anchors_min_y_ Represents minimum y value for a
-   * correspomding anchor
-   * @param[in] box_anchors_max_x_ Represents maximum x value for a
-   * correspomding anchor
-   * @param[in] box_anchors_max_y_ Represents maximum y value for a
-   * correspomding anchor
+   * @param[in] anchors_px_
+   *   Represents x-coordinate value for a corresponding anchor
+   * @param[in] anchors_py_
+   *   Represents y-coordinate value for a corresponding anchor
+   * @param[in] box_anchors_min_x_
+   *   Represents minimum x value for a corresponding anchor
+   * @param[in] box_anchors_min_y_
+   *   Represents minimum y value for a corresponding anchor
+   * @param[in] box_anchors_max_x_
+   *   Represents maximum x value for a corresponding anchor
+   * @param[in] box_anchors_max_y_
+   *   Represents maximum y value for a corresponding anchor
    * @details Make box anchors for nms
    */
   void ConvertAnchors2BoxAnchors(float* anchors_px_, float* anchors_py_,
-                                 float* anchors_dx_, float* anchors_dy_,
                                  float* box_anchors_min_x_,
                                  float* box_anchors_min_y_,
                                  float* box_anchors_max_x_,
@@ -339,10 +325,9 @@ class PointPillars {
    * @param[in] nms_overlap_threshold IOU threshold for NMS
    * @param[in] pfe_onnx_file Pillar Feature Extractor ONNX file path
    * @param[in] rpn_onnx_file Region Proposal Network ONNX file path
-   * @details Variables could be chaned through rosparam
+   * @details Variables could be changed through point_pillars_detection
    */
-  PointPillars(const bool reproduce_result_mode,
-               const float score_threshold,
+  PointPillars(const bool reproduce_result_mode, const float score_threshold,
                const float nms_overlap_threshold,
                const std::string pfe_onnx_file,
                const std::string rpn_onnx_file);
@@ -350,14 +335,13 @@ class PointPillars {
 
   /**
    * @brief Call PointPillars for the inference
-   * @param[in] in_points_array Pointcloud array
+   * @param[in] in_points_array Point cloud array
    * @param[in] in_num_points Number of points
    * @param[out] out_detections Network output bounding box
    * @param[out] out_labels Network output object's label
    * @details This is an interface for the algorithm
    */
-  void DoInference(const float* in_points_array,
-                   const int in_num_points,
+  void DoInference(const float* in_points_array, const int in_num_points,
                    std::vector<float>* out_detections,
                    std::vector<int>* out_labels);
 };

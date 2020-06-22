@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -23,16 +24,16 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
-        "//modules/common/proto:drive_event_proto",
+        "//modules/common/proto:drive_event_cc_proto",
         "//modules/common/util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//third_party/json",
     ] + select({
         "//modules/dreamview/backend:teleop": [
-            "//modules/teleop/modem/proto:modem_proto",
-            "//modules/teleop/daemon/proto:daemon_proto",
+            "//modules/teleop/modem/proto:modem_cc_proto",
+            "//modules/teleop/daemon/proto:daemon_cc_proto",
         ],
         "//conditions:default": [
         ],

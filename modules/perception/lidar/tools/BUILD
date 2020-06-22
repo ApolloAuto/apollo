@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,8 +8,6 @@ cc_binary(
     srcs = ["offline_lidar_obstacle_perception.cc"],
     deps = [
         "//cyber",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/map/proto:map_proto",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
@@ -17,6 +16,7 @@ cc_binary(
         "//modules/perception/lidar/app",
         "//modules/perception/lidar/lib/classifier/fused_classifier",
         "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
+        "//modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars",
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
         "//modules/perception/lidar/lib/object_builder",
         "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
@@ -27,7 +27,8 @@ cc_binary(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
+        "//third_party:cblas",
         "@eigen",
         "@pcl",
     ],

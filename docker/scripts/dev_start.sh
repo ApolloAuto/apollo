@@ -16,18 +16,25 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+APOLLO_ROOT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P)"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+
+DOCKER_REPO="apolloauto/apollo"
+
+DEV_INSIDE="in-dev-docker"
+
+## TODO(storypku): differentiate HOST_ARCH WITH TARGET_ARCH
+ARCH="$(uname -m)"
 
 LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
-ARCH=$(uname -m)
-VERSION_X86_64="dev-18.04-x86_64-20200507_0633"
+VERSION_X86_64="dev-x86_64-18.04-20200607_2302"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
+USER_AGREE="no"
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -45,13 +52,19 @@ function check_agreement() {
   cat $AGREEMENT_FILE
   tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
   echo $tip
-  read -n 1 user_agreed
-  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+  if [ "$USER_AGREE" == "yes" ]; then
     cp $AGREEMENT_FILE $agreement_record
     echo "$tip" >> $agreement_record
     echo "$user_agreed" >> $agreement_record
   else
-    exit 1
+    read -n 1 user_agreed
+    if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+      cp $AGREEMENT_FILE $agreement_record
+      echo "$tip" >> $agreement_record
+      echo "$user_agreed" >> $agreement_record
+    else
+      exit 1
+    fi
   fi
 }
 
@@ -71,12 +84,9 @@ EOF
 exit 0
 }
 
-function stop_containers()
-{
+function stop_containers() {
 running_containers=$(docker ps --format "{{.Names}}")
-
-for i in ${running_containers[*]}
-do
+for i in ${running_containers[*]} ; do
   if [[ "$i" =~ apollo_* ]];then
     printf %-*s 70 "stopping container: $i ..."
     docker stop $i > /dev/null
@@ -91,10 +101,8 @@ done
 
 function set_registry_mirrors()
 {
-sed -i '$aDOCKER_OPTS=\"--registry-mirror=http://hub-mirror.c.163.com\"' /etc/default/docker
-sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com"]' /etc/docker/daemon.json
+sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
 service docker restart
-
 }
 
 if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
@@ -103,6 +111,10 @@ fi
 
 if [ -e /proc/sys/kernel ]; then
     echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+fi
+
+if [ "$1" == "-y" ]; then
+    USER_AGREE="yes"
 fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
@@ -122,9 +134,7 @@ DEFAULT_TEST_MAPS=(
 MAP_VOLUME_CONF=""
 OTHER_VOLUME_CONF=""
 
-while [ $# -gt 0 ]
-do
-
+while [ $# -gt 0 ] ; do
     case "$1" in
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
@@ -148,8 +158,8 @@ do
         FAST_BUILD_MODE="yes"
         ;;
     -c|--china)
-       set_registry_mirrors
-	;;
+        set_registry_mirrors
+        ;;
     -f|--fast-test)
         FAST_TEST_MODE="yes"
         ;;
@@ -169,10 +179,12 @@ do
         NO_PULL_IMAGE="yes"
         info "running without pulling docker image"
         ;;
+    -y)
+        ;;
     stop)
-	stop_containers
-	exit 0
-	;;
+        stop_containers
+        exit 0
+        ;;
     *)
         echo -e "\033[93mWarning\033[0m: Unknown option: $1"
         exit 2
@@ -192,18 +204,12 @@ else
     exit 0
 fi
 
-if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
-fi
-
 if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
     VERSION="local_dev"
 fi
 
-
 APOLLO_DEV_IMAGE=${DOCKER_REPO}:$VERSION
 LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
 LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
 
 
@@ -239,8 +245,7 @@ function local_volumes() {
 }
 
 ## customized docker cmd
-function do_docker_image_inspect()
-{
+function do_docker_image_inspect() {
     docker image inspect -f {{.Config.Image}} $1 &> /dev/null
     if [ $? -ne 0 ];then
         error "Failed to find local docker image : $1"
@@ -248,8 +253,7 @@ function do_docker_image_inspect()
     fi
 }
 
-function do_docker_pull()
-{
+function do_docker_pull() {
     IMG=$1
     if [ "$NO_PULL_IMAGE" = "yes" ];then
         echo "Skipping pull docker image for $IMG"
@@ -269,39 +273,39 @@ DOCKER_RUN="docker run"
 USE_GPU=0
 
 function determine_gpu_use() {
-  # Check nvidia-driver and GPU device
-  local nv_driver="nvidia-smi"
-  if [ ! -x "$(command -v ${nv_driver} )" ]; then
-    warning "No nvidia-driver found. CPU will be used"
-  elif [ -z "$(eval ${nv_driver} )" ]; then
-    warning "No GPU device found. CPU will be used."
-  else
-    USE_GPU=1
-  fi
-
-  # Try to use GPU inside container
-  local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-  if [ ${USE_GPU} -eq 1 ]; then
-    DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-    if [ ! -z "$(which nvidia-docker)" ]; then
-      DOCKER_RUN="nvidia-docker run"
-      warning "nvidia-docker is deprecated. Please install latest docker " \
-              "and nvidia-container-toolkit as described by:"
-      warning "  ${nv_docker_doc}"
-    elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
-      if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
-        DOCKER_RUN="docker run --gpus all"
-      else
-        warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
-        USE_GPU=0
-      fi
+    # Check nvidia-driver and GPU device
+    local nv_driver="nvidia-smi"
+    if [ ! -x "$(command -v ${nv_driver} )" ]; then
+        warning "No nvidia-driver found. CPU will be used"
+    elif [ -z "$(eval ${nv_driver} )" ]; then
+        warning "No GPU device found. CPU will be used."
     else
-      USE_GPU=0
-      warning "Cannot access GPU from within container. Please install latest docker " \
-              "and nvidia-container-toolkit as described by: "
-      warning "  ${nv_docker_doc}"
+        USE_GPU=1
     fi
-  fi
+
+    # Try to use GPU inside container
+    local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
+    if [ ${USE_GPU} -eq 1 ]; then
+        DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+        if [ ! -z "$(which nvidia-docker)" ]; then
+            DOCKER_RUN="nvidia-docker run"
+            warning "nvidia-docker is deprecated. Please install latest docker " \
+                    "and nvidia-container-toolkit as described by:"
+            warning "  ${nv_docker_doc}"
+        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+            if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+                DOCKER_RUN="docker run --gpus all"
+            else
+                warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+                USE_GPU=0
+            fi
+        else
+            USE_GPU=0
+            warning "Cannot access GPU from within container. Please install " \
+                    "latest docker and nvidia-container-toolkit as described by: "
+            warning "  ${nv_docker_doc}"
+        fi
+    fi
 }
 
 function main() {
@@ -330,7 +334,7 @@ function main() {
         if [ "$FAST_TEST_MODE" == "no" ]; then
             # Included default maps.
             for map_name in ${DEFAULT_MAPS[@]}; do
-              source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+                source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
             done
             YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
             docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
@@ -343,7 +347,7 @@ function main() {
         else
             # Included default maps.
             for map_name in ${DEFAULT_TEST_MAPS[@]}; do
-              source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+                source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
             done
         fi
     fi
@@ -355,12 +359,6 @@ function main() {
     do_docker_pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
-    PADDLE_VOLUME=apollo_paddlepaddle_volume_$USER
-    docker stop ${PADDLE_VOLUME} > /dev/null 2>&1
-
-    PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
-    do_docker_pull ${PADDLE_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
 
     LOCAL_THIRD_PARTY_VOLUME=apollo_local_third_party_volume_$USER
     docker stop ${LOCAL_THIRD_PARTY_VOLUME} > /dev/null 2>&1
@@ -370,11 +368,10 @@ function main() {
     docker run -it -d --rm --name ${LOCAL_THIRD_PARTY_VOLUME} ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
 
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
 
     local display=""
-    if [[ -z ${DISPLAY} ]];then
+    if [[ -z "${DISPLAY}" ]];then
         display=":0"
     else
         display="${DISPLAY}"
@@ -386,12 +383,9 @@ function main() {
     GRP=$(id -g -n)
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
-    DOCKER_HOME="/home/$USER"
-    if [ "$USER" == "root" ];then
-        DOCKER_HOME="/root"
-    fi
+
     if [ ! -d "${CACHE_ROOT_DIR}" ]; then
-        mkdir "${CACHE_ROOT_DIR}"
+        mkdir -p "${CACHE_ROOT_DIR}"
     fi
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
@@ -408,7 +402,7 @@ function main() {
         ${OTHER_VOLUME_CONF} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
-        -e USER=$USER \
+        -e USER="${USER}" \
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
@@ -419,9 +413,9 @@ function main() {
         $(local_volumes) \
         --net host \
         -w /apollo \
-        --add-host in_dev_docker:127.0.0.1 \
-        --add-host ${LOCAL_HOST}:127.0.0.1 \
-        --hostname in_dev_docker \
+        --add-host "${DEV_INSIDE}:127.0.0.1" \
+        --add-host "${LOCAL_HOST}:127.0.0.1" \
+        --hostname "${DEV_INSIDE}" \
         --shm-size 2G \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
@@ -433,14 +427,13 @@ function main() {
     fi
     set +x
 
-    # User with uid=1000 or username=apollo excluded
-    if [[ "${USER}" != "root" ]] && [[ "${USER}" != "apollo" ]] \
-        && [[ $USER_ID -ne 1000 ]]; then
-        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+    if [[ "${USER}" != "root" ]]; then
+        docker exec -u root $APOLLO_DEV bash -c '/apollo/scripts/docker_start_user.sh'
     fi
 
-    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
+    ok "Finished setting up Apollo docker environment. " \
+       "Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }
 
-main
+main "$@"

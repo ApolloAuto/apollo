@@ -288,11 +288,6 @@ DEFINE_double(
     turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
 
-// planning config file
-DEFINE_string(planning_config_file,
-              "/apollo/modules/planning/conf/planning_config.pb.txt",
-              "planning config file");
-
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
@@ -536,18 +531,22 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
 
-DEFINE_string(planning_data_dir,
-              "/apollo/modules/planning/data/",
+DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
               "Prefix of files to store feature data");
-DEFINE_string(
-    planning_offline_bags, "",
-    "a list of source files or directories for offline mode. "
-    "The items need to be separated by colon ':'. ");
-DEFINE_int32(planning_offline_mode, 0,
-             "0: no learning"
-             "1: online mode, no dump file"
-             "2: dump learning_data to <record file>.<n>.bin");
+DEFINE_string(planning_offline_bags, "",
+              "a list of source files or directories for offline mode. "
+              "The items need to be separated by colon ':'. ");
+DEFINE_int32(planning_learning_mode, 0,
+             "0: no learning "
+             "1: offline learning. read record files and dump learning_data "
+             "   to <record file>.<n>.bin "
+             "2: online learning(e2e) "
+             "3: online learning(hybrid)");
 DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
              "time sec (second) of history trajectory points for a obstacle");
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
+DEFINE_string(
+    planning_birdview_img_feature_renderer_config_file,
+    "/apollo/modules/planning/conf/planning_semantic_map_config.pb.txt",
+    "config file for renderer singleton");

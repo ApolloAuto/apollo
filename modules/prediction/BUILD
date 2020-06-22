@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,7 +16,7 @@ cc_library(
         "//modules/prediction/common:message_process",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
-        "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/proto:offline_features_cc_proto",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/submodules:evaluator_submodule_lib",
         "//modules/prediction/submodules:predictor_submodule_lib",
@@ -33,6 +34,9 @@ cc_test(
         ":prediction_conf",
         ":prediction_data",
         ":prediction_testdata",
+    ],
+    linkopts = [
+        "-lgomp",
     ],
     deps = [
         ":prediction_component_lib",

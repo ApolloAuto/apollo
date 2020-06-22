@@ -18,10 +18,10 @@
 
 import sys
 import gflags
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from modules.control.proto import control_cmd_pb2
+from modules.control.proto import control_cmd_py_pb2
 BRAKE_LINE_DATA = []
 TROTTLE_LINE_DATA = []
 STEERING_LINE_DATA = []
@@ -51,7 +51,7 @@ def listener():
     cyber.init()
     test_node = cyber.Node("control_listener")
     test_node.create_reader("/apollo/control",
-                            control_cmd_pb2.ControlCommand, callback)
+                            control_cmd_py_pb2.ControlCommand, callback)
     test_node.spin()
     cyber.shutdown()
 

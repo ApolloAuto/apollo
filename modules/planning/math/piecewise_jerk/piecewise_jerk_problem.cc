@@ -17,7 +17,6 @@
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -92,7 +91,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   OSQPSettings* settings = SolverDefaultSettings();
   settings->max_iter = max_iter;
 
-  OSQPWorkspace* osqp_work = osqp_setup(data, settings);
+  OSQPWorkspace* osqp_work = nullptr;
+  osqp_setup(&osqp_work, data, settings);
 
   osqp_solve(osqp_work);
 

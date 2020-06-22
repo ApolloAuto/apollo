@@ -23,7 +23,7 @@ import importlib
 import os
 import sys
 
-from google.protobuf.descriptor_pb2 import FileDescriptorProto
+from google.protobuf.descriptor_py_pb2 import FileDescriptorProto
 
 
 # init vars
@@ -36,7 +36,7 @@ sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
 wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '../../py_wrapper'))
+                                                '../internal'))
 sys.path.insert(0, wrapper_lib_path)
 _CYBER_RECORD = importlib.import_module('_cyber_record_py3')
 PyBagMessage = collections.namedtuple('PyBagMessage',

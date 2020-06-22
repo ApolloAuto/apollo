@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,7 +13,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/tasks:task",
         "@ad_rss_lib//:ad_rss",
     ],

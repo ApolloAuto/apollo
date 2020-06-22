@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,18 +18,14 @@ cc_library(
     hdrs = ["lidar_obstacle_detection.h"],
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/drivers/proto:sensor_proto",
         "//modules/perception/lib/utils",
-        "//modules/perception/lidar/app/proto:app_proto",
+        "//modules/perception/lidar/app/proto:lidar_obstacle_detection_config_cc_proto",
         "//modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_detection",
         "//modules/perception/lidar/lib/map_manager",
         "//modules/perception/lidar/lib/object_builder",
         "//modules/perception/lidar/lib/object_filter_bank",
         "//modules/perception/lidar/lib/pointcloud_preprocessor",
         "//modules/perception/lidar/lib/scene_manager",
-        "//modules/perception/proto:perception_config_schema_proto",
         "@eigen",
     ],
 )
@@ -39,17 +36,13 @@ cc_library(
     hdrs = ["lidar_obstacle_segmentation.h"],
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/drivers/proto:sensor_proto",
         "//modules/perception/lib/utils",
-        "//modules/perception/lidar/app/proto:app_proto",
+        "//modules/perception/lidar/app/proto:lidar_obstacle_segmentation_config_cc_proto",
         "//modules/perception/lidar/lib/map_manager",
         "//modules/perception/lidar/lib/object_builder",
         "//modules/perception/lidar/lib/object_filter_bank",
         "//modules/perception/lidar/lib/pointcloud_preprocessor",
         "//modules/perception/lidar/lib/scene_manager",
-        "//modules/perception/proto:perception_config_schema_proto",
         "@eigen",
     ],
 )
@@ -64,7 +57,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/utils",
-        "//modules/perception/lidar/app/proto:app_proto",
+        "//modules/perception/lidar/app/proto:lidar_obstacle_tracking_config_cc_proto",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
         "@eigen",

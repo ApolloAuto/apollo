@@ -15,13 +15,13 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
-#include <boost/algorithm/string.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include <limits>
 #include <map>
 #include <utility>
+
+#include <boost/algorithm/string.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"

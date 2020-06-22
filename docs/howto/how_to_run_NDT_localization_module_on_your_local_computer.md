@@ -5,6 +5,12 @@
  - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) and [build Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md).
  - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only)
 
+the localization data is a experimental dataset to verify the availability of localization. It contains localization map(ndt_map/), vehicle params(params/), sensor recording data(records/). The specific attributes are as follows:  
+duration: 5 mins  
+mileage: 3km  
+areas: city roads in Sunnyvale  
+weather: sunny day
+
 ## 2. Configuring Parameters
 Assume that the path to download localization data from is DATA_PATH.
 ### 2.1. Configure Sensor Extrinsics

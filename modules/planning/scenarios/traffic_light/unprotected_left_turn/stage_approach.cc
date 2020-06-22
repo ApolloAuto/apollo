@@ -20,12 +20,11 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_approach.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -129,14 +128,14 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
   } else {
     // creep
     // update PlanningContext
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_traffic_light()
         ->mutable_done_traffic_light_overlap_id()
         ->Clear();
     for (const auto& traffic_light_overlap_id :
          GetContext()->current_traffic_light_overlap_ids) {
-      PlanningContext::Instance()
+      injector_->planning_context()
           ->mutable_planning_status()
           ->mutable_traffic_light()
           ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);

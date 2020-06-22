@@ -20,9 +20,9 @@
 
 import unittest
 
-from cyber.proto import record_pb2
+from cyber.proto import record_py_pb2
 from cyber_py3 import record
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from modules.common.util.testdata.simple_py_pb2 import SimpleMessage
 
 
 TEST_RECORD_FILE = "/tmp/test02.record"
@@ -63,7 +63,7 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(1, len(channel_list))
         self.assertEqual(CHAN_1, channel_list[0])
 
-        header = record_pb2.Header()
+        header = record_py_pb2.Header()
         header.ParseFromString(fread.get_headerstring())
         self.assertEqual(1, header.major_version)
         self.assertEqual(0, header.minor_version)

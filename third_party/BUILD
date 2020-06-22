@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 # Libs provided by the system.
@@ -29,11 +31,11 @@ cc_library(
 cc_library(
     name = "libtorch",
     deps = select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
+        "//tools/platform:use_gpu": [
+            "@libtorch_gpu",
         ],
         "//conditions:default": [
-            "@pytorch",
+            "@libtorch_cpu",
         ],
     }),
 )
@@ -70,4 +72,12 @@ cc_library(
 cc_library(
     name = "uuid",
     linkopts = ["-luuid"],
+)
+
+# atlas-cblas
+cc_library(
+    name = "cblas",
+    linkopts = [
+        "-lcblas",
+    ],
 )

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,13 +16,13 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "//modules/dreamview/backend/handlers:websocket_handler",
-        "//modules/dreamview/proto:camera_update_proto",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/proto:localization_proto",
+        "//modules/dreamview/proto:camera_update_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
         "//modules/transform:tf2_buffer_lib",
-        "//modules/transform/proto:transform_proto",
+        "//modules/transform/proto:transform_cc_proto",
         "@eigen",
     ],
 )

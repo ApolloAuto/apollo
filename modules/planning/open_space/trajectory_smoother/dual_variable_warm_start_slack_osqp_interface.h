@@ -24,11 +24,10 @@
 #include <vector>
 
 #include "Eigen/Dense"
-#include "osqp/include/osqp.h"
-
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
+#include "osqp/osqp.h"
 
 namespace apollo {
 namespace planning {

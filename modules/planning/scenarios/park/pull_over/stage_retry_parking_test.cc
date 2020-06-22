@@ -16,10 +16,9 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -31,14 +30,16 @@ class PullOverStageRetryParkingTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::PULL_OVER_RETRY_PARKING);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(PullOverStageRetryParkingTest, Init) {
-  PullOverStageRetryParking pull_over_stage_retry_parking(config_);
+  PullOverStageRetryParking pull_over_stage_retry_parking(config_, injector_);
   EXPECT_EQ(
       pull_over_stage_retry_parking.Name(),
       ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_RETRY_PARKING));

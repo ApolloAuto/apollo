@@ -32,11 +32,13 @@ namespace narrow_street_u_turn {
 class NarrowStreetUTurnScenario : public Scenario {
  public:
   NarrowStreetUTurnScenario(const ScenarioConfig& config,
-                            const ScenarioContext* context)
-      : Scenario(config, context) {}
+                            const ScenarioContext* context,
+                            const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector) override;
 };
 
 }  // namespace narrow_street_u_turn

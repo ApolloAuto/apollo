@@ -29,6 +29,7 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/offline_features.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -49,7 +50,7 @@ std::string PredictionComponent::Name() const {
 void PredictionComponent::OfflineProcessFeatureProtoFile(
     const std::string& features_proto_file_name) {
   auto obstacles_container_ptr =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager_->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   obstacles_container_ptr->Clear();
   Features features;
@@ -58,39 +59,53 @@ void PredictionComponent::OfflineProcessFeatureProtoFile(
   for (const Feature& feature : features.feature()) {
     obstacles_container_ptr->InsertFeatureProto(feature);
     Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
-    EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr,
-                                                   obstacles_container_ptr);
+    evaluator_manager_->EvaluateObstacle(obstacle_ptr, obstacles_container_ptr);
   }
 }
 
 bool PredictionComponent::Init() {
   component_start_time_ = Clock::NowInSeconds();
 
-  if (!MessageProcess::Init()) {
+  container_manager_ = std::make_shared<ContainerManager>();
+  evaluator_manager_.reset(new EvaluatorManager());
+  predictor_manager_.reset(new PredictorManager());
+  scenario_manager_.reset(new ScenarioManager());
+
+  PredictionConf prediction_conf;
+  if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << ComponentBase::ConfigFilePath();
+    return false;
+  }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+
+  if (!MessageProcess::Init(container_manager_.get(), evaluator_manager_.get(),
+                            predictor_manager_.get(), prediction_conf)) {
     return false;
   }
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
-      FLAGS_planning_trajectory_topic, nullptr);
+      prediction_conf.topic_conf().planning_trajectory_topic(), nullptr);
 
   localization_reader_ =
       node_->CreateReader<localization::LocalizationEstimate>(
-          FLAGS_localization_topic, nullptr);
+          prediction_conf.topic_conf().localization_topic(), nullptr);
 
   storytelling_reader_ = node_->CreateReader<storytelling::Stories>(
-      FLAGS_storytelling_topic, nullptr);
+      prediction_conf.topic_conf().storytelling_topic(), nullptr);
 
-  prediction_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  prediction_writer_ = node_->CreateWriter<PredictionObstacles>(
+      prediction_conf.topic_conf().prediction_topic());
 
-  container_writer_ =
-      node_->CreateWriter<SubmoduleOutput>(FLAGS_container_topic_name);
+  container_writer_ = node_->CreateWriter<SubmoduleOutput>(
+      prediction_conf.topic_conf().container_topic_name());
 
   adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
-      FLAGS_adccontainer_topic_name);
+      prediction_conf.topic_conf().adccontainer_topic_name());
 
   perception_obstacles_writer_ = node_->CreateWriter<PerceptionObstacles>(
-      FLAGS_perception_obstacles_topic_name);
+      prediction_conf.topic_conf().perception_obstacles_topic_name());
 
   return true;
 }
@@ -115,14 +130,15 @@ bool PredictionComponent::ContainerSubmoduleProcess(
     AERROR << "Prediction: cannot receive any localization message.";
     return false;
   }
-  MessageProcess::OnLocalization(*ptr_localization_msg);
+  MessageProcess::OnLocalization(container_manager_.get(),
+                                 *ptr_localization_msg);
 
   // Read planning info. of last frame and call OnPlanning to update
   // the ADCTrajectoryContainer
   planning_reader_->Observe();
   auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
   if (ptr_trajectory_msg != nullptr) {
-    MessageProcess::OnPlanning(*ptr_trajectory_msg);
+    MessageProcess::OnPlanning(container_manager_.get(), *ptr_trajectory_msg);
   }
 
   // Read storytelling message and call OnStorytelling to update the
@@ -130,24 +146,27 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   storytelling_reader_->Observe();
   auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
   if (ptr_storytelling_msg != nullptr) {
-    MessageProcess::OnStoryTelling(*ptr_storytelling_msg);
+    MessageProcess::OnStoryTelling(container_manager_.get(),
+                                   *ptr_storytelling_msg);
   }
 
-  MessageProcess::ContainerProcess(*perception_obstacles);
+  MessageProcess::ContainerProcess(container_manager_, *perception_obstacles,
+                                   scenario_manager_.get());
 
   auto obstacles_container_ptr =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager_->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container_ptr);
 
   auto adc_trajectory_container_ptr =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+      container_manager_->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
   CHECK_NOTNULL(adc_trajectory_container_ptr);
 
   SubmoduleOutput submodule_output =
       obstacles_container_ptr->GetSubmoduleOutput(kHistorySize,
                                                   frame_start_time);
+  submodule_output.set_curr_scenario(scenario_manager_->scenario());
   container_writer_->Write(submodule_output);
   adc_container_writer_->Write(*adc_trajectory_container_ptr);
   perception_obstacles_writer_->Write(*perception_obstacles);
@@ -179,7 +198,8 @@ bool PredictionComponent::PredictionEndToEndProc(
     AERROR << "Prediction: cannot receive any localization message.";
     return false;
   }
-  MessageProcess::OnLocalization(*ptr_localization_msg);
+  MessageProcess::OnLocalization(container_manager_.get(),
+                                 *ptr_localization_msg);
   auto end_time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time2 - end_time1;
   ADEBUG << "Time for updating PoseContainer: " << diff.count() * 1000
@@ -190,7 +210,8 @@ bool PredictionComponent::PredictionEndToEndProc(
   storytelling_reader_->Observe();
   auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
   if (ptr_storytelling_msg != nullptr) {
-    MessageProcess::OnStoryTelling(*ptr_storytelling_msg);
+    MessageProcess::OnStoryTelling(container_manager_.get(),
+                                   *ptr_storytelling_msg);
   }
 
   // Read planning info. of last frame and call OnPlanning to update
@@ -198,7 +219,7 @@ bool PredictionComponent::PredictionEndToEndProc(
   planning_reader_->Observe();
   auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
   if (ptr_trajectory_msg != nullptr) {
-    MessageProcess::OnPlanning(*ptr_trajectory_msg);
+    MessageProcess::OnPlanning(container_manager_.get(), *ptr_trajectory_msg);
   }
   auto end_time3 = std::chrono::system_clock::now();
   diff = end_time3 - end_time2;
@@ -209,7 +230,9 @@ bool PredictionComponent::PredictionEndToEndProc(
   // process them all.
   auto perception_msg = *perception_obstacles;
   PredictionObstacles prediction_obstacles;
-  MessageProcess::OnPerception(perception_msg, &prediction_obstacles);
+  MessageProcess::OnPerception(
+      perception_msg, container_manager_, evaluator_manager_.get(),
+      predictor_manager_.get(), scenario_manager_.get(), &prediction_obstacles);
   auto end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
   ADEBUG << "Time for updating PerceptionContainer: " << diff.count() * 1000

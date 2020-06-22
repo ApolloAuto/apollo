@@ -15,11 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
-#=================================================
-#                   Utils
-#=================================================
-
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
@@ -37,23 +32,23 @@ function apollo_check_system_config() {
   fi
 
   # check operating system
-  OP_SYSTEM=$(uname -s)
-  case $OP_SYSTEM in
+  HOST_OS=$(uname -s)
+  case $HOST_OS in
     "Linux")
       echo "System check passed. Build continue ..."
       # check system configuration
       DEFAULT_MEM_SIZE="2.0"
-      MEM_SIZE=$(free -m | grep Mem | awk '{printf("%0.2f", $2 / 1024.0)}')
+      MEM_SIZE=$(free -m | awk '/Mem:/ {printf("%0.2f", $2 / 1024.0)}')
       if (( $(echo "$MEM_SIZE < $DEFAULT_MEM_SIZE" | bc -l) )); then
          warning "System memory [${MEM_SIZE}G] is lower than minimum required memory size [2.0G]. Apollo build could fail."
       fi
       ;;
     "Darwin")
-      warning "Mac OS is not officially supported in the current version. Build could fail. We recommend using Ubuntu 14.04."
+      warning "MacOS is UNSUPPORTED currently."
+      exit 1
       ;;
     *)
-      error "Unsupported system: ${OP_SYSTEM}."
-      error "Please use Linux, we recommend Ubuntu 18.04."
+      error "Apollo is UNTESTED on ${HOST_OS} systems. Linux systems expected."
       exit 1
       ;;
   esac
@@ -64,11 +59,6 @@ function check_machine_arch() {
     fail "Machine architecture $MACHINE_ARCH currently not supported yet."
     exit 1
   fi
-
-  #TODO(ALL): checks whether still in use
-  #setup vtk folder name for different systems.
-  VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | tail -n1 | cut -d '-' -f 2)
-  sed "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE.in > WORKSPACE
 }
 
 function check_esd_files() {
@@ -153,9 +143,6 @@ function build() {
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
     fail 'Build failed!'
   fi
-
-  # Build python proto
-  build_py_proto
 
   # Clear KV DB and update commit_id after compiling.
   if [ "$BUILD_FILTER" == 'cyber' ] || [ "$BUILD_FILTER" == 'drivers' ]; then
@@ -265,21 +252,6 @@ function apollo_build_dbg() {
 
 function apollo_build_opt() {
   build "opt" $@
-}
-
-function build_py_proto() {
-  # TODO(xiaoxq): Retire this as we are using bazel to compile protos into bazel-genfiles.
-  if [ -d "./py_proto" ];then
-    rm -rf py_proto
-  fi
-  mkdir py_proto
-  find modules/ cyber/ -name "*.proto" \
-      | grep -v node_modules \
-      | xargs protoc --python_out=py_proto
-  find modules/ cyber/ -name "*_service.proto" \
-      | grep -v node_modules \
-      | xargs python -m grpc_tools.protoc --proto_path=. --python_out=py_proto --grpc_python_out=py_proto
-  find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
 function check() {
@@ -479,16 +451,12 @@ function clean() {
 }
 
 function buildify() {
-  local buildifier_url=https://github.com/bazelbuild/buildtools/releases/download/0.4.5/buildifier
-  wget $buildifier_url -O ~/.buildifier
-  chmod +x ~/.buildifier
-  find . -name '*BUILD' -type f -exec ~/.buildifier -showlog -mode=fix {} +
+  find . -name '*BUILD' -or -name '*.bzl' -type f -exec buildifier -mode=fix {} +
   if [ $? -eq 0 ]; then
     success 'Buildify worked!'
   else
     fail 'Buildify failed!'
   fi
-  rm ~/.buildifier
 }
 
 function build_fe() {
@@ -585,10 +553,27 @@ function print_usage() {
   "
 }
 
+function bootstrap() {
+  if [ -z "$PYTHON_BIN_PATH" ]; then
+    PYTHON_BIN_PATH=$(which python3 || true)
+  fi
+  if [[ -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]]; then
+    return
+  fi
+  cp -f "${TOP_DIR}/tools/sample.bazelrc" "${APOLLO_ROOT_DIR}/.apollo.bazelrc"
+  # Set all env variables
+  # TODO(storypku): enable bootstrap.py inside docker
+  # $PYTHON_BIN_PATH ${APOLLO_ROOT_DIR}/tools/bootstrap.py $@
+  echo "bootstrap done"
+}
+
 function main() {
 
   check_machine_arch
   apollo_check_system_config
+
+  bootstrap
+
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
@@ -704,9 +689,6 @@ function main() {
       ;;
     buildify)
       buildify
-      ;;
-    build_py)
-      build_py_proto
       ;;
     config)
       config

@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/task.h"
 
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -28,6 +30,12 @@ namespace planning {
 using apollo::common::Status;
 
 Task::Task(const TaskConfig& config) : config_(config) {
+  name_ = TaskConfig::TaskType_Name(config_.task_type());
+}
+
+Task::Task(const TaskConfig& config,
+           const std::shared_ptr<DependencyInjector>& injector)
+    : config_(config), injector_(injector) {
   name_ = TaskConfig::TaskType_Name(config_.task_type());
 }
 

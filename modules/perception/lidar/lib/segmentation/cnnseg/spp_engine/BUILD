@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,6 +14,7 @@ cc_library(
         ":spp_seg_cc_2d",
         ":spp_struct",
         "//cyber",
+        "@com_google_googletest//:gtest",
         "@eigen",
     ],
 )
@@ -56,6 +58,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/common/i_lib",
         "//modules/perception/lidar/common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -81,6 +84,7 @@ cc_library(
         "//modules/perception/common/i_lib",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
+        "@com_google_googletest//:gtest",
     ],
 )
 

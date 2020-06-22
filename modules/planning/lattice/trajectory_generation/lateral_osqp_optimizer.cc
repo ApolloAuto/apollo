@@ -167,7 +167,8 @@ bool LateralOSQPOptimizer::optimize(
   data->u = upper_bounds;
 
   // Workspace
-  OSQPWorkspace* work = osqp_setup(data, settings);
+  OSQPWorkspace* work = nullptr;
+  osqp_setup(&work, data, settings);
 
   // Solve Problem
   osqp_solve(work);

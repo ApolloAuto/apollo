@@ -20,10 +20,7 @@
 
 #pragma once
 
-#include <vector>
-
-#include "torch/script.h"
-#include "torch/torch.h"
+#include <memory>
 
 #include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 #include "modules/planning/scenarios/stage.h"
@@ -37,8 +34,9 @@ struct LearningModelSampleContext;
 class LearningModelSampleStageRun : public Stage {
  public:
   explicit LearningModelSampleStageRun(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config), device_(torch::kCPU) {}
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
@@ -46,17 +44,11 @@ class LearningModelSampleStageRun : public Stage {
   LearningModelSampleContext* GetContext() {
     return GetContextAs<LearningModelSampleContext>();
   }
-  bool ExtractFeatures(Frame* frame,
-                       std::vector<torch::jit::IValue> *input_features);
-  bool InferenceModel(const std::vector<torch::jit::IValue> &input_features,
-                      Frame* frame);
+
   Stage::StageStatus FinishStage();
 
  private:
   ScenarioLearningModelSampleConfig scenario_config_;
-  torch::Device device_;
-  torch::jit::script::Module model_;
-  int input_feature_num_ = 0;
 };
 
 }  // namespace scenario

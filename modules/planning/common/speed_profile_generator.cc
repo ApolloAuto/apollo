@@ -23,7 +23,6 @@
 #include <algorithm>
 
 #include "cyber/common/log.h"
-#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
@@ -34,10 +33,10 @@ namespace planning {
 using apollo::common::SpeedPoint;
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
-    const double stop_distance) {
+    const EgoInfo* ego_info, const double stop_distance) {
   AERROR << "Fallback using piecewise jerk speed!";
-  const double init_v = EgoInfo::Instance()->start_point().v();
-  const double init_a = EgoInfo::Instance()->start_point().a();
+  const double init_v = ego_info->start_point().v();
+  const double init_a = ego_info->start_point().a();
   AWARN << "init_v = " << init_v << ", init_a = " << init_a;
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();

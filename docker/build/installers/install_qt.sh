@@ -20,6 +20,14 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
+
+TARGET_ARCH="$(uname -m)"
+
+if [[ "${TARGET_ARCH}" != "x86_64" ]]; then
+    error "Qt installer for ${TARGET_ARCH} not ready."
+    exit 0
+fi
 
 apt-get -y update && \
     apt-get -y install \
@@ -33,8 +41,6 @@ apt-get -y update && \
 # Note(storypku)
 # The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
-. /tmp/installers/installer_base.sh
-
 QT_VERSION_A=5.12
 QT_VERSION_B=5.12.2
 QT_VERSION_Z=$(echo "$QT_VERSION_B" | tr -d '.')
@@ -43,7 +49,7 @@ QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
 CHECKSUM="384c833bfbccf596a00bb02bbad14b53201854c287daf2d99c23a93b8de4062a"
 DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
 
-pip3 install cuteci
+pip3_install cuteci
 
 download_if_not_cached $QT_INSTALLER $CHECKSUM $DOWLOAD_LINK
 chmod +x $QT_INSTALLER
@@ -72,5 +78,3 @@ rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
 
 
 pip3 uninstall -y cuteci
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
