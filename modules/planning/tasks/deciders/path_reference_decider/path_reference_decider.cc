@@ -62,7 +62,8 @@ Status PathReferenceDecider::Process(Frame *frame,
 
   // get learning model output (trajectory) from frame
   const std::vector<common::TrajectoryPoint> &path_reference =
-      frame->learning_data_adc_future_trajectory_points();
+      frame->learning_based_data()
+           .learning_data_adc_future_trajectory_points();
   ADEBUG << "There are " << path_reference.size() << " path points.";
 
   // get regular path bound
@@ -93,7 +94,7 @@ Status PathReferenceDecider::Process(Frame *frame,
     return Status::OK();
   }
   // mark learning trajectory as path reference
-  frame->set_learning_trajectory_valid(true);
+  frame->mutable_learning_based_data()->set_is_learning_trajectory_valid(true);
 
   reference_line_info->mutable_path_data()->set_trimmed_path_bound_size(
       trimmed_path_bound_size_);

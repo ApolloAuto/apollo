@@ -53,15 +53,16 @@ Status LearningModelInferenceTrajectoryTask::Process(
   const auto &config =
       config_.learning_model_inference_trajectory_task_config();
 
-  const std::vector<TrajectoryPoint> adc_future_trajectory_points =
-      frame->learning_data_adc_future_trajectory_points();
+  const std::vector<TrajectoryPoint> adc_future_trajectory_points
+      = frame->learning_based_data()
+             .learning_data_adc_future_trajectory_points();
 
   const double first_point_relative_time =
       adc_future_trajectory_points.front().relative_time();
   const double last_point_relative_time =
       adc_future_trajectory_points.back().relative_time();
   ADEBUG << "LearningModelInferenceTrajectoryTask: frame_num["
-         << frame->learning_data_frame().frame_num()
+         << frame->learning_based_data().learning_data_frame().frame_num()
          << "] adc_future_trajectory_points_size["
          << adc_future_trajectory_points.size()
          << "] first_point_relative_time[" << first_point_relative_time

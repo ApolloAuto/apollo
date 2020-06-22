@@ -58,7 +58,8 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   const auto& config = config_.learning_model_inference_task_config();
 
   LearningDataFrame learning_data_frame;
-  learning_data_frame.CopyFrom(frame->learning_data_frame());
+  learning_data_frame.CopyFrom(
+      frame->learning_based_data().learning_data_frame());
 
   ADEBUG << "LearningModelInferenceTask: frame_num["
          << learning_data_frame.frame_num() << "] adc_trajectory_point_size["
@@ -176,7 +177,8 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   //   AERROR << "FUTURE After: " << t.relative_time();
   // }
 
-  frame->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
+  frame->mutable_learning_based_data()
+       ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
 
   return Status::OK();
 }
