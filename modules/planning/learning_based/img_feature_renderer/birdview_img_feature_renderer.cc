@@ -41,6 +41,10 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   config_ = config;
   ego_vehicle_config_ = common::VehicleConfigHelper::GetConfig();
 
+  // a redundant call to HDMapUtil::BaseMap() to save time for renderering when
+  // the basemap is not yet initialized in HDMapUtil
+  apollo::hdmap::HDMapUtil::BaseMap();
+
   const std::string map_name =
       FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
   if (map_name != "sunnyvale_with_two_offices" && map_name != "sunnyvale") {

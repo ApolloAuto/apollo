@@ -34,7 +34,8 @@ class ModelInference {
   /**
    * @brief Constructor
    */
-  explicit ModelInference(const LearningModelInferenceTaskConfig& config) {}
+  explicit ModelInference(const LearningModelInferenceTaskConfig& config) :
+      config_(config) {}
 
   /**
    * @brief Destructor
@@ -49,12 +50,15 @@ class ModelInference {
   /**
    * @brief load a learned model
    */
-  virtual bool LoadModel(const LearningModelInferenceTaskConfig& config) = 0;
+  virtual bool LoadModel() = 0;
 
   /**
    * @brief inference a learned model
    */
-  virtual bool Inference(LearningDataFrame* learning_data_frame) = 0;
+  virtual bool DoInference(LearningDataFrame* learning_data_frame) = 0;
+
+ protected:
+  LearningModelInferenceTaskConfig config_;
 };
 
 }  // namespace planning

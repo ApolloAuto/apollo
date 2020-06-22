@@ -38,7 +38,7 @@ class PathReferenceDecider : public Task {
 
  private:
   apollo::common::Status Process(Frame *frame,
-                                 const ReferenceLineInfo *reference_line_info);
+                                 ReferenceLineInfo *reference_line_info);
 
   /**
    * @brief check is learning model output is within path bounds
@@ -109,6 +109,9 @@ class PathReferenceDecider : public Task {
   bool IsADCBoxAlongPathReferenceWithinPathBounds(
       const std::vector<common::TrajectoryPoint> &path_reference,
       const PathBoundary *regular_path_bound);
+
+ private:
+  size_t trimmed_path_bound_size_;
 };
 
 }  // namespace planning
