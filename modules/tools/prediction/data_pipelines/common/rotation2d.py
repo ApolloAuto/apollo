@@ -18,7 +18,7 @@
 
 
 from math import cos, sin
-from .vector2d import Vector2
+from modules.tools.prediction.data_pipelines.common.vector2d import Vector2
 
 
 def rotate(v, theta):

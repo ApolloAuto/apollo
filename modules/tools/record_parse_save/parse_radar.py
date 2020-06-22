@@ -30,9 +30,9 @@ import json
 import os
 import sys
 
-from cyber_py3 import cyber
-from cyber_py3 import record
-from modules.drivers.proto.conti_radar_pb2 import ContiRadar
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import record
+from modules.drivers.proto.conti_radar_py_pb2 import ContiRadar
 
 
 class RadarMessageConti408(object):

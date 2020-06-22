@@ -29,9 +29,9 @@ current implementation for:
 import os
 import sys
 
-from cyber_py3 import cyber
-from cyber_py3 import record
-from modules.drivers.proto.pointcloud_pb2 import PointCloud
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import record
+from modules.drivers.proto.pointcloud_py_pb2 import PointCloud
 
 
 def parse_data(channelname, msg, out_folder):

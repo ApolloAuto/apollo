@@ -16,9 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
-from modules.common.proto import error_code_pb2
-from .statistical_analyzer import PrintColors
-from .distribution_analyzer import DistributionAnalyzer
+from modules.common.proto import error_code_py_pb2
+from modules.tools.record_analyzer.statistical_analyzer import PrintColors
+from modules.tools.record_analyzer.distribution_analyzer import DistributionAnalyzer
 
 
 class ErrorCodeAnalyzer:
@@ -31,7 +31,7 @@ class ErrorCodeAnalyzer:
     def put(self, error_code):
         """put"""
         error_code_name = \
-            error_code_pb2.ErrorCode.Name(error_code)
+            error_code_py_pb2.ErrorCode.Name(error_code)
         if error_code_name not in self.error_code_count:
             self.error_code_count[error_code_name] = 1
         else:
