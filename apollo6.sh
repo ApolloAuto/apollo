@@ -100,19 +100,19 @@ function main() {
             env ${APOLLO_ENV} bash "${build_sh}" "$@"
             ;;
         build_opt)
-            env ${APOLLO_ENV} bash "${build_sh}" -c opt "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt "$@"
             ;;
         build_dbg)
-            env ${APOLLO_ENV} bash "${build_sh}" -c dbg "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=dbg "$@"
             ;;
         build_cpu)
-            env ${APOLLO_ENV} bash "${build_sh}" --mode build_cpu "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config build_cpu "$@"
             ;;
         build_gpu)
-            env ${APOLLO_ENV} bash "${build_sh}" --mode build_gpu "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config build_gpu "$@"
             ;;
         build_opt_gpu)
-            env ${APOLLO_ENV} bash "${build_sh}" --mode build_gpu -c opt "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config build_opt_gpu "$@"
             ;;
         buildify)
             env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh
