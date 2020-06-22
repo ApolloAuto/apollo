@@ -25,8 +25,8 @@ if [ -f /.dockerenv ]; then
   APOLLO_ROOT_DIR="/apollo"
 fi
 
-export APOLLO_ROOT_DIR
-export APOLLO_IN_DOCKER
+export APOLLO_ROOT_DIR="${APOLLO_ROOT_DIR}"
+export APOLLO_IN_DOCKER="${APOLLO_IN_DOCKER}"
 export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
 export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
@@ -82,6 +82,25 @@ function fail() {
   print_delim
   exit 1
 }
+
+function determine_gpu_use() {
+    # TODO(all): remove USE_GPU when {cyber,dev}_start.sh"
+    local use_gpu=0
+    # Check nvidia-driver and GPU device
+    local nv_driver="nvidia-smi"
+    if [ ! -x "$(command -v ${nv_driver} )" ]; then
+        warning "No nvidia-driver found. CPU will be used."
+    elif [ -z "$(eval ${nv_driver} )" ]; then
+        warning "No GPU device found. CPU will be used."
+    else
+        use_gpu=1
+    fi
+    export USE_GPU="${use_gpu}"
+}
+
+if [ -z "${USE_GPU}" ]; then
+    determine_gpu_use
+fi
 
 function file_ext() {
   local __ext="${1##*.}"
@@ -177,3 +196,4 @@ function optarg_check_for_opt() {
     local optarg="$2"
     ! [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]
 }
+

@@ -8,7 +8,6 @@ ARCH="$(uname -m)"
 
 # STAGE="${STAGE:-dev}"
 : ${STAGE:=dev}
-: ${USE_GPU:=0}
 : ${USE_ESD_CAN:=false}
 
 COMMAND_LINE_OPTIONS=

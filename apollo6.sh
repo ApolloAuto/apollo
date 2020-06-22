@@ -10,7 +10,6 @@ APOLLO_VERSION="@non-git"
 APOLLO_ENV=""
 
 USE_ESD_CAN=false
-: ${USE_GPU:=0}
 : ${STAGE:=dev}
 
 function check_architecture_support() {
@@ -38,25 +37,6 @@ function check_minimal_memory_requirement() {
         warning "System memory [${actual_mem_gb}G] is lower than the minimum required" \
                 "[${minimal_mem_gb}G]. Apollo build could fail."
     fi
-}
-
-function determine_gpu_use() {
-    # If already inside container, use env USE_GPU directly
-    if [[ "${APOLLO_IN_DOCKER}" == "true" ]] ; then
-        return
-    fi
-
-    local use_gpu=0
-    # Check nvidia-driver and GPU device
-    local nv_driver="nvidia-smi"
-    if [ ! -x "$(command -v ${nv_driver} )" ]; then
-        warning "No nvidia-driver found. CPU will be used."
-    elif [ -z "$(eval ${nv_driver} )" ]; then
-        warning "No GPU device found. CPU will be used."
-    else
-        use_gpu=1
-    fi
-    USE_GPU="${use_gpu}"
 }
 
 function determine_esdcan_use() {
@@ -88,7 +68,6 @@ function apollo_env_setup() {
     determine_gpu_use
     determine_esdcan_use
 
-    APOLLO_ENV="${APOLLO_ENV} USE_GPU=${USE_GPU}"
     APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"
     APOLLO_ENV="${APOLLO_ENV} USE_ESD_CAN=${USE_ESD_CAN}"
     # Add more here ...
@@ -98,7 +77,7 @@ function apollo_env_setup() {
     info "${TAB}APOLLO_CACHE_DIR: ${APOLLO_CACHE_DIR}"
     info "${TAB}APOLLO_IN_DOCKER: ${APOLLO_IN_DOCKER}"
     info "${TAB}APOLLO_VERSION: ${APOLLO_VERSION}"
-    info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
+    info "${TAB}APOLLO_ENV: ${APOLLO_ENV} USE_GPU=${USE_GPU}"
 }
 
 function _usage() {
