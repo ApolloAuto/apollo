@@ -7,9 +7,6 @@ cc_test(
     name = "camera_app_obstacle_camera_perception_test",
     size = "medium",
     srcs = ["camera_app_obstacle_camera_perception_test.cc"],
-    linkopts = [
-        "-lnvinfer_plugin",
-    ],
     deps = [
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/common:perception_gflags",
@@ -27,9 +24,6 @@ cc_test(
 #cc_test(
 #    name = "camera_app_traffic_light_camera_perception_test",
 #    srcs = ["camera_app_traffic_light_camera_perception_test.cc"],
-#    linkopts = [
-#        "-lnvinfer_plugin",
-#    ],
 #    deps = [
 #        "//modules/perception/camera/app:traffic_light_camera_perception",
 #        "//modules/perception/inference:inference_factory",
@@ -64,9 +58,6 @@ cc_test(
     name = "camera_common_data_provider_test",
     size = "small",
     srcs = ["camera_common_data_provider_test.cc"],
-    linkopts = [
-        "-lnvinfer_plugin",
-    ],
     deps = [
         ":camera_common_io_util",
         "//modules/perception/camera/common:data_provider",
@@ -86,9 +77,6 @@ cc_test(
     name = "camera_common_twod_threed_util_test",
     size = "small",
     srcs = ["camera_common_twod_threed_util_test.cc"],
-    linkopts = [
-        "-lnvinfer_plugin",
-    ],
     deps = [
         "//modules/perception/camera/common:twod_threed_util",
         "//modules/perception/common/i_lib/algorithm:i_sort",
@@ -118,9 +106,6 @@ cc_library(
 #cc_test(
 #    name = "camera_common_undistortion_handler_test",
 #    srcs = ["camera_common_undistortion_handler_test.cc"],
-#    linkopts = [
-#        "-lnvinfer_plugin",
-#    ],
 #    deps = [
 #        ":camera_common_io_util",
 #        ":camera_common_undistortion",
@@ -140,9 +125,6 @@ cc_test(
     name = "camera_common_util_test",
     size = "small",
     srcs = ["camera_common_util_test.cc"],
-    linkopts = [
-        "-lnvinfer_plugin",
-    ],
     deps = [
         ":camera_common_io_util",
         "//modules/perception/camera/common:data_provider",
@@ -164,9 +146,6 @@ cc_test(
     name = "camera_common_veh_template_test",
     size = "small",
     srcs = ["camera_common_veh_template_test.cc"],
-    linkopts = [
-        "-lnvinfer_plugin",
-    ],
     deps = [
         "//modules/perception/camera/common:object_template_manager",
         "//modules/perception/inference:inference_factory",
@@ -527,9 +506,6 @@ cc_test(
 # cc_test(
 #     name = "camera_lib_traffic_light_detector_detection_test",
 #     srcs = ["camera_lib_traffic_light_detector_detection_test.cc"],
-#     linkopts = [
-#         "-lnvinfer_plugin",
-#     ],
 #     deps = [
 #         "//modules/perception/camera/lib/traffic_light/detector/detection:detection",
 #         "//modules/perception/inference:inference_factory",
@@ -546,9 +522,6 @@ cc_test(
 #cc_test(
 #    name = "camera_lib_traffic_light_detector_recognition_test",
 #    srcs = ["camera_lib_traffic_light_detector_recognition_test.cc"],
-#    linkopts = [
-#        "-lnvinfer_plugin",
-#    ],
 #    deps = [
 #        "//modules/perception/camera/lib/traffic_light/detector/recognition:recognition",
 #        "//modules/perception/inference:inference_factory",
@@ -583,9 +556,6 @@ cc_test(
 #cc_test(
 #    name = "camera_lib_traffic_light_preprocessor_test",
 #    srcs = ["camera_lib_traffic_light_preprocessor_test.cc"],
-#    linkopts = [
-#        "-lnvinfer_plugin",
-#    ],
 #    deps = [
 #        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
 #        "//modules/perception/common/sensor_manager:sensor_manager",
@@ -604,9 +574,6 @@ cc_test(
     name = "camera_lib_traffic_light_tracker_test",
     size = "small",
     srcs = ["camera_lib_traffic_light_tracker_test.cc"],
-    linkopts = [
-        "-lnvinfer_plugin",
-    ],
     deps = [
         "//cyber",
         "//modules/perception/base:distortion_model",

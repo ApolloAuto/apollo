@@ -159,5 +159,8 @@ echo "########################### All check passed! ###########################"
 #          See https://docs.bazel.build/versions/master/be/python.html
 # TODO(Kecheng Xu): modules/tools/configurator/configurator.py: 2to3
 # TODO(storypku): cyber.aarch64 docker image
-# TODO(storypku): tools/workspace.bzl to re-org WORKSPACE.in
+# TODO(storypku): tools/workspace.bzl to re-org WORKSPACE
 # TODO(?): no break for cpu only build
+# TODO(?): Substitute implicit "-l" linkopts with explicit deps in BUILD files
+# find modules/ -name "BUILD" -exec grep -- "-l" {} +
+

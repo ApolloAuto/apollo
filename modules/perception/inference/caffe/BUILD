@@ -7,12 +7,12 @@ cc_library(
     name = "caffe_net_lib",
     srcs = ["caffe_net.cc"],
     hdrs = ["caffe_net.h"],
-    linkopts = ["-lnvinfer_plugin"],
     deps = [
         "//modules/perception/inference:inference_lib",
         "//third_party:boost",
         "@caffe",
         "@com_google_protobuf//:protobuf",
+        "@local_config_tensorrt//:tensorrt",
         "@opencv",
     ],
 )

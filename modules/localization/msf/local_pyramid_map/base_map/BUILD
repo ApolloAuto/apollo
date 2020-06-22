@@ -28,14 +28,12 @@ cc_library(
     ],
     linkopts = [
         "-lz",
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
     ],
     deps = [
         "//cyber/common",
         "@com_google_glog//:glog",
         "@eigen",
+        "@opencv",
     ],
 )
 
