@@ -144,8 +144,10 @@ void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
     out_points_array[point_pos * kNumPointFeature + 0] = point.x;
     out_points_array[point_pos * kNumPointFeature + 1] = point.y;
     out_points_array[point_pos * kNumPointFeature + 2] = point.z;
+    out_points_array[point_pos * kNumPointFeature + 3] =
+        point.intensity / normalizing_factor;
     // delta of timestamp between prev and cur frames
-    out_points_array[point_pos * kNumPointFeature + 3] = 0;
+    out_points_array[point_pos * kNumPointFeature + 4] = 0;
   }
 }
 
@@ -173,6 +175,8 @@ void PointPillarsDetection::FusePointCloudToArray(
       out_points_array[point_pos * kNumPointFeature + 2] =
           static_cast<float>(trans_point(2));
       out_points_array[point_pos * kNumPointFeature + 3] =
+          static_cast<float>(point.intensity / normalizing_factor);
+      out_points_array[point_pos * kNumPointFeature + 4] =
           static_cast<float>(lidar_frame_ref_->timestamp - iter->second);
       point_counter++;
     }
