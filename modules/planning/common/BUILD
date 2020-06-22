@@ -245,6 +245,7 @@ cc_library(
     deps = [
         ":indexed_queue",
         ":feature_output",
+        ":learning_based_data",
         ":local_view",
         ":obstacle",
         ":open_space_info",
@@ -518,6 +519,17 @@ cc_library(
         ":frame",
         ":history",
         ":planning_context",
+    ],
+)
+
+cc_library(
+    name = "learning_based_data",
+    hdrs = ["learning_based_data.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//modules/planning/proto:learning_data_proto",
     ],
 )
 
