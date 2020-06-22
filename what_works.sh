@@ -149,7 +149,6 @@ echo "########################### All check passed! ###########################"
 
 # TODO(?): apollo.sh build
 # TODO(?): apollo.sh test
-# TODO(?): apollo.sh lint
 # TODO(?): apollo.sh check
 # TODO(?): bstart; apollo.sh check
 # TODO(?): replay-engine image which is compatible with docker_dev branch.
