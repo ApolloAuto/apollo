@@ -21,7 +21,7 @@ import h5py
 import numpy as np
 import os
 
-from modules.prediction.proto import offline_features_pb2
+from modules.prediction.proto import offline_features_py_pb2
 
 
 junction_label_label_dim = 12
@@ -35,7 +35,7 @@ that is contained in that file.
 
 def LoadDataForLearning(filepath):
     list_of_data_for_learning = \
-        offline_features_pb2.ListDataForLearning()
+        offline_features_py_pb2.ListDataForLearning()
     with open(filepath, 'rb') as file_in:
         list_of_data_for_learning.ParseFromString(file_in.read())
     return list_of_data_for_learning.data_for_learning

@@ -17,8 +17,8 @@
 ###############################################################################
 
 from modules.common.proto import error_code_pb2
-from .statistical_analyzer import PrintColors
-from .distribution_analyzer import DistributionAnalyzer
+from modules.tools.record_analyzer.statistical_analyzer import PrintColors
+from modules.tools.record_analyzer.distribution_analyzer import DistributionAnalyzer
 
 
 class ErrorMsgAnalyzer:

@@ -32,12 +32,12 @@ import sys
 from google.protobuf import text_format
 import numpy as np
 
-from cyber_py3.record import RecordReader
-from cyber.proto import record_pb2
-from configuration_yaml_generator import ConfigYaml
-from extract_static_data import get_subfolder_list, select_static_image_pcd
+from cyber.python.cyber_py3.record import RecordReader
+from cyber.proto import record_py_pb2
+from modules.tools.sensor_calibration.configuration_yaml_generator import ConfigYaml
+from modules.tools.sensor_calibration.extract_static_data import get_subfolder_list, select_static_image_pcd
 from modules.tools.sensor_calibration.proto import extractor_config_py_pb2
-from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
+from modules.tools.sensor_calibration.sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
 
 
 SMALL_TOPICS = [
@@ -280,7 +280,7 @@ def validate_record(record_file):
     # Check the validity of a cyber record file according to header info.
     record_reader = RecordReader(record_file)
     header_msg = record_reader.get_headerstring()
-    header = record_pb2.Header()
+    header = record_py_pb2.Header()
     header.ParseFromString(header_msg)
     print("header is {}".format(header))
 

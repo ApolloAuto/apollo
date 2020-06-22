@@ -24,9 +24,9 @@ from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import numpy as np
 
-from modules.prediction.proto import offline_features_pb2
-from .bounding_rectangle import BoundingRectangle
-from .configure import parameters
+from modules.prediction.proto import offline_features_py_pb2
+from modules.tools.prediction.data_pipelines.common.bounding_rectangle import BoundingRectangle
+from modules.tools.prediction.data_pipelines.common.configure import parameters
 
 
 param_fea = parameters['feature']
@@ -89,7 +89,7 @@ class LabelGenerator(object):
 
     def LoadPBFeatures(self, filepath):
         self.filepath = filepath
-        offline_features = offline_features_pb2.Features()
+        offline_features = offline_features_py_pb2.Features()
         with open(filepath, 'rb') as file_in:
             offline_features.ParseFromString(file_in.read())
         return offline_features.feature
@@ -273,7 +273,7 @@ class LabelGenerator(object):
     '''
 
     def LabelSingleLane(self, period_of_interest=3.0):
-        output_features = offline_features_pb2.Features()
+        output_features = offline_features_py_pb2.Features()
         for obs_id, feature_sequence in self.feature_dict.items():
             feature_seq_len = len(feature_sequence)
             for idx, feature in enumerate(feature_sequence):
@@ -394,7 +394,7 @@ class LabelGenerator(object):
         np.save(self.filepath + '.cruise_label.npy', self.cruise_label_dict)
 
     def LabelTrajectory(self, period_of_interest=3.0):
-        output_features = offline_features_pb2.Features()
+        output_features = offline_features_py_pb2.Features()
         for obs_id, feature_sequence in self.feature_dict.items():
             for idx, feature in enumerate(feature_sequence):
                 # Observe the subsequent Features
@@ -420,7 +420,7 @@ class LabelGenerator(object):
         '''
         label feature trajectory according to real future lane sequence in 7s
         '''
-        output_features = offline_features_pb2.Features()
+        output_features = offline_features_py_pb2.Features()
         for obs_id, feature_sequence in self.feature_dict.items():
             feature_seq_len = len(feature_sequence)
             for i, fea in enumerate(feature_sequence):

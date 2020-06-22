@@ -21,16 +21,16 @@ import sys
 
 import matplotlib.pyplot as plt
 
-from cyber_py3.record import RecordReader
-from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
-from modules.canbus.proto import chassis_pb2
-from modules.control.proto import control_cmd_pb2
-from modules.drivers.proto import pointcloud_pb2
-from modules.perception.proto import perception_obstacle_pb2
-from modules.planning.proto import planning_pb2
-from modules.prediction.proto import prediction_obstacle_pb2
-from module_control_analyzer import ControlAnalyzer
-from module_planning_analyzer import PlannigAnalyzer
+from cyber.python.cyber_py3.record import RecordReader
+from modules.tools.record_analyzer.lidar_endtoend_analyzer import LidarEndToEndAnalyzer
+from modules.canbus.proto import chassis_py_pb2
+from modules.control.proto import control_cmd_py_pb2
+from modules.drivers.proto import pointcloud_py_pb2
+from modules.perception.proto import perception_obstacle_py_pb2
+from modules.planning.proto import planning_py_pb2
+from modules.prediction.proto import prediction_obstacle_py_pb2
+from modules.tools.record_analyzer.module_control_analyzer import ControlAnalyzer
+from modules.tools.record_analyzer.module_planning_analyzer import PlannigAnalyzer
 
 
 def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
@@ -39,10 +39,10 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
 
     for msg in reader.read_messages():
         if msg.topic == "/apollo/canbus/chassis":
-            chassis = chassis_pb2.Chassis()
+            chassis = chassis_py_pb2.Chassis()
             chassis.ParseFromString(msg.message)
             if chassis.driving_mode == \
-                    chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
+                    chassis_py_pb2.Chassis.COMPLETE_AUTO_DRIVE:
                 is_auto_drive = True
             else:
                 is_auto_drive = False
@@ -51,7 +51,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             if (not is_auto_drive and not all_data) or \
                     is_simulation or plot_planning_path or plot_planning_refpath:
                 continue
-            control_cmd = control_cmd_pb2.ControlCommand()
+            control_cmd = control_cmd_py_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
             control_analyzer.put(control_cmd)
             lidar_endtoend_analyzer.put_pb('control', control_cmd)
@@ -59,7 +59,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
         if msg.topic == "/apollo/planning":
             if (not is_auto_drive) and (not all_data):
                 continue
-            adc_trajectory = planning_pb2.ADCTrajectory()
+            adc_trajectory = planning_py_pb2.ADCTrajectory()
             adc_trajectory.ParseFromString(msg.message)
             planning_analyzer.put(adc_trajectory)
             lidar_endtoend_analyzer.put_pb('planning', adc_trajectory)
@@ -74,7 +74,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
                     plot_planning_path or plot_planning_refpath:
                 continue
-            point_cloud = pointcloud_pb2.PointCloud()
+            point_cloud = pointcloud_py_pb2.PointCloud()
             point_cloud.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_lidar(point_cloud)
 
@@ -82,7 +82,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
                     plot_planning_path or plot_planning_refpath:
                 continue
-            perception = perception_obstacle_pb2.PerceptionObstacles()
+            perception = perception_obstacle_py_pb2.PerceptionObstacles()
             perception.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_pb('perception', perception)
 
@@ -90,7 +90,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
                     plot_planning_path or plot_planning_refpath:
                 continue
-            prediction = prediction_obstacle_pb2.PredictionObstacles()
+            prediction = prediction_obstacle_py_pb2.PredictionObstacles()
             prediction.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_pb('prediction', prediction)
 

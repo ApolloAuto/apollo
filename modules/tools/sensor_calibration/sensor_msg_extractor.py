@@ -28,12 +28,12 @@ import cv2
 import pypcd
 import numpy as np
 
-from data_file_object import TimestampFileObject, OdometryFileObject
-from modules.drivers.proto import conti_radar_pb2
-from modules.drivers.proto import sensor_image_pb2
-from modules.drivers.proto import pointcloud_pb2
-from modules.localization.proto import gps_pb2
-from modules.localization.proto import localization_pb2
+from modules.tools.sensor_calibration.data_file_object import TimestampFileObject, OdometryFileObject
+from modules.drivers.proto import conti_radar_py_pb2
+from modules.drivers.proto import sensor_image_py_pb2
+from modules.drivers.proto import pointcloud_py_pb2
+from modules.localization.proto import gps_py_pb2
+from modules.localization.proto import localization_py_pb2
 
 
 class SensorMessageParser(object):
@@ -92,7 +92,7 @@ class GpsParser(SensorMessageParser):
             self._odomotry_output_file = os.path.join(self._output_path, "odometry")
 
     def _init_parser(self):
-        self._msg_parser = gps_pb2.Gps()
+        self._msg_parser = gps_py_pb2.Gps()
 
     def parse_sensor_message(self, msg):
         """ parse Gps information from GNSS odometry channel"""
@@ -135,7 +135,7 @@ class PoseParser(GpsParser):
     """
 
     def _init_parser(self):
-        self._msg_parser = localization_pb2.LocalizationEstimate()
+        self._msg_parser = localization_py_pb2.LocalizationEstimate()
 
     def parse_sensor_message(self, msg):
         """ parse localization information from localization estimate channel"""
@@ -218,7 +218,7 @@ class PointCloudParser(SensorMessageParser):
         pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
 
     def _init_parser(self):
-        self._msg_parser = pointcloud_pb2.PointCloud()
+        self._msg_parser = pointcloud_py_pb2.PointCloud()
 
     def parse_sensor_message(self, msg):
         """
@@ -253,7 +253,7 @@ class ImageParser(SensorMessageParser):
         self._suffix = suffix
 
     def _init_parser(self):
-        self._msg_parser = sensor_image_pb2.Image()
+        self._msg_parser = sensor_image_py_pb2.Image()
 
     def parse_sensor_message(self, msg):
 
@@ -372,7 +372,7 @@ class ContiRadarParser(SensorMessageParser):
         pypcd.save_point_cloud_bin(pc_meta, pcd_file)
 
     def _init_parser(self):
-        self._msg_parser = conti_radar_pb2.ContiRadar()
+        self._msg_parser = conti_radar_py_pb2.ContiRadar()
 
     def parse_sensor_message(self, msg):
         """
