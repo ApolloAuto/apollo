@@ -98,7 +98,8 @@ TEST_F(MPCControllerTest, ComputeLateralErrors) {
   auto chassis_pb = LoadChassisPb(
       "/apollo/modules/control/testdata/mpc_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  auto vehicle_state = VehicleStateProvider::Instance();
+  auto injector = std::make_shared<DependencyInjector>();
+  auto vehicle_state = injector->vehicle_state();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(

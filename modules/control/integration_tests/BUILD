@@ -6,6 +6,7 @@ cc_library(
     name = "control_test_base",
     srcs = ["control_test_base.cc"],
     hdrs = ["control_test_base.h"],
+    copts = ["-fno-access-control"],
     deps = [
         "//cyber",
         "//modules/common/proto:geometry_proto",
@@ -21,6 +22,7 @@ cc_test(
     name = "simple_control_test",
     size = "small",
     srcs = ["simple_control_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
@@ -32,6 +34,7 @@ cc_test(
     name = "relative_position_test",
     size = "small",
     srcs = ["relative_position_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
@@ -43,6 +46,7 @@ cc_test(
     name = "mpc_controller_test",
     size = "small",
     srcs = ["mpc_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",

@@ -23,6 +23,7 @@
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace prediction {
@@ -1389,7 +1390,7 @@ std::unique_ptr<Obstacle> Obstacle::Create(
     const PerceptionObstacle& perception_obstacle, const double timestamp,
     const int prediction_id) {
   static std::mutex mutex_createobstacle;
-  std::unique_lock<std::mutex> lock(mutex_createobstacle);
+  UNIQUE_LOCK_MULTITHREAD(mutex_createobstacle);
   std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle());
   if (!ptr_obstacle->Insert(perception_obstacle, timestamp, prediction_id)) {
     return nullptr;

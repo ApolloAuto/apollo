@@ -30,6 +30,7 @@
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -47,7 +48,8 @@ void SpeedData::AppendSpeedPoint(const double s, const double time,
                                  const double v, const double a,
                                  const double da) {
   static std::mutex mutex_speedpoint;
-  std::unique_lock<std::mutex> lock(mutex_speedpoint);
+  UNIQUE_LOCK_MULTITHREAD(mutex_speedpoint);
+
   if (!empty()) {
     ACHECK(back().t() < time);
   }
