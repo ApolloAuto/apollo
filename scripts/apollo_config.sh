@@ -1,28 +1,45 @@
 #! /usr/bin/env bash
 
-set -e
-
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 # STAGE="${STAGE:-dev}"
 : ${STAGE:=dev}
 
+IFS='' read -r -d '' STARTUP_TXT << EOF
+startup --output_user_root="${APOLLO_CACHE_DIR}/bazel"
+EOF
+
+set -e
+
 function config_noninteractive() {
-    echo "config_noninteractive"
+    local bzl_cfg_file="${APOLLO_ROOT_DIR}/.apollo.bazelrc"
+    echo "${STARTUP_TXT}" > "${bzl_cfg_file}"
+    cat "${APOLLO_ROOT_DIR}/tools/apollo.bazelrc.sample" >> "${bzl_cfg_file}"
 }
 
 function config_interactive() {
-    echo "config_interactive"
+    if [ -z "$PYTHON_BIN_PATH" ]; then
+        PYTHON_BIN_PATH=$(which python3 || true)
+    fi
+    local bzl_cfg_file="${APOLLO_ROOT_DIR}/.apollo.bazelrc"
+
+    # Set all env variables
+    "$PYTHON_BIN_PATH" "${TOP_DIR}/tools/bootstrap.py" "$@"
+    echo "${STARTUP_TXT}" >> "${bzl_cfg_file}"
 }
 
 function config() {
     local stage="${STAGE}"
-    local mode="$1"
-    if [[ "${mode}" == "--noninteractive" ]]; then
-        config_noninteractive
-    else
+    if [ $# -eq 0 ]; then
         config_interactive
+    else
+        local mode="$1" ; shift
+        if [[ "${mode}" == "--noninteractive" ]]; then
+            config_noninteractive "$@"
+        else
+            config_interactive
+        fi
     fi
 }
 

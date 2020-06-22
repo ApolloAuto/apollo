@@ -48,12 +48,14 @@ _TF_CURRENT_BAZEL_VERSION = None
 _TF_MIN_BAZEL_VERSION = '2.0.0'
 _TF_MAX_BAZEL_VERSION = '3.99.0'
 
+
 class UserInputError(Exception):
     pass
 
 
 def is_linux():
     return platform.system() == 'Linux'
+
 
 def get_input(question):
     try:
@@ -102,8 +104,10 @@ def write_to_bazelrc(line):
     with open(_TF_BAZELRC, 'a') as f:
         f.write(line + '\n')
 
+
 def write_action_env_to_bazelrc(var_name, var):
     write_to_bazelrc('build --action_env {}="{}"'.format(var_name, str(var)))
+
 
 def run_shell(cmd, allow_non_zero=False, stderr=None):
     if stderr is None:
@@ -116,6 +120,7 @@ def run_shell(cmd, allow_non_zero=False, stderr=None):
     else:
         output = subprocess.check_output(cmd, stderr=stderr)
     return output.decode('UTF-8').strip()
+
 
 def get_python_path(environ_cp, python_bin_path):
     """Get the python site package paths."""
@@ -147,10 +152,12 @@ def get_python_path(environ_cp, python_bin_path):
             paths.append(path)
     return paths
 
+
 def get_python_major_version(python_bin_path):
     """Get the python major version."""
     return run_shell(
         [python_bin_path, '-c', 'import sys; print(sys.version[0])'])
+
 
 def setup_python(environ_cp):
     """Setup python related env variables."""
@@ -216,9 +223,11 @@ def setup_python(environ_cp):
             'w') as f:
         f.write('export PYTHON_BIN_PATH="{}"'.format(python_bin_path))
 
+
 def reset_tf_configure_bazelrc():
     """Reset file that contains customized config settings."""
     open(_TF_BAZELRC, 'w').close()
+
 
 def get_var(environ_cp,
             var_name,
@@ -489,6 +498,7 @@ def set_tf_cuda_clang(environ_cp):
         no_reply=no_reply,
         bazel_config_name='cuda_clang')
 
+
 def get_from_env_or_user_or_default(environ_cp, var_name, ask_for_var,
                                     var_default):
     """Get var_name either from env, or user or default.
@@ -537,6 +547,7 @@ def set_clang_cuda_compiler_path(environ_cp):
     environ_cp['CLANG_CUDA_COMPILER_PATH'] = clang_cuda_compiler_path
     write_action_env_to_bazelrc('CLANG_CUDA_COMPILER_PATH',
                                 clang_cuda_compiler_path)
+
 
 def prompt_loop_or_load_from_env(environ_cp,
                                  var_name,
@@ -710,6 +721,7 @@ def is_cuda_compatible(lib, cuda_ver, cudnn_ver):
         cuda_ok = (cudart == cuda_ver)
     return cudnn_ok and cuda_ok
 
+
 def set_tf_tensorrt_version(environ_cp):
     """Set TF_TENSORRT_VERSION."""
     if not int(environ_cp.get('TF_NEED_TENSORRT', False)):
@@ -723,6 +735,7 @@ def set_tf_tensorrt_version(environ_cp):
         environ_cp, 'TF_TENSORRT_VERSION', ask_tensorrt_version,
         _DEFAULT_TENSORRT_VERSION)
     environ_cp['TF_TENSORRT_VERSION'] = tf_tensorrt_version
+
 
 def set_tf_nccl_version(environ_cp):
     """Set TF_NCCL_VERSION."""
@@ -880,6 +893,7 @@ def system_specific_test_config(environ_cp):
     if environ_cp.get('TF_NEED_CUDA', None) == '1':
         write_to_bazelrc('test --test_env=LD_LIBRARY_PATH')
 
+
 def set_system_libs_flag(environ_cp):
     syslibs = environ_cp.get('TF_SYSTEM_LIBS', '')
     if syslibs:
@@ -896,6 +910,7 @@ def set_system_libs_flag(environ_cp):
     if 'INCLUDEDIR' in environ_cp:
         write_to_bazelrc(
             'build --define=INCLUDEDIR=%s' % environ_cp['INCLUDEDIR'])
+
 
 def config_info_line(name, help_text):
     """Helper function to print formatted help text for Bazel config options."""
@@ -923,6 +938,7 @@ def validate_cuda_config(environ_cp):
     if environ_cp.get('TF_NCCL_VERSION', None):
         cuda_libraries.append('nccl')
 
+    # FIXME(all): abs path for find_cuda_config.py
     proc = subprocess.Popen(
         [environ_cp['PYTHON_BIN_PATH'], 'tools/gpus/find_cuda_config.py'] +
         cuda_libraries,
@@ -961,6 +977,7 @@ def validate_cuda_config(environ_cp):
     environ_cp['CUDA_TOOLKIT_PATH'] = config['cuda_toolkit_path']
     return True
 
+
 def set_overall_build_config():
     overall_text = """
 ## The following was adapted from tensorflow/.bazelrc
@@ -987,11 +1004,13 @@ build:nonccl --define=no_nccl_support=true
     with open(_TF_BAZELRC, 'a') as f:
         f.write(overall_text)
 
+
 def default_workspace_directory():
     current_dir = os.path.dirname(__file__)
     if len(current_dir) == 0:
         current_dir = "."
     return os.path.abspath(current_dir + "/..")
+
 
 def main():
     if not is_linux():
@@ -1125,6 +1144,7 @@ def main():
 #    config_info_line('noaws', 'Disable AWS S3 filesystem support.')
 #    config_info_line('nogcp', 'Disable GCP support.')
 #    config_info_line('nohdfs', 'Disable HDFS support.')
+
 
 if __name__ == '__main__':
     main()

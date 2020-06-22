@@ -37,7 +37,7 @@ sudo ldconfig
 # Fail on first failure.
 set -e
 
-./bootstrap.sh --noninteractive
+./apollo6.sh config --noninteractive
 
 function bazel_build_with_dist_cache() {
     # bazel build -c opt --distdir=/apollo/.cache/distdir "$@"
