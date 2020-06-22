@@ -144,6 +144,22 @@ function add_to_path() {
   fi
 }
 
+## Prevent multiple entries of my_libdir in LD_LIBRARY_PATH
+function add_to_ld_library_path() {
+  if [ -z "$1" ]; then
+    return
+  fi
+  local my_libdir="$1"
+  local result="${LD_LIBRARY_PATH}"
+  if [ -z "${result}" ]; then
+    result="${my_libdir}"
+  elif [ -n "${result##*${my_libdir}}" ] && [ -n "${result##*${my_libdir}:*}" ]; then
+    result="${result}:${my_libdir}"
+  fi
+  export LD_LIBRARY_PATH="${result}"
+}
+
+
 # Exits the script if the command fails.
 function run() {
   if [ "${VERBOSE}" = yes ]; then
