@@ -190,6 +190,7 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
 Status LatController::Init(std::shared_ptr<DependencyInjector> injector,
                            const ControlConf *control_conf) {
   control_conf_ = control_conf;
+  injector_ = injector;
   if (!LoadControlConf(control_conf_)) {
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,

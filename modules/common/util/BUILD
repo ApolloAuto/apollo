@@ -13,6 +13,8 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/math",
+        "//modules/common/configs:config_gflags",
     ],
 )
 

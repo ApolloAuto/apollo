@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/common/status/status.h"

@@ -52,7 +52,7 @@ TEST(RTKReplayPlannerTest, ComputeTrajectory) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_x(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
-  common::VehicleStateProvider::Instance()->Update(localization, chassis);
+  injector->vehicle_state()->Update(localization, chassis);
   common::VehicleState state;
   state.set_x(point.x());
   state.set_y(point.y());
@@ -98,7 +98,7 @@ TEST(RTKReplayPlannerTest, ErrorTest) {
   localization.mutable_pose()->mutable_linear_acceleration()->set_x(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_y(0.0);
   localization.mutable_pose()->mutable_linear_acceleration()->set_z(0.0);
-  common::VehicleStateProvider::Instance()->Update(localization, chassis);
+  injector->vehicle_state()->Update(localization, chassis);
   ReferenceLine ref;
   hdmap::RouteSegments segments;
   common::VehicleState state;

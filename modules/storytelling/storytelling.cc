@@ -52,8 +52,7 @@ bool Storytelling::Proc() {
 
   // Send stories.
   apollo::common::util::FillHeader("Storytelling", &stories_);
-  auto copy_story = stories_;
-  story_writer_->Write(copy_story);
+  story_writer_->Write(stories_);
 
   frame_manager_->EndFrame();
   return true;
