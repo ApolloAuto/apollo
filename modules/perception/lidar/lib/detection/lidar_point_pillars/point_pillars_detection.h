@@ -81,17 +81,17 @@ class PointPillarsDetection {
   double collect_time_ = 0.0;
 
   // constants
-  const float kNormalizingFactor = 255.0f;
-  const int kNumPointFeature = 4;
+  const float kNormalizingFactor = 255.0f;  // normalize intensity to [0, 1]
+  const int kNumPointFeature = 5;  // x, y, z, intensity, delta of time
   const int kOutputNumBoxFeature = 7;
-  const int kNumFuseFrames = 5;
-  const bool kFuseFrames = false;
-  const bool kReproduceResultMode = false;
-  const bool kShufflePoints = true;
-  const float kScoreThreshold = 0.5;
+  const int kNumFuseFrames = 5;  // number of frames to fuse, including current
+  const bool kFuseFrames = false;  // fuse preceding frames' point cloud or not
+  const bool kReproduceResultMode = false;  // true if preprocess in CPU mode
+  const bool kShufflePoints = false;  // shuffle point array before inference
+  const float kScoreThreshold = 0.5;  // classification score threshold
   const float kNmsOverlapThreshold = 0.5;
-  const float kTimeInterval = 0.5;
-  const int kMaxNumPoints = INT_MAX;
+  const float kTimeInterval = 0.5;  // fuse frames within the time interval
+  const int kMaxNumPoints = INT_MAX;  // max number of points to do inference
 };  // class PointPillarsDetection
 
 }  // namespace lidar
