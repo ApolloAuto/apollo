@@ -129,21 +129,30 @@ void BlackListRangeGenerator::AddBlackMapFromTerminal(
     double end_s, TopoRangeManager* const range_manager) const {
   double start_length = src_node->Length();
   double end_length = dest_node->Length();
-  if (start_s < 0.0 || start_s > start_length) {
+
+  static constexpr double kEpsilon = 1e-2;
+  const double start_s_adjusted =
+      (start_s > start_length && start_s - start_length <= kEpsilon) ?
+          start_length : start_s;
+  const double end_s_adjusted =
+      (end_s > end_length && end_s - end_length <= kEpsilon) ?
+          end_length : end_s;
+
+  if (start_s_adjusted < 0.0 || start_s_adjusted > start_length) {
     AERROR << "Illegal start_s: " << start_s << ", length: " << start_length;
     return;
   }
-  if (end_s < 0.0 || end_s > end_length) {
+  if (end_s_adjusted < 0.0 || end_s_adjusted > end_length) {
     AERROR << "Illegal end_s: " << end_s << ", length: " << end_length;
     return;
   }
 
-  double start_cut_s = MoveSBackward(start_s, 0.0);
+  double start_cut_s = MoveSBackward(start_s_adjusted, 0.0);
   range_manager->Add(src_node, start_cut_s, start_cut_s);
   AddBlackMapFromOutParallel(src_node, start_cut_s / start_length,
                              range_manager);
 
-  double end_cut_s = MoveSForward(end_s, end_length);
+  double end_cut_s = MoveSForward(end_s_adjusted, end_length);
   range_manager->Add(dest_node, end_cut_s, end_cut_s);
   AddBlackMapFromInParallel(dest_node, end_cut_s / end_length, range_manager);
   range_manager->SortAndMerge();
