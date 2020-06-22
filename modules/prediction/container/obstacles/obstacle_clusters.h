@@ -25,6 +25,7 @@
 
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace prediction {
@@ -122,7 +123,7 @@ class ObstacleClusters {
 
   static std::unordered_map<std::string, std::vector<LaneObstacle>>&
   GetLaneObstacles() {
-    std::unique_lock<std::mutex> lock(mutex_obstacle_cluster_);
+    UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
     return lane_obstacles_;
   }
 

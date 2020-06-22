@@ -60,7 +60,8 @@ TEST_F(VehicleModelTest, RearCenteredKinematicBicycleModel) {
   double predicted_time_horizon = localization_post_.measurement_time() -
                                   localization_pre_.measurement_time();
 
-  auto vehicle_state_provider = VehicleStateProvider::Instance();
+  auto vehicle_state_provider =
+      std::make_shared<common::VehicleStateProvider>();
 
   vehicle_state_provider->Update(localization_pre_, chassis_pre_);
   cur_vehicle_state_ = vehicle_state_provider->vehicle_state();

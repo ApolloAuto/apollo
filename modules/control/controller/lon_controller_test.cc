@@ -56,6 +56,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     timestamp_ = Clock::NowInSeconds();
 
     controller_.reset(new LonController());
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
@@ -66,7 +67,7 @@ class LonControllerTest : public ::testing::Test, LonController {
   }
 
   common::Status Init(const ControlConf *control_conf) {
-    return LonController::Init(control_conf);
+    return LonController::Init(injector_, control_conf);
   }
 
  protected:
@@ -112,7 +113,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   double time_now = Clock::NowInSeconds();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  auto vehicle_state = VehicleStateProvider::Instance();
+  auto vehicle_state = injector_->vehicle_state();
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 

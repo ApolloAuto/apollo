@@ -28,7 +28,7 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
+// #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/interpolation_2d.h"
 #include "modules/control/common/leadlag_controller.h"
 #include "modules/control/common/pid_controller.h"

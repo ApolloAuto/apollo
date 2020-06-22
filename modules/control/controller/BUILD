@@ -68,7 +68,6 @@ cc_library(
         "//modules/common/filters:digital_filter_coefficients",
         "//modules/common/status",
         "//modules/common/time",
-        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
         "//modules/control/common:interpolation_2d",
         "//modules/control/common:leadlag_controller",
@@ -165,6 +164,7 @@ cc_test(
     name = "lon_controller_test",
     size = "small",
     srcs = ["lon_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":lon_controller",
@@ -183,6 +183,7 @@ cc_test(
     name = "lat_controller_test",
     size = "small",
     srcs = ["lat_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":lat_controller",
@@ -200,6 +201,7 @@ cc_test(
     name = "mpc_controller_test",
     size = "small",
     srcs = ["mpc_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":mpc_controller",

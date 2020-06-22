@@ -35,6 +35,7 @@ cc_library(
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
         "//modules/planning/proto:ipopt_return_status_cc_proto",
         "//modules/planning/tasks/optimizers:speed_optimizer",
+        "//modules/common/util:util",
     ],
 )
 

@@ -48,6 +48,7 @@ class LatControllerTest : public ::testing::Test, LatController {
     lateral_conf_ = control_conf.lat_controller_conf();
 
     timestamp_ = Clock::NowInSeconds();
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
@@ -97,7 +98,7 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
       "/apollo/modules/control/testdata/lateral_controller_test/"
       "1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  auto vehicle_state = VehicleStateProvider::Instance();
+  auto vehicle_state = injector_->vehicle_state();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
