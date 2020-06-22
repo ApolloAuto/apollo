@@ -14,7 +14,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:trajectory_evaluator",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
-        "//modules/planning/learning_based/model_inference:trajectory_imitation_inference",
+        "//modules/planning/learning_based/model_inference:trajectory_imitation_libtorch_inference",
         "//modules/planning/proto:learning_data_cc_proto",
         "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/tasks:task",

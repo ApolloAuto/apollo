@@ -201,7 +201,11 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-// Next-id: 29
+message SensorMeasurements{
+  repeated Object sensor_measurement = 1;
+}
+
+// Next-id: 30
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -277,4 +281,7 @@ message SimulationWorld {
 
   // A map from a story name to whether it is on
   map<string, bool> stories = 28;
+
+  // A map from a sensor_id to a group of sensor_measurements
+  map<string, SensorMeasurements> sensor_measurements = 29;
 }

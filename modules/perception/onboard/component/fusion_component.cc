@@ -185,8 +185,10 @@ bool FusionComponent::InternalProc(
 
   const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Obstacle:End:msg_time[" << timestamp
-        << "]:cur_time[" << cur_time << "]:cur_latency[" << latency
+  AINFO << std::setprecision(16)
+        << "FRAME_STATISTICS:Obstacle:End:msg_time[" << timestamp
+        << "]:cur_time[" << cur_time
+        << "]:cur_latency[" << latency
         << "]:obj_cnt[" << valid_objects.size() << "]";
   AINFO << "publish_number: " << valid_objects.size() << " obj";
   return true;

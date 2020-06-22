@@ -334,12 +334,9 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   float* points_array = new float[pcl_pc_ptr->size() * 4];
   test_obj.PclToArray(pcl_pc_ptr, points_array);
 
-  int x_coors[kMaxNumPillars];
-  int y_coors[kMaxNumPillars];
-  float num_points_per_pillar[kMaxNumPillars];
-  memset(x_coors, 0, kMaxNumPillars * sizeof(int));
-  memset(y_coors, 0, kMaxNumPillars * sizeof(int));
-  memset(num_points_per_pillar, 0, kMaxNumPillars * sizeof(float));
+  int x_coors[kMaxNumPillars] = {};
+  int y_coors[kMaxNumPillars] = {};
+  float num_points_per_pillar[kMaxNumPillars] = {};
 
   float* pillar_point_feature =
       new float[test_obj.max_num_pillars * test_obj.max_num_points_per_pillar *
@@ -419,7 +416,7 @@ TEST(TestSuite, CheckPreprocessGPU) {
   int* dev_sparse_pillar_map;
   float* dev_pillar_point_feature;
   float* dev_pillar_coors;
-  int host_pillar_count[1] = {0};
+  int host_pillar_count[1] = {};
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_points),
                        in_num_points * kNumBoxCorners * sizeof(float)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_x_coors),

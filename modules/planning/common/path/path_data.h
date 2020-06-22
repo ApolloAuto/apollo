@@ -94,6 +94,24 @@ class PathData {
     return blocking_obstacle_id_;
   }
 
+  const size_t trimmed_path_bound_size() const {
+    return trimmed_path_bound_size_;
+  }
+  void set_trimmed_path_bound_size(const size_t trimmed_path_bound_size);
+
+  const common::PointENU path_reference_end_pose() const {
+    return path_reference_end_pos_;
+  }
+  void set_path_reference_end_pose(
+      const common::PointENU &path_reference_end_pose);
+
+  const bool is_valid_path_reference() const {
+    return is_valid_path_reference_;
+  }
+  void set_valid_path_reference(bool is_valid_path_reference) {
+    is_valid_path_reference_ = is_valid_path_reference;
+  }
+
  private:
   /*
    * convert frenet path to cartesian path by reference line
@@ -117,6 +135,17 @@ class PathData {
 
   std::string path_label_ = "";
   std::string blocking_obstacle_id_;
+
+  /**
+   * @brief parameters for using the learning model output as a path reference
+   *
+   */
+  // use path reference for optimization target
+  bool is_valid_path_reference_ = false;
+  // path bound size after trimmed according to the learning model output
+  size_t trimmed_path_bound_size_{0};
+  // end pose of the reference
+  common::PointENU path_reference_end_pos_;
 };
 
 }  // namespace planning

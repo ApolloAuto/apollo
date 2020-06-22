@@ -20,7 +20,8 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
-#include "modules/planning/learning_based/model_inference/trajectory_imitation_inference.h"
+#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+#include "modules/planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_semantic_map_config.pb.h"
 #include "modules/planning/proto/task_config.pb.h"
@@ -47,10 +48,10 @@ class ModelInferenceTest : public ::testing::Test {
   }
 };
 
-TEST_F(ModelInferenceTest, trajectory_imitation) {
+TEST_F(ModelInferenceTest, trajectory_imitation_libtorch_inference) {
   FLAGS_test_model_inference_task_config_file =
       "/apollo/modules/planning/testdata/model_inference_test/"
-      "test_learning_model_inference_task_config.pb.txt";
+      "test_libtorch_inference_task_config.pb.txt";
   FLAGS_test_data_frame_file =
       "/apollo/modules/planning/testdata/model_inference_test/"
       "learning_data_sunnyvale_with_two_offices.bin";
@@ -77,10 +78,52 @@ TEST_F(ModelInferenceTest, trajectory_imitation) {
 
   BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
 
-  std::unique_ptr<ModelInference> trajectory_imitation_inference =
-      std::unique_ptr<ModelInference>(new TrajectoryImitationInference(config));
+  std::unique_ptr<ModelInference> trajectory_imitation_libtorch_inference =
+      std::unique_ptr<ModelInference>(
+          new TrajectoryImitationLibtorchInference(config));
+  ACHECK(trajectory_imitation_libtorch_inference->LoadModel())
+      << "Failed to load model in libtorch inference";
+  ACHECK(trajectory_imitation_libtorch_inference->DoInference(&test_data_frame))
+      << "Failed to inference trajectory_imitation_model";
+}
 
-  ACHECK(trajectory_imitation_inference->Inference(&test_data_frame))
+TEST_F(ModelInferenceTest, trajectory_imitation_tensorrt_inference) {
+  FLAGS_test_model_inference_task_config_file =
+      "/apollo/modules/planning/testdata/model_inference_test/"
+      "test_tensorrt_inference_task_config.pb.txt";
+  FLAGS_test_data_frame_file =
+      "/apollo/modules/planning/testdata/model_inference_test/"
+      "learning_data_sunnyvale_with_two_offices.bin";
+  FLAGS_planning_birdview_img_feature_renderer_config_file =
+      "/apollo/modules/planning/conf/planning_semantic_map_config.pb.txt";
+
+  LearningModelInferenceTaskConfig config;
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
+      FLAGS_test_model_inference_task_config_file, &config))
+      << "Failed to load config file "
+      << FLAGS_test_model_inference_task_config_file;
+
+  LearningDataFrame test_data_frame;
+  ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_test_data_frame_file,
+                                                 &test_data_frame))
+      << "Failed to load data frame file " << FLAGS_test_data_frame_file;
+
+  PlanningSemanticMapConfig renderer_config;
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
+      FLAGS_planning_birdview_img_feature_renderer_config_file,
+      &renderer_config))
+      << "Failed to load renderer config"
+      << FLAGS_planning_birdview_img_feature_renderer_config_file;
+
+  BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
+
+  std::unique_ptr<ModelInference> trajectory_imitation_tensorrt_inference =
+      std::unique_ptr<ModelInference>(
+          new TrajectoryImitationTensorRTInference(config));
+
+  ACHECK(trajectory_imitation_tensorrt_inference->LoadModel())
+      << "Failed to load model in tensorRT inference";
+  ACHECK(trajectory_imitation_tensorrt_inference->DoInference(&test_data_frame))
       << "Failed to inference trajectory_imitation_model";
 }
 

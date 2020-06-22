@@ -62,7 +62,6 @@ class IndexedQueue {
   }
 
   void Clear() {
-    capacity_ = 0;
     while (!queue_.empty()) {
       queue_.pop();
     }
