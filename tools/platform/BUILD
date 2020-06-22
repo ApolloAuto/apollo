@@ -18,3 +18,10 @@ config_setting(
         "define": "USE_GPU=true",
     },
 )
+
+config_setting(
+    name = "use_esd_can",
+    values = {
+        "define": "USE_ESD_CAN=true",
+    },
+)

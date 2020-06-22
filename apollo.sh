@@ -62,13 +62,10 @@ function check_machine_arch() {
 }
 
 function check_esd_files() {
-  CAN_CARD="fake_can"
-
   if [ -f ./third_party/can_card_library/esd_can/include/ntcan.h \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4 \
       -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4.0.1 ]; then
       USE_ESD_CAN=true
-      CAN_CARD="esd_can"
   else
       warning "ESD CAN library supplied by ESD Electronics does not exist. If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md."
       USE_ESD_CAN=false
@@ -576,7 +573,7 @@ function main() {
 
   check_esd_files
 
-  DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+  DEFINES="--define ARCH=${MACHINE_ARCH} --define USE_ESD_CAN=${USE_ESD_CAN} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
   # Enable bazel's feature to compute md5 checksums in parallel
   DEFINES="${DEFINES} --experimental_multi_threaded_digest"
 
