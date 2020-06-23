@@ -8,10 +8,10 @@ ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
 
-COMMAND_LINE_OPTIONS=
-BUILD_TARGETS=
+CMDLINE_OPTIONS=
+SHORTHAND_TARGETS=
 
-function determine_disabled_targets() {
+function determine_disabled_bazel_targets() {
     local disabled=
     local compo="$1"
     if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
@@ -33,88 +33,68 @@ function determine_disabled_targets() {
 # components="$(echo -e "${@// /\\n}" | sort -u)"
 # if [ ${PIPESTATUS[0]} -ne 0 ]; then ... ; fi
 
-function determine_targets() {
-    local targets=
+function determine_bazel_targets() {
+    local bazel_targets=
     local compo="$1"
     if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
         local exceptions=
         if ! ${USE_ESD_CAN}; then
-            exceptions="$(determine_disabled_targets ${compo})"
+            exceptions="$(determine_disabled_bazel_targets ${compo})"
         fi
         if [ -z "${compo}" ]; then
-            targets="//modules/... union //cyber/... ${exceptions}"
+            bazel_targets="//modules/... union //cyber/... ${exceptions}"
         else
-            targets="//modules/drivers/... ${exceptions}"
+            bazel_targets="//modules/drivers/... ${exceptions}"
         fi
     elif [[ "${compo}" == "cyber" ]]; then
         if [[ "${ARCH}" == "x86_64" ]]; then
-            targets="//cyber/... union //modules/tools/visualizer/..."
+            bazel_targets="//cyber/... union //modules/tools/visualizer/..."
         else
-            targets="//cyber/..."
+            bazel_targets="//cyber/..."
         fi
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-        targets="//modules/${compo}/..."
+        bazel_targets="//modules/${compo}/..."
     else
         error "Oops, no such component under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
         exit 1
     fi
-    echo "${targets}"
+    echo "${bazel_targets}"
 }
 
-function _arg_parse() {
-    local __retopts="$1"
-    local __retargs="$2"
-    shift 2
-
+function _parse_cmdline_arguments() {
     local known_options=""
     local remained_args=""
-    while [ "$#" -gt 0 ]; do
-        local opt="$1"
+
+    for ((pos=1; pos <= $#; pos++)); do #do echo "$#" "$i" "${!i}"; done
+        local opt="${!pos}"
         local optarg
 
         case "${opt}" in
             --config=*)
                 optarg="${opt#*=}"
                 known_options="${known_options} ${opt}"
-                shift
                 ;;
             --config)
-                optarg="${2}"; shift 2
-                # check here
+                ((++pos))
+                optarg="${!pos}"
                 known_options="${known_options} ${opt} ${optarg}"
                 ;;
             -c)
-                optarg="$2"; shift 2
-                # check here
+                ((++pos))
+                optarg="${!pos}"
                 known_options="${known_options} ${opt} ${optarg}"
                 ;;
             *)
                 remained_args="${remained_args} ${opt}"
-                shift
                 ;;
         esac
     done
-    eval ${__retopts}="'${known_options}'"
-    eval ${__retargs}="'${remained_args}'"
-}
+    # Strip leading whitespaces
+    known_options="$(echo "${known_options}" | sed -e 's/^[[:space:]]*//')"
+    remained_args="$(echo "${remained_args}" | sed -e 's/^[[:space:]]*//')"
 
-function parse_cmdline_options() {
-	local remained_args=""
-	local known_options=""
-	_arg_parse known_options remained_args
-
-	# FIXME(all): Use "--define USE_ESD_CAN=${USE_ESD_CAN}" instead
-    local myopts="${known_options} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
-
-    local targets
-    targets="$(determine_targets ${remained_args})"
-
-    COMMAND_LINE_OPTIONS="${myopts}"
-    BUILD_TARGETS="${targets}"
-
-    info "Build Overview: "
-    info "${TAB}Bazel Options: ${GREEN}${COMMAND_LINE_OPTIONS}${NO_COLOR}"
-    info "${TAB}Build Targets: ${GREEN}${BUILD_TARGETS}${NO_COLOR}"
+    CMDLINE_OPTIONS="${known_options}"
+    SHORTHAND_TARGETS="${remained_args}"
 }
 
 function _run_bazel_build_impl() {
@@ -128,8 +108,19 @@ function bazel_build() {
         # exit 1
     fi
 
-    parse_cmdline_options "$@"
-    _run_bazel_build_impl "${COMMAND_LINE_OPTIONS}" "$(bazel query ${BUILD_TARGETS})"
+	_parse_cmdline_arguments $@
+
+	# FIXME(all): Use "--define USE_ESD_CAN=${USE_ESD_CAN}" instead
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+
+    local bazel_targets
+    bazel_targets="$(determine_bazel_targets ${SHORTHAND_TARGETS})"
+
+    info "Build Overview: "
+    info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
+    info "${TAB}Build Targets: ${GREEN}${bazel_targets}${NO_COLOR}"
+
+    _run_bazel_build_impl "${CMDLINE_OPTIONS}" "$(bazel query ${bazel_targets})"
 }
 
 function build_simulator() {
@@ -147,11 +138,10 @@ function build_simulator() {
 
 function main() {
     if [ "${USE_GPU}" -eq 1 ]; then
-        info "Running build under GPU mode. GPU is required to run the build."
+        info "Your GPU is enabled to run the build on ${ARCH} platform."
     else
-        info "Running build under CPU mode."
+        info "Running build under CPU mode on ${ARCH} platform."
     fi
-    info "Building for ${ARCH} arch ..."
     bazel_build $@
     build_simulator
     success "Done building Apollo. Enjoy!"
