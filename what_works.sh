@@ -69,7 +69,8 @@ bazel_build_with_dist_cache \
     //modules/contrib/... \
     //modules/planning/... \
     //modules/perception/... \
-    //modules/third_party_perception/...
+    //modules/third_party_perception/... \
+    //modules/tools/...
 
 bazel_test_with_dist_cache \
     //cyber/... \
@@ -87,7 +88,8 @@ bazel_test_with_dist_cache \
     //modules/guardian/... \
     //modules/map/... \
     //modules/contrib/... \
-    //modules/third_party_perception/...
+    //modules/third_party_perception/... \
+    //modules/tools/...
 
 # Drivers: OK
 bash scripts/install_esdcan_library.sh install
@@ -108,11 +110,6 @@ bazel_test_with_dist_cache $(bazel query //modules/perception/... \
 # Flaky
 # //modules/perception/camera/test:camera_lib_lane_postprocessor_denseline_lane_postprocessor_test
 # //modules/perception/camera/test:camera_lib_lane_detector_denseline_lane_detector_test
-
-bazel_build_with_dist_cache //modules/tools/...
-bazel_test_with_dist_cache $(bazel query //modules/tools/... \
-    except //modules/tools/visualizer/... \
-)
 
 # Localization: 3 test failures
 bazel_test_with_dist_cache $(bazel query //modules/localization/... \

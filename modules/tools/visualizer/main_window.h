@@ -57,7 +57,7 @@ class MainWindow : public QMainWindow {
  protected:
   void resizeEvent(QResizeEvent*) override;
 
- private slots:
+ private slots:  // NOLINT
   void ActionAddGrid(void);
 
   void ActionOpenPointCloud(void);
