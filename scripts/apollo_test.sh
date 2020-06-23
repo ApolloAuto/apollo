@@ -64,10 +64,14 @@ function _disabled_test_targets_all() {
         warning "  third_party/can_card_library/esd_can/README.md"
         disabled="${disabled} except //modules/drivers/canbus/can_client/esd/..."
     fi
+    # TODO(all): arch exceptions should be done in BUILD file level.
     if [[ "${ARCH}" != "x86_64" ]]; then
         disabled="${disabled} except //modules/localization/msf/..."
     fi
     echo "${disabled}"
+    # TODO(all): exceptions for CPU mode: should be done in BUILD file level.
+    # grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|
+    # perception_traffic_light_rectify_test\|cuda_util_test"`"
 }
 
 # bazel run //modules/planning/tools:inference_demo crash
