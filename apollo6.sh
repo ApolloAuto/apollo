@@ -42,8 +42,8 @@ function check_minimal_memory_requirement() {
 function determine_esdcan_use() {
     local esdcan_dir="${APOLLO_ROOT_DIR}/third_party/can_card_library/esd_can"
     local use_esd=false
-    if [ -f "${esdcan_dir}/include/ntcan.h" -a \
-         -f "${esdcan_dir}/lib/libntcan.so.4" ]; then
+    if [ -f "${esdcan_dir}/include/ntcan.h" ] && \
+       [ -f "${esdcan_dir}/lib/libntcan.so.4" ]; then
         use_esd=true
     fi
     USE_ESD_CAN="${use_esd}"
@@ -82,7 +82,7 @@ function apollo_env_setup() {
 
 #TODO(all): Update node modules
 function build_dreamview_frontend() {
-    pushd ${APOLLO_ROOT_DIR}/modules/dreamview/frontend >/dev/null
+    pushd "${APOLLO_ROOT_DIR}/modules/dreamview/frontend" >/dev/null
         yarn build
     popd >/dev/null
 }
@@ -100,7 +100,7 @@ function main() {
     local cmd="$1"; shift
     case "${cmd}" in
         config)
-            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_config.sh "$@"
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" "$@"
             ;;
         build)
             env ${APOLLO_ENV} bash "${build_sh}" "$@"
@@ -121,25 +121,30 @@ function main() {
             env ${APOLLO_ENV} bash "${build_sh}" --config=opt_gpu "$@"
             ;;
         build_prof)
-            evn ${APOLLO_ENV} bash "${build_sh}" --config=cpu_prof --config=dbg "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=cpu_prof "$@"
+            ;;
+        build_teleop)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=teleop --config=opt "$@"
+            ;;
+
         build_fe)
             build_dreamview_frontend
             ;;
         buildify)
-            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
             ;;
         lint)
             # FIXME(all): apollo_lint.sh "$@" when bash/python scripts are ready.
-            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh cpp
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
             ;;
         clean)
-            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh "$@"
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "$@"
             ;;
         doc)
-            env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh "$@"
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"
             ;;
         configurator) # Consult Kecheng Xu
-            ${APOLLO_ROOT_DIR}/scripts/configurator.sh "$@"
+            bash "${APOLLO_ROOT_DIR}/scripts/configurator.sh" "$@"
             ;;
         usage)
             _usage

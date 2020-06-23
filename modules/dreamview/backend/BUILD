@@ -1,5 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/platform:build_defs.bzl", "copts_if_with_teleop", "if_with_teleop")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,7 +11,7 @@ cc_library(
         "main.cc",
     ],
     hdrs = ["dreamview.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'] + copts_if_with_teleop(),
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
@@ -28,20 +29,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "@civetweb//:civetweb++",
-    ] + select({
-        ":teleop": [
-            "//modules/dreamview/backend/teleop",
-        ],
-        "//conditions:default": [
-        ],
-    }),
-)
-
-config_setting(
-    name = "teleop",
-    values = {
-        "define": "WITH_TELEOP=1",
-    },
+    ] + if_with_teleop(["//modules/dreamview/backend/teleop"]),
 )
 
 cpplint()

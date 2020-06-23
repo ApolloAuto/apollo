@@ -25,3 +25,10 @@ config_setting(
         "define": "USE_ESD_CAN=true",
     },
 )
+
+config_setting(
+    name = "with_teleop",
+    values = {
+        "define": "WITH_TELEOP=1",
+    },
+)
