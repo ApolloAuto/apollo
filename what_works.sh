@@ -146,9 +146,8 @@ bazel_test_with_dist_cache $(bazel query //modules/planning/... \
 echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
-
-# TODO(?): apollo.sh build
-# TODO(?): apollo.sh test
+bash apollo6.sh build
+# TODO(storypku): apollo.sh test
 # TODO(?): apollo.sh check
 # TODO(?): bstart; apollo.sh check
 # TODO(?): replay-engine image which is compatible with docker_dev branch.
