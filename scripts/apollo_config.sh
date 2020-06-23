@@ -8,6 +8,7 @@ source "${TOP_DIR}/scripts/apollo.bashrc"
 
 IFS='' read -r -d '' STARTUP_TXT << EOF
 startup --output_user_root="${APOLLO_CACHE_DIR}/bazel"
+common --distdir="${APOLLO_CACHE_DIR}/distdir"
 EOF
 
 set -e

@@ -65,7 +65,7 @@ function apollo_env_setup() {
     check_architecture_support
     check_platform_support
     check_minimal_memory_requirement
-    determine_gpu_use
+    # determine_gpu_use # work done by scripts/apollo.bashrc
     determine_esdcan_use
 
     APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"

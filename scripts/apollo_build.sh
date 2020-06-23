@@ -6,8 +6,6 @@ source "${TOP_DIR}/scripts/apollo.bashrc"
 
 ARCH="$(uname -m)"
 
-# STAGE="${STAGE:-dev}"
-: ${STAGE:=dev}
 : ${USE_ESD_CAN:=false}
 
 COMMAND_LINE_OPTIONS=
@@ -42,7 +40,7 @@ function determine_targets() {
             exceptions="$(determine_disabled_targets ${compo})"
         fi
         if [ -z "${compo}" ]; then
-            targets="//... ${exceptions}"
+            targets="//modules/... union //cyber/... ${exceptions}"
         else
             targets="//modules/drivers/... ${exceptions}"
         fi
@@ -61,43 +59,53 @@ function determine_targets() {
     echo "${targets}"
 }
 
-function parse_cmdline_options() {
-    local build_mode="build"
-    local compilation_mode="fastbuild"
-    local args_to_pass_on=""
+function _arg_parse() {
+    local __retopts="$1"
+    local __retargs="$2"
+    shift 2
 
+    local known_options=""
+    local remained_args=""
     while [ "$#" -gt 0 ]; do
-        local option="$1"
-        case "${option}" in
-            --mode)
-                build_mode="$(_check_build_mode $2)"; shift 2
+        local opt="$1"
+        local optarg
+
+        case "${opt}" in
+            --config=*)
+                optarg="${opt#*=}"
+                known_options="${known_options} ${opt}"
+                shift
                 ;;
-            -c|--compilation_mode)
-                compilation_mode="$(_check_compilation_mode $2)"; shift 2
+            --config)
+                optarg="${2}"; shift 2
+                # check here
+                known_options="${known_options} ${opt} ${optarg}"
+                ;;
+            -c)
+                optarg="$2"; shift 2
+                # check here
+                known_options="${known_options} ${opt} ${optarg}"
                 ;;
             *)
-                # Pass arguments we don't handle to bazel
-                args_to_pass_on="${args_to_pass_on} ${option}"; shift
+                remained_args="${remained_args} ${opt}"
+                shift
                 ;;
         esac
     done
+    eval ${__retopts}="'${known_options}'"
+    eval ${__retargs}="'${remained_args}'"
+}
 
-    local myopts=""
-    if [ "${compilation_mode}" != "fastbuild" ]; then
-        myopts="${myopts} -c ${compilation_mode}"
-    fi
-    # TODO(all):
-    # Corner cases: build_gpu if env USE_GPU=0, build_cpu if env USE_GPU=1
-    # And, interaction with apollo.bazelrc
-    if [ "${build_mode}" == "build_cpu" ]; then
-        myopts="${myopts} --cxxopt=-DCPU_ONLY"
-    elif [ "${USE_GPU}" -eq 1 ]; then
-        myopts="${myopts} --config=gpu"
-    fi
-    myopts="${myopts} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+function parse_cmdline_options() {
+	local remained_args=""
+	local known_options=""
+	_arg_parse known_options remained_args
+
+	# FIXME(all): Use "--define USE_ESD_CAN=${USE_ESD_CAN}" instead
+    local myopts="${known_options} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
 
     local targets
-    targets="$(determine_targets ${args_to_pass_on})"
+    targets="$(determine_targets ${remained_args})"
 
     COMMAND_LINE_OPTIONS="${myopts}"
     BUILD_TARGETS="${targets}"
@@ -107,52 +115,23 @@ function parse_cmdline_options() {
     info "${TAB}Build Targets: ${GREEN}${BUILD_TARGETS}${NO_COLOR}"
 }
 
-function _check_build_mode() {
-    local supported_modes=" build build_cpu build_gpu "
-    local mode="$1"
-
-    if ! optarg_check_for_opt "--mode" "${mode}" ; then
-        exit 1
-    fi
-
-    if [[ "${supported_modes}" != *" ${mode} "* ]]; then
-        error "Unknown build mode: ${mode}. Supported values:"
-        error " ${supported_modes}"
-        exit 1
-    fi
-
-    echo "${mode}"
-}
-
-function _check_compilation_mode() {
-    local supported_modes=" fastbuild dbg opt "
-    local mode="$1"
-
-    if ! optarg_check_for_opt "-c" "${mode}" ; then
-        exit 1
-    fi
-
-    if [[ "${supported_modes}" != *" ${mode} "* ]]; then
-        error "Unknown compilation mode: ${mode}. Supported values:"
-        error " ${supported_modes}"
-        exit 1
-    fi
-    echo "${mode}"
+function _run_bazel_build_impl() {
+    local job_args="--jobs=$(nproc)"
+    bazel build --distdir="${APOLLO_CACHE_DIR}/distdir" "${job_args}" $@
 }
 
 function bazel_build() {
-    parse_cmdline_options "$@"
-
     if ! "${APOLLO_IN_DOCKER}" ; then
         error "The build operation must be run from within docker container"
-        exit 1
+        # exit 1
     fi
 
-    run bazel build --distdir="${APOLLO_CACHE_DIR}" "${COMMAND_LINE_OPTIONS}" "${BUILD_TARGETS}"
+    parse_cmdline_options "$@"
+    _run_bazel_build_impl "${COMMAND_LINE_OPTIONS}" "$(bazel query ${BUILD_TARGETS})"
 }
 
 function main() {
-    bazel_build "$@"
+    bazel_build $@
 }
 
 main "$@"
