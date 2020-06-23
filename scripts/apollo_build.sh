@@ -71,7 +71,7 @@ function determine_build_targets() {
             targets_all="${targets_all} union ${build_targets}"
         fi
     done
-    echo "${targets_all}" | sed -e 's/^[[:space:]]*//'
+    echo "${targets_all}"
 }
 
 function _parse_cmdline_arguments() {
