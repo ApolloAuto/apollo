@@ -87,6 +87,13 @@ function build_dreamview_frontend() {
     popd >/dev/null
 }
 
+function build_test_and_lint() {
+    env ${APOLLO_ENV} bash "${build_sh}" --config=cpu
+    env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test --config=cpu
+    env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
+    success "Build and Test and Lint finished."
+}
+
 function _usage() {
     warning "Usage: Not implemented yet"
 }
@@ -132,6 +139,9 @@ function main() {
             ;;
         test)
             env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test "$@"
+            ;;
+        check)
+            build_test_and_lint
             ;;
         buildify)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
