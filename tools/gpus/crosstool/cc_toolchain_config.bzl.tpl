@@ -1,4 +1,4 @@
-"""cc_toolchain_config rule for configuring CUDA toolchains on Linux ONLY"""
+"""cc_toolchain_config rule for configuring CUDA toolchains on Linux ONLY."""
 
 load(
     "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
@@ -239,14 +239,14 @@ def _no_canonical_prefixes_group(extra_flags):
 
 def _cuda_set(cuda_path, actions):
     if cuda_path:
-        return flag_set(
+        return [flag_set(
             actions = actions,
             flag_groups = [
                 flag_group(
                     flags = ["--cuda-path=" + cuda_path],
                 ),
             ],
-        )
+        )]
     else:
         return []
 
@@ -254,299 +254,307 @@ def _nologo():
     return flag_group(flags = ["/nologo"])
 
 def _features(cpu, compiler, ctx):
-    if cpu != "local":
-        fail("Oops, we have tailored cc_toolchain_config.bzl to support Linux ONLY")
-
-    return [
-        feature(name = "no_legacy_features"),
-        feature(
-            name = "all_compile_flags",
-            enabled = True,
-            flag_sets = [
-                flag_set(
-                    actions = all_compile_actions(),
-                    flag_groups = [
-                        flag_group(
-                            flags = ["-MD", "-MF", "%{dependency_file}"],
-                            expand_if_available = "dependency_file",
-                        ),
-                        flag_group(
-                            flags = ["-gsplit-dwarf"],
-                            expand_if_available = "per_object_debug_info_file",
-                        ),
-                    ],
-                ),
-                flag_set(
-                    actions = all_preprocessed_actions(),
-                    flag_groups = [
-                        flag_group(
-                            flags = ["-frandom-seed=%{output_file}"],
-                            expand_if_available = "output_file",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-D%{preprocessor_defines}"],
-                            iterate_over = "preprocessor_defines",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-include", "%{includes}"],
-                            iterate_over = "includes",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-iquote", "%{quote_include_paths}"],
-                            iterate_over = "quote_include_paths",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-I%{include_paths}"],
-                            iterate_over = "include_paths",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-isystem", "%{system_include_paths}"],
-                            iterate_over = "system_include_paths",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-F", "%{framework_include_paths}"],
-                            iterate_over = "framework_include_paths",
-                        ),
-                    ],
-                ),
-                flag_set(
-                    actions = all_cpp_compile_actions(),
-                    flag_groups = [
-                        flag_group(flags = ["-fexperimental-new-pass-manager"]),
-                    ] if compiler == "clang" else [],
-                ),
-                flag_set(
-                    actions = all_compile_actions(),
-                    flag_groups = [
-                        flag_group(
-                            flags = [
-                                "-Wno-builtin-macro-redefined",
-                                "-D__DATE__=\"redacted\"",
-                                "-D__TIMESTAMP__=\"redacted\"",
-                                "-D__TIME__=\"redacted\"",
-                            ],
-                        ),
-                        flag_group(
-                            flags = ["-fPIC"],
-                            expand_if_available = "pic",
-                        ),
-                        flag_group(
-                            flags = ["-fPIE"],
-                            expand_if_not_available = "pic",
-                        ),
-                        flag_group(
-                            flags = [
-                                "-U_FORTIFY_SOURCE",
-                                "-D_FORTIFY_SOURCE=1",
-                                "-fstack-protector",
-                                "-Wall",
-                            ] + ctx.attr.host_compiler_warnings + [
-                                "-fno-omit-frame-pointer",
-                            ],
-                        ),
-                        _no_canonical_prefixes_group(
-                            ctx.attr.extra_no_canonical_prefixes_flags,
-                        ),
-                    ],
-                ),
-                flag_set(
-                    actions = all_compile_actions(),
-                    flag_groups = [flag_group(flags = ["-DNDEBUG"])],
-                    with_features = [with_feature_set(features = ["disable-assertions"])],
-                ),
-                flag_set(
-                    actions = all_compile_actions(),
-                    flag_groups = [
-                        flag_group(
-                            flags = [
-                                "-g0",
-                                "-O2",
-                                "-ffunction-sections",
-                                "-fdata-sections",
-                            ],
-                        ),
-                    ],
-                    with_features = [with_feature_set(features = ["opt"])],
-                ),
-                flag_set(
-                    actions = all_compile_actions(),
-                    flag_groups = [flag_group(flags = ["-g"])],
-                    with_features = [with_feature_set(features = ["dbg"])],
-                ),
-            ] + _cuda_set(
-                ctx.attr.cuda_path,
-                all_compile_actions,
-            ) + [
-                flag_set(
-                    actions = all_compile_actions(),
-                    flag_groups = [
-                        _iterate_flag_group(
-                            flags = ["%{user_compile_flags}"],
-                            iterate_over = "user_compile_flags",
-                        ),
-                        _sysroot_group(),
-                        flag_group(
-                            expand_if_available = "source_file",
-                            flags = ["-c", "%{source_file}"],
-                        ),
-                        flag_group(
-                            expand_if_available = "output_assembly_file",
-                            flags = ["-S"],
-                        ),
-                        flag_group(
-                            expand_if_available = "output_preprocess_file",
-                            flags = ["-E"],
-                        ),
-                        flag_group(
-                            expand_if_available = "output_file",
-                            flags = ["-o", "%{output_file}"],
-                        ),
-                    ],
-                ),
-            ],
-        ),
-        feature(
-            name = "all_archive_flags",
-            enabled = True,
-            flag_sets = [
-                flag_set(
-                    actions = all_archive_actions(),
-                    flag_groups = [
-                        flag_group(
-                            expand_if_available = "linker_param_file",
-                            flags = ["@%{linker_param_file}"],
-                        ),
-                        flag_group(flags = ["rcsD"]),
-                        flag_group(
-                            flags = ["%{output_execpath}"],
-                            expand_if_available = "output_execpath",
-                        ),
-                        flag_group(
-                            iterate_over = "libraries_to_link",
-                            flag_groups = [
-                                flag_group(
-                                    flags = ["%{libraries_to_link.name}"],
-                                    expand_if_equal = variable_with_value(
-                                        name = "libraries_to_link.type",
-                                        value = "object_file",
+    if cpu == "local":
+        return [
+            feature(name = "no_legacy_features"),
+            feature(
+                name = "all_compile_flags",
+                enabled = True,
+                flag_sets = [
+                    flag_set(
+                        actions = all_compile_actions(),
+                        flag_groups = [
+                            flag_group(
+                                flags = ["-MD", "-MF", "%{dependency_file}"],
+                                expand_if_available = "dependency_file",
+                            ),
+                            flag_group(
+                                flags = ["-gsplit-dwarf"],
+                                expand_if_available = "per_object_debug_info_file",
+                            ),
+                        ],
+                    ),
+                    flag_set(
+                        actions = all_preprocessed_actions(),
+                        flag_groups = [
+                            flag_group(
+                                flags = ["-frandom-seed=%{output_file}"],
+                                expand_if_available = "output_file",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-D%{preprocessor_defines}"],
+                                iterate_over = "preprocessor_defines",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-include", "%{includes}"],
+                                iterate_over = "includes",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-iquote", "%{quote_include_paths}"],
+                                iterate_over = "quote_include_paths",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-I%{include_paths}"],
+                                iterate_over = "include_paths",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-isystem", "%{system_include_paths}"],
+                                iterate_over = "system_include_paths",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-F", "%{framework_include_paths}"],
+                                iterate_over = "framework_include_paths",
+                            ),
+                        ],
+                    ),
+                    flag_set(
+                        actions = all_cpp_compile_actions(),
+                        flag_groups = [
+                            flag_group(flags = ["-fexperimental-new-pass-manager"]),
+                        ] if compiler == "clang" else [],
+                    ),
+                    flag_set(
+                        actions = all_compile_actions(),
+                        flag_groups = [
+                            flag_group(
+                                flags = [
+                                    "-Wno-builtin-macro-redefined",
+                                    "-D__DATE__=\"redacted\"",
+                                    "-D__TIMESTAMP__=\"redacted\"",
+                                    "-D__TIME__=\"redacted\"",
+                                ],
+                            ),
+                            flag_group(
+                                flags = ["-fPIC"],
+                                expand_if_available = "pic",
+                            ),
+                            flag_group(
+                                flags = ["-fPIE"],
+                                expand_if_not_available = "pic",
+                            ),
+                            flag_group(
+                                flags = [
+                                    "-U_FORTIFY_SOURCE",
+                                    "-D_FORTIFY_SOURCE=1",
+                                    "-fstack-protector",
+                                    "-Wall",
+                                ] + ctx.attr.host_compiler_warnings + [
+                                    "-fno-omit-frame-pointer",
+                                ],
+                            ),
+                            _no_canonical_prefixes_group(
+                                ctx.attr.extra_no_canonical_prefixes_flags,
+                            ),
+                        ],
+                    ),
+                    flag_set(
+                        actions = all_compile_actions(),
+                        flag_groups = [flag_group(flags = ["-DNDEBUG"])],
+                        with_features = [with_feature_set(features = ["disable-assertions"])],
+                    ),
+                    flag_set(
+                        actions = all_compile_actions(),
+                        flag_groups = [
+                            flag_group(
+                                flags = [
+                                    "-g0",
+                                    "-O2",
+                                    "-ffunction-sections",
+                                    "-fdata-sections",
+                                ],
+                            ),
+                        ],
+                        with_features = [with_feature_set(features = ["opt"])],
+                    ),
+                    flag_set(
+                        actions = all_compile_actions(),
+                        flag_groups = [flag_group(flags = ["-g"])],
+                        with_features = [with_feature_set(features = ["dbg"])],
+                    ),
+                ] + _cuda_set(
+                    ctx.attr.cuda_path,
+                    all_compile_actions(),
+                ) + [
+                    flag_set(
+                        actions = all_compile_actions(),
+                        flag_groups = [
+                            _iterate_flag_group(
+                                flags = ["%{user_compile_flags}"],
+                                iterate_over = "user_compile_flags",
+                            ),
+                            _sysroot_group(),
+                            flag_group(
+                                expand_if_available = "source_file",
+                                flags = ["-c", "%{source_file}"],
+                            ),
+                            flag_group(
+                                expand_if_available = "output_assembly_file",
+                                flags = ["-S"],
+                            ),
+                            flag_group(
+                                expand_if_available = "output_preprocess_file",
+                                flags = ["-E"],
+                            ),
+                            flag_group(
+                                expand_if_available = "output_file",
+                                flags = ["-o", "%{output_file}"],
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            feature(
+                name = "all_archive_flags",
+                enabled = True,
+                flag_sets = [
+                    flag_set(
+                        actions = all_archive_actions(),
+                        flag_groups = [
+                            flag_group(
+                                expand_if_available = "linker_param_file",
+                                flags = ["@%{linker_param_file}"],
+                            ),
+                            flag_group(flags = ["rcsD"]),
+                            flag_group(
+                                flags = ["%{output_execpath}"],
+                                expand_if_available = "output_execpath",
+                            ),
+                            flag_group(
+                                iterate_over = "libraries_to_link",
+                                flag_groups = [
+                                    flag_group(
+                                        flags = ["%{libraries_to_link.name}"],
+                                        expand_if_equal = variable_with_value(
+                                            name = "libraries_to_link.type",
+                                            value = "object_file",
+                                        ),
                                     ),
-                                ),
-                                flag_group(
-                                    flags = ["%{libraries_to_link.object_files}"],
-                                    iterate_over = "libraries_to_link.object_files",
-                                    expand_if_equal = variable_with_value(
-                                        name = "libraries_to_link.type",
-                                        value = "object_file_group",
+                                    flag_group(
+                                        flags = ["%{libraries_to_link.object_files}"],
+                                        iterate_over = "libraries_to_link.object_files",
+                                        expand_if_equal = variable_with_value(
+                                            name = "libraries_to_link.type",
+                                            value = "object_file_group",
+                                        ),
                                     ),
-                                ),
-                            ],
-                            expand_if_available = "libraries_to_link",
-                        ),
-                    ],
-                ),
-            ],
-        ),
-        feature(
-            name = "all_link_flags",
-            enabled = True,
-            flag_sets = [
-                flag_set(
-                    actions = all_shared_library_link_actions(),
-                    flag_groups = [flag_group(flags = ["-shared"])],
-                ),
-                flag_set(
-                    actions = all_link_actions(),
-                    flag_groups = [
-                        flag_group(flags = (
-                            ["-Wl,-no-as-needed"] if cpu == "local" else []
-                        ) + [
-                            "-B" + ctx.attr.linker_bin_path,
-                        ]),
-                        flag_group(
-                            flags = ["@%{linker_param_file}"],
-                            expand_if_available = "linker_param_file",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["%{linkstamp_paths}"],
-                            iterate_over = "linkstamp_paths",
-                        ),
-                        flag_group(
-                            flags = ["-o", "%{output_execpath}"],
-                            expand_if_available = "output_execpath",
-                        ),
-                        _iterate_flag_group(
-                            flags = ["-L%{library_search_directories}"],
-                            iterate_over = "library_search_directories",
-                        ),
-                        _iterate_flag_group(
-                            iterate_over = "runtime_library_search_directories",
-                            flags = [
-                                "-Wl,-rpath,$ORIGIN/%{runtime_library_search_directories}",
-                            ] if cpu == "local" else [
-                                "-Wl,-rpath,@loader_path/%{runtime_library_search_directories}",
-                            ],
-                        ),
-                        _libraries_to_link_group("linux"),
-                        _iterate_flag_group(
-                            flags = ["%{user_link_flags}"],
-                            iterate_over = "user_link_flags",
-                        ),
-                        flag_group(
-                            flags = ["-Wl,--gdb-index"],
-                            expand_if_available = "is_using_fission",
-                        ),
-                        flag_group(
-                            flags = ["-Wl,-S"],
-                            expand_if_available = "strip_debug_symbols",
-                        ),
-                        flag_group(flags = ["-lstdc++"]),
-                        _no_canonical_prefixes_group(
-                            ctx.attr.extra_no_canonical_prefixes_flags,
-                        ),
-                    ],
-                ),
-                flag_set(
-                    actions = all_executable_link_actions(),
-                    flag_groups = [flag_group(flags = ["-pie"])],
-                ),
-            ] + ([
-                flag_set(
-                    actions = all_link_actions(),
-                    flag_groups = [flag_group(flags = [
-                        "-Wl,-z,relro,-z,now",
-                    ])],
-                ),
-            ] if cpu == "local" else []) + ([
-                flag_set(
-                    actions = all_link_actions(),
-                    flag_groups = [
-                        flag_group(flags = ["-Wl,--gc-sections"]),
-                        flag_group(
-                            flags = ["-Wl,--build-id=md5", "-Wl,--hash-style=gnu"],
-                        ),
-                    ],
-                ),
-            ] if cpu == "local" else []) +
-            _cuda_set(
-                ctx.attr.cuda_path,
-                all_link_actions(),
-            ) + [
-                flag_set(
-                    actions = all_link_actions(),
-                    flag_groups = [
-                        _sysroot_group(),
-                    ],
-                ),
-            ],
-        ),
-        feature(name = "opt"),
-        feature(name = "fastbuild"),
-        feature(name = "dbg"),
-        feature(name = "supports_dynamic_linker", enabled = True),
-        feature(name = "pic", enabled = True),
-        feature(name = "supports_pic", enabled = True),
-        feature(name = "has_configured_linker_path", enabled = True),
-    ]
+                                ],
+                                expand_if_available = "libraries_to_link",
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            feature(
+                name = "all_link_flags",
+                enabled = True,
+                flag_sets = [
+                    flag_set(
+                        actions = all_shared_library_link_actions(),
+                        flag_groups = [flag_group(flags = ["-shared"])],
+                    ),
+                    flag_set(
+                        actions = all_link_actions(),
+                        flag_groups = [
+                            flag_group(flags = (
+                                ["-Wl,-no-as-needed"] if cpu == "local" else []
+                            ) + [
+                                "-B" + ctx.attr.linker_bin_path,
+                            ]),
+                            flag_group(
+                                flags = ["@%{linker_param_file}"],
+                                expand_if_available = "linker_param_file",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["%{linkstamp_paths}"],
+                                iterate_over = "linkstamp_paths",
+                            ),
+                            flag_group(
+                                flags = ["-o", "%{output_execpath}"],
+                                expand_if_available = "output_execpath",
+                            ),
+                            _iterate_flag_group(
+                                flags = ["-L%{library_search_directories}"],
+                                iterate_over = "library_search_directories",
+                            ),
+                            _iterate_flag_group(
+                                iterate_over = "runtime_library_search_directories",
+                                flags = [
+                                    "-Wl,-rpath,$ORIGIN/%{runtime_library_search_directories}",
+                                ] if cpu == "local" else [
+                                    "-Wl,-rpath,@loader_path/%{runtime_library_search_directories}",
+                                ],
+                            ),
+                            _libraries_to_link_group("darwin" if cpu == "darwin" else "linux"),
+                            _iterate_flag_group(
+                                flags = ["%{user_link_flags}"],
+                                iterate_over = "user_link_flags",
+                            ),
+                            flag_group(
+                                flags = ["-Wl,--gdb-index"],
+                                expand_if_available = "is_using_fission",
+                            ),
+                            flag_group(
+                                flags = ["-Wl,-S"],
+                                expand_if_available = "strip_debug_symbols",
+                            ),
+                            flag_group(flags = ["-lc++" if cpu == "darwin" else "-lstdc++"]),
+                            _no_canonical_prefixes_group(
+                                ctx.attr.extra_no_canonical_prefixes_flags,
+                            ),
+                        ],
+                    ),
+                    flag_set(
+                        actions = all_executable_link_actions(),
+                        flag_groups = [flag_group(flags = ["-pie"])],
+                    ),
+                ] + ([
+                    flag_set(
+                        actions = all_link_actions(),
+                        flag_groups = [flag_group(flags = [
+                            "-Wl,-z,relro,-z,now",
+                        ])],
+                    ),
+                ] if cpu == "local" else []) + ([
+                    flag_set(
+                        actions = all_link_actions(),
+                        flag_groups = [
+                            flag_group(flags = ["-Wl,--gc-sections"]),
+                            flag_group(
+                                flags = ["-Wl,--build-id=md5", "-Wl,--hash-style=gnu"],
+                            ),
+                        ],
+                    ),
+                ] if cpu == "local" else []) + ([
+                    flag_set(
+                        actions = all_link_actions(),
+                        flag_groups = [flag_group(flags = ["-undefined", "dynamic_lookup"])],
+                    ),
+                ] if cpu == "darwin" else []) + _cuda_set(
+                    ctx.attr.cuda_path,
+                    all_link_actions(),
+                ) + [
+                    flag_set(
+                        actions = all_link_actions(),
+                        flag_groups = [
+                            _sysroot_group(),
+                        ],
+                    ),
+                ],
+            ),
+            feature(name = "disable-assertions"),
+            feature(
+                name = "opt",
+                implies = ["disable-assertions"],
+            ),
+            feature(name = "fastbuild"),
+            feature(name = "dbg"),
+            feature(name = "supports_dynamic_linker", enabled = True),
+            feature(name = "pic", enabled = True),
+            feature(name = "supports_pic", enabled = True),
+            feature(name = "has_configured_linker_path", enabled = True),
+        ]
+    else:
+        fail("Unreachable")
 
 def _impl(ctx):
     cpu = ctx.attr.cpu
