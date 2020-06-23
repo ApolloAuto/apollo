@@ -105,6 +105,7 @@ function main() {
     fi
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
     local test_sh="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
+    local ci_sh="${APOLLO_ROOT_DIR}/scripts/apollo_ci.sh"
     local cmd="$1"; shift
     case "${cmd}" in
         config)
@@ -139,6 +140,12 @@ function main() {
             ;;
         test)
             env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test "$@"
+            ;;
+        cibuild)
+            env ${APOLLO_ENV} bash "${ci_sh}" "build"
+            ;;
+        citest)
+            env ${APOLLO_ENV} bash "${ci_sh}" "test"
             ;;
         check)
             build_test_and_lint
