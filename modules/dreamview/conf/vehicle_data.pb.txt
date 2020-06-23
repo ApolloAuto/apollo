@@ -126,3 +126,7 @@ data_files {
   source_path: "perception_dag"
   dest_path: "/apollo/modules/perception/production/dag"
 }
+data_files {
+  source_path: "perception_launch"
+  dest_path: "/apollo/modules/perception/production/launch"
+}
