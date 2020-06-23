@@ -550,6 +550,60 @@ cyber_recorder play -l -f demo_3.5.record
 
 ## 常见问题
 
-a.显卡的驱动没有安装成功
+a.显卡的驱动没有安装或者没有安装成功
 
 请参考显卡的驱动安装的部分重新安装，注意需要在apollo内核中安装GPU的驱动并且安装后需要重新启动计算机。
+
+b.docker进不去, no matching entries in passwd file
+
+安装好ubuntu Linux，apollo-kernel，docker后，执行
+ 
+ ```
+ bash docker/scripts/dev_start.sh
+ bash docker/scripts/dev_into.sh
+ ```
+ 
+ 遇到报错如下：
+ unable to find user xxx : no matching entries in passwd file.
+ 主要是由于用户权限没有加进docker去导致。执行如下两行命令：
+ 
+ `sudo gpasswd -a $USER docker`
+ `sudo usermod -aG docker $USER` 
+
+ 其中$USER是登陆用户名，执行成功后logout，然后重新登陆ubuntu。
+ 如果没有解决，那么有可能是/apollo/scripts/docker_adduser.sh没有权限，需要`sudo chmod a+rx /apollo/scripts/docker_adduser.sh`增加权限。（ 我们曾遇到一种情况就是/apollo/scripts/目录下有一个docker_adduser.sh~文件，导致报错，所以需要检查是否存在副本文件或者交换文件之类的，需要删除掉 ）。
+如果还是不行，可以试试`sudo chmod 777 /var/run/docker.sock docker/scripts`。
+
+c.编译的时候CAN警告
+
+若您的CAN卡是EMUC-CAN卡，请直接忽略；若您的CAN卡是ESD-CAN卡，请接着往下看。    
+编译的时候，刚开始就报出几行黄色的提示找不到ESD CAN的报错，原因是CAN驱动没有安装好，参见下图：
+
+![图片](images/debug_can_warn.png)
+
+首先要下载ESD CAN安装包，按照<https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md>进行CAN驱动安装。其次需要从安装包中拷贝头文件和库文件到指定目录。具体操作如下：
+检查apollo/apollo.sh脚本中的check_esd_files()函数，我这里看到1.0.0版本会检查3个文件：
+libntcan.so，
+libntcan.so.4，
+libntcan.so.4.0.1，
+所以对应应该建立的软链接是：
+```
+ln -s libntcan.so.4.0.1 libntcan.so.4
+ln -s libntcan.so.4.0.1 libntcan.so.4.0
+```
+请看apollo.sh的check_esd_files()函数：
+```
+function check_esd_files() {
+  if [ -f ./third_party/can_card_library/esd_can/include/ntcan.h \
+      -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so \
+      -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4 \
+      -a -f ./third_party/can_card_library/esd_can/lib/libntcan.so.4.0.1 ]; then
+      USE_ESD_CAN=true
+  else
+      warning "${YELLOW}ESD CAN library supplied by ESD Electronics does not exit.${NO_COLOR}"
+      warning "${YELLOW}If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md${NO_COLOR}"
+      USE_ESD_CAN=false
+  fi
+}
+```
+不同的apollo版本可能对检查的库文件名称的要求不同，可根据实际情况建立软连接。
