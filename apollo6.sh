@@ -97,6 +97,7 @@ function main() {
         exit 0
     fi
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
+    local test_sh="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
     local cmd="$1"; shift
     case "${cmd}" in
         config)
@@ -126,10 +127,11 @@ function main() {
         build_teleop)
             env ${APOLLO_ENV} bash "${build_sh}" --config=teleop --config=opt "$@"
             ;;
-
         build_fe)
             build_dreamview_frontend
             ;;
+        test)
+            env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test "$@"
         buildify)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
             ;;
