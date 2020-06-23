@@ -396,13 +396,13 @@ void LonController::ComputeLongitudinalErrors(
   double d_matched = 0.0;
   double d_dot_matched = 0.0;
 
+  auto vehicle_state = injector_->vehicle_state();
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      injector_->vehicle_state()->x(), injector_->vehicle_state()->y());
+      vehicle_state->x(), vehicle_state->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      injector_->vehicle_state()->x(), injector_->vehicle_state()->y(),
-      injector_->vehicle_state()->heading(),
-      injector_->vehicle_state()->linear_velocity(), matched_point, &s_matched,
+      vehicle_state->x(), vehicle_state->y(), vehicle_state->heading(),
+      vehicle_state->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
   double current_control_time = Clock::NowInSeconds();
@@ -432,16 +432,14 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
 
-  double heading_error = common::math::NormalizeAngle(
-      injector_->vehicle_state()->heading() - matched_point.theta());
-  double lon_speed =
-      injector_->vehicle_state()->linear_velocity() * std::cos(heading_error);
-  double lon_acceleration = injector_->vehicle_state()->linear_acceleration() *
-                            std::cos(heading_error);
-  double one_minus_kappa_lat_error =
-      1 - reference_point.path_point().kappa() *
-              injector_->vehicle_state()->linear_velocity() *
-              std::sin(heading_error);
+  double heading_error = common::math::NormalizeAngle(vehicle_state->heading() -
+                                                      matched_point.theta());
+  double lon_speed = vehicle_state->linear_velocity() * std::cos(heading_error);
+  double lon_acceleration =
+      vehicle_state->linear_acceleration() * std::cos(heading_error);
+  double one_minus_kappa_lat_error = 1 - reference_point.path_point().kappa() *
+                                             vehicle_state->linear_velocity() *
+                                             std::sin(heading_error);
 
   debug->set_station_reference(reference_point.path_point().s());
   debug->set_current_station(s_matched);
