@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #pragma once
+#include <memory>
 
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -24,7 +26,9 @@ namespace planning {
 
 class RuleBasedStopDecider : public Decider {
  public:
-  explicit RuleBasedStopDecider(const TaskConfig& config);
+  explicit RuleBasedStopDecider(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   apollo::common::Status Process(

@@ -85,7 +85,7 @@ void TaskFactory::Init(const PlanningConfig& config,
       TaskConfig::OPEN_SPACE_FALLBACK_DECIDER,
       [](const TaskConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Task* {
-        return new OpenSpaceFallbackDecider(config);
+        return new OpenSpaceFallbackDecider(config, injector);
       });
   task_factory_.Register(
       TaskConfig::OPEN_SPACE_PRE_STOP_DECIDER,
@@ -145,7 +145,7 @@ void TaskFactory::Init(const PlanningConfig& config,
       TaskConfig::RULE_BASED_STOP_DECIDER,
       [](const TaskConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Task* {
-        return new RuleBasedStopDecider(config);
+        return new RuleBasedStopDecider(config, injector);
       });
   task_factory_.Register(
       TaskConfig::SPEED_BOUNDS_PRIORI_DECIDER,

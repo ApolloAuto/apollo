@@ -40,8 +40,10 @@ namespace {
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-RuleBasedStopDecider::RuleBasedStopDecider(const TaskConfig &config)
-    : Decider(config) {
+RuleBasedStopDecider::RuleBasedStopDecider(
+    const TaskConfig &config,
+    const std::shared_ptr<DependencyInjector> &injector)
+    : Decider(config, injector) {
   ACHECK(config.has_rule_based_stop_decider_config());
   rule_based_stop_decider_config_ = config.rule_based_stop_decider_config();
 }

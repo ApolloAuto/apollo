@@ -325,21 +325,22 @@ Status MPCController::ComputeControlCommand(
 
   FeedforwardUpdate(debug);
 
+  auto vehicle_state = injector_->vehicle_state();
   // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
-        matrix_q_(0, 0) * lat_err_interpolation_->Interpolate(
-                              injector_->vehicle_state()->linear_velocity());
+        matrix_q_(0, 0) *
+        lat_err_interpolation_->Interpolate(vehicle_state->linear_velocity());
     matrix_q_updated_(2, 2) =
         matrix_q_(2, 2) * heading_err_interpolation_->Interpolate(
-                              injector_->vehicle_state()->linear_velocity());
+                              vehicle_state->linear_velocity());
     steer_angle_feedforwardterm_updated_ =
         steer_angle_feedforwardterm_ *
         feedforwardterm_interpolation_->Interpolate(
-            injector_->vehicle_state()->linear_velocity());
+            vehicle_state->linear_velocity());
     matrix_r_updated_(0, 0) =
         matrix_r_(0, 0) * steer_weight_interpolation_->Interpolate(
-                              injector_->vehicle_state()->linear_velocity());
+                              vehicle_state->linear_velocity());
   } else {
     matrix_q_updated_ = matrix_q_;
     matrix_r_updated_ = matrix_r_;
@@ -456,11 +457,11 @@ Status MPCController::ComputeControlCommand(
                        steer_angle_ff_compensation;
 
   if (FLAGS_set_steer_limit) {
-    const double steer_limit =
-        std::atan(max_lat_acc_ * wheelbase_ /
-                  (injector_->vehicle_state()->linear_velocity() *
-                   injector_->vehicle_state()->linear_velocity())) *
-        steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
+    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
+                                         (vehicle_state->linear_velocity() *
+                                          vehicle_state->linear_velocity())) *
+                               steer_ratio_ * 180 / M_PI /
+                               steer_single_direction_max_degree_ * 100;
 
     // Clamp the steer angle with steer limitations at current speed
     double steer_angle_limited =
@@ -522,7 +523,7 @@ Status MPCController::ComputeControlCommand(
   cmd->set_brake(brake_cmd);
   cmd->set_acceleration(acceleration_cmd);
 
-  debug->set_heading(injector_->vehicle_state()->heading());
+  debug->set_heading(vehicle_state->heading());
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
@@ -531,7 +532,7 @@ Status MPCController::ComputeControlCommand(
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
-  if (std::fabs(injector_->vehicle_state()->linear_velocity()) <=
+  if (std::fabs(vehicle_state->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
       chassis->gear_location() == planning_published_trajectory->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
