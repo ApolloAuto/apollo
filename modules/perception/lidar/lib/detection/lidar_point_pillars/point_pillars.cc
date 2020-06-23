@@ -111,13 +111,12 @@ PointPillars::PointPillars(const bool reproduce_result_mode,
     preprocess_points_ptr_.reset(new PreprocessPoints(
         kMaxNumPillars, kMaxNumPointsPerPillar, kNumPointFeature, kGridXSize,
         kGridYSize, kGridZSize, kPillarXSize, kPillarYSize, kPillarZSize,
-        kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan, kNumPointFeature));
+        kMinXRange, kMinYRange, kMinZRange, kNumIndsForScan));
   } else {
     preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
         kNumThreads, kMaxNumPillars, kMaxNumPointsPerPillar, kNumPointFeature,
         kNumIndsForScan, kGridXSize, kGridYSize, kGridZSize, kPillarXSize,
-        kPillarYSize, kPillarZSize, kMinXRange, kMinYRange, kMinZRange,
-        kNumPointFeature));
+        kPillarYSize, kPillarZSize, kMinXRange, kMinYRange, kMinZRange));
   }
 
   anchor_mask_cuda_ptr_.reset(new AnchorMaskCuda(
