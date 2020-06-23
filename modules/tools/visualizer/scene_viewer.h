@@ -79,11 +79,11 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
     }
   }
 
- signals:
+ signals:  // NOLINT
   void CameraPosChanged(const QVector3D& pos);
   void CameraAttitudeChanged(const QVector3D& attitude);
 
- public slots:
+ public slots:  // NOLINT
   void ChangeCameraType(int index);
   //  void ChangeCameraMode(int index);
 
