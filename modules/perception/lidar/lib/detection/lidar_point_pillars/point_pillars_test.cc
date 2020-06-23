@@ -67,8 +67,7 @@ class TestClass {
             const float pillar_x_size, const float pillar_y_size,
             const float pillar_z_size, const float min_x_range,
             const float min_y_range, const float min_z_range,
-            const int num_inds_for_scan, const int num_threads,
-            const int num_box_corners);
+            const int num_inds_for_scan, const int num_threads);
   const int num_class;
   const int max_num_pillars;
   const int max_num_points_per_pillar;
@@ -84,13 +83,15 @@ class TestClass {
   const float min_z_range;
   const int num_inds_for_scan;
   const int num_threads;
-  const int num_box_corners;
 
   // Make pointcloud for test
   void MakePointsForTest(pcl::PointCloud<pcl::PointXYZI>::Ptr in_pcl_pc_ptr);
   void PclToArray(const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
                   float* out_points_array,
                   const float normalizing_factor = 1.0);
+  void PclXYZITToArray(
+      const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
+      float* out_points_array, const float normalizing_factor = 1.0);
   void Preprocess(const float* in_points_array, int in_num_points, int* x_coors,
                   int* y_coors, float* num_points_per_pillar,
                   float* pillar_point_feature, float* pillar_coors,
@@ -132,18 +133,16 @@ TestClass::TestClass()
       min_y_range(-40.0),
       min_z_range(-3.0),
       num_inds_for_scan(512),
-      num_threads(64),
-      num_box_corners(4) {
+      num_threads(64) {
   preprocess_points_ptr_.reset(new PreprocessPoints(
       max_num_pillars, max_num_points_per_pillar, num_point_feature,
       grid_x_size, grid_y_size, grid_z_size, pillar_x_size, pillar_y_size,
-      pillar_z_size, min_x_range, min_y_range, min_z_range, num_inds_for_scan,
-      num_box_corners));
+      pillar_z_size, min_x_range, min_y_range, min_z_range, num_inds_for_scan));
   preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
       num_threads, max_num_pillars, max_num_points_per_pillar,
       num_point_feature, num_inds_for_scan, grid_x_size, grid_y_size,
       grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size, min_x_range,
-      min_y_range, min_z_range, num_box_corners));
+      min_y_range, min_z_range));
 
   bool reproduce_result_mode = false;
   float score_threshold = 0.5;
@@ -161,8 +160,7 @@ TestClass::TestClass(const int num_class, const int max_num_pillars,
                      const float pillar_x_size, const float pillar_y_size,
                      const float pillar_z_size, const float min_x_range,
                      const float min_y_range, const float min_z_range,
-                     const int num_inds_for_scan, const int num_threads,
-                     const int num_box_corners)
+                     const int num_inds_for_scan, const int num_threads)
     : num_class(num_class),
       max_num_pillars(max_num_pillars),
       max_num_points_per_pillar(max_num_points_per_pillar),
@@ -177,18 +175,16 @@ TestClass::TestClass(const int num_class, const int max_num_pillars,
       min_y_range(min_y_range),
       min_z_range(min_z_range),
       num_inds_for_scan(num_inds_for_scan),
-      num_threads(num_threads),
-      num_box_corners(num_box_corners) {
+      num_threads(num_threads) {
   preprocess_points_ptr_.reset(new PreprocessPoints(
       max_num_pillars, max_num_points_per_pillar, num_point_feature,
       grid_x_size, grid_y_size, grid_z_size, pillar_x_size, pillar_y_size,
-      pillar_z_size, min_x_range, min_y_range, min_z_range, num_inds_for_scan,
-      num_box_corners));
+      pillar_z_size, min_x_range, min_y_range, min_z_range, num_inds_for_scan));
   preprocess_points_cuda_ptr_.reset(new PreprocessPointsCuda(
       num_threads, max_num_pillars, max_num_points_per_pillar,
       num_point_feature, num_inds_for_scan, grid_x_size, grid_y_size,
       grid_z_size, pillar_x_size, pillar_y_size, pillar_z_size, min_x_range,
-      min_y_range, min_z_range, num_box_corners));
+      min_y_range, min_z_range));
 
   bool reproduce_result_mode = false;
   float score_threshold = 0.5;
@@ -229,6 +225,20 @@ void TestClass::PclToArray(
     out_points_array[i * 4 + 2] = point.z;
     out_points_array[i * 4 + 3] =
         static_cast<float>(point.intensity / normalizing_factor);
+  }
+}
+
+void TestClass::PclXYZITToArray(
+    const pcl::PointCloud<pcl::PointXYZI>::Ptr& in_pcl_pc_ptr,
+    float* out_points_array, const float normalizing_factor) {
+  for (size_t i = 0; i < in_pcl_pc_ptr->size(); ++i) {
+    pcl::PointXYZI point = in_pcl_pc_ptr->at(i);
+    out_points_array[i * 5 + 0] = point.x;
+    out_points_array[i * 5 + 1] = point.y;
+    out_points_array[i * 5 + 2] = point.z;
+    out_points_array[i * 5 + 3] =
+        static_cast<float>(point.intensity / normalizing_factor);
+    out_points_array[i * 5 + 4] = 0;
   }
 }
 
@@ -320,12 +330,10 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
   const int kNumThreads = 64;
-  const int kNumBoxCorners = 4;
   TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
                      kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
                      kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
-                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
-                     kNumBoxCorners);
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
@@ -342,13 +350,13 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
       new float[test_obj.max_num_pillars * test_obj.max_num_points_per_pillar *
                 test_obj.num_point_feature];
   float* pillar_coors = new float[test_obj.max_num_pillars * 4];
-  float* sparse_pillar_map = new float[test_obj.num_inds_for_scan *
-                                       test_obj.num_inds_for_scan];
+  float* sparse_pillar_map =
+      new float[kNumIndsForScan * kNumIndsForScan];
 
   int host_pillar_count[1] = {0};
   test_obj.Preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,
-                      num_points_per_pillar, pillar_point_feature,
-                      pillar_coors, sparse_pillar_map, host_pillar_count);
+                      num_points_per_pillar, pillar_point_feature, pillar_coors,
+                      sparse_pillar_map, host_pillar_count);
   EXPECT_EQ(1, num_points_per_pillar[0]);
   EXPECT_FLOAT_EQ(12.9892, pillar_point_feature[0]);
   EXPECT_EQ(74, x_coors[1]);
@@ -378,13 +386,11 @@ TEST(TestSuite, CheckPreprocessGPU) {
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
   const int kNumThreads = 64;
-  const int kNumBoxCorners = 4;
   const float kNormalizingFactor = 255.0;
   TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
                      kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
                      kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
-                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
-                     kNumBoxCorners);
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads);
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_pc_ptr(
       new pcl::PointCloud<pcl::PointXYZI>);
@@ -419,7 +425,7 @@ TEST(TestSuite, CheckPreprocessGPU) {
   float* dev_pillar_coors;
   int host_pillar_count[1] = {};
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_points),
-                       in_num_points * kNumBoxCorners * sizeof(float)));
+                       in_num_points * kNumPointFeature * sizeof(float)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_x_coors),
                        kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_y_coors),
@@ -428,51 +434,45 @@ TEST(TestSuite, CheckPreprocessGPU) {
                        kMaxNumPillars * sizeof(float)));
   GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_sparse_pillar_map),
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_point_feature),
-      kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature
-          * sizeof(float)));
-  GPU_CHECK(cudaMalloc(
-      reinterpret_cast<void**>(&dev_pillar_coors),
-      kMaxNumPillars * 4 * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_point_feature),
+                       kMaxNumPillars * kMaxNumPointsPerPillar *
+                           kNumPointFeature * sizeof(float)));
+  GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&dev_pillar_coors),
+                       kMaxNumPillars * 4 * sizeof(float)));
 
   GPU_CHECK(cudaMemcpy(dev_points, points_array,
-                       in_num_points * kNumBoxCorners * sizeof(float),
+                       in_num_points * kNumPointFeature * sizeof(float),
                        cudaMemcpyHostToDevice));
   GPU_CHECK(cudaMemset(dev_x_coors, 0, kMaxNumPillars * sizeof(int)));
   GPU_CHECK(cudaMemset(dev_y_coors, 0, kMaxNumPillars * sizeof(int)));
-  GPU_CHECK(cudaMemset(dev_num_points_per_pillar, 0,
-                       kMaxNumPillars * sizeof(float)));
+  GPU_CHECK(
+      cudaMemset(dev_num_points_per_pillar, 0, kMaxNumPillars * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_pillar_point_feature, 0,
                        kMaxNumPillars * kMaxNumPointsPerPillar *
                            kNumPointFeature * sizeof(float)));
-  GPU_CHECK(cudaMemset(dev_pillar_coors, 0,
-                       kMaxNumPillars * 4 * sizeof(float)));
+  GPU_CHECK(
+      cudaMemset(dev_pillar_coors, 0, kMaxNumPillars * 4 * sizeof(float)));
   GPU_CHECK(cudaMemset(dev_sparse_pillar_map, 0,
                        kNumIndsForScan * kNumIndsForScan * sizeof(int)));
 
   test_obj.PreprocessGPU(dev_points, in_num_points, dev_x_coors, dev_y_coors,
-                        dev_num_points_per_pillar, dev_pillar_point_feature,
-                        dev_pillar_coors, dev_sparse_pillar_map,
-                        host_pillar_count);
+                         dev_num_points_per_pillar, dev_pillar_point_feature,
+                         dev_pillar_coors, dev_sparse_pillar_map,
+                         host_pillar_count);
 
   int* x_coors = new int[kMaxNumPillars];
   int* y_coors = new int[kMaxNumPillars];
   float* num_points_per_pillar = new float[kMaxNumPillars];
   int* sparse_pillar_map = new int[kNumIndsForScan * kNumIndsForScan];
-  float* pillar_point_feature = new float[kMaxNumPillars
-                                          * kMaxNumPointsPerPillar
-                                          * kNumPointFeature];
+  float* pillar_point_feature =
+      new float[kMaxNumPillars * kMaxNumPointsPerPillar * kNumPointFeature];
   float* pillar_coors = new float[kMaxNumPillars * 4];
-  GPU_CHECK(cudaMemcpy(x_coors, dev_x_coors,
-                       kMaxNumPillars * sizeof(int),
+  GPU_CHECK(cudaMemcpy(x_coors, dev_x_coors, kMaxNumPillars * sizeof(int),
                        cudaMemcpyDeviceToHost));
-  GPU_CHECK(cudaMemcpy(y_coors, dev_y_coors,
-                       kMaxNumPillars * sizeof(int),
+  GPU_CHECK(cudaMemcpy(y_coors, dev_y_coors, kMaxNumPillars * sizeof(int),
                        cudaMemcpyDeviceToHost));
   GPU_CHECK(cudaMemcpy(num_points_per_pillar, dev_num_points_per_pillar,
-                       kMaxNumPillars * sizeof(float),
-                       cudaMemcpyDeviceToHost));
+                       kMaxNumPillars * sizeof(float), cudaMemcpyDeviceToHost));
   GPU_CHECK(cudaMemcpy(sparse_pillar_map, dev_sparse_pillar_map,
                        kNumIndsForScan * kNumIndsForScan * sizeof(int),
                        cudaMemcpyDeviceToHost));
@@ -528,12 +528,10 @@ TEST(TestSuite, CheckGenerateAnchors) {
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
   const int kNumThreads = 64;
-  const int kNumBoxCorners = 4;
   TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
                      kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
                      kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
-                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
-                     kNumBoxCorners);
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads);
 
   const int kNumAnchor = 432 * 0.5 * 496 * 0.5 * 2;
   float* anchors_px = new float[kNumAnchor];
@@ -579,12 +577,10 @@ TEST(TestSuite, CheckGenerateBoxAnchors) {
   const float kMinZRange = -3.0;
   const int kNumIndsForScan = 512;
   const int kNumThreads = 64;
-  const int kNumBoxCorners = 4;
   TestClass test_obj(kNumClass, kMaxNumPillars, kMaxNumPointsPerPillar,
                      kNumPointFeature, kGridXSize, kGridYSize, kGridZSize,
                      kPillarXSize, kPillarYSize, kPillarZSize, kMinXRange,
-                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads,
-                     kNumBoxCorners);
+                     kMinYRange, kMinZRange, kNumIndsForScan, kNumThreads);
 
   const int kNumAnchor = 432 * 0.5 * 496 * 0.5 * 2;
 
@@ -624,6 +620,7 @@ TEST(TestSuite, CheckGenerateBoxAnchors) {
 }*/
 
 TEST(TestSuite, CheckDoInference) {
+  const int kNumPointFeature = 5;
   const int kOutputNumBoxFeature = 7;
   const float kNormalizingFactor = 255.0;
   TestClass test_obj;
@@ -648,8 +645,8 @@ TEST(TestSuite, CheckDoInference) {
     point.intensity = org_cloud_ptr->at(i).intensity;
     pcl_pc_ptr->push_back(point);
   }
-  float* points_array = new float[pcl_pc_ptr->size() * 4];
-  test_obj.PclToArray(pcl_pc_ptr, points_array, kNormalizingFactor);
+  float* points_array = new float[pcl_pc_ptr->size() * kNumPointFeature];
+  test_obj.PclXYZITToArray(pcl_pc_ptr, points_array, kNormalizingFactor);
 
   std::vector<float> out_detections;
   std::vector<int> out_labels;
@@ -657,7 +654,7 @@ TEST(TestSuite, CheckDoInference) {
                        &out_labels);
 
   int num_objects = out_detections.size() / kOutputNumBoxFeature;
-  EXPECT_GE(num_objects, 4);
+  EXPECT_GE(num_objects, 10);
   EXPECT_EQ(num_objects, out_labels.size());
 
   for (int j = 0; j < num_objects; ++j) {

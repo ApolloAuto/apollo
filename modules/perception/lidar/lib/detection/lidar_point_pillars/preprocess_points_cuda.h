@@ -60,7 +60,6 @@ class PreprocessPointsCuda {
   const float min_x_range_;
   const float min_y_range_;
   const float min_z_range_;
-  const int num_box_corners_;
   // end initializer list
 
   float* dev_pillar_point_feature_in_coors_;
@@ -86,7 +85,6 @@ class PreprocessPointsCuda {
    * @param[in] min_x_range Minimum x value for point cloud
    * @param[in] min_y_range Minimum y value for point cloud
    * @param[in] min_z_range Minimum z value for point cloud
-   * @param[in] num_box_corners Number of corners for 2D box
    * @details Captital variables never change after the compile
    */
   PreprocessPointsCuda(const int num_threads, const int max_num_pillars,
@@ -96,7 +94,7 @@ class PreprocessPointsCuda {
                        const int grid_z_size, const float pillar_x_size,
                        const float pillar_y_size, const float pillar_z_size,
                        const float min_x_range, const float min_y_range,
-                       const float min_z_range, const int num_box_corners);
+                       const float min_z_range);
   ~PreprocessPointsCuda();
 
   /**
