@@ -6,14 +6,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "teleop",
     srcs = select({
-        "//modules/dreamview/backend:teleop": [
+        "//tools/platform:with_teleop": [
             "teleop.cc",
         ],
         "//conditions:default": [
         ],
     }),
     hdrs = select({
-        "//modules/dreamview/backend:teleop": [
+        "//tools/platform:with_teleop": [
             "teleop.h",
         ],
         "//conditions:default": [
@@ -31,7 +31,7 @@ cc_library(
         "//modules/planning/proto:planning_cc_proto",
         "//third_party/json",
     ] + select({
-        "//modules/dreamview/backend:teleop": [
+        "//tools/platform:with_teleop": [
             "//modules/teleop/modem/proto:modem_cc_proto",
             "//modules/teleop/daemon/proto:daemon_cc_proto",
         ],
@@ -44,7 +44,7 @@ cc_test(
     name = "teleop_test",
     size = "small",
     srcs = select({
-        "//modules/dreamview/backend:teleop": [
+        "//tools/platform:with_teleop": [
             "teleop_test.cc",
         ],
         "//conditions:default": [

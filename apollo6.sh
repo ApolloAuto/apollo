@@ -132,6 +132,7 @@ function main() {
             ;;
         test)
             env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test "$@"
+            ;;
         buildify)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
             ;;
