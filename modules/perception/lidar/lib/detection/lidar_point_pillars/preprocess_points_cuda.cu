@@ -48,16 +48,16 @@ __global__ void make_pillar_histo_kernel(
     const int grid_y_size, const int grid_z_size, const float min_x_range,
     const float min_y_range, const float min_z_range, const float pillar_x_size,
     const float pillar_y_size, const float pillar_z_size,
-    const int num_box_corners) {
+    const int num_point_feature) {
   int th_i = threadIdx.x + blockIdx.x * blockDim.x;
   if (th_i >= num_points) {
     return;
   }
-  int y_coor = floor((dev_points[th_i * num_box_corners + 1] - min_y_range) /
+  int y_coor = floor((dev_points[th_i * num_point_feature + 1] - min_y_range) /
                      pillar_y_size);
-  int x_coor = floor((dev_points[th_i * num_box_corners + 0] - min_x_range) /
+  int x_coor = floor((dev_points[th_i * num_point_feature + 0] - min_x_range) /
                      pillar_x_size);
-  int z_coor = floor((dev_points[th_i * num_box_corners + 2] - min_z_range) /
+  int z_coor = floor((dev_points[th_i * num_point_feature + 2] - min_z_range) /
                      pillar_z_size);
 
   if (x_coor >= 0 && x_coor < grid_x_size && y_coor >= 0 &&
@@ -65,12 +65,13 @@ __global__ void make_pillar_histo_kernel(
     int count =
         atomicAdd(&pillar_count_histo[y_coor * grid_x_size + x_coor], 1);
     if (count < max_points_per_pillar) {
-      int ind = y_coor * grid_x_size * max_points_per_pillar * num_box_corners +
-                x_coor * max_points_per_pillar * num_box_corners +
-                count * num_box_corners;
-      for (int i = 0; i < num_box_corners; ++i) {
+      int ind =
+          y_coor * grid_x_size * max_points_per_pillar * num_point_feature +
+          x_coor * max_points_per_pillar * num_point_feature +
+          count * num_point_feature;
+      for (int i = 0; i < num_point_feature; ++i) {
         dev_pillar_point_feature_in_coors[ind + i] =
-            dev_points[th_i * num_box_corners + i];
+            dev_points[th_i * num_point_feature + i];
       }
     }
   }
@@ -143,7 +144,7 @@ PreprocessPointsCuda::PreprocessPointsCuda(
     const int num_inds_for_scan, const int grid_x_size, const int grid_y_size,
     const int grid_z_size, const float pillar_x_size, const float pillar_y_size,
     const float pillar_z_size, const float min_x_range, const float min_y_range,
-    const float min_z_range, const int num_box_corners)
+    const float min_z_range)
     : num_threads_(num_threads),
       max_num_pillars_(max_num_pillars),
       max_num_points_per_pillar_(max_points_per_pillar),
@@ -157,8 +158,7 @@ PreprocessPointsCuda::PreprocessPointsCuda(
       pillar_z_size_(pillar_z_size),
       min_x_range_(min_x_range),
       min_y_range_(min_y_range),
-      min_z_range_(min_z_range),
-      num_box_corners_(num_box_corners) {
+      min_z_range_(min_z_range) {
   GPU_CHECK(
       cudaMalloc(reinterpret_cast<void**>(&dev_pillar_point_feature_in_coors_),
                  grid_y_size_ * grid_x_size_ * max_num_points_per_pillar_ *
@@ -194,7 +194,7 @@ void PreprocessPointsCuda::DoPreprocessPointsCuda(
       dev_points, dev_pillar_point_feature_in_coors_, dev_pillar_count_histo_,
       in_num_points, max_num_points_per_pillar_, grid_x_size_, grid_y_size_,
       grid_z_size_, min_x_range_, min_y_range_, min_z_range_, pillar_x_size_,
-      pillar_y_size_, pillar_z_size_, num_box_corners_);
+      pillar_y_size_, pillar_z_size_, num_point_feature_);
 
   make_pillar_index_kernel<<<grid_x_size_, grid_y_size_>>>(
       dev_pillar_count_histo_, dev_counter_, dev_pillar_count_, dev_x_coors,
