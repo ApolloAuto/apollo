@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-
 namespace apollo {
 namespace planning {
 using apollo::common::Status;
@@ -29,8 +27,10 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
-    : Decider(config) {}
+OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
                                                               const double b,

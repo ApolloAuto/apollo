@@ -29,8 +29,8 @@
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -53,8 +53,7 @@ void SpeedData::AppendSpeedPoint(const double s, const double time,
   if (!empty()) {
     ACHECK(back().t() < time);
   }
-  auto ret_value = common::util::PointFactory::ToSpeedPoint(s, time, v, a, da);
-  push_back(ret_value);
+  push_back(common::util::PointFactory::ToSpeedPoint(s, time, v, a, da));
 }
 
 bool SpeedData::EvaluateByTime(const double t,
