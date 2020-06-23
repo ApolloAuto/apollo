@@ -144,7 +144,7 @@ function main() {
     fi
     bazel_build $@
     build_simulator
-    success "Done building Apollo. Enjoy!"
+    success "Done building ${SHORTHAND_TARGETS} . Enjoy!"
 }
 
 main "$@"
