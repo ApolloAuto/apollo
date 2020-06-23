@@ -33,7 +33,7 @@ function determine_disabled_bazel_targets() {
 # components="$(echo -e "${@// /\\n}" | sort -u)"
 # if [ ${PIPESTATUS[0]} -ne 0 ]; then ... ; fi
 
-function determine_bazel_targets() {
+function determine_build_targets() {
     local targets_all
     if [[ "$#" -eq 0 ]]; then
         local exceptions=
@@ -46,29 +46,29 @@ function determine_bazel_targets() {
     fi
 
     for compo in $@ ; do
-        local bazel_targets
+        local build_targets
         if [[ "${compo}" == "drivers" ]]; then
             local exceptions=
             if ! ${USE_ESD_CAN}; then
-                exceptions="$(determine_disabled_bazel_targets ${compo})"
+                exceptions="$(determine_disabled_build_targets ${compo})"
             fi
-            bazel_targets="//modules/drivers/... ${exceptions}"
+            build_targets="//modules/drivers/... ${exceptions}"
         elif [[ "${compo}" == "cyber" ]]; then
             if [[ "${ARCH}" == "x86_64" ]]; then
-                bazel_targets="//cyber/... union //modules/tools/visualizer/..."
+                build_targets="//cyber/... union //modules/tools/visualizer/..."
             else
-                bazel_targets="//cyber/..."
+                build_targets="//cyber/..."
             fi
         elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-            bazel_targets="//modules/${compo}/..."
+            build_targets="//modules/${compo}/..."
         else
             error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
             exit 1
         fi
         if [ -z "${targets_all}" ]; then
-            targets_all="${bazel_targets}"
+            targets_all="${build_targets}"
         else
-            targets_all="${targets_all} union ${bazel_targets}"
+            targets_all="${targets_all} union ${build_targets}"
         fi
     done
     echo "${targets_all}" | sed -e 's/^[[:space:]]*//'
@@ -126,14 +126,14 @@ function bazel_build() {
 	# FIXME(all): Use "--define USE_ESD_CAN=${USE_ESD_CAN}" instead
     CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
 
-    local bazel_targets
-    bazel_targets="$(determine_bazel_targets ${SHORTHAND_TARGETS})"
+    local build_targets
+    build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
 
     info "Build Overview: "
     info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
-    info "${TAB}Build Targets: ${GREEN}${bazel_targets}${NO_COLOR}"
+    info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
 
-    _run_bazel_build_impl "${CMDLINE_OPTIONS}" "$(bazel query ${bazel_targets})"
+    _run_bazel_build_impl "${CMDLINE_OPTIONS}" "$(bazel query ${build_targets})"
 }
 
 function build_simulator() {
