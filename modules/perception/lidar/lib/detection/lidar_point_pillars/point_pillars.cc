@@ -50,8 +50,6 @@ const float PointPillars::kMinZRange = Params::kMinZRange;
 const float PointPillars::kMaxXRange = Params::kMaxXRange;
 const float PointPillars::kMaxYRange = Params::kMaxYRange;
 const float PointPillars::kMaxZRange = Params::kMaxZRange;
-const float PointPillars::kSensorHeight = Params::kSensorHeight;
-// TODO(chenjiahao): replace kSensorHeight with anchor's z-coor
 const int PointPillars::kNumClass = Params::kNumClass;
 const int PointPillars::kMaxNumPillars = Params::kMaxNumPillars;
 const int PointPillars::kMaxNumPointsPerPillar = Params::kMaxNumPointsPerPillar;
@@ -87,6 +85,8 @@ const std::vector<std::vector<float>> PointPillars::kAnchorDySizes =
     Params::AnchorDySizes();
 const std::vector<std::vector<float>> PointPillars::kAnchorDzSizes =
     Params::AnchorDzSizes();
+const std::vector<std::vector<float>> PointPillars::kAnchorZCoors =
+    Params::AnchorZCoors();
 const std::vector<std::vector<int>> PointPillars::kNumAnchorRo =
     Params::NumAnchorRo();
 const std::vector<std::vector<float>> PointPillars::kAnchorRo =
@@ -351,7 +351,7 @@ void PointPillars::GenerateAnchors(float* anchors_px_, float* anchors_py_,
             anchors_px_[ind] = anchor_x_count[x];
             anchors_py_[ind] = anchor_y_count[y];
             anchors_ro_[ind] = kAnchorRo[head][ro_count];
-            anchors_pz_[ind] = -1 * kSensorHeight;
+            anchors_pz_[ind] = kAnchorZCoors[head][c];
             anchors_dx_[ind] = kAnchorDxSizes[head][c];
             anchors_dy_[ind] = kAnchorDySizes[head][c];
             anchors_dz_[ind] = kAnchorDzSizes[head][c];

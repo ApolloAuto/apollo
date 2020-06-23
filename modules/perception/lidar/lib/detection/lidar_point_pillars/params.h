@@ -33,7 +33,6 @@ class Params {
   static constexpr float kMaxXRange = 50.0f;
   static constexpr float kMaxYRange = 50.0f;
   static constexpr float kMaxZRange = 3.0f;
-  static constexpr float kSensorHeight = 1.73f;
   static constexpr int kNumClass = 10;
   static constexpr int kMaxNumPillars = 30000;
   static constexpr int kMaxNumPointsPerPillar = 60;
@@ -77,6 +76,15 @@ class Params {
                          3.8f, 3.8f, 2.73004906f},
       std::vector<float>{0.98297065f, 1.27192197f, 1.44403034f,
                          1.75748069f, 1.06232151f}
+    };
+  }
+
+  static std::vector<std::vector<float>> AnchorZCoors() {
+    return std::vector<std::vector<float>>{
+      std::vector<float>{-0.0715754f, -0.93897414f, -0.08168083f,
+                         0.22228277f, 0.22228277f, -0.37937912f},
+      std::vector<float>{-1.27247968f, -1.03743013f, -0.99194854f,
+                         -0.73911038f, -1.27868911f}
     };
   }
 
