@@ -59,7 +59,6 @@ class PreprocessPoints {
   const float min_y_range_;
   const float min_z_range_;
   const int num_inds_for_scan_;
-  const int num_box_corners_;
 
  public:
   /**
@@ -77,7 +76,6 @@ class PreprocessPoints {
    * @param[in] min_y_range Minimum y value for pointcloud
    * @param[in] min_z_range Minimum z value for pointcloud
    * @param[in] num_inds_for_scan Number of indexes for scan(cumsum)
-   * @param[in] num_box_corners Number of box's corner
    * @details Captital variables never change after the compile
    */
   PreprocessPoints(const int max_num_pillars, const int max_points_per_pillar,
@@ -86,7 +84,7 @@ class PreprocessPoints {
                    const float pillar_x_size, const float pillar_y_size,
                    const float pillar_z_size, const float min_x_range,
                    const float min_y_range, const float min_z_range,
-                   const int num_inds_for_scan, const int num_box_corners);
+                   const int num_inds_for_scan);
 
   /**
    * @brief CPU preprocessing for input pointcloud

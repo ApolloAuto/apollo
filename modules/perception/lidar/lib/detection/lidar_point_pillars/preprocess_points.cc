@@ -46,8 +46,7 @@ PreprocessPoints::PreprocessPoints(
     const int num_point_feature, const int grid_x_size, const int grid_y_size,
     const int grid_z_size, const float pillar_x_size, const float pillar_y_size,
     const float pillar_z_size, const float min_x_range, const float min_y_range,
-    const float min_z_range, const int num_inds_for_scan,
-    const int num_box_corners)
+    const float min_z_range, const int num_inds_for_scan)
     : max_num_pillars_(max_num_pillars),
       max_num_points_per_pillar_(max_points_per_pillar),
       num_point_feature_(num_point_feature),
@@ -60,8 +59,7 @@ PreprocessPoints::PreprocessPoints(
       min_x_range_(min_x_range),
       min_y_range_(min_y_range),
       min_z_range_(min_z_range),
-      num_inds_for_scan_(num_inds_for_scan),
-      num_box_corners_(num_box_corners) {}
+      num_inds_for_scan_(num_inds_for_scan) {}
 
 void PreprocessPoints::InitializeVariables(int* coor_to_pillaridx,
                                            float* sparse_pillar_map,
@@ -102,15 +100,15 @@ void PreprocessPoints::Preprocess(const float* in_points_array,
   InitializeVariables(coor_to_pillaridx, sparse_pillar_map,
                       pillar_point_feature, pillar_coors);
   for (int i = 0; i < in_num_points; ++i) {
-    int x_coor =
-        std::floor((in_points_array[i * num_box_corners_ + 0] - min_x_range_) /
-                   pillar_x_size_);
-    int y_coor =
-        std::floor((in_points_array[i * num_box_corners_ + 1] - min_y_range_) /
-                   pillar_y_size_);
-    int z_coor =
-        std::floor((in_points_array[i * num_box_corners_ + 2] - min_z_range_) /
-                   pillar_z_size_);
+    int x_coor = std::floor(
+        (in_points_array[i * num_point_feature_ + 0] - min_x_range_) /
+        pillar_x_size_);
+    int y_coor = std::floor(
+        (in_points_array[i * num_point_feature_ + 1] - min_y_range_) /
+        pillar_y_size_);
+    int z_coor = std::floor(
+        (in_points_array[i * num_point_feature_ + 2] - min_z_range_) /
+        pillar_z_size_);
     if (x_coor < 0 || x_coor >= grid_x_size_ || y_coor < 0 ||
         y_coor >= grid_y_size_ || z_coor < 0 || z_coor >= grid_z_size_) {
       continue;
@@ -136,7 +134,7 @@ void PreprocessPoints::Preprocess(const float* in_points_array,
         pillar_point_feature[pillar_index * max_num_points_per_pillar_ *
                                  num_point_feature_ +
                              num * num_point_feature_ + j] =
-            in_points_array[i * num_box_corners_ + j];
+            in_points_array[i * num_point_feature_ + j];
       }
       num_points_per_pillar[pillar_index] += 1;
     }
