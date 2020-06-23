@@ -16,6 +16,11 @@ set -e
 function config_noninteractive() {
     local bzl_cfg_file="${APOLLO_ROOT_DIR}/.apollo.bazelrc"
     echo "${STARTUP_TXT}" > "${bzl_cfg_file}"
+    if [ "${USE_GPU}" -eq 1 ]; then
+        echo "build --config=gpu" >> "${bzl_cfg_file}"
+    else
+        echo "build --config=cpu" >> "${bzl_cfg_file}"
+    fi
     cat "${APOLLO_ROOT_DIR}/tools/apollo.bazelrc.sample" >> "${bzl_cfg_file}"
 }
 

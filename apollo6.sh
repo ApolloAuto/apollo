@@ -106,13 +106,13 @@ function main() {
             env ${APOLLO_ENV} bash "${build_sh}" --config=dbg "$@"
             ;;
         build_cpu)
-            env ${APOLLO_ENV} bash "${build_sh}" --config build_cpu "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=cpu "$@"
             ;;
         build_gpu)
-            env ${APOLLO_ENV} bash "${build_sh}" --config build_gpu "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=gpu "$@"
             ;;
         build_opt_gpu)
-            env ${APOLLO_ENV} bash "${build_sh}" --config build_opt_gpu "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt_gpu "$@"
             ;;
         buildify)
             env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh

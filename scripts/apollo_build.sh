@@ -31,6 +31,8 @@ function determine_disabled_targets() {
 }
 
 # components="$(echo -e "${@// /\\n}" | sort -u)"
+# if [ ${PIPESTATUS[0]} -ne 0 ]; then ... ; fi
+
 function determine_targets() {
     local targets=
     local compo="$1"
@@ -130,8 +132,29 @@ function bazel_build() {
     _run_bazel_build_impl "${COMMAND_LINE_OPTIONS}" "$(bazel query ${BUILD_TARGETS})"
 }
 
+function build_simulator() {
+    local SIMULATOR_TOP_DIR="/apollo-simulator"
+    if [ -d "${SIMULATOR_TOP_DIR}" ] && [ -e "${SIMULATOR_TOP_DIR}/build.sh" ]; then
+        pushd "${SIMULATOR_TOP_DIR}"
+            if bash build.sh build ; then
+                success "Done building Apollo simulator."
+            else
+                fail "Building Apollo simulator failed."
+            fi
+        popd >/dev/null
+    fi
+}
+
 function main() {
+    if [ "${USE_GPU}" -eq 1 ]; then
+        info "Running build under GPU mode. GPU is required to run the build."
+    else
+        info "Running build under CPU mode."
+    fi
+    info "Building for ${ARCH} arch ..."
     bazel_build $@
+    build_simulator
+    success "Done building Apollo. Enjoy!"
 }
 
 main "$@"

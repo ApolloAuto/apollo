@@ -31,6 +31,8 @@ build --cxxopt="-fdiagnostics-color=always"
 # Do not show warnings from external dependencies.
 # build --output_filter="^//"
 
+build --config=dbg
+
 # TODO(storypku): disable the following line temporarily as
 # external/upb/upb/decode.c:164 can't compile
 #build --copt="-Werror=sign-compare"
@@ -45,18 +47,22 @@ build --define=PREFIX=/usr
 build --define=LIBDIR=$(PREFIX)/lib
 build --define=INCLUDEDIR=$(PREFIX)/include
 
-# build --enable_platform_specific_config
-
-# dbg config, as a shorthand for '--config=opt -c dbg'
-build:dbg --config=opt -c dbg
-
-## build -c opt
-build:opt --copt=-march=native
-build:opt --host_copt=-march=native
-build:opt --define with_default_optimizations=true
+# dbg config, as a shorthand for '--config=optimize -c dbg'
+build:dbg --config=optimize -c dbg
+build:opt --config=optimize -c opt
 
 # Instruction set optimizations
-build:native_arch_linux --copt=-march=native
+build:optimize --copt=-march=native
+build:optimize --host_copt=-march=native
+build:optimize --define with_default_optimizations=true
+
+build:cpu --define USE_GPU=false
+build:gpu --define USE_GPU=true
+build:opt_gpu --config=opt --config=gpu
+
+# build with profiling
+build:cpu_prof --config=cpu
+build:cpu_prof --linkopt=-lprofiler
 
 # Build Apollo with C++ 17 features.
 build:c++17 --cxxopt=-std=c++1z
@@ -66,9 +72,6 @@ build:c++1z --config=c++17
 # Enable C++14 (aka c++1y) by default
 build --cxxopt="-std=c++14"
 build --host_cxxopt="-std=c++14"
-
-# build with profiling
-build:cpu_prof --linkopt=-lprofiler
 
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
@@ -80,6 +83,8 @@ test --test_env=LD_LIBRARY_PATH
 # By default prints output only from failed tests.
 test --test_output=errors
 
+test:unit_test -c dbg --test_verbose_timeout_warnings
+
 test:coverage --copt=--coverage
 test:coverage --cxxopt=--coverage
 test:coverage --cxxopt=-fprofile-arcs
@@ -88,7 +93,6 @@ test:coverage --linkopt=-coverage
 test:coverage --linkopt=-lgcov
 test:coverage --linkopt=-lgcc
 test:coverage --linkopt=-lc
-test:unit_test -c dbg --test_verbose_timeout_warnings
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
