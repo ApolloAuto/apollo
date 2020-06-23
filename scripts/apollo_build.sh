@@ -34,31 +34,44 @@ function determine_disabled_bazel_targets() {
 # if [ ${PIPESTATUS[0]} -ne 0 ]; then ... ; fi
 
 function determine_bazel_targets() {
-    local bazel_targets=
-    local compo="$1"
-    if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
+    local targets_all
+    if [[ "$#" -eq 0 ]]; then
         local exceptions=
         if ! ${USE_ESD_CAN}; then
-            exceptions="$(determine_disabled_bazel_targets ${compo})"
+            exceptions="$(determine_disabled_bazel_targets)"
         fi
-        if [ -z "${compo}" ]; then
-            bazel_targets="//modules/... union //cyber/... ${exceptions}"
-        else
-            bazel_targets="//modules/drivers/... ${exceptions}"
-        fi
-    elif [[ "${compo}" == "cyber" ]]; then
-        if [[ "${ARCH}" == "x86_64" ]]; then
-            bazel_targets="//cyber/... union //modules/tools/visualizer/..."
-        else
-            bazel_targets="//cyber/..."
-        fi
-    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-        bazel_targets="//modules/${compo}/..."
-    else
-        error "Oops, no such component under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
-        exit 1
+        targets_all="//modules/... union //cyber/... ${exceptions}"
+        echo "${targets_all}"
+        return
     fi
-    echo "${bazel_targets}"
+
+    for compo in $@ ; do
+        local bazel_targets
+        if [[ "${compo}" == "drivers" ]]; then
+            local exceptions=
+            if ! ${USE_ESD_CAN}; then
+                exceptions="$(determine_disabled_bazel_targets ${compo})"
+            fi
+            bazel_targets="//modules/drivers/... ${exceptions}"
+        elif [[ "${compo}" == "cyber" ]]; then
+            if [[ "${ARCH}" == "x86_64" ]]; then
+                bazel_targets="//cyber/... union //modules/tools/visualizer/..."
+            else
+                bazel_targets="//cyber/..."
+            fi
+        elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
+            bazel_targets="//modules/${compo}/..."
+        else
+            error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+            exit 1
+        fi
+        if [ -z "${targets_all}" ]; then
+            targets_all="${bazel_targets}"
+        else
+            targets_all="${targets_all} union ${bazel_targets}"
+        fi
+    done
+    echo "${targets_all}" | sed -e 's/^[[:space:]]*//'
 }
 
 function _parse_cmdline_arguments() {
