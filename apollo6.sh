@@ -80,6 +80,13 @@ function apollo_env_setup() {
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV} USE_GPU=${USE_GPU}"
 }
 
+#TODO(all): Update node modules
+function build_dreamview_frontend() {
+    pushd ${APOLLO_ROOT_DIR}/modules/dreamview/frontend >/dev/null
+        yarn build
+    popd >/dev/null
+}
+
 function _usage() {
     warning "Usage: Not implemented yet"
 }
@@ -95,7 +102,6 @@ function main() {
         config)
             env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_config.sh "$@"
             ;;
-
         build)
             env ${APOLLO_ENV} bash "${build_sh}" "$@"
             ;;
@@ -113,6 +119,11 @@ function main() {
             ;;
         build_opt_gpu)
             env ${APOLLO_ENV} bash "${build_sh}" --config=opt_gpu "$@"
+            ;;
+        build_prof)
+            evn ${APOLLO_ENV} bash "${build_sh}" --config=cpu_prof --config=dbg "$@"
+        build_fe)
+            build_dreamview_frontend
             ;;
         buildify)
             env ${APOLLO_ENV} bash ${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh
