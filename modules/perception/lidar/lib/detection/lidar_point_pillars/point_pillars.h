@@ -111,7 +111,6 @@ class PointPillars {
   static const float kMaxXRange;
   static const float kMaxYRange;
   static const float kMaxZRange;
-  static const float kSensorHeight;
   static const int kNumClass;
   static const int kMaxNumPillars;
   static const int kMaxNumPointsPerPillar;
@@ -138,6 +137,7 @@ class PointPillars {
   static const std::vector<std::vector<float>> kAnchorDxSizes;
   static const std::vector<std::vector<float>> kAnchorDySizes;
   static const std::vector<std::vector<float>> kAnchorDzSizes;
+  static const std::vector<std::vector<float>> kAnchorZCoors;
   static const std::vector<std::vector<int>> kNumAnchorRo;
   static const std::vector<std::vector<float>> kAnchorRo;
 
