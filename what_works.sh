@@ -144,18 +144,16 @@ echo "########################### All check passed! ###########################"
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
 bash apollo6.sh build
-# TODO(storypku): apollo.sh test
-# TODO(?): apollo.sh check
-# TODO(?): bstart; apollo.sh check
+bash apollo6.sh "test"
+bash apollo6.sh check
+
 # TODO(?): replay-engine image which is compatible with docker_dev branch.
 # TODO(?): Integrate pycodestyle (or similar) into "apollo.sh lint" to lint python code.
 #          See https://pypi.org/project/pycodestyle/
 # TODO(?): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
-# TODO(Kecheng Xu): modules/tools/configurator/configurator.py: 2to3
 # TODO(storypku): cyber.aarch64 docker image
 # TODO(storypku): tools/workspace.bzl to re-org WORKSPACE
 # TODO(?): no break for cpu only build
 # TODO(?): Substitute implicit "-l" linkopts with explicit deps in BUILD files
 # find modules/ -name "BUILD" -exec grep -- "-l" {} +
-
