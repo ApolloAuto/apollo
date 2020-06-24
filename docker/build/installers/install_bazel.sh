@@ -24,7 +24,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 . installer_base.sh
 
 TARGET_ARCH=$(uname -m)
-VERSION="3.2.0"
+VERSION="3.3.0"
 
 if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
