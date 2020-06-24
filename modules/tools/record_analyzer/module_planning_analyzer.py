@@ -33,7 +33,7 @@ from modules.tools.record_analyzer.metrics.latency import Latency
 from modules.tools.record_analyzer.metrics.lat_acceleration import LatAcceleration
 from modules.tools.record_analyzer.metrics.lon_acceleration import LonAcceleration
 from modules.tools.record_analyzer.metrics.reference_line import ReferenceLine
-from modules.planning.proto import planning_py_pb2
+from modules.planning.proto import planning_pb2
 from shapely.geometry import LineString, Point
 
 
@@ -73,7 +73,7 @@ class PlannigAnalyzer:
                 adc_trajectory.header.status.error_code)
             self.error_msg_analyzer.put(adc_trajectory.header.status.msg)
 
-            traj_type = planning_py_pb2.ADCTrajectory.TrajectoryType.Name(
+            traj_type = planning_pb2.ADCTrajectory.TrajectoryType.Name(
                 adc_trajectory.trajectory_type)
             self.trajectory_type_dist[traj_type] = \
                 self.trajectory_type_dist.get(traj_type, 0) + 1

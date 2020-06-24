@@ -17,9 +17,9 @@
 ###############################################################################
 
 from cyber.python.cyber_py3.record import RecordReader
-from modules.canbus.proto import chassis_py_pb2
-from modules.localization.proto import localization_py_pb2
-from modules.planning.proto import planning_py_pb2
+from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
+from modules.planning.proto import planning_pb2
 
 
 class RecordItemReader:
@@ -32,19 +32,19 @@ class RecordItemReader:
             if msg.topic not in topics:
                 continue
             if msg.topic == "/apollo/canbus/chassis":
-                chassis = chassis_py_pb2.Chassis()
+                chassis = chassis_pb2.Chassis()
                 chassis.ParseFromString(msg.message)
                 data = {"chassis": chassis}
                 yield data
 
             if msg.topic == "/apollo/localization/pose":
-                location_est = localization_py_pb2.LocalizationEstimate()
+                location_est = localization_pb2.LocalizationEstimate()
                 location_est.ParseFromString(msg.message)
                 data = {"pose": location_est}
                 yield data
 
             if msg.topic == "/apollo/planning":
-                planning = planning_py_pb2.ADCTrajectory()
+                planning = planning_pb2.ADCTrajectory()
                 planning.ParseFromString(msg.message)
                 data = {"planning": planning}
                 yield data

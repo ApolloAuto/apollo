@@ -25,7 +25,7 @@ import sys
 import threading
 import time
 
-from google.protobuf.descriptor_py_pb2 import FileDescriptorProto
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 
 PY_CALLBACK_TYPE = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)

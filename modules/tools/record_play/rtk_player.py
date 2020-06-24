@@ -33,13 +33,13 @@ import scipy.signal as signal
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 from modules.tools.common.logger import Logger
-from modules.canbus.proto import chassis_py_pb2
-from modules.common.configs.proto import vehicle_config_py_pb2
-from modules.common.proto import drive_state_py_pb2
-from modules.common.proto import pnc_point_py_pb2
-from modules.control.proto import pad_msg_py_pb2
-from modules.localization.proto import localization_py_pb2
-from modules.planning.proto import planning_py_pb2
+from modules.canbus.proto import chassis_pb2
+from modules.common.configs.proto import vehicle_config_pb2
+from modules.common.proto import drive_state_pb2
+from modules.common.proto import pnc_point_pb2
+from modules.control.proto import pad_msg_pb2
+from modules.localization.proto import localization_pb2
+from modules.planning.proto import planning_pb2
 import modules.tools.common.proto_utils as proto_utils
 
 
@@ -69,14 +69,14 @@ class RtkPlayer(object):
         self.data = genfromtxt(file_handler, delimiter=',', names=True)
         file_handler.close()
 
-        self.localization = localization_py_pb2.LocalizationEstimate()
-        self.chassis = chassis_py_pb2.Chassis()
-        self.padmsg = pad_msg_py_pb2.PadMessage()
+        self.localization = localization_pb2.LocalizationEstimate()
+        self.chassis = chassis_pb2.Chassis()
+        self.padmsg = pad_msg_pb2.PadMessage()
         self.localization_received = False
         self.chassis_received = False
 
         self.planning_pub = node.create_writer('/apollo/planning',
-                                               planning_py_pb2.ADCTrajectory)
+                                               planning_pb2.ADCTrajectory)
 
         self.speedmultiplier = speedmultiplier / 100
         self.terminating = False
@@ -97,7 +97,7 @@ class RtkPlayer(object):
         self.estop = False
         self.logger.info("Planning Ready")
 
-        vehicle_config = vehicle_config_py_pb2.VehicleConfig()
+        vehicle_config = vehicle_config_pb2.VehicleConfig()
         proto_utils.get_pb_from_text_file(
             "/apollo/modules/common/data/vehicle_param.pb.txt", vehicle_config)
         self.vehicle_param = vehicle_config.vehicle_param
@@ -118,7 +118,7 @@ class RtkPlayer(object):
         """
         self.chassis.CopyFrom(data)
         self.automode = (self.chassis.driving_mode ==
-                         chassis_py_pb2.Chassis.COMPLETE_AUTO_DRIVE)
+                         chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
         self.chassis_received = True
 
     def padmsg_callback(self, data):
@@ -212,7 +212,7 @@ class RtkPlayer(object):
                 "localization not received yet when publish_planningmsg")
             return
 
-        planningdata = planning_py_pb2.ADCTrajectory()
+        planningdata = planning_pb2.ADCTrajectory()
         now = cyber_time.Time.now().to_sec()
         planningdata.header.timestamp_sec = now
         planningdata.header.module_name = "planning"
@@ -269,10 +269,10 @@ class RtkPlayer(object):
             self.data['time'][self.start]
         planningdata.gear = int(self.data['gear'][self.closest_time()])
         planningdata.engage_advice.advice = \
-            drive_state_py_pb2.EngageAdvice.READY_TO_ENGAGE
+            drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
 
         for i in range(self.start, self.end):
-            adc_point = pnc_point_py_pb2.TrajectoryPoint()
+            adc_point = pnc_point_pb2.TrajectoryPoint()
             adc_point.path_point.x = self.data['x'][i]
             adc_point.path_point.y = self.data['y'][i]
             adc_point.path_point.z = self.data['z'][i]
@@ -292,7 +292,7 @@ class RtkPlayer(object):
                     (self.vehicle_param.length // 2 - self.vehicle_param.back_edge_to_center) * \
                     math.sin(adc_point.path_point.theta)
 
-            if planningdata.gear == chassis_py_pb2.Chassis.GEAR_REVERSE:
+            if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.v = -adc_point.v
                 adc_point.path_point.s = -adc_point.path_point.s
 
@@ -359,14 +359,14 @@ def main():
                        args['complete'].lower(), args['replan'].lower())
     atexit.register(player.shutdown)
 
-    node.create_reader('/apollo/canbus/chassis', chassis_py_pb2.Chassis,
+    node.create_reader('/apollo/canbus/chassis', chassis_pb2.Chassis,
                        player.chassis_callback)
 
     node.create_reader('/apollo/localization/pose',
-                       localization_py_pb2.LocalizationEstimate,
+                       localization_pb2.LocalizationEstimate,
                        player.localization_callback)
 
-    node.create_reader('/apollo/control/pad', pad_msg_py_pb2.PadMessage,
+    node.create_reader('/apollo/control/pad', pad_msg_pb2.PadMessage,
                        player.padmsg_callback)
 
     while not cyber.is_shutdown():

@@ -27,17 +27,17 @@ import time
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 
-from modules.drivers.gnss.proto import ins_py_pb2
+from modules.drivers.gnss.proto import ins_pb2
 
 
 class InsStat(object):
     def __init__(self,node):
-        self.insstat_pub = node.create_writer('/apollo/sensor/gnss/ins_stat', ins_py_pb2.InsStat)
+        self.insstat_pub = node.create_writer('/apollo/sensor/gnss/ins_stat', ins_pb2.InsStat)
         self.sequence_num = 0
         self.terminating = False
 
     def publish_statmsg(self):
-        insstat = ins_py_pb2.InsStat()
+        insstat = ins_pb2.InsStat()
         now = cyber_time.Time.now().to_sec()
         insstat.header.timestamp_sec = now
         insstat.header.module_name = "ins_stat"

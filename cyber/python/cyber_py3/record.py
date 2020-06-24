@@ -23,7 +23,7 @@ import importlib
 import os
 import sys
 
-from google.protobuf.descriptor_py_pb2 import FileDescriptorProto
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 
 # init vars
