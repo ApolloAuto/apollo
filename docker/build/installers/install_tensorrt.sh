@@ -32,16 +32,32 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #For running TensorRT Python applications:
 #sudo apt-get install python-libnvinfer python3-libnvinfer
 
-apt-get -y update && \
-    apt-get -y install \
-	libnvinfer7 \
-	libnvonnxparsers7 \
-	libnvparsers7 \
-	libnvinfer-plugin7 \
-    libnvinfer-dev \
-    libnvonnxparsers-dev \
-    libnvparsers-dev \
-    libnvinfer-plugin-dev
+fixed_version=true
+
+if ${fixed_version}; then
+    VERSION="7.0.0-1+cuda10.2"
+    apt-get -y update && \
+        apt-get -y install \
+	    libnvinfer7="${VERSION}" \
+	    libnvonnxparsers7="${VERSION}" \
+	    libnvparsers7="${VERSION}" \
+	    libnvinfer-plugin7="${VERSION}" \
+        libnvinfer-dev="${VERSION}" \
+        libnvonnxparsers-dev="${VERSION}" \
+        libnvparsers-dev="${VERSION}" \
+        libnvinfer-plugin-dev="${VERSION}"
+else
+    apt-get -y update && \
+        apt-get -y install \
+	    libnvinfer7 \
+	    libnvonnxparsers7 \
+	    libnvparsers7 \
+	    libnvinfer-plugin7 \
+        libnvinfer-dev \
+        libnvonnxparsers-dev \
+        libnvparsers-dev \
+        libnvinfer-plugin-dev
+fi
 
 # Make caffe-1.0 compilation pass
 CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
