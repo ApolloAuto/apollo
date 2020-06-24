@@ -163,9 +163,6 @@ function main() {
         doc)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"
             ;;
-        configurator) # Consult Kecheng Xu
-            bash "${APOLLO_ROOT_DIR}/scripts/configurator.sh" "$@"
-            ;;
         usage)
             _usage
             ;;

@@ -500,10 +500,6 @@ function get_branch() {
   echo "$BRANCH"
 }
 
-function config() {
-  ${APOLLO_ROOT_DIR}/scripts/configurator.sh
-}
-
 function set_use_gpu() {
   if [ "${USE_GPU}" = "1" ] ; then
     DEFINES="${DEFINES} --define USE_GPU=true"
@@ -539,7 +535,6 @@ function print_usage() {
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
-  ${BLUE}config${NONE}: run configurator tool
   ${BLUE}coverage${NONE}: generate test coverage report
   ${BLUE}doc${NONE}: generate doxygen document
   ${BLUE}lint${NONE}: run code style check
@@ -686,9 +681,6 @@ function main() {
       ;;
     buildify)
       buildify
-      ;;
-    config)
-      config
       ;;
     doc)
       gen_doc
