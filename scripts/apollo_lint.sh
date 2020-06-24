@@ -34,7 +34,7 @@ function run_cpp_lint() {
     _cpp_lint_impl "${targets}"
 
     if [[ "${STAGE}" == "dev" ]]; then
-        _cpp_lint_impl "$(bazel query //modules/... except //modules/tools/visualizer/...)"
+        _cpp_lint_impl "//modules/..."
     fi
 
 }
