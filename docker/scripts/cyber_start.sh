@@ -20,7 +20,7 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
-VERSION_X86_64="cyber-x86_64-18.04-20200616_0028"
+VERSION_X86_64="cyber-x86_64-18.04-20200624_0625"
 VERSION_AARCH64="cyber-aarch64-18.04-20200609_2215"
 VERSION_LOCAL_CYBER="local_cyber_dev"
 CYBER_CONTAINER="apollo_cyber_${USER}"
