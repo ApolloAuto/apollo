@@ -15,10 +15,6 @@ cc_binary(
     linkopts = [
         "-lconsole_bridge",
         "-lGL",
-        "-lQt5Core",
-        "-lQt5Widgets",
-        "-lQt5Gui",
-        "-lQt5OpenGL",
     ],
     deps = [
         ":visualizer_lib",
