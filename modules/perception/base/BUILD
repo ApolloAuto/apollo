@@ -259,7 +259,6 @@ cc_test(
         ":point_cloud",
         "//cyber",
         "@com_google_googletest//:gtest_main",
-        "@eigen",
     ],
 )
 
@@ -273,7 +272,6 @@ cc_library(
         ":object_pool",
         ":point_cloud",
         "//cyber",
-        "@eigen",
     ],
 )
 

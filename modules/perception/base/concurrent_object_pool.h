@@ -70,7 +70,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
       queue_.push(obj_ptr);
     });
 #else
-    return std::shared_ptr<ObjectType>(new ObjectType);
+    return std::make_shared<ObjectType>();
 #endif
   }
   // @brief overrided function to get batch of smart pointers
@@ -102,7 +102,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
+      data->emplace_back(std::make_shared<ObjectType>());
     }
 #endif
   }
@@ -143,8 +143,8 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
 #else
     for (size_t i = 0; i < num; ++i) {
       is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType))
-          : data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
+          ? data->emplace_front(std::make_shared<ObjectType>())
+          : data->emplace_back(std::make_shared<ObjectType>());
     }
 #endif
   }
@@ -183,8 +183,8 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
 #else
     for (size_t i = 0; i < num; ++i) {
       is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(new ObjectType))
-          : data->emplace_back(std::shared_ptr<ObjectType>(new ObjectType));
+          ? data->emplace_front(std::make_shared<ObjectType>())
+          : data->emplace_back(std::make_shared<ObjectType>());
     }
 #endif
   }

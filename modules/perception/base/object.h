@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 #include <boost/circular_buffer.hpp>
 
 #include "modules/perception/base/object_supplement.h"
@@ -32,6 +32,8 @@ namespace perception {
 namespace base {
 
 struct alignas(16) Object {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   Object();
   std::string ToString() const;
   void Reset();

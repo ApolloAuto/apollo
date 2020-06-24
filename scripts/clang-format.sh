@@ -20,7 +20,7 @@
 #   clang-format.sh <path/to/src/dir/or/file>
 
 # Fail on error
-set -euo pipefail
+set -e
 
 TOP_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
