@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 
 #include <algorithm>
+#include <mutex>
 #include <utility>
 
 #include "absl/strings/str_cat.h"
@@ -28,6 +29,7 @@
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -45,6 +47,9 @@ SpeedData::SpeedData(std::vector<SpeedPoint> speed_points)
 void SpeedData::AppendSpeedPoint(const double s, const double time,
                                  const double v, const double a,
                                  const double da) {
+  static std::mutex mutex_speedpoint;
+  UNIQUE_LOCK_MULTITHREAD(mutex_speedpoint);
+
   if (!empty()) {
     ACHECK(back().t() < time);
   }

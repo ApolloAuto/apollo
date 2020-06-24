@@ -59,8 +59,10 @@ using apollo::hdmap::RouteSegments;
 ReferenceLineProvider::~ReferenceLineProvider() {}
 
 ReferenceLineProvider::ReferenceLineProvider(
+    const common::VehicleStateProvider *vehicle_state_provider,
     const hdmap::HDMap *base_map,
-    const std::shared_ptr<relative_map::MapMsg> &relative_map) {
+    const std::shared_ptr<relative_map::MapMsg> &relative_map)
+    : vehicle_state_provider_(vehicle_state_provider) {
   if (!FLAGS_use_navigation_mode) {
     pnc_map_ = std::make_unique<hdmap::PncMap>(base_map);
     relative_map_ = nullptr;
@@ -308,8 +310,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   // get current adc lane info by vehicle state
-  common::VehicleState vehicle_state =
-      common::VehicleStateProvider::Instance()->vehicle_state();
+  common::VehicleState vehicle_state = vehicle_state_provider_->vehicle_state();
   hdmap::LaneWaypoint adc_lane_way_point;
   if (!GetNearestWayPointFromNavigationPath(vehicle_state, navigation_lane_ids,
                                             &adc_lane_way_point)) {

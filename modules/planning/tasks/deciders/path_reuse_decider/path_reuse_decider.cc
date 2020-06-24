@@ -164,8 +164,7 @@ bool PathReuseDecider::IsIgnoredBlockingObstacle(
   static constexpr double kSDistBuffer = 30.0;  // meter
   static constexpr int kTimeBuffer = 3;         // second
   // vehicle speed
-  double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  double adc_speed = injector_->vehicle_state()->linear_velocity();
   double final_s_buffer = std::max(kSDistBuffer, kTimeBuffer * adc_speed);
   // current vehicle s position
   common::SLPoint adc_position_sl;
@@ -207,9 +206,8 @@ bool PathReuseDecider::GetBlockingObstacleS(
 
 void PathReuseDecider::GetADCSLPoint(const ReferenceLine& reference_line,
                                      common::SLPoint* adc_position_sl) {
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  common::math::Vec2d adc_position = {injector_->vehicle_state()->x(),
+                                      injector_->vehicle_state()->y()};
   reference_line.XYToSL(adc_position, adc_position_sl);
 }
 

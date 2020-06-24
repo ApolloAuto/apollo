@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/history.h"
@@ -30,16 +31,28 @@ class DependencyInjector {
 
   ~DependencyInjector() = default;
 
-  PlanningContext* planning_context() { return &planning_context_; }
-  FrameHistory* frame_history() { return &frame_history_; }
-  History* history() { return &history_; }
-  EgoInfo* ego_info() { return &ego_info_; }
+  PlanningContext* planning_context() {
+    return &planning_context_;
+  }
+  FrameHistory* frame_history() {
+    return &frame_history_;
+  }
+  History* history() {
+    return &history_;
+  }
+  EgoInfo* ego_info() {
+    return &ego_info_;
+  }
+  apollo::common::VehicleStateProvider* vehicle_state() {
+    return &vehicle_state_;
+  }
 
  private:
   PlanningContext planning_context_;
   FrameHistory frame_history_;
   History history_;
   EgoInfo ego_info_;
+  apollo::common::VehicleStateProvider vehicle_state_;
 };
 
 }  // namespace planning

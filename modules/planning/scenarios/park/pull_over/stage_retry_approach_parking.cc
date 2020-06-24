@@ -64,7 +64,7 @@ Stage::StageStatus PullOverStageRetryApproachParking::Process(
 bool PullOverStageRetryApproachParking::CheckADCStop(const Frame& frame) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+      injector_->vehicle_state()->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()

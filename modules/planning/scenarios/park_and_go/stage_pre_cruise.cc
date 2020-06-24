@@ -17,9 +17,7 @@
 #include "modules/planning/scenarios/park_and_go/stage_pre_cruise.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
@@ -48,12 +46,13 @@ Stage::StageStatus ParkAndGoStagePreCruise::Process(
   }
   // const bool ready_to_cruise =
   //     scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
-  auto vehicle_status = common::VehicleStateProvider::Instance();
+  auto vehicle_status = injector_->vehicle_state();
   ADEBUG << vehicle_status->steering_percentage();
 
   if ((std::fabs(vehicle_status->steering_percentage()) <
        scenario_config_.max_steering_percentage_when_cruise()) &&
-      scenario::util::CheckADCReadyToCruise(frame, scenario_config_)) {
+      scenario::util::CheckADCReadyToCruise(injector_->vehicle_state(), frame,
+                                            scenario_config_)) {
     return FinishStage();
   }
   return StageStatus::RUNNING;

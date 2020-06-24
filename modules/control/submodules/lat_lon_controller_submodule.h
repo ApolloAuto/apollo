@@ -86,6 +86,7 @@ class LatLonControllerSubmodule final : public cyber::Component<Preprocessor> {
   ControlConf lateral_controller_conf_;
   ControlConf longitudinal_controller_conf_;
   std::shared_ptr<cyber::Writer<ControlCommand>> control_core_writer_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 CYBER_REGISTER_COMPONENT(LatLonControllerSubmodule)

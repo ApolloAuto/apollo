@@ -79,8 +79,7 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
 
 bool StageApproachingParkingSpot::CheckADCStop(const Frame& frame) {
   const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()

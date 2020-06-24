@@ -79,19 +79,6 @@ class PointPillarsDetection {
   double pcl_to_array_time_ = 0.0;
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
-
-  // constants
-  const float kNormalizingFactor = 255.0f;
-  const int kNumPointFeature = 4;
-  const int kOutputNumBoxFeature = 7;
-  const int kNumFuseFrames = 5;
-  const bool kFuseFrames = false;
-  const bool kReproduceResultMode = false;
-  const bool kShufflePoints = true;
-  const float kScoreThreshold = 0.5;
-  const float kNmsOverlapThreshold = 0.5;
-  const float kTimeInterval = 0.5;
-  const int kMaxNumPoints = INT_MAX;
 };  // class PointPillarsDetection
 
 }  // namespace lidar

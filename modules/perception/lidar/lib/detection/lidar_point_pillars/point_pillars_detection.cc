@@ -36,11 +36,12 @@ using base::Object;
 using base::PointD;
 using base::PointF;
 
+// TODO(chenjiahao):
+//  specify score threshold and nms over lap threshold for each class.
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
-  point_pillars_ptr_.reset(
-      new PointPillars(kReproduceResultMode, kScoreThreshold,
-                       kNmsOverlapThreshold, FLAGS_pfe_onnx_file,
-                       FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(new PointPillars(
+      FLAGS_reproduce_result_mode, FLAGS_score_threshold,
+      FLAGS_nms_overlap_threshold, FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
   return true;
 }
 
@@ -80,10 +81,11 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   int num_points = original_cloud_->size();
   int num_point_indexes;
   std::vector<int> point_indexes;
-  if (kFuseFrames && kNumFuseFrames > 1) {
+  if (FLAGS_enable_fuse_frames && FLAGS_num_fuse_frames > 1) {
     // before fusing
     while (!prev_point_clouds_.empty() &&
-        frame->timestamp - prev_point_clouds_.front().second > kTimeInterval) {
+           frame->timestamp - prev_point_clouds_.front().second >
+               FLAGS_fuse_time_interval) {
       prev_point_clouds_.pop_front();
     }
 
@@ -92,33 +94,36 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
       num_points += pc_timestamp.first->size();
     }
     num_point_indexes = num_points;
-    point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
-    num_points = std::min(num_points, kMaxNumPoints);
-    points_array = new float[num_points * kNumPointFeature]();
+    point_indexes =
+        GenerateIndexes(0, num_point_indexes, FLAGS_enable_shuffle_points);
+    num_points = std::min(num_points, FLAGS_max_num_points);
+    points_array = new float[num_points * FLAGS_num_point_feature]();
     FusePointCloudToArray(original_cloud_, points_array, point_indexes,
-                          kNormalizingFactor);
+                          FLAGS_normalizing_factor);
 
     // after fusing
-    while (static_cast<int>(prev_point_clouds_.size()) >= kNumFuseFrames - 1) {
+    while (static_cast<int>(prev_point_clouds_.size()) >=
+           FLAGS_num_fuse_frames - 1) {
       prev_point_clouds_.pop_front();
     }
     prev_point_clouds_.emplace_back(
         std::make_pair(original_world_cloud_, frame->timestamp));
   } else {
     num_point_indexes = num_points;
-    point_indexes = GenerateIndexes(0, num_point_indexes, kShufflePoints);
-    num_points = std::min(num_points, kMaxNumPoints);
-    points_array = new float[num_points * kNumPointFeature]();
+    point_indexes =
+        GenerateIndexes(0, num_point_indexes, FLAGS_enable_shuffle_points);
+    num_points = std::min(num_points, FLAGS_max_num_points);
+    points_array = new float[num_points * FLAGS_num_point_feature]();
     PclToArray(original_cloud_, points_array, point_indexes,
-               kNormalizingFactor);
+               FLAGS_normalizing_factor);
   }
   pcl_to_array_time_ = timer.toc(true);
 
   // inference
   std::vector<float> out_detections;
   std::vector<int> out_labels;
-  point_pillars_ptr_->DoInference(points_array, num_points,
-                                  &out_detections, &out_labels);
+  point_pillars_ptr_->DoInference(points_array, num_points, &out_detections,
+                                  &out_labels);
   inference_time_ = timer.toc(true);
 
   // transfer output bounding boxes to objects
@@ -126,7 +131,8 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
              &out_detections, &out_labels);
   collect_time_ = timer.toc(true);
 
-  AINFO << "PointPillars: " << "pcl_to_array: " << pcl_to_array_time_ << "\t"
+  AINFO << "PointPillars: "
+        << "pcl_to_array: " << pcl_to_array_time_ << "\t"
         << "inference: " << inference_time_ << "\t"
         << "collect: " << collect_time_;
 
@@ -140,13 +146,15 @@ void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
                                        const float normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
     int point_pos = point_indexes.at(i);
-    if (point_pos >= kMaxNumPoints) continue;
+    if (point_pos >= FLAGS_max_num_points) continue;
     const auto& point = pc_ptr->at(i);
-    out_points_array[point_pos * kNumPointFeature + 0] = point.x;
-    out_points_array[point_pos * kNumPointFeature + 1] = point.y;
-    out_points_array[point_pos * kNumPointFeature + 2] = point.z;
+    out_points_array[point_pos * FLAGS_num_point_feature + 0] = point.x;
+    out_points_array[point_pos * FLAGS_num_point_feature + 1] = point.y;
+    out_points_array[point_pos * FLAGS_num_point_feature + 2] = point.z;
+    out_points_array[point_pos * FLAGS_num_point_feature + 3] =
+        point.intensity / normalizing_factor;
     // delta of timestamp between prev and cur frames
-    out_points_array[point_pos * kNumPointFeature + 3] = 0;
+    out_points_array[point_pos * FLAGS_num_point_feature + 4] = 0;
   }
 }
 
@@ -158,22 +166,24 @@ void PointPillarsDetection::FusePointCloudToArray(
 
   int point_counter = pc_ptr->size();
   for (auto iter = prev_point_clouds_.rbegin();
-      iter != prev_point_clouds_.rend(); ++iter) {
+       iter != prev_point_clouds_.rend(); ++iter) {
     base::PointDCloudPtr& prev_pc_ptr = iter->first;
     // transform prev world point cloud to current sensor's coordinates
     for (size_t i = 0; i < prev_pc_ptr->size(); ++i) {
       int point_pos = point_indexes.at(point_counter);
-      if (point_pos >= kMaxNumPoints) continue;
+      if (point_pos >= FLAGS_max_num_points) continue;
       const auto& point = prev_pc_ptr->at(i);
       Eigen::Vector3d trans_point(point.x, point.y, point.z);
       trans_point = lidar_frame_ref_->lidar2world_pose.inverse() * trans_point;
-      out_points_array[point_pos * kNumPointFeature + 0] =
+      out_points_array[point_pos * FLAGS_num_point_feature + 0] =
           static_cast<float>(trans_point(0));
-      out_points_array[point_pos * kNumPointFeature + 1] =
+      out_points_array[point_pos * FLAGS_num_point_feature + 1] =
           static_cast<float>(trans_point(1));
-      out_points_array[point_pos * kNumPointFeature + 2] =
+      out_points_array[point_pos * FLAGS_num_point_feature + 2] =
           static_cast<float>(trans_point(2));
-      out_points_array[point_pos * kNumPointFeature + 3] =
+      out_points_array[point_pos * FLAGS_num_point_feature + 3] =
+          static_cast<float>(point.intensity / normalizing_factor);
+      out_points_array[point_pos * FLAGS_num_point_feature + 4] =
           static_cast<float>(lidar_frame_ref_->timestamp - iter->second);
       point_counter++;
     }
@@ -199,7 +209,7 @@ std::vector<int> PointPillarsDetection::GenerateIndexes(int start_index,
 void PointPillarsDetection::GetObjects(
     std::vector<std::shared_ptr<Object>>* objects, const Eigen::Affine3d& pose,
     std::vector<float>* detections, std::vector<int>* labels) {
-  int num_objects = detections->size() / kOutputNumBoxFeature;
+  int num_objects = detections->size() / FLAGS_num_output_box_feature;
 
   objects->clear();
   base::ObjectPool::Instance().BatchGet(num_objects, objects);
@@ -209,13 +219,13 @@ void PointPillarsDetection::GetObjects(
     object->id = i;
 
     // read params of bounding box
-    float x = detections->at(i * kOutputNumBoxFeature + 0);
-    float y = detections->at(i * kOutputNumBoxFeature + 1);
-    float z = detections->at(i * kOutputNumBoxFeature + 2);
-    float dx = detections->at(i * kOutputNumBoxFeature + 4);
-    float dy = detections->at(i * kOutputNumBoxFeature + 3);
-    float dz = detections->at(i * kOutputNumBoxFeature + 5);
-    float yaw = detections->at(i * kOutputNumBoxFeature + 6);
+    float x = detections->at(i * FLAGS_num_output_box_feature + 0);
+    float y = detections->at(i * FLAGS_num_output_box_feature + 1);
+    float z = detections->at(i * FLAGS_num_output_box_feature + 2);
+    float dx = detections->at(i * FLAGS_num_output_box_feature + 4);
+    float dy = detections->at(i * FLAGS_num_output_box_feature + 3);
+    float dz = detections->at(i * FLAGS_num_output_box_feature + 5);
+    float yaw = detections->at(i * FLAGS_num_output_box_feature + 6);
     yaw += M_PI / 2;
     yaw = std::atan2(sinf(yaw), cosf(yaw));
     yaw = -yaw;
@@ -238,8 +248,8 @@ void PointPillarsDetection::GetObjects(
         Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
     Eigen::Translation3f translation(x, y, z);
     Eigen::Affine3f affine3f = translation * quater.toRotationMatrix();
-    for (float vx : std::vector<float>{dx/2, -dx/2}) {
-      for (float vy : std::vector<float>{dy/2, -dy/2}) {
+    for (float vx : std::vector<float>{dx / 2, -dx / 2}) {
+      for (float vy : std::vector<float>{dy / 2, -dy / 2}) {
         for (float vz : std::vector<float>{0, dz}) {
           Eigen::Vector3f v3f(vx, vy, vz);
           v3f = affine3f * v3f;
@@ -266,8 +276,8 @@ void PointPillarsDetection::GetObjects(
     object->lidar_supplement.raw_classification_methods.push_back(Name());
     object->sub_type = GetObjectSubType(labels->at(i));
     object->type = base::kSubType2TypeMap.at(object->sub_type);
-    object->lidar_supplement.raw_probs.back()[
-        static_cast<int>(object->type)] = 1.0f;
+    object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
+        1.0f;
     // copy to type
     object->type_probs.assign(object->lidar_supplement.raw_probs.back().begin(),
                               object->lidar_supplement.raw_probs.back().end());

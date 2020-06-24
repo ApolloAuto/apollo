@@ -17,12 +17,14 @@ limitations under the License.
 
 #include <algorithm>
 #include <limits>
+#include <mutex>
 #include <set>
 #include <unordered_set>
 
 #include "absl/strings/match.h"
 #include "cyber/common/file.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace hdmap {
@@ -1296,6 +1298,8 @@ template <class KDTree>
 int HDMapImpl::SearchObjects(const Vec2d& center, const double radius,
                              const KDTree& kdtree,
                              std::vector<std::string>* const results) {
+  static std::mutex mutex_search_object;
+  UNIQUE_LOCK_MULTITHREAD(mutex_search_object);
   if (results == nullptr) {
     return -1;
   }

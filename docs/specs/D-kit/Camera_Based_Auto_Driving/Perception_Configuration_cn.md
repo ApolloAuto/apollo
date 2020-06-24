@@ -32,8 +32,7 @@
 |序号 | 待修改文件 | 修改内容 | 
 |---|---|---|
 |  1 | `modules/common/data/global_flagfile.txt` |  添加`--half_vehicle_width=0.43` |
-|  2 | `modules/perception/production/launch/dev_kit_perception_camera.launch` |重命名为`perception_camera.launch ` 并替换原`perception_camera.launch`文件  |
-|  3 | `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt` | 文件中`output_obstacles_channel_name`对应的内容修改为 `/apollo/perception/obstacles` |
+|  2 | `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt` | 文件中`output_obstacles_channel_name`对应的内容修改为 `/apollo/perception/obstacles` |
 
 ## 启动Camera感知
 
@@ -70,7 +69,7 @@
 使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
 
 ```
-budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/perception_camera.launch
+budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/dev_kit_perception_camera.launch
 ```
 #### 5. 验证Camera感知效果
 查看车前方运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，行人黄色，车辆绿色），如下图所示：

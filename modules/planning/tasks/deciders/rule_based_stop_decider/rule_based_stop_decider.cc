@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -41,8 +40,10 @@ namespace {
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-RuleBasedStopDecider::RuleBasedStopDecider(const TaskConfig &config)
-    : Decider(config) {
+RuleBasedStopDecider::RuleBasedStopDecider(
+    const TaskConfig &config,
+    const std::shared_ptr<DependencyInjector> &injector)
+    : Decider(config, injector) {
   ACHECK(config.has_rule_based_stop_decider_config());
   rule_based_stop_decider_config_ = config.rule_based_stop_decider_config();
 }
@@ -254,8 +255,7 @@ bool RuleBasedStopDecider::CheckADCStop(
     return false;
   }
 
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   if (adc_speed > rule_based_stop_decider_config_.max_adc_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;

@@ -23,7 +23,6 @@
 #include <memory>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_context.h"
@@ -81,7 +80,7 @@ bool Rerouting::ChangeLaneFailRerouting() {
   // 5. If the end of current passage region is further than kPrepareRoutingTime
   // * speed, no rerouting
   double adc_s = reference_line_info_->AdcSlBoundary().end_s();
-  const auto vehicle_state = common::VehicleStateProvider::Instance();
+  const auto vehicle_state = injector_->vehicle_state();
   double speed = vehicle_state->linear_velocity();
   const double prepare_rerouting_time =
       config_.rerouting().prepare_rerouting_time();

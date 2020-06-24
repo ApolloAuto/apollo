@@ -17,14 +17,15 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include "modules/prediction/proto/feature.pb.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/proto/feature.pb.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace prediction {
@@ -122,6 +123,7 @@ class ObstacleClusters {
 
   static std::unordered_map<std::string, std::vector<LaneObstacle>>&
   GetLaneObstacles() {
+    UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
     return lane_obstacles_;
   }
 
@@ -134,6 +136,7 @@ class ObstacleClusters {
   static std::unordered_map<std::string, std::vector<LaneObstacle>>
       lane_obstacles_;
   static std::unordered_map<std::string, StopSign> lane_id_stop_sign_map_;
+  static std::mutex mutex_obstacle_cluster_;
 };
 
 }  // namespace prediction

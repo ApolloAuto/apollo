@@ -17,9 +17,7 @@
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
@@ -68,9 +66,8 @@ ParkAndGoStageCruise::CheckADCParkAndGoCruiseCompleted(
   const auto& reference_line = reference_line_info.reference_line();
 
   // check l delta
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  const common::math::Vec2d adc_position = {injector_->vehicle_state()->x(),
+                                            injector_->vehicle_state()->y()};
   common::SLPoint adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);
 

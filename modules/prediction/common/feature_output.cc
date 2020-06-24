@@ -19,6 +19,7 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace prediction {
@@ -35,6 +36,7 @@ std::size_t FeatureOutput::idx_learning_ = 0;
 std::size_t FeatureOutput::idx_prediction_result_ = 0;
 std::size_t FeatureOutput::idx_frame_env_ = 0;
 std::size_t FeatureOutput::idx_tuning_ = 0;
+std::mutex FeatureOutput::mutex_feature_;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
@@ -68,6 +70,7 @@ void FeatureOutput::Close() {
 }
 
 void FeatureOutput::Clear() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   idx_feature_ = 0;
   idx_learning_ = 0;
   idx_prediction_result_ = 0;
@@ -86,6 +89,7 @@ bool FeatureOutput::Ready() {
 }
 
 void FeatureOutput::InsertFeatureProto(const Feature& feature) {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   features_.add_feature()->CopyFrom(feature);
 }
 
@@ -101,6 +105,7 @@ void FeatureOutput::InsertDataForLearning(
     const Feature& feature, const std::vector<double>& feature_values,
     const std::vector<std::string>& string_feature_values,
     const std::string& category, const LaneSequence* lane_sequence_ptr) {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   DataForLearning* data_for_learning =
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());
@@ -121,6 +126,7 @@ void FeatureOutput::InsertDataForLearning(
 void FeatureOutput::InsertPredictionResult(
     const Obstacle* obstacle, const PredictionObstacle& prediction_obstacle,
     const ObstacleConf& obstacle_conf, const Scenario& scenario) {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
   prediction_result->set_id(obstacle->id());
@@ -140,6 +146,7 @@ void FeatureOutput::InsertPredictionResult(
 }
 
 void FeatureOutput::InsertFrameEnv(const FrameEnv& frame_env) {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   list_frame_env_.add_frame_env()->CopyFrom(frame_env);
 }
 
@@ -147,6 +154,7 @@ void FeatureOutput::InsertDataForTuning(
     const Feature& feature, const std::vector<double>& feature_values,
     const std::string& category, const LaneSequence& lane_sequence,
     const std::vector<TrajectoryPoint>& adc_trajectory) {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   DataForTuning* data_for_tuning = list_data_for_tuning_.add_data_for_tuning();
   data_for_tuning->set_id(feature.id());
   data_for_tuning->set_timestamp(feature.timestamp());
@@ -162,6 +170,7 @@ void FeatureOutput::InsertDataForTuning(
 }
 
 void FeatureOutput::WriteFeatureProto() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   if (features_.feature().empty()) {
     ADEBUG << "Skip writing empty feature.";
   } else {
@@ -174,6 +183,7 @@ void FeatureOutput::WriteFeatureProto() {
 }
 
 void FeatureOutput::WriteDataForLearning() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   if (list_data_for_learning_.data_for_learning().empty()) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
@@ -186,6 +196,7 @@ void FeatureOutput::WriteDataForLearning() {
 }
 
 void FeatureOutput::WritePredictionResult() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   if (list_prediction_result_.prediction_result().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
@@ -199,6 +210,7 @@ void FeatureOutput::WritePredictionResult() {
 }
 
 void FeatureOutput::WriteFrameEnv() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   if (list_frame_env_.frame_env().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
@@ -211,6 +223,7 @@ void FeatureOutput::WriteFrameEnv() {
 }
 
 void FeatureOutput::WriteDataForTuning() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   if (list_data_for_tuning_.data_for_tuning().empty()) {
     ADEBUG << "Skip writing empty data_for_tuning.";
     return;
@@ -222,19 +235,28 @@ void FeatureOutput::WriteDataForTuning() {
   ++idx_tuning_;
 }
 
-int FeatureOutput::Size() { return features_.feature_size(); }
+int FeatureOutput::Size() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
+  return features_.feature_size();
+}
 
 int FeatureOutput::SizeOfDataForLearning() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   return list_data_for_learning_.data_for_learning_size();
 }
 
 int FeatureOutput::SizeOfPredictionResult() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   return list_prediction_result_.prediction_result_size();
 }
 
-int FeatureOutput::SizeOfFrameEnv() { return list_frame_env_.frame_env_size(); }
+int FeatureOutput::SizeOfFrameEnv() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
+  return list_frame_env_.frame_env_size();
+}
 
 int FeatureOutput::SizeOfDataForTuning() {
+  UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   return list_data_for_tuning_.data_for_tuning_size();
 }
 

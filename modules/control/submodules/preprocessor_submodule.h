@@ -26,6 +26,7 @@
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/util.h"
+#include "modules/control/common/dependency_injector.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_common_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
@@ -96,6 +97,8 @@ class PreprocessorSubmodule final : public cyber::Component<LocalView> {
   std::shared_ptr<cyber::Writer<Preprocessor>> preprocessor_writer_;
 
   ControlCommonConf control_common_conf_;
+
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);

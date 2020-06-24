@@ -21,14 +21,15 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
+#include "modules/common/status/status.h"
+#include "modules/control/common/dependency_injector.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-
-#include "modules/common/status/status.h"
 
 /**
  * @namespace apollo::control
@@ -59,7 +60,8 @@ class Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual common::Status Init(const ControlConf *control_conf) = 0;
+  virtual common::Status Init(std::shared_ptr<DependencyInjector> injector,
+                              const ControlConf *control_conf) = 0;
 
   /**
    * @brief compute control command based on current vehicle status
