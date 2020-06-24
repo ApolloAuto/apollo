@@ -17,7 +17,9 @@
 ###############################################################################
 # For development only! Will remove before merging to master!
 # Testing steps:
-# 1. Start container: ./docker/scripts/dev_start.sh
+# 0. Checkout docker_dev branch of apollo-internal.
+#    *Read README.md to setup your workstation if you have not done so.*
+# 1. Start container: bstart
 # 2. Login to container: ./docker/scripts/dev_into.sh
 # 3. Run this script.
 ###############################################################################
@@ -48,28 +50,7 @@ function bazel_test_with_dist_cache() {
 }
 
 # Working parts.
-bazel_build_with_dist_cache \
-    //cyber/... \
-    //modules/bridge/... \
-    //modules/canbus/... \
-    //modules/common/... \
-    //modules/map/...    \
-    //modules/control/... \
-    //modules/data/... \
-    //modules/monitor/... \
-    //modules/routing/... \
-    //modules/storytelling/... \
-    //modules/transform/... \
-    //modules/v2x/... \
-    //modules/dreamview/... \
-    //modules/guardian/... \
-    //modules/localization/... \
-    //modules/prediction/... \
-    //modules/contrib/... \
-    //modules/planning/... \
-    //modules/perception/... \
-    //modules/third_party_perception/... \
-    //modules/tools/...
+bazel_build_with_dist_cache //...
 
 bazel_test_with_dist_cache \
     //cyber/... \
@@ -78,6 +59,7 @@ bazel_test_with_dist_cache \
     //modules/common/... \
     //modules/control/... \
     //modules/data/... \
+    //modules/drivers/... \
     //modules/monitor/... \
     //modules/routing/... \
     //modules/storytelling/... \
@@ -89,12 +71,6 @@ bazel_test_with_dist_cache \
     //modules/contrib/... \
     //modules/third_party_perception/... \
     //modules/tools/...
-
-# Drivers: OK
-bash scripts/install_esdcan_library.sh install
-bazel_build_with_dist_cache //modules/drivers/...
-bazel_test_with_dist_cache //modules/drivers/...
-bash scripts/install_esdcan_library.sh uninstall
 
 # Perception: 7 test failures + 2 flaky
 bazel_test_with_dist_cache $(bazel query //modules/perception/... \
