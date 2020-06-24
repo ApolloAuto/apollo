@@ -1,4 +1,11 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><title>Dreamview</title><meta name="viewport" content="width=device-width,initial-scale=1"><script>loadJSON('parameters.json', (response) => {
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Dreamview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+      loadJSON('parameters.json', (response) => {
         window.PARAMETERS = JSON.parse(response);
       });
       function loadJSON(jsonFilePath, callback) {
@@ -14,4 +21,10 @@
           }
         };
         xobj.send(null);
-      }</script></head><body><div id="root"></div><script src="/app.bundle.js"></script></body></html>
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  <script type="text/javascript" src="/app.bundle.js"></script></body>
+</html>
