@@ -14,13 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-
-#include <Eigen/Core>
-
 #include <memory>
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
 #include <boost/circular_buffer.hpp>
 
 #include "modules/perception/base/object_supplement.h"

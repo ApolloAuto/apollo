@@ -33,14 +33,14 @@ build --cxxopt="-fdiagnostics-color=always"
 
 build --config=dbg
 
-# TODO(storypku): disable the following line temporarily as
-# external/upb/upb/decode.c:164 can't compile
-#build --copt="-Werror=sign-compare"
+build --per_file_copt=external/upb/.*@-Wno-sign-compare
+build --copt="-Werror=sign-compare"
 build --copt="-Werror=return-type"
 build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 build --cxxopt="-Werror=reorder"
+build --cxxopt="-Wno-sign-compare"
 
 # Default paths for SYSTEM LIBRARIES
 build --define=PREFIX=/usr
