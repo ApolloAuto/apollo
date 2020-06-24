@@ -513,7 +513,6 @@ void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
       ADEBUG << "the last point is selected as parking point";
     } else {
       ADEBUG << "the last point found in path and speed > speed_deadzone";
-      debug->set_path_remain(10000);
     }
   }
   debug->set_path_remain(
