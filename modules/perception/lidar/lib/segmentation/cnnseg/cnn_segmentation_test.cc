@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <algorithm>
-
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
+
+#include <algorithm>
 
 #include "gtest/gtest.h"
 #include "pcl/io/pcd_io.h"
@@ -75,7 +75,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
       "/apollo/modules/perception/testdata/"
       "lidar/lib/segmentation/cnnseg/";
 
-  std::shared_ptr<CNNSegmentation> segmentation(new CNNSegmentation);
+  auto segmentation = std::make_shared<CNNSegmentation>();
   SegmentationOptions options;
   EXPECT_FALSE(segmentation->Segment(options, nullptr));
   LidarFrame frame_data;
@@ -123,12 +123,11 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
       "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
-  base::PointFCloudPtr pc_ptr;
-  pc_ptr.reset(new base::PointFCloud);
+  auto pcl_ptr = std::make_shared<base::PointFCloud>();
   std::string filename =
       "/apollo/modules/perception/testdata/lidar/app/data/perception/"
       "lidar/files/0002_00.pcd";
-  bool ret = LoadPCDFile(filename, pc_ptr);
+  bool ret = LoadPCDFile(filename, pcl_ptr);
   ACHECK(ret) << "Failed to load " << filename;
   // load non ground indices
   base::PointIndices non_ground_indices;
@@ -142,16 +141,16 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   //  }
 
   // test init
-  std::shared_ptr<CNNSegmentation> segmentation(new CNNSegmentation);
+  auto segmentation = std::make_shared<CNNSegmentation>();
   EXPECT_TRUE(segmentation->Init());
 
   // test segment
   using base::ObjectType;
   SegmentationOptions options;
   LidarFrame frame_data;
-  frame_data.cloud = pc_ptr;
+  frame_data.cloud = pcl_ptr;
   frame_data.world_cloud = base::PointDCloudPool::Instance().Get();
-  frame_data.world_cloud->resize(pc_ptr->size());
+  frame_data.world_cloud->resize(pcl_ptr->size());
   frame_data.non_ground_indices = non_ground_indices;
   segmentation->Segment(options, &frame_data);
   std::vector<base::ObjectPtr>& objects = frame_data.segmented_objects;
