@@ -63,7 +63,7 @@ apt-get -y update && \
 if [[ "${INSTALL_MODE}" != "build" ]]; then
     VERSION=1.0.1
     PKG_NAME="caffe-1.0.1-x86_64.tar.gz"
-    CHECKSUM="d89c15fdc5865c0e0e956ae75c335c633b99fb1113d69877b25bb784ecddfd6e"
+    CHECKSUM="80767f5f847b2e66eedc1987e09e36cfe45a710bb28ce9d8081e4c3d130a8974"
     DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
@@ -72,6 +72,10 @@ if [[ "${INSTALL_MODE}" != "build" ]]; then
     tar xzf ${PKG_NAME}
     mv -f caffe-${VERSION}-x86_64 "${PKGS_DIR}"/caffe
     rm -rf ${PKG_NAME}
+
+    echo "${PKGS_DIR}/caffe/lib" >> "${APOLLO_LD_FILE}"
+    ldconfig
+
     exit 0
 fi
 
