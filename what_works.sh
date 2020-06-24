@@ -40,12 +40,11 @@ set -e
 ./apollo6.sh config --noninteractive
 
 function bazel_build_with_dist_cache() {
-    # bazel build -c opt --distdir=/apollo/.cache/distdir "$@"
-    bazel build --distdir=/apollo/.cache/distdir "$@"
+    bazel build -c opt --distdir=/apollo/.cache/distdir "$@"
 }
 
 function bazel_test_with_dist_cache() {
-    bazel test --distdir=/apollo/.cache/distdir "$@"
+    bazel test -c opt --distdir=/apollo/.cache/distdir "$@"
 }
 
 # Working parts.
@@ -142,11 +141,11 @@ bazel_test_with_dist_cache $(bazel query //modules/planning/... \
 
 echo "########################### All check passed! ###########################"
 
-# In-progress parts. Feel free to claim by adding your name in TODO and move it
-bash apollo6.sh build
-bash apollo6.sh "test"
-bash apollo6.sh check
+# bash apollo6.sh build OK
+# bash apollo6.sh "test" OK
+# bash apollo6.sh check OK
 
+# In-progress parts. Feel free to claim by adding your name in TODO and move it
 # TODO(?): replay-engine image which is compatible with docker_dev branch.
 # TODO(?): Integrate pycodestyle (or similar) into "apollo.sh lint" to lint python code.
 #          See https://pypi.org/project/pycodestyle/

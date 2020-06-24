@@ -260,11 +260,11 @@ new_local_repository(
 #
 
 # mklml
-new_local_repository(
-    name = "mklml",
-    build_file = "third_party/mklml.BUILD",
-    path = "/usr/local/apollo/local_third_party/mklml",
-)
+# new_local_repository(
+#    name = "mklml",
+#    build_file = "third_party/mklml.BUILD",
+#    path = "/usr/local/apollo/local_third_party/mklml",
+# )
 
 ## Proj.4
 new_local_repository(
