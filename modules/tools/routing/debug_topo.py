@@ -23,7 +23,7 @@ import sys
 import matplotlib.pyplot as plt
 
 import modules.tools.common.proto_utils as proto_utils
-import modules.routing.proto.topo_graph_py_pb2 as topo_graph_py_pb2
+import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import modules.tools.routing.util as util
 
 
@@ -139,7 +139,7 @@ def plot_node(node, plot_id, color):
 
 def plot_edge(edge, midddle_point_map):
     """plot topology graph edge"""
-    if edge.direction_type == topo_graph_py_pb2.Edge.FORWARD:
+    if edge.direction_type == topo_graph_pb2.Edge.FORWARD:
         return
     # if lane change is allowed, draw an arrow from lane with from_id to lane with to_id
     from_id = edge.from_lane_id

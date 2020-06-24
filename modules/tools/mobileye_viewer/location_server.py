@@ -32,8 +32,8 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 from numpy.polynomial.polynomial import polyval
-from modules.localization.proto import localization_py_pb2
-from modules.drivers.proto import mobileye_py_pb2
+from modules.localization.proto import localization_pb2
+from modules.drivers.proto import mobileye_pb2
 
 # pip install -U flask-cors
 # is currently required in docker

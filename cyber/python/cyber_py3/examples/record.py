@@ -25,11 +25,11 @@ Run with:
 
 import time
 
-from google.protobuf.descriptor_py_pb2 import FileDescriptorProto
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
-from cyber.proto.unit_test_py_pb2 import Chatter
+from cyber.proto.unit_test_pb2 import Chatter
 from cyber.python.cyber_py3 import record
-from modules.common.util.testdata.simple_py_pb2 import SimpleMessage
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"

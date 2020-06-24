@@ -27,13 +27,13 @@ import time
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 
-from modules.localization.proto import localization_py_pb2
-from modules.localization.proto import gps_py_pb2
+from modules.localization.proto import localization_pb2
+from modules.localization.proto import gps_pb2
 
 class OdomPublisher(object):
     def __init__(self, node):
-        self.localization = localization_py_pb2.LocalizationEstimate()
-        self.gps_odom_pub = node.create_writer('/apollo/sensor/gnss/odometry', gps_py_pb2.Gps) 
+        self.localization = localization_pb2.LocalizationEstimate()
+        self.gps_odom_pub = node.create_writer('/apollo/sensor/gnss/odometry', gps_pb2.Gps) 
         self.sequence_num = 0
         self.terminating = False
         self.position_x = 0
@@ -64,7 +64,7 @@ class OdomPublisher(object):
         self.linear_velocity_z = self.localization.pose.linear_velocity.z
 
     def publish_odom(self):
-        odom = gps_py_pb2.Gps()
+        odom = gps_pb2.Gps()
         now = cyber_time.Time.now().to_sec()
         odom.header.timestamp_sec = now
         odom.header.module_name = "odometry"
@@ -98,7 +98,7 @@ def main():
     """
     node = cyber.Node('odom_publisher')
     odom = OdomPublisher(node)
-    node.create_reader('/apollo/localization/pose', localization_py_pb2.LocalizationEstimate, odom.localization_callback)
+    node.create_reader('/apollo/localization/pose', localization_pb2.LocalizationEstimate, odom.localization_callback)
     while not cyber.is_shutdown():
         now = cyber_time.Time.now().to_sec()
         odom.publish_odom()

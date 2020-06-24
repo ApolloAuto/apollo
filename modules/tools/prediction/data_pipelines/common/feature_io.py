@@ -24,8 +24,8 @@ from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import google.protobuf.text_format as text_format
 
-from modules.prediction.proto import feature_py_pb2
-from modules.prediction.proto import offline_features_py_pb2
+from modules.prediction.proto import feature_pb2
+from modules.prediction.proto import offline_features_pb2
 
 
 def readVarint32(stream):
@@ -48,7 +48,7 @@ def load_protobuf(filename):
     """
     read a file in protobuf binary
     """
-    offline_features = offline_features_py_pb2.Features()
+    offline_features = offline_features_pb2.Features()
     with open(filename, 'rb') as file_in:
         offline_features.ParseFromString(file_in.read())
     return offline_features.feature
@@ -64,7 +64,7 @@ def load_label_feature(filename):
             if len(data) < read_bytes:
                 print("Failed to load protobuf")
                 break
-            fea = feature_py_pb2.Feature()
+            fea = feature_pb2.Feature()
             fea.ParseFromString(data)
             features.append(fea)
             size = readVarint32(f)

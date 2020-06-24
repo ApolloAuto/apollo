@@ -24,8 +24,8 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
 from cyber.python.cyber_py3 import cyber
-from modules.control.proto import control_cmd_py_pb2
-from modules.planning.proto import planning_py_pb2
+from modules.control.proto import control_cmd_pb2
+from modules.planning.proto import planning_pb2
 
 
 LAST_TRAJ_DATA = []
@@ -91,7 +91,7 @@ def listener():
     cyber.init()
     test_node = cyber.Node("planning_listener")
     test_node.create_reader("/apollo/planning",
-                            planning_py_pb2.ADCTrajectory, callback)
+                            planning_pb2.ADCTrajectory, callback)
 
 
 def compensate(data_list):

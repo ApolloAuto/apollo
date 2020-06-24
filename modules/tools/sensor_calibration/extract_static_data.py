@@ -33,10 +33,10 @@ from google.protobuf import text_format
 import numpy as np
 
 from cyber.python.cyber_py3.record import RecordReader
-from cyber.proto import record_py_pb2
+from cyber.proto import record_pb2
 from modules.tools.sensor_calibration.configuration_yaml_generator import ConfigYaml
 from modules.tools.sensor_calibration.data_file_object import TimestampFileObject, OdometryFileObject
-from modules.tools.sensor_calibration.proto import extractor_config_py_pb2
+from modules.tools.sensor_calibration.proto import extractor_config_pb2
 
 
 CYBER_PATH = os.environ['CYBER_PATH']

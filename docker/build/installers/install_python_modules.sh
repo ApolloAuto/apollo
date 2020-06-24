@@ -29,7 +29,8 @@ apt update -y && apt install -y \
     python3-pip \
     python3-psutil \
     python3-scipy \
-    software-properties-common
+    software-properties-common \
+    libasound2-dev
 
 pip3_install -r py3_requirements.txt
 

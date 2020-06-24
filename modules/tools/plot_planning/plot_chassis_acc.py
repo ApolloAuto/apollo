@@ -24,8 +24,8 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
 from cyber.python.cyber_py3 import cyber
-from modules.canbus.proto import chassis_py_pb2
-from modules.control.proto import control_cmd_py_pb2
+from modules.canbus.proto import chassis_pb2
+from modules.control.proto import control_cmd_pb2
 
 
 INIT_ACC_DATA = []
@@ -78,7 +78,7 @@ def listener():
     cyber.init()
     test_node = cyber.Node("chassis_acc_listener")
     test_node.create_reader("/apollo/canbus/chassis",
-                            chassis_py_pb2.Chassis, callback)
+                            chassis_pb2.Chassis, callback)
 
 
 def compensate(data_list):

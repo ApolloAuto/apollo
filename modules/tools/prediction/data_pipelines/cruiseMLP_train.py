@@ -39,7 +39,7 @@ import torch.optim as optim
 
 from modules.tools.prediction.data_pipelines.common.configure import parameters
 from modules.tools.prediction.data_pipelines.cruise_models import FullyConn_NN, FCNN_CNN1D
-from modules.tools.prediction.data_pipelines.proto.cruise_model_py_pb2 import TensorParameter, InputParameter,\
+from modules.tools.prediction.data_pipelines.proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
     AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\
     ClassifyParameter, RegressParameter, CruiseModelParameter

@@ -21,7 +21,7 @@ import argparse
 import google.protobuf.text_format as text_format
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
-from modules.perception.proto import perception_obstacle_py_pb2
+from modules.perception.proto import perception_obstacle_pb2
 
 
 def update(perception_obstacles):
@@ -53,9 +53,9 @@ if __name__ == "__main__":
     node = cyber.Node("perception_obstacle_sender")
     perception_pub = node.create_writer(
         "/apollo/perception/obstacles",
-        perception_obstacle_py_pb2.PerceptionObstacles)
+        perception_obstacle_pb2.PerceptionObstacles)
 
-    perception_obstacles = perception_obstacle_py_pb2.PerceptionObstacles()
+    perception_obstacles = perception_obstacle_pb2.PerceptionObstacles()
     with open(args.file, 'r') as f:
         text_format.Merge(f.read(), perception_obstacles)
 
