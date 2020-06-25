@@ -101,6 +101,24 @@ class TrajectoryImitationTensorRTInference : public ModelInference {
   bool DoInference(LearningDataFrame* learning_data_frame) override;
 
  private:
+   /**
+   * @brief inference a CONV_RNN model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoCONVRNNMODELInference(LearningDataFrame* learning_data_frame);
+
+  /**
+   * @brief inference a CNN model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoCNNMODELInference(LearningDataFrame* learning_data_frame);
+
+  /**
+   * @brief inference a CNN_LSTM model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
+
   Logger g_logger_;
   nvinfer1::IExecutionContext* trt_context_;
   nvinfer1::ICudaEngine* trt_engine_;
