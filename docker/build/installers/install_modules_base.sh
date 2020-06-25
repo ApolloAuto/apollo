@@ -35,7 +35,7 @@ bash /tmp/installers/install_boost.sh
 bash /tmp/installers/install_ffmpeg.sh
 bash /tmp/installers/install_vtk.sh
 
-#  OpenCV depends on ffmpeg and vtk
+# OpenCV depends on ffmpeg and vtk
 bash /tmp/installers/install_opencv.sh
 
 # PCL is required by [ Perception Localization Dreamview ]
@@ -44,4 +44,3 @@ bash /tmp/installers/install_pcl.sh
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-

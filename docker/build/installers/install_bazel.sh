@@ -30,7 +30,7 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
   PKG_NAME="bazel_${VERSION}-linux-x86_64.deb"
   DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}
-  SHA256SUM="215b160b363fb88dd8b73035bf842819f147c6a7d81e4f0bde89310328712973"
+  SHA256SUM="aebed9ba87b0e4b56e3ae6baeece004a31774ee402182ad4e9f70715345d5f56"
   download_if_not_cached $PKG_NAME $SHA256SUM $DOWNLOAD_LINK
 
   apt-get -y update && \
