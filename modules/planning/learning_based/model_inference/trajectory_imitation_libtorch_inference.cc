@@ -426,7 +426,8 @@ bool TrajectoryImitationLibtorchInference::DoCNNLSTMMODELInference(
     const double heading_diff = path_point.theta() - current_heading;
     const double v = trajectory_point.v();
     past_points_tensor[0][past_history_size - 1 - i][0] = relative_coords.first;
-    past_points_tensor[0][past_history_size - 1 - i][1] = relative_coords.second;
+    past_points_tensor[0][past_history_size - 1 - i][1] =
+        relative_coords.second;
     past_points_tensor[0][past_history_size - 1 - i][2] = heading_diff;
     past_points_tensor[0][past_history_size - 1 - i][3] = v;
   }
