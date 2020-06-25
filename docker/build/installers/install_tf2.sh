@@ -47,7 +47,7 @@ pushd tf2-apollo-${VERSION}
     make install
 popd
 
-echo "${PKGS}/tf2/lib" >> "${APOLLO_LD_FILE}"
+echo "${PKGS_DIR}/tf2/lib" >> "${APOLLO_LD_FILE}"
 ldconfig
 
 ok "Successfully installed tf2-apollo, VERSION=${VERSION}"

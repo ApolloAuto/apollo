@@ -24,11 +24,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 VERSION="3.12.3"
 
-PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
-CHECKSUM="4ef97ec6a8e0570d22ad8c57c99d2055a61ea2643b8e1a0998d2c844916c4968"
-DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/protobuf-cpp-${VERSION}.tar.gz"
+PKG_NAME="protobuf-${VERSION}.tar.gz"
+CHECKSUM="71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29"
+DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/archive/v${VERSION}.tar.gz"
 
-# https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protobuf-cpp-3.12.3.tar.gz
+#PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
+#CHECKSUM="4ef97ec6a8e0570d22ad8c57c99d2055a61ea2643b8e1a0998d2c844916c4968"
+#DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/protobuf-cpp-${VERSION}.tar.gz"
 
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 
@@ -41,6 +43,7 @@ mkdir cmake/build && cd cmake/build
 # conflicts with the system provided version.
 cmake .. \
     -DBUILD_SHARED_LIBS=ON \
+    -Dprotobuf_BUILD_TESTS=OFF \
     -DCMAKE_INSTALL_PREFIX:PATH="${SYSROOT_DIR}" \
     -DCMAKE_BUILD_TYPE=Release
 

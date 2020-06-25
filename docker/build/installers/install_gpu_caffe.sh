@@ -60,25 +60,6 @@ apt-get -y update && \
 # BLAS: install ATLAS by sudo apt-get install libatlas-base-dev or install
 # OpenBLAS by sudo apt-get install libopenblas-dev or MKL for better CPU performance.
 
-if [[ "${INSTALL_MODE}" != "build" ]]; then
-    VERSION=1.0.1
-    PKG_NAME="caffe-1.0.1-x86_64.tar.gz"
-    CHECKSUM="80767f5f847b2e66eedc1987e09e36cfe45a710bb28ce9d8081e4c3d130a8974"
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-
-    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-    info "Extracting ${PKG_NAME} to ${PKGS_DIR}/caffe ..."
-    tar xzf ${PKG_NAME}
-    mv -f caffe-${VERSION}-x86_64 "${PKGS_DIR}"/caffe
-    rm -rf ${PKG_NAME}
-
-    echo "${PKGS_DIR}/caffe/lib" >> "${APOLLO_LD_FILE}"
-    ldconfig
-
-    exit 0
-fi
-
 pip3_install numpy -U
 
 # Build Caffe from source
@@ -116,7 +97,7 @@ pushd caffe-${VERSION}
     make install
 popd
 
-echo "${PKGS_DIR}/caffe/lib" >> "${APOLLO_LD_FILE}"
+echo "${PKGS_DIR}/caffe/lib" | tee -a "${APOLLO_LD_FILE}"
 ldconfig
 
 # Clean up.

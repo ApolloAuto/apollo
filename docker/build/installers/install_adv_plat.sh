@@ -84,7 +84,7 @@ pushd ${OUT_DIR}
     mv include ${DEST_DIR}
     mv lib ${DEST_DIR}
 
-    echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
     ldconfig
 popd
 

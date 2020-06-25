@@ -23,6 +23,19 @@ function ok() {
     (>&2 echo -e "[${GREEN}${BOLD} OK ${NO_COLOR}] $*")
 }
 
+export ARCHIVE_DIR="/tmp/archive"
+export RCFILES_DIR="/opt/apollo/rcfiles"
+
+export PKGS_DIR="/opt/apollo/pkgs"
+export SYSROOT_DIR="/opt/apollo/sysroot"
+
+export APOLLO_PROFILE="/etc/profile.d/apollo.sh"
+export APOLLO_LD_FILE="/etc/ld.so.conf.d/apollo.conf"
+export DOWNLOAD_LOG="/opt/apollo/build.log"
+export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
+
+export SUPPORTED_NVIDIA_SMS="6.0 6.1 7.0 7.2 7.5"
+
 # Ref: https://reproducible-builds.org/docs/source-date-epoch
 function source_date_epoch_setup() {
     DATE_FMT="+%Y-%m-%d"
@@ -33,39 +46,26 @@ function source_date_epoch_setup() {
 }
 
 function apollo_environ_setup() {
-    export ARCHIVE_DIR="/tmp/archive"
-    export RCFILES_DIR="/opt/apollo/rcfiles"
-
-    export PKGS_DIR="/opt/apollo/pkgs"
-    export SYSROOT_DIR="/opt/apollo/sysroot"
-
-    export APOLLO_PROFILE="/etc/profile.d/apollo.sh"
-    export APOLLO_LD_FILE="/etc/ld.so.conf.d/apollo.conf"
-    export DOWNLOAD_LOG="/opt/apollo/build.log"
-    export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
-
-    export SUPPORTED_NVIDIA_SMS="6.0 6.1 7.0 7.2 7.5"
-
-    if [[ -z "${SOURCE_DATE_EPOCH}" ]]; then
+    if [ -z "${SOURCE_DATE_EPOCH}" ]; then
         source_date_epoch_setup
     fi
 
-    if [[ ! -d "${PKGS_DIR}" ]]; then
+    if [ ! -d "${PKGS_DIR}" ]; then
         mkdir -p "${PKGS_DIR}"
     fi
-    if [[ ! -d "${SYSROOT_DIR}" ]]; then
+    if [ ! -d "${SYSROOT_DIR}" ]; then
         mkdir -p ${SYSROOT_DIR}/{bin,include,lib,share}
     fi
-    if [[ ! -d "${APOLLO_LD_FILE}" ]]; then
-        echo "${SYSROOT_DIR}/lib" > "${APOLLO_LD_FILE}"
+    if [ ! -f "${APOLLO_LD_FILE}" ]; then
+        echo "${SYSROOT_DIR}/lib" | tee -a "${APOLLO_LD_FILE}"
     fi
-    if [[ ! -f "${APOLLO_PROFILE}" ]]; then
+    if [ ! -f "${APOLLO_PROFILE}" ]; then
         cp -f /opt/apollo/rcfiles/apollo.sh.sample "${APOLLO_PROFILE}"
         echo "add_to_path ${SYSROOT_DIR}/bin" >> "${APOLLO_PROFILE}"
     fi
-    if [[ ! -f "${DOWNLOAD_LOG}" ]]; then
-        echo "#Summary: Apollo Package Downloads" > "${DOWNLOAD_LOG}"
-        echo "Package  SHA256 DOWNLOAD_LINK" >> "${DOWNLOAD_LOG}"
+    if [ ! -f "${DOWNLOAD_LOG}" ]; then
+        echo "##==== Summary: Apollo Package Downloads ====##" > "${DOWNLOAD_LOG}"
+        echo -e "Package\tSHA256\tDOWNLOADLINK" | tee -a "${DOWNLOAD_LOG}"
     fi
 }
 
