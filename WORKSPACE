@@ -41,9 +41,9 @@ http_archive(
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "e8c7601439dbd4489fe5069c33d374804990a56c2f710e00227ee5d8fd650e67",
-    strip_prefix = "protobuf-3.11.2",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.11.2.tar.gz"],
+    sha256 = "71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29",
+    strip_prefix = "protobuf-3.12.3",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.12.3.tar.gz"],
 )
 
 http_archive(
@@ -105,19 +105,18 @@ new_local_repository(
 #    url = "https://github.com/google/glog/archive/v0.4.0.tar.gz",
 #)
 # See https://github.com/bazelbuild/bazel/issues/11406
-maybe(
-    http_archive,
-    name = "boringssl",
-    sha256 = "fb236ae74676dba515e1230aef4cc69ab265af72fc08784a6755a319dd013ca6",
-    urls = ["https://apollo-platform-system.bj.bcebos.com/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
-)
-
+# maybe(
+#    http_archive,
+#    name = "boringssl",
+#    sha256 = "fb236ae74676dba515e1230aef4cc69ab265af72fc08784a6755a319dd013ca6",
+#    urls = ["https://apollo-platform-system.bj.bcebos.com/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
+# )
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "2fcb7f1ab160d6fd3aaade64520be3e5446fc4c6fa7ba6581afdc4e26094bd81",
-    strip_prefix = "grpc-1.26.0",
-    urls = ["https://github.com/grpc/grpc/archive/v1.26.0.tar.gz"],
+    sha256 = "419dba362eaf8f1d36849ceee17c3e2ff8ff12ac666b42d3ff02a164ebe090e9",
+    strip_prefix = "grpc-1.30.0",
+    urls = ["https://github.com/grpc/grpc/archive/v1.30.0.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
