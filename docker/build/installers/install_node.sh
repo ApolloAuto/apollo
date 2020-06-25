@@ -25,9 +25,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
 VERSION="6.5.1"
-PKG_NAME="n-6.5.1.tar.gz"
+NODE_VERSION="12.18.1"
+PKG_NAME="n-${VERSION}.tar.gz"
 CHECKSUM="5833f15893b9951a9ed59487e87b6c181d96b83a525846255872c4f92f0d25dd"
-DOWNLOAD_LINK="https://github.com/tj/n/archive/v6.5.1.tar.gz"
+DOWNLOAD_LINK="https://github.com/tj/n/archive/v${VERSION}.tar.gz"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xzf "${PKG_NAME}"
@@ -36,7 +37,7 @@ info "Install Node for $geo ..."
 
 pushd n-${VERSION}
     make install
-    n 12.18.0
+    n ${NODE_VERSION}
 popd
 
 rm -fr "${PKG_NAME}" "n-${VERSION}"
