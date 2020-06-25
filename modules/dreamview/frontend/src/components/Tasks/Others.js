@@ -55,15 +55,6 @@ export default class Others extends React.Component {
                                                             'showDataCollectionMonitor');
                                     }} />
                     }
-                    <CheckboxItem id={"toggleSimControl"}
-                                  title={"Sim Control"}
-                                  isChecked={options.enableSimControl}
-                                  disabled={options.lockTaskPanel}
-                                  extraClasses="others-checkbox"
-                                  onClick={() => {
-                                      WS.toggleSimControl(!options.enableSimControl);
-                                      this.props.store.handleOptionToggle('enableSimControl');
-                                  }} />
                     <CheckboxItem id={"showVideo"}
                                   title={"Camera Sensor"}
                                   isChecked={options.showVideo}

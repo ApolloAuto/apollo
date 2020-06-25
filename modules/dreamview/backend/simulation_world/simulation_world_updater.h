@@ -33,7 +33,6 @@
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
-#include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 #include "modules/routing/proto/poi.pb.h"
 
@@ -56,13 +55,12 @@ class SimulationWorldUpdater {
    * @brief Constructor with the websocket handler.
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
-   * @param sim_control Pointer of sim control.
    * @param map_service Pointer of the map service to provide a high-level API
    * of hdmap.
    * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
-                         WebSocketHandler *camera_ws, SimControl *sim_control,
+                         WebSocketHandler *camera_ws,
                          const MapService *map_service,
                          DataCollectionMonitor *data_collection_monitor,
                          PerceptionCameraUpdater *perception_camera_updater,
@@ -122,7 +120,6 @@ class SimulationWorldUpdater {
   WebSocketHandler *websocket_ = nullptr;
   WebSocketHandler *map_ws_ = nullptr;
   WebSocketHandler *camera_ws_ = nullptr;
-  SimControl *sim_control_ = nullptr;
   DataCollectionMonitor *data_collection_monitor_ = nullptr;
   PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 

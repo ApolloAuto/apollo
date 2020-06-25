@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/sim_2d/sim_2d_component.h"
 
-#include "cyber/blocker/blocker_manager.h"
+#include <vector>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "cyber/blocker/blocker_manager.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/quaternion.h"
@@ -35,25 +36,27 @@ using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
 
 namespace apollo {
-namespace dreamview {
+namespace sim_2d {
 
-class SimControlTest : public ::testing::Test {
+class Sim2DComponentTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
+    // ACHECK(cyber::Init("Sim2DComponentTest"));
     cyber::GlobalData::Instance()->EnableSimulationMode();
   }
 
   virtual void SetUp() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
+    FLAGS_map_dir = "/apollo/modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
+    FLAGS_sim_map_filename = "garage.bin";
 
-    map_service_.reset(new MapService(false));
-    sim_control_.reset(new SimControl(map_service_.get()));
+    sim_2d_.reset(new Sim2DComponent());
+    apollo::cyber::proto::ComponentConfig compcfg;
+    sim_2d_->Initialize(compcfg);
   }
 
  protected:
-  std::unique_ptr<MapService> map_service_;
-  std::unique_ptr<SimControl> sim_control_;
+  std::unique_ptr<Sim2DComponent> sim_2d_;
 };
 
 void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
@@ -76,9 +79,9 @@ void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
   adc_trajectory->set_gear(Chassis::GEAR_DRIVE);
 }
 
-TEST_F(SimControlTest, Test) {
-  sim_control_->Init(false);
-  sim_control_->enabled_ = true;
+TEST_F(Sim2DComponentTest, Test) {
+  sim_2d_->InitState(false);
+  sim_2d_->enabled_ = true;
 
   planning::ADCTrajectory adc_trajectory;
   std::vector<double> xs(5);
@@ -106,13 +109,13 @@ TEST_F(SimControlTest, Test) {
   const double timestamp = 100.0;
   adc_trajectory.mutable_header()->set_timestamp_sec(timestamp);
 
-  sim_control_->SetStartPoint(adc_trajectory.trajectory_point(0));
-  sim_control_->OnPlanning(std::make_shared<ADCTrajectory>(adc_trajectory));
+  sim_2d_->SetStartPoint(adc_trajectory.trajectory_point(0));
+  sim_2d_->OnPlanning(std::make_shared<ADCTrajectory>(adc_trajectory));
 
   {
     Clock::SetMode(Clock::MOCK);
     Clock::SetNowInSeconds(100.01);
-    sim_control_->RunOnce();
+    sim_2d_->SimStep();
 
     BlockerManager::Instance()->Observe();
     auto localization =
@@ -165,11 +168,11 @@ TEST_F(SimControlTest, Test) {
   }
 }
 
-TEST_F(SimControlTest, TestDummyPrediction) {
+TEST_F(Sim2DComponentTest, TestDummyPrediction) {
   Clock::SetMode(Clock::MOCK);
 
-  sim_control_->Init(false);
-  sim_control_->enabled_ = true;
+  sim_2d_->InitState(false);
+  sim_2d_->enabled_ = true;
 
   auto obstacles = std::make_shared<PredictionObstacles>();
 
@@ -178,29 +181,29 @@ TEST_F(SimControlTest, TestDummyPrediction) {
     Clock::SetNowInSeconds(timestamp);
     obstacles->mutable_header()->set_timestamp_sec(timestamp);
     obstacles->mutable_header()->set_module_name("NoneSimPrediction");
-    sim_control_->OnPredictionObstacles(obstacles);
+    sim_2d_->OnPredictionObstacles(obstacles);
 
-    sim_control_->PublishDummyPrediction();
+    sim_2d_->PublishDummyPrediction();
 
     BlockerManager::Instance()->Observe();
-    EXPECT_FALSE(sim_control_->send_dummy_prediction_);
+    EXPECT_FALSE(sim_2d_->send_dummy_prediction_);
     EXPECT_TRUE(BlockerManager::Instance()
                     ->GetBlocker<PredictionObstacles>(FLAGS_prediction_topic)
                     ->IsObservedEmpty());
   }
 
-  sim_control_->InternalReset();
+  sim_2d_->InternalReset();
 
   {
     const double timestamp = 100.2;
     Clock::SetNowInSeconds(timestamp);
     obstacles->mutable_header()->set_timestamp_sec(timestamp);
     obstacles->mutable_header()->set_module_name("SimPrediction");
-    sim_control_->OnPredictionObstacles(obstacles);
+    sim_2d_->OnPredictionObstacles(obstacles);
 
-    sim_control_->PublishDummyPrediction();
+    sim_2d_->PublishDummyPrediction();
 
-    EXPECT_TRUE(sim_control_->send_dummy_prediction_);
+    EXPECT_TRUE(sim_2d_->send_dummy_prediction_);
     BlockerManager::Instance()->Observe();
     auto prediction =
         BlockerManager::Instance()
@@ -210,5 +213,5 @@ TEST_F(SimControlTest, TestDummyPrediction) {
     EXPECT_DOUBLE_EQ(prediction->header().timestamp_sec(), timestamp);
   }
 }
-}  // namespace dreamview
+}  // namespace sim_2d
 }  // namespace apollo

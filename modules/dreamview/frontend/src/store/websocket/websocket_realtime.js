@@ -47,9 +47,6 @@ export default class RealtimeWebSocketEndpoint {
                 case "VehicleParam":
                     STORE.hmi.updateVehicleParam(message.data);
                     break;
-                case "SimControlStatus":
-                    STORE.setOptionStatus('enableSimControl', message.enabled);
-                    break;
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
@@ -299,13 +296,6 @@ export default class RealtimeWebSocketEndpoint {
             event_msg: eventMessage,
             event_type: eventTypes,
             is_reportable: isReportable,
-        }));
-    }
-
-    toggleSimControl(enable) {
-        this.websocket.send(JSON.stringify({
-            type: "ToggleSimControl",
-            enable: enable,
         }));
     }
 

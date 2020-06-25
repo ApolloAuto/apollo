@@ -90,6 +90,12 @@ cyber_modules {
   }
 }
 cyber_modules {
+  key: "Sim2D"
+  value: {
+    dag_files: "/apollo/modules/sim_2d/dag/sim_2d.dag"
+  }
+}
+cyber_modules {
   key: "Third Party Perception"
   value: {
     dag_files: "/apollo/modules/third_party_perception/dag/third_party_perception.dag"
