@@ -60,6 +60,39 @@ class TrajectoryImitationLibtorchInference : public ModelInference {
   bool DoInference(LearningDataFrame* learning_data_frame) override;
 
  private:
+  /**
+   * @brief load a CONV_RNN model
+   */
+  bool LoadCONVRNNModel();
+
+  /**
+   * @brief load a CNN model
+   */
+  bool LoadCNNModel();
+
+  /**
+   * @brief load a CNN_LSTM model
+   */
+  bool LoadCNNLSTMModel();
+
+  /**
+   * @brief inference a CONV_RNN model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoCONVRNNMODELInference(LearningDataFrame* learning_data_frame);
+
+  /**
+   * @brief inference a CNN model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoCNNMODELInference(LearningDataFrame* learning_data_frame);
+
+  /**
+   * @brief inference a CNN_LSTM model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
+
   torch::jit::script::Module model_;
   torch::Device device_;
 };

@@ -1,2 +1,3 @@
+model_type: CONV_RNN
 model_file: "/apollo/modules/planning/data/model/test_model.onnx"
 use_cuda: true
