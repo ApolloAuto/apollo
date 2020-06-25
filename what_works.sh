@@ -26,16 +26,9 @@
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-FLAG_PKG="libatlas-base-dev"
-if dpkg -l |grep -q "${FLAG_PKG}"; then
-    echo "${FLAG_PKG} already installed"
-else
-    sudo apt-get -y update
-    sudo apt-get -y install ${FLAG_PKG} libpython2.7-dev
+if [ ! -f /usr/local/bin/python ]; then
+    sudo ln -s /usr/bin/python3 /usr/local/bin/python
 fi
-echo "/opt/apollo/pkgs/caffe/lib" | sudo tee -a /etc/ld.so.conf.d/apollo.conf
-sudo ldconfig
-
 # Fail on first failure.
 set -e
 
