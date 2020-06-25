@@ -24,10 +24,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 . installer_base.sh
 
 TARGET_ARCH=$(uname -m)
-VERSION="3.3.0"
 
 if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
+  VERSION="3.3.0"
   PKG_NAME="bazel_${VERSION}-linux-x86_64.deb"
   DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}
   SHA256SUM="aebed9ba87b0e4b56e3ae6baeece004a31774ee402182ad4e9f70715345d5f56"
@@ -65,6 +65,8 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
   INSTALL_MODE="$1"
+  # TODO(xiaoxq): Stick to v3.2 for a while until we have ARM machine to work with.
+  VERSION="3.2.0"
   # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
   # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
   if [[ "${INSTALL_MODE}" == "build" ]]; then
