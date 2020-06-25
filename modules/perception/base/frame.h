@@ -30,8 +30,6 @@ namespace perception {
 namespace base {
 
 struct alignas(16) Frame {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
   Frame() { sensor2world_pose.setIdentity(); }
 
   void Reset() {
