@@ -53,6 +53,8 @@ DEFINE_double(pedestrian_nearby_lane_search_radius, 5.0,
               "Radius to determine if pedestrian-like obstacle is near lane.");
 DEFINE_int32(road_graph_max_search_horizon, 20,
              "Maximal search depth for building road graph");
+DEFINE_double(surrounding_lane_search_radius, 3.0,
+              "Search radius for surrounding lanes.");
 
 // Semantic Map
 DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");

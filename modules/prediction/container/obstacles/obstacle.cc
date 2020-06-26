@@ -21,6 +21,8 @@
 #include <limits>
 
 #include "modules/prediction/common/junction_analyzer.h"
+#include "modules/prediction/common/prediction_constants.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 #include "modules/common/util/util.h"
@@ -171,6 +173,11 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   if (type_ != PerceptionObstacle::PEDESTRIAN) {
     SetCurrentLanes(&feature);
     SetNearbyLanes(&feature);
+  }
+
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForLearning) {
+    SetSurroundingLaneIds(&feature, FLAGS_surrounding_lane_search_radius);
   }
 
   if (FLAGS_adjust_vehicle_heading_by_lane &&
@@ -763,6 +770,21 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     lane_feature->set_lane_type(nearby_lane->lane().type());
     ADEBUG << "Obstacle [" << id_ << "] has nearby lanes ["
            << lane_feature->ShortDebugString() << "]";
+  }
+}
+
+void Obstacle::SetSurroundingLaneIds(Feature* feature, const double radius) {
+  Eigen::Vector2d point(feature->position().x(), feature->position().y());
+  std::vector<std::string> lane_ids =
+      PredictionMap::NearbyLaneIds(point, radius);
+  for (const auto& lane_id : lane_ids) {
+    feature->add_surrounding_lane_id(lane_id);
+    std::shared_ptr<const LaneInfo> lane_info =
+        PredictionMap::LaneById(lane_id);
+    if (lane_info->IsOnLane({feature->position().x(),
+                             feature->position().y()})) {
+      feature->add_within_lane_id(lane_id);
+    }
   }
 }
 
