@@ -31,6 +31,7 @@ cc_library(
     deps = [
         "//modules/common/filters:digital_filter",
         "//modules/prediction/common:junction_analyzer",
+        "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:prediction_conf_cc_proto",
