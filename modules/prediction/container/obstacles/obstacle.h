@@ -276,6 +276,8 @@ class Obstacle {
 
   void SetNearbyLanes(Feature* feature);
 
+  void SetSurroundingLaneIds(Feature* feature, const double radius);
+
   void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
 
   /** @brief This functions updates the lane-points into the lane-segments
