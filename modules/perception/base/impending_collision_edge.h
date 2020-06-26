@@ -50,7 +50,9 @@ struct ImpendingCollisionEdges {
 
   // sensor to world position
   Eigen::Matrix4d sensor2world_pose = Eigen::Matrix4d::Zero();
-};
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
 
 // TODO(all): to remove
 // typedef std::shared_ptr<ImpendingCollisionEdges> ImpendingCollisionEdgesPtr;

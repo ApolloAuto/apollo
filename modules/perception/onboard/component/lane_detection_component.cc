@@ -545,7 +545,7 @@ int LaneDetectionComponent::InitMotionService() {
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
   if (mot_buffer_ == nullptr) {
-    mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+    mot_buffer_.reset(new base::MotionBuffer(motion_buffer_size_));
   } else {
     mot_buffer_->set_capacity(motion_buffer_size_);
   }

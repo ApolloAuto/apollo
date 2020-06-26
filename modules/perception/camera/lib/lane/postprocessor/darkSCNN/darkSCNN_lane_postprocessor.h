@@ -35,6 +35,9 @@ namespace camera {
 
 class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   DarkSCNNLanePostprocessor() : BaseLanePostprocessor() {}
 
   virtual ~DarkSCNNLanePostprocessor() {}

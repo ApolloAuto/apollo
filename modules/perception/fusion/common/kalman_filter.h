@@ -25,6 +25,9 @@ namespace fusion {
 
 class KalmanFilter : public BaseFilter {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   KalmanFilter();
 
   bool Init(const Eigen::VectorXd &initial_belief_states,

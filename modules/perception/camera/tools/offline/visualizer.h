@@ -33,6 +33,9 @@ namespace camera {
 
 class Visualizer {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   bool Init(const std::vector<std::string> &camera_names,
             TransformServer *tf_server);
   bool Init_all_info_single_camera(

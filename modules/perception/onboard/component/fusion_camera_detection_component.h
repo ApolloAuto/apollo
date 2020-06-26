@@ -48,6 +48,9 @@ namespace onboard {
 
 class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   FusionCameraDetectionComponent() : seq_num_(0) {}
   ~FusionCameraDetectionComponent();
 

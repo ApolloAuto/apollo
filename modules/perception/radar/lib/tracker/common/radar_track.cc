@@ -40,7 +40,7 @@ RadarTrack::RadarTrack(const base::ObjectPtr& obs, const double timestamp) {
   is_dead_ = false;
 
   // Or use register class instead.
-  filter_ = std::make_shared<AdaptiveKalmanFilter>();
+  filter_.reset(new AdaptiveKalmanFilter);
   filter_->Init(*obs);
 }
 

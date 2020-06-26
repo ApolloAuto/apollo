@@ -56,6 +56,9 @@ class LaneDetectionComponent;
 typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
 class LaneDetectionComponent : public apollo::cyber::Component<> {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   LaneDetectionComponent() : seq_num_(0) {}
   ~LaneDetectionComponent();
 

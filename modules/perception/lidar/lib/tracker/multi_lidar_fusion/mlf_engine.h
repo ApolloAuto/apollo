@@ -35,6 +35,9 @@ namespace lidar {
 
 class MlfEngine : public BaseMultiTargetTracker {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   MlfEngine() = default;
   ~MlfEngine() = default;
 

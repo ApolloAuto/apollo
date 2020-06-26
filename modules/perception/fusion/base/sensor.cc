@@ -69,7 +69,7 @@ bool Sensor::GetPose(double timestamp, Eigen::Affine3d* pose) const {
 }
 
 void Sensor::AddFrame(const base::FrameConstPtr& frame_ptr) {
-  SensorFramePtr frame = std::make_shared<SensorFrame>(frame_ptr);
+  SensorFramePtr frame(new SensorFrame(frame_ptr));
   if (frames_.size() == kMaxCachedFrameNum) {
     frames_.pop_front();
   }

@@ -75,7 +75,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
       "/apollo/modules/perception/testdata/"
       "lidar/lib/segmentation/cnnseg/";
 
-  auto segmentation = std::make_shared<CNNSegmentation>();
+  auto segmentation = std::shared_ptr<CNNSegmentation>(new CNNSegmentation);
   SegmentationOptions options;
   EXPECT_FALSE(segmentation->Segment(options, nullptr));
   LidarFrame frame_data;
@@ -123,7 +123,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
       "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
-  auto pcl_ptr = std::make_shared<base::PointFCloud>();
+  auto pcl_ptr = std::shared_ptr<base::PointFCloud>(new base::PointFCloud);
   std::string filename =
       "/apollo/modules/perception/testdata/lidar/app/data/perception/"
       "lidar/files/0002_00.pcd";
@@ -141,7 +141,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   //  }
 
   // test init
-  auto segmentation = std::make_shared<CNNSegmentation>();
+  auto segmentation = std::shared_ptr<CNNSegmentation>(new CNNSegmentation);
   EXPECT_TRUE(segmentation->Init());
 
   // test segment
