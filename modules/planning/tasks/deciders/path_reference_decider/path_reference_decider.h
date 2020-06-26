@@ -49,7 +49,7 @@ class PathReferenceDecider : public Task {
    * @return false
    */
   bool IsValidPathReference(
-      const ReferenceLineInfo *reference_line_info,
+      const ReferenceLineInfo &reference_line_info,
       const PathBoundary &path_bound,
       const std::vector<common::TrajectoryPoint> &path_reference);
 
@@ -58,9 +58,9 @@ class PathReferenceDecider : public Task {
    *
    */
   void PathBoundToLineSegments(
-      const PathBoundary *path_bound,
+      const PathBoundary &path_bound,
       std::vector<std::vector<common::math::LineSegment2d>>
-          &path_bound_segments);
+          *path_bound_segments);
 
   /**
    * @brief convert path points from evenly dt to evenly ds distribution
@@ -70,7 +70,7 @@ class PathReferenceDecider : public Task {
    * @param evaluated_path_reference
    */
   void EvaluatePathReference(
-      const PathBoundary *path_bound,
+      const PathBoundary &path_bound,
       const std::vector<common::TrajectoryPoint> &path_reference,
       std::vector<common::PathPoint> *evaluated_path_reference);
 
@@ -84,7 +84,7 @@ class PathReferenceDecider : public Task {
    * @return int
    */
 
-  int IsPointWithinPathBounds(const ReferenceLineInfo *reference_line_info,
+  int IsPointWithinPathBounds(const ReferenceLineInfo &reference_line_info,
                               const PathBoundary &path_bound, const double x,
                               const double y);
 
@@ -108,7 +108,7 @@ class PathReferenceDecider : public Task {
    */
   bool IsADCBoxAlongPathReferenceWithinPathBounds(
       const std::vector<common::TrajectoryPoint> &path_reference,
-      const PathBoundary *regular_path_bound);
+      const PathBoundary &regular_path_bound);
 };
 
 }  // namespace planning
