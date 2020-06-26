@@ -28,6 +28,7 @@ DECLARE_string(scenario_bare_intersection_unprotected_config_file);
 DECLARE_string(scenario_emergency_pull_over_config_file);
 DECLARE_string(scenario_emergency_stop_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
+DECLARE_string(scenario_lane_follow_hybrid_config_file);
 DECLARE_string(scenario_learning_model_sample_config_file);
 DECLARE_string(scenario_narrow_street_u_turn_config_file);
 DECLARE_string(scenario_park_and_go_config_file);
