@@ -60,7 +60,7 @@ cc_library(
         "preprocess_points.h",
     ],
     deps = [
-        "preprocess_points_cuda",
+        ":preprocess_points_cuda",
         ":common",
     ],
 )

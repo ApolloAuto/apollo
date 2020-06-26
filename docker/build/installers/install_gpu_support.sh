@@ -28,8 +28,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 info "Install TensorRT 7 ..."
 bash /tmp/installers/install_tensorrt.sh
 
-info "Install Caffe 1.0 ..."
-bash /tmp/installers/install_gpu_caffe.sh ${INSTALL_MODE}
+#info "Install Caffe 1.0 ..."
+#bash /tmp/installers/install_gpu_caffe.sh ${INSTALL_MODE}
 
 info "Install libtorch ..."
 bash /tmp/installers/install_libtorch.sh
