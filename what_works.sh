@@ -68,12 +68,6 @@ bazel_test_with_dist_cache \
 # Perception: 7 test failures + 2 flaky
 bazel_test_with_dist_cache $(bazel query //modules/perception/... \
 	except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
-	except //modules/perception/camera/test:camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test \
-	except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test \
-	except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_region_output_test \
-	except //modules/perception/camera/test:camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test \
-	except //modules/perception/camera/test:camera_lib_lane_detector_darkscnn_lane_detector_test \
-	except //modules/perception/camera/test:camera_app_obstacle_camera_perception_test \
 )
 # Flaky
 # //modules/perception/camera/test:camera_lib_lane_postprocessor_denseline_lane_postprocessor_test
