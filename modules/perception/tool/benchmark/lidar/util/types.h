@@ -39,6 +39,7 @@ struct PointXYZIT {
   float z;
   uint8_t intensity;
   double timestamp;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 typedef ::pcl::PointCloud<PointXYZIT> PointXYZITCloud;
@@ -50,6 +51,7 @@ struct PointXYZL {
   float y;
   float z;
   uint32_t label;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 typedef ::pcl::PointCloud<PointXYZL> PointXYZLCloud;
@@ -69,6 +71,7 @@ struct PointXYZIL {
   float z = 0.f;
   float intensity = 0.f;
   uint32_t label = 0;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 }  // namespace benchmark

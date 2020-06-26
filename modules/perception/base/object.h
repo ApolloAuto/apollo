@@ -32,6 +32,8 @@ namespace perception {
 namespace base {
 
 struct alignas(16) Object {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   Object();
   std::string ToString() const;
   void Reset();

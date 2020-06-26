@@ -37,6 +37,7 @@ struct PCLPointXYZIT {
   float z;
   uint8_t intensity;
   double timestamp;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 struct PCLPointXYZL {
@@ -44,6 +45,7 @@ struct PCLPointXYZL {
   float y;
   float z;
   uint32_t label;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 inline bool LoadPCLPCD(const std::string& file_path,
