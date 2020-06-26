@@ -82,9 +82,10 @@ Status PathReferenceDecider::Process(Frame *frame,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   // check if path reference is valid
   // current, only check if path reference point is within path bounds
-  if (!IsValidPathReference(reference_line_info,
+  if (!IsValidPathReference(*reference_line_info,
                             path_boundaries[regular_path_bound_idx],
                             path_reference)) {
     reference_line_info->mutable_path_data()->set_is_valid_path_reference(
@@ -93,9 +94,10 @@ Status PathReferenceDecider::Process(Frame *frame,
               "path reference";
     return Status::OK();
   }
-  std::vector<PathPoint> evaluated_path_reference;
+
   // evaluate path reference
-  EvaluatePathReference(&path_boundaries[regular_path_bound_idx],
+  std::vector<PathPoint> evaluated_path_reference;
+  EvaluatePathReference(path_boundaries[regular_path_bound_idx],
                         path_reference, &evaluated_path_reference);
 
   // mark learning trajectory as path reference
@@ -118,7 +120,7 @@ size_t PathReferenceDecider::GetRegularPathBound(
 }
 
 bool PathReferenceDecider::IsValidPathReference(
-    const ReferenceLineInfo *reference_line_info,
+    const ReferenceLineInfo &reference_line_info,
     const PathBoundary &regular_path_bound,
     const std::vector<TrajectoryPoint> &path_reference) {
   for (auto path_referece_point : path_reference) {
@@ -134,13 +136,13 @@ bool PathReferenceDecider::IsValidPathReference(
 
 bool PathReferenceDecider::IsADCBoxAlongPathReferenceWithinPathBounds(
     const std::vector<TrajectoryPoint> &path_reference,
-    const PathBoundary *regular_path_bound) {
+    const PathBoundary &regular_path_bound) {
   /* check adc box has overlap with each path line segment*/
   // loop over output trajectory points
   // check if path reference point is valid or not
   // 1. line segment formed by two adjacent boundary point
   std::vector<std::vector<LineSegment2d>> segmented_path_bounds;
-  PathBoundToLineSegments(regular_path_bound, segmented_path_bounds);
+  PathBoundToLineSegments(regular_path_bound, &segmented_path_bounds);
   // has intersection with
   std::vector<Box2d> vehicle_boxes;
   for (const auto path_reference_point : path_reference) {
@@ -177,15 +179,15 @@ bool PathReferenceDecider::IsADCBoxAlongPathReferenceWithinPathBounds(
 }
 
 void PathReferenceDecider::PathBoundToLineSegments(
-    const PathBoundary *path_bound,
-    std::vector<std::vector<LineSegment2d>> &path_bound_segments) {
-  const double start_s = path_bound->start_s();
-  const double delta_s = path_bound->delta_s();
-  const size_t path_bound_size = path_bound->boundary().size();
+    const PathBoundary &path_bound,
+    std::vector<std::vector<LineSegment2d>> *path_bound_segments) {
+  const double start_s = path_bound.start_s();
+  const double delta_s = path_bound.delta_s();
+  const size_t path_bound_size = path_bound.boundary().size();
   std::vector<LineSegment2d> cur_left_bound_segments;
   std::vector<LineSegment2d> cur_right_bound_segments;
   const std::vector<std::pair<double, double>> &path_bound_points =
-      path_bound->boundary();
+      path_bound.boundary();
   // setup the init path bound point
   SLPoint prev_left_sl_point;
   SLPoint prev_right_sl_point;
@@ -228,16 +230,16 @@ void PathReferenceDecider::PathBoundToLineSegments(
     cur_left_bound_segments.emplace_back(cur_left_segment);
     cur_right_bound_segments.emplace_back(cur_right_segment);
   }
-  path_bound_segments.emplace_back(cur_left_bound_segments);
-  path_bound_segments.emplace_back(cur_right_bound_segments);
+  path_bound_segments->emplace_back(cur_left_bound_segments);
+  path_bound_segments->emplace_back(cur_right_bound_segments);
 }
 
 int PathReferenceDecider::IsPointWithinPathBounds(
-    const ReferenceLineInfo *reference_line_info,
+    const ReferenceLineInfo &reference_line_info,
     const PathBoundary &path_bound, const double x, const double y) {
   const double kPathBoundsDeciderResolution = 0.5;
   common::SLPoint point_sl;
-  reference_line_info->reference_line().XYToSL({x, y}, &point_sl);
+  reference_line_info.reference_line().XYToSL({x, y}, &point_sl);
   const double start_s = path_bound.start_s();
   const double delta_s = path_bound.delta_s();
   const int path_bound_size = path_bound.boundary().size();
@@ -245,7 +247,7 @@ int PathReferenceDecider::IsPointWithinPathBounds(
 
   if (point_sl.s() > end_s ||
       point_sl.s() < start_s - kPathBoundsDeciderResolution * 2) {
-    ADEBUG << "Longitudinally outside the boundary.";
+    AERROR << "Longitudinally outside the boundary.";
     return -1;
   }
   int idx_after = 0;
@@ -253,31 +255,32 @@ int PathReferenceDecider::IsPointWithinPathBounds(
          start_s + idx_after * delta_s < point_sl.s()) {
     ++idx_after;
   }
-  ADEBUG << "The idx_after = " << idx_after;
-  ADEBUG << "The point is at: " << point_sl.l();
-  int idx_before = idx_after - 1;
-  if (std::get<0>(path_bound.boundary().at(idx_before)) <= point_sl.l() &&
-      std::get<1>(path_bound.boundary().at(idx_before)) >= point_sl.l() &&
-      std::get<0>(path_bound.boundary().at(idx_after)) <= point_sl.l() &&
-      std::get<1>(path_bound.boundary().at(idx_after)) >= point_sl.l()) {
-    return idx_after;
+  ADEBUG << "idx_after[" << idx_after << "] point_l[" << point_sl.l() << "]";
+  if (idx_after >= 1) {
+    int idx_before = idx_after - 1;
+    if (std::get<0>(path_bound.boundary().at(idx_before)) <= point_sl.l() &&
+        std::get<1>(path_bound.boundary().at(idx_before)) >= point_sl.l() &&
+        std::get<0>(path_bound.boundary().at(idx_after)) <= point_sl.l() &&
+        std::get<1>(path_bound.boundary().at(idx_after)) >= point_sl.l()) {
+      return idx_after;
+    }
   }
   ADEBUG << "Laterally outside the boundary.";
   return -1;
 }
 
 void PathReferenceDecider::EvaluatePathReference(
-    const PathBoundary *path_bound,
+    const PathBoundary &path_bound,
     const std::vector<TrajectoryPoint> &path_reference,
     std::vector<PathPoint> *evaluated_path_reference) {
-  const double delta_s = path_bound->delta_s();
+  const double delta_s = path_bound.delta_s();
   const double path_reference_end_s = path_reference.back().path_point().s();
   DiscretizedPath discrete_path_reference;
   for (auto trajectory_point : path_reference) {
     discrete_path_reference.emplace_back(trajectory_point.path_point());
   }
   size_t idx;
-  for (idx = 0; idx < path_bound->boundary().size(); ++idx) {
+  for (idx = 0; idx < path_bound.boundary().size(); ++idx) {
     // relative s
     double cur_s = static_cast<double>(idx) * delta_s;
     if (cur_s > path_reference_end_s) {
