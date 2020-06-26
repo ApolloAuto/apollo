@@ -49,19 +49,10 @@ class LearningBasedData {
     return learning_data_adc_future_trajectory_points_;
   }
 
-  void set_is_learning_trajectory_valid(const bool is_valid) {
-    is_learning_trajectory_valid_ = is_valid;
-  }
-
-  const bool is_learning_trajectory_valid() const {
-    return is_learning_trajectory_valid_;
-  }
-
  private:
   LearningDataFrame learning_data_frame_;
   std::vector<common::TrajectoryPoint>
       learning_data_adc_future_trajectory_points_;
-  bool is_learning_trajectory_valid_ = false;
 };
 
 }  // namespace planning
