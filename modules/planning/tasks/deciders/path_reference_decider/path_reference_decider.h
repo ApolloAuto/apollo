@@ -109,6 +109,10 @@ class PathReferenceDecider : public Task {
   bool IsADCBoxAlongPathReferenceWithinPathBounds(
       const std::vector<common::TrajectoryPoint> &path_reference,
       const PathBoundary &regular_path_bound);
+
+ private:
+  static int valid_path_reference_counter_;  // count valid path reference
+  static int total_path_counter_;            // count total path
 };
 
 }  // namespace planning
