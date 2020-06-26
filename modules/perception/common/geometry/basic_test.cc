@@ -345,7 +345,7 @@ TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary) {
   EXPECT_NEAR(distance, 0.f, std::numeric_limits<float>::epsilon());
 }
 
-TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary_list) {
+TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary_lists) {
   Eigen::Vector3f pt(0.0, 0.0, 0.0);
   PointCloud<PointF> left, right;
   std::vector<PointCloud<PointF>> left_list, right_list;

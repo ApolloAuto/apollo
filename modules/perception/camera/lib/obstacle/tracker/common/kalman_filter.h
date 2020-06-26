@@ -26,6 +26,9 @@ namespace camera {
 
 class KalmanFilterConstVelocity {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   KalmanFilterConstVelocity();
 
   void Init(Eigen::VectorXd);

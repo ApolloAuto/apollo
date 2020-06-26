@@ -46,6 +46,9 @@ class BaseCameraModel {
 
 class PinholeCameraModel : public BaseCameraModel {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   ~PinholeCameraModel() = default;
 
   Eigen::Vector2f Project(const Eigen::Vector3f& point3d) override;
