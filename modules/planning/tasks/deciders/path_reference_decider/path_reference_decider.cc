@@ -44,6 +44,9 @@ using common::math::Box2d;
 using common::math::LineSegment2d;
 using common::math::Vec2d;
 
+int PathReferenceDecider::valid_path_reference_counter_ = 0;
+int PathReferenceDecider::total_path_counter_ = 0;
+
 PathReferenceDecider::PathReferenceDecider(const TaskConfig &config)
     : Task(config) {}
 
@@ -61,8 +64,21 @@ Status PathReferenceDecider::Process(Frame *frame,
     reference_line_info->mutable_path_data()->set_is_valid_path_reference(
         false);
     ADEBUG << "Skip path reference when changing lane.";
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
     return Status::OK();
   }
+
+  // skip using path reference during side pass
+  if (reference_line_info->is_path_lane_borrow()) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
+    ADEBUG << "Skip path reference when sidepass.";
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
+    return Status::OK();
+  }
+
   // get path bounds info from reference line info
   const std::vector<PathBoundary> &path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
@@ -80,9 +96,12 @@ Status PathReferenceDecider::Process(Frame *frame,
         false);
     const std::string msg = "No regular path boundary";
     AERROR << msg;
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  ++total_path_counter_;
   // check if path reference is valid
   // current, only check if path reference point is within path bounds
   if (!IsValidPathReference(*reference_line_info,
@@ -92,19 +111,25 @@ Status PathReferenceDecider::Process(Frame *frame,
         false);
     ADEBUG << "Learning model output violates path bounds. Not a validated "
               "path reference";
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
     return Status::OK();
   }
 
   // evaluate path reference
   std::vector<PathPoint> evaluated_path_reference;
-  EvaluatePathReference(path_boundaries[regular_path_bound_idx],
-                        path_reference, &evaluated_path_reference);
+  EvaluatePathReference(path_boundaries[regular_path_bound_idx], path_reference,
+                        &evaluated_path_reference);
 
   // mark learning trajectory as path reference
   reference_line_info->mutable_path_data()->set_is_valid_path_reference(true);
 
   reference_line_info->mutable_path_data()->set_path_reference(
       evaluated_path_reference);
+
+  ++valid_path_reference_counter_;
+  ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+         << "] total_path_counter[" << total_path_counter_ << "]";
 
   return Status::OK();
 }
