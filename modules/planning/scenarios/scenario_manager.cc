@@ -132,8 +132,14 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                              &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  if (FLAGS_planning_learning_mode == 3) {
+    // HYBRID
+    ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_hybrid_config_file,
+                                &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  } else {
+    ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
+                                &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  }
 
   // bare_intersection
   ACHECK(Scenario::LoadConfig(
