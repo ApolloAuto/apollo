@@ -212,4 +212,3 @@ function optarg_check_for_opt() {
     local optarg="$2"
     ! [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]
 }
-

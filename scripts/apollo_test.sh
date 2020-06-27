@@ -4,27 +4,25 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
-##========== Perception: 7 test failures + 2 flaky ================##
+##========== Perception ================##
 PERCEPTION_EXCEPTIONS="\
 except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
-except //modules/perception/camera/test:camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test \
-except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test \
-except //modules/perception/camera/test:camera_lib_obstacle_detector_yolo_region_output_test \
-except //modules/perception/camera/test:camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test \
-except //modules/perception/camera/test:camera_lib_lane_detector_darkscnn_lane_detector_test \
-except //modules/perception/camera/test:camera_app_obstacle_camera_perception_test \
-except //modules/perception/camera/test:camera_lib_lane_postprocessor_denseline_lane_postprocessor_test \
-except //modules/perception/camera/test:camera_lib_lane_detector_denseline_lane_detector_test \
 "
 
-##============= Localization: 3 test failures ===================##
+##============= Localization ===================##
 LOCALIZATION_EXCEPTIONS="\
 except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
 except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
 except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
+except //modules/localization/msf:msf_localization_test \
+except //modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map_test \
+except //modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_test \
+except //modules/localization/ndt:ndt_localization_pose_buffer_test \
+except //modules/localization/ndt:ndt_localization_test \
+except //modules/localization/ndt/ndt_locator:ndt_solver_test \
 "
 
-##============== Prediction: 4 test failures ====================##
+##============== Prediction ====================##
 PREDICTION_EXCEPTIONS="\
 except //modules/prediction/predictor/single_lane:single_lane_predictor_test \
 except //modules/prediction/container/obstacles:obstacle_test \
@@ -32,7 +30,7 @@ except //modules/prediction/container/obstacles:obstacle_clusters_test \
 except //modules/prediction/common:road_graph_test \
 "
 
-##====================== Planning: 7 test failures ===============##
+##====================== Planning ===============##
 PLANNING_EXCEPTIONS="\
 except //modules/planning/tasks/learning_model:learning_model_inference_task_test \
 except //modules/planning/reference_line:qp_spline_reference_line_smoother_test   \
@@ -182,7 +180,7 @@ function bazel_test() {
     fi
 
     _parse_cmdline_arguments "$@"
-    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
 
     local test_targets
     test_targets="$(determine_test_targets ${SHORTHAND_TARGETS})"
