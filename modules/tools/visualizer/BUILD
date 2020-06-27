@@ -1,5 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//tools:cpplint.bzl", "cpplint")
 load("//tools:qt.bzl", "qt_cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,12 +11,10 @@ cc_binary(
     includes = [
         ".",
     ],
-    linkopts = [
-        "-lconsole_bridge",
-        "-lGL",
-    ],
     deps = [
         ":visualizer_lib",
+        "//third_party:console_bridge",
+        "//third_party:glvnd",
         "//third_party:pthread",
         "@fastrtps",
         "@qt//:qt_core",
