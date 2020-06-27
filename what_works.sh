@@ -118,8 +118,10 @@ echo "########################### All check passed! ###########################"
 #          See https://pypi.org/project/pycodestyle/
 # TODO(?): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
-# TODO(storypku): cyber.aarch64 docker image
+# TODO(storypku): cyber.aarch64 docker image (to be validated)
 # TODO(storypku): tools/workspace.bzl to re-org WORKSPACE
 # TODO(?): no break for cpu only build
-# TODO(?): Substitute implicit "-l" linkopts with explicit deps in BUILD files
+
+# The following should be checked regularly until everyone follows the rule.
+# Substitute implicit "-l" linkopts with explicit deps in BUILD files
 # find modules/ -name "BUILD" -exec grep -- "-l" {} +
