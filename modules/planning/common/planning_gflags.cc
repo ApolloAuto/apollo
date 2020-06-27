@@ -554,3 +554,10 @@ DEFINE_string(
     planning_birdview_img_feature_renderer_config_file,
     "/apollo/modules/planning/conf/planning_semantic_map_config.pb.txt",
     "config file for renderer singleton");
+
+DEFINE_bool(
+    skip_path_reference_in_side_pass, false,
+    "skipping using learning model output as path reference in side pass");
+DEFINE_bool(
+    skip_path_reference_in_change_lane, true,
+    "skipping using learning model output as path reference in change lane");

@@ -275,3 +275,7 @@ DECLARE_string(planning_offline_bags);
 DECLARE_int32(learning_data_obstacle_history_time_sec);
 DECLARE_int32(learning_data_frame_num_per_file);
 DECLARE_string(planning_birdview_img_feature_renderer_config_file);
+
+// hybrid model
+DECLARE_bool(skip_path_reference_in_side_pass);
+DECLARE_bool(skip_path_reference_in_change_lane);
