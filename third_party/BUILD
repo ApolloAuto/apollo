@@ -81,3 +81,10 @@ cc_library(
         "-lcblas",
     ],
 )
+
+cc_library(
+    name = "zlib",
+    linkopts = [
+        "-lz",
+    ],
+)

@@ -26,11 +26,9 @@ cc_library(
         "base_map_fwd.h",
         "base_map_matrix.h",
     ],
-    linkopts = [
-        "-lz",
-    ],
     deps = [
         "//cyber/common",
+        "//third_party:zlib",
         "@com_google_glog//:glog",
         "@eigen",
         "@opencv",
