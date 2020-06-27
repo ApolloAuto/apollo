@@ -201,11 +201,11 @@ new_local_repository(
 #)
 
 # Caffe
-new_local_repository(
-    name = "caffe",
-    build_file = "external/caffe.BUILD",
-    path = "/opt/apollo/pkgs/caffe/include",
-)
+# new_local_repository(
+#    name = "caffe",
+#    build_file = "external/caffe.BUILD",
+#    path = "/opt/apollo/pkgs/caffe/include",
+# )
 
 # YAML-CPP
 http_archive(
