@@ -60,7 +60,7 @@ build:cpu --define USE_GPU=false
 build:gpu --define USE_GPU=true
 build:opt_gpu --config=opt --config=gpu
 
-# build with profiling
+# Build with profiling
 build:cpu_prof --config=cpu
 build:cpu_prof --linkopt=-lprofiler
 

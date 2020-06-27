@@ -123,8 +123,7 @@ function bazel_build() {
 
 	_parse_cmdline_arguments $@
 
-	# FIXME(all): Use "--define USE_ESD_CAN=${USE_ESD_CAN}" instead
-    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
 
     local build_targets
     build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
