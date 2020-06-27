@@ -318,13 +318,6 @@ new_local_repository(
     path = "/usr/local/libtorch_gpu/include",
 )
 
-# ffmpeg
-new_local_repository(
-    name = "ffmpeg",
-    build_file = "external/ffmpeg.BUILD",
-    path = "/opt/apollo/sysroot/include",
-)
-
 new_local_repository(
     name = "opencv",
     build_file = "external/opencv.BUILD",
@@ -338,10 +331,16 @@ new_local_repository(
     path = "/opt/apollo/pkgs/tf2/include",
 )
 
-# TODO(storypku) rules_boost
+# TODO(all) rules_boost
 new_local_repository(
     name = "boost",
     build_file = "external/boost.BUILD",
+    path = "/opt/apollo/sysroot/include",
+)
+
+new_local_repository(
+    name = "ffmpeg",
+    build_file = "external/ffmpeg.BUILD",
     path = "/opt/apollo/sysroot/include",
 )
 
