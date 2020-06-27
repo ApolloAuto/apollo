@@ -35,11 +35,11 @@ set -e
 ./apollo6.sh config --noninteractive
 
 function bazel_build_with_dist_cache() {
-    bazel build -c opt --distdir=/apollo/.cache/distdir "$@"
+    bazel build --distdir=/apollo/.cache/distdir "$@"
 }
 
 function bazel_test_with_dist_cache() {
-    bazel test -c opt --distdir=/apollo/.cache/distdir "$@"
+    bazel test --distdir=/apollo/.cache/distdir "$@"
 }
 
 # Working parts.
@@ -65,19 +65,23 @@ bazel_test_with_dist_cache \
     //modules/third_party_perception/... \
     //modules/tools/...
 
-# Perception: 7 test failures + 2 flaky
+# Perception
 bazel_test_with_dist_cache $(bazel query //modules/perception/... \
 	except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
 )
-# Flaky
-# //modules/perception/camera/test:camera_lib_lane_postprocessor_denseline_lane_postprocessor_test
-# //modules/perception/camera/test:camera_lib_lane_detector_denseline_lane_detector_test
 
-# Localization: 3 test failures
+# Localization: 9 test failures
 bazel_test_with_dist_cache $(bazel query //modules/localization/... \
     except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
     except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
     except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
+    \
+    except //modules/localization/msf:msf_localization_test \
+    except //modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map_test \
+    except //modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_test \
+    except //modules/localization/ndt:ndt_localization_pose_buffer_test \
+    except //modules/localization/ndt:ndt_localization_test \
+    except //modules/localization/ndt/ndt_locator:ndt_solver_test \
 )
 
 # Prediction: 4 test failures
