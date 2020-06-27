@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <ATen/core/jit_type.h>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

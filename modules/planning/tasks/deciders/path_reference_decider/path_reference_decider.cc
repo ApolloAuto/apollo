@@ -60,7 +60,8 @@ Status PathReferenceDecider::Process(Frame *frame,
                                      ReferenceLineInfo *reference_line_info) {
   // skip using path reference during lane changing
   // There are two reference line during change lane
-  if (frame->reference_line_info().size() > 1) {
+  if (FLAGS_skip_path_reference_in_change_lane &&
+      frame->reference_line_info().size() > 1) {
     reference_line_info->mutable_path_data()->set_is_valid_path_reference(
         false);
     ADEBUG << "Skip path reference when changing lane.";
@@ -70,7 +71,8 @@ Status PathReferenceDecider::Process(Frame *frame,
   }
 
   // skip using path reference during side pass
-  if (reference_line_info->is_path_lane_borrow()) {
+  if (FLAGS_skip_path_reference_in_side_pass &&
+      reference_line_info->is_path_lane_borrow()) {
     reference_line_info->mutable_path_data()->set_is_valid_path_reference(
         false);
     ADEBUG << "Skip path reference when sidepass.";

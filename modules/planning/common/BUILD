@@ -543,7 +543,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//modules/planning/proto:learning_data_proto",
+        "//modules/planning/proto:learning_data_cc_proto",
     ],
 )
 
