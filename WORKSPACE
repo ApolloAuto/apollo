@@ -4,11 +4,14 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
 load("//tools/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
-load("//third_party:vtk_configure.bzl", "vtk_configure")
+load("//third_party/py:python_configure.bzl", "python_configure")
+load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
 
 cuda_configure(name = "local_config_cuda")
 
 tensorrt_configure(name = "local_config_tensorrt")
+
+python_configure(name = "local_config_python")
 
 vtk_configure(name = "local_config_vtk")
 
@@ -296,12 +299,6 @@ new_local_repository(
     name = "fastrtps",
     build_file = "external/fastrtps.BUILD",
     path = "/usr/local/fast-rtps",
-)
-
-new_local_repository(
-    name = "python3",
-    build_file = "external/python3.BUILD",
-    path = "/usr",
 )
 
 ## libtorch
