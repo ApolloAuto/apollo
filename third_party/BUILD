@@ -88,3 +88,17 @@ cc_library(
         "-lz",
     ],
 )
+
+cc_library(
+    name = "console_bridge",
+    linkopts = [
+        "-lconsole_bridge",
+    ],
+)
+
+cc_library(
+    name = "glvnd",
+    linkopts = [
+        "-lGL",
+    ],
+)
