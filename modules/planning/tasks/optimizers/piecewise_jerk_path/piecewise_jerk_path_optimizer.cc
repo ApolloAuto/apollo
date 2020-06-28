@@ -278,7 +278,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   piecewise_jerk_problem.set_dx_bounds(-FLAGS_lateral_derivative_bound_default,
                                        FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_ddx_bounds(ddl_bounds);
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
   // Estimate lat_acc and jerk boundary from vehicle_params
   const auto& veh_param =
