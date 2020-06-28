@@ -26,9 +26,6 @@
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-if [ ! -f /usr/local/bin/python ]; then
-    sudo ln -s /usr/bin/python3 /usr/local/bin/python
-fi
 # Fail on first failure.
 set -e
 

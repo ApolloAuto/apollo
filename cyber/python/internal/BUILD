@@ -18,7 +18,7 @@ cc_library(
     hdrs = ["py_cyber.h"],
     deps = [
         "//cyber:cyber_core",
-        "//third_party:python3",
+        "@local_config_python//:python_headers",
     ],
 )
 
@@ -30,6 +30,7 @@ cc_test(
         ":py3_cyber",
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest",
+        "@local_config_python//:python_lib",
     ],
 )
 
@@ -48,7 +49,7 @@ cc_library(
     deps = [
         "//cyber/message:py_message",
         "//cyber/record",
-        "//third_party:python3",
+        "@local_config_python//:python_headers",
     ],
 )
 
@@ -62,6 +63,7 @@ cc_test(
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest_main",
         "@fastrtps",
+        "@local_config_python//:python_lib",
     ],
 )
 
@@ -79,8 +81,8 @@ cc_library(
     hdrs = ["py_time.h"],
     deps = [
         "//cyber:cyber_core",
-        "//third_party:python3",
         "@fastrtps",
+        "@local_config_python//:python_headers",
     ],
 )
 
@@ -98,7 +100,7 @@ cc_library(
     hdrs = ["py_timer.h"],
     deps = [
         "//cyber:cyber_core",
-        "//third_party:python3",
+        "@local_config_python//:python_headers",
     ],
 )
 
@@ -117,7 +119,7 @@ cc_library(
     deps = [
         ":py3_cyber",
         "//cyber:cyber_core",
-        "//third_party:python3",
+        "@local_config_python//:python_headers",
     ],
 )
 
