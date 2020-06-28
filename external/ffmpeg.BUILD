@@ -30,3 +30,12 @@ cc_library(
         "-lswscale",
     ],
 )
+
+cc_library(
+    name = "avutil",
+    includes = ["."],
+    linkopts = [
+        "-L/opt/apollo/sysroot/lib",
+        "-lavutil",
+    ],
+)
