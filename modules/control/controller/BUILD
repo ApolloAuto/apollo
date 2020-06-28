@@ -9,10 +9,6 @@ cc_library(
     hdrs = ["controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
-        "//modules/control/proto:control_cmd_cc_proto",
-        "//modules/control/proto:control_conf_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
         "//modules/control/common:dependency_injector",
     ],
 )
@@ -153,9 +149,9 @@ cc_library(
         "//cyber",
         "//modules/common/time",
         "//modules/common/util:factory",
+        "//modules/control/common:dependency_injector",
         "//modules/control/proto:control_cmd_cc_proto",
         "//modules/planning/proto:planning_cc_proto",
-        "//modules/control/common:dependency_injector",
         "@osqp",
     ],
 )

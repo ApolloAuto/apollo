@@ -56,7 +56,7 @@ bool PointCloudPreprocessor::Init(
   box_backward_x_ = static_cast<float>(-vehicle_param.left_edge_to_center());
   box_forward_y_ = static_cast<float>(vehicle_param.front_edge_to_center());
   box_backward_y_ = static_cast<float>(-vehicle_param.back_edge_to_center());*/
-  filter_high_z_points_ = static_cast<float>(config.filter_high_z_points());
+  filter_high_z_points_ = config.filter_high_z_points();
   z_threshold_ = config.z_threshold();
   return true;
 }

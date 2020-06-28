@@ -77,9 +77,9 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        "//modules/common/util",
         "//modules/prediction/common:road_graph",
         "//modules/prediction/proto:feature_cc_proto",
-        "//modules/common/util",
     ],
 )
 

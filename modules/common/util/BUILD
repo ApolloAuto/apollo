@@ -10,11 +10,11 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//cyber/common:types",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/math",
         "//modules/common/math:geometry",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/proto:pnc_point_cc_proto",
-        "//modules/common/math",
-        "//modules/common/configs:config_gflags",
     ],
 )
 

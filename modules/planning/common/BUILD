@@ -252,7 +252,6 @@ cc_library(
     ],
     deps = [
         ":feature_output",
-        ":indexed_queue",
         ":learning_based_data",
         ":local_view",
         ":obstacle",
