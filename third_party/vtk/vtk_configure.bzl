@@ -1,3 +1,4 @@
+load("//tools:common.bzl", "basename", "dirname")
 load("//tools/platform:common.bzl", "execute", "make_copy_dir_rule", "make_copy_files_rule")
 
 _APOLLO_SYSROOT_DIR = "APOLLO_SYSROOT_DIR"
@@ -24,40 +25,8 @@ def find_sysroot_dir(repository_ctx):
     # fail("Environment variable APOLLO_SYSROOT_DIR was not specified." +
     #    "Re-run ./apollo6.sh config")
 
-# Ref: bazel-skylib@lib/paths.bzl
-def _basename(p):
-    """Returns the basename (i.e., the file portion) of a path.
-    Note that if `p` ends with a slash, this function returns an empty string.
-    This matches the behavior of Python's `os.path.basename`, but differs from
-    the Unix `basename` command (which would return the path segment preceding
-    the final slash).
-    Args:
-      p: The path whose basename should be returned.
-    Returns:
-      The basename of the path, which includes the extension.
-    """
-    return p.rpartition("/")[-1]
-
-def _dirname(p):
-    """Returns the dirname of a path.
-    The dirname is the portion of `p` up to but not including the file portion
-    (i.e., the basename). Any slashes immediately preceding the basename are not
-    included, unless omitting them would make the dirname empty.
-    Args:
-      p: The path whose dirname should be returned.
-    Returns:
-      The dirname of the path.
-    """
-    prefix, sep, _ = p.rpartition("/")
-    if not prefix:
-        return sep
-    else:
-        # If there are multiple consecutive slashes, strip them all out as Python's
-        # os.path.dirname does.
-        return prefix.rstrip("/")
-
 def _vtk_version_from_incl_path(incl_path):
-    return _basename(incl_path).strip("vtk-")
+    return basename(incl_path).strip("vtk-")
 
 def _create_local_vtk_repository(repository_ctx):
     sysroot_dir = find_sysroot_dir(repository_ctx)
@@ -104,8 +73,8 @@ def _vtk_match_version(repository_ctx, sysroot_dir = None):
 
     libdict = {}
     for solib in lib_result.split("\n"):
-        libpath = _dirname(solib)
-        version = _basename(solib).rstrip(".so").split("-")[-1]
+        libpath = dirname(solib)
+        version = basename(solib).rstrip(".so").split("-")[-1]
         prefix = solib[:solib.find("/lib/")]
         libdict[solib] = (libpath, version, prefix)
 
