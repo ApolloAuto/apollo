@@ -179,7 +179,7 @@ new_local_repository(
 
 new_local_repository(
     name = "qt",
-    build_file = "external/qt.BUILD",
+    build_file = "third_party/qt5/qt.BUILD",
     path = "/usr/local/qt5/include",
 )
 

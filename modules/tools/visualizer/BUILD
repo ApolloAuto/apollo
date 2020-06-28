@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//tools:qt.bzl", "qt_cc_library")
+load("//third_party/qt5:qt.bzl", "qt_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
