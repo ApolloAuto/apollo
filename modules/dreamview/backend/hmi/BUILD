@@ -68,7 +68,6 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/common/kv_db",
         "//modules/common/proto:drive_event_cc_proto",
         "//modules/common/util:map_util",
         "//modules/common/util:message_util",

@@ -22,7 +22,6 @@
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/future.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"

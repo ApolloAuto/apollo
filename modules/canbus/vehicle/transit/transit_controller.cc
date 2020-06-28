@@ -21,7 +21,6 @@
 #include "cyber/common/log.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"

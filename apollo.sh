@@ -73,7 +73,7 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  COMMON_TARGETS="//cyber/... union //modules/common/kv_db/... union //modules/dreamview/... $DISABLED_CYBER_MODULES"
+  COMMON_TARGETS="//cyber/... union //modules/dreamview/... $DISABLED_CYBER_MODULES"
   case $BUILD_FILTER in
   cyber)
     BUILD_TARGETS=`bazel query //cyber/... union //modules/tools/visualizer/...`
@@ -149,10 +149,7 @@ function build() {
     if [ ${PIPESTATUS[0]} -ne 0 ]; then
       fail 'Build failed!'
     fi
-    rm -fr data/kv_db*
     REVISION=$(get_revision)
-    ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
-        --key="apollo:data:commit_id" --value="$REVISION"
   fi
 
   # TODO(ALL): check whether still in public use.
