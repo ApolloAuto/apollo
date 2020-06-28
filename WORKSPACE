@@ -167,7 +167,7 @@ http_archive(
 # PCL 1.11
 new_local_repository(
     name = "pcl",
-    build_file = "external/pcl.BUILD",
+    build_file = "third_party/pcl.BUILD",
     path = "/opt/apollo/sysroot/include/pcl-1.10",
 )
 
