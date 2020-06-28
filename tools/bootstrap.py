@@ -927,7 +927,7 @@ def validate_cuda_config(environ_cp):
 
     # FIXME(all): abs path for find_cuda_config.py
     proc = subprocess.Popen(
-        [environ_cp['PYTHON_BIN_PATH'], 'tools/gpus/find_cuda_config.py'] +
+        [environ_cp['PYTHON_BIN_PATH'], 'third_party/gpus/find_cuda_config.py'] +
         cuda_libraries,
         stdout=subprocess.PIPE,
         env=environ_cp)

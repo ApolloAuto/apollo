@@ -29,7 +29,7 @@ DESCRIPTION:
   arguments as is.
 
 NOTES(storypku): Move this file to
-    //tools/gpus/crosstool/crosstool_wrapper_is_not_gcc ?
+    //third_party/gpus/crosstool/crosstool_wrapper_is_not_gcc ?
 
 """
 
@@ -53,7 +53,7 @@ PREFIX_DIR = os.path.dirname(GCC_HOST_COMPILER_PATH)
 NVCC_VERSION = '%{cuda_version}'
 
 def Log(s):
-  print('//tools/gpus/crosstool: {0}'.format(s))
+  print('//third_party/gpus/crosstool: {0}'.format(s))
 
 
 def GetOptionValue(argv, option):

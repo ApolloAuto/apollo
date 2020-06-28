@@ -2,8 +2,8 @@ workspace(name = "apollo")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
-load("//tools/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
+load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
+load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 load("//third_party/py:python_configure.bzl", "python_configure")
 load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
 
