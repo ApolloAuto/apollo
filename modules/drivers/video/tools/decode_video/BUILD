@@ -9,6 +9,7 @@ cc_binary(
     deps = [
         ":frame_processor",
         "@com_github_gflags_gflags//:gflags",
+        "@ffmpeg//:avutil",
     ],
 )
 
@@ -29,7 +30,7 @@ cc_library(
     hdrs = ["h265_decoder.h"],
     deps = [
         "//cyber/common:log",
-        "@ffmpeg",
+        "@ffmpeg//:avcodec",
     ],
 )
 
