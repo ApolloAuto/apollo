@@ -6,6 +6,7 @@ load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
 load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 load("//third_party/py:python_configure.bzl", "python_configure")
 load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
+load("//tools:common.bzl", "clean_dep")
 
 cuda_configure(name = "local_config_cuda")
 
@@ -124,7 +125,7 @@ grpc_extra_deps()
 # Cpplint
 http_archive(
     name = "cpplint",
-    build_file = "cpplint.BUILD",
+    build_file = clean_dep("//third_party:cpplint.BUILD"),
     sha256 = "96db293564624543a2fd3b1a0d23f663b8054c79853a5918523655721a9f6b53",
     strip_prefix = "cpplint-1.4.5",
     urls = ["https://github.com/cpplint/cpplint/archive/1.4.5.tar.gz"],
