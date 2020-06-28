@@ -7,6 +7,8 @@
   * `PYTHON_LIB_PATH`: Location of python libraries.
 """
 
+load("//tools:common.bzl", "basename")
+
 _BAZEL_SH = "BAZEL_SH"
 _PYTHON3_BIN_PATH = "PYTHON_BIN_PATH"
 _PYTHON3_LIB_PATH = "PYTHON_LIB_PATH"
@@ -15,20 +17,6 @@ _HEADERS_HELP = (
     "Are Python3 headers installed? Try installing python3-dev on " +
     "Debian-based systems. Try python3-devel on Redhat-based systems."
 )
-
-# TODO(all): move all these to tools/common.bzl
-def _basename(p):
-    """Returns the basename (i.e., the file portion) of a path.
-    Note that if `p` ends with a slash, this function returns an empty string.
-    This matches the behavior of Python's `os.path.basename`, but differs from
-    the Unix `basename` command (which would return the path segment preceding
-    the final slash).
-    Args:
-      p: The path whose basename should be returned.
-    Returns:
-      The basename of the path, which includes the extension.
-    """
-    return p.rpartition("/")[-1]
 
 def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
     if not out:
@@ -269,7 +257,7 @@ def _create_single_version_package(
         "{}_include".format(variety_name),
         "{}_include".format(variety_name),
     )
-    python_solib = _basename(python_include)
+    python_solib = basename(python_include)
     _tpl(
         repository_ctx,
         "variety",
