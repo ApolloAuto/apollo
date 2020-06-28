@@ -150,9 +150,6 @@ function build() {
       fail 'Build failed!'
     fi
     rm -fr data/kv_db*
-    REVISION=$(get_revision)
-    ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
-        --key="apollo:data:commit_id" --value="$REVISION"
   fi
 
   # TODO(ALL): check whether still in public use.
