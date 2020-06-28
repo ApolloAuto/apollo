@@ -16,7 +16,7 @@ _HEADERS_HELP = (
     "Debian-based systems. Try python3-devel on Redhat-based systems."
 )
 
-# Ref: bazel-skylib@lib/paths.bzl
+# TODO(all): move all these to tools/common.bzl
 def _basename(p):
     """Returns the basename (i.e., the file portion) of a path.
     Note that if `p` ends with a slash, this function returns an empty string.
