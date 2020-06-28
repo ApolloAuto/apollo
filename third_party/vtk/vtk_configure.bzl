@@ -22,7 +22,7 @@ def find_sysroot_dir(repository_ctx):
         return repository_ctx.os.environ[_APOLLO_SYSROOT_DIR].strip()
     return None
     # fail("Environment variable APOLLO_SYSROOT_DIR was not specified." +
-    #    "Re-run ./apollo6.sh configure")
+    #    "Re-run ./apollo6.sh config")
 
 # Ref: bazel-skylib@lib/paths.bzl
 def _basename(p):
