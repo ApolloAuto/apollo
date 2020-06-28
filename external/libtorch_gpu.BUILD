@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -8,7 +10,6 @@ cc_library(
         ".",
         "torch/csrc/api/include",
     ],
-    linkstatic = False,
     linkopts = [
         "-L/usr/local/libtorch_gpu/lib",
         "-lc10",
@@ -16,7 +17,8 @@ cc_library(
         "-ltorch_cpu",
         "-ltorch_cuda",
     ],
+    linkstatic = False,
     deps = [
-        "@python3",
+        "@local_config_python//:python_lib",
     ],
 )

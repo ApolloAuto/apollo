@@ -3,6 +3,8 @@
 
 BAZEL_SH = "BAZEL_SH"
 PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
+PYTHON_LIB_PATH = "PYTHON_LIB_PATH"
+TF_PYTHON_CONFIG_REPO = "TF_PYTHON_CONFIG_REPO"
 
 def auto_config_fail(msg):
     """Output failure message when auto configuration fails."""
