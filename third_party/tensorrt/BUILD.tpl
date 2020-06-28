@@ -16,7 +16,7 @@ cc_library(
         "tensorrt/include/tensorrt_config.h",
         ":tensorrt_include"
     ],
-    include_prefix = "tools/tensorrt",
+    include_prefix = "third_party/tensorrt",
     strip_include_prefix = "tensorrt/include",
 )
 

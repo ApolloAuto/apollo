@@ -34,7 +34,7 @@ cuda_header_library(
         "cuda/cuda_config.h",
         ":cuda-include"
     ],
-    include_prefix = "tools/gpus",
+    include_prefix = "third_party/gpus",
     includes = [
         ".",  # required to include cuda/cuda/cuda_config.h as cuda/config.h
         "cuda/include",
@@ -66,7 +66,7 @@ cc_library(
 cuda_header_library(
     name = "cublas_headers",
     hdrs = [":cublas-include"],
-    include_prefix = "tools/gpus/cuda/include",
+    include_prefix = "third_party/gpus/cuda/include",
     strip_include_prefix = "cublas/include",
     deps = [":cuda_headers"],
     includes = ["cublas/include"],
@@ -97,7 +97,7 @@ cc_library(
 cc_library(
     name = "cudnn_header",
     hdrs = [":cudnn-include"],
-    include_prefix = "tools/gpus/cudnn",
+    include_prefix = "third_party/gpus/cudnn",
     strip_include_prefix = "cudnn/include",
     deps = [":cuda_headers"],
 )
@@ -131,7 +131,7 @@ cc_library(
 cuda_header_library(
     name = "cupti_headers",
     hdrs = [":cuda-extras"],
-    include_prefix="tools/gpus",
+    include_prefix="third_party/gpus",
     includes = ["cuda/extras/CUPTI/include/"],
     deps = [":cuda_headers"],
 )
