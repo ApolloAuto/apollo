@@ -1,12 +1,12 @@
 workspace(name = "apollo")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
 load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 load("//third_party/py:python_configure.bzl", "python_configure")
 load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
 load("//tools:common.bzl", "clean_dep")
+# load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 cuda_configure(name = "local_config_cuda")
 
@@ -67,20 +67,20 @@ http_archive(
 # gflags
 new_local_repository(
     name = "com_github_gflags_gflags",
-    build_file = "external/gflags.BUILD",
+    build_file = "third_party/gflags.BUILD",
     path = "/usr/local/include/gflags",
 )
 
 # glog
 new_local_repository(
     name = "com_google_glog",
-    build_file = "external/glog.BUILD",
+    build_file = "third_party/glog.BUILD",
     path = "/usr/local/include/glog",
 )
 
 new_local_repository(
     name = "poco",
-    build_file = "external/poco.BUILD",
+    build_file = "third_party/poco.BUILD",
     path = "/opt/apollo/sysroot/include",
 )
 
@@ -143,7 +143,7 @@ http_archive(
 # eigen
 http_archive(
     name = "eigen",
-    build_file = "eigen.BUILD",
+    build_file = clean_dep("//third_party:eigen.BUILD"),
     sha256 = "a8d87c8df67b0404e97bcef37faf3b140ba467bc060e2b883192165b319cea8d",
     strip_prefix = "eigen-git-mirror-3.3.7",
     urls = ["https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz"],
@@ -152,7 +152,7 @@ http_archive(
 # CivetWeb (web server)
 http_archive(
     name = "civetweb",
-    build_file = "civetweb.BUILD",
+    build_file = clean_dep("//third_party:civetweb.BUILD"),
     sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
     strip_prefix = "civetweb-1.11",
     urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz"],
@@ -198,14 +198,14 @@ new_local_repository(
 # Caffe
 # new_local_repository(
 #    name = "caffe",
-#    build_file = "external/caffe.BUILD",
+#    build_file = "third_party/caffe.BUILD",
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
 
 # YAML-CPP
 http_archive(
     name = "com_github_jbeder_yaml_cpp",
-    build_file = "yaml_cpp.BUILD",
+    build_file = clean_dep("//third_party:yaml_cpp.BUILD"),
     sha256 = "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed",
     strip_prefix = "yaml-cpp-yaml-cpp-0.6.3",
     urls = ["https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz"],
@@ -213,21 +213,21 @@ http_archive(
 
 new_local_repository(
     name = "qpOASES",
-    build_file = "external/qpOASES.BUILD",
+    build_file = "third_party/qpOASES.BUILD",
     path = "/opt/apollo/sysroot/include",
 )
 
 # OSQP
 new_local_repository(
     name = "osqp",
-    build_file = "external/osqp.BUILD",
+    build_file = "third_party/osqp.BUILD",
     path = "/opt/apollo/sysroot/include",
 )
 
 # ipopt
 new_local_repository(
     name = "ipopt",
-    build_file = "external/ipopt.BUILD",
+    build_file = "third_party/ipopt.BUILD",
     path = "/usr/include",
 )
 
@@ -263,13 +263,13 @@ new_local_repository(
 ## Proj.4
 new_local_repository(
     name = "proj4",
-    build_file = "external/proj4.BUILD",
+    build_file = "third_party/proj4.BUILD",
     path = "/usr/include",
 )
 
 new_local_repository(
     name = "tinyxml2",
-    build_file = "external/tinyxml2.BUILD",
+    build_file = "third_party/tinyxml2.BUILD",
     path = "/usr/include",
 )
 
@@ -283,53 +283,53 @@ new_local_repository(
 #adv_plat
 new_local_repository(
     name = "adv_plat",
-    build_file = "external/adv_plat.BUILD",
+    build_file = "third_party/adv_plat.BUILD",
     path = "/opt/apollo/pkgs/adv_plat/include",
 )
 
 new_local_repository(
     name = "fastrtps",
-    build_file = "external/fastrtps.BUILD",
+    build_file = "third_party/fastrtps.BUILD",
     path = "/usr/local/fast-rtps",
 )
 
 ## libtorch
 new_local_repository(
     name = "libtorch_cpu",
-    build_file = "external/libtorch_cpu.BUILD",
+    build_file = "third_party/libtorch_cpu.BUILD",
     path = "/usr/local/libtorch_cpu/include",
 )
 
 # libtorch GPU
 new_local_repository(
     name = "libtorch_gpu",
-    build_file = "external/libtorch_gpu.BUILD",
+    build_file = "third_party/libtorch_gpu.BUILD",
     path = "/usr/local/libtorch_gpu/include",
 )
 
 new_local_repository(
     name = "opencv",
-    build_file = "external/opencv.BUILD",
+    build_file = "third_party/opencv.BUILD",
     path = "/usr/include",
 )
 
 # Needed by modules/transform
 new_local_repository(
     name = "tf2",
-    build_file = "external/tf2.BUILD",
+    build_file = "third_party/tf2.BUILD",
     path = "/opt/apollo/pkgs/tf2/include",
 )
 
 # TODO(all) rules_boost
 new_local_repository(
     name = "boost",
-    build_file = "external/boost.BUILD",
+    build_file = "third_party/boost.BUILD",
     path = "/opt/apollo/sysroot/include",
 )
 
 new_local_repository(
     name = "ffmpeg",
-    build_file = "external/ffmpeg.BUILD",
+    build_file = "third_party/ffmpeg.BUILD",
     path = "/opt/apollo/sysroot/include",
 )
 
@@ -342,6 +342,6 @@ new_local_repository(
 
 new_local_repository(
     name = "npp",
-    build_file = "external/npp.BUILD",
+    build_file = "third_party/npp.BUILD",
     path = "/usr/local/cuda",
 )
