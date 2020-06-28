@@ -88,7 +88,10 @@ class PiecewiseJerkProblem {
     scale_factor_ = scale_factor;
   }
 
-  void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
+  void set_x_ref(const double weight_x_ref, const std::vector<double>& x_ref);
+
+  void set_x_ref(const std::vector<double>& weight_x_ref_vec_,
+                 const std::vector<double>& x_ref);
 
   void set_end_state_ref(const std::array<double, 3>& weight_end_state,
                          const std::array<double, 3>& end_state_ref);
@@ -154,6 +157,8 @@ class PiecewiseJerkProblem {
   bool has_x_ref_ = false;
   double weight_x_ref_ = 0.0;
   std::vector<double> x_ref_;
+  // un-uniformed weighting
+  std::vector<double> weight_x_ref_vec_;
 
   bool has_end_state_ref_ = false;
   std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};

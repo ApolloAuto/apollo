@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
-
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
+
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -38,13 +38,13 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // x(i)^2 * (w_x + w_x_ref)
   for (int i = 0; i < n - 1; ++i) {
-    columns[i].emplace_back(
-        i, (weight_x_ + weight_x_ref_) / (scale_factor_[0] * scale_factor_[0]));
+    columns[i].emplace_back(i, (weight_x_ + weight_x_ref_vec_[i]) /
+                                   (scale_factor_[0] * scale_factor_[0]));
     ++value_index;
   }
   // x(n-1)^2 * (w_x + w_x_ref + w_end_x)
   columns[n - 1].emplace_back(
-      n - 1, (weight_x_ + weight_x_ref_ + weight_end_state_[0]) /
+      n - 1, (weight_x_ + weight_x_ref_vec_[n - 1] + weight_end_state_[0]) /
                  (scale_factor_[0] * scale_factor_[0]));
   ++value_index;
 
@@ -108,7 +108,7 @@ void PiecewiseJerkPathProblem::CalculateOffset(std::vector<c_float>* q) {
 
   if (has_x_ref_) {
     for (int i = 0; i < n; ++i) {
-      q->at(i) += -2.0 * weight_x_ref_ * x_ref_[i] / scale_factor_[0];
+      q->at(i) += -2.0 * weight_x_ref_vec_.at(i) * x_ref_[i] / scale_factor_[0];
     }
   }
 

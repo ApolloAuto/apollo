@@ -53,7 +53,8 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
   bool OptimizePath(
       const std::array<double, 3>& init_state,
       const std::array<double, 3>& end_state,
-      const std::vector<double>& path_reference_l_ref, const double delta_s,
+      const std::vector<double>& path_reference_l_ref,
+      const size_t path_reference_size, const double delta_s,
       const bool is_valid_path_reference,
       const std::vector<std::pair<double, double>>& lat_boundaries,
       const std::vector<std::pair<double, double>>& ddl_bounds,
