@@ -19,7 +19,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <ATen/core/jit_type.h>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -40,12 +39,11 @@ bool TrajectoryImitationLibtorchInference::LoadCONVRNNModel() {
   torch::Tensor initial_point_tensor = torch::zeros({1, 1, 200, 200});
   torch::Tensor initial_box_tensor = torch::zeros({1, 1, 200, 200});
   std::vector<torch::jit::IValue> torch_inputs;
-  torch_inputs.push_back(c10::ivalue::Tuple::create(
-      {std::move(input_feature_tensor.to(device_)),
-       std::move(initial_point_tensor.to(device_)),
-       std::move(initial_box_tensor.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+  at::Tensor tensor_tmp;
+  torch_inputs.push_back(
+      c10::ivalue::Tuple::create({std::move(input_feature_tensor.to(device_)),
+                                  std::move(initial_point_tensor.to(device_)),
+                                  std::move(initial_box_tensor.to(device_))}));
   try {
     auto torch_output_tensor =
         model_.forward(torch_inputs).toTensor().to(torch::kCPU);
@@ -80,9 +78,7 @@ bool TrajectoryImitationLibtorchInference::LoadCNNLSTMModel() {
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(input_feature_tensor.to(device_)),
        std::move(past_points_tensor.to(device_)),
-       std::move(past_points_step_tensor.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+       std::move(past_points_step_tensor.to(device_))}));
   try {
     auto torch_output_tensor =
         model_.forward(torch_inputs).toTensor().to(torch::kCPU);
@@ -203,12 +199,10 @@ bool TrajectoryImitationLibtorchInference::DoCONVRNNMODELInference(
   auto inference_start_time = std::chrono::system_clock::now();
 
   std::vector<torch::jit::IValue> torch_inputs;
-  torch_inputs.push_back(c10::ivalue::Tuple::create(
-      {std::move(input_feature_tensor.to(device_)),
-       std::move(initial_point_tensor.to(device_)),
-       std::move(initial_box_tensor.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+  torch_inputs.push_back(
+      c10::ivalue::Tuple::create({std::move(input_feature_tensor.to(device_)),
+                                  std::move(initial_point_tensor.to(device_)),
+                                  std::move(initial_box_tensor.to(device_))}));
   at::Tensor torch_output_tensor =
       model_.forward(torch_inputs).toTensor().to(torch::kCPU);
 
@@ -462,9 +456,7 @@ bool TrajectoryImitationLibtorchInference::DoCNNLSTMMODELInference(
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(input_feature_tensor.to(device_)),
        std::move(past_points_tensor.to(device_)),
-       std::move(past_points_step_tensor.to(device_))},
-      c10::TupleType::create(
-          std::vector<c10::TypePtr>(3, c10::TensorType::create()))));
+       std::move(past_points_step_tensor.to(device_))}));
   at::Tensor torch_output_tensor =
       model_.forward(torch_inputs).toTensor().to(torch::kCPU);
 
