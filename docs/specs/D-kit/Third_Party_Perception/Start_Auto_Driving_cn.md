@@ -20,7 +20,7 @@
         bash apollo.sh build_opt
         bash scripts/bootstrap.sh 
  
-2. 在浏览器中打开(http://localhost:8888), 选择`Dev_Kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Camera、Transform模块。
+2. 在浏览器中打开(http://localhost:8888)，选择`Dev_Kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Camera、Transform模块。
 
 ![camera_demonstration_dreamview](images/camera_demonstration_dreamview.jpeg)
 
@@ -29,8 +29,8 @@
 	|channel_name | 检查项目 | 
 	|---|---|
 	| `/apollo/localization/pose`| 确保能正常输出数据 | 
-	|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据、`sol_type:` 选项显示为`NARROW_INT`   |
-	| `/apollo/sensor/smartereye/image` | 确保能正常输出数据、帧率在15帧左右         |
+	|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据，`sol_type:` 选项显示为`NARROW_INT`   |
+	| `/apollo/sensor/smartereye/image` | 确保能正常输出数据，帧率在15帧左右         |
 	|`/tf`|确保能正常输出数据|
 	|`/tf_static`|确保能正常输出数据|
 
@@ -60,7 +60,7 @@
 
 ![camera_demonstration_planning_data](images/camera_demonstration_planning_data.png) 
 
-如果出现上图所示轨迹线和topic信息，表示规划模块适配和开环测试通过，否则继续查看log信息进行调试。
+如果出现上图所示轨迹线和channel信息，表示规划模块适配和开环测试通过，否则继续查看log信息进行调试。
 
 8. 在附近没有人员和车的情况下，遥控器下放权限并在Tasks标签页中点击Start Auto使车进入自动驾驶状态，在车自动驾驶这个过程中做好随时用遥控器接管，确保安全的准备。
 

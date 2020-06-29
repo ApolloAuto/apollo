@@ -35,7 +35,7 @@
 	| channel_name | 检查项目 | 
 	|---|---|
 	|`/apollo/localization/pose`| 确保能正常输出数据 | 
-	|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据、`sol_type:` 选项显示为`NARROW_INT` |
+	|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据，`sol_type:` 选项显示为`NARROW_INT` |
 	|`/apollo/sensor/smartereye/image` | 确保能正常输出数据，帧率稳定在15HZ左右 |
 	|`/apollo/sensor/smartereye/image/compressed` | 确保能正常输出数据，帧率稳定在15HZ左右 |
 	|`/tf`| 确保能正常输出数据 |
@@ -51,4 +51,4 @@
 
 ![camera_adaption_dreamview_obstacle2](images/camera_adaption_dreamview_obstacle2.png)
 
-如果在dreamview上能看到障碍物并且`/apollo/perception/obstacles`有障碍物信息，则开环测试通过。
+如果在DreamView上能看到障碍物并且`/apollo/perception/obstacles`有障碍物信息，则开环测试通过。
