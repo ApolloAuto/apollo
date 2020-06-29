@@ -155,7 +155,6 @@ export default class PerceptionObstacles {
                 }
             }
         }
-        this.hideUnusedObjects();
     }
 
     reset(scene, empty) {
