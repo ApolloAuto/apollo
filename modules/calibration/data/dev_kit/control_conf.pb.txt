@@ -124,7 +124,7 @@ lon_controller_conf {
   low_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
-    kp: 1.2
+    kp: 0.7
     ki: 0.2
     kd: 0.0
   }
