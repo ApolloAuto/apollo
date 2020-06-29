@@ -95,6 +95,10 @@ export default class OfflinePlaybackWebSocketEndpoint {
         };
     }
 
+    setPointCloudWS() {
+        // Stub as offline version doesn't support point cloud
+    }
+
     checkMessage(message) {
         if (this.lastUpdateTimestamp !== 0
             && message.timestamp - this.lastUpdateTimestamp > 150) {

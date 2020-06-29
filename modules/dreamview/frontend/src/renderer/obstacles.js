@@ -32,6 +32,7 @@ export default class PerceptionObstacles {
         this.laneMarkers = []; // for lane markers
         this.icons = [];
         this.trafficCones = []; // for traffic cone meshes
+
         this.arrowIdx = 0;
         this.cubeIdx = 0;
         this.extrusionFaceIdx = 0;
@@ -40,10 +41,11 @@ export default class PerceptionObstacles {
     }
 
     update(world, coordinates, scene, isBirdView) {
-        this.reset(scene, _.isEmpty(world.object));
+        this.resetObjects(scene, _.isEmpty(world.object));
         this.updateObjects(world, coordinates, scene, isBirdView);
         this.updateSensorMeasurements(world, coordinates, scene);
         this.hideUnusedObjects();
+
         this.updateLaneMarkers(world, coordinates, scene);
     }
 
@@ -157,7 +159,7 @@ export default class PerceptionObstacles {
         }
     }
 
-    reset(scene, empty) {
+    resetObjects(scene, empty) {
         // Id meshes need to be recreated every time.
         // Each text mesh needs to be removed from the scene,
         // and its char meshes need to be hidden for reuse purpose.
@@ -200,7 +202,7 @@ export default class PerceptionObstacles {
         if (key.search("camera") !== -1) {
             return "CameraSensor";
         }
-        console.warn("Cannot deduce sensor type!");
+        console.warn("Cannot deduce sensor type:", key);
         return null;
     }
 
