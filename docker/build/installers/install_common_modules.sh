@@ -93,6 +93,11 @@ apt-get -y update && \
     apt-get -y install \
     liblz4-dev
 
+#######################################################
+COMPONENT="modules/tools"
+info "Install support for [${COMPONENT}] ..."
+bash /tmp/installers/install_python_modules.sh
+
 # Modules that DON'T need pre-installed dependencies
 # modules/v2x
 # modules/storytelling
