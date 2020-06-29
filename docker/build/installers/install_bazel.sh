@@ -86,8 +86,10 @@ elif [ "$TARGET_ARCH" == "aarch64" ]; then
     BBUILD_DIR="${PKG_NAME%.zip}"
     unzip "${PKG_NAME}" -d "${BBUILD_DIR}"
 
+    # https://reproducible-builds.org/docs/source-date-epoch
     pushd ${BBUILD_DIR}
       # env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+      SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date +%s)}"
       env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH}" bash ./compile.sh
       cp -f output/bazel ${SYSROOT_DIR}/bin/
       chmod a+x ${SYSROOT_DIR}/bin
