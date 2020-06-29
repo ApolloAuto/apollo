@@ -22,7 +22,7 @@ function buildify() {
 
     buildifier_cmd="${buildifier_cmd} -lint=fix"
 
-    local build_dirs="cyber third_party tools external"
+    local build_dirs="cyber third_party tools"
     if [ "${stage}" == "dev" ]; then
         build_dirs="modules ${build_dirs}"
     fi
