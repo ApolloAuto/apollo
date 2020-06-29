@@ -25,12 +25,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 apt update -y && apt install -y \
     libgeos-dev \
-    python3-matplotlib \
-    python3-pip \
-    python3-psutil \
-    python3-scipy \
-    software-properties-common \
-    libasound2-dev
+    software-properties-common
 
 pip3_install -r py3_requirements.txt
 
