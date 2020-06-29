@@ -152,7 +152,7 @@ bool TrajectoryImitationTensorRTInference::LoadModel() {
 
   auto parser = nvonnxparser::createParser(*network, g_logger_);
   if (!parser->parseFromFile(
-          config_.model_file().c_str(),
+          config_.gpu_model_file().c_str(),
           static_cast<int>(nvinfer1::ILogger::Severity::kERROR))) {
     AERROR << "failed to parse onnx file";
     return false;
