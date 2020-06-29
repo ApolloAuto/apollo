@@ -1,0 +1,823 @@
+frame_threshold: 20
+total_frames: 4000
+scenario {
+  key: "Go Straight"
+  value {
+    feature {
+      name: "Forward"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 1
+        }
+      }
+    }
+    feature {
+      name: "Steering Angle"
+      range {
+        name: "Straight"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: -1
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 1
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "Speed 0 ~ 2.5mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0.2
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 2.5
+        }
+      }
+      range {
+        name: "Speed >= 2.5mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 2.5
+        }
+      }
+    }
+    feature {
+      name: "Accelerator (Decelerator)"
+      range {
+        name: "Throttle deadzone ~ 24%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 24
+        }
+      }
+      range {
+        name: "Throttle >= 24%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 24
+        }
+      }
+      range {
+        name: "Brake deadzone ~ 28%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "brake_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 28
+        }
+      }
+      range {
+        name: "Brake >= 28%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 28
+        }
+      }
+    }
+  }
+}
+scenario {
+  key: "Branch Left/Right"
+  value {
+    feature {
+      name: "Forward"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 1
+        }
+      }
+    }
+    feature {
+      name: "Steering Angle"
+      range {
+        name: "Branch Left"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 1
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 30
+        }
+      }
+      range {
+        name: "Branch Right"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: -30
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: -1
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "Speed 0 ~ 10mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0.2
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 10
+        }
+      }
+      range {
+        name: "Speed 10 ~ 20mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 10
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Speed >= 20mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+      }
+    }
+    feature {
+      name: "Accelerator (Decelerator)"
+      range {
+        name: "Throttle deadzone ~ 25%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Throttle 25% ~ 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 30
+        }
+      }
+      range {
+        name: "Throttle >= 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Brake deadzone ~ 20%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "brake_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Brake 20% ~ 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Brake >= 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+      }
+    }
+  }
+}
+scenario {
+  key: "Turn Left/Right"
+  value {
+    feature {
+      name: "Forward"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 1
+        }
+      }
+    }
+    feature {
+      name: "Steering Angle"
+      range {
+        name: "Turn Left"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 30
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 60
+        }
+      }
+      range {
+        name: "Turn Right"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: -60
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: -30
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "Speed 0 ~ 10mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0.2
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 10
+        }
+      }
+      range {
+        name: "Speed 10 ~ 20mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 10
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+    }
+    feature {
+      name: "Accelerator (Decelerator)"
+      range {
+        name: "Throttle deadzone ~ 25%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Throttle 25% ~ 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 30
+        }
+      }
+      range {
+        name: "Throttle >= 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Brake deadzone ~ 20%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "brake_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Brake 20% ~ 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Brake >= 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+      }
+    }
+  }
+}
+scenario {
+  key: "Sharp Left/Right"
+  value {
+    feature {
+      name: "Forward"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 1
+        }
+      }
+    }
+    feature {
+      name: "Steering Angle"
+      range {
+        name: "Sharp Left"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 60
+        }
+      }
+      range {
+        name: "Sharp Right"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: -60
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "Speed 0 ~ 10mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0.2
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 10
+        }
+      }
+      range {
+        name: "Speed 10 ~ 20mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 10
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+    }
+    feature {
+      name: "Accelerator (Decelerator)"
+      range {
+        name: "Throttle deadzone ~ 25%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Throttle 25% ~ 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 30
+        }
+      }
+      range {
+        name: "Throttle >= 30%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 30
+        }
+      }
+      range {
+        name: "Brake deadzone ~ 20%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "brake_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Brake 20% ~ 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Brake >= 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+      }
+    }
+  }
+}
+scenario {
+  key: "Reverse: Go Straight or Branch Left/Right"
+  value {
+    feature {
+      name: "Reverse"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 2
+        }
+      }
+    }
+    feature {
+      name: "Steering Angle"
+      range {
+        name: "Go Straight"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: -1
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 1
+        }
+      }
+      range {
+        name: "Branch Left"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 1
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 30
+        }
+      }
+      range {
+        name: "Branch Right"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: -30
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: -1
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "Speed 0 ~ 2mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0.2
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 2
+        }
+      }
+    }
+    feature {
+      name: "Accelerator (Decelerator)"
+      range {
+        name: "Throttle < deadzone, Brake < deadzone"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          vehicle_config: "brake_deadzone"
+        }
+      }
+      range {
+        name: "Throttle deadzone ~ 20%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Throttle >= 20%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+      }
+      range {
+        name: "Brake deadzone ~ 20%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "brake_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Brake 20% ~ 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Brake >= 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+      }
+    }
+  }
+}
+scenario {
+  key: "Reverse: Turn Left/Right"
+  value {
+    feature {
+      name: "Reverse"
+      range {
+        criterion {
+          field: "gear_location"
+          comparison_operator: EQUAL
+          value: 2
+        }
+      }
+    }
+    feature {
+      name: "Steering Angle"
+      range {
+        name: "Turn Left"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 30
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: 60
+        }
+      }
+      range {
+        name: "Turn Right"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: -60
+        }
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: -30
+        }
+      }
+      range {
+        name: "Sharp Left"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 60
+        }
+      }
+      range {
+        name: "Sharp Right"
+        criterion {
+          field: "steering_percentage"
+          comparison_operator: LESS_THAN
+          value: -60
+        }
+      }
+    }
+    feature {
+      name: "Speed"
+      range {
+        name: "Speed 0 ~ 2mps"
+        criterion {
+          field: "speed_mps"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 0.2
+        }
+        criterion {
+          field: "speed_mps"
+          comparison_operator: LESS_THAN
+          value: 2
+        }
+      }
+    }
+    feature {
+      name: "Accelerator (Decelerator)"
+      range {
+        name: "Throttle < deadzone, Brake < deadzone"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          vehicle_config: "brake_deadzone"
+        }
+      }
+      range {
+        name: "Throttle deadzone ~ 20%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "throttle_deadzone"
+        }
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Throttle >= 20%"
+        criterion {
+          field: "throttle_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+      }
+      range {
+        name: "Brake deadzone ~ 20%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          vehicle_config: "brake_deadzone"
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 20
+        }
+      }
+      range {
+        name: "Brake 20% ~ 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 20
+        }
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: LESS_THAN
+          value: 25
+        }
+      }
+      range {
+        name: "Brake >= 25%"
+        criterion {
+          field: "brake_percentage"
+          comparison_operator: GREATER_THAN_OR_EQUAL
+          value: 25
+        }
+      }
+    }
+  }
+}
