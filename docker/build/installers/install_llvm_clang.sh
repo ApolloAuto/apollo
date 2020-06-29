@@ -60,7 +60,7 @@ fi
 
 __mytext="""
 if [ -d \"${CLANG_INSTALL_DIR}/bin\" ]; then
-    export PATH=${CLANG_INSTALL_DIR}/bin:\$PATH
+    add_to_path ${CLANG_INSTALL_DIR}/bin
 fi
 """
 
