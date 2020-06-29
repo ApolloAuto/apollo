@@ -40,26 +40,29 @@ if [[ "${HOST_ARCH}" != "${TARGET_ARCH}" ]]; then
             "${NONROOT_SUDO_ERRMSG}"
 fi
 
-if [ "${TARGET_ARCH}" == "x86_64" ]; then
+if [[ "${TARGET_ARCH}" == "x86_64" || "${TARGET_ARCH}" == "aarch64" ]]; then
     docker exec \
         -u "${DOCKER_USER}" \
-        -it "${CYBER_CONTAINER}" \
-        /bin/bash
-elif [ "${TARGET_ARCH}" == "aarch64" ]; then
-    info "For the first time after CyberRT container starts, you can running" \
-         "the following two commands to su to a non-root user:"
-    info "1) /apollo/scripts/docker_start_user.sh"
-    info "2) su - ${DOCKER_USER}"
-
-    # warning "! To exit, please use 'ctrl+p ctrl+q' !"
-    # docker attach "${CYBER_CONTAINER}"
-    docker exec \
-        -u root \
         -it "${CYBER_CONTAINER}" \
         /bin/bash
 else
     error "Unsupported architecture: ${TARGET_ARCH}"
     exit 1
 fi
+
+# Note(storypku): Tested on Ubuntu 18.04 running on Jetson TX2,
+# The following steps are no longer needed.
+# if [ "${TARGET_ARCH}" == "aarch64" ]; then
+#    info "For the first time after CyberRT container starts, you can running" \
+#         "the following two commands to su to a non-root user:"
+#    info "1) /apollo/scripts/docker_start_user.sh"
+#    info "2) su - ${DOCKER_USER}"
+#
+#    # warning "! To exit, please use 'ctrl+p ctrl+q' !"
+#    # docker attach "${CYBER_CONTAINER}"
+#    docker exec \
+#        -u root \
+#        -it "${CYBER_CONTAINER}" \
+#        /bin/bash
 
 xhost -local:root 1>/dev/null 2>&1
