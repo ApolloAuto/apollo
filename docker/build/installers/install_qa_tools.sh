@@ -37,6 +37,7 @@ apt-get -y update && \
 ## Pylint
 pip3_install pycodestyle
 pip3_install pyflakes
+pip3_install  flake8
 # pip3_install pylint
 
 # Clean up cache to reduce layer size.
