@@ -241,6 +241,18 @@
 			"default": true,
 			"menuId": "perceptionObstacleInfo"
 		},
+		"showObstaclesLidarSensor": {
+			"default": false,
+			"menuId": "perceptionLidarSensor"
+		},
+		"showObstaclesRadarSensor": {
+			"default": false,
+			"menuId": "perceptionRadarSensor"
+		},
+		"showObstaclesCameraSensor": {
+			"default": false,
+			"menuId": "perceptionCameraSensor"
+		},
 		"showPositionGps": {
 			"default": false,
 			"menuId": "positionGps"
