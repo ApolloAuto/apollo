@@ -63,8 +63,8 @@ function run_sh_lint() {
 }
 
 function run_py_lint() {
-    local pyflakes_cmd="$(command -v flake8)"
-    if [ -z "${pyflakes_cmd}" ]; then
+    local flake8_cmd="$(command -v flake8)"
+    if [ -z "${flake8_cmd}" ]; then
         warning "Command flake8 not found. You can install it manually via:"
         warning "  '[sudo -H] python3 -m pip install flake8'"
         exit 1
