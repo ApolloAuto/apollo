@@ -11,7 +11,7 @@ data_files {
   dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
 }
 data_files {
-  source_path: "data_collection_table.pb.txt"
+  source_path: "dreamview_conf/data_collection_table.pb.txt"
   dest_path: "/apollo/modules/dreamview/conf/data_collection_table.pb.txt"
 }
 data_files {
