@@ -43,7 +43,9 @@ GOROOT="${PKGS_DIR}/go"
 
 MY_TEXT="""
 export GOROOT=${GOROOT}
-add_to_path \"\${GOROOT}/bin\"
+if [ -x \"\${GOROOT}/bin/go\" ]; then
+    add_to_path \"\${GOROOT}/bin\"
+fi
 """
 
 echo "${MY_TEXT}" | tee -a "${APOLLO_PROFILE}"
