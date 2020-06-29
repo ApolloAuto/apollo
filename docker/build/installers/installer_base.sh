@@ -180,7 +180,7 @@ function download_if_not_cached {
             ok "Successfully downloaded $pkg_name"
         elif [[ "$my_schema" == "git" ]]; then
             info "Clone into git repo $url..."
-            git clone --recurse-submodules --single-branch "$url"
+            git clone  "${url}" --branch master --recurse-submodules --single-branch
             ok "Successfully cloned git repo: $url"
         else
             error "Unknown schema for package \"$pkg_name\", url=\"$url\""
