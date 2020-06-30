@@ -29,6 +29,22 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
 
+http_archive(
+    name = "rules_proto",
+    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
+    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+        "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+    ],
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
 # googletest (GTest and GMock)
 http_archive(
     name = "com_google_googletest",
@@ -42,16 +58,6 @@ http_archive(
     sha256 = "71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29",
     strip_prefix = "protobuf-3.12.3",
     urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.12.3.tar.gz"],
-)
-
-http_archive(
-    name = "rules_proto",
-    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
-    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-        "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-    ],
 )
 
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
@@ -75,6 +81,7 @@ http_archive(
 #    sha256 = "fb236ae74676dba515e1230aef4cc69ab265af72fc08784a6755a319dd013ca6",
 #    urls = ["https://apollo-platform-system.bj.bcebos.com/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
 # )
+
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
@@ -118,18 +125,11 @@ http_archive(
     urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz"],
 )
 
-#ros
-#new_local_repository(
-#    name = "ros",
-#    build_file = "third_party/ros.BUILD",
-#    path = "/home/tmp/ros",
-#)
-
-new_local_repository(
-    name = "glew",
-    build_file = "third_party/glew.BUILD",
-    path = "/usr/include",
-)
+# new_local_repository(
+#    name = "glew",
+#    build_file = "third_party/glew.BUILD",
+#    path = "/usr/include",
+# )
 
 new_local_repository(
     name = "qt",
@@ -154,15 +154,6 @@ new_local_repository(
 #    build_file = "third_party/caffe.BUILD",
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
-
-# YAML-CPP
-http_archive(
-    name = "com_github_jbeder_yaml_cpp",
-    build_file = clean_dep("//third_party:yaml_cpp.BUILD"),
-    sha256 = "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed",
-    strip_prefix = "yaml-cpp-yaml-cpp-0.6.3",
-    urls = ["https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz"],
-)
 
 new_local_repository(
     name = "qpOASES",
@@ -231,10 +222,4 @@ new_local_repository(
     name = "ffmpeg",
     build_file = "third_party/ffmpeg.BUILD",
     path = "/opt/apollo/sysroot/include",
-)
-
-new_local_repository(
-    name = "npp",
-    build_file = "third_party/npp.BUILD",
-    path = "/usr/local/cuda",
 )
