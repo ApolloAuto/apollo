@@ -3,6 +3,7 @@
 # TODO(all): merge this with @local_config_cuda
 
 load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(
     default_visibility = ["//visibility:public"],
 )
