@@ -70,48 +70,6 @@ def initialize_third_party():
 
 # Define all external repositories required by
 def apollo_repositories():
-    ##=============== bazel_skylib ===============##
-    http_archive(
-        name = "bazel_skylib",
-        sha256 = "1dde365491125a3db70731e25658dfdd3bc5dbdfd11b840b3e987ecf043c7ca0",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/0.9.0/bazel_skylib-0.9.0.tar.gz"],
-    )
-
-    load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
-
-    bazel_skylib_workspace()
-
-    ##=============== rules_proto ===============##
-    http_archive(
-        name = "rules_proto",
-        sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
-        strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
-        urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-            "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-        ],
-    )
-
-    load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-
-    rules_proto_dependencies()
-    rules_proto_toolchains()
-
-    ##================== grpc =====================##
-	http_archive(
-    	name = "com_github_grpc_grpc",
-    	sha256 = "419dba362eaf8f1d36849ceee17c3e2ff8ff12ac666b42d3ff02a164ebe090e9",
-    	strip_prefix = "grpc-1.30.0",
-    	urls = ["https://github.com/grpc/grpc/archive/v1.30.0.tar.gz"],
-    )
-
-    load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-    grpc_deps()
-
-	load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
-	grpc_extra_deps()
-
-    ##=============== local_config_xxx ==================##
     cuda_configure(name = "local_config_cuda")
     tensorrt_configure(name = "local_config_tensorrt")
     python_configure(name = "local_config_python")
