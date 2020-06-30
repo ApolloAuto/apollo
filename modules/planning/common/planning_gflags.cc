@@ -561,3 +561,7 @@ DEFINE_bool(
 DEFINE_bool(
     skip_path_reference_in_change_lane, true,
     "skipping using learning model output as path reference in change lane");
+
+DEFINE_int32(min_past_history_points_len, 0,
+             "minimun past history points length for trainsition from "
+             "rule-based planning to learning-based planning");
