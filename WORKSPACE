@@ -2,8 +2,6 @@ workspace(name = "apollo")
 
 load("//tools:workspace.bzl", "apollo_repositories")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//tools:common.bzl", "clean_dep")
-# load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 apollo_repositories()
 
@@ -32,6 +30,21 @@ load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_
 rules_proto_dependencies()
 
 rules_proto_toolchains()
+
+http_archive(
+    name = "rules_python",
+    sha256 = "b5668cde8bb6e3515057ef465a35ad712214962f0b3a314e551204266c7be90c",
+    strip_prefix = "rules_python-0.0.2",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.0.2/rules_python-0.0.2.tar.gz",
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+# Only needed if using the packaging rules.
+# load("@rules_python//python:pip.bzl", "pip_repositories")
+# pip_repositories()
 
 # load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 # See https://github.com/bazelbuild/bazel/issues/11406
@@ -65,11 +78,7 @@ http_archive(
     urls = ["https://github.com/grpc/grpc/archive/v1.30.0.tar.gz"],
 )
 
-load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-
 grpc_deps()
-
-load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
 
