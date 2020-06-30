@@ -29,7 +29,7 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/planning/proto:planning_cc_proto",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
     ] + select({
         "//tools/platform:with_teleop": [
             "//modules/teleop/modem/proto:modem_cc_proto",

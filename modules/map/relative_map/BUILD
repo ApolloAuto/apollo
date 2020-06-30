@@ -84,7 +84,7 @@ cc_test(
     ],
     deps = [
         ":relative_map_component_lib",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
     ],
 )

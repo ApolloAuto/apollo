@@ -27,7 +27,7 @@
 
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 /**
  * @namespace apollo::dreamview

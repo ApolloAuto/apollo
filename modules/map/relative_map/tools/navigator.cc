@@ -19,7 +19,7 @@
 #include <thread>
 #include <vector>
 
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"

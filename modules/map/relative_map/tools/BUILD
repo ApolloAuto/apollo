@@ -25,7 +25,7 @@ cc_binary(
         "//modules/common/util",
         "//modules/map/relative_map:relative_map_lib",
         "//modules/map/relative_map/proto:navigator_config_cc_proto",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
     ],
 )
 

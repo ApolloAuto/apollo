@@ -27,7 +27,7 @@
 #include <boost/thread/shared_mutex.hpp>
 
 #include "gtest/gtest_prod.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "cyber/cyber.h"
 #include "modules/canbus/proto/chassis.pb.h"
