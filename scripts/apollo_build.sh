@@ -155,7 +155,8 @@ function main() {
         info "Running build under CPU mode on ${ARCH} platform."
     fi
     bazel_build $@
-    build_simulator
+    # Disable simulator build temporarily
+    # build_simulator
     success "Done building ${SHORTHAND_TARGETS} . Enjoy!"
 }
 
