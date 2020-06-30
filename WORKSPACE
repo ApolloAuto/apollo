@@ -45,14 +45,6 @@ rules_proto_dependencies()
 
 rules_proto_toolchains()
 
-# googletest (GTest and GMock)
-http_archive(
-    name = "com_google_googletest",
-    sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
-    strip_prefix = "googletest-release-1.10.0",
-    url = "https://github.com/google/googletest/archive/release-1.10.0.tar.gz",
-)
-
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
 
 rules_proto_dependencies()
@@ -90,15 +82,6 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
-
-# Cpplint
-http_archive(
-    name = "cpplint",
-    build_file = clean_dep("//third_party:cpplint.BUILD"),
-    sha256 = "96db293564624543a2fd3b1a0d23f663b8054c79853a5918523655721a9f6b53",
-    strip_prefix = "cpplint-1.4.5",
-    urls = ["https://github.com/cpplint/cpplint/archive/1.4.5.tar.gz"],
-)
 
 # ad-rss-lib
 http_archive(
