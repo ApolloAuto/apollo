@@ -67,27 +67,7 @@ http_archive(
     urls = ["https://github.com/abseil/abseil-cpp/archive/20200225.2.tar.gz"],
 )
 
-new_local_repository(
-    name = "poco",
-    build_file = "third_party/poco.BUILD",
-    path = "/opt/apollo/sysroot/include",
-)
-
-#http_archive(
-#    name = "com_github_gflags_gflags",
-#    build_file = "gflags.BUILD",
-#    sha256 = "34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf",
-#    strip_prefix = "gflags-2.2.2",
-#    urls = ["https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"],
-#)
 #
-#http_archive(
-#    name = "com_google_glog",
-#    build_file = "glog.BUILD",
-#    sha256 = "f28359aeba12f30d73d9e4711ef356dc842886968112162bc73002645139c39c",
-#    strip_prefix = "glog-0.4.0",
-#    url = "https://github.com/google/glog/archive/v0.4.0.tar.gz",
-#)
 # See https://github.com/bazelbuild/bazel/issues/11406
 # maybe(
 #    http_archive,
@@ -129,15 +109,6 @@ http_archive(
     urls = ["https://github.com/intel/ad-rss-lib/archive/v1.1.0.tar.gz"],
 )
 
-# eigen
-http_archive(
-    name = "eigen",
-    build_file = clean_dep("//third_party:eigen.BUILD"),
-    sha256 = "a8d87c8df67b0404e97bcef37faf3b140ba467bc060e2b883192165b319cea8d",
-    strip_prefix = "eigen-git-mirror-3.3.7",
-    urls = ["https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz"],
-)
-
 # CivetWeb (web server)
 http_archive(
     name = "civetweb",
@@ -153,13 +124,6 @@ http_archive(
 #    build_file = "third_party/ros.BUILD",
 #    path = "/home/tmp/ros",
 #)
-#
-# PCL 1.11
-new_local_repository(
-    name = "pcl",
-    build_file = "third_party/pcl.BUILD",
-    path = "/opt/apollo/sysroot/include/pcl-1.10",
-)
 
 new_local_repository(
     name = "glew",
@@ -242,19 +206,6 @@ new_local_repository(
 #    path = "/usr/local/apollo/local_third_party/mklml",
 # )
 
-## Proj.4
-new_local_repository(
-    name = "proj4",
-    build_file = "third_party/proj4.BUILD",
-    path = "/usr/include",
-)
-
-new_local_repository(
-    name = "tinyxml2",
-    build_file = "third_party/tinyxml2.BUILD",
-    path = "/usr/include",
-)
-
 ##jsoncpp .so for adv_plat
 #new_local_repository(
 #    name = "jsoncpp",
@@ -277,29 +228,9 @@ new_local_repository(
 )
 
 new_local_repository(
-    name = "opencv",
-    build_file = "third_party/opencv.BUILD",
-    path = "/usr/include",
-)
-
-# Needed by modules/transform
-new_local_repository(
-    name = "tf2",
-    build_file = "third_party/tf2.BUILD",
-    path = "/opt/apollo/pkgs/tf2/include",
-)
-
-new_local_repository(
     name = "ffmpeg",
     build_file = "third_party/ffmpeg.BUILD",
     path = "/opt/apollo/sysroot/include",
-)
-
-# lz4
-new_local_repository(
-    name = "lz4",
-    build_file = "third_party/lz4.BUILD",
-    path = "/usr/include/",
 )
 
 new_local_repository(
