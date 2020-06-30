@@ -29,7 +29,7 @@ namespace planning {
 DECLARE_string(test_model_inference_task_config_file);
 DEFINE_string(test_model_inference_task_config_file, "",
               "inference task config");
-              
+
 class LearningModelInferenceTaskTest : public ::testing::Test {
  public:
   virtual void SetUp() {
@@ -37,14 +37,14 @@ class LearningModelInferenceTaskTest : public ::testing::Test {
     auto* inference_config =
         config_.mutable_learning_model_inference_task_config();
 
-  FLAGS_test_model_inference_task_config_file =
-      "/apollo/modules/planning/testdata/model_inference_test/"
-      "test_libtorch_inference_task_config.pb.txt";
+    FLAGS_test_model_inference_task_config_file =
+        "/apollo/modules/planning/testdata/model_inference_test/"
+        "test_libtorch_inference_task_config.pb.txt";
 
-  ACHECK(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_test_model_inference_task_config_file, inference_config))
-      << "Failed to load config file "
-      << FLAGS_test_model_inference_task_config_file;
+    ACHECK(apollo::cyber::common::GetProtoFromFile(
+        FLAGS_test_model_inference_task_config_file, inference_config))
+        << "Failed to load config file "
+        << FLAGS_test_model_inference_task_config_file;
   }
 
   virtual void TearDown() {}
