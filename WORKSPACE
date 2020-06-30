@@ -118,11 +118,12 @@ http_archive(
     urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz"],
 )
 
-# new_local_repository(
-#    name = "glew",
-#    build_file = "third_party/glew.BUILD",
-#    path = "/usr/include",
-# )
+#ros
+#new_local_repository(
+#    name = "ros",
+#    build_file = "third_party/ros.BUILD",
+#    path = "/home/tmp/ros",
+#)
 
 #new_local_repository(
 #    name = "opengl",
@@ -142,18 +143,19 @@ http_archive(
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
 
-# ipopt
-new_local_repository(
-    name = "ipopt",
-    build_file = "third_party/ipopt.BUILD",
-    path = "/usr/include",
+# YAML-CPP
+http_archive(
+    name = "com_github_jbeder_yaml_cpp",
+    build_file = clean_dep("//third_party:yaml_cpp.BUILD"),
+    sha256 = "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed",
+    strip_prefix = "yaml-cpp-yaml-cpp-0.6.3",
+    urls = ["https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz"],
 )
 
-## Local-integ
 new_local_repository(
-    name = "local_integ",
-    build_file = "third_party/local_integ.BUILD",
-    path = "/usr/local/apollo/local_integ",
+    name = "qpOASES",
+    build_file = "third_party/qpOASES.BUILD",
+    path = "/opt/apollo/sysroot/include",
 )
 
 ## mkldnn
@@ -190,10 +192,4 @@ new_local_repository(
     name = "libtorch_gpu",
     build_file = "third_party/libtorch_gpu.BUILD",
     path = "/usr/local/libtorch_gpu/include",
-)
-
-new_local_repository(
-    name = "ffmpeg",
-    build_file = "third_party/ffmpeg.BUILD",
-    path = "/opt/apollo/sysroot/include",
 )
