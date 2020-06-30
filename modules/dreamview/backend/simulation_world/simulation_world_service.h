@@ -33,7 +33,7 @@
 
 #include "cyber/common/log.h"
 #include "gtest/gtest_prod.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/proto/drive_event.pb.h"

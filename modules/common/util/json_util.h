@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "google/protobuf/message.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "cyber/common/log.h"
 

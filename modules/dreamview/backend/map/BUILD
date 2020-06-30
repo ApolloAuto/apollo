@@ -13,7 +13,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//third_party:boost",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
         "@com_google_glog//:glog",
     ],
 )

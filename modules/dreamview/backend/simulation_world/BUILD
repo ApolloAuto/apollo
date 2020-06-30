@@ -31,7 +31,7 @@ cc_library(
         "//modules/planning/proto:planning_cc_proto",
         "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/storytelling/proto:story_cc_proto",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
         "@com_google_absl//absl/strings",
     ],
 )

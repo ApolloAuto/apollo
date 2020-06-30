@@ -164,7 +164,7 @@ cc_library(
     hdrs = ["json_util.h"],
     deps = [
         "//cyber/common",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
         "@com_google_protobuf//:protobuf",
     ],
 )
