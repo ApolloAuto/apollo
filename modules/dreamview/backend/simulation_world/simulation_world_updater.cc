@@ -226,6 +226,11 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
+      "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
+        sim_world_service_.SetToClear();
+      });
+
+  websocket_->RegisterMessageHandler(
       "Dump", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.DumpMessages();
       });

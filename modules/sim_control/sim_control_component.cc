@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/sim_2d/sim_2d_component.h"
+#include "modules/sim_control/sim_control_component.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -26,7 +26,7 @@
 #include "modules/common/util/util.h"
 
 namespace apollo {
-namespace sim_2d {
+namespace sim_control {
 
 using apollo::canbus::Chassis;
 using apollo::common::Header;
@@ -62,12 +62,15 @@ bool IsSameHeader(const Header& lhs, const Header& rhs) {
 
 }  // namespace
 
-Sim2DComponent::Sim2DComponent()
+SimControlComponent::SimControlComponent()
     : current_trajectory_(std::make_shared<ADCTrajectory>()) {}
 
-void Sim2DComponent::InitTimerAndIO() {
-  localization_reader_ =
-      node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
+void SimControlComponent::InitTimerAndIO() {
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      FLAGS_localization_topic,
+      [this](const std::shared_ptr<LocalizationEstimate>& localization) {
+        this->OnLocalization(localization);
+      });
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic,
       [this](const std::shared_ptr<ADCTrajectory>& trajectory) {
@@ -96,22 +99,21 @@ void Sim2DComponent::InitTimerAndIO() {
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   // Start timer to publish localization and chassis messages.
-  sim_2d_timer_.reset(new cyber::Timer(
-      kSim2DComponentIntervalMs, [this]() { this->SimStep(); }, false));
+  sim_control_timer_.reset(new cyber::Timer(
+      kSimControlComponentIntervalMs, [this]() { this->Proc(); }, false));
   sim_prediction_timer_.reset(new cyber::Timer(
       kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
       false));
 }
 
-void Sim2DComponent::InitState(bool set_start_point, double start_velocity,
+void SimControlComponent::InitState(bool set_start_point, double start_velocity,
                                double start_acceleration) {
   if (set_start_point && !FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
-  InitTimerAndIO();
 }
 
-void Sim2DComponent::InitStartPoint(double start_velocity,
+void SimControlComponent::InitStartPoint(double start_velocity,
                                     double start_acceleration) {
   TrajectoryPoint point;
   // fall back to a dummy point from map
@@ -135,30 +137,30 @@ void Sim2DComponent::InitStartPoint(double start_velocity,
   SetStartPoint(point);
 }
 
-void Sim2DComponent::SetStartPoint(const TrajectoryPoint& start_point) {
+void SimControlComponent::SetStartPoint(const TrajectoryPoint& start_point) {
   next_point_ = start_point;
   prev_point_index_ = next_point_index_ = 0;
   received_planning_ = false;
 }
 
-void Sim2DComponent::Reset() {
+void SimControlComponent::Reset() {
   std::lock_guard<std::mutex> lock(mutex_);
   InternalReset();
 }
 
-void Sim2DComponent::InternalReset() {
+void SimControlComponent::InternalReset() {
   current_routing_header_.Clear();
   re_routing_triggered_ = false;
   send_dummy_prediction_ = true;
   ClearPlanning();
 }
 
-void Sim2DComponent::ClearPlanning() {
+void SimControlComponent::ClearPlanning() {
   current_trajectory_->Clear();
   received_planning_ = false;
 }
 
-void Sim2DComponent::OnReceiveNavigationInfo(
+void SimControlComponent::OnReceiveNavigationInfo(
     const std::shared_ptr<NavigationInfo>& navigation_info) {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -170,7 +172,7 @@ void Sim2DComponent::OnReceiveNavigationInfo(
   }
 }
 
-void Sim2DComponent::OnRoutingResponse(
+void SimControlComponent::OnRoutingResponse(
     const std::shared_ptr<RoutingResponse>& routing) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
@@ -204,7 +206,7 @@ void Sim2DComponent::OnRoutingResponse(
   }
 }
 
-void Sim2DComponent::OnPredictionObstacles(
+void SimControlComponent::OnPredictionObstacles(
     const std::shared_ptr<PredictionObstacles>& obstacles) {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -215,13 +217,14 @@ void Sim2DComponent::OnPredictionObstacles(
   send_dummy_prediction_ = obstacles->header().module_name() == "SimPrediction";
 }
 
-bool Sim2DComponent::Init() {
+bool SimControlComponent::Init() {
   InitState(true);
+  InitTimerAndIO();
   Start();
   return true;
 }
 
-void Sim2DComponent::Start() {
+void SimControlComponent::Start() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (!enabled_) {
@@ -235,23 +238,23 @@ void Sim2DComponent::Start() {
               next_point_.has_a() ? next_point_.a() : 0.0);
 
     InternalReset();
-    sim_2d_timer_->Start();
+    sim_control_timer_->Start();
     sim_prediction_timer_->Start();
     enabled_ = true;
   }
 }
 
-void Sim2DComponent::Stop() {
+void SimControlComponent::Stop() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (enabled_) {
-    sim_2d_timer_->Stop();
+    sim_control_timer_->Stop();
     sim_prediction_timer_->Stop();
     enabled_ = false;
   }
 }
 
-void Sim2DComponent::OnPlanning(
+void SimControlComponent::OnPlanning(
     const std::shared_ptr<ADCTrajectory>& trajectory) {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -260,7 +263,7 @@ void Sim2DComponent::OnPlanning(
   }
 
   // Reset current trajectory and the indices upon receiving a new trajectory.
-  // The routing Sim2DComponent owns must match with the one Planning has.
+  // The routing SimControlComponent owns must match with the one Planning has.
   if (re_routing_triggered_ ||
       IsSameHeader(trajectory->routing_header(), current_routing_header_)) {
     current_trajectory_ = trajectory;
@@ -272,25 +275,57 @@ void Sim2DComponent::OnPlanning(
   }
 }
 
-void Sim2DComponent::Freeze() {
+void SimControlComponent::OnLocalization(
+    const std::shared_ptr<localization::LocalizationEstimate>& localization) {
+  static const char* kSimControlHeaderName = "SimControl";
+  if (localization->has_header() && localization->header().has_module_name() &&
+      kSimControlHeaderName == localization->header().module_name()) {
+    return;
+  }
+  TrajectoryPoint point;
+
+  start_point_from_localization_ = true;
+  const auto& pose = localization->pose();
+  point.mutable_path_point()->set_x(pose.position().x());
+  point.mutable_path_point()->set_y(pose.position().y());
+  point.mutable_path_point()->set_z(pose.position().z());
+  point.mutable_path_point()->set_theta(pose.heading());
+  point.mutable_path_point()->set_kappa(0.0);
+  point.set_v(
+      std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
+  // Take the dot product of acceleration and velocity
+  const double projection =
+      pose.linear_acceleration().x() * pose.linear_velocity().x() +
+      pose.linear_acceleration().y() * pose.linear_velocity().y();
+
+  // Calculate the magnitude of the acceleration
+  const double magnitude = std::hypot(pose.linear_acceleration().x(),
+                                pose.linear_acceleration().y());
+  point.set_a(std::signbit(projection) ? -magnitude : magnitude);
+
+  SetStartPoint(point);
+}
+
+void SimControlComponent::Freeze() {
   next_point_.set_v(0.0);
   next_point_.set_a(0.0);
   prev_point_ = next_point_;
 }
 
-void Sim2DComponent::SimStep() {
+void SimControlComponent::Proc() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   TrajectoryPoint trajectory_point;
   Chassis::GearPosition gear_position;
   if (!PerfectControlModel(&trajectory_point, &gear_position)) {
     AERROR << "Failed to calculate next point with perfect control model";
+    return;
   }
   PublishChassis(trajectory_point.v(), gear_position);
   PublishLocalization(trajectory_point);
 }
 
-bool Sim2DComponent::PerfectControlModel(TrajectoryPoint* point,
+bool SimControlComponent::PerfectControlModel(TrajectoryPoint* point,
                                          Chassis::GearPosition* gear_position) {
   // Result of the interpolation.
   auto current_time = Clock::NowInSeconds();
@@ -341,10 +376,10 @@ bool Sim2DComponent::PerfectControlModel(TrajectoryPoint* point,
   return true;
 }
 
-void Sim2DComponent::PublishChassis(double cur_speed,
+void SimControlComponent::PublishChassis(double cur_speed,
                                     Chassis::GearPosition gear_position) {
   auto chassis = std::make_shared<Chassis>();
-  FillHeader("Sim2DComponent", chassis.get());
+  FillHeader("SimControlComponent", chassis.get());
 
   chassis->set_engine_started(true);
   chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
@@ -361,9 +396,9 @@ void Sim2DComponent::PublishChassis(double cur_speed,
   chassis_writer_->Write(chassis);
 }
 
-void Sim2DComponent::PublishLocalization(const TrajectoryPoint& point) {
+void SimControlComponent::PublishLocalization(const TrajectoryPoint& point) {
   auto localization = std::make_shared<LocalizationEstimate>();
-  FillHeader("Sim2DComponent", localization.get());
+  FillHeader("SimControlComponent", localization.get());
 
   auto* pose = localization->mutable_pose();
   auto prev = prev_point_.path_point();
@@ -429,7 +464,7 @@ void Sim2DComponent::PublishLocalization(const TrajectoryPoint& point) {
   adc_position_.set_z(pose->position().z());
 }
 
-void Sim2DComponent::PublishDummyPrediction() {
+void SimControlComponent::PublishDummyPrediction() {
   auto prediction = std::make_shared<PredictionObstacles>();
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -441,5 +476,5 @@ void Sim2DComponent::PublishDummyPrediction() {
   prediction_writer_->Write(prediction);
 }
 
-}  // namespace sim_2d
+}  // namespace sim_control
 }  // namespace apollo

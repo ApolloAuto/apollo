@@ -39,8 +39,8 @@ DEFINE_bool(routing_from_file, false,
 
 DEFINE_string(routing_response_file,
               "modules/map/data/demo/garage_routing.pb.txt",
-              "File path of the routing response that Sim2D will read the "
-              "start point from. If this is absent, Sim2D will directly "
+              "File path of the routing response that SimControl will read the "
+              "start point from. If this is absent, SimControl will directly "
               "take the RoutingResponse from external to determine the start "
               "point.");
 

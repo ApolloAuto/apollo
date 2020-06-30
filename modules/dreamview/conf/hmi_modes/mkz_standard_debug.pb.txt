@@ -90,9 +90,9 @@ cyber_modules {
   }
 }
 cyber_modules {
-  key: "Sim2D"
+  key: "SimControl"
   value: {
-    dag_files: "/apollo/modules/sim_2d/dag/sim_2d.dag"
+    dag_files: "/apollo/modules/sim_control/dag/sim_control.dag"
   }
 }
 cyber_modules {

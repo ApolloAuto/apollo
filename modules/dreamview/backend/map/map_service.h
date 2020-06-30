@@ -57,7 +57,7 @@ class MapService {
   bool GetPoseWithRegardToLane(const double x, const double y, double *theta,
                                double *s) const;
 
-  // Get a point on the map to serve as dummy start point for sim
+  // Get a point on the map to serve as dummy start point of SimControl
   bool GetStartPoint(apollo::common::PointENU *start_point) const;
 
   /**

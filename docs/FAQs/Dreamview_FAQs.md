@@ -59,7 +59,7 @@ It simulates a SDC's control module, and moves the car based on planning result.
 
 Purpose of sim control: drive the car based on the planning trajectory. Good for debugging planning algorithms.
 
-**Apollo 2.5 or after**: simply turning on the SimControl/Sim2D switch as seen in the image below:
+**Apollo 2.5 or after**: simply turning on the SimControl switch as seen in the image below:
       
 ![](images/sim_control_2.5.png)
 
@@ -72,7 +72,7 @@ Purpose of sim control: drive the car based on the planning trajectory. Good for
     bash scripts/bootstrap.sh start
 ```
  
-**Please note**, planning and routing modules (see image below) should be ON while using SimControl/Sim2D. To navigate the ego-car, select either “route editing” or “default routing” from the side bar to define a route. You can turn the sim_control on and off from the toggle. However, a new routing request is needed each time the sim_control is restarted.
+**Please note**, planning and routing modules (see image below) should be ON while using SimControl. To navigate the ego-car, select either “route editing” or “default routing” from the side bar to define a route. You can turn the sim_control on and off from the toggle. However, a new routing request is needed each time the sim_control is restarted.
 ![](images/sim_control_2.0.png)
 
 ---

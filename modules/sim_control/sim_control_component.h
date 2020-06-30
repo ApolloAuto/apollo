@@ -36,21 +36,21 @@
  * @brief apollo::dreamview
  */
 namespace apollo {
-namespace sim_2d {
+namespace sim_control {
 
 /**
- * @class Sim2DComponent
+ * @class SimControlComponent
  * @brief A module that simulates a 'perfect control' algorithm, which assumes
  * an ideal world where the car can be perfectly placed wherever the planning
  * asks it to be, with the expected speed, acceleration, etc.
  */
-class Sim2DComponent final : public cyber::Component<> {
+class SimControlComponent final : public cyber::Component<> {
  public:
   /**
-   * @brief Constructor of Sim2DComponent.
+   * @brief Constructor of SimControlComponent.
    * @param map_service the pointer of MapService.
    */
-  Sim2DComponent();
+  SimControlComponent();
 
   bool IsEnabled() const { return enabled_; }
 
@@ -79,11 +79,13 @@ class Sim2DComponent final : public cyber::Component<> {
    */
   void Reset();
 
-  void SimStep();
+  void Proc();
 
  private:
   void OnPlanning(
       const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
+  void OnLocalization(
+      const std::shared_ptr<localization::LocalizationEstimate> &localization);
   void OnRoutingResponse(
       const std::shared_ptr<apollo::routing::RoutingResponse> &routing);
   void OnReceiveNavigationInfo(
@@ -141,13 +143,13 @@ class Sim2DComponent final : public cyber::Component<> {
       prediction_writer_;
 
   // The timer to publish simulated localization and chassis messages.
-  std::unique_ptr<cyber::Timer> sim_2d_timer_;
+  std::unique_ptr<cyber::Timer> sim_control_timer_;
 
   // The timer to publish dummy prediction
   std::unique_ptr<cyber::Timer> sim_prediction_timer_;
 
   // Time interval of the timer, in milliseconds.
-  static constexpr double kSim2DComponentIntervalMs = 10;
+  static constexpr double kSimControlComponentIntervalMs = 10;
   static constexpr double kSimPredictionIntervalMs = 100;
 
   // The latest received planning trajectory.
@@ -183,10 +185,10 @@ class Sim2DComponent final : public cyber::Component<> {
   // Linearize reader/timer callbacks and external operations.
   std::mutex mutex_;
 
-  FRIEND_TEST(Sim2DComponentTest, Test);
-  FRIEND_TEST(Sim2DComponentTest, TestDummyPrediction);
+  FRIEND_TEST(SimControlComponentTest, Test);
+  FRIEND_TEST(SimControlComponentTest, TestDummyPrediction);
 };
-CYBER_REGISTER_COMPONENT(Sim2DComponent)
+CYBER_REGISTER_COMPONENT(SimControlComponent)
 
-}  // namespace sim_2d
+}  // namespace sim_control
 }  // namespace apollo
