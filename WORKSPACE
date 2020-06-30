@@ -86,7 +86,7 @@ grpc_extra_deps()
 #    build_file = "third_party/caffe.BUILD",
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
-# mkldnn
+
 #new_local_repository(
 #    name = "mkldnn",
 #    build_file = "third_party/mkldnn.BUILD",
