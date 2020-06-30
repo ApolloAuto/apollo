@@ -1,5 +1,6 @@
 workspace(name = "apollo")
 
+load("//tools:workspace.bzl", "apollo_repositories")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
 load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
@@ -15,6 +16,8 @@ tensorrt_configure(name = "local_config_tensorrt")
 python_configure(name = "local_config_python")
 
 vtk_configure(name = "local_config_vtk")
+
+apollo_repositories()
 
 http_archive(
     name = "bazel_skylib",
@@ -62,20 +65,6 @@ http_archive(
     sha256 = "f41868f7a938605c92936230081175d1eae87f6ea2c248f41077c8f88316f111",
     strip_prefix = "abseil-cpp-20200225.2",
     urls = ["https://github.com/abseil/abseil-cpp/archive/20200225.2.tar.gz"],
-)
-
-# gflags
-new_local_repository(
-    name = "com_github_gflags_gflags",
-    build_file = "third_party/gflags.BUILD",
-    path = "/usr/local/include/gflags",
-)
-
-# glog
-new_local_repository(
-    name = "com_google_glog",
-    build_file = "third_party/glog.BUILD",
-    path = "/usr/local/include/glog",
 )
 
 new_local_repository(
@@ -318,13 +307,6 @@ new_local_repository(
     name = "tf2",
     build_file = "third_party/tf2.BUILD",
     path = "/opt/apollo/pkgs/tf2/include",
-)
-
-# TODO(all) rules_boost
-new_local_repository(
-    name = "boost",
-    build_file = "third_party/boost.BUILD",
-    path = "/opt/apollo/sysroot/include",
 )
 
 new_local_repository(
