@@ -157,7 +157,10 @@ function main() {
     bazel_build $@
     # Disable simulator build temporarily
     # build_simulator
-    success "Done building ${SHORTHAND_TARGETS} . Enjoy!"
+    if [ -z "${SHORTHAND_TARGETS}" ]; then
+        SHORTHAND_TARGETS="apollo"
+    fi
+    success "Done building ${SHORTHAND_TARGETS}. Enjoy!"
 }
 
 main "$@"
