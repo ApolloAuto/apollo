@@ -92,29 +92,25 @@ grpc_extra_deps()
 #    build_file = "third_party/glfw.BUILD",
 #    path = "/usr/include",
 #)
-
 # Caffe
 # new_local_repository(
 #    name = "caffe",
 #    build_file = "third_party/caffe.BUILD",
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
-
-## mkldnn
+# mkldnn
 #new_local_repository(
 #    name = "mkldnn",
 #    build_file = "third_party/mkldnn.BUILD",
 #    path = "/usr/local/apollo/local_third_party/mkldnn",
 #)
 #
-
 # mklml
 # new_local_repository(
 #    name = "mklml",
 #    build_file = "third_party/mklml.BUILD",
 #    path = "/usr/local/apollo/local_third_party/mklml",
 # )
-
 ##jsoncpp .so for adv_plat
 #new_local_repository(
 #    name = "jsoncpp",
