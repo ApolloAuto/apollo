@@ -184,13 +184,6 @@ new_local_repository(
     path = "/usr/include",
 )
 
-# ADOL-C
-new_local_repository(
-    name = "adolc",
-    build_file = "third_party/adolc.BUILD",
-    path = "/usr/include",
-)
-
 ## Local-integ
 new_local_repository(
     name = "local_integ",
@@ -219,19 +212,6 @@ new_local_repository(
 #    build_file = "third_party/jsoncpp.BUILD",
 #    path = "/usr/local/apollo/jsoncpp/",
 #)
-
-#adv_plat
-new_local_repository(
-    name = "adv_plat",
-    build_file = "third_party/adv_plat.BUILD",
-    path = "/opt/apollo/pkgs/adv_plat/include",
-)
-
-new_local_repository(
-    name = "fastrtps",
-    build_file = "third_party/fastrtps.BUILD",
-    path = "/usr/local/fast-rtps",
-)
 
 ## libtorch
 new_local_repository(
