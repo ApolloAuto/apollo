@@ -2,20 +2,8 @@ workspace(name = "apollo")
 
 load("//tools:workspace.bzl", "apollo_repositories")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
-load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
-load("//third_party/py:python_configure.bzl", "python_configure")
-load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
 load("//tools:common.bzl", "clean_dep")
 # load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-
-cuda_configure(name = "local_config_cuda")
-
-tensorrt_configure(name = "local_config_tensorrt")
-
-python_configure(name = "local_config_python")
-
-vtk_configure(name = "local_config_vtk")
 
 apollo_repositories()
 
@@ -38,12 +26,6 @@ http_archive(
         "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
     ],
 )
-
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-
-rules_proto_dependencies()
-
-rules_proto_toolchains()
 
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
 
