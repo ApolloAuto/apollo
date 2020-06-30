@@ -67,12 +67,6 @@ http_archive(
     urls = ["https://github.com/abseil/abseil-cpp/archive/20200225.2.tar.gz"],
 )
 
-new_local_repository(
-    name = "poco",
-    build_file = "third_party/poco.BUILD",
-    path = "/opt/apollo/sysroot/include",
-)
-
 #
 # See https://github.com/bazelbuild/bazel/issues/11406
 # maybe(
@@ -130,13 +124,6 @@ http_archive(
 #    build_file = "third_party/ros.BUILD",
 #    path = "/home/tmp/ros",
 #)
-
-# PCL 1.11
-new_local_repository(
-    name = "pcl",
-    build_file = "third_party/pcl.BUILD",
-    path = "/opt/apollo/sysroot/include/pcl-1.10",
-)
 
 new_local_repository(
     name = "glew",
@@ -226,12 +213,6 @@ new_local_repository(
 #    path = "/usr/local/apollo/local_third_party/mklml",
 # )
 
-new_local_repository(
-    name = "tinyxml2",
-    build_file = "third_party/tinyxml2.BUILD",
-    path = "/usr/include",
-)
-
 ##jsoncpp .so for adv_plat
 #new_local_repository(
 #    name = "jsoncpp",
@@ -270,13 +251,6 @@ new_local_repository(
     name = "ffmpeg",
     build_file = "third_party/ffmpeg.BUILD",
     path = "/opt/apollo/sysroot/include",
-)
-
-# lz4
-new_local_repository(
-    name = "lz4",
-    build_file = "third_party/lz4.BUILD",
-    path = "/usr/include/",
 )
 
 new_local_repository(
