@@ -53,13 +53,6 @@ http_archive(
     url = "https://github.com/google/googletest/archive/release-1.10.0.tar.gz",
 )
 
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29",
-    strip_prefix = "protobuf-3.12.3",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.12.3.tar.gz"],
-)
-
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
 
 rules_proto_dependencies()
@@ -130,12 +123,6 @@ http_archive(
 #    build_file = "third_party/glew.BUILD",
 #    path = "/usr/include",
 # )
-
-new_local_repository(
-    name = "qt",
-    build_file = "third_party/qt5/qt.BUILD",
-    path = "/usr/local/qt5/include",
-)
 
 #new_local_repository(
 #    name = "opengl",
