@@ -118,13 +118,6 @@ http_archive(
     urls = ["https://github.com/civetweb/civetweb/archive/v1.11.tar.gz"],
 )
 
-#ros
-#new_local_repository(
-#    name = "ros",
-#    build_file = "third_party/ros.BUILD",
-#    path = "/home/tmp/ros",
-#)
-
 #new_local_repository(
 #    name = "opengl",
 #    build_file = "third_party/opengl.BUILD",
@@ -142,21 +135,6 @@ http_archive(
 #    build_file = "third_party/caffe.BUILD",
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
-
-# YAML-CPP
-http_archive(
-    name = "com_github_jbeder_yaml_cpp",
-    build_file = clean_dep("//third_party:yaml_cpp.BUILD"),
-    sha256 = "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed",
-    strip_prefix = "yaml-cpp-yaml-cpp-0.6.3",
-    urls = ["https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz"],
-)
-
-new_local_repository(
-    name = "qpOASES",
-    build_file = "third_party/qpOASES.BUILD",
-    path = "/opt/apollo/sysroot/include",
-)
 
 ## mkldnn
 #new_local_repository(
