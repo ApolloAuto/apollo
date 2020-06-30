@@ -155,19 +155,6 @@ new_local_repository(
 #    path = "/opt/apollo/pkgs/caffe/include",
 # )
 
-new_local_repository(
-    name = "qpOASES",
-    build_file = "third_party/qpOASES.BUILD",
-    path = "/opt/apollo/sysroot/include",
-)
-
-# OSQP
-new_local_repository(
-    name = "osqp",
-    build_file = "third_party/osqp.BUILD",
-    path = "/opt/apollo/sysroot/include",
-)
-
 # ipopt
 new_local_repository(
     name = "ipopt",
