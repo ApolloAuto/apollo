@@ -89,15 +89,10 @@ sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 ##----------------##
 
 if [[ "${MY_GEO}" == "cn" ]]; then
-    if [[ "${ARCH}" == "x86_64" ]]; then
-        # Mirror from Tsinghua Univ.
-        PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
-        pip3_install -i "$PYPI_MIRROR" pip -U
-        python3 -m pip config set global.index-url "$PYPI_MIRROR"
-    else
-        info "Use default PYPI mirror: https://pypi.org/simple for ${ARCH} for ${MY_GEO}"
-        pip3_install pip -U
-    fi
+    # configure tsinghua's pypi mirror for x86_64 and aarch64
+    PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
+    pip3_install -i "$PYPI_MIRROR" pip -U
+    python3 -m pip config set global.index-url "$PYPI_MIRROR"
 else
     pip3_install pip -U
 fi
