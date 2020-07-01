@@ -70,18 +70,6 @@ load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
 
-# grpc
-http_archive(
-    name = "com_github_grpc_grpc",
-    sha256 = "419dba362eaf8f1d36849ceee17c3e2ff8ff12ac666b42d3ff02a164ebe090e9",
-    strip_prefix = "grpc-1.30.0",
-    urls = ["https://github.com/grpc/grpc/archive/v1.30.0.tar.gz"],
-)
-
-grpc_deps()
-
-grpc_extra_deps()
-
 #new_local_repository(
 #    name = "opengl",
 #    build_file = "third_party/opengl.BUILD",
