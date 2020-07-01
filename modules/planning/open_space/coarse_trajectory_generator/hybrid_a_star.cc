@@ -428,7 +428,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // TODO(Jinyun): move to confs
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(10000.0, x_ref);
+  piecewise_jerk_problem.set_x_ref(10000.0, std::move(x_ref));
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));

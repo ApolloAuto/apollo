@@ -36,13 +36,14 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
   std::vector<std::vector<std::pair<c_int, c_float>>> columns(num_of_variables);
   int value_index = 0;
 
-  // x(i)^2 * (w_x + w_x_ref)
+  // x(i)^2 * (w_x + w_x_ref[i]), w_x_ref might be a uniform value for all x(i)
+  // or piecewise values for different x(i)
   for (int i = 0; i < n - 1; ++i) {
     columns[i].emplace_back(i, (weight_x_ + weight_x_ref_vec_[i]) /
                                    (scale_factor_[0] * scale_factor_[0]));
     ++value_index;
   }
-  // x(n-1)^2 * (w_x + w_x_ref + w_end_x)
+  // x(n-1)^2 * (w_x + w_x_ref[n-1] + w_end_x)
   columns[n - 1].emplace_back(
       n - 1, (weight_x_ + weight_x_ref_vec_[n - 1] + weight_end_state_[0]) /
                  (scale_factor_[0] * scale_factor_[0]));
