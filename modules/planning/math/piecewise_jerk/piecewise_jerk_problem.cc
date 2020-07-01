@@ -309,21 +309,22 @@ void PiecewiseJerkProblem::set_ddx_bounds(const double ddx_lower_bound,
 }
 
 void PiecewiseJerkProblem::set_x_ref(const double weight_x_ref,
-                                     const std::vector<double>& x_ref) {
+                                     std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
   weight_x_ref_ = weight_x_ref;
+  // set uniform weighting
   weight_x_ref_vec_ = std::vector<double>(num_of_knots_, weight_x_ref);
-  x_ref_ = x_ref;
+  x_ref_ = std::move(x_ref);
   has_x_ref_ = true;
 }
 
-void PiecewiseJerkProblem::set_x_ref(
-    const std::vector<double>& weight_x_ref_vec,
-    const std::vector<double>& x_ref) {
+void PiecewiseJerkProblem::set_x_ref(std::vector<double> weight_x_ref_vec,
+                                     std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
   CHECK_EQ(weight_x_ref_vec.size(), num_of_knots_);
-  weight_x_ref_vec_ = weight_x_ref_vec;
-  x_ref_ = x_ref;
+  // set piecewise weighting
+  weight_x_ref_vec_ = std::move(weight_x_ref_vec);
+  x_ref_ = std::move(x_ref);
   has_x_ref_ = true;
 }
 

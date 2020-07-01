@@ -20,12 +20,14 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
+
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
 #include <algorithm>
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -34,7 +36,6 @@
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/proto/ipopt_return_status.pb.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
-#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -340,7 +341,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
 
-  piecewise_jerk_problem.set_x_ref(10.0, speed_ref);
+  piecewise_jerk_problem.set_x_ref(10.0, std::move(speed_ref));
 
   if (!piecewise_jerk_problem.Optimize(4000)) {
     std::string msg("Smoothing speed limit failed");
@@ -396,7 +397,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
 
-  piecewise_jerk_problem.set_x_ref(10.0, path_curvature);
+  piecewise_jerk_problem.set_x_ref(10.0, std::move(path_curvature));
 
   if (!piecewise_jerk_problem.Optimize(1000)) {
     std::string msg("Smoothing path curvature failed");
@@ -453,7 +454,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
     speed_data->EvaluateByTime(curr_t, &sp);
     x_ref.emplace_back(sp.s());
   }
-  piecewise_jerk_problem.set_x_ref(config.ref_s_weight(), x_ref);
+  piecewise_jerk_problem.set_x_ref(config.ref_s_weight(), std::move(x_ref));
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {

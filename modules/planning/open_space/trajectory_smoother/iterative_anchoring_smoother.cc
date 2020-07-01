@@ -653,7 +653,8 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(), x_ref);
+  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(),
+                                   std::move(x_ref));
   piecewise_jerk_problem.set_weight_ddx(s_curve_config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(s_curve_config.jerk_weight());
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
