@@ -10,6 +10,7 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        ":obstacle_clusters",
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_constants",
@@ -28,10 +29,10 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        ":obstacle_clusters",
         "//modules/common/filters:digital_filter",
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/common:prediction_constants",
-        "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
@@ -76,9 +77,9 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        "//modules/common/util",
         "//modules/prediction/common:road_graph",
         "//modules/prediction/proto:feature_proto",
-        "//modules/common/util",
     ],
 )
 
