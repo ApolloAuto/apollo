@@ -32,14 +32,15 @@ except //modules/prediction/common:road_graph_test \
 
 ##====================== Planning ===============##
 PLANNING_EXCEPTIONS="\
-except //modules/planning/tasks/learning_model:learning_model_inference_task_test \
-except //modules/planning/reference_line:qp_spline_reference_line_smoother_test   \
-except //modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_osqp_interface_test \
-except //modules/planning/math/smoothing_spline:osqp_spline_2d_solver_test  \
-except //modules/planning/math/smoothing_spline:osqp_spline_1d_solver_test  \
 except //modules/planning/learning_based/model_inference:model_inference_test   \
-except //modules/planning/integration_tests:sunnyvale_big_loop_test \
 "
+
+#except //modules/planning/tasks/learning_model:learning_model_inference_task_test \
+#except //modules/planning/reference_line:qp_spline_reference_line_smoother_test   \
+#except //modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_osqp_interface_test \
+#except //modules/planning/math/smoothing_spline:osqp_spline_2d_solver_test  \
+#except //modules/planning/math/smoothing_spline:osqp_spline_1d_solver_test  \
+#except //modules/planning/integration_tests:sunnyvale_big_loop_test \
 
 ##======================= Failed Test Cases are Listed Above ================##
 ARCH="$(uname -m)"

@@ -89,15 +89,9 @@ bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
     except //modules/prediction/common:road_graph_test \
 )
 
-# Planning: 7 test failures
+# Planning: 7(osqp-0.6.0) or 1(osqp-0.4.1) test failures
 bazel_test_with_dist_cache $(bazel query //modules/planning/... \
-    except //modules/planning/tasks/learning_model:learning_model_inference_task_test \
-    except //modules/planning/reference_line:qp_spline_reference_line_smoother_test   \
-    except //modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_osqp_interface_test \
-    except //modules/planning/math/smoothing_spline:osqp_spline_2d_solver_test  \
-    except //modules/planning/math/smoothing_spline:osqp_spline_1d_solver_test  \
     except //modules/planning/learning_based/model_inference:model_inference_test   \
-    except //modules/planning/integration_tests:sunnyvale_big_loop_test \
 )
 
 # FIXME(all): inference_demo crashed
