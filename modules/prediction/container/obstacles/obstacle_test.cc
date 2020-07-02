@@ -16,6 +16,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
+#include "modules/prediction/common/dependency_injector.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -25,6 +26,7 @@ namespace prediction {
 
 class ObstacleTest : public KMLMapBasedTest {
  public:
+  ObstacleTest() : container_(&injector_) {}
   virtual void SetUp() {
     FLAGS_p_var = 0.1;
     FLAGS_q_var = 0.1;
@@ -46,6 +48,7 @@ class ObstacleTest : public KMLMapBasedTest {
   }
 
  protected:
+  DependencyInjector injector_;
   ObstaclesContainer container_;
 };
 

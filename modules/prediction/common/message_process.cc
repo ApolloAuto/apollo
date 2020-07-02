@@ -21,7 +21,6 @@
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
@@ -51,11 +50,12 @@ using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
 using apollo::storytelling::Stories;
 
-bool MessageProcess::Init(ContainerManager* container_manager,
+bool MessageProcess::Init(DependencyInjector* injector,
+                          ContainerManager* container_manager,
                           EvaluatorManager* evaluator_manager,
                           PredictorManager* predictor_manager,
                           const PredictionConf& prediction_conf) {
-  InitContainers(container_manager);
+  InitContainers(injector, container_manager);
   InitEvaluators(evaluator_manager, prediction_conf);
   InitPredictors(predictor_manager, prediction_conf);
 
@@ -66,8 +66,8 @@ bool MessageProcess::Init(ContainerManager* container_manager,
 
   return true;
 }
-
-bool MessageProcess::InitContainers(ContainerManager* container_manager) {
+bool MessageProcess::InitContainers(DependencyInjector* injector,
+                                    ContainerManager* container_manager) {
   common::adapter::AdapterManagerConfig adapter_conf;
   if (!cyber::common::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
                                        &adapter_conf)) {
@@ -78,7 +78,7 @@ bool MessageProcess::InitContainers(ContainerManager* container_manager) {
   ADEBUG << "Adapter config file is loaded into: "
          << adapter_conf.ShortDebugString();
 
-  container_manager->Init(adapter_conf);
+  container_manager->Init(injector, adapter_conf);
   return true;
 }
 
@@ -95,6 +95,7 @@ bool MessageProcess::InitPredictors(PredictorManager* predictor_manager,
 }
 
 void MessageProcess::ContainerProcess(
+    DependencyInjector* injector,
     const std::shared_ptr<ContainerManager>& container_manager,
     const perception::PerceptionObstacles& perception_obstacles,
     ScenarioManager* scenario_manager) {
@@ -160,7 +161,7 @@ void MessageProcess::ContainerProcess(
   // Build junction feature for the obstacles in junction
   const Scenario scenario = scenario_manager->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
-    JunctionAnalyzer::Init(scenario.junction_id());
+    injector->GetJunctionAnalyzer()->Init(scenario.junction_id());
     ptr_obstacles_container->BuildJunctionFeature();
   }
 
@@ -175,12 +176,14 @@ void MessageProcess::ContainerProcess(
 }
 
 void MessageProcess::OnPerception(
+    DependencyInjector* injector,
     const perception::PerceptionObstacles& perception_obstacles,
     const std::shared_ptr<ContainerManager>& container_manager,
     EvaluatorManager* evaluator_manager, PredictorManager* predictor_manager,
     ScenarioManager* scenario_manager,
     PredictionObstacles* const prediction_obstacles) {
-  ContainerProcess(container_manager, perception_obstacles, scenario_manager);
+  ContainerProcess(injector, container_manager, perception_obstacles,
+                   scenario_manager);
 
   auto ptr_obstacles_container =
       container_manager->GetContainer<ObstaclesContainer>(
@@ -278,7 +281,7 @@ void MessageProcess::OnStoryTelling(ContainerManager* container_manager,
 }
 
 void MessageProcess::ProcessOfflineData(
-    const PredictionConf& prediction_conf,
+    DependencyInjector* injector, const PredictionConf& prediction_conf,
     const std::shared_ptr<ContainerManager>& container_manager,
     EvaluatorManager* evaluator_manager, PredictorManager* predictor_manager,
     ScenarioManager* scenario_manager, const std::string& record_filepath) {
@@ -298,8 +301,8 @@ void MessageProcess::ProcessOfflineData(
               message.channel_name, perception_obstacles, message.time);
         }
         PredictionObstacles prediction_obstacles;
-        OnPerception(perception_obstacles, container_manager, evaluator_manager,
-                     predictor_manager, scenario_manager,
+        OnPerception(injector, perception_obstacles, container_manager,
+                     evaluator_manager, predictor_manager, scenario_manager,
                      &prediction_obstacles);
         if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
           writer.WriteMessage<PredictionObstacles>(

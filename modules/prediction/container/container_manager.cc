@@ -27,9 +27,11 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManagerConfig;
 
-void ContainerManager::Init(const AdapterManagerConfig& config) {
+void ContainerManager::Init(DependencyInjector* injector,
+                            const AdapterManagerConfig& config) {
   config_.CopyFrom(config);
   RegisterContainers();
+  injector_ = injector;
 }
 
 void ContainerManager::RegisterContainers() {
@@ -46,7 +48,7 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
     const AdapterConfig::MessageType& type) {
   std::unique_ptr<Container> container_ptr(nullptr);
   if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
-    container_ptr.reset(new ObstaclesContainer());
+    container_ptr.reset(new ObstaclesContainer(injector_));
   } else if (type == AdapterConfig::LOCALIZATION) {
     container_ptr.reset(new PoseContainer());
   } else if (type == AdapterConfig::PLANNING_TRAJECTORY) {

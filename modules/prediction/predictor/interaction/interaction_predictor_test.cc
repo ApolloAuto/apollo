@@ -43,7 +43,8 @@ TEST_F(InteractionPredictorTest, OnLaneCase) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   MLPEvaluator mlp_evaluator;
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();

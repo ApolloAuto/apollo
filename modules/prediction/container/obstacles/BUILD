@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/filters:digital_filter",
-        "//modules/prediction/common:junction_analyzer",
+        "//modules/prediction/common:dependency_injector",
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
@@ -65,6 +65,7 @@ cc_test(
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
         "@com_google_googletest//:gtest_main",
+        "//modules/prediction/common:dependency_injector",
     ],
 )
 

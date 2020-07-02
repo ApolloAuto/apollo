@@ -24,6 +24,7 @@ namespace prediction {
 
 class ObstaclesContainerTest : public KMLMapBasedTest {
  public:
+  ObstaclesContainerTest() : container_(&injector_) {}
   virtual void SetUp() {
     const std::string file =
         "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
@@ -33,6 +34,7 @@ class ObstaclesContainerTest : public KMLMapBasedTest {
   }
 
  protected:
+  DependencyInjector injector_;
   ObstaclesContainer container_;
 };
 

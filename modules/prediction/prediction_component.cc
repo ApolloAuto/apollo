@@ -20,7 +20,6 @@
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -80,8 +79,9 @@ bool PredictionComponent::Init() {
   ADEBUG << "Prediction config file is loaded into: "
          << prediction_conf.ShortDebugString();
 
-  if (!MessageProcess::Init(container_manager_.get(), evaluator_manager_.get(),
-                            predictor_manager_.get(), prediction_conf)) {
+  if (!MessageProcess::Init(&injector_, container_manager_.get(),
+                            evaluator_manager_.get(), predictor_manager_.get(),
+                            prediction_conf)) {
     return false;
   }
 
@@ -150,7 +150,8 @@ bool PredictionComponent::ContainerSubmoduleProcess(
                                    *ptr_storytelling_msg);
   }
 
-  MessageProcess::ContainerProcess(container_manager_, *perception_obstacles,
+  MessageProcess::ContainerProcess(&injector_, container_manager_,
+                                   *perception_obstacles,
                                    scenario_manager_.get());
 
   auto obstacles_container_ptr =
@@ -231,7 +232,7 @@ bool PredictionComponent::PredictionEndToEndProc(
   auto perception_msg = *perception_obstacles;
   PredictionObstacles prediction_obstacles;
   MessageProcess::OnPerception(
-      perception_msg, container_manager_, evaluator_manager_.get(),
+      &injector_, perception_msg, container_manager_, evaluator_manager_.get(),
       predictor_manager_.get(), scenario_manager_.get(), &prediction_obstacles);
   auto end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;

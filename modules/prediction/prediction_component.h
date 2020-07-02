@@ -30,6 +30,7 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/submodules/submodule_output.h"
 #include "modules/storytelling/proto/story.pb.h"
+#include "modules/prediction/common/dependency_injector.h"
 
 /**
  * @namespace apollo::prediction
@@ -104,6 +105,8 @@ class PredictionComponent
   std::unique_ptr<PredictorManager> predictor_manager_;
 
   std::unique_ptr<ScenarioManager> scenario_manager_;
+
+  DependencyInjector injector_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)

@@ -22,6 +22,7 @@
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
+#include "modules/prediction/common/dependency_injector.h"
 
 namespace apollo {
 namespace prediction {
@@ -56,8 +57,8 @@ TEST_F(PredictorManagerTest, General) {
       cyber::common::GetProtoFromFile(conf_file, &adapter_conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
-
-  container_manager_->Init(adapter_conf_);
+  DependencyInjector injector;
+  container_manager_->Init(&injector, adapter_conf_);
   evaluator_manager_->Init(prediction_conf_);
   predictor_manager_->Init(prediction_conf_);
 

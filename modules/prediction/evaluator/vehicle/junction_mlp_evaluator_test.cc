@@ -33,11 +33,12 @@ class JunctionMLPEvaluatorTest : public KMLMapBasedTest {
         "single_perception_vehicle_injunction.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
     FLAGS_enable_all_junction = true;
-    JunctionAnalyzer::Init("j2");
+    injector_.GetJunctionAnalyzer()->Init("j2");
   }
 
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
+  DependencyInjector injector_;
 };
 
 TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
@@ -47,7 +48,7 @@ TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   JunctionMLPEvaluator junction_mlp_evaluator;
-  ObstaclesContainer container;
+  ObstaclesContainer container(&injector_);
   container.Insert(perception_obstacles_);
   container.BuildJunctionFeature();
   Obstacle* obstacle_ptr = container.GetObstacle(1);

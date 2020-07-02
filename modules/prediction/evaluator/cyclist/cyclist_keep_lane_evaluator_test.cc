@@ -42,7 +42,8 @@ TEST_F(CyclistKeepLaneEvaluatorTest, OnLaneCase) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   CyclistKeepLaneEvaluator cyclist_keep_lane_evaluator;
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);

@@ -31,6 +31,7 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/dependency_injector.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
@@ -228,6 +229,8 @@ class Obstacle {
 
   PredictionObstacle GeneratePredictionObstacle();
 
+  void SetInjector(DependencyInjector* injector) { injector_ = injector; }
+
  private:
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
                  double timestamp, Feature* feature);
@@ -326,6 +329,8 @@ class Obstacle {
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
 
   ObstacleConf obstacle_conf_;
+
+  DependencyInjector* injector_ = nullptr;
 };
 
 }  // namespace prediction

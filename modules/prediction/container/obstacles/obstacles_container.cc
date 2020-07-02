@@ -32,11 +32,12 @@ namespace prediction {
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-ObstaclesContainer::ObstaclesContainer()
-    : ptr_obstacles_(FLAGS_max_num_obstacles) {}
+ObstaclesContainer::ObstaclesContainer(DependencyInjector* injector)
+    : ptr_obstacles_(FLAGS_max_num_obstacles), injector_(injector) {}
 
-ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
-    : ptr_obstacles_(FLAGS_max_num_obstacles) {
+ObstaclesContainer::ObstaclesContainer(DependencyInjector* injector,
+                                       const SubmoduleOutput& submodule_output)
+    : ptr_obstacles_(FLAGS_max_num_obstacles), injector_(injector) {
   for (const Obstacle& obstacle : submodule_output.curr_frame_obstacles()) {
     // Deep copy of obstacle is needed for modification
     std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(obstacle));
@@ -244,6 +245,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
       AERROR << "Failed to insert obstacle into container";
       return;
     }
+    ptr_obstacle->SetInjector(injector_);
     ptr_obstacles_.Put(id, std::move(ptr_obstacle));
     ADEBUG << "Insert obstacle [" << id << "]";
   }
@@ -270,6 +272,7 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
       AERROR << "Failed to insert obstacle into container";
       return;
     }
+    ptr_obstacle->SetInjector(injector_);
     ptr_obstacles_.Put(id, std::move(ptr_obstacle));
   }
 }
@@ -314,7 +317,8 @@ void ObstaclesContainer::BuildJunctionFeature() {
       AERROR << "Null obstacle found.";
       continue;
     }
-    const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
+    const std::string& junction_id =
+        injector_->GetJunctionAnalyzer()->GetJunctionId();
     if (obstacle_ptr->IsInJunction(junction_id)) {
       ADEBUG << "Build junction feature for obstacle [" << obstacle_ptr->id()
              << "] in junction [" << junction_id << "]";

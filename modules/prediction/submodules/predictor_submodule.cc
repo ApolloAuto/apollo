@@ -63,7 +63,7 @@ bool PredictorSubmodule::Proc(
   const apollo::common::ErrorCode& perception_error_code =
       perception_obstacles->error_code();
   const absl::Time& frame_start_time = submodule_output->frame_start_time();
-  ObstaclesContainer obstacles_container(*submodule_output);
+  ObstaclesContainer obstacles_container(&injector_, *submodule_output);
   predictor_manager_->Run(*perception_obstacles, adc_trajectory_container.get(),
                           &obstacles_container);
   PredictionObstacles prediction_obstacles =

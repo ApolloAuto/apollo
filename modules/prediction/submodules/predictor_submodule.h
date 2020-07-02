@@ -29,6 +29,7 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/submodules/submodule_output.h"
+#include "modules/prediction/common/dependency_injector.h"
 
 namespace apollo {
 namespace prediction {
@@ -67,6 +68,8 @@ class PredictorSubmodule
   std::shared_ptr<cyber::Writer<PredictionObstacles>> predictor_writer_;
 
   std::unique_ptr<PredictorManager> predictor_manager_;
+
+  DependencyInjector injector_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictorSubmodule)

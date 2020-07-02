@@ -41,7 +41,8 @@ TEST_F(PedestrianInteractionEvaluatorTest, Evaluate) {
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 101);
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(101);
   EXPECT_NE(obstacle_ptr, nullptr);

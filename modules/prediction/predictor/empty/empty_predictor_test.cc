@@ -44,7 +44,8 @@ TEST_F(EmptyPredictorTest, General) {
   EXPECT_EQ(perception_obstacle.id(), 1);
 
   MLPEvaluator evaluator;
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);

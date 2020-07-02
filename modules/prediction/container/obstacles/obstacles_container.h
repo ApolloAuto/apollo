@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"
+#include "modules/prediction/common/dependency_injector.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -39,12 +40,13 @@ class ObstaclesContainer : public Container {
   /**
    * @brief Constructor
    */
-  ObstaclesContainer();
+  explicit ObstaclesContainer(DependencyInjector* injector);
 
   /**
    * @brief Constructor from container output
    */
-  explicit ObstaclesContainer(const SubmoduleOutput& submodule_output);
+  explicit ObstaclesContainer(DependencyInjector* injector,
+                              const SubmoduleOutput& submodule_output);
 
   /**
    * @brief Destructor
@@ -157,6 +159,7 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
   Scenario curr_scenario_;
+  DependencyInjector* injector_;
 };
 
 }  // namespace prediction

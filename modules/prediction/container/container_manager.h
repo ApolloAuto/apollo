@@ -26,8 +26,8 @@
 
 #include "cyber/common/macros.h"
 #include "gtest/gtest.h"
-
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/prediction/common/dependency_injector.h"
 #include "modules/prediction/container/container.h"
 
 /**
@@ -48,7 +48,8 @@ class ContainerManager {
    * @brief Container manager initialization
    * @param Adapter config
    */
-  void Init(const common::adapter::AdapterManagerConfig &config);
+  void Init(DependencyInjector *injector,
+            const common::adapter::AdapterManagerConfig &config);
 
   /**
    * @brief Get mutable container
@@ -92,6 +93,8 @@ class ContainerManager {
   std::unordered_map<int, std::unique_ptr<Container>> containers_;
 
   common::adapter::AdapterManagerConfig config_;
+
+  DependencyInjector *injector_;
 };
 
 }  // namespace prediction

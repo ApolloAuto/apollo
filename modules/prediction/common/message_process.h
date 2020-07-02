@@ -24,9 +24,9 @@
 #include <string>
 
 #include "cyber/proto/record.pb.h"
-
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/common/dependency_injector.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
@@ -42,12 +42,14 @@ class MessageProcess {
  public:
   MessageProcess() = delete;
 
-  static bool Init(ContainerManager *container_manager,
+  static bool Init(DependencyInjector *injector,
+                   ContainerManager *container_manager,
                    EvaluatorManager *evaluator_manager,
                    PredictorManager *predictor_manager,
                    const PredictionConf &prediction_conf);
 
-  static bool InitContainers(ContainerManager *container_manager);
+  static bool InitContainers(DependencyInjector *injector,
+                             ContainerManager *container_manager);
 
   static bool InitEvaluators(EvaluatorManager *evaluator_manager,
                              const PredictionConf &prediction_conf);
@@ -56,11 +58,13 @@ class MessageProcess {
                              const PredictionConf &prediction_conf);
 
   static void ContainerProcess(
+      DependencyInjector *injector,
       const std::shared_ptr<ContainerManager> &container_manager,
       const perception::PerceptionObstacles &perception_obstacles,
       ScenarioManager *scenario_manger);
 
   static void OnPerception(
+      DependencyInjector *injector,
       const perception::PerceptionObstacles &perception_obstacles,
       const std::shared_ptr<ContainerManager> &container_manager,
       EvaluatorManager *evaluator_manager, PredictorManager *predictor_manager,
@@ -78,7 +82,7 @@ class MessageProcess {
                              const storytelling::Stories &story);
 
   static void ProcessOfflineData(
-      const PredictionConf &prediction_conf,
+      DependencyInjector *injector, const PredictionConf &prediction_conf,
       const std::shared_ptr<ContainerManager> &container_manager,
       EvaluatorManager *evaluator_manager, PredictorManager *predictor_manager,
       ScenarioManager *scenario_manager, const std::string &record_filepath);

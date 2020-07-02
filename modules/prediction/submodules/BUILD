@@ -34,6 +34,7 @@ cc_library(
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/common:dependency_injector",
     ],
     alwayslink = True,
 )
@@ -64,6 +65,7 @@ cc_library(
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/common:dependency_injector",
     ],
     alwayslink = True,
 )

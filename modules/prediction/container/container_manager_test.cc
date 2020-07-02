@@ -39,8 +39,8 @@ TEST_F(ContainerManagerTest, GetContainer) {
   bool ret_load_conf = cyber::common::GetProtoFromFile(conf_file, &conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(conf_.IsInitialized());
-
-  manager_->Init(conf_);
+  DependencyInjector injector;
+  manager_->Init(&injector, conf_);
   EXPECT_TRUE(manager_->GetContainer<ObstaclesContainer>(
                   AdapterConfig::PERCEPTION_OBSTACLES) != nullptr);
   EXPECT_TRUE(manager_->GetContainer<PoseContainer>(

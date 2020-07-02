@@ -223,6 +223,7 @@ cc_library(
         "//modules/prediction/proto:offline_features_proto",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/util:data_extraction",
+        ":dependency_injector",
     ],
 )
 
@@ -271,6 +272,14 @@ cc_library(
 cc_library(
     name = "prediction_constants",
     hdrs = ["prediction_constants.h"],
+)
+
+cc_library(
+    name = "dependency_injector",
+    hdrs = ["dependency_injector.h"],
+    deps = [
+        ":junction_analyzer",
+    ],
 )
 
 cpplint()

@@ -14,9 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/file.h"
-
 #include "absl/strings/str_split.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -51,9 +50,10 @@ void GenerateDataForLearning() {
   EvaluatorManager evaluator_manager;
   PredictorManager predictor_manager;
   ScenarioManager scenario_manager;
-
-  if (!MessageProcess::Init(container_manager.get(), &evaluator_manager,
-                            &predictor_manager, prediction_conf)) {
+  DependencyInjector injector;
+  if (!MessageProcess::Init(&injector, container_manager.get(),
+                            &evaluator_manager, &predictor_manager,
+                            prediction_conf)) {
     return;
   }
   const std::vector<std::string> inputs =
@@ -67,9 +67,9 @@ void GenerateDataForLearning() {
     for (std::size_t i = 0; i < offline_bags.size(); ++i) {
       AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
-      MessageProcess::ProcessOfflineData(prediction_conf, container_manager,
-                                         &evaluator_manager, &predictor_manager,
-                                         &scenario_manager, offline_bags[i]);
+      MessageProcess::ProcessOfflineData(
+          &injector, prediction_conf, container_manager, &evaluator_manager,
+          &predictor_manager, &scenario_manager, offline_bags[i]);
     }
   }
   FeatureOutput::Close();

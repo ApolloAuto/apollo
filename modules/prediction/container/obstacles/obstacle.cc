@@ -20,12 +20,12 @@
 #include <iomanip>
 #include <limits>
 
+#include "modules/common/util/util.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
-#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace prediction {
@@ -51,17 +51,13 @@ bool IsClosed(const double x0, const double y0, const double theta0,
 
 }  // namespace
 
-PerceptionObstacle::Type Obstacle::type() const {
-  return type_;
-}
+PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
 bool Obstacle::IsPedestrian() const {
   return type_ == PerceptionObstacle::PEDESTRIAN;
 }
 
-int Obstacle::id() const {
-  return id_;
-}
+int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
   ACHECK(!feature_history_.empty());
@@ -94,9 +90,7 @@ Feature* Obstacle::mutable_latest_feature() {
   return &(feature_history_.front());
 }
 
-size_t Obstacle::history_size() const {
-  return feature_history_.size();
-}
+size_t Obstacle::history_size() const { return feature_history_.size(); }
 
 bool Obstacle::IsStill() {
   if (feature_history_.size() > 0) {
@@ -251,7 +245,8 @@ void Obstacle::BuildJunctionFeature() {
     return;
   }
   // If obstacle is not in the given junction, then exit.
-  const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
+  const std::string& junction_id =
+      injector_->GetJunctionAnalyzer()->GetJunctionId();
   if (!IsInJunction(junction_id)) {
     ADEBUG << "Obstacle [" << id_ << "] is not in junction [" << junction_id
            << "]";
@@ -303,7 +298,7 @@ bool Obstacle::IsCloseToJunctionExit() const {
 void Obstacle::SetJunctionFeatureWithEnterLane(const std::string& enter_lane_id,
                                                Feature* const feature_ptr) {
   feature_ptr->mutable_junction_feature()->CopyFrom(
-      JunctionAnalyzer::GetJunctionFeature(enter_lane_id));
+      injector_->GetJunctionAnalyzer()->GetJunctionFeature(enter_lane_id));
 }
 
 void Obstacle::SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr) {
@@ -333,7 +328,7 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr) {
   }
   // TODO(kechxu) Maybe output all exits if no start lane found
   feature_ptr->mutable_junction_feature()->CopyFrom(
-      JunctionAnalyzer::GetJunctionFeature(start_lane_ids));
+      injector_->GetJunctionAnalyzer()->GetJunctionFeature(start_lane_ids));
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
@@ -781,8 +776,8 @@ void Obstacle::SetSurroundingLaneIds(Feature* feature, const double radius) {
     feature->add_surrounding_lane_id(lane_id);
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane_id);
-    if (lane_info->IsOnLane({feature->position().x(),
-                             feature->position().y()})) {
+    if (lane_info->IsOnLane(
+            {feature->position().x(), feature->position().y()})) {
       feature->add_within_lane_id(lane_id);
     }
   }

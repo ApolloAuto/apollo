@@ -48,7 +48,8 @@ TEST_F(EvaluatorManagerTest, General) {
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
   ContainerManager container_manager;
-  container_manager.Init(adapter_conf_);
+  DependencyInjector injector;
+  container_manager.Init(&injector, adapter_conf_);
   auto obstacles_container =
       container_manager.GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);

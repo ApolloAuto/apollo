@@ -20,6 +20,7 @@
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/common/dependency_injector.h"
 
 namespace apollo {
 namespace prediction {
@@ -45,7 +46,8 @@ TEST_F(FreeMovePredictorTest, General) {
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 15);
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
@@ -60,7 +62,8 @@ TEST_F(FreeMovePredictorTest, Pedestrian) {
       ::apollo::perception::PerceptionObstacle::PEDESTRIAN);
   apollo::perception::PerceptionObstacle perception_obstacle =
       perception_obstacles_.perception_obstacle(0);
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);

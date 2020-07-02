@@ -42,7 +42,8 @@ TEST_F(CruiseMLPEvaluatorTest, OnLaneCase) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   CruiseMLPEvaluator cruise_mlp_evaluator;
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);

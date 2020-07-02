@@ -43,7 +43,8 @@ TEST_F(SingleLanePredictorTest, OnLaneCase) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 1);
   CostEvaluator cost_evaluator;
-  ObstaclesContainer container;
+  DependencyInjector injector;
+  ObstaclesContainer container(&injector);
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   ADCTrajectoryContainer adc_trajectory_container;
