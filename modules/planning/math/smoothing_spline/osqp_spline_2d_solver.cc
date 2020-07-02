@@ -147,7 +147,8 @@ bool OsqpSpline2dSolver::Solve() {
 
   // Setup workspace
   OSQPWorkspace* work = nullptr;
-  osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
+  // osqp_setup(&work, data, settings);
 
   // Solve Problem
   osqp_solve(work);
