@@ -33,10 +33,12 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
 ObstaclesContainer::ObstaclesContainer()
-    : ptr_obstacles_(FLAGS_max_num_obstacles) {}
+    : ptr_obstacles_(FLAGS_max_num_obstacles),
+      clusters_(new ObstacleClusters()) {}
 
 ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
-    : ptr_obstacles_(FLAGS_max_num_obstacles) {
+    : ptr_obstacles_(FLAGS_max_num_obstacles),
+      clusters_(new ObstacleClusters()) {
   for (const Obstacle& obstacle : submodule_output.curr_frame_obstacles()) {
     // Deep copy of obstacle is needed for modification
     std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(obstacle));
@@ -140,10 +142,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
          << timestamp_ << "]";
 
   // Set up the ObstacleClusters:
-  // 1. Initialize ObstacleClusters
-  ObstacleClusters::Init();
-
-  // 2. Insert the Obstacles one by one
+  // Insert the Obstacles one by one
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
@@ -154,7 +153,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 
   SetConsideredObstacleIds();
-  ObstacleClusters::SortObstacles();
+  clusters_->SortObstacles();
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
@@ -239,7 +238,8 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     obstacle_ptr->Insert(perception_obstacle, timestamp, id);
     ADEBUG << "Refresh obstacle [" << id << "]";
   } else {
-    auto ptr_obstacle = Obstacle::Create(perception_obstacle, timestamp, id);
+    auto ptr_obstacle =
+        Obstacle::Create(perception_obstacle, timestamp, id, clusters_.get());
     if (ptr_obstacle == nullptr) {
       AERROR << "Failed to insert obstacle into container";
       return;
@@ -265,7 +265,7 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->InsertFeature(feature);
   } else {
-    auto ptr_obstacle = Obstacle::Create(feature);
+    auto ptr_obstacle = Obstacle::Create(feature, clusters_.get());
     if (ptr_obstacle == nullptr) {
       AERROR << "Failed to insert obstacle into container";
       return;
@@ -366,6 +366,10 @@ SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput(
 
 const Scenario& ObstaclesContainer::curr_scenario() const {
   return curr_scenario_;
+}
+
+ObstacleClusters* ObstaclesContainer::GetClustersPtr() const {
+  return clusters_.get();
 }
 
 }  // namespace prediction
