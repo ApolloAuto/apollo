@@ -63,7 +63,7 @@ RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_google_styleguide.sh
 RUN bash /tmp/installers/install_gpu_caffe.sh
 RUN bash /tmp/installers/install_ipopt.sh
-RUN bash /tmp/installers/install_osqp.sh
+RUN bash /tmp/installers/install_temp_osqp.sh # FIXME(planning)
 RUN bash /tmp/installers/install_libjsonrpc-cpp.sh
 RUN bash /tmp/installers/install_nlopt.sh
 RUN bash /tmp/installers/install_node.sh
