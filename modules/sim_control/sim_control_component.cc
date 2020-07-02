@@ -107,14 +107,14 @@ void SimControlComponent::InitTimerAndIO() {
 }
 
 void SimControlComponent::InitState(bool set_start_point, double start_velocity,
-                               double start_acceleration) {
+                                    double start_acceleration) {
   if (set_start_point && !FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
 }
 
 void SimControlComponent::InitStartPoint(double start_velocity,
-                                    double start_acceleration) {
+                                         double start_acceleration) {
   TrajectoryPoint point;
   // fall back to a dummy point from map
   start_point_from_localization_ = false;
@@ -131,6 +131,7 @@ void SimControlComponent::InitStartPoint(double start_velocity,
   map_service_.GetPoseWithRegardToLane(start_point.x(), start_point.y(), &theta,
                                        &s);
   point.mutable_path_point()->set_theta(theta);
+  point.mutable_path_point()->set_kappa(0.0);
   point.set_v(start_velocity);
   point.set_a(start_acceleration);
 
@@ -202,6 +203,7 @@ void SimControlComponent::OnRoutingResponse(
     map_service_.GetPoseWithRegardToLane(start_pose.x(), start_pose.y(), &theta,
                                          &s);
     point.mutable_path_point()->set_theta(theta);
+    point.mutable_path_point()->set_kappa(0.0);
     SetStartPoint(point);
   }
 }
@@ -277,7 +279,7 @@ void SimControlComponent::OnPlanning(
 
 void SimControlComponent::OnLocalization(
     const std::shared_ptr<localization::LocalizationEstimate>& localization) {
-  static const char* kSimControlHeaderName = "SimControl";
+  static const char* kSimControlHeaderName = "SimControlComponent";
   if (localization->has_header() && localization->header().has_module_name() &&
       kSimControlHeaderName == localization->header().module_name()) {
     return;
@@ -300,7 +302,7 @@ void SimControlComponent::OnLocalization(
 
   // Calculate the magnitude of the acceleration
   const double magnitude = std::hypot(pose.linear_acceleration().x(),
-                                pose.linear_acceleration().y());
+                                      pose.linear_acceleration().y());
   point.set_a(std::signbit(projection) ? -magnitude : magnitude);
 
   SetStartPoint(point);
@@ -325,8 +327,8 @@ void SimControlComponent::Proc() {
   PublishLocalization(trajectory_point);
 }
 
-bool SimControlComponent::PerfectControlModel(TrajectoryPoint* point,
-                                         Chassis::GearPosition* gear_position) {
+bool SimControlComponent::PerfectControlModel(
+    TrajectoryPoint* point, Chassis::GearPosition* gear_position) {
   // Result of the interpolation.
   auto current_time = Clock::NowInSeconds();
   const auto& trajectory = current_trajectory_->trajectory_point();
@@ -377,7 +379,7 @@ bool SimControlComponent::PerfectControlModel(TrajectoryPoint* point,
 }
 
 void SimControlComponent::PublishChassis(double cur_speed,
-                                    Chassis::GearPosition gear_position) {
+                                         Chassis::GearPosition gear_position) {
   auto chassis = std::make_shared<Chassis>();
   FillHeader("SimControlComponent", chassis.get());
 
@@ -397,6 +399,13 @@ void SimControlComponent::PublishChassis(double cur_speed,
 }
 
 void SimControlComponent::PublishLocalization(const TrajectoryPoint& point) {
+  ACHECK(point.has_path_point());
+  ACHECK(point.path_point().has_x());
+  ACHECK(point.path_point().has_y());
+  ACHECK(point.path_point().has_theta());
+  ACHECK(point.has_a());
+  ACHECK(point.has_v());
+
   auto localization = std::make_shared<LocalizationEstimate>();
   FillHeader("SimControlComponent", localization.get());
 
@@ -441,8 +450,9 @@ void SimControlComponent::PublishLocalization(const TrajectoryPoint& point) {
   // frame
   pose->mutable_angular_velocity()->set_x(0);
   pose->mutable_angular_velocity()->set_y(0);
-  pose->mutable_angular_velocity()->set_z(point.v() *
-                                          point.path_point().kappa());
+  pose->mutable_angular_velocity()->set_z(
+      point.path_point().has_kappa() ? point.v() * point.path_point().kappa()
+                                     : 0.0);
 
   TransformToVRF(pose->angular_velocity(), pose->orientation(),
                  pose->mutable_angular_velocity_vrf());
