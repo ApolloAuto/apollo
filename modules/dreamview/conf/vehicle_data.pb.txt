@@ -7,8 +7,8 @@ data_files {
   dest_path: "/apollo/modules/control/conf/control_conf.pb.txt"
 }
 data_files {
-  source_path: "cancard_params/canbus_conf.pb.txt"
-  dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
+  source_path: "cancard_params"
+  dest_path: "/apollo/modules/canbus/conf"
 }
 data_files {
   source_path: "dreamview_conf/data_collection_table.pb.txt"
@@ -121,6 +121,10 @@ data_files {
 data_files {
   source_path: "localization_conf"
   dest_path: "/apollo/modules/localization/conf"
+}
+data_files {
+  source_path: "localization_dag"
+  dest_path: "/apollo/modules/localization/dag"
 }
 data_files {
   source_path: "perception_dag"
