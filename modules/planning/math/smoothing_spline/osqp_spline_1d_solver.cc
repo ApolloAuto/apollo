@@ -148,7 +148,8 @@ bool OsqpSpline1dSolver::Solve() {
   data_->l = l;
   data_->u = u;
 
-  osqp_setup(&work_, data_, settings_);
+  // osqp_setup(&work_, data_, settings_);
+  work_ = osqp_setup(data_, settings_);
 
   // Solve Problem
   osqp_solve(work_);

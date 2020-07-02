@@ -92,7 +92,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   settings->max_iter = max_iter;
 
   OSQPWorkspace* osqp_work = nullptr;
-  osqp_setup(&osqp_work, data, settings);
+  osqp_work = osqp_setup(data, settings);
+  // osqp_setup(&osqp_work, data, settings);
 
   osqp_solve(osqp_work);
 

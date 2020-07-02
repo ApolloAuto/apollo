@@ -209,7 +209,8 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
 
   // Workspace
   OSQPWorkspace* work = nullptr;
-  osqp_setup(&work, data, settings);
+  // osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
 
   // Solve Problem
   osqp_solve(work);

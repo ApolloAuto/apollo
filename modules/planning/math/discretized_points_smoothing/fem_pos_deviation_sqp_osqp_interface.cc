@@ -113,7 +113,8 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
 
   // Define osqp workspace
   OSQPWorkspace* work = nullptr;
-  osqp_setup(&work, data, settings);
+  // osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
 
   // Initial solution
   bool initial_solve_res = OptimizeWithOsqp(primal_warm_start, &work);
