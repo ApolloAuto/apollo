@@ -56,6 +56,7 @@
 
 #pragma once
 
+#include <cmath>  // for std::isfinite
 #include <limits>
 #include <map>
 #include <vector>
@@ -369,9 +370,9 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {
         if (!input_->is_dense) {
           // Check if the point is invalid
-          if (!pcl_isfinite(input_->points[cp].x) ||
-              !pcl_isfinite(input_->points[cp].y) ||
-              !pcl_isfinite(input_->points[cp].z)) {
+          if (!std::isfinite(input_->points[cp].x) ||
+              !std::isfinite(input_->points[cp].y) ||
+              !std::isfinite(input_->points[cp].z)) {
             continue;
           }
         }
@@ -455,9 +456,9 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {
         if (!input_->is_dense) {
           // Check if the point is invalid
-          if (!pcl_isfinite(input_->points[cp].x) ||
-              !pcl_isfinite(input_->points[cp].y) ||
-              !pcl_isfinite(input_->points[cp].z)) {
+          if (!std::isfinite(input_->points[cp].x) ||
+              !std::isfinite(input_->points[cp].y) ||
+              !std::isfinite(input_->points[cp].z)) {
             continue;
           }
         }
