@@ -1,0 +1,24 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/hesai/libhesai_driver_component.so"
+    components {
+        class_name : "HesaiComponent"
+        config {
+          name : "hesai40p_driver"
+          config_file_path : "/apollo/modules/drivers/hesai/conf/hesai40p.pb.txt"
+        }
+    }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "hesai40p_compensator"
+        config_file_path : "/apollo/modules/drivers/hesai/conf/hesai40p_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/hesai40/PointCloud2"}
+      }
+    }
+}
+
+
