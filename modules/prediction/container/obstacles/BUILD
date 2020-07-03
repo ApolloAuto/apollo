@@ -18,6 +18,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/submodules:submodule_output",
+        "//modules/prediction/common:junction_analyzer",
     ],
 )
 
