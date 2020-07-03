@@ -22,6 +22,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # Fail on first error.
 set -e
 
+TENSORRT_NEEDED=0
+
 ##===== Install CUDA 10.2 =====##
 VERSION_1="10-2"
 VERSION_2="10.2.89"
@@ -66,19 +68,29 @@ for pkg in ${CUDNN_PKGS}; do
 done
 
 for pkg in ${CUDNN_PKGS}; do
-    sudo dpkg -i "${pkg}"
+    dpkg -i "${pkg}"
     rm -rf ${pkg}
 done
 
 info "Successfully installed CUDNN ${MAJOR}"
 
-##===== Install TensorRT 7 =====##
+# Install pre-reqs for TensorRT from local CUDA repo
 
-# Install PreReqs from local CUDA repo
 apt-get -y install \
     libcublas10 \
     libcublas-dev
 
+# Kick the ladder and cleanup
+apt-get -y purge "cuda-repo-l4t-${VERSION_1}-local-${VERSION_2}"
+
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+if [ "${TENSORRT_NEEDED}" -eq 0 ]; then
+    exit 0
+fi
+
+CUDA_VER="10.2"
 TRT_VER1="7.1.0-1"
 MAJOR="${TRT_VER1%%.*}"
 TRT_VERSION="${TRT_VER1}+cuda${CUDA_VER}"
@@ -107,7 +119,7 @@ dpkg -i ${TRT_PKGS}
 
 info "Successfully installed TensorRT ${MAJOR}"
 
-# Kick the ladder and cleanup
-apt-get -y purge "cuda-repo-l4t-${VERSION_1}-local-${VERSION_2}"
+rm -rf ${TRT_PKGS}
+
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
