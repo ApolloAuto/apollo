@@ -78,6 +78,10 @@ apt-get -y update && \
     zip     \
     xz-utils
 
+if [[ "${ARCH}" == "aarch64" ]]; then
+    apt-get -y install kmod
+fi
+
 ##----------------##
 ##    SUDO        ##
 ##----------------##
