@@ -22,10 +22,15 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
-OSQP_VER="0.6.0"
+OSQP_VER="0.5.0"
+# OSQP_VER="0.6.0"
 PKG_NAME_OSQP="osqp-${OSQP_VER}.tar.gz"
-CHECKSUM="6e00d11d1f88c1e32a4419324b7539b89e8f9cbb1c50afe69f375347c989ba2b"
-DOWNLOAD_LINK="https://github.com/oxfordcontrol/osqp/archive/v0.6.0.tar.gz"
+# FOR 0.6.0
+#CHECKSUM="6e00d11d1f88c1e32a4419324b7539b89e8f9cbb1c50afe69f375347c989ba2b"
+
+CHECKSUM="e0932d1f7bc56dbe526bee4a81331c1694d94c570f8ac6a6cb413f38904e0f64"
+
+DOWNLOAD_LINK="https://github.com/oxfordcontrol/osqp/archive/v${VERSION}.tar.gz"
 download_if_not_cached "${PKG_NAME_OSQP}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xzf "${PKG_NAME_OSQP}"

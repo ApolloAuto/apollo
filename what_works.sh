@@ -89,7 +89,8 @@ bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
     except //modules/prediction/common:road_graph_test \
 )
 
-# Planning: 7(osqp-0.6.0) or 1(osqp-0.4.1) test failures
+# Planning: 1 test failures
+# osqp downgraded to 0.5.0 to avoid breaking changes in osqp-0.6.0
 bazel_test_with_dist_cache $(bazel query //modules/planning/... \
     except //modules/planning/learning_based/model_inference:model_inference_test   \
 )
