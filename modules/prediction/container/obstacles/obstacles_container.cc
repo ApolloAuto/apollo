@@ -42,12 +42,14 @@ ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
   for (const Obstacle& obstacle : submodule_output.curr_frame_obstacles()) {
     // Deep copy of obstacle is needed for modification
     std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(obstacle));
+    ptr_obstacle->SetJunctionAnalyzer(&junction_analyzer_);
     ptr_obstacles_.Put(obstacle.id(), std::move(ptr_obstacle));
   }
 
   Obstacle ego_vehicle = submodule_output.GetEgoVehicle();
   std::unique_ptr<Obstacle> ptr_ego_vehicle(
       new Obstacle(std::move(ego_vehicle)));
+  ptr_ego_vehicle->SetJunctionAnalyzer(&junction_analyzer_);
   ptr_obstacles_.Put(ego_vehicle.id(), std::move(ptr_ego_vehicle));
 
   curr_frame_movable_obstacle_ids_ =
@@ -244,6 +246,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
       AERROR << "Failed to insert obstacle into container";
       return;
     }
+    ptr_obstacle->SetJunctionAnalyzer(&junction_analyzer_);
     ptr_obstacles_.Put(id, std::move(ptr_obstacle));
     ADEBUG << "Insert obstacle [" << id << "]";
   }
@@ -270,6 +273,7 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
       AERROR << "Failed to insert obstacle into container";
       return;
     }
+    ptr_obstacle->SetJunctionAnalyzer(&junction_analyzer_);
     ptr_obstacles_.Put(id, std::move(ptr_obstacle));
   }
 }
@@ -314,7 +318,7 @@ void ObstaclesContainer::BuildJunctionFeature() {
       AERROR << "Null obstacle found.";
       continue;
     }
-    const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
+    const std::string& junction_id = junction_analyzer_.GetJunctionId();
     if (obstacle_ptr->IsInJunction(junction_id)) {
       ADEBUG << "Build junction feature for obstacle [" << obstacle_ptr->id()
              << "] in junction [" << junction_id << "]";
@@ -370,6 +374,9 @@ const Scenario& ObstaclesContainer::curr_scenario() const {
 
 ObstacleClusters* ObstaclesContainer::GetClustersPtr() const {
   return clusters_.get();
+}
+JunctionAnalyzer* ObstaclesContainer::GetJunctionAnalyzer() {
+  return &junction_analyzer_;
 }
 
 }  // namespace prediction
