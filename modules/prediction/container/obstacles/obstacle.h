@@ -337,11 +337,8 @@ class Obstacle {
 
   ObstacleConf obstacle_conf_;
 
-<<<<<<< HEAD
   ObstacleClusters* clusters_ptr_ = nullptr;
-=======
   JunctionAnalyzer* junction_analyzer_;
->>>>>>> Master: prediction module clear the static function.
 };
 
 }  // namespace prediction
