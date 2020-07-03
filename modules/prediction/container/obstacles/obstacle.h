@@ -31,6 +31,7 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/feature.pb.h"
@@ -67,6 +68,10 @@ class Obstacle {
    * @brief Destructor
    */
   virtual ~Obstacle() = default;
+
+  void SetJunctionAnalyzer(JunctionAnalyzer* junction_analyzer) {
+    junction_analyzer_ = junction_analyzer;
+  }
 
   /**
    * @brief Insert a perception obstacle with its timestamp.
@@ -332,7 +337,11 @@ class Obstacle {
 
   ObstacleConf obstacle_conf_;
 
+<<<<<<< HEAD
   ObstacleClusters* clusters_ptr_ = nullptr;
+=======
+  JunctionAnalyzer* junction_analyzer_;
+>>>>>>> Master: prediction module clear the static function.
 };
 
 }  // namespace prediction
