@@ -16,12 +16,18 @@ set -e
 function config_noninteractive() {
     local bzl_cfg_file="${APOLLO_ROOT_DIR}/.apollo.bazelrc"
     echo "${STARTUP_TXT}" > "${bzl_cfg_file}"
-    determine_gpu_use
-    if [ "${USE_GPU}" -eq 1 ]; then
+    # determine_gpu_use
+    # FIXME(all): Disable gpu mode for aarch64 until we are ready.
+    if [ "$(uname -m)" = "aarch64" ]; then
         echo "build --config=gpu" >> "${bzl_cfg_file}"
     else
-        echo "build --config=cpu" >> "${bzl_cfg_file}"
+        if [ "${USE_GPU}" -eq 1 ]; then
+            echo "build --config=gpu" >> "${bzl_cfg_file}"
+        else
+            echo "build --config=cpu" >> "${bzl_cfg_file}"
+        fi
     fi
+
     cat "${APOLLO_ROOT_DIR}/tools/apollo.bazelrc.sample" >> "${bzl_cfg_file}"
 }
 
