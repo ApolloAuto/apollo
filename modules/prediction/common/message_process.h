@@ -24,7 +24,6 @@
 #include <string>
 
 #include "cyber/proto/record.pb.h"
-#include "cyber/record/record_reader.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/container/container_manager.h"
