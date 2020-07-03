@@ -269,7 +269,25 @@ function geo_specific_config() {
     fi
 }
 
-function determine_gpu_use() {
+function determine_gpu_use_aarch64() {
+    local use_gpu=0
+    if  lsmod | grep -q nvgpu ; then
+        use_gpu=1
+    fi
+    if [[ "${use_gpu}" -eq 1 ]]; then
+        local docker_version
+        docker_version="$(docker version --format '{{.Server.Version}}')"
+        if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
+            DOCKER_RUN_CMD="docker run --gpus all"
+        else
+            warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+            use_gpu=0
+        fi
+    fi
+    USE_GPU="${use_gpu}"
+}
+
+function determine_gpu_use_amd64() {
     # Check nvidia-driver and GPU device
     local nv_driver="nvidia-smi"
     if [ ! -x "$(command -v ${nv_driver} )" ]; then
@@ -306,6 +324,14 @@ function determine_gpu_use() {
     fi
 }
 
+function determine_gpu_use() {
+    if [[ "${HOST_ARCH}" == "x86_64" ]]; then
+        determine_gpu_use_amd64
+    else
+        determine_gpu_use_aarch64
+    fi
+
+}
 function setup_devices_and_mount_volumes() {
     local __retval="$1"
 

@@ -18,6 +18,8 @@
 TOP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
 source ${TOP_DIR}/scripts/apollo.bashrc
 
+HOST_ARCH="$(uname -m)"
+
 function set_lib_path() {
   local CYBER_SETUP="${APOLLO_ROOT_DIR}/cyber/setup.bash"
   [[ -e "${CYBER_SETUP}" ]] && . "${CYBER_SETUP}"
@@ -84,15 +86,20 @@ function find_device() {
   fi
 }
 
-function setup_device() {
-  if [ $(uname -s) != "Linux" ]; then
-    echo "Not on Linux, skip mapping devices."
-    return
+function setup_device_for_aarch64() {
+  local can_dev="/dev/can0"
+  if [ ! -e "${can_dev}" ]; then
+      warning "No CAN device named ${can_dev}. "
+      return
   fi
 
+  sudo ip link set can0 type can bitrate 500000
+  sudo ip link set can0 up
+}
+
+function setup_device_for_amd64() {
   # setup CAN device
-  for INDEX in `seq 0 3`
-  do
+  for INDEX in $(seq 0 3) ; do
     # soft link if sensorbox exist
     if [ -e /dev/zynq_can${INDEX} ] &&  [ ! -e /dev/can${INDEX} ]; then
       sudo ln -s /dev/zynq_can${INDEX} /dev/can${INDEX}
@@ -102,25 +109,36 @@ function setup_device() {
     fi
   done
 
-  if [ "$(uname -m)" == 'aarch64' ]; then
-    sudo ip link set can0 type can bitrate 500000
-    sudo ip link set can0 up
-  fi
-
   # setup nvidia device
   sudo /sbin/modprobe nvidia
   sudo /sbin/modprobe nvidia-uvm
   if [ ! -e /dev/nvidia0 ];then
+    info "mknod /dev/nvidia0"
     sudo mknod -m 666 /dev/nvidia0 c 195 0
   fi
   if [ ! -e /dev/nvidiactl ];then
+    info "mknod /dev/nvidiactl"
     sudo mknod -m 666 /dev/nvidiactl c 195 255
   fi
   if [ ! -e /dev/nvidia-uvm ];then
+    info "mknod /dev/nvidia-uvm"
     sudo mknod -m 666 /dev/nvidia-uvm c 243 0
   fi
   if [ ! -e /dev/nvidia-uvm-tools ];then
+    info "mknod /dev/nvidia-uvm-tools"
     sudo mknod -m 666 /dev/nvidia-uvm-tools c 243 1
+  fi
+}
+
+function setup_device() {
+  if [ "$(uname -s)" != "Linux" ]; then
+    info "Not on Linux, skip mapping devices."
+    return
+  fi
+  if [[ "${HOST_ARCH}" == "x86_64" ]]; then
+      setup_device_for_amd64
+  else
+      setup_device_for_aarch64
   fi
 }
 
