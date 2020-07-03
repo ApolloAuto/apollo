@@ -91,6 +91,7 @@ sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 ##----------------##
 ## Python Setings |
 ##----------------##
+update-alternatives --install /usr/bin/python python /usr/bin/python3 36
 
 if [[ "${MY_GEO}" == "cn" ]]; then
     # configure tsinghua's pypi mirror for x86_64 and aarch64

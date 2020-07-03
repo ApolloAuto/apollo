@@ -74,10 +74,6 @@ elif [ "$TARGET_ARCH" == "aarch64" ]; then
       apt-get -y install \
       build-essential openjdk-11-jdk python3 zip unzip
 
-    if [[ ! -e /usr/bin/python ]]; then
-        ln -s /usr/bin/python3 /usr/local/bin/python
-    fi
-
     PKG_NAME="bazel-${VERSION}-dist.zip"
     CHECKSUM="44ec129436f6de45f2230e14100104919443a1364c2491f5601666b358738bfa"
     DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}"
