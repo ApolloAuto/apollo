@@ -19,7 +19,7 @@ function config_noninteractive() {
     # determine_gpu_use
     # FIXME(all): Disable gpu mode for aarch64 until we are ready.
     if [ "$(uname -m)" = "aarch64" ]; then
-        echo "build --config=gpu" >> "${bzl_cfg_file}"
+        echo "build --config=cpu" >> "${bzl_cfg_file}"
     else
         if [ "${USE_GPU}" -eq 1 ]; then
             echo "build --config=gpu" >> "${bzl_cfg_file}"
