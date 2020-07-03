@@ -24,24 +24,26 @@ namespace prediction {
 class JunctionAnalyzerTest : public KMLMapBasedTest {};
 
 TEST_F(JunctionAnalyzerTest, SingleLane) {
-  JunctionAnalyzer::Init("j2");
-  EXPECT_NEAR(JunctionAnalyzer::ComputeJunctionRange(), 74.0306, 0.001);
+  JunctionAnalyzer junction_analyzer;
+  junction_analyzer.Init("j2");
+  EXPECT_NEAR(junction_analyzer.ComputeJunctionRange(), 74.0306, 0.001);
   const JunctionFeature& junction_feature =
-      JunctionAnalyzer::GetJunctionFeature("l61");
+      junction_analyzer.GetJunctionFeature("l61");
   EXPECT_EQ(junction_feature.junction_id(), "j2");
   EXPECT_EQ(junction_feature.enter_lane().lane_id(), "l61");
   EXPECT_GT(junction_feature.junction_exit_size(), 0);
-  JunctionAnalyzer::Clear();
+  junction_analyzer.Clear();
 }
 
 TEST_F(JunctionAnalyzerTest, MultiLane) {
-  JunctionAnalyzer::Init("j2");
+  JunctionAnalyzer junction_analyzer;
+  junction_analyzer.Init("j2");
   const JunctionFeature& merged_junction_feature =
-      JunctionAnalyzer::GetJunctionFeature(
+      junction_analyzer.GetJunctionFeature(
           std::vector<std::string>{"l35", "l61", "l114", "l162"});
   EXPECT_EQ(merged_junction_feature.junction_id(), "j2");
   EXPECT_EQ(merged_junction_feature.junction_exit_size(), 3);
-  JunctionAnalyzer::Clear();
+  junction_analyzer.Clear();
 }
 
 }  // namespace prediction

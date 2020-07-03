@@ -31,6 +31,7 @@
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/submodules/submodule_output.h"
+#include "modules/prediction/common/junction_analyzer.h"
 
 namespace apollo {
 namespace prediction {
@@ -145,6 +146,7 @@ class ObstaclesContainer : public Container {
    * @brief Get the raw pointer of clusters_
    */
   ObstacleClusters* GetClustersPtr() const;
+  JunctionAnalyzer* GetJunctionAnalyzer();
 
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
@@ -164,6 +166,7 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_considered_obstacle_ids_;
   Scenario curr_scenario_;
   std::unique_ptr<ObstacleClusters> clusters_;
+  JunctionAnalyzer junction_analyzer_;
 };
 
 }  // namespace prediction
