@@ -81,7 +81,7 @@ apt-get -y install \
     libcublas-dev
 
 # Kick the ladder and cleanup
-apt-get -y purge "cuda-repo-l4t-${VERSION_1}-local-${VERSION_2}"
+apt-get -y remove --purge "cuda-repo-l4t-${VERSION_1}-local-${VERSION_2}"
 
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
