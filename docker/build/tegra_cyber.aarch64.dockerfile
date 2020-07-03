@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:18.04
+FROM nvcr.io/nvidia/l4t-base:r32.4.2
 
 ARG BUILD_STAGE
 ARG GEOLOC
