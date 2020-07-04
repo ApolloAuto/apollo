@@ -4,4 +4,5 @@ package(
 
 exports_files([
     "CPPLINT.cfg",
+    "tox.ini",
 ])
