@@ -22,17 +22,15 @@
 
 #include <algorithm>
 
-#include "cyber/task/task.h"
-#include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
-
 #include "absl/strings/str_cat.h"
+#include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/common/planning_context.h"
+#include "modules/planning/proto/planning_status.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -191,7 +189,7 @@ bool ReferenceLineInfo::GetNeighborLaneInfo(
       break;
     }
     default:
-      CHECK(false);
+      ACHECK(false);
   }
   auto ptr_neighbor_lane =
       hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(*ptr_lane_id);
@@ -494,7 +492,7 @@ RSSInfo* ReferenceLineInfo::mutable_rss_info() { return &rss_info_; }
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     const double relative_time, const double start_s,
     DiscretizedTrajectory* ptr_discretized_trajectory) {
-  CHECK(ptr_discretized_trajectory != nullptr);
+  ACHECK(ptr_discretized_trajectory != nullptr);
   // use varied resolution to reduce data load but also provide enough data
   // point for control module
   const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
@@ -533,6 +531,95 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(speed_point.t() + relative_time);
     ptr_discretized_trajectory->AppendTrajectoryPoint(trajectory_point);
+  }
+  return true;
+}
+
+// TODO(all): It is a brutal way to insert the planning init point, one elegant
+// way would be bypassing trajectory stitching logics somehow, or use planing
+// init point from trajectory stitching to compute the trajectory at the very
+// start
+bool ReferenceLineInfo::AdjustTrajectoryWhichStartsFromCurrentPos(
+    const common::TrajectoryPoint& planning_start_point,
+    const std::vector<common::TrajectoryPoint>& trajectory,
+    DiscretizedTrajectory* adjusted_trajectory) {
+  ACHECK(adjusted_trajectory != nullptr);
+  // find insert index by check heading
+  static constexpr double kMaxAngleDiff = M_PI_2;
+  const double start_point_heading = planning_start_point.path_point().theta();
+  const double start_point_x = planning_start_point.path_point().x();
+  const double start_point_y = planning_start_point.path_point().y();
+  const double start_point_relative_time = planning_start_point.relative_time();
+
+  int insert_idx = -1;
+  for (size_t i = 0; i < trajectory.size(); ++i) {
+    // skip trajectory_points early than planning_start_point
+    if (trajectory[i].relative_time() <= start_point_relative_time) {
+      continue;
+    }
+
+    const double cur_point_x = trajectory[i].path_point().x();
+    const double cur_point_y = trajectory[i].path_point().y();
+    const double tracking_heading =
+        std::atan2(cur_point_y - start_point_y, cur_point_x - start_point_x);
+    if (std::fabs(common::math::AngleDiff(start_point_heading,
+                                          tracking_heading)) < kMaxAngleDiff) {
+      insert_idx = i;
+      break;
+    }
+  }
+  if (insert_idx == -1) {
+    AERROR << "All points are behind of planning init point";
+    return false;
+  }
+
+  DiscretizedTrajectory cut_trajectory(trajectory);
+  cut_trajectory.erase(cut_trajectory.begin(),
+                       cut_trajectory.begin() + insert_idx);
+  cut_trajectory.insert(cut_trajectory.begin(), planning_start_point);
+
+  // In class TrajectoryStitcher, the stitched point which is also the planning
+  // init point is supposed have one planning_cycle_time ahead respect to
+  // current timestamp as its relative time. So the relative timelines
+  // of planning init point and the trajectory which start from current
+  // position(relative time = 0) are the same. Therefore any conflicts on the
+  // relative time including the one below should return false and inspected its
+  // cause.
+  if (cut_trajectory.size() > 1 && cut_trajectory.front().relative_time() >=
+                                       cut_trajectory[1].relative_time()) {
+    AERROR << "planning init point relative_time["
+           << cut_trajectory.front().relative_time()
+           << "] larger than its next point's relative_time["
+           << cut_trajectory[1].relative_time() << "]";
+    return false;
+  }
+
+  // In class TrajectoryStitcher, the planing_init_point is set to have s as 0,
+  // so adjustment is needed to be done on the other points
+  double accumulated_s = 0.0;
+  for (size_t i = 1; i < cut_trajectory.size(); ++i) {
+    const auto& pre_path_point = cut_trajectory[i - 1].path_point();
+    auto* cur_path_point = cut_trajectory[i].mutable_path_point();
+    accumulated_s += std::sqrt((cur_path_point->x() - pre_path_point.x()) *
+                                   (cur_path_point->x() - pre_path_point.x()) +
+                               (cur_path_point->y() - pre_path_point.y()) *
+                                   (cur_path_point->y() - pre_path_point.y()));
+    cur_path_point->set_s(accumulated_s);
+  }
+
+  // reevaluate relative_time to make delta t the same
+  adjusted_trajectory->clear();
+  // use varied resolution to reduce data load but also provide enough data
+  // point for control module
+  const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
+  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
+  const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
+  for (double cur_rel_time = cut_trajectory.front().relative_time();
+       cur_rel_time <= cut_trajectory.back().relative_time();
+       cur_rel_time += (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion
+                                                     : kSparseTimeResolution)) {
+    adjusted_trajectory->AppendTrajectoryPoint(
+        cut_trajectory.Evaluate(cur_rel_time));
   }
   return true;
 }
@@ -638,7 +725,8 @@ void ReferenceLineInfo::ExportVehicleSignal(
 
 bool ReferenceLineInfo::ReachedDestination() const {
   static constexpr double kDestinationDeltaS = 0.05;
-  return SDistanceToDestination() <= kDestinationDeltaS;
+  const double distance_destination = SDistanceToDestination();
+  return distance_destination <= kDestinationDeltaS;
 }
 
 double ReferenceLineInfo::SDistanceToDestination() const {
@@ -658,8 +746,9 @@ double ReferenceLineInfo::SDistanceToDestination() const {
   return stop_s - adc_sl_boundary_.end_s();
 }
 
-void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
-  MakeDecision(decision_result);
+void ReferenceLineInfo::ExportDecision(
+    DecisionResult* decision_result, PlanningContext* planning_context) const {
+  MakeDecision(decision_result, planning_context);
   ExportVehicleSignal(decision_result->mutable_vehicle_signal());
   auto* main_decision = decision_result->mutable_main_decision();
   if (main_decision->has_stop()) {
@@ -671,7 +760,8 @@ void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
   }
 }
 
-void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result) const {
+void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result,
+                                     PlanningContext* planning_context) const {
   CHECK_NOTNULL(decision_result);
   decision_result->Clear();
 
@@ -683,17 +773,18 @@ void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result) const {
   if (error_code < 0) {
     MakeEStopDecision(decision_result);
   }
-  MakeMainMissionCompleteDecision(decision_result);
+  MakeMainMissionCompleteDecision(decision_result, planning_context);
   SetObjectDecisions(decision_result->mutable_object_decision());
 }
 
 void ReferenceLineInfo::MakeMainMissionCompleteDecision(
-    DecisionResult* decision_result) const {
+    DecisionResult* decision_result, PlanningContext* planning_context) const {
   if (!decision_result->main_decision().has_stop()) {
     return;
   }
   auto main_stop = decision_result->main_decision().stop();
-  if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
+  if (main_stop.reason_code() != STOP_REASON_DESTINATION &&
+      main_stop.reason_code() != STOP_REASON_PULL_OVER) {
     return;
   }
   const auto& adc_pos = adc_planning_point_.path_point();
@@ -705,8 +796,7 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
   if (ReachedDestination()) {
-    PlanningContext::Instance()
-        ->mutable_planning_status()
+    planning_context->mutable_planning_status()
         ->mutable_destination()
         ->set_has_passed_destination(true);
   } else {
@@ -789,7 +879,8 @@ void ReferenceLineInfo::SetObjectDecisions(
   }
 }
 
-void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
+void ReferenceLineInfo::ExportEngageAdvice(
+    EngageAdvice* engage_advice, PlanningContext* planning_context) const {
   static EngageAdvice prev_advice;
   static constexpr double kMaxAngleDiff = M_PI / 6.0;
 
@@ -797,10 +888,8 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   if (!IsDrivable()) {
     prev_advice.set_reason("Reference line not drivable");
   } else if (!is_on_reference_line_) {
-    const auto& scenario_type = PlanningContext::Instance()
-                                    ->planning_status()
-                                    .scenario()
-                                    .scenario_type();
+    const auto& scenario_type =
+        planning_context->planning_status().scenario().scenario_type();
     if (scenario_type == ScenarioConfig::PARK_AND_GO || IsChangeLanePath()) {
       // note: when is_on_reference_line_ is FALSE
       //   (1) always engage while in PARK_AND_GO scenario

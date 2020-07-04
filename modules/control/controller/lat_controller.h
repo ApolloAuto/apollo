@@ -26,9 +26,7 @@
 #include <string>
 
 #include "Eigen/Core"
-
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/filters/mean_filter.h"
@@ -69,7 +67,8 @@ class LatController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf) override;
+  common::Status Init(std::shared_ptr<DependencyInjector> injector,
+                      const ControlConf *control_conf) override;
 
   /**
    * @brief compute steering target based on current vehicle status
@@ -168,8 +167,10 @@ class LatController : public Controller {
   // longitudial length for look-ahead lateral error estimation during forward
   // driving and look-back lateral error estimation during backward driving
   // (look-ahead controller)
-  double lookahead_station_ = 0.0;
-  double lookback_station_ = 0.0;
+  double lookahead_station_low_speed_ = 0.0;
+  double lookback_station_low_speed_ = 0.0;
+  double lookahead_station_high_speed_ = 0.0;
+  double lookback_station_high_speed_ = 0.0;
 
   // number of states without previews, includes
   // lateral error, lateral error rate, heading error, heading error rate
@@ -222,6 +223,9 @@ class LatController : public Controller {
   bool enable_mrac_ = false;
   MracController mrac_controller_;
 
+  // Look-ahead controller
+  bool enable_look_ahead_back_control_ = false;
+
   // for compute the differential valute to estimate acceleration/lon_jerk
   double previous_lateral_acceleration_ = 0.0;
 
@@ -254,7 +258,11 @@ class LatController : public Controller {
 
   double low_speed_bound_ = 0.0;
 
+  double low_speed_window_ = 0.0;
+
   double driving_orientation_ = 0.0;
+
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace control

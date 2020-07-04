@@ -26,9 +26,9 @@ int ContiArsPreprocessor::local2global_[ORIGIN_CONTI_MAX_ID_NUM] = {0};
 bool ContiArsPreprocessor::Init() {
   std::string model_name = "ContiArsPreprocessor";
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name,
-                                                       &model_config));
-  CHECK(model_config->get_value("delay_time", &delay_time_));
+  ACHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name,
+                                                        &model_config));
+  ACHECK(model_config->get_value("delay_time", &delay_time_));
   return true;
 }
 

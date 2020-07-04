@@ -22,7 +22,6 @@
 
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
-
 #include <algorithm>
 #include <string>
 
@@ -35,6 +34,7 @@
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/proto/ipopt_return_status.pb.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -49,7 +49,7 @@ PiecewiseJerkSpeedNonlinearOptimizer::PiecewiseJerkSpeedNonlinearOptimizer(
     : SpeedOptimizer(config),
       smoothed_speed_limit_(0.0, 0.0, 0.0),
       smoothed_path_curvature_(0.0, 0.0, 0.0) {
-  CHECK(config_.has_piecewise_jerk_nonlinear_speed_config());
+  ACHECK(config_.has_piecewise_jerk_nonlinear_speed_optimizer_config());
 }
 
 Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
@@ -438,7 +438,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
   // TODO(Jinyun): parameter tunnings
-  const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
+  const auto& config =
+      config_.piecewise_jerk_nonlinear_speed_optimizer_config();
   piecewise_jerk_problem.set_weight_x(0.0);
   piecewise_jerk_problem.set_weight_dx(0.0);
   piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
@@ -471,6 +472,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
 Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     std::vector<double>* distance, std::vector<double>* velocity,
     std::vector<double>* acceleration) {
+  static std::mutex mutex_tnlp;
+  UNIQUE_LOCK_MULTITHREAD(mutex_tnlp);
   // Set optimizer instance
   auto ptr_interface = new PiecewiseJerkSpeedNonlinearIpoptInterface(
       s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
@@ -480,7 +483,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
   ptr_interface->set_safety_bounds(s_bounds_);
 
   // Set weights and reference values
-  const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
+  const auto& config =
+      config_.piecewise_jerk_nonlinear_speed_optimizer_config();
 
   ptr_interface->set_curvature_curve(smoothed_path_curvature_);
 
@@ -550,7 +554,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
   }
 
   const auto start_timestamp = std::chrono::system_clock::now();
-
   status = app->OptimizeTNLP(problem);
 
   const auto end_timestamp = std::chrono::system_clock::now();

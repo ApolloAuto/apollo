@@ -31,8 +31,8 @@ bool OnlineCalibrationService::Init(
   sensor_name_ = options.calibrator_working_sensor_name;
   // Init k_matrix
   auto &name_intrinsic_map = options.name_intrinsic_map;
-  CHECK(name_intrinsic_map.find(master_sensor_name_) !=
-        name_intrinsic_map.end());
+  ACHECK(name_intrinsic_map.find(master_sensor_name_) !=
+         name_intrinsic_map.end());
   CameraStatus camera_status;
   name_camera_status_map_.clear();
   for (auto iter = name_intrinsic_map.begin(); iter != name_intrinsic_map.end();
@@ -59,8 +59,8 @@ bool OnlineCalibrationService::Init(
       name_camera_status_map_[master_sensor_name_].k_matrix[5]);
   calibrator_.reset(
       BaseCalibratorRegisterer::GetInstanceByName(options.calibrator_method));
-  CHECK(calibrator_ != nullptr);
-  CHECK(calibrator_->Init(calibrator_init_options))
+  ACHECK(calibrator_ != nullptr);
+  ACHECK(calibrator_->Init(calibrator_init_options))
       << "Failed to init " << options.calibrator_method;
   return true;
 }
@@ -75,7 +75,7 @@ bool OnlineCalibrationService::QueryDepthOnGroundPlane(int x, int y,
   if (!is_service_ready_) {
     return false;
   }
-  CHECK(depth != nullptr);
+  ACHECK(depth != nullptr);
   double pixel[2] = {static_cast<double>(x), static_cast<double>(y)};
   double point[3] = {0};
 
@@ -97,7 +97,7 @@ bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(
   if (!is_service_ready_) {
     return false;
   }
-  CHECK(point3d != nullptr);
+  ACHECK(point3d != nullptr);
   double pixel[2] = {static_cast<double>(x), static_cast<double>(y)};
   double point[3] = {0};
   auto iter = name_camera_status_map_.find(sensor_name_);
@@ -189,7 +189,7 @@ void OnlineCalibrationService::Update(CameraFrame *frame) {
         << " meter.";
   AINFO << "pitch_angle: " << iter->second.pitch_angle * 180.0 / M_PI
         << " degree.";
-  // CHECK(BuildIndex());
+  // ACHECK(BuildIndex());
   is_service_ready_ = true;
 }
 
@@ -205,8 +205,8 @@ void OnlineCalibrationService::SetCameraHeightAndPitch(
     auto iter_ground_height = name_camera_ground_height_map.find(iter->first);
     auto iter_pitch_angle_diff =
         name_camera_pitch_angle_diff_map.find(iter->first);
-    CHECK(iter_ground_height != name_camera_ground_height_map.end());
-    CHECK(iter_pitch_angle_diff != name_camera_pitch_angle_diff_map.end());
+    ACHECK(iter_ground_height != name_camera_ground_height_map.end());
+    ACHECK(iter_pitch_angle_diff != name_camera_pitch_angle_diff_map.end());
     // set camera status
     name_camera_status_map_[iter->first].camera_ground_height =
         iter_ground_height->second;

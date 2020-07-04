@@ -75,3 +75,5 @@ DEFINE_bool(state_transform_to_com_reverse, false,
 DEFINE_bool(state_transform_to_com_drive, true,
             "Enable vehicle states coordinate transformation from center of "
             "rear-axis to center of mass, during forward driving");
+DEFINE_bool(multithread_run, false,
+            "multi-thread run flag mainly used by simulation");

@@ -32,7 +32,8 @@ namespace pull_over {
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     PullOverScenario::s_stage_factory_;
 
 void PullOverScenario::Init() {
@@ -56,28 +57,32 @@ void PullOverScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::PULL_OVER_APPROACH,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new PullOverStageApproach(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new PullOverStageApproach(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new PullOverStageRetryApproachParking(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new PullOverStageRetryApproachParking(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::PULL_OVER_RETRY_PARKING,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new PullOverStageRetryParking(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new PullOverStageRetryParking(config, injector);
       });
 }
 
 std::unique_ptr<Stage> PullOverScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+  auto ptr = s_stage_factory_.CreateObjectOrNull(
+      stage_config.stage_type(), stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

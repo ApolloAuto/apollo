@@ -94,6 +94,16 @@ class PathData {
     return blocking_obstacle_id_;
   }
 
+  const bool is_valid_path_reference() const {
+    return is_valid_path_reference_;
+  }
+  void set_is_valid_path_reference(bool is_valid_path_reference) {
+    is_valid_path_reference_ = is_valid_path_reference;
+  }
+
+  const std::vector<common::PathPoint> &path_reference() const;
+  void set_path_reference(const std::vector<common::PathPoint> &path_reference);
+
  private:
   /*
    * convert frenet path to cartesian path by reference line
@@ -117,6 +127,15 @@ class PathData {
 
   std::string path_label_ = "";
   std::string blocking_obstacle_id_;
+
+  /**
+   * @brief parameters for using the learning model output as a path reference
+   *
+   */
+  // use path reference for optimization target
+  bool is_valid_path_reference_ = false;
+  // path reference
+  std::vector<common::PathPoint> path_reference_;
 };
 
 }  // namespace planning

@@ -13,6 +13,7 @@ cc_library(
         "//modules/perception/lib/utils",
         "//modules/perception/onboard/common_flags",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/proto:feature_proto",
         "@eigen",
     ],
 )

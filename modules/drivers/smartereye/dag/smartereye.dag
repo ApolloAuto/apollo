@@ -1,0 +1,22 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/smartereye/libsmartereye_component.so"
+    components {
+      class_name : "SmartereyeComponent"
+      config {
+        name : "smartereye"
+        config_file_path : "/apollo/modules/drivers/smartereye/conf/smartereye.pb.txt"
+      }
+    }
+    components {
+      class_name : "CompressComponent"
+      config {
+        name : "smartereye_compress"
+        config_file_path : "/apollo/modules/drivers/smartereye/conf/smartereye.pb.txt"
+        readers {
+          channel: "/apollo/sensor/smartereye/image"
+          pending_queue_size: 10
+        }
+      }
+    }
+}

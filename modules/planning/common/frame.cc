@@ -22,8 +22,6 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/routing/proto/routing.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
@@ -33,11 +31,12 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/feature_output.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -83,7 +82,7 @@ const common::VehicleState &Frame::vehicle_state() const {
   return vehicle_state_;
 }
 
-bool Frame::Rerouting() {
+bool Frame::Rerouting(PlanningContext *planning_context) {
   if (FLAGS_use_navigation_mode) {
     AERROR << "Rerouting not supported in navigation mode";
     return false;
@@ -123,9 +122,8 @@ bool Frame::Rerouting() {
     return false;
   }
 
-  auto *rerouting = PlanningContext::Instance()
-                        ->mutable_planning_status()
-                        ->mutable_rerouting();
+  auto *rerouting =
+      planning_context->mutable_planning_status()->mutable_rerouting();
   rerouting->set_need_rerouting(true);
   *rerouting->mutable_routing_request() = request;
 
@@ -320,11 +318,13 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
 }
 
 Status Frame::Init(
+    const common::VehicleStateProvider *vehicle_state_provider,
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
-    const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
+    const std::vector<routing::LaneWaypoint> &future_route_waypoints,
+    const EgoInfo *ego_info) {
   // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
-  auto status = InitFrameData();
+  auto status = InitFrameData(vehicle_state_provider, ego_info);
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
@@ -338,12 +338,18 @@ Status Frame::Init(
   return Status::OK();
 }
 
-Status Frame::InitForOpenSpace() { return InitFrameData(); }
+Status Frame::InitForOpenSpace(
+    const common::VehicleStateProvider *vehicle_state_provider,
+    const EgoInfo *ego_info) {
+  return InitFrameData(vehicle_state_provider, ego_info);
+}
 
-Status Frame::InitFrameData() {
+Status Frame::InitFrameData(
+    const common::VehicleStateProvider *vehicle_state_provider,
+    const EgoInfo *ego_info) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
-  vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
+  vehicle_state_ = vehicle_state_provider->vehicle_state();
   if (!util::IsVehicleStateValid(vehicle_state_)) {
     AERROR << "Adc init point is not set";
     return Status(ErrorCode::PLANNING_ERROR, "Adc init point is not set");
@@ -361,7 +367,7 @@ Status Frame::InitFrameData() {
     AddObstacle(*ptr);
   }
   if (planning_start_point_.v() < 1e-3) {
-    const auto *collision_obstacle = FindCollisionObstacle();
+    const auto *collision_obstacle = FindCollisionObstacle(ego_info);
     if (collision_obstacle != nullptr) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
@@ -375,15 +381,17 @@ Status Frame::InitFrameData() {
 
   ReadPadMsgDrivingAction();
 
+  ReadLearningDataFrame();
+
   return Status::OK();
 }
 
-const Obstacle *Frame::FindCollisionObstacle() const {
+const Obstacle *Frame::FindCollisionObstacle(const EgoInfo *ego_info) const {
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
 
-  const auto &adc_polygon = Polygon2d(EgoInfo::Instance()->ego_box());
+  const auto &adc_polygon = Polygon2d(ego_info->ego_box());
   for (const auto &obstacle : obstacles_.Items()) {
     if (obstacle->IsVirtual()) {
       continue;
@@ -397,7 +405,9 @@ const Obstacle *Frame::FindCollisionObstacle() const {
   return nullptr;
 }
 
-uint32_t Frame::SequenceNum() const { return sequence_num_; }
+uint32_t Frame::SequenceNum() const {
+  return sequence_num_;
+}
 
 std::string Frame::DebugString() const {
   return "Frame: " + std::to_string(sequence_num_);
@@ -459,7 +469,9 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   }
 }
 
-Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
+Obstacle *Frame::Find(const std::string &id) {
+  return obstacles_.Find(id);
+}
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
@@ -481,6 +493,16 @@ void Frame::ReadTrafficLights() {
   }
   for (const auto &traffic_light : traffic_light_detection->traffic_light()) {
     traffic_lights_[traffic_light.id()] = &traffic_light;
+  }
+}
+
+void Frame::ReadLearningDataFrame() {
+  if (FLAGS_planning_learning_mode != 2 && FLAGS_planning_learning_mode != 3) {
+    return;
+  }
+  auto learning_data_frame = FeatureOutput::GetLatestLearningDataFrame();
+  if (learning_data_frame != nullptr) {
+    learning_based_data_.set_learning_data_frame(*learning_data_frame);
   }
 }
 

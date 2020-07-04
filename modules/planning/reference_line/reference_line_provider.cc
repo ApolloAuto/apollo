@@ -59,8 +59,10 @@ using apollo::hdmap::RouteSegments;
 ReferenceLineProvider::~ReferenceLineProvider() {}
 
 ReferenceLineProvider::ReferenceLineProvider(
+    const common::VehicleStateProvider *vehicle_state_provider,
     const hdmap::HDMap *base_map,
-    const std::shared_ptr<relative_map::MapMsg> &relative_map) {
+    const std::shared_ptr<relative_map::MapMsg> &relative_map)
+    : vehicle_state_provider_(vehicle_state_provider) {
   if (!FLAGS_use_navigation_mode) {
     pnc_map_ = std::make_unique<hdmap::PncMap>(base_map);
     relative_map_ = nullptr;
@@ -69,8 +71,8 @@ ReferenceLineProvider::ReferenceLineProvider(
     relative_map_ = relative_map;
   }
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                        &smoother_config_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
+                                         &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
   if (smoother_config_.has_qp_spline()) {
@@ -80,8 +82,8 @@ ReferenceLineProvider::ReferenceLineProvider(
   } else if (smoother_config_.has_discrete_points()) {
     smoother_.reset(new DiscretePointsReferenceLineSmoother(smoother_config_));
   } else {
-    CHECK(false) << "unknown smoother config "
-                 << smoother_config_.DebugString();
+    ACHECK(false) << "unknown smoother config "
+                  << smoother_config_.DebugString();
   }
   is_initialized_ = true;
 }
@@ -308,8 +310,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   // get current adc lane info by vehicle state
-  common::VehicleState vehicle_state =
-      common::VehicleStateProvider::Instance()->vehicle_state();
+  common::VehicleState vehicle_state = vehicle_state_provider_->vehicle_state();
   hdmap::LaneWaypoint adc_lane_way_point;
   if (!GetNearestWayPointFromNavigationPath(vehicle_state, navigation_lane_ids,
                                             &adc_lane_way_point)) {

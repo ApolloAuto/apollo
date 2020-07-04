@@ -32,15 +32,17 @@ class TrafficLightUnprotectedLeftTurnStageCreepTest : public ::testing::Test {
   virtual void SetUp() {
     config_.set_stage_type(
         ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(TrafficLightUnprotectedLeftTurnStageCreepTest, Init) {
   TrafficLightUnprotectedLeftTurnStageCreep
-      traffic_light_unprotected_left_turn_stage_creep(config_);
+      traffic_light_unprotected_left_turn_stage_creep(config_, injector_);
   EXPECT_EQ(traffic_light_unprotected_left_turn_stage_creep.Name(),
             ScenarioConfig::StageType_Name(
                 ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP));

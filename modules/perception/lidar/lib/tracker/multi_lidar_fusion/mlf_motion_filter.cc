@@ -33,15 +33,15 @@ using cyber::common::GetAbsolutePath;
 bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_motion_filter.conf");
   MlfMotionFilterConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   use_adaptive_ = config.use_adaptive();
   use_breakdown_ = config.use_breakdown();
   use_convergence_boostup_ = config.use_convergence_boostup();
@@ -58,7 +58,7 @@ bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
   motion_measurer_.reset(new MlfMotionMeasurement);
 
   motion_refiner_.reset(new MlfMotionRefiner);
-  CHECK(motion_refiner_->Init());
+  ACHECK(motion_refiner_->Init());
   return true;
 }
 

@@ -19,6 +19,7 @@
  */
 
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
+
 #include <string>
 #include <unordered_map>
 
@@ -60,12 +61,14 @@ bool DistanceApproachProblem::Solve(
         horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
         XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
         planner_open_space_config_);
-  } else if (planner_open_space_config_.distance_approach_config()
-                 .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
-    ptop = new DistanceApproachIPOPTCUDAInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-        planner_open_space_config_);
+    // TODO(xiaoxq): Disable CUDA in planning temporarily.
+    // } else if (planner_open_space_config_.distance_approach_config()
+    //              .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
+    //   ptop = new DistanceApproachIPOPTCUDAInterface(
+    //       horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
+    //       last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+    //       obstacles_A, obstacles_b, planner_open_space_config_);
+    // }
   } else if (planner_open_space_config_.distance_approach_config()
                  .distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_FIXED_DUAL) {

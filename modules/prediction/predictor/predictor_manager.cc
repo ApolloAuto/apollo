@@ -279,7 +279,7 @@ void PredictorManager::PredictObstacle(
   prediction_obstacle->set_is_static(obstacle->IsStill());
   if (FLAGS_prediction_offline_mode ==
       PredictionConstants::kDumpPredictionResult) {
-    const Scenario& scenario = ScenarioManager::Instance()->scenario();
+    const Scenario& scenario = obstacles_container->curr_scenario();
     FeatureOutput::InsertPredictionResult(obstacle, *prediction_obstacle,
                                           obstacle->obstacle_conf(), scenario);
   }

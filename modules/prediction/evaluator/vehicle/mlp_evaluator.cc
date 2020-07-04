@@ -94,7 +94,7 @@ bool MLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
-    CHECK(lane_sequence_ptr != nullptr);
+    ACHECK(lane_sequence_ptr != nullptr);
     std::vector<double> lane_feature_values;
     SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
     if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
@@ -358,8 +358,8 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
-  CHECK(model_ptr_ != nullptr);
-  CHECK(cyber::common::GetProtoFromFile(model_file, model_ptr_.get()))
+  ACHECK(model_ptr_ != nullptr);
+  ACHECK(cyber::common::GetProtoFromFile(model_file, model_ptr_.get()))
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";

@@ -9,8 +9,18 @@ cc_binary(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
         "@com_github_gflags_gflags//:gflags",
+    ],
+)
+
+cc_binary(
+    name = "inference_demo",
+    srcs = ["inference_demo.cc"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+        "//third_party:libtorch",
     ],
 )
 

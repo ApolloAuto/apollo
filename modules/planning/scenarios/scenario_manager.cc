@@ -31,6 +31,7 @@
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
+#include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
@@ -48,6 +49,10 @@ namespace scenario {
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
+ScenarioManager::ScenarioManager(
+    const std::shared_ptr<DependencyInjector>& injector)
+    : injector_(injector) {}
+
 bool ScenarioManager::Init() {
   RegisterScenarios();
   default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
@@ -63,53 +68,57 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
       ptr.reset(
           new scenario::bare_intersection::BareIntersectionUnprotectedScenario(
-              config_map_[scenario_type], &scenario_context_));
+              config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::EMERGENCY_PULL_OVER:
       ptr.reset(new emergency_pull_over::EmergencyPullOverScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::EMERGENCY_STOP:
       ptr.reset(new emergency_stop::EmergencyStopScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::LANE_FOLLOW:
-      ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
-                                                    &scenario_context_));
+      ptr.reset(new lane_follow::LaneFollowScenario(
+          config_map_[scenario_type], &scenario_context_, injector_));
+      break;
+    case ScenarioConfig::LEARNING_MODEL_SAMPLE:
+      ptr.reset(new scenario::LearningModelSampleScenario(
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::PARK_AND_GO:
       ptr.reset(new scenario::park_and_go::ParkAndGoScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::PULL_OVER:
       ptr.reset(new scenario::pull_over::PullOverScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       ptr.reset(new scenario::stop_sign::StopSignUnprotectedScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
       ptr.reset(new scenario::traffic_light::TrafficLightProtectedScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
       ptr.reset(
           new scenario::traffic_light::TrafficLightUnprotectedLeftTurnScenario(
-              config_map_[scenario_type], &scenario_context_));
+              config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       ptr.reset(
           new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
-              config_map_[scenario_type], &scenario_context_));
+              config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::VALET_PARKING:
       ptr.reset(new scenario::valet_parking::ValetParkingScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     case ScenarioConfig::YIELD_SIGN:
       ptr.reset(new scenario::yield_sign::YieldSignScenario(
-          config_map_[scenario_type], &scenario_context_));
+          config_map_[scenario_type], &scenario_context_, injector_));
       break;
     default:
       return nullptr;
@@ -123,54 +132,65 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  if (FLAGS_planning_learning_mode == 3) {
+    // HYBRID
+    ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_hybrid_config_file,
+                                &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  } else {
+    ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
+                                &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  }
 
   // bare_intersection
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_bare_intersection_unprotected_config_file,
       &config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]));
 
   // emergency_pull_over
-  CHECK(
+  ACHECK(
       Scenario::LoadConfig(FLAGS_scenario_emergency_pull_over_config_file,
                            &config_map_[ScenarioConfig::EMERGENCY_PULL_OVER]));
 
   // emergency_stop
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
-                             &config_map_[ScenarioConfig::EMERGENCY_STOP]));
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
+                              &config_map_[ScenarioConfig::EMERGENCY_STOP]));
+
+  // learning model
+  ACHECK(Scenario::LoadConfig(
+      FLAGS_scenario_learning_model_sample_config_file,
+      &config_map_[ScenarioConfig::LEARNING_MODEL_SAMPLE]));
 
   // park_and_go
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
-                             &config_map_[ScenarioConfig::PARK_AND_GO]));
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
+                              &config_map_[ScenarioConfig::PARK_AND_GO]));
 
   // pull_over
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
-                             &config_map_[ScenarioConfig::PULL_OVER]));
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
+                              &config_map_[ScenarioConfig::PULL_OVER]));
 
   // stop_sign
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
 
   // traffic_light
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_protected_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]));
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_left_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]));
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
 
   // valet parking
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
-                             &config_map_[ScenarioConfig::VALET_PARKING]));
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
+                              &config_map_[ScenarioConfig::VALET_PARKING]));
 
   // yield_sign
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_yield_sign_config_file,
-                             &config_map_[ScenarioConfig::YIELD_SIGN]));
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_yield_sign_config_file,
+                              &config_map_[ScenarioConfig::YIELD_SIGN]));
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
@@ -202,7 +222,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   // too close to destination + not found pull-over position
   if (pull_over_scenario) {
     const auto& pull_over_status =
-        PlanningContext::Instance()->planning_status().pull_over();
+        injector_->planning_context()->planning_status().pull_over();
     if (adc_distance_to_dest < scenario_config.max_distance_stop_search() &&
         !pull_over_status.has_position()) {
       pull_over_scenario = false;
@@ -476,11 +496,10 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   static constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
-  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
-    const double dist =
-        traffic_light_overlap.start_s - traffic_light_overlap.start_s;
+  for (const auto& overlap : traffic_light_overlaps) {
+    const double dist = overlap.start_s - traffic_light_overlap.start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      next_traffic_lights.push_back(traffic_light_overlap);
+      next_traffic_lights.push_back(overlap);
     }
   }
 
@@ -714,7 +733,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   bool park_and_go = false;
   const auto& scenario_config =
       config_map_[ScenarioConfig::PARK_AND_GO].park_and_go_config();
-  const auto vehicle_state_provider = common::VehicleStateProvider::Instance();
+  const auto vehicle_state_provider = injector_->vehicle_state();
   common::VehicleState vehicle_state = vehicle_state_provider->vehicle_state();
   auto adc_point = common::util::PointFactory::ToPointENU(vehicle_state);
   // TODO(SHU) might consider gear == GEAR_PARKING
@@ -776,23 +795,56 @@ void ScenarioManager::Observe(const Frame& frame) {
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
                              const Frame& frame) {
-  CHECK(!frame.reference_line_info().empty());
+  ACHECK(!frame.reference_line_info().empty());
 
   Observe(frame);
 
-  ScenarioDispatch(ego_point, frame);
+  ScenarioDispatch(frame);
 }
 
-void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
-                                       const Frame& frame) {
-  CHECK(!frame.reference_line_info().empty());
+void ScenarioManager::ScenarioDispatch(const Frame& frame) {
+  ACHECK(!frame.reference_line_info().empty());
 
+  ScenarioConfig::ScenarioType scenario_type;
+
+  const int history_points_len = frame.learning_based_data()
+                                     .learning_data_frame()
+                                     .adc_trajectory_point_size();
+
+  if (FLAGS_planning_learning_mode == 2 &&
+      history_points_len >= FLAGS_min_past_history_points_len) {
+    scenario_type = ScenarioDispatchLearning();
+  } else {
+    scenario_type = ScenarioDispatchNonLearning(frame);
+  }
+
+  ADEBUG << "select scenario: "
+         << ScenarioConfig::ScenarioType_Name(scenario_type);
+
+  // update PlanningContext
+  UpdatePlanningContext(frame, scenario_type);
+
+  if (current_scenario_->scenario_type() != scenario_type) {
+    current_scenario_ = CreateScenario(scenario_type);
+  }
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchLearning() {
+  ////////////////////////////////////////
+  // learning model scenario
+  ScenarioConfig::ScenarioType scenario_type =
+      ScenarioConfig::LEARNING_MODEL_SAMPLE;
+  return scenario_type;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
+    const Frame& frame) {
   ////////////////////////////////////////
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
   ////////////////////////////////////////
-  // Pad Msg Scenario
+  // Pad Msg scenario
   scenario_type = SelectPadMsgScenario(frame);
 
   if (scenario_type == default_scenario_type_) {
@@ -850,15 +902,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     scenario_type = SelectValetParkingScenario(frame);
   }
 
-  ADEBUG << "select scenario: "
-         << ScenarioConfig::ScenarioType_Name(scenario_type);
-
-  // update PlanningContext
-  UpdatePlanningContext(frame, scenario_type);
-
-  if (current_scenario_->scenario_type() != scenario_type) {
-    current_scenario_ = CreateScenario(scenario_type);
-  }
+  return scenario_type;
 }
 
 bool ScenarioManager::IsBareIntersectionScenario(
@@ -909,7 +953,7 @@ void ScenarioManager::UpdatePlanningContext(
 // update: bare_intersection status in PlanningContext
 void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  auto* bare_intersection = PlanningContext::Instance()
+  auto* bare_intersection = injector_->planning_context()
                                 ->mutable_planning_status()
                                 ->mutable_bare_intersection();
 
@@ -937,7 +981,7 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
 // update: emergency_stop status in PlanningContext
 void ScenarioManager::UpdatePlanningContextEmergencyStopcenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  auto* emergency_stop = PlanningContext::Instance()
+  auto* emergency_stop = injector_->planning_context()
                              ->mutable_planning_status()
                              ->mutable_emergency_stop();
   if (!scenario_type == ScenarioConfig::EMERGENCY_STOP) {
@@ -949,7 +993,7 @@ void ScenarioManager::UpdatePlanningContextEmergencyStopcenario(
 void ScenarioManager::UpdatePlanningContextStopSignScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsStopSignScenario(scenario_type)) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_stop_sign()
         ->Clear();
@@ -964,7 +1008,7 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_stop_sign()
         ->set_current_stop_sign_overlap_id(map_itr->second.object_id);
@@ -978,7 +1022,7 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
 void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsTrafficLightScenario(scenario_type)) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_traffic_light()
         ->Clear();
@@ -998,7 +1042,7 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
   }
 
   if (current_traffic_light_overlap_id.empty()) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_traffic_light()
         ->Clear();
@@ -1015,7 +1059,7 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
         return overlap.object_id == current_traffic_light_overlap_id;
       });
   if (traffic_light_overlap_itr == traffic_light_overlaps.end()) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_traffic_light()
         ->Clear();
@@ -1029,7 +1073,7 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const double dist =
         traffic_light_overlap.start_s - current_traffic_light_overlap_start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      PlanningContext::Instance()
+      injector_->planning_context()
           ->mutable_planning_status()
           ->mutable_traffic_light()
           ->add_current_traffic_light_overlap_id(
@@ -1045,7 +1089,7 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
 void ScenarioManager::UpdatePlanningContextYieldSignScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsYieldSignScenario(scenario_type)) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_yield_sign()
         ->Clear();
@@ -1065,7 +1109,7 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
   }
 
   if (current_yield_sign_overlap_id.empty()) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_yield_sign()
         ->Clear();
@@ -1082,7 +1126,7 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
         return overlap.object_id == current_yield_sign_overlap_id;
       });
   if (yield_sign_overlap_itr == yield_sign_overlaps.end()) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_yield_sign()
         ->Clear();
@@ -1096,7 +1140,7 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
     const double dist =
         yield_sign_overlap.start_s - current_yield_sign_overlap_start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      PlanningContext::Instance()
+      injector_->planning_context()
           ->mutable_planning_status()
           ->mutable_yield_sign()
           ->add_current_yield_sign_overlap_id(yield_sign_overlap.object_id);
@@ -1110,7 +1154,7 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
 // update: pull_over status in PlanningContext
 void ScenarioManager::UpdatePlanningContextPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  auto* pull_over = PlanningContext::Instance()
+  auto* pull_over = injector_->planning_context()
                         ->mutable_planning_status()
                         ->mutable_pull_over();
   if (scenario_type == ScenarioConfig::PULL_OVER) {
@@ -1127,7 +1171,7 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
   // check pull_over_status left behind
   // keep it if close to destination, to keep stop fence
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
     const auto& routing = frame.local_view().routing;
@@ -1146,7 +1190,7 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
 
       static constexpr double kDestMaxDelta = 30.0;  // meter
       if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {
-        PlanningContext::Instance()
+        injector_->planning_context()
             ->mutable_planning_status()
             ->clear_pull_over();
       }

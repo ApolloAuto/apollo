@@ -18,6 +18,8 @@
 
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")/../.." && pwd )"
+CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
+
 # the machine type, currently support x86_64, aarch64
 MACHINE_ARCH=$(uname -m)
 
@@ -80,8 +82,8 @@ function main() {
     if [ "$USER" == "root" ];then
         DOCKER_HOME="/root"
     fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
+    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
+        mkdir "${CACHE_ROOT_DIR}"
     fi
 
     DOCKER_CMD="nvidia-docker"
@@ -96,7 +98,6 @@ function main() {
         -v ${HOME}/data:/apollo/data \
         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
         -v /etc/localtime:/etc/localtime:ro \
-        -v $HOME/.cache:${DOCKER_HOME}/.cache \
         -w /apollo \
         -e DISPLAY=${display} \
         -e RELEASE_DOCKER=1 \
@@ -114,7 +115,7 @@ function main() {
         --shm-size 2G \
         $IMG
     if [ "${USER}" != "root" ]; then
-      docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
+      docker exec apollo_release bash -c "/apollo/scripts/docker_start_user.sh"
       docker exec apollo_release bash -c "chown -R ${USER}:${GRP} /apollo/data"
       docker exec apollo_release bash -c "chmod a+w /apollo"
 

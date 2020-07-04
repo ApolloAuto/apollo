@@ -21,7 +21,6 @@
 #pragma once
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"

@@ -21,26 +21,45 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-QT_VERSION_A=5.9
-QT_VERSION_B=5.9.8
+apt-get -y update && \
+    apt-get -y install \
+    libx11-xcb1 \
+    libfreetype6 \
+    libdbus-1-3 \
+    libfontconfig1
 
-ARCH=$(uname -m)
+. /tmp/installers/installer_base.sh
 
-wget https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/qt-opensource-linux-x64-${QT_VERSION_B}.run
+QT_VERSION_A=5.12
+QT_VERSION_B=5.12.2
+QT_VERSION_Z=$(echo "$QT_VERSION_B" | tr -d '.')
 
-chmod +x qt-opensource-linux-x64-${QT_VERSION_B}.run
+QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
+CHECKSUM="384c833bfbccf596a00bb02bbad14b53201854c287daf2d99c23a93b8de4062a"
+DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
 
-    # The '-platform' flag causes a message to stdout "Unknown option: p, l, a, t, f, o, r, m": message is incorrectly printed (it's a bug). The command still succeeds.
-    # https://stackoverflow.com/a/34032216/1158977
+pip3 install cuteci
 
-    # the below error can be ignored since Ubuntu 14 does not have sslv2
-    # qt.network.ssl: QSslSocket: cannot resolve SSLv2_client_method
-    # qt.network.ssl: QSslSocket: cannot resolve SSLv2_server_method
-./qt-opensource-linux-x64-${QT_VERSION_B}.run --script qt-noninteractive.qs  -platform minimal
+download_if_not_cached $QT_INSTALLER $CHECKSUM $DOWLOAD_LINK
+chmod +x $QT_INSTALLER
 
-mkdir /usr/local/Qt$QT_VERSION_B
-ln -s /qt/$QT_VERSION_B /usr/local/Qt$QT_VERSION_B/$QT_VERSION_A
+MY_DEST_DIR="/usr/local/Qt${QT_VERSION_B}"
+cuteci \
+    --installer "$PWD/$QT_INSTALLER" \
+    install \
+    --destdir="$MY_DEST_DIR" \
+    --packages "qt.qt5.${QT_VERSION_Z}.gcc_64" \
+    --keep-tools
 
-    # clean up
-rm qt-opensource-linux-x64-${QT_VERSION_B}.run
-rm -rf /usr/local/Qt$QT_VERSION_B/{Docs,Examples,Extras,Tools}
+# Hide qt5 version from end users
+ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 /usr/local/qt5
+
+# clean up
+rm -f ${QT_INSTALLER}
+# Keep License files
+rm -rf ${MY_DEST_DIR}/{Docs,Examples,Tools,dist} || true
+rm -rf ${MY_DEST_DIR}/MaintenanceTool* || true
+rm -rf ${MY_DEST_DIR}/{InstallationLog.txt,installer-changelog} || true
+rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
+
+pip3 uninstall -y cuteci

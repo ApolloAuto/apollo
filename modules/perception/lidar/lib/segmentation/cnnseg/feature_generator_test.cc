@@ -127,7 +127,7 @@ TEST_F(FeatureGeneratorTest, basic_test) {
       "/apollo/modules/perception/testdata/lidar/lib/segmentation/cnnseg/"
       "pcd_data/3_car_1_person.pcd";
   bool ret = LoadPCLPCD(filename, pc_ptr.get());
-  CHECK(ret) << "Failed to load " << filename;
+  ACHECK(ret) << "Failed to load " << filename;
 
   std::vector<int> point2grid;
   float range = 60.f;
@@ -158,7 +158,7 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     EXPECT_NE(generator_->top_intensity_data_, nullptr);
     // save feature map
     std::ofstream ofs("cpu_top_intensity_map.txt");
-    CHECK(ofs.is_open());
+    ACHECK(ofs.is_open());
     for (size_t i = 0; i < param.height() * param.width(); ++i) {
       ofs << generator_->top_intensity_data_[i] << std::endl;
     }
@@ -195,7 +195,7 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     cudaMemcpy(top_intensity_data.data(), generator_->top_intensity_data_,
                map_size * sizeof(float), cudaMemcpyDeviceToHost);
     std::ofstream ofs("gpu_top_intensity_map.txt");
-    CHECK(ofs.is_open());
+    ACHECK(ofs.is_open());
     for (size_t i = 0; i < param.height() * param.width(); ++i) {
       ofs << top_intensity_data[i] << std::endl;
     }

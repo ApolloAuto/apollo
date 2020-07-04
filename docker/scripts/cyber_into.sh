@@ -16,30 +16,30 @@
 # limitations under the License.
 ###############################################################################
 
-ARCH=$(uname -m)
-CMD=""
+DOCKER_USER="${USER}"
+CYBER_CONTAINER="apollo_cyber_${USER}"
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
+APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
 
 xhost +local:root 1>/dev/null 2>&1
 
-if [ ${ARCH} == "x86_64" ]; then
+ARCH="$(uname -m)"
+if [ "${ARCH}" == "x86_64" ]; then
     docker exec \
-        -u $USER \
-        -it apollo_cyber_$USER \
+        -u "${DOCKER_USER}" \
+        -it "${CYBER_CONTAINER}" \
         /bin/bash
-elif [ ${ARCH} == "aarch64" ]; then
+elif [ "${ARCH}" == "aarch64" ]; then
     warning "!!! For the first time after starting the Cyber RT container, please run the following two commands: !!!"
-    warning "!!!   1) /apollo/scripts/docker_adduser.sh !!!"
-    warning "!!!   2) su $USER !!!"
+    warning "!!!   1) /apollo/scripts/docker_start_user.sh # with root or sudo permissions!!!"
+    warning "!!!   2) su ${DOCKER_USER} !!!"
     warning "! To exit, please use 'ctrl+p ctrl+q' !"
 
-    docker attach apollo_cyber_$USER
+    docker attach "${CYBER_CONTAINER}"
 
 else
-    echo "Unknown architecture: ${ARCH}"
+    echo "Unsupported architecture: ${ARCH}"
     exit 0
 fi
 

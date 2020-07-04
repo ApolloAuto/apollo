@@ -16,9 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-sudo apt-get install -y ntpdate
-
-grep -q ntpdate /etc/crontab
+[ -x "$(command -v ntpdate)" ] || sudo apt-get install -y ntpdate
 
 REGIN="us"
 
@@ -32,6 +30,7 @@ fi
 
 echo "Regin is set as: ${REGIN}, make sure this regin is consistent with list on pool.npt.org"
 
+grep -q ntpdate /etc/crontab
 if [ $? -eq 1 ]; then
     echo "*/1 * * * * root ntpdate -v -u ${REGIN}.pool.ntp.org" | sudo tee -a /etc/crontab
 fi

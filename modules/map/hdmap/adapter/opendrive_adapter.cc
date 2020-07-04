@@ -36,7 +36,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
 
   // root node
   const tinyxml2::XMLElement* root_node = document.RootElement();
-  CHECK(root_node != nullptr);
+  ACHECK(root_node != nullptr);
   // header
   PbHeader* map_header = pb_map->mutable_header();
   Status status = HeaderXmlParser::Parse(*root_node, map_header);

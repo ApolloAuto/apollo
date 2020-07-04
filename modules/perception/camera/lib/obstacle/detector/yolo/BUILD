@@ -12,7 +12,8 @@ cuda_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
-        "@cuda",
+        "//modules/prediction/proto:feature_proto",
+	"@cuda",
     ],
 )
 

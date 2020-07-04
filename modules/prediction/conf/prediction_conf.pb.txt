@@ -1,3 +1,14 @@
+topic_conf {
+  adccontainer_topic_name: "/apollo/prediction/adccontainer"
+  container_topic_name: "/apollo/prediction/container"
+  evaluator_topic_name: "/apollo/prediction/evaluator"
+  localization_topic: "/apollo/localization/pose"
+  perception_obstacle_topic: "/apollo/perception/obstacles"
+  perception_obstacles_topic_name: "/apollo/prediction/perception_obstacles"
+  planning_trajectory_topic: "/apollo/planning"
+  prediction_topic: "/apollo/prediction"
+  storytelling_topic: "/apollo/storytelling"
+}
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: ON_LANE
@@ -33,7 +44,8 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
-  evaluator_type: PEDESTRIAN_INTERACTION_EVALUATOR
+  obstacle_status: MOVING
+  evaluator_type: SEMANTIC_LSTM_EVALUATOR
   predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {

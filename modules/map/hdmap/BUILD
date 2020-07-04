@@ -21,6 +21,7 @@ cc_library(
         "//cyber/common:macros",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
+        "//modules/common/util",
         "//modules/common/math:linear_interpolation",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",

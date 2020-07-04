@@ -18,6 +18,7 @@
 #include "cyber/record/record_writer.h"
 
 #include <string>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -83,6 +84,40 @@ TEST(RecordTest, TestSingleRecordFile) {
     ASSERT_EQ(i, message.time);
   }
   ASSERT_FALSE(reader.ReadMessage(&message, 0, kMessageNum - 2));
+  ASSERT_FALSE(remove(kTestFile));
+}
+
+TEST(RecordTest, TestReaderOrder) {
+  RecordWriter writer;
+  writer.SetSizeOfFileSegmentation(0);
+  writer.SetIntervalOfFileSegmentation(0);
+  writer.Open(kTestFile);
+  writer.WriteChannel(kChannelName1, kMessageType1, kProtoDesc);
+
+  for (uint32_t i = kMessageNum; i > 0; --i) {
+    auto msg = std::make_shared<RawMessage>(std::to_string(i));
+    writer.WriteMessage(kChannelName1, msg, i * 100);
+  }
+  ASSERT_EQ(kMessageNum, writer.GetMessageNumber(kChannelName1));
+  ASSERT_EQ(kMessageType1, writer.GetMessageType(kChannelName1));
+  ASSERT_EQ(kProtoDesc, writer.GetProtoDesc(kChannelName1));
+  writer.Close();
+
+  RecordReader reader(kTestFile);
+  RecordMessage message;
+  ASSERT_EQ(kMessageNum, reader.GetMessageNumber(kChannelName1));
+  ASSERT_EQ(kMessageType1, reader.GetMessageType(kChannelName1));
+  ASSERT_EQ(kProtoDesc, reader.GetProtoDesc(kChannelName1));
+
+  // read all message
+  for (uint32_t i = 1; i <= kMessageNum; ++i) {
+    ASSERT_TRUE(reader.ReadMessage(&message));
+    ASSERT_EQ(kChannelName1, message.channel_name);
+    ASSERT_NE(std::to_string(i), message.content);
+    ASSERT_NE(i * 100, message.time);
+  }
+
+  ASSERT_FALSE(reader.ReadMessage(&message));
   ASSERT_FALSE(remove(kTestFile));
 }
 

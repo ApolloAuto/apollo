@@ -25,6 +25,7 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
+#include "modules/control/common/dependency_injector.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/controller/mpc_controller.h"
 #include "modules/control/proto/calibration_table.pb.h"
@@ -84,6 +85,7 @@ class MPCControllerSubmodule final : public cyber::Component<Preprocessor> {
   // TODO(SHU): separate conf
   ControlConf mpc_controller_conf_;
   std::shared_ptr<cyber::Writer<ControlCommand>> control_core_writer_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 CYBER_REGISTER_COMPONENT(MPCControllerSubmodule)

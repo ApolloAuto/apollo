@@ -20,6 +20,7 @@
 #include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 
 #include "modules/planning/common/planning_context.h"
@@ -36,8 +37,10 @@ int PathReuseDecider::reusable_path_counter_ = 0;
 int PathReuseDecider::total_path_counter_ = 0;
 bool PathReuseDecider::path_reusable_ = false;
 
-PathReuseDecider::PathReuseDecider(const TaskConfig& config)
-    : Decider(config) {}
+PathReuseDecider::PathReuseDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 Status PathReuseDecider::Process(Frame* const frame,
                                  ReferenceLineInfo* const reference_line_info) {
@@ -52,8 +55,10 @@ Status PathReuseDecider::Process(Frame* const frame,
   }
 
   // skip path reuse if not in LANE_FOLLOW_SCENARIO
-  const auto scenario_type =
-      PlanningContext::Instance()->planning_status().scenario().scenario_type();
+  const auto scenario_type = injector_->planning_context()
+                                 ->planning_status()
+                                 .scenario()
+                                 .scenario_type();
   if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
     ADEBUG << "skipping reusing path: not in LANE_FOLLOW scenario";
     reference_line_info->set_path_reusable(false);
@@ -61,7 +66,7 @@ Status PathReuseDecider::Process(Frame* const frame,
   }
 
   // active path reuse during change_lane only
-  auto* lane_change_status = PlanningContext::Instance()
+  auto* lane_change_status = injector_->planning_context()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
   ADEBUG << "lane change status: " << lane_change_status->ShortDebugString();
@@ -95,7 +100,7 @@ Status PathReuseDecider::Process(Frame* const frame,
   // 3. failed to trim previous path
   // 4. speed optimization failed on previous path
   bool speed_optimization_successful = false;
-  const auto& history_frame = FrameHistory::Instance()->Latest();
+  const auto& history_frame = injector_->frame_history()->Latest();
   if (history_frame) {
     const auto history_trajectory_type =
         history_frame->reference_line_info().front().trajectory_type();
@@ -103,7 +108,7 @@ Status PathReuseDecider::Process(Frame* const frame,
         (history_trajectory_type != ADCTrajectory::SPEED_FALLBACK);
   }
 
-  // const auto history_trajectory_type = FrameHistory::Instance()
+  // const auto history_trajectory_type = injector_->FrameHistory()s
   //                                          ->Latest()
   //                                          ->reference_line_info()
   //                                          .front()
@@ -121,7 +126,7 @@ Status PathReuseDecider::Process(Frame* const frame,
     }
   } else {
     // F -> T
-    auto* mutable_path_decider_status = PlanningContext::Instance()
+    auto* mutable_path_decider_status = injector_->planning_context()
                                             ->mutable_planning_status()
                                             ->mutable_path_decider();
     static constexpr int kWaitCycle = -2;  // wait 2 cycle
@@ -159,8 +164,7 @@ bool PathReuseDecider::IsIgnoredBlockingObstacle(
   static constexpr double kSDistBuffer = 30.0;  // meter
   static constexpr int kTimeBuffer = 3;         // second
   // vehicle speed
-  double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  double adc_speed = injector_->vehicle_state()->linear_velocity();
   double final_s_buffer = std::max(kSDistBuffer, kTimeBuffer * adc_speed);
   // current vehicle s position
   common::SLPoint adc_position_sl;
@@ -180,7 +184,7 @@ bool PathReuseDecider::IsIgnoredBlockingObstacle(
 
 bool PathReuseDecider::GetBlockingObstacleS(
     ReferenceLineInfo* const reference_line_info, double* blocking_obstacle_s) {
-  auto* mutable_path_decider_status = PlanningContext::Instance()
+  auto* mutable_path_decider_status = injector_->planning_context()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
   // get blocking obstacle ID (front_static_obstacle_id)
@@ -202,9 +206,8 @@ bool PathReuseDecider::GetBlockingObstacleS(
 
 void PathReuseDecider::GetADCSLPoint(const ReferenceLine& reference_line,
                                      common::SLPoint* adc_position_sl) {
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  common::math::Vec2d adc_position = {injector_->vehicle_state()->x(),
+                                      injector_->vehicle_state()->y()};
   reference_line.XYToSL(adc_position, adc_position_sl);
 }
 
@@ -254,7 +257,7 @@ bool PathReuseDecider::IsCollisionFree(
     return true;
   }
 
-  const auto& history_frame = FrameHistory::Instance()->Latest();
+  const auto& history_frame = injector_->frame_history()->Latest();
   if (!history_frame) {
     return false;
   }
@@ -323,7 +326,7 @@ bool PathReuseDecider::NotShortPath(const DiscretizedPath& current_path) {
 bool PathReuseDecider::TrimHistoryPath(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
   const ReferenceLine& reference_line = reference_line_info->reference_line();
-  const auto& history_frame = FrameHistory::Instance()->Latest();
+  const auto& history_frame = injector_->frame_history()->Latest();
   if (!history_frame) {
     ADEBUG << "no history frame";
     return false;

@@ -52,7 +52,7 @@ double MF::GetMax() const {
 }
 
 double MF::Update(const double measurement) {
-  CHECK(initialized_);
+  ACHECK(initialized_);
   CHECK_LE(values_.size(), window_size_);
   CHECK_LE(min_candidates_.size(), window_size_);
   CHECK_LE(max_candidates_.size(), window_size_);

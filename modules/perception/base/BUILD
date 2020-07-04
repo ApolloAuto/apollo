@@ -204,6 +204,7 @@ cc_library(
         "vehicle_struct.h",
     ],
     deps = [
+        "//modules/prediction/proto:feature_proto",
         ":box",
         ":point_cloud",
         "@eigen",

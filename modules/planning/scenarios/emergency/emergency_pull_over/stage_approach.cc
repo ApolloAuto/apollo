@@ -20,11 +20,11 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "cyber/common/log.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -42,8 +42,9 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 
 EmergencyPullOverStageApproach::EmergencyPullOverStageApproach(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus EmergencyPullOverStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -61,7 +62,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
 
   // add a stop fence
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
     const auto& reference_line = reference_line_info.reference_line();
@@ -91,8 +92,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
   if (stop_line_s > 0.0) {
     const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     double distance = stop_line_s - adc_front_edge_s;
-    const double adc_speed =
-        common::VehicleStateProvider::Instance()->linear_velocity();
+    const double adc_speed = injector_->vehicle_state()->linear_velocity();
     const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                           ->GetConfig()
                                           .vehicle_param()

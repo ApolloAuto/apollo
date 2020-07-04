@@ -44,12 +44,13 @@ std::string MPCControllerSubmodule::Name() const {
 }
 
 bool MPCControllerSubmodule::Init() {
+  injector_ = std::make_shared<DependencyInjector>();
   // TODO(SHU): separate common_control conf from controller conf
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
-                                        &mpc_controller_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
+                                         &mpc_controller_conf_))
       << "Unable to load control conf file: " << FLAGS_mpc_controller_conf_file;
 
-  if (!mpc_controller_.Init(&mpc_controller_conf_).ok()) {
+  if (!mpc_controller_.Init(injector_, &mpc_controller_conf_).ok()) {
     monitor_logger_buffer_.ERROR(
         "Control init MPC controller failed! Stopping...");
     return false;
@@ -57,7 +58,7 @@ bool MPCControllerSubmodule::Init() {
 
   control_core_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
-  CHECK(control_core_writer_ != nullptr);
+  ACHECK(control_core_writer_ != nullptr);
   return true;
 }
 

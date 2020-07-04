@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -27,7 +29,8 @@ namespace planning {
 
 class TrafficLight : public TrafficRule {
  public:
-  explicit TrafficLight(const TrafficRuleConfig& config);
+  TrafficLight(const TrafficRuleConfig& config,
+               const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~TrafficLight() = default;
 

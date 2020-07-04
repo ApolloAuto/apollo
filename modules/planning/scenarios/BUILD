@@ -43,6 +43,7 @@ cc_library(
         "//modules/planning/scenarios/emergency/emergency_pull_over:emergency_pull_over_scenario",
         "//modules/planning/scenarios/emergency/emergency_stop:emergency_stop_scenario",
         "//modules/planning/scenarios/lane_follow",
+        "//modules/planning/scenarios/learning_model",
         "//modules/planning/scenarios/park/pull_over:pull_over_scenario",
         "//modules/planning/scenarios/park/valet_parking",
         "//modules/planning/scenarios/park_and_go:park_and_go_scenario",

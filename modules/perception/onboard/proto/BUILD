@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -86,4 +86,38 @@ proto_library(
     srcs = ["lidar_component_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "lane_perception_component_pb2",
+    src = "lane_perception_component.proto",
+)
+
+py_proto(
+    name = "trafficlights_perception_component_pb2",
+    src = "trafficlights_perception_component.proto",
+)
+
+py_proto(
+    name = "motion_service_pb2",
+    src = "motion_service.proto",
+    with_grpc = True,
+)
+
+py_proto(
+    name = "fusion_component_config_pb2",
+    src = "fusion_component_config.proto",
+)
+
+py_proto(
+    name = "lidar_component_config_pb2",
+    src = "lidar_component_config.proto",
+)
+
+py_proto(
+    name = "radar_component_config_pb2",
+    src = "radar_component_config.proto",
+)
+
+py_proto(
+    name = "fusion_camera_detection_component_pb2",
+    src = "fusion_camera_detection_component.proto",
+)

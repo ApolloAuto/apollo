@@ -57,7 +57,8 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
     double rotate_angle, const Vec2d& translate_origin,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec) {
+    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
+    double* time_latency) {
   if (XYbounds.empty() || end_pose.empty() || obstacles_edges_num.cols() == 0 ||
       obstacles_A.cols() == 0 || obstacles_b.cols() == 0) {
     ADEBUG << "OpenSpaceTrajectoryOptimizer input data not ready";
@@ -177,6 +178,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
         init_v = 0.0;
       }
       // TODO(Jinyun): Further testing
+      const auto smoother_start_timestamp = std::chrono::system_clock::now();
       if (FLAGS_use_iterative_anchoring_smoother) {
         if (!GenerateDecoupledTraj(
                 xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
@@ -184,10 +186,15 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                 &time_result_ds_vec[i])) {
           ADEBUG << "Smoother fail at " << i << "th trajectory";
           ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
-          return Status(ErrorCode::PLANNING_ERROR,
-                        "distance approach smoothing problem failed to solve");
+          return Status(
+              ErrorCode::PLANNING_ERROR,
+              "iterative anchoring smoothing problem failed to solve");
         }
       } else {
+        const double start_system_timestamp =
+            std::chrono::duration<double>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count();
         if (!GenerateDistanceApproachTraj(
                 xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
                 obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
@@ -202,7 +209,31 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
           return Status(ErrorCode::PLANNING_ERROR,
                         "distance approach smoothing problem failed to solve");
         }
+        const auto end_system_timestamp =
+            std::chrono::duration<double>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count();
+        const auto time_diff_ms =
+            (end_system_timestamp - start_system_timestamp) * 1000;
+        ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
+        ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+        ADEBUG << "average time spend: " << time_diff_ms / xWS_vec[i].cols()
+               << " ms per point.";
+        ADEBUG << "average time spend after smooth: "
+               << time_diff_ms / state_result_ds_vec[i].cols()
+               << " ms per point.";
+        ADEBUG << i << "th smoothed trajectory size is "
+               << state_result_ds_vec[i].cols();
       }
+      const auto smoother_end_timestamp = std::chrono::system_clock::now();
+      std::chrono::duration<double> smoother_diff =
+          smoother_end_timestamp - smoother_start_timestamp;
+      ADEBUG << "Open space trajectory smoothing total time: "
+             << smoother_diff.count() * 1000.0 << " ms at the " << i
+             << "th trajectory.";
+      ADEBUG << "The " << i << "th trajectory pre-smoothing size is "
+             << xWS_vec[i].cols() << "; post-smoothing size is "
+             << state_result_ds_vec[i].cols();
     }
 
     // Retrive the trajectory in one piece
@@ -256,6 +287,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
   std::chrono::duration<double> diff = end_timestamp - start_timestamp;
   ADEBUG << "open space trajectory smoother total time: "
          << diff.count() * 1000.0 << " ms.";
+  *time_latency = diff.count() * 1000.0;
 
   return Status::OK();
 }

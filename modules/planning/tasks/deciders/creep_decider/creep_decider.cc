@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,8 +38,10 @@ using apollo::hdmap::PathOverlap;
 
 uint32_t CreepDecider::creep_clear_counter_ = 0;
 
-CreepDecider::CreepDecider(const TaskConfig& config) : Decider(config) {
-  CHECK(config_.has_creep_decider_config());
+CreepDecider::CreepDecider(const TaskConfig& config,
+                           const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {
+  ACHECK(config_.has_creep_decider_config());
 }
 
 Status CreepDecider::Process(Frame* frame,
@@ -50,17 +53,17 @@ Status CreepDecider::Process(Frame* frame,
   std::string current_overlap_id;
 
   // stop sign
-  const std::string stop_sign_overlap_id = PlanningContext::Instance()
+  const std::string stop_sign_overlap_id = injector_->planning_context()
                                                ->planning_status()
                                                .stop_sign()
                                                .current_stop_sign_overlap_id();
   // traffic light
   std::string current_traffic_light_overlap_id;
-  if (PlanningContext::Instance()
+  if (injector_->planning_context()
           ->planning_status()
           .traffic_light()
           .current_traffic_light_overlap_id_size() > 0) {
-    current_traffic_light_overlap_id = PlanningContext::Instance()
+    current_traffic_light_overlap_id = injector_->planning_context()
                                            ->planning_status()
                                            .traffic_light()
                                            .current_traffic_light_overlap_id(0);
@@ -68,11 +71,11 @@ Status CreepDecider::Process(Frame* frame,
 
   // yield sign
   std::string yield_sign_overlap_id;
-  if (PlanningContext::Instance()
+  if (injector_->planning_context()
           ->planning_status()
           .yield_sign()
           .current_yield_sign_overlap_id_size() > 0) {
-    yield_sign_overlap_id = PlanningContext::Instance()
+    yield_sign_overlap_id = injector_->planning_context()
                                 ->planning_status()
                                 .yield_sign()
                                 .current_yield_sign_overlap_id(0);

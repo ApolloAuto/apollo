@@ -41,10 +41,10 @@ DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b),
       xWS_(xWS) {
-  CHECK(horizon < std::numeric_limits<int>::max())
+  ACHECK(horizon < std::numeric_limits<int>::max())
       << "Invalid cast on horizon in open space planner";
   horizon_ = static_cast<int>(horizon);
-  CHECK(obstacles_num < std::numeric_limits<int>::max())
+  ACHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
   obstacles_num_ = static_cast<int>(obstacles_num);
   w_ev_ = ego_(1, 0) + ego_(3, 0);
@@ -102,9 +102,9 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x) << "Warm start init_x setting failed";
-  CHECK(!init_z) << "Warm start init_z setting failed";
-  CHECK(!init_lambda) << "Warm start init_lambda setting failed";
+  ACHECK(init_x) << "Warm start init_x setting failed";
+  ACHECK(!init_z) << "Warm start init_z setting failed";
+  ACHECK(!init_lambda) << "Warm start init_lambda setting failed";
 
   int l_index = l_start_index_;
   int n_index = n_start_index_;

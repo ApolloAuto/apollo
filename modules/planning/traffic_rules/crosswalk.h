@@ -20,9 +20,11 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -30,7 +32,8 @@ namespace planning {
 
 class Crosswalk : public TrafficRule {
  public:
-  explicit Crosswalk(const TrafficRuleConfig& config);
+  Crosswalk(const TrafficRuleConfig& config,
+            const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Crosswalk() = default;
 
   common::Status ApplyRule(Frame* const frame,

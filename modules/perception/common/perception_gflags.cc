@@ -16,6 +16,8 @@
 
 #include "modules/perception/common/perception_gflags.h"
 
+#include <climits>
+
 namespace apollo {
 namespace perception {
 
@@ -34,6 +36,35 @@ DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");
 // config_manager
 DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
 DEFINE_string(work_root, "", "Project work root direcotry.");
+
+// lidar_point_pillars
+DEFINE_int32(gpu_id, 0, "The id of gpu used for inference.");
+DEFINE_string(pfe_onnx_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/point_pillars/pfe.onnx",
+              "The path of pillars feature extractor onnx file.");
+DEFINE_string(rpn_onnx_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/point_pillars/rpn.onnx",
+              "The path of RPN onnx file.");
+DEFINE_double(normalizing_factor, 255,
+              "Normalize intensity range to [0, 1] by this factor.");
+DEFINE_int32(num_point_feature, 5,
+             "Length of raw point feature. Features include x, y, z,"
+             "intensity and delta of time.");
+DEFINE_bool(enable_fuse_frames, false,
+            "Enable fusing preceding frames' point cloud into current frame.");
+DEFINE_int32(num_fuse_frames, 5,
+             "Number of frames to fuse, including current frame.");
+DEFINE_double(fuse_time_interval, 0.5,
+              "Time interval in seconds of frames to fuse.");
+DEFINE_bool(enable_shuffle_points, false,
+            "Enable shuffling points before preprocessing.");
+DEFINE_int32(max_num_points, INT_MAX, "Max number of points to preprocess.");
+DEFINE_bool(reproduce_result_mode, false, "True if preprocess in CPU mode.");
+DEFINE_double(score_threshold, 0.5, "Classification score threshold.");
+DEFINE_double(nms_overlap_threshold, 0.5, "Nms overlap threshold.");
+DEFINE_int32(num_output_box_feature, 7, "Length of output box feature.");
 
 }  // namespace perception
 }  // namespace apollo

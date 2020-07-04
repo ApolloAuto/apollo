@@ -27,7 +27,7 @@ namespace prediction {
 class FreeMovePredictorTest : public KMLMapBasedTest {
  public:
   FreeMovePredictorTest() {
-    CHECK(cyber::common::GetProtoFromFile(
+    ACHECK(cyber::common::GetProtoFromFile(
         "modules/prediction/testdata/single_perception_vehicle_offlane.pb.txt",
         &perception_obstacles_));
     FLAGS_p_var = 0.1;

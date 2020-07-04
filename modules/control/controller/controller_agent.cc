@@ -77,14 +77,16 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
   return Status::OK();
 }
 
-Status ControllerAgent::Init(const ControlConf *control_conf) {
+Status ControllerAgent::Init(std::shared_ptr<DependencyInjector> injector,
+                             const ControlConf *control_conf) {
+  injector_ = injector;
   RegisterControllers(control_conf);
-  CHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
+  ACHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
   for (auto &controller : controller_list_) {
     if (controller == nullptr) {
       return Status(ErrorCode::CONTROL_INIT_ERROR, "Controller is null.");
     }
-    if (!controller->Init(control_conf_).ok()) {
+    if (!controller->Init(injector, control_conf_).ok()) {
       AERROR << "Controller <" << controller->Name() << "> init failed!";
       return Status(ErrorCode::CONTROL_INIT_ERROR,
                     "Failed to init Controller:" + controller->Name());

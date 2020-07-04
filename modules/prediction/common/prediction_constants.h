@@ -32,6 +32,7 @@ class PredictionConstants {
   static const int kDumpPredictionResult = 3;
   static const int kDumpFrameEnv = 4;
   static const int kDumpDataForTuning = 5;
+  static const int kDumpRecord = 6;
 };
 
 }  // namespace prediction

@@ -20,10 +20,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -31,7 +32,8 @@ namespace planning {
 
 class SpeedBoundsDecider : public Decider {
  public:
-  explicit SpeedBoundsDecider(const TaskConfig& config);
+  SpeedBoundsDecider(const TaskConfig& config,
+                     const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   common::Status Process(Frame* const frame,

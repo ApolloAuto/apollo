@@ -21,19 +21,22 @@ DEFINE_string(third_party_perception_node_name, "third_party_perception",
 
 DEFINE_double(third_party_perception_freq, 10,
               "third party perception timer frequency.");
-DEFINE_bool(enable_mobileye, true, "switch to turn on/off mobileye obstacles");
 DEFINE_bool(enable_radar, true, "switch to turn on/off radar obstacles");
 
 // flags to calibrate mobileye, radar and localization
 DEFINE_double(mobileye_pos_adjust, 3.0,
               "adjust mobileye objects's position due to distance between "
               "mobileye and gps.");
+DEFINE_double(smartereye_pos_adjust, 3.0,
+              "adjust smartereye objects's position due to distance between "
+              "smartereye and gps.");
 DEFINE_double(
     radar_pos_adjust, 3.0,
     "adjust radar objects's position due to distance between radar and gps.");
 
 // object id offset
 DEFINE_int32(mobileye_id_offset, 0, "id offset for mobileye");
+DEFINE_int32(smartereye_id_offset, 0, "id offset for smartereye");
 DEFINE_int32(radar_id_offset, 1000, "id offset for radar");
 
 // flags to create fake bounding box

@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -48,7 +49,11 @@ class PublicRoadPlanner : public PlannerWithReferenceLine {
   /**
    * @brief Constructor
    */
-  PublicRoadPlanner() = default;
+  PublicRoadPlanner() = delete;
+
+  explicit PublicRoadPlanner(
+      const std::shared_ptr<DependencyInjector>& injector)
+      : PlannerWithReferenceLine(injector) {}
 
   /**
    * @brief Destructor

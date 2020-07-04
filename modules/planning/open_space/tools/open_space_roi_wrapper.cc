@@ -355,7 +355,7 @@ class OpenSpaceROITest {
       return false;
     }
 
-    CHECK(cyber::common::GetProtoFromFile(
+    ACHECK(cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;

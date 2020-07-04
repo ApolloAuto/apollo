@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
@@ -34,9 +36,10 @@ struct EmergencyPullOverContext;
 
 class EmergencyPullOverStageStandby : public Stage {
  public:
-  explicit EmergencyPullOverStageStandby(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  EmergencyPullOverStageStandby(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

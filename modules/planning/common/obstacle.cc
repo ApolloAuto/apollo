@@ -77,14 +77,14 @@ Obstacle::Obstacle(const std::string& id,
       perception_obstacle.polygon_point_size() <= 2) {
     perception_bounding_box_.GetAllCorners(&polygon_points);
   } else {
-    CHECK(perception_obstacle.polygon_point_size() > 2)
+    ACHECK(perception_obstacle.polygon_point_size() > 2)
         << "object " << id << "has less than 3 polygon points";
     for (const auto& point : perception_obstacle.polygon_point()) {
       polygon_points.emplace_back(point.x(), point.y());
     }
   }
-  CHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
-                                                   &perception_polygon_))
+  ACHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
+                                                    &perception_polygon_))
       << "object[" << id << "] polygon is not a valid convex hull.\n"
       << perception_obstacle.DebugString();
 

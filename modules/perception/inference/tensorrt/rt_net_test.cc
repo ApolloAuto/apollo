@@ -79,15 +79,15 @@ class TestableRTNet : public RTNet {
 //   std::vector<int> shape = {batchsize, height, width, 3};
 //   std::map<std::string, std::vector<int>> shape_map{{input_blob_name,
 //   shape}}; rt_net.set_max_batch_size(batchsize);
-//   CHECK(rt_net.Init(shape_map));
-//   CHECK(!rt_net.shape("bad", &shape));
+//   ACHECK(rt_net.Init(shape_map));
+//   ACHECK(!rt_net.shape("bad", &shape));
 
-//   CHECK(!rt_net.checkInt8("test", nullptr));
+//   ACHECK(!rt_net.checkInt8("test", nullptr));
 //   std::shared_ptr<nvinfer1::Int8EntropyCalibrator> calibrator;
 //   apollo::perception::inference::BatchStream stream;
 //   calibrator.reset(new nvinfer1::Int8EntropyCalibrator(stream, 0, true, ""));
-//   CHECK(!rt_net.checkInt8("test", calibrator.get()));
-//   CHECK(rt_net.checkInt8("Tesla P4", calibrator.get()));
+//   ACHECK(!rt_net.checkInt8("test", calibrator.get()));
+//   ACHECK(rt_net.checkInt8("Tesla P4", calibrator.get()));
 // }
 // TEST(RTNetLayerOwnCalibratorTest, test) {
 //   std::string image_root =
@@ -230,7 +230,7 @@ class TestableRTNet : public RTNet {
 
 //   rt_net = apollo::perception::inference::CreateInferenceByName(
 //       "RTNet", proto_file, weight_file, outputs, inputs);
-//   CHECK(rt_net);
+//   ACHECK(rt_net);
 //   int height = 576;
 //   int width = 1440;
 //   int offset_y = 312;
@@ -239,7 +239,7 @@ class TestableRTNet : public RTNet {
 //   rt_net->set_gpu_id(-1);
 //   std::map<std::string, std::vector<int>> shape_map{{input_blob_name,
 //   shape}}; rt_net->set_max_batch_size(batchsize);
-//   CHECK(!rt_net->Init(shape_map));
+//   ACHECK(!rt_net->Init(shape_map));
 //   if (rt_net != nullptr) {
 //     delete rt_net;
 //   }
@@ -279,7 +279,7 @@ class TestableRTNet : public RTNet {
 
 //   rt_net = apollo::perception::inference::CreateInferenceByName(
 //       "UNKNWONNet", proto_file, weight_file, outputs, inputs);
-//   CHECK(!rt_net);
+//   ACHECK(!rt_net);
 //   if (rt_net != nullptr) {
 //     delete rt_net;
 //   }
@@ -319,14 +319,14 @@ class TestableRTNet : public RTNet {
 
 //   rt_net = apollo::perception::inference::CreateInferenceByName(
 //       "RTNet", proto_file, weight_file, outputs, inputs);
-//   CHECK(rt_net);
+//   ACHECK(rt_net);
 //   int height = 111;
 //   int width = 222;
 //   int offset_y = 23;
 //   int batchsize = 2;
 //   std::vector<int> shape = {batchsize, height, width, 4};
 //   std::map<std::string, std::vector<int>> shape_map{{"bad", shape}};
-//   CHECK(rt_net->Init(shape_map));
+//   ACHECK(rt_net->Init(shape_map));
 //   auto blob = rt_net->get_blob(input_blob_name);
 //   for (int i = 0; i < shape.size(); i++) {
 //     CHECK_NE(blob->shape(i), shape[i]);
@@ -371,7 +371,7 @@ class TestableRTNet : public RTNet {
 
 //   rt_net = apollo::perception::inference::CreateInferenceByName(
 //       "RTNet", proto_file, weight_file, outputs, inputs);
-//   CHECK(rt_net);
+//   ACHECK(rt_net);
 //   int height = 576;
 //   int width = 1440;
 //   int offset_y = 312;
@@ -447,7 +447,7 @@ class TestableRTNet : public RTNet {
 
 //   rt_net.reset(apollo::perception::inference::CreateInferenceByName(
 //       "CaffeNet", proto_file, weight_file, outputs, inputs));
-//   CHECK(rt_net);
+//   ACHECK(rt_net);
 
 //   int height = 576;
 //   int width = 1440;

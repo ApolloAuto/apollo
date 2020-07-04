@@ -7,6 +7,9 @@ cc_library(
     srcs = [],
     hdrs = ["controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
+    deps = [
+        "//modules/control/common:dependency_injector",
+    ],
 )
 
 cc_library(
@@ -51,7 +54,6 @@ cc_library(
         "//modules/common/filters:digital_filter_coefficients",
         "//modules/common/status",
         "//modules/common/time",
-        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
         "//modules/control/common:interpolation_2d",
         "//modules/control/common:leadlag_controller",
@@ -118,6 +120,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/control/common:dependency_injector",
         "@osqp",
     ],
 )
@@ -126,6 +129,7 @@ cc_test(
     name = "lon_controller_test",
     size = "small",
     srcs = ["lon_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":lon_controller",
@@ -144,6 +148,7 @@ cc_test(
     name = "lat_controller_test",
     size = "small",
     srcs = ["lat_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":lat_controller",
@@ -162,6 +167,7 @@ cc_test(
     name = "mpc_controller_test",
     size = "small",
     srcs = ["mpc_controller_test.cc"],
+    copts = ["-fno-access-control"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":mpc_controller",

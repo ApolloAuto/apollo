@@ -31,14 +31,16 @@ class YieldSignStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::YIELD_SIGN_APPROACH);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(YieldSignStageApproachTest, Init) {
-  YieldSignStageApproach yield_sign_stage_approach(config_);
+  YieldSignStageApproach yield_sign_stage_approach(config_, injector_);
   EXPECT_EQ(
       yield_sign_stage_approach.Name(),
       ScenarioConfig::StageType_Name(ScenarioConfig::YIELD_SIGN_APPROACH));

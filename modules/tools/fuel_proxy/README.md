@@ -17,17 +17,4 @@ We have offered a unique opportunity through the Data Pipeline tool to communica
 
 ## Submit Job
 
-1. Prepare a [job config](proto/job_config.proto) file. See the
-   [example](conf/example_job.pb.txt).
-
-1. Build Apollo Python libs in /apollo.
-
-   ```bash
-   ./apollo.sh build_py
-   ```
-
-1. Run the tool.
-
-   ```bash
-   ./submit_job.py --job_config=/path/to/your/job.pb.txt
-   ```
+Go to our [web portal](http://apollo.auto/fuel.html) to submit your job.

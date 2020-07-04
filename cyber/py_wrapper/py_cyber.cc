@@ -520,7 +520,7 @@ PyObject *cyber_PyNode_create_reader(PyObject *self, PyObject *args) {
 
   PyReader *reader = reinterpret_cast<PyReader *>((node->create_reader(
       (std::string const &)channel_name, (std::string const &)type_name)));
-  CHECK(reader) << "PyReader is NULL!";
+  ACHECK(reader) << "PyReader is NULL!";
 
   PyObject *pyobj_reader =
       PyCapsule_New(reader, "apollo_cyber_pyreader", nullptr);

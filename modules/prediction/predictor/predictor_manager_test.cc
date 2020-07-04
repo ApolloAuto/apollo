@@ -33,13 +33,20 @@ class PredictorManagerTest : public KMLMapBasedTest {
   void SetUp() override {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+
+    container_manager_.reset(new ContainerManager());
+    evaluator_manager_.reset(new EvaluatorManager());
+    predictor_manager_.reset(new PredictorManager());
   }
 
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
   common::adapter::AdapterManagerConfig adapter_conf_;
   PredictionConf prediction_conf_;
+  std::unique_ptr<ContainerManager> container_manager_;
+  std::unique_ptr<EvaluatorManager> evaluator_manager_;
+  std::unique_ptr<PredictorManager> predictor_manager_;
 };
 
 TEST_F(PredictorManagerTest, General) {
@@ -50,26 +57,26 @@ TEST_F(PredictorManagerTest, General) {
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
-  ContainerManager::Instance()->Init(adapter_conf_);
-  EvaluatorManager::Instance()->Init(prediction_conf_);
-  PredictorManager::Instance()->Init(prediction_conf_);
+  container_manager_->Init(adapter_conf_);
+  evaluator_manager_->Init(prediction_conf_);
+  predictor_manager_->Init(prediction_conf_);
 
   auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager_->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 
   auto adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+      container_manager_->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
 
-  EvaluatorManager::Instance()->Run(obstacles_container);
-  PredictorManager::Instance()->Run(
-      perception_obstacles_, adc_trajectory_container, obstacles_container);
+  evaluator_manager_->Run(obstacles_container);
+  predictor_manager_->Run(perception_obstacles_, adc_trajectory_container,
+                          obstacles_container);
 
   const PredictionObstacles& prediction_obstacles =
-      PredictorManager::Instance()->prediction_obstacles();
+      predictor_manager_->prediction_obstacles();
   EXPECT_EQ(prediction_obstacles.prediction_obstacle_size(), 1);
 }
 

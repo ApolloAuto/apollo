@@ -440,7 +440,7 @@ torch::Tensor LaneAggregatingEvaluator::AggregateLaneEncodings(
 
 torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  CHECK(!lane_encoding_list.empty());
+  ACHECK(!lane_encoding_list.empty());
   torch::Tensor output_tensor = lane_encoding_list[0];
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {
@@ -454,7 +454,7 @@ torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
 
 torch::Tensor LaneAggregatingEvaluator::LaneEncodingAvgPooling(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  CHECK(!lane_encoding_list.empty());
+  ACHECK(!lane_encoding_list.empty());
   torch::Tensor output_tensor = lane_encoding_list[0];
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {

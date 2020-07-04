@@ -42,7 +42,7 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     object_ptr = obj_ptr;
 
     sensor_to_local_pose = pose;
-
+    global_local_offset = global_to_local_offset;
     // object info to tracked object
     center = pose * object_ptr->center;
     const PointFCloud& cloud = (object_ptr->lidar_supplement).cloud;

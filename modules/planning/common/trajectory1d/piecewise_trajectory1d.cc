@@ -31,7 +31,7 @@ double PiecewiseTrajectory1d::Evaluate(const std::uint32_t order,
                                        const double param) const {
   auto it_lower = std::lower_bound(accumulated_param_lengths_.begin(),
                                    accumulated_param_lengths_.end(), param);
-  CHECK(it_lower != accumulated_param_lengths_.end());
+  ACHECK(it_lower != accumulated_param_lengths_.end());
 
   size_t index = (size_t)(it_lower - accumulated_param_lengths_.begin());
 

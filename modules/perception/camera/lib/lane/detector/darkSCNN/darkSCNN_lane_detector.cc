@@ -61,8 +61,8 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
     input_height_ = static_cast<uint16_t>(base_camera_model_->get_height());
     input_width_ = static_cast<uint16_t>(base_camera_model_->get_width());
   }
-  CHECK(input_width_ > 0) << "input width should be more than 0";
-  CHECK(input_height_ > 0) << "input height should be more than 0";
+  ACHECK(input_width_ > 0) << "input width should be more than 0";
+  ACHECK(input_height_ > 0) << "input height should be more than 0";
 
   AINFO << "input_height: " << input_height_;
   AINFO << "input_width: " << input_width_;
@@ -122,11 +122,11 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   cnnadapter_lane_.reset(
       inference::CreateInferenceByName(model_type, proto_file, weight_file,
                                        net_outputs_, net_inputs_, model_root));
-  CHECK(cnnadapter_lane_ != nullptr);
+  ACHECK(cnnadapter_lane_ != nullptr);
 
   cnnadapter_lane_->set_gpu_id(options.gpu_id);
-  CHECK(resize_width_ > 0) << "resize width should be more than 0";
-  CHECK(resize_height_ > 0) << "resize height should be more than 0";
+  ACHECK(resize_width_ > 0) << "resize width should be more than 0";
+  ACHECK(resize_height_ > 0) << "resize height should be more than 0";
   std::vector<int> shape = {1, 3, resize_height_, resize_width_};
   std::map<std::string, std::vector<int>> input_reshape{
       {net_inputs_[0], shape}};

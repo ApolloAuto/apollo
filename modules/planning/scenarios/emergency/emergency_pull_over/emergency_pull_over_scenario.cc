@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 
+#include <memory>
+
 #include "cyber/common/log.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
@@ -32,7 +34,8 @@ namespace emergency_pull_over {
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     EmergencyPullOverScenario::s_stage_factory_;
 
 void EmergencyPullOverScenario::Init() {
@@ -56,28 +59,32 @@ void EmergencyPullOverScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new EmergencyPullOverStageSlowDown(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new EmergencyPullOverStageSlowDown(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new EmergencyPullOverStageApproach(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new EmergencyPullOverStageApproach(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new EmergencyPullOverStageStandby(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new EmergencyPullOverStageStandby(config, injector);
       });
 }
 
 std::unique_ptr<Stage> EmergencyPullOverScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+  auto ptr = s_stage_factory_.CreateObjectOrNull(
+      stage_config.stage_type(), stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

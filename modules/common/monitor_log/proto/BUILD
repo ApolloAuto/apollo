@@ -1,3 +1,5 @@
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -13,5 +15,13 @@ proto_library(
     deps = [
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+py_proto(
+    name = "monitor_log_pb2",
+    src = "monitor_log.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
     ],
 )

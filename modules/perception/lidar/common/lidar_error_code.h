@@ -31,6 +31,7 @@ enum class LidarErrorCode {
   ObjectFilterError = 6,
   ClassifierError = 7,
   TrackerError = 8,
+  DetectionError = 9,
 };
 
 struct LidarProcessResult {

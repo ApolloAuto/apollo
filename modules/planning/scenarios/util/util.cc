@@ -78,10 +78,13 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
 /**
  * @brief: check adc parked properly
  */
-PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
-                                const ScenarioPullOverConfig& scenario_config) {
+PullOverStatus CheckADCPullOver(
+    const common::VehicleStateProvider* vehicle_state_provider,
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioPullOverConfig& scenario_config,
+    const PlanningContext* planning_context) {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      planning_context->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
@@ -101,8 +104,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return PASS_DESTINATION;
   }
 
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = vehicle_state_provider->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
@@ -118,15 +120,14 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return APPROACHING;
   }
 
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  const common::math::Vec2d adc_position = {vehicle_state_provider->x(),
+                                            vehicle_state_provider->y()};
   const common::math::Vec2d target_position = {pull_over_status.position().x(),
                                                pull_over_status.position().y()};
 
   const bool position_check = CheckPullOverPositionBySL(
       reference_line_info, scenario_config, adc_position,
-      common::VehicleStateProvider::Instance()->heading(), target_position,
+      vehicle_state_provider->heading(), target_position,
       pull_over_status.theta(), true);
 
   return position_check ? PARK_COMPLETE : PARK_FAIL;
@@ -138,9 +139,10 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 PullOverStatus CheckADCPullOverPathPoint(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioPullOverConfig& scenario_config,
-    const common::PathPoint& path_point) {
+    const common::PathPoint& path_point,
+    const PlanningContext* planning_context) {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      planning_context->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
@@ -192,9 +194,10 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
   return ret;
 }
 
-bool CheckADCReadyToCruise(Frame* frame,
-                           const ScenarioParkAndGoConfig& scenario_config) {
-  auto vehicle_status = common::VehicleStateProvider::Instance();
+bool CheckADCReadyToCruise(
+    const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
+    const ScenarioParkAndGoConfig& scenario_config) {
+  auto vehicle_status = vehicle_state_provider;
   common::math::Vec2d adc_position = {vehicle_status->x(), vehicle_status->y()};
   const double adc_heading = vehicle_status->heading();
 
@@ -254,6 +257,9 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   // obstacle boxes
   auto obstacles = frame->obstacles();
   for (const auto& obstacle : obstacles) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
     const Polygon2d& nudge_polygon = obstacle_polygon.ExpandByDistance(
         std::fabs(FLAGS_static_obstacle_nudge_l_buffer));

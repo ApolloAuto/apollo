@@ -20,7 +20,9 @@
 #include "cyber/init.h"
 #include "cyber/time/time.h"
 
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/pad_msg.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
@@ -30,14 +32,23 @@ namespace {
 using apollo::cyber::CreateNode;
 using apollo::cyber::Node;
 using apollo::cyber::Writer;
+using apollo::cyber::common::GetProtoFromFile;
 using apollo::planning::DrivingAction;
 using apollo::planning::PadMessage;
+using apollo::planning::PlanningConfig;
 
 class PadTerminal {
  public:
   PadTerminal() : node_(CreateNode("planning_pad_terminal")) {}
   void init() {
-    pad_writer_ = node_->CreateWriter<PadMessage>(FLAGS_planning_pad_topic);
+    const std::string planning_config_file =
+        "/apollo/modules/planning/conf/planning_config.pb.txt";
+    PlanningConfig planning_config;
+    ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
+        << "failed to load planning config file " << planning_config_file;
+
+    pad_writer_ = node_->CreateWriter<PadMessage>(
+        planning_config.topic_config().planning_pad_topic());
     terminal_thread_.reset(new std::thread([this] { terminal_thread_func(); }));
   }
   void help() {

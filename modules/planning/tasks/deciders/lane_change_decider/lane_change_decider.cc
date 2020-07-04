@@ -17,6 +17,7 @@
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 
 #include <limits>
+#include <memory>
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_context.h"
@@ -30,9 +31,11 @@ using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::time::Clock;
 
-LaneChangeDecider::LaneChangeDecider(const TaskConfig& config)
-    : Decider(config) {
-  CHECK(config_.has_lane_change_decider_config());
+LaneChangeDecider::LaneChangeDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {
+  ACHECK(config_.has_lane_change_decider_config());
 }
 
 // added a dummy parameter to enable this task in ExecuteTaskOnReferenceLine
@@ -56,7 +59,7 @@ Status LaneChangeDecider::Process(
     return Status::OK();
   }
 
-  auto* prev_status = PlanningContext::Instance()
+  auto* prev_status = injector_->planning_context()
                           ->mutable_planning_status()
                           ->mutable_change_lane();
   double now = Clock::NowInSeconds();
@@ -144,10 +147,10 @@ Status LaneChangeDecider::Process(
 
 void LaneChangeDecider::UpdatePreparationDistance(
     const bool is_opt_succeed, const Frame* frame,
-    const ReferenceLineInfo* const reference_line_info) {
-  auto* lane_change_status = PlanningContext::Instance()
-                                 ->mutable_planning_status()
-                                 ->mutable_change_lane();
+    const ReferenceLineInfo* const reference_line_info,
+    PlanningContext* planning_context) {
+  auto* lane_change_status =
+      planning_context->mutable_planning_status()->mutable_change_lane();
   ADEBUG << "Current time: " << lane_change_status->timestamp();
   ADEBUG << "Lane Change Status: " << lane_change_status->status();
   // If lane change planning succeeded, update and return
@@ -193,7 +196,7 @@ void LaneChangeDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
 void LaneChangeDecider::UpdateStatus(double timestamp,
                                      ChangeLaneStatus::Status status_code,
                                      const std::string& path_id) {
-  auto* lane_change_status = PlanningContext::Instance()
+  auto* lane_change_status = injector_->planning_context()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
   lane_change_status->set_timestamp(timestamp);

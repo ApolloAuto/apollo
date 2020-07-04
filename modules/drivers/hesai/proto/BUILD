@@ -1,5 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
 
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -24,6 +26,22 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+py_proto(
+    name = "hesai_pb2",
+    src = "hesai.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "config_pb2",
+    src = "config.proto",
+    deps = [
+        "//modules/drivers/hesai/proto:hesai_pb2",
     ],
 )
 

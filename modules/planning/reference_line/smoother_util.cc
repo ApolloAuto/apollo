@@ -57,8 +57,8 @@ class SmootherUtil {
       auto y_str = point_str.substr(idx + 1);
       raw_points_.emplace_back(std::stod(x_str), std::stod(y_str));
     }
-    CHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                          &config_))
+    ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
+                                           &config_))
         << "Failed to read smoother config file: "
         << FLAGS_smoother_config_filename;
   }

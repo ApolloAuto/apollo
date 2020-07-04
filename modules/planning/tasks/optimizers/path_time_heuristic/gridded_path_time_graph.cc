@@ -66,7 +66,7 @@ bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
 }  // namespace
 
 GriddedPathTimeGraph::GriddedPathTimeGraph(
-    const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
+    const StGraphData& st_graph_data, const DpStSpeedOptimizerConfig& dp_config,
     const std::vector<const Obstacle*>& obstacles,
     const common::TrajectoryPoint& init_point)
     : st_graph_data_(st_graph_data),

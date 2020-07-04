@@ -21,6 +21,7 @@
 #pragma once
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,7 +47,8 @@ namespace apollo {
 namespace planning {
 class OpenSpaceRoiDecider : public Decider {
  public:
-  explicit OpenSpaceRoiDecider(const TaskConfig &config);
+  OpenSpaceRoiDecider(const TaskConfig &config,
+                      const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   apollo::common::Status Process(Frame *frame) override;

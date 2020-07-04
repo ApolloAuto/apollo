@@ -35,4 +35,6 @@ message LatControllerConf {
   optional double lookback_station = 22 [default = 0.0];
   optional MracConf steer_mrac_conf = 23;
   optional bool enable_steer_mrac_control = 24 [default = false];
+  optional double lookahead_station_high_speed = 25 [default = 0.0];
+  optional double lookback_station_high_speed = 26 [default = 0.0];
 }

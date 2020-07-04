@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -28,7 +29,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/st_bounds_decider_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_driving_limits.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_guide_line.h"
@@ -42,7 +43,8 @@ constexpr double kSTPassableThreshold = 3.0;
 
 class STBoundsDecider : public Decider {
  public:
-  explicit STBoundsDecider(const TaskConfig& config);
+  STBoundsDecider(const TaskConfig& config,
+                  const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   common::Status Process(Frame* const frame,

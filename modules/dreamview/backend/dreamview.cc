@@ -56,9 +56,13 @@ Status Dreamview::Init() {
   // Initialize and run the web server which serves the dreamview htmls and
   // javascripts and handles websocket requests.
   std::vector<std::string> options = {
-      "document_root",      FLAGS_static_file_dir,   "listening_ports",
-      FLAGS_server_ports,   "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
-      "request_timeout_ms", FLAGS_request_timeout_ms};
+      "document_root",      FLAGS_static_file_dir,
+      "listening_ports",    FLAGS_server_ports,
+      "websocket_timeout_ms",  FLAGS_websocket_timeout_ms,
+      "request_timeout_ms", FLAGS_request_timeout_ms,
+      "enable_keep_alive", "yes",
+      "tcp_nodelay",  "1",
+      "keep_alive_timeout_ms", "500"};
   if (PathExists(FLAGS_ssl_certificate)) {
     options.push_back("ssl_certificate");
     options.push_back(FLAGS_ssl_certificate);
@@ -84,7 +88,8 @@ Status Dreamview::Init() {
       websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
       map_service_.get(), data_collection_monitor_.get(),
       perception_camera_updater_.get(), FLAGS_routing_from_file));
-  point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
+  point_cloud_updater_.reset(
+    new PointCloudUpdater(point_cloud_ws_.get(), sim_world_updater_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get(),
                      data_collection_monitor_.get()));
 

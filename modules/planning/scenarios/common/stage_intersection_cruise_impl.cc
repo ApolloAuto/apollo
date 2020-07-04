@@ -34,7 +34,8 @@ namespace scenario {
 
 bool StageIntersectionCruiseImpl::CheckDone(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type,
-    const ScenarioConfig::StageConfig& config, const bool right_of_way_status) {
+    const ScenarioConfig::StageConfig& config, const PlanningContext* context,
+    const bool right_of_way_status) {
   const auto& reference_line_info = frame.reference_line_info().front();
 
   const auto& pnc_junction_overlaps =
@@ -47,8 +48,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
     if (scenario_type == ScenarioConfig::STOP_SIGN_PROTECTED ||
         scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
       // stop_sign scenarios
-      const auto& stop_sign_status =
-          PlanningContext::Instance()->planning_status().stop_sign();
+      const auto& stop_sign_status = context->planning_status().stop_sign();
       const std::string traffic_sign_overlap_id =
           stop_sign_status.current_stop_sign_overlap_id();
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
@@ -61,7 +61,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
                    ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
       // traffic_light scenarios
       const auto& traffic_light_status =
-          PlanningContext::Instance()->planning_status().traffic_light();
+          context->planning_status().traffic_light();
       const std::string traffic_sign_overlap_id =
           traffic_light_status.current_traffic_light_overlap_id_size() > 0
               ? traffic_light_status.current_traffic_light_overlap_id(0)
@@ -71,8 +71,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
           ReferenceLineInfo::SIGNAL);
     } else if (scenario_type == ScenarioConfig::YIELD_SIGN) {
       // yield_sign scenarios
-      const auto& yield_sign_status =
-          PlanningContext::Instance()->planning_status().yield_sign();
+      const auto& yield_sign_status = context->planning_status().yield_sign();
       const std::string traffic_sign_overlap_id =
           yield_sign_status.current_yield_sign_overlap_id_size() > 0
               ? yield_sign_status.current_yield_sign_overlap_id(0)

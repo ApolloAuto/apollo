@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -50,7 +51,8 @@ class PathBoundsDecider : public Decider {
     NO_BORROW,
     RIGHT_BORROW,
   };
-  explicit PathBoundsDecider(const TaskConfig& config);
+  PathBoundsDecider(const TaskConfig& config,
+                    const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   /** @brief Every time when Process function is called, it will:
@@ -194,6 +196,14 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
 
+  /** @brief Update left boundary by lane_left_width
+   *   This is for normal pull-over, which uses lane boundary as left boundary
+   *   and road_boundary for right boundary
+   */
+  void UpdatePullOverBoundaryByLaneBoundary(
+      const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
+
   void ConvertBoundarySAxisFromLaneCenterToRefLine(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
@@ -237,6 +247,18 @@ class PathBoundsDecider : public Decider {
    */
   double GetBufferBetweenADCCenterAndEdge();
 
+  /** @brief Update the path_boundary at "idx"
+   *         It also checks if ADC is blocked (lmax < lmin).
+   *  @param The current index of the path_bounds
+   *  @param The minimum left boundary (l_max)
+   *  @param The maximum right boundary (l_min)
+   *  @param The path_boundaries (its content at idx will be updated)
+   *  @return If path is good, true; if path is blocked, false.
+   */
+  bool UpdatePathBoundaryWithBuffer(
+      size_t idx, double left_bound, double right_bound,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
    *         It also checks if ADC is blocked (lmax < lmin).
    *  @param The current index of the path_bounds
@@ -246,7 +268,7 @@ class PathBoundsDecider : public Decider {
    *  @param The center_line (to be updated)
    *  @return If path is good, true; if path is blocked, false.
    */
-  bool UpdatePathBoundaryAndCenterLine(
+  bool UpdatePathBoundaryAndCenterLineWithBuffer(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
       double* const center_line);

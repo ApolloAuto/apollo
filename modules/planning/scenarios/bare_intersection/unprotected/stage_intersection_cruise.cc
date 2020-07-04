@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_intersection_cruise.h"
 
+#include <memory>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -38,7 +40,8 @@ Stage::StageStatus BareIntersectionUnprotectedStageIntersectionCruise::Process(
   }
 
   bool stage_done = stage_impl_.CheckDone(
-      *frame, ScenarioConfig::BARE_INTERSECTION_UNPROTECTED, config_, false);
+      *frame, ScenarioConfig::BARE_INTERSECTION_UNPROTECTED, config_,
+      injector_->planning_context(), false);
   if (stage_done) {
     return FinishStage();
   }

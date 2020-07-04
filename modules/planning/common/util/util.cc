@@ -51,10 +51,10 @@ bool IsDifferentRouting(const RoutingResponse& first,
   return true;
 }
 
-double GetADCStopDeceleration(const double adc_front_edge_s,
-                              const double stop_line_s) {
-  double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+double GetADCStopDeceleration(
+    apollo::common::VehicleStateProvider* vehicle_state,
+    const double adc_front_edge_s, const double stop_line_s) {
+  double adc_speed = vehicle_state->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
@@ -133,7 +133,7 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
  */
 void GetFilesByPath(const boost::filesystem::path& path,
                     std::vector<std::string>* files) {
-  CHECK(files);
+  ACHECK(files);
   if (!boost::filesystem::exists(path)) {
     return;
   }

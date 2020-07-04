@@ -21,7 +21,6 @@
 #include "modules/planning/scenarios/scenario.h"
 
 #include "cyber/common/file.h"
-#include "modules/planning/common/planning_context.h"
 
 #include "modules/planning/common/frame.h"
 
@@ -29,8 +28,9 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context)
-    : config_(config), scenario_context_(context) {
+Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context,
+                   const std::shared_ptr<DependencyInjector>& injector)
+    : config_(config), scenario_context_(context), injector_(injector) {
   name_ = ScenarioConfig::ScenarioType_Name(config.scenario_type());
 }
 
@@ -40,10 +40,10 @@ bool Scenario::LoadConfig(const std::string& config_file,
 }
 
 void Scenario::Init() {
-  CHECK(!config_.stage_type().empty());
+  ACHECK(!config_.stage_type().empty());
 
   // set scenario_type in PlanningContext
-  auto* scenario = PlanningContext::Instance()
+  auto* scenario = injector_->planning_context()
                        ->mutable_planning_status()
                        ->mutable_scenario();
   scenario->Clear();
@@ -54,13 +54,14 @@ void Scenario::Init() {
   }
   for (int i = 0; i < config_.stage_type_size(); ++i) {
     auto stage_type = config_.stage_type(i);
-    CHECK(common::util::ContainsKey(stage_config_map_, stage_type))
+    ACHECK(common::util::ContainsKey(stage_config_map_, stage_type))
         << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
         << " has no config";
   }
   ADEBUG << "init stage "
          << ScenarioConfig::StageType_Name(config_.stage_type(0));
-  current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
+  current_stage_ =
+      CreateStage(*stage_config_map_[config_.stage_type(0)], injector_);
 }
 
 Scenario::ScenarioStatus Scenario::Process(
@@ -98,7 +99,8 @@ Scenario::ScenarioStatus Scenario::Process(
           scenario_status_ = STATUS_UNKNOWN;
           return scenario_status_;
         }
-        current_stage_ = CreateStage(*stage_config_map_[next_stage]);
+        current_stage_ =
+            CreateStage(*stage_config_map_[next_stage], injector_);
         if (current_stage_ == nullptr) {
           AWARN << "Current stage is a null pointer.";
           return STATUS_UNKNOWN;

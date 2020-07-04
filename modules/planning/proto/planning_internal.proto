@@ -159,6 +159,9 @@ message OpenSpaceDebug {
   optional apollo.planning_internal.Trajectories fallback_trajectory = 15;
   optional apollo.common.TrajectoryPoint trajectory_stitching_point = 16;
   optional apollo.common.TrajectoryPoint future_collision_point = 17;
+  optional double time_latency = 18 [default = 0.0];  // ms
+  optional apollo.common.PointENU origin_point = 19;  // meter
+  optional double origin_heading_rad = 20;
 }
 
 message SmootherDebug {

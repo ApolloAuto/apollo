@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
         << ". config file: " << FLAGS_smart_recorder_config_filename
         << ". program name: " << argv[0];
   SmartRecordTrigger trigger_conf;
-  CHECK(GetProtoFromFile(FLAGS_smart_recorder_config_filename, &trigger_conf))
+  ACHECK(GetProtoFromFile(FLAGS_smart_recorder_config_filename, &trigger_conf))
       << "Failed to load triggers config file "
       << FLAGS_smart_recorder_config_filename;
   auto processor = std::unique_ptr<RecordProcessor>(new RealtimeRecordProcessor(

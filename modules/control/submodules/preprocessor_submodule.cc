@@ -49,8 +49,9 @@ std::string PreprocessorSubmodule::Name() const {
 }
 
 bool PreprocessorSubmodule::Init() {
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
-                                        &control_common_conf_))
+  injector_ = std::make_shared<DependencyInjector>();
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
+                                         &control_common_conf_))
       << "Unable to load control common conf file: "
       << FLAGS_control_common_conf_file;
 
@@ -58,7 +59,7 @@ bool PreprocessorSubmodule::Init() {
   preprocessor_writer_ =
       node_->CreateWriter<Preprocessor>(FLAGS_control_preprocessor_topic);
 
-  CHECK(preprocessor_writer_ != nullptr);
+  ACHECK(preprocessor_writer_ != nullptr);
   return true;
 }
 
@@ -231,8 +232,8 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
       }
     }
   }
-  VehicleStateProvider::Instance()->Update(local_view->localization(),
-                                           local_view->chassis());
+  injector_->vehicle_state()->Update(local_view->localization(),
+                                     local_view->chassis());
 
   return Status::OK();
 }

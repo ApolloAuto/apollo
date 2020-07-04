@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_pre_stop_decider.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,9 +38,11 @@ using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 
-OpenSpacePreStopDecider::OpenSpacePreStopDecider(const TaskConfig& config)
-    : Decider(config) {
-  CHECK(config.has_open_space_pre_stop_decider_config());
+OpenSpacePreStopDecider::OpenSpacePreStopDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {
+  ACHECK(config.has_open_space_pre_stop_decider_config());
 }
 
 Status OpenSpacePreStopDecider::Process(
@@ -80,7 +83,7 @@ bool OpenSpacePreStopDecider::CheckPullOverPreStop(
     double* target_s) {
   *target_s = 0.0;
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
     common::SLPoint pull_over_sl;

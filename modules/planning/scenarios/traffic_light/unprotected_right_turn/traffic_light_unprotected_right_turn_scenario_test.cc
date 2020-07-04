@@ -50,8 +50,9 @@ TEST_F(TrafficLightUnprotectedRightTurnScenarioTest, Init) {
       &config));
 
   ScenarioContext context;
+  auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(
-      new TrafficLightUnprotectedRightTurnScenario(config, &context));
+      new TrafficLightUnprotectedRightTurnScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
 }

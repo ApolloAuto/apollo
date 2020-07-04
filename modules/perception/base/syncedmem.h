@@ -77,7 +77,7 @@ inline void PerceptionMallocHost(void** ptr, size_t size, bool use_cuda) {
   }
 #endif
   *ptr = malloc(size);
-  CHECK(*ptr) << "host allocation of size " << size << " failed";
+  ACHECK(*ptr) << "host allocation of size " << size << " failed";
 }
 
 inline void PerceptionFreeHost(void* ptr, bool use_cuda) {

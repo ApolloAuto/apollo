@@ -30,7 +30,6 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
@@ -144,6 +143,11 @@ void NavigationLane::SetConfig(const NavigationLaneConfig &config) {
   config_ = config;
 }
 
+void NavigationLane::SetVehicleStateProvider(
+    common::VehicleStateProvider *vehicle_state_provider) {
+  vehicle_state_provider_ = vehicle_state_provider;
+}
+
 void NavigationLane::UpdateNavigationInfo(
     const NavigationInfo &navigation_path) {
   navigation_info_ = navigation_path;
@@ -160,7 +164,7 @@ bool NavigationLane::GeneratePath() {
   current_navi_path_tuple_ = std::make_tuple(-1, -1.0, -1.0, nullptr);
 
   // original_pose is in world coordination: ENU
-  original_pose_ = VehicleStateProvider::Instance()->original_pose();
+  original_pose_ = vehicle_state_provider_->original_pose();
 
   int navigation_line_num = navigation_info_.navigation_path_size();
   const auto &lane_marker = perception_obstacles_.lane_marker();
@@ -685,7 +689,7 @@ void NavigationLane::ConvertLaneMarkerToPath(
                    quality_divider;
 
   const double current_speed =
-      VehicleStateProvider::Instance()->vehicle_state().linear_velocity();
+      vehicle_state_provider_->vehicle_state().linear_velocity();
   double path_range =
       current_speed * config_.ratio_navigation_lane_len_to_speed();
   if (path_range <= config_.min_len_for_navigation_lane()) {

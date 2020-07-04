@@ -33,7 +33,7 @@ class RTKLocalizationTest : public ::testing::Test {
  protected:
   template <class T>
   void load_data(const std::string &filename, T *data) {
-    CHECK(cyber::common::GetProtoFromFile(filename, data))
+    ACHECK(cyber::common::GetProtoFromFile(filename, data))
         << "Failed to open file " << filename;
   }
 
@@ -106,7 +106,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
+    load_data("modules/localization/testdata/1_imu_2.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122.70;

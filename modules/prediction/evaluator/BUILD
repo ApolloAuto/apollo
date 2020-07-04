@@ -17,7 +17,6 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/cyclist:cyclist_keep_lane_evaluator",
-        "//modules/prediction/evaluator/pedestrian:pedestrian_interaction_evaluator",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_map_evaluator",

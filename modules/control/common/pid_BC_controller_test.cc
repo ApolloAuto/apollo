@@ -31,7 +31,7 @@ class PidBCControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
 

@@ -31,7 +31,9 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -54,9 +56,11 @@ class Obstacle {
    */
   static std::unique_ptr<Obstacle> Create(
       const perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp, const int prediction_id);
+      const double timestamp, const int prediction_id,
+      ObstacleClusters* clusters_ptr);
 
-  static std::unique_ptr<Obstacle> Create(const Feature& feature);
+  static std::unique_ptr<Obstacle> Create(const Feature& feature,
+                                          ObstacleClusters* clusters_ptr);
 
   Obstacle() = default;
 
@@ -64,6 +68,10 @@ class Obstacle {
    * @brief Destructor
    */
   virtual ~Obstacle() = default;
+
+  void SetJunctionAnalyzer(JunctionAnalyzer* junction_analyzer) {
+    junction_analyzer_ = junction_analyzer;
+  }
 
   /**
    * @brief Insert a perception obstacle with its timestamp.
@@ -88,6 +96,8 @@ class Obstacle {
    * @return The type pf perception obstacle.
    */
   perception::PerceptionObstacle::Type type() const;
+
+  bool IsPedestrian() const;
 
   /**
    * @brief Get the obstacle's ID.
@@ -274,6 +284,8 @@ class Obstacle {
 
   void SetNearbyLanes(Feature* feature);
 
+  void SetSurroundingLaneIds(Feature* feature, const double radius);
+
   void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
 
   /** @brief This functions updates the lane-points into the lane-segments
@@ -311,6 +323,8 @@ class Obstacle {
       const LaneSequence& lane_sequence,
       const std::unordered_set<std::string>& exit_lane_id_set);
 
+  void SetClusters(ObstacleClusters* clusters_ptr);
+
  private:
   int id_ = FLAGS_ego_vehicle_id;
 
@@ -322,6 +336,9 @@ class Obstacle {
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
 
   ObstacleConf obstacle_conf_;
+
+  ObstacleClusters* clusters_ptr_ = nullptr;
+  JunctionAnalyzer* junction_analyzer_ = nullptr;
 };
 
 }  // namespace prediction

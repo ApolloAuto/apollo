@@ -17,6 +17,7 @@
 ###############################################################################
 
 APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+CACHE_DIR="${APOLLO_ROOT}/.cache"
 
 function update() {
   UPDATE_TAG=$(python ${APOLLO_ROOT}/modules/tools/ota/query_client.py)
@@ -31,28 +32,26 @@ function update() {
   if [ "$user_agreed" != "y" ] && [ "$user_agreed" != "Y" ]; then
     exit 1
   fi
-  cp ${APOLLO_ROOT}/scripts/ota.sh /home/$DOCKER_USER/.cache/
-  ssh $DOCKER_USER@localhost  bash /home/$DOCKER_USER/.cache/ota.sh download $UPDATE_TAG
+  cp ${APOLLO_ROOT}/scripts/ota.sh "${CACHE_DIR}"
+  ssh $DOCKER_USER@localhost  bash ${CACHE_DIR}/ota.sh download $UPDATE_TAG
   python ${APOLLO_ROOT}/modules/tools/ota/verify_client.py
   if [ "$?" != "0" ]; then
     exit 1
   fi
 
-  if [ -e "$HOME/.cache/apollo_release" ]; then
-    rm -rf "$HOME/.cache/apollo_release"
-  fi
-  tar xzf /home/$DOCKER_USER/.cache/apollo_release.tar.gz -C /home/$DOCKER_USER/.cache
+  [ -e "${CACHE_DIR}/apollo_release" ] && rm -rf "${CACHE_DIR}/apollo_release"
+  tar xzf ${CACHE_DIR}/apollo_release.tar.gz -C ${CACHE_DIR}
   NEW_TAG="${UPDATE_TAG}-local"
 
-  ssh $DOCKER_USER@localhost  bash /home/$DOCKER_USER/.cache/ota.sh setup $NEW_TAG
+  ssh $DOCKER_USER@localhost  bash ${CACHE_DIR}/ota.sh setup $NEW_TAG
   python ${APOLLO_ROOT}/modules/tools/ota/update_client.py ${UPDATE_TAG}
 }
 
 function clean() {
-  rm -rf $HOME/.cache/apollo_update
-  rm -rf $HOME/.cache/apollo_release.tar.gz
-  rm -rf $HOME/.cache/sec_apollo_release.tar.gz
-  rm -rf $HOME/.cache/ota.sh
+  rm -rf ${CACHE_DIR}/apollo_update
+  rm -rf ${CACHE_DIR}/apollo_release.tar.gz
+  rm -rf ${CACHE_DIR}/sec_apollo_release.tar.gz
+  rm -rf ${CACHE_DIR}/ota.sh
   docker stop test_container 1>/dev/null
   docker rm test_container 1>/dev/null
 }
@@ -78,7 +77,7 @@ function download() {
       docker stop test_container 1>/dev/null
       docker rm -f test_container 1>/dev/null
   fi
-  docker run -d -it --name test_container -v $HOME/.cache:/root/mnt $UPDATE_TAG
+  docker run -d -it --name test_container -v ${CACHE_DIR}:/root/mnt $UPDATE_TAG
   docker exec test_container cp /root/sec_apollo_release.tar.gz /root/mnt
 }
 

@@ -24,7 +24,8 @@ COMMON_PROTOS='../../common/proto/*.proto ../../common/configs/proto/vehicle_con
 LOCALIZATION_PROTOS='../../localization/proto/localization.proto ../../localization/proto/pose.proto ../../localization/proto/localization_status.proto'
 CHASSIS_PROTOS='../../canbus/proto/chassis.proto'
 PLANNING_PROTOS='../../planning/proto/*.proto'
-PREDICTION_PROTOS='../../prediction/proto/feature.proto ../../prediction/proto/lane_graph.proto ../../prediction/proto/prediction_point.proto'
+
+PREDICTION_PROTOS='../../prediction/proto/feature.proto ../../prediction/proto/lane_graph.proto ../../prediction/proto/prediction_point.proto ../../prediction/proto/prediction_obstacle.proto ../../prediction/proto/scenario.proto'
 PERCEPTION_PROTOS='../../perception/proto/traffic_light_detection.proto ../../perception/proto/perception_obstacle.proto'
 REALTIVE_MAP_PROTOS='../../map/relative_map/proto/*.proto'
 MAP_PROTOS='../../map/proto/*.proto'

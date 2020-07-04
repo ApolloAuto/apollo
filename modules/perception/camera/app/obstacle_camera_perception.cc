@@ -44,12 +44,12 @@ bool ObstacleCameraPerception::Init(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
       << "Read config failed: " << config_file;
-  CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
+  ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   // Init detector
-  CHECK(perception_param_.detector_param_size() > 0)
+  ACHECK(perception_param_.detector_param_size() > 0)
       << "Failed to init detector.";
   // Init detector
   base::BaseCameraModelPtr model;
@@ -73,14 +73,14 @@ bool ObstacleCameraPerception::Init(
     name_detector_map_.insert(
         std::pair<std::string, std::shared_ptr<BaseObstacleDetector>>(
             detector_param.camera_name(), detector_ptr));
-    CHECK(name_detector_map_.at(detector_param.camera_name()) != nullptr);
-    CHECK(name_detector_map_.at(detector_param.camera_name())
-              ->Init(detector_init_options))
+    ACHECK(name_detector_map_.at(detector_param.camera_name()) != nullptr);
+    ACHECK(name_detector_map_.at(detector_param.camera_name())
+               ->Init(detector_init_options))
         << "Failed to init: " << plugin_param.name();
   }
 
   // Init tracker
-  CHECK(perception_param_.has_tracker_param()) << "Failed to init tracker.";
+  ACHECK(perception_param_.has_tracker_param()) << "Failed to init tracker.";
   {
     ObstacleTrackerInitOptions tracker_init_options;
     tracker_init_options.image_width = static_cast<float>(model->get_width());
@@ -92,13 +92,13 @@ bool ObstacleCameraPerception::Init(
     tracker_init_options.conf_file = plugin_param.config_file();
     tracker_.reset(
         BaseObstacleTrackerRegisterer::GetInstanceByName(plugin_param.name()));
-    CHECK(tracker_ != nullptr);
-    CHECK(tracker_->Init(tracker_init_options))
+    ACHECK(tracker_ != nullptr);
+    ACHECK(tracker_->Init(tracker_init_options))
         << "Failed to init: " << plugin_param.name();
   }
 
   // Init transformer
-  CHECK(perception_param_.has_transformer_param())
+  ACHECK(perception_param_.has_transformer_param())
       << "Failed to init transformer.";
   {
     ObstacleTransformerInitOptions transformer_init_options;
@@ -108,13 +108,13 @@ bool ObstacleCameraPerception::Init(
     transformer_init_options.conf_file = plugin_param.config_file();
     transformer_.reset(BaseObstacleTransformerRegisterer::GetInstanceByName(
         plugin_param.name()));
-    CHECK(transformer_ != nullptr);
-    CHECK(transformer_->Init(transformer_init_options))
+    ACHECK(transformer_ != nullptr);
+    ACHECK(transformer_->Init(transformer_init_options))
         << "Failed to init: " << plugin_param.name();
   }
 
   // Init obstacle postprocessor
-  CHECK(perception_param_.has_postprocessor_param())
+  ACHECK(perception_param_.has_postprocessor_param())
       << "Failed to init obstacle postprocessor.";
   {
     ObstaclePostprocessorInitOptions obstacle_postprocessor_init_options;
@@ -125,8 +125,8 @@ bool ObstacleCameraPerception::Init(
     obstacle_postprocessor_.reset(
         BaseObstaclePostprocessorRegisterer::GetInstanceByName(
             plugin_param.name()));
-    CHECK(obstacle_postprocessor_ != nullptr);
-    CHECK(obstacle_postprocessor_->Init(obstacle_postprocessor_init_options))
+    ACHECK(obstacle_postprocessor_ != nullptr);
+    ACHECK(obstacle_postprocessor_->Init(obstacle_postprocessor_init_options))
         << "Failed to init: " << plugin_param.name();
   }
 
@@ -141,8 +141,8 @@ bool ObstacleCameraPerception::Init(
     init_options.conf_file = plugin_param.config_file();
     extractor_.reset(
         BaseFeatureExtractorRegisterer::GetInstanceByName(plugin_param.name()));
-    CHECK(extractor_ != nullptr);
-    CHECK(extractor_->Init(init_options))
+    ACHECK(extractor_ != nullptr);
+    ACHECK(extractor_->Init(init_options))
         << "Failed to init: " << plugin_param.name();
   }
 
@@ -175,7 +175,7 @@ bool ObstacleCameraPerception::Init(
         perception_param_.object_template_param().plugin_param();
     init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
     init_options.conf_file = plugin_param.config_file();
-    CHECK(ObjectTemplateManager::Instance()->Init(init_options));
+    ACHECK(ObjectTemplateManager::Instance()->Init(init_options));
   }
   return true;
 }
@@ -189,7 +189,7 @@ void ObstacleCameraPerception::InitLane(
   for (int i = 0; i < perception_param.lane_param_size(); ++i) {
     // Initialize lane detector
     const auto &lane_param = perception_param.lane_param(i);
-    CHECK(lane_param.has_lane_detector_param())
+    ACHECK(lane_param.has_lane_detector_param())
         << "Failed to include lane_detector_param.";
     LaneDetectorInitOptions lane_detector_init_options;
     const auto &lane_detector_param = lane_param.lane_detector_param();
@@ -206,8 +206,8 @@ void ObstacleCameraPerception::InitLane(
     AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
     lane_detector_.reset(BaseLaneDetectorRegisterer::GetInstanceByName(
         lane_detector_plugin_param.name()));
-    CHECK(lane_detector_ != nullptr);
-    CHECK(lane_detector_->Init(lane_detector_init_options))
+    ACHECK(lane_detector_ != nullptr);
+    ACHECK(lane_detector_->Init(lane_detector_init_options))
         << "Failed to init: " << lane_detector_plugin_param.name();
     AINFO << "Detector: " << lane_detector_->Name();
 
@@ -226,8 +226,8 @@ void ObstacleCameraPerception::InitLane(
     lane_postprocessor_.reset(
         BaseLanePostprocessorRegisterer::GetInstanceByName(
             lane_postprocessor_param.name()));
-    CHECK(lane_postprocessor_ != nullptr);
-    CHECK(lane_postprocessor_->Init(postprocessor_init_options))
+    ACHECK(lane_postprocessor_ != nullptr);
+    ACHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init: " << lane_postprocessor_param.name();
     AINFO << "lane_postprocessor: " << lane_postprocessor_->Name();
 
@@ -252,7 +252,7 @@ void ObstacleCameraPerception::InitCalibrationService(
     const std::string &work_root, const base::BaseCameraModelPtr model,
     const app::PerceptionParam &perception_param) {
   // Init calibration service
-  CHECK(perception_param.has_calibration_service_param())
+  ACHECK(perception_param.has_calibration_service_param())
       << "Failed to include calibration_service_param.";
   {
     auto calibration_service_param =
@@ -270,8 +270,8 @@ void ObstacleCameraPerception::InitCalibrationService(
     calibration_service_.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(
             calibration_service_param.plugin_param().name()));
-    CHECK(calibration_service_ != nullptr);
-    CHECK(calibration_service_->Init(calibration_service_init_options))
+    ACHECK(calibration_service_ != nullptr);
+    ACHECK(calibration_service_->Init(calibration_service_init_options))
         << "Failed to init: "
         << calibration_service_param.plugin_param().name();
     AINFO << "calibration_service: " << calibration_service_->Name();

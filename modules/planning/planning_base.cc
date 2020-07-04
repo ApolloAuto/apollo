@@ -28,11 +28,14 @@ namespace planning {
 
 using apollo::common::Status;
 
+PlanningBase::PlanningBase(const std::shared_ptr<DependencyInjector>& injector)
+    : injector_(injector) {}
+
 PlanningBase::~PlanningBase() {}
 
 Status PlanningBase::Init(const PlanningConfig& config) {
-  PlanningContext::Instance()->Instance()->Init();
-  TaskFactory::Init(config);
+  injector_->planning_context()->Init();
+  TaskFactory::Init(config, injector_);
   return Status::OK();
 }
 

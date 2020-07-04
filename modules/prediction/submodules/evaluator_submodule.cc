@@ -21,7 +21,6 @@
 #include "modules/common/time/time.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
-#include "modules/prediction/evaluator/evaluator_manager.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,12 +32,22 @@ std::string EvaluatorSubmodule::Name() const {
 }
 
 bool EvaluatorSubmodule::Init() {
-  if (!MessageProcess::InitEvaluators()) {
+  evaluator_manager_.reset(new EvaluatorManager());
+  PredictionConf prediction_conf;
+  if (!ComponentBase::GetProtoConfig(&prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << ComponentBase::ConfigFilePath();
+    return false;
+  }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+  if (!MessageProcess::InitEvaluators(evaluator_manager_.get(),
+                                      prediction_conf)) {
     return false;
   }
   // TODO(kechxu) change topic name when finalized
-  evaluator_writer_ =
-      node_->CreateWriter<SubmoduleOutput>(FLAGS_evaluator_topic_name);
+  evaluator_writer_ = node_->CreateWriter<SubmoduleOutput>(
+      prediction_conf.topic_conf().evaluator_topic_name());
   return true;
 }
 
@@ -47,7 +56,7 @@ bool EvaluatorSubmodule::Proc(
   constexpr static size_t kHistorySize = 1;
   const auto frame_start_time = container_output->frame_start_time();
   ObstaclesContainer obstacles_container(*container_output);
-  EvaluatorManager::Instance()->Run(&obstacles_container);
+  evaluator_manager_->Run(&obstacles_container);
   SubmoduleOutput submodule_output =
       obstacles_container.GetSubmoduleOutput(kHistorySize, frame_start_time);
   evaluator_writer_->Write(submodule_output);

@@ -422,11 +422,11 @@ TEST_F(HDMapImplTestSuite, GetLocalMap) {
       std::chrono::steady_clock::now().time_since_epoch().count());
   const std::string output_bin_file =
       absl::StrCat(FLAGS_output_dir, "/base_map_", time_since_epoch, " .bin");
-  CHECK(cyber::common::SetProtoToBinaryFile(local_map, output_bin_file))
+  ACHECK(cyber::common::SetProtoToBinaryFile(local_map, output_bin_file))
       << "failed to output binary format base map";
 
   local_map.Clear();
-  CHECK(cyber::common::GetProtoFromFile(output_bin_file, &local_map))
+  ACHECK(cyber::common::GetProtoFromFile(output_bin_file, &local_map))
       << "failed to load map";
   cyber::common::DeleteFile(output_bin_file);
 }

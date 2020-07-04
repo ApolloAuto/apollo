@@ -27,8 +27,16 @@ namespace apollo {
 namespace routing {
 
 bool RoutingComponent::Init() {
+  RoutingConfig routing_conf;
+  ACHECK(cyber::ComponentBase::GetProtoConfig(&routing_conf))
+      << "Unable to load routing conf file: "
+      << cyber::ComponentBase::ConfigFilePath();
+
+  AINFO << "Config file: " << cyber::ComponentBase::ConfigFilePath()
+        << " is loaded.";
+
   apollo::cyber::proto::RoleAttributes attr;
-  attr.set_channel_name(FLAGS_routing_response_topic);
+  attr.set_channel_name(routing_conf.topic_config().routing_response_topic());
   auto qos = attr.mutable_qos_profile();
   qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_reliability(
@@ -38,7 +46,8 @@ bool RoutingComponent::Init() {
   response_writer_ = node_->CreateWriter<RoutingResponse>(attr);
 
   apollo::cyber::proto::RoleAttributes attr_history;
-  attr_history.set_channel_name(FLAGS_routing_response_history_topic);
+  attr_history.set_channel_name(
+      routing_conf.topic_config().routing_response_history_topic());
   auto qos_history = attr_history.mutable_qos_profile();
   qos_history->set_history(
       apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);

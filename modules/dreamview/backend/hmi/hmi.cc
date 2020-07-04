@@ -97,7 +97,7 @@ void HMI::RegisterMessageHandlers() {
         // Extra works for current Dreamview.
         if (hmi_action == HMIAction::CHANGE_MAP) {
           // Reload simulation map after changing map.
-          CHECK(map_service_->ReloadMap(true))
+          ACHECK(map_service_->ReloadMap(true))
               << "Failed to load new simulation map: " << value;
         } else if (hmi_action == HMIAction::CHANGE_VEHICLE) {
           // Reload lidar params for point cloud service.

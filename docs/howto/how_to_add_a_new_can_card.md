@@ -119,7 +119,7 @@ void CanClientFactory::RegisterCanClients() {
 ### Step 3
 
 Next, you would need to update the config File
-Add the EXAMPLE_CAN into `/modules/canbus/proto/can_card_parameter.proto`
+Add the EXAMPLE_CAN into `/modules/drivers/canbus/proto/can_card_parameter.proto`
 
 ```proto
 message CANCardParameter {
@@ -132,6 +132,18 @@ message CANCardParameter {
 }
 ```
 Update `/modules/canbus/conf/canbus_conf.pb.txt`
+
+```txt
+... ...
+can_card_parameter {
+  brand:EXAMPLE_CAN
+  type: PCI_CARD // suppose the new can card is PCI_CARD
+  channel_id: CHANNEL_ID_ZERO // suppose the new can card has CHANNEL_ID_ZERO
+}
+... ...
+```
+
+If you use radar, like Conti radar in apollo, its' canbus configuration file should alse be modified. Update `/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt`
 
 ```txt
 ... ...

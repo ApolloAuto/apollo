@@ -103,7 +103,7 @@ TEST_F(LidarLibGroundServiceDetectorTest,
 
   GroundServiceContent ground_service_content;
   auto ground_service = SceneManager::Instance().Service("GroundService");
-  CHECK(ground_service);
+  ACHECK(ground_service);
   ground_service->GetServiceContentCopy(&ground_service_content);
   ground_service->UpdateServiceContent(ground_service_content);
 

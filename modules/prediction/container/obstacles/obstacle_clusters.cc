@@ -26,18 +26,6 @@ namespace prediction {
 
 using ::apollo::hdmap::LaneInfo;
 
-std::unordered_map<std::string, std::vector<LaneObstacle>>
-    ObstacleClusters::lane_obstacles_;
-std::unordered_map<std::string, StopSign>
-    ObstacleClusters::lane_id_stop_sign_map_;
-
-void ObstacleClusters::Clear() {
-  lane_obstacles_.clear();
-  lane_id_stop_sign_map_.clear();
-}
-
-void ObstacleClusters::Init() { Clear(); }
-
 LaneGraph ObstacleClusters::GetLaneGraph(
     const double start_s, const double length, const bool consider_lane_split,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {

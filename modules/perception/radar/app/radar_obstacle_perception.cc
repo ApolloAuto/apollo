@@ -29,19 +29,19 @@ namespace radar {
 bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   std::string model_name = pipeline_name;
   const ModelConfig* model_config = nullptr;
-  CHECK(ConfigManager::Instance()->GetModelConfig(model_name, &model_config))
+  ACHECK(ConfigManager::Instance()->GetModelConfig(model_name, &model_config))
       << "not found model: " << model_name;
 
   std::string detector_name;
-  CHECK(model_config->get_value("Detector", &detector_name))
+  ACHECK(model_config->get_value("Detector", &detector_name))
       << "Detector not found";
 
   std::string roi_filter_name;
-  CHECK(model_config->get_value("RoiFilter", &roi_filter_name))
+  ACHECK(model_config->get_value("RoiFilter", &roi_filter_name))
       << "RoiFilter not found";
 
   std::string tracker_name;
-  CHECK(model_config->get_value("Tracker", &tracker_name))
+  ACHECK(model_config->get_value("Tracker", &tracker_name))
       << "Tracker not found";
 
   BaseDetector* detector =
@@ -58,9 +58,9 @@ bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   CHECK_NOTNULL(tracker);
   tracker_.reset(tracker);
 
-  CHECK(detector_->Init()) << "radar detector init error";
-  CHECK(roi_filter_->Init()) << "radar roi filter init error";
-  CHECK(tracker_->Init()) << "radar tracker init error";
+  ACHECK(detector_->Init()) << "radar detector init error";
+  ACHECK(roi_filter_->Init()) << "radar roi filter init error";
+  ACHECK(tracker_->Init()) << "radar tracker init error";
 
   return true;
 }

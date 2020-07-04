@@ -42,7 +42,7 @@ void Predictor::SetEqualProbability(const double total_probability,
                                     const int start_index,
                                     Obstacle* obstacle_ptr) {
   int num = NumOfTrajectories(*obstacle_ptr);
-  CHECK(num > start_index);
+  ACHECK(num > start_index);
 
   const auto prob = total_probability / static_cast<double>(num - start_index);
   for (int i = start_index; i < num; ++i) {

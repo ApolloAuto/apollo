@@ -39,7 +39,7 @@ nlohmann::json JsonUtil::ProtoToTypedJson(
   static const auto kJsonOption = JsonOption();
   std::string json_string;
   const auto status = MessageToJsonString(proto, &json_string, kJsonOption);
-  CHECK(status.ok()) << "Cannot convert proto to json:" << proto.DebugString();
+  ACHECK(status.ok()) << "Cannot convert proto to json:" << proto.DebugString();
 
   Json json_obj;
   json_obj["type"] = json_type;

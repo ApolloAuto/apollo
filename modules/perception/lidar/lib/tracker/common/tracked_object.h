@@ -147,6 +147,8 @@ struct TrackedObject {
   Eigen::Vector3d output_center;
   Eigen::Vector3d output_size;
   base::SensorInfo sensor_info;
+
+  Eigen::Vector3d global_local_offset;
 };  // struct TrackedObject
 
 typedef std::shared_ptr<TrackedObject> TrackedObjectPtr;

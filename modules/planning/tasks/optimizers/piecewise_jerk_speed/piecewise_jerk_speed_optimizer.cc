@@ -44,7 +44,7 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config_.has_piecewise_jerk_speed_config());
+  ACHECK(config_.has_piecewise_jerk_speed_optimizer_config());
 }
 
 Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
@@ -54,7 +54,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     return Status::OK();
   }
 
-  CHECK(speed_data != nullptr);
+  ACHECK(speed_data != nullptr);
   SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {
@@ -77,12 +77,10 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  const auto& piecewise_jerk_speed_config =
-      config_.piecewise_jerk_speed_config();
-  piecewise_jerk_problem.set_weight_ddx(
-      piecewise_jerk_speed_config.acc_weight());
-  piecewise_jerk_problem.set_weight_dddx(
-      piecewise_jerk_speed_config.jerk_weight());
+  const auto& config =
+      config_.piecewise_jerk_speed_optimizer_config();
+  piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
+  piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
 
   piecewise_jerk_problem.set_x_bounds(0.0, total_length);
   piecewise_jerk_problem.set_dx_bounds(
@@ -93,7 +91,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
                                         FLAGS_longitudinal_jerk_upper_bound);
 
-  piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
+  piecewise_jerk_problem.set_dx_ref(config.ref_v_weight(),
                                     reference_line_info_->GetCruiseSpeed());
 
   // Update STBoundary
@@ -149,14 +147,14 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     // get curvature
     PathPoint path_point = path_data.GetPathPointWithPathS(path_s);
     penalty_dx.push_back(std::fabs(path_point.kappa()) *
-                         piecewise_jerk_speed_config.kappa_penalty_weight());
+                         config.kappa_penalty_weight());
     // get v_upper_bound
     const double v_lower_bound = 0.0;
     double v_upper_bound = FLAGS_planning_upper_speed_limit;
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
-  piecewise_jerk_problem.set_x_ref(piecewise_jerk_speed_config.ref_s_weight(),
+  piecewise_jerk_problem.set_x_ref(config.ref_s_weight(),
                                    x_ref);
   piecewise_jerk_problem.set_penalty_dx(penalty_dx);
   piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));

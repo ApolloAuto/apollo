@@ -16,13 +16,17 @@
 
 #pragma once
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "boost/thread/locks.hpp"
+#include "boost/thread/shared_mutex.hpp"
+
 #include "cyber/cyber.h"
+#include "cyber/time/time.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
@@ -90,12 +94,18 @@ class HMIWorker {
   void StartModule(const std::string& module) const;
   void StopModule(const std::string& module) const;
 
+  void ResetComponentStatusTimer();
+  void UpdateComponentStatus();
+
   const HMIConfig config_;
 
   // HMI status maintenance.
   HMIStatus status_;
+  std::atomic<double> last_status_received_s_;
+  bool monitor_timed_out_{true};
   HMIMode current_mode_;
   bool status_changed_ = false;
+  size_t last_status_fingerprint_{};
   bool stop_ = false;
   mutable boost::shared_mutex status_mutex_;
   std::future<void> thread_future_;

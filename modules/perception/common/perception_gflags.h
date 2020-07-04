@@ -31,5 +31,21 @@ DECLARE_bool(enable_base_object_pool);
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 
+// lidar_point_pillars
+DECLARE_int32(gpu_id);
+DECLARE_string(pfe_onnx_file);
+DECLARE_string(rpn_onnx_file);
+DECLARE_double(normalizing_factor);
+DECLARE_int32(num_point_feature);
+DECLARE_bool(enable_fuse_frames);
+DECLARE_int32(num_fuse_frames);
+DECLARE_double(fuse_time_interval);
+DECLARE_bool(enable_shuffle_points);
+DECLARE_int32(max_num_points);
+DECLARE_bool(reproduce_result_mode);
+DECLARE_double(score_threshold);
+DECLARE_double(nms_overlap_threshold);
+DECLARE_int32(num_output_box_feature);
+
 }  // namespace perception
 }  // namespace apollo

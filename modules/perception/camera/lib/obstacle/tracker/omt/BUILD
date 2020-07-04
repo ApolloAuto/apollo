@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -80,6 +81,11 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
     ],
+)
+
+py_proto(
+    name = "omt_pb2",
+    src = "omt.proto",
 )
 
 cpplint()

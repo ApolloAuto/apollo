@@ -43,10 +43,10 @@ DistanceApproachIPOPTFixedTsInterface::DistanceApproachIPOPTFixedTsInterface(
       obstacles_edges_num_(obstacles_edges_num),
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b) {
-  CHECK(horizon < std::numeric_limits<int>::max())
+  ACHECK(horizon < std::numeric_limits<int>::max())
       << "Invalid cast on horizon in open space planner";
   horizon_ = static_cast<int>(horizon);
-  CHECK(obstacles_num < std::numeric_limits<int>::max())
+  ACHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
 
   obstacles_num_ = static_cast<int>(obstacles_num);
@@ -152,7 +152,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
                                                             double* g_l,
                                                             double* g_u) {
   ADEBUG << "get_bounds_info";
-  CHECK(XYbounds_.size() == 4)
+  ACHECK(XYbounds_.size() == 4)
       << "XYbounds_ size is not 4, but" << XYbounds_.size();
 
   // Variables: includes state, u, sample time and lagrange multipliers
@@ -342,7 +342,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x) << "Warm start init_x setting failed";
+  ACHECK(init_x) << "Warm start init_x setting failed";
 
   CHECK_EQ(horizon_, uWS_.cols());
   CHECK_EQ(horizon_ + 1, xWS_.cols());

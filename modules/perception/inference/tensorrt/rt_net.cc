@@ -68,7 +68,7 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
                          TensorModifyMap *tensor_modify_map) {
   ConvolutionParameter conv = layer_param.convolution_param();
   ConvParam param;
-  CHECK(ParserConvParam(conv, &param));
+  ACHECK(ParserConvParam(conv, &param));
   nvinfer1::IConvolutionLayer *convLayer = nullptr;
   int size = conv.num_output() * param.kernel_w * param.kernel_h *
              inputs[0]->getDimensions().d[0];
@@ -215,7 +215,7 @@ void RTNet::addPoolingLayer(const LayerParameter &layer_param,
       (pool.pool() == PoolingParameter_PoolMethod_MAX)
           ? nvinfer1::PoolingType::kMAX
           : nvinfer1::PoolingType::kAVERAGE;
-  CHECK(modify_pool_param(&pool));
+  ACHECK(modify_pool_param(&pool));
   nvinfer1::IPoolingLayer *poolLayer = net->addPooling(
       *inputs[0], pool_type,
       {static_cast<int>(pool.kernel_h()), static_cast<int>(pool.kernel_w())});
@@ -277,7 +277,7 @@ void RTNet::addScaleLayer(const LayerParameter &layer_param,
     lw[1] = loadLayerWeights(power_param.shift(), size);
     lw[2] = loadLayerWeights(power_param.power(), size);
   } else {
-    CHECK(weight_map->find(layer_param.name().c_str()) != weight_map->end());
+    ACHECK(weight_map->find(layer_param.name().c_str()) != weight_map->end());
     for (size_t i = 0; i < (*weight_map)[layer_param.name().c_str()].size();
          i++) {
       lw[i] = (*weight_map)[layer_param.name().c_str()][i];
@@ -609,7 +609,7 @@ void RTNet::init_blob(std::vector<std::string> *names) {
     int count = dims.c() * dims.h() * dims.w() * max_batch_size_;
     cudaMalloc(&buffers_[bindingIndex], count * sizeof(float));
     std::vector<int> shape;
-    CHECK(this->shape(name, &shape));
+    ACHECK(this->shape(name, &shape));
     std::shared_ptr<apollo::perception::base::Blob<float>> blob;
     blob.reset(new apollo::perception::base::Blob<float>(shape));
     blob->set_gpu_data(reinterpret_cast<float *>(buffers_[bindingIndex]));

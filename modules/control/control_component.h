@@ -34,6 +34,7 @@
 #include "modules/control/controller/controller_agent.h"
 #include "modules/control/proto/preprocessor.pb.h"
 #include "modules/control/submodules/preprocessor_submodule.h"
+#include "modules/control/common/dependency_injector.h"
 
 /**
  * @namespace apollo::control
@@ -117,6 +118,8 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   LocalView local_view_;
+
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 CYBER_REGISTER_COMPONENT(ControlComponent)

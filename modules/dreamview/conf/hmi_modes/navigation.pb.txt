@@ -68,6 +68,12 @@ cyber_modules {
     dag_files: "/apollo/modules/guardian/dag/guardian.dag"
   }
 }
+cyber_modules {
+  key: "Third Party Perception"
+  value: {
+    dag_files: "/apollo/modules/third_party_perception/dag/third_party_perception.dag"
+  }
+}
 modules {
   key: "Recorder"
   value: {

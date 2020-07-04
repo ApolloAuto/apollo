@@ -46,7 +46,7 @@ std::vector<const Obstacle*> PredictionQuerier::GetObstacles() const {
 
 double PredictionQuerier::ProjectVelocityAlongReferenceLine(
     const std::string& obstacle_id, const double s, const double t) const {
-  CHECK(id_obstacle_map_.find(obstacle_id) != id_obstacle_map_.end());
+  ACHECK(id_obstacle_map_.find(obstacle_id) != id_obstacle_map_.end());
 
   const auto& trajectory = id_obstacle_map_.at(obstacle_id)->Trajectory();
   int num_traj_point = trajectory.trajectory_point_size();

@@ -208,7 +208,12 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           for (const auto &landmark : poi_.landmark()) {
             Json place;
             place["name"] = landmark.name();
-            place["parkingSpaceId"] = landmark.parking_space_id();
+
+            Json parking_info =
+                apollo::common::util::JsonUtil::ProtoToTypedJson(
+                    "parkingInfo", landmark.parking_info());
+            place["parkingInfo"] = parking_info["data"];
+
             Json waypoint_list;
             for (const auto &waypoint : landmark.waypoint()) {
               Json point;
@@ -217,6 +222,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
               waypoint_list.push_back(point);
             }
             place["waypoint"] = waypoint_list;
+
             poi_list.push_back(place);
           }
         } else {
@@ -366,11 +372,15 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     return false;
   }
 
-  // set parking space
-  if (ContainsKey(json, "parkingSpaceId") &&
-      json.find("parkingSpaceId")->is_string()) {
-    routing_request->mutable_parking_space()->mutable_id()->set_id(
-        json["parkingSpaceId"]);
+  // set parking info
+  if (ContainsKey(json, "parkingInfo")) {
+    auto *requested_parking_info = routing_request->mutable_parking_info();
+    if (!JsonStringToMessage(json["parkingInfo"].dump(), requested_parking_info)
+             .ok()) {
+      AERROR << "Failed to prepare a routing request: invalid parking info."
+             << json["parkingInfo"].dump();
+      return false;
+    }
   }
 
   AINFO << "Constructed RoutingRequest to be sent:\n"
@@ -402,6 +412,8 @@ void SimulationWorldUpdater::OnTimer() {
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    last_pushed_adc_timestamp_sec_ =
+        sim_world_service_.world().auto_driving_car().timestamp_sec();
     sim_world_service_.GetWireFormatString(
         FLAGS_sim_map_radius, &simulation_world_,
         &simulation_world_with_planning_data_);

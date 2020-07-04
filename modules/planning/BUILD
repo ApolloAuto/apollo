@@ -19,8 +19,10 @@ cc_library(
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:history",
+        "//modules/planning/common:message_process",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/storytelling/proto:story_proto",
     ],
 )
 
@@ -88,6 +90,7 @@ cc_library(
     deps = [
         ":planning_base",
         "//cyber/common:log",
+        "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
     ],
 )
 

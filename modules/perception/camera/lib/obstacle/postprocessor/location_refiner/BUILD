@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -34,6 +35,11 @@ cc_library(
     deps = [
         "//modules/perception/camera/common",
     ],
+)
+
+py_proto(
+    name = "location_refiner_pb2",
+    src = "location_refiner.proto",
 )
 
 cpplint()

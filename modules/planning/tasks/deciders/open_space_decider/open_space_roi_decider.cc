@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.h"
 
+#include <memory>
 #include <utility>
 
 #include "modules/common/util/point_factory.h"
@@ -38,8 +39,10 @@ using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 
-OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig &config)
-    : Decider(config) {
+OpenSpaceRoiDecider::OpenSpaceRoiDecider(
+    const TaskConfig &config,
+    const std::shared_ptr<DependencyInjector> &injector)
+    : Decider(config, injector) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_params_ =
@@ -68,9 +71,10 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     const auto &routing_request =
         frame->local_view().routing->routing_request();
 
-    if (routing_request.has_parking_space() &&
-        !routing_request.parking_space().id().id().empty()) {
-      target_parking_spot_id_ = routing_request.parking_space().id().id();
+    if (routing_request.has_parking_info() &&
+        routing_request.parking_info().has_parking_space_id()) {
+      target_parking_spot_id_ =
+          routing_request.parking_info().parking_space_id();
     } else {
       const std::string msg = "Failed to get parking space id from routing";
       AERROR << msg;
@@ -116,7 +120,7 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
     ADEBUG << "nearby_path: " << nearby_path.DebugString();
     ADEBUG << "found nearby_path";
-    if (!PlanningContext::Instance()
+    if (!injector_->planning_context()
              ->planning_status()
              .park_and_go()
              .has_adc_init_position()) {
@@ -154,7 +158,7 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
                                            const hdmap::Path &nearby_path) {
   // get ADC box
   const auto &park_and_go_status =
-      PlanningContext::Instance()->planning_status().park_and_go();
+      injector_->planning_context()->planning_status().park_and_go();
 
   const double adc_init_x = park_and_go_status.adc_init_position().x();
   const double adc_init_y = park_and_go_status.adc_init_position().y();
@@ -276,7 +280,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
 
 void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
   const auto &pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   const double pull_over_x = pull_over_status.position().x();
   const double pull_over_y = pull_over_status.position().y();
   double pull_over_theta = pull_over_status.theta();
@@ -305,7 +309,7 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   const double kSpeedRatio = 0.1;  // after adjust speed is 10% of speed limit
   // get vehicle current location
   // get vehicle s,l info
-  auto park_and_go_status = PlanningContext::Instance()
+  auto park_and_go_status = injector_->planning_context()
                                 ->mutable_planning_status()
                                 ->mutable_park_and_go();
 
@@ -1060,7 +1064,7 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
     Frame *const frame, const hdmap::Path &nearby_path,
     std::vector<std::vector<common::math::Vec2d>> *const roi_parking_boundary) {
   const auto &park_and_go_status =
-      PlanningContext::Instance()->planning_status().park_and_go();
+      injector_->planning_context()->planning_status().park_and_go();
   const double adc_init_x = park_and_go_status.adc_init_position().x();
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
@@ -1195,7 +1199,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
   // Check if last frame lane is available
-  const auto &ptr_last_frame = FrameHistory::Instance()->Latest();
+  const auto &ptr_last_frame = injector_->frame_history()->Latest();
 
   if (ptr_last_frame == nullptr) {
     AERROR << "Last frame failed, fail to GetParkingSpotfrom frame "
@@ -1279,7 +1283,7 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
     Frame *const frame, std::array<common::math::Vec2d, 4> *vertices,
     hdmap::Path *nearby_path) {
   const auto &pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {

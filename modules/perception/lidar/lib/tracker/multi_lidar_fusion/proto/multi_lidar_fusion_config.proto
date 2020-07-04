@@ -11,6 +11,7 @@ message MlfDistanceWeight {
   optional float histogram_dist_weight = 6 [default = 0];
   optional float centroid_shift_dist_weight = 7 [default = 0];
   optional float bbox_iou_dist_weight = 8 [default = 0];
+  optional float semantic_map_dist_weight = 9 [default = 0];
 }
 
 message MlfDistanceConfig {

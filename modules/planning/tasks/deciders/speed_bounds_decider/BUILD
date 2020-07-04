@@ -38,6 +38,7 @@ cc_library(
         "//modules/common/status",
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
@@ -50,7 +51,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:speed_bounds_decider_config_proto",
+        "//modules/planning/proto:task_config_proto",
         "//modules/planning/reference_line",
     ],
 )

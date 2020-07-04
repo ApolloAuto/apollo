@@ -139,12 +139,12 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
   // including resolution, grid size, ...
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config))
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config))
       << "Failed to get model config: SceneManager";
 
   const std::string& work_root = config_manager->work_root();
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path))
+  ACHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
 
   std::string config_file;
@@ -152,7 +152,7 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
   config_file = GetAbsolutePath(config_file, "ground_service.conf");
 
   GroundServiceConfig config_params;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
       << "Failed to parse GroundServiceConfig config file.";
 
   double roi_region_rad_x = config_params.roi_rad_x();

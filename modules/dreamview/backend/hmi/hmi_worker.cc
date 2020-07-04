@@ -113,7 +113,7 @@ void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
     *flag = value;
     // Overwrite global flagfile.
     std::ofstream fout(kGlobalFlagfile, std::ios_base::app);
-    CHECK(fout) << "Fail to open global flagfile " << kGlobalFlagfile;
+    ACHECK(fout) << "Fail to open global flagfile " << kGlobalFlagfile;
     fout << "\n--" << flag_name << "=" << value << std::endl;
   }
 }
@@ -142,6 +142,7 @@ void HMIWorker::Start() {
         status_writer_->Write(*status);
         status->clear_header();
       });
+  ResetComponentStatusTimer();
   thread_future_ = cyber::Async(&HMIWorker::StatusUpdateThreadLoop, this);
 }
 
@@ -157,7 +158,7 @@ HMIConfig HMIWorker::LoadConfig() {
   // Get available modes, maps and vehicles by listing data directory.
   *config.mutable_modes() =
       ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  CHECK(!config.modes().empty())
+  ACHECK(!config.modes().empty())
       << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
@@ -168,14 +169,14 @@ HMIConfig HMIWorker::LoadConfig() {
 
 HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
   HMIMode mode;
-  CHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
+  ACHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
       << "Unable to parse HMIMode from file " << mode_config_path;
   // Translate cyber_modules to regular modules.
   for (const auto& iter : mode.cyber_modules()) {
     const std::string& module_name = iter.first;
     const CyberModule& cyber_module = iter.second;
     // Each cyber module should have at least one dag file.
-    CHECK(!cyber_module.dag_files().empty())
+    ACHECK(!cyber_module.dag_files().empty())
         << "None dag file is provided for " << module_name << " module in "
         << mode_config_path;
 
@@ -259,6 +260,8 @@ void HMIWorker::InitReadersAndWriters() {
   node_->CreateReader<SystemStatus>(
       FLAGS_system_status_topic,
       [this](const std::shared_ptr<SystemStatus>& system_status) {
+        this->ResetComponentStatusTimer();
+
         WLock wlock(status_mutex_);
 
         const bool is_realtime_msg =
@@ -287,12 +290,11 @@ void HMIWorker::InitReadersAndWriters() {
         }
 
         // Check if the status is changed.
-        static size_t last_status_fingerprint = 0;
         const size_t new_fingerprint =
             apollo::common::util::MessageFingerprint(status_);
-        if (last_status_fingerprint != new_fingerprint) {
+        if (last_status_fingerprint_ != new_fingerprint) {
           status_changed_ = true;
-          last_status_fingerprint = new_fingerprint;
+          last_status_fingerprint_ = new_fingerprint;
         }
       });
 
@@ -464,7 +466,7 @@ void HMIWorker::ChangeVehicle(const std::string& vehicle_name) {
   }
   ResetMode();
 
-  CHECK(VehicleManager::Instance()->UseVehicle(*vehicle_dir));
+  ACHECK(VehicleManager::Instance()->UseVehicle(*vehicle_dir));
 }
 
 void HMIWorker::ChangeMode(const std::string& mode_name) {
@@ -541,6 +543,7 @@ void HMIWorker::StatusUpdateThreadLoop() {
   while (!stop_) {
     static constexpr int kLoopIntervalMs = 200;
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopIntervalMs));
+    UpdateComponentStatus();
     bool status_changed = false;
     {
       WLock wlock(status_mutex_);
@@ -562,6 +565,38 @@ void HMIWorker::StatusUpdateThreadLoop() {
     for (const auto handler : status_update_handlers_) {
       handler(status_changed, &status);
     }
+  }
+}
+
+void HMIWorker::ResetComponentStatusTimer() {
+  last_status_received_s_ = cyber::Time::Now().ToSecond();
+  last_status_fingerprint_ = 0;
+}
+
+void HMIWorker::UpdateComponentStatus() {
+  static constexpr double kSecondsTillTimeout(2.5);
+  const double now = cyber::Time::Now().ToSecond();
+  if (now - last_status_received_s_.load() > kSecondsTillTimeout) {
+    if (!monitor_timed_out_) {
+      WLock wlock(status_mutex_);
+
+      const uint64_t now_ms = static_cast<uint64_t>(now * 2e3);
+      static constexpr bool kIsReportable = true;
+      SubmitDriveEvent(now_ms, "Monitor timed out", {"PROBLEM"}, kIsReportable);
+      AWARN << "System fault. Auto disengage.";
+      Trigger(HMIAction::DISENGAGE);
+
+      for (auto& monitored_component :
+           *status_.mutable_monitored_components()) {
+        monitored_component.second.set_status(ComponentStatus::UNKNOWN);
+        monitored_component.second.set_message(
+            "Status not reported by Monitor.");
+      }
+      status_changed_ = true;
+    }
+    monitor_timed_out_ = true;
+  } else {
+    monitor_timed_out_ = false;
   }
 }
 

@@ -19,8 +19,14 @@
 # Fail on first error.
 set -e
 
+rm -rf /tmp/archive
+
 # Create required soft links.
 ln -rs /usr/lib/x86_64-linux-gnu/libprofiler.so.0 /usr/lib/libprofiler.so
 ln -rs /usr/lib/x86_64-linux-gnu/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmalloc_and_profiler.so
 # https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
+
 ln -s -f /bin/true /usr/bin/chfn
+
+# Remove tarballs
+rm -rf /tmp/archive

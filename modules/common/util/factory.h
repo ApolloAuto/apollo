@@ -65,7 +65,7 @@ class Factory {
    * @param id Identifier of the class being registered
    * @param creator Function returning a pointer to an instance of
    * the registered class
-   * @return True iff the key id is still available
+   * @return True if the key id is still available
    */
   bool Register(const IdentifierType &id, ProductCreator creator) {
     return producers_.insert(std::make_pair(id, creator)).second;

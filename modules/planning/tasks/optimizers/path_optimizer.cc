@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/optimizers/path_optimizer.h"
 
+#include <memory>
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -28,6 +30,11 @@ namespace planning {
 using apollo::common::Status;
 
 PathOptimizer::PathOptimizer(const TaskConfig& config) : Task(config) {}
+
+PathOptimizer::PathOptimizer(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Task(config, injector) {}
 
 Status PathOptimizer::Execute(Frame* frame,
                               ReferenceLineInfo* const reference_line_info) {

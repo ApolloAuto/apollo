@@ -43,6 +43,7 @@ DEFINE_bool(test_update_golden_log, false,
 DEFINE_string(test_routing_response_file, "", "The routing file used in test");
 DEFINE_string(test_localization_file, "", "The localization test file");
 DEFINE_string(test_chassis_file, "", "The chassis test file");
+DEFINE_string(test_planning_config_file, "", "planning config file for test");
 DEFINE_string(test_prediction_file, "", "The prediction module test file");
 DEFINE_string(test_traffic_light_file, "", "The traffic light test file");
 DEFINE_string(test_relative_map_file, "", "The relative map test file");
@@ -52,8 +53,6 @@ DEFINE_string(test_previous_planning_file, "",
 void PlanningTestBase::SetUpTestCase() {
   FLAGS_use_multi_thread_to_add_obstacles = false;
   FLAGS_enable_multi_thread_in_dp_st_graph = false;
-  FLAGS_planning_config_file =
-      "/apollo/modules/planning/conf/planning_config.pb.txt";
   FLAGS_traffic_rule_config_filename =
       "/apollo/modules/planning/conf/traffic_rule_config.pb.txt";
   FLAGS_smoother_config_filename =
@@ -62,6 +61,8 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_localization_file = "";
   FLAGS_test_chassis_file = "";
   FLAGS_test_routing_response_file = "";
+  FLAGS_test_planning_config_file =
+      "/apollo/modules/planning/conf/planning_config.pb.txt";
   FLAGS_test_previous_planning_file = "";
   FLAGS_test_prediction_file = "";
   FLAGS_align_prediction_time = false;
@@ -149,25 +150,29 @@ bool PlanningTestBase::FeedTestData() {
 }
 
 void PlanningTestBase::SetUp() {
+  injector_ = std::make_shared<DependencyInjector>();
+
   if (FLAGS_use_navigation_mode) {
     // TODO(all)
     // planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
   } else {
-    planning_ = std::unique_ptr<PlanningBase>(new OnLanePlanning());
+    planning_ = std::unique_ptr<PlanningBase>(new OnLanePlanning(injector_));
   }
 
-  CHECK(FeedTestData()) << "Failed to feed test data";
+  ACHECK(FeedTestData()) << "Failed to feed test data";
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_planning_config_file, &config_))
-      << "failed to load planning config file " << FLAGS_planning_config_file;
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_test_planning_config_file,
+                                         &config_))
+      << "failed to load planning config file "
+      << FLAGS_test_planning_config_file;
 
-  CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
+  ACHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
 
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
-    CHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
+    ACHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_->last_publishable_trajectory_.reset(
         new PublishableTrajectory(prev_planning));
   }
@@ -180,13 +185,13 @@ void PlanningTestBase::SetUp() {
 }
 
 void PlanningTestBase::UpdateData() {
-  CHECK(FeedTestData()) << "Failed to feed test data";
+  ACHECK(FeedTestData()) << "Failed to feed test data";
 
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
-    CHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
+    ACHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_->last_publishable_trajectory_.reset(
         new PublishableTrajectory(prev_planning));
   }

@@ -274,7 +274,7 @@ class Blob {
   }
 
   inline const std::shared_ptr<SyncedMemory>& data() const {
-    CHECK(data_);
+    ACHECK(data_);
     return data_;
   }
 

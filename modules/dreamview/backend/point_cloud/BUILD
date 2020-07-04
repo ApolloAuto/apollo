@@ -12,6 +12,7 @@ cc_library(
         "//modules/common/math",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
+        "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/dreamview/proto:point_cloud_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",

@@ -52,8 +52,8 @@ void AsyncLogger::Stop() {
   }
 
   FlushBuffer(active_buf_);
-  CHECK(active_buf_->empty());
-  CHECK(flushing_buf_->empty());
+  ACHECK(active_buf_->empty());
+  ACHECK(flushing_buf_->empty());
   // std::cout << "Async Logger Stop!" << std::endl;
 }
 

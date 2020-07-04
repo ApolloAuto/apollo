@@ -28,7 +28,7 @@ QuinticSpiralPath::QuinticSpiralPath(const double x0, const double dx0,
                                      const double dx1, const double ddx1,
                                      const double p)
     : QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, p) {
-  CHECK(p > 0.0);
+  ACHECK(p > 0.0);
 
   double p2 = p * p;
   double p3 = p2 * p;

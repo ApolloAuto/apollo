@@ -13,12 +13,12 @@ new_http_archive(
 # very soon.
 new_local_repository(
     name = "gtest",
-    path = "/home/tmp",
     build_file_content = """
 package(default_visibility = ["//visibility:public"])
 cc_library(name = "gtest", deps = ["@com_google_googletest//:gtest"])
 cc_library(name = "main", deps = ["@com_google_googletest//:gtest_main"])
     """,
+    path = "/home/tmp",
 )
 
 # gflags
@@ -51,12 +51,12 @@ new_local_repository(
     path = "/home/tmp/google_styleguide",
 )
 
-#ad-rss-lib
-new_git_repository(
+# ad-rss-lib
+new_http_archive(
     name = "ad_rss_lib",
     build_file = "third_party/rss_lib.BUILD",
-    tag = "v1.1.0",
-    remote = "https://github.com/intel/ad-rss-lib",
+    strip_prefix = "ad-rss-lib-1.1.0",
+    url = "file:///home/tmp/ad_rss_lib-1.1.0.tar.gz",
 )
 
 # eigen
@@ -98,6 +98,12 @@ new_local_repository(
 )
 
 new_local_repository(
+    name = "qt",
+    build_file = "third_party/qt.BUILD",
+    path = "/usr/local/qt5/include",
+)
+
+new_local_repository(
     name = "opengl",
     build_file = "third_party/opengl.BUILD",
     path = "/usr/include",
@@ -107,6 +113,14 @@ new_local_repository(
     name = "glfw",
     build_file = "third_party/glfw.BUILD",
     path = "/usr/include",
+)
+
+http_archive(
+    name = "com_google_absl",
+    sha256 = "794d483dd9a19c43dc1fbbe284ce8956eb7f2600ef350dac4c602f9b4eb26e90",
+    strip_prefix = "abseil-cpp-20180600",
+    # url = "https://github.com/abseil/abseil-cpp/archive/20180600.tar.gz",
+    url = "file:///home/tmp/abseil-cpp-20180600.tar.gz",
 )
 
 new_local_repository(
@@ -121,6 +135,7 @@ new_local_repository(
     build_file = "third_party/caffe.BUILD",
     path = "/usr/include/caffe",
 )
+
 ## tensorrt
 new_local_repository(
     name = "tensorrt",
@@ -261,8 +276,8 @@ new_local_repository(
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
-    url = "file:///home/tmp/v1.14.2.tar.gz",
     strip_prefix = "grpc-1.14.2",
+    url = "file:///home/tmp/v1.14.2.tar.gz",
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")

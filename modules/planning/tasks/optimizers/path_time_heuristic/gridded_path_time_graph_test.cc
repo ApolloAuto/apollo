@@ -41,18 +41,19 @@ class DpStGraphTest : public ::testing::Test {
     FLAGS_scenario_lane_follow_config_file =
         "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
     ScenarioConfig config;
-    CHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
+    ACHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
-    FLAGS_planning_config_file =
-        "/apollo/modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
-    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
-        << "failed to load planning config file " << FLAGS_planning_config_file;
+    const std::string planning_config_file =
+        "/apollo/modules/planning/conf/planning_config.pb.txt";
+    ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
+        << "failed to load planning config file " << planning_config_file;
 
-    DpStSpeedConfig default_dp_config;
+    DpStSpeedOptimizerConfig default_dp_config;
     for (const auto& cfg : planning_config.default_task_config()) {
-      if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
-        default_dp_config = cfg.speed_heuristic_config().default_speed_config();
+      if (cfg.task_type() == TaskConfig::SPEED_HEURISTIC_OPTIMIZER) {
+        default_dp_config =
+            cfg.speed_heuristic_optimizer_config().default_speed_config();
         break;
       }
     }
@@ -60,9 +61,9 @@ class DpStGraphTest : public ::testing::Test {
 
     for (const auto& stage : config.stage_config()) {
       for (const auto& cfg : stage.task_config()) {
-        if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
+        if (cfg.task_type() == TaskConfig::SPEED_HEURISTIC_OPTIMIZER) {
           dp_config_.MergeFrom(
-              cfg.speed_heuristic_config().default_speed_config());
+              cfg.speed_heuristic_optimizer_config().default_speed_config());
           break;
         }
       }
@@ -84,7 +85,7 @@ class DpStGraphTest : public ::testing::Test {
   StGraphData st_graph_data_;
   SpeedLimit speed_limit_;
 
-  DpStSpeedConfig dp_config_;
+  DpStSpeedOptimizerConfig dp_config_;
 
   common::TrajectoryPoint init_point_;
 };

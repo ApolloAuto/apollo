@@ -5,6 +5,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "cyber_visualizer",
+    copts = [
+        "-Iexternal/qt",
+    ],
     includes = [
         ".",
     ],
@@ -20,6 +23,10 @@ cc_binary(
         ":visualizer_lib",
         "//third_party:pthread",
         "@fastrtps",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_opengl",
+        "@qt//:qt_widgets",
     ],
 )
 
@@ -31,7 +38,7 @@ qt_cc_library(
     ),
     copts = [
         "-Imodules/drivers/proto",
-        "-I/usr/include/x86_64-linux-gnu/qt5",
+        "-Iexternal/qt",
     ],
     hdr = glob([
         "*.h",
@@ -49,6 +56,10 @@ qt_cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_opengl",
+        "@qt//:qt_widgets",
     ],
 )
 

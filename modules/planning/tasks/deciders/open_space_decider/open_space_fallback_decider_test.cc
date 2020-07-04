@@ -36,7 +36,8 @@ class OpenSpaceFallbackDeciderTest : public ::testing::Test {
 };
 
 TEST_F(OpenSpaceFallbackDeciderTest, Init) {
-  OpenSpaceFallbackDecider open_space_fallback_decider(config_);
+  auto injector = std::make_shared<DependencyInjector>();
+  OpenSpaceFallbackDecider open_space_fallback_decider(config_, injector);
   EXPECT_EQ(open_space_fallback_decider.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

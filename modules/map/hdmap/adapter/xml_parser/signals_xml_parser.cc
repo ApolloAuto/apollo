@@ -119,7 +119,7 @@ Status SignalsXmlParser::ParseTrafficLights(
           std::string stop_line_id;
           int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
                                                             &stop_line_id);
-          CHECK(checker == tinyxml2::XML_SUCCESS);
+          ACHECK(checker == tinyxml2::XML_SUCCESS);
           trafficlight_internal.stop_line_ids.insert(stop_line_id);
           sub_node = sub_node->NextSiblingElement("objectReference");
         }
@@ -258,7 +258,7 @@ Status SignalsXmlParser::ParseStopSigns(
           std::string stop_line_id;
           int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
                                                             &stop_line_id);
-          CHECK(checker == tinyxml2::XML_SUCCESS);
+          ACHECK(checker == tinyxml2::XML_SUCCESS);
           stop_sign_internal.stop_line_ids.insert(stop_line_id);
 
           sub_node = sub_node->NextSiblingElement("objectReference");
@@ -319,7 +319,7 @@ Status SignalsXmlParser::ParseYieldSigns(
           std::string stop_line_id;
           int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
                                                             &stop_line_id);
-          CHECK(checker == tinyxml2::XML_SUCCESS);
+          ACHECK(checker == tinyxml2::XML_SUCCESS);
           yield_sign_internal.stop_line_ids.insert(stop_line_id);
 
           sub_node = sub_node->NextSiblingElement("objectReference");

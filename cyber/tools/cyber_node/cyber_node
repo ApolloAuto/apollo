@@ -34,9 +34,9 @@ def print_node_info(node_name, sleep_s=2):
     except:
         print("RoleAttributes ParseFromString failed. size is ", len(roleattr_rawdata))
         return
-    print("nodename\t", msg.node_name)
-    print("processid\t", msg.process_id)
-    print("hostname\t", msg.host_name)
+    print("nodename\t%s" %  msg.node_name)
+    print("processid\t%d" % msg.process_id)
+    print("hostname\t%s" % msg.host_name)
 
     print("[Reading Channels]:")
     reader_channels = sorted(cyber.NodeUtils.get_readersofnode(node_name, 0))

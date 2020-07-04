@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -42,6 +43,11 @@ cc_library(
         "//modules/perception/inference:inference_lib",
     ],
     alwayslink = True,
+)
+
+py_proto(
+    name = "recognition_pb2",
+    src = "recognition.proto",
 )
 
 cpplint()

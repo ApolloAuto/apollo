@@ -35,14 +35,19 @@ using apollo::common::Status;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_speed_heuristic_config());
-  speed_heuristic_config_ = config.speed_heuristic_config();
+  ACHECK(config.has_speed_heuristic_optimizer_config());
+  speed_heuristic_optimizer_config_ = config.speed_heuristic_optimizer_config();
 }
 
 bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
     SpeedData* speed_data) const {
+  const auto& dp_st_speed_optimizer_config =
+      reference_line_info_->IsChangeLanePath()
+          ? speed_heuristic_optimizer_config_.lane_change_speed_config()
+          : speed_heuristic_optimizer_config_.default_speed_config();
+
   GriddedPathTimeGraph st_graph(
-      reference_line_info_->st_graph_data(), dp_st_speed_config_,
+      reference_line_info_->st_graph_data(), dp_st_speed_optimizer_config,
       reference_line_info_->path_decision()->obstacles().Items(), init_point_);
 
   if (!st_graph.Search(speed_data).ok()) {
@@ -56,10 +61,6 @@ Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
     SpeedData* const speed_data) {
   init_point_ = init_point;
-
-  dp_st_speed_config_ = reference_line_info_->IsChangeLanePath()
-                            ? speed_heuristic_config_.lane_change_speed_config()
-                            : speed_heuristic_config_.default_speed_config();
 
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");

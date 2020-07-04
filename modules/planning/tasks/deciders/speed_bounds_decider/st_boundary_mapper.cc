@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -47,17 +48,18 @@ using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-STBoundaryMapper::STBoundaryMapper(const SpeedBoundsDeciderConfig& config,
-                                   const ReferenceLine& reference_line,
-                                   const PathData& path_data,
-                                   const double planning_distance,
-                                   const double planning_time)
+STBoundaryMapper::STBoundaryMapper(
+    const SpeedBoundsDeciderConfig& config, const ReferenceLine& reference_line,
+    const PathData& path_data, const double planning_distance,
+    const double planning_time,
+    const std::shared_ptr<DependencyInjector>& injector)
     : speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
       planning_max_distance_(planning_distance),
-      planning_max_time_(planning_time) {}
+      planning_max_time_(planning_time),
+      injector_(injector) {}
 
 Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   // Sanity checks.
@@ -76,7 +78,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   double min_stop_s = std::numeric_limits<double>::max();
   for (const auto* ptr_obstacle_item : path_decision->obstacles().Items()) {
     Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
-    CHECK(ptr_obstacle != nullptr);
+    ACHECK(ptr_obstacle != nullptr);
 
     // If no longitudinal decision has been made, then plot it onto ST-graph.
     if (!ptr_obstacle->HasLongitudinalDecision()) {
@@ -199,7 +201,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     return false;
   }
 
-  const auto* planning_status = PlanningContext::Instance()
+  const auto* planning_status = injector_->planning_context()
                                     ->mutable_planning_status()
                                     ->mutable_change_lane();
 

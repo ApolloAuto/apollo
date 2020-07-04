@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <utility>
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -42,8 +43,10 @@ using PathPointDecision = std::tuple<double, PathData::PathPointType, double>;
 constexpr double kMinObstacleArea = 1e-4;
 }  // namespace
 
-PathAssessmentDecider::PathAssessmentDecider(const TaskConfig& config)
-    : Decider(config) {}
+PathAssessmentDecider::PathAssessmentDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 Status PathAssessmentDecider::Process(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
@@ -161,7 +164,7 @@ Status PathAssessmentDecider::Process(
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.
-  auto* mutable_path_decider_status = PlanningContext::Instance()
+  auto* mutable_path_decider_status = injector_->planning_context()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
   if (reference_line_info->GetBlockingObstacle() != nullptr) {
@@ -205,7 +208,7 @@ Status PathAssessmentDecider::Process(
     bool left_borrow = false;
     bool right_borrow = false;
     const auto& path_decider_status =
-        PlanningContext::Instance()->planning_status().path_decider();
+        injector_->planning_context()->planning_status().path_decider();
     for (const auto& lane_borrow_direction :
          path_decider_status.decided_side_pass_direction()) {
       if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW &&
@@ -806,8 +809,8 @@ int ContainsOutOnReverseLane(
 
 int GetBackToInLaneIndex(
     const std::vector<PathPointDecision>& path_point_decision) {
-  // CHECK(!path_point_decision.empty());
-  // CHECK(std::get<1>(path_point_decision.back()) ==
+  // ACHECK(!path_point_decision.empty());
+  // ACHECK(std::get<1>(path_point_decision.back()) ==
   //       PathData::PathPointType::IN_LANE);
 
   for (int i = static_cast<int>(path_point_decision.size()) - 1; i >= 0; --i) {

@@ -158,7 +158,7 @@ class CanSender {
    *        the protocol data as one. By default, it is false.
    */
   void AddMessage(uint32_t message_id, ProtocolData<SensorType> *protocol_data,
-                  bool init_one = false);
+                  bool init_with_one = false);
 
   /**
    * @brief Start the CAN sender.

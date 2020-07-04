@@ -54,6 +54,8 @@ class GuardianComponent : public apollo::cyber::TimerComponent {
   apollo::control::ControlCommand control_cmd_;
   apollo::guardian::GuardianCommand guardian_cmd_;
 
+  double last_status_received_s_{};
+
   std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
       chassis_reader_;
   std::shared_ptr<apollo::cyber::Reader<apollo::control::ControlCommand>>

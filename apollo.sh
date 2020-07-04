@@ -107,7 +107,7 @@ function generate_build_targets() {
   *)
 #    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
     # FIXME(all): temporarily disable modules doesn't compile in 18.04
-    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/v2x/... except //modules/map/tools/map_datachecker/... $DISABLE_CYBER_MODULES`
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/v2x/... except //modules/map/tools/map_datachecker/... $DISABLE_CYBER_MODULES`
   esac
 
   if [ $? -ne 0 ]; then
@@ -262,6 +262,7 @@ function apollo_build_opt() {
 }
 
 function build_py_proto() {
+  # TODO(xiaoxq): Retire this as we are using bazel to compile protos into bazel-genfiles.
   if [ -d "./py_proto" ];then
     rm -rf py_proto
   fi
@@ -297,7 +298,8 @@ function warn_proprietary_sw() {
 }
 
 function release() {
-  RELEASE_DIR="${HOME}/.cache/apollo_release"
+  CACHE_DIR="/apollo/.cache"
+  RELEASE_DIR="${CACHE_DIR}/apollo_release"
   if [ -d "${RELEASE_DIR}" ]; then
     rm -rf "${RELEASE_DIR}"
   fi

@@ -86,15 +86,15 @@ bool ROIService::Init(const SceneServiceInitOptions& options) {
   roi_content_ref_ = dynamic_cast<ROIServiceContent*>(self_content_.get());
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "roi_service.conf");
   ROIServiceConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   roi_content_ref_->cell_size_ = config.cell_size();
   roi_content_ref_->range_ = config.range();
   return true;

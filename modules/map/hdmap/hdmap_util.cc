@@ -39,7 +39,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
   }
   AERROR << "No existing file found in " << dir << "/" << files
          << ". Fallback to first candidate as default result.";
-  CHECK(!candidates.empty()) << "Please specify at least one map.";
+  ACHECK(!candidates.empty()) << "Please specify at least one map.";
   return absl::StrCat(FLAGS_map_dir, "/", candidates[0]);
 }
 

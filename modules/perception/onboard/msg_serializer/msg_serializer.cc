@@ -21,6 +21,7 @@
 
 #include "modules/common/time/time.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
+#include "modules/prediction/proto/feature.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -31,9 +32,10 @@ bool MsgSerializer::SerializeMsg(double timestamp, uint64_t lidar_timestamp,
                                  const std::vector<base::ObjectPtr> &objects,
                                  const apollo::common::ErrorCode &error_code,
                                  PerceptionObstacles *obstacles) {
-  double publish_time = apollo::common::time::Clock::NowInSeconds();
+  // double publish_time = apollo::common::time::Clock::NowInSeconds();
   ::apollo::common::Header *header = obstacles->mutable_header();
-  header->set_timestamp_sec(publish_time);
+  // weide:fixme:header->set_timestamp_sec(publish_time);
+  header->set_timestamp_sec((static_cast<double>(lidar_timestamp)) / 1e9);
   header->set_module_name("perception_obstacle");
   header->set_sequence_num(seq_num);
   header->set_lidar_timestamp(lidar_timestamp);
@@ -175,6 +177,18 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
       pb_box->set_xmax(measurement.box.xmax);
       pb_box->set_ymax(measurement.box.ymax);
     }
+  }
+
+  // record the best prediction trajectory
+  if (object_ptr->feature.get() &&
+      object_ptr->feature->predicted_trajectory_size() > 0) {
+    apollo::perception::DebugMessage *dmsg = pb_msg->mutable_msg();
+    apollo::perception::Trajectory *target_traj = dmsg->add_trajectory();
+    const apollo::prediction::Trajectory &src_traj =
+        object_ptr->feature->predicted_trajectory(0);
+    (*target_traj->mutable_trajectory_point()) = (src_traj.trajectory_point());
+    ADEBUG << "Inserting Trajectores in PB with point size "
+          << src_traj.trajectory_point_size();
   }
 
   return true;

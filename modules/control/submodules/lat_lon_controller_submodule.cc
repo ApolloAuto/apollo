@@ -41,24 +41,26 @@ std::string LatLonControllerSubmodule::Name() const {
 }
 
 bool LatLonControllerSubmodule::Init() {
+  injector_ = std::make_shared<DependencyInjector>();
   // lateral controller initialization
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_lateral_controller_conf_file,
-                                        &lateral_controller_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_lateral_controller_conf_file,
+                                         &lateral_controller_conf_))
       << "Unable to load lateral controller conf file: "
       << FLAGS_lateral_controller_conf_file;
 
-  if (!lateral_controller_.Init(&lateral_controller_conf_).ok()) {
+  if (!lateral_controller_.Init(injector_, &lateral_controller_conf_).ok()) {
     monitor_logger_buffer_.ERROR(
         "Control init lateral controller failed! Stopping...");
     return false;
   }
   // longitudinal controller
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_longitudinal_controller_conf_file,
-                                        &longitudinal_controller_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(
+      FLAGS_longitudinal_controller_conf_file, &longitudinal_controller_conf_))
       << "Unable to load longitudinal controller conf file: " +
              FLAGS_longitudinal_controller_conf_file;
 
-  if (!longitudinal_controller_.Init(&longitudinal_controller_conf_).ok()) {
+  if (!longitudinal_controller_.Init(injector_, &longitudinal_controller_conf_)
+           .ok()) {
     monitor_logger_buffer_.ERROR(
         "Control init longitudinal controller failed! Stopping...");
     return false;
@@ -67,7 +69,7 @@ bool LatLonControllerSubmodule::Init() {
   control_core_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
 
-  CHECK(control_core_writer_ != nullptr);
+  ACHECK(control_core_writer_ != nullptr);
 
   return true;
 }

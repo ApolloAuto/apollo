@@ -12,6 +12,7 @@ startup --batch_cpu_scheduling
 
 startup --host_jvm_args=-XX:-UseParallelGC
 
+startup --output_user_root=/apollo/.cache/bazel
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
@@ -85,3 +86,8 @@ build --copt="-Werror=switch"
 build --cxxopt="-std=c++1y"
 # Enable colorful output of GCC
 # build --cxxopt="-fdiagnostics-color=always"
+
+# +------------------------------------------------------------+
+# | Python Configurations                                      |
+# +------------------------------------------------------------+
+run --python_path=/usr/bin/python3

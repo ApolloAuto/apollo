@@ -1,3 +1,5 @@
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -12,5 +14,13 @@ proto_library(
     srcs = ["simple.proto"],
     deps = [
         "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+py_proto(
+    name = "simple_pb2",
+    src = "simple.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
     ],
 )

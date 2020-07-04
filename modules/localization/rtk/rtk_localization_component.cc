@@ -65,20 +65,20 @@ bool RTKLocalizationComponent::InitIO() {
   corrected_imu_listener_ = node_->CreateReader<localization::CorrectedImu>(
       imu_topic_, std::bind(&RTKLocalization::ImuCallback, localization_.get(),
                             std::placeholders::_1));
-  CHECK(corrected_imu_listener_);
+  ACHECK(corrected_imu_listener_);
 
   gps_status_listener_ = node_->CreateReader<drivers::gnss::InsStat>(
       gps_status_topic_, std::bind(&RTKLocalization::GpsStatusCallback,
                                    localization_.get(), std::placeholders::_1));
-  CHECK(gps_status_listener_);
+  ACHECK(gps_status_listener_);
 
   localization_talker_ =
       node_->CreateWriter<LocalizationEstimate>(localization_topic_);
-  CHECK(localization_talker_);
+  ACHECK(localization_talker_);
 
   localization_status_talker_ =
       node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
-  CHECK(localization_status_talker_);
+  ACHECK(localization_status_talker_);
   return true;
 }
 

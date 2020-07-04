@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.storytelling;
+
+message TopicConfig {
+  optional string planning_trajectory_topic = 1;
+  optional string storytelling_topic = 2;
+}
+
+message StorytellingConfig {
+  optional TopicConfig topic_config = 1;
+}

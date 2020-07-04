@@ -11,7 +11,8 @@ cuda_library(
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
         "//modules/perception/inference/utils:inference_gemm_lib",
-        "@cuda",
+	"//modules/prediction/proto:feature_proto",
+	"@cuda",
     ],
 )
 

@@ -31,7 +31,7 @@ class EvaluatorManagerTest : public KMLMapBasedTest {
   virtual void SetUp() {
     const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
@@ -47,15 +47,18 @@ TEST_F(EvaluatorManagerTest, General) {
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
-  ContainerManager::Instance()->Init(adapter_conf_);
+  ContainerManager container_manager;
+  container_manager.Init(adapter_conf_);
   auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager.GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 
-  EvaluatorManager::Instance()->Init(prediction_conf_);
-  EvaluatorManager::Instance()->Run(obstacles_container);
+  EvaluatorManager evaluator_manager;
+
+  evaluator_manager.Init(prediction_conf_);
+  evaluator_manager.Run(obstacles_container);
 
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);

@@ -254,7 +254,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
   base_camera_model_ = options.base_camera_model;
-  CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
+  ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
       GetAbsolutePath(options.root_dir, options.conf_file);
   if (!cyber::common::GetProtoFromFile(config_path, &yolo_param_)) {
@@ -283,7 +283,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   if (!LoadExpand(expand_file, &expands_)) {
     return false;
   }
-  CHECK(expands_.size() == types_.size());
+  ACHECK(expands_.size() == types_.size());
   if (!InitNet(yolo_param_, model_root)) {
     return false;
   }

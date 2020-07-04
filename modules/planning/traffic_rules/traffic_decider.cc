@@ -21,6 +21,7 @@
 #include "modules/planning/traffic_rules/traffic_decider.h"
 
 #include <limits>
+#include <memory>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -38,48 +39,68 @@ namespace apollo {
 namespace planning {
 using apollo::common::Status;
 
-apollo::common::util::Factory<TrafficRuleConfig::RuleId, TrafficRule,
-                              TrafficRule *(*)(const TrafficRuleConfig &config)>
+apollo::common::util::Factory<
+    TrafficRuleConfig::RuleId, TrafficRule,
+    TrafficRule *(*)(const TrafficRuleConfig &config,
+                     const std::shared_ptr<DependencyInjector> &injector)>
     TrafficDecider::s_rule_factory;
 
 void TrafficDecider::RegisterRules() {
-  s_rule_factory.Register(TrafficRuleConfig::BACKSIDE_VEHICLE,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new BacksideVehicle(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::CROSSWALK,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Crosswalk(config);
-                          });
+  s_rule_factory.Register(
+      TrafficRuleConfig::BACKSIDE_VEHICLE,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new BacksideVehicle(config);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::CROSSWALK,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new Crosswalk(config, injector);
+      });
 
-  s_rule_factory.Register(TrafficRuleConfig::DESTINATION,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Destination(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::KEEP_CLEAR,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new KeepClear(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new ReferenceLineEnd(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::REROUTING,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new Rerouting(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new StopSign(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::YIELD_SIGN,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new YieldSign(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::TRAFFIC_LIGHT,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new TrafficLight(config);
-                          });
+  s_rule_factory.Register(
+      TrafficRuleConfig::DESTINATION,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new Destination(config, injector);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::KEEP_CLEAR,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new KeepClear(config, injector);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::REFERENCE_LINE_END,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new ReferenceLineEnd(config, injector);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::REROUTING,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new Rerouting(config, injector);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::STOP_SIGN,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new StopSign(config, injector);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::YIELD_SIGN,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new YieldSign(config, injector);
+      });
+  s_rule_factory.Register(
+      TrafficRuleConfig::TRAFFIC_LIGHT,
+      [](const TrafficRuleConfig &config,
+         const std::shared_ptr<DependencyInjector> &injector) -> TrafficRule * {
+        return new TrafficLight(config, injector);
+      });
 }
 
 bool TrafficDecider::Init(const TrafficRuleConfigs &config) {
@@ -131,8 +152,9 @@ void TrafficDecider::BuildPlanningTarget(
   }
 }
 
-Status TrafficDecider::Execute(Frame *frame,
-                               ReferenceLineInfo *reference_line_info) {
+Status TrafficDecider::Execute(
+    Frame *frame, ReferenceLineInfo *reference_line_info,
+    const std::shared_ptr<DependencyInjector> &injector) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -141,7 +163,8 @@ Status TrafficDecider::Execute(Frame *frame,
       ADEBUG << "Rule " << rule_config.rule_id() << " not enabled";
       continue;
     }
-    auto rule = s_rule_factory.CreateObject(rule_config.rule_id(), rule_config);
+    auto rule = s_rule_factory.CreateObject(rule_config.rule_id(), rule_config,
+                                            injector);
     if (!rule) {
       AERROR << "Could not find rule " << rule_config.DebugString();
       continue;

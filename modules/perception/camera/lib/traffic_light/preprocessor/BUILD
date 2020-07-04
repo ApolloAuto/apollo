@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -55,6 +56,11 @@ cc_library(
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
+)
+
+py_proto(
+    name = "tl_preprocess_pb2",
+    src = "tl_preprocess.proto",
 )
 
 cpplint()

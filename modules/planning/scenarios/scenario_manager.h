@@ -22,6 +22,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -30,11 +31,15 @@ namespace scenario {
 
 class ScenarioManager final {
  public:
-  ScenarioManager() = default;
+  ScenarioManager() = delete;
+
+  explicit ScenarioManager(const std::shared_ptr<DependencyInjector>& injector);
 
   bool Init();
 
   Scenario* mutable_scenario() { return current_scenario_.get(); }
+
+  DependencyInjector* injector() { return injector_.get(); }
 
   void Update(const common::TrajectoryPoint& ego_point, const Frame& frame);
 
@@ -68,8 +73,9 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
 
-  void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
-                        const Frame& frame);
+  void ScenarioDispatch(const Frame& frame);
+  ScenarioConfig::ScenarioType ScenarioDispatchLearning();
+  ScenarioConfig::ScenarioType ScenarioDispatchNonLearning(const Frame& frame);
 
   bool IsBareIntersectionScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
@@ -109,6 +115,7 @@ class ScenarioManager final {
   std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
                      std::hash<int>>
       first_encountered_overlap_map_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace scenario

@@ -30,15 +30,15 @@ using cyber::common::GetAbsolutePath;
 bool MlfShapeFilter::Init(const MlfFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_shape_filter.conf");
   MlfShapeFilterConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   bottom_points_ignore_threshold_ = config.bottom_points_ignore_threshold();
   top_points_ignore_threshold_ = config.top_points_ignore_threshold();

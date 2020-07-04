@@ -24,6 +24,10 @@ set -e
 source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash
 
+if [ ! -z "$4" ]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$4
+fi
+
 sudo mkdir -p ${TARGET_DIR}
 
 if [ -z "$3" ]; then
@@ -38,4 +42,5 @@ fi
     --prediction_offline_mode=2 \
     --prediction_offline_bags=${SRC_DIR} \
     --prediction_data_dir=${TARGET_DIR} \
-    --noenable_multi_thread
+    --noenable_multi_thread \
+    --noenable_async_draw_base_image

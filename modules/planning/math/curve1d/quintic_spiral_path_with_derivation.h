@@ -118,7 +118,7 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
     const double x0, const double dx0, const double ddx0, const double x1,
     const double dx1, const double ddx1, const double s)
     : QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, s) {
-  CHECK(s > 0.0);
+  ACHECK(s > 0.0);
 
   auto gauss_points = common::math::GetGaussLegendrePoints<N>();
   gauss_points_ = gauss_points.first;

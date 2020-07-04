@@ -145,7 +145,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   calibration_service_init_options.image_width =
       static_cast<int>(model.get_width());
   OnlineCalibrationService calibration_service;
-  CHECK(calibration_service.Init(calibration_service_init_options));
+  ACHECK(calibration_service.Init(calibration_service_init_options));
 
   std::map<std::string, float> name_camera_ground_height_map;
   std::map<std::string, float> name_camera_pitch_angle_diff_map;
@@ -214,7 +214,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
         "darkSCNN/data/test_%d.jpg",
         i);
     cv::Mat img = cv::imread(impath);
-    CHECK(!img.empty()) << "input image is empty.";
+    ACHECK(!img.empty()) << "input image is empty.";
     int size = img.cols * img.rows * img.channels();
     img_gpu_data.reset(new base::SyncedMemory(size, true));
     memcpy(img_gpu_data->mutable_cpu_data(), img.data, size * sizeof(uint8_t));

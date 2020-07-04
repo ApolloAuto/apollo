@@ -35,15 +35,15 @@ int main(int argc, char **argv) {
 
   const auto map_filename = FLAGS_map_dir + "/base_map.txt";
   apollo::hdmap::Map pb_map;
-  CHECK(apollo::cyber::common::GetProtoFromFile(map_filename, &pb_map))
+  ACHECK(apollo::cyber::common::GetProtoFromFile(map_filename, &pb_map))
       << "fail to load data from : " << map_filename;
 
   const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(apollo::cyber::common::SetProtoToBinaryFile(pb_map, output_bin_file))
+  ACHECK(apollo::cyber::common::SetProtoToBinaryFile(pb_map, output_bin_file))
       << "failed to output binary format base map";
 
   pb_map.Clear();
-  CHECK(apollo::cyber::common::GetProtoFromFile(output_bin_file, &pb_map))
+  ACHECK(apollo::cyber::common::GetProtoFromFile(output_bin_file, &pb_map))
       << "failed to load map,transform map failed";
 
   AINFO << "transform map into .bin map success";

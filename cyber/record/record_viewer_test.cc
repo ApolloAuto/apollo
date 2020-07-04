@@ -17,15 +17,16 @@
 #include "cyber/record/record_viewer.h"
 
 #include <unistd.h>
+
 #include <algorithm>
 #include <atomic>
 #include <memory>
 #include <string>
-#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
@@ -38,16 +39,20 @@ constexpr char kMessageType1[] = "apollo.cyber.proto.Test";
 constexpr char kProtoDesc1[] = "1234567890";
 constexpr char kTestFile[] = "viewer_test.record";
 
-void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
-                     uint64_t time_step) {
+static void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
+                            uint64_t time_step, bool reverse = false) {
   RecordWriter writer;
   writer.SetSizeOfFileSegmentation(0);
   writer.SetIntervalOfFileSegmentation(0);
   writer.Open(kTestFile);
   writer.WriteChannel(kChannelName1, kMessageType1, kProtoDesc1);
   for (uint64_t i = 0; i < msg_num; i++) {
-    auto msg = std::make_shared<RawMessage>(std::to_string(i));
-    writer.WriteMessage(kChannelName1, msg, begin_time + time_step * i);
+    auto ai = i;
+    if (reverse) {
+      ai = msg_num - 1 - i;
+    }
+    auto msg = std::make_shared<RawMessage>(std::to_string(ai));
+    writer.WriteMessage(kChannelName1, msg, begin_time + time_step * ai);
   }
   ASSERT_EQ(msg_num, writer.GetMessageNumber(kChannelName1));
   writer.Close();
@@ -92,6 +97,42 @@ TEST(RecordTest, iterator_test) {
     EXPECT_EQ(std::to_string(i), msg.content);
     i++;
   });
+  EXPECT_EQ(msg_num, i);
+
+  i = 0;
+  for (auto it = viewer.begin(); it != viewer.end(); ++it) {
+    EXPECT_EQ(kChannelName1, it->channel_name);
+    EXPECT_EQ(begin_time + step_time * i, it->time);
+    EXPECT_EQ(std::to_string(i), it->content);
+    i++;
+  }
+  EXPECT_EQ(msg_num, i);
+  ASSERT_FALSE(remove(kTestFile));
+}
+
+TEST(RecordTest, iterator_test_reverse) {
+  uint64_t msg_num = 200;
+  uint64_t begin_time = 1000;
+  uint64_t step_time = 10;
+  // TODO(storypku): investigtate why the following fails
+  // uint64_t begin_time = 100000000;
+  // uint64_t step_time = 100000000;  // 100ms
+  uint64_t end_time = begin_time + step_time * (msg_num - 1);
+  ConstructRecord(msg_num, begin_time, step_time, true);
+
+  auto reader = std::make_shared<RecordReader>(kTestFile);
+  RecordViewer viewer(reader);
+  EXPECT_TRUE(viewer.IsValid());
+  EXPECT_EQ(begin_time, viewer.begin_time());
+  EXPECT_EQ(end_time, viewer.end_time());
+
+  uint64_t i = 0;
+  for (auto& msg : viewer) {
+    EXPECT_EQ(kChannelName1, msg.channel_name);
+    EXPECT_EQ(begin_time + step_time * i, msg.time);
+    EXPECT_EQ(std::to_string(i), msg.content);
+    i++;
+  }
   EXPECT_EQ(msg_num, i);
 
   i = 0;

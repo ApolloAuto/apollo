@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 
+#include <memory>
+
 #include "cyber/common/log.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -35,8 +37,9 @@ namespace pull_over {
 using apollo::common::TrajectoryPoint;
 
 PullOverStageRetryParking::PullOverStageRetryParking(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageRetryParking::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -56,11 +59,12 @@ Stage::StageStatus PullOverStageRetryParking::Process(
 
   // set debug info in planning_data
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   auto* pull_over_debug = frame->mutable_open_space_info()
                               ->mutable_debug()
                               ->mutable_planning_data()
                               ->mutable_pull_over();
+  pull_over_debug->mutable_position()->CopyFrom(pull_over_status.position());
   pull_over_debug->set_theta(pull_over_status.theta());
   pull_over_debug->set_length_front(pull_over_status.length_front());
   pull_over_debug->set_length_back(pull_over_status.length_back());
@@ -71,6 +75,7 @@ Stage::StageStatus PullOverStageRetryParking::Process(
   if (CheckADCPullOverOpenSpace()) {
     return FinishStage();
   }
+
   return StageStatus::RUNNING;
 }
 
@@ -80,7 +85,7 @@ Stage::StageStatus PullOverStageRetryParking::FinishStage() {
 
 bool PullOverStageRetryParking::CheckADCPullOverOpenSpace() {
   const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
+      injector_->planning_context()->planning_status().pull_over();
   if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
       !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
@@ -90,15 +95,15 @@ bool PullOverStageRetryParking::CheckADCPullOverOpenSpace() {
   }
 
   const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+      injector_->vehicle_state()->x(),
+      injector_->vehicle_state()->y()};
   const common::math::Vec2d target_position = {pull_over_status.position().x(),
                                                pull_over_status.position().y()};
 
   const double distance_diff = adc_position.DistanceTo(target_position);
   const double theta_diff = std::fabs(common::math::NormalizeAngle(
       pull_over_status.theta() -
-      common::VehicleStateProvider::Instance()->heading()));
+      injector_->vehicle_state()->heading()));
   ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
          << "]";
   // check distance/theta diff

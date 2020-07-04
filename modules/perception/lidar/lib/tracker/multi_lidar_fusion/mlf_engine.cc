@@ -16,31 +16,35 @@
 
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
 
+#include <Eigen/Geometry>
 #include <utility>
 
 #include "cyber/common/file.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
+#include "modules/prediction/proto/feature.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
 using cyber::common::GetAbsolutePath;
+using apollo::prediction::Feature;
 
 bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_engine.conf");
   MlfEngineConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   main_sensor_.clear();
   for (int i = 0; i < config.main_sensor_size(); ++i) {
@@ -63,11 +67,12 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
 
   matcher_.reset(new MlfTrackObjectMatcher);
   MlfTrackObjectMatcherInitOptions matcher_init_options;
-  CHECK(matcher_->Init(matcher_init_options));
+  ACHECK(matcher_->Init(matcher_init_options));
 
   tracker_.reset(new MlfTracker);
   MlfTrackerInitOptions tracker_init_options;
-  CHECK(tracker_->Init(tracker_init_options));
+  ACHECK(tracker_->Init(tracker_init_options));
+  evaluator_.Init();
   return true;
 }
 
@@ -109,6 +114,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
   // 6. remove stale data
   RemoveStaleTrackData("foreground", frame->timestamp, &foreground_track_data_);
   RemoveStaleTrackData("background", frame->timestamp, &background_track_data_);
+
   AINFO << "MlfEngine publish objects: " << frame->tracked_objects.size()
         << " sensor_name: " << frame->sensor_info.name
         << " at timestamp: " << frame->timestamp;
@@ -145,7 +151,7 @@ void MlfEngine::TrackObjectMatchAndAssign(
     const MlfTrackObjectMatcherOptions& match_options,
     const std::vector<TrackedObjectPtr>& objects, const std::string& name,
     std::vector<MlfTrackDataPtr>* tracks) {
-  std::vector<std::pair<size_t, size_t> > assignments;
+  std::vector<std::pair<size_t, size_t>> assignments;
   std::vector<size_t> unassigned_tracks;
   std::vector<size_t> unassigned_objects;
   matcher_->Match(match_options, objects, *tracks, &assignments,
@@ -165,7 +171,6 @@ void MlfEngine::TrackObjectMatchAndAssign(
     tracker_->InitializeTrack(track_data, objects[id]);
     tracks->push_back(track_data);
   }
-  // 3. for unassigned_tracks, do nothing
 }
 
 void MlfEngine::TrackStateFilter(const std::vector<MlfTrackDataPtr>& tracks,
@@ -178,6 +183,57 @@ void MlfEngine::TrackStateFilter(const std::vector<MlfTrackDataPtr>& tracks,
     }
     if (objects.empty()) {
       tracker_->UpdateTrackDataWithoutObject(frame_timestamp, track_data);
+    }
+  }
+}
+
+void convertPoseToLoc(const Eigen::Affine3d& pose,
+                      localization::LocalizationEstimate* localization) {
+  ADEBUG << "translation x y z " << pose.translation()[0] << " "
+        << pose.translation()[1] << " " << pose.translation()[2];
+  localization->mutable_pose()->mutable_position()
+              ->set_x(pose.translation()[0]);
+  localization->mutable_pose()->mutable_position()
+              ->set_y(pose.translation()[1]);
+  localization->mutable_pose()->mutable_position()
+              ->set_z(pose.translation()[2]);
+  Eigen::Quaterniond p(pose.rotation());
+  localization->mutable_pose()->mutable_orientation()->set_qx(p.x());
+  localization->mutable_pose()->mutable_orientation()->set_qy(p.y());
+  localization->mutable_pose()->mutable_orientation()->set_qz(p.z());
+  localization->mutable_pose()->mutable_orientation()->set_qw(p.w());
+}
+
+void MlfEngine::AttachDebugInfo(
+    std::vector<std::shared_ptr<base::Object>>* foreground_objs) {
+  for (auto i : obstacle_container_.curr_frame_movable_obstacle_ids()) {
+    Obstacle* obj = obstacle_container_.GetObstacle(i);
+    for (size_t i = 0; i < (*foreground_objs).size(); ++i) {
+      if (obj->id() == (*foreground_objs)[static_cast<int>(i)]->track_id) {
+        (*foreground_objs)[static_cast<int>(i)]->feature.reset(
+            new Feature(obj->latest_feature()));
+        ADEBUG << "traj size is mlf engine is "
+              << (*foreground_objs)[static_cast<int>(i)]
+                     ->feature->predicted_trajectory_size()
+              << " track id "
+              << (*foreground_objs)[static_cast<int>(i)]->track_id
+              << " feature address is "
+              << static_cast<void*>(
+            (*foreground_objs)[static_cast<int>(i)]->feature.get());
+      }
+    }
+  }
+}
+
+void MlfEngine::AttachSemanticPredictedTrajectory(
+    const std::vector<MlfTrackDataPtr>& tracks) {
+  for (auto i : obstacle_container_.curr_frame_movable_obstacle_ids()) {
+    Obstacle* obj = obstacle_container_.GetObstacle(i);
+    for (size_t j = 0; j < tracks.size(); ++j) {
+      MlfTrackDataPtr ptr = tracks[j];
+      if (obj->id() == ptr->track_id_) {
+        ptr->feature_.reset(new Feature(obj->latest_feature()));
+      }
     }
   }
 }
@@ -205,6 +261,33 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
     }
   };
   collect(&foreground_track_data_);
+  // update semantic map object container
+  if (use_semantic_map_) {
+    obstacle_container_.CleanUp();
+    // use msg serializer to convert object to perception obstacles
+    apollo::common::ErrorCode err = apollo::common::ErrorCode::OK;
+    apollo::perception::PerceptionObstacles obstacles;
+    double lidar_ts = frame->timestamp;
+    localization::LocalizationEstimate localization;
+    localization.mutable_header()->set_timestamp_sec(lidar_ts);
+    localization.mutable_header()->set_lidar_timestamp(lidar_ts * 1e9);
+    localization.mutable_pose()->mutable_linear_velocity()->set_x(0.0f);
+    localization.mutable_pose()->mutable_linear_velocity()->set_y(0.0f);
+    localization.mutable_pose()->mutable_linear_velocity()->set_z(0.0f);
+    convertPoseToLoc(frame->novatel2world_pose, &localization);
+    pose_container_.Insert(localization);
+    obstacle_container_.InsertPerceptionObstacle(
+        *(pose_container_.ToPerceptionObstacle()), lidar_ts);
+    std::vector<std::shared_ptr<base::Object>> foreground_objs(
+        tracked_objects.begin(), tracked_objects.begin() + pos);
+    serializer_.SerializeMsg(0, static_cast<uint64_t>(lidar_ts * 1e9), 0,
+                             foreground_objs, err, &obstacles);
+    obstacle_container_.Insert(obstacles);
+    evaluator_.Run(&obstacle_container_);
+    AttachDebugInfo(&foreground_objs);
+    AttachSemanticPredictedTrajectory(foreground_track_data_);
+  }
+
   collect(&background_track_data_);
   if (num_predict != 0) {
     AINFO << "MlfEngine, num_predict: " << num_predict

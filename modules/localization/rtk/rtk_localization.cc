@@ -415,7 +415,7 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
     AERROR << "[InterpolateIMU2]: the given time stamp[" << timestamp_sec
            << "] is newer than the 2nd message["
            << imu2.header().timestamp_sec() << "]";
-    *imu_msg = imu1;
+    *imu_msg = imu2;
   } else {
     *imu_msg = imu1;
     imu_msg->mutable_header()->set_timestamp_sec(timestamp_sec);

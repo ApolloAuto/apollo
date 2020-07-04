@@ -38,7 +38,8 @@ enum class ProcessStage {
   ULTRASONIC_DETECTION = 7,
   SENSOR_FUSION = 8,
   UNKNOWN_STAGE = 9,
-  PROCESSSTAGE_COUNT = 10
+  PROCESSSTAGE_COUNT = 10,
+  LIDAR_DETECTION = 11
 };
 
 class Descriptor {

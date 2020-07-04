@@ -33,7 +33,7 @@ using cyber::common::GetAbsolutePath;
 bool ExternalFeatureExtractor::Init(
     const FeatureExtractorInitOptions &options) {
   std::string efx_config = GetAbsolutePath(options.root_dir, options.conf_file);
-  CHECK(cyber::common::GetProtoFromFile(efx_config, &param_))
+  ACHECK(cyber::common::GetProtoFromFile(efx_config, &param_))
       << "Read config failed: " << efx_config;
   AINFO << "Load config Success: " << param_.ShortDebugString();
   std::string proto_file =
@@ -51,14 +51,14 @@ bool ExternalFeatureExtractor::Init(
   inference_.reset(inference::CreateInferenceByName(
       model_type, proto_file, weight_file, output_names, input_names,
       options.root_dir));
-  CHECK(nullptr != inference_) << "Failed to init CNNAdapter";
+  ACHECK(nullptr != inference_) << "Failed to init CNNAdapter";
   gpu_id_ = GlobalConfig::Instance()->track_feature_gpu_id;
   inference_->set_gpu_id(gpu_id_);
   std::vector<int> shape = {1, height_, width_, 3};
   std::map<std::string, std::vector<int>> shape_map{
       {param_.input_blob(), shape}};
 
-  CHECK(inference_->Init(shape_map));
+  ACHECK(inference_->Init(shape_map));
   inference_->Infer();
   InitFeatureExtractor(options.root_dir);
   image_.reset(new base::Image8U(height_, width_, base::Color::BGR));

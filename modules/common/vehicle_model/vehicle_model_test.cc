@@ -32,18 +32,18 @@ class VehicleModelTest : public ::testing::Test {
   virtual void SetUp() {
     std::string localization_pre_file =
         "modules/common/testdata/localization_pre.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(localization_pre_file,
-                                          &localization_pre_));
+    ACHECK(cyber::common::GetProtoFromFile(localization_pre_file,
+                                           &localization_pre_));
     std::string localization_post_file =
         "modules/common/testdata/localization_post.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(localization_post_file,
-                                          &localization_post_));
+    ACHECK(cyber::common::GetProtoFromFile(localization_post_file,
+                                           &localization_post_));
     const std::string chassis_pre_file =
         "modules/common/testdata/chassis_pre.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
+    ACHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
     const std::string chassis_post_file =
         "modules/common/testdata/chassis_post.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(chassis_post_file, &chassis_post_));
+    ACHECK(cyber::common::GetProtoFromFile(chassis_post_file, &chassis_post_));
   }
 
  protected:
@@ -60,7 +60,8 @@ TEST_F(VehicleModelTest, RearCenteredKinematicBicycleModel) {
   double predicted_time_horizon = localization_post_.measurement_time() -
                                   localization_pre_.measurement_time();
 
-  auto vehicle_state_provider = VehicleStateProvider::Instance();
+  auto vehicle_state_provider =
+      std::make_shared<common::VehicleStateProvider>();
 
   vehicle_state_provider->Update(localization_pre_, chassis_pre_);
   cur_vehicle_state_ = vehicle_state_provider->vehicle_state();

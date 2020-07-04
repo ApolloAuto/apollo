@@ -44,7 +44,7 @@ AABox2d::AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner)
               std::abs(one_corner.y() - opposite_corner.y())) {}
 
 AABox2d::AABox2d(const std::vector<Vec2d> &points) {
-  CHECK(!points.empty());
+  ACHECK(!points.empty());
   double min_x = points[0].x();
   double max_x = points[0].x();
   double min_y = points[0].y();

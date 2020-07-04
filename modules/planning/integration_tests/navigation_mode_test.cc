@@ -33,8 +33,6 @@ class NavigationModeTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_use_navigation_mode = true;
-    FLAGS_planning_config_file =
-        "modules/planning/conf/planning_config_navi.pb.txt";
     FLAGS_lane_follow_scenario_config_file =
         "modules/planning/conf/lane_follow_scenario_config.pb.txt";
     FLAGS_test_data_dir = "modules/planning/testdata/navigation_mode_test";

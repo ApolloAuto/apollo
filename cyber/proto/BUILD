@@ -1,3 +1,5 @@
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -119,6 +121,11 @@ proto_library(
     srcs = ["record.proto"],
 )
 
+py_proto(
+    name = "record_pb2",
+    src = "record.proto",
+)
+
 cc_proto_library(
     name = "unit_test_cc_proto",
     deps = [
@@ -227,4 +234,104 @@ proto_library(
     ],
 )
 
-#cpplint()
+py_proto(
+    name = "perf_conf_pb2",
+    src = "perf_conf.proto",
+)
+
+py_proto(
+    name = "run_mode_conf_pb2",
+    src = "run_mode_conf.proto",
+)
+
+py_proto(
+    name = "dag_conf_pb2",
+    src = "dag_conf.proto",
+    deps = [
+        "//cyber/proto:component_conf_pb2",
+    ],
+)
+
+py_proto(
+    name = "unit_test_pb2",
+    src = "unit_test.proto",
+)
+
+py_proto(
+    name = "choreography_conf_pb2",
+    src = "choreography_conf.proto",
+)
+
+py_proto(
+    name = "role_attributes_pb2",
+    src = "role_attributes.proto",
+    deps = [
+        "//cyber/proto:qos_profile_pb2",
+    ],
+)
+
+py_proto(
+    name = "proto_desc_pb2",
+    src = "proto_desc.proto",
+)
+
+py_proto(
+    name = "perception_pb2",
+    src = "perception.proto",
+)
+
+py_proto(
+    name = "scheduler_conf_pb2",
+    src = "scheduler_conf.proto",
+    deps = [
+        "//cyber/proto:choreography_conf_pb2",
+        "//cyber/proto:classic_conf_pb2",
+    ],
+)
+
+py_proto(
+    name = "parameter_pb2",
+    src = "parameter.proto",
+)
+
+py_proto(
+    name = "classic_conf_pb2",
+    src = "classic_conf.proto",
+)
+
+py_proto(
+    name = "component_conf_pb2",
+    src = "component_conf.proto",
+    deps = [
+        "//cyber/proto:qos_profile_pb2",
+    ],
+)
+
+py_proto(
+    name = "transport_conf_pb2",
+    src = "transport_conf.proto",
+)
+
+py_proto(
+    name = "qos_profile_pb2",
+    src = "qos_profile.proto",
+)
+
+py_proto(
+    name = "cyber_conf_pb2",
+    src = "cyber_conf.proto",
+    deps = [
+        "//cyber/proto:perf_conf_pb2",
+        "//cyber/proto:run_mode_conf_pb2",
+        "//cyber/proto:scheduler_conf_pb2",
+        "//cyber/proto:transport_conf_pb2",
+    ],
+)
+
+py_proto(
+    name = "topology_change_pb2",
+    src = "topology_change.proto",
+    deps = [
+        "//cyber/proto:role_attributes_pb2",
+    ],
+)

@@ -17,6 +17,7 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
 
 #include <limits>
+#include <memory>
 
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
@@ -38,8 +39,11 @@ using STBound = std::vector<STBoundPoint>;
 using ObsDecSet = std::vector<std::pair<std::string, ObjectDecisionType>>;
 }  // namespace
 
-STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
-  CHECK(config.has_st_bounds_decider_config());
+STBoundsDecider::STBoundsDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {
+  ACHECK(config.has_st_bounds_decider_config());
   st_bounds_config_ = config.st_bounds_decider_config();
 }
 
@@ -88,7 +92,7 @@ void STBoundsDecider::InitSTBoundsDecider(
   auto time1 = std::chrono::system_clock::now();
   st_obstacles_processor_.Init(path_data.discretized_path().Length(),
                                st_bounds_config_.total_time(), path_data,
-                               path_decision);
+                               path_decision, injector_->history());
   st_obstacles_processor_.MapObstaclesToSTBoundaries(path_decision);
   auto time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = time2 - time1;

@@ -243,7 +243,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
       "/apollo/modules/perception/testdata/"
       "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
+  ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   // Init camera list
   const std::vector<std::string> camera_names =
@@ -260,7 +260,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
 
   for (int i = 0; i < camera_names.size(); i++) {
     data_options.sensor_name = camera_names[i];
-    CHECK(data_providers[i].Init(data_options));
+    ACHECK(data_providers[i].Init(data_options));
     name_provider_map.insert(std::pair<std::string, DataProvider *>(
         camera_names[i], &data_providers[i]));
     AINFO << "Init data_provider for " << camera_names[i];

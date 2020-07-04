@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -38,4 +38,17 @@ proto_library(
     srcs = ["spp_engine_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "cnnseg_config_pb2",
+    src = "cnnseg_config.proto",
+)
+
+py_proto(
+    name = "spp_engine_config_pb2",
+    src = "spp_engine_config.proto",
+)
+
+py_proto(
+    name = "cnnseg_param_pb2",
+    src = "cnnseg_param.proto",
+)

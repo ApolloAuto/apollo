@@ -62,6 +62,7 @@ void FillPerceptionPolygon(PerceptionObstacle* const perception_obstacle,
     perception_obstacle->mutable_polygon_point(i)->set_y(
         mid_y + sign_l[i] * length * std::sin(heading) / 2.0 -
         sign_w[i] * width * std::cos(heading) / 2.0);
+    perception_obstacle->mutable_polygon_point(i)->set_z(mid_z);
   }
 }
 

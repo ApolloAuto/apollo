@@ -31,15 +31,15 @@ using apollo::perception::base::ObjectType;
 bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "fused_classifier.conf");
   FusedClassifierConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   temporal_window_ = config.temporal_window();
   enable_temporal_fusion_ = config.enable_temporal_fusion();
   use_tracked_objects_ = config.use_tracked_objects();
@@ -49,11 +49,11 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
       one_shot_fusion_method_));
   bool init_success = true;
   CHECK_NOTNULL(one_shot_fuser_.get());
-  CHECK(one_shot_fuser_->Init(init_option_));
+  ACHECK(one_shot_fuser_->Init(init_option_));
   sequence_fuser_.reset(BaseSequenceTypeFusionRegisterer::GetInstanceByName(
       sequence_fusion_method_));
   CHECK_NOTNULL(sequence_fuser_.get());
-  CHECK(sequence_fuser_->Init(init_option_));
+  ACHECK(sequence_fuser_->Init(init_option_));
   return init_success;
 }
 

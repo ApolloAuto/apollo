@@ -29,6 +29,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/tasks/task.h"
 
@@ -46,7 +47,9 @@ class Scenario {
     STATUS_DONE = 2,
   };
 
-  Scenario(const ScenarioConfig& config, const ScenarioContext* context);
+  Scenario(const ScenarioConfig& config,
+           const ScenarioContext* context,
+           const std::shared_ptr<DependencyInjector>& injector);
 
   static bool LoadConfig(const std::string& config_file,
                          ScenarioConfig* config);
@@ -64,7 +67,8 @@ class Scenario {
    * transition from one stage to another.
    */
   virtual std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) = 0;
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector) = 0;
 
   // Each scenario should define its own transfer condition, i.e., when it
   // should allow to transfer from other scenario to itself.
@@ -73,8 +77,8 @@ class Scenario {
     return true;
   }
 
-  ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
-                         Frame* frame);
+  virtual ScenarioStatus Process(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame);
 
   const ScenarioStatus& GetStatus() const { return scenario_status_; }
 
@@ -98,6 +102,7 @@ class Scenario {
   const ScenarioContext* scenario_context_ = nullptr;
   std::string name_;
   std::string msg_;  // debug msg
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace scenario

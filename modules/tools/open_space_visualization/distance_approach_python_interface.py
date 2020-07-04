@@ -22,6 +22,7 @@ from ctypes import c_bool
 from ctypes import c_double
 from ctypes import c_ushort
 from ctypes import c_void_p
+from ctypes import cdll, POINTER
 
 
 lib = cdll.LoadLibrary(

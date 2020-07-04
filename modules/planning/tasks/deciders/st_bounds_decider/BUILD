@@ -45,7 +45,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:speed_bounds_decider_config_proto",
+        "//modules/planning/proto:task_config_proto",
         "//modules/planning/reference_line",
     ],
 )
@@ -74,7 +74,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:speed_bounds_decider_config_proto",
+        "//modules/planning/proto:task_config_proto",
         "//modules/planning/reference_line",
     ],
 )
@@ -104,7 +104,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:speed_bounds_decider_config_proto",
+        "//modules/planning/proto:task_config_proto",
         "//modules/planning/reference_line",
     ],
 )

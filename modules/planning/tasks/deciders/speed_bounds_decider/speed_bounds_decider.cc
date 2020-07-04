@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,9 +40,11 @@ using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
-SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
-    : Decider(config) {
-  CHECK(config.has_speed_bounds_decider_config());
+SpeedBoundsDecider::SpeedBoundsDecider(
+    const TaskConfig &config,
+    const std::shared_ptr<DependencyInjector> &injector)
+    : Decider(config, injector) {
+  ACHECK(config.has_speed_bounds_decider_config());
   speed_bounds_config_ = config.speed_bounds_decider_config();
 }
 
@@ -57,7 +60,8 @@ Status SpeedBoundsDecider::Process(
   auto time1 = std::chrono::system_clock::now();
   STBoundaryMapper boundary_mapper(
       speed_bounds_config_, reference_line, path_data,
-      path_data.discretized_path().Length(), speed_bounds_config_.total_time());
+      path_data.discretized_path().Length(), speed_bounds_config_.total_time(),
+      injector_);
 
   if (!FLAGS_use_st_drivable_boundary) {
     path_decision->EraseStBoundaries();

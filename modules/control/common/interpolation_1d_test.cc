@@ -34,7 +34,7 @@ class Interpolation1DTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
   }
 
  protected:

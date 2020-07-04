@@ -31,14 +31,17 @@ class StopSignUnprotectedStageStopTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StopSignUnprotectedStageStopTest, Init) {
-  StopSignUnprotectedStageStop stop_sign_unprotected_stage_stop(config_);
+  StopSignUnprotectedStageStop stop_sign_unprotected_stage_stop(config_,
+                                                                injector_);
   EXPECT_EQ(stop_sign_unprotected_stage_stop.Name(),
             ScenarioConfig::StageType_Name(
                 ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP));

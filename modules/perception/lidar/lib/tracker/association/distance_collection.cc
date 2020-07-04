@@ -17,9 +17,10 @@
 #include <vector>
 
 #include "cyber/common/log.h"
+#include "modules/common/math/line_segment2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/common/geometry/common.h"
-
 #include "modules/perception/lidar/lib/tracker/association/distance_collection.h"
 
 namespace apollo {
@@ -244,6 +245,37 @@ float BboxIouDistance(const TrackedObjectConstPtr& last_object,
   // Step 4: compute dist
   double dist = (1 - iou) * match_threshold;
   return static_cast<float>(dist);
+}
+
+float SemanticMapDistance(const MlfTrackData& track_dat,
+                          const TrackedObjectConstPtr& cur_obj) {
+  if (track_dat.feature_ &&
+      track_dat.feature_->predicted_trajectory_size() > 0) {
+    const apollo::prediction::Trajectory& traj =
+        track_dat.feature_->predicted_trajectory(0);
+    apollo::common::math::Vec2d pt(
+        cur_obj->center[0] - cur_obj->global_local_offset[0],
+        cur_obj->center[1] - cur_obj->global_local_offset[1]);
+    std::vector<float> dist_vec;
+    for (int i = 0; i < traj.trajectory_point_size() - 1; ++i) {
+      const apollo::common::TrajectoryPoint& pt_st = traj.trajectory_point(i);
+      const apollo::common::TrajectoryPoint& pt_et =
+          traj.trajectory_point(i + 1);
+      apollo::common::math::Vec2d start(pt_st.path_point().x(),
+                                        pt_st.path_point().y());
+      apollo::common::math::Vec2d end(pt_et.path_point().x(),
+                                      pt_et.path_point().y());
+      apollo::common::math::LineSegment2d seg(start, end);
+      double dist = seg.DistanceTo(pt);
+      dist_vec.push_back(static_cast<float>(dist));
+    }
+    float min_dist = *(std::min_element(dist_vec.begin(), dist_vec.end()));
+    ADEBUG << "min_dist calculated for track id " << track_dat.track_id_
+          << " object id " << cur_obj->track_id << " distance " << min_dist;
+    return min_dist;
+  }
+
+  return 0.0f;
 }
 
 }  // namespace lidar

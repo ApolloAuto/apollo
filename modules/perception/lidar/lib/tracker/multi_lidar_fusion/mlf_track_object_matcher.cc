@@ -28,33 +28,33 @@ bool MlfTrackObjectMatcher::Init(
     const MlfTrackObjectMatcherInitOptions &options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig *model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(config_file,
                                                "mlf_track_object_matcher.conf");
   MlfTrackObjectMatcherConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   foreground_matcher_.reset(
       BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
           config.foreground_mathcer_method()));
-  CHECK(foreground_matcher_ != nullptr);
+  ACHECK(foreground_matcher_ != nullptr);
   AINFO << "MlfTrackObjectMatcher, fg: " << foreground_matcher_->Name();
   background_matcher_.reset(
       BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
           config.background_matcher_method()));
-  CHECK(background_matcher_ != nullptr);
+  ACHECK(background_matcher_ != nullptr);
   AINFO << "MlfTrackObjectMatcher, bg: " << background_matcher_->Name();
   foreground_matcher_->cost_matrix()->Reserve(1000, 1000);
   background_matcher_->cost_matrix()->Reserve(1000, 1000);
 
   track_object_distance_.reset(new MlfTrackObjectDistance);
   MlfTrackObjectDistanceInitOptions distance_init_options;
-  CHECK(track_object_distance_->Init(distance_init_options));
+  ACHECK(track_object_distance_->Init(distance_init_options));
 
   bound_value_ = config.bound_value();
   max_match_distance_ = config.max_match_distance();
