@@ -137,8 +137,24 @@ parse_arguments "$@"
 check_arguments
 
 CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
+
 TIME=$(date +%Y%m%d_%H%M)
-TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
+
+
+TAG=""
+function determine_tag() {
+    local cuda_ver="10.2"
+    local cudnn_ver="8"
+    local docker_fn="$(basename ${DOCKERFILE})"
+    local myid="${docker_fn%%.*}"
+    if [ "${myid}" = "tegra_cyber" ]; then
+        TAG="${REPO}:L4T-${cuda_ver}-cudnn${cudnn_ver}-${UBT_LTS}-${TIME}"
+    else
+        TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
+    fi
+}
+
+determine_tag
 
 echo "=====.=====.=====.=====  Docker Image Build for Cyber =====.=====.=====.====="
 echo "|  Docker build ${TAG} CLEAN_MODE=${CLEAN_MODE}"
