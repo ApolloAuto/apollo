@@ -156,7 +156,7 @@ function main() {
     fi
     bazel_build $@
     # Disable simulator build temporarily
-    # build_simulator
+    build_simulator
     if [ -z "${SHORTHAND_TARGETS}" ]; then
         SHORTHAND_TARGETS="apollo"
     fi
