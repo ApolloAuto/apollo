@@ -32,35 +32,26 @@ export default class PerceptionObstacles {
         this.laneMarkers = []; // for lane markers
         this.icons = [];
         this.trafficCones = []; // for traffic cone meshes
+
+        this.arrowIdx = 0;
+        this.cubeIdx = 0;
+        this.extrusionFaceIdx = 0;
+        this.iconIdx = 0;
+        this.trafficConeIdx = 0;
     }
 
     update(world, coordinates, scene, isBirdView) {
+        this.resetObjects(scene, _.isEmpty(world.object));
         this.updateObjects(world, coordinates, scene, isBirdView);
+        this.updateSensorMeasurements(world, coordinates, scene);
+        this.hideUnusedObjects();
+
         this.updateLaneMarkers(world, coordinates, scene);
     }
 
     updateObjects(world, coordinates, scene, isBirdView) {
-        // Id meshes need to be recreated every time.
-        // Each text mesh needs to be removed from the scene,
-        // and its char meshes need to be hidden for reuse purpose.
-        if (!_.isEmpty(this.ids)) {
-            this.ids.forEach(t => {
-                t.children.forEach(c => c.visible = false);
-                scene.remove(t);
-            });
-            this.ids = [];
-        }
-        this.textRender.reset();
-
         const objects = world.object;
         if (_.isEmpty(objects)) {
-            hideArrayObjects(this.arrows);
-            hideArrayObjects(this.solidCubes);
-            hideArrayObjects(this.dashedCubes);
-            hideArrayObjects(this.extrusionSolidFaces);
-            hideArrayObjects(this.extrusionDashedFaces);
-            hideArrayObjects(this.icons);
-            hideArrayObjects(this.trafficCones);
             return;
         }
 
@@ -70,17 +61,13 @@ export default class PerceptionObstacles {
         });
         adc.heading = world.autoDrivingCar.heading;
 
-        let arrowIdx = 0;
-        let cubeIdx = 0;
-        let extrusionFaceIdx = 0;
-        let iconIdx = 0;
-        let trafficConeIdx = 0;
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
             if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
                 || !_.isNumber(obstacle.positionX) || !_.isNumber(obstacle.positionY)) {
                 continue;
             }
+
             const position = coordinates.applyOffset(
                     new THREE.Vector3(obstacle.positionX,
                                       obstacle.positionY,
@@ -90,16 +77,14 @@ export default class PerceptionObstacles {
             if (STORE.options.showObstaclesVelocity && obstacle.type &&
                     obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
                 const arrowMesh = this.updateArrow(position,
-                        obstacle.speedHeading, color, arrowIdx++, scene);
+                        obstacle.speedHeading, color, this.arrowIdx++, scene);
                 const scale = 1 + Math.log2(obstacle.speed);
                 arrowMesh.scale.set(scale, scale, scale);
                 arrowMesh.visible = true;
             }
+
             if (STORE.options.showObstaclesHeading) {
-                const arrowMesh = this.updateArrow(position, obstacle.heading,
-                        0xFFFFFF, arrowIdx++, scene);
-                arrowMesh.scale.set(1, 1, 1);
-                arrowMesh.visible = true;
+                this.drawObstacleHeading(position, obstacle.heading, this.arrowIdx++, scene);
             }
 
             this.updateTexts(adc, obstacle, position, scene, isBirdView);
@@ -110,15 +95,15 @@ export default class PerceptionObstacles {
             confidence = Math.min(1.0, confidence);
             const polygon = obstacle.polygonPoint;
             if (obstacle.subType === "ST_TRAFFICCONE") {
-                this.updateTrafficCone(position, trafficConeIdx, scene);
-                trafficConeIdx++;
+                this.updateTrafficCone(position, this.trafficConeIdx, scene);
+                this.trafficConeIdx++;
             } else if (polygon !== undefined && polygon.length > 0) {
                 this.updatePolygon(polygon, obstacle.height, color, coordinates, confidence,
-                        extrusionFaceIdx, scene);
-                extrusionFaceIdx += polygon.length;
+                        this.extrusionFaceIdx, scene);
+                this.extrusionFaceIdx += polygon.length;
             } else if (obstacle.length && obstacle.width && obstacle.height) {
                 this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
-                        obstacle.heading, color, confidence, cubeIdx++, scene);
+                        obstacle.heading, color, confidence, this.cubeIdx++, scene);
             }
 
             // draw a yield sign to indicate ADC is yielding to this obstacle
@@ -128,17 +113,97 @@ export default class PerceptionObstacles {
                     y: position.y,
                     z: position.z + obstacle.height + 0.5,
                 };
-                this.updateIcon(iconPosition, world.autoDrivingCar.heading, iconIdx, scene);
-                iconIdx++;
+                this.updateIcon(iconPosition, world.autoDrivingCar.heading, this.iconIdx, scene);
+                this.iconIdx++;
             }
         }
-        hideArrayObjects(this.arrows, arrowIdx);
-        hideArrayObjects(this.solidCubes, cubeIdx);
-        hideArrayObjects(this.dashedCubes, cubeIdx);
-        hideArrayObjects(this.extrusionSolidFaces, extrusionFaceIdx);
-        hideArrayObjects(this.extrusionDashedFaces, extrusionFaceIdx);
-        hideArrayObjects(this.icons, iconIdx);
-        hideArrayObjects(this.trafficCones, trafficConeIdx);
+    }
+
+    updateSensorMeasurements(world, coordinates, scene) {
+        if (!STORE.options['showObstaclesLidarSensor'] && !STORE.options['showObstaclesRadarSensor']
+            && !STORE.options['showObstaclesCameraSensor']) {
+            return;
+        }
+
+        const sensorMeasures = world.sensorMeasurements;
+        for (const key in sensorMeasures) {
+            const sensorType = this.deduceSensorType(key.toLowerCase());
+            if (!sensorType || !STORE.options['showObstacles' + sensorType]) {
+                continue;
+            }
+
+            for (const measurement of sensorMeasures[key]["sensorMeasurement"]) {
+                if (!_.isNumber(measurement.positionX) || !_.isNumber(measurement.positionY)) {
+                    continue;
+                }
+
+                const position = coordinates.applyOffset(
+                    new THREE.Vector3(measurement.positionX,
+                        measurement.positionY,
+                        (measurement.height || DEFAULT_HEIGHT) / 2));
+                const color = ObstacleColorMapping[measurement.type] || DEFAULT_COLOR;
+
+                if (STORE.options.showObstaclesHeading) {
+                    this.drawObstacleHeading(position, measurement.heading, this.arrowIdx++, scene);
+                }
+
+                if (measurement.subType === "ST_TRAFFICCONE") {
+                    this.updateTrafficCone(position, this.trafficConeIdx, scene);
+                    this.trafficConeIdx++;
+                } else if (measurement.length && measurement.width && measurement.height) {
+                    this.updateCube(measurement.length, measurement.width,
+                        measurement.height, position,
+                        measurement.heading, color, 0.5, this.cubeIdx++, scene);
+                }
+            }
+        }
+    }
+
+    resetObjects(scene, empty) {
+        // Id meshes need to be recreated every time.
+        // Each text mesh needs to be removed from the scene,
+        // and its char meshes need to be hidden for reuse purpose.
+        if (!_.isEmpty(this.ids)) {
+            this.ids.forEach(t => {
+                t.children.forEach(c => c.visible = false);
+                scene.remove(t);
+            });
+            this.ids = [];
+        }
+
+        this.textRender.reset();
+        this.arrowIdx = 0;
+        this.cubeIdx = 0;
+        this.extrusionFaceIdx = 0;
+        this.iconIdx = 0;
+        this.trafficConeIdx = 0;
+        if (empty) {
+            this.hideUnusedObjects();
+        }
+    }
+
+    hideUnusedObjects() {
+        hideArrayObjects(this.arrows, this.arrowIdx);
+        hideArrayObjects(this.solidCubes, this.cubeIdx);
+        hideArrayObjects(this.dashedCubes, this.cubeIdx);
+        hideArrayObjects(this.extrusionSolidFaces, this.extrusionFaceIdx);
+        hideArrayObjects(this.extrusionDashedFaces, this.extrusionFaceIdx);
+        hideArrayObjects(this.icons, this.iconIdx);
+        hideArrayObjects(this.trafficCones, this.trafficConeIdx);
+    }
+
+    deduceSensorType(key) {
+        if (key.search("radar") !== -1) {
+            return "RadarSensor";
+        }
+        if (key.search("lidar") !== -1 || key.search("velodyne") !== -1) {
+            return "LidarSensor";
+        }
+        if (key.search("camera") !== -1) {
+            return "CameraSensor";
+        }
+        console.warn("Cannot deduce sensor type:", key);
+        return null;
     }
 
     updateArrow(position, heading, color, arrowIdx, scene) {
@@ -328,6 +393,12 @@ export default class PerceptionObstacles {
             this.ids.push(text);
             scene.add(text);
         }
+    }
+
+    drawObstacleHeading(position, heading, index, scene) {
+        const arrowMesh = this.updateArrow(position, heading, "OxFFFFFF", index, scene);
+        arrowMesh.scale.set(1, 1, 1);
+        arrowMesh.visible = true;
     }
 
     updateLaneMarkers(world, coordinates, scene) {

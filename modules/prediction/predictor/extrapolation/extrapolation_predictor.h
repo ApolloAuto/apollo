@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
 namespace apollo {
@@ -58,14 +59,15 @@ class ExtrapolationPredictor : public SequencePredictor {
     int point_index = -1;
   };
 
-  void PostProcess(Trajectory* trajectory_ptr);
+  void PostProcess(Trajectory* trajectory_ptr, ObstacleClusters* clusters_ptr);
 
   LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
                                            const int num_tail_point);
 
   void ExtrapolateByLane(const LaneSearchResult& lane_search_result,
                          const double extrapolation_speed,
-                         Trajectory* trajectory_ptr);
+                         Trajectory* trajectory_ptr,
+                         ObstacleClusters* clusters_ptr);
 
   void ExtrapolateByFreeMove(const int num_tail_point,
                              const double extrapolation_speed,

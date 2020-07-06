@@ -22,7 +22,7 @@
 
 |修改文件名称 | 修改内容 | 对应的gflag参数 | 单位 | 作用 | 
 |---|---|---|---|---|
-|`planning.conf` | 修改`defaut_cruise_speed`数值| 比如1.5 |m/s | 默认巡航速度|
+|`planning.conf` | 修改`default_cruise_speed`数值| 比如1.5 |m/s | 默认巡航速度|
 |`planning.conf` | 修改`planning_upper_speed_limit`数值| 比如1.5 |m/s |车planning最大速度 |
 |`planning.conf` | 添加`planning_lower_speed_limit`数值| 比如0.5 |m/s |车planning最小速度 |
 |`planning.conf` |添加`speed_upper_bound`数值| 比如1.5 | m/s |车最大速度|

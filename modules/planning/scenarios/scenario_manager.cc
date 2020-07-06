@@ -806,7 +806,13 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   ACHECK(!frame.reference_line_info().empty());
 
   ScenarioConfig::ScenarioType scenario_type;
-  if (FLAGS_planning_learning_mode == 2) {
+
+  const int history_points_len = frame.learning_based_data()
+                                     .learning_data_frame()
+                                     .adc_trajectory_point_size();
+
+  if (FLAGS_planning_learning_mode == 2 &&
+      history_points_len >= FLAGS_min_past_history_points_len) {
     scenario_type = ScenarioDispatchLearning();
   } else {
     scenario_type = ScenarioDispatchNonLearning(frame);
