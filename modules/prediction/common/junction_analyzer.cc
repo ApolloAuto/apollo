@@ -31,13 +31,6 @@ using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::LaneInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-std::shared_ptr<const JunctionInfo> JunctionAnalyzer::junction_info_ptr_;
-// Maps exit lane-id to JunctionExit info.
-std::unordered_map<std::string, JunctionExit> JunctionAnalyzer::junction_exits_;
-// Maps starting lane-id to JunctionFeature info.
-std::unordered_map<std::string, JunctionFeature>
-    JunctionAnalyzer::junction_features_;
-
 void JunctionAnalyzer::Init(const std::string& junction_id) {
   if (junction_info_ptr_ != nullptr &&
       junction_info_ptr_->id().id() == junction_id) {

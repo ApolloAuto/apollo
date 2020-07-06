@@ -43,9 +43,17 @@ message LaneChangeDeciderConfig {
 // LearningModelInferenceTaskConfig
 
 message LearningModelInferenceTaskConfig {
-  optional string model_file = 1;
-  optional bool use_cuda = 2 [default = true];
-  optional double trajectory_delta_t = 3 [default = 0.2];  // second
+  enum ModelType {
+    CONV_RNN = 1;
+    CNN = 2;
+    CNN_LSTM = 3;
+  }
+  optional ModelType model_type = 1;
+  optional string cpu_model_file = 2;
+  optional string gpu_model_file = 3;
+  optional bool use_cuda = 4 [default = true];
+  // delta_t depends on the model output, not a configurable value here
+  optional double trajectory_delta_t = 5 [default = 0.2];  // second
 }
 
 //////////////////////////////////

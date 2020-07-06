@@ -388,3 +388,9 @@ default_task_config: {
     static_obstacle_buffer: 0.3
   }
 }
+default_task_config {
+  task_type: PATH_REFERENCE_DECIDER
+  path_reference_decider_config {
+    min_path_reference_length: 20
+  }
+}

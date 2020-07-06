@@ -21,7 +21,6 @@
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
@@ -160,7 +159,8 @@ void MessageProcess::ContainerProcess(
   // Build junction feature for the obstacles in junction
   const Scenario scenario = scenario_manager->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
-    JunctionAnalyzer::Init(scenario.junction_id());
+    ptr_obstacles_container->GetJunctionAnalyzer()->Init(
+        scenario.junction_id());
     ptr_obstacles_container->BuildJunctionFeature();
   }
 

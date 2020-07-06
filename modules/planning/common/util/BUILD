@@ -38,13 +38,14 @@ cc_library(
 
 cc_library(
     name = "math_util_lib",
+    srcs = ["math_util.cc"],
     hdrs = ["math_util.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",
-        "//modules/common/util:map_util",
+        "//modules/common/math",
     ],
 )
 cpplint()

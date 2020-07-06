@@ -132,8 +132,14 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                              &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  if (FLAGS_planning_learning_mode == 3) {
+    // HYBRID
+    ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_hybrid_config_file,
+                                &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  } else {
+    ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
+                                &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  }
 
   // bare_intersection
   ACHECK(Scenario::LoadConfig(
@@ -800,7 +806,13 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   ACHECK(!frame.reference_line_info().empty());
 
   ScenarioConfig::ScenarioType scenario_type;
-  if (FLAGS_planning_learning_mode == 2) {
+
+  const int history_points_len = frame.learning_based_data()
+                                     .learning_data_frame()
+                                     .adc_trajectory_point_size();
+
+  if (FLAGS_planning_learning_mode == 2 &&
+      history_points_len >= FLAGS_min_past_history_points_len) {
     scenario_type = ScenarioDispatchLearning();
   } else {
     scenario_type = ScenarioDispatchNonLearning(frame);
