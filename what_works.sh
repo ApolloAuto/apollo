@@ -63,9 +63,7 @@ bazel_test_with_dist_cache \
     //modules/tools/...
 
 # Perception
-bazel_test_with_dist_cache $(bazel query //modules/perception/... \
-	except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
-)
+bazel_test_with_dist_cache $(bazel query //modules/perception/... )
 
 # Localization: 9 test failures
 bazel_test_with_dist_cache $(bazel query //modules/localization/... \
@@ -78,22 +76,14 @@ bazel_test_with_dist_cache $(bazel query //modules/localization/... \
     except //modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_test \
     except //modules/localization/ndt:ndt_localization_pose_buffer_test \
     except //modules/localization/ndt:ndt_localization_test \
-    except //modules/localization/ndt/ndt_locator:ndt_solver_test \
 )
 
 # Prediction: 4 test failures
-bazel_test_with_dist_cache $(bazel query //modules/prediction/... \
-    except //modules/prediction/predictor/single_lane:single_lane_predictor_test \
-    except //modules/prediction/container/obstacles:obstacle_test \
-    except //modules/prediction/container/obstacles:obstacle_clusters_test \
-    except //modules/prediction/common:road_graph_test \
-)
+bazel_test_with_dist_cache $(bazel query //modules/prediction/... )
 
 # Planning: 1 test failures
 # osqp downgraded to 0.5.0 to avoid breaking changes in osqp-0.6.0
-bazel_test_with_dist_cache $(bazel query //modules/planning/... \
-    except //modules/planning/learning_based/model_inference:model_inference_test   \
-)
+bazel_test_with_dist_cache $(bazel query //modules/planning/... )
 
 # FIXME(all): inference_demo crashed
 # bazel run //modules/planning/tools:inference_demo
