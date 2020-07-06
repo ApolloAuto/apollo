@@ -92,13 +92,16 @@ bool TrajectoryImitationLibtorchInference::LoadModel() {
   if (config_.use_cuda() && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
+    try {
+      model_ = torch::jit::load(config_.gpu_model_file(), device_);
+    } catch (const c10::Error& e) {
+      AERROR << "Failed to load model on to device";
+      return false;
+    }
+  } else {
+    model_ = torch::jit::load(config_.cpu_model_file(), device_);
   }
-  try {
-    model_ = torch::jit::load(config_.model_file(), device_);
-  } catch (const c10::Error& e) {
-    AERROR << "Failed to load model on to device";
-    return false;
-  }
+
   torch::set_num_threads(1);
   switch (config_.model_type()) {
     case LearningModelInferenceTaskConfig::CONV_RNN: {

@@ -19,7 +19,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
@@ -53,14 +52,16 @@ bool ExtrapolationPredictor::Predict(
            << "] has no short-term trajectories.";
     return false;
   }
+  auto* cluster_ptr = obstacles_container->GetClustersPtr();
   for (int i = 0; i < feature_ptr->predicted_trajectory_size(); ++i) {
     Trajectory* trajectory_ptr = feature_ptr->mutable_predicted_trajectory(i);
-    PostProcess(trajectory_ptr);
+    PostProcess(trajectory_ptr, cluster_ptr);
   }
   return true;
 }
 
-void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
+void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr,
+                                         ObstacleClusters* clusters_ptr) {
   // TODO(kechxu) handle corner cases
   static constexpr int kNumTailPoint = 5;
   ExtrapolationPredictor::LaneSearchResult lane_search_result =
@@ -68,7 +69,8 @@ void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
   double extraplation_speed =
       ComputeExtraplationSpeed(kNumTailPoint, *trajectory_ptr);
   if (lane_search_result.found) {
-    ExtrapolateByLane(lane_search_result, extraplation_speed, trajectory_ptr);
+    ExtrapolateByLane(lane_search_result, extraplation_speed, trajectory_ptr,
+                      clusters_ptr);
   } else {
     ExtrapolateByFreeMove(kNumTailPoint, extraplation_speed, trajectory_ptr);
   }
@@ -104,7 +106,7 @@ ExtrapolationPredictor::SearchExtrapolationLane(const Trajectory& trajectory,
 
 void ExtrapolationPredictor::ExtrapolateByLane(
     const LaneSearchResult& lane_search_result, const double extraplation_speed,
-    Trajectory* trajectory_ptr) {
+    Trajectory* trajectory_ptr, ObstacleClusters* clusters_ptr) {
   std::string start_lane_id = lane_search_result.lane_id;
   int point_index = lane_search_result.point_index;
   while (trajectory_ptr->trajectory_point_size() > point_index + 1) {
@@ -134,7 +136,7 @@ void ExtrapolationPredictor::ExtrapolateByLane(
   double length = extraplation_speed * time_range;
 
   LaneGraph lane_graph =
-      ObstacleClusters::GetLaneGraph(lane_s, length, false, lane_info_ptr);
+      clusters_ptr->GetLaneGraph(lane_s, length, false, lane_info_ptr);
   CHECK_EQ(lane_graph.lane_sequence_size(), 1);
   const LaneSequence& lane_sequence = lane_graph.lane_sequence(0);
   int lane_segment_index = 0;
