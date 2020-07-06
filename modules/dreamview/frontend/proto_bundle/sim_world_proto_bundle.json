@@ -7729,22 +7729,35 @@
             },
             "LearningModelInferenceTaskConfig": {
               "fields": {
+                "modelType": {
+                  "type": "ModelType",
+                  "id": 1
+                },
                 "modelFile": {
                   "type": "string",
-                  "id": 1
+                  "id": 2
                 },
                 "useCuda": {
                   "type": "bool",
-                  "id": 2,
+                  "id": 3,
                   "options": {
                     "default": true
                   }
                 },
                 "trajectoryDeltaT": {
                   "type": "double",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": 0.2
+                  }
+                }
+              },
+              "nested": {
+                "ModelType": {
+                  "values": {
+                    "CONV_RNN": 1,
+                    "CNN": 2,
+                    "CNN_LSTM": 3
                   }
                 }
               }
@@ -11861,6 +11874,16 @@
                   "rule": "repeated",
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 34
+                },
+                "surroundingLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 35
+                },
+                "withinLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 36
                 }
               }
             },

@@ -6,7 +6,7 @@
  
 ## 主要步骤
 
- - 摄像头安装配置与数据验证
+ - 摄像头安装配置与数据验证。
 
 ### 摄像头型号说明
 
@@ -36,9 +36,15 @@
  
  - 运行`git clone https://github.com/ApolloAuto/apollo-contrib.git`命令将apollo-contrib仓库克隆至本地，然后将apollo-contrib文件夹下面的smartereye文件夹整体拷贝到/apollo目录下。
  
- - 启动docker环境，在docker环境中输入以下命令`sudo bash /apollo/smartereye/install.sh /apollo/third_party/camera_library/smartereye`将smartereye的共享库拷贝至apollo的对应的位置. 删除`/apollo/smartereye`文件夹。
+ - 启动docker环境，在docker环境中输入以下命令：
 
- - 将`/apollo/modules/dreamview/conf/hmi_modes/mkz_standard_debug.pb.txt`文件中的第四行的内容`dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"`修改为`dag_files: "/apollo/modules/drivers/smartereye/dag/smartereye.dag"`并保存；将`/apollo/modules/common/data/global_flagfile.txt`文件中的末尾添加下面一行：`--image_short_topic=/apollo/sentor/smartereye/image/compressed`并保存。
+ ```
+ sudo bash /apollo/smartereye/install.sh /apollo/third_party/camera_library/smartereye
+ ```
+
+ 将smartereye的共享库拷贝至apollo的对应的位置。删除`/apollo/smartereye`文件夹。
+
+ - 将`/apollo/modules/dreamview/conf/hmi_modes/mkz_standard_debug.pb.txt`文件中的第四行的内容`dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"`修改为`dag_files: "/apollo/modules/drivers/smartereye/dag/smartereye.dag"`并保存；将`/apollo/modules/common/data/global_flagfile.txt`文件中的末尾添加下面一行：`--image_short_topic=/apollo/sensor/smartereye/image/compressed`并保存。
 
  - 确保apollo被正确编译。
  
@@ -52,7 +58,7 @@
  
 ![camera_integration_dreamview2](images/camera_integration_dreamview2.png)
  
- - 如果一切正常，则会在`dreamview`右下角出现摄像头采集的图像。
+ - 如果一切正常，则会在`DreamView`右下角出现摄像头采集的图像。
  
  - 在正确完成上述步骤后，在`docker`环境内使用`cyber_monitor`工具，查看`/apollo/sensor/smartereye/image`、`/apollo/sensor/smartereye/image/compressed`是否有数据输出，且帧率是否稳定在15帧左右。
 

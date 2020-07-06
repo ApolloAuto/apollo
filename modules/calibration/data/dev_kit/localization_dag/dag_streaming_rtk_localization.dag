@@ -1,0 +1,23 @@
+# Define all coms in DAG streaming.
+# In D-KIT, we only support MSF localization, we use this configuration to overwrite the original RTK configuration.
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/localization/msf/libmsf_localization_component.so"
+
+    components {
+      class_name : "MSFLocalizationComponent"
+      config {
+        name : "msf_localization"
+        flag_file_path : "/apollo/modules/localization/conf/localization.conf"
+        readers: [
+          {
+            channel: "/apollo/sensor/gnss/imu"
+            qos_profile: {
+              depth : 10
+            }
+            pending_queue_size: 50
+          }
+        ]
+      }
+    }
+}
