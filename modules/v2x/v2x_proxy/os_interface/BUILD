@@ -19,8 +19,8 @@ cc_library(
 
 cc_test(
     name = "os_interface_test",
-    size = "medium",
-    timeout = "moderate",
+    size = "small",
+    timeout = "short",
     srcs = ["os_interface_test.cc"],
     deps = [
         ":os_interface",
