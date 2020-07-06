@@ -60,6 +60,8 @@ apt-get -y update &&    \
     cuda-libraries-${VERSION_1} \
     cuda-libraries-dev-${VERSION_1} \
     cuda-minimal-build-${VERSION_1} \
+    cuda-cupti-${VERSION_1} \
+    cuda-cupti-dev-${VERSION_1} \
     cuda-npp-${VERSION_1} \
     cuda-npp-dev-${VERSION_1}
 
