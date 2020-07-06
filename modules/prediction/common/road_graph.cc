@@ -251,7 +251,7 @@ void RoadGraph::ConstructLaneSequence(
   // End condition: if search reached the maximum search distance,
   // or if there is no more successor lane_segment.
   if (search_forward_direction) {
-    if (lane_segment.end_s() < lane_info_ptr->total_length() ||
+    if (lane_segments->back().end_s() < lane_info_ptr->total_length() ||
         lane_info_ptr->lane().successor_id().empty()) {
       LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
       for (const auto& it : *lane_segments) {
@@ -261,7 +261,7 @@ void RoadGraph::ConstructLaneSequence(
       return;
     }
   } else {
-    if (lane_segment.start_s() > 0.0 ||
+    if (lane_segments->front().start_s() > 0.0 ||
         lane_info_ptr->lane().predecessor_id().empty()) {
       LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
       for (const auto& it : *lane_segments) {
