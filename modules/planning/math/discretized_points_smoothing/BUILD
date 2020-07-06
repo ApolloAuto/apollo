@@ -12,7 +12,7 @@ cc_library(
     deps = [
         ":cos_theta_ipopt_interface",
         "//cyber/common:log",
-        "//modules/planning/proto:cos_theta_smoother_config_proto",
+        "//modules/planning/proto/math:cos_theta_smoother_config_proto",
         "//third_party:ipopt",
     ],
 )
@@ -43,7 +43,7 @@ cc_library(
         ":fem_pos_deviation_osqp_interface",
         ":fem_pos_deviation_sqp_osqp_interface",
         "//cyber/common:log",
-        "//modules/planning/proto:fem_pos_deviation_smoother_config_proto",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
         "//third_party:ipopt",
     ],
 )
