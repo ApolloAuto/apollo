@@ -20,13 +20,13 @@
 #include <algorithm>
 #include <numeric>
 #include <random>
-#include <vector>
 
 #include "cyber/common/log.h"
 
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
+#include "modules/perception/lidar/common/pcl_util.h"
 
 namespace apollo {
 namespace perception {
@@ -69,55 +69,90 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   // check output
   frame->segmented_objects.clear();
 
-  Timer timer;
-
   if (cudaSetDevice(FLAGS_gpu_id) != cudaSuccess) {
     AERROR << "Failed to set device to gpu " << FLAGS_gpu_id;
     return false;
   }
 
-  // transform point cloud into an array
-  float* points_array;
-  int num_points = original_cloud_->size();
-  int num_point_indexes;
-  std::vector<int> point_indexes;
+  Timer timer;
+
+  int num_points;
+  cur_cloud_ptr_ = std::make_shared<base::AttributePointCloud<base::PointF>>();
+
+  // down sample the point cloud through filtering voxel grid
+  if (FLAGS_enable_downsample_pointcloud) {
+    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_ptr(
+        new pcl::PointCloud<pcl::PointXYZI>());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(
+        new pcl::PointCloud<pcl::PointXYZI>());
+    TransformToPCLXYZI(*original_cloud_, pcl_cloud_ptr);
+    DownSampleCloudByVoxelGrid(pcl_cloud_ptr, filtered_cloud_ptr,
+                               FLAGS_downsample_voxel_size_x,
+                               FLAGS_downsample_voxel_size_y,
+                               FLAGS_downsample_voxel_size_z);
+
+    // transform pcl point cloud to apollo point cloud
+    TransformFromPCLXYZI(filtered_cloud_ptr, cur_cloud_ptr_);
+  }
+  downsample_time_ = timer.toc(true);
+
+  num_points = cur_cloud_ptr_->size();
+  ADEBUG << "num points before fusing: " << num_points;
+
+  // fuse clouds of preceding frames with current cloud
   if (FLAGS_enable_fuse_frames && FLAGS_num_fuse_frames > 1) {
     // before fusing
-    while (!prev_point_clouds_.empty() &&
-           frame->timestamp - prev_point_clouds_.front().second >
-               FLAGS_fuse_time_interval) {
-      prev_point_clouds_.pop_front();
+    while (!prev_world_clouds_.empty() &&
+        frame->timestamp - prev_world_clouds_.front()->get_timestamp() >
+            FLAGS_fuse_time_interval) {
+      prev_world_clouds_.pop_front();
     }
+    // transform current cloud to world coordinate and save to a new ptr
+    base::PointDCloudPtr cur_world_cloud_ptr =
+        std::make_shared<base::PointDCloud>();
+    for (size_t i = 0; i < cur_cloud_ptr_->size(); ++i) {
+      auto& pt = cur_cloud_ptr_->at(i);
+      Eigen::Vector3d trans_point(pt.x, pt.y, pt.z);
+      trans_point = lidar_frame_ref_->lidar2world_pose * trans_point;
+      PointD world_point;
+      world_point.x = trans_point(0);
+      world_point.y = trans_point(1);
+      world_point.z = trans_point(2);
+      world_point.intensity = pt.intensity;
+      cur_world_cloud_ptr->push_back(world_point);
+    }
+    cur_world_cloud_ptr->set_timestamp(frame->timestamp);
 
-    // fusing
-    for (auto& pc_timestamp : prev_point_clouds_) {
-      num_points += pc_timestamp.first->size();
+    // fusing clouds
+    for (auto& prev_world_cloud_ptr : prev_world_clouds_) {
+      num_points += prev_world_cloud_ptr->size();
     }
-    num_point_indexes = num_points;
-    point_indexes =
-        GenerateIndexes(0, num_point_indexes, FLAGS_enable_shuffle_points);
-    num_points = std::min(num_points, FLAGS_max_num_points);
-    points_array = new float[num_points * FLAGS_num_point_feature]();
-    FusePointCloudToArray(original_cloud_, points_array, point_indexes,
-                          FLAGS_normalizing_factor);
+    FuseCloud(cur_cloud_ptr_, prev_world_clouds_);
 
     // after fusing
-    while (static_cast<int>(prev_point_clouds_.size()) >=
-           FLAGS_num_fuse_frames - 1) {
-      prev_point_clouds_.pop_front();
+    while (static_cast<int>(prev_world_clouds_.size()) >=
+        FLAGS_num_fuse_frames - 1) {
+      prev_world_clouds_.pop_front();
     }
-    prev_point_clouds_.emplace_back(
-        std::make_pair(original_world_cloud_, frame->timestamp));
-  } else {
-    num_point_indexes = num_points;
-    point_indexes =
-        GenerateIndexes(0, num_point_indexes, FLAGS_enable_shuffle_points);
-    num_points = std::min(num_points, FLAGS_max_num_points);
-    points_array = new float[num_points * FLAGS_num_point_feature]();
-    PclToArray(original_cloud_, points_array, point_indexes,
-               FLAGS_normalizing_factor);
+    prev_world_clouds_.emplace_back(cur_world_cloud_ptr);
   }
-  pcl_to_array_time_ = timer.toc(true);
+  ADEBUG << "num points after fusing: " << num_points;
+  fuse_time_ = timer.toc(true);
+
+  // shuffle points and cut off
+  if (FLAGS_enable_shuffle_points) {
+    num_points = std::min(num_points, FLAGS_max_num_points);
+    std::vector<int> point_indices = GenerateIndices(0, num_points, true);
+    base::PointFCloudPtr shuffle_cloud_ptr(
+        new base::PointFCloud(*cur_cloud_ptr_, point_indices));
+    cur_cloud_ptr_ = shuffle_cloud_ptr;
+  }
+  shuffle_time_ = timer.toc(true);
+
+  // point cloud to array
+  float* points_array = new float[num_points * FLAGS_num_point_feature]();
+  CloudToArray(cur_cloud_ptr_, points_array, FLAGS_normalizing_factor);
+  cloud_to_array_time_ = timer.toc(true);
 
   // inference
   std::vector<float> out_detections;
@@ -131,8 +166,11 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
              &out_detections, &out_labels);
   collect_time_ = timer.toc(true);
 
-  AINFO << "PointPillars: "
-        << "pcl_to_array: " << pcl_to_array_time_ << "\t"
+  AINFO << "PointPillars: " << "\n"
+        << "down sample: " << downsample_time_ << "\t"
+        << "fuse: " << fuse_time_ << "\t"
+        << "shuffle: " << shuffle_time_ << "\t"
+        << "cloud_to_array: " << cloud_to_array_time_ << "\t"
         << "inference: " << inference_time_ << "\t"
         << "collect: " << collect_time_;
 
@@ -140,70 +178,56 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   return true;
 }
 
-void PointPillarsDetection::PclToArray(const base::PointFCloudPtr& pc_ptr,
-                                       float* out_points_array,
-                                       const std::vector<int>& point_indexes,
-                                       const float normalizing_factor) {
+void PointPillarsDetection::CloudToArray(const base::PointFCloudPtr& pc_ptr,
+                                         float* out_points_array,
+                                         const float normalizing_factor) {
   for (size_t i = 0; i < pc_ptr->size(); ++i) {
-    int point_pos = point_indexes.at(i);
-    if (point_pos >= FLAGS_max_num_points) continue;
     const auto& point = pc_ptr->at(i);
-    out_points_array[point_pos * FLAGS_num_point_feature + 0] = point.x;
-    out_points_array[point_pos * FLAGS_num_point_feature + 1] = point.y;
-    out_points_array[point_pos * FLAGS_num_point_feature + 2] = point.z;
-    out_points_array[point_pos * FLAGS_num_point_feature + 3] =
+    out_points_array[i * FLAGS_num_point_feature + 0] = point.x;
+    out_points_array[i * FLAGS_num_point_feature + 1] = point.y;
+    out_points_array[i * FLAGS_num_point_feature + 2] = point.z;
+    out_points_array[i * FLAGS_num_point_feature + 3] =
         point.intensity / normalizing_factor;
     // delta of timestamp between prev and cur frames
-    out_points_array[point_pos * FLAGS_num_point_feature + 4] = 0;
+    out_points_array[i * FLAGS_num_point_feature + 4] =
+        static_cast<float>(pc_ptr->points_timestamp(i));
   }
 }
 
-// TODO(chenjiahao): write a cuda version to accelerate
-void PointPillarsDetection::FusePointCloudToArray(
-    const base::PointFCloudPtr& pc_ptr, float* out_points_array,
-    const std::vector<int>& point_indexes, const float normalizing_factor) {
-  PclToArray(pc_ptr, out_points_array, point_indexes, normalizing_factor);
-
-  int point_counter = pc_ptr->size();
-  for (auto iter = prev_point_clouds_.rbegin();
-       iter != prev_point_clouds_.rend(); ++iter) {
-    base::PointDCloudPtr& prev_pc_ptr = iter->first;
+void PointPillarsDetection::FuseCloud(const base::PointFCloudPtr& out_cloud_ptr,
+    const std::deque<base::PointDCloudPtr> &fuse_clouds) {
+  for (auto iter = fuse_clouds.rbegin(); iter != fuse_clouds.rend(); ++iter) {
+    double delta_t = lidar_frame_ref_->timestamp - (*iter)->get_timestamp();
     // transform prev world point cloud to current sensor's coordinates
-    for (size_t i = 0; i < prev_pc_ptr->size(); ++i) {
-      int point_pos = point_indexes.at(point_counter);
-      if (point_pos >= FLAGS_max_num_points) continue;
-      const auto& point = prev_pc_ptr->at(i);
+    for (size_t i = 0; i < (*iter)->size(); ++i) {
+      auto& point = (*iter)->at(i);
       Eigen::Vector3d trans_point(point.x, point.y, point.z);
       trans_point = lidar_frame_ref_->lidar2world_pose.inverse() * trans_point;
-      out_points_array[point_pos * FLAGS_num_point_feature + 0] =
-          static_cast<float>(trans_point(0));
-      out_points_array[point_pos * FLAGS_num_point_feature + 1] =
-          static_cast<float>(trans_point(1));
-      out_points_array[point_pos * FLAGS_num_point_feature + 2] =
-          static_cast<float>(trans_point(2));
-      out_points_array[point_pos * FLAGS_num_point_feature + 3] =
-          static_cast<float>(point.intensity / normalizing_factor);
-      out_points_array[point_pos * FLAGS_num_point_feature + 4] =
-          static_cast<float>(lidar_frame_ref_->timestamp - iter->second);
-      point_counter++;
+      base::PointF pt;
+      pt.x = static_cast<float>(trans_point(0));
+      pt.y = static_cast<float>(trans_point(1));
+      pt.z = static_cast<float>(trans_point(2));
+      pt.intensity = static_cast<float>(point.intensity);
+      // delta of time between current and prev frame
+      out_cloud_ptr->push_back(pt, delta_t);
     }
   }
 }
 
-std::vector<int> PointPillarsDetection::GenerateIndexes(int start_index,
+std::vector<int> PointPillarsDetection::GenerateIndices(int start_index,
                                                         int size,
                                                         bool shuffle) {
   // create a range number array
-  std::vector<int> indexes(size);
-  std::iota(indexes.begin(), indexes.end(), start_index);
+  std::vector<int> indices(size);
+  std::iota(indices.begin(), indices.end(), start_index);
 
   // shuffle the index array
   if (shuffle) {
     unsigned seed = 0;
-    std::shuffle(indexes.begin(), indexes.end(),
+    std::shuffle(indices.begin(), indices.end(),
                  std::default_random_engine(seed));
   }
-  return indexes;
+  return indices;
 }
 
 void PointPillarsDetection::GetObjects(

@@ -85,3 +85,11 @@
 
 --config_manager_path=./
 --start_visualizer=false
+
+# configs for lidar point pillars
+--score_threshold=0.7
+--downsample_voxel_size_x=0.1
+--downsample_voxel_size_y=0.1
+--downsample_voxel_size_z=0.1
+--enable_fuse_frames=false
+--num_fuse_frames=5
