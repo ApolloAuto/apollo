@@ -172,18 +172,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "spiral_curve_config_proto",
-    deps = [
-        ":spiral_curve_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "spiral_curve_config_proto_lib",
-    srcs = ["spiral_curve_config.proto"],
-)
-
-cc_proto_library(
     name = "planning_status_proto",
     deps = [
         ":planning_status_proto_lib",
@@ -358,11 +346,6 @@ py_proto(
 py_proto(
     name = "task_config_pb2",
     src = "task_config.proto",
-)
-
-py_proto(
-    name = "spiral_curve_config_pb2",
-    src = "spiral_curve_config.proto",
 )
 
 py_proto(
