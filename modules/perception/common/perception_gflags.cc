@@ -52,6 +52,14 @@ DEFINE_double(normalizing_factor, 255,
 DEFINE_int32(num_point_feature, 5,
              "Length of raw point feature. Features include x, y, z,"
              "intensity and delta of time.");
+DEFINE_bool(enable_downsample_pointcloud, true,
+            "Enable down sampling point cloud into centroids of voxel grid.");
+DEFINE_double(downsample_voxel_size_x, 0.01,
+              "X-axis size of voxels used for down sampling point cloud.");
+DEFINE_double(downsample_voxel_size_y, 0.01,
+              "Y-axis size of voxels used for down sampling point cloud.");
+DEFINE_double(downsample_voxel_size_z, 0.01,
+              "Z-axis size of voxels used for down sampling point cloud.");
 DEFINE_bool(enable_fuse_frames, false,
             "Enable fusing preceding frames' point cloud into current frame.");
 DEFINE_int32(num_fuse_frames, 5,

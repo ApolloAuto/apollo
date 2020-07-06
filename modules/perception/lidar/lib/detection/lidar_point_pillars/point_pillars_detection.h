@@ -18,8 +18,10 @@
 #include <deque>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
+
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud.h"
@@ -46,17 +48,14 @@ class PointPillarsDetection {
   std::string Name() const { return "PointPillarsDetection"; }
 
  private:
-  void PclToArray(const base::PointFCloudPtr& pc_ptr,
-                  float* out_points_array,
-                  const std::vector<int>& point_indexes,
-                  float normalizing_factor);
+  void CloudToArray(const base::PointFCloudPtr& pc_ptr,
+                    float* out_points_array,
+                    float normalizing_factor);
 
-  void FusePointCloudToArray(const base::PointFCloudPtr& pc_ptr,
-                             float* out_points_array,
-                             const std::vector<int>& point_indexes,
-                             float normalizing_factor);
+  void FuseCloud(const base::PointFCloudPtr& out_cloud_ptr,
+                 const std::deque<base::PointDCloudPtr>& fuse_clouds);
 
-  std::vector<int> GenerateIndexes(int start_index, int size, bool shuffle);
+  std::vector<int> GenerateIndices(int start_index, int size, bool shuffle);
 
   void GetObjects(std::vector<std::shared_ptr<base::Object>>* objects,
                   const Eigen::Affine3d& pose,
@@ -73,10 +72,14 @@ class PointPillarsDetection {
 
   // PointPillars
   std::unique_ptr<PointPillars> point_pillars_ptr_;
-  std::deque<std::pair<base::PointDCloudPtr, double>> prev_point_clouds_;
+  std::deque<base::PointDCloudPtr> prev_world_clouds_;
+  base::PointFCloudPtr cur_cloud_ptr_;
 
   // time statistics
-  double pcl_to_array_time_ = 0.0;
+  double downsample_time_ = 0.0;
+  double fuse_time_ = 0.0;
+  double shuffle_time_ = 0.0;
+  double cloud_to_array_time_ = 0.0;
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
 };  // class PointPillarsDetection
