@@ -277,18 +277,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "qp_problem_proto",
-    deps = [
-        ":qp_problem_lib",
-    ],
-)
-
-proto_library(
-    name = "qp_problem_lib",
-    srcs = ["qp_problem.proto"],
-)
-
-cc_proto_library(
     name = "ipopt_return_status_proto",
     deps = [
         ":ipopt_return_status_proto_lib",
@@ -380,11 +368,6 @@ py_proto(
 py_proto(
     name = "st_drivable_boundary_pb2",
     src = "st_drivable_boundary.proto",
-)
-
-py_proto(
-    name = "qp_problem_pb2",
-    src = "qp_problem.proto",
 )
 
 py_proto(

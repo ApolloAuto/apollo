@@ -83,7 +83,7 @@ cc_library(
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:qp_problem_proto",
+        "//modules/planning/proto/math:qp_problem_proto",
         "@eigen",
     ],
 )
