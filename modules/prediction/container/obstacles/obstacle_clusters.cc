@@ -26,27 +26,9 @@ namespace prediction {
 
 using ::apollo::hdmap::LaneInfo;
 
-std::unordered_map<std::string, std::vector<LaneObstacle>>
-    ObstacleClusters::lane_obstacles_;
-std::unordered_map<std::string, StopSign>
-    ObstacleClusters::lane_id_stop_sign_map_;
-
-std::mutex ObstacleClusters::mutex_obstacle_cluster_;
-
-void ObstacleClusters::Clear() {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
-  lane_obstacles_.clear();
-  lane_id_stop_sign_map_.clear();
-}
-
-void ObstacleClusters::Init() {
-  Clear();
-}
-
 LaneGraph ObstacleClusters::GetLaneGraph(
     const double start_s, const double length, const bool consider_lane_split,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   std::string lane_id = lane_info_ptr->id().id();
   RoadGraph road_graph(start_s, length, consider_lane_split, lane_info_ptr);
   LaneGraph lane_graph;
@@ -57,7 +39,6 @@ LaneGraph ObstacleClusters::GetLaneGraph(
 LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
     const double start_s, const double length, bool is_on_lane,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   RoadGraph road_graph(start_s, length, true, lane_info_ptr);
   LaneGraph lane_graph;
   road_graph.BuildLaneGraphBidirection(&lane_graph);
@@ -67,7 +48,6 @@ LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
 void ObstacleClusters::AddObstacle(const int obstacle_id,
                                    const std::string& lane_id,
                                    const double lane_s, const double lane_l) {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   LaneObstacle lane_obstacle;
   lane_obstacle.set_obstacle_id(obstacle_id);
   lane_obstacle.set_lane_id(lane_id);
@@ -77,7 +57,6 @@ void ObstacleClusters::AddObstacle(const int obstacle_id,
 }
 
 void ObstacleClusters::SortObstacles() {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   for (auto iter = lane_obstacles_.begin(); iter != lane_obstacles_.end();
        ++iter) {
     std::sort(iter->second.begin(), iter->second.end(),
@@ -91,7 +70,6 @@ bool ObstacleClusters::ForwardNearbyObstacle(
     const LaneSequence& lane_sequence, const int obstacle_id,
     const double obstacle_s, const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr) {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   double accumulated_s = 0.0;
   for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
     std::string lane_id = lane_segment.lane_id();
@@ -122,7 +100,6 @@ bool ObstacleClusters::BackwardNearbyObstacle(
     const LaneSequence& lane_sequence, const int obstacle_id,
     const double obstacle_s, const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr) {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   if (lane_sequence.lane_segment().empty()) {
     AERROR << "Empty lane sequence found.";
     return false;
@@ -182,7 +159,6 @@ bool ObstacleClusters::BackwardNearbyObstacle(
 }
 
 StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
-  UNIQUE_LOCK_MULTITHREAD(mutex_obstacle_cluster_);
   StopSign stop_sign;
   // Find the stop_sign by lane_id in the hashtable
   if (lane_id_stop_sign_map_.find(lane_id) != lane_id_stop_sign_map_.end()) {
