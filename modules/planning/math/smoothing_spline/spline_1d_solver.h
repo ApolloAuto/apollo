@@ -28,7 +28,7 @@
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_kernel.h"
-#include "modules/planning/proto/qp_problem.pb.h"
+#include "modules/planning/proto/math/qp_problem.pb.h"
 
 namespace apollo {
 namespace planning {
