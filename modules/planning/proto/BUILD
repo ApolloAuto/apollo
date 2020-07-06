@@ -191,21 +191,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "lattice_sampling_config_proto",
-    deps = [
-        ":lattice_sampling_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "lattice_sampling_config_proto_lib",
-    srcs = ["lattice_sampling_config.proto"],
-    deps = [
-        "//modules/common/proto:pnc_point_proto_lib",
-    ],
-)
-
-cc_proto_library(
     name = "lattice_structure_proto",
     deps = [
         ":lattice_structure_proto_lib",
@@ -216,7 +201,6 @@ proto_library(
     name = "lattice_structure_proto_lib",
     srcs = ["lattice_structure.proto"],
     deps = [
-        ":lattice_sampling_config_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
@@ -374,11 +358,6 @@ py_proto(
     deps = [
         "//modules/common/proto:pnc_point_pb2",
     ],
-)
-
-py_proto(
-    name = "lattice_sampling_config_pb2",
-    src = "lattice_sampling_config.proto",
 )
 
 py_proto(
