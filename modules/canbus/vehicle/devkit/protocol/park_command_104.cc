@@ -1,0 +1,107 @@
+/******************************************************************************
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
+
+#include "modules/drivers/canbus/common/byte.h"
+
+namespace apollo {
+namespace canbus {
+namespace devkit {
+
+using ::apollo::drivers::canbus::Byte;
+
+const int32_t Parkcommand104::ID = 0x104;
+
+// public
+Parkcommand104::Parkcommand104() { Reset(); }
+
+uint32_t Parkcommand104::GetPeriod() const {
+  // TODO(All) :  modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
+}
+
+void Parkcommand104::UpdateData(uint8_t* data) {
+  set_p_park_target(data, park_target_);
+  set_p_park_en_ctrl(data, park_en_ctrl_);
+  checksum_115_ =
+      data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+  set_p_checksum_115(data, checksum_115_);
+}
+
+void Parkcommand104::Reset() {
+  // TODO(All) :  you should check this manually
+  checksum_115_ = 0;
+  park_target_ = Park_command_104::PARK_TARGET_RELEASE;
+  park_en_ctrl_ = Park_command_104::PARK_EN_CTRL_DISABLE;
+}
+
+Parkcommand104* Parkcommand104::set_checksum_115(int checksum_115) {
+  checksum_115_ = checksum_115;
+  return this;
+}
+
+// config detail: {'name': 'CheckSum_115', 'offset': 0.0, 'precision': 1.0,
+// 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
+// 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+void Parkcommand104::set_p_checksum_115(uint8_t* data, int checksum_115) {
+  checksum_115 = ProtocolData::BoundedValue(0, 255, checksum_115);
+  int x = checksum_115;
+
+  Byte to_set(data + 7);
+  to_set.set_value(x, 0, 8);
+}
+
+Parkcommand104* Parkcommand104::set_park_target(
+    Park_command_104::Park_targetType park_target) {
+  park_target_ = park_target;
+  return this;
+}
+
+// config detail: {'name': 'Park_Target', 'enum': {0: 'PARK_TARGET_RELEASE', 1:
+// 'PARK_TARGET_PARKING_TRIGGER'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
+// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum',
+// 'order': 'motorola', 'physical_unit': ''}
+void Parkcommand104::set_p_park_target(
+    uint8_t* data, Park_command_104::Park_targetType park_target) {
+  int x = park_target;
+
+  Byte to_set(data + 1);
+  to_set.set_value(x, 0, 1);
+}
+
+Parkcommand104* Parkcommand104::set_park_en_ctrl(
+    Park_command_104::Park_en_ctrlType park_en_ctrl) {
+  park_en_ctrl_ = park_en_ctrl;
+  return this;
+}
+
+// config detail: {'name': 'Park_EN_CTRL', 'enum': {0: 'PARK_EN_CTRL_DISABLE',
+// 1: 'PARK_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
+// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
+// 'order': 'motorola', 'physical_unit': ''}
+void Parkcommand104::set_p_park_en_ctrl(
+    uint8_t* data, Park_command_104::Park_en_ctrlType park_en_ctrl) {
+  int x = park_en_ctrl;
+
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 1);
+}
+
+}  // namespace devkit
+}  // namespace canbus
+}  // namespace apollo
