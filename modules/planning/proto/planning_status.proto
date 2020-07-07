@@ -44,7 +44,7 @@ message ChangeLaneStatus {
 message StopTime {
   optional string obstacle_id = 1;
   // the timestamp when start stopping for the crosswalk
-  optional double obstacle_stop_timestamp = 2;
+  optional double stop_timestamp_sec = 2;
 }
 
 message CrosswalkStatus {
@@ -107,6 +107,10 @@ message ReroutingStatus {
   optional apollo.routing.RoutingRequest routing_request = 3;
 }
 
+message SpeedDeciderStatus {
+  repeated StopTime pedestrian_stop_time = 1;
+}
+
 message ScenarioStatus {
   optional ScenarioConfig.ScenarioType scenario_type = 1;
   optional ScenarioConfig.StageType stage_type = 2;
@@ -142,7 +146,8 @@ message PlanningStatus {
   optional PullOverStatus pull_over = 9;
   optional ReroutingStatus rerouting = 10;
   optional ScenarioStatus scenario = 11;
-  optional StopSignStatus stop_sign = 12;
-  optional TrafficLightStatus traffic_light = 13;
-  optional YieldSignStatus yield_sign = 14;
+  optional SpeedDeciderStatus speed_decider = 12;
+  optional StopSignStatus stop_sign = 13;
+  optional TrafficLightStatus traffic_light = 14;
+  optional YieldSignStatus yield_sign = 15;
 }

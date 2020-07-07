@@ -268,7 +268,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   double wait_time = stop_timeout + 0.5;
   for (auto& stop_time : *crosswalk_status->mutable_stop_time()) {
     if (stop_time.obstacle_id() == "11652") {
-      stop_time.set_obstacle_stop_timestamp(Clock::NowInSeconds() - wait_time);
+      stop_time.set_stop_timestamp_sec(Clock::NowInSeconds() - wait_time);
     }
   }
 
