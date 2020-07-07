@@ -31,8 +31,7 @@ filegroup(
 
 cc_test(
     name = "localization_msf_local_map_pool_test",
-    size = "medium",
-    timeout = "moderate",
+    size = "small",
     srcs = ["map_pool_test.cc"],
     copts = [
         "-fno-access-control",
@@ -50,8 +49,7 @@ cc_test(
 
 cc_test(
     name = "localization_msf_lossless_map_config_test",
-    size = "medium",
-    timeout = "moderate",
+    size = "small",
     srcs = ["lossless_map_config_test.cc"],
     data = [":localization_msf_local_map_test_data"],
     deps = [
