@@ -45,13 +45,13 @@ function config_interactive() {
 function config() {
     local stage="${STAGE}"
     if [ $# -eq 0 ]; then
-        config_interactive
+        config_noninteractive
     else
         local mode="$1" ; shift
-        if [[ "${mode}" == "--noninteractive" ]]; then
-            config_noninteractive "$@"
+        if [[ "${mode}" == "--interactive" || "${mode}" == "-i" ]]; then
+            config_interactive "$@"
         else
-            config_interactive
+            config_noninteractive
         fi
     fi
 }
