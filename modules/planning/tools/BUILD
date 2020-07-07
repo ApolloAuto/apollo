@@ -11,12 +11,8 @@ cc_binary(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:fem_pos_deviation_smoother_config_cc_proto",
-        "//modules/planning/proto:open_space_task_config_cc_proto",
         "//modules/planning/proto:pad_msg_cc_proto",
-        "//modules/planning/proto:planner_open_space_config_cc_proto",
         "//modules/planning/proto:planning_config_cc_proto",
-        "//modules/planning/proto:task_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

@@ -35,7 +35,6 @@ cc_binary(
         "//modules/perception/proto:perception_obstacle_cc_proto",
         "//modules/perception/proto:traffic_light_detection_cc_proto",
         "//modules/planning/proto:decision_cc_proto",
-        "//modules/planning/proto:fem_pos_deviation_smoother_config_cc_proto",
         "//modules/planning/proto:open_space_task_config_cc_proto",
         "//modules/planning/proto:planner_open_space_config_cc_proto",
         "//modules/planning/proto:planning_cc_proto",

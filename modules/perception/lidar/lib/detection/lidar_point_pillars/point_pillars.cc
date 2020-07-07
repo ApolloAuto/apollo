@@ -488,9 +488,8 @@ void PointPillars::OnnxToTRTModel(
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kWARNING);
 
   // create the builder
-  // TODO(chenjiahao): assign value from constant param 'kBatchSize'
   const auto explicit_batch =
-      1U << static_cast<uint32_t>(
+      static_cast<uint32_t>(kBatchSize) << static_cast<uint32_t>(
           nvinfer1::NetworkDefinitionCreationFlag::kEXPLICIT_BATCH);
   nvinfer1::IBuilder* builder = nvinfer1::createInferBuilder(g_logger_);
   nvinfer1::INetworkDefinition* network =

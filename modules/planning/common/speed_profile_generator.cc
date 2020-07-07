@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
@@ -61,7 +62,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
                                                    init_s);
 
   std::vector<double> end_state_ref(num_of_knots, stop_distance);
-  piecewise_jerk_problem.set_x_ref(1.0, end_state_ref);
+  piecewise_jerk_problem.set_x_ref(1.0, std::move(end_state_ref));
 
   piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
