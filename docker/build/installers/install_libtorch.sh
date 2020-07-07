@@ -39,6 +39,8 @@ popd
 
 # Cleanup
 rm -rf libtorch ${PKG_NAME}
+rm -f /usr/local/libtorch_gpu/lib/libcudart-80664282.so.10.2
+ln -s /usr/local/cuda/lib64/libcudart.so.10.2 /usr/local/libtorch_gpu/lib/libcudart-80664282.so.10.2
 
 PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0+cpu.zip"
 DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip"
