@@ -95,14 +95,14 @@ echo "########################### All check passed! ###########################"
 # bash apollo6.sh check OK
 
 # In-progress parts. Feel free to claim by adding your name in TODO and move it
-# TODO(?): replay-engine image which is compatible with docker_dev branch.
-# TODO(?): Integrate pycodestyle (or similar) into "apollo.sh lint" to lint python code.
+# DONE(?): replay-engine image which is compatible with docker_dev branch.
+# DONE(?): Integrate pycodestyle (or similar) into "apollo.sh lint" to lint python code.
 #          See https://pypi.org/project/pycodestyle/
-# TODO(?): Use py_library, py_binary, py_test to manage python code:
+# DONE(changsh726): Use py_library, py_binary, py_test to manage python code:
 #          See https://docs.bazel.build/versions/master/be/python.html
-# TODO(storypku): cyber.aarch64 docker image (to be validated)
-# TODO(storypku): tools/workspace.bzl to re-org WORKSPACE
-# TODO(?): no break for cpu only build
+# DONE(storypku): cyber.aarch64 docker image (to be validated)
+# DONE(storypku): tools/workspace.bzl to re-org WORKSPACE
+# DONE(storypku): no break for cpu only build
 
 # The following should be checked regularly until everyone follows the rule.
 # Substitute implicit "-l" linkopts with explicit deps in BUILD files
