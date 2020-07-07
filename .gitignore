@@ -57,6 +57,7 @@ docker/build/archive/
 
 # python proto
 *_pb2.py
+py_proto
 
 # calibration files
 modules/calibration/data/
