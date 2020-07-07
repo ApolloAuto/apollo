@@ -31,8 +31,9 @@ TEST(HermesCanClient, init) {
   param.set_channel_id(CANCardParameter::CHANNEL_ID_ZERO);
   HermesCanClient hermes_can;
   EXPECT_TRUE(hermes_can.Init(param));
-  //    EXPECT_EQ(hermes_can.Start(), ErrorCode::CAN_CLIENT_ERROR_BASE);
-  //      EXPECT_EQ(hermes_can.Start(), ErrorCode::OK);
+  EXPECT_EQ(hermes_can.Start(), ErrorCode::CAN_CLIENT_ERROR_BASE);
+  // EXPECT_EQ(hermes_can.Start(), ErrorCode::OK);
+  hermes_can.Stop();
 }
 
 /*
@@ -85,8 +86,8 @@ TEST(HermesCanClient, receiver) {
 }  // namespace drivers
 }  // namespace apollo
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  int ret = RUN_ALL_TESTS();
-  return ret;
-}
+// int main(int argc, char **argv) {
+//   ::testing::InitGoogleTest(&argc, argv);
+//   int ret = RUN_ALL_TESTS();
+//   return ret;
+// }
