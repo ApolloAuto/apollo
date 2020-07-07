@@ -228,7 +228,7 @@ void OnlineVisualizerComponent::OnFusionLocalization(
 
 void OnlineVisualizerComponent::ParsePointCloudMessage(
     const std::shared_ptr<drivers::PointCloud> &msg,
-    std::vector<Eigen::Vector3d> *pt3ds,
+    ::apollo::common::EigenVector3dVec *pt3ds,
     std::vector<unsigned char> *intensities) {
   CHECK_NOTNULL(pt3ds);
   CHECK_NOTNULL(intensities);

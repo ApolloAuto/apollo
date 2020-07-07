@@ -180,4 +180,10 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "eigen_defs",
+    hdrs = ["eigen_defs.h"],
+    deps = ["@eigen"],
+)
+
 cpplint()

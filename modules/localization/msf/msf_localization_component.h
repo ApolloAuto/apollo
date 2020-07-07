@@ -65,6 +65,8 @@ class MSFLocalizationComponent final
  private:
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
   MSFLocalization localization_;
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 CYBER_REGISTER_COMPONENT(MSFLocalizationComponent);

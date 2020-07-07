@@ -40,7 +40,7 @@ struct LidarVisFrame {
   /**@brief The time stamp. */
   double timestamp;
   /**@brief The 3D point cloud in this frame. */
-  std::vector<Eigen::Vector3d> pt3ds;
+  std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> pt3ds;
 };
 
 struct LocalizationMsg {

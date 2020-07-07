@@ -16,6 +16,7 @@ cc_library(
         "//modules/common/time",
         "//modules/common/util",
         "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common/util:eigen_defs",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
@@ -24,7 +25,6 @@ cc_library(
         "//modules/localization/proto:localization_config_cc_proto",
         "@boost",
         "@com_google_googletest//:gtest_main",
-        "@eigen",
         "@pcl",
     ],
 )
