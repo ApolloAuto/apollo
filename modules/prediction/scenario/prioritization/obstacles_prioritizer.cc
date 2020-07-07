@@ -551,7 +551,7 @@ void ObstaclesPrioritizer::SetCautionBackward(
     return;
   }
   std::unordered_map<std::string, std::vector<LaneObstacle>> lane_obstacles =
-      ObstacleClusters::GetLaneObstacles();
+      obstacles_container->GetClustersPtr()->GetLaneObstacles();
   std::queue<std::pair<ConstLaneInfoPtr, double>> lane_info_queue;
   lane_info_queue.emplace(start_lane_info_ptr,
                           start_lane_info_ptr->total_length());

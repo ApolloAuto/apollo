@@ -50,16 +50,36 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
   std::vector<common::PathPoint> ConvertPathPointRefFromFrontAxeToRearAxe(
       const PathData& path_data);
 
+  /**
+   * @brief
+   *
+   * @param init_state path start point
+   * @param end_state path end point
+   * @param path_reference_l_ref: a vector with default value 0.0
+   * @param path_reference_size: length of learning model output
+   * @param delta_s: path point spatial distance
+   * @param is_valid_path_reference: whether using learning model output or not
+   * @param lat_boundaries: path boundaries
+   * @param ddl_bounds: constains
+   * @param w: weighting scales
+   * @param max_iter: optimization max interations
+   * @param ptr_x: optimization result of x
+   * @param ptr_dx: optimization result of dx
+   * @param ptr_ddx: optimization result of ddx
+   * @return true
+   * @return false
+   */
   bool OptimizePath(
       const std::array<double, 3>& init_state,
       const std::array<double, 3>& end_state,
-      const std::vector<double>& path_reference_l_ref, const double delta_s,
+      std::vector<double> path_reference_l_ref,
+      const size_t path_reference_size, const double delta_s,
       const bool is_valid_path_reference,
       const std::vector<std::pair<double, double>>& lat_boundaries,
       const std::vector<std::pair<double, double>>& ddl_bounds,
-      const std::array<double, 5>& w, std::vector<double>* ptr_x,
-      std::vector<double>* ptr_dx, std::vector<double>* ptr_ddx,
-      const int max_iter);
+      const std::array<double, 5>& w, const int max_iter,
+      std::vector<double>* ptr_x, std::vector<double>* ptr_dx,
+      std::vector<double>* ptr_ddx);
 
   FrenetFramePath ToPiecewiseJerkPath(const std::vector<double>& l,
                                       const std::vector<double>& dl,

@@ -138,8 +138,8 @@ proto_library(
     name = "reference_line_smoother_config_proto_lib",
     srcs = ["reference_line_smoother_config.proto"],
     deps = [
-        ":cos_theta_smoother_config_proto_lib",
-        ":fem_pos_deviation_smoother_config_proto_lib",
+        "//modules/planning/proto/math:cos_theta_smoother_config_proto_lib",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto_lib",
     ],
 )
 
@@ -169,18 +169,6 @@ cc_proto_library(
 proto_library(
     name = "traffic_rule_config_proto_lib",
     srcs = ["traffic_rule_config.proto"],
-)
-
-cc_proto_library(
-    name = "spiral_curve_config_proto",
-    deps = [
-        ":spiral_curve_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "spiral_curve_config_proto_lib",
-    srcs = ["spiral_curve_config.proto"],
 )
 
 cc_proto_library(
@@ -237,8 +225,8 @@ proto_library(
     name = "planner_open_space_config_proto_lib",
     srcs = ["planner_open_space_config.proto"],
     deps = [
-        ":fem_pos_deviation_smoother_config_proto_lib",
         ":task_config_proto_lib",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto_lib",
     ],
 )
 
@@ -274,42 +262,6 @@ cc_proto_library(
 proto_library(
     name = "auto_tuning_model_input_lib",
     srcs = ["auto_tuning_model_input.proto"],
-)
-
-cc_proto_library(
-    name = "qp_problem_proto",
-    deps = [
-        ":qp_problem_lib",
-    ],
-)
-
-proto_library(
-    name = "qp_problem_lib",
-    srcs = ["qp_problem.proto"],
-)
-
-cc_proto_library(
-    name = "cos_theta_smoother_config_proto",
-    deps = [
-        ":cos_theta_smoother_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "cos_theta_smoother_config_proto_lib",
-    srcs = ["cos_theta_smoother_config.proto"],
-)
-
-cc_proto_library(
-    name = "fem_pos_deviation_smoother_config_proto",
-    deps = [
-        ":fem_pos_deviation_smoother_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "fem_pos_deviation_smoother_config_proto_lib",
-    srcs = ["fem_pos_deviation_smoother_config.proto"],
 )
 
 cc_proto_library(
@@ -397,18 +349,8 @@ py_proto(
 )
 
 py_proto(
-    name = "spiral_curve_config_pb2",
-    src = "spiral_curve_config.proto",
-)
-
-py_proto(
     name = "st_drivable_boundary_pb2",
     src = "st_drivable_boundary.proto",
-)
-
-py_proto(
-    name = "qp_problem_pb2",
-    src = "qp_problem.proto",
 )
 
 py_proto(
@@ -435,11 +377,6 @@ py_proto(
 )
 
 py_proto(
-    name = "cos_theta_smoother_config_pb2",
-    src = "cos_theta_smoother_config.proto",
-)
-
-py_proto(
     name = "lattice_sampling_config_pb2",
     src = "lattice_sampling_config.proto",
 )
@@ -448,8 +385,8 @@ py_proto(
     name = "reference_line_smoother_config_pb2",
     src = "reference_line_smoother_config.proto",
     deps = [
-        "//modules/planning/proto:cos_theta_smoother_config_pb2",
-        "//modules/planning/proto:fem_pos_deviation_smoother_config_pb2",
+        "//modules/planning/proto/math:cos_theta_smoother_config_pb2",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_pb2",
     ],
 )
 
@@ -514,14 +451,9 @@ py_proto(
     name = "planner_open_space_config_pb2",
     src = "planner_open_space_config.proto",
     deps = [
-        "//modules/planning/proto:fem_pos_deviation_smoother_config_pb2",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_pb2",
         "//modules/planning/proto:task_config_pb2",
     ],
-)
-
-py_proto(
-    name = "fem_pos_deviation_smoother_config_pb2",
-    src = "fem_pos_deviation_smoother_config.proto",
 )
 
 py_proto(

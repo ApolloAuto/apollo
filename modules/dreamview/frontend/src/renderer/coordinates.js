@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import _ from 'lodash';
+
 export default class Coordinates {
     constructor() {
         this.systemName = "ENU";
@@ -11,6 +13,11 @@ export default class Coordinates {
     }
 
     initialize(x, y) {
+        if (!_.isNumber(x) || !_.isNumber(y)) {
+            console.warn('Skip setting invalid offset:', x, y);
+            return;
+        }
+
         this.offset = {
             x: x,
             y: y

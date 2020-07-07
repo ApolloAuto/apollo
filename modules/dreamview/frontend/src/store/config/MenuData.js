@@ -30,6 +30,9 @@ export default [
             perceptionId: 'Id',
             perceptionObstacleInfo: 'Distance and Speed',
             perceptionLaneMarker: 'Lane Marker',
+            perceptionLidarSensor: 'Lidar Sensor',
+            perceptionRadarSensor: 'Radar Sensor',
+            perceptionCameraSensor: 'Camera Sensor',
         },
         supportInOfflineView: true,
     }, {

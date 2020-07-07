@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/cos_theta_smoother_config.pb.h"
+#include "modules/planning/proto/math/cos_theta_smoother_config.pb.h"
 
 namespace apollo {
 namespace planning {

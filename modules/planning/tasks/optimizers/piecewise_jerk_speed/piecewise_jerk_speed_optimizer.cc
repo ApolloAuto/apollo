@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -77,8 +76,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  const auto& config =
-      config_.piecewise_jerk_speed_optimizer_config();
+  const auto& config = config_.piecewise_jerk_speed_optimizer_config();
   piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
 
@@ -154,8 +152,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
-  piecewise_jerk_problem.set_x_ref(config.ref_s_weight(),
-                                   x_ref);
+  piecewise_jerk_problem.set_x_ref(config.ref_s_weight(), std::move(x_ref));
   piecewise_jerk_problem.set_penalty_dx(penalty_dx);
   piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));
 

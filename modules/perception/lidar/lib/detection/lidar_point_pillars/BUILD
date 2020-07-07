@@ -45,6 +45,7 @@ cc_library(
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
         "@eigen",
+        "@pcl",
     ],
     alwayslink = True,
 )
