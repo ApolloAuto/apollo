@@ -15,3 +15,8 @@ def repo():
         strip_prefix = "eigen-git-mirror-3.3.7",
         urls = ["https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz"],
     )
+    #native.new_local_repository(
+    #    name = "eigen",
+    #    build_file = clean_dep("//third_party/eigen3:eigen.BUILD"),
+    #    path = "/usr/include/eigen3",
+    #)
