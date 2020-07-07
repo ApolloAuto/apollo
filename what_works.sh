@@ -78,7 +78,7 @@ bazel_test_with_dist_cache $(bazel query //modules/localization/... \
     except //modules/localization/ndt:ndt_localization_test \
 )
 
-# Prediction: 4 test failures
+# Prediction
 bazel_test_with_dist_cache $(bazel query //modules/prediction/... )
 
 # Planning: 1 test failures

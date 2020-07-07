@@ -22,14 +22,6 @@ except //modules/localization/ndt:ndt_localization_test \
 except //modules/localization/ndt/ndt_locator:ndt_solver_test \
 "
 
-##============== Prediction ====================##
-PREDICTION_EXCEPTIONS="\
-except //modules/prediction/predictor/single_lane:single_lane_predictor_test \
-except //modules/prediction/container/obstacles:obstacle_test \
-except //modules/prediction/container/obstacles:obstacle_clusters_test \
-except //modules/prediction/common:road_graph_test \
-"
-
 ##====================== Planning ===============##
 PLANNING_EXCEPTIONS="\
 except //modules/planning/learning_based/model_inference:model_inference_test   \
@@ -46,7 +38,6 @@ DISABLED_TARGETS=
 
 function _disabled_test_targets_all() {
     local disabled="${PERCEPTION_EXCEPTIONS}"
-    disabled="${disabled} ${PREDICTION_EXCEPTIONS}"
     disabled="${disabled} ${LOCALIZATION_EXCEPTIONS}"
     disabled="${disabled} ${PLANNING_EXCEPTIONS}"
 
