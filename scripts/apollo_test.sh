@@ -14,12 +14,6 @@ LOCALIZATION_EXCEPTIONS="\
 except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
 except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
 except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
-except //modules/localization/msf:msf_localization_test \
-except //modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map_test \
-except //modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_test \
-except //modules/localization/ndt:ndt_localization_pose_buffer_test \
-except //modules/localization/ndt:ndt_localization_test \
-except //modules/localization/ndt/ndt_locator:ndt_solver_test \
 "
 
 ##======================= Failed Test Cases are Listed Above ================##

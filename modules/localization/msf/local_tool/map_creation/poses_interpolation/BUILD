@@ -10,7 +10,7 @@ cc_library(
     deps = [
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//third_party:boost",
-        "@eigen",
+        "//modules/common/util:eigen_defs",
     ],
 )
 

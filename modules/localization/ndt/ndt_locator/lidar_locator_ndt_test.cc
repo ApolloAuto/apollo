@@ -45,7 +45,7 @@ TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
   locator.SetLidarHeight(1.7);
 
   // Load poses.
-  std::vector<Eigen::Affine3d> poses;
+  std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d>> poses;
   std::vector<double> timestamps;
   msf::velodyne::LoadPcdPoses(poses_file, &poses, &timestamps);
   Eigen::Affine3d location = Eigen::Affine3d::Identity();
@@ -60,7 +60,7 @@ TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
       continue;
     }
 
-    std::vector<Eigen::Vector3d> pt3ds;
+    ::apollo::common::EigenVector3dVec pt3ds;
     std::vector<unsigned char> intensities;
     std::stringstream ss;
     ss << frame_idx + 1;

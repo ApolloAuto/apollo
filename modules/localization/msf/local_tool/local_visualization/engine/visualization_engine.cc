@@ -141,7 +141,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
 
 void VisualizationEngine::Visualize(
     const std::vector<LocalizatonInfo> &loc_infos,
-    const std::vector<Eigen::Vector3d> &cloud) {
+    const ::apollo::common::EigenVector3dVec &cloud) {
   if (!is_init_) {
     AERROR << "Visualziation should be init first.";
     return;
@@ -725,11 +725,10 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
   AINFO << "image_visual_leaf_path: " << image_visual_leaf_path_;
 }
 
-void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
-                                     const Eigen::Affine3d &velodyne_extrinsic,
-                                     const std::vector<Eigen::Vector3d> &cloud,
-                                     cv::Mat *cloud_img,
-                                     cv::Mat *cloud_img_mask) {
+void VisualizationEngine::CloudToMat(
+    const Eigen::Affine3d &cur_pose, const Eigen::Affine3d &velodyne_extrinsic,
+    const ::apollo::common::EigenVector3dVec &cloud, cv::Mat *cloud_img,
+    cv::Mat *cloud_img_mask) {
   unsigned int img_width = map_param_.map_node_size_x;
   unsigned int img_height = map_param_.map_node_size_y;
   Eigen::Vector3d cen = car_pose_.translation();

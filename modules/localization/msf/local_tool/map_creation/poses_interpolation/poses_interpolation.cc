@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 #include <fstream>
 
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
-#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 namespace apollo {
 namespace localization {
@@ -45,7 +45,7 @@ bool PosesInterpolation::Init(const std::string &input_poses_path,
 
 void PosesInterpolation::DoInterpolation() {
   // Load input poses
-  std::vector<Eigen::Vector3d> input_stds;
+  ::apollo::common::EigenVector3dVec input_stds;
   velodyne::LoadPosesAndStds(input_poses_path_, &input_poses_, &input_stds,
                              &input_poses_timestamps_);
 
@@ -107,12 +107,12 @@ void PosesInterpolation::WritePCDPoses() {
 }  // namespace msf
 
 void PosesInterpolation::PoseInterpolationByTime(
-    const std::vector<Eigen::Affine3d> &in_poses,
+    const ::apollo::common::EigenAffine3dVec &in_poses,
     const std::vector<double> &in_timestamps,
     const std::vector<double> &ref_timestamps,
     const std::vector<unsigned int> &ref_indexes,
     std::vector<unsigned int> *out_indexes, std::vector<double> *out_timestamps,
-    std::vector<Eigen::Affine3d> *out_poses) {
+    ::apollo::common::EigenAffine3dVec *out_poses) {
   out_indexes->clear();
   out_timestamps->clear();
   out_poses->clear();

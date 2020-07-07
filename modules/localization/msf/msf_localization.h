@@ -56,6 +56,9 @@ class LocalizationMsgPublisher;
  */
 class MSFLocalization {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   MSFLocalization();
 
   apollo::common::Status Init();

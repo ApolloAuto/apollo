@@ -65,17 +65,11 @@ bazel_test_with_dist_cache \
 # Perception
 bazel_test_with_dist_cache $(bazel query //modules/perception/... )
 
-# Localization: 9 test failures
+# Localization: 3 test failures (deadlock ?)
 bazel_test_with_dist_cache $(bazel query //modules/localization/... \
     except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
     except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
     except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
-    \
-    except //modules/localization/msf:msf_localization_test \
-    except //modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map_test \
-    except //modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_test \
-    except //modules/localization/ndt:ndt_localization_pose_buffer_test \
-    except //modules/localization/ndt:ndt_localization_test \
 )
 
 # Prediction
