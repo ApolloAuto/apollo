@@ -22,11 +22,6 @@ except //modules/localization/ndt:ndt_localization_test \
 except //modules/localization/ndt/ndt_locator:ndt_solver_test \
 "
 
-##====================== Planning ===============##
-PLANNING_EXCEPTIONS="\
-except //modules/planning/learning_based/model_inference:model_inference_test   \
-"
-
 ##======================= Failed Test Cases are Listed Above ================##
 ARCH="$(uname -m)"
 
@@ -39,7 +34,6 @@ DISABLED_TARGETS=
 function _disabled_test_targets_all() {
     local disabled="${PERCEPTION_EXCEPTIONS}"
     disabled="${disabled} ${LOCALIZATION_EXCEPTIONS}"
-    disabled="${disabled} ${PLANNING_EXCEPTIONS}"
 
     if ! ${USE_ESD_CAN} ; then
         warning "ESD CAN library supplied by ESD Electronics doesn't exist."
@@ -80,8 +74,6 @@ function determine_disabled_targets() {
             disabled="${disabled} ${LOCALIZATION_EXCEPTIONS}"
         elif [[ "${compo}" == "prediction" ]]; then
             disabled="${disabled} ${PREDICTION_EXCEPTIONS}"
-        elif [[ "${compo}" == "planning" ]]; then
-            disabled="${disabled} ${PLANNING_EXCEPTIONS}"
         elif [[ "${compo}" == "perception" ]]; then
             disabled="${disabled} ${PERCEPTION_EXCEPTIONS}"
         fi
