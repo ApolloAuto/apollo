@@ -105,7 +105,6 @@ class SpeedDecider : public Task {
   bool IsFollowTooClose(const Obstacle& obstacle) const;
 
  private:
-  static std::unordered_map<std::string, double> pedestrian_stop_timer_;
   SLBoundary adc_sl_boundary_;
   common::TrajectoryPoint init_point_;
   const ReferenceLine* reference_line_ = nullptr;

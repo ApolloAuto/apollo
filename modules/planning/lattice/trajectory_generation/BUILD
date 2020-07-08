@@ -48,7 +48,6 @@ cc_library(
         "//modules/planning/lattice/trajectory_generation:lattice_trajectory1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/proto:lattice_sampling_config_cc_proto",
         "//modules/planning/proto:lattice_structure_cc_proto",
     ],
 )
@@ -68,7 +67,6 @@ cc_library(
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
-        "//modules/planning/proto:lattice_sampling_config_cc_proto",
     ],
 )
 

@@ -171,24 +171,6 @@ py_proto_library(
     ],
 )
 cc_proto_library(
-    name = "lattice_sampling_config_cc_proto",
-    deps = [
-        ":lattice_sampling_config_proto",
-    ],
-)
-
-proto_library(
-    name = "lattice_sampling_config_proto",
-    srcs = ["lattice_sampling_config.proto"],
-)
-
-py_proto_library(
-    name = "lattice_sampling_config_py_pb2",
-    deps = [
-        ":lattice_sampling_config_proto",
-    ],
-)
-cc_proto_library(
     name = "planning_stats_cc_proto",
     deps = [
         ":planning_stats_proto",
