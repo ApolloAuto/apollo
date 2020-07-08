@@ -66,11 +66,15 @@ if [[ "$ARCH" == "x86_64" ]]; then
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
 
+    # Ref: https://src.fedoraproject.org/rpms/pcl.git
     pushd pcl-pcl-${VERSION}/
+        patch -p1 < /tmp/installers/pcl-sse-fix-${VERSION}.patch
         mkdir build && cd build
 
+        # -DCUDA_ARCH_BIN="${SUPPORTED_NVIDIA_SMS}"
         cmake .. \
-            -DCUDA_ARCH_BIN="${SUPPORTED_NVIDIA_SMS}" \
+            -DWITH_CUDA=OFF \
+            -DPCL_ENABLE_SSE=ON \
             -DBoost_NO_SYSTEM_PATHS=TRUE \
             -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
             -DBUILD_SHARED_LIBS=ON \
