@@ -31,18 +31,29 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-Apollo 5.5 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
+Apollo is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
 
-**[Attention]** The Apollo team is proud to announce that the platform has been migrated to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
+**[New 2020-07-08]** The Apollo platform is now upgraded with software packages and library dependencies of newer versions including:
 
-1. Upgrade host to ubuntu_16.04 and above (Ubuntu 18.04 is preferred)
+1. Host OS Ubuntu 18.04.
+2. Bazel upgraded to version 3.2.0
+3. GCC upgraded to version  7.5 with full support of C++ 14
+4. CUDA upgraded to version 10.2 with NVIDIA driver >= 440.33
+5. Python 2.x retired and upgraded to 3.x
+6. Many library dependencies upgraded with newer versions
+
+In order not to disrupt your usage of the latest version of Apollo, please update your host OS and upgrade NVIDIA driver and CUDA versions required by the above guidance.
+
+**[New 2019-08]** The Apollo team is proud to announce that the platform has been migrated to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
+
+1. Upgrade host to ubuntu 16.04 and above (Ubuntu 18.04 is preferred)
 2. Update local host NVIDIA driver >=410.48. [Website link](https://www.nvidia.com/Download/index.aspx?lang=en-us). Or follow the [guide](https://github.com/ApolloAuto/apollo-kernel/tree/master/linux/Install_nvidia_driver_on_ubuntu_18.04.md) to install Apollo-Kernel and NVIDIA driver, if you want to install Apollo-Kernel.
 3. Install latest Docker-CE (19.03+) by following the [official doc](https://docs.docker.com/install/linux/docker-ce/ubuntu).
 4. Install latest nvidia-container-toolkit by following the [official doc](https://github.com/NVIDIA/nvidia-docker).
 
 For those developers that would like to continue working with Ubuntu 14.04, please use the [Ubuntu 14.04 branch](https://github.com/ApolloAuto/apollo/tree/ubuntu_14.04) instead of the master branch.
 
-**[Attention]** The Apollo team has decided to retire Git LFS, which might impact your development. For details, please refer to:
+**[New 2019-01]** The Apollo team has decided to retire Git LFS, which might impact your development. For details, please refer to:
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
 
 [Want to contribute to our code?](CONTRIBUTING.md) Follow this guide.
