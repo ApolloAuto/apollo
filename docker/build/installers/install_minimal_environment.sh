@@ -74,6 +74,7 @@ apt-get -y update && \
     software-properties-common \
     sudo    \
     unzip   \
+    vim     \
     wget    \
     zip     \
     xz-utils
