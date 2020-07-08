@@ -7,6 +7,8 @@ You could still proceed with the next few steps even if you are missing the Linu
 ./apollo.sh
 # To make sure you start clean
 ./apollo.sh clean
+# To configure bazel settings
+./apollo.sh config
 # This will build the full system and requires that you have an nVidia GPU with nVidia drivers loaded
 bash apollo.sh build
 ```
