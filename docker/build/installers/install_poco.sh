@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2019 The Apollo Authors. All Rights Reserved.
+# Copyright 2020 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,27 +21,62 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Ubuntu 14.04 has poco package version 1.3.6
-# if a higher version is required, the below
-# will install from source
-apt-get -y update && \
-    apt-get -y install poco
+# To reduce image size
+# apt-get -y update && \
+#    apt-get -y install \
+#    libssl-dev
+#    libpoco-dev
+
+. /tmp/installers/installer_base.sh
+
+THREAD_NUM=$(nproc)
 
 # Install from source
-#VERSION=1.9.0
+VERSION=1.10.1
+PKG_NAME="poco-${VERSION}-release.tar.gz"
+CHECKSUM="44592a488d2830c0b4f3bfe4ae41f0c46abbfad49828d938714444e858a00818"
+DOWNLOAD_LINK=https://github.com/pocoproject/poco/archive/poco-${VERSION}-release.tar.gz
 
-#wget https://github.com/pocoproject/poco/archive/poco-${VERSION}-release.tar.gz
-#tar -xf poco-${VERSION}-release.tar.gz
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-# we cant use cmake because poco requires > 3.2
-# and the container is at 2.8
-# but standard ./configure && make works fine
+tar xzf poco-${VERSION}-release.tar.gz
 
-#pushd poco-poco-${VERSION}-release
-  #./configure --omit=Data/ODBC,Data/MySQL && \
-      #    make -s -j`nproc` && \
-      #    make -s -j`nproc` install
-#popd
+pushd poco-poco-${VERSION}-release
+    mkdir cmakebuild && cd cmakebuild
+    # Keep only PocoFoundation
+    cmake .. \
+        -DENABLE_NETSSL=OFF \
+        -DENABLE_CRYPTO=OFF \
+        -DENABLE_JWT=OFF \
+        -DENABLE_APACHECONNECTOR=OFF \
+        -DENABLE_DATA_MYSQL=OFF \
+        -DENABLE_DATA_POSTGRESQL=OFF \
+        -DENABLE_DATA_ODBC=OFF \
+        -DENABLE_MONGODB=OFF \
+        -DENABLE_REDIS=OFF \
+        -DENABLE_DATA_SQLITE=OFF \
+        -DENABLE_DATA=OFF \
+        -DENABLE_PAGECOMPILER=OFF \
+        -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
+        -DENABLE_ZIP=OFF \
+        -DENABLE_NET=OFF \
+        -DENABLE_JSON=OFF \
+        -DENABLE_XML=OFF \
+        -DENABLE_PDF=OFF \
+        -DENABLE_POCODOC=OFF \
+        -DENABLE_ENCODINGS=OFF \
+        -DENABLE_UTIL=OFF \
+        -DENABLE_CPPPARSER=OFF \
+        -DENABLE_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+        -DCMAKE_BUILD_TYPE=Release
+
+    make -j${THREAD_NUM}
+    make install
+popd
+
+ldconfig
 
 # clean up
-#rm -rf poco-${VERSION}-release.tar.gz poco-poco-${VERSION}-release
+rm -rf poco-${VERSION}-release.tar.gz poco-poco-${VERSION}-release

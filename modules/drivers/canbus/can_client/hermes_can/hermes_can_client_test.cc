@@ -36,32 +36,32 @@ TEST(HermesCanClient, init) {
   hermes_can.Stop();
 }
 
-/*
 TEST(HermesCanClient, send) {
   CANCardParameter param;
   param.set_brand(CANCardParameter::HERMES_CAN);
-  param.set_channel_id(CANCardParameter::CHANNEL_ID_ZERO);
-  HermesCanClient hermes_can;
-  EXPECT_TRUE(hermes_can.Init(param));
+  param.set_channel_id(CANCardParameter::CHANNEL_ID_ONE);
+  std::unique_ptr<HermesCanClient> hermes_can =
+      std::unique_ptr<HermesCanClient>(new HermesCanClient());
+  EXPECT_TRUE(hermes_can.get()->Init(param));
 
   // CanFrame can_frame[1];
   std::vector<CanFrame> frames;
   int32_t num = 0;
 
-  CanFrame frame;
-  frame.id = 0x60;
-  frame.len = 8;
-  frame.data[0] = 0;
-  EXPECT_EQ(hermes_can.Send(frames, &num),
+  // CanFrame frame;
+  // frame.id = 0x60;
+  // frame.len = 8;
+  // frame.data[0] = 0;
+  EXPECT_EQ(hermes_can.get()->Send(frames, &num),
             ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED);
 
-  frames.push_back(frame);
-  num = 1;
-  EXPECT_EQ(hermes_can.Start(), ErrorCode::OK);
-  EXPECT_EQ(hermes_can.Send(frames, &num), ErrorCode::OK);
+  // frames.push_back(frame);
+  // num = 1;
+  // EXPECT_EQ(hermes_can.get()->Start(), ErrorCode::OK);
+  // EXPECT_EQ(hermes_can.get()->Send(frames, &num), ErrorCode::OK);
   frames.clear();
 }
-
+/*
 TEST(HermesCanClient, receiver) {
   CANCardParameter param;
   param.set_brand(CANCardParameter::HERMES_CAN);

@@ -30,7 +30,7 @@ TEST(CanClientFactoryTest, CreateCanClient) {
 
   can_factory->RegisterCanClients();
 
-#if USE_ESD_CAN
+#if USE_ESD_CAN == true
   CANCardParameter can_card_parameter;
   can_card_parameter.set_brand(CANCardParameter::ESD_CAN);
   can_card_parameter.set_type(CANCardParameter::PCI_CARD);

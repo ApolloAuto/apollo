@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/tools/visualizer/renderable_object.h"
 

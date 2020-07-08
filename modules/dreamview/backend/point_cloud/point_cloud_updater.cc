@@ -25,7 +25,7 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
 #include "pcl/filters/voxel_grid.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {

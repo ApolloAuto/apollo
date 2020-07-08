@@ -38,7 +38,7 @@ void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr) {
   foreground_objects_.reserve(base_objects.size());
 
   for (const auto& base_obj : base_objects) {
-    SensorObjectPtr obj = std::make_shared<SensorObject>(base_obj, header_);
+    SensorObjectPtr obj(new SensorObject(base_obj, header_));
     if (base_obj->lidar_supplement.is_background) {
       background_objects_.emplace_back(obj);
     } else {

@@ -19,25 +19,74 @@
 # Fail on first error.
 set -e
 
-APOLLO_LIB_PATH=/usr/local/apollo
-# Expected file structure:
-#  ${APOLLO_LIB_PATH}/
-#    - jsoncpp
-#      - lib/*.so
-#    - adv_plat
-#      - include/*.h
-#      - lib/*.a
+MY_MODE="$1" ; shift
+. /tmp/installers/installer_base.sh
 
-mkdir -p ${APOLLO_LIB_PATH}
-cd ${APOLLO_LIB_PATH}
+DEST_DIR="${PKGS_DIR}/adv_plat"
+[[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
 
-# Install jsoncpp.
-wget https://apollocache.blob.core.windows.net/apollo-cache/jsoncpp.zip
-unzip jsoncpp.zip
+if [[ "${MY_MODE}" == "download" ]]; then
+    PKG_NAME="adv_plat-3.0-x86_64.tar.gz"
+    CHECKSUM="1c4a0e205ab2940fc547e5c61b2e181688d4396db2a699f65539add6e10b8150"
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
-# Install adv plat.
-wget https://apollocache.blob.core.windows.net/apollo-cache/adv_plat.zip
-unzip adv_plat.zip
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-# Clean up.
-rm -fr jsoncpp.zip adv_plat.zip
+    tar xzf ${PKG_NAME}
+
+    mv adv_plat/include ${DEST_DIR}/include
+    mv adv_plat/lib     ${DEST_DIR}/lib
+
+    echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    ldconfig
+
+    rm -r ${PKG_NAME} adv_plat
+    exit 0
+fi
+
+#info "Git clone https://github.com/ApolloAuto/apollo-contrib.git"
+#git clone https://github.com/ApolloAuto/apollo-contrib.git
+
+PKG_NAME="apollo-contrib-baidu-1.0.tar.gz"
+CHECKSUM="cd385dae6d23c6fd70c2c0dcd0ce306241f84a638f50988c6ca52952c304bbec"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf ${PKG_NAME}
+
+BAIDU_DIR="apollo-contrib/baidu"
+SRC_DIR="${BAIDU_DIR}/src/lib"
+OUT_DIR="${BAIDU_DIR}/output"
+
+pushd ${SRC_DIR}
+    pushd adv_trigger
+        make -j$(nproc)
+        make install
+        make clean
+    popd
+    pushd bcan
+        make -j$(nproc)
+        make install
+        make clean
+    popd
+popd
+
+LINUX_HEADERS="../src/kernel/include/uapi/linux"
+
+pushd ${OUT_DIR}
+    cp -r ${LINUX_HEADERS} include/
+    rm -rf lib/libadv_*.a
+
+    create_so_symlink lib
+
+    mkdir -p "${DEST_DIR}"
+    mv include ${DEST_DIR}
+    mv lib ${DEST_DIR}
+
+    echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    ldconfig
+popd
+
+rm -rf ${PKG_NAME} apollo-contrib
+

@@ -40,14 +40,14 @@ from keras.utils import np_utils
 from sklearn.model_selection import train_test_split
 import google.protobuf.text_format as text_format
 
-from . import common.log
-from . import proto.fnn_model_pb2
-from .common.data_preprocess import load_h5
-from .common.data_preprocess import down_sample
-from .common.data_preprocess import train_test_split
-from .common.configure import parameters
-from .common.configure import labels
-from .proto.fnn_model_pb2 import FnnModel, Layer
+from modules.tools.prediction.data_pipelines.proto import fnn_model_pb2
+from modules.tools.prediction.data_pipelines.common import log
+from modules.tools.prediction.data_pipelines.common.data_preprocess import load_h5
+from modules.tools.prediction.data_pipelines.common.data_preprocess import down_sample
+from modules.tools.prediction.data_pipelines.common.data_preprocess import train_test_split
+from modules.tools.prediction.data_pipelines.common.configure import parameters
+from modules.tools.prediction.data_pipelines.common.configure import labels
+from fnn_model_pb2 import FnnModel, Layer
 
 
 # Constants
@@ -58,7 +58,7 @@ dim_output = parameters['mlp']['dim_output']
 train_data_rate = parameters['mlp']['train_data_rate']
 
 evaluation_log_path = os.path.join(os.getcwd(), "evaluation_report")
-common.log.init_log(evaluation_log_path, level=logging.DEBUG)
+log.init_log(evaluation_log_path, level=logging.DEBUG)
 
 
 def load_data(filename):
@@ -245,11 +245,11 @@ def save_model(model, param_norm, filename):
         net_layer.layer_input_dim = dim_input
         net_layer.layer_output_dim = dim_output
         if config['activation'] == 'relu':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.RELU
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.RELU
         elif config['activation'] == 'tanh':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.TANH
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.TANH
         elif config['activation'] == 'sigmoid':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.SIGMOID
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.SIGMOID
 
         weights, bias = layer.get_weights()
         net_layer.layer_bias.columns.extend(bias.reshape(-1).tolist())

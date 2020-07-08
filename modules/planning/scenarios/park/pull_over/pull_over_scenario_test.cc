@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -48,8 +47,7 @@ TEST_F(PullOverScenarioTest, Init) {
       FLAGS_scenario_pull_over_config_file, &config));
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
-  scenario_.reset(
-      new PullOverScenario(config, &context, injector));
+  scenario_.reset(new PullOverScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::PULL_OVER);
 }
 

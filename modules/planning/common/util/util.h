@@ -16,10 +16,11 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <string>
 #include <vector>
+
+#include <boost/filesystem.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

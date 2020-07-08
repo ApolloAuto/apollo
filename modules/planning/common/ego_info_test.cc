@@ -21,7 +21,6 @@
 #include "modules/planning/common/ego_info.h"
 
 #include "gtest/gtest.h"
-
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"

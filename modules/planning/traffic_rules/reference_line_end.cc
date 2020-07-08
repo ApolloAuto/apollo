@@ -22,9 +22,8 @@
 
 #include <memory>
 
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,7 +33,7 @@ using apollo::common::Status;
 
 ReferenceLineEnd::ReferenceLineEnd(
     const TrafficRuleConfig& config,
-    const std::shared_ptr<DependencyInjector> &injector)
+    const std::shared_ptr<DependencyInjector>& injector)
     : TrafficRule(config, injector) {}
 
 Status ReferenceLineEnd::ApplyRule(

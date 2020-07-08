@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -20,7 +21,7 @@ cc_library(
     hdrs = ["transit_message_manager.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -34,12 +35,10 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":transit_message_manager",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "//modules/common/kv_db",
+        "//modules/common/proto:vehicle_signal_cc_proto",
         "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
 )

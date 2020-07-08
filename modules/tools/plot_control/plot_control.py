@@ -18,7 +18,7 @@
 
 import sys
 import gflags
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from modules.control.proto import control_cmd_pb2

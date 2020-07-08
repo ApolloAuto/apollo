@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "cyber/cyber.h"
 
 class MainWindow;

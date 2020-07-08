@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-
 #include <fstream>
 #include <iomanip>
+
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
@@ -26,7 +26,11 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/math/quaternion.h"
+
 #include "modules/localization/msf/common/io/velodyne_utility.h"
+
+using ::apollo::common::EigenAffine3dVec;
+using ::apollo::common::EigenVector3dVec;
 
 static bool LoadGnssAntennaExtrinsic(const std::string &file_path,
                                      Eigen::Vector3d *imu_ant_offset) {
@@ -48,8 +52,8 @@ static bool LoadGnssAntennaExtrinsic(const std::string &file_path,
 }
 
 static void PoseAndStdInterpolationByTime(
-    const std::vector<Eigen::Affine3d> &in_poses,
-    const std::vector<Eigen::Vector3d> &in_stds,
+    const EigenAffine3dVec &in_poses,
+    const EigenVector3dVec &in_stds,
     const std::vector<double> &in_timestamps,
     const std::vector<double> &ref_timestamps,
     std::map<unsigned int, Eigen::Affine3d> *out_poses,
@@ -147,8 +151,8 @@ int main(int argc, char **argv) {
     }
   }
 
-  std::vector<Eigen::Affine3d> poses_a;
-  std::vector<Eigen::Vector3d> stds_a;
+  EigenAffine3dVec poses_a;
+  EigenVector3dVec stds_a;
   std::vector<double> timestamps_a;
   apollo::localization::msf::velodyne::LoadPosesAndStds(loc_file_a, &poses_a,
                                                         &stds_a, &timestamps_a);
@@ -156,8 +160,8 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  std::vector<Eigen::Affine3d> poses_b;
-  std::vector<Eigen::Vector3d> stds_b;
+  EigenAffine3dVec poses_b;
+  EigenVector3dVec stds_b;
   std::vector<double> timestamps_b;
   apollo::localization::msf::velodyne::LoadPosesAndStds(loc_file_b, &poses_b,
                                                         &stds_b, &timestamps_b);

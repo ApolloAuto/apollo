@@ -15,8 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <algorithm>
 #include <cfloat>
+
+#include <numeric>
+#include <algorithm>
 #include <vector>
 
 #include "Eigen/Dense"

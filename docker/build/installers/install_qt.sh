@@ -20,15 +20,26 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
+
+TARGET_ARCH="$(uname -m)"
+
+if [[ "${TARGET_ARCH}" != "x86_64" ]]; then
+    error "Qt installer for ${TARGET_ARCH} not ready."
+    exit 0
+fi
 
 apt-get -y update && \
     apt-get -y install \
     libx11-xcb1 \
     libfreetype6 \
     libdbus-1-3 \
-    libfontconfig1
+    libfontconfig1 \
+    libxkbcommon0   \
+    libxkbcommon-x11-0
 
-. /tmp/installers/installer_base.sh
+# Note(storypku)
+# The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
 QT_VERSION_A=5.12
 QT_VERSION_B=5.12.2
@@ -38,7 +49,7 @@ QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
 CHECKSUM="384c833bfbccf596a00bb02bbad14b53201854c287daf2d99c23a93b8de4062a"
 DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
 
-pip3 install cuteci
+pip3_install cuteci
 
 download_if_not_cached $QT_INSTALLER $CHECKSUM $DOWLOAD_LINK
 chmod +x $QT_INSTALLER
@@ -54,6 +65,9 @@ cuteci \
 # Hide qt5 version from end users
 ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 /usr/local/qt5
 
+echo "/usr/local/qt5/lib" > /etc/ld.so.conf.d/qt.conf
+ldconfig
+
 # clean up
 rm -f ${QT_INSTALLER}
 # Keep License files
@@ -61,5 +75,6 @@ rm -rf ${MY_DEST_DIR}/{Docs,Examples,Tools,dist} || true
 rm -rf ${MY_DEST_DIR}/MaintenanceTool* || true
 rm -rf ${MY_DEST_DIR}/{InstallationLog.txt,installer-changelog} || true
 rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
+
 
 pip3 uninstall -y cuteci

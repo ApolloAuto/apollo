@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -24,7 +25,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/common:stage_intersection_cruise_impl",
         "//modules/planning/scenarios/util:scenario_util_lib",
@@ -42,6 +43,7 @@ cc_test(
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -55,6 +57,7 @@ cc_test(
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -68,6 +71,7 @@ cc_test(
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -81,6 +85,7 @@ cc_test(
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

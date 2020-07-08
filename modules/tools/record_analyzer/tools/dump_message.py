@@ -19,7 +19,7 @@
 import argparse
 import sys
 
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.drivers.proto import pointcloud_pb2

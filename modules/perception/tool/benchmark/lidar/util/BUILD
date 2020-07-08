@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -29,8 +30,8 @@ cc_library(
         "//modules/common/util",
         "@com_google_absl//absl/strings",
         "@eigen",
+        "@local_config_vtk//:vtk",
         "@pcl",
-        "@vtk",
     ],
 )
 

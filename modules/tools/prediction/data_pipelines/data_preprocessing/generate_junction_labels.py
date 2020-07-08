@@ -22,10 +22,7 @@ import logging
 import os
 import sys
 
-from online_to_offline import LabelGenerator
-
-
-sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
+from modules.tools.prediction.data_pipelines.common.online_to_offline import LabelGenerator
 
 
 if __name__ == "__main__":

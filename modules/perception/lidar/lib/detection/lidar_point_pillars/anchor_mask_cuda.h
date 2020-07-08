@@ -69,14 +69,10 @@ class AnchorMaskCuda {
    * @param[in] grid_y_size Number of pillars in y-coordinate
    * @details Captital variables never change after the compile
    */
-  AnchorMaskCuda(const int num_threads,
-                 const int num_inds_for_scan,
-                 const int num_anchor,
-                 const float min_x_range,
-                 const float min_y_range,
-                 const float pillar_x_size,
-                 const float pillar_y_size,
-                 const int grid_x_size,
+  AnchorMaskCuda(const int num_threads, const int num_inds_for_scan,
+                 const int num_anchor, const float min_x_range,
+                 const float min_y_range, const float pillar_x_size,
+                 const float pillar_y_size, const int grid_x_size,
                  const int grid_y_size);
 
   /**
@@ -101,8 +97,7 @@ class AnchorMaskCuda {
    * @details dev_* means device memory. Make a mask for filtering pillar
    * occupancy area
    */
-  void DoAnchorMaskCuda(int* dev_sparse_pillar_map,
-                        int* dev_cumsum_along_x,
+  void DoAnchorMaskCuda(int* dev_sparse_pillar_map, int* dev_cumsum_along_x,
                         int* dev_cumsum_along_y,
                         const float* dev_box_anchors_min_x,
                         const float* dev_box_anchors_min_y,

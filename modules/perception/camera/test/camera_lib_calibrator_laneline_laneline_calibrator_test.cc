@@ -198,8 +198,8 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
     CalibratorOptions calibrator_options;
     calibrator_options.lane_objects =
         std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
-    calibrator_options.camera2world_pose =
-        std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
+    calibrator_options.camera2world_pose.reset(
+        new Eigen::Affine3d(frame.camera2world_pose));
     calibrator_options.timestamp = &(frame.timestamp);
     float pitch_angle;
     // blank ego lane
@@ -217,8 +217,8 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
     }
     calibrator_options.lane_objects =
         std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
-    calibrator_options.camera2world_pose =
-        std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
+    calibrator_options.camera2world_pose.reset(
+        new Eigen::Affine3d(frame.camera2world_pose));
     calibrator_options.timestamp = &(frame.timestamp);
     // lack ego right
     EXPECT_FALSE(calibrator.Calibrate(calibrator_options, &pitch_angle));
@@ -240,8 +240,8 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
     // process
     calibrator_options.lane_objects =
         std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
-    calibrator_options.camera2world_pose =
-        std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
+    calibrator_options.camera2world_pose.reset(
+        new Eigen::Affine3d(frame.camera2world_pose));
     calibrator_options.timestamp = &(frame.timestamp);
     update = calibrator.Calibrate(calibrator_options, &pitch_angle);
     if (update) {

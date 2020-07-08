@@ -16,6 +16,7 @@
 
 #include "modules/planning/tuning/speed_model/autotuning_speed_feature_builder.h"
 
+#include <cmath>
 #include <string>
 
 #include "cyber/common/log.h"

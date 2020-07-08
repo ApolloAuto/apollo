@@ -20,11 +20,12 @@
 
 #pragma once
 
-#include <coin/IpIpoptApplication.hpp>
-#include <coin/IpSolveStatistics.hpp>
 #include <vector>
 
 #include "Eigen/Dense"
+
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"

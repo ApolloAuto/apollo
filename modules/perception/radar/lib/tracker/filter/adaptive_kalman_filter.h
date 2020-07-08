@@ -22,6 +22,9 @@ namespace perception {
 namespace radar {
 class AdaptiveKalmanFilter : public BaseFilter {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   AdaptiveKalmanFilter();
   ~AdaptiveKalmanFilter();
   void Init(const base::Object& object) override;

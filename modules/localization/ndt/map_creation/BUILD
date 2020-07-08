@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -5,12 +6,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "ndt_map_creator",
     srcs = ["ndt_map_creator.cc"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
-    linkstatic = 0,
     deps = [
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
@@ -22,6 +17,7 @@ cc_binary(
         "//third_party:boost",
         "@eigen",
         "@pcl",
+        "@opencv",
     ],
 )
 

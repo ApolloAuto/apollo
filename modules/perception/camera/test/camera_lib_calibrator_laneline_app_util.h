@@ -15,12 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <opencv2/opencv.hpp>
-
 #include <algorithm>
 #include <string>
 #include <vector>
+
+#include <boost/filesystem.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/core/i_rand.h"

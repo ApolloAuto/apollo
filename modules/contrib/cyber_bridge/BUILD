@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -5,12 +6,10 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "cyber_bridge",
     srcs = ["bridge.cc"],
-    linkopts = [
-        "-lboost_system",
-    ],
     deps = [
         ":bridge_server",
         "//external:gflags",
+        "@boost",
     ],
 )
 

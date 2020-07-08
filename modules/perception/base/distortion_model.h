@@ -57,6 +57,9 @@ typedef std::shared_ptr<const BaseCameraDistortionModel>
 
 class BrownCameraDistortionModel : public BaseCameraDistortionModel {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   BrownCameraDistortionModel() = default;
   ~BrownCameraDistortionModel() = default;
 

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -82,8 +83,8 @@ cc_library(
         "//modules/common/util",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
-        "//modules/prediction/proto:offline_features_proto",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/proto:offline_features_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
     ],
 )
 
@@ -109,7 +110,7 @@ cc_library(
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_system_gflags",
-        "//modules/prediction/proto:lane_graph_proto",
+        "//modules/prediction/proto:lane_graph_cc_proto",
     ],
 )
 
@@ -140,7 +141,7 @@ cc_library(
     deps = [
         "//modules/common/math",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/proto:lane_graph_proto",
+        "//modules/prediction/proto:lane_graph_cc_proto",
     ],
 )
 
@@ -164,7 +165,7 @@ cc_library(
     hdrs = ["environment_features.h"],
     deps = [
         "//cyber",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
     ],
 )
 
@@ -187,7 +188,7 @@ cc_library(
     ],
     deps = [
         ":prediction_map",
-        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:feature_cc_proto",
     ],
 )
 
@@ -220,7 +221,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
-        "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/proto:offline_features_cc_proto",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/util:data_extraction",
     ],
@@ -263,7 +264,7 @@ cc_library(
         "//modules/common/util",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/pose:pose_container",
-        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:feature_cc_proto",
         "@opencv",
     ],
 )

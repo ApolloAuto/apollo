@@ -603,7 +603,7 @@ int FusionCameraDetectionComponent::InitMotionService() {
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
   if (motion_buffer_ == nullptr) {
-    motion_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+    motion_buffer_.reset(new base::MotionBuffer(motion_buffer_size_));
   } else {
     motion_buffer_->set_capacity(motion_buffer_size_);
   }

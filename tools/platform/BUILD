@@ -14,14 +14,21 @@ config_setting(
 
 config_setting(
     name = "use_gpu",
-    values = {
-        "define": "USE_GPU=true",
+    define_values = {
+        "USE_GPU": "1",
     },
 )
 
 config_setting(
     name = "use_esd_can",
-    values = {
-        "define": "CAN_CARD=esd_can",
+    define_values = {
+        "USE_ESD_CAN": "true",
+    },
+)
+
+config_setting(
+    name = "with_teleop",
+    define_values = {
+        "WITH_TELEOP": "1",
     },
 )

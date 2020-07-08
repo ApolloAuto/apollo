@@ -30,7 +30,7 @@ from absl import flags
 from absl import logging
 import cv2
 
-from cyber_py3.record import RecordReader, RecordWriter
+from cyber.python.cyber_py3.record import RecordReader, RecordWriter
 from modules.drivers.proto.sensor_image_pb2 import CompressedImage
 
 

@@ -1,6 +1,5 @@
 # Bazel
 bazel-*
-WORKSPACE
 
 # Temporary files
 *.pyc
@@ -43,7 +42,6 @@ modules/tools/ota/vehicle_info.pb.txt
 modules/localization/msf/local_map/test_data/ndt_map/map_data/
 
 # Doxygen
-docs/doxygen
 cyber/doxy-docs/build/
 cyber/doxy-docs/xml/
 
@@ -58,7 +56,6 @@ modules/map/data
 docker/build/archive/
 
 # python proto
-py_proto
 *_pb2.py
 
 # calibration files
@@ -73,3 +70,6 @@ docs/demo_guide/*.record
 
 # bazel cache and others
 .cache/
+tools/python_bin_path.sh
+.apollo.bazelrc
+.errors.log

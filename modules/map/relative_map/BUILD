@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -22,9 +23,9 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util",
         "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/map/relative_map/proto:relative_map_config_proto",
-        "//modules/perception/proto:perception_proto",
+        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/map/relative_map/proto:relative_map_config_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
     ],
 )
 
@@ -35,13 +36,13 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
-        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/localization/proto:localization_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
         "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/map/relative_map/proto:relative_map_config_proto",
-        "//modules/perception/proto:perception_proto",
+        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/map/relative_map/proto:relative_map_config_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
     ],
 )
 
@@ -83,7 +84,7 @@ cc_test(
     ],
     deps = [
         ":relative_map_component_lib",
-        "//third_party/json",
+        "@com_github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 
+#include <numeric>
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/object.h"

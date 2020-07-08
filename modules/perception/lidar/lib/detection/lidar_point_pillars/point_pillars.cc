@@ -75,9 +75,14 @@ const int PointPillars::kNumThreads = Params::kNumThreads;
 const int PointPillars::kNumBoxCorners = Params::kNumBoxCorners;
 const std::vector<int> PointPillars::kAnchorStrides = Params::AnchorStrides();
 const std::vector<int> PointPillars::kAnchorRanges{
-    0, kGridXSize, 0, kGridYSize,
-    static_cast<int>(kGridXSize * 0.1), static_cast<int>(kGridXSize * 0.9),
-    static_cast<int>(kGridYSize * 0.1), static_cast<int>(kGridYSize * 0.9)};
+    0,
+    kGridXSize,
+    0,
+    kGridYSize,
+    static_cast<int>(kGridXSize * 0.1),
+    static_cast<int>(kGridXSize * 0.9),
+    static_cast<int>(kGridYSize * 0.1),
+    static_cast<int>(kGridYSize * 0.9)};
 const std::vector<int> PointPillars::kNumAnchorSets = Params::NumAnchorSets();
 const std::vector<std::vector<float>> PointPillars::kAnchorDxSizes =
     Params::AnchorDxSizes();

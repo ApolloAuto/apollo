@@ -28,7 +28,7 @@ import cv2
 import pypcd
 import numpy as np
 
-from data_file_object import TimestampFileObject, OdometryFileObject
+from modules.tools.sensor_calibration.data_file_object import TimestampFileObject, OdometryFileObject
 from modules.drivers.proto import conti_radar_pb2
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2

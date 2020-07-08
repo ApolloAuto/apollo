@@ -25,7 +25,7 @@ import sys
 
 import numpy
 
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 
 

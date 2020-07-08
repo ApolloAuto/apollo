@@ -15,13 +15,13 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
-#include <boost/algorithm/string.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include <limits>
 #include <map>
 #include <utility>
+
+#include <boost/algorithm/string.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
@@ -416,8 +416,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
 
   SyncV2XTrafficLights(&frame_);
 
-  std::shared_ptr<apollo::perception::TrafficLightDetection> out_msg =
-      std::make_shared<apollo::perception::TrafficLightDetection>();
+  std::shared_ptr<TrafficLightDetection> out_msg(new TrafficLightDetection);
   if (!TransformOutputMessage(&frame_, camera_name, &out_msg)) {
     AERROR << "transform_output_message failed, msg_time: "
            << GLOG_TIMESTAMP(msg->measurement_time());
@@ -1112,7 +1111,7 @@ void TrafficLightsPerceptionComponent::SyncV2XTrafficLights(
 }
 
 void TrafficLightsPerceptionComponent::SendSimulationMsg() {
-  auto out_msg = std::make_shared<TrafficLightDetection>();
+  TrafficLightDetection out_msg;
   writer_->Write(out_msg);
 }
 

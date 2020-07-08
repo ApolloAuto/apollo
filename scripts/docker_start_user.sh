@@ -14,28 +14,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 ###############################################################################
-
-##===========================================================##
-
-# TODO(storypku):
-# Save these rc files to /opt/apollo/rcfiles in docker build stage.
-# and copied to user's `$HOME` directory with docker_start_user.sh
-# Ref: https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
-IFS='' read -r -d '' BASHRC_TEXT << EOF
-export PATH="\$PATH:/apollo/scripts:/usr/local/miniconda/bin"
-if [ -e "/apollo/scripts/apollo_base.sh" ]; then
-  source /apollo/scripts/apollo_base.sh
-fi
-ulimit -c unlimited
-EOF
-
-IFS='' read -r -d '' LCOVRC_TEXT << EOF
-genhtml_branch_coverage = 1
-lcov_branch_coverage = 1
-EOF
-
-##===========================================================##
 
 function _create_user_account() {
     local user_name="$1"
@@ -48,25 +28,37 @@ function _create_user_account() {
             "${user_name}" --uid "${uid}" --gid "${gid}" # 2>/dev/null
 
     usermod -aG sudo "${user_name}"
-    return 0
 }
 
 function setup_user_bashrc() {
     local uid="$1"
     local gid="$2"
     local user_home="/home/$3"
-    cp -rf /etc/skel/.{profile,bash*} "${user_home}"
+    # cp -rf /etc/skel/.{profile,bash*} "${user_home}"
+    local RCFILES_DIR="/opt/apollo/rcfiles"
+    local rc
+    if [[ -d "${RCFILES_DIR}" ]]; then
+        for entry in ${RCFILES_DIR}/*; do
+            rc=$(basename "${entry}")
+            if [[ "${rc}" = user.* ]]; then
+                cp -rf "${entry}" "${user_home}/${rc##user}"
+            fi
+        done
+    fi
     # Set user files ownership to current user, such as .bashrc, .profile, etc.
-    echo "${BASHRC_TEXT}" >> "${user_home}/.bashrc"
-    echo "${LCOVRC_TEXT}" > "${user_home}/.lcovrc"
-    chown -R "${uid}:${gid}" "${user_home}"
+    # chown -R "${uid}:${gid}" "${user_home}"
+    chown -R "${uid}:${gid}" ${user_home}/.*
 }
 
-function setup_user_account() {
+function setup_user_account_if_not_exist() {
     local user_name="$1"
     local uid="$2"
     local group_name="$3"
     local gid="$4"
+    if grep -q "${user_name}" /etc/passwd; then
+        echo "User ${user_name} already exist. Skip setting user account."
+        return
+    fi
     _create_user_account "$@"
     setup_user_bashrc "${uid}" "${gid}" "${user_name}"
 }
@@ -84,6 +76,12 @@ function grant_device_permissions() {
     [ -e /dev/camera/trafficlights ] && chmod a+rw /dev/camera/trafficlights
 }
 
+function setup_apollo_directories() {
+    local apollo_dir="/opt/apollo"
+    [[ -d "${apollo_dir}" ]] || mkdir -p "${apollo_dir}"
+    # chown -R "${uid}:${gid}" "${apollo_dir}"
+}
+
 ##===================== Main ==============================##
 function main() {
     local user_name="$1"
@@ -97,9 +95,9 @@ function main() {
     if [ "${user_name}" != "${group_name}" ]; then
         echo "Warning: user_name(${user_name}) != group_name(${group_name}) found."
     fi
-    setup_user_account "$@"
+    setup_user_account_if_not_exist "$@"
+    setup_apollo_directories "${uid}" "${gid}"
     grant_device_permissions
 }
 
 main "${DOCKER_USER}" "${DOCKER_USER_ID}" "${DOCKER_GRP}" "${DOCKER_GRP_ID}"
-

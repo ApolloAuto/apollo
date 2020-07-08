@@ -69,21 +69,14 @@ license and copyright terms herein.
 namespace apollo {
 namespace perception {
 namespace inference {
-template<typename Dtype>
-__global__ void ROIPoolForward(const int nthreads,
-                               const Dtype *bottom_data,
-                               const bool use_floor,
-                               const Dtype spatial_scale,
-                               const int channels,
-                               const int height,
-                               const int width,
-                               const int pooled_height,
-                               const int pooled_width,
-                               const Dtype *bottom_rois,
-                               Dtype *top_data,
-                               int *argmax_data) {
-  for (int index = blockIdx.x * blockDim.x + threadIdx.x;
-       index < (nthreads);
+template <typename Dtype>
+__global__ void ROIPoolForward(const int nthreads, const Dtype *bottom_data,
+                               const bool use_floor, const Dtype spatial_scale,
+                               const int channels, const int height,
+                               const int width, const int pooled_height,
+                               const int pooled_width, const Dtype *bottom_rois,
+                               Dtype *top_data, int *argmax_data) {
+  for (int index = blockIdx.x * blockDim.x + threadIdx.x; index < (nthreads);
        index += blockDim.x * gridDim.x) {
     // (n, c, ph, pw) is an element in the pooled output
     int pw = index % pooled_width;
@@ -113,19 +106,15 @@ __global__ void ROIPoolForward(const int nthreads,
     // Force malformed ROIs to be 1x1
     int roi_width = max(roi_end_w - roi_start_w + 1, 1);
     int roi_height = max(roi_end_h - roi_start_h + 1, 1);
-    Dtype bin_size_h = static_cast<Dtype>(roi_height)
-        / static_cast<Dtype>(pooled_height);
-    Dtype bin_size_w = static_cast<Dtype>(roi_width)
-        / static_cast<Dtype>(pooled_width);
+    Dtype bin_size_h =
+        static_cast<Dtype>(roi_height) / static_cast<Dtype>(pooled_height);
+    Dtype bin_size_w =
+        static_cast<Dtype>(roi_width) / static_cast<Dtype>(pooled_width);
 
-    int hstart = static_cast<int>(floor(static_cast<Dtype>(ph)
-                                            * bin_size_h));
-    int wstart = static_cast<int>(floor(static_cast<Dtype>(pw)
-                                            * bin_size_w));
-    int hend = static_cast<int>(ceil(static_cast<Dtype>(ph + 1)
-                                         * bin_size_h));
-    int wend = static_cast<int>(ceil(static_cast<Dtype>(pw + 1)
-                                         * bin_size_w));
+    int hstart = static_cast<int>(floor(static_cast<Dtype>(ph) * bin_size_h));
+    int wstart = static_cast<int>(floor(static_cast<Dtype>(pw) * bin_size_w));
+    int hend = static_cast<int>(ceil(static_cast<Dtype>(ph + 1) * bin_size_h));
+    int wend = static_cast<int>(ceil(static_cast<Dtype>(pw + 1) * bin_size_w));
 
     // Add roi offsets and clip to input boundaries
     hstart = min(max(hstart + roi_start_h, 0), height);
@@ -152,11 +141,10 @@ __global__ void ROIPoolForward(const int nthreads,
     argmax_data[index] = maxidx;
   }
 }
-template<typename Dtype>
-void ROIPoolingLayer<Dtype>::ForwardGPU(const std::vector<std::shared_ptr<
-                                            base::Blob<Dtype>>> &bottom,
-                                        const std::vector<std::shared_ptr<
-                                            base::Blob<Dtype>>> &top) {
+template <typename Dtype>
+void ROIPoolingLayer<Dtype>::ForwardGPU(
+    const std::vector<std::shared_ptr<base::Blob<Dtype>>> &bottom,
+    const std::vector<std::shared_ptr<base::Blob<Dtype>>> &top) {
   auto feat_b = bottom[0];
   auto roi_b = bottom[1];
   channels_ = feat_b->channels();
@@ -173,17 +161,17 @@ void ROIPoolingLayer<Dtype>::ForwardGPU(const std::vector<std::shared_ptr<
   int count = top[0]->count();
   const int thread_size = 512;
   int block_size = (count + thread_size - 1) / thread_size;
-  ROIPoolForward<Dtype> << < block_size, thread_size >> > (
+  ROIPoolForward<Dtype><<<block_size, thread_size>>>(
       count, bottom_data, use_floor_, spatial_scale_, channels_, height_,
-          width_,
-          pooled_height_, pooled_width_, bottom_rois, top_data, argmax_data);
+      width_, pooled_height_, pooled_width_, bottom_rois, top_data,
+      argmax_data);
 }
-template void ROIPoolingLayer<double>::ForwardGPU( \
-      const std::vector<std::shared_ptr<base::Blob<double>>> & bottom, \
-      const std::vector<std::shared_ptr<base::Blob<double>>> & top);
-template void ROIPoolingLayer<float>::ForwardGPU( \
-      const std::vector<std::shared_ptr<base::Blob<float>>> & bottom, \
-      const std::vector<std::shared_ptr<base::Blob<float>>> & top);
+template void ROIPoolingLayer<double>::ForwardGPU(
+    const std::vector<std::shared_ptr<base::Blob<double>>> &bottom,
+    const std::vector<std::shared_ptr<base::Blob<double>>> &top);
+template void ROIPoolingLayer<float>::ForwardGPU(
+    const std::vector<std::shared_ptr<base::Blob<float>>> &bottom,
+    const std::vector<std::shared_ptr<base::Blob<float>>> &top);
 
 }  // namespace inference
 }  // namespace perception

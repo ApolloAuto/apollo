@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -38,7 +39,7 @@ filegroup(
 cc_test(
     name = "ndt_lidar_locator_test",
     size = "small",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["lidar_locator_ndt_test.cc"],
     data = [":ndt_lidar_locator_test_data"],
     deps = [
@@ -46,6 +47,8 @@ cc_test(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
+        "@lz4",
+        "@opencv",
     ],
 )
 
@@ -55,14 +58,13 @@ cc_test(
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
     data = [":ndt_lidar_locator_test_data"],
-    linkopts = [
-        "-llz4",
-    ],
     deps = [
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
+        "@lz4"
     ],
 )
 

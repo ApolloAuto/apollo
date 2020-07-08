@@ -15,14 +15,15 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/laps_checker.h"
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <limits>
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 
 namespace apollo {
 namespace hdmap {

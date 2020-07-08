@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -24,11 +25,12 @@ cc_library(
         "//modules/planning/common:planning_common",
         "//modules/planning/common/util:common_lib",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/util:scenario_util_lib",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -42,6 +44,7 @@ cc_test(
     deps = [
         ":pull_over_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -55,6 +58,7 @@ cc_test(
     deps = [
         ":pull_over_scenario",
         "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 

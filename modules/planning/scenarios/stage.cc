@@ -99,8 +99,8 @@ bool Stage::ExecuteTaskOnReferenceLine(
 
       const double end_timestamp = Clock::NowInSeconds();
       const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-      ADEBUG << "after task[" << task->Name() << "]: "
-             << reference_line_info.PathSpeedDebugString();
+      ADEBUG << "after task[" << task->Name()
+             << "]: " << reference_line_info.PathSpeedDebugString();
       ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
       RecordDebugInfo(&reference_line_info, task->Name(), time_diff_ms);
 
@@ -151,8 +151,8 @@ bool Stage::ExecuteTaskOnReferenceLineForOnlineLearning(
 
     const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-    ADEBUG << "task[" << task->Name()
-           << "] time spent: " << time_diff_ms << " ms.";
+    ADEBUG << "task[" << task->Name() << "] time spent: " << time_diff_ms
+           << " ms.";
     RecordDebugInfo(&picked_reference_line_info, task->Name(), time_diff_ms);
 
     if (!ret.ok()) {
@@ -166,7 +166,7 @@ bool Stage::ExecuteTaskOnReferenceLineForOnlineLearning(
       picked_reference_line_info.trajectory();
   DiscretizedTrajectory trajectory;
   if (picked_reference_line_info.AdjustTrajectoryWhichStartsFromCurrentPos(
-      planning_start_point, adc_future_trajectory_points, &trajectory)) {
+          planning_start_point, adc_future_trajectory_points, &trajectory)) {
     picked_reference_line_info.SetTrajectory(trajectory);
     picked_reference_line_info.SetDrivable(true);
     picked_reference_line_info.SetCost(0);

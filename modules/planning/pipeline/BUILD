@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,9 +14,9 @@ cc_library(
         ":evaluator_logger",
         "//cyber",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/util:util_lib",
         "//modules/planning/common:trajectory_evaluator",
-        "//modules/planning/proto:learning_data_proto",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:learning_data_cc_proto",
     ],
 )
 
@@ -49,9 +50,9 @@ cc_binary(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/common:feature_output",
         "//modules/planning/common:message_process",
+        "//modules/planning/common:planning_gflags",
     ],
 )
 

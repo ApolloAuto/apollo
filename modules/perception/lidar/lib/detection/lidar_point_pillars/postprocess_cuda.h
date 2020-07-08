@@ -117,10 +117,9 @@ class PostprocessCuda {
       const float* dev_anchors_pz, const float* dev_anchors_dx,
       const float* dev_anchors_dy, const float* dev_anchors_dz,
       const float* dev_anchors_ro, float* dev_filtered_box,
-      float* dev_filtered_score, int* dev_filtered_label,
-      int* dev_filtered_dir, float* dev_box_for_nms,
-      int* dev_filter_count, std::vector<float>* out_detection,
-      std::vector<int>* out_label);
+      float* dev_filtered_score, int* dev_filtered_label, int* dev_filtered_dir,
+      float* dev_box_for_nms, int* dev_filter_count,
+      std::vector<float>* out_detection, std::vector<int>* out_label);
 };
 
 }  // namespace lidar

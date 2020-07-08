@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -48,8 +47,7 @@ TEST_F(LaneFollowScenarioTest, Init) {
       FLAGS_scenario_lane_follow_config_file, &config));
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
-  scenario_.reset(
-      new LaneFollowScenario(config, &context, injector));
+  scenario_.reset(new LaneFollowScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 }
 

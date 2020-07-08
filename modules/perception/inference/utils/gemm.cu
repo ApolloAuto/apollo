@@ -112,8 +112,8 @@ void GPUGemmFloat(const CBLAS_TRANSPOSE TransA, const CBLAS_TRANSPOSE TransB,
   cublasOperation_t cuTransB =
       (TransB == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
   ACHECK(cublasSgemm(CudaUtil::get_handler(), cuTransB, cuTransA, N, M, K,
-                    &alpha, B, ldb, A, lda, &beta, C,
-                    N) == CUBLAS_STATUS_SUCCESS);
+                     &alpha, B, ldb, A, lda, &beta, C,
+                     N) == CUBLAS_STATUS_SUCCESS);
 }
 
 }  // namespace inference

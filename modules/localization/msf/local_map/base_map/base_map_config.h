@@ -16,9 +16,10 @@
 
 #pragma once
 
-#include <boost/property_tree/xml_parser.hpp>
 #include <string>
 #include <vector>
+
+#include <boost/property_tree/xml_parser.hpp>
 
 #include "modules/localization/msf/common/util/rect2d.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"

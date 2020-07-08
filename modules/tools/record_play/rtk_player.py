@@ -30,9 +30,9 @@ import time
 from numpy import genfromtxt
 import scipy.signal as signal
 
-from cyber_py3 import cyber
-from cyber_py3 import cyber_time
-from common.logger import Logger
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber_time
+from modules.tools.common.logger import Logger
 from modules.canbus.proto import chassis_pb2
 from modules.common.configs.proto import vehicle_config_pb2
 from modules.common.proto import drive_state_pb2
@@ -40,7 +40,7 @@ from modules.common.proto import pnc_point_pb2
 from modules.control.proto import pad_msg_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 
 
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')

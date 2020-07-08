@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -14,12 +15,12 @@ cc_library(
         "//modules/bridge/common:bridge_proto_serialized_buf",
         "//modules/bridge/common:macro",
         "//modules/bridge/common:util",
-        "//modules/bridge/proto:udp_bridge_remote_info_proto",
+        "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

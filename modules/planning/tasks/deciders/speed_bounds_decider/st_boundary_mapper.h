@@ -25,8 +25,6 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/obstacle.h"
@@ -34,6 +32,7 @@
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed_limit.h"
+#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {

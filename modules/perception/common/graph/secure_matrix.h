@@ -25,6 +25,9 @@ namespace common {
 template <typename T>
 class SecureMat {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   SecureMat() : height_(0), width_(0) { Reserve(max_height_, max_width_); }
 
   size_t height() { return height_; }

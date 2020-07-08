@@ -89,7 +89,7 @@ bool RadarObstaclePerception::Perceive(
          << detect_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
 
-  base::FramePtr tracker_frame_ptr = std::make_shared<base::Frame>();
+  base::FramePtr tracker_frame_ptr(new base::Frame);
   if (!tracker_->Track(*detect_frame_ptr, options.track_options,
                        tracker_frame_ptr)) {
     AERROR << "radar track error";

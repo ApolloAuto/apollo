@@ -304,8 +304,7 @@ class PointPillars {
    *   Represents maximum y value for a corresponding anchor
    * @details Make box anchors for nms
    */
-  void ConvertAnchors2BoxAnchors(float* anchors_px_,
-                                 float* anchors_py_,
+  void ConvertAnchors2BoxAnchors(float* anchors_px_, float* anchors_py_,
                                  float* box_anchors_min_x_,
                                  float* box_anchors_min_y_,
                                  float* box_anchors_max_x_,
@@ -328,8 +327,7 @@ class PointPillars {
    * @param[in] rpn_onnx_file Region Proposal Network ONNX file path
    * @details Variables could be changed through point_pillars_detection
    */
-  PointPillars(const bool reproduce_result_mode,
-               const float score_threshold,
+  PointPillars(const bool reproduce_result_mode, const float score_threshold,
                const float nms_overlap_threshold,
                const std::string pfe_onnx_file,
                const std::string rpn_onnx_file);
@@ -343,8 +341,7 @@ class PointPillars {
    * @param[out] out_labels Network output object's label
    * @details This is an interface for the algorithm
    */
-  void DoInference(const float* in_points_array,
-                   const int in_num_points,
+  void DoInference(const float* in_points_array, const int in_num_points,
                    std::vector<float>* out_detections,
                    std::vector<int>* out_labels);
 };

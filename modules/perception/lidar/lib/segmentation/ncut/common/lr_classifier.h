@@ -35,6 +35,9 @@ namespace lidar {
 
 class LRClassifier {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   LRClassifier() = default;
   ~LRClassifier() {}
   bool init() {

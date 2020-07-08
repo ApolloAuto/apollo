@@ -26,7 +26,6 @@ node_path="${CYBER_PATH}/tools/cyber_node"
 service_path="${CYBER_PATH}/tools/cyber_service"
 rosbag_to_record_path="${bazel_bin_path}/modules/data/tools/rosbag_to_record"
 
-
 # TODO(all): place all these in one place and add_to_path
 for entry in "${cyber_bin_path}" "${recorder_path}" "${monitor_path}" "${launch_path}" \
     "${channel_path}" "${node_path}" "${service_path}" \

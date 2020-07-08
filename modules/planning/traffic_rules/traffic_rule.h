@@ -22,11 +22,10 @@
 
 #include <memory>
 
-#include "modules/planning/proto/traffic_rule_config.pb.h"
-
 #include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/proto/traffic_rule_config.pb.h"
 
 namespace apollo {
 namespace planning {

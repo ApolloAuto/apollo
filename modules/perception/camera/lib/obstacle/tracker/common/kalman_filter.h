@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 #include "Eigen/Core"
@@ -24,6 +25,9 @@ namespace perception {
 namespace camera {
 
 class KalmanFilterConstVelocity {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   KalmanFilterConstVelocity();
 
@@ -205,9 +209,11 @@ void KalmanFilterConstState<N>::Correct(const VectorNd &measurement) {
 
     // compute likelihood
     residual_ = measurement - predict_state_;
-    likelihood_ = std::exp(-0.5 * residual_.transpose() *
-                           measurements_cov.inverse() * residual_) /
-                  std::sqrt(2 * M_PI * measurements_cov.determinant());
+    // Ref: https://eigen.tuxfamily.org/bz/show_bug.cgi?id=1610
+    double kval = -0.5 * residual_.transpose().adjoint().dot(
+                             measurements_cov.inverse() * residual_);
+    likelihood_ =
+        std::exp(kval) / std::sqrt(2 * M_PI * measurements_cov.determinant());
   }
 }
 // [END] KalmanFilterConstState

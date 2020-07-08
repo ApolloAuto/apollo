@@ -20,26 +20,40 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-pip3 install --no-cache-dir PyYAML typing
+. /tmp/installers/installer_base.sh
 
-git clone --recursive --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/pytorch.git
+PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0.zip"
+DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
+CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
 
-pushd pytorch
-  export USE_CUDA=0
-  python3 setup.py install
-  mkdir -p /usr/local/apollo/libtorch
-  cp -r build/lib.linux-x86_64-3.6/torch/lib /usr/local/apollo/libtorch/
-  cp -r build/lib.linux-x86_64-3.6/torch/include /usr/local/apollo/libtorch/
+#https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+unzip ${PKG_NAME}
 
-  python3 setup.py clean
-
-  export USE_CUDA=1
-  export TORCH_CUDA_ARCH_LIST="3.5;5.0;5.2;6.1;7.0;7.5"
-
-  python3 setup.py install
-  mkdir -p /usr/local/apollo/libtorch_gpu
-  cp -r build/lib.linux-x86_64-3.6/torch/lib /usr/local/apollo/libtorch_gpu/
-  cp -r build/lib.linux-x86_64-3.6/torch/include /usr/local/apollo/libtorch_gpu/
-
+pushd libtorch
+    mkdir -p /usr/local/libtorch_gpu/
+    mv include /usr/local/libtorch_gpu/include
+    mv lib     /usr/local/libtorch_gpu/lib
+    mv share   /usr/local/libtorch_gpu/share
 popd
-rm -fr pytorch
+
+# Cleanup
+rm -rf libtorch ${PKG_NAME}
+rm -f /usr/local/libtorch_gpu/lib/libcudart-80664282.so.10.2
+ln -s /usr/local/cuda/lib64/libcudart.so.10.2 /usr/local/libtorch_gpu/lib/libcudart-80664282.so.10.2
+
+PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0+cpu.zip"
+DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip"
+CHECKSUM="3e438237a08099a4bf014335cd0da88708da3a1678aec12a46c67305792b5fa4"
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+unzip ${PKG_NAME}
+pushd libtorch
+    mkdir -p /usr/local/libtorch_cpu/
+    mv include /usr/local/libtorch_cpu/include
+    mv lib     /usr/local/libtorch_cpu/lib
+    mv share   /usr/local/libtorch_cpu/share
+popd
+
+# Cleanup
+rm -rf libtorch ${PKG_NAME}

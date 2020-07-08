@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -19,11 +20,6 @@ cc_library(
         "aligned_matrix.h",
         "pyramid_map_matrix.h",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         ":localization_pyramid_map_pyramid_map_config",
         "//modules/localization/msf/common/util:localization_msf_common_util",
@@ -31,6 +27,7 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_matrix",
         "@com_google_glog//:glog",
         "@eigen",
+        "@opencv",
     ],
 )
 
@@ -78,11 +75,6 @@ cc_library(
     name = "localization_pyramid_map_pyramid_map_pool",
     srcs = ["pyramid_map_pool.cc"],
     hdrs = ["pyramid_map_pool.h"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix",
         ":localization_pyramid_map_pyramid_map_matrix_handler",
@@ -93,6 +85,7 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_pool",
         "@com_google_glog//:glog",
         "@eigen",
+        "@opencv",
     ],
 )
 
@@ -129,6 +122,7 @@ cc_test(
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix_handler",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 
@@ -137,7 +131,7 @@ cc_test(
     size = "medium",
     timeout = "short",
     srcs = ["pyramid_map_matrix_test.cc"],
-    copts = ["-Dprivate=public"],
+    copts = ["-fno-access-control"],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix",
         "@com_google_googletest//:gtest_main",
@@ -152,6 +146,7 @@ cc_test(
     deps = [
         ":localization_pyramid_map_pyramid_map_node",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 
@@ -165,18 +160,20 @@ cc_test(
         ":localization_pyramid_map_pyramid_map_pool",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 
 cc_test(
     name = "pyramid_map_test",
     size = "medium",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["pyramid_map_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map",
         ":localization_pyramid_map_pyramid_map_pool",
         "@com_google_googletest//:gtest_main",
+        "@opencv",
     ],
 )
 

@@ -15,14 +15,15 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <vector>
+
+#include <boost/circular_buffer.hpp>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/kalman_filter.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/track_object.h"
 
 namespace apollo {

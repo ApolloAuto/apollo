@@ -1,0 +1,63 @@
+#! /usr/bin/env bash
+
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
+
+# STAGE="${STAGE:-dev}"
+: ${STAGE:=dev}
+
+IFS='' read -r -d '' STARTUP_TXT << EOF
+startup --output_user_root="${APOLLO_CACHE_DIR}/bazel"
+common --distdir="${APOLLO_CACHE_DIR}/distdir"
+EOF
+
+set -e
+
+function config_noninteractive() {
+    local bzl_cfg_file="${APOLLO_ROOT_DIR}/.apollo.bazelrc"
+    echo "${STARTUP_TXT}" > "${bzl_cfg_file}"
+    # determine_gpu_use
+    # FIXME(all): Disable gpu mode for aarch64 until we are ready.
+    if [ "$(uname -m)" = "aarch64" ]; then
+        echo "build --config=cpu" >> "${bzl_cfg_file}"
+    else
+        if [ "${USE_GPU}" -eq 1 ]; then
+            echo "build --config=gpu" >> "${bzl_cfg_file}"
+        else
+            echo "build --config=cpu" >> "${bzl_cfg_file}"
+        fi
+    fi
+
+    cat "${APOLLO_ROOT_DIR}/tools/apollo.bazelrc.sample" >> "${bzl_cfg_file}"
+}
+
+function config_interactive() {
+    if [ -z "$PYTHON_BIN_PATH" ]; then
+        PYTHON_BIN_PATH=$(which python3 || true)
+    fi
+    local bzl_cfg_file="${APOLLO_ROOT_DIR}/.apollo.bazelrc"
+
+    # Set all env variables
+    "$PYTHON_BIN_PATH" "${TOP_DIR}/tools/bootstrap.py" "$@"
+    echo "${STARTUP_TXT}" >> "${bzl_cfg_file}"
+}
+
+function config() {
+    local stage="${STAGE}"
+    if [ $# -eq 0 ]; then
+        config_noninteractive
+    else
+        local mode="$1" ; shift
+        if [[ "${mode}" == "--interactive" || "${mode}" == "-i" ]]; then
+            config_interactive "$@"
+        else
+            config_noninteractive
+        fi
+    fi
+}
+
+function main() {
+    config "$@"
+}
+
+main "$@"
