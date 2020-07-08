@@ -30,7 +30,7 @@ PKG_NAME_OSQP="osqp-${OSQP_VER}.tar.gz"
 
 CHECKSUM="e0932d1f7bc56dbe526bee4a81331c1694d94c570f8ac6a6cb413f38904e0f64"
 
-DOWNLOAD_LINK="https://github.com/oxfordcontrol/osqp/archive/v${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://github.com/oxfordcontrol/osqp/archive/v${OSQP_VER}.tar.gz"
 download_if_not_cached "${PKG_NAME_OSQP}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xzf "${PKG_NAME_OSQP}"
