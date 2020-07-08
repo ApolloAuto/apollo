@@ -190,8 +190,10 @@ bool CreepDecider::CheckCreepDone(const Frame& frame,
       creep_clear_counter = 0;  // reset
       creep_done = true;
     }
+    // use PlanningContext instead of static counter for multi-ADC
     creep_decider_status->set_creep_clear_counter(creep_clear_counter);
   }
+
   return creep_done;
 }
 

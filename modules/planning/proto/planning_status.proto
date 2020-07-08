@@ -15,6 +15,7 @@ import "modules/routing/proto/routing.proto";
 message BareIntersectionStatus {
   optional string current_pnc_junction_overlap_id = 1;
   optional string done_pnc_junction_overlap_id = 2;
+  optional uint32 clear_counter = 3;
 }
 
 message ChangeLaneStatus {

@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/stage.h"
@@ -47,12 +48,13 @@ class BareIntersectionUnprotectedStageApproach : public Stage {
     return GetContextAs<BareIntersectionUnprotectedContext>();
   }
 
- private:
+  bool CheckClear(const ReferenceLineInfo& reference_line_info,
+                  std::vector<std::string>* wait_for_obstacle_ids);
+
   Stage::StageStatus FinishStage(Frame* frame);
 
  private:
   ScenarioBareIntersectionUnprotectedConfig scenario_config_;
-  static uint32_t clear_counter_;
 };
 
 }  // namespace bare_intersection
