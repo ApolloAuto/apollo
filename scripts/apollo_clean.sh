@@ -32,6 +32,10 @@ function clean() {
             bazel clean --async
         popd >/dev/null
     fi
+
+    # Remove local bazel config.
+    bash "${TOP_DIR}/scripts/apollo_config.sh" --clean
+
     success "Done $0 ${stage}."
 }
 
