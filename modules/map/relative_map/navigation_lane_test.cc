@@ -28,7 +28,7 @@
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 namespace apollo {
 namespace relative_map {

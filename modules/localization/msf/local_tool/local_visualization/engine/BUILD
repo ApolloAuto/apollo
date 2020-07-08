@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -19,10 +20,10 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
+        "//modules/common/util:eigen_defs",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "//third_party:boost",
-        "@eigen",
+        "@boost",
     ],
 )
 

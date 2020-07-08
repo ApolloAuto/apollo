@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-#include <vector>
 
 #include "cyber/common/file.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
@@ -102,6 +103,9 @@ void VarianceOnline(double* mean, double* var, unsigned int* N, double x) {
   (*var) = (((*N) - 1) * (*var) + v1 * v2) / (*N);
 }
 
+using ::apollo::common::EigenAffine3dVec;
+using ::apollo::common::EigenVector3dVec;
+
 int main(int argc, char** argv) {
   FeatureXYPlane plane_extractor;
 
@@ -164,7 +168,7 @@ int main(int argc, char** argv) {
   for (size_t i = 0; i < num_trials; ++i) {
     AINFO << pcd_folder_paths[i];
   }
-  std::vector<std::vector<Eigen::Affine3d>> ieout_poses(num_trials);
+  std::vector<EigenAffine3dVec> ieout_poses(num_trials);
   std::vector<std::vector<double>> time_stamps(num_trials);
   std::vector<std::vector<unsigned int>> pcd_indices(num_trials);
   for (size_t i = 0; i < pose_files.size(); ++i) {
@@ -258,7 +262,7 @@ int main(int argc, char** argv) {
     for (unsigned int frame_idx = 0; frame_idx < ieout_poses[trial].size();
          ++frame_idx) {
       unsigned int trial_frame_idx = frame_idx;
-      const std::vector<Eigen::Affine3d>& poses = ieout_poses[trial];
+      const EigenAffine3dVec& poses = ieout_poses[trial];
       apollo::localization::msf::velodyne::VelodyneFrame velodyne_frame;
       std::string pcd_file_path;
       std::ostringstream ss;

@@ -27,7 +27,7 @@
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
-#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
@@ -47,6 +47,9 @@ namespace perception {
 namespace onboard {
 
 class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   FusionCameraDetectionComponent() : seq_num_(0) {}
   ~FusionCameraDetectionComponent();

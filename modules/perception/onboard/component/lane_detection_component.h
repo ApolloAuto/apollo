@@ -31,7 +31,7 @@
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/lane_camera_perception.h"
-#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/lib/motion_service/motion_service.h"
@@ -55,6 +55,9 @@ typedef Eigen::Matrix4d MotionType;
 class LaneDetectionComponent;
 typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
 class LaneDetectionComponent : public apollo::cyber::Component<> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   LaneDetectionComponent() : seq_num_(0) {}
   ~LaneDetectionComponent();

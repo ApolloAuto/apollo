@@ -1,0 +1,24 @@
+diff -aruN pcl-pcl-1.10.1.orig/cmake/pcl_find_sse.cmake pcl-pcl-1.10.1/cmake/pcl_find_sse.cmake
+--- pcl-pcl-1.10.1.orig/cmake/pcl_find_sse.cmake	2020-07-07 20:35:54.475887756 -0700
++++ pcl-pcl-1.10.1/cmake/pcl_find_sse.cmake	2020-07-07 20:40:22.728476949 -0700
+@@ -4,20 +4,6 @@
+     set(SSE_FLAGS)
+     set(SSE_DEFINITIONS)
+ 
+-    if(NOT CMAKE_CROSSCOMPILING)
+-        # Test GCC/G++ and CLANG
+-        if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
+-            include(CheckCXXCompilerFlag)
+-            check_cxx_compiler_flag("-march=native" HAVE_MARCH)
+-            if(HAVE_MARCH)
+-                list(APPEND SSE_FLAGS "-march=native")
+-            else()
+-                list(APPEND SSE_FLAGS "-mtune=native")
+-            endif()
+-            message(STATUS "Using CPU native flags for SSE optimization: ${SSE_FLAGS}")
+-        endif()
+-    endif()
+-
+     # Unfortunately we need to check for SSE to enable "-mfpmath=sse" alongside
+     # "-march=native". The reason for this is that by default, 32bit architectures
+     # tend to use the x87 FPU (which has 80 bit internal precision), thus leading

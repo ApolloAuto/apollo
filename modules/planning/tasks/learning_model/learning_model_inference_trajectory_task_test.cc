@@ -29,8 +29,7 @@ namespace planning {
 class LearningModelInferenceTrajectoryTaskTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_task_type(
-        TaskConfig::LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK);
+    config_.set_task_type(TaskConfig::LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK);
     config_.mutable_learning_model_inference_trajectory_task_config();
   }
 
@@ -41,8 +40,8 @@ class LearningModelInferenceTrajectoryTaskTest : public ::testing::Test {
 };
 
 TEST_F(LearningModelInferenceTrajectoryTaskTest, Init) {
-  LearningModelInferenceTrajectoryTask
-      learning_model_inference_trajectory_task(config_);
+  LearningModelInferenceTrajectoryTask learning_model_inference_trajectory_task(
+      config_);
   EXPECT_EQ(learning_model_inference_trajectory_task.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

@@ -29,6 +29,9 @@ namespace camera {
 // @brief Car's Pose
 class CarPose {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   CarPose() = default;
   ~CarPose() = default;
 

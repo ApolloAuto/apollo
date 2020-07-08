@@ -24,15 +24,14 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/map/proto/map_geometry.pb.h"
-#include "modules/map/proto/map.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/routing/proto/routing.pb.h"
-
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/map/proto/map.pb.h"
+#include "modules/map/proto/map_geometry.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {

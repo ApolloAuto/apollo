@@ -15,8 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 
-#include <boost/format.hpp>
 #include <limits>
+
+#include <boost/format.hpp>
 
 #include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"

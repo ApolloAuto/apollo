@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -28,14 +29,15 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/proto:sensor_canbus_conf_cc_proto",
         "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
-        "//modules/localization/proto:localization_proto",
-        "//modules/localization/proto:pose_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/localization/proto:pose_cc_proto",
         "@eigen",
     ],
 )
 
-cc_binary(
+cc_library(
     name = "libconti_radar.so",
     linkopts = ["-shared"],
     linkstatic = False,

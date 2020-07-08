@@ -26,8 +26,8 @@ import logging
 import argparse
 import numpy as np
 import tensorflow as tf
-from . import proto.fnn_model_pb2
-from .proto.fnn_model_pb2 import FnnModel, Layer
+from modules.tools.prediction.data_pipelines.proto import fnn_model_pb2
+from fnn_model_pb2 import FnnModel, Layer
 from sklearn.model_selection import train_test_split
 
 dim_input = 7 + 72
@@ -71,13 +71,13 @@ def save_model(model, filename):
         net_layer.layer_input_dim = dim_input
         net_layer.layer_output_dim = dim_output
         if config['activation'] == 'relu':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.RELU
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.RELU
         elif config['activation'] == 'tanh':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.TANH
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.TANH
         elif config['activation'] == 'sigmoid':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.SIGMOID
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.SIGMOID
         elif config['activation'] == 'softmax':
-            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.SOFTMAX
+            net_layer.layer_activation_func = fnn_model_pb2.Layer.SOFTMAX
 
         weights, bias = layer.get_weights()
         net_layer.layer_bias.columns.extend(bias.reshape(-1).tolist())

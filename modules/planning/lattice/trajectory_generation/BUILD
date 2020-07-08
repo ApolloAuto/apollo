@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -25,7 +26,7 @@ cc_library(
         "//modules/planning/lattice/behavior:feasible_region",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/behavior:prediction_querier",
-        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/proto:lattice_structure_cc_proto",
     ],
 )
 
@@ -47,8 +48,7 @@ cc_library(
         "//modules/planning/lattice/trajectory_generation:lattice_trajectory1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/proto:lattice_structure_cc_proto",
     ],
 )
 
@@ -67,7 +67,6 @@ cc_library(
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
-        "//modules/planning/proto:lattice_sampling_config_proto",
     ],
 )
 
@@ -132,6 +131,7 @@ cc_library(
     deps = [
         ":lateral_qp_optimizer",
         "//cyber/common:log",
+        "//modules/common/math:matrix_operations",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",

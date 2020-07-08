@@ -16,9 +16,8 @@
 
 #include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 
-#include "gmock/gmock.h"
-
 #include "cyber/common/log.h"
+#include "gmock/gmock.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"

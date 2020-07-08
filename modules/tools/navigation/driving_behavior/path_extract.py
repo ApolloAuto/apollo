@@ -22,7 +22,7 @@ Usage:
 """
 import sys
 import datetime
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 kLocalizationTopic = '/apollo/localization/pose'

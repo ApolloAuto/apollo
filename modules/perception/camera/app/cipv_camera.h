@@ -54,6 +54,9 @@ static constexpr uint32_t kMaxNumVirtualLanePoint = 25;
 static constexpr float kAverageFrameRate = 0.05f;
 
 class Cipv {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   // Member functions
  public:
   Cipv(void);

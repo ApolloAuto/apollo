@@ -24,7 +24,6 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 
 namespace apollo {

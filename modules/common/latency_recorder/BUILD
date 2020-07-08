@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +11,7 @@ cc_library(
         "//cyber",
         "//cyber/common:log",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/latency_recorder/proto:latency_record_proto",
+        "//modules/common/latency_recorder/proto:latency_record_cc_proto",
         "//modules/common/util:message_util",
     ],
 )

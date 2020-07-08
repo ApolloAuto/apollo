@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -22,7 +23,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util",
     ],
 )
@@ -36,11 +37,16 @@ cc_library(
         ":serial_stream",
         ":stream",
         "//cyber",
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common/proto:drive_state_cc_proto",
+        "//modules/common/proto:vehicle_signal_cc_proto",
         "//modules/common/util:message_util",
         "//modules/drivers/gnss/parser:gnss_parser",
-        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/proto:gnss_status_cc_proto",
+        "//modules/drivers/gnss/proto:heading_cc_proto",
+        "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/drivers/gnss/util:gnss_util",
     ],
 )

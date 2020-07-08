@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#define private public
 #include "modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion/kalman_motion_fusion.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/fusion/base/sensor.h"

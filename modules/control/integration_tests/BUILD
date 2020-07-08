@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,11 +10,10 @@ cc_library(
     copts = ["-fno-access-control"],
     deps = [
         "//cyber",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "//modules/common/time",
         "//modules/control:control_component_lib",
         "//modules/control/common:control_gflags",
-        "//modules/control/proto:control_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -112,7 +112,9 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
   settings->eps_dual_inf = 1e-5;
 
   // Define osqp workspace
-  OSQPWorkspace* work = osqp_setup(data, settings);
+  OSQPWorkspace* work = nullptr;
+  // osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
 
   // Initial solution
   bool initial_solve_res = OptimizeWithOsqp(primal_warm_start, &work);

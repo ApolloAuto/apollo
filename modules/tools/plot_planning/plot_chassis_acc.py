@@ -23,7 +23,7 @@ import gflags
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
 

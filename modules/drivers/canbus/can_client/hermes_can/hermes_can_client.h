@@ -106,7 +106,7 @@ class HermesCanClient : public CanClient {
   void SetInited(bool init);
 
  private:
-  bool _is_init;
+  bool _is_init = false;
   bcan_hdl_t _dev_handler;
   CANCardParameter::CANChannelId _card_port;
   bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];

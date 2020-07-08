@@ -18,7 +18,7 @@
 
 import argparse
 
-import features_labels_utils
+import modules.tools.prediction.data_pipelines.data_preprocessing.features_labels_utils as features_labels_utils
 
 
 if __name__ == "__main__":

@@ -19,14 +19,25 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+geo="$1"; shift
 
-wget https://github.com/tj/n/archive/v2.1.0.tar.gz
-tar xzf v2.1.0.tar.gz
-pushd n-2.1.0
-make install
-n 8.0.0
+cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
+
+VERSION="6.5.1"
+NODE_VERSION="12.18.1"
+PKG_NAME="n-${VERSION}.tar.gz"
+CHECKSUM="5833f15893b9951a9ed59487e87b6c181d96b83a525846255872c4f92f0d25dd"
+DOWNLOAD_LINK="https://github.com/tj/n/archive/v${VERSION}.tar.gz"
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf "${PKG_NAME}"
+
+info "Install Node for $geo ..."
+
+pushd n-${VERSION}
+    make install
+    n ${NODE_VERSION}
 popd
 
-# Clean up.
-rm -fr v2.1.0.tar.gz n-2.1.0
+rm -fr "${PKG_NAME}" "n-${VERSION}"

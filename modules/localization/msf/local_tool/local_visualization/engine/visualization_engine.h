@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "Eigen/Geometry"
+#include "modules/common/util/eigen_defs.h"
 #include "opencv2/opencv.hpp"
 
 namespace apollo {
@@ -38,6 +39,8 @@ namespace msf {
  * @brief The data structure to store info of a localization
  */
 struct LocalizatonInfo {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   void set(const Eigen::Translation3d &location,
            const Eigen::Quaterniond &attitude, const Eigen::Vector3d &std_var,
            const std::string &description, const double timestamp,
@@ -166,7 +169,7 @@ class VisualizationEngine {
             const int zone_id, const Eigen::Affine3d &extrinsic,
             const unsigned int loc_info_num = 1);
   void Visualize(const std::vector<LocalizatonInfo> &loc_infos,
-                 const std::vector<Eigen::Vector3d> &cloud);
+                 const ::apollo::common::EigenVector3dVec &cloud);
   void SetAutoPlay(bool auto_play);
 
  private:
@@ -194,8 +197,8 @@ class VisualizationEngine {
   /**@brief Project point cloud ti mat.*/
   void CloudToMat(const Eigen::Affine3d &cur_pose,
                   const Eigen::Affine3d &velodyne_extrinsic,
-                  const std::vector<Eigen::Vector3d> &cloud, cv::Mat *cloud_img,
-                  cv::Mat *cloud_img_mask);
+                  const ::apollo::common::EigenVector3dVec &cloud,
+                  cv::Mat *cloud_img, cv::Mat *cloud_img_mask);
   void CoordToImageKey(const Eigen::Vector2d &coord, MapImageKey *key);
   /**@brief Compute grid index in current map given global coordinate.*/
   cv::Point CoordToMapGridIndex(const Eigen::Vector2d &coord,
@@ -270,7 +273,7 @@ class VisualizationEngine {
   bool auto_play_ = false;
 
   Eigen::Affine3d car_pose_;
-  std::vector<Eigen::Vector3d> cloud_;
+  ::apollo::common::EigenVector3dVec cloud_;
   cv::Mat cloud_img_;
   cv::Mat cloud_img_mask_;
   Eigen::Vector2d cloud_img_lt_coord_;

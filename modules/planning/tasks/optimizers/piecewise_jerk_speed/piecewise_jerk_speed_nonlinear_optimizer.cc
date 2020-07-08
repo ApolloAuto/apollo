@@ -20,11 +20,11 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
+#include <algorithm>
+#include <string>
 
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
-#include <algorithm>
-#include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/util.h"

@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -50,8 +49,8 @@ TEST_F(TrafficLightProtectedScenarioTest, Init) {
 
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
-  scenario_.reset(new TrafficLightProtectedScenario(config, &context,
-                                                    injector));
+  scenario_.reset(
+      new TrafficLightProtectedScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
 }

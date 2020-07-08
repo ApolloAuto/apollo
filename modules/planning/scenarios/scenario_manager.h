@@ -19,10 +19,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {

@@ -64,9 +64,6 @@
 * KCFcpp
     BSD 3-Clause "New" or "Revised" License
     https://github.com/joaofaro/KCFcpp/blob/master/LICENSE
-* PaddlePaddle
-    Apache License 2.0
-    https://github.com/PaddlePaddle/Paddle/blob/develop/LICENSE
 * Protocol Buffer
     https://github.com/google/protobuf/blob/master/LICENSE
 * Protobuf Rules

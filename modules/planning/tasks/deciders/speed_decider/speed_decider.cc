@@ -23,15 +23,14 @@
 #include <algorithm>
 #include <memory>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/decision.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/tasks/utils/st_gap_estimator.h"
 
 namespace apollo {
@@ -43,8 +42,6 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::perception::PerceptionObstacle;
-
-std::unordered_map<std::string, double> SpeedDecider::pedestrian_stop_timer_;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config,
                            const std::shared_ptr<DependencyInjector>& injector)
@@ -525,6 +522,17 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
     return false;
   }
 
+  // read pedestrian stop time from PlanningContext
+  auto* mutable_speed_decider_status = injector_->planning_context()
+                                                ->mutable_planning_status()
+                                                ->mutable_speed_decider();
+  std::unordered_map<std::string, double> stop_time_map;
+  for (const auto& pedestrian_stop_time :
+      mutable_speed_decider_status->pedestrian_stop_time()) {
+    stop_time_map[pedestrian_stop_time.obstacle_id()] =
+        pedestrian_stop_time.stop_timestamp_sec();
+  }
+
   const std::string& obstacle_id = obstacle.Id();
 
   // update stop timestamp on static pedestrian for watch timer
@@ -532,32 +540,41 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
   static constexpr double kSDistanceStartTimer = 10.0;
   static constexpr double kMaxStopSpeed = 0.3;
   static constexpr double kPedestrianStopTimeout = 4.0;
+
+  bool result = true;
   if (obstacle.path_st_boundary().min_s() < kSDistanceStartTimer) {
     const auto obstacle_speed = std::hypot(perception_obstacle.velocity().x(),
                                            perception_obstacle.velocity().y());
     if (obstacle_speed > kMaxStopSpeed) {
-      pedestrian_stop_timer_.erase(obstacle_id);
+      stop_time_map.erase(obstacle_id);
     } else {
-      if (pedestrian_stop_timer_.find(obstacle_id) ==
-          pedestrian_stop_timer_.end()) {
+      if (stop_time_map.count(obstacle_id) == 0) {
         // add timestamp
-        pedestrian_stop_timer_[obstacle_id] = Clock::NowInSeconds();
+        stop_time_map[obstacle_id] = Clock::NowInSeconds();
         ADEBUG << "add timestamp: obstacle_id[" << obstacle_id << "] timestamp["
                << Clock::NowInSeconds() << "]";
       } else {
         // check timeout
         double stop_timer =
-            Clock::NowInSeconds() - pedestrian_stop_timer_[obstacle_id];
+            Clock::NowInSeconds() - stop_time_map[obstacle_id];
         ADEBUG << "stop_timer: obstacle_id[" << obstacle_id << "] stop_timer["
                << stop_timer << "]";
         if (stop_timer >= kPedestrianStopTimeout) {
-          return false;
+          result = false;
         }
       }
     }
   }
 
-  return true;
+  // write pedestrian stop time to PlanningContext
+  mutable_speed_decider_status->mutable_pedestrian_stop_time()->Clear();
+  for (const auto& stop_time : stop_time_map) {
+    auto pedestrian_stop_time =
+        mutable_speed_decider_status->add_pedestrian_stop_time();
+    pedestrian_stop_time->set_obstacle_id(stop_time.first);
+    pedestrian_stop_time->set_stop_timestamp_sec(stop_time.second);
+  }
+  return result;
 }
 
 }  // namespace planning

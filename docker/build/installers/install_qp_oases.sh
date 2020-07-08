@@ -21,17 +21,56 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.tar.gz
-tar xzf v3.2.1-1.tar.gz
+. /tmp/installers/installer_base.sh
 
-pushd qp-oases-3.2.1-1
+# Reference: https://github.com/coin-or/qpOASES
+warning "Currently libqpOASES.so built from source can't work properly, so we" \
+        "provide pre-built x86_64 version here. " \
+        "Will be removed once we are ready."
+
+VERSION="3.2.1-1"
+PKG_NAME="qp-oases-${VERSION}.x86_64.tar.gz"
+CHECKSUM="225f6e19ae4498cccaeba464b672f33c4582f3bf2d6bb66c6693a7136003c8d5"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf ${PKG_NAME}
+pushd qp-oases-${VERSION}
+    mv include/qpOASES{,.hpp} "${SYSROOT_DIR}/include"
+    mv lib/libqpOASES.so "${SYSROOT_DIR}/lib"
+popd
+rm -rf qp-oases-${VERSION} ${PKG_NAME}
+
+exit 0
+
+VERSION="3.2.1-1"
+PKG_NAME="qp-oases-${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://github.com/ApolloAuto/qp-oases/archive/v${VERSION}.tar.gz"
+CHECKSUM="2cf87de73c9987efe9458e41c3c8782e26fac1560db565a8695f78d7ccdec38a"
+
+download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
+
+tar xzf "${PKG_NAME}"
+
+pushd qp-oases-${VERSION}
 mkdir bin
-make -j8 CPPFLAGS="-Wall -pedantic -Wshadow -Wfloat-equal -O3 -Wconversion \
-                   -Wsign-conversion -fPIC -DLINUX -DSOLVER_NONE \
-                   -D__NO_COPYRIGHT__"
+
+cat << MYFLAGS
+-Wall -pedantic -Wshadow \
+-Wfloat-equal -O3 -Wconversion \
+-Wsign-conversion -fPIC -DLINUX -DSOLVER_NONE \
+-D__NO_COPYRIGHT__
+MYFLAGS
+
+THREAD_NUM=$(nproc)
+make -j${THREAD_NUM} CXXFLAGS="${MYFLAGS}"
+
 cp bin/libqpOASES.so /usr/local/lib
 cp -r include/* /usr/local/include
 popd
 
+ok "Successfully build qp-oases-${VERSION}"
+
 # Clean up.
-rm -fr v3.2.1-1.tar.gz qp-oases-3.2.1-1
+rm -fr ${PKG_NAME} qp-oases-${VERSION}

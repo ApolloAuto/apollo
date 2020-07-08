@@ -17,6 +17,8 @@
 #pragma once
 
 #include <QtGui/QColor>
+#include <memory>
+#include <string>
 
 #include "modules/drivers/proto/radar.pb.h"
 #include "modules/tools/visualizer/renderable_object.h"

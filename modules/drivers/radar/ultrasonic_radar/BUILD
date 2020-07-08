@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,12 +8,13 @@ cc_library(
     srcs = ["ultrasonic_radar_message_manager.cc"],
     hdrs = ["ultrasonic_radar_message_manager.h"],
     deps = [
+        "//modules/common/proto:header_cc_proto",
         "//modules/common/util:message_util",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:ultrasonic_radar_cc_proto",
     ],
 )
 
@@ -38,7 +40,8 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/canbus/proto:sensor_canbus_conf_cc_proto",
+        "//modules/drivers/radar/ultrasonic_radar/proto:ultrasonic_radar_conf_cc_proto",
     ],
 )
 
@@ -49,7 +52,6 @@ cc_library(
 #     deps = [
 #         ":ultrasonic_radar_canbus_lib",
 #         ":ultrasonic_radar_message_manager",
-#         "//modules/drivers/proto:sensor_proto",
 #         "@com_google_googletest//:gtest_main",
 #     ],
 # )
@@ -62,6 +64,7 @@ cc_library(
     deps = [
         ":ultrasonic_radar_canbus_lib",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/drivers/proto:ultrasonic_radar_cc_proto",
     ],
 )
 

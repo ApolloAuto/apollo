@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,7 +10,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",
@@ -21,7 +22,7 @@ cc_library(
         "//modules/planning/constraint_checker",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/planner",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "//modules/planning/tasks:task",

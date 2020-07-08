@@ -33,6 +33,9 @@ namespace onboard {
 
 class CameraPerceptionVizMessage {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   CameraPerceptionVizMessage() { type_name_ = "CameraPerceptionVizMessage"; }
   ~CameraPerceptionVizMessage() = default;
 

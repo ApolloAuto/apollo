@@ -20,7 +20,7 @@ import argparse
 import os
 import re
 
-from features_labels_utils import *
+from modules.tools.prediction.data_pipelines.data_preprocessing.features_labels_utils import CombineFeaturesAndLabels, MergeCombinedFeaturesAndLabels
 
 
 if __name__ == "__main__":

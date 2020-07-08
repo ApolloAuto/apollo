@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,7 +18,6 @@ cc_library(
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning:planning_component_lib",
-        "//modules/planning/proto:task_config_proto",
         "@com_google_googletest//:gtest",
     ],
 )

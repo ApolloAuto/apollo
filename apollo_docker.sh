@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/scripts/apollo.bashrc
+source "${DIR}/scripts/apollo.bashrc"
 
 DEV_CONTAINER="apollo_dev_${USER}"
 

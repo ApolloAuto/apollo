@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,12 +13,12 @@ cc_library(
         "//modules/common/util:color",
         "//modules/common/util:message_util",
         "//modules/map/hdmap:hdmap_util",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
     ],
 )
 
-cc_binary(
+cc_library(
     name = "libmanual_traffic_light_component.so",
-    linkshared = True,
     linkstatic = False,
     deps = [":manual_traffic_light"],
 )

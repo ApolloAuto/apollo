@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
-
 #include "modules/perception/radar/lib/detector/conti_ars_detector/conti_ars_detector.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -55,7 +54,7 @@ TEST(ContiArsDetector, detect) {
   options.car_linear_speed = Eigen::Vector3f(3, 1, 0);
   options.car_angular_speed = Eigen::Vector3f(0, 0, 0);
 
-  base::FramePtr radar_frame(new base::Frame);
+  auto radar_frame = std::shared_ptr<base::Frame>(new base::Frame);
   ContiArsDetector detector;
   detector.Init();
   detector.Detect(corrected_obstacles, options, radar_frame);
@@ -83,25 +82,25 @@ TEST(ContiArsDetector, detect) {
   EXPECT_LT(dist_diff, 1.0e-6);
   EXPECT_LT(vel_diff, 1.0e-6);
 
-  base::FramePtr radar_frame1(new base::Frame);
+  auto radar_frame1 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_CAR);
   detector.Detect(corrected_obstacles, options, radar_frame1);
   radar_object = radar_frame1->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::VEHICLE);
 
-  base::FramePtr radar_frame2(new base::Frame);
+  auto radar_frame2 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_PEDESTRIAN);
   detector.Detect(corrected_obstacles, options, radar_frame2);
   radar_object = radar_frame2->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::PEDESTRIAN);
 
-  base::FramePtr radar_frame3(new base::Frame);
+  auto radar_frame3 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_MOTOCYCLE);
   detector.Detect(corrected_obstacles, options, radar_frame3);
   radar_object = radar_frame3->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::BICYCLE);
 
-  base::FramePtr radar_frame4(new base::Frame);
+  auto radar_frame4 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_BICYCLE);
   detector.Detect(corrected_obstacles, options, radar_frame4);
   radar_object = radar_frame4->objects.front();
@@ -170,20 +169,20 @@ TEST(ContiArsDetector, detect) {
   radar_object = radar_frame14->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::UNKNOWN);
 
-  base::FramePtr radar_frame15(new base::Frame);
+  auto radar_frame15 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_dynprop(
       CONTI_CROSSING_STATIONARY);
   detector.Detect(corrected_obstacles, options, radar_frame15);
   radar_object = radar_frame15->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::STATIONARY);
 
-  base::FramePtr radar_frame16(new base::Frame);
+  auto radar_frame16 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_dynprop(CONTI_CROSSING_MOVING);
   detector.Detect(corrected_obstacles, options, radar_frame16);
   radar_object = radar_frame16->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::MOVING);
 
-  base::FramePtr radar_frame17(new base::Frame);
+  auto radar_frame17 = std::shared_ptr<base::Frame>(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_dynprop(CONTI_STOPPED);
   detector.Detect(corrected_obstacles, options, radar_frame17);
   radar_object = radar_frame17->objects.front();

@@ -18,7 +18,6 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -28,9 +27,7 @@ LearningData FeatureOutput::learning_data_;
 std::size_t FeatureOutput::idx_learning_data_ = 0;
 int FeatureOutput::learning_data_file_index_ = 0;
 
-void FeatureOutput::Close() {
-  Clear();
-}
+void FeatureOutput::Close() { Clear(); }
 
 void FeatureOutput::Clear() {
   learning_data_.Clear();
@@ -66,20 +63,18 @@ LearningDataFrame* FeatureOutput::GetLatestLearningDataFrame() {
   return size > 0 ? learning_data_.mutable_learning_data(size - 1) : nullptr;
 }
 
-void FeatureOutput::InsertPlanningResult() {
-}
+void FeatureOutput::InsertPlanningResult() {}
 
-void FeatureOutput::WriteLearningData(
-    const std::string& record_file) {
+void FeatureOutput::WriteLearningData(const std::string& record_file) {
   if (FLAGS_planning_learning_mode != 1) {
     return;
   }
   std::string src_file_name =
       record_file.substr(record_file.find_last_of("/") + 1);
   src_file_name = src_file_name.empty() ? "00000" : src_file_name;
-  const std::string dest_file = absl::StrCat(
-      FLAGS_planning_data_dir, "/", src_file_name, ".",
-      learning_data_file_index_, ".bin");
+  const std::string dest_file =
+      absl::StrCat(FLAGS_planning_data_dir, "/", src_file_name, ".",
+                   learning_data_file_index_, ".bin");
   cyber::common::SetProtoToBinaryFile(learning_data_, dest_file);
   // cyber::common::SetProtoToASCIIFile(learning_data_, dest_file + ".txt");
   learning_data_.Clear();

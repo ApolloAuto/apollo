@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,12 +14,12 @@ cc_library(
         ":obstacle_clusters",
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
+        "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/prediction/submodules:submodule_output",
-        "//modules/prediction/common:junction_analyzer",
     ],
 )
 
@@ -35,8 +36,8 @@ cc_library(
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/network/rnn_model",
-        "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
     ],
 )
 
@@ -80,7 +81,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/prediction/common:road_graph",
-        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:feature_cc_proto",
     ],
 )
 

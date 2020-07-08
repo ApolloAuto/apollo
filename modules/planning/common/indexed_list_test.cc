@@ -18,10 +18,10 @@
  * @file
  **/
 
-#include "gtest/gtest.h"
-
-#include "modules/common/util/util.h"
 #include "modules/planning/common/indexed_list.h"
+
+#include "gtest/gtest.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {

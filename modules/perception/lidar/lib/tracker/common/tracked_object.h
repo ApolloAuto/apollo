@@ -149,7 +149,9 @@ struct TrackedObject {
   base::SensorInfo sensor_info;
 
   Eigen::Vector3d global_local_offset;
-};  // struct TrackedObject
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;  // struct TrackedObject
 
 typedef std::shared_ptr<TrackedObject> TrackedObjectPtr;
 typedef std::shared_ptr<const TrackedObject> TrackedObjectConstPtr;

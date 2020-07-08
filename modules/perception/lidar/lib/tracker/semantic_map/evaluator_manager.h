@@ -37,10 +37,10 @@
 namespace apollo {
 namespace perception {
 
-using apollo::prediction::ObstaclesContainer;
 using apollo::prediction::Obstacle;
-using apollo::prediction::SemanticLSTMEvaluator;
 using apollo::prediction::ObstacleHistory;
+using apollo::prediction::ObstaclesContainer;
+using apollo::prediction::SemanticLSTMEvaluator;
 
 class EvaluatorManager {
  public:

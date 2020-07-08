@@ -31,13 +31,13 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
 LearningModelInferenceTrajectoryTask::LearningModelInferenceTrajectoryTask(
-    const TaskConfig &config) : Task(config) {
+    const TaskConfig &config)
+    : Task(config) {
   ACHECK(config.has_learning_model_inference_trajectory_task_config());
 }
 
 Status LearningModelInferenceTrajectoryTask::Execute(
-    Frame *frame,
-    ReferenceLineInfo *reference_line_info) {
+    Frame *frame, ReferenceLineInfo *reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -46,11 +46,11 @@ Status LearningModelInferenceTrajectoryTask::Execute(
 }
 
 Status LearningModelInferenceTrajectoryTask::Process(
-    Frame *frame, ReferenceLineInfo* reference_line_info) {
+    Frame *frame, ReferenceLineInfo *reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  const auto& config =
+  const auto &config =
       config_.learning_model_inference_trajectory_task_config();
 
   const std::vector<TrajectoryPoint> adc_future_trajectory_points
@@ -72,17 +72,16 @@ Status LearningModelInferenceTrajectoryTask::Process(
       last_point_relative_time <
           config.min_adc_future_trajectory_time_length()) {
     const std::string msg =
-        absl::StrCat(
-            "adc_future_trajectory_point issue. size[",
-            adc_future_trajectory_points.size(),
-            "] first_point_relative_time[", first_point_relative_time,
-            "] last_point_relative_time[", last_point_relative_time);
+        absl::StrCat("adc_future_trajectory_point issue. size[",
+                     adc_future_trajectory_points.size(),
+                     "] first_point_relative_time[", first_point_relative_time,
+                     "] last_point_relative_time[", last_point_relative_time);
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   reference_line_info->SetTrajectory(
-  DiscretizedTrajectory(adc_future_trajectory_points));
+      DiscretizedTrajectory(adc_future_trajectory_points));
 
   return Status::OK();
 }

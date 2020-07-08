@@ -35,9 +35,8 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 
-PathDecider::PathDecider(
-    const TaskConfig &config,
-    const std::shared_ptr<DependencyInjector>& injector)
+PathDecider::PathDecider(const TaskConfig &config,
+                         const std::shared_ptr<DependencyInjector> &injector)
     : Task(config, injector) {}
 
 Status PathDecider::Execute(Frame *frame,
@@ -119,7 +118,8 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
     // - add STOP decision for blocking obstacles.
     if (obstacle->Id() == blocking_obstacle_id &&
-        !injector_->planning_context()->planning_status()
+        !injector_->planning_context()
+             ->planning_status()
              .path_decider()
              .is_in_path_lane_borrow_scenario()) {
       // Add stop decision

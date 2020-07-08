@@ -20,7 +20,7 @@
 #include <boost/thread/shared_mutex.hpp>
 
 #include "cyber/cyber.h"
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #ifdef TELEOP
 #include "modules/planning/proto/pad_msg.pb.h"

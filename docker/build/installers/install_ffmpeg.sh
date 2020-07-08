@@ -19,63 +19,61 @@
 # Fail on first error.
 set -e
 
-# Reference https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
-# Prepare
-FFMPEG_HOME="$(cd $( dirname "${BASH_SOURCE[0]}" ); pwd)"
-FFMPEG_HOME=$FFMPEG_HOME/ffmpeg
-FFMPEG_SOURCE=$FFMPEG_HOME/ffmpeg_source
-FFMPEG_BUILD=$FFMPEG_HOME/ffmpeg_build
-FFMPEG_BIN=$FFMPEG_HOME/ffmpeg_bin
-FFMPEG_TARGET=/usr/local/apollo/ffmpeg
-mkdir -p $FFMPEG_SOURCE $FFMPEG_BUILD && cd $FFMPEG_SOURCE
-apt-get update -y && apt-get install -y mercurial
+cd $( dirname "${BASH_SOURCE[0]}")
 
-wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
-tar xjvf nasm-2.14.02.tar.bz2
-HG_SETTING=$'[ui]\ntls = False'
-HG_SETTING_FILE="/root/.hgrc"
-echo "$HG_SETTING" > $HG_SETTING_FILE
-if cd x265 2> /dev/null; then hg pull && hg update && cd ..; else hg clone https://bitbucket.org/multicoreware/x265; fi
-rm $HG_SETTING_FILE
-wget https://github.com/FFmpeg/FFmpeg/archive/n4.1.3.tar.gz
-tar zxvf n4.1.3.tar.gz && mv FFmpeg-n4.1.3 ffmpeg
+# References
+# 1) https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
+# 2) https://linuxize.com/post/how-to-install-ffmpeg-on-ubuntu-18-04
+# 3) https://launchpad.net/~savoury1/+archive/ubuntu/ffmpeg4
+# We choose 1) in this script
+# cat > /etc/apt/sources.list.d/ffmpeg4.list <<EOF
+# deb http://ppa.launchpad.net/savoury1/ffmpeg4/ubuntu bionic main
+# EOF
+# apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 374C7797FB006459
 
-# Build and install
-pushd nasm-2.14.02
-  ./autogen.sh
-  PATH="$FFMPEG_BIN:$PATH" ./configure --prefix="$FFMPEG_BUILD" --bindir="$FFMPEG_BIN"
-  make
-  make install
-popd
+apt-get -y update && \
+    apt-get -y install \
+    nasm \
+    yasm \
+    libx265-dev \
+    libnuma-dev
 
-pushd x265/build/linux
-  PATH="$FFMPEG_BIN:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$FFMPEG_BUILD" -DENABLE_SHARED=off ../../source
-  PATH="$FFMPEG_BIN:$PATH" make
-  make install
-popd
+. /tmp/installers/installer_base.sh
+
+VERSION="4.2.2"
+PKG_NAME="ffmpeg-${VERSION}.tar.gz"
+CHECKSUM="5447ca061444e574dc0d5e6da1657f49a64a0e660403995c7744beee3e69b2b8"
+DOWNLOAD_LINK="https://github.com/FFmpeg/FFmpeg/archive/n${VERSION}.tar.gz"
+# https://github.com/FFmpeg/FFmpeg/archive/n4.2.2.tar.gz
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+tar xzf ${PKG_NAME} && mv "FFmpeg-n${VERSION}" ffmpeg
+
+# Unused options
+# --pkg-config-flags="--static"
 
 pushd ffmpeg
-  PATH="$FFMPEG_BIN:$PATH" PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$FFMPEG_BUILD/lib/pkgconfig" ./configure \
-    --prefix="$FFMPEG_BUILD" \
-    --pkg-config-flags="--static" \
-    --extra-cflags="-I$FFMPEG_BUILD/include" \
-    --extra-ldflags="-L$FFMPEG_BUILD/lib" \
-    --extra-libs="-lpthread -lm -lx265" \
-    --bindir="$FFMPEG_BIN" \
+    ./configure \
+    --prefix=${SYSROOT_DIR} \
+    --extra-libs="-lpthread -lm" \
     --enable-shared \
-    --disable-stripping \
     --enable-pic \
     --enable-gpl \
     --enable-libx265 \
     --enable-nonfree
-  PATH="$FFMPEG_BIN:$PATH" make
-  make install
+    make -j$(nproc)
+    make install
 popd
 
-mkdir -p $FFMPEG_TARGET
-cp -r $FFMPEG_BUILD/include $FFMPEG_TARGET/include
-cp -r $FFMPEG_BUILD/lib $FFMPEG_TARGET/lib
+ldconfig
 
-# Clean
-rm -fr $FFMPEG_HOME
-apt-get autoremove -y mercurial
+rm -fr ${PKG_NAME} ffmpeg
+
+apt-get -y update && \
+    apt-get -y autoremove \
+    nasm \
+    yasm \
+    libx265-dev
+
+# Don't remove libnuma-dev!
+

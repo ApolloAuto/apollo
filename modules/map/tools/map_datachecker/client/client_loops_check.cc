@@ -16,8 +16,8 @@
 
 #include "modules/map/tools/map_datachecker/client/client_loops_check.h"
 
-#include <boost/algorithm/string.hpp>
 #include <utility>
+#include <boost/algorithm/string.hpp>
 
 #include "grpc++/grpc++.h"
 #include "yaml-cpp/yaml.h"

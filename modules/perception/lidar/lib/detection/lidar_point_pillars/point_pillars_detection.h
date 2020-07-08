@@ -58,8 +58,7 @@ class PointPillarsDetection {
   std::vector<int> GenerateIndices(int start_index, int size, bool shuffle);
 
   void GetObjects(std::vector<std::shared_ptr<base::Object>>* objects,
-                  const Eigen::Affine3d& pose,
-                  std::vector<float>* detections,
+                  const Eigen::Affine3d& pose, std::vector<float>* detections,
                   std::vector<int>* labels);
 
   base::ObjectSubType GetObjectSubType(int label);

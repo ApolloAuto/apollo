@@ -21,7 +21,6 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include "gtest/gtest.h"
-
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
 

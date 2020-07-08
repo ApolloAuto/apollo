@@ -32,12 +32,12 @@ import sys
 from google.protobuf import text_format
 import numpy as np
 
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from cyber.proto import record_pb2
-from configuration_yaml_generator import ConfigYaml
-from extract_static_data import get_subfolder_list, select_static_image_pcd
+from modules.tools.sensor_calibration.configuration_yaml_generator import ConfigYaml
+from modules.tools.sensor_calibration.extract_static_data import get_subfolder_list, select_static_image_pcd
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
-from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
+from modules.tools.sensor_calibration.sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
 
 
 SMALL_TOPICS = [

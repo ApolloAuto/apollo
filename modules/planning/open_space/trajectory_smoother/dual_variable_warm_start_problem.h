@@ -20,8 +20,8 @@
 
 #pragma once
 #include <algorithm>
-#include "Eigen/Dense"
 
+#include "Eigen/Dense"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"

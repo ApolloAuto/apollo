@@ -15,11 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/motion_service/motion_service.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
 #include <limits>
 #include <string>
 #include <unordered_map>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

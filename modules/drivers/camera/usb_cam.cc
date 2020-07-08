@@ -38,7 +38,7 @@
 #include <string>
 
 #ifndef __aarch64__
-#include "adv_plat/include/adv_trigger.h"
+#include "adv_trigger.h"
 #include "modules/drivers/camera/util.h"
 #endif
 #include "modules/drivers/camera/usb_cam.h"

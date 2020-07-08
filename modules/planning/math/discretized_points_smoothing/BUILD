@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,8 +13,8 @@ cc_library(
     deps = [
         ":cos_theta_ipopt_interface",
         "//cyber/common:log",
-        "//modules/planning/proto/math:cos_theta_smoother_config_proto",
-        "//third_party:ipopt",
+        "//modules/planning/proto/math:cos_theta_smoother_config_cc_proto",
+        "@ipopt",
     ],
 )
 
@@ -26,8 +27,8 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "@adolc",
+        "@ipopt",
     ],
 )
 
@@ -43,8 +44,8 @@ cc_library(
         ":fem_pos_deviation_osqp_interface",
         ":fem_pos_deviation_sqp_osqp_interface",
         "//cyber/common:log",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
-        "//third_party:ipopt",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_cc_proto",
+        "@ipopt",
     ],
 )
 
@@ -57,8 +58,8 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//third_party:adolc",
-        "//third_party:ipopt",
+        "@adolc",
+        "@ipopt",
     ],
 )
 

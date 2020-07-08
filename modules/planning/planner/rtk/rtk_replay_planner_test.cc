@@ -18,7 +18,6 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"

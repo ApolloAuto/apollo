@@ -26,7 +26,7 @@ namespace perception {
 namespace base {
 
 template <typename T>
-struct Point {
+struct alignas(16) Point {
   T x = 0;
   T y = 0;
   T z = 0;

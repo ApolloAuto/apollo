@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,8 +8,8 @@ cc_library(
     hdrs = ["model_inference.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/proto:learning_data_proto",
-        "//modules/planning/proto:task_config_proto",
+        "//modules/planning/proto:learning_data_cc_proto",
+        "//modules/planning/proto:task_config_cc_proto",
     ],
 )
 
@@ -40,9 +41,9 @@ cc_library(
         "//modules/planning/common/util:math_util_lib",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
         "//third_party:libtorch",
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
         "@opencv",
-        "@tensorrt",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 

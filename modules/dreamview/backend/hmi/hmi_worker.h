@@ -21,12 +21,11 @@
 #include <string>
 #include <vector>
 
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
-
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"

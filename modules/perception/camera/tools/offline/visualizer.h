@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
-
 #include <map>
 #include <string>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
@@ -33,6 +33,9 @@ namespace camera {
 
 class Visualizer {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   bool Init(const std::vector<std::string> &camera_names,
             TransformServer *tf_server);
   bool Init_all_info_single_camera(
@@ -40,11 +43,8 @@ class Visualizer {
       const std::string &visual_camera,
       const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
       const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-      const Eigen::Matrix4d &ex_lidar2imu,
-      const double pitch_adj,
-      const double yaw_adj,
-      const double roll_adj,
-      const int image_height,
+      const Eigen::Matrix4d &ex_lidar2imu, const double pitch_adj,
+      const double yaw_adj, const double roll_adj, const int image_height,
       const int image_width);
   bool adjust_angles(const std::string &camera_name, const double pitch_adj,
                      const double yaw_adj, const double roll_adj);
@@ -52,17 +52,13 @@ class Visualizer {
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
   void ShowResult_all_info_single_camera(
-      const cv::Mat &img,
-      const CameraFrame &frame,
+      const cv::Mat &img, const CameraFrame &frame,
       const base::MotionBufferPtr motion_buffer,
       const Eigen::Affine3d &world2camera);
   void Draw2Dand3D_all_info_single_camera(
-      const std::string &camera_name,
-      const cv::Mat &img,
-      const CameraFrame &frame,
-      const Eigen::Matrix3d &intrinsic,
-      const Eigen::Matrix4d &extrinsic,
-      const Eigen::Affine3d &world2camera,
+      const std::string &camera_name, const cv::Mat &img,
+      const CameraFrame &frame, const Eigen::Matrix3d &intrinsic,
+      const Eigen::Matrix4d &extrinsic, const Eigen::Affine3d &world2camera,
       const base::MotionBufferPtr motion_buffer);
   bool DrawTrajectories(const base::ObjectPtr &object,
                         const base::MotionBufferPtr motion_buffer);

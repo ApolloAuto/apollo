@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -16,12 +17,12 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util:map_util",
         "//modules/common/util:point_factory",
         "//modules/map/pnc_map:path",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "@com_google_absl//absl/strings",
     ],
 )
@@ -32,7 +33,7 @@ cc_library(
     hdrs = ["reference_line_smoother.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "//modules/planning/proto:reference_line_smoother_config_cc_proto",
     ],
 )
 
@@ -48,8 +49,8 @@ cc_library(
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/smoothing_spline:active_set_spline_2d_solver",
         "//modules/planning/math/smoothing_spline:osqp_spline_2d_solver",
-        "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "//modules/planning/proto:reference_line_smoother_config_cc_proto",
         "@eigen",
     ],
 )
@@ -72,9 +73,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d:quintic_spiral_path",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
-        "//modules/planning/proto:planning_proto",
-        "//third_party:ipopt",
+        "//modules/planning/proto:planning_cc_proto",
         "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -105,8 +106,8 @@ cc_library(
         "//modules/planning/math:discrete_points_math",
         "//modules/planning/math/discretized_points_smoothing:cos_theta_smoother",
         "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
-        "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:reference_line_smoother_config_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "//modules/planning/proto:reference_line_smoother_config_cc_proto",
     ],
 )
 
@@ -156,8 +157,8 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/planning/common:indexed_queue",
         "//modules/planning/common:planning_context",
-        "//modules/planning/proto:planning_config_proto",
-        "//modules/planning/proto:planning_status_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/planning/proto:planning_status_cc_proto",
         "@eigen",
     ],
 )
@@ -170,7 +171,7 @@ cc_binary(
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 
@@ -179,7 +180,7 @@ cc_binary(
     srcs = ["spiral_smoother_util.cc"],
     deps = [
         ":spiral_reference_line_smoother",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 

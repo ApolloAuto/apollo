@@ -24,11 +24,10 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/planning_status.pb.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {
 namespace planning {

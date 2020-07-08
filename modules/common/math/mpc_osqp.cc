@@ -294,7 +294,9 @@ bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
 
   OSQPSettings *settings = Settings();
   ADEBUG << "OSQP setting done";
-  OSQPWorkspace *osqp_workspace = osqp_setup(data, settings);
+  OSQPWorkspace *osqp_workspace = nullptr;
+  // osqp_setup(&osqp_workspace, data, settings);
+  osqp_workspace = osqp_setup(data, settings);
   ADEBUG << "OSQP workspace ready";
   osqp_solve(osqp_workspace);
 

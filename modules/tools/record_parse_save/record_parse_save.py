@@ -37,8 +37,8 @@ import time
 from importlib import import_module
 import yaml
 
-from cyber_py3 import cyber
-from cyber_py3 import record
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import record
 
 
 os.system('clear')

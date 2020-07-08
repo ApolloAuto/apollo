@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 # Libs provided by the system.
@@ -30,10 +32,10 @@ cc_library(
     name = "libtorch",
     deps = select({
         "//tools/platform:use_gpu": [
-            "@pytorch_gpu",
+            "@libtorch_gpu",
         ],
         "//conditions:default": [
-            "@pytorch",
+            "@libtorch_cpu",
         ],
     }),
 )
@@ -42,12 +44,6 @@ cc_library(
 cc_library(
     name = "ncurses",
     linkopts = ["-lncurses"],
-)
-
-# libpoco-dev
-cc_library(
-    name = "PocoFoundation",
-    linkopts = ["-lPocoFoundation"],
 )
 
 cc_library(
@@ -76,4 +72,33 @@ cc_library(
 cc_library(
     name = "uuid",
     linkopts = ["-luuid"],
+)
+
+# atlas-cblas
+cc_library(
+    name = "cblas",
+    linkopts = [
+        "-lcblas",
+    ],
+)
+
+cc_library(
+    name = "zlib",
+    linkopts = [
+        "-lz",
+    ],
+)
+
+cc_library(
+    name = "console_bridge",
+    linkopts = [
+        "-lconsole_bridge",
+    ],
+)
+
+cc_library(
+    name = "glvnd",
+    linkopts = [
+        "-lGL",
+    ],
 )

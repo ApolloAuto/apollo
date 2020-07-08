@@ -92,7 +92,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   std::unordered_map<std::string, double> stop_times;
   for (const auto& stop_time : mutable_crosswalk_status->stop_time()) {
     stop_times.emplace(stop_time.obstacle_id(),
-                       stop_time.obstacle_stop_timestamp());
+                       stop_time.stop_timestamp_sec());
   }
   crosswalk_stop_timer.emplace(mutable_crosswalk_status->crosswalk_id(),
                                stop_times);
@@ -226,7 +226,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     for (const auto& timer : crosswalk_stop_timer[crosswalk]) {
       auto* stop_time = mutable_crosswalk_status->add_stop_time();
       stop_time->set_obstacle_id(timer.first);
-      stop_time->set_obstacle_stop_timestamp(timer.second);
+      stop_time->set_stop_timestamp_sec(timer.second);
       ADEBUG << "UPDATE stop_time: id[" << crosswalk << "] obstacle_id["
              << timer.first << "] stop_timestamp[" << timer.second << "]";
     }

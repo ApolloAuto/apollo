@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -83,7 +84,7 @@ cc_library(
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto/math:qp_problem_proto",
+        "//modules/planning/proto/math:qp_problem_cc_proto",
         "@eigen",
     ],
 )
@@ -227,6 +228,7 @@ cc_library(
     deps = [
         ":spline_2d_solver",
         "//modules/common/math:matrix_operations",
+        "@com_google_googletest//:gtest",
         "@osqp",
     ],
 )
@@ -285,6 +287,7 @@ cc_test(
     name = "spline_1d_kernel_test",
     size = "small",
     srcs = ["spline_1d_kernel_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":spline_1d_kernel",
         "@com_google_googletest//:gtest_main",

@@ -35,8 +35,7 @@ class TrajectoryEvaluator {
   void EvaluateADCFutureTrajectory(
       const int frame_num,
       const std::vector<TrajectoryPointFeature>& adc_future_trajectory,
-      const double start_point_timestamp_sec,
-      const double delta_time,
+      const double start_point_timestamp_sec, const double delta_time,
       std::vector<TrajectoryPointFeature>* evaluated_adc_future_trajectory);
 
   void EvaluateObstacleTrajectory(const double start_point_timestamp_sec,
@@ -44,18 +43,15 @@ class TrajectoryEvaluator {
                                   LearningDataFrame* learning_data_frame);
 
   void EvaluateObstaclePredictionTrajectory(
-      const double start_point_timestamp_sec,
-      const double delta_time,
+      const double start_point_timestamp_sec, const double delta_time,
       LearningDataFrame* learning_data_frame);
 
  private:
   void EvaluateTrajectoryByTime(
-      const int frame_num,
-      const std::string& obstacle_id,
+      const int frame_num, const std::string& obstacle_id,
       const std::vector<std::pair<double, CommonTrajectoryPointFeature>>&
           trajectory,
-      const double start_point_timestamp_sec,
-      const double delta_time,
+      const double start_point_timestamp_sec, const double delta_time,
       std::vector<TrajectoryPointFeature>* evaluated_trajectory);
 
   void Convert(const CommonTrajectoryPointFeature& tp,

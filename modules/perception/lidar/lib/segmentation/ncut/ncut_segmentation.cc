@@ -297,7 +297,7 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   // .5.1 outlier
   for (size_t i = 0; i < cloud_outlier.size(); ++i) {
     base::PointFCloudPtr pc = cloud_components[cloud_outlier[i]];
-    base::ObjectPtr obj = std::make_shared<base::Object>();
+    base::ObjectPtr obj(new base::Object);
     obj->lidar_supplement.cloud = *pc;
     _outliers->push_back(obj);
   }

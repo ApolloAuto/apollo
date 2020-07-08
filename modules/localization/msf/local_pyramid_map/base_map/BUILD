@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -25,16 +26,12 @@ cc_library(
         "base_map_fwd.h",
         "base_map_matrix.h",
     ],
-    linkopts = [
-        "-lz",
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//cyber/common",
+        "//third_party:zlib",
         "@com_google_glog//:glog",
         "@eigen",
+        "@opencv",
     ],
 )
 
