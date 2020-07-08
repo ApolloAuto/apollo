@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/vehicle_factory.h"
+
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
+#include "modules/canbus/vehicle/devkit/devkit_vehicle_factory.h"
 #include "modules/canbus/vehicle/ge3/ge3_vehicle_factory.h"
 #include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 #include "modules/canbus/vehicle/lexus/lexus_vehicle_factory.h"
@@ -52,6 +54,9 @@ void VehicleFactory::RegisterVehicleFactory() {
   });
   Register(apollo::common::CH,
            []() -> AbstractVehicleFactory * { return new ChVehicleFactory(); });
+  Register(apollo::common::DKIT, []() -> AbstractVehicleFactory * {
+    return new DevkitVehicleFactory();
+  });
 }
 
 std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(

@@ -16,6 +16,7 @@ proto_library(
         "ch.proto",
         "chassis.proto",
         "chassis_detail.proto",
+        "devkit.proto",
         "ge3.proto",
         "lexus.proto",
         "transit.proto",
@@ -66,6 +67,11 @@ py_proto(
 py_proto(
     name = "ch_pb2",
     src = "ch.proto",
+)
+
+py_proto(
+    name = "devkit_pb2",
+    src = "devkit.proto",
 )
 
 py_proto(
