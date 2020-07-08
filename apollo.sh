@@ -80,7 +80,7 @@ function apollo_env_setup() {
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV} USE_GPU=${USE_GPU}"
 
     if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
-        env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" "$@"
+        env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
     fi
 }
 
