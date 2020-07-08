@@ -107,16 +107,16 @@ function _usage() {
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_cpu${NONE}: dbg build with CPU
-  ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
+  ${BLUE}build_gpu${NONE}: run build only with GPU mode support
   ${BLUE}build_dbg${NONE}: run build only with debug
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_teleop${NONE}: run build with teleop
   ${BLUE}build_prof${NONE}: build for gprof support.
-  ${BLUE}buildify${NONE}: fix style of BUILD files
+  ${BLUE}buildify${NONE}: Run buildifier to fix style of bazel files
   ${BLUE}check${NONE}: run test and lint, please make sure it passes before checking in new code
   ${BLUE}clean${NONE}: run Bazel clean
-  ${BLUE}config${NONE}: run configurator tool
+  ${BLUE}config${NONE}: configure apollo build environment
   ${BLUE}doc${NONE}: generate doxygen document
   ${BLUE}lint${NONE}: run code style check
   ${BLUE}usage${NONE}: print this menu
