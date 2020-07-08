@@ -4,11 +4,6 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
-##========== Perception ================##
-PERCEPTION_EXCEPTIONS="\
-except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
-"
-
 ##============= Localization ===================##
 LOCALIZATION_EXCEPTIONS="\
 except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
@@ -26,8 +21,7 @@ SHORTHAND_TARGETS=
 DISABLED_TARGETS=
 
 function _disabled_test_targets_all() {
-    local disabled="${PERCEPTION_EXCEPTIONS}"
-    disabled="${disabled} ${LOCALIZATION_EXCEPTIONS}"
+    local disabled="${LOCALIZATION_EXCEPTIONS}"
 
     if ! ${USE_ESD_CAN} ; then
         warning "ESD CAN library supplied by ESD Electronics doesn't exist."
@@ -66,10 +60,6 @@ function determine_disabled_targets() {
                 disabled="${disabled} except //modules/localization/msf/..."
             fi
             disabled="${disabled} ${LOCALIZATION_EXCEPTIONS}"
-        elif [[ "${compo}" == "prediction" ]]; then
-            disabled="${disabled} ${PREDICTION_EXCEPTIONS}"
-        elif [[ "${compo}" == "perception" ]]; then
-            disabled="${disabled} ${PERCEPTION_EXCEPTIONS}"
         fi
     done
 
