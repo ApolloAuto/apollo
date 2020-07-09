@@ -32,8 +32,9 @@ cc_library(
         "@com_github_nlohmann_json//:json",
     ] + select({
         "//tools/platform:with_teleop": [
-            "//modules/teleop/modem/proto:modem_cc_proto",
-            "//modules/teleop/daemon/proto:daemon_cc_proto",
+            "//modules/teleop/modem/proto:modem_info_cc_proto",
+            "//modules/teleop/daemon/proto:daemon_cmd_cc_proto",
+            "//modules/teleop/daemon/proto:daemon_rpt_cc_proto",
         ],
         "//conditions:default": [
         ],
