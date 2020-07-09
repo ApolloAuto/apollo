@@ -13,12 +13,12 @@ APOLLO_TEST_SH="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
 
 function run_ci_build() {
     info "Running CI Build ..."
-    env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_BUILD_SH}" --config=cpu
+    env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_BUILD_SH}"
 }
 
 function run_ci_test() {
     info "Running CI Test ..."
-    env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_TEST_SH}" --config=cpu --config=unit_test
+    env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_TEST_SH}" --config=unit_test
 }
 
 function main() {
