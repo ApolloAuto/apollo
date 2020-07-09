@@ -1,4 +1,4 @@
-# Apollo master Quick Start Guide
+# Apollo Master Quick Start Guide
 
 The following guide serves as a user manual for launching the Apollo upgraded software and hardware stack on vehicle.
 
@@ -77,7 +77,7 @@ bash apollo.sh lint
 
 ### Bazel x Apollo
 
-The bazel version pre-installed in our cyber/dev docker images is 3.2.0+.
+The bazel version pre-installed in our cyber/dev docker images are 3.2.0+.
 And the default `--distdir` destination is under
 `${APOLLO_ROOT_DIR}/.cache/distdir`.
 
