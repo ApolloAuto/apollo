@@ -99,9 +99,3 @@ grpc_extra_deps()
 #    build_file = "third_party/mklml.BUILD",
 #    path = "/usr/local/apollo/local_third_party/mklml",
 # )
-##jsoncpp .so for adv_plat
-#new_local_repository(
-#    name = "jsoncpp",
-#    build_file = "third_party/jsoncpp.BUILD",
-#    path = "/usr/local/apollo/jsoncpp/",
-#)
