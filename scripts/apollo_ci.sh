@@ -3,7 +3,7 @@ set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
-
+source "${TOP_DIR}/scripts/apollo_base.sh"
 ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
@@ -27,6 +27,7 @@ function main() {
         cmd="build"
     fi
     if [ "$1" == "test" ]; then
+    info "Running CI Test ..."
         run_ci_test
     else
         run_ci_build
