@@ -34,7 +34,7 @@ for entry in "${cyber_bin_path}" "${recorder_path}" "${monitor_path}" "${launch_
     add_to_path "${entry}"
 done
 
-PYTHON_LD_PATH="${bazel_bin_path}/cyber/py_wrapper"
+PYTHON_LD_PATH="${bazel_bin_path}/cyber/python/internal"
 export PYTHONPATH=${PYTHON_LD_PATH}:${CYBER_PATH}/python:$PYTHONPATH
 
 export CYBER_DOMAIN_ID=80

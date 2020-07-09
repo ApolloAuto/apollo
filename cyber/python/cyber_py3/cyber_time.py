@@ -34,8 +34,8 @@ sys.path.append(CYBER_PATH + "/lib/python/")
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
-_CYBER = importlib.import_module('_cyber_py3')
-_CYBER_TIME = importlib.import_module('_cyber_time_py3')
+_CYBER = importlib.import_module('_cyber_wrapper')
+_CYBER_TIME = importlib.import_module('_cyber_time_wrapper')
 
 
 class Duration(object):
