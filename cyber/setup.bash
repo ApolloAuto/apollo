@@ -1,19 +1,16 @@
 #! /usr/bin/env bash
-if [ -z "${APOLLO_ROOT_DIR}" ]; then
-    export APOLLO_ROOT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
-    source ${APOLLO_ROOT_DIR}/scripts/apollo.bashrc
-fi
+TOP_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+source ${TOP_DIR}/scripts/apollo.bashrc
 
 export CYBER_PATH="${APOLLO_ROOT_DIR}/cyber"
 
+# FIXME(all): preconfigured in /etc/profile.d/apollo.sh
 export QT5_PATH="/usr/local/qt5"
-export LD_LIBRARY_PATH=${QT5_PATH}/lib:$LD_LIBRARY_PATH
 export QT_QPA_PLATFORM_PLUGIN_PATH=${QT5_PATH}/plugins
 add_to_path "${QT5_PATH}/bin"
 
 bazel_bin_path="${APOLLO_ROOT_DIR}/bazel-bin"
-apollo_tool_path="${bazel_bin_path}/modules/tools"
-visualizer_path="${apollo_tool_path}/visualizer"
+visualizer_path="${bazel_bin_path}/modules/tools/visualizer"
 
 cyber_bin_path="${bazel_bin_path}/cyber"
 cyber_tool_path="${bazel_bin_path}/cyber/tools"
@@ -34,8 +31,7 @@ for entry in "${cyber_bin_path}" "${recorder_path}" "${monitor_path}" "${launch_
     add_to_path "${entry}"
 done
 
-PYTHON_LD_PATH="${bazel_bin_path}/cyber/python/internal"
-export PYTHONPATH=${PYTHON_LD_PATH}:${CYBER_PATH}/python:$PYTHONPATH
+export PYTHONPATH=${bazel_bin_path}/cyber/python/internal:${CYBER_PATH}/python:$PYTHONPATH
 
 export CYBER_DOMAIN_ID=80
 export CYBER_IP=127.0.0.1
