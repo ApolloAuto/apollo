@@ -31,7 +31,7 @@
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#if TELEOP == 1
+#if WITH_TELEOP == 1
 #include "modules/dreamview/backend/teleop/teleop.h"
 #endif
 
@@ -68,7 +68,7 @@ class Dreamview {
   std::unique_ptr<HMI> hmi_;
   std::unique_ptr<DataCollectionMonitor> data_collection_monitor_;
   std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
-#if TELEOP == 1
+#if WITH_TELEOP == 1
   std::unique_ptr<TeleopService> teleop_;
   std::unique_ptr<WebSocketHandler> teleop_ws_;
 #endif
