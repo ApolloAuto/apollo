@@ -20,7 +20,7 @@ cc_library(
         ":common",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
-        "//third_party:boost",
+        "@boost",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_library(
     hdrs = ["common.h"],
     deps = [
         "//cyber",
-        "//third_party:boost",
+        "@boost",
     ],
 )
 
@@ -69,7 +69,7 @@ cc_library(
     deps = [
         ":common",
         "//modules/map/tools/map_datachecker/proto:collection_error_code_cc_proto",
-        "//third_party:boost",
+        "@boost",
     ],
 )
 

@@ -27,7 +27,7 @@ cc_library(
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",
-        "//third_party:boost",
+        "@boost",
     ],
 )
 

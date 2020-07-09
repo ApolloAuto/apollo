@@ -78,7 +78,7 @@ cc_library(
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/dreamview/proto:hmi_status_cc_proto",
         "//modules/monitor/proto:system_status_cc_proto",
-        "//third_party:boost",
+        "@boost",
         "@com_google_absl//absl/strings",
     ],
 )
