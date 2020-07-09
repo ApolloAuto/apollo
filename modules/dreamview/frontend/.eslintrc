@@ -6,7 +6,11 @@
     "ecmaFeatures": {
       "jsx": true,
       "modules": true,
+      "legacyDecorators": true
     }
+  },
+  "env": {
+    "browser": true
   },
   "rules": {
     // Require a semi colon at the end of a statement.
@@ -15,6 +19,8 @@
     "max-len": ["error", 100, { "ignoreStrings": true }],
     // Always require curly brackets.
     "curly": "error",
+    // specify whether double or single quotes should be used
+    "quotes": ["error", "single", { "avoidEscape": true }],
 
     // Require the use of `===` and `!==`.
     "eqeqeq": "error",
@@ -40,8 +46,24 @@
     // Require parentheses when invoking a constructor with no
     // arguments.
     "new-parens": "error",
+
+    // disallow mixed spaces and tabs for indentation
+    "no-mixed-spaces-and-tabs": "error",
     // Disallow trailing white space at the end of lines.
     "no-trailing-spaces": "error",
+    // require or disallow space before blocks
+    "space-before-blocks": "error",
+    // require or disallow space before function opening parenthesis
+    // https://eslint.org/docs/rules/space-before-function-paren
+    "space-before-function-paren": ["error", {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    // require or disallow spaces inside parentheses
+    "space-in-parens": ["error", "never"],
+    // require spaces around operators
+    "space-infix-ops": "error",
     // React specific rule. Enable this so that no-unused-vars respect
     // the use of a react component.
     "react/jsx-uses-vars": "error",
@@ -57,6 +79,33 @@
     // Require `const` declaration for variables that are never
     // reassigned after declared.
     "prefer-const": "error",
+
+      // this option sets a specific tab width for your code
+    // https://eslint.org/docs/rules/indent
+    "indent": ["error", 2, {
+      "SwitchCase": 1,
+      "VariableDeclarator": 1,
+      "outerIIFEBody": 1,
+      // MemberExpression: null,
+      "FunctionDeclaration": {
+        "parameters": 1,
+        "body": 1
+      },
+      "FunctionExpression": {
+        "parameters": 1,
+        "body": 1
+      },
+      "CallExpression": {
+        "arguments": 1
+      },
+      "ArrayExpression": 1,
+      "ObjectExpression": 1,
+      "ImportDeclaration": 1,
+      "flatTernaryExpressions": false,
+      // list derived from https://github.com/benjamn/ast-types/blob/HEAD/def/jsx.js
+      "ignoredNodes": ["JSXElement", "JSXElement > *", "JSXAttribute", "JSXIdentifier", "JSXNamespacedName", "JSXMemberExpression", "JSXSpreadAttribute", "JSXExpressionContainer", "JSXOpeningElement", "JSXClosingElement", "JSXFragment", "JSXOpeningFragment", "JSXClosingFragment", "JSXText", "JSXEmptyExpression", "JSXSpreadChild"],
+      "ignoreComments": false
+    }],
   },
   "plugins": [
     "react"
