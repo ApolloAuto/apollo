@@ -27,7 +27,7 @@ function main() {
         cmd="build"
     fi
     if [ "$1" == "test" ]; then
-    info "Running CI Test ..."
+        info "Running CI Test ..."
         run_ci_test
     else
         run_ci_build
