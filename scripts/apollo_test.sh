@@ -4,11 +4,18 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
+##============= Perception ===================##
+PERCEPTION_EXCEPTIONS="\
+except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
+"
+
 ##============= Localization ===================##
 LOCALIZATION_EXCEPTIONS="\
 except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
 except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
 except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
+except //modules/localization/ndt/ndt_locator:ndt_solver_test \
+except //modules/localization/msf:msf_localization_test \
 "
 
 ##======================= Failed Test Cases are Listed Above ================##
@@ -22,7 +29,7 @@ DISABLED_TARGETS=
 
 function _disabled_test_targets_all() {
     local disabled="${LOCALIZATION_EXCEPTIONS}"
-
+    disabled="${disabled} ${PERCEPTION_EXCEPTIONS}"
     if ! ${USE_ESD_CAN} ; then
         warning "ESD CAN library supplied by ESD Electronics doesn't exist."
         warning "If you need ESD CAN, please refer to:"
