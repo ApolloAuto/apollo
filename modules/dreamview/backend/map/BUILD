@@ -12,7 +12,7 @@ cc_library(
         "//modules/dreamview/proto:simulation_world_cc_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
-        "//third_party:boost",
+        "@boost",
         "@com_github_nlohmann_json//:json",
         "@com_google_glog//:glog",
     ],

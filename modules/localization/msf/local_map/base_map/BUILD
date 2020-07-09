@@ -34,7 +34,7 @@ cc_test(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//third_party:boost",
+        "@boost",
         "@com_google_googletest//:gtest_main",
         "@opencv",
     ],

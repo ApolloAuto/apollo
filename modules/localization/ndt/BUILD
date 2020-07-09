@@ -35,7 +35,7 @@ cc_library(
         "//modules/localization/proto:localization_cc_proto",
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
-        "//third_party:boost",
+        "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@eigen",

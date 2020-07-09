@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//third_party:boost",
+        "@boost",
     ],
 )
 
