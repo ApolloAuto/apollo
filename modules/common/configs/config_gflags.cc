@@ -77,3 +77,7 @@ DEFINE_bool(state_transform_to_com_drive, true,
             "rear-axis to center of mass, during forward driving");
 DEFINE_bool(multithread_run, false,
             "multi-thread run flag mainly used by simulation");
+DEFINE_string(
+    lidar_height_filename,
+    "velodyne128_height.yaml",
+    "lidar height file");
