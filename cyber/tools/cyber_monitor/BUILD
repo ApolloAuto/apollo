@@ -13,6 +13,7 @@ cc_binary(
         "renderable_message.cc",
         "screen.cc",
     ],
+    linkopts = ["-pthread"],
     deps = [
         ":cyber_topology_message",
         ":general_channel_message",
@@ -20,7 +21,6 @@ cc_binary(
         "//cyber:init",
         "//cyber/service_discovery:topology_manager",
         "//third_party:ncurses",
-        "//third_party:pthread",
     ],
 )
 

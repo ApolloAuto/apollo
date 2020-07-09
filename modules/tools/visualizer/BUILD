@@ -11,11 +11,13 @@ cc_binary(
     includes = [
         ".",
     ],
+    linkopts = [
+        "-pthread",
+    ],
     deps = [
         ":visualizer_lib",
         "//third_party:console_bridge",
         "//third_party:glvnd",
-        "//third_party:pthread",
         "@fastrtps",
         "@qt//:qt_core",
         "@qt//:qt_gui",
