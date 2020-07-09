@@ -106,3 +106,8 @@ bash /tmp/installers/install_python_modules.sh
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+######################################################
+COMPONENT="modules/teleop"
+info "Install support for [${COMPONENT}] ..."
+bash /tmp/installers/install_openh264.sh
