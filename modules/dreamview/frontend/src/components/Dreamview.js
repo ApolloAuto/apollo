@@ -1,85 +1,86 @@
-import React from "react";
-import { inject, observer } from "mobx-react";
+import React from 'react';
+import { inject, observer } from 'mobx-react';
 
 import SplitPane from 'react-split-pane';
-import Header from "components/Header";
-import MainView from "components/Layouts/MainView";
-import ToolView from "components/Layouts/ToolView";
-import MonitorPanel from "components/Layouts/MonitorPanel";
-import SideBar from "components/SideBar";
+import Header from 'components/Header';
+import MainView from 'components/Layouts/MainView';
+import ToolView from 'components/Layouts/ToolView';
+import MonitorPanel from 'components/Layouts/MonitorPanel';
+import SideBar from 'components/SideBar';
 
-import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
-import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from "store/websocket";
+import HOTKEYS_CONFIG from 'store/config/hotkeys.yml';
+import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from 'store/websocket';
 
-
-@inject("store") @observer
+@inject('store') @observer
 export default class Dreamview extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleDrag = this.handleDrag.bind(this);
-        this.handleKeyPress = this.handleKeyPress.bind(this);
-        this.updateDimension = this.props.store.dimension.update.bind(this.props.store.dimension);
+  constructor(props) {
+    super(props);
+    this.handleDrag = this.handleDrag.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.updateDimension = this.props.store.dimension.update.bind(this.props.store.dimension);
+  }
+
+  handleDrag(masterViewWidth) {
+    const { options, dimension } = this.props.store;
+    if (options.showMonitor) {
+      dimension.updateMonitorWidth(
+        Math.min(
+          Math.max(window.innerWidth - masterViewWidth, 0),
+          window.innerWidth,
+        ),
+      );
+    }
+  }
+
+  handleKeyPress(event) {
+    const { options, enableHMIButtonsOnly, hmi } = this.props.store;
+
+    const optionName = HOTKEYS_CONFIG[event.key];
+    if (!optionName || options.showDataRecorder) {
+      return;
     }
 
-    handleDrag(masterViewWidth) {
-        const { options, dimension } = this.props.store;
-        if (options.showMonitor) {
-            dimension.updateMonitorWidth(
-                Math.min(
-                    Math.max(window.innerWidth - masterViewWidth, 0),
-                    window.innerWidth
-                )
-            );
-        }
+    event.preventDefault();
+    if (optionName === 'cameraAngle') {
+      options.rotateCameraAngle();
+    } else if (
+      !options.isSideBarButtonDisabled(optionName, enableHMIButtonsOnly, hmi.inNavigationMode)
+    ) {
+      this.props.store.handleOptionToggle(optionName);
     }
+  }
 
-    handleKeyPress(event) {
-        const { options, enableHMIButtonsOnly, hmi } = this.props.store;
+  componentWillMount() {
+    this.props.store.dimension.initialize();
+  }
 
-        const optionName = HOTKEYS_CONFIG[event.key];
-        if (!optionName || options.showDataRecorder) {
-            return;
-        }
+  componentDidMount() {
+    WS.initialize();
+    MAP_WS.initialize();
+    POINT_CLOUD_WS.initialize();
+    CAMERA_WS.initialize();
+    window.addEventListener('resize', this.updateDimension, false);
+    window.addEventListener('keypress', this.handleKeyPress, false);
+  }
 
-        event.preventDefault();
-        if (optionName === "cameraAngle") {
-            options.rotateCameraAngle();
-        } else if (
-            !options.isSideBarButtonDisabled(optionName, enableHMIButtonsOnly, hmi.inNavigationMode)
-        ) {
-            this.props.store.handleOptionToggle(optionName);
-        }
-    }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimension, false);
+    window.removeEventListener('keypress', this.handleKeyPress, false);
+  }
 
-    componentWillMount() {
-        this.props.store.dimension.initialize();
-    }
+  render() {
+    const { dimension, options, hmi } = this.props.store;
 
-    componentDidMount() {
-        WS.initialize();
-        MAP_WS.initialize();
-        POINT_CLOUD_WS.initialize();
-        CAMERA_WS.initialize();
-        window.addEventListener("resize", this.updateDimension, false);
-        window.addEventListener("keypress", this.handleKeyPress, false);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.updateDimension, false);
-        window.removeEventListener("keypress", this.handleKeyPress, false);
-    }
-
-    render() {
-        const { dimension, options, hmi } = this.props.store;
-
-        return (
+    return (
             <div>
                 <Header />
                 <div className="pane-container">
-                    <SplitPane split="vertical"
+                    <SplitPane
+                        split="vertical"
                         size={dimension.pane.width}
                         onChange={this.handleDrag}
-                        allowResize={options.showMonitor}>
+                        allowResize={options.showMonitor}
+                    >
                         <div className="left-pane">
                             <SideBar />
                             <div className="dreamview-body">
@@ -90,10 +91,11 @@ export default class Dreamview extends React.Component {
                         <MonitorPanel
                             hmi={hmi}
                             viewName={options.monitorName}
-                            showVideo={options.showVideo} />
+                            showVideo={options.showVideo}
+                        />
                     </SplitPane>
                 </div>
             </div>
-        );
-    }
+    );
+  }
 }

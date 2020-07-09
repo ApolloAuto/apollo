@@ -1,28 +1,28 @@
-import React from "react";
+import React from 'react';
 
-import classNames from "classnames";
+import classNames from 'classnames';
 
 class PlayIcons extends React.Component {
-    render() {
-        const { onClick } = this.props;
+  render() {
+    const { onClick } = this.props;
 
-        return (
+    return (
             <svg className="icon" viewBox="0 0 10 10" onClick={onClick}>
                 <polygon className="play" points="0 0, 10 5, 0 10" />
             </svg>
-        );
-    }
+    );
+  }
 }
 
-
 class ReplayIcons extends React.Component {
-    render() {
-        const { onClick } = this.props;
+  render() {
+    const { onClick } = this.props;
 
-        return (
+    return (
             <svg className="icon" viewBox="0 0 100 100" onClick={onClick}>
-                 <path className="replay"
-                       d="M0.166,49.438C0.166,75.152,20.744,96,46.125,96
+                <path
+                    className="replay"
+                    d="M0.166,49.438C0.166,75.152,20.744,96,46.125,96
                          c12.096,0,23.1-4.731,31.306-12.469
                          c2.144-2.021-8.776-12.227-10.269-10.84
                          c-5.54,5.146-12.926,8.286-21.037,8.286
@@ -39,87 +39,91 @@ class ReplayIcons extends React.Component {
                          M78.743,44.933
                          l0.115,0.023l-0.089,0.086
                          C78.754,44.977,78.743,44.933,78.743,44.933
-                         z">
-                 </path>
+                         z"
+                />
             </svg>
-        );
-    }
+    );
+  }
 }
 
 class PauseIcons extends React.Component {
-    render() {
-        const { onClick } = this.props;
+  render() {
+    const { onClick } = this.props;
 
-        return (
+    return (
             <svg className="icon" viewBox="0 0 20 20" onClick={onClick}>
-                <polygon className="pause" points="4 0, 6 0, 6 20, 4 20"/>
-                <polygon className="pause" points="13 0, 15 0, 15 20, 13 20"/>
+                <polygon className="pause" points="4 0, 6 0, 6 20, 4 20" />
+                <polygon className="pause" points="13 0, 15 0, 15 20, 13 20" />
             </svg>
-        );
-    }
+    );
+  }
 }
 
 class FullScreenIcons extends React.Component {
-    render() {
-        const { onClick } = this.props;
+  render() {
+    const { onClick } = this.props;
 
-        return (
+    return (
             <svg className="icon" viewBox="0 0 70 70">
-                <path className="fullscreen"
-                      d="M0 25 V0 H25
+                <path
+                    className="fullscreen"
+                    d="M0 25 V0 H25
                          M0 45 V70 H25
                          M45 0 H70 V25
-                         M45 70 H70 V45"/>
+                         M45 70 H70 V45"
+                />
             </svg>
-        );
-    }
+    );
+  }
 }
 
 class NormalScreenIcons extends React.Component {
-    render() {
-        const { onClick } = this.props;
+  render() {
+    const { onClick } = this.props;
 
-        return (
+    return (
             <svg className="icon" viewBox="0 0 70 70">
-                <path className="exit-fullscreen"
-                      d="M0 25 H25 V0
+                <path
+                    className="exit-fullscreen"
+                    d="M0 25 H25 V0
                          M0 45 H25 V70
                          M45 0 V25 H70
-                         M45 70 V45 H70"/>
+                         M45 70 V45 H70"
+                />
             </svg>
-        );
-    }
+    );
+  }
 }
 
 export default class ControlIcons extends React.Component {
-    render() {
-        const { type, onClick, extraClasses } = this.props;
+  render() {
+    const { type, onClick, extraClasses } = this.props;
 
-        let icon = null;
-        switch(type) {
-            case 'replay':
-                icon = <ReplayIcons />;
-                break;
-            case 'pause':
-                icon = <PauseIcons />;
-                break;
-            case 'play':
-                icon = <PlayIcons />;
-                break;
-            case 'fullscreen':
-                icon = <FullScreenIcons />;
-                break;
-            case 'normalscreen':
-                icon = <NormalScreenIcons />;
-                break;
-            default:
-                break;
-        }
+    let icon = null;
+    switch (type) {
+      case 'replay':
+        icon = <ReplayIcons />;
+        break;
+      case 'pause':
+        icon = <PauseIcons />;
+        break;
+      case 'play':
+        icon = <PlayIcons />;
+        break;
+      case 'fullscreen':
+        icon = <FullScreenIcons />;
+        break;
+      case 'normalscreen':
+        icon = <NormalScreenIcons />;
+        break;
+      default:
+        break;
+    }
 
-        return (
+    return (
             <div className={classNames(extraClasses)} onClick={onClick}>
                 {icon}
             </div>
-        );
-    }
+    );
+  }
 }
