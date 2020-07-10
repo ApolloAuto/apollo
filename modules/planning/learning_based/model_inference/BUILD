@@ -49,7 +49,7 @@ cc_library(
 
 cc_test(
     name = "model_inference_test",
-    size = "medium",
+    size = "small",
     srcs = ["model_inference_test.cc"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
