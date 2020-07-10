@@ -52,7 +52,11 @@ DEFINE_double(normalizing_factor, 255,
 DEFINE_int32(num_point_feature, 5,
              "Length of raw point feature. Features include x, y, z,"
              "intensity and delta of time.");
-DEFINE_bool(enable_downsample_pointcloud, true,
+DEFINE_bool(enable_downsample_beams, false,
+            "Enable down sampling point cloud beams with a factor.");
+DEFINE_int32(downsample_beams_factor, 4,
+             "Down sample point cloud beams with this factor.");
+DEFINE_bool(enable_downsample_pointcloud, false,
             "Enable down sampling point cloud into centroids of voxel grid.");
 DEFINE_double(downsample_voxel_size_x, 0.01,
               "X-axis size of voxels used for down sampling point cloud.");
