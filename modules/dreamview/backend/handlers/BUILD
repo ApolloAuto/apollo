@@ -11,8 +11,8 @@ cc_library(
     deps = [
         "//modules/common/time",
         "//modules/common/util:map_util",
-        "@com_github_nlohmann_json//:json",
         "@civetweb//:civetweb++",
+        "@com_github_nlohmann_json//:json",
         "@com_google_absl//absl/strings",
     ],
 )

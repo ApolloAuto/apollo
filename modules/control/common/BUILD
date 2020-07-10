@@ -331,7 +331,7 @@ cc_library(
     name = "dependency_injector",
     hdrs = ["dependency_injector.h"],
     deps = [
-       "//modules/common/vehicle_state:vehicle_state_provider"
+        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 

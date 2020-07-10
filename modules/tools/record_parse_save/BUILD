@@ -6,8 +6,8 @@ py_library(
     name = "parse_camera",
     srcs = ["parse_camera.py"],
     deps = [
-        "//cyber/python/cyber_py3:record",
         "//cyber/python/cyber_py3:cyber",
+        "//cyber/python/cyber_py3:record",
         "//modules/drivers/proto:sensor_image_py_pb2",
     ],
 )

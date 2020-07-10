@@ -27,6 +27,7 @@ cc_library(
         ":piecewise_jerk_speed_nonlinear_ipopt_interface",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/util",
         "//modules/planning/common:speed_profile_generator",
         "//modules/planning/common:st_graph_data",
         "//modules/planning/common/path:path_data",
@@ -35,7 +36,6 @@ cc_library(
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
         "//modules/planning/proto:ipopt_return_status_cc_proto",
         "//modules/planning/tasks/optimizers:speed_optimizer",
-        "//modules/common/util:util",
     ],
 )
 

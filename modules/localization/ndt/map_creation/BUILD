@@ -16,8 +16,8 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
         "@boost",
         "@eigen",
-        "@pcl",
         "@opencv",
+        "@pcl",
     ],
 )
 
