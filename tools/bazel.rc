@@ -114,4 +114,4 @@ test:coverage --test_tag_filters=-cpplint
 # +------------------------------------------------------------+
 # | Python Configurations                                      |
 # +------------------------------------------------------------+
-# build --copt="-I/usr/include/python3.6m"
+# Python support was configured by third_party/py .
