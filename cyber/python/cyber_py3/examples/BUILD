@@ -8,8 +8,6 @@ py_binary(
     deps = [
         "//cyber/proto:unit_test_py_pb2",
         "//cyber/python/cyber_py3:record",
-        "//modules/common/proto:error_code_py_pb2",
-        "//modules/common/proto:header_py_pb2",
         "//modules/common/util/testdata:simple_py_pb2",
     ],
 )
