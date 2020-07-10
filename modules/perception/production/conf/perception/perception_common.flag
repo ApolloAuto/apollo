@@ -86,8 +86,12 @@
 --config_manager_path=./
 --start_visualizer=false
 
-# configs for lidar point pillars
---score_threshold=0.7
+###########################################################################
+# Flags from lidar_point_pillars
+--score_threshold=0.5
+--enable_downsample_beams=false
+--downsample_beams_factor=4
+--enable_downsample_pointcloud=false
 --downsample_voxel_size_x=0.1
 --downsample_voxel_size_y=0.1
 --downsample_voxel_size_z=0.1

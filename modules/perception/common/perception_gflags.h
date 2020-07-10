@@ -37,6 +37,8 @@ DECLARE_string(pfe_onnx_file);
 DECLARE_string(rpn_onnx_file);
 DECLARE_double(normalizing_factor);
 DECLARE_int32(num_point_feature);
+DECLARE_bool(enable_downsample_beams);
+DECLARE_int32(downsample_beams_factor);
 DECLARE_bool(enable_downsample_pointcloud);
 DECLARE_double(downsample_voxel_size_x);
 DECLARE_double(downsample_voxel_size_y);
