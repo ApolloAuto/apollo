@@ -66,7 +66,7 @@ proto_library(
     srcs = ["devkit.proto"],
 )
 
-py_proto_library(
+python_proto_library(
     name = "devkit_py_pb2",
     deps = [
         ":devkit_proto",
