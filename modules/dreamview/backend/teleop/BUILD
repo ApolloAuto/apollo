@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "copts_if_with_teleop","if_with_teleop")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,7 +20,7 @@ cc_library(
         "//conditions:default": [
         ],
     }),
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'] + copts_if_with_teleop(),
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -29,6 +30,7 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/planning/proto:planning_cc_proto",
+        "//modules/planning/proto:pad_msg_cc_proto",
         "@com_github_nlohmann_json//:json",
     ] + select({
         "//tools/platform:with_teleop": [
@@ -57,6 +59,7 @@ cc_test(
     deps = [
         ":teleop",
         "@com_google_googletest//:gtest_main",
+        "@boost",
     ],
 )
 

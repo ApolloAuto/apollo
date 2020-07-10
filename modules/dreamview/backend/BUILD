@@ -28,6 +28,7 @@ cc_library(
         "//modules/dreamview/proto:simulation_world_cc_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
+        "//modules/planning/proto:pad_msg_cc_proto",
         "@civetweb//:civetweb++",
     ] + if_with_teleop(["//modules/dreamview/backend/teleop"]),
 )
