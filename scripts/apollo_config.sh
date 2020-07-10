@@ -17,16 +17,11 @@ BAZEL_CONF="${TOP_DIR}/.apollo.bazelrc"
 
 function config_noninteractive() {
     echo "${STARTUP_TXT}" > "${BAZEL_CONF}"
-    # determine_gpu_use
-    # FIXME(all): Disable gpu mode for aarch64 until we are ready.
-    if [ "$(uname -m)" = "aarch64" ]; then
-        echo "build --config=cpu" >> "${BAZEL_CONF}"
+    determine_gpu_use
+    if [ "${USE_GPU}" -eq 1 ]; then
+        echo "build --config=gpu" >> "${BAZEL_CONF}"
     else
-        if [ "${USE_GPU}" -eq 1 ]; then
-            echo "build --config=gpu" >> "${BAZEL_CONF}"
-        else
-            echo "build --config=cpu" >> "${BAZEL_CONF}"
-        fi
+        echo "build --config=cpu" >> "${BAZEL_CONF}"
     fi
     cat "${TOP_DIR}/tools/apollo.bazelrc.sample" >> "${BAZEL_CONF}"
 }
