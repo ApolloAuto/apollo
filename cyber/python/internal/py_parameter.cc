@@ -599,10 +599,10 @@ static PyMethodDef _cyber_parameter_methods[] = {
 };
 
 /// Init function of this module
-PyMODINIT_FUNC PyInit__cyber_parameter_py3(void) {
+PyMODINIT_FUNC PyInit__cyber_parameter_wrapper(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_parameter_py3",    // Module name.
+      "_cyber_parameter_wrapper",    // Module name.
       "CyberParameter module",   // Module doc.
       -1,                        // Module size.
       _cyber_parameter_methods,  // Module methods.

@@ -9,5 +9,5 @@ py_binary(
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
         "//modules/routing/proto:routing_py_pb2",
-    ]
+    ],
 )

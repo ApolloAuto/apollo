@@ -70,6 +70,23 @@ load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
 
+http_archive(
+    name = "rules_proto_grpc",
+    urls = ["https://github.com/rules-proto-grpc/rules_proto_grpc/archive/1.0.2.tar.gz"],
+    sha256 = "5f0f2fc0199810c65a2de148a52ba0aff14d631d4e8202f41aff6a9d590a471b",
+    strip_prefix = "rules_proto_grpc-1.0.2",
+)
+
+load("@rules_proto_grpc//:repositories.bzl", "rules_proto_grpc_toolchains", "rules_proto_grpc_repos")
+
+rules_proto_grpc_toolchains()
+
+rules_proto_grpc_repos()
+
+load("@rules_proto_grpc//python:repositories.bzl", rules_proto_grpc_python_repos="python_repos")
+
+rules_proto_grpc_python_repos()
+
 #new_local_repository(
 #    name = "opengl",
 #    build_file = "third_party/opengl.BUILD",
@@ -99,9 +116,3 @@ grpc_extra_deps()
 #    build_file = "third_party/mklml.BUILD",
 #    path = "/usr/local/apollo/local_third_party/mklml",
 # )
-##jsoncpp .so for adv_plat
-#new_local_repository(
-#    name = "jsoncpp",
-#    build_file = "third_party/jsoncpp.BUILD",
-#    path = "/usr/local/apollo/jsoncpp/",
-#)

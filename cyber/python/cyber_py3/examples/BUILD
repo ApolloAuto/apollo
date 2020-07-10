@@ -11,3 +11,20 @@ py_binary(
         "//modules/common/util/testdata:simple_py_pb2",
     ],
 )
+
+py_binary(
+    name = "time",
+    srcs = ["time.py"],
+    deps = [
+        "//cyber/python/cyber_py3:cyber_time",
+    ],
+)
+
+py_binary(
+    name = "timer",
+    srcs = ["timer.py"],
+    deps = [
+        "//cyber/python/cyber_py3:cyber",
+        "//cyber/python/cyber_py3:cyber_timer",
+    ],
+)

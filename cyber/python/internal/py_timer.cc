@@ -158,10 +158,10 @@ static PyMethodDef _cyber_timer_methods[] = {
 };
 
 /// Init function of this module
-PyMODINIT_FUNC PyInit__cyber_timer_py3(void) {
+PyMODINIT_FUNC PyInit__cyber_timer_wrapper(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_timer_py3",    // Module name.
+      "_cyber_timer_wrapper",    // Module name.
       "CyberTimer module",   // Module doc.
       -1,                    // Module size.
       _cyber_timer_methods,  // Module methods.

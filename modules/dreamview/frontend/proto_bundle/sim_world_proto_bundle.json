@@ -2985,73 +2985,6 @@
                 }
               }
             },
-            "CosThetaSmootherConfig": {
-              "fields": {
-                "weightCosIncludedAngle": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 10000
-                  }
-                },
-                "weightAnchorPoints": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightLength": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "printLevel": {
-                  "type": "int32",
-                  "id": 4,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "maxNumOfIterations": {
-                  "type": "int32",
-                  "id": 5,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "acceptableNumOfIterations": {
-                  "type": "int32",
-                  "id": 6,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "tol": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 1e-8
-                  }
-                },
-                "acceptableTol": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 0.1
-                  }
-                },
-                "ipoptUseAutomaticDifferentiation": {
-                  "type": "bool",
-                  "id": 9,
-                  "options": {
-                    "default": false
-                  }
-                }
-              }
-            },
             "TargetLane": {
               "fields": {
                 "id": {
@@ -3545,157 +3478,6 @@
                 }
               }
             },
-            "FemPosDeviationSmootherConfig": {
-              "fields": {
-                "weightFemPosDeviation": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10000000000
-                  }
-                },
-                "weightRefDeviation": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightPathLength": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "applyCurvatureConstraint": {
-                  "type": "bool",
-                  "id": 5,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "weightCurvatureConstraintSlackVar": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "curvatureConstraint": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "useSqp": {
-                  "type": "bool",
-                  "id": 8,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "sqpFtol": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0.0001
-                  }
-                },
-                "sqpCtol": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0.001
-                  }
-                },
-                "sqpPenMaxIter": {
-                  "type": "int32",
-                  "id": 11,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "sqpSubMaxIter": {
-                  "type": "int32",
-                  "id": 12,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "maxIter": {
-                  "type": "int32",
-                  "id": 100,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "timeLimit": {
-                  "type": "double",
-                  "id": 101,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "verbose": {
-                  "type": "bool",
-                  "id": 102,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "scaledTermination": {
-                  "type": "bool",
-                  "id": 103,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "warmStart": {
-                  "type": "bool",
-                  "id": 104,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "printLevel": {
-                  "type": "int32",
-                  "id": 200,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "maxNumOfIterations": {
-                  "type": "int32",
-                  "id": 201,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "acceptableNumOfIterations": {
-                  "type": "int32",
-                  "id": 202,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "tol": {
-                  "type": "double",
-                  "id": 203,
-                  "options": {
-                    "default": 1e-8
-                  }
-                },
-                "acceptableTol": {
-                  "type": "double",
-                  "id": 204,
-                  "options": {
-                    "default": 0.1
-                  }
-                }
-              }
-            },
             "IpoptReturnStatus": {
               "values": {
                 "SOLVE_SUCCEEDED": 0,
@@ -3716,138 +3498,6 @@
                 "NONIPOPT_EXCEPTION_THROWN": -101,
                 "INSUFFICIENT_MEMORY": -102,
                 "INTERNAL_ERROR": 199
-              }
-            },
-            "LonCondition": {
-              "fields": {
-                "s": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "ds": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "dds": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0
-                  }
-                }
-              }
-            },
-            "LatCondition": {
-              "fields": {
-                "l": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "dl": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "ddl": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0
-                  }
-                }
-              }
-            },
-            "TStrategy": {
-              "fields": {
-                "tMarkers": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "tStep": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "strategy": {
-                  "type": "string",
-                  "id": 3
-                }
-              }
-            },
-            "SStrategy": {
-              "fields": {
-                "sMarkers": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "sStep": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "strategy": {
-                  "type": "string",
-                  "id": 3
-                }
-              }
-            },
-            "LonSampleConfig": {
-              "fields": {
-                "lonEndCondition": {
-                  "type": "LonCondition",
-                  "id": 1
-                },
-                "tStrategy": {
-                  "type": "TStrategy",
-                  "id": 2
-                }
-              }
-            },
-            "LatSampleConfig": {
-              "fields": {
-                "latEndCondition": {
-                  "type": "LatCondition",
-                  "id": 1
-                },
-                "sStrategy": {
-                  "type": "SStrategy",
-                  "id": 2
-                }
-              }
-            },
-            "LatticeSamplingConfig": {
-              "fields": {
-                "lonSampleConfig": {
-                  "type": "LonSampleConfig",
-                  "id": 1
-                },
-                "latSampleConfig": {
-                  "type": "LatSampleConfig",
-                  "id": 2
-                }
               }
             },
             "StopPoint": {
@@ -6928,7 +6578,7 @@
                   "type": "string",
                   "id": 1
                 },
-                "obstacleStopTimestamp": {
+                "stopTimestampSec": {
                   "type": "double",
                   "id": 2
                 }
@@ -7121,6 +6771,15 @@
                 }
               }
             },
+            "SpeedDeciderStatus": {
+              "fields": {
+                "pedestrianStopTime": {
+                  "rule": "repeated",
+                  "type": "StopTime",
+                  "id": 1
+                }
+              }
+            },
             "ScenarioStatus": {
               "fields": {
                 "scenarioType": {
@@ -7229,106 +6888,21 @@
                   "type": "ScenarioStatus",
                   "id": 11
                 },
+                "speedDecider": {
+                  "type": "SpeedDeciderStatus",
+                  "id": 12
+                },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 12
+                  "id": 13
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 13
+                  "id": 14
                 },
                 "yieldSign": {
                   "type": "YieldSignStatus",
-                  "id": 14
-                }
-              }
-            },
-            "QuadraticProgrammingProblem": {
-              "fields": {
-                "paramSize": {
-                  "type": "int32",
-                  "id": 1
-                },
-                "quadraticMatrix": {
-                  "type": "QPMatrix",
-                  "id": 2
-                },
-                "bias": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "equalityMatrix": {
-                  "type": "QPMatrix",
-                  "id": 4
-                },
-                "equalityValue": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "inequalityMatrix": {
-                  "type": "QPMatrix",
-                  "id": 6
-                },
-                "inequalityValue": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "inputMarker": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "optimalParam": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "packed": false
-                  }
-                }
-              }
-            },
-            "QPMatrix": {
-              "fields": {
-                "rowSize": {
-                  "type": "int32",
-                  "id": 1
-                },
-                "colSize": {
-                  "type": "int32",
-                  "id": 2
-                },
-                "element": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "packed": false
-                  }
-                }
-              }
-            },
-            "QuadraticProgrammingProblemSet": {
-              "fields": {
-                "problem": {
-                  "rule": "repeated",
-                  "type": "QuadraticProgrammingProblem",
-                  "id": 1
+                  "id": 15
                 }
               }
             },
@@ -7580,31 +7154,6 @@
                 }
               }
             },
-            "SpiralCurveConfig": {
-              "fields": {
-                "simpsonSize": {
-                  "type": "int32",
-                  "id": 1,
-                  "options": {
-                    "default": 9
-                  }
-                },
-                "newtonRaphsonTol": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0.01
-                  }
-                },
-                "newtonRaphsonMaxIter": {
-                  "type": "int32",
-                  "id": 3,
-                  "options": {
-                    "default": 20
-                  }
-                }
-              }
-            },
             "STDrivableBoundaryInstance": {
               "fields": {
                 "t": {
@@ -7733,20 +7282,24 @@
                   "type": "ModelType",
                   "id": 1
                 },
-                "modelFile": {
+                "cpuModelFile": {
                   "type": "string",
                   "id": 2
                 },
+                "gpuModelFile": {
+                  "type": "string",
+                  "id": 3
+                },
                 "useCuda": {
                   "type": "bool",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": true
                   }
                 },
                 "trajectoryDeltaT": {
                   "type": "double",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": 0.2
                   }
@@ -8972,6 +8525,313 @@
                 "config": {
                   "rule": "repeated",
                   "type": "TrafficRuleConfig",
+                  "id": 1
+                }
+              }
+            },
+            "CosThetaSmootherConfig": {
+              "fields": {
+                "weightCosIncludedAngle": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 10000
+                  }
+                },
+                "weightAnchorPoints": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightLength": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 5,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 6,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 0.1
+                  }
+                },
+                "ipoptUseAutomaticDifferentiation": {
+                  "type": "bool",
+                  "id": 9,
+                  "options": {
+                    "default": false
+                  }
+                }
+              }
+            },
+            "FemPosDeviationSmootherConfig": {
+              "fields": {
+                "weightFemPosDeviation": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 10000000000
+                  }
+                },
+                "weightRefDeviation": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightPathLength": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "applyCurvatureConstraint": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "weightCurvatureConstraintSlackVar": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "curvatureConstraint": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "useSqp": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "sqpFtol": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.0001
+                  }
+                },
+                "sqpCtol": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.001
+                  }
+                },
+                "sqpPenMaxIter": {
+                  "type": "int32",
+                  "id": 11,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "sqpSubMaxIter": {
+                  "type": "int32",
+                  "id": 12,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "maxIter": {
+                  "type": "int32",
+                  "id": 100,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "timeLimit": {
+                  "type": "double",
+                  "id": 101,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "verbose": {
+                  "type": "bool",
+                  "id": 102,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "scaledTermination": {
+                  "type": "bool",
+                  "id": 103,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "warmStart": {
+                  "type": "bool",
+                  "id": 104,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 200,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 201,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 202,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 203,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 204,
+                  "options": {
+                    "default": 0.1
+                  }
+                }
+              }
+            },
+            "QuadraticProgrammingProblem": {
+              "fields": {
+                "paramSize": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "quadraticMatrix": {
+                  "type": "QPMatrix",
+                  "id": 2
+                },
+                "bias": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "equalityMatrix": {
+                  "type": "QPMatrix",
+                  "id": 4
+                },
+                "equalityValue": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "inequalityMatrix": {
+                  "type": "QPMatrix",
+                  "id": 6
+                },
+                "inequalityValue": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "inputMarker": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "optimalParam": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "QPMatrix": {
+              "fields": {
+                "rowSize": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "colSize": {
+                  "type": "int32",
+                  "id": 2
+                },
+                "element": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "QuadraticProgrammingProblemSet": {
+              "fields": {
+                "problem": {
+                  "rule": "repeated",
+                  "type": "QuadraticProgrammingProblem",
                   "id": 1
                 }
               }

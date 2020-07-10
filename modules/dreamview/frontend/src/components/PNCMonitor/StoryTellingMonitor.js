@@ -1,46 +1,47 @@
-
-import React from "react";
-import { inject, observer } from "mobx-react";
-import classNames from "classnames";
-import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
+import React from 'react';
+import { inject, observer } from 'mobx-react';
+import classNames from 'classnames';
+import {
+  Tabs, TabList, Tab, TabPanel,
+} from 'react-tabs';
 
 class StoryItem extends React.PureComponent {
-    render() {
-        const { name, value } = this.props;
+  render() {
+    const { name, value } = this.props;
 
-        const textClassNames = classNames({
-            "text": true,
-            "active": value,
-        });
+    const textClassNames = classNames({
+      text: true,
+      active: value,
+    });
 
-        return (
+    return (
             <tr className="monitor-table-item">
                 <td className={textClassNames}>{name.toUpperCase()}</td>
                 <td className={textClassNames}>{value ? 'YES' : 'No'}</td>
             </tr>
-        );
-    }
+    );
+  }
 }
 
-@inject("store") @observer
+@inject('store') @observer
 export default class StoryTellingMonitor extends React.Component {
-    render() {
-        const { stories } = this.props.store.storyTellers;
+  render() {
+    const { stories } = this.props.store.storyTellers;
 
-        let storyTable = null;
-        if (stories.size > 0) {
-            storyTable = stories.entries().map(([story, isOn]) =>
+    let storyTable = null;
+    if (stories.size > 0) {
+      storyTable = stories.entries().map(([story, isOn]) =>
                 <StoryItem key={`story_${story}`} name={story} value={isOn} />
-            );
-        } else {
-            storyTable = (
+      );
+    } else {
+      storyTable = (
                 <tr className="monitor-table-item">
                     <td className="text">No Data</td>
                 </tr>
-            );
-        }
+      );
+    }
 
-        return (
+    return (
             <Tabs>
                 <TabList>
                     <Tab>Story Tellers</Tab>
@@ -51,6 +52,6 @@ export default class StoryTellingMonitor extends React.Component {
                     </table>
                 </TabPanel>
             </Tabs>
-        );
-    }
+    );
+  }
 }

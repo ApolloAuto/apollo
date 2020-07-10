@@ -14,10 +14,10 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
-        "//third_party:boost",
+        "@boost",
         "@eigen",
-        "@opencv",
         "@lz4",
+        "@opencv",
     ],
 )
 
@@ -30,7 +30,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
-        "//third_party:boost",
+        "@boost",
         "@eigen",
         "@opencv",
     ],

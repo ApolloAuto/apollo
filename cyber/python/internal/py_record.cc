@@ -558,10 +558,10 @@ static PyMethodDef _cyber_record_methods[] = {
 };
 
 /// Init function of this module
-PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
+PyMODINIT_FUNC PyInit__cyber_record_wrapper(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_record_py3",    // Module name.
+      "_cyber_record_wrapper",    // Module name.
       "CyberRecord module",   // Module doc.
       -1,                     // Module size.
       _cyber_record_methods,  // Module methods.
@@ -571,6 +571,6 @@ PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
       nullptr,
   };
 
-  AINFO << "init _cyber_record_py3";
+  AINFO << "init _cyber_record_wrapper";
   return PyModule_Create(&module_def);
 }

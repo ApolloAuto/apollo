@@ -17,5 +17,5 @@ py_binary(
     srcs = ["roadshow.py"],
     deps = [
         "//modules/tools/mapshow/libs:map",
-    ]
+    ],
 )

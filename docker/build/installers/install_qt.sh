@@ -62,11 +62,20 @@ cuteci \
     --packages "qt.qt5.${QT_VERSION_Z}.gcc_64" \
     --keep-tools
 
+QT5_PATH="/usr/local/qt5"
 # Hide qt5 version from end users
-ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 /usr/local/qt5
+ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 "${QT5_PATH}"
 
-echo "/usr/local/qt5/lib" > /etc/ld.so.conf.d/qt.conf
+echo "${QT5_PATH}/lib" > /etc/ld.so.conf.d/qt.conf
 ldconfig
+
+__mytext="""
+export QT5_PATH=\"${QT5_PATH}\"
+export QT_QPA_PLATFORM_PLUGIN_PATH=\"\${QT5_PATH}/plugins\"
+add_to_path \"\${QT5_PATH}/bin\"
+"""
+
+echo "${__mytext}" | tee -a "${APOLLO_PROFILE}"
 
 # clean up
 rm -f ${QT_INSTALLER}
@@ -75,6 +84,5 @@ rm -rf ${MY_DEST_DIR}/{Docs,Examples,Tools,dist} || true
 rm -rf ${MY_DEST_DIR}/MaintenanceTool* || true
 rm -rf ${MY_DEST_DIR}/{InstallationLog.txt,installer-changelog} || true
 rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
-
 
 pip3 uninstall -y cuteci

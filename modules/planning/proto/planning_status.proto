@@ -15,6 +15,7 @@ import "modules/routing/proto/routing.proto";
 message BareIntersectionStatus {
   optional string current_pnc_junction_overlap_id = 1;
   optional string done_pnc_junction_overlap_id = 2;
+  optional uint32 clear_counter = 3;
 }
 
 message ChangeLaneStatus {
@@ -39,6 +40,10 @@ message ChangeLaneStatus {
   // denotes if the surrounding area is clear for ego vehicle to
   // change lane at this moment.
   optional bool is_clear_to_change_lane = 8 [default = false];
+}
+
+message CreepDeciderStatus {
+  optional uint32 creep_clear_counter = 1;
 }
 
 message StopTime {
@@ -137,17 +142,18 @@ message YieldSignStatus {
 message PlanningStatus {
   optional BareIntersectionStatus bare_intersection = 1;
   optional ChangeLaneStatus change_lane = 2;
-  optional CrosswalkStatus crosswalk = 3;
-  optional DestinationStatus destination = 4;
-  optional EmergencyStopStatus emergency_stop = 5;
-  optional OpenSpaceStatus open_space = 6;
-  optional ParkAndGoStatus park_and_go = 7;
-  optional PathDeciderStatus path_decider = 8;
-  optional PullOverStatus pull_over = 9;
-  optional ReroutingStatus rerouting = 10;
-  optional ScenarioStatus scenario = 11;
-  optional SpeedDeciderStatus speed_decider = 12;
-  optional StopSignStatus stop_sign = 13;
-  optional TrafficLightStatus traffic_light = 14;
-  optional YieldSignStatus yield_sign = 15;
+  optional CreepDeciderStatus creep_decider = 3;
+  optional CrosswalkStatus crosswalk = 4;
+  optional DestinationStatus destination = 5;
+  optional EmergencyStopStatus emergency_stop = 6;
+  optional OpenSpaceStatus open_space = 7;
+  optional ParkAndGoStatus park_and_go = 8;
+  optional PathDeciderStatus path_decider = 9;
+  optional PullOverStatus pull_over = 10;
+  optional ReroutingStatus rerouting = 11;
+  optional ScenarioStatus scenario = 12;
+  optional SpeedDeciderStatus speed_decider = 13;
+  optional StopSignStatus stop_sign = 14;
+  optional TrafficLightStatus traffic_light = 15;
+  optional YieldSignStatus yield_sign = 16;
 }

@@ -33,10 +33,10 @@ cc_library(
     hdrs = ["open_space_fallback_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/tasks/deciders:decider_base",
-        "//modules/planning/common:dependency_injector",
     ],
 )
 
@@ -56,8 +56,8 @@ cc_test(
     srcs = ["open_space_fallback_decider_test.cc"],
     deps = [
         ":open_space_fallback_decider",
-        "@com_google_googletest//:gtest_main",
         "//modules/planning/common:dependency_injector",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "cyber_recorder",
     srcs = ["main.cc"],
+    linkopts = ["-pthread"],
     deps = [
         ":info",
         ":player",
@@ -15,7 +16,6 @@ cc_binary(
         "//cyber:init",
         "//cyber/common:file",
         "//cyber/common:time_conversion",
-        "//third_party:pthread",
     ],
 )
 

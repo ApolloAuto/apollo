@@ -19,7 +19,7 @@ def if_with_teleop(if_true, if_false = []):
     })
 
 def copts_if_with_teleop():
-    return if_with_teleop(["-DTELEOP=1"])
+    return if_with_teleop(["-DWITH_TELEOP=1"])
 
 def if_x86_mode(if_true, if_false = []):
     return select({

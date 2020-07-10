@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -42,8 +42,8 @@ cc_library(
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
         "//third_party:libtorch",
         "@local_config_cuda//cuda:cudart",
-        "@opencv",
         "@local_config_tensorrt//:tensorrt",
+        "@opencv",
     ],
 )
 

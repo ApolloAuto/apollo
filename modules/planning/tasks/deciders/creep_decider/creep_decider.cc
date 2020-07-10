@@ -36,8 +36,6 @@ namespace planning {
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-uint32_t CreepDecider::creep_clear_counter_ = 0;
-
 CreepDecider::CreepDecider(const TaskConfig& config,
                            const std::shared_ptr<DependencyInjector>& injector)
     : Decider(config, injector) {
@@ -183,12 +181,19 @@ bool CreepDecider::CheckCreepDone(const Frame& frame,
       }
     }
 
-    creep_clear_counter_ = all_far_away ? creep_clear_counter_ + 1 : 0;
-    if (creep_clear_counter_ >= 5) {
-      creep_clear_counter_ = 0;  // reset
+    auto* creep_decider_status = injector_->planning_context()
+                                          ->mutable_planning_status()
+                                          ->mutable_creep_decider();
+    int creep_clear_counter = creep_decider_status->creep_clear_counter();
+    creep_clear_counter = all_far_away ? creep_clear_counter + 1 : 0;
+    if (creep_clear_counter >= 5) {
+      creep_clear_counter = 0;  // reset
       creep_done = true;
     }
+    // use PlanningContext instead of static counter for multi-ADC
+    creep_decider_status->set_creep_clear_counter(creep_clear_counter);
   }
+
   return creep_done;
 }
 

@@ -63,8 +63,8 @@ cc_test(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
+        "@lz4",
         "@opencv",
-        "@lz4"
     ],
 )
 

@@ -20,11 +20,11 @@ cc_binary(
         "mainboard/module_controller.cc",
         "mainboard/module_controller.h",
     ],
+    linkopts = ["-pthread"],
     linkstatic = False,
     deps = [
         ":cyber_core",
         "//cyber/proto:dag_conf_cc_proto",
-        "//third_party:pthread",
     ],
 )
 
@@ -59,6 +59,7 @@ cc_library(
     name = "cyber_core",
     srcs = ["cyber.cc"],
     hdrs = ["cyber.h"],
+    linkopts = ["-lrt"],
     deps = [
         "//cyber:binary",
         "//cyber:init",
@@ -99,7 +100,6 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
-        "//third_party:rt",
         "//third_party:uuid",
         "@com_google_glog//:glog",
         "@com_google_protobuf//:protobuf",

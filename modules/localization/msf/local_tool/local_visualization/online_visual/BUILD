@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,8 +15,8 @@ cc_library(
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/common/util:eigen_defs",
+        "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
