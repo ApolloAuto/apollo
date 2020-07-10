@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 # JSON for Modern C++
 licenses(["notice"])  # 3-Clause BSD
 
@@ -6,7 +8,7 @@ exports_files(["LICENSE.MIT"])
 cc_library(
     name = "json",
     hdrs = glob([
-       "include/nlohmann/**/*.hpp",
+        "include/nlohmann/**/*.hpp",
     ]),
     includes = ["include"],
     visibility = ["//visibility:public"],
