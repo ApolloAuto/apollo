@@ -90,10 +90,12 @@ function determine_gpu_use() {
 
     if [[ "${arch}" == "aarch64" ]]; then
         if lsmod | grep -q nvgpu; then
-            use_gpu=1
+            if ldconfig -p | grep -q cudart; then
+                use_gpu=1
+            fi
         fi
     else ## x86_64 mode
-        # TODO(all): remove USE_GPU when {cyber,dev}_start.sh"
+        # TODO(all): remove USE_GPU env var in {cyber,dev}_start.sh"
         # Check nvidia-driver and GPU device
         local nv_driver="nvidia-smi"
         if [ ! -x "$(command -v ${nv_driver} )" ]; then
