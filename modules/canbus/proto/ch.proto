@@ -234,7 +234,7 @@ message Ecu_status_2_516 {
   optional double battery_voltage = 2;
   // Current battery current (BMS status) [A] [-60|60]
   optional double battery_current = 3;
-  // Current battery temperature (BMS status) [¡É] [-40|110]
+  // Current battery temperature (BMS status) [?] [-40|110]
   optional int32 battery_temperature = 4;
 }
 
@@ -243,8 +243,7 @@ message Ch {
   optional Gear_command_114 gear_command_114 = 2;          // control message
   optional Brake_command_111 brake_command_111 = 3;        // control message
   optional Throttle_command_110 throttle_command_110 = 4;  // control message
-  optional Turnsignal_command_113 turnsignal_command_113 =
-      5;                                                   // control message
+  optional Turnsignal_command_113 turnsignal_command_113 = 5; // control message
   optional Steer_command_112 steer_command_112 = 6;        // control message
   optional Brake_status__511 brake_status__511 = 7;        // report message
   optional Throttle_status__510 throttle_status__510 = 8;  // report message
