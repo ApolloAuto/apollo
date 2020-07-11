@@ -31,7 +31,8 @@ for entry in "${cyber_bin_path}" "${recorder_path}" "${monitor_path}" "${launch_
     add_to_path "${entry}"
 done
 
-export PYTHONPATH=${bazel_bin_path}/cyber/python/internal:${CYBER_PATH}/python:$PYTHONPATH
+export PYTHONPATH=${bazel_bin_path}/cyber/python/internal:${bazel_bin_path}/cyber/python:$PYTHONPATH
+#export PYTHONPATH=${bazel_bin_path}:${bazel_bin_path}/cyber/python/internal:${CYBER_PATH}/python:$PYTHONPATH
 
 export CYBER_DOMAIN_ID=80
 export CYBER_IP=127.0.0.1
