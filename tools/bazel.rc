@@ -83,7 +83,7 @@ test --test_env=LD_LIBRARY_PATH
 # By default prints output only from failed tests.
 test --test_output=errors
 
-test:unit_test -c dbg --test_verbose_timeout_warnings
+test:unit_test --test_verbose_timeout_warnings
 
 test:coverage --copt=--coverage
 test:coverage --cxxopt=--coverage
