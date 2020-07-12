@@ -21,7 +21,7 @@
 import unittest
 
 from cyber.proto import record_pb2
-from cyber_py3 import record
+from cyber.python.cyber_py3 import record
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 

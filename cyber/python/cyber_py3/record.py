@@ -25,10 +25,11 @@ import sys
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
-
-# init vars
-# NOTE(all):     source cyber/setup.bash before run
-# FIXME(infras): remove the requirement listed above.
+# Refer to the _cyber_record_wrapper.so with relative path so that it can be
+# always addressed as a part of the runfiles.
+wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                '../internal'))
+sys.path.append(wrapper_lib_path)
 
 _CYBER_RECORD = importlib.import_module('_cyber_record_wrapper')
 PyBagMessage = collections.namedtuple('PyBagMessage',
