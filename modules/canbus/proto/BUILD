@@ -6,6 +6,24 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "devkit_cc_proto",
+    deps = [
+        ":devkit_proto",
+    ],
+)
+
+proto_library(
+    name = "devkit_proto",
+    srcs = ["devkit.proto"],
+)
+
+py_proto_library(
+    name = "devkit_py_pb2",
+    deps = [
+        ":devkit_proto",
+    ],
+)
+cc_proto_library(
     name = "chassis_cc_proto",
     deps = [
         ":chassis_proto",
@@ -54,25 +72,6 @@ py_proto_library(
         ":ch_proto",
     ],
 )
-cc_proto_library(
-    name = "devkit_cc_proto",
-    deps = [
-        ":devkit_proto",
-    ],
-)
-
-proto_library(
-    name = "devkit_proto",
-    srcs = ["devkit.proto"],
-)
-
-python_proto_library(
-    name = "devkit_py_pb2",
-    deps = [
-        ":devkit_proto",
-    ],
-)
-
 cc_proto_library(
     name = "zhongyun_cc_proto",
     deps = [
@@ -226,13 +225,13 @@ proto_library(
     deps = [
         "//modules/common/configs/proto:vehicle_config_proto",
         ":chassis_proto",
+        ":ch_proto",
         ":devkit_proto",
         ":ge3_proto",
         ":lexus_proto",
         ":transit_proto",
         ":wey_proto",
         ":zhongyun_proto",
-        ":ch_proto",
     ],
 )
 
@@ -242,12 +241,13 @@ py_proto_library(
         ":chassis_detail_proto",
         "//modules/common/configs/proto:vehicle_config_py_pb2",
         ":chassis_py_pb2",
+        ":ch_py_pb2",
+        ":devkit_py_pb2",
         ":ge3_py_pb2",
         ":lexus_py_pb2",
         ":transit_py_pb2",
         ":wey_py_pb2",
         ":zhongyun_py_pb2",
-        ":ch_py_pb2",
     ],
 )
 
