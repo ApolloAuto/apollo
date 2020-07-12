@@ -97,16 +97,18 @@ def py_proto_library(
     """Generate python code for a protobuf.
     Args:
       name: The name of the target.
-      deps: A list of proto_library dependencies. Must contain a single element.
+      deps: A list of proto_library dependencies. Must contain one proto_library target
+        element, plus other py_proto_library targets depended on.
       plugin: An optional custom protoc plugin to execute together with
         generating the protobuf code.
       **kwargs: Additional arguments to be supplied to the invocation of
         py_library.
     """
     codegen_target = "_{}_codegen".format(name)
-    if len(deps) < 1:
-        fail("Can only compile a single proto at a time.")
     src_deps = [d for d in deps if d.endswith("_proto")]
+    if len(src_deps) != 1:
+        fail("Can only compile a single proto at a time.")
+
     lib_deps = [d for d in deps if d.endswith("_py_pb2")]
 
     _generate_pb2_src(
