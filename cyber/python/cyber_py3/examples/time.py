@@ -20,7 +20,7 @@
 
 import time
 
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber_time
 
 
 def test_time():
