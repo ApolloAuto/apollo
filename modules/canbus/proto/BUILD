@@ -14,6 +14,7 @@ proto_library(
         "ch.proto",
         "chassis.proto",
         "chassis_detail.proto",
+        "devkit.proto",
         "ge3.proto",
         "lexus.proto",
         "transit.proto",
