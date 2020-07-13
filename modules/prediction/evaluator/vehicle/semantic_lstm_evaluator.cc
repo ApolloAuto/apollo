@@ -19,13 +19,11 @@
 #include <omp.h>
 
 #include "Eigen/Dense"
-
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
-#include "modules/prediction/common/semantic_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,7 +31,8 @@ namespace prediction {
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
 
-SemanticLSTMEvaluator::SemanticLSTMEvaluator() : device_(torch::kCPU) {
+SemanticLSTMEvaluator::SemanticLSTMEvaluator(SemanticMap* semantic_map)
+    : device_(torch::kCPU), semantic_map_(semantic_map) {
   evaluator_type_ = ObstacleConf::SEMANTIC_LSTM_EVALUATOR;
   LoadModel();
 }
@@ -61,7 +60,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     return false;
   }
   cv::Mat feature_map;
-  if (!SemanticMap::Instance()->GetMapById(id, &feature_map)) {
+  if (!semantic_map_->GetMapById(id, &feature_map)) {
     return false;
   }
   // Process the feature_map

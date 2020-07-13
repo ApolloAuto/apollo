@@ -48,14 +48,15 @@ bool IsTrainable(const Feature& feature) {
 }
 
 void EvaluatorManager::Init() {
-  SemanticMap::Instance()->Init();
-  evaluator_.reset(new SemanticLSTMEvaluator());
+  semantic_map_.reset(new SemanticMap());
+  semantic_map_->Init();
+  evaluator_.reset(new SemanticLSTMEvaluator(semantic_map_.get()));
   AERROR << "Init SemanticMap instance.";
 }
 
 void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
   BuildObstacleIdHistoryMap(obstacles_container);
-  SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
+  semantic_map_->RunCurrFrame(obstacle_id_history_map_);
   AINFO << "starting evaluating objects in semantic map";
   std::vector<Obstacle*> dynamic_env;
   for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {

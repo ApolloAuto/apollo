@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "cyber/common/macros.h"
+#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 
@@ -75,9 +76,8 @@ class EvaluatorManager {
                         ObstaclesContainer* obstacles_container);
 
  private:
-  void BuildObstacleIdHistoryMap(
-      ObstaclesContainer* obstacles_container,
-      size_t max_num_frame);
+  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container,
+                                 size_t max_num_frame);
 
   void DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container);
 
@@ -128,6 +128,8 @@ class EvaluatorManager {
       ObstacleConf::MLP_EVALUATOR;
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
+
+  std::unique_ptr<SemanticMap> semantic_map_;
 };
 
 }  // namespace prediction

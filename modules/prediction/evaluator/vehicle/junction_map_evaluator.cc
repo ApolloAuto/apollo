@@ -17,6 +17,7 @@
 #include "modules/prediction/evaluator/vehicle/junction_map_evaluator.h"
 
 #include <omp.h>
+
 #include <unordered_map>
 #include <utility>
 
@@ -25,12 +26,12 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
-#include "modules/prediction/common/semantic_map.h"
 
 namespace apollo {
 namespace prediction {
 
-JunctionMapEvaluator::JunctionMapEvaluator() : device_(torch::kCPU) {
+JunctionMapEvaluator::JunctionMapEvaluator(SemanticMap* semantic_map)
+    : device_(torch::kCPU), semantic_map_(semantic_map) {
   evaluator_type_ = ObstacleConf::JUNCTION_MAP_EVALUATOR;
   LoadModel();
 }
@@ -72,7 +73,7 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
     return false;
   }
   cv::Mat feature_map;
-  if (!SemanticMap::Instance()->GetMapById(id, &feature_map)) {
+  if (!semantic_map_->GetMapById(id, &feature_map)) {
     return false;
   }
 
@@ -94,9 +95,9 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
 
-  torch_inputs.push_back(c10::ivalue::Tuple::create(
-      {std::move(img_tensor.to(device_)),
-       std::move(junction_exit_mask.to(device_))}));
+  torch_inputs.push_back(
+      c10::ivalue::Tuple::create({std::move(img_tensor.to(device_)),
+                                  std::move(junction_exit_mask.to(device_))}));
 
   // Compute probability
   std::vector<double> probability;
