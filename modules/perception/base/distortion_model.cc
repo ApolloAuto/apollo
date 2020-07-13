@@ -21,11 +21,11 @@ namespace apollo {
 namespace perception {
 namespace base {
 
-Eigen::Vector2f BrownCameraDistortionModel::Project(
-    const Eigen::Vector3f& point3d) {
-  if (std::isless(point3d[2], 0.f)) {
-    AERROR << "The input point (" << point3d
-           << ") should be in front of the camera";
+// Eigen::Vector2f BrownCameraDistortionModel::Project(
+//     const Eigen::Vector3f& point3d) {
+//   if (std::isless(point3d[2], 0.f)) {
+//     AERROR << "The input point (" << point3d
+//            << ") should be in front of the camera";
   }
   // radial distortion coefficients
   const float k1 = distort_params_[0];
