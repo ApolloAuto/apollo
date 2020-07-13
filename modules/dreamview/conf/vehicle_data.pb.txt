@@ -138,3 +138,7 @@ data_files {
   source_path: "perception_launch"
   dest_path: "/apollo/modules/perception/production/launch"
 }
+data_files {
+  source_path: "fusion_camera_detection_component_conf"
+  dest_path: "/apollo/modules/perception/production/conf/perception/camera"  
+}
