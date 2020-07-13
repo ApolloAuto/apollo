@@ -32,10 +32,9 @@ bool MsgSerializer::SerializeMsg(double timestamp, uint64_t lidar_timestamp,
                                  const std::vector<base::ObjectPtr> &objects,
                                  const apollo::common::ErrorCode &error_code,
                                  PerceptionObstacles *obstacles) {
-  // double publish_time = apollo::common::time::Clock::NowInSeconds();
+  double publish_time = apollo::common::time::Clock::NowInSeconds();
   ::apollo::common::Header *header = obstacles->mutable_header();
-  // weide:fixme:header->set_timestamp_sec(publish_time);
-  header->set_timestamp_sec((static_cast<double>(lidar_timestamp)) / 1e9);
+  header->set_timestamp_sec(publish_time);
   header->set_module_name("perception_obstacle");
   header->set_sequence_num(seq_num);
   header->set_lidar_timestamp(lidar_timestamp);
