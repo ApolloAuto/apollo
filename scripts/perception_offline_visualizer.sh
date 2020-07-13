@@ -22,5 +22,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/apollo_base.sh"
 # run function from apollo_base.sh
 # run command_name module_name
-run perception "$@" --dag_config_path=/apollo/modules/perception/conf/dag_camera_obstacle_vis.config \
+run_module perception "$@" --dag_config_path=/apollo/modules/perception/conf/dag_camera_obstacle_vis.config \
 --alsologtostderr=1 --v=4
