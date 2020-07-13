@@ -1,11 +1,11 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+cc_binary(
     name = "libvideo_driver_component.so",
-    linkopts = ["-shared"],
+    linkshared = True,
     linkstatic = False,
     deps = [":video_driver_component_lib"],
 )

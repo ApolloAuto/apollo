@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -52,9 +52,9 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_binary(
     name = "libmsf_localization_component.so",
-    linkopts = ["-shared"],
+    linkshared = True,
     linkstatic = False,
     deps = [":msf_localization_component_lib"],
 )

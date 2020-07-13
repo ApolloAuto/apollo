@@ -37,7 +37,6 @@ cc_test(
 
 cc_binary(
     name = "libcanbus.so",
-    linkopts = ["-shared"],
     linkshared = True,
     linkstatic = False,
     deps = [

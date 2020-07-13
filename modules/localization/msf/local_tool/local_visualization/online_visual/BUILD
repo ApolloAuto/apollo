@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -29,9 +29,9 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_binary(
     name = "online_visualizer_compenont.so",
-    linkopts = ["-shared"],
+    linkshared = True,
     linkstatic = False,
     deps = [":online_visualizer_component_lib"],
 )
