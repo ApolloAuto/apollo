@@ -16,14 +16,15 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "torch/extension.h"
-#include "torch/script.h"
-
+#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator.h"
+#include "torch/extension.h"
+#include "torch/script.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,7 +34,8 @@ class JunctionMapEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  JunctionMapEvaluator();
+  JunctionMapEvaluator() = delete;
+  explicit JunctionMapEvaluator(SemanticMap* semantic_map);
 
   /**
    * @brief Destructor
@@ -77,6 +79,7 @@ class JunctionMapEvaluator : public Evaluator {
   static const size_t JUNCTION_FEATURE_SIZE = 12;
   torch::jit::script::Module torch_model_;
   torch::Device device_;
+  SemanticMap* semantic_map_;
 };
 
 }  // namespace prediction

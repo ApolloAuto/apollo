@@ -29,6 +29,8 @@ namespace prediction {
 
 class SemanticMap {
  public:
+  SemanticMap();
+
   virtual ~SemanticMap() = default;
 
   void Init();
@@ -102,8 +104,6 @@ class SemanticMap {
   std::future<void> task_future_;
 
   bool started_drawing_ = false;
-
-  DECLARE_SINGLETON(SemanticMap)
 };
 
 }  // namespace prediction
