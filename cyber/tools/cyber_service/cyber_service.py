@@ -18,11 +18,7 @@
 import os
 import sys
 
-from cyber_py3 import cyber
-
-
-sys.path.append("../")
-
+from cyber.python.cyber_py3 import cyber
 
 def print_service_info(service_name, sleep_s=2):
     roleattr_rawdata = cyber.ServiceUtils.get_service_attr(service_name, sleep_s)
@@ -99,7 +95,6 @@ Commands:
 Type cyber_service <command> -h for more detailed usage, e.g. 'cyber_service info -h'
 """)
     sys.exit(getattr(os, 'EX_USAGE', 1))
-
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

@@ -18,11 +18,7 @@
 import os
 import sys
 
-from cyber_py3 import cyber
-
-
-sys.path.append("../")
-
+from cyber.python.cyber_py3 import cyber
 
 def print_node_info(node_name, sleep_s=2):
     roleattr_rawdata = cyber.NodeUtils.get_node_attr(node_name, sleep_s)

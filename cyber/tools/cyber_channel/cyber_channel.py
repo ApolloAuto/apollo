@@ -20,12 +20,8 @@ import os
 import sys
 import time
 
-from cyber_py3 import cyber_time
-from cyber_py3 import cyber
-
-
-sys.path.append("../")
-
+from cyber.python.cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber
 
 def print_channel_type(channel_name):
     msgtype = cyber.ChannelUtils.get_msgtype(channel_name)
