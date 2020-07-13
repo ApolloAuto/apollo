@@ -21,8 +21,8 @@
 import time
 import unittest
 
-from cyber_py3 import cyber
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber_time
 
 
 class TestTime(unittest.TestCase):
