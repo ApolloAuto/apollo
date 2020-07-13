@@ -25,4 +25,4 @@ source "$DIR/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run canbus "$@"
+run_module canbus "$@"

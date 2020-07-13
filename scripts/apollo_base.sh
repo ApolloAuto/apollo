@@ -378,7 +378,7 @@ function record_bag_env_log() {
 }
 
 # run command_name module_name
-function run() {
+function run_module() {
   local module=$1
   shift
   run_customized_path $module $module "$@"

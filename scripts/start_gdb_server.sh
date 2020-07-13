@@ -66,7 +66,7 @@ if [ -z ${PROCESS_ID} ]; then
 
   # run function from apollo_base.sh
   # run command_name module_name
-  run ${MODULE_NAME} "$@"
+  run_module ${MODULE_NAME} "$@"
 
   PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
   echo ${PROCESS_ID}

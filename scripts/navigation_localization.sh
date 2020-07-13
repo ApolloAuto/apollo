@@ -23,4 +23,4 @@ source "${DIR}/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run localization "$@" --localization_config_file=/apollo/modules/localization/conf/navi_localization_config.pb.txt
+run_module localization "$@" --localization_config_file=/apollo/modules/localization/conf/navi_localization_config.pb.txt
