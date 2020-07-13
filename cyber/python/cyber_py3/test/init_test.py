@@ -15,49 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ****************************************************************************
+# -*- coding: utf-8 -*-
+"""Module for test init."""
 
-"""Module for test cyber timer."""
-
-import time
 import unittest
 
-from cyber_py3 import cyber
-from cyber_py3 import cyber_timer
+from cyber.python.cyber_py3 import cyber
 
+class TestInit(unittest.TestCase):
 
-class TestCyberTimer(unittest.TestCase):
     """
-    Class for cyber timer unit test.
+    Class for init unit test.
     """
 
-    count = 0
-
-    @classmethod
-    def setUpClass(cls):
-        cyber.init()
-
-    @classmethod
-    def tearDownClass(cls):
+    def test_init(self):
+        """
+        Test cyber.
+        """
+        self.assertTrue(cyber.init())
+        self.assertTrue(cyber.ok())
         cyber.shutdown()
-
-    def func(cls):
-        print('Callback function is called [%d] times.' % cls.count)
-        cls.count += 1
-
-    def test_timer(self):
-        ct = cyber_timer.Timer(100, self.func, 0)  # 100ms
-        ct.start()
-        time.sleep(1)  # 1s
-        ct.stop()
-
-        print('+' * 40 + 'test set_option' + '+' * 40)
-        ct2 = cyber_timer.Timer()  # 10ms
-        ct2.set_option(100, self.func, 0)
-        ct2.start()
-        time.sleep(1)  # 1s
-        ct2.stop()
+        self.assertTrue(cyber.is_shutdown())
 
 
 if __name__ == '__main__':
     unittest.main()
-    # TODO(xiaoxq): It crashes here.

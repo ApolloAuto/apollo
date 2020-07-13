@@ -21,7 +21,7 @@
 import time
 import unittest
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 
