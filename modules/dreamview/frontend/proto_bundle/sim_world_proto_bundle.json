@@ -1411,7 +1411,8 @@
                 "GE3": 4,
                 "WEY": 5,
                 "ZHONGYUN": 6,
-                "CH": 7
+                "CH": 7,
+                "DKIT": 8
               }
             },
             "VehicleID": {
@@ -6515,6 +6516,10 @@
                 "donePncJunctionOverlapId": {
                   "type": "string",
                   "id": 2
+                },
+                "clearCounter": {
+                  "type": "uint32",
+                  "id": 3
                 }
               }
             },
@@ -6569,6 +6574,14 @@
                     "CHANGE_LANE_FAILED": 2,
                     "CHANGE_LANE_FINISHED": 3
                   }
+                }
+              }
+            },
+            "CreepDeciderStatus": {
+              "fields": {
+                "creepClearCounter": {
+                  "type": "uint32",
+                  "id": 1
                 }
               }
             },
@@ -6852,57 +6865,61 @@
                   "type": "ChangeLaneStatus",
                   "id": 2
                 },
+                "creepDecider": {
+                  "type": "CreepDeciderStatus",
+                  "id": 3
+                },
                 "crosswalk": {
                   "type": "CrosswalkStatus",
-                  "id": 3
+                  "id": 4
                 },
                 "destination": {
                   "type": "DestinationStatus",
-                  "id": 4
+                  "id": 5
                 },
                 "emergencyStop": {
                   "type": "EmergencyStopStatus",
-                  "id": 5
+                  "id": 6
                 },
                 "openSpace": {
                   "type": "OpenSpaceStatus",
-                  "id": 6
+                  "id": 7
                 },
                 "parkAndGo": {
                   "type": "ParkAndGoStatus",
-                  "id": 7
+                  "id": 8
                 },
                 "pathDecider": {
                   "type": "PathDeciderStatus",
-                  "id": 8
+                  "id": 9
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 9
+                  "id": 10
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 10
+                  "id": 11
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 11
+                  "id": 12
                 },
                 "speedDecider": {
                   "type": "SpeedDeciderStatus",
-                  "id": 12
+                  "id": 13
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 13
+                  "id": 14
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 14
+                  "id": 15
                 },
                 "yieldSign": {
                   "type": "YieldSignStatus",
-                  "id": 15
+                  "id": 16
                 }
               }
             },
