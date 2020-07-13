@@ -37,7 +37,7 @@
 
 `$cmd,set,leverarm,gnss,x_offset,y_offset,z_offset*ff`
 
-这里的杆臂值就是车辆集成环节中测量所得的杆臂值，杆臂值请以自己使用的实际情况为准。
+这里的杆臂值`x_offset,y_offset,z_offset`就是车辆集成环节中测量所得的杆臂值，杆臂值请以自己使用的实际情况为准。
 
 ### GNSS航向配置
 
