@@ -73,6 +73,11 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
         absl::StrCat("learning_data adc_trajectory_point empty. frame_num[",
                      learning_data_frame.frame_num(), "]");
     AERROR << msg;
+    // hybrid model will use rule based planning when learning model output is
+    // not ready
+    if (FLAGS_planning_learning_mode == 3) {
+      return Status::OK();
+    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -178,7 +183,7 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   // }
 
   frame->mutable_learning_based_data()
-       ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
+      ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
 
   return Status::OK();
 }

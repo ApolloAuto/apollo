@@ -91,6 +91,12 @@ Status PathReferenceDecider::Process(Frame *frame,
       frame->learning_based_data().learning_data_adc_future_trajectory_points();
   ADEBUG << "There are " << path_reference.size() << " path points.";
 
+  // when learning model has no output, use rule-based model instead.
+  if (path_reference.size() == 0) {
+    ADEBUG << "No learning model output, using rule-based planning instead";
+    return Status::OK();
+  }
+
   // get regular path bound
   size_t regular_path_bound_idx = GetRegularPathBound(path_boundaries);
   if (regular_path_bound_idx == path_boundaries.size()) {
