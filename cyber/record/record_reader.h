@@ -65,7 +65,7 @@ class RecordReader : public RecordBase {
    * @param begin_time
    * @param end_time
    *
-   * @return True for success, flase for not.
+   * @return True for success, false for not.
    */
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
                    uint64_t end_time = UINT64_MAX);
