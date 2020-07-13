@@ -86,14 +86,16 @@ test --test_output=errors
 
 test:unit_test --test_verbose_timeout_warnings
 
-test:coverage --copt=--coverage
-test:coverage --cxxopt=--coverage
-test:coverage --cxxopt=-fprofile-arcs
-test:coverage --cxxopt=-ftest-coverage
-test:coverage --linkopt=-coverage
-test:coverage --linkopt=-lgcov
-test:coverage --linkopt=-lgcc
-test:coverage --linkopt=-lc
+coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
+# coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"
+coverage --instrument_test_targets --combined_report=lcov
+coverage --coverage_report_generator="@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main"
+
+coverage --cxxopt=--coverage
+coverage --cxxopt=-fprofile-arcs
+coverage --cxxopt=-ftest-coverage
+coverage --linkopt=-lgcov
+
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
@@ -110,7 +112,7 @@ test:cpplint --build_tests_only
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
 # Coverage tests
-test:coverage --test_tag_filters=-cpplint
+coverage --test_tag_filters=-cpplint
 
 # +------------------------------------------------------------+
 # | Python Configurations                                      |
