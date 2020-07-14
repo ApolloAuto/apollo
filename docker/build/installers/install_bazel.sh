@@ -50,7 +50,8 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
-  mv -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
+  cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
+  rm -rf ${PKG_NAME}
 
   ## buildozer
   PKG_NAME="buildozer"
@@ -60,7 +61,8 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
-  mv -f "${PKG_NAME} "${SYSROOT_DIR}/bin/"
+  cp -f "${PKG_NAME}" "${SYSROOT_DIR}/bin/"
+  rm -f "${PKG_NAME}"
   info "Done installing bazel ${BAZEL_VERSION} with buildifier and buildozer"
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
@@ -73,7 +75,12 @@ elif [ "$TARGET_ARCH" == "aarch64" ]; then
   CHECKSUM="440672f319be239d7dd5d7c5062edee23499dd49b49e89cc26dc9d44aa044a96"
   download_if_not_cached "${ARM64_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
   chmod a+x ${ARM64_BINARY}
-  mv -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/bazel"
+  cp -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/bazel"
+  rm -rf "${ARM64_BINARY}"
+
+  cp /opt/apollo/rcfiles/bazel_completion.bash /etc/bash_completion.d/bazel
+
+  # TODO(buildifer)
 
   info "Done installing bazel ${BAZEL_ARM_VERSION}"
 else
