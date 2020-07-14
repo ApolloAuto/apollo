@@ -22,10 +22,6 @@
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
-#include "modules/perception/lidar/lib/interface/base_classifier.h"
-#include "modules/perception/lidar/lib/map_manager/map_manager.h"
-#include "modules/perception/lidar/lib/object_builder/object_builder.h"
-#include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
 namespace apollo {
@@ -34,7 +30,6 @@ namespace lidar {
 
 struct LidarObstacleDetectionInitOptions {
   std::string sensor_name = "velodyne64";
-  bool enable_hdmap_input = true;
 };
 
 struct LidarObstacleDetectionOptions {
@@ -68,14 +63,9 @@ class LidarObstacleDetection {
 
  private:
   PointCloudPreprocessor cloud_preprocessor_;
-  MapManager map_manager_;
   std::unique_ptr<PointPillarsDetection> detector_;
-  ObjectBuilder builder_;
-  ObjectFilterBank filter_bank_;
   // params
   std::string detector_name_;
-  bool use_map_manager_ = true;
-  bool use_object_filter_bank_ = true;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

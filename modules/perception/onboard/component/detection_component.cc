@@ -42,7 +42,7 @@ bool DetectionComponent::Init() {
       comp_config.lidar2novatel_tf2_child_frame_id();
   lidar_query_tf_offset_ =
       static_cast<float>(comp_config.lidar_query_tf_offset());
-  enable_hdmap_ = comp_config.enable_hdmap();
+//  enable_hdmap_ = comp_config.enable_hdmap();
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
   if (!InitAlgorithmPlugin()) {
@@ -82,8 +82,8 @@ bool DetectionComponent::InitAlgorithmPlugin() {
   }
   lidar::LidarObstacleDetectionInitOptions init_options;
   init_options.sensor_name = sensor_name_;
-  init_options.enable_hdmap_input =
-      FLAGS_obs_enable_hdmap_input && enable_hdmap_;
+//  init_options.enable_hdmap_input =
+//      FLAGS_obs_enable_hdmap_input && enable_hdmap_;
   if (!detector_->Init(init_options)) {
     AINFO << "sensor_name_ "
           << "Failed to init detection.";

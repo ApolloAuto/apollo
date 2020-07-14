@@ -49,14 +49,27 @@ class HDMapInput {
   void MergeBoundaryJunction(
       const std::vector<apollo::hdmap::RoadRoiPtr>& boundary,
       const std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
-      std::vector<base::RoadBoundary>* road_boundaries_ptr,
-      std::vector<base::PolygonDType>* road_polygons_ptr,
-      std::vector<base::PolygonDType>* junction_polygons_ptr);
+      std::vector<base::RoadBoundary,
+                  Eigen::aligned_allocator<base::RoadBoundary> >*
+          road_boundaries_ptr,
+      std::vector<base::PointCloud<base::PointD>,
+                  Eigen::aligned_allocator<base::PointCloud<base::PointD> > >*
+          road_polygons_ptr,
+      std::vector<base::PointCloud<base::PointD>,
+                  Eigen::aligned_allocator<base::PointCloud<base::PointD> > >*
+          junction_polygons_ptr);
 
   bool GetRoadBoundaryFilteredByJunctions(
-      const std::vector<base::RoadBoundary>& road_boundaries,
-      const std::vector<base::PointCloud<base::PointD>>& junctions,
-      std::vector<base::RoadBoundary>* flt_road_boundaries_ptr);
+      const std::vector<base::RoadBoundary,
+                        Eigen::aligned_allocator<base::RoadBoundary> >&
+          road_boundaries,
+      const std::vector<
+          base::PointCloud<base::PointD>,
+          Eigen::aligned_allocator<base::PointCloud<base::PointD> > >&
+          junctions,
+      std::vector<base::RoadBoundary,
+                  Eigen::aligned_allocator<base::RoadBoundary> >*
+          flt_road_boundaries_ptr);
 
   void DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
                         base::PointCloud<base::PointD>* polygon_ptr,
@@ -64,8 +77,13 @@ class HDMapInput {
 
   void SplitBoundary(
       const base::PointCloud<base::PointD>& boundary_line,
-      const std::vector<base::PointCloud<base::PointD>>& junctions,
-      std::vector<base::PointCloud<base::PointD>>* boundary_line_vec_ptr);
+      const std::vector<
+          base::PointCloud<base::PointD>,
+          Eigen::aligned_allocator<base::PointCloud<base::PointD> > >&
+          junctions,
+      std::vector<base::PointCloud<base::PointD>,
+                  Eigen::aligned_allocator<base::PointCloud<base::PointD> > >*
+          boundary_line_vec_ptr);
 
   bool GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
                            double forward_distance,

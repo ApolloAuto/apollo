@@ -14,10 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
+
+#include "Eigen/StdVector"
 
 #include "modules/perception/lidar/lib/classifier/fused_classifier/type_fusion_interface.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
@@ -28,6 +32,8 @@ namespace lidar {
 
 class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
                   std::shared_ptr<perception::base::Object> object) override;
@@ -37,12 +43,16 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
       Vectord* log_prob);
 
  protected:
-  std::map<std::string, Matrixd> smooth_matrices_;
+  std::map<std::string, Matrixd, std::less<std::string>,
+           Eigen::aligned_allocator<std::pair<const std::string, Matrixd>>>
+      smooth_matrices_;
   Matrixd confidence_smooth_matrix_;
 };
 
 class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
                   TrackedObjects* tracked_objects) override;
@@ -72,9 +82,9 @@ class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
   Matrixd transition_matrix_;
 
   // data member for window inference version
-  std::vector<Vectord> fused_oneshot_probs_;
-  std::vector<Vectord> fused_sequence_probs_;
-  std::vector<Vectori> state_back_trace_;
+  std::vector<Vectord, Eigen::aligned_allocator<Vectord>> fused_oneshot_probs_;
+  std::vector<Vectord, Eigen::aligned_allocator<Vectord>> fused_sequence_probs_;
+  std::vector<Vectori, Eigen::aligned_allocator<Vectori>> state_back_trace_;
 
  protected:
   double s_alpha_ = 1.8;
