@@ -8,6 +8,7 @@ bazel-*
 
 # Generated files
 *.result
+py_proto
 
 # Eclipse IDE files
 .project
