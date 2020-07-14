@@ -143,6 +143,5 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::lidar::PCLPointXYZIT,
                                       intensity)(double, timestamp, timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::lidar::PCLPointXYZL,
-                                  (float, x, x)(float, y, y)(float, z,
-                                                             z)(uint32_t, label,
-                                                                label))
+                                  (float, x, x)(float, y, y)(float, z, z)(
+                                      std::uint32_t, label, label))

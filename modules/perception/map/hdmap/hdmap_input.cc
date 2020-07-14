@@ -130,7 +130,8 @@ bool HDMapInput::GetRoiHDMapStruct(
   hdmap_struct_ptr->road_polygons.clear();
 
   // Merge boundary and junction
-  std::vector<RoadBoundary> road_boundaries;
+  std::vector<base::RoadBoundary, Eigen::aligned_allocator<base::RoadBoundary> >
+      road_boundaries;
   MergeBoundaryJunction(road_boundary_vec, junctions_vec, &road_boundaries,
                         &(hdmap_struct_ptr->road_polygons),
                         &(hdmap_struct_ptr->junction_polygons));
@@ -144,9 +145,14 @@ bool HDMapInput::GetRoiHDMapStruct(
 void HDMapInput::MergeBoundaryJunction(
     const std::vector<apollo::hdmap::RoadRoiPtr>& boundary,
     const std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
-    std::vector<base::RoadBoundary>* road_boundaries_ptr,
-    std::vector<base::PolygonDType>* road_polygons_ptr,
-    std::vector<base::PolygonDType>* junction_polygons_ptr) {
+    std::vector<RoadBoundary, Eigen::aligned_allocator<RoadBoundary> >*
+        road_boundaries_ptr,
+    std::vector<base::PointCloud<base::PointD>,
+                Eigen::aligned_allocator<base::PointCloud<base::PointD> > >*
+        road_polygons_ptr,
+    std::vector<base::PointCloud<base::PointD>,
+                Eigen::aligned_allocator<base::PointCloud<base::PointD> > >*
+        junction_polygons_ptr) {
   const int boundary_size = static_cast<int>(boundary.size());
   const int junctions_size = static_cast<int>(junctions.size());
   const int polygon_size = boundary_size;
@@ -228,13 +234,23 @@ void HDMapInput::MergeBoundaryJunction(
 }
 
 bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
-    const std::vector<base::RoadBoundary>& road_boundaries,
-    const std::vector<base::PointCloud<PointD>>& junctions,
-    std::vector<base::RoadBoundary>* flt_road_boundaries_ptr) {
+    const std::vector<base::RoadBoundary,
+                      Eigen::aligned_allocator<base::RoadBoundary> >&
+        road_boundaries,
+    const std::vector<
+        base::PointCloud<base::PointD>,
+        Eigen::aligned_allocator<base::PointCloud<base::PointD> > >& junctions,
+    std::vector<base::RoadBoundary,
+                Eigen::aligned_allocator<base::RoadBoundary> >*
+        flt_road_boundaries_ptr) {
   for (size_t n_rd = 0; n_rd < road_boundaries.size(); ++n_rd) {
     const base::RoadBoundary& temp_road_boundary = road_boundaries[n_rd];
-    std::vector<base::PolygonDType> temp_left_boundary_vec;
-    std::vector<base::PolygonDType> temp_right_boundary_vec;
+    std::vector<base::PointCloud<base::PointD>,
+                Eigen::aligned_allocator<base::PointCloud<base::PointD> > >
+        temp_left_boundary_vec;
+    std::vector<base::PointCloud<base::PointD>,
+                Eigen::aligned_allocator<base::PointCloud<base::PointD> > >
+        temp_right_boundary_vec;
     // Filter left boundary points
     this->SplitBoundary(temp_road_boundary.left_boundary, junctions,
                         &temp_left_boundary_vec);
@@ -308,8 +324,12 @@ void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
 
 void HDMapInput::SplitBoundary(
     const base::PointCloud<base::PointD>& boundary_line,
-    const std::vector<base::PointCloud<base::PointD>>& junctions,
-    std::vector<base::PointCloud<base::PointD>>* boundary_line_vec_ptr) {
+    const std::vector<
+        base::PointCloud<base::PointD>,
+        Eigen::aligned_allocator<base::PointCloud<base::PointD> > >& junctions,
+    std::vector<base::PointCloud<base::PointD>,
+                Eigen::aligned_allocator<base::PointCloud<base::PointD> > >*
+        boundary_line_vec_ptr) {
   std::vector<bool> boundary_flag(boundary_line.size());
   for (size_t npt = 0; npt < boundary_line.size(); ++npt) {
     const PointD& pointd = boundary_line[npt];
