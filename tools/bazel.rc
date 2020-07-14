@@ -88,8 +88,10 @@ test:unit_test --test_verbose_timeout_warnings
 
 coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
 # coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"
-coverage --instrument_test_targets --combined_report=lcov
-coverage --coverage_report_generator="@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main"
+coverage --instrument_test_targets
+coverage --combined_report=lcov
+coverage --nocache_test_results
+# coverage --coverage_report_generator="@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main"
 
 coverage --cxxopt=--coverage
 coverage --cxxopt=-fprofile-arcs
