@@ -125,7 +125,7 @@ bool RecordFileWriter::WriteSection(const T& message) {
   Section section;
   /// zero out whole struct even if padded
   memset(&section, 0, sizeof(section));
-  section = {type, message.ByteSize()};
+  section = {type, static_cast<int64_t>(message.ByteSizeLong())};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
@@ -143,12 +143,12 @@ bool RecordFileWriter::WriteSection(const T& message) {
   }
   if (type == proto::SectionType::SECTION_HEADER) {
     static char blank[HEADER_LENGTH] = {'0'};
-    count = write(fd_, &blank, HEADER_LENGTH - message.ByteSize());
+    count = write(fd_, &blank, HEADER_LENGTH - message.ByteSizeLong());
     if (count < 0) {
       AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
       return false;
     }
-    if (count != HEADER_LENGTH - message.ByteSize()) {
+    if (count != HEADER_LENGTH - message.ByteSizeLong()) {
       AERROR << "Write fd failed, fd: " << fd_
              << ", expect count: " << sizeof(section)
              << ", actual count: " << count;
