@@ -8,6 +8,8 @@ source "${TOP_DIR}/scripts/apollo_base.sh"
 BAZEL_OUT="${TOP_DIR}/bazel-out" # $(bazel info output_path)
 COVERAGE_HTML="${TOP_DIR}/.cache/coverage"
 COVERAGE_DAT="${BAZEL_OUT}/_coverage/_coverage_report.dat"
+GENHTML_OPTIONS="--rc genhtml_branch_coverage=1"
+#GENHTML_OPTIONS="--rc genhtml_branch_coverage=1 --highlight --legend"
 
 ##============= Perception ===================##
 PERCEPTION_EXCEPTIONS="\
@@ -174,7 +176,7 @@ function main() {
     fi
 
     bazel_coverage $@
-    genhtml "${COVERAGE_DAT}" --output-directory "${COVERAGE_HTML}"
+    genhtml "${COVERAGE_DAT}" ${GENHTML_OPTIONS} --output-directory "${COVERAGE_HTML}"
     success "Done bazel coverage ${SHORTHAND_TARGETS}. "
     info "Coverage report was generated under ${COVERAGE_HTML}"
 }
