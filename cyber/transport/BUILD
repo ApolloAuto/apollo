@@ -340,10 +340,7 @@ cc_library(
     srcs = ["rtps/underlay_message_type.cc"],
     hdrs = ["rtps/underlay_message_type.h"],
     deps = [
-        ":underlay_message",
-        "@fastrtps",
-    ],
-)
+
 
 cc_test(
     name = "rtps_test",
