@@ -27,10 +27,10 @@ TARGET_ARCH=$(uname -m)
 
 if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
-  VERSION="3.3.0"
-  PKG_NAME="bazel_${VERSION}-linux-x86_64.deb"
-  DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}
-  SHA256SUM="aebed9ba87b0e4b56e3ae6baeece004a31774ee402182ad4e9f70715345d5f56"
+  BAZEL_VERSION="3.4.1"
+  PKG_NAME="bazel_${BAZEL_VERSION}-linux-x86_64.deb"
+  DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${PKG_NAME}
+  SHA256SUM="1a64c807716e10c872f1618852d95f4893d81667fe6e691ef696489103c9b460"
   download_if_not_cached $PKG_NAME $SHA256SUM $DOWNLOAD_LINK
 
   apt-get -y update && \
@@ -44,8 +44,9 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
 
   ## buildifier ##
   PKG_NAME="buildifier"
+  BUILDIFIER_VERSION="3.3.0"
   CHECKSUM="0c5df005e2b65060c715a7c5764c2a04f7fac199bd73442e004e0bf29381a55a"
-  DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/${VERSION}/buildifier"
+  DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/${BUILDIFIER_VERSION}/buildifier"
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
@@ -54,8 +55,9 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
 
   ## buildozer
   PKG_NAME="buildozer"
+  BUILDOZER_VERSION="3.3.0"
   CHECKSUM="6618c2a4473ddc35a5341cf9a651609209bd5362e0ffa54413be256fe8a4081a"
-  DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/${VERSION}/buildozer"
+  DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/${BUILDOZER_VERSION}/buildozer"
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
@@ -64,44 +66,20 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   info "Done installing bazel ${VERSION} with buildifier and buildozer"
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
-  INSTALL_MODE="$1"
   # TODO(xiaoxq): Stick to v3.2 for a while until we have ARM machine to work with.
-  VERSION="3.2.0"
+  BAZEL_ARM_VERSION="3.4.0"
   # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
   # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
-  if [[ "${INSTALL_MODE}" == "build" ]]; then
-    apt-get -y update && \
-      apt-get -y install \
-      build-essential openjdk-11-jdk python3 zip unzip
-
-    PKG_NAME="bazel-${VERSION}-dist.zip"
-    CHECKSUM="44ec129436f6de45f2230e14100104919443a1364c2491f5601666b358738bfa"
-    DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${VERSION}/${PKG_NAME}"
-    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-    BBUILD_DIR="${PKG_NAME%.zip}"
-    unzip "${PKG_NAME}" -d "${BBUILD_DIR}"
-
-    # https://reproducible-builds.org/docs/source-date-epoch
-    pushd ${BBUILD_DIR}
-      # env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
-      SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date +%s)}"
-      env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH}" bash ./compile.sh
-      cp -f output/bazel ${SYSROOT_DIR}/bin/
-      chmod a+x ${SYSROOT_DIR}/bin
-    popd
-    rm -rf "${PKG_NAME}" "${BBUILD_DIR}"
-  else # Download Mode
-    PKG_NAME="bazel-${VERSION}-aarch64-linux-gnu.tar.gz"
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-    CHECKSUM="56b904a06a809da59c0a20ccd570f51d0b9d9daa4cf551a73357ffd0a09d61d0"
-    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-    tar xvf "${PKG_NAME}"
-    pushd "bazel-${VERSION}-aarch64-linux-gnu"
-        DEST=${SYSROOT_DIR} bash install.sh
-    popd
-    rm -rf "bazel-${VERSION}-aarch64-linux-gnu" "${PKG_NAME}"
-  fi
+  # Download Mode
+  PKG_NAME_PRE="bazel-${BAZEL_ARM_VERSION}-linux-arm64"
+  PKG_NAME="bazel"
+  DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_ARM_VERSION}/${PKG_NAME_PRE}"
+  CHECKSUM="440672f319be239d7dd5d7c5062edee23499dd49b49e89cc26dc9d44aa044a96"
+  download_if_not_cached "${PKG_NAME_PRE}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+  chmod a+x ${PKG_NAME_PRE}
+  mv ${PKG_NAME_PRE} ${PKG_NAME}
+  cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
+  rm -f ${PKG_NAME}
 else
   error "Target arch ${TARGET_ARCH} not supported yet"
 fi
