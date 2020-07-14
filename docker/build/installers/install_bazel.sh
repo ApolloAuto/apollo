@@ -71,15 +71,13 @@ elif [ "$TARGET_ARCH" == "aarch64" ]; then
   # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
   # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
   # Download Mode
-  PKG_NAME_PRE="bazel-${BAZEL_ARM_VERSION}-linux-arm64"
+  ARM64_BINARY="bazel-${BAZEL_ARM_VERSION}-linux-arm64"
   PKG_NAME="bazel"
-  DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_ARM_VERSION}/${PKG_NAME_PRE}"
+  DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_ARM_VERSION}/${ARM64_BINARY}"
   CHECKSUM="440672f319be239d7dd5d7c5062edee23499dd49b49e89cc26dc9d44aa044a96"
-  download_if_not_cached "${PKG_NAME_PRE}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-  chmod a+x ${PKG_NAME_PRE}
-  mv ${PKG_NAME_PRE} ${PKG_NAME}
-  cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
-  rm -f ${PKG_NAME}
+  download_if_not_cached "${ARM64_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+  chmod a+x ${ARM64_BINARY}
+  mv -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/${PKG_NAME}"
 else
   error "Target arch ${TARGET_ARCH} not supported yet"
 fi
