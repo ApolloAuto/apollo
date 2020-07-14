@@ -30,7 +30,7 @@ namespace reader {
 using proto::Chatter;
 
 auto callback = [](const std::shared_ptr<proto::Chatter>& msg) {
-  AINFO << "msg size = " << msg->ByteSize();
+  AINFO << "msg size = " << msg->ByteSizeLong();
 };
 
 TEST(ReaderTest, test1) {

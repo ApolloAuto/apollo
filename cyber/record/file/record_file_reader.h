@@ -79,9 +79,9 @@ bool RecordFileReader::ReadSection(int64_t size, T* message) {
     return false;
   }
   coded_input.PopLimit(limit);
-  if (message->ByteSize() != size) {
+  if (message->ByteSizeLong() != size) {
     AERROR << "Message size is not consistent in section header"
-           << ", expect: " << size << ", actual: " << message->ByteSize();
+           << ", expect: " << size << ", actual: " << message->ByteSizeLong();
     return false;
   }
   return true;

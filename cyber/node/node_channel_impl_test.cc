@@ -93,7 +93,7 @@ TEST(Node_Channel_ImplTest, test3) {
   std::string nameSpace("");
 
   auto callback = [](const std::shared_ptr<proto::Chatter>& msg) {
-    std::cout << "msg size = " << msg->ByteSize() << std::endl;
+    std::cout << "msg size = " << msg->ByteSizeLong() << std::endl;
   };
 
   {
