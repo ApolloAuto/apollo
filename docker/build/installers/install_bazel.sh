@@ -50,8 +50,7 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
-  cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
-  rm -f ${PKG_NAME}
+  mv -f ${PKG_NAME} "${SYSROOT_DIR}/bin"
 
   ## buildozer
   PKG_NAME="buildozer"
@@ -61,25 +60,25 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   chmod a+x ${PKG_NAME}
-  cp ${PKG_NAME} "${SYSROOT_DIR}/bin"
-  rm -rf ${PKG_NAME}
-  info "Done installing bazel ${VERSION} with buildifier and buildozer"
+  mv -f "${PKG_NAME} "${SYSROOT_DIR}/bin/"
+  info "Done installing bazel ${BAZEL_VERSION} with buildifier and buildozer"
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
-  # TODO(xiaoxq): Stick to v3.2 for a while until we have ARM machine to work with.
   BAZEL_ARM_VERSION="3.4.0"
   # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
   # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
   # Download Mode
   ARM64_BINARY="bazel-${BAZEL_ARM_VERSION}-linux-arm64"
-  PKG_NAME="bazel"
   DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_ARM_VERSION}/${ARM64_BINARY}"
   CHECKSUM="440672f319be239d7dd5d7c5062edee23499dd49b49e89cc26dc9d44aa044a96"
   download_if_not_cached "${ARM64_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
   chmod a+x ${ARM64_BINARY}
-  mv -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/${PKG_NAME}"
+  mv -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/bazel"
+
+  info "Done installing bazel ${BAZEL_ARM_VERSION}"
 else
   error "Target arch ${TARGET_ARCH} not supported yet"
+  exit 1
 fi
 
 # Clean up cache to reduce layer size.
