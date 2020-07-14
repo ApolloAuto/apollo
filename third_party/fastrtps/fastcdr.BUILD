@@ -1,16 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "fastrtps",
+    name = "fastcdr",
     includes = [
         ".",
     ],
     linkopts = [
         "-L/usr/local/fast-rtps/lib",
-        "-lfastrtps",
-    ],
-    deps = [
-        "@fastcdr",
+        "-lfastcdr",
     ],
     visibility = ["//visibility:public"],
 )
