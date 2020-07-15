@@ -55,8 +55,13 @@ ldconfig
 
 popd
 
+# install protobuf python
+# FIXME(all): better installed via the steps above)
+pip3_install protobuf
+
 ldconfig
-ok "Successfully installed protobuf-cpp, VERSION=${VERSION}"
+
+ok "Successfully installed protobuf, VERSION=${VERSION}"
 
 # Clean up.
 rm -fr ${PKG_NAME}  protobuf-${VERSION}
