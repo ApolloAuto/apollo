@@ -110,7 +110,7 @@ void Evaluator::WriteOutData(const std::string& source_filename,
                              const LearningData& learning_data) {
   const std::string file = FLAGS_planning_data_dir + "/" + source_filename;
   cyber::common::SetProtoToBinaryFile(learning_data, file);
-  cyber::common::SetProtoToASCIIFile(learning_data, file + ".txt");
+  // cyber::common::SetProtoToASCIIFile(learning_data, file + ".txt");
   learning_data_.Clear();
 }
 
