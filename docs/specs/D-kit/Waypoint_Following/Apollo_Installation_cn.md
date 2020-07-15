@@ -397,7 +397,7 @@ b.注意事项
 
 ##### 安装docker
 
-使用apollo官网上的[install_nvidia_docker.sh](https://github.com/ApolloAuto/apollo/blob/master/docker/setup_host/install_nvidia_docker.sh)来安装docker。工控机在联网情况下在终端中输入以下命令来完成安装：
+使用apollo官网上的[install_nvidia_docker.sh](https://github.com/ApolloAuto/apollo/blob/r5.5.0/docker/setup_host/install_nvidia_docker.sh)来安装docker。工控机在联网情况下在终端中输入以下命令来完成安装：
 
 ```
 sudo apt update
