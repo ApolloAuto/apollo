@@ -25,7 +25,6 @@ DISABLED_TARGETS=
 
 function _disabled_test_targets_all() {
     local disabled="${LOCALIZATION_EXCEPTIONS}"
-    disabled="${disabled} ${PERCEPTION_EXCEPTIONS}"
     if ! ${USE_ESD_CAN} ; then
         warning "ESD CAN library supplied by ESD Electronics doesn't exist."
         warning "If you need ESD CAN, please refer to:"
