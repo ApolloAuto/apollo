@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "Eigen/Core"
-
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point_cloud.h"
 
@@ -311,8 +310,12 @@ void CalculateDistAndDirToBoundary(
 template <typename PointT>
 void CalculateDistAndDirToBoundary(
     const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
-    const std::vector<base::PointCloud<PointT>, Eigen::aligned_allocator<base::PointCloud<PointT>>> &left_boundary,
-    const std::vector<base::PointCloud<PointT>, Eigen::aligned_allocator<base::PointCloud<PointT>>> &right_boundary,
+    const std::vector<base::PointCloud<PointT>,
+                      Eigen::aligned_allocator<base::PointCloud<PointT>>>
+        &left_boundary,
+    const std::vector<base::PointCloud<PointT>,
+                      Eigen::aligned_allocator<base::PointCloud<PointT>>>
+        &right_boundary,
     typename PointT::Type *dist,
     Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   using Type = typename PointT::Type;
