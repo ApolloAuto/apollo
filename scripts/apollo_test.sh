@@ -5,11 +5,6 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
-##============= Perception ===================##
-PERCEPTION_EXCEPTIONS="\
-except //modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_test \
-"
-
 ##============= Localization ===================##
 LOCALIZATION_EXCEPTIONS="\
 except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
