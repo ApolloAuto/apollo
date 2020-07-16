@@ -159,7 +159,7 @@ function main() {
             env ${APOLLO_ENV} bash "${build_sh}" --config=cpu_prof "$@"
             ;;
         build_teleop)
-            env ${APOLLO_ENV} bash "${build_sh}" --config=teleop --config=opt "$@"
+            env ${APOLLO_ENV} bash "${build_sh}" --config=teleop "$@"
             ;;
         build_fe)
             build_dreamview_frontend
