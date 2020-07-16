@@ -25,8 +25,12 @@ def _generate_py_impl(context):
     tools = [context.executable._protoc]
 
     out_dir = get_out_dir(protos, context)
+    real_out_dir = out_dir.path
+    if context.build_file_path.startswith("external"):
+        real_out_dir = real_out_dir + "/external/apollo/"
+
     arguments = ([
-        "--python_out={}".format(out_dir.path),
+        "--python_out={}".format(real_out_dir),
     ] + [
         "--proto_path={}".format(get_include_directory(i))
         for i in includes
