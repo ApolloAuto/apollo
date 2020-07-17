@@ -11,6 +11,7 @@ topic_config {
   story_telling_topic: "/apollo/storytelling"
   traffic_light_detection_topic: "/apollo/perception/traffic_light"
 }
+learning_mode: NO_LEARNING  # NOLEARNING / E2E / HYBRID
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {

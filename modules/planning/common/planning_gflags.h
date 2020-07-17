@@ -269,7 +269,7 @@ DECLARE_bool(use_front_axe_center_in_path_planning);
 DECLARE_bool(use_road_boundary_from_map);
 
 // learning related
-DECLARE_int32(planning_learning_mode);
+DECLARE_bool(planning_offline_learning);
 DECLARE_string(planning_data_dir);
 DECLARE_string(planning_offline_bags);
 DECLARE_int32(learning_data_obstacle_history_time_sec);

@@ -73,7 +73,7 @@ bool MessageProcess::Init(
 
   obstacle_history_map_.clear();
 
-  if (FLAGS_planning_learning_mode == 1) {
+  if (FLAGS_planning_offline_learning) {
     // offline process logging
     log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
                    std::ios_base::out | std::ios_base::app);
@@ -95,7 +95,7 @@ bool MessageProcess::Init(
 void MessageProcess::Close() {
   FeatureOutput::Clear();
 
-  if (FLAGS_planning_learning_mode == 1) {
+  if (FLAGS_planning_offline_learning) {
     // offline process logging
     std::ostringstream msg;
     msg << "Total learning_data_frame number: "
@@ -143,7 +143,7 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     msg << "missing localization too long: time_stamp["
         << le.header().timestamp_sec() << "] time_diff[" << time_diff << "]";
     AERROR << msg.str();
-    if (FLAGS_planning_learning_mode == 1) {
+    if (FLAGS_planning_offline_learning) {
       log_file_ << msg.str() << std::endl;
     }
   }
@@ -169,11 +169,10 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   GenerateLearningDataFrame(&learning_data_frame);
 
   // output
-  if (FLAGS_planning_learning_mode == 1) {
+  if (FLAGS_planning_offline_learning) {
     // offline
     FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
-  } else if (FLAGS_planning_learning_mode == 2
-      || FLAGS_planning_learning_mode == 3) {
+  } else {
     // online
     injector_->learning_based_data()
              ->InsertLearningDataFrame(learning_data_frame);
@@ -248,7 +247,7 @@ void MessageProcess::OnPrediction(
           << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
           << "] time_diff[" << time_diff << "]";
       AERROR << msg.str();
-      if (FLAGS_planning_learning_mode == 1) {
+      if (FLAGS_planning_offline_learning) {
         log_file_ << msg.str() << std::endl;
       }
     }
@@ -595,7 +594,7 @@ void MessageProcess::GenerateObstacleFeature(
     msg << "fail to get ADC current info: frame_num["
         << learning_data_frame->frame_num() << "]";
     AERROR << msg.str();
-    if (FLAGS_planning_learning_mode == 1) {
+    if (FLAGS_planning_offline_learning) {
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -777,7 +776,7 @@ void MessageProcess::GenerateRoutingFeature(
     msg << "SKIP: invalid routing_response. frame_num["
         << learning_data_frame->frame_num() << "]";
     AERROR << msg.str();
-    if (FLAGS_planning_learning_mode == 1) {
+    if (FLAGS_planning_offline_learning) {
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -801,7 +800,7 @@ void MessageProcess::GenerateRoutingFeature(
     msg << "failed generate local_routing. frame_num["
         << learning_data_frame->frame_num() << "]";
     AERROR << msg.str();
-    if (FLAGS_planning_learning_mode == 1) {
+    if (FLAGS_planning_offline_learning) {
       log_file_ << msg.str() << std::endl;
     }
     return;
@@ -892,7 +891,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
     planning_tag->set_lane_turn(lane_turn);
     planning_tag_.set_lane_turn(lane_turn);
 
-    if (FLAGS_planning_learning_mode == 1) {
+    if (FLAGS_planning_offline_learning) {
       // planning_tag: overlap tags
       double point_distance = 0.0;
       if (trajectory_point_index > 0) {
@@ -1028,7 +1027,7 @@ void MessageProcess::GenerateADCTrajectoryPoints(
         << learning_data_frame->frame_num() << "] size["
         << adc_trajectory_points.size() << "]";
     AERROR << msg.str();
-    if (FLAGS_planning_learning_mode == 1) {
+    if (FLAGS_planning_offline_learning) {
       log_file_ << msg.str() << std::endl;
     }
   }
@@ -1039,16 +1038,13 @@ void MessageProcess::GenerateADCTrajectoryPoints(
 void MessageProcess::GeneratePlanningTag(
     LearningDataFrame* learning_data_frame) {
   auto planning_tag = learning_data_frame->mutable_planning_tag();
-  switch (FLAGS_planning_learning_mode) {
-    case 0:
-      break;
-    case 1:
-      planning_tag->set_lane_turn(planning_tag_.lane_turn());
-      break;
-    case 2:
-    case 3:
+  if (FLAGS_planning_offline_learning) {
+    planning_tag->set_lane_turn(planning_tag_.lane_turn());
+  } else {
+    if (planning_config_.learning_mode() != PlanningConfig::NO_LEARNING) {
+      // online learning
       planning_tag->CopyFrom(planning_tag_);
-      break;
+    }
   }
 }
 

@@ -116,7 +116,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
         "planning is not initialized with config : " + config_.DebugString());
   }
 
-  if (FLAGS_planning_learning_mode == 2 || FLAGS_planning_learning_mode == 3) {
+  if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     PlanningSemanticMapConfig renderer_config;
     ACHECK(apollo::cyber::common::GetProtoFromFile(
         FLAGS_planning_birdview_img_feature_renderer_config_file,
