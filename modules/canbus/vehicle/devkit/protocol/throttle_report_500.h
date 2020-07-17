@@ -35,7 +35,7 @@ class Throttlereport500 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'name': 'Throttle_Pedal_Actual', 'offset': 0.0,
   // 'precision': 0.1, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[0|100]', 'bit': 31, 'type': 'double', 'order': 'motorola',
-  // 'physical_unit': ''}
+  // 'physical_unit': '%'}
   double throttle_pedal_actual(const std::uint8_t* bytes,
                                const int32_t length) const;
 

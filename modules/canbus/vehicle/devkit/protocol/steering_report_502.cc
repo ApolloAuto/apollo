@@ -49,7 +49,8 @@ void Steeringreport502::Parse(const std::uint8_t* bytes, int32_t length,
 
 // config detail: {'name': 'steer_angle_spd_actual', 'offset': 0.0,
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
-// '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+// '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit':
+// 'deg/s'}
 int Steeringreport502::steer_angle_spd_actual(const std::uint8_t* bytes,
                                               int32_t length) const {
   Byte t0(bytes + 6);
@@ -94,10 +95,6 @@ Steering_report_502::Steer_flt1Type Steeringreport502::steer_flt1(
 // 'STEER_EN_STATE_TAKEOVER', 3: 'STEER_EN_STATE_STANDBY'}, 'precision': 1.0,
 // 'len': 2, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]',
 // 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-// 'STEER_EN_STATE_MANUAL', 1: 'STEER_EN_STATE_AUTO', 2:
-// 'STEER_EN_STATE_TAKEOVER'}, 'precision': 1.0, 'len': 2, 'is_signed_var':
-// False, 'offset': 0.0, 'physical_range': '[0|2]', 'bit': 1, 'type': 'enum',
-// 'order': 'motorola', 'physical_unit': ''}
 Steering_report_502::Steer_en_stateType Steeringreport502::steer_en_state(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
@@ -110,7 +107,7 @@ Steering_report_502::Steer_en_stateType Steeringreport502::steer_en_state(
 
 // config detail: {'name': 'steer_angle_actual', 'offset': -500.0, 'precision':
 // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[-500|500]',
-// 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
 double Steeringreport502::steer_angle_actual(const std::uint8_t* bytes,
                                              int32_t length) const {
   Byte t0(bytes + 3);

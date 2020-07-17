@@ -38,7 +38,7 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'name': 'Brake_Dec', 'offset': 0.0, 'precision': 0.01,
   // 'len': 10, 'is_signed_var': False, 'physical_range': '[0|10.00]', 'bit':
-  // 15, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
   Brakecommand101* set_brake_dec(double brake_dec);
 
   // config detail: {'name': 'CheckSum_111', 'offset': 0.0, 'precision': 1.0,
@@ -48,7 +48,7 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'name': 'Brake_Pedal_Target', 'offset': 0.0, 'precision':
   // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   Brakecommand101* set_brake_pedal_target(double brake_pedal_target);
 
   // config detail: {'name': 'Brake_EN_CTRL', 'enum': {0:
