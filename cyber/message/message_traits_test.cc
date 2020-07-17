@@ -37,7 +37,8 @@ class Message {
   std::size_t ByteSizeLong() const { return content.size(); }
 
   bool SerializeToArray(void* data, int size) const {
-    if (data == nullptr || size < ByteSizeLong()) {
+    if (data == nullptr || size < 0 ||
+        static_cast<size_t>(size) < ByteSizeLong()) {
       return false;
     }
 
