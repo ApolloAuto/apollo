@@ -25,9 +25,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH=$(uname -m)
 
+BAZEL_VERSION="3.4.1"
+
 if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
-  BAZEL_VERSION="3.4.1"
   PKG_NAME="bazel_${BAZEL_VERSION}-linux-x86_64.deb"
   DOWNLOAD_LINK=https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${PKG_NAME}
   SHA256SUM="1a64c807716e10c872f1618852d95f4893d81667fe6e691ef696489103c9b460"
@@ -65,13 +66,10 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   info "Done installing bazel ${BAZEL_VERSION} with buildifier and buildozer"
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
-  BAZEL_VERSION="3.4.0"
-  # Ref: https://docs.bazel.build/versions/master/install-compile-source.html
-  # Ref: https://github.com/storypku/storydev/blob/master/bazel-build/build-bazel-from-source.md
-  # Download Mode
   ARM64_BINARY="bazel-${BAZEL_VERSION}-linux-arm64"
+  CHECKSUM="07955cbef922b51025577df4e258d5dfc4f7adc5ec8ab110dedb411878d63627"
   DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${ARM64_BINARY}"
-  CHECKSUM="440672f319be239d7dd5d7c5062edee23499dd49b49e89cc26dc9d44aa044a96"
+  # https://github.com/bazelbuild/bazel/releases/download/3.4.1/bazel-3.4.1-linux-arm64
   download_if_not_cached "${ARM64_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
   chmod a+x ${ARM64_BINARY}
   cp -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/bazel"
