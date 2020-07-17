@@ -19,10 +19,9 @@ simplejson
 pyproj
 shapely
 matplotlib
-python_dev_tools
 
 # Driver
-pyaudio
+pyusb
 
 # Data format
 h5py

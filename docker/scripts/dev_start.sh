@@ -419,7 +419,6 @@ function main() {
         --shm-size 2G \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
-        --device /dev/snd \
         $APOLLO_DEV_IMAGE \
         /bin/bash
     if [ $? -ne 0 ];then
