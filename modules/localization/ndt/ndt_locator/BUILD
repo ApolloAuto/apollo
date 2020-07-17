@@ -39,7 +39,7 @@ filegroup(
 cc_test(
     name = "ndt_lidar_locator_test",
     size = "small",
-    timeout = "moderate",
+    timeout = "short",
     srcs = ["lidar_locator_ndt_test.cc"],
     data = [":ndt_lidar_locator_test_data"],
     deps = [
