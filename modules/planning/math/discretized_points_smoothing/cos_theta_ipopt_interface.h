@@ -16,15 +16,15 @@
 
 #pragma once
 
-#include <adolc/adolc.h>
-#include <adolc/adolc_sparse.h>
-#include <adolc/adouble.h>
-
 #include <cstddef>
 
 #include <map>
 #include <utility>
 #include <vector>
+
+#include <adolc/adolc.h>
+#include <adolc/adolc_sparse.h>
+#include <adolc/adouble.h>
 
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpIpoptCalculatedQuantities.hpp>

@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 
-#include <cuda_runtime_api.h>
-
 #include <algorithm>
 #include <numeric>
 #include <random>
+
+#include <cuda_runtime_api.h>
 
 #include "cyber/common/log.h"
 

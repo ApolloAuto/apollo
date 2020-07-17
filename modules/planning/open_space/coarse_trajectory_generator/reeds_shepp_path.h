@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include <omp.h>
-
 #include <limits>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <omp.h>
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"

@@ -16,10 +16,10 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_map_evaluator.h"
 
-#include <omp.h>
-
 #include <unordered_map>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"

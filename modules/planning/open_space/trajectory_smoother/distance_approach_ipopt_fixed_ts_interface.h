@@ -20,19 +20,21 @@
 
 #pragma once
 
+#include <algorithm>
+#include <limits>
+#include <vector>
+
+#include <omp.h>
+
 #include <adolc/adolc.h>
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-#include <omp.h>
-
-#include <algorithm>
-#include <limits>
-#include <vector>
-#include "Eigen/Dense"
 
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
+
+#include "Eigen/Dense"
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"

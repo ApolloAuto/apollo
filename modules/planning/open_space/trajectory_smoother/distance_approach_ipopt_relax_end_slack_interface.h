@@ -20,16 +20,16 @@
 
 #pragma once
 
+#include <algorithm>
+#include <limits>
+#include <vector>
+
 #include <omp.h>
 
 #include <adolc/adolc.h>
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-
-#include <algorithm>
-#include <limits>
-#include <vector>
 
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
