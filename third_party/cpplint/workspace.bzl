@@ -11,7 +11,7 @@ def repo():
     http_archive(
         name = "cpplint",
         build_file = clean_dep("//third_party/cpplint:cpplint.BUILD"),
-        sha256 = "96db293564624543a2fd3b1a0d23f663b8054c79853a5918523655721a9f6b53",
-        strip_prefix = "cpplint-1.4.5",
-        urls = ["https://github.com/cpplint/cpplint/archive/1.4.5.tar.gz"],
+        sha256 = "5ace9cb77ddfa61bb0135b21d8a3fe62970266588ba41b8a644cd271d3c0676e",
+        strip_prefix = "cpplint-1.5.2",
+        urls = ["https://github.com/cpplint/cpplint/archive/1.5.2.tar.gz"],
     )
