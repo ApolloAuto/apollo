@@ -167,7 +167,7 @@ cc_test(
 cc_test(
     name = "pyramid_map_test",
     size = "medium",
-    timeout = "moderate",
+    timeout = "short",
     srcs = ["pyramid_map_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map",
