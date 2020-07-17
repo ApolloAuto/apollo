@@ -34,25 +34,25 @@ class Ultrsensor5511 : public ::apollo::drivers::canbus::ProtocolData<
  private:
   // config detail: {'name': 'uiUSS7_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-  // 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
   double uiuss7_tof_direct(const std::uint8_t* bytes,
                            const int32_t length) const;
 
   // config detail: {'name': 'uiUSS6_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-  // 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
   double uiuss6_tof_direct(const std::uint8_t* bytes,
                            const int32_t length) const;
 
   // config detail: {'name': 'uiUSS1_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-  // 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': ''}
+  // 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': 'cm'}
   double uiuss1_tof_direct(const std::uint8_t* bytes,
                            const int32_t length) const;
 
   // config detail: {'name': 'uiUSS0_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-  // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
   double uiuss0_tof_direct(const std::uint8_t* bytes,
                            const int32_t length) const;
 };

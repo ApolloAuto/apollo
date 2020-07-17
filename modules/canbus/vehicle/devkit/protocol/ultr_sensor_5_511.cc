@@ -43,7 +43,7 @@ void Ultrsensor5511::Parse(const std::uint8_t* bytes, int32_t length,
 
 // config detail: {'name': 'uiuss7_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor5511::uiuss7_tof_direct(const std::uint8_t* bytes,
                                          int32_t length) const {
   Byte t0(bytes + 6);
@@ -60,7 +60,7 @@ double Ultrsensor5511::uiuss7_tof_direct(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss6_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor5511::uiuss6_tof_direct(const std::uint8_t* bytes,
                                          int32_t length) const {
   Byte t0(bytes + 4);
@@ -77,7 +77,7 @@ double Ultrsensor5511::uiuss6_tof_direct(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss1_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': ''}
+// 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': 'cm'}
 double Ultrsensor5511::uiuss1_tof_direct(const std::uint8_t* bytes,
                                          int32_t length) const {
   Byte t0(bytes + 3);
@@ -94,7 +94,7 @@ double Ultrsensor5511::uiuss1_tof_direct(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss0_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor5511::uiuss0_tof_direct(const std::uint8_t* bytes,
                                          int32_t length) const {
   Byte t0(bytes + 0);

@@ -47,7 +47,7 @@ void Ultrsensor4510::Parse(const std::uint8_t* bytes, int32_t length,
 
 // config detail: {'name': 'uiuss5_tof_indirect', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 55, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor4510::uiuss5_tof_indirect(const std::uint8_t* bytes,
                                            int32_t length) const {
   Byte t0(bytes + 6);
@@ -64,7 +64,7 @@ double Ultrsensor4510::uiuss5_tof_indirect(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss4_tof_indirect', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 39, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor4510::uiuss4_tof_indirect(const std::uint8_t* bytes,
                                            int32_t length) const {
   Byte t0(bytes + 4);
@@ -81,7 +81,7 @@ double Ultrsensor4510::uiuss4_tof_indirect(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss3_tof_indirect', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor4510::uiuss3_tof_indirect(const std::uint8_t* bytes,
                                            int32_t length) const {
   Byte t0(bytes + 2);
@@ -98,7 +98,7 @@ double Ultrsensor4510::uiuss3_tof_indirect(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss2_tof_indirect', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'bit': 7, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor4510::uiuss2_tof_indirect(const std::uint8_t* bytes,
                                            int32_t length) const {
   Byte t0(bytes + 0);
