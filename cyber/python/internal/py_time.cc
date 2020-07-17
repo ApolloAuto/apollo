@@ -16,10 +16,10 @@
 
 #include "cyber/python/internal/py_time.h"
 
-#include <python3.6m/Python.h>
-
 #include <set>
 #include <string>
+
+#include <Python.h>
 
 using apollo::cyber::PyDuration;
 using apollo::cyber::PyRate;
