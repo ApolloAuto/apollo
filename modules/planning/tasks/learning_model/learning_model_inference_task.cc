@@ -75,7 +75,7 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
     AERROR << msg;
     // hybrid model will use rule based planning when learning model output is
     // not ready
-    if (FLAGS_planning_learning_mode == 3) {
+    if (config.allow_empty_output_trajectory()) {
       return Status::OK();
     }
     return Status(ErrorCode::PLANNING_ERROR, msg);

@@ -213,6 +213,7 @@ message PlanningData {
   optional OpenSpaceDebug open_space = 27;
   optional SmootherDebug smoother = 28;
   optional PullOverDebug pull_over = 29;
+  optional HybridModelDebug hybrid_model = 30;
 }
 
 message LatticeStPixel {
@@ -252,4 +253,10 @@ message CloudReferenceLineRoutingRequest {
 
 message CloudReferenceLineResponse {
   repeated apollo.common.Path segment = 1;
+}
+
+message HybridModelDebug {
+  optional bool using_learning_model_output = 1 [default = false];
+  optional double learning_model_output_usage_ratio = 2;
+  optional string learning_model_output_fail_reason = 3;
 }
