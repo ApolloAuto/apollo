@@ -16,10 +16,10 @@
 
 #include "cyber/python/internal/py_record.h"
 
-#include <python3.6m/Python.h>
-
 #include <set>
 #include <string>
+
+#include <Python.h>
 
 using apollo::cyber::record::PyRecordReader;
 using apollo::cyber::record::PyRecordWriter;

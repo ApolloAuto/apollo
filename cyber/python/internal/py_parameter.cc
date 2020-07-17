@@ -16,11 +16,10 @@
 
 #include "cyber/python/internal/py_parameter.h"
 
-#include <python3.6m/Python.h>
-
 #include <set>
 #include <string>
 
+#include <Python.h>
 #include "cyber/python/internal/py_cyber.h"
 
 using apollo::cyber::Parameter;

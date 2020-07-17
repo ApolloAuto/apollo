@@ -16,10 +16,10 @@
 
 #include "cyber/python/internal/py_cyber.h"
 
-#include <python3.6m/Python.h>
-
 #include <string>
 #include <vector>
+
+#include <Python.h>
 
 using apollo::cyber::Node;
 using apollo::cyber::PyChannelUtils;
