@@ -72,7 +72,6 @@ class FeatureOutput {
 
  private:
   static LearningData learning_data_;
-  static std::size_t idx_learning_data_;
   static int learning_data_file_index_;
 };
 

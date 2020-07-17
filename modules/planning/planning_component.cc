@@ -52,7 +52,7 @@ bool PlanningComponent::Init() {
       << ComponentBase::ConfigFilePath();
 
   if (FLAGS_planning_learning_mode > 0) {
-    if (!message_process_.Init(config_)) {
+    if (!message_process_.Init(config_, injector_)) {
       AERROR << "failed to init MessageProcess";
       return false;
     }

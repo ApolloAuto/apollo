@@ -31,17 +31,19 @@ class LearningModelInferenceTrajectoryTaskTest : public ::testing::Test {
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK);
     config_.mutable_learning_model_inference_trajectory_task_config();
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   virtual void TearDown() {}
 
  protected:
   TaskConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(LearningModelInferenceTrajectoryTaskTest, Init) {
   LearningModelInferenceTrajectoryTask learning_model_inference_trajectory_task(
-      config_);
+      config_, injector_);
   EXPECT_EQ(learning_model_inference_trajectory_task.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

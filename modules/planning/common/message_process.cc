@@ -58,7 +58,8 @@ using apollo::routing::RoutingResponse;
 using apollo::storytelling::CloseToJunction;
 using apollo::storytelling::Stories;
 
-bool MessageProcess::Init(const PlanningConfig& planning_config) {
+bool MessageProcess::Init(
+    const PlanningConfig& planning_config) {
   planning_config_.CopyFrom(planning_config);
 
   map_m_["Sunnyvale"] = "sunnyvale";
@@ -82,6 +83,13 @@ bool MessageProcess::Init(const PlanningConfig& planning_config) {
               << "Local date and time: " << std::asctime(std::localtime(&now));
   }
   return true;
+}
+
+bool MessageProcess::Init(
+    const PlanningConfig& planning_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
+  injector_ = injector;
+  return Init(planning_config);
 }
 
 void MessageProcess::Close() {
@@ -161,7 +169,15 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   GenerateLearningDataFrame(&learning_data_frame);
 
   // output
-  FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
+  if (FLAGS_planning_learning_mode == 1) {
+    // offline
+    FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
+  } else if (FLAGS_planning_learning_mode == 2
+      || FLAGS_planning_learning_mode == 3) {
+    // online
+    injector_->learning_based_data()
+             ->InsertLearningDataFrame(learning_data_frame);
+  }
 }
 
 void MessageProcess::OnPrediction(

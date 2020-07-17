@@ -23,6 +23,7 @@
 #include <chrono>
 #include <fstream>
 #include <list>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -33,6 +34,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -45,6 +47,9 @@ namespace planning {
 class MessageProcess {
  public:
   bool Init(const PlanningConfig& planning_config);
+  bool Init(const PlanningConfig& planning_config,
+            const std::shared_ptr<DependencyInjector>& injector);
+
   void Close();
 
   void OnChassis(const apollo::canbus::Chassis& chassis);
@@ -108,6 +113,7 @@ class MessageProcess {
   void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
+  std::shared_ptr<DependencyInjector> injector_;
   PlanningConfig planning_config_;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
