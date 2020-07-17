@@ -148,7 +148,7 @@ bool RecordFileWriter::WriteSection(const T& message) {
       AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
       return false;
     }
-    if (count != HEADER_LENGTH - message.ByteSizeLong()) {
+    if (static_cast<size_t>(count) != HEADER_LENGTH - message.ByteSizeLong()) {
       AERROR << "Write fd failed, fd: " << fd_
              << ", expect count: " << sizeof(section)
              << ", actual count: " << count;
