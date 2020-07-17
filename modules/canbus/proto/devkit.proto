@@ -4,25 +4,25 @@ package apollo.canbus;
 
 message Wheelspeed_report_506 {
 // Report Message
-  // [] [0|65.535]
+  // [m/s] [0|65.535]
   optional double rr = 1;
-  // [] [0|65.535]
+  // [m/s] [0|65.535]
   optional double rl = 2;
-  // [] [0|65.535]
+  // [m/s] [0|65.535]
   optional double fr = 3;
-  // [] [0|65.535]
+  // [m/s] [0|65.535]
   optional double fl = 4;
 }
 
 message Ultr_sensor_1_507 {
 // Report Message
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss9_tof_direct = 1;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss8_tof_direct = 2;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss11_tof_direct = 3;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss10_tof_direct = 4;
 }
 
@@ -34,7 +34,7 @@ message Steering_command_102 {
   }
   // [] [0|1]
   optional Steer_en_ctrlType steer_en_ctrl = 1;
-  // [] [-500|500]
+  // [deg] [-500|500]
   optional double steer_angle_target = 2;
   // [] [0|250]
   optional int32 steer_angle_spd = 3;
@@ -69,11 +69,11 @@ message Throttle_command_100 {
     THROTTLE_EN_CTRL_DISABLE = 0;
     THROTTLE_EN_CTRL_ENABLE = 1;
   }
-  // [] [0|10]
+  // [m/s^2] [0|10]
   optional double throttle_acc = 1;
   // [] [0|255]
   optional int32 checksum_110 = 2;
-  // [] [0|100]
+  // [%] [0|100]
   optional double throttle_pedal_target = 3;
   // [] [0|1]
   optional Throttle_en_ctrlType throttle_en_ctrl = 4;
@@ -85,11 +85,11 @@ message Brake_command_101 {
     BRAKE_EN_CTRL_DISABLE = 0;
     BRAKE_EN_CTRL_ENABLE = 1;
   }
-  // [] [0|10.23]
+  // [m/s^2] [0|10]
   optional double brake_dec = 1;
   // [] [0|255]
   optional int32 checksum_111 = 2;
-  // [] [0|100]
+  // [%] [0|100]
   optional double brake_pedal_target = 3;
   // [] [0|1]
   optional Brake_en_ctrlType brake_en_ctrl = 4;
@@ -115,49 +115,49 @@ message Park_command_104 {
 
 message Ultr_sensor_2_508 {
 // Report Message
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss9_tof_indirect = 1;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss8_tof_indirect = 2;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss11_tof_indirect = 3;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss10_tof_indirect = 4;
 }
 
 message Ultr_sensor_3_509 {
 // Report Message
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss5_tof_direct = 1;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss4_tof_direct = 2;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss3_tof_direct = 3;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss2_tof_direct = 4;
 }
 
 message Ultr_sensor_5_511 {
 // Report Message
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss7_tof_direct = 1;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss6_tof_direct = 2;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss1_tof_direct = 3;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss0_tof_direct = 4;
 }
 
 message Ultr_sensor_4_510 {
 // Report Message
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss5_tof_indirect = 1;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss4_tof_indirect = 2;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss3_tof_indirect = 3;
-  // [] [0|65535]
+  // [cm] [0|65535]
   optional double uiuss2_tof_indirect = 4;
 }
 
@@ -179,10 +179,36 @@ message Park_report_504 {
 
 message Vcu_report_505 {
 // Report Message
-  // [] [-10|10]
-  optional double acc = 1;
-  // [] [0|65.535]
-  optional double speed = 2;
+  enum Vehicle_mode_stateType {
+    VEHICLE_MODE_STATE_MANUAL_REMOTE_MODE = 0;
+    VEHICLE_MODE_STATE_AUTO_MODE = 1;
+    VEHICLE_MODE_STATE_EMERGENCY_MODE = 2;
+    VEHICLE_MODE_STATE_STANDBY_MODE = 3;
+  }
+  enum Frontcrash_stateType {
+    FRONTCRASH_STATE_NO_EVENT = 0;
+    FRONTCRASH_STATE_CRASH_EVENT = 1;
+  }
+  enum Backcrash_stateType {
+    BACKCRASH_STATE_NO_EVENT = 0;
+    BACKCRASH_STATE_CRASH_EVENT = 1;
+  }
+  enum Aeb_stateType {
+    AEB_STATE_INCTIVE = 0;
+    AEB_STATE_ACTIVE = 1;
+  }
+  // [] [0|0]
+  optional Vehicle_mode_stateType vehicle_mode_state = 1;
+  // [] [0|0]
+  optional Frontcrash_stateType frontcrash_state = 2;
+  // [] [0|0]
+  optional Backcrash_stateType backcrash_state = 3;
+  // [] [0|0]
+  optional Aeb_stateType aeb_state = 4;
+  // [m/s^2] [-10|10]
+  optional double acc = 5;
+  // [m/s] [0|65.535]
+  optional double speed = 6;
 }
 
 message Steering_report_502 {
@@ -201,7 +227,7 @@ message Steering_report_502 {
     STEER_EN_STATE_TAKEOVER = 2;
     STEER_EN_STATE_STANDBY = 3;
   }
-  // [] [0|0]
+  // [deg/s] [0|250]
   optional int32 steer_angle_spd_actual = 1;
   // Steer system communication fault [] [0|1]
   optional Steer_flt2Type steer_flt2 = 2;
@@ -209,7 +235,7 @@ message Steering_report_502 {
   optional Steer_flt1Type steer_flt1 = 3;
   // [] [0|2]
   optional Steer_en_stateType steer_en_state = 4;
-  // [] [-500|500]
+  // [deg] [-500|500]
   optional double steer_angle_actual = 5;
 }
 
@@ -248,7 +274,7 @@ message Throttle_report_500 {
     THROTTLE_EN_STATE_TAKEOVER = 2;
     THROTTLE_EN_STATE_STANDBY = 3;
   }
-  // [] [0|100]
+  // [%] [0|100]
   optional double throttle_pedal_actual = 1;
   // Drive system communication fault [] [0|1]
   optional Throttle_flt2Type throttle_flt2 = 2;
@@ -274,7 +300,7 @@ message Brake_report_501 {
     BRAKE_EN_STATE_TAKEOVER = 2;
     BRAKE_EN_STATE_STANDBY = 3;
   }
-  // [] [0|100]
+  // [%] [0|100]
   optional double brake_pedal_actual = 1;
   // Brake system communication fault [] [0|1]
   optional Brake_flt2Type brake_flt2 = 2;

@@ -35,7 +35,7 @@ class Steeringreport502 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'name': 'Steer_ANGLE_SPD_Actual', 'offset': 0.0,
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
   // '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit':
-  // ''}
+  // 'deg/s'}
   int steer_angle_spd_actual(const std::uint8_t* bytes,
                              const int32_t length) const;
 
@@ -67,7 +67,7 @@ class Steeringreport502 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'name': 'Steer_ANGLE_Actual', 'offset': -500.0,
   // 'precision': 0.1, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[-500|500]', 'bit': 31, 'type': 'double', 'order': 'motorola',
-  // 'physical_unit': ''}
+  // 'physical_unit': 'deg'}
   double steer_angle_actual(const std::uint8_t* bytes,
                             const int32_t length) const;
 };

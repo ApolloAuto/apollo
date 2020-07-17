@@ -45,7 +45,7 @@ void Brakereport501::Parse(const std::uint8_t* bytes, int32_t length,
 
 // config detail: {'name': 'brake_pedal_actual', 'offset': 0.0, 'precision':
 // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-// 31, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 double Brakereport501::brake_pedal_actual(const std::uint8_t* bytes,
                                           int32_t length) const {
   Byte t0(bytes + 3);

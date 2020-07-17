@@ -43,7 +43,7 @@ void Wheelspeedreport506::Parse(const std::uint8_t* bytes, int32_t length,
 
 // config detail: {'name': 'rr', 'offset': 0.0, 'precision': 0.001, 'len': 16,
 // 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 55, 'type':
-// 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
 double Wheelspeedreport506::rr(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 6);
@@ -60,7 +60,7 @@ double Wheelspeedreport506::rr(const std::uint8_t* bytes,
 
 // config detail: {'name': 'rl', 'offset': 0.0, 'precision': 0.001, 'len': 16,
 // 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 39, 'type':
-// 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
 double Wheelspeedreport506::rl(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 4);
@@ -77,7 +77,7 @@ double Wheelspeedreport506::rl(const std::uint8_t* bytes,
 
 // config detail: {'name': 'fr', 'offset': 0.0, 'precision': 0.001, 'len': 16,
 // 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 23, 'type':
-// 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
 double Wheelspeedreport506::fr(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 2);
@@ -94,7 +94,7 @@ double Wheelspeedreport506::fr(const std::uint8_t* bytes,
 
 // config detail: {'name': 'fl', 'offset': 0.0, 'precision': 0.001, 'len': 16,
 // 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 7, 'type':
-// 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
 double Wheelspeedreport506::fl(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 0);

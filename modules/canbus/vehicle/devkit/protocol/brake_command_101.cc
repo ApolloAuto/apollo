@@ -59,7 +59,7 @@ Brakecommand101* Brakecommand101::set_brake_dec(double brake_dec) {
 
 // config detail: {'name': 'Brake_Dec', 'offset': 0.0, 'precision': 0.01, 'len':
 // 10, 'is_signed_var': False, 'physical_range': '[0|10]', 'bit': 15, 'type':
-// 'double', 'order': 'motorola', 'physical_unit': ''}
+// 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
 void Brakecommand101::set_p_brake_dec(uint8_t* data, double brake_dec) {
   brake_dec = ProtocolData::BoundedValue(0.0, 10.0, brake_dec);
   int x = brake_dec / 0.010000;
@@ -99,7 +99,7 @@ Brakecommand101* Brakecommand101::set_brake_pedal_target(
 
 // config detail: {'name': 'Brake_Pedal_Target', 'offset': 0.0, 'precision':
 // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-// 31, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+// 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 void Brakecommand101::set_p_brake_pedal_target(uint8_t* data,
                                                double brake_pedal_target) {
   brake_pedal_target =
