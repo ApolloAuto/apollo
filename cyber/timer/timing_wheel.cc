@@ -51,7 +51,7 @@ void TimingWheel::Tick() {
         ADEBUG << "index: " << current_work_wheel_index_
                << " timer id: " << task->timer_id_;
         auto callback = task->callback;
-        cyber::Async([this, callback] {
+        cyber::Async([this, &callback] {
           if (this->running_) {
             callback();
           }
