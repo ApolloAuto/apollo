@@ -2,12 +2,13 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# shellcheck source=apollo/scripts/apollo.bashrc
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 : ${STAGE:=dev}
 
 function _cpp_lint_impl() {
-    bazel test --distdir="${APOLLO_CACHE_DIR}" --config=cpplint $@
+    bazel test --distdir="${APOLLO_CACHE_DIR}" --config=cpplint "$@"
 }
 
 function run_cpp_lint() {
@@ -23,7 +24,8 @@ function run_cpp_lint() {
             warning "unattended BUILD file found: ${prey}. Add cpplint() automatically."
             sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' "${prey}"
             sed -i -e '$a\\ncpplint()' "${prey}"
-            local buidifier="$(command -v buildifier)"
+            local buidifier
+            buidifier="$(command -v buildifier)"
             if [ ! -z "${buidifier}" ]; then
                 ${buidifier} -lint=fix "${prey}"
             fi
@@ -40,7 +42,8 @@ function run_cpp_lint() {
 }
 
 function run_sh_lint() {
-    local shellcheck_cmd="$(command -v shellcheck)"
+    local shellcheck_cmd
+    shellcheck_cmd="$(command -v shellcheck)"
     if [ -z "${shellcheck_cmd}" ]; then
         warning "Command 'shellcheck' not found. For Debian/Ubuntu systems," \
                 "please run the following command to install it: "
@@ -63,7 +66,8 @@ function run_sh_lint() {
 }
 
 function run_py_lint() {
-    local flake8_cmd="$(command -v flake8)"
+    local flake8_cmd
+    flake8_cmd="$(command -v flake8)"
     if [ -z "${flake8_cmd}" ]; then
         warning "Command flake8 not found. You can install it manually via:"
         warning "  '[sudo -H] python3 -m pip install flake8'"
