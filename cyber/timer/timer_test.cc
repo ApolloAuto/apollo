@@ -47,20 +47,22 @@ TEST(TimerTest, one_shot) {
 }
 
 TEST(TimerTest, cycle) {
+  using TimerPtr = std::shared_ptr<Timer>;
   int count = 0;
-  Timer timers[1000];
+  TimerPtr timers[1000];
   TimerOption opt;
   opt.oneshot = false;
   opt.callback = [=] { AINFO << count; };
   for (int i = 0; i < 1000; i++) {
     opt.period = i + 1;
-    timers[i].SetTimerOption(opt);
-    timers[i].Start();
+    timers[i] = std::make_shared<Timer>();
+    timers[i]->SetTimerOption(opt);
+    timers[i]->Start();
   }
 
   std::this_thread::sleep_for(std::chrono::seconds(3));
   for (int i = 0; i < 1000; i++) {
-    timers[i].Stop();
+    timers[i]->Stop();
   }
 }
 
