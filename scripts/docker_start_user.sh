@@ -74,6 +74,9 @@ function grant_device_permissions() {
     # setup camera device
     [ -e /dev/camera/obstacle ]      && chmod a+rw /dev/camera/obstacle
     [ -e /dev/camera/trafficlights ] && chmod a+rw /dev/camera/trafficlights
+
+    # setup audio device
+    [ -e /dev/snd ] && adduser "$1" audio
 }
 
 function setup_apollo_directories() {
@@ -97,7 +100,7 @@ function main() {
     fi
     setup_user_account_if_not_exist "$@"
     setup_apollo_directories "${uid}" "${gid}"
-    grant_device_permissions
+    grant_device_permissions "${user_name}"
 }
 
 main "${DOCKER_USER}" "${DOCKER_USER_ID}" "${DOCKER_GRP}" "${DOCKER_GRP_ID}"
