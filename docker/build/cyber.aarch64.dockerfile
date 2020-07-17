@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=apolloauto/apollo:L4T-10.2-cudnn8-18.04-20200703_2109
+ARG BASE_IMAGE=apolloauto/apollo:L4T-10.2-cudnn8-18.04-20200717_1842
 # ARG BASE_IMAGE=arm64v8/ubuntu:18.04
 FROM ${BASE_IMAGE}
 
