@@ -492,6 +492,7 @@ function start_cyber_container() {
         --hostname "${CYBER_INSIDE}" \
         --shm-size 2G \
         --pid=host \
+        --device /dev/snd \
         "${image}" \
         /bin/bash
 
