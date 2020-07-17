@@ -54,6 +54,7 @@ message LearningModelInferenceTaskConfig {
   optional bool use_cuda = 4 [default = true];
   // delta_t depends on the model output, not a configurable value here
   optional double trajectory_delta_t = 5 [default = 0.2];  // second
+  optional bool allow_empty_output_trajectory = 6 [default = false];
 }
 
 //////////////////////////////////

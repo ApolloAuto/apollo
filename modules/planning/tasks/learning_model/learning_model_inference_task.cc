@@ -81,6 +81,11 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
         absl::StrCat("learning_data adc_trajectory_point empty. frame_num[",
                      learning_data_frame.frame_num(), "]");
     AERROR << msg;
+    // hybrid model will use rule based planning when learning model output is
+    // not ready
+    if (config.allow_empty_output_trajectory()) {
+      return Status::OK();
+    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
