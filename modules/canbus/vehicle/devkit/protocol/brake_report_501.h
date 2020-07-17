@@ -34,7 +34,7 @@ class Brakereport501 : public ::apollo::drivers::canbus::ProtocolData<
  private:
   // config detail: {'name': 'Brake_Pedal_Actual', 'offset': 0.0, 'precision':
   // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   double brake_pedal_actual(const std::uint8_t* bytes,
                             const int32_t length) const;
 
