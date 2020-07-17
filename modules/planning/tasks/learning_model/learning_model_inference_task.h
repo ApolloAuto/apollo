@@ -33,7 +33,9 @@ namespace planning {
 
 class LearningModelInferenceTask : public Task {
  public:
-  explicit LearningModelInferenceTask(const TaskConfig &config);
+  LearningModelInferenceTask(
+      const TaskConfig &config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

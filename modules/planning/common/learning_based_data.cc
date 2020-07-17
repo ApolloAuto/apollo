@@ -14,44 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file learning_data.h
- **/
+#include "modules/planning/common/learning_based_data.h"
 
-#pragma once
-
-#include <vector>
-
-#include "modules/planning/proto/learning_data.pb.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {
 
-class LearningBasedData {
- public:
-  LearningBasedData() = default;
+void LearningBasedData::Clear() {
+  learning_data_.Clear();
+}
 
-  void Clear();
+void LearningBasedData::InsertLearningDataFrame(
+    const LearningDataFrame& learning_data_frame) {
+  learning_data_.add_learning_data()->CopyFrom(learning_data_frame);
 
-  void InsertLearningDataFrame(const LearningDataFrame& learning_data_frame);
-
-  LearningDataFrame* GetLatestLearningDataFrame();
-
-  void set_learning_data_adc_future_trajectory_points(
-      const std::vector<common::TrajectoryPoint> &trajectory_points) {
-    learning_data_adc_future_trajectory_points_ = trajectory_points;
+  while (learning_data_.learning_data_size() > 10) {
+    learning_data_.mutable_learning_data()->DeleteSubrange(0, 1);
   }
+}
 
-  const std::vector<common::TrajectoryPoint>
-      &learning_data_adc_future_trajectory_points() const {
-    return learning_data_adc_future_trajectory_points_;
-  }
-
- private:
-  LearningData learning_data_;
-  std::vector<common::TrajectoryPoint>
-      learning_data_adc_future_trajectory_points_;
-};
+LearningDataFrame* LearningBasedData::GetLatestLearningDataFrame() {
+  const int size = learning_data_.learning_data_size();
+  return size > 0 ? learning_data_.mutable_learning_data(size - 1) : nullptr;
+}
 
 }  // namespace planning
 }  // namespace apollo

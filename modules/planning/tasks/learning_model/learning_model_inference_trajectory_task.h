@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -27,7 +29,9 @@ namespace planning {
 
 class LearningModelInferenceTrajectoryTask : public Task {
  public:
-  explicit LearningModelInferenceTrajectoryTask(const TaskConfig &config);
+  LearningModelInferenceTrajectoryTask(
+      const TaskConfig &config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

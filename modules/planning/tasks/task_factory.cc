@@ -127,7 +127,7 @@ void TaskFactory::Init(const PlanningConfig& config,
       TaskConfig::PATH_REFERENCE_DECIDER,
       [](const TaskConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Task* {
-        return new PathReferenceDecider(config);
+        return new PathReferenceDecider(config, injector);
       });
   task_factory_.Register(
       TaskConfig::PATH_REUSE_DECIDER,
@@ -215,13 +215,13 @@ void TaskFactory::Init(const PlanningConfig& config,
       TaskConfig::LEARNING_MODEL_INFERENCE_TASK,
       [](const TaskConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Task* {
-        return new LearningModelInferenceTask(config);
+        return new LearningModelInferenceTask(config, injector);
       });
   task_factory_.Register(
       TaskConfig::LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK,
       [](const TaskConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Task* {
-        return new LearningModelInferenceTrajectoryTask(config);
+        return new LearningModelInferenceTrajectoryTask(config, injector);
       });
 
   for (const auto& default_task_config : config.default_task_config()) {
