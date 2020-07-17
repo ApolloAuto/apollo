@@ -252,7 +252,6 @@ cc_library(
     ],
     deps = [
         ":feature_output",
-        ":learning_based_data",
         ":local_view",
         ":obstacle",
         ":open_space_info",
@@ -266,7 +265,6 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/proto:learning_data_cc_proto",
         "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/reference_line:reference_line_provider",
@@ -484,6 +482,8 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        ":dependency_injector",
+        ":feature_output",
         "//cyber",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
@@ -492,7 +492,6 @@ cc_library(
         "//modules/localization/proto:localization_cc_proto",
         "//modules/perception/proto:perception_obstacle_cc_proto",
         "//modules/perception/proto:traffic_light_detection_cc_proto",
-        "//modules/planning/common:feature_output",
         "//modules/planning/common/util:math_util_lib",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_cc_proto",
@@ -531,17 +530,20 @@ cc_library(
         ":ego_info",
         ":frame",
         ":history",
+        ":learning_based_data",
         ":planning_context",
     ],
 )
 
 cc_library(
     name = "learning_based_data",
+    srcs = ["learning_based_data.cc"],
     hdrs = ["learning_based_data.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        "//cyber/common",
         "//modules/planning/proto:learning_data_cc_proto",
     ],
 )

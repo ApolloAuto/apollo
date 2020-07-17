@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,7 +32,8 @@ namespace apollo {
 namespace planning {
 class PathReferenceDecider : public Task {
  public:
-  explicit PathReferenceDecider(const TaskConfig &config);
+  PathReferenceDecider(const TaskConfig &config,
+                       const std::shared_ptr<DependencyInjector>& injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

@@ -47,8 +47,10 @@ using common::math::Vec2d;
 int PathReferenceDecider::valid_path_reference_counter_ = 0;
 int PathReferenceDecider::total_path_counter_ = 0;
 
-PathReferenceDecider::PathReferenceDecider(const TaskConfig &config)
-    : Task(config) {}
+PathReferenceDecider::PathReferenceDecider(
+    const TaskConfig &config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Task(config, injector) {}
 
 Status PathReferenceDecider::Execute(Frame *frame,
                                      ReferenceLineInfo *reference_line_info) {
@@ -88,7 +90,8 @@ Status PathReferenceDecider::Process(Frame *frame,
 
   // get learning model output (trajectory) from frame
   const std::vector<common::TrajectoryPoint> &path_reference =
-      frame->learning_based_data().learning_data_adc_future_trajectory_points();
+      injector_->learning_based_data()
+               ->learning_data_adc_future_trajectory_points();
   ADEBUG << "There are " << path_reference.size() << " path points.";
 
   // get regular path bound

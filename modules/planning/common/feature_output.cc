@@ -24,14 +24,12 @@ namespace apollo {
 namespace planning {
 
 LearningData FeatureOutput::learning_data_;
-std::size_t FeatureOutput::idx_learning_data_ = 0;
 int FeatureOutput::learning_data_file_index_ = 0;
 
 void FeatureOutput::Close() { Clear(); }
 
 void FeatureOutput::Clear() {
   learning_data_.Clear();
-  idx_learning_data_ = 0;
   learning_data_file_index_ = 0;
 }
 
@@ -45,16 +43,10 @@ void FeatureOutput::InsertLearningDataFrame(
     const LearningDataFrame& learning_data_frame) {
   learning_data_.add_learning_data()->CopyFrom(learning_data_frame);
 
-  if (FLAGS_planning_learning_mode == 1) {
-    // write frames into a file
-    if (learning_data_.learning_data_size() >=
-        FLAGS_learning_data_frame_num_per_file) {
-      WriteLearningData(record_file);
-    }
-  } else {
-    while (learning_data_.learning_data_size() > 10) {
-      learning_data_.mutable_learning_data()->DeleteSubrange(0, 1);
-    }
+  // write frames into a file
+  if (learning_data_.learning_data_size() >=
+      FLAGS_learning_data_frame_num_per_file) {
+    WriteLearningData(record_file);
   }
 }
 
@@ -66,9 +58,6 @@ LearningDataFrame* FeatureOutput::GetLatestLearningDataFrame() {
 void FeatureOutput::InsertPlanningResult() {}
 
 void FeatureOutput::WriteLearningData(const std::string& record_file) {
-  if (FLAGS_planning_learning_mode != 1) {
-    return;
-  }
   std::string src_file_name =
       record_file.substr(record_file.find_last_of("/") + 1);
   src_file_name = src_file_name.empty() ? "00000" : src_file_name;
@@ -83,10 +72,6 @@ void FeatureOutput::WriteLearningData(const std::string& record_file) {
 
 void FeatureOutput::WriteRemainderiLearningData(
     const std::string& record_file) {
-  if (FLAGS_planning_learning_mode != 1) {
-    return;
-  }
-
   if (learning_data_.learning_data_size() > 0) {
     WriteLearningData(record_file);
   }
