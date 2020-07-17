@@ -360,14 +360,21 @@ message TopicConfig {
 }
 
 message PlanningConfig {
+  enum PlanningLearningMode {
+    NO_LEARNING = 0;
+    E2E = 1;
+    HYBRID = 2;
+  }
+
   optional TopicConfig topic_config = 1;
+  optional PlanningLearningMode learning_mode = 2;
   oneof planning_config {
-    RtkPlanningConfig rtk_planning_config = 2;
-    StandardPlanningConfig standard_planning_config = 3;
-    NavigationPlanningConfig navigation_planning_config = 4;
+    RtkPlanningConfig rtk_planning_config = 3;
+    StandardPlanningConfig standard_planning_config = 4;
+    NavigationPlanningConfig navigation_planning_config = 5;
   }
 
   // default task config, it will be used if there is no scenario-specific
   // task config.
-  repeated TaskConfig default_task_config = 5;
+  repeated TaskConfig default_task_config = 6;
 }
