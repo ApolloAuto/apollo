@@ -111,6 +111,7 @@ coverage --linkopt=-lgcov
 # at the end.
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
+test:cpplint --flaky_test_attempts=1
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
 # Coverage tests
