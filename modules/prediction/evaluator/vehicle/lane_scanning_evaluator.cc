@@ -16,10 +16,10 @@
 
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 
-#include <omp.h>
-
 #include <algorithm>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/common/math/vec2d.h"

@@ -16,12 +16,12 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-
-#include <utility>
-#include <vector>
 
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpIpoptCalculatedQuantities.hpp>

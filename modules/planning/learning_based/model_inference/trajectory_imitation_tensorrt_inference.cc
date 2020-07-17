@@ -16,23 +16,24 @@
 
 #include "modules/planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h"
 
-#include <cuda_runtime_api.h>
-
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <cuda_runtime_api.h>
+
+#include "opencv2/opencv.hpp"
+#include "torch/extension.h"
+#include "torch/script.h"
 #include "NvInfer.h"
 #include "NvOnnxParser.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/util/math_util.h"
 #include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
-#include "opencv2/opencv.hpp"
-#include "torch/extension.h"
-#include "torch/script.h"
 
 namespace apollo {
 namespace planning {

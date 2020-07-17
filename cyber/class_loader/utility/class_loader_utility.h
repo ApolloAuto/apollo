@@ -17,9 +17,9 @@
 #ifndef CYBER_CLASS_LOADER_UTILITY_CLASS_LOADER_UTILITY_H_
 #define CYBER_CLASS_LOADER_UTILITY_CLASS_LOADER_UTILITY_H_
 
-#include <Poco/SharedLibrary.h>
 #include <cassert>
 #include <cstdio>
+
 #include <map>
 #include <memory>
 #include <mutex>
@@ -27,6 +27,8 @@
 #include <typeinfo>
 #include <utility>
 #include <vector>
+
+#include <Poco/SharedLibrary.h>
 
 #include "cyber/class_loader/utility/class_factory.h"
 #include "cyber/common/log.h"

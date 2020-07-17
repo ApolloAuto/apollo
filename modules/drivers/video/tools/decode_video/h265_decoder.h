@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <vector>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -23,7 +25,6 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-#include <vector>
 
 namespace apollo {
 namespace drivers {

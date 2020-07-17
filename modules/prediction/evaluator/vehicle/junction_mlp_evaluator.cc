@@ -16,11 +16,11 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
-#include <omp.h>
-
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"

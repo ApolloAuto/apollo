@@ -20,16 +20,16 @@
 
 #pragma once
 
-#include <adolc/adolc.h>
-#include <adolc/adolc_sparse.h>
-
 #include <limits>
 #include <vector>
 
-#include "Eigen/Dense"
+#include <adolc/adolc.h>
+#include <adolc/adolc_sparse.h>
 
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
+
+#include "Eigen/Dense"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
