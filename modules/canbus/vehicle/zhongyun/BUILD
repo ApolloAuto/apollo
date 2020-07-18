@@ -11,7 +11,6 @@ cc_library(
         ":zhongyun_controller",
         ":zhongyun_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "@qpOASES",
     ],
 )
 
