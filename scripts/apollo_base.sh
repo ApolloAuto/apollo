@@ -26,7 +26,6 @@ function set_lib_path() {
 
   # TODO(storypku):
   # /usr/local/apollo/local_integ/lib
-  export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
 
   if [ -e /usr/local/cuda/ ];then
     add_to_path "/usr/local/cuda/bin"
