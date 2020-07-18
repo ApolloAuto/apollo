@@ -24,20 +24,12 @@ function set_lib_path() {
   local CYBER_SETUP="${APOLLO_ROOT_DIR}/cyber/setup.bash"
   [[ -e "${CYBER_SETUP}" ]] && . "${CYBER_SETUP}"
 
-  export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib:/usr/lib/$(uname -m)-linux-gnu"
-  export LD_LIBRARY_PATH="/usr/local/qt5/lib:$LD_LIBRARY_PATH"
-  export LD_LIBRARY_PATH="/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH"
-  export LD_LIBRARY_PATH="/usr/local/tf2/lib:$LD_LIBRARY_PATH"
   # TODO(storypku):
-  # /apollo/bazel-genfiles/external/caffe/lib
   # /usr/local/apollo/local_integ/lib
   export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
 
   if [ -e /usr/local/cuda/ ];then
     add_to_path "/usr/local/cuda/bin"
-    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
-    export C_INCLUDE_PATH=/usr/local/cuda/include:$C_INCLUDE_PATH
-    export CPLUS_INCLUDE_PATH=/usr/local/cuda/include:$CPLUS_INCLUDE_PATH
   fi
 
   # TODO(storypku): Remove this!
