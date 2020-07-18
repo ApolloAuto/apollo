@@ -49,6 +49,12 @@ class Time {
   static Time MonoTime();
 
   /**
+   * @brief This is for USE_SIM_TIME mode only.
+   * It sets the timestamp as the sim_time value.
+   */
+  static void SetSimTime(const Time& sim_time);
+
+  /**
    * @brief Sleep Until time.
    *
    * @param time the Time object.
@@ -97,6 +103,8 @@ class Time {
 
  private:
   uint64_t nanoseconds_ = 0;
+  static Time sim_time_;
+  static bool use_sim_time_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Time& rhs);

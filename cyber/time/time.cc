@@ -33,6 +33,9 @@ using std::chrono::system_clock;
 const Time Time::MAX = Time(std::numeric_limits<uint64_t>::max());
 const Time Time::MIN = Time(1);
 
+Time Time::sim_time_{0};
+bool Time::use_sim_time_ = false;
+
 Time::Time(uint64_t nanoseconds) { nanoseconds_ = nanoseconds; }
 
 Time::Time(int nanoseconds) {
@@ -54,7 +57,15 @@ Time& Time::operator=(const Time& other) {
   return *this;
 }
 
+void Time::SetSimTime(const Time& sim_time) {
+  Time::use_sim_time_ = true;
+  Time::sim_time_ = sim_time;
+}
+
 Time Time::Now() {
+  if (Time::use_sim_time_) {
+    return Time::sim_time_;
+  }
   auto now = high_resolution_clock::now();
   auto nano_time_point =
       std::chrono::time_point_cast<std::chrono::nanoseconds>(now);
