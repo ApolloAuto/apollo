@@ -48,6 +48,7 @@ class Node {
   friend class TimerComponent;
   friend std::unique_ptr<Node> CreateNode(const std::string&,
                                           const std::string&);
+  friend bool Init(const char* binary_name);
   virtual ~Node();
 
   /**

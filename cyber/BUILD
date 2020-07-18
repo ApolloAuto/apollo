@@ -48,8 +48,10 @@ cc_library(
     hdrs = ["init.h"],
     deps = [
         "//cyber:state",
+        "//cyber/common:environment",
         "//cyber/logger:async_logger",
         "//cyber/node",
+        "//cyber/proto:clock_cc_proto",
         "//cyber/sysmo",
         "//cyber/timer:timing_wheel",
     ],
