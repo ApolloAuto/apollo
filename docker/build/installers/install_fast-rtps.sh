@@ -36,6 +36,7 @@ apt-get -y update && \
 #
 # Ref: https://github.com/eProsima/Fast-DDS
 # Ref: https://github.com/ros2/rmw_fastrtps
+DEST_DIR="/usr/local/fast-rtps"
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
@@ -45,7 +46,7 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
     tar xzf ${PKG_NAME}
-    mv fast-rtps-1.5.0 /usr/local/fast-rtps
+    mv fast-rtps-1.5.0 "${DEST_DIR}"
     rm -rf ${PKG_NAME}
 else # aarch64
     PKG_NAME="fast-rtps-1.5.0.prebuilt.aarch64.tar.gz"
@@ -54,7 +55,9 @@ else # aarch64
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
-    mv fast-rtps-1.5.0 /usr/local/fast-rtps
+    mv fast-rtps-1.5.0 "${DEST_DIR}"
     rm -rf ${PKG_NAME}
 fi
+
+echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
 
