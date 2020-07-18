@@ -349,3 +349,22 @@ py_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "clock_cc_proto",
+    deps = [
+        ":clock_proto",
+    ],
+)
+
+proto_library(
+    name = "clock_proto",
+    srcs = ["clock.proto"],
+)
+
+py_proto_library(
+    name = "clock_py_pb2",
+    deps = [
+        ":clock_proto",
+    ],
+)
+
