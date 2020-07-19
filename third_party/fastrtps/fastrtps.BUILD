@@ -9,8 +9,8 @@ cc_library(
         "-L/usr/local/fast-rtps/lib",
         "-lfastrtps",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "@fastcdr",
     ],
-    visibility = ["//visibility:public"],
 )
