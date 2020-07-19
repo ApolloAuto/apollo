@@ -30,7 +30,7 @@ function buildify() {
 
     set -x
     find ${build_dirs} -type f \
-        \( -name "BUILD" -or -name "*.BUILD" -or -name "*.bzl" \) \
+        \( -name "BUILD" -or -name "*.BUILD" -or -name "*.bzl" -or -name "*.bazel" \) \
         -exec ${buildifier_cmd} {} +
     set +x
 
