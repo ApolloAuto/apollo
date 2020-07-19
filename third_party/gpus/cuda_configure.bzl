@@ -465,6 +465,13 @@ def _find_libs(repository_ctx, check_cuda_libs_script, cuda_config):
             cuda_config.cuda_lib_version,
             static = False,
         ),
+        "nccl": _check_cuda_lib_params(
+            "nccl",
+            cpu_value,
+            cuda_config.config["nccl_library_dir"],
+            version = None,
+            static = False,
+        ),
     }
 
     # Verify that the libs actually exist at their locations.
@@ -529,7 +536,7 @@ def _get_cuda_config(repository_ctx, find_cuda_config_script):
           compute_capabilities: A list of the system's CUDA compute capabilities.
           cpu_value: The name of the host operating system.
       """
-    config = find_cuda_config(repository_ctx, find_cuda_config_script, ["cuda", "cudnn"])
+    config = find_cuda_config(repository_ctx, find_cuda_config_script, ["cuda", "cudnn", "nccl"])
     cpu_value = get_cpu_value(repository_ctx)
     toolkit_path = config["cuda_toolkit_path"]
 
@@ -539,6 +546,7 @@ def _get_cuda_config(repository_ctx, find_cuda_config_script):
 
     cuda_version = "{}.{}".format(cuda_major, cuda_minor)
     cudnn_version = config["cudnn_version"]
+    nccl_version = config["nccl_version"]
 
     # cuda_lib_version is for libraries like cuBLAS, cuFFT, cuSOLVER, etc.
     # It changed from 'x.y' to just 'x' in CUDA 10.1.
@@ -551,6 +559,7 @@ def _get_cuda_config(repository_ctx, find_cuda_config_script):
         cuda_toolkit_path = toolkit_path,
         cuda_version = cuda_version,
         cudnn_version = cudnn_version,
+        nccl_version = nccl_version,
         cuda_lib_version = cuda_lib_version,
         compute_capabilities = compute_capabilities(repository_ctx),
         cpu_value = cpu_value,
@@ -795,7 +804,8 @@ def _create_local_cuda_repository(repository_ctx):
     cudnn_header_dir = cuda_config.config["cudnn_include_dir"]
     cupti_header_dir = cuda_config.config["cupti_include_dir"]
     nvvm_libdevice_dir = cuda_config.config["nvvm_library_dir"]
-
+    nccl_header_dir = cuda_config.config["nccl_include_dir"]
+    nccl_libdevice_dir = cuda_config.config["nccl_library_dir"]
     # Create genrule to copy files from the installed CUDA toolkit into execroot.
     copy_rules = [
         make_copy_dir_rule(
@@ -818,20 +828,31 @@ def _create_local_cuda_repository(repository_ctx):
         ),
     ]
 
-    copy_rules.append(make_copy_files_rule(
-        repository_ctx,
-        name = "cublas-include",
-        srcs = [
-            cublas_include_path + "/cublas.h",
-            cublas_include_path + "/cublas_v2.h",
-            cublas_include_path + "/cublas_api.h",
-        ],
-        outs = [
-            "cublas/include/cublas.h",
-            "cublas/include/cublas_v2.h",
-            "cublas/include/cublas_api.h",
-        ],
-    ))
+    copy_rules.append(
+        make_copy_files_rule(
+            repository_ctx,
+            name = "cublas-include",
+            srcs = [
+                cublas_include_path + "/cublas.h",
+                cublas_include_path + "/cublas_v2.h",
+                cublas_include_path + "/cublas_api.h",
+            ],
+            outs = [
+                "cublas/include/cublas.h",
+                "cublas/include/cublas_v2.h",
+                "cublas/include/cublas_api.h",
+            ],
+        ),
+    )
+
+    copy_rules.append(
+        make_copy_files_rule(
+            repository_ctx,
+            name = "nccl-include",
+            srcs = [nccl_header_dir + "/nccl.h"],
+            outs = ["cuda/include/nccl.h"],
+        ),
+    )
 
     check_cuda_libs_script = repository_ctx.path(Label("//third_party/gpus:check_cuda_libs.py"))
     cuda_libs = _find_libs(repository_ctx, check_cuda_libs_script, cuda_config)
@@ -901,6 +922,7 @@ def _create_local_cuda_repository(repository_ctx):
             "%{curand_lib}": _basename(repository_ctx, cuda_libs["curand"]),
             "%{cupti_lib}": _basename(repository_ctx, cuda_libs["cupti"]),
             "%{cusparse_lib}": _basename(repository_ctx, cuda_libs["cusparse"]),
+            "%{nccl_lib}": _basename(repository_ctx, cuda_libs["nccl"]),
             "%{copy_rules}": "\n".join(copy_rules),
         },
     )
