@@ -55,7 +55,7 @@ function setup_user_account_if_not_exist() {
     local uid="$2"
     local group_name="$3"
     local gid="$4"
-    if grep -q "${user_name}" /etc/passwd; then
+    if grep -q "^${user_name}:" /etc/passwd; then
         echo "User ${user_name} already exist. Skip setting user account."
         return
     fi
