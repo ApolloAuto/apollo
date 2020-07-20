@@ -76,7 +76,7 @@ function grant_device_permissions() {
     [ -e /dev/camera/trafficlights ] && chmod a+rw /dev/camera/trafficlights
 
     # setup audio device
-    [ -e /dev/snd ] && adduser "$1" audio
+    [ -e /dev/snd ] && usermod -a -G audio "$1"
 }
 
 function setup_apollo_directories() {

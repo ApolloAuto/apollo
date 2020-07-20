@@ -27,7 +27,8 @@ bash /tmp/installers/install_adv_plat.sh "${MY_MODE}"
 bash /tmp/installers/install_proj4.sh
 
 # Required by audio-driver python version
-sudo apt-get install python3-pyaudio
+apt-get -y update && \
+    apt-get -y install python3-pyaudio
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
