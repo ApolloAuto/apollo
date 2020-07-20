@@ -16,6 +16,7 @@ cc_library(
     name = "common",
     hdrs = ["common.h"],
     deps = [
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:box",
         "//modules/perception/base:point_cloud",
     ],

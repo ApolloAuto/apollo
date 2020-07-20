@@ -78,8 +78,8 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   Timer timer;
 
   int num_points;
-//  cur_cloud_ptr_ = std::make_shared<base::PointFCloud>(*original_cloud_);
-  cur_cloud_ptr_ = original_cloud_;  // TODO(chenjiahao): for emergency use
+  cur_cloud_ptr_ = std::shared_ptr<base::PointFCloud>(
+      new base::PointFCloud(*original_cloud_));
 
   // down sample the point cloud through filtering beams
   if (FLAGS_enable_downsample_beams) {

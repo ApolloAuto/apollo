@@ -104,9 +104,7 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
 
 bool LoadMultipleMatricesFile(
     const std::string& filename,
-    std::map<std::string, Matrixd, std::less<std::string>,
-             Eigen::aligned_allocator<std::pair<const std::string, Matrixd> > >*
-        matrices) {
+    EigenMap<std::string, Matrixd>* matrices) {
   if (matrices == nullptr) {
     return false;
   }
