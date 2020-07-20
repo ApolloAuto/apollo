@@ -36,6 +36,13 @@ export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 
 export SUPPORTED_NVIDIA_SMS="6.0 6.1 7.0 7.2 7.5"
 
+function py3_version() {
+    local version
+    # major.minor.rev (e.g. 3.6.9) expected
+    version="$(python3 --version | awk '{print $2}')"
+    echo "${version%.*}"
+}
+
 # Ref: https://reproducible-builds.org/docs/source-date-epoch
 function source_date_epoch_setup() {
     DATE_FMT="+%Y-%m-%d"
