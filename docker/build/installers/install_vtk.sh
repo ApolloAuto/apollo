@@ -26,6 +26,8 @@ if ldconfig -p | grep -q libvtkCommonCore ; then
     exit 0
 fi
 
+TARGET_ARCH="$(uname -m)"
+
 # Note(storypku):
 #   Although vtk are shipped with Ubuntu distribution, we decide to build VTK
 #   from source here to avoid massive amount of system dependency.
@@ -48,8 +50,11 @@ pushd VTK-${VERSION}
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
         -DCMAKE_BUILD_TYPE=Release
-
-    make -j${THREAD_NUM}
+    thread_num="$(nproc)"
+    if [ "${TARGET_ARCH}" = "aarch64" ]; then
+        thread_num=$(( thread_num / 2 ))
+    fi
+    make -j${thread_num}
     make install
 popd
 
