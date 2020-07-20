@@ -18,8 +18,7 @@
 #include <memory>
 #include <vector>
 
-#include "Eigen/StdVector"
-
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point_cloud.h"
 
 namespace apollo {
@@ -37,17 +36,10 @@ struct alignas(16) LaneBoundary {
 };
 
 struct alignas(16) HdmapStruct {
-  std::vector<RoadBoundary, Eigen::aligned_allocator<RoadBoundary> >
-      road_boundary;
-  std::vector<PointCloud<PointD>,
-              Eigen::aligned_allocator<PointCloud<PointD> > >
-      road_polygons;
-  std::vector<PointCloud<PointD>,
-              Eigen::aligned_allocator<PointCloud<PointD> > >
-      hole_polygons;
-  std::vector<PointCloud<PointD>,
-              Eigen::aligned_allocator<PointCloud<PointD> > >
-      junction_polygons;
+  apollo::common::EigenVector<RoadBoundary> road_boundary;
+  apollo::common::EigenVector<PointCloud<PointD>> road_polygons;
+  apollo::common::EigenVector<PointCloud<PointD>> hole_polygons;
+  apollo::common::EigenVector<PointCloud<PointD>> junction_polygons;
 };
 
 using HdmapStructPtr = std::shared_ptr<HdmapStruct>;

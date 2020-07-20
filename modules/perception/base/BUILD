@@ -36,6 +36,9 @@ cc_library(
         "sensor_meta.h",
         "vehicle_struct.h",
     ],
+    deps = [
+        "//modules/common/util:eigen_defs",
+    ],
 )
 
 cc_library(

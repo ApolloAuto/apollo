@@ -18,13 +18,14 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "Eigen/StdVector"
-
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/type_fusion_interface.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
+
+using apollo::common::EigenMap;
+using apollo::common::EigenVector;
 
 namespace apollo {
 namespace perception {
@@ -43,9 +44,7 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
       Vectord* log_prob);
 
  protected:
-  std::map<std::string, Matrixd, std::less<std::string>,
-           Eigen::aligned_allocator<std::pair<const std::string, Matrixd>>>
-      smooth_matrices_;
+  EigenMap<std::string, Matrixd> smooth_matrices_;
   Matrixd confidence_smooth_matrix_;
 };
 
@@ -82,9 +81,9 @@ class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
   Matrixd transition_matrix_;
 
   // data member for window inference version
-  std::vector<Vectord, Eigen::aligned_allocator<Vectord>> fused_oneshot_probs_;
-  std::vector<Vectord, Eigen::aligned_allocator<Vectord>> fused_sequence_probs_;
-  std::vector<Vectori, Eigen::aligned_allocator<Vectori>> state_back_trace_;
+  EigenVector<Vectord> fused_oneshot_probs_;
+  EigenVector<Vectord> fused_sequence_probs_;
+  EigenVector<Vectori> state_back_trace_;
 
  protected:
   double s_alpha_ = 1.8;

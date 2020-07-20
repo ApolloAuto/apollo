@@ -9,6 +9,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:object",
         "@eigen",
     ],
@@ -32,6 +33,7 @@ cc_library(
         ":type_fusion_interface",
         ":util",
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:object",
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
