@@ -20,4 +20,22 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "channel_test_writer",
+    srcs = ["channel_test_writer.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/examples/proto:examples_cc_proto",
+    ],
+)
+
+cc_binary(
+    name = "channel_prediction_writer",
+    srcs = ["channel_prediction_writer.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/examples/proto:examples_cc_proto",
+    ],
+)
+
 cpplint()
