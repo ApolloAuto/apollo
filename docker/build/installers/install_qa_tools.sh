@@ -36,7 +36,7 @@ apt-get -y update && \
     valgrind    \
     libgoogle-perftools4  # gperftools
 
-ln -s /usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so.0.4.8 /usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so
+ln -s /usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so.0 /usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so
 
 ## Pylint
 pip3_install pycodestyle
