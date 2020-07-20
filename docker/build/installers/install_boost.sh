@@ -46,11 +46,13 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xjf "${PKG_NAME}"
 
+py3_ver="$(py3_version)"
+
 # Ref: https://www.boost.org/doc/libs/1_73_0/doc/html/mpi/getting_started.html
 pushd "boost_${VERSION}"
     echo "using mpi : ${SYSROOT_DIR}/bin/mpicc ;" > user-config.jam
     ./bootstrap.sh \
-        --with-python-version=3.6 \
+        --with-python-version=${py3_ver} \
         --prefix="${SYSROOT_DIR}" \
         --without-icu
 
