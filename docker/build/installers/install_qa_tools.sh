@@ -23,6 +23,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
+TARGET_ARCH="$(uname -m)"
+
 ## NOTE:
 ## buildifier/buildozer was moved into install_bazel.sh.
 
@@ -33,6 +35,8 @@ apt-get -y update && \
     lcov        \
     valgrind    \
     libgoogle-perftools4  # gperftools
+
+ln -s /usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so.0.4.8 /usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so
 
 ## Pylint
 pip3_install pycodestyle
