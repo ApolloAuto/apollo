@@ -22,6 +22,8 @@
 
 #include <limits>
 
+#include "modules/common/util/eigen_defs.h"
+
 namespace apollo {
 namespace perception {
 namespace fusion {
