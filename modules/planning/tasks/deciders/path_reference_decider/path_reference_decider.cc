@@ -49,7 +49,7 @@ int PathReferenceDecider::total_path_counter_ = 0;
 
 PathReferenceDecider::PathReferenceDecider(
     const TaskConfig &config,
-    const std::shared_ptr<DependencyInjector>& injector)
+    const std::shared_ptr<DependencyInjector> &injector)
     : Task(config, injector) {}
 
 Status PathReferenceDecider::Execute(Frame *frame,
@@ -114,7 +114,7 @@ Status PathReferenceDecider::Process(Frame *frame,
   // get learning model output (trajectory) from frame
   const std::vector<common::TrajectoryPoint> &path_reference =
       injector_->learning_based_data()
-               ->learning_data_adc_future_trajectory_points();
+          ->learning_data_adc_future_trajectory_points();
   ADEBUG << "There are " << path_reference.size() << " path points.";
 
   // get regular path bound
@@ -161,6 +161,8 @@ Status PathReferenceDecider::Process(Frame *frame,
             (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
+
+  RecordDebugInfo(path_reference, reference_line_info);
 
   // check if path reference is valid
   // current, only check if path reference point is within path bounds
@@ -394,6 +396,47 @@ void PathReferenceDecider::EvaluatePathReference(
     evaluated_path_reference->emplace_back(
         discrete_path_reference.Evaluate(cur_s));
   }
+}
+
+void PathReferenceDecider::RecordDebugInfo(
+    const std::vector<TrajectoryPoint> &path_reference,
+    ReferenceLineInfo *const reference_line_info) {
+  // Sanity checks.
+  ACHECK(!path_reference.empty());
+  CHECK_NOTNULL(reference_line_info);
+
+  // Take learning model output and transform it into
+  // PathData so that it can be displayed in simulator.
+  std::vector<common::FrenetFramePoint> frenet_frame_path_reference_points;
+  for (const TrajectoryPoint &path_reference_point : path_reference) {
+    common::SLPoint point_sl;
+    reference_line_info->reference_line().XYToSL(
+        {path_reference_point.path_point().x(),
+         path_reference_point.path_point().y()},
+        &point_sl);
+    common::FrenetFramePoint frenet_frame_point;
+    frenet_frame_point.set_s(point_sl.s());
+    frenet_frame_point.set_dl(0.0);
+    frenet_frame_point.set_ddl(0.0);
+    // get l from reference line
+    frenet_frame_point.set_l(point_sl.l());
+    frenet_frame_path_reference_points.push_back(frenet_frame_point);
+  }
+
+  auto frenet_frame_path_reference =
+      FrenetFramePath(std::move(frenet_frame_path_reference_points));
+  PathData path_reference_data;
+  path_reference_data.SetReferenceLine(
+      &(reference_line_info->reference_line()));
+  path_reference_data.SetFrenetPath(std::move(frenet_frame_path_reference));
+
+  // Insert the transformed PathData into the simulator display.
+  auto *ptr_display_path =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
+  ptr_display_path->set_name("path_reference");
+  ptr_display_path->mutable_path_point()->CopyFrom(
+      {path_reference_data.discretized_path().begin(),
+       path_reference_data.discretized_path().end()});
 }
 
 }  // namespace planning
