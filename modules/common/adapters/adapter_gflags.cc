@@ -27,6 +27,8 @@ DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
 DEFINE_string(localization_topic, "/apollo/localization/pose",
               "localization topic name");
+DEFINE_string(planning_learning_data_topic, "/apollo/planning/learning_data",
+              "planning learning data");
 DEFINE_string(planning_trajectory_topic, "/apollo/planning",
               "planning trajectory topic name");
 DEFINE_string(planning_pad_topic, "/apollo/planning/pad",
