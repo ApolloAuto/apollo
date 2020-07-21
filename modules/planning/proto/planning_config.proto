@@ -357,6 +357,7 @@ message TopicConfig {
   optional string routing_response_topic = 9;
   optional string story_telling_topic = 10;
   optional string traffic_light_detection_topic = 11;
+  optional string planning_learning_data_topic =12;
 }
 
 message PlanningConfig {
@@ -364,6 +365,7 @@ message PlanningConfig {
     NO_LEARNING = 0;
     E2E = 1;
     HYBRID = 2;
+    RL_TEST = 3;
   }
 
   optional TopicConfig topic_config = 1;
