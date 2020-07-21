@@ -26,4 +26,3 @@ RUN bash /tmp/installers/install_3rdparty_pept_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_release_stage.sh
 
 RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
-RUN bash /tmp/installers/install_perf.sh
