@@ -16,7 +16,7 @@ cc_library(
         ":kalman_filter",
         ":linear_interpolation",
         ":lqr",
-        ":mpc",
+        ":mpc_osqp",
         ":quaternion",
         ":search",
         ":sin_table",
@@ -201,18 +201,6 @@ cc_library(
 )
 
 cc_library(
-    name = "mpc",
-    srcs = ["mpc_solver.cc"],
-    hdrs = ["mpc_solver.h"],
-    copts = ["-Iexternal/eigen"],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@eigen",
-    ],
-)
-
-cc_library(
     name = "cartesian_frenet_conversion",
     srcs = ["cartesian_frenet_conversion.cc"],
     hdrs = ["cartesian_frenet_conversion.h"],
@@ -236,19 +224,8 @@ cc_test(
     size = "small",
     srcs = ["mpc_osqp_test.cc"],
     deps = [
-        ":mpc",
         ":mpc_osqp",
         "//cyber/common:log",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "mpc_test",
-    size = "small",
-    srcs = ["mpc_solver_test.cc"],
-    deps = [
-        ":mpc",
         "@com_google_googletest//:gtest_main",
     ],
 )

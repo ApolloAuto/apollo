@@ -28,7 +28,6 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/mpc_osqp.h"
-#include "modules/common/math/mpc_solver.h"
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 
@@ -69,9 +68,7 @@ MPCController::MPCController() : name_("MPC Controller") {
   AINFO << "Using " << name_;
 }
 
-MPCController::~MPCController() {
-  CloseLogFile();
-}
+MPCController::~MPCController() { CloseLogFile(); }
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -255,13 +252,9 @@ double MPCController::Wheel2SteerPct(const double wheel_angle) {
   return wheel_angle / wheel_single_direction_max_degree_ * 100;
 }
 
-void MPCController::Stop() {
-  CloseLogFile();
-}
+void MPCController::Stop() { CloseLogFile(); }
 
-std::string MPCController::Name() const {
-  return name_;
-}
+std::string MPCController::Name() const { return name_; }
 
 void MPCController::LoadMPCGainScheduler(
     const MPCControllerConf &mpc_controller_conf) {
@@ -393,29 +386,18 @@ Status MPCController::ComputeControlCommand(
   const double v = injector_->vehicle_state()->linear_velocity();
 
   std::vector<double> control_cmd(controls_, 0);
-  if (FLAGS_use_osqp_solver) {
-    apollo::common::math::MpcOsqp mpc_osqp(
-        matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
-        matrix_state_, lower_bound, upper_bound, lower_state_bound,
-        upper_state_bound, reference_state, mpc_max_iteration_, horizon_,
-        mpc_eps_);
-    if (!mpc_osqp.Solve(&control_cmd)) {
-      AERROR << "MPC OSQP solver failed";
-    } else {
-      ADEBUG << "MPC OSQP problem solved! ";
-      control[0](0, 0) = control_cmd.at(0);
-      control[0](1, 0) = control_cmd.at(1);
-    }
+
+  apollo::common::math::MpcOsqp mpc_osqp(
+      matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
+      matrix_state_, lower_bound, upper_bound, lower_state_bound,
+      upper_state_bound, reference_state, mpc_max_iteration_, horizon_,
+      mpc_eps_);
+  if (!mpc_osqp.Solve(&control_cmd)) {
+    AERROR << "MPC OSQP solver failed";
   } else {
-    if (!common::math::SolveLinearMPC(
-            matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
-            matrix_r_updated_, lower_bound, upper_bound, matrix_state_,
-            reference, mpc_eps_, mpc_max_iteration_, &control, &control_gain,
-            &addition_gain)) {
-      AERROR << "MPC solver failed";
-    } else {
-      ADEBUG << "MPC problem solved! ";
-    }
+    ADEBUG << "MPC OSQP problem solved! ";
+    control[0](0, 0) = control_cmd.at(0);
+    control[0](1, 0) = control_cmd.at(1);
   }
 
   steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
