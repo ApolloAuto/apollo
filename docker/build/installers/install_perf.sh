@@ -25,4 +25,4 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt-get -y update && \
     apt-get -y install \
     linux-tools-common \
-    linux-tools-5.3.0-62-generic
+perf 2>&1 | grep linux-tools | head -n 1 | xargs sudo apt install -y
