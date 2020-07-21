@@ -276,6 +276,7 @@ proto_library(
     deps = [
         "//modules/canbus/proto:chassis_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_lane_proto",
         "//modules/perception/proto:perception_obstacle_proto",
