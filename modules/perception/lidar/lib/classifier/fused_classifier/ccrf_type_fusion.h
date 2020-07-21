@@ -24,9 +24,6 @@
 #include "modules/perception/lidar/lib/classifier/fused_classifier/type_fusion_interface.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
 
-using apollo::common::EigenMap;
-using apollo::common::EigenVector;
-
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -44,7 +41,7 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
       Vectord* log_prob);
 
  protected:
-  EigenMap<std::string, Matrixd> smooth_matrices_;
+  apollo::common::EigenMap<std::string, Matrixd> smooth_matrices_;
   Matrixd confidence_smooth_matrix_;
 };
 
@@ -81,9 +78,9 @@ class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
   Matrixd transition_matrix_;
 
   // data member for window inference version
-  EigenVector<Vectord> fused_oneshot_probs_;
-  EigenVector<Vectord> fused_sequence_probs_;
-  EigenVector<Vectori> state_back_trace_;
+  apollo::common::EigenVector<Vectord> fused_oneshot_probs_;
+  apollo::common::EigenVector<Vectord> fused_sequence_probs_;
+  apollo::common::EigenVector<Vectori> state_back_trace_;
 
  protected:
   double s_alpha_ = 1.8;
