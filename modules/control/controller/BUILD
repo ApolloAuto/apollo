@@ -99,7 +99,6 @@ cc_library(
         "//modules/common/math:euler_angles_zxy",
         "//modules/common/math:geometry",
         "//modules/common/math:lqr",
-        "//modules/common/math:mpc",
         "//modules/common/math:mpc_osqp",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/status",

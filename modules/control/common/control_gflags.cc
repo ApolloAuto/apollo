@@ -114,8 +114,6 @@ DEFINE_bool(
     enable_gear_drive_negative_speed_protection, false,
     "Enable estop to prevent following negative speed during gear drive");
 
-DEFINE_bool(use_osqp_solver, false, "use OSQP solver for MPC controller");
-
 DEFINE_bool(use_control_submodules, false,
             "use control submodules instead of controller agent");
 
