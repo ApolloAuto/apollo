@@ -33,7 +33,7 @@ namespace planning {
 class PathReferenceDecider : public Task {
  public:
   PathReferenceDecider(const TaskConfig &config,
-                       const std::shared_ptr<DependencyInjector>& injector);
+                       const std::shared_ptr<DependencyInjector> &injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
@@ -111,6 +111,10 @@ class PathReferenceDecider : public Task {
   bool IsADCBoxAlongPathReferenceWithinPathBounds(
       const std::vector<common::TrajectoryPoint> &path_reference,
       const PathBoundary &regular_path_bound);
+
+  void RecordDebugInfo(
+      const std::vector<common::TrajectoryPoint> &path_reference,
+      ReferenceLineInfo *const reference_line_info);
 
  private:
   static int valid_path_reference_counter_;  // count valid path reference
