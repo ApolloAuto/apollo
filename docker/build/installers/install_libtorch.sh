@@ -22,9 +22,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
-PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0.zip"
-DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
-CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
+# PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0.zip"
+# DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
+# CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
+
+PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0-apollo.zip"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+CHECKSUM="aeab4ab92cbd96d8bd29c3f85fc4e6e61144528fceb900c123f8c878121c1881"
 
 #https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
@@ -39,8 +43,6 @@ popd
 
 # Cleanup
 rm -rf libtorch ${PKG_NAME}
-rm -f /usr/local/libtorch_gpu/lib/libcudart-80664282.so.10.2
-ln -s /usr/local/cuda/lib64/libcudart.so.10.2 /usr/local/libtorch_gpu/lib/libcudart-80664282.so.10.2
 
 PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0+cpu.zip"
 DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip"
