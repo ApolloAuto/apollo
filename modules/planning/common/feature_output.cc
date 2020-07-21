@@ -41,18 +41,19 @@ bool FeatureOutput::Ready() {
 void FeatureOutput::InsertLearningDataFrame(
     const std::string& record_file,
     const LearningDataFrame& learning_data_frame) {
-  learning_data_.add_learning_data()->CopyFrom(learning_data_frame);
+  learning_data_.add_learning_data_frame()->CopyFrom(learning_data_frame);
 
   // write frames into a file
-  if (learning_data_.learning_data_size() >=
+  if (learning_data_.learning_data_frame_size() >=
       FLAGS_learning_data_frame_num_per_file) {
     WriteLearningData(record_file);
   }
 }
 
 LearningDataFrame* FeatureOutput::GetLatestLearningDataFrame() {
-  const int size = learning_data_.learning_data_size();
-  return size > 0 ? learning_data_.mutable_learning_data(size - 1) : nullptr;
+  const int size = learning_data_.learning_data_frame_size();
+  return size > 0 ? learning_data_.mutable_learning_data_frame(size - 1)
+      : nullptr;
 }
 
 void FeatureOutput::InsertPlanningResult() {}
@@ -72,7 +73,7 @@ void FeatureOutput::WriteLearningData(const std::string& record_file) {
 
 void FeatureOutput::WriteRemainderiLearningData(
     const std::string& record_file) {
-  if (learning_data_.learning_data_size() > 0) {
+  if (learning_data_.learning_data_frame_size() > 0) {
     WriteLearningData(record_file);
   }
 }

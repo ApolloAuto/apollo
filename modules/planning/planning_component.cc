@@ -175,7 +175,7 @@ bool PlanningComponent::Proc(
         injector_->learning_based_data()->GetLatestLearningDataFrame();
     if (learning_data_frame) {
       planning_learning_data.mutable_learning_data()
-                            ->add_learning_data()
+                            ->add_learning_data_frame()
                             ->CopyFrom(*learning_data_frame);
       common::util::FillHeader(node_->Name(), &planning_learning_data);
       planning_learning_data_writer_->Write(planning_learning_data);
