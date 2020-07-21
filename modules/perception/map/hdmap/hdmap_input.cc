@@ -29,6 +29,7 @@ namespace apollo {
 namespace perception {
 namespace map {
 
+using apollo::common::EigenVector;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::JunctionInfoConstPtr;

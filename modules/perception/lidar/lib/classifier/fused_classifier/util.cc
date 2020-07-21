@@ -21,6 +21,7 @@ namespace perception {
 namespace lidar {
 namespace util {
 
+using apollo::common::EigenMap;
 using apollo::perception::base::ObjectType;
 
 void FromStdToVector(const std::vector<float>& src_prob, Vectord* dst_prob) {

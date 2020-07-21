@@ -25,8 +25,6 @@
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point_cloud.h"
 
-using apollo::common::EigenVector;
-
 namespace apollo {
 namespace perception {
 namespace common {
@@ -313,8 +311,8 @@ void CalculateDistAndDirToBoundary(
 template <typename PointT>
 void CalculateDistAndDirToBoundary(
     const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
-    const EigenVector<base::PointCloud<PointT>> &left_boundary,
-    const EigenVector<base::PointCloud<PointT>> &right_boundary,
+    const apollo::common::EigenVector<base::PointCloud<PointT>> &left_boundary,
+    const apollo::common::EigenVector<base::PointCloud<PointT>> &right_boundary,
     typename PointT::Type *dist,
     Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   using Type = typename PointT::Type;

@@ -26,8 +26,6 @@
 #include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/object_types.h"
 
-using apollo::common::EigenMap;
-
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -61,7 +59,8 @@ bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix);
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 
 bool LoadMultipleMatricesFile(
-    const std::string& filename, EigenMap<std::string, Matrixd>* matrices);
+    const std::string& filename,
+    apollo::common::EigenMap<std::string, Matrixd>* matrices);
 
 }  // namespace util
 }  // namespace lidar
