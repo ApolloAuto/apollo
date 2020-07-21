@@ -229,7 +229,7 @@ message LearningDataFrame {
 }
 
 message LearningData {
-  repeated LearningDataFrame learning_data = 1;
+  repeated LearningDataFrame learning_data_frame = 1;
 }
 
 message PlanningLearningData {

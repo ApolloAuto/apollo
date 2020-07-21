@@ -27,16 +27,17 @@ void LearningBasedData::Clear() {
 
 void LearningBasedData::InsertLearningDataFrame(
     const LearningDataFrame& learning_data_frame) {
-  learning_data_.add_learning_data()->CopyFrom(learning_data_frame);
+  learning_data_.add_learning_data_frame()->CopyFrom(learning_data_frame);
 
-  while (learning_data_.learning_data_size() > 10) {
-    learning_data_.mutable_learning_data()->DeleteSubrange(0, 1);
+  while (learning_data_.learning_data_frame_size() > 10) {
+    learning_data_.mutable_learning_data_frame()->DeleteSubrange(0, 1);
   }
 }
 
 LearningDataFrame* LearningBasedData::GetLatestLearningDataFrame() {
-  const int size = learning_data_.learning_data_size();
-  return size > 0 ? learning_data_.mutable_learning_data(size - 1) : nullptr;
+  const int size = learning_data_.learning_data_frame_size();
+  return size > 0 ? learning_data_.mutable_learning_data_frame(size - 1)
+      : nullptr;
 }
 
 }  // namespace planning

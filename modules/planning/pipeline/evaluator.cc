@@ -54,8 +54,8 @@ void Evaluator::Evaluate(const std::string& source_file) {
 
   cyber::common::GetProtoFromFile(source_file, &learning_data_);
 
-  for (int i = 0; i < learning_data_.learning_data_size(); ++i) {
-    auto learning_data_frame = learning_data_.mutable_learning_data(i);
+  for (int i = 0; i < learning_data_.learning_data_frame_size(); ++i) {
+    auto learning_data_frame = learning_data_.mutable_learning_data_frame(i);
     if (learning_data_frame->adc_trajectory_point_size() <= 0) {
       continue;
     }
@@ -72,14 +72,15 @@ void Evaluator::Evaluate(const std::string& source_file) {
 
     // evaluate adc future trajectory
     std::vector<TrajectoryPointFeature> adc_future_trajectory;
-    for (const auto& tp : learning_data_.learning_data(i)
+    for (const auto& tp : learning_data_.learning_data_frame(i)
                               .output()
                               .adc_future_trajectory_point()) {
       adc_future_trajectory.push_back(tp);
     }
     std::vector<TrajectoryPointFeature> evaluated_adc_future_trajectory;
     trajectory_evaluator_.EvaluateADCFutureTrajectory(
-        learning_data_.learning_data(i).frame_num(), adc_future_trajectory,
+        learning_data_.learning_data_frame(i).frame_num(),
+        adc_future_trajectory,
         start_point_timestamp_sec, FLAGS_trajectory_delta_t,
         &evaluated_adc_future_trajectory);
     learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
