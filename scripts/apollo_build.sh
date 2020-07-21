@@ -156,10 +156,9 @@ function main() {
         info "Running build under CPU mode on ${ARCH} platform."
     fi
     bazel_build $@
-    # Disable simulator build temporarily
-    build_simulator
     if [ -z "${SHORTHAND_TARGETS}" ]; then
         SHORTHAND_TARGETS="apollo"
+        build_simulator
     fi
     success "Done building ${SHORTHAND_TARGETS}. Enjoy!"
 }
