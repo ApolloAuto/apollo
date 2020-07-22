@@ -39,17 +39,14 @@ AtomicHashMap<uint64_t, std::string, 256> GlobalData::task_id_map_;
 
 namespace {
 const char* empty_str_ = "";
-char* program_path() {
-  char* path = reinterpret_cast<char*>(malloc(PATH_MAX));
-  if (path != nullptr) {
-    auto len = readlink("/proc/self/exe", path, PATH_MAX);
-    if (len == -1) {
-      free(path);
-      return nullptr;
-    }
-    path[len] = '\0';
+std::string program_path() {
+  char path[PATH_MAX];
+  auto len = readlink("/proc/self/exe", path, sizeof(path));
+  if (len == -1) {
+    return empty_str_;
   }
-  return path;
+  path[len] = '\0';
+  return std::string(path);
 }
 }  // namespace
 
@@ -57,22 +54,19 @@ GlobalData::GlobalData() {
   InitHostInfo();
   ACHECK(InitConfig());
   process_id_ = getpid();
-  char* prog_path = program_path();
-  if (prog_path) {
+  auto prog_path = program_path();
+  if (!prog_path.empty()) {
     process_group_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
-    free(prog_path);
   } else {
     process_group_ = "cyber_default_" + std::to_string(process_id_);
   }
+
   is_reality_mode_ =
       config_.run_mode_conf().run_mode() == proto::RunMode::MODE_REALITY;
 
-  const char* run_mode_val = ::getenv("CYBER_RUN_MODE");
-  if (run_mode_val != nullptr) {
-    std::string run_mode_str(run_mode_val);
-    if (run_mode_str == "simulation") {
-      is_reality_mode_ = false;
-    }
+  auto run_mode = GetEnv("CYBER_RUN_MODE");
+  if (!run_mode.empty() && run_mode == "simulation") {
+    is_reality_mode_ = false;
   }
 }
 
