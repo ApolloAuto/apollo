@@ -25,6 +25,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
+apt-get -y update && \
+    apt-get -y install \
+    libopenblas-dev \
+    libatlas-base-dev \
+    libcublas10 \
+    libcublas-dev
+
+
 info "Install TensorRT 7 ..."
 bash /tmp/installers/install_tensorrt.sh
 
