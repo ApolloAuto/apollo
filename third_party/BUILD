@@ -37,10 +37,3 @@ cc_library(
         "-lz",
     ],
 )
-
-cc_library(
-    name = "glvnd",
-    linkopts = [
-        "-lGL",
-    ],
-)
