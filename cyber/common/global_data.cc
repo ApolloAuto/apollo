@@ -21,8 +21,10 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <climits>
 #include <cstdlib>
+
 #include <functional>
 
 #include "cyber/common/environment.h"
@@ -38,12 +40,12 @@ AtomicHashMap<uint64_t, std::string, 256> GlobalData::service_id_map_;
 AtomicHashMap<uint64_t, std::string, 256> GlobalData::task_id_map_;
 
 namespace {
-const char* empty_str_ = "";
+const std::string& kEmptyString = "";
 std::string program_path() {
   char path[PATH_MAX];
   auto len = readlink("/proc/self/exe", path, sizeof(path));
   if (len == -1) {
-    return empty_str_;
+    return kEmptyString;
   }
   path[len] = '\0';
   return std::string(path);
@@ -181,7 +183,7 @@ std::string GlobalData::GetNodeById(uint64_t id) {
   if (node_id_map_.Get(id, &node_name)) {
     return *node_name;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 uint64_t GlobalData::RegisterChannel(const std::string& channel) {
@@ -204,7 +206,7 @@ std::string GlobalData::GetChannelById(uint64_t id) {
   if (channel_id_map_.Get(id, &channel)) {
     return *channel;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 uint64_t GlobalData::RegisterService(const std::string& service) {
@@ -227,7 +229,7 @@ std::string GlobalData::GetServiceById(uint64_t id) {
   if (service_id_map_.Get(id, &service)) {
     return *service;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
@@ -250,7 +252,7 @@ std::string GlobalData::GetTaskNameById(uint64_t id) {
   if (task_id_map_.Get(id, &task_name)) {
     return *task_name;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 }  // namespace common
