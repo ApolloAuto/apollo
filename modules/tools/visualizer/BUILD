@@ -16,7 +16,6 @@ cc_binary(
     ],
     deps = [
         ":visualizer_lib",
-        "//third_party:glvnd",
         "@console_bridge",
         "@fastrtps",
         "@qt//:qt_core",

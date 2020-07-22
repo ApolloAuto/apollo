@@ -59,6 +59,7 @@ cc_library(
     linkopts = [
         "-L/usr/local/qt5/lib",
         "-lQt5OpenGL",
+        "-lGL",
     ],
     visibility = ["//visibility:public"],
     deps = [
