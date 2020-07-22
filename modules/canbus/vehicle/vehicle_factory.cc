@@ -23,6 +23,7 @@
 #include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 #include "modules/canbus/vehicle/lexus/lexus_vehicle_factory.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
+#include "modules/canbus/vehicle/neolix_edu/neolix_edu_vehicle_factory.h"
 #include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
 #include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_vehicle_factory.h"
@@ -52,11 +53,13 @@ void VehicleFactory::RegisterVehicleFactory() {
   Register(apollo::common::ZHONGYUN, []() -> AbstractVehicleFactory * {
     return new ZhongyunVehicleFactory();
   });
-  Register(apollo::common::CH, []() -> AbstractVehicleFactory * {
-    return new ChVehicleFactory();
-  });
+  Register(apollo::common::CH,
+           []() -> AbstractVehicleFactory * { return new ChVehicleFactory(); });
   Register(apollo::common::DKIT, []() -> AbstractVehicleFactory * {
     return new DevkitVehicleFactory();
+  });
+  Register(apollo::common::NEOLIX, []() -> AbstractVehicleFactory * {
+    return new Neolix_eduVehicleFactory();
   });
 }
 
