@@ -73,6 +73,7 @@ cc_library(
     name = "message_util",
     hdrs = ["message_util.h"],
     deps = [
+        "//cyber/common:file",
         "//modules/common/time",
         "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",

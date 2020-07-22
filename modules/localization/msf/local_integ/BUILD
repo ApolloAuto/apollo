@@ -10,7 +10,7 @@ cc_library(
     deps = [
         "//modules/common/math",
         "//modules/common/status",
-        "//modules/common/time",
+        "//modules/common/time:timer",
         "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/drivers/gnss/proto:gnss_cc_proto",
         "//modules/drivers/gnss/proto:gnss_raw_observation_cc_proto",
