@@ -14,8 +14,10 @@
       - [7.再次确认上述安装步骤](#7再次确认上述安装步骤)
     - [激光雷达的配置及启动](#激光雷达的配置及启动)
       - [1.修改工控机IP地址](#1修改工控机ip地址)
-      - [2.修改`modules/transform/conf/static_transform_conf.pb.txt`文件](#2修改modulestransformconfstatic_transform_confpbtxt文件)
     - [激光雷达数据的验证](#激光雷达数据的验证)
+      - [1. 编译项目，启动Dreamview](#1-编译项目启动dreamview)
+      - [2. 启动所需模块](#2-启动所需模块)
+      - [3. 检查lidar数据是否正确](#3-检查lidar数据是否正确)
   - [毫米波雷达安装与数据验证(根据自身需求配置)](#毫米波雷达安装与数据验证根据自身需求配置)
     - [毫米波雷达接口及线序](#毫米波雷达接口及线序)
     - [毫米波雷达的安装固定](#毫米波雷达的安装固定)
@@ -102,30 +104,39 @@
 
  - 激光雷达的默认IP地址是192.168.1.201，通过网线与工控机Ethernet接口连接，将该Ehternet接口的IP修改为固定IP，且与激光雷达IP处在同一网段，即`192.168.1.xx`，一个示例配置如下图所示：
  
-![lidar_integration_ip](images/lidar_integration_ip.png)
+    ![lidar_integration_ip](images/lidar_integration_ip.png)
 
  - 激光雷达的相关参数配置：在浏览器中输入激光雷达ip地址，打开激光雷达配置界面， 将`Host IP Address`修改为`255.255.255.255`，将`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键保存配置。 
  
-![lidar_integration_config](images/lidar_integration_config.png)
-
-#### 2.修改`modules/transform/conf/static_transform_conf.pb.txt`文件
-
-使用`modules/calibration/data/dev_kit/transform_conf/static_transform_conf.pb.txt`替换`modules/transform/conf/static_transform_conf.pb.txt`文件。
-
+    ![lidar_integration_config](images/lidar_integration_config.png)
 
 ### 激光雷达数据的验证
 
- 在完成上述配置后，可以使用以下方法验证激光雷达能否正常工作：
- 
- - 在室外，GPS信号良好的场地，启动`GPS`、`Localization`、`Transform`模块
- 
- - 使用如下命令启动激光雷达
- 
-```
-budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch 
-```
+####  1. 编译项目，启动Dreamview
+进入docker环境，用gpu编译项目，启动DreamView 
 
- - 打开新的终端，并使用`bash docker/scripts/dev_into.sh`命令进入docker环境，在新终端中输入`cyber_monitor`命令，查看是否有`/apollo/sensor/lidar16/PointCloud2`、`/apollo/sensor/lidar16/Scan`、`/apollo/sensor/lidar16/compensator/PointCloud2`三个channel，并使用上下方向键选择channel，使用右方向键查看channel详细数据，数据无异常则说明激光雷达适配成功
+    cd /apollo
+    bash docker/scripts/dev_start.sh
+    bash docker/scripts/dev_into.sh
+    bash apollo.sh build_opt_gpu
+    bash scripts/bootstrap.sh
+
+####  2. 启动所需模块
+
+- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动GPS、Localization、Transform模块。
+
+  ![lidar_adaption_start_localization](images/lidar_adaption_start_localization.png)
+
+- 定位模块启动后，需要接收定位数据，需要等待约1分钟左右。打开新的终端，并使用`bash docker/scripts/dev_into.sh`命令进入docker环境，在新终端中输入`cyber_monitor`命令查看`tf`、`tf_static`、`/apollo/localization/pose`数据，这三个数据在cyber_monitor中均显示为绿色代表定位模块启动成功
+![lidar_integration_localization_check](images/lidar_integration_localization_check.png)
+
+- 在dreamview中启动`lidar`模块
+
+  ![lidar_integration_start_lidar](images/lidar_adaption_start_lidar_1.png)
+ 
+####  3. 检查lidar数据是否正确
+
+ - 使用`cyber_monitor`，查看是否有`/apollo/sensor/lidar16/PointCloud2`、`/apollo/sensor/lidar16/Scan`、`/apollo/sensor/lidar16/compensator/PointCloud2`三个channel，并使用上下方向键选择channel，使用右方向键查看channel详细数据，数据无异常则说明激光雷达适配成功
  
     ![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
 
@@ -192,7 +203,7 @@ budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/laun
     bash start.sh
   ```
 
-- 正确启动Apollo及DreamView，选择车辆型号及运行模式，并打开`radar`模块开关，如下图所示：
+- 正确启动Apollo及DreamView，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并打开`radar`模块开关，如下图所示：
 
   ![lidar_integration_radar_dreamview](images/lidar_integration_radar_dreamview.png)
 

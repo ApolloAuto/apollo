@@ -115,27 +115,16 @@ Camera坐标系原点在下图所示平面的中心点：
 | VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
 | Localization       | /apollo/localization/pose             | 100           |
 
-为获取上述`channel`，需要在DreamView启动`GPS`、`Localization`、`Camera`三个模块，详细操作方式分别参考[循迹搭建--定位模块配置](../Waypoint_following/Localization_configuration_cn.md)、[基于摄像头的封闭园区自动驾驶搭建--感知设备集成](../Camera_Based_Auto_Driving/Sensor_Integration_cn.md)。在正式开始录制前，务必确保以上channel能正常输出数据。
+为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`Camera`三个模块，详细操作方式分别参考[循迹搭建--定位模块配置](../Waypoint_following/Localization_configuration_cn.md)、[基于摄像头的封闭园区自动驾驶搭建--感知设备集成](../Camera_Based_Auto_Driving/Sensor_Integration_cn.md)。在正式开始录制前，务必确保以上channel能正常输出数据。
 
 #### 2. 使用Apollo录制数据包的方法
 
- - 确保相关模块正常启动，需要录制的channel数据能正常输出
- 
- - 打开新的终端，并使用如下命令进入docker环境
- 
-    ``` 
-    budaoshi@budaoshi:~/apollo$ bash docker/scripts/dev_into.sh
-    ```
- 
- - 在上一步新打开的终端中，输入如下命令，开始录制数据包
- 
-    ![lidar_calibration_recorder_command1](images/lidar_calibration_recorder_command1.png)
+- 在dreamview中，启动`recorder`模块即开始录制数据包，关闭`recorder`模块即停止录制数据包
 
-    其中， `-i 60`表示每60秒分割一次数据包，`-m 1000`代表每1000M分割一次数据包，`-a`代表录制所有channel，具体数值用户可自行指定，更多信息可使用`cyber_recorder record -h`命令查看：
+  ![sensor_calibration_recorder](images/sensor_calibration_recorder.png)  
 
-    ![lidar_calibration_recorder_command2](images/lidar_calibration_recorder_command2.png)
+- 如果工控机没有插入移动硬盘，则数据包会存储到工控机的`apollo/data/bag/`路径下(注意，apollo为代码目录);如果工控机插入了移动硬盘，则系统会将数据包存储到可用容量较大的硬盘中，如果移动硬盘可用容量较大，则存储路径为移动硬盘的`data/bag/`目录。
 
- - 录制完成后，使用`Ctrl + C`停止录制，在Apollo代码根目录下会生成数据包。 
 
 
 #### 3. 开始录制数据包
