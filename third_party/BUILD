@@ -23,12 +23,6 @@ cc_library(
     linkopts = ["-lncurses"],
 )
 
-# libsqlite3-dev
-cc_library(
-    name = "sqlite3",
-    linkopts = ["-lsqlite3"],
-)
-
 # uuid-dev
 cc_library(
     name = "uuid",

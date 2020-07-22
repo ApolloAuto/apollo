@@ -11,9 +11,9 @@ cc_library(
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/common/util:future",
-        "//third_party:sqlite3",
         "@com_github_gflags_gflags//:gflags",
         "@com_google_absl//absl/strings",
+        "@sqlite3",
     ],
 )
 
