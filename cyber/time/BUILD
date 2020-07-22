@@ -9,7 +9,6 @@ cc_library(
     hdrs = ["time.h"],
     deps = [
         ":duration",
-        "//cyber/common",
     ],
 )
 
@@ -18,7 +17,7 @@ cc_test(
     size = "small",
     srcs = ["time_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        ":time",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -30,7 +29,7 @@ cc_library(
     deps = [
         ":duration",
         ":time",
-        "//cyber/common",
+        "//cyber/common:log",
     ],
 )
 
@@ -38,9 +37,6 @@ cc_library(
     name = "duration",
     srcs = ["duration.cc"],
     hdrs = ["duration.h"],
-    deps = [
-        "//cyber/common",
-    ],
 )
 
 cc_test(
@@ -48,7 +44,8 @@ cc_test(
     size = "small",
     srcs = ["duration_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        ":duration",
+        ":time",
         "@com_google_googletest//:gtest_main",
     ],
 )
