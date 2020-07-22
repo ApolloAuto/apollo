@@ -33,9 +33,7 @@ qt_cc_library(
         ["*.cc"],
     ),
     copts = [
-        "-Imodules/drivers/proto",
         "-Iexternal/qt",
-        "-fPIC",
     ],
     hdr = glob([
         "*.h",
@@ -43,7 +41,7 @@ qt_cc_library(
     includes = [
         ".",
     ],
-    linkstatic = 1,
+    linkstatic = False,
     res = glob([
         "*.qrc",
     ]),
