@@ -23,12 +23,6 @@ cc_library(
     linkopts = ["-lncurses"],
 )
 
-# uuid-dev
-cc_library(
-    name = "uuid",
-    linkopts = ["-luuid"],
-)
-
 # atlas-cblas
 cc_library(
     name = "cblas",

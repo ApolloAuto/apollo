@@ -100,10 +100,10 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
-        "//third_party:uuid",
         "@com_google_glog//:glog",
         "@com_google_protobuf//:protobuf",
         "@fastrtps",
+        "@uuid",
     ],
 )
 
