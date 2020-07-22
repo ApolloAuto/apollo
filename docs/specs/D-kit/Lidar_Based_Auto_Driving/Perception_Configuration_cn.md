@@ -5,10 +5,11 @@
   - [前提条件](#前提条件)
   - [配置文件的修改](#配置文件的修改)
   - [启动Lidar感知](#启动lidar感知)
-      - [1. 编译项目，启动Dreamview](#1-编译项目启动dreamview)
-      - [2. 启动所需模块](#2-启动所需模块)
-      - [3. 检查各模块channel是否正确](#3-检查各模块channel是否正确)
-      - [4. 启动Lidar感知](#4-启动lidar感知)
+      - [1. 启动can卡](#1-启动can卡)
+      - [2. 编译项目，启动Dreamview](#2-编译项目启动dreamview)
+      - [3. 启动所需模块](#3-启动所需模块)
+      - [4. 检查lidar数据是否正确](#4-检查lidar数据是否正确)
+      - [5. 启动Lidar感知](#5-启动lidar感知)
   - [验证Lidar感知效果](#验证lidar感知效果)
   - [NEXT](#next)
   - [常见问题](#常见问题)
@@ -33,48 +34,49 @@
 
 ## 启动Lidar感知
 
-把车辆开到户外，手动控制车辆，看感知是否有数据。
+把车辆开到户外，启动lidar感知
 
 
+#### 1. 启动can卡
 
-#### 1. 编译项目，启动Dreamview
-进入docker环境，用gpu编译项目，启动Dreamview 
+进入can卡目录启动can卡，用以下命令启动
 
-    cd apollo
+    cd ~/SocketCan/
+    bash start.sh
+
+####  2. 编译项目，启动Dreamview
+进入docker环境，用gpu编译项目，启动DreamView 
+
+    cd /apollo
     bash docker/scripts/dev_start.sh
     bash docker/scripts/dev_into.sh
     bash apollo.sh build_opt_gpu
     bash scripts/bootstrap.sh
 
+####  3. 启动所需模块
 
-#### 2. 启动所需模块
-在浏览器中打开`(http://localhost:8888)`，选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Transform模块。
+- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
 
-![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview1.png)
+  ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview4.png)
 
-使用如下命令启动16线激光雷达
+- 定位模块启动后，需要接收定位数据，需要等待约1分钟左右。打开新的终端，并使用`bash docker/scripts/dev_into.sh`命令进入docker环境，在新终端中输入`cyber_monitor`命令查看`tf`、`tf_static`、`/apollo/localization/pose`数据，这三个数据在cyber_monitor中均显示为绿色代表定位模块启动成功
+![lidar_integration_localization_check](images/lidar_integration_localization_check.png)
 
-    budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch
+- 在dreamview中启动`lidar`模块
 
-#### 3. 检查各模块channel是否正确
-在docker环境内打开新的终端并输入`cyber_monitor`命令启动`cyber_monitro`工具，并检查各模块的channel是否正常（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
-	
-|channel_name | 检查项目 | 
-|---|---|
-| `/apollo/localization/pose`| 确保能正常输出数据 | 
-|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据、`sol_type:` 选项显示为`NARROW_INT`   |
-|`/apollo/sensor/lidar16/PointCloud2` | 确保能正常输出数据|
-|`/apollo/sensor/lidar16/Scan`| 确保能正常输出数据|
-| `/apollo/sensor/lidar16/compensator/PointCloud2`  | 确保能正常输出数据 |
-|`/tf`|确保能正常输出数据|
-|`/tf_static`|确保能正常输出数据|
+  ![lidar_integration_start_lidar](images/lidar_integration_start_lidar.png)
+ 
+####  4. 检查lidar数据是否正确
 
-#### 4. 启动Lidar感知
-使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+ - 使用`cyber_monitor`，查看是否有`/apollo/sensor/lidar16/PointCloud2`、`/apollo/sensor/lidar16/Scan`、`/apollo/sensor/lidar16/compensator/PointCloud2`三个channel，并使用上下方向键选择channel，使用右方向键查看channel详细数据
+ 
+    ![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
 
-```
-budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/dev_kit_perception_lidar.launch
-```
+    ![lidar_integration_channel](images/lidar_integration_channel.png)
+
+#### 5. 启动Lidar感知
+在dreamview中启动`lidar perception`模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+
 ![lidar_adaptation_dreamview3](images/lidar_adaptation_dreamview3.png)
 
 ## 验证Lidar感知效果
