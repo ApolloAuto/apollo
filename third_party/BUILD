@@ -13,14 +13,3 @@ cc_library(
         ],
     }),
 )
-
-# systemlibs
-# TODO(infra): all the system libs should have its own section
-
-# atlas-cblas
-cc_library(
-    name = "cblas",
-    linkopts = [
-        "-lcblas",
-    ],
-)

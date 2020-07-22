@@ -1,8 +1,9 @@
 # Apollo external dependencies that can be loaded in WORKSPACE files.
+load("//third_party/absl:workspace.bzl", absl = "repo")
 load("//third_party/adolc:workspace.bzl", adolc = "repo")
 load("//third_party/adv_plat:workspace.bzl", adv_plat = "repo")
-load("//third_party/absl:workspace.bzl", absl = "repo")
 load("//third_party/ad_rss_lib:workspace.bzl", ad_rss_lib = "repo")
+load("//third_party/atlas:workspace.bzl", atlas = "repo")
 load("//third_party/boost:workspace.bzl", boost = "repo")
 load("//third_party/civetweb:workspace.bzl", civetweb = "repo")
 load("//third_party/console_bridge:workspace.bzl", console_bridge = "repo")
@@ -47,6 +48,7 @@ def initialize_third_party():
     adolc()
     adv_plat()
     ad_rss_lib()
+    atlas()
     boost()
     console_bridge()
     cpplint()
