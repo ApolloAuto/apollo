@@ -131,6 +131,7 @@ function main() {
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
     local test_sh="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
     local coverage_sh="${APOLLO_ROOT_DIR}/scripts/apollo_coverage.sh"
+    local perf_sh="${APOLLO_ROOT_DIR}/scripts/apollo_perf.sh"
     local ci_sh="${APOLLO_ROOT_DIR}/scripts/apollo_ci.sh"
     local cmd="$1"; shift
     case "${cmd}" in
@@ -169,6 +170,9 @@ function main() {
             ;;
         coverage)
             env ${APOLLO_ENV} bash "${coverage_sh}" "$@"
+            ;;
+        perf)
+            env ${APOLLO_ENV} bash "${perf_sh}" "$@"
             ;;
         cibuild)
             env ${APOLLO_ENV} bash "${ci_sh}" "build"
