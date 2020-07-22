@@ -25,11 +25,13 @@
 
 2. 正确完成了[基于摄像头的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)。
 
-3. 正确完成了[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/Planning_Configuration_cn.md)。
+3. 正确完成了[封闭园区自动驾驶搭建--虚拟车道线制作](Virtual_Lane_Generation_cn.md)。
 
-4. 确保在道路平整、车少人少等相对安全的情况下实验。
+4. 正确完成了[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/Planning_Configuration_cn.md)。
 
-5. 确保至少两人操作，一人操作工控机，一人操作遥控器，做好随时接管准备。
+5. 确保在道路平整、车少人少等相对安全的情况下实验。
+
+6. 确保至少两人操作，一人操作工控机，一人操作遥控器，做好随时接管准备。
 
 
 ## 概览
@@ -55,7 +57,7 @@
     bash scripts/bootstrap.sh
  
 #### 3. 启动所需模块
-在浏览器中打开`(http://localhost:8888)`,选择模式为`Mkz Standard Debug`， 选择车型为`dev_kit`并选择相应高精地图，在module Controller标签页启动Camera、GPS、Localization、Transform模块。
+在浏览器中打开`(http://localhost:8888)`,选择模式为`Dev Kit Debug`， 选择车型为`dev_kit`并选择相应高精地图，在module Controller标签页启动Canbus、Camera、GPS、Localization、Transform模块。
 
 ![camera_adaptation_dreamview](images/camera_adaptation_dreamview.png)
 
@@ -69,9 +71,13 @@
 | `/apollo/sensor/camera/front_6mm/image` | 确保能正常输出数据、帧率在15帧左右|
 |`/tf`|确保能正常输出数据|
 |`/tf_static`|确保能正常输出数据|
+|`/apollo/canbus/chassis`|确保能正常输出数据|
+|`/apollo/canbus/chassis_detail`|确保能正常输出数据|
 
 #### 5. 启动Camera感知
-确认各模块正常启动且channel输出正常后，使用`cyber_launch start modules/perception/production/launch/perception_camera.launch`命令启动摄像头感知，
+
+在dreamview中启动`Camera Perception`模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+![camera_adaptation_dreamview](images/camera_adaptation_dreamview_start_perception.png)
 
 #### 6. 感知验证
 使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在DreamView上查看障碍物信息：查看车前方10米处运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，行人黄色，车辆绿色），如下图所示：

@@ -11,11 +11,12 @@
     - [PPS授时接口输出](#pps授时接口输出)
   - [系统文件配置](#系统文件配置)
     - [GNSS配置](#gnss配置)
-    - [检查GPS信号](#检查gps信号)
-    - [关闭点云定位](#关闭点云定位)
-    - [定位模式配置](#定位模式配置)
-    - [检查定位信号](#检查定位信号)
-  - [`Localization.conf`文件的配置](#localizationconf文件的配置)
+    - [`Localization.conf`文件的配置](#localizationconf文件的配置)
+  - [检查定位模块能否正常启动](#检查定位模块能否正常启动)
+      - [1. 编译项目，启动Dreamview](#1-编译项目启动dreamview)
+      - [2. 启动定位模块](#2-启动定位模块)
+      - [3. 检查GPS信号](#3-检查gps信号)
+      - [4. 检查定位信号](#4-检查定位信号)
   - [NEXT](#next)
   - [常见问题](#常见问题)
 
@@ -101,7 +102,7 @@ log com3 gprmc ontime 1 0.25
 
 ## 系统文件配置
 
-系统文件配置主要包括三个部分，GNSS配置、关闭点云定位和定位模式配置。
+系统文件配置主要包括两部分，GNSS配置、`localization.conf`文件配置。
 
 ### GNSS配置
 
@@ -150,36 +151,53 @@ rtk_from {
 
 注意：RTK基站信息需要同时配置在M2的IMU主机中和apollo的开发套件的`gnss_conf.pb.txt`配置文件中。
 
-### 检查GPS信号
-
-将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh脚本打开gps模块。输入命令`cyber_monitor`，进入 `/apollo/sensor/gnss/best_pose`条目下，查看sol_type字段是否为NARROW_INT。若为NARROW_INT，则表示GPS信号良好；若不为NARROW_INT，则将车辆移动一下，直到出现NARROW_INT为止。进入`/apollo/sensor/gnss/imu`条目下，确认IMU有数据刷新即表明GPS模块配置成功。
-
-### 关闭点云定位
-
-在`apollo/modules/localization/conf/localization.conf`文件中将：`--enable_lidar_localization=true`修改为：`--enable_lidar_localization=false`。
-
-### 定位模式配置
-
-将`apollo/modules/localization/launch/localization.launch`文件中的`dag_streaming_rtk_localization.dag`修改为`dag_streaming_msf_localization.dag`。
-
-### 检查定位信号
-
-将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh和localization.sh脚本打开gps模块和localization模块。确认GPS模块已成功启动并且GPS信号良好。输入命令`cyber_monotor`，进入`/apollo/localization/pose`条目下，等待两分钟，直到有数据刷新即表明定位模块配置成功。
-
-
-## `Localization.conf`文件的配置
-对`modules/localization/conf/localization.conf` 文件进行配置。**如果该配置文件没有进行正确配置，可能会对之后的传感器标定、虚拟车道线制作等功能产生影响**
-
+### `Localization.conf`文件的配置
+对`modules/calibration/data/dev_kit/localization_conf/localization.conf`文件进行配置。**如果该配置文件没有进行正确配置，可能会对之后的传感器标定、虚拟车道线制作等功能产生影响**
 
 | 参数 | 说明 |
 | --  |-- |
 |lidar_height_default|参数值修改为lidar中心到地面的距离 单位m|
-|local_utm_zone_id|  需要用户查询所在地区的utm_zone，并进行修改。例如，北京地区utm_zone为50 |
-|lidar_topic| 参数值修改为`/apollo/sensor/lidar16/compensator/PointCloud2` |
-|lidar_extrinsics_file|参数值修改为`/apollo/modules/localization/msf/params/velodyne_params/velodyne16_novatel_extrinsics.yaml`|
+|local_utm_zone_id|  需要用户查询所在地区的utm_zone，并进行修改。例如，北京地区utm_zone为50。utm_zone的查询可参考[该网页](https://mangomap.com/robertyoung/maps/69585/what-utm-zone-am-i-in-#) |
 |imu_to_ant_offset_x|x轴方向杆臂值，单位m，杆臂值测量方法参看`循迹搭建--车辆集成`文档|
 |imu_to_ant_offset_y|y轴方向杆臂值，单位m，杆臂值测量方法参看`循迹搭建--车辆集成`文档|
 |imu_to_ant_offset_z|z轴方向杆臂值，单位m，杆臂值测量方法参看`循迹搭建--车辆集成`文档|
+|--enable_lidar_localization=true|修改为`--enable_lidar_localization=false`|
+
+
+
+## 检查定位模块能否正常启动
+
+将车辆移至室外平坦开阔处，按顺序执行如下操作
+
+####  1. 编译项目，启动Dreamview
+进入docker环境，用gpu编译项目，启动DreamView 
+
+    cd /apollo
+    bash docker/scripts/dev_start.sh
+    bash docker/scripts/dev_into.sh
+    bash apollo.sh build_opt   
+    bash scripts/bootstrap.sh
+
+####  2. 启动定位模块
+
+- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动GPS、Localization模块。
+
+  ![localization_config_start_localization](images/localization_config_start_localization.png)
+
+####  3. 检查GPS信号
+
+打开新的终端，并使用`bash docker/scripts/dev_into.sh`命令进入docker环境，在新终端中输入`cyber_monitor`命令，进入 `/apollo/sensor/gnss/best_pose`条目下，查看sol_type字段是否为NARROW_INT。若为NARROW_INT，则表示GPS信号良好；若不为NARROW_INT，则将车辆移动一下，直到出现NARROW_INT为止。进入`/apollo/sensor/gnss/imu`条目下，确认IMU有数据刷新即表明GPS模块配置成功。
+
+![localization_config_check_gps_1](images/localization_config_check_gps_1.png)
+![localization_config_check_gps_2](images/localization_config_check_gps_2.png)
+
+####  4. 检查定位信号
+
+使用`cyber_monotor`查看，进入`/apollo/localization/pose`条目下，等待两分钟，直到有数据刷新即表明定位模块配置成功。
+
+![localization_config_check_pose_1](images/localization_config_check_pose_1.png)
+![localization_config_check_pose_2](images/localization_config_check_pose_2.png)
+
 
 
 ## NEXT

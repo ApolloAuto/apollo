@@ -87,9 +87,6 @@
 	sudo reboot  //重启工控机
 	```
  
-### Apollo配置的修改
-将`modules/drivers/camera/dag/dev_kit_camera.dag` 文件重命名为`modules/drivers/camera/dag/camera.dag`并替换原有的`camera.dag`文件。
-
 ### 摄像头的启动
 #### 1. 检查摄像头是否被系统识别  
 在摄像头与工控机正常连接的基础上，执行`ls /dev/video*`指令，查看摄像头是否被识别， 如果摄像头设备已经被识别，则会显示以`video`开头的设备名称，否则的话，请检查摄像头与工控机的连线是否可靠。
@@ -109,11 +106,13 @@
     bash scripts/bootstrap.sh 
     
 #### 4. 启动camera模块
- - 在`Module Controller`标签栏下，打开`Camera`开关，开关位置如下图所示：
+
+
+ - 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动`Camera`模块
  
 	![camera_integration_dreamview1](images/camera_integration_dreamview1.png)
 
- - 首先选择`Mkz Standard Debug`模式，之后在`Tasks`标签栏下依次打开`SimControl`和`Camera Sensor`开关，`Camera Sensor`打开后，务必关闭`SimControl`。开关在dreamview界面的位置如下图所示：
+ - 之后在`Tasks`标签栏下依次打开`SimControl`和`Camera Sensor`开关，`Camera Sensor`打开后，务必关闭`SimControl`。开关在dreamview界面的位置如下图所示：
  
 	![camera_integration_dreamview2](images/camera_integration_dreamview2.png)
 #### 5. 验证camera是否工作正常
