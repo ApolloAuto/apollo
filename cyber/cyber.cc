@@ -37,8 +37,7 @@ std::unique_ptr<Node> CreateNode(const std::string& node_name,
     AERROR << "please initialize cyber firstly.";
     return nullptr;
   }
-  std::unique_ptr<Node> node(new Node(node_name, name_space));
-  return std::move(node);
+  return std::unique_ptr<Node>(new Node(node_name, name_space));
 }
 
 }  // namespace cyber
