@@ -4,7 +4,7 @@ package apollo.drivers.audio.proto;
 
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/header.proto";
-import "modules/drivers/audio/respeaker_driver/proto/speaker_config.proto";
+import "modules/drivers/audio/proto/speaker_config.proto";
 
 message ChannelData {
   optional ChannelType channel_type = 1;

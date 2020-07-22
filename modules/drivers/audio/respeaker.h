@@ -58,7 +58,7 @@ class Stream {
               PaSampleFormat format);
   void read_stream(int n_frames, char *buffer);
   int get_chunk_size(int n_frames);
-}
+};
 
 class Respeaker {
  private:
@@ -74,4 +74,4 @@ class Respeaker {
   PaDeviceIndex host_api_device_index_to_device_index(PaHostApiIndex hostApi,
                                                  int hostApiDeviceIndex);
   const PaHostApiInfo *get_host_api_info(PaHostApiIndex index);
-}
+};
