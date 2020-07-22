@@ -28,10 +28,10 @@ cc_library(
     ],
     deps = [
         "//cyber/common",
-        "//third_party:zlib",
         "@com_google_glog//:glog",
         "@eigen",
         "@opencv",
+        "@zlib",
     ],
 )
 
