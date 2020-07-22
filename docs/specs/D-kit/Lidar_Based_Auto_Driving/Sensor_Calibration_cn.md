@@ -10,6 +10,7 @@
       - [2. Lidar坐标系原点在传感器的位置](#2-lidar坐标系原点在传感器的位置)
       - [3. IMU坐标系原点在传感器的位置](#3-imu坐标系原点在传感器的位置)
       - [4. 手动测量Lidar-GNSS的初始化外参](#4-手动测量lidar-gnss的初始化外参)
+  - [标定场地选择](#标定场地选择)
   - [Lidar-GNSS标定数据包录制](#lidar-gnss标定数据包录制)
       - [1. 标定所需channel](#1-标定所需channel)
       - [2. 使用Apollo录制数据包的方法](#2-使用apollo录制数据包的方法)
@@ -93,6 +94,11 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 	    y: 0.38
 	    z: 1.33
 	```
+## 标定场地选择
+标定场地会直接影响到标定效果。对标定场地有如下要求
+- 标定场地中心8米范围内需要有轮廓清晰的静态参照物，如电线杆、建筑物、车辆，避免过多动态障碍物。如果静态障碍物距离较远，会严重影响标定效果
+- 确保路面平坦
+- 能确保GNSS信号良好，不要有过多的干扰
 
 ## Lidar-GNSS标定数据包录制
 
@@ -105,36 +111,23 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 | VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
 | Localization       | /apollo/localization/pose             | 100           |
 
-为获取上述`channel`，需要启动`GPS`、`Localization`、`16线激光雷达`三个模块，`GPS`、`Localization`模块在DreamView上直接启动，`16线激光雷达`使用命令`cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch`启动，详情可分别参考[循迹搭建--定位模块配置](../Waypoint_Following/Localization_Configuration_cn.md)、[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/Sensor_Integration_cn.md)
+为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`lidar`三个模块，可参考[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/Sensor_Integration_cn.md)
 
 **注意**：在正式开始录制前，务必确保以上channel能正常输出数据。
 
 #### 2. 使用Apollo录制数据包的方法
+- 在dreamview中，启动`recorder`模块即开始录制数据包，关闭`recorder`模块即停止录制数据包
 
- - 确保相关模块正常启动，需要录制的channel数据能正常输出
- 
- - 打开新的终端，并使用如下命令进入docker环境
- 
-    ``` 
-    budaoshi@budaoshi:~/apollo$ bash docker/scripts/dev_into.sh
-    ```
- 
- - 在上一步新打开的终端中，输入如下命令，开始录制数据包
- 
-    ![lidar_calibration_recorder_command1](images/lidar_calibration_recorder_command1.png)
+  ![sensor_calibration_recorder](images/sensor_calibration_recorder.png)  
 
-    其中， `-i 60`表示每60秒分割一次数据包，`-m 1000`代表每1000M分割一次数据包，`-a`代表录制所有channel，具体数值用户可自行指定，更多信息可使用`cyber_recorder record -h`命令查看：
-
-    ![lidar_calibration_recorder_command2](images/lidar_calibration_recorder_command2.png)
-
- - 录制完成后，使用`Ctrl + C`停止录制，在Apollo代码根目录下会生成数据包。 
+- 如果工控机没有插入移动硬盘，则数据包会存储到工控机的`apollo/data/bag/`路径下(注意，apollo为代码目录);如果工控机插入了移动硬盘，则系统会将数据包存储到可用容量较大的硬盘中，如果移动硬盘可用容量较大，则存储路径为移动硬盘的`data/bag/`目录。
 
 #### 3. 开始录制数据包
 待channel数据正常输出后，可以开始录制数据包。录制期间，需要控制车辆以8字形轨迹缓慢行驶，并使转弯半径尽量小 ，至少包含5圈完整的8字轨迹数据。
 
 ![lidar_calibration_turn_around](images/lidar_calibration_turn_around.png)
 
-**注意**：场地周围需要有轮廓清晰的静态参照物，如电线杆、建筑物、车辆，避免过多动态障碍物；如果静态参照物距离较远，非常容易得到较差的标定结果。
+
 
 ## Lidar-GNSS标定数据预处理
 
@@ -233,7 +226,9 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 ## 常见问题
 #### 1. 提交后，显示`UNAUTHORIZED`,如下图所示
+
 ![lidar_calibration_unauthorized](images/lidar_calibration_unauthorized.png)
+
 出现该问题，一般是`Partner ID`输入有误 
 #### 2. 进行`Sensor Calibration`任务后，邮件显示任务失败
 建议检查一下输入路径是否正确

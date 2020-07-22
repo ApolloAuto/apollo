@@ -16,6 +16,7 @@
 ## 前提条件
 
   - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)
+  - 完成了[封闭园区自动驾驶搭建--虚拟车道线制作](Virtual_Lane_Generation_cn.md)
 
 ## 配置文件的修改
 对`/apollo/modules/planning/conf/planning.conf`和`/apollo/modules/planning/conf/planning_config.pb.txt`两个配置文件进行以下修改：
@@ -54,7 +55,7 @@
 #### 3. 启动 Planning、Prediction、Routing、Control模块
 确保感知模块启动成功后，在Module Controller标签页启动Planning、Prediction、Routing、Control模块。
 - 对于Lidar感知方案，DreamView上显示启动的模块如下图所示：
-![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview7.png)
+![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview7_debug.png)
 
 - 对于Camera感知方案，DreamView上显示启动的模块如下图所示：
 ![camera_demonstration_dreamview](../Camera_Based_Auto_Driving/images/camera_demonstration_dreamview.png)
