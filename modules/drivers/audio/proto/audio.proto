@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.drivers.audio.proto;
+
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/header.proto";
+import "modules/drivers/audio/respeaker_driver/proto/speaker_config.proto";
+
+message ChannelData {
+  optional ChannelType channel_type = 1;
+  optional bytes data = 2;
+  optional int32 size = 3;
+}
+
+message AudioData {
+  optional apollo.common.Header header = 1;
+  optional SpeakerConfig speaker_config = 2;
+  optional apollo.common.Quaternion orientation = 3;
+  repeated ChannelData channel_data = 4;
+}

@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.drivers.audio.proto;
+
+// TODO(QiL): move this to under /modules/drivers/audio/proto before release.
+
+
+enum ChannelType {
+  UNKOWN = 0;
+  ASR = 1; // Automatic Speech Recognition
+  RAW = 2;
+  PLAYBACK = 3;
+}
+
+message SpeakerConfig {
+  enum SpeakerModel {
+    UNKOWN = 0;
+    RESPEAKER = 1;
+  }
+  optional SpeakerModel speaker_model = 2;
+  optional int32 channel_number = 3;
+  optional int32 chunk = 4;
+  optional int32 sample_rate = 5;
+  optional float record_seconds = 6;
+  optional int32 sample_width = 7; // in bytes
+  optional int32 id_vendor = 8;
+  optional int32 id_product = 9;
+  optional int32 doa_id = 10; // Usually read only. Orientation depends on build configuration.
+  optional int32 doa_offset = 11;
+  repeated ChannelType channel_type = 1;
+}
