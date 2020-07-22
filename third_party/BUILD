@@ -17,12 +17,6 @@ cc_library(
 # systemlibs
 # TODO(infra): all the system libs should have its own section
 
-# libncurses5-dev
-cc_library(
-    name = "ncurses",
-    linkopts = ["-lncurses"],
-)
-
 # atlas-cblas
 cc_library(
     name = "cblas",

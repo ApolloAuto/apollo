@@ -20,7 +20,7 @@ cc_binary(
         ":screen",
         "//cyber:init",
         "//cyber/service_discovery:topology_manager",
-        "//third_party:ncurses",
+        "@ncurses5",
     ],
 )
 
