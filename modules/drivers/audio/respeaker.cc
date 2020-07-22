@@ -121,14 +121,14 @@ PaSampleFormat Respeaker::get_format_from_width(int width,
   }
 }
 
-devIndex Respeaker::get_respeaker_index() {
+PaDeviceIndex Respeaker::get_respeaker_index() {
   // return index of respeaker
   const PaHostApiInfo *host_api_info = get_host_api_info(0);
   const PaDeviceInfo *device_info = nullptr;
-  for (devIndex i = 0; i < _info.deviceCount; ++i) {
+  for (PaDeviceIndex i = 0; i < _info.deviceCount; ++i) {
     device_info = get_device_info(host_api_device_index_to_device_index(0, i));
     if (string(device_info->name).find("ReSpeaker") != string::npos) {
-      return devIndex;
+      return i;
     }
   }
   AERROR << "Error: Respeaker device not found";
@@ -147,10 +147,10 @@ const PaDeviceInfo *Respeaker::get_device_info(PaDeviceIndex index) {
   return _info;
 }
 
-devIndex Respeaker::host_api_device_index_to_device_index(
+PaDeviceIndex Respeaker::host_api_device_index_to_device_index(
     PaHostApiIndex hostApi, int hostApiDeviceIndex) {
   // Get standard device index from host-API-specific device index
-  devIndex device_index =
+  PaDeviceIndex device_index =
       Pa_HostApiDeviceIndexToDeviceIndex(hostApi, hostApiDeviceIndex);
   if (device_index < 0) {
     report_error_and_throw(device_index);

@@ -37,7 +37,8 @@
 #pragma
 
 #include "modules/drivers/audio/proto/speaker_config.pb.h"
-#include "respeaker_driver.h"
+#include "modules/drivers/audio/respeaker.h"
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {
