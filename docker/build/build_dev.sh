@@ -107,8 +107,32 @@ function check_arguments() {
     fi
 }
 
+function docker_experimental_check() {
+    local JQ_CMD="$(command -v jq)"
+    if [ -z "${JQ_CMD}" ]; then
+        echo "Oops, command 'jq' not found."
+        echo "For ubuntu, you can install it via:"
+        echo "  sudo apt-get -y update && sudo apt-get -y install jq"
+        exit 1
+    fi
+    local daemon_cfg="/etc/docker/daemon.json"
+    local enabled="$(jq '.experimental' ${daemon_cfg} )"
+    if [ "${enabled}" != "true" ]; then
+        echo "Experimental features should be enabled to run Apollo docker build."
+        echo "Please perform the following two steps to have it enabled:"
+        echo "  1) Add '\"experimental\": true' to '${daemon_cfg}'"
+        echo "     The simplest ${daemon_cfg} looks like:"
+        echo "       {"
+        echo "           \"experimental\": true "
+        echo "       }"
+        echo "  2) Restart docker daemon. E.g., 'sudo systemctl restart docker'"
+        exit 1
+    fi
+}
+
 parse_arguments "$@"
 check_arguments
+docker_experimental_check
 
 CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
 TIME=$(date +%Y%m%d_%H%M)
