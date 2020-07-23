@@ -64,7 +64,7 @@ bool SpeakerComponent::Init() {
 
 void SpeakerComponent::run() {
   char *pos = nullptr;
-  vector<string*> data;
+  std::vector<std::string*> data;
   for (int i = 0; i < n_channels_; ++i)
     data.push_back(audio_data_->mutable_channel_data(i)->mutable_data());
   while (!cyber::IsShutdown()) {  // TODO: or apollo::cyber::OK() ?

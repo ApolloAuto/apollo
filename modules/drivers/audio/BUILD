@@ -35,6 +35,7 @@ cc_library(
         "//modules/common/proto:header_cc_proto",
         "//modules/drivers/audio/proto:audio_cc_proto",
         "//modules/drivers/audio/proto:speaker_config_cc_proto",
+        "@portaudio",
     ],
 )
 

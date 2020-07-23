@@ -13,3 +13,15 @@ cc_library(
         ],
     }),
 )
+
+# portaudio
+cc_library(
+    name = "portaduio",
+    linkopts = [
+        "-lrt",
+        "-lasound",
+        "-ljack",
+        "-lpthread",
+        "-lportaudio",
+    ],
+)
