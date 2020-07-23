@@ -16,7 +16,7 @@ cc_library(
 
 # portaudio
 cc_library(
-    name = "portaduio",
+    name = "portaudio",
     linkopts = [
         "-lrt",
         "-lasound",
