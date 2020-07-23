@@ -2,9 +2,6 @@ syntax = "proto2";
 
 package apollo.drivers.audio.proto;
 
-// TODO(QiL): move this to under /modules/drivers/audio/proto before release.
-
-
 enum ChannelType {
   UNKOWN = 0;
   ASR = 1; // Automatic Speech Recognition

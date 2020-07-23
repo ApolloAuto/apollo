@@ -22,6 +22,8 @@ cc_library(
         "//cyber",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/common/proto:header_cc_proto",
+        "//modules/drivers/audio/proto:audio_cc_proto",
+        "//modules/drivers/audio/proto:speaker_config_cc_proto",
     ],
 )
 
@@ -32,9 +34,6 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"audio\\"'],
     deps = [
         "//cyber",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/audio/proto:audio_cc_proto",
-        "//modules/drivers/audio/proto:speaker_config_cc_proto",
         "//third_party:portaudio",
     ],
 )
