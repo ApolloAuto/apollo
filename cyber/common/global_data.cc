@@ -63,13 +63,8 @@ GlobalData::GlobalData() {
     process_group_ = "cyber_default_" + std::to_string(process_id_);
   }
 
-  is_reality_mode_ =
-      config_.run_mode_conf().run_mode() == proto::RunMode::MODE_REALITY;
-
-  auto run_mode = GetEnv("CYBER_RUN_MODE");
-  if (!run_mode.empty() && run_mode == "simulation") {
-    is_reality_mode_ = false;
-  }
+  const auto& run_mode_conf = config_.run_mode_conf();
+  run_mode_ = run_mode_conf.run_mode();
 }
 
 GlobalData::~GlobalData() {}
@@ -95,11 +90,17 @@ const std::string& GlobalData::HostIp() const { return host_ip_; }
 
 const std::string& GlobalData::HostName() const { return host_name_; }
 
-void GlobalData::EnableSimulationMode() { is_reality_mode_ = false; }
+void GlobalData::EnableSimulationMode() {
+  run_mode_ = RunMode::MODE_SIMULATION;
+}
 
-void GlobalData::DisableSimulationMode() { is_reality_mode_ = true; }
+void GlobalData::DisableSimulationMode() {
+  run_mode_ = RunMode::MODE_REALITY;
+}
 
-bool GlobalData::IsRealityMode() const { return is_reality_mode_; }
+bool GlobalData::IsRealityMode() const {
+  return run_mode_ == RunMode::MODE_REALITY;
+}
 
 void GlobalData::InitHostInfo() {
   char host_name[1024];
