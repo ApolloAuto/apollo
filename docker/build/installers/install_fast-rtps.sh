@@ -59,5 +59,5 @@ else # aarch64
     rm -rf ${PKG_NAME}
 fi
 
-echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
 
