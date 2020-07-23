@@ -18,10 +18,8 @@ cc_library(
     hdrs = ["speaker_component.h"],
     copts = ['-DMODULE_NAME=\\"audio\\"'],
     deps = [
-        ":respeaker",
+        "//modules/drivers/audio:respeaker",
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
         "//modules/drivers/audio/proto:audio_cc_proto",
         "//modules/drivers/audio/proto:speaker_config_cc_proto",
     ],

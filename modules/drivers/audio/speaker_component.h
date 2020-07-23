@@ -28,11 +28,9 @@ namespace audio {
 using apollo::cyber::Component;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;
-using apollo::drivers::audio::proto::AudioData;  // check if it is package
-                                                 // name(proto) / lib name:
-                                                 // respeaker_config
-using apollo::drivers::audio::proto::ChannelData;
-using apollo::drivers::audio::proto::SpeakerConfig;
+using apollo::drivers::audio::config::AudioData;
+using apollo::drivers::audio::config::ChannelData;
+using apollo::drivers::audio::config::SpeakerConfig;
 
 class SpeakerComponent : public Component<> {
  public:

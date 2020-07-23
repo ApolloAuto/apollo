@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.drivers.audio.proto;
+package apollo.drivers.audio.config;
 
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/header.proto";

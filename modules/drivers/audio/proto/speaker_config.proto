@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.drivers.audio.proto;
+package apollo.drivers.audio.config;
 
 enum ChannelType {
   UNKOWN = 0;
