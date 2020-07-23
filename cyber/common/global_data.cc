@@ -24,7 +24,6 @@
 
 #include <climits>
 #include <cstdlib>
-
 #include <functional>
 
 #include "cyber/common/environment.h"
@@ -65,6 +64,7 @@ GlobalData::GlobalData() {
 
   const auto& run_mode_conf = config_.run_mode_conf();
   run_mode_ = run_mode_conf.run_mode();
+  clock_mode_ = run_mode_conf.clock_mode();
 }
 
 GlobalData::~GlobalData() {}
@@ -94,12 +94,14 @@ void GlobalData::EnableSimulationMode() {
   run_mode_ = RunMode::MODE_SIMULATION;
 }
 
-void GlobalData::DisableSimulationMode() {
-  run_mode_ = RunMode::MODE_REALITY;
-}
+void GlobalData::DisableSimulationMode() { run_mode_ = RunMode::MODE_REALITY; }
 
 bool GlobalData::IsRealityMode() const {
   return run_mode_ == RunMode::MODE_REALITY;
+}
+
+bool GlobalData::IsMockTimeMode() const {
+  return clock_mode_ == ClockMode::MODE_MOCK;
 }
 
 void GlobalData::InitHostInfo() {

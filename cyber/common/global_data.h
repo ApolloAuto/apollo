@@ -32,6 +32,7 @@ namespace cyber {
 namespace common {
 
 using ::apollo::cyber::base::AtomicHashMap;
+using ::apollo::cyber::proto::ClockMode;
 using ::apollo::cyber::proto::CyberConfig;
 using ::apollo::cyber::proto::RunMode;
 
@@ -60,6 +61,7 @@ class GlobalData {
   void DisableSimulationMode();
 
   bool IsRealityMode() const;
+  bool IsMockTimeMode() const;
 
   static uint64_t GenerateHashId(const std::string& name) {
     return common::Hash(name);
@@ -99,6 +101,7 @@ class GlobalData {
 
   // run mode
   RunMode run_mode_;
+  ClockMode clock_mode_;
 
   static AtomicHashMap<uint64_t, std::string, 512> node_id_map_;
   static AtomicHashMap<uint64_t, std::string, 256> channel_id_map_;
