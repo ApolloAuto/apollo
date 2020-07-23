@@ -39,9 +39,8 @@
 #include <stdio.h>
 #include <string>
 
-#include "portaudio.h"
 #include "cyber/cyber.h"
-
+#include "portaudio.h"
 
 /* A Partial version of PA Stream used only for respeaker as input.
  * Refer to http://portaudio.com/docs/v19-doxydocs/
@@ -53,25 +52,23 @@ class Stream {
   PaStreamParameters *inputParameters;
 
  public:
-  Stream() {};
+  Stream(){};
   void init_stream(int rate, int channels, int input_device_index,
-              PaSampleFormat format);
+                   PaSampleFormat format);
   void read_stream(int n_frames, char *buffer);
   int get_chunk_size(int n_frames);
 };
 
 class Respeaker {
- private:
+ public:
   Stream stream;
 
- public:
-  Respeaker() {};
-
+  Respeaker(){};
   void init(int sample_rate, int sample_width, int n_channels);
   PaSampleFormat get_format_from_width(int width, bool is_unsigned = true);
   PaDeviceIndex get_respeaker_index();
   const PaDeviceInfo *get_device_info(PaDeviceIndex index);
   PaDeviceIndex host_api_device_index_to_device_index(PaHostApiIndex hostApi,
-                                                 int hostApiDeviceIndex);
+                                                      int hostApiDeviceIndex);
   const PaHostApiInfo *get_host_api_info(PaHostApiIndex index);
 };

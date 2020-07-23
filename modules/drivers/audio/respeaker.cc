@@ -122,7 +122,7 @@ PaDeviceIndex Respeaker::get_respeaker_index() {
   // return index of respeaker
   const PaHostApiInfo *host_api_info = get_host_api_info(0);
   const PaDeviceInfo *device_info = nullptr;
-  for (PaDeviceIndex i = 0; i < host_api_info.deviceCount; ++i) {
+  for (PaDeviceIndex i = 0; i < host_api_info->deviceCount; ++i) {
     device_info = get_device_info(host_api_device_index_to_device_index(0, i));
     if (std::string(device_info->name).find("ReSpeaker") != std::string::npos) {
       return i;

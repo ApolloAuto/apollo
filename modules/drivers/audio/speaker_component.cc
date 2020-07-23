@@ -21,19 +21,19 @@ namespace drivers {
 namespace audio {
 
 bool SpeakerComponent::Init() {
-  speaker_config_ = std::make_shared<Config>();
+  speaker_config_ = std::make_shared<SpeakerConfig>();
   if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                               camera_config_.get())) {
+                                               speaker_config_.get())) {
     return false;
   }
   AINFO << "Speaker config: " << speaker_config_->DebugString();
 
   // dump config
-  n_channels_ = speaker_config_->channel_config_size();
-  sample_rate_ = speaker_config_->sample_rate;
-  sample_width_ = speaker_config_->sample_width;
-  record_seconds_ = speaker_config_->record_seconds;
-  chunk_ = speaker_config_->chunk;
+  n_channels_ = speaker_config_->channel_type_size();
+  sample_rate_ = speaker_config_->sample_rate();
+  sample_width_ = speaker_config_->sample_width();
+  record_seconds_ = speaker_config_->record_seconds();
+  chunk_ = speaker_config_->chunk();
 
   // new speaker device
   speaker_device_.reset(new Respeaker());
@@ -43,9 +43,9 @@ bool SpeakerComponent::Init() {
   chunk_size_ = speaker_device_->stream->get_chunk_size(chunk_);
   n_chunks_ = sample_rate_ * 1.0 / chunk_size_ * record_seconds_;
   buffer_size_ = n_chunks_ * chunk_size_;
-  buffer_ = reinterpret_cast<char *> malloc(buffer_size);
+  buffer_ = reinterpret_cast<char *> (malloc(buffer_size));
   if (buffer_ == nullptr) {
-    AERROR << "System calloc memory error, size:" << num_bytes;
+    AERROR << "System calloc memory error, size:" << buffer_size;
     return false;
   }
 
@@ -55,21 +55,18 @@ bool SpeakerComponent::Init() {
     channel_data = audio_data_->add_channel_data();
     channel_data->set_channel_type(speaker_config_->channel_type(i));
     channel_data->set_size(sample_width_);
-    audio_data->mutable_data()->resize(buffer_size_ / n_channels_);
+    audio_data_->mutable_data()->resize(buffer_size_ / n_channels_);
   }
-
   writer_ = node_->CreateWriter<AudioData>(speaker_config_->channel_name());
 
-  writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
-  async_result_ = cyber::Async(&CameraComponent::run, this);
   return true;
 }
 
-void CameraComponent::run() {
+void SpeakerComponent::run() {
   char *pos = nullptr;
   while (!cyber::IsShutdown()) {  // TODO: or apollo::cyber::OK() ?
     AINFO << "Start recording";
-    pos = buffer_
+    pos = buffer_;
     for (int i = 0; i < n_chunks; ++i) {
       speaker_device_->stream->read_stream(chunk_size_, pos);
       pos += chunk_size_;

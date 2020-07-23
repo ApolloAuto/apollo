@@ -34,15 +34,16 @@
  *
  *********************************************************************/
 
-#pragma
+#pragma once
 
 #include "modules/drivers/audio/proto/speaker_config.pb.h"
+#include "modules/drivers/audio/proto/audio.pb.h"
 #include "modules/drivers/audio/respeaker.h"
 #include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {
-namespace respeaker {
+namespace audio {
 
 using apollo::cyber::Component;
 using apollo::cyber::Reader;
@@ -65,7 +66,7 @@ class SpeakerComponent : public Component<> {
   int sample_rate_, n_channels_, sample_width_, record_seconds_, chunk_;
 
   // class data
-  std::shared_ptr<Writer<AudioData>> writer;
+  std::shared_ptr<Writer<AudioData>> writer_;
   std::unique_ptr<Respeaker> speaker_device_;
   std::shared_ptr<SpeakerConfig> speaker_config_;
   std::shared_ptr<AudioData> audio_data_;
@@ -75,6 +76,6 @@ class SpeakerComponent : public Component<> {
 };
 
 CYBER_REGISTER_COMPONENT(SpeakerComponent)
-}  // namespace respeaker
+}  // namespace audio
 }  // namespace drivers
 }  // namespace apollo

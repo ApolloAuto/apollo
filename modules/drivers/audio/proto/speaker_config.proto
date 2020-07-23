@@ -27,5 +27,6 @@ message SpeakerConfig {
   optional int32 id_product = 9;
   optional int32 doa_id = 10; // Usually read only. Orientation depends on build configuration.
   optional int32 doa_offset = 11;
+  optional string channel_name = 12;
   repeated ChannelType channel_type = 1;
 }
