@@ -19,11 +19,10 @@
 #define DEFAULT_FRAMES_PER_BUFFER 1024
 
 // Helper functions
-void report_error_and_throw(PaError err) {
-  AERROR << "An error occured while using the portaudio stream";
+void report_error(PaError err, const string& func_name) {
+  AERROR << "An error occured while calling " << func_name;
   AERROR << "Error number: " << err;
   AERROR << "Error message: " << Pa_GetErrorText(err);
-  throw std::runtime_error("");
 }
 
 // Stream
@@ -48,7 +47,7 @@ void Stream::init_stream(int rate, int channels, int input_device_index,
       /* no callback (& context): default to 'blocking read/write' mode */
       nullptr, nullptr);
   if (err != paNoError) {
-    report_error_and_throw(err);
+    report_error(err, "Pa_OpenStream");
   }
 
   pastreamInfo = (PaStreamInfo *)Pa_GetStreamInfo(pastream);
@@ -61,7 +60,7 @@ void Stream::init_stream(int rate, int channels, int input_device_index,
 void Stream::read_stream(int n_frames, char *buffer) {
   int err = Pa_ReadStream(this->pastream, buffer, n_frames);
   if (err != paNoError) {
-    report_error_and_throw(err);
+    report_error(err, "Pa_ReadStream");
   }
 }
 
@@ -75,7 +74,7 @@ void Respeaker::init(int sample_rate, int sample_width, int n_channels) {
   int err = Pa_Initialize();
   if (err != paNoError) {
     Pa_Terminate();
-    report_error_and_throw(err);
+    report_error(err, "Pa_Initialize");
   }
 
   PaDeviceIndex device_index = get_respeaker_index();
@@ -96,7 +95,7 @@ PaSampleFormat Respeaker::get_format_from_width(int width, bool is_unsigned) {
       return paFloat32;
   }
   AERROR << "Invalid width: " << width;
-  throw std::runtime_error("");
+  return -1;
 }
 
 PaDeviceIndex Respeaker::get_respeaker_index() {
@@ -110,7 +109,7 @@ PaDeviceIndex Respeaker::get_respeaker_index() {
     }
   }
   AERROR << "Error: Respeaker device not found";
-  throw std::runtime_error("");
+  return -1;
 }
 
 const PaDeviceInfo *Respeaker::get_device_info(PaDeviceIndex index) {
@@ -119,7 +118,7 @@ const PaDeviceInfo *Respeaker::get_device_info(PaDeviceIndex index) {
   _info = (PaDeviceInfo *)Pa_GetDeviceInfo(index);
   if (!_info) {
     AERROR << "Invalid device index" << index;
-    throw std::runtime_error("");
+    return nullptr;
   }
 
   return _info;
@@ -131,7 +130,7 @@ PaDeviceIndex Respeaker::host_api_device_index_to_device_index(
   PaDeviceIndex device_index =
       Pa_HostApiDeviceIndexToDeviceIndex(hostApi, hostApiDeviceIndex);
   if (device_index < 0) {
-    report_error_and_throw(device_index);
+    report_error(device_index, "Pa_HostApiDeviceIndexToDeviceIndex");
   }
   return device_index;
 }

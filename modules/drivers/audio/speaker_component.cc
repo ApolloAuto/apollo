@@ -59,7 +59,7 @@ bool SpeakerComponent::Init() {
     channel_data->mutable_data()->resize(buffer_size_ / n_channels_);
   }
   writer_ = node_->CreateWriter<AudioData>(speaker_config_->channel_name());
-
+  async_result_ = cyber::Async(&SpeakerComponent::run, this);
   return true;
 }
 
@@ -83,7 +83,6 @@ void SpeakerComponent::run() {
       }
     }
     writer_->Write(audio_data_);
-    async_result_ = cyber::Async(&SpeakerComponent::run, this);
   }
 }
 
