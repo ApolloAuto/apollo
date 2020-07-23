@@ -9,9 +9,8 @@ def _file_name(filePathName):
 def _base_name(fileName):
     return fileName.split(".")[0]
 
-def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):
-    srcs = src
-    for hItem in hdr:
+def qt_cc_library(name, srcs, hdrs, copts = [], uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):
+    for hItem in hdrs:
         base_name = _base_name(_file_name(hItem))
         cmd = """
         if grep -q Q_OBJECT $(location %s); then \
@@ -35,7 +34,7 @@ def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = N
             outs = ["ui_%s.h" % base_name],
             cmd = "/usr/local/qt5/bin/uic $(locations %s) -o $@" % uitem,
         )
-        hdr.append("ui_%s.h" % base_name)
+        hdrs.append("ui_%s.h" % base_name)
 
     for ritem in res:
         base_name = _base_name(_file_name(ritem))
@@ -47,12 +46,13 @@ def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = N
         )
         srcs.append("res_%s.cpp" % base_name)
 
-    hdrs = hdr + normal_hdrs
+    hdrs = hdrs + normal_hdrs
     cc_library(
         name = name,
         srcs = srcs,
         hdrs = hdrs,
         deps = deps,
+        copts = copts + ["-fPIC"],
         alwayslink = 1,
         **kwargs
     )

@@ -26,16 +26,15 @@ cc_binary(
 )
 
 # TODO(all): Extract the large library to thin pieces.
-# name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = None
 qt_cc_library(
     name = "visualizer_lib",
-    src = glob(
+    srcs = glob(
         ["*.cc"],
     ),
     copts = [
         "-Iexternal/qt",
     ],
-    hdr = glob([
+    hdrs = glob([
         "*.h",
     ]),
     includes = [
