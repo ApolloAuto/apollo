@@ -28,6 +28,7 @@ namespace localization {
 namespace msf {
 
 using apollo::common::Status;
+using apollo::common::time::Clock;
 
 LocalizationIntegProcess::LocalizationIntegProcess()
     : sins_(new Sins()),
@@ -91,14 +92,31 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   static double pre_imu_time = cur_imu_time;
   double delta_time = cur_imu_time - pre_imu_time;
   if (delta_time > 0.1) {
-    ADEBUG << std::setprecision(16) << "the imu message loss more than 10, "
+    AERROR << std::setprecision(16) << "the imu message loss more than 10, "
            << "the pre time and current time: " << pre_imu_time << " "
            << cur_imu_time;
   } else if (delta_time < 0.0) {
-    ADEBUG << std::setprecision(16)
+    AERROR << std::setprecision(16)
            << "received imu message's time is eary than last imu message, "
            << "the pre time and current time: " << pre_imu_time << " "
            << cur_imu_time;
+  }
+
+  double cur_system_time = Clock::NowInSeconds();
+  static double pre_system_time = cur_system_time;
+
+  double delta_system_time = cur_system_time - pre_imu_time;
+  if (delta_system_time > 0.1) {
+    AERROR << std::setprecision(16)
+           << "the imu message loss more than 10 according to system time, "
+           << "the pre system time and current system time: " << pre_system_time
+           << " " << cur_system_time;
+  } else if (delta_system_time < 0.0) {
+    AERROR << std::setprecision(16)
+           << "received imu message's time is eary than last imu message "
+              "according to system time, "
+           << "the pre system time and current system time: " << pre_system_time
+           << " " << cur_system_time;
   }
 
   // add imu msg and get current predict pose

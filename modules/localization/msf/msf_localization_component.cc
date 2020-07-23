@@ -162,6 +162,23 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
 
 void LocalizationMsgPublisher::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
+  double cur_system_time = localization.header().timestamp_sec();
+  if (pre_system_time_ > 0.0 && cur_system_time - pre_system_time_ > 0.02) {
+    AERROR << std::setprecision(16)
+           << "the localization processing time enlonged more than 2 times "
+              "according to system time, "
+           << "the pre system time and current system time: "
+           << pre_system_time_ << " " << cur_system_time;
+  } else if (pre_system_time_ > 0.0 &&
+             cur_system_time - pre_system_time_ < 0.0) {
+    AERROR << std::setprecision(16)
+           << "published localization message's time is eary than last imu "
+              "message "
+              "according to system time, "
+           << "the pre system time and current system time: "
+           << pre_system_time_ << " " << cur_system_time;
+  }
+  pre_system_time_ = cur_system_time;
   localization_talker_->Write(localization);
 }
 
