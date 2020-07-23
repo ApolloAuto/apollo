@@ -49,6 +49,29 @@ function print_usage() {
     echo "${TAB}${prog_name} -l -f cyber.aarch64.dockerfile -m download"
 }
 
+function docker_experimental_check() {
+    local JQ_CMD="$(command -v jq)"
+    if [ -z "${JQ_CMD}" ]; then
+        echo "Oops, command 'jq' not found."
+        echo "For ubuntu, you can install it via:"
+        echo "  sudo apt-get -y update && sudo apt-get -y install jq"
+        exit 1
+    fi
+    local daemon_cfg="/etc/docker/daemon.json"
+    local enabled="$(jq '.experimental' ${daemon_cfg} )"
+    if [ "${enabled}" != "true" ]; then
+        echo "Experimental features should be enabled to run Apollo docker build."
+        echo "Please perform the following two steps to have it enabled:"
+        echo "  1) Add '\"experimental\": true' to '${daemon_cfg}'"
+        echo "     The simplest ${daemon_cfg} looks like:"
+        echo "       {"
+        echo "           \"experimental\": true "
+        echo "       }"
+        echo "  2) Restart docker daemon. E.g., 'sudo systemctl restart docker'"
+        exit 1
+    fi
+}
+
 function determine_target_arch() {
     local dockerfile="$( basename "$1" )"
     IFS='.' read -ra __arr <<< "${dockerfile}"
@@ -135,19 +158,19 @@ function check_arguments() {
 
 parse_arguments "$@"
 check_arguments
+docker_experimental_check
 
 CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
 
 TIME=$(date +%Y%m%d_%H%M)
 
-
 TAG=""
 function determine_tag() {
-    local cuda_ver="10.2"
-    local cudnn_ver="8"
     local docker_fn="$(basename ${DOCKERFILE})"
     local myid="${docker_fn%%.*}"
     if [ "${myid}" = "tegra_cyber" ]; then
+        local cuda_ver="10.2"
+        local cudnn_ver="8"
         TAG="${REPO}:L4T-${cuda_ver}-cudnn${cudnn_ver}-${UBT_LTS}-${TIME}"
     else
         TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
@@ -163,10 +186,10 @@ echo "|  ${TAB}TARGET_ARCH=${TARGET_ARCH}, HOST_ARCH=${HOST_ARCH}"
 echo "|  ${TAB}INSTALL_MODE=${MODE}, GEOLOC=${GEOLOC}"
 echo "=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.=====.====="
 
-EXTRA_ARGS=""
+EXTRA_ARGS="--squash"
 
 if [[ "${CLEAN_MODE}" == "yes" ]]; then
-    EXTRA_ARGS="--no-cache"
+    EXTRA_ARGS="${EXTRA_ARGS} --no-cache"
 fi
 
 docker build ${EXTRA_ARGS} -t "${TAG}" --build-arg INSTALL_MODE="${MODE}" \
