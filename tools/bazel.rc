@@ -40,7 +40,6 @@ build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 build --cxxopt="-Werror=reorder"
-build --cxxopt="-Wno-sign-compare"
 
 # Default paths for SYSTEM LIBRARIES
 build --define=PREFIX=/usr
