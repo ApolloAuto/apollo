@@ -121,7 +121,7 @@ void CalculateBBoxSizeCenter2DXY(const PointCloudT &cloud,
   Eigen::Vector3d min_pt(DBL_MAX, DBL_MAX, DBL_MAX);
   Eigen::Vector3d max_pt(-DBL_MAX, -DBL_MAX, -DBL_MAX);
   Eigen::Vector3d loc_pt(0.0, 0.0, 0.0);
-  for (int i = 0; i < cloud.size(); i++) {
+  for (size_t i = 0; i < cloud.size(); i++) {
     loc_pt = projection * Eigen::Vector3d(cloud[i].x, cloud[i].y, cloud[i].z);
 
     min_pt(0) = std::min(min_pt(0), loc_pt(0));

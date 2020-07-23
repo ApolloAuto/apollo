@@ -78,7 +78,8 @@ void DownsamplingCircularOrgAll(
   size_t ii = 0;
   for (size_t ori_ii = 0; ori_ii < cloud->size(); ori_ii += smp_step) {
     for (size_t jj = ori_ii;
-         jj < cloud->size() && (jj - ori_ii) < velodyne_model; ++jj) {
+         jj < cloud->size() && static_cast<int>(jj - ori_ii) < velodyne_model;
+         ++jj) {
       const PointT& p = cloud->at(jj);
       if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) {
         continue;
@@ -115,9 +116,9 @@ void DownsamplingCircularOrgPartial(
   size_t ii = 0;
   down_cloud->resize(smp_height * smp_width);
   all_org_idx_ptr->resize(smp_height * smp_width);
-  for (size_t hh = 0; hh < smp_height; ++hh) {
-    for (size_t ww = 0; ww < smp_width; ++ww) {
-      int ori_hh = static_cast<int>(hh) * smp_ratio;
+  for (int hh = 0; hh < smp_height; ++hh) {
+    for (int ww = 0; ww < smp_width; ++ww) {
+      int ori_hh = hh * smp_ratio;
       const PointT* p_ptr = cloud->at(ww, ori_hh);
       if (p_ptr == nullptr) {
         continue;
@@ -131,8 +132,8 @@ void DownsamplingCircularOrgPartial(
         continue;
       } else {
         down_cloud->at(ii) = p;
-        all_org_idx_ptr->at(ii).first = static_cast<int>(hh);
-        all_org_idx_ptr->at(ii).second = static_cast<int>(ww);
+        all_org_idx_ptr->at(ii).first = hh;
+        all_org_idx_ptr->at(ii).second = ww;
         ++ii;
       }
     }
@@ -159,9 +160,9 @@ void DownsamplingRectangleOrgPartial(
   size_t ii = 0;
   down_cloud->resize(smp_height * smp_width);
   all_org_idx_ptr->resize(smp_height * smp_width);
-  for (size_t hh = 0; hh < smp_height; ++hh) {
-    for (size_t ww = 0; ww < smp_width; ++ww) {
-      int ori_hh = static_cast<int>(hh) * smp_ratio;
+  for (int hh = 0; hh < smp_height; ++hh) {
+    for (int ww = 0; ww < smp_width; ++ww) {
+      int ori_hh = hh * smp_ratio;
       const PointT* p_ptr = cloud->at(ww, ori_hh);
       if (p_ptr == nullptr) {
         continue;
@@ -174,8 +175,8 @@ void DownsamplingRectangleOrgPartial(
         continue;
       } else {
         down_cloud->at(ii) = p;
-        all_org_idx_ptr->at(ii).first = static_cast<int>(hh);
-        all_org_idx_ptr->at(ii).second = static_cast<int>(ww);
+        all_org_idx_ptr->at(ii).first = hh;
+        all_org_idx_ptr->at(ii).second = ww;
         ++ii;
       }
     }
@@ -191,19 +192,19 @@ void DownsamplingRectangleNeighbour(
     float front_range, float side_range, double max_nei, int velo_model,
     typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
-  if (cloud->width() != velo_model) {
+  if (static_cast<int>(cloud->width()) != velo_model) {
     AERROR << "cloud->width (" << cloud->width() << ") does not match "
            << "velo_model (" << velo_model << ")";
     return;
   }
   down_cloud->resize(cloud->size());
   size_t pt_num = 0;
-  for (int ww = 0; ww < cloud->width(); ++ww) {
+  for (size_t ww = 0; ww < cloud->width(); ++ww) {
     PointT nei_pt;
     nei_pt.x = 0;
     nei_pt.y = 0;
     nei_pt.z = 0;
-    for (int hh = 0; hh < cloud->height(); ++hh) {
+    for (size_t hh = 0; hh < cloud->height(); ++hh) {
       const PointT* p_ptr = cloud->at(ww, hh);
       if (p_ptr == nullptr) {
         continue;

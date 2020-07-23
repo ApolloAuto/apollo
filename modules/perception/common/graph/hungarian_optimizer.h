@@ -190,7 +190,7 @@ class HungarianOptimizer {
   bool optimization_initialized_ = false;
 
   /* the size of the problem, i.e. std::max(#agents, #tasks). */
-  int matrix_size_ = 0;
+  size_t matrix_size_ = 0;
 
   /* the expanded cost matrix. */
   SecureMat<T> costs_;
@@ -216,8 +216,8 @@ class HungarianOptimizer {
   int zero_row_ = 0;
 
   /* the width_ and height_ of the initial (non-expanded) cost matrix. */
-  int width_ = 0;
-  int height_ = 0;
+  size_t width_ = 0;
+  size_t height_ = 0;
 
   /* The current state of the algorithm */
   std::function<void()> fn_state_ = nullptr;
@@ -275,9 +275,9 @@ void HungarianOptimizer<T>::OptimizationInit() {
   if (optimization_initialized_) {
     return;
   }
-  width_ = static_cast<int>(costs_.width());
+  width_ = costs_.width();
   if (width_ > 0) {
-    height_ = static_cast<int>(costs_.height());
+    height_ = costs_.height();
   } else {
     height_ = 0;
   }
@@ -436,7 +436,7 @@ bool HungarianOptimizer<T>::FindZero(size_t* zero_row, size_t* zero_col) {
   uncov_col_.clear();
   uncov_row_.clear();
 
-  for (int i = 0; i < matrix_size_; ++i) {
+  for (size_t i = 0; i < matrix_size_; ++i) {
     if (!RowCovered(i)) {
       uncov_row_.push_back(i);
     }
@@ -499,7 +499,7 @@ void HungarianOptimizer<T>::CheckStar() {
   for (size_t row = 0; row < height_; ++row) {
     int star_col = -1;
     bool is_single = true;
-    for (int col = 0; col < width_; ++col) {
+    for (size_t col = 0; col < width_; ++col) {
       if (IsStarred(row, col)) {
         if (star_col == -1) {
           star_col = col;
@@ -510,7 +510,7 @@ void HungarianOptimizer<T>::CheckStar() {
       }
     }
     if (!is_single) {
-      for (int col = 0; col < width_; ++col) {
+      for (size_t col = 0; col < width_; ++col) {
         Unstar(row, col);
       }
     }
@@ -607,7 +607,7 @@ void HungarianOptimizer<T>::PrimeZeroes() {
     }
 
     Prime(zero_row, zero_col);
-    size_t star_col = FindStarInRow(zero_row);
+    int star_col = FindStarInRow(zero_row);
 
     if (star_col != kHungarianOptimizerColNotFound) {
       CoverRow(zero_row);
@@ -660,7 +660,7 @@ void HungarianOptimizer<T>::MakeAugmentingPath() {
 
   while (!done) {
     /* first construct the alternating path... */
-    size_t row = FindStarInCol(assignments_[count].second);
+    int row = FindStarInCol(assignments_[count].second);
 
     if (row != kHungarianOptimizerRowNotFound) {
       count++;
@@ -671,7 +671,7 @@ void HungarianOptimizer<T>::MakeAugmentingPath() {
     }
 
     if (!done) {
-      size_t col = FindPrimeInRow(assignments_[count].first);
+      int col = FindPrimeInRow(assignments_[count].first);
       count++;
       assignments_[count].first = assignments_[count - 1].first;
       assignments_[count].second = col;
