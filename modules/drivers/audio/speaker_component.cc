@@ -43,9 +43,9 @@ bool SpeakerComponent::Init() {
   chunk_size_ = speaker_device_->stream->get_chunk_size(chunk_);
   n_chunks_ = sample_rate_ * 1.0 / chunk_size_ * record_seconds_;
   buffer_size_ = n_chunks_ * chunk_size_;
-  buffer_ = reinterpret_cast<char *> (malloc(buffer_size));
+  buffer_ = reinterpret_cast<char *> (malloc(buffer_size_));
   if (buffer_ == nullptr) {
-    AERROR << "System calloc memory error, size:" << buffer_size;
+    AERROR << "System calloc memory error, size:" << buffer_size_;
     return false;
   }
 
@@ -55,7 +55,7 @@ bool SpeakerComponent::Init() {
     channel_data = audio_data_->add_channel_data();
     channel_data->set_channel_type(speaker_config_->channel_type(i));
     channel_data->set_size(sample_width_);
-    audio_data_->mutable_data()->resize(buffer_size_ / n_channels_);
+    channel_data->mutable_data()->resize(buffer_size_ / n_channels_);
   }
   writer_ = node_->CreateWriter<AudioData>(speaker_config_->channel_name());
 
@@ -67,15 +67,15 @@ void SpeakerComponent::run() {
   while (!cyber::IsShutdown()) {  // TODO: or apollo::cyber::OK() ?
     AINFO << "Start recording";
     pos = buffer_;
-    for (int i = 0; i < n_chunks; ++i) {
+    for (int i = 0; i < n_chunks_; ++i) {
       speaker_device_->stream->read_stream(chunk_size_, pos);
       pos += chunk_size_;
     }
     AINFO << "End recording";
-    for (int buff_i = 0; buff_i < buffer_size_; ++buff_i)
+    for (int buff_i = 0, i = 0; buff_i < buffer_size_; ++buff_i, i += 2)
       for (int channel_i = 0; channel_i < n_channels_; ++channel_i) {
         audio_data_->channel_data(channel_i).data[i] = buffer_[buff_i++];
-        audio_data_->channel_data(channel_i).data[i] = buffer_[buff_i++];
+        audio_data_->channel_data(channel_i).data[i+1] = buffer_[buff_i++];
       }
   }
   writer_->Write(audio_data_);

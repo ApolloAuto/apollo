@@ -61,7 +61,7 @@ class Stream {
 
 class Respeaker {
  public:
-  Stream stream;
+  std::unique_ptr<Stream> stream_;
 
   Respeaker(){};
   void init(int sample_rate, int sample_width, int n_channels);

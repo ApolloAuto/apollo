@@ -99,7 +99,8 @@ void Respeaker::init(int sample_rate, int sample_width, int n_channels) {
   }
 
   PaDeviceIndex device_index = get_respeaker_index();
-  stream.init_stream(sample_rate, n_channels, device_index,
+  stream_.reset(new Stream());
+  stream_.init_stream(sample_rate, n_channels, device_index,
                      get_format_from_width(sample_width));
 }
 
