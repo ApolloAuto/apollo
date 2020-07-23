@@ -32,7 +32,7 @@ using std::chrono::steady_clock;
 using std::chrono::system_clock;
 
 const Time Time::MAX = Time(std::numeric_limits<uint64_t>::max());
-const Time Time::MIN = Time(1);
+const Time Time::MIN = Time(0);
 
 Time::Time(uint64_t nanoseconds) { nanoseconds_ = nanoseconds; }
 
