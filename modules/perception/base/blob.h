@@ -121,7 +121,7 @@ class Blob {
   void ReshapeLike(const Blob& other);
   inline std::string shape_string() const {
     std::ostringstream stream;
-    for (int i = 0; i < shape_.size(); ++i) {
+    for (size_t i = 0; i < shape_.size(); ++i) {
       stream << shape_[i] << " ";
     }
     stream << "(" << count_ << ")";
@@ -246,7 +246,7 @@ class Blob {
     int offset = 0;
     for (int i = 0; i < num_axes(); ++i) {
       offset *= shape(i);
-      if (indices.size() > i) {
+      if (static_cast<int>(indices.size()) > i) {
         CHECK_GE(indices[i], 0);
         CHECK_LT(indices[i], shape(i));
         offset += indices[i];
