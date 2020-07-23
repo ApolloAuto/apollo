@@ -51,6 +51,7 @@ bool SpeakerComponent::Init() {
 
   // std::unique_ptr<ChannelData> channel_data = nullptr;
   ChannelData *channel_data = nullptr;
+  audio_data_.reset(new AudioData());
   for (int i = 0; i < n_channels_; ++i) {
     channel_data = audio_data_->add_channel_data();
     channel_data->set_channel_type(speaker_config_->channel_type(i));
@@ -81,8 +82,16 @@ void SpeakerComponent::run() {
         (*data[channel_i])[i+1] = buffer_[buff_i++];
       }
     }
+    writer_->Write(audio_data_);
+    async_result_ = cyber::Async(&SpeakerComponent::run, this);
   }
-  writer_->Write(audio_data_);
+}
+
+SpeakerComponent::~SpeakerComponent() {
+  if (running_.load()) {
+    running_.exchange(false);
+    async_result_.wait();
+  }
 }
 
 }  // namespace audio

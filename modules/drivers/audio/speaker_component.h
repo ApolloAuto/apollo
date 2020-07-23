@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <atomic>
+#include <future>
+#include <vector>
+
 #include "modules/drivers/audio/proto/speaker_config.pb.h"
 #include "modules/drivers/audio/proto/audio.pb.h"
 #include "modules/drivers/audio/respeaker.h"
@@ -51,6 +55,8 @@ class SpeakerComponent : public Component<> {
   std::vector<std::unique_ptr<ChannelData>>* channels_;
   char *buffer_;
   int n_chunks_, chunk_size_, buffer_size_;
+  std::future<void> async_result_;
+  std::atomic<bool> running_ = {false};
 };
 
 CYBER_REGISTER_COMPONENT(SpeakerComponent)
