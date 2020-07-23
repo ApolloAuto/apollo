@@ -1,0 +1,11 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/audio/libspeaker_component.so"
+    components {
+        class_name : "SpeakerComponent"
+        config {
+            name : "respeaker"
+            config_file_path : "/apollo/modules/drivers/audio/conf/respeaker.pb.txt"
+        }
+    }
+}
