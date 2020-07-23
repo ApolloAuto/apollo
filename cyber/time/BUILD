@@ -50,4 +50,18 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "clock",
+    srcs = ["clock.cc"],
+    hdrs = ["clock.h"],
+    deps = [
+        ":time",
+        "//cyber/common:global_data",
+        "//cyber/common:log",
+        "//cyber/common:macros",
+        "//cyber/common:util",
+        "//cyber/proto:run_mode_conf_cc_proto",
+    ],
+)
+
 cpplint()
