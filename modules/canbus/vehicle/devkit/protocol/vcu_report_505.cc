@@ -91,7 +91,7 @@ Vcu_report_505::Backcrash_stateType Vcureport505::backcrash_state(
   return ret;
 }
 
-// config detail: {'name': 'aeb_state', 'enum': {0: 'AEB_STATE_INCTIVE', 1:
+// config detail: {'name': 'aeb_state', 'enum': {0: 'AEB_STATE_INACTIVE', 1:
 // 'AEB_STATE_ACTIVE'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 32, 'type': 'enum', 'order':
 // 'motorola', 'physical_unit': ''}
