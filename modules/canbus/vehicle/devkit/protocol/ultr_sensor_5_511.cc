@@ -77,13 +77,13 @@ double Ultrsensor5511::uiuss6_tof_direct(const std::uint8_t* bytes,
 
 // config detail: {'name': 'uiuss1_tof_direct', 'offset': 0.0, 'precision':
 // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-// 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': 'cm'}
+// 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
 double Ultrsensor5511::uiuss1_tof_direct(const std::uint8_t* bytes,
                                          int32_t length) const {
-  Byte t0(bytes + 3);
+  Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 2);
+  Byte t1(bytes + 3);
   int32_t t = t1.get_byte(0, 8);
   x <<= 8;
   x |= t;

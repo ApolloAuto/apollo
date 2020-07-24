@@ -46,7 +46,7 @@ class Ultrsensor5511 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'name': 'uiUSS1_ToF_Direct', 'offset': 0.0, 'precision':
   // 0.01724, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|65535]',
-  // 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': 'cm'}
+  // 'bit': 23, 'type': 'double', 'order': 'motorola', 'physical_unit': 'cm'}
   double uiuss1_tof_direct(const std::uint8_t* bytes,
                            const int32_t length) const;
 
