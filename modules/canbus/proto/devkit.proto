@@ -194,7 +194,7 @@ message Vcu_report_505 {
     BACKCRASH_STATE_CRASH_EVENT = 1;
   }
   enum Aeb_stateType {
-    AEB_STATE_INCTIVE = 0;
+    AEB_STATE_INACTIVE = 0;
     AEB_STATE_ACTIVE = 1;
   }
   // [] [0|0]

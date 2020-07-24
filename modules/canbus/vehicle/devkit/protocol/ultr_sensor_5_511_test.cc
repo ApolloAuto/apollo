@@ -44,7 +44,7 @@ TEST_F(Ultrsensor5511Test, General) {
 
   EXPECT_EQ(cd.devkit().ultr_sensor_5_511().uiuss7_tof_direct(), 10);
   EXPECT_EQ(cd.devkit().ultr_sensor_5_511().uiuss6_tof_direct(), 39);
-  EXPECT_EQ(cd.devkit().ultr_sensor_5_511().uiuss1_tof_direct(), 388);
+  EXPECT_EQ(cd.devkit().ultr_sensor_5_511().uiuss1_tof_direct(), 28);
   EXPECT_EQ(cd.devkit().ultr_sensor_5_511().uiuss0_tof_direct(), 1000);
 }
 
