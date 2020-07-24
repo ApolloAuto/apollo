@@ -74,9 +74,9 @@ class NCutSegmentation : public BaseSegmentation {
   base::ObjectType Label2Type(const std::string& label);
 
   // ground detector for background segmentation
-  std::unique_ptr<BaseGroundDetector> ground_detector_;
+  BaseGroundDetector* ground_detector_;
   // roi filter for background segmentation
-  std::unique_ptr<BaseROIFilter> roi_filter_;
+  BaseROIFilter* roi_filter_;
 
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;

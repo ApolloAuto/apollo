@@ -46,16 +46,14 @@ bool LidarObstacleTracking::Init(
   multi_target_tracker_name_ = config.multi_target_tracker();
   fusion_classifier_name_ = config.fusion_classifier();
 
-  multi_target_tracker_.reset(
-      BaseMultiTargetTrackerRegisterer::GetInstanceByName(
-          multi_target_tracker_name_));
-  CHECK_NOTNULL(multi_target_tracker_.get());
+  multi_target_tracker_ = BaseMultiTargetTrackerRegisterer::GetInstanceByName(
+          multi_target_tracker_name_);
+  CHECK_NOTNULL(multi_target_tracker_);
   MultiTargetTrackerInitOptions tracker_init_options;
   ACHECK(multi_target_tracker_->Init(tracker_init_options));
 
-  fusion_classifier_.reset(
-      BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name_));
-  CHECK_NOTNULL(fusion_classifier_.get());
+  fusion_classifier_ = BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name_);
+  CHECK_NOTNULL(fusion_classifier_);
   ClassifierInitOptions fusion_classifier_init_options;
   ACHECK(fusion_classifier_->Init(fusion_classifier_init_options));
   return true;

@@ -65,9 +65,8 @@ bool LidarObstacleSegmentation::Init(
     }
   }
 
-  segmentor_.reset(
-      BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_));
-  CHECK_NOTNULL(segmentor_.get());
+  segmentor_ = BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_);
+  CHECK_NOTNULL(segmentor_);
   SegmentationInitOptions segmentation_init_options;
   segmentation_init_options.sensor_name = sensor_name;
   ACHECK(segmentor_->Init(segmentation_init_options));

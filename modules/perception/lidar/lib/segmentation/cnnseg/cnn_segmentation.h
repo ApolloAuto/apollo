@@ -87,9 +87,9 @@ class CNNSegmentation : public BaseSegmentation {
   std::vector<int> point2grid_;
 
   // ground detector for background segmentation
-  std::unique_ptr<BaseGroundDetector> ground_detector_;
+  BaseGroundDetector* ground_detector_;
   // roi filter for background segmentation
-  std::unique_ptr<BaseROIFilter> roi_filter_;
+  BaseROIFilter* roi_filter_;
 
   // thread worker
   lib::ThreadWorker worker_;

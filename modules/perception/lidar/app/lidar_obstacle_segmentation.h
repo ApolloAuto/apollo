@@ -69,7 +69,7 @@ class LidarObstacleSegmentation {
  private:
   PointCloudPreprocessor cloud_preprocessor_;
   MapManager map_manager_;
-  std::unique_ptr<BaseSegmentation> segmentor_;
+  BaseSegmentation* segmentor_;
   ObjectBuilder builder_;
   ObjectFilterBank filter_bank_;
   // params

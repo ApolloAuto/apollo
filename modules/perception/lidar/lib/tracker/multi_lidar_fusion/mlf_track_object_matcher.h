@@ -67,8 +67,8 @@ class MlfTrackObjectMatcher {
 
  protected:
   std::unique_ptr<MlfTrackObjectDistance> track_object_distance_;
-  std::unique_ptr<BaseBipartiteGraphMatcher> foreground_matcher_;
-  std::unique_ptr<BaseBipartiteGraphMatcher> background_matcher_;
+  BaseBipartiteGraphMatcher* foreground_matcher_;
+  BaseBipartiteGraphMatcher* background_matcher_;
 
   float bound_value_ = 100.f;
   float max_match_distance_ = 4.0f;

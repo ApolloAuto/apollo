@@ -48,8 +48,8 @@ class LidarObstacleTracking {
   std::string Name() const { return "LidarObstacleTracking"; }
 
  private:
-  std::shared_ptr<BaseMultiTargetTracker> multi_target_tracker_;
-  std::shared_ptr<BaseClassifier> fusion_classifier_;
+  BaseMultiTargetTracker* multi_target_tracker_;
+  BaseClassifier* fusion_classifier_;
   std::string multi_target_tracker_name_;
   std::string fusion_classifier_name_;
 };  // class LidarObstacleTracking
