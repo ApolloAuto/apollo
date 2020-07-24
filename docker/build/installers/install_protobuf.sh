@@ -62,7 +62,7 @@ python setup.py install --cpp_implementation
 
 popd
 
-echo "export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp" | tee -a "${APOLLO_PROFILE}"
+echo -e "\nexport PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp" | tee -a "${APOLLO_PROFILE}"
 ok "Successfully installed protobuf, VERSION=${VERSION}"
 
 # Clean up.
