@@ -46,7 +46,7 @@ bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
   const auto &model_type = param_.model_type();
   AINFO << "model_type=" << model_type;
   inference_.reset(inference::CreateInferenceByName(
-      model_type, proto_file, weight_file, output_names, input_names,
+      "feature_extractor_project_perception", model_type, proto_file, weight_file, output_names, input_names,
       options.root_dir));
   ACHECK(nullptr != inference_) << "Failed to init CNNAdapter";
   gpu_id_ = GlobalConfig::Instance()->track_feature_gpu_id;
@@ -57,7 +57,9 @@ bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
       {param_.input_blob(), shape}};
 
   ACHECK(inference_->Init(shape_map));
+  AINFO << "camera_feature_extractor_project_feature infer start";
   inference_->Infer();
+  AINFO << "infer finish";
   return true;
 }
 
@@ -74,7 +76,9 @@ bool ProjectFeature::Extract(const FeatureExtractorOptions &options,
       frame->track_feature_blob->count() * sizeof(float), cudaMemcpyDefault);
 
   cudaDeviceSynchronize();
+  AINFO << "camera_feature_extractor_project_feature infer start2";
   inference_->Infer();
+  AINFO << "infer finish";
   cudaDeviceSynchronize();
   frame->track_feature_blob->Reshape(
       {static_cast<int>(frame->detected_objects.size()), output_blob->shape(1),

@@ -1,0 +1,57 @@
+name: "YOLOv2-half"
+layer {
+  name: "input"
+  type: "Input"
+  top: "roi_feature"
+  input_param {
+    shape {
+      dim: 1
+      dim: 64
+      dim: 3
+      dim: 3
+    }
+  }
+}
+layer {
+  name: "project1-1"
+  type: "Convolution"
+  bottom: "roi_feature"
+  top: "conv4_1"
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+  }
+}
+layer {
+  name: "conv4_1_relu"
+  type: "ReLU"
+  bottom: "conv4_1"
+  top: "conv4_1"
+  relu_param {
+    negative_slope: 0.1
+  }
+}
+layer {
+  name: "project1-2"
+  type: "Convolution"
+  bottom: "conv4_1"
+  top: "conv4_2"
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+  }
+}

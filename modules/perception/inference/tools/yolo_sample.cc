@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
         proto_file, weight_file, outputs, inputs, calibrator.get());
   } else {
     rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNet", proto_file, weight_file, outputs, inputs);
+        "yolo_sample_perception","RTNet", proto_file, weight_file, outputs, inputs);
   }
   const int height = 576;
   const int width = 1440;

@@ -1,0 +1,5 @@
+sensor_name: "velodyne128"
+enable_hdmap: true
+lidar_query_tf_offset: 0
+lidar2novatel_tf2_child_frame_id: "velodyne128"
+output_channel_name: "/perception/inner/DetectionObjects"

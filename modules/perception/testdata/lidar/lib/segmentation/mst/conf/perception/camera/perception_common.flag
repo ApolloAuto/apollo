@@ -1,0 +1,12 @@
+###########################################################################
+# Flags from sensor_manager
+
+# SensorManager config file
+# type: string
+# default:
+--obs_sensor_meta_path=./modules/perception/production/data/perception/common/sensor_meta.pt
+
+# The intrinsics/extrinsics dir
+# type: string
+# default:
+--obs_sensor_intrinsic_path=/apollo/modules/perception/data/params

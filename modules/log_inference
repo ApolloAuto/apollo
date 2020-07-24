@@ -1,0 +1,487 @@
+planning/proto/planning_config.proto:75:    LearningModelInferenceTaskConfig learning_model_inference_task_config = 22;
+planning/proto/planning_config.proto:77:        learning_model_inference_trajectory_task_config = 23;
+planning/conf/scenario/lane_follow_hybrid_config.pb.txt:27:    learning_model_inference_task_config {
+planning/conf/scenario/learning_model_sample_config.pb.txt:14:    learning_model_inference_task_config {
+planning/conf/scenario/learning_model_sample_config.pb.txt:23:    learning_model_inference_trajectory_task_config {
+planning/tasks/task_factory.cc:41:#include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
+planning/tasks/task_factory.cc:42:#include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
+planning/tasks/learning_model/learning_model_inference_task.cc:21:#include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
+planning/tasks/learning_model/learning_model_inference_task.cc:28:#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+planning/tasks/learning_model/learning_model_inference_task.cc:41:  ACHECK(config.has_learning_model_inference_task_config());
+planning/tasks/learning_model/learning_model_inference_task.cc:42:  trajectory_imitation_inference_ =
+planning/tasks/learning_model/learning_model_inference_task.cc:44:          config.learning_model_inference_task_config());
+planning/tasks/learning_model/learning_model_inference_task.cc:58:  const auto& config = config_.learning_model_inference_task_config();
+planning/tasks/learning_model/learning_model_inference_task.cc:111:  if (!trajectory_imitation_inference_->LoadModel()) {
+planning/tasks/learning_model/learning_model_inference_task.cc:118:  if (!trajectory_imitation_inference_->DoInference(&learning_data_frame)) {
+planning/tasks/learning_model/learning_model_inference_task.h:28:#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+planning/tasks/learning_model/learning_model_inference_task.h:49:      trajectory_imitation_inference_;
+planning/tasks/learning_model/learning_model_inference_trajectory_task.cc:21:#include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
+planning/tasks/learning_model/learning_model_inference_trajectory_task.cc:35:  ACHECK(config.has_learning_model_inference_trajectory_task_config());
+planning/tasks/learning_model/learning_model_inference_trajectory_task.cc:54:      config_.learning_model_inference_trajectory_task_config();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:19: * @brief Define the trajectory_imitation_tensorrt_inference class
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:29:#include "modules/planning/learning_based/model_inference/model_inference.h"
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:81:   * @brief Get the name of model inference
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:98:   * @brief inference a learned model
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:99:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:105:   * @brief inference a CONV_RNN model
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:106:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:111:   * @brief inference a CNN model
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:112:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:117:   * @brief inference a CNN_LSTM model
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:118:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:17:#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:37:  // run a fake inference at init time as first inference is relative slow
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:52:    AERROR << "Fail to do initial inference on CONV_RNN Model";
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:59:  // run a fake inference at init time as first inference is relative slow
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:67:    AERROR << "Fail to do initial inference on CNN Model";
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:74:  // run a fake inference at init time as first inference is relative slow
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:89:    AERROR << "Fail to do initial inference on CNN_LSTM Model";
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:205:  auto inference_start_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:217:  auto inference_end_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:218:  std::chrono::duration<double> inference_diff =
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:219:      inference_end_time - inference_start_time;
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:220:  ADEBUG << "trajectory imitation model inference used time: "
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:221:         << inference_diff.count() * 1000 << " ms.";
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:309:  auto inference_start_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:316:  auto inference_end_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:317:  std::chrono::duration<double> inference_diff =
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:318:      inference_end_time - inference_start_time;
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:319:  ADEBUG << "trajectory imitation model inference used time: "
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:320:         << inference_diff.count() * 1000 << " ms.";
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:461:  auto inference_start_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:473:  auto inference_end_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:474:  std::chrono::duration<double> inference_diff =
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:475:      inference_end_time - inference_start_time;
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:476:  ADEBUG << "trajectory imitation model inference used time: "
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:477:         << inference_diff.count() * 1000 << " ms.";
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:19: * @brief Define the trajectory_imitation_libtorch_inference class
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:26:#include "modules/planning/learning_based/model_inference/model_inference.h"
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:47:   * @brief Get the name of model inference
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:57:   * @brief inference a learned model
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:58:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:79:   * @brief inference a CONV_RNN model
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:80:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:85:   * @brief inference a CNN model
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:86:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:91:   * @brief inference a CNN_LSTM model
+planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:92:   * @param learning_data_frame input and output intermediate for inference
+planning/learning_based/model_inference/model_inference.h:19: * @brief Define the model inference base class
+planning/learning_based/model_inference/model_inference.h:46:   * @brief Get the name of model inference
+planning/learning_based/model_inference/model_inference.h:56:   * @brief inference a learned model
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:17:#include "modules/planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h"
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:259:  auto inference_start_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:282:  auto inference_end_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:283:  std::chrono::duration<double> inference_diff =
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:284:      inference_end_time - inference_start_time;
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:285:  ADEBUG << "trajectory imitation model inference used time: "
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:286:         << inference_diff.count() * 1000 << " ms.";
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:378:  auto inference_start_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:393:  auto inference_end_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:394:  std::chrono::duration<double> inference_diff =
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:395:      inference_end_time - inference_start_time;
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:396:  ADEBUG << "trajectory imitation model inference used time: "
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:397:         << inference_diff.count() * 1000 << " ms.";
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:542:  auto inference_start_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:565:  auto inference_end_time = std::chrono::system_clock::now();
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:566:  std::chrono::duration<double> inference_diff =
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:567:      inference_end_time - inference_start_time;
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:568:  ADEBUG << "trajectory imitation model inference used time: "
+planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.cc:569:         << inference_diff.count() * 1000 << " ms.";
+tools/prediction/multiple_gpu_estimator/model_base.py:46:      is_training: if build training or inference model.
+log_inference:1:planning/proto/planning_config.proto:75:    LearningModelInferenceTaskConfig learning_model_inference_task_config = 22;
+log_inference:2:planning/proto/planning_config.proto:77:        learning_model_inference_trajectory_task_config = 23;
+log_inference:3:planning/conf/scenario/lane_follow_hybrid_config.pb.txt:27:    learning_model_inference_task_config {
+log_inference:4:planning/conf/scenario/learning_model_sample_config.pb.txt:14:    learning_model_inference_task_config {
+log_inference:5:planning/conf/scenario/learning_model_sample_config.pb.txt:23:    learning_model_inference_trajectory_task_config {
+log_inference:6:planning/tasks/task_factory.cc:41:#include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
+log_inference:7:planning/tasks/task_factory.cc:42:#include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
+log_inference:8:planning/tasks/learning_model/learning_model_inference_task.cc:21:#include "modules/planning/tasks/learning_model/learning_model_inference_task.h"
+log_inference:9:planning/tasks/learning_model/learning_model_inference_task.cc:28:#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+log_inference:10:planning/tasks/learning_model/learning_model_inference_task.cc:41:  ACHECK(config.has_learning_model_inference_task_config());
+log_inference:11:planning/tasks/learning_model/learning_model_inference_task.cc:42:  trajectory_imitation_inference_ =
+log_inference:12:planning/tasks/learning_model/learning_model_inference_task.cc:44:          config.learning_model_inference_task_config());
+log_inference:13:planning/tasks/learning_model/learning_model_inference_task.cc:58:  const auto& config = config_.learning_model_inference_task_config();
+log_inference:14:planning/tasks/learning_model/learning_model_inference_task.cc:111:  if (!trajectory_imitation_inference_->LoadModel()) {
+log_inference:15:planning/tasks/learning_model/learning_model_inference_task.cc:118:  if (!trajectory_imitation_inference_->DoInference(&learning_data_frame)) {
+log_inference:16:planning/tasks/learning_model/learning_model_inference_task.h:28:#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+log_inference:17:planning/tasks/learning_model/learning_model_inference_task.h:49:      trajectory_imitation_inference_;
+log_inference:18:planning/tasks/learning_model/learning_model_inference_trajectory_task.cc:21:#include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
+log_inference:19:planning/tasks/learning_model/learning_model_inference_trajectory_task.cc:35:  ACHECK(config.has_learning_model_inference_trajectory_task_config());
+log_inference:20:planning/tasks/learning_model/learning_model_inference_trajectory_task.cc:54:      config_.learning_model_inference_trajectory_task_config();
+log_inference:21:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:19: * @brief Define the trajectory_imitation_tensorrt_inference class
+log_inference:22:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:29:#include "modules/planning/learning_based/model_inference/model_inference.h"
+log_inference:23:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:81:   * @brief Get the name of model inference
+log_inference:24:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:98:   * @brief inference a learned model
+log_inference:25:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:99:   * @param learning_data_frame input and output intermediate for inference
+log_inference:26:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:105:   * @brief inference a CONV_RNN model
+log_inference:27:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:106:   * @param learning_data_frame input and output intermediate for inference
+log_inference:28:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:111:   * @brief inference a CNN model
+log_inference:29:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:112:   * @param learning_data_frame input and output intermediate for inference
+log_inference:30:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:117:   * @brief inference a CNN_LSTM model
+log_inference:31:planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h:118:   * @param learning_data_frame input and output intermediate for inference
+log_inference:32:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:17:#include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
+log_inference:33:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:37:  // run a fake inference at init time as first inference is relative slow
+log_inference:34:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:52:    AERROR << "Fail to do initial inference on CONV_RNN Model";
+log_inference:35:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:59:  // run a fake inference at init time as first inference is relative slow
+log_inference:36:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:67:    AERROR << "Fail to do initial inference on CNN Model";
+log_inference:37:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:74:  // run a fake inference at init time as first inference is relative slow
+log_inference:38:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:89:    AERROR << "Fail to do initial inference on CNN_LSTM Model";
+log_inference:39:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:205:  auto inference_start_time = std::chrono::system_clock::now();
+log_inference:40:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:217:  auto inference_end_time = std::chrono::system_clock::now();
+log_inference:41:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:218:  std::chrono::duration<double> inference_diff =
+log_inference:42:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:219:      inference_end_time - inference_start_time;
+log_inference:43:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:220:  ADEBUG << "trajectory imitation model inference used time: "
+log_inference:44:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:221:         << inference_diff.count() * 1000 << " ms.";
+log_inference:45:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:309:  auto inference_start_time = std::chrono::system_clock::now();
+log_inference:46:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:316:  auto inference_end_time = std::chrono::system_clock::now();
+log_inference:47:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:317:  std::chrono::duration<double> inference_diff =
+log_inference:48:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:318:      inference_end_time - inference_start_time;
+log_inference:49:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:319:  ADEBUG << "trajectory imitation model inference used time: "
+log_inference:50:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:320:         << inference_diff.count() * 1000 << " ms.";
+log_inference:51:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:461:  auto inference_start_time = std::chrono::system_clock::now();
+log_inference:52:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:473:  auto inference_end_time = std::chrono::system_clock::now();
+log_inference:53:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:474:  std::chrono::duration<double> inference_diff =
+log_inference:54:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:475:      inference_end_time - inference_start_time;
+log_inference:55:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:476:  ADEBUG << "trajectory imitation model inference used time: "
+log_inference:56:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.cc:477:         << inference_diff.count() * 1000 << " ms.";
+log_inference:57:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:19: * @brief Define the trajectory_imitation_libtorch_inference class
+log_inference:58:planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h:26:#include "modules/planning/learning_based/model_inference/model_inference.h"
+perception/camera/app/cipv_camera.cc:369:  // Option 2. Homography based 3D inference
+perception/camera/app/obstacle_camera_perception.cc:28:#include "modules/perception/inference/utils/cuda_util.h"
+perception/camera/app/obstacle_camera_perception.cc:49:  ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
+perception/camera/app/obstacle_camera_perception.cc:312:  inference::CudaUtil::set_device_id(perception_param_.gpu_id());
+perception/camera/app/lane_camera_perception.cc:35:#include "modules/perception/inference/utils/cuda_util.h"
+perception/camera/app/lane_camera_perception.cc:55:  ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
+perception/camera/app/lane_camera_perception.cc:200:  inference::CudaUtil::set_device_id(perception_param_.gpu_id());
+perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h:27:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h:65:  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
+perception/camera/lib/lane/detector/denseline/denseline_lane_detector.cc:23:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/lane/detector/denseline/denseline_lane_detector.cc:24:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/lane/detector/denseline/denseline_lane_detector.cc:111:  rt_net_.reset(inference::CreateInferenceByName("lane_detector_denseline_perception", model_type, proto_file,
+perception/camera/lib/lane/detector/denseline/denseline_lane_detector.cc:192:  inference::ResizeGPU(
+perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.cc:24:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.cc:25:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.cc:123:      inference::CreateInferenceByName("lane_detect_dartSCNN_perception", model_type, proto_file, weight_file,
+perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.cc:212:  inference::ResizeGPU(
+perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h:29:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h:70:  std::shared_ptr<inference::Inference> cnnadapter_lane_ = nullptr;
+perception/camera/lib/interface/base_inference_engine.h:42:  // @brief: do network inference.
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:24:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:25:#include "modules/perception/inference/utils/gemm.h"
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:48:  inference_.reset(inference::CreateInferenceByName(
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:51:  ACHECK(nullptr != inference_) << "Failed to init CNNAdapter";
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:53:  inference_->set_gpu_id(gpu_id_);
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:54:  inference_->set_max_batch_size(100);
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:59:  ACHECK(inference_->Init(shape_map));
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:61:  inference_->Infer();
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:68:  auto input_blob = inference_->get_blob(param_.input_blob());
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:69:  auto output_blob = inference_->get_blob(param_.feat_blob());
+perception/camera/lib/feature_extractor/tfe/project_feature.cc:80:  inference_->Infer();
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:24:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:25:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:51:  inference_.reset(inference::CreateInferenceByName(
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:54:  ACHECK(nullptr != inference_) << "Failed to init CNNAdapter";
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:56:  inference_->set_gpu_id(gpu_id_);
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:61:  ACHECK(inference_->Init(shape_map));
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:63:  inference_->Infer();
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:76:  feat_options.feat_blob = inference_->get_blob(feat_blob_name);
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:88:  auto input_blob = inference_->get_blob(param_.input_blob());
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:98:  inference::ResizeGPU(*image_, input_blob, raw_width, 0);
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.cc:100:  inference_->Infer();
+perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.cc:79:      new inference::ROIPoolingLayer<float>(pooled_h, pooled_w, use_floor, 1,
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h:23:#include "modules/perception/inference/inference.h"
+perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h:37:  std::shared_ptr<inference::Inference> inference_;
+perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h:28:#include "modules/perception/inference/operators/roipooling_layer.h"
+perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h:29:#include "modules/perception/inference/utils/gemm.h"
+perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h:35:  std::shared_ptr<inference::Layer<float>> pooling_layer;
+perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h:53:  inference::GPUL2Norm norm_;
+perception/camera/lib/feature_extractor/tfe/project_feature.h:24:#include "modules/perception/inference/inference.h"
+perception/camera/lib/feature_extractor/tfe/project_feature.h:25:#include "modules/perception/inference/utils/gemm.h"
+perception/camera/lib/feature_extractor/tfe/project_feature.h:38:  std::shared_ptr<inference::Inference> inference_;
+perception/camera/lib/feature_extractor/tfe/project_feature.h:41:  inference::GPUL2Norm norm_;
+perception/camera/lib/traffic_light/detector/recognition/recognition.h:25:#include "modules/perception/inference/inference.h"
+perception/camera/lib/traffic_light/detector/recognition/classify.cc:22:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/traffic_light/detector/recognition/classify.cc:23:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/traffic_light/detector/recognition/classify.cc:63:  rt_net_.reset(inference::CreateInferenceByName(
+perception/camera/lib/traffic_light/detector/recognition/classify.cc:131:    inference::ResizeGPU(*image_, input_blob_recog,
+perception/camera/lib/traffic_light/detector/recognition/classify.h:27:#include "modules/perception/inference/inference.h"
+perception/camera/lib/traffic_light/detector/recognition/classify.h:47:  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
+perception/camera/lib/traffic_light/detector/detection/detection.h:28:#include "modules/perception/inference/inference.h"
+perception/camera/lib/traffic_light/detector/detection/detection.h:71:  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
+perception/camera/lib/traffic_light/detector/detection/detection.cc:25:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/traffic_light/detector/detection/detection.cc:26:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/traffic_light/detector/detection/detection.cc:27:#include "modules/perception/inference/utils/util.h"
+perception/camera/lib/traffic_light/detector/detection/detection.cc:92:  rt_net_.reset(inference::CreateInferenceByName("trafficLight_detection_perception", model_type, proto_file,
+perception/camera/lib/traffic_light/detector/detection/detection.cc:215:      inference::ResizeGPU(*image_, input_img_blob, img_width, resize_index,
+perception/camera/lib/dummy/dummy_algorithms.h:24:#include "modules/perception/camera/lib/interface/base_inference_engine.h"
+perception/camera/lib/obstacle/tracker/omt/frame_list.h:24:#include "modules/perception/inference/utils/cuda_util.h"
+perception/camera/lib/obstacle/tracker/omt/frame_list.h:25:#include "modules/perception/inference/utils/util.h"
+perception/camera/lib/obstacle/tracker/omt/frame_list.h:69:    inference::CudaUtil::set_device_id(gpu_id);
+perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.cc:352:  inference::CudaUtil::set_device_id(gpu_id_);
+perception/camera/lib/obstacle/tracker/common/similar.cu:23:#include "modules/perception/inference/utils/gemm.h"
+perception/camera/lib/obstacle/tracker/common/similar.cu:49:  inference::GPUGemmFloat(CblasNoTrans,
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:23:#include "modules/perception/inference/inference_factory.h"
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:24:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:38:  // inference input shape
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:128:  inference_.reset(inference::CreateInferenceByName("camera_obstacle_yolo", model_type, proto_file,
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:131:  if (nullptr == inference_.get()) {
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:135:  inference_->set_gpu_id(gpu_id_);
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:140:  if (!inference_->Init(shape_map)) {
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:144:  inference_->Infer();
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:150:  auto obj_blob_scale1 = inference_->get_blob(net_param.det1_obj_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:151:  auto obj_blob_scale2 = inference_->get_blob(net_param.det2_obj_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:152:  auto obj_blob_scale3 = inference_->get_blob(net_param.det3_obj_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:191:      inference_->get_blob(yolo_param_.net_param().det1_loc_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:193:      inference_->get_blob(yolo_param_.net_param().det1_obj_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:195:      inference_->get_blob(yolo_param_.net_param().det1_cls_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:197:      inference_->get_blob(yolo_param_.net_param().det1_ori_conf_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:199:      inference_->get_blob(yolo_param_.net_param().det1_ori_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:201:      inference_->get_blob(yolo_param_.net_param().det1_dim_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:203:      inference_->get_blob(yolo_param_.net_param().det2_loc_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:205:      inference_->get_blob(yolo_param_.net_param().det2_obj_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:207:      inference_->get_blob(yolo_param_.net_param().det2_cls_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:209:      inference_->get_blob(yolo_param_.net_param().det2_ori_conf_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:211:      inference_->get_blob(yolo_param_.net_param().det2_ori_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:213:      inference_->get_blob(yolo_param_.net_param().det2_dim_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:215:      inference_->get_blob(yolo_param_.net_param().det3_loc_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:217:      inference_->get_blob(yolo_param_.net_param().det3_obj_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:219:      inference_->get_blob(yolo_param_.net_param().det3_cls_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:221:      inference_->get_blob(yolo_param_.net_param().det3_ori_conf_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:223:      inference_->get_blob(yolo_param_.net_param().det3_ori_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:225:      inference_->get_blob(yolo_param_.net_param().det3_dim_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:228:      inference_->get_blob(yolo_param_.net_param().lof_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:230:      inference_->get_blob(yolo_param_.net_param().lor_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:233:      inference_->get_blob(yolo_param_.net_param().brvis_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:235:      inference_->get_blob(yolo_param_.net_param().brswt_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:237:      inference_->get_blob(yolo_param_.net_param().ltvis_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:239:      inference_->get_blob(yolo_param_.net_param().ltswt_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:241:      inference_->get_blob(yolo_param_.net_param().rtvis_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:243:      inference_->get_blob(yolo_param_.net_param().rtswt_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:246:      inference_->get_blob(yolo_param_.net_param().area_id_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:248:      inference_->get_blob(yolo_param_.net_param().visible_ratio_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:250:      inference_->get_blob(yolo_param_.net_param().cut_off_ratio_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:305:  feat_options.feat_blob = inference_->get_blob(feat_blob_name);
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:328:  auto input_blob = inference_->get_blob(yolo_param_.net_param().input_blob());
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:338:  inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.cc:344:  inference_->Infer();
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h:31:#include "modules/perception/inference/inference.h"
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h:32:#include "modules/perception/inference/utils/resize.h"
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h:33:#include "modules/perception/inference/utils/util.h"
+perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h:67:  std::shared_ptr<inference::Inference> inference_;
+perception/proto/rt.proto:3:package apollo.perception.inference;
+perception/common/perception_gflags.cc:41:DEFINE_int32(gpu_id, 0, "The id of gpu used for inference.");
+perception/lidar/lib/detection/lidar_point_pillars/point_pillars.cc:233:  // for trt inference
+perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h:83:  double inference_time_ = 0.0;
+perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h:339:   * @brief Call PointPillars for the inference
+perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.cc:157:  // inference
+perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.cc:162:  inference_time_ = timer.toc(true);
+perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.cc:174:        << "inference: " << inference_time_ << "\t"
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:22:#include "modules/perception/inference/inference_factory.h"
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:68:  // init inference model
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:79:  inference_.reset(inference::CreateInferenceByName("lidar_cnn_perception",cnnseg_param_.model_type(),
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:82:  CHECK_NOTNULL(inference_.get());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:86:  inference_->set_gpu_id(gpu_id_);  // inference sets CPU mode when -1
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:97:  ACHECK(inference_->Init(input_shapes)) << "Failed to init inference.";
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:100:  instance_pt_blob_ = inference_->get_blob(network_param.instance_pt_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:102:  category_pt_blob_ = inference_->get_blob(network_param.category_pt_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:105:      inference_->get_blob(network_param.confidence_pt_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:107:  height_pt_blob_ = inference_->get_blob(network_param.height_pt_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:109:  feature_blob_ = inference_->get_blob(network_param.feature_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:112:    classify_pt_blob_ = inference_->get_blob(network_param.class_pt_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:116:    heading_pt_blob_ = inference_->get_blob(network_param.heading_pt_blob());
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:305:  // model inference
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.cc:307:  inference_->Infer();
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h:28:#include "modules/perception/inference/inference.h"
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h:29:#include "modules/perception/inference/inference_factory.h"
+perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h:66:  std::shared_ptr<inference::Inference> inference_;
+perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h:59:  //     based on optimal state inference.
+perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h:63:  // window version of Chain-CRFs inference
+perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h:74:  // data member for window inference version
+perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.cc:170:  // AINFO << "Enter fuse with conditional probability inference";
+Binary file perception/production/data/perception/camera/models/lane_detector/darkSCNN/model matches
+Binary file perception/production/data/perception/camera/models/yolo_obstacle_detector/3d-yolo/model matches
+Binary file perception/production/data/perception/camera/models/yolo_obstacle_detector/3d-r4-half/model matches
+Binary file perception/production/data/perception/lidar/models/cnnseg/velodyne128/model matches
+perception/fusion/common/base_filter.h:26:// @brief base filter inference
+perception/inference/inference_factory.h:21:#include "modules/perception/inference/inference.h"
+perception/inference/inference_factory.h:25:namespace inference {
+perception/inference/inference_factory.h:35:}  // namespace inference
+perception/inference/tools/cal_table_generator.cc:24:#include "modules/perception/inference/inference.h"
+perception/inference/tools/cal_table_generator.cc:25:#include "modules/perception/inference/tensorrt/batch_stream.h"
+perception/inference/tools/cal_table_generator.cc:26:#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+perception/inference/tools/cal_table_generator.cc:27:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/inference/tools/cal_table_generator.cc:28:#include "modules/perception/inference/utils/util.h"
+perception/inference/tools/cal_table_generator.cc:172:  apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
+perception/inference/tools/cal_table_generator.cc:174:  apollo::perception::inference::BatchStream stream(2, FLAGS_max_batch,
+perception/inference/tools/cal_table_generator.cc:179:  apollo::perception::inference::RTNet *rt_net =
+perception/inference/tools/cal_table_generator.cc:180:      new apollo::perception::inference::RTNet(
+perception/inference/tools/denseline_sample.cc:21:#include "modules/perception/inference/inference.h"
+perception/inference/tools/denseline_sample.cc:22:#include "modules/perception/inference/inference_factory.h"
+perception/inference/tools/denseline_sample.cc:23:#include "modules/perception/inference/tensorrt/batch_stream.h"
+perception/inference/tools/denseline_sample.cc:24:#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+perception/inference/tools/denseline_sample.cc:25:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/inference/tools/denseline_sample.cc:26:#include "modules/perception/inference/utils/util.h"
+perception/inference/tools/denseline_sample.cc:60:  apollo::perception::inference::Inference *rt_net;
+perception/inference/tools/denseline_sample.cc:65:  apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
+perception/inference/tools/denseline_sample.cc:71:  apollo::perception::inference::BatchStream stream(2, 50, "./batches/");
+perception/inference/tools/denseline_sample.cc:76:    rt_net = new apollo::perception::inference::RTNet(
+perception/inference/tools/denseline_sample.cc:80:    rt_net = apollo::perception::inference::CreateInferenceByName(
+perception/inference/tools/denseline_sample.cc:141:  apollo::perception::inference::write_result(FLAGS_res_dir, output_data_vec);
+perception/inference/tools/lane_sample.cc:21:#include "modules/perception/inference/inference.h"
+perception/inference/tools/lane_sample.cc:22:#include "modules/perception/inference/inference_factory.h"
+perception/inference/tools/lane_sample.cc:23:#include "modules/perception/inference/tensorrt/batch_stream.h"
+perception/inference/tools/lane_sample.cc:24:#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+perception/inference/tools/lane_sample.cc:25:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/inference/tools/lane_sample.cc:26:#include "modules/perception/inference/utils/util.h"
+perception/inference/tools/lane_sample.cc:53:  apollo::perception::inference::Inference *rt_net;
+perception/inference/tools/lane_sample.cc:61:  apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
+perception/inference/tools/lane_sample.cc:68:    apollo::perception::inference::BatchStream stream(2, 50, "./batches/");
+perception/inference/tools/lane_sample.cc:71:    rt_net = apollo::perception::inference::CreateInferenceByName(
+perception/inference/tools/lane_sample.cc:75:    rt_net = apollo::perception::inference::CreateInferenceByName(
+perception/inference/tools/lane_sample.cc:134:  apollo::perception::inference::write_result(FLAGS_res_dir, output_data_vec);
+perception/inference/tools/yolo_sample.cc:20:#include "modules/perception/inference/inference.h"
+perception/inference/tools/yolo_sample.cc:21:#include "modules/perception/inference/inference_factory.h"
+perception/inference/tools/yolo_sample.cc:22:#include "modules/perception/inference/tensorrt/batch_stream.h"
+perception/inference/tools/yolo_sample.cc:23:#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+perception/inference/tools/yolo_sample.cc:24:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/inference/tools/yolo_sample.cc:25:#include "modules/perception/inference/utils/util.h"
+perception/inference/tools/yolo_sample.cc:42:  apollo::perception::inference::Inference *rt_net;
+perception/inference/tools/yolo_sample.cc:47:  apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
+perception/inference/tools/yolo_sample.cc:52:    apollo::perception::inference::BatchStream stream(2, 100, "./batches/");
+perception/inference/tools/yolo_sample.cc:55:    rt_net = new apollo::perception::inference::RTNet(
+perception/inference/tools/yolo_sample.cc:58:    rt_net = apollo::perception::inference::CreateInferenceByName(
+perception/inference/tools/yolo_sample.cc:97:  apollo::perception::inference::write_result(FLAGS_res_dir, output_data_vec);
+perception/inference/tensorrt/entropy_calibrator.h:29:#include "modules/perception/inference/tensorrt/batch_stream.h"
+perception/inference/tensorrt/entropy_calibrator.h:30:#include "modules/perception/inference/tensorrt/rt_utils.h"
+perception/inference/tensorrt/entropy_calibrator.h:61:      const apollo::perception::inference::BatchStream &stream, int first_batch,
+perception/inference/tensorrt/entropy_calibrator.h:93:        apollo::perception::inference::locateFile(network_, "CalibrationTable"),
+perception/inference/tensorrt/entropy_calibrator.h:108:        apollo::perception::inference::locateFile(network_, "CalibrationTable"),
+perception/inference/tensorrt/entropy_calibrator.h:118:  apollo::perception::inference::BatchStream stream_;
+perception/inference/tensorrt/plugins/argmax_plugin.h:19:#include "modules/perception/inference/tensorrt/rt_common.h"
+perception/inference/tensorrt/plugins/argmax_plugin.h:24:namespace inference {
+perception/inference/tensorrt/plugins/argmax_plugin.h:100:}  // namespace inference
+perception/inference/tensorrt/plugins/leakyReLU_plugin.h:22:#include "modules/perception/inference/tensorrt/rt_common.h"
+perception/inference/tensorrt/plugins/leakyReLU_plugin.h:26:namespace inference {
+perception/inference/tensorrt/plugins/leakyReLU_plugin.h:76:}  // namespace inference
+perception/inference/tensorrt/plugins/argmax_plugin.cu:18:#include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
+perception/inference/tensorrt/plugins/argmax_plugin.cu:21:namespace inference {
+perception/inference/tensorrt/plugins/argmax_plugin.cu:76:}  // namespace inference
+perception/inference/tensorrt/plugins/slice_plugin.h:22:#include "modules/perception/inference/tensorrt/rt_common.h"
+perception/inference/tensorrt/plugins/slice_plugin.h:26:namespace inference {
+perception/inference/tensorrt/plugins/slice_plugin.h:93:}  // namespace inference
+perception/inference/tensorrt/plugins/leakyReLU_plugin.cu:17:#include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
+perception/inference/tensorrt/plugins/leakyReLU_plugin.cu:23:namespace inference {
+perception/inference/tensorrt/plugins/leakyReLU_plugin.cu:54:}  // namespace inference
+perception/inference/tensorrt/plugins/slice_plugin.cu:18:#include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
+perception/inference/tensorrt/plugins/slice_plugin.cu:22:namespace inference {
+perception/inference/tensorrt/plugins/slice_plugin.cu:72:}  // namespace inference
+perception/inference/tensorrt/plugins/softmax_plugin.cu:18:#include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
+perception/inference/tensorrt/plugins/softmax_plugin.cu:22:namespace inference {
+perception/inference/tensorrt/plugins/softmax_plugin.cu:74:}  // namespace inference
+perception/inference/tensorrt/plugins/softmax_plugin.h:19:#include "modules/perception/inference/tensorrt/rt_common.h"
+perception/inference/tensorrt/plugins/softmax_plugin.h:23:namespace inference {
+perception/inference/tensorrt/plugins/softmax_plugin.h:102:}  // namespace inference
+perception/inference/tensorrt/rt_common.cc:17:#include "modules/perception/inference/tensorrt/rt_common.h"
+perception/inference/tensorrt/rt_common.cc:25:namespace inference {
+perception/inference/tensorrt/rt_common.cc:32:  int axis_inference = -1;
+perception/inference/tensorrt/rt_common.cc:40:      CHECK_EQ(axis_inference, -1);
+perception/inference/tensorrt/rt_common.cc:42:      axis_inference = i;
+perception/inference/tensorrt/rt_common.cc:165:}  // namespace inference
+perception/inference/tensorrt/rt_common.h:33:namespace inference {
+perception/inference/tensorrt/rt_common.h:61:}  // namespace inference
+perception/inference/tensorrt/rt_net.h:24:#include "modules/perception/inference/inference.h"
+perception/inference/tensorrt/rt_net.h:25:#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+perception/inference/tensorrt/rt_net.h:30:namespace inference {
+perception/inference/tensorrt/rt_net.h:202:}  // namespace inference
+perception/inference/tensorrt/rt_net.cc:17:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/inference/tensorrt/rt_net.cc:24:#include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
+perception/inference/tensorrt/rt_net.cc:25:#include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
+perception/inference/tensorrt/rt_net.cc:26:#include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
+perception/inference/tensorrt/rt_net.cc:27:#include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
+perception/inference/tensorrt/rt_net.cc:40:namespace inference {
+perception/inference/tensorrt/rt_net.cc:755:  // which will overwrite the `inference` results.
+perception/inference/tensorrt/rt_net.cc:783:}  // namespace inference
+perception/inference/tensorrt/batch_stream.cc:17:#include "modules/perception/inference/tensorrt/batch_stream.h"
+perception/inference/tensorrt/batch_stream.cc:26:namespace inference {
+perception/inference/tensorrt/batch_stream.cc:114:}  // namespace inference
+perception/inference/tensorrt/rt_utils.h:27:namespace inference {
+perception/inference/tensorrt/rt_utils.h:35:}  // namespace inference
+perception/inference/tensorrt/batch_stream.h:26:namespace inference {
+perception/inference/tensorrt/batch_stream.h:66:}  // namespace inference
+perception/inference/tensorrt/rt_utils.cc:17:#include "modules/perception/inference/tensorrt/rt_utils.h"
+perception/inference/tensorrt/rt_utils.cc:25:namespace inference {
+perception/inference/tensorrt/rt_utils.cc:64:}  // namespace inference
+perception/inference/operators/roipooling_layer.cc:64:#include "modules/perception/inference/operators/roipooling_layer.h"
+perception/inference/operators/roipooling_layer.cc:72:namespace inference {
+perception/inference/operators/roipooling_layer.cc:172:}  // namespace inference
+perception/inference/operators/roipooling_layer.cu:63:#include "modules/perception/inference/operators/roipooling_layer.h"
+perception/inference/operators/roipooling_layer.cu:71:namespace inference {
+perception/inference/operators/roipooling_layer.cu:188:}  // namespace inference
+perception/inference/operators/roipooling_layer.h:70:#include "modules/perception/inference/layer.h"
+perception/inference/operators/roipooling_layer.h:74:namespace inference {
+perception/inference/operators/roipooling_layer.h:106:}  // namespace inference
+perception/inference/layer.cc:17:#include "modules/perception/inference/layer.h"
+perception/inference/layer.cc:21:namespace inference {
+perception/inference/layer.cc:25:}  // namespace inference
+perception/inference/caffe/caffe_net.h:27:#include "modules/perception/inference/inference.h"
+perception/inference/caffe/caffe_net.h:31:namespace inference {
+perception/inference/caffe/caffe_net.h:64:}  // namespace inference
+perception/inference/caffe/caffe_net.cc:17:#include "modules/perception/inference/caffe/caffe_net.h"
+perception/inference/caffe/caffe_net.cc:23:namespace inference {
+perception/inference/caffe/caffe_net.cc:113:  // which will overwrite the `inference` results.
+perception/inference/caffe/caffe_net.cc:144:}  // namespace inference
+perception/inference/inference.cc:17:#include "modules/perception/inference/inference.h"
+perception/inference/inference.cc:21:namespace inference {
+perception/inference/inference.cc:29:}  // namespace inference
+perception/inference/paddlepaddle/paddle_net.h:29:#include "paddle/paddle_inference_api.h"
+perception/inference/paddlepaddle/paddle_net.h:31:#include "modules/perception/inference/inference.h"
+perception/inference/paddlepaddle/paddle_net.h:35:namespace inference {
+perception/inference/paddlepaddle/paddle_net.h:95:}  // namespace inference
+perception/inference/paddlepaddle/paddle_net.cc:19:#include "modules/perception/inference/paddlepaddle/paddle_net.h"
+perception/inference/paddlepaddle/paddle_net.cc:25:namespace inference {
+perception/inference/paddlepaddle/paddle_net.cc:140:  // which will overwrite the `inference` results.
+perception/inference/paddlepaddle/paddle_net.cc:196:}  // namespace inference
+perception/inference/inference.h:29:namespace inference {
+perception/inference/inference.h:56:}  // namespace inference
+perception/inference/utils/gemm.h:26:namespace inference {
+perception/inference/utils/gemm.h:43:}  // namespace inference
+perception/inference/utils/binary_data.h:26:namespace inference {
+perception/inference/utils/binary_data.h:47:}  // namespace inference
+perception/inference/utils/cuda_util.cu:17:#include "modules/perception/inference/utils/cuda_util.h"
+perception/inference/utils/cuda_util.cu:26:namespace inference {
+perception/inference/utils/cuda_util.cu:70:}  // namespace inference
+perception/inference/utils/binary_data.cc:20:#include "modules/perception/inference/utils/binary_data.h"
+perception/inference/utils/binary_data.cc:24:namespace inference {
+perception/inference/utils/binary_data.cc:181:}  // namespace inference
+perception/inference/utils/util.h:29:namespace inference {
+perception/inference/utils/util.h:51:}  // namespace inference
+perception/inference/utils/resize.h:26:namespace inference {
+perception/inference/utils/resize.h:42:}  // namespace inference
+perception/inference/utils/cuda_util.h:23:namespace inference {
+perception/inference/utils/cuda_util.h:37:}  // namespace inference
+perception/inference/utils/gemm.cu:17:#include "modules/perception/inference/utils/gemm.h"
+perception/inference/utils/gemm.cu:21:#include "modules/perception/inference/utils/cuda_util.h"
+perception/inference/utils/gemm.cu:22:#include "modules/perception/inference/utils/util.h"
+perception/inference/utils/gemm.cu:26:namespace inference {
+perception/inference/utils/gemm.cu:119:}  // namespace inference
+perception/inference/utils/util.cu:17:#include "modules/perception/inference/utils/util.h"
+perception/inference/utils/util.cu:25:namespace inference {
+perception/inference/utils/util.cu:109:}  // namespace inference
+perception/inference/utils/resize.cu:17:#include "modules/perception/inference/utils/resize.h"
+perception/inference/utils/resize.cu:22:#include "modules/perception/inference/utils/cuda_util.h"
+perception/inference/utils/resize.cu:23:#include "modules/perception/inference/utils/util.h"
+perception/inference/utils/resize.cu:27:namespace inference {
+perception/inference/utils/resize.cu:251:}  // namespace inference
+perception/inference/utils/util.cc:17:#include "modules/perception/inference/utils/util.h"
+perception/inference/utils/util.cc:22:namespace inference {
+perception/inference/utils/util.cc:53:}  // namespace inference
+perception/inference/inference_factory.cc:17:#include "modules/perception/inference/inference_factory.h"
+perception/inference/inference_factory.cc:19:#include "modules/perception/inference/caffe/caffe_net.h"
+perception/inference/inference_factory.cc:20:#include "modules/perception/inference/paddlepaddle/paddle_net.h"
+perception/inference/inference_factory.cc:21:#include "modules/perception/inference/tensorrt/rt_net.h"
+perception/inference/inference_factory.cc:26:namespace inference {
+perception/inference/inference_factory.cc:37:  writeFile.open("inference_check.txt", std::ios::app);
+perception/inference/inference_factory.cc:52:}  // namespace inference
+perception/inference/layer.h:26:namespace inference {
+perception/inference/layer.h:45:}  // namespace inference
+prediction/evaluator/vehicle/semantic_lstm_evaluator.cc:266:  // Run one inference to avoid very slow first inference later

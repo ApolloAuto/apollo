@@ -76,7 +76,7 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   output_names.push_back(network_param.class_pt_blob());
   std::vector<std::string> input_names;
   input_names.push_back(network_param.feature_blob());
-  inference_.reset(inference::CreateInferenceByName(cnnseg_param_.model_type(),
+  inference_.reset(inference::CreateInferenceByName("lidar_cnn_perception",cnnseg_param_.model_type(),
                                                     proto_file, weight_file,
                                                     output_names, input_names));
   CHECK_NOTNULL(inference_.get());
@@ -303,7 +303,9 @@ bool CNNSegmentation::Segment(const SegmentationOptions& options,
   feature_time_ = timer.toc(true);
 
   // model inference
+  AINFO << "lidar_cnn_segmentation infer start";
   inference_->Infer();
+  AINFO << "infer finish";
   infer_time_ = timer.toc(true);
 
   // processing clustering

@@ -1,0 +1,53 @@
+sensor_meta {
+    name: "velodyne64"
+    type: VELODYNE_64
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "front_12mm"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "front_6mm"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "onsemi_obstacle"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "onsemi_wide"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "onsemi_traffic"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+#sensor_meta {
+#    name: "spherical_left_forward"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}
+
+#sensor_meta {
+#    name: "spherical_right_forward"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}
+
+#sensor_meta {
+#    name: "spherical_backward"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}

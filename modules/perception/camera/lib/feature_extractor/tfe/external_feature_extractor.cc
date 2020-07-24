@@ -49,7 +49,7 @@ bool ExternalFeatureExtractor::Init(
   const auto &model_type = param_.model_type();
   AINFO << "model_type=" << model_type;
   inference_.reset(inference::CreateInferenceByName(
-      model_type, proto_file, weight_file, output_names, input_names,
+      "feature_extractor_perception", model_type, proto_file, weight_file, output_names, input_names,
       options.root_dir));
   ACHECK(nullptr != inference_) << "Failed to init CNNAdapter";
   gpu_id_ = GlobalConfig::Instance()->track_feature_gpu_id;
@@ -59,7 +59,9 @@ bool ExternalFeatureExtractor::Init(
       {param_.input_blob(), shape}};
 
   ACHECK(inference_->Init(shape_map));
+  AINFO << "camera_feature_extractor infer start";
   inference_->Infer();
+  AINFO << "infer finish";
   InitFeatureExtractor(options.root_dir);
   image_.reset(new base::Image8U(height_, width_, base::Color::BGR));
   return true;
@@ -94,7 +96,9 @@ bool ExternalFeatureExtractor::Extract(const FeatureExtractorOptions &options,
   // Timer timer;
   frame->data_provider->GetImage(image_options, image_.get());
   inference::ResizeGPU(*image_, input_blob, raw_width, 0);
+  AINFO << "camera_feature_extractor infer start2";
   inference_->Infer();
+  AINFO << "infer finish";
   FeatureExtractorOptions feat_options;
   feat_options.normalized = false;
   feature_extractor_->set_roi(

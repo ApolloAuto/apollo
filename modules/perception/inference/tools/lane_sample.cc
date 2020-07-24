@@ -69,11 +69,11 @@ int main(int argc, char **argv) {
     nvinfer1::Int8EntropyCalibrator calibrator(stream, 0, true, "./");
     std::cout << "int8" << std::endl;
     rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNetInt8", proto_file, weight_file, outputs, inputs, model_root);
+        "lane_sample_perception", "RTNetInt8", proto_file, weight_file, outputs, inputs, model_root);
   } else {
     std::cout << "fp32" << std::endl;
     rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNet", proto_file, weight_file, outputs, inputs);
+        "lane_sample_perception", "RTNet", proto_file, weight_file, outputs, inputs);
   }
   const int height = 608;
   const int width = 1024;

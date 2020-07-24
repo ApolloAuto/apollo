@@ -1,0 +1,74 @@
+gpu_id : 0
+detector_param {
+  plugin_param{
+    name : "YoloObstacleDetector"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
+    config_file : "config_paddle.pt"
+  }
+  camera_name : "front_6mm"
+  #camera_name : "spherical_left_forward"
+}
+detector_param {
+  plugin_param{
+    name : "YoloObstacleDetector"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
+    config_file : "config_paddle.pt"
+  }
+  camera_name : "front_12mm"
+}
+
+tracker_param {
+  plugin_param{
+    name : "OMTObstacleTracker"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/omt_obstacle_tracker"
+    config_file : "config.pt"
+  }
+}
+transformer_param {
+  plugin_param{
+    name : "MultiCueObstacleTransformer"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/multicue_obstacle_transformer"
+    config_file : "config.pt"
+  }
+}
+postprocessor_param {
+  plugin_param{
+    name : "LocationRefinerObstaclePostprocessor"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/location_refiner_obstacle_postprocessor"
+    config_file : "config.pt"
+  }
+}
+
+lane_param {
+  lane_detector_param {
+    plugin_param {
+      name : "DarkSCNNLaneDetector"
+      root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_detector/"
+      config_file : "config_darkSCNN_paddle.pt"
+    }
+    camera_name : "front_6mm"
+  }
+  lane_postprocessor_param {
+    name : "DarkSCNNLanePostprocessor"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/darkSCNN/"
+    config_file : "config.pt"
+  }
+}
+
+calibration_service_param {
+  plugin_param {
+    name : "OnlineCalibrationService"
+    root_dir : ""
+    config_file : ""
+  }
+  calibrator_method : "LaneLineCalibrator"
+}
+
+object_template_param {
+  plugin_param{
+    name : "ObjectTemplate"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/common/object_template/"
+    config_file : "object_template.pt"
+  }
+}
+

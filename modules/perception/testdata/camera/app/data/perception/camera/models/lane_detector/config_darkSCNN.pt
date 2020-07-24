@@ -1,0 +1,27 @@
+model_param {
+  model_name: "darkSCNN"
+  proto_file: "deploy.prototxt"
+  weight_file: "deploy.caffemodel"
+  input_offset_y: 312
+  input_offset_x: 0
+  crop_height: 768
+  crop_width: 1920
+  resize_height: 480
+  resize_width: 640
+  mean_b: 95
+  mean_g: 99
+  mean_r: 96
+  is_bgr: true
+  confidence_threshold: 0.95
+  vpt_mean_dx: 0.0
+  vpt_mean_dy: -77.284
+  vpt_std_dx: 103.109
+  vpt_std_dy: 95.273
+  model_type: "CaffeNet"
+}
+
+net_param {
+  seg_blob: "softmax"
+  vpt_blob: "fc_out"
+  input_blob: "data"
+}

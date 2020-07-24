@@ -19,17 +19,24 @@
 #include "modules/perception/inference/caffe/caffe_net.h"
 #include "modules/perception/inference/paddlepaddle/paddle_net.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
-
+#include <iostream>
+#include <fstream>
 namespace apollo {
 namespace perception {
 namespace inference {
 
-Inference *CreateInferenceByName(const std::string &name,
+Inference *CreateInferenceByName(const std:: string &module,
+				 const std::string &name,
                                  const std::string &proto_file,
                                  const std::string &weight_file,
                                  const std::vector<std::string> &outputs,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
+ 
+  std::fstream writeFile;
+  writeFile.open("inference_check.txt", std::ios::app);
+  writeFile << "module name: " << module << ", model name: " << name << "\n";
+  writeFile.close();
   if (name == "CaffeNet") {
     return new CaffeNet(proto_file, weight_file, outputs, inputs);
   } else if (name == "RTNet") {

@@ -7,15 +7,11 @@ header:
 child_frame_id: front_6mm
 transform:
   translation:
-    x: 0.580393
-    y: 0.0727572
-    z: -0.211861
+    x: -0.09
+    y: 0
+    z: -0.612
   rotation:
-     x: -0.502988
-     y: 0.496432
-     z: -0.507426
-     w: 0.493029
-  euler_angles_degree:
-     pitch: -89.936
-     yaw: -90.45
-     roll: -1.20027
+    x: -0.5
+    y: 0.5
+    z: -0.5
+    w: 0.5

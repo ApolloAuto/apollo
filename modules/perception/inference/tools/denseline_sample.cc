@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
   } else {
     AINFO << "fp32";
     rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNet", proto_file, weight_file, outputs, inputs);
+        "denseline_sample_perception", "RTNet", proto_file, weight_file, outputs, inputs);
   }
   std::vector<int> shape = {1, 3, height, width};
   std::map<std::string, std::vector<int>> shape_map{{input_blob_name, shape}};

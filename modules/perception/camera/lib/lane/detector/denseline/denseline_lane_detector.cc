@@ -108,7 +108,7 @@ bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
 
   const auto &model_type = model_param.model_type();
   AINFO << "model_type: " << model_type;
-  rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
+  rt_net_.reset(inference::CreateInferenceByName("lane_detector_denseline_perception", model_type, proto_file,
                                                  weight_file, net_outputs_,
                                                  net_inputs_, model_root));
   ACHECK(rt_net_ != nullptr);
@@ -195,6 +195,7 @@ bool DenselineLaneDetector::Detect(const LaneDetectorOptions &options,
       static_cast<float>(image_mean_[2]), false, static_cast<float>(1.0));
   AINFO << "resize gpu finish.";
   cudaDeviceSynchronize();
+  AINFO << "camera_lane_detector_denseline infer Start";
   rt_net_->Infer();
   AINFO << "infer finish.";
 

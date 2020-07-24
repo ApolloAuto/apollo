@@ -24,7 +24,8 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-Inference *CreateInferenceByName(const std::string &name,
+Inference *CreateInferenceByName(const std:: string &module,
+				 const std::string &name,
                                  const std::string &proto_file,
                                  const std::string &weight_file,
                                  const std::vector<std::string> &outputs,

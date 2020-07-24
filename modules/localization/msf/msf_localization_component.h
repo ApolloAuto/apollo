@@ -106,7 +106,6 @@ class LocalizationMsgPublisher {
   std::string localization_status_topic_ = "";
   std::shared_ptr<cyber::Writer<LocalizationStatus>>
       localization_status_talker_ = nullptr;
-  double pre_system_time_ = 0.0;
 };
 
 }  // namespace localization

@@ -89,7 +89,7 @@ bool TrafficLightDetection::Init(
   const auto &model_type = detection_param_.model_type();
   AINFO << "model_type: " << model_type;
 
-  rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
+  rt_net_.reset(inference::CreateInferenceByName("trafficLight_detection_perception", model_type, proto_file,
                                                  weight_file, net_outputs_,
                                                  net_inputs_, model_root));
 
@@ -219,6 +219,7 @@ bool TrafficLightDetection::Inference(
   }
   // _detection
   cudaDeviceSynchronize();
+  AINFO << "traffic_light_detection infer start";
   rt_net_->Infer();
   cudaDeviceSynchronize();
   AINFO << "rt_net run success";

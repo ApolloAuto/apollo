@@ -125,7 +125,7 @@ bool YoloObstacleDetector::InitNet(const yolo::YoloParam &yolo_param,
   // init Net
   const auto &model_type = model_param.model_type();
   AINFO << "model_type=" << model_type;
-  inference_.reset(inference::CreateInferenceByName(model_type, proto_file,
+  inference_.reset(inference::CreateInferenceByName("camera_obstacle_yolo", model_type, proto_file,
                                                     weight_file, output_names,
                                                     input_names, model_root));
   if (nullptr == inference_.get()) {
@@ -140,7 +140,9 @@ bool YoloObstacleDetector::InitNet(const yolo::YoloParam &yolo_param,
   if (!inference_->Init(shape_map)) {
     return false;
   }
+  AINFO << "obstacle_detector_yolo infer start";
   inference_->Infer();
+  AINFO << "infer finish";
   return true;
 }
 
@@ -338,6 +340,7 @@ bool YoloObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
   /////////////////////////// detection part ///////////////////////////
+  AINFO << "obstacle_detector_yolo infer start";
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";

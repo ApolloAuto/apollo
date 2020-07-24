@@ -120,7 +120,7 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   const auto &model_type = model_param.model_type();
   AINFO << "model_type: " << model_type;
   cnnadapter_lane_.reset(
-      inference::CreateInferenceByName(model_type, proto_file, weight_file,
+      inference::CreateInferenceByName("lane_detect_dartSCNN_perception", model_type, proto_file, weight_file,
                                        net_outputs_, net_inputs_, model_root));
   ACHECK(cnnadapter_lane_ != nullptr);
 
@@ -215,8 +215,9 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
       static_cast<float>(image_mean_[2]), false, static_cast<float>(1.0));
   ADEBUG << "resize gpu finish.";
   cudaDeviceSynchronize();
+  AINFO << "camera_lane_detector_darkSCNN infer start"; 
   cnnadapter_lane_->Infer();
-  ADEBUG << "infer finish.";
+  AINFO << "infer finish.";
 
   auto elapsed_1 = std::chrono::high_resolution_clock::now() - start;
   int64_t microseconds_1 =

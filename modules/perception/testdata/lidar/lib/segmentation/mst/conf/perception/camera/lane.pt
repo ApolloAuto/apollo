@@ -1,0 +1,30 @@
+gpu_id: 0
+lane_param {
+  lane_detector_param {
+    plugin_param {
+      name : "DarkSCNNLaneDetector"
+      root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_detector/"
+      config_file : "config_darkSCNN.pt"
+    }
+    camera_name : "front_6mm"
+  }
+  lane_postprocessor_param {
+      name : "DarkSCNNLanePostprocessor"
+      root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/darkSCNN/"
+      config_file : "config.pt"
+  }
+}
+
+calibration_service_param {
+  plugin_param {
+      name : "OnlineCalibrationService"
+      root_dir : ""
+      config_file : ""
+  }
+  calibrator_method : "LaneLineCalibrator"
+}
+
+debug_param {
+  lane_out_dir : "/apollo/debug_output/lane/"
+  calibration_out_dir : "/apollo/debug_output/calib/"
+}

@@ -61,7 +61,7 @@ void ClassifyBySimple::Init(
   AINFO << "model_root" << model_root;
 
   rt_net_.reset(inference::CreateInferenceByName(
-      model_config.model_type(), proto_file, weight_file, net_outputs_,
+      "trafficLight_recognition_perception", model_config.model_type(), proto_file, weight_file, net_outputs_,
       net_inputs_, model_root));
   AINFO << "create success";
 
@@ -134,6 +134,7 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
 
     AINFO << "resize gpu finish.";
     cudaDeviceSynchronize();
+    AINFO << "traffic_light_recognition infer start";
     rt_net_->Infer();
     cudaDeviceSynchronize();
     AINFO << "infer finish.";

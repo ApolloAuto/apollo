@@ -1,0 +1,189 @@
+max_dim_change_ratio: 0.1
+
+unknown {
+    speed_limit: 0.0
+}
+
+unknown_movable {
+    speed_limit: 35.0
+}
+
+unknown_unmovable {
+    speed_limit: 0.0
+}
+
+car {
+    speed_limit: 35.0
+    dim {
+        H: 1.38566
+        W: 1.49074
+        L: 4.12469
+    }
+    dim {
+        H: 1.46446
+        W: 1.65112
+        L: 4.54444
+    }
+    dim {
+        H: 1.68300
+        W: 1.84200
+        L: 4.62700
+    }
+}
+
+van {
+    speed_limit: 35.0
+    dim {
+        H: 1.87800
+        W: 1.64000
+        L: 4.18000
+    }
+    dim {
+        H: 2.16173
+        W: 1.87321
+        L: 5.11133
+    }
+    dim {
+        H: 2.2423
+        W: 1.95982
+        L: 6.08673
+    }
+}
+
+truck{
+    speed_limit: 23.0
+    dim {
+        H: 2.05209
+        W: 1.68595
+        L: 4.97111
+    }
+    dim {
+        H: 2.45055
+        W: 2.10637
+        L: 6.02256
+    }
+    dim {
+        H: 3.14926
+        W: 2.84919
+        L: 9.50667
+    }
+}
+
+bus {
+    speed_limit: 23.0
+    dim {
+        H: 2.82264
+        W: 2.39158
+        L: 7.61592
+    }
+    dim {
+        H: 3.11381
+        W: 2.68228
+        L: 9.98936
+    }
+    dim {
+        H: 3.16003
+        W: 2.80374
+        L: 11.9642
+    }
+}
+
+cyclist {
+    speed_limit: 4.0
+    # no people
+    dim {
+        H: 1.0
+        W: 0.4825
+        L: 1.4886
+    }
+    dim {
+        H: 1.6182
+        W: 0.4825
+        L: 1.4886
+    }
+    dim {
+        H: 1.6182
+        W: 0.4825
+        L: 1.4886
+    }
+}
+
+motorcyclist {
+    speed_limit: 6.0
+    dim {
+        H: 1.0
+        W: 0.4825
+        L: 1.4886
+    }
+
+    dim {
+        H: 1.6182
+        W: 0.4825
+        L: 1.4886
+    }
+
+    dim {
+        H: 1.6182
+        W: 0.4825
+        L: 1.4886
+    }
+}
+
+tricyclist {
+    speed_limit: 4.0
+    dim {
+        H: 1.5380
+        W: 0.9785
+        L: 2.3569
+    }
+    dim {
+        H: 2.16173
+        W: 1.87321
+        L: 5.11133
+    }
+    dim {
+        H: 2.45055
+        W: 2.10637
+        L: 6.02256
+    }
+}
+
+pedestrian {
+    speed_limit: 2.0
+    dim {
+        H: 1.5745
+        W: 0.4945
+        L: 0.4659
+    }
+    dim {
+        H: 1.6574
+        W: 0.5205
+        L: 0.4904
+    }
+    dim {
+        H: 1.7403
+        W: 0.5465
+        L: 0.5149
+    }
+}
+
+trafficcone {
+    speed_limit: 0.0
+    dim {
+        H: 0.50
+        W: 0.25
+        L: 0.25
+    }
+    dim {
+        H: 0.70
+        W: 0.41
+        L: 0.41
+    }
+    dim {
+        H: 0.80
+        W: 0.47
+        L: 0.47
+    }
+}
+
+
