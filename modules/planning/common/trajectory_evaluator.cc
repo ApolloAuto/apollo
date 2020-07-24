@@ -78,20 +78,10 @@ void TrajectoryEvaluator::EvaluateTrajectoryByTime(
     last_relative_time = tp.relative_time();
   }
 
-  int low_bound = 0;
-  int high_bound = 0;
-  if (updated_trajectory.size() == 1) {
-    const double single_point_relative_time =
-        updated_trajectory.front().relative_time();
-    if (single_point_relative_time > 0) {
-      high_bound = floor(single_point_relative_time / delta_time);
-    } else {
-      low_bound = ceil(single_point_relative_time / delta_time);
-    }
-  } else {
-    low_bound = ceil(updated_trajectory.front().relative_time() / delta_time);
-    high_bound = floor(updated_trajectory.back().relative_time() / delta_time);
-  }
+  const int low_bound =
+      ceil(updated_trajectory.front().relative_time() / delta_time);
+  const int high_bound =
+      floor(updated_trajectory.back().relative_time() / delta_time);
   ADEBUG << "frame_num[" << frame_num << "] obstacle_id[" << obstacle_id
          << "] low[" << low_bound << "] high[" << high_bound << "]";
   for (int i = low_bound; i <= high_bound; ++i) {
@@ -280,7 +270,7 @@ void TrajectoryEvaluator::EvaluateObstacleTrajectory(
 
     std::vector<TrajectoryPointFeature> evaluated_trajectory;
     if (fabs(trajectory.front().first - start_point_timestamp_sec) <=
-        delta_time) {
+        delta_time || trajectory.size() == 1) {
       ADEBUG << "too short obstacle_trajectory. frame_num["
              << learning_data_frame->frame_num() << "] obstacle_id["
              << obstacle_id << "] size[" << trajectory.size()
