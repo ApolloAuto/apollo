@@ -20,36 +20,32 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
 . /tmp/installers/installer_base.sh
-
-TARGET_ARCH="$(uname -m)"
-
-## NOTE:
-## buildifier/buildozer was moved into install_bazel.sh.
 
 apt-get -y update && \
     apt-get -y install \
-    cppcheck    \
-    shellcheck  \
-    lcov        \
-    valgrind
+    libunwind-dev \
+    graphviz
 
-# libgoogle-perftools4  # gperftools
-# PROFILER_SO="/usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so"
-# if [ ! -e "${PROFILER_SO}" ]; then
-#    # libgoogle-perftools4: /usr/lib/x86_64-linux-gnu/libprofiler.so.0
-#    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
-# fi
+VERSION="2.8"
+PKG_NAME="gperftools-${VERSION}.tar.gz"
+CHECKSUM="b09193adedcc679df2387042324d0d54b93d35d062ea9bff0340f342a709e860"
+DOWNLOAD_LINK="https://github.com/gperftools/gperftools/archive/${PKG_NAME}"
 
-bash /tmp/installers/install_gperftools.sh
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-## Pylint
-pip3_install pycodestyle \
-    pyflakes \
-    flake8
-# pylint
+tar xzf ${PKG_NAME}
 
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+pushd "gperftools-gperftools-${VERSION}" >/dev/null
+    ./autogen.sh
+    ./configure --prefix=/usr
+    make -j$(nproc)
+    make install
+popd >/dev/null
+
+ldconfig
+
+ok "Successfully installed gperftools-${VERSION}."
+
+# clean up
+rm -rf ${PKG_NAME} "gperftools-gperftools-${VERSION}"
