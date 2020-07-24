@@ -20,10 +20,9 @@
 
 #pragma once
 
+#include <shared_mutex>
 #include <unordered_map>
 #include <vector>
-
-#include <boost/thread/shared_mutex.hpp>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/map_util.h"
@@ -109,22 +108,22 @@ template <typename I, typename T>
 class ThreadSafeIndexedList : public IndexedList<I, T> {
  public:
   T* Add(const I id, const T& object) {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_mutex> writer_lock(mutex_);
     return IndexedList<I, T>::Add(id, object);
   }
 
   T* Find(const I id) {
-    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+    std::shared_lock<std::shared_mutex> reader_lock(mutex_);
     return IndexedList<I, T>::Find(id);
   }
 
   std::vector<const T*> Items() const {
-    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+    std::shared_lock<std::shared_mutex> reader_lock(mutex_);
     return IndexedList<I, T>::Items();
   }
 
  private:
-  mutable boost::shared_mutex mutex_;
+  mutable std::shared_mutex mutex_;
 };
 
 }  // namespace planning

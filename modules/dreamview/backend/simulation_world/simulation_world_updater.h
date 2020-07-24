@@ -21,9 +21,8 @@
 #pragma once
 
 #include <memory>
+#include <shared_mutex>
 #include <string>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
@@ -77,9 +76,7 @@ class SimulationWorldUpdater {
   // frontend.
   static constexpr double kSimWorldTimeIntervalMs = 100;
 
-  double LastAdcTimestampSec() {
-    return last_pushed_adc_timestamp_sec_;
-  }
+  double LastAdcTimestampSec() { return last_pushed_adc_timestamp_sec_; }
 
  private:
   /**
@@ -138,8 +135,7 @@ class SimulationWorldUpdater {
   std::string relative_map_string_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
-  // NOTE: Use boost until we have std version of rwlock support.
-  boost::shared_mutex mutex_;
+  std::shared_mutex mutex_;
 
   std::unique_ptr<cyber::Timer> timer_;
 

@@ -16,8 +16,7 @@
 
 #pragma once
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <shared_mutex>
 
 #include "cyber/cyber.h"
 #include "nlohmann/json.hpp"
@@ -106,8 +105,7 @@ class TeleopService {
   nlohmann::json teleop_status_;
 
   // Mutex to protect concurrent access to teleop_status_.
-  // NOTE: Use boost until we upgrade to std version with rwlock support.
-  boost::shared_mutex mutex_;
+  std::shared_mutex mutex_;
 };
 
 }  // namespace dreamview

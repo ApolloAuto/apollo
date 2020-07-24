@@ -65,7 +65,6 @@ cc_library(
         "//modules/dreamview/backend/perception_camera_updater",
         "//modules/dreamview/backend/sim_control",
         "//modules/routing/proto:poi_cc_proto",
-        "@boost",
     ],
 )
 

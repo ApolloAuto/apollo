@@ -20,9 +20,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <shared_mutex>
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
@@ -106,7 +104,7 @@ class HMIWorker {
   bool status_changed_ = false;
   size_t last_status_fingerprint_{};
   bool stop_ = false;
-  mutable boost::shared_mutex status_mutex_;
+  mutable std::shared_mutex status_mutex_;
   std::future<void> thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
 

@@ -139,7 +139,7 @@ void TeleopService::RegisterMessageHandlers() {
           bool start = false;  // false means stop
           // create a scope for the mutex lock
           {
-            boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+            std::unique_lock<std::shared_mutex> writer_lock(mutex_);
             // toggle depending on current state change
             if (teleop_status_["audio_starting"]) {
               teleop_status_["audio_starting"] = false;
@@ -171,7 +171,7 @@ void TeleopService::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         bool start = false;
         {
-          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          std::unique_lock<std::shared_mutex> writer_lock(mutex_);
           // toggle depending on current state change
           if (teleop_status_["mic_starting"]) {
             teleop_status_["mic_starting"] = false;
@@ -204,7 +204,7 @@ void TeleopService::RegisterMessageHandlers() {
         bool start = false;  // false means stop
         // create a scope for the mutex lock
         {
-          boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
+          std::shared_lock<std::shared_mutex> writer_lock(mutex_);
           // toggle depending on current state change
           if (teleop_status_["video_starting"]) {
             teleop_status_["video_starting"] = false;
@@ -233,20 +233,20 @@ void TeleopService::RegisterMessageHandlers() {
   // Issue pull-over command to remote
   websocket_->RegisterMessageHandler(
       "PullOver", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+        std::shared_lock<std::shared_mutex> reader_lock(mutex_);
         SendPullOverCmd();
       });
   // Issue emergency-stop command to remote
   websocket_->RegisterMessageHandler(
       "EStop", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+        std::shared_lock<std::shared_mutex> reader_lock(mutex_);
         SendEstopCmd();
       });
   // Issue resume-cruise command to remote
   websocket_->RegisterMessageHandler(
       "ResumeCruise",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+        std::shared_lock<std::shared_mutex> reader_lock(mutex_);
         SendResumeCruiseCmd();
       });
   // Request to get updated modem info for client display
@@ -260,7 +260,7 @@ void TeleopService::RegisterMessageHandlers() {
 void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
   std::string to_send;
   {
-    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+    std::shared_lock<std::shared_mutex> reader_lock(mutex_);
     to_send = teleop_status_.dump();
   }
   websocket_->SendData(conn, to_send);
@@ -273,7 +273,7 @@ void TeleopService::UpdateModem(const std::string &modem_id,
   if (modem_info->has_technology()) {
     // teleop_status_["modems"][modem_info->provider()] =
     //  modem_info->technology();
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_mutex> writer_lock(mutex_);
     std::string str;
     std::stringstream ss(str);
     double rx = 1.0 * modem_info->rx() / (1024 * 1024);
@@ -320,7 +320,7 @@ void TeleopService::UpdateCarDaemonRpt(
     bool sendStopAudio = false;
     // scope for the lock
     {
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+      std::unique_lock<std::shared_mutex> writer_lock(mutex_);
       teleop_status_["video"] = videoIsRunning;
       teleop_status_["audio"] = voipIsRunning;
 
@@ -389,7 +389,7 @@ void TeleopService::UpdateOperatorDaemonRpt(
     bool sendStopMic = false;
     // scope for the lock
     {
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+      std::unique_lock<std::shared_mutex> writer_lock(mutex_);
       teleop_status_["mic"] = voipIsRunning;
       // mic currently running
       if (teleop_status_["mic"]) {
@@ -507,7 +507,7 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
   bool sendStop = false;
   bool sendResume = false;
   {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_mutex> writer_lock(mutex_);
     if (pulled_over) {
       if (teleop_status_["pulling_over"]) {
         // pulled over confirmed

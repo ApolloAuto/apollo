@@ -63,14 +63,16 @@ build:opt_gpu --config=opt --config=gpu
 build:cpu_prof --config=cpu
 build:cpu_prof --linkopt=-lprofiler
 
-# Build Apollo with C++ 17 features.
+# Enable C++17 (aka C++1z) by default.
+build --config=c++17
 build:c++17 --cxxopt=-std=c++1z
 # build:c++17 --cxxopt=-stdlib=libc++
 build:c++1z --config=c++17
+build:c++17 --host_cxxopt="-std=c++17"
 
-# Enable C++14 (aka c++1y) by default
-build --cxxopt="-std=c++14"
-build --host_cxxopt="-std=c++14"
+# Build Apollo with C++14 (aka c++1y)
+build:c++14 --cxxopt="-std=c++14"
+build:c++14 --host_cxxopt="-std=c++14"
 
 # +------------------------------------------------------------+
 # | Test Configurations                                        |

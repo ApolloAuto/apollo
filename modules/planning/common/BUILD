@@ -10,8 +10,8 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        "//cyber/common:log",
         "//modules/common/util:map_util",
-        "@boost",
     ],
 )
 
@@ -22,7 +22,6 @@ cc_test(
     deps = [
         ":indexed_list",
         "//modules/common/util",
-        "@boost",
         "@com_google_googletest//:gtest_main",
     ],
 )

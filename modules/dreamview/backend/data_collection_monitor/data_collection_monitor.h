@@ -24,7 +24,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <boost/thread/shared_mutex.hpp>
+#include <shared_mutex>
 
 #include "gtest/gtest_prod.h"
 #include "nlohmann/json.hpp"
@@ -116,8 +116,7 @@ class DataCollectionMonitor {
   nlohmann::json current_progress_json_;
 
   // Mutex to protect concurrent access to current_progress_json_.
-  // NOTE: Use boost until we have std version of rwlock support.
-  boost::shared_mutex mutex_;
+  std::shared_mutex mutex_;
 
   FRIEND_TEST(DataCollectionMonitorTest, UpdateCollectionProgress);
   FRIEND_TEST(DataCollectionMonitorTest, ConstructCategories);

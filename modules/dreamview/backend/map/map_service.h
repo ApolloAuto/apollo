@@ -22,8 +22,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <shared_mutex>
 
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -113,7 +112,7 @@ class MapService {
   double y_offset_ = 0.0;
 
   // RW lock to protect map data
-  mutable boost::shared_mutex mutex_;
+  mutable std::shared_mutex mutex_;
 };
 
 }  // namespace dreamview

@@ -19,6 +19,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_cc_proto",
         "//modules/routing:routing_lib",
+        "@boost",
     ],
 )
 
