@@ -208,7 +208,7 @@ TEST_F(FusedClassifierTest, test_one_shot_fusion) {
   ClassifierOptions options;
   TypeFusionInitOption init_option;
   for (auto& i : instances) {
-    fused_classifier_->one_shot_fuser_.reset(i);
+    fused_classifier_->one_shot_fuser_ = i;
     EXPECT_TRUE(fused_classifier_->one_shot_fuser_->Init(init_option));
     for (size_t n = 0; n < kSequenceLength; ++n) {
       frames_[n].timestamp = timestamps_[n];
@@ -229,7 +229,7 @@ TEST_F(FusedClassifierTest, test_one_sequence_fusion) {
   ClassifierOptions options;
   TypeFusionInitOption init_option;
   for (auto& i : instances) {
-    fused_classifier_->sequence_fuser_.reset(i);
+    fused_classifier_->sequence_fuser_ = i;
     EXPECT_TRUE(fused_classifier_->sequence_fuser_->Init(init_option));
     for (size_t n = 0; n < kSequenceLength; ++n) {
       frames_[n].timestamp = timestamps_[n];
@@ -255,7 +255,7 @@ TEST_F(FusedClassifierTest, test_one_sequence_fusion_bad_timestamp) {
   ClassifierOptions options;
   TypeFusionInitOption init_option;
   for (auto& i : instances) {
-    fused_classifier_->sequence_fuser_.reset(i);
+    fused_classifier_->sequence_fuser_ = i;
     EXPECT_TRUE(fused_classifier_->sequence_fuser_->Init(init_option));
     for (size_t n = 0; n < kSequenceLength; ++n) {
       frames_[n].timestamp = timestamps_[n];
