@@ -20,41 +20,34 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
 . /tmp/installers/installer_base.sh
-
-TARGET_ARCH="$(uname -m)"
-
-## NOTE:
-## buildifier/buildozer was moved into install_bazel.sh.
 
 apt-get -y update && \
     apt-get -y install \
-    cppcheck    \
-    shellcheck  \
-    lcov        \
-    valgrind
+        flex \
+        bison
 
-# libgoogle-perftools4  # gperftools
-# PROFILER_SO="/usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so"
-# if [ ! -e "${PROFILER_SO}" ]; then
-#    # libgoogle-perftools4: /usr/lib/x86_64-linux-gnu/libprofiler.so.0
-#    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
-# fi
+VERSION="1_8_18"
+PKG_NAME="doxygen-Release_${VERSION}.tar.gz"
+CHECKSUM="9c88f733396dca16139483045d5afa5bbf19d67be0b8f0ea43c4e813ecfb2aa2"
+DOWNLOAD_LINK="https://github.com/doxygen/doxygen/archive/Release_${VERSION}.tar.gz"
+# https://github.com/doxygen/doxygen/archive/Release_1_8_18.tar.gz
 
-bash /tmp/installers/install_gperftools.sh
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-# TechDoc generation
-bash /tmp/installers/install_doxygen.sh
+tar xzf "${PKG_NAME}"
+pushd "doxygen-Release_${VERSION}" >/dev/null
+    mkdir build && cd build
+    cmake .. \
+        -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF
 
-# sphinx ?
+    make -j$(nproc)
+    make install
+popd
 
-## Pylint
-pip3_install pycodestyle \
-    pyflakes \
-    flake8
-# pylint
+rm -rf "${PKG_NAME}" "doxygen-Release_${VERSION}"
 
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+VERSION="$(echo ${VERSION} | tr '-' '.')"
+info "Done installing doxygen-${VERSION}"
