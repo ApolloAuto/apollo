@@ -25,7 +25,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt-get -y update && \
     apt-get -y install \
         flex \
-        bison
+        bison \
+        graphviz
 
 VERSION="1_8_18"
 PKG_NAME="doxygen-Release_${VERSION}.tar.gz"
