@@ -18,45 +18,34 @@
 
 # Fail on first error.
 set -e
-
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
 . /tmp/installers/installer_base.sh
 
-TARGET_ARCH="$(uname -m)"
+VERSION="1.5.1"
+PKG_NAME="benchmark-${VERSION}.tar.gz"
+CHECKSUM="23082937d1663a53b90cb5b61df4bcc312f6dee7018da78ba00dd6bd669dfef2"
+DOWNLOAD_LINK="https://github.com/google/benchmark/archive/v${VERSION}.tar.gz"
 
-## NOTE:
-## buildifier/buildozer was moved into install_bazel.sh.
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-apt-get -y update && \
-    apt-get -y install \
-    cppcheck    \
-    shellcheck  \
-    lcov        \
-    valgrind
+tar xzf "${PKG_NAME}"
 
-# libgoogle-perftools4  # gperftools
-# PROFILER_SO="/usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so"
-# if [ ! -e "${PROFILER_SO}" ]; then
-#    # libgoogle-perftools4: /usr/lib/x86_64-linux-gnu/libprofiler.so.0
-#    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
-# fi
+pushd "benchmark-${VERSION}"
+    mkdir build && cd build
+    cmake .. \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+        -DBENCHMARK_ENABLE_LTO=true \
+        -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
 
-bash /tmp/installers/install_gperftools.sh
+    make -j$(nproc)
+    make install
+popd
 
-bash /tmp/installers/install_benchmark.sh
+ldconfig
 
-# TechDoc generation
-bash /tmp/installers/install_doxygen.sh
+ok "Successfully installed benchmark ${VERSION}."
 
-# sphinx ?
+rm -fr "${PKG_NAME}" "benchmark-${VERSION}"
 
-## Pylint
-pip3_install pycodestyle \
-    pyflakes \
-    flake8
-# pylint
-
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
