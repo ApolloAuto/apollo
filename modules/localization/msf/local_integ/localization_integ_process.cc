@@ -105,7 +105,7 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   double cur_system_time = Clock::NowInSeconds();
   static double pre_system_time = cur_system_time;
 
-  double delta_system_time = cur_system_time - pre_imu_time;
+  double delta_system_time = cur_system_time - pre_system_time;
   if (delta_system_time > 0.1) {
     AERROR << std::setprecision(16)
            << "the imu message loss more than 10 according to system time, "
@@ -147,6 +147,7 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   }
 
   pre_imu_time = cur_imu_time;
+  pre_system_time = cur_system_time;
 }
 
 void LocalizationIntegProcess::GetValidFromOK() {
