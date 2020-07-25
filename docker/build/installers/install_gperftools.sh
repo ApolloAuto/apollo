@@ -39,6 +39,7 @@ tar xzf ${PKG_NAME}
 pushd "gperftools-gperftools-${VERSION}" >/dev/null
     ./autogen.sh
     ./configure --prefix=/usr
+    # shared lib only options: --enable-static=no --with-pic=yes
     make -j$(nproc)
     make install
 popd >/dev/null
