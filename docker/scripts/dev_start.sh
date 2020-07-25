@@ -23,7 +23,7 @@ DOCKER_REPO="apolloauto/apollo"
 
 DEV_INSIDE="in-dev-docker"
 
-## TODO(storypku): differentiate HOST_ARCH WITH TARGET_ARCH
+## TODO(all): differentiate HOST_ARCH WITH TARGET_ARCH
 ARCH="$(uname -m)"
 
 LOCAL_IMAGE="no"
@@ -246,7 +246,7 @@ function local_volumes() {
 
 ## customized docker cmd
 function do_docker_image_inspect() {
-    docker image inspect -f {{.Config.Image}} $1 &> /dev/null
+    docker image inspect -f "{{.Config.Image}}" $1 &> /dev/null
     if [ $? -ne 0 ];then
         error "Failed to find local docker image : $1"
         exit 1
@@ -322,10 +322,6 @@ function main() {
     APOLLO_DEV="apollo_dev_${USER}"
     docker ps -a --format "{{.Names}}" | grep "$APOLLO_DEV" 1>/dev/null
     if [ $? == 0 ]; then
-        if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$APOLLO_DEV_IMAGE" ]]; then
-            rm -rf $APOLLO_ROOT_DIR/bazel-*
-            rm -rf ${CACHE_ROOT_DIR}/bazel/*
-        fi
         docker stop $APOLLO_DEV 1>/dev/null
         docker rm -v -f $APOLLO_DEV 1>/dev/null
     fi
