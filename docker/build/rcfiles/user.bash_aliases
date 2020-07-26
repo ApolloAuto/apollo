@@ -26,21 +26,21 @@ alias bt="bazel test  --distdir=/apollo/.cache/distdir"
 
 function inc() {
     local _path="$1"
-    if [[ -d "${_path}" ]]; then
+    if [ -d "${_path}" ]; then
         /bin/grep "#include" -r "${_path}" | awk -F':' '{print $2}' | sort -u
-    elif [[ -f "${_path}" ]]; then
+    elif [ -f "${_path}" ]; then
         /bin/grep "#include" -r "${_path}" | sort -u
     fi
 }
 
 function show_line() {
-    if [[ -z "$1" ]]; then
+    if [ -z "$1" ]; then
         error "No file specified"
         return
     fi
     local sed_cmd
     sed_cmd="$(command -v sed)"
-    if [[ -z "${sed_cmd}" ]]; then
+    if [ -z "${sed_cmd}" ]; then
         error "sed not found in PATH"
         return
     fi
@@ -49,13 +49,13 @@ function show_line() {
     local start_ln=1
     if [[ "${filename_w_ln}" =~ :.* ]]; then
         start_ln="${filename_w_ln##*:}"
-    elif [[ -z "$1" ]]; then
+    elif [ -z "$1" ]; then
         start_ln=1
     else
         start_ln="$1"; shift
     fi
     local line_cnt=9; # 10
-    if [[ -n "$1" ]];  then
+    if [ -n "$1" ];  then
         line_cnt="$1"; shift
     fi
     # '10,33p' print line 10 to line 33
