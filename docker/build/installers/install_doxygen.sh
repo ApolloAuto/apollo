@@ -25,7 +25,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt-get -y update && \
     apt-get -y install \
         flex \
-        bison
+        bison \
+        graphviz \
+        doxygen
+
+exit 0
+
+# Source Build
 
 VERSION="1_8_18"
 PKG_NAME="doxygen-Release_${VERSION}.tar.gz"
@@ -49,5 +55,5 @@ popd
 
 rm -rf "${PKG_NAME}" "doxygen-Release_${VERSION}"
 
-VERSION="$(echo ${VERSION} | tr '-' '.')"
+VERSION="$(echo ${VERSION} | tr '_' '.')"
 info "Done installing doxygen-${VERSION}"
