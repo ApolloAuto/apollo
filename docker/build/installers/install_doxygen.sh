@@ -50,5 +50,5 @@ popd
 
 rm -rf "${PKG_NAME}" "doxygen-Release_${VERSION}"
 
-VERSION="$(echo ${VERSION} | tr '-' '.')"
+VERSION="$(echo ${VERSION} | tr '_' '.')"
 info "Done installing doxygen-${VERSION}"
