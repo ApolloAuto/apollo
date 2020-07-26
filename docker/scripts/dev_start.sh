@@ -84,19 +84,31 @@ EOF
 exit 0
 }
 
-function stop_containers() {
-running_containers=$(docker ps --format "{{.Names}}")
-for i in ${running_containers[*]} ; do
-  if [[ "$i" =~ apollo_* ]];then
-    printf %-*s 70 "stopping container: $i ..."
-    docker stop $i > /dev/null
-    if [ $? -eq 0 ];then
-      printf "\033[32m[DONE]\033[0m\n"
+function stop_all_apollo_containers_for_user() {
+    local force="$1"
+    local running_containers
+    running_containers="$(docker ps -a --format '{{.Names}}')"
+    for container in ${running_containers[*]} ; do
+        if [[ "${container}" =~ apollo_.*_${USER} ]] ; then
+            #printf %-*s 70 "Now stop container: ${container} ..."
+            #printf "\033[32m[DONE]\033[0m\n"
+            #printf "\033[31m[FAILED]\033[0m\n"
+            info "Now stop container ${container} ..."
+            if docker stop "${container}" >/dev/null; then
+                if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
+                    docker rm -f "${container}" >/dev/null
+                fi
+                info "Done."
+            else
+                warning "Failed."
+            fi
+        fi
+    done
+    if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
+        info "OK. Done stop and removal"
     else
-      printf "\033[31m[FAILED]\033[0m\n"
+        info "OK. Done stop."
     fi
-  fi
-done
 }
 
 function set_registry_mirrors()
@@ -182,7 +194,7 @@ while [ $# -gt 0 ] ; do
     -y)
         ;;
     stop)
-        stop_containers
+        stop_all_apollo_containers_for_user "-f"
         exit 0
         ;;
     *)
@@ -246,8 +258,8 @@ function local_volumes() {
 
 ## customized docker cmd
 function do_docker_image_inspect() {
-    docker image inspect -f "{{.Config.Image}}" $1 &> /dev/null
-    if [ $? -ne 0 ];then
+    local img="$1"
+    if ! docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${img}" ; then
         error "Failed to find local docker image : $1"
         exit 1
     fi
