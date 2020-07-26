@@ -302,12 +302,15 @@ cc_test(
 )
 
 cc_library(
+    name = "point",
+    hdrs = ["point.h"],
+)
+
+cc_library(
     name = "point_cloud",
-    hdrs = [
-        "point.h",
-        "point_cloud.h",
-    ],
+    hdrs = ["point_cloud.h"],
     deps = [
+        ":point",
         "@eigen",
     ],
 )
