@@ -60,6 +60,18 @@ cc_test(
 cc_library(
     name = "environment",
     hdrs = ["environment.h"],
+    deps = [
+        "//cyber/common:log",
+    ],
+)
+
+cc_test(
+    name = "environment_test",
+    srcs = ["environment_test.cc"],
+    deps = [
+        ":environment",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 cc_library(
