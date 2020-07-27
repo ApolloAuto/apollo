@@ -28,7 +28,7 @@ bash /tmp/installers/install_proj4.sh
 
 # Required by audio-driver python version
 apt-get -y update && \
-    apt-get -y install python3-pyaudio
+    apt-get -y install python3-pyaudio portaudio19-dev
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
