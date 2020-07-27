@@ -176,6 +176,9 @@ function main() {
         citest)
             env ${APOLLO_ENV} bash "${ci_sh}" "test"
             ;;
+        cilint)
+            env ${APOLLO_ENV} bash "${ci_sh}" "lint"
+            ;;
         check)
             build_test_and_lint
             ;;
