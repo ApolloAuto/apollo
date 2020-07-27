@@ -25,7 +25,7 @@ cc_library(
         "//modules/localization/proto:localization_config_cc_proto",
         "@boost",
         "@com_google_googletest//:gtest_main",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

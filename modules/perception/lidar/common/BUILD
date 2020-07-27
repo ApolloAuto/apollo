@@ -97,7 +97,7 @@ cc_library(
     deps = [
         ":lidar_log",
         "//modules/perception/base",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

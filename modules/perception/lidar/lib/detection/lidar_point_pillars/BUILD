@@ -47,7 +47,7 @@ cc_library(
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
         "@eigen",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
     alwayslink = True,
 )
@@ -133,7 +133,7 @@ cc_test(
         "@boost",
         "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

@@ -22,7 +22,7 @@ cc_library(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_github_nlohmann_json//:json",
         "@com_google_protobuf//:protobuf",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

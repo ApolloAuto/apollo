@@ -25,7 +25,7 @@ cc_library(
         "//modules/localization/proto:measure_cc_proto",
         "@boost",
         "@eigen",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 
@@ -38,7 +38,7 @@ cc_binary(
         "//cyber",
         "@boost",
         "@eigen",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

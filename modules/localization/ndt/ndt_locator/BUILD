@@ -25,7 +25,7 @@ cc_library(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@eigen",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 
