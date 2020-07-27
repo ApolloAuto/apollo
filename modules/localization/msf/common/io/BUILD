@@ -11,7 +11,7 @@ cc_library(
         "//cyber",
         "//modules/common/util:eigen_defs",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

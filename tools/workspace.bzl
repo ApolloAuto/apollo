@@ -24,7 +24,6 @@ load("//third_party/nlohmann_json:workspace.bzl", nlohmann_json = "repo")
 load("//third_party/npp:workspace.bzl", npp = "repo")
 load("//third_party/opencv:workspace.bzl", opencv = "repo")
 load("//third_party/osqp:workspace.bzl", osqp = "repo")
-load("//third_party/pcl:workspace.bzl", pcl = "repo")
 load("//third_party/poco:workspace.bzl", poco = "repo")
 load("//third_party/proj4:workspace.bzl", proj4 = "repo")
 load("//third_party/protobuf:workspace.bzl", protobuf = "repo")
@@ -41,6 +40,7 @@ load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
 load("//third_party/py:python_configure.bzl", "python_configure")
 load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
+load("//third_party/pcl:pcl_configure.bzl", "pcl_configure")
 
 def initialize_third_party():
     """ Load third party repositories.  See above load() statements. """
@@ -71,7 +71,6 @@ def initialize_third_party():
     npp()
     opencv()
     osqp()
-    pcl()
     poco()
     proj4()
     protobuf()
@@ -89,5 +88,6 @@ def apollo_repositories():
     tensorrt_configure(name = "local_config_tensorrt")
     python_configure(name = "local_config_python")
     vtk_configure(name = "local_config_vtk")
+    pcl_configure(name = "local_config_pcl")
 
     initialize_third_party()

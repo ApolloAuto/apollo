@@ -31,7 +31,7 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@eigen",
         "@local_config_vtk//:vtk",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

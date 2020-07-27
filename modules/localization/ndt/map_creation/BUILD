@@ -17,7 +17,7 @@ cc_binary(
         "@boost",
         "@eigen",
         "@opencv",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 
