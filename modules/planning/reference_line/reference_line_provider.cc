@@ -196,6 +196,7 @@ void ReferenceLineProvider::GenerateThread() {
     }
     std::list<ReferenceLine> reference_lines;
     std::list<hdmap::RouteSegments> segments;
+    is_reference_line_updated_ = true;
     if (!CreateReferenceLine(&reference_lines, &segments)) {
       is_reference_line_updated_ = false;
       AERROR << "Fail to get reference line";
