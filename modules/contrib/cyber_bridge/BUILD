@@ -8,8 +8,8 @@ cc_binary(
     srcs = ["bridge.cc"],
     deps = [
         ":bridge_server",
-        "//external:gflags",
         "@boost",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
