@@ -21,6 +21,7 @@ cc_binary(
     deps = [
         ":lane_common",
         "//cyber",
+        "//modules/common/time:timer",
         "//modules/common/util:string_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",

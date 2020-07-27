@@ -25,7 +25,7 @@
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/tools/lane_detection/lane_common.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/utils/timer.h"
+#include "modules/common/time/timer.h"
 
 namespace apollo {
 namespace perception {
@@ -156,7 +156,7 @@ int lane_postprocessor_eval() {
         pitch_angle);
     frame.calibration_service = calibration_service.get();
     // Detect the lane image
-    lib::Timer timer;
+    apollo::common::time timer;
     timer.Start();
     detector->Detect(detetor_options, &frame);
     AINFO << "Detector finished!";
