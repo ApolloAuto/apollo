@@ -75,7 +75,7 @@ def _vtk_match_version(repository_ctx, sysroot_dir = None):
     for solib in lib_result.split("\n"):
         libpath = dirname(solib)
         version = basename(solib).rstrip(".so").split("-")[-1]
-        prefix = solib[:solib.find("/lib/")]
+        prefix = solib[:solib.rfind("/lib/")]
         libdict[solib] = (libpath, version, prefix)
 
     prefix_dirs = ["/usr", "/usr/local"]
