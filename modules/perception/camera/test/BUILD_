@@ -108,7 +108,8 @@ cc_library(
 #    srcs = ["camera_common_undistortion_handler_test.cc"],
 #    deps = [
 #        ":camera_common_io_util",
-#        ":camera_common_undistortion",
+#        "//modules/common/time:timer",
+#        "//modules/common/camera/common:undistortion_handler",
 #        "//modules/perception/camera/common:undistortion_handler",
 #        "//modules/perception/inference:inference_factory",
 #        "//modules/perception/inference/operators:perception_inference_operators",
