@@ -397,8 +397,7 @@ TEST(TestSuite, CheckPreprocessGPU) {
   apollo::perception::benchmark::PointCloudPtr org_cloud_ptr(
       new pcl::PointCloud<apollo::perception::benchmark::PointXYZIL>);
   std::string file_name =
-      "/apollo/modules/perception/testdata/lidar/app/data/perception/"
-      "lidar/files/0001_00.pcd";
+      "/apollo/modules/perception/testdata/lidar/app/data/0001_00.pcd";
 
   bool ret = apollo::perception::benchmark::load_pcl_pcds_xyzit(file_name,
                                                                 org_cloud_ptr);
@@ -630,8 +629,7 @@ TEST(TestSuite, CheckDoInference) {
   apollo::perception::benchmark::PointCloudPtr org_cloud_ptr(
       new pcl::PointCloud<apollo::perception::benchmark::PointXYZIL>);
   std::string file_name =
-      "/apollo/modules/perception/testdata/lidar/app/data/perception/"
-      "lidar/files/0001_00.pcd";
+      "/apollo/modules/perception/testdata/lidar/app/data/0001_00.pcd";
 
   bool ret = apollo::perception::benchmark::load_pcl_pcds_xyzit(file_name,
                                                                 org_cloud_ptr);
