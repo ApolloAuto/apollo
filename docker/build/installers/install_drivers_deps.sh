@@ -21,14 +21,16 @@ set -e
 MY_MODE="$1"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. /tmp/installers/installer_base.sh
 
 bash /tmp/installers/install_opencv.sh
 bash /tmp/installers/install_adv_plat.sh "${MY_MODE}"
 bash /tmp/installers/install_proj4.sh
 
-# Required by audio-driver python version
-apt-get -y update && \
-    apt-get -y install python3-pyaudio portaudio19-dev
+# Required by python audio driver
+apt_get_update_and_install \
+    python3-pyaudio \
+    portaudio19-dev
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
