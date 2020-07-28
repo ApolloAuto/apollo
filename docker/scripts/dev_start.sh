@@ -81,6 +81,7 @@ OPTIONS:
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
     -n,                    Do not pull docker image.
+    -y,                    Agree to the license agreement.
     stop                   Stop all running Apollo containers.
 EOF
 exit 0
