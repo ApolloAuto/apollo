@@ -19,8 +19,6 @@
 # Fail on first error.
 set -e
 
-INSTALL_MODE=$1; shift;
-
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
@@ -35,8 +33,7 @@ bash /tmp/installers/install_osqp.sh
 info "Install qpOASES ..."
 bash /tmp/installers/install_qp_oases.sh
 
-apt-get -y update && \
-    apt-get -y install libsqlite3-dev
+apt_get_update_and_install libsqlite3-dev
 
 #######################################################
 
@@ -71,7 +68,6 @@ apt-get -y update && \
     libtinyxml2-dev
 
 # CUDA & nlohmann/json
-
 #######################################################
 
 COMPONENT="modules/monitor"
@@ -80,18 +76,14 @@ info "Install support for [${COMPONENT}] ..."
 if dpkg -l | grep -q "linux-libc-dev"; then
     info "linux-libc-dev already installed"
 else
-    apt-get -y update && \
-        ap-get -y install \
-        linux-libc-dev
+    apt_get_update_and_install linux-libc-dev
 fi
 
 #######################################################
 COMPONENT="modules/localization"
 info "Install support for [${COMPONENT}] ..."
 
-apt-get -y update && \
-    apt-get -y install \
-    liblz4-dev
+apt_get_update_and_install liblz4-dev
 
 #######################################################
 COMPONENT="modules/tools"
@@ -103,11 +95,12 @@ bash /tmp/installers/install_python_modules.sh
 # modules/storytelling
 # modules/routing
 
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 ######################################################
 COMPONENT="modules/teleop"
 info "Install support for [${COMPONENT}] ..."
 bash /tmp/installers/install_openh264.sh
+
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
