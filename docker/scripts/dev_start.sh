@@ -38,8 +38,7 @@ USER_AGREE="no"
 DOCKER_RUN="docker run"
 USE_GPU=0
 # Check whether user has agreed license agreement
-function check_agreement() 
-{
+function check_agreement() {
     agreement_record="${HOME}/.apollo_agreement.txt"
     if [ -e "$agreement_record" ]; then
         return
@@ -51,14 +50,14 @@ function check_agreement()
         exit 1
     fi
 
-    cat $AGREEMENT_FILE
-    tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-    echo $tip
     if [ "$USER_AGREE" == "yes" ]; then
         cp $AGREEMENT_FILE $agreement_record
         echo "$tip" >> $agreement_record
         echo "$user_agreed" >> $agreement_record
     else
+        cat $AGREEMENT_FILE
+        tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+        echo $tip
         read -n 1 user_agreed
         if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
             cp $AGREEMENT_FILE $agreement_record
@@ -70,8 +69,7 @@ function check_agreement()
     fi
 }
 
-function show_usage()
-{
+function show_usage(){
 cat <<EOF
 Usage: $(basename $0) [options] ...
 OPTIONS:
@@ -81,13 +79,13 @@ OPTIONS:
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
     -n,                    Do not pull docker image.
+    -y,                    Agree to the license agreement.
     stop                   Stop all running Apollo containers.
 EOF
 exit 0
 }
 
-function stop_all_apollo_containers_for_user() 
-{
+function stop_all_apollo_containers_for_user() {
     local force="$1"
     local running_containers
     running_containers="$(docker ps -a --format '{{.Names}}')"
@@ -114,14 +112,12 @@ function stop_all_apollo_containers_for_user()
     fi
 }
 
-function set_registry_mirrors()
-{
+function set_registry_mirrors(){
     sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
     service docker restart
 }
 
-function init()
-{
+function init(){
     source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
     if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
         sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
@@ -145,8 +141,7 @@ function init()
     OTHER_VOLUME_CONF=""
 }
 
-function parse_arguments()
-{
+function parse_arguments(){
     while [ $# -gt 0 ] ; do
         case "$1" in
         -image)
@@ -227,8 +222,7 @@ function parse_arguments()
     LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
 }
 
-function local_volumes() 
-{
+function local_volumes() {
     set +x
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo"
@@ -322,7 +316,7 @@ function determine_gpu_use() {
 
 function main() {
     init
-    parse_arguments
+    parse_arguments "$@"
     check_agreement
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $APOLLO_DEV_IMAGE"
