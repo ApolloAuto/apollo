@@ -31,6 +31,3 @@ utm
 opencv-python
 numpy
 scipy
-
-# Libtorch-gpu dependency
-mkl 
