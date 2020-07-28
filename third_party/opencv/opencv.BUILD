@@ -11,6 +11,7 @@ cc_library(
     name = "opencv",
     includes = ["."],
     linkopts = [
+        "-L/opt/apollo/sysroot/lib",
         "-lopencv_core",
         "-lopencv_highgui",
         "-lopencv_imgproc",
