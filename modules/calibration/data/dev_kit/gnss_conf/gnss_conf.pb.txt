@@ -2,7 +2,7 @@ data {
     format: NOVATEL_BINARY
     serial {
         device: "/dev/ttyACM0"
-        baud_rate: 460800
+        baud_rate: 115200
     }
 }
 
