@@ -34,7 +34,8 @@ export APOLLO_LD_FILE="/etc/ld.so.conf.d/apollo.conf"
 export DOWNLOAD_LOG="/opt/apollo/build.log"
 export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 
-export SUPPORTED_NVIDIA_SMS="6.0 6.1 7.0 7.2 7.5"
+# export SUPPORTED_NVIDIA_SMS="5.0 5.2 6.0 6.1 7.0 7.2 7.5"
+export SUPPORTED_NVIDIA_SMS="5.0 6.0 6.1 7.0 7.2 7.5"
 
 function py3_version() {
     local version
