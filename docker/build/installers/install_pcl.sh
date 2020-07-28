@@ -42,17 +42,25 @@ fi
 
 info "GPU Options for PCL:\"${GPU_OPTIONS}\""
 
+TARGET_ARCH="$(uname -m)"
+ARCH_OPTIONS=""
+if [ "${TARGET_ARCH}" = "x86_64" ]; then
+    ARCH_OPTIONS="-DPCL_ENABLE_SSE=ON"
+else
+    ARCH_OPTIONS="-DPCL_ENABLE_SSE=OFF"
+fi
+
 # libpcap-dev
 # libopenmpi-dev
 # libboost-all-dev
-apt-get -y update && \
-    apt-get -y install \
+apt_get_update_and_install \
     libeigen3-dev \
     libflann-dev \
     libglew-dev \
     libglfw3-dev \
     freeglut3-dev \
     libusb-1.0-0-dev \
+    libopenni-dev \
     libjpeg-dev \
     libpng-dev
 
@@ -75,12 +83,21 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_NAME}
 
 # Ref: https://src.fedoraproject.org/rpms/pcl.git
+#  -DPCL_PKGCONFIG_SUFFIX:STRING="" \
+#  -DCMAKE_SKIP_RPATH=ON \
+
 pushd pcl-pcl-${VERSION}/
     patch -p1 < /tmp/installers/pcl-sse-fix-${VERSION}.patch
     mkdir build && cd build
     cmake .. \
         "${GPU_OPTIONS}" \
+        "${ARCH_OPTIONS}" \
         -DPCL_ENABLE_SSE=ON \
+        -DWITH_DOCS=OFF \
+        -DWITH_TUTORIALS=OFF \
+        -DBUILD_documentation=OFF \
+        -DBUILD_global_tests=OFF \
+        -DOPENNI_INCLUDE_DIR:PATH=/usr/include/ni \
         -DBoost_NO_SYSTEM_PATHS=TRUE \
         -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
         -DBUILD_SHARED_LIBS=ON \
