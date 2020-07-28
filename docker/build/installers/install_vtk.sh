@@ -31,9 +31,11 @@ apt_get_update_and_install \
         libexpat1-dev \
         zlib1g-dev \
         liblz4-dev \
-        libsqlite3-dev
-
-bash /tmp/installers/install_proj4.sh
+        libdouble-conversion-dev \
+        libsqlite3-dev \
+        libglew-dev \
+        libfreetype6-dev \
+        libhdf5-dev
 
 if ldconfig -p | grep -q libvtkCommonCore ; then
     info "Found existing VTK installation. Skip re-installing."
@@ -46,7 +48,9 @@ TARGET_ARCH="$(uname -m)"
 # Although VTK can be installed via apt, build it from source to
 #   1) reduce image size
 #   2) avoid a lot of dependencies
-# RTFM: https://vtk.org/Wiki/VTK/Building/Linux
+# RTFM:
+# 1) https://src.fedoraproject.org/rpms/vtk/blob/master/f/vtk.spec
+# 2) https://vtk.org/Wiki/VTK/Building/Linux
 
 VERSION=8.2.0
 PKG_NAME="VTK-8.2.0.tar.gz"
@@ -62,6 +66,7 @@ tar xzf ${PKG_NAME}
 pushd VTK-${VERSION}
     mkdir build && cd build
     cmake .. \
+        -DVTK_USE_SYSTEM_LIBRARIES=ON \
         -DVTK_USE_SYSTEM_JPEG=ON  \
         -DVTK_USE_SYSTEM_PNG=ON   \
         -DVTK_USE_SYSTEM_TIFF=ON \
@@ -73,6 +78,11 @@ pushd VTK-${VERSION}
         -DVTK_USE_SYSTEM_EXPAT=ON \
         -DVTK_USE_SYSTEM_LIBPROJ=ON \
         -DVTK_USE_SYSTEM_SQLITE=ON \
+        -DVTK_USE_SYSTEM_PUGIXML=OFF \
+        -DVTK_USE_SYSTEM_NETCDF=OFF \
+        -DVTK_USE_SYSTEM_GL2PS=OFF \
+        -DVTK_USE_SYSTEM_LIBHARU=OFF \
+        -DVTK_USE_SYSTEM_JSONCPP=OFF \
         -DVTK_Group_Qt=OFF \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
