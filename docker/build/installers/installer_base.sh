@@ -44,6 +44,16 @@ function py3_version() {
     echo "${version%.*}"
 }
 
+function pip3_install() {
+    python3 -m pip install --no-cache-dir $@
+}
+
+function apt_get_update_and_install() {
+    # --fix-missing
+    apt-get -y update && \
+        apt-get -y install --no-install-recommends "$@"
+}
+
 # Ref: https://reproducible-builds.org/docs/source-date-epoch
 function source_date_epoch_setup() {
     DATE_FMT="+%Y-%m-%d"
@@ -118,10 +128,6 @@ function create_so_symlink() {
         ln -s "${mylib}" "${mydir}/${libX}.so.${arr[0]}"
         ln -s "${mylib}" "${mydir}/${libX}.so"
     done
-}
-
-function pip3_install() {
-    python3 -m pip install --no-cache-dir $@
 }
 
 function _local_http_cached() {
