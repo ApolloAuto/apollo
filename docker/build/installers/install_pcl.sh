@@ -14,9 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 # Fail on first error.
 set -e
+
+WORKHORSE="$1"
+if [ -z "${WORKHORSE}" ]; then
+    WORKHORSE="cpu"
+fi
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
@@ -31,7 +35,15 @@ if ldconfig -p | grep -q libpcl_common ; then
     exit 0
 fi
 
+GPU_OPTIONS="-DCUDA_ARCH_BIN=\"${SUPPORTED_NVIDIA_SMS}\""
+if [ "${WORKHORSE}" = "cpu" ]; then
+    GPU_OPTIONS="-DWITH_CUDA=OFF"
+fi
+
+info "GPU Options for PCL:\"${GPU_OPTIONS}\""
+
 # libpcap-dev
+# libopenmpi-dev
 # libboost-all-dev
 apt-get -y update && \
     apt-get -y install \
@@ -41,9 +53,8 @@ apt-get -y update && \
     libglfw3-dev \
     freeglut3-dev \
     libusb-1.0-0-dev \
-    libopenmpi-dev \
-    libpng-dev \
-    libjpeg-dev
+    libjpeg-dev \
+    libpng-dev
 
 # NOTE(storypku)
 # libglfw3-dev depends on libglfw3,
@@ -60,48 +71,29 @@ PKG_NAME="pcl-${VERSION}.tar.gz"
 
 DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
 
-ARCH=$(uname -m)
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+tar xzf ${PKG_NAME}
 
-if [[ "$ARCH" == "x86_64" ]]; then
-    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-    tar xzf ${PKG_NAME}
+# Ref: https://src.fedoraproject.org/rpms/pcl.git
+pushd pcl-pcl-${VERSION}/
+    patch -p1 < /tmp/installers/pcl-sse-fix-${VERSION}.patch
+    mkdir build && cd build
+    cmake .. \
+        "${GPU_OPTIONS}" \
+        -DPCL_ENABLE_SSE=ON \
+        -DBoost_NO_SYSTEM_PATHS=TRUE \
+        -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+        -DCMAKE_BUILD_TYPE=Release
+    make -j${THREAD_NUM}
+    make install
+popd
 
-    # Ref: https://src.fedoraproject.org/rpms/pcl.git
-    pushd pcl-pcl-${VERSION}/
-        patch -p1 < /tmp/installers/pcl-sse-fix-${VERSION}.patch
-        mkdir build && cd build
+ldconfig
 
-        # -DCUDA_ARCH_BIN="${SUPPORTED_NVIDIA_SMS}"
-        cmake .. \
-            -DWITH_CUDA=OFF \
-            -DPCL_ENABLE_SSE=ON \
-            -DBoost_NO_SYSTEM_PATHS=TRUE \
-            -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
-            -DBUILD_SHARED_LIBS=ON \
-            -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
-            -DCMAKE_BUILD_TYPE=Release
-        make -j${THREAD_NUM}
-        make install
-    popd
-
-    ldconfig
-    #clean up
-    rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
-else
-    # aarch64 prebuilt package
-    wget https://apollocache.blob.core.windows.net/apollo-cache/pcl.zip
-    unzip pcl.zip
-
-    pushd pcl/
-        mkdir -p /usr/local/include/pcl-1.7/
-        cd include
-        cp -r pcl /usr/local/include/pcl-1.7/
-        cd ../
-        cp -r lib /usr/local/
-    popd
-    #clean up
-    rm -fr pcl.zip pcl
-fi
+#clean up
+rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
