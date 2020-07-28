@@ -15,10 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 # Fail on first error.
 set -e
+
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
 warning "Pre-installed packages for pept not-ready."
+
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

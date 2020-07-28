@@ -25,10 +25,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt-get -y update && \
     apt-get -y install \
     git \
-    vim
+    vim \
+    silversearcher-ag
 
 # More:
-# silversearcher-ag
 # lrzsz
 
 bash /tmp/installers/install_bosfs.sh
