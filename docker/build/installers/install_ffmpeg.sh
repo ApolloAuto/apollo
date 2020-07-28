@@ -22,9 +22,10 @@ set -e
 cd $( dirname "${BASH_SOURCE[0]}")
 
 # References
-# 1) https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
-# 2) https://linuxize.com/post/how-to-install-ffmpeg-on-ubuntu-18-04
-# 3) https://launchpad.net/~savoury1/+archive/ubuntu/ffmpeg4
+# 1) http://www.linuxfromscratch.org/blfs/view/svn/multimedia/ffmpeg.html
+# 2) https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
+# 3) https://linuxize.com/post/how-to-install-ffmpeg-on-ubuntu-18-04
+# 4) https://launchpad.net/~savoury1/+archive/ubuntu/ffmpeg4
 # We choose 1) in this script
 # cat > /etc/apt/sources.list.d/ffmpeg4.list <<EOF
 # deb http://ppa.launchpad.net/savoury1/ffmpeg4/ubuntu bionic main
@@ -36,44 +37,60 @@ apt-get -y update && \
     nasm \
     yasm \
     libx265-dev \
+    libass-dev \
+    libfdk-aac-dev \
+    libmp3lame-dev \
+    libopus-dev \
+    libtheora-dev \
+    libvorbis-dev \
+    libvpx-dev \
+    libx264-dev \
     libnuma-dev
 
 . /tmp/installers/installer_base.sh
 
-VERSION="4.2.2"
-PKG_NAME="ffmpeg-${VERSION}.tar.gz"
-CHECKSUM="5447ca061444e574dc0d5e6da1657f49a64a0e660403995c7744beee3e69b2b8"
-DOWNLOAD_LINK="https://github.com/FFmpeg/FFmpeg/archive/n${VERSION}.tar.gz"
-# https://github.com/FFmpeg/FFmpeg/archive/n4.2.2.tar.gz
+VERSION="4.3.1"
+PKG_NAME="ffmpeg-${VERSION}.tar.xz"
+CHECKSUM="ad009240d46e307b4e03a213a0f49c11b650e445b1f8be0dda2a9212b34d2ffb"
+DOWNLOAD_LINK="http://ffmpeg.org/releases/ffmpeg-${VERSION}.tar.xz"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-tar xzf ${PKG_NAME} && mv "FFmpeg-n${VERSION}" ffmpeg
-
-# Unused options
-# --pkg-config-flags="--static"
-
-pushd ffmpeg
+tar xJf ${PKG_NAME}
+pushd ffmpeg-${VERSION}
+    sed -i 's/-lflite"/-lflite -lasound"/' configure
     ./configure \
-    --prefix=${SYSROOT_DIR} \
-    --extra-libs="-lpthread -lm" \
-    --enable-shared \
-    --enable-pic \
-    --enable-gpl \
-    --enable-libx265 \
-    --enable-nonfree
+        --prefix=${SYSROOT_DIR} \
+        --extra-libs="-lpthread -lm" \
+        --enable-gpl        \
+        --enable-version3   \
+        --enable-nonfree    \
+        --disable-static    \
+        --enable-shared     \
+        --disable-debug     \
+        --enable-avresample \
+        --enable-libass     \
+        --enable-libfdk-aac \
+        --enable-libfreetype \
+        --enable-libmp3lame \
+        --enable-libopus    \
+        --enable-libtheora  \
+        --enable-libvorbis  \
+        --enable-libvpx     \
+        --enable-libx264    \
+        --enable-libx265    \
+        --enable-nonfree
     make -j$(nproc)
     make install
 popd
 
 ldconfig
 
-rm -fr ${PKG_NAME} ffmpeg
+rm -fr ${PKG_NAME} ffmpeg-${VERSION}
 
 apt-get -y update && \
-    apt-get -y autoremove \
+    apt-get -y purge --autoremove \
     nasm \
-    yasm \
-    libx265-dev
+    yasm
 
 # Don't remove libnuma-dev!
 
