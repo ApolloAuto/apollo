@@ -27,10 +27,10 @@ apt-get -y update && \
     gfortran-7
 
 # Ref: https://www.open-mpi.org/software/ompi/v4.0/
-VERSION=4.0.3
-PKG_NAME="openmpi-4.0.3.tar.bz2"
+VERSION="4.0.4"
+PKG_NAME="openmpi-${VERSION}.tar.bz2"
+CHECKSUM="47e24eb2223fe5d24438658958a313b6b7a55bb281563542e1afc9dec4a31ac4"
 DOWNLOAD_LINK="https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-${VERSION}.tar.bz2"
-CHECKSUM="1402feced8c3847b3ab8252165b90f7d1fa28c23b6b2ca4632b6e4971267fd03"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xjf "${PKG_NAME}"
