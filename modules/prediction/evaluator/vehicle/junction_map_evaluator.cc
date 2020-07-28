@@ -80,7 +80,7 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
   // Build input features for torch
   std::vector<torch::jit::IValue> torch_inputs;
   // Process the feature_map
-  cv::cvtColor(feature_map, feature_map, CV_BGR2RGB);
+  cv::cvtColor(feature_map, feature_map, cv::COLOR_BGR2RGB);
   cv::Mat img_float;
   feature_map.convertTo(img_float, CV_32F, 1.0 / 255);
   torch::Tensor img_tensor = torch::from_blob(img_float.data, {1, 224, 224, 3});

@@ -84,7 +84,7 @@ int evaluate_image_list() {
   // Main loop
   for (size_t i = 0; i < img_list.size(); ++i) {
     std::string image_path = img_list[i] + FLAGS_image_ext;
-    cv::Mat img = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+    cv::Mat img = cv::imread(image_path, cv::IMAGE_COLOR);
     cv::Mat img_org;
 
     img.copyTo(img_org);

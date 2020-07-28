@@ -162,7 +162,7 @@ void PerceptionCameraUpdater::OnImage(
 
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
-  cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);
+  cv::Mat mat_image = cv::imdecode(compressed_raw_data, cv::IMREAD_COLOR);
   const int width = mat_image.cols;
   const int height = mat_image.rows;
 
@@ -171,7 +171,7 @@ void PerceptionCameraUpdater::OnImage(
   cv::resize(mat_image, mat_image,
              cv::Size(static_cast<int>(mat_image.cols * kImageScale),
                       static_cast<int>(mat_image.rows * kImageScale)),
-             0, 0, CV_INTER_LINEAR);
+             0, 0, cv::INTER_LINEAR);
   std::vector<uint8_t> tmp_buffer;
   cv::imencode(".jpg", mat_image, tmp_buffer, std::vector<int>() /* params */);
 
