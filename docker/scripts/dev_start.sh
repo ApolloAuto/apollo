@@ -268,17 +268,22 @@ function do_docker_image_inspect() {
 function do_docker_pull() {
     IMG=$1
     if [ "$NO_PULL_IMAGE" = "yes" ];then
-        echo "Skipping pull docker image for $IMG"
+        info "Skipping pull docker image for $IMG"
         # check for local existence if we skip
         do_docker_image_inspect $IMG
     else
-        info "Start pulling docker image $IMG ..."
-        docker pull $IMG
-        if [ $? -ne 0 ];then
-            error "Failed to pull docker image : $IMG"
-            exit 1
+        docker images --format "{{.Repository}}:{{.Tag}}" | grep "^${IMG}$" > /dev/null
+        if [ $? -eq 0 ]; then
+            info "The lastest Image ${IMG} exists."
+        else 
+            info "Start pulling docker image $IMG ..."
+            docker pull $IMG
+            if [ $? -ne 0 ];then
+                error "Failed to pull docker image : $IMG"
+                exit 1
+            fi
         fi
-    fi
+    fi  
 }
 
 DOCKER_RUN="docker run"
