@@ -35,37 +35,39 @@ VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 NO_PULL_IMAGE=""
 USER_AGREE="no"
-
+DOCKER_RUN="docker run"
+USE_GPU=0
 # Check whether user has agreed license agreement
-function check_agreement() {
-  agreement_record="${HOME}/.apollo_agreement.txt"
-  if [ -e "$agreement_record" ]; then
-    return
-  fi
-
-  AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
-  if [ ! -e "$AGREEMENT_FILE" ]; then
-    error "AGREEMENT $AGREEMENT_FILE does not exist."
-    exit 1
-  fi
-
-  cat $AGREEMENT_FILE
-  tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-  echo $tip
-  if [ "$USER_AGREE" == "yes" ]; then
-    cp $AGREEMENT_FILE $agreement_record
-    echo "$tip" >> $agreement_record
-    echo "$user_agreed" >> $agreement_record
-  else
-    read -n 1 user_agreed
-    if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
-      cp $AGREEMENT_FILE $agreement_record
-      echo "$tip" >> $agreement_record
-      echo "$user_agreed" >> $agreement_record
-    else
-      exit 1
+function check_agreement() 
+{
+    agreement_record="${HOME}/.apollo_agreement.txt"
+    if [ -e "$agreement_record" ]; then
+        return
     fi
-  fi
+
+    AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
+    if [ ! -e "$AGREEMENT_FILE" ]; then
+        error "AGREEMENT $AGREEMENT_FILE does not exist."
+        exit 1
+    fi
+
+    cat $AGREEMENT_FILE
+    tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
+    echo $tip
+    if [ "$USER_AGREE" == "yes" ]; then
+        cp $AGREEMENT_FILE $agreement_record
+        echo "$tip" >> $agreement_record
+        echo "$user_agreed" >> $agreement_record
+    else
+        read -n 1 user_agreed
+        if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
+            cp $AGREEMENT_FILE $agreement_record
+            echo "$tip" >> $agreement_record
+            echo "$user_agreed" >> $agreement_record
+        else
+            exit 1
+        fi
+    fi
 }
 
 function show_usage()
@@ -84,7 +86,8 @@ EOF
 exit 0
 }
 
-function stop_all_apollo_containers_for_user() {
+function stop_all_apollo_containers_for_user() 
+{
     local force="$1"
     local running_containers
     running_containers="$(docker ps -a --format '{{.Names}}')"
@@ -113,119 +116,119 @@ function stop_all_apollo_containers_for_user() {
 
 function set_registry_mirrors()
 {
-sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
-service docker restart
+    sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
+    service docker restart
 }
 
-if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
-    sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
-fi
+function init()
+{
+    source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+    if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
+        sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
+    fi
 
-if [ -e /proc/sys/kernel ]; then
-    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
-fi
+    if [ -e /proc/sys/kernel ]; then
+        echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+    fi
+    VOLUME_VERSION="latest"
+    DEFAULT_MAPS=(
+    sunnyvale_big_loop
+    sunnyvale_loop
+    sunnyvale_with_two_offices
+    san_mateo
+    )
+    DEFAULT_TEST_MAPS=(
+    sunnyvale_big_loop
+    sunnyvale_loop
+    )
+    MAP_VOLUME_CONF=""
+    OTHER_VOLUME_CONF=""
+}
 
-if [ "$1" == "-y" ]; then
-    USER_AGREE="yes"
-fi
-
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
-check_agreement
-
-VOLUME_VERSION="latest"
-DEFAULT_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-  sunnyvale_with_two_offices
-  san_mateo
-)
-DEFAULT_TEST_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-)
-MAP_VOLUME_CONF=""
-OTHER_VOLUME_CONF=""
-
-while [ $# -gt 0 ] ; do
-    case "$1" in
-    -image)
-        echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
-        show_usage
-        ;;
-    -t|--tag)
-        VAR=$1
-        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $VAR with $VERSION_OPT, only the last one will take effect.\n"
+function parse_arguments()
+{
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+        -image)
+            echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
+            show_usage
+            ;;
+        -t|--tag)
+            VAR=$1
+            [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $VAR with $VERSION_OPT, only the last one will take effect.\n"
+            shift
+            VERSION_OPT=$1
+            [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
+            [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
+            ;;
+        dev-*) # keep backward compatibility, should be removed from further version.
+            [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $1 with -t/--tag, only the last one will take effect.\n"
+            VERSION_OPT=$1
+            echo -e "\033[93mWarning\033[0m: You are using an old style command line option which may be removed from"
+            echo -e "further versoin, please use -t <version> instead.\n"
+            ;;
+        -b|--fast-build)
+            FAST_BUILD_MODE="yes"
+            ;;
+        -c|--china)
+            set_registry_mirrors
+            ;;
+        -f|--fast-test)
+            FAST_TEST_MODE="yes"
+            ;;
+        -h|--help)
+            show_usage
+            ;;
+        -l|--local)
+            LOCAL_IMAGE="yes"
+            ;;
+        --map)
+            map_name=$2
+            shift
+            source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
+                "${map_name}" "${VOLUME_VERSION}"
+            ;;
+        -n)
+            NO_PULL_IMAGE="yes"
+            info "running without pulling docker image"
+            ;;
+        -y)
+            USER_AGREE="yes"
+            ;;
+        stop)
+            stop_all_apollo_containers_for_user "-f"
+            exit 0
+            ;;
+        *)
+            echo -e "\033[93mWarning\033[0m: Unknown option: $1"
+            exit 2
+            ;;
+        esac
         shift
-        VERSION_OPT=$1
-        [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
-        [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
-        ;;
-    dev-*) # keep backward compatibility, should be removed from further version.
-        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $1 with -t/--tag, only the last one will take effect.\n"
-        VERSION_OPT=$1
-        echo -e "\033[93mWarning\033[0m: You are using an old style command line option which may be removed from"
-        echo -e "further versoin, please use -t <version> instead.\n"
-        ;;
-    -b|--fast-build)
-        FAST_BUILD_MODE="yes"
-        ;;
-    -c|--china)
-        set_registry_mirrors
-        ;;
-    -f|--fast-test)
-        FAST_TEST_MODE="yes"
-        ;;
-    -h|--help)
-        show_usage
-        ;;
-    -l|--local)
-        LOCAL_IMAGE="yes"
-        ;;
-    --map)
-        map_name=$2
-        shift
-        source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
-            "${map_name}" "${VOLUME_VERSION}"
-        ;;
-    -n)
-        NO_PULL_IMAGE="yes"
-        info "running without pulling docker image"
-        ;;
-    -y)
-        ;;
-    stop)
-        stop_all_apollo_containers_for_user "-f"
+    done
+
+    if [ ! -z "$VERSION_OPT" ]; then
+        VERSION=$VERSION_OPT
+    elif [ ${ARCH} == "x86_64" ]; then
+        VERSION=${VERSION_X86_64}
+    elif [ ${ARCH} == "aarch64" ]; then
+        VERSION=${VERSION_AARCH64}
+    else
+        echo "Unknown architecture: ${ARCH}"
         exit 0
-        ;;
-    *)
-        echo -e "\033[93mWarning\033[0m: Unknown option: $1"
-        exit 2
-        ;;
-    esac
-    shift
-done
+    fi
 
-if [ ! -z "$VERSION_OPT" ]; then
-    VERSION=$VERSION_OPT
-elif [ ${ARCH} == "x86_64" ]; then
-    VERSION=${VERSION_X86_64}
-elif [ ${ARCH} == "aarch64" ]; then
-    VERSION=${VERSION_AARCH64}
-else
-    echo "Unknown architecture: ${ARCH}"
-    exit 0
-fi
+    if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
+        VERSION="local_dev"
+    fi
 
-if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
-    VERSION="local_dev"
-fi
+    APOLLO_DEV_IMAGE=${DOCKER_REPO}:$VERSION
+    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
+    LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
+}
 
-APOLLO_DEV_IMAGE=${DOCKER_REPO}:$VERSION
-LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
-
-
-function local_volumes() {
+function local_volumes() 
+{
     set +x
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo"
@@ -281,9 +284,6 @@ function do_docker_pull() {
     fi
 }
 
-DOCKER_RUN="docker run"
-USE_GPU=0
-
 function determine_gpu_use() {
     # Check nvidia-driver and GPU device
     local nv_driver="nvidia-smi"
@@ -321,6 +321,9 @@ function determine_gpu_use() {
 }
 
 function main() {
+    init
+    parse_arguments
+    check_agreement
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $APOLLO_DEV_IMAGE"
     else
