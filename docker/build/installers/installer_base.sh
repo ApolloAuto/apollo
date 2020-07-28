@@ -54,6 +54,10 @@ function apt_get_update_and_install() {
         apt-get -y install --no-install-recommends "$@"
 }
 
+function apt_get_remove() {
+    apt-get -y purge --autoremove "$@"
+}
+
 # Ref: https://reproducible-builds.org/docs/source-date-epoch
 function source_date_epoch_setup() {
     DATE_FMT="+%Y-%m-%d"
