@@ -37,7 +37,7 @@ if [[ "${MY_MODE}" == "download" ]]; then
     mv adv_plat/include ${DEST_DIR}/include
     mv adv_plat/lib     ${DEST_DIR}/lib
 
-    echo "$DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
     ldconfig
 
     rm -r ${PKG_NAME} adv_plat
