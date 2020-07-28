@@ -125,7 +125,7 @@ TEST(DataProvider, test_fill_image_data) {
       "/apollo/modules/perception/testdata/"
       "camera/common/img/test.jpg");
   cv::cvtColor(bgr, rgb, CV_BGR2RGB);
-  cv::cvtColor(bgr, gray, CV_BGR2GRAY);
+  cv::cvtColor(bgr, gray, cv::BGR2GRAY);
 
   DataProvider::InitOptions init_options;
   init_options.image_height = bgr.rows;
@@ -179,7 +179,7 @@ TEST(DataProvider, test_convert_color) {
       "/apollo/modules/perception/testdata/"
       "camera/common/img/test.jpg");
   cv::cvtColor(bgr, rgb, CV_BGR2RGB);
-  cv::cvtColor(bgr, gray, CV_BGR2GRAY);
+  cv::cvtColor(bgr, gray, cv::BGR2GRAY);
 
   DataProvider::InitOptions init_options;
   init_options.image_height = bgr.rows;
