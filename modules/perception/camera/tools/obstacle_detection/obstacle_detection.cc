@@ -210,7 +210,7 @@ int main() {
         FLAGS_image_root + "/" + image_name + FLAGS_image_ext;
     std::string result_path = FLAGS_dest_dir + "/" + image_name + ".txt";
 
-    auto cv_img = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+    auto cv_img = cv::imread(image_path, cv::IMAGE_COLOR);
 
     if (FLAGS_pre_detected_dir != "") {
       std::string kitti_path =

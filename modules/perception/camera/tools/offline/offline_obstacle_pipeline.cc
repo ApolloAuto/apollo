@@ -232,10 +232,10 @@ int work() {
       image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
       cv::cvtColor(image, image, CV_GRAY2RGB);
     } else if (FLAGS_image_color == "rgb") {
-      image = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMAGE_COLOR);
       cv::cvtColor(image, image, CV_BGR2RGB);
     } else if (FLAGS_image_color == "bgr") {
-      image = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMAGE_COLOR);
     } else {
       AERROR << "Invalid color: " << FLAGS_image_color;
     }

@@ -131,7 +131,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
     AERROR << "Init other params failed.";
   }
 
-  cv::namedWindow(window_name_, CV_WINDOW_NORMAL);
+  cv::namedWindow(window_name_, cv::WINDOW_NORMAL);
   cv::resizeWindow(window_name_, 1024, 1024);
 
   is_init_ = true;
@@ -279,14 +279,14 @@ void VisualizationEngine::Draw() {
   int left_top_y = node_grid_index.y + 1024 - dis;
 
   cv::resize(big_window_(cv::Rect(left_top_x, left_top_y, width, width)),
-             image_window_, cv::Size(1024, 1024), 0, 0, CV_INTER_LINEAR);
+             image_window_, cv::Size(1024, 1024), 0, 0, cv::INTER_LINEAR);
   cv::flip(image_window_, image_window_, 0);
 
   DrawLegend();
   DrawInfo();
   DrawTips();
 
-  cv::namedWindow(window_name_, CV_WINDOW_NORMAL);
+  cv::namedWindow(window_name_, cv::WINDOW_NORMAL);
   // cv::setMouseCallback(window_name_, processMouse, 0);
   cv::imshow(window_name_, image_window_);
 
@@ -381,7 +381,7 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
 
           cv::Mat mat_tem;
           cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
-                     CV_INTER_LINEAR);
+                     cv::INTER_LINEAR);
           cv::Mat rotated_mat;
           // AINFO << "yaw: " << yaw;
           // RotateImg(mat_tem, rotated_mat, 90 - yaw);
@@ -395,7 +395,7 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
           if (car_lt.x >= 0 && car_lt.y >= 0 && car_rb.x <= 1024 * 3 &&
               car_rb.y <= 1024 * 3) {
             cv::Mat mat_mask;
-            cv::cvtColor(rotated_mat, mat_mask, CV_BGR2GRAY);
+            cv::cvtColor(rotated_mat, mat_mask, cv::COLOR_BGR2GRAY);
             rotated_mat.copyTo(
                 big_window_(cv::Rect(car_lt.x, car_lt.y, rotated_mat.cols,
                                      rotated_mat.rows)),
@@ -655,7 +655,7 @@ void VisualizationEngine::GenerateMutiResolutionImages(
         if (flag) {
           snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
                    image_visual_path_dst.c_str(), pt_y, pt_x, lvl);
-          cv::resize(large, small, cv::Size(1024, 1024), 0, 0, CV_INTER_LINEAR);
+          cv::resize(large, small, cv::Size(1024, 1024), 0, 0, cv::INTER_LINEAR);
           cv::imwrite(ss, small);
         }
       }
