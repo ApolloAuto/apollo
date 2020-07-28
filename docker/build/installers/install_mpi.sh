@@ -22,9 +22,12 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
-apt-get -y update && \
-    apt-get -y install \
-    gfortran-7
+WORKHORSE="$1"
+if [ -z "${WORKHORSE}" ]; then
+    WORKHORSE="cpu"
+fi
+
+apt_get_update_and_install gfortran libhwloc-dev libevent-dev
 
 # Ref: https://www.open-mpi.org/software/ompi/v4.0/
 VERSION="4.0.4"
@@ -33,9 +36,29 @@ CHECKSUM="47e24eb2223fe5d24438658958a313b6b7a55bb281563542e1afc9dec4a31ac4"
 DOWNLOAD_LINK="https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-${VERSION}.tar.bz2"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
+GPU_OPTIONS=""
+if [ "${WORKHORSE}" = "gpu" ]; then
+    GPU_OPTIONS="--with-cuda"
+else
+    GPU_OPTIONS="--with-cuda=no"
+fi
+TARGET_ARCH="$(uname -m)"
+
+# --target "${TARGET_ARCH}" \
 tar xjf "${PKG_NAME}"
 pushd openmpi-${VERSION}
-    ./configure --prefix="${SYSROOT_DIR}" --enable-mpi-cxx --with-cuda
+    ./configure \
+        --prefix="${SYSROOT_DIR}" \
+        --build "${TARGET_ARCH}" \
+        --disable-silent-rules \
+        --enable-builtin-atomics \
+        --enable-mpi-cxx \
+        --with-pic \
+        --enable-mpi1-compatibility \
+        --with-hwloc=/usr \
+        --with-libevent=external \
+        "${GPU_OPTIONS}"
+
     make -j$(nproc)
     make install
 popd
@@ -43,6 +66,7 @@ rm -rf "${PKG_NAME}" "openmpi-${VERSION}"
 
 ldconfig
 
+apt-get clean && apt-get -y purge --autoremove gfortran
 info "Done installing openmpi-${VERSION}"
 
 # openmpi @cuda
