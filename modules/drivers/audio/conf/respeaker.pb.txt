@@ -3,10 +3,6 @@ chunk: 1024
 sample_rate: 16000
 record_seconds: 6
 sample_width: 2
-id_vendor: 0x2886
-id_product: 0x0018
-doa_id: 21
-doa_offset: 9
 channel_name: "/apollo/speaker"
 frame_id: "respeaker"
 channel_type: ASR

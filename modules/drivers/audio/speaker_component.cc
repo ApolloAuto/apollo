@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ bool SpeakerComponent::Init() {
   chunk_ = speaker_config_ptr_->chunk();
   total_frames_ = speaker_config_ptr_->sample_rate() *
                   speaker_config_ptr_->record_seconds();
-  chunk_size_ = speaker_device_ptr_->stream_ptr_->get_chunk_size(chunk_);
+  chunk_size_ = speaker_device_ptr_->get_chunk_size(chunk_);
 
-  buffer_size_ = speaker_device_ptr_->stream_ptr_->get_chunk_size(total_frames_);
-  buffer_ = reinterpret_cast<char *>(malloc(buffer_size_));
+  buffer_size_ = speaker_device_ptr_->get_chunk_size(total_frames_);
+  buffer_ = new char[buffer_size_];
   if (buffer_ == nullptr) {
     AERROR << "System calloc memory error, size:" << buffer_size_;
     return false;
@@ -73,17 +73,20 @@ bool SpeakerComponent::Init() {
 
 void SpeakerComponent::run() {
   char *pos = nullptr;
-  int i, seq = 0;
+  int i;
   while (!cyber::IsShutdown()) {
     AINFO << "Start recording";
     pos = buffer_;
-    for (i = 1; chunk_ * i <= total_frames_; ++i) {
-      speaker_device_ptr_->stream_ptr_->read_stream(chunk_, pos);
-      pos += chunk_size_;
+    try {
+      for (i = 1; chunk_ * i <= total_frames_; ++i) {
+        speaker_device_ptr_->read_stream(chunk_, pos);
+        pos += chunk_size_;
+      }
+      if (chunk_ * --i < total_frames_)
+        speaker_device_ptr_->read_stream(total_frames_ - chunk_ * i, pos);
+    } catch (const std::exception &e) {
+      return;
     }
-    if (chunk_ * --i < total_frames_)
-      speaker_device_ptr_->stream_ptr_->read_stream(total_frames_ - chunk_ * i,
-                                                pos);
     AINFO << "End recording";
 
     for (int buff_i = 0, i = 0; buff_i < buffer_size_; i += 2) {
@@ -92,9 +95,7 @@ void SpeakerComponent::run() {
         (*channel_data_ptrs_[channel_i])[i + 1] = buffer_[buff_i++];
       }
     }
-    audio_data_ptr_->mutable_header()->set_sequence_num(seq++);
-    audio_data_ptr_->mutable_header()->set_timestamp_sec(
-        cyber::Time().Now().ToSecond());
+    FillHeader(node_->Name(), audio_data_ptr_.get());
     writer_ptr_->Write(audio_data_ptr_);
   }
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 #pragma once
 
-#include <google/protobuf/message.h>
-#include <portaudio.h>
-
 #include <memory>
 #include <string>
 
+#include <google/protobuf/message.h>
+#include <portaudio.h>
 #include "cyber/cyber.h"
 #include "modules/drivers/audio/proto/speaker_config.pb.h"
 
@@ -44,23 +43,27 @@ class Stream {
   ~Stream();
   void init_stream(int rate, int channels, int chunk, int input_device_index,
                    PaSampleFormat format);
-  void read_stream(int n_frames, char *buffer);
-  int get_chunk_size(int n_frames);
+  void read_stream(int n_frames, char *buffer) const;
+  int get_chunk_size(int n_frames) const;
 };
 
 class Respeaker {
- public:
+ private:
   std::unique_ptr<Stream> stream_ptr_;
+  const PaDeviceInfo *get_device_info(const PaDeviceIndex index) const;
+  const PaDeviceIndex host_api_device_index_to_device_index(
+      const PaHostApiIndex hostApi, const int hostApiDeviceIndex) const;
+  const PaHostApiInfo *get_host_api_info(const PaHostApiIndex index) const;
+  const PaDeviceIndex get_respeaker_index() const;
+  const PaSampleFormat get_format_from_width(int width,
+                                             bool is_unsigned = true) const;
 
+ public:
   Respeaker() {}
   ~Respeaker();
-  void init(std::shared_ptr<SpeakerConfig> speaker_config);
-  PaSampleFormat get_format_from_width(int width, bool is_unsigned = true);
-  PaDeviceIndex get_respeaker_index();
-  const PaDeviceInfo *get_device_info(PaDeviceIndex index);
-  PaDeviceIndex host_api_device_index_to_device_index(PaHostApiIndex hostApi,
-                                                      int hostApiDeviceIndex);
-  const PaHostApiInfo *get_host_api_info(PaHostApiIndex index);
+  void init(const std::shared_ptr<const SpeakerConfig> &speaker_config);
+  void read_stream(int n_frames, char *buffer) const;
+  int get_chunk_size(int n_frames) const;
 };
 
 }  // namespace audio
