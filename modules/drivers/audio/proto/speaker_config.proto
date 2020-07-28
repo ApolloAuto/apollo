@@ -19,11 +19,7 @@ message SpeakerConfig {
   optional float sample_rate = 4;
   optional float record_seconds = 5;
   optional int32 sample_width = 6; // in bytes
-  optional int32 id_vendor = 7;
-  optional int32 id_product = 8;
-  optional int32 doa_id = 9; // Usually read only. Orientation depends on build configuration.
-  optional int32 doa_offset = 10;
-  optional string channel_name = 11;
-  optional string frame_id = 12;
+  optional string channel_name = 7;
+  optional string frame_id = 8;
   repeated ChannelType channel_type = 1;
 }

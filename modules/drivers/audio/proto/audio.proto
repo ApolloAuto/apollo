@@ -15,6 +15,5 @@ message ChannelData {
 message AudioData {
   optional apollo.common.Header header = 1;
   optional SpeakerConfig speaker_config = 2;
-  optional apollo.common.Quaternion orientation = 3;
-  repeated ChannelData channel_data = 4;
+  repeated ChannelData channel_data = 3;
 }

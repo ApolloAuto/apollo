@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "cyber/cyber.h"
+#include "modules/common/util/message_util.h"
 #include "modules/drivers/audio/proto/audio.pb.h"
 #include "modules/drivers/audio/proto/speaker_config.pb.h"
 #include "modules/drivers/audio/respeaker.h"
@@ -31,6 +32,7 @@ namespace apollo {
 namespace drivers {
 namespace audio {
 
+using apollo::common::util::FillHeader;
 using apollo::cyber::Component;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;

@@ -19,6 +19,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"audio\\"'],
     deps = [
         "//cyber",
+        "//modules/common/util:message_util",
         "//modules/drivers/audio:respeaker",
         "//modules/drivers/audio/proto:audio_cc_proto",
         "//modules/drivers/audio/proto:speaker_config_cc_proto",
