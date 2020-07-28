@@ -20,12 +20,9 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-apt-get -y update && \
-  apt-get -y install \
-  nasm
-
 . /tmp/installers/installer_base.sh
+
+apt_get_update_and_install nasm
 
 VERSION="2.0.0"
 PKG_NAME="openh264-${VERSION}.tar.gz"
@@ -43,6 +40,7 @@ pushd openh264-${VERSION}
   make install
 popd
 
+apt_get_remove nasm
+
 # Clean
 rm -fr "${PKG_NAME}" "openh264-${VERSION}"
-
