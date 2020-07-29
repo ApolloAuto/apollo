@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package apollo.drivers.robosense;
+
+message Config {
+  optional string model = 1;
+  optional string frame_id = 2;  
+  optional string ip = 3;
+  optional uint32 msop_port = 4;
+  optional uint32 difop_port = 5;
+  optional uint32 echo_mode=6;
+  optional uint32 start_angle = 8;
+  optional uint32 end_angle = 9;
+  optional uint32 min_distance = 10;
+  optional uint32 max_distance = 11;
+  optional uint32 cut_angle = 12;
+  optional string pointcloud_channel = 13;
+  optional string scan_channel = 14;
+  optional string calibration_file=15;
+  optional bool use_lidar_clock = 16;
+}
+
