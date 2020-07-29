@@ -15,6 +15,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
         "@boost",
+        "@com_google_absl//absl/strings",
         "@eigen",
         "@lz4",
         "@opencv",

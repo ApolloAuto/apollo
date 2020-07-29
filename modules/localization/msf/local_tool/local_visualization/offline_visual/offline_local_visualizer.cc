@@ -17,6 +17,7 @@
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
 
 #include <boost/filesystem.hpp>
+#include "absl/strings/str_cat.h"
 
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
@@ -168,10 +169,7 @@ void OfflineLocalVisualizer::Visualize() {
     loc_infos.push_back(gnss_loc_info);
     loc_infos.push_back(fusion_loc_info);
 
-    std::string pcd_file_path;
-    std::ostringstream ss;
-    ss << idx + 1;
-    pcd_file_path = pcd_folder_ + "/" + ss.str() + ".pcd";
+    std::string pcd_file_path = absl::StrCat(pcd_folder_, "/", idx + 1, ".pcd");
     ::apollo::common::EigenVector3dVec pt3ds;
     std::vector<unsigned char> intensities;
     apollo::localization::msf::velodyne::LoadPcds(
