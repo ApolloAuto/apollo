@@ -14,7 +14,7 @@ RUN bash /tmp/installers/install_geo_adjustment.sh ${GEOLOC}
 RUN bash /tmp/installers/install_modules_base.sh
 RUN bash /tmp/installers/install_gpu_support.sh ${INSTALL_MODE}
 
-RUN bash /tmp/installers/install_common_modules.sh ${INSTALL_MODE}
+RUN bash /tmp/installers/install_ordinary_modules.sh ${INSTALL_MODE}
 
 RUN bash /tmp/installers/install_drivers_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_perception_deps.sh ${INSTALL_MODE}
