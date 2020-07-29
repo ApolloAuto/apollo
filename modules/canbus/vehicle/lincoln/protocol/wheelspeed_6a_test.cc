@@ -28,6 +28,7 @@ TEST(Wheelspeed6aTest, General) {
   int32_t length = 8;
   ChassisDetail cd;
   struct timeval timestamp;
+  gettimeofday(&timestamp, NULL);
   wheelspeed.Parse(data, length, timestamp, &cd);
 
   EXPECT_TRUE(cd.vehicle_spd().is_wheel_spd_fl_valid());
