@@ -40,7 +40,8 @@ using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
 
-SchedulerChoreography::SchedulerChoreography() {
+SchedulerChoreography::SchedulerChoreography()
+    : choreography_processor_prio_(0), pool_processor_prio_(0) {
   std::string conf("conf/");
   conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
   auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
