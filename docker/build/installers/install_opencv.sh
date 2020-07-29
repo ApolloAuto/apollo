@@ -23,13 +23,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 if ldconfig -p | grep -q libopencv_core ; then
     info "OpenCV was already installed"
-    exit 0
+    # exit 0
 fi
 
 WORKHORSE="$1"
 if [ -z "${WORKHORSE}" ]; then
     WORKHORSE="cpu"
 fi
+
+# Note(all): It seems that opencv_contrib is not used in Apollo
+BUILD_CONTRIB="no"
 
 # 1) Install OpenCV via apt
 # apt-get -y update && \
@@ -41,6 +44,20 @@ fi
 #    libopencv-dev
 # 2) Build OpenCV from source
 # RTFM: https://src.fedoraproject.org/rpms/opencv/blob/master/f/opencv.spec
+
+apt_get_update_and_install \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libv4l-dev \
+        libeigen3-dev \
+        libopenblas-dev \
+        libatlas-base-dev \
+        libxvidcore-dev \
+        libx264-dev \
+        libopenni-dev \
+	libwebp-dev
+
 pip3_install numpy
 
 VERSION="4.4.0"
@@ -51,23 +68,13 @@ DOWNLOAD_LINK="https://github.com/opencv/opencv/archive/${VERSION}.tar.gz"
 download_if_not_cached "${PKG_OCV}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_OCV}
 
-PKG_CONTRIB="opencv_contrib-${VERSION}.tar.gz"
-CHECKSUM="a69772f553b32427e09ffbfd0c8d5e5e47f7dab8b3ffc02851ffd7f912b76840"
-DOWNLOAD_LINK="https://github.com/opencv/opencv_contrib/archive/${VERSION}.tar.gz"
-download_if_not_cached "${PKG_CONTRIB}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-tar xzf ${PKG_CONTRIB}
-
-apt-get -y update && \
-    apt-get -y install \
-        libjpeg-dev \
-        libpng-dev \
-        libtiff-dev \
-        libv4l-dev \
-        libeigen3-dev \
-        libopenblas-dev \
-        libatlas-base-dev \
-        libxvidcore-dev \
-        libx264-dev
+if [ "${BUILD_CONTRIB}" = "yes" ]; then
+    PKG_CONTRIB="opencv_contrib-${VERSION}.tar.gz"
+    CHECKSUM="a69772f553b32427e09ffbfd0c8d5e5e47f7dab8b3ffc02851ffd7f912b76840"
+    DOWNLOAD_LINK="https://github.com/opencv/opencv_contrib/archive/${VERSION}.tar.gz"
+    download_if_not_cached "${PKG_CONTRIB}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+    tar xzf ${PKG_CONTRIB}
+fi
 
 # https://stackoverflow.com/questions/12427928/configure-and-build-opencv-to-custom-ffmpeg-install
 export LD_LIBRARY_PATH=${SYSROOT_DIR}/lib
@@ -88,13 +95,17 @@ else
 fi
 
 TARGET_ARCH="$(uname -m)"
-ARCH_OPTIONS=""
+
+EXTRA_OPTIONS=
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
-    ARCH_OPTIONS="-DCPU_BASELINE=SSE4"
+    EXTRA_OPTIONS="${EXTRA_OPTIONS} -DCPU_BASELINE=SSE4"
 fi
 
-COMM_DIR="$(pwd)"
+if [ "${BUILD_CONTRIB}" = "yes" ]; then
+    EXTRA_OPTIONS="${EXTRA_OPTIONS} -DOPENCV_EXTRA_MODULES_PATH=\"../../opencv_contrib-${VERSION}/modules\""
+fi
 
+# -DBUILD_LIST=core,highgui,improc
 pushd "opencv-${VERSION}"
     mkdir build && cd build
         cmake .. \
@@ -102,7 +113,6 @@ pushd "opencv-${VERSION}"
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS=ON          \
             -DENABLE_PRECOMPILED_HEADERS=OFF \
-            -DOPENCV_EXTRA_MODULES_PATH="${COMM_DIR}/opencv_contrib-${VERSION}/modules" \
             -DOPENCV_GENERATE_PKGCONFIG=ON  \
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_DOCS=OFF    \
@@ -112,15 +122,17 @@ pushd "opencv-${VERSION}"
             -DBUILD_PROTOBUF=OFF \
             -DPROTOBUF_UPDATE_FILES=ON \
             -DINSTALL_C_EXAMPLES=OFF   \
+            -DWITH_GTK=OFF  \
             -DWITH_IPP=OFF  \
             -DWITH_ITT=OFF  \
+            -DWITH_TBB=OFF  \
             -DWITH_EIGEN=ON \
             -DWITH_FFMPEG=ON   \
-            -DWITH_OPENMP=ON   \
             -DWITH_LIBV4L=ON   \
+            -DWITH_OPENMP=ON   \
+            -DWITH_OPENNI=ON   \
             -DWITH_OPENCL=ON   \
-            -DWITH_GTK=OFF  \
-            -DWITH_TBB=OFF  \
+	    -DWITH_WEBP=ON     \
             -DOpenGL_GL_PREFERENCE=GLVND \
             -DBUILD_opencv_python2=OFF  \
             -DBUILD_opencv_python3=ON   \
@@ -128,13 +140,17 @@ pushd "opencv-${VERSION}"
             -DPYTHON_DEFAULT_EXECUTABLE="$(which python3)" \
             -DOPENCV_PYTHON3_INSTALL_PATH="/usr/local/lib/python$(py3_version)/dist-packages" \
             -DOPENCV_ENABLE_NONFREE=ON \
-            "${GPU_OPTIONS}" \
-            "${ARCH_OPTIONS}" \
-            -DCV_TRACE=OFF
+            -DCV_TRACE=OFF      \
+            ${GPU_OPTIONS}    	\
+            ${EXTRA_OPTIONS}
 
         make -j$(nproc)
         make install
 popd
 
 ldconfig
-rm -rf ${PKG_OCV} ${PKG_CONTRIB} "opencv-${VERSION}" "opencv_contrib-${VERSION}"
+rm -rf ${PKG_OCV} ${PKG_CONTRIB} "opencv-${VERSION}"
+
+if [ "${BUILD_CONTRIB}" = "yes" ]; then
+    rm -rf "opencv_contrib-${VERSION}"
+fi
