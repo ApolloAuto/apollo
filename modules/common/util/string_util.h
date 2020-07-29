@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "google/protobuf/stubs/stringprintf.h"
+#include "absl/strings/str_format.h"
 #include "modules/common/util/future.h"
 
 /**
@@ -34,8 +34,7 @@ namespace apollo {
 namespace common {
 namespace util {
 
-// TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
-using google::protobuf::StringPrintf;
+using absl::StrFormat;
 
 struct DebugStringFormatter {
   template <class T>
