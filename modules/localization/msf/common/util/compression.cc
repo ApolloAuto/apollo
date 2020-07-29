@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/compression.h"
-
+#include <cstring>
 #include <zlib.h>
-
 #include "cyber/common/log.h"
+
 
 namespace apollo {
 namespace localization {
@@ -102,11 +102,8 @@ int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
   unsigned int dst_idx = 0;
 
   /* allocate inflate state */
-  stream_data.zalloc = Z_NULL;
-  stream_data.zfree = Z_NULL;
-  stream_data.opaque = Z_NULL;
-  stream_data.avail_in = 0;
-  stream_data.next_in = Z_NULL;
+  memset(&stream_data, 0, sizeof(z_stream));
+
   ret = inflateInit(&stream_data);
   if (ret != Z_OK) {
     return ret;
