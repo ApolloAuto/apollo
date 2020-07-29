@@ -29,6 +29,7 @@ apt-get -y update && \
     apt-get -y install \
     libopenblas-dev \
     libatlas-base-dev \
+    liblapack-dev \
     libcublas10 \
     libcublas-dev
 

@@ -33,6 +33,8 @@ bash /tmp/installers/install_mpi.sh
 bash /tmp/installers/install_boost.sh
 
 bash /tmp/installers/install_ffmpeg.sh
+# Proj4 was required to install VTK
+bash /tmp/installers/install_proj4.sh
 bash /tmp/installers/install_vtk.sh
 
 # OpenCV depends on ffmpeg and vtk
