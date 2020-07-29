@@ -16,7 +16,10 @@
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
 #include <numeric>
+
 #include <boost/format.hpp>
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 
 #include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
@@ -33,13 +36,7 @@ using cyber::common::GetAbsolutePath;
 
 template <typename Type>
 std::string vector2string(const std::vector<Type> &values) {
-  std::ostringstream oss;
-  oss << "(";
-  for (size_t i = 0; i < values.size(); i++) {
-    oss << values[i] << " ";
-  }
-  oss << ")";
-  return oss.str();
+  return absl::StrCat("(", absl::StrJoin(values, " "), ")");
 }
 
 std::string DstTypeFusion::name_ = "DstTypeFusion";  // NOLINT

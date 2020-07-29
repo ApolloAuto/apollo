@@ -16,9 +16,11 @@
 
 #include <string>
 #include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
+#include "absl/strings/str_cat.h"
 
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
@@ -163,10 +165,8 @@ int main(int argc, char** argv) {
     for (unsigned int frame_idx = 0; frame_idx < pcd_poses_i.size();
          ++frame_idx) {
       apollo::localization::msf::velodyne::VelodyneFrame velodyne_frame;
-      std::string pcd_file_path;
-      std::ostringstream ss;
-      ss << pcd_indices[i][frame_idx];
-      pcd_file_path = pcd_folder_paths[i] + "/" + ss.str() + ".pcd";
+      std::string pcd_file_path = absl::StrCat(
+          pcd_folder_paths[i], "/", pcd_indices[i][frame_idx], ".pcd");
       Eigen::Affine3d pcd_pose = pcd_poses_i[frame_idx];
       // Load pcd
       apollo::localization::msf::velodyne::LoadPcds(

@@ -18,6 +18,7 @@ cc_library(
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:dst_type_fusion_config_cc_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 

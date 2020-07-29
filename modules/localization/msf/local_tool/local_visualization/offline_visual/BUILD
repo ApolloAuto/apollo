@@ -14,6 +14,7 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_tool/local_visualization/engine",
         "@boost",
+        "@com_google_absl//absl/strings",
         "@eigen",
     ],
 )
