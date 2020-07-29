@@ -87,10 +87,7 @@ ldconfig
 
 rm -fr ${PKG_NAME} ffmpeg-${VERSION}
 
-apt-get -y update && \
-    apt-get -y purge --autoremove \
-    nasm \
-    yasm
+apt_get_remove nasm yasm
 
 # Don't remove libnuma-dev!
 
