@@ -22,12 +22,16 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . /tmp/installers/installer_base.sh
 
+apt_get_update_and_install mpi-default-dev mpi-default-bin libopenmpi-dev
+
+exit 0
+
 WORKHORSE="$1"
 if [ -z "${WORKHORSE}" ]; then
     WORKHORSE="cpu"
 fi
 
-apt_get_update_and_install gfortran libhwloc-dev libevent-dev
+apt_get_update_and_install gfortran libhwloc-dev hwloc-nox libevent-dev
 
 # Ref: https://www.open-mpi.org/software/ompi/v4.0/
 VERSION="4.0.4"
