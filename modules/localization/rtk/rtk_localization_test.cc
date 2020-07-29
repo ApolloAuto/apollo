@@ -133,8 +133,12 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
 
     EXPECT_EQ(1, localization.header().sequence_num());
     EXPECT_STREQ("localization", localization.header().module_name().c_str());
-    EXPECT_STREQ(expected_result.pose().DebugString().c_str(),
-                 localization.pose().DebugString().c_str());
+    EXPECT_NEAR(expected_result.pose().position().x(),
+                localization.pose().position().x(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().y(),
+                localization.pose().position().y(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().z(),
+                localization.pose().position().z(), 1.0e-7);
   }
 
   // TODO(Qi Luo) Update test once got new imu data for euler angle.
