@@ -42,6 +42,7 @@ cc_library(
         "polygon2d.h",
         "vec2d.h",
     ],
+    linkopts = ["-lm"],
     deps = [
         "//cyber/common:log",
         "//modules/common/util:string_util",
