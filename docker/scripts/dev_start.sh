@@ -69,7 +69,7 @@ function check_agreement() {
     fi
 }
 
-function show_usage(){
+function show_usage() {
 cat <<EOF
 Usage: $(basename $0) [options] ...
 OPTIONS:
@@ -112,12 +112,12 @@ function stop_all_apollo_containers_for_user() {
     fi
 }
 
-function set_registry_mirrors(){
+function set_registry_mirrors() {
     sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
     service docker restart
 }
 
-function init(){
+function init() {
     source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
     if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
         sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
@@ -128,20 +128,20 @@ function init(){
     fi
     VOLUME_VERSION="latest"
     DEFAULT_MAPS=(
-    sunnyvale_big_loop
-    sunnyvale_loop
-    sunnyvale_with_two_offices
-    san_mateo
+      sunnyvale_big_loop
+      sunnyvale_loop
+      sunnyvale_with_two_offices
+      san_mateo
     )
     DEFAULT_TEST_MAPS=(
-    sunnyvale_big_loop
-    sunnyvale_loop
+      sunnyvale_big_loop
+      sunnyvale_loop
     )
     MAP_VOLUME_CONF=""
     OTHER_VOLUME_CONF=""
 }
 
-function parse_arguments(){
+function parse_arguments() {
     while [ $# -gt 0 ] ; do
         case "$1" in
         -image)
