@@ -44,8 +44,8 @@ class SimControlTest : public ::testing::Test {
   }
 
   virtual void SetUp() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
-    FLAGS_base_map_filename = "garage.bin";
+    absl::GetFlag(FLAGS_map_dir) = "modules/dreamview/backend/testdata";
+    absl::GetFlag(FLAGS_base_map_filename) = "garage.bin";
 
     map_service_.reset(new MapService(false));
     sim_control_.reset(new SimControl(map_service_.get()));

@@ -30,7 +30,7 @@ namespace apollo {
 namespace planning {
 
 void GenerateLearningData() {
-  AINFO << "map_dir: " << FLAGS_map_dir;
+  AINFO << "map_dir: " << absl::GetFlag(FLAGS_map_dir);
   if (FLAGS_planning_offline_bags.empty()) {
     return;
   }

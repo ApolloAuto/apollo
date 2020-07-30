@@ -43,8 +43,9 @@ class ModelInferenceTest : public ::testing::Test {
  public:
   virtual ~ModelInferenceTest() = default;
   virtual void SetUp() {
-    FLAGS_map_dir = "/apollo/modules/map/data/sunnyvale_with_two_offices";
-    FLAGS_base_map_filename = "base_map.bin";
+    absl::SetFlag(&FLAGS_map_dir,
+                  "/apollo/modules/map/data/sunnyvale_with_two_offices");
+    absl::SetFlag(&FLAGS_base_map_filename, "base_map.bin");
   }
 };
 
