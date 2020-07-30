@@ -56,6 +56,8 @@ void SummaryMonitor::RunOnce(const double current_time) {
     auto* summary = component.second.mutable_summary();
     const auto& process_status = component.second.process_status();
     EscalateStatus(process_status.status(), process_status.message(), summary);
+    const auto& module_status = component.second.module_status();
+    EscalateStatus(module_status.status(), module_status.message(), summary);
     const auto& channel_status = component.second.channel_status();
     EscalateStatus(channel_status.status(), channel_status.message(), summary);
     const auto& resource_status = component.second.resource_status();

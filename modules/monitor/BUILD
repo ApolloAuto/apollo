@@ -21,6 +21,7 @@ cc_library(
         "//modules/monitor/software:latency_monitor",
         "//modules/monitor/software:localization_monitor",
         "//modules/monitor/software:process_monitor",
+        "//modules/monitor/software:module_monitor",
         "//modules/monitor/software:recorder_monitor",
         "//modules/monitor/software:summary_monitor",
     ],

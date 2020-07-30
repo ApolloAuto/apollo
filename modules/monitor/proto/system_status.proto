@@ -25,9 +25,10 @@ message Component {
 
   // Detailed status.
   optional ComponentStatus process_status = 2;
-  optional ComponentStatus channel_status = 3;
-  optional ComponentStatus resource_status = 4;
-  optional ComponentStatus other_status = 5;
+  optional ComponentStatus module_status = 3;
+  optional ComponentStatus channel_status = 4;
+  optional ComponentStatus resource_status = 5;
+  optional ComponentStatus other_status = 6;
 }
 
 message SystemStatus {

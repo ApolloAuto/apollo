@@ -25,6 +25,7 @@
 #include "modules/monitor/software/functional_safety_monitor.h"
 #include "modules/monitor/software/latency_monitor.h"
 #include "modules/monitor/software/localization_monitor.h"
+#include "modules/monitor/software/module_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/recorder_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
@@ -49,6 +50,8 @@ bool Monitor::Init() {
   runners_.emplace_back(new LocalizationMonitor());
   // Monitor if processes are running.
   runners_.emplace_back(new ProcessMonitor());
+  // Monitor if modules are running.
+  runners_.emplace_back(new ModuleMonitor());
   // Monitor message processing latencies across modules
   const std::shared_ptr<LatencyMonitor> latency_monitor(new LatencyMonitor());
   runners_.emplace_back(latency_monitor);
