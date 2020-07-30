@@ -10,6 +10,11 @@ message ProcessMonitorConfig {
   repeated string command_keywords = 1;
 }
 
+// For ModuleMonitor
+message ModuleMonitorConfig {
+  repeated string node_name = 1;
+}
+
 // For ChannelMonitor.
 message ChannelMonitorConfig {
   optional string name = 1;
@@ -74,18 +79,23 @@ message MonitoredComponent {
   // FATAL if the process is down.
   optional ProcessMonitorConfig process = 1;
 
+  // Generate SystemStatus.components[i].module_status.
+  // OK if the module is running.
+  // FATAL if the module is down.
+  optional ModuleMonitorConfig module = 2;
+
   // Generate SystemStatus.components[i].channel_status.
   // OK if delay is not notable.
   // FATAL if delay is larger than fatal_delay.
-  optional ChannelMonitorConfig channel = 2;
+  optional ChannelMonitorConfig channel = 3;
 
   // Generate SystemStatus.components[i].resource_status.
   // OK if all requirements are met.
   // WARN/ERROR/FATAL if any requirement is below expectation.
-  optional ResourceMonitorConfig resource = 3;
+  optional ResourceMonitorConfig resource = 4;
 
   // Whether to trigger safe-mode if the component is down.
-  optional bool required_for_safety = 4 [default = true];
+  optional bool required_for_safety = 5 [default = true];
 }
 
 // A module which can be started and stopped by HMI.
@@ -95,8 +105,10 @@ message Module {
 
   // We use the config in ProcessMonitor to check if the module is running.
   optional ProcessMonitorConfig process_monitor_config = 3;
+  // We use the config in ModuleMonitor to check if the module is running.
+  optional ModuleMonitorConfig module_monitor_config = 4;
   // Whether to trigger safe-mode if the module is down.
-  optional bool required_for_safety = 4 [default = true];
+  optional bool required_for_safety = 5 [default = true];
 }
 
 // A CyberModule will be translated to a regular Module upon loading.

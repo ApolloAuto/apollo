@@ -17,6 +17,20 @@ cc_library(
 )
 
 cc_library(
+    name = "module_monitor",
+    srcs = ["module_monitor.cc"],
+    hdrs = ["module_monitor.h"],
+    deps = [
+        ":summary_monitor",
+        "//cyber/service_discovery:node_manager",
+        "//modules/dreamview/proto:hmi_mode_cc_proto",
+        "//modules/monitor/common:monitor_manager",
+        "//modules/monitor/common:recurrent_runner",
+        "@com_github_gflags_gflags//:gflags",
+    ],
+)
+
+cc_library(
     name = "channel_monitor",
     srcs = ["channel_monitor.cc"],
     hdrs = ["channel_monitor.h"],
