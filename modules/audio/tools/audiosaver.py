@@ -19,9 +19,9 @@
 import os
 import wave
 from cyber.python.cyber_py3 import cyber
-from modules.drivers.audio.proto.audio_pb2 import AudioData
+from modules.drivers.microphone.proto.audio_pb2 import AudioData
 
-RESPEAKER_CHANNEL = "/apollo/speaker"
+RESPEAKER_CHANNEL = "/apollo/microphone"
 WAV_SAVING_PATH = "/tmp"
 
 
@@ -35,8 +35,8 @@ def save_to_wave(frames, filepath, sample_width, sample_rate, n_channels=1):
 
 
 def callback(audio):
-    sample_width = audio.speaker_config.sample_width
-    sample_rate = audio.speaker_config.sample_rate
+    sample_width = audio.microphone_config.sample_width
+    sample_rate = audio.microphone_config.sample_rate
     print("=" * 40)
     print(audio.header)
     print("Saving wave files under " + WAV_SAVING_PATH + "...")

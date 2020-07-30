@@ -24,26 +24,26 @@
 
 #include "cyber/cyber.h"
 #include "modules/common/util/message_util.h"
-#include "modules/drivers/audio/proto/audio.pb.h"
-#include "modules/drivers/audio/proto/speaker_config.pb.h"
-#include "modules/drivers/audio/respeaker.h"
+#include "modules/drivers/microphone/proto/audio.pb.h"
+#include "modules/drivers/microphone/proto/microphone_config.pb.h"
+#include "modules/drivers/microphone/respeaker.h"
 
 namespace apollo {
 namespace drivers {
-namespace audio {
+namespace microphone {
 
 using apollo::common::util::FillHeader;
 using apollo::cyber::Component;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;
-using apollo::drivers::audio::config::AudioData;
-using apollo::drivers::audio::config::ChannelData;
-using apollo::drivers::audio::config::SpeakerConfig;
+using apollo::drivers::microphone::config::AudioData;
+using apollo::drivers::microphone::config::ChannelData;
+using apollo::drivers::microphone::config::MicrophoneConfig;
 
-class SpeakerComponent : public Component<> {
+class MicrophoneComponent : public Component<> {
  public:
   bool Init() override;
-  ~SpeakerComponent();
+  ~MicrophoneComponent();
 
  private:
   void run();
@@ -54,16 +54,16 @@ class SpeakerComponent : public Component<> {
   // class data
   std::shared_ptr<AudioData> audio_data_ptr_;
   std::shared_ptr<Writer<AudioData>> writer_ptr_;
-  std::unique_ptr<Respeaker> speaker_device_ptr_;
+  std::unique_ptr<Respeaker> microphone_device_ptr_;
   std::vector<std::string *> channel_data_ptrs_;
-  std::shared_ptr<SpeakerConfig> speaker_config_ptr_;
+  std::shared_ptr<MicrophoneConfig> microphone_config_ptr_;
   char *buffer_;
 
   std::future<void> async_result_;
   std::atomic<bool> running_ = {false};
 };
 
-CYBER_REGISTER_COMPONENT(SpeakerComponent)
-}  // namespace audio
+CYBER_REGISTER_COMPONENT(MicrophoneComponent)
+}  // namespace microphone
 }  // namespace drivers
 }  // namespace apollo

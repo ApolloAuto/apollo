@@ -14,64 +14,65 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/audio/speaker_component.h"
+#include "modules/drivers/microphone/microphone_component.h"
 
 namespace apollo {
 namespace drivers {
-namespace audio {
+namespace microphone {
 
-bool SpeakerComponent::Init() {
-  speaker_config_ptr_ = std::make_shared<SpeakerConfig>();
+bool MicrophoneComponent::Init() {
+  microphone_config_ptr_ = std::make_shared<MicrophoneConfig>();
   if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                               speaker_config_ptr_.get())) {
+                                               microphone_config_ptr_.get())) {
     return false;
   }
-  AINFO << "Speaker config: " << speaker_config_ptr_->DebugString();
+  AINFO << "Microphone config: " << microphone_config_ptr_->DebugString();
 
-  // new speaker device
-  speaker_device_ptr_.reset(new Respeaker());
-  speaker_device_ptr_->init(speaker_config_ptr_);
+  // new microphone device
+  microphone_device_ptr_.reset(new Respeaker());
+  microphone_device_ptr_->init(microphone_config_ptr_);
 
   // dump config, calculate size and reserve buffer for audio
   // chunk_: number of frames per chunk; chunk_size_: number of bytes per chunk
-  n_channels_ = speaker_config_ptr_->channel_type_size();
-  chunk_ = speaker_config_ptr_->chunk();
-  total_frames_ = speaker_config_ptr_->sample_rate() *
-                  speaker_config_ptr_->record_seconds();
-  chunk_size_ = speaker_device_ptr_->get_chunk_size(chunk_);
+  n_channels_ = microphone_config_ptr_->channel_type_size();
+  chunk_ = microphone_config_ptr_->chunk();
+  total_frames_ = microphone_config_ptr_->sample_rate() *
+                  microphone_config_ptr_->record_seconds();
+  chunk_size_ = microphone_device_ptr_->get_chunk_size(chunk_);
 
-  buffer_size_ = speaker_device_ptr_->get_chunk_size(total_frames_);
+  buffer_size_ = microphone_device_ptr_->get_chunk_size(total_frames_);
   buffer_ = new char[buffer_size_];
   if (buffer_ == nullptr) {
     AERROR << "System calloc memory error, size:" << buffer_size_;
     return false;
   }
 
-  // assemble AudioData -- fill speaker_config, allocate memory for channel_data
+  // assemble AudioData -- fill microphone_config, allocate memory for
+  // channel_data
   audio_data_ptr_.reset(new AudioData());
   std::string config;
-  speaker_config_ptr_->SerializeToString(&config);
-  audio_data_ptr_->mutable_speaker_config()->ParseFromString(config);
+  microphone_config_ptr_->SerializeToString(&config);
+  audio_data_ptr_->mutable_microphone_config()->ParseFromString(config);
   audio_data_ptr_->mutable_header()->set_frame_id(
-      speaker_config_ptr_->frame_id());
+      microphone_config_ptr_->frame_id());
 
   ChannelData *channel_data = nullptr;
   int channel_size = buffer_size_ / n_channels_;
   for (int i = 0; i < n_channels_; ++i) {
     channel_data = audio_data_ptr_->add_channel_data();
-    channel_data->set_channel_type(speaker_config_ptr_->channel_type(i));
+    channel_data->set_channel_type(microphone_config_ptr_->channel_type(i));
     channel_data->set_size(channel_size);
     channel_data->mutable_data()->resize(channel_size);
     channel_data_ptrs_.push_back(channel_data->mutable_data());
   }
 
   writer_ptr_ =
-      node_->CreateWriter<AudioData>(speaker_config_ptr_->channel_name());
-  async_result_ = cyber::Async(&SpeakerComponent::run, this);
+      node_->CreateWriter<AudioData>(microphone_config_ptr_->channel_name());
+  async_result_ = cyber::Async(&MicrophoneComponent::run, this);
   return true;
 }
 
-void SpeakerComponent::run() {
+void MicrophoneComponent::run() {
   char *pos = nullptr;
   int i;
   while (!cyber::IsShutdown()) {
@@ -79,11 +80,11 @@ void SpeakerComponent::run() {
     pos = buffer_;
     try {
       for (i = 1; chunk_ * i <= total_frames_; ++i) {
-        speaker_device_ptr_->read_stream(chunk_, pos);
+        microphone_device_ptr_->read_stream(chunk_, pos);
         pos += chunk_size_;
       }
       if (chunk_ * --i < total_frames_)
-        speaker_device_ptr_->read_stream(total_frames_ - chunk_ * i, pos);
+        microphone_device_ptr_->read_stream(total_frames_ - chunk_ * i, pos);
     } catch (const std::exception &e) {
       return;
     }
@@ -100,7 +101,7 @@ void SpeakerComponent::run() {
   }
 }
 
-SpeakerComponent::~SpeakerComponent() {
+MicrophoneComponent::~MicrophoneComponent() {
   free(buffer_);
   if (running_.load()) {
     running_.exchange(false);
@@ -108,6 +109,6 @@ SpeakerComponent::~SpeakerComponent() {
   }
 }
 
-}  // namespace audio
+}  // namespace microphone
 }  // namespace drivers
 }  // namespace apollo
