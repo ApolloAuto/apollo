@@ -16,15 +16,15 @@
 
 #include "modules/common/configs/config_gflags.h"
 
-DEFINE_string(map_dir, "/apollo/modules/map/data/demo",
-              "Directory which contains a group of related maps.");
-DEFINE_int32(local_utm_zone_id, 10, "UTM zone id.");
+ABSL_FLAG(std::string, map_dir, "/apollo/modules/map/data/demo",
+          "Directory which contains a group of related maps.");
+ABSL_FLAG(int32_t, local_utm_zone_id, 10, "UTM zone id.");
+ABSL_FLAG(std::string, test_base_map_filename, "",
+          "If not empty, use this test base map files.");
+ABSL_FLAG(std::string, base_map_filename,
+          "base_map.bin|base_map.xml|base_map.txt",
+          "Base map files in the map_dir, search in order.");
 
-DEFINE_string(test_base_map_filename, "",
-              "If not empty, use this test base map files.");
-
-DEFINE_string(base_map_filename, "base_map.bin|base_map.xml|base_map.txt",
-              "Base map files in the map_dir, search in order.");
 DEFINE_string(sim_map_filename, "sim_map.bin|sim_map.txt",
               "Simulation map files in the map_dir, search in order.");
 DEFINE_string(routing_map_filename, "routing_map.bin|routing_map.txt",

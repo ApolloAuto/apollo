@@ -32,7 +32,8 @@ namespace {
 std::string FindFirstExist(const std::string& dir, const std::string& files) {
   const std::vector<std::string> candidates = absl::StrSplit(files, '|');
   for (const auto& filename : candidates) {
-    const std::string file_path = absl::StrCat(FLAGS_map_dir, "/", filename);
+    const std::string file_path =
+        absl::StrCat(absl::GetFlag(FLAGS_map_dir), "/", filename);
     if (cyber::common::PathExists(file_path)) {
       return file_path;
     }
@@ -40,7 +41,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
   AERROR << "No existing file found in " << dir << "/" << files
          << ". Fallback to first candidate as default result.";
   ACHECK(!candidates.empty()) << "Please specify at least one map.";
-  return absl::StrCat(FLAGS_map_dir, "/", candidates[0]);
+  return absl::StrCat(absl::GetFlag(FLAGS_map_dir), "/", candidates[0]);
 }
 
 }  // namespace
@@ -49,16 +50,18 @@ std::string BaseMapFile() {
   if (FLAGS_use_navigation_mode) {
     AWARN << "base_map file is not used when FLAGS_use_navigation_mode is true";
   }
-  return FLAGS_test_base_map_filename.empty()
-             ? FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename)
-             : FindFirstExist(FLAGS_map_dir, FLAGS_test_base_map_filename);
+  return absl::GetFlag(FLAGS_test_base_map_filename).empty()
+             ? FindFirstExist(absl::GetFlag(FLAGS_map_dir),
+                              absl::GetFlag(FLAGS_base_map_filename))
+             : FindFirstExist(absl::GetFlag(FLAGS_map_dir),
+                              absl::GetFlag(FLAGS_test_base_map_filename));
 }
 
 std::string SimMapFile() {
   if (FLAGS_use_navigation_mode) {
     AWARN << "sim_map file is not used when FLAGS_use_navigation_mode is true";
   }
-  return FindFirstExist(FLAGS_map_dir, FLAGS_sim_map_filename);
+  return FindFirstExist(absl::GetFlag(FLAGS_map_dir), FLAGS_sim_map_filename);
 }
 
 std::string RoutingMapFile() {
@@ -66,7 +69,8 @@ std::string RoutingMapFile() {
     AWARN << "routing_map file is not used when FLAGS_use_navigation_mode is "
              "true";
   }
-  return FindFirstExist(FLAGS_map_dir, FLAGS_routing_map_filename);
+  return FindFirstExist(absl::GetFlag(FLAGS_map_dir),
+                        FLAGS_routing_map_filename);
 }
 
 std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {

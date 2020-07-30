@@ -46,7 +46,8 @@ bool BirdviewImgFeatureRenderer::Init(const PlanningSemanticMapConfig& config) {
   apollo::hdmap::HDMapUtil::BaseMap();
 
   const std::string map_name =
-      FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
+      absl::GetFlag(FLAGS_map_dir)
+          .substr(absl::GetFlag(FLAGS_map_dir).find_last_of("/") + 1);
   if (map_name != "sunnyvale_with_two_offices" && map_name != "sunnyvale") {
     AERROR << "Map other than sunnyvale_with_two_offices are not supported";
   }

@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "@com_github_gflags_gflags//:gflags",
+        "@com_google_absl//absl/flags:flag"
     ],
 )
 

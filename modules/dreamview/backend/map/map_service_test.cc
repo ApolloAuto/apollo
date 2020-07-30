@@ -30,8 +30,8 @@ namespace dreamview {
 class MapServiceTest : public ::testing::Test {
  protected:
   MapServiceTest() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
-    FLAGS_base_map_filename = "garage.bin";
+    absl::SetFlag(&FLAGS_map_dir, "modules/dreamview/backend/testdata");
+    absl::SetFlag(&FLAGS_base_map_filename, "garage.bin");
     map_service.reset(new MapService(false));
   }
 

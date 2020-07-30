@@ -61,7 +61,8 @@ void MSFLocalization::InitParams() {
   localization_param_.enable_ins_aid_rtk = FLAGS_enable_ins_aid_rtk;
 
   // lidar module
-  localization_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
+  localization_param_.map_path =
+      absl::StrCat(absl::GetFlag(FLAGS_map_dir), "/", FLAGS_local_map_name);
   localization_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
   localization_param_.lidar_height_file = FLAGS_lidar_height_file;
   localization_param_.lidar_height_default = FLAGS_lidar_height_default;
@@ -76,7 +77,7 @@ void MSFLocalization::InitParams() {
   AINFO << "lidar_extrin: " << localization_param_.lidar_extrinsic_file;
   AINFO << "lidar_height: " << localization_param_.lidar_height_file;
 
-  localization_param_.utm_zone_id = FLAGS_local_utm_zone_id;
+  localization_param_.utm_zone_id = absl::GetFlag(FLAGS_local_utm_zone_id);
   // try load zone id from local_map folder
   if (FLAGS_if_utm_zone_id_from_folder) {
     bool success = LoadZoneIdFromFolder(localization_param_.map_path,

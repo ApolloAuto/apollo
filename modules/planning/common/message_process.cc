@@ -58,8 +58,7 @@ using apollo::routing::RoutingResponse;
 using apollo::storytelling::CloseToJunction;
 using apollo::storytelling::Stories;
 
-bool MessageProcess::Init(
-    const PlanningConfig& planning_config) {
+bool MessageProcess::Init(const PlanningConfig& planning_config) {
   planning_config_.CopyFrom(planning_config);
 
   map_m_["Sunnyvale"] = "sunnyvale";
@@ -69,7 +68,8 @@ bool MessageProcess::Init(
   map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
   map_m_["San Mateo"] = "san_mateo";
 
-  map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
+  map_name_ = absl::GetFlag(FLAGS_map_dir)
+                  .substr(absl::GetFlag(FLAGS_map_dir).find_last_of("/") + 1);
 
   obstacle_history_map_.clear();
 
@@ -85,9 +85,8 @@ bool MessageProcess::Init(
   return true;
 }
 
-bool MessageProcess::Init(
-    const PlanningConfig& planning_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
+bool MessageProcess::Init(const PlanningConfig& planning_config,
+                          const std::shared_ptr<DependencyInjector>& injector) {
   injector_ = injector;
   return Init(planning_config);
 }
@@ -124,7 +123,7 @@ void MessageProcess::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
   if (map_m_.count(current_map) > 0) {
     map_name_ = map_m_[current_map];
     const std::string& map_base_folder = "/apollo/modules/map/data/";
-    FLAGS_map_dir = map_base_folder + map_name_;
+    absl::SetFlag(&FLAGS_map_dir, (map_base_folder + map_name_));
   }
 }
 
@@ -174,8 +173,8 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
   } else {
     // online
-    injector_->learning_based_data()
-             ->InsertLearningDataFrame(learning_data_frame);
+    injector_->learning_based_data()->InsertLearningDataFrame(
+        learning_data_frame);
   }
 }
 

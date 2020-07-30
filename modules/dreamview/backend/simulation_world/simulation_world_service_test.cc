@@ -62,8 +62,8 @@ class SimulationWorldServiceTest : public ::testing::Test {
 
  protected:
   SimulationWorldServiceTest() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
-    FLAGS_base_map_filename = "garage.bin";
+    absl::SetFlag(&FLAGS_map_dir, "modules/dreamview/backend/testdata");
+    absl::SetFlag(&FLAGS_base_map_filename, "garage.bin");
     FLAGS_sim_world_with_routing_path = true;
     map_service_.reset(new MapService(false));
   }
