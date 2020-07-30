@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.drivers.audio.config;
+package apollo.drivers.microphone.config;
 
 enum ChannelType {
   UNKOWN = 0;
@@ -9,12 +9,12 @@ enum ChannelType {
   PLAYBACK = 3;
 }
 
-message SpeakerConfig {
-  enum SpeakerModel {
+message MicrophoneConfig {
+  enum MicrophoneModel {
     UNKOWN = 0;
     RESPEAKER = 1;
   }
-  optional SpeakerModel speaker_model = 2;
+  optional MicrophoneModel microphone_model = 2;
   optional int32 chunk = 3;
   optional float sample_rate = 4;
   optional float record_seconds = 5;

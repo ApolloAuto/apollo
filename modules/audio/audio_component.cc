@@ -19,7 +19,7 @@
 namespace apollo {
 namespace audio {
 
-using apollo::drivers::audio::config::AudioData;
+using apollo::drivers::microphone::config::AudioData;
 
 AudioComponent::~AudioComponent() {
 }

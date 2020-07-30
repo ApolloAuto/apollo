@@ -14,7 +14,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/audio/proto:audio_cc_proto",
-        "//modules/drivers/audio/proto:audio_cc_proto",
+        "//modules/drivers/microphone/proto:audio_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
     ],
     alwayslink = True,

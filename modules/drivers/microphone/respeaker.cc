@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/audio/respeaker.h"
+#include "modules/drivers/microphone/respeaker.h"
 
 namespace apollo {
 namespace drivers {
-namespace audio {
+namespace microphone {
 
 // Helper functions
 void report_error(PaError err, const std::string &func_name) {
@@ -74,9 +74,9 @@ int Stream::get_chunk_size(int n_frames) const {
 // Respeaker
 Respeaker::~Respeaker() { Pa_Terminate(); }
 void Respeaker::init(
-    const std::shared_ptr<const SpeakerConfig> &speaker_config) {
-  if (speaker_config->speaker_model() != SpeakerConfig::RESPEAKER) {
-    AERROR << "respeaker driver only supports respeaker model in config file";
+    const std::shared_ptr<const MicrophoneConfig> &microphone_config) {
+  if (microphone_config->microphone_model() != MicrophoneConfig::RESPEAKER) {
+    AERROR << "Microphone driver only supports respeaker model in config file";
   }
   int err = Pa_Initialize();
   if (err != paNoError) {
@@ -87,9 +87,9 @@ void Respeaker::init(
   const PaDeviceIndex device_index = get_respeaker_index();
   stream_ptr_.reset(new Stream());
   stream_ptr_->init_stream(
-      speaker_config->sample_rate(), speaker_config->channel_type_size(),
-      speaker_config->chunk(), device_index,
-      get_format_from_width(speaker_config->sample_width()));
+      microphone_config->sample_rate(), microphone_config->channel_type_size(),
+      microphone_config->chunk(), device_index,
+      get_format_from_width(microphone_config->sample_width()));
 }
 
 const PaSampleFormat Respeaker::get_format_from_width(int width,
@@ -167,6 +167,6 @@ int Respeaker::get_chunk_size(int n_frames) const {
   return stream_ptr_->get_chunk_size(n_frames);
 }
 
-}  // namespace audio
+}  // namespace microphone
 }  // namespace drivers
 }  // namespace apollo

@@ -16,9 +16,8 @@ proto_library(
     name = "audio_proto",
     srcs = ["audio.proto"],
     deps = [
-        ":speaker_config_proto",
-        "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
+        ":microphone_config_proto",
     ],
 )
 
@@ -26,24 +25,26 @@ py_proto_library(
     name = "audio_py_pb2",
     deps = [
         ":audio_proto",
+        "//modules/common/proto:header_py_pb2",
+        ":microphone_config_py_pb2",
     ],
 )
 
 cc_proto_library(
-    name = "speaker_config_cc_proto",
+    name = "microphone_config_cc_proto",
     deps = [
-        ":speaker_config_proto",
+        ":microphone_config_proto",
     ],
 )
 
 proto_library(
-    name = "speaker_config_proto",
-    srcs = ["speaker_config.proto"],
+    name = "microphone_config_proto",
+    srcs = ["microphone_config.proto"],
 )
 
 py_proto_library(
-    name = "speaker_config_py_pb2",
+    name = "microphone_config_py_pb2",
     deps = [
-        ":speaker_config_proto",
+        ":microphone_config_proto",
     ],
 )

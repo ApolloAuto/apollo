@@ -8,7 +8,7 @@ module_config {
             flag_file_path: "/apollo/modules/audio/conf/audio.conf"
             readers: [
                 {
-                    channel: "/apollo/speaker"
+                    channel: "/apollo/microphone"
                     qos_profile: {
                         depth : 1
                     }

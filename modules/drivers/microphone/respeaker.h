@@ -22,13 +22,13 @@
 #include <google/protobuf/message.h>
 #include <portaudio.h>
 #include "cyber/cyber.h"
-#include "modules/drivers/audio/proto/speaker_config.pb.h"
+#include "modules/drivers/microphone/proto/microphone_config.pb.h"
 
 namespace apollo {
 namespace drivers {
-namespace audio {
+namespace microphone {
 
-using apollo::drivers::audio::config::SpeakerConfig;
+using apollo::drivers::microphone::config::MicrophoneConfig;
 
 /* An incomplete version of PA Stream used only for respeaker as input.
  * Refer to http://portaudio.com/docs/v19-doxydocs/ for more information
@@ -61,11 +61,11 @@ class Respeaker {
  public:
   Respeaker() {}
   ~Respeaker();
-  void init(const std::shared_ptr<const SpeakerConfig> &speaker_config);
+  void init(const std::shared_ptr<const MicrophoneConfig> &microphone_config);
   void read_stream(int n_frames, char *buffer) const;
   int get_chunk_size(int n_frames) const;
 };
 
-}  // namespace audio
+}  // namespace microphone
 }  // namespace drivers
 }  // namespace apollo

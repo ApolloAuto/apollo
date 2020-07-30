@@ -25,7 +25,7 @@
 
 #include "cyber/component/component.h"
 #include "modules/audio/proto/audio.pb.h"
-#include "modules/drivers/audio/proto/audio.pb.h"
+#include "modules/drivers/microphone/proto/audio.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 /**
  * @namespace apollo::audio
@@ -35,7 +35,7 @@ namespace apollo {
 namespace audio {
 
 class AudioComponent
-    : public cyber::Component<apollo::drivers::audio::config::AudioData> {
+    : public cyber::Component<apollo::drivers::microphone::config::AudioData> {
  public:
   ~AudioComponent();
 
@@ -44,7 +44,7 @@ class AudioComponent
   bool Init() override;
 
   bool Proc(
-      const std::shared_ptr<apollo::drivers::audio::config::AudioData>&)
+      const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&)
   override;
 
  private:

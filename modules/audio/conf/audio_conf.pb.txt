@@ -1,4 +1,4 @@
 topic_conf {
-  audio_data_topic_name: "/apollo/speaker"
+  audio_data_topic_name: "/apollo/microphone"
   audio_detection_topic_name: "/apollo/audio_detection"
 }
