@@ -2410,7 +2410,7 @@ static void addpcv(const pcv_t* pcv, pcvs_t* pcvs) {
 static int readngspcv(const char* file, pcvs_t* pcvs) {
   FILE* fp;
   static const pcv_t pcv0 = {0};
-  pcv_t pcv;
+  pcv_t pcv = {0};
   double neu[3];
   int n = 0;
   char buff[256];
@@ -2465,7 +2465,7 @@ static int readngspcv(const char* file, pcvs_t* pcvs) {
 static int readantex(const char* file, pcvs_t* pcvs) {
   FILE* fp;
   static const pcv_t pcv0 = {0};
-  pcv_t pcv;
+  pcv_t pcv = {0};
   double neu[3];
   int i, f, freq = 0, state = 0, freqs[] = {1, 2, 5, 6, 7, 8, 0};
   char buff[256];
