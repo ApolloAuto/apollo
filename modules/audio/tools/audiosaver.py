@@ -21,7 +21,7 @@ import wave
 from cyber.python.cyber_py3 import cyber
 from modules.drivers.microphone.proto.audio_pb2 import AudioData
 
-RESPEAKER_CHANNEL = "/apollo/microphone"
+RESPEAKER_CHANNEL = "/apollo/sensor/microphone"
 WAV_SAVING_PATH = "/tmp"
 
 

@@ -82,6 +82,7 @@ SMALL_TOPICS = [
     '/apollo/sensor/gnss/rtk_eph',
     '/apollo/sensor/gnss/rtk_obs',
     '/apollo/sensor/gnss/heading',
+    '/apollo/sensor/microphone',
     '/apollo/sensor/mobileye',
     '/apollo/storytelling',
     '/tf',
