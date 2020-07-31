@@ -62,6 +62,11 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
       !injector_->learning_based_data()->GetLatestLearningDataFrame()) {
     const std::string msg = "learning_data_frame empty";
     AERROR << msg;
+    // hybrid model will use rule based planning when learning based data or
+    // learning data frame is empty
+    if (config.allow_empty_learning_based_data()) {
+      return Status::OK();
+    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
