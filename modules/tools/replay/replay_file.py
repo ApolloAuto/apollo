@@ -28,8 +28,8 @@ from google.protobuf import text_format
 
 from cyber_py3 import cyber
 
-import common.proto_utils as proto_utils
-from common.message_manager import PbMessageManager
+import modules.tools.common.proto_utils as proto_utils
+from modules.tools.common.message_manager import PbMessageManager
 
 g_message_manager = PbMessageManager()
 
