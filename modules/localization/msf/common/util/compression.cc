@@ -102,7 +102,7 @@ int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
   unsigned int dst_idx = 0;
 
   /* allocate inflate state */
-  memset(&stream_data, 0, sizeof(z_stream));
+  std::memset(&stream_data, 0, sizeof(z_stream));
 
   ret = inflateInit(&stream_data);
   if (ret != Z_OK) {
