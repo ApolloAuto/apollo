@@ -19,7 +19,7 @@
 #include <string>
 
 #include "modules/perception/fusion/base/base_init_options.h"
-#include "modules/perception/fusion/lib/interface/base_existance_fusion.h"
+#include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
@@ -60,11 +60,11 @@ class PbfTracker : public BaseTracker {
   static std::string s_type_fusion_method_;
   static std::string s_motion_fusion_method_;
   static std::string s_shape_fusion_method_;
-  static std::string s_existance_fusion_method_;
+  static std::string s_existence_fusion_method_;
 
   std::unique_ptr<BaseTypeFusion> type_fusion_ = nullptr;
   std::unique_ptr<BaseMotionFusion> motion_fusion_ = nullptr;
-  std::unique_ptr<BaseExistanceFusion> existance_fusion_ = nullptr;
+  std::unique_ptr<BaseExistenceFusion> existence_fusion_ = nullptr;
   std::unique_ptr<BaseShapeFusion> shape_fusion_ = nullptr;
 };
 

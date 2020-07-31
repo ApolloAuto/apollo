@@ -34,8 +34,8 @@ struct PbfGatekeeperParams {
   double min_camera_publish_distance = 50;
   double invisible_period_threshold = 0.001;
   double toic_threshold = 0.8;
-  double existance_threshold = 0.7;
-  double radar_existance_threshold = 0.9;
+  double existence_threshold = 0.7;
+  double radar_existence_threshold = 0.9;
 
   bool use_track_time_pub_strategy = true;
   int pub_track_time_thresh = 3;

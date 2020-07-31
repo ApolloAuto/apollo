@@ -87,9 +87,9 @@ class Track {
 
   inline void AddTrackedTimes() { ++tracked_times_; }
 
-  inline double GetExistanceProb() const { return existance_prob_; }
+  inline double GetExistenceProb() const { return existence_prob_; }
 
-  inline void SetExistanceProb(double prob) { existance_prob_ = prob; }
+  inline void SetExistenceProb(double prob) { existence_prob_ = prob; }
 
   inline double GetToicProb() const { return toic_prob_; }
 
@@ -140,7 +140,7 @@ class Track {
 
   FusedObjectPtr fused_object_ = nullptr;
   double tracking_period_ = 0.0;
-  double existance_prob_ = 0.0;
+  double existence_prob_ = 0.0;
   double toic_prob_ = 0.0;
 
   bool is_background_ = false;

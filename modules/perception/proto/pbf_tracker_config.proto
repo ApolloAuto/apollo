@@ -6,5 +6,5 @@ message PbfTrackerConfig {
   optional string type_fusion_method = 1 [default = "DstTypeFusion"];
   optional string motion_fusion_method = 2 [default = "KalmanMotionFusion"];
   optional string shape_fusion_method = 3 [default = "PbfShapeFusion"];
-  optional string existance_fusion_method = 4 [default = "DstExistanceFusion"];
+  optional string existence_fusion_method = 4 [default = "DstExistenceFusion"];
 }

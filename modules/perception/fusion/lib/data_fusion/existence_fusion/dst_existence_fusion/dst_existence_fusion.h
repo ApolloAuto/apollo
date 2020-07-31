@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "modules/perception/fusion/common/dst_evidence.h"
-#include "modules/perception/fusion/lib/interface/base_existance_fusion.h"
+#include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -33,13 +33,13 @@ struct ToicDstMaps {
   std::vector<std::string> subset_names_ = {"TOIC", "NTOIC", "TOICUNKOWN"};
 };
 
-struct ExistanceDstMaps {
+struct ExistenceDstMaps {
   enum { EXIST = (1 << 0), NEXIST = (1 << 1), EXISTUNKOWN = (EXIST | NEXIST) };
   std::vector<uint64_t> fod_subsets_ = {EXIST, NEXIST, EXISTUNKOWN};
   std::vector<std::string> subset_names_ = {"EXIST", "NEXIST", "EXISTUNKOWN"};
 };
 
-struct DstExistanceFusionOptions {
+struct DstExistenceFusionOptions {
   std::map<std::string, double> camera_max_valid_dist_ = {
       {"camera_smartereye", 110},
       {"camera_front_obstacle", 110},
@@ -49,10 +49,10 @@ struct DstExistanceFusionOptions {
   double track_object_max_match_distance_ = 4.0;
 };
 
-class DstExistanceFusion : public BaseExistanceFusion {
+class DstExistenceFusion : public BaseExistenceFusion {
  public:
-  explicit DstExistanceFusion(TrackPtr track);
-  ~DstExistanceFusion() {}
+  explicit DstExistenceFusion(TrackPtr track);
+  ~DstExistenceFusion() {}
 
   // @brief: add dst application
   static bool Init();
@@ -71,7 +71,7 @@ class DstExistanceFusion : public BaseExistanceFusion {
 
   std::string Name() const;
   double GetToicScore() const { return toic_score_; }
-  double GetExistanceProbability() const;
+  double GetExistenceProbability() const;
 
  private:
   void UpdateToicWithCameraMeasurement(const SensorObjectPtr &camera_obj,
@@ -88,20 +88,20 @@ class DstExistanceFusion : public BaseExistanceFusion {
   double GetToicProbability() const;
 
   // Update state
-  void UpdateExistanceState();
+  void UpdateExistenceState();
 
  private:
-  double existance_score_ = 0.0;
+  double existence_score_ = 0.0;
   Dst fused_toic_;
-  Dst fused_existance_;
+  Dst fused_existence_;
   double toic_score_ = 0.0;
 
  private:
   static const char *name_;
   static const char *toic_name_;
-  static ExistanceDstMaps existance_dst_maps_;
+  static ExistenceDstMaps existence_dst_maps_;
   static ToicDstMaps toic_dst_maps_;
-  static DstExistanceFusionOptions options_;
+  static DstExistenceFusionOptions options_;
 };
 
 }  // namespace fusion

@@ -189,21 +189,21 @@ py_proto_library(
     ],
 )
 cc_proto_library(
-    name = "dst_existance_fusion_config_cc_proto",
+    name = "dst_existence_fusion_config_cc_proto",
     deps = [
-        ":dst_existance_fusion_config_proto",
+        ":dst_existence_fusion_config_proto",
     ],
 )
 
 proto_library(
-    name = "dst_existance_fusion_config_proto",
-    srcs = ["dst_existance_fusion_config.proto"],
+    name = "dst_existence_fusion_config_proto",
+    srcs = ["dst_existence_fusion_config.proto"],
 )
 
 py_proto_library(
-    name = "dst_existance_fusion_config_py_pb2",
+    name = "dst_existence_fusion_config_py_pb2",
     deps = [
-        ":dst_existance_fusion_config_proto",
+        ":dst_existence_fusion_config_proto",
     ],
 )
 cc_proto_library(

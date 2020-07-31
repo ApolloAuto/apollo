@@ -4,9 +4,9 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "dst_existance_fusion",
-    srcs = ["dst_existance_fusion.cc"],
-    hdrs = ["dst_existance_fusion.h"],
+    name = "dst_existence_fusion",
+    srcs = ["dst_existence_fusion.cc"],
+    hdrs = ["dst_existence_fusion.h"],
     deps = [
         "//modules/common/util",
         "//modules/perception/fusion/base",
@@ -14,16 +14,16 @@ cc_library(
         "//modules/perception/fusion/common:dst_evidence",
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/lib/registerer",
-        "//modules/perception/proto:dst_existance_fusion_config_cc_proto",
+        "//modules/perception/proto:dst_existence_fusion_config_cc_proto",
     ],
 )
 
 cc_test(
-    name = "dst_existance_fusion_test",
+    name = "dst_existence_fusion_test",
     size = "small",
-    srcs = ["dst_existance_fusion_test.cc"],
+    srcs = ["dst_existence_fusion_test.cc"],
     deps = [
-        ":dst_existance_fusion",
+        ":dst_existence_fusion",
         "@com_google_googletest//:gtest_main",
     ],
 )

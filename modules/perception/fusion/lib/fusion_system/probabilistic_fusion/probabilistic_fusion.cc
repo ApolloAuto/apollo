@@ -24,7 +24,7 @@
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
-#include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
+#include "modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion/dst_existence_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
@@ -99,7 +99,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
     return false;
   }
 
-  bool state = DstTypeFusion::Init() && DstExistanceFusion::Init() &&
+  bool state = DstTypeFusion::Init() && DstExistenceFusion::Init() &&
                PbfTracker::InitParams();
 
   return state;
@@ -220,7 +220,7 @@ void ProbabilisticFusion::UpdateAssignedTracks(
     const SensorFramePtr& frame,
     const std::vector<TrackMeasurmentPair>& assignments) {
   // Attention: match_distance should be used
-  // in ExistanceFusion to calculate existence score.
+  // in ExistenceFusion to calculate existence score.
   // We set match_distance to zero if track and object are matched,
   // which only has a small difference compared with actural match_distance
   TrackerOptions options;
@@ -237,7 +237,7 @@ void ProbabilisticFusion::UpdateUnassignedTracks(
     const SensorFramePtr& frame,
     const std::vector<size_t>& unassigned_track_inds) {
   // Attention: match_distance(min_match_distance) should be used
-  // in ExistanceFusion to calculate toic score.
+  // in ExistenceFusion to calculate toic score.
   // Due to it hasn't been used(mainly for front radar object pub in
   // gatekeeper),
   // we do not set match_distance temporarily.

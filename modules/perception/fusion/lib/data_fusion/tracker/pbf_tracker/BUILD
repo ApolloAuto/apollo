@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["pbf_tracker.h"],
     deps = [
         "//modules/common/time:time_util",
-        "//modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion",
+        "//modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion",
         "//modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion",
         "//modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion",
         "//modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion",
