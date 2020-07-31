@@ -3,7 +3,7 @@ chunk: 1024
 sample_rate: 16000
 record_seconds: 6
 sample_width: 2
-channel_name: "/apollo/microphone"
+channel_name: "/apollo/sensor/microphone"
 frame_id: "respeaker"
 channel_type: ASR
 channel_type: RAW
