@@ -38,7 +38,7 @@ class NDTLocalizationTest : public ::testing::Test {
 };
 
 TEST_F(NDTLocalizationTest, Init) {
-  absl::SetFlag(&FLAGS_local_utm_zone_id, 10);
+  FLAGS_local_utm_zone_id = 10;
   FLAGS_online_resolution = 0.25;
   ndt_localization_ptr_->Init();
   EXPECT_EQ(ndt_localization_ptr_->GetZoneId(), 10);

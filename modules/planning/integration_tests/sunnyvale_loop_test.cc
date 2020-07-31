@@ -33,8 +33,8 @@ class SunnyvaleLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_use_navigation_mode = false;
-    absl::SetFlag(&FLAGS_map_dir, "modules/map/data/sunnyvale_loop");
-    absl::SetFlag(&FLAGS_test_base_map_filename, "base_map_test.bin");
+    FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
+    FLAGS_test_base_map_filename = "base_map_test.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;

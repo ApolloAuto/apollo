@@ -35,14 +35,14 @@ V2xProxy::V2xProxy()
 
   auto x2v_trafficlight_timer_period = ceil(
       (1.0 / static_cast<int>(FLAGS_x2v_trafficlight_timer_frequency)) * 1000);
-  x2v_trafficlight_timer_.reset(new cyber::Timer(
-      static_cast<uint32_t>(x2v_trafficlight_timer_period),
-      [this]() { this->OnX2vTrafficLightTimer(); }, false));
+  x2v_trafficlight_timer_.reset(
+      new cyber::Timer(static_cast<uint32_t>(x2v_trafficlight_timer_period),
+                       [this]() { this->OnX2vTrafficLightTimer(); }, false));
   auto v2x_carstatus_timer_period = ceil(
       (1.0 / static_cast<int>(FLAGS_v2x_carstatus_timer_frequency)) * 1000);
-  v2x_carstatus_timer_.reset(new cyber::Timer(
-      static_cast<uint32_t>(v2x_carstatus_timer_period),
-      [this]() { this->OnV2xCarStatusTimer(); }, false));
+  v2x_carstatus_timer_.reset(
+      new cyber::Timer(static_cast<uint32_t>(v2x_carstatus_timer_period),
+                       [this]() { this->OnV2xCarStatusTimer(); }, false));
 
   os_interface_.reset(new OsInterFace());
   obu_interface_.reset(new ObuInterFaceGrpcImpl());
@@ -57,8 +57,7 @@ V2xProxy::V2xProxy()
   }
 
   hdmap_.reset(new apollo::hdmap::HDMap());
-  std::string map_name = absl::StrCat(absl::GetFlag(FLAGS_map_dir), "/",
-                                      absl::GetFlag(FLAGS_base_map_filename));
+  std::string map_name = FLAGS_map_dir + "/" + FLAGS_base_map_filename;
   if (FLAGS_debug_flag) {
     map_name = FLAGS_hdmap_file_name;
   }

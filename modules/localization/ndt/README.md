@@ -8,7 +8,7 @@
 ## Input
   * Point cloud data from LiDAR sensor ( `/apollo/sensor/velodyne64/compensator/PointCloud2`)
   * Inspva message from integrated navigation sensor ( `/apollo/sensor/gnss/odometry`)
-  * Localization map absl::strcat(absl::GetFlag(FLAGS_map_dir), "/",  FLAGS_ndt_map_dir,  "/", FLAGS_local_map_name)
+  * Localization map (FLAGS_map_dir + "/" + FLAGS_ndt_map_dir + "/" + FLAGS_local_map_name)
   * Parameter config files (velodyne64_novatel_extrinsics_example.yaml, velodyne64_height.yaml, located in `modules/localization/msf/params/`)
 
 ## Output

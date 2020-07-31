@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  const auto map_filename = absl::GetFlag(FLAGS_map_dir) + "/base_map.txt";
+  const auto map_filename = FLAGS_map_dir + "/base_map.txt";
   apollo::hdmap::Map pb_map;
   ACHECK(apollo::cyber::common::GetProtoFromFile(map_filename, &pb_map))
       << "fail to load data from : " << map_filename;

@@ -102,7 +102,7 @@ bool MapService::ReloadMap(bool force_reload) {
 void MapService::UpdateOffsets() {
   x_offset_ = 0.0;
   y_offset_ = 0.0;
-  std::ifstream ifs(absl::StrCat(absl::GetFlag(FLAGS_map_dir), kMetaFileName));
+  std::ifstream ifs(FLAGS_map_dir + kMetaFileName);
   if (!ifs.is_open()) {
     AINFO << "Failed to open map meta file: " << kMetaFileName;
   } else {

@@ -45,8 +45,8 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
     FLAGS_use_navigation_mode = false;
-    absl::SetFlag(&FLAGS_map_dir, "modules/map/data/sunnyvale_big_loop");
-    absl::SetFlag(&FLAGS_test_base_map_filename, "base_map.bin");
+    FLAGS_map_dir = "modules/map/data/sunnyvale_big_loop";
+    FLAGS_test_base_map_filename = "base_map.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
 
