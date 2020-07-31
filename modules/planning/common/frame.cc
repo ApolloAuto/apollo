@@ -22,6 +22,8 @@
 #include <algorithm>
 #include <limits>
 
+#include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
@@ -408,7 +410,7 @@ uint32_t Frame::SequenceNum() const {
 }
 
 std::string Frame::DebugString() const {
-  return "Frame: " + std::to_string(sequence_num_);
+  return absl::StrCat("Frame: ", sequence_num_);
 }
 
 void Frame::RecordInputDebug(planning_internal::Debug *debug) {

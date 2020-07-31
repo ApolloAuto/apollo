@@ -448,8 +448,7 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
     // path is empty
     return false;
   }
-  path->set_name("Path from navigation line index " +
-                 std::to_string(line_index));
+  path->set_name(absl::StrCat("Path from navigation line index ", line_index));
   const auto &navigation_path =
       navigation_info_.navigation_path(line_index).path();
   auto proj_index_pair = UpdateProjectionIndex(navigation_path, line_index);
