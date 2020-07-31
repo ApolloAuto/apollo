@@ -39,6 +39,7 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
         "//modules/localization/proto:gnss_pnt_result_cc_proto",
+        "//modules/localization/proto:gps_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/localization/proto:localization_config_cc_proto",
         "//modules/localization/proto:localization_status_cc_proto",
