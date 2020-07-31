@@ -29,8 +29,8 @@ import time
 import os
 import sys
 
-from common.message_manager import PbMessageManager
-from common import proto_utils
+from modules.tools.common.message_manager import PbMessageManager
+from modules.tools.common import proto_utils
 
 g_message_manager = PbMessageManager()
 
