@@ -380,17 +380,6 @@ function setup_devices_and_mount_volumes() {
     eval "${__retval}='${volumes}'"
 }
 
-function determine_display() {
-    local display
-    # read from env
-    if [[ -z "${DISPLAY}" ]]; then
-        display=":0"
-    else
-        display="${DISPLAY}"
-    fi
-    echo "${display}"
-}
-
 function remove_existing_cyber_container() {
     if docker ps -a --format '{{.Names}}' | grep -q "${CYBER_CONTAINER}"; then
         info "Removing existing cyber container ${CYBER_CONTAINER}"
@@ -466,7 +455,7 @@ function start_cyber_container() {
     local local_volumes
     setup_devices_and_mount_volumes local_volumes
 
-    local display="$(determine_display)"
+    local display="${DISPLAY:-:0}"
 
     set -x
     ${DOCKER_RUN_CMD} -it \
