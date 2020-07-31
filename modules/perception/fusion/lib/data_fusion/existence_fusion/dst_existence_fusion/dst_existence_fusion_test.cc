@@ -21,7 +21,7 @@
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
-#include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
+#include "modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion/dst_existence_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -30,14 +30,14 @@ namespace fusion {
 /* TODO(all): Initialize() not compiling. to be fixed
 TEST(DstExistFusionTest, test_update_with_measurement) {
   FLAGS_work_root = "/apollo/modules/perception/testdata/"
-      "fusion/dst_existance_fusion";
+      "fusion/dst_existence_fusion";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/dst_existance_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/dst_existence_fusion/params";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   EXPECT_TRUE(common::SensorManager::Instance()->Init());
 
   std::cout << "start init dst app\n";
-  bool flag = DstExistanceFusion::Init();
+  bool flag = DstExistenceFusion::Init();
   EXPECT_TRUE(flag);
 
   // create a lidar track
@@ -57,7 +57,7 @@ TEST(DstExistFusionTest, test_update_with_measurement) {
   TrackPtr track(new Track());
   EXPECT_TRUE(track->Initialize(lidar_sensor_object_ptr));
 
-  DstExistanceFusion existance_fusion(track);
+  DstExistenceFusion existence_fusion(track);
 
   // create a camera measurement
   base::ObjectPtr base_camera_object_ptr(new base::Object());
@@ -80,10 +80,10 @@ TEST(DstExistFusionTest, test_update_with_measurement) {
       new SensorObject(base_camera_object_ptr, camera_sensor_frame_ptr));
 
   // update with measurment
-  existance_fusion.UpdateWithMeasurement(camera_sensor_object_ptr,
+  existence_fusion.UpdateWithMeasurement(camera_sensor_object_ptr,
                                          151192277.124567989, 0.9);
-  EXPECT_NEAR(existance_fusion.GetToicScore(), 0.5, 1e-6);
-  EXPECT_NEAR(existance_fusion.GetExistanceProbability(), 0.74, 1e-6);
+  EXPECT_NEAR(existence_fusion.GetToicScore(), 0.5, 1e-6);
+  EXPECT_NEAR(existence_fusion.GetExistenceProbability(), 0.74, 1e-6);
 
   // create a radar track
   base::ObjectPtr base_radar_object_ptr(new base::Object());
@@ -103,17 +103,17 @@ TEST(DstExistFusionTest, test_update_with_measurement) {
   TrackPtr track_1(new Track());
   EXPECT_TRUE(track_1->Initialize(radar_sensor_object_ptr));
 
-  DstExistanceFusion existance_fusion_1(track_1);
-  existance_fusion_1.UpdateWithMeasurement(camera_sensor_object_ptr,
+  DstExistenceFusion existence_fusion_1(track_1);
+  existence_fusion_1.UpdateWithMeasurement(camera_sensor_object_ptr,
                                            151192277.124567989, 0);
-  EXPECT_NEAR(existance_fusion_1.GetToicScore(), 0.71, 1e-2);
-  EXPECT_NEAR(existance_fusion_1.GetExistanceProbability(), 0.74, 1e-6);
+  EXPECT_NEAR(existence_fusion_1.GetToicScore(), 0.71, 1e-2);
+  EXPECT_NEAR(existence_fusion_1.GetExistenceProbability(), 0.74, 1e-6);
 
   // radar will not update toic score
-  existance_fusion_1.UpdateWithMeasurement(radar_sensor_object_ptr,
+  existence_fusion_1.UpdateWithMeasurement(radar_sensor_object_ptr,
                                            151192277.124567989, 0);
-  EXPECT_NEAR(existance_fusion_1.GetToicScore(), 0.71, 1e-2);
-  EXPECT_NEAR(existance_fusion_1.GetExistanceProbability(), 0.74, 1e-3);
+  EXPECT_NEAR(existence_fusion_1.GetToicScore(), 0.71, 1e-2);
+  EXPECT_NEAR(existence_fusion_1.GetExistenceProbability(), 0.74, 1e-3);
 }
 */
 
@@ -125,7 +125,7 @@ TEST(DstExistFusionTest, test_update_without_measurement) {
   EXPECT_TRUE(common::SensorManager::Instance()->Init());
 
   std::cout << "start init dst app\n";
-  bool flag = DstExistanceFusion::Init();
+  bool flag = DstExistenceFusion::Init();
   EXPECT_TRUE(flag);
 
   // create a lidar track
@@ -146,7 +146,7 @@ TEST(DstExistFusionTest, test_update_without_measurement) {
   TrackPtr track(new Track());
   EXPECT_TRUE(track->Initialize(lidar_sensor_object_ptr));
 
-  DstExistanceFusion existance_fusion(track);
+  DstExistenceFusion existence_fusion(track);
 
   // create a camera measurement
   base::ObjectPtr base_camera_object_ptr(new base::Object());
@@ -170,13 +170,13 @@ TEST(DstExistFusionTest, test_update_without_measurement) {
   // update without measurment
   std::string camera_sensor_id = camera_frame_ptr->sensor_info.name;
   std::string lidar_sensor_id = lidar_frame_ptr->sensor_info.name;
-  existance_fusion.UpdateWithoutMeasurement(
+  existence_fusion.UpdateWithoutMeasurement(
       lidar_sensor_id, 151192277.124567989, 151192277.124567989, 0.9);
-  EXPECT_NEAR(existance_fusion.GetExistanceProbability(), 0.455, 1e-6);
-  existance_fusion.UpdateWithoutMeasurement(
+  EXPECT_NEAR(existence_fusion.GetExistenceProbability(), 0.455, 1e-6);
+  existence_fusion.UpdateWithoutMeasurement(
       camera_sensor_id, 151192277.124567989, 151192277.124567989, 0.9);
-  EXPECT_NEAR(existance_fusion.GetToicScore(), 0.5, 1e-6);
-  EXPECT_NEAR(existance_fusion.GetExistanceProbability(), 0.455, 1e-6);
+  EXPECT_NEAR(existence_fusion.GetToicScore(), 0.5, 1e-6);
+  EXPECT_NEAR(existence_fusion.GetExistenceProbability(), 0.455, 1e-6);
 
   // create a radar track
   base::ObjectPtr base_radar_object_ptr(new base::Object());
@@ -196,21 +196,21 @@ TEST(DstExistFusionTest, test_update_without_measurement) {
   TrackPtr track_1(new Track());
   EXPECT_TRUE(track_1->Initialize(radar_sensor_object_ptr));
 
-  DstExistanceFusion existance_fusion_1(track_1);
-  existance_fusion_1.UpdateWithoutMeasurement(
+  DstExistenceFusion existence_fusion_1(track_1);
+  existence_fusion_1.UpdateWithoutMeasurement(
       camera_sensor_id, 151192277.124567989, 151192277.124567989, 1.0);
-  EXPECT_NEAR(existance_fusion_1.GetToicScore(), 0.5, 1e-2);
-  EXPECT_NEAR(existance_fusion_1.GetExistanceProbability(), 0.5, 1e-3);
-  existance_fusion_1.UpdateWithoutMeasurement("radar", 151192277.124567989,
+  EXPECT_NEAR(existence_fusion_1.GetToicScore(), 0.5, 1e-2);
+  EXPECT_NEAR(existence_fusion_1.GetExistenceProbability(), 0.5, 1e-3);
+  existence_fusion_1.UpdateWithoutMeasurement("radar", 151192277.124567989,
                                               151192277.124567989, 0.0);
 
   // create a camera track
   TrackPtr track_2(new Track());
   EXPECT_TRUE(track_2->Initialize(camera_sensor_object_ptr));
-  DstExistanceFusion existance_fusion_2(track_2);
-  existance_fusion_2.UpdateWithoutMeasurement(
+  DstExistenceFusion existence_fusion_2(track_2);
+  existence_fusion_2.UpdateWithoutMeasurement(
       camera_sensor_id, 151192277.124567989, 151192277.124567989, 1.0);
-  EXPECT_NEAR(existance_fusion_1.GetToicScore(), 0.5, 1e-2);
+  EXPECT_NEAR(existence_fusion_1.GetToicScore(), 0.5, 1e-2);
 }
 */
 

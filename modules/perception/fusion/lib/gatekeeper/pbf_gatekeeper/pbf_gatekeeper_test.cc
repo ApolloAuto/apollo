@@ -197,9 +197,9 @@ TEST(PbfGatekeeperTest, test) {
   EXPECT_FALSE(gate_keeper.AbleToPublish(track3));
   base_obj_2->camera_supplement.local_center = Eigen::Vector3f(0, 0, 60);
   EXPECT_FALSE(gate_keeper.AbleToPublish(track3));
-  track3->SetExistanceProb(0.6);
+  track3->SetExistenceProb(0.6);
   EXPECT_FALSE(gate_keeper.AbleToPublish(track3));
-  track3->SetExistanceProb(0.8);
+  track3->SetExistenceProb(0.8);
   EXPECT_TRUE(gate_keeper.AbleToPublish(track3));
   // camera narrow
   track3->Initialize(frame_3->GetForegroundObjects()[0]);

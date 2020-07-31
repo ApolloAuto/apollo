@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
+#include "modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion/dst_existence_fusion.h"
 
 #include <limits>
 
@@ -24,7 +24,7 @@
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/dst_existance_fusion_config.pb.h"
+#include "modules/perception/proto/dst_existence_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -32,20 +32,20 @@ namespace fusion {
 
 using cyber::common::GetAbsolutePath;
 
-const char *DstExistanceFusion::name_ = "DstExistanceFusion";
-const char *DstExistanceFusion::toic_name_ = "DstToicFusion";
-ExistanceDstMaps DstExistanceFusion::existance_dst_maps_;
-ToicDstMaps DstExistanceFusion::toic_dst_maps_;
-DstExistanceFusionOptions DstExistanceFusion::options_;
+const char *DstExistenceFusion::name_ = "DstExistenceFusion";
+const char *DstExistenceFusion::toic_name_ = "DstToicFusion";
+ExistenceDstMaps DstExistenceFusion::existence_dst_maps_;
+ToicDstMaps DstExistenceFusion::toic_dst_maps_;
+DstExistenceFusionOptions DstExistenceFusion::options_;
 
-DstExistanceFusion::DstExistanceFusion(TrackPtr track)
-    : BaseExistanceFusion(track),
+DstExistenceFusion::DstExistenceFusion(TrackPtr track)
+    : BaseExistenceFusion(track),
       fused_toic_(toic_name_),
-      fused_existance_(name_) {}
+      fused_existence_(name_) {}
 
-bool DstExistanceFusion::Init() {
+bool DstExistenceFusion::Init() {
   BaseInitOptions options;
-  if (!GetFusionInitOptions("DstExistanceFusion", &options)) {
+  if (!GetFusionInitOptions("DstExistenceFusion", &options)) {
     AERROR << "GetFusionInitOptions failed ";
     return false;
   }
@@ -54,7 +54,7 @@ bool DstExistanceFusion::Init() {
       lib::ConfigManager::Instance()->work_root(), options.root_dir);
 
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
-  DstExistanceFusionConfig params;
+  DstExistenceFusionConfig params;
 
   if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
@@ -73,8 +73,8 @@ bool DstExistanceFusion::Init() {
         << " track_object_max_match_distance: "
         << options_.track_object_max_match_distance_;
 
-  DstManager::Instance()->AddApp(name_, existance_dst_maps_.fod_subsets_,
-                                 existance_dst_maps_.subset_names_);
+  DstManager::Instance()->AddApp(name_, existence_dst_maps_.fod_subsets_,
+                                 existence_dst_maps_.subset_names_);
 
   DstManager::Instance()->AddApp(toic_name_, toic_dst_maps_.fod_subsets_,
                                  toic_dst_maps_.subset_names_);
@@ -83,7 +83,7 @@ bool DstExistanceFusion::Init() {
          DstManager::Instance()->IsAppAdded(toic_name_);
 }
 
-void DstExistanceFusion::UpdateWithMeasurement(
+void DstExistenceFusion::UpdateWithMeasurement(
     const SensorObjectPtr measurement, double target_timestamp,
     double match_dist) {
   std::string sensor_id = measurement->GetSensorId();
@@ -100,16 +100,16 @@ void DstExistanceFusion::UpdateWithMeasurement(
     decay = ComputeFeatureInfluence(measurement);
   }
   double obj_exist_prob = exist_factor * decay;
-  Dst existance_evidence(fused_existance_.Name());
-  existance_evidence.SetBba(
-      {{ExistanceDstMaps::EXIST, obj_exist_prob},
-       {ExistanceDstMaps::EXISTUNKOWN, 1 - obj_exist_prob}});
+  Dst existence_evidence(fused_existence_.Name());
+  existence_evidence.SetBba(
+      {{ExistenceDstMaps::EXIST, obj_exist_prob},
+       {ExistenceDstMaps::EXISTUNKOWN, 1 - obj_exist_prob}});
   // TODO(all) hard code for fused exist bba
   const double exist_fused_w = 1.0;
-  ADEBUG << " before update exist prob: " << GetExistanceProbability();
-  fused_existance_ =
-      fused_existance_ + existance_evidence * exist_fused_w * association_prob;
-  ADEBUG << " update with, EXIST prob: " << GetExistanceProbability()
+  ADEBUG << " before update exist prob: " << GetExistenceProbability();
+  fused_existence_ =
+      fused_existence_ + existence_evidence * exist_fused_w * association_prob;
+  ADEBUG << " update with, EXIST prob: " << GetExistenceProbability()
          << " obj_id " << measurement->GetBaseObject()->track_id
          << " association_prob: " << association_prob << " decay: " << decay
          << " exist_prob: " << obj_exist_prob
@@ -118,10 +118,10 @@ void DstExistanceFusion::UpdateWithMeasurement(
   if (IsCamera(measurement)) {
     UpdateToicWithCameraMeasurement(measurement, match_dist);
   }
-  UpdateExistanceState();
+  UpdateExistenceState();
 }
 
-void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
+void DstExistenceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
                                                   double measurement_timestamp,
                                                   double target_timestamp,
                                                   double min_match_dist) {
@@ -140,14 +140,14 @@ void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
        camera_object_latest->GetSensorId() == sensor_id) ||
       (radar_object != nullptr && radar_object->GetSensorId() == sensor_id &&
        lidar_object == nullptr && camera_object_latest == nullptr)) {
-    Dst existance_evidence(fused_existance_.Name());
+    Dst existence_evidence(fused_existence_.Name());
     double unexist_factor = GetUnexistReliability(sensor_id);
     base::ObjectConstPtr obj = track_ref_->GetFusedObject()->GetBaseObject();
     double dist_decay = ComputeDistDecay(obj, sensor_id, measurement_timestamp);
     double obj_unexist_prob = unexist_factor * dist_decay;
-    existance_evidence.SetBba(
-        {{ExistanceDstMaps::NEXIST, obj_unexist_prob},
-         {ExistanceDstMaps::EXISTUNKOWN, 1 - obj_unexist_prob}});
+    existence_evidence.SetBba(
+        {{ExistenceDstMaps::NEXIST, obj_unexist_prob},
+         {ExistenceDstMaps::EXISTUNKOWN, 1 - obj_unexist_prob}});
     // TODO(all) hard code for fused exist bba
     const double unexist_fused_w = 1.0;
     double min_match_dist_score = min_match_dist;
@@ -155,20 +155,20 @@ void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     //   min_match_dist_score = std::max(1 - min_match_dist /
     //   options_.track_object_max_match_distance_, 0.0);
     // }
-    ADEBUG << " before update exist prob: " << GetExistanceProbability()
+    ADEBUG << " before update exist prob: " << GetExistenceProbability()
            << " min_match_dist: " << min_match_dist
            << " min_match_dist_score: " << min_match_dist_score;
-    fused_existance_ = fused_existance_ + existance_evidence * unexist_fused_w *
+    fused_existence_ = fused_existence_ + existence_evidence * unexist_fused_w *
                                               (1 - min_match_dist_score);
-    ADEBUG << " update without, EXIST prob: " << GetExistanceProbability()
+    ADEBUG << " update without, EXIST prob: " << GetExistenceProbability()
            << " 1 - match_dist_score: " << 1 - min_match_dist_score
            << " sensor_id: " << sensor_id << " dist_decay: " << dist_decay
            << " track_id: " << track_ref_->GetTrackId();
   }
-  UpdateExistanceState();
+  UpdateExistenceState();
 }
 
-double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
+double DstExistenceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
                                             const std::string &sensor_id,
                                             double timestamp) {
   double distance = (std::numeric_limits<float>::max)();
@@ -198,7 +198,7 @@ double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
   return dist_decay;
 }
 
-double DstExistanceFusion::ComputeFeatureInfluence(
+double DstExistenceFusion::ComputeFeatureInfluence(
     const SensorObjectPtr measurement) {
   double velocity = measurement->GetBaseObject()->velocity.norm();
   auto sigmoid_fun = [](double velocity) {
@@ -213,7 +213,7 @@ double DstExistanceFusion::ComputeFeatureInfluence(
   return velocity_fact * confidence;
 }
 
-double DstExistanceFusion::GetExistReliability(
+double DstExistenceFusion::GetExistReliability(
     const SensorObjectPtr measurement) {
   bool unknown =
       (measurement->GetBaseObject()->type == base::ObjectType::UNKNOWN ||
@@ -230,7 +230,7 @@ double DstExistanceFusion::GetExistReliability(
   return 0.6;
 }
 
-double DstExistanceFusion::GetUnexistReliability(const std::string &sensor_id) {
+double DstExistenceFusion::GetUnexistReliability(const std::string &sensor_id) {
   common::SensorManager *sensor_manager = common::SensorManager::Instance();
   CHECK_NOTNULL(sensor_manager);
   if (sensor_manager->IsCamera(sensor_id)) {
@@ -242,7 +242,7 @@ double DstExistanceFusion::GetUnexistReliability(const std::string &sensor_id) {
   return 0.6;
 }
 
-void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
+void DstExistenceFusion::UpdateToicWithoutCameraMeasurement(
     const std::string &sensor_id, double measurement_timestamp,
     double min_match_dist) {
   double dist_score = min_match_dist;
@@ -289,7 +289,7 @@ void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
   fused_toic_ = fused_toic_ + toic_evidence * in_view_ratio * toic_fused_w;
 }
 
-void DstExistanceFusion::UpdateToicWithCameraMeasurement(
+void DstExistenceFusion::UpdateToicWithCameraMeasurement(
     const SensorObjectPtr &camera_obj, double match_dist) {
   std::string sensor_id = camera_obj->GetSensorId();
   double timestamp = camera_obj->GetTimestamp();
@@ -340,18 +340,18 @@ void DstExistanceFusion::UpdateToicWithCameraMeasurement(
   fused_toic_ = fused_toic_ + toic_evidence * toic_fused_w * in_view_ratio;
 }
 
-std::string DstExistanceFusion::Name() const { return name_; }
+std::string DstExistenceFusion::Name() const { return name_; }
 
-double DstExistanceFusion::GetExistanceProbability() const {
+double DstExistenceFusion::GetExistenceProbability() const {
   size_t toic_ind = DstManager::Instance()->FodSubsetToInd(
-      fused_existance_.Name(), ExistanceDstMaps::EXIST);
-  fused_existance_.ComputeProbability();
-  const std::vector<double> &existance_probs_vec =
-      fused_existance_.GetProbabilityVec();
-  return existance_probs_vec[toic_ind];
+      fused_existence_.Name(), ExistenceDstMaps::EXIST);
+  fused_existence_.ComputeProbability();
+  const std::vector<double> &existence_probs_vec =
+      fused_existence_.GetProbabilityVec();
+  return existence_probs_vec[toic_ind];
 }
 
-double DstExistanceFusion::GetToicProbability() const {
+double DstExistenceFusion::GetToicProbability() const {
   size_t toic_ind = DstManager::Instance()->FodSubsetToInd(fused_toic_.Name(),
                                                            ToicDstMaps::TOIC);
   fused_toic_.ComputeProbability();
@@ -359,11 +359,11 @@ double DstExistanceFusion::GetToicProbability() const {
   return toic_probs_vec[toic_ind];
 }
 
-void DstExistanceFusion::UpdateExistanceState() {
+void DstExistenceFusion::UpdateExistenceState() {
   double toic_p = GetToicProbability();
   track_ref_->SetToicProb(toic_p);
-  double existance_p = GetExistanceProbability();
-  track_ref_->SetExistanceProb(existance_p);
+  double existence_p = GetExistenceProbability();
+  track_ref_->SetExistenceProb(existence_p);
   // note, here max_p > 0.5, min_p < 0.5
   auto scale_probability = [](double p, double max_p, double min_p) {
     if (p > 0.5) {
