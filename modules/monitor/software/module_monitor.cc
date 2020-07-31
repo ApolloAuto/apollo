@@ -16,7 +16,7 @@
 
 #include "modules/monitor/software/module_monitor.h"
 
-#include "gflags/gflags.h"
+#include "absl/flags/flag.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -24,18 +24,18 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(module_monitor_name, "ModuleMonitor",
-              "Name of the modules monitor.");
+ABSL_FLAG(std::string, module_monitor_name, "ModuleMonitor",
+          "Name of the modules monitor.");
 
-DEFINE_double(module_monitor_interval, 1.5,
-              "Process status checking interval in seconds.");
+ABSL_FLAG(double, module_monitor_interval, 1.5,
+          "Process status checking interval in seconds.");
 
 namespace apollo {
 namespace monitor {
 
 ModuleMonitor::ModuleMonitor()
-    : RecurrentRunner(FLAGS_module_monitor_name,
-                      FLAGS_module_monitor_interval) {
+    : RecurrentRunner(absl::GetFlag(FLAGS_module_monitor_name),
+                      absl::GetFlag(FLAGS_module_monitor_interval)) {
   node_manager_ =
       cyber::service_discovery::TopologyManager::Instance()->node_manager();
 }

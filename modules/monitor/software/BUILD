@@ -26,7 +26,7 @@ cc_library(
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_github_gflags_gflags//:gflags",
+        "@com_google_absl//absl/flags:flag",
     ],
 )
 
