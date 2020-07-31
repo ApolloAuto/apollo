@@ -49,6 +49,7 @@ bool MSFLocalizationComponent::InitConfig() {
   lidar_topic_ = FLAGS_lidar_topic;
   bestgnsspos_topic_ = FLAGS_gnss_best_pose_topic;
   gnss_heading_topic_ = FLAGS_heading_topic;
+  gps_topic_ = FLAGS_gps_topic;
 
   if (!publisher_->InitConfig()) {
     AERROR << "Init publisher config failed.";
@@ -89,6 +90,10 @@ bool MSFLocalizationComponent::InitIO() {
   gnss_heading_listener_ = this->node_->CreateReader<drivers::gnss::Heading>(
       gnss_heading_topic_, gnss_heading_call);
 
+  std::function<void(const std::shared_ptr<Gps>& gps_msg)> gps_call =
+      std::bind(&MSFLocalization::OnGps, &localization_);
+  gps_listener_ = this->node_->CreateReader<Gps>(gps_topic_, gps_call);
+
   // init writer
   if (!publisher_->InitIO()) {
     AERROR << "Init publisher io failed.";
@@ -102,7 +107,7 @@ bool MSFLocalizationComponent::InitIO() {
 
 bool MSFLocalizationComponent::Proc(
     const std::shared_ptr<drivers::gnss::Imu>& imu_msg) {
-  localization_.OnRawImu(imu_msg);
+  localization_.OnRawImuCache(imu_msg);
   return true;
 }
 

@@ -30,6 +30,7 @@
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/transform/transform_broadcaster.h"
 
@@ -62,9 +63,13 @@ class MSFLocalizationComponent final
       gnss_heading_listener_ = nullptr;
   std::string gnss_heading_topic_ = "";
 
+  std::shared_ptr<cyber::Reader<Gps>> gps_listener_ = nullptr;
+  std::string gps_topic_ = "";
+
  private:
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
   MSFLocalization localization_;
+
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
