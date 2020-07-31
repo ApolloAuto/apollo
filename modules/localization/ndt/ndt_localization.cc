@@ -35,7 +35,7 @@ void NDTLocalization::Init() {
   tf_buffer_->Init();
 
   resolution_id_ = 0;
-  zone_id_ = absl::GetFlag(FLAGS_local_utm_zone_id);
+  zone_id_ = FLAGS_local_utm_zone_id;
   online_resolution_ = FLAGS_online_resolution;
   ndt_debug_log_flag_ = FLAGS_ndt_debug_log_flag;
   tf_source_frame_id_ = FLAGS_broadcast_tf_frame_id;
@@ -47,8 +47,7 @@ void NDTLocalization::Init() {
   error_ndt_score_ = FLAGS_ndt_error_ndt_score;
 
   std::string map_path_ =
-      absl::StrCat(absl::GetFlag(FLAGS_map_dir), "/", FLAGS_ndt_map_dir, "/",
-                   FLAGS_local_map_name);
+      FLAGS_map_dir + "/" + FLAGS_ndt_map_dir + "/" + FLAGS_local_map_name;
   AINFO << "map folder: " << map_path_;
   velodyne_extrinsic_ = Eigen::Affine3d::Identity();
   bool success =

@@ -210,7 +210,7 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
 void HMIWorker::InitStatus() {
   static const std::string kDockerImageEnv = "DOCKER_IMG";
   status_.set_docker_image(cyber::common::GetEnv(kDockerImageEnv));
-  status_.set_utm_zone_id(absl::GetFlag(FLAGS_local_utm_zone_id));
+  status_.set_utm_zone_id(FLAGS_local_utm_zone_id);
 
   // Populate modes and current_mode.
   const auto& modes = config_.modes();
@@ -223,7 +223,7 @@ void HMIWorker::InitStatus() {
     status_.add_maps(map_entry.first);
 
     // If current FLAG_map_dir is available, set it as current_map.
-    if (map_entry.second == absl::GetFlag(FLAGS_map_dir)) {
+    if (map_entry.second == FLAGS_map_dir) {
       status_.set_current_map(map_entry.first);
     }
   }
@@ -444,9 +444,7 @@ void HMIWorker::ChangeMap(const std::string& map_name) {
     status_changed_ = true;
   }
 
-  // SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
-  absl::SetFlag(&FLAGS_map_dir,  *map_dir);
-
+  SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
   ResetMode();
 }
 
