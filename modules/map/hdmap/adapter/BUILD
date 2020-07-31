@@ -37,6 +37,7 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util",
         "//modules/map/proto:map_cc_proto",
+        "@com_google_absl//absl/strings",
         "@proj4",
         "@tinyxml2",
     ],

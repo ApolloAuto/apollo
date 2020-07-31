@@ -20,6 +20,8 @@
 #include <thread>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
@@ -316,11 +318,10 @@ void RawStream::OnWheelVelocityTimer() {
   }
   auto latency_sec =
       cyber::Time::Now().ToSecond() - chassis_ptr_->header().timestamp_sec();
-  auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
-  auto speed_cmps =
-      std::to_string(std::lround(chassis_ptr_->speed_mps() * 100));
-  auto cmd_wheelvelocity =
-      "WHEELVELOCITY " + latency_ms + " 100 0 0 0 0 0 " + speed_cmps + "\r\n";
+  auto latency_ms = std::lround(latency_sec * 1000);
+  auto speed_cmps = std::lround(chassis_ptr_->speed_mps() * 100);
+  auto cmd_wheelvelocity = absl::StrCat("WHEELVELOCITY ", latency_ms,
+                                        " 100 0 0 0 0 0 ", speed_cmps, "\r\n");
   AINFO << "Write command: " << cmd_wheelvelocity;
   command_stream_->write(cmd_wheelvelocity);
 }
