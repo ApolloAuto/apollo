@@ -26,21 +26,36 @@ DOCKER_REPO="apolloauto/apollo"
 APOLLO_DEV="apollo_dev_${USER}"
 DEV_INSIDE="in-dev-docker"
 
-VERSION_X86_64="dev-x86_64-18.04-20200729_1839"
-VERSION_AARCH64="dev-aarch64-20170927_1111"
-
-CUSTOM_VERSION=
-VOLUME_VERSION="latest"
-GEOLOC="none"
-
+SUPPORTED_ARCHS=" x86_64 aarch64 "
 TARGET_ARCH="$(uname -m)"
 
-DOCKER_RUN="docker run"
-USE_GPU_HOST=0
+VERSION_X86_64="dev-x86_64-18.04-20200729_1839"
+VERSION_AARCH64="dev-aarch64-20170927_1111"
+USER_VERSION_OPT=
 
-USER_AGREED="no"
-USE_LOCAL_IMAGE="no"
+DOCKER_RUN="docker run"
 FAST_MODE="no"
+GEOLOC="none"
+USE_LOCAL_IMAGE="no"
+USE_GPU_HOST=0
+USER_AGREED="no"
+
+VOLUME_VERSION="latest"
+USER_SPECIFIED_MAP=
+MAP_VOLUME_CONF=
+OTHER_VOLUME_CONF=
+
+DEFAULT_MAPS=(
+  sunnyvale_big_loop
+  sunnyvale_loop
+  sunnyvale_with_two_offices
+  san_mateo
+)
+
+DEFAULT_TEST_MAPS=(
+  sunnyvale_big_loop
+  sunnyvale_loop
+)
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -130,6 +145,7 @@ function stop_all_apollo_containers_for_user() {
 }
 
 function _geo_specific_config_for_cn() {
+    # FIXME(all): make it more robust
     sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
     service docker restart
 }
@@ -181,8 +197,7 @@ function parse_arguments() {
 
         --map)
             map_name="$1"; shift
-            source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
-                "${map_name}" "${VOLUME_VERSION}"
+            USER_SPECIFIED_MAP="${USER_SPECIFIED_MAP} ${map_name}"
             ;;
         -y)
             USER_AGREED="yes"
@@ -199,7 +214,7 @@ function parse_arguments() {
     done # End while loop
 
     [ -n "${geo}" ] && GEOLOC="${geo}"
-    [ -n "${custom_version}" ] && CUSTOM_VERSION="${custom_version}"
+    [ -n "${custom_version}" ] && USER_VERSION_OPT="${custom_version}"
 }
 
 function determine_dev_image() {
@@ -220,24 +235,18 @@ function determine_dev_image() {
     APOLLO_DEV_IMAGE="${DOCKER_REPO}:${version}"
 }
 
-DEFAULT_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-  sunnyvale_with_two_offices
-  san_mateo
-)
-DEFAULT_TEST_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-)
-
-MAP_VOLUME_CONF=
-OTHER_VOLUME_CONF=
-
 function check_host_environment() {
     local kernel="$(uname -s)"
     if [ "${kernel}" != "Linux" ]; then
         warning "Running Apollo dev container on ${kernel} is UNTESTED, exiting..."
+        exit 1
+    fi
+}
+
+function check_target_arch() {
+    local arch="${TARGET_ARCH}"
+    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
+        error "Unsupported target architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
         exit 1
     fi
 }
@@ -273,23 +282,6 @@ function setup_devices_and_mount_local_volumes() {
                         -v /lib/modules:/lib/modules"
     volumes="$(tr -s " " <<< "${volumes}")"
     eval "${__retval}='${volumes}'"
-}
-
-function docker_pull() {
-    local img="$1"
-    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
-        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${img}" ; then
-            info "Local image ${img} found and will be used."
-            return
-        fi
-        warning "Image ${img} not found locally although local mode enabled. Trying to pull from remote registry."
-    fi
-
-    info "Start pulling docker image ${img} ..."
-    if ! docker pull "${img}" ; then
-        error "Failed to pull docker image : ${img}"
-        exit 1
-    fi
 }
 
 function determine_gpu_use_host() {
@@ -335,9 +327,27 @@ function remove_existing_dev_container() {
     fi
 }
 
-function _docker_restart_volume() {
+function docker_pull() {
+    local img="$1"
+    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
+        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${img}" ; then
+            info "Local image ${img} found and will be used."
+            return
+        fi
+        warning "Image ${img} not found locally although local mode enabled. Trying to pull from remote registry."
+    fi
+
+    info "Start pulling docker image ${img} ..."
+    if ! docker pull "${img}" ; then
+        error "Failed to pull docker image : ${img}"
+        exit 1
+    fi
+}
+
+function docker_restart_volume() {
     local container="$1"
     local image="$2"
+    info "Restart volume ${container} from image: ${image}"
     docker stop "${container}" &>/dev/null
     docker_pull "${image}"
     docker run -itd --rm --name "${container}" "${image}"
@@ -353,13 +363,55 @@ function restart_map_volume_if_needed() {
         local map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
         info "Load map ${map_name} from image: ${map_image}"
 
-        _docker_restart_volume "${map_volume}" "${map_image}"
+        docker_restart_volume "${map_volume}" "${map_image}"
         MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${map_volume}"
     fi
 }
 
 function mount_map_volumes() {
-    info "Starting mounting map volumes"
+    info "Starting mounting map volumes ..."
+    if [ -n "${USER_SPECIFIED_MAP}" ]; then
+        for map_name in ${USER_SPECIFIED_MAP}; do
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
+        done
+    fi
+
+    if [ "$FAST_MODE" = "no" ]; then
+        for map_name in ${DEFAULT_MAPS[@]}; do
+            restart_map_volume_if_needed ${map_name} "${VOLUME_VERSION}"
+        done
+    else
+        for map_name in ${DEFAULT_TEST_MAPS[@]}; do
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
+        done
+    fi
+}
+
+function mount_other_volumes() {
+    info "Mount other volumes ..."
+    local volume_conf=
+    if [ "${FAST_MODE}" = "no" ]; then
+        # YOLO3D
+        local yolo3d_volume="apollo_yolo3d_volume_${USER}"
+        local yolo3d_image="${DOCKER_REPO}:yolo3d_volume-${TARGET_ARCH}-latest"
+        docker_restart_volume "${yolo3d_volume}" "${yolo3d_image}"
+        volume_conf="${volume_conf} --volumes-from ${yolo3d_volume}"
+    fi
+
+    # LOCALIZATION
+    local localization_volume="apollo_localization_volume_${USER}"
+    local localization_image="${DOCKER_REPO}:localization_volume-${TARGET_ARCH}-latest"
+    docker_restart_volume "${localization_volume}" "${localization_image}"
+    volume_conf="${volume_conf} --volumes-from ${localization_volume}"
+
+    if [ "${TARGET_ARCH}" = "x86_64" ]; then
+        local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
+        local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
+        docker_restart_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
+        volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
+    fi
+
+    OTHER_VOLUME_CONF="${volume_conf}"
 }
 
 function post_run_setup() {
@@ -370,10 +422,12 @@ function post_run_setup() {
 
 function main() {
     check_host_environment
+    check_target_arch
+
     parse_arguments "$@"
     check_agreement
 
-    determine_dev_image "${CUSTOM_VERSION}"
+    determine_dev_image "${USER_VERSION_OPT}"
     geo_specific_config "${GEOLOC}"
 
     if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
@@ -393,41 +447,8 @@ function main() {
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
 
-    if [ "$FAST_MODE" == "no" ]; then
-        # Included default maps.
-        for map_name in ${DEFAULT_MAPS[@]}; do
-            restart_map_volume_if_needed ${map_name} "${VOLUME_VERSION}"
-        done
-        YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
-        docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
-
-        YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${TARGET_ARCH}-latest
-        docker_pull ${YOLO3D_VOLUME_IMAGE}
-        docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
-
-        OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${YOLO3D_VOLUME}"
-    else
-        for map_name in ${DEFAULT_TEST_MAPS[@]}; do
-            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
-        done
-    fi
-
-    LOCALIZATION_VOLUME=apollo_localization_volume_$USER
-    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
-
-    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${TARGET_ARCH}-latest
-    docker_pull ${LOCALIZATION_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
-
-    LOCAL_THIRD_PARTY_VOLUME=apollo_local_third_party_volume_$USER
-    docker stop ${LOCAL_THIRD_PARTY_VOLUME} > /dev/null 2>&1
-
-    LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest
-    docker_pull ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${LOCAL_THIRD_PARTY_VOLUME} ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
-
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
+    mount_map_volumes
+    mount_other_volumes
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
@@ -435,16 +456,14 @@ function main() {
     local display="${DISPLAY:-:0}"
     local user="${USER}"
     local uid="$(id -u)"
-    local group=$(id -g -n)
-    local gid=$(id -g)
+    local group="$(id -g -n)"
+    local gid="$(id -g)"
 
     set -x
 
     ${DOCKER_RUN} -itd  \
         --privileged    \
-        --name "${APOLLO_DEV}"  \
-        ${MAP_VOLUME_CONF}      \
-        ${OTHER_VOLUME_CONF}    \
+        --name "${APOLLO_DEV}"      \
         -e DISPLAY="${display}"     \
         -e DOCKER_USER="${user}"    \
         -e USER="${user}"           \
@@ -452,17 +471,19 @@ function main() {
         -e DOCKER_GRP="${group}"    \
         -e DOCKER_GRP_ID="${gid}"   \
         -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
-        -e USE_GPU="${USE_GPU_HOST}"         \
+        -e USE_GPU="${USE_GPU_HOST}"        \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
-        ${local_volumes} \
+        ${MAP_VOLUME_CONF}      \
+        ${OTHER_VOLUME_CONF}    \
+        ${local_volumes}        \
         --net host \
         -w /apollo \
         --add-host "${DEV_INSIDE}:127.0.0.1" \
         --add-host "${local_host}:127.0.0.1" \
         --hostname "${DEV_INSIDE}" \
-        --shm-size 2G \
-        --pid=host \
+        --shm-size 2G   \
+        --pid=host      \
         -v /dev/null:/dev/raw1394 \
         "${APOLLO_DEV_IMAGE}" \
         /bin/bash
@@ -475,8 +496,8 @@ function main() {
 
     post_run_setup
 
-    ok "Congratulations! You have successfully finished setting up Apollo dev docker environment." \
-       "To login into the newly created ${APOLLO_DEV} container, please run the following command:"
+    ok "Congratulations! You have successfully finished setting up Apollo dev docker environment."
+    ok "To login into the newly created ${APOLLO_DEV} container, please run the following command:"
     ok "  bash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }
