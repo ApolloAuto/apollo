@@ -118,10 +118,10 @@ function set_registry_mirrors() {
 }
 
 function init() {
-    source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
     if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
         sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
     fi
+    source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 
     if [ -e /proc/sys/kernel ]; then
         echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
