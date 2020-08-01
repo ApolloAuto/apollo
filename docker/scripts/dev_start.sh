@@ -231,8 +231,8 @@ DEFAULT_TEST_MAPS=(
   sunnyvale_loop
 )
 
-MAP_VOLUME_CONF=""
-OTHER_VOLUME_CONF=""
+MAP_VOLUME_CONF=
+OTHER_VOLUME_CONF=
 
 function check_host_environment() {
     local kernel="$(uname -s)"
@@ -330,10 +330,36 @@ function determine_gpu_use_host() {
 
 function remove_existing_dev_container() {
     if docker ps -a --format '{{.Names}}' | grep -q "${APOLLO_DEV}"; then
-        info "Removing existing apollo dev container: ${APOLLO_DEV}"
         docker stop "${APOLLO_DEV}" >/dev/null
         docker rm -v -f "${APOLLO_DEV}" >/dev/null
     fi
+}
+
+function _docker_restart_volume() {
+    local container="$1"
+    local image="$2"
+    docker stop "${container}" &>/dev/null
+    docker_pull "${image}"
+    docker run -itd --rm --name "${container}" "${image}"
+}
+
+function restart_map_volume_if_needed() {
+    local map_name="$1"
+    local map_version="$2"
+    local map_volume="apollo_map_volume-${map_name}_${USER}"
+    if [[ ${MAP_VOLUME_CONF} == *"${map_volume}"* ]]; then
+        info "Map ${map_name} has already been included."
+    else
+        local map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
+        info "Load map ${map_name} from image: ${map_image}"
+
+        _docker_restart_volume "${map_volume}" "${map_image}"
+        MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${map_volume}"
+    fi
+}
+
+function mount_map_volumes() {
+    info "Starting mounting map volumes"
 }
 
 function post_run_setup() {
@@ -359,8 +385,10 @@ function main() {
         exit 1
     fi
 
-    info "Check and remove existing ${APOLLO_DEV}..."
+    info "Check and remove existing Apollo dev container ..."
     remove_existing_dev_container
+
+    determine_gpu_use_host
 
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
@@ -368,7 +396,7 @@ function main() {
     if [ "$FAST_MODE" == "no" ]; then
         # Included default maps.
         for map_name in ${DEFAULT_MAPS[@]}; do
-            source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+            restart_map_volume_if_needed ${map_name} "${VOLUME_VERSION}"
         done
         YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
         docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
@@ -380,7 +408,7 @@ function main() {
         OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${YOLO3D_VOLUME}"
     else
         for map_name in ${DEFAULT_TEST_MAPS[@]}; do
-            source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
         done
     fi
 
@@ -401,7 +429,6 @@ function main() {
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
 
-    determine_gpu_use_host
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
     local local_host="$(hostname)"
