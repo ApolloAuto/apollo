@@ -30,7 +30,7 @@ SUPPORTED_ARCHS=" x86_64 aarch64 "
 TARGET_ARCH="$(uname -m)"
 
 VERSION_X86_64="dev-x86_64-18.04-20200729_1839"
-VERSION_AARCH64="dev-aarch64-20170927_1111"
+VERSION_AARCH64="dev-aarch64-18.04-20200731_0916"
 USER_VERSION_OPT=
 
 DOCKER_RUN="docker run"
@@ -369,6 +369,10 @@ function restart_map_volume_if_needed() {
 }
 
 function mount_map_volumes() {
+    if [ "${TARGET_ARCH}" = "aarch64" ]; then
+        warning "Skip mounting map volumes for ${TARGET_ARCH}"
+        return
+    fi
     info "Starting mounting map volumes ..."
     if [ -n "${USER_SPECIFIED_MAP}" ]; then
         for map_name in ${USER_SPECIFIED_MAP}; do
