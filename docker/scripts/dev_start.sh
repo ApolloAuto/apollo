@@ -27,6 +27,7 @@ APOLLO_DEV="apollo_dev_${USER}"
 DEV_INSIDE="in-dev-docker"
 
 SUPPORTED_ARCHS=" x86_64 aarch64 "
+HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
 
 VERSION_X86_64="dev-x86_64-18.04-20200729_1839"
@@ -285,14 +286,20 @@ function setup_devices_and_mount_local_volumes() {
 }
 
 function determine_gpu_use_host() {
-    # Check nvidia-driver and GPU device
-    local nv_driver="nvidia-smi"
-    if [ ! -x "$(command -v ${nv_driver} )" ]; then
-        warning "No nvidia-driver found. CPU will be used"
-    elif [ -z "$(eval ${nv_driver} )" ]; then
-        warning "No GPU device found. CPU will be used."
+    if [ "${HOST_ARCH}" = "aarch64" ]; then
+        if lsmod | grep -q "^nvgpu"; then
+            USE_GPU_HOST=1
+        fi
     else
-        USE_GPU_HOST=1
+        # Check nvidia-driver and GPU device
+        local nv_driver="nvidia-smi"
+        if [ ! -x "$(command -v ${nv_driver} )" ]; then
+            warning "No nvidia-driver found. CPU will be used"
+        elif [ -z "$(eval ${nv_driver} )" ]; then
+            warning "No GPU device found. CPU will be used."
+        else
+            USE_GPU_HOST=1
+        fi
     fi
 
     # Try to use GPU inside container
@@ -360,7 +367,12 @@ function restart_map_volume_if_needed() {
     if [[ ${MAP_VOLUME_CONF} == *"${map_volume}"* ]]; then
         info "Map ${map_name} has already been included."
     else
-        local map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
+        local map_image=
+        if [ "${TARGET_ARCH}" = "aarch64" ]; then
+            map_image="${DOCKER_REPO}:map_volume-${map_name}-${TARGET_ARCH}-${map_version}"
+        else
+            map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
+        fi
         info "Load map ${map_name} from image: ${map_image}"
 
         docker_restart_volume "${map_volume}" "${map_image}"
@@ -369,10 +381,6 @@ function restart_map_volume_if_needed() {
 }
 
 function mount_map_volumes() {
-    if [ "${TARGET_ARCH}" = "aarch64" ]; then
-        warning "Skip mounting map volumes for ${TARGET_ARCH}"
-        return
-    fi
     info "Starting mounting map volumes ..."
     if [ -n "${USER_SPECIFIED_MAP}" ]; then
         for map_name in ${USER_SPECIFIED_MAP}; do
@@ -446,7 +454,9 @@ function main() {
     info "Check and remove existing Apollo dev container ..."
     remove_existing_dev_container
 
+    info "Determine whether host GPU is available ..."
     determine_gpu_use_host
+    info "USE_GPU_HOST: ${USE_GPU_HOST}"
 
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
