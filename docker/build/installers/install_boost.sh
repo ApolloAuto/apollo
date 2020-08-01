@@ -50,7 +50,8 @@ py3_ver="$(py3_version)"
 
 # Ref: https://www.boost.org/doc/libs/1_73_0/doc/html/mpi/getting_started.html
 pushd "boost_${VERSION}"
-    echo "using mpi : ${SYSROOT_DIR}/bin/mpicc ;" > user-config.jam
+    # echo "using mpi : ${SYSROOT_DIR}/bin/mpicc ;" > user-config.jam
+    echo "using mpi ;" > user-config.jam
     ./bootstrap.sh \
         --with-python-version=${py3_ver} \
         --prefix="${SYSROOT_DIR}" \
