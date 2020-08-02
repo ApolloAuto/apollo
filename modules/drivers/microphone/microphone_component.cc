@@ -33,17 +33,17 @@ bool MicrophoneComponent::Init() {
   microphone_device_ptr_->init(microphone_config_ptr_);
 
   // dump config, calculate size and reserve buffer for audio
-  // chunk_: number of frames per chunk; chunk_size_: number of bytes per chunk
   n_channels_ = microphone_config_ptr_->channel_type_size();
+  sample_width_ = microphone_config_ptr_->sample_width();
+  // chunk_: number of frames per chunk; chunk_size_: number of bytes per chunk
   chunk_ = microphone_config_ptr_->chunk();
-  total_frames_ = microphone_config_ptr_->sample_rate() *
-                  microphone_config_ptr_->record_seconds();
-  chunk_size_ = microphone_device_ptr_->get_chunk_size(chunk_);
-
-  buffer_size_ = microphone_device_ptr_->get_chunk_size(total_frames_);
-  buffer_ = new char[buffer_size_];
+  n_chunk_ = static_cast<int>(
+      std::floor(microphone_config_ptr_->sample_rate() *
+                 microphone_config_ptr_->record_seconds() / chunk_));
+  chunk_size_ = chunk_ * n_channels_ * sample_width_;
+  buffer_ = new char[chunk_size_];
   if (buffer_ == nullptr) {
-    AERROR << "System calloc memory error, size:" << buffer_size_;
+    AERROR << "System new memory error, size:" << chunk_size_;
     return false;
   }
 
@@ -57,7 +57,7 @@ bool MicrophoneComponent::Init() {
       microphone_config_ptr_->frame_id());
 
   ChannelData *channel_data = nullptr;
-  int channel_size = buffer_size_ / n_channels_;
+  int channel_size = n_chunk_ * chunk_ * sample_width_;
   for (int i = 0; i < n_channels_; ++i) {
     channel_data = audio_data_ptr_->add_channel_data();
     channel_data->set_channel_type(microphone_config_ptr_->channel_type(i));
@@ -72,29 +72,28 @@ bool MicrophoneComponent::Init() {
   return true;
 }
 
-void MicrophoneComponent::run() {
-  char *pos = nullptr;
-  int i;
-  while (!cyber::IsShutdown()) {
-    AINFO << "Start recording";
-    pos = buffer_;
-    try {
-      for (i = 1; chunk_ * i <= total_frames_; ++i) {
-        microphone_device_ptr_->read_stream(chunk_, pos);
-        pos += chunk_size_;
+void MicrophoneComponent::fill_channel_data(int chunk_i) {
+  // next index of channel data to be filled
+  int pos = chunk_i * chunk_ * sample_width_;
+  for (int buff_i = 0; buff_i < chunk_size_; pos += sample_width_) {
+    for (int channel_i = 0; channel_i < n_channels_; ++channel_i) {
+      for (int di = 0; di < sample_width_; ++di) {
+        (*channel_data_ptrs_[channel_i])[pos + di] = buffer_[buff_i++];
       }
-      if (chunk_ * --i < total_frames_)
-        microphone_device_ptr_->read_stream(total_frames_ - chunk_ * i, pos);
+    }
+  }
+}
+
+void MicrophoneComponent::run() {
+  int chunk_i;
+  while (!cyber::IsShutdown()) {
+    try {
+      for (chunk_i = 0; chunk_i < n_chunk_; ++chunk_i) {
+        microphone_device_ptr_->read_stream(chunk_, buffer_);
+        fill_channel_data(chunk_i);
+      }
     } catch (const std::exception &e) {
       return;
-    }
-    AINFO << "End recording";
-
-    for (int buff_i = 0, i = 0; buff_i < buffer_size_; i += 2) {
-      for (int channel_i = 0; channel_i < n_channels_; ++channel_i) {
-        (*channel_data_ptrs_[channel_i])[i] = buffer_[buff_i++];
-        (*channel_data_ptrs_[channel_i])[i + 1] = buffer_[buff_i++];
-      }
     }
     FillHeader(node_->Name(), audio_data_ptr_.get());
     writer_ptr_->Write(audio_data_ptr_);
