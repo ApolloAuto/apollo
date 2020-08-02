@@ -36,7 +36,7 @@ using apollo::drivers::microphone::config::MicrophoneConfig;
 class Stream {
  private:
   PaStream *pastream_ptr_;
-  PaStreamParameters *inputParameters_ptr_;
+  PaStreamParameters *input_parameters_ptr_;
 
  public:
   Stream() {}
@@ -44,7 +44,6 @@ class Stream {
   void init_stream(int rate, int channels, int chunk, int input_device_index,
                    PaSampleFormat format);
   void read_stream(int n_frames, char *buffer) const;
-  int get_chunk_size(int n_frames) const;
 };
 
 class Respeaker {
@@ -52,7 +51,7 @@ class Respeaker {
   std::unique_ptr<Stream> stream_ptr_;
   const PaDeviceInfo *get_device_info(const PaDeviceIndex index) const;
   const PaDeviceIndex host_api_device_index_to_device_index(
-      const PaHostApiIndex hostApi, const int hostApiDeviceIndex) const;
+      const PaHostApiIndex host_api, const int host_api_device_index) const;
   const PaHostApiInfo *get_host_api_info(const PaHostApiIndex index) const;
   const PaDeviceIndex get_respeaker_index() const;
   const PaSampleFormat get_format_from_width(int width,
@@ -63,7 +62,6 @@ class Respeaker {
   ~Respeaker();
   void init(const std::shared_ptr<const MicrophoneConfig> &microphone_config);
   void read_stream(int n_frames, char *buffer) const;
-  int get_chunk_size(int n_frames) const;
 };
 
 }  // namespace microphone
