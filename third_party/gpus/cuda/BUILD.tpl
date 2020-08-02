@@ -116,30 +116,6 @@ cc_library(
     linkstatic = 1,
 )
 
-cuda_header_library(
-    name = "nccl_headers",
-    hdrs = [":nccl-include"],
-    include_prefix="third_party/gpus",
-    includes = ["cuda/include/"],
-    deps = [":cuda_headers"],
-)
-
-cc_library(
-    name = "nccl_lib",
-    srcs = ["cuda/lib/%{nccl_lib}"],
-    data = ["cuda/lib/%{nccl_lib}"],
-    linkstatic = 1,
-)
-
-cc_library(
-    name = "nccl",
-    deps = [
-        ":nccl_headers",
-        ":nccl_lib",
-        ":cuda",
-    ]
-)
-
 cc_library(
     name = "cuda",
     deps = [
