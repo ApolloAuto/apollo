@@ -119,7 +119,7 @@ function _run_bazel_build_impl() {
 function bazel_build() {
     if ! "${APOLLO_IN_DOCKER}" ; then
         error "The build operation must be run from within docker container"
-        # exit 1
+        exit 1
     fi
 
 	_parse_cmdline_arguments $@
