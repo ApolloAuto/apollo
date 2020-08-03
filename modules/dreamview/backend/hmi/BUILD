@@ -66,6 +66,7 @@ cc_library(
     deps = [
         ":vehicle_manager",
         "//cyber",
+        "//cyber/proto:dag_conf_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/common/kv_db",
