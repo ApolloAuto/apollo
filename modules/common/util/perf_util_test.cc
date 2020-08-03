@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,51 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#include "modules/common/util/perf_util.h"
 
-#include <string>
+#include <thread>
 
-#include "absl/time/time.h"
-#include "cyber/common/macros.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
-namespace time {
+namespace util {
 
-class Timer {
- public:
-  Timer() = default;
+TEST(PerfFunctionTest, test) {
+  PERF_FUNCTION_WITH_NAME("FunctionTest");
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
 
-  // no-thread safe.
-  void Start();
+TEST(PerfBlockTest, test) {
+  PERF_BLOCK_START();
+  // do somethings.
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  PERF_BLOCK_END("BLOCK1");
 
-  // return the elapsed time,
-  // also output msg and time in glog.
-  // automatically start a new timer.
-  // no-thread safe.
-  int64_t End(const std::string &msg);
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  PERF_BLOCK_END("BLOCK2");
+}
 
- private:
-  absl::Time start_time_;
-  absl::Time end_time_;
-
-  DISALLOW_COPY_AND_ASSIGN(Timer);
-};
-
-class TimerWrapper {
- public:
-  explicit TimerWrapper(const std::string &msg) : msg_(msg) { timer_.Start(); }
-
-  ~TimerWrapper() { timer_.End(msg_); }
-
- private:
-  Timer timer_;
-  std::string msg_;
-
-  DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
-};
-
-}  // namespace time
+}  // namespace util
 }  // namespace common
 }  // namespace apollo
-
