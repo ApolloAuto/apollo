@@ -18,6 +18,7 @@
 
 #include <omp.h>
 #include <algorithm>
+#include <limits>
 #include <map>
 
 #include "cyber/common/file.h"
@@ -494,12 +495,12 @@ bool NCutSegmentation::IsOutlier(const base::PointFCloudPtr& in_cloud) {
   if (in_cloud->size() < min_num_points) {
     return true;
   }
-  float x_max = -FLT_MAX;
-  float y_max = -FLT_MAX;
-  float z_max = -FLT_MAX;
-  float x_min = FLT_MAX;
-  float y_min = FLT_MAX;
-  float z_min = FLT_MAX;
+  float x_max = -std::numeric_limits<float>::max();
+  float y_max = -std::numeric_limits<float>::max();
+  float z_max = -std::numeric_limits<float>::max();
+  float x_min = std::numeric_limits<float>::max();
+  float y_min = std::numeric_limits<float>::max();
+  float z_min = std::numeric_limits<float>::max();
   base::PointF pt_max = (*in_cloud)[0];
   for (size_t i = 0; i < in_cloud->size(); ++i) {
     const base::PointF& pt = (*in_cloud)[i];

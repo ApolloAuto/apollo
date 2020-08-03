@@ -18,6 +18,7 @@
 #define CYBER_RECORD_RECORD_VIEWER_H_
 
 #include <cstddef>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -46,9 +47,10 @@ class RecordViewer {
    * @param end_time
    * @param channels
    */
-  RecordViewer(const RecordReaderPtr& reader, uint64_t begin_time = 0,
-               uint64_t end_time = UINT64_MAX,
-               const std::set<std::string>& channels = std::set<std::string>());
+  RecordViewer(
+      const RecordReaderPtr& reader, uint64_t begin_time = 0,
+      uint64_t end_time = std::numeric_limits<u_int64_t>::max(),
+      const std::set<std::string>& channels = std::set<std::string>());
 
   /**
    * @brief The constructor with multiple readers.
@@ -58,9 +60,10 @@ class RecordViewer {
    * @param end_time
    * @param channels
    */
-  RecordViewer(const std::vector<RecordReaderPtr>& readers,
-               uint64_t begin_time = 0, uint64_t end_time = UINT64_MAX,
-               const std::set<std::string>& channels = std::set<std::string>());
+  RecordViewer(
+      const std::vector<RecordReaderPtr>& readers, uint64_t begin_time = 0,
+      uint64_t end_time = std::numeric_limits<u_int64_t>::max(),
+      const std::set<std::string>& channels = std::set<std::string>());
 
   /**
    * @brief Is this record reader is valid.
@@ -184,7 +187,7 @@ class RecordViewer {
   bool Update(RecordMessage* message);
 
   uint64_t begin_time_ = 0;
-  uint64_t end_time_ = UINT64_MAX;
+  uint64_t end_time_ = std::numeric_limits<u_int64_t>::max();
   // User defined channels
   std::set<std::string> channels_;
   // All channel in user defined readers

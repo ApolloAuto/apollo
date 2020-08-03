@@ -94,8 +94,8 @@ bool GetPointCloudMinareaBbox(const PointFCloud& pc, BoundingCube* box,
     return false;
   }
   std::vector<cv::Point2f> pts;
-  float min_z = FLT_MAX;
-  float max_z = -FLT_MAX;
+  float min_z = std::numeric_limits<float>::max();
+  float max_z = -std::numeric_limits<float>::max();
   for (size_t i = 0; i < pc.size(); ++i) {
     pts.push_back(cv::Point2f(pc[i].x, pc[i].y));
     min_z = std::min(min_z, pc[i].z);

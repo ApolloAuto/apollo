@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cfloat>
+#include <limits>
 
 namespace apollo {
 namespace perception {
@@ -390,7 +391,7 @@ void PlaneFitGroundDetector::ComputeSignedGroundHeight(
   unsigned int r = 0;
   unsigned int nm1 = param_.nr_grids_coarse - 1;
   for (r = 0; r < nr_points; ++r) {
-    height_above_ground[r] = FLT_MAX;
+    height_above_ground[r] = std::numeric_limits<float>::max();
   }
   ComputeSignedGroundHeightLine(
       point_cloud, ground_planes_[0], ground_planes_[0], ground_planes_[1],
@@ -435,20 +436,20 @@ void PlaneFitGroundDetector::ComputeSignedGroundHeightLine(
     cptr = point_cloud + (nr_point_elements * pos);
     dist[0] = plane[0] != nullptr
                   ? IPlaneToPointSignedDistanceWUnitNorm(plane[0], cptr)
-                  : FLT_MAX;
+                  : std::numeric_limits<float>::max();
     min_abs_dist = IAbs(dist[0]);
     id = 0;
     // for candidates we take min dist:
     if (label) {
       dist[1] = plane[1] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[1], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       dist[2] = plane[2] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[2], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       dist[3] = plane[3] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[3], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       for (i = 1; i < 4; ++i) {
         if (min_abs_dist > IAbs(dist[i])) {
           min_abs_dist = IAbs(dist[i]);
@@ -474,22 +475,22 @@ void PlaneFitGroundDetector::ComputeSignedGroundHeightLine(
       cptr = point_cloud + (nr_point_elements * pos);
       dist[0] = plane[0] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[0], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       min_abs_dist = IAbs(dist[0]);
       id = 0;
       if (label) {
         dist[1] = plane[1] != nullptr
                       ? IPlaneToPointSignedDistanceWUnitNorm(plane[1], cptr)
-                      : FLT_MAX;
+                      : std::numeric_limits<float>::max();
         dist[2] = plane[2] != nullptr
                       ? IPlaneToPointSignedDistanceWUnitNorm(plane[2], cptr)
-                      : FLT_MAX;
+                      : std::numeric_limits<float>::max();
         dist[3] = plane[3] != nullptr
                       ? IPlaneToPointSignedDistanceWUnitNorm(plane[3], cptr)
-                      : FLT_MAX;
+                      : std::numeric_limits<float>::max();
         dist[4] = plane[4] != nullptr
                       ? IPlaneToPointSignedDistanceWUnitNorm(plane[4], cptr)
-                      : FLT_MAX;
+                      : std::numeric_limits<float>::max();
         for (i = 1; i < 5; ++i) {
           if (min_abs_dist > IAbs(dist[i])) {
             min_abs_dist = IAbs(dist[i]);
@@ -513,20 +514,20 @@ void PlaneFitGroundDetector::ComputeSignedGroundHeightLine(
     cptr = point_cloud + (nr_point_elements * pos);
     dist[0] = plane[0] != nullptr
                   ? IPlaneToPointSignedDistanceWUnitNorm(plane[0], cptr)
-                  : FLT_MAX;
+                  : std::numeric_limits<float>::max();
     min_abs_dist = IAbs(dist[0]);
     id = 0;
     // for candidates we take min dist:
     if (label) {
       dist[1] = plane[1] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[1], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       dist[2] = plane[2] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[2], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       dist[3] = plane[3] != nullptr
                     ? IPlaneToPointSignedDistanceWUnitNorm(plane[3], cptr)
-                    : FLT_MAX;
+                    : std::numeric_limits<float>::max();
       for (i = 1; i < 4; ++i) {
         if (min_abs_dist > IAbs(dist[i])) {
           min_abs_dist = IAbs(dist[i]);
@@ -838,7 +839,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   int best = 0;
   int nr_inliers = 0;
   int nr_inliers_best = -1;
-  float angle_best = FLT_MAX;
+  float angle_best = std::numeric_limits<float>::max();
 
   int rseed = I_DEFAULT_SEED;
   int indices_trial[] = {0, 0, 0};
@@ -1304,7 +1305,7 @@ unsigned int PlaneFitGroundDetector::GetGridDimY() const {
   return vg_coarse_->NrVoxelY();
 }
 
-float PlaneFitGroundDetector::GetUnknownHeight() { return FLT_MAX; }
+float PlaneFitGroundDetector::GetUnknownHeight() { return std::numeric_limits<float>::max(); }
 
 PlaneFitPointCandIndices **PlaneFitGroundDetector::GetCandis() const {
   return local_candis_;

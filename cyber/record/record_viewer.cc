@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/record/record_viewer.h"
-
+#include <limits>
 #include <algorithm>
 #include <utility>
 
@@ -109,7 +109,7 @@ void RecordViewer::Reset() {
 }
 
 void RecordViewer::UpdateTime() {
-  uint64_t min_begin_time = UINT64_MAX;
+  uint64_t min_begin_time = std::numeric_limits<u_int64_t>::max();
   uint64_t max_end_time = 0;
 
   for (auto& reader : readers_) {

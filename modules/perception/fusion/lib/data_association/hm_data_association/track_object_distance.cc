@@ -131,10 +131,10 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
   }
   size_t start_ind = projection_cache_.GetPoint2dsSize();
   size_t end_ind = projection_cache_.GetPoint2dsSize();
-  float xmin = FLT_MAX;
-  float ymin = FLT_MAX;
-  float xmax = -FLT_MAX;
-  float ymax = -FLT_MAX;
+  float xmin = std::numeric_limits<float>::max();
+  float ymin = std::numeric_limits<float>::max();
+  float xmax = -std::numeric_limits<float>::max();
+  float ymax = -std::numeric_limits<float>::max();
   // 4. check whether all lidar's 8 3d vertices would projected outside frustum,
   // if not, build projection object of its cloud and cache it
   // else, build empty projection object and cache it

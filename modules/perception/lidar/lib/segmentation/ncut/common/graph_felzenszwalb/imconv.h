@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 /* image conversion */
 #pragma once
 #include <climits>
+#include <limits>
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/image.h"
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/imutil.h"
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/misc.h"
@@ -96,11 +97,12 @@ Image<uchar> *image_float2uchar(Image<float> *input, float min, float max) {
   if (max == min) {
     return output;
   }
-  float scale = UCHAR_MAX / (max - min);
+  float scale = std::numeric_limits<unsigned char>::max() / (max - min);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       uchar val = (uchar)((imRef(input, x, y) - min) * scale);
-      imRef(output, x, y) = bound(val, (uchar)0, (uchar)UCHAR_MAX);
+      imRef(output, x, y) = bound(
+          val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
     }
   }
   return output;
@@ -129,11 +131,13 @@ Image<uchar> *image_long2uchar(Image<uint32_t> *input, uint32_t min,
   if (max == min) {
     return output;
   }
-  float scale = UCHAR_MAX / static_cast<float>(max - min);
+  float scale =
+      std::numeric_limits<unsigned char>::max() / static_cast<float>(max - min);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       uchar val = (uchar)((imRef(input, x, y) - min) * scale);
-      imRef(output, x, y) = bound(val, (uchar)0, (uchar)UCHAR_MAX);
+      imRef(output, x, y) = bound(
+          val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
     }
   }
   return output;
@@ -151,11 +155,13 @@ Image<uchar> *image_short2uchar(Image<uint16_t> *input, uint16_t min,
   if (max == min) {
     return output;
   }
-  float scale = UCHAR_MAX / static_cast<float>(max - min);
+  float scale =
+      std::numeric_limits<unsigned char>::max() / static_cast<float>(max - min);
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       uchar val = (uchar)((imRef(input, x, y) - min) * scale);
-      imRef(output, x, y) = bound(val, (uchar)0, (uchar)UCHAR_MAX);
+      imRef(output, x, y) = bound(
+          val, (uchar)0, (uchar)std::numeric_limits<unsigned char>::max());
     }
   }
   return output;

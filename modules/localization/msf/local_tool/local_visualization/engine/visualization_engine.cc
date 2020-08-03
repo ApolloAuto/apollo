@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
+#include <limits>
+
 #include <boost/filesystem.hpp>
 
 #include "cyber/common/file.h"
@@ -587,9 +589,9 @@ void VisualizationEngine::UpdateLevel() {
 void VisualizationEngine::GenerateMutiResolutionImages(
     const std::vector<std::string> &src_files, const int base_path_length,
     const std::string &dst_folder) {
-  int x_min = INT_MAX;
+  int x_min = std::numeric_limits<int>::max();
   int x_max = -1;
-  int y_min = INT_MAX;
+  int y_min = std::numeric_limits<int>::max();
   int y_max = -1;
   for (size_t i = 0; i < src_files.size(); ++i) {
     int len = static_cast<int>(src_files[i].length());

@@ -17,6 +17,7 @@
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_filter.h"
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 #include "cyber/common/file.h"
@@ -406,7 +407,7 @@ void MlfMotionFilter::BoostupState(const MlfTrackDataConstPtr& track_data,
   Eigen::Vector3d min_boosted_velocity = new_obj_belief_velocity;
   double min_boosted_velocity_norm = DBL_MAX;
   Eigen::Vector3d max_boosted_velocity = new_obj_belief_velocity;
-  double max_boosted_velocity_norm = DBL_MIN;
+  double max_boosted_velocity_norm = std::numeric_limits<double>::max();
   Eigen::Vector3d project_dir = min_boosted_velocity;
   project_dir(2) = 0.0;
   project_dir.normalize();

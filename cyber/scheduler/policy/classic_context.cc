@@ -17,6 +17,7 @@
 #include "cyber/scheduler/policy/classic_context.h"
 
 #include <climits>
+#include <limits>
 
 namespace apollo {
 namespace cyber {
@@ -84,7 +85,7 @@ void ClassicContext::Wait() {
 void ClassicContext::Shutdown() {
   stop_.store(true);
   mtx_wrapper_->Mutex().lock();
-  notify_grp_[current_grp] = UCHAR_MAX;
+  notify_grp_[current_grp] = std::numeric_limits<unsigned char>::max();
   mtx_wrapper_->Mutex().unlock();
   cw_->Cv().notify_all();
 }

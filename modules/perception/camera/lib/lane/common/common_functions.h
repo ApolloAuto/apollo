@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/box.h"
@@ -132,7 +133,7 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
   std::vector<int> index(3, 0);
   int max_inliers = 0;
-  Dtype min_residual = FLT_MAX;
+  Dtype min_residual = std::numeric_limits<float>::max();
   Dtype early_stop_ratio = 0.95f;
   Dtype good_lane_ratio = 0.666f;
   for (int j = 0; j < max_iters; ++j) {
