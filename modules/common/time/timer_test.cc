@@ -18,7 +18,6 @@
 
 #include <thread>
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -37,21 +36,6 @@ TEST(TimeTest, test_timer) {
 TEST(TimerWrapperTest, test) {
   TimerWrapper wrapper("TimerWrapperTest");
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-}
-
-TEST(PerfFunctionTest, test) {
-  PERF_FUNCTION("FunctionTest");
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-}
-
-TEST(PerfBlockTest, test) {
-  PERF_BLOCK_START();
-  // do somethings.
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  PERF_BLOCK_END("BLOCK1");
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  PERF_BLOCK_END("BLOCK2");
 }
 
 }  // namespace time
