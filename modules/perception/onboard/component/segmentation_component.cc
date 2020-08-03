@@ -17,7 +17,7 @@
 
 #include "modules/common/time/time.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -97,7 +97,7 @@ bool SegmentationComponent::InitAlgorithmPlugin() {
 bool SegmentationComponent::InternalProc(
     const std::shared_ptr<const drivers::PointCloud>& in_message,
     const std::shared_ptr<LidarFrameMessage>& out_message) {
-  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name_);
+  PERF_FUNCTION_WITH_INDICATOR(sensor_name_);
   {
     std::unique_lock<std::mutex> lock(s_mutex_);
     s_seq_num_++;
@@ -124,7 +124,7 @@ bool SegmentationComponent::InternalProc(
   frame->timestamp = timestamp;
   frame->sensor_info = sensor_info_;
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   Eigen::Affine3d pose = Eigen::Affine3d::Identity();
   Eigen::Affine3d pose_novatel = Eigen::Affine3d::Identity();
   const double lidar_query_tf_timestamp =
@@ -135,7 +135,7 @@ bool SegmentationComponent::InternalProc(
     AERROR << "Failed to get pose at time: " << lidar_query_tf_timestamp;
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
+  PERF_BLOCK_END_WITH_INDICATOR(
       sensor_name_, "segmentation_1::get_lidar_to_world_pose");
 
   frame->lidar2world_pose = pose;
@@ -152,7 +152,7 @@ bool SegmentationComponent::InternalProc(
     AERROR << "Lidar segmentation process error, " << ret.log;
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
                                            "segmentation_2::segment_obstacle");
 
   return true;

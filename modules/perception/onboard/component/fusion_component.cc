@@ -17,7 +17,7 @@
 
 #include "modules/common/time/time.h"
 #include "modules/perception/base/object_pool_types.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
 
@@ -102,7 +102,7 @@ bool FusionComponent::InternalProc(
     s_seq_num_++;
   }
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   const double timestamp = in_message->timestamp_;
   const uint64_t lidar_timestamp = in_message->lidar_timestamp_;
   std::vector<base::ObjectPtr> valid_objects;
@@ -128,7 +128,7 @@ bool FusionComponent::InternalProc(
     AERROR << "Failed to call fusion plugin.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_process"),
+  PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_process"),
                                            in_message->sensor_id_);
 
   if (in_message->sensor_id_ != fusion_main_sensor_) {
@@ -156,7 +156,7 @@ bool FusionComponent::InternalProc(
   } else {
     valid_objects.assign(fused_objects.begin(), fused_objects.end());
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_roi_check"),
+  PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_roi_check"),
                                            in_message->sensor_id_);
 
   // produce visualization msg
@@ -180,7 +180,7 @@ bool FusionComponent::InternalProc(
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
+  PERF_BLOCK_END_WITH_INDICATOR(
       std::string("fusion_serialize_message"), in_message->sensor_id_);
 
   const double cur_time = apollo::common::time::Clock::NowInSeconds();

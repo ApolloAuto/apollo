@@ -10,8 +10,8 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/time",
+        "//modules/common/util:perf_util",
         "//modules/perception/base",
-        "//modules/perception/lib/utils",
         "//modules/perception/onboard/common_flags",
         "//modules/perception/proto:perception_obstacle_cc_proto",
         "//modules/prediction/proto:feature_cc_proto",

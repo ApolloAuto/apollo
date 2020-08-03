@@ -17,7 +17,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_detection_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
@@ -78,13 +78,13 @@ LidarProcessResult LidarObstacleDetection::Process(
     LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;
 
-  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(options.sensor_name);
+  PERF_FUNCTION_WITH_INDICATOR(options.sensor_name);
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
   if (cloud_preprocessor_.Preprocess(preprocessor_options, message, frame)) {
     return ProcessCommon(options, frame);
   }
@@ -96,13 +96,13 @@ LidarProcessResult LidarObstacleDetection::ProcessCommon(
     const LidarObstacleDetectionOptions& options, LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   DetectionOptions detection_options;
   if (!detector_->Detect(detection_options, frame)) {
     return LidarProcessResult(LidarErrorCode::DetectionError,
                               "Failed to detect.");
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detection");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detection");
 
   return LidarProcessResult(LidarErrorCode::Succeed);
 }

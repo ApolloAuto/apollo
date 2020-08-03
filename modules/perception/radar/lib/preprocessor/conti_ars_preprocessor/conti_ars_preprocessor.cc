@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/radar/lib/preprocessor/conti_ars_preprocessor/conti_ars_preprocessor.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -36,7 +36,7 @@ bool ContiArsPreprocessor::Preprocess(
     const drivers::ContiRadar& raw_obstacles,
     const PreprocessorOptions& options,
     drivers::ContiRadar* corrected_obstacles) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   SkipObjects(raw_obstacles, corrected_obstacles);
   ExpandIds(corrected_obstacles);
   CorrectTime(corrected_obstacles);
