@@ -15,14 +15,7 @@ cc_library(
         ":coordinate_convert_tool",
         ":proto_organizer",
         "//cyber/common:log",
-        "//modules/map/hdmap/adapter/xml_parser:common_define",
-        "//modules/map/hdmap/adapter/xml_parser:header_xml_parser",
-        "//modules/map/hdmap/adapter/xml_parser:junctions_xml_parser",
-        "//modules/map/hdmap/adapter/xml_parser:lanes_xml_parser",
-        "//modules/map/hdmap/adapter/xml_parser:objects_xml_parser",
-        "//modules/map/hdmap/adapter/xml_parser:roads_xml_parser",
-        "//modules/map/hdmap/adapter/xml_parser:signals_xml_parser",
-        "//modules/map/hdmap/adapter/xml_parser:status",
+        "//modules/map/hdmap/adapter/xml_parser",
     ],
 )
 
