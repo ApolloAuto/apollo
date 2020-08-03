@@ -35,6 +35,7 @@ apt_get_update_and_install \
         libsqlite3-dev \
         libglew-dev \
         libfreetype6-dev \
+        libjsoncpp-dev \
         libhdf5-dev
 
 if ldconfig -p | grep -q libvtkCommonCore ; then
@@ -82,7 +83,7 @@ pushd VTK-${VERSION}
         -DVTK_USE_SYSTEM_NETCDF=OFF \
         -DVTK_USE_SYSTEM_GL2PS=OFF \
         -DVTK_USE_SYSTEM_LIBHARU=OFF \
-        -DVTK_USE_SYSTEM_JSONCPP=OFF \
+        -DVTK_USE_SYSTEM_JSONCPP=ON \
         -DVTK_Group_Qt=OFF \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
