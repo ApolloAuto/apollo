@@ -190,7 +190,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
 
   MeasureData measure_data = gnss_local_msg;
   if (is_trans_gpstime_to_utctime_) {
-    measure_data.time = TimeUtil::Gps2unix(measure_data.time);
+    measure_data.time = TimeUtil::Gps2Unix(measure_data.time);
   }
 
   AINFO << "the gnss velocity: " << measure_data.gnss_vel.ve << " "
@@ -405,7 +405,7 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
 
   measure->time = bestgnsspos_msg.measurement_time();
   if (is_trans_gpstime_to_utctime_) {
-    measure->time = TimeUtil::Gps2unix(measure->time);
+    measure->time = TimeUtil::Gps2Unix(measure->time);
   }
 
   measure->gnss_pos.longitude = bestgnsspos_msg.longitude() * DEG_TO_RAD;
