@@ -234,5 +234,5 @@ message LearningData {
 
 message PlanningLearningData {
   optional apollo.common.Header header = 1;
-  optional LearningData learning_data = 2;
+  optional LearningDataFrame learning_data_frame = 2;
 }
