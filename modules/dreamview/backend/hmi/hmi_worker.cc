@@ -19,7 +19,9 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+
 #include "cyber/common/file.h"
+#include "cyber/proto/dag_conf.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
@@ -56,6 +58,7 @@ using apollo::common::KVDB;
 using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::cyber::Node;
+using apollo::cyber::proto::DagConfig;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
 using google::protobuf::Map;
@@ -201,6 +204,24 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     // Construct process_monitor_config.
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
     module.mutable_process_monitor_config()->add_command_keywords(first_dag);
+    // Construct module_monitor_config.
+    DagConfig dag_config;
+    for (const std::string& dag : cyber_module.dag_files()) {
+      if (!cyber::common::GetProtoFromFile(dag, &dag_config)) {
+        AERROR << "Unable to parse dag config file " << dag;
+        continue;
+      }
+      for (const auto& module_config : dag_config.module_config()) {
+        for (const auto& component : module_config.components()) {
+          module.mutable_module_monitor_config()->add_node_name(
+              component.config().name());
+        }
+        for (const auto& timer_component : module_config.timer_components()) {
+          module.mutable_module_monitor_config()->add_node_name(
+              timer_component.config().name());
+        }
+      }
+    }
   }
   mode.clear_cyber_modules();
   AINFO << "Loaded HMI mode: " << mode.DebugString();

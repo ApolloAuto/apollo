@@ -48,17 +48,21 @@ void ModuleMonitor::RunOnce(const double current_time) {
   auto* hmi_modules = manager->GetStatus()->mutable_hmi_modules();
   for (const auto& iter : mode.modules()) {
     const std::string& module_name = iter.first;
-    const auto& config = iter.second.module_monitor_config();
-    UpdateStatus(config, module_name, &hmi_modules->at(module_name));
+    const auto& component = iter.second;
+    if (component.has_module_monitor_config()) {
+      const auto& config = component.module_monitor_config();
+      UpdateStatus(config, module_name, &hmi_modules->at(module_name));
+    }
   }
 
   // Check monitored components.
   auto* components = manager->GetStatus()->mutable_components();
   for (const auto& iter : mode.monitored_components()) {
     const std::string& name = iter.first;
-    if (iter.second.has_module() &&
+    const auto& monitored_component = iter.second;
+    if (monitored_component.has_module() &&
         apollo::common::util::ContainsKey(*components, name)) {
-      const auto& config = iter.second.module();
+      const auto& config = monitored_component.module();
       auto* status = components->at(name).mutable_module_status();
       UpdateStatus(config, name, status);
     }
