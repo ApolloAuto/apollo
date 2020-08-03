@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lib/utils/time_util.h"
+#include "modules/common/time/time_util.h"
 
 #include <cmath>
 #include <thread>
@@ -22,8 +22,8 @@
 #include "gtest/gtest.h"
 
 namespace apollo {
-namespace perception {
-namespace lib {
+namespace common {
+namespace time {
 
 TEST(TimeUtilTest, TestUnix2Gps) {
   double unix_time = 1476761767;
@@ -56,6 +56,6 @@ TEST(TimeUtilTest, TestGetCurrentTime) {
   FAIL();
 }
 
-}  // namespace lib
-}  // namespace perception
+}  // namespace time
+}  // namespace common
 }  // namespace apollo

@@ -7,8 +7,8 @@ cc_library(
     name = "utils",
     deps = [
         ":perception_perf",
-        ":perception_time_util",
         ":perception_timer",
+        "//modules/common/time:time_util",
     ],
 )
 
@@ -33,21 +33,6 @@ cc_test(
     srcs = ["timer_test.cc"],
     deps = [
         ":perception_timer",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "perception_time_util",
-    hdrs = ["time_util.h"],
-)
-
-cc_test(
-    name = "perception_time_util_test",
-    size = "small",
-    srcs = ["time_util_test.cc"],
-    deps = [
-        ":perception_time_util",
         "@com_google_googletest//:gtest_main",
     ],
 )
