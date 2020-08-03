@@ -77,6 +77,9 @@ function apollo_env_setup() {
     info "${TAB}APOLLO_CACHE_DIR: ${APOLLO_CACHE_DIR}"
     info "${TAB}APOLLO_IN_DOCKER: ${APOLLO_IN_DOCKER}"
     info "${TAB}APOLLO_VERSION: ${APOLLO_VERSION}"
+    if "${APOLLO_IN_DOCKER}" ; then
+        info "${TAB}DOCKER_IMG: ${DOCKER_IMG##*:}"
+    fi
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV} USE_GPU=${USE_GPU}"
 
     if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
