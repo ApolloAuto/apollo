@@ -29,7 +29,7 @@
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
 
 namespace apollo {
@@ -191,29 +191,29 @@ void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
 }
 
 void ProbabilisticFusion::FuseForegroundTrack(const SensorFramePtr& frame) {
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   std::string indicator = "fusion_" + frame->GetSensorId();
 
   AssociationOptions options;
   AssociationResult association_result;
   matcher_->Associate(options, frame, scenes_, &association_result);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator, "association");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "association");
 
   const std::vector<TrackMeasurmentPair>& assignments =
       association_result.assignments;
   this->UpdateAssignedTracks(frame, assignments);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_assigned_track");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_assigned_track");
 
   const std::vector<size_t>& unassigned_track_inds =
       association_result.unassigned_tracks;
   this->UpdateUnassignedTracks(frame, unassigned_track_inds);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator,
+  PERF_BLOCK_END_WITH_INDICATOR(indicator,
                                            "update_unassigned_track");
 
   const std::vector<size_t>& unassigned_obj_inds =
       association_result.unassigned_measurements;
   this->CreateNewTracks(frame, unassigned_obj_inds);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator, "create_track");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "create_track");
 }
 
 void ProbabilisticFusion::UpdateAssignedTracks(

@@ -27,13 +27,13 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -196,9 +196,9 @@ bool LaneCameraPerception::GetCalibrationService(
 
 bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
                                       CameraFrame *frame) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   inference::CudaUtil::set_device_id(perception_param_.gpu_id());
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
 
   if (frame->calibration_service == nullptr) {
     AERROR << "Calibraion service is not available";
@@ -216,27 +216,27 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
       AERROR << "Failed to detect lane.";
       return false;
     }
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "LaneDetector");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "LaneDetector");
 
     if (!lane_postprocessor_->Process2D(lane_postprocessor_options, frame)) {
       AERROR << "Failed to postprocess lane 2D.";
       return false;
     }
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "LanePostprocessor2D");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "LanePostprocessor2D");
 
     // Calibration service
     frame->calibration_service->Update(frame);
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "CalibrationService");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "CalibrationService");
 
     if (!lane_postprocessor_->Process3D(lane_postprocessor_options, frame)) {
       AERROR << "Failed to postprocess lane 3D.";
       return false;
     }
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "LanePostprocessor3D");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "LanePostprocessor3D");
 
     if (write_out_lane_file_) {
       std::string lane_file_path =
@@ -248,8 +248,8 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
     AINFO << "Will use service sync from obstacle camera instead.";
     // fill the frame using previous estimates
     frame->calibration_service->Update(frame);
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "CalibrationService");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "CalibrationService");
   }
 
   if (write_out_calib_file_) {

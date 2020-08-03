@@ -17,7 +17,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_tracking_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
@@ -64,22 +64,22 @@ LidarProcessResult LidarObstacleTracking::Process(
     const LidarObstacleTrackingOptions& options, LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;
 
-  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name);
+  PERF_FUNCTION_WITH_INDICATOR(sensor_name);
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   MultiTargetTrackerOptions tracker_options;
   if (!multi_target_tracker_->Track(tracker_options, frame)) {
     return LidarProcessResult(LidarErrorCode::TrackerError,
                               "Fail to track objects.");
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
 
   ClassifierOptions fusion_classifier_options;
   if (!fusion_classifier_->Classify(fusion_classifier_options, frame)) {
     return LidarProcessResult(LidarErrorCode::ClassifierError,
                               "Fail to fuse object types.");
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "type_fusion");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "type_fusion");
 
   return LidarProcessResult(LidarErrorCode::Succeed);
 }

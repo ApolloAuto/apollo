@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,7 +17,7 @@ cc_library(
     hdrs = ["lidar_obstacle_detection.h"],
     deps = [
         "//cyber",
-        "//modules/perception/lib/utils",
+        "//modules/common/util:perf_util",
         "//modules/perception/lidar/app/proto:lidar_obstacle_detection_config_cc_proto",
         "//modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_detection",
         "//modules/perception/lidar/lib/pointcloud_preprocessor",
@@ -32,9 +32,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
+        "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/utils",
         "//modules/perception/lidar/app/proto:lidar_obstacle_tracking_config_cc_proto",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface:base_classifier",

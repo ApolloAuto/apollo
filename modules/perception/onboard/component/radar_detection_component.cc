@@ -16,8 +16,8 @@
 #include "modules/perception/onboard/component/radar_detection_component.h"
 
 #include "modules/common/time/time.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -99,7 +99,7 @@ bool RadarDetectionComponent::InitAlgorithmPlugin() {
 bool RadarDetectionComponent::InternalProc(
     const std::shared_ptr<ContiRadar>& in_message,
     std::shared_ptr<SensorFrameMessage> out_message) {
-  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(radar_info_.name);
+  PERF_FUNCTION_WITH_INDICATOR(radar_info_.name);
   ContiRadar raw_obstacles = *in_message;
   {
     std::unique_lock<std::mutex> lock(_mutex);
@@ -111,14 +111,13 @@ bool RadarDetectionComponent::InternalProc(
   AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << timestamp
         << "]:cur_time[" << cur_time << "]:cur_latency[" << start_latency
         << "]";
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   // Init preprocessor_options
   radar::PreprocessorOptions preprocessor_options;
   ContiRadar corrected_obstacles;
   radar_preprocessor_->Preprocess(raw_obstacles, preprocessor_options,
                                   &corrected_obstacles);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
-                                           "radar_preprocessor");
+  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "radar_preprocessor");
   timestamp = corrected_obstacles.header().timestamp_sec();
 
   out_message->timestamp_ = timestamp;
@@ -143,8 +142,7 @@ bool RadarDetectionComponent::InternalProc(
     AERROR << "Failed to get radar2novatel trans at time: " << timestamp;
     return true;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
-                                           "GetSensor2worldTrans");
+  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetSensor2worldTrans");
   Eigen::Matrix4d radar2world_pose = radar_trans.matrix();
   options.detector_options.radar2world_pose = &radar2world_pose;
   Eigen::Matrix4d radar2novatel_trans_m = radar2novatel_trans.matrix();
@@ -155,7 +153,7 @@ bool RadarDetectionComponent::InternalProc(
     AERROR << "Failed to call get_car_speed. [timestamp: " << timestamp;
     // return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetCarSpeed");
+  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetCarSpeed");
   // Init roi_filter_options
   base::PointD position;
   position.x = radar_trans(0, 3);
@@ -166,8 +164,7 @@ bool RadarDetectionComponent::InternalProc(
     hdmap_input_->GetRoiHDMapStruct(position, radar_forward_distance_,
                                     options.roi_filter_options.roi);
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
-                                           "GetRoiHDMapStruct");
+  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetRoiHDMapStruct");
   // Init object_filter_options
   // Init track_options
   // Init object_builder_options
@@ -188,8 +185,7 @@ bool RadarDetectionComponent::InternalProc(
   const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
   const double end_latency =
       (end_timestamp - in_message->header().timestamp_sec()) * 1e3;
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
-                                           "radar_perception");
+  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "radar_perception");
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
         << in_message->header().timestamp_sec() << "]:cur_time["
         << end_timestamp << "]:cur_latency[" << end_latency << "]";
