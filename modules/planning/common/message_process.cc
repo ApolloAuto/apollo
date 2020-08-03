@@ -656,8 +656,8 @@ bool MessageProcess::GenerateLocalRoutingPassages(
 
   /* debug
   for (size_t i = 0; i < road_lengths.size(); ++i) {
-    AERROR << i << ": " << road_lengths[i].first << "; " <<
-  road_lengths[i].second;
+    AERROR << i << ": " << road_lengths[i].first << "; "
+           << road_lengths[i].second;
   }
   */
 
@@ -719,9 +719,15 @@ bool MessageProcess::GenerateLocalRoutingPassages(
     for (int j = 0; j < road.passage(i).segment_size(); ++j) {
       const auto& segment = road.passage(i).segment(j);
       road_s += (segment.end_s() - segment.start_s());
-      if (road_s > local_routing_start_road_s) {
+      if (road_s >= local_routing_start_road_s) {
+        ADEBUG << "INIT: passage[" << i << "] seg[" << j
+               << "] road_s[" << road_s << "] id[" << segment.id()
+               << "] length[" << segment.end_s() - segment.start_s() << "]";
         local_routing_passage.push_back(
             std::make_pair(segment.id(), segment.end_s() - segment.start_s()));
+      }
+      if (road_s > local_routing_end_road_s) {
+        break;
       }
     }
     local_routing_passages->push_back(local_routing_passage);
@@ -736,6 +742,7 @@ bool MessageProcess::GenerateLocalRoutingPassages(
     const size_t local_routing_passages_size = local_routing_passages->size();
     for (int j = 1; j < routing_response_.road(i).passage_size(); ++j) {
       for (size_t p = 0; p < local_routing_passages_size; ++p) {
+        ADEBUG << "GROW: passage[" << j << "]";
         local_routing_passages->push_back((*local_routing_passages)[p]);
       }
     }
@@ -756,6 +763,9 @@ bool MessageProcess::GenerateLocalRoutingPassages(
         }
 
         for (auto& routing_passage : *local_routing_passages) {
+          ADEBUG << "ADD road[" << j << "] passage[" << k
+                 << "] id[" << lane_segment.id() << "] length["
+                 << lane_segment.end_s() - lane_segment.start_s();
           routing_passage.push_back(
               std::make_pair(lane_segment.id(),
                              lane_segment.end_s() - lane_segment.start_s()));
@@ -814,6 +824,8 @@ void MessageProcess::GenerateRoutingFeature(
       routing->add_local_routing_lane_id(lane_segment.first);
     }
   }
+  ADEBUG << "local_routing: frame_num[" << learning_data_frame->frame_num()
+         << "] size[" << routing->local_routing_lane_id_size() << "]";
 }
 
 void MessageProcess::GenerateTrafficLightDetectionFeature(
