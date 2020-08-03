@@ -4,6 +4,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "xml_parser",
+    deps = [
+        ":header_xml_parser",
+        ":junctions_xml_parser",
+        ":lanes_xml_parser",
+        ":objects_xml_parser",
+        ":roads_xml_parser",
+        ":signals_xml_parser",
+        ":status",
+    ],
+)
+
+cc_library(
     name = "common_define",
     hdrs = ["common_define.h"],
     deps = [
