@@ -18,6 +18,7 @@ limitations under the License.
 #include <unordered_set>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
