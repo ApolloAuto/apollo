@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
+#include <limits>
 #include <numeric>
 
 #include <boost/format.hpp>
@@ -223,7 +224,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   Dst res_dst(name_);
   double type_probs_sum =
       std::accumulate(type_probs.begin(), type_probs.end(), 0.0);
-  if (type_probs_sum < DBL_MIN) {
+  if (type_probs_sum < std::numeric_limits<double>::min()) {
     // AWARN << "the sum of types probability equal 0.0";
     return res_dst;
   }

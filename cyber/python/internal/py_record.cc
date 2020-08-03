@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/python/internal/py_record.h"
-
+#include <limits>
 #include <set>
 #include <string>
 
@@ -75,7 +75,7 @@ PyObject *cyber_delete_PyRecordReader(PyObject *self, PyObject *args) {
 PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   uint64_t begin_time = 0;
-  uint64_t end_time = UINT64_MAX;
+  uint64_t end_time = std::numeric_limits<u_int64_t>::max();
   if (!PyArg_ParseTuple(args,
                         const_cast<char *>("OKK:PyRecordReader_ReadMessage"),
                         &pyobj_reader, &begin_time, &end_time)) {
@@ -561,10 +561,10 @@ static PyMethodDef _cyber_record_methods[] = {
 PyMODINIT_FUNC PyInit__cyber_record_wrapper(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_record_wrapper",    // Module name.
-      "CyberRecord module",   // Module doc.
-      -1,                     // Module size.
-      _cyber_record_methods,  // Module methods.
+      "_cyber_record_wrapper",  // Module name.
+      "CyberRecord module",     // Module doc.
+      -1,                       // Module size.
+      _cyber_record_methods,    // Module methods.
       nullptr,
       nullptr,
       nullptr,

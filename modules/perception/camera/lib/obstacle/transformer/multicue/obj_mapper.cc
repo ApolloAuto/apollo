@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/obj_mapper.h"
 
+#include <limits>
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -297,10 +299,10 @@ void ObjMapper::GetCenter(const float *bbox, const float &z_ref,
   while (!stop) {
     common::IBackprojectCanonical(x, k_mat_, z_ref, center_test);
     center_test[1] += hwl[0] / 2;
-    float x_min = FLT_MAX;
-    float x_max = -FLT_MAX;
-    float y_min = FLT_MAX;
-    float y_max = -FLT_MAX;
+    float x_min = std::numeric_limits<float>::max();
+    float x_max = -std::numeric_limits<float>::max();
+    float y_min = std::numeric_limits<float>::max();
+    float y_max = -std::numeric_limits<float>::max();
     float x_proj[3] = {0};
 
     for (int i = 0; i < 8; ++i) {

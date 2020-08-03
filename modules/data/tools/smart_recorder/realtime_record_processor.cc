@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <chrono>
 #include <csignal>
+#include <limits>
 #include <set>
 #include <sstream>
 #include <thread>
@@ -154,7 +155,7 @@ bool RealtimeRecordProcessor::Process() {
       break;
     }
     auto reader = std::make_shared<RecordReader>(record_path);
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    RecordViewer viewer(reader, 0, std::numeric_limits<u_int64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << "checking " << record_path << ": " << viewer.begin_time() << " - "
           << viewer.end_time();
@@ -171,7 +172,7 @@ bool RealtimeRecordProcessor::Process() {
     }
   } while (!is_terminating_);
   // Try restore the rest of messages one last time
-  RestoreMessage(UINT64_MAX);
+  RestoreMessage(std::numeric_limits<u_int64_t>::max());
   if (monitor_thread && monitor_thread->joinable()) {
     monitor_thread->join();
     monitor_thread = nullptr;

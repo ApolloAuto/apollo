@@ -62,6 +62,7 @@ license and copyright terms herein.
  *****************************************************************************/
 
 #include "modules/perception/base/blob.h"
+#include <limits>
 
 namespace apollo {
 namespace perception {
@@ -91,7 +92,8 @@ void Blob<Dtype>::Reshape(const std::vector<int>& shape) {
   for (size_t i = 0; i < shape.size(); ++i) {
     CHECK_GE(shape[i], 0);
     if (count_ != 0) {
-      CHECK_LE(shape[i], INT_MAX / count_) << "blob size exceeds INT_MAX";
+      CHECK_LE(shape[i], std::numeric_limits<int>::max() / count_)
+          << "blob size exceeds std::numeric_limits<int>::max()";
     }
     count_ *= shape[i];
     shape_[i] = shape[i];

@@ -196,7 +196,7 @@ int main(int argc, char** argv) {
   bool opt_loop = false;
   float opt_rate = 1.0f;
   uint64_t opt_begin = 0;
-  uint64_t opt_end = UINT64_MAX;
+  uint64_t opt_end = std::numeric_limits<u_int64_t>::max();
   uint64_t opt_start = 0;
   uint64_t opt_delay = 0;
   uint32_t opt_preload = 3;

@@ -79,7 +79,7 @@ TEST(ConvexHull2DTest, convex_hull_2d) {
   pt.x = 15.5f;
   pt.y = 5.5f;
   pt.z = 0.f;
-  pointcloud_in.push_back(pt, 0.0, FLT_MAX);
+  pointcloud_in.push_back(pt, 0.0, std::numeric_limits<float>::max());
   pointcloud_out.clear();
   flag = convex_hull_2d.GetConvexHullWithoutGround(
       pointcloud_in, distance_above_ground_thres, &pointcloud_out);

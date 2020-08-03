@@ -245,7 +245,7 @@ float ObjectTemplateManager::VehObjHwlBySearchTemplates(float *hwl, int *index,
   ACHECK(hwl != nullptr);
 
   float hwl_flip[3] = {hwl[0], hwl[2], hwl[1]};
-  float score_best = -FLT_MAX;
+  float score_best = -std::numeric_limits<float>::max();
   int i_best = -1;
   int i3 = 0;
   bool from_flip = false;
