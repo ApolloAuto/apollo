@@ -40,6 +40,9 @@ namespace util {
 std::string function_signature(const std::string& func_name,
                                const std::string& indicator) {
   auto simplified_name = func_name_simplified(func_name);
+  if (indicator.empty()) {
+    return simplified_name;
+  }
   return absl::StrCat(indicator, "_", simplified_name);
 }
 
