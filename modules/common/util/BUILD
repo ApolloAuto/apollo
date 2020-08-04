@@ -187,13 +187,12 @@ cc_library(
     deps = ["@eigen"],
 )
 
-# TODO(all): bazel settings on DISABLE_PERF
 cc_library(
     name = "perf_util",
     srcs = ["perf_util.cc"],
     hdrs = ["perf_util.h"],
-    # defines = ["DISABLE_PERF"],
     deps = [
+        "//cyber/common:macros",
         "//modules/common/time:timer",
         "@com_google_absl//absl/strings",
     ],
