@@ -24,15 +24,15 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/perf_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/common/util/perf_util.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/transform/proto/transform.pb.h"
 
@@ -315,8 +315,8 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     const double cur_time = apollo::common::time::Clock::NowInSeconds();
     const double start_latency = (cur_time - msg->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:TrafficLights:Start:msg_time["
-          << GLOG_TIMESTAMP(msg->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
+          << FORMAT_TIMESTAMP(msg->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
           << "]";
   }
 
@@ -328,8 +328,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     return;
   }
   const auto check_camera_status_time =
-      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator,
-                                               "CheckCameraImageStatus");
+      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator, "CheckCameraImageStatus");
 
   camera::TLPreprocessorOption preprocess_option;
   preprocess_option.image_borders_size = &image_border_sizes_;
@@ -339,8 +338,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     AWARN << "add_cached_camera_selection failed, ts: " << image_msg_ts;
   }
   const auto update_camera_selection_time =
-      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator,
-                                               "UpdateCameraSelection");
+      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator, "UpdateCameraSelection");
 
   // skipping frame according to last proc image timestamp
   if (last_proc_image_ts_ > 0.0 &&
@@ -355,8 +353,8 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   // sync image with cached projections
   bool sync_image_ok =
       preprocessor_->SyncInformation(image_msg_ts, camera_name);
-  const auto sync_information_time = PERF_BLOCK_END_WITH_INDICATOR(
-      perf_indicator, "SyncInformation");
+  const auto sync_information_time =
+      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator, "SyncInformation");
 
   if (!sync_image_ok) {
     AINFO << "PreprocessComponent not publish image, ts:" << image_msg_ts
@@ -399,16 +397,14 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     last_query_tf_ts_ = -1.0;
   }
   const auto verify_lights_projection_time =
-      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator,
-                                               "VerifyLightsProjection");
+      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator, "VerifyLightsProjection");
   last_proc_image_ts_ = apollo::common::time::Clock::NowInSeconds();
 
   AINFO << "start proc.";
   traffic_light_pipeline_->Perception(camera_perception_options_, &frame_);
 
   const auto traffic_lights_perception_time =
-      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator,
-                                               "TrafficLightsPerception");
+      PERF_BLOCK_END_WITH_INDICATOR(perf_indicator, "TrafficLightsPerception");
   for (auto light : frame_.traffic_lights) {
     AINFO << "after tl pipeline " << light->id << " color "
           << static_cast<int>(light->status.color);
@@ -419,7 +415,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   std::shared_ptr<TrafficLightDetection> out_msg(new TrafficLightDetection);
   if (!TransformOutputMessage(&frame_, camera_name, &out_msg)) {
     AERROR << "transform_output_message failed, msg_time: "
-           << GLOG_TIMESTAMP(msg->measurement_time());
+           << FORMAT_TIMESTAMP(msg->measurement_time());
     return;
   }
 
@@ -452,8 +448,8 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
     const double end_latency = (end_timestamp - msg->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:TrafficLights:End:msg_time["
-          << GLOG_TIMESTAMP(msg->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
+          << FORMAT_TIMESTAMP(msg->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
           << "]";
   }
 }

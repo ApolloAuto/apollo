@@ -16,9 +16,6 @@
 
 #include "modules/common/time/time_util.h"
 
-#include <cmath>
-#include <thread>
-
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -42,18 +39,6 @@ TEST(TimeUtilTest, TestGps2Unix) {
   double gps_time1 = 1260796984;
   double unix_time1 = TimeUtil::Gps2Unix(gps_time1);
   EXPECT_NEAR(unix_time1, 1576761766, 0.000001);
-}
-
-TEST(TimeUtilTest, TestGetCurrentTime) {
-  for (int i = 0; i < 20; i++) {
-    const double unix_time = TimeUtil::GetCurrentTime();
-    uint64_t current_time = ::time(NULL);
-    if (std::fabs(unix_time - static_cast<double>(current_time)) < 1) {
-      return;
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  }
-  FAIL();
 }
 
 }  // namespace time

@@ -16,7 +16,7 @@
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 
 #include "cyber/common/file.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion/dst_existence_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion/kalman_motion_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
@@ -116,7 +116,7 @@ void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
   std::string sensor_id = measurement->GetSensorId();
   ADEBUG << "fusion_updating..." << track_->GetTrackId() << " with "
          << sensor_id << "..." << measurement->GetBaseObject()->track_id << "@"
-         << GLOG_TIMESTAMP(measurement->GetTimestamp());
+         << FORMAT_TIMESTAMP(measurement->GetTimestamp());
   existence_fusion_->UpdateWithMeasurement(measurement, target_timestamp,
                                            options.match_distance);
   motion_fusion_->UpdateWithMeasurement(measurement, target_timestamp);

@@ -25,9 +25,6 @@ namespace apollo {
 namespace common {
 namespace time {
 
-#define GLOG_TIMESTAMP(timestamp) \
-  std::fixed << std::setprecision(9) << timestamp
-
 class TimeUtil {
  public:
   // @brief: UNIX timestamp to GPS timestamp, in seconds.
@@ -46,14 +43,6 @@ class TimeUtil {
       unix_time += 1.0;
     }
     return unix_time;
-  }
-
-  static double GetCurrentTime() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    const double timestamp =
-        static_cast<double>(tv.tv_sec * 1000000 + tv.tv_usec);
-    return timestamp / 1000000;
   }
 
  private:
