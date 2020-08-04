@@ -3,6 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+# TODO(all): target split
 cc_library(
     name = "benchmark_util",
     srcs = [
@@ -17,7 +18,6 @@ cc_library(
     hdrs = [
         "geo_util.h",
         "io_util.h",
-        "macros.h",
         "object.h",
         "object_supplement.h",
         "object_util.h",
@@ -27,11 +27,11 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/util",
+        "//modules/common/util:string_util",
         "@com_google_absl//absl/strings",
         "@eigen",
-        "@local_config_vtk//:vtk",
         "@local_config_pcl//:pcl",
+        "@local_config_vtk//:vtk",
     ],
 )
 
