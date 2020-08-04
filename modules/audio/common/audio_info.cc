@@ -28,33 +28,30 @@ using apollo::drivers::microphone::config::ChannelData;
 using apollo::drivers::microphone::config::ChannelType;
 using apollo::drivers::microphone::config::MicrophoneConfig;
 
-void AudioInfo::Init(const MicrophoneConfig& microphone_config) {
-  microphone_config_ = microphone_config;
-}
-
 void AudioInfo::Insert(const std::shared_ptr<AudioData>& audio_data) {
   std::size_t index = 0;
   for (const auto& channel_data : audio_data->channel_data()) {
     if (channel_data.channel_type() == ChannelType::RAW) {
-      InsertChannelData(index, channel_data);
+      InsertChannelData(index, channel_data, audio_data->microphone_config());
       ++index;
     }
   }
 }
 
-void AudioInfo::InsertChannelData(
-    const std::size_t index, const ChannelData& channel_data) {
+void AudioInfo::InsertChannelData(const std::size_t index,
+                                  const ChannelData& channel_data,
+                                  const MicrophoneConfig& microphone_config) {
   while (index >= signals_.size()) {
     signals_.push_back(std::deque<float>());
   }
-  int width = microphone_config_.sample_width();
+  int width = microphone_config.sample_width();
   const std::string& data = channel_data.data();
-  for (int i = 0; i + 1 < channel_data.size(); i += width) {
-    uint16_t signal = ((data[i] - '0') << 8) + (data[i + 1] - '0');
+  for (int i = 0; i < channel_data.size(); i += width) {
+    int16_t signal = ((int16_t(data[i])) << 8) | (0x00ff & data[i + 1]);
     signals_[index].push_back(static_cast<float>(signal));
   }
   std::size_t max_signal_length = static_cast<std::size_t>(
-      FLAGS_cache_signal_time * microphone_config_.sample_rate());
+      FLAGS_cache_signal_time * microphone_config.sample_rate());
   while (signals_[index].size() > max_signal_length) {
     signals_[index].pop_front();
   }

@@ -47,7 +47,7 @@ class AudioComponent
 
   bool Proc(
       const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&)
-  override;
+      override;
 
  private:
   std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>

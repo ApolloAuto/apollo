@@ -5,6 +5,7 @@ record_seconds: 6
 sample_width: 2
 channel_name: "/apollo/sensor/microphone"
 frame_id: "respeaker"
+mic_distance: 0.08127
 channel_type: ASR
 channel_type: RAW
 channel_type: RAW

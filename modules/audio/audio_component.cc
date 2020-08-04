@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/audio/audio_component.h"
-
+#include "modules/audio/inference/direction_detection.h"
 #include "modules/audio/proto/audio_conf.pb.h"
 
 namespace apollo {
@@ -23,8 +23,7 @@ namespace audio {
 
 using apollo::drivers::microphone::config::AudioData;
 
-AudioComponent::~AudioComponent() {
-}
+AudioComponent::~AudioComponent() {}
 
 std::string AudioComponent::Name() const {
   // TODO(all) implement
@@ -48,7 +47,11 @@ bool AudioComponent::Init() {
 
 bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {
   audio_info_.Insert(audio_data);
-  // TODO(all) get data for following online processings
+  AINFO << "Current direction is: "
+        << get_direction(
+               audio_info_.GetSignals(audio_data->microphone_config().chunk()),
+               audio_data->microphone_config().sample_rate(),
+               audio_data->microphone_config().mic_distance());
   return true;
 }
 
