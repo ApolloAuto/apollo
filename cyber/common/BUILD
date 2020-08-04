@@ -67,6 +67,7 @@ cc_library(
 
 cc_test(
     name = "environment_test",
+    size = "small",
     srcs = ["environment_test.cc"],
     deps = [
         ":environment",
