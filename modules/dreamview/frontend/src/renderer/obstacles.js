@@ -80,14 +80,16 @@ export default class PerceptionObstacles {
       if (STORE.options.showObstaclesVelocity && obstacle.type
                     && obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
         const arrowMesh = this.updateArrow(position,
-          obstacle.speedHeading, color, this.arrowIdx++, scene);
+          obstacle.speedHeading, color, scene);
+        this.arrowIdx++;
         const scale = 1 + Math.log2(obstacle.speed);
         arrowMesh.scale.set(scale, scale, scale);
         arrowMesh.visible = true;
       }
 
       if (STORE.options.showObstaclesHeading) {
-        this.drawObstacleHeading(position, obstacle.heading, this.arrowIdx++, scene);
+        this.drawObstacleHeading(position, obstacle.heading, scene);
+        this.arrowIdx++;
       }
 
       this.updateTexts(adc, obstacle, position, scene, isBirdView);
@@ -98,15 +100,16 @@ export default class PerceptionObstacles {
       confidence = Math.min(1.0, confidence);
       const polygon = obstacle.polygonPoint;
       if (obstacle.subType === 'ST_TRAFFICCONE') {
-        this.updateTrafficCone(position, this.trafficConeIdx, scene);
+        this.updateTrafficCone(position, scene);
         this.trafficConeIdx++;
       } else if (polygon !== undefined && polygon.length > 0) {
         this.updatePolygon(polygon, obstacle.height, color, coordinates, confidence,
-          this.extrusionFaceIdx, scene);
+          scene);
         this.extrusionFaceIdx += polygon.length;
       } else if (obstacle.length && obstacle.width && obstacle.height) {
         this.updateCube(obstacle.length, obstacle.width, obstacle.height, position,
-          obstacle.heading, color, confidence, this.cubeIdx++, scene);
+          obstacle.heading, color, confidence, scene);
+        this.cubeIdx++;
       }
 
       // draw a yield sign to indicate ADC is yielding to this obstacle
@@ -116,7 +119,7 @@ export default class PerceptionObstacles {
           y: position.y,
           z: position.z + obstacle.height + 0.5,
         };
-        this.updateIcon(iconPosition, world.autoDrivingCar.heading, this.iconIdx, scene);
+        this.updateIcon(iconPosition, world.autoDrivingCar.heading, scene);
         this.iconIdx++;
       }
     }
@@ -148,16 +151,18 @@ export default class PerceptionObstacles {
         const color = ObstacleColorMapping[measurement.type] || DEFAULT_COLOR;
 
         if (STORE.options.showObstaclesHeading) {
-          this.drawObstacleHeading(position, measurement.heading, this.arrowIdx++, scene);
+          this.drawObstacleHeading(position, measurement.heading, scene);
+          this.arrowIdx++;
         }
 
         if (measurement.subType === 'ST_TRAFFICCONE') {
-          this.updateTrafficCone(position, this.trafficConeIdx, scene);
+          this.updateTrafficCone(position, scene);
           this.trafficConeIdx++;
         } else if (measurement.length && measurement.width && measurement.height) {
           this.updateCube(measurement.length, measurement.width,
             measurement.height, position,
-            measurement.heading, color, 0.5, this.cubeIdx++, scene);
+            measurement.heading, color, 0.5, scene);
+          this.cubeIdx++;
         }
       }
     }
@@ -210,8 +215,8 @@ export default class PerceptionObstacles {
     return null;
   }
 
-  updateArrow(position, heading, color, arrowIdx, scene) {
-    const arrowMesh = this.getArrow(arrowIdx, scene);
+  updateArrow(position, heading, color, scene) {
+    const arrowMesh = this.getArrow(this.arrowIdx, scene);
     copyProperty(arrowMesh.position, position);
     arrowMesh.material.color.setHex(color);
     arrowMesh.rotation.set(0, 0, -(Math.PI / 2 - heading));
@@ -258,11 +263,11 @@ export default class PerceptionObstacles {
     }
   }
 
-  updatePolygon(points, height, color, coordinates, confidence, extrusionFaceIdx, scene) {
+  updatePolygon(points, height, color, coordinates, confidence, scene) {
     for (let i = 0; i < points.length; i++) {
       // Get cached face mesh.
-      const solidFaceMesh = this.getFace(extrusionFaceIdx + i, scene, true);
-      const dashedFaceMesh = this.getFace(extrusionFaceIdx + i, scene, false);
+      const solidFaceMesh = this.getFace(this.extrusionFaceIdx + i, scene, true);
+      const dashedFaceMesh = this.getFace(this.extrusionFaceIdx + i, scene, false);
 
       // Get the adjacent point.
       const next = (i === points.length - 1) ? 0 : i + 1;
@@ -297,9 +302,9 @@ export default class PerceptionObstacles {
     }
   }
 
-  updateCube(length, width, height, position, heading, color, confidence, cubeIdx, scene) {
+  updateCube(length, width, height, position, heading, color, confidence, scene) {
     if (confidence > 0) {
-      const solidCubeMesh = this.getCube(cubeIdx, scene, true);
+      const solidCubeMesh = this.getCube(this.cubeIdx, scene, true);
       solidCubeMesh.position.set(
         position.x, position.y, position.z + height * (confidence - 1) / 2);
       solidCubeMesh.scale.set(length, width, height * confidence);
@@ -309,7 +314,7 @@ export default class PerceptionObstacles {
     }
 
     if (confidence < 1) {
-      const dashedCubeMesh = this.getCube(cubeIdx, scene, false);
+      const dashedCubeMesh = this.getCube(this.cubeIdx, scene, false);
       dashedCubeMesh.position.set(
         position.x, position.y, position.z + height * confidence / 2);
       dashedCubeMesh.scale.set(length, width, height * (1 - confidence));
@@ -319,15 +324,15 @@ export default class PerceptionObstacles {
     }
   }
 
-  updateIcon(position, heading, iconIdx, scene) {
-    const icon = this.getIcon(iconIdx, scene);
+  updateIcon(position, heading, scene) {
+    const icon = this.getIcon(this.iconIdx, scene);
     copyProperty(icon.position, position);
     icon.rotation.set(Math.PI / 2, heading - Math.PI / 2, 0);
     icon.visible = true;
   }
 
-  updateTrafficCone(position, coneIdx, scene) {
-    const cone = this.getTrafficCone(coneIdx, scene);
+  updateTrafficCone(position, scene) {
+    const cone = this.getTrafficCone(this.trafficConeIdx, scene);
     cone.position.setX(position.x);
     cone.position.setY(position.y);
     cone.visible = true;
@@ -402,8 +407,8 @@ export default class PerceptionObstacles {
     }
   }
 
-  drawObstacleHeading(position, heading, index, scene) {
-    const arrowMesh = this.updateArrow(position, heading, 0xFFFFFF, index, scene);
+  drawObstacleHeading(position, heading, scene) {
+    const arrowMesh = this.updateArrow(position, heading, 0xFFFFFF, scene);
     arrowMesh.scale.set(1, 1, 1);
     arrowMesh.visible = true;
   }
