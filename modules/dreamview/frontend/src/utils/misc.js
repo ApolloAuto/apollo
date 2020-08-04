@@ -12,7 +12,7 @@ export function hideArrayObjects(objects, startIdx = 0) {
   if (objects.constructor === Array && objects.length > 0) {
     let idx = startIdx;
     for (;idx < objects.length; idx += 1) {
-      objects[startIdx].visible = false;
+      objects[idx].visible = false;
     }
   }
 }

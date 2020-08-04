@@ -3967,10 +3967,22 @@
             },
             "LearningData": {
               "fields": {
-                "learningData": {
+                "learningDataFrame": {
                   "rule": "repeated",
                   "type": "LearningDataFrame",
                   "id": 1
+                }
+              }
+            },
+            "PlanningLearningData": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "learningData": {
+                  "type": "LearningData",
+                  "id": 2
                 }
               }
             },
@@ -6363,6 +6375,10 @@
                 "trafficLightDetectionTopic": {
                   "type": "string",
                   "id": 11
+                },
+                "planningLearningDataTopic": {
+                  "type": "string",
+                  "id": 12
                 }
               }
             },
@@ -6381,22 +6397,36 @@
                   "type": "TopicConfig",
                   "id": 1
                 },
+                "learningMode": {
+                  "type": "PlanningLearningMode",
+                  "id": 2
+                },
                 "rtkPlanningConfig": {
                   "type": "RtkPlanningConfig",
-                  "id": 2
+                  "id": 3
                 },
                 "standardPlanningConfig": {
                   "type": "StandardPlanningConfig",
-                  "id": 3
+                  "id": 4
                 },
                 "navigationPlanningConfig": {
                   "type": "NavigationPlanningConfig",
-                  "id": 4
+                  "id": 5
                 },
                 "defaultTaskConfig": {
                   "rule": "repeated",
                   "type": "TaskConfig",
-                  "id": 5
+                  "id": 6
+                }
+              },
+              "nested": {
+                "PlanningLearningMode": {
+                  "values": {
+                    "NO_LEARNING": 0,
+                    "E2E": 1,
+                    "HYBRID": 2,
+                    "RL_TEST": 3
+                  }
                 }
               }
             },
@@ -7319,6 +7349,20 @@
                   "id": 5,
                   "options": {
                     "default": 0.2
+                  }
+                },
+                "allowEmptyLearningBasedData": {
+                  "type": "bool",
+                  "id": 6,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "allowEmptyOutputTrajectory": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
                   }
                 }
               },
@@ -9571,6 +9615,10 @@
                 "pullOver": {
                   "type": "PullOverDebug",
                   "id": 29
+                },
+                "hybridModel": {
+                  "type": "HybridModelDebug",
+                  "id": 30
                 }
               }
             },
@@ -9678,6 +9726,25 @@
                   "rule": "repeated",
                   "type": "apollo.common.Path",
                   "id": 1
+                }
+              }
+            },
+            "HybridModelDebug": {
+              "fields": {
+                "usingLearningModelOutput": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "learningModelOutputUsageRatio": {
+                  "type": "double",
+                  "id": 2
+                },
+                "learningModelOutputFailReason": {
+                  "type": "string",
+                  "id": 3
                 }
               }
             }
