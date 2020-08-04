@@ -17,50 +17,63 @@
 ###############################################################################
 
 # Usage:
-#   clang-format.sh <path/to/src/dir/or/file>
+#   clang-format.sh <path/to/src/dir/or/files>
 
 # Fail on error
 set -e
 
-TOP_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
-TARGET=$1
-if [[ -z "${TARGET}" ]]; then
-  echo "No path specified. Exiting..."
-  exit 1
-fi
+CLANG_FORMAT_CMD="clang-format"
 
-# Check tool.
-CLANG_FORMAT_CMD="$(command -v clang-format)"
-
-if [[ -z "${CLANG_FORMAT_CMD}" ]]; then
-  error "Oops, clang-format missing..."
-  error "Please make sure clang-format is installed and check your PATH" \
-        "settings. For Debian/Ubuntu, you can run the following command:"
-  error "  sudo apt-get -y update && sudo apt-get -y install clang-format"
-  exit 1
-fi
+function check_clang_format() {
+  CLANG_FORMAT_CMD="$(command -v clang-format)"
+  if [ -z "${CLANG_FORMAT_CMD}" ]; then
+    error "Oops, clang-format missing..."
+    error "Please make sure clang-format is installed and check your PATH" \
+      "settings. For Debian/Ubuntu, you can run the following command:"
+    error "  sudo apt-get -y update && sudo apt-get -y install clang-format"
+    exit 1
+  fi
+}
 
 function clang_format_run() {
   ${CLANG_FORMAT_CMD} -i -style=Google "$@"
 }
 
-# Format.
-if [ -f "${TARGET}" ]; then
-  if c_family_ext "${TARGET}"; then
-    clang_format_run "${TARGET}"
-    info "Done formatting ${TARGET}"
-  else
-    warning "Do nothing. ${TARGET} is not a c/c++/cuda header/source file."
+function run_clang_format() {
+  for target in "$@"; do
+    if [ -f "${target}" ]; then
+      if c_family_ext "${target}"; then
+        clang_format_run "${target}"
+        info "Done formatting ${target}"
+      else
+        warning "Do nothing. ${target} is not a c/c++/cuda header/source file."
+      fi
+    else
+      local srcs
+      srcs="$(find_c_cpp_srcs ${target})"
+      if [ -z "${srcs}" ]; then
+        warning "Do nothing. No c/c++/cuda header/source" \
+          "files found under ${target} ."
+        continue
+      fi
+      clang_format_run ${srcs}
+      info "Done formatting c/cpp/cuda source files under ${target}"
+    fi
+  done
+}
+
+function main() {
+  check_clang_format
+
+  if [ "$#" -eq 0 ]; then
+    error "Usage: $0 <path/to/dirs/or/files>"
+    exit 1
   fi
-else
-  srcs="$(find_c_cpp_srcs ${TARGET})"
-  if [[ -z "${srcs}" ]]; then
-      warning "Do nothing. No c/c++/cuda header/source" \
-              "files found under ${TARGET} ."
-      exit 0
-  fi
-  clang_format_run ${srcs}
-  info "Done formatting c/cpp/cuda source files under ${TARGET}"
-fi
+
+  run_clang_format "$@"
+}
+
+main "$@"
