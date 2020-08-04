@@ -20,7 +20,7 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <climits>
+#include <limits>
 #include <iostream>
 
 #define BOOST_NO_CXX11_SCOPED_ENUMS

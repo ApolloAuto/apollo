@@ -63,7 +63,7 @@ bool PostRecordProcessor::Process() {
     const auto reader = std::make_shared<RecordReader>(
         absl::StrCat(source_record_dir_, "/", record));
     RecordViewer viewer(reader, 0,
-                        std::numeric_limits<u_int64_t>::max(),
+                        std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << record << ":" << viewer.begin_time() << " - " << viewer.end_time();
     for (const auto& msg : viewer) {
@@ -79,7 +79,7 @@ bool PostRecordProcessor::Process() {
     const auto reader = std::make_shared<RecordReader>(
         absl::StrCat(source_record_dir_, "/", record));
     RecordViewer viewer(reader, 0,
-                        std::numeric_limits<u_int64_t>::max(),
+                        std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     for (const auto& msg : viewer) {
       // If the message fall into generated intervals,

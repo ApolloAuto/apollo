@@ -17,9 +17,9 @@
 
 #include <vector>
 
-#include "Eigen/Core"
 #include <limits>
 
+#include "Eigen/Core"
 #include "cyber/common/log.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point.h"

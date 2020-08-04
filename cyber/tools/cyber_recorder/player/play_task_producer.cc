@@ -41,7 +41,7 @@ PlayTaskProducer::PlayTaskProducer(const TaskBufferPtr& task_buffer,
       is_initialized_(false),
       is_stopped_(true),
       node_(nullptr),
-      earliest_begin_time_(std::numeric_limits<u_int64_t>::max()),
+      earliest_begin_time_(std::numeric_limits<uint64_t>::max()),
       latest_end_time_(0),
       total_msg_num_(0) {}
 

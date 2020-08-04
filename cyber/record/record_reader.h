@@ -69,7 +69,7 @@ class RecordReader : public RecordBase {
    * @return True for success, false for not.
    */
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
-                   uint64_t end_time = std::numeric_limits<u_int64_t>::max());
+                   uint64_t end_time = std::numeric_limits<uint64_t>::max());
 
   /**
    * @brief Reset the message index of record reader.

@@ -17,7 +17,6 @@
 #ifndef CYBER_TIME_DURATION_H_
 #define CYBER_TIME_DURATION_H_
 
-#include <climits>
 #include <cmath>
 #include <cstdint>
 #include <iostream>

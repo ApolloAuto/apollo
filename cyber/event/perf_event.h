@@ -158,7 +158,7 @@ class TransportEvent : public EventBase {
  private:
   std::string adder_ = "";
   uint64_t msg_seq_ = 0;
-  uint64_t channel_id_ = std::numeric_limits<u_int64_t>::max();
+  uint64_t channel_id_ = std::numeric_limits<uint64_t>::max();
 };
 
 }  // namespace event

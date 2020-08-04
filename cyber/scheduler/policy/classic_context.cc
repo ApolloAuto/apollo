@@ -16,7 +16,6 @@
 
 #include "cyber/scheduler/policy/classic_context.h"
 
-#include <climits>
 #include <limits>
 
 namespace apollo {

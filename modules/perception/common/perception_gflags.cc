@@ -16,7 +16,6 @@
 
 #include "modules/perception/common/perception_gflags.h"
 
-#include <climits>
 #include <limits>
 
 namespace apollo {
