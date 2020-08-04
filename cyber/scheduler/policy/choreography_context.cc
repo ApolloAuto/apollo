@@ -16,7 +16,6 @@
 
 #include "cyber/scheduler/policy/choreography_context.h"
 
-#include <climits>
 #include <limits>
 #include <unordered_map>
 #include <utility>

@@ -24,7 +24,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cerrno>
-#include <climits>
 #include <cstddef>
 #include <fstream>
 #include <string>

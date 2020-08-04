@@ -20,7 +20,6 @@
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 #include <algorithm>
-#include <climits>
 #include <vector>
 
 #include "cyber/common/log.h"

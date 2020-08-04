@@ -22,7 +22,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <climits>
 #include <cstdlib>
 #include <functional>
 

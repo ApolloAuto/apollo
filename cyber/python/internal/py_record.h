@@ -55,7 +55,7 @@ class PyRecordReader {
 
   BagMessage ReadMessage(
       uint64_t begin_time = 0,
-      uint64_t end_time = std::numeric_limits<u_int64_t>::max()) {
+      uint64_t end_time = std::numeric_limits<uint64_t>::max()) {
     BagMessage ret_msg;
     RecordMessage record_message;
     if (!record_reader_->ReadMessage(&record_message, begin_time, end_time)) {

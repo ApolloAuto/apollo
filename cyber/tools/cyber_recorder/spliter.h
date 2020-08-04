@@ -44,7 +44,7 @@ class Spliter {
           const std::vector<std::string>& white_channels,
           const std::vector<std::string>& black_channels,
           uint64_t begin_time = 0,
-          uint64_t end_time = std::numeric_limits<u_int64_t>::max());
+          uint64_t end_time = std::numeric_limits<uint64_t>::max());
   virtual ~Spliter();
   bool Proc();
 

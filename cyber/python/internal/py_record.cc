@@ -75,7 +75,7 @@ PyObject *cyber_delete_PyRecordReader(PyObject *self, PyObject *args) {
 PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   PyObject *pyobj_reader = nullptr;
   uint64_t begin_time = 0;
-  uint64_t end_time = std::numeric_limits<u_int64_t>::max();
+  uint64_t end_time = std::numeric_limits<uint64_t>::max();
   if (!PyArg_ParseTuple(args,
                         const_cast<char *>("OKK:PyRecordReader_ReadMessage"),
                         &pyobj_reader, &begin_time, &end_time)) {
