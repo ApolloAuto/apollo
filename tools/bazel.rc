@@ -63,6 +63,9 @@ build:opt_gpu --config=opt --config=gpu
 build:cpu_prof --config=cpu
 build:cpu_prof --linkopt=-lprofiler
 
+# This config refers to building perception modules with DISABLE_PERF
+build:disable_perf --cxxopt="-DDISABLE_PERF"
+
 # Build Apollo with C++ 17 features.
 build:c++17 --cxxopt=-std=c++1z
 # build:c++17 --cxxopt=-stdlib=libc++
