@@ -19,7 +19,8 @@
 #include <utility>
 
 #include "cyber/common/file.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/perf_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
@@ -29,7 +30,6 @@
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/common/util/perf_util.h"
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
 
 namespace apollo {
@@ -135,7 +135,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
     if (started_) {
       AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
             << ", obj_cnt : " << sensor_frame->objects.size() << ", "
-            << GLOG_TIMESTAMP(sensor_frame->timestamp);
+            << FORMAT_TIMESTAMP(sensor_frame->timestamp);
       sensor_data_manager->AddSensorMeasurements(sensor_frame);
     }
 
@@ -184,7 +184,7 @@ void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
         << frame->GetForegroundObjects().size()
         << ", background_object_number: "
         << frame->GetBackgroundObjects().size()
-        << ", timestamp: " << GLOG_TIMESTAMP(frame->GetTimestamp());
+        << ", timestamp: " << FORMAT_TIMESTAMP(frame->GetTimestamp());
   this->FuseForegroundTrack(frame);
   this->FusebackgroundTrack(frame);
   this->RemoveLostTrack();
@@ -207,8 +207,7 @@ void ProbabilisticFusion::FuseForegroundTrack(const SensorFramePtr& frame) {
   const std::vector<size_t>& unassigned_track_inds =
       association_result.unassigned_tracks;
   this->UpdateUnassignedTracks(frame, unassigned_track_inds);
-  PERF_BLOCK_END_WITH_INDICATOR(indicator,
-                                           "update_unassigned_track");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_unassigned_track");
 
   const std::vector<size_t>& unassigned_obj_inds =
       association_result.unassigned_measurements;
@@ -401,7 +400,7 @@ void ProbabilisticFusion::CollectFusedObjects(
 
   AINFO << "collect objects : fg_obj_cnt = " << fg_obj_num
         << ", bg_obj_cnt = " << bg_obj_num
-        << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
+        << ", timestamp = " << FORMAT_TIMESTAMP(timestamp);
 }
 
 void ProbabilisticFusion::CollectObjectsByTrack(
@@ -442,7 +441,7 @@ void ProbabilisticFusion::CollectObjectsByTrack(
   obj->tracking_time = track->GetTrackingPeriod();
   fused_objects->emplace_back(obj);
   ADEBUG << "fusion_reporting..." << obj->track_id << "@"
-         << GLOG_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
+         << FORMAT_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
          << obj->center(0) << "," << obj->center(1) << ","
          << obj->center_uncertainty(0, 0) << ","
          << obj->center_uncertainty(0, 1) << ","
