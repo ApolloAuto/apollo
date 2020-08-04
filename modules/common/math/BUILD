@@ -24,15 +24,34 @@ cc_library(
 )
 
 cc_library(
+    name = "math_utils",
+    srcs = ["math_utils.cc"],
+    hdrs = ["math_utils.h"],
+    linkopts = ["-lm"],
+    deps = [
+        ":vec2d",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "vec2d",
+    srcs = ["vec2d.cc"],
+    hdrs = ["vec2d.h"],
+    linkopts = ["-lm"],
+    deps = [
+        "//cyber/common:log",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
     name = "geometry",
     srcs = [
         "aabox2d.cc",
         "box2d.cc",
         "line_segment2d.cc",
-        "math_utils.cc",
-        "math_utils.h",
         "polygon2d.cc",
-        "vec2d.cc",
     ],
     hdrs = [
         "aabox2d.h",
@@ -40,14 +59,13 @@ cc_library(
         "box2d.h",
         "line_segment2d.h",
         "polygon2d.h",
-        "vec2d.h",
     ],
     linkopts = ["-lm"],
     deps = [
+        ":math_utils",
         "//cyber/common:log",
         "//modules/common/util:string_util",
         "@com_google_absl//absl/strings",
-        "@eigen",
         "@osqp",
     ],
 )
