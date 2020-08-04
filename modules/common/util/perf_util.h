@@ -19,6 +19,7 @@
 
 #include "absl/strings/str_cat.h"
 
+#include "cyber/common/macros.h"
 #include "modules/common/time/timer.h"
 
 #if defined(__GNUC__) || defined(__GNUG__)
@@ -70,7 +71,7 @@ std::string function_signature(const std::string& func_name,
 }  // namespace common
 }  // namespace apollo
 
-#if !defined(DISABLE_PERF)
+#if defined(ENABLE_PERF)
 #define PERF_FUNCTION()                               \
   apollo::common::time::TimerWrapper _timer_wrapper_( \
       apollo::common::util::function_signature(AFUNC))
@@ -87,9 +88,13 @@ std::string function_signature(const std::string& func_name,
   _timer_.End(absl::StrCat(indicator, "_", msg))
 #else
 #define PERF_FUNCTION()
-#define PERF_FUNCTION_WITH_NAME(func_name)
-#define PERF_FUNCTION_WITH_INDICATOR(indicator)
+#define PERF_FUNCTION_WITH_NAME(func_name) UNUSED(func_name);
+#define PERF_FUNCTION_WITH_INDICATOR(indicator) UNUSED(indicator);
 #define PERF_BLOCK_START()
-#define PERF_BLOCK_END(msg)
-#define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg)
-#endif  // DISABLE_PERF
+#define PERF_BLOCK_END(msg) UNUSED(msg);
+#define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg) \
+  {                                                   \
+    UNUSED(indicator);                                \
+    UNUSED(msg);                                      \
+  }
+#endif  // ENABLE_PERF
