@@ -19,8 +19,6 @@
 #include <cmath>
 #include <utility>
 
-#include "glog/logging.h"
-
 namespace apollo {
 namespace common {
 namespace math {
