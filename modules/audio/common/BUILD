@@ -1,0 +1,24 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "audio_gflags",
+    srcs = ["audio_gflags.cc"],
+    hdrs = ["audio_gflags.h"],
+)
+
+cc_library(
+    name = "audio_info",
+    srcs = ["audio_info.cc"],
+    hdrs = ["audio_info.h"],
+    deps = [
+        "//modules/audio/proto:audio_cc_proto",
+        "//modules/drivers/microphone/proto:audio_cc_proto",
+        "//modules/drivers/microphone/proto:microphone_config_cc_proto",
+        ":audio_gflags",
+    ],
+)
+
+cpplint()

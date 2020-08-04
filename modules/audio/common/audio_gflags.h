@@ -14,31 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/audio/audio_component.h"
+#pragma once
 
-namespace apollo {
-namespace audio {
+#include "gflags/gflags.h"
 
-using apollo::drivers::microphone::config::AudioData;
-
-AudioComponent::~AudioComponent() {
-}
-
-std::string AudioComponent::Name() const {
-  // TODO(all) implement
-  return "";
-}
-
-bool AudioComponent::Init() {
-  // TODO(all) implement
-  return false;
-}
-
-bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {
-  audio_info_.Insert(audio_data);
-  // TODO(all) get data for following online processings
-  return true;
-}
-
-}  // namespace audio
-}  // namespace apollo
+DECLARE_int32(cache_signal_time);

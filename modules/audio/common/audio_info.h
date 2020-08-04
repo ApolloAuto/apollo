@@ -14,51 +14,35 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
-#pragma once
-
+#include <deque>
 #include <memory>
 #include <string>
+#include <vector>
 
-#include "cyber/component/component.h"
-#include "modules/audio/common/audio_info.h"
-#include "modules/audio/proto/audio.pb.h"
 #include "modules/drivers/microphone/proto/audio.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/drivers/microphone/proto/microphone_config.pb.h"
 
-/**
- * @namespace apollo::audio
- * @brief apollo::audio
- */
 namespace apollo {
 namespace audio {
 
-class AudioComponent
-    : public cyber::Component<apollo::drivers::microphone::config::AudioData> {
+class AudioInfo {
  public:
-  ~AudioComponent();
+  AudioInfo() = default;
 
-  std::string Name() const;
+  void Init(const apollo::drivers::microphone::config::MicrophoneConfig&);
 
-  bool Init() override;
+  void Insert(
+      const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&);
 
-  bool Proc(
-      const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&)
-  override;
+  std::vector<std::vector<float>> GetSignals(const int signal_length);
 
  private:
-  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
-      localization_reader_;
+  void InsertChannelData(const std::size_t index,
+      const apollo::drivers::microphone::config::ChannelData& channel_data);
 
-  std::shared_ptr<cyber::Writer<AudioDetection>> audio_writer_;
-
-  AudioInfo audio_info_;
+  std::vector<std::deque<float>> signals_;
+  apollo::drivers::microphone::config::MicrophoneConfig microphone_config_;
 };
-
-CYBER_REGISTER_COMPONENT(AudioComponent)
 
 }  // namespace audio
 }  // namespace apollo
