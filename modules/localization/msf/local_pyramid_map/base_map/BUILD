@@ -108,7 +108,6 @@ cc_library(
     srcs = ["base_map.cc"],
     hdrs = [
         "base_map.h",
-        "base_map_cache.h",
         "base_map_fwd.h",
     ],
     deps = [

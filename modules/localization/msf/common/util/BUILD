@@ -66,6 +66,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "localization_msf_common_util_map_cache",
+    hdrs = [
+        "base_map_cache.h",
+    ],
+    deps = [
+        "//modules/common/util:lru_cache"
+    ],
+)
+
 cc_test(
     name = "compression_test",
     size = "small",

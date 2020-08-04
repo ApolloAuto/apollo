@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "cyber/task/task.h"
-#include "modules/localization/msf/local_pyramid_map/base_map/base_map_cache.h"
+#include "modules/localization/msf/common/util/base_map_cache.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
@@ -124,11 +124,13 @@ class BaseMap {
   /**@brief The map settings. */
   BaseMapConfig* map_config_ = nullptr;
 
+  MapNodeCache<MapNodeIndex, BaseMapNode>::DestroyFunc destroy_func_lvl1_;
+  MapNodeCache<MapNodeIndex, BaseMapNode>::DestroyFunc destroy_func_lvl2_;
   /**@brief The cache for map node preload. */
-  std::unique_ptr<MapNodeCacheL1<MapNodeIndex, BaseMapNode>>
+  std::unique_ptr<MapNodeCache<MapNodeIndex, BaseMapNode>>
       map_node_cache_lvl1_ = nullptr;
   /**brief The dynamic map node preloading thread pool pointer. */
-  std::unique_ptr<MapNodeCacheL2<MapNodeIndex, BaseMapNode>>
+  std::unique_ptr<MapNodeCache<MapNodeIndex, BaseMapNode>>
       map_node_cache_lvl2_ = nullptr;
   /**@brief The map node memory pool pointer. */
   BaseMapNodePool* map_node_pool_ = nullptr;
