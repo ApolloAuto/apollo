@@ -23,6 +23,10 @@
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/prediction/proto/feature.pb.h"
 
+namespace {
+constexpr float kFloatMax = std::numeric_limits<float>::max();
+}  // namespace
+
 namespace apollo {
 namespace perception {
 namespace onboard {
@@ -123,7 +127,7 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
       static_cast<PerceptionObstacle::SubType>(object_ptr->sub_type));
   pb_msg->set_timestamp(object_ptr->latest_tracked_time);  // in seconds.
 
-  if (object_ptr->lidar_supplement.height_above_ground != FLT_MAX) {
+  if (object_ptr->lidar_supplement.height_above_ground != kFloatMax) {
     pb_msg->set_height_above_ground(
         object_ptr->lidar_supplement.height_above_ground);
   } else {

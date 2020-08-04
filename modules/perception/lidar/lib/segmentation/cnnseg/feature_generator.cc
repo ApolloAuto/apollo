@@ -153,7 +153,7 @@ void FeatureGenerator::GenerateCPU(const base::PointFCloudPtr& pc_ptr,
   }
 
   for (int i = 0; i < map_size; ++i) {
-    if (count_data_[i] <= FLT_EPSILON) {
+    if (count_data_[i] <= std::numeric_limits<float>::epsilon()) {
       max_height_data_[i] = 0.f;
     } else {
       mean_height_data_[i] /= count_data_[i];

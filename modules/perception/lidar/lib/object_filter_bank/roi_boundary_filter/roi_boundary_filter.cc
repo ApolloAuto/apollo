@@ -15,12 +15,18 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 
+#include <limits>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/proto/roi_boundary_filter_config.pb.h"
+
+namespace {
+constexpr double kDoubleMax = std::numeric_limits<double>::max();
+}  // namespace
 
 namespace apollo {
 namespace perception {
@@ -151,7 +157,7 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
   auto& objects = frame->segmented_objects;
   double dist_to_boundary = 0.0;
   Eigen::Vector3d direction;
-  double min_dist_to_boundary = DBL_MAX;
+  double min_dist_to_boundary = kDoubleMax;
   Eigen::Vector3d world_point;
   for (size_t i = 0; i < objects.size(); ++i) {
     auto& obj = objects[i];
@@ -160,7 +166,7 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
       (*objects_valid_flag)[i] = false;
       for (auto& point : polygons_in_world_[i].points()) {
         dist_to_boundary = 0.0;
-        min_dist_to_boundary = DBL_MAX;
+        min_dist_to_boundary = kDoubleMax;
         world_point << point.x, point.y, point.z;
         for (const auto& boundary : road_boundary) {
           perception::common::CalculateDistAndDirToBoundary(
@@ -193,7 +199,7 @@ void ROIBoundaryFilter::FilterObjectsInsideBoundary(
   auto& objects = frame->segmented_objects;
   double dist_to_boundary = 0.0;
   Eigen::Vector3d direction;
-  double min_dist_to_boundary = DBL_MAX;
+  double min_dist_to_boundary = kDoubleMax;
   Eigen::Vector3d world_point;
   for (size_t i = 0; i < objects.size(); ++i) {
     auto& obj = objects[i];
@@ -203,7 +209,7 @@ void ROIBoundaryFilter::FilterObjectsInsideBoundary(
       (*objects_valid_flag)[i] = false;
       for (auto& point : polygons_in_world_[i].points()) {
         dist_to_boundary = 0.0;
-        min_dist_to_boundary = DBL_MAX;
+        min_dist_to_boundary = kDoubleMax;
         world_point << point.x, point.y, point.z;
         for (auto& boundary : road_boundary) {
           perception::common::CalculateDistAndDirToBoundary(

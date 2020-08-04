@@ -16,7 +16,6 @@
 #include "modules/perception/common/i_lib/pc/i_ground.h"
 
 #include <algorithm>
-#include <cfloat>
 #include <limits>
 
 namespace apollo {
@@ -1305,7 +1304,9 @@ unsigned int PlaneFitGroundDetector::GetGridDimY() const {
   return vg_coarse_->NrVoxelY();
 }
 
-float PlaneFitGroundDetector::GetUnknownHeight() { return std::numeric_limits<float>::max(); }
+float PlaneFitGroundDetector::GetUnknownHeight() {
+  return std::numeric_limits<float>::max();
+}
 
 PlaneFitPointCandIndices **PlaneFitGroundDetector::GetCandis() const {
   return local_candis_;

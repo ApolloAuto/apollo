@@ -15,7 +15,7 @@
  *****************************************************************************/
 #pragma once
 
-#include <cfloat>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
@@ -122,7 +122,7 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   }
 
   // loop to find nearest
-  double distance = DBL_MAX;
+  double distance = std::numeric_limits<double>::max();
   int idx = static_cast<int>(buffer_queue_.size()) - 1;
   for (; idx >= 0; --idx) {
     double temp_distance = fabs(timestamp - buffer_queue_[idx].first);

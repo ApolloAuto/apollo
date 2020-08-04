@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <cfloat>
 #include <limits>
 #include <memory>
 #include <vector>

@@ -17,6 +17,7 @@
 #include "modules/perception/map/hdmap/hdmap_input.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -262,6 +263,7 @@ bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
 void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
                                   base::PointCloud<base::PointD>* polygon_ptr,
                                   size_t min_points_num_for_sample) const {
+  constexpr double kDoubleEpsilon = std::numeric_limits<double>::epsilon();
   const PointDCloud& raw_cloud = *raw_cloud_ptr;
   unsigned int spt = 0;
   double acos_theta = 0.0;
@@ -284,7 +286,7 @@ void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
     double vector_dist =
         sqrt(v1.cwiseProduct(v1).sum()) * sqrt(v2.cwiseProduct(v2).sum());
     // Judge duplicate points
-    if (vector_dist < DBL_EPSILON) {
+    if (vector_dist < kDoubleEpsilon) {
       continue;
     }
     double cos_theta = (v1.cwiseProduct(v2)).sum() / vector_dist;
@@ -295,7 +297,7 @@ void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
     }
     double angle = (acos(cos_theta) * radian_to_degree);
     acos_theta += angle;
-    if ((acos_theta - 1.0) > DBL_EPSILON) {
+    if ((acos_theta - 1.0) > kDoubleEpsilon) {
       polygon_ptr->push_back(point_1);
       spt = static_cast<unsigned int>(idx - 1);
       acos_theta = 0.0;

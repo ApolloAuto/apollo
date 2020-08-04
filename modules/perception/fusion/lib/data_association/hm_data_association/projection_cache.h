@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
@@ -64,7 +65,8 @@ class ProjectionCacheFrame {
   ProjectionCacheFrame(std::string sensor_id, double timestamp)
       : sensor_id_(sensor_id), timestamp_(timestamp) {}
   bool VerifyKey(std::string sensor_id, double timestamp) {
-    if (sensor_id_ != sensor_id || fabs(timestamp_ - timestamp) > DBL_EPSILON) {
+    if (sensor_id_ != sensor_id ||
+        fabs(timestamp_ - timestamp) > std::numeric_limits<double>::epsilon()) {
       return false;
     }
     return true;
@@ -161,7 +163,8 @@ class ProjectionCache {
  private:
   bool VerifyKey(const std::string& sensor_id, double timestamp) {
     if (measurement_sensor_id_ != sensor_id ||
-        fabs(measurement_timestamp_ - timestamp) > DBL_EPSILON) {
+        fabs(measurement_timestamp_ - timestamp) >
+            std::numeric_limits<double>::epsilon()) {
       return false;
     }
     return true;
