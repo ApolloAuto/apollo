@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <cfloat>
-#include <vector>
 #include <limits>
+#include <vector>
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 namespace apollo {
 namespace perception {

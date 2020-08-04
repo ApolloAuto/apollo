@@ -16,7 +16,7 @@
 
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 
-#include <cfloat>
+#include <limits>
 #include <string>
 
 #include "cyber/common/file.h"
@@ -86,7 +86,7 @@ void PerceptionCameraUpdater::GetImageLocalization(
     return;
   }
 
-  double timestamp_diff = DBL_MAX;
+  double timestamp_diff = std::numeric_limits<double>::max();
   Pose image_pos;
   while (!localization_queue_.empty()) {
     const double tmp_diff = localization_queue_.front()->measurement_time() -

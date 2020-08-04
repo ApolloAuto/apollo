@@ -294,7 +294,8 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
     Eigen::Vector3d velocity_resisual =
         cur_obj_pair->second->selected_measured_velocity -
         object->output_velocity;
-    if (velocity_resisual.head(2).norm() < DBL_EPSILON) {
+    if (velocity_resisual.head(2).norm() <
+        std::numeric_limits<double>::epsilon()) {
       velocity_resisual =
           Eigen::Vector3d::Identity() * noise_maximum_ * noise_maximum_;
     }
@@ -405,9 +406,10 @@ void MlfMotionFilter::BoostupState(const MlfTrackDataConstPtr& track_data,
   // Compute min & max boosted velocity
   Eigen::Vector3d& new_obj_belief_velocity = new_object->belief_velocity;
   Eigen::Vector3d min_boosted_velocity = new_obj_belief_velocity;
-  double min_boosted_velocity_norm = DBL_MAX;
+  constexpr double kDoubleMax = std::numeric_limits<double>::max();
+  double min_boosted_velocity_norm = kDoubleMax;
   Eigen::Vector3d max_boosted_velocity = new_obj_belief_velocity;
-  double max_boosted_velocity_norm = std::numeric_limits<double>::max();
+  double max_boosted_velocity_norm = kDoubleMax;
   Eigen::Vector3d project_dir = min_boosted_velocity;
   project_dir(2) = 0.0;
   project_dir.normalize();

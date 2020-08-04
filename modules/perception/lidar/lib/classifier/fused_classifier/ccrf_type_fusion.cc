@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
 
+#include <limits>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/object_types.h"
@@ -195,7 +197,7 @@ bool CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(
   for (std::size_t i = 1; i < length; ++i) {
     for (std::size_t right = 0; right < VALID_OBJECT_TYPE; ++right) {
       double prob = 0.0;
-      double max_prob = -DBL_MAX;
+      double max_prob = -std::numeric_limits<double>::max();
       std::size_t id = 0;
       for (std::size_t left = 0; left < VALID_OBJECT_TYPE; ++left) {
         prob = fused_sequence_probs_[i - 1](left) +

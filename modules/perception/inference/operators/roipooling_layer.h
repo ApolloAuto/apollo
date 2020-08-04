@@ -63,7 +63,6 @@ license and copyright terms herein.
 
 #pragma once
 
-#include <cfloat>
 #include <memory>
 #include <vector>
 

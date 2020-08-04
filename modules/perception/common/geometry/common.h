@@ -109,17 +109,18 @@ bool IsPointInBBox(const Eigen::Matrix<typename PointT::Type, 3, 1> &gnd_c,
 // @brief calculate the size and center of the bounding-box of a point cloud
 // old name: compute_bbox_size_center_xy
 template <typename PointCloudT>
-void CalculateBBoxSizeCenter2DXY(const PointCloudT &cloud,
-                                 const Eigen::Vector3f &dir,
-                                 Eigen::Vector3f *size, Eigen::Vector3d *center,
-                                 float minimum_edge_length = FLT_EPSILON) {
+void CalculateBBoxSizeCenter2DXY(
+    const PointCloudT &cloud, const Eigen::Vector3f &dir, Eigen::Vector3f *size,
+    Eigen::Vector3d *center,
+    float minimum_edge_length = std::numeric_limits<float>::epsilon()) {
   // NOTE: direction should not be (0, 0, 1)
   Eigen::Matrix3d projection;
   Eigen::Vector3d dird(dir[0], dir[1], 0.0);
   dird.normalize();
   projection << dird[0], dird[1], 0.0, -dird[1], dird[0], 0.0, 0.0, 0.0, 1.0;
-  Eigen::Vector3d min_pt(DBL_MAX, DBL_MAX, DBL_MAX);
-  Eigen::Vector3d max_pt(-DBL_MAX, -DBL_MAX, -DBL_MAX);
+  constexpr double kDoubleMax = std::numeric_limits<double>::max();
+  Eigen::Vector3d min_pt(kDoubleMax, kDoubleMax, kDoubleMax);
+  Eigen::Vector3d max_pt(-kDoubleMax, -kDoubleMax, -kDoubleMax);
   Eigen::Vector3d loc_pt(0.0, 0.0, 0.0);
   for (size_t i = 0; i < cloud.size(); i++) {
     loc_pt = projection * Eigen::Vector3d(cloud[i].x, cloud[i].y, cloud[i].z);
@@ -137,8 +138,9 @@ void CalculateBBoxSizeCenter2DXY(const PointCloudT &cloud,
   coeff(2) = min_pt(2);
   *center = projection.transpose() * coeff;
 
-  float minimum_size =
-      minimum_edge_length > FLT_EPSILON ? minimum_edge_length : FLT_EPSILON;
+  constexpr float kFloatEpsilon = std::numeric_limits<float>::epsilon();
+  float minimum_size = std::max(minimum_edge_length, kFloatEpsilon);
+
   (*size)(0) = (*size)(0) <= minimum_size ? minimum_size : (*size)(0);
   (*size)(1) = (*size)(1) <= minimum_size ? minimum_size : (*size)(1);
   (*size)(2) = (*size)(2) <= minimum_size ? minimum_size : (*size)(2);

@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/ncut/common/flood_fill.h"
-#include <cfloat>
-#include <ctime>
 #include "cyber/common/log.h"
 
 namespace apollo {

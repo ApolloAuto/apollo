@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <cfloat>
-
 #include <algorithm>
 #include <limits>
 #include <numeric>
