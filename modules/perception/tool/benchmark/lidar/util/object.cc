@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
+
 #include <sstream>
-#include "modules/perception/tool/benchmark/lidar/util/macros.h"
+
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace perception {
@@ -159,8 +161,8 @@ std::string Object::to_string() const {
       << ", confidence: " << confidence << ", type: " << type
       << ", is_background: " << is_background << ", is_in_roi: " << is_in_roi
       << ", is_in_main_lanes: " << is_in_main_lanes
-      << ", tracking_time: " << GLOG_TIMESTAMP(tracking_time)
-      << ", latest_tracked_time: " << GLOG_TIMESTAMP(latest_tracked_time)
+      << ", tracking_time: " << FORMAT_TIMESTAMP(tracking_time)
+      << ", latest_tracked_time: " << FORMAT_TIMESTAMP(latest_tracked_time)
       << "]";
 
   return oss.str();
@@ -219,7 +221,7 @@ std::string get_sensor_name(SensorType sensor_type) {
 std::string SensorObjects::to_string() const {
   std::ostringstream oss;
   oss << "SensorObjects[sensor_type: " << get_sensor_name(type)
-      << ", name: " << name << ", timestamp:" << GLOG_TIMESTAMP(timestamp)
+      << ", name: " << name << ", timestamp:" << FORMAT_TIMESTAMP(timestamp)
       << ", sensor2world_pose:\n";
   oss << sensor2world_pose << "\n, objects: " << objects.size() << " < ";
   for (auto obj : objects) {
