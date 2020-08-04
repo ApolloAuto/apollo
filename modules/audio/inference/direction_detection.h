@@ -1,3 +1,4 @@
+
 /******************************************************************************
  * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
@@ -14,35 +15,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <deque>
-#include <memory>
-#include <string>
+#pragma once
+
+#include <algorithm>
+#include <cmath>
 #include <vector>
 
-#include "modules/drivers/microphone/proto/audio.pb.h"
-#include "modules/drivers/microphone/proto/microphone_config.pb.h"
+#include "ATen/ATen.h"
+#include "cyber/cyber.h"
+#include "torch/torch.h"
 
 namespace apollo {
 namespace audio {
 
-class AudioInfo {
- public:
-  AudioInfo() = default;
+constexpr float SOUND_SPEED = 343.2;
 
-  void Insert(
-      const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&);
-
-  std::vector<std::vector<float>> GetSignals(const int signal_length);
-
- private:
-  void InsertChannelData(
-      const std::size_t index,
-      const apollo::drivers::microphone::config::ChannelData& channel_data,
-      const apollo::drivers::microphone::config::MicrophoneConfig&
-          microphone_config);
-
-  std::vector<std::deque<float>> signals_;
-};
+float gcc_phat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
+               double max_tau, int interp);
+int get_direction(std::vector<std::vector<float>>&& channels_vec,
+                  const int sample_rate, const int mic_distance);
 
 }  // namespace audio
 }  // namespace apollo
