@@ -5,21 +5,32 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "monitor_log",
-    srcs = [
-        "monitor_log_buffer.cc",
-        "monitor_logger.cc",
+    deps = [
+        ":monitor_log_buffer",
+        ":monitor_logger",
+        "//cyber/common:log",
     ],
-    hdrs = [
-        "monitor_log_buffer.h",
-        "monitor_logger.h",
-    ],
+)
+
+cc_library(
+    name = "monitor_logger",
+    srcs = ["monitor_logger.cc"],
+    hdrs = ["monitor_logger.h"],
     deps = [
         "//cyber",
-        "//cyber/proto:component_conf_cc_proto",
         "//modules/common/monitor_log/proto:monitor_log_cc_proto",
-        "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/time",
         "//modules/common/util:message_util",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "monitor_log_buffer",
+    srcs = ["monitor_log_buffer.cc"],
+    hdrs = ["monitor_log_buffer.h"],
+    deps = [
+        ":monitor_logger",
+        "//modules/common/monitor_log/proto:monitor_log_cc_proto",
         "@com_google_googletest//:gtest",
     ],
 )
