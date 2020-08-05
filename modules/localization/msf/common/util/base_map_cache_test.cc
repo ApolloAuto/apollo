@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/localization/msf/common/util/base_map_cache.h"
+#include <string>
 #include <vector>
 #include "gtest/gtest.h"
 
@@ -46,13 +47,14 @@ class NodeIndex {
 class NodeData {
  public:
   NodeData() : is_reserved_(false), name_("") {}
-  NodeData(std::string name) : is_reserved_(false), name_(name) {}
+  explicit NodeData(const std::string& name)
+      : is_reserved_(false), name_(name) {}
 
  public:
   void SetIsReserved(bool b) { is_reserved_ = b; }
   bool GetIsReserved() { return is_reserved_; }
 
-  void SetName(std::string name) { name_ = name; }
+  void SetName(const std::string& name) { name_ = name; }
   std::string GetName() { return name_; }
 
  private:
@@ -73,66 +75,68 @@ class MapNodeCacheTest : public ::testing::Test {
         std::bind(MapNodeCache<NodeIndex, NodeData>::CacheL2Destroy,
                   std::placeholders::_1);
 
-    map_node_cache_lvl1_.reset(
+    map_node_cache_lvl_.reset(
         new MapNodeCache<NodeIndex, NodeData>(3, destroy_func_lvl1_));
-    map_node_cache_lvl2_.reset(
-        new MapNodeCache<NodeIndex, NodeData>(3, destroy_func_lvl2_));
 
-    node_pool_.push_back(std::make_pair(NodeIndex(1, 2), NodeData("aaa")));
-    node_pool_.push_back(std::make_pair(NodeIndex(2, 3), NodeData("bbb")));
-    node_pool_.push_back(std::make_pair(NodeIndex(3, 4), NodeData("ccc")));
-    node_pool_.push_back(std::make_pair(NodeIndex(4, 5), NodeData("ddd")));
+    std::string name_a("aaa");
+    std::string name_b("bbb");
+    std::string name_c("ccc");
+    std::string name_d("ddd");
+
+    node_pool_.push_back(std::make_pair(NodeIndex(1, 2), NodeData(name_a)));
+    node_pool_.push_back(std::make_pair(NodeIndex(2, 3), NodeData(name_b)));
+    node_pool_.push_back(std::make_pair(NodeIndex(3, 4), NodeData(name_c)));
+    node_pool_.push_back(std::make_pair(NodeIndex(4, 5), NodeData(name_d)));
   }
 
   MapNodeCache<NodeIndex, NodeData>::DestroyFunc destroy_func_lvl1_;
   MapNodeCache<NodeIndex, NodeData>::DestroyFunc destroy_func_lvl2_;
-  std::unique_ptr<MapNodeCache<NodeIndex, NodeData>> map_node_cache_lvl1_;
-  std::unique_ptr<MapNodeCache<NodeIndex, NodeData>> map_node_cache_lvl2_;
+  std::unique_ptr<MapNodeCache<NodeIndex, NodeData>> map_node_cache_lvl_;
 
   std::vector<std::pair<NodeIndex, NodeData>> node_pool_;
 };
 
 TEST_F(MapNodeCacheTest, PutAndGet) {
-  map_node_cache_lvl1_->Put(node_pool_[0].first, &(node_pool_[0].second));
-  map_node_cache_lvl1_->Put(node_pool_[1].first, &(node_pool_[1].second));
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 2);
+  map_node_cache_lvl_->Put(node_pool_[0].first, &(node_pool_[0].second));
+  map_node_cache_lvl_->Put(node_pool_[1].first, &(node_pool_[1].second));
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 2);
   NodeData* node_data = nullptr;
-  map_node_cache_lvl1_->ClearOne();
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 1);
-  map_node_cache_lvl1_->Get(std::move(NodeIndex(2, 3)), &node_data);
+  map_node_cache_lvl_->ClearOne();
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 1);
+  map_node_cache_lvl_->Get(std::move(NodeIndex(2, 3)), &node_data);
   EXPECT_EQ(node_data->GetName().compare("bbb"), 0);
 }
 
 TEST_F(MapNodeCacheTest, GetSilent) {
-  map_node_cache_lvl1_->Put(node_pool_[0].first, &(node_pool_[0].second));
-  map_node_cache_lvl1_->Put(node_pool_[1].first, &(node_pool_[1].second));
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 2);
+  map_node_cache_lvl_->Put(node_pool_[0].first, &(node_pool_[0].second));
+  map_node_cache_lvl_->Put(node_pool_[1].first, &(node_pool_[1].second));
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 2);
   NodeData* node_data;
-  map_node_cache_lvl1_->GetSilent(std::move(NodeIndex(2, 3)), &node_data);
-  map_node_cache_lvl1_->ClearOne();
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 1);
-  map_node_cache_lvl1_->Get(std::move(NodeIndex(2, 3)), &node_data);
+  map_node_cache_lvl_->GetSilent(std::move(NodeIndex(2, 3)), &node_data);
+  map_node_cache_lvl_->ClearOne();
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 1);
+  map_node_cache_lvl_->Get(std::move(NodeIndex(2, 3)), &node_data);
   EXPECT_EQ(node_data->GetName().compare("bbb"), 0);
 }
 
 TEST_F(MapNodeCacheTest, IsExist) {
-  map_node_cache_lvl1_->Put(node_pool_[0].first, &(node_pool_[0].second));
-  map_node_cache_lvl1_->Put(node_pool_[1].first, &(node_pool_[1].second));
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 2);
+  map_node_cache_lvl_->Put(node_pool_[0].first, &(node_pool_[0].second));
+  map_node_cache_lvl_->Put(node_pool_[1].first, &(node_pool_[1].second));
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 2);
   NodeData* node_data;
-  EXPECT_EQ(map_node_cache_lvl1_->IsExist(std::move(NodeIndex(1, 2))), true);
-  map_node_cache_lvl1_->ClearOne();
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 1);
-  map_node_cache_lvl1_->Get(std::move(NodeIndex(1, 2)), &node_data);
+  EXPECT_EQ(map_node_cache_lvl_->IsExist(std::move(NodeIndex(1, 2))), true);
+  map_node_cache_lvl_->ClearOne();
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 1);
+  map_node_cache_lvl_->Get(std::move(NodeIndex(1, 2)), &node_data);
   EXPECT_EQ(node_data->GetName().compare("aaa"), 0);
 }
 
 TEST_F(MapNodeCacheTest, DestroyFunc) {
-  map_node_cache_lvl1_->Put(node_pool_[0].first, &(node_pool_[0].second));
-  map_node_cache_lvl1_->Put(node_pool_[1].first, &(node_pool_[1].second));
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 2);
+  map_node_cache_lvl_->Put(node_pool_[0].first, &(node_pool_[0].second));
+  map_node_cache_lvl_->Put(node_pool_[1].first, &(node_pool_[1].second));
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 2);
   NodeData* node_data;
-  map_node_cache_lvl1_->Get(std::move(NodeIndex(1, 2)), &node_data);
+  map_node_cache_lvl_->Get(std::move(NodeIndex(1, 2)), &node_data);
   EXPECT_EQ(node_data->GetName().compare("aaa"), 0);
   node_data->SetIsReserved(true);
   EXPECT_EQ(destroy_func_lvl2_(node_data), false);
@@ -141,15 +145,15 @@ TEST_F(MapNodeCacheTest, DestroyFunc) {
 }
 
 TEST_F(MapNodeCacheTest, PutOverCapacity) {
-  map_node_cache_lvl1_->Put(node_pool_[0].first, &(node_pool_[0].second));
-  map_node_cache_lvl1_->Put(node_pool_[1].first, &(node_pool_[1].second));
-  map_node_cache_lvl1_->Put(node_pool_[2].first, &(node_pool_[2].second));
-  map_node_cache_lvl1_->Put(node_pool_[3].first, &(node_pool_[3].second));
-  EXPECT_EQ(map_node_cache_lvl1_->Size(), 3);
-  EXPECT_EQ(map_node_cache_lvl1_->IsExist(std::move(NodeIndex(1, 2))), false);
-  EXPECT_EQ(map_node_cache_lvl1_->IsExist(std::move(NodeIndex(2, 3))), true);
-  EXPECT_EQ(map_node_cache_lvl1_->IsExist(std::move(NodeIndex(3, 4))), true);
-  EXPECT_EQ(map_node_cache_lvl1_->IsExist(std::move(NodeIndex(4, 5))), true);
+  map_node_cache_lvl_->Put(node_pool_[0].first, &(node_pool_[0].second));
+  map_node_cache_lvl_->Put(node_pool_[1].first, &(node_pool_[1].second));
+  map_node_cache_lvl_->Put(node_pool_[2].first, &(node_pool_[2].second));
+  map_node_cache_lvl_->Put(node_pool_[3].first, &(node_pool_[3].second));
+  EXPECT_EQ(map_node_cache_lvl_->Size(), 3);
+  EXPECT_EQ(map_node_cache_lvl_->IsExist(std::move(NodeIndex(1, 2))), false);
+  EXPECT_EQ(map_node_cache_lvl_->IsExist(std::move(NodeIndex(2, 3))), true);
+  EXPECT_EQ(map_node_cache_lvl_->IsExist(std::move(NodeIndex(3, 4))), true);
+  EXPECT_EQ(map_node_cache_lvl_->IsExist(std::move(NodeIndex(4, 5))), true);
 }
 
 }  // namespace msf

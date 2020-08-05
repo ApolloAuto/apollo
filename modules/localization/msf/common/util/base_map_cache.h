@@ -32,7 +32,7 @@ using LRUCache = ::apollo::common::util::LRUCache<Key, Element*>;
 template <class Key, class Element, class MapLRUCache = LRUCache<Key, Element>>
 class MapNodeCache {
  public:
-  typedef std::function<bool(Element*)> DestroyFunc;
+  using DestroyFunc = std::function<bool(Element*)>;
   static bool CacheL1Destroy(Element* value) {
     value->SetIsReserved(false);
     return true;
@@ -43,7 +43,7 @@ class MapNodeCache {
 
  public:
   /**@brief The constructor. */
-  explicit MapNodeCache(unsigned int capacity, const DestroyFunc& destroy_func)
+  MapNodeCache(unsigned int capacity, const DestroyFunc& destroy_func)
       : destroy_func_(destroy_func), lru_map_nodes_(capacity) {}
   /**@brief The destructor. */
   ~MapNodeCache() {}
