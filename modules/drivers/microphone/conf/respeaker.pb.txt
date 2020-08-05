@@ -1,6 +1,6 @@
 microphone_model: RESPEAKER
-chunk: 1024
-sample_rate: 16000
+chunk: 8192
+sample_rate: 48000
 record_seconds: 6
 sample_width: 2
 channel_name: "/apollo/sensor/microphone"

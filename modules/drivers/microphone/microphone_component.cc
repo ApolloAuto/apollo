@@ -38,8 +38,8 @@ bool MicrophoneComponent::Init() {
   // chunk_: number of frames per chunk; chunk_size_: number of bytes per chunk
   chunk_ = microphone_config_ptr_->chunk();
   n_chunk_ = static_cast<int>(
-      std::floor(microphone_config_ptr_->sample_rate() *
-                 microphone_config_ptr_->record_seconds() / chunk_));
+      std::ceil(microphone_config_ptr_->sample_rate() *
+                microphone_config_ptr_->record_seconds() / chunk_));
   chunk_size_ = chunk_ * n_channels_ * sample_width_;
   buffer_ = new char[chunk_size_];
   if (buffer_ == nullptr) {
