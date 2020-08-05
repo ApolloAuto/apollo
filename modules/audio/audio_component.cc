@@ -16,6 +16,8 @@
 
 #include "modules/audio/audio_component.h"
 
+#include "modules/audio/proto/audio_conf.pb.h"
+
 namespace apollo {
 namespace audio {
 
@@ -30,8 +32,18 @@ std::string AudioComponent::Name() const {
 }
 
 bool AudioComponent::Init() {
-  // TODO(all) implement
-  return false;
+  AudioConf audio_conf;
+  if (!ComponentBase::GetProtoConfig(&audio_conf)) {
+    AERROR << "Unable to load audio conf file: "
+           << ComponentBase::ConfigFilePath();
+    return false;
+  }
+  localization_reader_ =
+      node_->CreateReader<localization::LocalizationEstimate>(
+          audio_conf.topic_conf().localization_topic_name(), nullptr);
+  audio_writer_ = node_->CreateWriter<AudioDetection>(
+      audio_conf.topic_conf().audio_detection_topic_name());
+  return true;
 }
 
 bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {

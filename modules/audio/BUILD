@@ -15,6 +15,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/audio/common:audio_info",
         "//modules/audio/proto:audio_cc_proto",
+        "//modules/audio/proto:audio_conf_cc_proto",
         "//modules/drivers/microphone/proto:audio_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
     ],
