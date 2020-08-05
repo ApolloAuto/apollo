@@ -265,7 +265,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // early return when reference line fails to update after rerouting
   if (failed_to_update_reference_line) {
-    std::string msg("Failed to updated reference line after rerouting.");
+    std::string msg("Failed to update reference line after rerouting.");
     AERROR << msg;
     ptr_trajectory_pb->mutable_decision()
         ->mutable_main_decision()
