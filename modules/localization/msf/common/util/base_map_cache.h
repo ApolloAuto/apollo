@@ -16,6 +16,7 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 #include "cyber/common/log.h"
 
 #include "modules/common/util/lru_cache.h"
@@ -42,7 +43,7 @@ class MapNodeCache {
 
  public:
   /**@brief The constructor. */
-  explicit MapNodeCache(unsigned int capacity, DestroyFunc& destroy_func)
+  explicit MapNodeCache(unsigned int capacity, const DestroyFunc& destroy_func)
       : destroy_func_(destroy_func), lru_map_nodes_(capacity) {}
   /**@brief The destructor. */
   virtual ~MapNodeCache() {}
@@ -82,7 +83,7 @@ class MapNodeCache {
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
-  DestroyFunc destroy_func_;
+  const DestroyFunc destroy_func_;
   MapLRUCache lru_map_nodes_;
 };
 
