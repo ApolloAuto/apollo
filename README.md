@@ -36,8 +36,8 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 **[New 2020-07-08]** The Apollo platform is now upgraded with software packages and library dependencies of newer versions including:
 
 1. Host OS Ubuntu 18.04.
-2. Bazel upgraded to version 3.2.0+ (3.3.0 for x86_64, 3.2.0 for aarch64)
-3. GCC upgraded to version  7.5 with full support of C++ 14
+2. Bazel upgraded to version 3.4+
+3. GCC upgraded to version 7.5 with full support of C++ 14
 4. CUDA upgraded to version 10.2 with NVIDIA driver >= 440.33
 5. Python 2.x retired and upgraded to 3.x
 6. Many library dependencies upgraded with newer versions
