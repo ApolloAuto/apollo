@@ -46,7 +46,7 @@ class MapNodeCache {
   explicit MapNodeCache(unsigned int capacity, const DestroyFunc& destroy_func)
       : destroy_func_(destroy_func), lru_map_nodes_(capacity) {}
   /**@brief The destructor. */
-  virtual ~MapNodeCache() {}
+  ~MapNodeCache() {}
   /**@brief Find element for key if it exists in the cache. If not exist, return
    * false. */
   bool Get(const Key& key, Element** value);

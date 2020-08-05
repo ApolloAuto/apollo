@@ -32,10 +32,7 @@ struct Node {
   V val;
   Node* prev;
   Node* next;
-  Node() : prev(nullptr), next(nullptr) {
-    key = {};
-    val = {};
-  }
+  Node() : prev(nullptr), next(nullptr) {}
 
   template <typename VV>
   Node(const K& key, VV&& val)
