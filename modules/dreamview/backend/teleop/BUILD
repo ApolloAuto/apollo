@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "copts_if_with_teleop","if_with_teleop")
+load("//tools/platform:build_defs.bzl", "copts_if_with_teleop")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -58,8 +58,8 @@ cc_test(
     ],
     deps = [
         ":teleop",
-        "@com_google_googletest//:gtest_main",
         "@boost",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
