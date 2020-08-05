@@ -176,7 +176,7 @@ class LRUCache {
     Init();
   }
 
-  bool Remove(K& key) {
+  bool Remove(const K& key) {
     if (!Contains(key)) {
       return false;
     }
@@ -185,7 +185,7 @@ class LRUCache {
     return true;
   }
 
-  bool ChangeCapacity(size_t capacity) {
+  bool ChangeCapacity(const size_t capacity) {
     if (size() > capacity) {
       return false;
     }
