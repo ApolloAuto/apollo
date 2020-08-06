@@ -29,7 +29,7 @@ cc_library(
         "//modules/drivers/gnss/proto:ins_cc_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/localization/common:localization_common",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/localization/msf/common/util",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "//modules/localization/proto:gps_cc_proto",
         "//modules/localization/proto:localization_cc_proto",

@@ -8,16 +8,16 @@ cc_binary(
     srcs = ["ndt_map_creator.cc"],
     deps = [
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
-        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "//modules/localization/msf/common/io:common_io",
+        "//modules/localization/msf/common/util",
+        "//modules/localization/msf/common/util:system_utility",
+        "//modules/localization/msf/local_pyramid_map/base_map",
+        "//modules/localization/msf/local_pyramid_map/ndt_map",
+        "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@boost",
         "@eigen",
-        "@opencv",
         "@local_config_pcl//:pcl",
+        "@opencv",
     ],
 )
 

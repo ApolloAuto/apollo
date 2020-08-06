@@ -21,8 +21,8 @@ cc_library(
         "//cyber",
         "//modules/common/util",
         "//modules/common/util:eigen_defs",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
+        "//modules/localization/msf/common/io:common_io",
+        "//modules/localization/msf/local_pyramid_map/base_map",
         "@boost",
     ],
 )
