@@ -33,7 +33,7 @@ cc_library(
     deps = [
         "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/drivers/velodyne/proto:config_cc_proto",
-        "//modules/transform:tf2_buffer_lib",
+        "//modules/transform:buffer",
         "@eigen",
     ],
 )

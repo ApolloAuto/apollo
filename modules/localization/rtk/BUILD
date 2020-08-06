@@ -28,7 +28,7 @@ cc_library(
         "//modules/localization/proto:imu_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/localization/proto:rtk_config_cc_proto",
-        "//modules/transform:transform_broadcaster_lib",
+        "//modules/transform:transform_broadcaster",
         "@com_google_googletest//:gtest",
         "@eigen",
     ],

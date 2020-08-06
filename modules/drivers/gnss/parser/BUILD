@@ -33,7 +33,7 @@ cc_library(
         "//modules/drivers/gnss/util:gnss_util",
         "//modules/localization/proto:gps_cc_proto",
         "//modules/localization/proto:imu_cc_proto",
-        "//modules/transform:transform_broadcaster_lib",
+        "//modules/transform:transform_broadcaster",
         "@eigen",
         "@proj4",
     ],
