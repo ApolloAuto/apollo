@@ -146,26 +146,26 @@ function stop_all_apollo_containers_for_user() {
 }
 
 function _geo_specific_config_for_cn() {
-    
-    if [ ! -e /etc/docker/daemon.json ]; then
-        touch daemon.json
-        echo -e "{\n \"experimental\": false\n}" >> daemon.json
-        sudo mv daemon.json /etc/docker/daemon.json
-    fi
-    cat /etc/docker/daemon.json | python -m json.tool | grep  "registry-mirrors" >/dev/null
-    if [ $? -eq 0 ]; then
-        echo "You have set registry mirrors, we won't add mirror again automatically," \
-        "if needed please manually add other mirrors"
-    else
-        echo "Add speed mirror will restart docker , if continue please type 'y' or 'Y' to agree"
-        read -r -n 1 user_agreed_speed
-        if [[ "${user_agreed_speed}" = "y" || "${user_agreed_speed}" == "Y" ]]; then
-            sudo sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com",  \
-            "https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
-            service docker restart
-        fi
+    local docker_cfg="/etc/docker/daemon.json"
+    if [ -e "${docker_cfg}" ] && \
+        jq '."registry-mirrors"[]' "${docker_cfg}" &>/dev/null ; then
+        echo "Existing registry mirrors in found ${docker_cfg} and will be used."
+        return
     fi
 
+    if [ ! -e "${docker_cfg}" ]; then
+        echo "{\"experimental\":true, \"registry-mirrors\":[ \
+               \"http://hub-mirror.c.163.com\", \
+               \"https://reg-mirror.qiniu.com\", \
+               \"https://dockerhub.azk8s.cn\" \
+           ]}" | jq -s ".[]" | sudo tee -a "${docker_cfg}"
+    else
+        local tmpfile="$(mktemp /tmp/docker.daemon.XXXXXX)"
+        jq '.+={"registry-mirrors":["http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]}' \
+            "${docker_cfg}" > "${tmpfile}"
+        sudo cp -f "${tmpfile}" "${docker_cfg}"
+    fi
+    service docker restart
 }
 
 function geo_specific_config() {
