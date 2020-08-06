@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../core/i_blas.h"
-#include "../core/i_rand.h"
-#include "../numeric/i_eig.h"
-#include "../numeric/i_svd.h"
+#include "modules/perception/common/core/i_blas.h"
+#include "modules/perception/common/core/i_rand.h"
+#include "modules/perception/common/numeric/i_eig.h"
+#include "modules/perception/common/numeric/i_svd.h"
 
 namespace idl {
 /*This routine force a 2x2 orthogonal matrix R in place (i.e., force it to be
