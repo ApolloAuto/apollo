@@ -16,6 +16,8 @@
 
 #include "modules/audio/common/audio_info.h"
 
+#include <algorithm>
+
 #include "modules/audio/common/audio_gflags.h"
 
 namespace apollo {
@@ -60,7 +62,14 @@ void AudioInfo::InsertChannelData(
 
 std::vector<std::vector<float>> AudioInfo::GetSignals(const int signal_length) {
   std::vector<std::vector<float>> signals;
-  // TODO(all): implement
+  for (std::size_t i = 0; i < signals_.size(); ++i) {
+    int start_index = static_cast<int>(signals_[i].size()) - signal_length;
+    start_index = std::max(0, start_index);
+    std::deque<float>::iterator iter = signals_[i].begin();
+    iter += start_index;
+    std::vector<float> signal(iter, signals_[i].end());
+    signals.push_back(signal);
+  }
   return signals;
 }
 
