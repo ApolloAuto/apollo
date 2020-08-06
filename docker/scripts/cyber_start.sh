@@ -260,7 +260,29 @@ function determine_target_version_and_arch() {
     CUSTOM_VERSION="${version}"
 }
 
-# Operate on DOCKER_REPO
+function _geo_specific_config_for_cn() {
+    local docker_cfg="/etc/docker/daemon.json"
+    if [ -e "${docker_cfg}" ] && \
+        jq '."registry-mirrors"[]' "${docker_cfg}" &>/dev/null ; then
+        echo "Existing registry mirrors in found ${docker_cfg} and will be used."
+        return
+    fi
+
+    if [ ! -e "${docker_cfg}" ]; then
+        echo "{\"experimental\":true, \"registry-mirrors\":[ \
+               \"http://hub-mirror.c.163.com\", \
+               \"https://reg-mirror.qiniu.com\", \
+               \"https://dockerhub.azk8s.cn\" \
+           ]}" | jq -s ".[]" | sudo tee -a "${docker_cfg}"
+    else
+        local tmpfile="$(mktemp /tmp/docker.daemon.XXXXXX)"
+        jq '.+={"registry-mirrors":["http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]}' \
+            "${docker_cfg}" > "${tmpfile}"
+        sudo cp -f "${tmpfile}" "${docker_cfg}"
+    fi
+    service docker restart
+}
+
 function geo_specific_config() {
     local geo="$1"
     if [[ -z "${geo}" ]]; then
@@ -268,7 +290,7 @@ function geo_specific_config() {
     fi
     info "Setup geolocation specific configurations for ${geo}"
     if [[ "${geo}" == "cn" ]]; then
-        info "TODO: CN mirrors"
+        _geo_specific_config_for_cn
     fi
 }
 
