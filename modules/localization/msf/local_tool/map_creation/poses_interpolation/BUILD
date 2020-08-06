@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["poses_interpolation.h"],
     deps = [
         "//modules/common/util:eigen_defs",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "//modules/localization/msf/common/io:common_io",
         "@boost",
     ],
 )

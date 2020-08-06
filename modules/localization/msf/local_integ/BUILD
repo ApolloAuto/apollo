@@ -4,7 +4,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "localization_msf_local_integ",
+    name = "local_integ",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
@@ -18,11 +18,11 @@ cc_library(
         "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/localization/common:localization_common",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/common/util:localization_msf_common_util_frame_transform",
-        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
-        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
+        "//modules/localization/msf/common/util",
+        "//modules/localization/msf/common/util:frame_transform",
+        "//modules/localization/msf/local_pyramid_map/base_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool",
         "//modules/localization/proto:gnss_pnt_result_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/localization/proto:localization_status_cc_proto",

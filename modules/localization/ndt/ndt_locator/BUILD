@@ -19,9 +19,9 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/time:timer",
         "//modules/localization/common:localization_common",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "//modules/localization/msf/common/util",
+        "//modules/localization/msf/local_pyramid_map/ndt_map",
+        "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@eigen",
@@ -30,7 +30,7 @@ cc_library(
 )
 
 filegroup(
-    name = "ndt_lidar_locator_test_data",
+    name = "test_data",
     srcs = glob([
         "ndt/test_data/**",
     ]),
@@ -41,10 +41,10 @@ cc_test(
     size = "small",
     timeout = "short",
     srcs = ["lidar_locator_ndt_test.cc"],
-    data = [":ndt_lidar_locator_test_data"],
+    data = [":test_data"],
     deps = [
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "//modules/localization/msf/common/io:common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
         "@lz4",
@@ -57,10 +57,10 @@ cc_test(
     size = "small",
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
-    data = [":ndt_lidar_locator_test_data"],
+    data = [":test_data"],
     deps = [
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "//modules/localization/msf/common/io:common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
         "@lz4",
