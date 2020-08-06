@@ -136,7 +136,10 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   const double time_diff =
       le.header().timestamp_sec() - last_localization_message_timestamp_sec;
   if (time_diff < 1.0 / FLAGS_planning_loop_rate) {
-    return;
+    if (planning_config_.learning_mode() != PlanningConfig::RL_TEST) {
+      // for RL_TEST, skip this check so that first frame can proceed
+      return;
+    }
   }
   if (time_diff >= (1.0 * 2 / FLAGS_planning_loop_rate)) {
     std::ostringstream msg;
