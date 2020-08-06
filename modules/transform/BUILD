@@ -4,26 +4,29 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "tf2_buffer_lib",
+    name = "buffer",
     srcs = ["buffer.cc"],
-    hdrs = [
-        "buffer.h",
-        "buffer_interface.h",
-    ],
+    hdrs = ["buffer.h"],
     deps = [
+        ":buffer_interface",
         "//cyber",
+        "//cyber/node",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/transform/proto:transform_cc_proto",
         "@com_google_absl//absl/strings",
         "@tf2",
     ],
 )
 
 cc_library(
-    name = "transform_broadcaster_lib",
+    name = "buffer_interface",
+    hdrs = ["buffer_interface.h"],
+    deps = [
+        "//modules/transform/proto:transform_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "transform_broadcaster",
     srcs = ["transform_broadcaster.cc"],
     hdrs = ["transform_broadcaster.h"],
     deps = [
