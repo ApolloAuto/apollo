@@ -146,9 +146,26 @@ function stop_all_apollo_containers_for_user() {
 }
 
 function _geo_specific_config_for_cn() {
-    # FIXME(all): make it more robust
-    sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
-    service docker restart
+    
+    if [ ! -e /etc/docker/daemon.json ]; then
+        touch daemon.json
+        echo -e "{\n \"experimental\": false\n}" >> daemon.json
+        sudo mv daemon.json /etc/docker/daemon.json
+    fi
+    cat /etc/docker/daemon.json | python -m json.tool | grep  "registry-mirrors" >/dev/null
+    if [ $? -eq 0 ]; then
+        echo "You have set registry mirrors, we won't add mirror again automatically," \
+        "if needed please manually add other mirrors"
+    else
+        echo "Add speed mirror will restart docker , if continue please type 'y' or 'Y' to agree"
+        read -r -n 1 user_agreed_speed
+        if [[ "${user_agreed_speed}" = "y" || "${user_agreed_speed}" == "Y" ]]; then
+            sudo sed -i '$i  ,"registry-mirrors": [ "http://hub-mirror.c.163.com",  \
+            "https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]' /etc/docker/daemon.json
+            service docker restart
+        fi
+    fi
+
 }
 
 function geo_specific_config() {
