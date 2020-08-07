@@ -95,8 +95,8 @@ cc_library(
     hdrs = ["active_set_spline_1d_solver.h"],
     deps = [
         ":spline_1d_solver",
-        "//modules/common/time",
         "@eigen",
+        "@qpOASES",
     ],
 )
 
@@ -117,7 +117,6 @@ cc_library(
     deps = [
         ":spline_1d_solver",
         "//modules/common/math:matrix_operations",
-        "//modules/common/time",
         "@eigen",
         "@osqp",
     ],
@@ -194,7 +193,6 @@ cc_library(
         "//modules/common/math:matrix_operations",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
-        "//modules/common/time",
         "//modules/planning/common:planning_gflags",
         "@eigen",
         "@osqp",

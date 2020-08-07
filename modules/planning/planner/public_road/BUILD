@@ -12,7 +12,6 @@ cc_library(
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",

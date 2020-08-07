@@ -33,7 +33,6 @@ cc_test(
     deps = [
         ":rtk_planner",
         "//cyber/common:log",
-        "//modules/common/time",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],
