@@ -63,9 +63,13 @@ def _create_local_pcl_repository(repository_ctx):
         ),
     ]
 
+    _pcl_linkopts = ["-l{}".format(lib) for lib in _APOLLO_PCL_LIBS]
+    _pcl_linkopts.insert(0, "-L%s" % (lib_path))
+
     # Set up BUILD file.
     build_tpl = repository_ctx.path(Label("//third_party/pcl:BUILD.tpl"))
     repository_ctx.template("BUILD", build_tpl, {
+        "%{pcl_linkopts}": "%s" % (_pcl_linkopts),
         "%{copy_rules}": "\n".join(copy_rules),
     })
 
