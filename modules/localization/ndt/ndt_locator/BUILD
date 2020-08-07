@@ -43,12 +43,10 @@ cc_test(
     srcs = ["lidar_locator_ndt_test.cc"],
     data = [":test_data"],
     deps = [
+        ":ndt_lidar_locator",
         "//cyber",
         "//modules/localization/msf/common/io:common_io",
-        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
-        "@lz4",
-        "@opencv//:core",
     ],
 )
 
@@ -59,12 +57,10 @@ cc_test(
     srcs = ["ndt_solver_test.cc"],
     data = [":test_data"],
     deps = [
+        ":ndt_lidar_locator",
         "//cyber",
         "//modules/localization/msf/common/io:common_io",
-        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
-        "@lz4",
-        "@opencv//:core",
     ],
 )
 
