@@ -11,8 +11,7 @@ cc_library(
 # TODO(storypku): split pcl into individual components
 cc_library(
     name = "pcl",
-    srcs = [":pcl_lib"],
-    linkstatic = 1,
+    linkopts = %{pcl_linkopts},
     deps = [
         ":pcl_headers",
         "@boost",
