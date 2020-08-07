@@ -29,7 +29,6 @@ cc_library(
         "//modules/drivers/proto:sensor_image_cc_proto",
         "@civetweb//:civetweb++",
         "@opencv//:imgcodecs",
-        "@opencv//:imgproc",
     ],
 )
 

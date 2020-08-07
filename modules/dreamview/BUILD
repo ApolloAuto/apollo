@@ -15,7 +15,6 @@ cc_binary(
     ],
     deps = [
         "//modules/dreamview/backend",
-        "@opencv//:core",
     ],
 )
 
