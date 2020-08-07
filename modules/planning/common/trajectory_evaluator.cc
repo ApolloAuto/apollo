@@ -269,13 +269,18 @@ void TrajectoryEvaluator::EvaluateObstacleTrajectory(
     }
 
     std::vector<TrajectoryPointFeature> evaluated_trajectory;
-    if (fabs(trajectory.front().first - start_point_timestamp_sec) <=
-        delta_time || trajectory.size() == 1) {
+    if (trajectory.size() == 1 ||
+        fabs(trajectory.front().first - start_point_timestamp_sec)
+            <= delta_time ||
+        fabs(trajectory.front().first - trajectory.back().first)
+            <= delta_time) {
       ADEBUG << "too short obstacle_trajectory. frame_num["
              << learning_data_frame->frame_num() << "] obstacle_id["
              << obstacle_id << "] size[" << trajectory.size()
              << "] timestamp_diff["
-             << start_point_timestamp_sec - trajectory.front().first << "]";
+             << start_point_timestamp_sec - trajectory.front().first
+             << "] time_range["
+             << fabs(trajectory.front().first - trajectory.back().first) << "]";
 
       // pick at lease one point regardless of short timestamp,
       // to avoid model failure
