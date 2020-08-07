@@ -15,6 +15,8 @@ set -e
 
 BAZEL_CONF="${TOP_DIR}/.apollo.bazelrc"
 
+ARCH="$(uname -m)"
+
 function config_noninteractive() {
     echo "${STARTUP_TXT}" > "${BAZEL_CONF}"
     determine_gpu_use
@@ -23,6 +25,7 @@ function config_noninteractive() {
     else
         echo "build --config=cpu" >> "${BAZEL_CONF}"
     fi
+    echo -e "build --action_env GCC_HOST_COMPILER_PATH=\"/usr/bin/${ARCH}-linux-gnu-gcc-7\"" >> "${BAZEL_CONF}"
     cat "${TOP_DIR}/tools/apollo.bazelrc.sample" >> "${BAZEL_CONF}"
 }
 
