@@ -25,7 +25,6 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve_math.h"
@@ -71,15 +70,9 @@ bool QpSplineReferenceLineSmoother::Smooth(
     return false;
   }
 
-  auto start = std::chrono::system_clock::now();
   if (!Solve()) {
     AERROR << "Solve spline smoother problem failed";
   }
-  auto end = std::chrono::system_clock::now();
-
-  std::chrono::duration<double> diff = end - start;
-  ADEBUG << "QpSplineReferenceLineSmoother solve time is "
-         << diff.count() * 1000.0 << " ms.";
 
   // mapping spline to reference line point
   const double start_t = t_knots_.front();

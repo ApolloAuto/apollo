@@ -26,15 +26,12 @@
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
 
-#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/reference_line/spiral_problem_interface.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::time::Clock;
 
 SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
@@ -43,7 +40,6 @@ SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-  const double start_timestamp = Clock::NowInSeconds();
   std::vector<double> opt_x;
   std::vector<double> opt_y;
   std::vector<double> opt_theta;
@@ -178,9 +174,6 @@ bool SpiralReferenceLineSmoother::Smooth(
     return false;
   }
   *smoothed_reference_line = ReferenceLine(ref_points);
-  const double end_timestamp = Clock::NowInSeconds();
-  ADEBUG << "Spiral reference line smoother time: "
-         << (end_timestamp - start_timestamp) * 1000 << " ms.";
   return true;
 }
 
