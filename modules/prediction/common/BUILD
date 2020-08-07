@@ -267,7 +267,6 @@ cc_library(
         "//modules/prediction/proto:feature_cc_proto",
         "@opencv//:highgui",
         "@opencv//:imgcodecs",
-        "@opencv//:imgproc",
     ],
 )
 
