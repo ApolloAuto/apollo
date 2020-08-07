@@ -28,7 +28,8 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/drivers/proto:sensor_image_cc_proto",
         "@civetweb//:civetweb++",
-        "@opencv",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 

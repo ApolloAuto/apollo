@@ -25,7 +25,7 @@ cc_library(
         "//modules/planning/common/util:math_util_lib",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
         "//third_party:libtorch",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_library(
         "//third_party:libtorch",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

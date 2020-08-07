@@ -48,7 +48,7 @@ cc_test(
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
         "@lz4",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 
@@ -64,7 +64,7 @@ cc_test(
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@com_google_googletest//:gtest_main",
         "@lz4",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

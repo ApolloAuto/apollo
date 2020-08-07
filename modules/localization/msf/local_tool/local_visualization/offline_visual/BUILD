@@ -30,7 +30,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/base_map",
         "@boost",
         "@eigen",
-        "@opencv",
+        "@opencv//:highgui",
     ],
 )
 

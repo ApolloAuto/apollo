@@ -18,7 +18,7 @@ cc_binary(
         "@com_google_absl//absl/strings",
         "@eigen",
         "@lz4",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool",
         "@boost",
         "@eigen",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 
@@ -44,7 +44,7 @@ cc_binary(
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
         "@eigen",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

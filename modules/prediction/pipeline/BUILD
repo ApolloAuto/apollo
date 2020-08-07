@@ -16,7 +16,7 @@ cc_binary(
         "//modules/prediction/common:message_process",
         "@boost",
         "@com_google_absl//absl/strings",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

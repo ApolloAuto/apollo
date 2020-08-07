@@ -75,7 +75,7 @@ cc_test(
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

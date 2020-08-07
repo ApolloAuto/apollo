@@ -324,7 +324,7 @@ cc_library(
         ":point_cloud",
         "//cyber",
         "@eigen",
-        "@opencv",
+        "@opencv//:imgproc",
     ],
 )
 
