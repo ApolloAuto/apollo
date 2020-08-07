@@ -8,14 +8,13 @@ cc_library(
     srcs = ["offline_local_visualizer.cc"],
     hdrs = ["offline_local_visualizer.h"],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/util",
         "//modules/localization/msf/common/io:common_io",
         "//modules/localization/msf/local_pyramid_map/base_map",
         "//modules/localization/msf/local_tool/local_visualization/engine",
         "@boost",
         "@com_google_absl//absl/strings",
-        "@eigen",
     ],
 )
 
@@ -25,12 +24,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":offline_local_visualizer_lib",
-        "//cyber",
-        "//modules/localization/msf/common/io:common_io",
-        "//modules/localization/msf/local_pyramid_map/base_map",
         "@boost",
-        "@eigen",
-        "@opencv//:highgui",
     ],
 )
 

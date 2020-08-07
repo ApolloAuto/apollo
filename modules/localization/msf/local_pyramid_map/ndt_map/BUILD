@@ -24,7 +24,6 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_matrix",
         "@com_google_glog//:glog",
         "@eigen",
-        "@opencv//:core",
     ],
 )
 
@@ -80,9 +79,6 @@ cc_library(
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_pool",
-        "@com_google_glog//:glog",
-        "@eigen",
-        "@opencv//:core",
     ],
 )
 
@@ -95,8 +91,6 @@ cc_library(
         ":ndt_map_node",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map",
-        "@com_google_glog//:glog",
-        "@eigen",
     ],
 )
 
@@ -119,8 +113,6 @@ cc_test(
         "//modules/localization/msf/local_pyramid_map/ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@com_google_googletest//:gtest_main",
-        "@eigen",
-        "@opencv//:core",
     ],
 )
 
