@@ -16,7 +16,7 @@ cc_library(
         "//modules/perception/proto:traffic_light_detection_cc_proto",
         "//modules/planning/proto:learning_data_cc_proto",
         "//modules/planning/proto:planning_semantic_map_config_cc_proto",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 

@@ -30,7 +30,7 @@ cc_library(
         "//cyber/common",
         "@com_google_glog//:glog",
         "@eigen",
-        "@opencv",
+        "@opencv//:imgcodecs",
         "@zlib",
     ],
 )

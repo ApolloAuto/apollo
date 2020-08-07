@@ -19,7 +19,7 @@ cc_library(
         "//modules/transform:buffer",
         "//modules/transform/proto:transform_cc_proto",
         "@eigen",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

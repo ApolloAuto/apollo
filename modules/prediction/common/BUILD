@@ -265,7 +265,9 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/pose:pose_container",
         "//modules/prediction/proto:feature_cc_proto",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 

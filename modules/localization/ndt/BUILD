@@ -59,7 +59,7 @@ cc_test(
         "//modules/localization/ndt:ndt_localization_component_lib",
         "@com_google_googletest//:gtest_main",
         "@lz4",
-        "@opencv",
+        "@opencv//:core",
         "@tf2",
     ],
 )
@@ -74,7 +74,7 @@ cc_test(
         "//modules/localization/ndt:ndt_localization_component_lib",
         "@com_google_googletest//:gtest_main",
         "@lz4",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

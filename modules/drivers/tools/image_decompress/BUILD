@@ -14,7 +14,7 @@ cc_library(
         "//modules/common/proto:header_cc_proto",
         "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/drivers/tools/image_decompress/proto:config_cc_proto",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -25,7 +25,6 @@ cc_test(
     deps = [
         ":image_decompress_lib",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
     ],
 )
 

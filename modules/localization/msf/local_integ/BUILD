@@ -35,7 +35,7 @@ cc_library(
         "@com_google_glog//:glog",
         "@eigen",
         "@local_integ",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

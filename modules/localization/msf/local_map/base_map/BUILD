@@ -20,20 +20,19 @@ cc_library(
         "//modules/localization/msf/common/util:compression",
         "//modules/localization/msf/common/util:system_utility",
         "@eigen",
-        "@opencv",
+        "@opencv//:imgproc",
     ],
 )
 
 cc_test(
     name = "map_node_index_test",
-    size = "medium",
     timeout = "short",
     srcs = ["map_node_index_test.cc"],
     deps = [
-        "//cyber",
         ":base_map",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 

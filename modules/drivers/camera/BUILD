@@ -44,7 +44,7 @@ cc_library(
         "//modules/common/proto:header_cc_proto",
         "//modules/drivers/camera/proto:config_cc_proto",
         "//modules/drivers/proto:sensor_image_cc_proto",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 

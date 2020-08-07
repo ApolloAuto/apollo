@@ -15,9 +15,8 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@boost",
+        "@com_google_absl//absl/strings",
         "@eigen",
-        "@local_config_pcl//:pcl",
-        "@opencv",
     ],
 )
 
