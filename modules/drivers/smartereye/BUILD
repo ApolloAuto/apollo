@@ -67,7 +67,7 @@ cc_library(
         "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/drivers/proto:smartereye_cc_proto",
         "//modules/drivers/smartereye/proto:config_cc_proto",
-        "@opencv//:core",
+        "@opencv//:highgui",
     ],
 )
 
