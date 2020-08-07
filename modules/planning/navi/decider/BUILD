@@ -105,7 +105,6 @@ cc_test(
         ":navi_obstacle_decider",
         ":navi_path_decider",
         ":navi_speed_decider",
-        "//modules/common/time",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],

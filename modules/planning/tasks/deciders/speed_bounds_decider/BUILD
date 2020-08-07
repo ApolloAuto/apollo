@@ -65,7 +65,6 @@ cc_test(
     deps = [
         ":st_boundary_mapper",
         "//cyber/common:log",
-        "//modules/common/time",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],
