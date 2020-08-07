@@ -8,7 +8,7 @@ cc_binary(
     srcs = ["lossless_map_creator.cc"],
     linkstatic = 0,
     deps = [
-        "//cyber",
+        "//cyber/common:file",
         "//modules/localization/msf/common/io:common_io",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map",
@@ -16,9 +16,6 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool",
         "@boost",
         "@com_google_absl//absl/strings",
-        "@eigen",
-        "@lz4",
-        "@opencv//:core",
     ],
 )
 
@@ -27,13 +24,10 @@ cc_binary(
     srcs = ["lossless_map_to_lossy_map.cc"],
     linkstatic = 0,
     deps = [
-        "//cyber",
         "//modules/localization/msf/local_pyramid_map/base_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool",
         "@boost",
-        "@eigen",
-        "@opencv//:core",
     ],
 )
 
@@ -43,8 +37,6 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
-        "@eigen",
-        "@opencv//:core",
     ],
 )
 

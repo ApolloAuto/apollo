@@ -18,7 +18,6 @@ cc_library(
         "//modules/localization/msf/common/util:compression",
         "//modules/localization/msf/local_map/base_map",
         "@eigen",
-        "@opencv//:core",
     ],
 )
 
@@ -43,7 +42,6 @@ cc_test(
         "//modules/localization/msf/local_map/lossless_map",
         "//modules/localization/msf/local_map/lossy_map",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 
@@ -59,7 +57,6 @@ cc_test(
         "//modules/localization/msf/local_map/lossless_map",
         "//modules/localization/msf/local_map/lossy_map",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 

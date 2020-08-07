@@ -17,7 +17,6 @@ cc_library(
         "//modules/localization/msf/common/util:compression",
         "//modules/localization/msf/local_map/base_map",
         "@eigen",
-        "@opencv//:imgcodecs",
     ],
 )
 
@@ -42,9 +41,7 @@ cc_test(
         "//modules/localization/msf/local_map/base_map",
         "//modules/localization/msf/local_map/lossless_map",
         "//modules/localization/msf/local_map/lossy_map",
-        "@boost",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:imgcodecs",
     ],
 )
 

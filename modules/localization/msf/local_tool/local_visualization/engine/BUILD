@@ -24,6 +24,7 @@ cc_library(
         "//modules/localization/msf/common/io:common_io",
         "//modules/localization/msf/local_pyramid_map/base_map",
         "@boost",
+        "@opencv//:highgui",
     ],
 )
 

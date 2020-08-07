@@ -35,12 +35,11 @@ cc_test(
     srcs = ["ndt_map_test.cc"],
     data = [":test_data"],
     deps = [
+        ":ndt_map",
         "//cyber",
         "//modules/localization/msf/common/io:common_io",
-        "//modules/localization/msf/local_map/ndt_map",
+        "@com_google_absl//absl/strings",
         "@com_google_googletest//:gtest_main",
-        "@eigen",
-        "@opencv//:imgcodecs",
     ],
 )
 
@@ -50,11 +49,9 @@ cc_test(
     timeout = "short",
     srcs = ["ndt_map_config_test.cc"],
     deps = [
+        ":ndt_map",
         "//cyber",
-        "//modules/localization/msf/local_map/ndt_map",
         "@com_google_googletest//:gtest_main",
-        "@eigen",
-        "@opencv//:imgcodecs",
     ],
 )
 

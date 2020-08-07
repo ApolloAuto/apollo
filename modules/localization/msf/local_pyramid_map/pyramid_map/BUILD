@@ -27,7 +27,6 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_matrix",
         "@com_google_glog//:glog",
         "@eigen",
-        "@opencv//:core",
     ],
 )
 
@@ -85,7 +84,6 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_pool",
         "@com_google_glog//:glog",
         "@eigen",
-        "@opencv//:core",
     ],
 )
 
@@ -122,7 +120,6 @@ cc_test(
     deps = [
         ":pyramid_map_matrix_handler",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 
@@ -146,7 +143,6 @@ cc_test(
     deps = [
         ":pyramid_map_node",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 
@@ -160,7 +156,6 @@ cc_test(
         ":pyramid_map_pool",
         "//modules/localization/msf/local_pyramid_map/base_map",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 
@@ -173,7 +168,6 @@ cc_test(
         ":pyramid_map",
         ":pyramid_map_pool",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 

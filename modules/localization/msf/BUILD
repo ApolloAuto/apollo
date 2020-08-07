@@ -14,10 +14,7 @@ cc_library(
         "msf_localization_component.h",
     ],
     copts = [
-        "-O2",
         "-DMODULE_NAME=\\\"localization\\\"",
-        "-DENABLE_DEBUG_LIB",
-        "-DENABLE_OPENCV",
     ],
     deps = [
         "//cyber",
@@ -70,12 +67,10 @@ cc_test(
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
-        "//cyber",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
         "@com_google_googletest//:gtest_main",
-        "@opencv//:core",
     ],
 )
 
