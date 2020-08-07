@@ -36,7 +36,6 @@ DiscretePointsReferenceLineSmoother::DiscretePointsReferenceLineSmoother(
 bool DiscretePointsReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-
   std::vector<std::pair<double, double>> raw_point2d;
   std::vector<double> anchorpoints_lateralbound;
 
@@ -52,7 +51,6 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   anchorpoints_lateralbound.back() = 0.0;
 
   NormalizePoints(&raw_point2d);
-
 
   bool status = false;
 

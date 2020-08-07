@@ -23,7 +23,8 @@
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
 
-#include "modules/common/time/time.h"
+#include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

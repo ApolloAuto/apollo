@@ -23,6 +23,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "cyber/time/time.h"
+
 namespace apollo {
 namespace planning {
 
@@ -170,8 +172,8 @@ bool DistanceApproachProblem::Solve(
 
     auto t_end = cyber::Time::Now().ToSecond();
 
-    AINFO << "DistanceApproachProblem solving time in second : "
-          << t_end - t_start;
+    ADEBUG << "DistanceApproachProblem solving time in second : "
+           << t_end - t_start;
   } else {
     /*
       return detailed failure information,
