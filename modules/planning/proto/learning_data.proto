@@ -171,6 +171,7 @@ message RoutingResponseFeature {
 message RoutingFeature {
   optional RoutingResponseFeature routing_response = 1;
   repeated string local_routing_lane_id = 2;  // local routing close to ADC
+  optional RoutingResponseFeature local_routing = 3;
 }
 
 // based on apollo.perception.TrafficLight
