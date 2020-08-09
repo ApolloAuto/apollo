@@ -322,7 +322,7 @@ cc_test(
     srcs = ["trajectory_analyzer_test.cc"],
     deps = [
         ":trajectory_analyzer",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "@com_google_googletest//:gtest_main",
     ],
 )

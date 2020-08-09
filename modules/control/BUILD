@@ -9,11 +9,11 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
+        "//cyber/time:clock",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/control/common",
         "//modules/control/controller",

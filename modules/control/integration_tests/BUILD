@@ -10,8 +10,8 @@ cc_library(
     copts = ["-fno-access-control"],
     deps = [
         "//cyber",
+        "//cyber/time:clock",
         "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/time",
         "//modules/control:control_component_lib",
         "//modules/control/common:control_gflags",
         "@com_google_googletest//:gtest_main",

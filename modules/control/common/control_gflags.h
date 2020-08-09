@@ -78,5 +78,3 @@ DECLARE_bool(enable_feedback_augment_on_high_speed);
 DECLARE_bool(enable_gear_drive_negative_speed_protection);
 
 DECLARE_bool(use_control_submodules);
-
-DECLARE_bool(use_system_time_in_control);

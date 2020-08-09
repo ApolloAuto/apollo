@@ -19,7 +19,7 @@
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/util/util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/integration_tests/control_test_base.h"
