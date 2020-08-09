@@ -29,10 +29,10 @@
 #include "modules/control/proto/control_cmd.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 
 // gflags
@@ -50,11 +50,11 @@ namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::VehicleSignal;
-using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 using apollo::cyber::CreateNode;
 using apollo::cyber::Reader;
+using apollo::cyber::Time;
 using apollo::cyber::Writer;
 
 const uint32_t KEYCODE_O = 0x4F;  // '0'
