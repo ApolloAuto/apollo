@@ -9,11 +9,11 @@ cc_library(
     hdrs = ["online_visualizer_component.h"],
     deps = [
         "//cyber",
+        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:eigen_defs",
         "//modules/drivers/proto:pointcloud_cc_proto",

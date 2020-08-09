@@ -18,12 +18,12 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/monitor_log",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/drivers/gnss/proto:config_cc_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
@@ -67,7 +67,7 @@ cc_test(
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
         "@com_google_googletest//:gtest_main",

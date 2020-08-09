@@ -19,8 +19,10 @@
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/localization/msf/local_integ/gnss_msg_transfer.h"
+
+using apollo::cyber::Clock;
 
 namespace apollo {
 namespace localization {
@@ -87,7 +89,7 @@ void LocalizationGnssProcess::RawObservationProcess(
                                                        raw_obs.gnss_second_s());
 
   double sys_secs_to_gnss =
-      common::time::Clock::NowInSeconds() - unix_to_gps + leap_second_s;
+      Clock::NowInSeconds() - unix_to_gps + leap_second_s;
   double obs_secs =
       raw_obs.gnss_second_s() + raw_obs.gnss_week() * sec_per_week;
   double obs_delay = sys_secs_to_gnss - obs_secs;
@@ -196,7 +198,8 @@ LocalizationMeasureState LocalizationGnssProcess::GetResult(
   CHECK_NOTNULL(gnss_msg);
 
   // convert GnssPntResult to IntegMeasure
-  // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
+  // double sec_s = Clock::NowInSeconds(); //
+  // ros::Time::now().toSec();
   const unsigned int second_per_week = 604800;
   double sec_s = gnss_pnt_result_.gnss_week() * second_per_week +
                  gnss_pnt_result_.gnss_second_s();

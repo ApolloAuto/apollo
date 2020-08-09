@@ -17,7 +17,7 @@
 #include <iomanip>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/localization/msf/local_integ/online_localization_expert.h"
 
 namespace apollo {
@@ -99,7 +99,7 @@ void OnlineLocalizationExpert::AddGnssBestPose(
 
 void OnlineLocalizationExpert::CheckImuDelayStatus(const double &cur_imu_time) {
   sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_NORMAL);
-  double cur_system_time = apollo::common::time::Clock::NowInSeconds();
+  double cur_system_time = apollo::cyber::Clock::NowInSeconds();
   double delta_system_time = cur_system_time - cur_imu_time;
   if (delta_system_time > imu_delay_time_threshold_1_) {
     ADEBUG << std::setprecision(16) << "the imu delays " << delta_system_time

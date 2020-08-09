@@ -15,12 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/rtk/rtk_localization_component.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 
 namespace apollo {
 namespace localization {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 RTKLocalizationComponent::RTKLocalizationComponent()
     : localization_(new RTKLocalization()) {}

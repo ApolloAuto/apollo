@@ -19,7 +19,7 @@
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/time/timer.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
@@ -28,7 +28,7 @@ namespace localization {
 namespace msf {
 
 using apollo::common::Status;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 LocalizationIntegProcess::LocalizationIntegProcess()
     : sins_(new Sins()),
@@ -197,7 +197,8 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   apollo::localization::Pose *posepb_loc = localization->mutable_pose();
 
   localization->set_measurement_time(ins_pva_.time);
-  headerpb_loc->set_timestamp_sec(apollo::common::time::Clock::NowInSeconds());
+  headerpb_loc->set_timestamp_sec(
+      apollo::cyber::Clock::NowInSeconds());
 
   apollo::common::PointENU *position_loc = posepb_loc->mutable_position();
   apollo::common::Quaternion *quaternion = posepb_loc->mutable_orientation();

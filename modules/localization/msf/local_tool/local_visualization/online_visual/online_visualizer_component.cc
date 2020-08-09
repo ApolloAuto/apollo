@@ -17,8 +17,10 @@
 #include "modules/localization/msf/local_tool/local_visualization/online_visual/online_visualizer_component.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/config_gflags.h"
+
+#include "cyber/time/clock.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"

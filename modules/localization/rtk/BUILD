@@ -16,10 +16,10 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
     deps = [
         "//cyber",
+        "//cyber/time:clock",
         "//modules/common/math",
         "//modules/common/monitor_log",
         "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/time",
         "//modules/common/util:message_util",
         "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/drivers/gnss/proto:gnss_cc_proto",
@@ -48,7 +48,7 @@ cc_test(
     data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/localization/rtk:rtk_localization_component_lib",
         "@com_google_googletest//:gtest_main",
