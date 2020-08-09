@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "cyber/timer/timing_wheel.h"
+
+#include <cmath>
+
 #include "cyber/task/task.h"
 
 namespace apollo {

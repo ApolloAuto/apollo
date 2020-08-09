@@ -64,4 +64,14 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "clock_test",
+    size = "small",
+    srcs = ["clock_test.cc"],
+    deps = [
+        ":clock",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cpplint()

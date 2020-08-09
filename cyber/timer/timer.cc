@@ -16,6 +16,8 @@
 
 #include "cyber/timer/timer.h"
 
+#include <cmath>
+
 #include "cyber/common/global_data.h"
 
 namespace apollo {
