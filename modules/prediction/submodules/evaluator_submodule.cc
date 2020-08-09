@@ -16,9 +16,9 @@
 
 #include "modules/prediction/submodules/evaluator_submodule.h"
 
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
