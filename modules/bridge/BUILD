@@ -18,7 +18,6 @@ cc_library(
         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/planning/proto:planning_cc_proto",
         "@com_github_gflags_gflags//:gflags",
