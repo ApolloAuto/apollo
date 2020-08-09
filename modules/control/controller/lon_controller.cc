@@ -20,9 +20,9 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -33,7 +33,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -87,13 +87,9 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() {
-  CloseLogFile();
-}
+void LonController::Stop() { CloseLogFile(); }
 
-LonController::~LonController() {
-  CloseLogFile();
-}
+LonController::~LonController() { CloseLogFile(); }
 
 Status LonController::Init(std::shared_ptr<DependencyInjector> injector,
                            const ControlConf *control_conf) {
@@ -379,9 +375,7 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const {
-  return name_;
-}
+std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,

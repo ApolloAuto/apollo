@@ -116,6 +116,3 @@ DEFINE_bool(
 
 DEFINE_bool(use_control_submodules, false,
             "use control submodules instead of controller agent");
-
-DEFINE_bool(use_system_time_in_control, true,
-            "use system time for time latency in control module");

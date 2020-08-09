@@ -19,7 +19,7 @@
 #include <utility>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/controller/lat_controller.h"
 #include "modules/control/controller/lon_controller.h"
@@ -30,7 +30,7 @@ namespace control {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
   AINFO << "Only support MPC controller or Lat + Lon controllers as of now";

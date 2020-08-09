@@ -25,10 +25,10 @@
 #include "Eigen/LU"
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/mpc_osqp.h"
-#include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -37,7 +37,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using Matrix = Eigen::MatrixXd;
 using apollo::common::VehicleConfigHelper;
 

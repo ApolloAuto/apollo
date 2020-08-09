@@ -23,17 +23,17 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace {
 
 using apollo::canbus::Chassis;
-using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
+using apollo::cyber::Clock;
 using apollo::cyber::CreateNode;
 using apollo::cyber::Node;
 using apollo::cyber::Reader;
@@ -81,13 +81,14 @@ class PadTerminal {
     // manual
     if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
       if (is_first_emergency_mode) {
-        count_start = absl::ToUnixMicros(Clock::Now());
+        count_start = Clock::Now().ToNanosecond() / 1e3;
         is_first_emergency_mode = false;
         AINFO << "detect emergency mode.";
       } else {
-        int64_t diff = absl::ToUnixMicros(Clock::Now()) - count_start;
+        int64_t diff =
+            Clock::Now().ToNanosecond() / 1e3 - count_start;
         if (diff > EMERGENCY_MODE_HOLD_TIME) {
-          count_start = absl::ToUnixMicros(Clock::Now());
+          count_start = Clock::Now().ToNanosecond() / 1e3;
           waiting_reset = true;
           // send a reset command to control
           send(RESET_COMMAND);
