@@ -18,8 +18,8 @@
 
 #include <string>
 
-#include "absl/time/time.h"
 #include "cyber/common/macros.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace common {
@@ -39,8 +39,8 @@ class Timer {
   int64_t End(const std::string &msg);
 
  private:
-  absl::Time start_time_;
-  absl::Time end_time_;
+  apollo::cyber::Time start_time_;
+  apollo::cyber::Time end_time_;
 
   DISALLOW_COPY_AND_ASSIGN(Timer);
 };
@@ -61,4 +61,3 @@ class TimerWrapper {
 }  // namespace time
 }  // namespace common
 }  // namespace apollo
-

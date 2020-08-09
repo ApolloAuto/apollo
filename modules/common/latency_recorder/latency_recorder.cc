@@ -16,9 +16,11 @@
 
 #include "modules/common/latency_recorder/latency_recorder.h"
 
-#include "cyber/common/global_data.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
+
+using apollo::cyber::Clock;
+using apollo::cyber::Time;
 
 namespace apollo {
 namespace common {
@@ -29,23 +31,24 @@ LatencyRecorder::LatencyRecorder(const std::string& module_name)
 }
 
 void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
-                                          const absl::Time& begin_time,
-                                          const absl::Time& end_time) {
+                                          const Time& begin_time,
+                                          const Time& end_time) {
   // TODO(michael): ALERT for now for trouble shooting,
   // CHECK_LT(begin_time, end_time) in the future to enforce the validation
   if (begin_time >= end_time) {
     // In Simulation mode, there might be large number of cases where
-    // begin_times equal to end_times, reduce the error frequency in this mode
+    // begin_time == end_time, reduce the error frequency in this mode
     static const int kErrorReduceBase = 1000;
+
+    // FIXME(storypku): IsRealityMode|MockTime
     if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
-      AERROR_EVERY(kErrorReduceBase)
-          << "latency begin_time: " << begin_time
-          << " greater than or equal to end_time: " << end_time << ", "
-          << kErrorReduceBase << " times";
+      AERROR_EVERY(kErrorReduceBase) << "latency begin_time: " << begin_time
+                                     << " >= end_time: " << end_time << ", "
+                                     << kErrorReduceBase << " times";
       return;
     }
     AERROR << "latency begin_time: " << begin_time
-           << " greater than or equal to end_time: " << end_time;
+           << " >= end_time: " << end_time;
     return;
   }
 
@@ -57,12 +60,12 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
   std::lock_guard<std::mutex> lock(mutex_);
 
   auto* latency_record = records_->add_latency_records();
-  latency_record->set_begin_time(absl::ToUnixNanos(begin_time));
-  latency_record->set_end_time(absl::ToUnixNanos(end_time));
+  latency_record->set_begin_time(begin_time.ToNanosecond());
+  latency_record->set_end_time(end_time.ToNanosecond());
   latency_record->set_message_id(message_id);
 
-  const auto now = absl::Now();
-  static const absl::Duration kPublishInterval = absl::Seconds(3);
+  const auto now = Clock::Now();
+  const apollo::cyber::Duration kPublishInterval(3.0);
   if (now - current_time_ > kPublishInterval) {
     PublishLatencyRecords(writer);
     current_time_ = now;
@@ -77,9 +80,10 @@ LatencyRecorder::CreateWriter() {
     return nullptr;
   }
   if (node_ == nullptr) {
-    current_time_ = absl::Now();
+    current_time_ = Clock::Now();
+
     node_ = apollo::cyber::CreateNode(absl::StrCat(
-        node_name_prefix, module_name_, absl::ToUnixNanos(current_time_)));
+        node_name_prefix, module_name_, current_time_.ToNanosecond()));
     if (node_ == nullptr) {
       AERROR << "unable to create node for latency recording";
       return nullptr;

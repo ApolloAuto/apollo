@@ -17,7 +17,8 @@
 #include "modules/common/time/timer.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+
+using apollo::cyber::Time;
 
 namespace apollo {
 namespace common {
@@ -27,12 +28,11 @@ using std::string;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-void Timer::Start() { start_time_ = Clock::Now(); }
+void Timer::Start() { start_time_ = Time::Now(); }
 
 int64_t Timer::End(const string &msg) {
-  end_time_ = Clock::Now();
-  int64_t elapsed_time = absl::ToInt64Milliseconds(end_time_ - start_time_);
-
+  end_time_ = Time::Now();
+  int64_t elapsed_time = (end_time_ - start_time_).ToNanosecond() / 1e6;
   ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
 
   // start new timer.

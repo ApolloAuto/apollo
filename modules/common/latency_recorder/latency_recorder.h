@@ -20,10 +20,8 @@
 #include <mutex>
 #include <string>
 
-#include "absl/time/time.h"
-
 #include "cyber/cyber.h"
-#include "cyber/time/time.h"
+
 #include "modules/common/latency_recorder/proto/latency_record.pb.h"
 
 namespace apollo {
@@ -34,8 +32,8 @@ class LatencyRecorder {
   explicit LatencyRecorder(const std::string& module_name);
 
   void AppendLatencyRecord(const uint64_t message_id,
-                           const absl::Time& begin_time,
-                           const absl::Time& end_time);
+                           const apollo::cyber::Time& begin_time,
+                           const apollo::cyber::Time& end_time);
 
  private:
   LatencyRecorder() = default;
@@ -46,7 +44,7 @@ class LatencyRecorder {
   std::string module_name_;
   std::mutex mutex_;
   std::unique_ptr<LatencyRecordMap> records_;
-  absl::Time current_time_;
+  apollo::cyber::Time current_time_;
   std::shared_ptr<apollo::cyber::Node> node_;
 };
 
