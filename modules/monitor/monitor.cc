@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/monitor/monitor.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/esdcan_monitor.h"
 #include "modules/monitor/hardware/gps_monitor.h"
@@ -72,7 +72,7 @@ bool Monitor::Init() {
 }
 
 bool Monitor::Proc() {
-  const double current_time = apollo::common::time::Clock::NowInSeconds();
+  const double current_time = apollo::cyber::Clock::NowInSeconds();
   if (!MonitorManager::Instance()->StartFrame(current_time)) {
     return false;
   }
