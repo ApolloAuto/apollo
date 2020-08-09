@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/drivers/velodyne/compensator/compensator_component.h"
 
 #include <memory>
 
+#include "cyber/time/time.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
-#include "modules/common/time/time.h"
-#include "modules/drivers/velodyne/compensator/compensator_component.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
+
+using apollo::cyber::Time;
 
 namespace apollo {
 namespace drivers {
@@ -51,7 +54,7 @@ bool CompensatorComponent::Init() {
 
 bool CompensatorComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
-  const auto start_time = common::time::Clock::Now();
+  const auto start_time = Time::Now();
   std::shared_ptr<PointCloud> point_cloud_compensated =
       compensator_pool_->GetObject();
   if (point_cloud_compensated == nullptr) {
@@ -65,14 +68,14 @@ bool CompensatorComponent::Proc(
   }
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
-    const auto end_time = common::time::Clock::Now();
+    const auto end_time = Time::Now();
     const auto diff = end_time - start_time;
     const auto meta_diff =
-        end_time - absl::FromUnixNanos(
-                       point_cloud_compensated->header().lidar_timestamp());
-    AINFO << "compenstator diff:" << absl::ToInt64Milliseconds(diff) << " ms"
-          << ";meta:" << point_cloud_compensated->header().lidar_timestamp()
-          << ";meta diff: " << absl::ToInt64Milliseconds(meta_diff) << " ms";
+        end_time - Time(point_cloud_compensated->header().lidar_timestamp());
+    AINFO << "compenstator diff (ms):" << (diff.ToNanosecond() / 1e6)
+          << ";meta (ns):"
+          << point_cloud_compensated->header().lidar_timestamp()
+          << ";meta diff (ms): " << (meta_diff.ToNanosecond() / 1e6);
     static common::LatencyRecorder latency_recorder(FLAGS_pointcloud_topic);
     latency_recorder.AppendLatencyRecord(
         point_cloud_compensated->header().lidar_timestamp(), start_time,

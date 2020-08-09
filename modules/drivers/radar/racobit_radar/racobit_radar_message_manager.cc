@@ -133,7 +133,7 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = absl::ToUnixMicros(Clock::Now());
+    const int64_t time = Time::Now().ToMicrosecond();
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;

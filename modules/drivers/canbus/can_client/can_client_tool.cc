@@ -21,9 +21,9 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "gflags/gflags.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/factory.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -41,6 +41,8 @@ DEFINE_int64(agent_mutual_send_frames, 1000, "Every agent send frame num");
 
 const int32_t MAX_CAN_SEND_FRAME_LEN = 1;
 const int32_t MAX_CAN_RECV_FRAME_LEN = 10;
+
+using apollo::cyber::Time;
 
 namespace apollo {
 namespace drivers {
@@ -94,7 +96,6 @@ class CanAgent {
 
   void SendThreadFunc() {
     using common::ErrorCode;
-    using common::time::Clock;
     AINFO << "Send thread starting...";
     TestCanParam *param = param_ptr();
     CanClient *client = param->can_client;
@@ -121,7 +122,7 @@ class CanAgent {
     while (!other_agent()->is_receiving()) {
       std::this_thread::yield();
     }
-    int64_t start = absl::ToUnixMicros(Clock::Now());
+    int64_t start = Time::Now().ToMicrosecond();
     while (true) {
       // param->print();
       if (count >= FLAGS_agent_mutual_send_frames) {
@@ -156,7 +157,7 @@ class CanAgent {
               << ", conf:" << param->conf.ShortDebugString();
       }
     }
-    int64_t end = absl::ToUnixMicros(Clock::Now());
+    int64_t end = Time::Now().ToMicrosecond();
     param->send_time = static_cast<int32_t>(end - start);
     // In case for finish too quick to receiver miss some msg
     sleep(2);
@@ -177,7 +178,6 @@ class CanAgent {
 
   void RecvThreadFunc() {
     using common::ErrorCode;
-    using common::time::Clock;
     AINFO << "Receive thread starting...";
     TestCanParam *param = param_ptr();
     CanClient *client = param->can_client;
@@ -194,7 +194,7 @@ class CanAgent {
         continue;
       }
       if (first) {
-        start = absl::ToUnixMicros(Clock::Now());
+        start = Time::Now().ToMicrosecond();
         first = false;
       }
       if (ret != ErrorCode::OK || len == 0) {
@@ -210,7 +210,7 @@ class CanAgent {
               << ",recv_cnt: " << param->recv_cnt;
       }
     }
-    int64_t end = absl::ToUnixMicros(Clock::Now());
+    int64_t end = Time::Now().ToMicrosecond();
     param->recv_time = static_cast<int32_t>(end - start);
     AINFO << "Recv thread stopping..., conf:" << param->conf.ShortDebugString();
     return;
