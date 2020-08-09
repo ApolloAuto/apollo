@@ -23,7 +23,7 @@
 
 #include <vector>
 
-#include "absl/time/time.h"
+#include "cyber/time/time.h"
 
 #include "modules/common/util/lru_cache.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -57,7 +57,7 @@ class SubmoduleOutput {
   void set_curr_frame_considered_obstacle_ids(
       const std::vector<int>& curr_frame_considered_obstacle_ids);
 
-  void set_frame_start_time(const absl::Time& frame_start_time);
+  void set_frame_start_time(const apollo::cyber::Time& frame_start_time);
 
   void set_curr_scenario(const Scenario& scenario);
 
@@ -74,7 +74,7 @@ class SubmoduleOutput {
 
   std::vector<int> curr_frame_considered_obstacle_ids() const;
 
-  const absl::Time& frame_start_time() const;
+  const apollo::cyber::Time& frame_start_time() const;
 
   const Scenario& curr_scenario() const { return curr_scenario_; }
 
@@ -84,7 +84,7 @@ class SubmoduleOutput {
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
-  absl::Time frame_start_time_;
+  apollo::cyber::Time frame_start_time_;
   Scenario curr_scenario_;
 };
 

@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-#include "absl/time/time.h"
+#include "cyber/time/time.h"
 
 #include "cyber/component/component.h"
 #include "modules/prediction/common/message_process.h"
