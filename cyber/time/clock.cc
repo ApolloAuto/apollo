@@ -25,6 +25,11 @@ namespace cyber {
 
 using GlobalData = ::apollo::cyber::common::GlobalData;
 
+using AtomicRWLock = ::apollo::cyber::base::AtomicRWLock;
+using AtomicWriteLockGuard =
+    ::apollo::cyber::base::WriteLockGuard<AtomicRWLock>;
+using AtomicReadLockGuard = ::apollo::cyber::base::ReadLockGuard<AtomicRWLock>;
+
 Clock::Clock() {
   const auto& cyber_config = GlobalData::Instance()->Config();
   const auto& clock_mode = cyber_config.run_mode_conf().clock_mode();
@@ -34,7 +39,8 @@ Clock::Clock() {
 
 Time Clock::Now() {
   auto clock = Instance();
-  std::lock_guard<std::mutex> lk(clock->mtx_);
+
+  AtomicReadLockGuard lg(clock->rwlock_);
   switch (clock->mode_) {
     case ClockMode::MODE_CYBER:
       return Time::Now();
@@ -51,7 +57,7 @@ double Clock::NowInSeconds() { return Now().ToSecond(); }
 
 void Clock::SetMode(ClockMode mode) {
   auto clock = Instance();
-  std::lock_guard<std::mutex> lk(clock->mtx_);
+  AtomicWriteLockGuard lg(clock->rwlock_);
   switch (mode) {
     case ClockMode::MODE_MOCK: {
       clock->mode_ = mode;
@@ -69,13 +75,13 @@ void Clock::SetMode(ClockMode mode) {
 
 ClockMode Clock::mode() {
   auto clock = Instance();
-  std::lock_guard<std::mutex> lk(clock->mtx_);
+  AtomicReadLockGuard lg(clock->rwlock_);
   return clock->mode_;
 }
 
 void Clock::SetNow(const Time& now) {
   auto clock = Instance();
-  std::lock_guard<std::mutex> lk(clock->mtx_);
+  AtomicWriteLockGuard lg(clock->rwlock_);
   if (clock->mode_ != ClockMode::MODE_MOCK) {
     AERROR << "SetSimNow only works for ClockMode::MOCK";
     return;
