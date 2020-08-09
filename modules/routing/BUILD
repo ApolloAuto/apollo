@@ -25,6 +25,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_lib",
+        "//cyber/time:clock",
     ],
 )
 
