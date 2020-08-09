@@ -17,11 +17,11 @@
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 
 #include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/util.h"
 
@@ -36,8 +36,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::InverseQuaternionRotate;
-using apollo::common::time::Clock;
 using apollo::common::util::FillHeader;
+using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;

@@ -34,7 +34,7 @@ cc_test(
     ],
     deps = [
         ":sim_control",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "@com_google_googletest//:gtest_main",
     ],
 )

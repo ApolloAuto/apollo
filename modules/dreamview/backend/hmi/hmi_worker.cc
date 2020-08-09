@@ -55,8 +55,8 @@ namespace {
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::KVDB;
-using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
+using apollo::cyber::Clock;
 using apollo::cyber::Node;
 using apollo::cyber::proto::DagConfig;
 using apollo::monitor::ComponentStatus;
@@ -322,7 +322,8 @@ void HMIWorker::InitReadersAndWriters() {
   // Received Chassis, trigger action if there is high beam signal.
   chassis_reader_ = node_->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
-        if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
+        if (Clock::NowInSeconds() -
+                chassis->header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {
           if (chassis->signal().high_beam()) {
             // Currently we do nothing on high_beam signal.
@@ -574,7 +575,7 @@ void HMIWorker::StatusUpdateThreadLoop() {
     // If status doesn't change, check if we reached update interval.
     if (!status_changed) {
       static double next_update_time = 0;
-      const double now = apollo::common::time::Clock::NowInSeconds();
+      const double now = Clock::NowInSeconds();
       if (now < next_update_time) {
         continue;
       }
