@@ -83,6 +83,10 @@ bool Time::IsZero() const { return nanoseconds_ == 0; }
 
 uint64_t Time::ToNanosecond() const { return nanoseconds_; }
 
+uint64_t Time::ToMicrosecond() const {
+  return static_cast<uint64_t>(nanoseconds_ / 1000.0);
+}
+
 std::string Time::ToString() const {
   auto nano = std::chrono::nanoseconds(nanoseconds_);
   system_clock::time_point tp(nano);

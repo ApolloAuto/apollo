@@ -63,6 +63,13 @@ class Time {
   double ToSecond() const;
 
   /**
+   * @brief convert time to microsecond (us).
+   *
+   * @return return a unit64_t value unit is us.
+   */
+  uint64_t ToMicrosecond() const;
+
+  /**
    * @brief convert time to nanosecond.
    *
    * @return return a unit64_t value unit is nanosecond.
