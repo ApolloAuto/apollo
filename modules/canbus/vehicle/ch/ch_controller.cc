@@ -17,10 +17,10 @@
 #include "modules/canbus/vehicle/ch/ch_controller.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -467,7 +467,7 @@ void ChController::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    start = ::apollo::cyber::Time::Now().ToMicrosecond();
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -505,7 +505,7 @@ void ChController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
