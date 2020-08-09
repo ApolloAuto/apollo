@@ -97,6 +97,7 @@ cc_library(
         "//cyber/sysmo",
         "//cyber/task",
         "//cyber/time",
+        "//cyber/time:clock",
         "//cyber/time:duration",
         "//cyber/time:rate",
         "//cyber/timer",

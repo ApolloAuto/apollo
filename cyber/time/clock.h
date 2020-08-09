@@ -20,8 +20,8 @@
 #include <mutex>
 
 #include "cyber/common/macros.h"
-#include "cyber/time/time.h"
 #include "cyber/proto/run_mode_conf.pb.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
@@ -49,25 +49,39 @@ class Clock {
    * @brief get current time.
    * @return a Time object representing the current time.
    */
-  Time Now();
+  static Time Now();
 
   /**
    * @brief gets the current time in second.
    * @return the current time in second.
    */
-  double NowInSeconds();
+  static double NowInSeconds();
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock.
    */
-  void SetNow(const Time& now);
+  static void SetNow(const Time& now);
+
+  /**
+   * @brief Set the behavior of the \class Clock.
+   * @param The new clock mode to be set.
+   */
+  static void SetMode(ClockMode mode);
+
+  /**
+   * @brief Gets the current clock mode.
+   * @return The current clock mode.
+   */
+  static ClockMode mode();
 
   /**
    * @brief This is for mock clock mode only. It will set the timestamp
    * for the mock clock with UNIX timestamp in seconds.
    */
-  void SetNowInSeconds(const double seconds) { SetNow(Time(seconds)); }
+  static void SetNowInSeconds(const double seconds) {
+    Clock::SetNow(Time(seconds));
+  }
 
  private:
   ClockMode mode_;
