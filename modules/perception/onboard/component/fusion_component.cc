@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_component.h"
 
-#include "modules/common/time/time.h"
-#include "modules/perception/base/object_pool_types.h"
+#include "cyber/time/clock.h"
 #include "modules/common/util/perf_util.h"
+#include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
 
@@ -128,8 +128,7 @@ bool FusionComponent::InternalProc(
     AERROR << "Failed to call fusion plugin.";
     return false;
   }
-  PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_process"),
-                                           in_message->sensor_id_);
+  PERF_BLOCK_END_WITH_INDICATOR("fusion_process", in_message->sensor_id_);
 
   if (in_message->sensor_id_ != fusion_main_sensor_) {
     return true;
@@ -156,8 +155,7 @@ bool FusionComponent::InternalProc(
   } else {
     valid_objects.assign(fused_objects.begin(), fused_objects.end());
   }
-  PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_roi_check"),
-                                           in_message->sensor_id_);
+  PERF_BLOCK_END_WITH_INDICATOR("fusion_roi_check", in_message->sensor_id_);
 
   // produce visualization msg
   if (FLAGS_obs_enable_visualization) {
@@ -180,15 +178,13 @@ bool FusionComponent::InternalProc(
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }
-  PERF_BLOCK_END_WITH_INDICATOR(
-      std::string("fusion_serialize_message"), in_message->sensor_id_);
+  PERF_BLOCK_END_WITH_INDICATOR("fusion_serialize_message",
+                                in_message->sensor_id_);
 
-  const double cur_time = apollo::common::time::Clock::NowInSeconds();
+  const double cur_time = ::apollo::cyber::Clock::NowInSeconds();
   const double latency = (cur_time - timestamp) * 1e3;
-  AINFO << std::setprecision(16)
-        << "FRAME_STATISTICS:Obstacle:End:msg_time[" << timestamp
-        << "]:cur_time[" << cur_time
-        << "]:cur_latency[" << latency
+  AINFO << std::setprecision(16) << "FRAME_STATISTICS:Obstacle:End:msg_time["
+        << timestamp << "]:cur_time[" << cur_time << "]:cur_latency[" << latency
         << "]:obj_cnt[" << valid_objects.size() << "]";
   AINFO << "publish_number: " << valid_objects.size() << " obj";
   return true;

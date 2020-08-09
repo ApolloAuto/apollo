@@ -14,13 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/onboard/component/recognition_component.h"
-#include "modules/common/time/time.h"
+
+#include "cyber/time/clock.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/common/util/perf_util.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 // #include "modules/perception/onboard/component/lidar_common_flags.h"
+
+using Clock = apollo::cyber::Clock;
 
 namespace apollo {
 namespace perception {
@@ -46,10 +49,10 @@ bool RecognitionComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
   AINFO << std::setprecision(16)
         << "Enter Tracking component, message timestamp: "
-        << message->timestamp_ << " current timestamp: "
-        << apollo::common::time::Clock::NowInSeconds();
+        << message->timestamp_
+        << " current timestamp: " << Clock::NowInSeconds();
 
-  std::shared_ptr<SensorFrameMessage> out_message(new SensorFrameMessage);
+  auto out_message = std::make_shared<SensorFrameMessage>();
 
   if (InternalProc(message, out_message)) {
     writer_->Write(out_message);
@@ -98,8 +101,7 @@ bool RecognitionComponent::InternalProc(
   track_options.sensor_name = sensor_name;
   lidar::LidarProcessResult ret =
       tracker_->Process(track_options, lidar_frame.get());
-  PERF_BLOCK_END_WITH_INDICATOR(sensor_name,
-                                           "recognition_1::track_obstacle");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
@@ -116,16 +118,13 @@ bool RecognitionComponent::InternalProc(
   frame->sensor2world_pose = lidar_frame->lidar2world_pose;
   frame->lidar_frame_supplement.on_use = true;
   frame->lidar_frame_supplement.cloud_ptr = lidar_frame->cloud;
-  PERF_BLOCK_END_WITH_INDICATOR(sensor_name,
-                                           "recognition_2::fill_out_message");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_2::fill_out_message");
 
-  const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
+  const double end_timestamp = Clock::NowInSeconds();
   const double end_latency = (end_timestamp - in_message->timestamp_) * 1e3;
-  AINFO << std::setprecision(16)
-        << "FRAME_STATISTICS:Lidar:End:msg_time[" << in_message->timestamp_
-        << "]:cur_time[" << end_timestamp
-        << "]:cur_latency[" << end_latency
-        << "]";
+  AINFO << std::setprecision(16) << "FRAME_STATISTICS:Lidar:End:msg_time["
+        << in_message->timestamp_ << "]:cur_time[" << end_timestamp
+        << "]:cur_latency[" << end_latency << "]";
   return true;
 }
 

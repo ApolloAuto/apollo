@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/segmentation_component.h"
 
-#include "modules/common/time/time.h"
-#include "modules/perception/common/sensor_manager/sensor_manager.h"
+#include "cyber/time/clock.h"
 #include "modules/common/util/perf_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -105,12 +105,9 @@ bool SegmentationComponent::InternalProc(
   const double timestamp = in_message->measurement_time();
   const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << std::setprecision(16)
-        << "FRAME_STATISTICS:Lidar:Start:msg_time[" << timestamp
-        << "]:sensor[" << sensor_name_
-        << "]:cur_time[" << cur_time
-        << "]:cur_latency[" << start_latency
-        << "]";
+  AINFO << std::setprecision(16) << "FRAME_STATISTICS:Lidar:Start:msg_time["
+        << timestamp << "]:sensor[" << sensor_name_ << "]:cur_time[" << cur_time
+        << "]:cur_latency[" << start_latency << "]";
 
   out_message->timestamp_ = timestamp;
   out_message->lidar_timestamp_ = in_message->header().lidar_timestamp();
@@ -135,8 +132,8 @@ bool SegmentationComponent::InternalProc(
     AERROR << "Failed to get pose at time: " << lidar_query_tf_timestamp;
     return false;
   }
-  PERF_BLOCK_END_WITH_INDICATOR(
-      sensor_name_, "segmentation_1::get_lidar_to_world_pose");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
+                                "segmentation_1::get_lidar_to_world_pose");
 
   frame->lidar2world_pose = pose;
   frame->novatel2world_pose = pose_novatel;
@@ -153,7 +150,7 @@ bool SegmentationComponent::InternalProc(
     return false;
   }
   PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
-                                           "segmentation_2::segment_obstacle");
+                                "segmentation_2::segment_obstacle");
 
   return true;
 }
