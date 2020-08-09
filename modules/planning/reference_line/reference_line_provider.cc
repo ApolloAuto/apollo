@@ -27,9 +27,9 @@
 
 #include "cyber/common/file.h"
 #include "cyber/task/task.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -49,7 +49,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleState;
 using apollo::common::math::AngleDiff;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;

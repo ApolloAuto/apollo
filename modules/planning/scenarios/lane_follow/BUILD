@@ -19,9 +19,9 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
+        "//cyber/time:clock",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -53,9 +53,9 @@ cc_library(
     deps = [
         ":lane_follow_stage",
         "//cyber/common:log",
+        "//cyber/time:clock",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",

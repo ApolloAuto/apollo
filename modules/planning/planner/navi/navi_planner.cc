@@ -26,8 +26,8 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -54,8 +54,8 @@ using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
 using apollo::common::util::PointFactory;
+using apollo::cyber::Clock;
 
 namespace {
 constexpr uint32_t KDestLanePriority = 0;

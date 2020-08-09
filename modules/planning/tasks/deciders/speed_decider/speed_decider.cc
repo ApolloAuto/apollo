@@ -24,8 +24,8 @@
 #include <memory>
 
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_context.h"
@@ -40,7 +40,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config,
@@ -524,11 +524,11 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
 
   // read pedestrian stop time from PlanningContext
   auto* mutable_speed_decider_status = injector_->planning_context()
-                                                ->mutable_planning_status()
-                                                ->mutable_speed_decider();
+                                           ->mutable_planning_status()
+                                           ->mutable_speed_decider();
   std::unordered_map<std::string, double> stop_time_map;
   for (const auto& pedestrian_stop_time :
-      mutable_speed_decider_status->pedestrian_stop_time()) {
+       mutable_speed_decider_status->pedestrian_stop_time()) {
     stop_time_map[pedestrian_stop_time.obstacle_id()] =
         pedestrian_stop_time.stop_timestamp_sec();
   }

@@ -23,7 +23,7 @@
 #include <string>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -37,7 +37,7 @@ namespace scenario {
 namespace traffic_light {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
 Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(

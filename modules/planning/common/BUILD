@@ -454,7 +454,7 @@ cc_test(
     deps = [
         ":st_graph_data",
         "//cyber/common:log",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],

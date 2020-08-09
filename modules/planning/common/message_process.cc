@@ -23,8 +23,8 @@
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -37,7 +37,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::canbus::Chassis;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;
@@ -58,8 +58,7 @@ using apollo::routing::RoutingResponse;
 using apollo::storytelling::CloseToJunction;
 using apollo::storytelling::Stories;
 
-bool MessageProcess::Init(
-    const PlanningConfig& planning_config) {
+bool MessageProcess::Init(const PlanningConfig& planning_config) {
   planning_config_.CopyFrom(planning_config);
 
   map_m_["Sunnyvale"] = "sunnyvale";
@@ -85,9 +84,8 @@ bool MessageProcess::Init(
   return true;
 }
 
-bool MessageProcess::Init(
-    const PlanningConfig& planning_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
+bool MessageProcess::Init(const PlanningConfig& planning_config,
+                          const std::shared_ptr<DependencyInjector>& injector) {
   injector_ = injector;
   return Init(planning_config);
 }
@@ -177,8 +175,8 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
   } else {
     // online
-    injector_->learning_based_data()
-             ->InsertLearningDataFrame(learning_data_frame);
+    injector_->learning_based_data()->InsertLearningDataFrame(
+        learning_data_frame);
   }
 }
 
@@ -723,9 +721,9 @@ bool MessageProcess::GenerateLocalRoutingPassages(
       const auto& segment = road.passage(i).segment(j);
       road_s += (segment.end_s() - segment.start_s());
       if (road_s >= local_routing_start_road_s) {
-        ADEBUG << "INIT: passage[" << i << "] seg[" << j
-               << "] road_s[" << road_s << "] id[" << segment.id()
-               << "] length[" << segment.end_s() - segment.start_s() << "]";
+        ADEBUG << "INIT: passage[" << i << "] seg[" << j << "] road_s["
+               << road_s << "] id[" << segment.id() << "] length["
+               << segment.end_s() - segment.start_s() << "]";
         local_routing_passage.push_back(
             std::make_pair(segment.id(), segment.end_s() - segment.start_s()));
       }
@@ -766,8 +764,8 @@ bool MessageProcess::GenerateLocalRoutingPassages(
         }
 
         for (auto& routing_passage : *local_routing_passages) {
-          ADEBUG << "ADD road[" << j << "] passage[" << k
-                 << "] id[" << lane_segment.id() << "] length["
+          ADEBUG << "ADD road[" << j << "] passage[" << k << "] id["
+                 << lane_segment.id() << "] length["
                  << lane_segment.end_s() - lane_segment.start_s();
           routing_passage.push_back(
               std::make_pair(lane_segment.id(),
