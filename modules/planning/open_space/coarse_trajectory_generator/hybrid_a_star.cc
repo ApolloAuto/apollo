@@ -27,7 +27,7 @@ namespace planning {
 
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   planner_open_space_config_.CopyFrom(open_space_conf);

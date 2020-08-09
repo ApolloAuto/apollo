@@ -37,7 +37,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
     const TaskConfig& config,

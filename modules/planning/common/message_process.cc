@@ -23,8 +23,8 @@
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -37,7 +37,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::canbus::Chassis;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::dreamview::HMIStatus;

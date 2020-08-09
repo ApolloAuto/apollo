@@ -22,8 +22,8 @@
 
 #include <memory>
 
+#include "cyber/time/clock.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_context.h"
 
@@ -31,7 +31,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 Rerouting::Rerouting(const TrafficRuleConfig& config,
                      const std::shared_ptr<DependencyInjector>& injector)

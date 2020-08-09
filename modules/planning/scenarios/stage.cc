@@ -23,7 +23,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -33,7 +33,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 namespace {
 // constexpr double kPathOptimizationFallbackCost = 2e4;
@@ -189,8 +189,8 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
   if (frame->open_space_info().fallback_flag()) {
     auto& trajectory = frame->open_space_info().fallback_trajectory().first;
     auto& gear = frame->open_space_info().fallback_trajectory().second;
-    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
-                                                 trajectory);
+    PublishableTrajectory publishable_trajectory(
+        Clock::NowInSeconds(), trajectory);
     auto publishable_traj_and_gear =
         std::make_pair(std::move(publishable_trajectory), gear);
 
@@ -201,8 +201,8 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
         frame->open_space_info().chosen_partitioned_trajectory().first;
     auto& gear =
         frame->open_space_info().chosen_partitioned_trajectory().second;
-    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
-                                                 trajectory);
+    PublishableTrajectory publishable_trajectory(
+        Clock::NowInSeconds(), trajectory);
     auto publishable_traj_and_gear =
         std::make_pair(std::move(publishable_trajectory), gear);
 

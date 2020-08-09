@@ -24,9 +24,9 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "gtest/gtest_prod.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
@@ -54,7 +54,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::dreamview::Chart;
 using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
@@ -73,9 +73,7 @@ OnLanePlanning::~OnLanePlanning() {
   injector_->ego_info()->Clear();
 }
 
-std::string OnLanePlanning::Name() const {
-  return "on_lane_planning";
-}
+std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   config_ = config;

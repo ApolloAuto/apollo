@@ -16,7 +16,7 @@
 
 #include "modules/planning/planning_base.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
