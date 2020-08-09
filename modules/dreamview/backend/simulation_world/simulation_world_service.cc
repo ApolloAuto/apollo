@@ -20,6 +20,7 @@
 
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -27,7 +28,6 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
@@ -47,10 +47,10 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::time::Clock;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::FillHeader;
 using apollo::control::ControlCommand;
+using apollo::cyber::Clock;
 using apollo::cyber::common::GetProtoFromFile;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
@@ -375,7 +375,7 @@ void SimulationWorldService::Update() {
   UpdateLatencies();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
-  world_.set_timestamp(static_cast<double>(absl::ToUnixMillis(Clock::Now())));
+  world_.set_timestamp(Clock::Now().ToSecond() * 1000);
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -417,7 +417,7 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
 
   Json update;
   update["type"] = "SimWorldUpdate";
-  update["timestamp"] = absl::ToUnixMillis(Clock::Now());
+  update["timestamp"] = Clock::Now().ToSecond() * 1000;
   update["world"] = sim_world_json_string;
 
   return update;

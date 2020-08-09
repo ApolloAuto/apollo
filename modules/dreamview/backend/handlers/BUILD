@@ -9,11 +9,10 @@ cc_library(
     hdrs = ["websocket_handler.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
-        "//modules/common/time",
+        "//cyber/common:log",
         "//modules/common/util:map_util",
         "@civetweb//:civetweb++",
         "@com_github_nlohmann_json//:json",
-        "@com_google_absl//absl/strings",
     ],
 )
 
