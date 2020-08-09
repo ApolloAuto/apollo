@@ -56,6 +56,7 @@ cc_library(
     hdrs = ["clock.h"],
     deps = [
         ":time",
+        "//cyber/base:atomic_rw_lock",
         "//cyber/common:global_data",
         "//cyber/common:log",
         "//cyber/common:macros",

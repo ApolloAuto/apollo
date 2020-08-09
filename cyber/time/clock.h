@@ -19,6 +19,7 @@
 
 #include <mutex>
 
+#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/macros.h"
 #include "cyber/proto/run_mode_conf.pb.h"
 #include "cyber/time/time.h"
@@ -86,7 +87,7 @@ class Clock {
  private:
   ClockMode mode_;
   Time mock_now_;
-  std::mutex mtx_;
+  ::apollo::cyber::base::AtomicRWLock rwlock_;
 
   DECLARE_SINGLETON(Clock)
 };
