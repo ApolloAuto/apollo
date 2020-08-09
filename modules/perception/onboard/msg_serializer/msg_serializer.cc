@@ -19,9 +19,11 @@
 
 #include "cyber/common/log.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/prediction/proto/feature.pb.h"
+
+using Clock = apollo::cyber::Clock;
 
 namespace {
 constexpr float kFloatMax = std::numeric_limits<float>::max();
@@ -36,7 +38,7 @@ bool MsgSerializer::SerializeMsg(double timestamp, uint64_t lidar_timestamp,
                                  const std::vector<base::ObjectPtr> &objects,
                                  const apollo::common::ErrorCode &error_code,
                                  PerceptionObstacles *obstacles) {
-  double publish_time = apollo::common::time::Clock::NowInSeconds();
+  double publish_time = Clock::NowInSeconds();
   ::apollo::common::Header *header = obstacles->mutable_header();
   header->set_timestamp_sec(publish_time);
   header->set_module_name("perception_obstacle");

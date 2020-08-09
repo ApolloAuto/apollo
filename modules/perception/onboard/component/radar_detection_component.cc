@@ -15,9 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/radar_detection_component.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/util/perf_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
+
+using Clock = apollo::cyber::Clock;
 
 namespace apollo {
 namespace perception {
@@ -61,9 +63,9 @@ bool RadarDetectionComponent::Init() {
 bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
   AINFO << "Enter radar preprocess, message timestamp: "
         << message->header().timestamp_sec() << " current timestamp "
-        << apollo::common::time::Clock::NowInSeconds();
-  std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
-                                                      SensorFrameMessage);
+        << Clock::NowInSeconds();
+  auto out_message = std::make_shared<SensorFrameMessage>();
+
   if (!InternalProc(message, out_message)) {
     return false;
   }
@@ -106,7 +108,7 @@ bool RadarDetectionComponent::InternalProc(
     ++seq_num_;
   }
   double timestamp = in_message->header().timestamp_sec();
-  const double cur_time = apollo::common::time::Clock::NowInSeconds();
+  const double cur_time = Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << timestamp
         << "]:cur_time[" << cur_time << "]:cur_latency[" << start_latency
@@ -182,13 +184,13 @@ bool RadarDetectionComponent::InternalProc(
   out_message->frame_->sensor2world_pose = radar_trans;
   out_message->frame_->objects = radar_objects;
 
-  const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
+  const double end_timestamp = Clock::NowInSeconds();
   const double end_latency =
       (end_timestamp - in_message->header().timestamp_sec()) * 1e3;
-  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "radar_perception");
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
         << in_message->header().timestamp_sec() << "]:cur_time["
         << end_timestamp << "]:cur_latency[" << end_latency << "]";
+  PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "radar_perception");
 
   return true;
 }

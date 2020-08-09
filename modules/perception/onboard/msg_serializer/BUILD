@@ -8,9 +8,7 @@ cc_library(
     srcs = ["msg_serializer.cc"],
     hdrs = ["msg_serializer.h"],
     deps = [
-        "//cyber",
-        "//modules/common/time",
-        "//modules/common/util:perf_util",
+        "//cyber/time:clock",
         "//modules/perception/base",
         "//modules/perception/onboard/common_flags",
         "//modules/perception/proto:perception_obstacle_cc_proto",

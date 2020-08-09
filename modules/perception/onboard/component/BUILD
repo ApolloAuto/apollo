@@ -16,10 +16,10 @@ cc_library(
         '-DMODULE_NAME=\\"perception\\"',
     ],
     deps = [
-        ":perception_component_inner_detection",
-        ":perception_component_inner_fusion",
-        ":perception_component_inner_radar",
-        ":perception_component_inner_recognition",
+        ":detection_component",
+        ":fusion_component",
+        ":radar_detection_component",
+        ":recognition_component",
     ],
     alwayslink = True,
 )
@@ -37,17 +37,12 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_component_inner_detection",
-    srcs = [
-        "detection_component.cc",
-    ],
-    hdrs = [
-        "detection_component.h",
-    ],
+    name = "detection_component",
+    srcs = ["detection_component.cc"],
+    hdrs = ["detection_component.h"],
     deps = [
         ":lidar_inner_component_messages",
-        "//cyber",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util:perf_util",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/lib/registerer",
@@ -61,16 +56,11 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_component_inner_fusion",
-    srcs = [
-        "fusion_component.cc",
-    ],
-    hdrs = [
-        "fusion_component.h",
-    ],
+    name = "fusion_component",
+    srcs = ["fusion_component.cc"],
+    hdrs = ["fusion_component.h"],
     deps = [
-        "//cyber",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",
@@ -90,7 +80,7 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_component_inner_radar",
+    name = "radar_detection_component",
     srcs = [
         "radar_detection_component.cc",
     ],
@@ -98,8 +88,7 @@ cc_library(
         "radar_detection_component.h",
     ],
     deps = [
-        "//cyber",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/common/sensor_manager",
@@ -132,7 +121,7 @@ cc_library(
 )
 
 cc_library(
-    name = "perception_component_inner_recognition",
+    name = "recognition_component",
     srcs = [
         "recognition_component.cc",
     ],
@@ -141,8 +130,7 @@ cc_library(
     ],
     deps = [
         ":lidar_inner_component_messages",
-        "//cyber",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/common/sensor_manager",

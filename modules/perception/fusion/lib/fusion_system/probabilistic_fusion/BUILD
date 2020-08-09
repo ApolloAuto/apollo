@@ -9,7 +9,6 @@ cc_library(
     hdrs = ["probabilistic_fusion.h"],
     deps = [
         "//cyber",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:perf_util",
         "//modules/perception/base",

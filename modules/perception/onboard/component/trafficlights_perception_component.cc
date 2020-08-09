@@ -27,8 +27,8 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/perf_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/camera/common/data_provider.h"
