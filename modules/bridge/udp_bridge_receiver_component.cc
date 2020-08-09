@@ -15,6 +15,8 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_receiver_component.h"
+
+#include "cyber/time/clock.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"
 
@@ -119,7 +121,7 @@ bool UDPBridgeReceiverComponent<T>::IsTimeout(double time_stamp) {
   if (enable_timeout_ == false) {
     return false;
   }
-  double cur_time = apollo::common::time::Clock::NowInSeconds();
+  double cur_time = apollo::cyber::Clock::NowInSeconds();
   if (cur_time < time_stamp) {
     return true;
   }
