@@ -24,9 +24,12 @@ namespace apollo {
 namespace cyber {
 
 TEST(Clock, MockTime) {
+  Clock::SetMode(ClockMode::MODE_CYBER);
   EXPECT_EQ(ClockMode::MODE_CYBER, Clock::mode());
+
   Clock::SetMode(ClockMode::MODE_MOCK);
   EXPECT_EQ(ClockMode::MODE_MOCK, Clock::mode());
+
   EXPECT_EQ(0, Clock::Now().ToNanosecond());
 
   Clock::SetNow(Time(1));
