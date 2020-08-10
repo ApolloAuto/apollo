@@ -71,7 +71,7 @@ enum class Orientation {
 struct VisPoint {
   VisPoint() = default;
 
-  explicit VisPoint(float x, float y) : point(Eigen::Vector2f(x, y)) {}
+  VisPoint(float x, float y) : point(Eigen::Vector2f(x, y)) {}
 
   explicit VisPoint(const Eigen::Vector2f& point_) : point(point_) {}
 
@@ -128,7 +128,7 @@ struct VisPoint {
 struct Segment {
   Segment() = default;
 
-  explicit Segment(const VisPoint& start, const VisPoint& end, int idx = -2)
+  Segment(const VisPoint& start, const VisPoint& end, int idx = -2)
       : start(start), end(end), idx(idx) {}
 
   bool operator<(const Segment& other) const;

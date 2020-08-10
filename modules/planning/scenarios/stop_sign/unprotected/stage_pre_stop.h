@@ -38,7 +38,7 @@ struct StopSignUnprotectedContext;
 
 class StopSignUnprotectedStagePreStop : public Stage {
  public:
-  explicit StopSignUnprotectedStagePreStop(
+  StopSignUnprotectedStagePreStop(
       const ScenarioConfig::StageConfig& config,
       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}

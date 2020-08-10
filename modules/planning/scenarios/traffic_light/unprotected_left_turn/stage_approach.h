@@ -35,7 +35,7 @@ struct TrafficLightUnprotectedLeftTurnContext;
 
 class TrafficLightUnprotectedLeftTurnStageApproach : public Stage {
  public:
-  explicit TrafficLightUnprotectedLeftTurnStageApproach(
+  TrafficLightUnprotectedLeftTurnStageApproach(
       const ScenarioConfig::StageConfig& config,
       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}

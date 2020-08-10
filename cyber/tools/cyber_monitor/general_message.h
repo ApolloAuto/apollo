@@ -25,10 +25,10 @@ class Screen;
 
 class GeneralMessage : public GeneralMessageBase {
  public:
-  explicit GeneralMessage(GeneralMessageBase* parent,
-                          const google::protobuf::Message* msg,
-                          const google::protobuf::Reflection* reflection,
-                          const google::protobuf::FieldDescriptor* field);
+  GeneralMessage(GeneralMessageBase* parent,
+                 const google::protobuf::Message* msg,
+                 const google::protobuf::Reflection* reflection,
+                 const google::protobuf::FieldDescriptor* field);
 
   ~GeneralMessage() {
     field_ = nullptr;

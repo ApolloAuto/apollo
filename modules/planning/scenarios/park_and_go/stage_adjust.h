@@ -31,9 +31,8 @@ struct ParkAndGoContext;
 
 class ParkAndGoStageAdjust : public Stage {
  public:
-  explicit ParkAndGoStageAdjust(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  ParkAndGoStageAdjust(const ScenarioConfig::StageConfig& config,
+                       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

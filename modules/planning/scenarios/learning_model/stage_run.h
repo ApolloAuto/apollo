@@ -33,7 +33,7 @@ struct LearningModelSampleContext;
 
 class LearningModelSampleStageRun : public Stage {
  public:
-  explicit LearningModelSampleStageRun(
+  LearningModelSampleStageRun(
       const ScenarioConfig::StageConfig& config,
       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}

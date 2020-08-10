@@ -21,9 +21,9 @@
 #pragma once
 
 #include <algorithm>
+#include <memory>
 #include <utility>
 #include <vector>
-#include <memory>
 
 #include "Eigen/Dense"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -41,9 +41,8 @@ namespace apollo {
 namespace planning {
 class OpenSpaceFallbackDecider : public Decider {
  public:
-  explicit OpenSpaceFallbackDecider(
-      const TaskConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector);
+  OpenSpaceFallbackDecider(const TaskConfig& config,
+                           const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   apollo::common::Status Process(Frame* frame) override;

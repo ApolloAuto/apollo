@@ -30,7 +30,7 @@ class SATPEXTSHARED_EXPORT RtdbSender : public RtdbService, public SATP::BlockHa
 {
     Q_OBJECT
 public:
-    explicit RtdbSender(RealtimeDatabase *rtdb, SATP::Protocol *protocol, QObject *parent = nullptr);
+    RtdbSender(RealtimeDatabase *rtdb, SATP::Protocol *protocol, QObject *parent = nullptr);
     virtual ~RtdbSender();
     //override BlockHandler
     bool handleReceiveBlock(uint32_t dataType, const char *block, int size);
