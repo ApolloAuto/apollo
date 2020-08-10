@@ -58,8 +58,7 @@ using apollo::routing::RoutingResponse;
 using apollo::storytelling::CloseToJunction;
 using apollo::storytelling::Stories;
 
-bool MessageProcess::Init(
-    const PlanningConfig& planning_config) {
+bool MessageProcess::Init(const PlanningConfig& planning_config) {
   planning_config_.CopyFrom(planning_config);
 
   map_m_["Sunnyvale"] = "sunnyvale";
@@ -85,9 +84,8 @@ bool MessageProcess::Init(
   return true;
 }
 
-bool MessageProcess::Init(
-    const PlanningConfig& planning_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
+bool MessageProcess::Init(const PlanningConfig& planning_config,
+                          const std::shared_ptr<DependencyInjector>& injector) {
   injector_ = injector;
   return Init(planning_config);
 }
@@ -129,15 +127,18 @@ void MessageProcess::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
 }
 
 void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
-  static double last_localization_message_timestamp_sec = 0.0;
-  if (last_localization_message_timestamp_sec == 0.0) {
-    last_localization_message_timestamp_sec = le.header().timestamp_sec();
+  if (last_localization_message_timestamp_sec_ == 0.0) {
+    last_localization_message_timestamp_sec_ = le.header().timestamp_sec();
   }
   const double time_diff =
-      le.header().timestamp_sec() - last_localization_message_timestamp_sec;
+      le.header().timestamp_sec() - last_localization_message_timestamp_sec_;
   if (time_diff < 1.0 / FLAGS_planning_loop_rate) {
+    // for RL_TEST, skip this check so that first frame can proceed
     if (planning_config_.learning_mode() != PlanningConfig::RL_TEST) {
-      // for RL_TEST, skip this check so that first frame can proceed
+      AERROR << "time_diff [" << time_diff
+             << "] between current and last received"
+                " localization msg smaller than planning component interval ["
+             << 1.0 / FLAGS_planning_loop_rate << "]";
       return;
     }
   }
@@ -150,7 +151,7 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
       log_file_ << msg.str() << std::endl;
     }
   }
-  last_localization_message_timestamp_sec = le.header().timestamp_sec();
+  last_localization_message_timestamp_sec_ = le.header().timestamp_sec();
   localizations_.push_back(le);
 
   while (!localizations_.empty()) {
@@ -177,8 +178,8 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
     FeatureOutput::InsertLearningDataFrame(record_file_, learning_data_frame);
   } else {
     // online
-    injector_->learning_based_data()
-             ->InsertLearningDataFrame(learning_data_frame);
+    injector_->learning_based_data()->InsertLearningDataFrame(
+        learning_data_frame);
   }
 }
 
@@ -723,9 +724,9 @@ bool MessageProcess::GenerateLocalRoutingPassages(
       const auto& segment = road.passage(i).segment(j);
       road_s += (segment.end_s() - segment.start_s());
       if (road_s >= local_routing_start_road_s) {
-        ADEBUG << "INIT: passage[" << i << "] seg[" << j
-               << "] road_s[" << road_s << "] id[" << segment.id()
-               << "] length[" << segment.end_s() - segment.start_s() << "]";
+        ADEBUG << "INIT: passage[" << i << "] seg[" << j << "] road_s["
+               << road_s << "] id[" << segment.id() << "] length["
+               << segment.end_s() - segment.start_s() << "]";
         local_routing_passage.push_back(
             std::make_pair(segment.id(), segment.end_s() - segment.start_s()));
       }
@@ -766,8 +767,8 @@ bool MessageProcess::GenerateLocalRoutingPassages(
         }
 
         for (auto& routing_passage : *local_routing_passages) {
-          ADEBUG << "ADD road[" << j << "] passage[" << k
-                 << "] id[" << lane_segment.id() << "] length["
+          ADEBUG << "ADD road[" << j << "] passage[" << k << "] id["
+                 << lane_segment.id() << "] length["
                  << lane_segment.end_s() - lane_segment.start_s();
           routing_passage.push_back(
               std::make_pair(lane_segment.id(),

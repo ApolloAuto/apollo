@@ -133,6 +133,7 @@ class MessageProcess {
   double traffic_light_detection_message_timestamp_;
   std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;
+  double last_localization_message_timestamp_sec_ = 0.0;
 };
 
 }  // namespace planning
