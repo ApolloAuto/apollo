@@ -20,20 +20,14 @@ APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
-
 DOCKER_REPO="apolloauto/apollo"
 DEV_INSIDE="in-dev-docker"
-
-SUPPORTED_ARCHS=" x86_64 aarch64 "
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
 USER_VERSION_OPT=
-
 DOCKER_RUN="docker run"
 FAST_MODE="no"
-USE_LOCAL_IMAGE="no"
 USE_GPU_HOST=0
-
 VOLUME_VERSION="latest"
 USER_SPECIFIED_MAP=
 MAP_VOLUME_CONF=
@@ -54,42 +48,14 @@ DEFAULT_TEST_MAPS=(
 eval $(grep ^VERSION_X86_64= ${APOLLO_ROOT_DIR}/docker/scripts/dev_start.sh)
 eval $(grep ^VERSION_AARCH64= ${APOLLO_ROOT_DIR}/docker/scripts/dev_start.sh)
 
-function _optarg_check_for_opt() {
-    local opt="$1"
-    local optarg="$2"
-
-    if [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]; then
-        error "Missing argument for ${opt}. Exiting..."
-        exit 2
-    fi
-}
-
 function parse_arguments() {
-    local custom_version=""
-
     while [ $# -gt 0 ] ; do
         local opt="$1"; shift
         case "${opt}" in
-        -t|--tag)
-            if [ -n "${custom_version}" ]; then
-                warning "Multiple option ${opt} specified, only the last one will take effect."
-            fi
-            custom_version="$1"; shift
-            _optarg_check_for_opt "${opt}" "${custom_version}"
-            ;;
-
         -f|--fast)
             FAST_MODE="yes"
             ;;
 
-        -l|--local)
-            USE_LOCAL_IMAGE="yes"
-            ;;
-
-        --map)
-            map_name="$1"; shift
-            USER_SPECIFIED_MAP="${USER_SPECIFIED_MAP} ${map_name}"
-            ;;
         *)
             warning "Unknown option: ${opt}"
             exit 2
@@ -97,16 +63,13 @@ function parse_arguments() {
         esac
     done # End while loop
 
-    [ -n "${custom_version}" ] && USER_VERSION_OPT="${custom_version}"
 }
 
 function determine_dev_image() {
     local version="$1"
     # If no custom version specified
     if [ -z "${version}" ]; then
-        if [ "${USE_LOCAL_IMAGE}" = "yes" ]; then
-            version="local_dev"
-        elif [ "${TARGET_ARCH}" = "x86_64" ]; then
+        if [ "${TARGET_ARCH}" = "x86_64" ]; then
             version="${VERSION_X86_64}"
         elif [ "${TARGET_ARCH}" = "aarch64" ]; then
             version="${VERSION_AARCH64}"
@@ -122,14 +85,6 @@ function check_host_environment() {
     local kernel="$(uname -s)"
     if [ "${kernel}" != "Linux" ]; then
         warning "Running Apollo dev container on ${kernel} is UNTESTED, exiting..."
-        exit 1
-    fi
-}
-
-function check_target_arch() {
-    local arch="${TARGET_ARCH}"
-    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
-        error "Unsupported target architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
         exit 1
     fi
 }
@@ -212,14 +167,6 @@ function determine_gpu_use_host() {
 
 function docker_pull() {
     local img="$1"
-    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
-        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${img}" ; then
-            info "Local image ${img} found and will be used."
-            return
-        fi
-        warning "Image ${img} not found locally although local mode enabled. Trying to pull from remote registry."
-    fi
-
     info "Start pulling docker image ${img} ..."
     if ! docker pull "${img}" ; then
         error "Failed to pull docker image : ${img}"
@@ -241,19 +188,12 @@ function restart_map_volume_if_needed() {
             map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
         fi
         info "Load map ${map_name} from image: ${map_image}"
-
         MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${map_volume}"
     fi
 }
 
 function mount_map_volumes() {
     info "Starting mounting map volumes ..."
-    if [ -n "${USER_SPECIFIED_MAP}" ]; then
-        for map_name in ${USER_SPECIFIED_MAP}; do
-            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
-        done
-    fi
-
     if [ "$FAST_MODE" = "no" ]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
             restart_map_volume_if_needed ${map_name} "${VOLUME_VERSION}"
@@ -291,15 +231,10 @@ function mount_other_volumes() {
 
 function main() {
     check_host_environment
-    check_target_arch
 
     parse_arguments "$@"
 
     determine_dev_image "${USER_VERSION_OPT}"
-
-    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
-        info "Start docker container based on local image : ${APOLLO_DEV_IMAGE}"
-    fi
 
     if ! docker_pull "${APOLLO_DEV_IMAGE}" ; then
         error "Failed to pull docker image."
@@ -312,7 +247,6 @@ function main() {
     local local_host="$(hostname)"
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
-
     mount_map_volumes
     mount_other_volumes
     set -x
@@ -336,7 +270,7 @@ function main() {
         /bin/bash /apollo/scripts/apollo_ci.sh
 
     if [ $? -ne 0 ];then
-        error "Failed to start docker container  based on image: ${APOLLO_DEV_IMAGE}"
+        error "CI Failed based on image: ${APOLLO_DEV_IMAGE}"
         exit 1
     fi
     set +x
