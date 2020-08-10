@@ -14,23 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
-#include <complex>
+#include "modules/audio/inference/moving_detection.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace audio {
 
-/**
- * @file moving_detection.h
- * @description detect if the sound is approaching or departing
- */
-
-class MovingDetection {
+class MovingDetectionTest : public ::testing::Test {
  public:
-  MovingDetection() = default;
+  virtual void SetUp() {}
 
-  std::vector<std::complex<double>> fft1d(const std::vector<double>& signal);
+ protected:
+  MovingDetection moving_detection_;
 };
+
+TEST_F(MovingDetectionTest, general) {
+  std::vector<double> signal{1.0, 2.0, 3.0, 4.0, -1.0, -2.0};
+  std::vector<std::complex<double>> fft_result =
+      moving_detection_.fft1d(signal);
+}
 
 }  // namespace audio
 }  // namespace apollo

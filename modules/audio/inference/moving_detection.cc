@@ -16,8 +16,31 @@
 
 #include "modules/audio/inference/moving_detection.h"
 
+#include <fftw3.h>
+
 namespace apollo {
 namespace audio {
+
+std::vector<std::complex<double>> MovingDetection::fft1d(
+    const std::vector<double>& signal) {
+  int n = static_cast<int>(signal.size());
+  fftw_complex in[n];  // NOLINT
+  fftw_complex out[n];  // NOLINT
+  for (int i = 0; i < n; ++i) {
+    in[i][0] = signal[i];
+    in[i][1] = 0.0;
+  }
+
+  fftw_plan p = fftw_plan_dft_1d(n, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(p);
+
+  std::vector<std::complex<double>> output;
+  output.reserve(n);
+  for (int i = 0; i < n; ++i) {
+    output.emplace_back(out[i][0], out[i][1]);
+  }
+  return output;
+}
 
 }  // namespace audio
 }  // namespace apollo

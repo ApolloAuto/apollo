@@ -19,4 +19,13 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "moving_detection_test",
+    srcs = ["moving_detection_test.cc"],
+    deps = [
+        ":moving_detection",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cpplint()
