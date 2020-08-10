@@ -39,7 +39,7 @@ function check_clang_format() {
 }
 
 function clang_format_run() {
-  ${CLANG_FORMAT_CMD} -i -style=Google "$@"
+  ${CLANG_FORMAT_CMD} -i "$@"
 }
 
 function run_clang_format() {
