@@ -132,15 +132,6 @@ function c_family_ext() {
   return 1
 }
 
-function py_ext() {
-  local __ext
-  __ext="$(file_ext $1)"
-  if [ "${__ext}" == "py" ]; then
-    return 0
-  fi
-  return 1
-}
-
 function find_c_cpp_srcs() {
   find "$@" -type f -name "*.h"   \
                  -o -name "*.c"   \
@@ -151,10 +142,6 @@ function find_c_cpp_srcs() {
                  -o -name "*.hxx" \
                  -o -name "*.cxx" \
                  -o -name "*.cu"
-}
-
-function find_py_srcs() {
-  find "$@" -type f -name "*.py"
 }
 
 ## Prevent multiple entries of my_bin_path in PATH
