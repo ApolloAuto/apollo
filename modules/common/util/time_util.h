@@ -16,14 +16,11 @@
 
 #pragma once
 
-#include <sys/time.h>
-#include <iomanip>
-
 #include "cyber/common/macros.h"
 
 namespace apollo {
 namespace common {
-namespace time {
+namespace util {
 
 class TimeUtil {
  public:
@@ -54,6 +51,6 @@ class TimeUtil {
   DISALLOW_COPY_AND_ASSIGN(TimeUtil);
 };
 
-}  // namespace time
+}  // namespace util
 }  // namespace common
 }  // namespace apollo

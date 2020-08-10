@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/time/timer.h"
+#include "modules/common/util/time_util.h"
 
-#include "cyber/common/log.h"
-
-using apollo::cyber::Time;
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {
-namespace time {
+namespace util {
 
-using std::string;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
+TEST(TimeUtilTest, TestUnix2Gps) {
+  double unix_time = 1476761767;
+  double gps_time = TimeUtil::Unix2Gps(unix_time);
+  EXPECT_NEAR(gps_time, 1160796984, 0.000001);
 
-void Timer::Start() { start_time_ = Time::Now(); }
-
-int64_t Timer::End(const string &msg) {
-  end_time_ = Time::Now();
-  int64_t elapsed_time = (end_time_ - start_time_).ToNanosecond() / 1e6;
-  ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
-
-  // start new timer.
-  start_time_ = end_time_;
-  return elapsed_time;
+  double unix_time1 = 1483228799;
+  double gps_time1 = TimeUtil::Unix2Gps(unix_time1);
+  EXPECT_NEAR(gps_time1, 1167264017, 0.000001);
 }
 
-}  // namespace time
+TEST(TimeUtilTest, TestGps2Unix) {
+  double gps_time = 1160796984;
+  double unix_time = TimeUtil::Gps2Unix(gps_time);
+  EXPECT_NEAR(unix_time, 1476761767, 0.000001);
+  double gps_time1 = 1260796984;
+  double unix_time1 = TimeUtil::Gps2Unix(gps_time1);
+  EXPECT_NEAR(unix_time1, 1576761766, 0.000001);
+}
+
+}  // namespace util
 }  // namespace common
 }  // namespace apollo

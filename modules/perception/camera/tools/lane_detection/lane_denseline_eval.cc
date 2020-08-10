@@ -17,6 +17,7 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
@@ -25,7 +26,6 @@
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/tools/lane_detection/lane_common.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/common/time/timer.h"
 
 namespace apollo {
 namespace perception {

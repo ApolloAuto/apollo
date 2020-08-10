@@ -105,6 +105,24 @@ cc_test(
 )
 
 cc_library(
+    name = "time_util",
+    hdrs = ["time_util.h"],
+    deps = [
+        "//cyber/common:macros",
+    ],
+)
+
+cc_test(
+    name = "time_util_test",
+    size = "small",
+    srcs = ["time_util_test.cc"],
+    deps = [
+        ":time_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "map_util",
     hdrs = ["map_util.h"],
     deps = [
@@ -192,8 +210,9 @@ cc_library(
     srcs = ["perf_util.cc"],
     hdrs = ["perf_util.h"],
     deps = [
+        "//cyber/common:log",
         "//cyber/common:macros",
-        "//modules/common/time:timer",
+        "//cyber/time",
         "@com_google_absl//absl/strings",
     ],
 )

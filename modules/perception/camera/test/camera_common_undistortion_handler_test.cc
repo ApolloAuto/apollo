@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/camera/common/undistortion_handler.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"
 #include "modules/perception/camera/test/camera_common_undistortion.h"
-#include "modules/common/time/timer.h"
 
 namespace apollo {
 namespace perception {

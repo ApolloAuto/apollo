@@ -61,7 +61,7 @@
 #include "pcl/point_types.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 
 namespace apollo {
 namespace localization {

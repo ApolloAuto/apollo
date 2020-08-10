@@ -26,7 +26,7 @@
 #include "pcl/io/pcd_io.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -159,7 +159,7 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
 
   // Start Ndt method
   // Convert online points to pcl pointcloud
-  apollo::common::time::Timer online_filtered_timer;
+  apollo::common::util::Timer online_filtered_timer;
   online_filtered_timer.Start();
   pcl::PointCloud<pcl::PointXYZ>::Ptr online_points(
       new pcl::PointCloud<pcl::PointXYZ>());
@@ -182,7 +182,7 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   online_filtered_timer.End("online point calc end.");
 
   //  Obtain map pointcloud
-  apollo::common::time::Timer map_timer;
+  apollo::common::util::Timer map_timer;
   map_timer.Start();
   Eigen::Vector2d left_top_coord2d(lt_x, lt_y);
   ComposeMapCells(left_top_coord2d, zone_id_, resolution_id_,
@@ -206,7 +206,7 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   reg_.SetInputTarget(cell_map_, pcl_map_point_cloud);
   reg_.SetInputSource(online_points_filtered);
 
-  apollo::common::time::Timer ndt_timer;
+  apollo::common::util::Timer ndt_timer;
   ndt_timer.Start();
   Eigen::Matrix3d inv_R = transform.inverse().linear();
   Eigen::Matrix4d init_matrix = Eigen::Matrix4d::Identity();
@@ -260,7 +260,7 @@ void LidarLocatorNdt::ComposeMapCells(
     const Eigen::Vector2d& left_top_coord2d, int zone_id,
     unsigned int resolution_id, float map_pixel_resolution,
     const Eigen::Affine3d& inverse_transform) {
-  apollo::common::time::Timer timer;
+  apollo::common::util::Timer timer;
   timer.Start();
 
   unsigned int map_node_size_x = map_.GetMapConfig().map_node_size_x_;

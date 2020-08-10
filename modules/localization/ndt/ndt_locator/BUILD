@@ -17,7 +17,7 @@ cc_library(
         "//cyber",
         "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/time:timer",
+        "//modules/common/util:perf_util",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/ndt_map",
