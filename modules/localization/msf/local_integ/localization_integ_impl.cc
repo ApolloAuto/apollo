@@ -17,7 +17,7 @@
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {

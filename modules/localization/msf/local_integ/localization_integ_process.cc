@@ -20,7 +20,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
@@ -197,8 +197,7 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   apollo::localization::Pose *posepb_loc = localization->mutable_pose();
 
   localization->set_measurement_time(ins_pva_.time);
-  headerpb_loc->set_timestamp_sec(
-      apollo::cyber::Clock::NowInSeconds());
+  headerpb_loc->set_timestamp_sec(apollo::cyber::Clock::NowInSeconds());
 
   apollo::common::PointENU *position_loc = posepb_loc->mutable_position();
   apollo::common::Quaternion *quaternion = posepb_loc->mutable_orientation();
@@ -328,7 +327,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
 
 void LocalizationIntegProcess::MeasureDataProcessImpl(
     const MeasureData &measure_msg) {
-  common::time::Timer timer;
+  common::util::Timer timer;
   timer.Start();
 
   if (!CheckIntegMeasureData(measure_msg)) {

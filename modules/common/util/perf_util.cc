@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/common/util/perf_util.h"
 
+#include "cyber/common/log.h"
+
 namespace {
 std::string func_name_simplified(const std::string& str) {
   constexpr char kLeftBracket = '(';
@@ -33,6 +35,8 @@ std::string func_name_simplified(const std::string& str) {
 }
 }  // namespace
 
+using apollo::cyber::Time;
+
 namespace apollo {
 namespace common {
 namespace util {
@@ -44,6 +48,18 @@ std::string function_signature(const std::string& func_name,
     return simplified_name;
   }
   return absl::StrCat(indicator, "_", simplified_name);
+}
+
+void Timer::Start() { start_time_ = Time::Now(); }
+
+int64_t Timer::End(const std::string& msg) {
+  end_time_ = Time::Now();
+  int64_t elapsed_time = (end_time_ - start_time_).ToNanosecond() / 1e6;
+  ADEBUG << "TIMER " << msg << " elapsed_time: " << elapsed_time << " ms";
+
+  // start new timer.
+  start_time_ = end_time_;
+  return elapsed_time;
 }
 
 }  // namespace util

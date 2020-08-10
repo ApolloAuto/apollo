@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_integ/localization_integ.h"
 
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/time_util.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
@@ -26,7 +26,7 @@ namespace localization {
 namespace msf {
 
 using common::Status;
-using common::time::TimeUtil;
+using common::util::TimeUtil;
 
 LocalizationInteg::LocalizationInteg()
     : localization_integ_impl_(new LocalizationIntegImpl()) {}

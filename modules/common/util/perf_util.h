@@ -20,7 +20,7 @@
 #include "absl/strings/str_cat.h"
 
 #include "cyber/common/macros.h"
-#include "modules/common/time/timer.h"
+#include "cyber/time/time.h"
 
 #if defined(__GNUC__) || defined(__GNUG__)
 #define AFUNC __PRETTY_FUNCTION__
@@ -67,21 +67,54 @@ namespace util {
 std::string function_signature(const std::string& func_name,
                                const std::string& indicator = "");
 
+class Timer {
+ public:
+  Timer() = default;
+
+  // no-thread safe.
+  void Start();
+
+  // return the elapsed time,
+  // also output msg and time in glog.
+  // automatically start a new timer.
+  // no-thread safe.
+  int64_t End(const std::string& msg);
+
+ private:
+  apollo::cyber::Time start_time_;
+  apollo::cyber::Time end_time_;
+
+  DISALLOW_COPY_AND_ASSIGN(Timer);
+};
+
+class TimerWrapper {
+ public:
+  explicit TimerWrapper(const std::string& msg) : msg_(msg) { timer_.Start(); }
+
+  ~TimerWrapper() { timer_.End(msg_); }
+
+ private:
+  Timer timer_;
+  std::string msg_;
+
+  DISALLOW_COPY_AND_ASSIGN(TimerWrapper);
+};
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
 
 #if defined(ENABLE_PERF)
 #define PERF_FUNCTION()                               \
-  apollo::common::time::TimerWrapper _timer_wrapper_( \
+  apollo::common::util::TimerWrapper _timer_wrapper_( \
       apollo::common::util::function_signature(AFUNC))
 #define PERF_FUNCTION_WITH_NAME(func_name) \
-  apollo::common::time::TimerWrapper _timer_wrapper_(func_name)
+  apollo::common::util::TimerWrapper _timer_wrapper_(func_name)
 #define PERF_FUNCTION_WITH_INDICATOR(indicator)       \
-  apollo::common::time::TimerWrapper _timer_wrapper_( \
+  apollo::common::util::TimerWrapper _timer_wrapper_( \
       apollo::common::util::function_signature(AFUNC, indicator))
 #define PERF_BLOCK_START()             \
-  apollo::common::time::Timer _timer_; \
+  apollo::common::util::Timer _timer_; \
   _timer_.Start()
 #define PERF_BLOCK_END(msg) _timer_.End(msg)
 #define PERF_BLOCK_END_WITH_INDICATOR(indicator, msg) \

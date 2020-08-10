@@ -24,6 +24,20 @@ namespace apollo {
 namespace common {
 namespace util {
 
+TEST(TimeTest, test_timer) {
+  Timer timer;
+  timer.Start();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  const uint64_t elapsed_time = timer.End("TimerTest");
+  EXPECT_GE(elapsed_time, 90);
+  EXPECT_LE(elapsed_time, 110);
+}
+
+TEST(TimerWrapperTest, test) {
+  TimerWrapper wrapper("TimerWrapperTest");
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+
 TEST(PerfFunctionTest, test) {
   PERF_FUNCTION_WITH_NAME("FunctionTest");
   std::this_thread::sleep_for(std::chrono::milliseconds(100));

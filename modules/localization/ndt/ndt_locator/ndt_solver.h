@@ -58,11 +58,11 @@
 #include <limits>
 #include <vector>
 
-#include "unsupported/Eigen/NonLinearOptimization"
 #include "pcl/registration/registration.h"
+#include "unsupported/Eigen/NonLinearOptimization"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/localization/ndt/ndt_locator/ndt_voxel_grid_covariance.h"
 
 namespace apollo {
