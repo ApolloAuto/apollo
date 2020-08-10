@@ -41,51 +41,51 @@ function _py_ext() {
 }
 
 function check_autopep8() {
-    AUTOPEP8_CMD="$(command -v autopep8)"
-    if [ -z "${AUTOPEP8_CMD}" ]; then
-        error "Oops, autopep8 missing..."
-        error "Please make sure autopep8 is installed and check your PATH" \
-            "settings. For Debian/Ubuntu, you can run the following command:"
-        error "  sudo pip install --upgrade --no-cache-dir autopep8"
-        exit 1
-    fi
+  AUTOPEP8_CMD="$(command -v autopep8)"
+  if [ -z "${AUTOPEP8_CMD}" ]; then
+    error "Oops, autopep8 missing..."
+    error "Please make sure autopep8 is installed and check your PATH" \
+        "settings. For Debian/Ubuntu, you can run the following command:"
+    error "  sudo pip install --upgrade --no-cache-dir autopep8"
+    exit 1
+  fi
 }
 
 function autopep8_run() {
-    ${AUTOPEP8_CMD} -i -a -a "$@"
+  ${AUTOPEP8_CMD} -i -a -a "$@"
 }
 
 function run_autopep8() {
-    for target in "$@"; do
-        if [ -f "${target}" ]; then
-            if _py_ext "${target}"; then
-                autopep8_run "${target}"
-                info "Done formatting ${target}"
-            else
-                warning "Do nothing. ${target} is not a Python file."
-            fi
-        else
-            local srcs
-            srcs="$(_find_py_srcs ${target})"
-            if [ -z "${srcs}" ]; then
-                warning "Do nothing. No Python files found under ${target} ."
-                continue
-            fi
-            autopep8_run ${srcs}
-            info "Done formatting Python source files under ${target}"
-        fi
-    done
+  for target in "$@"; do
+    if [ -f "${target}" ]; then
+      if _py_ext "${target}"; then
+        autopep8_run "${target}"
+        info "Done formatting ${target}"
+      else
+        warning "Do nothing. ${target} is not a Python file."
+      fi
+    else
+      local srcs
+      srcs="$(_find_py_srcs ${target})"
+      if [ -z "${srcs}" ]; then
+        warning "Do nothing. No Python files found under ${target} ."
+        continue
+      fi
+      autopep8_run ${srcs}
+      info "Done formatting Python source files under ${target}"
+    fi
+  done
 }
 
 function main() {
-    check_autopep8
+  check_autopep8
 
-    if [ "$#" -eq 0 ]; then
-        error "Usage: $0 <path/to/dirs/or/files>"
-        exit 1
-    fi
+  if [ "$#" -eq 0 ]; then
+    error "Usage: $0 <path/to/dirs/or/files>"
+    exit 1
+  fi
 
-    run_autopep8 "$@"
+  run_autopep8 "$@"
 }
 
 main "$@"

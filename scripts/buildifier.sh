@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-TOP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source ${TOP_DIR}/scripts/apollo.bashrc
 # Ubuntu 16.04+ is required.
 # Usage:
@@ -35,22 +35,35 @@ fi
 # echo "Installing buildifier..."
 # go get github.com/bazelbuild/buildtools/buildifier
 
-FIRST_TARGET="$1"
+function _bazel_family_ext() {
+  local __ext
+  __ext="$(file_ext $1)"
+  for ext in "bzl" "bazel" "BUILD"; do
+    if [ "${ext}" == "${__ext}" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Format.
-if [ -f "${FIRST_TARGET}" ]; then
-  ${BUILDIFIER_CMD} -lint=fix $@
-elif [ -d "${FIRST_TARGET}" ]; then
-  #${BUILDIFIER_CMD} -r -lint=fix $@
-  set -x
-  find $@ -type f \
+for target in "$@"; do
+  if [ -f "${target}" ]; then
+    if [ "$(basename "${target}")" = "BUILD" ] || _bazel_family_ext "${target}"; then
+      ${BUILDIFIER_CMD} -lint=fix "${target}"
+    fi
+  elif [ -d "${target}" ]; then
+    #${BUILDIFIER_CMD} -r -lint=fix $@
+    set -x
+    find $@ -type f \
       \( -name "BUILD" -or -name "*.BUILD" -or -name "*.bzl" -or -name "*.bazel" \) \
       -exec ${BUILDIFIER_CMD} -lint=fix {} +
-  set +x
+    set +x
 
-else
-  error "Bazel files or directories expected, got '${FIRST_TARGET}'"
-  exit 1
-fi
+  else
+    error "Bazel files or directories expected, got '${target}'"
+    exit 1
+  fi
+done
 
 info "Done buildifier on $@."
-

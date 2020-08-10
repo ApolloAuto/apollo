@@ -39,6 +39,8 @@ function check_clang_format() {
 }
 
 function clang_format_run() {
+  # Note: `${CLANG_FORMAT_CMD} -i -style=Google "$@"` 
+  # will override the settings in .clang-format
   ${CLANG_FORMAT_CMD} -i "$@"
 }
 
