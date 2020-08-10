@@ -160,8 +160,6 @@ class MapImageCache {
  */
 class VisualizationEngine {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   VisualizationEngine();
   ~VisualizationEngine() = default;
 
@@ -173,6 +171,8 @@ class VisualizationEngine {
   void Visualize(const std::vector<LocalizatonInfo> &loc_infos,
                  const ::apollo::common::EigenVector3dVec &cloud);
   void SetAutoPlay(bool auto_play);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   void Preprocess(const std::string &map_folder,

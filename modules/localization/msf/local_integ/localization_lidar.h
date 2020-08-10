@@ -70,8 +70,6 @@ struct MapNodeData {
 
 class LocalizationLidar {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   typedef apollo::localization::msf::pyramid_map::PyramidMap PyramidMap;
   typedef apollo::localization::msf::pyramid_map::MapNodeIndex MapNodeIndex;
   typedef apollo::localization::msf::pyramid_map::PyramidMapNode PyramidMapNode;
@@ -116,6 +114,8 @@ class LocalizationLidar {
                  double* location_score);
 
   void GetLocalizationDistribution(Eigen::MatrixXd* distribution);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
   void ComposeMapNode(const Eigen::Vector3d& trans);
