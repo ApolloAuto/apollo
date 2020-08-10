@@ -27,26 +27,22 @@ function run_ci_lint() {
 function main() {
     local cmd="$1"
     if [ -z "${cmd}" ]; then
+        cmd="ALL"
         info "Running ALL ..."
         run_ci_lint
         run_ci_build
         run_ci_test
-        success "All finished."
-    fi
-    if [ "${cmd}" == "test" ]; then
+    elif [ "${cmd}" == "test" ]; then
         info "Running CI Test ..."
         run_ci_test
-        success "ci${cmd} finished."
     elif [ "${cmd}" == "build" ]; then
         info "Running CI Build ..."
         run_ci_build
-        success "ci${cmd} finished."
     elif [ "${cmd}" == "lint" ]; then
         info "Running CI Lint ..."
         run_ci_lint
-        success "ci${cmd} finished."
     fi
-
+    success "ci ${cmd} finished."
 }
 
 main "$@"
