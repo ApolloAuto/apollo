@@ -36,6 +36,8 @@ namespace pyramid_map {
 /**@brief The data structure of a Node in the map. */
 class BaseMapNode {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   /**@brief Construct a map node. */
   BaseMapNode();
   /**@brief Construct a map node. */

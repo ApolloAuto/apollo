@@ -62,6 +62,8 @@ struct VehicleGnssAntExtrinsic {
  */
 class MeasureRepublishProcess {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   typedef drivers::gnss::GnssBestPose GnssBestPose;
 
   MeasureRepublishProcess();

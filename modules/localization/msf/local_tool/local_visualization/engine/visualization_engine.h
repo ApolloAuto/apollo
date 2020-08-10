@@ -160,6 +160,8 @@ class MapImageCache {
  */
 class VisualizationEngine {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   VisualizationEngine();
   ~VisualizationEngine() = default;
 

@@ -70,6 +70,7 @@ namespace ndt {
 /**@brief Simple structure to hold a centroid, covarince and the number of
  * points in a leaf. */
 struct Leaf {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Leaf()
       : nr_points_(0),
         mean_(Eigen::Vector3d::Zero()),
@@ -100,6 +101,8 @@ typedef const Leaf *LeafConstPtr;
  * data. */
 template <typename PointT>
 class VoxelGridCovariance {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  protected:
   typedef pcl::PointCloud<PointT> PointCloud;
   typedef boost::shared_ptr<PointCloud> PointCloudPtr;

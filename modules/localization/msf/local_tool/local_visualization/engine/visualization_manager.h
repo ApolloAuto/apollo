@@ -135,6 +135,7 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
 };
 
 struct VisualizationManagerParams {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   std::string map_folder;
   std::string map_visual_folder;
   Eigen::Affine3d velodyne_extrinsic;

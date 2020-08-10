@@ -70,6 +70,8 @@ struct MapNodeData {
 
 class LocalizationLidar {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   typedef apollo::localization::msf::pyramid_map::PyramidMap PyramidMap;
   typedef apollo::localization::msf::pyramid_map::MapNodeIndex MapNodeIndex;
   typedef apollo::localization::msf::pyramid_map::PyramidMapNode PyramidMapNode;
