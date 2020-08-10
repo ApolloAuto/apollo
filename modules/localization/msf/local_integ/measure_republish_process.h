@@ -27,7 +27,6 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-
 #include "include/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
@@ -62,8 +61,6 @@ struct VehicleGnssAntExtrinsic {
  */
 class MeasureRepublishProcess {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   typedef drivers::gnss::GnssBestPose GnssBestPose;
 
   MeasureRepublishProcess();
@@ -86,6 +83,8 @@ class MeasureRepublishProcess {
 
   bool GnssHeadingProcess(const drivers::gnss::Heading& heading_msg,
                           MeasureData* measure, int* status);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
   bool IsSinsAlign();

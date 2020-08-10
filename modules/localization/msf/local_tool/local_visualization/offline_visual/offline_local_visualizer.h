@@ -37,8 +37,6 @@ namespace msf {
  * @brief Offline localization visualization tool.
  */
 class OfflineLocalVisualizer {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #define LOC_INFO_NUM 3
 
  public:
@@ -54,6 +52,8 @@ class OfflineLocalVisualizer {
             const std::string &extrinsic_file);
 
   void Visualize();
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   bool PCDTimestampFileHandler();

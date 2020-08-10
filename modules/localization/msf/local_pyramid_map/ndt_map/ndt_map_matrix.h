@@ -34,8 +34,6 @@ namespace pyramid_map {
 /**@brief The data structure of a single ndt map cell. */
 class NdtMapSingleCell {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   /**@brief The default constructor. */
   NdtMapSingleCell();
   /**@brief Reset to default value. */
@@ -70,6 +68,8 @@ class NdtMapSingleCell {
   void MergeCell(const NdtMapSingleCell& cell_new);
 
   void CentroidEigenSolver(const Eigen::Matrix3f& centroid_cov);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
   /**@brief The average intensity value. */

@@ -50,8 +50,6 @@ class LocalizationLidarProcess;
 
 class LocalizationIntegImpl {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   LocalizationIntegImpl();
   ~LocalizationIntegImpl();
   // Initialization.
@@ -78,6 +76,8 @@ class LocalizationIntegImpl {
   const LocalizationResult& GetLastestIntegLocalization() const;
 
   const LocalizationResult& GetLastestGnssLocalization() const;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
   void PcdProcessImpl(const LidarFrame& pcd_data);

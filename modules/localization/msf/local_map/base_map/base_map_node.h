@@ -31,8 +31,6 @@ namespace msf {
 /**@brief The data structure of a Node in the map. */
 class BaseMapNode {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   /**@brief Construct a map node. */
   BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy);
   /**@brief Destruct a map node. */
@@ -128,6 +126,8 @@ class BaseMapNode {
   //                                                      index);
   static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option,
                                           const MapNodeIndex& index);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
   /**@brief Load the map cell from a binary chunk.

@@ -103,6 +103,7 @@ template <typename PointT>
 class VoxelGridCovariance {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  protected:
   typedef pcl::PointCloud<PointT> PointCloud;
   typedef boost::shared_ptr<PointCloud> PointCloudPtr;

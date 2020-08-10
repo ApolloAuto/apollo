@@ -37,14 +37,14 @@ namespace msf {
 
 class PosesInterpolation {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   PosesInterpolation();
   bool Init(const std::string &input_poses_path,
             const std::string &ref_timestamps_path,
             const std::string &out_poses_path,
             const std::string &extrinsic_path);
   void DoInterpolation();
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   void LoadPCDTimestamp();
