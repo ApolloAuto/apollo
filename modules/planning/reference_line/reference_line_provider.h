@@ -59,7 +59,7 @@ namespace planning {
 class ReferenceLineProvider {
  public:
   ReferenceLineProvider() = default;
-  explicit ReferenceLineProvider(
+  ReferenceLineProvider(
       const common::VehicleStateProvider* vehicle_state_provider,
       const hdmap::HDMap* base_map,
       const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
@@ -84,9 +84,7 @@ class ReferenceLineProvider {
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
 
-  bool UpdatedReferenceLine() {
-    return is_reference_line_updated_.load();
-  }
+  bool UpdatedReferenceLine() { return is_reference_line_updated_.load(); }
 
  private:
   /**

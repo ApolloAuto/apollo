@@ -45,8 +45,8 @@ namespace planning {
 
 class CosThetaIpoptInterface : public Ipopt::TNLP {
  public:
-  explicit CosThetaIpoptInterface(std::vector<std::pair<double, double>> points,
-                                  std::vector<double> bounds);
+  CosThetaIpoptInterface(std::vector<std::pair<double, double>> points,
+                         std::vector<double> bounds);
 
   virtual ~CosThetaIpoptInterface() = default;
 

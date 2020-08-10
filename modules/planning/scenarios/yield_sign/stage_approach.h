@@ -35,9 +35,8 @@ struct YieldSignContext;
 
 class YieldSignStageApproach : public Stage {
  public:
-  explicit YieldSignStageApproach(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  YieldSignStageApproach(const ScenarioConfig::StageConfig& config,
+                         const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:

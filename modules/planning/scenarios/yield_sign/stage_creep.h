@@ -35,9 +35,8 @@ struct YieldSignContext;
 
 class YieldSignStageCreep : public Stage {
  public:
-  explicit YieldSignStageCreep(
-      const ScenarioConfig::StageConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector)
+  YieldSignStageCreep(const ScenarioConfig::StageConfig& config,
+                      const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}
 
  private:

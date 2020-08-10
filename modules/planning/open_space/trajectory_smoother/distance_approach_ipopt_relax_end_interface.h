@@ -57,7 +57,7 @@ namespace planning {
 class DistanceApproachIPOPTRelaxEndInterface
     : public DistanceApproachInterface {
  public:
-  explicit DistanceApproachIPOPTRelaxEndInterface(
+  DistanceApproachIPOPTRelaxEndInterface(
       const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
