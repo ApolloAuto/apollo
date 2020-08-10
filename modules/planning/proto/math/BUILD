@@ -23,6 +23,7 @@ py_proto_library(
         ":fem_pos_deviation_smoother_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "cos_theta_smoother_config_cc_proto",
     deps = [
@@ -41,6 +42,7 @@ py_proto_library(
         ":cos_theta_smoother_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "qp_problem_cc_proto",
     deps = [

@@ -268,7 +268,6 @@ cc_test(
     ],
 )
 
-
 cc_library(
     name = "ultr_sensor_2_508",
     srcs = ["ultr_sensor_2_508.cc"],

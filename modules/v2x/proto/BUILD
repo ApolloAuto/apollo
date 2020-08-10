@@ -40,8 +40,8 @@ proto_library(
     name = "v2x_carstatus_proto",
     srcs = ["v2x_carstatus.proto"],
     deps = [
-        "//modules/localization/proto:localization_proto",
         "//modules/canbus/proto:chassis_detail_proto",
+        "//modules/localization/proto:localization_proto",
     ],
 )
 
@@ -49,8 +49,8 @@ py_proto_library(
     name = "v2x_carstatus_py_pb2",
     deps = [
         ":v2x_carstatus_proto",
-        "//modules/localization/proto:localization_py_pb2",
         "//modules/canbus/proto:chassis_detail_py_pb2",
+        "//modules/localization/proto:localization_py_pb2",
     ],
 )
 
@@ -72,8 +72,8 @@ proto_library(
     name = "v2x_service_obu_to_car_proto",
     srcs = ["v2x_service_obu_to_car.proto"],
     deps = [
-        "//modules/perception/proto:perception_obstacle_proto",
         ":v2x_traffic_light_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
     ],
 )
 
@@ -87,10 +87,11 @@ py_proto_library(
     name = "v2x_service_obu_to_car_py_pb2",
     deps = [
         ":v2x_service_obu_to_car_proto",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
         ":v2x_traffic_light_py_pb2",
+        "//modules/perception/proto:perception_obstacle_py_pb2",
     ],
 )
+
 cc_grpc_library(
     name = "v2x_service_car_to_obu_cc_grpc",
     srcs = [":v2x_service_car_to_obu_proto"],
@@ -109,8 +110,8 @@ proto_library(
     name = "v2x_service_car_to_obu_proto",
     srcs = ["v2x_service_car_to_obu.proto"],
     deps = [
-        "//modules/perception/proto:perception_obstacle_proto",
         ":v2x_carstatus_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
     ],
 )
 
@@ -123,8 +124,8 @@ py_grpc_library(
 py_proto_library(
     name = "v2x_service_car_to_obu_py_pb2",
     deps = [
+        ":v2x_carstatus_py_pb2",
         ":v2x_service_car_to_obu_proto",
         "//modules/perception/proto:perception_obstacle_py_pb2",
-        ":v2x_carstatus_py_pb2",
     ],
 )

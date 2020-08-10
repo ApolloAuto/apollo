@@ -50,4 +50,3 @@ py_proto_library(
         ":velodyne_py_pb2",
     ],
 )
-

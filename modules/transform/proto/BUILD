@@ -23,6 +23,7 @@ py_proto_library(
         ":static_transform_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "transform_cc_proto",
     deps = [
@@ -34,8 +35,8 @@ proto_library(
     name = "transform_proto",
     srcs = ["transform.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -43,8 +44,7 @@ py_proto_library(
     name = "transform_py_pb2",
     deps = [
         ":transform_proto",
-        "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
-

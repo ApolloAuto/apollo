@@ -14,10 +14,10 @@ cc_library(
     srcs = ["audio_info.cc"],
     hdrs = ["audio_info.h"],
     deps = [
+        ":audio_gflags",
         "//modules/audio/proto:audio_cc_proto",
         "//modules/drivers/microphone/proto:audio_cc_proto",
         "//modules/drivers/microphone/proto:microphone_config_cc_proto",
-        ":audio_gflags",
     ],
 )
 

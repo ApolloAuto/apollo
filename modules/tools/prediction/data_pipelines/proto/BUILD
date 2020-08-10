@@ -23,6 +23,7 @@ py_proto_library(
         ":cruise_model_proto",
     ],
 )
+
 cc_proto_library(
     name = "fnn_model_cc_proto",
     deps = [

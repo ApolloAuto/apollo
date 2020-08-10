@@ -54,6 +54,7 @@ py_proto_library(
         ":navigator_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "relative_map_config_cc_proto",
     deps = [

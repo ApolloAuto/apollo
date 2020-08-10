@@ -14,8 +14,8 @@ cc_library(
     srcs = ["direction_detection.cc"],
     hdrs = ["direction_detection.h"],
     deps = [
-        "//third_party:libtorch",
         "//cyber",
+        "//third_party:libtorch",
     ],
 )
 

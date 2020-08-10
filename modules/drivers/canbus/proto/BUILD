@@ -23,6 +23,7 @@ py_proto_library(
         ":can_card_parameter_proto",
     ],
 )
+
 cc_proto_library(
     name = "sensor_canbus_conf_cc_proto",
     deps = [
@@ -41,8 +42,7 @@ proto_library(
 py_proto_library(
     name = "sensor_canbus_conf_py_pb2",
     deps = [
-        ":sensor_canbus_conf_proto",
         ":can_card_parameter_py_pb2",
+        ":sensor_canbus_conf_proto",
     ],
 )
-

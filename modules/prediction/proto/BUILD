@@ -23,8 +23,8 @@ proto_library(
 py_proto_library(
     name = "fnn_vehicle_model_py_pb2",
     deps = [
-        ":fnn_vehicle_model_proto",
         ":fnn_model_base_py_pb2",
+        ":fnn_vehicle_model_proto",
     ],
 )
 
@@ -46,6 +46,7 @@ py_proto_library(
         ":scenario_proto",
     ],
 )
+
 cc_proto_library(
     name = "prediction_point_cc_proto",
     deps = [
@@ -64,6 +65,7 @@ py_proto_library(
         ":prediction_point_proto",
     ],
 )
+
 cc_proto_library(
     name = "network_layers_cc_proto",
     deps = [
@@ -82,6 +84,7 @@ py_proto_library(
         ":network_layers_proto",
     ],
 )
+
 cc_proto_library(
     name = "network_model_cc_proto",
     deps = [
@@ -100,8 +103,8 @@ proto_library(
 py_proto_library(
     name = "network_model_py_pb2",
     deps = [
-        ":network_model_proto",
         ":network_layers_py_pb2",
+        ":network_model_proto",
     ],
 )
 
@@ -116,12 +119,12 @@ proto_library(
     name = "feature_proto",
     srcs = ["feature.proto"],
     deps = [
+        ":lane_graph_proto",
+        ":prediction_point_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_lane_proto",
         "//modules/perception/proto:perception_obstacle_proto",
-        ":lane_graph_proto",
-        ":prediction_point_proto",
     ],
 )
 
@@ -129,12 +132,12 @@ py_proto_library(
     name = "feature_py_pb2",
     deps = [
         ":feature_proto",
+        ":lane_graph_py_pb2",
+        ":prediction_point_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
         "//modules/common/proto:pnc_point_py_pb2",
         "//modules/map/proto:map_lane_py_pb2",
         "//modules/perception/proto:perception_obstacle_py_pb2",
-        ":lane_graph_py_pb2",
-        ":prediction_point_py_pb2",
     ],
 )
 
@@ -176,21 +179,21 @@ proto_library(
     name = "offline_features_proto",
     srcs = ["offline_features.proto"],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
         ":feature_proto",
         ":prediction_conf_proto",
         ":scenario_proto",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 
 py_proto_library(
     name = "offline_features_py_pb2",
     deps = [
-        ":offline_features_proto",
-        "//modules/common/proto:pnc_point_py_pb2",
         ":feature_py_pb2",
+        ":offline_features_proto",
         ":prediction_conf_py_pb2",
         ":scenario_py_pb2",
+        "//modules/common/proto:pnc_point_py_pb2",
     ],
 )
 
@@ -205,17 +208,17 @@ proto_library(
     name = "prediction_conf_proto",
     srcs = ["prediction_conf.proto"],
     deps = [
-        "//modules/perception/proto:perception_obstacle_proto",
         ":feature_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
     ],
 )
 
 py_proto_library(
     name = "prediction_conf_py_pb2",
     deps = [
+        ":feature_py_pb2",
         ":prediction_conf_proto",
         "//modules/perception/proto:perception_obstacle_py_pb2",
-        ":feature_py_pb2",
     ],
 )
 
@@ -237,6 +240,7 @@ py_proto_library(
         ":fnn_model_base_proto",
     ],
 )
+
 cc_proto_library(
     name = "prediction_obstacle_cc_proto",
     deps = [
@@ -248,23 +252,22 @@ proto_library(
     name = "prediction_obstacle_proto",
     srcs = ["prediction_obstacle.proto"],
     deps = [
+        ":feature_proto",
+        ":scenario_proto",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
-        ":scenario_proto",
         "//modules/perception/proto:perception_obstacle_proto",
-        ":feature_proto",
     ],
 )
 
 py_proto_library(
     name = "prediction_obstacle_py_pb2",
     deps = [
+        ":feature_py_pb2",
         ":prediction_obstacle_proto",
+        ":scenario_py_pb2",
         "//modules/common/proto:error_code_py_pb2",
         "//modules/common/proto:header_py_pb2",
-        ":scenario_py_pb2",
         "//modules/perception/proto:perception_obstacle_py_pb2",
-        ":feature_py_pb2",
     ],
 )
-

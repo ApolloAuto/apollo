@@ -46,6 +46,7 @@ py_proto_library(
         ":lattice_structure_proto",
     ],
 )
+
 cc_proto_library(
     name = "decision_cc_proto",
     deps = [
@@ -84,8 +85,8 @@ proto_library(
     name = "planning_status_proto",
     srcs = ["planning_status.proto"],
     deps = [
-        "//modules/common/proto:geometry_proto",
         ":planning_config_proto",
+        "//modules/common/proto:geometry_proto",
         "//modules/routing/proto:routing_proto",
     ],
 )
@@ -93,9 +94,9 @@ proto_library(
 py_proto_library(
     name = "planning_status_py_pb2",
     deps = [
+        ":planning_config_py_pb2",
         ":planning_status_proto",
         "//modules/common/proto:geometry_py_pb2",
-        ":planning_config_py_pb2",
         "//modules/routing/proto:routing_py_pb2",
     ],
 )
@@ -111,8 +112,8 @@ proto_library(
     name = "planner_open_space_config_proto",
     srcs = ["planner_open_space_config.proto"],
     deps = [
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
         ":task_config_proto",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
     ],
 )
 
@@ -120,8 +121,8 @@ py_proto_library(
     name = "planner_open_space_config_py_pb2",
     deps = [
         ":planner_open_space_config_proto",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
         ":task_config_py_pb2",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
     ],
 )
 
@@ -143,6 +144,7 @@ py_proto_library(
         ":auto_tuning_model_input_proto",
     ],
 )
+
 cc_proto_library(
     name = "planning_semantic_map_config_cc_proto",
     deps = [
@@ -161,6 +163,7 @@ py_proto_library(
         ":planning_semantic_map_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "traffic_rule_config_cc_proto",
     deps = [
@@ -179,6 +182,7 @@ py_proto_library(
         ":traffic_rule_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "planning_stats_cc_proto",
     deps = [
@@ -197,6 +201,7 @@ py_proto_library(
         ":planning_stats_proto",
     ],
 )
+
 cc_proto_library(
     name = "open_space_task_config_cc_proto",
     deps = [
@@ -263,6 +268,7 @@ py_proto_library(
         ":task_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "learning_data_cc_proto",
     deps = [
@@ -280,9 +286,9 @@ proto_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_lane_proto",
         "//modules/perception/proto:perception_obstacle_proto",
+        "//modules/perception/proto:traffic_light_detection_proto",
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:prediction_obstacle_proto",
-        "//modules/perception/proto:traffic_light_detection_proto",
         "//modules/routing/proto:routing_proto",
     ],
 )
@@ -296,9 +302,9 @@ py_proto_library(
         "//modules/common/proto:pnc_point_py_pb2",
         "//modules/map/proto:map_lane_py_pb2",
         "//modules/perception/proto:perception_obstacle_py_pb2",
+        "//modules/perception/proto:traffic_light_detection_py_pb2",
         "//modules/prediction/proto:feature_py_pb2",
         "//modules/prediction/proto:prediction_obstacle_py_pb2",
-        "//modules/perception/proto:traffic_light_detection_py_pb2",
         "//modules/routing/proto:routing_py_pb2",
     ],
 )
@@ -314,20 +320,22 @@ proto_library(
     name = "planning_proto",
     srcs = ["planning.proto"],
     deps = [
+        ":decision_proto",
+        ":planning_internal_proto",
         "//modules/canbus/proto:chassis_proto",
         "//modules/common/proto:drive_state_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/proto:map_id_proto",
-        ":decision_proto",
-        ":planning_internal_proto",
     ],
 )
 
 py_proto_library(
     name = "planning_py_pb2",
     deps = [
+        ":decision_py_pb2",
+        ":planning_internal_py_pb2",
         ":planning_proto",
         "//modules/canbus/proto:chassis_py_pb2",
         "//modules/common/proto:drive_state_py_pb2",
@@ -335,8 +343,6 @@ py_proto_library(
         "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:pnc_point_py_pb2",
         "//modules/map/proto:map_id_py_pb2",
-        ":decision_py_pb2",
-        ":planning_internal_py_pb2",
     ],
 )
 
@@ -351,37 +357,37 @@ proto_library(
     name = "planning_internal_proto",
     srcs = ["planning_internal.proto"],
     deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/dreamview/proto:chart_proto",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/routing/proto:routing_proto",
-        "//modules/perception/proto:traffic_light_detection_proto",
-        ":sl_boundary_proto",
         ":decision_proto",
         ":planning_config_proto",
+        ":sl_boundary_proto",
+        "//modules/canbus/proto:chassis_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/dreamview/proto:chart_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/map/relative_map/proto:navigation_proto",
+        "//modules/perception/proto:traffic_light_detection_proto",
+        "//modules/routing/proto:routing_proto",
     ],
 )
 
 py_proto_library(
     name = "planning_internal_py_pb2",
     deps = [
-        ":planning_internal_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/dreamview/proto:chart_py_pb2",
-        "//modules/map/relative_map/proto:navigation_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
-        "//modules/perception/proto:traffic_light_detection_py_pb2",
-        ":sl_boundary_py_pb2",
         ":decision_py_pb2",
         ":planning_config_py_pb2",
+        ":planning_internal_proto",
+        ":sl_boundary_py_pb2",
+        "//modules/canbus/proto:chassis_py_pb2",
+        "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
+        "//modules/common/proto:pnc_point_py_pb2",
+        "//modules/dreamview/proto:chart_py_pb2",
+        "//modules/localization/proto:localization_py_pb2",
+        "//modules/map/relative_map/proto:navigation_py_pb2",
+        "//modules/perception/proto:traffic_light_detection_py_pb2",
+        "//modules/routing/proto:routing_py_pb2",
     ],
 )
 
@@ -404,8 +410,8 @@ proto_library(
 py_proto_library(
     name = "planning_config_py_pb2",
     deps = [
-        ":planning_config_proto",
         ":open_space_task_config_py_pb2",
+        ":planning_config_proto",
         ":task_config_py_pb2",
     ],
 )
@@ -474,6 +480,7 @@ py_proto_library(
         ":ipopt_return_status_proto",
     ],
 )
+
 cc_proto_library(
     name = "st_drivable_boundary_cc_proto",
     deps = [
