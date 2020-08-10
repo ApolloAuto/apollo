@@ -50,6 +50,8 @@ class LocalizationLidarProcess;
 
 class LocalizationIntegImpl {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   LocalizationIntegImpl();
   ~LocalizationIntegImpl();
   // Initialization.

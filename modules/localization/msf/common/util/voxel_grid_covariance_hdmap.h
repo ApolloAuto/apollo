@@ -104,6 +104,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
   typedef boost::shared_ptr<const pcl::VoxelGrid<PointT>> ConstPtr;
 
   struct Leaf {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Leaf()
         : nr_points_(0),
           mean_(Eigen::Vector3d::Zero()),

@@ -33,6 +33,8 @@ namespace msf {
 /**@brief The data structure of a single ndt map cell. */
 class NdtMapSingleCell {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   /**@brief The default constructor. */
   NdtMapSingleCell();
   /**@brief Reset to default value. */
