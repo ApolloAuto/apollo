@@ -16,6 +16,7 @@
 
 #include "modules/planning/common/message_process.h"
 
+#include <algorithm>
 #include <cmath>
 #include <memory>
 #include <sstream>
@@ -401,8 +402,8 @@ void MessageProcess::ProcessOfflineData(const std::string& record_file) {
   }
 }
 
-bool MessageProcess::GetADCCurrentRoutingIndex(int* road_index,
-                                               double* road_s) {
+bool MessageProcess::GetADCCurrentRoutingIndex(
+    int* adc_road_index, int* adc_passage_index, double* adc_passage_s) {
   if (localizations_.empty()) return false;
 
   static constexpr double kRadius = 4.0;
@@ -413,7 +414,7 @@ bool MessageProcess::GetADCCurrentRoutingIndex(int* road_index,
 
   for (auto& lane : lanes) {
     for (int i = 0; i < routing_response_.road_size(); ++i) {
-      *road_s = 0;
+      *adc_passage_s = 0;
       for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
         double passage_s = 0;
         for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
@@ -421,8 +422,9 @@ bool MessageProcess::GetADCCurrentRoutingIndex(int* road_index,
           const auto& segment = routing_response_.road(i).passage(j).segment(k);
           passage_s += (segment.end_s() - segment.start_s());
           if (lane->id().id() == segment.id()) {
-            *road_index = i;
-            *road_s += passage_s;
+            *adc_road_index = i;
+            *adc_passage_index = j;
+            *adc_passage_s = passage_s;
             return true;
           }
         }
@@ -624,9 +626,13 @@ void MessageProcess::GenerateObstacleFeature(
   }
 }
 
-bool MessageProcess::GenerateLocalRoutingPassages(
-    std::vector<std::vector<std::pair<std::string, double>>>*
-        local_routing_passages) {
+bool MessageProcess::GenerateLocalRouting(
+    const int frame_num,
+    RoutingResponseFeature* local_routing,
+    std::vector<std::string>* local_routing_lane_ids) {
+  local_routing->Clear();
+  local_routing_lane_ids->clear();
+
   if (routing_response_.road_size() == 0 ||
       routing_response_.road(0).passage_size() == 0 ||
       routing_response_.road(0).passage(0).segment_size() == 0) {
@@ -638,7 +644,7 @@ bool MessageProcess::GenerateLocalRoutingPassages(
   for (int i = 0; i < routing_response_.road_size(); ++i) {
     ADEBUG << "road_id[" << routing_response_.road(i).id() << "] passage_size["
            << routing_response_.road(i).passage_size() << "]";
-    double road_length = 0;
+    double road_length = 0.0;
     for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
       ADEBUG << "   passage: segment_size["
              << routing_response_.road(i).passage(j).segment_size() << "]";
@@ -649,10 +655,9 @@ bool MessageProcess::GenerateLocalRoutingPassages(
         passage_length += (segment.end_s() - segment.start_s());
       }
       ADEBUG << "      passage_length[" << passage_length << "]";
-      if (j == 0) {
-        road_length += passage_length;
-      }
+      road_length = std::max(road_length, passage_length);
     }
+
     road_lengths.push_back(
         std::make_pair(routing_response_.road(i).id(), road_length));
     ADEBUG << "   road_length[" << road_length << "]";
@@ -665,12 +670,16 @@ bool MessageProcess::GenerateLocalRoutingPassages(
   }
   */
 
-  int road_index;
-  double road_s;
-  if (!GetADCCurrentRoutingIndex(&road_index, &road_s) || road_index < 0 ||
-      road_s < 0) {
+  int adc_road_index;
+  int adc_passage_index;
+  double adc_passage_s;
+  if (!GetADCCurrentRoutingIndex(&adc_road_index, &adc_passage_index,
+                                 &adc_passage_s) ||
+      adc_road_index < 0 || adc_passage_index < 0 || adc_passage_s < 0) {
     return false;
   }
+  ADEBUG << "adc_road_index[" << adc_road_index << "] adc_passage_index["
+         << adc_passage_index << "] adc_passage_s[" << adc_passage_s << "]";
 
   constexpr double kLocalRoutingForwardLength = 200.0;
   constexpr double kLocalRoutingBackwardLength = 100.0;
@@ -679,14 +688,18 @@ bool MessageProcess::GenerateLocalRoutingPassages(
   int local_routing_start_road_index = 0;
   double local_routing_start_road_s = 0;
   double backward_length = kLocalRoutingBackwardLength;
-  for (int i = road_index; i >= 0; --i) {
+  for (int i = adc_road_index; i >= 0; --i) {
     const double road_length =
-        (i == road_index ? road_s : road_lengths[i].second);
+        (i == adc_road_index ? adc_passage_s : road_lengths[i].second);
     if (backward_length > road_length) {
       backward_length -= road_length;
     } else {
       local_routing_start_road_index = i;
       local_routing_start_road_s = road_length - backward_length;
+      ADEBUG << "local_routing_start_road_index["
+             << local_routing_start_road_index
+             << "] local_routing_start_road_s["
+             << local_routing_start_road_s << "]";
       break;
     }
   }
@@ -696,16 +709,20 @@ bool MessageProcess::GenerateLocalRoutingPassages(
   double local_routing_end_road_s =
       road_lengths[local_routing_end_road_index].second;
   double forwardward_length = kLocalRoutingForwardLength;
-  for (int i = road_index; i < routing_response_.road_size(); ++i) {
+  for (int i = adc_road_index; i < routing_response_.road_size(); ++i) {
     const double road_length =
-        (i == road_index ? road_lengths[i].second - road_s
-                         : road_lengths[i].second);
+        (i == adc_road_index ? road_lengths[i].second - adc_passage_s
+                             : road_lengths[i].second);
     if (forwardward_length > road_length) {
       forwardward_length -= road_length;
     } else {
       local_routing_end_road_index = i;
       local_routing_end_road_s =
-          (i == road_index ? road_s + forwardward_length : forwardward_length);
+          (i == adc_road_index ? adc_passage_s + forwardward_length
+                               : forwardward_length);
+      ADEBUG << "local_routing_end_road_index[" << local_routing_end_road_index
+             << "] local_routing_end_road_s["
+             << local_routing_end_road_s << "]";
       break;
     }
   }
@@ -715,64 +732,89 @@ bool MessageProcess::GenerateLocalRoutingPassages(
          << "] end_road_index[" << local_routing_end_road_index
          << "] end_road_s[" << local_routing_end_road_s << "]";
 
-  // init with passage(s) at local_routing_start_road_index + start_road_s
-  std::vector<std::pair<std::string, double>> local_routing_passage;
-  const auto road = routing_response_.road(local_routing_start_road_index);
-  for (int i = 0; i < road.passage_size(); ++i) {
-    double road_s = 0.0;
-    for (int j = 0; j < road.passage(i).segment_size(); ++j) {
-      const auto& segment = road.passage(i).segment(j);
-      road_s += (segment.end_s() - segment.start_s());
-      if (road_s >= local_routing_start_road_s) {
-        ADEBUG << "INIT: passage[" << i << "] seg[" << j << "] road_s["
-               << road_s << "] id[" << segment.id() << "] length["
-               << segment.end_s() - segment.start_s() << "]";
-        local_routing_passage.push_back(
-            std::make_pair(segment.id(), segment.end_s() - segment.start_s()));
-      }
-      if (road_s > local_routing_end_road_s) {
-        break;
-      }
-    }
-    local_routing_passages->push_back(local_routing_passage);
-  }
-
   bool local_routing_end = false;
-  for (int i = local_routing_start_road_index + 1;
+  int last_passage_index = adc_passage_index;
+  for (int i = local_routing_start_road_index;
        i <= local_routing_end_road_index; ++i) {
     if (local_routing_end) break;
 
-    // grow local_routing_passages
-    const size_t local_routing_passages_size = local_routing_passages->size();
-    for (int j = 1; j < routing_response_.road(i).passage_size(); ++j) {
-      for (size_t p = 0; p < local_routing_passages_size; ++p) {
-        ADEBUG << "GROW: passage[" << j << "]";
-        local_routing_passages->push_back((*local_routing_passages)[p]);
-      }
-    }
+    const auto& road = routing_response_.road(i);
+    auto local_routing_road = local_routing->add_road();
+    local_routing_road->set_id(road.id());
 
-    for (int j = 0; j < routing_response_.road(i).passage_size(); ++j) {
+    for (int j = 0; j < road.passage_size(); ++j) {
+      const auto& passage = road.passage(j);
+      auto local_routing_passage = local_routing_road->add_passage();
+      local_routing_passage->set_can_exit(passage.can_exit());
+      local_routing_passage->set_change_lane_type(passage.change_lane_type());
+
       double road_s = 0;
-      for (int k = 0; k < routing_response_.road(i).passage(j).segment_size();
-           ++k) {
-        const auto& lane_segment =
-            routing_response_.road(i).passage(j).segment(k);
+      for (int k = 0; k < passage.segment_size(); ++k) {
+        const auto& lane_segment = passage.segment(k);
         road_s += (lane_segment.end_s() - lane_segment.start_s());
 
-        // cut off last road based on local_routing_end_road_s
+        // first road
+        if (i == local_routing_start_road_index &&
+            road_s < local_routing_start_road_s) {
+          continue;
+        }
+
+        local_routing_passage->add_segment()->CopyFrom(lane_segment);
+        ADEBUG << "ADD road[" << i << "] id[" << road.id() << "] passage[" << j
+               << "] id[" << lane_segment.id() << "] length["
+               << lane_segment.end_s() - lane_segment.start_s() << "]";
+
+        // set local_routing_lane_ids
+        if (i == adc_road_index) {
+          // adc_road_index, pick the passage where ADC is
+          if (j == adc_passage_index) {
+            local_routing_lane_ids->push_back(lane_segment.id());
+            ADEBUG << "ADD local_routing_lane_ids: road[" << i
+                   << "] passage[" << j << "]: " << lane_segment.id();
+            last_passage_index = j;
+          }
+        } else {
+          if (road.passage_size() == 1) {
+            // single passage
+            ADEBUG << "ADD local_routing_lane_ids: road[" << i
+                   << "] passage[" << j << "]: " << lane_segment.id();
+            local_routing_lane_ids->push_back(lane_segment.id());
+            last_passage_index = j;
+          } else {
+            // multi passages
+            if (i < adc_road_index) {
+              // road behind ADC position
+              if (j == adc_passage_index ||
+                  (j == road.passage_size() - 1 &&
+                  j < adc_passage_index)) {
+                ADEBUG << "ADD local_routing_lane_ids: road[" << i
+                       << "] passage[" << j << "] adc_passage_index["
+                       << adc_passage_index << "] passage_size["
+                       << road.passage_size() << "]: " << lane_segment.id();
+                local_routing_lane_ids->push_back(lane_segment.id());
+              }
+            } else {
+              // road in front of ADC position:
+              // pick the passage towards change-left
+              if (j == last_passage_index + 1 ||
+                  (j == road.passage_size() - 1 &&
+                  j < last_passage_index + 1)) {
+                ADEBUG << "ADD local_routing_lane_ids: road[" << i
+                       << "] passage[" << j << "] last_passage_index["
+                       << last_passage_index << "] passage_size["
+                       << road.passage_size() << "]: " << lane_segment.id();
+                local_routing_lane_ids->push_back(lane_segment.id());
+                last_passage_index = j;
+              }
+            }
+          }
+        }
+
+        // last road
         if (i == local_routing_end_road_index &&
             road_s >= local_routing_end_road_s) {
           local_routing_end = true;
           break;
-        }
-
-        for (auto& routing_passage : *local_routing_passages) {
-          ADEBUG << "ADD road[" << j << "] passage[" << k << "] id["
-                 << lane_segment.id() << "] length["
-                 << lane_segment.end_s() - lane_segment.start_s();
-          routing_passage.push_back(
-              std::make_pair(lane_segment.id(),
-                             lane_segment.end_s() - lane_segment.start_s()));
         }
       }
     }
@@ -806,13 +848,13 @@ void MessageProcess::GenerateRoutingFeature(
         routing_response_.road(i));
   }
 
-  std::vector<std::vector<std::pair<std::string, double>>>
-      local_routing_passages;
-  if (!GenerateLocalRoutingPassages(&local_routing_passages) ||
-      local_routing_passages.empty()) {
+  const int frame_num = learning_data_frame->frame_num();
+  RoutingResponseFeature local_routing;
+  std::vector<std::string> local_routing_lane_ids;
+  if (!GenerateLocalRouting(frame_num, &local_routing,
+                            &local_routing_lane_ids)) {
     std::ostringstream msg;
-    msg << "failed generate local_routing. frame_num["
-        << learning_data_frame->frame_num() << "]";
+    msg << "failed generate local_routing. frame_num[" << frame_num << "]";
     AERROR << msg.str();
     if (FLAGS_planning_offline_learning) {
       log_file_ << msg.str() << std::endl;
@@ -820,15 +862,31 @@ void MessageProcess::GenerateRoutingFeature(
     return;
   }
 
-  // NOTE:
-  // serialize into one-dimension vector to output for now
-  // but we do have two-dimention vector support routing with paralle pasages
-  for (const auto& passage : local_routing_passages) {
-    for (const auto& lane_segment : passage) {
-      routing->add_local_routing_lane_id(lane_segment.first);
+  for (const auto& lane_id : local_routing_lane_ids) {
+    routing->add_local_routing_lane_id(lane_id);
+  }
+  routing->mutable_local_routing()->CopyFrom(local_routing);
+
+  const int local_routing_lane_id_size = routing->local_routing_lane_id_size();
+  if (local_routing_lane_id_size == 0) {
+    std::ostringstream msg;
+    msg << "empty local_routing. frame_num[" << frame_num << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_offline_learning) {
+      log_file_ << msg.str() << std::endl;
     }
   }
-  ADEBUG << "local_routing: frame_num[" << learning_data_frame->frame_num()
+  if (local_routing_lane_id_size > 100) {
+    std::ostringstream msg;
+    msg << "LARGE local_routing. frame_num[" << frame_num
+        << "] local_routing_lane_id_size[" << local_routing_lane_id_size
+        << "]";
+    AERROR << msg.str();
+    if (FLAGS_planning_offline_learning) {
+      log_file_ << msg.str() << std::endl;
+    }
+  }
+  ADEBUG << "local_routing: frame_num[" << frame_num
          << "] size[" << routing->local_routing_lane_id_size() << "]";
 }
 

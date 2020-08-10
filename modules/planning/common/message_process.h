@@ -81,7 +81,8 @@ class MessageProcess {
 
   apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
       const apollo::common::PointENU& position);
-  bool GetADCCurrentRoutingIndex(int* road_index, double* road_s);
+  bool GetADCCurrentRoutingIndex(int* adc_road_index, int* adc_passage_index,
+                                 double* adc_passage_s);
 
   int GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
@@ -95,9 +96,10 @@ class MessageProcess {
 
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
-  bool GenerateLocalRoutingPassages(
-      std::vector<std::vector<std::pair<std::string, double>>>*
-          local_routing_passages);
+  bool GenerateLocalRouting(
+      const int frame_num,
+      RoutingResponseFeature* local_routing,
+      std::vector<std::string>* local_routing_lane_ids);
 
   void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
 
