@@ -16,17 +16,17 @@ proto_library(
     name = "map_stop_sign_proto",
     srcs = ["map_stop_sign.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_stop_sign_py_pb2",
     deps = [
-        ":map_stop_sign_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_stop_sign_proto",
     ],
 )
 
@@ -41,17 +41,17 @@ proto_library(
     name = "map_junction_proto",
     srcs = ["map_junction.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_junction_py_pb2",
     deps = [
-        ":map_junction_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_junction_proto",
     ],
 )
 
@@ -73,6 +73,7 @@ py_proto_library(
         ":map_id_proto",
     ],
 )
+
 cc_proto_library(
     name = "map_pnc_junction_cc_proto",
     deps = [
@@ -84,17 +85,17 @@ proto_library(
     name = "map_pnc_junction_proto",
     srcs = ["map_pnc_junction.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_pnc_junction_py_pb2",
     deps = [
-        ":map_pnc_junction_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_pnc_junction_proto",
     ],
 )
 
@@ -117,9 +118,9 @@ proto_library(
 py_proto_library(
     name = "map_road_py_pb2",
     deps = [
-        ":map_road_proto",
         ":map_geometry_py_pb2",
         ":map_id_py_pb2",
+        ":map_road_proto",
     ],
 )
 
@@ -142,9 +143,9 @@ proto_library(
 py_proto_library(
     name = "map_parking_space_py_pb2",
     deps = [
-        ":map_parking_space_proto",
         ":map_geometry_py_pb2",
         ":map_id_py_pb2",
+        ":map_parking_space_proto",
     ],
 )
 
@@ -159,17 +160,17 @@ proto_library(
     name = "map_speed_bump_proto",
     srcs = ["map_speed_bump.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_speed_bump_py_pb2",
     deps = [
-        ":map_speed_bump_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_speed_bump_proto",
     ],
 )
 
@@ -184,19 +185,19 @@ proto_library(
     name = "map_signal_proto",
     srcs = ["map_signal.proto"],
     deps = [
-        "//modules/common/proto:geometry_proto",
         ":map_geometry_proto",
         ":map_id_proto",
+        "//modules/common/proto:geometry_proto",
     ],
 )
 
 py_proto_library(
     name = "map_signal_py_pb2",
     deps = [
-        ":map_signal_proto",
-        "//modules/common/proto:geometry_py_pb2",
         ":map_geometry_py_pb2",
         ":map_id_py_pb2",
+        ":map_signal_proto",
+        "//modules/common/proto:geometry_py_pb2",
     ],
 )
 
@@ -211,17 +212,17 @@ proto_library(
     name = "map_yield_sign_proto",
     srcs = ["map_yield_sign.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_yield_sign_py_pb2",
     deps = [
-        ":map_yield_sign_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_yield_sign_proto",
     ],
 )
 
@@ -236,8 +237,8 @@ proto_library(
     name = "map_clear_area_proto",
     srcs = ["map_clear_area.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
@@ -245,8 +246,8 @@ py_proto_library(
     name = "map_clear_area_py_pb2",
     deps = [
         ":map_clear_area_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
     ],
 )
 
@@ -286,17 +287,17 @@ proto_library(
     name = "map_overlap_proto",
     srcs = ["map_overlap.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_overlap_py_pb2",
     deps = [
-        ":map_overlap_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_overlap_proto",
     ],
 )
 
@@ -311,17 +312,17 @@ proto_library(
     name = "map_lane_proto",
     srcs = ["map_lane.proto"],
     deps = [
-        ":map_id_proto",
         ":map_geometry_proto",
+        ":map_id_proto",
     ],
 )
 
 py_proto_library(
     name = "map_lane_py_pb2",
     deps = [
-        ":map_lane_proto",
-        ":map_id_py_pb2",
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_lane_proto",
     ],
 )
 
@@ -366,8 +367,8 @@ proto_library(
 py_proto_library(
     name = "map_speed_control_py_pb2",
     deps = [
-        ":map_speed_control_proto",
         ":map_geometry_py_pb2",
+        ":map_speed_control_proto",
     ],
 )
 
@@ -387,32 +388,31 @@ proto_library(
         ":map_junction_proto",
         ":map_lane_proto",
         ":map_overlap_proto",
+        ":map_parking_space_proto",
+        ":map_pnc_junction_proto",
+        ":map_road_proto",
         ":map_signal_proto",
         ":map_speed_bump_proto",
         ":map_stop_sign_proto",
         ":map_yield_sign_proto",
-        ":map_road_proto",
-        ":map_parking_space_proto",
-        ":map_pnc_junction_proto",
     ],
 )
 
 py_proto_library(
     name = "map_py_pb2",
     deps = [
-        ":map_proto",
         ":map_clear_area_py_pb2",
         ":map_crosswalk_py_pb2",
         ":map_junction_py_pb2",
         ":map_lane_py_pb2",
         ":map_overlap_py_pb2",
+        ":map_parking_space_py_pb2",
+        ":map_pnc_junction_py_pb2",
+        ":map_proto",
+        ":map_road_py_pb2",
         ":map_signal_py_pb2",
         ":map_speed_bump_py_pb2",
         ":map_stop_sign_py_pb2",
         ":map_yield_sign_py_pb2",
-        ":map_road_py_pb2",
-        ":map_parking_space_py_pb2",
-        ":map_pnc_junction_py_pb2",
     ],
 )
-

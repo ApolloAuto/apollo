@@ -34,12 +34,11 @@ cc_library(
     hdrs = ["devkit_message_manager.h"],
     deps = [
         "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/devkit/protocol:canbus_devkit_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/canbus/vehicle/devkit/protocol:canbus_devkit_protocol",
     ],
 )
-
 
 cc_test(
     name = "devkit_message_manager_test",

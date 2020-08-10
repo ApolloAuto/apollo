@@ -62,8 +62,8 @@ proto_library(
     name = "imu_proto",
     srcs = ["imu.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -71,8 +71,8 @@ py_proto_library(
     name = "imu_py_pb2",
     deps = [
         ":imu_proto",
-        "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
 
@@ -117,6 +117,7 @@ py_proto_library(
         ":config_proto",
     ],
 )
+
 cc_proto_library(
     name = "gnss_raw_observation_cc_proto",
     deps = [
@@ -135,6 +136,7 @@ py_proto_library(
         ":gnss_raw_observation_proto",
     ],
 )
+
 cc_proto_library(
     name = "gnss_cc_proto",
     deps = [
@@ -146,8 +148,8 @@ proto_library(
     name = "gnss_proto",
     srcs = ["gnss.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -155,8 +157,8 @@ py_proto_library(
     name = "gnss_py_pb2",
     deps = [
         ":gnss_proto",
-        "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
 
@@ -171,8 +173,8 @@ proto_library(
     name = "ins_proto",
     srcs = ["ins.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -180,8 +182,7 @@ py_proto_library(
     name = "ins_py_pb2",
     deps = [
         ":ins_proto",
-        "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
-

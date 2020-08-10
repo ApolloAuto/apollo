@@ -69,6 +69,7 @@ py_proto_library(
         ":routing_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "routing_cc_proto",
     deps = [
@@ -80,9 +81,9 @@ proto_library(
     name = "routing_proto",
     srcs = ["routing.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:geometry_proto",
         "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
         "//modules/map/proto:map_parking_space_proto",
     ],
 )
@@ -91,10 +92,9 @@ py_proto_library(
     name = "routing_py_pb2",
     deps = [
         ":routing_proto",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
         "//modules/common/proto:error_code_py_pb2",
+        "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
         "//modules/map/proto:map_parking_space_py_pb2",
     ],
 )
-

@@ -205,8 +205,8 @@ proto_library(
     srcs = ["radar.proto"],
     deps = [
         "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:header_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -215,8 +215,7 @@ py_proto_library(
     deps = [
         ":radar_proto",
         "//modules/common/proto:error_code_py_pb2",
-        "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
-

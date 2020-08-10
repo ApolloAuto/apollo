@@ -29,4 +29,3 @@ py_proto_library(
         "//modules/localization/proto:pose_py_pb2",
     ],
 )
-

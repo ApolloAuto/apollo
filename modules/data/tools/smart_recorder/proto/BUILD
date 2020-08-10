@@ -23,6 +23,7 @@ py_proto_library(
         ":smart_recorder_triggers_proto",
     ],
 )
+
 cc_proto_library(
     name = "smart_recorder_status_cc_proto",
     deps = [
@@ -45,4 +46,3 @@ py_proto_library(
         "//modules/common/proto:header_py_pb2",
     ],
 )
-

@@ -23,6 +23,7 @@ py_proto_library(
         ":trafficlights_perception_component_proto",
     ],
 )
+
 cc_proto_library(
     name = "radar_component_config_cc_proto",
     deps = [
@@ -41,6 +42,7 @@ py_proto_library(
         ":radar_component_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "fusion_camera_detection_component_cc_proto",
     deps = [
@@ -59,6 +61,7 @@ py_proto_library(
         ":fusion_camera_detection_component_proto",
     ],
 )
+
 cc_proto_library(
     name = "lane_perception_component_cc_proto",
     deps = [
@@ -77,6 +80,7 @@ py_proto_library(
         ":lane_perception_component_proto",
     ],
 )
+
 cc_proto_library(
     name = "motion_service_cc_proto",
     deps = [
@@ -95,6 +99,7 @@ py_proto_library(
         ":motion_service_proto",
     ],
 )
+
 cc_proto_library(
     name = "lidar_component_config_cc_proto",
     deps = [
@@ -113,6 +118,7 @@ py_proto_library(
         ":lidar_component_config_proto",
     ],
 )
+
 cc_proto_library(
     name = "fusion_component_config_cc_proto",
     deps = [

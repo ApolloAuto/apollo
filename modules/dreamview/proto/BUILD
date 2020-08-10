@@ -23,6 +23,7 @@ py_proto_library(
         ":hmi_mode_proto",
     ],
 )
+
 cc_proto_library(
     name = "point_cloud_cc_proto",
     deps = [
@@ -41,6 +42,7 @@ py_proto_library(
         ":point_cloud_proto",
     ],
 )
+
 cc_proto_library(
     name = "camera_update_cc_proto",
     deps = [
@@ -59,6 +61,7 @@ py_proto_library(
         ":camera_update_proto",
     ],
 )
+
 cc_proto_library(
     name = "data_collection_table_cc_proto",
     deps = [
@@ -77,6 +80,7 @@ py_proto_library(
         ":data_collection_table_proto",
     ],
 )
+
 cc_proto_library(
     name = "simulation_world_cc_proto",
     deps = [

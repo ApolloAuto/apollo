@@ -23,6 +23,7 @@ py_proto_library(
         ":guardian_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "guardian_cc_proto",
     deps = [
@@ -47,4 +48,3 @@ py_proto_library(
         "//modules/control/proto:control_cmd_py_pb2",
     ],
 )
-

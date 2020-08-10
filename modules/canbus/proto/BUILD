@@ -23,6 +23,7 @@ py_proto_library(
         ":devkit_proto",
     ],
 )
+
 cc_proto_library(
     name = "chassis_cc_proto",
     deps = [
@@ -34,11 +35,11 @@ proto_library(
     name = "chassis_proto",
     srcs = ["chassis.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:vehicle_signal_proto",
+        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:drive_state_proto",
         "//modules/common/proto:geometry_proto",
-        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/common/proto:vehicle_signal_proto",
     ],
 )
 
@@ -46,11 +47,11 @@ py_proto_library(
     name = "chassis_py_pb2",
     deps = [
         ":chassis_proto",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:vehicle_signal_py_pb2",
+        "//modules/common/configs/proto:vehicle_config_py_pb2",
         "//modules/common/proto:drive_state_py_pb2",
         "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/common/proto:header_py_pb2",
+        "//modules/common/proto:vehicle_signal_py_pb2",
     ],
 )
 
@@ -72,6 +73,7 @@ py_proto_library(
         ":ch_proto",
     ],
 )
+
 cc_proto_library(
     name = "zhongyun_cc_proto",
     deps = [
@@ -90,6 +92,7 @@ py_proto_library(
         ":zhongyun_proto",
     ],
 )
+
 cc_proto_library(
     name = "vehicle_parameter_cc_proto",
     deps = [
@@ -109,8 +112,8 @@ proto_library(
 py_proto_library(
     name = "vehicle_parameter_py_pb2",
     deps = [
-        ":vehicle_parameter_proto",
         ":chassis_py_pb2",
+        ":vehicle_parameter_proto",
         "//modules/common/configs/proto:vehicle_config_py_pb2",
     ],
 )
@@ -133,6 +136,7 @@ py_proto_library(
         ":lexus_proto",
     ],
 )
+
 cc_proto_library(
     name = "wey_cc_proto",
     deps = [
@@ -151,6 +155,7 @@ py_proto_library(
         ":wey_proto",
     ],
 )
+
 cc_proto_library(
     name = "canbus_conf_cc_proto",
     deps = [
@@ -162,8 +167,8 @@ proto_library(
     name = "canbus_conf_proto",
     srcs = ["canbus_conf.proto"],
     deps = [
-        "//modules/drivers/canbus/proto:can_card_parameter_proto",
         ":vehicle_parameter_proto",
+        "//modules/drivers/canbus/proto:can_card_parameter_proto",
     ],
 )
 
@@ -171,8 +176,8 @@ py_proto_library(
     name = "canbus_conf_py_pb2",
     deps = [
         ":canbus_conf_proto",
-        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
         ":vehicle_parameter_py_pb2",
+        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
     ],
 )
 
@@ -194,6 +199,7 @@ py_proto_library(
         ":transit_proto",
     ],
 )
+
 cc_proto_library(
     name = "ge3_cc_proto",
     deps = [
@@ -212,6 +218,7 @@ py_proto_library(
         ":ge3_proto",
     ],
 )
+
 cc_proto_library(
     name = "chassis_detail_cc_proto",
     deps = [
@@ -223,31 +230,30 @@ proto_library(
     name = "chassis_detail_proto",
     srcs = ["chassis_detail.proto"],
     deps = [
-        "//modules/common/configs/proto:vehicle_config_proto",
-        ":chassis_proto",
         ":ch_proto",
+        ":chassis_proto",
         ":devkit_proto",
         ":ge3_proto",
         ":lexus_proto",
         ":transit_proto",
         ":wey_proto",
         ":zhongyun_proto",
+        "//modules/common/configs/proto:vehicle_config_proto",
     ],
 )
 
 py_proto_library(
     name = "chassis_detail_py_pb2",
     deps = [
-        ":chassis_detail_proto",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
-        ":chassis_py_pb2",
         ":ch_py_pb2",
+        ":chassis_detail_proto",
+        ":chassis_py_pb2",
         ":devkit_py_pb2",
         ":ge3_py_pb2",
         ":lexus_py_pb2",
         ":transit_py_pb2",
         ":wey_py_pb2",
         ":zhongyun_py_pb2",
+        "//modules/common/configs/proto:vehicle_config_py_pb2",
     ],
 )
-

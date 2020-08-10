@@ -37,10 +37,11 @@ py_grpc_library(
 py_proto_library(
     name = "collection_service_py_pb2",
     deps = [
-        ":collection_service_proto",
         ":collection_check_message_py_pb2",
+        ":collection_service_proto",
     ],
 )
+
 cc_proto_library(
     name = "collection_check_message_cc_proto",
     deps = [

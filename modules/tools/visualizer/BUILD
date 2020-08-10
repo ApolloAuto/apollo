@@ -31,12 +31,12 @@ qt_cc_library(
     srcs = glob(
         ["*.cc"],
     ),
-    copts = [
-        "-Iexternal/qt",
-    ],
     hdrs = glob([
         "*.h",
     ]),
+    copts = [
+        "-Iexternal/qt",
+    ],
     includes = [
         ".",
     ],

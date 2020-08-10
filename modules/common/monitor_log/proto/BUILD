@@ -27,4 +27,3 @@ py_proto_library(
         "//modules/common/proto:header_py_pb2",
     ],
 )
-

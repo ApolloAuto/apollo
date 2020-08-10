@@ -23,6 +23,7 @@ py_proto_library(
         ":drive_state_proto",
     ],
 )
+
 cc_proto_library(
     name = "pnc_point_cc_proto",
     deps = [
@@ -41,6 +42,7 @@ py_proto_library(
         ":pnc_point_proto",
     ],
 )
+
 cc_proto_library(
     name = "geometry_cc_proto",
     deps = [
@@ -59,6 +61,7 @@ py_proto_library(
         ":geometry_proto",
     ],
 )
+
 cc_proto_library(
     name = "header_cc_proto",
     deps = [
@@ -77,8 +80,8 @@ proto_library(
 py_proto_library(
     name = "header_py_pb2",
     deps = [
-        ":header_proto",
         ":error_code_py_pb2",
+        ":header_proto",
     ],
 )
 
@@ -100,6 +103,7 @@ py_proto_library(
         ":vehicle_signal_proto",
     ],
 )
+
 cc_proto_library(
     name = "error_code_cc_proto",
     deps = [
@@ -118,6 +122,7 @@ py_proto_library(
         ":error_code_proto",
     ],
 )
+
 cc_proto_library(
     name = "drive_event_cc_proto",
     deps = [
@@ -142,4 +147,3 @@ py_proto_library(
         "//modules/localization/proto:pose_py_pb2",
     ],
 )
-

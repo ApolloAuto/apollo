@@ -12,11 +12,11 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/adapters:adapter_gflags",
         "//modules/audio/common:audio_info",
         "//modules/audio/inference:direction_detection",
         "//modules/audio/proto:audio_cc_proto",
         "//modules/audio/proto:audio_conf_cc_proto",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/drivers/microphone/proto:audio_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
     ],

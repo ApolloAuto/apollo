@@ -15,5 +15,5 @@ py_binary(
     srcs = ["viewer.py"],
     deps = [
         "//modules/map/relative_map/proto:navigation_py_pb2",
-    ]
+    ],
 )

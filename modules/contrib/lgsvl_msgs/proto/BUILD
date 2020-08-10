@@ -16,17 +16,17 @@ proto_library(
     name = "detection3darray_proto",
     srcs = ["detection3darray.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         ":detection3d_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
     name = "detection3darray_py_pb2",
     deps = [
+        ":detection3d_py_pb2",
         ":detection3darray_proto",
         "//modules/common/proto:header_py_pb2",
-        ":detection3d_py_pb2",
     ],
 )
 
@@ -64,17 +64,17 @@ proto_library(
     name = "detection2darray_proto",
     srcs = ["detection2darray.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         ":detection2d_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
     name = "detection2darray_py_pb2",
     deps = [
+        ":detection2d_py_pb2",
         ":detection2darray_proto",
         "//modules/common/proto:header_py_pb2",
-        ":detection2d_py_pb2",
     ],
 )
 
@@ -89,19 +89,18 @@ proto_library(
     name = "detection3d_proto",
     srcs = ["detection3d.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:geometry_proto",
         ":detection2d_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
     name = "detection3d_py_pb2",
     deps = [
-        ":detection3d_proto",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
         ":detection2d_py_pb2",
+        ":detection3d_proto",
+        "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
-

@@ -25,9 +25,9 @@ proto_library(
 py_proto_library(
     name = "lon_controller_conf_py_pb2",
     deps = [
-        ":lon_controller_conf_proto",
         ":calibration_table_py_pb2",
         ":leadlag_conf_py_pb2",
+        ":lon_controller_conf_proto",
         ":pid_conf_py_pb2",
     ],
 )
@@ -43,21 +43,21 @@ proto_library(
     name = "preprocessor_proto",
     srcs = ["preprocessor.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:drive_state_proto",
         ":input_debug_proto",
         ":local_view_proto",
+        "//modules/common/proto:drive_state_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
     name = "preprocessor_py_pb2",
     deps = [
-        ":preprocessor_proto",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:drive_state_py_pb2",
         ":input_debug_py_pb2",
         ":local_view_py_pb2",
+        ":preprocessor_proto",
+        "//modules/common/proto:drive_state_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
 
@@ -79,6 +79,7 @@ py_proto_library(
         ":calibration_table_proto",
     ],
 )
+
 cc_proto_library(
     name = "control_cmd_cc_proto",
     deps = [
@@ -90,13 +91,13 @@ proto_library(
     name = "control_cmd_proto",
     srcs = ["control_cmd.proto"],
     deps = [
+        ":input_debug_proto",
+        ":pad_msg_proto",
         "//modules/canbus/proto:chassis_proto",
         "//modules/common/proto:drive_state_proto",
         "//modules/common/proto:header_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/proto:vehicle_signal_proto",
-        ":input_debug_proto",
-        ":pad_msg_proto",
     ],
 )
 
@@ -104,13 +105,13 @@ py_proto_library(
     name = "control_cmd_py_pb2",
     deps = [
         ":control_cmd_proto",
+        ":input_debug_py_pb2",
+        ":pad_msg_py_pb2",
         "//modules/canbus/proto:chassis_py_pb2",
         "//modules/common/proto:drive_state_py_pb2",
         "//modules/common/proto:header_py_pb2",
         "//modules/common/proto:pnc_point_py_pb2",
         "//modules/common/proto:vehicle_signal_py_pb2",
-        ":input_debug_py_pb2",
-        ":pad_msg_py_pb2",
     ],
 )
 
@@ -133,9 +134,9 @@ proto_library(
 py_proto_library(
     name = "mpc_controller_conf_py_pb2",
     deps = [
-        ":mpc_controller_conf_proto",
         ":calibration_table_py_pb2",
         ":gain_scheduler_conf_py_pb2",
+        ":mpc_controller_conf_proto",
     ],
 )
 
@@ -159,8 +160,8 @@ proto_library(
 py_proto_library(
     name = "lat_controller_conf_py_pb2",
     deps = [
-        ":lat_controller_conf_proto",
         ":gain_scheduler_conf_py_pb2",
+        ":lat_controller_conf_proto",
         ":leadlag_conf_py_pb2",
         ":mrac_conf_py_pb2",
     ],
@@ -184,6 +185,7 @@ py_proto_library(
         ":gain_scheduler_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "local_view_cc_proto",
     deps = [
@@ -195,9 +197,9 @@ proto_library(
     name = "local_view_proto",
     srcs = ["local_view.proto"],
     deps = [
+        ":pad_msg_proto",
         "//modules/canbus/proto:chassis_proto",
         "//modules/common/proto:header_proto",
-        ":pad_msg_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
     ],
@@ -207,9 +209,9 @@ py_proto_library(
     name = "local_view_py_pb2",
     deps = [
         ":local_view_proto",
+        ":pad_msg_py_pb2",
         "//modules/canbus/proto:chassis_py_pb2",
         "//modules/common/proto:header_py_pb2",
-        ":pad_msg_py_pb2",
         "//modules/localization/proto:localization_py_pb2",
         "//modules/planning/proto:planning_py_pb2",
     ],
@@ -233,6 +235,7 @@ py_proto_library(
         ":pid_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "leadlag_conf_cc_proto",
     deps = [
@@ -251,6 +254,7 @@ py_proto_library(
         ":leadlag_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "control_common_conf_cc_proto",
     deps = [
@@ -262,8 +266,8 @@ proto_library(
     name = "control_common_conf_proto",
     srcs = ["control_common_conf.proto"],
     deps = [
-        "//modules/canbus/proto:chassis_proto",
         ":pad_msg_proto",
+        "//modules/canbus/proto:chassis_proto",
     ],
 )
 
@@ -271,8 +275,8 @@ py_proto_library(
     name = "control_common_conf_py_pb2",
     deps = [
         ":control_common_conf_proto",
-        "//modules/canbus/proto:chassis_py_pb2",
         ":pad_msg_py_pb2",
+        "//modules/canbus/proto:chassis_py_pb2",
     ],
 )
 
@@ -287,11 +291,11 @@ proto_library(
     name = "control_conf_proto",
     srcs = ["control_conf.proto"],
     deps = [
-        "//modules/canbus/proto:chassis_proto",
-        ":pad_msg_proto",
         ":lat_controller_conf_proto",
         ":lon_controller_conf_proto",
         ":mpc_controller_conf_proto",
+        ":pad_msg_proto",
+        "//modules/canbus/proto:chassis_proto",
     ],
 )
 
@@ -299,11 +303,11 @@ py_proto_library(
     name = "control_conf_py_pb2",
     deps = [
         ":control_conf_proto",
-        "//modules/canbus/proto:chassis_py_pb2",
-        ":pad_msg_py_pb2",
         ":lat_controller_conf_py_pb2",
         ":lon_controller_conf_py_pb2",
         ":mpc_controller_conf_py_pb2",
+        ":pad_msg_py_pb2",
+        "//modules/canbus/proto:chassis_py_pb2",
     ],
 )
 
@@ -348,6 +352,7 @@ py_proto_library(
         ":mrac_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "pad_msg_cc_proto",
     deps = [
@@ -359,8 +364,8 @@ proto_library(
     name = "pad_msg_proto",
     srcs = ["pad_msg.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
         "//modules/canbus/proto:chassis_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -368,8 +373,7 @@ py_proto_library(
     name = "pad_msg_py_pb2",
     deps = [
         ":pad_msg_proto",
-        "//modules/common/proto:header_py_pb2",
         "//modules/canbus/proto:chassis_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
-
