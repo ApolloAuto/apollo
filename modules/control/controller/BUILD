@@ -60,7 +60,6 @@ cc_library(
     deps = [
         ":controller_interface",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
         "//modules/common/filters:digital_filter_coefficients",

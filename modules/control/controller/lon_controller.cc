@@ -20,7 +20,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "cyber/time/clock.h"
+#include "cyber/time/time.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/common/control_gflags.h"
@@ -33,7 +33,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::cyber::Clock;
+using apollo::cyber::Time;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -399,7 +399,7 @@ void LonController::ComputeLongitudinalErrors(
       vehicle_state->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Clock::NowInSeconds();
+  double current_control_time = Time::Now().ToSecond();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =
