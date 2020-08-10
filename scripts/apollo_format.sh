@@ -17,7 +17,7 @@
 ###############################################################################
 
 # Usage:
-#   apollo_format.sh <path/to/src/dir/or/files> [Options]
+#   apollo_format.sh [options] <path/to/src/dir/or/files>
 
 # Fail on error
 set -e
@@ -26,58 +26,64 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 function print_usage() {
-    info "Usage: $0 <path/to/src/dir/or/files> [Options]"
-    info "Options:"
-    info "${TAB}py|python   Format Python code"
-    info "${TAB}bazel       Lint Bazel code"
-    info "${TAB}cpp         Format cpp code"
-    info "${TAB}all         Lint all (C++/Python/Bazel)"
+  info "Usage: $0 [options] <path/to/src/dir/or/files> "
+  info "Options:"
+  info "${TAB}-p|--python      Format Python code"
+  info "${TAB}-b|--bazel       Format Bazel code"
+  info "${TAB}-c|--cpp         Format cpp code"
+  info "${TAB}-a|--all         Format all (C++/Python/Bazel)"
+  info "${TAB}-h|--help        # Show this message"
 }
 
 function run_clang_format() {
-    bash "${TOP_DIR}/scripts/clang_format.sh" "$@"
+  bash "${TOP_DIR}/scripts/clang_format.sh" "$@"
 }
 
 function run_buildifier() {
-    bash "${TOP_DIR}/scripts/buildifier.sh" "$@"
+  bash "${TOP_DIR}/scripts/buildifier.sh" "$@"
 }
 
 function run_autopep8() {
-    bash "${TOP_DIR}/scripts/autopep8.sh" "$@"
+  bash "${TOP_DIR}/scripts/autopep8.sh" "$@"
 }
 
 function run_format_all() {
-    run_clang_format "$@"
-    run_buildifier "$@"
-    run_autopep8 "$@"
+  run_clang_format "$@"
+  run_buildifier "$@"
+  run_autopep8 "$@"
 }
 
 function main() {
-    if [ "$#" -eq 0 ]; then
-        print_usage
-        exit 1
-    fi
+  if [ "$#" -eq 0 ]; then
+    print_usage
+    exit 1
+  fi
 
-    local path="$1"
-    shift
-    local option="$1"
-    case "${option}" in
-    py | python)
-        run_autopep8 "${path}"
-        ;;
-    cpp)
-        run_clang_format "${path}"
-        ;;
-    bazel)
-        run_buildifier "${path}"
-        ;;
-    all)
-        run_format_all "${path}"
-        ;;
-    *)
-        run_format_all "${path}"
-        ;;
-    esac
+  local option="$1"
+  shift
+  case "${option}" in
+  -p|--python)
+    run_autopep8 "$@"
+    ;;
+  -c|--cpp)
+    run_clang_format "$@"
+    ;;
+  -b|--bazel)
+    run_buildifier "$@"
+    ;;
+  -a|--all)
+    run_format_all "$@"
+    ;;
+  -h|--help)
+    print_usage
+    exit 1
+    ;;
+  *)
+    echo "Unknown option: ${option}"
+    print_usage
+    exit 1
+    ;;
+  esac
 }
 
 main "$@"
