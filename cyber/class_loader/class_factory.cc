@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cyber/class_loader/utility/class_factory.h"
+#include "cyber/class_loader/class_factory.h"
 
 #include "cyber/class_loader/class_loader.h"
 

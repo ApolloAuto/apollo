@@ -30,7 +30,7 @@
 
 #include "Poco/SharedLibrary.h"
 
-#include "cyber/class_loader/utility/class_factory.h"
+#include "cyber/class_loader/class_factory.h"
 #include "cyber/common/log.h"
 
 /**

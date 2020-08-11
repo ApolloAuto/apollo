@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/class_loader/utility/class_loader_utility.h"
+#include "cyber/class_loader/class_loader_utility.h"
 
 #include "cyber/class_loader/class_loader.h"
 

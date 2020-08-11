@@ -7,19 +7,13 @@ cc_library(
     name = "class_loader",
     srcs = [
         "class_loader.cc",
-        "utility/class_factory.cc",
-        "utility/class_loader_utility.cc",
     ],
     hdrs = [
         "class_loader.h",
-        "class_loader_register_macro.h",
-        "utility/class_factory.h",
-        "utility/class_loader_utility.h",
     ],
     deps = [
-        "//cyber:init",
-        "//cyber/common:log",
-        "@poco//:PocoFoundation",
+        ":class_factory",
+        ":class_loader_utility",
     ],
 )
 
@@ -45,6 +39,37 @@ cc_test(
         "//cyber/class_loader/test:base",
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_library(
+    name = "class_factory",
+    srcs = ["class_factory.cc"],
+    hdrs = [
+        "class_loader.h",
+        "class_loader_register_macro.h",
+        "class_factory.h",
+        "class_loader_utility.h",
+    ],
+    deps = [
+        "//cyber:init",
+        "@poco//:PocoFoundation",
+    ],
+)
+
+cc_library(
+    name = "class_loader_utility",
+    srcs = [
+        "class_loader_utility.cc",
+    ],
+    hdrs = [
+        "class_loader_utility.h",
+    ],
+    deps = [
+        "//cyber:init",
+        "//cyber/common:log",
+        "@poco//:PocoFoundation",
+        ":class_factory"
     ],
 )
 

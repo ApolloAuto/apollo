@@ -17,7 +17,7 @@
 #ifndef CYBER_CLASS_LOADER_CLASS_LOADER_REGISTER_MACRO_H_
 #define CYBER_CLASS_LOADER_CLASS_LOADER_REGISTER_MACRO_H_
 
-#include "cyber/class_loader/utility/class_loader_utility.h"
+#include "cyber/class_loader/class_loader_utility.h"
 
 #define CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)     \
   namespace {                                                             \
