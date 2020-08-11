@@ -23,44 +23,28 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 . /tmp/installers/installer_base.sh
 
-TARGET_ARCH="$(uname -m)"
+TARGET_ARCH=$(uname -m)
+VERSION="v3.1.2"
+BIN_NAME=""
+CHECKSUM=""
 
-## NOTE:
-## buildifier/buildozer was moved into install_bazel.sh.
+if [ "$TARGET_ARCH" == "x86_64" ]; then
+  BIN_NAME="shfmt_${VERSION}_linux_amd64"
+  CHECKSUM="c5794c1ac081f0028d60317454fe388068ab5af7740a83e393515170a7157dce"
 
-apt-get -y update && \
-    apt-get -y install \
-    cppcheck    \
-    shellcheck  \
-    lcov        \
-    valgrind
+elif [ "$TARGET_ARCH" == "aarch64" ]; then
+  BIN_NAME="shfmt_${VERSION}_linux_arm"
+  CHECKSUM="e13cf317cc653d33e6b6d1cfe36fa891052c6211190a2ada7a46367417726c44"
 
-# libgoogle-perftools4  # gperftools
-# PROFILER_SO="/usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so"
-# if [ ! -e "${PROFILER_SO}" ]; then
-#    # libgoogle-perftools4: /usr/lib/x86_64-linux-gnu/libprofiler.so.0
-#    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
-# fi
+else
+  error "Target arch ${TARGET_ARCH} not supported yet"
+  exit 1
+fi
 
-bash /tmp/installers/install_gperftools.sh
+DOWNLOAD_LINK="https://github.com/mvdan/sh/releases/download/${VERSION}/${BIN_NAME}"
 
-bash /tmp/installers/install_benchmark.sh
+download_if_not_cached "${BIN_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+chmod +x "${BIN_NAME}"
+mv "${BIN_NAME}" "/usr/local/bin/shfmt"
 
-# TechDoc generation
-bash /tmp/installers/install_doxygen.sh
-
-# sphinx ?
-
-## Pylint
-pip3_install pycodestyle \
-    pyflakes \
-    flake8 \
-    autopep8
-# pylint
-
-# shfmt
-bash /tmp/installers/install_shfmt.sh
-
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+ok "Successfully installed shfmt ${VERSION}."

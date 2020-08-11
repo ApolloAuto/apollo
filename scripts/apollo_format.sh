@@ -31,7 +31,8 @@ function print_usage() {
   info "${TAB}-p|--python      Format Python code"
   info "${TAB}-b|--bazel       Format Bazel code"
   info "${TAB}-c|--cpp         Format cpp code"
-  info "${TAB}-a|--all         Format all (C++/Python/Bazel)"
+  info "${TAB}-s|--shell       Format Shell code"
+  info "${TAB}-a|--all         Format all (C++/Python/Bazel/Shell)"
   info "${TAB}-h|--help        # Show this message"
 }
 
@@ -47,10 +48,15 @@ function run_autopep8() {
   bash "${TOP_DIR}/scripts/autopep8.sh" "$@"
 }
 
+function run_shfmt() {
+  bash "${TOP_DIR}/scripts/shell_format.sh" "$@"
+}
+
 function run_format_all() {
   run_clang_format "$@"
   run_buildifier "$@"
   run_autopep8 "$@"
+  run_shfmt "$@"
 }
 
 function main() {
@@ -70,6 +76,9 @@ function main() {
     ;;
   -b|--bazel)
     run_buildifier "$@"
+    ;;
+  -s|--shell)
+    run_shfmt "$@"
     ;;
   -a|--all)
     run_format_all "$@"
