@@ -28,11 +28,11 @@
 namespace apollo {
 namespace audio {
 
-constexpr float SOUND_SPEED = 343.2;
+constexpr double SOUND_SPEED = 343.2;
 
-float gcc_phat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
+double gcc_phat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
                double max_tau, int interp);
-int get_direction(std::vector<std::vector<float>>&& channels_vec,
+int get_direction(std::vector<std::vector<double>>&& channels_vec,
                   const int sample_rate, const int mic_distance);
 
 }  // namespace audio

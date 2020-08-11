@@ -8,6 +8,7 @@ cc_library(
     srcs = ["moving_detection.cc"],
     hdrs = ["moving_detection.h"],
     deps = [
+        "//modules/audio/proto:audio_cc_proto",
         "@fftw3",
     ],
 )
