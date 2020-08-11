@@ -52,6 +52,14 @@ bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {
                audio_info_.GetSignals(audio_data->microphone_config().chunk()),
                audio_data->microphone_config().sample_rate(),
                audio_data->microphone_config().mic_distance());
+  // TODO(all) remove GetSignals() multiple calls
+  auto signals =
+      audio_info_.GetSignals(audio_data->microphone_config().chunk());
+  MovingResult moving_result = moving_detection_.Detect(signals);
+  AudioDetection audio_detection;
+  audio_detection.set_moving_result(moving_result);
+  // TODO(all) add header to audio_detection
+  audio_writer_->Write(audio_detection);
   return true;
 }
 

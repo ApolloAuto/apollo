@@ -22,7 +22,7 @@ namespace audio {
 using torch::indexing::None;
 using torch::indexing::Slice;
 
-int get_direction(std::vector<std::vector<float>>&& channels_vec,
+int get_direction(std::vector<std::vector<double>>&& channels_vec,
                   const int sample_rate, const int mic_distance) {
   std::vector<torch::Tensor> channels_ts;
   auto options = torch::TensorOptions().dtype(torch::kFloat32);
@@ -31,9 +31,9 @@ int get_direction(std::vector<std::vector<float>>&& channels_vec,
     channels_ts.push_back(torch::from_blob(signal.data(), {size}, options));
   }
 
-  float tau0, tau1;
+  double tau0, tau1;
   int theta0, theta1;
-  const float max_tau = mic_distance / SOUND_SPEED;
+  const double max_tau = mic_distance / SOUND_SPEED;
   tau0 = gcc_phat(channels_ts[0], channels_ts[2], sample_rate, max_tau, 1);
   theta0 = asin(tau0 / max_tau) * 180 / M_PI;
   tau1 = gcc_phat(channels_ts[1], channels_ts[3], sample_rate, max_tau, 1);
@@ -56,7 +56,7 @@ int get_direction(std::vector<std::vector<float>>&& channels_vec,
  * signal refsig using the Generalized Cross Correlation - Phase Transform
  * (GCC-PHAT)method.
  */
-float gcc_phat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
+double gcc_phat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
                double max_tau, int interp) {
   const int n_sig = sig.size(0), n_refsig = refsig.size(0),
             n = n_sig + n_refsig;
@@ -76,7 +76,7 @@ float gcc_phat(const torch::Tensor& sig, const torch::Tensor& refsig, int fs,
   auto ttt = at::argmax(at::abs(cc), 0);
   // find max cross correlation index
   const int shift = at::argmax(at::abs(cc), 0).item<int>() - max_shift;
-  const float tau = shift / static_cast<float>(interp * fs);
+  const double tau = shift / static_cast<double>(interp * fs);
 
   return tau;
 }
