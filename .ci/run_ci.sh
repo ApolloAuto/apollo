@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
@@ -24,12 +24,10 @@ DOCKER_REPO="apolloauto/apollo"
 DEV_INSIDE="in-dev-docker"
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
-USER_VERSION_OPT=
 DOCKER_RUN="docker run"
 FAST_MODE="no"
 USE_GPU_HOST=0
 VOLUME_VERSION="latest"
-USER_SPECIFIED_MAP=
 MAP_VOLUME_CONF=
 OTHER_VOLUME_CONF=
 
@@ -66,17 +64,14 @@ function parse_arguments() {
 }
 
 function determine_dev_image() {
-    local version="$1"
-    # If no custom version specified
-    if [ -z "${version}" ]; then
-        if [ "${TARGET_ARCH}" = "x86_64" ]; then
-            version="${VERSION_X86_64}"
-        elif [ "${TARGET_ARCH}" = "aarch64" ]; then
-            version="${VERSION_AARCH64}"
-        else
-            error "Logic can't reach here! Please file an issue to Apollo GitHub."
-            exit 3
-        fi
+    local version=""
+    if [ "${TARGET_ARCH}" = "x86_64" ]; then
+        version="${VERSION_X86_64}"
+    elif [ "${TARGET_ARCH}" = "aarch64" ]; then
+        version="${VERSION_AARCH64}"
+    else
+        error "Logic can't reach here! Please file an issue to Apollo GitHub."
+        exit 3
     fi
     APOLLO_DEV_IMAGE="${DOCKER_REPO}:${version}"
 }
@@ -98,10 +93,6 @@ function setup_devices_and_mount_local_volumes() {
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
-    local teleop="${APOLLO_ROOT_DIR}/../apollo-teleop"
-    if [ -d "${teleop}" ]; then
-        volumes="-v ${teleop}:/apollo/modules/teleop ${volumes}"
-    fi
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
@@ -233,8 +224,7 @@ function main() {
     check_host_environment
 
     parse_arguments "$@"
-
-    determine_dev_image "${USER_VERSION_OPT}"
+    determine_dev_image
 
     if ! docker_pull "${APOLLO_DEV_IMAGE}" ; then
         error "Failed to pull docker image."
@@ -270,11 +260,11 @@ function main() {
         /bin/bash /apollo/scripts/apollo_ci.sh
 
     if [ $? -ne 0 ];then
-        error "CI Failed based on image: ${APOLLO_DEV_IMAGE}"
+        error "CI failed based on image: ${APOLLO_DEV_IMAGE}"
         exit 1
     fi
     set +x
-    ok "Enjoy!"
+    ok "CI success based on image: ${APOLLO_DEV_IMAGE}"
 }
 
 main "$@"
