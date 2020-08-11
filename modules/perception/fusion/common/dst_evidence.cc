@@ -15,10 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/fusion/common/dst_evidence.h"
 
-
 #include <algorithm>
-#include <numeric>
 #include <bitset>
+#include <numeric>
 
 #include <boost/format.hpp>
 

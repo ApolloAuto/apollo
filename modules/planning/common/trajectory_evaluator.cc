@@ -40,11 +40,10 @@ void TrajectoryEvaluator::EvaluateTrajectoryByTime(
         trajectory,
     const double start_point_timestamp_sec, const double delta_time,
     std::vector<TrajectoryPointFeature>* evaluated_trajectory) {
-  if (trajectory.empty() ||
-      (fabs(trajectory.front().first - start_point_timestamp_sec) <
-          delta_time &&
-      fabs(trajectory.back().first - start_point_timestamp_sec) <
-          delta_time)) {
+  if (trajectory.empty() || (fabs(trajectory.front().first -
+                                  start_point_timestamp_sec) < delta_time &&
+                             fabs(trajectory.back().first -
+                                  start_point_timestamp_sec) < delta_time)) {
     return;
   }
 
@@ -291,10 +290,8 @@ void TrajectoryEvaluator::EvaluateObstacleTrajectory(
       evaluated_trajectory.push_back(trajectory_point);
     } else {
       EvaluateTrajectoryByTime(learning_data_frame->frame_num(),
-                               std::to_string(obstacle_id),
-                               trajectory,
-                               start_point_timestamp_sec,
-                               delta_time,
+                               std::to_string(obstacle_id), trajectory,
+                               start_point_timestamp_sec, delta_time,
                                &evaluated_trajectory);
 
       ADEBUG << "frame_num[" << learning_data_frame->frame_num()
@@ -381,10 +378,9 @@ void TrajectoryEvaluator::EvaluateObstaclePredictionTrajectory(
   }
 }
 
-void TrajectoryEvaluator::Convert(
-    const CommonTrajectoryPointFeature& tp,
-    const double relative_time,
-    common::TrajectoryPoint* trajectory_point) {
+void TrajectoryEvaluator::Convert(const CommonTrajectoryPointFeature& tp,
+                                  const double relative_time,
+                                  common::TrajectoryPoint* trajectory_point) {
   auto path_point = trajectory_point->mutable_path_point();
   path_point->set_x(tp.path_point().x());
   path_point->set_y(tp.path_point().y());
@@ -398,10 +394,9 @@ void TrajectoryEvaluator::Convert(
   trajectory_point->mutable_gaussian_info()->CopyFrom(tp.gaussian_info());
 }
 
-void TrajectoryEvaluator::Convert(
-    const common::TrajectoryPoint& tp,
-    const double timestamp_sec,
-    TrajectoryPointFeature* trajectory_point) {
+void TrajectoryEvaluator::Convert(const common::TrajectoryPoint& tp,
+                                  const double timestamp_sec,
+                                  TrajectoryPointFeature* trajectory_point) {
   trajectory_point->set_timestamp_sec(timestamp_sec);
   auto path_point =
       trajectory_point->mutable_trajectory_point()->mutable_path_point();
@@ -415,8 +410,9 @@ void TrajectoryEvaluator::Convert(
   trajectory_point->mutable_trajectory_point()->set_a(tp.a());
   trajectory_point->mutable_trajectory_point()->set_relative_time(
       tp.relative_time());
-  trajectory_point->mutable_trajectory_point()->mutable_gaussian_info()
-                                              ->CopyFrom(tp.gaussian_info());
+  trajectory_point->mutable_trajectory_point()
+      ->mutable_gaussian_info()
+      ->CopyFrom(tp.gaussian_info());
 }
 
 }  // namespace planning

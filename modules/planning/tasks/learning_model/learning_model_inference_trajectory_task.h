@@ -31,7 +31,7 @@ class LearningModelInferenceTrajectoryTask : public Task {
  public:
   LearningModelInferenceTrajectoryTask(
       const TaskConfig &config,
-      const std::shared_ptr<DependencyInjector>& injector);
+      const std::shared_ptr<DependencyInjector> &injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

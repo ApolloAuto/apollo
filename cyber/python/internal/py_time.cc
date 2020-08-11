@@ -335,10 +335,10 @@ static PyMethodDef _cyber_time_methods[] = {
 PyMODINIT_FUNC PyInit__cyber_time_wrapper(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_time_wrapper",    // Module name.
-      "CyberTime module",   // Module doc.
-      -1,                   // Module size.
-      _cyber_time_methods,  // Module methods.
+      "_cyber_time_wrapper",  // Module name.
+      "CyberTime module",     // Module doc.
+      -1,                     // Module size.
+      _cyber_time_methods,    // Module methods.
       nullptr,
       nullptr,
       nullptr,

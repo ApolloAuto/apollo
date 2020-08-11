@@ -48,6 +48,7 @@ class ThirdPartyPerceptionMobileye : public ThirdPartyPerception {
 
   bool Process(
       apollo::perception::PerceptionObstacles* const response) override;
+
  private:
   std::shared_ptr<apollo::cyber::Reader<apollo::drivers::Mobileye>>
       mobileye_reader_ = nullptr;

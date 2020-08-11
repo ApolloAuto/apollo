@@ -201,10 +201,10 @@ bool TrajectoryImitationLibtorchInference::DoCONVRNNMODELInference(
   auto inference_start_time = std::chrono::system_clock::now();
 
   std::vector<torch::jit::IValue> torch_inputs;
-  torch_inputs.push_back(c10::ivalue::Tuple::create(
-      {std::move(input_feature_tensor.to(device_)),
-       std::move(initial_point_tensor.to(device_)),
-       std::move(initial_box_tensor.to(device_))}));
+  torch_inputs.push_back(
+      c10::ivalue::Tuple::create({std::move(input_feature_tensor.to(device_)),
+                                  std::move(initial_point_tensor.to(device_)),
+                                  std::move(initial_box_tensor.to(device_))}));
   at::Tensor torch_output_tensor =
       model_.forward(torch_inputs).toTensor().to(torch::kCPU);
 

@@ -58,12 +58,11 @@ class HMMatcher : public BaseMatcher {
                                 std::vector<TrackObjectPair> *assignments,
                                 std::vector<size_t> *unassigned_tracks,
                                 std::vector<size_t> *unassigned_objects);
-  void ComputeAssociationMat(
-      const std::vector<RadarTrackPtr> &radar_tracks,
-      const base::Frame &radar_frame,
-      const std::vector<size_t> &unassigned_tracks,
-      const std::vector<size_t> &unassigned_objects,
-      std::vector<std::vector<double> > *association_mat);
+  void ComputeAssociationMat(const std::vector<RadarTrackPtr> &radar_tracks,
+                             const base::Frame &radar_frame,
+                             const std::vector<size_t> &unassigned_tracks,
+                             const std::vector<size_t> &unassigned_objects,
+                             std::vector<std::vector<double>> *association_mat);
   double DistanceBetweenObs(const base::ObjectPtr &obs1, double timestamp1,
                             const base::ObjectPtr &obs2, double timestamp2);
 };

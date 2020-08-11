@@ -64,9 +64,8 @@ bool HasOverlap(const PerceptionObstacle& obstacle,
   return false;
 }
 
-PerceptionObstacles EyeRadarFusion(
-    const PerceptionObstacles& eye_obstacles,
-    const PerceptionObstacles& radar_obstacles) {
+PerceptionObstacles EyeRadarFusion(const PerceptionObstacles& eye_obstacles,
+                                   const PerceptionObstacles& radar_obstacles) {
   PerceptionObstacles eye_obstacles_fusion = eye_obstacles;
   PerceptionObstacles radar_obstacles_fusion = radar_obstacles;
 
@@ -76,8 +75,7 @@ PerceptionObstacles EyeRadarFusion(
          *(radar_obstacles_fusion.mutable_perception_obstacle())) {
       if (HasOverlap(eye_obstacle, radar_obstacle)) {
         eye_obstacle.set_confidence(0.99);
-        eye_obstacle.mutable_velocity()->CopyFrom(
-            radar_obstacle.velocity());
+        eye_obstacle.mutable_velocity()->CopyFrom(radar_obstacle.velocity());
       }
     }
   }

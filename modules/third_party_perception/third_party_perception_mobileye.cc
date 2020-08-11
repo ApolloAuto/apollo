@@ -26,27 +26,28 @@
 namespace apollo {
 namespace third_party_perception {
 
-using apollo::drivers::Mobileye;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
+using apollo::drivers::Mobileye;
 using apollo::perception::PerceptionObstacles;
 
 ThirdPartyPerceptionMobileye::ThirdPartyPerceptionMobileye(
-      apollo::cyber::Node* const node) :ThirdPartyPerception(node) {
+    apollo::cyber::Node* const node)
+    : ThirdPartyPerception(node) {
   mobileye_reader_ = node_->CreateReader<apollo::drivers::Mobileye>(
       FLAGS_mobileye_topic,
-      [this](const std::shared_ptr<apollo::drivers::Mobileye> &message) {
+      [this](const std::shared_ptr<apollo::drivers::Mobileye>& message) {
         OnMobileye(*message.get());
       });
   delphi_esr_reader_ = node_->CreateReader<apollo::drivers::DelphiESR>(
       FLAGS_delphi_esr_topic,
-      [this](const std::shared_ptr<apollo::drivers::DelphiESR> &message) {
+      [this](const std::shared_ptr<apollo::drivers::DelphiESR>& message) {
         OnDelphiESR(*message.get());
       });
 
   conti_radar_reader_ = node_->CreateReader<apollo::drivers::ContiRadar>(
       FLAGS_conti_radar_topic,
-      [this](const std::shared_ptr<apollo::drivers::ContiRadar> &message) {
+      [this](const std::shared_ptr<apollo::drivers::ContiRadar>& message) {
         OnContiRadar(*message.get());
       });
 }
@@ -87,7 +88,7 @@ void ThirdPartyPerceptionMobileye::OnContiRadar(const ContiRadar& message) {
 }
 
 bool ThirdPartyPerceptionMobileye::Process(
-            PerceptionObstacles* const response) {
+    PerceptionObstacles* const response) {
   ADEBUG << "Timer is triggered: publish PerceptionObstacles";
   CHECK_NOTNULL(response);
 

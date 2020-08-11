@@ -102,7 +102,7 @@ PlaneFitGroundDetector::~PlaneFitGroundDetector() { CleanUp(); }
 // Init the order lookup table
 void PlaneFitGroundDetector::InitOrderTable(const VoxelGridXY<float> *vg,
                                             std::pair<int, int> *order) {
-  std::vector<std::pair<float, int> > map_dist;
+  std::vector<std::pair<float, int>> map_dist;
   float cx = 0.f;
   float cy = 0.f;
   float dist2 = 0.f;
@@ -164,7 +164,7 @@ bool PlaneFitGroundDetector::Init() {
   }
 
   // Init order lookup table
-  order_table_ = IAlloc<std::pair<int, int> >(vg_fine_->NrVoxel());
+  order_table_ = IAlloc<std::pair<int, int>>(vg_fine_->NrVoxel());
   InitOrderTable(vg_coarse_, order_table_);
 
   // ground plane:
@@ -178,8 +178,8 @@ bool PlaneFitGroundDetector::Init() {
   if (!ground_planes_sphe_) {
     return false;
   }
-  ground_z_ = IAlloc2<std::pair<float, bool> >(param_.nr_grids_coarse,
-                                               param_.nr_grids_coarse);
+  ground_z_ = IAlloc2<std::pair<float, bool>>(param_.nr_grids_coarse,
+                                              param_.nr_grids_coarse);
   if (!ground_z_) {
     return false;
   }
@@ -270,7 +270,7 @@ void PlaneFitGroundDetector::CleanUp() {
   }
   IFree2<GroundPlaneLiDAR>(&ground_planes_);
   IFree2<GroundPlaneSpherical>(&ground_planes_sphe_);
-  IFree2<std::pair<float, bool> >(&ground_z_);
+  IFree2<std::pair<float, bool>>(&ground_z_);
   IFree2<PlaneFitPointCandIndices>(&local_candis_);
   IFreeAligned<float>(&pf_threeds_);
   IFreeAligned<char>(&labels_);
@@ -278,7 +278,7 @@ void PlaneFitGroundDetector::CleanUp() {
   IFreeAligned<float>(&sampled_z_values_);
   IFreeAligned<int>(&sampled_indices_);
   IFree2<float>(&pf_thresholds_);
-  IFree<std::pair<int, int> >(&order_table_);
+  IFree<std::pair<int, int>>(&order_table_);
 }
 
 int PlaneFitGroundDetector::CompareZ(const float *point_cloud,
@@ -763,7 +763,7 @@ int PlaneFitGroundDetector::Fit() {
 //  Filter candidates by neighbors
 int PlaneFitGroundDetector::FilterCandidates(
     int r, int c, const float *point_cloud, PlaneFitPointCandIndices *candi,
-    std::vector<std::pair<int, int> > *neighbors,
+    std::vector<std::pair<int, int>> *neighbors,
     unsigned int nr_point_element) {
   float avg_z = 0.f;
   int count = 0;
@@ -816,7 +816,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   // not enough samples, failed and return
 
   PlaneFitPointCandIndices &candi = local_candis_[r][c];
-  std::vector<std::pair<int, int> > neighbors;
+  std::vector<std::pair<int, int>> neighbors;
   GetNeighbors(r, c, param_.nr_grids_coarse, param_.nr_grids_coarse,
                &neighbors);
   FilterCandidates(r, c, point_cloud, &candi, &neighbors, nr_point_element);
@@ -989,7 +989,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
 
 float PlaneFitGroundDetector::CalculateAngleDist(
     const GroundPlaneLiDAR &plane,
-    const std::vector<std::pair<int, int> > &neighbors) {
+    const std::vector<std::pair<int, int>> &neighbors) {
   float angle_dist = 0.0f;
   int count = 0;
   unsigned int j = 0;
@@ -1042,7 +1042,7 @@ int PlaneFitGroundDetector::FitInOrder() {
 
 void PlaneFitGroundDetector::GetNeighbors(
     int r, int c, int rows, int cols,
-    std::vector<std::pair<int, int> > *neighbors) {
+    std::vector<std::pair<int, int>> *neighbors) {
   int left = IMax(0, c - 1);
   int right = IMin(cols - 1, c + 1);
   int up = IMax(0, r - 1);

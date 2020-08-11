@@ -72,8 +72,8 @@ DEFINE_double(fuse_time_interval, 0.5,
               "Time interval in seconds of frames to fuse.");
 DEFINE_bool(enable_shuffle_points, false,
             "Enable shuffling points before preprocessing.");
-DEFINE_int32(max_num_points, std::numeric_limits<int>::max()
-, "Max number of points to preprocess.");
+DEFINE_int32(max_num_points, std::numeric_limits<int>::max(),
+             "Max number of points to preprocess.");
 DEFINE_bool(reproduce_result_mode, false, "True if preprocess in CPU mode.");
 DEFINE_double(score_threshold, 0.5, "Classification score threshold.");
 DEFINE_double(nms_overlap_threshold, 0.5, "Nms overlap threshold.");

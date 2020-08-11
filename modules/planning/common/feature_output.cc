@@ -53,7 +53,7 @@ void FeatureOutput::InsertLearningDataFrame(
 LearningDataFrame* FeatureOutput::GetLatestLearningDataFrame() {
   const int size = learning_data_.learning_data_frame_size();
   return size > 0 ? learning_data_.mutable_learning_data_frame(size - 1)
-      : nullptr;
+                  : nullptr;
 }
 
 void FeatureOutput::InsertPlanningResult() {}

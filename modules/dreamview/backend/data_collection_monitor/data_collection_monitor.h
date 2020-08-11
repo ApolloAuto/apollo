@@ -24,8 +24,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <boost/thread/shared_mutex.hpp>
 
+#include <boost/thread/shared_mutex.hpp>
 #include "gtest/gtest_prod.h"
 #include "nlohmann/json.hpp"
 

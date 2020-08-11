@@ -50,8 +50,7 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   // set cruise_speed to slow down
-  const double adc_speed =
-      injector_->vehicle_state()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   double target_slow_down_speed = GetContext()->target_slow_down_speed;
   if (target_slow_down_speed <= 0) {
     target_slow_down_speed = GetContext()->target_slow_down_speed = std::max(

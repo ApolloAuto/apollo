@@ -128,7 +128,7 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
     lane_postprocessor->Process2D(postprocessor_options, &frame);
     lane_postprocessor->Process3D(postprocessor_options, &frame);
 
-    std::vector<std::vector<LanePointInfo> > laneline_point_set =
+    std::vector<std::vector<LanePointInfo>> laneline_point_set =
         lane_postprocessor->GetLanelinePointSet();
     std::vector<LanePointInfo> laneline_infer_set =
         lane_postprocessor->GetAllInferLinePointSet();

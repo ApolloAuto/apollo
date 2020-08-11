@@ -213,8 +213,8 @@ TEST(TargetTest, clapping_velocity_test) {
   ASSERT_TRUE(cyber::common::GetProtoFromFile(omt_config, &omt_param));
 
   auto read_pos_and_theta_vec =
-      [](const std::string& fname) -> std::vector<std::vector<double> > {
-    std::vector<std::vector<double> > pos_and_theta_vec;
+      [](const std::string& fname) -> std::vector<std::vector<double>> {
+    std::vector<std::vector<double>> pos_and_theta_vec;
     std::ifstream fin(fname);
     if (!fin.is_open()) {
       AERROR << "Cannot open : " << fname;

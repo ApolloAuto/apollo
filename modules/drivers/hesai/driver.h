@@ -34,8 +34,8 @@
 #include "modules/drivers/hesai/parser.h"
 #include "modules/drivers/hesai/proto/config.pb.h"
 #include "modules/drivers/hesai/proto/hesai.pb.h"
-#include "modules/drivers/hesai/udp_input.h"
 #include "modules/drivers/hesai/type_defs.h"
+#include "modules/drivers/hesai/udp_input.h"
 
 namespace apollo {
 namespace drivers {

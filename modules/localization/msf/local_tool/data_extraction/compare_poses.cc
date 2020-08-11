@@ -52,8 +52,7 @@ static bool LoadGnssAntennaExtrinsic(const std::string &file_path,
 }
 
 static void PoseAndStdInterpolationByTime(
-    const EigenAffine3dVec &in_poses,
-    const EigenVector3dVec &in_stds,
+    const EigenAffine3dVec &in_poses, const EigenVector3dVec &in_stds,
     const std::vector<double> &in_timestamps,
     const std::vector<double> &ref_timestamps,
     std::map<unsigned int, Eigen::Affine3d> *out_poses,

@@ -26,18 +26,17 @@ namespace third_party_perception {
 
 bool ThirdPartyPerceptionComponent::Init() {
   apollo::third_party_perception::ThirdPartyPerceptionDevice
-          third_party_perception_param;
+      third_party_perception_param;
   if (!GetProtoConfig(&third_party_perception_param)) {
     AINFO << "load third party perception param failed";
     return false;
   }
 
   ThirdPartyPerceptionDeviceType device_type =
-        third_party_perception_param.device_type();
+      third_party_perception_param.device_type();
 
   if (device_type == ThirdPartyPerceptionDeviceType::SMARTEREYE) {
-    perception_ = std::make_shared<ThirdPartyPerceptionSmartereye>(
-                  node_.get());
+    perception_ = std::make_shared<ThirdPartyPerceptionSmartereye>(node_.get());
   } else if (device_type == ThirdPartyPerceptionDeviceType::MOBILEYE) {
     perception_ = std::make_shared<ThirdPartyPerceptionMobileye>(node_.get());
   } else {

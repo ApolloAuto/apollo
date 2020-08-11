@@ -350,8 +350,7 @@ TEST(TestSuite, CheckPreprocessPointsCPU) {
       new float[test_obj.max_num_pillars * test_obj.max_num_points_per_pillar *
                 test_obj.num_point_feature];
   float* pillar_coors = new float[test_obj.max_num_pillars * 4];
-  float* sparse_pillar_map =
-      new float[kNumIndsForScan * kNumIndsForScan];
+  float* sparse_pillar_map = new float[kNumIndsForScan * kNumIndsForScan];
 
   int host_pillar_count[1] = {0};
   test_obj.Preprocess(points_array, pcl_pc_ptr->size(), x_coors, y_coors,

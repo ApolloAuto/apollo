@@ -18,10 +18,10 @@
  * @file
  */
 
+#include <cmath>
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
-#include <cmath>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
@@ -39,8 +39,8 @@ namespace apollo {
 namespace third_party_perception {
 namespace conversion_mobileye {
 
-using apollo::drivers::Mobileye;
 using apollo::canbus::Chassis;
+using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;

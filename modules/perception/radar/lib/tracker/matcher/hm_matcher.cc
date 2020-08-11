@@ -100,7 +100,7 @@ void HMMatcher::TrackObjectPropertyMatch(
   if (unassigned_tracks->empty() || unassigned_objects->empty()) {
     return;
   }
-  std::vector<std::vector<double> > association_mat(unassigned_tracks->size());
+  std::vector<std::vector<double>> association_mat(unassigned_tracks->size());
   for (size_t i = 0; i < association_mat.size(); ++i) {
     association_mat[i].resize(unassigned_objects->size(), 0);
   }
@@ -148,7 +148,7 @@ void HMMatcher::ComputeAssociationMat(
     const base::Frame &radar_frame,
     const std::vector<size_t> &unassigned_tracks,
     const std::vector<size_t> &unassigned_objects,
-    std::vector<std::vector<double> > *association_mat) {
+    std::vector<std::vector<double>> *association_mat) {
   double frame_timestamp = radar_frame.timestamp;
   for (size_t i = 0; i < unassigned_tracks.size(); ++i) {
     for (size_t j = 0; j < unassigned_objects.size(); ++j) {

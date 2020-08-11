@@ -15,10 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/compression.h"
-#include <cstring>
-#include <zlib.h>
-#include "cyber/common/log.h"
 
+#include <cstring>
+
+#include <zlib.h>
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {

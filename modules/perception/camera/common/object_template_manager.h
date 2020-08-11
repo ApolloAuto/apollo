@@ -37,7 +37,7 @@ enum class TemplateIndex {
   BUS_MIN_VOLUME_INDEX,
 };
 
-typedef std::map<base::ObjectSubType, std::vector<float> > TemplateMap;
+typedef std::map<base::ObjectSubType, std::vector<float>> TemplateMap;
 
 struct ObjectTemplateManagerInitOptions {
   std::string root_dir;

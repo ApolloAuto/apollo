@@ -16,8 +16,8 @@
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 
 #include "cyber/common/file.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/common/util/perf_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_segmentation_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"

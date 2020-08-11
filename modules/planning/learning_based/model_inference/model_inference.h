@@ -34,8 +34,8 @@ class ModelInference {
   /**
    * @brief Constructor
    */
-  explicit ModelInference(const LearningModelInferenceTaskConfig& config) :
-      config_(config) {}
+  explicit ModelInference(const LearningModelInferenceTaskConfig& config)
+      : config_(config) {}
 
   /**
    * @brief Destructor

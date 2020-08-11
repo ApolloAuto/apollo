@@ -196,8 +196,7 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   // }
 
   injector_->learning_based_data()
-           ->set_learning_data_adc_future_trajectory_points(
-               adc_future_trajectory);
+      ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
 
   return Status::OK();
 }

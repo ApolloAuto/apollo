@@ -85,11 +85,12 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   if (FLAGS_enable_downsample_beams) {
     base::PointFCloudPtr downsample_beams_cloud_ptr(new base::PointFCloud());
     if (DownSamplePointCloudBeams(original_cloud_, downsample_beams_cloud_ptr,
-        FLAGS_downsample_beams_factor)) {
+                                  FLAGS_downsample_beams_factor)) {
       cur_cloud_ptr_ = downsample_beams_cloud_ptr;
     } else {
       AWARN << "Down sample beams factor must be >= 1. Cancel down sampling."
-               " Current factor: " << FLAGS_downsample_beams_factor;
+               " Current factor: "
+            << FLAGS_downsample_beams_factor;
     }
   }
 
@@ -116,13 +117,13 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
   AINFO << "num points before fusing: " << num_points;
 
   // fuse clouds of preceding frames with current cloud
-  cur_cloud_ptr_->mutable_points_timestamp()->assign(
-      cur_cloud_ptr_->size(), 0.0);
+  cur_cloud_ptr_->mutable_points_timestamp()->assign(cur_cloud_ptr_->size(),
+                                                     0.0);
   if (FLAGS_enable_fuse_frames && FLAGS_num_fuse_frames > 1) {
     // before fusing
     while (!prev_world_clouds_.empty() &&
-        frame->timestamp - prev_world_clouds_.front()->get_timestamp() >
-            FLAGS_fuse_time_interval) {
+           frame->timestamp - prev_world_clouds_.front()->get_timestamp() >
+               FLAGS_fuse_time_interval) {
       prev_world_clouds_.pop_front();
     }
     // transform current cloud to world coordinate and save to a new ptr
@@ -149,7 +150,7 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
 
     // after fusing
     while (static_cast<int>(prev_world_clouds_.size()) >=
-        FLAGS_num_fuse_frames - 1) {
+           FLAGS_num_fuse_frames - 1) {
       prev_world_clouds_.pop_front();
     }
     prev_world_clouds_.emplace_back(cur_world_cloud_ptr);
@@ -212,8 +213,9 @@ void PointPillarsDetection::CloudToArray(const base::PointFCloudPtr& pc_ptr,
   }
 }
 
-void PointPillarsDetection::FuseCloud(const base::PointFCloudPtr& out_cloud_ptr,
-    const std::deque<base::PointDCloudPtr> &fuse_clouds) {
+void PointPillarsDetection::FuseCloud(
+    const base::PointFCloudPtr& out_cloud_ptr,
+    const std::deque<base::PointDCloudPtr>& fuse_clouds) {
   for (auto iter = fuse_clouds.rbegin(); iter != fuse_clouds.rend(); ++iter) {
     double delta_t = lidar_frame_ref_->timestamp - (*iter)->get_timestamp();
     // transform prev world point cloud to current sensor's coordinates

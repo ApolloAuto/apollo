@@ -555,8 +555,7 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
                << Clock::NowInSeconds() << "]";
       } else {
         // check timeout
-        double stop_timer =
-            Clock::NowInSeconds() - stop_time_map[obstacle_id];
+        double stop_timer = Clock::NowInSeconds() - stop_time_map[obstacle_id];
         ADEBUG << "stop_timer: obstacle_id[" << obstacle_id << "] stop_timer["
                << stop_timer << "]";
         if (stop_timer >= kPedestrianStopTimeout) {
