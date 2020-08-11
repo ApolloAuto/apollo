@@ -18,6 +18,13 @@ syntax = "proto2";
 
 package apollo.audio;
 
+enum MovingResult {
+  APPROACHING = 1;
+  DEPARTING = 2;
+  UNKNOWN = 3;
+}
+
 message AudioDetection {
   optional bool is_siren = 1;
+  optional MovingResult moving_result = 2 [default = UNKNOWN];
 }

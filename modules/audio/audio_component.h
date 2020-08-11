@@ -25,6 +25,7 @@
 
 #include "cyber/component/component.h"
 #include "modules/audio/common/audio_info.h"
+#include "modules/audio/inference/moving_detection.h"
 #include "modules/audio/proto/audio.pb.h"
 #include "modules/drivers/microphone/proto/audio.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -56,6 +57,8 @@ class AudioComponent
   std::shared_ptr<cyber::Writer<AudioDetection>> audio_writer_;
 
   AudioInfo audio_info_;
+
+  MovingDetection moving_detection_;
 };
 
 CYBER_REGISTER_COMPONENT(AudioComponent)

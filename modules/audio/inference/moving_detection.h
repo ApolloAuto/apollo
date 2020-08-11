@@ -14,8 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <deque>
 #include <vector>
 #include <complex>
+
+#include "modules/audio/proto/audio.pb.h"
 
 namespace apollo {
 namespace audio {
@@ -29,7 +32,34 @@ class MovingDetection {
  public:
   MovingDetection() = default;
 
-  std::vector<std::complex<double>> fft1d(const std::vector<double>& signal);
+  std::vector<std::complex<double>> fft1d(const std::vector<double>& signals);
+
+  MovingResult Detect(const std::vector<std::vector<double>>& signals);
+
+  MovingResult DetectSingleChannel(
+      const std::size_t channel_index, const std::vector<double>& signal);
+
+ private:
+  class SignalStat {
+   public:
+    SignalStat(double power, int top_frequency)
+        : power_(power), top_frequency_(top_frequency) {}
+    double power() const { return power_; }
+    int top_frequency() const { return top_frequency_; }
+   private:
+    double power_;
+    int top_frequency_;
+  };
+
+  SignalStat GetSignalStat(
+      const std::vector<std::complex<double>>& fft_results,
+      const int start_frequency);
+
+  MovingResult AnalyzePower(const std::deque<SignalStat>& signal_stats);
+
+  MovingResult AnalyzeTopFrequence(const std::deque<SignalStat>& signal_stats);
+
+  std::vector<std::deque<SignalStat>> signal_stats_;
 };
 
 }  // namespace audio

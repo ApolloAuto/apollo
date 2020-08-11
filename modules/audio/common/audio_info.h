@@ -32,7 +32,7 @@ class AudioInfo {
   void Insert(
       const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&);
 
-  std::vector<std::vector<float>> GetSignals(const int signal_length);
+  std::vector<std::vector<double>> GetSignals(const int signal_length);
 
  private:
   void InsertChannelData(
@@ -41,7 +41,7 @@ class AudioInfo {
       const apollo::drivers::microphone::config::MicrophoneConfig&
           microphone_config);
 
-  std::vector<std::deque<float>> signals_;
+  std::vector<std::deque<double>> signals_;
 };
 
 }  // namespace audio
