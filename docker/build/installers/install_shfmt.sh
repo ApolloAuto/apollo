@@ -20,20 +20,20 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
 . /tmp/installers/installer_base.sh
 
-TARGET_ARCH=$(uname -m)
-VERSION="v3.1.2"
+TARGET_ARCH="$(uname -m)"
+VERSION="3.1.2"
+
 BIN_NAME=""
 CHECKSUM=""
 
 if [ "$TARGET_ARCH" == "x86_64" ]; then
-  BIN_NAME="shfmt_${VERSION}_linux_amd64"
+  BIN_NAME="shfmt_v${VERSION}_linux_amd64"
   CHECKSUM="c5794c1ac081f0028d60317454fe388068ab5af7740a83e393515170a7157dce"
 
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
-  BIN_NAME="shfmt_${VERSION}_linux_arm"
+  BIN_NAME="shfmt_v${VERSION}_linux_arm"
   CHECKSUM="e13cf317cc653d33e6b6d1cfe36fa891052c6211190a2ada7a46367417726c44"
 
 else
@@ -41,10 +41,14 @@ else
   exit 1
 fi
 
-DOWNLOAD_LINK="https://github.com/mvdan/sh/releases/download/${VERSION}/${BIN_NAME}"
-
+DOWNLOAD_LINK="https://github.com/mvdan/sh/releases/download/v${VERSION}/${BIN_NAME}"
 download_if_not_cached "${BIN_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-chmod +x "${BIN_NAME}"
-mv "${BIN_NAME}" "/usr/local/bin/shfmt"
+
+cp -f "${BIN_NAME}" "${SYSROOT_DIR}/bin/shfmt"
+
+chmod a+x "${SYSROOT_DIR}/bin/shfmt"
 
 ok "Successfully installed shfmt ${VERSION}."
+
+# cleanup
+rm -rf "${BIN_NAME}"
