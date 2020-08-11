@@ -46,26 +46,8 @@
 
 ## 车辆配置文件准备
 
-在`/apollo/modules/calibration/data/`目录下Apollo支持车型的配置参数，开发套件的配置参数在`/apollo/modules/calibration/data/dev_kit`文件夹下，可以看到如下配置信息：
-
-![dev_kit_config](images/dev_kit_config.png)
-
-具体参数说明如下：
-
-- `camera_conf`时相机的配置文件。
-- `camera_params`目录是相机的标定参数。
-- `cancard_params`目录是CAN卡的相关配置文件。
-- `gnss_conf`目录主要是关于GPS相关配置文件，包含的文件`gnss_conf.pb.txt`是关于基站配置，具体内容在定位配置部分已经作了说明，必须保证信息正确。
-- `gnss_params`目录主要是关于IMU的杆臂值的配置参数。
-- `radar_conf`目录是毫米波雷达的相关配置文件。
-- `radar_params`目录时毫米波雷达的标定参数。
-- `vehicle_params`目录下是关于车辆`translation`和`rotation`相关设置，不用修改。
-- `velodyne_conf`目录是激光雷达的相关配置文件。
-- `velodyne_params`目录是激光雷达的标定参数。
-- `control_conf.pb.txt`文件是控制配置文件，包含了全部的控制参数，需要调整开发套件控制参数时，请调整此文件内容。
-- `vehicle_param.pb.txt`是关于车辆的基本参数。
-
-我们为车辆提供了默认的参数，请务必按照前述**前提条件**的步骤就行配置，否则会导致循迹启动失败。在完成上述循迹准备工作后，下面开始启动循迹操作。
+- 在`/apollo/modules/calibration/data/`目录下列出了Apollo支持车型的配置参数。
+- 在`/apollo/modules/calibration/data/dev_kit`文件夹下，我们为开发套件提供了默认的参数，请务必按照前述**前提条件**的步骤进行配置，否则会导致循迹启动失败。在完成前提条件准备工作后，下面开始启动循迹操作。
 
 ## 循迹启动
 
