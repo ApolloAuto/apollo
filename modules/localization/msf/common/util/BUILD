@@ -67,7 +67,7 @@ cc_library(
 )
 
 cc_library(
-    name = "localization_msf_common_util_map_cache",
+    name = "base_map_cache",
     hdrs = [
         "base_map_cache.h",
     ],
@@ -128,10 +128,10 @@ cc_test(
 )
 
 cc_test(
-    name = "localization_msf_common_map_cache_test",
+    name = "base_map_cache_test",
     srcs = ["base_map_cache_test.cc"],
     deps = [
-        ":localization_msf_common_util_map_cache",
+        ":base_map_cache",
         "//cyber/common",
         "@com_google_googletest//:gtest_main",
     ],

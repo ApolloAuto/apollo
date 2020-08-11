@@ -17,6 +17,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/localization/msf/common/util",
+        "//modules/localization/msf/common/util:base_map_cache",
         "//modules/localization/msf/common/util:compression",
         "//modules/localization/msf/common/util:system_utility",
         "@boost",

@@ -15,6 +15,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//modules/localization/msf/common/util",
+        "//modules/localization/msf/common/util:base_map_cache",
         "//modules/localization/msf/common/util:compression",
         "//modules/localization/msf/local_map/base_map",
         "@eigen",
