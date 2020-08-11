@@ -28,7 +28,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 PKG_NAME="libtorch-1.5.1-gpu-apollo.zip"
 DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-CHECKSUM="ac84c34298db9e1ded90c65d17c6a8050665aa14cbbf48bca7e59965a665d31f"
+CHECKSUM="6e8aa94e2f7086d3ecc79484ade50cdcac69f1b51b1f04e4feda2f9384b4c380"
 
 #https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
