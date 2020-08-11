@@ -73,11 +73,7 @@ apt-get -y update && \
 COMPONENT="modules/monitor"
 info "Install support for [${COMPONENT}] ..."
 
-if dpkg -l | grep -q "linux-libc-dev"; then
-    info "linux-libc-dev already installed"
-else
-    apt_get_update_and_install linux-libc-dev
-fi
+apt_get_update_and_install linux-libc-dev
 
 #######################################################
 COMPONENT="modules/localization"
@@ -99,6 +95,12 @@ bash /tmp/installers/install_python_modules.sh
 COMPONENT="modules/teleop"
 info "Install support for [${COMPONENT}] ..."
 bash /tmp/installers/install_openh264.sh
+
+
+######################################################
+COMPONENT="modules/audio"
+info "Install support for [${COMPONENT}] ..."
+bash /tmp/installers/install_fftw3.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
