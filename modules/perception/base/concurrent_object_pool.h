@@ -142,9 +142,8 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      is_front
-          ? data->emplace_front(new ObjectType)
-          : data->emplace_back(new ObjectType);
+      is_front ? data->emplace_front(new ObjectType)
+               : data->emplace_back(new ObjectType);
     }
 #endif
   }
@@ -182,9 +181,8 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     }
 #else
     for (size_t i = 0; i < num; ++i) {
-      is_front
-          ? data->emplace_front(new ObjectType)
-          : data->emplace_back(new ObjectType);
+      is_front ? data->emplace_front(new ObjectType)
+               : data->emplace_back(new ObjectType);
     }
 #endif
   }

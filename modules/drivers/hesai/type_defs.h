@@ -50,7 +50,7 @@ typedef struct Hesai40Packet {
 
 /************Hesai64*******************************/
 typedef struct Hesai64Header {
-  uint16_t sob;     // 0xFFEE 2bytes
+  uint16_t sob;           // 0xFFEE 2bytes
   uint8_t chLaserNumber;  // laser number 1byte
   uint8_t chBlockNumber;  // block number 1byte
   uint8_t chReturnType;   // return mode 1 byte

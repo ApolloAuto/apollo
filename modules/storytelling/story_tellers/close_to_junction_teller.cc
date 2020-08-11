@@ -284,12 +284,12 @@ void CloseToJunctionTeller::Update(Stories* stories) {
 
   // CloseToJunction
   if ((!junction_id_.empty() && junction_distance_ >= 0) ||
-      (!pnc_junction_id_.empty() && pnc_junction_distance_ >=0)) {
+      (!pnc_junction_id_.empty() && pnc_junction_distance_ >= 0)) {
     if (!stories->has_close_to_junction()) {
       AINFO << "Enter CloseToJunction story";
     }
     auto* story = stories->mutable_close_to_junction();
-    if (!pnc_junction_id_.empty() && pnc_junction_distance_ >=0) {
+    if (!pnc_junction_id_.empty() && pnc_junction_distance_ >= 0) {
       story->set_id(pnc_junction_id_);
       story->set_type(CloseToJunction::PNC_JUNCTION);
       story->set_distance(pnc_junction_distance_);

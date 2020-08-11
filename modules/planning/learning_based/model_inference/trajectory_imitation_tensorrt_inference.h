@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "NvInfer.h"
 #include "NvOnnxParser.h"
@@ -101,7 +101,7 @@ class TrajectoryImitationTensorRTInference : public ModelInference {
   bool DoInference(LearningDataFrame* learning_data_frame) override;
 
  private:
-   /**
+  /**
    * @brief inference a CONV_RNN model
    * @param learning_data_frame input and output intermediate for inference
    */

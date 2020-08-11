@@ -20,8 +20,8 @@
 #include <map>
 #include <utility>
 
-#include "cyber/tools/cyber_monitor/renderable_message.h"
 #include "cyber/cyber.h"
+#include "cyber/tools/cyber_monitor/renderable_message.h"
 
 class Screen;
 

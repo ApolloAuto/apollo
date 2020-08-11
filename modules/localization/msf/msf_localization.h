@@ -22,8 +22,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <mutex>
+#include <string>
 
 #include "gtest/gtest_prod.h"
 

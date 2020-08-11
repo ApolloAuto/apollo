@@ -938,10 +938,9 @@ bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
       unsigned char yuyvbuf[len];
       unsigned char uyvybuf[len];
       memcpy(yuyvbuf, src, len);
-      for (int index = 0; index < len; index = index + 2)
-      {
-        uyvybuf[index] = yuyvbuf[index+1];
-        uyvybuf[index+1] = yuyvbuf[index];
+      for (int index = 0; index < len; index = index + 2) {
+        uyvybuf[index] = yuyvbuf[index + 1];
+        uyvybuf[index + 1] = yuyvbuf[index];
       }
       memcpy(src, uyvybuf, len);
     }

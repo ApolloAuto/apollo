@@ -180,7 +180,7 @@ bool ObjectTemplateManager::Init(
 }
 
 void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
-  std::vector<std::tuple<float, float, float> > list_tpl;
+  std::vector<std::tuple<float, float, float>> list_tpl;
   list_tpl.resize(0);
   for (int i = 0; i < tmplt.dim_size(); ++i) {
     Dim dim = tmplt.dim(i);
@@ -196,7 +196,7 @@ void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
 
 void ObjectTemplateManager::LoadVehMinMidMaxTemplates(
     const base::ObjectSubType &type, const ObjectTemplate &tmplt) {
-  std::vector<std::tuple<float, float, float> > list_tpl;
+  std::vector<std::tuple<float, float, float>> list_tpl;
   list_tpl.resize(0);
   for (int i = 0; i < tmplt.dim_size(); ++i) {
     Dim dim = tmplt.dim(i);

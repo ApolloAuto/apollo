@@ -25,7 +25,6 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-
 namespace apollo {
 namespace drivers {
 namespace video {

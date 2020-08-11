@@ -177,7 +177,7 @@ int lane_postprocessor_eval() {
     lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width, &lane_map_height,
                                    &lane_ccs, &select_lane_ccs);
 
-    const std::vector<std::vector<LanePointInfo> >& detect_laneline_point_set =
+    const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set =
         lane_postprocessor->GetLanelinePointSet();
     if (FLAGS_lane_line_debug) {
       save_img_path = absl::StrCat(FLAGS_save_dir, "/", FLAGS_file_title, "_0_",

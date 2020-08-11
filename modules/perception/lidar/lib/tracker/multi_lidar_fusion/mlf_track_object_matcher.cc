@@ -42,11 +42,11 @@ bool MlfTrackObjectMatcher::Init(
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   foreground_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
-          config.foreground_mathcer_method());
+      config.foreground_mathcer_method());
   ACHECK(foreground_matcher_ != nullptr);
   AINFO << "MlfTrackObjectMatcher, fg: " << foreground_matcher_->Name();
   background_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
-          config.background_matcher_method());
+      config.background_matcher_method());
   ACHECK(background_matcher_ != nullptr);
   AINFO << "MlfTrackObjectMatcher, bg: " << background_matcher_->Name();
   foreground_matcher_->cost_matrix()->Reserve(1000, 1000);
@@ -65,7 +65,7 @@ void MlfTrackObjectMatcher::Match(
     const MlfTrackObjectMatcherOptions &options,
     const std::vector<TrackedObjectPtr> &objects,
     const std::vector<MlfTrackDataPtr> &tracks,
-    std::vector<std::pair<size_t, size_t> > *assignments,
+    std::vector<std::pair<size_t, size_t>> *assignments,
     std::vector<size_t> *unassigned_tracks,
     std::vector<size_t> *unassigned_objects) {
   assignments->clear();
@@ -83,9 +83,8 @@ void MlfTrackObjectMatcher::Match(
   matcher_options.cost_thresh = max_match_distance_;
   matcher_options.bound_value = bound_value_;
 
-  BaseBipartiteGraphMatcher *matcher = objects[0]->is_background
-                                           ? background_matcher_
-                                           : foreground_matcher_;
+  BaseBipartiteGraphMatcher *matcher =
+      objects[0]->is_background ? background_matcher_ : foreground_matcher_;
 
   common::SecureMat<float> *association_mat = matcher->cost_matrix();
 

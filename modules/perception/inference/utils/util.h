@@ -47,7 +47,7 @@ std::shared_ptr<float> load_binary_data(const std::string &filename);
 bool write_result(const std::string &out_path,
                   const std::vector<float> &results);
 bool write_result(const std::string &out_path,
-                  const std::map<std::string, std::vector<float> > &results);
+                  const std::map<std::string, std::vector<float>> &results);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo

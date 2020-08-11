@@ -23,11 +23,11 @@
 
 #include <cuda_runtime_api.h>
 
+#include "NvInfer.h"
+#include "NvOnnxParser.h"
 #include "opencv2/opencv.hpp"
 #include "torch/extension.h"
 #include "torch/script.h"
-#include "NvInfer.h"
-#include "NvOnnxParser.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

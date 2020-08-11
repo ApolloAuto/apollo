@@ -51,7 +51,7 @@ class CameraPerceptionVizMessage {
   CameraPerceptionVizMessage(
       const std::string& camera_name, const double msg_timestamp,
       const Eigen::Matrix4d& pose_camera_to_world,
-      const std::shared_ptr<base::Blob<uint8_t> >& image_blob,
+      const std::shared_ptr<base::Blob<uint8_t>>& image_blob,
       const std::vector<base::ObjectPtr>& camera_objects,
       const std::vector<base::LaneLine>& lane_objects,
       const apollo::common::ErrorCode& error_code);
@@ -62,7 +62,7 @@ class CameraPerceptionVizMessage {
   double msg_timestamp_ = 0.0;
 
   Eigen::Matrix4d pose_camera_to_world_;
-  std::shared_ptr<base::Blob<uint8_t> > image_blob_;
+  std::shared_ptr<base::Blob<uint8_t>> image_blob_;
   std::vector<base::ObjectConstPtr> camera_objects_;
   std::vector<base::LaneLine> lane_objects_;
   apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;

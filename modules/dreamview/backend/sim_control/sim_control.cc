@@ -102,9 +102,9 @@ void SimControl::InitTimerAndIO() {
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(
-      new cyber::Timer(kSimPredictionIntervalMs,
-                       [this]() { this->PublishDummyPrediction(); }, false));
+  sim_prediction_timer_.reset(new cyber::Timer(
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
+      false));
 }
 
 void SimControl::Init(bool set_start_point, double start_velocity,

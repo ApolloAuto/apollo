@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #ifndef LIDAR_HESAI_CONST_VAR_H_
 #define LIDAR_HESAI_CONST_VAR_H_
 

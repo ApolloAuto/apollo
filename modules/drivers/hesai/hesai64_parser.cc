@@ -260,4 +260,3 @@ void Hesai64Parser::CalcPointXYZIT(Hesai64Packet *pkt, int blockid,
 }  // namespace hesai
 }  // namespace drivers
 }  // namespace apollo
-

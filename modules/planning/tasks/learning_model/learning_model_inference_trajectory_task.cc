@@ -32,7 +32,7 @@ using apollo::common::TrajectoryPoint;
 
 LearningModelInferenceTrajectoryTask::LearningModelInferenceTrajectoryTask(
     const TaskConfig &config,
-    const std::shared_ptr<DependencyInjector>& injector)
+    const std::shared_ptr<DependencyInjector> &injector)
     : Task(config, injector) {
   ACHECK(config.has_learning_model_inference_trajectory_task_config());
 }

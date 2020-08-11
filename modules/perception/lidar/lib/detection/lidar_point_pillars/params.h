@@ -74,11 +74,10 @@ class Params {
 
   static std::vector<std::vector<float>> AnchorZCoors() {
     return std::vector<std::vector<float>>{
-      std::vector<float>{-0.0715754f, -0.93897414f, -0.08168083f,
-                         0.22228277f, 0.22228277f, -0.37937912f},
-      std::vector<float>{-1.27247968f, -1.03743013f, -0.99194854f,
-                         -0.73911038f, -1.27868911f}
-    };
+        std::vector<float>{-0.0715754f, -0.93897414f, -0.08168083f, 0.22228277f,
+                           0.22228277f, -0.37937912f},
+        std::vector<float>{-1.27247968f, -1.03743013f, -0.99194854f,
+                           -0.73911038f, -1.27868911f}};
   }
 
   static std::vector<std::vector<int>> NumAnchorRo() {

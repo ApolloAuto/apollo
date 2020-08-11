@@ -23,8 +23,8 @@ limitations under the License.
 
 #include "absl/strings/match.h"
 #include "cyber/common/file.h"
-#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/common/util/util.h"
+#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 
 namespace apollo {
 namespace hdmap {

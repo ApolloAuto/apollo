@@ -76,7 +76,7 @@ float get_jaccard_overlap(const NormalizedBBox &bbox1,
 
 void get_max_score_index(const std::vector<float> &scores,
                          const float threshold, const int top_k,
-                         std::vector<std::pair<float, int> > *score_index_vec) {
+                         std::vector<std::pair<float, int>> *score_index_vec) {
   // Generate index score pairs.
   for (int i = 0; i < static_cast<int>(scores.size()); ++i) {
     if (scores[i] > threshold) {
@@ -104,7 +104,7 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
       << "bboxes and scores have different size.";
 
   // Get top_k scores (with corresponding indices).
-  std::vector<std::pair<float, int> > score_index_vec;
+  std::vector<std::pair<float, int>> score_index_vec;
   get_max_score_index(*scores, score_threshold, top_k, &score_index_vec);
 
   // Do nms.
@@ -116,7 +116,7 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
     score_index_vec.erase(best_it);
     const NormalizedBBox &best_bbox = bboxes[best_idx];
     indices->push_back(best_idx);
-    for (std::vector<std::pair<float, int> >::iterator it =
+    for (std::vector<std::pair<float, int>>::iterator it =
              score_index_vec.begin();
          it != score_index_vec.end();) {
       int cur_idx = it->second;
@@ -214,7 +214,7 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
       << "bboxes and scores have different size.";
 
   // Get top_k scores (with corresponding indices).
-  std::vector<std::pair<float, int> > score_index_vec;
+  std::vector<std::pair<float, int>> score_index_vec;
   get_max_score_index(scores, score_threshold, top_k, &score_index_vec);
 
   // Do nms.

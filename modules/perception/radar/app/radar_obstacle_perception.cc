@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/radar/app/radar_obstacle_perception.h"
 
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/common/util/perf_util.h"
 
 using apollo::perception::lib::ConfigManager;
 using apollo::perception::lib::ModelConfig;

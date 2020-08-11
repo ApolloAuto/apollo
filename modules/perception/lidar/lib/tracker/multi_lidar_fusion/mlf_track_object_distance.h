@@ -46,8 +46,8 @@ class MlfTrackObjectDistance {
   std::string Name() const { return "MlfTrackObjectDistance"; }
 
  protected:
-  std::map<std::string, std::vector<float> > foreground_weight_table_;
-  std::map<std::string, std::vector<float> > background_weight_table_;
+  std::map<std::string, std::vector<float>> foreground_weight_table_;
+  std::map<std::string, std::vector<float>> background_weight_table_;
 
   static const std::vector<float> kForegroundDefaultWeight;
   static const std::vector<float> kBackgroundDefaultWeight;

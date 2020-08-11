@@ -126,7 +126,7 @@ void FloodFill::DfsColoring(int i, int j, int curr_component) {
 }
 
 void FloodFill::GetSegments(base::PointFCloudConstPtr cloud,
-                            std::vector<std::vector<int> >* segments_indices,
+                            std::vector<std::vector<int>>* segments_indices,
                             std::vector<int>* num_cells_per_segment) {
   CHECK_NOTNULL(segments_indices);
   CHECK_NOTNULL(num_cells_per_segment);

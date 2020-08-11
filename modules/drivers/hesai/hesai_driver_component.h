@@ -26,8 +26,8 @@
 #include "modules/drivers/hesai/const_var.h"
 #include "modules/drivers/hesai/driver.h"
 #include "modules/drivers/hesai/parser.h"
-#include "modules/drivers/hesai/type_defs.h"
 #include "modules/drivers/hesai/proto/config.pb.h"
+#include "modules/drivers/hesai/type_defs.h"
 
 namespace apollo {
 namespace drivers {

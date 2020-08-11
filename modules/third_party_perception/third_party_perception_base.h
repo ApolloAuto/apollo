@@ -20,19 +20,19 @@
 
 #pragma once
 
+#include <memory>
 #include <mutex>
 #include <string>
-#include <memory>
 
 #include "cyber/node/node.h"
 #include "cyber/node/reader.h"
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
+#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 
 /**
  * @namespace apollo::third_party_perception
@@ -57,8 +57,7 @@ class ThirdPartyPerception {
   // Upon receiving chassis data
   void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
-  virtual bool Process(
-      apollo::perception::PerceptionObstacles* const response);
+  virtual bool Process(apollo::perception::PerceptionObstacles* const response);
 
  protected:
   std::mutex third_party_perception_mutex_;
