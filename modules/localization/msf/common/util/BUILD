@@ -66,6 +66,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "base_map_cache",
+    hdrs = [
+        "base_map_cache.h",
+    ],
+    deps = [
+        "//modules/common/util:lru_cache",
+    ],
+)
+
 cc_test(
     name = "compression_test",
     size = "small",
@@ -113,6 +123,16 @@ cc_test(
     srcs = ["frame_transform_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:frame_transform",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "base_map_cache_test",
+    srcs = ["base_map_cache_test.cc"],
+    deps = [
+        ":base_map_cache",
+        "//cyber/common",
         "@com_google_googletest//:gtest_main",
     ],
 )

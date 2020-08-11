@@ -108,7 +108,6 @@ cc_library(
     srcs = ["base_map.cc"],
     hdrs = [
         "base_map.h",
-        "base_map_cache.h",
         "base_map_fwd.h",
     ],
     deps = [
@@ -118,6 +117,7 @@ cc_library(
         ":base_map_pool",
         "//cyber/common",
         "//modules/localization/msf/common/util",
+        "//modules/localization/msf/common/util:base_map_cache",
         "//modules/localization/msf/common/util:file_utility",
         "@com_google_glog//:glog",
         "@eigen",
