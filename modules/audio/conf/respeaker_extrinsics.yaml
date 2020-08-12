@@ -1,0 +1,17 @@
+header:
+  stamp:
+    secs: 0
+    nsecs: 0
+  seq: 0
+  frame_id: novatel
+child_frame_id:  microphone
+transform:
+  rotation:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  translation:
+    x: 0.0
+    y: 0.68
+    z: 0.72

@@ -19,7 +19,10 @@ cc_library(
     hdrs = ["direction_detection.h"],
     deps = [
         "//cyber",
+        "//modules/common/proto:geometry_cc_proto",
         "//third_party:libtorch",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@eigen",
     ],
 )
 

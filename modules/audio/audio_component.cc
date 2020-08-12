@@ -15,12 +15,13 @@
  *****************************************************************************/
 
 #include "modules/audio/audio_component.h"
-#include "modules/audio/inference/direction_detection.h"
 #include "modules/audio/proto/audio_conf.pb.h"
+#include "modules/common/proto/geometry.pb.h"
 
 namespace apollo {
 namespace audio {
 
+using apollo::common::Point3D;
 using apollo::drivers::microphone::config::AudioData;
 
 AudioComponent::~AudioComponent() {}
@@ -42,21 +43,24 @@ bool AudioComponent::Init() {
           audio_conf.topic_conf().localization_topic_name(), nullptr);
   audio_writer_ = node_->CreateWriter<AudioDetection>(
       audio_conf.topic_conf().audio_detection_topic_name());
+  respeaker_extrinsics_file_ = audio_conf.respeaker_extrinsics_path();
   return true;
 }
 
 bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {
-  audio_info_.Insert(audio_data);
-  AINFO << "Current direction is: "
-        << get_direction(
-               audio_info_.GetSignals(audio_data->microphone_config().chunk()),
-               audio_data->microphone_config().sample_rate(),
-               audio_data->microphone_config().mic_distance());
   // TODO(all) remove GetSignals() multiple calls
+  audio_info_.Insert(audio_data);
+  AudioDetection audio_detection;
+  *audio_detection.mutable_position() =
+      direction_detection_.EstimateSoundSource(
+          audio_info_.GetSignals(audio_data->microphone_config().chunk()),
+          respeaker_extrinsics_file_,
+          audio_data->microphone_config().sample_rate(),
+          audio_data->microphone_config().mic_distance());
+
   auto signals =
       audio_info_.GetSignals(audio_data->microphone_config().chunk());
   MovingResult moving_result = moving_detection_.Detect(signals);
-  AudioDetection audio_detection;
   audio_detection.set_moving_result(moving_result);
   // TODO(all) add header to audio_detection
   audio_writer_->Write(audio_detection);
