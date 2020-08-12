@@ -49,7 +49,7 @@ function run_autopep8() {
 }
 
 function run_shfmt() {
-  bash "${TOP_DIR}/scripts/shell_format.sh" "$@"
+  bash "${TOP_DIR}/scripts/shfmt.sh" "$@"
 }
 
 function run_format_all() {

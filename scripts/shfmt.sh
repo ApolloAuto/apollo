@@ -17,7 +17,7 @@
 ###############################################################################
 
 # Usage:
-#   shell_format.sh <path/to/src/dir/or/files>
+#   shfmt.sh <path/to/src/dir/or/files>
 
 # Fail on error
 set -e
