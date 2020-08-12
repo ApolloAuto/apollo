@@ -22,6 +22,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "siren_detection",
+    srcs = ["siren_detection.cc"],
+    hdrs = ["siren_detection.h"],
+    deps = [
+        "//cyber/common:log",
+        "//modules/audio/common:audio_gflags",
+        "//third_party:libtorch",
+    ],
+)
+
 cc_test(
     name = "moving_detection_test",
     size = "small",

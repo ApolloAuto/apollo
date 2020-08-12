@@ -16,7 +16,34 @@
 
 #pragma once
 
-#include "gflags/gflags.h"
+#include <vector>
 
-DECLARE_int32(cache_signal_time);
-DECLARE_string(torch_siren_detection_model);
+#include "torch/script.h"
+#include "torch/torch.h"
+
+namespace apollo {
+namespace audio {
+
+/**
+ * @file moving_detection.h
+ * @description detect if the sound is approaching or departing
+ */
+
+class SirenDetection {
+ public:
+  SirenDetection();
+
+  ~SirenDetection() = default;
+
+  bool Evaluate(const std::vector<std::vector<float>>& signals);
+
+ private:
+  void LoadModel();
+
+ private:
+  torch::jit::script::Module torch_model_;
+  torch::Device device_;
+};
+
+}  // namespace audio
+}  // namespace apollo
