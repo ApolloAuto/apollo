@@ -17,3 +17,6 @@
 #include "modules/audio/common/audio_gflags.h"
 
 DEFINE_int32(cache_signal_time, 3, "The time to cache signal");
+DEFINE_string(torch_siren_detection_model,
+              "/apollo/modules/audio/data/torch_siren_detection_model.pt",
+              "Siren detection model file");
