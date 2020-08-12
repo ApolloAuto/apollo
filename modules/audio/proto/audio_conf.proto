@@ -26,4 +26,5 @@ message TopicConf {
 
 message AudioConf {
   optional TopicConf topic_conf = 1;
+  optional string respeaker_extrinsics_path = 2;
 }

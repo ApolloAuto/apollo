@@ -15,12 +15,16 @@ cc_proto_library(
 proto_library(
     name = "audio_proto",
     srcs = ["audio.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto",
+    ],
 )
 
 py_proto_library(
     name = "audio_py_pb2",
     deps = [
         ":audio_proto",
+        "//modules/common/proto:geometry_py_pb2",
     ],
 )
 

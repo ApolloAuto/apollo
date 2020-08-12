@@ -25,6 +25,7 @@
 
 #include "cyber/component/component.h"
 #include "modules/audio/common/audio_info.h"
+#include "modules/audio/inference/direction_detection.h"
 #include "modules/audio/inference/moving_detection.h"
 #include "modules/audio/proto/audio.pb.h"
 #include "modules/drivers/microphone/proto/audio.pb.h"
@@ -59,6 +60,8 @@ class AudioComponent
   AudioInfo audio_info_;
 
   MovingDetection moving_detection_;
+  DirectionDetection direction_detection_;
+  std::string respeaker_extrinsics_file_;
 };
 
 CYBER_REGISTER_COMPONENT(AudioComponent)

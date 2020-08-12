@@ -3,3 +3,4 @@ topic_conf {
   audio_detection_topic_name: "/apollo/audio_detection"
   localization_topic_name: "/apollo/localization/pose"
 }
+respeaker_extrinsics_path: "/apollo/modules/audio/conf/respeaker_extrinsics.yaml"
