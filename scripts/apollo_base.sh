@@ -22,21 +22,10 @@ HOST_ARCH="$(uname -m)"
 
 function set_lib_path() {
   local CYBER_SETUP="${APOLLO_ROOT_DIR}/cyber/setup.bash"
-  [[ -e "${CYBER_SETUP}" ]] && . "${CYBER_SETUP}"
+  [ -e "${CYBER_SETUP}" ] && . "${CYBER_SETUP}"
 
   # TODO(storypku):
   # /usr/local/apollo/local_integ/lib
-
-  if [ -e /usr/local/cuda/ ];then
-    add_to_path "/usr/local/cuda/bin"
-  fi
-
-  # TODO(storypku): Remove this!
-  if [ "$USE_GPU" != "1" ];then
-    export LD_LIBRARY_PATH=/usr/local/libtorch_cpu/lib:$LD_LIBRARY_PATH
-  else
-    export LD_LIBRARY_PATH=/usr/local/libtorch_gpu/lib:$LD_LIBRARY_PATH
-  fi
 
   # FIXME(all): remove PYTHONPATH settings
   export PYTHONPATH="${APOLLO_ROOT_DIR}/modules/tools:${PYTHONPATH}"
@@ -58,21 +47,6 @@ function determine_bin_prefix() {
     APOLLO_BIN_PREFIX="${APOLLO_ROOT_DIR}/bazel-bin"
   fi
   export APOLLO_BIN_PREFIX
-}
-
-function find_device() {
-  # ${1} = device pattern
-  local device_list=$(find /dev -name "${1}")
-  if [ -z "${device_list}" ]; then
-    warning "Failed to find device with pattern \"${1}\" ..."
-  else
-    local devices=""
-    for device in $(find /dev -name "${1}"); do
-      ok "Found device: ${device}."
-      devices="${devices} --device ${device}:${device}"
-    done
-    echo "${devices}"
-  fi
 }
 
 function setup_device_for_aarch64() {
