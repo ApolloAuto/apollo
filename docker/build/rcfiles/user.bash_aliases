@@ -13,6 +13,9 @@ ulimit -c unlimited
 #if [ -e "/apollo/scripts/apollo_base.sh" ]; then
 #    . /apollo/scripts/apollo_base.sh
 #fi
+if [ -e "/apollo/cyber/setup.bash" ]; then
+    . /apollo/cyber/setup.bash
+fi
 
 if [ -f /etc/bash_completion.d/bazel ]; then
     . /etc/bash_completion.d/bazel
@@ -33,7 +36,7 @@ function inc() {
     fi
 }
 
-function show_line() {
+function sl() {
     if [ -z "$1" ]; then
         error "No file specified"
         return
