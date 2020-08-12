@@ -109,10 +109,6 @@ function determine_gpu_use() {
     export USE_GPU="${use_gpu}"
 }
 
-if [ -z "${USE_GPU}" ]; then
-    determine_gpu_use
-fi
-
 function file_ext() {
   local __ext="${1##*.}"
   if [ "${__ext}" == "$1" ]; then
@@ -223,3 +219,27 @@ function optarg_check_for_opt() {
     local optarg="$2"
     ! [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]
 }
+
+function setup_gpu_support() {
+    if [ -e /usr/local/cuda/ ];then
+        add_to_path "/usr/local/cuda/bin"
+    fi
+
+    determine_gpu_use
+
+    local dev=
+    if [ "${USE_GPU}" -eq 0 ]; then
+        dev="cpu"
+    else
+        dev="gpu"
+    fi
+
+    local torch_path="/usr/local/libtorch_${dev}/lib"
+    if [ -d "${torch_path}" ]; then
+        # FIXME(all): --config=cpu/gpu
+        export LD_LIBRARY_PATH="${torch_path}:$LD_LIBRARY_PATH"
+    fi
+}
+
+setup_gpu_support
+
