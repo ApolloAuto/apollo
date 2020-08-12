@@ -71,23 +71,6 @@ load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 grpc_extra_deps()
 
 #new_local_repository(
-#    name = "opengl",
-#    build_file = "third_party/opengl.BUILD",
-#    path = "/usr/include",
-#)
-#new_local_repository(
-#    name = "glfw",
-#    build_file = "third_party/glfw.BUILD",
-#    path = "/usr/include",
-#)
-# Caffe
-# new_local_repository(
-#    name = "caffe",
-#    build_file = "third_party/caffe.BUILD",
-#    path = "/opt/apollo/pkgs/caffe/include",
-# )
-
-#new_local_repository(
 #    name = "mkldnn",
 #    build_file = "third_party/mkldnn.BUILD",
 #    path = "/usr/local/apollo/local_third_party/mkldnn",
