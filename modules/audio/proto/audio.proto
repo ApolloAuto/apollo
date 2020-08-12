@@ -19,9 +19,10 @@ syntax = "proto2";
 package apollo.audio;
 
 enum MovingResult {
+  UNKNOWN = 0;
   APPROACHING = 1;
   DEPARTING = 2;
-  UNKNOWN = 3;
+  STATIONARY = 3;
 }
 
 message AudioDetection {
