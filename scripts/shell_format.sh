@@ -54,8 +54,8 @@ function check_shfmt() {
 }
 
 function shell_format_run() {
-  # Use Google's Style
-  ${SHELL_FORMAT_CMD} -i 2 -ci -w "$@"
+  # Use settings in .editorconfig
+  ${SHELL_FORMAT_CMD} -w "$@"
 }
 
 function run_shfmt() {

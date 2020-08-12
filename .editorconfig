@@ -1,0 +1,12 @@
+# http://editorconfig.org
+root = true
+
+[*.{sh,bash,bashrc}]
+# like -i=2
+indent_style = space
+indent_size = 2
+
+shell_variant      = bash    # like -ln=bash
+binary_next_line   = true    # like -bn
+switch_case_indent = true    # like -ci
+space_redirects    = true    # like -sr
