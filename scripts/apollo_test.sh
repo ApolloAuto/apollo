@@ -5,14 +5,7 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
-##============= Localization ===================##
-LOCALIZATION_EXCEPTIONS="\
-except //modules/localization/ndt/ndt_locator:ndt_lidar_locator_test \
-except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_test \
-except //modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool_test \
-except //modules/localization/ndt/ndt_locator:ndt_solver_test \
-except //modules/localization/msf:msf_localization_test \
-"
+EXCEPTIONS=""
 
 ##======================= Failed Test Cases are Listed Above ================##
 ARCH="$(uname -m)"
@@ -24,7 +17,7 @@ SHORTHAND_TARGETS=
 DISABLED_TARGETS=
 
 function _disabled_test_targets_all() {
-    local disabled="${LOCALIZATION_EXCEPTIONS}"
+    local disabled="${EXCEPTIONS}"
     if ! ${USE_ESD_CAN} ; then
         warning "ESD CAN library supplied by ESD Electronics doesn't exist."
         warning "If you need ESD CAN, please refer to:"
@@ -61,7 +54,7 @@ function determine_disabled_targets() {
             if [[ "${ARCH}" != "x86_64" ]]; then
                 disabled="${disabled} except //modules/localization/msf/..."
             fi
-            disabled="${disabled} ${LOCALIZATION_EXCEPTIONS}"
+            disabled="${disabled} ${EXCEPTIONS}"
         fi
     done
 
