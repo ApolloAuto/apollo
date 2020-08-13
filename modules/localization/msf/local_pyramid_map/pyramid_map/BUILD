@@ -150,7 +150,7 @@ cc_test(
 
 cc_test(
     name = "pyramid_map_pool_test",
-    size = "enormous",
+    size = "large",
     timeout = "short",
     srcs = ["pyramid_map_pool_test.cc"],
     deps = [
@@ -163,7 +163,7 @@ cc_test(
 
 cc_test(
     name = "pyramid_map_test",
-    size = "enormous",
+    size = "large",
     timeout = "short",
     srcs = ["pyramid_map_test.cc"],
     deps = [

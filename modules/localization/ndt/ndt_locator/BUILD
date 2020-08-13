@@ -38,7 +38,7 @@ filegroup(
 
 cc_test(
     name = "ndt_lidar_locator_test",
-    size = "enormous",
+    size = "large",
     timeout = "short",
     srcs = ["lidar_locator_ndt_test.cc"],
     data = [":test_data"],
@@ -52,7 +52,7 @@ cc_test(
 
 cc_test(
     name = "ndt_solver_test",
-    size = "enormous",
+    size = "large",
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
     data = [":test_data"],
