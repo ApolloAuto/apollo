@@ -165,7 +165,14 @@ function docker_pull() {
     fi
 }
 
-function restart_map_volume_if_needed() {
+function docker_start_volume() {
+    local container="$1"
+    local image="$2"
+    docker_pull "${image}"
+    docker run -id --rm --name "${container}" "${image}"
+}
+
+function start_map_volume() {
     local map_name="$1"
     local map_version="$2"
     local map_volume="apollo_map_volume-${map_name}_${USER}"
@@ -179,6 +186,7 @@ function restart_map_volume_if_needed() {
             map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
         fi
         info "Load map ${map_name} from image: ${map_image}"
+        docker_start_volume "${map_volume}" "${map_image}"
         MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${map_volume}"
     fi
 }
@@ -187,11 +195,11 @@ function mount_map_volumes() {
     info "Starting mounting map volumes ..."
     if [ "$FAST_MODE" = "no" ]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
-            restart_map_volume_if_needed ${map_name} "${VOLUME_VERSION}"
+            start_map_volume ${map_name} "${VOLUME_VERSION}"
         done
     else
         for map_name in ${DEFAULT_TEST_MAPS[@]}; do
-            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
+            start_map_volume "${map_name}" "${VOLUME_VERSION}"
         done
     fi
 }
@@ -203,17 +211,20 @@ function mount_other_volumes() {
         # YOLO3D
         local yolo3d_volume="apollo_yolo3d_volume_${USER}"
         local yolo3d_image="${DOCKER_REPO}:yolo3d_volume-${TARGET_ARCH}-latest"
+        docker_start_volume "${yolo3d_volume}" "${yolo3d_image}"
         volume_conf="${volume_conf} --volumes-from ${yolo3d_volume}"
     fi
 
     # LOCALIZATION
     local localization_volume="apollo_localization_volume_${USER}"
     local localization_image="${DOCKER_REPO}:localization_volume-${TARGET_ARCH}-latest"
+    docker_start_volume "${localization_volume}" "${localization_image}"
     volume_conf="${volume_conf} --volumes-from ${localization_volume}"
 
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
         local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
+        docker_start_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
         volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
     fi
 
@@ -241,7 +252,7 @@ function main() {
     mount_other_volumes
     set -x
 
-    ${DOCKER_RUN} -it --rm   \
+    ${DOCKER_RUN} -i --rm   \
         --privileged    \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
