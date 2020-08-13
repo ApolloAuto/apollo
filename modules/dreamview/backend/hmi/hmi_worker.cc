@@ -110,7 +110,7 @@ Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
 template <class FlagType, class ValueType>
 void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
                    FlagType* flag) {
-  static constexpr char kGlobalFlagfile[] =
+  constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
   if (*flag != value) {
     *flag = value;
@@ -322,8 +322,7 @@ void HMIWorker::InitReadersAndWriters() {
   // Received Chassis, trigger action if there is high beam signal.
   chassis_reader_ = node_->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
-        if (Clock::NowInSeconds() -
-                chassis->header().timestamp_sec() <
+        if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {
           if (chassis->signal().high_beam()) {
             // Currently we do nothing on high_beam signal.
@@ -562,8 +561,8 @@ void HMIWorker::ResetMode() const {
 }
 
 void HMIWorker::StatusUpdateThreadLoop() {
+  constexpr int kLoopIntervalMs = 200;
   while (!stop_) {
-    static constexpr int kLoopIntervalMs = 200;
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopIntervalMs));
     UpdateComponentStatus();
     bool status_changed = false;
@@ -591,13 +590,13 @@ void HMIWorker::StatusUpdateThreadLoop() {
 }
 
 void HMIWorker::ResetComponentStatusTimer() {
-  last_status_received_s_ = cyber::Time::Now().ToSecond();
+  last_status_received_s_ = Clock::NowInSeconds();
   last_status_fingerprint_ = 0;
 }
 
 void HMIWorker::UpdateComponentStatus() {
-  static constexpr double kSecondsTillTimeout(2.5);
-  const double now = cyber::Time::Now().ToSecond();
+  constexpr double kSecondsTillTimeout(2.5);
+  const double now = Clock::NowInSeconds();
   if (now - last_status_received_s_.load() > kSecondsTillTimeout) {
     if (!monitor_timed_out_) {
       WLock wlock(status_mutex_);

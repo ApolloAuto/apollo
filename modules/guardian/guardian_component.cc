@@ -19,6 +19,8 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
+using Time = ::apollo::cyber::Time;
+
 namespace apollo {
 namespace guardian {
 
@@ -52,7 +54,7 @@ bool GuardianComponent::Init() {
       [this](const std::shared_ptr<SystemStatus>& status) {
         ADEBUG << "Received system status data: run system status callback.";
         std::lock_guard<std::mutex> lock(mutex_);
-        last_status_received_s_ = cyber::Time::Now().ToSecond();
+        last_status_received_s_ = Time::Now().ToSecond();
         system_status_.CopyFrom(*status);
       });
 
@@ -62,12 +64,12 @@ bool GuardianComponent::Init() {
 }
 
 bool GuardianComponent::Proc() {
-  ADEBUG << "Timer is triggered: publish GuardianComponent result";
+  constexpr double kSecondsTillTimeout(2.5);
+
   bool safety_mode_triggered = false;
   if (guardian_conf_.guardian_enable()) {
     std::lock_guard<std::mutex> lock(mutex_);
-    static constexpr double kSecondsTillTimeout(2.5);
-    if (cyber::Time::Now().ToSecond() - last_status_received_s_ >
+    if (Time::Now().ToSecond() - last_status_received_s_ >
         kSecondsTillTimeout) {
       safety_mode_triggered = true;
     }

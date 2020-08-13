@@ -44,7 +44,7 @@ template <typename T, typename std::enable_if<
 static void FillHeader(const std::string& module_name, T* msg) {
   static std::atomic<uint64_t> sequence_num = {0};
   auto* header = msg->mutable_header();
-  double timestamp = apollo::cyber::Clock::NowInSeconds();
+  double timestamp = ::apollo::cyber::Clock::NowInSeconds();
   header->set_module_name(module_name);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(
