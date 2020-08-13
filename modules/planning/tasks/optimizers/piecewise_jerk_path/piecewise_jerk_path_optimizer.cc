@@ -129,7 +129,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
     // updated cost function for path reference
     std::vector<double> path_reference_l(path_boundary_size, 0.0);
-    bool is_valid_path_reference = reference_path_data.is_valid_path_reference();
+    bool is_valid_path_reference =
+        reference_path_data.is_valid_path_reference();
     size_t path_reference_size = reference_path_data.path_reference().size();
 
     if (path_boundary.label().find("regular") != std::string::npos &&
@@ -137,10 +138,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       // when path reference is ready
       for (size_t i = 0; i < path_reference_size; ++i) {
         common::SLPoint path_reference_sl;
-        reference_line.XYToSL(common::util::PointFactory::ToPointENU(
-                                  reference_path_data.path_reference().at(i).x(),
-                                  reference_path_data.path_reference().at(i).y()),
-                              &path_reference_sl);
+        reference_line.XYToSL(
+            common::util::PointFactory::ToPointENU(
+                reference_path_data.path_reference().at(i).x(),
+                reference_path_data.path_reference().at(i).y()),
+            &path_reference_sl);
         path_reference_l[i] = path_reference_sl.l();
       }
       end_state[0] = path_reference_l.back();

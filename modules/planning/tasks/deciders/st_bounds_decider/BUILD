@@ -42,6 +42,7 @@ cc_library(
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",
         "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/proto:planning_cc_proto",
