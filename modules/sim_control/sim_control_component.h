@@ -22,70 +22,70 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
-
 #include "gtest/gtest_prod.h"
 
+#include "cyber/cyber.h"
+#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
-
-#include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/backend/sim_control/sim_control_interface.h"
 
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
  */
 namespace apollo {
-namespace dreamview {
+namespace sim_control {
 
 /**
- * @class SimControl
+ * @class SimControlComponent
  * @brief A module that simulates a 'perfect control' algorithm, which assumes
  * an ideal world where the car can be perfectly placed wherever the planning
  * asks it to be, with the expected speed, acceleration, etc.
  */
-class SimControl : SimControlInterface {
+class SimControlComponent final : public cyber::Component<> {
  public:
   /**
-   * @brief Constructor of SimControl.
+   * @brief Constructor of SimControlComponent.
    * @param map_service the pointer of MapService.
    */
-  explicit SimControl(const MapService *map_service);
+  SimControlComponent();
 
   bool IsEnabled() const { return enabled_; }
+
+  bool Init() override;
 
   /**
    * @brief setup callbacks and timer
    * @param set_start_point initialize localization.
    */
-  void Init(bool set_start_point, double start_velocity = 0.0,
-            double start_acceleration = 0.0) override;
+  void InitState(bool set_start_point, double start_velocity = 0.0,
+                 double start_acceleration = 0.0);
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
    * messages.
    */
-  void Start() override;
+  void Start();
 
   /**
    * @brief Stops the timer.
    */
-  void Stop() override;
+  void Stop();
 
   /**
    * @brief Resets the internal state.
    */
-  void Reset() override;
+  void Reset();
 
-  void RunOnce() override;
+  void Proc();
 
  private:
   void OnPlanning(
       const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
+  void OnLocalization(
+      const std::shared_ptr<localization::LocalizationEstimate> &localization);
   void OnRoutingResponse(
       const std::shared_ptr<apollo::routing::RoutingResponse> &routing);
   void OnReceiveNavigationInfo(
@@ -123,9 +123,7 @@ class SimControl : SimControlInterface {
 
   void InternalReset();
 
-  const MapService *map_service_ = nullptr;
-
-  std::unique_ptr<cyber::Node> node_;
+  const dreamview::MapService map_service_;
 
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
@@ -151,7 +149,7 @@ class SimControl : SimControlInterface {
   std::unique_ptr<cyber::Timer> sim_prediction_timer_;
 
   // Time interval of the timer, in milliseconds.
-  static constexpr double kSimControlIntervalMs = 10;
+  static constexpr double kSimControlComponentIntervalMs = 10;
   static constexpr double kSimPredictionIntervalMs = 100;
 
   // The latest received planning trajectory.
@@ -187,9 +185,10 @@ class SimControl : SimControlInterface {
   // Linearize reader/timer callbacks and external operations.
   std::mutex mutex_;
 
-  FRIEND_TEST(SimControlTest, Test);
-  FRIEND_TEST(SimControlTest, TestDummyPrediction);
+  FRIEND_TEST(SimControlComponentTest, Test);
+  FRIEND_TEST(SimControlComponentTest, TestDummyPrediction);
 };
+CYBER_REGISTER_COMPONENT(SimControlComponent)
 
-}  // namespace dreamview
+}  // namespace sim_control
 }  // namespace apollo

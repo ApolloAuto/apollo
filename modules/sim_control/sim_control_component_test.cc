@@ -14,14 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/sim_control/sim_control_component.h"
 
-#include "cyber/blocker/blocker_manager.h"
-#include "cyber/time/clock.h"
+#include <vector>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "cyber/blocker/blocker_manager.h"
+#include "cyber/time/clock.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/quaternion.h"
@@ -29,32 +30,32 @@
 using apollo::canbus::Chassis;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::cyber::Clock;
-using apollo::cyber::ClockMode;
 using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
 
 namespace apollo {
-namespace dreamview {
+namespace sim_control {
 
-class SimControlTest : public ::testing::Test {
+class SimControlComponentTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
     cyber::GlobalData::Instance()->EnableSimulationMode();
   }
 
   virtual void SetUp() {
-    FLAGS_map_dir = "modules/dreamview/backend/testdata";
+    FLAGS_map_dir = "/apollo/modules/dreamview/backend/testdata";
     FLAGS_base_map_filename = "garage.bin";
+    FLAGS_sim_map_filename = "garage.bin";
 
-    map_service_.reset(new MapService(false));
-    sim_control_.reset(new SimControl(map_service_.get()));
+    sim_control_.reset(new SimControlComponent());
+    apollo::cyber::proto::ComponentConfig compcfg;
+    sim_control_->Initialize(compcfg);
   }
 
  protected:
-  std::unique_ptr<MapService> map_service_;
-  std::unique_ptr<SimControl> sim_control_;
+  std::unique_ptr<SimControlComponent> sim_control_;
 };
 
 void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
@@ -77,8 +78,8 @@ void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
   adc_trajectory->set_gear(Chassis::GEAR_DRIVE);
 }
 
-TEST_F(SimControlTest, Test) {
-  sim_control_->Init(false);
+TEST_F(SimControlComponentTest, Test) {
+  sim_control_->InitState(false);
   sim_control_->enabled_ = true;
 
   planning::ADCTrajectory adc_trajectory;
@@ -111,9 +112,9 @@ TEST_F(SimControlTest, Test) {
   sim_control_->OnPlanning(std::make_shared<ADCTrajectory>(adc_trajectory));
 
   {
-    Clock::SetMode(ClockMode::MODE_MOCK);
+    Clock::SetMode(cyber::ClockMode::MODE_MOCK);
     Clock::SetNowInSeconds(100.01);
-    sim_control_->RunOnce();
+    sim_control_->Proc();
 
     BlockerManager::Instance()->Observe();
     auto localization =
@@ -166,10 +167,10 @@ TEST_F(SimControlTest, Test) {
   }
 }
 
-TEST_F(SimControlTest, TestDummyPrediction) {
-  Clock::SetMode(ClockMode::MODE_MOCK);
+TEST_F(SimControlComponentTest, TestDummyPrediction) {
+  Clock::SetMode(cyber::ClockMode::MODE_MOCK);
 
-  sim_control_->Init(false);
+  sim_control_->InitState(false);
   sim_control_->enabled_ = true;
 
   auto obstacles = std::make_shared<PredictionObstacles>();
@@ -211,5 +212,5 @@ TEST_F(SimControlTest, TestDummyPrediction) {
     EXPECT_DOUBLE_EQ(prediction->header().timestamp_sec(), timestamp);
   }
 }
-}  // namespace dreamview
+}  // namespace sim_control
 }  // namespace apollo

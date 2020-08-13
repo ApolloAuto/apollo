@@ -79,13 +79,12 @@ Status Dreamview::Init() {
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
-  sim_control_.reset(new SimControl(map_service_.get()));
   data_collection_monitor_.reset(new DataCollectionMonitor());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
+      websocket_.get(), map_ws_.get(), camera_ws_.get(),
       map_service_.get(), data_collection_monitor_.get(),
       perception_camera_updater_.get(), FLAGS_routing_from_file));
   point_cloud_updater_.reset(
@@ -119,7 +118,6 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
-  sim_control_->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
   perception_camera_updater_->Stop();

@@ -3843,6 +3843,10 @@
                   "rule": "repeated",
                   "type": "string",
                   "id": 2
+                },
+                "localRouting": {
+                  "type": "RoutingResponseFeature",
+                  "id": 3
                 }
               }
             },
@@ -3980,8 +3984,8 @@
                   "type": "apollo.common.Header",
                   "id": 1
                 },
-                "learningData": {
-                  "type": "LearningData",
+                "learningDataFrame": {
+                  "type": "LearningDataFrame",
                   "id": 2
                 }
               }
@@ -7371,7 +7375,8 @@
                   "values": {
                     "CONV_RNN": 1,
                     "CNN": 2,
-                    "CNN_LSTM": 3
+                    "SELF_CNN_LSTM": 3,
+                    "HISTORY_UNCONDITIONED_CNN_LSTM": 4
                   }
                 }
               }
@@ -7743,6 +7748,13 @@
                   "options": {
                     "default": 1.5
                   }
+                },
+                "adcBufferCoeff": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 1
+                  }
                 }
               }
             },
@@ -7773,6 +7785,10 @@
                   "options": {
                     "default": 20
                   }
+                },
+                "weightXRefPathReference": {
+                  "type": "double",
+                  "id": 2
                 }
               }
             },
@@ -9745,6 +9761,10 @@
                 "learningModelOutputFailReason": {
                   "type": "string",
                   "id": 3
+                },
+                "evaluatedPathReference": {
+                  "type": "apollo.common.Path",
+                  "id": 4
                 }
               }
             }

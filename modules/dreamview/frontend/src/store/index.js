@@ -158,7 +158,7 @@ class DreamviewStore {
     }
 
     handleDrivingModeChange(wasAutoMode, isAutoMode) {
-      if (this.options.enableSimControl) {
+      if (this.hmi.moduleStatus.get('SimControl')) {
         return;
       }
 

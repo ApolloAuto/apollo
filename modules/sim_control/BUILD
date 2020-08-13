@@ -4,13 +4,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "sim_control",
-    srcs = ["sim_control.cc"],
+    name = "sim_control_component_lib",
+    srcs = ["sim_control_component.cc"],
     hdrs = [
-        "sim_control.h",
-        "sim_control_interface.h",
+        "sim_control_component.h",
     ],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = ['-DMODULE_NAME=\\"sim_control\\"'],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -25,15 +24,22 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "libsim_control_component.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":sim_control_component_lib"],
+)
+
 cc_test(
-    name = "sim_control_test",
+    name = "sim_control_component_test",
     size = "small",
-    srcs = ["sim_control_test.cc"],
+    srcs = ["sim_control_component_test.cc"],
     data = [
         "//modules/dreamview/backend/testdata",
     ],
     deps = [
-        ":sim_control",
+        ":sim_control_component_lib",
         "//cyber/time:clock",
         "@com_google_googletest//:gtest_main",
     ],

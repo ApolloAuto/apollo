@@ -39,8 +39,7 @@ using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
-    WebSocketHandler *camera_ws, SimControl *sim_control,
-    const MapService *map_service,
+    WebSocketHandler *camera_ws, const MapService *map_service,
     DataCollectionMonitor *data_collection_monitor,
     PerceptionCameraUpdater *perception_camera_updater, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
@@ -48,22 +47,12 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       websocket_(websocket),
       map_ws_(map_ws),
       camera_ws_(camera_ws),
-      sim_control_(sim_control),
       data_collection_monitor_(data_collection_monitor),
       perception_camera_updater_(perception_camera_updater) {
   RegisterMessageHandlers();
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
-  // Send current sim_control status to the new client.
-  websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        Json response;
-        response["type"] = "SimControlStatus";
-        response["enabled"] = sim_control_->IsEnabled();
-        websocket_->SendData(conn, response.dump());
-      });
-
   map_ws_->RegisterMessageHandler(
       "RetrieveMapData",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -239,7 +228,6 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
-        sim_control_->Reset();
       });
 
   websocket_->RegisterMessageHandler(
@@ -247,18 +235,6 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         sim_world_service_.DumpMessages();
       });
 
-  websocket_->RegisterMessageHandler(
-      "ToggleSimControl",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto enable = json.find("enable");
-        if (enable != json.end() && enable->is_boolean()) {
-          if (*enable) {
-            sim_control_->Start();
-          } else {
-            sim_control_->Stop();
-          }
-        }
-      });
   websocket_->RegisterMessageHandler(
       "RequestDataCollectionProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
