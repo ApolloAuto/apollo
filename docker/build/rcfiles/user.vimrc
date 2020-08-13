@@ -4,7 +4,7 @@ set hlsearch
 set smartindent
 set ruler
 set number
-set ts=4
-set sw=4
+set ts=2
+set sw=2
 set expandtab
 autocmd FileType make setlocal noexpandtab
