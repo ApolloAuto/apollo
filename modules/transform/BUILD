@@ -12,8 +12,8 @@ cc_library(
         "//cyber",
         "//cyber/node",
         "//modules/common/adapters:adapter_gflags",
+        "//third_party/tf2",
         "@com_google_absl//absl/strings",
-        "@tf2",
     ],
 )
 
