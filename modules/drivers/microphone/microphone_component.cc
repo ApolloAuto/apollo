@@ -61,7 +61,6 @@ bool MicrophoneComponent::Init() {
   for (int i = 0; i < n_channels_; ++i) {
     channel_data = audio_data_ptr_->add_channel_data();
     channel_data->set_channel_type(microphone_config_ptr_->channel_type(i));
-    channel_data->set_size(channel_size);
     channel_data->mutable_data()->resize(channel_size);
     channel_data_ptrs_.push_back(channel_data->mutable_data());
   }
