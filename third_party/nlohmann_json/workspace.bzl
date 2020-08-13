@@ -15,10 +15,3 @@ def repo():
         strip_prefix = "json-3.8.0",
         build_file = clean_dep("//third_party/nlohmann_json:json.BUILD"),
     )
-
-#native.new_local_repository(
-#    name = "com_github_nlohmann_json",
-#    build_file = clean_dep("//third_party/nlohmann_json:json.BUILD"),
-#    path = "/usr/include",
-#    # https://github.com/nlohmann/json/releases/download/v3.8.0/json.hpp,
-# )

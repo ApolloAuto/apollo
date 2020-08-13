@@ -19,7 +19,6 @@ cc_library(
     name = "single_json",
     hdrs = glob(["single_include/**/*.hpp"]),
     strip_include_prefix = "single_include",
-    #includes = ["single_include"],
     visibility = ["//visibility:public"],
     alwayslink = 1,
 )
