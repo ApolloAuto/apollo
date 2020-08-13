@@ -20,7 +20,7 @@
 namespace apollo {
 namespace hdmap {
 
-StaticAlign::StaticAlign(std::shared_ptr<JSonConf> sp_conf)
+StaticAlign::StaticAlign(std::shared_ptr<JsonConf> sp_conf)
     : Alignment(sp_conf) {
   sp_conf_ = sp_conf;
   static_align_detect_method_ = StaticAlignDetectMethod::DYNAMIC_CENTROID;

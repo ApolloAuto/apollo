@@ -55,7 +55,7 @@ typedef std::vector<OneRecordChannelCheckResult>::iterator CheckResultIterator;
 
 class ChannelVerify {
  public:
-  explicit ChannelVerify(std::shared_ptr<JSonConf> sp_conf);
+  explicit ChannelVerify(std::shared_ptr<JsonConf> sp_conf);
   ErrorCode Check(const std::string& record_dir_or_record_full_path);
   std::shared_ptr<std::vector<OneRecordChannelCheckResult>> get_check_result()
       const;
@@ -74,7 +74,7 @@ class ChannelVerify {
   void Reset();
 
  private:
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   CheckedResult sp_vec_check_result_ = nullptr;
   ErrorCode return_state_;
   std::set<std::string> checked_records_;

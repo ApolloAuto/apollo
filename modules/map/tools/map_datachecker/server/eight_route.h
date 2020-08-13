@@ -30,7 +30,7 @@ namespace hdmap {
 // TODO(yuanyijun): change EightRoute to FigureEight
 class EightRoute : public Alignment {
  public:
-  explicit EightRoute(std::shared_ptr<JSonConf> sp_conf);
+  explicit EightRoute(std::shared_ptr<JsonConf> sp_conf);
   ErrorCode Process(const std::vector<FramePose>& poses);
   double GetProgress() const;
 

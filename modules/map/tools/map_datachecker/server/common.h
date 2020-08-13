@@ -55,7 +55,7 @@ struct FramePose {
 
 enum class State { IDLE, RUNNING };
 
-struct JSonConf {
+struct JsonConf {
   std::vector<std::pair<std::string, double>> topic_list;
   bool use_system_time;
   double topic_rate_tolerance;
@@ -106,7 +106,7 @@ struct JSonConf {
   double laps_rate_thresh;
 };
 
-std::shared_ptr<JSonConf> ParseJson(std::string conf_path);
+std::shared_ptr<JsonConf> ParseJson(std::string conf_path);
 
 inline double GetYaw(double from_x, double from_y, double to_x, double to_y) {
   double vecx = to_x - from_x;
@@ -118,7 +118,7 @@ inline double GetYaw(double from_x, double from_y, double to_x, double to_y) {
   return kRADIANS_TO_DEGREES * alpha;
 }
 
-inline double UnixtimeNow() { return apollo::cyber::Time::Now().ToSecond(); }
+inline double UnixNow() { return apollo::cyber::Time::Now().ToSecond(); }
 
 }  // namespace hdmap
 }  // namespace apollo
