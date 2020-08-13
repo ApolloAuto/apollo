@@ -37,6 +37,8 @@
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 
+using Time = ::apollo::cyber::Time;
+
 namespace apollo {
 namespace data {
 
@@ -210,7 +212,7 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
                                             const std::string& message) const {
   SmartRecorderStatus status;
   Header* status_headerpb = status.mutable_header();
-  status_headerpb->set_timestamp_sec(cyber::Time::Now().ToSecond());
+  status_headerpb->set_timestamp_sec(Time::Now().ToSecond());
   status.set_recording_state(state);
   status.set_state_message(message);
   AINFO << "send message with state " << state << ", " << message;
