@@ -43,7 +43,7 @@ typedef struct Centroid3D {
 
 class StaticAlign : public Alignment {
  public:
-  explicit StaticAlign(std::shared_ptr<JSonConf> sp_conf);
+  explicit StaticAlign(std::shared_ptr<JsonConf> sp_conf);
   ErrorCode Process(const std::vector<FramePose>& poses);
 
  private:

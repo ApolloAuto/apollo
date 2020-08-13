@@ -29,7 +29,7 @@ namespace hdmap {
 
 class PoseCollectionAgent {
  public:
-  explicit PoseCollectionAgent(std::shared_ptr<JSonConf> sp_conf);
+  explicit PoseCollectionAgent(std::shared_ptr<JsonConf> sp_conf);
 
   void OnBestgnssposCallback(
       const std::shared_ptr<const apollo::drivers::gnss::GnssBestPose>
@@ -42,7 +42,7 @@ class PoseCollectionAgent {
  private:
   std::mutex mutex_;
   std::shared_ptr<PoseCollection> sp_pose_collection_ = nullptr;
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   std::shared_ptr<PJTransformer> sp_pj_transformer_ = nullptr;
 };
 

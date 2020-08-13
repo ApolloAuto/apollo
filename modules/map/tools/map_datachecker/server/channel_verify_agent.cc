@@ -25,7 +25,7 @@
 namespace apollo {
 namespace hdmap {
 
-ChannelVerifyAgent::ChannelVerifyAgent(std::shared_ptr<JSonConf> sp_conf) {
+ChannelVerifyAgent::ChannelVerifyAgent(std::shared_ptr<JsonConf> sp_conf) {
   sp_conf_ = sp_conf;
   sp_channel_checker_ = nullptr;
   sp_check_result_ = nullptr;

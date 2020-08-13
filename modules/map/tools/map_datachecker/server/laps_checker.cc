@@ -28,7 +28,7 @@ namespace apollo {
 namespace hdmap {
 
 LapsChecker::LapsChecker(const std::vector<FramePose> &poses, int laps_to_check,
-                         std::shared_ptr<JSonConf> sp_conf)
+                         std::shared_ptr<JsonConf> sp_conf)
     : poses_(poses), sp_conf_(sp_conf) {
   laps_to_check_ = laps_to_check;
   maxx_ = 0.0;

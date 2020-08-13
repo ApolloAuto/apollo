@@ -23,7 +23,7 @@
 namespace apollo {
 namespace hdmap {
 
-PoseCollectionAgent::PoseCollectionAgent(std::shared_ptr<JSonConf> sp_conf) {
+PoseCollectionAgent::PoseCollectionAgent(std::shared_ptr<JsonConf> sp_conf) {
   sp_pj_transformer_ = std::make_shared<PJTransformer>(50);
   sp_conf_ = sp_conf;
   Reset();
@@ -44,7 +44,7 @@ void PoseCollectionAgent::OnBestgnssposCallback(
       bestgnsspos->measurement_time());  // in seconds
   FramePose pose;
   if (sp_conf_->use_system_time) {
-    pose.time_stamp = UnixtimeNow();
+    pose.time_stamp = UnixNow();
     AINFO << "system time: " << pose.time_stamp;
   } else {
     pose.time_stamp = time_stamp;
