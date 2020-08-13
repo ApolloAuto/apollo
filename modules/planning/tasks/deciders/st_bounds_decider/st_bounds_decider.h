@@ -59,7 +59,8 @@ class STBoundsDecider : public Decider {
 
   common::Status GenerateRegularSTBound(
       std::vector<std::tuple<double, double, double>>* const st_bound,
-      std::vector<std::tuple<double, double, double>>* const vt_bound);
+      std::vector<std::tuple<double, double, double>>* const vt_bound,
+      std::vector<std::pair<double, double>>* const st_guide_line);
 
   void RemoveInvalidDecisions(
       std::pair<double, double> driving_limit,
@@ -81,6 +82,7 @@ class STBoundsDecider : public Decider {
   void RecordSTGraphDebug(
       const std::vector<STBoundary>& st_graph_data,
       const std::vector<std::tuple<double, double, double>>& st_bound,
+      const std::vector<std::pair<double, double>>& st_guide_line,
       planning_internal::STGraphDebug* const st_graph_debug);
 
  private:
