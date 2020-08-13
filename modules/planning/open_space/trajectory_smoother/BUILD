@@ -15,7 +15,7 @@ cc_library(
         ":dual_variable_warm_start_osqp_interface",
         ":dual_variable_warm_start_slack_osqp_interface",
         "//cyber/common:log",
-        "//cyber/time",
+        "//modules/common/util:perf_util",
     ],
 )
 
@@ -106,7 +106,7 @@ cc_library(
         ":distance_approach_ipopt_relax_end_interface",
         ":distance_approach_ipopt_relax_end_slack_interface",
         "//cyber/common:log",
-        "//cyber/time",
+        "//modules/common/util:perf_util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_cc_proto",
     ],
