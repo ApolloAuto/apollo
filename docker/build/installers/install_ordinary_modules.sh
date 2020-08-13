@@ -35,12 +35,6 @@ bash /tmp/installers/install_qp_oases.sh
 
 apt_get_update_and_install libsqlite3-dev
 
-#######################################################
-
-COMPONENT="modules/transform"
-info "Install support for [${COMPONENT}] ..."
-bash /tmp/installers/install_tf2.sh
-
 ######################################################
 
 COMPONENT="modules/prediction"
@@ -63,8 +57,7 @@ bash /tmp/installers/install_ipopt.sh
 COMPONENT="modules/map"
 info "Install support for [${COMPONENT}] ..."
 
-apt-get -y update && \
-    apt-get -y install \
+apt_get_update_and_install \
     libtinyxml2-dev
 
 # CUDA & nlohmann/json
