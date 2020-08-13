@@ -81,7 +81,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
   ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
-  const auto& path_data = reference_line_info_->path_data();
+  const auto& reference_path_data = reference_line_info_->path_data();
 
   std::vector<PathData> candidate_path_data;
   for (const auto& path_boundary : path_boundaries) {
@@ -123,10 +123,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       }
     }
 
+    // TODO(all): double-check this;
+    // final_path_data might carry info from upper stream
+    PathData path_data = *final_path_data;
+
     // updated cost function for path reference
     std::vector<double> path_reference_l(path_boundary_size, 0.0);
-    bool is_valid_path_reference = path_data.is_valid_path_reference();
-    size_t path_reference_size = path_data.path_reference().size();
+    bool is_valid_path_reference = reference_path_data.is_valid_path_reference();
+    size_t path_reference_size = reference_path_data.path_reference().size();
 
     if (path_boundary.label().find("regular") != std::string::npos &&
         is_valid_path_reference) {
@@ -134,12 +138,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       for (size_t i = 0; i < path_reference_size; ++i) {
         common::SLPoint path_reference_sl;
         reference_line.XYToSL(common::util::PointFactory::ToPointENU(
-                                  path_data.path_reference().at(i).x(),
-                                  path_data.path_reference().at(i).y()),
+                                  reference_path_data.path_reference().at(i).x(),
+                                  reference_path_data.path_reference().at(i).y()),
                               &path_reference_sl);
         path_reference_l[i] = path_reference_sl.l();
       }
       end_state[0] = path_reference_l.back();
+      path_data.set_is_optimized_towards_trajectory_reference(true);
     }
 
     const auto& veh_param =
@@ -170,16 +175,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
           ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
                               path_boundary.start_s());
 
-      // TODO(all): double-check this;
-      // final_path_data might carry info from upper stream
-      PathData path_data = *final_path_data;
       path_data.SetReferenceLine(&reference_line);
       path_data.SetFrenetPath(std::move(frenet_frame_path));
       if (FLAGS_use_front_axe_center_in_path_planning) {
         auto discretized_path = DiscretizedPath(
             ConvertPathPointRefFromFrontAxeToRearAxe(path_data));
-        path_data = *final_path_data;
-        path_data.SetReferenceLine(&reference_line);
         path_data.SetDiscretizedPath(discretized_path);
       }
       path_data.set_path_label(path_boundary.label());
