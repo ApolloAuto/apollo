@@ -8,7 +8,6 @@ import "modules/drivers/microphone/proto/microphone_config.proto";
 message ChannelData {
   optional ChannelType channel_type = 1;
   optional bytes data = 2;
-  optional int32 size = 3;
 }
 
 message AudioData {
