@@ -51,7 +51,7 @@ void EvaluatorManager::Init() {
   semantic_map_.reset(new SemanticMap());
   semantic_map_->Init();
   evaluator_.reset(new SemanticLSTMEvaluator(semantic_map_.get()));
-  AERROR << "Init SemanticMap instance.";
+  AINFO << "Init SemanticMap instance.";
 }
 
 void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
