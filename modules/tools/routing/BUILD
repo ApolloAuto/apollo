@@ -18,6 +18,7 @@ py_binary(
     srcs = ["debug_route.py"],
     deps = [
         ":debug_topo",
+        ":util",
         "//modules/routing/proto:topo_graph_py_pb2",
         "//modules/tools/common:proto_utils",
     ],

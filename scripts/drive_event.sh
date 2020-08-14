@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/apollo_base.sh"
-
-python ${DIR}/../modules/tools/rosbag/drive_event.py $@
+${TOP_DIR}/bazel-bin/modules/tools/rosbag/drive_event "$@"

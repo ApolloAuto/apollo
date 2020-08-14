@@ -16,9 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
-from record_reader import RecordItemReader
-from time_angular_velocity_data import TimeAngularVelocityData
-from time_speed_data import TimeSpeedData
+from modules.tools.plot_planning.record_reader import RecordItemReader
+from modules.tools.plot_planning.time_angular_velocity_data import TimeAngularVelocityData
+from modules.tools.plot_planning.time_speed_data import TimeSpeedData
 import math
 
 

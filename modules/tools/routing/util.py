@@ -22,7 +22,7 @@ import sys
 import gflags
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 import modules.map.proto.map_pb2 as map_pb2
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import modules.routing.proto.routing_pb2 as routing_pb2

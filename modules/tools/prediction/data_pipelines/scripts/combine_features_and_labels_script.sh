@@ -31,7 +31,7 @@ source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash
 
 if [ ${SCENARIO} == "junction" ]; then
-    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels_for_junction.py ${SRC_DIR} ${LBL_DIR}
+    /apollo/bazel-bin/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels_for_junction ${SRC_DIR} ${LBL_DIR}
 else
-    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels.py ${SRC_DIR} ${LBL_DIR}
+    /apollo/bazel-bin/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels ${SRC_DIR} ${LBL_DIR}
 fi
