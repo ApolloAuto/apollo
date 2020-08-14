@@ -27,8 +27,8 @@ See the gflags for more optional args.
 """
 
 import sys
-from cyber_py3 import cyber
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 if len(sys.argv) < 3:

@@ -6,7 +6,7 @@ velodyne check
 
 import time
 
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber_time
 from sensor_msgs.msg import PointCloud2
 
 

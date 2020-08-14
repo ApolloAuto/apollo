@@ -24,7 +24,7 @@ from datetime import datetime
 import os
 import shutil
 
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 
 
 g_args = None

@@ -24,12 +24,12 @@ import signal
 import sys
 import time
 
-from cyber_py3 import cyber
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber_time
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.localization.proto import localization_pb2
-from plot_data import Plotter
+from modules.tools.vehicle_calibration.plot_data import Plotter
 
 
 class DataCollector(object):

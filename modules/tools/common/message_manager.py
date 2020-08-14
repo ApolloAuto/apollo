@@ -28,8 +28,7 @@ from modules.canbus.proto import chassis_pb2
 from modules.common.proto import drive_event_pb2
 from modules.map.relative_map.proto import navigation_pb2
 from modules.guardian.proto import guardian_pb2
-
-from . import proto_utils
+from modules.tools.common import proto_utils
 
 
 class MessageType:

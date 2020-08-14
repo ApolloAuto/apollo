@@ -18,7 +18,7 @@
 
 import sys
 from datetime import datetime
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 if __name__ == '__main__':

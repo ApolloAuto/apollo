@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-from .map import Map
+from modules.tools.mapshow.libs.map import Map
 
 
 class PathSubplot:

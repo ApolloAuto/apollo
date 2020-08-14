@@ -20,7 +20,7 @@ from numpy.polynomial.polynomial import polyval
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.common.proto import drive_state_pb2
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber_time
 
 
 def euclidean_distance(point1, point2):

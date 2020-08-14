@@ -11,6 +11,7 @@ py_binary(
     name = "realtime_plot",
     srcs = ["realtime_plot.py"],
     deps = [
+        ":item",
         ":stitem",
         ":xyitem",
         "//cyber/python/cyber_py3:cyber",

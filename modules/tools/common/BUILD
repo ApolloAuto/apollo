@@ -11,8 +11,9 @@ py_library(
     name = "message_manager",
     srcs = ["message_manager.py"],
     deps = [
+        ":proto_utils",
         "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:drive_state_py_pb2",
+        "//modules/common/proto:drive_event_py_pb2",
         "//modules/control/proto:control_cmd_py_pb2",
         "//modules/guardian/proto:guardian_py_pb2",
         "//modules/localization/proto:localization_py_pb2",

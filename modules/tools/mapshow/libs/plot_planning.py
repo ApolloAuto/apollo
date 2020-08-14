@@ -21,15 +21,15 @@ import argparse
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from modules.planning.proto import planning_pb2
-from .localization import Localization
-from .planning import Planning
-from .subplot_path import PathSubplot
-from .subplot_sl_main import SlMainSubplot
-from .subplot_speed import SpeedSubplot
-from .subplot_st_main import StMainSubplot
-from .subplot_st_speed import StSpeedSubplot
+from modules.tools.mapshow.libs.localization import Localization
+from modules.tools.mapshow.libs.planning import Planning
+from modules.tools.mapshow.libs.subplot_path import PathSubplot
+from modules.tools.mapshow.libs.subplot_sl_main import SlMainSubplot
+from modules.tools.mapshow.libs.subplot_speed import SpeedSubplot
+from modules.tools.mapshow.libs.subplot_st_main import StMainSubplot
+from modules.tools.mapshow.libs.subplot_st_speed import StSpeedSubplot
 
 
 planning = Planning()

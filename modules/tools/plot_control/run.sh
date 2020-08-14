@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/../../../scripts/apollo_base.sh"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-eval "python ${DIR}/plot_control.py $1"
+eval "${TOP_DIR}/bazel-bin/modules/tools/plot_control/plot_control $1"

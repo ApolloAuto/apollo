@@ -23,7 +23,9 @@ then
     exit
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/../../../scripts/apollo_base.sh"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-eval "python ${DIR}/main.py $1 $2"
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+eval "${TOP_DIR}/bazel-bin/modules/tools/planning/plot_trajectory/main $1 $2"

@@ -17,10 +17,7 @@
 ###############################################################################
 
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
-
-python modules/tools/realtime_plot/realtime_plot.py $@
+${TOP_DIR}/bazel-bin/modules/tools/realtime_plot/realtime_plot "$@"
