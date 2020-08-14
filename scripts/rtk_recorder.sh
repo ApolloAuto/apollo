@@ -16,10 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function setup() {
   bash scripts/canbus.sh start
@@ -29,19 +27,19 @@ function setup() {
 }
 
 function start() {
-  TIME=`date +%F_%H_%M`
+  TIME="$(date +%F_%H_%M)"
   if [ -e data/log/garage.csv ]; then
     cp data/log/garage.csv data/log/garage-${TIME}.csv
   fi
 
-  NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_recorder.py")"
+  NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_recorder")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    python modules/tools/record_play/rtk_recorder.py
+    ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder
   fi
 }
 
 function stop() {
-  pkill -SIGKILL -f rtk_recorder.py
+  pkill -SIGKILL -f rtk_recorder
 }
 
 case $1 in
