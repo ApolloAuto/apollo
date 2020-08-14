@@ -11,6 +11,7 @@ We appreciate you go through Apollo documentations and search previous issues be
 - **OS Platform and Distribution (e.g., Linux Ubuntu 18.04)**:
 - **Apollo installed from (source or binary)**:
 - **Apollo version (3.5, 5.0, 5.5, 6.0)**:
+- **Output of `apollo.sh config` if on `master` branch**:
 
 ### Steps to reproduce the issue:
 - **Please use bullet points and include as much details as possible**:
