@@ -26,6 +26,7 @@ py_binary(
         "//cyber/python/cyber_py3:cyber",
         "//modules/canbus/proto:chassis_py_pb2",
         "//modules/localization/proto:localization_py_pb2",
+        "//modules/tools/common:logger",
         "//modules/tools/common:proto_utils",
     ],
 )
