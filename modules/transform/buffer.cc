@@ -24,7 +24,7 @@
 using Clock = ::apollo::cyber::Clock;
 
 namespace {
-constexpr float kSecondToNanoFactor = 1.0e9;
+constexpr float kSecondToNanoFactor = 1e9f;
 }  // namespace
 
 namespace apollo {
