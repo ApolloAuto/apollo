@@ -22,7 +22,7 @@ cc_library(
 
 cc_test(
     name = "mlp_evaluator_test",
-    size = "small",
+    size = "large",
     srcs = ["mlp_evaluator_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
@@ -51,7 +51,7 @@ cc_library(
 
 cc_test(
     name = "cost_evaluator_test",
-    size = "small",
+    size = "large",
     srcs = ["cost_evaluator_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
@@ -85,7 +85,7 @@ cc_library(
 
 cc_test(
     name = "junction_mlp_evaluator_test",
-    size = "small",
+    size = "large",
     srcs = ["junction_mlp_evaluator_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
@@ -137,7 +137,7 @@ cc_library(
 
 cc_test(
     name = "cruise_mlp_evaluator_test",
-    size = "small",
+    size = "large",
     srcs = ["cruise_mlp_evaluator_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

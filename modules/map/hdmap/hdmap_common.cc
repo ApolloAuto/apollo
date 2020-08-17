@@ -310,10 +310,11 @@ double LaneInfo::GetWidthFromSample(
   int high = static_cast<int>(samples.size());
   int mid;
   while (low + 1 < high) {
-    double tmp = samples[high].first - samples[low].first;
+    double tmp = samples[high - 1].first - samples[low].first;
     if (tmp > 0) {
       mid = low + (s - samples[low].first) /
-                      (samples[high].first - samples[low].first) * (high - low);
+                      (samples[high - 1].first - samples[low].first) *
+                      (high - low);
     } else {
       mid = (high + low) / 2;
     }

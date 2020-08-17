@@ -85,7 +85,7 @@ filegroup(
 
 cc_test(
     name = "pnc_path_test",
-    size = "small",
+    size = "large",
     srcs = ["path_test.cc"],
     deps = [
         ":path",
@@ -97,7 +97,7 @@ cc_test(
 
 cc_test(
     name = "pnc_map_test",
-    size = "small",
+    size = "large",
     srcs = ["pnc_map_test.cc"],
     data = [
         ":testdata",

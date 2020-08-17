@@ -112,7 +112,7 @@ cc_library(
 
 cc_test(
     name = "qp_spline_reference_line_smoother_test",
-    size = "small",
+    size = "large",
     srcs = ["qp_spline_reference_line_smoother_test.cc"],
     data = [
         "//modules/planning:planning_conf",
@@ -127,7 +127,7 @@ cc_test(
 
 cc_test(
     name = "discrete_points_reference_line_smoother_test",
-    size = "small",
+    size = "large",
     srcs = ["discrete_points_reference_line_smoother_test.cc"],
     data = [
         "//modules/planning:planning_conf",

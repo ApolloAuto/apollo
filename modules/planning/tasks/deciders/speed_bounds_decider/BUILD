@@ -57,7 +57,7 @@ cc_library(
 
 cc_test(
     name = "st_boundary_mapper_test",
-    size = "small",
+    size = "large",
     srcs = ["st_boundary_mapper_test.cc"],
     data = [
         "//modules/planning:planning_testdata",

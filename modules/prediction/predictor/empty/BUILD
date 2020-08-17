@@ -17,7 +17,7 @@ cc_library(
 
 cc_test(
     name = "empty_predictor_test",
-    size = "small",
+    size = "large",
     srcs = ["empty_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

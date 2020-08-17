@@ -33,7 +33,7 @@ cc_library(
 
 cc_test(
     name = "evaluator_manager_test",
-    size = "small",
+    size = "large",
     srcs = ["evaluator_manager_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

@@ -59,7 +59,7 @@ cc_library(
 
 cc_test(
     name = "prediction_map_test",
-    size = "small",
+    size = "large",
     srcs = ["prediction_map_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
@@ -194,7 +194,7 @@ cc_library(
 
 cc_test(
     name = "junction_analyzer_test",
-    size = "small",
+    size = "large",
     srcs = ["junction_analyzer_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

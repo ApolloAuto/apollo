@@ -18,7 +18,7 @@ cc_library(
 
 cc_test(
     name = "junction_predictor_test",
-    size = "small",
+    size = "large",
     srcs = ["junction_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

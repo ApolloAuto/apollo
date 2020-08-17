@@ -20,7 +20,7 @@ cc_library(
 
 cc_test(
     name = "adc_trajectory_container_test",
-    size = "small",
+    size = "large",
     srcs = ["adc_trajectory_container_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

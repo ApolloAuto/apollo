@@ -43,7 +43,7 @@ cc_library(
 
 cc_test(
     name = "obstacles_container_test",
-    size = "small",
+    size = "large",
     srcs = ["obstacles_container_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
@@ -58,7 +58,7 @@ cc_test(
 
 cc_test(
     name = "obstacle_test",
-    size = "small",
+    size = "large",
     srcs = ["obstacle_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

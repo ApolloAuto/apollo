@@ -20,7 +20,7 @@ cc_library(
 
 cc_test(
     name = "interaction_predictor_test",
-    size = "small",
+    size = "large",
     srcs = ["interaction_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

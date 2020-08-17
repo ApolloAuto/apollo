@@ -28,7 +28,7 @@ cc_library(
 
 cc_test(
     name = "predictor_manager_test",
-    size = "small",
+    size = "large",
     srcs = ["predictor_manager_test.cc"],
     data = [
         "//modules/prediction:prediction_data",

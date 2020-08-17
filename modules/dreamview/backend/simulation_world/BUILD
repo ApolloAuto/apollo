@@ -38,7 +38,7 @@ cc_library(
 
 cc_test(
     name = "simulation_world_service_test",
-    size = "small",
+    size = "large",
     srcs = ["simulation_world_service_test.cc"],
     data = [
         "//modules/dreamview/backend/testdata",

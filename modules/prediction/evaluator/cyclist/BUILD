@@ -18,7 +18,7 @@ cc_library(
 
 cc_test(
     name = "cyclist_keep_lane_evaluator_test",
-    size = "small",
+    size = "large",
     srcs = ["cyclist_keep_lane_evaluator_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
