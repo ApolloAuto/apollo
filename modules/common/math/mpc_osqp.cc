@@ -220,13 +220,17 @@ OSQPSettings *MpcOsqp::Settings() {
   // default setting
   OSQPSettings *settings =
       reinterpret_cast<OSQPSettings *>(c_malloc(sizeof(OSQPSettings)));
-  osqp_set_default_settings(settings);
-  settings->polish = true;
-  settings->scaled_termination = true;
-  settings->verbose = false;
-  settings->max_iter = max_iteration_;
-  settings->eps_abs = eps_abs_;
-  return settings;
+  if (settings != nullptr) {
+    osqp_set_default_settings(settings);
+    settings->polish = true;
+    settings->scaled_termination = true;
+    settings->verbose = false;
+    settings->max_iter = max_iteration_;
+    settings->eps_abs = eps_abs_;
+    return settings;
+  } else {
+    return nullptr;
+  }
 }
 
 OSQPData *MpcOsqp::Data() {
@@ -234,33 +238,38 @@ OSQPData *MpcOsqp::Data() {
   size_t kernel_dim = state_dim_ * (horizon_ + 1) + control_dim_ * horizon_;
   size_t num_affine_constraint =
       2 * state_dim_ * (horizon_ + 1) + control_dim_ * horizon_;
-  data->n = kernel_dim;
-  data->m = num_affine_constraint;
-  std::vector<c_float> P_data;
-  std::vector<c_int> P_indices;
-  std::vector<c_int> P_indptr;
-  ADEBUG << "before CalculateKernel";
-  CalculateKernel(&P_data, &P_indices, &P_indptr);
-  ADEBUG << "CalculateKernel done";
-  data->P = csc_matrix(kernel_dim, kernel_dim, P_data.size(), CopyData(P_data),
-                       CopyData(P_indices), CopyData(P_indptr));
-  ADEBUG << "Get P matrix";
-  data->q = gradient_.data();
-  ADEBUG << "before CalculateEqualityConstraint";
-  std::vector<c_float> A_data;
-  std::vector<c_int> A_indices;
-  std::vector<c_int> A_indptr;
-  CalculateEqualityConstraint(&A_data, &A_indices, &A_indptr);
-  ADEBUG << "CalculateEqualityConstraint done";
-  data->A =
-      csc_matrix(state_dim_ * (horizon_ + 1) + state_dim_ * (horizon_ + 1) +
-                     control_dim_ * horizon_,
-                 kernel_dim, A_data.size(), CopyData(A_data),
-                 CopyData(A_indices), CopyData(A_indptr));
-  ADEBUG << "Get A matrix";
-  data->l = lowerBound_.data();
-  data->u = upperBound_.data();
-  return data;
+  if (data != nullptr) {
+    data->n = kernel_dim;
+    data->m = num_affine_constraint;
+    std::vector<c_float> P_data;
+    std::vector<c_int> P_indices;
+    std::vector<c_int> P_indptr;
+    ADEBUG << "before CalculateKernel";
+    CalculateKernel(&P_data, &P_indices, &P_indptr);
+    ADEBUG << "CalculateKernel done";
+    data->P =
+        csc_matrix(kernel_dim, kernel_dim, P_data.size(), CopyData(P_data),
+                   CopyData(P_indices), CopyData(P_indptr));
+    ADEBUG << "Get P matrix";
+    data->q = gradient_.data();
+    ADEBUG << "before CalculateEqualityConstraint";
+    std::vector<c_float> A_data;
+    std::vector<c_int> A_indices;
+    std::vector<c_int> A_indptr;
+    CalculateEqualityConstraint(&A_data, &A_indices, &A_indptr);
+    ADEBUG << "CalculateEqualityConstraint done";
+    data->A =
+        csc_matrix(state_dim_ * (horizon_ + 1) + state_dim_ * (horizon_ + 1) +
+                       control_dim_ * horizon_,
+                   kernel_dim, A_data.size(), CopyData(A_data),
+                   CopyData(A_indices), CopyData(A_indptr));
+    ADEBUG << "Get A matrix";
+    data->l = lowerBound_.data();
+    data->u = upperBound_.data();
+    return data;
+  } else {
+    return nullptr;
+  }
 }
 
 void MpcOsqp::FreeData(OSQPData *data) {
