@@ -142,8 +142,8 @@ function _parse_cmdline_arguments() {
 }
 
 function _run_bazel_test_impl() {
-    local job_args="--jobs=$(nproc)"
-    bazel test --distdir="${APOLLO_CACHE_DIR}/distdir" "${job_args}" $@
+    local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+    bazel test --distdir="${APOLLO_CACHE_DIR}/distdir" ${job_args} $@
 }
 
 function bazel_test() {
