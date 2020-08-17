@@ -24,7 +24,7 @@
 using Clock = ::apollo::cyber::Clock;
 
 namespace {
-constexpr float kSecondToNanoFactor = 1e9f;
+constexpr float kSecondToNanoFactor = 1.0e9;
 }  // namespace
 
 namespace apollo {
@@ -168,7 +168,7 @@ TransformStamped Buffer::lookupTransform(const std::string& target_frame,
                                          const float timeout_second) const {
   tf2::Time tf2_time(time.ToNanosecond());
   geometry_msgs::TransformStamped tf2_trans_stamped =
-      lookupTransform(target_frame, source_frame, tf2_time);
+      tf2::BufferCore::lookupTransform(target_frame, source_frame, tf2_time);
   TransformStamped trans_stamped;
   TF2MsgToCyber(tf2_trans_stamped, trans_stamped);
   return trans_stamped;
@@ -181,8 +181,9 @@ TransformStamped Buffer::lookupTransform(const std::string& target_frame,
                                          const std::string& fixed_frame,
                                          const float timeout_second) const {
   geometry_msgs::TransformStamped tf2_trans_stamped =
-      lookupTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                      source_time.ToNanosecond(), fixed_frame);
+      tf2::BufferCore::lookupTransform(target_frame, target_time.ToNanosecond(),
+                                       source_frame, source_time.ToNanosecond(),
+                                       fixed_frame);
   TransformStamped trans_stamped;
   TF2MsgToCyber(tf2_trans_stamped, trans_stamped);
   return trans_stamped;
@@ -194,17 +195,21 @@ bool Buffer::canTransform(const std::string& target_frame,
                           std::string* errstr) const {
   uint64_t timeout_ns =
       static_cast<uint64_t>(timeout_second * kSecondToNanoFactor);
-  uint64_t start_time = Clock::Now().ToNanosecond();
-  while (
-      Clock::Now().ToNanosecond() < start_time + timeout_ns &&
-      !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
-      !cyber::IsShutdown()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(3));
+  uint64_t start_time = Clock::Now().ToNanosecond();  // time.ToNanosecond();
+  while (Clock::Now().ToNanosecond() < start_time + timeout_ns &&
+         !cyber::IsShutdown()) {
+    errstr->clear();
+    bool retval = tf2::BufferCore::canTransform(target_frame, source_frame,
+                                                time.ToNanosecond(), errstr);
+    if (retval) {
+      return true;
+    } else {
+      AWARN << "BufferCore::canTransform failed: " << *errstr;
+      std::this_thread::sleep_for(std::chrono::milliseconds(3));
+    }
   }
-  bool retval =
-      canTransform(target_frame, source_frame, time.ToNanosecond(), errstr);
-  // conditionally_append_timeout_info(errstr, start_time, timeout);
-  return retval;
+  *errstr = *errstr + ":timeout";
+  return false;
 }
 
 bool Buffer::canTransform(const std::string& target_frame,
@@ -219,16 +224,20 @@ bool Buffer::canTransform(const std::string& target_frame,
       static_cast<uint64_t>(timeout_second * kSecondToNanoFactor);
   uint64_t start_time = Clock::Now().ToNanosecond();
   while (Clock::Now().ToNanosecond() < start_time + timeout_ns &&
-         !canTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                       source_time.ToNanosecond(),
-                       fixed_frame) &&
          !cyber::IsShutdown()) {  // Make sure we haven't been stopped
-    std::this_thread::sleep_for(std::chrono::milliseconds(3));
+    errstr->clear();
+    bool retval = tf2::BufferCore::canTransform(
+        target_frame, target_time.ToNanosecond(), source_frame,
+        source_time.ToNanosecond(), fixed_frame, errstr);
+    if (retval) {
+      return true;
+    } else {
+      AWARN << "BufferCore::canTransform failed: " << *errstr;
+      std::this_thread::sleep_for(std::chrono::milliseconds(3));
+    }
   }
-  bool retval =
-      canTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                   source_time.ToNanosecond(), fixed_frame, errstr);
-  return retval;
+  *errstr = *errstr + ":timeout";
+  return false;
 }
 
 }  // namespace transform
