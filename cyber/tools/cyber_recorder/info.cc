@@ -111,6 +111,7 @@ bool Info::Display(const std::string& file) {
       std::cout << std::endl;
     }
   }
+  file_reader.Close();
   return true;
 }
 
