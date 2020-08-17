@@ -21,6 +21,7 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/util:message_util",
+        "//modules/common/util:string_util",
         "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/drivers/gnss/proto:gnss_cc_proto",
         "//modules/drivers/gnss/proto:ins_cc_proto",

@@ -20,6 +20,7 @@
 
 #include "cyber/time/clock.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/common/util/string_util.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 
 namespace apollo {
@@ -43,10 +44,9 @@ void RTKLocalization::InitConfig(const rtk_config::Config &config) {
 
 void RTKLocalization::GpsCallback(
     const std::shared_ptr<localization::Gps> &gps_msg) {
-  double time_delay =
-      last_received_timestamp_sec_
-          ? Clock::NowInSeconds() - last_received_timestamp_sec_
-          : last_received_timestamp_sec_;
+  double time_delay = last_received_timestamp_sec_
+                          ? Clock::NowInSeconds() - last_received_timestamp_sec_
+                          : last_received_timestamp_sec_;
   if (time_delay > gps_time_delay_tolerance_) {
     std::stringstream ss;
     ss << "GPS message time interval: " << time_delay;
@@ -131,8 +131,7 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
 
   // check GPS time stamp against system time
   double gps_delay_sec = Clock::NowInSeconds() - gps_timestamp;
-  double gps_service_delay =
-      Clock::NowInSeconds() - service_started_time;
+  double gps_service_delay = Clock::NowInSeconds() - service_started_time;
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * localization_publish_freq_);
 
@@ -406,9 +405,10 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
   }
   if (timestamp_sec - imu1.header().timestamp_sec() <
       std::numeric_limits<double>::min()) {
-    AERROR << "[InterpolateIMU1]: the given time stamp[" << timestamp_sec
+    AERROR << "[InterpolateIMU1]: the given time stamp["
+           << FORMAT_TIMESTAMP(timestamp_sec)
            << "] is older than the 1st message["
-           << imu1.header().timestamp_sec() << "]";
+           << FORMAT_TIMESTAMP(imu1.header().timestamp_sec()) << "]";
     *imu_msg = imu1;
   } else if (timestamp_sec - imu2.header().timestamp_sec() >
              std::numeric_limits<double>::min()) {

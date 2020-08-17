@@ -16,6 +16,7 @@
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
@@ -219,7 +220,7 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  static_cast<float>(FLAGS_obs_tf2_buff_size),
                                  &err_string)) {
-    AERROR << "Can not find transform. " << timestamp
+    AERROR << "Can not find transform. " << FORMAT_TIMESTAMP(timestamp)
            << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
            << " Error info: " << err_string;
     return false;

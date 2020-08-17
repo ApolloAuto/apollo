@@ -43,7 +43,7 @@ cc_library(
     deps = [
         ":lidar_inner_component_messages",
         "//cyber/time:clock",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:string_util",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/app:lidar_obstacle_detection",
