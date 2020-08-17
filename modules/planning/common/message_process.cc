@@ -136,10 +136,6 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   if (time_diff < 1.0 / FLAGS_planning_loop_rate) {
     // for RL_TEST, skip this check so that first frame can proceed
     if (planning_config_.learning_mode() != PlanningConfig::RL_TEST) {
-      AERROR << "time_diff [" << time_diff
-             << "] between current and last received"
-                " localization msg smaller than planning component interval ["
-             << 1.0 / FLAGS_planning_loop_rate << "]";
       return;
     }
   }
