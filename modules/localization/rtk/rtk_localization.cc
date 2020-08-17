@@ -403,15 +403,13 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
     AERROR << "imu1 and imu2 has no header or no timestamp_sec in header";
     return false;
   }
-  if (timestamp_sec - imu1.header().timestamp_sec() <
-      std::numeric_limits<double>::min()) {
+  if (timestamp_sec < imu1.header().timestamp_sec()) {
     AERROR << "[InterpolateIMU1]: the given time stamp["
            << FORMAT_TIMESTAMP(timestamp_sec)
            << "] is older than the 1st message["
            << FORMAT_TIMESTAMP(imu1.header().timestamp_sec()) << "]";
     *imu_msg = imu1;
-  } else if (timestamp_sec - imu2.header().timestamp_sec() >
-             std::numeric_limits<double>::min()) {
+  } else if (timestamp_sec > imu2.header().timestamp_sec()) {
     AERROR << "[InterpolateIMU2]: the given time stamp[" << timestamp_sec
            << "] is newer than the 2nd message["
            << imu2.header().timestamp_sec() << "]";
