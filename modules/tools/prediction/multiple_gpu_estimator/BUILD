@@ -20,6 +20,11 @@ py_library(
 py_binary(
     name = "mlp_main",
     srcs = ["mlp_main.py"],
+    deps = [
+        ":mlp_data",
+        ":mlp_model",
+        ":mlp_utils",
+    ],
 )
 
 py_library(
