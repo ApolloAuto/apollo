@@ -32,9 +32,6 @@ namespace transform {
 // extend the BufferInterface class and BufferCore class
 class Buffer : public BufferInterface, public tf2::BufferCore {
  public:
-  using tf2::BufferCore::canTransform;
-  using tf2::BufferCore::lookupTransform;
-
   /**
    * @brief  Constructor for a Buffer object
    * @param cache_time How long to keep a history of transforms
