@@ -220,7 +220,9 @@ OSQPSettings *MpcOsqp::Settings() {
   // default setting
   OSQPSettings *settings =
       reinterpret_cast<OSQPSettings *>(c_malloc(sizeof(OSQPSettings)));
-  if (settings != nullptr) {
+  if (settings == nullptr) {
+    return nullptr;
+  } else {
     osqp_set_default_settings(settings);
     settings->polish = true;
     settings->scaled_termination = true;
@@ -228,8 +230,6 @@ OSQPSettings *MpcOsqp::Settings() {
     settings->max_iter = max_iteration_;
     settings->eps_abs = eps_abs_;
     return settings;
-  } else {
-    return nullptr;
   }
 }
 
@@ -238,7 +238,9 @@ OSQPData *MpcOsqp::Data() {
   size_t kernel_dim = state_dim_ * (horizon_ + 1) + control_dim_ * horizon_;
   size_t num_affine_constraint =
       2 * state_dim_ * (horizon_ + 1) + control_dim_ * horizon_;
-  if (data != nullptr) {
+  if (data == nullptr) {
+    return nullptr;
+  } else {
     data->n = kernel_dim;
     data->m = num_affine_constraint;
     std::vector<c_float> P_data;
@@ -267,8 +269,6 @@ OSQPData *MpcOsqp::Data() {
     data->l = lowerBound_.data();
     data->u = upperBound_.data();
     return data;
-  } else {
-    return nullptr;
   }
 }
 
