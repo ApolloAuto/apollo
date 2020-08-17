@@ -55,7 +55,7 @@ filegroup(
 
 cc_test(
     name = "hdmap_map_test",
-    size = "small",
+    size = "large",
     timeout = "short",
     srcs = [
         "hdmap_common_test.cc",
