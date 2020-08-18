@@ -31,20 +31,20 @@ class PointFactory {
     return math::Vec2d(xy.x(), xy.y());
   }
 
-  static inline SLPoint ToSLPoint(const double s, const double l) {
+  static inline SLPoint ToSLPoint(const double& s, const double& l) {
     SLPoint sl;
     sl.set_s(s);
     sl.set_l(l);
-    return sl;
+    return std::move(sl);
   }
 
-  static inline PointENU ToPointENU(const double x, const double y,
-                                    const double z = 0) {
+  static inline PointENU ToPointENU(const double& x, const double& y,
+                                    const double& z = 0) {
     PointENU point_enu;
     point_enu.set_x(x);
     point_enu.set_y(y);
     point_enu.set_z(z);
-    return point_enu;
+    return std::move(point_enu);
   }
 
   template <typename XYZ>
@@ -52,24 +52,25 @@ class PointFactory {
     return ToPointENU(xyz.x(), xyz.y(), xyz.z());
   }
 
-  static inline SpeedPoint ToSpeedPoint(const double s, const double t,
-                                        const double v = 0, const double a = 0,
-                                        const double da = 0) {
+  static inline SpeedPoint ToSpeedPoint(const double& s, const double& t,
+                                        const double& v = 0,
+                                        const double& a = 0,
+                                        const double& da = 0) {
     SpeedPoint speed_point;
     speed_point.set_s(s);
     speed_point.set_t(t);
     speed_point.set_v(v);
     speed_point.set_a(a);
     speed_point.set_da(da);
-    return speed_point;
+    return std::move(speed_point);
   }
 
-  static inline PathPoint ToPathPoint(const double x, const double y,
-                                      const double z = 0, const double s = 0,
-                                      const double theta = 0,
-                                      const double kappa = 0,
-                                      const double dkappa = 0,
-                                      const double ddkappa = 0) {
+  static inline PathPoint ToPathPoint(const double& x, const double& y,
+                                      const double& z = 0, const double& s = 0,
+                                      const double& theta = 0,
+                                      const double& kappa = 0,
+                                      const double& dkappa = 0,
+                                      const double& ddkappa = 0) {
     PathPoint path_point;
     path_point.set_x(x);
     path_point.set_y(y);
@@ -79,7 +80,7 @@ class PointFactory {
     path_point.set_kappa(kappa);
     path_point.set_dkappa(dkappa);
     path_point.set_ddkappa(ddkappa);
-    return path_point;
+    return std::move(path_point);
   }
 };
 
