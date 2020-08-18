@@ -29,8 +29,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-uint32_t DetectionComponent::s_seq_num_ = 0;
-std::mutex DetectionComponent::s_mutex_;
+std::atomic<uint32_t> DetectionComponent::seq_num_{0};
 
 bool DetectionComponent::Init() {
   LidarDetectionComponentConfig comp_config;
@@ -98,10 +97,7 @@ bool DetectionComponent::InitAlgorithmPlugin() {
 bool DetectionComponent::InternalProc(
     const std::shared_ptr<const drivers::PointCloud>& in_message,
     const std::shared_ptr<LidarFrameMessage>& out_message) {
-  {
-    std::unique_lock<std::mutex> lock(s_mutex_);
-    s_seq_num_++;
-  }
+  uint32_t seq_num = seq_num_.fetch_add(1);
   const double timestamp = in_message->measurement_time();
   const double cur_time = Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
@@ -111,7 +107,7 @@ bool DetectionComponent::InternalProc(
 
   out_message->timestamp_ = timestamp;
   out_message->lidar_timestamp_ = in_message->header().lidar_timestamp();
-  out_message->seq_num_ = s_seq_num_;
+  out_message->seq_num_ = seq_num;
   out_message->process_stage_ = ProcessStage::LIDAR_DETECTION;
   out_message->error_code_ = apollo::common::ErrorCode::OK;
 
