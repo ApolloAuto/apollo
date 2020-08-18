@@ -90,12 +90,6 @@ cyber_modules {
   }
 }
 cyber_modules {
-  key: "Third Party Perception"
-  value: {
-    dag_files: "/apollo/modules/third_party_perception/dag/third_party_perception.dag"
-  }
-}
-cyber_modules {
   key: "Microphone"
   value: {
     dag_files: "/apollo/modules/drivers/microphone/dag/microphone.dag"
