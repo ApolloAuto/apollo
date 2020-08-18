@@ -407,7 +407,7 @@ function mount_map_volumes() {
 
     if [ "$FAST_MODE" = "no" ]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
-            restart_map_volume_if_needed ${map_name} "${VOLUME_VERSION}"
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
         done
     else
         for map_name in ${DEFAULT_TEST_MAPS[@]}; do
