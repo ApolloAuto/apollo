@@ -28,7 +28,7 @@ h5py
 utm
 
 # Learning
-opencv-python
+#opencv-python
 numpy
 scipy
 
