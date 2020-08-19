@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/camera/common/undistortion_handler.h"
 
-#include <npp.h>
 #include <vector>
 
+#include "cuda/include/npp.h"
 #include "Eigen/Dense"
 
 #include "cyber/common/log.h"
