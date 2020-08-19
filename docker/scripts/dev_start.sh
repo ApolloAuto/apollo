@@ -42,9 +42,9 @@ USE_GPU_HOST=0
 USER_AGREED="no"
 
 VOLUME_VERSION="latest"
-USER_SPECIFIED_MAP=
-MAP_VOLUME_CONF=
-OTHER_VOLUME_CONF=
+USER_SPECIFIED_MAPS=
+MAP_VOLUMES_CONF=
+OTHER_VOLUMES_CONF=
 
 DEFAULT_MAPS=(
   sunnyvale_big_loop
@@ -215,7 +215,7 @@ function parse_arguments() {
 
         --map)
             map_name="$1"; shift
-            USER_SPECIFIED_MAP="${USER_SPECIFIED_MAP} ${map_name}"
+            USER_SPECIFIED_MAPS="${USER_SPECIFIED_MAPS} ${map_name}"
             ;;
         -y)
             USER_AGREED="yes"
@@ -239,14 +239,12 @@ function determine_dev_image() {
     local version="$1"
     # If no custom version specified
     if [ -z "${version}" ]; then
-        if [ "${USE_LOCAL_IMAGE}" = "yes" ]; then
-            version="local_dev"
-        elif [ "${TARGET_ARCH}" = "x86_64" ]; then
+        if [ "${TARGET_ARCH}" = "x86_64" ]; then
             version="${VERSION_X86_64}"
         elif [ "${TARGET_ARCH}" = "aarch64" ]; then
             version="${VERSION_AARCH64}"
         else
-            error "Logic can't reach here! Please file an issue to Apollo GitHub."
+            error "Logic can't reach here! Please report this issue to Apollo@GitHub."
             exit 3
         fi
     fi
@@ -381,7 +379,7 @@ function restart_map_volume_if_needed() {
     local map_name="$1"
     local map_version="$2"
     local map_volume="apollo_map_volume-${map_name}_${USER}"
-    if [[ ${MAP_VOLUME_CONF} == *"${map_volume}"* ]]; then
+    if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* ]]; then
         info "Map ${map_name} has already been included."
     else
         local map_image=
@@ -393,14 +391,14 @@ function restart_map_volume_if_needed() {
         info "Load map ${map_name} from image: ${map_image}"
 
         docker_restart_volume "${map_volume}" "${map_image}"
-        MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${map_volume}"
+        MAP_VOLUMES_CONF="${MAP_VOLUMES_CONF} --volumes-from ${map_volume}"
     fi
 }
 
 function mount_map_volumes() {
     info "Starting mounting map volumes ..."
-    if [ -n "${USER_SPECIFIED_MAP}" ]; then
-        for map_name in ${USER_SPECIFIED_MAP}; do
+    if [ -n "${USER_SPECIFIED_MAPS}" ]; then
+        for map_name in ${USER_SPECIFIED_MAPS}; do
             restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
         done
     fi
@@ -440,7 +438,7 @@ function mount_other_volumes() {
         volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
     fi
 
-    OTHER_VOLUME_CONF="${volume_conf}"
+    OTHER_VOLUMES_CONF="${volume_conf}"
 }
 
 function post_run_setup() {
@@ -464,7 +462,7 @@ function main() {
     fi
 
     if ! docker_pull "${APOLLO_DEV_IMAGE}" ; then
-        error "Failed to pull docker image."
+        error "Failed to pull docker image ${APOLLO_DEV_IMAGE}"
         exit 1
     fi
 
@@ -505,8 +503,8 @@ function main() {
         -e USE_GPU="${USE_GPU_HOST}"        \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
-        ${MAP_VOLUME_CONF}      \
-        ${OTHER_VOLUME_CONF}    \
+        ${MAP_VOLUMES_CONF}      \
+        ${OTHER_VOLUMES_CONF}    \
         ${local_volumes}        \
         --net host \
         -w /apollo \
@@ -527,7 +525,7 @@ function main() {
 
     post_run_setup
 
-    ok "Congratulations! You have successfully finished setting up Apollo dev docker environment."
+    ok "Congratulations! You have successfully finished setting up Apollo Dev Environment."
     ok "To login into the newly created ${APOLLO_DEV} container, please run the following command:"
     ok "  bash docker/scripts/dev_into.sh"
     ok "Enjoy!"
