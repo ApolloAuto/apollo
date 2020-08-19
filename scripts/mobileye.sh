@@ -19,5 +19,6 @@
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
-# run function from apollo_base.sh
-run_module canbus "$@"
+# run_customized_path command_name module_name
+run_customized_path drivers/mobileye mobileye "$@"
+
