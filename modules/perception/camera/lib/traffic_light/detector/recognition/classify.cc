@@ -19,8 +19,8 @@
 
 #include "cyber/common/file.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/inference/inference_factory.h"
-#include "modules/perception/inference/utils/resize.h"
+// #include "modules/perception/inference/inference_factory.h"
+// #include "modules/perception/inference/utils/resize.h"
 
 namespace apollo {
 namespace perception {
@@ -60,12 +60,12 @@ void ClassifyBySimple::Init(
 
   AINFO << "model_root" << model_root;
 
-  rt_net_.reset(inference::CreateInferenceByName(
-      model_config.model_type(), proto_file, weight_file, net_outputs_,
-      net_inputs_, model_root));
+  // rt_net_.reset(inference::CreateInferenceByName(
+  //     model_config.model_type(), proto_file, weight_file, net_outputs_,
+  //     net_inputs_, model_root));
   AINFO << "create success";
 
-  rt_net_->set_gpu_id(gpu_id);
+  // rt_net_->set_gpu_id(gpu_id);
   gpu_id_ = gpu_id;
 
   resize_height_ = model_config.classify_resize_height();
@@ -95,9 +95,9 @@ void ClassifyBySimple::Init(
         << input_reshape[net_inputs_[0]][1] << ", "
         << input_reshape[net_inputs_[0]][2] << ", "
         << input_reshape[net_inputs_[0]][3];
-  if (!rt_net_->Init(input_reshape)) {
-    AINFO << "net init fail.";
-  }
+  // if (!rt_net_->Init(input_reshape)) {
+  //   AINFO << "net init fail.";
+  // }
 
   image_.reset(
       new base::Image8U(resize_height_, resize_width_, base::Color::BGR));
@@ -112,8 +112,8 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
     return;
   }
   std::shared_ptr<base::Blob<uint8_t>> rectified_blob;
-  auto input_blob_recog = rt_net_->get_blob(net_inputs_[0]);
-  auto output_blob_recog = rt_net_->get_blob(net_outputs_[0]);
+  // auto input_blob_recog = rt_net_->get_blob(net_inputs_[0]);
+  // auto output_blob_recog = rt_net_->get_blob(net_outputs_[0]);
 
   for (base::TrafficLightPtr light : *lights) {
     if (!light->region.is_detected) {
@@ -127,19 +127,19 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
 
     AINFO << "get img done";
 
-    const float* mean = mean_.get()->cpu_data();
-    inference::ResizeGPU(*image_, input_blob_recog,
-                         frame->data_provider->src_width(), 0, mean[0], mean[1],
-                         mean[2], true, scale_);
+    // const float* mean = mean_.get()->cpu_data();
+    // inference::ResizeGPU(*image_, input_blob_recog,
+    //                      frame->data_provider->src_width(), 0, mean[0], mean[1],
+    //                      mean[2], true, scale_);
 
     AINFO << "resize gpu finish.";
     cudaDeviceSynchronize();
-    rt_net_->Infer();
+    // rt_net_->Infer();
     cudaDeviceSynchronize();
     AINFO << "infer finish.";
 
-    float* out_put_data = output_blob_recog->mutable_cpu_data();
-    Prob2Color(out_put_data, unknown_threshold_, light);
+    // float* out_put_data = output_blob_recog->mutable_cpu_data();
+    // Prob2Color(out_put_data, unknown_threshold_, light);
   }
 }
 

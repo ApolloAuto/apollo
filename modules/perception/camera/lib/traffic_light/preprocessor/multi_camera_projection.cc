@@ -20,9 +20,12 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/perception/camera/common/util.h"
+// #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
+
+//for error: 'accumulate' is not a member of 'std'
+#include <numeric>
 
 namespace apollo {
 namespace perception {
@@ -141,7 +144,7 @@ bool MultiCamerasProjection::BoundaryBasedProject(
     return false;
   }
   int width = static_cast<int>(camera_model->get_width());
-  int height = static_cast<int>(camera_model->get_height());
+  int height = static_cast<int>(camera_model->get_height());  
   int bound_size = static_cast<int>(points.size());
   if (bound_size < 4) {
     AERROR << "invalid bound_size " << bound_size;
@@ -175,7 +178,8 @@ bool MultiCamerasProjection::BoundaryBasedProject(
   }
 
   base::BBox2DI roi(min_x, min_y, max_x, max_y);
-  if (OutOfValidRegion(roi, width, height) || roi.Area() == 0) {
+  // if (OutOfValidRegion(roi, width, height) || roi.Area() == 0) {
+  if (roi.Area() == 0 || width <= 0 || height <= 0){
     AWARN << "Projection get ROI outside the image. ";
     return false;
   }
