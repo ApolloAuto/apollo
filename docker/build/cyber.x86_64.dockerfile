@@ -1,4 +1,7 @@
-ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+ARG BASE_REPO=apolloauto/apollo
+# ARG BASE_REPO=nvidia/cuda
+
+ARG BASE_IMAGE=${BASE_REPO}:10.2-cudnn8-devel-ubuntu18.04
 FROM ${BASE_IMAGE}
 
 ARG BUILD_STAGE

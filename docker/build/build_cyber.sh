@@ -24,7 +24,7 @@
 set -euo pipefail
 
 SUPPORTED_ARCHS=" x86_64 aarch64 "
-REPO=apolloauto/apollo
+REPO="apolloauto/apollo"
 UBT_LTS="18.04"
 LOCAL_DEV_TAG="${REPO}:local_cyber_dev"
 
@@ -168,10 +168,14 @@ TAG=""
 function determine_tag() {
     local docker_fn="$(basename ${DOCKERFILE})"
     local myid="${docker_fn%%.*}"
+
+    local cuda_ver="10.2"
+    local cudnn_ver="8"
+
     if [ "${myid}" = "tegra_cyber" ]; then
-        local cuda_ver="10.2"
-        local cudnn_ver="8"
         TAG="${REPO}:L4T-${cuda_ver}-cudnn${cudnn_ver}-${UBT_LTS}-${TIME}"
+    elif [ "${myid}" = "nvidia_cuda" ]; then
+        TAG="${REPO}:${cuda_ver}-cudnn${cudnn_ver}-devel-ubuntu${UBT_LTS}"
     else
         TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
     fi
