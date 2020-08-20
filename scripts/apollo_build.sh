@@ -28,6 +28,7 @@ ARCH="$(uname -m)"
 
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
+DISTDIR="${APOLLO_CACHE_DIR}/distdir"
 
 function determine_disabled_bazel_targets() {
   local disabled=
@@ -115,6 +116,13 @@ function _parse_cmdline_arguments() {
         optarg="${!pos}"
         known_options="${known_options} ${opt} ${optarg}"
         ;;
+      --distdir=*)
+        if [ ! -d "${opt#*=}" ]; then
+          warning "${DISTDIR} doesn't exist!"
+        else
+          DISTDIR="${opt#*=}"
+        fi
+        ;;
       *)
         remained_args="${remained_args} ${opt}"
         ;;
@@ -130,7 +138,7 @@ function _parse_cmdline_arguments() {
 
 function _run_bazel_build_impl() {
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel build --distdir="${APOLLO_CACHE_DIR}/distdir" ${job_args} $@
+  bazel build "--distdir=${DISTDIR}" ${job_args} $@
 }
 
 function bazel_build() {
