@@ -25,7 +25,6 @@ VERSION_X86_64="cyber-x86_64-18.04-20200812_0256"
 # VERSION_AARCH64="cyber-aarch64-18.04-20200717_0327"
 # L4T
 VERSION_AARCH64="cyber-aarch64-18.04-20200719_0434"
-VERSION_LOCAL_CYBER="local_cyber_dev"
 CYBER_CONTAINER="apollo_cyber_${USER}"
 CYBER_INSIDE="in-cyber-docker"
 
@@ -220,26 +219,18 @@ function determine_target_version_and_arch() {
     local version="$1"
     # If no custom version specified
     if [[ -z "${version}" ]]; then
-        if [[ ${USE_LOCAL_IMAGE} -eq 1 ]]; then
-            version="${VERSION_LOCAL_CYBER}"
-            if [[ -z "${TARGET_ARCH}" ]]; then
-                TARGET_ARCH="${HOST_ARCH}"
-            fi
-            _target_arch_check "${TARGET_ARCH}"
-        else # Neither CUSTOM_VERSION nor USE_LOCAL_IMAGE set
-            # if target arch not set, assume it is equal to host arch.
-            if [[ -z "${TARGET_ARCH}" ]]; then
-                TARGET_ARCH="${HOST_ARCH}"
-            fi
-            _target_arch_check "${TARGET_ARCH}"
-            if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-                version="${VERSION_X86_64}"
-            elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-                version="${VERSION_AARCH64}"
-            else
-                error "CAN'T REACH HERE"
-                exit 1
-            fi
+        # if target arch not set, assume it is equal to host arch.
+        if [[ -z "${TARGET_ARCH}" ]]; then
+            TARGET_ARCH="${HOST_ARCH}"
+        fi
+        _target_arch_check "${TARGET_ARCH}"
+        if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+            version="${VERSION_X86_64}"
+        elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+            version="${VERSION_AARCH64}"
+        else
+            error "CAN'T REACH HERE"
+            exit 1
         fi
     elif [[ "${version}" =~ local* ]]; then
         if [[ -z "${TARGET_ARCH}" ]]; then
