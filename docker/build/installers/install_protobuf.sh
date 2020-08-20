@@ -22,10 +22,10 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
-VERSION="3.12.3"
+VERSION="3.13.0"
 
 PKG_NAME="protobuf-${VERSION}.tar.gz"
-CHECKSUM="71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29"
+CHECKSUM="9b4ee22c250fe31b16f1a24d61467e40780a3fbb9b91c3b65be2a376ed913a1a"
 DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/archive/v${VERSION}.tar.gz"
 
 #PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
