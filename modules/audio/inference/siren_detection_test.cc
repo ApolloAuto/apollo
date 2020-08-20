@@ -14,36 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#include "modules/audio/inference/siren_detection.h"
 
-#include <vector>
-
-#include "torch/script.h"
-#include "torch/torch.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace audio {
 
-/**
- * @file moving_detection.h
- * @description detect if the sound is approaching or departing
- */
-
-class SirenDetection {
+class SirenDetectionTest : public ::testing::Test {
  public:
-  SirenDetection();
+  virtual void SetUp() {}
 
-  ~SirenDetection() = default;
-
-  bool Evaluate(const std::vector<std::vector<double>>& signals);
-
- private:
-  void LoadModel();
-
- private:
-  torch::jit::script::Module torch_model_;
-  torch::Device device_;
+ protected:
+  SirenDetection siren_detection_;
 };
+
+TEST_F(SirenDetectionTest, is_siren) {
+  std::vector<std::vector<double>> signals(6,
+    (std::vector<double> (72000, 0.01)));
+  bool result = siren_detection_.Evaluate(signals);
+  EXPECT_EQ(result, false);
+}
 
 }  // namespace audio
 }  // namespace apollo

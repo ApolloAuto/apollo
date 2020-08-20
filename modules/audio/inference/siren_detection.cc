@@ -31,7 +31,7 @@ SirenDetection::SirenDetection() : device_(torch::kCPU) {
   LoadModel();
 }
 
-bool SirenDetection::Evaluate(const std::vector<std::vector<float>>& signals) {
+bool SirenDetection::Evaluate(const std::vector<std::vector<double>>& signals) {
   // Sanity checks.
   omp_set_num_threads(1);
   if (signals.size() == 0) {
@@ -43,7 +43,7 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<float>>& signals) {
     return false;
   }
 
-  torch::Tensor audio_tensor = torch::empty(6 * 1 * 30075);
+  torch::Tensor audio_tensor = torch::empty(6 * 1 * 72000);
   float* data = audio_tensor.data_ptr<float>();
 
   for (const auto& channel : signals) {
@@ -52,7 +52,7 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<float>>& signals) {
     }
   }
 
-  torch::Tensor torch_input = torch::from_blob(data, {6, 1, 30075});
+  torch::Tensor torch_input = torch::from_blob(data, {6, 1, 72000});
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(torch_input.to(device_));
 
@@ -62,20 +62,22 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<float>>& signals) {
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
-  ADEBUG << "SirenDetection used time: " << diff.count() * 1000 << " ms.";
+  AINFO << "SirenDetection used time: " << diff.count() * 1000 << " ms.";
   auto torch_output = torch_output_tensor.accessor<float, 2>();
 
   // TODO(Hongyi): change to majority vote when 6 channels are ready
+  ADEBUG << "torch_output[0][0] = " << torch_output[0][0]
+         << ", torch_output[0][1] = " << torch_output[0][1];
   if (torch_output[0][0] < torch_output[0][1]) {
-    return false;
-  } else {
     return true;
+  } else {
+    return false;
   }
 }
 
 void SirenDetection::LoadModel() {
   if (torch::cuda::is_available()) {
-    ADEBUG << "CUDA is available";
+    AINFO << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
   }
   torch::set_num_threads(1);

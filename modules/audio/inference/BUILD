@@ -37,6 +37,16 @@ cc_library(
     ],
 )
 
+# cc_test(
+#     name = "siren_detection_test",
+#     size = "small",
+#     srcs = ["siren_detection_test.cc"],
+#     deps = [
+#         ":siren_detection",
+#         "@com_google_googletest//:gtest_main",
+#     ],
+# )
+
 cc_test(
     name = "moving_detection_test",
     size = "small",
