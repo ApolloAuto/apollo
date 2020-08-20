@@ -109,7 +109,7 @@ function _parse_cmdline_arguments() {
   local known_options=""
   local remained_args=""
 
-  for ((pos=1; pos <= $#; pos++)); do #do echo "$#" "$i" "${!i}"; done
+  for ((pos = 1; pos <= $#; pos++)); do #do echo "$#" "$i" "${!i}"; done
     local opt="${!pos}"
     local optarg
 

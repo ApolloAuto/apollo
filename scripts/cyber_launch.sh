@@ -45,6 +45,11 @@ function run() {
       shift
       stop $@
       ;;
+    restart)
+      shift
+      stop $@
+      start $@
+      ;;
     *)
       echo "Unknow command: $1"
       exit 1

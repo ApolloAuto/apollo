@@ -45,6 +45,10 @@ function run() {
     stop)
       stop
       ;;
+    restart)
+      stop
+      start
+      ;;
     *)
       start
       ;;

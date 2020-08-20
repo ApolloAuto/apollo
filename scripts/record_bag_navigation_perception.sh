@@ -88,6 +88,11 @@ case $1 in
     shift
     help $@
     ;;
+  restart)
+    shift
+    stop $@
+    start $@
+    ;;
   *)
     start $@
     ;;

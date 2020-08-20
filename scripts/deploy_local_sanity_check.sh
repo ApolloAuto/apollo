@@ -36,8 +36,14 @@ if [ ! -e "$APOLLO_ROOT/.git" ]; then
   exit 1
 fi
 
-type curl >/dev/null 2>&1 || { error >&2 "command curl not found, please install it with: sudo apt-get install curl" ; exit 1; }
-type perl >/dev/null 2>&1 || { error >&2 "command perl not found, please install it with: sudo apt-get install perl-base" ; exit 1; }
+type curl > /dev/null 2>&1 || {
+  error >&2 "command curl not found, please install it with: sudo apt-get install curl"
+  exit 1
+}
+type perl > /dev/null 2>&1 || {
+  error >&2 "command perl not found, please install it with: sudo apt-get install perl-base"
+  exit 1
+}
 
 function uninstall() {
   if [ -L "$APOLLO_ROOT/.git/hooks/post-commit" ]; then

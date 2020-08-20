@@ -29,7 +29,7 @@ if [ -z "${BUILDIFIER_CMD}" ]; then
   error "Command 'buildifier' not found in your PATH."
   error "If installed, check your PATH settings."
   error "If not, please refer to https://github.com/bazelbuild/buildtools" \
-        "on how to install it manually."
+    "on how to install it manually."
   exit 1
 fi
 # echo "Installing buildifier..."

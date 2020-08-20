@@ -149,6 +149,14 @@ case $1 in
   stop_check_extrin)
     stop_check_extrin
     ;;
+  restart_record)
+    stop_record
+    start_record
+    ;;
+  restart_check_extrin)
+    stop_check_extrin
+    start_check_extrin
+    ;;
   *)
     record_start
     ;;

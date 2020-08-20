@@ -93,47 +93,47 @@ target_dir=""
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
-    -po|--perception_only)
+    -po | --perception_only)
       is_perception=true
       work_mode_num=$((work_mode_num + 1))
       shift # past argument
       ;;
-    -pc|--perfectcontrol)
+    -pc | --perfectcontrol)
       is_perfect_control=true
       work_mode_num=$((work_mode_num + 1))
       shift # past argument
       ;;
-    -np|--noplanning)
+    -np | --noplanning)
       is_no_planning=true
       work_mode_num=$((work_mode_num + 1))
       shift # past argument
       ;;
-    -pn|--nopredictionplanning)
+    -pn | --nopredictionplanning)
       is_no_prediction_planning=true
       work_mode_num=$((work_mode_num + 1))
       shift # past argument
       ;;
-    -wp|--withplanning)
+    -wp | --withplanning)
       is_with_planning=true
       work_mode_num=$((work_mode_num + 1))
       shift # past value
       ;;
-    -co|--cameraonly)
+    -co | --cameraonly)
       is_camera_only=true
       work_mode_num=$((work_mode_num + 1))
       shift # past value
       ;;
-    -ni|--noimage)
+    -ni | --noimage)
       is_no_pointcloud_image=true
       work_mode_num=$((work_mode_num + 1))
       shift # past argument
       ;;
-    -d|--dir)
+    -d | --dir)
       target_dir="$2"
       shift # past argument
       shift # past value
       ;;
-    -h|--help)
+    -h | --help)
       print_help
       exit 0
       ;;
