@@ -56,6 +56,9 @@ stage_config: {
   }
   task_config: {
     task_type: PATH_BOUNDS_DECIDER
+    path_bounds_decider_config {
+      adc_buffer_coeff: 0.0
+    }
   }
   task_config: {
     task_type: PATH_REFERENCE_DECIDER

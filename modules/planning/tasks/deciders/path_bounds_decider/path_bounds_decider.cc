@@ -1750,12 +1750,15 @@ bool PathBoundsDecider::UpdatePathBoundaryWithBuffer(
     size_t idx, double left_bound, double right_bound,
     PathBound* const path_boundaries) {
   // Update the right bound (l_min):
-  double new_l_min =
-      std::fmax(std::get<1>((*path_boundaries)[idx]),
-                right_bound + GetBufferBetweenADCCenterAndEdge());
+  double new_l_min = std::fmax(
+      std::get<1>((*path_boundaries)[idx]),
+      right_bound + config_.path_bounds_decider_config().adc_buffer_coeff() *
+                        GetBufferBetweenADCCenterAndEdge());
   // Update the left bound (l_max):
-  double new_l_max = std::fmin(std::get<2>((*path_boundaries)[idx]),
-                               left_bound - GetBufferBetweenADCCenterAndEdge());
+  double new_l_max = std::fmin(
+      std::get<2>((*path_boundaries)[idx]),
+      left_bound - config_.path_bounds_decider_config().adc_buffer_coeff() *
+                       GetBufferBetweenADCCenterAndEdge());
 
   // Check if ADC is blocked.
   // If blocked, don't update anything, return false.
