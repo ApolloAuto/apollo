@@ -47,7 +47,7 @@ void AudioInfo::InsertChannelData(const std::size_t index,
   int width = microphone_config.sample_width();
   const std::string& data = channel_data.data();
   for (std::size_t i = 0; i < data.length(); i += width) {
-    int16_t signal = ((int16_t(data[i])) << 8) | (0x00ff & data[i + 1]);
+    int16_t signal = ((int16_t(data[i + 1])) << 8) | (0x00ff & data[i]);
     signals_[index].push_back(static_cast<double>(signal));
   }
   std::size_t max_signal_length = static_cast<std::size_t>(
