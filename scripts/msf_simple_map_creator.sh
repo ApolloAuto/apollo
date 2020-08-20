@@ -1,10 +1,10 @@
 #! /bin/bash
 if [ $# -lt 4 ]; then
-    echo "Usage: msf_simple_map_creator.sh [records folder] [extrinsic_file] [zone_id] [map folder] [lidar_type]"
-    exit 1;
+  echo "Usage: msf_simple_map_creator.sh [records folder] [extrinsic_file] [zone_id] [map folder] [lidar_type]"
+  exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
@@ -47,27 +47,27 @@ function poses_interpolation() {
   local EXTRINSIC_PATH=$3
   local OUTPUT_POSES_PATH=$4
   /apollo/bazel-bin/modules/localization/msf/local_tool/map_creation/poses_interpolator \
-   --input_poses_path $INPUT_POSES_PATH \
-   --ref_timestamps_path $REF_TIMESTAMPS_PATH \
-   --extrinsic_path $EXTRINSIC_PATH \
-   --output_poses_path $OUTPUT_POSES_PATH
+    --input_poses_path $INPUT_POSES_PATH \
+    --ref_timestamps_path $REF_TIMESTAMPS_PATH \
+    --extrinsic_path $EXTRINSIC_PATH \
+    --output_poses_path $OUTPUT_POSES_PATH
 }
 
 function create_lossless_map() {
   /apollo/bazel-bin/modules/localization/msf/local_tool/map_creation/lossless_map_creator \
-      --use_plane_inliers_only true \
-      --pcd_folders $1 \
-      --pose_files $2 \
-      --map_folder $OUT_MAP_FOLDER \
-      --zone_id $ZONE_ID \
-      --coordinate_type UTM \
-      --map_resolution_type single
+    --use_plane_inliers_only true \
+    --pcd_folders $1 \
+    --pose_files $2 \
+    --map_folder $OUT_MAP_FOLDER \
+    --zone_id $ZONE_ID \
+    --coordinate_type UTM \
+    --map_resolution_type single
 }
 
 function create_lossy_map() {
   /apollo/bazel-bin/modules/localization/msf/local_tool/map_creation/lossless_map_to_lossy_map \
     --srcdir $OUT_MAP_FOLDER/lossless_map \
-    --dstdir $OUT_MAP_FOLDER \
+    --dstdir $OUT_MAP_FOLDER
 
   rm -fr $OUT_MAP_FOLDER/lossless_map
   rm -fr $OUT_MAP_FOLDER/parsed_data
@@ -77,8 +77,7 @@ function create_lossy_map() {
 cd $IN_FOLDER
 mkdir -p $OUT_MAP_FOLDER
 mkdir -p $PARSED_DATA_FOLDER
-for item in $(ls -l *.record* | awk '{print $9}')
-do
+for item in $(ls -l *.record* | awk '{print $9}'); do
   SEGMENTS=$(echo $item | awk -F'.' '{print NF}')
   DIR_NAME=$(echo $item | cut -d . -f ${SEGMENTS})
   DIR_NAME="${PARSED_DATA_FOLDER}/${DIR_NAME}"

@@ -68,30 +68,30 @@ function main() {
   local option="$1"
   shift
   case "${option}" in
-  -p|--python)
-    run_autopep8 "$@"
-    ;;
-  -c|--cpp)
-    run_clang_format "$@"
-    ;;
-  -b|--bazel)
-    run_buildifier "$@"
-    ;;
-  -s|--shell)
-    run_shfmt "$@"
-    ;;
-  -a|--all)
-    run_format_all "$@"
-    ;;
-  -h|--help)
-    print_usage
-    exit 1
-    ;;
-  *)
-    echo "Unknown option: ${option}"
-    print_usage
-    exit 1
-    ;;
+    -p|--python)
+      run_autopep8 "$@"
+      ;;
+    -c|--cpp)
+      run_clang_format "$@"
+      ;;
+    -b|--bazel)
+      run_buildifier "$@"
+      ;;
+    -s|--shell)
+      run_shfmt "$@"
+      ;;
+    -a|--all)
+      run_format_all "$@"
+      ;;
+    -h|--help)
+      print_usage
+      exit 1
+      ;;
+    *)
+      echo "Unknown option: ${option}"
+      print_usage
+      exit 1
+      ;;
   esac
 }
 

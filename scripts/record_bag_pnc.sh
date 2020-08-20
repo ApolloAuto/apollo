@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -30,37 +29,37 @@ function start() {
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup rosbag record --split --duration=10m -b 2048  \
-        /apollo/sensor/conti_radar \
-        /apollo/sensor/delphi_esr \
-        /apollo/sensor/gnss/best_pose \
-        /apollo/sensor/gnss/corrected_imu \
-        /apollo/sensor/gnss/gnss_status \
-        /apollo/sensor/gnss/imu \
-        /apollo/sensor/gnss/ins_stat \
-        /apollo/sensor/gnss/odometry \
-        /apollo/sensor/gnss/rtk_eph \
-        /apollo/sensor/gnss/rtk_obs \
-        /apollo/sensor/mobileye \
-        /apollo/canbus/chassis \
-        /apollo/canbus/chassis_detail \
-        /apollo/control \
-        /apollo/control/pad \
-        /apollo/navigation \
-        /apollo/perception/obstacles \
-        /apollo/perception/traffic_light \
-        /apollo/planning \
-        /apollo/prediction \
-        /apollo/routing_request \
-        /apollo/routing_response \
-        /apollo/localization/pose \
-        /apollo/drive_event \
-        /tf \
-        /tf_static \
-        /apollo/monitor \
-        /apollo/monitor/system_status \
-        /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
-    fi
+    nohup rosbag record --split --duration=10m -b 2048 \
+      /apollo/sensor/conti_radar \
+      /apollo/sensor/delphi_esr \
+      /apollo/sensor/gnss/best_pose \
+      /apollo/sensor/gnss/corrected_imu \
+      /apollo/sensor/gnss/gnss_status \
+      /apollo/sensor/gnss/imu \
+      /apollo/sensor/gnss/ins_stat \
+      /apollo/sensor/gnss/odometry \
+      /apollo/sensor/gnss/rtk_eph \
+      /apollo/sensor/gnss/rtk_obs \
+      /apollo/sensor/mobileye \
+      /apollo/canbus/chassis \
+      /apollo/canbus/chassis_detail \
+      /apollo/control \
+      /apollo/control/pad \
+      /apollo/navigation \
+      /apollo/perception/obstacles \
+      /apollo/perception/traffic_light \
+      /apollo/planning \
+      /apollo/prediction \
+      /apollo/routing_request \
+      /apollo/routing_response \
+      /apollo/localization/pose \
+      /apollo/drive_event \
+      /tf \
+      /tf_static \
+      /apollo/monitor \
+      /apollo/monitor/system_status \
+      /apollo/monitor/static_info < /dev/null > "${LOG}" 2>&1 &
+  fi
 }
 
 function stop() {

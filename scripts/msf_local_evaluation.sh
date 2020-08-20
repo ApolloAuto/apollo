@@ -1,9 +1,9 @@
 #! /bin/bash
 if [ $# -lt 1 ]; then
-    echo "Usage:"
-    echo "$0 [bags folder]                   evaluate fusion and lidar localization result"
-    echo "$0 [bags folder] [ant arm file]    evaluate fusion, lidar and gnss localization result"
-    exit 1;
+  echo "Usage:"
+  echo "$0 [bags folder]                   evaluate fusion and lidar localization result"
+  echo "$0 [bags folder] [ant arm file]    evaluate fusion, lidar and gnss localization result"
+  exit 1
 fi
 
 IN_FOLDER=$1
@@ -13,7 +13,7 @@ else
   ANT_IMU_FILE=""
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
@@ -65,8 +65,7 @@ function compare_poses() {
 }
 
 cd $IN_FOLDER
-for item in $(ls -l *record.* | awk '{print $9}')
-do
+for item in $(ls -l *record.* | awk '{print $9}'); do
   SEGMENTS=$(echo $item | awk -F'.' '{print NF}')
   DIR_NAME=$(echo $item | cut -d . -f ${SEGMENTS})
   if [ -d "${DIR_NAME}" ]; then
@@ -79,22 +78,19 @@ done
 
 rm -rf compare_fusion_odometry_all.txt
 touch compare_fusion_odometry_all.txt
-for item in  $(find . -name "compare_fusion_odometry.txt")
-do
+for item in $(find . -name "compare_fusion_odometry.txt"); do
   cat $item >> compare_fusion_odometry_all.txt
 done
 
 rm -rf compare_lidar_odometry_all.txt
 touch compare_lidar_odometry_all.txt
-for item in  $(find . -name "compare_lidar_odometry.txt")
-do
+for item in $(find . -name "compare_lidar_odometry.txt"); do
   cat $item >> compare_lidar_odometry_all.txt
 done
 
 rm -rf compare_gnss_odometry_all.txt
 touch compare_gnss_odometry_all.txt
-for item in  $(find . -name "compare_gnss_odometry.txt")
-do
+for item in $(find . -name "compare_gnss_odometry.txt"); do
   cat $item >> compare_gnss_odometry_all.txt
 done
 
@@ -109,6 +105,5 @@ python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare
 if [ $# -eq 2 ]; then
   echo ""
   echo "GNSS localization result:"
-  python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py\
-    compare_gnss_odometry_all.txt distance_only
+  python ${APOLLO_ROOT_DIR}/modules/tools/localization/evaluate_compare.py compare_gnss_odometry_all.txt distance_only
 fi

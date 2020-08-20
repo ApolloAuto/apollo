@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -27,25 +27,25 @@ fi
 cd "${APOLLO_ROOT_DIR}/data/bag"
 
 function check_bag() {
-  INFO=`rosbag info lidar_calib.bag`
+  INFO=$(rosbag info lidar_calib.bag)
 
   RESULT=0
   # check InsStat topic
-  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/gnss/ins_stat")}'`
+  FLAG=$(echo ${INFO} | awk '{print match($0, "/apollo/sensor/gnss/ins_stat")}')
   if [ ${FLAG} -eq 0 ]; then
     echo "No InsStat topic. "
     RESULT=1
   fi
 
   # check VelodyneScan topic
-  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/velodyne64/VelodyneScanUnified")}'`
+  FLAG=$(echo ${INFO} | awk '{print match($0, "/apollo/sensor/velodyne64/VelodyneScanUnified")}')
   if [ ${FLAG} -eq 0 ]; then
     echo "No VelodyneScan topic. "
     RESULT=1
   fi
 
   # check Relative Odometry topic
-  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/calibration/relative_odometry")}'`
+  FLAG=$(echo ${INFO} | awk '{print match($0, "/apollo/calibration/relative_odometry")}')
   if [ ${FLAG} -eq 0 ]; then
     echo "No Relative Odometry topic. "
     RESULT=1
@@ -59,7 +59,7 @@ function pack() {
 
   md5sum lidar_calib.bag > bag_md5
   tar -czvf lidar_calib_data.tar.gz ./lidar_calib.bag ./bag_md5 \
-    </dev/null >"${LOG}" 2>&1
+    < /dev/null > "${LOG}" 2>&1
 
   if [ -f bag_md5 ]; then
     rm bag_md5
@@ -90,13 +90,13 @@ function start_record() {
 
   # start to record lidar calibration data
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
-    if [ "${NUM_PROCESSES}" -eq 0 ]; then
-      nohup rosbag record -b 2048 -O lidar_calib.bag  \
-        /apollo/sensor/gnss/ins_stat \
-        /apollo/sensor/velodyne64/VelodyneScanUnified \
-        /apollo/calibration/relative_odometry \
-        </dev/null >"${LOG}" 2>&1 &
-    fi
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    nohup rosbag record -b 2048 -O lidar_calib.bag \
+      /apollo/sensor/gnss/ins_stat \
+      /apollo/sensor/velodyne64/VelodyneScanUnified \
+      /apollo/calibration/relative_odometry \
+      < /dev/null > "${LOG}" 2>&1 &
+  fi
 }
 
 function stop_record() {

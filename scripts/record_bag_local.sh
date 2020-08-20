@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -30,26 +29,26 @@ function start() {
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup rosbag record --split --duration=1m -b 2048  \
-        /apollo/sensor/gnss/best_pose \
-        /apollo/sensor/gnss/corrected_imu \
-        /apollo/sensor/gnss/gnss_status \
-        /apollo/sensor/gnss/imu \
-        /apollo/sensor/gnss/ins_stat \
-        /apollo/sensor/gnss/odometry \
-        /apollo/sensor/gnss/rtk_eph \
-        /apollo/sensor/gnss/rtk_obs \
-        /apollo/sensor/velodyne64/compensator/PointCloud2 \
-        /apollo/localization/pose \
-        /apollo/localization/msf_gnss \
-        /apollo/localization/msf_lidar \
-        /apollo/localization/msf_status \
-        /apollo/drive_event \
-        /tf \
-        /tf_static \
-        /apollo/monitor \
-        /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
-    fi
+    nohup rosbag record --split --duration=1m -b 2048 \
+      /apollo/sensor/gnss/best_pose \
+      /apollo/sensor/gnss/corrected_imu \
+      /apollo/sensor/gnss/gnss_status \
+      /apollo/sensor/gnss/imu \
+      /apollo/sensor/gnss/ins_stat \
+      /apollo/sensor/gnss/odometry \
+      /apollo/sensor/gnss/rtk_eph \
+      /apollo/sensor/gnss/rtk_obs \
+      /apollo/sensor/velodyne64/compensator/PointCloud2 \
+      /apollo/localization/pose \
+      /apollo/localization/msf_gnss \
+      /apollo/localization/msf_lidar \
+      /apollo/localization/msf_status \
+      /apollo/drive_event \
+      /tf \
+      /tf_static \
+      /apollo/monitor \
+      /apollo/monitor/static_info < /dev/null > "${LOG}" 2>&1 &
+  fi
 }
 
 function stop() {

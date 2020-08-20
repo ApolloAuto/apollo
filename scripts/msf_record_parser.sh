@@ -1,10 +1,10 @@
 #! /bin/bash
 if [ $# -lt 1 ]; then
-    echo "Usage: msf_record_parser.sh [records folder] [output folder]"
-    exit 1;
+  echo "Usage: msf_record_parser.sh [records folder] [output folder]"
+  exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
@@ -37,8 +37,7 @@ function data_exporter() {
 }
 
 cd $IN_FOLDER
-for item in $(ls -l *record.* | awk '{print $9}')
-do
+for item in $(ls -l *record.* | awk '{print $9}'); do
   SEGMENTS=$(echo $item | awk -F'.' '{print NF}')
   DIR_NAME=$(echo $item | cut -d . -f ${SEGMENTS})
   mkdir -p $OUT_FOLDER/$DIR_NAME
