@@ -26,16 +26,16 @@ LOG_DIR="${TOP_DIR}/data/log"
 
 function _clean_cache() {
   local opt="--async"
-  if [ "$1" == "expunge" ]; then
+  if [ "$1" == "--expunge" ]; then
     opt="--expunge_async"
   fi
 
-  bazel clean "${opt}"
+  bazel clean ${opt}
 
   # Remove bazel cache in associated directories
   if [ -d /apollo-simulator ]; then
     pushd /apollo-simulator > /dev/null
-    bazel clean "${opt}"
+    bazel clean ${opt}
     popd > /dev/null
   fi
 }
@@ -64,9 +64,20 @@ function _clean_docs() {
   fi
 }
 
-function clean() {
+function _print_usage() {
+  echo -e "Usage:\n  $0 [options]\nOptions:"
+  echo "${TAB}--expunge   Run \"bazel clean --expunge\""
+  echo "${TAB}-h, --help  Show this message"
+}
+
+function main() {
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    _print_usage
+    exit 1
+  fi
+
   if ! "${APOLLO_IN_DOCKER}"; then
-    error "The clean operation must be run from within docker container"
+    error "The clean operation should be run from within docker container"
     exit 1
   fi
 
@@ -76,19 +87,16 @@ function clean() {
 
   local answer
   typeset -l answer
-  warning "All the files under ${LOG_DIR} and ${CORE_DIR} will be removed."
-  warning "Do you want to continue (Y/n)?"
+  warning "Do you want to remove all log files under \"${LOG_DIR}\"" \
+    "and core dump files under \"${CORE_DIR}\" (Y/n)?"
   answer=$(read_one_char_from_stdin)
+  info "Your choice is: ${answer}"
   if [ "${answer}" == "y" ]; then
     _clean_core
     _clean_log
   fi
 
   success "Apollo cleanup done."
-}
-
-function main() {
-  clean "$@"
 }
 
 main "$@"
