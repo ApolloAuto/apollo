@@ -58,11 +58,11 @@ bool AudioComponent::Proc(const std::shared_ptr<AudioData>& audio_data) {
           audio_data->microphone_config().sample_rate(),
           audio_data->microphone_config().mic_distance());
 
+  // TODO(Hongyi): enable after upload model files
+  // bool is_siren = siren_detection_.Evaluate(audio_info_.GetSignals(72000));
+  // audio_detection.set_is_siren(is_siren);
   auto signals =
       audio_info_.GetSignals(audio_data->microphone_config().chunk());
-  // TODO(Hongyi): enable after upload model files
-  // bool is_siren = siren_detection_.Evaluate(signals);
-  // audio_detection.set_is_siren(is_siren);
   MovingResult moving_result = moving_detection_.Detect(signals);
   audio_detection.set_moving_result(moving_result);
   // TODO(all) add header to audio_detection
