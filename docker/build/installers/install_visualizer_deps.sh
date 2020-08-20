@@ -28,8 +28,7 @@ apt-get -y update && \
     libglvnd-dev \
     libgl1-mesa-dev \
     libegl1-mesa-dev \
-    libgles2-mesa-dev \
-    libconsole-bridge-dev
+    libgles2-mesa-dev
 
 # See Ref:
 # https://hub.docker.com/r/nvidia/cudagl
