@@ -55,7 +55,8 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<double>>& signals) {
     }
   }
 
-  torch::Tensor torch_input = torch::from_blob(data, {4, 1, 72000});
+  torch::Tensor torch_input = torch::from_blob(audio_tensor.data_ptr<float>(),
+                                               {4, 1, 72000});
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(torch_input.to(device_));
 
