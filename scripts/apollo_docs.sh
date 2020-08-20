@@ -122,13 +122,13 @@ function main() {
     clean)
       clean_docs
       ;;
-#   start)
-#     start_doc_server
-#     ;;
-#   shutdown)
-#     shutdown_doc_server
-#     ;;
-    -h|--help)
+      #  start)
+      #      start_doc_server
+      #      ;;
+      #  shutdown)
+      #      shutdown_doc_server
+      #      ;;
+    -h | --help)
       _usage
       ;;
 

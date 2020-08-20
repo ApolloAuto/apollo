@@ -31,7 +31,7 @@ function buildify() {
   if [ -z "${buildifier_cmd}" ]; then
     local download_link="https://github.com/bazelbuild/buildtools/releases"
     error "Command buildifier not found. You can download and install" \
-          "(or build) it from:"
+      "(or build) it from:"
     error "${TAB}${download_link}"
     exit 1
   fi

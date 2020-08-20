@@ -34,7 +34,7 @@ g_xy_file=""
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
-    -d|--dir)
+    -d | --dir)
       target_dir="$2"
       shift # past argument
       shift # past value
@@ -54,7 +54,7 @@ while [[ $# -gt 0 ]]; do
     #shift # past argument
     #shift # past value
     #;;
-    -h|--help)
+    -h | --help)
       print_help
       exit 0
       ;;

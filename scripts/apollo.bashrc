@@ -129,15 +129,15 @@ function c_family_ext() {
 }
 
 function find_c_cpp_srcs() {
-  find "$@" -type f -name "*.h"   \
-                 -o -name "*.c"   \
-                 -o -name "*.hpp" \
-                 -o -name "*.cpp" \
-                 -o -name "*.hh"  \
-                 -o -name "*.cc"  \
-                 -o -name "*.hxx" \
-                 -o -name "*.cxx" \
-                 -o -name "*.cu"
+  find "$@" -type f -name "*.h" \
+    -o -name "*.c" \
+    -o -name "*.hpp" \
+    -o -name "*.cpp" \
+    -o -name "*.hh" \
+    -o -name "*.cc" \
+    -o -name "*.hxx" \
+    -o -name "*.cxx" \
+    -o -name "*.cu"
 }
 
 ## Prevent multiple entries of my_bin_path in PATH
@@ -184,22 +184,22 @@ function run() {
 
 #commit_id=$(git log -1 --pretty=%H)
 function git_sha1() {
-  if [ -x "$(which git 2> /dev/null)" ] && \
-    [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+  if [ -x "$(which git 2> /dev/null)" ] \
+    && [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git rev-parse --short HEAD 2> /dev/null || true
   fi
 }
 
 function git_date() {
-  if [ -x "$(which git 2> /dev/null)" ] && \
-    [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+  if [ -x "$(which git 2> /dev/null)" ] \
+    && [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git log -1 --pretty=%ai | cut -d " " -f 1 || true
   fi
 }
 
 function git_branch() {
-  if [ -x "$(which git 2> /dev/null)" ] && \
-    [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+  if [ -x "$(which git 2> /dev/null)" ] \
+    && [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git rev-parse --abbrev-ref HEAD
   else
     echo "@non-git"

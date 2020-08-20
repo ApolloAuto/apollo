@@ -12,15 +12,15 @@ if [ "${ubuntu_release}" == "16.04" ] || [ "${ubuntu_release}" == "18.04" ]; the
   sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 fi
 
-sudo apt-get -y update && \
-  sudo apt-get -y install \
+sudo apt-get -y update \
+  && sudo apt-get -y install \
     gcc-7 \
     g++-7 \
     gcc-8 \
     g++-8 \
     gcc-9 \
-    g++-9 && \
-  sudo apt-get clean
+    g++-9 \
+  && sudo apt-get clean
 
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90

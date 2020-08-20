@@ -115,13 +115,13 @@ function print_usage() {
 function run_lint() {
   local cmd="$1"
   case "${cmd}" in
-    py|python)
+    py | python)
       run_py_lint
       ;;
     cpp)
       run_cpp_lint
       ;;
-    sh|shell)
+    sh | shell)
       run_sh_lint
       ;;
     all)

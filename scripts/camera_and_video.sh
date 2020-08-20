@@ -44,10 +44,18 @@ function run() {
     stop)
       stop
       ;;
-    *)
-      start
+    restart)
+      stop
+      start_driver
+      sleep 2
+      start_compensator
       ;;
-  esac
+    *)
+      start_driver
+      sleep 2
+      start_compensator
+      ;;
+    esac
 }
 
 run "$1"

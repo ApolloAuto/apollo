@@ -45,7 +45,7 @@ function check_autopep8() {
   if [ -z "${AUTOPEP8_CMD}" ]; then
     error "Oops, autopep8 missing..."
     error "Please make sure autopep8 is installed and check your PATH" \
-        "settings. For Debian/Ubuntu, you can run the following command:"
+      "settings. For Debian/Ubuntu, you can run the following command:"
     error "  sudo pip install --upgrade --no-cache-dir autopep8"
     exit 1
   fi

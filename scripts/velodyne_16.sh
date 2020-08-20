@@ -16,11 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${DIR}/scripts/apollo_base.sh"
 
 # TODO(all): This is just an initial commit. Velodyne 64 and 16 share lots of
 # things. We need to select their processes precisely in 'pgrep', 'pkill' and
@@ -46,6 +43,10 @@ function run() {
       ;;
     stop)
       stop
+      ;;
+    restart)
+      stop
+      start
       ;;
     *)
       start

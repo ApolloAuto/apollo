@@ -68,22 +68,22 @@ function main() {
   local option="$1"
   shift
   case "${option}" in
-    -p|--python)
+    -p | --python)
       run_autopep8 "$@"
       ;;
-    -c|--cpp)
+    -c | --cpp)
       run_clang_format "$@"
       ;;
-    -b|--bazel)
+    -b | --bazel)
       run_buildifier "$@"
       ;;
-    -s|--shell)
+    -s | --shell)
       run_shfmt "$@"
       ;;
-    -a|--all)
+    -a | --all)
       run_format_all "$@"
       ;;
-    -h|--help)
+    -h | --help)
       print_usage
       exit 1
       ;;

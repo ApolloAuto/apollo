@@ -16,11 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${DIR}/scripts/apollo_base.sh"
 
 function start() {
   LOG="${APOLLO_ROOT_DIR}/data/log/transform.out"
@@ -43,6 +40,10 @@ function run() {
       ;;
     stop)
       stop
+      ;;
+    restart)
+      stop
+      start
       ;;
     *)
       start

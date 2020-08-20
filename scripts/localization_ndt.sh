@@ -29,6 +29,10 @@ case $1 in
   stop)
     stop_customized_path localization ndt_localization "$@"
     ;;
+  restart)
+    stop_customized_path localization ndt_localization "$@"
+    start_customized_path localization ndt_localization "$@"
+    ;;
   *)
     start_customized_path localization ndt_localization "$@"
     ;;
