@@ -30,36 +30,34 @@ fi
 # Libtorch-gpu dependency
 pip3_install mkl
 
-# PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0.zip"
-# DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
-# CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
+TORCH_VERSION="1.6.0"
+PKG_NAME="libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}.zip"
+DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
+CHECKSUM="fded948bd2dbee625cee33ebbd4843a69496729389e0200a90fbb667cdaeeb69"
 
-PKG_NAME="libtorch-1.5.1-gpu-apollo.zip"
-DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-CHECKSUM="6e8aa94e2f7086d3ecc79484ade50cdcac69f1b51b1f04e4feda2f9384b4c380"
-
-#https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 unzip ${PKG_NAME}
 
-pushd libtorch_gpu
-    mkdir -p /usr/local/libtorch_gpu/
+mkdir -p /usr/local/libtorch_gpu/
+pushd libtorch
     mv include /usr/local/libtorch_gpu/include
     mv lib     /usr/local/libtorch_gpu/lib
     mv share   /usr/local/libtorch_gpu/share
 popd
 
 # Cleanup
-rm -rf libtorch_gpu ${PKG_NAME}
+rm -rf libtorch ${PKG_NAME}
 
-PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0+cpu.zip"
-DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip"
-CHECKSUM="3e438237a08099a4bf014335cd0da88708da3a1678aec12a46c67305792b5fa4"
+PKG_NAME="libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}+cpu.zip"
+DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-${TORCH_VERSION}%2Bcpu.zip"
+CHECKSUM="c6c0d3a87039338f7812a1ae343b9e48198536f20d1415b0e5a9a15ba7b90b3f"
+
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 unzip ${PKG_NAME}
+
+mkdir -p /usr/local/libtorch_cpu/
 pushd libtorch
-    mkdir -p /usr/local/libtorch_cpu/
     mv include /usr/local/libtorch_cpu/include
     mv lib     /usr/local/libtorch_cpu/lib
     mv share   /usr/local/libtorch_cpu/share
