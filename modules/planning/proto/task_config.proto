@@ -150,6 +150,7 @@ message PathBoundsDeciderConfig {
   optional double pull_over_road_edge_buffer = 5 [default = 0.15];
   optional double pull_over_approach_lon_distance_adjust_factor = 6
       [default = 1.5];
+  optional double adc_buffer_coeff = 7 [default = 1.0];
 }
 
 //////////////////////////////////
