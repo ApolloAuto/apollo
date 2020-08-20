@@ -42,6 +42,7 @@ USE_GPU_HOST=0
 USER_AGREED="no"
 
 VOLUME_VERSION="latest"
+SHM_SIZE="2G"
 USER_SPECIFIED_MAPS=
 MAP_VOLUMES_CONF=
 OTHER_VOLUMES_CONF=
@@ -113,6 +114,7 @@ OPTIONS:
     -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
     -l, --local            Use local docker image.
     -t, --tag <version>    Specify which version of a docker image to pull.
+    --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
     -y                     Agree to Apollo License Agreement non-interactively.
     stop                   Stop all running Apollo containers.
 EOF
@@ -182,6 +184,7 @@ function geo_specific_config() {
 
 function parse_arguments() {
     local custom_version=""
+    local shm_size=""
     local geo="none"
 
     while [ $# -gt 0 ] ; do
@@ -213,6 +216,11 @@ function parse_arguments() {
             USE_LOCAL_IMAGE="yes"
             ;;
 
+        --shm-size)
+            shm_size="$1"; shift
+            _optarg_check_for_opt "${opt}" "${shm_size}"
+            ;;
+
         --map)
             map_name="$1"; shift
             USER_SPECIFIED_MAPS="${USER_SPECIFIED_MAPS} ${map_name}"
@@ -233,6 +241,7 @@ function parse_arguments() {
 
     [ -n "${geo}" ] && GEOLOC="${geo}"
     [ -n "${custom_version}" ] && USER_VERSION_OPT="${custom_version}"
+    [ -n "${shm_size}" ] && SHM_SIZE="${shm_size}"
 }
 
 function determine_dev_image() {
@@ -511,7 +520,7 @@ function main() {
         --add-host "${DEV_INSIDE}:127.0.0.1" \
         --add-host "${local_host}:127.0.0.1" \
         --hostname "${DEV_INSIDE}" \
-        --shm-size 2G   \
+        --shm-size "${SHM_SIZE}"   \
         --pid=host      \
         -v /dev/null:/dev/raw1394 \
         "${APOLLO_DEV_IMAGE}" \
