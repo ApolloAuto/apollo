@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
 FROM ${BASE_IMAGE}
 
 ARG BUILD_STAGE
