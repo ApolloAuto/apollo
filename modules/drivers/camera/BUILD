@@ -12,7 +12,6 @@ cc_binary(
     linkstatic = False,
     deps = [
         ":camera_component_lib",
-        ":compress_component_lib",
         "@ffmpeg//:avcodec",
         "@ffmpeg//:avformat",
         "@ffmpeg//:swscale",
