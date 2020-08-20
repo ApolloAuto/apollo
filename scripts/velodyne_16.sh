@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "${DIR}/.."
 
@@ -27,31 +26,31 @@ source "${DIR}/apollo_base.sh"
 # things. We need to select their processes precisely in 'pgrep', 'pkill' and
 # the monitor module.
 function start() {
-    LOG="${APOLLO_ROOT_DIR}/data/log/velodyne16.out"
-    CMD="roslaunch velodyne start_velodyne_16.launch"
-    NUM_PROCESSES="$(pgrep -c -f "sensor_velodyne16")"
-    if [ "${NUM_PROCESSES}" -eq 0 ]; then
-        eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
-    fi
+  LOG="${APOLLO_ROOT_DIR}/data/log/velodyne16.out"
+  CMD="roslaunch velodyne start_velodyne_16.launch"
+  NUM_PROCESSES="$(pgrep -c -f "sensor_velodyne16")"
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
+  fi
 }
 
 function stop() {
-    pkill -SIGTERM -f start_velodyne_16.launch
+  pkill -SIGTERM -f start_velodyne_16.launch
 }
 
 # run command_name module_name
 function run() {
-    case $1 in
-        start)
-            start
-            ;;
-        stop)
-            stop
-            ;;
-        *)
-            start
-            ;;
-    esac
+  case $1 in
+    start)
+      start
+      ;;
+    stop)
+      stop
+      ;;
+    *)
+      start
+      ;;
+  esac
 }
 
 run "$1"

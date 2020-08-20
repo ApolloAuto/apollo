@@ -21,4 +21,3 @@ source "${TOP_DIR}/scripts/apollo_base.sh"
 
 # run_customized_path command_name module_name
 run_customized_path drivers/mobileye mobileye "$@"
-

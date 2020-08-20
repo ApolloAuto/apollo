@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DREAMVIEW_URL="http://localhost:8888"
 
 cd "${DIR}/.."
@@ -27,22 +27,22 @@ ulimit -c unlimited
 source "${DIR}/apollo_base.sh"
 
 function start() {
-    ./scripts/monitor.sh start
-    ./scripts/dreamview.sh start
-    if [ $? -eq 0 ]; then
-        sleep 2  # wait for some time before starting to check
-        http_status="$(curl -o /dev/null -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
-        if [ $http_status -eq 200 ]; then
-            echo "Dreamview is running at" $DREAMVIEW_URL
-        else
-            echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
-        fi
+  ./scripts/monitor.sh start
+  ./scripts/dreamview.sh start
+  if [ $? -eq 0 ]; then
+    sleep 2 # wait for some time before starting to check
+    http_status="$(curl -o /dev/null -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
+    if [ $http_status -eq 200 ]; then
+      echo "Dreamview is running at" $DREAMVIEW_URL
+    else
+      echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
     fi
+  fi
 }
 
 function stop() {
-    ./scripts/dreamview.sh stop
-    ./scripts/monitor.sh stop
+  ./scripts/dreamview.sh stop
+  ./scripts/monitor.sh stop
 }
 
 case $1 in

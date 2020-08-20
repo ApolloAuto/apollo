@@ -65,7 +65,7 @@ function _clean_docs() {
 }
 
 function clean() {
-  if ! "${APOLLO_IN_DOCKER}" ; then
+  if ! "${APOLLO_IN_DOCKER}"; then
     error "The clean operation must be run from within docker container"
     exit 1
   fi

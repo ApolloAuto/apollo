@@ -13,14 +13,14 @@ function GenerateCAKeys() {
   echo "Generate CA keys..."
   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out ca.key
   openssl req -new -x509 -sha256 -days 3650 -key ca.key \
-      -subj "/O=Apollo/CN=apollo.ca" -out ca.crt
+    -subj "/O=Apollo/CN=apollo.ca" -out ca.crt
 }
 
 function GenerateServerKeys() {
   echo "Generate server keys..."
   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out server.key
   openssl req -new -sha256 -key server.key \
-      -subj "/O=Apollo/OU=HMI/CN=${Domain}" -out server.csr
+    -subj "/O=Apollo/OU=HMI/CN=${Domain}" -out server.csr
 
   OPENSSL_CONF_FILE="./openssl.conf"
   echo "[req]req_extensions = v3_req
@@ -30,8 +30,8 @@ function GenerateServerKeys() {
         IP.1 = ${IP}
         DNS.1 = ${Domain}" > ${OPENSSL_CONF_FILE}
   openssl x509 -sha256 -days 3650 -req \
-      -extfile ${OPENSSL_CONF_FILE} -extensions v3_req \
-      -in server.csr -CAcreateserial -CA ca.crt -CAkey ca.key -out server.crt
+    -extfile ${OPENSSL_CONF_FILE} -extensions v3_req \
+    -in server.csr -CAcreateserial -CA ca.crt -CAkey ca.key -out server.crt
 
   openssl verify -verbose -CAfile ca.crt server.crt
 

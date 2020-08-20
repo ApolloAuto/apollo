@@ -16,40 +16,39 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
 function start() {
-    LOG="${APOLLO_ROOT_DIR}/data/log/usb_cam.out"
-    CMD="roslaunch usb_cam start_obstacle_camera.launch"
-    NUM_PROCESSES="$(pgrep -c -f "camera_nodelet_manager")"
-    if [ "${NUM_PROCESSES}" -eq 0 ]; then
-       eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
-    fi
+  LOG="${APOLLO_ROOT_DIR}/data/log/usb_cam.out"
+  CMD="roslaunch usb_cam start_obstacle_camera.launch"
+  NUM_PROCESSES="$(pgrep -c -f "camera_nodelet_manager")"
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
+  fi
 }
 
 function stop() {
-    pkill -9 -f start_obstacle_camera
-    pkill -9 -f camera_nodelet_manager
+  pkill -9 -f start_obstacle_camera
+  pkill -9 -f camera_nodelet_manager
 }
 
 # run command_name module_name
 function run() {
-    case $1 in
-        start)
-            start
-            ;;
-        stop)
-            stop
-            ;;
-        *)
-            start
-            ;;
-    esac
+  case $1 in
+    start)
+      start
+      ;;
+    stop)
+      stop
+      ;;
+    *)
+      start
+      ;;
+  esac
 }
 
 run "$1"

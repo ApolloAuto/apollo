@@ -16,30 +16,30 @@
 # limitations under the License.
 ###############################################################################
 
-source "$( dirname "${BASH_SOURCE[0]}" )/apollo_base.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/apollo_base.sh"
 
 if [ $# -lt 1 ]; then
-    echo "$0 record_file"
-    exit
+  echo "$0 record_file"
+  exit
 fi
 
 cyber_recorder play \
-    -c /apollo/perception/obstacles \
-    -c /apollo/control \
-    -c /apollo/canbus/chassis \
-    -c /apollo/localization/pose \
-    -c /apollo/routing_request \
-    -c /apollo/routing_response \
-    -c /apollo/prediction \
-    -c /apollo/planning \
-    -c /apollo/canbus/chassis \
-    -c /apollo/guardian \
-    -c /apollo/perception/traffic_light \
-    -c /apollo/monitor/system_status \
-    -c /tf_static \
-    -c /apollo/control/pad \
-    -c /apollo/drive_event \
-    -c /apollo/monitor \
-    -c /tf \
-    -c /apollo/sensor/gnss/best_pose \
-    -f $*
+  -c /apollo/perception/obstacles \
+  -c /apollo/control \
+  -c /apollo/canbus/chassis \
+  -c /apollo/localization/pose \
+  -c /apollo/routing_request \
+  -c /apollo/routing_response \
+  -c /apollo/prediction \
+  -c /apollo/planning \
+  -c /apollo/canbus/chassis \
+  -c /apollo/guardian \
+  -c /apollo/perception/traffic_light \
+  -c /apollo/monitor/system_status \
+  -c /tf_static \
+  -c /apollo/control/pad \
+  -c /apollo/drive_event \
+  -c /apollo/monitor \
+  -c /tf \
+  -c /apollo/sensor/gnss/best_pose \
+  -f $*

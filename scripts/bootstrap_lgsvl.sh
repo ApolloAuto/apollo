@@ -38,7 +38,7 @@ function start() {
       echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
     fi
   fi
-  popd >/dev/null
+  popd > /dev/null
 }
 
 function stop() {
@@ -46,7 +46,7 @@ function stop() {
   scripts/dreamview.sh stop
   scripts/monitor.sh stop
   cyber_launch stop modules/drivers/tools/image_decompress/launch/image_decompress.launch
-  popd >/dev/null
+  popd > /dev/null
 }
 
 function main() {

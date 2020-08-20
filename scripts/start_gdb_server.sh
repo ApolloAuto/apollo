@@ -35,12 +35,12 @@ function print_usage() {
   ${NONE}a port number, such as '1111'."
 }
 
-if [ $# -lt 2 ];then
-    print_usage
-    exit 1
+if [ $# -lt 2 ]; then
+  print_usage
+  exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${DIR}/apollo_base.sh"
 
 MODULE_NAME=$1

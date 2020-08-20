@@ -16,39 +16,38 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
 function start() {
-    LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
-    CMD="roslaunch velodyne start_velodyne_for_map_data_collector.launch"
-    NUM_PROCESSES="$(pgrep -c -f "velodyne_nodelet_manager")"
-    if [ "${NUM_PROCESSES}" -eq 0 ]; then
-       eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
-    fi
+  LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
+  CMD="roslaunch velodyne start_velodyne_for_map_data_collector.launch"
+  NUM_PROCESSES="$(pgrep -c -f "velodyne_nodelet_manager")"
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
+  fi
 }
 
 function stop() {
-    pkill -SIGTERM -f start_velodyne_for_map_data_collector.launch
+  pkill -SIGTERM -f start_velodyne_for_map_data_collector.launch
 }
 
 # run command_name module_name
 function run() {
-    case $1 in
-        start)
-            start
-            ;;
-        stop)
-            stop
-            ;;
-        *)
-            start
-            ;;
-    esac
+  case $1 in
+    start)
+      start
+      ;;
+    stop)
+      stop
+      ;;
+    *)
+      start
+      ;;
+  esac
 }
 
 run "$1"

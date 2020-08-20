@@ -150,24 +150,24 @@ function main() {
   local opt="$1"
   shift
   case "${opt}" in
-  help)
-    print_usage
-    exit 1
-    ;;
-  gen_data)
-    gen_perf_data "$@"
-    ;;
-  gen_svg)
-    gen_perf_svg
-    ;;
-  clean)
-    clean_all
-    ;;
-  *)
-    echo "Unknown command: ${opt}"
-    print_usage
-    exit 1
-    ;;
+    help)
+      print_usage
+      exit 1
+      ;;
+    gen_data)
+      gen_perf_data "$@"
+      ;;
+    gen_svg)
+      gen_perf_svg
+      ;;
+    clean)
+      clean_all
+      ;;
+    *)
+      echo "Unknown command: ${opt}"
+      print_usage
+      exit 1
+      ;;
   esac
 }
 

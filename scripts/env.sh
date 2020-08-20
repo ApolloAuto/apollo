@@ -17,9 +17,9 @@
 ###############################################################################
 
 if [ -f /.dockerenv ]; then
-    APOLLO_IN_DOCKER=true
+  APOLLO_IN_DOCKER=true
 else
-    APOLLO_IN_DOCKER=false
+  APOLLO_IN_DOCKER=false
 fi
 
 hostname
