@@ -2,6 +2,7 @@
 TOP_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
 source ${TOP_DIR}/scripts/apollo.bashrc
 
+export APOLLO_BAZEL_DISTDIR="${APOLLO_CACHE_DIR}/distdir"
 export CYBER_PATH="${APOLLO_ROOT_DIR}/cyber"
 
 bazel_bin_path="${APOLLO_ROOT_DIR}/bazel-bin"
