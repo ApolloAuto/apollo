@@ -46,7 +46,7 @@ cc_library(
         "//cyber",
         "@com_google_absl//absl/strings",
         "@eigen",
-        "@proj4",
+        "@proj",
     ],
 )
 

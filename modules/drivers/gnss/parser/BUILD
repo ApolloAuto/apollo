@@ -35,7 +35,7 @@ cc_library(
         "//modules/localization/proto:imu_cc_proto",
         "//modules/transform:transform_broadcaster",
         "@eigen",
-        "@proj4",
+        "@proj",
     ],
 )
 

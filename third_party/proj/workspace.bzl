@@ -1,4 +1,4 @@
-"""Loads the proj4 library"""
+"""Loads the proj library"""
 
 # Sanitize a dependency so that it works correctly from code that includes
 # Apollo as a submodule.
@@ -6,9 +6,9 @@ def clean_dep(dep):
     return str(Label(dep))
 
 def repo():
-    # proj4
+    # proj
     native.new_local_repository(
-        name = "proj4",
-        build_file = clean_dep("//third_party/proj4:proj4.BUILD"),
+        name = "proj",
+        build_file = clean_dep("//third_party/proj:proj.BUILD"),
         path = "/usr/include",
     )
