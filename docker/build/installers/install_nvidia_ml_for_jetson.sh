@@ -18,9 +18,7 @@
 
 # Note(storypku):
 # nvidia-ml-for-jetson installer is expected to run without installer_base.sh
-# . /tmp/installers/installer_base.sh
-# Fail on first error.
-# When run, please start Local http server on host at port 8388.
+# Please start local http cache server at port 8388 before run.
 ## Package Listing:
 # cuda-repo-l4t-10-2-local-10.2.89_1.0-1_arm64.deb
 # libcudnn8_8.0.0.145-1+cuda10.2_arm64.deb
@@ -39,6 +37,7 @@
 # libnvparsers-dev_7.1.0-1+cuda10.2_arm64.deb
 # tensorrt_7.1.0.16-1+cuda10.2_arm64.deb
 
+# Fail on first error.
 set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 

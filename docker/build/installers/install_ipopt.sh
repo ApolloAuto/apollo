@@ -20,9 +20,9 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
-apt-get -y update && \
-    apt-get -y install \
+apt_get_update_and_install \
     coinor-libipopt-dev
 
 #FIXME(all): dirty hack here.

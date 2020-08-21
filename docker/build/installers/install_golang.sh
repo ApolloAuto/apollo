@@ -20,7 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 VERSION="1.14.4"
 ARCH="$(uname -m)"

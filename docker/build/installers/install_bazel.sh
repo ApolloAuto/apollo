@@ -20,8 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-. installer_base.sh
+. ./installer_base.sh
 
 TARGET_ARCH=$(uname -m)
 

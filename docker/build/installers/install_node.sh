@@ -22,7 +22,7 @@ set -e
 geo="$1"; shift
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 VERSION="6.5.1"
 NODE_VERSION="12.18.1"

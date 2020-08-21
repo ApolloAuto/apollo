@@ -20,7 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 apt_get_update_and_install mpi-default-dev mpi-default-bin libopenmpi-dev
 

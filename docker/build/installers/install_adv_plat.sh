@@ -19,8 +19,10 @@
 # Fail on first error.
 set -e
 
+cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
+
 MY_MODE="$1" ; shift
-. /tmp/installers/installer_base.sh
 
 DEST_DIR="${PKGS_DIR}/adv_plat"
 [[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}

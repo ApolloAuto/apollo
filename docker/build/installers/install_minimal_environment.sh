@@ -20,6 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
 MY_GEO=$1; shift
 ARCH="$(uname -m)"
@@ -27,7 +28,6 @@ ARCH="$(uname -m)"
 ##----------------------------##
 ##  APT sources.list settings |
 ##----------------------------##
-. /tmp/installers/installer_base.sh
 
 if [[ "${ARCH}" == "x86_64" ]]; then
     if [[ "${MY_GEO}" == "cn" ]]; then

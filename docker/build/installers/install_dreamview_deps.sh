@@ -20,15 +20,15 @@ set -e
 
 GEOLOC="$1"; shift
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 # NodeJS
 info "Installing nodejs ..."
-bash /tmp/installers/install_node.sh "${GEOLOC}"
+bash ${CURR_DIR}/install_node.sh "${GEOLOC}"
 
 info "Installing yarn ..."
-bash /tmp/installers/install_yarn.sh
+bash ${CURR_DIR}/install_yarn.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

@@ -20,8 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-source /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 apt_get_update_and_install libfftw3-dev
 

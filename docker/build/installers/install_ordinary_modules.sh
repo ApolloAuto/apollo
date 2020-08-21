@@ -19,8 +19,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 #######################################################
 
@@ -28,10 +28,10 @@ COMPONENT="modules/common"
 info "Install support for [${COMPONENT}] ..."
 
 info "Install osqp ..."
-bash /tmp/installers/install_osqp.sh
+bash ${CURR_DIR}/install_osqp.sh
 
 info "Install qpOASES ..."
-bash /tmp/installers/install_qp_oases.sh
+bash ${CURR_DIR}/install_qp_oases.sh
 
 apt_get_update_and_install libsqlite3-dev
 
@@ -39,17 +39,17 @@ apt_get_update_and_install libsqlite3-dev
 
 COMPONENT="modules/prediction"
 info "Install support for [${COMPONENT}] ..."
-# bash /tmp/installers/install_libtorch.sh
-bash /tmp/installers/install_opencv.sh
+# bash ${CURR_DIR}/install_libtorch.sh
+bash ${CURR_DIR}/install_opencv.sh
 
 #######################################################
 
 COMPONENT="modules/planning"
 info "Install support for [${COMPONENT}] ..."
 
-# bash /tmp/installers/install_libtorch.sh
-bash /tmp/installers/install_adolc.sh
-bash /tmp/installers/install_ipopt.sh
+# bash ${CURR_DIR}/install_libtorch.sh
+bash ${CURR_DIR}/install_adolc.sh
+bash ${CURR_DIR}/install_ipopt.sh
 # [TO-BE-CONTINUED]
 
 #######################################################
@@ -77,7 +77,7 @@ apt_get_update_and_install liblz4-dev
 #######################################################
 COMPONENT="modules/tools"
 info "Install support for [${COMPONENT}] ..."
-bash /tmp/installers/install_python_modules.sh
+bash ${CURR_DIR}/install_python_modules.sh
 
 # Modules that DON'T need pre-installed dependencies
 # modules/v2x
@@ -87,13 +87,13 @@ bash /tmp/installers/install_python_modules.sh
 ######################################################
 COMPONENT="modules/teleop"
 info "Install support for [${COMPONENT}] ..."
-bash /tmp/installers/install_openh264.sh
+bash ${CURR_DIR}/install_openh264.sh
 
 
 ######################################################
 COMPONENT="modules/audio"
 info "Install support for [${COMPONENT}] ..."
-bash /tmp/installers/install_fftw3.sh
+bash ${CURR_DIR}/install_fftw3.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

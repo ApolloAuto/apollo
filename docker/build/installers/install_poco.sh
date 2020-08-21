@@ -20,14 +20,13 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
 # To reduce image size
 # apt-get -y update && \
 #    apt-get -y install \
 #    libssl-dev
 #    libpoco-dev
-
-. /tmp/installers/installer_base.sh
 
 THREAD_NUM=$(nproc)
 

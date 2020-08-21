@@ -21,7 +21,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 # Reference: https://github.com/coin-or/qpOASES
 warning "Currently libqpOASES.so built from source can't work properly, so we" \

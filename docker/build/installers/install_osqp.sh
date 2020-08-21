@@ -20,7 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 OSQP_VER="0.5.0"
 # OSQP_VER="0.6.0"
