@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <string>
 
+#define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
 #include <proj_api.h>
 
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
