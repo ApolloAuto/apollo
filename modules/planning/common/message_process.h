@@ -101,7 +101,10 @@ class MessageProcess {
       RoutingResponseFeature* local_routing,
       std::vector<std::string>* local_routing_lane_ids);
 
-  void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
+  void GenerateRoutingFeature(
+    const RoutingResponseFeature& local_routing,
+    const std::vector<std::string>& local_routing_lane_ids,
+    LearningDataFrame* learning_data_frame);
 
   void GenerateTrafficLightDetectionFeature(
       LearningDataFrame* learning_data_frame);
@@ -112,7 +115,7 @@ class MessageProcess {
 
   void GeneratePlanningTag(LearningDataFrame* learning_data_frame);
 
-  void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
+  bool GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
   std::shared_ptr<DependencyInjector> injector_;
