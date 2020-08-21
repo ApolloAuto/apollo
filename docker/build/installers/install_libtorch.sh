@@ -27,6 +27,9 @@ if [ "${TARGET_ARCH}" = "aarch64" ]; then
     exit 0
 fi
 
+# Libtorch-gpu dependency
+pip3_install mkl
+
 # PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0.zip"
 # DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
 # CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
