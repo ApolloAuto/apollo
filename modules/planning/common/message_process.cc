@@ -243,7 +243,7 @@ void MessageProcess::OnPrediction(
           obstacle_trajectory_point.timestamp_sec() -
           obstacle_history_map_[m.first].back().timestamp_sec();
       std::ostringstream msg;
-      msg << "SKIP: obstacle_id[" << m.first << "] last_timestamp_sec["
+      msg << "DISCARD: obstacle_id[" << m.first << "] last_timestamp_sec["
           << obstacle_history_map_[m.first].back().timestamp_sec()
           << "] timestamp_sec[" << obstacle_trajectory_point.timestamp_sec()
           << "] time_diff[" << time_diff << "]";
@@ -535,6 +535,7 @@ void MessageProcess::GenerateObstacleTrajectory(
 void MessageProcess::GenerateObstaclePrediction(
     const PredictionObstacle& prediction_obstacle,
     const ADCCurrentInfo& adc_curr_info, ObstacleFeature* obstacle_feature) {
+  const auto obstacle_id = obstacle_feature->id();
   auto obstacle_prediction = obstacle_feature->mutable_obstacle_prediction();
   obstacle_prediction->set_timestamp_sec(prediction_obstacle.timestamp());
   obstacle_prediction->set_predicted_period(
@@ -553,6 +554,25 @@ void MessageProcess::GenerateObstaclePrediction(
     for (int j = 0; j < obstacle_trajectory.trajectory_point_size(); ++j) {
       const auto& obstacle_trajectory_point =
           obstacle_trajectory.trajectory_point(j);
+
+      if (trajectory->trajectory_point_size() >0) {
+        const auto last_relative_time =
+            trajectory->trajectory_point(trajectory->trajectory_point_size()-1)
+                .trajectory_point().relative_time();
+        if (obstacle_trajectory_point.relative_time() < last_relative_time) {
+          std::ostringstream msg;
+          msg << "DISCARD prediction trajectory point: obstacle_id["
+              << obstacle_id << "] last_relative_time["
+              << last_relative_time << "] relative_time["
+              << obstacle_trajectory_point.relative_time() << "]";
+          AERROR << msg.str();
+          if (FLAGS_planning_offline_learning) {
+            log_file_ << msg.str() << std::endl;
+          }
+          continue;
+        }
+      }
+
       auto trajectory_point = trajectory->add_trajectory_point();
 
       auto path_point =

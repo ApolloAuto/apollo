@@ -66,15 +66,15 @@ void TrajectoryEvaluator::EvaluateTrajectoryByTime(
     // filter out abnormal perception data
     if (tp.relative_time() > last_relative_time) {
       discretized_trajectory.AppendTrajectoryPoint(tp);
+      last_relative_time = tp.relative_time();
     } else {
       const std::string msg = absl::StrCat(
-          "SKIP trajectory point: frame_num[", frame_num, "] obstacle_id[",
+          "DISCARD trajectory point: frame_num[", frame_num, "] obstacle_id[",
           obstacle_id, "] last_relative_time[", last_relative_time,
           "] relatice_time[", tp.relative_time(), "] relative_time_diff[",
           tp.relative_time() - last_relative_time, "]");
       WriteLog(msg);
     }
-    last_relative_time = tp.relative_time();
   }
 
   const int low_bound =
