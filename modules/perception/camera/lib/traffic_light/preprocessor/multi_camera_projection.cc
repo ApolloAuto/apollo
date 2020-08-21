@@ -17,6 +17,8 @@
 
 #include <algorithm>
 #include <limits>
+// for error: 'accumulate' is not a member of 'std'
+#include <numeric>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
