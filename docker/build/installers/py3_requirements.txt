@@ -32,5 +32,3 @@ utm
 numpy
 scipy
 
-# Libtorch-gpu dependency
-mkl
