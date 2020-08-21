@@ -30,9 +30,6 @@ info "Install support for [${COMPONENT}] ..."
 info "Install osqp ..."
 bash ${CURR_DIR}/install_osqp.sh
 
-info "Install qpOASES ..."
-bash ${CURR_DIR}/install_qp_oases.sh
-
 apt_get_update_and_install libsqlite3-dev
 
 ######################################################

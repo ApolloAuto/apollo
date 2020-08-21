@@ -29,7 +29,7 @@ namespace apollo {
 namespace common {
 namespace math {
 
-TEST(MPCOSQPSolverTest, OSQPvsQPOASES) {
+TEST(MPCOSQPSolverTest, ComputationTimeTest) {
   const int states = 4;
   const int controls = 2;
   const int horizon = 3;

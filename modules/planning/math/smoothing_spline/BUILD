@@ -82,31 +82,9 @@ cc_library(
         ":spline_1d_constraint",
         ":spline_1d_kernel",
         "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto/math:qp_problem_cc_proto",
         "@eigen",
-    ],
-)
-
-cc_library(
-    name = "active_set_spline_1d_solver",
-    srcs = ["active_set_spline_1d_solver.cc"],
-    hdrs = ["active_set_spline_1d_solver.h"],
-    deps = [
-        ":spline_1d_solver",
-        "@eigen",
-        "@qpOASES",
-    ],
-)
-
-cc_test(
-    name = "active_set_spline_1d_solver_test",
-    size = "small",
-    srcs = ["active_set_spline_1d_solver_test.cc"],
-    deps = [
-        ":active_set_spline_1d_solver",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -181,7 +159,6 @@ cc_library(
 cc_library(
     name = "spline_2d_solver",
     hdrs = [
-        "active_set_spline_2d_solver.h",
         "osqp_spline_2d_solver.h",
         "spline_2d_solver.h",
     ],
@@ -192,30 +169,9 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/math:matrix_operations",
         "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
         "//modules/planning/common:planning_gflags",
         "@eigen",
         "@osqp",
-    ],
-)
-
-cc_library(
-    name = "active_set_spline_2d_solver",
-    srcs = ["active_set_spline_2d_solver.cc"],
-    hdrs = ["active_set_spline_2d_solver.h"],
-    deps = [
-        ":spline_2d_solver",
-    ],
-)
-
-cc_test(
-    name = "active_set_spline_2d_solver_test",
-    size = "small",
-    srcs = ["spline_2d_solver_test.cc"],
-    deps = [
-        ":active_set_spline_2d_solver",
-        "//modules/planning/math:curve_math",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -242,45 +198,6 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "piecewise_linear_constraint",
-    srcs = ["piecewise_linear_constraint.cc"],
-    hdrs = ["piecewise_linear_constraint.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "@eigen",
-    ],
-)
-
-cc_library(
-    name = "piecewise_linear_kernel",
-    srcs = ["piecewise_linear_kernel.cc"],
-    hdrs = ["piecewise_linear_kernel.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "@eigen",
-    ],
-)
-
-cc_library(
-    name = "piecewise_linear_generator",
-    srcs = ["piecewise_linear_generator.cc"],
-    hdrs = ["piecewise_linear_generator.h"],
-    deps = [
-        ":piecewise_linear_constraint",
-        ":piecewise_linear_kernel",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@eigen",
-    ],
-)
-
 cc_test(
     name = "spline_1d_kernel_test",
     size = "small",
@@ -298,28 +215,6 @@ cc_test(
     srcs = ["spline_1d_constraint_test.cc"],
     deps = [
         ":spline_1d_constraint",
-        "//cyber/common",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "piecewise_linear_kernel_test",
-    size = "small",
-    srcs = ["piecewise_linear_kernel_test.cc"],
-    deps = [
-        ":piecewise_linear_kernel",
-        "//cyber/common",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "piecewise_linear_constraint_test",
-    size = "small",
-    srcs = ["piecewise_linear_constraint_test.cc"],
-    deps = [
-        ":piecewise_linear_constraint",
         "//cyber/common",
         "@com_google_googletest//:gtest_main",
     ],

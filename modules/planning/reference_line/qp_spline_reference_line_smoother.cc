@@ -28,7 +28,6 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve_math.h"
-#include "modules/planning/math/smoothing_spline/active_set_spline_2d_solver.h"
 #include "modules/planning/math/smoothing_spline/osqp_spline_2d_solver.h"
 
 namespace apollo {
@@ -37,13 +36,8 @@ namespace planning {
 QpSplineReferenceLineSmoother::QpSplineReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  if (FLAGS_use_osqp_optimizer_for_reference_line) {
-    spline_solver_.reset(
-        new OsqpSpline2dSolver(t_knots_, config.qp_spline().spline_order()));
-  } else {
-    spline_solver_.reset(new ActiveSetSpline2dSolver(
-        t_knots_, config.qp_spline().spline_order()));
-  }
+  spline_solver_.reset(
+      new OsqpSpline2dSolver(t_knots_, config.qp_spline().spline_order()));
 }
 
 void QpSplineReferenceLineSmoother::Clear() { t_knots_.clear(); }
