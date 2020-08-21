@@ -19,13 +19,13 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 TARGET_ARCH="$(uname -m)"
 
 info "Install poco ..."
-bash /tmp/installers/install_poco.sh
+bash ${CURR_DIR}/install_poco.sh
 
 apt-get -y update && \
     apt-get -y install \
@@ -34,13 +34,13 @@ apt-get -y update && \
     uuid-dev
 
 info "Install gflags & glog..."
-bash /tmp/installers/install_gflags_glog.sh
+bash ${CURR_DIR}/install_gflags_glog.sh
 
 info "Install protobuf ..."
-bash /tmp/installers/install_protobuf.sh
+bash ${CURR_DIR}/install_protobuf.sh
 
 info "Install fast-rtps ..."
-bash /tmp/installers/install_fast-rtps.sh
+bash ${CURR_DIR}/install_fast-rtps.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

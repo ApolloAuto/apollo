@@ -20,7 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 if ldconfig -p | grep -q "libboost_mpi.so" ; then
     info "Found existing Boost installation. Reinstallation skipped."

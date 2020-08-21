@@ -21,7 +21,7 @@ set -e
 
 TARGET_ARCH="$(uname -m)"
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 MY_GEO=$1; shift
 

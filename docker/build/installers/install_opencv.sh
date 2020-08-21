@@ -19,7 +19,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 if ldconfig -p | grep -q libopencv_core ; then
     info "OpenCV was already installed"

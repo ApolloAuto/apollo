@@ -20,12 +20,12 @@
 set -e
 MY_MODE="$1"
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base
 
-bash /tmp/installers/install_opencv.sh
-bash /tmp/installers/install_adv_plat.sh "${MY_MODE}"
-bash /tmp/installers/install_proj4.sh
+bash ${CURR_DIR}/install_opencv.sh
+bash ${CURR_DIR}/install_adv_plat.sh "${MY_MODE}"
+bash ${CURR_DIR}/install_proj4.sh
 
 # Required by python audio driver
 apt_get_update_and_install \

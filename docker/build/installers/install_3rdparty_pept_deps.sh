@@ -18,9 +18,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
-ok "Great! modules/third_party_perception has no extra dependencies that" \
-   "should be pre-installed."
+ok "Great! modules/third_party_perception has no extra dependencies."
 

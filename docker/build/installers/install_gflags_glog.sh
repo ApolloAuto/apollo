@@ -20,8 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 ARCH=$(uname -m)
 THREAD_NUM=$(nproc)

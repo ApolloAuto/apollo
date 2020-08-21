@@ -19,9 +19,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 apt_get_update_and_install \
     libopenblas-dev \
@@ -34,10 +33,10 @@ apt_get_update_and_install \
     libcublas-dev
 
 info "Install TensorRT 7 ..."
-bash /tmp/installers/install_tensorrt.sh
+bash ${CURR_DIR}/install_tensorrt.sh
 
 info "Install libtorch ..."
-bash /tmp/installers/install_libtorch.sh
+bash ${CURR_DIR}/install_libtorch.sh
 
 # openmpi @cuda
 # pcl @cuda

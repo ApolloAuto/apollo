@@ -20,6 +20,7 @@
 set -e
 
 cd $( dirname "${BASH_SOURCE[0]}")
+. ./installer_base.sh
 
 # References
 # 1) http://www.linuxfromscratch.org/blfs/view/svn/multimedia/ffmpeg.html
@@ -46,8 +47,6 @@ apt-get -y update && \
     libvpx-dev \
     libx264-dev \
     libnuma-dev
-
-. /tmp/installers/installer_base.sh
 
 VERSION="4.3.1"
 PKG_NAME="ffmpeg-${VERSION}.tar.xz"

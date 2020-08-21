@@ -20,13 +20,13 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
 apt-get -y update && \
     apt-get -y install \
     libproj-dev
 
 # https://github.com/OSGeo/proj.4/archive/4.9.3.zip
-#. /tmp/installers/installer_base.sh
 #
 #VERSION="4.9.3"
 #PKG_NAME="proj.4-${VERSION}.zip"

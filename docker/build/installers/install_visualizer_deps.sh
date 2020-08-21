@@ -19,10 +19,10 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
-apt-get -y update && \
-    apt-get -y install \
+apt_get_update_and_install \
     freeglut3-dev \
     mesa-common-dev \
     libglvnd-dev \
@@ -41,7 +41,7 @@ apt-get -y update && \
 # For test run
 # /usr/local/cuda/samples/5_Simulations/nbody
 
-bash /tmp/installers/install_qt.sh
+bash ${CURR_DIR}/install_qt.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

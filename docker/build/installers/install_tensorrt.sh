@@ -20,8 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 ARCH="$(uname -m)"
 
@@ -43,7 +42,7 @@ libnvparsers${MAJOR}_${TRT_VERSION}_arm64.deb \
 libnvparsers-dev_${TRT_VERSION}_arm64.deb \
 "
 
-    # tensorrt_7.1.0.16-1+cuda10.2_arm64.deb 
+    # tensorrt_7.1.0.16-1+cuda10.2_arm64.deb
     # libnvinfer-doc_${TRT_VERSION}_all.deb
     # libnvinfer-samples_${TRT_VERSION}_all.deb
 

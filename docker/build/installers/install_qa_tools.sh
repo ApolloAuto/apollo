@@ -19,9 +19,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-
-. /tmp/installers/installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 TARGET_ARCH="$(uname -m)"
 
@@ -42,12 +41,12 @@ apt-get -y update && \
 #    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
 # fi
 
-bash /tmp/installers/install_gperftools.sh
+bash ${CURR_DIR}/install_gperftools.sh
 
-bash /tmp/installers/install_benchmark.sh
+bash ${CURR_DIR}/install_benchmark.sh
 
 # TechDoc generation
-bash /tmp/installers/install_doxygen.sh
+bash ${CURR_DIR}/install_doxygen.sh
 
 # sphinx ?
 
@@ -59,7 +58,7 @@ pip3_install pycodestyle \
 # pylint
 
 # shfmt
-bash /tmp/installers/install_shfmt.sh
+bash ${CURR_DIR}/install_shfmt.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
