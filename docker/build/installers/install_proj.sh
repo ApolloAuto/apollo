@@ -33,6 +33,11 @@ apt_get_update_and_install \
 # proj installed via apt was 4.9.3, incompatible with pyproj which
 # requres proj >= 6.2.0
 
+if ldconfig -p |grep -q "libproj.so"; then
+    warning "Proj was already installed. Reinstallation skipped"
+    exit 0
+fi
+
 VERSION="7.1.0"
 PKG_NAME="proj-${VERSION}.tar.gz"
 CHECKSUM="876151e2279346f6bdbc63bd59790b48733496a957bccd5e51b640fdd26eaa8d"
@@ -54,7 +59,10 @@ pushd proj-${VERSION} >/dev/null
 popd >/dev/null
 
 ldconfig
-ok "Successfully built proj. version=$VERSION"
 
-# clean up.
+ok "Successfully built proj = ${VERSION}"
+
 rm -fr "${PKG_NAME}" "proj-${VERSION}"
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
