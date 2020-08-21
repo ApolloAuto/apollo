@@ -91,7 +91,7 @@ cc_library(
     hdrs = ["pj_transformer.h"],
     deps = [
         "//cyber",
-        "@proj4",
+        "@proj",
     ],
 )
 
