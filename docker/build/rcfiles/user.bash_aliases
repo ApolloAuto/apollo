@@ -24,8 +24,8 @@ fi
 export EDITOR="vim"
 alias v="vim"
 
-alias bb="bazel build --distdir=/apollo/.cache/distdir"
-alias bt="bazel test  --distdir=/apollo/.cache/distdir"
+alias bb="bazel build"
+alias bt="bazel test"
 
 function inc() {
     local _path="$1"
