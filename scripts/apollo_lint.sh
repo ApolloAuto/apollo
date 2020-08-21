@@ -25,7 +25,7 @@ source "${TOP_DIR}/scripts/apollo.bashrc"
 : ${STAGE:=dev}
 
 function _cpp_lint_impl() {
-  bazel test --distdir="${APOLLO_CACHE_DIR}" --config=cpplint "$@"
+  bazel test --config=cpplint "$@"
 }
 
 function run_cpp_lint() {
