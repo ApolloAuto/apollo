@@ -17,7 +17,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-//#include "modules/perception/camera/common/util.h"
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -133,15 +133,10 @@ bool TLPreprocessor::UpdateLightsProjection(
     return lights_on_image_.size() > 0;
   }
   for (const base::TrafficLightPtr &light : lights_on_image_) {
-    // if (OutOfValidRegion(light->region.projection_roi,
-    //                      projection_.getImageWidth(camera_name),
-    //                      projection_.getImageHeight(camera_name),
-    //                      option.image_borders_size->at(camera_name))) {
-    base::BBox2D<int> box(light->region.projection_roi);
-    if (box.xmin < option.image_borders_size->at(camera_name) ||
-        box.ymin < option.image_borders_size->at(camera_name) ||
-        box.xmax + option.image_borders_size->at(camera_name) > projection_.getImageWidth(camera_name)||
-        box.ymax + option.image_borders_size->at(camera_name) > projection_.getImageHeight(camera_name)){
+    if (OutOfValidRegion(light->region.projection_roi,
+                         projection_.getImageWidth(camera_name),
+                         projection_.getImageHeight(camera_name),
+                         option.image_borders_size->at(camera_name))) {
       AINFO << "update_lights_projection light project out of image region. "
             << "camera_name: " << camera_name;
       return false;
@@ -215,15 +210,10 @@ void TLPreprocessor::SelectCamera(
       auto lights = lights_on_image_array->at(cam_id);
       for (const auto light : lights) {
         // check boundary
-        // if (OutOfValidRegion(light->region.projection_roi,
-        //                      projection_.getImageWidth(camera_name),
-        //                      projection_.getImageHeight(camera_name),
-        //                      option.image_borders_size->at(camera_name))) {
-        base::BBox2D<int> box(light->region.projection_roi);
-        if (box.xmin < option.image_borders_size->at(camera_name) ||
-            box.ymin < option.image_borders_size->at(camera_name) ||
-            box.xmax + option.image_borders_size->at(camera_name) > projection_.getImageWidth(camera_name) ||
-            box.ymax + option.image_borders_size->at(camera_name) > projection_.getImageHeight(camera_name)){
+        if (OutOfValidRegion(light->region.projection_roi,
+                             projection_.getImageWidth(camera_name),
+                             projection_.getImageHeight(camera_name),
+                             option.image_borders_size->at(camera_name))) {
           ok = false;
           AINFO << "light project out of image region, "
                 << "camera_name: " << camera_name << " border_size: "

@@ -12,6 +12,7 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/detector/recognition/proto:recognition_cc_proto",
+        # TODO(zhangxiao23@baidu.com): Rebuild perception inference module
         # "//modules/perception/inference:inference_factory",
         # "//modules/perception/inference:inference_lib",
         # "//modules/perception/inference/utils:inference_resize_lib",
@@ -27,6 +28,7 @@ cc_library(
         ":classify",
         "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
+        # TODO(zhangxiao23@baidu.com): Rebuild perception inference module
         # "//modules/perception/inference:inference_lib",
     ],
     alwayslink = True,
