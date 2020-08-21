@@ -74,6 +74,23 @@ function config() {
 
 function main() {
   config "$@"
+  local opt="${!pos}"
+  local new_bazel_distdir
+  for ((pos = 1; pos <= $#; pos++)); do
+    case "${opt}" in
+      --distdir=*)
+        if [ ! -d "${opt#*=}" ]; then
+          warning "${DISTDIR} doesn't exist!"
+        else
+          new_bazel_distdir="APOLLO_BAZEL_DISTDIR=${opt#*=}"
+          sed -i '/^APOLLO_BAZEL_DISTDIR/c'$new_bazel_distdir ${TOP_DIR}/scripts/apollo_base.sh
+        fi
+        ;;
+      # TODO add bazel feature
+      *) ;;
+
+    esac
+  done
 }
 
 main "$@"

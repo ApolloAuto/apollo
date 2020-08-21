@@ -19,7 +19,6 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOP_DIR}/scripts/apollo.bashrc"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
 ARCH="$(uname -m)"
@@ -116,13 +115,6 @@ function _parse_cmdline_arguments() {
         optarg="${!pos}"
         known_options="${known_options} ${opt} ${optarg}"
         ;;
-      --distdir=*)
-        if [ ! -d "${opt#*=}" ]; then
-          warning "${DISTDIR} doesn't exist!"
-        else
-          DISTDIR="${opt#*=}"
-        fi
-        ;;
       *)
         remained_args="${remained_args} ${opt}"
         ;;
@@ -138,7 +130,7 @@ function _parse_cmdline_arguments() {
 
 function _run_bazel_build_impl() {
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel build "--distdir=${DISTDIR}" ${job_args} $@
+  bazel build ${job_args} $@
 }
 
 function bazel_build() {
@@ -149,7 +141,7 @@ function bazel_build() {
 
   _parse_cmdline_arguments $@
 
-  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN} --distdir=${APOLLO_BAZEL_DISTDIR}"
 
   local build_targets
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"

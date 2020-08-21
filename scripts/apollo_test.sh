@@ -143,7 +143,7 @@ function _parse_cmdline_arguments() {
 
 function _run_bazel_test_impl() {
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel test --distdir="${APOLLO_CACHE_DIR}/distdir" ${job_args} $@
+  bazel test ${job_args} $@
 }
 
 function bazel_test() {
@@ -153,7 +153,7 @@ function bazel_test() {
   fi
 
   _parse_cmdline_arguments "$@"
-  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN} --distdir=${APOLLO_BAZEL_DISTDIR}"
 
   local test_targets
   test_targets="$(determine_test_targets ${SHORTHAND_TARGETS})"

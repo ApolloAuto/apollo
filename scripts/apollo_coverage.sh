@@ -170,7 +170,7 @@ function bazel_coverage() {
   fi
 
   _parse_cmdline_arguments "$@"
-  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN} --distdir=${APOLLO_BAZEL_DISTDIR}"
 
   local test_targets
   test_targets="$(determine_test_targets ${SHORTHAND_TARGETS})"
