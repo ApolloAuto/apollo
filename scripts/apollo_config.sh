@@ -17,14 +17,13 @@
 ###############################################################################
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOP_DIR}/scripts/apollo.bashrc"
-
+source "${TOP_DIR}/cyber/setup.sh"
 # STAGE="${STAGE:-dev}"
 : ${STAGE:=dev}
 
 IFS='' read -r -d '' STARTUP_TXT << EOF
 startup --output_user_root="${APOLLO_CACHE_DIR}/bazel"
-common --distdir="${APOLLO_CACHE_DIR}/distdir"
+common --distdir="${APOLLO_BAZEL_DISTDIR}"
 EOF
 
 set -e
