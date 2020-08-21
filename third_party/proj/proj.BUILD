@@ -10,6 +10,7 @@ cc_library(
         ".",
     ],
     linkopts = [
+        "-L/opt/apollo/sysroot/lib",
         "-lproj",
     ],
     linkstatic = False,

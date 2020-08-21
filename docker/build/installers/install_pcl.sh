@@ -62,7 +62,8 @@ apt_get_update_and_install \
     libusb-1.0-0-dev \
     libopenni-dev \
     libjpeg-dev \
-    libpng-dev
+    libpng-dev \
+    libpcap-dev
 
 # NOTE(storypku)
 # libglfw3-dev depends on libglfw3,

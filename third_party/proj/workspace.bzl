@@ -6,9 +6,8 @@ def clean_dep(dep):
     return str(Label(dep))
 
 def repo():
-    # proj
     native.new_local_repository(
         name = "proj",
         build_file = clean_dep("//third_party/proj:proj.BUILD"),
-        path = "/usr/include",
+        path = "/opt/apollo/sysroot/include",
     )
