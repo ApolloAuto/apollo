@@ -469,8 +469,6 @@ DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
-DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
-            "Use OSQP optimizer for reference line optimization.");
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
 

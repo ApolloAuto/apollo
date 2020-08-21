@@ -22,7 +22,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/math/matrix_operations.h"
-#include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
