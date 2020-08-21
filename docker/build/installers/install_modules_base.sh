@@ -34,7 +34,7 @@ bash ${CURR_DIR}/install_boost.sh
 
 bash ${CURR_DIR}/install_ffmpeg.sh
 # Proj4 was required to install VTK
-bash ${CURR_DIR}/install_proj4.sh
+bash ${CURR_DIR}/install_proj.sh
 bash ${CURR_DIR}/install_vtk.sh
 
 # OpenCV depends on ffmpeg and vtk
