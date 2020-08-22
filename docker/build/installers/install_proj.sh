@@ -63,6 +63,8 @@ ldconfig
 ok "Successfully built proj = ${VERSION}"
 
 rm -fr "${PKG_NAME}" "proj-${VERSION}"
+
+apt_get_remove sqlite3
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
