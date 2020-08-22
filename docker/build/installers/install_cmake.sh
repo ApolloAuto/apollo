@@ -54,8 +54,7 @@ elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     # Build CMake from source for aarch64 #
     #=====================================#
     # PreReq for source build
-    apt-get -y update && \
-        apt-get -y install \
+    apt_get_update_and_install \
         libssl-dev \
         libcurl4-openssl-dev
     PKG_NAME="CMake-${VERSION}.tar.gz"
@@ -71,6 +70,7 @@ elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     popd
 
     rm -rf "CMake-${VERSION}" "${PKG_NAME}"
+    apt_get_remove libssl-dev libcurl4-openssl-dev
 fi
 
 # Clean up cache to reduce layer size.

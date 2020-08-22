@@ -25,8 +25,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # To reduce image size
 # apt-get -y update && \
 #    apt-get -y install \
-#    libssl-dev
 #    libpoco-dev
+apt_get_update_and_install \
+    libssl-dev
 
 THREAD_NUM=$(nproc)
 
