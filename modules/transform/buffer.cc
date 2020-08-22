@@ -21,6 +21,7 @@
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 
+using Time = ::apollo::cyber::Time;
 using Clock = ::apollo::cyber::Clock;
 
 namespace {
@@ -34,7 +35,7 @@ Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
   const std::string node_name =
-      absl::StrCat("transform_listener_", Clock::Now().ToNanosecond());
+      absl::StrCat("transform_listener_", Time::Now().ToNanosecond());
   node_ = cyber::CreateNode(node_name);
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
