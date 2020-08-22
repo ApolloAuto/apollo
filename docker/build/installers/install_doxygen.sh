@@ -27,22 +27,18 @@ apt-get -y update && \
         flex \
         bison \
         graphviz \
-        doxygen
 
-exit 0
+# Build doxygen from source to reduce image size
 
-# Source Build
-
-VERSION="1_8_18"
-PKG_NAME="doxygen-Release_${VERSION}.tar.gz"
-CHECKSUM="9c88f733396dca16139483045d5afa5bbf19d67be0b8f0ea43c4e813ecfb2aa2"
-DOWNLOAD_LINK="https://github.com/doxygen/doxygen/archive/Release_${VERSION}.tar.gz"
-# https://github.com/doxygen/doxygen/archive/Release_1_8_18.tar.gz
+VERSION="1.8.19"
+PKG_NAME="doxygen-${VERSION}.src.tar.gz"
+CHECKSUM="ac15d111615251ec53d3f0e54ac89c9d707538f488be57184245adef057778d3"
+DOWNLOAD_LINK="http://doxygen.nl/files/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xzf "${PKG_NAME}"
-pushd "doxygen-Release_${VERSION}" >/dev/null
+pushd "doxygen-${VERSION}" >/dev/null
     mkdir build && cd build
     cmake .. \
         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
@@ -53,7 +49,11 @@ pushd "doxygen-Release_${VERSION}" >/dev/null
     make install
 popd
 
-rm -rf "${PKG_NAME}" "doxygen-Release_${VERSION}"
+rm -rf "${PKG_NAME}" "doxygen-${VERSION}"
 
-VERSION="$(echo ${VERSION} | tr '_' '.')"
-info "Done installing doxygen-${VERSION}"
+# VERSION="$(echo ${VERSION} | tr '_' '.')"
+ok "Done installing doxygen-${VERSION}"
+
+# Kick the ladder
+apt_get_remove \
+    bison flex
