@@ -24,9 +24,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 apt_get_update_and_install nasm
 
-VERSION="2.0.0"
+VERSION="2.1.1"
 PKG_NAME="openh264-${VERSION}.tar.gz"
-CHECKSUM="73c35f80cc487560d11ecabb6d31ad828bd2f59d412f9cd726cc26bfaf4561fd"
+CHECKSUM="af173e90fce65f80722fa894e1af0d6b07572292e76de7b65273df4c0a8be678"
 DOWNLOAD_LINK="https://github.com/cisco/openh264/archive/v${VERSION}.tar.gz"
 
 # Prepare
@@ -36,9 +36,12 @@ tar xzf ${PKG_NAME}
 
 # Build and install.
 pushd openh264-${VERSION}
-  make -j`nproc`
-  make install
+    make \
+        BUILDTYPE=Release \
+        PREFIX="${SYSROOT_DIR}" \
+        -j$(nproc) install
 popd
+ldconfig
 
 apt_get_remove nasm
 
