@@ -20,8 +20,6 @@
 namespace apollo {
 namespace localization {
 
-using apollo::cyber::Clock;
-
 RTKLocalizationComponent::RTKLocalizationComponent()
     : localization_(new RTKLocalization()) {}
 
