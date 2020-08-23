@@ -12,6 +12,7 @@ cc_binary(
     linkstatic = False,
     deps = [
         ":camera_component_lib",
+        ":compress_component_lib",
         "@ffmpeg//:avcodec",
         "@ffmpeg//:avformat",
         "@ffmpeg//:swscale",
@@ -43,7 +44,10 @@ cc_library(
         "//modules/common/proto:header_cc_proto",
         "//modules/drivers/camera/proto:config_cc_proto",
         "//modules/drivers/proto:sensor_image_cc_proto",
+        "@opencv//:core",
         "@opencv//:highgui",
+        "@opencv//:imgproc",
+        "@opencv//:imgcodecs",
     ],
 )
 
