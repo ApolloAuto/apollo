@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/audio/proto/audio_common.proto";
+import "modules/common/proto/header.proto";
+
+message AudioEvent {
+  optional apollo.common.Header header = 1;
+  optional bool event_on = 2 [default = true];
+  optional int32 id = 3;  // obstacle ID.
+  optional apollo.audio.MovingResult moving_result = 4 [default = UNKNOWN];
+}
