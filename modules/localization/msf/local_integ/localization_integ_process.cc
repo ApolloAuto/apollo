@@ -28,7 +28,7 @@ namespace localization {
 namespace msf {
 
 using apollo::common::Status;
-using apollo::cyber::Clock;
+using apollo::common::time::Clock;
 
 LocalizationIntegProcess::LocalizationIntegProcess()
     : sins_(new Sins()),
