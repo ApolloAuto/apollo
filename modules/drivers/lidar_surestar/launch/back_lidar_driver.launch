@@ -1,0 +1,10 @@
+<cyber>
+    <desc>driver lidar_surestar</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>driver_lidar_surestar</name>
+        <dag_conf>/apollo/modules/drivers/lidar_surestar/dag/back_lidar.dag</dag_conf>
+        <process_name>driver_surestar_driver</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>
