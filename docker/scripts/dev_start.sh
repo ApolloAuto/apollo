@@ -440,6 +440,12 @@ function mount_other_volumes() {
     docker_restart_volume "${localization_volume}" "${localization_image}"
     volume_conf="${volume_conf} --volumes-from ${localization_volume}"
 
+    # AUDIO
+    local audio_volume="apollo_audio_volume_${USER}"
+    local audio_image="${DOCKER_REPO}:data_volume-audio_model-latest"
+    docker_restart_volume "${audio_volume}" "${audio_image}"
+    volume_conf="${volume_conf} --volumes-from ${audio_volume}"
+
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
         local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
