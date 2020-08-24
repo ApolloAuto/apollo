@@ -19,6 +19,7 @@ syntax = "proto2";
 package apollo.audio;
 
 import "modules/common/proto/geometry.proto";
+import "modules/common/proto/header.proto";
 
 enum MovingResult {
   UNKNOWN = 0;
@@ -28,7 +29,8 @@ enum MovingResult {
 }
 
 message AudioDetection {
-  optional bool is_siren = 1;
-  optional MovingResult moving_result = 2 [default = UNKNOWN];
-  optional apollo.common.Point3D position = 3;
+  optional apollo.common.Header header = 1;
+  optional bool is_siren = 2;
+  optional MovingResult moving_result = 3 [default = UNKNOWN];
+  optional apollo.common.Point3D position = 4;
 }
