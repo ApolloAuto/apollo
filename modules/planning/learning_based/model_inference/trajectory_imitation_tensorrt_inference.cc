@@ -75,7 +75,7 @@ TrajectoryImitationTensorRTInference::~TrajectoryImitationTensorRTInference() {
       GPU_CHECK(cudaFree(trt_buffers_[1]));
       break;
     }
-    case LearningModelInferenceTaskConfig::CNN_LSTM: {
+    case LearningModelInferenceTaskConfig::SELF_CNN_LSTM: {
       GPU_CHECK(cudaFree(trt_buffers_[0]));
       GPU_CHECK(cudaFree(trt_buffers_[1]));
       GPU_CHECK(cudaFree(trt_buffers_[2]));
@@ -118,7 +118,7 @@ void TrajectoryImitationTensorRTInference::DeviceMemoryMalloc() {
                                                  sizeof(float)));
       break;
     }
-    case LearningModelInferenceTaskConfig::CNN_LSTM: {
+    case LearningModelInferenceTaskConfig::SELF_CNN_LSTM: {
       GPU_CHECK(cudaMalloc(&trt_buffers_[0], BATCH_SIZE * FEATURE_CHANNELS_NUM *
                                                  IMG_SIZE * IMG_SIZE *
                                                  sizeof(float)));
@@ -446,7 +446,7 @@ bool TrajectoryImitationTensorRTInference::DoCNNMODELInference(
   return true;
 }
 
-bool TrajectoryImitationTensorRTInference::DoCNNLSTMMODELInference(
+bool TrajectoryImitationTensorRTInference::DoSelfCNNLSTMMODELInference(
     LearningDataFrame* learning_data_frame) {
   const int past_points_size = learning_data_frame->adc_trajectory_point_size();
   if (past_points_size == 0) {
@@ -633,8 +633,8 @@ bool TrajectoryImitationTensorRTInference::DoInference(
       }
       break;
     }
-    case LearningModelInferenceTaskConfig::CNN_LSTM: {
-      if (!DoCNNLSTMMODELInference(learning_data_frame)) {
+    case LearningModelInferenceTaskConfig::SELF_CNN_LSTM: {
+      if (!DoSelfCNNLSTMMODELInference(learning_data_frame)) {
         return false;
       }
       break;
