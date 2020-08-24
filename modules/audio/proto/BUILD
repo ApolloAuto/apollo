@@ -16,6 +16,7 @@ proto_library(
     name = "audio_proto",
     srcs = ["audio.proto"],
     deps = [
+        ":audio_common_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
     ],
@@ -27,6 +28,18 @@ py_proto_library(
         ":audio_proto",
         "//modules/common/proto:geometry_py_pb2",
         "//modules/common/proto:header_py_pb2",
+    ],
+)
+
+proto_library(
+    name = "audio_common_proto",
+    srcs = ["audio_common.proto"],
+)
+
+py_proto_library(
+    name = "audio_common_py_pb2",
+    deps = [
+        ":audio_common_proto",
     ],
 )
 
@@ -46,5 +59,22 @@ py_proto_library(
     name = "audio_conf_py_pb2",
     deps = [
         ":audio_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "audio_event_proto",
+    srcs = ["audio_event.proto"],
+    deps = [
+        ":audio_common_proto",
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "audio_event_py_pb2",
+    deps = [
+        ":audio_event_proto",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
