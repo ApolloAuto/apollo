@@ -69,10 +69,13 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<double>>& signals) {
   AINFO << "SirenDetection used time: " << diff.count() * 1000 << " ms.";
   auto torch_output = torch_output_tensor.accessor<float, 2>();
 
-  // TODO(Hongyi): change to majority vote when 4 channels are ready
-  ADEBUG << "torch_output[0][0] = " << torch_output[0][0]
-         << ", torch_output[0][1] = " << torch_output[0][1];
-  if (torch_output[0][0] < torch_output[0][1]) {
+  // majority vote with 4 channels
+  float neg_score = torch_output[0][0] + torch_output[1][0] +
+                    torch_output[2][0] + torch_output[3][0];
+  float pos_score = torch_output[0][1] + torch_output[1][1] +
+                    torch_output[2][1] + torch_output[3][1];
+  ADEBUG << "neg_score = " << neg_score << ", pos_score = " << pos_score;
+  if (neg_score < pos_score) {
     return true;
   } else {
     return false;
