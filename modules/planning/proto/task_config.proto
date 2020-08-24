@@ -46,7 +46,8 @@ message LearningModelInferenceTaskConfig {
   enum ModelType {
     CONV_RNN = 1;
     CNN = 2;
-    CNN_LSTM = 3;
+    SELF_CNN_LSTM = 3;
+    HISTORY_UNCONDITIONED_CNN_LSTM = 4;
   }
   optional ModelType model_type = 1;
   optional string cpu_model_file = 2;
