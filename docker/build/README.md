@@ -81,6 +81,10 @@ cd $HOME/archive
 nohup python3 -m http.server 8388 &
 ```
 
+> Note: Another advantage with the local HTTP cache mechanism is, it has
+> little influence on the final image size. Even if the cached package was
+> missing or broken, it can still be downloaded from the original URL.
+
 3. Rerun `build_cyber.sh` or `build_dev.sh`.
 
 ## Understand the Dependencies
