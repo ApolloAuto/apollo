@@ -206,9 +206,12 @@ Status PathReferenceDecider::Process(Frame *frame,
       ->mutable_planning_data()
       ->mutable_hybrid_model()
       ->mutable_evaluated_path_reference()
-      ->mutable_path_point()->CopyFrom(
-      {evaluated_path_reference.begin(),
-       evaluated_path_reference.end()});
+      ->mutable_path_point()
+      ->CopyFrom(
+          {evaluated_path_reference.begin(), evaluated_path_reference.end()});
+  // set evaluated path data
+  reference_line_info->mutable_path_data()->set_path_reference(
+      std::move(evaluated_path_reference));
 
   ++valid_path_reference_counter_;
   ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
