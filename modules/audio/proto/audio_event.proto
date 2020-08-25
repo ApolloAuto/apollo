@@ -9,4 +9,5 @@ message AudioEvent {
   optional apollo.common.Header header = 1;
   optional int32 id = 2;  // obstacle ID.
   optional apollo.audio.MovingResult moving_result = 3 [default = UNKNOWN];
+  optional bool siren_is_on = 4;
 }
