@@ -27,29 +27,75 @@ ARCH="$(uname -m)"
 
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
+DISABLED_TARGETS=
+
+function _determine_drivers_disabled() {
+  if ! ${USE_ESD_CAN}; then
+    warning "ESD CAN library supplied by ESD Electronics doesn't exist."
+    warning "If you need ESD CAN, please refer to:"
+    warning "  third_party/can_card_library/esd_can/README.md"
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
+  fi
+}
+
+function _determine_perception_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    warning "Perception module can not work without GPU, all targets skipped"
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
+  fi
+}
+
+function _determine_localization_disabled() {
+  if [ "${ARCH}" != "x86_64" ]; then
+    # Skip msf for non-x86_64 platforms
+    DISABLED_TARGETS="${disabled} except //modules/localization/msf/..."
+  fi
+}
+
+function _determine_planning_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/open_space/trajectory_smoother:planning_block \
+                      except //modules/planning/learning_based/..."
+  fi
+}
+
+function _determine_map_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/map/pnc_map:cuda_pnc_util \
+                      except //modules/map/pnc_map:cuda_util_test"
+  fi
+}
 
 function determine_disabled_build_targets() {
-  local disabled=
+  DISABLED_TARGETS=""
   local compo="$1"
-  if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
-    if ! ${USE_ESD_CAN}; then
-      warning "ESD CAN library supplied by ESD Electronics doesn't exist."
-      warning "If you need ESD CAN, please refer to:"
-      warning "  third_party/can_card_library/esd_can/README.md"
-      disabled="${disabled} except //modules/drivers/canbus/can_client/esd/..."
-    fi
-  elif [[ "${compo}" == "localization" && "${ARCH}" != "x86_64" ]]; then
-    # Skip msf for non-x86_64 platforms
-    disabled="${disabled} except //modules/localization/msf/..."
-  elif [[ "${compo}" == "perception" && "${USE_GPU}" == 0 ]]; then
-    warning "Perception module can not work without GPU, all targets passed"
-    disabled="${disabled} except //modules/perception/..."
-  elif [[ "${compo}" == "planning" && "${USE_GPU}" == 0 ]]; then
-    disabled="${disabled} except //modules/planning/open_space/trajectory_smoother:planning_block \
-              except //modules/planning/learning_based/..."
+  if [ -z "${compo}" ]; then
+    _determine_drivers_disabled
+    _determine_localization_disabled
+    _determine_perception_disabled
+    _determine_planning_disabled
+    _determine_map_disabled
+  else
+    case "${compo}" in
+      drivers)
+        _determine_drivers_disabled
+        ;;
+      localization)
+        _determine_localization_disabled
+        ;;
+      perception)
+        _determine_perception_disabled
+        ;;
+      planning)
+        _determine_planning_disabled
+        ;;
+      map)
+        _determine_map_disabled
+        ;;
+    esac
   fi
 
-  echo "${disabled}"
+  echo "${DISABLED_TARGETS}"
   # DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
 }
 
