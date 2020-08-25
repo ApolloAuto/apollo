@@ -19,8 +19,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. ./installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 TARGET_ARCH="$(uname -m)"
 
@@ -36,8 +36,8 @@ apt-get -y update && \
 # Note(storypku)
 # The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
-if [[ "${TARGET_ARCH}" != "x86_64" ]]; then
-    warning "Qt installer for ${TARGET_ARCH} not ready."
+if [ "${TARGET_ARCH}" = "aarch64" ]; then
+    bash ${CURR_DIR}/install_qt5base.sh
     exit 0
 fi
 
