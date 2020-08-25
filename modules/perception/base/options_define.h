@@ -16,7 +16,7 @@
 #pragma once
 
 // build perception with cpu or gpu
-/* #undef PERCEPTION_CPU_ONLY */
+/* #undef CPU_ONLY */
 
 // build perception with using cyber log lib or glog lib
 /* #undef PERCEPTION_USE_CYBER */
