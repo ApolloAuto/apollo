@@ -28,7 +28,7 @@ ARCH="$(uname -m)"
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 
-function determine_disabled_bazel_targets() {
+function determine_disabled_build_targets() {
   local disabled=
   local compo="$1"
   if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
