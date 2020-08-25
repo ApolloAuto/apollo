@@ -39,6 +39,7 @@ cc_test(
     name = "public_road_planner_test",
     size = "small",
     srcs = ["public_road_planner_test.cc"],
+    linkopts = ["-lgomp"],
     deps = [
         ":public_road_planner",
         "@com_google_googletest//:gtest_main",

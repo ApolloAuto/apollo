@@ -36,6 +36,7 @@ cc_test(
     size = "small",
     srcs = ["navi_planner_test.cc"],
     data = ["//modules/planning:planning_testdata"],
+    linkopts = ["-lgomp"],
     deps = [
         ":navi_planner",
         "//cyber/common:log",

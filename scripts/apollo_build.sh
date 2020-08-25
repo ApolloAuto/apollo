@@ -28,7 +28,7 @@ ARCH="$(uname -m)"
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 
-function determine_disabled_bazel_targets() {
+function determine_disabled_build_targets() {
   local disabled=
   local compo="$1"
   if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
@@ -41,6 +41,12 @@ function determine_disabled_bazel_targets() {
   elif [[ "${compo}" == "localization" && "${ARCH}" != "x86_64" ]]; then
     # Skip msf for non-x86_64 platforms
     disabled="${disabled} except //modules/localization/msf/..."
+  elif [[ "${compo}" == "perception" && "${USE_GPU}" == 0 ]]; then
+    warning "Perception module can not work without GPU, all targets passed"
+    disabled="${disabled} except //modules/perception/..."
+  elif [[ "${compo}" == "planning" && "${USE_GPU}" == 0 ]]; then
+    disabled="${disabled} except //modules/planning/open_space/trajectory_smoother:planning_block \
+              except //modules/planning/learning_based/..."
   fi
 
   echo "${disabled}"
@@ -55,7 +61,7 @@ function determine_build_targets() {
   if [[ "$#" -eq 0 ]]; then
     local exceptions=
     if ! ${USE_ESD_CAN}; then
-      exceptions="$(determine_disabled_bazel_targets)"
+      exceptions="$(determine_disabled_build_targets)"
     fi
     targets_all="//modules/... union //cyber/... ${exceptions}"
     echo "${targets_all}"
@@ -64,8 +70,8 @@ function determine_build_targets() {
 
   for compo in $@; do
     local build_targets
+    local exceptions
     if [[ "${compo}" == "drivers" ]]; then
-      local exceptions=
       if ! ${USE_ESD_CAN}; then
         exceptions="$(determine_disabled_build_targets ${compo})"
       fi
@@ -77,7 +83,8 @@ function determine_build_targets() {
         build_targets="//cyber/..."
       fi
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-      build_targets="//modules/${compo}/..."
+      exceptions="$(determine_disabled_build_targets ${compo})"
+      build_targets="//modules/${compo}/... ${exceptions}"
     else
       error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
       exit 1

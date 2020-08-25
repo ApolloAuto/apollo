@@ -56,6 +56,7 @@ build:optimize --host_copt=-march=native
 build:optimize --define with_default_optimizations=true
 
 build:cpu --define USE_GPU=false
+build:cpu --cxxopt=-DCPU_ONLY
 build:gpu --define USE_GPU=true
 build:opt_gpu --config=opt --config=gpu
 

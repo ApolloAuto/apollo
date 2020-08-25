@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -20,8 +21,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers:trajectory_optimizer",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_library(
@@ -56,6 +56,7 @@ cc_test(
     copts = [
         "-fopenmp",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":open_space_trajectory_provider",
         "@com_google_googletest//:gtest_main",
@@ -69,11 +70,11 @@ cc_test(
     copts = [
         "-fopenmp",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":open_space_trajectory_optimizer",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cpplint()

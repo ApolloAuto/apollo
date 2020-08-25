@@ -49,6 +49,7 @@ cc_test(
     name = "on_lane_planner_dispatcher_test",
     size = "small",
     srcs = ["on_lane_planner_dispatcher_test.cc"],
+    linkopts = ["-lgomp"],
     deps = [
         ":planner_dispatcher",
         "@com_google_googletest//:gtest_main",
@@ -59,6 +60,7 @@ cc_test(
     name = "navi_planner_dispatcher_test",
     size = "small",
     srcs = ["navi_planner_dispatcher_test.cc"],
+    linkopts = ["-lgomp"],
     deps = [
         ":planner_dispatcher",
         "@com_google_googletest//:gtest_main",
