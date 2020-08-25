@@ -78,6 +78,7 @@ cc_test(
     name = "reeds_shepp_path_test",
     size = "small",
     srcs = ["reeds_shepp_path_test.cc"],
+    linkopts = ["-lgomp"],
     deps = [
         ":open_space_utils",
         "//cyber/common:log",
@@ -92,6 +93,7 @@ cc_test(
     name = "node3d_test",
     size = "small",
     srcs = ["node3d_test.cc"],
+    linkopts = ["-lgomp"],
     deps = [
         ":open_space_utils",
         "//cyber/common:log",
@@ -103,6 +105,7 @@ cc_test(
     name = "hybrid_a_star_test",
     size = "small",
     srcs = ["hybrid_a_star_test.cc"],
+    linkopts = ["-lgomp"],
     deps = [
         ":hybrid_a_star",
         "@com_google_googletest//:gtest_main",

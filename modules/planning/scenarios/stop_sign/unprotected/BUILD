@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -40,11 +41,11 @@ cc_test(
     size = "small",
     srcs = ["stop_sign_unprotected_scenario_test.cc"],
     data = ["//modules/planning:planning_conf"],
+    linkopts = ["-lgomp"],
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -54,11 +55,11 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -68,11 +69,11 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -82,11 +83,11 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":stop_sign_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cpplint()

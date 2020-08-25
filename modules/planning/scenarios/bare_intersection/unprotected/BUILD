@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -27,8 +28,7 @@ cc_library(
         "//modules/planning/tasks/deciders/creep_decider",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -36,11 +36,11 @@ cc_test(
     size = "small",
     srcs = ["bare_intersection_unprotected_scenario_test.cc"],
     data = ["//modules/planning:planning_conf"],
+    linkopts = ["-lgomp"],
     deps = [
         ":bare_intersection_unprotected_scenario",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -50,6 +50,7 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":bare_intersection_unprotected_scenario",
         "@com_google_googletest//:gtest_main",

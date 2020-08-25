@@ -60,6 +60,7 @@ cc_test(
         "//modules/map/data:map_sunnyvale_big_loop",
         "//modules/planning:planning_testdata",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":planning_test_base",
     ],
