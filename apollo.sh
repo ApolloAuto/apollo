@@ -121,7 +121,7 @@ function _usage() {
   ${BLUE}build_teleop${NO_COLOR}: run build with teleop enabled.
   ${BLUE}build_prof [module]${NO_COLOR}: build with perf profiling support. Not implemented yet.
   ${BLUE}doc${NO_COLOR}: generate doxygen document
-  ${BLUE}clean${NO_COLOR}: cleanup bazel outputs and log/coredump files
+  ${BLUE}clean${NO_COLOR}: cleanup bazel output and log/coredump files
   ${BLUE}usage${NO_COLOR}: show this message
   "
 }
@@ -193,7 +193,7 @@ function main() {
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
             ;;
         clean)
-            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "$@"
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "-a"
             ;;
         doc)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"
