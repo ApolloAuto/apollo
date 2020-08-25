@@ -254,4 +254,12 @@ c.GPS打开后，发现best_pose, imu, localization/pose 信号没有收到
 /apollo/localization/pose
 ```
 如果best_pose和imu没有，请检查gps和imu的配置。
-如果best_pose和imu有了，但是没有localization/pose没有信号，请等待2分钟，如果还是没有，请让车开动几分钟。
+如果best_pose和imu有了，但是localization/pose没有信号，请等待2分钟，如果还是没有，请让车开动几分钟。
+
+d.GPS打开后，发现best_posed的sol_type为single，不是我们需要的NARROW_INT。
+
+首先，确认IMU设备里面和`modules/calibration/data/dev_kit/gnss_conf/gnss_conf.pb.txt`文件中已经配置好了基站信息。  
+其次，检查IMU的网络接口是否插好了网线连接上了路由器，并且可以在工控机的终端里ping通IMU，同时保证路由器里面插上了手机的sim卡并且工控机能通过路由器正常地访问互联网。  
+再次，联系商务的同事请他们提供刷新IMU的固件版本的教程和工具，刷新完IMU后请按照文档重新配置一遍IMU。  
+最后，联系商务的同事商讨将IMU返厂维修的事宜。
+
