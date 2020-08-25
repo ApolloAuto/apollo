@@ -192,6 +192,7 @@ Status PathReferenceDecider::Process(Frame *frame,
   std::vector<PathPoint> evaluated_path_reference;
   EvaluatePathReference(path_boundaries[regular_path_bound_idx], path_reference,
                         &evaluated_path_reference);
+  AINFO << "evaluated_path_reference: " << evaluated_path_reference.size();
 
   // mark learning trajectory as path reference
   reference_line_info->mutable_path_data()->set_is_valid_path_reference(true);
@@ -200,6 +201,14 @@ Status PathReferenceDecider::Process(Frame *frame,
       ->mutable_planning_data()
       ->mutable_hybrid_model()
       ->set_using_learning_model_output(true);
+  // export evaluated path reference
+  reference_line_info->mutable_debug()
+      ->mutable_planning_data()
+      ->mutable_hybrid_model()
+      ->mutable_evaluated_path_reference()
+      ->mutable_path_point()->CopyFrom(
+      {evaluated_path_reference.begin(),
+       evaluated_path_reference.end()});
 
   ++valid_path_reference_counter_;
   ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
@@ -212,6 +221,8 @@ Status PathReferenceDecider::Process(Frame *frame,
       ->set_learning_model_output_usage_ratio(
           static_cast<double>(valid_path_reference_counter_) /
           (total_path_counter_ + kMathEpsilon));
+
+  AINFO << "path reference size:" << path_reference.size();
 
   return Status::OK();
 }
@@ -230,6 +241,7 @@ bool PathReferenceDecider::IsValidPathReference(
     const ReferenceLineInfo &reference_line_info,
     const PathBoundary &regular_path_bound,
     const std::vector<TrajectoryPoint> &path_reference) {
+  AINFO << "path_reference" << path_reference.size();
   for (auto path_referece_point : path_reference) {
     const double cur_x = path_referece_point.path_point().x();
     const double cur_y = path_referece_point.path_point().y();

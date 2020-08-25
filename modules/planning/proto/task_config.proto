@@ -174,6 +174,8 @@ message PathLaneBorrowDeciderConfig {
 
 message PathReferenceDeciderConfig {
   optional uint32 min_path_reference_length = 1 [default = 20];
+  // learning model s weight
+  optional double weight_x_ref_path_reference = 2;
 }
 
 //////////////////////////////////
