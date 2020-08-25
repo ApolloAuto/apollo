@@ -55,6 +55,7 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
 
   ## buildozer
   PKG_NAME="buildozer"
+  BUILDOZER_VERSION="3.3.0"
   CHECKSUM="6618c2a4473ddc35a5341cf9a651609209bd5362e0ffa54413be256fe8a4081a"
   DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/${BUILDOZER_VERSION}/buildozer"
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
