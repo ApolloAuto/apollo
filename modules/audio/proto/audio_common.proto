@@ -24,3 +24,18 @@ enum MovingResult {
   DEPARTING = 2;
   STATIONARY = 3;
 }
+
+enum AudioType {
+  UNKNOWN_TYPE = 0;
+  POLICE = 1;
+  AMBULANCE = 2;
+  FIRETRUCK = 3;
+}
+
+enum AudioDirection {
+  UNKNOWN_DIRECTION = 0;
+  FRONT = 1;
+  LEFT = 2;
+  BACK = 3;
+  RIGHT = 4;
+}
