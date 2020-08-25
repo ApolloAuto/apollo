@@ -265,9 +265,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     // l weight = weight_x_ + weight_x_ref_ = (1.0 + 0.0)
     std::vector<double> weight_x_ref_vec(kNumKnots, 0.0);
     // increase l weight for path reference part only
-    constexpr double weight_x_ref_path_reference = 1000.0;
     for (size_t i = 0; i < path_reference_size; ++i) {
-      weight_x_ref_vec.at(i) = weight_x_ref_path_reference;
+      weight_x_ref_vec.at(i) = config_.piecewise_jerk_path_optimizer_config()
+                                   .path_reference_l_weight();
     }
     piecewise_jerk_problem.set_x_ref(std::move(weight_x_ref_vec),
                                      std::move(path_reference_l_ref));

@@ -221,7 +221,9 @@ message PiecewiseJerkNonlinearSpeedOptimizerConfig {
 message PiecewiseJerkPathOptimizerConfig {
   optional PiecewiseJerkPathWeights default_path_config = 1;
   optional PiecewiseJerkPathWeights lane_change_path_config = 2;
+  optional double path_reference_l_weight = 3 [default = 0.0];
 }
+
 message PiecewiseJerkPathWeights {
   optional double l_weight = 1 [default = 1.0];
   optional double dl_weight = 2 [default = 100.0];
