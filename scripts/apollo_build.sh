@@ -116,11 +116,7 @@ function determine_build_targets() {
     local build_targets
     local exceptions
     if [[ "${component}" == "cyber" ]]; then
-      if [[ "${ARCH}" == "x86_64" ]]; then
-        build_targets="//cyber/... union //modules/tools/visualizer/..."
-      else
-        build_targets="//cyber/..."
-      fi
+      build_targets="//cyber/... union //modules/tools/visualizer/..."
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
       exceptions="$(determine_disabled_build_targets ${component})"
       build_targets="//modules/${component}/... ${exceptions}"
