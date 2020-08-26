@@ -22,9 +22,6 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
-EXCEPTIONS=""
-
-##======================= Failed Test Cases are Listed Above ================##
 ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
@@ -33,19 +30,51 @@ CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
 
-function _disabled_test_targets_all() {
-  local disabled="${EXCEPTIONS}"
+function _determine_drivers_disabled() {
   if ! ${USE_ESD_CAN}; then
     warning "ESD CAN library supplied by ESD Electronics doesn't exist."
     warning "If you need ESD CAN, please refer to:"
     warning "  third_party/can_card_library/esd_can/README.md"
-    disabled="${disabled} except //modules/drivers/canbus/can_client/esd/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
   fi
+}
+
+function _determine_localization_disabled() {
+  if [ "${ARCH}" != "x86_64" ]; then
+    # Skip msf for non-x86_64 platforms
+    DISABLED_TARGETS="${disabled} except //modules/localization/msf/..."
+  fi
+}
+
+function _determine_perception_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    warning "Perception module can not work without GPU, all targets skipped"
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
+  fi
+}
+
+function _determine_planning_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/learning_based/..."
+  fi
+}
+
+function _determine_map_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/map/pnc_map:cuda_util_test"
+  fi
+}
+
+function _disabled_test_targets_all() {
+  DISABLED_TARGETS=""
+  _determine_drivers_disabled
   # TODO(all): arch exceptions should be done in BUILD file level.
-  if [[ "${ARCH}" != "x86_64" ]]; then
-    disabled="${disabled} except //modules/localization/msf/..."
-  fi
-  echo "${disabled}"
+  _determine_localization_disabled
+  _determine_perception_disabled
+  _determine_planning_disabled
+  _determine_map_disabled
+
+  echo "${DISABLED_TARGETS}"
   # TODO(all): exceptions for CPU mode: should be done in BUILD file level.
   # grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|
   # perception_traffic_light_rectify_test\|cuda_util_test"`"
@@ -58,24 +87,27 @@ function determine_disabled_targets() {
     return
   fi
 
-  local disabled=
   for compo in $@; do
-    if [[ "${compo}" == "drivers" ]]; then
-      if ! ${USE_ESD_CAN}; then
-        warning "ESD CAN library supplied by ESD Electronics doesn't exist."
-        warning "If you need ESD CAN, please refer to:"
-        warning "  third_party/can_card_library/esd_can/README.md"
-        disabled="${disabled} except //modules/drivers/canbus/can_client/esd/..."
-      fi
-    elif [[ "${compo}" == "localization" ]]; then
-      if [[ "${ARCH}" != "x86_64" ]]; then
-        disabled="${disabled} except //modules/localization/msf/..."
-      fi
-      disabled="${disabled} ${EXCEPTIONS}"
-    fi
+    case "${compo}" in
+    drivers)
+      _determine_drivers_disabled
+      ;;
+    localization)
+      _determine_localization_disabled
+      ;;
+    perception)
+      _determine_perception_disabled
+      ;;
+    planning)
+      _determine_planning_disabled
+      ;;
+    map)
+      _determine_map_disabled
+      ;;
+    esac
   done
 
-  echo "${disabled}"
+  echo "${DISABLED_TARGETS}"
 }
 
 function determine_test_targets() {
