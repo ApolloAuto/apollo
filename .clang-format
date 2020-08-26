@@ -5,5 +5,32 @@ Language:                               Cpp
 Cpp11BracedListStyle:                   true
 Standard:                               Cpp11
 CommentPragmas:                         '^ NOLINT'
-IncludeBlocks:                          Preserve
+# Mimic cpplint style
+IncludeCategories:
+  # Note that the "main" header is priority 0
+  # The priority is assigned to first match in the ordered list
+  # Miscelaneous system libraries
+  - Regex:       '<(immintrin.h|malloc.h|wait.h|x86intrin.h|cuda.*)>'
+    Priority:    3
+  # C standard libraries
+  - Regex:       '<(arpa/|netinet/|net/if|sys/)?[^\./]*\.h>'
+    Priority:    1
+  # C++ standard libraries
+  - Regex:       '<[^/\./]*>'
+    Priority:    2
+  # Experimental or other system libraries
+  - Regex:       '<'
+    Priority:    3
+  # Test libs
+  - Regex:       '"(gtest|gmock)/'
+    Priority:    4
+  # Protobuf Files
+  - Regex:       '\.pb\.h'
+    Priority:    6
+  # Apollo libs
+  - Regex:       '^"(cyber|modules)'
+    Priority:    7
+  # The rest
+  - Regex:       '.*'
+    Priority:    5
 ---
