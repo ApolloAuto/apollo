@@ -305,6 +305,9 @@ void MSFLocalization::OnGnssHeading(
 }
 
 void MSFLocalization::OnGps() {
+  if (!raw_imu_msg_) {
+    return;
+  }
   std::unique_lock<std::mutex> lock(mutex_imu_msg_);
   OnRawImu(raw_imu_msg_);
 }
