@@ -62,6 +62,7 @@ using apollo::perception::PerceptionObstacles;
 using apollo::perception::SensorMeasurement;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
+using apollo::perception::V2XInformation;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
@@ -556,6 +557,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     SetObstaclePolygon(obstacle, &world_obj);
     SetObstacleType(obstacle.type(), obstacle.sub_type(), &world_obj);
     SetObstacleSensorMeasurements(obstacle, &world_obj);
+    SetObstacleSource(obstacle, &world_obj);
   }
   return obj_map_[id];
 }
@@ -627,6 +629,24 @@ void SimulationWorldService::SetObstacleSensorMeasurements(
                       .add_sensor_measurement();
     CreateWorldObjectFromSensorMeasurement(sensor, obj);
   }
+}
+
+void SimulationWorldService::SetObstacleSource(
+    const apollo::perception::PerceptionObstacle &obstacle,
+    Object *world_object) {
+  if (world_object == nullptr || !obstacle.has_source()) {
+    return;
+  }
+  const PerceptionObstacle::Source obstacle_source = obstacle.source();
+  world_object->set_source(obstacle_source);
+  if (obstacle_source == PerceptionObstacle::V2X) {
+    V2XInformation *v2x_info = world_object->mutable_v2x_info();
+    v2x_info->clear_v2x_type();
+    for (int i = 0; i < obstacle.v2x_info().v2x_type_size(); i++) {
+      v2x_info->add_v2x_type(obstacle.v2x_info().v2x_type(i));
+    }
+  }
+  return;
 }
 
 template <>

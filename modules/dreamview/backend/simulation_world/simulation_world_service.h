@@ -178,6 +178,8 @@ class SimulationWorldService {
   void SetObstacleSensorMeasurements(
       const apollo::perception::PerceptionObstacle &obstacle,
       Object *world_object);
+  void SetObstacleSource(const apollo::perception::PerceptionObstacle &obstacle,
+                         Object *world_object);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
   void UpdateRSSInfo(const apollo::planning::ADCTrajectory &trajectory);

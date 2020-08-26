@@ -201,6 +201,9 @@ options:
   showObstaclesCameraSensor:
     default: false
     menuId: perceptionCameraSensor
+  showObstaclesV2xInfo:
+    default: false
+    menuId: perceptionV2xInfo
   showPositionGps:
     default: false
     menuId: positionGps
