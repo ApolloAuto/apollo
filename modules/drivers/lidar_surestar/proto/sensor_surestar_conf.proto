@@ -1,13 +1,13 @@
 syntax = "proto2";
 
-package cybertron.proto;
+package apollo.drivers.surestar;
 
 import "modules/drivers/lidar_surestar/proto/sensor_surestar.proto"; 
 
 message SurestarConfig {
     required string frame_id = 1;
-    required adu.common.sensor.Surestar.Model model = 2;
-    required adu.common.sensor.Surestar.Mode mode = 3;
+    required apollo.drivers.Surestar.Model model = 2;
+    required apollo.drivers.Surestar.Mode mode = 3;
     optional string pcap_file = 4;
     optional int32 npackets = 5;
     required float rpm = 6;

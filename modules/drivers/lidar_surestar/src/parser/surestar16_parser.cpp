@@ -23,12 +23,12 @@
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar_surestar/include/parser/surestar_parser.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
 Surestar16Parser::Surestar16Parser(
-    const cybertron::proto::SurestarConfig& config)
+    const apollo::drivers::surestar::SurestarConfig& config)
     : SurestarParser(config), _previous_packet_stamp(0), _gps_base_usec(0) {
   _inner_time = &surestar::INNER_TIME_16;
   _need_two_pt_correction = false;
@@ -46,7 +46,7 @@ void Surestar16Parser::init_orderindex() {
 }
 
 void Surestar16Parser::generate_pointcloud(
-    const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>&
+    const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
         scan_msg,
     const std::shared_ptr<apollo::drivers::PointCloud>& out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
@@ -92,7 +92,7 @@ uint64_t Surestar16Parser::get_timestamp(double base_time, float time_offset,
  *  @param pc shared pointer to point cloud (points are appended)
  */
 void Surestar16Parser::unpack(
-    const adu::common::sensor::Surestar::SurestarPacket& pkt,
+    const apollo::drivers::Surestar::SurestarPacket& pkt,
     const std::shared_ptr<apollo::drivers::PointCloud>& pc, uint32_t* nan_pts) {
   float azimuth = 0.0;
   float azimuth_diff = 0.0;
@@ -206,4 +206,4 @@ void Surestar16Parser::order(
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

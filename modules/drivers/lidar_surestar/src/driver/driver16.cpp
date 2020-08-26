@@ -24,12 +24,12 @@
 
 #include "modules/drivers/lidar_surestar/include/driver/driver.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
 Surestar16Driver::Surestar16Driver(
-    const cybertron::proto::SurestarConfig& surestar_config)
+    const apollo::drivers::surestar::SurestarConfig& surestar_config)
     : SurestarDriver() {
   _config = surestar_config;
 }
@@ -79,7 +79,7 @@ void Surestar16Driver::init() {
  *  @returns true unless end of file reached
  */
 bool Surestar16Driver::poll(
-    const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>& scan) {
+    const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan) {
   if (_basetime == 0) {
     AINFO << "poll function  _basetime=0!";
     usleep(100);
@@ -169,4 +169,4 @@ void Surestar16Driver::poll_positioning_packet(void) {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

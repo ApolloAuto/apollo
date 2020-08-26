@@ -1,5 +1,5 @@
 syntax = "proto2";
-package cybertron.proto;
+package apollo.drivers.surestar;
 
 // Vehicle parameters shared among several modules.
 // By default, all are measured with the SI units (meters, meters per second, etc.).

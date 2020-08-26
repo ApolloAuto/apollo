@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
-#define CYBERTRON_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
+#ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
+#define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
 
 #include <map>
 #include <memory>
 #include <string>
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -66,6 +66,6 @@ class Calibration {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
-#endif  // CYBERTRON_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
+#endif  // CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H

@@ -24,7 +24,7 @@
 #include <memory>
 #include <string>
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -91,12 +91,12 @@ bool SurestarDriver::set_base_time() {
 }
 
 int SurestarDriver::poll_standard(
-    const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>& scan) {
+    const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan) {
   // Since the surestar delivers data at a very high rate, keep
   // reading and publishing scans as fast as possible.
   for (int32_t i = 0; i < _config.npackets(); ++i) {
     while (true) {
-      adu::common::sensor::Surestar::SurestarPacket* packet;
+      apollo::drivers::Surestar::SurestarPacket* packet;
       // keep reading until full packet received
       packet = scan->add_firing_pkts();
       int rc = _input->get_firing_data_packet(packet);
@@ -114,13 +114,13 @@ int SurestarDriver::poll_standard(
 }
 
 int SurestarDriver::poll_sync_count(
-    const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>& scan,
+    const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan,
     bool main_frame) {
   static std::atomic_ullong sync_counter(0);
   if (main_frame) {
     for (int32_t i = 0; i < _config.npackets(); ++i) {
       while (true) {
-        adu::common::sensor::Surestar::SurestarPacket* packet;
+        apollo::drivers::Surestar::SurestarPacket* packet;
         // keep reading until full packet received
         packet = scan->add_firing_pkts();
         int rc = _input->get_firing_data_packet(packet);
@@ -136,7 +136,7 @@ int SurestarDriver::poll_sync_count(
   } else {
     while (scan->firing_pkts_size() < _config.npackets()) {
       while (true) {
-        adu::common::sensor::Surestar::SurestarPacket* packet;
+        apollo::drivers::Surestar::SurestarPacket* packet;
         // keep reading until full packet received
         packet = scan->add_firing_pkts();
         int rc = _input->get_firing_data_packet(packet);
@@ -179,8 +179,8 @@ void SurestarDriver::update_gps_top_hour(uint32_t current_time) {
 }
 
 SurestarDriver* SurestarDriverFactory::create_driver(
-    const cybertron::proto::SurestarConfig& surestar_config) {
-  if (surestar_config.model() == adu::common::sensor::Surestar::Model::VLP16) {
+    const apollo::drivers::surestar::SurestarConfig& surestar_config) {
+  if (surestar_config.model() == apollo::drivers::Surestar::Model::VLP16) {
     return new Surestar16Driver(surestar_config);
   } else {
     AERROR << "Invalid model, must be VLP16";
@@ -189,4 +189,4 @@ SurestarDriver* SurestarDriverFactory::create_driver(
 }
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

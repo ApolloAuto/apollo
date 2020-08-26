@@ -38,7 +38,7 @@ void operator>>(const YAML::Node& node, T& i) {
 }  // namespace YAML
 // #endif // HAVE_NEW_YAMLCPP
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -220,4 +220,4 @@ void Calibration::write(const std::string& calibration_file) {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

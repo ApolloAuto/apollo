@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -268,6 +268,6 @@ const int LASER_RING[N_LASERS] = {
     50, 51, 44, 45, 52, 53, 46, 47, 60, 61, 54, 55, 62, 63, 56, 57};
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CONST_VARIABLES_H

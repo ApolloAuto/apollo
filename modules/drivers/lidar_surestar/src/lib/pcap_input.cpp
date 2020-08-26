@@ -28,7 +28,7 @@
 
 #include "cyber/cyber.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -71,7 +71,7 @@ PcapInput::~PcapInput(void) { pcap_close(_pcap); }
 
 /** @brief Get one velodyne packet. */
 int PcapInput::get_firing_data_packet(
-    adu::common::sensor::Surestar::SurestarPacket* pkt) {
+    apollo::drivers::Surestar::SurestarPacket* pkt) {
   struct pcap_pkthdr* header;
   const u_char* pkt_data;
 
@@ -179,4 +179,4 @@ int PcapInput::get_positioning_data_packtet(const NMEATimePtr& nmea_time) {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

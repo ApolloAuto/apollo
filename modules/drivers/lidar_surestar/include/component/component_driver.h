@@ -25,7 +25,7 @@
 #include "modules/drivers/lidar_surestar/include/driver/driver.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 using apollo::cyber::Component;
@@ -38,7 +38,7 @@ class CompSureStarDriver : public Component<> {
   }
   bool Init() {
     // read config file
-    cybertron::proto::SurestarConfig config;
+    apollo::drivers::surestar::SurestarConfig config;
     if (!apollo::cyber::common::GetProtoFromFile(config_file_path_, &config)) {
       AERROR << "Failed to load config file";
       return false;
@@ -55,7 +55,7 @@ class CompSureStarDriver : public Component<> {
     if (driver == nullptr) {
       return false;
     }
-    writer_ = node_->CreateWriter<adu::common::sensor::Surestar::SurestarScan>(
+    writer_ = node_->CreateWriter<apollo::drivers::Surestar::SurestarScan>(
         config.scan_channel());
 
     dvr_.reset(driver);
@@ -73,8 +73,8 @@ class CompSureStarDriver : public Component<> {
  private:
   void device_poll() {
     while (!apollo::cyber::IsShutdown()) {
-      std::shared_ptr<adu::common::sensor::Surestar::SurestarScan> scan(
-          new adu::common::sensor::Surestar::SurestarScan);
+      std::shared_ptr<apollo::drivers::Surestar::SurestarScan> scan(
+          new apollo::drivers::Surestar::SurestarScan);
       if (dvr_->poll(scan)) {
         writer_->Write(scan);
       } else {
@@ -91,13 +91,13 @@ class CompSureStarDriver : public Component<> {
   std::shared_ptr<std::thread> device_thread_;
   std::shared_ptr<SurestarDriver> dvr_;  ///< driver implementation class
   std::shared_ptr<
-      apollo::cyber::Writer<adu::common::sensor::Surestar::SurestarScan>>
+      apollo::cyber::Writer<apollo::drivers::Surestar::SurestarScan>>
       writer_;
 };
 
 CYBER_REGISTER_COMPONENT(CompSureStarDriver);
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif

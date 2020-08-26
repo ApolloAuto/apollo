@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
-#define CYBERTRON_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
+#ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
+#define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
 
 #include <pcap.h>
 #include <stdio.h>
@@ -25,7 +25,7 @@
 
 #include "modules/drivers/lidar_surestar/include/lib/input.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -38,7 +38,7 @@ class PcapInput : public Input {
 
   void init();
   int get_firing_data_packet(
-      adu::common::sensor::Surestar::SurestarPacket* pkt);
+      apollo::drivers::Surestar::SurestarPacket* pkt);
   int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
 
  private:
@@ -54,6 +54,6 @@ class PcapInput : public Input {
 };
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
-#endif  // CYBERTRON_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
+#endif  // CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H

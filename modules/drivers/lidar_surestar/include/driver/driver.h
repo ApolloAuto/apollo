@@ -26,7 +26,7 @@
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar_conf.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -36,14 +36,14 @@ class SurestarDriver {
   virtual ~SurestarDriver() {}
 
   virtual bool poll(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>&
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>&
           scan) {
     return true;
   }
   virtual void init() = 0;
 
  protected:
-  cybertron::proto::SurestarConfig _config;
+  apollo::drivers::surestar::SurestarConfig _config;
   std::shared_ptr<Input> _input;
 
   bool flags = false;
@@ -51,9 +51,9 @@ class SurestarDriver {
   uint64_t _basetime;
   uint32_t _last_gps_time;
   int poll_standard(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>& scan);
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan);
   int poll_sync_count(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>& scan,
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan,
       bool main_frame);
   uint64_t _last_count;
   bool set_base_time();
@@ -66,12 +66,12 @@ class SurestarDriver {
 class Surestar16Driver : public SurestarDriver {
  public:
   explicit Surestar16Driver(
-      const cybertron::proto::SurestarConfig& surestar_config);
+      const apollo::drivers::surestar::SurestarConfig& surestar_config);
   ~Surestar16Driver();
 
   void init();
   bool poll(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>& scan);
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan);
   void poll_positioning_packet();
 
  private:
@@ -83,10 +83,10 @@ class Surestar16Driver : public SurestarDriver {
 class SurestarDriverFactory {
  public:
   static SurestarDriver* create_driver(
-      const cybertron::proto::SurestarConfig& surestar_config);
+      const apollo::drivers::surestar::SurestarConfig& surestar_config);
 };
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_DRIVER_DRIVER_H

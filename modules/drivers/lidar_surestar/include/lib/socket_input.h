@@ -23,7 +23,7 @@
 
 #include "modules/drivers/lidar_surestar/include/lib/input.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -36,7 +36,7 @@ class SocketInput : public Input {
   virtual ~SocketInput();
   void init(uint32_t port);
   int get_firing_data_packet(
-      adu::common::sensor::Surestar::SurestarPacket* pkt);
+      apollo::drivers::Surestar::SurestarPacket* pkt);
   int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
 
  private:
@@ -46,6 +46,6 @@ class SocketInput : public Input {
 };
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_SOCKET_INPUT_H

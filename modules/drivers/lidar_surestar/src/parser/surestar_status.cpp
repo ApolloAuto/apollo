@@ -19,7 +19,7 @@
 #include <memory>
 #include <utility>
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -27,7 +27,7 @@ namespace surestar {
 SurestarStatus::SurestarStatus() {}
 
 void SurestarStatus::get_status(
-    const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>
+    const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>
         &scan) {
   _status.clear();
   // temp hard code for byte position
@@ -87,4 +87,4 @@ void SurestarStatus::check_motor_speed() {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

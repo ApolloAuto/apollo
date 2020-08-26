@@ -22,12 +22,12 @@
 
 #include "cyber/cyber.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
 /** @brief Constructor. */
-Convert::Convert(const cybertron::proto::SurestarConfig& surestar_config) {
+Convert::Convert(const apollo::drivers::surestar::SurestarConfig& surestar_config) {
   _config = surestar_config;
   _config.set_view_direction(0.0);
   _config.set_view_width(2.0 * M_PI);
@@ -53,7 +53,7 @@ uint32_t Convert::GetPointSize() { return _parser->GetPointSize(); }
 
 /** @brief Callback for raw scan messages. */
 void Convert::convert_velodyne_to_pointcloud(
-    const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>&
+    const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
         scan_msg,
     const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud) {
   _parser->generate_pointcloud(scan_msg, point_cloud);
@@ -73,4 +73,4 @@ void Convert::convert_velodyne_to_pointcloud(
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

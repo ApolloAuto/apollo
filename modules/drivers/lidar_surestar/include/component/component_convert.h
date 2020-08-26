@@ -30,16 +30,16 @@
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 using apollo::cyber::Component;
 class CompSurestarConvert
-    : public Component<adu::common::sensor::Surestar::SurestarScan> {
+    : public Component<apollo::drivers::Surestar::SurestarScan> {
  public:
   bool Init() {
     // read config file
-    cybertron::proto::SurestarConfig config;
+    apollo::drivers::surestar::SurestarConfig config;
     if (!apollo::cyber::common::GetProtoFromFile(config_file_path_, &config)) {
       AERROR << "Failed to load config file";
       return false;
@@ -81,7 +81,7 @@ class CompSurestarConvert
     return true;
   }
 
-  bool Proc(const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan>&
+  bool Proc(const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>&
                 scan) {
     // AINFO << "procing convert----------------------------------------";
     uint64_t start = apollo::cyber::Time().Now().ToNanosecond();
@@ -127,6 +127,6 @@ class CompSurestarConvert
 CYBER_REGISTER_COMPONENT(CompSurestarConvert);
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // DRIVERS_SURESTAR_INCLUDE_COMPONENT_COMPONENT_CONVERT_H

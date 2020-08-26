@@ -27,7 +27,7 @@
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar_conf.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -72,7 +72,7 @@ class SurestarStatus {
   SurestarStatus();
   ~SurestarStatus() {}
   void get_status(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>&
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
           scan);
 
  private:
@@ -93,6 +93,6 @@ class SurestarStatus {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif

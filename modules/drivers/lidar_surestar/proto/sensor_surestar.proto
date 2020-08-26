@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package adu.common.sensor.Surestar;
+package apollo.drivers.Surestar;
 
 import "modules/common/proto/header.proto"; 
 

@@ -34,7 +34,7 @@
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar_conf.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -42,7 +42,7 @@ namespace surestar {
 class SurestarParser {
  public:
   SurestarParser() {}
-  explicit SurestarParser(const cybertron::proto::SurestarConfig& config);
+  explicit SurestarParser(const apollo::drivers::surestar::SurestarConfig& config);
   virtual ~SurestarParser() {}
 
   /** \brief Set up for data processing.
@@ -57,7 +57,7 @@ class SurestarParser {
    *           errno value for failure
    */
   virtual void generate_pointcloud(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>&
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
           scan_msg,
       const std::shared_ptr<apollo::drivers::PointCloud>& out_msg) = 0;
   virtual void setup();
@@ -77,7 +77,7 @@ class SurestarParser {
   Calibration _calibration;
   float _sin_rot_table[ROTATION_MAX_UNITS];
   float _cos_rot_table[ROTATION_MAX_UNITS];
-  cybertron::proto::SurestarConfig _config;
+  apollo::drivers::surestar::SurestarConfig _config;
   std::set<std::string> _filter_set;
   int _filter_grading;
   // Last surestar packet time stamp. (Full time)
@@ -109,7 +109,7 @@ class SurestarParser {
    * \brief Unpack surestar packet
    *
    */
-  virtual void unpack(const adu::common::sensor::Surestar::SurestarPacket& pkt,
+  virtual void unpack(const apollo::drivers::Surestar::SurestarPacket& pkt,
                       const std::shared_ptr<apollo::drivers::PointCloud>& pc,
                       uint32_t* nan_pts) = 0;
 
@@ -127,11 +127,11 @@ class SurestarParser {
 
 class Surestar16Parser : public SurestarParser {
  public:
-  explicit Surestar16Parser(const cybertron::proto::SurestarConfig& config);
+  explicit Surestar16Parser(const apollo::drivers::surestar::SurestarConfig& config);
   ~Surestar16Parser() {}
 
   void generate_pointcloud(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>&
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
           scan_msg,
       const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void order(const std::shared_ptr<apollo::drivers::PointCloud>& cloud);
@@ -141,7 +141,7 @@ class Surestar16Parser : public SurestarParser {
  private:
   uint64_t get_timestamp(double base_time, float time_offset,
                          uint16_t laser_block_id);
-  void unpack(const adu::common::sensor::Surestar::SurestarPacket& pkt,
+  void unpack(const apollo::drivers::Surestar::SurestarPacket& pkt,
               const std::shared_ptr<apollo::drivers::PointCloud>& pc,
               uint32_t* nan_pts);
   // Previous surestar packet time stamp. (offset to the top hour)
@@ -155,11 +155,11 @@ class Surestar16Parser : public SurestarParser {
 class SurestarParserFactory {
  public:
   static SurestarParser* create_parser(
-      const cybertron::proto::SurestarConfig& config);
+      const apollo::drivers::surestar::SurestarConfig& config);
 };
 
 }  // namespace  surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // SURESTAR_INCLUDE_VELODYNE_PARSER_VELODYNE_PARSER_H

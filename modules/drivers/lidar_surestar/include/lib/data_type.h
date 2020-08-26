@@ -20,7 +20,7 @@
 #include <limits>
 #include <memory>
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -159,6 +159,6 @@ struct NMEATime {
 typedef std::shared_ptr<NMEATime> NMEATimePtr;
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // DRIVERS_SURESTAR_DRIVER_INCLUDE_LIB_DATA_TYPE_H

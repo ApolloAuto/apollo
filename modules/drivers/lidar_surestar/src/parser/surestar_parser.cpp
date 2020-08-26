@@ -23,7 +23,7 @@
 
 #include "cyber/cyber.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -66,7 +66,7 @@ apollo::drivers::PointXYZIT SurestarParser::get_nan_point(uint64_t timestamp) {
   return nan_point;
 }
 
-SurestarParser::SurestarParser(const cybertron::proto::SurestarConfig& config)
+SurestarParser::SurestarParser(const apollo::drivers::surestar::SurestarConfig& config)
     : _config(config), _last_time_stamp(0), _mode(STRONGEST) {}
 
 void SurestarParser::init_angle_params(double view_direction,
@@ -107,7 +107,7 @@ void SurestarParser::setup() {
   // get lidars_filter_config and put them into _filter_set
   if (!_config.lidars_filter_config_path().empty()) {
     // read config file
-    cybertron::proto::LidarsFilter lidarsFilter;
+    apollo::drivers::surestar::LidarsFilter lidarsFilter;
     if (!apollo::cyber::common::GetProtoFromFile(
             _config.lidars_filter_config_path(), &lidarsFilter)) {
       AERROR << "Failed to load config file";
@@ -117,7 +117,7 @@ void SurestarParser::setup() {
 
     for (int i = 0; i < lidarsFilter.lidar_size(); i++) {
       if (lidarsFilter.lidar(i).frame_id() == _config.frame_id()) {
-        cybertron::proto::Lidar lidar(lidarsFilter.lidar(i));
+        apollo::drivers::surestar::Lidar lidar(lidarsFilter.lidar(i));
         _filter_grading = lidar.grading();
         for (int j = 0; j < lidar.point_size(); j++) {
           _filter_set.insert(lidar.point(j));
@@ -192,8 +192,8 @@ void SurestarParser::init_sin_cos_rot_table(float* sin_rot_table,
 }
 
 SurestarParser* SurestarParserFactory::create_parser(
-    const cybertron::proto::SurestarConfig& config) {
-  if (config.model() == adu::common::sensor::Surestar::VLP16) {
+    const apollo::drivers::surestar::SurestarConfig& config) {
+  if (config.model() == apollo::drivers::Surestar::VLP16) {
     return new Surestar16Parser(config);
   } else {
     AERROR << " invalid model, must be VLP16|HDL32E|"
@@ -204,4 +204,4 @@ SurestarParser* SurestarParserFactory::create_parser(
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

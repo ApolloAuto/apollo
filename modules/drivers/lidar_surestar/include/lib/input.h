@@ -25,7 +25,7 @@
 #include "modules/drivers/lidar_surestar/include/lib/data_type.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -70,7 +70,7 @@ class Input {
    *          > 0 if incomplete packet (is this possible?)
    */
   virtual int get_firing_data_packet(
-      adu::common::sensor::Surestar::SurestarPacket* pkt) = 0;
+      apollo::drivers::Surestar::SurestarPacket* pkt) = 0;
   virtual int get_positioning_data_packtet(const NMEATimePtr& nmea_time) = 0;
   virtual void init() {}
   virtual void init(uint32_t port) { (void)port; }
@@ -81,6 +81,6 @@ class Input {
 };
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // DRIVERS_SURESTAR_INCLUDE_LIB_INPUT_H

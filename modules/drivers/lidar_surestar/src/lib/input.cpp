@@ -18,7 +18,7 @@
 
 #include "cyber/cyber.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -53,4 +53,4 @@ bool Input::exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
 }
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

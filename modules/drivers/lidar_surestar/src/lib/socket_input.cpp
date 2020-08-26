@@ -24,7 +24,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
@@ -90,7 +90,7 @@ void SocketInput::init(uint32_t port) {
 
 /** @brief Get one surestar packet. */
 int SocketInput::get_firing_data_packet(
-    adu::common::sensor::Surestar::SurestarPacket *pkt) {
+    apollo::drivers::Surestar::SurestarPacket *pkt) {
   // double time1 = ros::Time::Now().toSec();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
@@ -186,4 +186,4 @@ bool SocketInput::input_available(int timeout) {
 
 }  // namespace surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo

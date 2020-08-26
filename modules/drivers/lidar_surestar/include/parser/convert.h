@@ -23,18 +23,18 @@
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 
-namespace autobot {
+namespace apollo {
 namespace drivers {
 namespace surestar {
 
 // convert surestar data to pointcloud and republish
 class Convert {
  public:
-  explicit Convert(const cybertron::proto::SurestarConfig& surestar_config);
+  explicit Convert(const apollo::drivers::surestar::SurestarConfig& surestar_config);
   ~Convert();
 
   void convert_velodyne_to_pointcloud(
-      const std::shared_ptr<adu::common::sensor::Surestar::SurestarScan const>&
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
           scan_msg,
       const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud);
 
@@ -43,11 +43,11 @@ class Convert {
 
  private:
   SurestarParser* _parser;
-  cybertron::proto::SurestarConfig _config;
+  apollo::drivers::surestar::SurestarConfig _config;
 };
 
 }  // namespace  surestar
 }  // namespace drivers
-}  // namespace autobot
+}  // namespace apollo
 
 #endif  // ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_PARSER_CONVERT_H
