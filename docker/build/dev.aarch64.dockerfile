@@ -1,5 +1,5 @@
 ARG BASE_IMAGE_CPU=apolloauto/apollo:cyber-aarch64-18.04-20200717_0327
-ARG BASE_IMAGE_GPU=apolloauto/apollo:cyber-aarch64-18.04-20200719_0434
+ARG BASE_IMAGE_GPU=apolloauto/apollo:cyber-aarch64-18.04-20200826_1538
 
 FROM ${BASE_IMAGE_GPU}
 
