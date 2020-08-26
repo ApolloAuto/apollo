@@ -147,10 +147,10 @@ export function drawV2xBox(dimension, color, linewidth) {
   const material = new THREE.MeshBasicMaterial({
     color,
     transparent: true,
-    opacity:0.8,
+    opacity: 0.8,
   });
   const box = new THREE.Mesh(geometry, material);
-  addOutlineToObject(box, geometry,color,linewidth);
+  addOutlineToObject(box, geometry, color, linewidth);
   return box;
 }
 
