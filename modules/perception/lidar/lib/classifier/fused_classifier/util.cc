@@ -116,6 +116,10 @@ bool LoadMultipleMatricesFile(const std::string& filename,
   matrices->clear();
   size_t num = 0;
   fin >> num;
+  if (num > 100) {
+    fin.close();
+    return false;
+  }
   for (size_t i = 0; i < num; ++i) {
     std::string name;
     fin >> name;
