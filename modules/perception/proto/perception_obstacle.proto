@@ -144,16 +144,17 @@ message PerceptionObstacle {
   // lights of vehicles
   optional LightStatus light_status = 25;
 
+  // Debug Message
+  optional DebugMessage msg = 26;
+
   enum Source {
     HOST_VEHICLE = 0;
     V2X = 1;
   };
 
-  optional Source source = 26 [ default = HOST_VEHICLE ]; // source type
+  optional Source source = 27 [ default = HOST_VEHICLE ]; // source type
   // v2x use case info
-  optional V2XInformation v2x_info = 27;
-  // Debug Message
-  optional DebugMessage msg = 28;
+  optional V2XInformation v2x_info = 28;
 }
 
 message LaneMarker {
