@@ -348,7 +348,7 @@ function determine_gpu_use_amd64() {
     fi
 }
 
-function determine_gpu_use() {
+function determine_gpu_use_host() {
     if [[ "${HOST_ARCH}" == "x86_64" ]]; then
         determine_gpu_use_amd64
     else
@@ -490,7 +490,7 @@ function start_cyber_container() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${image}" \
-        -e USE_GPU="${USE_GPU_HOST}" \
+        -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         -e OMP_NUM_THREADS=1 \
@@ -542,7 +542,7 @@ function main() {
 
     remove_existing_cyber_container
 
-    determine_gpu_use
+    determine_gpu_use_host
     info "DOCKER_RUN_CMD evaluated to: ${DOCKER_RUN_CMD}"
 
     start_cyber_container "${image}"

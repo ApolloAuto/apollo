@@ -515,7 +515,7 @@ function main() {
         -e DOCKER_GRP="${group}"    \
         -e DOCKER_GRP_ID="${gid}"   \
         -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
-        -e USE_GPU="${USE_GPU_HOST}"        \
+        -e USE_GPU_HOST="${USE_GPU_HOST}"   \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${MAP_VOLUMES_CONF}      \
