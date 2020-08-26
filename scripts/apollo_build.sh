@@ -104,11 +104,9 @@ function determine_disabled_build_targets() {
 
 function determine_build_targets() {
   local targets_all
+  local exceptions
   if [[ "$#" -eq 0 ]]; then
-    local exceptions=
-    if ! ${USE_ESD_CAN}; then
-      exceptions="$(determine_disabled_build_targets)"
-    fi
+    exceptions="$(determine_disabled_build_targets)"
     targets_all="//modules/... union //cyber/... ${exceptions}"
     echo "${targets_all}"
     return
@@ -117,12 +115,7 @@ function determine_build_targets() {
   for compo in $@; do
     local build_targets
     local exceptions
-    if [[ "${compo}" == "drivers" ]]; then
-      if ! ${USE_ESD_CAN}; then
-        exceptions="$(determine_disabled_build_targets ${compo})"
-      fi
-      build_targets="//modules/drivers/... ${exceptions}"
-    elif [[ "${compo}" == "cyber" ]]; then
+    if [[ "${compo}" == "cyber" ]]; then
       if [[ "${ARCH}" == "x86_64" ]]; then
         build_targets="//cyber/... union //modules/tools/visualizer/..."
       else
