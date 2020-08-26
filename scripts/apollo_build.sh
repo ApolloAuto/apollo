@@ -68,15 +68,15 @@ function _determine_map_disabled() {
 
 function determine_disabled_build_targets() {
   DISABLED_TARGETS=""
-  local compo="$1"
-  if [ -z "${compo}" ]; then
+  local component="$1"
+  if [ -z "${component}" ]; then
     _determine_drivers_disabled
     _determine_localization_disabled
     _determine_perception_disabled
     _determine_planning_disabled
     _determine_map_disabled
   else
-    case "${compo}" in
+    case "${component}" in
       drivers)
         _determine_drivers_disabled
         ;;
@@ -112,20 +112,20 @@ function determine_build_targets() {
     return
   fi
 
-  for compo in $@; do
+  for component in $@; do
     local build_targets
     local exceptions
-    if [[ "${compo}" == "cyber" ]]; then
+    if [[ "${component}" == "cyber" ]]; then
       if [[ "${ARCH}" == "x86_64" ]]; then
         build_targets="//cyber/... union //modules/tools/visualizer/..."
       else
         build_targets="//cyber/..."
       fi
-    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-      exceptions="$(determine_disabled_build_targets ${compo})"
-      build_targets="//modules/${compo}/... ${exceptions}"
+    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
+      exceptions="$(determine_disabled_build_targets ${component})"
+      build_targets="//modules/${component}/... ${exceptions}"
     else
-      error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+      error "Oops, no such component '${component}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
@@ -207,7 +207,7 @@ function build_simulator() {
     else
       fail "Building Apollo simulator failed."
     fi
-    popd > /dev/null
+    popd >/dev/null
   fi
 }
 

@@ -87,23 +87,23 @@ function determine_disabled_targets() {
     return
   fi
 
-  for compo in $@; do
-    case "${compo}" in
-    drivers)
-      _determine_drivers_disabled
-      ;;
-    localization)
-      _determine_localization_disabled
-      ;;
-    perception)
-      _determine_perception_disabled
-      ;;
-    planning)
-      _determine_planning_disabled
-      ;;
-    map)
-      _determine_map_disabled
-      ;;
+  for component in $@; do
+    case "${component}" in
+      drivers)
+        _determine_drivers_disabled
+        ;;
+      localization)
+        _determine_localization_disabled
+        ;;
+      perception)
+        _determine_perception_disabled
+        ;;
+      planning)
+        _determine_planning_disabled
+        ;;
+      map)
+        _determine_map_disabled
+        ;;
     esac
   done
 
@@ -118,14 +118,14 @@ function determine_test_targets() {
     return
   fi
 
-  for compo in $@; do
+  for component in $@; do
     local test_targets
-    if [[ "${compo}" == "cyber" ]]; then
+    if [[ "${component}" == "cyber" ]]; then
       test_targets="//cyber/..."
-    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-      test_targets="//modules/${compo}/..."
+    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
+      test_targets="//modules/${component}/..."
     else
-      error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+      error "Oops, no such component '${component}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
