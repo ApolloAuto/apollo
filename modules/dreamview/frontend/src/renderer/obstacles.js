@@ -6,7 +6,7 @@ import Text3D from 'renderer/text3d';
 import { copyProperty, hideArrayObjects, calculateLaneMarkerPoints } from 'utils/misc';
 import {
   drawSegmentsFromPoints, drawDashedLineFromPoints,
-  drawBox, drawV2xBox,drawDashedBox, drawArrow, drawImage,drawV2xPolygonFace,
+  drawBox, drawV2xBox, drawDashedBox, drawArrow, drawImage, drawV2xPolygonFace,
 } from 'utils/draw';
 
 import iconObjectYield from 'assets/images/decision/object-yield.png';
@@ -70,7 +70,7 @@ export default class PerceptionObstacles {
     for (let i = 0; i < objects.length; i++) {
       const obstacle = objects[i];
       if (!STORE.options[`showObstacles${_.upperFirst(_.camelCase(obstacle.type))}`]
-                || !_.isNumber(obstacle.positionX) || !_.isNumber(obstacle.positionY)) {
+        || !_.isNumber(obstacle.positionX) || !_.isNumber(obstacle.positionY)) {
         continue;
       }
 
@@ -81,7 +81,6 @@ export default class PerceptionObstacles {
       );
       const color = ObstacleColorMapping[obstacle.type] || DEFAULT_COLOR;
       const v2x = [];
-      //STORE.options.showObstaclesV2xInfo 添加这部分进行switch开关判断
       if (STORE.options.showObstaclesV2xInfo) {
         const source = obstacle.source;
         if (source !== undefined && source === 'V2X') {
@@ -91,10 +90,11 @@ export default class PerceptionObstacles {
           });
         }
       }
+
       const isV2x = !_.isEmpty(v2x);
 
       if (STORE.options.showObstaclesVelocity && obstacle.type
-                    && obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
+        && obstacle.type !== 'UNKNOWN_UNMOVABLE' && obstacle.speed > 0.5) {
         const arrowMesh = this.updateArrow(position,
           obstacle.speedHeading, color, scene);
         this.arrowIdx++;
@@ -108,7 +108,7 @@ export default class PerceptionObstacles {
         this.arrowIdx++;
       }
 
-      this.updateTexts(adc, obstacle, position, scene, isBirdView,v2x);
+      this.updateTexts(adc, obstacle, position, scene, isBirdView, v2x);
 
       // get the confidence and validate its range
       let confidence = obstacle.confidence;
@@ -158,7 +158,7 @@ export default class PerceptionObstacles {
 
   updateSensorMeasurements(world, coordinates, scene) {
     if (!STORE.options.showObstaclesLidarSensor && !STORE.options.showObstaclesRadarSensor
-            && !STORE.options.showObstaclesCameraSensor) {
+      && !STORE.options.showObstaclesCameraSensor) {
       return;
     }
 
@@ -258,7 +258,7 @@ export default class PerceptionObstacles {
     return arrowMesh;
   }
 
-  updateTexts(adc, obstacle, obstaclePosition, scene, isBirdView,v2xInfo) {
+  updateTexts(adc, obstacle, obstaclePosition, scene, isBirdView, v2xInfo) {
     const initPosition = {
       x: obstaclePosition.x,
       y: obstaclePosition.y,
@@ -295,7 +295,7 @@ export default class PerceptionObstacles {
           z: initPosition.z + (lineCount * deltaZ),
         };
         this.drawTexts(priority, textPosition, scene);
-        if(isV2x) {lineCount++;}
+        if (isV2x) { lineCount++; }
       }
     }
     if (isV2x) {
@@ -331,7 +331,7 @@ export default class PerceptionObstacles {
         continue;
       }
 
-      v2xFaceMesh.position.set(facePosition.x, facePosition.y,height);
+      v2xFaceMesh.position.set(facePosition.x, facePosition.y, height);
 
       // Set face scale.
       const edgeDistance = v.distanceTo(vNext);
@@ -389,7 +389,7 @@ export default class PerceptionObstacles {
   }
 
   updateV2xCube(length, width, height, position, heading, color, scene) {
-    const v2xCubeMesh = this.getCube(this.v2xCubeIdx,scene,true,true);
+    const v2xCubeMesh = this.getCube(this.v2xCubeIdx, scene, true, true);
     v2xCubeMesh.position.set(
       position.x, position.y, position.z);
     v2xCubeMesh.scale.set(length, width, height);
@@ -402,7 +402,7 @@ export default class PerceptionObstacles {
 
   updateCube(length, width, height, position, heading, color, confidence, scene) {
     if (confidence > 0) {
-      const solidCubeMesh = this.getCube(this.cubeIdx, scene, true,false);
+      const solidCubeMesh = this.getCube(this.cubeIdx, scene, true, false);
       solidCubeMesh.position.set(
         position.x, position.y, position.z + height * (confidence - 1) / 2);
       solidCubeMesh.scale.set(length, width, height * confidence);
@@ -412,7 +412,7 @@ export default class PerceptionObstacles {
     }
 
     if (confidence < 1) {
-      const dashedCubeMesh = this.getCube(this.cubeIdx, scene, false,false);
+      const dashedCubeMesh = this.getCube(this.cubeIdx, scene, false, false);
       dashedCubeMesh.position.set(
         position.x, position.y, position.z + height * confidence / 2);
       dashedCubeMesh.scale.set(length, width, height * (1 - confidence));
@@ -448,7 +448,7 @@ export default class PerceptionObstacles {
     return arrowMesh;
   }
 
-  getFace(index, scene, solid = true,v2x = false) {
+  getFace(index, scene, solid = true, v2x = false) {
     const extrusionFaces = v2x ? this.v2xSolidFaces :
       (solid ? this.extrusionSolidFaces : this.extrusionDashedFaces);
     if (index < extrusionFaces.length) {
@@ -463,7 +463,7 @@ export default class PerceptionObstacles {
     ];
     const extrusionFace = v2x ? drawV2xPolygonFace()
       : (solid
-        ? drawSegmentsFromPoints(points,DEFAULT_COLOR,LINE_THICKNESS)
+        ? drawSegmentsFromPoints(points, DEFAULT_COLOR, LINE_THICKNESS)
         : drawDashedLineFromPoints(points, DEFAULT_COLOR, LINE_THICKNESS, 0.1, 0.1));
     extrusionFace.visible = false;
     extrusionFaces.push(extrusionFace);
