@@ -215,6 +215,10 @@ bool load_frame_objects(const std::string& filename,
   auto load_polygon = [&](PointCloud* poly) {
     size_t size = 0;
     fin >> size;
+    if (size > 10000) {
+      fin.close();
+      return;
+    }
     poly->resize(size);
     for (size_t i = 0; i < size; ++i) {
       fin >> poly->points[i].x >> poly->points[i].y >> poly->points[i].z;
