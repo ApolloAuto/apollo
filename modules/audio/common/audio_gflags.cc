@@ -22,3 +22,6 @@ DEFINE_string(torch_siren_detection_model,
               "Siren detection model file");
 
 DEFINE_string(audio_records_dir, "", "The dir path to offline cyber records");
+DEFINE_string(audio_conf_file,
+              "/apollo/modules/audio/conf/audio_conf.pb.txt",
+              "Default conf file for audio module");

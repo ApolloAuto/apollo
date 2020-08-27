@@ -16,8 +16,8 @@ py_binary(
 )
 
 cc_binary(
-    name = "audio_profiling",
-    srcs = ["audio_profiling.cc"],
+    name = "audio_offline_processing",
+    srcs = ["audio_offline_processing.cc"],
     copts = [
         "-DMODULE_NAME=\\\"audio\\\"",
     ],
@@ -26,7 +26,10 @@ cc_binary(
     ],
     deps = [
         "//cyber",
+        "//modules/audio/common:audio_gflags",
         "//modules/audio/common:message_process",
+        "//modules/audio/proto:audio_event_cc_proto",
+        "@boost",
     ],
 )
 
