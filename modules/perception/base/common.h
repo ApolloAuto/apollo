@@ -16,7 +16,7 @@
 
 #pragma once
 
-#ifndef PERCEPTION_CPU_ONLY
+#ifndef CPU_ONLY
 
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
@@ -31,7 +31,7 @@ namespace base {
 #define NO_GPU assert(false)
 #endif
 
-#ifndef PERCEPTION_CPU_ONLY
+#ifndef CPU_ONLY
 
 #define BASE_CUDA_CHECK(condition) \
   { apollo::perception::base::GPUAssert((condition), __FILE__, __LINE__); }

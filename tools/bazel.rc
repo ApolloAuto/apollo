@@ -56,6 +56,7 @@ build:optimize --host_copt=-march=native
 build:optimize --define with_default_optimizations=true
 
 build:cpu --define USE_GPU=false
+build:cpu --cxxopt=-DCPU_ONLY
 build:gpu --define USE_GPU=true
 build:opt_gpu --config=opt --config=gpu
 
@@ -79,7 +80,7 @@ build --host_cxxopt="-std=c++14"
 test --flaky_test_attempts=3
 test --test_size_filters=small,medium
 # test --test_env=LD_LIBRARY_PATH
-test --test_env=PYTHONPATH
+# test --test_env=PYTHONPATH
 
 # By default prints output only from failed tests.
 test --test_output=errors

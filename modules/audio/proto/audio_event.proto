@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
-// build perception with cpu or gpu
-/* #undef CPU_ONLY */
+syntax = "proto2";
 
-// build perception with using cyber log lib or glog lib
-/* #undef PERCEPTION_USE_CYBER */
+package apollo.audio;
+
+import "modules/audio/proto/audio_common.proto";
+import "modules/common/proto/header.proto";
+import "modules/localization/proto/pose.proto";
+
+message AudioEvent {
+  optional apollo.common.Header header = 1;
+  optional int32 id = 2;  // obstacle ID.
+  optional apollo.audio.MovingResult moving_result = 3 [default = UNKNOWN];
+  optional apollo.audio.AudioType audio_type = 4 [default = UNKNOWN_TYPE];
+  optional bool siren_is_on = 5;
+  optional apollo.audio.AudioDirection audio_direction = 6 [default = UNKNOWN_DIRECTION];
+  optional apollo.localization.Pose pose = 7;
+}

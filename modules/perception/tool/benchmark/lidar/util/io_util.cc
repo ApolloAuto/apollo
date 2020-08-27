@@ -108,7 +108,10 @@ bool load_frame_objects(const std::string& filename,
   int frame_id = -1;
   int object_number = -1;
   fin >> frame_id >> object_number;
-
+  if (object_number < 0 || object_number > 10000) {
+    fin.close();
+    return false;
+  }
   objects_out->clear();
 
   for (int i = 0; i < object_number; ++i) {
@@ -179,6 +182,7 @@ bool load_frame_objects(const std::string& filename,
                point_number != indice_number) {
       std::cerr << "illegal object with different points & indices" << filename
                 << " object " << i << std::endl;
+      fin.close();
       return false;
     }
 
@@ -211,6 +215,10 @@ bool load_frame_objects(const std::string& filename,
   auto load_polygon = [&](PointCloud* poly) {
     size_t size = 0;
     fin >> size;
+    if (size > 10000) {
+      fin.close();
+      return;
+    }
     poly->resize(size);
     for (size_t i = 0; i < size; ++i) {
       fin >> poly->points[i].x >> poly->points[i].y >> poly->points[i].z;

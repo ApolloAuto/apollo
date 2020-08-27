@@ -1,5 +1,5 @@
 ARG BASE_IMAGE_CPU=apolloauto/apollo:cyber-aarch64-18.04-20200717_0327
-ARG BASE_IMAGE_GPU=apolloauto/apollo:cyber-aarch64-18.04-20200719_0434
+ARG BASE_IMAGE_GPU=apolloauto/apollo:cyber-aarch64-18.04-20200826_1538
 
 FROM ${BASE_IMAGE_GPU}
 
@@ -25,5 +25,5 @@ RUN bash /tmp/installers/install_gpu_support.sh # ${WORKHORSE}
 #RUN bash /tmp/installers/install_contrib_deps.sh ${INSTALL_MODE}
 #RUN bash /tmp/installers/install_3rdparty_pept_deps.sh ${INSTALL_MODE}
 
-#RUN bash /tmp/installers/install_release_stage.sh
+#RUN bash /tmp/installers/install_release_deps.sh
 RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}

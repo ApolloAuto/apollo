@@ -18,6 +18,7 @@
 #define CYBER_RECORD_RECORD_WRITER_H_
 
 #include <cstdint>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -184,7 +185,9 @@ class RecordWriter : public RecordBase {
   MessageTypeMap channel_message_type_map_;
   MessageProtoDescMap channel_proto_desc_map_;
   FileWriterPtr file_writer_ = nullptr;
-  FileWriterPtr file_writer_backup_ = nullptr;
+  // Initialize with a dummy value to simplify checking later
+  std::future<void> old_file_writer_closer_ =
+      std::async(std::launch::async, []() {});
   std::mutex mutex_;
   std::stringstream sstream_;
 };

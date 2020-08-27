@@ -71,9 +71,14 @@ class TrajectoryImitationLibtorchInference : public ModelInference {
   bool LoadCNNModel();
 
   /**
-   * @brief load a CNN_LSTM model
+   * @brief load a SELF_CNN_LSTM like model
    */
-  bool LoadCNNLSTMModel();
+  bool LoadSelfCNNLSTMModel();
+
+  /**
+   * @brief load a CNN_LSTM like model
+   */
+  bool LoadHistoryUnconditionedCNNLSTMModel();
 
   /**
    * @brief inference a CONV_RNN model
@@ -88,10 +93,17 @@ class TrajectoryImitationLibtorchInference : public ModelInference {
   bool DoCNNMODELInference(LearningDataFrame* learning_data_frame);
 
   /**
-   * @brief inference a CNN_LSTM model
+   * @brief inference a SELF_CNN_LSTM like model
    * @param learning_data_frame input and output intermediate for inference
    */
-  bool DoCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
+  bool DoSelfCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
+
+  /**
+   * @brief inference a CNN_LSTM like model
+   * @param learning_data_frame input and output intermediate for inference
+   */
+  bool DoHistoryUnconditionedCNNLSTMMODELInference(
+      LearningDataFrame* learning_data_frame);
 
   torch::jit::script::Module model_;
   torch::Device device_;

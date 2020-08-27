@@ -46,7 +46,8 @@ message LearningModelInferenceTaskConfig {
   enum ModelType {
     CONV_RNN = 1;
     CNN = 2;
-    CNN_LSTM = 3;
+    SELF_CNN_LSTM = 3;
+    HISTORY_UNCONDITIONED_CNN_LSTM = 4;
   }
   optional ModelType model_type = 1;
   optional string cpu_model_file = 2;
@@ -173,6 +174,8 @@ message PathLaneBorrowDeciderConfig {
 
 message PathReferenceDeciderConfig {
   optional uint32 min_path_reference_length = 1 [default = 20];
+  // learning model s weight
+  optional double weight_x_ref_path_reference = 2;
 }
 
 //////////////////////////////////

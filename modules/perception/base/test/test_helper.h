@@ -46,7 +46,7 @@ struct CPUDevice {
 template <typename Dtype>
 class CPUDeviceTest : public MultiDeviceTest<CPUDevice<Dtype>> {};
 
-#ifdef PERCEPTION_CPU_ONLY
+#ifdef CPU_ONLY
 
 typedef ::testing::Types<CPUDevice<float>, CPUDevice<double>>
     TestDtypesAndDevices;

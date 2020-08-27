@@ -533,6 +533,7 @@ void MessageProcess::GenerateObstacleTrajectory(
 }
 
 void MessageProcess::GenerateObstaclePrediction(
+    const int frame_num,
     const PredictionObstacle& prediction_obstacle,
     const ADCCurrentInfo& adc_curr_info, ObstacleFeature* obstacle_feature) {
   const auto obstacle_id = obstacle_feature->id();
@@ -561,8 +562,8 @@ void MessageProcess::GenerateObstaclePrediction(
                 .trajectory_point().relative_time();
         if (obstacle_trajectory_point.relative_time() < last_relative_time) {
           std::ostringstream msg;
-          msg << "DISCARD prediction trajectory point: obstacle_id["
-              << obstacle_id << "] last_relative_time["
+          msg << "DISCARD prediction trajectory point: frame_num[" << frame_num
+              << "] obstacle_id[" << obstacle_id << "] last_relative_time["
               << last_relative_time << "] relative_time["
               << obstacle_trajectory_point.relative_time() << "]";
           AERROR << msg.str();
@@ -638,7 +639,8 @@ void MessageProcess::GenerateObstacleFeature(
                                obstacle_feature);
 
     // obstacle prediction
-    GenerateObstaclePrediction(m.second, adc_curr_info, obstacle_feature);
+    GenerateObstaclePrediction(frame_num, m.second, adc_curr_info,
+                               obstacle_feature);
   }
 }
 
@@ -698,6 +700,9 @@ bool MessageProcess::GenerateLocalRouting(
   if (!GetADCCurrentRoutingIndex(&adc_road_index, &adc_passage_index,
                                  &adc_passage_s) ||
       adc_road_index < 0 || adc_passage_index < 0 || adc_passage_s < 0) {
+    // reset localization history
+    localizations_.clear();
+
     std::ostringstream msg;
     msg << "DISCARD: fail to locate ADC on routing. frame_num["
         << frame_num << "]";

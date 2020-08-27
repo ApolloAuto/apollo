@@ -124,7 +124,7 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
 
   bool success = false;
 
-#ifdef PERCEPTION_CPU_ONLY  // copy to host memory
+#ifdef CPU_ONLY  // copy to host memory
   AINFO << "Fill in CPU mode ...";
   if (handler_ != nullptr) {
     AERROR << "Undistortion DO NOT support CPU mode!";

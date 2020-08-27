@@ -27,23 +27,75 @@ ARCH="$(uname -m)"
 
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
+DISABLED_TARGETS=
 
-function determine_disabled_bazel_targets() {
-  local disabled=
-  local compo="$1"
-  if [[ -z "${compo}" || "${compo}" == "drivers" ]]; then
-    if ! ${USE_ESD_CAN}; then
-      warning "ESD CAN library supplied by ESD Electronics doesn't exist."
-      warning "If you need ESD CAN, please refer to:"
-      warning "  third_party/can_card_library/esd_can/README.md"
-      disabled="${disabled} except //modules/drivers/canbus/can_client/esd/..."
-    fi
-  elif [[ "${compo}" == "localization" && "${ARCH}" != "x86_64" ]]; then
+function _determine_drivers_disabled() {
+  if ! ${USE_ESD_CAN}; then
+    warning "ESD CAN library supplied by ESD Electronics doesn't exist."
+    warning "If you need ESD CAN, please refer to:"
+    warning "  third_party/can_card_library/esd_can/README.md"
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
+  fi
+}
+
+function _determine_perception_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    warning "Perception module can not work without GPU, all targets skipped"
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
+  fi
+}
+
+function _determine_localization_disabled() {
+  if [ "${ARCH}" != "x86_64" ]; then
     # Skip msf for non-x86_64 platforms
-    disabled="${disabled} except //modules/localization/msf/..."
+    DISABLED_TARGETS="${disabled} except //modules/localization/msf/..."
+  fi
+}
+
+function _determine_planning_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/open_space/trajectory_smoother:planning_block \
+                      except //modules/planning/learning_based/..."
+  fi
+}
+
+function _determine_map_disabled() {
+  if [ "${USE_GPU}" -eq 0 ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/map/pnc_map:cuda_pnc_util \
+                      except //modules/map/pnc_map:cuda_util_test"
+  fi
+}
+
+function determine_disabled_build_targets() {
+  DISABLED_TARGETS=""
+  local component="$1"
+  if [ -z "${component}" ]; then
+    _determine_drivers_disabled
+    _determine_localization_disabled
+    _determine_perception_disabled
+    _determine_planning_disabled
+    _determine_map_disabled
+  else
+    case "${component}" in
+      drivers)
+        _determine_drivers_disabled
+        ;;
+      localization)
+        _determine_localization_disabled
+        ;;
+      perception)
+        _determine_perception_disabled
+        ;;
+      planning)
+        _determine_planning_disabled
+        ;;
+      map)
+        _determine_map_disabled
+        ;;
+    esac
   fi
 
-  echo "${disabled}"
+  echo "${DISABLED_TARGETS}"
   # DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
 }
 
@@ -52,34 +104,24 @@ function determine_disabled_bazel_targets() {
 
 function determine_build_targets() {
   local targets_all
+  local exceptions
   if [[ "$#" -eq 0 ]]; then
-    local exceptions=
-    if ! ${USE_ESD_CAN}; then
-      exceptions="$(determine_disabled_bazel_targets)"
-    fi
+    exceptions="$(determine_disabled_build_targets)"
     targets_all="//modules/... union //cyber/... ${exceptions}"
     echo "${targets_all}"
     return
   fi
 
-  for compo in $@; do
+  for component in $@; do
     local build_targets
-    if [[ "${compo}" == "drivers" ]]; then
-      local exceptions=
-      if ! ${USE_ESD_CAN}; then
-        exceptions="$(determine_disabled_build_targets ${compo})"
-      fi
-      build_targets="//modules/drivers/... ${exceptions}"
-    elif [[ "${compo}" == "cyber" ]]; then
-      if [[ "${ARCH}" == "x86_64" ]]; then
-        build_targets="//cyber/... union //modules/tools/visualizer/..."
-      else
-        build_targets="//cyber/..."
-      fi
-    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-      build_targets="//modules/${compo}/..."
+    local exceptions
+    if [[ "${component}" == "cyber" ]]; then
+      build_targets="//cyber/... union //modules/tools/visualizer/..."
+    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
+      exceptions="$(determine_disabled_build_targets ${component})"
+      build_targets="//modules/${component}/... ${exceptions}"
     else
-      error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+      error "Oops, no such component '${component}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
@@ -144,6 +186,7 @@ function bazel_build() {
 
   local build_targets
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
+  build_targets="$(echo ${build_targets} | xargs)"
 
   info "Build Overview: "
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
@@ -161,7 +204,7 @@ function build_simulator() {
     else
       fail "Building Apollo simulator failed."
     fi
-    popd > /dev/null
+    popd >/dev/null
   fi
 }
 

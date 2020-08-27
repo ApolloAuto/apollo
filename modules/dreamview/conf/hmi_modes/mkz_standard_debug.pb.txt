@@ -1,4 +1,10 @@
 cyber_modules {
+  key: "AudioDetection"
+  value: {
+    dag_files: "/apollo/modules/audio/dag/audio.dag"
+  }
+}
+cyber_modules {
   key: "Camera"
   value: {
     dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"

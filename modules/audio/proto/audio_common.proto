@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
+syntax = "proto2";
 
-// build perception with cpu or gpu
-#cmakedefine PERCEPTION_CPU_ONLY
+package apollo.audio;
 
-// build perception with using cyber log lib or glog lib
-#cmakedefine PERCEPTION_USE_CYBER
+enum MovingResult {
+  UNKNOWN = 0;
+  APPROACHING = 1;
+  DEPARTING = 2;
+  STATIONARY = 3;
+}
 
+enum AudioType {
+  UNKNOWN_TYPE = 0;
+  POLICE = 1;
+  AMBULANCE = 2;
+  FIRETRUCK = 3;
+}
 
+enum AudioDirection {
+  UNKNOWN_DIRECTION = 0;
+  FRONT = 1;
+  LEFT = 2;
+  BACK = 3;
+  RIGHT = 4;
+}

@@ -45,6 +45,7 @@ import psutil
 
 
 SMALL_TOPICS = [
+    '/apollo/audio_detection',
     '/apollo/canbus/chassis',
     '/apollo/canbus/chassis_detail',
     '/apollo/common/latency_records',
@@ -82,7 +83,6 @@ SMALL_TOPICS = [
     '/apollo/sensor/gnss/rtk_eph',
     '/apollo/sensor/gnss/rtk_obs',
     '/apollo/sensor/gnss/heading',
-    '/apollo/sensor/microphone',
     '/apollo/sensor/mobileye',
     '/apollo/storytelling',
     '/tf',
@@ -110,12 +110,13 @@ LARGE_TOPICS = [
     '/apollo/sensor/lidar16/rear/right/PointCloud2',
     '/apollo/sensor/lidar16/fusion/PointCloud2',
     '/apollo/sensor/lidar16/fusion/compensator/PointCloud2',
-    '/apollo/sensor/velodyne64/compensator/PointCloud2',
     '/apollo/sensor/lidar128/PointCloud2',
     '/apollo/sensor/lidar128/compensator/PointCloud2',
     '/apollo/sensor/lidar16/Scan',
     '/apollo/sensor/lidar16/PointCloud2',
     '/apollo/sensor/lidar16/compensator/PointCloud2',
+    '/apollo/sensor/microphone',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
 ]
 
 def shell_cmd(cmd, alert_on_failure=True):

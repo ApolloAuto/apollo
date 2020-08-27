@@ -24,7 +24,11 @@ source "${TOP_DIR}/scripts/apollo.bashrc"
 CORE_DIR="${TOP_DIR}/data/core"
 LOG_DIR="${TOP_DIR}/data/log"
 
-function _clean_cache() {
+BAZEL_CLEAN_EXPUNGE=0
+CORE_DUMP_CLEANUP=0
+LOG_FILES_CLEANUP=0
+
+function _clean_bazel_cache() {
   local opt="--async"
   if [ "$1" == "--expunge" ]; then
     opt="--expunge_async"
@@ -34,9 +38,9 @@ function _clean_cache() {
 
   # Remove bazel cache in associated directories
   if [ -d /apollo-simulator ]; then
-    pushd /apollo-simulator > /dev/null
+    pushd /apollo-simulator >/dev/null
     bazel clean ${opt}
-    popd > /dev/null
+    popd >/dev/null
   fi
 }
 
@@ -66,33 +70,75 @@ function _clean_docs() {
 
 function _print_usage() {
   echo -e "Usage:\n  $0 [options]\nOptions:"
+  echo "${TAB}--bazel     Remove bazel output"
+  echo "${TAB}--core      Remove coredump files"
+  echo "${TAB}--log       Remove log files"
+  echo "${TAB}-a, --all   Equivalent to \"--bazel --core --log\""
   echo "${TAB}--expunge   Run \"bazel clean --expunge\""
+
   echo "${TAB}-h, --help  Show this message"
 }
 
+function parse_arguments() {
+  while [ $# -gt 0 ]; do
+    local opt="$1"
+    shift
+    case "${opt}" in
+      --bazel)
+        [ "${BAZEL_CLEAN_EXPUNGE}" -eq 0 ] && BAZEL_CLEAN_EXPUNGE=1
+        ;;
+      --core)
+        CORE_DUMP_CLEANUP=1
+        ;;
+      --log)
+        LOG_FILES_CLEANUP=1
+        ;;
+      --expunge)
+        BAZEL_CLEAN_EXPUNGE=2
+        ;;
+      -a | --all)
+        CORE_DUMP_CLEANUP=1
+        LOG_FILES_CLEANUP=1
+        [ "${BAZEL_CLEAN_EXPUNGE}" -eq 0 ] && BAZEL_CLEAN_EXPUNGE=1
+        ;;
+      -h | --help)
+        _print_usage
+        exit 1
+        ;;
+      *)
+        _print_usage
+        exit 1
+        ;;
+    esac
+  done
+}
+
 function main() {
-  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    _print_usage
-    exit 1
-  fi
+  parse_arguments "$@"
 
   if ! "${APOLLO_IN_DOCKER}"; then
     error "The clean operation should be run from within docker container"
     exit 1
   fi
 
-  _clean_cache "$@"
+  if [ "${BAZEL_CLEAN_EXPUNGE}" -eq 2 ]; then
+    info "Clean bazel cache, opcode=${BAZEL_CLEAN_EXPUNGE}"
+    _clean_bazel_cache "--expunge"
+  elif [ "${BAZEL_CLEAN_EXPUNGE}" -eq 1 ]; then
+    info "Clean bazel cache, opcode=${BAZEL_CLEAN_EXPUNGE}"
+    _clean_bazel_cache
+  fi
+
   _clean_config
   _clean_docs
 
-  local answer
-  typeset -l answer
-  warning "Do you want to remove all log files under \"${LOG_DIR}\"" \
-    "and core dump files under \"${CORE_DIR}\" (Y/n)?"
-  answer=$(read_one_char_from_stdin)
-  info "Your choice is: ${answer}"
-  if [ "${answer}" == "y" ]; then
+  if [ "${CORE_DUMP_CLEANUP}" -eq 1 ]; then
+    info "Cleanup core dump files under data/core/ ..."
     _clean_core
+  fi
+
+  if [ "${LOG_FILES_CLEANUP}" -eq 1 ]; then
+    info "Cleanup log files under data/log/ ..."
     _clean_log
   fi
 

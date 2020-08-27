@@ -76,15 +76,15 @@ function determine_disabled_targets() {
   fi
 
   local disabled=
-  for compo in $@; do
-    if [[ "${compo}" == "drivers" ]]; then
+  for component in $@; do
+    if [[ "${component}" == "drivers" ]]; then
       if ! ${USE_ESD_CAN}; then
         warning "ESD CAN library supplied by ESD Electronics doesn't exist."
         warning "If you need ESD CAN, please refer to:"
         warning "  third_party/can_card_library/esd_can/README.md"
         disabled="${disabled} except //modules/drivers/canbus/can_client/esd/..."
       fi
-    elif [[ "${compo}" == "localization" ]]; then
+    elif [[ "${component}" == "localization" ]]; then
       if [[ "${ARCH}" != "x86_64" ]]; then
         disabled="${disabled} except //modules/localization/msf/..."
       fi
@@ -103,14 +103,14 @@ function determine_test_targets() {
     return
   fi
 
-  for compo in $@; do
+  for component in $@; do
     local test_targets
-    if [[ "${compo}" == "cyber" ]]; then
+    if [[ "${component}" == "cyber" ]]; then
       test_targets="//cyber/..."
-    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${compo}" ]]; then
-      test_targets="//modules/${compo}/..."
+    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
+      test_targets="//modules/${component}/..."
     else
-      error "Oops, no such component '${compo}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+      error "Oops, no such component '${component}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
