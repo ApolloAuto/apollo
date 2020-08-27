@@ -343,7 +343,7 @@ class CyberChannelecho(object):
         # print type(raw_data) # str
         # print raw_data # str
 
-        msgtype = cyber.ChannelUtils.get_msgtype(self.channel_name, 0)
+        msgtype = cyber.ChannelUtils.get_msgtype(self.channel_name, 0).decode('utf-8')
         print(cyber.ChannelUtils.get_debugstring_rawmsgdata(msgtype, raw_data))
 
 
