@@ -9,7 +9,6 @@ build:gpu --config=cuda
 build:gpu --config=tensorrt
 
 #build:gpu --action_env USE_GPU=1
-#build --config=tensorrt
 
 ## The following was adapted from tensorflow/.bazelrc
 

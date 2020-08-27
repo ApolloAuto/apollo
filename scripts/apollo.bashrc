@@ -84,7 +84,7 @@ function fail() {
   exit 1
 }
 
-function determine_gpu_use() {
+function determine_gpu_use_target() {
   local arch="$(uname -m)"
   local use_gpu=0
 
@@ -95,7 +95,6 @@ function determine_gpu_use() {
       fi
     fi
   else ## x86_64 mode
-    # TODO(all): remove USE_GPU env var in {cyber,dev}_start.sh"
     # Check nvidia-driver and GPU device
     local nv_driver="nvidia-smi"
     if [ ! -x "$(command -v ${nv_driver})" ]; then
@@ -106,7 +105,7 @@ function determine_gpu_use() {
       use_gpu=1
     fi
   fi
-  export USE_GPU="${use_gpu}"
+  export USE_GPU_TARGET="${use_gpu}"
 }
 
 function file_ext() {
@@ -173,8 +172,8 @@ function run() {
     "${@}" || exit $?
   else
     local errfile="${APOLLO_ROOT_DIR}/.errors.log"
-    echo "${@}" > "${errfile}"
-    if ! "${@}" >> "${errfile}" 2>&1; then
+    echo "${@}" >"${errfile}"
+    if ! "${@}" >>"${errfile}" 2>&1; then
       local exitcode=$?
       cat "${errfile}" 1>&2
       exit $exitcode
@@ -184,22 +183,22 @@ function run() {
 
 #commit_id=$(git log -1 --pretty=%H)
 function git_sha1() {
-  if [ -x "$(which git 2> /dev/null)" ] \
-    && [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
-    git rev-parse --short HEAD 2> /dev/null || true
+  if [ -x "$(which git 2>/dev/null)" ] &&
+    [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+    git rev-parse --short HEAD 2>/dev/null || true
   fi
 }
 
 function git_date() {
-  if [ -x "$(which git 2> /dev/null)" ] \
-    && [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+  if [ -x "$(which git 2>/dev/null)" ] &&
+    [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git log -1 --pretty=%ai | cut -d " " -f 1 || true
   fi
 }
 
 function git_branch() {
-  if [ -x "$(which git 2> /dev/null)" ] \
-    && [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
+  if [ -x "$(which git 2>/dev/null)" ] &&
+    [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git rev-parse --abbrev-ref HEAD
   else
     echo "@non-git"
@@ -224,10 +223,10 @@ function setup_gpu_support() {
     add_to_path "/usr/local/cuda/bin"
   fi
 
-  determine_gpu_use
+  determine_gpu_use_target
 
   local dev=
-  if [ "${USE_GPU}" -eq 0 ]; then
+  if [ "${USE_GPU_TARGET}" -eq 0 ]; then
     dev="cpu"
   else
     dev="gpu"
@@ -235,7 +234,7 @@ function setup_gpu_support() {
 
   local torch_path="/usr/local/libtorch_${dev}/lib"
   if [ -d "${torch_path}" ]; then
-    # FIXME(all): --config=cpu/gpu
+    # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
     export LD_LIBRARY_PATH="${torch_path}:$LD_LIBRARY_PATH"
   fi
 }
