@@ -216,7 +216,7 @@ export function drawShapeFromPoints(points,
   const mesh = new THREE.Mesh(geometry, material);
   addOffsetZ(mesh, order);
   mesh.matrixAutoUpdate = matrixAutoUpdate;
-  if (matrixAutoUpdate === false) {
+  if (!matrixAutoUpdat) {
     mesh.updateMatrix();
   }
   return mesh;
