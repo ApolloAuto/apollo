@@ -122,6 +122,7 @@ function _usage() {
   ${BLUE}build_prof [module]${NO_COLOR}: build with perf profiling support. Not implemented yet.
   ${BLUE}doc${NO_COLOR}: generate doxygen document
   ${BLUE}clean${NO_COLOR}: cleanup bazel output and log/coredump files
+  ${BLUE}format${NO_COLOR}: fix style of C++/Python/Bazel/Shell files
   ${BLUE}usage${NO_COLOR}: show this message
   "
 }

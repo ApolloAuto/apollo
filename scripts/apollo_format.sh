@@ -26,14 +26,15 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 function print_usage() {
-  info "Usage: $0 [options] <path/to/src/dir/or/files> "
-  info "Options:"
-  info "${TAB}-p|--python      Format Python code"
-  info "${TAB}-b|--bazel       Format Bazel code"
-  info "${TAB}-c|--cpp         Format cpp code"
-  info "${TAB}-s|--shell       Format Shell code"
-  info "${TAB}-a|--all         Format all (C++/Python/Bazel/Shell)"
-  info "${TAB}-h|--help        # Show this message"
+  echo -e "\n${RED}Usage${NO_COLOR}:
+  .${BOLD}$0${NO_COLOR} [OPTION] <path/to/src/dir/or/files>"
+  echo -e "\n${RED}Options${NO_COLOR}:
+  ${BLUE}-p|--python          ${NO_COLOR}Format Python code
+  ${BLUE}-b|--bazel           ${NO_COLOR}Format Bazel code
+  ${BLUE}-c|--cpp             ${NO_COLOR}Format cpp code
+  ${BLUE}-s|--shell           ${NO_COLOR}Format Shell code
+  ${BLUE}-a|--all             ${NO_COLOR}Format all (C++/Python/Bazel/Shell)
+  ${BLUE}-h|--help            ${NO_COLOR}# Show this message"
 }
 
 function run_clang_format() {
