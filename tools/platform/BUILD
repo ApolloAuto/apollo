@@ -15,7 +15,7 @@ config_setting(
 config_setting(
     name = "use_gpu",
     define_values = {
-        "USE_GPU": "1",
+        "USE_GPU": "true",
     },
 )
 
@@ -26,6 +26,7 @@ config_setting(
     },
 )
 
+#TODO(infra): set to true
 config_setting(
     name = "with_teleop",
     define_values = {
