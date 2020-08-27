@@ -16,6 +16,7 @@
 
 #include "modules/planning/common/trajectory_evaluator.h"
 
+#include <algorithm>
 #include <limits>
 
 #include "absl/strings/str_cat.h"
@@ -78,9 +79,11 @@ void TrajectoryEvaluator::EvaluateTrajectoryByTime(
   }
 
   const int low_bound =
-      ceil(updated_trajectory.front().relative_time() / delta_time);
+      std::max(-150.0,
+               ceil(updated_trajectory.front().relative_time() / delta_time));
   const int high_bound =
-      floor(updated_trajectory.back().relative_time() / delta_time);
+      std::min(150.0,
+               floor(updated_trajectory.back().relative_time() / delta_time));
   ADEBUG << "frame_num[" << frame_num << "] obstacle_id[" << obstacle_id
          << "] low[" << low_bound << "] high[" << high_bound << "]";
   for (int i = low_bound; i <= high_bound; ++i) {
