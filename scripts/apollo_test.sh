@@ -25,6 +25,7 @@ source "${TOP_DIR}/scripts/apollo_base.sh"
 ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
+USE_GPU=-1
 
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
@@ -48,7 +49,7 @@ function _determine_localization_disabled() {
 
 function _determine_perception_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    warning "Perception module can not work without GPU, all targets skipped"
+    warning "Perception can't work without GPU, targets under 'modules/perception' skipped"
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
   fi
 }
@@ -65,25 +66,15 @@ function _determine_map_disabled() {
   fi
 }
 
-function _disabled_test_targets_all() {
-  DISABLED_TARGETS=""
-  _determine_drivers_disabled
-  # TODO(all): arch exceptions should be done in BUILD file level.
-  _determine_localization_disabled
-  _determine_perception_disabled
-  _determine_planning_disabled
-  _determine_map_disabled
-
-  echo "${DISABLED_TARGETS}"
-  # TODO(all): exceptions for CPU mode: should be done in BUILD file level.
-  # grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|
-  # perception_traffic_light_rectify_test\|cuda_util_test"`"
-}
-
 # bazel run //modules/planning/tools:inference_demo crash
 function determine_disabled_targets() {
   if [[ "$#" -eq 0 ]]; then
-    _disabled_test_targets_all
+    _determine_drivers_disabled
+    _determine_localization_disabled
+    _determine_perception_disabled
+    _determine_planning_disabled
+    _determine_map_disabled
+    echo "${DISABLED_TARGETS}"
     return
   fi
 
@@ -112,7 +103,7 @@ function determine_disabled_targets() {
 
 function determine_test_targets() {
   local targets_all
-  if [[ "$#" -eq 0 ]]; then
+  if [ "$#" -eq 0 ]; then
     targets_all="//modules/... union //cyber/..."
     echo "${targets_all}"
     return
@@ -120,12 +111,12 @@ function determine_test_targets() {
 
   for component in $@; do
     local test_targets
-    if [[ "${component}" == "cyber" ]]; then
+    if [ "${component}" = "cyber" ]; then
       test_targets="//cyber/..."
-    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
+    elif [ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]; then
       test_targets="//modules/${component}/..."
     else
-      error "Oops, no such component '${component}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+      error "Directory <APOLLO_ROOT_DIR>/modules/${component} not found. Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
@@ -137,7 +128,29 @@ function determine_test_targets() {
   echo "${targets_all}" | sed -e 's/^[[:space:]]*//'
 }
 
-function _parse_cmdline_arguments() {
+function _chk_n_set_gpu_arg() {
+  local arg="$1"
+  local use_gpu=-1
+  if [ "${arg}" = "cpu" ]; then
+    use_gpu=0
+  elif [ "${arg}" = "gpu" ]; then
+    use_gpu=1
+  else
+    # Do nothing
+    return 0
+  fi
+
+  if [[ "${USE_GPU}" -lt 0 || "${USE_GPU}" = "${use_gpu}" ]]; then
+    USE_GPU="${use_gpu}"
+    return 0
+  fi
+
+  error "Mixed use of '--config=cpu' and '--config=gpu' may" \
+    "lead to unexpected behavior. Exiting..."
+  exit 1
+}
+
+function parse_cmdline_arguments() {
   local known_options=""
   local remained_args=""
 
@@ -149,11 +162,13 @@ function _parse_cmdline_arguments() {
       --config=*)
         optarg="${opt#*=}"
         known_options="${known_options} ${opt}"
+        _chk_n_set_gpu_arg "${optarg}"
         ;;
       --config)
         ((++pos))
         optarg="${!pos}"
         known_options="${known_options} ${opt} ${optarg}"
+        _chk_n_set_gpu_arg "${optarg}"
         ;;
       -c)
         ((++pos))
@@ -173,19 +188,33 @@ function _parse_cmdline_arguments() {
   SHORTHAND_TARGETS="${remained_args}"
 }
 
-function _run_bazel_test_impl() {
-  local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel test ${job_args} $@
-}
-
-function bazel_test() {
-  if ! "${APOLLO_IN_DOCKER}"; then
-    error "The build operation must be run from within docker container"
-    # exit 1
+function determine_cpu_or_gpu_test() {
+  if [ "${USE_GPU}" -lt 0 ]; then
+    if [ "${USE_GPU_TARGET}" -eq 0 ]; then
+      CMDLINE_OPTIONS="--config=cpu ${CMDLINE_OPTIONS}"
+    else
+      CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
+    fi
+    # USE_GPU unset, defaults to USE_GPU_TARGET
+    USE_GPU="${USE_GPU_TARGET}"
+  elif [ "${USE_GPU}" -gt "${USE_GPU_TARGET}" ]; then
+    warning "USE_GPU=${USE_GPU} without GPU can't compile. Exiting ..."
+    exit 1
   fi
 
-  _parse_cmdline_arguments "$@"
-  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  if [ "${USE_GPU}" -eq 1 ]; then
+    ok "UnitTest run under GPU mode on ${ARCH} platform."
+  else
+    ok "UnitTest run under CPU mode on ${ARCH} platform."
+  fi
+}
+
+function run_bazel_test() {
+  if ${USE_ESD_CAN}; then
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  fi
+
+  CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
 
   local test_targets
   test_targets="$(determine_test_targets ${SHORTHAND_TARGETS})"
@@ -194,21 +223,26 @@ function bazel_test() {
   disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
 
   info "Test Overview: "
+  info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
   info "${TAB}Test Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Test Targets: ${GREEN}${test_targets}${NO_COLOR}"
   info "${TAB}Disabled:     ${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  _run_bazel_test_impl "${CMDLINE_OPTIONS}" "$(bazel query ${test_targets} ${disabled_targets})"
+  local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  bazel test ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${test_targets} ${disabled_targets})
 }
 
 function main() {
-  if [ "${USE_GPU}" -eq 1 ]; then
-    info "Your GPU is enabled to run unit tests on ${ARCH} platform."
-  else
-    info "Running tests under CPU mode on ${ARCH} platform."
+  if ! "${APOLLO_IN_DOCKER}"; then
+    error "This test operation must be run from within docker container"
+    exit 1
   fi
-  bazel_test $@
-  success "Done unit testing ${SHORTHAND_TARGETS}."
+
+  parse_cmdline_arguments "$@"
+  determine_cpu_or_gpu_test
+
+  run_bazel_test
+  success "Done testing ${SHORTHAND_TARGETS:-Apollo}. Enjoy"
 }
 
 main "$@"
