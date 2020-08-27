@@ -216,6 +216,13 @@ function determine_cpu_or_gpu_build() {
   fi
 }
 
+function format_bazel_targets() {
+  local targets="$(echo $@ | xargs)"
+  targets="${targets// union / }"   # replace all matches of "A union B" to "A B"
+  targets="${targets// except / -}" # replaces all matches of "A except B" to "A-B"
+  echo "${targets}"
+}
+
 function run_bazel_build() {
   if ${USE_ESD_CAN}; then
     CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
@@ -227,13 +234,17 @@ function run_bazel_build() {
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
   build_targets="$(echo ${build_targets} | xargs)"
 
+  # Note(storypku): Workaround for in case "/usr/bin/bazel: Argument list too long"
+  # bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
+  local formatted_targets="$(format_bazel_targets ${build_targets})"
+
   info "Build Overview: "
   info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
 
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
+  bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 
 function build_simulator() {
