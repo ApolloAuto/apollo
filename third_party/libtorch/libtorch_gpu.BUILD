@@ -19,7 +19,8 @@ cc_library(
     ],
     linkstatic = False,
     deps = [
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
-        "@local_config_cuda//:cudart",
     ],
 )
