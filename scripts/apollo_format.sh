@@ -34,7 +34,7 @@ function print_usage() {
   ${BLUE}-c|--cpp             ${NO_COLOR}Format cpp code
   ${BLUE}-s|--shell           ${NO_COLOR}Format Shell code
   ${BLUE}-a|--all             ${NO_COLOR}Format all (C++/Python/Bazel/Shell)
-  ${BLUE}-h|--help            ${NO_COLOR}# Show this message"
+  ${BLUE}-h|--help            ${NO_COLOR}Show this message"
 }
 
 function run_clang_format() {

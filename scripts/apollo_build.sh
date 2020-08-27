@@ -186,6 +186,7 @@ function bazel_build() {
 
   local build_targets
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
+  build_targets="$(echo ${build_targets} | xargs)"
 
   info "Build Overview: "
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
