@@ -209,6 +209,13 @@ function determine_cpu_or_gpu_test() {
   fi
 }
 
+function format_bazel_targets() {
+  local targets="$(echo $@ | xargs)"
+  targets="${targets// union / }"   # replace all matches of "A union B" to "A B"
+  targets="${targets// except / -}" # replaces all matches of "A except B" to "A-B"
+  echo "${targets}"
+}
+
 function run_bazel_test() {
   if ${USE_ESD_CAN}; then
     CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
@@ -222,6 +229,10 @@ function run_bazel_test() {
   local disabled_targets
   disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
 
+  # Note(storypku): Workaround for "/usr/bin/bazel: Argument list too long"
+  # bazel test ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${test_targets} ${disabled_targets})
+  local formatted_targets="$(format_bazel_targets ${test_targets} ${disabled_targets})"
+
   info "Test Overview: "
   info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
   info "${TAB}Test Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
@@ -229,7 +240,7 @@ function run_bazel_test() {
   info "${TAB}Disabled:     ${YELLOW}${disabled_targets}${NO_COLOR}"
 
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel test ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${test_targets} ${disabled_targets})
+  bazel test ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 
 function main() {

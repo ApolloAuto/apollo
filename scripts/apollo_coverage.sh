@@ -215,6 +215,13 @@ function parse_cmdline_arguments() {
   SHORTHAND_TARGETS="${remained_args}"
 }
 
+function format_bazel_targets() {
+  local targets="$(echo $@ | xargs)"
+  targets="${targets// union / }"   # replace all matches of "A union B" to "A B"
+  targets="${targets// except / -}" # replaces all matches of "A except B" to "A-B"
+  echo "${targets}"
+}
+
 function run_bazel_coverage() {
   if ${USE_ESD_CAN}; then
     CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
@@ -227,17 +234,19 @@ function run_bazel_coverage() {
   local disabled_targets
   disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
 
+  # Note(storypku): Workaround for "/usr/bin/bazel: Argument list too long"
+  ## bazel coverage ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${test_targets} ${disabled_targets})
+  local formatted_targets="$(format_bazel_targets ${test_targets} ${disabled_targets})"
+
   info "Coverage Overview: "
   info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
   info "${TAB}Coverage Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Coverage Targets: ${GREEN}${test_targets}${NO_COLOR}"
-  info "${TAB}Disabled:         ${YELLOW}${disabled_targets}${NO_COLOR}"
+  info "${TAB}Disabled: ${YELLOW}${disabled_targets}${NO_COLOR}"
 
   local count="$(($(nproc) / 2))"
   local job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.7"
-
-  bazel coverage ${CMDLINE_OPTIONS} ${job_args} \
-    "$(bazel query ${test_targets} ${disabled_targets})"
+  bazel coverage ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 
 function main() {
