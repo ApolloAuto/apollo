@@ -24,6 +24,7 @@ source "${TOP_DIR}/scripts/apollo_base.sh"
 ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
+USE_GPU=-1
 
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
@@ -40,7 +41,7 @@ function _determine_drivers_disabled() {
 
 function _determine_perception_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    warning "Perception module can not work without GPU, all targets skipped"
+    warning "Perception can't work without GPU, targets under 'modules/perception' skipped"
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
   fi
 }
@@ -54,8 +55,9 @@ function _determine_localization_disabled() {
 
 function _determine_planning_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/open_space/trajectory_smoother:planning_block \
-                      except //modules/planning/learning_based/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS} \
+        except //modules/planning/open_space/trajectory_smoother:planning_block \
+        except //modules/planning/learning_based/..."
   fi
 }
 
@@ -115,13 +117,13 @@ function determine_build_targets() {
   for component in $@; do
     local build_targets
     local exceptions
-    if [[ "${component}" == "cyber" ]]; then
+    if [ "${component}" = "cyber" ]; then
       build_targets="//cyber/... union //modules/tools/visualizer/..."
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
       exceptions="$(determine_disabled_build_targets ${component})"
       build_targets="//modules/${component}/... ${exceptions}"
     else
-      error "Oops, no such component '${component}' under <APOLLO_ROOT_DIR>/modules/ . Exiting ..."
+      error "Directory <APOLLO_ROOT_DIR>/modules/${component} not found. Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
@@ -133,7 +135,29 @@ function determine_build_targets() {
   echo "${targets_all}"
 }
 
-function _parse_cmdline_arguments() {
+function _chk_n_set_gpu_arg() {
+  local arg="$1"
+  local use_gpu=-1
+  if [ "${arg}" = "cpu" ]; then
+    use_gpu=0
+  elif [ "${arg}" = "gpu" ]; then
+    use_gpu=1
+  else
+    # Do nothing
+    return 0
+  fi
+
+  if [[ "${USE_GPU}" -lt 0 || "${USE_GPU}" = "${use_gpu}" ]]; then
+    USE_GPU="${use_gpu}"
+    return 0
+  fi
+
+  error "Mixed use of '--config=cpu' and '--config=gpu' may" \
+    "lead to unexpected behavior. Exiting..."
+  exit 1
+}
+
+function parse_cmdline_arguments() {
   local known_options=""
   local remained_args=""
 
@@ -145,11 +169,13 @@ function _parse_cmdline_arguments() {
       --config=*)
         optarg="${opt#*=}"
         known_options="${known_options} ${opt}"
+        _chk_n_set_gpu_arg "${optarg}"
         ;;
       --config)
         ((++pos))
         optarg="${!pos}"
         known_options="${known_options} ${opt} ${optarg}"
+        _chk_n_set_gpu_arg "${optarg}"
         ;;
       -c)
         ((++pos))
@@ -169,30 +195,45 @@ function _parse_cmdline_arguments() {
   SHORTHAND_TARGETS="${remained_args}"
 }
 
-function _run_bazel_build_impl() {
-  local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel build ${job_args} $@
-}
-
-function bazel_build() {
-  if ! "${APOLLO_IN_DOCKER}"; then
-    error "The build operation must be run from within docker container"
+function determine_cpu_or_gpu_build() {
+  if [ "${USE_GPU}" -lt 0 ]; then
+    if [ "${USE_GPU_TARGET}" -eq 0 ]; then
+      CMDLINE_OPTIONS="--config=cpu ${CMDLINE_OPTIONS}"
+    else
+      CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
+    fi
+    # USE_GPU unset, defaults to USE_GPU_TARGET
+    USE_GPU="${USE_GPU_TARGET}"
+  elif [ "${USE_GPU}" -gt "${USE_GPU_TARGET}" ]; then
+    warning "USE_GPU=${USE_GPU} without GPU can't compile. Exiting ..."
     exit 1
   fi
 
-  _parse_cmdline_arguments $@
+  if [ "${USE_GPU}" -eq 1 ]; then
+    ok "Running GPU build on ${ARCH} platform."
+  else
+    ok "Running CPU build on ${ARCH} platform."
+  fi
+}
 
-  CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+function run_bazel_build() {
+  if ${USE_ESD_CAN}; then
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  fi
+
+  CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
 
   local build_targets
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
   build_targets="$(echo ${build_targets} | xargs)"
 
   info "Build Overview: "
+  info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
 
-  _run_bazel_build_impl "${CMDLINE_OPTIONS}" "$(bazel query ${build_targets})"
+  local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
 }
 
 function build_simulator() {
@@ -209,12 +250,15 @@ function build_simulator() {
 }
 
 function main() {
-  if [ "${USE_GPU}" -eq 1 ]; then
-    info "Your GPU is enabled to run the build on ${ARCH} platform."
-  else
-    info "Running build under CPU mode on ${ARCH} platform."
+  if ! "${APOLLO_IN_DOCKER}"; then
+    error "The build operation must be run from within docker container"
+    exit 1
   fi
-  bazel_build $@
+  parse_cmdline_arguments "$@"
+  determine_cpu_or_gpu_build
+
+  run_bazel_build
+
   if [ -z "${SHORTHAND_TARGETS}" ]; then
     SHORTHAND_TARGETS="apollo"
     build_simulator
