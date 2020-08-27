@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+from modules.audio.proto import audio_event_pb2
 from modules.localization.proto import localization_pb2
 from modules.perception.proto import perception_obstacle_pb2
 from modules.perception.proto import traffic_light_detection_pb2
@@ -29,6 +30,7 @@ from modules.common.proto import drive_event_pb2
 from modules.map.relative_map.proto import navigation_pb2
 from modules.guardian.proto import guardian_pb2
 from modules.tools.common import proto_utils
+
 
 
 class MessageType:
@@ -50,6 +52,8 @@ class MessageType:
 
 
 topic_pb_list = [
+    MessageType("audio_event", "/apollo/audio_event",
+                    audio_event_pb2.AudioEvent),
     MessageType("planning", "/apollo/planning", planning_pb2.ADCTrajectory),
     MessageType("control", "/apollo/control", control_cmd_pb2.ControlCommand),
     MessageType("chassis", "/apollo/canbus/chassis", chassis_pb2.Chassis),
