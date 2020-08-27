@@ -14,34 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <deque>
-#include <memory>
-#include <string>
-#include <vector>
+#pragma once
 
+#include <string>
+
+#include "modules/audio/common/audio_info.h"
+#include "modules/audio/inference/direction_detection.h"
+#include "modules/audio/inference/moving_detection.h"
+#include "modules/audio/inference/siren_detection.h"
+#include "modules/audio/proto/audio.pb.h"
 #include "modules/drivers/microphone/proto/audio.pb.h"
-#include "modules/drivers/microphone/proto/microphone_config.pb.h"
 
 namespace apollo {
 namespace audio {
 
-class AudioInfo {
+class MessageProcess {
  public:
-  AudioInfo() = default;
+  MessageProcess() = delete;
 
-  void Insert(
-      const apollo::drivers::microphone::config::AudioData&);
-
-  std::vector<std::vector<double>> GetSignals(const int signal_length);
-
- private:
-  void InsertChannelData(
-      const std::size_t index,
-      const apollo::drivers::microphone::config::ChannelData& channel_data,
-      const apollo::drivers::microphone::config::MicrophoneConfig&
-          microphone_config);
-
-  std::vector<std::deque<double>> signals_;
+  static void OnMicrophone(
+      const apollo::drivers::microphone::config::AudioData& audio_data,
+      const std::string& respeaker_extrinsics_file,
+      AudioInfo* audio_info,
+      DirectionDetection* direction_detection,
+      MovingDetection* moving_detection,
+      SirenDetection* siren_detection,
+      AudioDetection* audio_detection);
 };
 
 }  // namespace audio
