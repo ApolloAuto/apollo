@@ -642,8 +642,8 @@ void SimulationWorldService::SetObstacleSource(
   if (obstacle_source == PerceptionObstacle::V2X) {
     V2XInformation *v2x_info = world_object->mutable_v2x_info();
     v2x_info->clear_v2x_type();
-    for (int i = 0; i < obstacle.v2x_info().v2x_type_size(); i++) {
-      v2x_info->add_v2x_type(obstacle.v2x_info().v2x_type(i));
+    for (const auto &v2x_type : obstacle.v2x_info().v2x_type()) {
+      v2x_info->add_v2x_type(v2x_type);
     }
   }
   return;

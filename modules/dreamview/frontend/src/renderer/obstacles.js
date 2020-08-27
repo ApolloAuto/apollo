@@ -260,7 +260,6 @@ export default class PerceptionObstacles {
     const deltaY = isBirdView ? 0.7 : lineSpacing * Math.sin(adc.heading);
     const deltaZ = isBirdView ? 0.0 : lineSpacing;
     let lineCount = 0;
-    const hasV2x = !_.isEmpty(v2xText);
     if (STORE.options.showObstaclesInfo) {
       const distance = adc.distanceTo(obstaclePosition).toFixed(1);
       const speed = obstacle.speed.toFixed(1);
@@ -288,7 +287,7 @@ export default class PerceptionObstacles {
         lineCount++;
       }
     }
-    if (hasV2x) {
+    if (v2xText) {
       v2xText.forEach((t) => {
         const textPosition = {
           x: initPosition.x + (lineCount * deltaX),
@@ -301,7 +300,7 @@ export default class PerceptionObstacles {
     }
   }
 
-  updatePolygon(points, height, color, coordinates, confidence, scene, v2x = false) {
+  updatePolygon(points, height, color, coordinates, confidence, scene, isForV2X = false) {
     for (let i = 0; i < points.length; i++) {
       // Get the adjacent point.
       const next = (i === points.length - 1) ? 0 : i + 1;
@@ -323,8 +322,7 @@ export default class PerceptionObstacles {
         continue;
       }
 
-      // Get cached face mesh. Set position,scale...
-      if (v2x) {
+      if (isForV2X) {
         const v2xFaceMesh = this.getFace(this.v2xSolidFaceIdx + i, scene, true, true);
         v2xFaceMesh.position.set(facePosition.x, facePosition.y, height);
         v2xFaceMesh.scale.set(edgeDistance, 1, height);
