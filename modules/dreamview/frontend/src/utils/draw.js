@@ -107,7 +107,7 @@ export function drawSegmentsFromPoints(
   return pathLine;
 }
 
-export function drawV2xPolygonFace(
+export function drawSolidPolygonFace(
   color = 0xff0000, zOffset = 0,
   matrixAutoUpdate = true, transparent = true, opacity = 0.8,
 ) {
@@ -142,7 +142,7 @@ function addOutlineToObject(object, objectGeometry, color, thickness = 1, opacit
   object.add(outline);
 }
 
-export function drawV2xBox(dimension, color, linewidth) {
+export function drawSolidBox(dimension, color, linewidth) {
   const geometry = new THREE.CubeGeometry(dimension.x, dimension.y, dimension.z);
   const material = new THREE.MeshBasicMaterial({
     color,
