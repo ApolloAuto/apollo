@@ -21,6 +21,16 @@ export const ObstacleColorMapping = {
   CIPV: 0xFF9966,
 };
 const LINE_THICKNESS = 1.5;
+const FaceType = Object.freeze({
+  SOLID_LINE: 'extrusionSolidFaces',
+  DASHED_LINE: 'extrusionDashedFaces',
+  SOLID_FACE: 'v2xSolidFaces',
+});
+const CubeType = Object.freeze({
+  SOLID_LINE: 'solidCubes',
+  DASHED_LINE: 'dashedCubes',
+  SOLID_FACE: 'v2xCubes',
+});
 
 export default class PerceptionObstacles {
   constructor() {
@@ -323,7 +333,7 @@ export default class PerceptionObstacles {
       }
 
       if (isForV2X) {
-        const v2xFaceMesh = this.getFace(this.v2xSolidFaceIdx + i, scene, true, true);
+        const v2xFaceMesh = this.getFace(this.v2xSolidFaceIdx + i, scene, 'SOLID_FACE');
         v2xFaceMesh.position.set(facePosition.x, facePosition.y, height);
         v2xFaceMesh.scale.set(edgeDistance, 1, height);
         v2xFaceMesh.material.color.setHex(color);
@@ -333,8 +343,8 @@ export default class PerceptionObstacles {
         v2xFaceMesh.visible = true;
       }
       else {
-        const solidFaceMesh = this.getFace(this.extrusionFaceIdx + i, scene, true, false);
-        const dashedFaceMesh = this.getFace(this.extrusionFaceIdx + i, scene, false, false);
+        const solidFaceMesh = this.getFace(this.extrusionFaceIdx + i, scene, 'SOLID_LINE');
+        const dashedFaceMesh = this.getFace(this.extrusionFaceIdx + i, scene, 'DASHED_LINE');
         solidFaceMesh.position.set(facePosition.x, facePosition.y, 0);
         dashedFaceMesh.position.set(facePosition.x, facePosition.y, height * confidence);
         solidFaceMesh.scale.set(edgeDistance, 1, height * confidence);
@@ -351,7 +361,7 @@ export default class PerceptionObstacles {
   }
 
   updateV2xCube(length, width, height, position, heading, color, scene) {
-    const v2xCubeMesh = this.getCube(this.v2xCubeIdx, scene, true, true);
+    const v2xCubeMesh = this.getCube(this.v2xCubeIdx, scene, 'SOLID_FACE');
     v2xCubeMesh.position.set(
       position.x, position.y, position.z);
     v2xCubeMesh.scale.set(length, width, height);
@@ -364,7 +374,7 @@ export default class PerceptionObstacles {
 
   updateCube(length, width, height, position, heading, color, confidence, scene) {
     if (confidence > 0) {
-      const solidCubeMesh = this.getCube(this.cubeIdx, scene, true, false);
+      const solidCubeMesh = this.getCube(this.cubeIdx, scene, 'SOLID_LINE');
       solidCubeMesh.position.set(
         position.x, position.y, position.z + height * (confidence - 1) / 2);
       solidCubeMesh.scale.set(length, width, height * confidence);
@@ -374,7 +384,7 @@ export default class PerceptionObstacles {
     }
 
     if (confidence < 1) {
-      const dashedCubeMesh = this.getCube(this.cubeIdx, scene, false, false);
+      const dashedCubeMesh = this.getCube(this.cubeIdx, scene,'DASHED_LINE');
       dashedCubeMesh.position.set(
         position.x, position.y, position.z + height * confidence / 2);
       dashedCubeMesh.scale.set(length, width, height * (1 - confidence));
@@ -410,14 +420,8 @@ export default class PerceptionObstacles {
     return arrowMesh;
   }
 
-  getFace(index, scene, solid = true, v2x = false) {
-    let extrusionFaces = null;
-    if (v2x) {
-      extrusionFaces = this.v2xSolidFaces;
-    }
-    else {
-      extrusionFaces = solid ? this.extrusionSolidFaces : this.extrusionDashedFaces;
-    }
+  getFace(index, scene, type) {
+    const extrusionFaces = this[FaceType[type]];
     if (index < extrusionFaces.length) {
       return extrusionFaces[index];
     }
@@ -429,11 +433,11 @@ export default class PerceptionObstacles {
       new THREE.Vector3(-0.5, 0, 1),
     ];
     let extrusionFace = null;
-    if (v2x) {
+    if (_.isEqual(type,'SOLID_FACE')) {
       extrusionFace = drawSolidPolygonFace();
     }
     else {
-      extrusionFace = solid
+      extrusionFace = (_.isEqual(type,'SOLID_LINE'))
         ? drawSegmentsFromPoints(points, DEFAULT_COLOR, LINE_THICKNESS)
         : drawDashedLineFromPoints(points, DEFAULT_COLOR, LINE_THICKNESS, 0.1, 0.1);
     }
@@ -443,24 +447,19 @@ export default class PerceptionObstacles {
     return extrusionFace;
   }
 
-  getCube(index, scene, solid = true, v2x = false) {
-    let cubes = null;
-    if (v2x) {
-      cubes = this.v2xCubes;
-    }
-    else {
-      cubes = solid ? this.solidCubes : this.dashedCubes;
-    }
+  getCube(index, scene,type) {
+    const cubes = this[CubeType[type]];
     if (index < cubes.length) {
       return cubes[index];
     }
     const cubeSize = new THREE.Vector3(1, 1, 1);
     let cubeMesh = null;
-    if (v2x) {
+    if (_.isEqual(type,'SOLID_FACE')) {
       cubeMesh = drawSolidBox(cubeSize, DEFAULT_COLOR, LINE_THICKNESS);
     }
     else {
-      cubeMesh = solid ? drawBox(cubeSize, DEFAULT_COLOR, LINE_THICKNESS)
+      cubeMesh = (_.isEqual(type,'SOLID_LINE'))
+        ? drawBox(cubeSize, DEFAULT_COLOR, LINE_THICKNESS)
         : drawDashedBox(cubeSize, DEFAULT_COLOR, LINE_THICKNESS, 0.1, 0.1);
     }
     cubeMesh.visible = false;
