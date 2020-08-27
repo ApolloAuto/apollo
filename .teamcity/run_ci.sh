@@ -32,32 +32,33 @@ MAP_VOLUME_CONF=
 OTHER_VOLUME_CONF=
 
 DEFAULT_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-  sunnyvale_with_two_offices
-  san_mateo
+    sunnyvale_big_loop
+    sunnyvale_loop
+    sunnyvale_with_two_offices
+    san_mateo
 )
 
 DEFAULT_TEST_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
+    sunnyvale_big_loop
+    sunnyvale_loop
 )
 
 eval $(grep ^VERSION_X86_64= ${APOLLO_ROOT_DIR}/docker/scripts/dev_start.sh)
 eval $(grep ^VERSION_AARCH64= ${APOLLO_ROOT_DIR}/docker/scripts/dev_start.sh)
 
 function parse_arguments() {
-    while [ $# -gt 0 ] ; do
-        local opt="$1"; shift
+    while [ $# -gt 0 ]; do
+        local opt="$1"
+        shift
         case "${opt}" in
-        -f|--fast)
-            FAST_MODE="yes"
-            ;;
+            -f | --fast)
+                FAST_MODE="yes"
+                ;;
 
-        *)
-            warning "Unknown option: ${opt}"
-            exit 2
-            ;;
+            *)
+                warning "Unknown option: ${opt}"
+                exit 2
+                ;;
         esac
     done # End while loop
 
@@ -98,9 +99,9 @@ function setup_devices_and_mount_local_volumes() {
     case "${os_release}" in
         14.04)
             warning "[Deprecated] Support for Ubuntu 14.04 will be removed" \
-                    "in the near future. Please upgrade to ubuntu 18.04+."
+                "in the near future. Please upgrade to ubuntu 18.04+."
             ;;
-        16.04|18.04|20.04|*)
+        16.04 | 18.04 | 20.04 | *)
             volumes="${volumes} -v /dev:/dev"
             ;;
     esac
@@ -109,7 +110,7 @@ function setup_devices_and_mount_local_volumes() {
                         -v /etc/localtime:/etc/localtime:ro \
                         -v /usr/src:/usr/src \
                         -v /lib/modules:/lib/modules"
-    volumes="$(tr -s " " <<< "${volumes}")"
+    volumes="$(tr -s " " <<<"${volumes}")"
     eval "${__retval}='${volumes}'"
 }
 
@@ -121,9 +122,9 @@ function determine_gpu_use_host() {
     else
         # Check nvidia-driver and GPU device
         local nv_driver="nvidia-smi"
-        if [ ! -x "$(command -v ${nv_driver} )" ]; then
+        if [ ! -x "$(command -v ${nv_driver})" ]; then
             warning "No nvidia-driver found. CPU will be used"
-        elif [ -z "$(eval ${nv_driver} )" ]; then
+        elif [ -z "$(eval ${nv_driver})" ]; then
             warning "No GPU device found. CPU will be used."
         else
             USE_GPU_HOST=1
@@ -137,7 +138,7 @@ function determine_gpu_use_host() {
         if [ ! -z "$(which nvidia-docker)" ]; then
             DOCKER_RUN="nvidia-docker run"
             warning "nvidia-docker is deprecated. Please install latest docker " \
-                    "and nvidia-container-toolkit as described by:"
+                "and nvidia-container-toolkit as described by:"
             warning "  ${nv_docker_doc}"
         elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
             if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
@@ -149,17 +150,16 @@ function determine_gpu_use_host() {
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install " \
-                    "latest docker and nvidia-container-toolkit as described by: "
+                "latest docker and nvidia-container-toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
 }
 
-
 function docker_pull() {
     local img="$1"
     info "Start pulling docker image ${img} ..."
-    if ! docker pull "${img}" ; then
+    if ! docker pull "${img}"; then
         error "Failed to pull docker image : ${img}"
         exit 1
     fi
@@ -168,7 +168,7 @@ function docker_pull() {
 # Note(storypku): Reuse existing docker volumes for CI
 function reuse_or_start_volume() {
     local container="$1"
-    if docker ps --format "{{.Names}}" | grep -q "${container}" ; then
+    if docker ps --format "{{.Names}}" | grep -q "${container}"; then
         info "Found existing volume \"${container}\", will be reused."
         return
     fi
@@ -242,7 +242,7 @@ function main() {
     parse_arguments "$@"
     determine_dev_image
 
-    if ! docker_pull "${APOLLO_DEV_IMAGE}" ; then
+    if ! docker_pull "${APOLLO_DEV_IMAGE}"; then
         error "Failed to pull docker image."
         exit 1
     fi
@@ -257,25 +257,27 @@ function main() {
     mount_other_volumes
     set -x
 
-    ${DOCKER_RUN} -i --rm   \
-        --privileged    \
+    ${DOCKER_RUN} -i --rm \
+        --privileged \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
-        ${MAP_VOLUME_CONF}      \
-        ${OTHER_VOLUME_CONF}    \
-        ${local_volumes}        \
+        -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
+        -e USE_GPU_HOST="${USE_GPU_HOST}" \
+        ${MAP_VOLUME_CONF} \
+        ${OTHER_VOLUME_CONF} \
+        ${local_volumes} \
         --net host \
         -w /apollo \
         --add-host "${DEV_INSIDE}:127.0.0.1" \
         --add-host "${local_host}:127.0.0.1" \
         --hostname "${DEV_INSIDE}" \
-        --shm-size 2G   \
-        --pid=host      \
+        --shm-size 2G \
+        --pid=host \
         -v /dev/null:/dev/raw1394 \
         "${APOLLO_DEV_IMAGE}" \
         /bin/bash /apollo/scripts/apollo_ci.sh
 
-    if [ $? -ne 0 ];then
+    if [ $? -ne 0 ]; then
         error "CI failed based on image: ${APOLLO_DEV_IMAGE}"
         exit 1
     fi
