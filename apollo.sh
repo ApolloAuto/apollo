@@ -129,6 +129,7 @@ function _usage() {
 function main() {
     apollo_env_setup
     if [ "$#" -eq 0 ]; then
+        _usage
         exit 0
     fi
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
