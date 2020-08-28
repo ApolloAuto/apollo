@@ -170,7 +170,9 @@ message DelaysInMs {
   optional double control = 9;
 }
 
-message RoutePath { repeated PolygonPoint point = 1; }
+message RoutePath { 
+  repeated PolygonPoint point = 1; 
+}
 
 message Latency {
   optional double timestamp_sec = 1;
@@ -205,7 +207,9 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-message SensorMeasurements { repeated Object sensor_measurement = 1; }
+message SensorMeasurements { 
+  repeated Object sensor_measurement = 1; 
+}
 
 // Next-id: 30
 message SimulationWorld {

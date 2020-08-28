@@ -647,12 +647,9 @@ void SimulationWorldService::SetObstacleSource(
   }
   const PerceptionObstacle::Source obstacle_source = obstacle.source();
   world_object->set_source(obstacle_source);
-  if (obstacle_source == PerceptionObstacle::V2X) {
-    V2XInformation *v2x_info = world_object->mutable_v2x_info();
-    v2x_info->clear_v2x_type();
-    for (const auto &v2x_type : obstacle.v2x_info().v2x_type()) {
-      v2x_info->add_v2x_type(v2x_type);
-    }
+  world_object->clear_v2x_info();
+  if (obstacle_source == PerceptionObstacle::V2X && obstacle.has_v2x_info()) {
+    world_object->mutable_v2x_info()->CopyFrom(obstacle.v2x_info());
   }
   return;
 }
