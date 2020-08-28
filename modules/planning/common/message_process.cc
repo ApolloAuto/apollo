@@ -134,8 +134,11 @@ void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
   const double time_diff =
       le.header().timestamp_sec() - last_localization_message_timestamp_sec_;
   if (time_diff < 1.0 / FLAGS_planning_loop_rate) {
-    // for RL_TEST, skip this check so that first frame can proceed
-    if (planning_config_.learning_mode() != PlanningConfig::RL_TEST) {
+    // for RL_TEST, E2E_TEST or HYBRID_TEST skip this check so that first
+    // frame can proceed
+    if (!(planning_config_.learning_mode() == PlanningConfig::RL_TEST ||
+          planning_config_.learning_mode() == PlanningConfig::E2E_TEST ||
+          planning_config_.learning_mode() == PlanningConfig::HYBRID_TEST)) {
       return;
     }
   }
