@@ -19,6 +19,9 @@
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 
+#include <algorithm>
+#include <limits>
+
 #ifdef USE_GPU
 #include "modules/planning/open_space/trajectory_smoother/planning_block.h"
 #endif
