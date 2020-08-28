@@ -31,7 +31,7 @@ function start() {
   ./scripts/dreamview.sh start
   if [ $? -eq 0 ]; then
     sleep 2 # wait for some time before starting to check
-    http_status="$(curl -o /dev/null -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
+    http_status="$(curl -o /dev/null -x '' -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
     if [ $http_status -eq 200 ]; then
       echo "Dreamview is running at" $DREAMVIEW_URL
     else
