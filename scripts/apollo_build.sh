@@ -41,7 +41,6 @@ function _determine_drivers_disabled() {
 
 function _determine_perception_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    warning "Perception can't work without GPU, targets under 'modules/perception' skipped"
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
   fi
 }
