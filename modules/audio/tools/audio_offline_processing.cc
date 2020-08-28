@@ -26,6 +26,8 @@
 #include "modules/audio/common/message_process.h"
 #include "modules/audio/proto/audio_conf.pb.h"
 #include "modules/audio/proto/audio_event.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace audio {
@@ -34,6 +36,8 @@ using apollo::cyber::record::RecordReader;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordWriter;
 using apollo::drivers::microphone::config::AudioData;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacles;
 
 void GetRecordFileNames(const boost::filesystem::path& p,
                         std::vector<std::string>* record_files) {
@@ -86,6 +90,23 @@ void ProcessSingleRecordFile(const AudioConf& audio_conf,
       if (audio_event.ParseFromString(message.content)) {
         writer.WriteMessage<AudioEvent>(message.channel_name, audio_event,
                                         message.time);
+        AINFO << "Save an audio even message.";
+      } else if (message.channel_name ==
+                 audio_conf.topic_conf().localization_topic_name()) {
+        LocalizationEstimate localization;
+        if (localization.ParseFromString(message.content)) {
+          writer.WriteMessage<LocalizationEstimate>(
+              message.channel_name, localization, message.time);
+          AINFO << "Save a localization message.";
+        }
+      } else if (message.channel_name ==
+                 audio_conf.topic_conf().perception_topic_name()) {
+        PerceptionObstacles perception_obstacles;
+        if (perception_obstacles.ParseFromString(message.content)) {
+          writer.WriteMessage<PerceptionObstacles>(
+              message.channel_name, perception_obstacles, message.time);
+          AINFO << "Save a perception message.";
+        }
       }
     }
   }
