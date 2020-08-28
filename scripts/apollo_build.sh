@@ -68,16 +68,18 @@ function _determine_map_disabled() {
   fi
 }
 
-function determine_disabled_build_targets() {
-  DISABLED_TARGETS=""
-  local component="$1"
-  if [ -z "${component}" ]; then
+function determine_disabled_targets() {
+  if [ "$#" -eq 0 ]; then
     _determine_drivers_disabled
     _determine_localization_disabled
     _determine_perception_disabled
     _determine_planning_disabled
     _determine_map_disabled
-  else
+    echo "${DISABLED_TARGETS}"
+    return
+  fi
+
+  for component in $@; do
     case "${component}" in
       drivers)
         _determine_drivers_disabled
@@ -95,7 +97,7 @@ function determine_disabled_build_targets() {
         _determine_map_disabled
         ;;
     esac
-  fi
+  done
 
   echo "${DISABLED_TARGETS}"
   # DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
@@ -106,22 +108,18 @@ function determine_disabled_build_targets() {
 
 function determine_build_targets() {
   local targets_all
-  local exceptions
   if [[ "$#" -eq 0 ]]; then
-    exceptions="$(determine_disabled_build_targets)"
-    targets_all="//modules/... union //cyber/... ${exceptions}"
+    targets_all="//modules/... union //cyber/..."
     echo "${targets_all}"
     return
   fi
 
   for component in $@; do
     local build_targets
-    local exceptions
     if [ "${component}" = "cyber" ]; then
       build_targets="//cyber/... union //modules/tools/visualizer/..."
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
-      exceptions="$(determine_disabled_build_targets ${component})"
-      build_targets="//modules/${component}/... ${exceptions}"
+      build_targets="//modules/${component}/..."
     else
       error "Directory <APOLLO_ROOT_DIR>/modules/${component} not found. Exiting ..."
       exit 1
@@ -232,16 +230,20 @@ function run_bazel_build() {
 
   local build_targets
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
-  build_targets="$(echo ${build_targets} | xargs)"
+
+  local disabled_targets
+  disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
+  disabled_targets="$(echo ${disabled_targets} | xargs)"
 
   # Note(storypku): Workaround for in case "/usr/bin/bazel: Argument list too long"
   # bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
-  local formatted_targets="$(format_bazel_targets ${build_targets})"
+  local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
 
   info "Build Overview: "
   info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
+  info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
 
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
