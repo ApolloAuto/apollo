@@ -9,8 +9,8 @@ def if_gpu(if_true, if_false = []):
         "//conditions:default": if_false,
     })
 
-def copts_if_gpu():
-    return if_gpu(["-DUSE_GPU=1"], ["-DCPU_ONLY=1"])
+# def copts_if_gpu():
+#    return if_gpu(["-DUSE_GPU=1"], ["-DUSE_GPU=0"])
 
 def if_with_teleop(if_true, if_false = []):
     return select({

@@ -55,8 +55,10 @@ build:optimize --copt=-march=native
 build:optimize --host_copt=-march=native
 build:optimize --define with_default_optimizations=true
 
-build:cpu --cxxopt="-DCPU_ONLY=1"
+# Now "cpu" configuration was dummy
+build:cpu --verbose_failures
 build:gpu --define USE_GPU=true
+build:gpu --cxxopt="-DUSE_GPU=1"
 
 # Build with profiling
 build:prof --linkopt=-lprofiler
