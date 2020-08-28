@@ -17,7 +17,10 @@
 
 #include <vector>
 
-#include "cuda/include/npp.h"
+#if USE_GPU == 1
+#include <npp.h>
+#endif
+
 #include "Eigen/Dense"
 
 #include "cyber/common/log.h"

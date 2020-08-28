@@ -33,7 +33,7 @@ namespace lidar {
 class FeatureGenerator {
  public:
   FeatureGenerator() {
-#ifndef CPU_ONLY
+#if USE_GPU == 1
     pc_gpu_size_ = kMaxPointCloudGPUSize;
     BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&pc_gpu_),
                                pc_gpu_size_ * sizeof(base::PointF)));
@@ -43,7 +43,7 @@ class FeatureGenerator {
   }
 
   virtual ~FeatureGenerator() {
-#ifndef CPU_ONLY
+#if USE_GPU == 1
     ReleaseGPUMemory();
 #endif
   }
@@ -52,7 +52,7 @@ class FeatureGenerator {
 
   void Generate(const base::PointFCloudPtr& pc_ptr,
                 const std::vector<int>& point2grid) {
-#ifndef CPU_ONLY
+#if USE_GPU == 1
     GenerateGPU(pc_ptr, point2grid);
 #else
     GenerateCPU(pc_ptr, point2grid);
@@ -62,7 +62,7 @@ class FeatureGenerator {
   inline std::string Name() const { return "FeatureGenerator"; }
 
  private:
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   void GenerateGPU(const base::PointFCloudPtr& pc_ptr,
                    const std::vector<int>& point2grid);
   void ReleaseGPUMemory();

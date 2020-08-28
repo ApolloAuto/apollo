@@ -22,7 +22,7 @@ namespace perception {
 namespace base {
 
 TEST(CommonTest, GPUAssertTest) {
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   GPUAssert(cudaSetDevice(-1), __FILE__, __LINE__, false);
 #endif
 }
