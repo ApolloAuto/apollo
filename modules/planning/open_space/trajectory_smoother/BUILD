@@ -240,12 +240,7 @@ cc_library(
 
 cc_library(
     name = "distance_approach_ipopt_cuda_interface",
-    srcs = ["distance_approach_ipopt_cuda_interface.cc"] + if_gpu(
-        [
-            "planning_block.h",
-            ":planning_block",
-        ],
-    ),
+    srcs = ["distance_approach_ipopt_cuda_interface.cc"],
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_cuda_interface.h",
@@ -265,7 +260,7 @@ cc_library(
         "@adolc",
         "@eigen",
         "@ipopt",
-    ],
+    ] + if_gpu([":planning_block"]),
 )
 
 cc_library(
@@ -290,6 +285,7 @@ cuda_library(
     srcs = ["planning_block.cu"],
     hdrs = ["planning_block.h"],
     deps = [
+        "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart",
     ],
 )
