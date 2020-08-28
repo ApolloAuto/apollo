@@ -93,13 +93,10 @@ bool TrajectoryImitationLibtorchInference::
   // run a fake inference at init time as first inference is relative slow
   torch::Tensor input_feature_tensor = torch::zeros({1, 12, 200, 200});
   torch::Tensor current_v = torch::zeros({1, 1});
-  torch::Tensor current_a = torch::zeros({1, 1});
-  torch::Tensor current_curvature = torch::zeros({1, 1});
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(input_feature_tensor.to(device_)),
-       std::move(current_v.to(device_)), std::move(current_a.to(device_)),
-       std::move(current_curvature.to(device_))}));
+       std::move(current_v.to(device_))}));
   try {
     auto torch_output_tensor =
         model_.forward(torch_inputs).toTensor().to(torch::kCPU);
@@ -585,17 +582,8 @@ bool TrajectoryImitationLibtorchInference::
           .trajectory_point();
 
   torch::Tensor current_v_tensor = torch::zeros({1, 1});
-  torch::Tensor current_a_tensor = torch::zeros({1, 1});
-  torch::Tensor current_curvature_tensor = torch::zeros({1, 1});
-
   const double current_v = current_traj_point.v();
-  const double current_a = current_traj_point.a();
-  // TODO(Jinyun): use angular velocity for curvature for now
-  const double current_curvature =
-      learning_data_frame->localization().angular_velocity().z();
   current_v_tensor[0][0] = current_v;
-  current_a_tensor[0][0] = current_a;
-  current_curvature_tensor[0][0] = current_curvature;
 
   auto input_preprocessing_end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> preprocessing_diff =
@@ -608,9 +596,7 @@ bool TrajectoryImitationLibtorchInference::
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(input_feature_tensor.to(device_)),
-       std::move(current_v_tensor.to(device_)),
-       std::move(current_a_tensor.to(device_)),
-       std::move(current_curvature_tensor.to(device_))}));
+       std::move(current_v_tensor.to(device_))}));
   at::Tensor torch_output_tensor =
       model_.forward(torch_inputs).toTensor().to(torch::kCPU);
 
@@ -630,8 +616,7 @@ bool TrajectoryImitationLibtorchInference::
   const double cur_y = cur_path_point.y();
   const double cur_heading = cur_path_point.theta();
   ADEBUG << "cur_x[" << cur_x << "], cur_y[" << cur_y << "], cur_heading["
-         << cur_heading << "], cur_v[" << current_v << "], current_a["
-         << current_a << "], current_curvature[" << current_curvature << "]";
+         << cur_heading << "], cur_v[" << current_v << "]";
 
   learning_data_frame->mutable_output()->clear_adc_future_trajectory_point();
   const double delta_t = config_.trajectory_delta_t();
