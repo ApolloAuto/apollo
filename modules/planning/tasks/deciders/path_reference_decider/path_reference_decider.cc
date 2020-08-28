@@ -264,6 +264,8 @@ bool PathReferenceDecider::IsValidPathReference(
     const double cur_y = path_referece_point.y();
     if (-1 == IsPointWithinPathBounds(reference_line_info, regular_path_bound,
                                       cur_x, cur_y)) {
+      ADEBUG << ", x: " << std::setprecision(9) << cur_x
+             << ", y: " << std::setprecision(9) << cur_y;
       return false;
     }
   }
@@ -391,8 +393,12 @@ int PathReferenceDecider::IsPointWithinPathBounds(
          start_s + idx_after * delta_s < point_sl.s()) {
     ++idx_after;
   }
-  ADEBUG << "idx_after[" << idx_after << "] point_l[" << point_sl.l() << "]";
-  if (idx_after >= 1) {
+  if (idx_after == 0) {
+    // consider as a valid point if the starting point is before path bound
+    // begining point
+    return idx_after;
+  } else {
+    ADEBUG << "idx_after[" << idx_after << "] point_l[" << point_sl.l() << "]";
     int idx_before = idx_after - 1;
     if (std::get<0>(path_bound.boundary().at(idx_before)) <= point_sl.l() &&
         std::get<1>(path_bound.boundary().at(idx_before)) >= point_sl.l() &&
