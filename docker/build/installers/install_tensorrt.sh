@@ -48,7 +48,7 @@ libnvparsers-dev_${TRT_VERSION}_arm64.deb \
 
     for pkg in ${TRT_PKGS}; do
         info "Downloading ${LOCAL_HTTP_ADDR}/${pkg}"
-        wget "${LOCAL_HTTP_ADDR}/${pkg}"
+        wget "${LOCAL_HTTP_ADDR}/${pkg}" >/dev/null
     done
 
     dpkg -i ${TRT_PKGS}
@@ -73,8 +73,7 @@ fixed_version=true
 
 if ${fixed_version}; then
     VERSION="7.0.0-1+cuda10.2"
-    apt-get -y update &&
-        apt-get -y install \
+    apt_get_update_and_install \
             libnvinfer7="${VERSION}" \
             libnvonnxparsers7="${VERSION}" \
             libnvparsers7="${VERSION}" \
@@ -84,8 +83,7 @@ if ${fixed_version}; then
             libnvparsers-dev="${VERSION}" \
             libnvinfer-plugin-dev="${VERSION}"
 else
-    apt-get -y update &&
-        apt-get -y install \
+    apt_get_update_and_install \
             libnvinfer7 \
             libnvonnxparsers7 \
             libnvparsers7 \
