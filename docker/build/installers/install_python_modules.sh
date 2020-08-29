@@ -25,6 +25,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt_get_update_and_install libgeos-dev
 pip3_install -r py3_requirements.txt
 
+if [ "$(uname -m)" = "x86_64" ]; then
+    pip3_install scipy grpcio-tools
+fi
+
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
