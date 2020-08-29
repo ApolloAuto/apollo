@@ -152,6 +152,7 @@ message PathBoundsDeciderConfig {
   optional double pull_over_approach_lon_distance_adjust_factor = 6
       [default = 1.5];
   optional double adc_buffer_coeff = 7 [default = 1.0];
+  optional bool is_extend_lane_bands_to_include_adc = 8 [default = true];
 }
 
 //////////////////////////////////
