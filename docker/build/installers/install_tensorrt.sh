@@ -73,27 +73,27 @@ fixed_version=true
 
 if ${fixed_version}; then
     VERSION="7.0.0-1+cuda10.2"
-    apt-get -y update && \
+    apt-get -y update &&
         apt-get -y install \
-	    libnvinfer7="${VERSION}" \
-	    libnvonnxparsers7="${VERSION}" \
-	    libnvparsers7="${VERSION}" \
-	    libnvinfer-plugin7="${VERSION}" \
-        libnvinfer-dev="${VERSION}" \
-        libnvonnxparsers-dev="${VERSION}" \
-        libnvparsers-dev="${VERSION}" \
-        libnvinfer-plugin-dev="${VERSION}"
+            libnvinfer7="${VERSION}" \
+            libnvonnxparsers7="${VERSION}" \
+            libnvparsers7="${VERSION}" \
+            libnvinfer-plugin7="${VERSION}" \
+            libnvinfer-dev="${VERSION}" \
+            libnvonnxparsers-dev="${VERSION}" \
+            libnvparsers-dev="${VERSION}" \
+            libnvinfer-plugin-dev="${VERSION}"
 else
-    apt-get -y update && \
+    apt-get -y update &&
         apt-get -y install \
-	    libnvinfer7 \
-	    libnvonnxparsers7 \
-	    libnvparsers7 \
-	    libnvinfer-plugin7 \
-        libnvinfer-dev \
-        libnvonnxparsers-dev \
-        libnvparsers-dev \
-        libnvinfer-plugin-dev
+            libnvinfer7 \
+            libnvonnxparsers7 \
+            libnvparsers7 \
+            libnvinfer-plugin7 \
+            libnvinfer-dev \
+            libnvonnxparsers-dev \
+            libnvparsers-dev \
+            libnvinfer-plugin-dev
 fi
 
 # FIXME(all):
@@ -104,7 +104,7 @@ fi
 # 2) move to cudnn installer section
 
 CUDNN_HEADER_DIR="/usr/include/$(uname -m)-linux-gnu"
-[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ] || \
+[ -e "${CUDNN_HEADER_DIR}/cudnn.h" ] ||
     ln -s "${CUDNN_HEADER_DIR}/cudnn_v7.h" "${CUDNN_HEADER_DIR}/cudnn.h"
 
 # Disable nvidia apt sources.list settings to speed up build process
