@@ -1181,24 +1181,36 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
         curr_lane_left_width + (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
                                     ? curr_neighbor_lane_width
                                     : 0.0);
-    double curr_left_bound_adc =
-        std::fmax(adc_l_to_lane_center_,
-                  adc_l_to_lane_center_ + ADC_speed_buffer) +
-        GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
-    double curr_left_bound =
-        std::fmax(curr_left_bound_lane, curr_left_bound_adc) - offset_to_map;
 
     double curr_right_bound_lane =
         -curr_lane_right_width -
         (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
              ? curr_neighbor_lane_width
              : 0.0);
-    double curr_right_bound_adc =
-        std::fmin(adc_l_to_lane_center_,
-                  adc_l_to_lane_center_ + ADC_speed_buffer) -
-        GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
-    double curr_right_bound =
-        std::fmin(curr_right_bound_lane, curr_right_bound_adc) - offset_to_map;
+
+    double curr_left_bound = 0.0;
+    double curr_right_bound = 0.0;
+
+    if (config_.path_bounds_decider_config()
+            .is_extend_lane_bands_to_include_adc()) {
+      double curr_left_bound_adc =
+          std::fmax(adc_l_to_lane_center_,
+                    adc_l_to_lane_center_ + ADC_speed_buffer) +
+          GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
+      curr_left_bound =
+          std::fmax(curr_left_bound_lane, curr_left_bound_adc) - offset_to_map;
+
+      double curr_right_bound_adc =
+          std::fmin(adc_l_to_lane_center_,
+                    adc_l_to_lane_center_ + ADC_speed_buffer) -
+          GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
+      curr_right_bound =
+          std::fmin(curr_right_bound_lane, curr_right_bound_adc) -
+          offset_to_map;
+    } else {
+      curr_left_bound = curr_left_bound_lane - offset_to_map;
+      curr_right_bound = curr_right_bound_lane - offset_to_map;
+    }
 
     ADEBUG << "At s = " << curr_s
            << ", left_lane_bound = " << curr_lane_left_width
