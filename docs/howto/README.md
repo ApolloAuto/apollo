@@ -53,7 +53,6 @@
 - [How to add a new evaluator in prediction module](how_to_add_a_new_evaluator_in_prediction_module_cn.md)
 - [How to add a new predictor in prediction module](how_to_add_a_new_predictor_in_prediction_module_cn.md)
 - [How to add a new vehicle](how_to_add_a_new_vehicle_cn.md)
-- [How to add an external dependency](how_to_add_an_external_dependency_cn.md)
 - [How to Run MSF Localization Module On Your Local Computer](how_to_run_MSF_localization_module_on_your_local_computer_cn.md)
 - [How to train Prediction's MLP model](how_to_train_prediction_mlp_model_cn.md)
 - [How to use the navigation mode of Apollo 2.5 cn](how_to_use_apollo_2.5_navigation_mode_cn.md)
