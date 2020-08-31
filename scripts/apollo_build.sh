@@ -252,7 +252,14 @@ function build_simulator() {
   local SIMULATOR_TOP_DIR="/apollo-simulator"
   if [ -d "${SIMULATOR_TOP_DIR}" ] && [ -e "${SIMULATOR_TOP_DIR}/build.sh" ]; then
     pushd "${SIMULATOR_TOP_DIR}"
-    if bash build.sh build; then
+    local opt
+    if [ "${USE_GPU}" -eq 1 ]; then
+      opt="--config=gpu"
+    else
+      opt="--config=cpu"
+    fi
+
+    if bash build.sh build ${opt}; then
       success "Done building Apollo simulator."
     else
       fail "Building Apollo simulator failed."
