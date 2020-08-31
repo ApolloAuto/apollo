@@ -10,6 +10,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
+        "//modules/audio/proto:audio_event_cc_proto",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",

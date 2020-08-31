@@ -52,6 +52,7 @@ namespace apollo {
 namespace dreamview {
 namespace {
 
+using apollo::audio::AudioEvent;
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::KVDB;
@@ -59,6 +60,7 @@ using apollo::control::DrivingAction;
 using apollo::cyber::Clock;
 using apollo::cyber::Node;
 using apollo::cyber::proto::DagConfig;
+using apollo::localization::LocalizationEstimate;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
 using google::protobuf::Map;
@@ -275,6 +277,8 @@ void HMIWorker::InitStatus() {
 void HMIWorker::InitReadersAndWriters() {
   status_writer_ = node_->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
   pad_writer_ = node_->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
+  audio_event_writer_ =
+      node_->CreateWriter<AudioEvent>(FLAGS_audio_event_topic);
   drive_event_writer_ =
       node_->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
 
@@ -319,6 +323,8 @@ void HMIWorker::InitReadersAndWriters() {
         }
       });
 
+  localization_reader_ =
+      node_->CreateReader<LocalizationEstimate>(FLAGS_localization_topic);
   // Received Chassis, trigger action if there is high beam signal.
   chassis_reader_ = node_->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
@@ -379,6 +385,43 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
       return false;
   }
   return true;
+}
+
+void HMIWorker::SubmitAudioEvent(const uint64_t event_time_ms,
+                                 const int obstacle_id, const int audio_type,
+                                 const int moving_result,
+                                 const int audio_direction,
+                                 const bool is_siren_on) {
+  std::shared_ptr<AudioEvent> audio_event = std::make_shared<AudioEvent>();
+  apollo::common::util::FillHeader("HMI", audio_event.get());
+  // Here we reuse the header time field as the event occurring time.
+  // A better solution might be adding an event time field to DriveEvent proto
+  // to make it clear.
+  audio_event->mutable_header()->set_timestamp_sec(
+      static_cast<double>(event_time_ms) / 1000.0);
+  audio_event->set_id(obstacle_id);
+  audio_event->set_audio_type(
+      static_cast<apollo::audio::AudioType>(audio_type));
+  audio_event->set_moving_result(
+      static_cast<apollo::audio::MovingResult>(moving_result));
+  audio_event->set_audio_direction(
+      static_cast<apollo::audio::AudioDirection>(audio_direction));
+  audio_event->set_siren_is_on(is_siren_on);
+
+  // Read the current localization pose
+  localization_reader_->Observe();
+  if (localization_reader_->Empty()) {
+    AERROR << "Failed to get localization associated with the audio event: "
+           << audio_event->DebugString() << "\n Localization reader is empty!";
+    return;
+  }
+
+  const std::shared_ptr<LocalizationEstimate> localization =
+      localization_reader_->GetLatestObserved();
+  audio_event->mutable_pose()->CopyFrom(localization->pose());
+  AINFO << "AudioEvent: " << audio_event->DebugString();
+
+  audio_event_writer_->Write(audio_event);
 }
 
 void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
