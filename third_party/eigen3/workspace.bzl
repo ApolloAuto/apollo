@@ -13,7 +13,10 @@ def repo():
         build_file = clean_dep("//third_party/eigen3:eigen.BUILD"),
         sha256 = "a8d87c8df67b0404e97bcef37faf3b140ba467bc060e2b883192165b319cea8d",
         strip_prefix = "eigen-git-mirror-3.3.7",
-        urls = ["https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz"],
+        urls = [
+            "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/3.3.7.tar.gz",
+            "https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz",
+        ],
     )
     #native.new_local_repository(
     #    name = "eigen",
