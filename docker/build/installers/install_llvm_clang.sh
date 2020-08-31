@@ -54,7 +54,7 @@ if [[ "${ARCH}" == "x86_64" ]]; then
     PKG_NAME="${DECOMPRESS_NAME}.tar.xz"
 
     CHECKSUM="b25f592a0c00686f03e3b7db68ca6dc87418f681f4ead4df4745a01d9be63843"
-    DOWNLOAD_LINK="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
@@ -68,7 +68,7 @@ if [[ "${ARCH}" == "aarch64" ]]; then
     DECOMPRESS_NAME="clang+llvm-${VERSION}-aarch64-linux-gnu"
     PKG_NAME="${DECOMPRESS_NAME}.tar.xz"
     CHECKSUM="c2072390dc6c8b4cc67737f487ef384148253a6a97b38030e012c4d7214b7295"
-    DOWNLOAD_LINK="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xJf "${PKG_NAME}"

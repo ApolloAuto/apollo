@@ -29,7 +29,7 @@ THREAD_NUM=$(nproc)
 VERSION="2.2.2"
 CHECKSUM="34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf"
 PKG_NAME="gflags-${VERSION}.tar.gz"
-DOWNLOAD_LINK="https://github.com/gflags/gflags/archive/v${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/v${VERSION}.tar.gz"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
@@ -53,7 +53,7 @@ rm -rf $PKG_NAME gflags-$VERSION
 VERSION="0.4.0"
 PKG_NAME="glog-${VERSION}.tar.gz"
 CHECKSUM="f28359aeba12f30d73d9e4711ef356dc842886968112162bc73002645139c39c"
-DOWNLOAD_LINK="https://github.com/google/glog/archive/v${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/v${VERSION}.tar.gz"
 # https://github.com/google/glog/archive/v0.4.0.tar.gz
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"

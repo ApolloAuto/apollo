@@ -33,7 +33,7 @@ apt-get -y update && \
 VERSION="1.8.19"
 PKG_NAME="doxygen-${VERSION}.src.tar.gz"
 CHECKSUM="ac15d111615251ec53d3f0e54ac89c9d707538f488be57184245adef057778d3"
-DOWNLOAD_LINK="http://doxygen.nl/files/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

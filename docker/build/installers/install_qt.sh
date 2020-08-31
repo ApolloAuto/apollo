@@ -47,7 +47,7 @@ QT_VERSION_Z=$(echo "$QT_VERSION_B" | tr -d '.')
 
 QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
 CHECKSUM="384c833bfbccf596a00bb02bbad14b53201854c287daf2d99c23a93b8de4062a"
-DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
+DOWLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${QT_INSTALLER}"
 
 pip3_install cuteci
 

@@ -25,7 +25,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 VERSION="1.5.1"
 PKG_NAME="benchmark-${VERSION}.tar.gz"
 CHECKSUM="23082937d1663a53b90cb5b61df4bcc312f6dee7018da78ba00dd6bd669dfef2"
-DOWNLOAD_LINK="https://github.com/google/benchmark/archive/v${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/v${VERSION}.tar.gz"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

@@ -55,7 +55,7 @@ VERSION="5.12.9"
 MAJOR_VERSION="${VERSION%.*}"
 PKG_NAME="qtbase-everywhere-src-${VERSION}.tar.xz"
 CHECKSUM="331dafdd0f3e8623b51bd0da2266e7e7c53aa8e9dc28a8eb6f0b22609c5d337e"
-DOWNLOAD_LINK="https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/submodules/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xJf ${PKG_NAME}

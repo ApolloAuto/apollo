@@ -56,7 +56,7 @@ TARGET_ARCH="$(uname -m)"
 VERSION=8.2.0
 PKG_NAME="VTK-8.2.0.tar.gz"
 CHECKSUM="34c3dc775261be5e45a8049155f7228b6bd668106c72a3c435d95730d17d57bb"
-DOWNLOAD_LINK=https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/VTK-8.2.0.tar.gz"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

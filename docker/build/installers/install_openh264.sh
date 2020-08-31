@@ -27,7 +27,7 @@ apt_get_update_and_install nasm
 VERSION="2.1.1"
 PKG_NAME="openh264-${VERSION}.tar.gz"
 CHECKSUM="af173e90fce65f80722fa894e1af0d6b07572292e76de7b65273df4c0a8be678"
-DOWNLOAD_LINK="https://github.com/cisco/openh264/archive/v${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/v${VERSION}.tar.gz"
 
 # Prepare
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"

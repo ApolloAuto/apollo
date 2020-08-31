@@ -53,7 +53,7 @@ popd
 rm -rf libtorch_gpu ${PKG_NAME}
 
 PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0+cpu.zip"
-DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip"
 CHECKSUM="3e438237a08099a4bf014335cd0da88708da3a1678aec12a46c67305792b5fa4"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

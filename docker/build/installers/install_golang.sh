@@ -34,7 +34,7 @@ else
     error "Unsupported arch: ${ARCH}. Exiting..."
     exit 1
 fi
-DOWNLOAD_LINK="https://dl.google.com/go/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 tar xzf ${PKG_NAME} -C "${PKGS_DIR}"

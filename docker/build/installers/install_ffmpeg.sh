@@ -51,7 +51,7 @@ apt-get -y update && \
 VERSION="4.3.1"
 PKG_NAME="ffmpeg-${VERSION}.tar.xz"
 CHECKSUM="ad009240d46e307b4e03a213a0f49c11b650e445b1f8be0dda2a9212b34d2ffb"
-DOWNLOAD_LINK="http://ffmpeg.org/releases/ffmpeg-${VERSION}.tar.xz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/ffmpeg-${VERSION}.tar.xz"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xJf ${PKG_NAME}

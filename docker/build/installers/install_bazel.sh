@@ -29,7 +29,7 @@ BAZEL_VERSION="3.4.1"
 if [ "$TARGET_ARCH" == "x86_64" ]; then
   # https://docs.bazel.build/versions/master/install-ubuntu.html
   PKG_NAME="bazel_${BAZEL_VERSION}-linux-x86_64.deb"
-  DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${PKG_NAME}"
+  DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
   SHA256SUM="dc8f51b7ed039d57bb990a1eebddcbb0014fe267a88df8972f4609ded1f11c90"
   download_if_not_cached $PKG_NAME $SHA256SUM $DOWNLOAD_LINK
 
@@ -48,7 +48,7 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
   BUILDTOOLS_VERSION="3.4.0"
   PKG_NAME="buildifier-${BUILDTOOLS_VERSION}.${TARGET_ARCH}.bin"
   CHECKSUM="5d47f5f452bace65686448180ff63b4a6aaa0fb0ce0fe69976888fa4d8606940"
-  DOWNLOAD_LINK="https://github.com/bazelbuild/buildtools/releases/download/${BUILDTOOLS_VERSION}/buildifier"
+  DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/buildifier"
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin/buildifier"
@@ -60,7 +60,7 @@ if [ "$TARGET_ARCH" == "x86_64" ]; then
 elif [ "$TARGET_ARCH" == "aarch64" ]; then
   ARM64_BINARY="bazel-${BAZEL_VERSION}-linux-arm64"
   CHECKSUM="07955cbef922b51025577df4e258d5dfc4f7adc5ec8ab110dedb411878d63627"
-  DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${ARM64_BINARY}"
+  DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${ARM64_BINARY}"
   # https://github.com/bazelbuild/bazel/releases/download/3.4.1/bazel-3.4.1-linux-arm64
   download_if_not_cached "${ARM64_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
   cp -f ${ARM64_BINARY} "${SYSROOT_DIR}/bin/bazel"

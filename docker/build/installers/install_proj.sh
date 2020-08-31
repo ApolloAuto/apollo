@@ -41,7 +41,7 @@ fi
 VERSION="7.1.0"
 PKG_NAME="proj-${VERSION}.tar.gz"
 CHECKSUM="876151e2279346f6bdbc63bd59790b48733496a957bccd5e51b640fdd26eaa8d"
-DOWNLOAD_LINK="https://github.com/OSGeo/PROJ/releases/download/${VERSION}/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 

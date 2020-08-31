@@ -78,7 +78,7 @@ VERSION="1.10.1"
 CHECKSUM="61ec734ec7c786c628491844b46f9624958c360012c173bbc993c5ff88b4900e" # 1.10.1
 PKG_NAME="pcl-${VERSION}.tar.gz"
 
-DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_NAME}

@@ -64,7 +64,7 @@ VERSION="4.4.0"
 
 PKG_OCV="opencv-${VERSION}.tar.gz"
 CHECKSUM="bb95acd849e458be7f7024d17968568d1ccd2f0681d47fd60d34ffb4b8c52563"
-DOWNLOAD_LINK="https://github.com/opencv/opencv/archive/${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${VERSION}.tar.gz"
 download_if_not_cached "${PKG_OCV}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_OCV}
 

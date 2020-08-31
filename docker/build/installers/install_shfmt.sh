@@ -41,7 +41,7 @@ else
   exit 1
 fi
 
-DOWNLOAD_LINK="https://github.com/mvdan/sh/releases/download/v${VERSION}/${BIN_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${BIN_NAME}"
 download_if_not_cached "${BIN_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 cp -f "${BIN_NAME}" "${SYSROOT_DIR}/bin/shfmt"

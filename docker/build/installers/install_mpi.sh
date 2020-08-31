@@ -37,7 +37,7 @@ apt_get_update_and_install gfortran libhwloc-dev hwloc-nox libevent-dev
 VERSION="4.0.4"
 PKG_NAME="openmpi-${VERSION}.tar.bz2"
 CHECKSUM="47e24eb2223fe5d24438658958a313b6b7a55bb281563542e1afc9dec4a31ac4"
-DOWNLOAD_LINK="https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-${VERSION}.tar.bz2"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/openmpi-${VERSION}.tar.bz2"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 GPU_OPTIONS=""

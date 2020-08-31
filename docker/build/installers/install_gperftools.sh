@@ -30,7 +30,7 @@ apt-get -y update && \
 VERSION="2.8"
 PKG_NAME="gperftools-${VERSION}.tar.gz"
 CHECKSUM="b09193adedcc679df2387042324d0d54b93d35d062ea9bff0340f342a709e860"
-DOWNLOAD_LINK="https://github.com/gperftools/gperftools/archive/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 

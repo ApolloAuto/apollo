@@ -29,7 +29,7 @@ TARGET_ARCH="$(uname -m)"
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     CMAKE_SH="cmake-${VERSION}-Linux-x86_64.sh"
     SHA256SUM="0241a05bee0dcdf60e912057cc86cbedba21b9b0d67ec11bc67ad4834f182a23"
-    DOWLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v${VERSION}/${CMAKE_SH}
+    DOWLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${CMAKE_SH}"
     download_if_not_cached $CMAKE_SH $SHA256SUM $DOWLOAD_LINK
     chmod a+x ${CMAKE_SH}
     ./${CMAKE_SH} --skip-license --prefix="${SYSROOT_DIR}"
@@ -59,7 +59,7 @@ elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
         libcurl4-openssl-dev
     PKG_NAME="CMake-${VERSION}.tar.gz"
     CHECKSUM="08b048117aa8966d477091680f1a5c67bf8ffb893a1c94ff62858cbb2358a07c"
-    DOWNLOAD_LINK=https://github.com/Kitware/CMake/archive/v3.16.8.tar.gz
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/v3.16.8.tar.gz"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
 

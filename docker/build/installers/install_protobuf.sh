@@ -26,7 +26,7 @@ VERSION="3.12.3"
 
 PKG_NAME="protobuf-${VERSION}.tar.gz"
 CHECKSUM="71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29"
-DOWNLOAD_LINK="https://github.com/protocolbuffers/protobuf/archive/v${VERSION}.tar.gz"
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/v${VERSION}.tar.gz"
 
 #PKG_NAME="protobuf-cpp-${VERSION}.tar.gz"
 #CHECKSUM="4ef97ec6a8e0570d22ad8c57c99d2055a61ea2643b8e1a0998d2c844916c4968"

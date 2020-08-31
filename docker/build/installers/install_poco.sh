@@ -35,7 +35,7 @@ THREAD_NUM=$(nproc)
 VERSION=1.10.1
 PKG_NAME="poco-${VERSION}-release.tar.gz"
 CHECKSUM="44592a488d2830c0b4f3bfe4ae41f0c46abbfad49828d938714444e858a00818"
-DOWNLOAD_LINK=https://github.com/pocoproject/poco/archive/poco-${VERSION}-release.tar.gz
+DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/poco-${VERSION}-release.tar.gz"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
