@@ -28,7 +28,9 @@ Setup steps:
     ```
     bash apollo.sh build
     ```
-    `Note:` If you do not have a GPU, you can use the following script instead
+    `Note:` If you do not have a GPU, you can use the following script instead.
+    It should be noted that learning based algorithms of the planning module and
+    the entire perception module cannot be used in CPU mode.
 
     ```
     bash apollo.sh build_cpu

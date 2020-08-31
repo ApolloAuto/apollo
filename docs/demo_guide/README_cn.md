@@ -1,6 +1,6 @@
 # 运行线下演示
 
-如果你没有车辆及车载硬件， Apollo还提供了一个计算机模拟环境，可用于演示和代码调试。 
+如果你没有车辆及车载硬件， Apollo还提供了一个计算机模拟环境，可用于演示和代码调试。
 
 线下演示首先要Fork并且Clone Apollo在GitHub的代码，然后需要设置docker的release环境，请参照 [how_to_build_and_release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md)文档中的[Install docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#docker)章节。
 
@@ -22,7 +22,8 @@ Apollo演示的安装步骤：
     ```
     bash apollo.sh build
     ```
-    `Note:` 如果没有GPU，请使用下面的命令
+    `Note:` 如果没有GPU，请使用下面的命令。需要注意的是，planning模块基于学习的算法
+    以及perception模块的所有功能无法在CPU模式下使用。
 
     ```
     bash apollo.sh build_cpu
