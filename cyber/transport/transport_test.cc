@@ -18,10 +18,12 @@
 
 #include <memory>
 #include <typeinfo>
+
 #include "gtest/gtest.h"
 
-#include "cyber/init.h"
 #include "cyber/proto/unit_test.pb.h"
+
+#include "cyber/init.h"
 #include "cyber/transport/common/identity.h"
 
 namespace apollo {

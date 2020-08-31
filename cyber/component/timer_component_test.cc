@@ -17,6 +17,7 @@
 #include "cyber/component/timer_component.h"
 
 #include <memory>
+
 #include "gtest/gtest.h"
 
 #include "cyber/init.h"

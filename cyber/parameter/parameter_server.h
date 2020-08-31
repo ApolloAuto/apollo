@@ -22,8 +22,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cyber/parameter/parameter.h"
 #include "cyber/proto/parameter.pb.h"
+
+#include "cyber/parameter/parameter.h"
 #include "cyber/service/service.h"
 
 namespace apollo {

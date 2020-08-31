@@ -17,6 +17,7 @@
 #include "cyber/service_discovery/topology_manager.h"
 
 #include <memory>
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"

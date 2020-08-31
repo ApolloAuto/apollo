@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/scheduler/policy/scheduler_classic.h"
+
 #include "gtest/gtest.h"
 
 #include "cyber/base/for_each.h"
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/classic_context.h"
-#include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/task/task.h"

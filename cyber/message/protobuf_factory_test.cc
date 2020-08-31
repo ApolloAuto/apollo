@@ -17,6 +17,7 @@
 #include "cyber/message/protobuf_factory.h"
 
 #include <string>
+
 #include "gtest/gtest.h"
 
 #include "cyber/proto/unit_test.pb.h"

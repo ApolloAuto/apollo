@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "cyber/record/record_viewer.h"
-#include <limits>
+
 #include <algorithm>
+#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"

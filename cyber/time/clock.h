@@ -19,9 +19,10 @@
 
 #include <mutex>
 
+#include "cyber/proto/run_mode_conf.pb.h"
+
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/macros.h"
-#include "cyber/proto/run_mode_conf.pb.h"
 #include "cyber/time/time.h"
 
 namespace apollo {
