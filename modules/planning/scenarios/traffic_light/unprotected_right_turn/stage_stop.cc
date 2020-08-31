@@ -125,8 +125,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
           GetContext()->stop_start_time = Clock::NowInSeconds();
         } else {
           auto start_time = GetContext()->stop_start_time;
-          const double wait_time =
-              Clock::NowInSeconds() - start_time;
+          const double wait_time = Clock::NowInSeconds() - start_time;
           ADEBUG << "stop_start_time[" << start_time << "] wait_time["
                  << wait_time << "]";
           if (wait_time >
