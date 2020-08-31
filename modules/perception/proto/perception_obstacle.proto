@@ -30,7 +30,7 @@ message V2XInformation {
     ZOMBIES_CAR = 1;
     BLIND_ZONE = 2;
   };
-  repeated V2XType v2x_type = 1; // use case type
+  repeated V2XType v2x_type = 1; 
 }
 
 message SensorMeasurement {
@@ -152,8 +152,7 @@ message PerceptionObstacle {
     V2X = 1;
   };
 
-  optional Source source = 27 [ default = HOST_VEHICLE ]; // source type
-  // v2x use case info
+  optional Source source = 27 [ default = HOST_VEHICLE ]; 
   optional V2XInformation v2x_info = 28;
 }
 
