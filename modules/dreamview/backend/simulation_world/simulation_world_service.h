@@ -35,6 +35,7 @@
 #include "gtest/gtest_prod.h"
 #include "nlohmann/json.hpp"
 
+#include "modules/audio/proto/audio_event.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -367,6 +368,8 @@ class SimulationWorldService {
       navigation_reader_;
   std::shared_ptr<cyber::Reader<apollo::relative_map::MapMsg>>
       relative_map_reader_;
+  std::shared_ptr<cyber::Reader<apollo::audio::AudioEvent>>
+      audio_event_reader_;
   std::shared_ptr<cyber::Reader<apollo::common::DriveEvent>>
       drive_event_reader_;
   std::shared_ptr<cyber::Reader<apollo::common::monitor::MonitorMessage>>

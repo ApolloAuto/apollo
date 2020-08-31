@@ -210,6 +210,8 @@ DEFINE_string(v2x_trafficlight_topic, "/apollo/v2x/traffic_light",
               "v2x trafficlight topic name");
 DEFINE_string(storytelling_topic, "/apollo/storytelling",
               "Storytelling topic.");
+DEFINE_string(audio_event_topic, "/apollo/audio_event",
+              "Audio event topic.");
 
 DEFINE_string(guardian_topic, "/apollo/guardian", "Guardian topic.");
 DEFINE_string(gnss_raw_data_topic, "/apollo/sensor/gnss/raw_data",

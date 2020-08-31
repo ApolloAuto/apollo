@@ -38,6 +38,7 @@
 namespace apollo {
 namespace dreamview {
 
+using apollo::audio::AudioEvent;
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::PathPoint;
@@ -281,6 +282,13 @@ void SimulationWorldService::InitReaders() {
   relative_map_reader_ = node_->CreateReader<MapMsg>(FLAGS_relative_map_topic);
   storytelling_reader_ = node_->CreateReader<Stories>(FLAGS_storytelling_topic);
 
+  audio_event_reader_ = node_->CreateReader<AudioEvent>(
+      FLAGS_audio_event_topic,
+      [this](const std::shared_ptr<AudioEvent> &audio_event) {
+        this->PublishMonitorMessage(
+            MonitorMessageItem::WARN,
+            apollo::audio::AudioType_Name(audio_event->audio_type()));
+      });
   drive_event_reader_ = node_->CreateReader<DriveEvent>(
       FLAGS_drive_event_topic,
       [this](const std::shared_ptr<DriveEvent> &drive_event) {
