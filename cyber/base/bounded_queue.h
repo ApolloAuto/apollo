@@ -18,6 +18,7 @@
 #define CYBER_BASE_BOUNDED_QUEUE_H_
 
 #include <unistd.h>
+
 #include <algorithm>
 #include <atomic>
 #include <cstdint>

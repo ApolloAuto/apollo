@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/io/session.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {

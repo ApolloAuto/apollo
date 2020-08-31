@@ -23,10 +23,11 @@
 #include <memory>
 #include <string>
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

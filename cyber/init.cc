@@ -26,13 +26,14 @@
 #include <memory>
 #include <string>
 
+#include "cyber/proto/clock.pb.h"
+
 #include "cyber/binary.h"
 #include "cyber/common/file.h"
 #include "cyber/common/global_data.h"
 #include "cyber/data/data_dispatcher.h"
 #include "cyber/logger/async_logger.h"
 #include "cyber/node/node.h"
-#include "cyber/proto/clock.pb.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/sysmo/sysmo.h"

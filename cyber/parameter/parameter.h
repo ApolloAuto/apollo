@@ -19,8 +19,9 @@
 
 #include <string>
 
-#include "cyber/common/log.h"
 #include "cyber/proto/parameter.pb.h"
+
+#include "cyber/common/log.h"
 
 /**
  * @namespace cyber.parameter

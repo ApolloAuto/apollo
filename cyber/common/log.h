@@ -24,9 +24,10 @@
 #include <cstdarg>
 #include <string>
 
-#include "cyber/binary.h"
 #include "glog/logging.h"
 #include "glog/raw_logging.h"
+
+#include "cyber/binary.h"
 
 #define LEFT_BRACKET "["
 #define RIGHT_BRACKET "]"

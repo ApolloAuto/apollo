@@ -22,12 +22,14 @@
 #include <mutex>
 #include <string>
 
-#include "cyber/common/macros.h"
-#include "cyber/proto/proto_desc.pb.h"
 #include "google/protobuf/compiler/parser.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/io/tokenizer.h"
+
+#include "cyber/proto/proto_desc.pb.h"
+
+#include "cyber/common/macros.h"
 
 namespace apollo {
 namespace cyber {

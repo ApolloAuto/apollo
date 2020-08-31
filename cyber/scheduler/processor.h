@@ -25,8 +25,9 @@
 #include <thread>
 #include <vector>
 
-#include "cyber/croutine/croutine.h"
 #include "cyber/proto/scheduler_conf.pb.h"
+
+#include "cyber/croutine/croutine.h"
 #include "cyber/scheduler/processor_context.h"
 
 namespace apollo {

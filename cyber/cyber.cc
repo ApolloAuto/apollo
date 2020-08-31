@@ -20,8 +20,9 @@
 #include <string>
 #include <utility>
 
-#include "cyber/common/global_data.h"
 #include "cyber/proto/run_mode_conf.pb.h"
+
+#include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {

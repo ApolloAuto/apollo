@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
+
+#include "cyber/cyber.h"
 
 using apollo::cyber::examples::proto::Driver;
 

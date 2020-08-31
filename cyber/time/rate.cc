@@ -52,6 +52,7 @@
  *****************************************************************************/
 
 #include "cyber/time/rate.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {

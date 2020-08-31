@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "cyber/time/clock.h"
+
+#include "gtest/gtest.h"
 
 using apollo::cyber::proto::ClockMode;
 

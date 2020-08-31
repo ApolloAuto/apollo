@@ -21,8 +21,9 @@
 #include <memory>
 #include <string>
 
-#include "cyber/common/macros.h"
 #include "cyber/proto/transport_conf.pb.h"
+
+#include "cyber/common/macros.h"
 #include "cyber/transport/dispatcher/intra_dispatcher.h"
 #include "cyber/transport/dispatcher/rtps_dispatcher.h"
 #include "cyber/transport/dispatcher/shm_dispatcher.h"

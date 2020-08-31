@@ -18,6 +18,7 @@
 
 #include <cstring>
 #include <string>
+
 #include "gtest/gtest.h"
 
 namespace apollo {

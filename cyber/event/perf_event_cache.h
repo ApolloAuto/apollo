@@ -23,10 +23,11 @@
 #include <string>
 #include <thread>
 
+#include "cyber/proto/perf_conf.pb.h"
+
 #include "cyber/base/bounded_queue.h"
 #include "cyber/common/macros.h"
 #include "cyber/event/perf_event.h"
-#include "cyber/proto/perf_conf.pb.h"
 
 namespace apollo {
 namespace cyber {

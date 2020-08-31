@@ -26,12 +26,13 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/proto/topology_change.pb.h"
+
 #include "cyber/blocker/blocker.h"
 #include "cyber/common/global_data.h"
 #include "cyber/croutine/routine_factory.h"
 #include "cyber/data/data_visitor.h"
 #include "cyber/node/reader_base.h"
-#include "cyber/proto/topology_change.pb.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/time/time.h"
