@@ -17,17 +17,20 @@
 #include "modules/audio/inference/direction_detection.h"
 #include "yaml-cpp/yaml.h"
 
+#include "modules/common/math/math_utils.h"
+
 namespace apollo {
 namespace audio {
 
 using torch::indexing::None;
 using torch::indexing::Slice;
+using apollo::common::math::NormalizeAngle;
 
 DirectionDetection::DirectionDetection() {}
 
 DirectionDetection::~DirectionDetection() {}
 
-Point3D DirectionDetection::EstimateSoundSource(
+std::pair<Point3D, double> DirectionDetection::EstimateSoundSource(
     std::vector<std::vector<double>>&& channels_vec,
     const std::string& respeaker_extrinsic_file, const int sample_rate,
     const double mic_distance) {
@@ -35,7 +38,7 @@ Point3D DirectionDetection::EstimateSoundSource(
     respeaker2imu_ptr_.reset(new Eigen::Matrix4d);
     LoadExtrinsics(respeaker_extrinsic_file, respeaker2imu_ptr_.get());
   }
-  const double degree =
+  double degree =
       EstimateDirection(move(channels_vec), sample_rate, mic_distance);
   Eigen::Vector4d source_position(kDistance * sin(degree),
                                   kDistance * cos(degree), 0, 1);
@@ -45,8 +48,8 @@ Point3D DirectionDetection::EstimateSoundSource(
   source_position_p3d.set_x(source_position[0]);
   source_position_p3d.set_y(source_position[1]);
   source_position_p3d.set_z(source_position[2]);
-
-  return source_position_p3d;
+  degree = NormalizeAngle(degree);
+  return {source_position_p3d, degree};
 }
 
 double DirectionDetection::EstimateDirection(
@@ -76,7 +79,7 @@ double DirectionDetection::EstimateDirection(
   }
   best_guess = (-best_guess + 480) % 360;
 
-  return static_cast<double>(best_guess) / 90 * M_PI;
+  return static_cast<double>(best_guess) / 180 * M_PI;
 }
 
 bool DirectionDetection::LoadExtrinsics(const std::string& yaml_file,

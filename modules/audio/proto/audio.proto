@@ -27,4 +27,5 @@ message AudioDetection {
   optional bool is_siren = 2;
   optional apollo.audio.MovingResult moving_result = 3 [default = UNKNOWN];
   optional apollo.common.Point3D position = 4;
+  optional double source_degree = 5;
 }

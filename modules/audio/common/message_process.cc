@@ -30,12 +30,14 @@ void MessageProcess::OnMicrophone(
     SirenDetection* siren_detection,
     AudioDetection* audio_detection) {
   audio_info->Insert(audio_data);
-  *(audio_detection->mutable_position()) =
+  auto direction_result =
       direction_detection->EstimateSoundSource(
           audio_info->GetSignals(audio_data.microphone_config().chunk()),
           respeaker_extrinsics_file,
           audio_data.microphone_config().sample_rate(),
           audio_data.microphone_config().mic_distance());
+  *(audio_detection->mutable_position()) = direction_result.first;
+  audio_detection->set_source_degree(direction_result.second);
 
   bool is_siren = siren_detection->Evaluate(audio_info->GetSignals(72000));
   audio_detection->set_is_siren(is_siren);
