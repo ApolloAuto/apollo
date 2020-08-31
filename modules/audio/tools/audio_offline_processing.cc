@@ -91,22 +91,22 @@ void ProcessSingleRecordFile(const AudioConf& audio_conf,
         writer.WriteMessage<AudioEvent>(message.channel_name, audio_event,
                                         message.time);
         AINFO << "Save an audio even message.";
-      } else if (message.channel_name ==
+      }
+    } else if (message.channel_name ==
                  audio_conf.topic_conf().localization_topic_name()) {
-        LocalizationEstimate localization;
-        if (localization.ParseFromString(message.content)) {
-          writer.WriteMessage<LocalizationEstimate>(
-              message.channel_name, localization, message.time);
-          AINFO << "Save a localization message.";
-        }
-      } else if (message.channel_name ==
+      LocalizationEstimate localization;
+      if (localization.ParseFromString(message.content)) {
+        writer.WriteMessage<LocalizationEstimate>(
+            message.channel_name, localization, message.time);
+        AINFO << "Save a localization message.";
+      }
+    } else if (message.channel_name ==
                  audio_conf.topic_conf().perception_topic_name()) {
-        PerceptionObstacles perception_obstacles;
-        if (perception_obstacles.ParseFromString(message.content)) {
-          writer.WriteMessage<PerceptionObstacles>(
-              message.channel_name, perception_obstacles, message.time);
-          AINFO << "Save a perception message.";
-        }
+      PerceptionObstacles perception_obstacles;
+      if (perception_obstacles.ParseFromString(message.content)) {
+        writer.WriteMessage<PerceptionObstacles>(
+            message.channel_name, perception_obstacles, message.time);
+        AINFO << "Save a perception message.";
       }
     }
   }
