@@ -84,7 +84,7 @@ export default class PerceptionObstacles {
         continue;
       }
 
-      if (!STORE.options.showObstaclesV2xInfo && obstacle.source === 'V2x') {
+      if (!STORE.options.showObstaclesV2xInfo && obstacle.source === 'V2X') {
         continue;
       }
 
