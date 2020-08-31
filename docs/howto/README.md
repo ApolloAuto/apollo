@@ -86,12 +86,10 @@
 - [How to Run RTK Localization Module On Your Local Computer](how_to_run_RTK_localization_module_on_your_local_computer_cn.md)
 
 ## Others
-- [How to install ubuntu](how_to_install_ubuntu.md)
 - [How to use IRC client on ubuntu](how_to_use_IRC_client_on_ubuntu.md)
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images.md)
 
 ### Chinese versions
 
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images_cn.md)
-- [How to install ubuntu](how_to_install_ubuntu_cn.md)
 - [How to solve slow pull from cn](how_to_solve_slow_pull_from_cn.md)
