@@ -96,8 +96,8 @@ function build_dreamview_frontend() {
 }
 
 function build_test_and_lint() {
-    env ${APOLLO_ENV} bash "${build_sh}" --config=cpu
-    env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test --config=cpu
+    env ${APOLLO_ENV} bash "${build_sh}"
+    env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test
     env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
     success "Build and Test and Lint finished."
 }
