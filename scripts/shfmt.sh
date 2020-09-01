@@ -75,7 +75,7 @@ function run_shfmt() {
         continue
       fi
       shell_format_run ${srcs}
-      info "Done formatting Shell source files under ${target}"
+      ok "Done formatting Shell source files under ${target}"
     fi
   done
 }
