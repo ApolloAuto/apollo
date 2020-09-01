@@ -1,50 +1,60 @@
 # How to Launch and Run Apollo
-First check and make sure you are in development docker container before you proceed. Now you will need to build from the source. If you want to run the entire system, make sure you have an
-nVidia GPU and that you have installed the Linux nVidia drivers.
-You could still proceed with the next few steps even if you are missing the Linux nVidia drivers, as the system will run but with the CUDA-based perception and other modules.
+
+## Build Apollo
+
+First check to make sure you are in development docker container before you
+proceed. Make sure nVidia GPU is available and that you have installed the
+appropriate nVidia driver if you want to run the entire system. You could still
+proceed with the next few steps if no nVidia GPU is available, the system will
+run without perception as it was CUDA-based.
+
 ```
-# To get a list of build commands
-./apollo.sh
-# To make sure you start clean, cleanup bazel output and log/coredump files.
+# Make sure you start up clean
 ./apollo.sh clean
-# This will build the full system and requires that you have an nVidia GPU with nVidia drivers loaded.
-# You can specify a module to build, e.g. <module> = cyber or modules/<module>. If <module> unspecified, build all.
-./apollo.sh build [module]
+
+# This will build the full system and requires nVidia GPU with nVidia drivers
+# loaded. If no GPU is availabe, please run "./apollo.sh build_opt" instead.
+./apollo.sh build_opt_gpu
 ```
 
-If you make modifications to the Dreamview frontend, then you must run `bash apollo.sh build_fe`  before you run the
-full build.
+**Note**:
+
+> Please run `./apollo.sh build_fe` before `./apollo.sh build_opt` if you made
+> any modifications to the Dreamview frontend.
 
 ## Run Apollo
 
-Follow the steps below to launch Apollo. Note that you must build the system first before you run it. Note that the
-bootstrap.sh will actually succeed but the user interface will not come up if you skip the build step.
+Once you have finished building Apollo, follow the steps below to launch it.
+Note that although `bootstrap.sh` may succeed, the Web UI won't be ready if the
+former building step was skipped.
 
 ### Start Apollo
 
-Running Apollo will start the Dreamview backend and then startup a web user interface called Dreamview frontend, this is handled by
-the bootstrap script, so from within the docker container, you should run:
+Running `scripts/bootstrap.sh` will start Dreamview with the monitor module
+enabled.
 
 ```
 # Startup modules monitor and dreamview, the default option is start.
 ./scripts/bootstrap.sh [start | stop | restart]
 ```
 
-### Access Dreamview
-Access Dreamview by opening your favorite browser, e.g. Chrome, go to http://localhost:8888 and you should see this screen
-However, there will be nothing running in the system.
+### Access Dreamview Web UI
+
+Open [http://localhost:8888](http://localhost:8888) in your favorite browser,
+e.g. Chrome, and you should see this screen. However, no modules are running in
+the backend at this time.
 
 ![Access Dreamview](images/apollo_bootstrap_screen.png)
 
 ### Select Drive Mode
+
 From the dropdown box selet "Navigation" mode.
 
 ![Navigation Mode](images/dreamview_2_5_setup_profile.png)
 
+### Replay Demo Record
 
-### Replay demo record
-
-To see if the system works, use the demo 'record' which feeds the system.
+To see if the system works, use the demo 'record' to "feed" the system.
 
 ```
 # You need to download the demo record using the following commands
@@ -55,8 +65,13 @@ python3 rosbag_helper.py demo_3.5.record
 cyber_recorder play -f docs/demo_guide/demo_3.5.record -l
 ```
 
-Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
+Dreamview should show a running vehicle now. (The following image might be
+different due to frontend code changes.)
 
 ![Dreamview with Trajectory](images/dv_trajectory_2.5.png)
 
-Congratulations! You have successfully built out Apollo!! If you do have the necessary Hardware setup, please go back to our [Readme](https://github.com/ApolloAuto/apollo/blob/master/README.md) for additional guidelines.
+### Congrats!
+
+You have successfully built Apollo! Now you can revisit
+[Apollo Readme](https://github.com/ApolloAuto/apollo/blob/master/README.md) for
+additional guidelines on the neccessary hardware setup.
