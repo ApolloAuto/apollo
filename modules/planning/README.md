@@ -13,7 +13,7 @@ There are 5 main driving scenarios that we will focus on Lane Follow, Intersecti
 
 As seen in the figure below, the lane-follow scenario, our default driving scenario, includes but is not limited to driving in a single lane (like cruising) or changing lane, following basic traffic convention or basic turning.
 
-   ![](images/Planning_default.png)
+   ![](images/planning_default.png)
 
 ```
 Note: Side Pass
