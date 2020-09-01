@@ -88,12 +88,58 @@
 
 ###########################################################################
 # Flags from lidar_point_pillars
+
+# classification score threshold
+# type: double
+# default: 0.5
 --score_threshold=0.5
+
+# enable ground removal
+# type: bool
+# default: false
+--enable_ground_removal=false
+
+# remove point cloud that under this height
+# type: double
+# default: -1.5
+--ground_removal_height=-1.5
+
+# enable down-sample point cloud by beams
+# type: bool
+# default: false
 --enable_downsample_beams=false
+
+# factor for down-sampling point cloud beams
+# type: int
+# default: 4
 --downsample_beams_factor=4
+
+# enable down-sample point cloud by voxelization
+# type: bool
+# default: false
 --enable_downsample_pointcloud=false
+
+# down-sample voxel size along x-axis
+# type: double
+# default: 0.01
 --downsample_voxel_size_x=0.1
+
+# down-sample voxel size along y-axis
+# type: double
+# default: 0.01
 --downsample_voxel_size_y=0.1
+
+# down-sample voxel size along z-axis
+# type: double
+# default: 0.01
 --downsample_voxel_size_z=0.1
+
+# enable fusing point cloud of preceding frames
+# type: bool
+# default: false
 --enable_fuse_frames=false
+
+# number of frames (including current frame) for fusing point cloud
+# type: int
+# default: 5
 --num_fuse_frames=5

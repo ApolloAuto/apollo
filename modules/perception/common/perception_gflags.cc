@@ -52,6 +52,8 @@ DEFINE_double(normalizing_factor, 255,
 DEFINE_int32(num_point_feature, 5,
              "Length of raw point feature. Features include x, y, z,"
              "intensity and delta of time.");
+DEFINE_bool(enable_ground_removal, false, "Enable ground removal.");
+DEFINE_double(ground_removal_height, -1.5, "Height for ground removal.");
 DEFINE_bool(enable_downsample_beams, false,
             "Enable down sampling point cloud beams with a factor.");
 DEFINE_int32(downsample_beams_factor, 4,
