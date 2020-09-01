@@ -41,8 +41,7 @@ function _py_ext() {
 }
 
 function check_autopep8() {
-  AUTOPEP8_CMD="$(command -v autopep8)"
-  if [ -z "${AUTOPEP8_CMD}" ]; then
+  if [ -z "$(command -v autopep8)" ]; then
     error "Oops, autopep8 missing..."
     error "Please make sure autopep8 is installed and check your PATH" \
       "settings. For Debian/Ubuntu, you can run the following command:"
@@ -52,7 +51,7 @@ function check_autopep8() {
 }
 
 function autopep8_run() {
-  ${AUTOPEP8_CMD} -i -a -a "$@"
+  ${AUTOPEP8_CMD} -i "$@"
 }
 
 function run_autopep8() {
@@ -72,7 +71,7 @@ function run_autopep8() {
         continue
       fi
       autopep8_run ${srcs}
-      info "Done formatting Python source files under ${target}"
+      ok "Done formatting Python source files under ${target}"
     fi
   done
 }

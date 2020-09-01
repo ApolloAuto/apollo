@@ -54,11 +54,9 @@ for target in "$@"; do
     fi
   elif [ -d "${target}" ]; then
     #${BUILDIFIER_CMD} -r -lint=fix $@
-    set -x
     find $@ -type f \
       \( -name "BUILD" -or -name "*.BUILD" -or -name "*.bzl" -or -name "*.bazel" \) \
       -exec ${BUILDIFIER_CMD} -lint=fix {} +
-    set +x
 
   else
     error "Bazel files or directories expected, got '${target}'"
@@ -66,4 +64,4 @@ for target in "$@"; do
   fi
 done
 
-info "Done buildifier on $@."
+ok "Done buildifier on $@."

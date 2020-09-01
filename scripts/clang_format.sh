@@ -62,7 +62,7 @@ function run_clang_format() {
         continue
       fi
       clang_format_run ${srcs}
-      info "Done formatting c/cpp/cuda source files under ${target}"
+      ok "Done formatting c/cpp/cuda source files under ${target}"
     fi
   done
 }
