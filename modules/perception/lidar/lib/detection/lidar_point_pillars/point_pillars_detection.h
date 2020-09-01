@@ -38,7 +38,7 @@ struct DetectionOptions {};
 
 class PointPillarsDetection {
  public:
-  PointPillarsDetection() = default;
+  PointPillarsDetection();
   ~PointPillarsDetection() = default;
 
   bool Init(const DetectionInitOptions& options = DetectionInitOptions());

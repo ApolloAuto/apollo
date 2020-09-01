@@ -38,24 +38,24 @@ using base::Object;
 using base::PointD;
 using base::PointF;
 
+PointPillarsDetection::PointPillarsDetection()
+    : x_min_(Params::kMinXRange),
+      x_max_(Params::kMaxXRange),
+      y_min_(Params::kMinYRange),
+      y_max_(Params::kMaxYRange),
+      z_min_(Params::kMinZRange),
+      z_max_(Params::kMaxZRange) {
+  if (FLAGS_enable_ground_removal) {
+    z_min_ = std::max(z_min_, static_cast<float>(FLAGS_ground_removal_height));
+  }
+}
+
 // TODO(chenjiahao):
 //  specify score threshold and nms over lap threshold for each class.
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(new PointPillars(
       FLAGS_reproduce_result_mode, FLAGS_score_threshold,
       FLAGS_nms_overlap_threshold, FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
-
-  // point cloud range
-  x_min_ = Params::kMinXRange;
-  x_max_ = Params::kMaxXRange;
-  y_min_ = Params::kMinYRange;
-  y_max_ = Params::kMaxYRange;
-  z_min_ = Params::kMinZRange;
-  z_max_ = Params::kMaxZRange;
-  if (FLAGS_enable_ground_removal) {
-    z_min_ = std::max(z_min_, static_cast<float>(FLAGS_ground_removal_height));
-  }
-
   return true;
 }
 
