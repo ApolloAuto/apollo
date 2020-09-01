@@ -1,14 +1,26 @@
-# 安装Apollo内核
-## 开始工作前的帮助性信息
-* Apollo在车辆的运行时环境依赖于Apollo内核。我们强烈建议使用者安装预先编译的内核版本。
+# Apollo 内核的安装
 
-## 安装内核
+## 在您开始前
 
-1.  从[Github](https://github.com/ApolloAuto/apollo-kernel/releases)上下载发布版本包
+Apollo 内核仅在实车的运行时环境中被依赖。如果您只是想在 Apollo 软件平台上开发/测
+试您的软件，或者只是运行自动驾驶模拟软件（如 LGSVL 模拟器），则无需安装 Apollo
+内核。
 
-2.  下载成功后安装内核：
-    * ```tar zxvf linux-4.4.32-apollo-1.5.0.tar.gz```
-    * ```cd install```
-    * ```sudo bash install_kernel.sh```
-3.  使用 ```reboot``` 指令重启系统
-4.  重启后，编译ESD CAN驱动。编译ESD CAN驱动的源代码可以在[ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)文件中获得。
+## 如何安装 Apollo 内核
+
+1.  从[Apollo 内核的 Github 发布页](https://github.com/ApolloAuto/apollo-kernel/releases)上
+    下载（最新的）Apollo 内核发布版软件包。
+
+2.  下载成功后运行如下命令安装内核：
+
+```bash
+tar zxvf linux-4.4.32-apollo-1.5.5.tar.gz
+cd install
+sudo bash install_kernel.sh
+```
+
+3.  重启系统。
+
+4.  重启后，编译 ESD CAN 驱动。按
+    照[ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
+    的说明编译 ESD CAN 驱动。
