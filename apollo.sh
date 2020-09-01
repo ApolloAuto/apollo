@@ -108,7 +108,7 @@ function _usage() {
     echo -e "\n${RED}Options${NO_COLOR}:
     ${BLUE}config [options]${NO_COLOR}: config bazel build environment either non-interactively (default) or interactively.
     ${BLUE}build [module]${NO_COLOR}: run build for cyber (<module> = cyber) or modules/<module>.  If <module> unspecified, build all.
-    ${BLUE}build_dbg [module]${NO_COLOR}: run debug build (default).
+    ${BLUE}build_dbg [module]${NO_COLOR}: run debug build.
     ${BLUE}build_opt [module]${NO_COLOR}: run optimized build.
     ${BLUE}build_cpu [module]${NO_COLOR}: build in CPU mode. Equivalent to 'bazel build --config=cpu'
     ${BLUE}build_gpu [module]${NO_COLOR}: run build in GPU mode. Equivalent to 'bazel build --config=gpu'
