@@ -5,28 +5,15 @@ You could still proceed with the next few steps even if you are missing the Linu
 ```
 # To get a list of build commands
 ./apollo.sh
-# To make sure you start clean
+# To make sure you start clean, cleanup bazel output and log/coredump files.
 ./apollo.sh clean
-# This will build the full system and requires that you have an nVidia GPU with nVidia drivers loaded
-bash apollo.sh build
+# This will build the full system and requires that you have an nVidia GPU with nVidia drivers loaded.
+# You can specify a module to build, e.g. <module> = cyber or modules/<module>. If <module> unspecified, build all.
+./apollo.sh build [module]
 ```
 
-If you do not have an nVidia GPU, the system will run but with the CUDA-based perception and other modules. You must
-specify either `dbg` for debug mode or `opt` for optimized code
-
-```
-./apollo.sh build_no_perception dbg
-```
-
-If you make modifications to the Dreamview frontend, then you must run `./apollo.sh build_fe`  before you run the
+If you make modifications to the Dreamview frontend, then you must run `bash apollo.sh build_fe`  before you run the
 full build.
-
-If the computer is very slow, you can enter the following command to limit the CPU.
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
-```
-
 
 ## Run Apollo
 
@@ -35,12 +22,12 @@ bootstrap.sh will actually succeed but the user interface will not come up if yo
 
 ### Start Apollo
 
-Running Apollo will start the ROS core and then startup a web user interface called Dreamview, this is handled by
+Running Apollo will start the Dreamview backend and then startup a web user interface called Dreamview frontend, this is handled by
 the bootstrap script, so from within the docker container, you should run:
 
 ```
-# start module monitor
-bash scripts/bootstrap.sh
+# Startup modules monitor and dreamview, the default option is start.
+./scripts/bootstrap.sh [start | stop | restart]
 ```
 
 ### Access Dreamview
