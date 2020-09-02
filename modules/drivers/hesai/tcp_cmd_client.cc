@@ -15,25 +15,22 @@
  *****************************************************************************/
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <linux/sockios.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#include <pthread.h>
-#include <setjmp.h>
-#include <signal.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
-#include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <syslog.h>
 #include <unistd.h>
+#include <linux/sockios.h>
+
+#include <cerrno>
+#include <csignal>
+#include <cstdio>
+#include <cstring>
 
 #include "cyber/cyber.h"
 #include "modules/drivers/hesai/tcp_cmd_client.h"

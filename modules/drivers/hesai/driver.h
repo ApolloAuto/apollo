@@ -29,36 +29,27 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/hesai/const_var.h"
-#include "modules/drivers/hesai/driver.h"
 #include "modules/drivers/hesai/parser.h"
-#include "modules/drivers/hesai/proto/config.pb.h"
-#include "modules/drivers/hesai/proto/hesai.pb.h"
-#include "modules/drivers/hesai/type_defs.h"
 #include "modules/drivers/hesai/udp_input.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
 
-using apollo::cyber::Node;
-using apollo::cyber::Writer;
-using apollo::drivers::hesai::HesaiScan;
-
 class HesaiDriver {
  public:
-  HesaiDriver(const std::shared_ptr<Node>& node, const Config& conf,
-              const std::shared_ptr<Parser>& parser)
+  HesaiDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
+              const Config& conf, const std::shared_ptr<Parser>& parser)
       : node_(node), conf_(conf), parser_(parser) {}
   ~HesaiDriver() { Stop(); }
   bool Init();
 
  private:
-  std::shared_ptr<Node> node_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Node> node_ = nullptr;
   Config conf_;
   std::shared_ptr<Parser> parser_ = nullptr;
   std::shared_ptr<Input> input_ = nullptr;
-  std::shared_ptr<Writer<HesaiScan>> scan_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<HesaiScan>> scan_writer_ = nullptr;
   std::mutex packet_mutex_;
   std::condition_variable packet_condition_;
   std::thread poll_thread_;

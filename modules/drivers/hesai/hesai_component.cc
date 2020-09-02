@@ -13,31 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#ifndef LIDAR_HESAI_SRC_INPUT_H_
-#define LIDAR_HESAI_SRC_INPUT_H_
-
-#include <cstdint>
-#include "modules/drivers/hesai/type_defs.h"
+#include "modules/drivers/hesai/hesai_component.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
 
-class Input {
- public:
-  Input(uint16_t port, uint16_t gpsPort);
-  ~Input();
-  int GetPacket(HesaiPacket *pkt);
+bool HesaiComponent::Init() {
+  if (!GetProtoConfig(&conf_)) {
+    AERROR << "load config error, file:" << config_file_path_;
+    return false;
+  }
 
- private:
-  int socketForLidar = -1;
-  int socketForGPS = -1;
-  int socketNumber = -1;
-};
+  AINFO << "conf:" << conf_.DebugString();
+  Parser* parser = ParserFactory::CreateParser(node_, conf_);
+  if (parser == nullptr) {
+    AERROR << "create parser error";
+    return false;
+  }
+  parser_.reset(parser);
+  driver_.reset(new HesaiDriver(node_, conf_, parser_));
+
+  if (!driver_->Init()) {
+    AERROR << "driver init error";
+    return false;
+  }
+  return true;
+}
 
 }  // namespace hesai
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // SRC_INPUT_H_
