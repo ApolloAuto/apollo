@@ -2,13 +2,12 @@
 
 ## Usage
 
-Make sure you have built Apollo successfully, which should also have added
-`/apollo/cyber/python` to the PYTHONPATH for you. Then in Python code:
+Make sure you have built Apollo successfully. Then in Python code:
 
 ```python3
 import sys
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 
 
 cyber.init()
@@ -24,3 +23,6 @@ cyber.shutdown()
 Learn more usage from the [examples](cyber_py3/examples/) and
 [tests](cyber_py3/test/).
 
+**Note:** Like C++ files, Python files are also managed by Bazel since Apollo 6.0. You can take
+[how_to_build_and_run_python_app.md](../../docs/howto/how_to_build_and_run_python_app.md)
+as reference.
