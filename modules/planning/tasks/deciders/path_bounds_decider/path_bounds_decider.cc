@@ -163,8 +163,13 @@ Status PathBoundsDecider::Process(
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    CHECK_LE(adc_frenet_l_, std::get<2>(lanechange_path_bound[0]));
-    CHECK_GE(adc_frenet_l_, std::get<1>(lanechange_path_bound[0]));
+
+    // disable this change when not extending lane bounds to include adc
+    if (config_.path_bounds_decider_config()
+            .is_extend_lane_bounds_to_include_adc()) {
+      CHECK_LE(adc_frenet_l_, std::get<2>(lanechange_path_bound[0]));
+      CHECK_GE(adc_frenet_l_, std::get<1>(lanechange_path_bound[0]));
+    }
     // Update the fallback path boundary into the reference_line_info.
     std::vector<std::pair<double, double>> lanechange_path_bound_pair;
     for (size_t i = 0; i < lanechange_path_bound.size(); ++i) {
@@ -216,8 +221,13 @@ Status PathBoundsDecider::Process(
     if (regular_path_bound.empty()) {
       continue;
     }
-    CHECK_LE(adc_frenet_l_, std::get<2>(regular_path_bound[0]));
-    CHECK_GE(adc_frenet_l_, std::get<1>(regular_path_bound[0]));
+    // disable this change when not extending lane bounds to include adc
+    if (config_.path_bounds_decider_config()
+            .is_extend_lane_bounds_to_include_adc()) {
+      CHECK_LE(adc_frenet_l_, std::get<2>(regular_path_bound[0]));
+      CHECK_GE(adc_frenet_l_, std::get<1>(regular_path_bound[0]));
+    }
+
     // Update the path boundary into the reference_line_info.
     std::vector<std::pair<double, double>> regular_path_bound_pair;
     for (size_t i = 0; i < regular_path_bound.size(); ++i) {
@@ -1194,7 +1204,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     double curr_right_bound = 0.0;
 
     if (config_.path_bounds_decider_config()
-            .is_extend_lane_bands_to_include_adc() ||
+            .is_extend_lane_bounds_to_include_adc() ||
         is_fallback) {
       // extend path bounds to include ADC in fallback path bounds.
       double curr_left_bound_adc =
