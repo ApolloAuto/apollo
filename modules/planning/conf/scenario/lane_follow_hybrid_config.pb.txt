@@ -58,7 +58,7 @@ stage_config: {
     task_type: PATH_BOUNDS_DECIDER
     path_bounds_decider_config {
       adc_buffer_coeff: 0.0
-      is_extend_lane_bands_to_include_adc: false
+      is_extend_lane_bounds_to_include_adc: false
     }
   }
   task_config: {
