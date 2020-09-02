@@ -27,7 +27,7 @@
 
 ![img](images/navigation_mode/choose_apollo_directory.png) 
 
-之后，执行菜单命令`任务->运行生成任务`或直接按快捷键`Ctrl+Shift+B`（与`Visual Studio`和`QT`的快捷键一致）构建工程，若之前没有启动过`Docker`，则编译时会启动`Docker`，需在底部终端窗口输入超级用户密码。命令执行完毕，若在底部终端窗口出现`终端将被任务重用，按任意键关闭。`信息（如下图所示），则表示构建成功。整个过程**一定要保持网络畅通**，否则无法下载依赖包。构建过程可能会遇到一些问题，解决方法可参见我写的一篇[博客](https://blog.csdn.net/davidhopper/article/details/79349927) ，也可直接查看`GitHub`网站的[帮助文档](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_debug_apollo_in_vscode_cn.md)。
+之后，执行菜单命令`任务->运行生成任务`或直接按快捷键`Ctrl+Shift+B`（与`Visual Studio`和`QT`的快捷键一致）构建工程，若之前没有启动过`Docker`，则编译时会启动`Docker`，需在底部终端窗口输入超级用户密码。命令执行完毕，若在底部终端窗口出现`终端将被任务重用，按任意键关闭。`信息（如下图所示），则表示构建成功。整个过程**一定要保持网络畅通**，否则无法下载依赖包。构建过程可能会遇到一些问题，解决方法可参见我写的一篇[博客](https://blog.csdn.net/davidhopper/article/details/79349927) ，也可直接查看`GitHub`网站的[帮助文档](https://github.com/ApolloAuto/apollo/blob/r5.5.0/docs/howto/how_to_build_and_debug_apollo_in_vscode_cn.md)。
 
 ![img](images/navigation_mode/build_successfully.png) 
 

@@ -59,15 +59,15 @@ bash scripts/bootstrap.sh
 
 Start the module to be debugged, either by using the command line or by using the Dreamview interface. The following is an example of debugging the **Planning** module from the Dreamview interface. Open Chrome browser, enter the URL: http://localhost:8888/, open the Dreamview interface, open the **SimControl** option, as shown below:
 
-![7](images/vscode/enable_simcontrol.png)
+![7](images/build_debug/enable_simcontrol.png)
 
 Click on the `Module Controler` tab on the left toolbar and select the `Routing` and `Planning` options as shown below:
 
-![8](images/vscode/start_routing_and_planning.png)
+![8](images/build_debug/start_routing_and_planning.png)
 
 Click the `Default Routing` tab on the left toolbar, select `Route: Reverse Early Change Lane` or any of these options, send a `Routing Request` request, and generate a global navigation path, as shown below:
 
-![9](images/vscode/check_route_reverse_early_change_lane.png)
+![9](images/build_debug/check_route_reverse_early_change_lane.png)
 
 #### Viewing the "Planning" Process ID
 
@@ -79,7 +79,7 @@ ps aux | grep mainboard | grep planning
 
 The result in the following figure is similar to the previous figure, you can see that the `Planning` process ID is 4147.
 
-![11](images/vscode/planning_id_ps.png)
+![11](images/build_debug/planning_id_ps.png)
 
 #### Debugging Planning module using GDBServer
 
@@ -90,14 +90,14 @@ sudo gdbserver :1111 --attach 4147
 ```
 In the above command, ":1111" indicates that the debugging service process with the port "1111" is enabled, and "4147" indicates the "Planning" process ID. If the result is as shown below, the operation is successful.
 
-![12](images/vscode/gdbserver_attach_debug.png)
+![12](images/build_debug/gdbserver_attach_debug.png)
 
 After restarting a command terminal and entering Docker, use the following command to see that the "gdbserver" process is running normally:
 
 ``` bash
 ps aux | grep gdbserver
 ```
-![13](images/vscode/view_gdbserver_process.png)
+![13](images/build_debug/view_gdbserver_process.png)
 
 #### Starting GDBServer with a Script File
 
@@ -139,7 +139,7 @@ ifconfig
 
 Assuming that the IP address of the industrial computer LAN is: 192.168.3.137, open your Chrome or Firefox browser, enter the following URL: http://192.168.3.137:8888/, start the module (`Planning`) to be debugged as shown in [Start the module that needs debugging](#Start-the-module-that-needs-debugging) section
 
-![17](images/vscode/remote_show_dreamview.png)
+![17](images/build_debug/remote_show_dreamview.png)
 
 #### Use the SSH Command to Remotely Log In to the Industrial PC and Start the Gdbserver Service of the Industrial PC
 
@@ -159,4 +159,4 @@ bash docker/scripts/dev_start_gdb_server.sh planning 1111
 ```
 As shown in the figure below, if you see a prompt similar to Listening on port 1111, the gdbserver service starts successfully.
 
-![19](images/vscode/remote_start_gdbserver.png)
+![19](images/build_debug/remote_start_gdbserver.png)
