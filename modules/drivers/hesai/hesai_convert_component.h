@@ -14,56 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef LIDAR_HESAI_HESAI_CONVERT_COMPONENT_H_
-#define LIDAR_HESAI_HESAI_CONVERT_COMPONENT_H_
+#pragma once
 
-#include <list>
 #include <memory>
 #include <string>
-#include <thread>
-
-#include "cyber/cyber.h"
-#include "modules/drivers/hesai/const_var.h"
-#include "modules/drivers/hesai/parser.h"
-#include "modules/drivers/hesai/type_defs.h"
 
 #include "modules/drivers/hesai/proto/config.pb.h"
 #include "modules/drivers/hesai/proto/hesai.pb.h"
+#include "cyber/cyber.h"
+#include "modules/drivers/hesai/parser_factory.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
 
-using apollo::cyber::Component;
-using apollo::drivers::hesai::HesaiScan;
-
-class HesaiConvertComponent : public Component<HesaiScan> {
+class HesaiConvertComponent : public ::apollo::cyber::Component<HesaiScan> {
  public:
-  ~HesaiConvertComponent() {}
-  bool Init() override {
-    if (!GetProtoConfig(&conf_)) {
-      AERROR << "load config error, file:" << config_file_path_;
-      return false;
-    }
+  virtual ~HesaiConvertComponent() = default;
+  bool Init() override;
 
-    AINFO << "conf:" << conf_.DebugString();
-    Parser* parser = ParserFactory::CreateParser(node_, conf_);
-    if (parser == nullptr) {
-      AERROR << "create parser error";
-      return false;
-    }
-    parser_.reset(parser);
-
-    if (!parser_->Init()) {
-      return false;
-    }
-    AINFO << "HesaiConvertComponent init success";
-    return true;
-  }
-
-  bool Proc(const std::shared_ptr<HesaiScan>& scan) override {
-    return parser_->Parse(scan);
-  }
+  bool Proc(const std::shared_ptr<HesaiScan>& scan) override;
 
  private:
   std::shared_ptr<Parser> parser_;
@@ -75,5 +45,3 @@ CYBER_REGISTER_COMPONENT(HesaiConvertComponent)
 }  // namespace hesai
 }  // namespace drivers
 }  // namespace apollo
-
-#endif

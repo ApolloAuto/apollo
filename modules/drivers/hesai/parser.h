@@ -20,16 +20,16 @@
 #include <deque>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
-#include "cyber/base/concurrent_object_pool.h"
-#include "cyber/cyber.h"
-#include "modules/drivers/hesai/const_var.h"
 #include "modules/drivers/hesai/proto/config.pb.h"
 #include "modules/drivers/hesai/proto/hesai.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/drivers/hesai/tcp_cmd_client.h"
 #include "modules/drivers/hesai/type_defs.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -37,17 +37,10 @@ namespace hesai {
 
 inline double degreeToRadian(double degree) { return degree * PI / 180; }
 
-using apollo::drivers::PointCloud;
-using apollo::drivers::PointXYZIT;
-using apollo::drivers::hesai::HesaiScan;
-
-using apollo::cyber::Node;
-using apollo::cyber::Writer;
-using apollo::cyber::base::CCObjectPool;
-
 class Parser {
  public:
-  Parser(const std::shared_ptr<Node>& node, const Config& conf);
+  Parser(const std::shared_ptr<::apollo::cyber::Node>& node,
+         const Config& conf);
   virtual ~Parser();
   void Parse(const uint8_t* data, int size, bool* is_end);
   bool Parse(const std::shared_ptr<HesaiScan>& scan);
@@ -73,9 +66,9 @@ class Parser {
   void ResetRawPointCloud();
 
   bool is_calibration_ = false;
-  std::shared_ptr<Node> node_;
+  std::shared_ptr<::apollo::cyber::Node> node_;
   Config conf_;
-  std::shared_ptr<Writer<PointCloud>> raw_pointcloud_writer_;
+  std::shared_ptr<::apollo::cyber::Writer<PointCloud>> raw_pointcloud_writer_;
   int pool_size_ = 8;
   int pool_index_ = 0;
   uint64_t raw_last_time_ = 0;
@@ -93,42 +86,6 @@ class Parser {
 
   double elev_angle_map_[LASER_COUNT_L64] = {0};
   double horizatal_azimuth_offset_map_[LASER_COUNT_L64] = {0};
-};
-
-/***********************hesai40P***********************/
-class Hesai40Parser : public Parser {
- public:
-  Hesai40Parser(const std::shared_ptr<Node>& node, const Config& conf);
-  ~Hesai40Parser();
-
- protected:
-  void ParseRawPacket(const uint8_t* buf, const int len, bool* is_end) override;
-
- private:
-  void CalcPointXYZIT(Hesai40Packet* pkt, int blockid);
-  double block_offset_[BLOCKS_PER_PACKET];
-  double laser_offset_[LASER_COUNT];
-};
-
-/***********************hesai64***********************/
-class Hesai64Parser : public Parser {
- public:
-  Hesai64Parser(const std::shared_ptr<Node>& node, const Config& conf);
-  ~Hesai64Parser();
-
- protected:
-  void ParseRawPacket(const uint8_t* buf, const int len, bool* is_end) override;
-
- private:
-  void CalcPointXYZIT(Hesai64Packet* pkt, int blockid, uint8_t chLaserNumber);
-  double block_offset_[BLOCKS_PER_PACKET_L64] = {0};
-  double laser_offset_[LASER_COUNT_L64] = {0};
-};
-
-class ParserFactory {
- public:
-  static Parser* CreateParser(const std::shared_ptr<Node>& node,
-                              const Config& conf);
 };
 
 }  // namespace hesai

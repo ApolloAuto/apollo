@@ -15,4 +15,38 @@
  *****************************************************************************/
 
 #include "modules/drivers/hesai/hesai_convert_component.h"
-#include "modules/drivers/hesai/hesai_driver_component.h"
+
+namespace apollo {
+namespace drivers {
+namespace hesai {
+
+using apollo::cyber::Component;
+
+bool HesaiConvertComponent::Init() {
+  if (!GetProtoConfig(&conf_)) {
+    AERROR << "load config error, file:" << config_file_path_;
+    return false;
+  }
+
+  AINFO << "conf:" << conf_.DebugString();
+  Parser* parser = ParserFactory::CreateParser(node_, conf_);
+  if (parser == nullptr) {
+    AERROR << "create parser error";
+    return false;
+  }
+  parser_.reset(parser);
+
+  if (!parser_->Init()) {
+    return false;
+  }
+  AINFO << "HesaiConvertComponent init success";
+  return true;
+}
+
+bool HesaiConvertComponent::Proc(const std::shared_ptr<HesaiScan>& scan) {
+  return parser_->Parse(scan);
+}
+
+}  // namespace hesai
+}  // namespace drivers
+}  // namespace apollo

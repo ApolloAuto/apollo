@@ -14,30 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef LIDAR_HESAI_SRC_INPUT_H_
-#define LIDAR_HESAI_SRC_INPUT_H_
+#include "modules/drivers/hesai/parser_factory.h"
 
-#include <cstdint>
-#include "modules/drivers/hesai/type_defs.h"
+#include "modules/drivers/hesai/hesai40_parser.h"
+#include "modules/drivers/hesai/hesai64_parser.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
 
-class Input {
- public:
-  Input(uint16_t port, uint16_t gpsPort);
-  ~Input();
-  int GetPacket(HesaiPacket *pkt);
+using ::apollo::cyber::Node;
 
- private:
-  int socketForLidar = -1;
-  int socketForGPS = -1;
-  int socketNumber = -1;
-};
+Parser* ParserFactory::CreateParser(const std::shared_ptr<Node>& node,
+                                    const Config& conf) {
+  if (conf.model() == HESAI40P) {
+    return new Hesai40Parser(node, conf);
+  } else if (conf.model() == HESAI64) {
+    return new Hesai64Parser(node, conf);
+  }
+
+  AERROR << "only support HESAI40P | HESAI64";
+  return nullptr;
+}
 
 }  // namespace hesai
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // SRC_INPUT_H_
