@@ -142,7 +142,7 @@ class Recorder(object):
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -c -f "smart_recorder"', False)
+        _, stdout, _ = shell_cmd('pgrep -f "smart_recorder" | grep -cv '^1$'', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 
