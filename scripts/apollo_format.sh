@@ -33,7 +33,8 @@ function print_usage() {
   ${BLUE}-b|--bazel           ${NO_COLOR}Format Bazel code
   ${BLUE}-c|--cpp             ${NO_COLOR}Format cpp code
   ${BLUE}-s|--shell           ${NO_COLOR}Format Shell code
-  ${BLUE}-a|--all             ${NO_COLOR}Format all (C++/Python/Bazel/Shell)
+  ${BLUE}-m|--markdown        ${NO_COLOR}Format Markdown file
+  ${BLUE}-a|--all             ${NO_COLOR}Format all
   ${BLUE}-h|--help            ${NO_COLOR}Show this message"
 }
 
@@ -53,11 +54,16 @@ function run_shfmt() {
   bash "${TOP_DIR}/scripts/shfmt.sh" "$@"
 }
 
+function run_prettier() {
+  bash "${TOP_DIR}/scripts/mdfmt.sh" "$@"
+}
+
 function run_format_all() {
   run_clang_format "$@"
   run_buildifier "$@"
   run_autopep8 "$@"
   run_shfmt "$@"
+  run_prettier "$@"
 }
 
 function main() {
@@ -80,6 +86,9 @@ function main() {
       ;;
     -s | --shell)
       run_shfmt "$@"
+      ;;
+    -m | --markdown)
+      run_prettier "$@"
       ;;
     -a | --all)
       run_format_all "$@"
