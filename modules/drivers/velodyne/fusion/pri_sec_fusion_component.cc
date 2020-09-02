@@ -43,7 +43,7 @@ bool PriSecFusionComponent::Init() {
 
 bool PriSecFusionComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
-  auto target = point_cloud;
+  auto target = std::make_shared<PointCloud>(*point_cloud);
   auto fusion_readers = readers_;
   auto start_time = Time::Now().ToSecond();
   while ((Time::Now().ToSecond() - start_time) < conf_.wait_time_s() &&
