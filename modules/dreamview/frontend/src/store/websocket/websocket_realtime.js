@@ -303,6 +303,18 @@ export default class RealtimeWebSocketEndpoint {
     }));
   }
 
+  submitAudioEvent(eventTimeMs, obstacleId, audioType, movingResult, direction, isSirenOn) {
+    this.websocket.send(JSON.stringify({
+      type: 'SubmitAudioEvent',
+      event_time_ms: eventTimeMs,
+      obstacle_id: obstacleId,
+      audio_type: audioType,
+      moving_result: movingResult,
+      audio_direction: direction,
+      is_siren_on: isSirenOn,
+    }));
+  }
+
   toggleSimControl(enable) {
     this.websocket.send(JSON.stringify({
       type: 'ToggleSimControl',
