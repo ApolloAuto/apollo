@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 #ifndef DRIVERS_SURESTAR_INCLUDE_COMPONENT_COMPONENT_CONVERT_H
 #define DRIVERS_SURESTAR_INCLUDE_COMPONENT_COMPONENT_CONVERT_H
 
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-
+#include <deque>
 #include <memory>
 #include <string>
 #include <thread>
-#include <deque>
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar_surestar/include/parser/convert.h"
@@ -33,9 +33,9 @@
 namespace apollo {
 namespace drivers {
 namespace surestar {
-using apollo::cyber::Component;
+
 class CompSurestarConvert
-    : public Component<apollo::drivers::Surestar::SurestarScan> {
+    : public apollo::cyber::Component<apollo::drivers::Surestar::SurestarScan> {
  public:
   bool Init() {
     // read config file
@@ -81,8 +81,8 @@ class CompSurestarConvert
     return true;
   }
 
-  bool Proc(const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>&
-                scan) {
+  bool Proc(
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan) {
     // AINFO << "procing convert----------------------------------------";
     uint64_t start = apollo::cyber::Time().Now().ToNanosecond();
     if (index_ >= size_) {

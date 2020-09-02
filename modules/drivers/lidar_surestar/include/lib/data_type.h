@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ static const int SCANS_PER_PACKET =
 static constexpr uint32_t VLP16_SCAN_SIZE =
     80;  // ceil 754/10  一圈的packet的数目
 static constexpr uint32_t VLP16_POINT_SIZE =
-    VLP16_SCAN_SIZE * SCANS_PER_PACKET;              //转一圈点的个数
+    VLP16_SCAN_SIZE * SCANS_PER_PACKET;              // 转一圈点的个数
 static constexpr uint32_t HDL64S3D_SCAN_SIZE = 579;  // ceil 5789/10
 static constexpr uint32_t HDL64S3D_POINT_SIZE =
     HDL64S3D_SCAN_SIZE * SCANS_PER_PACKET;

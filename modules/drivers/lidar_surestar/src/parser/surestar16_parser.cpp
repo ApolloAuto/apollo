@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/common/time.h>
-
 #include <fstream>
 #include <memory>
 #include <string>
+
+#include <pcl/common/time.h>
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar_surestar/include/parser/surestar_parser.h"

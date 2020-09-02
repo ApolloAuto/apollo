@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,7 @@ class SurestarDriver {
   virtual ~SurestarDriver() {}
 
   virtual bool poll(
-      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>&
-          scan) {
+      const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan) {
     return true;
   }
   virtual void init() = 0;
@@ -50,12 +49,13 @@ class SurestarDriver {
 
   uint64_t _basetime;
   uint32_t _last_gps_time;
+  uint64_t _last_count;
+
   int poll_standard(
       const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan);
   int poll_sync_count(
       const std::shared_ptr<apollo::drivers::Surestar::SurestarScan>& scan,
       bool main_frame);
-  uint64_t _last_count;
   bool set_base_time();
   void set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
                                     uint64_t* basetime,
@@ -77,7 +77,7 @@ class Surestar16Driver : public SurestarDriver {
  private:
   std::shared_ptr<Input> _positioning_input;
   std::thread positioning_thread_;
-  std::atomic<bool> _running = {true};
+  std::atomic<bool> running_ = {true};
 };
 
 class SurestarDriverFactory {

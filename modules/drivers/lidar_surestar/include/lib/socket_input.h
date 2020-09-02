@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 #ifndef DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_SOCKET_INPUT_H
 #define DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_SOCKET_INPUT_H
 
-#include <pcap.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <pcap.h>
 
 #include "modules/drivers/lidar_surestar/include/lib/input.h"
 

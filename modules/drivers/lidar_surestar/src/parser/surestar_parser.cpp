@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 #include "modules/drivers/lidar_surestar/include/parser/surestar_parser.h"
 
-#include <pcl/common/time.h>
-
 #include <fstream>
 #include <string>
+
+#include <pcl/common/time.h>
 
 #include "cyber/cyber.h"
 
@@ -31,7 +31,7 @@ uint64_t SurestarParser::get_gps_stamp(double current_packet_stamp,
                                        double* previous_packet_stamp,
                                        uint64_t* gps_base_usec) {
   if (std::abs(*previous_packet_stamp - current_packet_stamp) >
-      3599000000) {                                          // 微妙 us
+      3599000000) {                                       // 微妙 us
     *gps_base_usec += static_cast<uint64_t>(3600 * 1e6);  // + 1小时单位微妙
     AINFO << "gps_base+1---current_stamp:" << current_packet_stamp
           << "previous_stamp:" << previous_packet_stamp;
@@ -66,7 +66,8 @@ apollo::drivers::PointXYZIT SurestarParser::get_nan_point(uint64_t timestamp) {
   return nan_point;
 }
 
-SurestarParser::SurestarParser(const apollo::drivers::surestar::SurestarConfig& config)
+SurestarParser::SurestarParser(
+    const apollo::drivers::surestar::SurestarConfig& config)
     : _config(config), _last_time_stamp(0), _mode(STRONGEST) {}
 
 void SurestarParser::init_angle_params(double view_direction,
@@ -94,7 +95,7 @@ void SurestarParser::init_angle_params(double view_direction,
 void SurestarParser::setup() {
   _calibration.read(_config.calibration_file());
 
-  if (!_calibration._initialized) {
+  if (!_calibration.initialized_) {
     AERROR << " Unable to open calibration file: "
            << _config.calibration_file();
   }

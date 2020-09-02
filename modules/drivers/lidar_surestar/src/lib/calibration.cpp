@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 #include "modules/drivers/lidar_surestar/include/lib/calibration.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -25,6 +23,8 @@
 #include <map>
 #include <string>
 #include <utility>
+
+#include <yaml-cpp/yaml.h>
 
 // #ifdef HAVE_NEW_YAMLCPP
 namespace YAML {
@@ -191,11 +191,11 @@ void Calibration::read(const std::string& calibration_file) {
   std::ifstream fin(calibration_file.c_str());
 
   if (!fin.is_open()) {
-    _initialized = false;
+    initialized_ = false;
     return;
   }
 
-  _initialized = true;
+  initialized_ = true;
 
   try {
     YAML::Node doc;
@@ -204,7 +204,7 @@ void Calibration::read(const std::string& calibration_file) {
     doc >> *this;
   } catch (YAML::Exception& e) {
     std::cerr << "YAML Exception: " << e.what() << std::endl;
-    _initialized = false;
+    initialized_ = false;
   }
 
   fin.close();

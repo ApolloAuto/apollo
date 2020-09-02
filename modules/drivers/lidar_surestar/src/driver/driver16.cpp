@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,14 @@ Surestar16Driver::Surestar16Driver(
 }
 
 Surestar16Driver::~Surestar16Driver() {
-  _running.store(false);
+  running_.store(false);
   if (positioning_thread_.joinable()) {
     positioning_thread_.join();
   }
 }
 
 void Surestar16Driver::init() {
-  _running.store(true);
+  running_.store(true);
   double packet_rate =
       781.25;  // 每秒packet的数目 velodyne-754  beike v6k-781.25  v6c-833.33
   double frequency = (_config.rpm() /
@@ -121,7 +121,7 @@ bool Surestar16Driver::poll(
  *  @returns true unless end of file reached
  */
 void Surestar16Driver::poll_positioning_packet(void) {
-  while (!apollo::cyber::IsShutdown() && _running.load()) {
+  while (!apollo::cyber::IsShutdown() && running_.load()) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     if (!_config.use_gps_time()) {
@@ -139,7 +139,7 @@ void Surestar16Driver::poll_positioning_packet(void) {
             << "day:" << nmea_time->day << "hour:" << nmea_time->hour
             << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
-      while (true && _running.load()) {
+      while (true && running_.load()) {
         if (_positioning_input == nullptr) {
           AERROR << " _positioning_input uninited.";
           return;

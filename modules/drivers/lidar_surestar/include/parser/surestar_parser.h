@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include <boost/format.hpp>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
+#include <boost/format.hpp>
 
 #include "modules/drivers/lidar_surestar/include/lib/calibration.h"
 #include "modules/drivers/lidar_surestar/include/lib/const_variables.h"
@@ -42,7 +42,8 @@ namespace surestar {
 class SurestarParser {
  public:
   SurestarParser() {}
-  explicit SurestarParser(const apollo::drivers::surestar::SurestarConfig& config);
+  explicit SurestarParser(
+      const apollo::drivers::surestar::SurestarConfig& config);
   virtual ~SurestarParser() {}
 
   /** \brief Set up for data processing.
@@ -127,7 +128,8 @@ class SurestarParser {
 
 class Surestar16Parser : public SurestarParser {
  public:
-  explicit Surestar16Parser(const apollo::drivers::surestar::SurestarConfig& config);
+  explicit Surestar16Parser(
+      const apollo::drivers::surestar::SurestarConfig& config);
   ~Surestar16Parser() {}
 
   void generate_pointcloud(

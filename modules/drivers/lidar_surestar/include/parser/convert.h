@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ namespace surestar {
 // convert surestar data to pointcloud and republish
 class Convert {
  public:
-  explicit Convert(const apollo::drivers::surestar::SurestarConfig& surestar_config);
+  explicit Convert(
+      const apollo::drivers::surestar::SurestarConfig& surestar_config);
   ~Convert();
 
   void convert_velodyne_to_pointcloud(

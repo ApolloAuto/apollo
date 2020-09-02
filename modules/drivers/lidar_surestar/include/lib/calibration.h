@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,10 @@ class Calibration {
  public:
   std::map<int, LaserCorrection> _laser_corrections;
   int _num_lasers;
-  bool _initialized;
+  bool initialized_;
 
  public:
-  Calibration() : _initialized(false) {}
+  Calibration() : initialized_(false) {}
   explicit Calibration(const std::string& calibration_file) {
     read(calibration_file);
   }

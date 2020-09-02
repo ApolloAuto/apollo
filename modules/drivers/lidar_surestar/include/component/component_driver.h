@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@
 namespace apollo {
 namespace drivers {
 namespace surestar {
-using apollo::cyber::Component;
-class CompSureStarDriver : public Component<> {
+
+class CompSureStarDriver : public apollo::cyber::Component<> {
  public:
   ~CompSureStarDriver() {
     if (device_thread_->joinable()) {

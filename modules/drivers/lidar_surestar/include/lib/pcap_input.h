@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
 #ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
 #define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
 
-#include <pcap.h>
 #include <stdio.h>
 #include <unistd.h>
-
 #include <string>
+#include <pcap.h>
 
 #include "modules/drivers/lidar_surestar/include/lib/input.h"
 
@@ -37,8 +36,7 @@ class PcapInput : public Input {
   virtual ~PcapInput();
 
   void init();
-  int get_firing_data_packet(
-      apollo::drivers::Surestar::SurestarPacket* pkt);
+  int get_firing_data_packet(apollo::drivers::Surestar::SurestarPacket* pkt);
   int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
 
  private:

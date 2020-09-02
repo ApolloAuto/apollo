@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 #include "modules/drivers/lidar_surestar/include/parser/convert.h"
 
-#include <pcl/common/time.h>
-
 #include <memory>
+
+#include <pcl/common/time.h>
 
 #include "cyber/cyber.h"
 
@@ -27,7 +27,8 @@ namespace drivers {
 namespace surestar {
 
 /** @brief Constructor. */
-Convert::Convert(const apollo::drivers::surestar::SurestarConfig& surestar_config) {
+Convert::Convert(
+    const apollo::drivers::surestar::SurestarConfig& surestar_config) {
   _config = surestar_config;
   _config.set_view_direction(0.0);
   _config.set_view_width(2.0 * M_PI);
