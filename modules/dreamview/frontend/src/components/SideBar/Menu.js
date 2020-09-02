@@ -1,6 +1,5 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import classNames from 'classnames';
 import _ from 'lodash';
 
 import RadioItem from 'components/common/RadioItem';
@@ -131,7 +130,6 @@ class SubMenu extends React.Component {
                         }}
                         checked={options.cameraAngle === item}
                         title={_.startCase(item)}
-                        options={options}
                     />
         ));
       }
