@@ -32,7 +32,7 @@ function start() {
     cp data/log/garage.csv data/log/garage-${TIME}.csv
   fi
 
-  NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_recorder")"
+  NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder
   fi
