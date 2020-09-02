@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "cyber/cyber.h"
 #include "modules/drivers/hesai/parser.h"
 
