@@ -38,29 +38,29 @@ uint32_t Parkcommand104::GetPeriod() const {
 void Parkcommand104::UpdateData(uint8_t* data) {
   set_p_park_target(data, park_target_);
   set_p_park_en_ctrl(data, park_en_ctrl_);
-  checksum_115_ =
+  checksum_104_ =
       data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
-  set_p_checksum_115(data, checksum_115_);
+  set_p_checksum_104(data, checksum_104_);
 }
 
 void Parkcommand104::Reset() {
   // TODO(All) :  you should check this manually
-  checksum_115_ = 0;
+  checksum_104_ = 0;
   park_target_ = Park_command_104::PARK_TARGET_RELEASE;
   park_en_ctrl_ = Park_command_104::PARK_EN_CTRL_DISABLE;
 }
 
-Parkcommand104* Parkcommand104::set_checksum_115(int checksum_115) {
-  checksum_115_ = checksum_115;
+Parkcommand104* Parkcommand104::set_checksum_104(int checksum_104) {
+  checksum_104_ = checksum_104;
   return this;
 }
 
-// config detail: {'name': 'CheckSum_115', 'offset': 0.0, 'precision': 1.0,
+// config detail: {'name': 'CheckSum_104', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Parkcommand104::set_p_checksum_115(uint8_t* data, int checksum_115) {
-  checksum_115 = ProtocolData::BoundedValue(0, 255, checksum_115);
-  int x = checksum_115;
+void Parkcommand104::set_p_checksum_104(uint8_t* data, int checksum_104) {
+  checksum_104 = ProtocolData::BoundedValue(0, 255, checksum_104);
+  int x = checksum_104;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);
