@@ -9,7 +9,6 @@ This section includes:
 - [Download the Apollo Release Package](#download-apollo-source)
 - [Set up the Docker environment](#Set-up-the-Docker-environment)
 - [Support a new Vehicle in DreamView](#Support-a-new-Vehicle-in-DreamView)
-- [Install Apollo Kernel](#Install-apollo-kernel)
 - [Run Apollo in Ubuntu 16](#Run-Apollo-in-Ubuntu-16)
 
 Before getting started, please make sure you have installed Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo core Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
@@ -66,53 +65,3 @@ In order to support a new vehicle in DreamView, please follow the steps below:
 2. There is already a sample file in the `modules/calibration/data` folder named `mkz_example`. Refer to this structure and include all necessary configuration files in the same file structure as “mkz_example”. Remember to update the configuration files with your own parameters if needed. 
 
 3. Restart DreamView and you will be able to see your new vehicle (name is the same as your newly created folder) in the selected vehicle.
-
-## Install Apollo Kernel
-
-The Apollo runtime in the vehicle requires the [Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel). It is strongly recommended to install the pre-built kernel.
-
-### Use the pre-built Apollo Kernel
-
-You get access to and install the pre-built kernel using the following commands.
-
-1. Download the release packages from the release section on GitHub:
-
-```
-https://github.com/ApolloAuto/apollo-kernel/releases
-```
-
-2. Install the kernel after having downloaded the release package:
-
-```
-tar zxvf linux-4.4.32-apollo-1.5.0.tar.gz
-cd install
-sudo bash install_kernel.sh
-```
-
-3. Reboot your system using the `reboot` command.
-4. [Optional - if you are using CAN card for interface] Build the CAN driver source code, according to the vendor's instructions
-
-### Build your own kernel
-
-If you have modified the kernel, or the pre-built kernel is not the best for your platform, you can build your own kernel using the following steps:
-
-1. Clone the code from the repository
-
-```
-git clone https://github.com/ApolloAuto/apollo-kernel.git
-cd apollo-kernel
-```
-
-2. Add the CAN driver source code according to vendor's instruction
-3. Build the kernel using the following command:
-
-```
-bash build.sh
-```
-
-4. Install the kernel using the steps for a pre-built Apollo Kernel as described in the previous section.
-
-## Run Apollo in Ubuntu 16
-
-Please refer to
-[How to run Apollo with Ubuntu 16](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_apollo_2.5_with_ubuntu16.md)
