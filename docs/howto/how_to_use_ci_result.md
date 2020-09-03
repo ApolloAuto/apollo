@@ -1,0 +1,40 @@
+# How to Use CI Result in Apollo
+Apollo PR can be merged depend on CI result and CLA.
+
+## What works will CI check?
+Apollo CI will run following steps:
+    1: build your PR code merged master
+    2: lint your PR code include cc, h, py, BUILD, etc
+    3: run all unit tests in apollo project
+
+so we recommend you can run 
+
+```
+./apollo.sh lint
+./apollo.sh build
+./apollo.sh test
+
+```
+before commit your code. 
+
+when the CI failed of you PR, your can enter `Details`
+
+![build_failed](images/build_failed.png)
+
+now you are coming into our CI system, enter `Build Log` to see detail fail log.
+
+![detail_log](images/build_log.png)
+
+## Possible Errors And Solution
+
+### Error: " FAIL: //modules/perception/base:blob_cpplint"
+![lint](images/lint.png)
+This is due to lint error, we obey Google code style. So the header file shoud be reordered followed the suggestion. if you can't find the suggestion, please turn the log up and seek carefully.
+
+
+### Error: " FAIL: //modules/perception/base:blob_test"
+![test_failed](images/unit_test_failed.png)
+![test_failed_log](images/unit_failed_log.png)
+This is due to unit test fail. Read the test log carefully, you can correct the unit test. specially if timeout happened, you can try change BUILD size small to large, hope it works.
+
+if more complicated situation happened, welcome commonent in your PR.
