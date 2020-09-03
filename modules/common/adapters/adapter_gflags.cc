@@ -204,10 +204,18 @@ DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");
 DEFINE_string(hmi_status_topic, "/apollo/hmi/status", "HMI status topic name.");
 DEFINE_string(audio_capture_topic, "/apollo/hmi/audio_capture",
               "HMI audio capture topic name.");
+DEFINE_string(v2x_obu_trafficlight_topic,
+              "/apollo/v2x/obu/internal/traffic_light",
+              "v2x obu trafficlight topic name");
 DEFINE_string(v2x_obstacle_topic, "/apollo/v2x/obstacles",
               "v2x obstacles topic name");
 DEFINE_string(v2x_trafficlight_topic, "/apollo/v2x/traffic_light",
-              "v2x trafficlight topic name");
+              "v2x traffic light topic name");
+DEFINE_string(v2x_trafficlight_for_hmi_topic,
+              "/apollo/v2x/traffic_light/for_hmi",
+              "v2x traffic light topic name for hmi");
+DEFINE_string(v2x_rsi_topic, "/apollo/v2x/rsi", "v2x rsi topic name");
+
 DEFINE_string(storytelling_topic, "/apollo/storytelling",
               "Storytelling topic.");
 DEFINE_string(audio_event_topic, "/apollo/audio_event",
