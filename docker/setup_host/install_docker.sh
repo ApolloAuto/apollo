@@ -15,10 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-TOP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P)"
-source ${TOP_DIR}/scripts/apollo.bashrc
 
 ARCH="$(uname -m)"
+
+##==============================================================##
+## Note(storypku): DRY broken for this self-contained script.
+##==============================================================##
+BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[34m'
+NO_COLOR='\033[0m'
+
+function info() {
+  (echo >&2 -e "[${WHITE}${BOLD}INFO${NO_COLOR}] $*")
+}
+
+function error() {
+  (echo >&2 -e "[${RED}ERROR${NO_COLOR}] $*")
+}
+##==============================================================##
 
 function install_filesystem_support() {
   local kernel_version="$(uname -r)"
