@@ -39,9 +39,9 @@ void Steeringcommand102::UpdateData(uint8_t* data) {
   set_p_steer_en_ctrl(data, steer_en_ctrl_);
   set_p_steer_angle_target(data, steer_angle_target_);
   set_p_steer_angle_spd(data, steer_angle_spd_);
-  checksum_112_ =
+  checksum_102_ =
       data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
-  set_p_checksum_112(data, checksum_112_);
+  set_p_checksum_102(data, checksum_102_);
 }
 
 void Steeringcommand102::Reset() {
@@ -49,7 +49,7 @@ void Steeringcommand102::Reset() {
   steer_en_ctrl_ = Steering_command_102::STEER_EN_CTRL_DISABLE;
   steer_angle_target_ = 0.0;
   steer_angle_spd_ = 0;
-  checksum_112_ = 0;
+  checksum_102_ = 0;
 }
 
 Steeringcommand102* Steeringcommand102::set_steer_en_ctrl(
@@ -104,7 +104,7 @@ Steeringcommand102* Steeringcommand102::set_steer_angle_spd(
 
 // config detail: {'name': 'Steer_ANGLE_SPD', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|250]', 'bit': 15,
-// 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+// 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg/s'}
 void Steeringcommand102::set_p_steer_angle_spd(uint8_t* data,
                                                int steer_angle_spd) {
   steer_angle_spd = ProtocolData::BoundedValue(0, 250, steer_angle_spd);
@@ -114,17 +114,17 @@ void Steeringcommand102::set_p_steer_angle_spd(uint8_t* data,
   to_set.set_value(x, 0, 8);
 }
 
-Steeringcommand102* Steeringcommand102::set_checksum_112(int checksum_112) {
-  checksum_112_ = checksum_112;
+Steeringcommand102* Steeringcommand102::set_checksum_102(int checksum_102) {
+  checksum_102_ = checksum_102;
   return this;
 }
 
-// config detail: {'name': 'CheckSum_112', 'offset': 0.0, 'precision': 1.0,
+// config detail: {'name': 'CheckSum_102', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Steeringcommand102::set_p_checksum_112(uint8_t* data, int checksum_112) {
-  checksum_112 = ProtocolData::BoundedValue(0, 255, checksum_112);
-  int x = checksum_112;
+void Steeringcommand102::set_p_checksum_102(uint8_t* data, int checksum_102) {
+  checksum_102 = ProtocolData::BoundedValue(0, 255, checksum_102);
+  int x = checksum_102;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

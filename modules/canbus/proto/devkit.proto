@@ -36,10 +36,10 @@ message Steering_command_102 {
   optional Steer_en_ctrlType steer_en_ctrl = 1;
   // [deg] [-500|500]
   optional double steer_angle_target = 2;
-  // [] [0|250]
+  // [deg/s] [0|250]
   optional int32 steer_angle_spd = 3;
   // [] [0|255]
-  optional int32 checksum_112 = 4;
+  optional int32 checksum_102 = 4;
 }
 
 message Gear_command_103 {
@@ -60,7 +60,7 @@ message Gear_command_103 {
   // [] [0|1]
   optional Gear_en_ctrlType gear_en_ctrl = 2;
   // [] [0|255]
-  optional int32 checksum_114 = 3;
+  optional int32 checksum_103 = 3;
 }
 
 message Throttle_command_100 {
@@ -72,7 +72,7 @@ message Throttle_command_100 {
   // [m/s^2] [0|10]
   optional double throttle_acc = 1;
   // [] [0|255]
-  optional int32 checksum_110 = 2;
+  optional int32 checksum_100 = 2;
   // [%] [0|100]
   optional double throttle_pedal_target = 3;
   // [] [0|1]
@@ -88,7 +88,7 @@ message Brake_command_101 {
   // [m/s^2] [0|10]
   optional double brake_dec = 1;
   // [] [0|255]
-  optional int32 checksum_111 = 2;
+  optional int32 checksum_101 = 2;
   // [%] [0|100]
   optional double brake_pedal_target = 3;
   // [] [0|1]
@@ -106,7 +106,7 @@ message Park_command_104 {
     PARK_EN_CTRL_ENABLE = 1;
   }
   // [] [0|255]
-  optional int32 checksum_115 = 1;
+  optional int32 checksum_104 = 1;
   // [] [0|1]
   optional Park_targetType park_target = 2;
   // [] [0|1]
@@ -229,9 +229,9 @@ message Steering_report_502 {
   }
   // [deg/s] [0|250]
   optional int32 steer_angle_spd_actual = 1;
-  // Steer system communication fault [] [0|1]
+  // Steer system communication fault [] [0|255]
   optional Steer_flt2Type steer_flt2 = 2;
-  // Steer system hardware fault [] [0|1]
+  // Steer system hardware fault [] [0|255]
   optional Steer_flt1Type steer_flt1 = 3;
   // [] [0|2]
   optional Steer_en_stateType steer_en_state = 4;
