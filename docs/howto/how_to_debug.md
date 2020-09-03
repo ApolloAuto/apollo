@@ -48,7 +48,7 @@ Go to Docker and start Dreamview. The command is as follows:
 ```
 cd ${APOLLO_ROOT_DIR}
 # If Docker is not started, start it first, otherwise ignore this step
-bash docker/scripts/dev_start.sh -C
+bash docker/scripts/dev_start.sh
 # Enter Docker
 bash docker/scripts/dev_into.sh
 # Start Dreamview background service
