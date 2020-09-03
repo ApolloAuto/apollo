@@ -6,7 +6,6 @@
 - [How to build your own kernel](how_to_build_your_own_kernel.md)
 - [How to install apollo kernel](how_to_install_apollo_kernel.md)
 - [How to save and load docker image](how_to_save_and_load_docker_image.md)
-- [How to build Apollo using Ubuntu 16(Apollo 2.5)](how_to_run_apollo_2.5_with_ubuntu16.md)
 - [How to build and debug using VSCode](how_to_build_and_debug_using_vscode.md)
 - [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16.md)
 
