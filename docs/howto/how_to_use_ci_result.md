@@ -4,11 +4,9 @@ Apollo PR can be merged depend on CI result and CLA.
 ## What works will CI check?
 Apollo CI will run following steps:
 
-    1: Build your PR code merged master
-
-    2: Lint your PR code include cc, h, py, BUILD, etc
-
-    3: Run all unit tests in apollo project
+1. Build your PR code merged master
+1. Lint your PR code include cc, h, py, BUILD, etc
+1. Run all unit tests in apollo project
 
 So we recommend you can run
 
