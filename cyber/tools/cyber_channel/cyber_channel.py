@@ -248,6 +248,7 @@ def _channel_cmd_hz(argv):
 
 
 def print_role(rolsattr_rawdata):
+    from google.protobuf.message import DecodeError
     from cyber.proto.role_attributes_pb2 import RoleAttributes
     try:
         msg = RoleAttributes()

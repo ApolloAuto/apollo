@@ -691,8 +691,7 @@ static PyObject *cyber_PyChannelUtils_get_channels_info(PyObject *self,
 
     size_t pos = 0;
     for (auto &attr : roleAttr_list) {
-      PyList_SetItem(pyobj_list, pos,
-                     Py_BuildValue("s#", attr.c_str(), attr.size()));
+      PyList_SetItem(pyobj_list, pos, C_STR_TO_PY_BYTES(attr));
       pos++;
     }
     PyDict_SetItem(pyobj_channelinfo_dict, bld_name, pyobj_list);
