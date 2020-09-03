@@ -115,7 +115,7 @@ Camera坐标系原点在下图所示平面的中心点：
 | VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
 | Localization       | /apollo/localization/pose             | 100           |
 
-为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`Camera`三个模块，详细操作方式分别参考[循迹搭建--定位模块配置](../Waypoint_following/Localization_configuration_cn.md)、[基于摄像头的封闭园区自动驾驶搭建--感知设备集成](../Camera_Based_Auto_Driving/Sensor_Integration_cn.md)。在正式开始录制前，务必确保以上channel能正常输出数据。
+为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`Camera`三个模块，详细操作方式分别参考[循迹搭建--定位模块配置](../Waypoint_Following/Localization_Configuration_cn.md)、[基于摄像头的封闭园区自动驾驶搭建--感知设备集成](../Camera_Based_Auto_Driving/Sensor_Integration_cn.md)。在正式开始录制前，务必确保以上channel能正常输出数据。
 
 #### 2. 使用Apollo录制数据包的方法
 
