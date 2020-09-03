@@ -51,13 +51,13 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'name': 'Steer_ANGLE_SPD', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|250]', 'bit': 15,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg/s'}
   Steeringcommand102* set_steer_angle_spd(int steer_angle_spd);
 
-  // config detail: {'name': 'CheckSum_112', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_102', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  Steeringcommand102* set_checksum_112(int checksum_112);
+  Steeringcommand102* set_checksum_102(int checksum_102);
 
  private:
   // config detail: {'name': 'Steer_EN_CTRL', 'enum': {0:
@@ -70,24 +70,24 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'name': 'Steer_ANGLE_Target', 'offset': -500.0,
   // 'precision': 0.1, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[-500|500]', 'bit': 31, 'type': 'double', 'order': 'motorola',
-  // 'physical_unit': ''}
+  // 'physical_unit': 'deg'}
   void set_p_steer_angle_target(uint8_t* data, double steer_angle_target);
 
   // config detail: {'name': 'Steer_ANGLE_SPD', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|250]', 'bit': 15,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg/s'}
   void set_p_steer_angle_spd(uint8_t* data, int steer_angle_spd);
 
-  // config detail: {'name': 'CheckSum_112', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_102', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_checksum_112(uint8_t* data, int checksum_112);
+  void set_p_checksum_102(uint8_t* data, int checksum_102);
 
  private:
   Steering_command_102::Steer_en_ctrlType steer_en_ctrl_;
   double steer_angle_target_;
   int steer_angle_spd_;
-  int checksum_112_;
+  int checksum_102_;
 };
 
 }  // namespace devkit

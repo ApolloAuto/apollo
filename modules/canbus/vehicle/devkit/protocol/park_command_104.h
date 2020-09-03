@@ -36,10 +36,10 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'name': 'CheckSum_115', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_104', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  Parkcommand104* set_checksum_115(int checksum_115);
+  Parkcommand104* set_checksum_104(int checksum_104);
 
   // config detail: {'name': 'Park_Target', 'enum': {0: 'PARK_TARGET_RELEASE',
   // 1: 'PARK_TARGET_PARKING_TRIGGER'}, 'precision': 1.0, 'len': 1,
@@ -56,10 +56,10 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
       Park_command_104::Park_en_ctrlType park_en_ctrl);
 
  private:
-  // config detail: {'name': 'CheckSum_115', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_104', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_checksum_115(uint8_t* data, int checksum_115);
+  void set_p_checksum_104(uint8_t* data, int checksum_104);
 
   // config detail: {'name': 'Park_Target', 'enum': {0: 'PARK_TARGET_RELEASE',
   // 1: 'PARK_TARGET_PARKING_TRIGGER'}, 'precision': 1.0, 'len': 1,
@@ -76,7 +76,7 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
                           Park_command_104::Park_en_ctrlType park_en_ctrl);
 
  private:
-  int checksum_115_;
+  int checksum_104_;
   Park_command_104::Park_targetType park_target_;
   Park_command_104::Park_en_ctrlType park_en_ctrl_;
 };
