@@ -57,8 +57,7 @@ function run_clang_format() {
       local srcs
       srcs="$(find_c_cpp_srcs ${target})"
       if [ -z "${srcs}" ]; then
-        warning "Do nothing. No c/c++/cuda header/source" \
-          "files found under ${target} ."
+        ok "No need to format C/C++/CUDA files under ${target} as none found"
         continue
       fi
       clang_format_run ${srcs}
