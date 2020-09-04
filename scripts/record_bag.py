@@ -46,6 +46,7 @@ import psutil
 
 SMALL_TOPICS = [
     '/apollo/audio_detection',
+    '/apollo/audio_event',
     '/apollo/canbus/chassis',
     '/apollo/canbus/chassis_detail',
     '/apollo/common/latency_records',
