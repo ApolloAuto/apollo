@@ -129,3 +129,32 @@ py_proto_library(
         "//modules/perception/proto:perception_obstacle_py_pb2",
     ],
 )
+
+cc_proto_library(
+    name = "fusion_params_proto",
+    deps = [
+        ":fusion_params_lib",
+    ],
+)
+
+proto_library(
+    name = "fusion_params_lib",
+    srcs = ["fusion_params.proto"],
+)
+
+cc_proto_library(
+    name = "v2x_obstacles_proto",
+    deps = [
+        ":v2x_obstacles_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "v2x_obstacles_proto_lib",
+    srcs = ["v2x_obstacles.proto"],
+    deps = [
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+    ],
+)
