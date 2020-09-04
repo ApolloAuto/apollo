@@ -54,6 +54,7 @@ bash ${CURR_DIR}/install_doxygen.sh
 pip3_install pycodestyle \
     pyflakes \
     flake8 \
+    yapf \
     autopep8
 # pylint
 
