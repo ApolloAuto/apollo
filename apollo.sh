@@ -822,7 +822,7 @@ function main() {
       cibuild_extended $@
       ;;
     build_opt)
-      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY --copt=-fpic"
+      DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY --copt=-fPIC"
       apollo_build_opt $@
       ;;
     build_gpu)
@@ -831,12 +831,12 @@ function main() {
       ;;
     build_opt_gpu)
       set_use_gpu
-      DEFINES="${DEFINES} --copt=-fpic"
+      DEFINES="${DEFINES} --copt=-fPIC"
       apollo_build_opt $@
       ;;
     build_teleop)
       set_use_gpu
-      DEFINES="${DEFINES} --copt=-fpic --define WITH_TELEOP=1 --cxxopt=-DTELEOP"
+      DEFINES="${DEFINES} --copt=-fPIC --define WITH_TELEOP=1 --cxxopt=-DTELEOP"
       apollo_build_opt $@
       ;;
     build_fe)
