@@ -71,7 +71,7 @@ function run_autopep8() {
         continue
       fi
       autopep8_run ${srcs}
-      ok "Done formatting Python source files under ${target}"
+      ok "Done formatting Python files under ${target}"
     fi
   done
 }
