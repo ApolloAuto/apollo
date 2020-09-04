@@ -3,7 +3,7 @@
 ## Introduction
 As you may already know, Apollo was run inside Docker container, and there are two flavors of Apollo docker images,  `CyberRT` (`Cyber` for short) and `Dev` . `Cyber` images were for developers who want to play with the `CyberRT` framework only, while `Dev` images were used to build the whole Apollo project.
 
-Currently, Apollo comes with support for two CPU architectures, namely, `x86_64` and `aarch64`.  (Please note that till the time this document was updated, the `dev.aarch64` image  was not complete. Hope we can make it ready in the next few months.)
+Currently, Apollo comes with support for two CPU architectures, namely, `x86_64` and `aarch64`.  (Please note that till the time this document was updated, the `dev-aarch64` image  was not complete. Hope we can make it ready in the next few months.)
 
 In the next section, I will describe briefly the steps to build these Docker images.
 
