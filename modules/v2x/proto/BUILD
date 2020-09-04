@@ -7,25 +7,130 @@ load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "v2x_traffic_light_cc_proto",
+    name = "v2x_obu_rsi_cc_proto",
     deps = [
-        ":v2x_traffic_light_proto",
+        ":v2x_obu_rsi_proto",
     ],
 )
 
 proto_library(
-    name = "v2x_traffic_light_proto",
-    srcs = ["v2x_traffic_light.proto"],
+    name = "v2x_obu_rsi_proto",
+    srcs = ["v2x_obu_rsi.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "v2x_obu_rsi_py_pb2",
+    deps = [
+        ":v2x_obu_rsi_proto",
+        "//modules/common/proto:geometry_py_pb2",
+        "//modules/common/proto:header_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "v2x_monitor_cc_proto",
+    deps = [
+        ":v2x_monitor_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_monitor_proto",
+    srcs = ["v2x_monitor.proto"],
+)
+
+py_proto_library(
+    name = "v2x_monitor_py_pb2",
+    deps = [
+        ":v2x_monitor_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "v2x_rsi_cc_proto",
+    deps = [
+        ":v2x_rsi_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_rsi_proto",
+    srcs = ["v2x_rsi.proto"],
     deps = [
         "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
-    name = "v2x_traffic_light_py_pb2",
+    name = "v2x_rsi_py_pb2",
     deps = [
-        ":v2x_traffic_light_proto",
+        ":v2x_rsi_proto",
         "//modules/common/proto:header_py_pb2",
+    ],
+)
+
+cc_grpc_library(
+    name = "v2x_service_car_to_obu_cc_grpc",
+    srcs = [":v2x_service_car_to_obu_proto"],
+    grpc_only = True,
+    deps = [":v2x_service_car_to_obu_cc_proto"],
+)
+
+cc_proto_library(
+    name = "v2x_service_car_to_obu_cc_proto",
+    deps = [
+        ":v2x_service_car_to_obu_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_service_car_to_obu_proto",
+    srcs = ["v2x_service_car_to_obu.proto"],
+    deps = [
+        ":v2x_carstatus_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+    ],
+)
+
+py_grpc_library(
+    name = "v2x_service_car_to_obu_py_pb2_grpc",
+    srcs = [":v2x_service_car_to_obu_proto"],
+    deps = [":v2x_service_car_to_obu_py_pb2"],
+)
+
+py_proto_library(
+    name = "v2x_service_car_to_obu_py_pb2",
+    deps = [
+        ":v2x_carstatus_py_pb2",
+        ":v2x_service_car_to_obu_proto",
+        "//modules/perception/proto:perception_obstacle_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "v2x_junction_cc_proto",
+    deps = [
+        ":v2x_junction_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_junction_proto",
+    srcs = ["v2x_junction.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto",
+    ],
+)
+
+py_proto_library(
+    name = "v2x_junction_py_pb2",
+    deps = [
+        ":v2x_junction_proto",
+        "//modules/common/proto:geometry_py_pb2",
     ],
 )
 
@@ -92,40 +197,50 @@ py_proto_library(
     ],
 )
 
-cc_grpc_library(
-    name = "v2x_service_car_to_obu_cc_grpc",
-    srcs = [":v2x_service_car_to_obu_proto"],
-    grpc_only = True,
-    deps = [":v2x_service_car_to_obu_cc_proto"],
-)
-
 cc_proto_library(
-    name = "v2x_service_car_to_obu_cc_proto",
+    name = "v2x_traffic_light_cc_proto",
     deps = [
-        ":v2x_service_car_to_obu_proto",
+        ":v2x_traffic_light_proto",
     ],
 )
 
 proto_library(
-    name = "v2x_service_car_to_obu_proto",
-    srcs = ["v2x_service_car_to_obu.proto"],
+    name = "v2x_traffic_light_proto",
+    srcs = ["v2x_traffic_light.proto"],
     deps = [
-        ":v2x_carstatus_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
-py_grpc_library(
-    name = "v2x_service_car_to_obu_py_pb2_grpc",
-    srcs = [":v2x_service_car_to_obu_proto"],
-    deps = [":v2x_service_car_to_obu_py_pb2"],
+py_proto_library(
+    name = "v2x_traffic_light_py_pb2",
+    deps = [
+        ":v2x_traffic_light_proto",
+        "//modules/common/proto:header_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "v2x_obu_traffic_light_cc_proto",
+    deps = [
+        ":v2x_obu_traffic_light_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_obu_traffic_light_proto",
+    srcs = ["v2x_obu_traffic_light.proto"],
+    deps = [
+        ":v2x_traffic_light_proto",
+        "//modules/common/proto:header_proto",
+    ],
 )
 
 py_proto_library(
-    name = "v2x_service_car_to_obu_py_pb2",
+    name = "v2x_obu_traffic_light_py_pb2",
     deps = [
-        ":v2x_carstatus_py_pb2",
-        ":v2x_service_car_to_obu_proto",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
+        ":v2x_obu_traffic_light_proto",
+        ":v2x_traffic_light_py_pb2",
+        "//modules/common/proto:header_py_pb2",
     ],
 )
