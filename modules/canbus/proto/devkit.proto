@@ -39,7 +39,9 @@ message Steering_command_102 {
   // [deg/s] [0|250]
   optional int32 steer_angle_spd = 3;
   // [] [0|255]
-  optional int32 checksum_102 = 4;
+  optional int32 checksum_112 = 4 [deprecated = true];
+  // [] [0|255]
+  optional int32 checksum_102 = 5;
 }
 
 message Gear_command_103 {
@@ -60,7 +62,9 @@ message Gear_command_103 {
   // [] [0|1]
   optional Gear_en_ctrlType gear_en_ctrl = 2;
   // [] [0|255]
-  optional int32 checksum_103 = 3;
+  optional int32 checksum_114 = 3 [deprecated = true];
+  // [] [0|255]
+  optional int32 checksum_103 = 4;
 }
 
 message Throttle_command_100 {
@@ -72,11 +76,13 @@ message Throttle_command_100 {
   // [m/s^2] [0|10]
   optional double throttle_acc = 1;
   // [] [0|255]
-  optional int32 checksum_100 = 2;
+  optional int32 checksum_110 = 2 [deprecated = true];
   // [%] [0|100]
   optional double throttle_pedal_target = 3;
   // [] [0|1]
   optional Throttle_en_ctrlType throttle_en_ctrl = 4;
+  // [] [0|255]
+  optional int32 checksum_100 = 5;
 }
 
 message Brake_command_101 {
@@ -88,11 +94,13 @@ message Brake_command_101 {
   // [m/s^2] [0|10]
   optional double brake_dec = 1;
   // [] [0|255]
-  optional int32 checksum_101 = 2;
+  optional int32 checksum_111 = 2 [deprecated = true];
   // [%] [0|100]
   optional double brake_pedal_target = 3;
   // [] [0|1]
   optional Brake_en_ctrlType brake_en_ctrl = 4;
+  // [] [0|255]
+  optional int32 checksum_101 = 5;
 }
 
 message Park_command_104 {
@@ -106,11 +114,13 @@ message Park_command_104 {
     PARK_EN_CTRL_ENABLE = 1;
   }
   // [] [0|255]
-  optional int32 checksum_104 = 1;
+  optional int32 checksum_115 = 1 [deprecated = true];
   // [] [0|1]
   optional Park_targetType park_target = 2;
   // [] [0|1]
   optional Park_en_ctrlType park_en_ctrl = 3;
+  // [] [0|255]
+  optional int32 checksum_104 = 4;
 }
 
 message Ultr_sensor_2_508 {
