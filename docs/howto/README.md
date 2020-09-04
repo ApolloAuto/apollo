@@ -14,7 +14,7 @@
 ## Contribution
 - [How to document code](how_to_document_code.md)
 - [How to style check your code contribution](how_to_style_check_to_one_dir.md)
-- [How to create a pull request](how_to_create_a_pull.md)
+- [How to create a pull request](how_to_create_pull_request.md)
 - [How to migrate to the updated apollo master from previous versions.md](how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
 
 ### Chinese versions
