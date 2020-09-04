@@ -11,7 +11,7 @@ cc_library(
         "//cyber",
         "//modules/map/hdmap",
         "//modules/v2x/common:v2x_proxy_gflags",
-        "//modules/v2x/proto:v2x_carstatus_cc_proto",
+        "//modules/v2x/proto:v2x_car_status_cc_proto",
         "//modules/v2x/proto:v2x_junction_cc_proto",
         "//modules/v2x/proto:v2x_obu_rsi_cc_proto",
         "//modules/v2x/proto:v2x_obu_traffic_light_cc_proto",

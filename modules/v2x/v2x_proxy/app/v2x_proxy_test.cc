@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file grpc_server_test.cc
- * @brief test v2x proxy module and onboard unit interface grpc implement
- */
+#include "modules/v2x/v2x_proxy/app/v2x_proxy.h"
 
-#include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_server.h"
+#include <iostream>
+#include <memory>
+
+#include <google/protobuf/text_format.h>
 
 #include "gtest/gtest.h"
 
-namespace apollo {
-namespace v2x {
+#include "modules/v2x/v2x_proxy/app/utils.h"
 
-TEST(GrpcServerImplTest, Construct) {
-  apollo::cyber::Init("grpc_server_test");
-  bool init_succ = false;
-  GrpcServerImpl grpc_server;
-  init_succ = grpc_server.InitFlag();
-  EXPECT_TRUE(init_succ);
-  std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> ptr = nullptr;
-  grpc_server.GetMsgFromGrpc(&ptr);
-  EXPECT_EQ(nullptr, ptr);
+TEST(V2xProxy, V2xProxy) {
+  ::apollo::cyber::Init("TestCase");
+  auto hdmap = std::make_shared<::apollo::hdmap::HDMap>();
+  hdmap->LoadMapFromFile(apollo::hdmap::BaseMapFile());
+  ::apollo::v2x::V2xProxy v2x_proxy(hdmap);
+  EXPECT_TRUE(v2x_proxy.InitFlag());
+  sleep(1);
+  v2x_proxy.stop();
+  ::apollo::cyber::Clear();
 }
-}  // namespace v2x
-}  // namespace apollo

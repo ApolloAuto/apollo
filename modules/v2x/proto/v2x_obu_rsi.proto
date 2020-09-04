@@ -5,7 +5,7 @@ package apollo.v2x.obu;
 import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
 
-message OBURsi {
+message ObuRsi {
   optional apollo.common.Header header = 1;
   optional bytes rsu_id = 2;
   optional int32 rsi_id = 3;

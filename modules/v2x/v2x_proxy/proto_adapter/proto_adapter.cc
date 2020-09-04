@@ -38,9 +38,8 @@ OSLightype ProtoAdapter::LightTypeObu2Sys(int32_t type) {
   }
 }
 
-bool ProtoAdapter::LightObu2Sys(const OBULight &obu_light,
+bool ProtoAdapter::LightObu2Sys(const ObuLight &obu_light,
                                 std::shared_ptr<OSLight> *os_light) {
-#if 0
   if (nullptr == os_light) {
     return false;
   }
@@ -58,29 +57,27 @@ bool ProtoAdapter::LightObu2Sys(const OBULight &obu_light,
   if (obu_light.header().has_module_name()) {
     res->mutable_header()->set_module_name(obu_light.header().module_name());
   }
-  if (obu_light.road_trafficlight_size() < 1) {
+  if (0 == obu_light.road_traffic_light_size()) {
     return false;
   }
-  // FOR-EACH ROAD
   bool flag_has_data = false;
-  for (int idx_road = 0; idx_road < obu_light.road_trafficlight_size();
+  for (int idx_road = 0; idx_road < obu_light.road_traffic_light_size();
        idx_road++) {
-    const auto &obu_road_light1 = obu_light.road_trafficlight(idx_road);
+    const auto &obu_road_light1 = obu_light.road_traffic_light(idx_road);
     // Set the road index for lane
-    apollo::v2x::RoadTrafficLight_Attribute tl_attr =
-        apollo::v2x::RoadTrafficLight_Attribute_EAST;
+    apollo::common::Direction tl_attr = apollo::common::Direction::EAST;
     switch (obu_road_light1.road_direction()) {
       case 1:
-        tl_attr = apollo::v2x::RoadTrafficLight_Attribute_EAST;
+        tl_attr = apollo::common::Direction::EAST;
         break;
       case 2:
-        tl_attr = apollo::v2x::RoadTrafficLight_Attribute_WEST;
+        tl_attr = apollo::common::Direction::WEST;
         break;
       case 3:
-        tl_attr = apollo::v2x::RoadTrafficLight_Attribute_SOUTH;
+        tl_attr = apollo::common::Direction::SOUTH;
         break;
       case 4:
-        tl_attr = apollo::v2x::RoadTrafficLight_Attribute_NORTH;
+        tl_attr = apollo::common::Direction::NORTH;
         break;
       default:
         AINFO << "Road direction=" << obu_road_light1.road_direction()
@@ -134,11 +131,9 @@ bool ProtoAdapter::LightObu2Sys(const OBULight &obu_light,
   }
   *os_light = res;
   return flag_has_data;
-#endif
-  return false;
 }
 
-bool ProtoAdapter::RsiObu2Sys(const OBURsi *obu_rsi,
+bool ProtoAdapter::RsiObu2Sys(const ObuRsi *obu_rsi,
                               std::shared_ptr<OSRsi> *os_rsi) {
   if (nullptr == obu_rsi) {
     return false;
@@ -212,11 +207,11 @@ bool ProtoAdapter::RsiObu2Sys(const OBURsi *obu_rsi,
 }
 
 bool ProtoAdapter::JunctionHd2obu(const HDJunction &hd_junction,
-                                  std::shared_ptr<OBUJunction> *obu_junction) {
+                                  std::shared_ptr<ObuJunction> *obu_junction) {
   if (nullptr == obu_junction) {
     return false;
   }
-  auto res = std::make_shared<OBUJunction>();
+  auto res = std::make_shared<ObuJunction>();
   if (nullptr == res) {
     return false;
   }

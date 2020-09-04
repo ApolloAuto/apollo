@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "modules/v2x/proto/v2x_carstatus.pb.h"
+#include "modules/v2x/proto/v2x_car_status.pb.h"
 #include "modules/v2x/proto/v2x_junction.pb.h"
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
 #include "modules/v2x/proto/v2x_obu_traffic_light.pb.h"
@@ -52,22 +52,22 @@ enum RsiAlterType {
 
 using OSLightColor = ::apollo::v2x::SingleTrafficLight_Color;
 using OSLightype = ::apollo::v2x::SingleTrafficLight_Type;
-using OBULightype = ::apollo::v2x::obu::SingleTrafficLight_Type;
+using ObuLightype = ::apollo::v2x::obu::SingleTrafficLight_Type;
 using OSLight = ::apollo::v2x::IntersectionTrafficLightData;
-using OBULight = ::apollo::v2x::obu::OBUTrafficLightData;
+using ObuLight = ::apollo::v2x::obu::ObuTrafficLight;
 using OSLocation = ::apollo::localization::LocalizationEstimate;
 using OSRsi = ::apollo::v2x::RsiMsg;
-using OBURsi = ::apollo::v2x::obu::OBURsi;
+using ObuRsi = ::apollo::v2x::obu::ObuRsi;
 using HDJunction = ::apollo::hdmap::JunctionInfoConstPtr;
-using OBUJunction = ::apollo::v2x::Junction;
+using ObuJunction = ::apollo::v2x::Junction;
 class ProtoAdapter final {
  public:
   static OSLightype LightTypeObu2Sys(int32_t type);
-  static bool LightObu2Sys(const OBULight &obu_light,
+  static bool LightObu2Sys(const ObuLight &obu_light,
                            std::shared_ptr<OSLight> *os_light);
-  static bool RsiObu2Sys(const OBURsi *obu_rsi, std::shared_ptr<OSRsi> *os_rsi);
+  static bool RsiObu2Sys(const ObuRsi *obu_rsi, std::shared_ptr<OSRsi> *os_rsi);
   static bool JunctionHd2obu(const HDJunction &hd_junction,
-                             std::shared_ptr<OBUJunction> *obu_junction);
+                             std::shared_ptr<ObuJunction> *obu_junction);
 };
 
 }  // namespace v2x

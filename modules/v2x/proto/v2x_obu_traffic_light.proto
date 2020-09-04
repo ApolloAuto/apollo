@@ -39,9 +39,9 @@ message RoadTrafficLight {
   repeated LaneTrafficLight lane_traffic_light = 1;
   optional int32 road_direction = 2;
 }
-message OBUTrafficLightData {
+message ObuTrafficLight {
   optional apollo.common.Header header = 1;
-  repeated RoadTrafficLight road_trafficlight = 2;
+  repeated RoadTrafficLight road_traffic_light = 2;
   optional int32 intersection_id = 3;
   optional bytes hdmap_junction_id = 4;
 }
