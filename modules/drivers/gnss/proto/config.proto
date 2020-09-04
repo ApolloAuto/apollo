@@ -14,9 +14,6 @@ message Stream {
 
     UBLOX_TEXT = 20;
     UBLOX_BINARY = 21;
-
-    NEWTONM2_TEXT = 30;
-    NEWTONM2_BINARY = 31;
   }
   optional Format format = 1;
 
@@ -58,10 +55,6 @@ message Stream {
 // Device-specific configuration.
 message NovatelConfig {
   // See Page 75 of SPAN on OEM6 Firmware Reference Manual for details.
-  optional int32 imu_orientation = 1 [default = 5];
-}
-
-message NewtonM2Config {
   optional int32 imu_orientation = 1 [default = 5];
 }
 
@@ -113,7 +106,6 @@ message Config {
   oneof device_config {
     NovatelConfig novatel_config = 7;
     UbloxConfig ublox_config = 8;
-    NewtonM2Config newtonm2_config = 15;
   }
 
   enum RtkSolutionType {
