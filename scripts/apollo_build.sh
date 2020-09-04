@@ -264,7 +264,7 @@ function build_simulator() {
     else
       fail "Building Apollo simulator failed."
     fi
-    popd >/dev/null
+    popd > /dev/null
   fi
 }
 

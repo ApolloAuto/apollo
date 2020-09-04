@@ -55,7 +55,7 @@ function run() {
       sleep 2
       start_compensator
       ;;
-    esac
+  esac
 }
 
 run "$1"

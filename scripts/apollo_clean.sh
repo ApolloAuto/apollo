@@ -38,9 +38,9 @@ function _clean_bazel_cache() {
 
   # Remove bazel cache in associated directories
   if [ -d /apollo-simulator ]; then
-    pushd /apollo-simulator >/dev/null
+    pushd /apollo-simulator > /dev/null
     bazel clean ${opt}
-    popd >/dev/null
+    popd > /dev/null
   fi
 }
 
