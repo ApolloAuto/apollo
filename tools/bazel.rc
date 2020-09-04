@@ -33,7 +33,7 @@ build --cxxopt="-fdiagnostics-color=always"
 
 build --per_file_copt=external/upb/.*@-Wno-sign-compare
 build --copt="-Werror=sign-compare"
-build --copt="-Werror=return-type"
+build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc,@"-Werror=return-type"
 build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
