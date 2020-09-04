@@ -1,6 +1,6 @@
-name : "CH"
-brand : CH
-model : CH
+name : "DKIT"
+brand : DKIT
+model : DKIT
 license {
-    vin : "ch05"
+    vin : "devkit01"
 }
