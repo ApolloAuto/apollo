@@ -1,7 +1,7 @@
 data {
     format: NOVATEL_BINARY
     serial {
-        device: "/dev/ttyACM0"
+        device: "/dev/imu"
         baud_rate: 115200
     }
 }
@@ -9,11 +9,11 @@ data {
 rtk_from {
     format: RTCM_V3
     ntrip {
-        address: "<IP>"
-        port: <PORT>
-        mount_point: "<MOUNTPOINT>"
-        user: "<USER>"
-        password: "<PASSWORD>"
+        address: "203.107.45.154"
+        port: 8002
+        mount_point: "RTCM32_GGB"
+        user: "qianxun1234"
+        password: "abc123"
         timeout_s: 5
     }
     push_location: true
@@ -22,7 +22,7 @@ rtk_from {
 rtk_to {
     format: NOVATEL_BINARY
     serial {
-        device: "/dev/ttyACM0"
+        device: "/dev/imu"
         baud_rate: 115200
     }
 }
@@ -30,7 +30,7 @@ rtk_to {
 command {
     format: NOVATEL_BINARY
     serial {
-        device: "/dev/ttyACM0"
+        device: "/dev/imu"
         baud_rate: 115200
     }
 }
