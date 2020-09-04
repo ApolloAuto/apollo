@@ -70,6 +70,7 @@ function grant_device_permissions() {
   [ -e /dev/novatel2 ] && chmod a+rw /dev/novatel2
 
   [ -e /dev/ttyACM0 ] && chmod a+rw /dev/ttyACM0
+  [ -e /dev/imu ] && chmod a+rw /dev/imu
 
   # setup camera device
   [ -e /dev/camera/obstacle ] && chmod a+rw /dev/camera/obstacle
