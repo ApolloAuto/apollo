@@ -47,11 +47,11 @@ DEFINE_int64(msg_timeout, 250, "timeout value which getting the msg from OBU");
 DEFINE_int64(sim_sending_num, 10, "the max sending times");
 DEFINE_bool(use_nearest_flag, true,
             "use the hdmap interface get_forward_nearest_signals_on_lane flag");
-DEFINE_int64(spat_period, 150, "SPAT message periond");
-DEFINE_double(check_time, 0.5, "SPAT message periond");
-DEFINE_int64(rsu_whitelist_period, 3 * 1000, "get whitelist periond");  // 3s
-DEFINE_string(rsu_whitelist_name,
-              "/apollo/modules/v2x/conf/rsu_whitelist.txt",
+DEFINE_int64(spat_period, 150, "SPAT message period in ms");
+DEFINE_double(check_time, 0.5, "SPAT message period in s");
+DEFINE_int64(rsu_whitelist_period, 3 * 1000,
+             "get whitelist period in ms");  // 3s
+DEFINE_string(rsu_whitelist_name, "/apollo/modules/v2x/conf/rsu_whitelist.txt",
               "file name for RSU whitelist");
 
 }  // namespace v2x

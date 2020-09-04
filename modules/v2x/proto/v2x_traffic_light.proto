@@ -20,7 +20,7 @@ message SingleTrafficLight {
     U_TURN = 3;
   };
   optional Color color = 1;
-  repeated Type trafficlight_type = 2;
+  repeated Type traffic_light_type = 2;
   // Traffic light string-ID in the map data.
   optional string id = 3;
   optional int32 color_remaining_time_s = 4;

@@ -14,7 +14,7 @@ message SingleTrafficLight {
   };
 
   optional apollo.v2x.SingleTrafficLight.Color color = 1;
-  optional int32 trafficlight_type = 2;
+  optional int32 traffic_light_type = 2;
   // Traffic light string-ID in the map data.
   optional string id = 3;
   optional int32 color_remaining_time_s = 4;
@@ -36,7 +36,7 @@ message LaneTrafficLight {
 }
 
 message RoadTrafficLight {
-  repeated LaneTrafficLight lane_trafficlight = 1;
+  repeated LaneTrafficLight lane_traffic_light = 1;
   optional int32 road_direction = 2;
 }
 message OBUTrafficLightData {
