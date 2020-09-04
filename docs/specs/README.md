@@ -24,9 +24,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [Radar](Radar/README.md)
 - [Navigation](Navigation/README.md)
 - [IPC](IPC/Nuvo-6108GC_Installation_Guide.md)
-- [Software system and Kernel Installation](Software_and_Kernel_Installation_guide.md)
-- [Software system and Kernel Installation](Software_and_Kernel_Installation_guide_cn.md)
-
+- [Prerequisite Software Installation](prerequisite_software_installation_guide.md)
 
 ## Perception
 - [Perception Apollo 5.0](perception_apollo_5.0.md)

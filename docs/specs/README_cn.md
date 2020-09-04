@@ -15,7 +15,7 @@
 - [雷达](Radar/README.md)
 - [导航](Navigation/README_cn.md)
 - [IPC](IPC/Nuvo-6108GC_Installation_Guide_cn.md)
-- [软件系统和内核安装指南](Software_and_Kernel_Installation_guide_cn.md)
+- [安装前的准备工作](prerequisite_software_installation_guide.md)
 
 ## 感知
 
