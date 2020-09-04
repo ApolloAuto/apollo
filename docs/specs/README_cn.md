@@ -39,4 +39,4 @@
 
 ## 其他通用知识
 - [坐标系统](coordination_cn.md)
-- [Apollo安全更新SDK用户指南](apollo_secure_upgrade_user_guide-CN.md)
+- [Apollo安全更新SDK用户指南](apollo_secure_upgrade_user_guide_cn.md)

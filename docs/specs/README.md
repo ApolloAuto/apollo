@@ -64,10 +64,10 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 
 ## General
 - [Coordinate System.pdf](coordination.pdf)
-- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide-EN.md)
+- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide.md)
 
 
 ### Chinese documents
 
 - [Coordinate System CN](coordination_cn.md)
-- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide-CN.md)
+- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide_cn.md)
