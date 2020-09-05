@@ -34,7 +34,7 @@
 
 - [循迹搭建--Apollo系统安装](Apollo_Installation_cn.md)
 
-- [循迹搭建--车辆循迹演示](Start_Waypoint_Following_cn)
+- [循迹搭建--车辆循迹演示](Start_Waypoint_Following_cn.md)
 
 ## 主要步骤
 
@@ -72,12 +72,12 @@
     | Localization | `/apollo/localization/pose` | 确保能正常输出位置数据 |
     | GPS | `apollo/sensor/gnss/best_pose` | 确保`sol_type`为`NARROW_INT` |
 
-- 通过使用`cyber`命令来检查采集数据内是否存在上述`channel`的数据：
+- 通过使用`cyber_recorder`命令来检查采集数据内是否存在上述`channel`的数据：
 
 ```
     cyber_recorder info xxxxxx.record.xxxxx
 ```
-- 如下图所示，可以看到上述表格内对应channel的message数据不为0，说明数据有效。
+- 如下图所示，可以看到上述表格内对应`channel`的`messages`数据不为0，说明数据有效。
 
 ![profiling_channel_check](images/profiling_channel_check.png)
 
@@ -100,7 +100,7 @@
 
 1）请将标定数据按照如下文件夹结构进行放置：
 
-![control_profiling_online_folder_structure](images/control_profiling_online_folder_structure.png)
+![profiling_folder_structure](images/profiling_folder_structure.png)
 
 2）`Origin Folder`一般是**BOS的根目录**，本例中`task001`目录是在BOS根目录下创建的（根目录：登录BOS存储服务器后首先看到的目录即为根目录，一般是`Bucket name`目录）；
 
@@ -119,9 +119,15 @@
 
 #### 4. 提交标定任务据至BOS
 
-打开Apollo云服务页面，在`New Job`下拉框中选择`Control Profiling`选项，根据实际情况填写Partner ID（请与商务联系）、Access Key（按BOS账号实际情况填写）、Secret Key（按BOS账号实际情况填写）、Input Data Path填写到根目录（在本示例中填写为`task001`），最后点击Submit Job按钮提交。
+首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`控制评测`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`。如下图所示：
 
-![control_profiling_online_submit](images/control_profiling_online_submit.png)
+![profiling_submit_task1](images/profiling_submit_task1.png)
+
+![profiling_submit_task2](images/profiling_submit_task2.png)
+
+![profiling_submit_task3](images/profiling_submit_task3.png)
+
+![profiling_submit_task4](images/profiling_submit_task4.png)
 
 #### 5. 获取评测结果
 
