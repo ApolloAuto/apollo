@@ -1,5 +1,5 @@
-#! /usr/bin/env python3
-# Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+# Lint as: python3
+# Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,25 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Compresses the contents of 'find_cuda_config.py'
 
-The compressed file is what is actually being used. It works around remote
-config not being able to upload files yet.
-"""
-import base64
-import zlib
-
-
-def main():
-    with open('find_cuda_config.py', 'rb') as f:
-        data = f.read()
-
-    compressed = zlib.compress(data)
-    b64encoded = base64.b64encode(compressed)
-
-    with open('find_cuda_config.py.gz.base64', 'wb') as f:
-        f.write(b64encoded)
-
-
-if __name__ == '__main__':
-    main()
+config = %{cuda_config}

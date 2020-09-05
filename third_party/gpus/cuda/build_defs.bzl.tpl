@@ -38,14 +38,18 @@ def if_cuda_clang_opt(if_true, if_false = []):
        "//conditions:default": if_false
    })
 
+# TODO(storypku): revisit the APOLLO_CUDA macro
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
-    return if_cuda(
-        ["-x", "cuda", "-DAPOLLO_CUDA=1"]
-    ) + if_cuda_clang_opt(
+    return if_cuda([
+        "-x", "cuda",
+        "-DAPOLLO_CUDA=1",
+        "-Xcuda-fatbinary=--compress-all",
+        "--no-cuda-include-ptx=all"
+    ] + %{cuda_extra_copts}) + if_cuda_clang_opt(
         # Some important CUDA optimizations are only enabled at O3.
         ["-O3"]
-    ) + %{cuda_extra_copts}
+    )
 
 def cuda_is_configured():
     """Returns true if CUDA was enabled during the configure process."""
@@ -97,8 +101,3 @@ def cuda_header_library(
 def cuda_library(copts = [], **kwargs):
     """Wrapper over cc_library which adds default CUDA options."""
     native.cc_library(copts = cuda_default_copts() + copts, **kwargs)
-
-def cuda_binary(copts = [], **kwargs):
-    """Wrapper over cc_binary which adds default CUDA options."""
-    native.cc_binary(copts = cuda_default_copts() + copts, **kwargs)
-

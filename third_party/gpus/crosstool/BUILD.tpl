@@ -25,6 +25,7 @@ cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         "local|compiler": ":cc-compiler-local",
+        "arm": ":cc-compiler-local",
         "aarch64": ":cc-compiler-local",
         "k8": ":cc-compiler-local",
 
