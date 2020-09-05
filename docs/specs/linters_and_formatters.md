@@ -26,7 +26,7 @@ As you may already know, Apollo adopted Google coding style for C/C++ and Python
 programs. You can refer to
 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and
 [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
-for full text of specifications.
+for full text of their specifications.
 
 ## Linters in Apollo
 
@@ -48,7 +48,7 @@ are provided for developers to check style issues.
 To make sure your code conforms to Apollo coding style, you can use
 `./apollo.sh lint` to find any possible style problems and fix them manually.
 
-## Formatters in apollo
+## Formatters in Apollo
 
 To help ease your life with Apollo coding style, various formatters are
 pre-installed into Apollo Docker image, to help you auto-format your code, and
@@ -82,7 +82,7 @@ which will auto-format Bazel `WORKSPACE` file under `$APOLLO_ROOT_DIR`,
 
 Note:
 
-> `./apollo.sh format` is expected to work outside Docker if relavant tools
+> `./apollo.sh format` can also work outside Docker if relavant tools
 > installed properly.
 
 ## Conclusion
