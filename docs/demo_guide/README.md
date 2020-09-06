@@ -31,7 +31,7 @@ Note:
 
 > The script will auto-detect whether it was a CPU only build or a GPU build.
 
-## Start Apollo
+## Start Dreamview
 
 Please run the following command to start the Monitor module and Dreamview
 backend.
