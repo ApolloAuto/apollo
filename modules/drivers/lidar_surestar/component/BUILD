@@ -25,9 +25,11 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"surestar\\"'],
     deps = [
         "//cyber",
-        "//modules/drivers/lidar_surestar/parser",
+        "//modules/drivers/lidar_surestar/driver:surestar_driver_component_lib",
+        "//modules/drivers/lidar_surestar/parser:surestar_parser_component_lib",
         "//modules/drivers/lidar_surestar/proto:surestar_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
+        "@eigen",
         "@local_config_pcl//:pcl",
     ],
 )

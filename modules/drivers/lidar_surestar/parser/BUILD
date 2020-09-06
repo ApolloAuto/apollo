@@ -7,14 +7,14 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "libsurestar_driver_component.so",
+    name = "libsurestar_parser_component.so",
     linkshared = True,
     linkstatic = False,
-    deps = [":surestar_driver_component_lib"],
+    deps = [":surestar_parser_component_lib"],
 )
 
 cc_library(
-    name = "surestar_driver_component_lib",
+    name = "surestar_parser_component_lib",
     srcs =  [
         "convert.cpp",
         "surestar_parser.cpp",
@@ -29,7 +29,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"surestar\\"'],
     deps = [
         "//cyber",
-        "//modules/drivers/lidar_surestar/lib",
+        "//modules/drivers/lidar_surestar/lib:surestar_lib_component_lib",
         "//modules/drivers/lidar_surestar/proto:surestar_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
         "@local_config_pcl//:pcl",
