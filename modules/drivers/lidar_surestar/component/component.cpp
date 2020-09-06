@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_surestar/include/component/component_driver.h"
-#include "modules/drivers/lidar_surestar/include/component/component_convert.h"
+#include "modules/drivers/lidar_surestar/component/component_driver.h"
+#include "modules/drivers/lidar_surestar/component/component_convert.h"
 
 

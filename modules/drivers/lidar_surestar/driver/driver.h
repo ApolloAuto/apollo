@@ -20,9 +20,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/drivers/lidar_surestar/include/lib/data_type.h"
-#include "modules/drivers/lidar_surestar/include/lib/pcap_input.h"
-#include "modules/drivers/lidar_surestar/include/lib/socket_input.h"
+#include "modules/drivers/lidar_surestar/lib/data_type.h"
+#include "modules/drivers/lidar_surestar/lib/pcap_input.h"
+#include "modules/drivers/lidar_surestar/lib/socket_input.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar_conf.pb.h"
 

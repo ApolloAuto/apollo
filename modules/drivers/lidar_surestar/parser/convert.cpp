@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_surestar/include/parser/convert.h"
+#include "modules/drivers/lidar_surestar/parser/convert.h"
 
 #include <memory>
 

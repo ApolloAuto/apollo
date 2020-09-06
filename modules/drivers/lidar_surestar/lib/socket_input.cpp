@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_surestar/include/lib/socket_input.h"
+#include "modules/drivers/lidar_surestar/lib/socket_input.h"
 
 #include <arpa/inet.h>
 #include <errno.h>

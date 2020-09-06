@@ -21,7 +21,7 @@
 #include <pcl/common/time.h>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar_surestar/include/parser/surestar_parser.h"
+#include "modules/drivers/lidar_surestar/parser/surestar_parser.h"
 
 namespace apollo {
 namespace drivers {

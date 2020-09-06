@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_surestar/include/parser/surestar_parser.h"
+#include "modules/drivers/lidar_surestar/parser/surestar_parser.h"
 
 #include <fstream>
 #include <string>

@@ -22,7 +22,7 @@
 #include <thread>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar_surestar/include/driver/driver.h"
+#include "modules/drivers/lidar_surestar/driver/driver.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 
 namespace apollo {

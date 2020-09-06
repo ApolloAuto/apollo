@@ -22,7 +22,7 @@
 #include <string>
 #include <thread>
 
-#include "modules/drivers/lidar_surestar/include/driver/driver.h"
+#include "modules/drivers/lidar_surestar/driver/driver.h"
 
 namespace apollo {
 namespace drivers {

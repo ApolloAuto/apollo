@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_surestar/include/lib/calibration.h"
+#include "modules/drivers/lidar_surestar/lib/calibration.h"
 
 #include <cmath>
 #include <fstream>

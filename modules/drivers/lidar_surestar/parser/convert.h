@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "modules/drivers/lidar_surestar/include/parser/surestar_parser.h"
+#include "modules/drivers/lidar_surestar/parser/surestar_parser.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 

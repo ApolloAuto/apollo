@@ -26,7 +26,7 @@
 #include <pcl/point_types.h>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar_surestar/include/parser/convert.h"
+#include "modules/drivers/lidar_surestar/parser/convert.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 

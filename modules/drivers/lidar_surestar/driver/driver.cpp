@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar_surestar/include/driver/driver.h"
+#include "modules/drivers/lidar_surestar/driver/driver.h"
 
 #include <math.h>
 #include <time.h>

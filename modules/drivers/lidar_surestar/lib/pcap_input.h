@@ -22,7 +22,7 @@
 #include <string>
 #include <pcap.h>
 
-#include "modules/drivers/lidar_surestar/include/lib/input.h"
+#include "modules/drivers/lidar_surestar/lib/input.h"
 
 namespace apollo {
 namespace drivers {

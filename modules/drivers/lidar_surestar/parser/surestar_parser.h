@@ -26,9 +26,9 @@
 #include <string>
 #include <boost/format.hpp>
 
-#include "modules/drivers/lidar_surestar/include/lib/calibration.h"
-#include "modules/drivers/lidar_surestar/include/lib/const_variables.h"
-#include "modules/drivers/lidar_surestar/include/lib/data_type.h"
+#include "modules/drivers/lidar_surestar/lib/calibration.h"
+#include "modules/drivers/lidar_surestar/lib/const_variables.h"
+#include "modules/drivers/lidar_surestar/lib/data_type.h"
 #include "modules/drivers/lidar_surestar/proto/lidars_filter_config.pb.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar_conf.pb.h"

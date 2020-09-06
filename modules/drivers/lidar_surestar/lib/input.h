@@ -23,7 +23,7 @@
 #include <pcap.h>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar_surestar/include/lib/data_type.h"
+#include "modules/drivers/lidar_surestar/lib/data_type.h"
 #include "modules/drivers/lidar_surestar/proto/sensor_surestar.pb.h"
 
 namespace apollo {
