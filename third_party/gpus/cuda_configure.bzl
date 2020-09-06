@@ -812,7 +812,7 @@ def _create_local_cuda_repository(repository_ctx):
         "cuda:cuda_config.py",
     ]}
     tpl_paths["cuda:BUILD"] = _tpl_path(repository_ctx, "cuda:BUILD")
-    find_cuda_config_script = repository_ctx.path(Label("@//third_party/gpus:find_cuda_config.py.gz.base64"))
+    find_cuda_config_script = repository_ctx.path(Label("//third_party/gpus:find_cuda_config.py.gz.base64"))
 
     cuda_config = _get_cuda_config(repository_ctx, find_cuda_config_script)
 
@@ -909,7 +909,7 @@ def _create_local_cuda_repository(repository_ctx):
         ],
     ))
 
-    check_cuda_libs_script = repository_ctx.path(Label("@//third_party/gpus:check_cuda_libs.py"))
+    check_cuda_libs_script = repository_ctx.path(Label("//third_party/gpus:check_cuda_libs.py"))
     cuda_libs = _find_libs(repository_ctx, check_cuda_libs_script, cuda_config)
     cuda_lib_srcs = []
     cuda_lib_outs = []
