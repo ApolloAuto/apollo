@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PREPROCESS_SUB_COPTS = ["-DMODULE_NAME=\\\"preprocessor_submodule\\\""]
 
 cc_library(
     name = "control_module_lib",
@@ -24,9 +25,7 @@ cc_library(
     name = "preprocessor_submodule_lib",
     srcs = ["preprocessor_submodule.cc"],
     hdrs = ["preprocessor_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"preprocessor_submodule\\\"",
-    ],
+    copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
         "//cyber/time:clock",
@@ -60,9 +59,7 @@ cc_library(
     name = "mpc_controller_submodule_lib",
     srcs = ["mpc_controller_submodule.cc"],
     hdrs = ["mpc_controller_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"mpc_controller_submodule\\\"",
-    ],
+    copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
         "//cyber/time:clock",
@@ -98,9 +95,7 @@ cc_library(
     name = "lat_lon_controller_submodule_lib",
     srcs = ["lat_lon_controller_submodule.cc"],
     hdrs = ["lat_lon_controller_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"lat_lon_controller_submodule\\\"",
-    ],
+    copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
         "//cyber/time:clock",
@@ -130,9 +125,7 @@ cc_library(
     name = "postprocessor_submodule_lib",
     srcs = ["postprocessor_submodule.cc"],
     hdrs = ["postprocessor_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"postprocessor_submodule\\\"",
-    ],
+    copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
         "//cyber/time:clock",

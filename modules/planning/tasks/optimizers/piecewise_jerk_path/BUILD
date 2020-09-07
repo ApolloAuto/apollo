@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "piecewise_jerk_path_optimizer",
     srcs = ["piecewise_jerk_path_optimizer.cc"],
     hdrs = ["piecewise_jerk_path_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -40,7 +41,7 @@ cc_library(
     name = "piecewise_jerk_path_ipopt_solver",
     srcs = ["piecewise_jerk_path_ipopt_solver.cc"],
     hdrs = ["piecewise_jerk_path_ipopt_solver.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber",
         "@eigen",

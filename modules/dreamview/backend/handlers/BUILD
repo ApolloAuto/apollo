@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
 cc_library(
     name = "websocket_handler",
     srcs = ["websocket_handler.cc"],
     hdrs = ["websocket_handler.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/util:map_util",
@@ -20,7 +21,7 @@ cc_library(
     name = "image_handler",
     srcs = ["image_handler.cc"],
     hdrs = ["image_handler.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

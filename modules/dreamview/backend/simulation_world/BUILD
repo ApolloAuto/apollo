@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
 cc_library(
     name = "simulation_world_service",
     srcs = ["simulation_world_service.cc"],
     hdrs = ["simulation_world_service.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         "//cyber",
         "//modules/audio/proto:audio_event_cc_proto",
@@ -55,7 +56,7 @@ cc_library(
     name = "simulation_world_updater",
     srcs = ["simulation_world_updater.cc"],
     hdrs = ["simulation_world_updater.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         ":simulation_world_service",
         "//modules/common/util:map_util",

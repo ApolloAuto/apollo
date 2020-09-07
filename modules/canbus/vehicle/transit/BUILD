@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
 cc_library(
     name = "transit_vehicle_factory",
     srcs = ["transit_vehicle_factory.cc"],
     hdrs = ["transit_vehicle_factory.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":transit_controller",
         ":transit_message_manager",
@@ -19,7 +20,7 @@ cc_library(
     name = "transit_message_manager",
     srcs = ["transit_message_manager.cc"],
     hdrs = ["transit_message_manager.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
@@ -32,7 +33,7 @@ cc_library(
     name = "transit_controller",
     srcs = ["transit_controller.cc"],
     hdrs = ["transit_controller.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":transit_message_manager",
         "//modules/canbus/vehicle:vehicle_controller_base",
