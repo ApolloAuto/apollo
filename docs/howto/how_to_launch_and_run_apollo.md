@@ -30,7 +30,7 @@ former building step was skipped.
 
 ### Start Apollo
 
-Running `scripts/bootstrap.sh` will start Dreamview with the monitor module
+Running `scripts/bootstrap.sh` will start Dreamview backend with the Monitor module
 enabled.
 
 ```
@@ -41,8 +41,8 @@ enabled.
 ### Access Dreamview Web UI
 
 Open [http://localhost:8888](http://localhost:8888) in your favorite browser,
-e.g. Chrome, and you should see this screen. However, no modules are running in
-the backend at this time.
+e.g. Chrome, and you should see this screen. However, no module (except Monitor)
+is running in the background at this moment.
 
 ![Access Dreamview](images/apollo_bootstrap_screen.png)
 
@@ -54,7 +54,7 @@ From the dropdown box selet "Navigation" mode.
 
 ### Replay Demo Record
 
-To see if the system works, use the demo 'record' to "feed" the system.
+To see if the system works, use the demo record to "feed" the system.
 
 ```
 # You need to download the demo record using the following commands

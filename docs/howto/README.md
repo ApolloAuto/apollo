@@ -1,7 +1,7 @@
 # Howto Guides
 
 ## Build
-- [How to launch and run Apollo](how_to_launch_Apollo.md)
+- [How to launch and run Apollo](how_to_launch_and_run_apollo.md)
 - [How to build your own kernel](how_to_build_your_own_kernel.md)
 - [How to install apollo kernel](how_to_install_apollo_kernel.md)
 - [How to save and load docker image](how_to_save_and_load_docker_image.md)
