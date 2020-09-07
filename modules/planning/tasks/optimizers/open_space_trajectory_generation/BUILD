@@ -4,7 +4,7 @@ load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
-FOPENMP_COPTS =["-fopenmp"]
+FOPENMP_COPTS = ["-fopenmp"]
 
 cc_library(
     name = "open_space_trajectory_provider",
