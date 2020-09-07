@@ -291,7 +291,7 @@ The car has complete 360-degree visibility, along with upgraded perception deep 
 
 * [Build and Release using Docker](docs/howto/how_to_build_and_release.md) - This step is required
 
-* [Launch and Run Apollo](docs/howto/how_to_launch_Apollo.md)
+* [Launch and Run Apollo](docs/howto/how_to_launch_and_run_apollo.md)
 
 Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
 
