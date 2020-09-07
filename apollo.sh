@@ -72,6 +72,12 @@ function apollo_env_setup() {
     APOLLO_ENV="${APOLLO_ENV} USE_ESD_CAN=${USE_ESD_CAN}"
     # Add more here ...
 
+    if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
+        env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
+    fi
+}
+
+function print_env() {
     info "Apollo Environment Settings:"
     info "${TAB}APOLLO_ROOT_DIR: ${APOLLO_ROOT_DIR}"
     info "${TAB}APOLLO_CACHE_DIR: ${APOLLO_CACHE_DIR}"
@@ -82,10 +88,6 @@ function apollo_env_setup() {
     fi
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
     info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET}"
-
-    if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
-        env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
-    fi
 }
 
 #TODO(all): Update node modules
@@ -144,6 +146,7 @@ function main() {
     local cmd="$1"; shift
     case "${cmd}" in
         config)
+            print_env
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" "$@"
             ;;
         build)
