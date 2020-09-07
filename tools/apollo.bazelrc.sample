@@ -29,4 +29,4 @@ build:cuda_clang --action_env TF_CUDA_CLANG=1
 build:tensorrt --action_env TF_NEED_TENSORRT=1
 build:nonccl --define=no_nccl_support=true
 
-build:teleop --define=WITH_TELEOP=1
+build:teleop --define=WITH_TELEOP=true
