@@ -26,10 +26,9 @@ config_setting(
     },
 )
 
-#TODO(infra): set to true
 config_setting(
     name = "with_teleop",
     define_values = {
-        "WITH_TELEOP": "1",
+        "WITH_TELEOP": "true",
     },
 )
