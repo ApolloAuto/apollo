@@ -1,12 +1,12 @@
-# Best Coding Practice
+# Apollo Best Coding Practice
 
-1. Always compile all, test all and lint all.
+1. Always build, test, and lint all.
 
    ```bash
-   apollo.sh check
+   ./apollo.sh check
    ```
 
-1. Always write unit test and put it along with the source code.
+1. Always write unit tests and put them along with the source files.
 
    ```text
    foobar.h
@@ -14,9 +14,9 @@
    foobar_test.cc
    ```
 
-1. A bazel target contains at most one header and one source file.
+1. A bazel target should contain at most one header and one source file.
 
-   ```text
+   ```python
    cc_library(
      name = "foobar",
      hdrs = ["foobar.h"],
@@ -36,12 +36,13 @@
    )
    ```
 
-   You could setup and run `scripts/buildifier.sh <some/path>` to fix BUILD file
-   style issues.
+   You can use `scripts/buildifier.sh <path/to/BUILD>` to fix BUILD file style
+   issues.
 
-1. In general, we follow
+1. In general, Apollo follows
    [Google C++ coding style](https://google.github.io/styleguide/cppguide.html).
-   You could run `scripts/clang-format.sh <some/path>` to fix C++ style issues.
+   You should run `scripts/clang_format.sh <path/to/cpp/dirs/or/files>` to fix
+   C++ style issues.
 
 1. Simple and unified function signature.
 
@@ -71,14 +72,59 @@
    const std::string& name() const;
    ```
 
-1. The DRY principle.
+1. Prefer C++ headers over C headers.
+
+   We prefer using `#include <ctime>` over `#include <time.h>`, `<cmath>` over
+   `<math.h>`, `<cstdio>` over `<stdio.h>`, `<cstring>` over `<string.h>`, etc.
+
+1. Include necessary headers **only**. No more, no less.
+
+   Please also pay attention to header orders. Again, you can use
+   `scripts/clang_format.sh` to fix header order issues.
+
+1. List only direct dependencies in `deps` section of a Bazel target.
+
+   Generally, only targets to which the included headers belongs should be
+   listed as a dependency.
+
+   For example, suppose `sandwich.h` includes `bread.h` which in turn includes
+   `flour.h`. Since `sandwich.h` doesn't include `flour.h` directly (who wants
+   flour in their sandwich?), the BUILD file would look like this:
+
+   ```python
+   cc_library(
+    name = "sandwich",
+    srcs = ["sandwich.cc"],
+    hdrs = ["sandwich.h"],
+    deps = [
+        ":bread",
+        # BAD practice to uncomment the line below
+        # ":flour",
+    ],
+   )
+
+    cc_library(
+        name = "bread",
+        srcs = ["bread.cc"],
+        hdrs = ["bread.h"],
+        deps = [":flour"],
+    )
+
+    cc_library(
+        name = "flour",
+        srcs = ["flour.cc"],
+        hdrs = ["flour.h"],
+    )
+   ```
+
+1. Conform to the DRY principle.
 
    Don't repeat yourself, in any way. Avoid duplicate classes, functions, const
    variables, or a simple piece of code. Some examples:
 
    - It's fine to refer a name with full path once, like
-     `apollo::common::util::Type`, but better to make a short alias
-     if you need to use twice or more: `using apollo::common::util::Type;`.
+     `apollo::common::util::Type`, but better to make a short alias if you need
+     to use twice or more: `using apollo::common::util::Type;`.
    - It's fine to access a sub-field of proto once in cascade style, like
      `a_proto.field_1().field_2().field_3()`, but better to save the reference
      of a common part first if you need to access it twice or more:
