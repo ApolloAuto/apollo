@@ -19,7 +19,7 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-# shellcheck source=apollo/scripts/apollo.bashrc
+# shellcheck source=./apollo.bashrc
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 : ${STAGE:=dev}
@@ -75,10 +75,10 @@ function run_sh_lint() {
 
   sh_dirs=$(printf "${APOLLO_ROOT_DIR}/%s " ${sh_dirs})
   run find ${sh_dirs} -type f \( -name "*.sh" -or -name "*.bashrc" \) -exec \
-    shellcheck -x {} +
+    shellcheck -x --shell=bash {} +
 
   for script in ${APOLLO_ROOT_DIR}/*.sh; do
-    run shellcheck -x "${script}"
+    run shellcheck -x --shell=bash "${script}"
   done
 }
 
