@@ -21,6 +21,7 @@ rosbag_to_record_path="${bazel_bin_path}/modules/data/tools/rosbag_to_record"
 for entry in "${cyber_bin_path}" \
     "${recorder_path}" "${monitor_path}"  \
     "${channel_path}" "${node_path}" \
+    "${service_path}" \
     "${launch_path}" \
     "${visualizer_path}" \
     "${rosbag_to_record_path}" ; do
