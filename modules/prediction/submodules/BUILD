@@ -2,14 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
 
 cc_library(
     name = "submodule_output",
     srcs = ["submodule_output.cc"],
     hdrs = ["submodule_output.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
+    copts = PREDICTION_COPTS,
     deps = [
         "//modules/common/util:lru_cache",
         "//modules/perception/proto:perception_obstacle_cc_proto",
@@ -22,9 +21,7 @@ cc_library(
     name = "evaluator_submodule_lib",
     srcs = ["evaluator_submodule.cc"],
     hdrs = ["evaluator_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
+    copts = PREDICTION_COPTS,
     deps = [
         "//cyber",
         "//cyber/time:clock",
@@ -49,9 +46,7 @@ cc_library(
     name = "predictor_submodule_lib",
     srcs = ["predictor_submodule.cc"],
     hdrs = ["predictor_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
+    copts = PREDICTION_COPTS,
     deps = [
         "//cyber",
         "//cyber/time:clock",

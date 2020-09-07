@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "open_space_roi_decider",
     srcs = ["open_space_roi_decider.cc"],
     hdrs = ["open_space_roi_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
@@ -19,7 +20,7 @@ cc_library(
     name = "open_space_pre_stop_decider",
     srcs = ["open_space_pre_stop_decider.cc"],
     hdrs = ["open_space_pre_stop_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common/util:common_lib",
@@ -31,7 +32,7 @@ cc_library(
     name = "open_space_fallback_decider",
     srcs = ["open_space_fallback_decider.cc"],
     hdrs = ["open_space_fallback_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/common:dependency_injector",
         "//modules/planning/common:planning_context",

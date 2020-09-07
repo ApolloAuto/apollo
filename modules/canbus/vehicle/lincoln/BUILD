@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
 cc_library(
     name = "lincoln_vehicle_factory",
     srcs = ["lincoln_vehicle_factory.cc"],
     hdrs = ["lincoln_vehicle_factory.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":lincoln_controller",
         ":lincoln_message_manager",
@@ -19,7 +20,7 @@ cc_library(
     name = "lincoln_message_manager",
     srcs = ["lincoln_message_manager.cc"],
     hdrs = ["lincoln_message_manager.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
@@ -32,7 +33,7 @@ cc_library(
     name = "lincoln_controller",
     srcs = ["lincoln_controller.cc"],
     hdrs = ["lincoln_controller.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":lincoln_message_manager",
         "//modules/canbus/proto:chassis_detail_cc_proto",

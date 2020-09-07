@@ -4,12 +4,14 @@ load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
+PLANNING_FOPENMP = ["-DMODULE_NAME=\\\"planning\\\"","-fopenmp"]
 
 cc_library(
     name = "dual_variable_warm_start_problem",
     srcs = ["dual_variable_warm_start_problem.cc"],
     hdrs = ["dual_variable_warm_start_problem.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":dual_variable_warm_start_ipopt_interface",
         ":dual_variable_warm_start_ipopt_qp_interface",
@@ -24,7 +26,7 @@ cc_library(
     name = "dual_variable_warm_start_ipopt_interface",
     srcs = ["dual_variable_warm_start_ipopt_interface.cc"],
     hdrs = ["dual_variable_warm_start_ipopt_interface.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -42,7 +44,7 @@ cc_library(
     name = "dual_variable_warm_start_ipopt_qp_interface",
     srcs = ["dual_variable_warm_start_ipopt_qp_interface.cc"],
     hdrs = ["dual_variable_warm_start_ipopt_qp_interface.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -60,7 +62,7 @@ cc_library(
     name = "dual_variable_warm_start_osqp_interface",
     srcs = ["dual_variable_warm_start_osqp_interface.cc"],
     hdrs = ["dual_variable_warm_start_osqp_interface.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -77,7 +79,7 @@ cc_library(
     name = "dual_variable_warm_start_slack_osqp_interface",
     srcs = ["dual_variable_warm_start_slack_osqp_interface.cc"],
     hdrs = ["dual_variable_warm_start_slack_osqp_interface.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -94,10 +96,7 @@ cc_library(
     name = "distance_approach_problem",
     srcs = ["distance_approach_problem.cc"],
     hdrs = ["distance_approach_problem.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         # TODO(xiaoxq): Disable CUDA in planning temporarily.
         # ":distance_approach_ipopt_cuda_interface",
@@ -120,10 +119,7 @@ cc_library(
         "distance_approach_interface.h",
         "distance_approach_ipopt_fixed_ts_interface.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -145,10 +141,7 @@ cc_library(
         "distance_approach_interface.h",
         "distance_approach_ipopt_fixed_dual_interface.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -170,10 +163,7 @@ cc_library(
         "distance_approach_interface.h",
         "distance_approach_ipopt_relax_end_interface.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -195,10 +185,7 @@ cc_library(
         "distance_approach_interface.h",
         "distance_approach_ipopt_relax_end_slack_interface.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -220,10 +207,7 @@ cc_library(
         "distance_approach_interface.h",
         "distance_approach_ipopt_interface.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -245,10 +229,7 @@ cc_library(
         "distance_approach_interface.h",
         "distance_approach_ipopt_cuda_interface.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -294,10 +275,7 @@ cc_test(
     name = "distance_approach_ipopt_interface_test",
     size = "small",
     srcs = ["distance_approach_ipopt_interface_test.cc"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_ipopt_interface",
@@ -310,10 +288,7 @@ cc_test(
     name = "distance_approach_ipopt_cuda_interface_test",
     size = "small",
     srcs = ["distance_approach_ipopt_cuda_interface_test.cc"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_ipopt_cuda_interface",
@@ -326,10 +301,7 @@ cc_test(
     name = "distance_approach_problem_test",
     size = "small",
     srcs = ["distance_approach_problem_test.cc"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+    copts = PLANNING_FOPENMP,
     linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_problem",

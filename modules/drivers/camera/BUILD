@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
 cc_binary(
     name = "libcamera_component.so",
@@ -23,7 +24,7 @@ cc_library(
     name = "camera_component_lib",
     srcs = ["camera_component.cc"],
     hdrs = ["camera_component.h"],
-    copts = ['-DMODULE_NAME=\\"camera\\"'],
+    copts = CAMERA_COPTS,
     deps = [
         ":camera",
         "//cyber",
@@ -37,7 +38,7 @@ cc_library(
     name = "compress_component_lib",
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
-    copts = ['-DMODULE_NAME=\\"camera\\"'],
+    copts = CAMERA_COPTS,
     deps = [
         "//cyber",
         "//modules/common/proto:error_code_cc_proto",

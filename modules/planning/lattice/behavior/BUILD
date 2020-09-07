@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "feasible_region",
     srcs = ["feasible_region.cc"],
     hdrs = ["feasible_region.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_cc_proto",
@@ -19,7 +20,7 @@ cc_library(
     name = "path_time_graph",
     srcs = ["path_time_graph.cc"],
     hdrs = ["path_time_graph.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/math:linear_interpolation",
@@ -37,7 +38,7 @@ cc_library(
     name = "prediction_querier",
     srcs = ["prediction_querier.cc"],
     hdrs = ["prediction_querier.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math",
         "//modules/common/math:path_matcher",
