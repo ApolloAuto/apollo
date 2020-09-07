@@ -25,3 +25,10 @@ extrinsic_file {
     file_path: "/apollo/modules/perception/data/params/front_12mm_extrinsics.yaml"
     enable: true
 }
+
+extrinsic_file {
+    frame_id: "velodyne128"
+    child_frame_id: "radar_front"
+    file_path: "/apollo/modules/perception/data/params/radar_front_extrinsics.yaml"
+    enable: true
+}
