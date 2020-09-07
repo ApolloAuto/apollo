@@ -5,11 +5,9 @@
 - [How to build your own kernel](how_to_build_your_own_kernel.md)
 - [How to install apollo kernel](how_to_install_apollo_kernel.md)
 - [How to save and load docker image](how_to_save_and_load_docker_image.md)
-- [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16.md)
 
 #### Chinese versions
 - [How to install apollo kernel](how_to_install_apollo_kernel_cn.md)
-- [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16_cn.md)
 
 ## Contribution
 - [How to document code](how_to_document_code.md)
