@@ -1,0 +1,96 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar_robosense/libsuteng_driver_component.so"
+    
+    ##################################################
+    #                   drivers                      #
+    ##################################################
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_left_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_left.conf"
+      }
+    }
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_right_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_right.conf"
+      }
+    }
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_back_driver"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_back.conf"
+      }
+    }
+    ##################################################
+    #                   convert                      #
+    ##################################################
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_left_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_left.conf"
+        readers {
+          channel: "/apollo/sensor/suteng16/left/SutengScan"
+        }
+      }
+    }
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_right_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_right.conf"
+        readers {
+          channel: "/apollo/sensor/suteng16/right/SutengScan"
+        }
+      }
+    }
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_back_convert"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_back.conf"
+        readers {
+          channel: "/apollo/sensor/suteng16/back/SutengScan"
+        }
+      }
+    }
+}
+##################################################
+#                   fusion                      #
+##################################################
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/fusion/libvelodyne_fusion_component.so"
+
+    components {
+      class_name : "PriSecFusionComponent"
+      config {
+        name : "velodyne_fusion"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/robo_fusion_conf.pb.txt"
+        readers {channel: "/apollo/sensor/velodyne16/back/PointCloud2"}
+    }
+  }
+}
+
+
+##################################################
+#                compensation                    #
+##################################################
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
+
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "velodyne16_fusion_compensator"
+        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/fusion/PointCloud2"}
+      }
+    }
+}
+
