@@ -8,10 +8,8 @@ Apollo.
 - Installing Docker Engine
 - Installing NVIDIA Container Toolkit
 
-![tip_icon](images/tip_icon.png)
-
-> Working knowledge of Linux is assumed for successful software installation in
-> this guide.
+![tip_icon](images/tip_icon.png) Working knowledge of Linux is assumed for
+successful software installation in this guide.
 
 ## Installing Ubuntu Linux
 
@@ -32,12 +30,11 @@ sudo apt-get update
 sudo apt-get upgrade
 ```
 
-![tip_icon](images/tip_icon.png)
-
-> Internet access is needed for successful software updates. Make sure either
-> WiFi or Ethernet cable is connected to a network with Internet access. You
-> might need to configure the network for your host if the connected network is
-> not using the Dynamic Host Configuration Protocol (DHCP).
+![tip_icon](images/tip_icon.png) Internet access is needed for successful
+software updates. Make sure either WiFi or Ethernet cable is connected to a
+network with Internet access. You might need to configure the network for your
+host if the connected network is not using the Dynamic Host Configuration
+Protocol (DHCP).
 
 ## Installing NVIDIA GPU Driver
 
@@ -128,10 +125,8 @@ sudo apt-get -y update
 sudo apt-get install -y nvidia-container-toolkit
 ```
 
-![tip_icon](images/tip_icon.png)
-
-> Don't forget to restart the Docker daemon for the changes above to take
-> effect.
+![tip_icon](images/tip_icon.png) Don't forget to restart the Docker daemon for
+the changes above to take effect.
 
 ```
 sudo systemctl restart docker
