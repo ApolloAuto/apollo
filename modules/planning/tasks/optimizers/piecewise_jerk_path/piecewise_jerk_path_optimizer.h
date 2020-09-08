@@ -90,6 +90,9 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
   double EstimateJerkBoundary(const double vehicle_speed,
                               const double axis_distance,
                               const double max_steering_rate) const;
+
+  double GaussianWeighting(const double x, const double peak_weighting,
+                           const double peak_weighting_x) const;
 };
 
 }  // namespace planning
