@@ -220,6 +220,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "neolix_edu_cc_proto",
+    deps = [
+        ":neolix_edu_proto",
+    ],
+)
+
+proto_library(
+    name = "neolix_edu_proto",
+    srcs = ["neolix_edu.proto"],
+)
+
+py_proto_library(
+    name = "neolix_edu_py_pb2",
+    deps = [
+        ":neolix_edu_proto",
+    ],
+)
+
+cc_proto_library(
     name = "chassis_detail_cc_proto",
     deps = [
         ":chassis_detail_proto",
@@ -235,6 +254,7 @@ proto_library(
         ":devkit_proto",
         ":ge3_proto",
         ":lexus_proto",
+        ":neolix_edu_proto",
         ":transit_proto",
         ":wey_proto",
         ":zhongyun_proto",
@@ -251,6 +271,7 @@ py_proto_library(
         ":devkit_py_pb2",
         ":ge3_py_pb2",
         ":lexus_py_pb2",
+        ":neolix_edu_py_pb2",
         ":transit_py_pb2",
         ":wey_py_pb2",
         ":zhongyun_py_pb2",
