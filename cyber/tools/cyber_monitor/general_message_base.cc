@@ -131,7 +131,7 @@ int GeneralMessageBase::lineCountOfField(
 void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
                                       const google::protobuf::Message& msg,
                                       int& jumpLines, const Screen* s,
-                                      unsigned& lineNo, int indent) {
+                                      int& lineNo, int indent) {
   const google::protobuf::Reflection* reflection = msg.GetReflection();
   const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
   std::vector<const google::protobuf::FieldDescriptor*> fields;
@@ -142,7 +142,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     reflection->ListFields(msg, &fields);
   }
   for (std::size_t i = 0; i < fields.size(); ++i) {
-    if (lineNo > static_cast<unsigned>(s->Height())) {
+    if (lineNo > s->Height()) {
       break;
     }
     const google::protobuf::FieldDescriptor* field = fields[i];
@@ -181,7 +181,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
 
 void GeneralMessageBase::PrintField(
     GeneralMessageBase* baseMsg, const google::protobuf::Message& msg,
-    int& jumpLines, const Screen* s, unsigned& lineNo, int indent,
+    int& jumpLines, const Screen* s, int& lineNo, int indent,
     const google::protobuf::Reflection* ref,
     const google::protobuf::FieldDescriptor* field, int index) {
   std::ostringstream outStr;

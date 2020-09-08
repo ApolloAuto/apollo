@@ -206,7 +206,7 @@ void CyberTopologyMessage::ChangeState(const Screen* s, int key) {
   }
 }
 
-void CyberTopologyMessage::Render(const Screen* s, int key) {
+int CyberTopologyMessage::Render(const Screen* s, int key) {
   page_item_count_ = s->Height() - 1;
   pages_ = static_cast<int>(all_channels_map_.size()) / page_item_count_ + 1;
   ChangeState(s, key);
@@ -275,4 +275,6 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
     }
     s->ClearCurrentColor();
   }
+
+  return line;
 }
