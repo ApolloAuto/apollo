@@ -139,8 +139,8 @@ data_files {
   dest_path: "/apollo/modules/perception/production/launch"
 }
 data_files {
-  source_path: "perception_camera_conf"
-  dest_path: "/apollo/modules/perception/production/conf/perception/camera"
+  source_path: "perception_conf"
+  dest_path: "/apollo/modules/perception/production/conf/perception"
 }
 data_files {
   source_path: "velodyne_dag"
