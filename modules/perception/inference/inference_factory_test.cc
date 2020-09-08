@@ -18,8 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/perception/inference/caffe/caffe_net.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
+// #include "modules/perception/inference/tensorrt/rt_net.h"
 
 namespace apollo {
 namespace perception {

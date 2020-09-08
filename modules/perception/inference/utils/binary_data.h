@@ -17,11 +17,10 @@
 
 #include <map>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
 #include <limits>
 
 #include "modules/perception/base/blob.h"
+#include <boost/shared_ptr.hpp>
 
 namespace apollo {
 namespace perception {

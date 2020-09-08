@@ -20,9 +20,8 @@ cc_library(
     hdrs = ["cuda_util.h"],
     linkstatic = 1,
     deps = [
-        "@caffe",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -51,9 +50,8 @@ cc_library(
         "//modules/perception/base:box",
         "//modules/perception/base:image",
         "//modules/perception/base:point_cloud",
-        "@caffe",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -77,9 +75,8 @@ cc_library(
     hdrs = ["resize.h"],
     linkstatic = 1,
     deps = [
-        "@caffe",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -103,9 +100,8 @@ cc_library(
     hdrs = ["gemm.h"],
     linkstatic = 1,
     deps = [
-        "@caffe",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -128,9 +124,8 @@ cc_library(
     hdrs = ["binary_data.h"],
     deps = [
         "//modules/perception/base:blob",
-        "@caffe",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:imgcodecs",
     ],
 )
 
