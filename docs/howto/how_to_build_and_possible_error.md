@@ -28,7 +28,7 @@ bash docker/scripts/dev_into.sh
 bash apollo.sh build [OPTION]
 ```
 
-if you want to build apollo in diversified modules, you can choose 'build_dbg'„ÄÅ
+If you want to build apollo in diversified modules, you can choose 'build_dbg',
 'build_opt' etc.
 
 `Note:` If you do not have a GPU, you can use the following script instead
@@ -37,7 +37,7 @@ if you want to build apollo in diversified modules, you can choose 'build_dbg'„Ä
 bash apollo.sh build_cpu
 ```
 
-some special build modules:
+Some special build modules:
 
 `build_dbg [module]`: run debug build.
 
