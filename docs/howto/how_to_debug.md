@@ -71,7 +71,7 @@ Start the module to be debugged, either by using the command line or by using
 the Dreamview interface. The following is an example of debugging the
 **Planning** module from the Dreamview interface.
 
-- Open Chrome browser, enter the URL: http://localhost:8888/
+- Open Chrome browser, enter the URL: <http://localhost:8888/>
 - Open the Dreamview interface
 - Click on the **SimControl** slider, as shown below:
 
@@ -171,7 +171,7 @@ ifconfig
 
 Assuming that the IP address of the industrial computer LAN is: `192.168.3.137`,
 open your Chrome or Firefox browser, enter the following URL:
-http://192.168.3.137:8888/, start the module (`Planning`) to be debugged as
+<http://192.168.3.137:8888/>, start the module (`Planning`) to be debugged as
 shown in
 [Start the module that needs debugging](#Start-the-module-that-needs-to-be-debugged)
 section.
