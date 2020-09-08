@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #include <map>
-#include <opencv2/opencv.hpp>
 #include <string>
+#include <vector>
+
 #include <torch/torch.h>
 #include <torch/script.h>
-#include <vector>
+#include <opencv2/opencv.hpp>
 
 #include "cyber/common/file.h"
 #include "modules/perception/base/blob.h"
