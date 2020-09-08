@@ -85,7 +85,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
     }
   }
 
-  void Render(const Screen* s, int key) override;
+  int Render(const Screen* s, int key) override;
 
   void CloseChannel(void) {
     if (channel_reader_ != nullptr) {
@@ -159,8 +159,8 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   GeneralChannelMessage* OpenChannel(const std::string& channelName);
 
-  void RenderDebugString(const Screen* s, int key, unsigned lineNo);
-  void RenderInfo(const Screen* s, int key, unsigned lineNo);
+  void RenderDebugString(const Screen* s, int key, int& lineNo);
+  void RenderInfo(const Screen* s, int key, int& lineNo);
 
   void set_has_message_come(bool b) { has_message_come_ = b; }
 

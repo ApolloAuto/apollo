@@ -29,10 +29,10 @@ class GeneralMessageBase : public RenderableMessage {
  protected:
   static void PrintMessage(GeneralMessageBase* baseMsg,
                            const google::protobuf::Message& msg, int& jumpLines,
-                           const Screen* s, unsigned& lineNo, int indent);
+                           const Screen* s, int& lineNo, int indent);
   static void PrintField(GeneralMessageBase* baseMsg,
                          const google::protobuf::Message& msg, int& jumpLines,
-                         const Screen* s, unsigned& lineNo, int indent,
+                         const Screen* s, int& lineNo, int indent,
                          const google::protobuf::Reflection* ref,
                          const google::protobuf::FieldDescriptor* field,
                          int index);

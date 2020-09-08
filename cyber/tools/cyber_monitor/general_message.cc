@@ -82,12 +82,10 @@ GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
       message_ptr_(msg),
       reflection_ptr_(reflection) {}
 
-void GeneralMessage::Render(const Screen* s, int key) {
+int GeneralMessage::Render(const Screen* s, int key) {
   s->SetCurrentColor(Screen::WHITE_BLACK);
-
+  int lineNo = 0;
   {
-    unsigned lineNo = 0;
-
     RenderableMessage* p = this;
     while (p->parent()->parent()->parent()) {
       p = p->parent();
@@ -112,7 +110,7 @@ void GeneralMessage::Render(const Screen* s, int key) {
     auto channelMsg = channelMsgPtr->CopyMsgPtr();
     if (!channelMsgPtr->raw_msg_class_->ParseFromString(channelMsg->message)) {
       s->AddStr(0, lineNo++, "Cannot Parse the message for Real-Time Updating");
-      return;
+      return lineNo;
     }
 
     if (message_ptr_ && reflection_ptr_) {
@@ -130,7 +128,7 @@ void GeneralMessage::Render(const Screen* s, int key) {
         outStr.str("");
         outStr << "The item [" << itemIndex_ << "] has been empty !!!";
         s->AddStr(0, lineNo++, outStr.str().c_str());
-        return;
+        return lineNo;
       }
 
       if (key == ',') {
@@ -183,4 +181,5 @@ void GeneralMessage::Render(const Screen* s, int key) {
   }
 
   s->ClearCurrentColor();
+  return lineNo;
 }

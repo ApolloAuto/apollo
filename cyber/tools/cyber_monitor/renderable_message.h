@@ -36,7 +36,7 @@ class RenderableMessage {
 
   virtual ~RenderableMessage() { parent_ = nullptr; }
 
-  virtual void Render(const Screen* s, int key) = 0;
+  virtual int Render(const Screen* s, int key) = 0;
   virtual RenderableMessage* Child(int /* lineNo */) const = 0;
 
   virtual double frame_ratio(void) { return frame_ratio_; }

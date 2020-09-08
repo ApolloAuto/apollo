@@ -135,7 +135,7 @@ GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
   return this;
 }
 
-void GeneralChannelMessage::Render(const Screen* s, int key) {
+int GeneralChannelMessage::Render(const Screen* s, int key) {
   switch (key) {
     case 'b':
     case 'B':
@@ -152,7 +152,7 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
 
   clear();
 
-  unsigned lineNo = 0;
+  int lineNo = 0;
 
   s->SetCurrentColor(Screen::WHITE_BLACK);
   s->AddStr(0, lineNo++, "ChannelName: ");
@@ -174,10 +174,12 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
     s->AddStr(0, lineNo++, "Channel has been closed");
   }
   s->ClearCurrentColor();
+
+  return lineNo;
 }
 
 void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
-                                       unsigned lineNo) {
+                                       int& lineNo) {
   page_item_count_ = s->Height() - lineNo;
   pages_ = static_cast<int>(readers_.size() + writers_.size() + lineNo) /
                page_item_count_ +
@@ -223,7 +225,7 @@ void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
 }
 
 void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
-                                              unsigned lineNo) {
+                                              int& lineNo) {
   if (has_message_come()) {
     if (raw_msg_class_ == nullptr) {
       auto rawFactory = apollo::cyber::message::ProtobufFactory::Instance();

@@ -243,7 +243,8 @@ void Screen::Resize(void) {
 
 void Screen::ShowRenderMessage(int ch) {
   erase();
-  current_render_obj_->Render(this, ch);
+  int line_num = current_render_obj_->Render(this, ch);
+  const int max_height = std::min(Height(), line_num);
 
   int* y = current_render_obj_->line_no();
 
@@ -257,8 +258,8 @@ void Screen::ShowRenderMessage(int ch) {
     case KEY_DOWN:
       ++(*y);
       highlight_direction_ = -1;
-      if (*y >= Height()) {
-        *y = Height() - 1;
+      if (*y >= max_height) {
+        *y = max_height - 1;
       }
       break;
 
