@@ -3,7 +3,7 @@
 The following guide serves as a user manual for launching the Apollo upgraded software and hardware stack on vehicle, which
 is similar to Apollo 5.5.
 
-The latest Apollo upgrade, Quick Start Guide focuses on the new features, like software and third_party dependencies update. For general Apollo concepts, please refer to
+The latest Apollo upgrade, Quick Start Guide focuses on the new features, like software and third party dependencies update. For general Apollo concepts, please refer to
 [Apollo 3.5 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_quick_start.md)
 
 ## Contents

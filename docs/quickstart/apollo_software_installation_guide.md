@@ -38,7 +38,7 @@ The Docker container is the simplest way to set up the build environment for Apo
 
 For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. Please follow the [official guide to install the docker-ce 19.03+](https://docs.docker.com/install/linux/docker-ce/ubuntu).Don't forget the [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+1. Please follow the [official guide to install the docker-ce 19.03+](https://docs.docker.com/install/linux/docker-ce/ubuntu). Don't forget the [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
 2. After the installation, log out and then log back into the system to enable Docker.
 
