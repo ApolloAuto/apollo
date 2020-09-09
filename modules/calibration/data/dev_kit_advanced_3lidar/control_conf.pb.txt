@@ -33,8 +33,6 @@ lat_controller_conf {
   preview_window: 0
   cf: 126050
   cr: 126050
-  #cf: 155493.663
-  #cr: 155493.663
   mass_fl: 100
   mass_fr: 100
   mass_rl: 100
@@ -57,14 +55,6 @@ lat_controller_conf {
   lookahead_station: 0.5
   lookback_station: 1.05
   lat_err_gain_scheduler {
-#    scheduler {
-#      speed: 1.0
-#      ratio: 1.4
-#    }
-#    scheduler {
-#      speed: 1.5
-#      ratio: 1.2
-#    }
     scheduler {
       speed: 2.0
       ratio: 1.0
@@ -145,7 +135,6 @@ lon_controller_conf {
   low_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
-    #kp: 0.7
     kp: 1.2
     ki: 0.0005
     kd: 0.1
