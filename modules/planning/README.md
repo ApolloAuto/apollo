@@ -16,6 +16,22 @@ use cases as they were all treated as a single driving scenario.
 Apollo 5.5, which focuses on curb-to-curb autonomous driving on urban roads,
 introduced 2 new planning scenarios.
 
+Apollo 6.0, which focuses on intellegence of autonomous driving, introduced two new planning modes: E2E mode and Hybrid mode. 
+
+## E2E Mode
+   ![](images/e2e_mode.png)
+### How to Enable 
+
+### Model Inputs and Outputs
+
+### Parameters 
+
+## Hybrid Mode
+   ![](images/hybrid_mode.png)
+### How to Enable
+
+### Parameters
+
 ## Driving Scenarios
 
 There are 5 main driving scenarios that we will focus on Lane Follow, Intersection, Pull-Over, and the newly introduced Park-and-go and Emergency. Let's dive into them individually:
@@ -27,6 +43,7 @@ As seen in the figure below, the lane-follow scenario, our default driving scena
    ![](images/planning_default.png)
 
 > Note: Side Pass
+>
 > > While the functionality of side pass still exists, it has now been made universal rather than limiting it to a type of scenario. The side-pass feature is incorporated as part of the path-bounds decider task. You can choose to turn it on or off by properly configuring the path-lane-borrow decider task. For example, if you want the vehicle to be agile, then turn side-pass on for all scenarios; if you feel it not safe to side-pass in intersections, then turn it off for those related scenarios.
 
 ### Intersection
@@ -56,6 +73,7 @@ In order to safely pass through a STOP sign, both protected and unprotected, the
 - Safely move through the crossroad
 
 > Note:
+>
 > > The team is working to add additional driving scenarios into our planner. One such example is handling Traffic Lights.
 
 #### Traffic Light
@@ -145,6 +163,7 @@ In Apollo 5.5, the Planning module architecture has been modified to incorporate
 Each driving scenario has its set of driving parameters that are unique to that scenario making it safer, efficient, easier to customize and debug and more flexible. 
 
 > Note:
+>
 > > If you wish to include your own driving scenarios, please refer to existing scenarios as a reference. We currently do not have a template for writing your own planning scenario.
 
 ![](images/architecture_5.5.png)
