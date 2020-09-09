@@ -306,7 +306,7 @@ export default class PerceptionObstacles {
           y: initPosition.y + (lineCount * deltaY),
           z: initPosition.z + (lineCount * deltaZ),
         };
-        this.drawTexts(t, textPosition, scene);
+        this.drawTexts(t, textPosition, scene, 0xFF0000);
         lineCount++;
       });
     }
@@ -488,8 +488,8 @@ export default class PerceptionObstacles {
     return icon;
   }
 
-  drawTexts(content, position, scene) {
-    const text = this.textRender.drawText(content, scene);
+  drawTexts(content, position, scene, color = 0xFFEA00) {
+    const text = this.textRender.drawText(content, scene, color);
     if (text) {
       text.position.set(position.x, position.y, position.z);
       this.ids.push(text);
