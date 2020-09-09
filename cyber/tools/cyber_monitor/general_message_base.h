@@ -29,10 +29,10 @@ class GeneralMessageBase : public RenderableMessage {
  protected:
   static void PrintMessage(GeneralMessageBase* baseMsg,
                            const google::protobuf::Message& msg, int& jumpLines,
-                           const Screen* s, int& lineNo, int indent);
+                           const Screen* s, int& line_no, int indent);
   static void PrintField(GeneralMessageBase* baseMsg,
                          const google::protobuf::Message& msg, int& jumpLines,
-                         const Screen* s, int& lineNo, int indent,
+                         const Screen* s, int& line_no, int indent,
                          const google::protobuf::Reflection* ref,
                          const google::protobuf::FieldDescriptor* field,
                          int index);
@@ -44,11 +44,11 @@ class GeneralMessageBase : public RenderableMessage {
                               const google::protobuf::Reflection* reflection,
                               bool is_folded = true);
 
-  void insertRepeatedMessage(int lineNo, GeneralMessageBase* item) {
-    children_map_.insert(std::make_pair(lineNo, item));
+  void insertRepeatedMessage(int line_no, GeneralMessageBase* item) {
+    children_map_.insert(std::make_pair(line_no, item));
   }
 
-  RenderableMessage* Child(int lineNo) const override;
+  RenderableMessage* Child(int line_no) const override;
 
   explicit GeneralMessageBase(RenderableMessage* parent = nullptr)
       : RenderableMessage(parent), children_map_() {}

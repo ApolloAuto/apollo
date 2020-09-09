@@ -84,7 +84,7 @@ GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
 
 int GeneralMessage::Render(const Screen* s, int key) {
   s->SetCurrentColor(Screen::WHITE_BLACK);
-  int lineNo = 0;
+  int line_no = 0;
   {
     RenderableMessage* p = this;
     while (p->parent()->parent()->parent()) {
@@ -93,24 +93,24 @@ int GeneralMessage::Render(const Screen* s, int key) {
 
     GeneralChannelMessage* channelMsgPtr =
         static_cast<GeneralChannelMessage*>(p->parent());
-    s->AddStr(0, lineNo++, "ChannelName: ");
+    s->AddStr(0, line_no++, "ChannelName: ");
     s->AddStr(channelMsgPtr->GetChannelName().c_str());
 
-    s->AddStr(0, lineNo++, "MessageType: ");
+    s->AddStr(0, line_no++, "MessageType: ");
     s->AddStr(channelMsgPtr->message_type().c_str());
 
     std::ostringstream outStr;
     outStr << std::fixed << std::setprecision(FrameRatio_Precision)
            << channelMsgPtr->frame_ratio();
-    s->AddStr(0, lineNo++, "FrameRatio: ");
+    s->AddStr(0, line_no++, "FrameRatio: ");
     s->AddStr(outStr.str().c_str());
 
     clear();
 
     auto channelMsg = channelMsgPtr->CopyMsgPtr();
     if (!channelMsgPtr->raw_msg_class_->ParseFromString(channelMsg->message)) {
-      s->AddStr(0, lineNo++, "Cannot Parse the message for Real-Time Updating");
-      return lineNo;
+      s->AddStr(0, line_no++, "Cannot Parse the message for Real-Time Updating");
+      return line_no;
     }
 
     if (message_ptr_ && reflection_ptr_) {
@@ -127,8 +127,8 @@ int GeneralMessage::Render(const Screen* s, int key) {
       if (size <= itemIndex_) {
         outStr.str("");
         outStr << "The item [" << itemIndex_ << "] has been empty !!!";
-        s->AddStr(0, lineNo++, outStr.str().c_str());
-        return lineNo;
+        s->AddStr(0, line_no++, outStr.str().c_str());
+        return line_no;
       }
 
       if (key == ',') {
@@ -157,7 +157,7 @@ int GeneralMessage::Render(const Screen* s, int key) {
 
       int lcount = lineCountOfField(*message_ptr_, s->Width(), field_,
                                     reflection_ptr_, is_folded_);
-      page_item_count_ = s->Height() - lineNo - 8;
+      page_item_count_ = s->Height() - line_no - 8;
       if (page_item_count_ < 1) {
         page_item_count_ = 1;
       }
@@ -168,12 +168,12 @@ int GeneralMessage::Render(const Screen* s, int key) {
           SortProtobufMapByKeys(*message_ptr_, field_, *reflection_ptr_, size));
       if (is_folded_) {
         GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
-                                       lineNo, 0, reflection_ptr_, field_,
+                                       line_no, 0, reflection_ptr_, field_,
                                        indices[itemIndex_]);
       } else {
         for (const int index : indices) {
           GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
-                                         lineNo, 0, reflection_ptr_, field_,
+                                         line_no, 0, reflection_ptr_, field_,
                                          index);
         }
       }
@@ -181,5 +181,5 @@ int GeneralMessage::Render(const Screen* s, int key) {
   }
 
   s->ClearCurrentColor();
-  return lineNo;
+  return line_no;
 }
