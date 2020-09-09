@@ -161,22 +161,22 @@ void Screen::MoveOffsetXY(int offsetX, int offsetY) const {
   }
 }
 
-void Screen::HighlightLine(int lineNo) {
-  if (IsInit() && lineNo < Height()) {
+void Screen::HighlightLine(int line_no) {
+  if (IsInit() && line_no < Height()) {
     SetCurrentColor(WHITE_BLACK);
     for (int x = 0; x < Width(); ++x) {
-      chtype ch = mvinch(lineNo + highlight_direction_, x);
+      chtype ch = mvinch(line_no + highlight_direction_, x);
       ch &= A_CHARTEXT;
       if (ch == ' ') {
-        mvaddch(lineNo + highlight_direction_, x, ch);
+        mvaddch(line_no + highlight_direction_, x, ch);
       }
     }
     ClearCurrentColor();
 
     SetCurrentColor(BLACK_WHITE);
     for (int x = 0; x < Width(); ++x) {
-      chtype ch = mvinch(lineNo, x);
-      mvaddch(lineNo, x, ch & A_CHARTEXT);
+      chtype ch = mvinch(line_no, x);
+      mvaddch(line_no, x, ch & A_CHARTEXT);
     }
     ClearCurrentColor();
   }

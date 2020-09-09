@@ -131,7 +131,7 @@ int GeneralMessageBase::lineCountOfField(
 void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
                                       const google::protobuf::Message& msg,
                                       int& jumpLines, const Screen* s,
-                                      int& lineNo, int indent) {
+                                      int& line_no, int indent) {
   const google::protobuf::Reflection* reflection = msg.GetReflection();
   const google::protobuf::Descriptor* descriptor = msg.GetDescriptor();
   std::vector<const google::protobuf::FieldDescriptor*> fields;
@@ -142,7 +142,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     reflection->ListFields(msg, &fields);
   }
   for (std::size_t i = 0; i < fields.size(); ++i) {
-    if (lineNo > s->Height()) {
+    if (line_no > s->Height()) {
       break;
     }
     const google::protobuf::FieldDescriptor* field = fields[i];
@@ -157,12 +157,12 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
         GeneralMessage* item =
             new GeneralMessage(baseMsg, &msg, reflection, field);
         if (item) {
-          baseMsg->insertRepeatedMessage(lineNo, item);
+          baseMsg->insertRepeatedMessage(line_no, item);
         }
-        s->AddStr(indent, lineNo++, outStr.str().c_str());
+        s->AddStr(indent, line_no++, outStr.str().c_str());
       }
     } else {
-      PrintField(baseMsg, msg, jumpLines, s, lineNo, indent, reflection, field,
+      PrintField(baseMsg, msg, jumpLines, s, line_no, indent, reflection, field,
                  -1);
     }  // end else
   }    // end for
@@ -173,7 +173,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
     Screen::ColorPair c = s->Color();
     s->ClearCurrentColor();
     s->SetCurrentColor(Screen::RED_BLACK);
-    s->AddStr(indent, lineNo++, "Have Unknown Fields");
+    s->AddStr(indent, line_no++, "Have Unknown Fields");
     s->ClearCurrentColor();
     s->SetCurrentColor(c);
   }
@@ -181,7 +181,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
 
 void GeneralMessageBase::PrintField(
     GeneralMessageBase* baseMsg, const google::protobuf::Message& msg,
-    int& jumpLines, const Screen* s, int& lineNo, int indent,
+    int& jumpLines, const Screen* s, int& line_no, int indent,
     const google::protobuf::Reflection* ref,
     const google::protobuf::FieldDescriptor* field, int index) {
   std::ostringstream outStr;
@@ -204,7 +204,7 @@ void GeneralMessageBase::PrintField(
                      ? ref->GetRepeated##METHOD(msg, field, index) \
                      : ref->Get##METHOD(msg, field));              \
       outStr.flags(old_flags);                                     \
-      s->AddStr(indent, lineNo++, outStr.str().c_str());           \
+      s->AddStr(indent, line_no++, outStr.str().c_str());           \
     }                                                              \
     break
 
@@ -266,8 +266,8 @@ void GeneralMessageBase::PrintField(
             outStr << ch;
           }
 
-          s->AddStr(indent, lineNo, outStr.str().c_str());
-          lineNo += lineCount;
+          s->AddStr(indent, line_no, outStr.str().c_str());
+          line_no += lineCount;
         }
       }
 
@@ -293,7 +293,7 @@ void GeneralMessageBase::PrintField(
         } else {
           outStr << enum_value;
         }
-        s->AddStr(indent, lineNo++, outStr.str().c_str());
+        s->AddStr(indent, line_no++, outStr.str().c_str());
       }
       break;
     }
@@ -308,7 +308,7 @@ void GeneralMessageBase::PrintField(
             outStr << "[" << index << "] ";
           }
         }
-        s->AddStr(indent, lineNo++, outStr.str().c_str());
+        s->AddStr(indent, line_no++, outStr.str().c_str());
       } else {
         --jumpLines;
       }
@@ -316,16 +316,16 @@ void GeneralMessageBase::PrintField(
           baseMsg,
           field->is_repeated() ? ref->GetRepeatedMessage(msg, field, index)
                                : ref->GetMessage(msg, field),
-          jumpLines, s, lineNo, indent + 2);
+          jumpLines, s, line_no, indent + 2);
       break;
   }
 }
 
-RenderableMessage* GeneralMessageBase::Child(int lineNo) const {
-  if (lineNo < 0) {
+RenderableMessage* GeneralMessageBase::Child(int line_no) const {
+  if (line_no < 0) {
     return nullptr;
   }
-  auto iter = children_map_.find(lineNo);
+  auto iter = children_map_.find(line_no);
   if (iter == children_map_.cend()) {
     return nullptr;
   }

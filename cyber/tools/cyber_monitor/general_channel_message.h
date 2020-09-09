@@ -159,8 +159,8 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   GeneralChannelMessage* OpenChannel(const std::string& channelName);
 
-  void RenderDebugString(const Screen* s, int key, int& lineNo);
-  void RenderInfo(const Screen* s, int key, int& lineNo);
+  void RenderDebugString(const Screen* s, int key, int& line_no);
+  void RenderInfo(const Screen* s, int key, int& line_no);
 
   void set_has_message_come(bool b) { has_message_come_ = b; }
 
