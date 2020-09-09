@@ -20,7 +20,7 @@
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  // add by caros for dv performance improve
+  // Added by caros to improve dv performance
   apollo::cyber::GlobalData::Instance()->SetProcessGroup("dreamview_sched");
   apollo::cyber::Init(argv[0]);
 
