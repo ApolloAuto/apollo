@@ -45,8 +45,10 @@ TEST_F(Aebfrontwheelspeed353Test, reset) {
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
 
-  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeedvalid(), false);
-  EXPECT_DOUBLE_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeed(), 106.3125);
+  EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeedvalid(),
+            false);
+  EXPECT_DOUBLE_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclespeed(),
+                   106.3125);
   EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().vehiclerealdirect(), 3);
   EXPECT_EQ(cd.neolix_edu().aeb_frontwheelspeed_353().wheelspeed_fl_valid(),
             false);

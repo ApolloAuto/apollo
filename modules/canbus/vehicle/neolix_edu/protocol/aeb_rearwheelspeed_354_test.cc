@@ -45,14 +45,14 @@ TEST_F(Aebrearwheelspeed354Test, reset) {
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
 
-  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl_valid(), false);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl_valid(),
+            false);
   EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl(), 254.44);
-  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr_valid(), false);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr_valid(),
+            false);
   EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr(), 208.18);
-  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl_direct(),
-            1);
-  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr_direct(),
-            1);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl_direct(), 1);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr_direct(), 1);
 }
 
 }  // namespace neolix_edu
