@@ -98,8 +98,7 @@ std::vector<Obstacle*> DecisionData::GetObstacleByType(
   for (const std::string& id : ids) {
     ret.emplace_back(GetObstacleById(id));
     if (ret.back() == nullptr) {
-      AERROR << "can't find obstacle by id: " << id;
-      AERROR << "ignore...";
+      AERROR << "Ignore. can't find obstacle by id: " << id;
       ret.pop_back();
     }
   }

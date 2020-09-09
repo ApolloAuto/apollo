@@ -307,9 +307,9 @@ Status SpeedDecider::MakeObjectDecision(
             mutable_obstacle->AddLongitudinalDecision("dp_st_graph/cross",
                                                       stop_decision);
           }
-          const std::string msg =
-              "Failed to find a solution for crossing obstacle:" +
-              mutable_obstacle->Id();
+          const std::string msg = absl::StrCat(
+              "Failed to find a solution for crossing obstacle: ",
+              mutable_obstacle->Id());
           AERROR << msg;
           return Status(ErrorCode::PLANNING_ERROR, msg);
         }

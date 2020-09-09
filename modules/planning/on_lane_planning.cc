@@ -143,7 +143,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   std::list<hdmap::RouteSegments> segments;
   if (!reference_line_provider_->GetReferenceLines(&reference_lines,
                                                    &segments)) {
-    std::string msg = "Failed to create reference line";
+    const std::string msg = "Failed to create reference line";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   DCHECK_EQ(reference_lines.size(), segments.size());
@@ -154,14 +155,16 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   for (auto& ref_line : reference_lines) {
     if (!ref_line.Segment(Vec2d(vehicle_state.x(), vehicle_state.y()),
                           FLAGS_look_backward_distance, forward_limit)) {
-      std::string msg = "Fail to shrink reference line.";
+      const std::string msg = "Fail to shrink reference line.";
+      AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
   for (auto& seg : segments) {
     if (!seg.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
                     FLAGS_look_backward_distance, forward_limit)) {
-      std::string msg = "Fail to shrink routing segments.";
+      const std::string msg = "Fail to shrink routing segments.";
+      AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
@@ -228,9 +231,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       << start_timestamp - vehicle_state_timestamp << " secs";
 
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
-    std::string msg(
+    const std::string msg =
         "Update VehicleStateProvider failed "
-        "or the vehicle state is out dated.");
+        "or the vehicle state is out dated.";
     AERROR << msg;
     ptr_trajectory_pb->mutable_decision()
         ->mutable_main_decision()
@@ -263,7 +266,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // early return when reference line fails to update after rerouting
   if (failed_to_update_reference_line) {
-    std::string msg("Failed to update reference line after rerouting.");
+    const std::string msg = "Failed to update reference line after rerouting.";
     AERROR << msg;
     ptr_trajectory_pb->mutable_decision()
         ->mutable_main_decision()
@@ -540,7 +543,7 @@ Status OnLanePlanning::Plan(
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
     const auto* target_ref_info = frame_->FindTargetReferenceLineInfo();
     if (!best_ref_info) {
-      std::string msg("planner failed to make a driving plan");
+      const std::string msg = "planner failed to make a driving plan";
       AERROR << msg;
       if (last_publishable_trajectory_) {
         last_publishable_trajectory_->Clear();

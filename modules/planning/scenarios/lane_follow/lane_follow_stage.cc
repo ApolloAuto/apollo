@@ -199,7 +199,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
           planning_start_point.path_point().s(), &trajectory)) {
-    std::string msg("Fail to aggregate planning trajectory.");
+    const std::string msg = "Fail to aggregate planning trajectory.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -246,7 +246,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
   if (FLAGS_enable_trajectory_check) {
     if (ConstraintChecker::ValidTrajectory(trajectory) !=
         ConstraintChecker::Result::VALID) {
-      std::string msg("Current planning trajectory is not valid.");
+      const std::string msg = "Current planning trajectory is not valid.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
