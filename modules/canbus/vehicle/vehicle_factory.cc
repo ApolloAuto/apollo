@@ -52,8 +52,9 @@ void VehicleFactory::RegisterVehicleFactory() {
   Register(apollo::common::ZHONGYUN, []() -> AbstractVehicleFactory * {
     return new ZhongyunVehicleFactory();
   });
-  Register(apollo::common::CH,
-           []() -> AbstractVehicleFactory * { return new ChVehicleFactory(); });
+  Register(apollo::common::CH, []() -> AbstractVehicleFactory * {
+    return new ChVehicleFactory();
+  });
   Register(apollo::common::DKIT, []() -> AbstractVehicleFactory * {
     return new DevkitVehicleFactory();
   });
