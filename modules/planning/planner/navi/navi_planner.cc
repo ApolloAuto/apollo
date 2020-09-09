@@ -75,7 +75,7 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
   // NaviPlanner is only used in navigation mode based on the real-time relative
   // map.
   if (!FLAGS_use_navigation_mode) {
-    std::string msg = "NaviPlanner is only used in navigation mode.";
+    const std::string msg = "NaviPlanner is only used in navigation mode.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -91,7 +91,8 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
   }
   for (auto& task : tasks_) {
     if (!task->Init(config)) {
-      std::string msg(absl::StrCat("Init task[", task->Name(), "] failed."));
+      const std::string msg = absl::StrCat(
+          "Init task[", task->Name(), "] failed.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -104,7 +105,7 @@ Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
   // NaviPlanner is only used in navigation mode based on the real-time relative
   // map.
   if (!FLAGS_use_navigation_mode) {
-    std::string msg = "NaviPlanner is only used in navigation mode.";
+    const std::string msg = "NaviPlanner is only used in navigation mode.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -197,7 +198,7 @@ Status NaviPlanner::PlanOnReferenceLine(
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_init_point.relative_time(),
           planning_init_point.path_point().s(), &trajectory)) {
-    std::string msg("Fail to aggregate planning trajectory.");
+    const std::string msg = "Fail to aggregate planning trajectory.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -219,7 +220,7 @@ Status NaviPlanner::PlanOnReferenceLine(
   if (FLAGS_enable_trajectory_check) {
     if (ConstraintChecker::ValidTrajectory(trajectory) !=
         ConstraintChecker::Result::VALID) {
-      std::string msg("Current planning trajectory is not valid.");
+      const std::string msg = "Current planning trajectory is not valid.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

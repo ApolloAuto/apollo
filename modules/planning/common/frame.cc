@@ -370,11 +370,11 @@ Status Frame::InitFrameData(
   if (planning_start_point_.v() < 1e-3) {
     const auto *collision_obstacle = FindCollisionObstacle(ego_info);
     if (collision_obstacle != nullptr) {
-      std::string err_str =
-          "Found collision with obstacle: " + collision_obstacle->Id();
-      AERROR << err_str;
-      monitor_logger_buffer_.ERROR(err_str);
-      return Status(ErrorCode::PLANNING_ERROR, err_str);
+      const std::string msg = absl::StrCat(
+          "Found collision with obstacle: ", collision_obstacle->Id());
+      AERROR << msg;
+      monitor_logger_buffer_.ERROR(msg);
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
 

@@ -57,13 +57,13 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
     const PathData& path_data, const TrajectoryPoint& init_point,
     SpeedData* const speed_data) {
   if (speed_data == nullptr) {
-    std::string msg("Null speed_data pointer");
+    const std::string msg = "Null speed_data pointer";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (path_data.discretized_path().empty()) {
-    std::string msg("Speed Optimizer receives empty path data");
+    const std::string msg = "Speed Optimizer receives empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -236,9 +236,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
             s_upper_bound =
                 std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
             if (!speed_data.EvaluateByTime(curr_t, &sp)) {
-              std::string msg(
-                  "rough speed profile estimation for soft follow fence "
-                  "failed");
+              const std::string msg =
+                  "rough speed profile estimation for soft follow fence failed";
               AERROR << msg;
               return Status(ErrorCode::PLANNING_ERROR, msg);
             }
@@ -256,7 +255,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
         }
       }
       if (s_lower_bound > s_upper_bound) {
-        std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+        const std::string msg =
+            "s_lower_bound larger than s_upper_bound on STGraph";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
@@ -293,7 +293,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
         }
       }
       if (s_lower_bound > s_upper_bound) {
-        std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+        const std::string msg =
+            "s_lower_bound larger than s_upper_bound on STGraph";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
@@ -344,7 +345,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
   piecewise_jerk_problem.set_x_ref(10.0, std::move(speed_ref));
 
   if (!piecewise_jerk_problem.Optimize(4000)) {
-    std::string msg("Smoothing speed limit failed");
+    const std::string msg = "Smoothing speed limit failed";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -400,7 +401,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
   piecewise_jerk_problem.set_x_ref(10.0, std::move(path_curvature));
 
   if (!piecewise_jerk_problem.Optimize(1000)) {
-    std::string msg("Smoothing path curvature failed");
+    const std::string msg = "Smoothing path curvature failed";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -458,9 +459,10 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
-    std::string msg("Speed Optimization by Quadratic Programming failed");
-    AERROR << "Speed optimization by Quadratic Programming failed, st boundary "
-              "is infeasible";
+    const std::string msg =
+        "Speed Optimization by Quadratic Programming failed. "
+        "st boundary is infeasible.";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -501,8 +503,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
         warm_start_acceleration.empty() ||
         warm_start_distance.size() != warm_start_velocity.size() ||
         warm_start_velocity.size() != warm_start_acceleration.size()) {
-      std::string msg(
-          "Piecewise jerk speed nonlinear optimizer warm start invalid!");
+      const std::string msg =
+          "Piecewise jerk speed nonlinear optimizer warm start invalid!";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -547,9 +549,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    std::string msg(
-        "Piecewise jerk speed nonlinear optimizer failed during "
-        "initialization!");
+    const std::string msg =
+        "Piecewise jerk speed nonlinear optimizer failed during initialization";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -579,7 +580,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     } else {
       AERROR << "Solver failure case is : " << ipopt_return_status;
     }
-    std::string msg("Piecewise jerk speed nonlinear optimizer failed!");
+    const std::string msg = "Piecewise jerk speed nonlinear optimizer failed";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

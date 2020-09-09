@@ -74,18 +74,22 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   // Sanity checks.
   if (path_decision == nullptr) {
     const std::string msg = "path_decision is nullptr";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   if (planning_time_ < 0.0) {
     const std::string msg = "Negative planning time.";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   if (planning_distance_ < 0.0) {
     const std::string msg = "Negative planning distance.";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   if (path_data_.discretized_path().size() <= 1) {
     const std::string msg = "Number of path points is too few.";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   obs_id_to_st_boundary_.clear();
@@ -121,6 +125,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
     if (obs_ptr == nullptr) {
       const std::string msg = "Null obstacle pointer.";
+      AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
 
