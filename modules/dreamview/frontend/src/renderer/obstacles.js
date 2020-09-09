@@ -300,7 +300,7 @@ export default class PerceptionObstacles {
       }
     }
     if (isV2X) {
-      _.get(obstacle,'v2xInfo',[]).forEach((t) => {
+      _.get(obstacle,'v2xInfo.v2xType',[]).forEach((t) => {
         const textPosition = {
           x: initPosition.x + (lineCount * deltaX),
           y: initPosition.y + (lineCount * deltaY),
