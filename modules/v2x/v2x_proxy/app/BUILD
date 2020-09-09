@@ -1,19 +1,24 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "v2x_proxy_lib",
-    srcs = [
-        "main.cc",
-        "v2x_proxy.cc",
-    ],
+    name = "v2x_proxy",
+    srcs = ["v2x_proxy.cc"],
     hdrs = ["v2x_proxy.h"],
     deps = [
         "//modules/map/hdmap",
         "//modules/v2x/v2x_proxy/obu_interface:obu_interface_grpc_impl",
         "//modules/v2x/v2x_proxy/os_interface",
+    ],
+)
+
+cc_binary(
+    name = "v2x",
+    srcs = ["main.cc"],
+    deps = [
+        ":v2x_proxy",
     ],
 )
 
