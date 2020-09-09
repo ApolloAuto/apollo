@@ -97,7 +97,7 @@ void ClassifyBySimple::Init(
         << input_reshape[net_inputs_[0]][3];
 
   if (!rt_net_->Init(input_reshape)) {
-    AINFO << "net init fail.";
+    AWARN << "net init fail.";
   }
 
   image_.reset(

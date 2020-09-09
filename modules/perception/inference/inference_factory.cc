@@ -16,7 +16,6 @@
 
 #include "modules/perception/inference/inference_factory.h"
 
-// #include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/inference/libtorch/libtorch_net.h"
 
 namespace apollo {

@@ -36,8 +36,8 @@ int main() {
                     "vertical/vertical_net_libtorch.pth";
   std::vector<std::string> net_inputs_ = {"data_org"};
   std::vector<std::string> net_outputs_ = {"prob"};
-  std::string imagePath = "/apollo/modules/perception/inference/libtorch/"\
-        "test_data/0_green/DE_BBBR667_2015-04-17_11-05-32-836043_k0_2.jpg";
+  std::string image_path = "/apollo/modules/perception/inference/libtorch/"\
+        "test_data/0_green/0.png";
 
   rt_net_.reset(apollo::perception::inference::CreateInferenceByName(
                                   "TorchNet", weight_file, weight_file,
@@ -60,7 +60,7 @@ int main() {
   auto input_blob_recog = rt_net_->get_blob(net_inputs_[0]);
   auto output_blob_recog = rt_net_->get_blob(net_outputs_[0]);
 
-  auto image_transfomed = cv::imread(imagePath, cv::ImreadModes::IMREAD_COLOR);
+  auto image_transfomed = cv::imread(image_path, cv::ImreadModes::IMREAD_COLOR);
   cv::Mat image;
   cv::Mat image_resize;
   // cv::resize(image_transfomed, image_resize, cv::Size(32, 96));

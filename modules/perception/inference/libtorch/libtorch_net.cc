@@ -39,16 +39,16 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   net_ = torch::jit::load(net_file_, device);
 
   for (auto name : output_names_) {
-    std::shared_ptr<apollo::perception::base::Blob<float>> blob;
-    blob.reset(new apollo::perception::base::Blob<float>(1, 4, 1, 1));
+    auto blob = std::make_shared<apollo::perception::base::Blob<float>>
+                                                          (1, 4, 1, 1);
     blobs_.insert(std::make_pair(name, blob));
   }
 
   for (auto name : input_names_) {
-    std::shared_ptr<apollo::perception::base::Blob<float>> blob;
     auto iter = shapes.find(name);
     if (iter != shapes.end()) {
-      blob.reset(new apollo::perception::base::Blob<float>(iter->second));
+      auto blob = std::make_shared<apollo::perception::base::Blob<float>>
+                                                          (iter->second);
       blobs_.insert(std::make_pair(name, blob));
     }
   }
@@ -99,7 +99,6 @@ void TorchNet::Infer() {
 
   torch::Tensor output = net_.forward({tensor_image}).toTensor();
   torch::Tensor prob = torch::softmax(output, 1);
-  std::cout << prob << std::endl;
   blobs_[output_names_[0]]->data()->set_gpu_data(prob.data_ptr());
 }
 

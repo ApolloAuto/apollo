@@ -27,7 +27,6 @@ cc_library(
     hdrs = ["libtorch_net.h"],
     deps = [
         "//modules/perception/inference:inference_lib",
-        # "//third_party:boost",
         "//third_party:libtorch",
         "@com_google_protobuf//:protobuf",
         "@opencv//:imgcodecs",
