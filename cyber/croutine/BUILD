@@ -53,7 +53,7 @@ cc_library(
                 "detail/swap_aarch64.S",
             ],
         },
-        no_match_error = "Please Build with an ARM or Linux x86_64 platform",
+        no_match_error = "Please Build with a Linux aarch64 or x86_64 platform",
     ),
 )
 
