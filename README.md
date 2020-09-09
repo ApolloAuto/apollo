@@ -44,8 +44,6 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 In order not to disrupt your usage of the latest version of Apollo, please update your host OS and upgrade NVIDIA driver and CUDA versions required by the above guidance.
 
-[Quick start guide for the latest master](docs/quickstart/quick_start_latest.md)
-
 **[New 2019-08]** The Apollo team is proud to announce that the platform has been migrated to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
 
 1. Upgrade host to ubuntu 16.04 and above (Ubuntu 18.04 is preferred)
