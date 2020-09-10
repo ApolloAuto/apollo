@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/bridge/udp_bridge_sender_component.h"
+#include "gtest/gtest.h"
 
 #include "cyber/init.h"
-#include "gtest/gtest.h"
+#include "modules/bridge/udp_bridge_sender_component.h"
 
 namespace apollo {
 namespace bridge {

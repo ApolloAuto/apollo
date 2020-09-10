@@ -18,6 +18,7 @@
 
 #include <cstring>
 #include <string>
+
 #include "modules/bridge/common/bridge_header_item.h"
 
 namespace apollo {
