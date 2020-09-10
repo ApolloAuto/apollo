@@ -30,33 +30,14 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "trajectory_imitation_tensorrt_inference",
-    srcs = ["trajectory_imitation_tensorrt_inference.cc"],
-    hdrs = ["trajectory_imitation_tensorrt_inference.h"],
-    copts = PLANNING_COPTS,
-    deps = [
-        ":model_inference",
-        "//modules/common/math",
-        "//modules/common/util",
-        "//modules/planning/common/util:math_util_lib",
-        "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
-        "//third_party:libtorch",
-        "@local_config_cuda//cuda:cudart",
-        "@local_config_tensorrt//:tensorrt",
-        "@opencv//:core",
-    ],
-)
-
 cc_test(
     name = "model_inference_test",
-    size = "small",
+    size = "medium",
     srcs = ["model_inference_test.cc"],
     copts = PLANNING_COPTS,
     deps = [
         ":model_inference",
         ":trajectory_imitation_libtorch_inference",
-        ":trajectory_imitation_tensorrt_inference",
         "//modules/common/configs:config_gflags",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",

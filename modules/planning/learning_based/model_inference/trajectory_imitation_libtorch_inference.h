@@ -23,9 +23,10 @@
 
 #include <string>
 
-#include "modules/planning/learning_based/model_inference/model_inference.h"
 #include "torch/extension.h"
 #include "torch/script.h"
+
+#include "modules/planning/learning_based/model_inference/model_inference.h"
 
 namespace apollo {
 namespace planning {
@@ -57,53 +58,36 @@ class TrajectoryImitationLibtorchInference : public ModelInference {
    * @brief inference a learned model
    * @param learning_data_frame input and output intermediate for inference
    */
-  bool DoInference(LearningDataFrame* learning_data_frame) override;
+  bool DoInference(LearningDataFrame* const learning_data_frame) override;
 
  private:
-  /**
-   * @brief load a CONV_RNN model
-   */
-  bool LoadCONVRNNModel();
-
   /**
    * @brief load a CNN model
    */
   bool LoadCNNModel();
 
   /**
-   * @brief load a SELF_CNN_LSTM like model
-   */
-  bool LoadSelfCNNLSTMModel();
-
-  /**
    * @brief load a CNN_LSTM like model
    */
-  bool LoadHistoryUnconditionedCNNLSTMModel();
-
-  /**
-   * @brief inference a CONV_RNN model
-   * @param learning_data_frame input and output intermediate for inference
-   */
-  bool DoCONVRNNMODELInference(LearningDataFrame* learning_data_frame);
+  bool LoadCNNLSTMModel();
 
   /**
    * @brief inference a CNN model
    * @param learning_data_frame input and output intermediate for inference
    */
-  bool DoCNNMODELInference(LearningDataFrame* learning_data_frame);
-
-  /**
-   * @brief inference a SELF_CNN_LSTM like model
-   * @param learning_data_frame input and output intermediate for inference
-   */
-  bool DoSelfCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
+  bool DoCNNMODELInference(LearningDataFrame* const learning_data_frame);
 
   /**
    * @brief inference a CNN_LSTM like model
    * @param learning_data_frame input and output intermediate for inference
    */
-  bool DoHistoryUnconditionedCNNLSTMMODELInference(
-      LearningDataFrame* learning_data_frame);
+  bool DoCNNLSTMMODELInference(LearningDataFrame* const learning_data_frame);
+
+  /**
+   * @brief postprocessing model trajectory output
+   */
+  void output_postprocessing(const at::Tensor& torch_output_tensor,
+                             LearningDataFrame* const learning_data_frame);
 
   torch::jit::script::Module model_;
   torch::Device device_;
