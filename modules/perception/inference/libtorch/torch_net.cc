@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/inference/libtorch/libtorch_net.h"
+#include "modules/perception/inference/libtorch/torch_net.h"
 
 #include "cyber/common/log.h"
 
@@ -80,7 +80,7 @@ void TorchNet::Infer() {
   torch::Device device(deviceType, deviceId);
   auto blob = blobs_[input_names_[0]];
 
-  // pay attention to the tensor shape orde, if change without permute
+  // pay attention to the tensor shape order, if changed without permute
   // will get wrong result
   torch::Tensor tensor_image = torch::from_blob(
                               blob->data()->mutable_cpu_data(),
