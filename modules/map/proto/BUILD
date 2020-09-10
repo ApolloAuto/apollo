@@ -51,6 +51,7 @@ py_proto_library(
     deps = [
         ":map_geometry_py_pb2",
         ":map_id_py_pb2",
+        ":map_rsu_py_pb2",
         ":map_junction_proto",
     ],
 )
@@ -385,6 +386,7 @@ py_proto_library(
     name = "map_rsu_py_pb2",
     deps = [
         ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
         ":map_rsu_proto",
     ],
 )

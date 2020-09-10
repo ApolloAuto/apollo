@@ -37,28 +37,28 @@ cc_binary(
     ],
 )
 
-cc_binary(
+cc_binary (
     name = "sim_map_generator",
     srcs = ["sim_map_generator.cc"],
     deps = [
+        "//modules/map/proto:map_proto",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:points_downsampler",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
-        "//modules/map/proto:map_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
 
-cc_binary(
+cc_binary (
     name = "proto_map_generator",
     srcs = ["proto_map_generator.cc"],
     deps = [
         "//cyber/common:file",
+       # "//modules/map/proto:map_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
-        "//modules/map/proto:map_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
