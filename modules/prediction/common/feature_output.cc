@@ -145,6 +145,23 @@ void FeatureOutput::InsertPredictionResult(
   }
 }
 
+void FeatureOutput::InsertPredictionResult(
+    const PredictionObstacles& prediction_obstacles) {
+  for (const auto& prediction_obstacle :
+       prediction_obstacles.prediction_obstacle()) {
+    PredictionResult* prediction_result =
+      list_prediction_result_.add_prediction_result();
+    prediction_result->set_id(prediction_obstacle.perception_obstacle().id());
+    prediction_result->set_timestamp(prediction_obstacle.timestamp());
+    AERROR << "(" << prediction_result->id() << ", "
+           << prediction_result->timestamp() << ")";
+    for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
+      prediction_result->add_trajectory()->CopyFrom(
+          prediction_obstacle.trajectory(i));
+    }
+  }
+}
+
 void FeatureOutput::InsertFrameEnv(const FrameEnv& frame_env) {
   UNIQUE_LOCK_MULTITHREAD(mutex_feature_);
   list_frame_env_.add_frame_env()->CopyFrom(frame_env);
@@ -204,6 +221,7 @@ void FeatureOutput::WritePredictionResult() {
         absl::StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
                      idx_prediction_result_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_prediction_result_, file_name);
+    AERROR << list_prediction_result_.prediction_result_size();
     list_prediction_result_.Clear();
     ++idx_prediction_result_;
   }

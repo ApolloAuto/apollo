@@ -277,6 +277,11 @@ void MessageProcess::OnStoryTelling(ContainerManager* container_manager,
          << "].";
 }
 
+void MessageProcess::OnPredictionOffline(
+      const PredictionObstacles& prediction_obstacles) {
+  FeatureOutput::InsertPredictionResult(prediction_obstacles);
+}
+
 void MessageProcess::ProcessOfflineData(
     const PredictionConf& prediction_conf,
     const std::shared_ptr<ContainerManager>& container_manager,
@@ -291,6 +296,10 @@ void MessageProcess::ProcessOfflineData(
   while (reader.ReadMessage(&message)) {
     if (message.channel_name ==
         prediction_conf.topic_conf().perception_obstacle_topic()) {
+      if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpOldPredictionResult) {
+        continue;
+      }
       PerceptionObstacles perception_obstacles;
       if (perception_obstacles.ParseFromString(message.content)) {
         if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
@@ -310,6 +319,10 @@ void MessageProcess::ProcessOfflineData(
       }
     } else if (message.channel_name ==
                prediction_conf.topic_conf().localization_topic()) {
+      if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpOldPredictionResult) {
+        continue;
+      }
       LocalizationEstimate localization;
       if (localization.ParseFromString(message.content)) {
         if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
@@ -320,14 +333,31 @@ void MessageProcess::ProcessOfflineData(
       }
     } else if (message.channel_name ==
                prediction_conf.topic_conf().planning_trajectory_topic()) {
+      if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpOldPredictionResult) {
+        continue;
+      }
       ADCTrajectory adc_trajectory;
       if (adc_trajectory.ParseFromString(message.content)) {
         OnPlanning(container_manager.get(), adc_trajectory);
+      }
+    } else if (message.channel_name ==
+               prediction_conf.topic_conf().prediction_topic()) {
+      if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpOldPredictionResult) {
+        PredictionObstacles prediction_obstacles;
+        if (prediction_obstacles.ParseFromString(message.content)) {
+          OnPredictionOffline(prediction_obstacles);
+        }
       }
     }
   }
   if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpRecord) {
     writer.Close();
+  }
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpOldPredictionResult) {
+    FeatureOutput::WritePredictionResult();
   }
 }
 

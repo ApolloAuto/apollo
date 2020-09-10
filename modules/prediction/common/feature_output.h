@@ -82,6 +82,13 @@ class FeatureOutput {
       const ObstacleConf& obstacle_conf, const Scenario& scenario);
 
   /**
+   * @brief Insert a prediction result with predicted trajectories
+   * @param prediction_obstacles
+   */
+  static void InsertPredictionResult(
+      const PredictionObstacles& prediction_obstacles);
+
+  /**
    * @brief Insert a frame env
    * @param frame env
    */

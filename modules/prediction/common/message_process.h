@@ -76,6 +76,9 @@ class MessageProcess {
   static void OnStoryTelling(ContainerManager *container_manager,
                              const storytelling::Stories &story);
 
+  static void OnPredictionOffline(
+      const PredictionObstacles& prediction_obstacles);
+
   static void ProcessOfflineData(
       const PredictionConf &prediction_conf,
       const std::shared_ptr<ContainerManager> &container_manager,
