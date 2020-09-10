@@ -1,6 +1,14 @@
-# Vehicle Control Calibration
+# Vehicle Calibration Online Service
 
-Control calibration system automatically generates calibration table for different vehicle models. It includes three parts: a frontend data collection monitor system, a data pipeline upload/download tool for uploading collected data and downloading generated calibration tables, and a visualization tool for performance evaluation.
+### Note:
+
+1. Please refer to [Apply_BOS_Account](../Apollo_Fuel/Apply_BOS_Account_cn.md) for account setup before you can use the service.
+
+2. New service entrance point available at [Apollo Dreamland](http://bce.apollo.auto)
+
+3. Chinese version tailing for D-kit is available at [Vehicle_Calibration_Online_cn.md](../D-kit/Waypoint_Following/Vehicle_Calibration_Online_cn.md)
+
+vehicle calibration system automatically generates calibration table for different vehicle models. It includes three parts: a frontend data collection monitor system, a data pipeline upload/download tool for uploading collected data and downloading generated calibration tables, and a visualization tool for performance evaluation.
 
 <!-- # Table of Contents 1\. [Frontend](#frontend) 2\. [Data](#data) - [Upload Tool](#upload) - [Download Tool](#download) 3\. [Visulization](#visulization) -->
 
@@ -78,7 +86,7 @@ Firstly, please make sure you have already finished setting up the **Apollo Fuel
 
 https://github.com/ApolloAuto/apollo/blob/master/modules/tools/fuel_proxy/README.md
 
-This is **essential** before you can get enjoy control calibration or other Apollo Fuel-based cloud service.
+This is **essential** before you can get enjoy vehicle calibration or other Apollo Fuel-based cloud service.
 
 ## Folder Structure Requirement
 

@@ -22,3 +22,6 @@ You might see other metrics elsewhere as follows:
 
 * **BIT DEPTH** same to sample_width except that the unit is bit.
 * **BIT RATE** number of bits encoded per second (kbps or k) -- for compressed format like mp3.
+
+## Output
+  * Raw microphone data (cyber channel `apollo/sensor/microphone`).
