@@ -19,12 +19,14 @@
 #include <mutex>
 #include <string>
 
+namespace {
+std::mutex m;
+std::string binary_name; // NOLINT
+}  // namespace
+
 namespace apollo {
 namespace cyber {
 namespace binary {
-
-static std::mutex m;
-static std::string binary_name;  // NOLINT
 
 std::string GetName() {
   std::lock_guard<std::mutex> lock(m);
@@ -38,4 +40,3 @@ void SetName(const std::string& name) {
 }  // namespace binary
 }  // namespace cyber
 }  // namespace apollo
-
