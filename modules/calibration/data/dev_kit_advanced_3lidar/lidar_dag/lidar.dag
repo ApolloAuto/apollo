@@ -4,7 +4,7 @@ module_config {
         class_name : "RobosenseComponent"
         config {
           name : "RS16_left_Driver"
-          config_file_path : "/apollo/modules/drivers/velodyne/conf/rs16_left.pb.txt"
+          config_file_path : "/apollo/modules/drivers/lidar/conf/rs16_left.pb.txt"
         }
     }
 
@@ -12,7 +12,7 @@ module_config {
         class_name : "RobosenseComponent"
         config {
           name : "RS16_right_Driver"
-          config_file_path : "/apollo/modules/drivers/velodyne/conf/rs16_right.pb.txt"
+          config_file_path : "/apollo/modules/drivers/lidar/conf/rs16_right.pb.txt"
         }
     }
 
@@ -20,7 +20,7 @@ module_config {
         class_name : "RobosenseComponent"
         config {
           name : "RS16_back_Driver"
-          config_file_path : "/apollo/modules/drivers/velodyne/conf/rs16_back.pb.txt"
+          config_file_path : "/apollo/modules/drivers/lidar/conf/rs16_back.pb.txt"
         }
     }
 }
@@ -35,8 +35,8 @@ module_config {
       class_name : "PriSecFusionComponent"
       config {
         name : "velodyne_fusion"
-        config_file_path : "/apollo/modules/drivers/velodyne/conf/robo_fusion_conf.pb.txt"
-        readers {channel: "/apollo/sensor/velodyne16/back/PointCloud2"}
+        config_file_path : "/apollo/modules/drivers/lidar/conf/robo_fusion_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
     }
   }
 }
@@ -50,7 +50,7 @@ module_config {
       class_name : "CompensatorComponent"
       config {
         name : "RS16_Compensator"
-        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_fusion_compensator.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/fusion/PointCloud2"}
       }
     }

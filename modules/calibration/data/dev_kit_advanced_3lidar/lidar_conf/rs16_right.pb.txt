@@ -1,5 +1,5 @@
 model: "RS16"
-frame_id: "velodyne16_right"
+frame_id: "lidar16_right"
 ip: "192.168.10.15"
 msop_port: 2370
 difop_port: 8310
@@ -9,6 +9,6 @@ end_angle: 360
 min_distance: 0
 max_distance: 200
 cut_angle: 0
-pointcloud_channel: "/apollo/sensor/velodyne16/right/PointCloud2"
+pointcloud_channel: "/apollo/sensor/lidar16/right/PointCloud2"
 scan_channel: "/apollo/sensor/rs16/right/Scan"
 use_lidar_clock: false
