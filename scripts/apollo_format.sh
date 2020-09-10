@@ -32,6 +32,8 @@ FORMAT_PYTHON=0
 FORMAT_SHELL=0
 FORMAT_ALL=0
 
+HAS_OPTION=0
+
 function print_usage() {
   echo -e "\n${RED}Usage${NO_COLOR}:
   .${BOLD}$0${NO_COLOR} [OPTION] <path/to/src/dir/or/files>"
@@ -76,22 +78,27 @@ function main() {
     case "${opt}" in
       -p | --python)
         FORMAT_PYTHON=1
+        HAS_OPTION=1
         shift
         ;;
       -c | --cpp)
         FORMAT_CPP=1
+        HAS_OPTION=1
         shift
         ;;
       -b | --bazel)
         FORMAT_BAZEL=1
+        HAS_OPTION=1
         shift
         ;;
       -s | --shell)
         FORMAT_SHELL=1
+        HAS_OPTION=1
         shift
         ;;
       -m | --markdown)
         FORMAT_MARKDOWN=1
+        HAS_OPTION=1
         shift
         ;;
       -a | --all)
@@ -107,7 +114,9 @@ function main() {
           print_usage
           exit 1
         else
-          FORMAT_ALL=1
+          if [ "$HAS_OPTION" -eq 0 ]; then
+            FORMAT_ALL=1
+          fi
           break
         fi
         ;;
