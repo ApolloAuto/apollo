@@ -1,4 +1,3 @@
-#carid:mkz058
 #set primary if single-antenna;set both primary and secondary if dual-antenna.
 leverarm:
   primary:
