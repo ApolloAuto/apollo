@@ -297,7 +297,7 @@ void MessageProcess::ProcessOfflineData(
     if (message.channel_name ==
         prediction_conf.topic_conf().perception_obstacle_topic()) {
       if (FLAGS_prediction_offline_mode ==
-          PredictionConstants::kDumpOldPredictionResult) {
+          PredictionConstants::kDumpOriginalPredictionResult) {
         continue;
       }
       PerceptionObstacles perception_obstacles;
@@ -320,7 +320,7 @@ void MessageProcess::ProcessOfflineData(
     } else if (message.channel_name ==
                prediction_conf.topic_conf().localization_topic()) {
       if (FLAGS_prediction_offline_mode ==
-          PredictionConstants::kDumpOldPredictionResult) {
+          PredictionConstants::kDumpOriginalPredictionResult) {
         continue;
       }
       LocalizationEstimate localization;
@@ -334,7 +334,7 @@ void MessageProcess::ProcessOfflineData(
     } else if (message.channel_name ==
                prediction_conf.topic_conf().planning_trajectory_topic()) {
       if (FLAGS_prediction_offline_mode ==
-          PredictionConstants::kDumpOldPredictionResult) {
+          PredictionConstants::kDumpOriginalPredictionResult) {
         continue;
       }
       ADCTrajectory adc_trajectory;
@@ -344,7 +344,7 @@ void MessageProcess::ProcessOfflineData(
     } else if (message.channel_name ==
                prediction_conf.topic_conf().prediction_topic()) {
       if (FLAGS_prediction_offline_mode ==
-          PredictionConstants::kDumpOldPredictionResult) {
+          PredictionConstants::kDumpOriginalPredictionResult) {
         PredictionObstacles prediction_obstacles;
         if (prediction_obstacles.ParseFromString(message.content)) {
           OnPredictionOffline(prediction_obstacles);
@@ -356,7 +356,7 @@ void MessageProcess::ProcessOfflineData(
     writer.Close();
   }
   if (FLAGS_prediction_offline_mode ==
-      PredictionConstants::kDumpOldPredictionResult) {
+      PredictionConstants::kDumpOriginalPredictionResult) {
     FeatureOutput::WritePredictionResult();
   }
 }

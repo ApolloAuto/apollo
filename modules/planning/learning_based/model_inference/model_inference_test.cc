@@ -82,7 +82,8 @@ TEST_F(ModelInferenceTest, trajectory_imitation_libtorch_inference) {
           new TrajectoryImitationLibtorchInference(config));
     ACHECK(trajectory_imitation_libtorch_inference->LoadModel())
         << "Failed to load model in libtorch inference";
-    ACHECK(trajectory_imitation_libtorch_inference->DoInference(&test_data_frame))
+    ACHECK(trajectory_imitation_libtorch_inference->DoInference(
+        &test_data_frame))
         << "Failed to inference trajectory_imitation_model";
 }
 
