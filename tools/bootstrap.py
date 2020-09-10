@@ -217,11 +217,6 @@ def setup_python(environ_cp):
         if python_lib_path in python_paths:
             write_action_env_to_bazelrc('PYTHONPATH',
                                         environ_cp.get('PYTHONPATH'))
-    # Write tools/python_bin_path.sh
-    with open(os.path.join(_APOLLO_ROOT_DIR, 'tools', 'python_bin_path.sh'),
-              'w') as f:
-        f.write('export PYTHON_BIN_PATH="{}"'.format(python_bin_path))
-
 
 def reset_tf_configure_bazelrc():
     """Reset file that contains customized config settings."""
