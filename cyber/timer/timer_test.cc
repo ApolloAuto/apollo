@@ -34,8 +34,33 @@ namespace timer {
 using cyber::Timer;
 using cyber::TimerOption;
 
-TEST(TimerTest, one_shot) {
+TEST(TimerTest, shutdown) {
+  std::mutex cv_m;
+  std::condition_variable cv;
   int count = 0;
+  {
+    Timer timer(
+        10,
+        [&cv_m, &cv, &count]() {
+          {
+            std::lock_guard<std::mutex> lock(cv_m);
+            ++count;
+          }
+          cv.notify_one();
+        },
+        false);
+    timer.Start();
+    std::unique_lock<std::mutex> lock_1(cv_m);
+    EXPECT_TRUE(cv.wait_for(lock_1, std::chrono::milliseconds(1000),
+                            [&count]() { return 1 == count; }));
+  }
+  std::unique_lock<std::mutex> lock_2(cv_m);
+  EXPECT_FALSE(cv.wait_for(lock_2, std::chrono::milliseconds(1000),
+                           [&count]() { return 2 == count; }));
+}
+
+TEST(TimerTest, one_shot) {
+  std::atomic<int> count{};
   Timer timer(
       100, [&count] { count = 100; }, true);
   timer.Start();

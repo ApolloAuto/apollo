@@ -17,6 +17,7 @@
 #ifndef CYBER_TIMER_TIMING_WHEEL_H_
 #define CYBER_TIMER_TIMING_WHEEL_H_
 
+#include <atomic>
 #include <future>
 #include <list>
 #include <memory>
@@ -72,7 +73,7 @@ class TimingWheel {
     return index & (ASSISTANT_WHEEL_SIZE - 1);
   }
 
-  bool running_ = false;
+  std::atomic<bool> running_{};
   uint64_t tick_count_ = 0;
   std::mutex running_mutex_;
   TimerBucket work_wheel_[WORK_WHEEL_SIZE];

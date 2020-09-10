@@ -177,6 +177,7 @@ class AsyncLogger : public google::base::Logger {
   // 64 bits should be enough to never worry about overflow.
   uint64_t drop_count_ = 0;
 
+  std::mutex active_buf_mutex_;
   // The buffer to which application threads append new log messages.
   std::unique_ptr<std::deque<Msg>> active_buf_;
 
@@ -188,6 +189,7 @@ class AsyncLogger : public google::base::Logger {
   enum State { INITTED, RUNNING, STOPPED };
   std::atomic<State> state_ = {INITTED};
   std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
+  std::mutex map_mutex_;
   std::unordered_map<std::string, std::unique_ptr<LogFileObject>>
       module_logger_map_;
 

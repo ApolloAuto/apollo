@@ -28,8 +28,17 @@ namespace apollo {
 namespace cyber {
 namespace logger {
 
-static const std::unordered_map<char, int> log_level_map = {
+namespace {
+const std::unordered_map<char, int> kLogLevelMap = {
     {'F', 3}, {'E', 2}, {'W', 1}, {'I', 0}};
+
+template <typename T>
+typename std::deque<T>::size_type LockedDequeSize(const std::deque<T>& deque,
+                                                  std::mutex* const m) {
+  std::lock_guard<std::mutex> lock(*m);
+  return deque.size();
+}
+}  // namespace
 
 AsyncLogger::AsyncLogger(google::base::Logger* wrapped) : wrapped_(wrapped) {
   active_buf_.reset(new std::deque<Msg>());
@@ -68,8 +77,11 @@ void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
     while (flag_.test_and_set(std::memory_order_acquire)) {
       cpu_relax();
     }
-    active_buf_->emplace_back(timestamp, std::move(msg_str),
-                              log_level_map.at(message[0]));
+    {
+      std::lock_guard<std::mutex> lock(active_buf_mutex_);
+      active_buf_->emplace_back(timestamp, std::move(msg_str),
+                                kLogLevelMap.at(message[0]));
+    }
     flag_.clear(std::memory_order_release);
   }
 
@@ -79,6 +91,7 @@ void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
 }
 
 void AsyncLogger::Flush() {
+  std::lock_guard<std::mutex> m(map_mutex_);
   for (auto& module_logger : module_logger_map_) {
     module_logger.second->Flush();
   }
@@ -94,7 +107,7 @@ void AsyncLogger::RunThread() {
     active_buf_.swap(flushing_buf_);
     flag_.clear(std::memory_order_release);
     FlushBuffer(flushing_buf_);
-    if (active_buf_->size() < 800) {
+    if (LockedDequeSize(*active_buf_, &active_buf_mutex_) < 800) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
   }
@@ -111,6 +124,7 @@ void AsyncLogger::FlushBuffer(const std::unique_ptr<std::deque<Msg>>& buffer) {
       if (!FLAGS_log_dir.empty()) {
         file_name = FLAGS_log_dir + "/" + file_name;
       }
+      std::lock_guard<std::mutex> m(map_mutex_);
       module_logger_map_[module_name].reset(
           new LogFileObject(google::INFO, file_name.c_str()));
       module_logger_map_[module_name]->SetSymlinkBasename(module_name.c_str());

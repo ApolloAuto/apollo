@@ -49,24 +49,21 @@ void TimingWheel::Tick() {
     std::lock_guard<std::mutex> lock(bucket.mutex());
     auto ite = bucket.task_list().begin();
     while (ite != bucket.task_list().end()) {
-      auto task = ite->lock();
-      if (task) {
-        ADEBUG << "index: " << current_work_wheel_index_
-               << " timer id: " << task->timer_id_;
-        auto* callback =
-            reinterpret_cast<std::function<void()>*>(&(task->callback));
-        cyber::Async([this, callback] {
-          if (this->running_) {
-            (*callback)();
-          }
-        });
-      }
+      auto task = *ite;
+      ADEBUG << "index: " << current_work_wheel_index_
+             << " timer id: " << task->timer_id_;
+      cyber::Async([this, callback = task->callback] {
+        if (this->running_) {
+          callback();
+        }
+      });
       ite = bucket.task_list().erase(ite);
     }
   }
 }
 
 void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task) {
+  std::lock_guard<std::mutex> lock(current_work_wheel_index_mutex_);
   AddTask(task, current_work_wheel_index_);
 }
 
@@ -110,9 +107,12 @@ void TimingWheel::Cascade(const uint64_t assistant_wheel_index) {
   std::lock_guard<std::mutex> lock(bucket.mutex());
   auto ite = bucket.task_list().begin();
   while (ite != bucket.task_list().end()) {
-    auto task = ite->lock();
-    if (task) {
-      work_wheel_[task->remainder_interval_ms].AddTask(task);
+    {
+      auto task = *ite;
+      std::lock_guard<std::mutex> lock(task->mutex);
+      if (task->active) {
+        work_wheel_[task->remainder_interval_ms].AddTask(task);
+      }
     }
     ite = bucket.task_list().erase(ite);
   }

@@ -17,6 +17,7 @@
 #ifndef CYBER_COMMON_MACROS_H_
 #define CYBER_COMMON_MACROS_H_
 
+#include <atomic>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -52,7 +53,7 @@ typename std::enable_if<!HasShutdown<T>::value>::type CallShutdown(
 #define DECLARE_SINGLETON(classname)                                      \
  public:                                                                  \
   static classname *Instance(bool create_if_needed = true) {              \
-    static classname *instance = nullptr;                                 \
+    static std::atomic<classname *> instance{};                           \
     if (!instance && create_if_needed) {                                  \
       static std::once_flag flag;                                         \
       std::call_once(flag,                                                \
