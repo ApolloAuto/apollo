@@ -22,6 +22,7 @@ DECLARE_bool(enable_adapter_dump);
 DECLARE_string(gps_topic);
 DECLARE_string(imu_topic);
 DECLARE_string(raw_imu_topic);
+DECLARE_string(audio_detection_topic);
 DECLARE_string(chassis_topic);
 DECLARE_string(chassis_detail_topic);
 DECLARE_string(localization_topic);

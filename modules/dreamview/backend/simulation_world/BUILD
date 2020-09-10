@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/audio/proto:audio_event_cc_proto",
+        "//modules/audio/proto:audio_cc_proto",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",

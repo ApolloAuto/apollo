@@ -630,6 +630,13 @@
                   "keyType": "string",
                   "type": "SensorMeasurements",
                   "id": 29
+                },
+                "isSirenOn": {
+                  "type": "bool",
+                  "id": 30,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             },
@@ -7767,6 +7774,13 @@
                   "id": 7,
                   "options": {
                     "default": 1
+                  }
+                },
+                "isExtendLaneBoundsToIncludeAdc": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": true
                   }
                 }
               }
