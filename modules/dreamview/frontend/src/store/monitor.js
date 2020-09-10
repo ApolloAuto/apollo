@@ -7,6 +7,8 @@ export default class Monitor {
 
     @observable rssInfo = [];
 
+    @observable isSirenOn = false;
+
     lastUpdateTimestamp = 0;
 
     refreshTimer = null;
@@ -32,7 +34,16 @@ export default class Monitor {
       this.hasActiveNotification = value;
     }
 
-    @action update(world) {
+    update(world) {
+      this.updateMonitorItems(world);
+      this.updateEmergencyItem(world);
+    }
+
+    @action updateEmergencyItem(world) {
+      this.isSirenOn = world.isSirenOn;
+    }
+
+    @action updateMonitorItems(world) {
       if (!world.monitor && !world.notification) {
         return;
       }

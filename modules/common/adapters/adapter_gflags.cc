@@ -22,6 +22,8 @@ DEFINE_bool(enable_adapter_dump, false,
 DEFINE_string(gps_topic, "/apollo/sensor/gnss/odometry", "GPS topic name");
 DEFINE_string(imu_topic, "/apollo/sensor/gnss/corrected_imu", "IMU topic name");
 DEFINE_string(raw_imu_topic, "/apollo/sensor/gnss/imu", "Raw IMU topic name");
+DEFINE_string(audio_detection_topic, "/apollo/audio_detection",
+              "audio detection topic name");
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
 DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
@@ -218,8 +220,7 @@ DEFINE_string(v2x_rsi_topic, "/apollo/v2x/rsi", "v2x rsi topic name");
 
 DEFINE_string(storytelling_topic, "/apollo/storytelling",
               "Storytelling topic.");
-DEFINE_string(audio_event_topic, "/apollo/audio_event",
-              "Audio event topic.");
+DEFINE_string(audio_event_topic, "/apollo/audio_event", "Audio event topic.");
 
 DEFINE_string(guardian_topic, "/apollo/guardian", "Guardian topic.");
 DEFINE_string(gnss_raw_data_topic, "/apollo/sensor/gnss/raw_data",

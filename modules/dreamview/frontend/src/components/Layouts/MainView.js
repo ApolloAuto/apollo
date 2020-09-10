@@ -2,11 +2,12 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import Loadable from 'react-loadable';
 
-import RouteEditingBar from 'components/RouteEditingBar';
-import StatusBar from 'components/StatusBar';
-import Scene from 'components/Scene';
+import EmergencyNotification from 'components/common/EmergencyNotification';
 import Loader from 'components/common/Loader';
 import PlaybackControls from 'components/PlaybackControls';
+import RouteEditingBar from 'components/RouteEditingBar';
+import Scene from 'components/Scene';
+import StatusBar from 'components/StatusBar';
 
 const Navigation = Loadable({
   loader: () => import('components/Navigation'),
@@ -31,6 +32,8 @@ class SceneView extends React.Component {
                     options={options}
                     shouldDisplayOnRight={dimension.shouldDivideSceneAndMapSpace}
                 />
+                {monitor.isSirenOn &&
+                  <EmergencyNotification msg="Emergency Siren Detected" />}
                 {options.showRouteEditingBar
                   ? <RouteEditingBar />
                   : (
