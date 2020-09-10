@@ -1,7 +1,7 @@
-# Open Space Profiling Service
+# Open Space Planner Profiling Service
 
 
-- [Open Space Profiling Service](#Open Space Profiling Service)
+- [Open Space Planner Profiling Service](#Open-Space-Planer-Profiling-Service)
   - [Overview ](##Overview)
   - [Prerequisites](##Prerequisites)
   - [Main Steps](##Main-Steps)
