@@ -41,7 +41,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   for (auto name : output_names_) {
     auto blob = std::make_shared<apollo::perception::base::Blob<float>>
                                                           (1, 4, 1, 1);
-    blobs_.insert(std::make_pair(name, blob));
+    blobs_.emplace(std::make_pair(name, blob));
   }
 
   for (auto name : input_names_) {
@@ -49,7 +49,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     if (iter != shapes.end()) {
       auto blob = std::make_shared<apollo::perception::base::Blob<float>>
                                                           (iter->second);
-      blobs_.insert(std::make_pair(name, blob));
+      blobs_.emplace(std::make_pair(name, blob));
     }
   }
   return true;
