@@ -517,7 +517,7 @@ struct JunctionBoundary {
 using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
 
 class RSUInfo {
-public:
+ public:
   explicit RSUInfo(const RSU& rsu);
 
   const Id& id() const {
@@ -527,7 +527,7 @@ public:
     return _rsu;
   }
 
-private:
+ private:
   RSU _rsu;
 };
 

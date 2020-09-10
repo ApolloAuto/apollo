@@ -1203,11 +1203,11 @@ int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
 
   double nearest_s = 0.0;
   double nearest_l = 0.0;
-  if (GetNearestLaneWithHeading(target_point, 
+  if (GetNearestLaneWithHeading(target_point,
                               distance,
                               central_heading,
-                              max_heading_difference, 
-                              &lane_ptr, 
+                              max_heading_difference,
+                              &lane_ptr,
                               &nearest_s,
                               &nearest_l) == -1) {
     AERROR << "Fail to get nearest lanes";
@@ -1222,81 +1222,87 @@ int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
   double s = 0;
   double real_distance = distance + nearest_s;
   const std::string nearst_lane_id = lane_ptr->id().id();
-  
+
   while (s < real_distance) {
     s += lane_ptr->total_length();
     std::vector<std::pair<double, JunctionInfoConstPtr>> overlap_junctions;
     double start_s = 0;
     for (size_t x = 0; x < lane_ptr->junctions().size(); ++x) {
-        auto overlap_ptr = lane_ptr->junctions()[x];
-        for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
-          if (overlap_ptr->overlap().object(i).id().id() == lane_ptr->id().id()) {
-              start_s = overlap_ptr->overlap().object(i).lane_overlap_info().start_s();
-              continue;
-          }
-          JunctionInfoConstPtr junction_ptr = GetJunctionById(overlap_ptr->overlap().object(i).id());
-          CHECK_NOTNULL(junction_ptr);
-          if (nearst_lane_id == lane_ptr->id().id() 
-              && !junction_ptr->polygon().IsPointIn(target_point)) {
-              if (nearest_s > start_s) {
-                  continue;
-              }
-          }
-          overlap_junctions.push_back(std::make_pair(start_s, junction_ptr));
+      const auto overlap_ptr = lane_ptr->junctions()[x];
+      for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
+        const auto& overlap_object = overlap_ptr->overlap().object(i);
+        if (overlap_object.id().id() == lane_ptr->id().id()) {
+          start_s = overlap_object.lane_overlap_info().start_s();
+          continue;
         }
+
+        const auto junction_ptr = GetJunctionById(overlap_object.id());
+        CHECK_NOTNULL(junction_ptr);
+        if (nearst_lane_id == lane_ptr->id().id()
+          && !junction_ptr->polygon().IsPointIn(target_point)) {
+          if (nearest_s > start_s) {
+            continue;
+          }
+        }
+
+        overlap_junctions.push_back(std::make_pair(start_s, junction_ptr));
+      }
     }
 
     std::sort(overlap_junctions.begin(), overlap_junctions.end());
 
     std::set<std::string> duplicate_checker;
     for (const auto& overlap_junction : overlap_junctions) {
-        const auto& junction = overlap_junction.second;
-        if (duplicate_checker.count(junction->id().id()) > 0) {
-            continue;
-        }
-        duplicate_checker.insert(junction->id().id());
+      const auto& junction = overlap_junction.second;
+      if (duplicate_checker.count(junction->id().id()) > 0) {
+        continue;
+      }
+      duplicate_checker.insert(junction->id().id());
 
-        for (const auto& overlap_id : junction->junction().overlap_id()) {
-            OverlapInfoConstPtr overlap_ptr = GetOverlapById(overlap_id);
-            CHECK_NOTNULL(overlap_ptr);
-            for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
-                if (!overlap_ptr->overlap().object(i).has_rsu_overlap_info()) {
-                    continue; 
-                }
-                RSUInfoConstPtr rsu_ptr = GetRSUById(overlap_ptr->overlap().object(i).id());
-                if (rsu_ptr != nullptr) {
-                    rsus->push_back(rsu_ptr);
-                }
-            }
-        }
-        if (!rsus->empty()) {
-            break;
+      for (const auto& overlap_id : junction->junction().overlap_id()) {
+        OverlapInfoConstPtr overlap_ptr = GetOverlapById(overlap_id);
+        CHECK_NOTNULL(overlap_ptr);
+        for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
+          const auto& overlap_object = overlap_ptr->overlap().object(i);
+          if (!overlap_object.has_rsu_overlap_info()) {
+            continue;
+          }
+
+          const auto rsu_ptr = GetRSUById(overlap_object.id());
+          if (rsu_ptr != nullptr) {
+            rsus->push_back(rsu_ptr);
+          }
         }
       }
 
       if (!rsus->empty()) {
           break;
       }
+    }
 
-      for (const auto suc_lane_id : lane_ptr->lane().successor_id()) {
-          LaneInfoConstPtr suc_lane_ptr = GetLaneById(suc_lane_id);
-          if (lane_ptr->lane().successor_id_size() > 1) {
-              if (suc_lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
-                  lane_ptr = suc_lane_ptr;
-                  break;
-              }
-          }else {
-              lane_ptr = suc_lane_ptr;
-              break;
-          }
+    if (!rsus->empty()) {
+        break;
+    }
+
+    for (const auto suc_lane_id : lane_ptr->lane().successor_id()) {
+      LaneInfoConstPtr suc_lane_ptr = GetLaneById(suc_lane_id);
+      if (lane_ptr->lane().successor_id_size() > 1) {
+        if (suc_lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
+          lane_ptr = suc_lane_ptr;
+          break;
+        }
+      } else {
+        lane_ptr = suc_lane_ptr;
+        break;
       }
     }
+  }
 
-    if (rsus->empty()) {
-        return -1;
-    }
-    
-    return 0;
+  if (rsus->empty()) {
+    return -1;
+  }
+
+  return 0;
 }
 
 template <class Table, class BoxTable, class KDTree>
