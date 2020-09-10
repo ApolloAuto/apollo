@@ -14,18 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_BINARY_H_
-#define CYBER_BINARY_H_
+#include "cyber/binary.h"
 
+#include <mutex>
 #include <string>
 
 namespace apollo {
 namespace cyber {
 namespace binary {
-std::string GetName();
-void SetName(const std::string& name);
+
+static std::mutex m;
+static std::string binary_name;  // NOLINT
+
+std::string GetName() {
+  std::lock_guard<std::mutex> lock(m);
+  return binary_name;
+}
+void SetName(const std::string& name) {
+  std::lock_guard<std::mutex> lock(m);
+  binary_name = name;
+}
+
 }  // namespace binary
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_BINARY_H_

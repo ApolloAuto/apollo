@@ -62,9 +62,9 @@ logger::AsyncLogger* async_logger = nullptr;
 void InitLogger(const char* binary_name) {
   const char* slash = strrchr(binary_name, '/');
   if (slash) {
-    ::apollo::cyber::Binary::SetName(slash + 1);
+    ::apollo::cyber::binary::SetName(slash + 1);
   } else {
-    ::apollo::cyber::Binary::SetName(binary_name);
+    ::apollo::cyber::binary::SetName(binary_name);
   }
 
   // Init glog
