@@ -15,8 +15,8 @@
 该用户手册旨在帮助用户完成规划模块的配置和开环验证。规划模块需要上游的感知数据，目前有Lidar感知和Camera感知两种方案，用户可以选择其中任意一种感知方案。
 ## 前提条件
 
-  - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)
-  - 完成了[封闭园区自动驾驶搭建--虚拟车道线制作](Virtual_Lane_Generation_cn.md)
+  - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知适配](perception_configuration_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/perception_configuration_cn.md)
+  - 完成了[封闭园区自动驾驶搭建--虚拟车道线制作](virtual_lane_generation_cn.md)
 
 ## 配置文件的修改
 对`/apollo/modules/planning/conf/planning.conf`和`/apollo/modules/planning/conf/planning_config.pb.txt`两个配置文件进行以下修改：

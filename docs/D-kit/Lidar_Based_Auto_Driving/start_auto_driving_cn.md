@@ -22,7 +22,7 @@
 该用户手册旨在帮助用户完成基于Lidar感知的封闭园区自动驾驶。为了方便用户快速实现基于lidar的封闭园区自动驾驶演示，我们提供了`Dev kit Closeloop`模式，建议用户在进行基于lidar的封闭园区自动驾驶演示时使用该模式， 除此之外建议使用`Dev Kit Debug`模式。本文将以`Dev kit Closeloop`模式进行说明，如果用户选择使用`Dev Kit Debug`模式，操作方法相同。
 ## 前提条件
  
-1. 正确完成了[封闭园区自动驾驶搭建--规划适配](Planning_Configuration_cn.md)。
+1. 正确完成了[封闭园区自动驾驶搭建--规划适配](planning_configuration_cn.md)。
 
 2. 确保在道路平整、车少人少等相对安全的情况下实验。
 

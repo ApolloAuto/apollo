@@ -35,10 +35,10 @@
 
 1. 在进行车辆循迹前，需要完成以下前提工作：
 
-- [循迹搭建--车辆集成](Vehicle_Integration_cn.md)
-- [循迹搭建--Apollo系统安装](Apollo_Installation_cn.md)
-- [循迹搭建--定位模块配置](Localization_Configuration_cn.md)
-- [循迹搭建--车辆动力学云标定](Vehicle_Calibration_Online_cn.md)
+- [循迹搭建--车辆集成](vehicle_integration_cn.md)
+- [循迹搭建--Apollo系统安装](apollo_installation_cn.md)
+- [循迹搭建--定位模块配置](localization_configuration_cn.md)
+- [循迹搭建--车辆动力学云标定](vehicle_calibration_online_cn.md)
 
 2. 确保在开阔场地、车少人少等相对安全的情况下实验。
 

@@ -28,13 +28,13 @@
 
 车辆控制评测是根据车辆自动驾驶的数据来进行控制评分评测，因此需要车辆完成车辆闭环自动驾驶，可以是循迹自动驾驶，也可以是带感知的自动驾驶。因此需要最少完成以下前提步骤：
 
-- [循迹搭建--车辆集成](Vehicle_Integration_cn.md)
+- [循迹搭建--车辆集成](vehicle_integration_cn.md)
 
-- [循迹搭建--定位模块配置](Localization_Configuration_cn.md)
+- [循迹搭建--定位模块配置](localization_configuration_cn.md)
 
-- [循迹搭建--Apollo系统安装](Apollo_Installation_cn.md)
+- [循迹搭建--Apollo系统安装](apollo_installation_cn.md)
 
-- [循迹搭建--车辆循迹演示](Start_Waypoint_Following_cn.md)
+- [循迹搭建--车辆循迹演示](start_waypoint_following_cn.md)
 
 ## 主要步骤
 

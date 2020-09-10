@@ -26,7 +26,7 @@
 
 ## 前提条件
 
- - 完成了[循迹搭建--车辆集成](Vehicle_Integration_cn.md)
+ - 完成了[循迹搭建--车辆集成](vehicle_integration_cn.md)
  - 拥有RTK基站账号
 
 ## 导航设备配置

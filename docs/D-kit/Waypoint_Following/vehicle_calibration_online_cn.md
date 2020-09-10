@@ -39,11 +39,11 @@
 
 ## 前提条件
 
-- [循迹搭建--车辆集成](Vehicle_Integration_cn.md)
+- [循迹搭建--车辆集成](vehicle_integration_cn.md)
 
-- [循迹搭建--定位模块配置](Localization_Configuration_cn.md)
+- [循迹搭建--定位模块配置](localization_configuration_cn.md)
 
-- [循迹搭建--Apollo系统安装](Apollo_Installation_cn.md)
+- [循迹搭建--Apollo系统安装](apollo_installation_cn.md)
 
 ## 主要步骤
 

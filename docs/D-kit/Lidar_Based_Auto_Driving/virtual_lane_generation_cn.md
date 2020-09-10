@@ -18,7 +18,7 @@
 
 ## 前提条件
 
- - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](Sensor_Calibration_cn.md)
+ - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](sensor_calibration_cn.md)
 
 ## 百度云对象存储BOS注册
 注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/Apply_BOS_Account_cn.md)

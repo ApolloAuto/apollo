@@ -20,7 +20,7 @@
 
 ## 前提条件
 
- - 完成了[循迹搭建--Apollo系统安装](Apollo_Installation_cn.md)
+ - 完成了[循迹搭建--Apollo系统安装](apollo_installation_cn.md)
 
 ## 工控机安装
 

@@ -34,9 +34,9 @@
 该用户手册旨在帮助用户完成激光雷达的标定(Lidar-IMU)
 ## 前提条件
  
- - 完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/Start_Waypoint_Following_cn.md)
+ - 完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/start_waypoint_following_cn.md)
  
- - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](Sensor_Integration_cn.md)
+ - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](sensor_integration_cn.md)
 
 ## 百度云对象存储BOS注册
 注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/Apply_BOS_Account_cn.md) 

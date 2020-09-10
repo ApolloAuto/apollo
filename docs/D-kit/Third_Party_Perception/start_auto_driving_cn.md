@@ -2,9 +2,9 @@
 
 ## 前提条件
  
-1. 正确完成了[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/Planning_Configuration_cn.md)。
+1. 正确完成了[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/planning_configuration_cn.md)。
 
-2. 正确完成了[基于双目感知的封闭园区自动驾驶搭建--设备集成](Sensor_Integration_cn.md)。
+2. 正确完成了[基于双目感知的封闭园区自动驾驶搭建--设备集成](sensor_integration_cn.md)。
 
 2. 确保在道路平整、车少人少等相对安全的情况下实验。
 

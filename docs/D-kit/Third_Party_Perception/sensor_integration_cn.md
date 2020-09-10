@@ -2,7 +2,7 @@
 
 ## 前提条件
 
- - 完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/Start_Waypoint_Following_cn.md)
+ - 完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/start_waypoint_following_cn.md)
  
 ## 主要步骤
 

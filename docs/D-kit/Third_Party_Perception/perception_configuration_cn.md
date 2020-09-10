@@ -2,9 +2,9 @@
 
 ## 前提条件
 
- 1. 正确完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/Start_Waypoint_Following_cn.md)。
+ 1. 正确完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/start_waypoint_following_cn.md)。
 
- 2. 正确完成了[基于双目感知的封闭园区自动驾驶搭建--设备集成](Sensor_Integration_cn.md)。
+ 2. 正确完成了[基于双目感知的封闭园区自动驾驶搭建--设备集成](sensor_integration_cn.md)。
 
 ## 配置文件的修改
 

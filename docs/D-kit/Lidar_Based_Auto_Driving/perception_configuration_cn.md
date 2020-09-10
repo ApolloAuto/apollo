@@ -20,11 +20,11 @@
 
 ## 前提条件
 
- 1. 正确完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/Start_Waypoint_Following_cn.md)
+ 1. 正确完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/start_waypoint_following_cn.md)
 
- 2. 正确完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](Sensor_Integration_cn.md)
+ 2. 正确完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](sensor_integration_cn.md)
  
- 3. 正确完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](Sensor_Calibration_cn.md)
+ 3. 正确完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](sensor_calibration_cn.md)
 
 ## 配置文件的修改
 
