@@ -36,7 +36,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
 
   // Init net
   torch::Device device(deviceType, deviceId);
-  net_ = torch::jit::load(net_file_, device);
+  net_ = torch::jit::load(model_file_, device);
 
   for (auto name : output_names_) {
     auto blob = std::make_shared<apollo::perception::base::Blob<float>>
