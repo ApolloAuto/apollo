@@ -215,7 +215,7 @@
 2、在`Others`按钮区，选择`Data Collection Monitor`（数据采集监视器），选择`Go Straight`按钮。
 如下图所示，为标定数据才采集面板。
 
-![vehicle_calibration_online_dreamview1](images/vehicle_calibration_online_dreamview1.png)
+![vehicle_calibration_online_dreamview1](images/vehicle_calibration_online_dreamview1.jpg)
 
 ### 开始采集
 
@@ -238,7 +238,7 @@
 
 在`DreamView`界面点击左侧边栏，选择`Module Controller`，可以看到`Canbus`开关已经打开，这时开始点击`Recorder`开关，**（请务必切记先打开<Recorder>开关，再进行标定数据采集操作，实际情况常常会因未打开<Recorder>开关造成数据未记录保存，影响效率）**，这时Apollo系统就开始录制记录车辆标定数据了。
 
-![vehicle_calibration_online_dreamview2](images/vehicle_calibration_online_dreamview2.png)
+![vehicle_calibration_online_dreamview2](images/vehicle_calibration_online_dreamview2.jpg)
 
 这时，我们使用遥控器遥控车辆，根据右侧数据采集监视器，采集相应标定条件的车辆数据，直到采集监视器内各标定条件进度条（**蓝色**）全部集满后，点击关闭`Recorder`开关，关闭数据记录，结束车辆标定数据采集。
 

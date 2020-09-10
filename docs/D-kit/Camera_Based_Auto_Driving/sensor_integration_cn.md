@@ -45,15 +45,15 @@
 
 - 注意摄像头不要装反(usb接口应该在下方)，正确的放置方向如下图所示：
 
-	![camera_integration_look](images/camera_integration_look.jpeg)
+	![camera_integration_look](images/camera_integration_look.jpg)
 
 ### 摄像头与工控机连接
  
  - 直接用数据线将设备连接在IPC的USB3.0接口。接口顺序无固定顺序，用户可自行指定。
  
-	![camera_integration_background](images/camera_integration_background.PNG)
+	![camera_integration_background](images/camera_integration_background.png)
 
-	![camera_integration_line](images/camera_integration_line.jpeg)
+	![camera_integration_line](images/camera_integration_line.jpg)
 
 ### 摄像头规则文件的配置
  

@@ -48,7 +48,7 @@
 |---|---|
 | `modules/localization/conf/localization.conf`|`enable_lidar_localization`设置为`false`| 
 
-![lidar_calibration_localization_config](images/lidar_calibration_localization_config.jpeg)
+![lidar_calibration_localization_config](images/lidar_calibration_localization_config.jpg)
 
 **注意**：所有传感器标定完成后，如果用户要使用msf定位，则需要再改为`true`。
 
@@ -58,7 +58,7 @@
 
 ####  1. IMU、Lidar的坐标系定义
 
- ![lidar_calibration_coordinate_system](images/lidar_calibration_coordinate_system.jpeg)
+ ![lidar_calibration_coordinate_system](images/lidar_calibration_coordinate_system.jpg)
 
 #### 2. Lidar坐标系原点在传感器的位置
 

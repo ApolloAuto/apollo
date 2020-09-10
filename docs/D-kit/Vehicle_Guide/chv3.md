@@ -39,7 +39,7 @@
 
 注意：下图所示两个DB9接口分别为底盘CAN线和底盘升级口，上边是CAN线接口，与IPC CAN0连接。下边是底层软件升级口，不常用，后续面临版本升级时会开放使用；接线时请注意不要接错。  
 
- ![CanLine_2.png](images/CanLine_2.png.JPG)
+ ![CanLine_2.png](images/CanLine_2.png.jpg)
 
  
 

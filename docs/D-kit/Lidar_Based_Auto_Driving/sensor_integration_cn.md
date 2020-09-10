@@ -56,7 +56,7 @@
 
 #### 1.线缆端口及定义
 
-![lidar_integration_line](images/lidar_integration_line.jpeg)
+![lidar_integration_line](images/lidar_integration_line.jpg)
 
 |端口号 | 端口名称 | 
 |---|---|
@@ -72,7 +72,7 @@
 
 连接完成后，效果如下图所示：
 
-![lidar_integration_slot](images/lidar_integration_slot.jpeg)
+![lidar_integration_slot](images/lidar_integration_slot.jpg)
 
 #### 4.将激光雷达电源接口(端口4、端口5)接入车上的12V接线盒
 
@@ -82,7 +82,7 @@
  
  - 将端口5(GND)接入车上12V电源接线盒的GND
 
-![lidar_integration_power_line](images/lidar_integration_power_line.jpeg)
+![lidar_integration_power_line](images/lidar_integration_power_line.jpg)
 
 #### 5.将端口2(授时)与IMU的授时端口相连
 
@@ -148,7 +148,7 @@
  
  - continental AS 408-21简介：ARS408-21 是大陆 40X 毫米波雷达传感器系列中最新推出的高端产品，可以适用于不同的应用场景。ARS 408-21 很好的处理了测量性能与高安全性之间的矛盾，可实时检测目标的距离并根据当前车速判断是否存在碰撞风险可靠；具有自动故障检测功能，可识别传感器问题，并自动输出故障码鲁棒、轻量化设计；通过使用相对简单的雷达测量技术，以及在汽车行业的深度研发和批量生产基础，可以保证产品鲁棒和轻量化性能。
  
-    ![lidar_integration_radar_look](images/lidar_integration_radar_look.jpeg)
+    ![lidar_integration_radar_look](images/lidar_integration_radar_look.jpg)
 
 ### 毫米波雷达接口及线序
 
@@ -164,13 +164,13 @@
  
  - 毫米波雷达CAN接口与工控机的CAN1接口连接，如下图所示：
  
-     ![lidar_integration_radar_connection](images/lidar_integration_radar_connection.jpeg)
+     ![lidar_integration_radar_connection](images/lidar_integration_radar_connection.jpg)
   
 ### 毫米波雷达的安装固定
 
  - 传感器应安装在车前方中心处，当人正向面对车辆正前方时，传感器的正面朝向人，传感器的连接口朝向人的右手边，如下图所示：
  
-    ![lidar_integration_radar_installation_look](images/lidar_integration_radar_installation_look.jpeg)
+    ![lidar_integration_radar_installation_look](images/lidar_integration_radar_installation_look.jpg)
  
     ![lidar_integration_radar_installation_position](images/lidar_integration_radar_installation_position.png)
  

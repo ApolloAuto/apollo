@@ -107,7 +107,7 @@
 
 **注:** 可以在车辆左前轮处画一个十字符号，记录车辆的起点。
 
-![rtk_recorder](images/rtk_recorder.png)
+![rtk_recorder](images/rtk_recorder.jpg)
 
 2）启动`Rtk_Recorder`录制循迹数据：
 
@@ -129,7 +129,7 @@
 - 注意车辆的**起点位置**和**车头朝向**都尽量与循迹录制时起点保持一致；
 - **遥控器放权**。
 
-![rtk_player_start](images/rtk_player.png)
+![rtk_player_start](images/rtk_player.jpg)
 
 2）启动`Rtk_Player`进行循迹回放：
 

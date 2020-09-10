@@ -69,11 +69,11 @@
 - 将射频线的SMA母口连接上IMU主机的SMA公口，车尾天线为主天线，将其连接在IMU的Primary接口上。
 ![IMU_TNC](images/imu_tnc.png)
 - 将数据/电源线缆的公口和IMU主机的母口连接。
-![IMU_POWER_DATA](images/imu_power_data.png)
+![IMU_POWER_DATA](images/imu_power_data.jpg)
 - 将数据/电源线缆的串口母头连接上工控机的串口公口COM1，此线若过短，请使用串口延长线。注意：此线在完全配置完IMU之后就不需要再连接在IPC上了。
-![IMU_COM](images/imu_com.png)
+![IMU_COM](images/imu_com.jpg)
 - 将数据/电源线缆的网线母头和路由器LAN口接出来的有线网的水晶头相连接。
-![IMU_ETHERNET](images/imu_ethernet.png)
+![IMU_ETHERNET](images/imu_ethernet.jpg)
 - 将数据/电源线缆的USB接口连接上IPC的USB接口。
 ![IMU_USB](images/imu_usb.png)
 - 将数据/电源线缆的电源线接口和小车的12V电源接口连接起来。

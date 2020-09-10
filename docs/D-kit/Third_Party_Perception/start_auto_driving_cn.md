@@ -22,7 +22,7 @@
  
 2. 在浏览器中打开(http://localhost:8888)，选择`Dev_Kit`并选择相应高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Camera、Transform模块。
 
-![camera_demonstration_dreamview](images/camera_demonstration_dreamview.jpeg)
+![camera_demonstration_dreamview](images/camera_demonstration_dreamview.jpg)
 
 3. 在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
 	

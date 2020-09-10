@@ -63,7 +63,7 @@
 
 - PA-280W-OW
 
-  ![IPC-6108GC-front-side](images/ipc_hardware_before_cover.jpeg)
+  ![IPC-6108GC-front-side](images/ipc_hardware_before_cover.jpg)
   
   或者：
 
@@ -77,7 +77,7 @@
 
 - 480W适配器
 
-  ![IPC-8108GC-front-side](images/software_installation_look_8108.PNG)
+  ![IPC-8108GC-front-side](images/software_installation_look_8108.png)
 
 注意，在较早版本的8108工控机中，CAN口的标号为从右向左分别为CAN1、CAN2，文档中将统一按照上图所示，分别称为CAN0、CAN1，请使用较早版本8108的用户注意。新用户可以忽略。
 
@@ -91,11 +91,11 @@
 
    a. 找到并拧下机器边上的8个螺丝（显示在棕色方框内或棕色箭头指向的区域）
 
-   ![Positions_of_Screws](images/ipc_hardware_cover1.png)
+   ![Positions_of_Screws](images/ipc_hardware_cover1.jpg)
 
    b. 移除机器盖板
 
-   ![removing the cover](images/ipc_hardware_cover2.jpeg)
+   ![removing the cover](images/ipc_hardware_cover2.jpg)
 
    在机箱底部将能看到固定着的3个PCI插槽（其中一个已经被显卡占据）
    
@@ -103,7 +103,7 @@
   
    c. 设置CAN卡的终端跳线：将4个红色的跳线帽从原位置移除并放置在终端位置，如下图所示：
 
-   ![prepare_can_card2](images/ipc_hardware_slot2.png)
+   ![prepare_can_card2](images/ipc_hardware_slot2.jpg)
 
    ![warning_icon](images/warning_icon.png)**WARNING**：如果终端跳线没有被正确设置，CAN卡将不能正确工作。
 
@@ -171,7 +171,7 @@
 
 ##### 连接电源
 
-![IPC-6108GC-PowerCable.JPG](images/ipc_hardware_power_on.jpeg)
+![IPC-6108GC-PowerCable.JPG](images/ipc_hardware_power_on.jpg)
 
 
 ### 工控机软件系统安装

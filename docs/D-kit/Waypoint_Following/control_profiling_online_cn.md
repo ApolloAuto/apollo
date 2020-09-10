@@ -121,9 +121,9 @@
 
 首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`控制评测`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`。如下图所示：
 
-![profiling_submit_task1](images/profiling_submit_task1.png)
+![profiling_submit_task1](images/profiling_submit_task1.jpg)
 
-![profiling_submit_task2](images/profiling_submit_task2.png)
+![profiling_submit_task2](images/profiling_submit_task2.jpg)
 
 ![profiling_submit_task3](images/profiling_submit_task3.png)
 
@@ -169,9 +169,9 @@
 
 控制测评参数主要说明如下：
 
-![profiling_result_param1](images/profiling_result_param1.png)
+![profiling_result_param1](images/profiling_result_param1.jpg)
 
-![profiling_result_param2](images/profiling_result_param2.png)
+![profiling_result_param2](images/profiling_result_param2.jpg)
 
 ![profiling_result_param3](images/profiling_result_param3.png)
 

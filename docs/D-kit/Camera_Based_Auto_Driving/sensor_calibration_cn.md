@@ -54,7 +54,7 @@
 |---|---|
 | `modules/localization/conf/localization.conf`|`enable_lidar_localization`为`false`| 
  
-![camera_calibration_modify_localization_file](images/camera_calibration_modify_localization_file.jpeg)
+![camera_calibration_modify_localization_file](images/camera_calibration_modify_localization_file.jpg)
 
 **注意**：所有传感器标定完成后，如果用户要使用msf定位，则需要再改为`true`。
 
@@ -64,13 +64,13 @@
 
 #### 1. Lidar、Camera的坐标系定义
 
- ![camera_calibration_coordinate_system](images/camera_calibration_coordinate_system.jpeg)
+ ![camera_calibration_coordinate_system](images/camera_calibration_coordinate_system.jpg)
  
 #### 2. Camera坐标系原点在传感器的位置
 
 Camera坐标系原点在下图所示平面的中心点：
 
-![camera_calibration_look](images/camera_calibration_look.jpeg)
+![camera_calibration_look](images/camera_calibration_look.jpg)
 
 #### 3. Lidar坐标系原点在传感器的位置
 
@@ -221,9 +221,9 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
  **Camera-Lidar标定结果验证**：
  BOS中用户指定的Output Data Path路径下包含了标定结果验证图片。在产生的点云投影图像内，可寻找其中具有明显边缘的物体和标志物，查看其边缘轮廓对齐情况。如果50米以内的目标，点云边缘和图像边缘能够重合，则可以证明标定结果的精度很高。反之，若出现错位现象，则说明标定结果存在误差。当误差大于一定范围时（范围依据实际使用情况而定），该外参不可用。如下图所示，图1为准确外参的点云投影效果，图2为有偏差外参的点云投影效果。
  
-![camera_calibration_result_picture1](images/camera_calibration_result_picture1.png) 
+![camera_calibration_result_picture1](images/camera_calibration_result_picture1.jpg) 
 
-![camera_calibration_result_picture2](images/camera_calibration_result_picture2.png)
+![camera_calibration_result_picture2](images/camera_calibration_result_picture2.jpg)
 
  **Camera-Lidar标定外参文件**：
 
