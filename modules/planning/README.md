@@ -16,15 +16,19 @@ use cases as they were all treated as a single driving scenario.
 Apollo 5.5, which focuses on curb-to-curb autonomous driving on urban roads,
 introduced 2 new planning scenarios.
 
-Apollo 6.0, which focuses on intellegence of autonomous driving, introduced two new planning modes: E2E mode and Hybrid mode. 
+Apollo 6.0, which focuses on data-driven development of autonomous driving, introduced two new planning modes: E2E mode and Hybrid mode, by which we demonstrate the new capability of dynamically nudginng a moving obstacle. These two modes also define a series of APIs where developers can generate thier own training data and bring in their own models.
+
+**Note:** The current development of E2E mode is in early stage where it is fined-tuned more for the dynamic nudge scenario rather than comprehensive ones. So suboptimality is expected when running other scenarios in simulation. E2E mode and Hybrid mode are not tested on real vehicle yet. The work on data-driven planning is still in progress and welcomes any collaboration by any means including algorithms, models and data.
 
 ## E2E Mode
    ![](images/e2e_mode.png)
 ### How to Enable 
+- Change the configuration "learning_mode" in apollo/modules/planning/conf/planning_config.pb.txt to be "E2E_TEST" if Apollo is run in simulation or "E2E" on real vehicle
+- Change the configuration "model_type" in apollo/modules/planning/conf/scenario/learning_model_sample_config.pb.txt to be either "CNN_LSTM" or "CNN" and adapt the following "cpu_model_file" and "gpu_model_file" file paths. "CNN_LSTM" is the preferred model for now.
 
 ### Model Inputs and Outputs
-
-### Parameters 
+- Model input consists of a birdview image centered by vehicle pose and vehicle current velocity.
+- Model output is planning trajectory
 
 ## Hybrid Mode
    ![](images/hybrid_mode.png)
