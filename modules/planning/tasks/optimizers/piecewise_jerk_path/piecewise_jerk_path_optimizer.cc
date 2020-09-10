@@ -276,10 +276,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
       const double x = static_cast<double>(i) * delta_s;
       weight_x_ref_vec.at(i) = GaussianWeighting(x, peak_value, peak_value_x);
       ADEBUG << "i: " << i << ", weight: " << weight_x_ref_vec.at(i);
-      // const weigh
-      //   weight_x_ref_vec.at(i) =
-      //   config_.piecewise_jerk_path_optimizer_config()
-      //    .path_reference_l_weight();
     }
     piecewise_jerk_problem.set_x_ref(std::move(weight_x_ref_vec),
                                      std::move(path_reference_l_ref));
@@ -372,7 +368,6 @@ double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
 double PiecewiseJerkPathOptimizer::GaussianWeighting(
     const double x, const double peak_weighting,
     const double peak_weighting_x) const {
-  // y = peak_weighting*exp(x-peak_weighting_x)^2
   return peak_weighting *
          exp(-0.5 * (x - peak_weighting_x) * (x - peak_weighting_x));
 }

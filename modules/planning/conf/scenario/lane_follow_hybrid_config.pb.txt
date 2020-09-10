@@ -69,7 +69,7 @@ stage_config: {
     task_type: PIECEWISE_JERK_PATH_OPTIMIZER
     piecewise_jerk_path_optimizer_config
     {
-      path_reference_l_weight: 10000.0
+      path_reference_l_weight: 100.0
     }
   }
   task_config: {
