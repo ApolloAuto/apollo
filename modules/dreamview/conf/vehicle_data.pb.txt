@@ -138,3 +138,11 @@ data_files {
   source_path: "perception_launch"
   dest_path: "/apollo/modules/perception/production/launch"
 }
+data_files {
+  source_path: "lidar_dag"
+  dest_path: "/apollo/modules/drivers/lidar/dag"
+}
+data_files {
+  source_path: "lidar_conf"
+  dest_path: "/apollo/modules/drivers/lidar/conf"
+}
