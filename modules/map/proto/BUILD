@@ -51,6 +51,7 @@ py_proto_library(
     deps = [
         ":map_geometry_py_pb2",
         ":map_id_py_pb2",
+        ":map_rsu_py_pb2",
         ":map_junction_proto",
     ],
 )
@@ -372,6 +373,31 @@ py_proto_library(
     ],
 )
 
+proto_library(
+    name = "map_rsu_proto",
+    srcs = ["map_rsu.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+    ],
+)
+
+py_proto_library(
+    name = "map_rsu_py_pb2",
+    deps = [
+        ":map_geometry_py_pb2",
+        ":map_id_py_pb2",
+        ":map_rsu_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "map_rsu_cc_proto",
+    deps = [
+        ":map_rsu_proto",
+    ],
+)
+
 cc_proto_library(
     name = "map_cc_proto",
     deps = [
@@ -395,6 +421,7 @@ proto_library(
         ":map_speed_bump_proto",
         ":map_stop_sign_proto",
         ":map_yield_sign_proto",
+        ":map_rsu_proto",
     ],
 )
 
@@ -414,5 +441,6 @@ py_proto_library(
         ":map_speed_bump_py_pb2",
         ":map_stop_sign_py_pb2",
         ":map_yield_sign_py_pb2",
+        ":map_rsu_py_pb2",
     ],
 )

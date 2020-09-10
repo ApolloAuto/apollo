@@ -18,7 +18,6 @@ limitations under the License.
 #include <unordered_set>
 
 #include "absl/strings/str_cat.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
@@ -182,6 +181,13 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
   }
 }
 
+void ProtoOrganizer::GetObjectElements(const ObjectInternal& objects) {
+  for (const auto& rsu_internal : objects.rsus) {
+    const std::string& rsu_id = rsu_internal.rsu.id().id();
+    proto_data_.pb_rsus[rsu_id] = rsu_internal.rsu;
+  }
+}
+
 void ProtoOrganizer::GetLaneSignalOverlapElements(
     const std::string& lane_id,
     const std::vector<OverlapWithLane>& overlap_with_lanes) {
@@ -215,6 +221,10 @@ void ProtoOrganizer::GetLaneSignalOverlapElements(
     } else if (proto_data_.pb_yield_signs.count(object_id) > 0) {
       object_overlap->mutable_yield_sign_overlap_info();
       proto_data_.pb_yield_signs[object_id].add_overlap_id()->set_id(
+          overlap_id);
+    } else if (proto_data_.pb_rsus.count(object_id) > 0) {
+      object_overlap->mutable_rsu_overlap_info();
+      proto_data_.pb_rsus[object_id].add_overlap_id()->set_id(
           overlap_id);
     } else {
       AERROR << "unknown signal, signal id:" << object_id;
@@ -339,6 +349,10 @@ void ProtoOrganizer::GetJunctionObjectOverlapElements(
       } else if (proto_data_.pb_signals.count(object_id) > 0) {
         object_overlap->mutable_signal_overlap_info();
         proto_data_.pb_signals[object_id].add_overlap_id()->set_id(overlap_id);
+    } else if (proto_data_.pb_rsus.count(object_id) > 0) {
+        object_overlap->mutable_rsu_overlap_info();
+        proto_data_.pb_rsus[object_id].add_overlap_id()->set_id(
+          overlap_id);
       } else {
         continue;
       }
@@ -411,6 +425,9 @@ void ProtoOrganizer::OutputData(apollo::hdmap::Map* pb_map) {
   for (auto& junction_pair : proto_data_.pb_junctions) {
     *(pb_map->add_junction()) = junction_pair.second;
   }
+  for (auto& rsu_pair : proto_data_.pb_rsus) {
+    *(pb_map->add_rsu()) = rsu_pair.second;
+  }
   for (auto& overlap_pair : proto_data_.pb_overlaps) {
     *(pb_map->add_overlap()) = overlap_pair.second;
   }
@@ -426,6 +443,7 @@ void ProtoOrganizer::OutputData(apollo::hdmap::Map* pb_map) {
         << proto_data_.pb_yield_signs.size() << ",pnc-junctions-"
         << proto_data_.pb_pnc_junctions.size() << ",junctions-"
         << proto_data_.pb_junctions.size() << ",overlaps-"
+        << proto_data_.pb_rsus.size() << ",rsus-"
         << proto_data_.pb_overlaps.size();
 }
 
