@@ -56,7 +56,8 @@ function _determine_perception_disabled() {
 
 function _determine_planning_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/learning_based/..."
+    # Nothing disabled in planning for now
+    DISABLED_TARGETS="${DISABLED_TARGETS}"
   fi
 }
 
