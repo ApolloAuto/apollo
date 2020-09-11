@@ -147,6 +147,18 @@ function stop_all_apollo_containers_for_user() {
     fi
 }
 
+function _check_if_command_jq_exist() {
+    if [[ -x "$(command -v jq)" ]]; then
+        return 0
+    fi
+
+    warning "Command 'jq' (used for geolocation settings) not found on your Host."
+    warning "You can install it via 'sudo apt-get install jq' if on Ubuntu."
+    warning "Or visit jq at https://github.com/stedolan/jq for instructions."
+    warning "Exiting ..."
+    exit 1
+}
+
 function _geo_specific_config_for_cn() {
     local docker_cfg="/etc/docker/daemon.json"
     if [ -e "${docker_cfg}" ] && \
@@ -173,12 +185,13 @@ function _geo_specific_config_for_cn() {
 function geo_specific_config() {
     local geo="$1"
     if [ -z "${geo}" ] || [ "${geo}" = "none" ]; then
-        info "GeoLocation based settings: use default."
+        info "Use default GeoLocation settings"
     elif [ "${geo}" = "cn" ]; then
-        info "GeoLocation based settings: from within China"
+        info "GeoLocation settings for Mainland China"
+        _check_if_command_jq_exist
         _geo_specific_config_for_cn
     else
-        info "GeoLocation based settings for ${geo}: not ready, fallback to default"
+        info "GeoLocation settings for ${geo} is not ready, fallback to default"
     fi
 }
 
