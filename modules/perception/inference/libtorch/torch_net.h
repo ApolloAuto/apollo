@@ -30,7 +30,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-typedef std::shared_ptr<apollo::perception::base::Blob<float>> BlobPtr;
+using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;;
 
 class TorchNet : public Inference {
  public:

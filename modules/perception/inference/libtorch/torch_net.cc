@@ -22,6 +22,8 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
+using apollo::perception::base::Blob;
+
 TorchNet::TorchNet(const std::string &net_file, const std::string &model_file,
                    const std::vector<std::string> &outputs)
     : net_file_(net_file), model_file_(model_file), output_names_(outputs) {}
@@ -39,17 +41,15 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   net_ = torch::jit::load(model_file_, device);
 
   for (auto name : output_names_) {
-    auto blob = std::make_shared<apollo::perception::base::Blob<float>>
-                                                          (1, 4, 1, 1);
-    blobs_.emplace(std::make_pair(name, blob));
+    auto blob = std::make_shared<Blob<float>>(1, 4, 1, 1);
+    blobs_.emplace(name, blob);
   }
 
   for (auto name : input_names_) {
     auto iter = shapes.find(name);
     if (iter != shapes.end()) {
-      auto blob = std::make_shared<apollo::perception::base::Blob<float>>
-                                                          (iter->second);
-      blobs_.emplace(std::make_pair(name, blob));
+      auto blob = std::make_shared<Blob<float>>(iter->second);
+      blobs_.emplace(name, blob);
     }
   }
   return true;
@@ -63,8 +63,7 @@ TorchNet::TorchNet(const std::string &net_file, const std::string &model_file,
       output_names_(outputs),
       input_names_(inputs) {}
 
-std::shared_ptr<apollo::perception::base::Blob<float>> TorchNet::get_blob(
-    const std::string &name) {
+std::shared_ptr<Blob<float>> TorchNet::get_blob(const std::string &name) {
   auto iter = blobs_.find(name);
   if (iter == blobs_.end()) {
     return nullptr;
