@@ -165,10 +165,13 @@ def _path_check(build_file_path):
 
 
 ##================ REGEX FOR GRPC CHECK ====================================##
-PATT_SERVICE = re.compile("^service\s+\S+\s+{$")
-PATT_RPC_RET = re.compile("^rpc\s+\S+(\S+)\s+returns")
-PATT_RPC_ONLY = re.compile("^rpc\s+\S+(\S+)")
-PATT_RET_ONLY = re.compile("^returns\s+(\S+)\s+{")
+# message : "[_A-Za-z]([_A-Za-z0-9]*)*"
+# pkg.msg : "([_A-Za-z]([_A-Za-z0-9]*)*\.)*[_A-Za-z]([_A-Za-z0-9]*)*"
+
+PATT_SERVICE = re.compile("\s*service\s+\S+\s*{\s*")
+PATT_RPC_RET = re.compile("^\s*rpc\s+\S+\s*\(\s*\S+\s*\)\s*returns")
+PATT_RPC_ONLY = re.compile("^\s*rpc\s+\S+\s*\(\s*\S+\s*\)\s*$")
+PATT_RET_ONLY = re.compile("^\s*returns\s*\(\s*\S+\s*\)\s*{")
 
 
 ##===============  GRPC CHECK ==============================================##
