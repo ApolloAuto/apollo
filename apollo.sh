@@ -124,7 +124,7 @@ function _usage() {
     ${BLUE}doc${NO_COLOR}: generate doxygen document
     ${BLUE}clean${NO_COLOR}: cleanup bazel output and log/coredump files
     ${BLUE}format${NO_COLOR}: format C++/Python/Bazel/Shell files
-    ${BLUE}usage${NO_COLOR}: show this message
+    ${BLUE}usage${NO_COLOR}: show this message and exit
     "
 }
 
@@ -199,7 +199,7 @@ function main() {
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
             ;;
         clean)
-            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "-a"
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "$@"
             ;;
         doc)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"
