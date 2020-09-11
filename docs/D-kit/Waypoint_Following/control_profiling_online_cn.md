@@ -46,7 +46,7 @@
 
 ## 百度云对象存储BOS注册
 
-注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/Apply_BOS_Account_cn.md)
+注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/apply_bos_account_cn.md)
 
 **注意:** 必须使用开通过权限的`bucket`，确认`Bucket名称`、`所属地域`和提交商务注册时的`Bucket名称`和`所属区域`保持一致。
 
@@ -88,7 +88,7 @@
 
 #### 1. 准备百度云对象存储BOS服务
 
-在使用云标定服务前，需要准备[百度云对象存储BOS服务](../../Apollo_Fuel/Apply_BOS_Account_cn.md)用于存放标定预处理后的数据。
+在使用云标定服务前，需要准备[百度云对象存储BOS服务](../../Apollo_Fuel/apply_bos_account_cn.md)用于存放标定预处理后的数据。
 
 **注意:** 必须使用开通过权限的`bucket`，确认`Bucket名称`、`所属地域`和提交商务注册时的`Bucket名称`和`所属区域`保持一致。
 

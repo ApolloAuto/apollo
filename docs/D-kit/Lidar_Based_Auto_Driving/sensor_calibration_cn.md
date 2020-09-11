@@ -39,7 +39,7 @@
  - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](sensor_integration_cn.md)
 
 ## 百度云对象存储BOS注册
-注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/Apply_BOS_Account_cn.md) 
+注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/apply_bos_account_cn.md) 
 ## 开通云服务账号
 请与商务部门联系开通云服务账号，需要提供上一步骤中注册的`Bucket名称`、`所属地域`和用户邮箱信息
 ## 修改配置文件
