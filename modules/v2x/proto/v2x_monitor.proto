@@ -13,7 +13,7 @@ enum ErrorCode {
     OBUID = 999;
 }
 
-message OBUAlarm {
+message ObuAlarm {
     required double mode_num = 1;
     required ErrorCode error_num = 2;
     required string error_msg = 3;
