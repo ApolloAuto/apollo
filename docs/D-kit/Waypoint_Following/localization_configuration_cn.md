@@ -222,7 +222,7 @@ rtk_from {
 
 ## NEXT
 
-现在，您已经完成定位模块配置，接下来可以开始[循迹搭建--车辆动力学云标定](Vehicle_Calibration_Online_cn.md)
+现在，您已经完成定位模块配置，接下来可以开始[循迹搭建--车辆动力学云标定](vehicle_calibration_online_cn.md)
 
 ## 常见问题
 a.系统无法生成驱动设备`ttyACM0`，在`/apollo/data/log/gnss.INFO`里面会有类似报错提示：

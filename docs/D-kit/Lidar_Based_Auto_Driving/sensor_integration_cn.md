@@ -237,7 +237,7 @@
     ![lidar_integration_radar_verify_excel](images/lidar_integration_radar_verify_excel.png)
 
 ## NEXT
-现在，您已经完成激光雷达感知设备集成，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](Sensor_Calibration_cn.md)
+现在，您已经完成激光雷达感知设备集成，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](sensor_calibration_cn.md)
 ## 常见问题
 #### 1. 无法打开Lidar配置网页
 一般情况下只要Lidar IP、工控机与Lidar连接的网口IP处于相同号段就可以在浏览器中打开配置网页，如果确认本地IP已经正确修改还不能打开配置页面，请确认Lidar的IP地址是否被修改，可以下载`wireshark`来查看Lidar IP

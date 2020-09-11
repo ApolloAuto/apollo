@@ -121,5 +121,5 @@
 #### 1. 自动驾驶过程中车轮来回摆动，有画龙现象
 这种情况一般是车辆动力学标定没有做好，建议重新进行动力学标定
 #### 2. 车辆换道、停止等效果不理想
-- 在保证感知、定位稳定的前提下，可以尝试修改planning配置文件中的相关参数进行调整，详情参考[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/Planning_Configuration_cn.md)
+- 在保证感知、定位稳定的前提下，可以尝试修改planning配置文件中的相关参数进行调整，详情参考[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/planning_configuration_cn.md)
 

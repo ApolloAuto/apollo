@@ -546,7 +546,7 @@ cyber_recorder play -l -f demo_3.5.record
 
 ## NEXT
 
-现在，您已经完成Apollo系统安装，接下来可以开始[循迹搭建--车辆集成](Vehicle_Integration_cn.md)
+现在，您已经完成Apollo系统安装，接下来可以开始[循迹搭建--车辆集成](vehicle_integration_cn.md)
 
 ## 常见问题
 

@@ -88,7 +88,7 @@
     ![图片](images/gps_vehicle_map1.png)
     ![图片](images/gps_vehicle_map2.png)
 
-如上图所示：开发套件M2主机放置与车辆后轴中间附近（关于车辆坐标系说明请参考[Apollo车辆坐标系说明](../../coordination_cn.md)），M2的Y轴正向与车辆前进方向一致，前后天线分别安装至车辆前后中间位置，后天线与M2主机在X轴的原点位置重合，则X轴偏移x_offset的值为0；后天线在M2主机Y轴的负向0.1m处，则Y轴偏移y_offset的值为-0.1；后天线在M2主机Z轴的正向0.6m处，则Z轴偏移z_offset的值为0.6，则杆臂值为(0,-0.1,0.6)。
+如上图所示：开发套件M2主机放置与车辆后轴中间附近（关于车辆坐标系说明请参考[Apollo车辆坐标系说明](../../specs/coordination_cn.md)），M2的Y轴正向与车辆前进方向一致，前后天线分别安装至车辆前后中间位置，后天线与M2主机在X轴的原点位置重合，则X轴偏移x_offset的值为0；后天线在M2主机Y轴的负向0.1m处，则Y轴偏移y_offset的值为-0.1；后天线在M2主机Z轴的正向0.6m处，则Z轴偏移z_offset的值为0.6，则杆臂值为(0,-0.1,0.6)。
 
 ## NEXT
-现在，您已经完成车辆集成，接下来可以开始[循迹搭建--定位模块配置](Localization_Configuration_cn.md)
+现在，您已经完成车辆集成，接下来可以开始[循迹搭建--定位模块配置](localization_configuration_cn.md)

@@ -94,7 +94,7 @@
 如果在dreamview上能看到障碍物并且`/apollo/perception/obstacles`有障碍物信息，则开环测试通过。
 
 ## NEXT
-现在，您已经完成摄像头感知适配，接下来可以开始[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/Planning_Configuration_cn.md)
+现在，您已经完成摄像头感知适配，接下来可以开始[封闭园区自动驾驶搭建--规划适配](../Lidar_Based_Auto_Driving/planning_configuration_cn.md)
 
 ## 常见问题
 

@@ -74,7 +74,7 @@ Camera坐标系原点在下图所示平面的中心点：
 
 #### 3. Lidar坐标系原点在传感器的位置
 
-见[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](../Lidar_Based_Auto_Driving/Sensor_Calibration_cn.md)文档
+见[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](../Lidar_Based_Auto_Driving/sensor_calibration_cn.md)文档
 
 #### 4. 手动测量Camera-Lidar的初始化外参文件
 
@@ -115,7 +115,7 @@ Camera坐标系原点在下图所示平面的中心点：
 | VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
 | Localization       | /apollo/localization/pose             | 100           |
 
-为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`Camera`三个模块，详细操作方式分别参考[循迹搭建--定位模块配置](../Waypoint_Following/Localization_Configuration_cn.md)、[基于摄像头的封闭园区自动驾驶搭建--感知设备集成](../Camera_Based_Auto_Driving/Sensor_Integration_cn.md)。在正式开始录制前，务必确保以上channel能正常输出数据。
+为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`Camera`三个模块，详细操作方式分别参考[循迹搭建--定位模块配置](../Waypoint_Following/localization_configuration_cn.md)、[基于摄像头的封闭园区自动驾驶搭建--感知设备集成](../Camera_Based_Auto_Driving/sensor_integration_cn.md)。在正式开始录制前，务必确保以上channel能正常输出数据。
 
 #### 2. 使用Apollo录制数据包的方法
 
@@ -235,7 +235,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
  
  - 默认使用1个6mm、1个12mm摄像头，用户如需要使用第二个6mm摄像头时，需要自行指定文件名，并进行相应修改。
 ## NEXT
-现在，您已经完成摄像头感知设备标定， 接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](../Lidar_Based_Auto_Driving/Virtual_Lane_Generation_cn.md)(如果在适配基于激光雷达的自动驾驶过程中已经制作了虚拟车道线文件，则可以跳过此步骤，进行[基于摄像头的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md))
+现在，您已经完成摄像头感知设备标定， 接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](../Lidar_Based_Auto_Driving/virtual_lane_generation_cn.md)(如果在适配基于激光雷达的自动驾驶过程中已经制作了虚拟车道线文件，则可以跳过此步骤，进行[基于摄像头的封闭园区自动驾驶搭建--感知适配](perception_configuration_cn.md))
 ## 常见问题
 #### 1. 提交后，显示`UNAUTHORIZED`
 ![lidar_calibration_unauthorized](images/lidar_calibration_unauthorized.png)

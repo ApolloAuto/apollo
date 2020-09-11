@@ -49,8 +49,8 @@
 
 
 #### 2. 启动感知
-- 如果用户使用Lidar感知方案，请参照[基于激光雷达的封闭园区自动驾驶搭建--感知适配](Perception_Configuration_cn.md)启动Lidar感知
-- 如果用户使用Camera感知方案，请参照[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/Perception_Configuration_cn.md)启动Camera感知
+- 如果用户使用Lidar感知方案，请参照[基于激光雷达的封闭园区自动驾驶搭建--感知适配](perception_configuration_cn.md)启动Lidar感知
+- 如果用户使用Camera感知方案，请参照[基于摄像头的封闭园区自动驾驶搭建--感知适配](../Camera_Based_Auto_Driving/perception_configuration_cn.md)启动Camera感知
 
 #### 3. 启动 Planning、Prediction、Routing、Control模块
 确保感知模块启动成功后，在Module Controller标签页启动Planning、Prediction、Routing、Control模块。
@@ -80,4 +80,4 @@
 如果出现上图所示轨迹线和topic信息，表示规划模块适配和开环测试通过，否则继续查看log信息进行调试。
 
 ## NEXT
-现在，您已经完成规划适配，根据您适配的是Lidar感知方案还是Camera感知方案，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--自动驾驶演示](Start_Auto_Driving_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--自动驾驶演示](../Camera_Based_Auto_Driving/Start_Auto_Driving_cn.md)
+现在，您已经完成规划适配，根据您适配的是Lidar感知方案还是Camera感知方案，接下来可以开始[基于激光雷达的封闭园区自动驾驶搭建--自动驾驶演示](start_auto_driving_cn.md)或[基于摄像头的封闭园区自动驾驶搭建--自动驾驶演示](../Camera_Based_Auto_Driving/start_auto_driving_cn.md)

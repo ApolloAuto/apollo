@@ -111,7 +111,7 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 | VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
 | Localization       | /apollo/localization/pose             | 100           |
 
-为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`lidar`三个模块，可参考[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/Sensor_Integration_cn.md)
+为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`lidar`三个模块，可参考[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/sensor_integration_cn.md)
 
 **注意**：在正式开始录制前，务必确保以上channel能正常输出数据。
 
@@ -222,7 +222,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 确认邮件得到的外参文件合理后，将邮件发送的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/dev_kit/velodyne_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`、不要直接替换文件。
 
 ## NEXT
-现在，您已经完成激光雷达感知设备标定，接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](Virtual_Lane_Generation_cn.md)
+现在，您已经完成激光雷达感知设备标定，接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](virtual_lane_generation_cn.md)
 
 ## 常见问题
 #### 1. 提交后，显示`UNAUTHORIZED`,如下图所示

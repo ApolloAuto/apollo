@@ -125,7 +125,7 @@
 	budaoshi@in_dev_docker:/apollo$ cyber_monitor
 	```
 ## NEXT
-现在，您已经完成摄像头感知设备集成，接下来可以开始[基于摄像头的封闭园区自动驾驶搭建--感知设备标定](Sensor_Calibration_cn.md)
+现在，您已经完成摄像头感知设备集成，接下来可以开始[基于摄像头的封闭园区自动驾驶搭建--感知设备标定](sensor_calibration_cn.md)
 ## 常见问题
 #### 1. 规则文件修改后不显示软连接
 规则文件修改后需要重启工控机才能生效
