@@ -60,8 +60,8 @@ class TorchNet : public Inference {
   std::vector<std::string> input_names_;
   BlobMap blobs_;
 
-  torch::DeviceType deviceType;
-  int deviceId = 0;
+  torch::DeviceType device_type_;
+  int device_id_ = 0;
 };
 
 }  // namespace inference

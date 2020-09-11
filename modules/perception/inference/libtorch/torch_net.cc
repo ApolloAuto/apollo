@@ -28,14 +28,14 @@ TorchNet::TorchNet(const std::string &net_file, const std::string &model_file,
 
 bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   if (gpu_id_ >= 0) {
-    deviceType = torch::kCUDA;
-    deviceId = gpu_id_;
+    device_type_ = torch::kCUDA;
+    device_id_ = gpu_id_;
   } else {
-    deviceType = torch::kCPU;
+    device_type_ = torch::kCPU;
   }
 
   // Init net
-  torch::Device device(deviceType, deviceId);
+  torch::Device device(device_type_, device_id_);
   net_ = torch::jit::load(model_file_, device);
 
   for (auto name : output_names_) {
@@ -77,7 +77,7 @@ bool TorchNet::reshape() {
 }
 
 void TorchNet::Infer() {
-  torch::Device device(deviceType, deviceId);
+  torch::Device device(device_type_, device_id_);
   auto blob = blobs_[input_names_[0]];
 
   // pay attention to the tensor shape order, if changed without permute
@@ -86,7 +86,7 @@ void TorchNet::Infer() {
                               blob->data()->mutable_cpu_data(),
                               {blob->shape(1), blob->shape(2), blob->shape(3)},
                               torch::kFloat32);
-  if (deviceId >= 0) {
+  if (device_id_ >= 0) {
     tensor_image = tensor_image.to(device);
   }
 
