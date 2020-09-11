@@ -29,8 +29,18 @@ Apollo 6.0, which focuses on intellegence of autonomous driving, introduced two 
 ## Hybrid Mode
    ![](images/hybrid_mode.png)
 ### How to Enable
+In configuration file,
+```
+./modules/planning/conf/planning_config.pb.txt
+```
+set learning_mode: `learning_mode: ` as `HYBRID` for road test or `HYBRID_TEST` for simulation.
 
 ### Parameters
+The configurable parameters in hybrid model are listed in the configuration file
+```
+modules/planning/conf/scenario/lane_follow_hybrid_config.pb.txt
+```
+The parameter `path_reference_l_weight` is for adjusting hybrid model path output. A larger value of `path_reference_l_weight` means higher penalty of the difference between hybrid model path and learning model path in lateral direction.
 
 ## Driving Scenarios
 
