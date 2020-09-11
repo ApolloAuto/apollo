@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 
+#include "modules/common/math/math_utils.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -36,6 +37,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
+using apollo::common::math::Gaussian;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(
     const TaskConfig& config,
@@ -368,8 +370,13 @@ double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
 double PiecewiseJerkPathOptimizer::GaussianWeighting(
     const double x, const double peak_weighting,
     const double peak_weighting_x) const {
-  return peak_weighting *
-         exp(-0.5 * (x - peak_weighting_x) * (x - peak_weighting_x));
+  double std = 1 / (std::sqrt(2 * M_PI) * peak_weighting);
+  double u = peak_weighting_x * std;
+  double x_updated = x * std;
+  ADEBUG << peak_weighting *
+                exp(-0.5 * (x - peak_weighting_x) * (x - peak_weighting_x));
+  ADEBUG << Gaussian(u, std, x_updated);
+  return Gaussian(u, std, x_updated);
 }
 
 }  // namespace planning
