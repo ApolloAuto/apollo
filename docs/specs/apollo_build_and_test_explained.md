@@ -21,7 +21,7 @@ about Bazel, the better you know about Apollo Build.
 
 Let's first take a look at the usage of `apollo.sh`.
 
-![apollo.sh help](images/apollo_sh_help.png)
+![apollo.sh help](images/apollo_sh_help.jpg)
 
 From this message, we can see subcommands that starts with "build\_", like
 `build_dbg`, `build_cpu`, and `build_opt_gpu`, etc. As you may figure out, they
