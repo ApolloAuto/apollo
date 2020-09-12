@@ -1,50 +1,50 @@
 vertical_model{
     model_name: "./";
-    model_type: "CaffeNet";
+    model_type: "TorchNet";
     input_blob: "data_org";
     output_blob: "prob";
-    weight_file: "vertical/baidu_iter_250000.caffemodel";
+    weight_file: "vertical/vertical_net_libtorch.pth";
     proto_file: "vertical/deploy.prototxt";
     classify_threshold: 0.5;
     classify_resize_width: 32;
     classify_resize_height: 96;
-    mean_r: 69.06;
-    mean_g: 66.58;
-    mean_b: 66.56;
-    is_bgr: true;
-    scale: 0.01
+    mean_r: 123.675;
+    mean_g: 116.28;
+    mean_b: 103.53;
+    is_bgr: false;
+    scale: 1
 }
 
 quadrate_model{
     model_name: "./";
-    model_type: "CaffeNet";
+    model_type: "TorchNet";
     input_blob: "data_org";
     output_blob: "prob";
-    weight_file: "quadrate/baidu_iter_200000.caffemodel";
+    weight_file: "quadrate/quadrate_net_libtorch.pth";
     proto_file: "quadrate/deploy.prototxt";
     classify_threshold: 0.5;
     classify_resize_width: 64;
     classify_resize_height: 64;
-    mean_r: 69.06;
-    mean_g: 66.58;
-    mean_b: 66.56;
-    is_bgr: true;
+    mean_r: 123.675;
+    mean_g: 116.28;
+    mean_b: 103.53;
+    is_bgr: false;
     scale: 0.01
 }
 
 horizontal_model{
     model_name: "./";
-    model_type: "CaffeNet";
+    model_type: "TorchNet";
     input_blob: "data_org";
     output_blob: "prob";
-    weight_file: "horizontal/baidu_iter_200000.caffemodel";
+    weight_file: "horizontal/horizontal_net_libtorch.pth";
     proto_file: "horizontal/deploy.prototxt";
     classify_threshold: 0.5;
     classify_resize_width: 96;
     classify_resize_height: 32;
-    mean_r: 69.06;
-    mean_g: 66.58;
-    mean_b: 66.56;
-    is_bgr: true;
+    mean_r: 123.675;
+    mean_g: 116.28;
+    mean_b: 103.53;
+    is_bgr: false;
     scale: 0.01
 }

@@ -47,8 +47,7 @@ cc_library(
     hdrs = ["inference_factory.h"],
     deps = [
         ":inference_lib",
-        "//modules/perception/inference/caffe:caffe_net_lib",
-        "//modules/perception/inference/tensorrt:rt_net",
+        "//modules/perception/inference/libtorch:torch_net",
         "//modules/perception/inference/utils:inference_util_lib",
     ],
 )

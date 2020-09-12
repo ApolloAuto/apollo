@@ -16,8 +16,7 @@
 
 #include "modules/perception/inference/inference_factory.h"
 
-#include "modules/perception/inference/caffe/caffe_net.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
+#include "modules/perception/inference/libtorch/torch_net.h"
 
 namespace apollo {
 namespace perception {
@@ -29,12 +28,8 @@ Inference *CreateInferenceByName(const std::string &name,
                                  const std::vector<std::string> &outputs,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
-  if (name == "CaffeNet") {
-    return new CaffeNet(proto_file, weight_file, outputs, inputs);
-  } else if (name == "RTNet") {
-    return new RTNet(proto_file, weight_file, outputs, inputs);
-  } else if (name == "RTNetInt8") {
-    return new RTNet(proto_file, weight_file, outputs, inputs, model_root);
+  if (name == "TorchNet") {
+    return new TorchNet(proto_file, weight_file, outputs, inputs);
   }
   return nullptr;
 }

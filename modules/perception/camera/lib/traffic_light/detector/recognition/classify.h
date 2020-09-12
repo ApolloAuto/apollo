@@ -24,6 +24,7 @@
 #include "modules/perception/base/traffic_light.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
+#include "modules/perception/inference/inference.h"
 
 namespace apollo {
 namespace perception {
@@ -43,7 +44,7 @@ class ClassifyBySimple {
  private:
   void Prob2Color(const float* out_put_data, float threshold,
                   base::TrafficLightPtr light);
-  // std::shared_ptr<inference::Inference> rt_net_ = nullptr;
+  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
   DataProvider::ImageOptions data_provider_image_option_;
   std::shared_ptr<base::Image8U> image_ = nullptr;
   std::shared_ptr<base::Blob<float>> mean_buffer_;
