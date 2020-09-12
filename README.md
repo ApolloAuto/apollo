@@ -81,7 +81,7 @@ For those developers that would like to continue working with Ubuntu 14.04, plea
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![](docs/demo_guide/images/Apollo_Roadmap_5.5.png)
+![](docs/demo_guide/images/Apollo_Roadmap_6_0.png)
 
 [**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
 
@@ -89,69 +89,17 @@ Apollo 1.0, also referred to as the Automatic GPS Waypoint Following, works in a
 
 ![image alt text](docs/demo_guide/images/Apollo_1.png)
 
-**For Setup:**
-
-* **Hardware**:
-
-    * Industrial PC (IPC)
-
-    * Global Positioning System (GPS)
-
-    * Inertial Measurement Unit (IMU)
-
-    * Controller Area Network (CAN) card
-
-    * Hard drive
-
-    * GPS Antenna
-
-    * GPS Receiver
-
-* **Software**:
-
-    * Apollo Linux Kernel (based on Linux Kernel 4.4.32)
-
 [**Apollo 1.5:**](docs/quickstart/apollo_1_5_hardware_system_installation_guide.md)
 
 Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
 
 ![image alt text](docs/demo_guide/images/Apollo_1_5.png)
 
-**For Setup:**
-
-* All the requirements mentioned in version 1.0
-
-* **Hardware**:
-
-    * Light Detection and Ranging System (LiDAR)
-
-    * ASUS GTX1080 GPU-A8G- Gaming GPU Card
-
-* **Software**:
-
-    * Nvidia GPU Driver
-
 [**Apollo 2.0:**](docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md#key-hardware-components)
 
 Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicles are able to cruise on roads safely, avoid collisions with obstacles, stop at traffic lights, and change lanes if needed to reach their destination.  Please note, the modules highlighted in Red are additions or upgrades for version 2.0.
 
 ![image alt text](docs/demo_guide/images/Apollo_2.png)
-
-**For Setup:**
-
-* All the requirements mentioned in versions 1.5 and 1.0
-
-* **Hardware**:
-
-    * Traffic Light Detection using Camera
-
-    * Ranging System (LiDAR)
-
-    * Radar
-
-* **Software**:
-
-    * Same as 1.5
 
 [**Apollo 2.5:**](docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
@@ -165,37 +113,11 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 ![image alt text](docs/demo_guide/images/Apollo_2_5.png)
 
-**For Setup:**
-
-* All the requirements mentioned in 2.0
-
-* Hardware:
-
-    * Additional Camera
-
-* Software:
-
-    * Same as 2.0
-
 [**Apollo 3.0:**](docs/quickstart/apollo_3_0_quick_start.md)
 
 Apollo 3.0's primary focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them.
 
 ![image alt text](docs/demo_guide/images/Apollo_3.0_diagram.png)
-
-**For Setup:**
-
-* Hardware:
-
-    * Ultrasonic sensors
-    * Apollo Sensor Unit
-    * Apollo Hardware Development Platform with additional sensor support and flexibility
-
-* Software:
-
-    * Guardian
-    * Monitor
-    * Additional drivers to support Hardware
 
 [**Apollo 3.5:**](docs/quickstart/apollo_3_5_quick_start.md)
 
@@ -203,71 +125,24 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 ![image alt text](docs/demo_guide/images/Apollo_3_5_Architecture.png)
 
-**For Setup:**
-
-* Hardware:
-
-    * Velodyne VLS - 128
-    * Apollo Extension Unit (AXU)
-    * ARGUS FPD-Link Cameras (3)
-    * NovAtel PwrPak7
-    * Additional IPC
-
-* Software:
-
-    * Perception
-    * Planning
-    * V2X
-    * Additional drivers to support Hardware
-
-* Runtime Framework
-    * Cyber RT
-
 [**Apollo 5.0:**](docs/quickstart/apollo_3_5_quick_start.md)
 
 Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous Driving.
 The car now has 360-degree visibility, along with upgraded perception deep learning model to handle the changing conditions of complex road scenarios, making the car more secure and aware. Scenario-based planning has been enhanced to support additional scenarios like pull over and crossing bare intersections.
 
-![](docs/demo_guide/images/Apollo_5_0_diagram1.png)
-
-**For Setup:**
-
-* Hardware:
-
-    * Same as Apollo 3.5
-
-* Software:
-
-    * [Data Pipeline](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/fuel_proxy)
-    * Perception
-    * Planning
-    * Control
-    * Prediction
-    * Map Engine
-    * Simulation
-    * [Apollo Synthetic Data Set](http://apollo.auto/synthetic.html)
+![image alt text](docs/demo_guide/images/Apollo_5_0_diagram1.png)
 
 [**Apollo 5.5:**](docs/quickstart/apollo_5_5_quick_start.md)
 
-Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving.
-The car has complete 360-degree visibility, along with upgraded perception deep learning model and a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. 
+Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. The car has complete 360-degree visibility, along with upgraded perception deep learning model and a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. 
 
-![](docs/demo_guide/images/Apollo_5_5_Architecture.png)
+![image alt text](docs/demo_guide/images/Apollo_5_5_Architecture.png)
 
-**For Setup:**
+[**Apollo 6.0:**](docs/quickstart/apollo_6_5_quick_start.md)
 
-* Hardware:
+Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new addtions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
 
-    * Same as Apollo 5.0
-
-* Software:
-
-    * [Data Pipeline](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/fuel_proxy)
-    * Perception
-    * Planning
-    * Control
-    * Prediction
-    * Simulation
+![image alt text](docs/demo_guide/images/Apollo_6_0.png)
 
 ## Architecture
 
