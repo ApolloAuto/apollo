@@ -127,6 +127,10 @@ function c_family_ext() {
   return 1
 }
 
+function find_proto_srcs() {
+    find "$@" -type f -name "*.proto"
+}
+
 function find_c_cpp_srcs() {
   find "$@" -type f -name "*.h" \
     -o -name "*.c" \
