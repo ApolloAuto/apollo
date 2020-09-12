@@ -5,9 +5,8 @@ package apollo.perception.onboard;
 message FusionCameraDetection {
   optional string camera_names = 1 [default = "front_6mm,front_12mm"];
   optional string input_camera_channel_names = 2
-      [default =
-           "/sensor/camera/traffic/image_short,/sensor/camera/obstacle/"
-           "image_narrow"];
+      [default = "/sensor/camera/traffic/image_short,/sensor/camera/obstacle/"
+                 "image_narrow"];
   optional double timestamp_offset = 3 [default = 0.0];
   optional string camera_obstacle_perception_conf_dir = 4
       [default = "conf/perception/camera"];

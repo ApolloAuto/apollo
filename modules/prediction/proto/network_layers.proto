@@ -82,8 +82,7 @@ message ActivationParameter {
   optional string activation = 1;
 }
 
-message FlattenParameter {
-}
+message FlattenParameter {}
 
 message ConcatenateParameter {
   optional int32 axis = 1;

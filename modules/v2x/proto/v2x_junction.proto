@@ -17,7 +17,8 @@ message Junction {
   repeated Id overlap_id = 4;
 
   // The number of road segments (arms) that are involved.
-  // e.g 3-way junction indicates a T junction (two arms form one road) or a Y junction.
+  // e.g 3-way junction indicates a T junction (two arms form one road) or a Y
+  // junction.
   optional int32 num_road_segments = 5 [default = 4];
   // lanes in the junction
   repeated Id lane_id = 6;

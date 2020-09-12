@@ -129,8 +129,7 @@ message NaviSpeedDeciderConfig {
 //////////////////////////////////
 // PathAssessmentDeciderConfig
 
-message PathAssessmentDeciderConfig {
-}
+message PathAssessmentDeciderConfig {}
 
 //////////////////////////////////
 // PathBoundsDeciderConfig

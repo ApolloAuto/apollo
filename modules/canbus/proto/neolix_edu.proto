@@ -4,49 +4,56 @@ package apollo.canbus;
 
 message Aeb_systemstate_11 {
   // Report Message
-    // 0x00:read only;0x01:brake enable [] [0|1]
-    optional int32 aeb_state = 1;
-    // 0x00:off;0x01:on [] [0|1]
-    optional bool aeb_brakestate = 2;
-    // 0x0:Nomal;0x1:Level 1;0x2:Level 2;0x3:Level 3;0x4:Level 4;0x5:Level 5;0x6:Reserved;0x7:Reserved [] [0|5]
-    optional int32 faultrank = 3;
-    // [] [0|120]
-    optional int32 currenttemperature = 4;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_f1_stop = 5;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_f2_stop = 6;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_f3_stop = 7;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_f4_stop = 8;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_b1_stop = 9;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_b2_stop = 10;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_b3_stop = 11;
-    // 0x0:Normal;0x1:ActivateBrake [] [0|1]
-    optional bool pas_b4_stop = 12;
-    // [] [0|15]
-    optional int32 aeb_livecounter_rear = 13;
-    // [bit] [0|255]
-    optional int32 aeb_cheksum = 14;
-  }
+  // 0x00:read only;0x01:brake enable [] [0|1]
+  optional int32 aeb_state = 1;
+  // 0x00:off;0x01:on [] [0|1]
+  optional bool aeb_brakestate = 2;
+  // 0x0:Nomal;0x1:Level 1;0x2:Level 2;0x3:Level 3;0x4:Level 4;0x5:Level
+  // 5;0x6:Reserved;0x7:Reserved [] [0|5]
+  optional int32 faultrank = 3;
+  // [] [0|120]
+  optional int32 currenttemperature = 4;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_f1_stop = 5;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_f2_stop = 6;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_f3_stop = 7;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_f4_stop = 8;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_b1_stop = 9;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_b2_stop = 10;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_b3_stop = 11;
+  // 0x0:Normal;0x1:ActivateBrake [] [0|1]
+  optional bool pas_b4_stop = 12;
+  // [] [0|15]
+  optional int32 aeb_livecounter_rear = 13;
+  // [bit] [0|255]
+  optional int32 aeb_cheksum = 14;
+}
 
 message Vcu_vehicle_fault_response_201 {
-// Report Message
-  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4: level 4 error;0x5: level 5 error [] [0|0]
+  // Report Message
+  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4:
+  // level 4 error;0x5: level 5 error [] [0|0]
   optional int32 vehicle_error_indicationsvcu = 1;
-  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4: level 4 error;0x5: level 5 error [] [0|0]
+  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4:
+  // level 4 error;0x5: level 5 error [] [0|0]
   optional int32 brake_system_errorehb = 2;
-  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4: level 4 error;0x5: level 5 error [] [0|0]
+  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4:
+  // level 4 error;0x5: level 5 error [] [0|0]
   optional int32 eps_error = 3;
-  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4: level 4 error;0x5: level 5 error [] [0|0]
+  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4:
+  // level 4 error;0x5: level 5 error [] [0|0]
   optional int32 motor_error = 4;
-  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4: level 4 error;0x5: level 5 error [] [0|0]
+  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4:
+  // level 4 error;0x5: level 5 error [] [0|0]
   optional int32 epb_error = 5;
-  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4: level 4 error;0x5: level 5 error [] [0|0]
+  // 0x0: no error;0x1: level 1 error;0x2: level 2 error;0x3: level 3 error;0x4:
+  // level 4 error;0x5: level 5 error [] [0|0]
   optional int32 high_voltage_battery_errorbcu = 6;
   // 0x0:Normal;0x1:Failure [] [0|0]
   optional bool automode_exit_reason_losscommuni = 7;
@@ -71,8 +78,9 @@ message Vcu_vehicle_fault_response_201 {
 }
 
 message Vcu_powerstatus_214 {
-// Report Message
-  // 0x0:OFF;0x1:IG_ON;0x2:Power_ON;0x3:Auto_ON;0x4:Reserved;0x5:Reserved;0x6:Reserved;0x7:Reserved [bit] [0|7]
+  // Report Message
+  // 0x0:OFF;0x1:IG_ON;0x2:Power_ON;0x3:Auto_ON;0x4:Reserved;0x5:Reserved;0x6:Reserved;0x7:Reserved
+  // [bit] [0|7]
   optional int32 vcu_powermode = 1;
   // 0x0:Not Available;0x1:Invalid;0x2:Valid;0x3:Reserved [bit] [0|3]
   optional int32 vcu_powermodevalid = 2;
@@ -85,7 +93,7 @@ message Vcu_powerstatus_214 {
 }
 
 message Ads_light_horn_command_310 {
-// Control Message
+  // Control Message
   // 0x0:disable ;0x1:enable [bit] [0|1]
   optional bool turn_right_light_command = 1;
   // 0x0:disable ;0x1:enable ;0x2-0x3:Reserved  [bit] [0|1]
@@ -101,7 +109,7 @@ message Ads_light_horn_command_310 {
 }
 
 message Ads_brake_command_46 {
-// Control Message
+  // Control Message
   // 0x0:disable ;0x1:enable [] [0|0]
   optional bool drive_enable = 1;
   // [] [0|0]
@@ -117,7 +125,7 @@ message Ads_brake_command_46 {
 }
 
 message Vcu_brake_report_47 {
-// Report Message
+  // Report Message
   enum Control_mode_respType {
     CONTROL_MODE_RESP_STANDBY = 0;
     CONTROL_MODE_RESP_AUTO_DRIVE = 1;
@@ -127,13 +135,15 @@ message Vcu_brake_report_47 {
   }
   // 0x0:disable;0x1:enable [] [0|0]
   optional bool brake_enable_resp = 1;
-  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency brake;0x5~0x7:Reserved [bit] [0|7]
+  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency
+  // brake;0x5~0x7:Reserved [bit] [0|7]
   optional Control_mode_respType control_mode_resp = 2;
   // 0x0:disable;0x1:enable [] [0|0]
   optional bool vcu_real_brake_valid = 3;
   // [] [0|0]
   optional int32 vcu_real_brake = 4;
-  // 0x0:EPB_Released;0x1:EPB_Applied;0x2:EPB_Releasing;0x3:EPB_Fault;0x4:EPB_Applying [] [0|0]
+  // 0x0:EPB_Released;0x1:EPB_Applied;0x2:EPB_Releasing;0x3:EPB_Fault;0x4:EPB_Applying
+  // [] [0|0]
   optional int32 vcu_real_parking_status = 5;
   // 0x0:disable;0x1:enable [] [0|0]
   optional bool vcu_real_parking_valid = 6;
@@ -148,7 +158,7 @@ message Vcu_brake_report_47 {
 }
 
 message Vcu_eps_report_57 {
-// Report Message
+  // Report Message
   enum Control_mode_respType {
     CONTROL_MODE_RESP_STANDBY = 0;
     CONTROL_MODE_RESP_AUTO_DRIVE = 1;
@@ -158,7 +168,8 @@ message Vcu_eps_report_57 {
   }
   // 0x0:disable;0x1:enable [] [0|0]
   optional bool drive_enable_resp = 1;
-  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency brake;0x5~0x7:Reserved [] [0|7]
+  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency
+  // brake;0x5~0x7:Reserved [] [0|7]
   optional Control_mode_respType control_mode_resp = 2;
   // 0x0:not overflow;0x1:overflow [] [0|0]
   optional bool vcu_eps_report = 3;
@@ -177,7 +188,7 @@ message Vcu_eps_report_57 {
 }
 
 message Ads_eps_command_56 {
-// Control Message
+  // Control Message
   // 0x0:disable ;0x1:enable [] [0|0]
   optional bool drive_enable = 1;
   // [] [0|0]
@@ -189,7 +200,7 @@ message Ads_eps_command_56 {
 }
 
 message Ads_drive_command_50 {
-// Control Message
+  // Control Message
   enum Auto_shift_commandType {
     AUTO_SHIFT_COMMAND_N = 0;
     AUTO_SHIFT_COMMAND_D = 1;
@@ -209,7 +220,7 @@ message Ads_drive_command_50 {
 }
 
 message Vcu_drive_report_52 {
-// Report Message
+  // Report Message
   enum Control_mode_respType {
     CONTROL_MODE_RESP_STANDBY = 0;
     CONTROL_MODE_RESP_AUTO_DRIVE = 1;
@@ -225,7 +236,8 @@ message Vcu_drive_report_52 {
   }
   // 0x0:disable;0x1:enable [] [0|0]
   optional bool drive_enable_resp = 1;
-  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency brake;0x5~0x7:Reserved [] [0|7]
+  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency
+  // brake;0x5~0x7:Reserved [] [0|7]
   optional Control_mode_respType control_mode_resp = 2;
   // 0x0:N档;0x1:D档;0x2:R档;0x3:Reserved [] [0|3]
   optional Vcu_real_shiftType vcu_real_shift = 3;
@@ -244,8 +256,9 @@ message Vcu_drive_report_52 {
 }
 
 message Ads_diagnosis_628 {
-// Control Message
-  // 0x0:Nomal;0x1:Level 1;0x2:Level 2;0x3:Level 3;0x4:Level 4;0x5:Level 5;0x6:Reserved;0x7:Reserved [bit] [0|5]
+  // Control Message
+  // 0x0:Nomal;0x1:Level 1;0x2:Level 2;0x3:Level 3;0x4:Level 4;0x5:Level
+  // 5;0x6:Reserved;0x7:Reserved [bit] [0|5]
   optional int32 faultrank = 1;
   // [] [0|65535]
   optional int32 adas_fault_code = 2;
@@ -256,13 +269,13 @@ message Ads_diagnosis_628 {
 }
 
 message Vcu_nm_401 {
-// Report Message
+  // Report Message
   // 0x0:Inactive;0x1:Active [bit] [0|1]
   optional bool vcu_sleepcommand = 1;
 }
 
 message Vcu_vehicle_status_report_101 {
-// Report Message
+  // Report Message
   enum Control_mode_respType {
     CONTROL_MODE_RESP_STANDBY = 0;
     CONTROL_MODE_RESP_AUTO_DRIVE = 1;
@@ -276,7 +289,8 @@ message Vcu_vehicle_status_report_101 {
   optional bool vcu_highvoltagecircuitstate = 2;
   // 0x0: Disable;0x1:Enable [] [0|0]
   optional bool vcu_dcdc_enabledstates = 3;
-  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency brake;0x5~0x7:Reserved [] [0|7]
+  // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency
+  // brake;0x5~0x7:Reserved [] [0|7]
   optional Control_mode_respType control_mode_resp = 4;
   // [Km/h] [0|460.69]
   optional double vcu_vehicle_speed = 5;
@@ -297,7 +311,7 @@ message Vcu_vehicle_status_report_101 {
 }
 
 message Vcu_vehicle_info_response_502 {
-// Report Message
+  // Report Message
   // [] [0|16777215]
   optional int32 vehicle_softwareversion_indicati = 1;
   // [] [0|15]
@@ -316,20 +330,20 @@ message Vcu_vehicle_info_response_502 {
 
 message Aeb_diagnosis1_626 {
   // Report Message
-    // [bit] [0.0|255.0]
-    optional double aeb_softwareversion = 1;
-    // [bit] [0.0|255.0]
-    optional double aeb_hardwareversion = 2;
-  }
-  
-  message Aeb_diagresp_718 {
+  // [bit] [0.0|255.0]
+  optional double aeb_softwareversion = 1;
+  // [bit] [0.0|255.0]
+  optional double aeb_hardwareversion = 2;
+}
+
+message Aeb_diagresp_718 {
   // Report Message
-    // [bit] [0.0|1.0]
-    optional bool aeb_diagresp = 1;
-  }
-  
+  // [bit] [0.0|1.0]
+  optional bool aeb_diagresp = 1;
+}
+
 message Pas_1st_data_311 {
-// Report Message
+  // Report Message
   // phy=int*2;0xFF:no obstacle [cm] [0|510]
   optional double pasdistance4 = 1;
   // phy=int*2;0xFF:no obstacle [cm] [0|510]
@@ -347,118 +361,123 @@ message Pas_1st_data_311 {
   // [cm] [0|510]
   optional double pasdistance1 = 8;
 }
-  
-  message Pas_2nd_data_312 {
+
+message Pas_2nd_data_312 {
   // Report Message
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool pas_b1_status = 1;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool pas_b2_status = 2;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool pas_b3_status = 3;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool pas_b4_status = 4;
-    // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
-    optional double pasdistance1 = 5;
-    // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
-    optional double pasdistance2 = 6;
-    // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
-    optional double pasdistance3 = 7;
-    // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
-    optional double pasdistance4 = 8;
-  }
-  
-  message Aeb_wheelimpulse_355 {
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool pas_b1_status = 1;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool pas_b2_status = 2;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool pas_b3_status = 3;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool pas_b4_status = 4;
+  // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
+  optional double pasdistance1 = 5;
+  // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
+  optional double pasdistance2 = 6;
+  // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
+  optional double pasdistance3 = 7;
+  // phy=int*2;0xFF:no obstacle [cm] [0.0|510.0]
+  optional double pasdistance4 = 8;
+}
+
+message Aeb_wheelimpulse_355 {
   // Report Message
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1023.0]
-    optional double flimpulse = 1;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool flimpulsevalid = 2;
-    // [km/h] [0.0|1023.0]
-    optional double frimpulse = 3;
-    // [km/h] [0.0|1.0]
-    optional bool frimpulsevalid = 4;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1023.0]
-    optional double rlimpulse = 5;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool rlimpulsevalid = 6;
-    // [km/h] [0.0|1023.0]
-    optional double rrimpulse = 7;
-    // [km/h] [0.0|1.0]
-    optional bool rrimpulsevalid = 8;
-    // [] [0.0|15.0]
-    optional double alivecounter = 9;
-    // [] [0.0|255.0]
-    optional double checksum = 10;
-  }
-  
-  message Aeb_rearwheelspeed_354 {
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1023.0]
+  optional double flimpulse = 1;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool flimpulsevalid = 2;
+  // [km/h] [0.0|1023.0]
+  optional double frimpulse = 3;
+  // [km/h] [0.0|1.0]
+  optional bool frimpulsevalid = 4;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1023.0]
+  optional double rlimpulse = 5;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool rlimpulsevalid = 6;
+  // [km/h] [0.0|1023.0]
+  optional double rrimpulse = 7;
+  // [km/h] [0.0|1.0]
+  optional bool rrimpulsevalid = 8;
+  // [] [0.0|15.0]
+  optional double alivecounter = 9;
+  // [] [0.0|255.0]
+  optional double checksum = 10;
+}
+
+message Aeb_rearwheelspeed_354 {
   // Report Message
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool wheelspeed_rl_valid = 1;
-    // [km/h] [0.0|327.67]
-    optional double wheelspeed_rl = 2;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool wheelspeed_rr_valid = 3;
-    // [km/h] [0.0|327.67]
-    optional double wheelspeed_rr = 4;
-    // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
-    optional double wheelspeed_rl_direct = 5;
-    // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
-    optional double wheelspeed_rr_direct = 6;
-    // [] [0.0|15.0]
-    optional double alivecounter_rear = 7;
-    // [] [0.0|255.0]
-    optional double checksum_rear = 8;
-  }
-  
-  message Aeb_frontwheelspeed_353 {
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool wheelspeed_rl_valid = 1;
+  // [km/h] [0.0|327.67]
+  optional double wheelspeed_rl = 2;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool wheelspeed_rr_valid = 3;
+  // [km/h] [0.0|327.67]
+  optional double wheelspeed_rr = 4;
+  // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
+  optional double wheelspeed_rl_direct = 5;
+  // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
+  optional double wheelspeed_rr_direct = 6;
+  // [] [0.0|15.0]
+  optional double alivecounter_rear = 7;
+  // [] [0.0|255.0]
+  optional double checksum_rear = 8;
+}
+
+message Aeb_frontwheelspeed_353 {
   // Report Message
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool vehiclespeedvalid = 1;
-    // [Km/h] [0.0|460.69]
-    optional double vehiclespeed = 2;
-    // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
-    optional double vehiclerealdirect = 3;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool wheelspeed_fl_valid = 4;
-    // [km/h] [0.0|327.67]
-    optional double wheelspeed_fl = 5;
-    // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
-    optional bool wheelspeed_fr_valid = 6;
-    // [km/h] [0.0|327.67]
-    optional double wheelspeed_fr = 7;
-    // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
-    optional double wheelspeed_fl_direct = 8;
-    // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
-    optional double wheelspeed_fr_direct = 9;
-    // [] [0.0|15.0]
-    optional double alivecounter_front = 10;
-    // [] [0.0|255.0]
-    optional double checksum_front = 11;
-  }
-  
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool vehiclespeedvalid = 1;
+  // [Km/h] [0.0|460.69]
+  optional double vehiclespeed = 2;
+  // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
+  optional double vehiclerealdirect = 3;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool wheelspeed_fl_valid = 4;
+  // [km/h] [0.0|327.67]
+  optional double wheelspeed_fl = 5;
+  // 0x0:Invalid;0x1:Valid [bit] [0.0|1.0]
+  optional bool wheelspeed_fr_valid = 6;
+  // [km/h] [0.0|327.67]
+  optional double wheelspeed_fr = 7;
+  // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
+  optional double wheelspeed_fl_direct = 8;
+  // 0x0:Invalid;0x1:D;0x2:N;0x3:R [bit] [0.0|3.0]
+  optional double wheelspeed_fr_direct = 9;
+  // [] [0.0|15.0]
+  optional double alivecounter_front = 10;
+  // [] [0.0|255.0]
+  optional double checksum_front = 11;
+}
 
 message Neolix_edu {
-  optional Aeb_systemstate_11 aeb_systemstate_11 = 1; // report message
-  optional Vcu_vehicle_fault_response_201 vcu_vehicle_fault_response_201 = 2; // report message
-  optional Vcu_powerstatus_214 vcu_powerstatus_214 = 3; // report message
-  optional Ads_light_horn_command_310 ads_light_horn_command_310 = 4; // control message
-  optional Ads_brake_command_46 ads_brake_command_46 = 5; // control message
-  optional Vcu_brake_report_47 vcu_brake_report_47 = 6; // report message
-  optional Vcu_eps_report_57 vcu_eps_report_57 = 7; // report message
-  optional Ads_eps_command_56 ads_eps_command_56 = 8; // control message
-  optional Ads_drive_command_50 ads_drive_command_50 = 9; // control message
-  optional Vcu_drive_report_52 vcu_drive_report_52 = 10; // report message
-  optional Ads_diagnosis_628 ads_diagnosis_628 = 11; // control message
-  optional Vcu_nm_401 vcu_nm_401 = 12; // report message
-  optional Vcu_vehicle_status_report_101 vcu_vehicle_status_report_101 = 13; // report message
-  optional Vcu_vehicle_info_response_502 vcu_vehicle_info_response_502 = 14; // report message
-  optional Aeb_diagnosis1_626 aeb_diagnosis1_626 = 15; // report message
-  optional Aeb_diagresp_718 aeb_diagresp_718 = 16; // report message
-  optional Pas_1st_data_311 pas_1st_data_311 = 17; // report message
-  optional Pas_2nd_data_312 pas_2nd_data_312 = 18; // report message
-  optional Aeb_wheelimpulse_355 aeb_wheelimpulse_355 = 19; // report message
-  optional Aeb_rearwheelspeed_354 aeb_rearwheelspeed_354 = 20; // report message
-  optional Aeb_frontwheelspeed_353 aeb_frontwheelspeed_353 = 21; // report message
+  optional Aeb_systemstate_11 aeb_systemstate_11 = 1;  // report message
+  optional Vcu_vehicle_fault_response_201 vcu_vehicle_fault_response_201 =
+      2;                                                 // report message
+  optional Vcu_powerstatus_214 vcu_powerstatus_214 = 3;  // report message
+  optional Ads_light_horn_command_310 ads_light_horn_command_310 =
+      4;                                                   // control message
+  optional Ads_brake_command_46 ads_brake_command_46 = 5;  // control message
+  optional Vcu_brake_report_47 vcu_brake_report_47 = 6;    // report message
+  optional Vcu_eps_report_57 vcu_eps_report_57 = 7;        // report message
+  optional Ads_eps_command_56 ads_eps_command_56 = 8;      // control message
+  optional Ads_drive_command_50 ads_drive_command_50 = 9;  // control message
+  optional Vcu_drive_report_52 vcu_drive_report_52 = 10;   // report message
+  optional Ads_diagnosis_628 ads_diagnosis_628 = 11;       // control message
+  optional Vcu_nm_401 vcu_nm_401 = 12;                     // report message
+  optional Vcu_vehicle_status_report_101 vcu_vehicle_status_report_101 =
+      13;  // report message
+  optional Vcu_vehicle_info_response_502 vcu_vehicle_info_response_502 =
+      14;                                                   // report message
+  optional Aeb_diagnosis1_626 aeb_diagnosis1_626 = 15;      // report message
+  optional Aeb_diagresp_718 aeb_diagresp_718 = 16;          // report message
+  optional Pas_1st_data_311 pas_1st_data_311 = 17;          // report message
+  optional Pas_2nd_data_312 pas_2nd_data_312 = 18;          // report message
+  optional Aeb_wheelimpulse_355 aeb_wheelimpulse_355 = 19;  // report message
+  optional Aeb_rearwheelspeed_354 aeb_rearwheelspeed_354 =
+      20;  // report message
+  optional Aeb_frontwheelspeed_353 aeb_frontwheelspeed_353 =
+      21;  // report message
 }
