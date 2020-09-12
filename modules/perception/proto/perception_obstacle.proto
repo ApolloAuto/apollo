@@ -9,10 +9,10 @@ import "modules/common/proto/pnc_point.proto";
 import "modules/map/proto/map_lane.proto";
 
 message BBox2D {
-  optional double xmin = 1; // in pixels.
-  optional double ymin = 2; // in pixels.
-  optional double xmax = 3; // in pixels.
-  optional double ymax = 4; // in pixels.
+  optional double xmin = 1;  // in pixels.
+  optional double ymin = 2;  // in pixels.
+  optional double xmax = 3;  // in pixels.
+  optional double ymax = 4;  // in pixels.
 }
 
 message LightStatus {
@@ -30,7 +30,7 @@ message V2XInformation {
     ZOMBIES_CAR = 1;
     BLIND_ZONE = 2;
   };
-  repeated V2XType v2x_type = 1; 
+  repeated V2XType v2x_type = 1;
 }
 
 message SensorMeasurement {
@@ -48,11 +48,11 @@ message SensorMeasurement {
   optional PerceptionObstacle.Type type = 9;
   optional PerceptionObstacle.SubType sub_type = 10;
   optional double timestamp = 11;
-  optional BBox2D box = 12; // only for camera measurements
+  optional BBox2D box = 12;  // only for camera measurements
 }
 
 message Trajectory {
-  optional double probability = 1; // probability of this trajectory
+  optional double probability = 1;  // probability of this trajectory
   repeated apollo.common.TrajectoryPoint trajectory_point = 2;
 }
 
@@ -62,20 +62,20 @@ message DebugMessage {
 }
 
 message PerceptionObstacle {
-  optional int32 id = 1; // obstacle ID.
+  optional int32 id = 1;  // obstacle ID.
 
   // obstacle position in the world coordinate system.
   optional apollo.common.Point3D position = 2;
 
-  optional double theta = 3; // heading in the world coordinate system.
-  optional apollo.common.Point3D velocity = 4; // obstacle velocity.
+  optional double theta = 3;  // heading in the world coordinate system.
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
 
   // Size of obstacle bounding box.
-  optional double length = 5; // obstacle length.
-  optional double width = 6;  // obstacle width.
-  optional double height = 7; // obstacle height.
+  optional double length = 5;  // obstacle length.
+  optional double width = 6;   // obstacle width.
+  optional double height = 7;  // obstacle height.
 
-  repeated apollo.common.Point3D polygon_point = 8; // obstacle corner points.
+  repeated apollo.common.Point3D polygon_point = 8;  // obstacle corner points.
 
   // duration of an obstacle since detection in s.
   optional double tracking_time = 9;
@@ -84,29 +84,29 @@ message PerceptionObstacle {
     UNKNOWN = 0;
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
-    PEDESTRIAN = 3; // Pedestrian, usually determined by moving behavior.
-    BICYCLE = 4;    // bike, motor bike
-    VEHICLE = 5;    // Passenger car or truck.
+    PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behavior.
+    BICYCLE = 4;     // bike, motor bike
+    VEHICLE = 5;     // Passenger car or truck.
   };
-  optional Type type = 10;        // obstacle type
-  optional double timestamp = 11; // GPS time in seconds.
+  optional Type type = 10;         // obstacle type
+  optional double timestamp = 11;  // GPS time in seconds.
 
   // Just for offline debugging, will not fill this field on board.
   // Format: [x0, y0, z0, x1, y1, z1...]
-  repeated double point_cloud = 12 [ packed = true ];
+  repeated double point_cloud = 12 [packed = true];
 
-  optional double confidence = 13 [ deprecated = true ];
+  optional double confidence = 13 [deprecated = true];
   enum ConfidenceType {
     CONFIDENCE_UNKNOWN = 0;
     CONFIDENCE_CNN = 1;
     CONFIDENCE_RADAR = 2;
   };
-  optional ConfidenceType confidence_type = 14 [ deprecated = true ];
+  optional ConfidenceType confidence_type = 14 [deprecated = true];
   // trajectory of object.
-  repeated apollo.common.Point3D drops = 15 [ deprecated = true ];
+  repeated apollo.common.Point3D drops = 15 [deprecated = true];
 
   // The following fields are new added in Apollo 4.0
-  optional apollo.common.Point3D acceleration = 16; // obstacle acceleration
+  optional apollo.common.Point3D acceleration = 16;  // obstacle acceleration
 
   // a stable obstacle point in the world coordinate system
   // position defined above is the obstacle bounding box ground center
@@ -127,19 +127,19 @@ message PerceptionObstacle {
     ST_PEDESTRIAN = 10;
     ST_TRAFFICCONE = 11;
   };
-  optional SubType sub_type = 19; // obstacle sub_type
+  optional SubType sub_type = 19;  // obstacle sub_type
 
-  repeated SensorMeasurement measurements = 20; // sensor measurements
+  repeated SensorMeasurement measurements = 20;  // sensor measurements
 
   // orthogonal distance between obstacle lowest point and ground plane
-  optional double height_above_ground = 21 [ default = nan ];
+  optional double height_above_ground = 21 [default = nan];
 
   // position covariance which is a row-majored 3x3 matrix
-  repeated double position_covariance = 22 [ packed = true ];
+  repeated double position_covariance = 22 [packed = true];
   // velocity covariance which is a row-majored 3x3 matrix
-  repeated double velocity_covariance = 23 [ packed = true ];
+  repeated double velocity_covariance = 23 [packed = true];
   // acceleration covariance which is a row-majored 3x3 matrix
-  repeated double acceleration_covariance = 24 [ packed = true ];
+  repeated double acceleration_covariance = 24 [packed = true];
 
   // lights of vehicles
   optional LightStatus light_status = 25;
@@ -152,13 +152,13 @@ message PerceptionObstacle {
     V2X = 1;
   };
 
-  optional Source source = 27 [ default = HOST_VEHICLE ]; 
+  optional Source source = 27 [default = HOST_VEHICLE];
   optional V2XInformation v2x_info = 28;
 }
 
 message LaneMarker {
   optional apollo.hdmap.LaneBoundaryType.Type lane_type = 1;
-  optional double quality = 2; // range = [0,1]; 1 = the best quality
+  optional double quality = 2;  // range = [0,1]; 1 = the best quality
   optional int32 model_degree = 3;
 
   // equation X = c3 * Z^3 + c2 * Z^2 + c1 * Z + c0
@@ -184,9 +184,9 @@ message CIPVInfo {
 }
 
 message PerceptionObstacles {
-  repeated PerceptionObstacle perception_obstacle = 1; // An array of obstacles
-  optional apollo.common.Header header = 2;            // Header
-  optional apollo.common.ErrorCode error_code = 3 [ default = OK ];
+  repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
+  optional apollo.common.Header header = 2;             // Header
+  optional apollo.common.ErrorCode error_code = 3 [default = OK];
   optional LaneMarkers lane_marker = 4;
-  optional CIPVInfo cipv_info = 5; // Closest In Path Vehicle (CIPV)
+  optional CIPVInfo cipv_info = 5;  // Closest In Path Vehicle (CIPV)
 }

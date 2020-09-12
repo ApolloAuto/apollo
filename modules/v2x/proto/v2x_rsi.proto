@@ -17,5 +17,5 @@ message RsiMsg {
   optional string description = 6;
   optional int32 rsi_type = 7;
   optional double radius = 8;
-  optional int32 priority = 9 ;
+  optional int32 priority = 9;
 }

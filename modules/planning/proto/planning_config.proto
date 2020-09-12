@@ -62,14 +62,15 @@ message TaskConfig {
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 14;
     STBoundsDeciderConfig st_bounds_decider_config = 15;
     // optimizers
-    OpenSpaceTrajectoryPartitionConfig
-        open_space_trajectory_partition_config = 16;
-    OpenSpaceTrajectoryProviderConfig
-        open_space_trajectory_provider_config = 17;
+    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config =
+        16;
+    OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config =
+        17;
     PiecewiseJerkNonlinearSpeedOptimizerConfig
         piecewise_jerk_nonlinear_speed_optimizer_config = 18;
     PiecewiseJerkPathOptimizerConfig piecewise_jerk_path_optimizer_config = 19;
-    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config = 20;
+    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config =
+        20;
     SpeedHeuristicOptimizerConfig speed_heuristic_optimizer_config = 21;
     // other tasks
     LearningModelInferenceTaskConfig learning_model_inference_task_config = 22;
@@ -357,7 +358,7 @@ message TopicConfig {
   optional string routing_response_topic = 9;
   optional string story_telling_topic = 10;
   optional string traffic_light_detection_topic = 11;
-  optional string planning_learning_data_topic =12;
+  optional string planning_learning_data_topic = 12;
 }
 
 message PlanningConfig {

@@ -153,7 +153,7 @@ message PredictionObstacleFeature {
 }
 
 message ObstacleFeature {
-  optional int32 id = 1;  // obstacle ID.
+  optional int32 id = 1;       // obstacle ID.
   optional double length = 2;  // obstacle length.
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
