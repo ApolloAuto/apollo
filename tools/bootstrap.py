@@ -185,8 +185,8 @@ def setup_common_dirs(environ_cp):
     if 'APOLLO_CACHE_DIR' in environ_cp:
         cache_dir = environ_cp['APOLLO_CACHE_DIR']
 
-    if 'APOLLO_BAZEL_DISTDIR' in environ_cp:
-        dist_dir = environ_cp['APOLLO_BAZEL_DISTDIR']
+    if 'APOLLO_BAZEL_DIST_DIR' in environ_cp:
+        dist_dir = environ_cp['APOLLO_BAZEL_DIST_DIR']
 
     write_to_bazelrc('startup --output_user_root="{}/bazel"'.format(cache_dir))
     write_to_bazelrc('common --distdir="{}"'.format(dist_dir))
