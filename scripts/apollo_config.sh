@@ -15,52 +15,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/cyber/setup.bash"
 
-set -e
-
 BAZEL_CONF="${TOP_DIR}/.apollo.bazelrc"
 
-ARCH="$(uname -m)"
-
-function config_noninteractive() {
-  local output_dir="${APOLLO_CACHE_DIR}/bazel"
-
-  > "${BAZEL_CONF}"
-  echo "startup --output_user_root=\"${output_dir}\"" >> "${BAZEL_CONF}"
-  echo "common --distdir=\"${APOLLO_BAZEL_DISTDIR}\"" >> "${BAZEL_CONF}"
-  echo >> "${BAZEL_CONF}"
-
-  echo -e "build --action_env GCC_HOST_COMPILER_PATH=\"/usr/bin/${ARCH}-linux-gnu-gcc-7\"" >> "${BAZEL_CONF}"
-  cat "${TOP_DIR}/tools/apollo.bazelrc.sample" >> "${BAZEL_CONF}"
-}
-
-function config_interactive() {
+function run_bootstrap() {
   py3_bin="$(which python3 || true)"
   # Set all env variables
   "${py3_bin}" "${TOP_DIR}/tools/bootstrap.py" "$@"
 }
 
-function config() {
-  if [ $# -eq 0 ]; then
-    config_noninteractive
-  else
-    local mode="$1"
-    shift
-    if [ "${mode}" == "--clean" ]; then
-      rm -f "${BAZEL_CONF}"
-    elif [[ "${mode}" == "--interactive" || "${mode}" == "-i" ]]; then
-      config_interactive "$@"
-    else
-      config_noninteractive
-    fi
-  fi
-}
-
 function main() {
-  config "$@"
+  local mycfg="$(basename ${BAZEL_CONF})"
+  if [[ "$#" -eq 0 ]]; then
+    run_bootstrap --help
+    exit 1
+  fi
+
+  case "$1" in
+    --clean)
+      rm -f "${BAZEL_CONF}"
+      exit 0
+      ;;
+    -h | --help)
+      run_bootstrap --help
+      exit 0
+      ;;
+    -i | --interactive)
+      info "Configure ${mycfg} in interactive mode"
+      run_bootstrap --interactive
+      ok "Successfully configured ${mycfg} in interactive mode."
+      exit 0
+      ;;
+    --noninteractive)
+      info "Configure ${mycfg} in non-interactive mode"
+      run_bootstrap --interactive false
+      ok "Successfully configured ${mycfg} in non-interactive mode."
+      exit 0
+      ;;
+    *)
+      run_bootstrap --help
+      exit 0
+      ;;
+  esac
 }
 
 main "$@"
