@@ -195,8 +195,7 @@ function main() {
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
             ;;
         lint)
-            # FIXME(all): apollo_lint.sh "$@" when bash/python scripts are ready.
-            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" "$@"
             ;;
         clean)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "$@"
