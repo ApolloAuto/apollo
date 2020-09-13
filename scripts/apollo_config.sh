@@ -18,13 +18,6 @@
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/cyber/setup.bash"
-# STAGE="${STAGE:-dev}"
-: ${STAGE:=dev}
-
-IFS='' read -r -d '' STARTUP_TXT << EOF
-startup --output_user_root="${APOLLO_CACHE_DIR}/bazel"
-common --distdir="${APOLLO_BAZEL_DISTDIR}"
-EOF
 
 set -e
 
@@ -33,23 +26,24 @@ BAZEL_CONF="${TOP_DIR}/.apollo.bazelrc"
 ARCH="$(uname -m)"
 
 function config_noninteractive() {
-  echo "${STARTUP_TXT}" > "${BAZEL_CONF}"
+  local output_dir="${APOLLO_CACHE_DIR}/bazel"
+
+  > "${BAZEL_CONF}"
+  echo "startup --output_user_root=\"${output_dir}\"" >> "${BAZEL_CONF}"
+  echo "common --distdir=\"${APOLLO_BAZEL_DISTDIR}\"" >> "${BAZEL_CONF}"
+  echo >> "${BAZEL_CONF}"
+
   echo -e "build --action_env GCC_HOST_COMPILER_PATH=\"/usr/bin/${ARCH}-linux-gnu-gcc-7\"" >> "${BAZEL_CONF}"
   cat "${TOP_DIR}/tools/apollo.bazelrc.sample" >> "${BAZEL_CONF}"
 }
 
 function config_interactive() {
-  if [ -z "$PYTHON_BIN_PATH" ]; then
-    PYTHON_BIN_PATH=$(which python3 || true)
-  fi
-
+  py3_bin="$(which python3 || true)"
   # Set all env variables
-  "$PYTHON_BIN_PATH" "${TOP_DIR}/tools/bootstrap.py" "$@"
-  echo "${STARTUP_TXT}" >> "${BAZEL_CONF}"
+  "${py3_bin}" "${TOP_DIR}/tools/bootstrap.py" "$@"
 }
 
 function config() {
-  local stage="${STAGE}"
   if [ $# -eq 0 ]; then
     config_noninteractive
   else
