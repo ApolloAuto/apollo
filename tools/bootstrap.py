@@ -49,6 +49,7 @@ _DEFAULT_CUDA_VERSION = '10'
 _DEFAULT_CUDNN_VERSION = '7'
 _DEFAULT_TENSORRT_VERSION = '7'
 _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.7,5.2,6.0,6.1,7.0,7.2,7.5'
+_DEFAULT_PYTHON_LIB_PATH = '/usr/lib/python3/dist-packages'
 
 _DEFAULT_PROMPT_ASK_ATTEMPTS = 3
 
@@ -58,6 +59,8 @@ _APOLLO_BAZELRC = '.apollo.bazelrc'
 _APOLLO_CURRENT_BAZEL_VERSION = None
 _APOLLO_MIN_BAZEL_VERSION = '2.0.0'
 _APOLLO_INSIDE_DOCKER = True
+
+_INTERACTIVE_MODE = True
 
 
 class UserInputError(Exception):
@@ -90,9 +93,25 @@ def get_input(question):
     return answer
 
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def write_to_bazelrc(line):
     with open(_APOLLO_BAZELRC, 'a') as f:
         f.write(line + '\n')
+
+
+def write_blank_line_to_bazelrc():
+    with open(_APOLLO_BAZELRC, 'a') as f:
+        f.write('\n')
 
 
 def write_action_env_to_bazelrc(var_name, var):
@@ -159,16 +178,15 @@ def get_python_major_version(python_bin_path):
 
 def setup_common_dirs(environ_cp):
     """Setup --distdir and --output_user_root directories"""
-    default_cache_dir = os.path.join(_APOLLO_ROOT_DIR, '.cache')
-    default_dist_dir = os.path.join(_APOLLO_ROOT_DIR, '.cache/distdir')
-    cache_dir = environ_cp.get('APOLLO_CACHE_DIR')
-    dist_dir = environ_cp.get('APOLLO_BAZEL_DISTDIR')
+    cache_dir = os.path.join(_APOLLO_ROOT_DIR, '.cache')
+    dist_dir = os.path.join(_APOLLO_ROOT_DIR, '.cache/distdir')
 
     # if cyber/setup.bash not sourced
-    if len(cache_dir) == 0:
-        cache_dir = default_cache_dir
-    if len(dist_dir) == 0:
-        dist_dir = default_dist_dir
+    if 'APOLLO_CACHE_DIR' in environ_cp:
+        cache_dir = environ_cp['APOLLO_CACHE_DIR']
+
+    if 'APOLLO_BAZEL_DISTDIR' in environ_cp:
+        dist_dir = environ_cp['APOLLO_BAZEL_DISTDIR']
 
     write_to_bazelrc('startup --output_user_root="{}/bazel"'.format(cache_dir))
     write_to_bazelrc('common --distdir="{}"'.format(dist_dir))
@@ -177,6 +195,58 @@ def setup_common_dirs(environ_cp):
 
 def setup_python(environ_cp):
     """Setup python related env variables."""
+    if not _INTERACTIVE_MODE:
+        setup_python_non_interactively(environ_cp)
+    else:
+        setup_python_interactively(environ_cp)
+
+
+def setup_python_non_interactively(environ_cp):
+    """Setup python related env variables non-interactively."""
+    # Get PYTHON_BIN_PATH, default is the current running python.
+    python_bin_path = sys.executable
+    if not os.path.exists(python_bin_path):
+        print('Invalid python path: {} cannot be found.'.format(
+            python_bin_path))
+        sys.exit(1)
+    if not os.path.isfile(python_bin_path) or not os.access(
+            python_bin_path, os.X_OK):
+        print('{} is not executable.'.format(python_bin_path))
+        sys.exit(1)
+    python_major_version = get_python_major_version(python_bin_path)
+    if python_major_version != '3':
+        print('Python 2 was Retired on April 2020. Use Python 3 instead.')
+        sys.exit(1)
+
+    environ_cp['PYTHON_BIN_PATH'] = python_bin_path
+    # Get PYTHON_LIB_PATH
+    python_lib_path = environ_cp.get('PYTHON_LIB_PATH')
+    if not python_lib_path:
+        python_lib_paths = get_python_path(environ_cp, python_bin_path)
+        print('Found possible Python library paths:\n  %s' %
+              '\n  '.join(python_lib_paths))
+        if _DEFAULT_PYTHON_LIB_PATH in python_lib_paths:
+            default_python_lib_path = _DEFAULT_PYTHON_LIB_PATH
+        else:
+            default_python_lib_path = python_lib_paths[0]
+        python_lib_path = default_python_lib_path
+
+    # Set-up env variables used by python_configure.bzl
+    write_action_env_to_bazelrc('PYTHON_BIN_PATH', python_bin_path)
+    write_action_env_to_bazelrc('PYTHON_LIB_PATH', python_lib_path)
+    write_to_bazelrc('build --python_path=\"{}\"'.format(python_bin_path))
+
+    # If choosen python_lib_path is from a path specified in the PYTHONPATH
+    # variable, need to tell bazel to include PYTHONPATH
+    if environ_cp.get('PYTHONPATH'):
+        python_paths = environ_cp.get('PYTHONPATH').split(':')
+        if python_lib_path in python_paths:
+            write_action_env_to_bazelrc('PYTHONPATH',
+                                        environ_cp.get('PYTHONPATH'))
+
+
+def setup_python_interactively(environ_cp):
+    """Setup python related env variables interactively."""
     # Get PYTHON_BIN_PATH, default is the current running python.
     default_python_bin_path = sys.executable
     ask_python_bin_path = (
@@ -198,6 +268,11 @@ def setup_python(environ_cp):
                 python_bin_path))
         environ_cp['PYTHON_BIN_PATH'] = ''
 
+    python_major_version = get_python_major_version(python_bin_path)
+    if python_major_version != '3':
+        print('Python 2 was Retired on April 2020. Use Python 3 instead.')
+        sys.exit(1)
+
     # Get PYTHON_LIB_PATH
     python_lib_path = environ_cp.get('PYTHON_LIB_PATH')
     if not python_lib_path:
@@ -211,11 +286,6 @@ def setup_python(environ_cp):
         if not python_lib_path:
             python_lib_path = default_python_lib_path
         environ_cp['PYTHON_LIB_PATH'] = python_lib_path
-
-    python_major_version = get_python_major_version(python_bin_path)
-    if python_major_version != '3':
-        print('Python 2 was Retired on April 2020. Use Python 3 instead.')
-        sys.exit(1)
 
     # Set-up env variables used by python_configure.bzl
     write_action_env_to_bazelrc('PYTHON_BIN_PATH', python_bin_path)
@@ -485,15 +555,20 @@ def set_gcc_host_compiler_path(environ_cp):
         # os.readlink is only available in linux
         default_gcc_host_compiler_path = os.path.realpath(cuda_bin_symlink)
 
-    gcc_host_compiler_path = prompt_loop_or_load_from_env(
-        environ_cp,
-        var_name='GCC_HOST_COMPILER_PATH',
-        var_default=default_gcc_host_compiler_path,
-        ask_for_var='Please specify which gcc should be used by nvcc as the host compiler.',
-        check_success=os.path.exists,
-        resolve_symlinks=True,
-        error_msg='Invalid gcc path. %s cannot be found.',
-    )
+    if not _INTERACTIVE_MODE:
+        gcc_host_compiler_path = default_gcc_host_compiler_path
+        if os.path.islink(gcc_host_compiler_path):
+            gcc_host_compiler_path = os.path.realpath(gcc_host_compiler_path)
+    else:
+        gcc_host_compiler_path = prompt_loop_or_load_from_env(
+            environ_cp,
+            var_name='GCC_HOST_COMPILER_PATH',
+            var_default=default_gcc_host_compiler_path,
+            ask_for_var='Please specify which gcc should be used by nvcc as the host compiler.',
+            check_success=os.path.exists,
+            resolve_symlinks=True,
+            error_msg='Invalid gcc path. %s cannot be found.',
+        )
 
     write_action_env_to_bazelrc('GCC_HOST_COMPILER_PATH',
                                 gcc_host_compiler_path)
@@ -638,6 +713,19 @@ def get_native_cuda_compute_capabilities(environ_cp):
 
 def set_cuda_compute_capabilities(environ_cp):
     """Set TF_CUDA_COMPUTE_CAPABILITIES."""
+    if not _INTERACTIVE_MODE:
+        native_cuda_compute_capabilities = get_native_cuda_compute_capabilities(
+            environ_cp)
+        if native_cuda_compute_capabilities:
+            tf_cuda_compute_capabilities = native_cuda_compute_capabilities
+        else:
+            tf_cuda_compute_capabilities = _DEFAULT_CUDA_COMPUTE_CAPABILITIES
+        # Set TF_CUDA_COMPUTE_CAPABILITIES
+        environ_cp['TF_CUDA_COMPUTE_CAPABILITIES'] = tf_cuda_compute_capabilities
+        write_action_env_to_bazelrc('TF_CUDA_COMPUTE_CAPABILITIES',
+                                    tf_cuda_compute_capabilities)
+        return
+
     while True:
         native_cuda_compute_capabilities = get_native_cuda_compute_capabilities(
             environ_cp)
@@ -656,7 +744,7 @@ def set_cuda_compute_capabilities(environ_cp):
             'capability significantly increases your '
             'build time and binary size, and that '
             'we only supports compute '
-            'capabilities >= 5.0 [Default is: %s]: ' %
+            'capabilities >= 3.7 [Default is: %s]: ' %
             default_cuda_compute_capabilities)
         tf_cuda_compute_capabilities = get_from_env_or_user_or_default(
             environ_cp, 'TF_CUDA_COMPUTE_CAPABILITIES',
@@ -709,9 +797,11 @@ def validate_cuda_config(environ_cp):
     if environ_cp.get('TF_NCCL_VERSION', None):
         cuda_libraries.append('nccl')
 
-    # FIXME(all): abs path for find_cuda_config.py
+    find_cuda_script = os.path.join(
+        _APOLLO_ROOT_DIR,
+        'third_party/gpus/find_cuda_config.py')
     proc = subprocess.Popen(
-        [environ_cp['PYTHON_BIN_PATH'], 'third_party/gpus/find_cuda_config.py']
+        [environ_cp['PYTHON_BIN_PATH'], find_cuda_script]
         + cuda_libraries,
         stdout=subprocess.PIPE,
         env=environ_cp)
@@ -749,73 +839,7 @@ def validate_cuda_config(environ_cp):
     return True
 
 
-def set_other_build_config():
-    build_text = """
-# This config refers to building with CUDA available.
-build:using_cuda --define=using_cuda=true
-build:using_cuda --action_env TF_NEED_CUDA=1
-build:using_cuda --crosstool_top=@local_config_cuda//crosstool:toolchain
-
-# This config refers to building CUDA with nvcc.
-build:cuda --config=using_cuda
-build:cuda --define=using_cuda_nvcc=true
-
-build:tensorrt --action_env TF_NEED_TENSORRT=1
-"""
-    with open(_APOLLO_BAZELRC, 'a') as f:
-        f.write(build_text)
-
-    write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
-
-
-def main():
-    if not is_linux():
-        raise ValueError('Currently, only Linux is support.')
-
-    global _APOLLO_ROOT_DIR
-    global _APOLLO_BAZELRC
-    global _APOLLO_CURRENT_BAZEL_VERSION
-    global _APOLLO_INSIDE_DOCKER
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--output_file',
-        type=str,
-        default='.apollo.bazelrc',
-        help='Path of the bazelrc file to write to (relative to APOLLO_ROOT_DIR)')
-
-    args = parser.parse_args()
-
-    _APOLLO_ROOT_DIR = default_root_dir()
-    _APOLLO_BAZELRC = os.path.join(_APOLLO_ROOT_DIR, args.output_file)
-    _APOLLO_INSIDE_DOCKER = inside_docker()
-
-    # Make a copy of os.environ to be clear when functions and getting and setting
-    # environment variables.
-    environ_cp = dict(os.environ)
-
-    try:
-        current_bazel_version = check_bazel_version(_APOLLO_MIN_BAZEL_VERSION)
-    except subprocess.CalledProcessError as e:
-        print('Error checking bazel version: ',
-              e.output.decode('UTF-8').strip())
-        raise e
-
-    _APOLLO_CURRENT_BAZEL_VERSION = convert_version_to_int(
-        current_bazel_version)
-
-    reset_apollo_bazelrc()
-    setup_common_dirs(environ_cp)
-    setup_python(environ_cp)
-
-    environ_cp['TF_NEED_CUDA'] = '1'
-    environ_cp['TF_NEED_TENSORRT'] = '1'
-
-    # build:gpu --config=using_cuda
-    write_to_bazelrc('build:gpu --config=cuda')
-    write_to_bazelrc('build:gpu --config=tensorrt')
-    write_to_bazelrc('')
-
+def setup_cuda_family_config_interactively(environ_cp):
     environ_save = dict(environ_cp)
     for _ in range(_DEFAULT_PROMPT_ASK_ATTEMPTS):
 
@@ -844,6 +868,7 @@ def main():
         # validated.
         environ_cp = dict(environ_save)
 
+        # TODO(build): revisit these settings
         set_cuda_version(environ_cp)
         set_cudnn_version(environ_cp)
         set_tensorrt_version(environ_cp)
@@ -856,6 +881,117 @@ def main():
             'Invalid CUDA setting were provided %d '
             'times in a row. Assuming to be a scripting mistake.' %
             _DEFAULT_PROMPT_ASK_ATTEMPTS)
+
+
+def setup_cuda_family_config_non_interactively(environ_cp):
+    if not validate_cuda_config(environ_cp):
+        print("Cannot validate_cuda_config non-interactively. Aborting ...")
+        sys.exit(1)
+
+    cuda_env_names = [
+        'TF_CUDA_VERSION',
+        'TF_CUBLAS_VERSION',
+        'TF_CUDNN_VERSION',
+        'TF_TENSORRT_VERSION',
+        'TF_NCCL_VERSION',
+        'TF_CUDA_PATHS',
+        # Items below are for backwards compatibility
+        'CUDA_TOOLKIT_PATH',
+        'CUDNN_INSTALL_PATH',
+        'NCCL_INSTALL_PATH',
+        'NCCL_HDR_PATH',
+        'TENSORRT_INSTALL_PATH'
+    ]
+    for name in cuda_env_names:
+        if name in environ_cp:
+            write_action_env_to_bazelrc(name, environ_cp[name])
+
+
+def setup_cuda_family_config(environ_cp):
+    """Setup CUDA/cuDNN/TensorRT/NCCL action env."""
+    if not _INTERACTIVE_MODE:
+        setup_cuda_family_config_non_interactively(environ_cp)
+    else:
+        setup_cuda_family_config_interactively(environ_cp)
+
+
+def set_other_build_config():
+    build_text = """
+# This config refers to building with CUDA available.
+build:using_cuda --define=using_cuda=true
+build:using_cuda --action_env TF_NEED_CUDA=1
+build:using_cuda --crosstool_top=@local_config_cuda//crosstool:toolchain
+
+# This config refers to building CUDA with nvcc.
+build:cuda --config=using_cuda
+build:cuda --define=using_cuda_nvcc=true
+
+build:tensorrt --action_env TF_NEED_TENSORRT=1
+"""
+    with open(_APOLLO_BAZELRC, 'a') as f:
+        f.write(build_text)
+
+    write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
+
+
+def main():
+    if not is_linux():
+        raise ValueError('Currently, only Linux is support.')
+
+    global _APOLLO_ROOT_DIR
+    global _APOLLO_BAZELRC
+    global _APOLLO_CURRENT_BAZEL_VERSION
+    global _APOLLO_INSIDE_DOCKER
+    global _INTERACTIVE_MODE
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--output_file',
+        type=str,
+        default='.apollo.bazelrc',
+        help='Path of the bazelrc file to write to (relative to APOLLO_ROOT_DIR)')
+
+    parser.add_argument('--interactive', type=str2bool, nargs='?',
+                        const=True, default=True,
+                        help='Run this script interactively')
+
+    args = parser.parse_args()
+
+    _APOLLO_ROOT_DIR = default_root_dir()
+    _APOLLO_BAZELRC = os.path.join(_APOLLO_ROOT_DIR, args.output_file)
+    _APOLLO_INSIDE_DOCKER = inside_docker()
+
+    _INTERACTIVE_MODE = args.interactive
+    print("== Configure {} {}interactively ==".format(args.output_file,
+                                                      "" if _INTERACTIVE_MODE else "non-"))
+
+    # Make a copy of os.environ to be clear when functions and getting and setting
+    # environment variables.
+    environ_cp = dict(os.environ)
+
+    try:
+        current_bazel_version = check_bazel_version(_APOLLO_MIN_BAZEL_VERSION)
+    except subprocess.CalledProcessError as e:
+        print('Error checking bazel version: ',
+              e.output.decode('UTF-8').strip())
+        raise e
+
+    _APOLLO_CURRENT_BAZEL_VERSION = convert_version_to_int(
+        current_bazel_version)
+
+    reset_apollo_bazelrc()
+    setup_common_dirs(environ_cp)
+    setup_python(environ_cp)
+
+    environ_cp['TF_NEED_CUDA'] = '1'
+    environ_cp['TF_NEED_TENSORRT'] = '1'
+
+    # build:gpu --config=using_cuda
+    write_to_bazelrc('build:gpu --config=cuda')
+    write_to_bazelrc('build:gpu --config=tensorrt')
+    write_blank_line_to_bazelrc()
+
+    setup_cuda_family_config(environ_cp)
 
     set_cuda_compute_capabilities(environ_cp)
     if not _APOLLO_INSIDE_DOCKER and 'LD_LIBRARY_PATH' in environ_cp:
