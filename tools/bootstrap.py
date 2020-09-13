@@ -962,8 +962,6 @@ def main():
     _APOLLO_INSIDE_DOCKER = inside_docker()
 
     _INTERACTIVE_MODE = args.interactive
-    print("== Configure {} {}interactively ==".format(args.output_file,
-                                                      "" if _INTERACTIVE_MODE else "non-"))
 
     # Make a copy of os.environ to be clear when functions and getting and setting
     # environment variables.
