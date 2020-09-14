@@ -162,7 +162,7 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
 
 * [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
 
-* [Build and Release using Docker](docs/howto/how_to_build_and_release.md) - This step is required
+* [Build with Docker](docs/howto/how_to_build_and_possible_error.md) - This step is required
 
 * [Launch and Run Apollo](docs/howto/how_to_launch_and_run_apollo.md)
 
