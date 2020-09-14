@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/inference/libtorch/torch_det_net.h"
+#include "modules/perception/inference/libtorch/torch_det.h"
 
 #include "cyber/common/log.h"
 
@@ -24,11 +24,11 @@ namespace inference {
 
 using apollo::perception::base::Blob;
 
-TorchDetNet::TorchDetNet(const std::string &net_file,
+TorchDet::TorchDet(const std::string &net_file,
       const std::string &model_file, const std::vector<std::string> &outputs)
     : net_file_(net_file), model_file_(model_file), output_names_(outputs) {}
 
-bool TorchDetNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
+bool TorchDet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   if (gpu_id_ >= 0) {
     device_type_ = torch::kCUDA;
     device_id_ = gpu_id_;
@@ -55,7 +55,7 @@ bool TorchDetNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   return true;
 }
 
-TorchDetNet::TorchDetNet(const std::string &net_file,
+TorchDet::TorchDet(const std::string &net_file,
                          const std::string &model_file,
                          const std::vector<std::string> &outputs,
                          const std::vector<std::string> &inputs)
@@ -64,7 +64,7 @@ TorchDetNet::TorchDetNet(const std::string &net_file,
       output_names_(outputs),
       input_names_(inputs) {}
 
-std::shared_ptr<Blob<float>> TorchDetNet::get_blob(
+std::shared_ptr<Blob<float>> TorchDet::get_blob(
     const std::string &name) {
   auto iter = blobs_.find(name);
   if (iter == blobs_.end()) {
@@ -73,7 +73,7 @@ std::shared_ptr<Blob<float>> TorchDetNet::get_blob(
   return iter->second;
 }
 
-void TorchDetNet::Infer() {
+void TorchDet::Infer() {
   torch::Device device(device_type_, device_id_);
   auto blob = blobs_[input_names_[0]];
   auto input_param = blobs_[input_names_[1]];

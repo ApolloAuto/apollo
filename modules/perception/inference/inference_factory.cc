@@ -16,8 +16,8 @@
 
 #include "modules/perception/inference/inference_factory.h"
 
+#include "modules/perception/inference/libtorch/torch_det.h"
 #include "modules/perception/inference/libtorch/torch_net.h"
-#include "modules/perception/inference/libtorch/torch_det_net.h"
 
 namespace apollo {
 namespace perception {
@@ -31,8 +31,8 @@ Inference *CreateInferenceByName(const std::string &name,
                                  const std::string &model_root) {
   if (name == "TorchNet") {
     return new TorchNet(proto_file, weight_file, outputs, inputs);
-  } else if (name == "TorchDetNet") {
-    return new TorchDetNet(proto_file, weight_file, outputs, inputs);
+  } else if (name == "TorchDet") {
+    return new TorchDet(proto_file, weight_file, outputs, inputs);
   }
   return nullptr;
 }
