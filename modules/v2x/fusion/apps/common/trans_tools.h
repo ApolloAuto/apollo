@@ -28,38 +28,38 @@ namespace apollo {
 namespace v2x {
 namespace ft {
 
-base::Object PbToObject(const PerceptionObstacle &obstacle,
+base::Object Pb2Object(const PerceptionObstacle &obstacle,
                         const std::string &frame_id);
-void PbToObject(const PerceptionObstacle &obstacle, base::Object *object,
+void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
                 const std::string &frame_id, double timestamp_object = 0.0);
 
-void V2xPbToObject(const V2XObstacle &obstacle, base::Object *object,
+void V2xPb2Object(const V2XObstacle &obstacle, base::Object *object,
                    const std::string &frame_id, double timestamp_object);
 
-void CarstatusPbToObject(const LocalizationEstimate &carstatus,
+void CarstatusPb2Object(const LocalizationEstimate &carstatus,
                          base::Object *object, const std::string &frame_id);
 
-double PbsToObjects(const PerceptionObstacles &obstacles,
+double Pbs2Objects(const PerceptionObstacles &obstacles,
                     std::vector<base::Object> *objects,
                     std::string frame_id = "");
 
-double V2xPbsToObjects(const V2XObstacles &obstacles,
+double V2xPbs2Objects(const V2XObstacles &obstacles,
                        std::vector<base::Object> *objects,
                        std::string frame_id);
 
-double CarstatusPbToObjects(const LocalizationEstimate &carstatus,
+double CarstatusPb2Objects(const LocalizationEstimate &carstatus,
                             std::vector<base::Object> *objects,
                             std::string frame_id);
 
-PerceptionObstacle ObjectToPb(const base::Object &object);
+PerceptionObstacle Object2Pb(const base::Object &object);
 void FillObjectPolygonFromBBox3D(PerceptionObstacle *object_ptr);
-void ObjectToPb(const base::Object &object, PerceptionObstacle *obstacle);
+void Object2Pb(const base::Object &object, PerceptionObstacle *obstacle);
 
-void ObjectToV2xPb(const base::Object &object, V2XObstacle *obstacle);
-void ObjectsToPbs(const std::vector<base::Object> &objects,
+void Object2V2xPb(const base::Object &object, V2XObstacle *obstacle);
+void Objects2Pbs(const std::vector<base::Object> &objects,
                   std::shared_ptr<PerceptionObstacles> obstacles);
 
-void ObjectsToV2xPbs(const std::vector<base::Object> &objects,
+void Objects2V2xPbs(const std::vector<base::Object> &objects,
                      std::shared_ptr<V2XObstacles> obstacles);
 
 }  // namespace ft

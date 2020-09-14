@@ -23,7 +23,7 @@ namespace apollo {
 namespace v2x {
 namespace ft {
 
-void PbToObject(const PerceptionObstacle &obstacle, base::Object *object,
+void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
                 const std::string &frame_id, double timestamp_object) {
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
@@ -118,10 +118,10 @@ void PbToObject(const PerceptionObstacle &obstacle, base::Object *object,
   object->polygon = polygon_info3d;
 }
 
-void V2xPbToObject(const apollo::v2x::V2XObstacle &obstacle,
+void V2xPb2Object(const apollo::v2x::V2XObstacle &obstacle,
                    base::Object *object, const std::string &frame_id,
                    double timestamp_object) {
-  PbToObject(obstacle.perception_obstacle(), object, frame_id,
+  Pb2Object(obstacle.perception_obstacle(), object, frame_id,
              timestamp_object);
   if (obstacle.has_v2x_info() && obstacle.v2x_info().v2x_type_size() > 0 &&
       obstacle.v2x_info().v2x_type(0) ==
@@ -130,7 +130,7 @@ void V2xPbToObject(const apollo::v2x::V2XObstacle &obstacle,
   }
 }
 
-base::Object PbToObject(const PerceptionObstacle &obstacle,
+base::Object Pb2Object(const PerceptionObstacle &obstacle,
                         const std::string &frame_id) {
   base::Object object;
   Eigen::Vector3d value;
@@ -205,7 +205,7 @@ base::Object PbToObject(const PerceptionObstacle &obstacle,
   return object;
 }
 
-PerceptionObstacle ObjectToPb(const base::Object &object) {
+PerceptionObstacle Object2Pb(const base::Object &object) {
   PerceptionObstacle obstacle;
   // times
   obstacle.set_timestamp(object.timestamp);
@@ -314,7 +314,7 @@ void FillObjectPolygonFromBBox3D(PerceptionObstacle *object_ptr) {
   }
 }
 
-void ObjectToPb(const base::Object &object, PerceptionObstacle *obstacle) {
+void Object2Pb(const base::Object &object, PerceptionObstacle *obstacle) {
   // times
   obstacle->set_timestamp(object.timestamp);
   // id
@@ -400,13 +400,13 @@ void ObjectToPb(const base::Object &object, PerceptionObstacle *obstacle) {
   }
 }
 
-void ObjectToV2xPb(const base::Object &object, V2XObstacle *obstacle) {
+void Object2V2xPb(const base::Object &object, V2XObstacle *obstacle) {
   PerceptionObstacle perception_obstacle;
-  ObjectToPb(object, &perception_obstacle);
+  Object2Pb(object, &perception_obstacle);
   obstacle->mutable_perception_obstacle()->CopyFrom(perception_obstacle);
 }
 
-double PbsToObjects(const PerceptionObstacles &obstacles,
+double Pbs2Objects(const PerceptionObstacles &obstacles,
                     std::vector<base::Object> *objects, std::string frame_id) {
   double timestamp = std::numeric_limits<double>::max();
   objects->clear();
@@ -428,7 +428,7 @@ double PbsToObjects(const PerceptionObstacles &obstacles,
   }
   for (int j = 0; j < obstacles.perception_obstacle_size(); ++j) {
     base::Object object;
-    PbToObject(obstacles.perception_obstacle(j), &object, frame_id,
+    Pb2Object(obstacles.perception_obstacle(j), &object, frame_id,
                timestamp_object);
     objects->push_back(object);
     if (timestamp > object.timestamp) {
@@ -439,7 +439,7 @@ double PbsToObjects(const PerceptionObstacles &obstacles,
   return timestamp;
 }
 
-void CarstatusPbToObject(const LocalizationEstimate &carstatus,
+void CarstatusPb2Object(const LocalizationEstimate &carstatus,
                          base::Object *object, const std::string &frame_id) {
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
@@ -467,13 +467,13 @@ void CarstatusPbToObject(const LocalizationEstimate &carstatus,
   object->timestamp = carstatus.header().timestamp_sec();
 }
 
-double CarstatusPbToObjects(const LocalizationEstimate &carstatus,
+double CarstatusPb2Objects(const LocalizationEstimate &carstatus,
                             std::vector<base::Object> *objects,
                             std::string frame_id) {
   double timestamp = std::numeric_limits<double>::max();
   objects->clear();
   base::Object object;
-  CarstatusPbToObject(carstatus, &object, frame_id);
+  CarstatusPb2Object(carstatus, &object, frame_id);
   objects->push_back(object);
   if (timestamp > carstatus.header().timestamp_sec()) {
     timestamp = carstatus.header().timestamp_sec();
@@ -481,7 +481,7 @@ double CarstatusPbToObjects(const LocalizationEstimate &carstatus,
   return timestamp;
 }
 
-double V2xPbsToObjects(const V2XObstacles &obstacles,
+double V2xPbs2Objects(const V2XObstacles &obstacles,
                        std::vector<base::Object> *objects,
                        std::string frame_id) {
   double timestamp = std::numeric_limits<double>::max();
@@ -501,7 +501,7 @@ double V2xPbsToObjects(const V2XObstacles &obstacles,
   }
   for (int j = 0; j < obstacles.v2x_obstacle_size(); ++j) {
     base::Object object;
-    V2xPbToObject(obstacles.v2x_obstacle(j), &object, frame_id,
+    V2xPb2Object(obstacles.v2x_obstacle(j), &object, frame_id,
                   timestamp_object);
     objects->push_back(object);
     if (timestamp > object.timestamp) {
@@ -512,7 +512,7 @@ double V2xPbsToObjects(const V2XObstacles &obstacles,
   return timestamp;
 }
 
-void ObjectsToPbs(const std::vector<base::Object> &objects,
+void Objects2Pbs(const std::vector<base::Object> &objects,
                   std::shared_ptr<PerceptionObstacles> obstacles) {
   obstacles->mutable_perception_obstacle()->Clear();
   if (objects.size() < 1) {
@@ -521,12 +521,12 @@ void ObjectsToPbs(const std::vector<base::Object> &objects,
   // obstacles->mutable_header()->set_frame_id(objects[0].frame_id);
   for (const auto &object : objects) {
     PerceptionObstacle obstacle;
-    ObjectToPb(object, &obstacle);
+    Object2Pb(object, &obstacle);
     obstacles->add_perception_obstacle()->CopyFrom(obstacle);
   }
 }
 
-void ObjectsToV2xPbs(const std::vector<base::Object> &objects,
+void Objects2V2xPbs(const std::vector<base::Object> &objects,
                      std::shared_ptr<V2XObstacles> obstacles) {
   obstacles->mutable_v2x_obstacle()->Clear();
   if (objects.size() < 1) {
@@ -537,7 +537,7 @@ void ObjectsToV2xPbs(const std::vector<base::Object> &objects,
       continue;
     }
     V2XObstacle obstacle;
-    ObjectToV2xPb(object, &obstacle);
+    Object2V2xPb(object, &obstacle);
     obstacles->add_v2x_obstacle()->CopyFrom(obstacle);
   }
 }

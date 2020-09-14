@@ -55,7 +55,7 @@ bool V2XFusionComponent::V2XMessageFusionProcess(
     return false;
   }
   base::Object hv_obj;
-  CarstatusPbToObject(*localization_msg, &hv_obj, "VEHICLE");
+  CarstatusPb2Object(*localization_msg, &hv_obj, "VEHICLE");
   v2x_obstacles_reader_->Observe();
   auto v2x_obstacles_msg = v2x_obstacles_reader_->GetLatestObserved();
   if (v2x_obstacles_msg == nullptr) {
@@ -66,9 +66,9 @@ bool V2XFusionComponent::V2XMessageFusionProcess(
     std::vector<Object> fused_objects;
     std::vector<std::vector<Object>> fusion_result;
     std::vector<Object> v2x_objects;
-    V2xPbsToObjects(*v2x_obstacles_msg, &v2x_objects, "V2X");
+    V2xPbs2Objects(*v2x_obstacles_msg, &v2x_objects, "V2X");
     std::vector<Object> perception_objects;
-    PbsToObjects(*perception_obstacles, &perception_objects);
+    Pbs2Objects(*perception_obstacles, &perception_objects);
     perception_objects.push_back(hv_obj);
     fusion_.CombineNewResource(perception_objects, &fused_objects,
                                &fusion_result);
@@ -85,7 +85,7 @@ void V2XFusionComponent::SerializeMsg(
     const std::vector<base::Object>& objects,
     std::shared_ptr<PerceptionObstacles> output_msg) {
   static int seq_num = 0;
-  ObjectsToPbs(objects, output_msg);
+  Objects2Pbs(objects, output_msg);
   apollo::common::Header* header = output_msg->mutable_header();
   header->set_timestamp_sec(apollo::cyber::Time::Now().ToSecond());
   header->set_module_name("v2x_fusion");
