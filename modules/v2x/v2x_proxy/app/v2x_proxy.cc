@@ -41,6 +41,9 @@ V2xProxy::~V2xProxy() {
   if (planning_thread_ != nullptr && planning_thread_->joinable()) {
     planning_thread_->join();
   }
+  if (obs_thread_ != nullptr && obs_thread_->joinable()) {
+    obs_thread_->join();
+  }
 }
 
 V2xProxy::V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap)
@@ -79,6 +82,13 @@ V2xProxy::V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap)
   planning_thread_.reset(new std::thread([this]() {
     while (!exit_.load()) {
       this->RecvOsPlanning();
+    }
+  }));
+  obs_thread_.reset(new std::thread([this]() {
+    while (!exit_.load()) {
+      std::shared_ptr<::apollo::v2x::V2XObstacles> obs = nullptr;
+      this->obu_interface_->GetV2xObstaclesFromObu(&obs);  // Blocked
+      this->os_interface_->SendV2xObstacles2Sys(obs);
     }
   }));
   v2x_car_status_timer_->Start();
