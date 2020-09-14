@@ -153,7 +153,7 @@ function parse_cmdline_args() {
 
 function main() {
   parse_cmdline_args "$@"
-  if [[ "${CPP_LINT_FLAG}" ]]; then
+  if [[ "${CPP_LINT_FLAG}" -eq 1 ]]; then
     run_cpp_lint
   fi
   if [[ "${PYTHON_LINT_FLAG}" -eq 1 ]]; then
