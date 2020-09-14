@@ -4,7 +4,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "base",
+    name = "v2x_object",
     hdrs = [
         "v2x_object.h",
     ],
@@ -21,7 +21,7 @@ cc_test(
     size = "small",
     srcs = ["v2x_object_test.cc"],
     deps = [
-        ":base",
+        ":v2x_object",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -11,13 +11,11 @@ cc_library(
         "-DMODULE_NAME=\\\"v2x_fusion\\\"",
     ],
     deps = [
-        "//cyber/common:file",
-        "//modules/common/math",
-        "//modules/v2x/fusion/apps/common:apps_common",
-        "//modules/v2x/fusion/configs:v2x_configs_lib",
-        "//modules/v2x/fusion/libs/common/base",
-        "//modules/v2x/fusion/libs/fusion:v2x_fusion_lib",
-        "@boost",
+        "//cyber/component",
+        "//modules/v2x/fusion/apps/common:trans_tools",
+        "//modules/v2x/fusion/configs:ft_config_manager",
+        "//modules/v2x/fusion/configs:fusion_tracker_gflags",
+        "//modules/v2x/fusion/libs/fusion",
     ],
     alwayslink = True,
 )

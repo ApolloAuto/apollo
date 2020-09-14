@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/v2x/fusion/libs/common/base/v2x_object.h"
+#include "modules/v2x/fusion/libs/common/v2x_object.h"
 
 #include "gtest/gtest.h"
 

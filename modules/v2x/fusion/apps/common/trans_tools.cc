@@ -16,7 +16,6 @@
 
 #include "modules/v2x/fusion/apps/common/trans_tools.h"
 
-#include <iostream>
 #include <limits>
 
 namespace apollo {

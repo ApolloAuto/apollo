@@ -22,7 +22,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/v2x/proto/v2x_obstacles.pb.h"
 
-#include "modules/v2x/fusion/libs/common/base/v2x_object.h"
+#include "modules/v2x/fusion/libs/common/v2x_object.h"
 
 namespace apollo {
 namespace v2x {
