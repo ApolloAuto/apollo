@@ -4,21 +4,31 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "v2x_fusion_lib",
-    srcs = [
-        "fusion.cc",
-    ],
-    hdrs = [
-        "fusion.h",
-        "km.h",
-        "test_tools.h",
-    ],
+    name = "fusion",
+    srcs = ["fusion.cc"],
+    hdrs = ["fusion.h"],
     copts = ['-DMODULE_NAME=\\"v2x_fusion\\"'],
     deps = [
-        "//cyber",
-        "//modules/common/math",
-        "//modules/v2x/fusion/configs:v2x_configs_lib",
-        "//modules/v2x/fusion/libs/common/base",
+        ":km",
+        "//modules/v2x/fusion/configs:ft_config_manager",
+        "//modules/v2x/fusion/libs/common:v2x_object",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "km",
+    hdrs = ["km.h"],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "test_tools",
+    hdrs = ["test_tools.h"],
+    deps = [
+        "//modules/v2x/fusion/libs/common:v2x_object",
     ],
 )
 
@@ -27,7 +37,8 @@ cc_test(
     size = "small",
     srcs = ["fusion_test.cc"],
     deps = [
-        ":v2x_fusion_lib",
+        ":fusion",
+        ":test_tools",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -37,7 +48,7 @@ cc_test(
     size = "small",
     srcs = ["km_test.cc"],
     deps = [
-        ":v2x_fusion_lib",
+        ":km",
         "@com_google_googletest//:gtest_main",
     ],
 )

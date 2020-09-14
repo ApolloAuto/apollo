@@ -28,7 +28,7 @@
 #include <Eigen/Core>
 
 #include "modules/v2x/fusion/configs/ft_config_manager.h"
-#include "modules/v2x/fusion/libs/common/base/v2x_object.h"
+#include "modules/v2x/fusion/libs/common/v2x_object.h"
 #include "modules/v2x/fusion/libs/fusion/km.h"
 
 namespace apollo {
