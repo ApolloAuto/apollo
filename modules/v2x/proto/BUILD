@@ -7,6 +7,25 @@ load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "fusion_params_cc_proto",
+    deps = [
+        ":fusion_params_proto",
+    ],
+)
+
+proto_library(
+    name = "fusion_params_proto",
+    srcs = ["fusion_params.proto"],
+)
+
+py_proto_library(
+    name = "fusion_params_py_pb2",
+    deps = [
+        ":fusion_params_proto",
+    ],
+)
+
+cc_proto_library(
     name = "v2x_obu_rsi_cc_proto",
     deps = [
         ":v2x_obu_rsi_proto",
@@ -132,6 +151,33 @@ py_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "v2x_obstacles_cc_proto",
+    deps = [
+        ":v2x_obstacles_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_obstacles_proto",
+    srcs = ["v2x_obstacles.proto"],
+    deps = [
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+    ],
+)
+
+py_proto_library(
+    name = "v2x_obstacles_py_pb2",
+    deps = [
+        ":v2x_obstacles_proto",
+        "//modules/common/proto:error_code_py_pb2",
+        "//modules/common/proto:header_py_pb2",
+        "//modules/perception/proto:perception_obstacle_py_pb2",
+    ],
+)
+
 cc_grpc_library(
     name = "v2x_service_obu_to_car_cc_grpc",
     srcs = [":v2x_service_obu_to_car_proto"],
@@ -151,6 +197,7 @@ proto_library(
     srcs = ["v2x_service_obu_to_car.proto"],
     deps = [
         ":v2x_monitor_proto",
+        ":v2x_obstacles_proto",
         ":v2x_obu_rsi_proto",
         ":v2x_obu_traffic_light_proto",
     ],
@@ -166,6 +213,7 @@ py_proto_library(
     name = "v2x_service_obu_to_car_py_pb2",
     deps = [
         ":v2x_monitor_py_pb2",
+        ":v2x_obstacles_py_pb2",
         ":v2x_obu_rsi_py_pb2",
         ":v2x_obu_traffic_light_py_pb2",
         ":v2x_service_obu_to_car_proto",
@@ -246,34 +294,5 @@ py_proto_library(
         ":v2x_obu_traffic_light_proto",
         ":v2x_traffic_light_py_pb2",
         "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "fusion_params_cc_proto",
-    deps = [
-        ":fusion_params_lib",
-    ],
-)
-
-proto_library(
-    name = "fusion_params_lib",
-    srcs = ["fusion_params.proto"],
-)
-
-cc_proto_library(
-    name = "v2x_obstacles_cc_proto",
-    deps = [
-        ":v2x_obstacles_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "v2x_obstacles_proto_lib",
-    srcs = ["v2x_obstacles.proto"],
-    deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
     ],
 )
