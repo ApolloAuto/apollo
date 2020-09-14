@@ -40,12 +40,12 @@ bool TorchDet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   torch::Device device(device_type_, device_id_);
   net_ = torch::jit::load(model_file_, device);
 
-  for (auto name : output_names_) {
+  for (const auto& name : output_names_) {
     auto blob = std::make_shared<Blob<float>>(2, 6, 1, 1);
     blobs_.emplace(name, blob);
   }
 
-  for (auto name : input_names_) {
+  for (const auto& name : input_names_) {
     auto iter = shapes.find(name);
     if (iter != shapes.end()) {
       auto blob = std::make_shared<Blob<float>>(iter->second);
@@ -56,9 +56,9 @@ bool TorchDet::Init(const std::map<std::string, std::vector<int>> &shapes) {
 }
 
 TorchDet::TorchDet(const std::string &net_file,
-                         const std::string &model_file,
-                         const std::vector<std::string> &outputs,
-                         const std::vector<std::string> &inputs)
+                   const std::string &model_file,
+                   const std::vector<std::string> &outputs,
+                   const std::vector<std::string> &inputs)
     : net_file_(net_file),
       model_file_(model_file),
       output_names_(outputs),
@@ -99,7 +99,15 @@ void TorchDet::Infer() {
   torch::Tensor bbox = outputs[0].toTensor();
   torch::Tensor scores = outputs[1].toTensor().unsqueeze(1);
   torch::Tensor labels = outputs[2].toTensor().unsqueeze(1);
-  torch::Tensor result = torch::cat({bbox, scores, labels}, 1);
+  torch::Tensor img_id = torch::zeros({scores.sizes()},
+                                      torch::kFloat).to(device);
+  torch::Tensor one_hot = torch::zeros({scores.size(0), 2},
+                                       torch::kFloat).to(device);
+
+  torch::Tensor result = torch::cat({img_id, bbox, scores, labels, one_hot},
+                                   1);
+  blobs_[output_names_[0]]->Reshape({static_cast<int>(result.size(0)),
+                             static_cast<int>(result.size(1)), 1, 1});
   blobs_[output_names_[0]]->data()->set_gpu_data(result.data_ptr());
 }
 
