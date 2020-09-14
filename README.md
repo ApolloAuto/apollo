@@ -21,21 +21,19 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
+1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-    - [Basic Requirements](#basic-requirements)
-    - [Individual Version Requirements](#individual-version-requirements)
-3. [Architecture](#architecture)
-4. [Installation](#installation)
-5. [Documents](#documents)
+3. [Individual Versions](#individual-versions)
+4. [Architecture](#architecture)
+5. [Installation](#installation)
+6. [Quick Starts](#quick-starts)
+7. [Documents](#documents)
 
-## Getting Started
+## Introduction
 
 Apollo is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
 
 ## Prerequisites
-
-#### Basic Requirements:
 
 * The vehicle equipped with the by-wire system, including but not limited to brake-by-wire, steering-by-wire, throttle-by-wire and shift-by-wire (Apollo is currently tested on Lincoln MKZ)
 
@@ -53,7 +51,7 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 **Please note**, it is recommended that you install the versions of Apollo in the following order: **1.0 -> whichever version you would like to test out**. The reason behind this recommendation is that you need to confirm whether individual hardware components and modules are functioning correctly and clear various version test cases, before progressing to a higher, more capable version for your safety and the safety of those around you.
 
-#### Individual Version Requirements:
+## Individual Versions:
 
 The following diagram highlights the scope and features of each Apollo release:
 
@@ -114,7 +112,7 @@ Apollo 5.5 enhances the complex urban road autonomous driving capabilities of pr
 
 ![image alt text](docs/demo_guide/images/Apollo_5_5_Architecture.png)
 
-[**Apollo 6.0:**](docs/quickstart/apollo_6_5_quick_start.md)
+[**Apollo 6.0:**](docs/quickstart/apollo_6_0_quick_start.md)
 
 Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new addtions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
 
@@ -130,21 +128,21 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
 
 ![image alt text](docs/demo_guide/images/Hardware_connection_3_5_1.png)
 
-* **Software Overview - Navigation Mode**
+* **Software Overview**
 
 ![image alt text](docs/demo_guide/images/Apollo_3_5_software_architecture.png)
 
 ## Installation
 
-* [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
+* [Fork and then clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
 
-* [Build with Docker](docs/howto/how_to_build_and_possible_error.md) - This step is required
+* [Build with Docker](docs/howto/how_to_build_and_possible_error.md) - **This step is required**
 
-* [Launch and Run Apollo](docs/howto/how_to_launch_and_run_apollo.md)
+* [Launch and run Apollo](docs/howto/how_to_launch_and_run_apollo.md)
 
 Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
 
-### With Hardware:
+## Quick Starts:
 
 * [Apollo 1.0 QuickStart Guide](docs/quickstart/apollo_1_0_quick_start.md)
 
@@ -161,6 +159,8 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 * [Apollo 5.0 QuickStart Guide](docs/quickstart/apollo_5_0_quick_start.md)
 
 * [Apollo 5.5 QuickStart Guide](docs/quickstart/apollo_5_5_quick_start.md)
+
+* [Apollo 6.0 QuickStart Guide](docs/quickstart/apollo_6_0_quick_start.md)
 
 ## Documents
 
