@@ -31,9 +31,9 @@ function run_bootstrap() {
 function print_usage() {
   info "Usage: $0 [Options]"
   info "Options:"
-  info "${TAB}-i|--interactive  Run in interactive mode"
-  info "${TAB}--noninteractive  Run in non-interactive mode"
-  info "${TAB}-h|--help         Show this message and exit"
+  info "${TAB}-i|--interactive      Run in interactive mode"
+  info "${TAB}-n|--noninteractive   Run in non-interactive mode"
+  info "${TAB}-h|--help             Show this message and exit"
 }
 
 function main() {
@@ -58,7 +58,7 @@ function main() {
       ok "Successfully configured ${mycfg} in interactive mode."
       exit 0
       ;;
-    --noninteractive)
+    -n | --noninteractive)
       info "Configure ${mycfg} in non-interactive mode"
       run_bootstrap --interactive false
       ok "Successfully configured ${mycfg} in non-interactive mode."

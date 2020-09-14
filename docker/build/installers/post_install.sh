@@ -24,6 +24,8 @@ build_stage="$1"; shift
 [ -d /tmp/installers ] && rm -rf /tmp/installers
 
 
+echo "stage=${build_stage}" > /etc/apollo.conf
+
 if [[ "${build_stage}" == "cyber" ]]; then
     # https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
     ln -s -f /bin/true /usr/bin/chfn
