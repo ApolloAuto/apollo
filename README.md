@@ -47,7 +47,7 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 * Docker-CE version 19.03 and above ([Official doc](https://docs.docker.com/engine/install/ubuntu/))
 
-* nVidia container toolkit ([Official doc](https://github.com/NVIDIA/nvidia-docke))
+* nVidia container toolkit ([Official doc](https://github.com/NVIDIA/nvidia-docker))
 
 **Please note**, it is recommended that you install the versions of Apollo in the following order: **1.0 -> whichever version you would like to test out**. The reason behind this recommendation is that you need to confirm whether individual hardware components and modules are functioning correctly and clear various version test cases, before progressing to a higher, more capable version for your safety and the safety of those around you.
 
@@ -133,6 +133,8 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
 ![image alt text](docs/demo_guide/images/Apollo_3_5_software_architecture.png)
 
 ## Installation
+
+* [Hardware installation guide](docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
 
 * [Fork and then clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
 
