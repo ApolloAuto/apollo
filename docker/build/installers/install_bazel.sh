@@ -19,8 +19,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. ./installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 TARGET_ARCH=$(uname -m)
 
@@ -86,6 +86,10 @@ else
   error "Target arch ${TARGET_ARCH} not supported yet"
   exit 1
 fi
+
+# Note(storypku):
+# Used by `apollo.sh config` to determine native cuda compute capability.
+bash ${CURR_DIR}/install_device_query.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
