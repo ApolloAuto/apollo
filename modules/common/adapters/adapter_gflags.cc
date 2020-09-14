@@ -209,6 +209,8 @@ DEFINE_string(audio_capture_topic, "/apollo/hmi/audio_capture",
 DEFINE_string(v2x_obu_traffic_light_topic,
               "/apollo/v2x/obu/internal/traffic_light",
               "v2x obu traffic_light topic name");
+DEFINE_string(v2x_internal_obstacle_topic, "/apollo/v2x/obu/internal/obstacles",
+              "v2x internal obstacles topic name");
 DEFINE_string(v2x_obstacle_topic, "/apollo/v2x/obstacles",
               "v2x obstacles topic name");
 DEFINE_string(v2x_traffic_light_topic, "/apollo/v2x/traffic_light",
