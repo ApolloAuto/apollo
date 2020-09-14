@@ -96,6 +96,11 @@ void ObuInterFaceGrpcImpl::GetV2xTrafficLightFromObu(
   grpc_server_->GetMsgFromGrpc(msg);
 }
 
+void ObuInterFaceGrpcImpl::GetV2xObstaclesFromObu(
+    std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) {
+  grpc_server_->GetMsgFromGrpc(msg);
+}
+
 void ObuInterFaceGrpcImpl::GetV2xRsiFromObu(std::shared_ptr<ObuRsi> *msg) {
   grpc_server_->GetMsgFromGrpc(msg);
 }

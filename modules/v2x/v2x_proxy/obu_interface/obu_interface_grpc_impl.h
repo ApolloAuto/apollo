@@ -54,6 +54,9 @@ class ObuInterFaceGrpcImpl : public ObuInterFaceBase {
   void GetV2xTrafficLightFromObu(
       std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> *msg) override;
 
+  void GetV2xObstaclesFromObu(
+      std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) override;
+
   void GetV2xRsiFromObu(
       std::shared_ptr<::apollo::v2x::obu::ObuRsi> *msg) override;
 
