@@ -22,6 +22,8 @@
 
 #include <sstream>
 
+#include "modules/common/math/quaternion.h"
+
 namespace apollo {
 namespace v2x {
 
@@ -492,8 +494,6 @@ bool GetRsuInfo(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
   if (!out_heading) {
     return false;
   }
-  // TODO(qiumiaohan): uncomment when HDMAP done
-#if 0
   *out_junction_id = kUnknownJunctionId;
   auto res = std::make_shared<::apollo::v2x::CarStatus>();
   if (nullptr == res) {
@@ -505,22 +505,18 @@ bool GetRsuInfo(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
   if (!os_location.has_pose()) {
     return false;
   }
-  std::shared_ptr<::v2x::proxy::ObuLocationT> obu_location = nullptr;
-  if (!::v2x::proxy::adapter_location_os2obu(os_location, obu_location)) {
-    return false;
-  }
-  res->mutable_localization()->CopyFrom(*obu_location);
+  res->mutable_localization()->CopyFrom(os_location);
   ::apollo::common::PointENU point;
   point.set_x(os_location.pose().position().x());
   point.set_y(os_location.pose().position().y());
-  double heading = ::apollo::commmon::math::QuaternionToHeading(
-    os_location.pose().orientation().qw(),
-    os_location.pose().orientation().qx(),
-    os_location.pose().orientation().qy(),
-    os_location.pose().orientation().qz());
+  double heading = ::apollo::common::math::QuaternionToHeading(
+      os_location.pose().orientation().qw(),
+      os_location.pose().orientation().qx(),
+      os_location.pose().orientation().qy(),
+      os_location.pose().orientation().qz());
   *out_heading = heading;
   std::vector<::apollo::hdmap::RSUInfoConstPtr> rsus;
-  if (0 != hdmap->GetForwardNearestRSU(point, distance, heading,
+  if (0 != hdmap->GetForwardNearestRSUs(point, distance, heading,
                                         max_heading_difference, &rsus) ||
       rsus.empty()) {
     AINFO << "no rsu is found";
@@ -533,21 +529,19 @@ bool GetRsuInfo(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
     return false;
   }
   AINFO << "This RSU is in the white list";
-  AINFO << "Junction id " << rsus[0]->RSU().junction_id().id();
-  auto junction_info = hdmap->GetJunctionById(rsus[0]->RSU().junction_id());
+  AINFO << "Junction id " << rsus[0]->rsu().junction_id().id();
+  auto junction_info = hdmap->GetJunctionById(rsus[0]->rsu().junction_id());
   if (nullptr == junction_info) {
     return false;
   }
-  std::shared_ptr<::apollo::obu::normal::Junction> obu_junction = nullptr;
-  if (!ProtoAdapter::JunctionHd2obu(junction_info, obu_junction)) {
+  std::shared_ptr<::apollo::v2x::ObuJunction> obu_junction = nullptr;
+  if (!ProtoAdapter::JunctionHd2obu(junction_info, &obu_junction)) {
     return false;
   }
   res->mutable_junction()->CopyFrom(*obu_junction);
   *v2x_car_status = res;
   *out_junction_id = junction_info->id().id();
   return true;
-#endif
-  return false;
 }
 
 OSLightColor GetNextColor(OSLightColor color) {

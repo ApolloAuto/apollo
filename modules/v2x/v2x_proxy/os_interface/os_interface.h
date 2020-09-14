@@ -83,8 +83,7 @@ class OsInterFace {
       localization_reader_ = nullptr;
   std::shared_ptr<::apollo::cyber::Reader<::apollo::planning::ADCTrajectory>>
       planning_reader_ = nullptr;
-  std::shared_ptr<
-      ::apollo::cyber::Writer<::apollo::v2x::obu::ObuTrafficLight>>
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::v2x::obu::ObuTrafficLight>>
       v2x_obu_traffic_light_writer_ = nullptr;
   std::shared_ptr<
       ::apollo::cyber::Writer<::apollo::v2x::IntersectionTrafficLightData>>
