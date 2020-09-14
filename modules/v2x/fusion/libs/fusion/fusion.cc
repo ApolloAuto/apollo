@@ -112,7 +112,7 @@ double Fusion::CheckOdistance(const base::Object &in1_ptr,
   double yi = in1_ptr.position.y();
   double xj = in2_ptr.position.x();
   double yj = in2_ptr.position.y();
-  double distance = std::hypot(std::fabs(xi - xj), std::fabs(yi - yj));
+  double distance = std::hypot(xi - xj, yi - yj);
   return distance;
 }
 
