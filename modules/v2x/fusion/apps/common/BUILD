@@ -19,7 +19,7 @@ cc_library(
         "//modules/localization/proto:localization_cc_proto",
         "//modules/perception/proto:perception_camera_cc_proto",
         "//modules/v2x/fusion/libs/common/base",
-        "//modules/v2x/proto:v2x_obstacles_proto",
+        "//modules/v2x/proto:v2x_obstacles_cc_proto",
     ],
 )
 

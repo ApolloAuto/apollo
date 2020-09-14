@@ -5,19 +5,37 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "v2x_configs_lib",
+    deps = [
+        ":ft_config_manager",
+        ":fusion_tracker_gflags",
+    ],
+)
+
+cc_library(
+    name = "fusion_tracker_gflags",
     srcs = [
-        "ft_config_manager.cc",
         "fusion_tracker_gflags.cc",
     ],
     hdrs = [
-        "ft_config_manager.h",
         "fusion_tracker_gflags.h",
     ],
-    copts = ['-DMODULE_NAME=\\"v2x_configs\\"'],
     deps = [
-        "//cyber",
-        "//modules/v2x/proto:fusion_params_proto",
         "@com_github_gflags_gflags//:gflags",
+    ],
+)
+
+cc_library(
+    name = "ft_config_manager",
+    srcs = [
+        "ft_config_manager.cc",
+    ],
+    hdrs = [
+        "ft_config_manager.h",
+    ],
+    deps = [
+        ":fusion_tracker_gflags",
+        "//cyber",
+        "//modules/v2x/proto:fusion_params_cc_proto",
     ],
 )
 

@@ -40,27 +40,12 @@ namespace ft {
 class V2XFusionComponent
     : public apollo::cyber::Component<PerceptionObstacles> {
  public:
-  /**
-   * @brief Destructor
-   */
   ~V2XFusionComponent();
 
-  /**
-   * @brief Get name of the node
-   * @return Name of the node
-   */
   std::string Name() const;
 
-  /**
-   * @brief Initialize the node
-   * @return If initialized
-   */
   bool Init() override;
 
-  /**
-   * @brief Data callback upon receiving a perception obstacle message.
-   * @param Perception obstacle message.
-   */
   bool Proc(const std::shared_ptr<PerceptionObstacles>& perception_obstacles)
       override;
 

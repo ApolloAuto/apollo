@@ -49,13 +49,13 @@ bool V2XFusionComponent::V2XMessageFusionProcess(
   // Read localization info. and call OnLocalization to update
   // the PoseContainer.
   localization_reader_->Observe();
-  auto ptr_localization_msg = localization_reader_->GetLatestObserved();
-  if (ptr_localization_msg == nullptr) {
+  auto localization_msg = localization_reader_->GetLatestObserved();
+  if (localization_msg == nullptr) {
     AERROR << "V2X: cannot receive any localization message.";
     return false;
   }
   base::Object hv_obj;
-  CarstatusPbToObject(*ptr_localization_msg, &hv_obj, "VEHICLE");
+  CarstatusPbToObject(*localization_msg, &hv_obj, "VEHICLE");
   v2x_obstacles_reader_->Observe();
   auto v2x_obstacles_msg = v2x_obstacles_reader_->GetLatestObserved();
   if (v2x_obstacles_msg == nullptr) {

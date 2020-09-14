@@ -131,7 +131,7 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "fusion_params_proto",
+    name = "fusion_params_cc_proto",
     deps = [
         ":fusion_params_lib",
     ],
@@ -143,7 +143,7 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "v2x_obstacles_proto",
+    name = "v2x_obstacles_cc_proto",
     deps = [
         ":v2x_obstacles_proto_lib",
     ],
