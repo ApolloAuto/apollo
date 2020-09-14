@@ -59,6 +59,7 @@ _APOLLO_BAZELRC = '.apollo.bazelrc'
 _APOLLO_CURRENT_BAZEL_VERSION = None
 _APOLLO_MIN_BAZEL_VERSION = '2.0.0'
 _APOLLO_INSIDE_DOCKER = True
+_APOLLO_DOCKER_STAGE = "dev"
 
 _INTERACTIVE_MODE = True
 
@@ -73,6 +74,17 @@ def is_linux():
 
 def inside_docker():
     return os.path.isfile('/.dockerenv')
+
+
+def docker_stage():
+    if not inside_docker():
+        return "dev"
+    with open("/etc/apollo.conf") as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith("stage="):
+                return line.split("=")[-1]
+    return "dev"
 
 
 def default_root_dir():
@@ -943,6 +955,7 @@ def main():
     global _APOLLO_CURRENT_BAZEL_VERSION
     global _APOLLO_INSIDE_DOCKER
     global _INTERACTIVE_MODE
+    global _APOLLO_DOCKER_STAGE
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -960,7 +973,7 @@ def main():
     _APOLLO_ROOT_DIR = default_root_dir()
     _APOLLO_BAZELRC = os.path.join(_APOLLO_ROOT_DIR, args.output_file)
     _APOLLO_INSIDE_DOCKER = inside_docker()
-
+    _APOLLO_DOCKER_STAGE = docker_stage()
     _INTERACTIVE_MODE = args.interactive
 
     # Make a copy of os.environ to be clear when functions and getting and setting
@@ -982,11 +995,13 @@ def main():
     setup_python(environ_cp)
 
     environ_cp['TF_NEED_CUDA'] = '1'
-    environ_cp['TF_NEED_TENSORRT'] = '1'
-
     # build:gpu --config=using_cuda
     write_to_bazelrc('build:gpu --config=cuda')
-    write_to_bazelrc('build:gpu --config=tensorrt')
+
+    if _APOLLO_DOCKER_STAGE == "dev":
+        environ_cp['TF_NEED_TENSORRT'] = '1'
+        write_to_bazelrc('build:gpu --config=tensorrt')
+
     write_blank_line_to_bazelrc()
 
     setup_cuda_family_config(environ_cp)
