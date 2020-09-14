@@ -28,10 +28,18 @@ function run_bootstrap() {
   "${py3_bin}" "${TOP_DIR}/tools/bootstrap.py" "$@"
 }
 
+function print_usage() {
+  info "Usage: $0 [Options]"
+  info "Options:"
+  info "${TAB}-i|--interactive  Run in interactive mode"
+  info "${TAB}--noninteractive  Run in non-interactive mode"
+  info "${TAB}-h|--help         Show this message and exit"
+}
+
 function main() {
   local mycfg="$(basename ${BAZEL_CONF})"
   if [[ "$#" -eq 0 ]]; then
-    run_bootstrap --help
+    print_usage
     exit 1
   fi
 
@@ -41,7 +49,7 @@ function main() {
       exit 0
       ;;
     -h | --help)
-      run_bootstrap --help
+      print_usage
       exit 0
       ;;
     -i | --interactive)
@@ -57,8 +65,8 @@ function main() {
       exit 0
       ;;
     *)
-      run_bootstrap --help
-      exit 0
+      print_usage
+      exit 1
       ;;
   esac
 }
