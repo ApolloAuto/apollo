@@ -44,8 +44,8 @@ GrpcServerImpl::GrpcServerImpl()
 grpc::Status GrpcServerImpl::SendV2xRSI(grpc::ServerContext * /* context */,
                                         const ObuRsi *request,
                                         StatusResponse *response) {
-  AINFO << "Received SendV2xRSI request from client! \n";
-  AINFO << request->DebugString();
+  ADEBUG << "Received SendV2xRSI request from client!";
+  ADEBUG << request->DebugString();
 
   if (!request->has_header()) {
     response->set_status(false);
@@ -72,12 +72,26 @@ grpc::Status GrpcServerImpl::SendV2xRSI(grpc::ServerContext * /* context */,
   AINFO << "SendV2xRSI response success.";
   return Status::OK;
 }
+grpc::Status GrpcServerImpl::SendPerceptionObstacles(
+    grpc::ServerContext *, const apollo::v2x::V2XObstacles *request,
+    StatusResponse *response) {
+  ADEBUG << "Received SendPerceptionObstacles request from client!";
+  {
+    std::lock_guard<std::mutex> guard(obstacles_mutex_);
+    latest_obstacles_.CopyFrom(*request);
+    response->set_status(true);
+    obs_refresh_ = true;
+    ADEBUG << "SendPerceptionObstacles response success.";
+  }
+  obs_condition_.notify_one();
+  return Status::OK;
+}
 
 grpc::Status GrpcServerImpl::SendV2xTrafficLight(
     grpc::ServerContext * /* context */, const ObuTrafficLight *request,
     StatusResponse *response) {
-  AINFO << "Received SendV2xTrafficLight request from client! \n";
-  AINFO << request->DebugString();
+  ADEBUG << "Received SendV2xTrafficLight request from client!";
+  ADEBUG << request->DebugString();
 
   int num_current_light = request->road_traffic_light_size();
 
@@ -134,6 +148,21 @@ void GrpcServerImpl::GetMsgFromGrpc(std::shared_ptr<ObuRsi> *ptr) {
     return;
   }
   (*ptr)->CopyFrom(latest_rsi_);
+}
+
+void GrpcServerImpl::GetMsgFromGrpc(
+    std::shared_ptr<::apollo::v2x::V2XObstacles> *ptr) {
+  if (nullptr == ptr) {
+    return;
+  }
+  std::unique_lock<std::mutex> guard(obstacles_mutex_);
+  obs_condition_.wait(guard, [this] { return obs_refresh_; });
+  obs_refresh_ = false;
+  *ptr = std::make_shared<::apollo::v2x::V2XObstacles>();
+  if (nullptr == *ptr) {
+    return;
+  }
+  (*ptr)->CopyFrom(latest_obstacles_);
 }
 
 void GrpcServerImpl::GetMsgFromGrpc(std::shared_ptr<ObuTrafficLight> *ptr) {

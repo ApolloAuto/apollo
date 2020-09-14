@@ -26,6 +26,7 @@
 
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/v2x/proto/v2x_car_status.pb.h"
+#include "modules/v2x/proto/v2x_obstacles.pb.h"
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
 #include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
@@ -53,6 +54,8 @@ class ObuInterFaceBase {
 
   virtual void GetV2xRsiFromObu(
       std::shared_ptr<::apollo::v2x::obu::ObuRsi> *msg) {}
+  virtual void GetV2xObstaclesFromObu(
+      std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) {}
 };
 
 }  // namespace v2x
