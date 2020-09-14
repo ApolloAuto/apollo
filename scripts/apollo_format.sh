@@ -67,6 +67,42 @@ function run_prettier() {
   bash "${TOP_DIR}/scripts/mdfmt.sh" "$@"
 }
 
+function run_apollo_format() {
+  for arg in "$@"; do
+    if [[ -f "${arg}" ]]; then
+      if c_family_ext "${arg}" || proto_ext "${arg}"; then
+        run_clang_format "${arg}"
+      elif py_ext "${arg}"; then
+        run_autopep8 "${arg}"
+      elif prettier_ext "${arg}"; then
+        run_prettier "${arg}"
+      elif bazel_extended "${arg}"; then
+        run_buildifier "${arg}"
+      elif bash_ext "${arg}"; then
+        run_shfmt "${arg}"
+      fi
+    elif [[ -d "${arg}" ]]; then
+      if [ "${FORMAT_BAZEL}" -eq 1 ]; then
+        run_buildifier "${arg}"
+      fi
+      if [ "${FORMAT_CPP}" -eq 1 ]; then
+        run_clang_format "${arg}"
+      fi
+      if [ "${FORMAT_PYTHON}" -eq 1 ]; then
+        run_autopep8 "${arg}"
+      fi
+      if [ "${FORMAT_SHELL}" -eq 1 ]; then
+        run_shfmt "${arg}"
+      fi
+      if [ "${FORMAT_MARKDOWN}" -eq 1 ]; then
+        run_prettier "${arg}"
+      fi
+    else
+      warning "Ignored ${arg} as not a regular file/directory"
+    fi
+  done
+}
+
 function main() {
   if [ "$#" -eq 0 ]; then
     print_usage
@@ -131,21 +167,7 @@ function main() {
     FORMAT_PYTHON=1
   fi
 
-  if [ "${FORMAT_BAZEL}" -eq 1 ]; then
-    run_buildifier "$@"
-  fi
-  if [ "${FORMAT_CPP}" -eq 1 ]; then
-    run_clang_format "$@"
-  fi
-  if [ "${FORMAT_PYTHON}" -eq 1 ]; then
-    run_autopep8 "$@"
-  fi
-  if [ "${FORMAT_SHELL}" -eq 1 ]; then
-    run_shfmt "$@"
-  fi
-  if [ "${FORMAT_MARKDOWN}" -eq 1 ]; then
-    run_prettier "$@"
-  fi
+  run_apollo_format "$@"
 }
 
 main "$@"
