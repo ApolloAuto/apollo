@@ -98,8 +98,7 @@ cc_library(
     hdrs = ["distance_approach_problem.h"],
     copts = PLANNING_FOPENMP,
     deps = [
-        # TODO(xiaoxq): Disable CUDA in planning temporarily.
-        # ":distance_approach_ipopt_cuda_interface",
+        ":distance_approach_ipopt_cuda_interface",
         ":distance_approach_ipopt_fixed_dual_interface",
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
