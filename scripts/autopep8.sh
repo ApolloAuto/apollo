@@ -27,19 +27,6 @@ source "${TOP_DIR}/scripts/apollo.bashrc"
 
 AUTOPEP8_CMD="autopep8"
 
-function _find_py_srcs() {
-  find "$@" -type f -name "*.py"
-}
-
-function _py_ext() {
-  local __ext
-  __ext="$(file_ext $1)"
-  if [ "${__ext}" == "py" ]; then
-    return 0
-  fi
-  return 1
-}
-
 function check_autopep8() {
   if [ -z "$(command -v autopep8)" ]; then
     error "Oops, autopep8 missing..."
@@ -57,7 +44,7 @@ function autopep8_run() {
 function run_autopep8() {
   for target in "$@"; do
     if [ -f "${target}" ]; then
-      if _py_ext "${target}"; then
+      if py_ext "${target}"; then
         autopep8_run "${target}"
         info "Done formatting ${target}"
       else
@@ -65,7 +52,7 @@ function run_autopep8() {
       fi
     else
       local srcs
-      srcs="$(_find_py_srcs ${target})"
+      srcs="$(find_py_srcs ${target})"
       if [ -z "${srcs}" ]; then
         warning "Do nothing. No Python files found under ${target} ."
         continue
