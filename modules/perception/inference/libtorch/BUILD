@@ -17,9 +17,9 @@ cc_library(
 )
 
 cc_library(
-    name = "torch_det_net",
-    srcs = ["torch_det_net.cc"],
-    hdrs = ["torch_det_net.h"],
+    name = "torch_det",
+    srcs = ["torch_det.cc"],
+    hdrs = ["torch_det.h"],
     deps = [
         "//modules/perception/inference:inference_lib",
         "//third_party:libtorch",

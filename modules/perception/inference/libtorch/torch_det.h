@@ -32,16 +32,16 @@ namespace inference {
 
 using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
-class TorchDetNet : public Inference {
+class TorchDet : public Inference {
  public:
-  TorchDetNet(const std::string &net_file, const std::string &model_file,
+  TorchDet(const std::string &net_file, const std::string &model_file,
            const std::vector<std::string> &outputs);
 
-  TorchDetNet(const std::string &net_file, const std::string &model_file,
+  TorchDet(const std::string &net_file, const std::string &model_file,
            const std::vector<std::string> &outputs,
            const std::vector<std::string> &inputs);
 
-  virtual ~TorchDetNet() {}
+  virtual ~TorchDet() {}
 
   bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
 
