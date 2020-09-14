@@ -84,6 +84,7 @@ class V2xProxy {
   std::unique_ptr<std::thread> recv_thread_ = nullptr;
   std::unique_ptr<std::thread> planning_thread_ = nullptr;
   std::unique_ptr<std::thread> rsi_thread_ = nullptr;
+  std::unique_ptr<std::thread> obs_thread_ = nullptr;
 
   /* function car to obu car status timer callback
    */
