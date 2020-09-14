@@ -119,14 +119,15 @@ Then you can copy the prepared data folder to somewhere under /mnt/bos.
 
 Login in the [Apollo webpage](http://bce.apollo.auto/) and choose the **Account Status** in the functionality menu, as shown as follows:
 
-(The image will come sooner)
-
 Select the **Dynamic Modeling** option in the **New Job** menu，and then fill out the Partner ID（Please contact the Apollo business if you do not have it yet）、Access Key、and Secret Key. Then, give the **Input Data Path** starting from the root directory under your BOS folder， and choose Ture or Flase in the **is_backward** option (True, if your intend to train the dynamic model under the backward driving mode; otherwise, False). Finally, submit your job by clicking the **Submit Job** button。
 
-(The image will come sooner)
+![](images/dynamic_model_job_submit.png)
 
 ## Receive Model Training Results
 
 After the dynamic modeling job successfully starts and your uploaded data passes the sanity check, the user will receive the **first notice email** at your registered email address.
 
 Then, after the dynamic modeling job is fully finished, the user will receive the **second notice email**, in which the generated model storage path and filtered data visualization path under your own BOS folder will be provided.  
+
+
+![](images/dynamic_model_email.png)
