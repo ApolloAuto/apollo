@@ -284,13 +284,15 @@
 
 #### 4. 提交标定任务据至BOS
 
-打开Apollo云服务页面，如下图：
+首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`控制评测`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`（因为“task001”在BOS的根目录）。如下图所示：
 
-![vehicle_calibration_online_fuel1](images/vehicle_calibration_online_fuel1.png)
+![vehicle_calibration_submit_task1](images/vehicle_calibration_submit_task1.jpg)
 
-在New Job下拉框中选择Vehicle Calibration选项，根据实际情况填写Partner ID（请与商务联系）、Access Key（按BOS账号实际情况填写）、Secret Key（按BOS账号实际情况填写）、Input Data Path填写到根目录（在本例中填写为"task001"，因为“task001”在BOS的根目录），最后点击Submit Job按钮提交。
+![vehicle_calibration_submit_task2](images/vehicle_calibration_submit_task2.jpg)
 
-![vehicle_calibration_online_fuel2](images/vehicle_calibration_online_fuel2.png)
+![vehicle_calibration_submit_task3](images/vehicle_calibration_submit_task3.png)
+
+![vehicle_calibration_submit_task4](images/vehicle_calibration_submit_task4.png)
 
 #### 5. 获取标定结果及标定表
 
