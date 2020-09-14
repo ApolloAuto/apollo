@@ -58,7 +58,7 @@ bool OsInterFace::InitReaders() {
         }
         cond_planning_.notify_one();
       });
-  return !!localization_reader_ && !!planning_reader_;
+  return nullptr != localization_reader_ && nullptr != planning_reader_;
 }
 
 bool OsInterFace::InitWriters() {
@@ -71,8 +71,13 @@ bool OsInterFace::InitWriters() {
   v2x_traffic_light_hmi_writer_ =
       node_->CreateWriter<::apollo::perception::TrafficLightDetection>(
           FLAGS_v2x_traffic_light_for_hmi_topic);
-
-  return !!v2x_obu_traffic_light_writer_ && !!v2x_traffic_light_writer_;
+  v2x_obstacles_internal_writer_ =
+      node_->CreateWriter<apollo::v2x::V2XObstacles>(
+          FLAGS_v2x_internal_obstacle_topic);
+  return nullptr != v2x_obu_traffic_light_writer_ &&
+         nullptr != v2x_traffic_light_hmi_writer_ &&
+         nullptr != v2x_obstacles_internal_writer_ &&
+         nullptr != v2x_traffic_light_writer_;
 }
 
 void OsInterFace::GetLocalizationFromOs(
@@ -98,6 +103,16 @@ void OsInterFace::SendV2xObuTrafficLightToOs(
   }
   AINFO << "send v2x obu traffic_light to os";
   SendMsgToOs(v2x_obu_traffic_light_writer_.get(), msg);
+  AINFO << "v2x obu traffic_light result: " << msg->DebugString();
+}
+
+void OsInterFace::SendV2xObstacles2Sys(
+    const std::shared_ptr<apollo::v2x::V2XObstacles> &msg) {
+  if (nullptr == msg) {
+    return;
+  }
+  AINFO << "send v2x obu traffic_light to os";
+  SendMsgToOs(v2x_obstacles_internal_writer_.get(), msg);
   AINFO << "v2x obu traffic_light result: " << msg->DebugString();
 }
 

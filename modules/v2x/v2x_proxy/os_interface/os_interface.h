@@ -31,6 +31,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/v2x/proto/v2x_obstacles.pb.h"
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
 #include "modules/v2x/proto/v2x_obu_traffic_light.pb.h"
 #include "modules/v2x/proto/v2x_traffic_light.pb.h"
@@ -59,6 +60,9 @@ class OsInterFace {
 
   void SendV2xTrafficLightToOs(
       const std::shared_ptr<::apollo::v2x::IntersectionTrafficLightData> &msg);
+
+  void SendV2xObstacles2Sys(
+      const std::shared_ptr<apollo::v2x::V2XObstacles> &msg);
 
   void SendV2xTrafficLight4Hmi2Sys(
       const std::shared_ptr<::apollo::perception::TrafficLightDetection> &msg);
@@ -91,6 +95,8 @@ class OsInterFace {
   std::shared_ptr<
       ::apollo::cyber::Writer<::apollo::perception::TrafficLightDetection>>
       v2x_traffic_light_hmi_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::v2x::V2XObstacles>>
+      v2x_obstacles_internal_writer_ = nullptr;
   ::apollo::localization::LocalizationEstimate current_localization_;
   ::apollo::planning::ADCTrajectory adc_trajectory_msg_;
   bool flag_planning_new_ = false;
