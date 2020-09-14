@@ -116,7 +116,7 @@ ppscontrol enable positive 1.0 10000
 log com3 gprmc ontime 1 0.25
 ```
 
-将所有配置逐条发送给设备，得到设备返回`$cmd,config,ok*ff`字段，说明配置成功，配置成功后要进行配置保存，发送`$cmd,save,config*ff`指令，然后将该设备断电后重新上电加载后即可使用。注意：PPS授时接口输出的两条配置命令是没有返回`$cmd,config,ok*ff`字段的，这是正常情况，不用担心。
+将所有配置逐条发送给设备，得到设备返回`$cmd,config,ok*ff`字段，说明配置成功，配置成功后要进行配置保存，发送`$cmd,save,config*ff`指令;也可以将以上的相关配置命令保存在`/apollo/docs/specs/D-kit/sample/imu.conf`文件中,然后在cutecom中点击右边的`Send file...`按钮，在弹出的对话框中选择`imu.conf`文件后点击`Open`按钮后即可将文件中保存的配置命令全部发送给设备，一切正常的情况下，设备会返回25个`$cmd,config,ok*ff`字段，说明配置成功；切记在发送文件之前将自己的实际信息保存在文件中，比如杆臂值和`GNSS`的账号信息等。配置成功后将该设备断电后重新上电加载后即可使用。注意：PPS授时接口输出的两条配置命令是没有返回`$cmd,config,ok*ff`字段的，这是正常情况，不用担心。
 
 ## 系统文件配置
 
@@ -124,52 +124,7 @@ log com3 gprmc ontime 1 0.25
 
 ### GNSS配置
 
-修改`/apollo/modules/calibration/data/dev_kit/gnss_conf`文件夹下面的配置文件`gnss_conf.pb.txt`，修改如下内容配置基站信息：
-```
-rtk_from {
-    format: RTCM_V3
-    ntrip {
-        address: "<IP>"
-        port: <PORT>
-        mount_point: "<MOUNTPOINT>"
-        user: "<USER>"
-        password: "<PASSWORD>"
-        timeout_s: 5
-    }
-    push_location: true
-}
-
-```
-这是RTK基站信息相关的配置，请依据自己的实际情况进行配置。假如您购买了一个千寻知寸账号，账号信息如下：
-
-```
-ip:203.107.45.154
-port:8002
-mount_point:RTCM32_GGB
-user:qianxun1234
-password:abc123
-```
-
-则修改后的内容如下所示：
-```
-rtk_from {
-    format: RTCM_V3
-    ntrip {
-        address: "203.107.45.154"
-        port: 8002
-        mount_point: "RTCM32_GGB"
-        user: "qianxun1234"
-        password: "abc123"
-        timeout_s: 5
-    }
-    push_location: true
-}
-
-```
-
-注意：RTK基站信息需要同时配置在M2的IMU主机中和apollo的开发套件的`gnss_conf.pb.txt`配置文件中。
-
-同时将文档中的`proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"`这一行中的`zone=50`中的50换成自己的城市所在的utmzone数值；比如这里的数值50代表的是北京，若您在纽约，则用纽约的utmzone数值10替换掉这里的数值50，以此类推。
+将文档中的`proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"`这一行中的`zone=50`中的50换成自己的城市所在的utmzone数值；比如这里的数值50代表的是北京，若您在纽约，则用纽约的utmzone数值10替换掉这里的数值50，以此类推。
 
 ### `Localization.conf`文件的配置
 对`modules/calibration/data/dev_kit/localization_conf/localization.conf`文件进行配置。**如果该配置文件没有进行正确配置，可能会对之后的传感器标定、虚拟车道线制作等功能产生影响**
@@ -268,4 +223,3 @@ d.GPS打开后，发现best_posed的sol_type为single，不是我们需要的NAR
 其次，检查IMU的网络接口是否插好了网线连接上了路由器，并且可以在工控机的终端里ping通IMU，同时保证路由器里面插上了手机的sim卡并且工控机能通过路由器正常地访问互联网。  
 再次，联系商务的同事请他们提供刷新IMU的固件版本的教程和工具，刷新完IMU后请按照文档重新配置一遍IMU。  
 最后，联系商务的同事商讨将IMU返厂维修的事宜。
-
