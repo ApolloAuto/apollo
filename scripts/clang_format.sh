@@ -43,14 +43,6 @@ function clang_format_run() {
   ${CLANG_FORMAT_CMD} -i "$@"
 }
 
-function proto_ext() {
-  if [[ "$(file_ext $1)" == "proto" ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 function run_clang_format() {
   for target in "$@"; do
     if [[ -f "${target}" ]]; then
