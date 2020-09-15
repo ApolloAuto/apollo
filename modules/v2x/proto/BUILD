@@ -296,3 +296,22 @@ py_proto_library(
         "//modules/common/proto:header_py_pb2",
     ],
 )
+
+cc_proto_library(
+    name = "v2x_traffic_light_policy_cc_proto",
+    deps = [
+        ":v2x_traffic_light_policy_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_traffic_light_policy_proto",
+    srcs = ["v2x_traffic_light_policy.proto"],
+)
+
+py_proto_library(
+    name = "v2x_traffic_light_policy_py_pb2",
+    deps = [
+        ":v2x_traffic_light_policy_proto",
+    ],
+)
