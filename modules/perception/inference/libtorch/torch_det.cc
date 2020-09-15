@@ -104,7 +104,7 @@ void TorchDet::Infer() {
   torch::Tensor one_hot = torch::zeros({scores.size(0), 2},
                                        torch::kFloat).to(device);
 
-  torch::Tensor result = torch::cat({img_id, bbox, scores, labels, one_hot},
+  torch::Tensor result = torch::cat({img_id, bbox, labels, scores, one_hot},
                                    1);
   blobs_[output_names_[0]]->Reshape({static_cast<int>(result.size(0)),
                              static_cast<int>(result.size(1)), 1, 1});
