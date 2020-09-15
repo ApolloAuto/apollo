@@ -168,6 +168,25 @@ Status PathReferenceDecider::Process(Frame *frame,
   reference_line_info->AdjustTrajectoryWhichStartsFromCurrentPos(
       frame->PlanningStartPoint(), learning_model_trajectory,
       &stitched_learning_model_trajectory);
+  // when path_reference is too short not valid path reference
+  if (stitched_learning_model_trajectory.size() <= 1) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
+    std::string err_msg = "Stitched path reference is too short";
+    reference_line_info->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_hybrid_model()
+        ->set_learning_model_output_fail_reason(err_msg);
+    reference_line_info->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_hybrid_model()
+        ->set_learning_model_output_usage_ratio(
+            static_cast<double>(valid_path_reference_counter_) /
+            (total_path_counter_ + kMathEpsilon));
+    return Status::OK();
+  }
   ConvertTrajectoryToPath(stitched_learning_model_trajectory, &path_reference);
   const std::string path_reference_name = "path_reference";
   RecordDebugInfo(path_reference, path_reference_name, reference_line_info);
