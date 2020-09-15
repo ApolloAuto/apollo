@@ -16,9 +16,9 @@ use cases as they were all treated as a single driving scenario.
 Apollo 5.5, which focuses on curb-to-curb autonomous driving on urban roads,
 introduced 2 new planning scenarios.
 
-Apollo 6.0, which focuses on data-driven development of autonomous driving, introduced two new planning modes: E2E mode and Hybrid mode, by which we demonstrate the new capability of dynamically nudginng a moving obstacle. These two modes also define a series of APIs where developers can generate thier own training data and bring in their own models.
+Apollo 6.0 extended the technology to incorporate data-driven mothedologies to tackle trajectory planning problems with learning-based models, and introduced two new planning modes: E2E mode and Hybrid mode, by which the new capability of dynamically nudginng moving obstacles are demonstrated. In these two modes, a series of APIs is also defined  where developers can generate their own training data and integrate their own models.
 
-**Note:** The current development of E2E mode is in early stage where it is fined-tuned more for the dynamic nudge scenario rather than comprehensive ones. So suboptimality is expected when running other scenarios in simulation. E2E mode and Hybrid mode are not tested on real vehicle yet. The work on data-driven planning is still in progress and welcomes any collaboration by any means including algorithms, models and data.
+**Note:** The current development of E2E mode is in an early stage where the model is trained for the dynamic nudge scenario as a research demonstration purpose. The capability of the model is limited, and suboptimality is expected when it is tested with a wider selection of  scenarios. E2E mode and Hybrid mode are not tested on real roads yet, but rather serve as a baseline to promote and encourage extensive research on learning based planning.  All developers are welcomes to collaborate with us by any means including algorithms, models and data.
 
 ## E2E Mode
    ![](images/e2e_mode.png)
