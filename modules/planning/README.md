@@ -46,6 +46,22 @@ modules/planning/conf/scenario/lane_follow_hybrid_config.pb.txt
 ```
 The parameter `path_reference_l_weight` is for adjusting hybrid model path output. A larger value of `path_reference_l_weight` means higher penalty of the difference between hybrid model path and learning model path in lateral direction.
 
+## Apollo 5.5 vs E2E Mode vs Hybrid Mode
+
+We demonstrate simulation results on a dynamic nudge scenario with Apollo 5.5, E2E mode, and Hybrid mode. 
+
+- Apollo 5.5 
+
+![](images/sim_rule.gif)
+
+- E2E  Mode
+
+![](images/sim_e2e.gif)
+
+- Hybrid Mode
+
+![](images/sim_hybrid.gif)
+
 ## Driving Scenarios
 
 There are 5 main driving scenarios that we will focus on Lane Follow, Intersection, Pull-Over, and the newly introduced Park-and-go and Emergency. Let's dive into them individually:
