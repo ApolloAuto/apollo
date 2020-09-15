@@ -1,0 +1,75 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+message Position2D {
+  optional double x = 1;
+  optional double y = 2;
+}
+
+message Connection {
+  enum Type {
+    STRAIGHT = 0;
+    LEFT = 1;
+    RIGHT = 2;
+    U_TURN = 3;
+  };
+  optional Type allow_driving_behavior = 1;
+  optional int32 phase_id = 2;
+}
+
+message Lane {
+  optional int32 lane_id = 1;
+  repeated Position2D position_offset = 2;
+  repeated Connection connections = 3;
+}
+
+message Road {
+  optional int32 upstream_node_id = 1;
+  optional Position2D points = 2;
+  repeated Lane lanes = 3;
+}
+
+message Intersection {
+  optional int32 id = 1;
+  optional Position2D position = 2;
+  repeated Road roads = 3;
+}
+
+message Map {
+  optional double time_stamp = 1;
+  optional int32 msg_cnt = 2;
+  repeated Intersection intersections = 3;
+}
+
+message Phase {
+  enum Color {
+    UNKNOWN = 0;
+    RED = 1;
+    YELLOW = 2;
+    GREEN = 3;
+    BLACK = 4;
+    FLASH_GREEN = 5;
+  };
+  optional int32 id = 1;
+  optional Color color = 2;
+  optional int32 color_remaining_time_s = 3;
+}
+
+message IntersectionState {
+  optional int32 intersection_id = 1;
+  repeated Phase Phases = 2;
+  optional int32 moy = 3;
+  optional int32 time_stamp_dsecond = 4;
+}
+
+message Spat {
+  optional double time_stamp = 1;
+  optional int32 msg_cnt = 2;
+  repeated IntersectionState intersections = 3;
+}
+
+message PolicyData {
+  optional Map map = 1;
+  optional Spat spat = 2;
+}
