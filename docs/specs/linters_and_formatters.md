@@ -39,7 +39,7 @@ are provided for developers to check style issues.
 > files only. We hope that linters for other languages will be online in the
 > near future.
 
-|  Linters   |           Source Extensions           | Apollo Command Used       |
+|  Linters   |           Source Extensions           | Usage                     |
 | :--------: | :-----------------------------------: | :------------------------ |
 |  cpplint   | .h/.c/.hpp/.cpp/.hh/.cc/.hxx/.cxx/.cu | bash apollo.sh lint --cpp |
 |   flake8   |                  .py                  | bash apollo.sh lint --py  |
@@ -57,7 +57,7 @@ avoid common mistakes when writing code.
 The following table lists the formatters currently integrated into Apollo,
 covering C/C++, Python, Bash, Bazel, Markdown, JSON and YAML files.
 
-|  Formatters  |              Source Extensions               |               Apollo Command Used                | Formatter Config |
+|  Formatters  |              Source Extensions               |                      Usage                       | Formatter Config |
 | :----------: | :------------------------------------------: | :----------------------------------------------: | :--------------: |
 | clang-format | .h/.c/.hpp/.cpp/.hh/.cc/.hxx/.cxx/.cu/.proto | ./apollo.sh format -c <path/to/src/dir/or/files> |  .clang-format   |
 |   autopep8   |                     .py                      | ./apollo.sh format -p <path/to/src/dir/or/files> |     tox.ini      |
