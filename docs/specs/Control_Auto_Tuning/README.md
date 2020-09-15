@@ -90,7 +90,7 @@ Before using the auto-tuning service，set up the input file storage first accor
 
 ### Submit Job via Webpage
 
-Login in the [Apollo webpage](http://bce.apollo.auto/) and choose the **Apollo Fuel -> New Jobs** in the functionality menu. Select the **Control Auto Tuning** option in the **New Job** menu，and then fill the **Input Data Path** with the task configuration file path starting from the root directory under the users' BOS folder (Note: **the Input Data Path must include the full configuration file name**, for example, 'input/XXX_tuner_params_config.pb.txt'). Finally, submit your job by clicking the **Submit Job** button。
+Login in the [Apollo webpage](http://bce.apollo.auto/) and choose the **Apollo Fuel -> New Job** in the functionality menu. Select the **Control Auto Tuning** option in the **New Job** menu，and then fill the **Input Data Path** with the task configuration file path starting from the root directory under the users' BOS folder (Note: **the Input Data Path must include the full configuration file name**, for example, 'input/XXX_tuner_params_config.pb.txt'). Finally, submit your job by clicking the **Submit Job** button。
 
 ![](images/control_auto_tuning_webpage.png)
 
@@ -116,4 +116,4 @@ Login in the [Apollo webpage](http://bce.apollo.auto/) and choose the **Apollo F
 | `Base_Target` | The weighted score of the best control parameters  |
 | `Base_Params` | The best control parameters  |
 | `Optimization_Time` | The overall time consumption of the entire auto-tuning optimization process | Unit: seconds |
-| `Time_Efficiency` | The average time consumption of the single optimization iteration step | Unit: seconds / iteration | 
+| `Time_Efficiency` | The average time consumption of the single optimization iteration step | Unit: seconds / iteration |
