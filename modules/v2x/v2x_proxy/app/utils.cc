@@ -32,7 +32,6 @@ InternalData::InternalData() {
   msg_timestamp_ = new double[kBufferSize];
   CHECK_NOTNULL(remaining_time_);
   CHECK_NOTNULL(msg_timestamp_);
-  sim_oslight_ = std::make_shared<OSLight>();
   obu_light_ = std::make_shared<ObuLight>();
   this->reset();
 }
@@ -44,16 +43,13 @@ InternalData::~InternalData() {
 
 void InternalData::reset() {
   oslight_ = nullptr;
-  sim_oslight_->Clear();
-  sim_sending_count_ = 0;
   intersection_id_ = -1;
   change_color_timestamp_ = 0.0;
 }
 
 bool InternalData::TrafficLightProc(
     const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap, double distance,
-    ::apollo::v2x::RoadTrafficLight *msg,
-    ::apollo::v2x::RoadTrafficLight *sim_msg) {
+    ::apollo::v2x::RoadTrafficLight *msg) {
   if (nullptr == msg) {
     return false;
   }
@@ -111,58 +107,6 @@ bool InternalData::TrafficLightProc(
   return true;
 }
 
-bool InternalData::GenerateSimMsg() {
-  if (nullptr == oslight_) {
-    return false;
-  }
-  if (sim_sending_count_ > kMaxSimulSendingCount) {
-    AWARN << "reach the limitation, will not send the msg";
-    return false;
-  }
-  auto cur_time = ::apollo::cyber::Time::Now().ToSecond();
-  auto msg_data =
-      std::make_shared<::apollo::v2x::IntersectionTrafficLightData>();
-  msg_data->CopyFrom(*oslight_);
-  if ((cur_time - msg_data->mutable_header()->timestamp_sec()) > 3.0) {
-    AWARN << "sim msg is too old, will not send the msg";
-    return false;
-  }
-  int num_os_traffic_light = msg_data->road_traffic_light_size();
-  for (int i = 0; i < num_os_traffic_light; i++) {
-    auto stamp_diff = cur_time - msg_timestamp_[i];
-    if (1.0 > stamp_diff) {
-      continue;
-    }
-    AINFO << std::setprecision(11) << "Index " << i
-          << " time stamp diff is: " << stamp_diff << ", cur_time:" << cur_time
-          << "time stamp:" << msg_timestamp_[i];
-    auto os_current_light = msg_data->mutable_road_traffic_light(i);
-    for (int j = 0; j < os_current_light->single_traffic_light_size(); j++) {
-      auto single = os_current_light->mutable_single_traffic_light(j);
-      auto color = single->color();
-      auto remaining_time = single->color_remaining_time_s();
-      if (remaining_time < static_cast<int>(stamp_diff)) {
-        color = utils::GetNextColor(color);
-        remaining_time = single->next_remaining_time_s() + remaining_time -
-                         static_cast<int>(stamp_diff);
-        single->set_color(color);
-      } else {
-        remaining_time = remaining_time - static_cast<int>(stamp_diff);
-      }
-      change_color_timestamp_ = ::apollo::cyber::Time::Now().ToSecond();
-      single->set_color_remaining_time_s(remaining_time);
-    }
-  }
-  sim_sending_count_++;
-  AINFO << "Have sent " << sim_sending_count_ << " time(s).";
-  // modify the time stamp in header
-  msg_data->mutable_header()->set_timestamp_sec(
-      ::apollo::cyber::Time::Now().ToSecond());
-  sim_oslight_->Clear();
-  sim_oslight_->CopyFrom(*msg_data);
-  return true;
-}
-
 bool IsRushHour() {
   std::time_t local = std::time(nullptr);
   std::tm now = {};
@@ -185,10 +129,6 @@ bool InternalData::ProcTrafficlight(
     if (junction_id == kUnknownJunctionId) {
       return false;
     }
-    if (!this->GenerateSimMsg()) {
-      return false;
-    }
-    (*os_light)->CopyFrom(*sim_oslight_);
     return true;
   }
   if (junction_id != x2v_traffic_light->hdmap_junction_id()) {
@@ -209,16 +149,13 @@ bool InternalData::ProcTrafficlight(
   std::shared_ptr<OSLight> sim_traffic_light_data = nullptr;
   // enter the new intersection if the sim message is not null, clear
   auto cur_junction_id = x2v_traffic_light->intersection_id();
-  if (cur_junction_id != intersection_id_) {
-    sim_oslight_->Clear();
-  }
   auto tmp_os_traffic_light = std::make_shared<OSLight>();
   tmp_os_traffic_light->CopyFrom(*os_traffic_light);
   // clear road traffic light
   tmp_os_traffic_light->clear_road_traffic_light();
   for (int i = 0; i < num_os_traffic_light; i++) {
     auto os_current_light = os_traffic_light->mutable_road_traffic_light(i);
-    if (!TrafficLightProc(hdmap, distance, os_current_light, nullptr)) {
+    if (!TrafficLightProc(hdmap, distance, os_current_light)) {
       AERROR << "Traffic light proc failed";
       continue;
     }
@@ -236,7 +173,6 @@ bool InternalData::ProcTrafficlight(
   }
   cur_junction_id = x2v_traffic_light->intersection_id();
   tmp_os_traffic_light->set_intersection_id(cur_junction_id);
-  sim_sending_count_ = 0;
   // enter a new junction, need to clear the list
   if (cur_junction_id != intersection_id_) {
     AINFO << "Enter New Juncion: " << cur_junction_id;
@@ -250,7 +186,6 @@ bool InternalData::ProcTrafficlight(
       remaining_time_[i] = remaining_time;
       msg_timestamp_[i] = x2v_traffic_light->header().timestamp_sec();
     }
-    sim_oslight_->Clear();
   } else {
     ADEBUG << "Same Juncion: " << cur_junction_id;
     if (flag_u_turn) {

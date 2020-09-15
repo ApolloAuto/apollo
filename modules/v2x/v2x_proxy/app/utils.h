@@ -41,12 +41,9 @@ const char *const kUnknownJunctionId = "unknown";
 
 class InternalData final {
  private:
-  static constexpr int kMaxSimulSendingCount = 10;
   static constexpr size_t kBufferSize = 40;
   std::shared_ptr<OSLight> oslight_ = nullptr;
-  std::shared_ptr<OSLight> sim_oslight_ = nullptr;
   std::shared_ptr<ObuLight> obu_light_ = nullptr;
-  int sim_sending_count_ = 0;
   int intersection_id_ = -1;
   double change_color_timestamp_ = 0.0;
   int32_t *remaining_time_ = nullptr;
@@ -60,10 +57,7 @@ class InternalData final {
   void reset();
 
   bool TrafficLightProc(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
-                        double distance, ::apollo::v2x::RoadTrafficLight *msg,
-                        ::apollo::v2x::RoadTrafficLight *sim_msg);
-
-  bool GenerateSimMsg();
+                        double distance, ::apollo::v2x::RoadTrafficLight *msg);
 
   bool ProcTrafficlight(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
                         const ObuLight *x2v_traffic_light,
