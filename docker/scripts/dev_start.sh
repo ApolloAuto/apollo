@@ -456,7 +456,13 @@ function mount_other_volumes() {
     local yolov4_volume="apollo_yolov4_volume_${USER}"
     local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-latest"
     docker_restart_volume "${yolov4_volume}" "${yolov4_image}"
-    OTHER_VOLUMES_CONF="${OTHER_VOLUMES_CONF} --volumes-from ${yolov4_volume}"
+    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+
+    # FASTER_RCNN
+    local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
+    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-latest"
+    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
+    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
