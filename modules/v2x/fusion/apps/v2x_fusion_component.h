@@ -27,7 +27,6 @@
 #include <vector>
 
 #include "cyber/component/component.h"
-#include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/v2x/fusion/apps/common/trans_tools.h"
 #include "modules/v2x/fusion/configs/ft_config_manager.h"
