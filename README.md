@@ -31,7 +31,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Introduction
 
-Apollo is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
+Apollo is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platforms.
 
 ## Prerequisites
 
@@ -39,17 +39,17 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 * A machine with a 8-core processor and 16GB memory minimum 
 
-* nVidia Turing GPU is strongly recommended 
+* NVIDIA Turing GPU is strongly recommended 
 
 * Ubuntu 18.04
 
-* nVidia driver version 440.33 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us)), and CUDA version 10.2
+* NVIDIA driver version 440.33.01 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us)), and CUDA version 10.2
 
 * Docker-CE version 19.03 and above ([Official doc](https://docs.docker.com/engine/install/ubuntu/))
 
-* nVidia container toolkit ([Official doc](https://github.com/NVIDIA/nvidia-docker))
+* NVIDIA container toolkit ([Official doc](https://github.com/NVIDIA/nvidia-docker))
 
-**Please note**, it is recommended that you install the versions of Apollo in the following order: **1.0 -> whichever version you would like to test out**. The reason behind this recommendation is that you need to confirm whether individual hardware components and modules are functioning correctly and clear various version test cases, before progressing to a higher, more capable version for your safety and the safety of those around you.
+**Please note**, it is recommended that you install the versions of Apollo in the following order: **1.0 -> whichever version you would like to test out**. The reason behind this recommendation is that you need to confirm whether individual hardware components and modules are functioning correctly, and clear various version test cases before progressing to a higher and more capable version for your safety and the safety of those around you.
 
 ## Individual Versions:
 
@@ -114,7 +114,7 @@ Apollo 5.5 enhances the complex urban road autonomous driving capabilities of pr
 
 [**Apollo 6.0:**](docs/quickstart/apollo_6_0_quick_start.md)
 
-Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new addtions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
+Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new additions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
 
 ![image alt text](docs/demo_guide/images/Apollo_6_0.png)
 
@@ -146,23 +146,23 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 ## Quick Starts:
 
-* [Apollo 1.0 QuickStart Guide](docs/quickstart/apollo_1_0_quick_start.md)
-
-* [Apollo 1.5 QuickStart Guide](docs/quickstart/apollo_1_5_quick_start.md)
-
-* [Apollo 2.0 QuickStart Guide](docs/quickstart/apollo_2_0_quick_start.md)
-
-* [Apollo 2.5 QuickStart Guide](docs/quickstart/apollo_2_5_quick_start.md)
-
-* [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
-
-* [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
-
-* [Apollo 5.0 QuickStart Guide](docs/quickstart/apollo_5_0_quick_start.md)
+* [Apollo 6.0 QuickStart Guide](docs/quickstart/apollo_6_0_quick_start.md)
 
 * [Apollo 5.5 QuickStart Guide](docs/quickstart/apollo_5_5_quick_start.md)
 
-* [Apollo 6.0 QuickStart Guide](docs/quickstart/apollo_6_0_quick_start.md)
+* [Apollo 5.0 QuickStart Guide](docs/quickstart/apollo_5_0_quick_start.md)
+
+* [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
+
+* [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
+
+* [Apollo 2.5 QuickStart Guide](docs/quickstart/apollo_2_5_quick_start.md)
+
+* [Apollo 2.0 QuickStart Guide](docs/quickstart/apollo_2_0_quick_start.md)
+
+* [Apollo 1.5 QuickStart Guide](docs/quickstart/apollo_1_5_quick_start.md)
+
+* [Apollo 1.0 QuickStart Guide](docs/quickstart/apollo_1_0_quick_start.md)
 
 ## Documents
 

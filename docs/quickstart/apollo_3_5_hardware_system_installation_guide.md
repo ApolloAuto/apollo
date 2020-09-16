@@ -56,7 +56,7 @@ The following set of documentation describes Apollo 3.0:
     * [Apollo Sensor Unit (ASU)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
     * Apollo Extension Unit (AXU)
 
-  * **Software**: Refer to the [Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Software_and_Kernel_Installation_guide.md) for information on the following:
+  * **Software**: Refer to the [Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md) for information on the following:
     * Ubuntu Linux
     * Apollo Linux Kernel
     * NVIDIA GPU Driver

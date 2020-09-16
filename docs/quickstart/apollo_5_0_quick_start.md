@@ -2,7 +2,7 @@
 
 The following guide serves as a user manual for launching the Apollo upgraded software and hardware stack on vehicle.
 
-The latest Apollo upgrade, Quick Start Guide focuses on the new features. For general Apollo concepts, please refer to
+This Quick Start Guide focuses on the new features. For general Apollo concepts, please refer to
 [Apollo 3.5 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_quick_start.md)
 
 ## Contents
@@ -14,7 +14,7 @@ The latest Apollo upgrade, Quick Start Guide focuses on the new features. For ge
 
 ## Calibration Guide
 
-Apollo currently offers a robust calibration service to support your calibration requirements from LiDARs to IMU to Cameras. This service is currently being offered to select partners only. If you would like to learn more about the calibration service, please reach out to us via email: **apollopartner@baidu.com**
+Apollo currently offers a robust calibration service to support your calibration requirements from LiDARs to IMU to Cameras. This service is being offered to selected partners only. If you would like to learn more about the calibration service, please reach out to us via email: **apollopartner@baidu.com**
 
 ## Hardware and Software Installation
 

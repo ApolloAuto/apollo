@@ -3,19 +3,24 @@
 The following guide serves as a user manual for launching the Apollo upgraded software and hardware stack on vehicle, which
 is similar to Apollo 5.5.
 
-The latest Apollo upgrade, Quick Start Guide focuses on the new features, like software and third party dependencies update. For general Apollo concepts, please refer to
-[Apollo 3.5 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_quick_start.md)
+This Quick Start Guide focuses on the new features. For general Apollo concepts, please refer to
+[Apollo 5.5 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_5_5_quick_start.md)
 
 ## Contents
 
-- [Calibration Guide](#calibration-guide)
+- [Emergency Audio Detection](#emergency-audio-detection)
+- [New Deep Learning Models](#new-deep-learning-models)
 - [Hardware and Software Installation](#hardware-and-software-installation)
 - [Dreamview Usage Table](#dreamview-usage-table)
 - [Onboard Test](#onboard-test)
 
-## Calibration Guide
+## Emergency Audio Detection
 
-Apollo currently offers a robust calibration service to support your calibration requirements from LiDARs to IMU to Cameras. This service is currently being offered to select partners only as part of our Data Pipeline service offering. If you would like to learn more about the calibration service, please reach out to us via email: **apollopartner@baidu.com**
+Apollo currently integrates emergency vehicle detection through audio devices. Microphones are installed on the vehicle to collect audio signals around the autonomous vehicle, and the recorded soundtracks will be analized and processed to detect emergency vehicles in the surroundings. The module detail is [here](https://github.com/ApolloAuto/apollo/tree/master/modules/audio).
+
+## New Deep Learning Models
+
+Apollo integrates new deep learning models including obstacle detection with PointPillars, pedestrian prediction with semantic map and learning based trajectory planning. Please find details in corresponding modules
 
 ## Hardware and Software Installation
 
@@ -40,8 +45,7 @@ For questions regarding Dreamland and the scenario editor, please visit our [Dre
 
 4. Launch DreamView
 
-   Note\: Use Chrome or other browser to access Dreamview web service in your host
-   machine browser with URL <http://localhost:8888>
+   Open URL <http://localhost:8888> to launch  Dreamview web service onyour host
 
    ![launch_dreamview](images/dreamview_2_5.png)
 
