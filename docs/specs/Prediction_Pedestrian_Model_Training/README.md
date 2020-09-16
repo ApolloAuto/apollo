@@ -10,7 +10,9 @@ Prediction Pedestrian Model Treaining Service is a cloud based service to train 
 
 - [Apollo](https://github.com/ApolloAuto/apollo) 6.0 or higher version.
 
-- Cloud and simulation services registered according to [Apollo_Fuel](Localization_Configuration_cn.md) and [Apollo Dreamland](http://bce.apollo.auto/)
+- Baidu Cloud BOS service registered according to [document](https://github.com/ApolloAuto/apollo/blob/master/docs/Apollo_Fuel/apply_bos_account_cn.md)
+
+- Fuel service account on [Apollo Dreamland](http://bce.apollo.auto/user-manual/fuel-service)
 
 ## Main Steps
 
