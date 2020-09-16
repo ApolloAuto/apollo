@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber/component",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/v2x/fusion/apps/common:trans_tools",
         "//modules/v2x/fusion/configs:ft_config_manager",
         "//modules/v2x/fusion/configs:fusion_tracker_gflags",

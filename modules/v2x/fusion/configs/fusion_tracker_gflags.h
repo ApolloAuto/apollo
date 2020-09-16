@@ -32,8 +32,6 @@ DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
 DECLARE_string(config_path);
 DECLARE_string(v2x_module_name);
-DECLARE_string(localization_topic);
-DECLARE_string(v2x_obstacles_topic);
 DECLARE_string(v2x_fusion_obstacles_topic);
 DECLARE_bool(use_v2x);
 // fusion

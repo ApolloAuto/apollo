@@ -50,6 +50,9 @@ class Fusion {
       const std::vector<base::Object> &new_objects,
       std::vector<base::Object> *fused_objects,
       std::vector<std::vector<base::Object>> *fusion_result);
+  bool GetV2xFusionObjects(
+      const std::vector<std::vector<base::Object>> &fusion_result,
+      std::vector<base::Object> *fused_objects);
   int DeleteRedundant(std::vector<base::Object> *objects);
 
  private:
@@ -63,6 +66,8 @@ class Fusion {
                      double *score);
   bool CheckTypeScore(const base::Object &in1_ptr, const base::Object &in2_ptr,
                       double *score);
+  bool host_vehicle_ = false;
+  bool zom_vehicle_ = false;
   double last_timestamp_;
   const double MAX_SCORE = 250000;
   float m_matched_dis_limit_;
