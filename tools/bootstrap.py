@@ -77,14 +77,19 @@ def inside_docker():
 
 
 def docker_stage():
+    default_apollo_stage = "dev"
     if not inside_docker():
-        return "dev"
+        return default_apollo_stage
+    stage_conf = "/etc/apollo.conf"
+    if not os.path.exists(stage_conf) or not os.path.isfile(stage_conf):
+        return default_apollo_stage
+
     with open("/etc/apollo.conf") as f:
         for line in f:
             line = line.strip()
             if line.startswith("stage="):
                 return line.split("=")[-1]
-    return "dev"
+    return default_apollo_stage
 
 
 def default_root_dir():
