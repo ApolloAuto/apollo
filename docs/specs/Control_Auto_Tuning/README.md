@@ -31,9 +31,9 @@ Control parameter auto-tuning is executed in the control-in-the-loop simulation 
 
 - [Apollo](https://github.com/ApolloAuto/apollo) 6.0 or higher version
 
-- Cloud and simulation services registered according to [Apollo_Fuel](Localization_Configuration_cn.md) and [Apollo Dreamland](http://bce.apollo.auto/)
+- Cloud and simulation services registered according to [Apollo Dreamland](http://bce.apollo.auto/)
 
-- [Dynamic Modeling](dynamic_modeling.md) service
+- [Dynamic Modeling](../Dynamic_Model/README.md) service
 
 
 ## Main Steps
