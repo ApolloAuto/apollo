@@ -9,8 +9,9 @@ Open Space Profiling Service is a cloud based service to evaluate the open space
 
 - [Apollo](https://github.com/ApolloAuto/apollo) 6.0 or higher version.
 
-- Cloud Fuel services registered according to [Apollo_Fuel](https://github.com/ApolloAuto/apollo/blob/master/docs/Apollo_Fuel/apply_bos_account_cn.md) on [Apollo Dreamland](http://bce.apollo.auto/)
+- Baidu Cloud BOS service registered according to [document](https://github.com/ApolloAuto/apollo/blob/master/docs/Apollo_Fuel/apply_bos_account_cn.md)
 
+- Fuel service account on [Apollo Dreamland](http://bce.apollo.auto/user-manual/fuel-service)
 
 ## Main Steps
 
@@ -52,7 +53,7 @@ Finish one autonomous driving scenario with open space planner, e.g. Valet Parki
 
 ### Upload data to BOS
 
-Here is the folder structure requirements for job submission：
+Here is the folder structure requirements for job submission:
 1. A cyber record file containing the execution of open space planner scenario.
 
 1. A configuration file `vehicle_param.pb.txt`; there is a sample file under `apollo/modules/common/data/vehicle_param.pb.txt`.
