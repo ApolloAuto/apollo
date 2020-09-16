@@ -1,6 +1,6 @@
 # Release 6.0
 
-Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new addtions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
+Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new additions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
 
 ## Major Features and Improvements
 * Upgraded Deep Learning Models
@@ -18,7 +18,7 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
     * Remote control interface with DreamView integration
     * Audio bssed emergency vehicle detection system
 
-**[Note]** All models and methodogies included in Apollo 6.0 are for research purposes only. Productized and commercial uses of these models are **NOT** encouraged, and it is at your own risk. Please be cautious to try Apollo 6.0 with enough safety protection mechanmism and provide your feedback so that we can continuously improve the models.
+**[Note]** All models and methodogies included in Apollo 6.0 are for research purposes only. Productized and commercial uses of these models are **NOT** encouraged, and it is at your own risk. Please be cautious to try Apollo 6.0 with enough safety protection mechanmism. Your feedback is highly appreciated for us to continuously improve the models.
 
 # Release 5.5
 

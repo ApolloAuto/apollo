@@ -18,7 +18,7 @@ introduced 2 new planning scenarios.
 
 Apollo 6.0 extended the technology to incorporate data-driven mothedologies to tackle trajectory planning problems with learning-based models, and introduced two new planning modes: E2E mode and Hybrid mode, by which the new capability of dynamically nudginng moving obstacles are demonstrated. In these two modes, a series of APIs is also defined  where developers can generate their own training data and integrate their own models.
 
-**Note:** The current development of E2E mode is in an early stage where the model is trained for the dynamic nudge scenario as a research demonstration purpose. The capability of the model is limited, and suboptimality is expected when it is tested with a wider selection of  scenarios. E2E mode and Hybrid mode are not tested on real roads yet, but rather serve as a baseline to promote and encourage extensive research on learning based planning.  All developers are welcomes to collaborate with us by any means including algorithms, models and data.
+**Note:** The current development of E2E mode is in an early stage where the model is trained for the dynamic nudge scenario as a research demonstration purpose. The capability of the model is limited, and suboptimality is expected when it is tested with a wider selection of  scenarios. E2E mode and Hybrid mode are not tested on real roads yet, but rather serve as a baseline to promote and encourage extensive research on learning based planning.  All developers are welcome to collaborate with us by any means including algorithms, models and data.
 
 ## E2E Mode
    ![](images/e2e_mode.png)
