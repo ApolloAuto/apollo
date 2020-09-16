@@ -106,6 +106,39 @@ bool Fusion::CombineNewResource(
   return true;
 }
 
+bool Fusion::GetV2xFusionObjects(
+    const std::vector<std::vector<base::Object>> &fusion_result,
+    std::vector<base::Object> *fused_objects) {
+  for (auto &objects : fusion_result) {
+    if (objects.size() == 1) {
+      fused_objects->push_back(objects.at(0));
+      if (objects.at(0).frame_id == "V2X") {
+        fused_objects->back().v2x_type = base::V2xType::BLIND_ZONE;
+      } else {
+        fused_objects->back().v2x_type = base::V2xType::UNKNOWN;
+      }
+    } else {
+      fused_objects->push_back(objects.at(0));
+      host_vehicle_ = false;
+      zom_vehicle_ = false;
+      for (auto &object : objects) {
+        if (object.v2x_type == base::V2xType::HOST_VEHICLE) {
+          host_vehicle_ = true;
+        } else if (object.v2x_type == base::V2xType::ZOMBIES_CAR) {
+          zom_vehicle_ = true;
+        }
+      }
+      if (zom_vehicle_ == true) {
+        fused_objects->back().v2x_type = base::V2xType::ZOMBIES_CAR;
+      }
+      if (host_vehicle_ == true) {
+        fused_objects->back().v2x_type = base::V2xType::HOST_VEHICLE;
+      }
+    }
+  }
+  return true;
+}
+
 double Fusion::CheckOdistance(const base::Object &in1_ptr,
                               const base::Object &in2_ptr) {
   double xi = in1_ptr.position.x();

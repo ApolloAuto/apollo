@@ -23,7 +23,7 @@ namespace v2x {
 namespace ft {
 
 void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
-                const std::string &frame_id, double timestamp_object) {
+               const std::string &frame_id, double timestamp_object) {
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
   variance.setIdentity();
@@ -118,10 +118,9 @@ void Pb2Object(const PerceptionObstacle &obstacle, base::Object *object,
 }
 
 void V2xPb2Object(const apollo::v2x::V2XObstacle &obstacle,
-                   base::Object *object, const std::string &frame_id,
-                   double timestamp_object) {
-  Pb2Object(obstacle.perception_obstacle(), object, frame_id,
-             timestamp_object);
+                  base::Object *object, const std::string &frame_id,
+                  double timestamp_object) {
+  Pb2Object(obstacle.perception_obstacle(), object, frame_id, timestamp_object);
   if (obstacle.has_v2x_info() && obstacle.v2x_info().v2x_type_size() > 0 &&
       obstacle.v2x_info().v2x_type(0) ==
           ::apollo::v2x::V2XInformation::ZOMBIES_CAR) {
@@ -130,7 +129,7 @@ void V2xPb2Object(const apollo::v2x::V2XObstacle &obstacle,
 }
 
 base::Object Pb2Object(const PerceptionObstacle &obstacle,
-                        const std::string &frame_id) {
+                       const std::string &frame_id) {
   base::Object object;
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
@@ -406,15 +405,10 @@ void Object2V2xPb(const base::Object &object, V2XObstacle *obstacle) {
 }
 
 double Pbs2Objects(const PerceptionObstacles &obstacles,
-                    std::vector<base::Object> *objects, std::string frame_id) {
+                   std::vector<base::Object> *objects,
+                   const std::string &frame_id) {
   double timestamp = std::numeric_limits<double>::max();
   objects->clear();
-  if (frame_id == "") {
-    frame_id = obstacles.header().frame_id();
-  }
-  if (obstacles.header().module_name() == "perception_obstacle") {
-    frame_id = "VEHICLE";
-  }
   double timestamp_object = 0.0;
   if (obstacles.perception_obstacle_size() > 0 &&
       obstacles.perception_obstacle(0).has_timestamp() == false) {
@@ -428,7 +422,7 @@ double Pbs2Objects(const PerceptionObstacles &obstacles,
   for (int j = 0; j < obstacles.perception_obstacle_size(); ++j) {
     base::Object object;
     Pb2Object(obstacles.perception_obstacle(j), &object, frame_id,
-               timestamp_object);
+              timestamp_object);
     objects->push_back(object);
     if (timestamp > object.timestamp) {
       timestamp = object.timestamp;
@@ -439,7 +433,7 @@ double Pbs2Objects(const PerceptionObstacles &obstacles,
 }
 
 void CarstatusPb2Object(const LocalizationEstimate &carstatus,
-                         base::Object *object, const std::string &frame_id) {
+                        base::Object *object, const std::string &frame_id) {
   Eigen::Vector3d value;
   Eigen::Matrix3d variance;
   variance.setIdentity();
@@ -466,23 +460,9 @@ void CarstatusPb2Object(const LocalizationEstimate &carstatus,
   object->timestamp = carstatus.header().timestamp_sec();
 }
 
-double CarstatusPb2Objects(const LocalizationEstimate &carstatus,
-                            std::vector<base::Object> *objects,
-                            std::string frame_id) {
-  double timestamp = std::numeric_limits<double>::max();
-  objects->clear();
-  base::Object object;
-  CarstatusPb2Object(carstatus, &object, frame_id);
-  objects->push_back(object);
-  if (timestamp > carstatus.header().timestamp_sec()) {
-    timestamp = carstatus.header().timestamp_sec();
-  }
-  return timestamp;
-}
-
 double V2xPbs2Objects(const V2XObstacles &obstacles,
-                       std::vector<base::Object> *objects,
-                       std::string frame_id) {
+                      std::vector<base::Object> *objects,
+                      const std::string &frame_id) {
   double timestamp = std::numeric_limits<double>::max();
   objects->clear();
   double timestamp_object = 0.0;
@@ -495,13 +475,10 @@ double V2xPbs2Objects(const V2XObstacles &obstacles,
       timestamp_object = obstacles.header().lidar_timestamp() / 1000000000.0;
     }
   }
-  if (frame_id == "") {
-    frame_id = obstacles.header().frame_id();
-  }
   for (int j = 0; j < obstacles.v2x_obstacle_size(); ++j) {
     base::Object object;
     V2xPb2Object(obstacles.v2x_obstacle(j), &object, frame_id,
-                  timestamp_object);
+                 timestamp_object);
     objects->push_back(object);
     if (timestamp > object.timestamp) {
       timestamp = object.timestamp;
@@ -512,13 +489,16 @@ double V2xPbs2Objects(const V2XObstacles &obstacles,
 }
 
 void Objects2Pbs(const std::vector<base::Object> &objects,
-                  std::shared_ptr<PerceptionObstacles> obstacles) {
+                 std::shared_ptr<PerceptionObstacles> obstacles) {
   obstacles->mutable_perception_obstacle()->Clear();
   if (objects.size() < 1) {
     return;
   }
   // obstacles->mutable_header()->set_frame_id(objects[0].frame_id);
   for (const auto &object : objects) {
+    if (object.v2x_type == base::V2xType::HOST_VEHICLE) {
+      continue;
+    }
     PerceptionObstacle obstacle;
     Object2Pb(object, &obstacle);
     obstacles->add_perception_obstacle()->CopyFrom(obstacle);
@@ -526,7 +506,7 @@ void Objects2Pbs(const std::vector<base::Object> &objects,
 }
 
 void Objects2V2xPbs(const std::vector<base::Object> &objects,
-                     std::shared_ptr<V2XObstacles> obstacles) {
+                    std::shared_ptr<V2XObstacles> obstacles) {
   obstacles->mutable_v2x_obstacle()->Clear();
   if (objects.size() < 1) {
     return;

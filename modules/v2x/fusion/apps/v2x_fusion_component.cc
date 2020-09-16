@@ -26,12 +26,11 @@ std::string V2XFusionComponent::Name() const { return FLAGS_v2x_module_name; }
 
 bool V2XFusionComponent::Init() {
   v2x_obstacles_reader_ =
-      node_->CreateReader<V2XObstacles>(FLAGS_v2x_obstacles_topic, nullptr);
+      node_->CreateReader<V2XObstacles>(FLAGS_v2x_obstacle_topic, nullptr);
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic, nullptr);
   perception_fusion_obstacles_writer_ =
-      node_->CreateWriter<PerceptionObstacles>(
-          FLAGS_v2x_fusion_obstacles_topic);
+      node_->CreateWriter<PerceptionObstacles>(FLAGS_perception_obstacle_topic);
   return true;
 }
 
@@ -64,18 +63,19 @@ bool V2XFusionComponent::V2XMessageFusionProcess(
   } else {
     header_.CopyFrom(perception_obstacles->header());
     std::vector<Object> fused_objects;
+    std::vector<Object> v2x_fused_objects;
     std::vector<std::vector<Object>> fusion_result;
     std::vector<Object> v2x_objects;
     V2xPbs2Objects(*v2x_obstacles_msg, &v2x_objects, "V2X");
     std::vector<Object> perception_objects;
-    Pbs2Objects(*perception_obstacles, &perception_objects);
+    Pbs2Objects(*perception_obstacles, &perception_objects, "VEHICLE");
     perception_objects.push_back(hv_obj);
     fusion_.CombineNewResource(perception_objects, &fused_objects,
                                &fusion_result);
     fusion_.CombineNewResource(v2x_objects, &fused_objects, &fusion_result);
-    // auto output_msg = std::make_shared<V2XObstacles>();
+    fusion_.GetV2xFusionObjects(fusion_result, &v2x_fused_objects);
     auto output_msg = std::make_shared<PerceptionObstacles>();
-    SerializeMsg(fused_objects, output_msg);
+    SerializeMsg(v2x_fused_objects, output_msg);
     perception_fusion_obstacles_writer_->Write(*output_msg);
   }
   return true;

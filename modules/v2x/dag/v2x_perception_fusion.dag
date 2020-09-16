@@ -9,7 +9,7 @@ module_config {
         flag_file_path : "/apollo/modules/v2x/conf/v2x_fusion_tracker.conf"
         readers: [
           {
-            channel: "/apollo/perception/obstacles"
+            channel: "/perception/vehicle/obstacles"
           }
         ]
       }
