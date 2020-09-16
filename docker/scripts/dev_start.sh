@@ -343,22 +343,19 @@ function determine_gpu_use_host() {
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
     if [ ${USE_GPU_HOST} -eq 1 ]; then
         DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-        if [ ! -z "$(which nvidia-docker)" ]; then
-            DOCKER_RUN="nvidia-docker run"
-            warning "nvidia-docker is deprecated. Please install latest docker " \
-                    "and nvidia-container-toolkit as described by:"
-            warning "  ${nv_docker_doc}"
-        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
             if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
                 DOCKER_RUN="docker run --gpus all"
             else
-                warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+                warning "You must upgrade to Docker-CE 19.03+ to access GPU from container!"
                 USE_GPU_HOST=0
             fi
+        elif [[ -x "$(which nvidia-docker)" ]]; then
+            DOCKER_RUN="nvidia-docker run"
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install " \
-                    "latest docker and nvidia-container-toolkit as described by: "
+                    "latest Docker and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
