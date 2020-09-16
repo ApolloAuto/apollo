@@ -62,4 +62,3 @@
 
 ## Others
 - [Apollo software installation guide](apollo_software_installation_guide.md)
-- [Apollo software installation guide cn](apollo_software_installation_guide_cn.md)

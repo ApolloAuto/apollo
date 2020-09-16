@@ -5,7 +5,7 @@
 ## 准备工作
 
 假设您已经按
-照[Apollo 软件安装指南](../quickstart/apollo_software_installation_guide_cn.md)的
+照[Apollo 软件安装指南](../quickstart/apollo_software_installation_guide.md)的
 说明准备搭建好 Apollo 的运行环境。即，您已经克隆了 Apollo 在 GitHub 上的代码仓库
 ，并安装了所有必需的软件。
 
