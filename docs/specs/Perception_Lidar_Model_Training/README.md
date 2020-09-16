@@ -18,7 +18,7 @@ Open Perception Lidar Model Training Service is a cloud based service to train p
 
 - Job submission
 
-- Results analysis
+- Get trained models
 
 
 ## Data Collection
@@ -55,7 +55,7 @@ Collect sensor data from lidar and cameras in different scenarios covering your 
     bus, Car, construction_vehicle, Truck, barrier, Cyclist, motorcycle, Pedestrian, traffic_cone
 ```
 
-  When label your data,`type` must be the one of above categories(please note the uppercase). 
+    When label your data,`type` must be the one of above categories(please note the uppercase). 
 
 
 ## Job Submission
