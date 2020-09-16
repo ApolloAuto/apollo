@@ -35,7 +35,7 @@ void MlfTrackData::Reset() {
   sensor_history_objects_.clear();
   cached_objects_.clear();
   predict_.Reset();
-  feature_.reset();
+//  feature_.reset();
 }
 
 void MlfTrackData::Reset(TrackedObjectPtr obj, int track_id) {

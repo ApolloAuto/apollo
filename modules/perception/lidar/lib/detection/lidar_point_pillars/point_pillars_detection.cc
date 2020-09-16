@@ -55,7 +55,7 @@ PointPillarsDetection::PointPillarsDetection()
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(new PointPillars(
       FLAGS_reproduce_result_mode, FLAGS_score_threshold,
-      FLAGS_nms_overlap_threshold, FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
+      FLAGS_nms_overlap_threshold, FLAGS_pfe_torch_file, FLAGS_rpn_onnx_file));
   return true;
 }
 
@@ -349,7 +349,8 @@ void PointPillarsDetection::GetObjects(
   }
 }
 
-// TODO(chenjiahao): update the base ObjectSubType with more fine-grained types
+// TODO(all): update the base ObjectSubType with more fine-grained types
+// TODO(chenjiahao): move types into an array in the same order as offline
 base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
   switch (label) {
     case 0:
@@ -358,19 +359,17 @@ base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
       return base::ObjectSubType::CAR;
     case 2:  // construction vehicle
       return base::ObjectSubType::UNKNOWN_MOVABLE;
-    case 3:  // trailer
-      return base::ObjectSubType::UNKNOWN_MOVABLE;
-    case 4:
+    case 3:
       return base::ObjectSubType::TRUCK;
-    case 5:  // barrier
+    case 4:  // barrier
       return base::ObjectSubType::UNKNOWN_UNMOVABLE;
-    case 6:
+    case 5:
       return base::ObjectSubType::CYCLIST;
-    case 7:
+    case 6:
       return base::ObjectSubType::MOTORCYCLIST;
-    case 8:
+    case 7:
       return base::ObjectSubType::PEDESTRIAN;
-    case 9:
+    case 8:
       return base::ObjectSubType::TRAFFICCONE;
     default:
       return base::ObjectSubType::UNKNOWN;

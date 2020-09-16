@@ -26,6 +26,7 @@ cc_library(
         ":preprocess_points",
         ":scatter_cuda",
         "//modules/perception/common:perception_gflags",
+        "//third_party:libtorch",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
     ],
