@@ -65,6 +65,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 ## General
 - [Coordinate System.pdf](coordination.pdf)
 - [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide.md)
+- [Bazel in Apollo: An Overview](bazel_in_apollo_an_overview.md)
 - [Apollo Build and Test Explained](apollo_build_and_test_explained.md)
 
 ### Chinese documents
