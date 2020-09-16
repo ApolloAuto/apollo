@@ -18,7 +18,7 @@ Docker if needed.
 Run the following commands to clone
 [Apollo's GitHub Repo](https://github.com/ApolloAuto/apollo.git).
 
-```
+```bash
 # Using SSH
 git clone git@github.com:ApolloAuto/apollo.git
 
@@ -29,7 +29,7 @@ git clone https://github.com/ApolloAuto/apollo.git
 
 And checkout the latest branch:
 
-```
+```bash
 cd apollo
 git checkout master
 ```
@@ -37,7 +37,7 @@ git checkout master
 (Optional) For convenience, you can set up environment variable
 `APOLLO_ROOT_DIR` to refer to Apollo root directory by running:
 
-```
+```bash
 echo "export APOLLO_ROOT_DIR=$(pwd)" >> ~/.bashrc  && source ~/.bashrc
 ```
 
@@ -48,7 +48,7 @@ root directory as `$APOLLO_ROOT_DIR`
 
 From the `${APOLLO_ROOT_DIR}` directory, type
 
-```
+```bash
 bash docker/scripts/dev_start.sh
 ```
 
@@ -56,7 +56,7 @@ to start Apollo development Docker container.
 
 If successful, you will see the following messages at the bottom of your screen:
 
-```
+```bash
 [ OK ] Congratulations! You have successfully finished setting up Apollo Dev Environment.
 [ OK ] To login into the newly created apollo_dev_michael container, please run the following command:
 [ OK ]   bash docker/scripts/dev_into.sh
@@ -67,7 +67,7 @@ If successful, you will see the following messages at the bottom of your screen:
 
 Run the following command to login into the newly started container:
 
-```
+```bash
 bash docker/scripts/dev_into.sh
 ```
 
@@ -75,7 +75,7 @@ bash docker/scripts/dev_into.sh
 
 From the `/apollo` directory inside Apollo Docker container, type:
 
-```
+```bash
 ./apollo.sh build
 ```
 
@@ -83,7 +83,7 @@ to build the whole Apollo project.
 
 Or type
 
-```
+```bash
 ./apollo.sh build_opt
 ```
 
