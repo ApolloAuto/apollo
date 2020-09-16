@@ -67,6 +67,7 @@ module_config {
         }
     }
   }
+
   components {
     class_name : "V2XFusionComponent"
     config {
