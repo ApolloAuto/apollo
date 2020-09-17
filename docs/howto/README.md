@@ -77,6 +77,7 @@
 
 ## Others
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images.md)
+- [How to clone Apollo repository from CN](how_to_clone_apollo_repo_from_cn.md)
 
 ### Chinese versions
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images_cn.md)
