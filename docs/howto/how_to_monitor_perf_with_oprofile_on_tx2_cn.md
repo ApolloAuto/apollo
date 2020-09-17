@@ -2,14 +2,12 @@ oprofile是运行在linux系统上对应用程序进行性能测试的工具。l
 
 oprofile对多线程支持良好，可以对函数调用次数及源码进行分析，所以非常适合在TX2上使用。
 
-注意事项：在`dev_aarch64_20190102_1200`及以后的镜像中已经包含了oprofile工具，开发者不需要在容器环境内再次安装oprofile。
-
 #### 下载
 下载最新版本的oprofile
 ```bash
-$ wget http://prdownloads.sourceforge.net/oprofile/oprofile-1.3.0.tar.gz
-$ tar zxvf oprofile-1.3.0.tar.gz
-$ cd oprofile-1.3.0
+$ wget http://prdownloads.sourceforge.net/oprofile/oprofile-1.4.0.tar.gz
+$ tar zxvf oprofile-1.4.0.tar.gz
+$ cd oprofile-1.4.0
 ```
 #### 安装oprofile
 ```bash
