@@ -59,7 +59,7 @@
 注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/apply_bos_account_cn.md) 
 
 ## 开通云服务账号
-请与商务部门联系开通云服务账号，需要提供上一步骤中注册的`Bucket名称`、`所属地域`和用户邮箱信息
+请提前与商务部门联系(邮件develop-kit@apollo.auto)确保获得授权，之后打开[Dreamland网址](http://bce.apollo.auto/)选择用百度账号登录，登录后点击左侧菜单栏「用户帮助」里的「Fuel使用指南」菜单项，并按照文档开通云服务账号。
 
 ## 修改配置文件
 
@@ -254,7 +254,7 @@
 
 在使用云标定服务前，需要准备[百度云对象存储BOS服务](https://cloud.baidu.com/product/bos.html)用于存放标定预处理后的数据。
 
-**注意:** 必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的`Bucket名称`和`所属区域`保持一致。
+**注意:** 必须使用在Dreamland中提交用户账号信息的 Bos bucket，确认`Bos容器名`、`Bos服务区域`、`Bos访问秘钥`、`Bos访问私钥`正确。
 
 #### 2. 和Apollo开发套件商务联系开通云标定服务账号
 
@@ -345,12 +345,7 @@
 
 ## 常见问题
 
-#### 1. 提交后，显示`UNAUTHORIZED`,如下图所示
-![vehicle_calibration_unauthorized](images/vehicle_calibration_unauthorized.png)
-
-出现该问题，一般是`Partner ID`输入有误。
-
-#### 2.在进行车辆标定时，收到如下报错邮件，数据完整性检查出现错误
+#### 1.在进行车辆标定时，收到如下报错邮件，数据完整性检查出现错误
 ![vehicle_calibration_online_error1](images/vehicle_calibration_online_error1.png)
 
 排查方法：
