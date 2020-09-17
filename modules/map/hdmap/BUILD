@@ -3,6 +3,8 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
+
 cc_library(
     name = "hdmap",
     srcs = [
@@ -16,7 +18,7 @@ cc_library(
         "hdmap_impl.h",
         "hdmap_util.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         "//cyber/common:file",
         "//cyber/common:macros",
@@ -36,7 +38,7 @@ cc_library(
     name = "hdmap_util",
     srcs = ["hdmap_util.cc"],
     hdrs = ["hdmap_util.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         ":hdmap",
         "//cyber/common:file",
