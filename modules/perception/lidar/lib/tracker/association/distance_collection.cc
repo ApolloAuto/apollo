@@ -247,6 +247,7 @@ float BboxIouDistance(const TrackedObjectConstPtr& last_object,
   return static_cast<float>(dist);
 }
 
+// TODO(all): semantic map related, for debugging
 // float SemanticMapDistance(const MlfTrackData& track_dat,
 //                          const TrackedObjectConstPtr& cur_obj) {
 //  if (track_dat.feature_ &&
