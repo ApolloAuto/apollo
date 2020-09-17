@@ -28,6 +28,7 @@ message AudioEvent {
   optional apollo.audio.MovingResult moving_result = 3 [default = UNKNOWN];
   optional apollo.audio.AudioType audio_type = 4 [default = UNKNOWN_TYPE];
   optional bool siren_is_on = 5;
-  optional apollo.audio.AudioDirection audio_direction = 6 [default = UNKNOWN_DIRECTION];
+  optional apollo.audio.AudioDirection audio_direction = 6
+      [default = UNKNOWN_DIRECTION];
   optional apollo.localization.Pose pose = 7;
 }

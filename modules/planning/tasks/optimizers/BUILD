@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "path_optimizer",
     srcs = ["path_optimizer.cc"],
     hdrs = ["path_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/status",
         "//modules/planning/common:path_decision",
@@ -23,7 +24,7 @@ cc_library(
     name = "speed_optimizer",
     srcs = ["speed_optimizer.cc"],
     hdrs = ["speed_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/status",
         "//modules/planning/common:path_decision",
@@ -42,7 +43,7 @@ cc_library(
     name = "trajectory_optimizer",
     srcs = ["trajectory_optimizer.cc"],
     hdrs = ["trajectory_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/status",
         "//modules/planning/common:planning_gflags",

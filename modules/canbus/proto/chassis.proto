@@ -215,4 +215,3 @@ message Surround {
 message License {
   optional string vin = 1 [deprecated = true];
 }
-

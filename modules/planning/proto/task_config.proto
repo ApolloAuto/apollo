@@ -44,10 +44,8 @@ message LaneChangeDeciderConfig {
 
 message LearningModelInferenceTaskConfig {
   enum ModelType {
-    CONV_RNN = 1;
-    CNN = 2;
-    SELF_CNN_LSTM = 3;
-    HISTORY_UNCONDITIONED_CNN_LSTM = 4;
+    CNN = 1;
+    CNN_LSTM = 2;
   }
   optional ModelType model_type = 1;
   optional string cpu_model_file = 2;
@@ -131,8 +129,7 @@ message NaviSpeedDeciderConfig {
 //////////////////////////////////
 // PathAssessmentDeciderConfig
 
-message PathAssessmentDeciderConfig {
-}
+message PathAssessmentDeciderConfig {}
 
 //////////////////////////////////
 // PathBoundsDeciderConfig

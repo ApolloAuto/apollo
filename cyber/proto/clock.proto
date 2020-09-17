@@ -5,4 +5,3 @@ package apollo.cyber.proto;
 message Clock {
   required uint64 clock = 1;
 }
-

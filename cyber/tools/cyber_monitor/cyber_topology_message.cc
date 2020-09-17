@@ -53,9 +53,9 @@ bool CyberTopologyMessage::isFromHere(const std::string& nodeName) {
   return (templateName.compare(baseName) == 0);
 }
 
-RenderableMessage* CyberTopologyMessage::Child(int lineNo) const {
+RenderableMessage* CyberTopologyMessage::Child(int line_no) const {
   RenderableMessage* ret = nullptr;
-  auto iter = findChild(lineNo);
+  auto iter = findChild(line_no);
   if (iter != all_channels_map_.cend() &&
       !GeneralChannelMessage::isErrorCode(iter->second) &&
       iter->second->is_enabled()) {
@@ -65,13 +65,13 @@ RenderableMessage* CyberTopologyMessage::Child(int lineNo) const {
 }
 
 std::map<std::string, GeneralChannelMessage*>::const_iterator
-CyberTopologyMessage::findChild(int lineNo) const {
-  --lineNo;
+CyberTopologyMessage::findChild(int line_no) const {
+  --line_no;
 
   std::map<std::string, GeneralChannelMessage*>::const_iterator ret =
       all_channels_map_.cend();
 
-  if (lineNo > -1 && lineNo < page_item_count_) {
+  if (line_no > -1 && line_no < page_item_count_) {
     int i = 0;
 
     auto iter = all_channels_map_.cbegin();
@@ -81,7 +81,7 @@ CyberTopologyMessage::findChild(int lineNo) const {
     }
 
     for (i = 0; iter != all_channels_map_.cend(); ++iter) {
-      if (i == lineNo) {
+      if (i == line_no) {
         ret = iter;
         break;
       }
@@ -206,7 +206,7 @@ void CyberTopologyMessage::ChangeState(const Screen* s, int key) {
   }
 }
 
-void CyberTopologyMessage::Render(const Screen* s, int key) {
+int CyberTopologyMessage::Render(const Screen* s, int key) {
   page_item_count_ = s->Height() - 1;
   pages_ = static_cast<int>(all_channels_map_.size()) / page_item_count_ + 1;
   ChangeState(s, key);
@@ -275,4 +275,6 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
     }
     s->ClearCurrentColor();
   }
+
+  return line;
 }

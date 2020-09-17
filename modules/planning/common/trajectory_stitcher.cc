@@ -190,10 +190,10 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
            << ", longitudinal diff: " << lon_diff;
 
     if (std::fabs(lat_diff) > FLAGS_replan_lateral_distance_threshold) {
-      std::string msg(absl::StrCat(
+      const std::string msg = absl::StrCat(
           "the distance between matched point and actual position is too "
           "large. Replan is triggered. lat_diff = ",
-          lat_diff));
+          lat_diff);
       AERROR << msg;
       *replan_reason = msg;
       return ComputeReinitStitchingTrajectory(planning_cycle_time,
@@ -201,10 +201,10 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     }
 
     if (std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {
-      std::string msg(absl::StrCat(
+      const std::string msg = absl::StrCat(
           "the distance between matched point and actual position is too "
           "large. Replan is triggered. lon_diff = ",
-          lon_diff));
+          lon_diff);
       AERROR << msg;
       *replan_reason = msg;
       return ComputeReinitStitchingTrajectory(planning_cycle_time,

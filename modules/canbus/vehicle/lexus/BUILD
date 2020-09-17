@@ -3,11 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 cc_library(
     name = "lexus_vehicle_factory",
     srcs = ["lexus_vehicle_factory.cc"],
     hdrs = ["lexus_vehicle_factory.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":lexus_controller",
         ":lexus_message_manager",
@@ -21,7 +23,7 @@ cc_library(
     name = "lexus_message_manager",
     srcs = ["lexus_message_manager.cc"],
     hdrs = ["lexus_message_manager.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/lexus/protocol:canbus_lexus_protocol",
@@ -34,7 +36,7 @@ cc_library(
     name = "lexus_controller",
     srcs = ["lexus_controller.cc"],
     hdrs = ["lexus_controller.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":lexus_message_manager",
         "//modules/canbus/proto:chassis_detail_cc_proto",

@@ -3,6 +3,8 @@ load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
+FOPENMP_COPTS = ["-fopenmp"]
 
 cc_library(
     name = "open_space_trajectory_provider",
@@ -53,9 +55,7 @@ cc_test(
     name = "open_space_trajectory_provider_test",
     size = "small",
     srcs = ["open_space_trajectory_provider_test.cc"],
-    copts = [
-        "-fopenmp",
-    ],
+    copts = FOPENMP_COPTS,
     linkopts = ["-lgomp"],
     deps = [
         ":open_space_trajectory_provider",
@@ -67,9 +67,7 @@ cc_test(
     name = "open_space_trajectory_optimizer_test",
     size = "small",
     srcs = ["open_space_trajectory_optimizer_test.cc"],
-    copts = [
-        "-fopenmp",
-    ],
+    copts = FOPENMP_COPTS,
     linkopts = ["-lgomp"],
     deps = [
         ":open_space_trajectory_optimizer",

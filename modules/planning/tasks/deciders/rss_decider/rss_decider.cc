@@ -52,7 +52,7 @@ Status RssDecider::Process(Frame *frame,
 
   if (reference_line_info->path_data().Empty() ||
       reference_line_info->speed_data().empty()) {
-    std::string msg("Empty path or speed data");
+    const std::string msg = "Empty path or speed data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

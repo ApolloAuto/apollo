@@ -20,13 +20,14 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# shellcheck source=./installer_base.sh
 . ./installer_base.sh
 
-apt-get -y update && \
-    apt-get -y install \
-        flex \
-        bison \
-        graphviz \
+apt_get_update_and_install \
+    flex \
+    bison \
+    graphviz
 
 # Build doxygen from source to reduce image size
 
@@ -45,7 +46,7 @@ pushd "doxygen-${VERSION}" >/dev/null
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF
 
-    make -j$(nproc)
+    make -j "$(nproc)"
     make install
 popd
 

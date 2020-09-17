@@ -39,7 +39,7 @@ class CyberTopologyMessage : public RenderableMessage {
   explicit CyberTopologyMessage(const std::string& channel);
   ~CyberTopologyMessage();
 
-  void Render(const Screen* s, int key) override;
+  int Render(const Screen* s, int key) override;
   RenderableMessage* Child(int index) const override;
 
   void TopologyChanged(const apollo::cyber::proto::ChangeMsg& change_msg);

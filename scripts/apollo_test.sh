@@ -56,13 +56,14 @@ function _determine_perception_disabled() {
 
 function _determine_planning_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/learning_based/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/planning/open_space/trajectory_smoother:planning_block"
   fi
 }
 
 function _determine_map_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/map/pnc_map:cuda_util_test"
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/map/pnc_map:cuda_pnc_util \
+                      except //modules/map/pnc_map:cuda_util_test"
   fi
 }
 
@@ -228,6 +229,7 @@ function run_bazel_test() {
 
   local disabled_targets
   disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
+  disabled_targets="$(echo ${disabled_targets} | xargs)"
 
   # Note(storypku): Workaround for "/usr/bin/bazel: Argument list too long"
   # bazel test ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${test_targets} ${disabled_targets})

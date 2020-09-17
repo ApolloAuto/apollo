@@ -2,10 +2,7 @@ bazel-*
 .cache
 
 # Temporarily settings for markdown prettier
-cyber
-modules
-third_party
-scripts
+# tools
 
 *.py
 *.sh

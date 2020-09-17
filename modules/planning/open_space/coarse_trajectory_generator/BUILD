@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "node3d",
     srcs = ["node3d.cc"],
     hdrs = ["node3d.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
@@ -40,7 +41,7 @@ cc_library(
     name = "grid_search",
     srcs = ["grid_search.cc"],
     hdrs = ["grid_search.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
@@ -50,7 +51,7 @@ cc_library(
 
 cc_library(
     name = "open_space_utils",
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/open_space/coarse_trajectory_generator:grid_search",
         "//modules/planning/open_space/coarse_trajectory_generator:node3d",
@@ -62,7 +63,7 @@ cc_library(
     name = "hybrid_a_star",
     srcs = ["hybrid_a_star.cc"],
     hdrs = ["hybrid_a_star.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":open_space_utils",
         "//cyber/common:log",

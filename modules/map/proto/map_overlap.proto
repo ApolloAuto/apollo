@@ -13,33 +13,27 @@ message LaneOverlapInfo {
   optional Id region_overlap_id = 4;
 }
 
-message SignalOverlapInfo {
-}
+message SignalOverlapInfo {}
 
-message StopSignOverlapInfo {
-}
+message StopSignOverlapInfo {}
 
 message CrosswalkOverlapInfo {
   optional Id region_overlap_id = 1;
 }
 
-message JunctionOverlapInfo {
-}
+message JunctionOverlapInfo {}
 
-message YieldOverlapInfo {
-}
+message YieldOverlapInfo {}
 
-message ClearAreaOverlapInfo {
-}
+message ClearAreaOverlapInfo {}
 
-message SpeedBumpOverlapInfo {
-}
+message SpeedBumpOverlapInfo {}
 
-message ParkingSpaceOverlapInfo {
-}
+message ParkingSpaceOverlapInfo {}
 
-message PNCJunctionOverlapInfo {
-}
+message PNCJunctionOverlapInfo {}
+
+message RSUOverlapInfo {}
 
 message RegionOverlapInfo {
   optional Id id = 1;
@@ -61,6 +55,7 @@ message ObjectOverlapInfo {
     SpeedBumpOverlapInfo speed_bump_overlap_info = 10;
     ParkingSpaceOverlapInfo parking_space_overlap_info = 11;
     PNCJunctionOverlapInfo pnc_junction_overlap_info = 12;
+    RSUOverlapInfo rsu_overlap_info = 13;
   }
 }
 

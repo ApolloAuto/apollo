@@ -208,5 +208,14 @@ int HDMap::GetLocalMap(const apollo::common::PointENU& point,
   return impl_.GetLocalMap(point, range, local_map);
 }
 
+int HDMap::GetForwardNearestRSUs(const apollo::common::PointENU& point,
+                    double distance, double central_heading,
+                    double max_heading_difference,
+                    std::vector<RSUInfoConstPtr>* rsus) const {
+  return impl_.GetForwardNearestRSUs(point, distance,
+                    central_heading,
+                    max_heading_difference, rsus);
+}
+
 }  // namespace hdmap
 }  // namespace apollo

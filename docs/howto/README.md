@@ -1,15 +1,13 @@
 # Howto Guides
 
 ## Build
-- [How to launch and run Apollo](how_to_launch_Apollo.md)
+- [How to launch and run Apollo](how_to_launch_and_run_apollo.md)
 - [How to build your own kernel](how_to_build_your_own_kernel.md)
 - [How to install apollo kernel](how_to_install_apollo_kernel.md)
 - [How to save and load docker image](how_to_save_and_load_docker_image.md)
-- [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16.md)
 
 #### Chinese versions
 - [How to install apollo kernel](how_to_install_apollo_kernel_cn.md)
-- [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16_cn.md)
 
 ## Contribution
 - [How to document code](how_to_document_code.md)
@@ -78,10 +76,8 @@
 - [How to Run RTK Localization Module On Your Local Computer](how_to_run_RTK_localization_module_on_your_local_computer_cn.md)
 
 ## Others
-- [How to use IRC client on ubuntu](how_to_use_IRC_client_on_ubuntu.md)
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images.md)
 
 ### Chinese versions
-
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images_cn.md)
 - [How to solve slow pull from cn](how_to_solve_slow_pull_from_cn.md)

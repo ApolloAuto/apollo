@@ -1,0 +1,47 @@
+input {
+  input_type: OLD
+  seq: 0
+  channel_name: "/perception/obstacles_old"
+}
+input {
+  input_type: CAMERA
+  seq: 1
+  channel_name: "/perception/obstacles_camera1"
+}
+input {
+  input_type: CAMERA
+  seq: 2
+  channel_name: "/perception/obstacles_camera2"
+}
+input {
+  input_type: CAMERA
+  seq: 3
+  channel_name: "/perception/obstacles_camera3"
+}
+input {
+  input_type: CAMERA
+  seq: 4
+  channel_name: "/perception/obstacles_camera4"
+}
+input {
+  input_type: CAMERA
+  seq: 5
+  channel_name: "/perception/obstacles_camera5"
+}
+input {
+  input_type: CAMERA
+  seq: 6
+  channel_name: "/perception/obstacles_camera6"
+}
+input {
+  input_type: CAMERA
+  seq: 7
+  channel_name: "/perception/obstacles_camera7"
+}
+input {
+  input_type: CAMERA
+  seq: 8
+  channel_name: "/perception/obstacles_camera8"
+}
+output_name: "/perception/obstacles"
+

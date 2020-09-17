@@ -52,9 +52,9 @@ size_t BinaryWriteString(FILE *fp, const std::string &str) {
 }
 
 template <typename Dtype>
-boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
+std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
   int ndim;
-  boost::shared_ptr<base::Blob<Dtype>> blob(new base::Blob<Dtype>());
+  std::shared_ptr<base::Blob<Dtype>> blob(new base::Blob<Dtype>());
   char dtype[kMaxStrLen];
 
   // read dtype
@@ -104,17 +104,17 @@ void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob) {
   }
 }
 
-template boost::shared_ptr<base::Blob<float>> BinaryReadBlob(FILE *fp);
-template boost::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE *fp);
+template std::shared_ptr<base::Blob<float>> BinaryReadBlob(FILE *fp);
+template std::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE *fp);
 
 template void BinaryWriteBlob(FILE *fp, const base::Blob<float> &blob);
 template void BinaryWriteBlob(FILE *fp, const base::Blob<double> &blob);
 
 template <typename Dtype>
-std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
+std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
     const char *file_path) {
   char name[kMaxStrLen];
-  std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> data_dict;
+  std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> data_dict;
 
   FILE *fp = fopen(file_path, "rb");
   if (NULL == fp) {
@@ -157,18 +157,18 @@ bool BinaryWriteFile(const char *file_path,
   return true;
 }
 
-template std::map<std::string, boost::shared_ptr<base::Blob<float>>>
+template std::map<std::string, std::shared_ptr<base::Blob<float>>>
 BinaryReadFile(const char *file_path);
-template std::map<std::string, boost::shared_ptr<base::Blob<double>>>
+template std::map<std::string, std::shared_ptr<base::Blob<double>>>
 BinaryReadFile(const char *file_path);
 
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string, boost::shared_ptr<base::Blob<float>>>
+    const std::map<std::string, std::shared_ptr<base::Blob<float>>>
         &data_dict);
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string, boost::shared_ptr<base::Blob<double>>>
+    const std::map<std::string, std::shared_ptr<base::Blob<double>>>
         &data_dict);
 
 template bool BinaryWriteFile(

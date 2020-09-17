@@ -25,7 +25,7 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
 #include "modules/perception/camera/lib/traffic_light/proto/detection.pb.h"
-// #include "modules/perception/inference/inference.h"
+#include "modules/perception/inference/inference.h"
 
 namespace apollo {
 namespace perception {
@@ -68,9 +68,9 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
  private:
   traffic_light::detection::DetectionParam detection_param_;
   DataProvider::ImageOptions data_provider_image_option_;
-//  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
+  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
   std::shared_ptr<base::Image8U> image_ = nullptr;
-//  std::shared_ptr<base::Blob<float>> param_blob_;
+  std::shared_ptr<base::Blob<float>> param_blob_;
   std::shared_ptr<base::Blob<float>> mean_buffer_;
   std::shared_ptr<IGetBox> crop_;
   std::vector<base::TrafficLightPtr> detected_bboxes_;

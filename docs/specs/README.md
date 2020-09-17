@@ -6,7 +6,7 @@
 - [Apollo 3.0 Software Architecture](Apollo_3.0_Software_Architecture.md)
 - [Apollo 2.0 Software Architecture](Apollo_2.0_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
-- [Control Calibration](calibration_table/control_calibration.md)
+- [Vehicle Calibration Online](Vehicle_Calibration_Online/README.md)
 - [Control-in-loop simulation](dynamic_model.md)
 
 ### Chinese documents
@@ -65,7 +65,8 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 ## General
 - [Coordinate System.pdf](coordination.pdf)
 - [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide.md)
-
+- [Bazel in Apollo: An Overview](bazel_in_apollo_an_overview.md)
+- [Apollo Build and Test Explained](apollo_build_and_test_explained.md)
 
 ### Chinese documents
 

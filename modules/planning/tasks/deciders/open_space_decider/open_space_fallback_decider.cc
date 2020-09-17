@@ -145,8 +145,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       }
     }
 
-    AERROR << "stop index before is: " << stop_index;
-    AERROR << "fallback_start index before is: " << fallback_start_index;
+    ADEBUG << "stop index before is: " << stop_index
+           << "; fallback_start index before is: " << fallback_start_index;
 
     for (size_t i = 0; i < fallback_start_index; ++i) {
       fallback_trajectory_pair_candidate.first[i].set_v(
