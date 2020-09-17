@@ -34,6 +34,8 @@
 #include <chrono>
 #include <iostream>
 
+#include "cyber/common/log.h"
+
 // headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h"
 
@@ -614,6 +616,11 @@ void PointPillars::DoInference(const float* in_points_array,
                                const int in_num_points,
                                std::vector<float>* out_detections,
                                std::vector<int>* out_labels) {
+  if (device_id_ < 0) {
+    AERROR << "Torch is not using GPU!";
+    return;
+  }
+
   Preprocess(in_points_array, in_num_points);
 
   anchor_mask_cuda_ptr_->DoAnchorMaskCuda(
@@ -643,13 +650,9 @@ void PointPillars::DoInference(const float* in_points_array,
       {kMaxNumPillars, 4}, torch::kCUDA);
 
   torch::Device device(device_type_, device_id_);
-  if (device_id_ >= 0) {
-    tensor_pillar_point_feature.to(device);
-    tensor_num_points_per_pillar.to(device);
-    tensor_pillar_coors.to(device);
-  } else {
-    return;
-  }
+  tensor_pillar_point_feature.to(device);
+  tensor_num_points_per_pillar.to(device);
+  tensor_pillar_coors.to(device);
 
   auto pfe_output = pfe_net_.forward({tensor_pillar_point_feature,
                                       tensor_num_points_per_pillar,
