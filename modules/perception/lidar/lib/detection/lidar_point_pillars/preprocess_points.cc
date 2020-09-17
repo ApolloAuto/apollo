@@ -148,7 +148,6 @@ void PreprocessPoints::Preprocess(const float* in_points_array,
       y = static_cast<float>(y_coors[i]);
     }
     pillar_coors[i * 4 + 0] = 0;  // batch idx, but currently it is useless
-    // TODO(chenjiahao): need to specify z if use voxels
     pillar_coors[i * 4 + 1] = 0;  // z
     pillar_coors[i * 4 + 2] = y;
     pillar_coors[i * 4 + 3] = x;

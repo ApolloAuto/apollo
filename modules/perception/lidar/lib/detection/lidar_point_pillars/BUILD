@@ -126,7 +126,7 @@ cuda_library(
 
 cc_test(
     name = "point_pillars_test",
-    size = "small",
+    size = "large",
     srcs = ["point_pillars_test.cc"],
     deps = [
         ":point_pillars",
