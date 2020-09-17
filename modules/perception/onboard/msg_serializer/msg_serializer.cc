@@ -184,6 +184,7 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
     }
   }
 
+// TODO(all): semantic map related, for debugging
 //  // record the best prediction trajectory
 //  if (object_ptr->feature.get() &&
 //      object_ptr->feature->predicted_trajectory_size() > 0) {
