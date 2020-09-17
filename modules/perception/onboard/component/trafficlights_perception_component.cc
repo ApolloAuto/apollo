@@ -20,9 +20,9 @@
 #include <utility>
 
 #include <boost/algorithm/string.hpp>
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_cat.h"
 
@@ -37,11 +37,12 @@
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/transform/proto/transform.pb.h"
 
-using ::apollo::cyber::Clock;
-
 namespace apollo {
 namespace perception {
 namespace onboard {
+
+using ::apollo::cyber::Clock;
+
 using TLCamID = apollo::perception::TrafficLightDetection::CameraID;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::common::SensorManager;
