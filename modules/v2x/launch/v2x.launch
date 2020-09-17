@@ -9,11 +9,3 @@
         <version>1.0.0</version>
     </module>
 </cyber>
-
-<cyber>
-    <module>
-        <name>v2x_fusion</name>
-        <dag_conf>/apollo/modules/v2x/dag/v2x_perception_fusion.dag</dag_conf>
-        <process_name>v2x_fusion</process_name>
-    </module>
-</cyber>
