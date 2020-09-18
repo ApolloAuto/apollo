@@ -87,8 +87,7 @@ static int GetGpuId(
 }
 
 bool TrafficLightsPerceptionComponent::Init() {
-  std::shared_ptr<camera::CameraFrame> p(new camera::CameraFrame);
-  frame_.swap(p);
+  frame_.reset(new camera::CameraFrame);
   writer_ = node_->CreateWriter<apollo::perception::TrafficLightDetection>(
       "/apollo/perception/traffic_light");
 
@@ -1025,13 +1024,13 @@ void TrafficLightsPerceptionComponent::SyncV2XTrafficLights(
   auto sync_single_light = [&](base::TrafficLightPtr light) {
     for (auto itr = v2x_msg_buffer_.rbegin(); itr != v2x_msg_buffer_.rend();
          ++itr) {
-      double v2x_timestamp = (*itr).header().timestamp_sec();
+      double v2x_timestamp = itr->header().timestamp_sec();
       // find close enough v2x msg
       if (std::fabs(camera_frame_timestamp - v2x_timestamp) <
           v2x_sync_interval_seconds_) {
         const int v2x_lights_num =
-            (*itr).road_traffic_light(0).single_traffic_light_size();
-        const auto& v2x_lights = (*itr).road_traffic_light(0);
+            itr->road_traffic_light(0).single_traffic_light_size();
+        const auto& v2x_lights = itr->road_traffic_light(0);
         for (int i = 0; i < v2x_lights_num; ++i) {
           const auto& v2x_light = v2x_lights.single_traffic_light(i);
           // check signal id

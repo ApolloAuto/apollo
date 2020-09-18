@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PERCEPTION_COPTS = [ '-DMODULE_NAME=\\"perception\\"' ]
 
 cc_binary(
     name = "libperception_component_camera.so",
@@ -18,10 +19,7 @@ cc_library(
     hdrs = [
         "trafficlights_perception_component.h",
     ],
-    copts = [
-        '-DMODULE_NAME=\\"perception\\"',
-    ],
-    linkopts = ["-lstdc++"],
+    copts = PERCEPTION_COPTS,
     deps = [
         "//cyber",
         "//modules/common/math",
@@ -31,8 +29,6 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/app:traffic_light_camera_perception",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/traffic_light/preprocessor:multi_camera_projection",
-        "//modules/perception/camera/lib/traffic_light/preprocessor:pose",
         "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/map/hdmap:hdmap_input",
@@ -44,10 +40,7 @@ cc_library(
         "//modules/v2x/common:v2x_proxy_gflags",
         "//modules/v2x/proto:v2x_traffic_light_cc_proto",
         "@eigen",
-        "@opencv//:core",
         "@opencv//:highgui",
-        "@opencv//:imgcodecs",
-        "@opencv//:imgproc",
     ],
     alwayslink = True,
 )
