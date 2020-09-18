@@ -1,0 +1,83 @@
+data {
+    format: NOVATEL_BINARY
+    serial {
+        device: "/dev/ttyACM0"
+        baud_rate: 460800
+    }
+}
+
+#rtk_from {
+#    format: RTCM_V3
+#    ntrip {
+#        address: "<IP>"
+#        port: <PORT>
+#        mount_point: "<MOUNTPOINT>"
+#        user: "<USER>"
+#        password: "<PASSWORD>"
+#        timeout_s: 5
+#    }
+#    push_location: true
+#}
+#
+#rtk_to {
+#    format: NOVATEL_BINARY
+#    serial {
+#        device: "/dev/ttyACM0"
+#        baud_rate: 115200
+#    }
+#}
+#
+#command {
+#    format: NOVATEL_BINARY
+#    serial {
+#        device: "/dev/ttyACM0"
+#        baud_rate: 115200
+#    }
+#}
+
+rtk_solution_type: RTK_RECEIVER_SOLUTION
+imu_type: CPT_XW5651
+proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+
+tf {
+    frame_id: "world"
+    child_frame_id: "novatel"
+}
+
+
+# If given, the driver will send velocity info into novatel one time per second
+#wheel_parameters: "SETWHEELPARAMETERS 100 1 1\r\n"
+
+gpsbin_folder: "/apollo/data/gpsbin"
+
+#login_commands: "UNLOGALL THISPORT\r\n"
+#login_commands: "LOG COM2 GPRMC ONTIME 1.0 0.25\r\n"
+#login_commands: "EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10\r\n"
+#login_commands: "EVENTOUTCONTROL MARK1 ENABLE POSITIVE 50000000 50000000\r\n"
+#login_commands: "LOG NCOM1 GPGGA ONTIME 1.0\r\n"
+#login_commands: "log bestgnssposb ontime 0.5\r\n"
+#login_commands: "log bestposb ontime 1.0 0.2\r\n"
+#login_commands: "log inspvaxb ontime 1 0.7\r\n"
+#login_commands: "log inspvab ontime 0.01 0\r\n"
+#login_commands: "log corrimudatab ontime 0.01 0\r\n"
+#login_commands: "log RAWIMUB onnew 0 0\r\n"
+#login_commands: "log mark1pvab onnew 0 0\r\n"
+#login_commands: "log rangecmpb ontime 1.0\r\n"
+#login_commands: "log rawephemb onchanged\r\n"
+#login_commands: "log gloephemerisb onchanged\r\n"
+#login_commands: "log bdsephemerisb onchanged\r\n"
+#login_commands: "log imutoantoffsetsb once\r\n"
+#login_commands: "log vehiclebodyrotationb onchanged\r\n"
+#login_commands: "log headingb onchanged\r\n"
+#
+#login_commands: "log rangeb ontime 0.2\r\n"
+#login_commands: "log bdsephemerisb\r\n"
+#login_commands: "log gpsephemb\r\n"
+#login_commands: "log gloephemerisb\r\n"
+#login_commands: "log bdsephemerisb ontime 15\r\n"
+#login_commands: "log gpsephemb ontime 15\r\n"
+#login_commands: "log gloephemerisb ontime 15\r\n"
+#
+#logout_commands: "EVENTOUTCONTROL MARK2 DISABLE\r\n"
+#logout_commands: "EVENTOUTCONTROL MARK1 DISABLE\r\n"
+#
