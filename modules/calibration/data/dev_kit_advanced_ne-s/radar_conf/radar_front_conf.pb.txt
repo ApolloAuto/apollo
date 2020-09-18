@@ -1,0 +1,40 @@
+can_conf {
+
+  can_card_parameter {
+    brand:SOCKET_CAN_RAW
+    type: PCI_CARD
+    channel_id: CHANNEL_ID_ONE
+  }
+
+  enable_debug_mode: false
+  enable_receiver_log: false
+}
+
+radar_conf {
+  max_distance_valid: true
+  sensor_id_valid: false
+  radar_power_valid: false
+  output_type_valid: true
+  send_quality_valid: true
+  send_ext_info_valid: true
+  sort_index_valid: false
+  store_in_nvm_valid: true
+  ctrl_relay_valid: false
+  rcs_threshold_valid: true
+
+  max_distance: 250
+  sensor_id: 0
+  output_type: OUTPUT_TYPE_OBJECTS
+  radar_power: 0
+  ctrl_relay: 0
+  send_ext_info: true
+  send_quality: true
+  sort_index: 0
+  store_in_nvm: 1
+  rcs_threshold: RCS_THRESHOLD_STANDARD
+
+  # unit: nanoseconds, 20ms for 50Hz
+  input_send_interval: 20000000
+}
+
+radar_channel: "/apollo/sensor/radar/front"
