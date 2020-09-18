@@ -34,7 +34,7 @@ module_config {
     components {
       class_name : "PriSecFusionComponent"
       config {
-        name : "velodyne_fusion"
+        name : "RS16_fusion"
         config_file_path : "/apollo/modules/drivers/lidar/conf/robo_fusion_conf.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
     }

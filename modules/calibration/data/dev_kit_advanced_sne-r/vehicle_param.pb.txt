@@ -1,0 +1,50 @@
+vehicle_param {
+  brand: NEOLIX
+  vehicle_id {
+      other_unique_id: "NEOLIX_EDU"
+  }
+  front_edge_to_center: 1.373
+  back_edge_to_center: 1.402
+  left_edge_to_center: 0.505
+  right_edge_to_center: 0.505
+
+  length: 2.775
+  width: 1.01
+  height: 1.672
+  min_turn_radius: 3.75
+  max_acceleration: 2.5
+  max_deceleration: -7.0
+  max_steer_angle: 6.6323
+  max_steer_angle_rate: 6.98131700798
+  min_steer_angle_rate:0
+  steer_ratio: 10.85
+  wheel_base: 1.73
+  wheel_rolling_radius: 0.286
+  max_abs_speed_when_stopped: 0.2
+  brake_deadzone: 0
+  throttle_deadzone: 0
+
+  steering_latency_param
+  {
+      dead_time: 0.0
+      rise_time: 0.0
+      peak_time: 0.0
+      settling_time: 0.0
+  }
+
+  throttle_latency_param
+  {
+      dead_time: 0.0
+      rise_time: 0.0
+      peak_time: 0.0
+      settling_time: 0.0
+  }
+
+  brake_latency_param
+  {
+      dead_time: 0.0
+      rise_time: 0.0
+      peak_time: 0.0
+      settling_time: 0.0
+  }
+}
