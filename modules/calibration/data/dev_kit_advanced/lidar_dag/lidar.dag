@@ -6,7 +6,7 @@ module_config {
       class_name : "CompSureStarDriver"
       config {
         name : "velodyne_driver"
-        config_file_path : "/apollo/modules/drivers/velodyne/conf/surestar.conf"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/surestar.conf"
       }
     }
 }
@@ -19,7 +19,7 @@ module_config {
       config {
         name : "velodyne_convert"
        
-        config_file_path : "/apollo/modules/drivers/velodyne/conf/surestar.conf"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/surestar.conf"
         readers {channel: "/apollo/sensor/lidar16/Scan"}
       }
     }
@@ -32,7 +32,7 @@ module_config {
       class_name : "CompensatorComponent"
       config {
         name : "velodyne_compensator"
-        config_file_path : "/apollo/modules/drivers/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/velodyne16_fusion_compensator.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/PointCloud2"}
       }
     }
