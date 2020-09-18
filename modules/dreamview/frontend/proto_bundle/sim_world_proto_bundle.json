@@ -840,6 +840,18 @@
         },
         "common": {
           "nested": {
+            "Direction": {
+              "values": {
+                "EAST": 0,
+                "WEST": 1,
+                "SOUTH": 2,
+                "NORTH": 3,
+                "NORTHEAST": 4,
+                "SOUTHEAST": 5,
+                "SOUTHWEST": 6,
+                "NORTHWEST": 7
+              }
+            },
             "DriveEvent": {
               "fields": {
                 "header": {
@@ -1430,7 +1442,8 @@
                 "WEY": 5,
                 "ZHONGYUN": 6,
                 "CH": 7,
-                "DKIT": 8
+                "DKIT": 8,
+                "NEOLIX": 9
               }
             },
             "VehicleID": {
@@ -5290,207 +5303,6 @@
                 }
               }
             },
-            "EStop": {
-              "fields": {
-                "isEstop": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "reason": {
-                  "type": "string",
-                  "id": 2
-                }
-              }
-            },
-            "TaskStats": {
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "timeMs": {
-                  "type": "double",
-                  "id": 2
-                }
-              }
-            },
-            "LatencyStats": {
-              "fields": {
-                "totalTimeMs": {
-                  "type": "double",
-                  "id": 1
-                },
-                "taskStats": {
-                  "rule": "repeated",
-                  "type": "TaskStats",
-                  "id": 2
-                },
-                "initFrameTimeMs": {
-                  "type": "double",
-                  "id": 3
-                }
-              }
-            },
-            "RSSInfo": {
-              "fields": {
-                "isRssSafe": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "curDistLon": {
-                  "type": "double",
-                  "id": 2
-                },
-                "rssSafeDistLon": {
-                  "type": "double",
-                  "id": 3
-                },
-                "accLonRangeMinimum": {
-                  "type": "double",
-                  "id": 4
-                },
-                "accLonRangeMaximum": {
-                  "type": "double",
-                  "id": 5
-                },
-                "accLatLeftRangeMinimum": {
-                  "type": "double",
-                  "id": 6
-                },
-                "accLatLeftRangeMaximum": {
-                  "type": "double",
-                  "id": 7
-                },
-                "accLatRightRangeMinimum": {
-                  "type": "double",
-                  "id": 8
-                },
-                "accLatRightRangeMaximum": {
-                  "type": "double",
-                  "id": 9
-                }
-              }
-            },
-            "ADCTrajectory": {
-              "fields": {
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 1
-                },
-                "totalPathLength": {
-                  "type": "double",
-                  "id": 2
-                },
-                "totalPathTime": {
-                  "type": "double",
-                  "id": 3
-                },
-                "trajectoryPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.TrajectoryPoint",
-                  "id": 12
-                },
-                "estop": {
-                  "type": "EStop",
-                  "id": 6
-                },
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.PathPoint",
-                  "id": 13
-                },
-                "isReplan": {
-                  "type": "bool",
-                  "id": 9,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "replanReason": {
-                  "type": "string",
-                  "id": 22
-                },
-                "gear": {
-                  "type": "apollo.canbus.Chassis.GearPosition",
-                  "id": 10
-                },
-                "decision": {
-                  "type": "apollo.planning.DecisionResult",
-                  "id": 14
-                },
-                "latencyStats": {
-                  "type": "LatencyStats",
-                  "id": 15
-                },
-                "routingHeader": {
-                  "type": "apollo.common.Header",
-                  "id": 16
-                },
-                "debug": {
-                  "type": "apollo.planning_internal.Debug",
-                  "id": 8
-                },
-                "rightOfWayStatus": {
-                  "type": "RightOfWayStatus",
-                  "id": 17
-                },
-                "laneId": {
-                  "rule": "repeated",
-                  "type": "apollo.hdmap.Id",
-                  "id": 18
-                },
-                "engageAdvice": {
-                  "type": "apollo.common.EngageAdvice",
-                  "id": 19
-                },
-                "criticalRegion": {
-                  "type": "CriticalRegion",
-                  "id": 20
-                },
-                "trajectoryType": {
-                  "type": "TrajectoryType",
-                  "id": 21,
-                  "options": {
-                    "default": "UNKNOWN"
-                  }
-                },
-                "targetLaneId": {
-                  "rule": "repeated",
-                  "type": "apollo.hdmap.Id",
-                  "id": 23
-                },
-                "rssInfo": {
-                  "type": "RSSInfo",
-                  "id": 100
-                }
-              },
-              "nested": {
-                "RightOfWayStatus": {
-                  "values": {
-                    "UNPROTECTED": 0,
-                    "PROTECTED": 1
-                  }
-                },
-                "CriticalRegion": {
-                  "fields": {
-                    "region": {
-                      "rule": "repeated",
-                      "type": "apollo.common.Polygon",
-                      "id": 1
-                    }
-                  }
-                },
-                "TrajectoryType": {
-                  "values": {
-                    "UNKNOWN": 0,
-                    "NORMAL": 1,
-                    "PATH_FALLBACK": 2,
-                    "SPEED_FALLBACK": 3,
-                    "PATH_REUSED": 4
-                  }
-                }
-              }
-            },
             "TaskConfig": {
               "oneofs": {
                 "taskConfig": {
@@ -6454,6 +6266,207 @@
                 }
               }
             },
+            "EStop": {
+              "fields": {
+                "isEstop": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "reason": {
+                  "type": "string",
+                  "id": 2
+                }
+              }
+            },
+            "TaskStats": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "timeMs": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "LatencyStats": {
+              "fields": {
+                "totalTimeMs": {
+                  "type": "double",
+                  "id": 1
+                },
+                "taskStats": {
+                  "rule": "repeated",
+                  "type": "TaskStats",
+                  "id": 2
+                },
+                "initFrameTimeMs": {
+                  "type": "double",
+                  "id": 3
+                }
+              }
+            },
+            "RSSInfo": {
+              "fields": {
+                "isRssSafe": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "curDistLon": {
+                  "type": "double",
+                  "id": 2
+                },
+                "rssSafeDistLon": {
+                  "type": "double",
+                  "id": 3
+                },
+                "accLonRangeMinimum": {
+                  "type": "double",
+                  "id": 4
+                },
+                "accLonRangeMaximum": {
+                  "type": "double",
+                  "id": 5
+                },
+                "accLatLeftRangeMinimum": {
+                  "type": "double",
+                  "id": 6
+                },
+                "accLatLeftRangeMaximum": {
+                  "type": "double",
+                  "id": 7
+                },
+                "accLatRightRangeMinimum": {
+                  "type": "double",
+                  "id": 8
+                },
+                "accLatRightRangeMaximum": {
+                  "type": "double",
+                  "id": 9
+                }
+              }
+            },
+            "ADCTrajectory": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "totalPathLength": {
+                  "type": "double",
+                  "id": 2
+                },
+                "totalPathTime": {
+                  "type": "double",
+                  "id": 3
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 12
+                },
+                "estop": {
+                  "type": "EStop",
+                  "id": 6
+                },
+                "pathPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.PathPoint",
+                  "id": 13
+                },
+                "isReplan": {
+                  "type": "bool",
+                  "id": 9,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "replanReason": {
+                  "type": "string",
+                  "id": 22
+                },
+                "gear": {
+                  "type": "apollo.canbus.Chassis.GearPosition",
+                  "id": 10
+                },
+                "decision": {
+                  "type": "apollo.planning.DecisionResult",
+                  "id": 14
+                },
+                "latencyStats": {
+                  "type": "LatencyStats",
+                  "id": 15
+                },
+                "routingHeader": {
+                  "type": "apollo.common.Header",
+                  "id": 16
+                },
+                "debug": {
+                  "type": "apollo.planning_internal.Debug",
+                  "id": 8
+                },
+                "rightOfWayStatus": {
+                  "type": "RightOfWayStatus",
+                  "id": 17
+                },
+                "laneId": {
+                  "rule": "repeated",
+                  "type": "apollo.hdmap.Id",
+                  "id": 18
+                },
+                "engageAdvice": {
+                  "type": "apollo.common.EngageAdvice",
+                  "id": 19
+                },
+                "criticalRegion": {
+                  "type": "CriticalRegion",
+                  "id": 20
+                },
+                "trajectoryType": {
+                  "type": "TrajectoryType",
+                  "id": 21,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                },
+                "targetLaneId": {
+                  "rule": "repeated",
+                  "type": "apollo.hdmap.Id",
+                  "id": 23
+                },
+                "rssInfo": {
+                  "type": "RSSInfo",
+                  "id": 100
+                }
+              },
+              "nested": {
+                "RightOfWayStatus": {
+                  "values": {
+                    "UNPROTECTED": 0,
+                    "PROTECTED": 1
+                  }
+                },
+                "CriticalRegion": {
+                  "fields": {
+                    "region": {
+                      "rule": "repeated",
+                      "type": "apollo.common.Polygon",
+                      "id": 1
+                    }
+                  }
+                },
+                "TrajectoryType": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "NORMAL": 1,
+                    "PATH_FALLBACK": 2,
+                    "SPEED_FALLBACK": 3,
+                    "PATH_REUSED": 4
+                  }
+                }
+              }
+            },
             "PlanningSemanticMapConfig": {
               "fields": {
                 "resolution": {
@@ -7393,10 +7406,8 @@
               "nested": {
                 "ModelType": {
                   "values": {
-                    "CONV_RNN": 1,
-                    "CNN": 2,
-                    "SELF_CNN_LSTM": 3,
-                    "HISTORY_UNCONDITIONED_CNN_LSTM": 4
+                    "CNN": 1,
+                    "CNN_LSTM": 2
                   }
                 }
               }
@@ -10581,134 +10592,6 @@
         },
         "hdmap": {
           "nested": {
-            "Projection": {
-              "fields": {
-                "proj": {
-                  "type": "string",
-                  "id": 1
-                }
-              }
-            },
-            "Header": {
-              "fields": {
-                "version": {
-                  "type": "bytes",
-                  "id": 1
-                },
-                "date": {
-                  "type": "bytes",
-                  "id": 2
-                },
-                "projection": {
-                  "type": "Projection",
-                  "id": 3
-                },
-                "district": {
-                  "type": "bytes",
-                  "id": 4
-                },
-                "generation": {
-                  "type": "bytes",
-                  "id": 5
-                },
-                "revMajor": {
-                  "type": "bytes",
-                  "id": 6
-                },
-                "revMinor": {
-                  "type": "bytes",
-                  "id": 7
-                },
-                "left": {
-                  "type": "double",
-                  "id": 8
-                },
-                "top": {
-                  "type": "double",
-                  "id": 9
-                },
-                "right": {
-                  "type": "double",
-                  "id": 10
-                },
-                "bottom": {
-                  "type": "double",
-                  "id": 11
-                },
-                "vendor": {
-                  "type": "bytes",
-                  "id": 12
-                }
-              }
-            },
-            "Map": {
-              "fields": {
-                "header": {
-                  "type": "Header",
-                  "id": 1
-                },
-                "crosswalk": {
-                  "rule": "repeated",
-                  "type": "Crosswalk",
-                  "id": 2
-                },
-                "junction": {
-                  "rule": "repeated",
-                  "type": "Junction",
-                  "id": 3
-                },
-                "lane": {
-                  "rule": "repeated",
-                  "type": "Lane",
-                  "id": 4
-                },
-                "stopSign": {
-                  "rule": "repeated",
-                  "type": "StopSign",
-                  "id": 5
-                },
-                "signal": {
-                  "rule": "repeated",
-                  "type": "Signal",
-                  "id": 6
-                },
-                "yield": {
-                  "rule": "repeated",
-                  "type": "YieldSign",
-                  "id": 7
-                },
-                "overlap": {
-                  "rule": "repeated",
-                  "type": "Overlap",
-                  "id": 8
-                },
-                "clearArea": {
-                  "rule": "repeated",
-                  "type": "ClearArea",
-                  "id": 9
-                },
-                "speedBump": {
-                  "rule": "repeated",
-                  "type": "SpeedBump",
-                  "id": 10
-                },
-                "road": {
-                  "rule": "repeated",
-                  "type": "Road",
-                  "id": 11
-                },
-                "parkingSpace": {
-                  "rule": "repeated",
-                  "type": "ParkingSpace",
-                  "id": 12
-                },
-                "pncJunction": {
-                  "rule": "repeated",
-                  "type": "PNCJunction",
-                  "id": 13
-                }
-              }
-            },
             "ClearArea": {
               "fields": {
                 "id": {
@@ -11071,6 +10954,9 @@
             "PNCJunctionOverlapInfo": {
               "fields": {}
             },
+            "RSUOverlapInfo": {
+              "fields": {}
+            },
             "RegionOverlapInfo": {
               "fields": {
                 "id": {
@@ -11097,7 +10983,8 @@
                     "clearAreaOverlapInfo",
                     "speedBumpOverlapInfo",
                     "parkingSpaceOverlapInfo",
-                    "pncJunctionOverlapInfo"
+                    "pncJunctionOverlapInfo",
+                    "rsuOverlapInfo"
                   ]
                 }
               },
@@ -11145,6 +11032,10 @@
                 "pncJunctionOverlapInfo": {
                   "type": "PNCJunctionOverlapInfo",
                   "id": 12
+                },
+                "rsuOverlapInfo": {
+                  "type": "RSUOverlapInfo",
+                  "id": 13
                 }
               }
             },
@@ -11280,6 +11171,139 @@
                 }
               }
             },
+            "Projection": {
+              "fields": {
+                "proj": {
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "Header": {
+              "fields": {
+                "version": {
+                  "type": "bytes",
+                  "id": 1
+                },
+                "date": {
+                  "type": "bytes",
+                  "id": 2
+                },
+                "projection": {
+                  "type": "Projection",
+                  "id": 3
+                },
+                "district": {
+                  "type": "bytes",
+                  "id": 4
+                },
+                "generation": {
+                  "type": "bytes",
+                  "id": 5
+                },
+                "revMajor": {
+                  "type": "bytes",
+                  "id": 6
+                },
+                "revMinor": {
+                  "type": "bytes",
+                  "id": 7
+                },
+                "left": {
+                  "type": "double",
+                  "id": 8
+                },
+                "top": {
+                  "type": "double",
+                  "id": 9
+                },
+                "right": {
+                  "type": "double",
+                  "id": 10
+                },
+                "bottom": {
+                  "type": "double",
+                  "id": 11
+                },
+                "vendor": {
+                  "type": "bytes",
+                  "id": 12
+                }
+              }
+            },
+            "Map": {
+              "fields": {
+                "header": {
+                  "type": "Header",
+                  "id": 1
+                },
+                "crosswalk": {
+                  "rule": "repeated",
+                  "type": "Crosswalk",
+                  "id": 2
+                },
+                "junction": {
+                  "rule": "repeated",
+                  "type": "Junction",
+                  "id": 3
+                },
+                "lane": {
+                  "rule": "repeated",
+                  "type": "Lane",
+                  "id": 4
+                },
+                "stopSign": {
+                  "rule": "repeated",
+                  "type": "StopSign",
+                  "id": 5
+                },
+                "signal": {
+                  "rule": "repeated",
+                  "type": "Signal",
+                  "id": 6
+                },
+                "yield": {
+                  "rule": "repeated",
+                  "type": "YieldSign",
+                  "id": 7
+                },
+                "overlap": {
+                  "rule": "repeated",
+                  "type": "Overlap",
+                  "id": 8
+                },
+                "clearArea": {
+                  "rule": "repeated",
+                  "type": "ClearArea",
+                  "id": 9
+                },
+                "speedBump": {
+                  "rule": "repeated",
+                  "type": "SpeedBump",
+                  "id": 10
+                },
+                "road": {
+                  "rule": "repeated",
+                  "type": "Road",
+                  "id": 11
+                },
+                "parkingSpace": {
+                  "rule": "repeated",
+                  "type": "ParkingSpace",
+                  "id": 12
+                },
+                "pncJunction": {
+                  "rule": "repeated",
+                  "type": "PNCJunction",
+                  "id": 13
+                },
+                "rsu": {
+                  "rule": "repeated",
+                  "type": "RSU",
+                  "id": 14
+                }
+              }
+            },
             "BoundaryEdge": {
               "fields": {
                 "curve": {
@@ -11382,6 +11406,23 @@
                     "CITY_ROAD": 2,
                     "PARK": 3
                   }
+                }
+              }
+            },
+            "RSU": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "junctionId": {
+                  "type": "Id",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
                 }
               }
             },
