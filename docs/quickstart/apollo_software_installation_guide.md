@@ -13,7 +13,7 @@ Please also make sure Docker is running. Type `systemctl status docker` to check
 the running status of Docker daemon, and type `systemctl start docker` to start
 Docker if needed.
 
-## Download Apollo Source
+## Download Apollo Sources
 
 Run the following commands to clone
 [Apollo's GitHub Repo](https://github.com/ApolloAuto/apollo.git).
@@ -33,6 +33,10 @@ And checkout the latest branch:
 cd apollo
 git checkout master
 ```
+
+For CN users, please refer to
+[How to Clone Apollo Repository from CN](../howto/how_to_clone_apollo_repo_from_cn.md)
+if your have difficulty cloning from GitHub.
 
 (Optional) For convenience, you can set up environment variable
 `APOLLO_ROOT_DIR` to refer to Apollo root directory by running:
@@ -89,13 +93,17 @@ Or type
 
 for an optimized build.
 
+You can refer to
+[Apollo Build and Test Explained](../specs/apollo_build_and_test_explained.md)
+for a thorough understanding of Apollo builds and tests.
+
 ## Launch and Run Apollo
 
 Please refer to the
 [Run Apollo](../howto/how_to_launch_and_run_apollo.md#run-apollo) section of
 [How to Launch And Run Apollo](../howto/how_to_launch_and_run_apollo.md).
 
-## Support a new Vehicle in DreamView
+## (Optional) Support a new Vehicle in DreamView
 
 In order to support a new vehicle in DreamView, please follow the steps below:
 

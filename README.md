@@ -135,11 +135,7 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
 ## Installation
 
 * [Hardware installation guide](docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
-
-* [Fork and then clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
-
-* [Build with Docker](docs/howto/how_to_build_and_possible_error.md) - **This step is required**
-
+* [Software installation guide](docs/quickstart/apollo_software_installation_guide.md) - **This step is required**
 * [Launch and run Apollo](docs/howto/how_to_launch_and_run_apollo.md)
 
 Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
@@ -168,7 +164,7 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 * [Technical Tutorials](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
 
-* [How To Guides](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
+* [How-To Guides](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
 
 * [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 
