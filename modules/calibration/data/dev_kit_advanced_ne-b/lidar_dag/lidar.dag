@@ -5,7 +5,7 @@ module_config {
     components {
       class_name : "CompSureStarDriver"
       config {
-        name : "velodyne_driver"
+        name : "surestar_driver"
         config_file_path : "/apollo/modules/drivers/lidar/conf/surestar.conf"
       }
     }
@@ -17,7 +17,7 @@ module_config {
     components {
       class_name : "CompSurestarConvert"
       config {
-        name : "velodyne_convert"
+        name : "surestar_convert"
        
         config_file_path : "/apollo/modules/drivers/lidar/conf/surestar.conf"
         readers {channel: "/apollo/sensor/lidar16/Scan"}
