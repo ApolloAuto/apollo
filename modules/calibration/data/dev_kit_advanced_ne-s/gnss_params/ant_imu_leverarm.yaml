@@ -1,0 +1,20 @@
+#set primary if single-antenna;set both primary and secondary if dual-antenna.
+leverarm:
+  primary:
+    offset:
+      x: 0.0143
+      y: -0.6452
+      z: 1.1802
+    uncertainty:
+      x: 0.030
+      y: 0.030
+      z: 0.030
+  secondary:
+    offset:
+      x: 0.0143
+      y: 0.8128
+      z: 1.1802
+    uncertainty:
+      x: 0.030
+      y: 0.030
+      z: 0.030
