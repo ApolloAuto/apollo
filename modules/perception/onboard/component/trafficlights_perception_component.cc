@@ -41,10 +41,9 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-using apollo::cyber::Clock;
-
 using TLCamID = apollo::perception::TrafficLightDetection::CameraID;
 using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::Clock;
 using apollo::perception::common::SensorManager;
 
 class TLInfo {
