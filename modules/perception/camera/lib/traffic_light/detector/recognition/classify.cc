@@ -124,7 +124,7 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
 
     data_provider_image_option_.crop_roi = light->region.detection_roi;
     data_provider_image_option_.do_crop = true;
-    data_provider_image_option_.target_color = base::Color::BGR;
+    data_provider_image_option_.target_color = base::Color::RGB;
     frame->data_provider->GetImage(data_provider_image_option_, image_.get());
 
     AINFO << "get img done";

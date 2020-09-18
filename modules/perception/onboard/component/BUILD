@@ -2,6 +2,48 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PERCEPTION_COPTS = [ '-DMODULE_NAME=\\"perception\\"' ]
+
+cc_binary(
+    name = "libperception_component_camera.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":perception_component_inner_camera"],
+)
+
+cc_library(
+    name = "perception_component_inner_camera",
+    srcs = [
+        "trafficlights_perception_component.cc",
+    ],
+    hdrs = [
+        "trafficlights_perception_component.h",
+    ],
+    copts = PERCEPTION_COPTS,
+    deps = [
+        "//cyber",
+        "//modules/common/math",
+        "//modules/common/util:time_util",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/map/proto:map_cc_proto",
+        "//modules/perception/base",
+        "//modules/perception/camera/app:traffic_light_camera_perception",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/map/hdmap:hdmap_input",
+        "//modules/perception/onboard/common_flags",
+        "//modules/perception/onboard/proto:trafficlights_perception_component_cc_proto",
+        "//modules/perception/onboard/transform_wrapper",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/transform/proto:transform_cc_proto",
+        "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/v2x/proto:v2x_traffic_light_cc_proto",
+        "@eigen",
+        "@opencv//:highgui",
+    ],
+    alwayslink = True,
+)
 
 cc_binary(
     name = "libperception_component_lidar.so",

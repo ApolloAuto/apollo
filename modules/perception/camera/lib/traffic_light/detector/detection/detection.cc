@@ -101,7 +101,7 @@ bool TrafficLightDetection::Init(
   int resize_height = detection_param_.min_crop_size();
   int resize_width = detection_param_.min_crop_size();
   max_batch_size_ = detection_param_.max_batch_size();
-  param_blob_length_ = 4;
+  param_blob_length_ = 3;
 
   CHECK_GT(resize_height, 0);
   CHECK_GT(resize_width, 0);
@@ -132,7 +132,6 @@ bool TrafficLightDetection::Init(
     param_data[offset + 0] = static_cast<float>(resize_width);
     param_data[offset + 1] = static_cast<float>(resize_height);
     param_data[offset + 2] = 1;
-    param_data[offset + 3] = 1;
   }
 
   switch (detection_param_.crop_method()) {
@@ -171,7 +170,7 @@ bool TrafficLightDetection::Inference(
                           static_cast<int>(detection_param_.min_crop_size()),
                           static_cast<int>(detection_param_.min_crop_size()),
                           3);
-  param_blob_->Reshape(static_cast<int>(batch_num), 4, 1, 1);
+  param_blob_->Reshape(static_cast<int>(batch_num), 1, 3, 1);
   float *param_data = param_blob_->mutable_cpu_data();
   for (size_t i = 0; i < batch_num; ++i) {
     auto offset = i * param_blob_length_;
@@ -180,7 +179,6 @@ bool TrafficLightDetection::Inference(
     param_data[offset + 1] =
         static_cast<float>(detection_param_.min_crop_size());
     param_data[offset + 2] = 1;
-    param_data[offset + 3] = 1;
   }
 
   AINFO << "reshape inputblob " << input_img_blob->shape_string();
@@ -314,7 +312,7 @@ bool TrafficLightDetection::SelectOutputBoxes(
     float x2 = result_data[3];
     float y2 = result_data[4];
     std::vector<float> score{result_data[5], result_data[6], result_data[7],
-                              result_data[8]};
+                             result_data[8]};
     for (int i = 0; i < 9; ++i) {
       ADEBUG << "result_data " << result_data[i];
     }
@@ -334,8 +332,8 @@ bool TrafficLightDetection::SelectOutputBoxes(
       tmp->region.detect_score = *biggest;
 
       if (OutOfValidRegion(tmp->region.detection_roi,
-                            crop_box_list.at(img_id).width,
-                            crop_box_list.at(img_id).height) ||
+                           crop_box_list.at(img_id).width,
+                           crop_box_list.at(img_id).height) ||
           tmp->region.detection_roi.Area() <= 0) {
         AINFO << "Invalid width or height or x or y: "
               << tmp->region.detection_roi.width << " | "

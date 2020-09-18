@@ -108,6 +108,9 @@ void TorchDet::Infer() {
                                    1);
   blobs_[output_names_[0]]->Reshape({static_cast<int>(result.size(0)),
                              static_cast<int>(result.size(1)), 1, 1});
+  if (result.size(0) == 0) {
+    result = torch::zeros({1, 9}, torch::kFloat).to(device);
+  }
   blobs_[output_names_[0]]->data()->set_gpu_data(result.data_ptr());
 }
 

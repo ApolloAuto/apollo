@@ -11,5 +11,5 @@ output_blob_name : "bboxes"
 model_name: "./"
 model_type: "TorchDet"
 proto_file:"deploy.prototxt"
-weight_file: "faster_rcnn_model.ts"
+weight_file: "faster_rcnn_model/faster_rcnn_model.ts"
 max_batch_size: 1
