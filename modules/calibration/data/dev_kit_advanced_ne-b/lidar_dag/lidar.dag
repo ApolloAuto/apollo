@@ -31,8 +31,8 @@ module_config {
     components {
       class_name : "CompensatorComponent"
       config {
-        name : "velodyne_compensator"
-        config_file_path : "/apollo/modules/drivers/lidar/conf/velodyne16_fusion_compensator.pb.txt"
+        name : "lidar_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_fusion_compensator.pb.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/PointCloud2"}
       }
     }
