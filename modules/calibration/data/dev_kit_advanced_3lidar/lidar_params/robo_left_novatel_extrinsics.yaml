@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 1598864144
+    nsecs: 0
+  frame_id: novatel
+transform:
+  rotation:
+    x: -0.00286894868765535
+    y: 0.004124527761619362
+    z: 0.9328082862516019
+    w: 0.3603378994988631
+  translation:
+    z: 0.490
+    x: -0.445
+    y: 1.370
+child_frame_id: lidar16_left
