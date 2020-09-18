@@ -11,6 +11,7 @@
     - [Task Configuration Protocol Buffers](#TaskConfigurationProtocolBuffers)
     - [Task Configuration File Example](#TaskConfigurationFileExample)
     - [Task Configuration Detailed Explanations](#TaskConfigurationDetailedExplanations)
+    - [Customized Dynamic Models Guidance](#CustomizedDynamicModelsGuidance)
   - [Task Submission](#TaskSubmission)
     - [Task Configuration File Storage](#TaskConfigurationFileStorage)
     - [Submit Job via Webpage](#SubmitJobviaWebpage)
@@ -70,7 +71,7 @@ The detailed explanations of the message in the XXX_tuner_params_config.pb.txt i
 
 | Message | Detailed Explanations | Notes |
 |---|---|---|
-| `git_info.repo`| The repo name which will be executed in the Apollo simulation platform | The dynamic models used in simulation must be put in the designed path |
+| `git_info.repo`| The repo name which will be executed in the Apollo simulation platform | The dynamic models used in simulation must be placed in the designed path in this github repo, following the [Customized Dynamic Models Guidance](#CustomizedDynamicModelsGuidance)|
 | `git_info.commit_id` | The commit id which will be executed in the Apollo simulation platform | If empty, by default the latest commit id will be used |
 | `tuner_parameters.user_tuning_module` | Set as **CONTROL** | Must be **CONTROL** otherwise cannot pass the task sanity check |
 | `tuner_parameters.user_conf_filename` | The control configuration file in the `git_info.repo`, which will be executed in the Apollo simulation platform | The tuned parameters and flags must be included in the configuration file |
@@ -80,6 +81,10 @@ The detailed explanations of the message in the XXX_tuner_params_config.pb.txt i
 | `tuner_parameters.parameter` | (repeated message) Set as many parameters as the users need in the users' control configuration file. If the users set the **constant** property of the parameter, then the parameters will be treated as **Constant Parameter** and the set constant values will overwrite the default values in control configuration file; If the users set the **min** and **max** properties of the parameter, then the parameters will be treated as **Tuned Parameter** and the auto-tuning service will attempt to search the best parameter value through the range limited by **min** and **max** | The more the tuned parameters are, the more the optimization iteration step number (and the longer and slower auto-tuning process) may be needed |
 | `scenarios.id` | (repeated message) Set as many scenario IDs as the users need for the control performance evaluation in the parameter auto-tuning. Suggested IDs: **11014, 11015, 11016, 11017, 11018, 11019, 11020** | The users may also choose any available scenario ID from the public scenarios from the Apollo simulation platform. The more the scenario IDs are, the slower the auto-tuning process may be |
 | `dynamic_model` | Set as **ECHO_LINCOLN**, only if `git_info.repo` is set as the official Apollo repo | Ignored if the customized repo is used in `git_info.repo`|  
+
+### Customized Dynamic Models Guidance
+
+If the users intend to use their own dynamic models in simulation, then please provide the forward-driving model at github **apollo/modules/control/conf/dynamic_model_forward.bin**; backward-driving model at github **apollo/modules/control/conf/dynamic_model_backward.bin**. Please refer to [Dynamic Model](../../Apollo_Fuel/Dynamic_Model/README.md) for guidance on how to generate the customized dynamic models
 
 
 ## Task Submission
