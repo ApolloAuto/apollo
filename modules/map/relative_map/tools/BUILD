@@ -3,10 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
+
 cc_binary(
     name = "navigation_dummy",
     srcs = ["navigation_dummy.cc"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -18,7 +20,7 @@ cc_binary(
 cc_binary(
     name = "navigator",
     srcs = ["navigator.cc"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

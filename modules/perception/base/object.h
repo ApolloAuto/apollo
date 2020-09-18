@@ -25,7 +25,7 @@
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/vehicle_struct.h"
-#include "modules/prediction/proto/feature.pb.h"
+// #include "modules/prediction/proto/feature.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -117,7 +117,7 @@ struct alignas(16) Object {
   FusionObjectSupplement fusion_supplement;
 
   // @debug feature to be used for semantic mapping
-  std::shared_ptr<apollo::prediction::Feature> feature;
+//  std::shared_ptr<apollo::prediction::Feature> feature;
 };
 
 using ObjectPtr = std::shared_ptr<Object>;

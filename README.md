@@ -1,4 +1,4 @@
-![image alt text](docs/demo_guide/images/Apollo_logo.png)
+![](docs/demo_guide/images/Apollo_logo.png)
 
 [![Build Status](http://180.76.142.62:8111/app/rest/builds/buildType:Apollo_Build/statusIcon)](http://180.76.142.62:8111/viewType.html?buildTypeId=Apollo_Build&guest=1)
 [![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/daily-build/public)
@@ -43,11 +43,11 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 * Ubuntu 18.04
 
-* NVIDIA driver version 440.33.01 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us)), and CUDA version 10.2
+* NVIDIA driver version 440.33.01 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
 
 * Docker-CE version 19.03 and above ([Official doc](https://docs.docker.com/engine/install/ubuntu/))
 
-* NVIDIA container toolkit ([Official doc](https://github.com/NVIDIA/nvidia-docker))
+* NVIDIA Container Toolkit ([Official doc](https://github.com/NVIDIA/nvidia-docker))
 
 **Please note**, it is recommended that you install the versions of Apollo in the following order: **1.0 -> whichever version you would like to test out**. The reason behind this recommendation is that you need to confirm whether individual hardware components and modules are functioning correctly, and clear various version test cases before progressing to a higher and more capable version for your safety and the safety of those around you.
 
@@ -61,19 +61,19 @@ The following diagram highlights the scope and features of each Apollo release:
 
 Apollo 1.0, also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
 
-![image alt text](docs/demo_guide/images/Apollo_1.png)
+![](docs/demo_guide/images/Apollo_1.png)
 
 [**Apollo 1.5:**](docs/quickstart/apollo_1_5_hardware_system_installation_guide.md)
 
 Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
 
-![image alt text](docs/demo_guide/images/Apollo_1_5.png)
+![](docs/demo_guide/images/Apollo_1_5.png)
 
 [**Apollo 2.0:**](docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md#key-hardware-components)
 
 Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicles are able to cruise on roads safely, avoid collisions with obstacles, stop at traffic lights, and change lanes if needed to reach their destination.  Please note, the modules highlighted in Red are additions or upgrades for version 2.0.
 
-![image alt text](docs/demo_guide/images/Apollo_2.png)
+![](docs/demo_guide/images/Apollo_2.png)
 
 [**Apollo 2.5:**](docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
@@ -85,61 +85,57 @@ Apollo Engineering team. Your safety is our #1 priority,
 and we want to ensure Apollo 2.5 was integrated correctly with your vehicle before you hit the road.
 ```
 
-![image alt text](docs/demo_guide/images/Apollo_2_5.png)
+![](docs/demo_guide/images/Apollo_2_5.png)
 
 [**Apollo 3.0:**](docs/quickstart/apollo_3_0_quick_start.md)
 
 Apollo 3.0's primary focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them.
 
-![image alt text](docs/demo_guide/images/Apollo_3.0_diagram.png)
+![](docs/demo_guide/images/Apollo_3.0_diagram.png)
 
 [**Apollo 3.5:**](docs/quickstart/apollo_3_5_quick_start.md)
 
 Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios, including unprotected turns and narrow streets often found in residential areas and roads with stop signs.
 
-![image alt text](docs/demo_guide/images/Apollo_3_5_Architecture.png)
+![](docs/demo_guide/images/Apollo_3_5_Architecture.png)
 
 [**Apollo 5.0:**](docs/quickstart/apollo_3_5_quick_start.md)
 
 Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous Driving.
 The car now has 360-degree visibility, along with upgraded perception deep learning model to handle the changing conditions of complex road scenarios, making the car more secure and aware. Scenario-based planning has been enhanced to support additional scenarios like pull over and crossing bare intersections.
 
-![image alt text](docs/demo_guide/images/Apollo_5_0_diagram1.png)
+![](docs/demo_guide/images/Apollo_5_0_diagram1.png)
 
 [**Apollo 5.5:**](docs/quickstart/apollo_5_5_quick_start.md)
 
 Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. The car has complete 360-degree visibility, along with upgraded perception deep learning model and a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. 
 
-![image alt text](docs/demo_guide/images/Apollo_5_5_Architecture.png)
+![](docs/demo_guide/images/Apollo_5_5_Architecture.png)
 
 [**Apollo 6.0:**](docs/quickstart/apollo_6_0_quick_start.md)
 
 Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new additions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
 
-![image alt text](docs/demo_guide/images/Apollo_6_0.png)
+![](docs/demo_guide/images/Apollo_6_0.png)
 
 ## Architecture
 
 * **Hardware/ Vehicle Overview**
 
-![image alt text](docs/demo_guide/images/Hardware_overview_3_5.png)
+![](docs/demo_guide/images/Hardware_overview_3_5.png)
 
 * **Hardware Connection Overview**
 
-![image alt text](docs/demo_guide/images/Hardware_connection_3_5_1.png)
+![](docs/demo_guide/images/Hardware_connection_3_5_1.png)
 
 * **Software Overview**
 
-![image alt text](docs/demo_guide/images/Apollo_3_5_software_architecture.png)
+![](docs/demo_guide/images/Apollo_3_5_software_architecture.png)
 
 ## Installation
 
 * [Hardware installation guide](docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
-
-* [Fork and then clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
-
-* [Build with Docker](docs/howto/how_to_build_and_possible_error.md) - **This step is required**
-
+* [Software installation guide](docs/quickstart/apollo_software_installation_guide.md) - **This step is required**
 * [Launch and run Apollo](docs/howto/how_to_launch_and_run_apollo.md)
 
 Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
@@ -166,9 +162,9 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 ## Documents
 
-* [Technical Tutorial](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
+* [Technical Tutorials](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
 
-* [How To Guide](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
+* [How-To Guides](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
 
 * [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 

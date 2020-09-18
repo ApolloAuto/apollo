@@ -170,7 +170,7 @@ Use the components that you were required to provide to perform the following ta
 
 ## Time Sync Script Setup [Optional]
 
-In order to, sync the computer time to the NTP server on the internet, you could use the [Time Sync script](https://github.com/ApolloAuto/apollo/blob/master/scripts/time_sync.sh)
+In order to sync the computer time with NTP servers on the internet, you could use the [Time Sync script](https://github.com/ApolloAuto/apollo/blob/master/scripts/time_sync.sh)
 
 ## Next Steps
 
