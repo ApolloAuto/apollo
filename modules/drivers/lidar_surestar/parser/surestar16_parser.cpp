@@ -132,9 +132,10 @@ void Surestar16Parser::unpack(
         /** correct for the laser rotation as a function of timing during the
          * firings **/
         azimuth_corrected_f =
-            azimuth + tmpAngleDif * ((static_cast<float>(dsr)) +  // dsr [0-15]
-                                     (static_cast<float>(firing) *
-                                      RFANS16_SCANS_PER_FIRING));  // firing [0-1]
+            azimuth +
+            tmpAngleDif * ((static_cast<float>(dsr)) +  // dsr [0-15]
+                           (static_cast<float>(firing) *
+                            RFANS16_SCANS_PER_FIRING));  // firing [0-1]
         azimuth_corrected =
             static_cast<int>(round(fmod(azimuth_corrected_f, 36000.0)));
 
