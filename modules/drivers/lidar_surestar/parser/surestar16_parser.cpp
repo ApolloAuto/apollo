@@ -40,7 +40,7 @@ void Surestar16Parser::setup() {
 }
 
 void Surestar16Parser::init_orderindex() {
-  for (uint32_t i = 0; i < VLP16_POINT_SIZE; ++i) {
+  for (uint32_t i = 0; i < RFANS16_POINT_SIZE; ++i) {
     order_map_[i] = getOrderIndex(i);
   }
 }
@@ -118,9 +118,9 @@ void Surestar16Parser::unpack(
 
     float tmpAngleDif = azimuth_diff / SCANS_PER_BLOCK;
     // for 0-2
-    for (int firing = 0, k = 0; firing < VLP16_FIRINGS_PER_BLOCK; ++firing) {
+    for (int firing = 0, k = 0; firing < RFANS16_FIRINGS_PER_BLOCK; ++firing) {
       // for 0-16
-      for (int dsr = 0; dsr < VLP16_SCANS_PER_FIRING;
+      for (int dsr = 0; dsr < RFANS16_SCANS_PER_FIRING;
            ++dsr, k += RAW_SCAN_SIZE) {
         // LaserCorrection& corrections = _calibration._laser_corrections[dsr];
 
@@ -134,7 +134,7 @@ void Surestar16Parser::unpack(
         azimuth_corrected_f =
             azimuth + tmpAngleDif * ((static_cast<float>(dsr)) +  // dsr [0-15]
                                      (static_cast<float>(firing) *
-                                      VLP16_SCANS_PER_FIRING));  // firing [0-1]
+                                      RFANS16_SCANS_PER_FIRING));  // firing [0-1]
         azimuth_corrected =
             static_cast<int>(round(fmod(azimuth_corrected_f, 36000.0)));
 
@@ -142,12 +142,12 @@ void Surestar16Parser::unpack(
         // _lower_previous_packet_stamp
         uint64_t timestamp = get_timestamp(
             basetime,
-            (*_inner_time)[block][firing * VLP16_SCANS_PER_FIRING + dsr],
+            (*_inner_time)[block][firing * RFANS16_SCANS_PER_FIRING + dsr],
             LOWER_BANK);  // _inner_time[12][32] 一个packet里面每个点的时间
 
         if (block == BLOCKS_PER_PACKET - 1 &&
-            firing == VLP16_FIRINGS_PER_BLOCK - 1 &&
-            dsr == VLP16_SCANS_PER_FIRING - 1) {
+            firing == RFANS16_FIRINGS_PER_BLOCK - 1 &&
+            dsr == RFANS16_SCANS_PER_FIRING - 1) {
           // set header stamp before organize the point cloud
           pc->mutable_header()->set_lidar_timestamp(timestamp);
           pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
@@ -185,7 +185,7 @@ void Surestar16Parser::unpack(
   }
 }
 
-uint32_t Surestar16Parser::GetPointSize() { return VLP16_POINT_SIZE; }
+uint32_t Surestar16Parser::GetPointSize() { return RFANS16_POINT_SIZE; }
 
 uint32_t Surestar16Parser::getOrderIndex(uint32_t index) {
   uint32_t width = 16;

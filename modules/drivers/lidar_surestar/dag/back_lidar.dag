@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar_surestar/libsurestar_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar_surestar/component/libsurestar_component.so"
     ##################################################
     #                   drivers                      #
     ##################################################
@@ -24,7 +24,7 @@ module_config {
         name : "surestar_back_convert"
         config_file_path : "/apollo/modules/drivers/lidar_surestar/conf/single_back.conf"
         readers {
-          channel: "/sensor/velodyne16/back/VelodyneScan"
+          channel: "/apollo/sensor/surestar16/VelodyneScan"
         }
       }
     }

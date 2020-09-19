@@ -6,11 +6,7 @@ import "modules/common/proto/header.proto";
 
 enum Model {
     UNKOWN = 0;
-    HDL64E_S3S = 1;
-    HDL64E_S3D = 2;
-    HDL64E_S2 = 3;
-    HDL32E = 4;
-    VLP16 = 5;
+    RFANS16 = 1;
 }
 
 enum Mode {
@@ -31,7 +27,6 @@ message SurestarScan {
 
     repeated SurestarPacket firing_pkts = 4;
 
-    //for HDL32 and VLP16
     repeated SurestarPacket positioning_pkts = 5;
         // Surestar device serial number, corresponds to a specific calibration file
     optional string sn = 6; 

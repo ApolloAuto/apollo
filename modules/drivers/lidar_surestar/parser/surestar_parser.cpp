@@ -194,11 +194,10 @@ void SurestarParser::init_sin_cos_rot_table(float* sin_rot_table,
 
 SurestarParser* SurestarParserFactory::create_parser(
     const apollo::drivers::surestar::SurestarConfig& config) {
-  if (config.model() == apollo::drivers::Surestar::VLP16) {
+  if (config.model() == apollo::drivers::Surestar::RFANS16) {
     return new Surestar16Parser(config);
   } else {
-    AERROR << " invalid model, must be VLP16|HDL32E|"
-           << "HDL64E_S3S|HDL64E_S3D|HDL64E_S2";
+    AERROR << " invalid model, must be RFANS16";
     return nullptr;
   }
 }

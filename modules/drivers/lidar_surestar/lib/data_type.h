@@ -52,12 +52,12 @@ static const uint16_t LOWER_BANK = 0xddff;
 
 static const float ANGULAR_RESOLUTION = 0.00300919;
 
-/** Special Defines for VLP16 support **/
-static const int VLP16_FIRINGS_PER_BLOCK = 2;
-static const int VLP16_SCANS_PER_FIRING = 16;
-static const float VLP16_BLOCK_TDURATION = 110.592f;
-static const float VLP16_DSR_TOFFSET = 2.304f;
-static const float VLP16_FIRING_TOFFSET = 55.296f;
+/** Special Defines for RFANS16 support **/
+static const int RFANS16_FIRINGS_PER_BLOCK = 2;
+static const int RFANS16_SCANS_PER_FIRING = 16;
+static const float RFANS16_BLOCK_TDURATION = 110.592f;
+static const float RFANS16_DSR_TOFFSET = 2.304f;
+static const float RFANS16_FIRING_TOFFSET = 55.296f;
 
 static const int PACKET_SIZE = 1206;
 static const int BLOCKS_PER_PACKET = 12;
@@ -65,10 +65,10 @@ static const int PACKET_STATUS_SIZE = 4;
 static const int SCANS_PER_PACKET =
     (SCANS_PER_BLOCK * BLOCKS_PER_PACKET);  // 1 packet的point 个数
 
-static constexpr uint32_t VLP16_SCAN_SIZE =
+static constexpr uint32_t RFANS16_SCAN_SIZE =
     80;  // ceil 754/10  一圈的packet的数目
-static constexpr uint32_t VLP16_POINT_SIZE =
-    VLP16_SCAN_SIZE * SCANS_PER_PACKET;              // 转一圈点的个数
+static constexpr uint32_t RFANS16_POINT_SIZE =
+    RFANS16_SCAN_SIZE * SCANS_PER_PACKET;              // 转一圈点的个数
 static constexpr uint32_t HDL64S3D_SCAN_SIZE = 579;  // ceil 5789/10
 static constexpr uint32_t HDL64S3D_POINT_SIZE =
     HDL64S3D_SCAN_SIZE * SCANS_PER_PACKET;

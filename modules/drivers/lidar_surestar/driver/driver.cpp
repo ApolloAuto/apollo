@@ -180,10 +180,10 @@ void SurestarDriver::update_gps_top_hour(uint32_t current_time) {
 
 SurestarDriver* SurestarDriverFactory::create_driver(
     const apollo::drivers::surestar::SurestarConfig& surestar_config) {
-  if (surestar_config.model() == apollo::drivers::Surestar::Model::VLP16) {
+  if (surestar_config.model() == apollo::drivers::Surestar::Model::RFANS16) {
     return new Surestar16Driver(surestar_config);
   } else {
-    AERROR << "Invalid model, must be VLP16";
+    AERROR << "Invalid model, must be RFANS16";
     return nullptr;
   }
 }
