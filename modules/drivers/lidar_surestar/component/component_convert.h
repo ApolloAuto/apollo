@@ -95,7 +95,7 @@ class CompSurestarConvert
     }
     // just clear header now, we will reset all other value in pb.
     point_cloud_send->mutable_header()->Clear();
-    _conv->convert_velodyne_to_pointcloud(scan, point_cloud_send);
+    _conv->convert_surestar_to_pointcloud(scan, point_cloud_send);
     if (point_cloud_send == nullptr || point_cloud_send->point_size() == 0) {
       AINFO << "discard null point cloud";
       return false;

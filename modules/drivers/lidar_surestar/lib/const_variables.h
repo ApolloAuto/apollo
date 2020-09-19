@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CONST_VARIABLES_H
-#define DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CONST_VARIABLES_H
+#ifndef DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_CONST_VARIABLES_H
+#define DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_CONST_VARIABLES_H
 
 #include <iostream>
 
@@ -270,4 +270,4 @@ const int LASER_RING[N_LASERS] = {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CONST_VARIABLES_H
+#endif  // DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_CONST_VARIABLES_H

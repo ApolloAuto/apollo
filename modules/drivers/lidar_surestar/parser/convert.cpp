@@ -53,7 +53,7 @@ Convert::~Convert() {
 uint32_t Convert::GetPointSize() { return _parser->GetPointSize(); }
 
 /** @brief Callback for raw scan messages. */
-void Convert::convert_velodyne_to_pointcloud(
+void Convert::convert_surestar_to_pointcloud(
     const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
         scan_msg,
     const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud) {

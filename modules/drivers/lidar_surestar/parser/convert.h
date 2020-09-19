@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_PARSER_CONVERT_H
-#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_PARSER_CONVERT_H
+#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_PARSER_CONVERT_H
+#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_PARSER_CONVERT_H
 
 #include <memory>
 
@@ -34,7 +34,7 @@ class Convert {
       const apollo::drivers::surestar::SurestarConfig& surestar_config);
   ~Convert();
 
-  void convert_velodyne_to_pointcloud(
+  void convert_surestar_to_pointcloud(
       const std::shared_ptr<apollo::drivers::Surestar::SurestarScan const>&
           scan_msg,
       const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud);
@@ -51,4 +51,4 @@ class Convert {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_PARSER_CONVERT_H
+#endif  // ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_PARSER_CONVERT_H

@@ -69,7 +69,7 @@ void PcapInput::init() {
 /** destructor */
 PcapInput::~PcapInput(void) { pcap_close(_pcap); }
 
-/** @brief Get one velodyne packet. */
+/** @brief Get one surestar packet. */
 int PcapInput::get_firing_data_packet(
     apollo::drivers::Surestar::SurestarPacket* pkt) {
   struct pcap_pkthdr* header;

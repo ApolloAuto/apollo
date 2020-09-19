@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
-#define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
+#ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_PCAP_INPUT_H
+#define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_PCAP_INPUT_H
 
 #include <stdio.h>
 #include <unistd.h>
@@ -54,4 +54,4 @@ class PcapInput : public Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_PCAP_INPUT_H
+#endif  // CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_PCAP_INPUT_H

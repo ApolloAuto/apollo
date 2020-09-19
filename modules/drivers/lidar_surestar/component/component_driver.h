@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_COMPONENT_COMPONENT_DRIVER_H
-#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_COMPONENT_COMPONENT_DRIVER_H
+#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_COMPONENT_COMPONENT_DRIVER_H
+#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_COMPONENT_COMPONENT_DRIVER_H
 
 #include <memory>
 #include <string>
@@ -46,7 +46,7 @@ class CompSureStarDriver : public apollo::cyber::Component<> {
     AINFO << "config:" << config.DebugString();
 
     // set default main frame
-    if (!config.has_main_frame() && config.frame_id() == "velodyne16_back") {
+    if (!config.has_main_frame() && config.frame_id() == "surestar16") {
       config.set_main_frame(true);
     }
 

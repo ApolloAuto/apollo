@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_SOCKET_INPUT_H
-#define DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_SOCKET_INPUT_H
+#ifndef DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_SOCKET_INPUT_H
+#define DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_SOCKET_INPUT_H
 
 #include <stdio.h>
 #include <unistd.h>
@@ -48,4 +48,4 @@ class SocketInput : public Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_SOCKET_INPUT_H
+#endif  // DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_SOCKET_INPUT_H

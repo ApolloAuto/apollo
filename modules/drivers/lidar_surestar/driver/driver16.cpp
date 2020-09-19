@@ -44,7 +44,7 @@ Surestar16Driver::~Surestar16Driver() {
 void Surestar16Driver::init() {
   running_.store(true);
   double packet_rate =
-      781.25;  // 每秒packet的数目 velodyne-754  beike v6k-781.25  v6c-833.33
+      781.25;  // 每秒packet的数目  beike v6k-781.25  v6c-833.33
   double frequency = (_config.rpm() /
                       60.0);  // 每秒frame的数目，即每秒的圈数  expected Hz rate
 

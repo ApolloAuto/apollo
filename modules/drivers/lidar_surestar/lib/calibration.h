@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
-#define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
+#ifndef CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_CALIBRATION_H
+#define CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_CALIBRATION_H
 
 #include <map>
 #include <memory>
@@ -68,4 +68,4 @@ class Calibration {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_LIB_CALIBRATION_H
+#endif  // CYBER_ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_LIB_CALIBRATION_H

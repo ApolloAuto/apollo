@@ -64,7 +64,7 @@ class Input {
 
   /** @brief Read one surestar packet.
    *
-   * @param pkt points to VelodynePacket message
+   * @param pkt points to SurestarPacket message
    *
    * @returns 0 if successful,
    *          -1 if end of file

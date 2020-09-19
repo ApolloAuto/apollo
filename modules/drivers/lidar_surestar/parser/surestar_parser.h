@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef SURESTAR_INCLUDE_VELODYNE_PARSER_VELODYNE_PARSER_H
-#define SURESTAR_INCLUDE_VELODYNE_PARSER_VELODYNE_PARSER_H
+#ifndef SURESTAR_INCLUDE_SURESTAR_PARSER_SURESTAR_PARSER_H
+#define SURESTAR_INCLUDE_SURESTAR_PARSER_SURESTAR_PARSER_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -152,7 +152,7 @@ class Surestar16Parser : public SurestarParser {
   std::map<uint32_t, uint32_t> order_map_;
   uint32_t getOrderIndex(uint32_t index);
   void init_orderindex();
-};  // class Velodyne32Parser
+};  // class Surestar32Parser
 
 class SurestarParserFactory {
  public:
@@ -164,4 +164,4 @@ class SurestarParserFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // SURESTAR_INCLUDE_VELODYNE_PARSER_VELODYNE_PARSER_H
+#endif  // SURESTAR_INCLUDE_SURESTAR_PARSER_SURESTAR_PARSER_H

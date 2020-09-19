@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_DRIVER_DRIVER_H
-#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_DRIVER_DRIVER_H
+#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_DRIVER_DRIVER_H
+#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_DRIVER_DRIVER_H
 
 #include <memory>
 #include <string>
@@ -89,4 +89,4 @@ class SurestarDriverFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  // ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_DRIVER_DRIVER_H
+#endif  // ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_DRIVER_DRIVER_H

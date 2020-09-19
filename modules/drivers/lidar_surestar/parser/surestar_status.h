@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_PARSER_surestar_status_H
-#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_VELODYNE_PARSER_surestar_status_H
+#ifndef ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_PARSER_surestar_status_H
+#define ONBOARD_DRIVERS_SURESTAR_INCLUDE_SURESTAR_PARSER_surestar_status_H
 
 #include <memory>
 #include <string>
