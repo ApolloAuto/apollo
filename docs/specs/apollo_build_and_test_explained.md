@@ -131,17 +131,18 @@ Here is a snapshot showing the log messages on my screen when running
 
 There are three `USE_GPU`: `USE_GPU_HOST`, `USE_GPU_TARGET` and `USE_GPU`.
 
-- `USE_GPU_HOST` is an Env variable determined by `docker/scripts/dev_start.sh`
-  to pass to Apollo Docker container, which indicates whether the host machine
-  (where Docker is running) is GPU capable.
-- `USE_GPU_TARGET` is an Env variable determined by `scripts/apollo.bashrc`
-  inside Docker container to indicate whether the container is GPU capable.
+- `USE_GPU_HOST` is an environment variable determined by
+  `docker/scripts/dev_start.sh` to pass to Apollo Docker container, which
+  indicates whether the host machine (where Docker is running) is GPU capable.
+- `USE_GPU_TARGET` is an environment variable determined by
+  `scripts/apollo.bashrc` inside Docker container to indicate whether the
+  container is GPU capable.
 - `USE_GPU` is a variable indicating whether to perform CPU build or GPU build.
 
 When you type `bash apollo.sh build --config=cpu` or
-`apollo.sh build --config=gpu`, the build script
-(https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_build.sh) will
-check the GPU capability of the Docker container and determines whether the
+`apollo.sh build --config=gpu`, the
+[build script](https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_build.sh)
+will check the GPU capability of the Docker container and determines whether the
 build you specified can succeed.
 
 ![tip_icon](images/tip_icon.png) If you didn't specify whether to perform CPU or
