@@ -14,8 +14,7 @@ message TargetLane {
   optional double speed_limit = 4;  // in m/s
 }
 
-message ObjectIgnore {
-}
+message ObjectIgnore {}
 
 enum StopReasonCode {
   STOP_REASON_HEAD_VEHICLE = 1;
@@ -92,19 +91,16 @@ message ObjectSidePass {
 }
 
 // unified object decision while estop
-message ObjectAvoid {
-}
+message ObjectAvoid {}
 
 message ObjectStatus {
   optional ObjectMotionType motion_type = 1;
   optional ObjectDecisionType decision_type = 2;
 }
 
-message ObjectStatic {
-}
+message ObjectStatic {}
 
-message ObjectDynamic {
-}
+message ObjectDynamic {}
 
 message ObjectMotionType {
   oneof motion_tag {
@@ -146,11 +142,9 @@ message MainStop {
   optional apollo.routing.ChangeLaneType change_lane_type = 5;
 }
 
-message EmergencyStopHardBrake {
-}
+message EmergencyStopHardBrake {}
 
-message EmergencyStopCruiseToStop {
-}
+message EmergencyStopCruiseToStop {}
 
 message MainEmergencyStop {
   // Unexpected event happened, human driver is required to take over

@@ -13,7 +13,7 @@ Apollo3.5主要聚焦在三个主要驾驶场景，即：
 
 如下图所示，车道保持场景（我们的默认驾驶场景）包括但不限于在单车道（如巡航）或换道行驶，遵循基本的交通约定或基本转弯。
 
-![](images/Planning_default.png)
+![](images/planning_default.png)
 
 
 ### Side Pass

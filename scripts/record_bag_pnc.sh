@@ -27,7 +27,7 @@ function start() {
   # Start recording.
   record_bag_env_log
   LOG="/tmp/apollo_record.out"
-  NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
+  NUM_PROCESSES="$(pgrep -f "rosbag record" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record --split --duration=10m -b 2048 \
       /apollo/sensor/conti_radar \

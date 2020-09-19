@@ -34,7 +34,7 @@ cc_library(
 
 cc_test(
     name = "transport_test",
-    size = "small",
+    size = "large",
     srcs = ["transport_test.cc"],
     deps = [
         "//cyber:cyber_core",
@@ -572,7 +572,7 @@ cc_test(
 
 cc_test(
     name = "condition_notifier_test",
-    size = "small",
+    size = "large",
     srcs = ["shm/condition_notifier_test.cc"],
     deps = [
         "//cyber:cyber_core",

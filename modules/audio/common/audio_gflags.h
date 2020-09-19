@@ -20,3 +20,6 @@
 
 DECLARE_int32(cache_signal_time);
 DECLARE_string(torch_siren_detection_model);
+
+DECLARE_string(audio_records_dir);
+DECLARE_string(audio_conf_file);

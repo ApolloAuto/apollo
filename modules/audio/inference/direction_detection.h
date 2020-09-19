@@ -47,9 +47,10 @@ class DirectionDetection {
   DirectionDetection();
   ~DirectionDetection();
   // Estimates the position of the source of the sound
-  Point3D EstimateSoundSource(std::vector<std::vector<double>>&& channels_vec,
-                              const std::string& respeaker_extrinsic_file,
-                              const int sample_rate, const double mic_distance);
+  std::pair<Point3D, double> EstimateSoundSource(
+      std::vector<std::vector<double>>&& channels_vec,
+      const std::string& respeaker_extrinsic_file,
+      const int sample_rate, const double mic_distance);
 
  private:
   const double kSoundSpeed = 343.2;

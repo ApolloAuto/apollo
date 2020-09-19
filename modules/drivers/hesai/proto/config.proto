@@ -11,11 +11,10 @@ message Config {
   optional uint32 gps_recv_port = 4;
   optional uint32 start_angle = 5;
   optional string pointcloud_channel = 6;
-  optional uint32 time_zone = 7;  
-  optional string frame_id = 8;  
+  optional uint32 time_zone = 7;
+  optional string frame_id = 8;
   optional string scan_channel = 9;
   optional bool is_online_calibration = 11 [default = true];
   optional string calibration_file = 12;
-  optional uint32 tcp_cmd_port = 13 [default = 9347]; 
+  optional uint32 tcp_cmd_port = 13 [default = 9347];
 }
-

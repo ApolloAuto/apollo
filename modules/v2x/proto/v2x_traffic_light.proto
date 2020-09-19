@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.v2x;
 
 import "modules/common/proto/header.proto";
+import "modules/common/proto/direction.proto";
 
 message SingleTrafficLight {
   enum Color {
@@ -20,22 +21,28 @@ message SingleTrafficLight {
     U_TURN = 3;
   };
   optional Color color = 1;
-  repeated Type trafficlight_type = 2;
+  repeated Type traffic_light_type = 2;
   // Traffic light string-ID in the map data.
   optional string id = 3;
   optional int32 color_remaining_time_s = 4;
   optional bool right_turn_light = 5;
+  // v2x next trrafic light color
+  optional Color next_color = 6;
+  // v2x next traffic light remaining time
+  optional double next_remaining_time_s = 7;
 }
 
-message CurrentLaneTrafficLight {
-  // Feature points of lane in the map reference frame.
+message RoadTrafficLight {
+  // Feature points of road in the map reference frame.
   optional double gps_x_m = 1;
   optional double gps_y_m = 2;
   repeated SingleTrafficLight single_traffic_light = 3;
+  optional apollo.common.Direction road_attribute = 4;
 }
 
 message IntersectionTrafficLightData {
   optional apollo.common.Header header = 1;
-  optional CurrentLaneTrafficLight current_lane_trafficlight = 2;
+  repeated RoadTrafficLight road_traffic_light = 2;
   optional int32 intersection_id = 3;
+  optional double confidence = 4;
 }

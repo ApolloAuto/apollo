@@ -18,14 +18,16 @@
 #include <string>
 #include <thread>
 #include <vector>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/unit_test.pb.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/node/reader.h"
 #include "cyber/node/writer.h"
-#include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cyber {

@@ -24,14 +24,16 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #include <cstdlib>
+
+#include "modules/canbus/proto/chassis.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/udp_listener.h"
 #include "modules/bridge/common/util.h"
-#include "modules/canbus/proto/chassis.pb.h"
 
 using apollo::bridge::BRIDGE_HEADER_FLAG;
 using apollo::bridge::BridgeHeader;

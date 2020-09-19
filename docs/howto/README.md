@@ -1,28 +1,18 @@
 # Howto Guides
 
 ## Build
-- [How to build and release](how_to_build_and_release.md)
-- [How to launch and run Apollo](how_to_launch_Apollo.md)
+- [How to launch and run Apollo](how_to_launch_and_run_apollo.md)
 - [How to build your own kernel](how_to_build_your_own_kernel.md)
 - [How to install apollo kernel](how_to_install_apollo_kernel.md)
-- [How to save and load docker image locally](how_to_save_load_docker_image_locally.md)
-- [How to build Apollo using Ubuntu 16(Apollo 2.5)](how_to_run_apollo_2.5_with_ubuntu16.md)
-- [How to build and debug using VSCode](how_to_build_and_debug_using_vscode.md)
-- [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16.md)
+- [How to save and load docker image](how_to_save_and_load_docker_image.md)
 
 #### Chinese versions
-- [How to build and debug using VSCode](how_to_build_and_debug_apollo_in_vscode_cn.md)
 - [How to install apollo kernel](how_to_install_apollo_kernel_cn.md)
-- [How to build Apollo using Ubuntu 16(Apollo 3.0)](how_to_run_apollo_3.0_with_ubuntu16_cn.md)
 
 ## Contribution
 - [How to document code](how_to_document_code.md)
-- [How to style check your code contribution](how_to_style_check_to_one_dir.md)
-- [How to create a pull request](how_to_create_a_pull.md)
+- [How to create a pull request](how_to_create_pull_request.md)
 - [How to migrate to the updated apollo master from previous versions.md](how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
-
-### Chinese versions
-- [How to style check your code contribution](how_to_style_check_to_one_dir_cn.md)
 
 ## Debugging and troubleshooting
 - [How to debug dreamview start problem](how_to_debug_dreamview_start_problem.md)
@@ -53,7 +43,6 @@
 - [How to add a new evaluator in prediction module](how_to_add_a_new_evaluator_in_prediction_module_cn.md)
 - [How to add a new predictor in prediction module](how_to_add_a_new_predictor_in_prediction_module_cn.md)
 - [How to add a new vehicle](how_to_add_a_new_vehicle_cn.md)
-- [How to add an external dependency](how_to_add_an_external_dependency_cn.md)
 - [How to Run MSF Localization Module On Your Local Computer](how_to_run_MSF_localization_module_on_your_local_computer_cn.md)
 - [How to train Prediction's MLP model](how_to_train_prediction_mlp_model_cn.md)
 - [How to use the navigation mode of Apollo 2.5 cn](how_to_use_apollo_2.5_navigation_mode_cn.md)
@@ -87,13 +76,9 @@
 - [How to Run RTK Localization Module On Your Local Computer](how_to_run_RTK_localization_module_on_your_local_computer_cn.md)
 
 ## Others
-- [How to install ubuntu](how_to_install_ubuntu.md)
-- [How to use IRC client on ubuntu](how_to_use_IRC_client_on_ubuntu.md)
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images.md)
-- [How to add a different vehicle](how_to_use_a_different_vehicle.md)
+- [How to clone Apollo repository from CN](how_to_clone_apollo_repo_from_cn.md)
 
 ### Chinese versions
-
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images_cn.md)
-- [How to install ubuntu](how_to_install_ubuntu_cn.md)
 - [How to solve slow pull from cn](how_to_solve_slow_pull_from_cn.md)

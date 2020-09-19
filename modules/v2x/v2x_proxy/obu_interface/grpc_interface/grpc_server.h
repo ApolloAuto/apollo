@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 /**
  * @file grpc_server.h
  * @brief define v2x proxy module and onboard unit interface grpc implement
@@ -21,57 +20,88 @@
 
 #pragma once
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <thread>
+
+#include <grpc++/grpc++.h>
+
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/v2x/proto/v2x_obu_rsi.pb.h"
+#include "modules/v2x/proto/v2x_service_obu_to_car.grpc.pb.h"
+#include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
 #include "cyber/cyber.h"
-#include "modules/v2x/proto/v2x_service_obu_to_car.grpc.pb.h"
 
 namespace apollo {
 namespace v2x {
 
-class GrpcServerImpl final : public ObuToCar::Service {
+class GrpcServerImpl final : public ::apollo::v2x::ObuToCar::Service {
  public:
   /* construct function
    */
   GrpcServerImpl();
 
-  ~GrpcServerImpl() {}
+  ~GrpcServerImpl() {
+    traffic_light_condition_.notify_all();
+    rsi_condition_.notify_all();
+  }
 
   bool InitFlag() { return init_flag_; }
 
+  /* function that send v2x traffic_light through grpc
+  @param input v2x traffic_light grpc request
+  @param output grpc response
+  */
+  grpc::Status SendV2xTrafficLight(
+      grpc::ServerContext *context,
+      const ::apollo::v2x::obu::ObuTrafficLight *request,
+      ::apollo::v2x::StatusResponse *response) override;
+
+  /* function that send v2x monitor messages through grpc
+  @param input v2x monitor grpc request
+  @param output grpc response
+  */
+  grpc::Status SendObuAlarm(grpc::ServerContext *context,
+                            const ::apollo::v2x::ObuAlarm *request,
+                            ::apollo::v2x::StatusResponse *response) override;
+
   /* function that send perception obstacles through grpc
-  @param input perception obstacles grpc request
-  @param output grpc response
-  */
-  grpc::Status SendPerceptionObstacles(
-      grpc::ServerContext* context,
-      const apollo::perception::PerceptionObstacles* request,
-      StatusResponse* response);
+     @param input perception obstacles grpc request
+     @param output grpc response
+    */
+  grpc::Status SendPerceptionObstacles(grpc::ServerContext *context,
+                                       const apollo::v2x::V2XObstacles *request,
+                                       StatusResponse *response) override;
 
-  /* function that send v2x trafficlight through grpc
-  @param input v2x trafficlight grpc request
-  @param output grpc response
-  */
-  grpc::Status SendV2xTrafficLight(grpc::ServerContext* context,
-                                   const IntersectionTrafficLightData* request,
-                                   StatusResponse* response);
+  grpc::Status SendV2xRSI(grpc::ServerContext *context,
+                          const ::apollo::v2x::obu::ObuRsi *request,
+                          ::apollo::v2x::StatusResponse *response);
 
-  /* function that get latest msg from grpc
-  @param output shared_ptr
-  */
   void GetMsgFromGrpc(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles>& ptr);
-  void GetMsgFromGrpc(const std::shared_ptr<IntersectionTrafficLightData>& ptr);
+      std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> *ptr);
+
+  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::obu::ObuRsi> *ptr);
+  void GetMsgFromGrpc(std::shared_ptr<::apollo::v2x::V2XObstacles> *ptr);
 
  private:
   std::mutex traffic_light_mutex_;
+  std::mutex rsi_mutex_;
   std::mutex obstacles_mutex_;
-  apollo::perception::PerceptionObstacles latest_obstacles_;
-  IntersectionTrafficLightData latest_trafficlight_;
+  std::condition_variable traffic_light_condition_;
+  std::condition_variable rsi_condition_;
+  std::condition_variable obs_condition_;
+  ::apollo::v2x::obu::ObuTrafficLight latest_traffic_light_;
+  ::apollo::v2x::obu::ObuRsi latest_rsi_;
+  ::apollo::v2x::V2XObstacles latest_obstacles_;
+
   bool init_flag_ = false;
-  bool first_recv_flag_ = true;
-  std::unique_ptr<cyber::Node> node_;
-  std::shared_ptr<cyber::Writer<StatusResponse>> first_flag_writer_ = nullptr;
+  bool refresh_ = false;
+  bool rsi_refresh_ = false;
+  bool obs_refresh_ = false;
+  std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
 };
 
 }  // namespace v2x

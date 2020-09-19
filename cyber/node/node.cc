@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/node/node.h"
+
 #include "cyber/common/global_data.h"
 #include "cyber/time/time.h"
 

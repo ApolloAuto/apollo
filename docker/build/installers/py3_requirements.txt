@@ -5,8 +5,9 @@ psutil
 # Google infras
 absl-py
 glog
-grpcio-tools
-protobuf
+# Use protobuf installed from source
+# protobuf
+# Note(infra): to be retired by absl-py
 python-gflags
 
 # Web
@@ -21,7 +22,7 @@ shapely
 matplotlib
 
 # Driver
-pyusb
+# pyusb
 
 # Data format
 h5py
@@ -30,5 +31,3 @@ utm
 # Learning
 #opencv-python
 numpy
-scipy
-

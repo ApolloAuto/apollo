@@ -22,7 +22,7 @@ source "${DIR}/scripts/apollo_base.sh"
 function start() {
   LOG="${APOLLO_ROOT_DIR}/data/log/transform.out"
   CMD="cyber_launch start /apollo/modules/transform/launch/static_transform.launch"
-  NUM_PROCESSES="$(pgrep -c -f "modules/transform/dag/static_transform.dag")"
+  NUM_PROCESSES="$(pgrep -f "modules/transform/dag/static_transform.dag" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
   fi

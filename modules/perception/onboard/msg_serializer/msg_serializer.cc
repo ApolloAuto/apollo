@@ -184,17 +184,18 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
     }
   }
 
-  // record the best prediction trajectory
-  if (object_ptr->feature.get() &&
-      object_ptr->feature->predicted_trajectory_size() > 0) {
-    apollo::perception::DebugMessage *dmsg = pb_msg->mutable_msg();
-    apollo::perception::Trajectory *target_traj = dmsg->add_trajectory();
-    const apollo::prediction::Trajectory &src_traj =
-        object_ptr->feature->predicted_trajectory(0);
-    (*target_traj->mutable_trajectory_point()) = (src_traj.trajectory_point());
-    ADEBUG << "Inserting Trajectores in PB with point size "
-           << src_traj.trajectory_point_size();
-  }
+// TODO(all): semantic map related, for debugging
+//  // record the best prediction trajectory
+//  if (object_ptr->feature.get() &&
+//      object_ptr->feature->predicted_trajectory_size() > 0) {
+//    apollo::perception::DebugMessage *dmsg = pb_msg->mutable_msg();
+//    apollo::perception::Trajectory *target_traj = dmsg->add_trajectory();
+//    const apollo::prediction::Trajectory &src_traj =
+//        object_ptr->feature->predicted_trajectory(0);
+//  (*target_traj->mutable_trajectory_point()) = (src_traj.trajectory_point());
+//    ADEBUG << "Inserting Trajectores in PB with point size "
+//           << src_traj.trajectory_point_size();
+//  }
 
   return true;
 }

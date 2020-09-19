@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "st_bounds_decider",
     srcs = ["st_bounds_decider.cc"],
     hdrs = ["st_bounds_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":st_driving_limits",
         ":st_guide_line",
@@ -26,7 +27,7 @@ cc_library(
     name = "st_guide_line",
     srcs = ["st_guide_line.cc"],
     hdrs = ["st_guide_line.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
@@ -55,7 +56,7 @@ cc_library(
     name = "st_driving_limits",
     srcs = ["st_driving_limits.cc"],
     hdrs = ["st_driving_limits.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
@@ -80,7 +81,7 @@ cc_library(
     name = "st_obstacles_processor",
     srcs = ["st_obstacles_processor.cc"],
     hdrs = ["st_obstacles_processor.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_cc_proto",

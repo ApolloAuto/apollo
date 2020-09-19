@@ -39,15 +39,15 @@ void Brakecommand101::UpdateData(uint8_t* data) {
   set_p_brake_dec(data, brake_dec_);
   set_p_brake_pedal_target(data, brake_pedal_target_);
   set_p_brake_en_ctrl(data, brake_en_ctrl_);
-  checksum_111_ =
+  checksum_101_ =
       data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
-  set_p_checksum_111(data, checksum_111_);
+  set_p_checksum_101(data, checksum_101_);
 }
 
 void Brakecommand101::Reset() {
   // TODO(All) :  you should check this manually
   brake_dec_ = 0.0;
-  checksum_111_ = 0;
+  checksum_101_ = 0;
   brake_pedal_target_ = 0.0;
   brake_en_ctrl_ = Brake_command_101::BRAKE_EN_CTRL_DISABLE;
 }
@@ -75,17 +75,17 @@ void Brakecommand101::set_p_brake_dec(uint8_t* data, double brake_dec) {
   to_set1.set_value(t, 0, 8);
 }
 
-Brakecommand101* Brakecommand101::set_checksum_111(int checksum_111) {
-  checksum_111_ = checksum_111;
+Brakecommand101* Brakecommand101::set_checksum_101(int checksum_101) {
+  checksum_101_ = checksum_101;
   return this;
 }
 
-// config detail: {'name': 'CheckSum_111', 'offset': 0.0, 'precision': 1.0,
+// config detail: {'name': 'CheckSum_101', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Brakecommand101::set_p_checksum_111(uint8_t* data, int checksum_111) {
-  checksum_111 = ProtocolData::BoundedValue(0, 255, checksum_111);
-  int x = checksum_111;
+void Brakecommand101::set_p_checksum_101(uint8_t* data, int checksum_101) {
+  checksum_101 = ProtocolData::BoundedValue(0, 255, checksum_101);
+  int x = checksum_101;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

@@ -18,9 +18,10 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/proto/unit_test.pb.h"
+
 #include "cyber/blocker/intra_reader.h"
 #include "cyber/blocker/intra_writer.h"
-#include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cyber {

@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+enum ErrorCode {
+  LTEV = 500;
+  NET = 501;
+  CPU = 502;
+  MEM = 503;
+  GPS = 504;
+  MAP = 510;
+  SPAT = 511;
+  OBUID = 999;
+}
+
+message ObuAlarm {
+  required double mode_num = 1;
+  required ErrorCode error_num = 2;
+  required string error_msg = 3;
+}

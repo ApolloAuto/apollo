@@ -39,12 +39,6 @@ struct CameraFrame {
   DataProvider *data_provider = nullptr;
   // calibration service
   BaseCalibrationService *calibration_service = nullptr;
-  // camera intrinsics
-  Eigen::Matrix3f camera_k_matrix = Eigen::Matrix3f::Identity();
-  // narrow to obstacle projected_matrix
-  Eigen::Matrix3d project_matrix = Eigen::Matrix3d::Identity();
-  // camera to world pose
-  Eigen::Affine3d camera2world_pose = Eigen::Affine3d::Identity();
   // hdmap struct
   base::HdmapStructPtr hdmap_struct = nullptr;
   // tracker proposed objects
@@ -61,9 +55,12 @@ struct CameraFrame {
   std::shared_ptr<base::Blob<float>> lane_detected_blob = nullptr;
   // detected traffic lights
   std::vector<base::TrafficLightPtr> traffic_lights;
-
-  void Reset() {}
-
+  // camera intrinsics
+  Eigen::Matrix3f camera_k_matrix = Eigen::Matrix3f::Identity();
+  // narrow to obstacle projected_matrix
+  Eigen::Matrix3d project_matrix = Eigen::Matrix3d::Identity();
+  // camera to world pose
+  Eigen::Affine3d camera2world_pose = Eigen::Affine3d::Identity();
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;  // struct CameraFrame
 

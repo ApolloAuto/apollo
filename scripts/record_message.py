@@ -134,7 +134,7 @@ class Recorder(object):
         recorder_exe = '/apollo/bazel-bin/modules/data/tools/smart_recorder/smart_recorder'
         cmd = '''
             source /apollo/scripts/apollo_base.sh
-            source /apollo/framework/install/setup.bash
+            source /apollo/cyber/setup.bash
             nohup {} --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
         '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
         shell_cmd(cmd)
@@ -142,7 +142,7 @@ class Recorder(object):
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -c -f "smart_recorder"', False)
+        _, stdout, _ = shell_cmd('pgrep -f "smart_recorder" | grep -cv \'^1$\'', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 

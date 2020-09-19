@@ -33,7 +33,7 @@ build --cxxopt="-fdiagnostics-color=always"
 
 build --per_file_copt=external/upb/.*@-Wno-sign-compare
 build --copt="-Werror=sign-compare"
-build --copt="-Werror=return-type"
+build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc,@"-Werror=return-type"
 build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
@@ -55,15 +55,14 @@ build:optimize --copt=-march=native
 build:optimize --host_copt=-march=native
 build:optimize --define with_default_optimizations=true
 
-build:cpu --define USE_GPU=false
-build:cpu --cxxopt=-DCPU_ONLY
+# Now "cpu" configuration was dummy
+build:cpu --verbose_failures
 build:gpu --define USE_GPU=true
-build:opt_gpu --config=opt --config=gpu
+build:gpu --cxxopt="-DUSE_GPU=1"
 
 # Build with profiling
-build:cpu_prof --config=cpu
-build:cpu_prof --linkopt=-lprofiler
-build:cpu_prof --cxxopt="-DENABLE_PERF"
+build:prof --linkopt=-lprofiler
+build:prof --cxxopt="-DENABLE_PERF=1"
 
 # Build Apollo with C++ 17 features.
 build:c++17 --cxxopt=-std=c++1z

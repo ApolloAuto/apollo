@@ -65,17 +65,17 @@ function run_shfmt() {
         shell_format_run "${target}"
         info "Done formatting ${target}"
       else
-        warning "Do nothing. ${target} is not a Shell file."
+        warning "Do nothing. ${target} is not a bash scripts."
       fi
     else
       local srcs
       srcs="$(_find_shell_srcs ${target})"
       if [ -z "${srcs}" ]; then
-        warning "Do nothing. No Shell files found under ${target} ."
+        ok "No need to format shell scripts under ${target} as none found"
         continue
       fi
       shell_format_run ${srcs}
-      info "Done formatting Shell source files under ${target}"
+      ok "Done formatting shell scripts under ${target}"
     fi
   done
 }

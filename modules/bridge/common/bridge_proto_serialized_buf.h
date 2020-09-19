@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/bridge/common/bridge_header.h"
 #include "modules/bridge/common/macro.h"
 

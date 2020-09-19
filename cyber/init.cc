@@ -26,13 +26,14 @@
 #include <memory>
 #include <string>
 
+#include "cyber/proto/clock.pb.h"
+
 #include "cyber/binary.h"
 #include "cyber/common/file.h"
 #include "cyber/common/global_data.h"
 #include "cyber/data/data_dispatcher.h"
 #include "cyber/logger/async_logger.h"
 #include "cyber/node/node.h"
-#include "cyber/proto/clock.pb.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/sysmo/sysmo.h"
@@ -61,9 +62,9 @@ logger::AsyncLogger* async_logger = nullptr;
 void InitLogger(const char* binary_name) {
   const char* slash = strrchr(binary_name, '/');
   if (slash) {
-    ::apollo::cyber::Binary::SetName(slash + 1);
+    ::apollo::cyber::binary::SetName(slash + 1);
   } else {
-    ::apollo::cyber::Binary::SetName(binary_name);
+    ::apollo::cyber::binary::SetName(binary_name);
   }
 
   // Init glog

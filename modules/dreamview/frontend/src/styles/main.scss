@@ -271,50 +271,8 @@ body {
         }
 
         .react-tabs {
-            &:not(:last-child) {
-                border-bottom: 2px solid #000000;
-            }
-
-            &__tab-list {
-                display: table;
-                width: 100%;
-                margin: 0px;
-                border-bottom: 1px solid #000000;
-                padding: 0;
-            }
-
-            &__tab {
-                display: table-cell;
-
-                position: relative;
-                border: 1px solid transparent;
-                border-bottom: none;
-                padding: 6px 12px;
-
-                background: #1D2226;
-                color: #999999;
-                list-style: none;
-                cursor: pointer;
-
-                &--selected {
-                    background: #2A3238;
-                    color: #FFFFFF;
-                }
-
-                span {
-                    color: #FFFFFF;
-                }
-            }
-
-            &__tab-panel {
-                display: none;
-
-                &--selected {
-                    display: block;
-                }
-            }
+            @extend .custom-react-tab;
         }
-
     }
 
     .SplitPane {
@@ -357,6 +315,7 @@ body {
         }
     }
 }
+
 
 .offlineview {
     display: flex;
@@ -413,7 +372,7 @@ body {
         background: #1D2226;
 
         @include small-screen {
-            padding: 15px 5px 15px 15px;
+            padding: 12px 5px 15px 12px;
         }
 
         .card-header {
@@ -1227,18 +1186,55 @@ body {
 
 .data-recorder {
     z-index: 10;
+
+    padding-left: 5px;
+
+    .react-tabs {
+        @extend .custom-react-tab;
+
+        height: 100%;
+
+        &__tab-panel {
+            box-sizing: border-box;
+            height: 100%;
+            padding: 10px 0px 5px 0px;
+
+            @include small-screen {
+                padding: 5px 0px 0px 0px;
+            }
+        }
+
+        ul.react-tabs__tab-list {
+            width: unset;
+        }
+
+        li.react-tabs__tab {
+            border-bottom: 1px solid #999999;
+            padding: 10px 35px;
+
+            &--selected {
+                border-bottom: 1px solid #FFFFFF;
+            }
+        }
+    }
+
     table {
         width: 100%;
         height: 100%;
-        min-width: 550px;
+        min-width: 860px;
+
+        @include small-screen {
+            min-width: 550px;
+        }
 
         tr, td {
             border: 2px solid #1D2226;
         }
 
         td:first-child {
-            width: 100px;
+            width: 110px;
             border: none;
+            padding-left: 15px;
 
             box-sizing: border-box;
             white-space: nowrap;
@@ -1271,14 +1267,13 @@ body {
                     background: #49a9ee;
                 }
             }
-
         }
 
         .drive-event-msg-row {
             width: 70%;
             height: 70%;
 
-            textarea {
+            textarea, input {
                 height: 100%;
                 width: 100%;
                 max-width: 500px;
@@ -1289,17 +1284,26 @@ body {
 
                 resize: none;
             }
+
+            input {
+                padding: 7px;
+            }
         }
 
         %drive-event-button {
+            min-width: 135px;
             margin-right: 5px;
             padding: 10px 35px;
-            border: none;
+            border: 1px solid #383838;
 
             background: #1D2226;
             color: #FFFFFF;
 
             cursor: pointer;
+
+            @include small-screen {
+                min-width: 125px;
+            }
         }
 
         .drive-event-type-button {
@@ -1490,5 +1494,104 @@ body {
         height: 30px;
 
         cursor: pointer;
+    }
+}
+
+.notification-alert-center {
+    z-index: 10;
+    position: absolute;
+    max-width: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #B96E76;
+    padding: 7px 10px;
+
+    background-color: rgba(74, 5, 24, 0.5);
+
+    .icon {
+        position: relative;
+        height: 20px;
+        width: 20px;
+        padding-right: 5px;
+
+        @include small-screen {
+            height: 15px;
+            width: 15px;
+        }
+    }
+
+    .text {
+        position: relative;
+        padding-left: 5px;
+        color: rgb(185, 92, 118);
+
+        line-height: 150%;
+        font-size: 22px;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+
+        @include small-screen {
+            font-size: 18px;
+        }
+    }
+
+    animation: blinker 1.5s linear infinite alternate;
+    animation-play-state: running;
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+}
+
+.custom-react-tab {
+    .react-tabs:not(:last-child) {
+        border-bottom: 2px solid #000000;
+    }
+
+    .react-tabs__tab-list {
+        display: table;
+        width: 100%;
+        margin: 0px;
+        border-bottom: 1px solid #000000;
+        padding: 0;
+    }
+
+    .react-tabs__tab {
+        display: table-cell;
+
+        position: relative;
+        border: 1px solid transparent;
+        border-bottom: none;
+        padding: 6px 12px;
+
+        background: #1D2226;
+        color: #999999;
+        list-style: none;
+        cursor: pointer;
+        font-size: 18px;
+
+        @include small-screen {
+            font-size: 16px;
+        }
+
+        &--selected {
+            background: #2A3238;
+            color: #FFFFFF;
+        }
+
+        span {
+            color: #FFFFFF;
+        }
+    }
+
+    .react-tabs__tab-panel {
+        display: none;
+
+        &--selected {
+            display: block;
+        }
     }
 }

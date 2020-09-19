@@ -3,11 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 cc_library(
     name = "gem_vehicle_factory",
     srcs = ["gem_vehicle_factory.cc"],
     hdrs = ["gem_vehicle_factory.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":gem_controller",
         ":gem_message_manager",
@@ -31,7 +33,7 @@ cc_library(
     name = "gem_message_manager",
     srcs = ["gem_message_manager.cc"],
     hdrs = ["gem_message_manager.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
@@ -54,7 +56,7 @@ cc_library(
     name = "gem_controller",
     srcs = ["gem_controller.cc"],
     hdrs = ["gem_controller.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
         ":gem_message_manager",
         "//modules/canbus/proto:chassis_detail_cc_proto",

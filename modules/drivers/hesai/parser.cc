@@ -24,7 +24,10 @@ namespace apollo {
 namespace drivers {
 namespace hesai {
 
-Parser::Parser(const std::shared_ptr<Node>& node, const Config& conf)
+using apollo::drivers::PointCloud;
+
+Parser::Parser(const std::shared_ptr<::apollo::cyber::Node>& node,
+               const Config& conf)
     : node_(node), conf_(conf) {
   tz_second_ = conf_.time_zone() * 3600;
   start_angle_ = static_cast<int>(conf_.start_angle() * 100);
@@ -266,18 +269,6 @@ void Parser::CheckPktTime(double time_sec) {
     // AWARN << conf_.frame_id() << " time too big, diff:" << diff
     //       << "host time:" << now << ";lidar time:" << time_sec;
   }
-}
-
-Parser* ParserFactory::CreateParser(const std::shared_ptr<Node>& node,
-                                    const Config& conf) {
-  if (conf.model() == HESAI40P) {
-    return new Hesai40Parser(node, conf);
-  } else if (conf.model() == HESAI64) {
-    return new Hesai64Parser(node, conf);
-  }
-
-  AERROR << "only support HESAI40P | HESAI64";
-  return nullptr;
 }
 
 }  // namespace hesai

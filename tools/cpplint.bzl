@@ -8,7 +8,8 @@ _SOURCE_EXTENSIONS = [source_ext for source_ext in """
 .cc
 .cpp
 .cxx
-.c++.C
+.c++
+.C
 .h
 .hh
 .hpp

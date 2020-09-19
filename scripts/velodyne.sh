@@ -22,7 +22,7 @@ source "${DIR}/scripts/apollo_base.sh"
 function start() {
   LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
   CMD="cyber_launch start /apollo/modules/drivers/velodyne/launch/velodyne.launch"
-  NUM_PROCESSES="$(pgrep -c -f "/apollo/modules/drivers/velodyne/dag/velodyne.dag")"
+  NUM_PROCESSES="$(pgrep -f "/apollo/modules/drivers/velodyne/dag/velodyne.dag" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
   fi

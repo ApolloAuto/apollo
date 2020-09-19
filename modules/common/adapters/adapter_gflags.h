@@ -22,6 +22,7 @@ DECLARE_bool(enable_adapter_dump);
 DECLARE_string(gps_topic);
 DECLARE_string(imu_topic);
 DECLARE_string(raw_imu_topic);
+DECLARE_string(audio_detection_topic);
 DECLARE_string(chassis_topic);
 DECLARE_string(chassis_detail_topic);
 DECLARE_string(localization_topic);
@@ -102,13 +103,18 @@ DECLARE_string(relative_map_topic);
 DECLARE_string(navigation_topic);
 DECLARE_string(hmi_status_topic);
 DECLARE_string(audio_capture_topic);
+DECLARE_string(v2x_obu_traffic_light_topic);
+DECLARE_string(v2x_internal_obstacle_topic);
 DECLARE_string(v2x_obstacle_topic);
-DECLARE_string(v2x_trafficlight_topic);
+DECLARE_string(v2x_traffic_light_topic);
+DECLARE_string(v2x_traffic_light_for_hmi_topic);
+DECLARE_string(v2x_rsi_topic);
 DECLARE_string(storytelling_topic);
 DECLARE_string(gnss_raw_data_topic);
 DECLARE_string(stream_status_topic);
 DECLARE_string(heading_topic);
 DECLARE_string(rtcm_data_topic);
+DECLARE_string(audio_event_topic);
 
 // Guardian topic
 DECLARE_string(guardian_topic);

@@ -19,25 +19,28 @@
 #include <unordered_set>
 
 #include "absl/strings/str_split.h"
+#include "google/protobuf/util/json_util.h"
+
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
+#include "modules/dreamview/proto/simulation_world.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/time/clock.h"
-#include "google/protobuf/util/json_util.h"
-#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
-
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/proto/simulation_world.pb.h"
 
 namespace apollo {
 namespace dreamview {
 
+using apollo::audio::AudioDetection;
+using apollo::audio::AudioEvent;
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::PathPoint;
@@ -62,6 +65,7 @@ using apollo::perception::PerceptionObstacles;
 using apollo::perception::SensorMeasurement;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
+using apollo::perception::V2XInformation;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
@@ -280,7 +284,16 @@ void SimulationWorldService::InitReaders() {
       node_->CreateReader<NavigationInfo>(FLAGS_navigation_topic);
   relative_map_reader_ = node_->CreateReader<MapMsg>(FLAGS_relative_map_topic);
   storytelling_reader_ = node_->CreateReader<Stories>(FLAGS_storytelling_topic);
+  audio_detection_reader_ =
+      node_->CreateReader<AudioDetection>(FLAGS_audio_detection_topic);
 
+  audio_event_reader_ = node_->CreateReader<AudioEvent>(
+      FLAGS_audio_event_topic,
+      [this](const std::shared_ptr<AudioEvent> &audio_event) {
+        this->PublishMonitorMessage(
+            MonitorMessageItem::WARN,
+            apollo::audio::AudioType_Name(audio_event->audio_type()));
+      });
   drive_event_reader_ = node_->CreateReader<DriveEvent>(
       FLAGS_drive_event_topic,
       [this](const std::shared_ptr<DriveEvent> &drive_event) {
@@ -357,6 +370,7 @@ void SimulationWorldService::Update() {
   obj_map_.clear();
   world_.clear_object();
   world_.clear_sensor_measurements();
+  UpdateWithLatestObserved(audio_detection_reader_.get());
   UpdateWithLatestObserved(storytelling_reader_.get());
   UpdateWithLatestObserved(perception_obstacle_reader_.get());
   UpdateWithLatestObserved(perception_traffic_light_reader_.get(), false);
@@ -545,6 +559,12 @@ void SimulationWorldService::UpdateSimulationWorld(const Stories &stories) {
   }
 }
 
+template <>
+void SimulationWorldService::UpdateSimulationWorld(
+    const AudioDetection &audio_detection) {
+  world_.set_is_siren_on(audio_detection.is_siren());
+}
+
 Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     const PerceptionObstacle &obstacle) {
   const std::string id = std::to_string(obstacle.id());
@@ -556,6 +576,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     SetObstaclePolygon(obstacle, &world_obj);
     SetObstacleType(obstacle.type(), obstacle.sub_type(), &world_obj);
     SetObstacleSensorMeasurements(obstacle, &world_obj);
+    SetObstacleSource(obstacle, &world_obj);
   }
   return obj_map_[id];
 }
@@ -627,6 +648,21 @@ void SimulationWorldService::SetObstacleSensorMeasurements(
                       .add_sensor_measurement();
     CreateWorldObjectFromSensorMeasurement(sensor, obj);
   }
+}
+
+void SimulationWorldService::SetObstacleSource(
+    const apollo::perception::PerceptionObstacle &obstacle,
+    Object *world_object) {
+  if (world_object == nullptr || !obstacle.has_source()) {
+    return;
+  }
+  const PerceptionObstacle::Source obstacle_source = obstacle.source();
+  world_object->set_source(obstacle_source);
+  world_object->clear_v2x_info();
+  if (obstacle_source == PerceptionObstacle::V2X && obstacle.has_v2x_info()) {
+    world_object->mutable_v2x_info()->CopyFrom(obstacle.v2x_info());
+  }
+  return;
 }
 
 template <>

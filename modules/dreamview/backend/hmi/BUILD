@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
 cc_library(
     name = "vehicle_manager",
     srcs = ["vehicle_manager.cc"],
     hdrs = ["vehicle_manager.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
@@ -21,7 +22,7 @@ cc_library(
 cc_binary(
     name = "vehicle_manager_main",
     srcs = ["vehicle_manager_main.cc"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         ":vehicle_manager",
     ],
@@ -43,7 +44,7 @@ cc_library(
     name = "hmi",
     srcs = ["hmi.cc"],
     hdrs = ["hmi.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         ":hmi_worker",
         "//modules/common/adapters:adapter_gflags",
@@ -62,11 +63,12 @@ cc_library(
     name = "hmi_worker",
     srcs = ["hmi_worker.cc"],
     hdrs = ["hmi_worker.h"],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    copts = DREAMVIEW_COPTS,
     deps = [
         ":vehicle_manager",
         "//cyber",
         "//cyber/proto:dag_conf_cc_proto",
+        "//modules/audio/proto:audio_event_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/common/kv_db",
@@ -78,6 +80,7 @@ cc_library(
         "//modules/dreamview/proto:hmi_config_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/dreamview/proto:hmi_status_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
         "//modules/monitor/proto:system_status_cc_proto",
         "@boost",
         "@com_google_absl//absl/strings",

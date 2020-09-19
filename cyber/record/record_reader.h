@@ -24,6 +24,7 @@
 #include <unordered_map>
 
 #include "cyber/proto/record.pb.h"
+
 #include "cyber/record/file/record_file_reader.h"
 #include "cyber/record/record_base.h"
 #include "cyber/record/record_message.h"

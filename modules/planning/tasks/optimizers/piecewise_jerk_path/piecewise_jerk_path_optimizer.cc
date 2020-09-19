@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 
+#include "modules/common/math/math_utils.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -36,6 +37,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
+using apollo::common::math::Gaussian;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(
     const TaskConfig& config,
@@ -129,12 +131,12 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
     // updated cost function for path reference
     std::vector<double> path_reference_l(path_boundary_size, 0.0);
-    bool is_valid_path_reference =
-        reference_path_data.is_valid_path_reference();
+    bool is_valid_path_reference = false;
     size_t path_reference_size = reference_path_data.path_reference().size();
 
     if (path_boundary.label().find("regular") != std::string::npos &&
-        is_valid_path_reference) {
+        reference_path_data.is_valid_path_reference()) {
+      ADEBUG << "path label is: " << path_boundary.label();
       // when path reference is ready
       for (size_t i = 0; i < path_reference_size; ++i) {
         common::SLPoint path_reference_sl;
@@ -147,6 +149,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       }
       end_state[0] = path_reference_l.back();
       path_data.set_is_optimized_towards_trajectory_reference(true);
+      is_valid_path_reference = true;
     }
 
     const auto& veh_param =
@@ -265,9 +268,16 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     // l weight = weight_x_ + weight_x_ref_ = (1.0 + 0.0)
     std::vector<double> weight_x_ref_vec(kNumKnots, 0.0);
     // increase l weight for path reference part only
-    constexpr double weight_x_ref_path_reference = 1000.0;
+
+    const double peak_value = config_.piecewise_jerk_path_optimizer_config()
+                                  .path_reference_l_weight();
+    const double peak_value_x =
+        0.5 * static_cast<double>(path_reference_size) * delta_s;
     for (size_t i = 0; i < path_reference_size; ++i) {
-      weight_x_ref_vec.at(i) = weight_x_ref_path_reference;
+      // Gaussian weighting
+      const double x = static_cast<double>(i) * delta_s;
+      weight_x_ref_vec.at(i) = GaussianWeighting(x, peak_value, peak_value_x);
+      ADEBUG << "i: " << i << ", weight: " << weight_x_ref_vec.at(i);
     }
     piecewise_jerk_problem.set_x_ref(std::move(weight_x_ref_vec),
                                      std::move(path_reference_l_ref));
@@ -355,6 +365,18 @@ double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
     const double vehicle_speed, const double axis_distance,
     const double max_yaw_rate) const {
   return max_yaw_rate / axis_distance / vehicle_speed;
+}
+
+double PiecewiseJerkPathOptimizer::GaussianWeighting(
+    const double x, const double peak_weighting,
+    const double peak_weighting_x) const {
+  double std = 1 / (std::sqrt(2 * M_PI) * peak_weighting);
+  double u = peak_weighting_x * std;
+  double x_updated = x * std;
+  ADEBUG << peak_weighting *
+                exp(-0.5 * (x - peak_weighting_x) * (x - peak_weighting_x));
+  ADEBUG << Gaussian(u, std, x_updated);
+  return Gaussian(u, std, x_updated);
 }
 
 }  // namespace planning

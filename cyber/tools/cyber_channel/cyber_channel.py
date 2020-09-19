@@ -248,6 +248,7 @@ def _channel_cmd_hz(argv):
 
 
 def print_role(rolsattr_rawdata):
+    from google.protobuf.message import DecodeError
     from cyber.proto.role_attributes_pb2 import RoleAttributes
     try:
         msg = RoleAttributes()
@@ -343,8 +344,8 @@ class CyberChannelecho(object):
         # print type(raw_data) # str
         # print raw_data # str
 
-        msgtype = cyber.ChannelUtils.get_msgtype(self.channel_name, 0)
-        print(cyber.ChannelUtils.get_debugstring_rawmsgdata(msgtype, raw_data))
+        msgtype = cyber.ChannelUtils.get_msgtype(self.channel_name, 0).decode('utf-8')
+        print(cyber.ChannelUtils.get_debugstring_rawmsgdata(msgtype, raw_data).decode('utf-8'))
 
 
 def channel_echo(channel_name):

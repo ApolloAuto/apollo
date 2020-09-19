@@ -44,10 +44,8 @@ message LaneChangeDeciderConfig {
 
 message LearningModelInferenceTaskConfig {
   enum ModelType {
-    CONV_RNN = 1;
-    CNN = 2;
-    SELF_CNN_LSTM = 3;
-    HISTORY_UNCONDITIONED_CNN_LSTM = 4;
+    CNN = 1;
+    CNN_LSTM = 2;
   }
   optional ModelType model_type = 1;
   optional string cpu_model_file = 2;
@@ -131,8 +129,7 @@ message NaviSpeedDeciderConfig {
 //////////////////////////////////
 // PathAssessmentDeciderConfig
 
-message PathAssessmentDeciderConfig {
-}
+message PathAssessmentDeciderConfig {}
 
 //////////////////////////////////
 // PathBoundsDeciderConfig
@@ -152,6 +149,7 @@ message PathBoundsDeciderConfig {
   optional double pull_over_approach_lon_distance_adjust_factor = 6
       [default = 1.5];
   optional double adc_buffer_coeff = 7 [default = 1.0];
+  optional bool is_extend_lane_bounds_to_include_adc = 8 [default = true];
 }
 
 //////////////////////////////////
@@ -221,7 +219,9 @@ message PiecewiseJerkNonlinearSpeedOptimizerConfig {
 message PiecewiseJerkPathOptimizerConfig {
   optional PiecewiseJerkPathWeights default_path_config = 1;
   optional PiecewiseJerkPathWeights lane_change_path_config = 2;
+  optional double path_reference_l_weight = 3 [default = 0.0];
 }
+
 message PiecewiseJerkPathWeights {
   optional double l_weight = 1 [default = 1.0];
   optional double dl_weight = 2 [default = 100.0];

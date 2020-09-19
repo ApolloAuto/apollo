@@ -24,6 +24,15 @@ message LightStatus {
   optional double right_turn_switch_on = 6;
 }
 
+message V2XInformation {
+  enum V2XType {
+    NONE = 0;
+    ZOMBIES_CAR = 1;
+    BLIND_ZONE = 2;
+  };
+  repeated V2XType v2x_type = 1;
+}
+
 message SensorMeasurement {
   optional string sensor_id = 1;
   optional int32 id = 2;
@@ -137,6 +146,14 @@ message PerceptionObstacle {
 
   // Debug Message
   optional DebugMessage msg = 26;
+
+  enum Source {
+    HOST_VEHICLE = 0;
+    V2X = 1;
+  };
+
+  optional Source source = 27 [default = HOST_VEHICLE];
+  optional V2XInformation v2x_info = 28;
 }
 
 message LaneMarker {

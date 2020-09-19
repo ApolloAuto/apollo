@@ -23,13 +23,14 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -112,10 +113,10 @@ Status PathReferenceDecider::Process(Frame *frame,
   ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
 
   // get learning model output (trajectory) from frame
-  const std::vector<common::TrajectoryPoint> &path_reference =
+  const std::vector<common::TrajectoryPoint> &learning_model_trajectory =
       injector_->learning_based_data()
           ->learning_data_adc_future_trajectory_points();
-  ADEBUG << "There are " << path_reference.size() << " path points.";
+  ADEBUG << "There are " << learning_model_trajectory.size() << " path points.";
 
   // get regular path bound
   size_t regular_path_bound_idx = GetRegularPathBound(path_boundaries);
@@ -143,7 +144,7 @@ Status PathReferenceDecider::Process(Frame *frame,
   ++total_path_counter_;
 
   // when learning model has no output, use rule-based model instead.
-  if (path_reference.size() == 0) {
+  if (learning_model_trajectory.size() == 0) {
     reference_line_info->mutable_path_data()->set_is_valid_path_reference(
         false);
     ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
@@ -161,8 +162,34 @@ Status PathReferenceDecider::Process(Frame *frame,
             (total_path_counter_ + kMathEpsilon));
     return Status::OK();
   }
-
-  RecordDebugInfo(path_reference, reference_line_info);
+  std::vector<PathPoint> path_reference;
+  // adjusting trajectory init point
+  DiscretizedTrajectory stitched_learning_model_trajectory;
+  reference_line_info->AdjustTrajectoryWhichStartsFromCurrentPos(
+      frame->PlanningStartPoint(), learning_model_trajectory,
+      &stitched_learning_model_trajectory);
+  // when path_reference is too short not valid path reference
+  if (stitched_learning_model_trajectory.size() <= 1) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
+    std::string err_msg = "Stitched path reference is too short";
+    reference_line_info->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_hybrid_model()
+        ->set_learning_model_output_fail_reason(err_msg);
+    reference_line_info->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_hybrid_model()
+        ->set_learning_model_output_usage_ratio(
+            static_cast<double>(valid_path_reference_counter_) /
+            (total_path_counter_ + kMathEpsilon));
+    return Status::OK();
+  }
+  ConvertTrajectoryToPath(stitched_learning_model_trajectory, &path_reference);
+  const std::string path_reference_name = "path_reference";
+  RecordDebugInfo(path_reference, path_reference_name, reference_line_info);
 
   // check if path reference is valid
   // current, only check if path reference point is within path bounds
@@ -212,6 +239,10 @@ Status PathReferenceDecider::Process(Frame *frame,
   // set evaluated path data
   reference_line_info->mutable_path_data()->set_path_reference(
       std::move(evaluated_path_reference));
+  // uncomment this for debug
+  //   const std::string evaluation_path_name = "evaluated_path_reference";
+  //   RecordDebugInfo(evaluated_path_reference, evaluation_path_name,
+  //                   reference_line_info);
 
   ++valid_path_reference_counter_;
   ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
@@ -230,6 +261,15 @@ Status PathReferenceDecider::Process(Frame *frame,
   return Status::OK();
 }
 
+void PathReferenceDecider::ConvertTrajectoryToPath(
+    const std::vector<TrajectoryPoint> &trajectory_points,
+    std::vector<PathPoint> *path_points) {
+  for (auto trajectory_point : trajectory_points) {
+    if (trajectory_point.has_path_point()) {
+      path_points->push_back(trajectory_point.path_point());
+    }
+  }
+}
 size_t PathReferenceDecider::GetRegularPathBound(
     const std::vector<PathBoundary> &path_bounds) const {
   for (auto iter = begin(path_bounds); iter != end(path_bounds); ++iter) {
@@ -243,12 +283,14 @@ size_t PathReferenceDecider::GetRegularPathBound(
 bool PathReferenceDecider::IsValidPathReference(
     const ReferenceLineInfo &reference_line_info,
     const PathBoundary &regular_path_bound,
-    const std::vector<TrajectoryPoint> &path_reference) {
+    const std::vector<PathPoint> &path_reference) {
   for (auto path_referece_point : path_reference) {
-    const double cur_x = path_referece_point.path_point().x();
-    const double cur_y = path_referece_point.path_point().y();
+    const double cur_x = path_referece_point.x();
+    const double cur_y = path_referece_point.y();
     if (-1 == IsPointWithinPathBounds(reference_line_info, regular_path_bound,
                                       cur_x, cur_y)) {
+      ADEBUG << ", x: " << std::setprecision(9) << cur_x
+             << ", y: " << std::setprecision(9) << cur_y;
       return false;
     }
   }
@@ -376,8 +418,12 @@ int PathReferenceDecider::IsPointWithinPathBounds(
          start_s + idx_after * delta_s < point_sl.s()) {
     ++idx_after;
   }
-  ADEBUG << "idx_after[" << idx_after << "] point_l[" << point_sl.l() << "]";
-  if (idx_after >= 1) {
+  if (idx_after == 0) {
+    // consider as a valid point if the starting point is before path bound
+    // begining point
+    return idx_after;
+  } else {
+    ADEBUG << "idx_after[" << idx_after << "] point_l[" << point_sl.l() << "]";
     int idx_before = idx_after - 1;
     if (std::get<0>(path_bound.boundary().at(idx_before)) <= point_sl.l() &&
         std::get<1>(path_bound.boundary().at(idx_before)) >= point_sl.l() &&
@@ -392,13 +438,13 @@ int PathReferenceDecider::IsPointWithinPathBounds(
 
 void PathReferenceDecider::EvaluatePathReference(
     const PathBoundary &path_bound,
-    const std::vector<TrajectoryPoint> &path_reference,
+    const std::vector<PathPoint> &path_reference,
     std::vector<PathPoint> *evaluated_path_reference) {
   const double delta_s = path_bound.delta_s();
-  const double path_reference_end_s = path_reference.back().path_point().s();
+  const double path_reference_end_s = path_reference.back().s();
   DiscretizedPath discrete_path_reference;
-  for (auto trajectory_point : path_reference) {
-    discrete_path_reference.emplace_back(trajectory_point.path_point());
+  for (auto path_point : path_reference) {
+    discrete_path_reference.emplace_back(path_point);
   }
   size_t idx;
   for (idx = 0; idx < path_bound.boundary().size(); ++idx) {
@@ -413,44 +459,17 @@ void PathReferenceDecider::EvaluatePathReference(
 }
 
 void PathReferenceDecider::RecordDebugInfo(
-    const std::vector<TrajectoryPoint> &path_reference,
+    const std::vector<PathPoint> &path_points, const std::string &path_name,
     ReferenceLineInfo *const reference_line_info) {
   // Sanity checks.
-  ACHECK(!path_reference.empty());
+  ACHECK(!path_points.empty());
   CHECK_NOTNULL(reference_line_info);
-
-  // Take learning model output and transform it into
-  // PathData so that it can be displayed in simulator.
-  std::vector<common::FrenetFramePoint> frenet_frame_path_reference_points;
-  for (const TrajectoryPoint &path_reference_point : path_reference) {
-    common::SLPoint point_sl;
-    reference_line_info->reference_line().XYToSL(
-        {path_reference_point.path_point().x(),
-         path_reference_point.path_point().y()},
-        &point_sl);
-    common::FrenetFramePoint frenet_frame_point;
-    frenet_frame_point.set_s(point_sl.s());
-    frenet_frame_point.set_dl(0.0);
-    frenet_frame_point.set_ddl(0.0);
-    // get l from reference line
-    frenet_frame_point.set_l(point_sl.l());
-    frenet_frame_path_reference_points.push_back(frenet_frame_point);
-  }
-
-  auto frenet_frame_path_reference =
-      FrenetFramePath(std::move(frenet_frame_path_reference_points));
-  PathData path_reference_data;
-  path_reference_data.SetReferenceLine(
-      &(reference_line_info->reference_line()));
-  path_reference_data.SetFrenetPath(std::move(frenet_frame_path_reference));
-
   // Insert the transformed PathData into the simulator display.
   auto *ptr_display_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_display_path->set_name("path_reference");
+  ptr_display_path->set_name(path_name);
   ptr_display_path->mutable_path_point()->CopyFrom(
-      {path_reference_data.discretized_path().begin(),
-       path_reference_data.discretized_path().end()});
+      {path_points.begin(), path_points.end()});
 }
 
 }  // namespace planning

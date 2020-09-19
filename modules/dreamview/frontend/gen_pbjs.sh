@@ -24,6 +24,7 @@ COMMON_PROTOS='../../common/proto/*.proto ../../common/configs/proto/vehicle_con
 LOCALIZATION_PROTOS='../../localization/proto/localization.proto ../../localization/proto/pose.proto ../../localization/proto/localization_status.proto'
 CHASSIS_PROTOS='../../canbus/proto/chassis.proto'
 PLANNING_PROTOS='../../planning/proto/*.proto ../../planning/proto/math/*.proto'
+AUDIO_PROTO='../../audio/proto/audio_common.proto ../../audio/proto//audio_event.proto'
 
 PREDICTION_PROTOS='../../prediction/proto/feature.proto ../../prediction/proto/lane_graph.proto ../../prediction/proto/prediction_point.proto ../../prediction/proto/prediction_obstacle.proto ../../prediction/proto/scenario.proto'
 PERCEPTION_PROTOS='../../perception/proto/traffic_light_detection.proto ../../perception/proto/perception_obstacle.proto'
@@ -35,7 +36,7 @@ ROUTING_PROTOS='../../routing/proto/routing.proto'
 node_modules/protobufjs/bin/pbjs -t json $SIMULATION_PROTO \
     $COMMON_PROTOS $LOCALIZATION_PROTOS $CHASSIS_PROTOS $PLANNING_PROTOS \
     $PERCEPTION_PROTOS $MONITOR_PROTOS $ROUTING_PROTOS $MAP_PROTOS \
-    $PREDICTION_PROTOS $REALTIVE_MAP_PROTOS \
+    $PREDICTION_PROTOS $REALTIVE_MAP_PROTOS $AUDIO_PROTO \
     -o proto_bundle/sim_world_proto_bundle.json
 
 node_modules/protobufjs/bin/pbjs -t json ../proto/point_cloud.proto \

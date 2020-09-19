@@ -20,11 +20,11 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
-VERSION_X86_64="cyber-x86_64-18.04-20200823_0434"
+VERSION_X86_64="cyber-x86_64-18.04-20200914_0704"
 # ARMV8
 # VERSION_AARCH64="cyber-aarch64-18.04-20200717_0327"
 # L4T
-VERSION_AARCH64="cyber-aarch64-18.04-20200826_1538"
+VERSION_AARCH64="cyber-aarch64-18.04-20200915_0055"
 CYBER_CONTAINER="apollo_cyber_${USER}"
 CYBER_INSIDE="in-cyber-docker"
 
@@ -304,7 +304,7 @@ function determine_gpu_use_aarch64() {
         if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
             DOCKER_RUN_CMD="docker run --gpus all"
         else
-            warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+            warning "You must upgrade to Docker-CE 19.03+ to access GPU from container!"
             use_gpu=0
         fi
     fi
@@ -324,13 +324,8 @@ function determine_gpu_use_amd64() {
 
     # Try to use GPU inside container
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [ ${USE_GPU_HOST} -eq 1 ]; then
-        if [ ! -z "$(which nvidia-docker)" ]; then
-            DOCKER_RUN_CMD="nvidia-docker run"
-            warning "nvidia-docker is deprecated. Please install latest docker" \
-                    "and nvidia-container-toolkit as described by:"
-            warning "  ${nv_docker_doc}"
-        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
+        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
             if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
@@ -339,16 +334,18 @@ function determine_gpu_use_amd64() {
                 warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
                 USE_GPU_HOST=0
             fi
+        elif [[ -x "$(which nvidia-docker)" ]]; then
+            DOCKER_RUN_CMD="nvidia-docker run"
         else
             USE_GPU_HOST=0
-            warning "Cannot access GPU from within container. Please install latest docker" \
-                    "and nvidia-container-toolkit as described by: "
+            warning "Cannot access GPU from within container. Please install latest Docker" \
+                    "and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
 }
 
-function determine_gpu_use() {
+function determine_gpu_use_host() {
     if [[ "${HOST_ARCH}" == "x86_64" ]]; then
         determine_gpu_use_amd64
     else
@@ -490,7 +487,7 @@ function start_cyber_container() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${image}" \
-        -e USE_GPU="${USE_GPU_HOST}" \
+        -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         -e OMP_NUM_THREADS=1 \
@@ -542,7 +539,7 @@ function main() {
 
     remove_existing_cyber_container
 
-    determine_gpu_use
+    determine_gpu_use_host
     info "DOCKER_RUN_CMD evaluated to: ${DOCKER_RUN_CMD}"
 
     start_cyber_container "${image}"

@@ -24,8 +24,8 @@ namespace apollo {
 namespace cyber {
 
 namespace {
-static std::atomic<uint64_t> global_timer_id = {0};
-static uint64_t GenerateTimerId() { return global_timer_id.fetch_add(1); }
+std::atomic<uint64_t> global_timer_id = {0};
+uint64_t GenerateTimerId() { return global_timer_id.fetch_add(1); }
 }  // namespace
 
 Timer::Timer() {

@@ -6,7 +6,7 @@
 - [Apollo 3.0 Software Architecture](Apollo_3.0_Software_Architecture.md)
 - [Apollo 2.0 Software Architecture](Apollo_2.0_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
-- [Control Calibration](calibration_table/control_calibration.md)
+- [Vehicle Calibration Online](Vehicle_Calibration_Online/README.md)
 - [Control-in-loop simulation](dynamic_model.md)
 
 ### Chinese documents
@@ -24,9 +24,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [Radar](Radar/README.md)
 - [Navigation](Navigation/README.md)
 - [IPC](IPC/Nuvo-6108GC_Installation_Guide.md)
-- [Software system and Kernel Installation](Software_and_Kernel_Installation_guide.md)
-- [Software system and Kernel Installation](Software_and_Kernel_Installation_guide_cn.md)
-
+- [Prerequisite Software Installation](prerequisite_software_installation_guide.md)
 
 ## Perception
 - [Perception Apollo 5.0](perception_apollo_5.0.md)
@@ -66,10 +64,11 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 
 ## General
 - [Coordinate System.pdf](coordination.pdf)
-- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide-EN.md)
-
+- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide.md)
+- [Bazel in Apollo: An Overview](bazel_in_apollo_an_overview.md)
+- [Apollo Build and Test Explained](apollo_build_and_test_explained.md)
 
 ### Chinese documents
 
 - [Coordinate System CN](coordination_cn.md)
-- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide-CN.md)
+- [Apollo secure upgrade user guide](apollo_secure_upgrade_user_guide_cn.md)

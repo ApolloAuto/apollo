@@ -33,6 +33,7 @@ export default [
       perceptionLidarSensor: 'Lidar Sensor',
       perceptionRadarSensor: 'Radar Sensor',
       perceptionCameraSensor: 'Camera Sensor',
+      perceptionV2xInfo:'V2X',
     },
     supportInOfflineView: true,
   }, {

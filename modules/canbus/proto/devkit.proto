@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 message Wheelspeed_report_506 {
-// Report Message
+  // Report Message
   // [m/s] [0|65.535]
   optional double rr = 1;
   // [m/s] [0|65.535]
@@ -15,7 +15,7 @@ message Wheelspeed_report_506 {
 }
 
 message Ultr_sensor_1_507 {
-// Report Message
+  // Report Message
   // [cm] [0|65535]
   optional double uiuss9_tof_direct = 1;
   // [cm] [0|65535]
@@ -27,7 +27,7 @@ message Ultr_sensor_1_507 {
 }
 
 message Steering_command_102 {
-// Control Message
+  // Control Message
   enum Steer_en_ctrlType {
     STEER_EN_CTRL_DISABLE = 0;
     STEER_EN_CTRL_ENABLE = 1;
@@ -36,14 +36,16 @@ message Steering_command_102 {
   optional Steer_en_ctrlType steer_en_ctrl = 1;
   // [deg] [-500|500]
   optional double steer_angle_target = 2;
-  // [] [0|250]
+  // [deg/s] [0|250]
   optional int32 steer_angle_spd = 3;
   // [] [0|255]
-  optional int32 checksum_112 = 4;
+  optional int32 checksum_112 = 4 [deprecated = true];
+  // [] [0|255]
+  optional int32 checksum_102 = 5;
 }
 
 message Gear_command_103 {
-// Control Message
+  // Control Message
   enum Gear_targetType {
     GEAR_TARGET_INVALID = 0;
     GEAR_TARGET_PARK = 1;
@@ -60,11 +62,13 @@ message Gear_command_103 {
   // [] [0|1]
   optional Gear_en_ctrlType gear_en_ctrl = 2;
   // [] [0|255]
-  optional int32 checksum_114 = 3;
+  optional int32 checksum_114 = 3 [deprecated = true];
+  // [] [0|255]
+  optional int32 checksum_103 = 4;
 }
 
 message Throttle_command_100 {
-// Control Message
+  // Control Message
   enum Throttle_en_ctrlType {
     THROTTLE_EN_CTRL_DISABLE = 0;
     THROTTLE_EN_CTRL_ENABLE = 1;
@@ -72,15 +76,17 @@ message Throttle_command_100 {
   // [m/s^2] [0|10]
   optional double throttle_acc = 1;
   // [] [0|255]
-  optional int32 checksum_110 = 2;
+  optional int32 checksum_110 = 2 [deprecated = true];
   // [%] [0|100]
   optional double throttle_pedal_target = 3;
   // [] [0|1]
   optional Throttle_en_ctrlType throttle_en_ctrl = 4;
+  // [] [0|255]
+  optional int32 checksum_100 = 5;
 }
 
 message Brake_command_101 {
-// Control Message
+  // Control Message
   enum Brake_en_ctrlType {
     BRAKE_EN_CTRL_DISABLE = 0;
     BRAKE_EN_CTRL_ENABLE = 1;
@@ -88,15 +94,17 @@ message Brake_command_101 {
   // [m/s^2] [0|10]
   optional double brake_dec = 1;
   // [] [0|255]
-  optional int32 checksum_111 = 2;
+  optional int32 checksum_111 = 2 [deprecated = true];
   // [%] [0|100]
   optional double brake_pedal_target = 3;
   // [] [0|1]
   optional Brake_en_ctrlType brake_en_ctrl = 4;
+  // [] [0|255]
+  optional int32 checksum_101 = 5;
 }
 
 message Park_command_104 {
-// Control Message
+  // Control Message
   enum Park_targetType {
     PARK_TARGET_RELEASE = 0;
     PARK_TARGET_PARKING_TRIGGER = 1;
@@ -106,15 +114,17 @@ message Park_command_104 {
     PARK_EN_CTRL_ENABLE = 1;
   }
   // [] [0|255]
-  optional int32 checksum_115 = 1;
+  optional int32 checksum_115 = 1 [deprecated = true];
   // [] [0|1]
   optional Park_targetType park_target = 2;
   // [] [0|1]
   optional Park_en_ctrlType park_en_ctrl = 3;
+  // [] [0|255]
+  optional int32 checksum_104 = 4;
 }
 
 message Ultr_sensor_2_508 {
-// Report Message
+  // Report Message
   // [cm] [0|65535]
   optional double uiuss9_tof_indirect = 1;
   // [cm] [0|65535]
@@ -126,7 +136,7 @@ message Ultr_sensor_2_508 {
 }
 
 message Ultr_sensor_3_509 {
-// Report Message
+  // Report Message
   // [cm] [0|65535]
   optional double uiuss5_tof_direct = 1;
   // [cm] [0|65535]
@@ -138,7 +148,7 @@ message Ultr_sensor_3_509 {
 }
 
 message Ultr_sensor_5_511 {
-// Report Message
+  // Report Message
   // [cm] [0|65535]
   optional double uiuss7_tof_direct = 1;
   // [cm] [0|65535]
@@ -150,7 +160,7 @@ message Ultr_sensor_5_511 {
 }
 
 message Ultr_sensor_4_510 {
-// Report Message
+  // Report Message
   // [cm] [0|65535]
   optional double uiuss5_tof_indirect = 1;
   // [cm] [0|65535]
@@ -162,7 +172,7 @@ message Ultr_sensor_4_510 {
 }
 
 message Park_report_504 {
-// Report Message
+  // Report Message
   enum Parking_actualType {
     PARKING_ACTUAL_RELEASE = 0;
     PARKING_ACTUAL_PARKING_TRIGGER = 1;
@@ -178,7 +188,7 @@ message Park_report_504 {
 }
 
 message Vcu_report_505 {
-// Report Message
+  // Report Message
   enum Vehicle_mode_stateType {
     VEHICLE_MODE_STATE_MANUAL_REMOTE_MODE = 0;
     VEHICLE_MODE_STATE_AUTO_MODE = 1;
@@ -212,7 +222,7 @@ message Vcu_report_505 {
 }
 
 message Steering_report_502 {
-// Report Message
+  // Report Message
   enum Steer_flt2Type {
     STEER_FLT2_NO_FAULT = 0;
     STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT = 1;
@@ -229,9 +239,9 @@ message Steering_report_502 {
   }
   // [deg/s] [0|250]
   optional int32 steer_angle_spd_actual = 1;
-  // Steer system communication fault [] [0|1]
+  // Steer system communication fault [] [0|255]
   optional Steer_flt2Type steer_flt2 = 2;
-  // Steer system hardware fault [] [0|1]
+  // Steer system hardware fault [] [0|255]
   optional Steer_flt1Type steer_flt1 = 3;
   // [] [0|2]
   optional Steer_en_stateType steer_en_state = 4;
@@ -240,7 +250,7 @@ message Steering_report_502 {
 }
 
 message Gear_report_503 {
-// Report Message
+  // Report Message
   enum Gear_fltType {
     GEAR_FLT_NO_FAULT = 0;
     GEAR_FLT_FAULT = 1;
@@ -259,7 +269,7 @@ message Gear_report_503 {
 }
 
 message Throttle_report_500 {
-// Report Message
+  // Report Message
   enum Throttle_flt2Type {
     THROTTLE_FLT2_NO_FAULT = 0;
     THROTTLE_FLT2_DRIVE_SYSTEM_COMUNICATION_FAULT = 1;
@@ -285,7 +295,7 @@ message Throttle_report_500 {
 }
 
 message Brake_report_501 {
-// Report Message
+  // Report Message
   enum Brake_flt2Type {
     BRAKE_FLT2_NO_FAULT = 0;
     BRAKE_FLT2_BRAKE_SYSTEM_COMUNICATION_FAULT = 1;
@@ -311,21 +321,21 @@ message Brake_report_501 {
 }
 
 message Devkit {
-  optional Wheelspeed_report_506 wheelspeed_report_506 = 1; // report message
-  optional Ultr_sensor_1_507 ultr_sensor_1_507 = 2; // report message
-  optional Steering_command_102 steering_command_102 = 3; // control message
-  optional Gear_command_103 gear_command_103 = 4; // control message
-  optional Throttle_command_100 throttle_command_100 = 5; // control message
-  optional Brake_command_101 brake_command_101 = 6; // control message
-  optional Park_command_104 park_command_104 = 7; // control message
-  optional Ultr_sensor_2_508 ultr_sensor_2_508 = 8; // report message
-  optional Ultr_sensor_3_509 ultr_sensor_3_509 = 9; // report message
-  optional Ultr_sensor_5_511 ultr_sensor_5_511 = 10; // report message
-  optional Ultr_sensor_4_510 ultr_sensor_4_510 = 11; // report message
-  optional Park_report_504 park_report_504 = 12; // report message
-  optional Vcu_report_505 vcu_report_505 = 13; // report message
-  optional Steering_report_502 steering_report_502 = 14; // report message
-  optional Gear_report_503 gear_report_503 = 15; // report message
-  optional Throttle_report_500 throttle_report_500 = 16; // report message
-  optional Brake_report_501 brake_report_501 = 17; // report message
+  optional Wheelspeed_report_506 wheelspeed_report_506 = 1;  // report message
+  optional Ultr_sensor_1_507 ultr_sensor_1_507 = 2;          // report message
+  optional Steering_command_102 steering_command_102 = 3;    // control message
+  optional Gear_command_103 gear_command_103 = 4;            // control message
+  optional Throttle_command_100 throttle_command_100 = 5;    // control message
+  optional Brake_command_101 brake_command_101 = 6;          // control message
+  optional Park_command_104 park_command_104 = 7;            // control message
+  optional Ultr_sensor_2_508 ultr_sensor_2_508 = 8;          // report message
+  optional Ultr_sensor_3_509 ultr_sensor_3_509 = 9;          // report message
+  optional Ultr_sensor_5_511 ultr_sensor_5_511 = 10;         // report message
+  optional Ultr_sensor_4_510 ultr_sensor_4_510 = 11;         // report message
+  optional Park_report_504 park_report_504 = 12;             // report message
+  optional Vcu_report_505 vcu_report_505 = 13;               // report message
+  optional Steering_report_502 steering_report_502 = 14;     // report message
+  optional Gear_report_503 gear_report_503 = 15;             // report message
+  optional Throttle_report_500 throttle_report_500 = 16;     // report message
+  optional Brake_report_501 brake_report_501 = 17;           // report message
 }

@@ -30,7 +30,7 @@ class AudioInfo {
   AudioInfo() = default;
 
   void Insert(
-      const std::shared_ptr<apollo::drivers::microphone::config::AudioData>&);
+      const apollo::drivers::microphone::config::AudioData&);
 
   std::vector<std::vector<double>> GetSignals(const int signal_length);
 

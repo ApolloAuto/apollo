@@ -24,7 +24,6 @@ bool InitialCuda() {
   int dev = 0;
   cudaDeviceProp deviceProp;
   CUDA_CHECK(cudaGetDeviceProperties(&deviceProp, dev));
-  printf("Using device %d: %s\n", dev, deviceProp.name);
   CUDA_CHECK(cudaSetDevice(dev));
   return true;
 }

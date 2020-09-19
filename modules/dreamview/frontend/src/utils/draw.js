@@ -107,6 +107,53 @@ export function drawSegmentsFromPoints(
   return pathLine;
 }
 
+export function drawSolidPolygonFace(
+  color = 0xff0000, zOffset = 0,
+  matrixAutoUpdate = true, transparent = true, opacity = 0.8,
+) {
+  const geometry = new THREE.PlaneGeometry(1, 1);
+  const material = new THREE.MeshBasicMaterial({
+    color,
+    side: THREE.DoubleSide,
+    transparent,
+    opacity,
+  });
+  const rect = new THREE.Mesh(geometry, material);
+  addOffsetZ(rect, zOffset);
+  rect.matrixAutoUpdate = matrixAutoUpdate;
+  if (matrixAutoUpdate === false) {
+    rect.updateMatrix();
+  }
+  return rect;
+}
+
+function addOutlineToObject(object, objectGeometry, color, thickness = 1, opacity = 1) {
+  const outline = new THREE.LineSegments(
+    new THREE.EdgesGeometry(objectGeometry),
+    new THREE.LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      shadowSide: THREE.DoubleSide,
+      depthTest: false,
+      linewidth: thickness,
+    }),
+  );
+  object.add(outline);
+}
+
+export function drawSolidBox(dimension, color, linewidth) {
+  const geometry = new THREE.CubeGeometry(dimension.x, dimension.y, dimension.z);
+  const material = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.8,
+  });
+  const box = new THREE.Mesh(geometry, material);
+  addOutlineToObject(box, geometry, color, linewidth);
+  return box;
+}
+
 export function drawBox(dimension, color, linewidth) {
   const geometry = new THREE.CubeGeometry(dimension.x, dimension.y, dimension.z);
   const material = new THREE.MeshBasicMaterial({ color });
@@ -169,7 +216,7 @@ export function drawShapeFromPoints(points,
   const mesh = new THREE.Mesh(geometry, material);
   addOffsetZ(mesh, order);
   mesh.matrixAutoUpdate = matrixAutoUpdate;
-  if (matrixAutoUpdate === false) {
+  if (!matrixAutoUpdate) {
     mesh.updateMatrix();
   }
   return mesh;

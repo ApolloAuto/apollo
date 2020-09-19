@@ -2,5 +2,5 @@ fusion_method: "ProbabilisticFusion"
 fusion_main_sensor: "velodyne128"
 object_in_roi_check: true
 radius_for_roi_object_check: 120
-output_obstacles_channel_name: "/apollo/perception/obstacles"
+output_obstacles_channel_name: "/perception/vehicle/obstacles"
 output_viz_fused_content_channel_name: "/perception/inner/visualization/FusedObjects"

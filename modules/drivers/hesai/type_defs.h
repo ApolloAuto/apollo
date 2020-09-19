@@ -17,6 +17,7 @@
 #ifndef LIDAR_HESAI_SRC_TYPE_DEFS_H_
 #define LIDAR_HESAI_SRC_TYPE_DEFS_H_
 
+#include <ctime>
 #include "modules/drivers/hesai/const_var.h"
 
 namespace apollo {

@@ -112,7 +112,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   if (stop_obstacle) {
     bool success = MapStopDecision(stop_obstacle, stop_decision);
     if (!success) {
-      std::string msg = "Fail to MapStopDecision.";
+      const std::string msg = "Fail to MapStopDecision.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

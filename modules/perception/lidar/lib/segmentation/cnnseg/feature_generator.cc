@@ -46,7 +46,7 @@ bool FeatureGenerator::Init(const FeatureParam& feature_param,
 
   // set output feature blob data
   float* out_blob_data = nullptr;
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   log_blob_.reset(
       new base::Blob<float>(1, 1, 1, static_cast<int>(log_table_.size())));
   float* log_table = log_blob_->mutable_gpu_data();
@@ -95,7 +95,7 @@ bool FeatureGenerator::Init(const FeatureParam& feature_param,
     }
 
 // memory copy direction and distance features
-#ifndef CPU_ONLY
+#if USE_GPU == 1
     cudaMemcpy(direction_data_, direction_data.data(),
                direction_data.size() * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(distance_data_, distance_data.data(),

@@ -53,7 +53,7 @@ class PathReferenceDecider : public Task {
   bool IsValidPathReference(
       const ReferenceLineInfo &reference_line_info,
       const PathBoundary &path_bound,
-      const std::vector<common::TrajectoryPoint> &path_reference);
+      const std::vector<common::PathPoint> &path_reference);
 
   /**
    * @brief convert discrete path bounds to line segments
@@ -73,7 +73,7 @@ class PathReferenceDecider : public Task {
    */
   void EvaluatePathReference(
       const PathBoundary &path_bound,
-      const std::vector<common::TrajectoryPoint> &path_reference,
+      const std::vector<common::PathPoint> &path_reference,
       std::vector<common::PathPoint> *evaluated_path_reference);
 
   /**
@@ -112,9 +112,13 @@ class PathReferenceDecider : public Task {
       const std::vector<common::TrajectoryPoint> &path_reference,
       const PathBoundary &regular_path_bound);
 
-  void RecordDebugInfo(
-      const std::vector<common::TrajectoryPoint> &path_reference,
-      ReferenceLineInfo *const reference_line_info);
+  void ConvertTrajectoryToPath(
+      const std::vector<common::TrajectoryPoint> &trajectory,
+      std::vector<common::PathPoint> *path);
+
+  void RecordDebugInfo(const std::vector<common::PathPoint> &path_points,
+                       const std::string &path_name,
+                       ReferenceLineInfo *const reference_line_info);
 
  private:
   static int valid_path_reference_counter_;  // count valid path reference

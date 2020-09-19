@@ -36,7 +36,7 @@ class GeneralMessage : public GeneralMessageBase {
     reflection_ptr_ = nullptr;
   }
 
-  void Render(const Screen* s, int key) override;
+  int Render(const Screen* s, int key) override;
 
  private:
   GeneralMessage(const GeneralMessage&) = delete;

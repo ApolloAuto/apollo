@@ -39,15 +39,15 @@ void Throttlecommand100::UpdateData(uint8_t* data) {
   set_p_throttle_acc(data, throttle_acc_);
   set_p_throttle_pedal_target(data, throttle_pedal_target_);
   set_p_throttle_en_ctrl(data, throttle_en_ctrl_);
-  checksum_110_ =
+  checksum_100_ =
       data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
-  set_p_checksum_110(data, checksum_110_);
+  set_p_checksum_100(data, checksum_100_);
 }
 
 void Throttlecommand100::Reset() {
   // TODO(All) :  you should check this manually
   throttle_acc_ = 0.0;
-  checksum_110_ = 0;
+  checksum_100_ = 0;
   throttle_pedal_target_ = 0.0;
   throttle_en_ctrl_ = Throttle_command_100::THROTTLE_EN_CTRL_DISABLE;
 }
@@ -76,17 +76,17 @@ void Throttlecommand100::set_p_throttle_acc(uint8_t* data,
   to_set1.set_value(t, 0, 8);
 }
 
-Throttlecommand100* Throttlecommand100::set_checksum_110(int checksum_110) {
-  checksum_110_ = checksum_110;
+Throttlecommand100* Throttlecommand100::set_checksum_100(int checksum_100) {
+  checksum_100_ = checksum_100;
   return this;
 }
 
-// config detail: {'name': 'CheckSum_110', 'offset': 0.0, 'precision': 1.0,
+// config detail: {'name': 'CheckSum_100', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-void Throttlecommand100::set_p_checksum_110(uint8_t* data, int checksum_110) {
-  checksum_110 = ProtocolData::BoundedValue(0, 255, checksum_110);
-  int x = checksum_110;
+void Throttlecommand100::set_p_checksum_100(uint8_t* data, int checksum_100) {
+  checksum_100 = ProtocolData::BoundedValue(0, 255, checksum_100);
+  int x = checksum_100;
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);

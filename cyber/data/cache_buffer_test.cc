@@ -19,6 +19,7 @@
 #include <mutex>
 #include <thread>
 #include <utility>
+
 #include "gtest/gtest.h"
 
 namespace apollo {

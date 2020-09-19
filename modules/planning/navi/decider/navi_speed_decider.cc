@@ -262,9 +262,9 @@ Status NaviSpeedDecider::MakeSpeedDecision(
          << " start_s: " << start_s << " planning_length: " << planning_length;
 
   if (start_v > max_speed_) {
-    AERROR << "exceeding maximum allowable speed.";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "exceeding maximum allowable speed.");
+    const std::string msg = "exceeding maximum allowable speed.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   start_v = std::max(0.0, start_v);
 
@@ -418,8 +418,9 @@ Status AddTrafficDecisionConstraints() {
 Status NaviSpeedDecider::AddCentricAccelerationConstraints(
     const std::vector<PathPoint>& path_points) {
   if (path_points.size() < 2) {
-    AERROR << "Too few path points";
-    return Status(ErrorCode::PLANNING_ERROR, "too few path points.");
+    const std::string msg = "Too few path points";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   double max_kappa = 0.0;

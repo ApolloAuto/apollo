@@ -3,6 +3,8 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
+
 filegroup(
     name = "relative_map_conf",
     srcs = glob(["conf/**"]),
@@ -12,7 +14,7 @@ cc_library(
     name = "relative_map_lib",
     srcs = ["relative_map.cc"],
     hdrs = ["relative_map.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     data = [
         ":relative_map_conf",
     ],
@@ -33,7 +35,7 @@ cc_library(
     name = "navigation_lane_lib",
     srcs = ["navigation_lane.cc"],
     hdrs = ["navigation_lane.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         "//cyber",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -50,7 +52,7 @@ cc_library(
     name = "relative_map_component_lib",
     srcs = ["relative_map_component.cc"],
     hdrs = ["relative_map_component.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         ":relative_map_lib",
         "//cyber",
@@ -61,7 +63,7 @@ cc_library(
 
 cc_binary(
     name = "librelative_map_component.so",
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     linkshared = True,
     linkstatic = False,
     deps = [":relative_map_component_lib"],

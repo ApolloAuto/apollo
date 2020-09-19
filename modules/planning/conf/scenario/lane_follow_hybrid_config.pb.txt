@@ -5,10 +5,10 @@ stage_config: {
   enabled: true
   task_type: LEARNING_MODEL_INFERENCE_TASK
   task_type: LANE_CHANGE_DECIDER
-  task_type: PATH_REUSE_DECIDER
   task_type: PATH_LANE_BORROW_DECIDER
   task_type: PATH_BOUNDS_DECIDER
   task_type: PATH_REFERENCE_DECIDER
+  task_type: PATH_REUSE_DECIDER
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
@@ -25,9 +25,9 @@ stage_config: {
   task_config: {
     task_type: LEARNING_MODEL_INFERENCE_TASK
     learning_model_inference_task_config {
-      model_type: CNN
-      cpu_model_file: "/apollo/modules/planning/data/model/cpu_test_model_cnn.pt"
-      gpu_model_file: "/apollo/modules/planning/data/model/gpu_test_model_cnn.pt"
+      model_type: CNN_LSTM
+      cpu_model_file: "/apollo/modules/planning/data/model/cpu_test_model_cnn_lstm.pt"
+      gpu_model_file: "/apollo/modules/planning/data/model/gpu_test_model_cnn_lstm.pt"
       use_cuda: true
       allow_empty_learning_based_data: true
       allow_empty_output_trajectory: true
@@ -42,29 +42,34 @@ stage_config: {
   }
 
   task_config: {
-    task_type: PATH_REUSE_DECIDER
-    path_reuse_decider_config {
-      reuse_path: false
-    }
-  }
-
-  task_config: {
     task_type: PATH_LANE_BORROW_DECIDER
     path_lane_borrow_decider_config {
       allow_lane_borrowing: true
     }
   }
+
   task_config: {
     task_type: PATH_BOUNDS_DECIDER
     path_bounds_decider_config {
       adc_buffer_coeff: 0.0
+      is_extend_lane_bounds_to_include_adc: false
     }
   }
   task_config: {
     task_type: PATH_REFERENCE_DECIDER
   }
   task_config: {
+    task_type: PATH_REUSE_DECIDER
+    path_reuse_decider_config {
+      reuse_path: true
+    }
+  }
+  task_config: {
     task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+    piecewise_jerk_path_optimizer_config
+    {
+      path_reference_l_weight: 100.0
+    }
   }
   task_config: {
     task_type: PATH_ASSESSMENT_DECIDER

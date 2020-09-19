@@ -18,9 +18,10 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/proto/unit_test.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cyber {

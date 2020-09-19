@@ -20,12 +20,13 @@
 #include <string>
 #include <unordered_map>
 
+#include "cyber/proto/cyber_conf.pb.h"
+
 #include "cyber/base/atomic_hash_map.h"
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/common/util.h"
-#include "cyber/proto/cyber_conf.pb.h"
 
 namespace apollo {
 namespace cyber {

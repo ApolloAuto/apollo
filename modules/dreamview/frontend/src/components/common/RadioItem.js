@@ -26,7 +26,7 @@ export default class RadioItem extends React.Component {
 
   render() {
     const {
-      id, title, options, onClick, checked, extraClasses, autoFocus,
+      id, title, onClick, checked, extraClasses, autoFocus,
     } = this.props;
 
     return (

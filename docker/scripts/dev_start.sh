@@ -30,8 +30,8 @@ SUPPORTED_ARCHS=" x86_64 aarch64 "
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20200823_0534"
-VERSION_AARCH64="dev-aarch64-18.04-20200731_0916"
+VERSION_X86_64="dev-x86_64-18.04-20200914_0742"
+VERSION_AARCH64="dev-aarch64-18.04-20200915_0106"
 USER_VERSION_OPT=
 
 DOCKER_RUN="docker run"
@@ -147,6 +147,18 @@ function stop_all_apollo_containers_for_user() {
     fi
 }
 
+function _check_if_command_jq_exist() {
+    if [[ -x "$(command -v jq)" ]]; then
+        return 0
+    fi
+
+    warning "Command 'jq' (used for geolocation settings) not found on your Host."
+    warning "You can install it via 'sudo apt-get install jq' if on Ubuntu."
+    warning "Or visit jq at https://github.com/stedolan/jq for instructions."
+    warning "Exiting ..."
+    exit 1
+}
+
 function _geo_specific_config_for_cn() {
     local docker_cfg="/etc/docker/daemon.json"
     if [ -e "${docker_cfg}" ] && \
@@ -173,12 +185,13 @@ function _geo_specific_config_for_cn() {
 function geo_specific_config() {
     local geo="$1"
     if [ -z "${geo}" ] || [ "${geo}" = "none" ]; then
-        info "GeoLocation based settings: use default."
+        info "Use default GeoLocation settings"
     elif [ "${geo}" = "cn" ]; then
-        info "GeoLocation based settings: from within China"
+        info "GeoLocation settings for Mainland China"
+        _check_if_command_jq_exist
         _geo_specific_config_for_cn
     else
-        info "GeoLocation based settings for ${geo}: not ready, fallback to default"
+        info "GeoLocation settings for ${geo} is not ready, fallback to default"
     fi
 }
 
@@ -330,22 +343,19 @@ function determine_gpu_use_host() {
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
     if [ ${USE_GPU_HOST} -eq 1 ]; then
         DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-        if [ ! -z "$(which nvidia-docker)" ]; then
-            DOCKER_RUN="nvidia-docker run"
-            warning "nvidia-docker is deprecated. Please install latest docker " \
-                    "and nvidia-container-toolkit as described by:"
-            warning "  ${nv_docker_doc}"
-        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
             if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
                 DOCKER_RUN="docker run --gpus all"
             else
-                warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
+                warning "You must upgrade to Docker-CE 19.03+ to access GPU from container!"
                 USE_GPU_HOST=0
             fi
+        elif [[ -x "$(which nvidia-docker)" ]]; then
+            DOCKER_RUN="nvidia-docker run"
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install " \
-                    "latest docker and nvidia-container-toolkit as described by: "
+                    "latest Docker and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
@@ -412,7 +422,7 @@ function mount_map_volumes() {
         done
     fi
 
-    if [ "$FAST_MODE" = "no" ]; then
+    if [[ "$FAST_MODE" == "no" ]]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
             restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
         done
@@ -426,13 +436,6 @@ function mount_map_volumes() {
 function mount_other_volumes() {
     info "Mount other volumes ..."
     local volume_conf=
-    if [ "${FAST_MODE}" = "no" ]; then
-        # YOLO3D
-        local yolo3d_volume="apollo_yolo3d_volume_${USER}"
-        local yolo3d_image="${DOCKER_REPO}:yolo3d_volume-${TARGET_ARCH}-latest"
-        docker_restart_volume "${yolo3d_volume}" "${yolo3d_image}"
-        volume_conf="${volume_conf} --volumes-from ${yolo3d_volume}"
-    fi
 
     # LOCALIZATION
     local localization_volume="apollo_localization_volume_${USER}"
@@ -445,6 +448,18 @@ function mount_other_volumes() {
     local audio_image="${DOCKER_REPO}:data_volume-audio_model-latest"
     docker_restart_volume "${audio_volume}" "${audio_image}"
     volume_conf="${volume_conf} --volumes-from ${audio_volume}"
+
+    # YOLOV4
+    local yolov4_volume="apollo_yolov4_volume_${USER}"
+    local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-latest"
+    docker_restart_volume "${yolov4_volume}" "${yolov4_image}"
+    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+
+    # FASTER_RCNN
+    local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
+    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-latest"
+    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
+    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
@@ -515,7 +530,7 @@ function main() {
         -e DOCKER_GRP="${group}"    \
         -e DOCKER_GRP_ID="${gid}"   \
         -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
-        -e USE_GPU="${USE_GPU_HOST}"        \
+        -e USE_GPU_HOST="${USE_GPU_HOST}"   \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${MAP_VOLUMES_CONF}      \

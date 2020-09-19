@@ -16,7 +16,6 @@
 # NOTE(storypku): Tailored to support Linux ONLY.
 # Origin: tensorflow/third_party/gpus/find_cuda_config.py
 # ==============================================================================
-
 """Prints CUDA library and header directories and versions found on the system.
 
 The script searches for CUDA library and header files on the system, inspects
@@ -116,7 +115,7 @@ def _at_least_version(actual_version, required_version):
 def _get_header_version(path, name):
     """Returns preprocessor defines in C header file."""
     for line in io.open(path, "r", encoding="utf-8").readlines():
-        match = re.match("#define %s +(\d+)" % name, line)
+        match = re.match(r"#define %s +(\d+)" % name, line)
         if match:
             return match.group(1)
     return ""
@@ -164,6 +163,7 @@ def _header_paths():
         "include/*-linux-gnu",
         "extras/CUPTI/include",
         "include/cuda/CUPTI",
+        "local/cuda/extras/CUPTI/include",
     ]
 
 
@@ -176,14 +176,16 @@ def _library_paths():
         "lib/*-linux-gnu",
         "lib/x64",
         "extras/CUPTI/*",
+        "local/cuda/lib64",
+        "local/cuda/extras/CUPTI/lib64",
     ]
 
 
 def _not_found_error(base_paths, relative_paths, filepattern):
     base_paths = "".join(["\n        '%s'" %
                           path for path in sorted(base_paths)])
-    relative_paths = "".join(
-        ["\n        '%s'" % path for path in relative_paths])
+    relative_paths = "".join(["\n        '%s'" %
+                              path for path in relative_paths])
     return ConfigError(
         "Could not find any %s in any subdirectory:%s\nof:%s\n" %
         (filepattern, relative_paths, base_paths))
@@ -241,7 +243,7 @@ def _find_cuda_config(base_paths, required_version):
     cuda_library_path = _find_library(base_paths, "cudart", cuda_version)
 
     def get_nvcc_version(path):
-        pattern = "Cuda compilation tools, release \d+\.\d+, V(\d+\.\d+\.\d+)"
+        pattern = r"Cuda compilation tools, release \d+\.\d+, V(\d+\.\d+\.\d+)"
         for line in subprocess.check_output([path, "--version"]).splitlines():
             match = re.match(pattern, line.decode("ascii"))
             if match:
@@ -252,12 +254,14 @@ def _find_cuda_config(base_paths, required_version):
     nvcc_path, nvcc_version = _find_versioned_file(base_paths, [
         "",
         "bin",
+        "local/cuda/bin",
     ], nvcc_name, cuda_version, get_nvcc_version)
 
     nvvm_path = _find_file(base_paths, [
         "nvvm/libdevice",
         "share/cuda",
         "lib/nvidia-cuda-toolkit/libdevice",
+        "local/cuda/nvvm/libdevice",
     ], "libdevice*.10.bc")
 
     cupti_header_path = _find_file(base_paths, _header_paths(), "cupti.h")
@@ -306,7 +310,8 @@ def _find_cublas_config(base_paths, required_version, cuda_version):
         cublas_version = header_version.split(".")[0]
 
     else:
-        # There is no version info available before CUDA 10.1, just find the file.
+        # There is no version info available before CUDA 10.1, just find the
+        # file.
         header_version = cuda_version
         header_path = _find_file(base_paths, _header_paths(), "cublas_api.h")
         # cuBLAS version is the same as CUDA version (x.y).
@@ -340,7 +345,9 @@ def _find_cusolver_config(base_paths, required_version, cuda_version):
     else:
         header_version = cuda_version
         header_path = _find_file(
-            base_paths, _header_paths(), "cusolver_common.h")
+            base_paths,
+            _header_paths(),
+            "cusolver_common.h")
         cusolver_version = required_version
 
     library_path = _find_library(base_paths, "cusolver", cusolver_version)
@@ -537,7 +544,8 @@ def _get_legacy_path(env_name, default=[]):
     """
     if env_name in os.environ:
         match = re.match(
-            "^(/[^/ ]*)+/lib/\w+-linux-gnu/?$", os.environ[env_name])
+            r"^(/[^/ ]*)+/lib/\w+-linux-gnu/?$",
+            os.environ[env_name])
         if match:
             return [match.group(1)]
     return _list_from_env(env_name, default)
@@ -564,7 +572,8 @@ def find_cuda_config():
         cuda_version = result["cuda_version"]
         cublas_paths = base_paths
         if tuple(int(v) for v in cuda_version.split(".")) < (10, 1):
-            # Before CUDA 10.1, cuBLAS was in the same directory as the toolkit.
+            # Before CUDA 10.1, cuBLAS was in the same directory as the
+            # toolkit.
             cublas_paths = cuda_paths
         cublas_version = os.environ.get("TF_CUBLAS_VERSION", "")
         result.update(
@@ -588,8 +597,11 @@ def find_cuda_config():
         if tuple(int(v) for v in cuda_version.split(".")) < (11, 0):
             cufft_paths = cuda_paths
         cufft_version = os.environ.get("TF_CUFFT_VERSION", "")
-        result.update(_find_cufft_config(
-            cufft_paths, cufft_version, cuda_version))
+        result.update(
+            _find_cufft_config(
+                cufft_paths,
+                cufft_version,
+                cuda_version))
 
         cusparse_paths = base_paths
         if tuple(int(v) for v in cuda_version.split(".")) < (11, 0):

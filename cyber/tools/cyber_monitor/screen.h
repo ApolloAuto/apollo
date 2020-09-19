@@ -72,7 +72,7 @@ class Screen final {
   Screen& operator=(const Screen&) = delete;
 
   int SwitchState(int ch);
-  void HighlightLine(int lineNo);
+  void HighlightLine(int line_no);
 
   void ShowInteractiveCmd(int ch);
   void ShowRenderMessage(int ch);
