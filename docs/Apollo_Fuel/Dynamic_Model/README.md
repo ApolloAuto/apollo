@@ -127,5 +127,6 @@ After the dynamic modeling job successfully starts and your uploaded data passes
 
 Then, after the dynamic modeling job is fully finished, the user will receive the **second notice email**, in which the generated model storage path and filtered data visualization path under your own BOS folder will be provided.  
 
-
 ![](images/dynamic_model_email.png)
+
+To use these generated dynamic models in the simulation platform or the [Control_Auto_Tuning](../../Apollo_Fuel/Control_Auto_Tuning/README.md) service, the users need to rename the received dynamic models and put them in the corresponding github repo path as follows: provide the forward-driving model at github **apollo/modules/control/conf/dynamic_model_forward.bin**; backward-driving model at github **apollo/modules/control/conf/dynamic_model_backward.bin**.

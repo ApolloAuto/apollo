@@ -28,7 +28,9 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -191,10 +193,9 @@ class PathBoundsDecider : public Decider {
    */
   bool GetBoundaryFromLanesAndADC(
       const ReferenceLineInfo& reference_line_info,
-      const LaneBorrowInfo& lane_borrow_info, const bool is_fallback,
-      double ADC_buffer,
+      const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
       std::vector<std::tuple<double, double, double>>* const path_bound,
-      std::string* const borrow_lane_type);
+      std::string* const borrow_lane_type, bool is_fallback_lanechange = false);
 
   /** @brief Update left boundary by lane_left_width
    *   This is for normal pull-over, which uses lane boundary as left boundary
@@ -253,11 +254,14 @@ class PathBoundsDecider : public Decider {
    *  @param The minimum left boundary (l_max)
    *  @param The maximum right boundary (l_min)
    *  @param The path_boundaries (its content at idx will be updated)
+   *  @param Is the left bound comes from lane boundary
+   *  @param Is the right bound comes from lane boundary
    *  @return If path is good, true; if path is blocked, false.
    */
   bool UpdatePathBoundaryWithBuffer(
       size_t idx, double left_bound, double right_bound,
-      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+      std::vector<std::tuple<double, double, double>>* const path_boundaries,
+      bool is_left_lane_bound = false, bool is_right_lane_bound = false);
 
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
    *         It also checks if ADC is blocked (lmax < lmin).
