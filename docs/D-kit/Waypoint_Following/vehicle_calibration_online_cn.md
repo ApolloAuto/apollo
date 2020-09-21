@@ -248,7 +248,7 @@
 
 1）请将标定数据按照如下文件夹结构进行放置：
 
-![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure.png)
+![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure_1.png)
 
 2）`Origin Folder`确保是**BOS的根目录**，确保`task001`目录是在BOS根目录下创建的（根目录：登录BOS存储服务器后首先看到的目录即为根目录，一般是`Bucket name`目录）；
 
