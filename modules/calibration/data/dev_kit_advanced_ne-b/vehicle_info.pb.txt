@@ -1,0 +1,6 @@
+name : "NEOLIX_EDU"
+brand : NEOLIX
+model : NEOLIX_EDU
+license {
+    vin : "neolix213"
+}
