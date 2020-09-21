@@ -82,6 +82,10 @@
         "js-yaml": "^3.13.1",
         "**/kind-of": "^6.0.3",
         "**/resize-img": "^2.0.0",
-        "@babel/parser": "7.7.5"
+        "@babel/parser": "7.7.5",
+        "webpack-dev-server/selfsigned/node-forge":"^0.10.0",
+        "react/fbjs/isomorphic-fetch/node-fetch":"^2.6.1",
+        "**/bl":"^4.0.3",
+        "**/jpeg-js":"^0.4.0"
     }
 }
