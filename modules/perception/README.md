@@ -23,7 +23,7 @@ The general architecture of the perception module is shown:
 ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_sensor_based.png)
 
 The detailed perception modules are displayed below.
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_detail.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo6.0_perception_detail.png)
 
 ## Input
 
