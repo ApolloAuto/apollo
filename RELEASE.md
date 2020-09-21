@@ -16,9 +16,9 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
     * Complete control parameter auto-tune service
 * Driverless Research
     * Remote control interface with DreamView integration
-    * Audio bssed emergency vehicle detection system
+    * Audio based emergency vehicle detection system
 
-**[Note]** All models and methodogies included in Apollo 6.0 are for research purposes only. Productized and commercial uses of these models are **NOT** encouraged, and it is at your own risk. Please be cautious to try Apollo 6.0 with enough safety protection mechanmism. Your feedback is highly appreciated for us to continuously improve the models.
+**[Note]** All models and methodologies included in Apollo 6.0 are for research purposes only. Productized and commercial uses of these models are **NOT** encouraged, and it is at your own risk. Please be cautious to try Apollo 6.0 with enough safety protection mechanism. Your feedback is highly appreciated for us to continuously improve the models.
 
 # Release 5.5
 
