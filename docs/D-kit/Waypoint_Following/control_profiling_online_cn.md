@@ -36,6 +36,8 @@
 
 - [循迹搭建--车辆循迹演示](start_waypoint_following_cn.md)
 
+- [开通云服务账号](../../Apollo_Fuel/apply_fuel_account_cn.md)
+
 ## 主要步骤
 
 - 评测数据采集
