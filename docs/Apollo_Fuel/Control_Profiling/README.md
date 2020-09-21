@@ -9,7 +9,7 @@ Control Profiling Service is a cloud based service to evaluate the control and p
 
 - [Apollo](https://github.com/ApolloAuto/apollo) 6.0 or higher version.
 
-- Baidu Cloud BOS service registered according to [document](https://github.com/ApolloAuto/apollo/blob/master/docs/Apollo_Fuel/apply_bos_account_cn.md)
+- Baidu Cloud BOS service registered according to [document](../apply_fuel_account_cn.md)
 
 - Fuel service account on [Apollo Dreamland](http://bce.apollo.auto/user-manual/fuel-service)
 
@@ -60,7 +60,7 @@ Here is the folder structure requirements for job submission:
 
 ### Submit job in Dreamland
 
-Go to [Apollo Dreamland](http://bce.apollo.auto/), login with **Baidu** account, choose `Apollo Fuel --> Jobs`，`New Job`, `Open Space Planner Profiling`，and input the correct BOS path as in [Upload data to BOS](###Upload-data-to-BOS) section：
+Go to [Apollo Dreamland](http://bce.apollo.auto/), login with **Baidu** account, choose `Apollo Fuel --> Jobs`，`New Job`, `Control Profiling`，and input the correct BOS path as in [Upload data to BOS](###Upload-data-to-BOS) section：
 
 ![control_profiling_submit_job2_en](images/control_profiling_submit_job2_en.png)
 
