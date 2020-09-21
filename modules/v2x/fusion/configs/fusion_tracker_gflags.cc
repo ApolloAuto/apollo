@@ -26,8 +26,6 @@ namespace v2x {
 namespace ft {
 
 // config manager
-DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
-DEFINE_string(work_root, "", "Project work root direcotry.");
 DEFINE_string(config_path, "/apollo/modules/v2x/data",
               "ADU shared data path, including maps, routings...");
 DEFINE_string(v2x_module_name, "v2x_fusion", "name");
