@@ -92,9 +92,8 @@ OnnxObstacleDetector::~OnnxObstacleDetector() {}
 
 void OnnxObstacleDetector::OnnxToTRTModel(
     const std::string& model_file,  // name of the onnx model
-    nvinfer1::IHostMemory** trt_model_stream) {  // output buffer for the TensorRT model
+    nvinfer1::IHostMemory** trt_model_stream) {
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kWARNING);
-
   int kBatchSize = 1;
 
   // create the builder
@@ -119,7 +118,7 @@ void OnnxObstacleDetector::OnnxToTRTModel(
   config->setMaxWorkspaceSize(1<<20);
   config->setFlag(nvinfer1::BuilderFlag::kFP16);
   nvinfer1::ICudaEngine* engine =
-      builder->buildEngineWithConfig(*network, *config);
+  builder->buildEngineWithConfig(*network, *config);
 
   // serialize the engine, then close everything down
   *trt_model_stream = engine->serialize();
@@ -128,14 +127,13 @@ void OnnxObstacleDetector::OnnxToTRTModel(
   network->destroy();
   config->destroy();
   builder->destroy();
-  
+
   engine->destroy();
 }
 
 void OnnxObstacleDetector::TRTStreamToContext(
-  const nvinfer1::IHostMemory* yolov4_trt_model_stream, 
+  const nvinfer1::IHostMemory* yolov4_trt_model_stream,
   nvinfer1::IExecutionContext** context_ptr) {
-
   nvinfer1::ICudaEngine* engine;
   nvinfer1::IRuntime* runtime;
 
@@ -146,8 +144,9 @@ void OnnxObstacleDetector::TRTStreamToContext(
   }
 
   engine = runtime->deserializeCudaEngine(
-      yolov4_trt_model_stream->data(), yolov4_trt_model_stream->size(), nullptr);
-
+    yolov4_trt_model_stream->data(),
+    yolov4_trt_model_stream->size(),
+    nullptr);
   if (engine == nullptr) {
     std::cerr << "Failed to create TensorRT Engine." << std::endl;
   }
@@ -165,13 +164,15 @@ void OnnxObstacleDetector::TRTStreamToContext(
 void OnnxObstacleDetector::TRTStreamToContext(
   const std::vector<char>& trt_model_stream,
   nvinfer1::IExecutionContext** context_ptr) {
-
   nvinfer1::IRuntime* runtime = nvinfer1::createInferRuntime(g_logger_);
   if (runtime == nullptr) {
     std::cerr << "Failed to create TensorRT Runtime object." << std::endl;
   }
 
-  nvinfer1::ICudaEngine* engine = runtime->deserializeCudaEngine(trt_model_stream.data(), trt_model_stream.size(), nullptr);
+  nvinfer1::ICudaEngine* engine = runtime->deserializeCudaEngine(
+    trt_model_stream.data(),
+    trt_model_stream.size(),
+    nullptr);
 
   if (engine == nullptr) {
     std::cerr << "Failed to create TensorRT Engine." << std::endl;
@@ -191,46 +192,51 @@ void OnnxObstacleDetector::postProcessing(cv::Mat& img,
   float* output, int row_cnt,
   int num_classes,
   const std::vector<std::string>& names) {
-  //TODO, only draw the bbox with higheest confidence.
   int col_cnt = num_classes + 4;
-
-  int maxid_i; // instance id
-  int maxid_j; // class id
+  int maxid_i;  // instance id
+  int maxid_j;  // class id
   float maxv = -1;
-  for (int i=0; i<row_cnt; i++){
-    for (int j=4; j<col_cnt; j++){
+  for (int i=0; i < row_cnt; i++) {
+    for (int j=4; j < col_cnt; j++) {
       float v = output[i*col_cnt+j];
-      if (maxv < v && v > -2 && v < 2){
+      if (maxv < v && v > -2 && v < 2) {
         maxv = v;
         maxid_i = i;
         maxid_j = j;
       }
     }
   }
-
   int width = img.cols;
   int height = img.rows;
   float* best_box = output + col_cnt * maxid_i;
-  int x1 = int((best_box[0] - best_box[2] / 2.0) * width);
-  int y1 = int((best_box[1] - best_box[3] / 2.0) * height);
-  int x2 = int((best_box[0] + best_box[2] / 2.0) * width);
-  int y2 = int((best_box[1] + best_box[3] / 2.0) * height);
+  int x1 = static_cast<int>((best_box[0] - best_box[2] / 2.0) * width);
+  int y1 = static_cast<int>((best_box[1] - best_box[3] / 2.0) * height);
+  int x2 = static_cast<int>((best_box[0] + best_box[2] / 2.0) * width);
+  int y2 = static_cast<int>((best_box[1] + best_box[3] / 2.0) * height);
 
-  cv::rectangle(img, cv::Point(x1,y1), cv::Point(x2,y2), cv::Scalar(0, 255, 0));
-  cv::putText(img, names[maxid_j-4], cv::Point2f(x1,y1), cv::FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0,0,255,255), 1);
+  cv::rectangle(img,
+    cv::Point(x1, y1),
+    cv::Point(x2, y2),
+    cv::Scalar(0, 255, 0));
+  cv::putText(img, names[maxid_j-4],
+    cv::Point2f(x1, y1),
+    cv::FONT_HERSHEY_SIMPLEX,
+    1.2,
+    cv::Scalar(0, 0, 255, 255),
+    1);
 }
 
-void OnnxObstacleDetector::inference(nvinfer1::IExecutionContext* yolov4_context_, 
-  int num_classes, const std::vector<std::string>& names, 
-  const std::string& image_path, const std::string& prediction_image_path) {
-
+void OnnxObstacleDetector::inference(
+  nvinfer1::IExecutionContext* yolov4_context_,
+  int num_classes, const std::vector<std::string>& names,
+  const std::string& image_path,
+  const std::string& prediction_image_path) {
   cv::Mat img_ori = cv::imread(image_path);
 
-  if (img_ori.empty()){
+  if (img_ori.empty()) {
     std::cout << "Load image fail: " << image_path << std::endl;
     return;
-  }
-  else{
+  } else {
     std::cout << "Load image success: " << image_path << std::endl;
   }
 
@@ -247,36 +253,46 @@ void OnnxObstacleDetector::inference(nvinfer1::IExecutionContext* yolov4_context
 
   int input_length = tot_length * sizeof(float);
   int row_cnt = 10647;
-  int output_length = 1 * row_cnt * (num_classes + 4) * sizeof(float); //3577392
+  int output_length = 1 *
+    row_cnt * (num_classes + 4) * sizeof(float);  // 3577392
 
-  float* input_image_ = (float*) malloc(input_length);
+  float* input_image_ = reinterpret_cast<float*>(malloc(input_length));
 
-  for (int i=0; i<img.rows; i++){
-    for (int j=0; j<img.cols; j++){
-      for (int k=0; k<3; k++){
-        input_image_[k*img.rows*img.cols + i*img.cols + j] = static_cast<float>(img.data[i*img.cols*3+j*3+k]) / 255.0;
+  for (int i = 0; i < img.rows; i++) {
+    for (int j = 0; j < img.cols; j++) {
+      for (int k = 0; k < 3; k++) {
+        input_image_[k*img.rows*img.cols + i*img.cols + j] =
+        static_cast<float>(img.data[i*img.cols*3+j*3+k]) / 255.0;
       }
     }
   }
 
   void* buffers[2];
   GPU_CHECK(cudaMalloc(&buffers[0], input_length));
-  GPU_CHECK(cudaMemcpy(buffers[0], input_image_, input_length, cudaMemcpyHostToDevice));
+  GPU_CHECK(cudaMemcpy(buffers[0],
+    input_image_,
+    input_length,
+    cudaMemcpyHostToDevice));
 
   GPU_CHECK(cudaMalloc(&buffers[1], output_length));
   GPU_CHECK(cudaMemset(buffers[1], 0, output_length));
-  
+
   yolov4_context_->enqueueV2(buffers, stream, nullptr);
   std::cout << "Inference success" << std::endl;
 
-  float* output = (float*) malloc(output_length);
-  GPU_CHECK(cudaMemcpy(output, buffers[1], output_length, cudaMemcpyDeviceToHost));
+  float* output = reinterpret_cast<float*>(malloc(output_length));
+  GPU_CHECK(
+    cudaMemcpy(
+      output,
+      buffers[1],
+      output_length,
+      cudaMemcpyDeviceToHost));
 
   postProcessing(img_ori, output, row_cnt, num_classes, names);
 
   cv::imwrite(prediction_image_path, img_ori);
-  std::cout << "Save prediction image to " << prediction_image_path << std::endl;
-
+  std::cout << "Save prediction image to "
+    << prediction_image_path << std::endl;
   GPU_CHECK(cudaFree(buffers[0]));
   GPU_CHECK(cudaFree(buffers[1]));
   free(input_image_);
@@ -289,13 +305,18 @@ void OnnxObstacleDetector::readNames(
   std::vector<std::string>& names) {
   std::ifstream f_names(names_file_path);
   std::string s;
-  while (std::getline(f_names, s)){
+  while (std::getline(f_names, s)) {
     names.push_back(s);
   }
 }
 
-bool OnnxObstacleDetector::Init(const std::map<std::string, std::vector<int>> &shapes) {
-  std::cout << NV_TENSORRT_MAJOR  << "." << NV_TENSORRT_MINOR << "." << NV_TENSORRT_PATCH << "." << NV_TENSORRT_BUILD  << std::endl;
+bool OnnxObstacleDetector::Init(
+  const std::map<std::string,
+  std::vector<int>> &shapes) {
+  std::cout << NV_TENSORRT_MAJOR
+  << "." << NV_TENSORRT_MINOR << "."
+  << NV_TENSORRT_PATCH << "."
+  << NV_TENSORRT_BUILD  << std::endl;
   return true;
 }
 
@@ -306,7 +327,11 @@ void OnnxObstacleDetector::Infer() {
   TRTStreamToContext(trt_stream, &context_);
 
   readNames(names_file_path_, names_);
-  inference(context_, num_classes_, names_, image_path_, prediction_image_path_);
+  inference(context_,
+    num_classes_,
+    names_,
+    image_path_,
+    prediction_image_path_);
 
   trt_stream->destroy();
 }
@@ -319,6 +344,6 @@ BlobPtr OnnxObstacleDetector::get_blob(const std::string &name) {
   return iter->second;
 }
 
-} // namespace inference
-} // namespace perception
-} // namespace apollo
+}  // namespace inference
+}  // namespace perception
+}  // namespace apollo

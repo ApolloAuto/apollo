@@ -38,6 +38,6 @@ TEST_F(LibtorchObstacleDetectionTest, is_) {
   EXPECT_EQ(result, false);
 }
 
-} // namespace inference
-} // namespace perception
-} // namespace apollo
+}  // namespace inference
+}  // namespace perception
+}  // namespace apollo

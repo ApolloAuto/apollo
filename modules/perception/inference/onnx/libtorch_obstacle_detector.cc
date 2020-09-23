@@ -1,4 +1,3 @@
-  
 /******************************************************************************
  * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
@@ -32,7 +31,8 @@ LibtorchObstacleDetection::LibtorchObstacleDetection() : device_(torch::kCPU) {
   LoadModel();
 }
 
-bool LibtorchObstacleDetection::Evaluate(const std::vector<std::vector<double>>& imageFrame) {
+bool LibtorchObstacleDetection::Evaluate(
+  const std::vector<std::vector<double>>& imageFrame) {
   // Sanity checks.
   omp_set_num_threads(1);
   if (imageFrame.size() == 0) {
@@ -68,7 +68,7 @@ bool LibtorchObstacleDetection::Evaluate(const std::vector<std::vector<double>>&
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
-  AINFO << "LibtorchObstacleDetection used time: " << diff.count() * 1000 << " ms.";
+  AINFO << "LibtorchDetection used time: " << diff.count() * 1000 << " ms.";
   auto torch_output = torch_output_tensor.accessor<float, 2>();
 
   // majority vote with 4 channels
@@ -94,6 +94,6 @@ void LibtorchObstacleDetection::LoadModel() {
   torch_model_ = torch::jit::load(FLAGS_torch_detector_model, device_);
 }
 
-} // inference
-} // perception
-} // apollo
+}  // namespace inference
+}  // namespace perception
+}  // namespace apollo
