@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/inference/onnx/onnx_obstacle_detector.h"
+#include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 
 #include "gtest/gtest.h"
 
@@ -23,16 +23,19 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-TEST(OnnxInferenceTest, test) {
-  OnnxObstacleDetector test_onnx_detector(
-    FLAGS_onnx_obstacle_detector_model,
-    FLAGS_num_classes,
-    FLAGS_onnx_test_input_path,
-    FLAGS_onnx_test_input_name_file,
-    FLAGS_onnx_prediction_image_path);
-  test_onnx_detector.Infer();
-  int dummy = 1;
-  EXPECT_EQ(dummy, 1);
+class LibtorchObstacleDetectionTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
+
+ protected:
+  LibtorchObstacleDetection obstacle_detection_;
+};
+
+TEST_F(LibtorchObstacleDetectionTest, is_) {
+  std::vector<std::vector<double>> imageFrame(4,
+    (std::vector<double> (2073600, 0.01)));
+  bool result = obstacle_detection_.Evaluate(imageFrame);
+  EXPECT_EQ(result, false);
 }
 
 } // namespace inference

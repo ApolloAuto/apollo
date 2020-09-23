@@ -61,5 +61,8 @@ DECLARE_string(onnx_test_input_path);
 DECLARE_string(onnx_test_input_name_file);
 DECLARE_string(onnx_prediction_image_path);
 DECLARE_int32(num_classes);
+
+// emergency detection libtorch
+DECLARE_string(torch_detector_model);
 }  // namespace perception
 }  // namespace apollo
