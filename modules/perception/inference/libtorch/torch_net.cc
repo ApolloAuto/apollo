@@ -16,6 +16,8 @@
 
 #include "modules/perception/inference/libtorch/torch_net.h"
 
+#include <c10/cuda/CUDACachingAllocator.h>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -39,6 +41,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   // Init net
   torch::Device device(device_type_, device_id_);
   net_ = torch::jit::load(model_file_, device);
+  net_.eval();
 
   for (auto name : output_names_) {
     auto blob = std::make_shared<Blob<float>>(1, 4, 1, 1);
@@ -82,7 +85,7 @@ void TorchNet::Infer() {
   // pay attention to the tensor shape order, if changed without permute
   // will get wrong result
   torch::Tensor tensor_image = torch::from_blob(
-                              blob->data()->mutable_cpu_data(),
+                              blob->data()->mutable_gpu_data(),
                               {blob->shape(1), blob->shape(2), blob->shape(3)},
                               torch::kFloat32);
   if (device_id_ >= 0) {
@@ -99,6 +102,7 @@ void TorchNet::Infer() {
   torch::Tensor output = net_.forward({tensor_image}).toTensor();
   torch::Tensor prob = torch::softmax(output, 1);
   blobs_[output_names_[0]]->data()->set_gpu_data(prob.data_ptr());
+  c10::cuda::CUDACachingAllocator::emptyCache();
 }
 
 
