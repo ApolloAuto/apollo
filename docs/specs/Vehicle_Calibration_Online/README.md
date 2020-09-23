@@ -78,15 +78,6 @@ The brake and throttle specs are different between vehicle models. Therefore, th
 
 (description)
 
-## Data Upload/Download
-
-### Prerequisites
-
-Firstly, please make sure you have already finished setting up the **Apollo Fuel Proxy** following documents available at:
-
-https://github.com/ApolloAuto/apollo/blob/master/modules/tools/fuel_proxy/README.md
-
-This is **essential** before you can get enjoy vehicle calibration or other Apollo Fuel-based cloud service.
 
 ## Folder Structure Requirement
 
