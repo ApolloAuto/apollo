@@ -12,6 +12,9 @@ APOLLO_ENV=""
 USE_ESD_CAN=false
 : ${STAGE:=dev}
 
+AVAILABLE_COMMANDS="config build build_dbg build_opt build_cpu build_gpu build_opt_gpu test coverage lint \
+                    buildify check build_fe build_teleop build_prof doc clean format usage -h --help"
+
 function check_architecture_support() {
     if [[ "${SUPPORTED_ARCHS}" != *" ${ARCH} "* ]]; then
         error "Unsupported CPU arch: ${ARCH}. Currently, Apollo only" \
@@ -128,6 +131,15 @@ function _usage() {
     "
 }
 
+function _check_command() {
+    local name="${BASH_SOURCE[0]}"
+    local commands="$(echo ${AVAILABLE_COMMANDS} | xargs)"
+    local help_msg="Run './apollo.sh --help' for usage."
+    local cmd="$@"
+
+    python scripts/command_checker.py --name "${name}" --command "${cmd}" --available "${commands}" --helpmsg "${help_msg}"
+}
+
 function main() {
     if [ "$#" -eq 0 ]; then
         _usage
@@ -213,7 +225,7 @@ function main() {
             _usage
             ;;
         *)
-            _usage
+            _check_command "${cmd}"
             ;;
     esac
 }
