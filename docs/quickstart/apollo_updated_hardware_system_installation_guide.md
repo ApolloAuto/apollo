@@ -1,18 +1,20 @@
 # Apollo Upgraded Hardware and System Installation Guide
 
-* [About This Guide](#about-this-guide)
-    * [Document Conventions](#document-conventions)
-* [Introduction](#introduction)
-    * [Documentation](#documentation)
-* [Key Hardware Components](#key-hardware-components)
-    * [Additional Components Required](#additional-components-required)
-* [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
-    * [At the Office](#at-the-office)
-    * [In the Vehicle](#in-the-vehicle)
-        * [Prerequisites](#prerequisites)
-        * [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
-* [Additional Tasks Required](#additional-tasks-required)
-* [Next Steps](#next-steps)
+- [Apollo Upgraded Hardware and System Installation Guide](#apollo-upgraded-hardware-and-system-installation-guide)
+  - [About This Guide](#about-this-guide)
+    - [Document Conventions](#document-conventions)
+  - [Introduction](#introduction)
+    - [Documentation](#documentation)
+  - [Key Hardware Components](#key-hardware-components)
+    - [Additional Components Required](#additional-components-required)
+  - [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
+    - [At the Office](#at-the-office)
+    - [In the Vehicle](#in-the-vehicle)
+      - [Prerequisites](#prerequisites)
+      - [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
+  - [Additional Tasks Required](#additional-tasks-required)
+  - [Time Sync Script Setup [Optional]](#time-sync-script-setup-optional)
+  - [Next Steps](#next-steps)
 
 
 ## About This Guide
@@ -45,19 +47,19 @@ The following set of documentation describes Apollo 3.0:
 
     - **Vehicle**:
 
-      - [Industrial PC (IPC)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/IPC/Nuvo-6108GC_Installation_Guide.md)
-      - [Global Positioning System (GPS)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README.md)
-      - [Inertial Measurement Unit (IMU)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Navigation/README.md)
+      - [Industrial PC (IPC)](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/IPC/Nuvo-6108GC_Installation_Guide.md)
+      - [Global Positioning System (GPS)](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Navigation/README.md)
+      - [Inertial Measurement Unit (IMU)](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Navigation/README.md)
       - Controller Area Network (CAN) card
       - GPS Antenna
       - GPS Receiver
-      - [Light Detection and Ranging System (LiDAR)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/README.md)
-      - [Camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Camera/README.md)
-      - [Radar](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Radar/README.md)
-      - [Apollo Sensor Unit (ASU)](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
+      - [Light Detection and Ranging System (LiDAR)](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Lidar/README.md)
+      - [Camera](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Camera/README.md)
+      - [Radar](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Radar/README.md)
+      - [Apollo Sensor Unit (ASU)](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
       - Apollo Extension Unit (AXU)
 
-    - **Software**: Refer to the [Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Software_and_Kernel_Installation_guide.md) for information on the following:
+    - **Software**: Refer to the [Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/Software_and_Kernel_Installation_guide.md) for information on the following:
       - Ubuntu Linux
       - Apollo Linux Kernel
       - NVIDIA GPU Driver
@@ -74,10 +76,10 @@ The key hardware components to install include:
   You can select one of the following options:
   - NovAtel SPAN-IGM-A1
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
-  - NovAtel SPAN® PwrPak7™ 
+  - NovAtel SPAN® PwrPak7™
   - Navtech NV-GI120
 - Light Detection and Ranging System (LiDAR) ─  You can select one of the following options, please note Apollo upgrade uses VLS-128 LiDAR:
-    - [Velodyne VLS-128](https://github.com/ApolloAuto/apollo2/blob/master/docs/specs/Lidar/VLS_128_Installation_Guide.md)
+    - [Velodyne VLS-128](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/VLS_128_Installation_Guide.md)
     - Velodyne HDL-64E S3
     - Velodyne Puck series
     - Innovusion LiDAR
@@ -86,7 +88,7 @@ The key hardware components to install include:
     - Leopard Imaging LI-USB30-AR023ZWDR with USB 3.0 case
     - Argus Camera (FPD-Link)
     - Wissen Camera
-- Radar —  You can select one of the following options: 
+- Radar —  You can select one of the following options:
     - Continental ARS408-21
     - Racobit B01HC
 

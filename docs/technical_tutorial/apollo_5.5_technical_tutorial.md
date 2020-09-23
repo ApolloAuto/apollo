@@ -42,7 +42,6 @@
   * [Canbus module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/canbus/README.md)
   * [Common module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/common/README.md)
   * [Control module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/control/README.md)
-  * [Data module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/data/README.md)
   * [Localization module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/localization/README.md)
   * [Perception module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/perception/README.md)
   * [Planning module](https://github.com/ApolloAuto/apollo/blob/r5.5.0/modules/planning/README.md)

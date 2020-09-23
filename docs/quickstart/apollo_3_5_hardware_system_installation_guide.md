@@ -1,18 +1,20 @@
 # Apollo 3.5 Hardware and System Installation Guide
 
-* [About This Guide](#about-this-guide)
-  * [Document Conventions](#document-conventions)
-* [Introduction](#introduction)
-  * [Documentation](#documentation)
-* [Key Hardware Components](#key-hardware-components)
-  * [Additional Components Required](#additional-components-required)
-* [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
-  * [At the Office](#at-the-office)
-  * [In the Vehicle](#in-the-vehicle)
-    * [Prerequisites](#prerequisites)
-    * [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
-* [Additional Tasks Required](#additional-tasks-required)
-* [Next Steps](#next-steps)
+- [Apollo 3.5 Hardware and System Installation Guide](#apollo-35-hardware-and-system-installation-guide)
+  - [About This Guide](#about-this-guide)
+    - [Document Conventions](#document-conventions)
+  - [Introduction](#introduction)
+    - [Documentation](#documentation)
+  - [Key Hardware Components](#key-hardware-components)
+    - [Additional Components Required](#additional-components-required)
+  - [Steps for the Installation Tasks](#steps-for-the-installation-tasks)
+    - [At the Office](#at-the-office)
+    - [In the Vehicle](#in-the-vehicle)
+      - [Prerequisites](#prerequisites)
+      - [Diagrams of the Major Component Installations](#diagrams-of-the-major-component-installations)
+  - [Additional Tasks Required](#additional-tasks-required)
+  - [Time Sync Script Setup [Optional]](#time-sync-script-setup-optional)
+  - [Next Steps](#next-steps)
 
 ## About This Guide
 
@@ -76,7 +78,7 @@ The key hardware components to install include:
   * NovAtel SPAN® PwrPak7™
   * Navtech NV-GI120
 * Light Detection and Ranging System (LiDAR) ─  You can select one of the following options, please note Apollo master uses VLS-128 LiDAR:
-  * [Velodyne VLS-128](https://github.com/ApolloAuto/apollo2/blob/master/docs/specs/Lidar/VLS_128_Installation_Guide.md)
+  * [Velodyne VLS-128](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Lidar/VLS_128_Installation_Guide.md)
   * Velodyne HDL-64E S3
   * Velodyne Puck series
   * Innovusion LiDAR

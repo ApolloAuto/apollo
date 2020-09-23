@@ -11,7 +11,7 @@ There are 5 types of calibration:
 
 For additional information on Sensor Calibration, please refer to our [calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide.md)
 
-For additional information on LiDAR - GNSS calibration please refer to our [LiDAR - GNSS calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_lidar_calibration_guide.md)
+For additional information on LiDAR - GNSS calibration please refer to our [LiDAR - GNSS calibration guide](https://github.com/ApolloAuto/apollo/blob/r1.5.0/docs/quickstart/apollo_1_5_lidar_calibration_guide.md)
 
 ---
 ## Is the order of sensor calibration important at all ? Can I do IMU - vehicle before Radar - Camera ?
