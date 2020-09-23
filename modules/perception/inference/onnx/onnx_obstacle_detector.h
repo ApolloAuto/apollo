@@ -78,7 +78,7 @@ class OnnxObstacleDetector : public Inference {
 
   void readNames(
   const std::string& names_file_path,
-  const std::vector<std::string>& names);
+  std::vector<std::string>* names);
 
   bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
   void Infer() override;
@@ -92,7 +92,6 @@ class OnnxObstacleDetector : public Inference {
   nvinfer1::IExecutionContext* context_;
 
   int num_classes_;
-  std::vector<std::string> names_;
   std::string image_path_;
   std::string names_file_path_;  // coco.names
   std::string prediction_image_path_;

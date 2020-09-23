@@ -188,8 +188,9 @@ void OnnxObstacleDetector::TRTStreamToContext(
   std::cout << "Create context success" << std::endl;
 }
 
-void OnnxObstacleDetector::postProcessing(cv::Mat& img,
-  float* output, int row_cnt,
+void OnnxObstacleDetector::postProcessing(const cv::Mat& img,
+  float* output,
+  int row_cnt,
   int num_classes,
   const std::vector<std::string>& names) {
   int col_cnt = num_classes + 4;
@@ -302,11 +303,11 @@ void OnnxObstacleDetector::inference(
 
 void OnnxObstacleDetector::readNames(
   const std::string& names_file_path,
-  std::vector<std::string>& names) {
+  std::vector<std::string>* names) {
   std::ifstream f_names(names_file_path);
   std::string s;
   while (std::getline(f_names, s)) {
-    names.push_back(s);
+    names->push_back(s);
   }
 }
 
@@ -326,10 +327,11 @@ void OnnxObstacleDetector::Infer() {
 
   TRTStreamToContext(trt_stream, &context_);
 
-  readNames(names_file_path_, names_);
+  std::vector<std::string>* names =  new std::vector<std::string>;
+  readNames(names_file_path_, names);
   inference(context_,
     num_classes_,
-    names_,
+    *names,
     image_path_,
     prediction_image_path_);
 
