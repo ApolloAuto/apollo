@@ -26,11 +26,11 @@ namespace inference {
 
 class LibtorchObstacleDetection {
  public:
-  LibtrochObstacleDetection();
+  LibtorchObstacleDetection();
 
   ~LibtorchObstacleDetection() = default;
 
-  bool Evaluate();
+  bool Evaluate(const std::vector<std::vector<double>>& imageFrame);
 
  private:
   void LoadModel();

@@ -35,12 +35,13 @@ cc_library(
 )
 
 cc_test(
-	name = "onnx_obstacle_detector_test",
+	name = "libtorch_obstacle_detector_test",
 	size = "small",
-	srcs = ["onnx_obstacle_detector_test.cc"],
+	srcs = ["libtorch_obstacle_detector_test.cc"],
 	deps = [
 		"//modules/perception/common:perception_gflags",
-		":onnx_obstacle_detector",
+		":libtorch_obstacle_detector",
 		"@com_google_googletest//:gtest_main",
+        "//third_party:libtorch",
 	],
 )

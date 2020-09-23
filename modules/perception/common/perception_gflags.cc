@@ -99,5 +99,11 @@ DEFINE_string(onnx_prediction_image_path,
               "/onnx/testdata/prediction.jpg",
               "The prediction output image file for onnx inference");
 DEFINE_int32(num_classes, 80, "number of classes for onnx inference");
+
+// emergency detection libtorch
+DEFINE_string(torch_detector_model,
+              "/apollo/modules/perception/camera"
+              "/lib/obstacle/detector/yolov4/model/yolov4.pt",
+              "The torch model file for emergency detection");
 }  // namespace perception
 }  // namespace apollo
