@@ -40,6 +40,6 @@ class LibtorchObstacleDetection {
   torch::Device device_;
 };
 
-}  // inference
-}  // perception
-}  // apollo
+}  // namespace inference
+}  // namespace perception
+}  // namespace apollo
