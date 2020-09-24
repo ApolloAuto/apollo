@@ -7,7 +7,7 @@ DreamView工具可以模拟感知模块并展现模拟效果，但它缺乏可�
 在运行可视化工具之前，我们需要准备必要的PCD和Pose数据，这些数据可以从带有记录点云数据的ROS包中提取。为了便于数据提取，我们提供了一个ROS启动文件来转储PCD帧文件和一个python脚本来为每个帧生成Pose文件。
 
 #### 1.1 启动PCD导出器
- 更多详细信息请参考 [Velodyne驱动文档](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne)
+ 更多详细信息请参考 [Velodyne驱动文档](../../modules/drivers/velodyne)
 ```
 roslaunch velodyne export_pcd_offline.launch
 ```
