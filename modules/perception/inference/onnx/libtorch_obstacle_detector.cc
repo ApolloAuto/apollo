@@ -36,15 +36,15 @@ bool LibtorchObstacleDetection::Evaluate(
   // Sanity checks.
   omp_set_num_threads(1);
   if (imageFrame.size() == 0) {
-    AERROR << "Got no channel in image frame!";
+    AINFO << "Got no channel in image frame!";
     return false;
   }
   if (imageFrame[0].size() == 0) {
-    AERROR << "Got no image frame in channel 0!";
+    AINFO << "Got no image frame in channel 0!";
     return false;
   }
   if (imageFrame[0].size() != 72000) {
-    AERROR << "imageFrame[0].size() = " << imageFrame[0].size() << ", skiping!";
+    AINFO << "imageFrame[0].size() = " << imageFrame[0].size() << ", skiping!";
     return false;
   }
   // image imput size is 1920 * 1080 = 2073600
