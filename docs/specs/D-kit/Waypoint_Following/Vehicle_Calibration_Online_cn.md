@@ -1,26 +1,22 @@
 # 循迹搭建--车辆动力学云标定
 
 - [循迹搭建--车辆动力学云标定](#循迹搭建--车辆动力学云标定)
-    - [概览](#概览)
-    - [前提条件](#前提条件)
-    - [主要步骤](#主要步骤)
-    - [百度云对象存储BOS注册](#百度云对象存储bos注册)
-    - [开通云服务账号](#开通云服务账号)
-    - [修改配置文件](#修改配置文件)
-    - [标定数据采集](#标定数据采集)
-        - [准备](#准备)
-        - [开始采集](#开始采集)
-    - [标定任务提交](#标定任务提交)
-        - [文件夹结构要求](#文件夹结构要求)
-            - [1. 准备百度云对象存储BOS服务](#1-准备百度云对象存储bos服务)
-            - [2. 和Apollo开发套件商务联系开通云标定服务账号](#2-和apollo开发套件商务联系开通云标定服务账号)
-            - [3. 上传预处理后的数据至BOS](#3-上传预处理后的数据至bos)
-            - [4. 提交标定任务据至BOS](#4-提交标定任务据至bos)
-            - [5. 获取标定结果及标定表](#5-获取标定结果及标定表)
-            - [6. 将标定表写入控制配置文件中](#6-将标定表写入控制配置文件中)
-    - [结果显示](#结果显示)
-    - [NEXT](#next)
-    - [常见问题](#常见问题)
+  - [概览](#概览)
+  - [前提条件](#前提条件)
+  - [主要步骤](#主要步骤)
+  - [修改配置文件](#修改配置文件)
+  - [标定数据采集](#标定数据采集)
+    - [准备](#准备)
+    - [开始采集](#开始采集)
+  - [标定任务提交](#标定任务提交)
+    - [文件夹结构要求](#文件夹结构要求)
+      - [1. 上传预处理后的数据至BOS](#1-上传预处理后的数据至bos)
+      - [2. 提交标定任务](#2-提交标定任务)
+      - [3. 获取标定结果及标定表](#3-获取标定结果及标定表)
+      - [4. 将标定表写入控制配置文件中](#4-将标定表写入控制配置文件中)
+  - [结果显示](#结果显示)
+  - [NEXT](#next)
+  - [常见问题](#常见问题)
 
 
 ## 概览
@@ -45,6 +41,8 @@
 
 - [循迹搭建--Apollo系统安装](Apollo_Installation_cn.md)
 
+- [开通云服务账号](../../Apollo_Fuel/apply_fuel_account_cn.md)
+
 ## 主要步骤
 
 - 修改标定配置文件
@@ -54,12 +52,6 @@
 - 标定任务提交
 
 - 可视化结果分析
-
-## 百度云对象存储BOS注册
-注册方法参考[百度云对象存储BOS注册与基本使用向导](../../Apollo_Fuel/Apply_BOS_Account_cn.md) 
-
-## 开通云服务账号
-请提前与商务部门联系(邮件develop-kit@apollo.auto)确保获得授权，之后打开[Dreamland网址](http://bce.apollo.auto/)选择用百度账号登录，登录后点击左侧菜单栏「用户帮助」里的「Fuel使用指南」菜单项，并按照文档开通云服务账号。
 
 ## 修改配置文件
 
@@ -250,21 +242,13 @@
 
 ### 文件夹结构要求
 
-#### 1. 准备百度云对象存储BOS服务
-
-在使用云标定服务前，需要准备[百度云对象存储BOS服务](https://cloud.baidu.com/product/bos.html)用于存放标定预处理后的数据。
-
-**注意:** 必须使用在Dreamland中提交用户账号信息的 Bos bucket，确认`Bos容器名`、`Bos服务区域`、`Bos访问秘钥`、`Bos访问私钥`正确。
-
-#### 2. 和Apollo开发套件商务联系开通云标定服务账号
-
-#### 3. 上传预处理后的数据至BOS
+#### 1. 上传预处理后的数据至BOS
 
 在上传数据之前，请注意以下几点：
 
 1）请将标定数据按照如下文件夹结构进行放置：
 
-![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure.png)
+![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure_1.png)
 
 2）`Origin Folder`确保是**BOS的根目录**，确保`task001`目录是在BOS根目录下创建的（根目录：登录BOS存储服务器后首先看到的目录即为根目录，一般是`Bucket name`目录）；
 
@@ -282,21 +266,23 @@
     BOS根目录 -> Task Folder ->Vehicle Folder -> Records + vehicle_param.pb.txt
 
 
-#### 4. 提交标定任务据至BOS
+#### 2. 提交标定任务
 
-打开Apollo云服务页面，如下图：
+首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`控制评测`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`（因为“task001”在BOS的根目录）。如下图所示：
 
-![vehicle_calibration_online_fuel1](images/vehicle_calibration_online_fuel1.png)
+![vehicle_calibration_submit_task1](images/vehicle_calibration_submit_task1.jpg)
 
-在New Job下拉框中选择Vehicle Calibration选项，根据实际情况填写Partner ID（请与商务联系）、Access Key（按BOS账号实际情况填写）、Secret Key（按BOS账号实际情况填写）、Input Data Path填写到根目录（在本例中填写为"task001"，因为“task001”在BOS的根目录），最后点击Submit Job按钮提交。
+![vehicle_calibration_submit_task2](images/vehicle_calibration_submit_task2.jpg)
 
-![vehicle_calibration_online_fuel2](images/vehicle_calibration_online_fuel2.png)
+![vehicle_calibration_submit_task3](images/vehicle_calibration_submit_task3.png)
 
-#### 5. 获取标定结果及标定表
+![vehicle_calibration_submit_task4](images/vehicle_calibration_submit_task4.png)
+
+#### 3. 获取标定结果及标定表
 
 - 云标定任务完成后，将在注册的邮箱（请与商务联系）中收到一封标定结果邮件。如果标定任务成功，将包含标定表及标定结果图片。
 
-#### 6. 将标定表写入控制配置文件中
+#### 4. 将标定表写入控制配置文件中
 
 - 生成的标定表以 `车型_calibration_table.pb.txt`命名，将标定表内的标定数据为calibration_table字段，把全部数据拷贝替换至`apollo/modules/calibration/data/dev_kit/control_conf.pb.txt`下对应的`lon_controller_conf`字段下面的`calibration_table`段内。
 
