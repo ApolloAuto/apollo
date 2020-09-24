@@ -106,7 +106,7 @@ and
 [Configure Docker to Start on Boot](https://docs.docker.com/engine/install/linux-postinstall/#configure-docker-to-start-on-boot).
 
 There is also a
-[dedicated bash script](https://github.com/ApolloAuto/apollo/blob/master/docker/setup_host/install_docker.sh)
+[dedicated bash script](../../docker/setup_host/install_docker.sh)
 Apollo provides to ease Docker installation, which works both for X86_64 and
 AArch64 platforms.
 

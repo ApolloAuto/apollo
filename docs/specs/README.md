@@ -33,7 +33,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [Perception Apollo 2.5](perception_apollo_2.5.md)
 - [Guideline Sensor Installation Apollo 2.5](Guideline_sensor_Installation_apollo_2.5.md)
 - [LiDAR Calibration.pdf](lidar_calibration.pdf)
-- [LiDAR - IMU Calibration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md)
+- [LiDAR - IMU Calibration Guide](../quickstart/multiple_lidar_gnss_calibration_guide.md)
 
 ### Chinese documents
 

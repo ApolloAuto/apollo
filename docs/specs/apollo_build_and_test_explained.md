@@ -141,7 +141,7 @@ There are three `USE_GPU`: `USE_GPU_HOST`, `USE_GPU_TARGET` and `USE_GPU`.
 
 When you type `bash apollo.sh build --config=cpu` or
 `apollo.sh build --config=gpu`, the
-[build script](https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_build.sh)
+[build script](../../scripts/apollo_build.sh)
 will check the GPU capability of the Docker container and determines whether the
 build you specified can succeed.
 
@@ -210,10 +210,10 @@ all the discussions about `apollo.sh test` applies to `apollo.sh coverage`.
 ## Build/Test/Coverage: An Insider's View
 
 Under the hood, `apollo.sh build/test/coverage` makes use of
-[scripts/apollo_build.sh](https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_build.sh),
-[scripts/apollo_test.sh](https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_test.sh),
+[scripts/apollo_build.sh](../../scripts/apollo_build.sh),
+[scripts/apollo_test.sh](../../scripts/apollo_test.sh),
 and
-[scripts/apollo_coverage.sh](https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_coverage.sh)
+[scripts/apollo_coverage.sh](../../scripts/apollo_coverage.sh)
 respectively.
 
 If you are familiar with Bazel, you can build/test any fine-grained target(s).
