@@ -3,11 +3,11 @@ Lidar是一种常用的环境感知传感器，利用脉冲激光来照射目标
 
 ## Velodyne驱动的主要部分
 
-1. [Driver](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/driver): 通过网络端口接收lidar硬件产生的UDP数据包，将每一帧封装成VelodyneScan格式后发送。
+1. [Driver](../../modules/drivers/velodyne/driver): 通过网络端口接收lidar硬件产生的UDP数据包，将每一帧封装成VelodyneScan格式后发送。
 
-2. [Parser](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/parser): 接收VelodyneScan数据，把VelodyneScan中的点由球面坐标系转换成空间直角坐标系下的pointcldoud点云格式后发送。
+2. [Parser](../../modules/drivers/velodyne/parser): 接收VelodyneScan数据，把VelodyneScan中的点由球面坐标系转换成空间直角坐标系下的pointcldoud点云格式后发送。
 
-3. [Compensator](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/compensator): 接收点云数据和pose数据，根据每个点的对应的pose信息把点转换到点云中最大时刻对应的坐标系下，减小由车辆自身的运动带来的误差。需要点云数据中包含每个点的时间戳信息。
+3. [Compensator](../../modules/drivers/velodyne/compensator): 接收点云数据和pose数据，根据每个点的对应的pose信息把点转换到点云中最大时刻对应的坐标系下，减小由车辆自身的运动带来的误差。需要点云数据中包含每个点的时间戳信息。
 
 
 

@@ -42,7 +42,7 @@
 ## 控制器调谐
 
 ### 实用工具
-类似于[诊断](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/diagnostics) 和 [realtime_plot](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/realtime_plot) 可用于控制器调优，并且可以在`apollo/modules/tools/`中找到.
+类似于[诊断](../../modules/tools/diagnostics) 和 [realtime_plot](../../modules/tools/realtime_plot) 可用于控制器调优，并且可以在`apollo/modules/tools/`中找到.
 ### 横向控制器的整定
 横向控制器设计用于最小调谐力。“所有”车辆的基础横向控制器调谐步骤如下：
 

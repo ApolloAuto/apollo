@@ -7,7 +7,7 @@ We introduce the detailed steps to build and run the offline visualizer in docke
 Before running the visualizer, we need to prepare necessary PCD and Pose data which can be extracted from a ROS bag with recorded point cloud data. To facilitate the data extraction, we provide a ROS launch file to dump the PCD frame file and a python script to generate the Pose file for each frame.
 
 #### 1.1 Launching the PCD exporter
- Additional details can be found in the [Velodyne driver doc](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne)
+ Additional details can be found in the [Velodyne driver doc](../../modules/drivers/velodyne)
 ```
 roslaunch velodyne export_pcd_offline.launch
 ```
