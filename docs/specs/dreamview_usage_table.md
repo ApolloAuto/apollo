@@ -62,7 +62,7 @@ If route editing is on, routing point(s) can be added visually on the map.
 
 If route editing is off, clicking a desired POI will send a routing request to the server. If the selected POI contains only a point, the start point of the routing request is the current position of the autonomous car; otherwise, the start position is the first point from the desired route.
 
-To edit POIs, see [default_end_way_point.txt](https://github.com/ApolloAuto/apollo/blob/master/modules/map/data/demo/default_end_way_point.txt) file under the directory of the Map. For example, if the map selected from the map selector is "Demo", then [default_end_way_point.txt](https://github.com/ApolloAuto/apollo/blob/master/modules/map/data/demo/default_end_way_point.txt) is located under `modules/map/data/demo`.
+To edit POIs, see [default_end_way_point.txt](../../modules/map/data/demo/default_end_way_point.txt) file under the directory of the Map. For example, if the map selected from the map selector is "Demo", then [default_end_way_point.txt](../../modules/map/data/demo/default_end_way_point.txt) is located under `modules/map/data/demo`.
 
 ### Main view:
 Main view animated 3D computer graphics in a web browser.
@@ -179,15 +179,15 @@ To view the monitor:
 The Planning/Control tab from the monitor plots various graphs to reflect the internal states of its modules.
 
 #### Customizable Graphs for Planning Module
-[planning_internal.proto](https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L180) is a protobuf that stores debugging information, which is processed by dreamview server and send to dreamview client to help engineers debug. For users who want to plot their own graphs for new planning algorithms:
+[planning_internal.proto](../../modules/planning/proto/planning_internal.proto#L180) is a protobuf that stores debugging information, which is processed by dreamview server and send to dreamview client to help engineers debug. For users who want to plot their own graphs for new planning algorithms:
 1. Fill in the information of your "chart" defined in planning_internal.proto.
-2. X/Y axis: [**chart.proto** ](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto) has "Options" that you could set for axis which include
+2. X/Y axis: [**chart.proto** ](../../modules/dreamview/proto/chart.proto) has "Options" that you could set for axis which include
     * min/max: minimum/maximum number for the scale
     * label_string: axis label
     * legend_display: to show or hide a chart legend.
         <img src="images/dreamview_usage_table/pncmonitor_options.png" width="600" height="300" />
 3. Dataset:
-    * Type: each graph can have multiple lines, polygons, and/or car markers defined in [**chart.proto**](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto):
+    * Type: each graph can have multiple lines, polygons, and/or car markers defined in [**chart.proto**](../../modules/dreamview/proto/chart.proto):
         * Line:
 
             <img src="images/dreamview_usage_table/pncmonitor_line.png" width="600" height="300" />
@@ -210,10 +210,10 @@ The Planning/Control tab from the monitor plots various graphs to reflect the in
         | showLine    | Whether to draw the line                | true                    |
 
     Refer to https://www.chartjs.org/docs/latest/charts/line.html for more properties.
-4. Sample: You could look into [on_lane_planning.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/on_lane_planning.cc#L562) for a code sample.
+4. Sample: You could look into [on_lane_planning.cc](../../modules/planning/on_lane_planning.cc#L562) for a code sample.
 
 #### Additional Planning Paths
-For users who want to render additional paths on dreamview 3D scene, add the desired paths to the "path" field in [planning_internal.proto](https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L164). These paths will be rendered when PnC Monitor is on:
+For users who want to render additional paths on dreamview 3D scene, add the desired paths to the "path" field in [planning_internal.proto](../../modules/planning/proto/planning_internal.proto#L164). These paths will be rendered when PnC Monitor is on:
 ![](images/dreamview_usage_table/pncmonitor_paths.png)
 
 Dreamview has predefined styles for the first four paths:
@@ -225,7 +225,7 @@ Dreamview has predefined styles for the first four paths:
 | opacity    | 0.65     | 1        | 0.7       | 0.8      |
 | zOffset    | 4        | 7        | 6         | 5        |
 
-If you have more than four paths to render or want to change the styles, edit the planning.pathProperties value in [dreamview/frtonend/dist/parameters.json](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/frontend/dist/parameters.json)
+If you have more than four paths to render or want to change the styles, edit the planning.pathProperties value in [dreamview/frtonend/dist/parameters.json](../../modules/dreamview/frontend/dist/parameters.json)
 .
 
 ### Latency graph
