@@ -210,9 +210,9 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 打开Apollo云服务页面，如下图：
 
-![camera_calibration_fuel](images/camera_calibration_fuel.png)
+![lidar_calibration_fuel](images/camera_calibration_fuel.jpg)
 
-在New Job下拉框中选择Sensor Calibration选项，根据实际情况填写Partner ID（请与商务联系）、Access Key（按BOS账号实际情况填写）、Secret Key（按BOS账号实际情况填写）、Input Data Path（在本例中为"sensor_calibration"）、Output Data Path（用户需要在BOS中指定一个目录，用于存储验证标定效果的图片文件）最后点击Submit Job按钮提交。
+点击`新建任务`，在下拉框中选择`感知标定`选项，根据实际情况填写输入数据路径(Input Data Path)、输出数据路径(Output Data Path),最后点击`提交任务`(Submit Job)按钮提交。
 
 #### 3. 获取标定结果验证及标定外参文件
 
