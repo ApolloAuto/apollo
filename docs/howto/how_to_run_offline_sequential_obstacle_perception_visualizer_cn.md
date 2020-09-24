@@ -1,10 +1,10 @@
 # 如何运行融合障碍可视化工具
 
-Apollo创建了LiDAR障碍物可视化工具，这是一种离线可视化工具，用于显示基于LiDAR的障碍物感知结果（请参看 [如何离线运行Perception Visulizer](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_offline_perception_visualizer_cn.md)）。但是，该工具缺乏基于雷达的障碍物感知结果和基于其两个传感器的融合结果的可视化能力。
+Apollo创建了LiDAR障碍物可视化工具，这是一种离线可视化工具，用于显示基于LiDAR的障碍物感知结果（请参看 [如何离线运行Perception Visulizer](how_to_run_offline_perception_visualizer_cn.md)）。但是，该工具缺乏基于雷达的障碍物感知结果和基于其两个传感器的融合结果的可视化能力。
 
 Apollo开发了第二个可视化工具，即融合障碍可视化工具，以补充LiDAR障碍物可视化工具。融合障碍可视化工具显示了这些模块的障碍感知结果：
 
--  基于LiDAR的算法模块 
+-  基于LiDAR的算法模块
 -  基于雷达的算法模块
 -  融合算法模块，用于调试和测试完整的障碍物感知算法
 
@@ -52,9 +52,9 @@ bazel build //modules/perception/tool/export_sensor_data:export_sensor_data
 /apollo/bazel-bin/modules/perception/tool/export_sensor_data/export_sensor_data
 ```
 
-3. 运行ROS bag.   
+3. 运行ROS bag.
 
-​       ROS bag的默认目录是`/apollo/data/bag`。 
+​       ROS bag的默认目录是`/apollo/data/bag`。
 ​       下面的例子展示了文件名为`example.bag`的ROS bag.
 
 ​      使用下面的命令：
@@ -113,10 +113,10 @@ visualization-enabling布尔标志为`true`，默认情况下，要显示的障�
 
 您可以看到如下的结果：
 
-- 一个弹出窗口，逐帧显示点云的感知结果 
+- 一个弹出窗口，逐帧显示点云的感知结果
 - 原点云以灰色显示
 - 已检测到的边界框（带有指示标题的红色箭头）：
   -  车辆 (绿色)
   -  行人 (粉色)
   -  自行车 (蓝色)
-  -  无法识别的元素 (紫色) 
+  -  无法识别的元素 (紫色)

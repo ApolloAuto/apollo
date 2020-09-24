@@ -54,8 +54,8 @@ py_test(
 ```
 
 Above is a BUILD file template, you can also use the
-[BUILD](https://github.com/ApolloAuto/apollo/blob/master/cyber/python/BUILD) and
-[BUILD](https://github.com/ApolloAuto/apollo/blob/master/cyber/python/examples/BUILD)
+[BUILD](../../cyber/python/BUILD) and
+[BUILD](../../cyber/python/cyber_py3/examples/BUILD)
 file as examples.
 
 ## Build, Test and Run commands

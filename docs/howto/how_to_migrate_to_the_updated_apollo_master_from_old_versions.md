@@ -3,11 +3,11 @@
 ## Introduction
 
 Due to a fatal bug with Git LFS that has caused restricted access to Apollo repos, we have decided to retire the service from all Apollo repos. On May 14th 2:07 PM Pacific Time, the Apollo Team has completed the migration. We are sorry for any inconveniences this may cause you.
-``` 
+```
 Note:
 If this is the first time you are cloning/building Apollo, you do not need to follow this guide. This guide is for people who had installed Git LFS previously with Apollo.
 ```
-If this is your first time installing Apollo, please return to the [README](https://github.com/ApolloAuto/apollo/blob/master/README.md) page.
+If this is your first time installing Apollo, please return to the [README](../../README.md) page.
 
 ## Why did we retire Git LFS
 
@@ -31,7 +31,7 @@ git pull --rebase upstream master #where “upstream” is your defined alias of
 ```
 
 3. Hard reset your forked repo:
-``` 
+```
 git push -f original master
 ```
 
@@ -47,10 +47,10 @@ please cherry-pick those changes to the new repo and submit your commits.
 
 ```
 Note:
-If your repo did not sync with ours, you will still be using the Git LFS service. However, once the service is disabled, there is a high likelihood that your access to Apollo repos will be blocked/denied. To avoid such an incident, please follow the steps listed above that best 
+If your repo did not sync with ours, you will still be using the Git LFS service. However, once the service is disabled, there is a high likelihood that your access to Apollo repos will be blocked/denied. To avoid such an incident, please follow the steps listed above that best
 fit your situation.
 ```
 
-## Troubleshooting steps 
+## Troubleshooting steps
 
-If you are still experiencing issues, you can always re-fork the repo. Let us know if you need any assistance on this process by creating an issue. 
+If you are still experiencing issues, you can always re-fork the repo. Let us know if you need any assistance on this process by creating an issue.
