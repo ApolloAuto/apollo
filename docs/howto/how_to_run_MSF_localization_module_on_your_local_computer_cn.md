@@ -4,7 +4,7 @@
 
 ## 1. 事先准备
  - 从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码
- - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README.md)设置Docker环境
+ - 按照[教程](../quickstart/apollo_software_installation_guide.md)设置Docker环境
  - 从[Apollo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载多传感器融合定位demo数据包（仅限美国地区），使用其中*apollo3.5*文件夹下的数据。
 
 此定位数据为实验性质的demo数据，用于验证定位模块的可用性。数据主要包含定位地图(local_map/), 车辆参数(params/), 传感器数据(records/)。具体属性如下：

@@ -2,12 +2,12 @@
 
 ## 1. Preparation
  - Download source code of Apollo from [GitHub](https://github.com/ApolloAuto/apollo)
- - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md).
+ - Follow the tutorial to set up [docker environment](../quickstart/apollo_software_installation_guide.md).
  - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only).
 
 ## 2. Build Apollo
 
-First check and make sure you are in development docker container before you proceed. Now you will need to build from the source. 
+First check and make sure you are in development docker container before you proceed. Now you will need to build from the source.
 ```
 # To make sure you start clean
 bash apollo.sh clean
@@ -27,7 +27,7 @@ bash apollo.sh build_opt --local_resources 2048,1.0,1.0
 cyber_launch start /apollo/modules/localization/launch/rtk_localization.launch
 ```
 
-In /apollo/data/log directory, you can see the localization log files.     
+In /apollo/data/log directory, you can see the localization log files.
  - localization.INFO : INFO log
  - localization.WARNING : WARNING log
  - localization.ERROR : ERROR log

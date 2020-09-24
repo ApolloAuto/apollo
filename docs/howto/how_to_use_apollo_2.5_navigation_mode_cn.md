@@ -3,7 +3,7 @@
 
 `Apollo`项目以其优异的系统架构、完整的模块功能、良好的开源生态及规范的代码风格，受到众多开发者的喜爱和好评。不过在`Apollo`之前的版本中，感知、预测、导航、规划模块均依赖于高精地图，而高精地图的制作方法繁琐且不透明，对于很多开发者而言，这是一个难以逾越的障碍。因为没有高精地图，很多人只能使用`Apollo`提供的模拟数据包进行走马观花式的观赏，而无法在测试道路上完成真枪实弹式的实车调试，这极大降低了`Apollo`项目带来的便利，也不利于自动驾驶开源社区的发展和壮大。显然，`Apollo`项目组已注意到该问题，经过他们几个月的艰苦努力，终于在2.5版开发了一种新的基于相对地图(`relative map`)的导航模式(`navigation mode`)，利用该模式可顺利实施测试道路上的实车调试。
 
-相对地图是Apollo2.5引入的新特性。从架构层面，相对地图模块是连接高精地图(`HD Map`)、感知(`Perception`)模块和规划(`Planning`)模块的中间层。相对地图模块会实时生成基于车身坐标系的地图（格式与高精地图一致），并且输出供规划模块使用的参考线。更多信息，可以参考[相对地图的说明文档](https://github.com/ApolloAuto/apollo/blob/master/modules/map/relative_map/README.md)。从开发者友好性角度看，基于相对地图的导航模式，让开发者可以不依赖高精地图便可实施测试道路的实车调试，极大降低了开发者的使用门槛。
+相对地图是Apollo2.5引入的新特性。从架构层面，相对地图模块是连接高精地图(`HD Map`)、感知(`Perception`)模块和规划(`Planning`)模块的中间层。相对地图模块会实时生成基于车身坐标系的地图（格式与高精地图一致），并且输出供规划模块使用的参考线。更多信息，可以参考[相对地图的说明文档](../../modules/map/relative_map/README.md)。从开发者友好性角度看，基于相对地图的导航模式，让开发者可以不依赖高精地图便可实施测试道路的实车调试，极大降低了开发者的使用门槛。
 
 导航模式的基本思路是：
 
@@ -17,19 +17,19 @@
 
 ## 一、Apollo 2.5版的构建
 
-首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载`Apollo2.5`版源代码，可以使用`git`命令下载，也可以直接通过网页下载压缩包。源代码下载完成并放置到合适的目录后，可以使用两种方法构建：1.在`Visual Studio Code`中构建（推荐）；2.使用命令行构建。当然，两种方法都有一个前提，就是在你的机器上已经顺利安装了`Docker`。你可以使用`Apollo`提供的脚本文件[`install_docker.sh`](https://github.com/ApolloAuto/apollo/blob/master/docker/scripts/install_docker.sh)安装`Docker`。
+首先从[GitHub网站](https://github.com/ApolloAuto/apollo)下载`Apollo2.5`版源代码，可以使用`git`命令下载，也可以直接通过网页下载压缩包。源代码下载完成并放置到合适的目录后，可以使用两种方法构建：1.在`Visual Studio Code`中构建（推荐）；2.使用命令行构建。当然，两种方法都有一个前提，就是在你的机器上已经顺利安装了`Docker`。你可以使用`Apollo`提供的脚本文件[`install_docker.sh`](../../docker/scripts/install_docker.sh)安装`Docker`。
 
 ### 1.1 在Visual Studio Code中构建
 
 打开`Visual Studio Code`，执行菜单命令`文件->打开文件夹`，在弹出的对话框中，选择`Apollo项目`源文件夹，点击“确定”，如下图所示：
 
-![img](images/navigation_mode/open_directory.png) 
+![img](images/navigation_mode/open_directory.png)
 
-![img](images/navigation_mode/choose_apollo_directory.png) 
+![img](images/navigation_mode/choose_apollo_directory.png)
 
 之后，执行菜单命令`任务->运行生成任务`或直接按快捷键`Ctrl+Shift+B`（与`Visual Studio`和`QT`的快捷键一致）构建工程，若之前没有启动过`Docker`，则编译时会启动`Docker`，需在底部终端窗口输入超级用户密码。命令执行完毕，若在底部终端窗口出现`终端将被任务重用，按任意键关闭。`信息（如下图所示），则表示构建成功。整个过程**一定要保持网络畅通**，否则无法下载依赖包。构建过程可能会遇到一些问题，解决方法可参见我写的一篇[博客](https://blog.csdn.net/davidhopper/article/details/79349927) ，也可直接查看`GitHub`网站的[帮助文档](https://github.com/ApolloAuto/apollo/blob/r5.5.0/docs/howto/how_to_build_and_debug_apollo_in_vscode_cn.md)。
 
-![img](images/navigation_mode/build_successfully.png) 
+![img](images/navigation_mode/build_successfully.png)
 
 ### 1.2 在命令行中构建
 
@@ -78,13 +78,13 @@ bash scripts/bootstrap.sh
 ```
 在浏览器中打开网页[http://localhost:8888](http://localhost:8888)（注意不要使用代理），进入`Dreamview`界面，如下图所示：
 
-![img](images/navigation_mode/dreamview_interface.png) 
+![img](images/navigation_mode/dreamview_interface.png)
 
 **1**  驾驶员将车辆驶入待测试路段起点；
 
 **2**  操作员点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面，选中`GPS`、`Localization`、`Record Bag`选项，**注意：如果采集的数据包需用于线下模拟测试，还需加上`CAN Bus`选项。**
 
-![img](images/navigation_mode/options_for_data_recording.png) 
+![img](images/navigation_mode/options_for_data_recording.png)
 
 **3**  驾驶员从起点启动车辆并按预定路线行驶至终点；
 
@@ -111,7 +111,7 @@ python viewer_raw.py ./path_2018-04-01-09-58-00.bag.txt
 ```
 会显示类似下图的路径图：
 
-![img](images/navigation_mode/view_raw_data.png) 
+![img](images/navigation_mode/view_raw_data.png)
 
 ### 3.2 对裸数据进行平滑处理
 
@@ -127,7 +127,7 @@ python viewer_smooth.py ./path_2018-04-01-09-58-00.bag.txt ./path_2018-04-01-09-
 ```
 其中，第一个参数`./path_2018-04-01-09-58-00.bag.txt`是裸数据，第二个参数`./path_2018-04-01-09-58-00.bag.txt.smoothed`是平滑结果，显示效果类似下图：
 
-![img](images/navigation_mode/view_smoothing_results.png) 
+![img](images/navigation_mode/view_smoothing_results.png)
 
 ## 四、Dreamview前端的编译
 
@@ -135,7 +135,7 @@ python viewer_smooth.py ./path_2018-04-01-09-58-00.bag.txt ./path_2018-04-01-09-
 
 ### 4.1 更改导航地图
 
-打开文件`[apollo项目根目录]/modules/dreamview/frontend/src/store/config/ parameters.yml`，根据需要将下述内容替换为`Google`地图或`Baidu`地图： 
+打开文件`[apollo项目根目录]/modules/dreamview/frontend/src/store/config/ parameters.yml`，根据需要将下述内容替换为`Google`地图或`Baidu`地图：
 ``` bash
 navigation:
   # possible options: BaiduMap or GoogleMap
@@ -192,19 +192,19 @@ bash scripts/bootstrap.sh
 # 模拟测试情形下，循环播放录制数据；实车调试情形忽略该步骤
 rosbag play -l /apollo/data/bag/2018-04-01-09-58-00.bag
 ```
-在浏览器中打开网页[http://localhost:8888](http://localhost:8888)（注意不要使用代理），进入`Dreamview`界面，点击右上方下拉框，将模式设置为`Navigation`（导航模式），如下图所示： 
+在浏览器中打开网页[http://localhost:8888](http://localhost:8888)（注意不要使用代理），进入`Dreamview`界面，点击右上方下拉框，将模式设置为`Navigation`（导航模式），如下图所示：
 
-![img](images/navigation_mode/enable_navigation_mode.png) 
+![img](images/navigation_mode/enable_navigation_mode.png)
 
 ### 5.2 启用导航模式下的相关功能模块
 
 点击`Dreamview`界面左侧工具栏中的`Module Controller`按钮，进入模块控制页面。**若是线下模拟测试**，选中`Relative Map`、`Navi Planning`选项，其他模块根据需要开启，如下图所示（图中显示空白文本的模块是`Mobileye`模块，需安装配置好相关硬件后才可见））：
 
-![img](images/navigation_mode/test_in_navigation_mode.png) 
+![img](images/navigation_mode/test_in_navigation_mode.png)
 
 **若是实车调试**，建议除`Record Bag`、`Mobileye`（若`Mobileye`硬件未安装，则会显示为空白文本）和`Third Party Perception`模块外，其余模块全部开启，如下图所示：
 
-![img](images/navigation_mode/drive_car_in_navigation_mode.png) 
+![img](images/navigation_mode/drive_car_in_navigation_mode.png)
 
 ### 5.3 发送参考线数据
 
@@ -215,11 +215,11 @@ python navigator.py ./path_2018-04-01-09-58-00.bag.txt.smoothed
 ```
 下图是**线下模拟测试情形下**`Dreamview`接收到参考线后的界面，注意界面左上角已出现了百度地图界面，我们发送的参考线在百度地图中以红线方式、在主界面中以白色车道线的方式展现。
 
-![img](images/navigation_mode/navigation_mode_with_reference_line_test.png) 
+![img](images/navigation_mode/navigation_mode_with_reference_line_test.png)
 
 下图是**实车调试情形下的**`Dreamview`接收到参考线后的界面，注意界面左上角已出现了百度地图界面，我们发送的参考线在百度地图中以红线方式、在主界面中以黄色车道线的方式展现。
 
-![img](images/navigation_mode/navigation_mode_with_reference_line_car.png) 
+![img](images/navigation_mode/navigation_mode_with_reference_line_car.png)
 
 需注意以下几点：
 
@@ -228,6 +228,6 @@ python navigator.py ./path_2018-04-01-09-58-00.bag.txt.smoothed
 # 停止Dreamview后台服务
 bash scripts/bootstrap.sh stop
 # 重新启动Dreamview后台服务
-bash scripts/bootstrap.sh 
+bash scripts/bootstrap.sh
 ```
 (2) 每次车辆重新回到起点后，无论是线下模拟测试还是实车调试情形，**均需再次发送参考线数据**。

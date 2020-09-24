@@ -4,13 +4,13 @@
 
 Simulation plays a central role in Apollo’s internal development cycle. Dreamland empowers developers and start-ups to run millions of miles of simulation daily, which dramatically accelerates the development cycle.
 
-So far Apollo simulation allowed external users to access over 200 sample scenarios which includes a diverse range of LogSim scenarios based on real world driving data and WorldSim scenarios that have been manually created by our simulation team. To learn more about Dreamland, refer to [our Dreamland Introduction Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Dreamland_introduction.md)
+So far Apollo simulation allowed external users to access over 200 sample scenarios which includes a diverse range of LogSim scenarios based on real world driving data and WorldSim scenarios that have been manually created by our simulation team. To learn more about Dreamland, refer to [our Dreamland Introduction Guide](../specs/Dreamland_introduction.md)
 
 Several developers wrote in requesting that our Dreamland platform should support Scenario Creation and Editing which the Apollo team now proudly presents in Apollo 5.0!
 
 ## Setting up Scenario Editor
 
-1. Login to your Dreamland account. For additional details on How to create an account, please refer to [our Dreamland Introduction Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Dreamland_introduction.md) 
+1. Login to your Dreamland account. For additional details on How to create an account, please refer to [our Dreamland Introduction Guide](../specs/Dreamland_introduction.md)
 
 2. Once inside the platform, the Scenario Editor can be accessed under `Scenario Management` or using the [following link](https://azure.apollo.auto/scenario-management/scenario-editor)
 
@@ -18,11 +18,11 @@ Several developers wrote in requesting that our Dreamland platform should suppor
 
 3. Once inside, you will have to complete the form on the screen as seen in the image below. As this app is in Beta testing, it is not open to all our developers.
 
-    ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/form.png)
+    ![](../../docs/specs/images/form.png)
 
 4. You should receive the following activation confirmation via email within 3 business days:
 
- ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/email.png)
+ ![](../../docs/specs/images/email.png)
 
 ## Using Scenario Editor
 
@@ -42,7 +42,7 @@ Let's understand each tool along with its purpose
 
 ### General Action Tools
 
-The 4 General action tools can be found on the bottom right corner of the map. 
+The 4 General action tools can be found on the bottom right corner of the map.
 
 1. **Zoom tool**: while you can use your trackpad to zoom in and out of the map, there exists the Zoom tool to help you zoom in and out of the map in case you do not have a trackpad ready.
 
@@ -56,10 +56,10 @@ The 4 General action tools can be found on the bottom right corner of the map.
 
     ![](images/se_ruler.png)  ![](images/se_distance.png)
 
-4. **Add Route tool**: this tool can be used both for the ego-car as well as the obstacles you set in its path. For the ego-car you can only set its destination, but for obstacles, you can set multiple points that define their driving behavior. 
+4. **Add Route tool**: this tool can be used both for the ego-car as well as the obstacles you set in its path. For the ego-car you can only set its destination, but for obstacles, you can set multiple points that define their driving behavior.
 
     ![](images/se_addroute.png)
- 
+
 ### Configuration Tools
 
 There are 4 types of configurations that you will need to set up in order to create a scenario, three of which are listed on the left-side of the map - General, Ego-car and Participants (Obstacles) and the last one is Traffic Light
@@ -83,8 +83,8 @@ The Ego car's heading can also be set by dragging the arrow linked to the ego ca
 ![](images/heading.png)
 
 ```
-Note: 
-You can set the ego car’s end point by clicking on the “Add Route Point” icon in the lower right corner of the map. Described in the General Action tools section. 
+Note:
+You can set the ego car’s end point by clicking on the “Add Route Point” icon in the lower right corner of the map. Described in the General Action tools section.
 ```
 
 Once you have placed the Ego car's end point on the map, The end point coordinates will then appear on the right-hand attribute's window. You can drag the end point flag to change the ego car’s end point location. The “End point” coordinates will be automatically updated accordingly.
@@ -95,23 +95,23 @@ Finally, you can always come back and edit the existing attributes of the ego ca
 
 #### Participants' Configuration
 
-If you select `Participant` from the configuration menu, you can place your participant in your scenario by clicking on a desired location on the map. You will notice that your mouse pointer will turn into a cross until you place the new participant on your map. Once you place it, a form will appear on the right-hand attributes window as it did with `Ego Car`. Before you edit the fields on the form, you can change the position of the participant by clicking and dragging it. You can also modify its heading by clicking on the arrow head. Once you have finalized the heading and position of your participant, you can start working on specific details mentioned in the form - type, length, speed and motion type. 
+If you select `Participant` from the configuration menu, you can place your participant in your scenario by clicking on a desired location on the map. You will notice that your mouse pointer will turn into a cross until you place the new participant on your map. Once you place it, a form will appear on the right-hand attributes window as it did with `Ego Car`. Before you edit the fields on the form, you can change the position of the participant by clicking and dragging it. You can also modify its heading by clicking on the arrow head. Once you have finalized the heading and position of your participant, you can start working on specific details mentioned in the form - type, length, speed and motion type.
 
 ![](images/obstacle.png)
 
-In the Basic Information section, you will notice an auto-generated ID along with a description textbox. You could give your participant a suitable ID as well as a description about its expected behavior. You could also specify what is your participant's type, which will be set to `Car` by default. Upon selecting a different type, the participant on your screen will change accordingly. You will also need to determine its initial speed and other attributes including width, length and height. There are predetermined values for each vehicle type, which can be changed. 
+In the Basic Information section, you will notice an auto-generated ID along with a description textbox. You could give your participant a suitable ID as well as a description about its expected behavior. You could also specify what is your participant's type, which will be set to `Car` by default. Upon selecting a different type, the participant on your screen will change accordingly. You will also need to determine its initial speed and other attributes including width, length and height. There are predetermined values for each vehicle type, which can be changed.
 
 In the Initial State section, you will need to set the speed of the participant which can be either set in `m/s` or `km/hr`. The coordinates and heading of the participant are preset and can be changed by directly editing the participant's position on the map.
 
-In Runtime Configuration, you can set whether the participant is mobile or static. Should you select static, you have finished setting up your participant and are ready to save. 
+In Runtime Configuration, you can set whether the participant is mobile or static. Should you select static, you have finished setting up your participant and are ready to save.
 
-If you select mobile instead, you would need to set its `Trigger Type`. Once you have completed your mobile participant setup, click on the `add route point` button to set the participant's trajectory points as seen in the image below. 
+If you select mobile instead, you would need to set its `Trigger Type`. Once you have completed your mobile participant setup, click on the `add route point` button to set the participant's trajectory points as seen in the image below.
 
 ![](images/se_addroute.png)
 
 You can set a single destination, or add several points in between. You will also be able to add speed and change the speed of your participant on the form from one point to the next. Also, you can edit the location of the point on the screen by clicking on and dragging it to its desired locaiton.
 
-Finally, if you have added several trajectory points and do not know how to go back to your participant, you can use the `Re-center tool` (which is similar to the General Action re-center tool), but this re-center tool only works for your participants. 
+Finally, if you have added several trajectory points and do not know how to go back to your participant, you can use the `Re-center tool` (which is similar to the General Action re-center tool), but this re-center tool only works for your participants.
 
 ![](images/center2.png)
 
@@ -149,6 +149,6 @@ The minimum requirements of saving a scenario are to configure all required attr
 
 ![](images/select_scenario.png)
 
-3. You can then search for your newly created scenario. An easy way to filter your private scenarios is to perform an instance search for your username in the `Search scenarios` field. 
+3. You can then search for your newly created scenario. An easy way to filter your private scenarios is to perform an instance search for your username in the `Search scenarios` field.
 
 ![](images/instance.png)
