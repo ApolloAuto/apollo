@@ -20,10 +20,6 @@
 #include "torch/script.h"
 #include "torch/torch.h"
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-
 namespace apollo {
 namespace perception {
 namespace inference {
