@@ -34,7 +34,8 @@ class LibtorchObstacleDetection {
 
   ~LibtorchObstacleDetection() = default;
 
-  bool Evaluate(const std::vector<std::vector<std::vector<double>>>& imageFrame);
+  bool Evaluate(
+    const std::vector<std::vector<std::vector<double>>>& imageFrame);
 
  private:
   void LoadModel();
