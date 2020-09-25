@@ -32,8 +32,7 @@ class LibtorchObstacleDetectionTest : public ::testing::Test {
 };
 
 TEST_F(LibtorchObstacleDetectionTest, is_) {
-  std::vector<std::vector<double>> imageFrame(4,
-    (std::vector<double> (2073600, 0.01)));
+  std::vector<std::vector<std::vector<double>>>imageFrame(3, std::vector<std::vector<double>>(608, std::vector<double>(608, 0.01)));
   bool result = obstacle_detection_.Evaluate(imageFrame);
   EXPECT_EQ(result, false);
 }
