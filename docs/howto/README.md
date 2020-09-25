@@ -15,11 +15,9 @@
 - [How to migrate to the updated apollo master from previous versions.md](how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
 
 ## Debugging and troubleshooting
-- [How to debug dreamview start problem](how_to_debug_dreamview_start_problem.md)
 - [How to troubleshoot your ESD CAN device](how_to_troubleshoot_esdcan.md)
 
 ### Chinese versions
-- [How to debug dreamview start problem](how_to_debug_dreamview_start_problem_cn.md)
 - [How to troubleshoot your ESD CAN device](how_to_troubleshoot_esdcan_cn.md)
 
 ## Extended modules
@@ -81,4 +79,4 @@
 
 ### Chinese versions
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images_cn.md)
-- [How to solve slow pull from cn](how_to_solve_slow_pull_from_cn.md)
+- [How to solve slow pull from CN](how_to_solve_slow_pull_from_cn.md)
