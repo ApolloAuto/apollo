@@ -17,6 +17,10 @@ if [ -e "/apollo/cyber/setup.bash" ]; then
     . /apollo/cyber/setup.bash
 fi
 
+if [ -e "/apollo/scripts/apollo_auto_complete.bash" ]; then
+    . /apollo/scripts/apollo_auto_complete.bash
+fi
+
 if [ -f /etc/bash_completion.d/bazel ]; then
     . /etc/bash_completion.d/bazel
 fi
