@@ -9,30 +9,6 @@ successfully able to use them.
 
 ---
 
-## I’m having difficulty connecting to localhost:8888 (Dreamview).
-
-The Dreamview web server is provided by the dreamview node(A node is an
-executable in ROS concept). Before accessing the Dreamview page, you need to
-build the system(including dreamview node) within the docker container following
-the
-[Software Installation Guide](../quickstart/apollo_software_installation_guide.md).
-Once built, dreamview node will be started after the step
-`bash scripts/bootstrap.sh`.
-
-So if you can not access Dreamview, please check:
-
-- Make sure you have dreamview process running correctly. In the latest version,
-  `bash scripts/bootstrap.sh` will report `dreamview: ERROR (spawn error)` if
-  dreamview fails to start. For early version, please check with command:
-  `supervisorctl status dreamview` or `ps aux | grep dreamview`. If dreamview is
-  not running, please refer to
-  [How to Debug a Dreamview Start Problem](../howto/how_to_debug_dreamview_start_problem.md).
-- Make sure the address and port are not blocked by the firewall.
-- Make sure you're using <apollo_host_ip>:8888 instead of localhost:8888 if you
-  are not accessing the Dreamview page through the host machine.
-
----
-
 ## How can I perform step-by-step debugging?
 
 The majority of bugs can be found through logging (using AERROR, AINFO, ADEBUG).
@@ -61,15 +37,14 @@ the BUILD files properly and apollo.sh will build your module automatically
 ## Build error "docker: Error response from daemon: failed to copy files: userspace copy failed":
 
 An error message like this means that your system does not have enough space to
-build Apollo and the build process will fail. To resolve this issue, run the
-following to free up some space:
+build Apollo. To resolve this issue, run the
+following command to free up some space on your host:
 
 ```
 docker/setup_host/cleanup_resources.sh
 ```
 
-If it does not work, delete the Apollo repo, free up some space and then try
-again.
+Run `bash apollo.sh clean -a` inside Docker to free more.
 
 ---
 

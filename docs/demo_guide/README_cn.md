@@ -43,7 +43,7 @@ cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
 
 选项 `--loop` 用于设置循环回放模式.
 
-## 在浏览器中输入**localhost:8888**访问 Apollo Dreamview
+## 在浏览器中输入<http://localhost:8888>访问 Apollo Dreamview
 
 如下图所示： ![](images/dv_trajectory.png) 如果一切正常，现在您应该能看到一辆汽
 车在模拟器里移动。
