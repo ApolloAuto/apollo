@@ -16,13 +16,6 @@ If step-by-step debugging is needed, we recommend using gdb.
 
 ---
 
-## How do I run the Offline Perception Visualizer?
-
-Refer to the How-To guide located
-[here](../howto/how_to_run_offline_perception_visualizer.md).
-
----
-
 ## How do I add a new module
 
 Apollo currently functions as a single system, therefore before adding a module

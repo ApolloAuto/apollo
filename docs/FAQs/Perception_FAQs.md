@@ -25,13 +25,6 @@ Camera
 
 ---
 
-## How do I run the Offline Perception Visualizer?
-
-Refer to the How-To guide located
-[here](../howto/how_to_run_offline_perception_visualizer.md).
-
----
-
 ## Are you going to release the source code for the calibration tools ?
 
 No, we currently have not released the source code for our calibration tools.
