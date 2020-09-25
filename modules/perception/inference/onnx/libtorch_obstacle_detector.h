@@ -20,6 +20,10 @@
 #include "torch/script.h"
 #include "torch/torch.h"
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 namespace apollo {
 namespace perception {
 namespace inference {
@@ -30,7 +34,7 @@ class LibtorchObstacleDetection {
 
   ~LibtorchObstacleDetection() = default;
 
-  bool Evaluate(const std::vector<std::vector<double>>& imageFrame);
+  bool Evaluate(const std::vector<std::vector<std::vector<double>>>& imageFrame);
 
  private:
   void LoadModel();
