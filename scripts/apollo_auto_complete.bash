@@ -3,9 +3,8 @@
 COMMANDS="config build build_dbg build_opt build_cpu build_gpu build_opt_gpu test coverage lint \
           buildify check build_fe build_teleop build_prof doc clean format usage -h --help"
 
-MODULES="cyber audio bridge canbus common contrib control data dreamview drivers guardian \
-         localization map monitor perception planning prediction routing storytelling teleop \
-         third_party_perception tools transform v2x"
+MODULES="$(find /apollo/modules/* -maxdepth 0 -type d -printf "%f ")"
+MODULES="cyber ${MODULES}"
 
 function _complete_apollo_func() {
   COMPREPLY=()
