@@ -168,10 +168,15 @@ TAG=""
 function determine_tag() {
     local docker_fn="$(basename ${DOCKERFILE})"
     local myid="${docker_fn%%.*}"
-    if [ "${myid}" = "tegra_cyber" ]; then
+    if [[ "${myid}" == "tegra_cyber" ]]; then
         local cuda_ver="10.2"
         local cudnn_ver="8"
         TAG="${REPO}:L4T-${cuda_ver}-cudnn${cudnn_ver}-${UBT_LTS}-${TIME}"
+    elif [[ "${myid}" == "pre_cyber" ]]; then
+        local cuda_ver="10.2"
+        local cudnn_ver="7"
+        local trt_ver="7"
+        TAG="${REPO}:cuda${cuda_ver}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBT_LTS}-${TARGET_ARCH}"
     else
         TAG="${REPO}:cyber-${TARGET_ARCH}-${UBT_LTS}-${TIME}"
     fi
