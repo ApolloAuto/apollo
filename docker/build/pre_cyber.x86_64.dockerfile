@@ -13,9 +13,6 @@ RUN apt-get -y update \
     libnvonnxparsers-dev="${TENSORRT_VERSION}" \
     libnvparsers-dev="${TENSORRT_VERSION}" \
     libnvinfer-plugin-dev="${TENSORRT_VERSION}" \
-    && find /usr/lib/x86_64-linux-gnu/ -type f \
-        \( -name "libnv*_static.a" -or -name "libmyelin_*_static.a" \) \
-        -delete -print  \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /etc/apt/sources.list.d/nvidia-ml.list \
