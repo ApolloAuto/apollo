@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <string>
+
 #include "Eigen/Dense"
 
 namespace apollo {
@@ -28,7 +31,7 @@ class SecureMat {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  SecureMat() : height_(0), width_(0) { Reserve(max_height_, max_width_); }
+  SecureMat() { Reserve(max_height_, max_width_); }
 
   size_t height() { return height_; }
   size_t width() { return width_; }
@@ -36,10 +39,10 @@ class SecureMat {
   /* @brief: reserve memory of SecureMat
    * @params[IN] reserve_height: height of reserve memory
    * @params[IN] reserve_width: width of reserve memory
-   * @return nothing */
+   */
   void Reserve(const size_t reserve_height, const size_t reserve_width) {
-    max_height_ = (reserve_height > max_height_) ? reserve_height : max_height_;
-    max_width_ = (reserve_width > max_width_) ? reserve_width : max_width_;
+    max_height_ = std::max(reserve_height, max_height_);
+    max_width_ = std::max(reserve_width, max_width_);
     mat_.resize(max_height_, max_width_);
   }
 
@@ -53,19 +56,20 @@ class SecureMat {
     if (resize_height <= max_height_ && resize_width <= max_width_) {
       return;
     }
-    max_height_ = (resize_height > max_height_) ? resize_height : max_height_;
-    max_width_ = (resize_width > max_width_) ? resize_width : max_width_;
+    max_height_ = std::max(resize_height, max_height_);
+    max_width_ = std::max(resize_width, max_width_);
     mat_.resize(max_height_, max_width_);
   }
 
-  void ToString(std::ostream* out_stream) {
-    std::ostream& stream = *out_stream;
+  std::string ToString() const {
+    std::ostringstream oss;
     for (size_t row = 0; row < height_; ++row) {
       for (size_t col = 0; col < width_; ++col) {
-        stream << mat_(row, col) << "\t";
+        oss << mat_(row, col) << "\t";
       }
-      stream << "\n";
+      oss << "\n";
     }
+    return oss.str();
   }
 
   inline const T& operator()(const size_t row, const size_t col) const {
