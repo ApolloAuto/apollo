@@ -18,85 +18,108 @@
 
 # Note(storypku):
 # nvidia-ml-for-jetson installer is expected to run without installer_base.sh
-# Please start local http cache server at port 8388 before run.
-## Package Listing:
-# cuda-repo-l4t-10-2-local-10.2.89_1.0-1_arm64.deb
-# libcudnn8_8.0.0.145-1+cuda10.2_arm64.deb
-# libcudnn8-dev_8.0.0.145-1+cuda10.2_arm64.deb
 
 # Fail on first error.
 set -e
+
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
+# PKG_DOWNLOAD_ADDR="http://172.17.0.1:8388"
+PKG_DOWNLOAD_ADDR="https://apollo-platform-system.cdn.bcebos.com/archive/6.0"
 
 apt-get -y update && \
     apt-get -y install --no-install-recommends \
     gnupg2 \
     ca-certificates
 
-##===== Install CUDA 10.2 =====##
-VERSION_1="10-2"
-VERSION_2="10.2.89"
+##============== Install CUDA ===============##
 
-CUDA_REPO_NAME="cuda-repo-l4t-10-2-local-10.2.89_1.0-1_arm64.deb"
+CUDA_VER_APT="10-2"
+CUDA_VERSION="10.2.89"
 
-wget -O "${CUDA_REPO_NAME}" "${LOCAL_HTTP_ADDR}/${CUDA_REPO_NAME}" >/dev/null
-dpkg -i "${CUDA_REPO_NAME}" && rm -rf "${CUDA_REPO_NAME}"
-apt-key add "/var/cuda-repo-${VERSION_1}-local-${VERSION_2}/7fa2af80.pub"
+CUDA_REPO="cuda-repo-l4t-10-2-local-10.2.89_1.0-1_arm64.deb"
+
+wget -O "${CUDA_REPO}" "${PKG_DOWNLOAD_ADDR}/${CUDA_REPO}" >/dev/null \
+	&& dpkg -i "${CUDA_REPO}" \
+	&& rm -rf "${CUDA_REPO}" \
+	&& apt-key add "/var/cuda-repo-${CUDA_VER_APT}-local-${CUDA_VERSION}/7fa2af80.pub"
+
 apt-get -y update &&    \
     apt-get -y install --no-install-recommends \
-    cuda-cudart-${VERSION_1}            \
-    cuda-license-${VERSION_1}           \
-    cuda-nvml-dev-${VERSION_1}          \
-    cuda-command-line-tools-${VERSION_1} \
-    cuda-libraries-${VERSION_1} \
-    cuda-libraries-dev-${VERSION_1} \
-    cuda-minimal-build-${VERSION_1} \
-    cuda-cupti-${VERSION_1} \
-    cuda-cupti-dev-${VERSION_1} \
+    cuda-cudart-${CUDA_VER_APT}            \
+    cuda-license-${CUDA_VER_APT}           \
+    cuda-nvml-dev-${CUDA_VER_APT}          \
+    cuda-command-line-tools-${CUDA_VER_APT} \
+    cuda-libraries-${CUDA_VER_APT} \
+    cuda-libraries-dev-${CUDA_VER_APT} \
+    cuda-minimal-build-${CUDA_VER_APT} \
+    cuda-cupti-${CUDA_VER_APT} \
+    cuda-cupti-dev-${CUDA_VER_APT} \
     libcublas10 \
     libcublas-dev \
-    cuda-npp-${VERSION_1} \
-    cuda-npp-dev-${VERSION_1} \
-    && ln -s "cuda-${VERSION_2%.*}" /usr/local/cuda
+    cuda-npp-${CUDA_VER_APT} \
+    cuda-npp-dev-${CUDA_VER_APT}
 
-# Note(storypku): The last two are requred by third_party/npp
+echo "Successfully installed CUDA  ${CUDA_VERSION}"
 
-CUDA_VER="${VERSION_2%.*}"
-echo "Successfully installed CUDA  ${CUDA_VER}"
+CUDA_VER="${CUDA_VERSION%.*}"
 
-##===== Install CUDNN 8 =====##
+##================ Install cuDNN =======================##
 
-CUDNN_VER1="8.0.0.180-1"
-MAJOR="${CUDNN_VER1%%.*}"
-CUDNN_VERSION="${CUDNN_VER1}+cuda${CUDA_VER}"
+cuDNN_VERSION="8.0.0.180"
+cuDNN_MAJOR="${cuDNN_VERSION%%.*}"
+cuDNN_VER_APT="${cuDNN_VERSION}-1+cuda${CUDA_VER}"
 
-CUDNN_PKGS="\
-libcudnn${MAJOR}_${CUDNN_VERSION}_arm64.deb \
-libcudnn${MAJOR}-dev_${CUDNN_VERSION}_arm64.deb \
-"
+cuDNN_PKGS=(
+    libcudnn${cuDNN_MAJOR}_${cuDNN_VER_APT}_arm64.deb
+    libcudnn${cuDNN_MAJOR}-dev_${cuDNN_VER_APT}_arm64.deb
+)
 
-for pkg in ${CUDNN_PKGS}; do
-    echo "Downloading ${LOCAL_HTTP_ADDR}/${pkg}"
-    wget "${LOCAL_HTTP_ADDR}/${pkg}" >/dev/null
+for pkg in "${cuDNN_PKGS[@]}"; do
+    wget "${PKG_DOWNLOAD_ADDR}/${pkg}" >/dev/null
 done
 
-for pkg in ${CUDNN_PKGS}; do
-    dpkg -i "${pkg}"
-    rm -rf ${pkg}
-done
+dpkg -i ${cuDNN_PKGS[*]} && rm -rf ${cuDNN_PKGS[*]}
 
-echo "Stripping off libcudnn8 static libraries..."
+
+echo "Delete static cuDNN libraries..."
 find /usr/lib/$(uname -m)-linux-gnu -name "libcudnn_*.a" -delete -print
 
-echo "Successfully installed CUDNN ${MAJOR}"
+echo "Successfully installed cuDNN${cuDNN_MAJOR}"
+
+##=============== Install TensorRT ================##
+
+TRT_VERSION="7.1.3"
+TRT_MAJOR="${TRT_VERSION%%.*}"
+TRT_VER_APT="${TRT_VERSION}-1+cuda${CUDA_VER}"
+
+TRT_PKGS=(
+    libnvinfer${TRT_MAJOR}_${TRT_VER_APT}_arm64.deb
+    libnvinfer-bin_${TRT_VER_APT}_arm64.deb
+    libnvinfer-dev_${TRT_VER_APT}_arm64.deb
+    libnvinfer-plugin${TRT_MAJOR}_${TRT_VER_APT}_arm64.deb
+    libnvinfer-plugin-dev_${TRT_VER_APT}_arm64.deb
+    libnvonnxparsers${TRT_MAJOR}_${TRT_VER_APT}_arm64.deb
+    libnvonnxparsers-dev_${TRT_VER_APT}_arm64.deb
+    libnvparsers${TRT_MAJOR}_${TRT_VER_APT}_arm64.deb
+    libnvparsers-dev_${TRT_VER_APT}_arm64.deb
+)
+
+for pkg in "${TRT_PKGS[@]}"; do
+    wget "${PKG_DOWNLOAD_ADDR}/${pkg}" >/dev/null
+done
+
+dpkg -i ${TRT_PKGS[*]} && rm -rf ${TRT_PKGS[*]}
+
+echo "Successfully installed TensorRT ${TRT_VERSION}"
+
+##============== Cleanup ================##
 
 # Kick the ladder and cleanup
 apt-get purge --autoremove -y \
     gnupg2 \
     ca-certificates \
-    "cuda-repo-l4t-${VERSION_1}-local-${VERSION_2}"
+    "cuda-repo-l4t-${CUDA_VER_APT}-local-${CUDA_VERSION}"
 
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
