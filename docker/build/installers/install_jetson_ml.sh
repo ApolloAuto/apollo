@@ -95,7 +95,6 @@ TRT_VER_APT="${TRT_VERSION}-1+cuda${CUDA_VER}"
 
 TRT_PKGS=(
     libnvinfer${TRT_MAJOR}_${TRT_VER_APT}_arm64.deb
-    libnvinfer-bin_${TRT_VER_APT}_arm64.deb
     libnvinfer-dev_${TRT_VER_APT}_arm64.deb
     libnvinfer-plugin${TRT_MAJOR}_${TRT_VER_APT}_arm64.deb
     libnvinfer-plugin-dev_${TRT_VER_APT}_arm64.deb

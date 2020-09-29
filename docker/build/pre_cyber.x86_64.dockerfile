@@ -3,6 +3,14 @@ FROM ${BASE_IMAGE}
 
 ENV TENSORRT_VERSION 7.0.0-1+cuda10.2
 
+#For only running TensorRT C++ applications:
+#   sudo apt-get install libnvinfer7 libnvonnxparsers7 libnvparsers7 libnvinfer-plugin7
+#For also building TensorRT C++ applications:
+#   sudo apt-get install libnvinfer-dev libnvonnxparsers-dev \
+#       libnvparsers-dev libnvinfer-plugin-dev
+#For running TensorRT Python applications:
+#   sudo apt-get install python3-libnvinfer
+
 RUN apt-get -y update \
     && apt-get install -y --no-install-recommends \
     libnvinfer7="${TENSORRT_VERSION}" \

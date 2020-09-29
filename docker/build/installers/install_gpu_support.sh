@@ -30,16 +30,7 @@ apt_get_update_and_install \
 TARGET_ARCH="$(uname -m)"
 
 # Note(storypku):
-# 1) cublas disabled for x86 since already installed before this installer runs
-
-if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-    apt_get_update_and_install \
-        libcublas10 \
-        libcublas-dev
-
-    info "Install TensorRT 7 ..."
-    bash ${CURR_DIR}/install_tensorrt.sh
-fi
+# 1) cublas was already installed before this installer runs
 
 info "Install libtorch ..."
 bash ${CURR_DIR}/install_libtorch.sh
