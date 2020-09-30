@@ -118,7 +118,7 @@
 #### 5. 验证camera是否工作正常
  - 如果一切正常，则会在`dreamview`右下角出现摄像头采集的图像。
  
- - 在`docker`环境内使用`cyber_monitor`工具，查看`/apollo/sensor/camera/front_6mm/image`、`/apollo/sensor/camera/front_12mm/image`是否有数据输出，且帧率是否稳定在15帧左右。
+ - 在`docker`环境内使用`cyber_monitor`工具，查看`/apollo/sensor/camera/front_6mm/image`、`/apollo/sensor/camera/front_12mm/image`是否有数据输出，且帧率是否稳定在15帧左右(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))。
 
 	```
 	//输入如下命令启动cyber_monitor
