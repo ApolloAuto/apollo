@@ -62,7 +62,7 @@
 ![camera_adaptation_dreamview](images/camera_adaptation_dreamview.png)
 
 ####  4. 检查各模块channel是否正确
-在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
+在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息。关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md)）：
 	
 |channel_name | 检查项目 | 
 |---|---|
