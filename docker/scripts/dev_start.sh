@@ -31,7 +31,7 @@ HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
 
 VERSION_X86_64="dev-x86_64-18.04-20200926_1057"
-VERSION_AARCH64="dev-aarch64-18.04-20200915_0106"
+VERSION_AARCH64="dev-aarch64-18.04-20201006_0154"
 USER_VERSION_OPT=
 
 DOCKER_RUN="docker run"
@@ -313,6 +313,10 @@ function setup_devices_and_mount_local_volumes() {
             volumes="${volumes} -v /dev:/dev"
             ;;
     esac
+    # local tegra_dir="/usr/lib/aarch64-linux-gnu/tegra"
+    # if [[ "${TARGET_ARCH}" == "aarch64" && -d "${tegra_dir}" ]]; then
+    #    volumes="${volumes} -v ${tegra_dir}:${tegra_dir}:ro"
+    # fi
     volumes="${volumes} -v /media:/media \
                         -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                         -v /etc/localtime:/etc/localtime:ro \
@@ -443,25 +447,25 @@ function mount_other_volumes() {
     docker_restart_volume "${localization_volume}" "${localization_image}"
     volume_conf="${volume_conf} --volumes-from ${localization_volume}"
 
-    # AUDIO
-    local audio_volume="apollo_audio_volume_${USER}"
-    local audio_image="${DOCKER_REPO}:data_volume-audio_model-latest"
-    docker_restart_volume "${audio_volume}" "${audio_image}"
-    volume_conf="${volume_conf} --volumes-from ${audio_volume}"
-
-    # YOLOV4
-    local yolov4_volume="apollo_yolov4_volume_${USER}"
-    local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-latest"
-    docker_restart_volume "${yolov4_volume}" "${yolov4_image}"
-    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
-
-    # FASTER_RCNN
-    local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
-    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-latest"
-    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
-    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
-
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
+        # AUDIO
+        local audio_volume="apollo_audio_volume_${USER}"
+        local audio_image="${DOCKER_REPO}:data_volume-audio_model-latest"
+        docker_restart_volume "${audio_volume}" "${audio_image}"
+        volume_conf="${volume_conf} --volumes-from ${audio_volume}"
+
+        # YOLOV4
+        local yolov4_volume="apollo_yolov4_volume_${USER}"
+        local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-latest"
+        docker_restart_volume "${yolov4_volume}" "${yolov4_image}"
+        volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+
+        # FASTER_RCNN
+        local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
+        local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-latest"
+        docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
+        volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
+
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
         local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
         docker_restart_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
