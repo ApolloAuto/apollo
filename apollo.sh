@@ -26,7 +26,7 @@ function check_architecture_support() {
 
 function check_platform_support() {
     local platform="$(uname -s)"
-    if [ "$platform" != "Linux" ]; then
+    if [[ "${platform}" != "Linux" ]]; then
         error "Unsupported platform: ${platform}."
         error "${TAB}Apollo is expected to run on Linux systems (E.g., Debian/Ubuntu)."
         exit 1
@@ -45,8 +45,9 @@ function check_minimal_memory_requirement() {
 function determine_esdcan_use() {
     local esdcan_dir="${APOLLO_ROOT_DIR}/third_party/can_card_library/esd_can"
     local use_esd=false
-    if [ -f "${esdcan_dir}/include/ntcan.h" ] &&
-        [ -f "${esdcan_dir}/lib/libntcan.so.4" ]; then
+    if [[ "${ARCH}" == "x86_64" ]] &&
+        [[ -f "${esdcan_dir}/include/ntcan.h" ]] &&
+        [[ -f "${esdcan_dir}/lib/libntcan.so.4" ]]; then
         use_esd=true
     fi
     USE_ESD_CAN="${use_esd}"
@@ -160,7 +161,8 @@ function main() {
     local coverage_sh="${APOLLO_ROOT_DIR}/scripts/apollo_coverage.sh"
     local ci_sh="${APOLLO_ROOT_DIR}/scripts/apollo_ci.sh"
 
-    local cmd="$1"; shift
+    local cmd="$1"
+    shift
     case "${cmd}" in
         config)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" "$@"
