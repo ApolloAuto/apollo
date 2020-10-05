@@ -100,6 +100,7 @@ cc_test(
     name = "camera_test",
     size = "small",
     srcs = ["camera_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":camera",
         "@com_google_googletest//:gtest_main",
