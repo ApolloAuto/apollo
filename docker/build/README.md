@@ -87,27 +87,6 @@ nohup python3 -m http.server 8388 &
 
 3. Rerun `build_cyber.sh` or `build_dev.sh`.
 
-## Understand the Dependencies
-
-To help users understand the dependencies, we are trying to compile a high
-level [dependency graph](dependencies.dot). You can build your own Dockerfile or
-ISO package according to it.
-
-To view the graph, please run:
-
-```bash
-sudo apt -y install xdot
-xdot dependencies.dot
-```
-
-## Add New Dependency
-
-When you need to add something to the Docker image or Bazel `WORKSPACE` file, it's
-defined as a new dependency. Before doing that, please add it as well as all its
-dependencies to the `dependencies.dot` first, so we understand all the
-dependencies and dependents, which helps us manage its lifecycle like upgrading
-and retiring in the future.
-
 ## Add New Installer
 
 The best practice of a new installer would be:
