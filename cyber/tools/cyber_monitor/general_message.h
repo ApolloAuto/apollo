@@ -19,7 +19,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-#include "general_message_base.h"
+#include "cyber/tools/cyber_monitor/general_message_base.h"
 
 class Screen;
 
