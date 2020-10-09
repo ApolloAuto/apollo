@@ -14,15 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber_topology_message.h"
-#include "general_channel_message.h"
-#include "screen.h"
+#include <csignal>
+#include <iostream>
 
 #include "cyber/init.h"
 #include "cyber/service_discovery/topology_manager.h"
-
-#include <csignal>
-#include <iostream>
+#include "cyber/tools/cyber_monitor/cyber_topology_message.h"
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
 namespace {
 void SigResizeHandle(int) { Screen::Instance()->Resize(); }
@@ -44,7 +43,7 @@ enum COMMAND {
   CHANNEL     // 3 -> 4
 };
 
-COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
+COMMAND parseOption(int argc, char *const argv[], std::string *commandVal) {
   if (argc > 4) {
     return TOO_MANY_PARAMETER;
   }
@@ -59,7 +58,7 @@ COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
     }
     if (strcmp(opt, "-c") == 0) {
       if (argv[index + 1]) {
-        commandVal = argv[index + 1];
+        *commandVal = argv[index + 1];
         return CHANNEL;
       }
     }
@@ -75,7 +74,7 @@ COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
 int main(int argc, char *argv[]) {
   std::string val;
 
-  COMMAND com = parseOption(argc, argv, val);
+  COMMAND com = parseOption(argc, argv, &val);
 
   switch (com) {
     case TOO_MANY_PARAMETER:
@@ -83,7 +82,8 @@ int main(int argc, char *argv[]) {
     case HELP:
       printHelp(argv[0]);
       return 0;
-    default:;
+    default: {
+    }
   }
 
   apollo::cyber::Init(argv[0]);

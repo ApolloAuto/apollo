@@ -28,11 +28,11 @@ class Screen;
 class GeneralMessageBase : public RenderableMessage {
  protected:
   static void PrintMessage(GeneralMessageBase* baseMsg,
-                           const google::protobuf::Message& msg, int& jumpLines,
-                           const Screen* s, int& line_no, int indent);
+                           const google::protobuf::Message& msg, int* jumpLines,
+                           const Screen* s, int* line_no, int indent);
   static void PrintField(GeneralMessageBase* baseMsg,
-                         const google::protobuf::Message& msg, int& jumpLines,
-                         const Screen* s, int& line_no, int indent,
+                         const google::protobuf::Message& msg, int* jumpLines,
+                         const Screen* s, int* line_no, int indent,
                          const google::protobuf::Reflection* ref,
                          const google::protobuf::FieldDescriptor* field,
                          int index);

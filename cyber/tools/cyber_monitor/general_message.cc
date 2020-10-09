@@ -109,7 +109,8 @@ int GeneralMessage::Render(const Screen* s, int key) {
 
     auto channelMsg = channelMsgPtr->CopyMsgPtr();
     if (!channelMsgPtr->raw_msg_class_->ParseFromString(channelMsg->message)) {
-      s->AddStr(0, line_no++, "Cannot Parse the message for Real-Time Updating");
+      s->AddStr(0, line_no++,
+                "Cannot Parse the message for Real-Time Updating");
       return line_no;
     }
 
@@ -167,13 +168,13 @@ int GeneralMessage::Render(const Screen* s, int key) {
       const std::vector<int> indices(
           SortProtobufMapByKeys(*message_ptr_, field_, *reflection_ptr_, size));
       if (is_folded_) {
-        GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
-                                       line_no, 0, reflection_ptr_, field_,
+        GeneralMessageBase::PrintField(this, *message_ptr_, &jumpLines, s,
+                                       &line_no, 0, reflection_ptr_, field_,
                                        indices[itemIndex_]);
       } else {
         for (const int index : indices) {
-          GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
-                                         line_no, 0, reflection_ptr_, field_,
+          GeneralMessageBase::PrintField(this, *message_ptr_, &jumpLines, s,
+                                         &line_no, 0, reflection_ptr_, field_,
                                          index);
         }
       }

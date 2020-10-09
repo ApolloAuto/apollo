@@ -78,7 +78,8 @@ bool GeneralChannelMessage::isErrorCode(void* ptr) {
     case ErrorCode::NoCloseChannel:
       return true;
 
-    default: {}
+    default: {
+    }
   }
   return false;
 }
@@ -147,7 +148,8 @@ int GeneralChannelMessage::Render(const Screen* s, int key) {
       current_state_ = State::ShowInfo;
       break;
 
-    default: {}
+    default: {
+    }
   }
 
   clear();
@@ -164,10 +166,10 @@ int GeneralChannelMessage::Render(const Screen* s, int key) {
   if (is_enabled()) {
     switch (current_state_) {
       case State::ShowDebugString:
-        RenderDebugString(s, key, line_no);
+        RenderDebugString(s, key, &line_no);
         break;
       case State::ShowInfo:
-        RenderInfo(s, key, line_no);
+        RenderInfo(s, key, &line_no);
         break;
     }
   } else {
@@ -178,10 +180,9 @@ int GeneralChannelMessage::Render(const Screen* s, int key) {
   return line_no;
 }
 
-void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
-                                       int& line_no) {
-  page_item_count_ = s->Height() - line_no;
-  pages_ = static_cast<int>(readers_.size() + writers_.size() + line_no) /
+void GeneralChannelMessage::RenderInfo(const Screen* s, int key, int* line_no) {
+  page_item_count_ = s->Height() - *line_no;
+  pages_ = static_cast<int>(readers_.size() + writers_.size() + *line_no) /
                page_item_count_ +
            1;
   SplitPages(key);
@@ -208,24 +209,24 @@ void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
   }
 
   if (hasReader) {
-    s->AddStr(0, line_no++, "Readers:");
+    s->AddStr(0, (*line_no)++, "Readers:");
     for (; iter != vec->cend(); ++iter) {
-      s->AddStr(ReaderWriterOffset, line_no++, iter->c_str());
+      s->AddStr(ReaderWriterOffset, (*line_no)++, iter->c_str());
     }
 
-    ++line_no;
+    ++(*line_no);
     vec = &writers_;
     iter = vec->cbegin();
   }
 
-  s->AddStr(0, line_no++, "Writers:");
+  s->AddStr(0, (*line_no)++, "Writers:");
   for (; iter != vec->cend(); ++iter) {
-    s->AddStr(ReaderWriterOffset, line_no++, iter->c_str());
+    s->AddStr(ReaderWriterOffset, (*line_no)++, iter->c_str());
   }
 }
 
 void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
-                                              int& line_no) {
+                                              int* line_no) {
   if (has_message_come()) {
     if (raw_msg_class_ == nullptr) {
       auto rawFactory = apollo::cyber::message::ProtobufFactory::Instance();
@@ -233,9 +234,9 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
     }
 
     if (raw_msg_class_ == nullptr) {
-      s->AddStr(0, line_no++, "Cannot Generate Message by Message Type");
+      s->AddStr(0, (*line_no)++, "Cannot Generate Message by Message Type");
     } else {
-      s->AddStr(0, line_no++, "FrameRatio: ");
+      s->AddStr(0, (*line_no)++, "FrameRatio: ");
 
       std::ostringstream outStr;
       outStr << std::fixed << std::setprecision(FrameRatio_Precision)
@@ -245,7 +246,7 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
       decltype(channel_message_) channelMsg = CopyMsgPtr();
 
       if (channelMsg->message.size()) {
-        s->AddStr(0, line_no++, "RawMessage Size: ");
+        s->AddStr(0, (*line_no)++, "RawMessage Size: ");
         outStr.str("");
         outStr << channelMsg->message.size() << " Bytes";
         if (channelMsg->message.size() >= kGB) {
@@ -261,22 +262,22 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
         s->AddStr(outStr.str().c_str());
         if (raw_msg_class_->ParseFromString(channelMsg->message)) {
           int lcount = lineCount(*raw_msg_class_, s->Width());
-          page_item_count_ = s->Height() - line_no;
+          page_item_count_ = s->Height() - *line_no;
           pages_ = lcount / page_item_count_ + 1;
           SplitPages(key);
           int jumpLines = page_index_ * page_item_count_;
           jumpLines <<= 2;
           jumpLines /= 5;
-          GeneralMessageBase::PrintMessage(this, *raw_msg_class_, jumpLines, s,
+          GeneralMessageBase::PrintMessage(this, *raw_msg_class_, &jumpLines, s,
                                            line_no, 0);
         } else {
-          s->AddStr(0, line_no++, "Cannot parse the raw message");
+          s->AddStr(0, (*line_no)++, "Cannot parse the raw message");
         }
       } else {
-        s->AddStr(0, line_no++, "The size of this raw Message is Zero");
+        s->AddStr(0, (*line_no)++, "The size of this raw Message is Zero");
       }
     }
   } else {
-    s->AddStr(0, line_no++, "No Message Came");
+    s->AddStr(0, (*line_no)++, "No Message Came");
   }
 }

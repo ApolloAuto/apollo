@@ -18,9 +18,13 @@
 #define TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
 
 #include <atomic>
+#include <memory>
+#include <string>
+#include <vector>
 
+#include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-#include "general_message_base.h"
+#include "cyber/tools/cyber_monitor/general_message_base.h"
 
 class CyberTopologyMessage;
 class GeneralMessage;
@@ -74,12 +78,12 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   const std::string& NodeName(void) const { return node_name_; }
 
-  void add_reader(const std::string& reader) { DoAdd(readers_, reader); }
-  void del_reader(const std::string& reader) { DoDelete(readers_, reader); }
+  void add_reader(const std::string& reader) { DoAdd(&readers_, reader); }
+  void del_reader(const std::string& reader) { DoDelete(&readers_, reader); }
 
-  void add_writer(const std::string& writer) { DoAdd(writers_, writer); }
+  void add_writer(const std::string& writer) { DoAdd(&writers_, writer); }
   void del_writer(const std::string& writer) {
-    DoDelete(writers_, writer);
+    DoDelete(&writers_, writer);
     if (!writers_.size()) {
       set_has_message_come(false);
     }
@@ -119,23 +123,23 @@ class GeneralChannelMessage : public GeneralMessageBase {
   GeneralChannelMessage(const GeneralChannelMessage&) = delete;
   GeneralChannelMessage& operator=(const GeneralChannelMessage&) = delete;
 
-  static void DoDelete(std::vector<std::string>& vec, const std::string& str) {
-    for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
+  static void DoDelete(std::vector<std::string>* vec, const std::string& str) {
+    for (auto iter = vec->begin(); iter != vec->end(); ++iter) {
       if (*iter == str) {
-        vec.erase(iter);
+        vec->erase(iter);
         break;
       }
     }
   }
 
-  static void DoAdd(std::vector<std::string>& vec, const std::string& str) {
-    for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
-      if (*iter == str) {
+  static void DoAdd(std::vector<std::string>* vec, const std::string& str) {
+    for (const auto& item : *vec) {
+      if (item == str) {
         return;
       }
     }
 
-    vec.emplace_back(str);
+    vec->emplace_back(str);
   }
 
   void updateRawMessage(
@@ -159,8 +163,8 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   GeneralChannelMessage* OpenChannel(const std::string& channelName);
 
-  void RenderDebugString(const Screen* s, int key, int& line_no);
-  void RenderInfo(const Screen* s, int key, int& line_no);
+  void RenderDebugString(const Screen* s, int key, int* line_no);
+  void RenderInfo(const Screen* s, int key, int* line_no);
 
   void set_has_message_come(bool b) { has_message_come_ = b; }
 
