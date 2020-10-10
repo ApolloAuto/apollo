@@ -17,7 +17,7 @@
 # **1. 套件开箱简介**
 
 收到套件后，请您第一时间开箱检查车辆。套件的发货状态如图所示：
-![vehicle_shipment_status_v4](./images/vehicle_shipment_status_V4.png)
+![vehicle_shipment_status_v4](./images/vehicle_shipment_status_V4.jpg)
 
 如上图所示，套件在发货时，传感器支架已经与车辆底盘完成固定，并在传感器支架上预装了显示器、摄像头支架。车辆遥控器在“随车配件箱”中，动力电池在电池包装箱中，激光雷达支架如图所示。工控机、激光雷达、毫米波雷达及其他传感器在另外纸箱中。
 开箱后，请做以下检查：
@@ -28,7 +28,7 @@
 
 # **1.1 随车配件介绍**
 打开随车配件箱，请按照清单核对随车配件。随车配件箱包含内容如下图所示：
-![vehicle_accessory_parts](./images/vehicle_accessory_parts.png)
+![vehicle_accessory_parts](./images/vehicle_accessory_parts.jpg)
 
 配件及功能介绍如下：
 清单   —— 发货清单描述
@@ -44,15 +44,15 @@ DB9延长线——连接工控机CAN0与底盘CAN口/配置IMU时连接工控机
 
 ## **2.1简介**
 打开电池箱，如下图所示：
-![Battery_v4_1](./images/Battery_v4_1.png)
+![Battery_v4_1](./images/Battery_v4_1.jpg)
 
 本产品采用的是模块化锂电池组，电池组有正面和侧面两个操作面。侧面布置如图所示：
 
-![Battery_v4_2](./images/Battery_v4_2.png)
+![Battery_v4_2](./images/Battery_v4_2.jpg)
  
 电池箱开关拉开时为开启状态，按下时为关闭状态。
 取出电池后，请检查电池剩余电量。若电量低于20%，请先充电后再使用。充电方法见后续2.3说明。检查电量方法：拉开电池红色电源开关，按下启停按钮。启停按钮会变绿色，同时液晶显示屏会显示电量百分比。如下图所示：
-![Battery_v4_3](./images/Battery_v4_3.png)
+![Battery_v4_3](./images/Battery_v4_3.jpg)
 
 ## **2.2取放方式**
 
@@ -64,7 +64,7 @@ DB9延长线——连接工控机CAN0与底盘CAN口/配置IMU时连接工控机
 3）紧固电池固定螺栓；
 
 4）将电缆与相应的高压放电插口和低压通讯插口连接妥当；
-![Battery_v4_4](./images/Battery_v4_4.png) 
+![Battery_v4_4](./images/Battery_v4_4.jpg) 
 
  如果需要拆卸电池组，步骤相似。
 
@@ -114,7 +114,7 @@ DB9延长线——连接工控机CAN0与底盘CAN口/配置IMU时连接工控机
 拉电源总开关，按下启/停按钮，即全车上电。
 
 **2）开启驱动电机使能**
-![Motor_Enable_1](./images/Motor_Enable_1.png)
+![Motor_Enable_1](./images/Motor_Enable_1.jpg)
  
 向右旋开驱动电机使能开关，即开启驱动电机使能。
 
@@ -134,15 +134,15 @@ DB9延长线——连接工控机CAN0与底盘CAN口/配置IMU时连接工控机
 D-kit底盘的紧急制动分**主动急停控制**和**被动急停控制**。
 主动急停控制有**急停按钮**和**遥控器急停**。
 急停按钮为为VCU外部控制的最高优先级控制。在车辆出现异常行驶情况时，请优先第一时间按下位于车辆后部的急停按钮。遥控器急停将在3.4节介绍。
-![collision_protection](./images/collision_protection.png)
+![collision_protection](./images/collision_protection.jpg)
 前/后碰撞条后的急停开关为被动急停控制。碰撞急停触发2秒后VCU会解除碰撞触发急停控制。
 
 # **3. 遥控器及注意事项**
 
 ## **3.1 遥控器介绍**
-![remote_control_1](./images/remote_control_1.png)
-![remote_control_2](./images/remote_control_2.png)
-![remote_control_3](./images/remote_control_3.png)
+![remote_control_1](./images/remote_control_1.jpg)
+![remote_control_2](./images/remote_control_2.jpg)
+![remote_control_3](./images/remote_control_3.jpg)
 此遥控器采用１２V电源供电，发货配8节5号电池夹，用户可选用８节５号电池供电，也可购买锂电池供电。
 此外具有以下控制单元：
 * 电源控制开关——power
@@ -153,7 +153,7 @@ D-kit底盘的紧急制动分**主动急停控制**和**被动急停控制**。
 * 换档开关——H键，拨起不松为换挡；
  * 调试开关——G，正常使用默认位于最下位置，拨起会使遥控器进入调试模式，影响您的正常使用。
 按键与屏幕的对照如下图：
-![remote_control_7](./images/remote_control_7.png)
+![remote_control_7](./images/remote_control_7.jpg)
 
 注意：C/E/F目前处于空值状态，G为调试通道开关，操作遥控时默认开关C/E/F/G处于朝下（关闭状态）。
 * 警告：出于安全考虑，在遥控器开启电源前请确保所有开关均处于关闭状态。
@@ -167,17 +167,17 @@ D-kit底盘的紧急制动分**主动急停控制**和**被动急停控制**。
 开启：
 
 1）开启遥控器电源
-![remote_control_5](./images/remote_control_5.png)
+![remote_control_5](./images/remote_control_5.jpg)
 
 2）开启电锁开关 
-![remote_control_6](./images/remote_control_6.png)
+![remote_control_6](./images/remote_control_6.jpg)
 
 关闭：
 
 1）先关闭电锁开关
- ![remote_control_8](./images/remote_control_8.png)
+ ![remote_control_8](./images/remote_control_8.jpg)
 2）关闭遥控器电源
- ![remote_control_4](./images/remote_control_4.png)
+ ![remote_control_4](./images/remote_control_4.jpg)
 
 * 提示：此底盘具有检测遥控器信号是否失联的自动保护功能，当底盘发现遥控器在没有关闭电锁的情况下失去信号，底盘会自动刹车；如果关闭遥控器电源先于关闭电锁，会让底盘误以为是遥控器信号失联，也会触发自动刹车保护。
 
@@ -241,14 +241,14 @@ D-kit底盘的紧急制动分**主动急停控制**和**被动急停控制**。
 ## **５.3 急停开关**
 
 急停开关位于车辆后方左下方，其实际位置如下图红框所示：
- ![Motor_Enable_1](./images/Motor_Enable_1.png)
+ ![Motor_Enable_1](./images/Motor_Enable_1.jpg)
                                     图6.1 急停开关实际位置图
 当车辆在自动驾驶模式中有碰撞风险且无法使用遥控器时，随车人员可以根据实际情况选择拍下急停开关来实现全车制动，有效规避风险。
 
 * 提示：急停开关被拍下后，车轮将会抱死，遥控器的指令也将无法对车辆进行操控，必须要在旋开急停开关以后，才能继续进行操作。
 
 ## **５.4 碰撞保护**
-![collision_protection](./images/collision_protection.png)
+![collision_protection](./images/collision_protection.jpg)
 车辆前后分别有一条防撞条，能够感应防撞条与车体间的压力从而判断是否发生了碰撞。当发生轻微碰撞时，碰撞保护触点开关感受到压力就会立即解除动力，并会出发刹车，待车停稳后自动复位，以防进一步伤害。此外，防撞条本身也能形成有效的隔离，一定程度上保护车辆和被撞物体。
  
 # **６. 常见问题及解决方法**

@@ -19,25 +19,25 @@
 # **1. 车体整体结构简介**
 
 本产品主要由两部分组成，分别为底盘部分以及车体部分，如下图：
- ![Vehicles_1](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/Vehicles_1.png)
+ ![Vehicles_1](./images/Vehicles_1.jpg)
 
 整车右后视图  ①车体部分 ②底盘
 
 其中底盘包含如下部件，其结构图如下：
-![Chassis](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/Chassis.png)
+![Chassis](./images/Chassis.jpg)
 
 上装车体的结构如下图所示：
-![Vehicles_2](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/Vehicles_2.png)
+![Vehicles_2](./images/Vehicles_2.jpg)
 
 车体整体安装实物如下：
 
-![Vehicles_3](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/Vehicles_3.png) 
+![Vehicles_3](./images/Vehicles_3.jpg) 
 
 
 
 注意：下图所示两个DB9接口分别为底盘CAN线和底盘升级口，上边是CAN线接口，与IPC CAN0连接。下边是底层软件升级口，不常用，后续面临版本升级时会开放使用；接线时请注意不要接错。  
 
- ![CanLine_2.png](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/CanLine_2.png.jpg)
+ ![CanLine_2](./images/CanLine_2.jpg)
 
  
 
@@ -47,7 +47,7 @@
 
 本产品采用的是模块化锂电池组，电池组有正面和侧面两个操作面。其布置如图所示：
 
-![battery_14](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/battery_14.jpg)
+![battery_14](./images/battery_14.jpg)
 
 电池箱开关横置时为开启状态，竖置时为关闭状态。
 
@@ -58,11 +58,11 @@
 
 2）将电池组放入电池仓内； 
 
-3）将电缆与相应的高压放电插口和低压通讯插口连接妥当；![battery_12](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/battery_12.png)
+3）将电缆与相应的高压放电插口和低压通讯插口连接妥当；![battery_12](./images/battery_12.jpg)
 
 4）重新安装电池固定挡板用两个螺栓固定，确保电池固定板没有晃动的情况。
 
-![battery_11](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/battery_11.png)
+![battery_11](./images/battery_11.jpg)
 
  如果需要拆卸电池组，步骤相似。
 
@@ -87,7 +87,7 @@
 
 下电步骤：先关闭BMS唤醒按钮，后关开关，再拔充/放电插头；
 
-![battery_13](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/battery_13.png)
+![battery_13](./images/battery_13.jpg)
 
 **警告**
 
@@ -108,7 +108,7 @@
 ## **2.4 上电及断电**
 
 在上电/断电之前，先确保车辆停放在安全位置，并将急停开关拍下。
-![Emergency stop_1](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/Emergency_stop_1.png)
+![Emergency stop_1](./images/Emergency_stop_1.jpg)
 
 **1）上电**
 
@@ -118,7 +118,7 @@
 
 **2）开启驱动电机使能**
 
-![CanLine_3.png](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/CanLine_3.png.png)
+![CanLine_3.](./images/CanLine_3.jpg)
 
 向右旋开驱动电机使能开关，即开启驱动电机使能。
 
@@ -126,7 +126,7 @@
 
 **3）关闭驱动电机使能**
 
-![CanLine_4](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/CanLine_4.png)
+![CanLine_4](./images/CanLine_4.jpg)
 
 向左旋开驱动电机使能开关，即关闭驱动电机使能。
 
@@ -138,9 +138,9 @@
 
 ## **3.1 遥控器介绍**
 
-![remote control_1](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/remote_control_7.png)
+![remote control_1](./images/remote_control_7.jpg)
 
-![remote control_2](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/remote_control_9.png)
+![remote control_2](./images/remote_control_8.jpg)
 
 此遥控器采用8节5号电池进行供电，此外具有以下控制单元：
 
@@ -165,21 +165,21 @@
 
 1）开启遥控器电源
 
-![remote control_3](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/remote_control_3.png) 
+![remote control_3](./images/remote_control_3.jpg) 
 
 2）开启电锁开关 
 
-![remote control_4](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/remote_control_4.png)  
+![remote control_4](./images/remote_control_4.jpg)  
 
 关闭：
 
 1）先关闭电锁开关
 
-![remote control_5](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/remote_control_5.png) 
+![remote control_5](./images/remote_control_5.jpg) 
 
 2）关闭遥控器电源
 
-![remote control_6](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/remote_control_6.png) 
+![remote control_6](./images/remote_control_6.jpg) 
 * 提示：此底盘具有检测遥控器信号是否失联的自动保护功能，当底盘发现遥控器在没有关闭电锁的情况下失去信号，底盘会自动刹车；如果关闭遥控器电源先于关闭电锁，会让底盘误以为是遥控器信号失联，也会触发自动刹车保护。
 * 警告：为了延长油压碟刹的寿命，长期停车时候避免处于制动状态。
 
@@ -229,11 +229,11 @@
 
 需要在此说明的是，底盘根据Apollo使用的上装传感器型号，匹配了为上装工控机、传感器等供电的接口和相应线束。供电线束如下图所示，
 
-![xianshu_1](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/xianshu_1.jpg)
+![xianshu_1](./images/xianshu_1.jpg)
 
 1：激光雷达供电线；2：保险座接线端子，如下图中标注“2”的位置；3：预留12V供电线；4：毫米波雷达或IMU供电线；5：毫米波雷达或IMU供电线；6：路由器供电线；7：显示器供电线；8：工控机供电线；9：保险座接线端子正，如下图中标注“9”的位置。
 
-![xianshu_2](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/xianshu_2.jpg)
+![xianshu_2](./images/xianshu_2.jpg)
 
 
 
@@ -257,7 +257,7 @@
 
 急停开关位于车辆后方左下方，其实际位置如下图红框所示：
 
-![Emergency stop_2](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/Emergency_stop_2.png) 
+![Emergency stop_2](./images/Emergency_stop_2.jpg) 
 
 ​                            图6.1 急停开关实际位置图
 当车辆在自动驾驶模式中有碰撞风险且无法使用遥控器时，随车人员可以根据实际情况选择拍下急停开关来实现全车制动，有效规避风险。
@@ -267,7 +267,7 @@
 ## **6.4 碰撞保护**
 
 车辆前后分别有一条防撞条，能够感应防撞条与车体间的压力从而判断是否发生了碰撞。当发生轻微碰撞时，碰撞保护触点开关感受到压力就会立即解除动力，并会出发刹车，待车停稳后自动复位，以防进一步伤害。此外，防撞条本身也能形成有效的隔离，一定程度上保护车辆和被撞物体。
-![collision protection](https://github.com/fymahu/apollo/blob/master/docs/specs/images/quick_start/collision_protection.png) 
+![collision protection](./images/collision_protection.jpg) 
 
 # **7. 常见问题及解决方法**
 

@@ -17,23 +17,23 @@
 # **1. 车体整体结构简介**
 
 本产品主要由两部分组成，分别为底盘部分以及车体部分，如下图：
- ![Vehicles_1](./images/Vehicles_1.png)
+ ![Vehicles_1](./images/Vehicles_1.jpg)
 
 整车右后视图  ①车体部分 ②底盘
 
 其中底盘包含如下部件，其结构图如下：
-![Chassis](./images/Chassis.png)
+![Chassis](./images/Chassis.jpg)
 
 上装车体的结构如下图所示：
-![Vehicles_2](./images/Vehicles_2.png)
+![Vehicles_2](./images/Vehicles_2.jpg)
 
 车体整体安装实物如下：
 
-![Vehicles_3](./images/Vehicles_3.png) 
+![Vehicles_3](./images/Vehicles_3.jpg) 
 
 注意：下图所示两个DB9接口分别为底盘CAN线和底盘升级口，上边是CAN线接口，与IPC CAN0连接。下边是底层软件升级口，不常用，后续面临版本升级时会开放使用；接线时请注意不要接错。  
 
- ![CanLine_2.png](./images/CanLine_2.png.JPG)
+ ![CanLine_2.png](./images/CanLine_2.jpg)
 
 # **2. 电池**
 
@@ -52,13 +52,13 @@
 
 2）将电池组放入电池仓内； 
 
-3）将电缆与相应的高压放电插口和低压通讯插口连接妥当；![battery_12](./images/battery_12.png)
+3）将电缆与相应的高压放电插口和低压通讯插口连接妥当；![battery_12](./images/battery_12.jpg)
 
 4）重新安装电池固定挡板用两个螺栓固定，确保电池固定板没有晃动的情况。
 
-![battery_11](./images/battery_11.png)
+![battery_11](./images/battery_11.jpg)
 
-![battery_11](./images/battery_11.png)
+![battery_11](./images/battery_11.jpg)
 
  如果需要拆卸电池组，步骤相似。
 
@@ -83,7 +83,7 @@
 
 下电步骤：先关电池开关把手，后拔 充/放电插头；
 
-![battery_13](./images/battery_13.png)
+![battery_13](./images/battery_13.jpg)
 
 **警告**
 
@@ -104,7 +104,7 @@
 ## **2.4 上电及断电**
 
 在上电/断电之前，先确保车辆停放在安全位置，并将急停开关拍下。
-![Emergency stop_1](./images/Motor_Enable_1.png)
+![Emergency stop_1](./images/Motor_Enable_1.jpg)
 
 **1）上电**
 
@@ -112,15 +112,15 @@
 
 a.将电池开关置于开启位置,就可以车辆通电：此时车辆可以执行除前进/后退之外的所有功能；
 
-b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电。此时车辆完全供电.![CanLine_3.png](./images/CanLine_3.png.png)
+b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电。此时车辆完全供电.![CanLine_3.png](./images/CanLine_3.jpg)
 
-b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电。此时车辆完全供电，可执行车辆具备的所有功能；![CanLine_3.png](./images/CanLine_3.png.png)
+b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电。此时车辆完全供电，可执行车辆具备的所有功能；![CanLine_3.png](./images/CanLine_3.jpg)
 
 **2）断电**
 
 将底盘后面的开关左旋下电
 
-![CanLine_4](./images/CanLine_4.png)
+![CanLine_4](./images/CanLine_4.jpg)
 
 将电池开关置于关闭位置，即可完成全车断电。
 
@@ -128,9 +128,9 @@ b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电
 
 ## **3.1 遥控器介绍**
 
-![remote control_1](./images/remote_control_1.png)
+![remote control_1](./images/remote_control_1.jpg)
 
-![remote control_2](./images/remote_control_2.png)
+![remote control_2](./images/remote_control_2.jpg)
 
 此遥控器采用8节5号电池进行供电，此外具有以下控制单元：
 
@@ -155,21 +155,21 @@ b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电
 
 1）开启遥控器电源
 
-![remote control_5](./images/remote_control_5.png) 
+![remote control_5](./images/remote_control_5.jpg) 
 
 2）开启电锁开关（接管）
 
-![remote control_6](./images/remote_control_6.png)  
+![remote control_6](./images/remote_control_6.jpg)  
 
 关闭：
 
 1）先关闭电锁开关（放权）
 
-![remote control_8](./images/remote_control_8.png) 
+![remote control_8](./images/remote_control_8.jpg) 
 
 2）关闭遥控器电源
 
-![remote control_4](./images/remote_control_4.png) 
+![remote control_4](./images/remote_control_4.jpg) 
 * 提示：此底盘具有检测遥控器信号是否失联的自动保护功能，当底盘发现遥控器在没有关闭电锁的情况下失去信号，底盘会自动刹车；如果关闭遥控器电源先于关闭电锁，会让底盘误以为是遥控器信号失联，也会触发自动刹车保护。
 * 警告：为了延长油压碟刹的寿命，长期停车时候避免处于制动状态。
 
@@ -236,7 +236,7 @@ b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电
 
 急停开关位于车辆后方左下方，其实际位置如下图红框所示：
  
-![Emergency_stop_2](./images/Motor_Enable_1.png)
+![Emergency_stop_2](./images/Motor_Enable_1.jpg)
 ​                                                      图6.1 急停开关实际位置图
 当车辆在自动驾驶模式中有碰撞风险且无法使用遥控器时，随车人员可以根据实际情况选择拍下急停开关来实现全车制动，有效规避风险。
 
@@ -245,7 +245,7 @@ b.将底盘后面上的开关旋至图示位置，就可以为驱动电机上电
 ## **6.4 碰撞保护**
 
 车辆前后分别有一条防撞条，能够感应防撞条与车体间的压力从而判断是否发生了碰撞。当发生轻微碰撞时，碰撞保护触点开关感受到压力就会立即解除动力，并会出发刹车，待车停稳后自动复位，以防进一步伤害。此外，防撞条本身也能形成有效的隔离，一定程度上保护车辆和被撞物体。
-![collision protection](./images/collision_protection.png) 
+![collision protection](./images/collision_protection.jpg) 
 
 # **7. 常见问题及解决方法**
 
@@ -283,7 +283,7 @@ chassis_detail分为(1)check_response; (2)ch
 
 ch部分分五个模块上报，分别是：(1)brake_status;  (2)throttle_status;  (3)steer_status;  (4)ecu_status;  (5)gear_status
 
-![chassis_detail](./images/chassis_detail.png)
+![chassis_detail](./images/chassis_detail.jpg)
 
 a. check_response
 
@@ -383,10 +383,9 @@ b. ch
 
 # **10. 底盘线束安装说明**
 
-
 **1). 开关、接口说明**
 
-![jiexian1](./images/jiexian1.png)
+![jiexian1](./images/jiexian1.jpg)
 
 1: 急停开关
 
@@ -406,13 +405,13 @@ a. 上装供电口提供12V和24V两路电源，其中12V电源的供电功率�
 
 2: 24v 接工控机(工控机后部的凤凰端子)，红正黑负
 
-![jiexian2](./images/jiexian2.png)
+![jiexian2](./images/jiexian2.jpg)
 
 ![jiexian3](./images/jiexian3.jpg)
 
 b. 12V电源线需要先接到保险盒的输入端，各12v的用电设备的电源线需要从保险盒的输出端引出。
 
-![jiexian4](./images/jiexian4.png)
+![jiexian4](./images/jiexian4.jpg)
 
 1/3: 保险盒的输出端，１２V的用电设备需要从此处引出，靠近输入负接线柱的６个端子为输出负接线端子
 
@@ -426,7 +425,7 @@ d: 显示屏供电线
 
 下图中的显示屏供电线，一端接保险盒的输出端，另一端接显示屏底部的供电接口。
 
-![jiexian6](./images/jiexian6.png)
+![jiexian6](./images/jiexian6.jpg)
 
 e: 驱动电机钥匙旋钮
 
@@ -440,4 +439,3 @@ e: 驱动电机钥匙旋钮
 4）. 一旦开始使用本产品，即视为您已阅读、理解、认可和接受本产品的说明书、免责声明的全部条款和内容。使用者承诺对自已的行为及因此而产生的所有后果负责。  
 5）. 在使用本产品的过程中，请您务必严格遵守并执行包括但不限于说明书里的要求。对于违反说明书所提示的使用行为或不可抗因素导致的一切人身伤害、事故、财产损失、法律纠纷，及其他一切造成利益冲突的不利事件，均由用户自己承担相关责任和损失，套件提供商将不承担任何责任。  
 6）. 用户使用本产品直接或间接发生的任何违反法律规定的行为，套件提供商将不承担任何责任。
-
