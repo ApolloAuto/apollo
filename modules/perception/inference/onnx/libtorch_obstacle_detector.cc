@@ -32,33 +32,35 @@ LibtorchObstacleDetection::LibtorchObstacleDetection() : device_(torch::kCPU) {
 }
 
 bool LibtorchObstacleDetection::Evaluate(
-  const std::vector<std::vector<double>>& imageFrame) {
+  const std::vector<std::vector<std::vector<double>>>& imageFrame) {
   // Sanity checks.
   omp_set_num_threads(1);
   if (imageFrame.size() == 0) {
-    AINFO << "Got no channel in image frame!";
+    AERROR << "Got no channel in image frame!";
     return false;
   }
   if (imageFrame[0].size() == 0) {
-    AINFO << "Got no image frame in channel 0!";
+    AERROR << "Got no image frame in channel 0!";
     return false;
   }
-  if (imageFrame[0].size() != 72000) {
-    AINFO << "imageFrame[0].size() = " << imageFrame[0].size() << ", skiping!";
+  if (imageFrame[0].size() != 369664) {
+    AERROR << "imageFrame[0].size() = " << imageFrame[0].size() << ", skiping!";
     return false;
   }
-  // image imput size is 1920 * 1080 = 2073600
-  torch::Tensor image_tensor = torch::empty(32 * 3 * 3 * 3);
+  // image imput size is 608 * 608 = 369664
+  torch::Tensor image_tensor = torch::empty(1 * 3 * 608 * 608);
   float* data = image_tensor.data_ptr<float>();
 
   for (const auto& channel : imageFrame) {
     for (const auto& i : channel) {
-      *data++ = static_cast<float>(i) / 32767.0;
+      for (const auto& j : i) {
+        *data++ = static_cast<float>(j) / 255.0;
+      }
     }
   }
 
   torch::Tensor torch_input = torch::from_blob(image_tensor.data_ptr<float>(),
-                                               {32, 3, 3, 3, 3});
+                                               {1, 3, 608, 608});
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(torch_input.to(device_));
 

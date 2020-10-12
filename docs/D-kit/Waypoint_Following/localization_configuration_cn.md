@@ -208,7 +208,7 @@ b.gps.sh打开后不正常，log提示Unable to load gnss conf file
 
 c.GPS打开后，发现best_pose, imu, localization/pose 信号没有收到
 
-运行bash gps.sh后，可以cyber_monitor中观察以下几个信号
+运行bash gps.sh后，可以cyber_monitor中观察以下几个信号。(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))
 ```
 /apollo/sensor/gnss/best_pose
 /apollo/sensor/gnss/imu

@@ -86,6 +86,13 @@ function apollo_env_setup() {
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
     info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET}"
 
+    if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
+        source "${TOP_DIR}/cyber/setup.bash"
+    fi
+    if [[ ! -d "${APOLLO_BAZEL_DIST_DIR}" ]]; then
+        mkdir -p "${APOLLO_BAZEL_DIST_DIR}"
+    fi
+
     if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
         env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
     fi

@@ -92,3 +92,7 @@ The prediction module estimates the future motion trajectories for all perceived
 The prediction module also takes messages from both localization and planning as input. The structure is shown below:
 
 ![](images/architecture2.png)
+
+## Related Paper
+
+1. [Xu K, Xiao X, Miao J, Luo Q. "Data Driven Prediction Architecture for Autonomous Driving and its Application on Apollo Platform." *arXiv preprint arXiv:2006.06715.* ](https://arxiv.org/pdf/2006.06715.pdf)
