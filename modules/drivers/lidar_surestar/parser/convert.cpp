@@ -37,7 +37,7 @@ Convert::Convert(
 bool Convert::Init() {
   _parser = SurestarParserFactory::create_parser(_config);
   if (_parser == nullptr) {
-    AERROR << " can not create velodyen parser";
+    AERROR << " can not create surestar parser";
     return false;
   }
   _parser->setup();
