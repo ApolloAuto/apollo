@@ -40,14 +40,14 @@ class GeneralChannelMessage : public GeneralMessageBase {
     NoCloseChannel = -6
   };
 
-  static const char* errCode2Str(ErrorCode errCode);
-  static bool isErrorCode(void* ptr);
+  static const char* ErrCode2Str(ErrorCode errCode);
+  static bool IsErrorCode(void* ptr);
 
-  static ErrorCode castPtr2ErrorCode(void* ptr) {
-    assert(isErrorCode(ptr));
+  static ErrorCode CastPtr2ErrorCode(void* ptr) {
+    assert(IsErrorCode(ptr));
     return static_cast<ErrorCode>(reinterpret_cast<intptr_t>(ptr));
   }
-  static GeneralChannelMessage* castErrorCode2Ptr(ErrorCode errCode) {
+  static GeneralChannelMessage* CastErrorCode2Ptr(ErrorCode errCode) {
     return reinterpret_cast<GeneralChannelMessage*>(
         static_cast<intptr_t>(errCode));
   }
@@ -102,7 +102,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   }
 
  private:
-  explicit GeneralChannelMessage(const std::string& nodeName,
+  explicit GeneralChannelMessage(const std::string& node_name,
                                  RenderableMessage* parent = nullptr)
       : GeneralMessageBase(parent),
         current_state_(State::ShowDebugString),
@@ -112,7 +112,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
         last_time_(apollo::cyber::Time::MonoTime()),
         msg_time_(last_time_.ToNanosecond() + 1),
         channel_node_(nullptr),
-        node_name_(nodeName),
+        node_name_(node_name),
         readers_(),
         writers_(),
         channel_message_(nullptr),
@@ -142,26 +142,26 @@ class GeneralChannelMessage : public GeneralMessageBase {
     vec->emplace_back(str);
   }
 
-  void updateRawMessage(
-      const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
+  void UpdateRawMessage(
+      const std::shared_ptr<apollo::cyber::message::RawMessage>& raw_msg) {
     set_has_message_come(true);
     msg_time_ = apollo::cyber::Time::MonoTime();
     ++frame_counter_;
     std::lock_guard<std::mutex> _g(inner_lock_);
     channel_message_.reset();
-    channel_message_ = rawMsg;
+    channel_message_ = raw_msg;
   }
 
   std::shared_ptr<apollo::cyber::message::RawMessage> CopyMsgPtr(void) const {
-    decltype(channel_message_) channelMsg;
+    decltype(channel_message_) channel_msg;
     {
       std::lock_guard<std::mutex> g(inner_lock_);
-      channelMsg = channel_message_;
+      channel_msg = channel_message_;
     }
-    return channelMsg;
+    return channel_msg;
   }
 
-  GeneralChannelMessage* OpenChannel(const std::string& channelName);
+  GeneralChannelMessage* OpenChannel(const std::string& channel_name);
 
   void RenderDebugString(const Screen* s, int key, int* line_no);
   void RenderInfo(const Screen* s, int key, int* line_no);

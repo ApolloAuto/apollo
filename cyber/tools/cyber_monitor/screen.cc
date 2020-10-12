@@ -24,11 +24,11 @@
 #include <mutex>
 #include <thread>
 
-#include <ncurses.h>
-
 #include "cyber/tools/cyber_monitor/cyber_topology_message.h"
 #include "cyber/tools/cyber_monitor/general_channel_message.h"
 #include "cyber/tools/cyber_monitor/renderable_message.h"
+
+#include <ncurses.h> // NOLINT
 
 namespace {
 constexpr double MinHalfFrameRatio = 12.5;
