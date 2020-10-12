@@ -45,11 +45,6 @@
 - [How to train Prediction's MLP model](how_to_train_prediction_mlp_model_cn.md)
 - [How to use the navigation mode of Apollo 2.5 cn](how_to_use_apollo_2.5_navigation_mode_cn.md)
 
-
-## Preparing the environment and porting to other distros
-- [How to set up a network](how_to_set_up_a_network.md)
-- [How to prepare Centos based GPU enabled image for ROS perception module](how_to_prepare_centosbased_gpu_enabled_image_for_ROS_perception_module.md)
-
 ## Architecture
 - [How to understand Apollo's core architecture and workflow](how_to_understand_architecture_and_workflow.md)
 
