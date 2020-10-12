@@ -79,8 +79,8 @@ ErrorCode SocketCanClientRaw::Start() {
 
   // 1. for non virtual busses, set receive message_id filter, ie white list
   if (interface_ != CANCardParameter::VIRTUAL) {
-    struct can_filter filter[512];
-    for (int i = 0; i < 512; ++i) {
+    struct can_filter filter[2048];
+    for (int i = 0; i < 2048; ++i) {
       filter[i].can_id = 0x000 + i;
       filter[i].can_mask = CAN_SFF_MASK;
     }
