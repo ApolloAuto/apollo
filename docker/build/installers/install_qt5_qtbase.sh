@@ -35,7 +35,7 @@ QT5_PREFIX="/usr/local/qt5"
 if [[ "${BUILD_TYPE}" == "download" ]]; then
     PKG_NAME="Qt-${VERSION}-linux-arm64.bin.tar.gz"
     CHECKSUM="9361d04678610fe5fddebbbf9bab38d75690d691f3d88f1f2d3eb96a07364945"
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf "${PKG_NAME}" -C /usr/local
     ln -sfnv "Qt-${VERSION}" "${QT5_PREFIX}"

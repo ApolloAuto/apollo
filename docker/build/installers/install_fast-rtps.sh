@@ -41,7 +41,7 @@ DEST_DIR="/usr/local/fast-rtps"
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
     CHECKSUM="ca0534db4f757cb41a9feaebac07a13dd4b63af0a217b2cb456e20b0836bc797"
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
@@ -51,7 +51,7 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
 else # aarch64
     PKG_NAME="fast-rtps-1.5.0.prebuilt.aarch64.tar.gz"
     CHECKSUM="061da391763949e39ed0ac4d0596112818e8692b938aa845d54fac1a1aa550db"
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
