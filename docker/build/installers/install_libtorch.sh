@@ -35,7 +35,7 @@ pip3_install mkl
 # CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
 
 PKG_NAME="libtorch-1.5.1-gpu-apollo.zip"
-DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 CHECKSUM="6e8aa94e2f7086d3ecc79484ade50cdcac69f1b51b1f04e4feda2f9384b4c380"
 
 #https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
