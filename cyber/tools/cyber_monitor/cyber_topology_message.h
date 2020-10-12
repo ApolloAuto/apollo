@@ -51,9 +51,9 @@ class CyberTopologyMessage : public RenderableMessage {
   CyberTopologyMessage& operator=(const CyberTopologyMessage&) = delete;
 
   void ChangeState(const Screen* s, int key);
-  bool isFromHere(const std::string& nodeName);
+  bool IsFromHere(const std::string& node_name);
 
-  std::map<std::string, GeneralChannelMessage*>::const_iterator findChild(
+  std::map<std::string, GeneralChannelMessage*>::const_iterator FindChild(
       int index) const;
 
   enum class SecondColumnType { MessageType, MessageFrameRatio };

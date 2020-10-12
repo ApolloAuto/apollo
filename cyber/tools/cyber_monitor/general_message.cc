@@ -76,7 +76,7 @@ GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
                                const google::protobuf::Reflection* reflection,
                                const google::protobuf::FieldDescriptor* field)
     : GeneralMessageBase(parent),
-      itemIndex_(0),
+      item_index_(0),
       is_folded_(true),
       field_(field),
       message_ptr_(msg),
@@ -91,24 +91,25 @@ int GeneralMessage::Render(const Screen* s, int key) {
       p = p->parent();
     }
 
-    GeneralChannelMessage* channelMsgPtr =
+    GeneralChannelMessage* channel_msg_ptr =
         static_cast<GeneralChannelMessage*>(p->parent());
     s->AddStr(0, line_no++, "ChannelName: ");
-    s->AddStr(channelMsgPtr->GetChannelName().c_str());
+    s->AddStr(channel_msg_ptr->GetChannelName().c_str());
 
     s->AddStr(0, line_no++, "MessageType: ");
-    s->AddStr(channelMsgPtr->message_type().c_str());
+    s->AddStr(channel_msg_ptr->message_type().c_str());
 
-    std::ostringstream outStr;
-    outStr << std::fixed << std::setprecision(FrameRatio_Precision)
-           << channelMsgPtr->frame_ratio();
+    std::ostringstream out_str;
+    out_str << std::fixed << std::setprecision(FrameRatio_Precision)
+            << channel_msg_ptr->frame_ratio();
     s->AddStr(0, line_no++, "FrameRatio: ");
-    s->AddStr(outStr.str().c_str());
+    s->AddStr(out_str.str().c_str());
 
     clear();
 
-    auto channelMsg = channelMsgPtr->CopyMsgPtr();
-    if (!channelMsgPtr->raw_msg_class_->ParseFromString(channelMsg->message)) {
+    auto channel_msg = channel_msg_ptr->CopyMsgPtr();
+    if (!channel_msg_ptr->raw_msg_class_->ParseFromString(
+            channel_msg->message)) {
       s->AddStr(0, line_no++,
                 "Cannot Parse the message for Real-Time Updating");
       return line_no;
@@ -125,10 +126,10 @@ int GeneralMessage::Render(const Screen* s, int key) {
         }
       }
 
-      if (size <= itemIndex_) {
-        outStr.str("");
-        outStr << "The item [" << itemIndex_ << "] has been empty !!!";
-        s->AddStr(0, line_no++, outStr.str().c_str());
+      if (size <= item_index_) {
+        out_str.str("");
+        out_str << "The item [" << item_index_ << "] has been empty !!!";
+        s->AddStr(0, line_no++, out_str.str().c_str());
         return line_no;
       }
 
@@ -138,25 +139,26 @@ int GeneralMessage::Render(const Screen* s, int key) {
         switch (key) {
           case 'n':
           case 'N':
-            ++itemIndex_;
-            if (itemIndex_ >= size) {
-              itemIndex_ = 0;
+            ++item_index_;
+            if (item_index_ >= size) {
+              item_index_ = 0;
             }
             break;
 
           case 'm':
           case 'M':
-            --itemIndex_;
-            if (itemIndex_ < 0) {
-              itemIndex_ = size - 1;
+            --item_index_;
+            if (item_index_ < 0) {
+              item_index_ = size - 1;
             }
             break;
 
-          default: {}
+          default: {
+          }
         }
       }
 
-      int lcount = lineCountOfField(*message_ptr_, s->Width(), field_,
+      int lcount = LineCountOfField(*message_ptr_, s->Width(), field_,
                                     reflection_ptr_, is_folded_);
       page_item_count_ = s->Height() - line_no - 8;
       if (page_item_count_ < 1) {
@@ -164,16 +166,16 @@ int GeneralMessage::Render(const Screen* s, int key) {
       }
       pages_ = lcount / page_item_count_ + 1;
       SplitPages(key);
-      int jumpLines = page_index_ * page_item_count_;
+      int jump_lines = page_index_ * page_item_count_;
       const std::vector<int> indices(
           SortProtobufMapByKeys(*message_ptr_, field_, *reflection_ptr_, size));
       if (is_folded_) {
-        GeneralMessageBase::PrintField(this, *message_ptr_, &jumpLines, s,
+        GeneralMessageBase::PrintField(this, *message_ptr_, &jump_lines, s,
                                        &line_no, 0, reflection_ptr_, field_,
-                                       indices[itemIndex_]);
+                                       indices[item_index_]);
       } else {
         for (const int index : indices) {
-          GeneralMessageBase::PrintField(this, *message_ptr_, &jumpLines, s,
+          GeneralMessageBase::PrintField(this, *message_ptr_, &jump_lines, s,
                                          &line_no, 0, reflection_ptr_, field_,
                                          index);
         }

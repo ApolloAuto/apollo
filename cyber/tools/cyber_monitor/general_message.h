@@ -42,7 +42,7 @@ class GeneralMessage : public GeneralMessageBase {
   GeneralMessage(const GeneralMessage&) = delete;
   GeneralMessage& operator=(const GeneralMessage&) = delete;
 
-  int itemIndex_;
+  int item_index_;
   bool is_folded_;
   const google::protobuf::FieldDescriptor* field_;
   const google::protobuf::Message* message_ptr_;
