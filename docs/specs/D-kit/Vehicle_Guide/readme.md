@@ -15,5 +15,5 @@
 |---|---|
 |2019001~2019016|[酷黑底盘使用手册V01批次](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Quick_Start_V01.md)|
 |2019017~2019050|[酷黑底盘使用手册V02批次](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Quick_Start_V02.md)|
-|2019051~2019090|[酷黑底盘使用手册V03批次](CHV3.md)|
-|2019091-2019095<br>2020001-2020015|[酷黑底盘使用手册V04批次](CHV4.md)|
+|2019051~2019090|[酷黑底盘使用手册V03批次](./Quick_Start_V03.md)|
+|2019091-2019095<br>2020001及以后|[酷黑底盘使用手册V04批次](./Quick_Start_V04.md)<br>[传感器安装说明V04批次](./Apollo_D-kit_sensor_integration_V04.md)|
