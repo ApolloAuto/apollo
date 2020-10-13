@@ -12,7 +12,6 @@
 ## Contribution
 - [How to document code](how_to_document_code.md)
 - [How to create a pull request](how_to_create_pull_request.md)
-- [How to migrate to the updated apollo master from previous versions.md](how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
 
 ## Debugging and troubleshooting
 - [How to troubleshoot your ESD CAN device](how_to_troubleshoot_esdcan.md)
