@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "cyber/tools/cyber_monitor/general_channel_message.h"
 #include "cyber/tools/cyber_monitor/general_message.h"
 #include "cyber/tools/cyber_monitor/screen.h"
 
@@ -29,22 +28,22 @@ constexpr int INT_FLOAT_PRECISION = 6;
 constexpr int DOULBE_PRECISION = 9;
 
 int CalculateStringLines(const std::string& str, int screen_width) {
-  int lineWidth = 0;
+  int line_width = 0;
   int line_count = 0;
   for (std::size_t i = 0; i < str.size(); ++i) {
     if (str[i] == '\n' || str[i] == '\r') {
       ++line_count;
-      lineWidth = 0;
+      line_width = 0;
     } else {
-      ++lineWidth;
-      if (lineWidth == screen_width) {
+      ++line_width;
+      if (line_width == screen_width) {
         ++line_count;
-        lineWidth = 0;
+        line_width = 0;
       }
     }
   }
 
-  if (lineWidth) {
+  if (line_width) {
     ++line_count;
   }
 
@@ -69,7 +68,7 @@ int GeneralMessageBase::LineCount(const google::protobuf::Message& msg,
   int ret = 0;
   for (decltype(fsize) i = 0; i < fsize; ++i) {
     ret += LineCountOfField(msg, screen_width, fields[i], reflection);
-  }  // end for
+  }
 
   return ret;
 }
@@ -100,7 +99,7 @@ int GeneralMessageBase::LineCountOfField(
 
         default:
           ret += 1;
-      }  // end switch
+      }
     }
   } else {
     ret = 1;
@@ -123,7 +122,7 @@ int GeneralMessageBase::LineCountOfField(
 
         default: {
         }
-      }  // end switch
+      }
     }
   }
   return ret;
@@ -158,15 +157,15 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
         GeneralMessage* item =
             new GeneralMessage(baseMsg, &msg, reflection, field);
         if (item) {
-          baseMsg->insertRepeatedMessage(*line_no, item);
+          baseMsg->InsertRepeatedMessage(*line_no, item);
         }
         s->AddStr(indent, (*line_no)++, out_str.str().c_str());
       }
     } else {
       PrintField(baseMsg, msg, jump_lines, s, line_no, indent, reflection,
                  field, -1);
-    }  // end else
-  }    // end for
+    }
+  }
 
   const google::protobuf::UnknownFieldSet& unknown_fields =
       reflection->GetUnknownFields(msg);
@@ -225,24 +224,24 @@ void GeneralMessageBase::PrintField(
               ? ref->GetRepeatedStringReference(msg, field, index, &scratch)
               : ref->GetStringReference(msg, field, &scratch);
       {
-        int lineWidth = 0;
+        int line_width = 0;
         std::size_t i = 0;
 
         for (; i < str.size() && *jump_lines > 0; ++i) {
           if (str[i] == '\n' || str[i] == '\r') {
             --(*jump_lines);
-            lineWidth = 0;
+            line_width = 0;
           } else {
-            ++lineWidth;
-            if (lineWidth == s->Width()) {
+            ++line_width;
+            if (line_width == s->Width()) {
               --(*jump_lines);
-              lineWidth = 0;
+              line_width = 0;
             }
           }
         }
 
         if (*jump_lines == 0) {
-          lineWidth = 0;
+          line_width = 0;
           unsigned line_count = 1;
 
           const std::string& fieldName = field->name();
@@ -255,13 +254,13 @@ void GeneralMessageBase::PrintField(
             char ch = str[i];
             if (str[i] == '\n' || str[i] == '\r') {
               ++line_count;
-              lineWidth = 0;
+              line_width = 0;
               ch = '\n';
             } else {
-              ++lineWidth;
-              if (lineWidth == s->Width()) {
+              ++line_width;
+              if (line_width == s->Width()) {
                 ++line_count;
-                lineWidth = 0;
+                line_width = 0;
               }
             }
             out_str << ch;
