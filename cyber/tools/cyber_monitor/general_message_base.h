@@ -45,8 +45,8 @@ class GeneralMessageBase : public RenderableMessage {
                               const google::protobuf::Reflection* reflection,
                               bool is_folded = true);
 
-  void insertRepeatedMessage(int line_no, GeneralMessageBase* item) {
-    children_map_.insert(std::make_pair(line_no, item));
+  void InsertRepeatedMessage(int line_no, GeneralMessageBase* item) {
+    children_map_.emplace(line_no, item);
   }
 
   RenderableMessage* Child(int line_no) const override;
