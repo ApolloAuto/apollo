@@ -9,27 +9,19 @@
 
 ## 2. 编译apollo工程
 
-### 2.1 构建docker容器
-我们提供了一个叫做*dev-latest*的docker镜像，docker容器会将你本地的apollo工程挂载到 */apollo* 。
+### 2.1 启动并进入Apollo开发版Docker容器
+
 ```
 bash docker/scripts/dev_start.sh
-```
-### 2.2 进入docker容器
-```
 bash docker/scripts/dev_into.sh
 ```
-### 2.3 编译工程
+
+### 2.2 编译工程
 ```
-# To make sure you start clean
-bash apollo.sh clean
-# Build the full system
+# (Optional) To make sure you start clean
+bash apollo.sh clean -a
+
 bash apollo.sh build_opt
-```
-
-`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
 ```
 
 ## 3. 运行RTK模式定位

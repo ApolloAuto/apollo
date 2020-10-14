@@ -27,12 +27,6 @@ bash apollo.sh clean
 bash apollo.sh build_opt
 ```
 
-`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
-```
-
 ## 3. 生产定位地图
 
 在下载好的定位demo数据中，找到一个名为"apollo3.5"的文件夹，将其中的数据包解压，假设该文件夹所在路径为DATA_PATH。

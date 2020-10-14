@@ -17,12 +17,6 @@ bash apollo.sh clean
 bash apollo.sh build_opt
 ```
 
-**`Note:`** If the computer is very slow, you can enter the following build command to limit the CPU.
-
-```
-bash apollo.sh build_opt --local_resources 2048,1.0,1.0
-```
-
 ## Generate Localization Map
 In the downloaded data, look for a folder named *apollo3.5*. Let's assume the path of this folder to be DATA_PATH.
 

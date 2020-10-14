@@ -32,12 +32,6 @@ bash apollo.sh clean
 bash apollo.sh build_opt
 ```
 
-`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
-```
-
 ## 3. 配置定位模块
 为了使定位模块正确运行，需要对地图路径和传感器外参进行配置。假设下载的定位数据的所在路径为DATA_PATH。
 

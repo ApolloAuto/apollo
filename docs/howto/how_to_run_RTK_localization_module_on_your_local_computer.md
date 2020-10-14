@@ -7,18 +7,13 @@
 
 ## 2. Build Apollo
 
-First check and make sure you are in development docker container before you proceed. Now you will need to build from the source.
+First check and make sure you are in Apollo Development Docker container before you proceed. Now you will need to build from the source.
+
 ```
-# To make sure you start clean
+# (Optional) To make sure you start clean
 bash apollo.sh clean
-# Build the full system
+
 bash apollo.sh build_opt
-```
-
-`note:` If the computer is very slow, you can enter the following command to limit the CPU.
-
-```
-bash apollo.sh build_opt --local_resources 2048,1.0,1.0
 ```
 
 ## 3. Run the RTK localization module
@@ -49,7 +44,7 @@ cyber_launch start /apollo/modules/localization/launch/msf_visualizer.launch
 ```
 First, the visualization tool will generate a series of cache files from the localization map, which will be stored in the /apollo/cyber/data/map_visual directory.
 
-Then it will receive the topics blew and draw them on screen.
+Then it will receive the topics listed below and draw them on screen.
  - /apollo/sensor/lidar128/compensator/PointCloud2
  - /apollo/localization/pose
 
