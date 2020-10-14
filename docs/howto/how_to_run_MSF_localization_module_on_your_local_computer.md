@@ -21,12 +21,6 @@ bash apollo.sh clean
 bash apollo.sh build_opt
 ```
 
-`note:` If the computer is very slow, you can enter the following command to limit the CPU.
-
-```
-bash apollo.sh build_opt --local_resources 2048,1.0,1.0
-```
-
 ## 3. Configuring Parameters
 In the downloaded data, you can find a folder named *apollo3.5*. Let's assume the path of this folder as DATA_PATH.
 ### 3.1 Configure Sensor Extrinsics
