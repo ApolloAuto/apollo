@@ -233,7 +233,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
       if (!UseFailSafeSearch(*partitioned_trajectories, trajectories_encodings,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
-        std::string msg("Fail to find nearest trajectory point to follow");
+        const std::string msg =
+            "Fail to find nearest trajectory point to follow";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }

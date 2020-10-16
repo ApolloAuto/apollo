@@ -14,23 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber_topology_message.h"
-#include "general_channel_message.h"
-#include "screen.h"
+#include <csignal>
+#include <iostream>
 
 #include "cyber/init.h"
 #include "cyber/service_discovery/topology_manager.h"
-
-#include <csignal>
-#include <iostream>
+#include "cyber/tools/cyber_monitor/cyber_topology_message.h"
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
 namespace {
 void SigResizeHandle(int) { Screen::Instance()->Resize(); }
 void SigCtrlCHandle(int) { Screen::Instance()->Stop(); }
 
-void printHelp(const char *cmdName) {
+void printHelp(const char *cmd_name) {
   std::cout << "Usage:\n"
-            << cmdName << "  [option]\nOption:\n"
+            << cmd_name << "  [option]\nOption:\n"
             << "   -h print help info\n"
             << "   -c specify one channel\n"
             << "Interactive Command:\n"
@@ -44,7 +43,7 @@ enum COMMAND {
   CHANNEL     // 3 -> 4
 };
 
-COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
+COMMAND ParseOption(int argc, char *const argv[], std::string *command_val) {
   if (argc > 4) {
     return TOO_MANY_PARAMETER;
   }
@@ -59,7 +58,7 @@ COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
     }
     if (strcmp(opt, "-c") == 0) {
       if (argv[index + 1]) {
-        commandVal = argv[index + 1];
+        *command_val = argv[index + 1];
         return CHANNEL;
       }
     }
@@ -75,7 +74,7 @@ COMMAND parseOption(int argc, char *const argv[], std::string &commandVal) {
 int main(int argc, char *argv[]) {
   std::string val;
 
-  COMMAND com = parseOption(argc, argv, val);
+  COMMAND com = ParseOption(argc, argv, &val);
 
   switch (com) {
     case TOO_MANY_PARAMETER:
@@ -83,7 +82,8 @@ int main(int argc, char *argv[]) {
     case HELP:
       printHelp(argv[0]);
       return 0;
-    default:;
+    default: {
+    }
   }
 
   apollo::cyber::Init(argv[0]);
@@ -91,28 +91,28 @@ int main(int argc, char *argv[]) {
   FLAGS_alsologtostderr = 0;
   FLAGS_colorlogtostderr = 0;
 
-  CyberTopologyMessage topologyMsg(val);
+  CyberTopologyMessage topology_msg(val);
 
-  auto topologyCallback =
-      [&topologyMsg](const apollo::cyber::proto::ChangeMsg &change_msg) {
-        topologyMsg.TopologyChanged(change_msg);
+  auto topology_callback =
+      [&topology_msg](const apollo::cyber::proto::ChangeMsg &change_msg) {
+        topology_msg.TopologyChanged(change_msg);
       };
 
-  auto channelManager =
+  auto channel_manager =
       apollo::cyber::service_discovery::TopologyManager::Instance()
           ->channel_manager();
-  channelManager->AddChangeListener(topologyCallback);
+  channel_manager->AddChangeListener(topology_callback);
 
-  std::vector<apollo::cyber::proto::RoleAttributes> roleVec;
-  channelManager->GetWriters(&roleVec);
-  for (auto &role : roleVec) {
-    topologyMsg.AddReaderWriter(role, true);
+  std::vector<apollo::cyber::proto::RoleAttributes> role_vec;
+  channel_manager->GetWriters(&role_vec);
+  for (auto &role : role_vec) {
+    topology_msg.AddReaderWriter(role, true);
   }
 
-  roleVec.clear();
-  channelManager->GetReaders(&roleVec);
-  for (auto &role : roleVec) {
-    topologyMsg.AddReaderWriter(role, false);
+  role_vec.clear();
+  channel_manager->GetReaders(&role_vec);
+  for (auto &role : role_vec) {
+    topology_msg.AddReaderWriter(role, false);
   }
 
   Screen *s = Screen::Instance();
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
   signal(SIGWINCH, SigResizeHandle);
   signal(SIGINT, SigCtrlCHandle);
 
-  s->SetCurrentRenderMessage(&topologyMsg);
+  s->SetCurrentRenderMessage(&topology_msg);
 
   s->Init();
   s->Run();

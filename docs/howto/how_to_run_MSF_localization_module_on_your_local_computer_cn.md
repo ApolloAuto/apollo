@@ -4,13 +4,13 @@
 
 ## 1. 事先准备
  - 从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码
- - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README_cn.md)设置Docker环境
+ - 按照[教程](../quickstart/apollo_software_installation_guide.md)设置Docker环境
  - 从[Apollo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载多传感器融合定位demo数据包（仅限美国地区），使用其中*apollo3.5*文件夹下的数据。
 
-此定位数据为实验性质的demo数据，用于验证定位模块的可用性。数据主要包含定位地图(local_map/), 车辆参数(params/), 传感器数据(records/)。具体属性如下：  
-时长：5分钟   
-里程：3km  
-场景：Sunnyvale 城市道路  
+此定位数据为实验性质的demo数据，用于验证定位模块的可用性。数据主要包含定位地图(local_map/), 车辆参数(params/), 传感器数据(records/)。具体属性如下：
+时长：5分钟
+里程：3km
+场景：Sunnyvale 城市道路
 天气：晴天
 
 ## 2. 编译apollo工程
@@ -30,12 +30,6 @@ bash docker/scripts/dev_into.sh
 bash apollo.sh clean
 # Build the full system
 bash apollo.sh build_opt
-```
-
-`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
 ```
 
 ## 3. 配置定位模块
@@ -74,7 +68,7 @@ bash apollo.sh build --local_resources 2048,1.0,1.0
 cyber_launch start /apollo/modules/localization/launch/msf_localization.launch
 ```
 
-在/apollo/data/log目录下，可以看到定位模块输出的相关log文件。 
+在/apollo/data/log目录下，可以看到定位模块输出的相关log文件。
 
  - localization.INFO : INFO级别的log信息
  - localization.WARNING : WARNING级别的log信息
@@ -133,7 +127,7 @@ python /apollo/scripts/record_bag.py --stop
 ```
 该脚本会以RTK模式的定位结果为基准，与多传感器融合模式的定位结果进行对比。
 
-`注意:` 
+`注意:`
 (注意只有在GNSS信号良好，RTK定位模式运行良好的区域，这样的对比才是有意义的。)
 
 获得如下统计结果：
@@ -142,7 +136,7 @@ python /apollo/scripts/record_bag.py --stop
 
 可以看到两组统计结果，第一组是组合导航(输出频率200hz)的统计结果，第二组是点云定位(输出频率5hz)的统计结果。
 
-表格中各项的意义， 
+表格中各项的意义，
  - error：  平面误差，单位为米
  - error lon：  车前进方向的误差，单位为米
  - error lat：  车横向方向的误差，单位为米

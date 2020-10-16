@@ -15,58 +15,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/cyber/setup.bash"
-# STAGE="${STAGE:-dev}"
-: ${STAGE:=dev}
-
-IFS='' read -r -d '' STARTUP_TXT << EOF
-startup --output_user_root="${APOLLO_CACHE_DIR}/bazel"
-common --distdir="${APOLLO_BAZEL_DISTDIR}"
-EOF
-
-set -e
 
 BAZEL_CONF="${TOP_DIR}/.apollo.bazelrc"
 
-ARCH="$(uname -m)"
-
-function config_noninteractive() {
-  echo "${STARTUP_TXT}" > "${BAZEL_CONF}"
-  echo -e "build --action_env GCC_HOST_COMPILER_PATH=\"/usr/bin/${ARCH}-linux-gnu-gcc-7\"" >> "${BAZEL_CONF}"
-  cat "${TOP_DIR}/tools/apollo.bazelrc.sample" >> "${BAZEL_CONF}"
-}
-
-function config_interactive() {
-  if [ -z "$PYTHON_BIN_PATH" ]; then
-    PYTHON_BIN_PATH=$(which python3 || true)
-  fi
-
+function run_bootstrap() {
+  py3_bin="$(which python3 || true)"
   # Set all env variables
-  "$PYTHON_BIN_PATH" "${TOP_DIR}/tools/bootstrap.py" "$@"
-  echo "${STARTUP_TXT}" >> "${BAZEL_CONF}"
+  "${py3_bin}" "${TOP_DIR}/tools/bootstrap.py" "$@"
 }
 
-function config() {
-  local stage="${STAGE}"
-  if [ $# -eq 0 ]; then
-    config_noninteractive
-  else
-    local mode="$1"
-    shift
-    if [ "${mode}" == "--clean" ]; then
-      rm -f "${BAZEL_CONF}"
-    elif [[ "${mode}" == "--interactive" || "${mode}" == "-i" ]]; then
-      config_interactive "$@"
-    else
-      config_noninteractive
-    fi
-  fi
+function print_usage() {
+  info "Usage: $0 [Options]"
+  info "Options:"
+  info "${TAB}-i|--interactive      Run in interactive mode"
+  info "${TAB}-n|--noninteractive   Run in non-interactive mode"
+  info "${TAB}-h|--help             Show this message and exit"
 }
 
 function main() {
-  config "$@"
+  local mycfg="$(basename ${BAZEL_CONF})"
+  if [[ "$#" -eq 0 ]]; then
+    print_usage
+    exit 1
+  fi
+
+  case "$1" in
+    --clean)
+      rm -f "${BAZEL_CONF}"
+      exit 0
+      ;;
+    -h | --help)
+      print_usage
+      exit 0
+      ;;
+    -i | --interactive)
+      info "Configure ${mycfg} in interactive mode"
+      run_bootstrap --interactive
+      ok "Successfully configured ${mycfg} in interactive mode."
+      exit 0
+      ;;
+    -n | --noninteractive)
+      info "Configure ${mycfg} in non-interactive mode"
+      run_bootstrap --interactive false
+      ok "Successfully configured ${mycfg} in non-interactive mode."
+      exit 0
+      ;;
+    *)
+      print_usage
+      exit 1
+      ;;
+  esac
 }
 
 main "$@"

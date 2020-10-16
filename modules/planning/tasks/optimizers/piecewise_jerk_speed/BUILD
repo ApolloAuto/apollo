@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "piecewise_jerk_speed_optimizer",
     srcs = ["piecewise_jerk_speed_optimizer.cc"],
     hdrs = ["piecewise_jerk_speed_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/proto:error_code_cc_proto",
         "//modules/common/proto:pnc_point_cc_proto",
@@ -22,7 +23,7 @@ cc_library(
     name = "piecewise_jerk_speed_nonlinear_optimizer",
     srcs = ["piecewise_jerk_speed_nonlinear_optimizer.cc"],
     hdrs = ["piecewise_jerk_speed_nonlinear_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":piecewise_jerk_speed_nonlinear_ipopt_interface",
         "//modules/common/proto:error_code_cc_proto",
@@ -43,7 +44,7 @@ cc_library(
     name = "piecewise_jerk_speed_nonlinear_ipopt_interface",
     srcs = ["piecewise_jerk_speed_nonlinear_ipopt_interface.cc"],
     hdrs = ["piecewise_jerk_speed_nonlinear_ipopt_interface.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/planning/common/path:path_data",

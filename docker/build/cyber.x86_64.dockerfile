@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+ARG BASE_IMAGE=apolloauto/apollo:cuda10.2-cudnn7-trt7-devel-18.04-x86_64
 FROM ${BASE_IMAGE}
 
 ARG BUILD_STAGE
@@ -12,8 +12,8 @@ ENV PATH /opt/apollo/sysroot/bin:$PATH
 COPY installers /tmp/installers
 COPY rcfiles /opt/apollo/rcfiles
 
-# Pre-downloaded tarballs
-COPY archive /tmp/archive
+# (Deprecated) Pre-downloaded tarballs
+# COPY archive /tmp/archive
 
 RUN bash /tmp/installers/install_minimal_environment.sh ${GEOLOC}
 RUN bash /tmp/installers/install_cmake.sh

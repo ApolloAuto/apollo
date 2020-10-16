@@ -57,7 +57,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {
-    std::string msg("Empty path data");
+    const std::string msg = "Empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -121,7 +121,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
       }
     }
     if (s_lower_bound > s_upper_bound) {
-      std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+      const std::string msg =
+          "s_lower_bound larger than s_upper_bound on STGraph";
       AERROR << msg;
       speed_data->clear();
       return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -158,7 +159,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
-    std::string msg("Piecewise jerk speed optimizer failed!");
+    const std::string msg = "Piecewise jerk speed optimizer failed!";
     AERROR << msg;
     speed_data->clear();
     return Status(ErrorCode::PLANNING_ERROR, msg);

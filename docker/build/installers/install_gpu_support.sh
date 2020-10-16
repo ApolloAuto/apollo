@@ -27,13 +27,10 @@ apt_get_update_and_install \
     libatlas-base-dev \
     liblapack-dev
 
-# TODO(storypku): GPU Build only
-apt_get_update_and_install \
-    libcublas10 \
-    libcublas-dev
+TARGET_ARCH="$(uname -m)"
 
-info "Install TensorRT 7 ..."
-bash ${CURR_DIR}/install_tensorrt.sh
+# Note(storypku):
+# 1) cublas was already installed before this installer runs
 
 info "Install libtorch ..."
 bash ${CURR_DIR}/install_libtorch.sh

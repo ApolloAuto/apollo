@@ -1,13 +1,11 @@
 # Audio
 
 ## Introduction
-  The Audio module detect the siren sound coming from the active emergency vehicle. It's trying to do on/off detection, moving status and the relative position of the siren.
-
-  The Audio module depends on some libtorch model file, which is published as a docker volume and mount into Apollo when starting the Apollo dev docker.
+  The Audio module detect the siren sound coming from the active emergency vehicle. It detects and output siren on/off status, moving status and the relative position of the siren. When active emergency vehicles detected, you can also see active alerts on Dreamview.
 
 
 ## Input
-  * Audio signal data (cyber channel /apollo/sensor/microphone)
+  * Audio signal data (cyber channel `/apollo/sensor/microphone`)
 
 ## Output
-  * Audio detection result, including the siren type, moving status(approaching/departing/stationary), and the relative position.
+  * Audio detection result, including the siren active/inactive status, moving status(approaching/departing/stationary), and the positions (cyber channel `apollo/audio/audio_detection`).

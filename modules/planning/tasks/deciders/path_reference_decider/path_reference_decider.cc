@@ -23,13 +23,14 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -162,7 +163,31 @@ Status PathReferenceDecider::Process(Frame *frame,
     return Status::OK();
   }
   std::vector<PathPoint> path_reference;
-  ConvertTrajectoryToPath(learning_model_trajectory, &path_reference);
+  // adjusting trajectory init point
+  DiscretizedTrajectory stitched_learning_model_trajectory;
+  reference_line_info->AdjustTrajectoryWhichStartsFromCurrentPos(
+      frame->PlanningStartPoint(), learning_model_trajectory,
+      &stitched_learning_model_trajectory);
+  // when path_reference is too short not valid path reference
+  if (stitched_learning_model_trajectory.size() <= 1) {
+    reference_line_info->mutable_path_data()->set_is_valid_path_reference(
+        false);
+    ADEBUG << "valid_path_reference_counter[" << valid_path_reference_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
+    std::string err_msg = "Stitched path reference is too short";
+    reference_line_info->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_hybrid_model()
+        ->set_learning_model_output_fail_reason(err_msg);
+    reference_line_info->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_hybrid_model()
+        ->set_learning_model_output_usage_ratio(
+            static_cast<double>(valid_path_reference_counter_) /
+            (total_path_counter_ + kMathEpsilon));
+    return Status::OK();
+  }
+  ConvertTrajectoryToPath(stitched_learning_model_trajectory, &path_reference);
   const std::string path_reference_name = "path_reference";
   RecordDebugInfo(path_reference, path_reference_name, reference_line_info);
 
@@ -439,37 +464,12 @@ void PathReferenceDecider::RecordDebugInfo(
   // Sanity checks.
   ACHECK(!path_points.empty());
   CHECK_NOTNULL(reference_line_info);
-
-  // Take learning model output and transform it into
-  // PathData so that it can be displayed in simulator.
-  std::vector<common::FrenetFramePoint> frenet_frame_path_points;
-  for (const PathPoint &path_point : path_points) {
-    common::SLPoint point_sl;
-    reference_line_info->reference_line().XYToSL(
-        {path_point.x(), path_point.y()}, &point_sl);
-    common::FrenetFramePoint frenet_frame_point;
-    frenet_frame_point.set_s(point_sl.s());
-    frenet_frame_point.set_dl(0.0);
-    frenet_frame_point.set_ddl(0.0);
-    // get l from reference line
-    frenet_frame_point.set_l(point_sl.l());
-    frenet_frame_path_points.push_back(frenet_frame_point);
-  }
-
-  auto frenet_frame_path_reference =
-      FrenetFramePath(std::move(frenet_frame_path_points));
-  PathData path_reference_data;
-  path_reference_data.SetReferenceLine(
-      &(reference_line_info->reference_line()));
-  path_reference_data.SetFrenetPath(std::move(frenet_frame_path_reference));
-
   // Insert the transformed PathData into the simulator display.
   auto *ptr_display_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
   ptr_display_path->set_name(path_name);
   ptr_display_path->mutable_path_point()->CopyFrom(
-      {path_reference_data.discretized_path().begin(),
-       path_reference_data.discretized_path().end()});
+      {path_points.begin(), path_points.end()});
 }
 
 }  // namespace planning

@@ -51,7 +51,7 @@ class Screen final {
   int Width(void) const;
   int Height(void) const;
 
-  void AddStr(int x, int y, ColorPair color, const char* cStr) const;
+  void AddStr(int x, int y, ColorPair color, const char* str) const;
 
   ColorPair Color(void) const { return current_color_pair_; }
   void SetCurrentColor(ColorPair color) const;
@@ -60,9 +60,9 @@ class Screen final {
   void MoveOffsetXY(int offsetX, int offsetY) const;
   void ClearCurrentColor(void) const;
 
-  void SetCurrentRenderMessage(RenderableMessage* const renderObj) {
-    if (renderObj) {
-      current_render_obj_ = renderObj;
+  void SetCurrentRenderMessage(RenderableMessage* const render_obj) {
+    if (render_obj) {
+      current_render_obj_ = render_obj;
     }
   }
 
@@ -72,7 +72,7 @@ class Screen final {
   Screen& operator=(const Screen&) = delete;
 
   int SwitchState(int ch);
-  void HighlightLine(int lineNo);
+  void HighlightLine(int line_no);
 
   void ShowInteractiveCmd(int ch);
   void ShowRenderMessage(int ch);

@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.v2x.obu;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/geometry.proto";
+
+message ObuRsi {
+  optional apollo.common.Header header = 1;
+  optional bytes rsu_id = 2;
+  optional int32 rsi_id = 3;
+  optional int32 alter_type = 4;
+  optional string description = 5;
+  optional apollo.common.Point2D ref_point = 6;
+  repeated apollo.common.Point2D points = 7;
+  optional int32 radius = 8;
+  optional int32 msg_cnt = 9;
+}

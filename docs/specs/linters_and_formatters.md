@@ -39,11 +39,11 @@ are provided for developers to check style issues.
 > files only. We hope that linters for other languages will be online in the
 > near future.
 
-|  Linters   |           Source Extensions           | Apollo Command Used        |
-| :--------: | :-----------------------------------: | :------------------------- |
-|  cpplint   | .h/.c/.hpp/.cpp/.hh/.cc/.hxx/.cxx/.cu | scripts/apollo_lint.sh cpp |
-|   flake8   |                  .py                  | scripts/apollo_lint.sh py  |
-| shellcheck |           .sh/.bash/.bashrc           | scripts/apollo_lint.sh sh  |
+|  Linters   |           Source Extensions           | Usage                     |
+| :--------: | :-----------------------------------: | :------------------------ |
+|  cpplint   | .h/.c/.hpp/.cpp/.hh/.cc/.hxx/.cxx/.cu | bash apollo.sh lint --cpp |
+|   flake8   |                  .py                  | bash apollo.sh lint --py  |
+| shellcheck |           .sh/.bash/.bashrc           | bash apollo.sh lint --sh  |
 
 To make sure your code conforms to Apollo coding style, you can use
 `./apollo.sh lint` to find any possible style problems and fix them manually.
@@ -57,13 +57,13 @@ avoid common mistakes when writing code.
 The following table lists the formatters currently integrated into Apollo,
 covering C/C++, Python, Bash, Bazel, Markdown, JSON and YAML files.
 
-|  Formatters  |            Source Extension            |               Apollo Command Used                | Formatter Config |
-| :----------: | :------------------------------------: | :----------------------------------------------: | :--------------: |
-| clang-format | .h/.c/.hpp/.cpp/.hh/.cc/.hxx/.cxx;/.cu | ./apollo.sh format -c <path/to/src/dir/or/files> |  .clang-format   |
-|   autopep8   |                  .py                   | ./apollo.sh format -p <path/to/src/dir/or/files> |     tox.ini      |
-|  buildifier  |   .BUILD/.bzl/.bazel/WORKSPACE/BUILD   | ./apollo.sh format -b <path/to/src/dir/or/files> |       N/A        |
-|    shfmt     |           .sh/.bash/.bashrc            | ./apollo.sh format -s <path/to/src/dir/or/files> |  .editorconfig   |
-|   prettier   |             .md/.json/.yml             | ./apollo.sh format -m <path/to/src/dir/or/files> |  .prettier.json  |
+|  Formatters  |              Source Extensions               |                      Usage                       | Formatter Config |
+| :----------: | :------------------------------------------: | :----------------------------------------------: | :--------------: |
+| clang-format | .h/.c/.hpp/.cpp/.hh/.cc/.hxx/.cxx/.cu/.proto | ./apollo.sh format -c <path/to/src/dir/or/files> |  .clang-format   |
+|   autopep8   |                     .py                      | ./apollo.sh format -p <path/to/src/dir/or/files> |     tox.ini      |
+|  buildifier  |      .BUILD/.bzl/.bazel/WORKSPACE/BUILD      | ./apollo.sh format -b <path/to/src/dir/or/files> |       N/A        |
+|    shfmt     |              .sh/.bash/.bashrc               | ./apollo.sh format -s <path/to/src/dir/or/files> |  .editorconfig   |
+|   prettier   |                .md/.json/.yml                | ./apollo.sh format -m <path/to/src/dir/or/files> |  .prettier.json  |
 
 For easy use, you can format all files with types listed above with:
 
@@ -82,8 +82,8 @@ which will auto-format Bazel `WORKSPACE` file under `$APOLLO_ROOT_DIR`,
 
 Note:
 
-> `./apollo.sh format` can also work outside Docker if relavant tools
-> installed properly.
+> `./apollo.sh format` can also work outside Docker if relavant tools installed
+> properly.
 
 ## Conclusion
 

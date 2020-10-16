@@ -170,7 +170,7 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
       data_providers_map_;
 
   // image
-  camera::CameraFrame frame_;
+  std::shared_ptr<camera::CameraFrame> frame_;
 
   // proc
   camera::CameraPerceptionInitOptions camera_perception_init_options_;

@@ -22,9 +22,9 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"
-// #include "modules/perception/inference/inference_factory.h"
-// #include "modules/perception/inference/utils/resize.h"
-// #include "modules/perception/inference/utils/util.h"
+#include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/inference/utils/resize.h"
+#include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
 namespace perception {
@@ -89,19 +89,19 @@ bool TrafficLightDetection::Init(
   const auto &model_type = detection_param_.model_type();
   AINFO << "model_type: " << model_type;
 
-//  rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
-//                                                 weight_file, net_outputs_,
-//                                                 net_inputs_, model_root));
+  rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
+                                                weight_file, net_outputs_,
+                                                net_inputs_, model_root));
 
-//  AINFO << "rt_net_ create succeed";
-//  rt_net_->set_gpu_id(options.gpu_id);
+  AINFO << "rt_net_ create succeed";
+  rt_net_->set_gpu_id(options.gpu_id);
   AINFO << "set gpu id " << options.gpu_id;
   gpu_id_ = options.gpu_id;
 
   int resize_height = detection_param_.min_crop_size();
   int resize_width = detection_param_.min_crop_size();
   max_batch_size_ = detection_param_.max_batch_size();
-  param_blob_length_ = 6;
+  param_blob_length_ = 3;
 
   CHECK_GT(resize_height, 0);
   CHECK_GT(resize_width, 0);
@@ -117,25 +117,22 @@ bool TrafficLightDetection::Init(
   input_reshape.insert(
       (std::pair<std::string, std::vector<int>>(net_inputs_[1], shape_param)));
 
-//  if (!rt_net_->Init(input_reshape)) {
-//    AINFO << "net init fail.";
-//    return false;
-//  }
-//  AINFO << "net init success.";
+  if (!rt_net_->Init(input_reshape)) {
+    AWARN << "net init fail.";
+    return false;
+  }
+  AINFO << "net init success.";
 
   mean_buffer_.reset(new base::Blob<float>(1, resize_height, resize_height, 3));
 
-//  param_blob_ = rt_net_->get_blob(net_inputs_[1]);
-//  float *param_data = param_blob_->mutable_cpu_data();
-//  for (int i = 0; i < max_batch_size_; ++i) {
-//    auto offset = i * param_blob_length_;
-//    param_data[offset + 0] = static_cast<float>(resize_width);
-//    param_data[offset + 1] = static_cast<float>(resize_height);
-//    param_data[offset + 2] = 1;
-//    param_data[offset + 3] = 1;
-//    param_data[offset + 4] = 0;
-//    param_data[offset + 5] = 0;
-//  }
+  param_blob_ = rt_net_->get_blob(net_inputs_[1]);
+  float *param_data = param_blob_->mutable_cpu_data();
+  for (int i = 0; i < max_batch_size_; ++i) {
+    auto offset = i * param_blob_length_;
+    param_data[offset + 0] = static_cast<float>(resize_width);
+    param_data[offset + 1] = static_cast<float>(resize_height);
+    param_data[offset + 2] = 1;
+  }
 
   switch (detection_param_.crop_method()) {
     default:
@@ -166,28 +163,25 @@ bool TrafficLightDetection::Inference(
   int img_height = data_provider->src_height();
   int resize_index = 0;
   auto batch_num = lights->size();
-//  auto input_img_blob = rt_net_->get_blob(net_inputs_[0]);
-//  auto input_param = rt_net_->get_blob(net_inputs_[1]);
+  auto input_img_blob = rt_net_->get_blob(net_inputs_[0]);
+  auto input_param = rt_net_->get_blob(net_inputs_[1]);
 
-//  input_img_blob->Reshape(static_cast<int>(batch_num),
-//                          static_cast<int>(detection_param_.min_crop_size()),
-//                          static_cast<int>(detection_param_.min_crop_size()),
-//                          3);
-//  param_blob_->Reshape(static_cast<int>(batch_num), 6, 1, 1);
-//  float *param_data = param_blob_->mutable_cpu_data();
-//  for (size_t i = 0; i < batch_num; ++i) {
-//    auto offset = i * param_blob_length_;
-//    param_data[offset + 0] =
-//        static_cast<float>(detection_param_.min_crop_size());
-//    param_data[offset + 1] =
-//        static_cast<float>(detection_param_.min_crop_size());
-//    param_data[offset + 2] = 1;
-//    param_data[offset + 3] = 1;
-//    param_data[offset + 4] = 0;
-//    param_data[offset + 5] = 0;
-//  }
+  input_img_blob->Reshape(static_cast<int>(batch_num),
+                          static_cast<int>(detection_param_.min_crop_size()),
+                          static_cast<int>(detection_param_.min_crop_size()),
+                          3);
+  param_blob_->Reshape(static_cast<int>(batch_num), 1, 3, 1);
+  float *param_data = param_blob_->mutable_cpu_data();
+  for (size_t i = 0; i < batch_num; ++i) {
+    auto offset = i * param_blob_length_;
+    param_data[offset + 0] =
+        static_cast<float>(detection_param_.min_crop_size());
+    param_data[offset + 1] =
+        static_cast<float>(detection_param_.min_crop_size());
+    param_data[offset + 2] = 1;
+  }
 
-//  AINFO << "reshape inputblob " << input_img_blob->shape_string();
+  AINFO << "reshape inputblob " << input_img_blob->shape_string();
 
   for (size_t i = 0; i < batch_num; ++i) {
     base::TrafficLightPtr light = lights->at(i);
@@ -212,16 +206,16 @@ bool TrafficLightDetection::Inference(
           static_cast<float>(std::min(cbox.width, cbox.height));
       resize_scale_list_.push_back(resize_scale);
 
-//      inference::ResizeGPU(*image_, input_img_blob, img_width, resize_index,
-//                           mean_[0], mean_[1], mean_[2], true, 1.0);
+      inference::ResizeGPU(*image_, input_img_blob, img_width, resize_index,
+                            mean_[0], mean_[1], mean_[2], true, 1.0);
       resize_index++;
     }
   }
   // _detection
-//  cudaDeviceSynchronize();
-//  rt_net_->Infer();
-//  cudaDeviceSynchronize();
-//  AINFO << "rt_net run success";
+  cudaDeviceSynchronize();
+  rt_net_->Infer();
+  cudaDeviceSynchronize();
+  AINFO << "rt_net run success";
 
   // dump the output
   SelectOutputBoxes(crop_box_list_, resize_scale_list_, resize_scale_list_,
@@ -240,7 +234,7 @@ bool TrafficLightDetection::Detect(const TrafficLightDetectorOptions &options,
   }
 
   const auto &data_provider = frame->data_provider;
-//  auto input_blob = rt_net_->get_blob(net_inputs_[0]);
+  auto input_blob = rt_net_->get_blob(net_inputs_[0]);
   int img_width = data_provider->src_width();
   int img_height = data_provider->src_height();
   std::vector<base::TrafficLightPtr> &lights_ref = frame->traffic_lights;
@@ -270,7 +264,7 @@ bool TrafficLightDetection::Detect(const TrafficLightDetectorOptions &options,
     }
   }
 
-//  Inference(&lights_ref, data_provider);
+  Inference(&lights_ref, data_provider);
 
   AINFO << "Dump output Done! Get box num:" << detected_bboxes_.size();
 
@@ -294,80 +288,80 @@ bool TrafficLightDetection::SelectOutputBoxes(
     const std::vector<float> &resize_scale_list_col,
     const std::vector<float> &resize_scale_list_row,
     std::vector<base::TrafficLightPtr> *lights) {
-//  auto output_blob = rt_net_->get_blob(net_outputs_[0]);
-//  int result_box_num = output_blob->shape(0);
-//  int each_box_length = output_blob->shape(1);
+  auto output_blob = rt_net_->get_blob(net_outputs_[0]);
+  int result_box_num = output_blob->shape(0);
+  int each_box_length = output_blob->shape(1);
 
-//  AINFO << "output blob size " << output_blob->shape(0) << " "
-//        << output_blob->shape(1) << " " << output_blob->shape(2) << " "
-//        << output_blob->shape(3);
+  AINFO << "output blob size " << output_blob->shape(0) << " "
+        << output_blob->shape(1) << " " << output_blob->shape(2) << " "
+        << output_blob->shape(3);
 
-//  for (int candidate_id = 0; candidate_id < result_box_num; candidate_id++) {
-//    const float *result_data =
-//        output_blob->cpu_data() + candidate_id * each_box_length;
-//    int img_id = static_cast<int>(result_data[0]);
-//    if (img_id >= static_cast<int>(crop_box_list.size())) {
-//      AINFO << "img id " << img_id << " > " << crop_box_list.size();
-//      continue;
-//    }
-//    base::TrafficLightPtr tmp(new base::TrafficLight);
-//    float inflate_col = 1 / resize_scale_list_col.at(img_id);
-//    float inflate_row = 1 / resize_scale_list_row.at(img_id);
-//    float x1 = result_data[1];
-//    float y1 = result_data[2];
-//    float x2 = result_data[3];
-//    float y2 = result_data[4];
-//    std::vector<float> score{result_data[5], result_data[6], result_data[7],
-//                             result_data[8]};
-//    for (int i = 0; i < 9; ++i) {
-//      ADEBUG << "result_data " << result_data[i];
-//    }
-//
-//    std::vector<float>::iterator biggest =
-//        std::max_element(std::begin(score), std::end(score));
-//    tmp->region.detect_class_id =
-//        base::TLDetectionClass(std::distance(std::begin(score), biggest) - 1);
+  for (int candidate_id = 0; candidate_id < result_box_num; candidate_id++) {
+    const float *result_data =
+        output_blob->cpu_data() + candidate_id * each_box_length;
+    int img_id = static_cast<int>(result_data[0]);
+    if (img_id >= static_cast<int>(crop_box_list.size())) {
+      AINFO << "img id " << img_id << " > " << crop_box_list.size();
+      continue;
+    }
+    base::TrafficLightPtr tmp(new base::TrafficLight);
+    float inflate_col = 1 / resize_scale_list_col.at(img_id);
+    float inflate_row = 1 / resize_scale_list_row.at(img_id);
+    float x1 = result_data[1];
+    float y1 = result_data[2];
+    float x2 = result_data[3];
+    float y2 = result_data[4];
+    std::vector<float> score{result_data[5], result_data[6], result_data[7],
+                             result_data[8]};
+    for (int i = 0; i < 9; ++i) {
+      ADEBUG << "result_data " << result_data[i];
+    }
 
-//    if (static_cast<int>(tmp->region.detect_class_id) >= 0) {
-//      tmp->region.detection_roi.x = static_cast<int>(x1 * inflate_col);
-//      tmp->region.detection_roi.y = static_cast<int>(y1 * inflate_row);
-//      tmp->region.detection_roi.width =
-//          static_cast<int>((x2 - x1 + 1) * inflate_col);
-//      tmp->region.detection_roi.height =
-//          static_cast<int>((y2 - y1 + 1) * inflate_row);
-//      tmp->region.detect_score = *biggest;
-//
-//      if (OutOfValidRegion(tmp->region.detection_roi,
-//                           crop_box_list.at(img_id).width,
-//                           crop_box_list.at(img_id).height) ||
-//          tmp->region.detection_roi.Area() <= 0) {
-//        AINFO << "Invalid width or height or x or y: "
-//              << tmp->region.detection_roi.width << " | "
-//              << tmp->region.detection_roi.height << " | "
-//              << tmp->region.detection_roi.x << " | "
-//              << tmp->region.detection_roi.y;
-//        AINFO << " max width " << crop_box_list.at(img_id).width
-//              << " max height " << crop_box_list.at(img_id).height
-//              << " at img_id " << img_id;
-//        continue;
-//      }
-//
-//      RefineBox(tmp->region.detection_roi, crop_box_list.at(img_id).width,
-//          crop_box_list.at(img_id).height, &(tmp->region.detection_roi));
-//      tmp->region.detection_roi.x += crop_box_list.at(img_id).x;
-//      tmp->region.detection_roi.y += crop_box_list.at(img_id).y;
-//      tmp->region.is_detected = true;
-//      AINFO << "detect roi x " << tmp->region.detection_roi.x << " "
-//            << tmp->region.detection_roi.y << " "
-//            << tmp->region.detection_roi.width << " "
-//            << tmp->region.detection_roi.height;
-//
-//      lights->push_back(tmp);
-//    } else {
-//      AINFO << "Invalid classid  "
-//            << static_cast<int>(tmp->region.detect_class_id);
-//    }
-//  }
+    std::vector<float>::iterator biggest =
+        std::max_element(std::begin(score), std::end(score));
+    tmp->region.detect_class_id =
+        base::TLDetectionClass(std::distance(std::begin(score), biggest) - 1);
+
+    if (static_cast<int>(tmp->region.detect_class_id) >= 0) {
+      tmp->region.detection_roi.x = static_cast<int>(x1 * inflate_col);
+      tmp->region.detection_roi.y = static_cast<int>(y1 * inflate_row);
+      tmp->region.detection_roi.width =
+          static_cast<int>((x2 - x1 + 1) * inflate_col);
+      tmp->region.detection_roi.height =
+          static_cast<int>((y2 - y1 + 1) * inflate_row);
+      tmp->region.detect_score = *biggest;
+
+      if (OutOfValidRegion(tmp->region.detection_roi,
+                           crop_box_list.at(img_id).width,
+                           crop_box_list.at(img_id).height) ||
+          tmp->region.detection_roi.Area() <= 0) {
+        AINFO << "Invalid width or height or x or y: "
+              << tmp->region.detection_roi.width << " | "
+              << tmp->region.detection_roi.height << " | "
+              << tmp->region.detection_roi.x << " | "
+              << tmp->region.detection_roi.y;
+        AINFO << " max width " << crop_box_list.at(img_id).width
+              << " max height " << crop_box_list.at(img_id).height
+              << " at img_id " << img_id;
+        continue;
+      }
+
+      RefineBox(tmp->region.detection_roi, crop_box_list.at(img_id).width,
+          crop_box_list.at(img_id).height, &(tmp->region.detection_roi));
+      tmp->region.detection_roi.x += crop_box_list.at(img_id).x;
+      tmp->region.detection_roi.y += crop_box_list.at(img_id).y;
+      tmp->region.is_detected = true;
+      AINFO << "detect roi x " << tmp->region.detection_roi.x << " "
+            << tmp->region.detection_roi.y << " "
+            << tmp->region.detection_roi.width << " "
+            << tmp->region.detection_roi.height;
+
+      lights->push_back(tmp);
+    } else {
+      AWARN << "Invalid classid  "
+            << static_cast<int>(tmp->region.detect_class_id);
+    }
+  }
 
   return true;
 }

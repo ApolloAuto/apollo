@@ -38,9 +38,9 @@ function _clean_bazel_cache() {
 
   # Remove bazel cache in associated directories
   if [ -d /apollo-simulator ]; then
-    pushd /apollo-simulator > /dev/null
+    pushd /apollo-simulator >/dev/null
     bazel clean ${opt}
-    popd > /dev/null
+    popd >/dev/null
   fi
 }
 
@@ -75,11 +75,15 @@ function _print_usage() {
   echo "${TAB}--log       Remove log files"
   echo "${TAB}-a, --all   Equivalent to \"--bazel --core --log\""
   echo "${TAB}--expunge   Run \"bazel clean --expunge\""
-
-  echo "${TAB}-h, --help  Show this message"
+  echo "${TAB}-h, --help  Show this message and exit"
 }
 
 function parse_arguments() {
+  if [[ $# -eq 0 ]]; then
+    _print_usage
+    exit 1
+  fi
+
   while [ $# -gt 0 ]; do
     local opt="$1"
     shift

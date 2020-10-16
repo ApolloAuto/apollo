@@ -1,7 +1,7 @@
 # How to Add a New External Dependency
 
 The bazel files about third-party dependencies are all in the folder
-[third_party](https://github.com/ApolloAuto/apollo/blob/master/third_party)
+[third_party](../../third_party)
 which has a structure as following.
 
 ```shell
@@ -68,7 +68,7 @@ def repo():
 
 It's pretty common to do so. But it needs very solid knowledge with bazel.
 
-[workspace.bzl](https://github.com/ApolloAuto/apollo/blob/master/third_party/yaml_cpp/workspace.bzl):
+[workspace.bzl](../../third_party/yaml_cpp/workspace.bzl):
 
 ```python
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
@@ -88,7 +88,7 @@ def repo():
     )
 ```
 
-[yaml.BUILD](https://github.com/ApolloAuto/apollo/blob/master/third_party/yaml_cpp/yaml.BUILD):
+[yaml.BUILD](../../third_party/yaml_cpp/yaml.BUILD):
 
 ```python
 load("@rules_cc//cc:defs.bzl", "cc_library")
@@ -123,7 +123,7 @@ For example,
 
 - [Poco](https://github.com/pocoproject/poco)
 
-[workspace.bzl](https://github.com/ApolloAuto/apollo/blob/master/third_party/poco/workspace.bzl):
+[workspace.bzl](../../third_party/poco/workspace.bzl):
 
 ```python
 def clean_dep(dep):
@@ -137,7 +137,7 @@ def repo():
     )
 ```
 
-[poco.BUILD](https://github.com/ApolloAuto/apollo/blob/master/third_party/poco/poco.BUILD):
+[poco.BUILD](../../third_party/poco/poco.BUILD):
 
 ```python
 load("@rules_cc//cc:defs.bzl", "cc_library")
@@ -164,7 +164,7 @@ as they are in the system path.
 
 For all of the above types of external dependencies, we also need to add them
 into
-[tools/workspace.bzl](https://github.com/ApolloAuto/apollo/blob/master/tools/workspace.bzl)
+[tools/workspace.bzl](../../tools/workspace.bzl)
 
 ## References
 

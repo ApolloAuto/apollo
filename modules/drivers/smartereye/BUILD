@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
 cc_binary(
     name = "libsmartereye_component.so",
@@ -17,7 +18,7 @@ cc_library(
     name = "smartereye_component_lib",
     srcs = ["smartereye_component.cc"],
     hdrs = ["smartereye_component.h"],
-    copts = ['-DMODULE_NAME=\\"camera\\"'],
+    copts = CAMERA_COPTS,
     deps = [
         ":smartereye_device",
         ":smartereye_handler",
@@ -35,7 +36,7 @@ cc_library(
     name = "smartereye_device",
     srcs = ["smartereye_device.cc"],
     hdrs = ["smartereye_device.h"],
-    copts = ['-DMODULE_NAME=\\"camera\\"'],
+    copts = CAMERA_COPTS,
     deps = [
         ":smartereye_handler",
         "//cyber",
@@ -48,7 +49,7 @@ cc_library(
     name = "smartereye_handler",
     srcs = ["smartereye_handler.cc"],
     hdrs = ["smartereye_handler.h"],
-    copts = ['-DMODULE_NAME=\\"camera\\"'],
+    copts = CAMERA_COPTS,
     deps = [
         "//cyber",
         "//third_party/camera_library/smartereye",
@@ -59,7 +60,7 @@ cc_library(
     name = "compress_component_lib",
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
-    copts = ['-DMODULE_NAME=\\"camera\\"'],
+    copts = CAMERA_COPTS,
     deps = [
         "//cyber",
         "//modules/common/proto:error_code_cc_proto",

@@ -19,6 +19,12 @@
 # Fail on first error.
 set -e
 
+if [[ "$1" == "build" ]]; then
+    BUILD_TYPE="build"
+else
+    BUILD_TYPE="download"
+fi
+
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
 
@@ -37,7 +43,7 @@ apt-get -y update && \
 # The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
 if [ "${TARGET_ARCH}" = "aarch64" ]; then
-    bash ${CURR_DIR}/install_qt5base.sh
+    bash ${CURR_DIR}/install_qt5_qtbase.sh "${BUILD_TYPE}"
     exit 0
 fi
 

@@ -40,7 +40,7 @@
 
 预测模块负责预测所有感知障碍物的未来运动轨迹。输出预测消息封装了感知信息。预测订阅定位和感知障碍物消息，如下所示。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/prediction.png)
+![img](images/prediction.png)
 
 当接收到定位更新时，预测模块更新其内部状态。当感知发出其发布感知障碍物消息时，触发预测实际执行。
 
@@ -49,16 +49,16 @@
 定位模块聚合各种数据以定位自动驾驶车辆。有两种类型的定位模式：OnTimer和多传感器融合。
 
 第一种基于RTK的定位方法，通过计时器的回调函数“OnTimer”实现，如下所示。
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/localization.png)
+![img](images/localization.png)
 
 另一种定位方法是多传感器融合（MSF）方法，其中注册了一些事件触发的回调函数，如下所示。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/localization_2.png)
+![img](images/localization_2.png)
 
 ## 路由
 为了计算可通行车道和道路，路由模块需要知道起点和终点。通常，路由起点是自动驾驶车辆位置。重要的数据接口是一个名为`OnRoutingRequest`的事件触发函数，其中`RoutingResponse`的计算和发布如下所示。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/routing.png)
+![img](images/routing.png)
 
 ## 规划
 Apollo 2.0需要使用多个信息源来规划安全无碰撞的行驶轨迹，因此规划模块几乎与其他所有模块进行交互。
@@ -68,30 +68,30 @@ Apollo 2.0需要使用多个信息源来规划安全无碰撞的行驶轨迹，�
 
 最后，规划模块需要知道定位信息（定位：我在哪里）以及当前的自动驾驶车辆信息（底盘：我的状态是什么）。规划模块由固定频率触发，主数据接口是调用`RunOnce`函数的`OnTimer`回调函数。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/planning_1.png)
+![img](images/planning_1.png)
 
 底盘，定位，交通灯和预测等数据依赖关系通过`AdapterManager`类进行管理。核心软件模块同样也由`AdapterManager`类管理。例如，定位通过`AdapterManager :: GetLocalization()`管理，如下所示。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/planning_2.png)
+![img](images/planning_2.png)
 
 ## 控制
 如规划模块中所述，控制将规划轨迹作为输入，并生成控制命令传递给CanBus。它有三个主要的数据接口：OnPad，OnMonitor和OnTimer。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/control_1.png)
+![img](images/control_1.png)
 
 `OnPad`和`OnMonitor`是仿真和HMI的交互接口。 主要数据接口是`OnTimer`，它定期产生实际的控制命令，如下所示。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/control_2.png)
+![img](images/control_2.png)
 
 ## CanBus
 
 CanBus有两个数据接口。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/canbus_1.png)
+![img](images/canbus_1.png)
 
 第一个数据接口是基于计时器的发布者，回调函数为“OnTimer”。如果启用，此数据接口会定期发布底盘信息。
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/canbus_2.png)
+![img](images/canbus_2.png)
 
 第二个数据接口是一个基于事件的发布者，回调函数为“OnControlCommand”，当CanBus模块接收到控制命令时会触发该函数。
 

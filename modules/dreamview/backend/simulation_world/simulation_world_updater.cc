@@ -16,8 +16,9 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
-#include "cyber/common/file.h"
 #include "google/protobuf/util/json_util.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -402,8 +403,8 @@ bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
 }
 
 void SimulationWorldUpdater::Start() {
-  timer_.reset(new cyber::Timer(kSimWorldTimeIntervalMs,
-                                [this]() { this->OnTimer(); }, false));
+  timer_.reset(new cyber::Timer(
+      kSimWorldTimeIntervalMs, [this]() { this->OnTimer(); }, false));
   timer_->Start();
 }
 

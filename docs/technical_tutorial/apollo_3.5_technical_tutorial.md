@@ -3,12 +3,12 @@
 ## Overview
 > Learn how to setup Apollo 3.5
 
-  * [Apollo 3.5 quick start](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/quickstart/apollo_3_5_quick_start.md)
+  * [Apollo 3.5 quick start](https://github.com/ApolloAuto/apollo/blob/r5.5.0/docs/quickstart/apollo_3_5_quick_start.md)
 
 ## Hardware system installation
 > Learn the procedure of Apollo 3.5 hardware system installation
 
-  * [Apollo 3.5 Hardware System Installation guide](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
+  * [Apollo 3.5 Hardware System Installation guide](https://github.com/ApolloAuto/apollo/blob/r5.5.0/docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
 
 ## Software installation
 > Apollo 3.5 Software and Dreamview installation
@@ -20,7 +20,7 @@
 ## Apollo Cyber
 > All you need to know about Apollo Cyber RT
 
-* [Apollo 3.5 all you need to know about Cyber RT](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/cyber/README.md)
+* [Apollo 3.5 all you need to know about Cyber RT](https://github.com/ApolloAuto/apollo/blob/r3.5.0/cyber/README.md)
 
 
 ## Calibration
@@ -34,7 +34,7 @@
 ## Software architecture and algorithms
 > Deep dive into Apollo's modules and algorithms
 
-  * [Apollo 3.5 software architecture](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/specs/Apollo_3.5_Software_Architecture.md "Apollo software architecture")
+  * [Apollo 3.5 software architecture](https://github.com/ApolloAuto/apollo/blob/r5.0.0/docs/specs/Apollo_3.5_Software_Architecture.md "Apollo software architecture")
   * [3D Obstacle Perception](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/specs/3d_obstacle_perception.md)
   * [Apollo 3.5 Perception](https://github.com/ApolloAuto/apollo/blob/r3.5.0/modules/perception/README.md)
   * [QP-Spline-Path Optimizer](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/specs/qp_spline_path_optimizer.md)

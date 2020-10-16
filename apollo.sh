@@ -12,6 +12,9 @@ APOLLO_ENV=""
 USE_ESD_CAN=false
 : ${STAGE:=dev}
 
+AVAILABLE_COMMANDS="config build build_dbg build_opt build_cpu build_gpu build_opt_gpu test coverage lint \
+                    buildify check build_fe build_teleop build_prof doc clean format usage -h --help"
+
 function check_architecture_support() {
     if [[ "${SUPPORTED_ARCHS}" != *" ${ARCH} "* ]]; then
         error "Unsupported CPU arch: ${ARCH}. Currently, Apollo only" \
@@ -83,6 +86,13 @@ function apollo_env_setup() {
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
     info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET}"
 
+    if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
+        source "${TOP_DIR}/cyber/setup.bash"
+    fi
+    if [[ ! -d "${APOLLO_BAZEL_DIST_DIR}" ]]; then
+        mkdir -p "${APOLLO_BAZEL_DIST_DIR}"
+    fi
+
     if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
         env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
     fi
@@ -124,8 +134,17 @@ function _usage() {
     ${BLUE}doc${NO_COLOR}: generate doxygen document
     ${BLUE}clean${NO_COLOR}: cleanup bazel output and log/coredump files
     ${BLUE}format${NO_COLOR}: format C++/Python/Bazel/Shell files
-    ${BLUE}usage${NO_COLOR}: show this message
+    ${BLUE}usage${NO_COLOR}: show this message and exit
     "
+}
+
+function _check_command() {
+    local name="${BASH_SOURCE[0]}"
+    local commands="$(echo ${AVAILABLE_COMMANDS} | xargs)"
+    local help_msg="Run './apollo.sh --help' for usage."
+    local cmd="$@"
+
+    python scripts/command_checker.py --name "${name}" --command "${cmd}" --available "${commands}" --helpmsg "${help_msg}"
 }
 
 function main() {
@@ -195,11 +214,10 @@ function main() {
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
             ;;
         lint)
-            # FIXME(all): apollo_lint.sh "$@" when bash/python scripts are ready.
-            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" cpp
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" "$@"
             ;;
         clean)
-            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "-a"
+            env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "$@"
             ;;
         doc)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"
@@ -214,7 +232,7 @@ function main() {
             _usage
             ;;
         *)
-            _usage
+            _check_command "${cmd}"
             ;;
     esac
 }

@@ -188,7 +188,6 @@ AnchorMaskCuda::AnchorMaskCuda(
       grid_x_size_(grid_x_size),
       grid_y_size_(grid_y_size) {}
 
-// TODO(chenjiahao): set anchor ranges for each class
 void AnchorMaskCuda::DoAnchorMaskCuda(
     int* dev_sparse_pillar_map, int* dev_cumsum_along_x,
     int* dev_cumsum_along_y, const float* dev_box_anchors_min_x,

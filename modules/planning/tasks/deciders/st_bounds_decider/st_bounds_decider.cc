@@ -63,7 +63,7 @@ Status STBoundsDecider::Process(Frame* const frame,
     return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
   }
   if (regular_st_bound.empty()) {
-    std::string msg = "Generated regular ST-boundary is empty.";
+    const std::string msg = "Generated regular ST-boundary is empty.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

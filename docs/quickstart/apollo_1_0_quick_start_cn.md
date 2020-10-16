@@ -1,17 +1,19 @@
 # Apollo 快速入门指南  1.0
 ## 目录
-* [关于这个文档](#关于这个文档)
-    * [文档规约](#文档规约)
-* [概览](#概览)
-* [车辆环境描述](#车辆环境描述)
-* [硬件安装](#硬件安装)
-* [软件安装](#软件安装)
-* [在车辆上运行示例](#在车辆上运行示例)
-    * [启动本地版本Docker映像](#启动本地版本Docker映像)
-    * [记录驾驶轨迹](#记录驾驶轨迹)
-    * [执行自动驾驶](#执行自动驾驶)
-    * [关闭](#关闭)
-* [运行离线演示](#运行离线演示)
+- [Apollo 快速入门指南  1.0](#apollo-快速入门指南-10)
+  - [目录](#目录)
+- [关于这个文档](#关于这个文档)
+  - [文档规约](#文档规约)
+- [概览](#概览)
+- [车辆环境描述](#车辆环境描述)
+- [硬件安装](#硬件安装)
+- [软件安装](#软件安装)
+- [在车辆上运行示例](#在车辆上运行示例)
+  - [启动本地版本Docker映像](#启动本地版本docker映像)
+  - [记录驾驶轨迹](#记录驾驶轨迹)
+  - [执行自动驾驶](#执行自动驾驶)
+  - [关闭](#关闭)
+- [运行离线演示](#运行离线演示)
 
 # 关于这个文档
 
@@ -52,12 +54,12 @@ The Lincoln MKZ, enhanced by Autonomous Stuff, 为用户提供了一个无障碍
 
 # 硬件安装
 
-请参考 [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
+请参考 [Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/r1.0.0/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
 中的步骤来安装硬件组件以及系统软件
 
 # 软件安装
 
-请参考[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)
+请参考[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/apollo_software_installation_guide_cn.md)
 
 # 在车辆上运行示例
 
@@ -129,4 +131,4 @@ bash docker/scripts/release_start.sh local_release
 4. 关掉车子
 
 # 运行离线演示
-参考 [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/README.md)
+参考 [Offline Demo Guide](https://github.com/ApolloAuto/apollo/blob/r1.0.0/docs/demo_guide/README.md)

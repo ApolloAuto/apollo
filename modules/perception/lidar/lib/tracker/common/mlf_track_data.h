@@ -109,7 +109,7 @@ class MlfTrackData : public TrackData {
   bool is_current_state_predicted_ = true;
 
   // @debug feature to be used for semantic mapping based tracking
-  std::shared_ptr<apollo::prediction::Feature> feature_;
+//  std::shared_ptr<apollo::prediction::Feature> feature_;
 
   static const double kMaxHistoryTime;
 };

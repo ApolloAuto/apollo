@@ -32,9 +32,9 @@ TEST(GrpcServerImplTest, Construct) {
   GrpcServerImpl grpc_server;
   init_succ = grpc_server.InitFlag();
   EXPECT_TRUE(init_succ);
-  auto ptr = std::make_shared<IntersectionTrafficLightData>();
-  grpc_server.GetMsgFromGrpc(ptr);
-  EXPECT_FALSE(ptr->has_current_lane_trafficlight());
+  std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> ptr = nullptr;
+  grpc_server.GetMsgFromGrpc(&ptr);
+  EXPECT_EQ(nullptr, ptr);
 }
 }  // namespace v2x
 }  // namespace apollo

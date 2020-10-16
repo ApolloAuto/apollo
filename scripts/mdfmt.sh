@@ -36,19 +36,23 @@ function check_if_tools_installed() {
   fi
 }
 
+function prettier_run() {
+  npx prettier --write "$@"
+}
+
 function format_markdown_by_prettier() {
   for mypath in "$@"; do
     if [ -d "${mypath}" ]; then
-      find "${mypath}" -type f \( -name "*.md" \
-        -or -name "*.json" \
-        -or -name "*.yml" \) \
-        -exec npx prettier --write {} +
+      local srcs="$(find_prettier_srcs ${mypath})"
+      if [[ -n "${srcs}" ]]; then
+        prettier_run ${srcs}
+      fi
+      ok "Done formatting markdown/json/yaml files under ${mypath}."
     elif [ -f "${mypath}" ]; then
-      local ext="${mypath##*.}"
-      if [[ "${ext}" == "md" || "${ext}" == "yml" || "${ext}" == "json" ]]; then
-        npx prettier --write "${mypath}"
+      if prettier_ext "${mypath}"; then
+        prettier_run "${mypath}"
       else
-        warning "Only regular md/json/yml files will be formatted. Ignored ${mypath}"
+        warning "Only regular markdown/json/yaml files will be formatted. Ignored ${mypath}"
       fi
     else
       warning "Special/Symlink file won't be formatted. Ignored ${mypath}"

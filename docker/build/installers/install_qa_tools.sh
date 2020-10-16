@@ -30,7 +30,6 @@ TARGET_ARCH="$(uname -m)"
 apt-get -y update && \
     apt-get -y install \
     cppcheck    \
-    shellcheck  \
     lcov        \
     valgrind
 
@@ -41,10 +40,9 @@ apt-get -y update && \
 #    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
 # fi
 
+bash ${CURR_DIR}/install_shellcheck.sh
 bash ${CURR_DIR}/install_gperftools.sh
-
 bash ${CURR_DIR}/install_benchmark.sh
-
 # TechDoc generation
 bash ${CURR_DIR}/install_doxygen.sh
 

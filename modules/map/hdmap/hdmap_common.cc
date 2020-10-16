@@ -688,5 +688,8 @@ void PNCJunctionInfo::Init() {
   }
 }
 
+RSUInfo::RSUInfo(const RSU& rsu) : _rsu(rsu) {
+}
+
 }  // namespace hdmap
 }  // namespace apollo

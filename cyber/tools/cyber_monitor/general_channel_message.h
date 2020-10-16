@@ -18,9 +18,13 @@
 #define TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
 
 #include <atomic>
+#include <memory>
+#include <string>
+#include <vector>
 
+#include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-#include "general_message_base.h"
+#include "cyber/tools/cyber_monitor/general_message_base.h"
 
 class CyberTopologyMessage;
 class GeneralMessage;
@@ -36,14 +40,14 @@ class GeneralChannelMessage : public GeneralMessageBase {
     NoCloseChannel = -6
   };
 
-  static const char* errCode2Str(ErrorCode errCode);
-  static bool isErrorCode(void* ptr);
+  static const char* ErrCode2Str(ErrorCode errCode);
+  static bool IsErrorCode(void* ptr);
 
-  static ErrorCode castPtr2ErrorCode(void* ptr) {
-    assert(isErrorCode(ptr));
+  static ErrorCode CastPtr2ErrorCode(void* ptr) {
+    assert(IsErrorCode(ptr));
     return static_cast<ErrorCode>(reinterpret_cast<intptr_t>(ptr));
   }
-  static GeneralChannelMessage* castErrorCode2Ptr(ErrorCode errCode) {
+  static GeneralChannelMessage* CastErrorCode2Ptr(ErrorCode errCode) {
     return reinterpret_cast<GeneralChannelMessage*>(
         static_cast<intptr_t>(errCode));
   }
@@ -74,18 +78,18 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   const std::string& NodeName(void) const { return node_name_; }
 
-  void add_reader(const std::string& reader) { DoAdd(readers_, reader); }
-  void del_reader(const std::string& reader) { DoDelete(readers_, reader); }
+  void add_reader(const std::string& reader) { DoAdd(&readers_, reader); }
+  void del_reader(const std::string& reader) { DoDelete(&readers_, reader); }
 
-  void add_writer(const std::string& writer) { DoAdd(writers_, writer); }
+  void add_writer(const std::string& writer) { DoAdd(&writers_, writer); }
   void del_writer(const std::string& writer) {
-    DoDelete(writers_, writer);
+    DoDelete(&writers_, writer);
     if (!writers_.size()) {
       set_has_message_come(false);
     }
   }
 
-  void Render(const Screen* s, int key) override;
+  int Render(const Screen* s, int key) override;
 
   void CloseChannel(void) {
     if (channel_reader_ != nullptr) {
@@ -98,7 +102,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   }
 
  private:
-  explicit GeneralChannelMessage(const std::string& nodeName,
+  explicit GeneralChannelMessage(const std::string& node_name,
                                  RenderableMessage* parent = nullptr)
       : GeneralMessageBase(parent),
         current_state_(State::ShowDebugString),
@@ -108,7 +112,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
         last_time_(apollo::cyber::Time::MonoTime()),
         msg_time_(last_time_.ToNanosecond() + 1),
         channel_node_(nullptr),
-        node_name_(nodeName),
+        node_name_(node_name),
         readers_(),
         writers_(),
         channel_message_(nullptr),
@@ -119,48 +123,48 @@ class GeneralChannelMessage : public GeneralMessageBase {
   GeneralChannelMessage(const GeneralChannelMessage&) = delete;
   GeneralChannelMessage& operator=(const GeneralChannelMessage&) = delete;
 
-  static void DoDelete(std::vector<std::string>& vec, const std::string& str) {
-    for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
+  static void DoDelete(std::vector<std::string>* vec, const std::string& str) {
+    for (auto iter = vec->begin(); iter != vec->end(); ++iter) {
       if (*iter == str) {
-        vec.erase(iter);
+        vec->erase(iter);
         break;
       }
     }
   }
 
-  static void DoAdd(std::vector<std::string>& vec, const std::string& str) {
-    for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
-      if (*iter == str) {
+  static void DoAdd(std::vector<std::string>* vec, const std::string& str) {
+    for (const auto& item : *vec) {
+      if (item == str) {
         return;
       }
     }
 
-    vec.emplace_back(str);
+    vec->emplace_back(str);
   }
 
-  void updateRawMessage(
-      const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
+  void UpdateRawMessage(
+      const std::shared_ptr<apollo::cyber::message::RawMessage>& raw_msg) {
     set_has_message_come(true);
     msg_time_ = apollo::cyber::Time::MonoTime();
     ++frame_counter_;
     std::lock_guard<std::mutex> _g(inner_lock_);
     channel_message_.reset();
-    channel_message_ = rawMsg;
+    channel_message_ = raw_msg;
   }
 
   std::shared_ptr<apollo::cyber::message::RawMessage> CopyMsgPtr(void) const {
-    decltype(channel_message_) channelMsg;
+    decltype(channel_message_) channel_msg;
     {
       std::lock_guard<std::mutex> g(inner_lock_);
-      channelMsg = channel_message_;
+      channel_msg = channel_message_;
     }
-    return channelMsg;
+    return channel_msg;
   }
 
-  GeneralChannelMessage* OpenChannel(const std::string& channelName);
+  GeneralChannelMessage* OpenChannel(const std::string& channel_name);
 
-  void RenderDebugString(const Screen* s, int key, unsigned lineNo);
-  void RenderInfo(const Screen* s, int key, unsigned lineNo);
+  void RenderDebugString(const Screen* s, int key, int* line_no);
+  void RenderInfo(const Screen* s, int key, int* line_no);
 
   void set_has_message_come(bool b) { has_message_come_ = b; }
 

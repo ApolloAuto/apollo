@@ -58,8 +58,7 @@ message NovatelConfig {
   optional int32 imu_orientation = 1 [default = 5];
 }
 
-message UbloxConfig {
-}
+message UbloxConfig {}
 
 enum ImuType {
   // We currently use the following IMUs. We'll extend this list when a new IMU

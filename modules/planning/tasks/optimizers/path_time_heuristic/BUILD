@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "st_graph_point",
     srcs = ["st_graph_point.cc"],
     hdrs = ["st_graph_point.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/speed:st_point",
@@ -18,7 +19,7 @@ cc_library(
     name = "dp_st_cost",
     srcs = ["dp_st_cost.cc"],
     hdrs = ["dp_st_cost.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":st_graph_point",
         "//modules/common/proto:pnc_point_cc_proto",
@@ -33,7 +34,7 @@ cc_library(
     name = "gridded_path_time_graph",
     srcs = ["gridded_path_time_graph.cc"],
     hdrs = ["gridded_path_time_graph.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":dp_st_cost",
         ":st_graph_point",
@@ -56,7 +57,7 @@ cc_library(
     name = "path_time_heuristic_optimizer",
     srcs = ["path_time_heuristic_optimizer.cc"],
     hdrs = ["path_time_heuristic_optimizer.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":dp_st_cost",
         ":gridded_path_time_graph",

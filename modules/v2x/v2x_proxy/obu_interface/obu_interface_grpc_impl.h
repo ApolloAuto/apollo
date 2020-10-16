@@ -21,7 +21,12 @@
 
 #pragma once
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <thread>
+
+#include <grpc++/grpc++.h>
 
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_client.h"
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_server.h"
@@ -43,30 +48,23 @@ class ObuInterFaceGrpcImpl : public ObuInterFaceBase {
    */
   bool InitialClient() override;
 
-  /* function that get perception obstacles through grpc
-  @param output return latest v2x perception obstacles
-  */
-  void GetV2xObstaclesFromObu(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg)
-      override;
-
   /* function that get v2x traffic light through grpc
   @param output return latest v2x traffic light
   */
   void GetV2xTrafficLightFromObu(
-      const std::shared_ptr<IntersectionTrafficLightData> &msg) override;
+      std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> *msg) override;
+
+  void GetV2xObstaclesFromObu(
+      std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) override;
+
+  void GetV2xRsiFromObu(
+      std::shared_ptr<::apollo::v2x::obu::ObuRsi> *msg) override;
 
   /* function that send car status through grpc
   @param input send car status msg to grpc
   */
-  void SendCarStatusToObu(const std::shared_ptr<CarStatus> &msg) override;
-
-  /* function that send perception obstacles through grpc
-  @param input send perception obstacles msg to grpc
-  */
-  void SendObstaclesToObu(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg)
-      override;
+  void SendCarStatusToObu(
+      const std::shared_ptr<::apollo::v2x::CarStatus> &msg) override;
 
   /* function that return init flag
    */
@@ -76,16 +74,17 @@ class ObuInterFaceGrpcImpl : public ObuInterFaceBase {
   /* thread function that run server
    */
   void ThreadRunServer();
+
   std::shared_ptr<GrpcClientImpl> grpc_client_;
-  std::shared_ptr<GrpcServerImpl> grpc_server_;
+  std::unique_ptr<GrpcServerImpl> grpc_server_;
   std::unique_ptr<grpc::Server> server_;
 
-  bool grpc_client_init_flag_ = false;
-  bool grpc_server_init_flag_ = false;
+  bool cli_init_ = false;
+  bool srv_init_ = false;
 
   bool init_succ_ = false;
   bool exit_flag_ = false;
-  std::unique_ptr<std::thread> thread_ptr_;
+  std::unique_ptr<std::thread> thread_grpc_;
   std::mutex mutex_;
   std::condition_variable condition_;
 };

@@ -105,8 +105,8 @@ float BboxIouDistance(const TrackedObjectConstPtr& last_object,
 // @params [in]: track data contained predicted trajectory feature
 // @params [in]: new detected object for computing distance
 // @return distance
-float SemanticMapDistance(const MlfTrackData& track_dat,
-                          const TrackedObjectConstPtr& cur_obj);
+// float SemanticMapDistance(const MlfTrackData& track_dat,
+//                          const TrackedObjectConstPtr& cur_obj);
 
 }  // namespace lidar
 }  // namespace perception

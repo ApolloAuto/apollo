@@ -3,7 +3,7 @@
 The perception module requires Nvidia GPU and CUDA installed to run the perception algorithms with Caffe. We have already installed the CUDA and Caffe libraries in the released docker. However, the Nvidia GPU driver is not installed in the released dev docker image. To run the perception module with CUDA acceleration, we suggest to install the exactly same version of Nvidia driver in the docker as the one installed in your host machine, and build Apollo with GPU option.
 
 We provide a step-by-step instruction on running perception module with Nvidia GPU as below:
-1. Get into the docker container via: 
+1. Get into the docker container via:
     ```bash
     $APOLLO_HOME/docker/scripts/dev_start.sh
     $APOLLO_HOME/docker/scripts/dev_into.sh
@@ -32,7 +32,7 @@ http://localhost:8888/
 
 8. Launch the perception modules
 
-    - If you want to launch all modules 
+    - If you want to launch all modules
     ```
     cyber_launch start /apollo/modules/perception/production/launch/perception_all.launch
     ```
@@ -41,7 +41,7 @@ http://localhost:8888/
     ```
     cyber_launch start /apollo/modules/perception/production/launch/perception_camera.launch
     ```
-            
+
     If you want to visualize camera-based results overlaid on the captured image and in bird view, mark `enable_visualization: true` in `‘modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt` befor executing the above command. It will pop up when you play recorded data in point 9
     Also, If you want to enable CIPO, add ‘enable_cipv: true’ as a new line in the same file
 
@@ -62,4 +62,4 @@ http://localhost:8888/
     cyber_recorder play -f /apollo/data/bag/anybag -r 0.2
     ```
 
-Please note that the Nvidia driver should be installed appropriately even if the perception module is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module). Please see the detailed instruction of perception module in [the perception README](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md).
+Please note that the Nvidia driver should be installed appropriately even if the perception module is running in Caffe CPU_ONLY mode (i.e., using `./apollo.sh build` or `./apollo.sh build_opt` to build the perception module). Please see the detailed instruction of perception module in [the perception README](../../modules/perception/README.md).

@@ -33,7 +33,7 @@
 #define RIGHT_BRACKET "]"
 
 #ifndef MODULE_NAME
-#define MODULE_NAME apollo::cyber::Binary::GetName().c_str()
+#define MODULE_NAME apollo::cyber::binary::GetName().c_str()
 #endif
 
 #define ADEBUG_MODULE(module) \

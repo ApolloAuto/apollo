@@ -10,9 +10,9 @@ Suppose you have followed the
 You have cloned Apollo's GitHub repo, all the software pre-requisites were
 installed correctly.
 
-## Start and enter Apollo development container
+## Start and enter Apollo development Docker container
 
-The following commands are assumed to run from Apollo root directory.
+The following commands are assumed to run from `$APOLLO_ROOT_DIR`.
 
 ```
 bash docker/scripts/dev_start.sh
@@ -21,7 +21,7 @@ bash docker/scripts/dev_into.sh
 
 ## Build Apollo
 
-Run the following command to build Apollo inside the development container:
+Run the following command to build Apollo inside Docker:
 
 ```
 ./apollo.sh build
@@ -33,8 +33,8 @@ Note:
 
 ## Start Dreamview
 
-Please run the following command to start the Monitor module and Dreamview
-backend.
+To start the Monitor module and Dreamview
+backend, run:
 
 ```
 bash scripts/bootstrap.sh
@@ -51,10 +51,9 @@ Note:
 
 > The `--loop` option enables record to keep playing in a loop playback mode.
 
-## Open **http://127.0.0.1:8888** in your favorate browser (e.g. Chrome) to access Apollo Dreamview
+## Open <http://127.0.0.1:8888> in your favorate browser (e.g. Chrome) to access Apollo Dreamview
 
-The following screen should be shown to you and the car in Dreamview is happy to
-move around!
+The following screen should be shown to you and the car in Dreamview now moves around!
 
 ![](images/dv_trajectory.png)
 

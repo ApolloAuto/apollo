@@ -38,11 +38,9 @@ You can use command `bash apollo.sh test` to run all unit tests.
 
 * **Python coding style**:  Apollo adopted the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). You can use the  [yapf](https://github.com/google/yapf) command `yapf -i --style='{based_on_style: google}' foo.py` to format a file foo.py.
 
-* **Apollo best coding practice**: Please also refer to [Apollo Best Coding Practice](docs/technical_tutorial/best_coding_practice.md) for more coding practice disciplines.
+* **Apollo best coding practice**: Please also refer to [Apollo Best Coding Practice](docs/technical_tutorial/apollo_best_coding_practice.md) for more coding practice disciplines.
 
 * **BUILD coding style** : you can use command `bash apollo.sh buildify` to format your BUILD files before you submit.
-
-* **Best coding practice**: Follow [this guide](docs/technical_tutorial/best_coding_practice.md)
 
 #### Documentation
 
