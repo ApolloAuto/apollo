@@ -70,7 +70,7 @@ upstream	git@github.com:ApolloAuto/apollo.git (push)
 git pull --rebase upstream master
 ```
 
-如果遇到问题，你可以参考这篇文档：[如何解决国内拉取 GitHub仓库太慢的问题](how_to_solve_slow_pull_from_cn.md).
+如果遇到问题，你可以参考这篇文档：[国内环境拉取GitHub仓库慢的缓解方案](how_to_solve_slow_pull_from_cn.md).
 
 ## 结语
 
