@@ -35,7 +35,7 @@ git checkout master
 ```
 
 For CN users, please refer to
-[How to Clone Apollo Repository from CN](../howto/how_to_clone_apollo_repo_from_cn.md)
+[How to Clone Apollo Repository from China](../howto/how_to_clone_apollo_repo_from_china.md)
 if your have difficulty cloning from GitHub.
 
 (Optional) For convenience, you can set up environment variable

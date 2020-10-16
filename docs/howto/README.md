@@ -63,8 +63,9 @@
 
 ## Others
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images.md)
-- [How to clone Apollo repository from CN](how_to_clone_apollo_repo_from_cn.md)
+- [How to clone Apollo repository from China](how_to_clone_apollo_repo_from_china.md)
 
 ### Chinese versions
 - [How to generate and push images into Docker](how_to_generate_and_push_docker_images_cn.md)
+- [国内环境下如何克隆Apollo 仓库](how_to_clone_apollo_repo_from_china_cn.md)
 - [How to solve slow pull from CN](how_to_solve_slow_pull_from_cn.md)
