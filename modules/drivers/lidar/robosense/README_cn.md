@@ -1,10 +1,12 @@
 # **Robosense LiDAR Driver**
 
+**Apollo 6.0**
+
 
 
 ## 1 工程简介
 
- **robosense** 为速腾聚创在阿波罗平台上的雷达驱动集成包。 目前支持*RS16，RS32，RSBP，RS128*四种型号的雷达。 
+ **robosense** 为速腾聚创在阿波罗平台上的雷达驱动集成包。 目前支持*RS16, RS32, RSBP, RS128, RS80*四种型号的雷达。 
 
 
 
@@ -88,6 +90,25 @@ mainboard -d /apollo/modules/drivers/lidar/robosenseag/rsbp.dag
 
 - Scan--/apollo/sensor/rsbp/Scan
 - 运动补偿后点云 -- /apollo/sensor/rsbp/compensator/PointCloud2
+
+#### 2.5 RS80
+
+```sh
+cyber_launch start /apollo/modules/drivers/robosense/launch/rs80.launch
+```
+
+或
+
+```sh
+mainboard -d /apollo/modules/drivers/robosenseag/rs80.dag
+```
+
+默认话题名：
+
+- 原始点云 -- /apollo/sensor/rs80/PointCloud2
+
+- Scan--/apollo/sensor/rs80/Scan
+- 运动补偿后点云 -- /apollo/sensor/rs80/compensator/PointCloud2
 
 
 

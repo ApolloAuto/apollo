@@ -31,7 +31,7 @@ Input::~Input() {
 int Input::setUpSocket(uint16_t port) {
   int sock_fd = socket(PF_INET, SOCK_DGRAM, 0);
   if (sock_fd < 0) {
-    std::cerr << "socket: " << std::strerror(errno) << std::endl;
+    AERROR << "socket: " << std::strerror(errno);
     return -1;
   }
   struct sockaddr_in my_addr;
@@ -41,7 +41,7 @@ int Input::setUpSocket(uint16_t port) {
   my_addr.sin_addr.s_addr = INADDR_ANY;
 
   if (bind(sock_fd, (struct sockaddr *)&my_addr, sizeof(my_addr)) < 0) {
-    std::cerr << "bind: " << std::strerror(errno) << std::endl;
+    AERROR << "bind: " << std::strerror(errno);
     return -1;
   }
   struct timeval timeout;
@@ -49,7 +49,7 @@ int Input::setUpSocket(uint16_t port) {
   timeout.tv_usec = 0;
   if (setsockopt(sock_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) <
       0) {
-    std::cerr << "setsockopt: " << std::strerror(errno) << std::endl;
+    AERROR << "setsockopt: " << std::strerror(errno);
     return -1;
   }
   return sock_fd;
@@ -72,7 +72,7 @@ InputState Input::getPacket(uint8_t *pkt, uint32_t timeout) {
   if (retval == -1 && errno == EINTR) {
     res = INPUT_EXIT;
   } else if (retval == -1) {
-    std::cerr << "select: " << std::strerror(errno) << std::endl;
+    AERROR << "select: " << std::strerror(errno);
     res = InputState(res | INPUT_ERROR);
   } else if (retval) {
     ssize_t n;

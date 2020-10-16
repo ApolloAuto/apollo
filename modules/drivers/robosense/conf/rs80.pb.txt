@@ -1,5 +1,5 @@
-model: "RS128"
-frame_id: "rslidar_128"
+model: "RS80"
+frame_id: "rslidar_80"
 ip: "192.168.1.200"
 msop_port: 6699
 difop_port: 7788
@@ -11,6 +11,6 @@ split_frame_mode: 1
 num_pkts_split: 1
 cut_angle: 0
 angle_path: "/apollo/modules/drivers/robosense/angle.csv"
-pointcloud_channel: "/apollo/sensor/rs128/PointCloud2"
-scan_channel: "/apollo/sensor/rs128/Scan"
+pointcloud_channel: "/apollo/sensor/rs80/PointCloud2"
+scan_channel: "/apollo/sensor/rs80/Scan"
 use_lidar_clock: false

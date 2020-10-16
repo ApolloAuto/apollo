@@ -28,6 +28,7 @@
 #include "modules/drivers/lidar/robosense/decoder/decoder_factory.hpp"
 #include "modules/drivers/lidar/robosense/driver/utility.h"
 #include "modules/drivers/lidar/robosense/input/input.h"
+#include "cyber/base/thread_pool.h"
 #define PKT_DATA_LENGTH 1248
 namespace apollo {
 namespace drivers {
@@ -79,6 +80,7 @@ class RobosenseDriver {
   uint32_t points_seq_;
   std::shared_ptr<PointCloud> point_cloud_ptr_;
   std::shared_ptr<RobosenseScan> scan_ptr_;
+  std::shared_ptr<cyber::base::ThreadPool> thread_pool_ptr_;
 };
 }  // namespace robosense
 }  // namespace drivers
