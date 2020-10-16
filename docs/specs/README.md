@@ -6,7 +6,6 @@
 - [Apollo 3.0 Software Architecture](Apollo_3.0_Software_Architecture.md)
 - [Apollo 2.0 Software Architecture](Apollo_2.0_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
-- [Vehicle Calibration Online](Vehicle_Calibration_Online/README.md)
 - [Control-in-loop simulation](dynamic_model.md)
 
 ### Chinese documents
