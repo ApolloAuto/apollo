@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>RS80</name>
+        <dag_conf>/apollo/modules/drivers/robosense/dag/rs80.dag</dag_conf>
+        <process_name>robosense</process_name>
+    </module>
+</cyber>
