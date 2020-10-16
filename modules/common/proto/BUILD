@@ -6,6 +6,25 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "error_code_cc_proto",
+    deps = [
+        ":error_code_proto",
+    ],
+)
+
+proto_library(
+    name = "error_code_proto",
+    srcs = ["error_code.proto"],
+)
+
+py_proto_library(
+    name = "error_code_py_pb2",
+    deps = [
+        ":error_code_proto",
+    ],
+)
+
+cc_proto_library(
     name = "drive_state_cc_proto",
     deps = [
         ":drive_state_proto",
@@ -63,6 +82,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "direction_cc_proto",
+    deps = [
+        ":direction_proto",
+    ],
+)
+
+proto_library(
+    name = "direction_proto",
+    srcs = ["direction.proto"],
+)
+
+py_proto_library(
+    name = "direction_py_pb2",
+    deps = [
+        ":direction_proto",
+    ],
+)
+
+cc_proto_library(
     name = "header_cc_proto",
     deps = [
         ":header_proto",
@@ -101,25 +139,6 @@ py_proto_library(
     name = "vehicle_signal_py_pb2",
     deps = [
         ":vehicle_signal_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "error_code_cc_proto",
-    deps = [
-        ":error_code_proto",
-    ],
-)
-
-proto_library(
-    name = "error_code_proto",
-    srcs = ["error_code.proto"],
-)
-
-py_proto_library(
-    name = "error_code_py_pb2",
-    deps = [
-        ":error_code_proto",
     ],
 )
 

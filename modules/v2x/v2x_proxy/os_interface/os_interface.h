@@ -21,108 +21,90 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstring>
+#include <iostream>
 #include <memory>
+#include <mutex>
+#include <string>
 
-#include "cyber/cyber.h"
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/v2x/common/v2x_proxy_gflags.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/v2x/proto/v2x_obstacles.pb.h"
+#include "modules/v2x/proto/v2x_obu_rsi.pb.h"
+#include "modules/v2x/proto/v2x_obu_traffic_light.pb.h"
 #include "modules/v2x/proto/v2x_traffic_light.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {
 namespace v2x {
-
 class OsInterFace {
  public:
   OsInterFace();
 
   ~OsInterFace();
 
-  inline void PrintModuleDetails() {
-    AINFO << "[module name: ]"
-          << "v2x_os_interface"
-          << " "
-          << "[localization topic name: ]"
-          << localization_reader_->GetChannelName() << " "
-          << "[perception topic name: ]"
-          << perception_obstacle_reader_->GetChannelName() << " "
-          << "[v2x obstacles topic name: ]"
-          << v2x_obstacle_writer_->GetChannelName() << " "
-          << "[v2x trafficlight topic name: ]"
-          << v2x_trafficlight_writer_->GetChannelName();
-  }
-
   bool InitFlag() { return init_flag_; }
-  /*function that get localization msg from apollo os
-  @param output localization type msg shared ptr
-  */
+
   void GetLocalizationFromOs(
-      const std::shared_ptr<apollo::localization::LocalizationEstimate> &msg);
+      const std::shared_ptr<::apollo::localization::LocalizationEstimate> &msg);
 
-  /*function that get perception msg from apollo os
-  @param output perception obstacles type msg shared ptr
-  */
-  void GetObstaclesFromOs(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg);
+  void GetPlanningAdcFromOs(
+      const std::shared_ptr<::apollo::planning::ADCTrajectory> &msg);
 
-  /*function that send trafficlight msg to apollo os
-  @param input trafficlight type msg shared ptr
-  */
+  void SendV2xObuTrafficLightToOs(
+      const std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> &msg);
+
   void SendV2xTrafficLightToOs(
-      const std::shared_ptr<IntersectionTrafficLightData> &msg);
+      const std::shared_ptr<::apollo::v2x::IntersectionTrafficLightData> &msg);
 
-  /*function that send obstacles msg to apollo os
-  @param input obstacles type msg shared ptr
-  */
-  void SendV2xObstaclesToOs(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg);
+  void SendV2xObstacles2Sys(
+      const std::shared_ptr<apollo::v2x::V2XObstacles> &msg);
+
+  void SendV2xTrafficLight4Hmi2Sys(
+      const std::shared_ptr<::apollo::perception::TrafficLightDetection> &msg);
 
  private:
-  /*template function that get msg from apollo os according to type
-  @param input  cybertron reader
-  @param output template type msg shared ptr
-  */
   template <typename MessageT>
-  void GetMsgFromOs(const cyber::Reader<MessageT> *reader,
-                    const std::shared_ptr<MessageT> &msg) {
-    node_->Observe();
-    if (reader->Empty()) {
-      AINFO_EVERY(100) << "Has not received any data from "
-                       << reader->GetChannelName();
+  void SendMsgToOs(::apollo::cyber::Writer<MessageT> *writer,
+                   const std::shared_ptr<MessageT> &msg) {
+    if (nullptr == writer) {
       return;
     }
-    msg->CopyFrom(*(reader->GetLatestObserved()));
+    writer->Write(msg);
   }
 
-  /*template function that send msg to apollo os according to type
-  @param input  cybertron writer
-  @param input  template type msg shared ptr
-  */
-  template <typename MessageT>
-  void SendMsgToOs(cyber::Writer<MessageT> *writer,
-                   const std::shared_ptr<MessageT> &msg) {
-    if (writer == nullptr) {
-      AERROR << "Writer in not valid";
-      return;
-    }
-    if (writer->Write(msg) == true) {
-      ADEBUG << "Write msg success to: " << writer->GetChannelName();
-    } else {
-      AERROR << "Write msg failed to: " << writer->GetChannelName();
-    }
-  }
   bool InitReaders();
+
   bool InitWriters();
-  std::unique_ptr<cyber::Node> node_;
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
+
+  std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
+  std::shared_ptr<
+      ::apollo::cyber::Reader<::apollo::localization::LocalizationEstimate>>
       localization_reader_ = nullptr;
-  std::shared_ptr<cyber::Reader<apollo::perception::PerceptionObstacles>>
-      perception_obstacle_reader_ = nullptr;
-  std::shared_ptr<cyber::Writer<apollo::perception::PerceptionObstacles>>
-      v2x_obstacle_writer_ = nullptr;
-  std::shared_ptr<cyber::Writer<IntersectionTrafficLightData>>
-      v2x_trafficlight_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Reader<::apollo::planning::ADCTrajectory>>
+      planning_reader_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::v2x::obu::ObuTrafficLight>>
+      v2x_obu_traffic_light_writer_ = nullptr;
+  std::shared_ptr<
+      ::apollo::cyber::Writer<::apollo::v2x::IntersectionTrafficLightData>>
+      v2x_traffic_light_writer_ = nullptr;
+  std::shared_ptr<
+      ::apollo::cyber::Writer<::apollo::perception::TrafficLightDetection>>
+      v2x_traffic_light_hmi_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::v2x::V2XObstacles>>
+      v2x_obstacles_internal_writer_ = nullptr;
+  ::apollo::localization::LocalizationEstimate current_localization_;
+  ::apollo::planning::ADCTrajectory adc_trajectory_msg_;
+  bool flag_planning_new_ = false;
+
+  mutable std::mutex mutex_localization_;
+  mutable std::mutex mutex_planning_;
+  mutable std::condition_variable cond_planning_;
+
   bool init_flag_ = false;
 };
 }  // namespace v2x

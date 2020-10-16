@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "curve_math",
@@ -13,9 +14,7 @@ cc_library(
     name = "discrete_points_math",
     srcs = ["discrete_points_math.cc"],
     hdrs = ["discrete_points_math.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
     ],
@@ -35,9 +34,7 @@ cc_library(
     name = "polynomial_xd",
     srcs = ["polynomial_xd.cc"],
     hdrs = ["polynomial_xd.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
     ],

@@ -59,8 +59,9 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
     blocking_obstacle_id = reference_line_info->GetBlockingObstacle()->Id();
   }
   if (!MakeObjectDecision(path_data, blocking_obstacle_id, path_decision)) {
-    AERROR << "Failed to make decision based on tunnel";
-    return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
+    const std::string msg = "Failed to make decision based on tunnel";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   return Status::OK();
 }

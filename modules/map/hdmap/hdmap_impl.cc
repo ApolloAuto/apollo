@@ -102,12 +102,18 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
     pnc_junction_table_[pnc_junction.id().id()].reset(
         new PNCJunctionInfo(pnc_junction));
   }
+  for (const auto& rsu : map_.rsu()) {
+    rsu_table_[rsu.id().id()].reset(new RSUInfo(rsu));
+  }
   for (const auto& overlap : map_.overlap()) {
     overlap_table_[overlap.id().id()].reset(new OverlapInfo(overlap));
   }
 
   for (const auto& road : map_.road()) {
     road_table_[road.id().id()].reset(new RoadInfo(road));
+  }
+  for (const auto& rsu : map_.rsu()) {
+    rsu_table_[rsu.id().id()].reset(new RSUInfo(rsu));
   }
   for (const auto& road_ptr_pair : road_table_) {
     const auto& road_id = road_ptr_pair.second->id();
@@ -206,6 +212,10 @@ PNCJunctionInfoConstPtr HDMapImpl::GetPNCJunctionById(const Id& id) const {
   return it != pnc_junction_table_.end() ? it->second : nullptr;
 }
 
+RSUInfoConstPtr HDMapImpl::GetRSUById(const Id& id) const {
+  RSUTable::const_iterator it = rsu_table_.find(id.id());
+  return it != rsu_table_.end() ? it->second : nullptr;
+}
 int HDMapImpl::GetLanes(const PointENU& point, double distance,
                         std::vector<LaneInfoConstPtr>* lanes) const {
   return GetLanes({point.x(), point.y()}, distance, lanes);
@@ -1181,6 +1191,120 @@ int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
   return 0;
 }
 
+int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
+                    double distance, double central_heading,
+                    double max_heading_difference,
+                    std::vector<RSUInfoConstPtr>* rsus) const {
+  CHECK_NOTNULL(rsus);
+
+  rsus->clear();
+  LaneInfoConstPtr lane_ptr = nullptr;
+  apollo::common::math::Vec2d target_point(point.x(), point.y());
+
+  double nearest_s = 0.0;
+  double nearest_l = 0.0;
+  if (GetNearestLaneWithHeading(target_point,
+                              distance,
+                              central_heading,
+                              max_heading_difference,
+                              &lane_ptr,
+                              &nearest_s,
+                              &nearest_l) == -1) {
+    AERROR << "Fail to get nearest lanes";
+    return -1;
+  }
+
+  if (lane_ptr == nullptr) {
+    AERROR << "Fail to get nearest lanes";
+    return -1;
+  }
+
+  double s = 0;
+  double real_distance = distance + nearest_s;
+  const std::string nearst_lane_id = lane_ptr->id().id();
+
+  while (s < real_distance) {
+    s += lane_ptr->total_length();
+    std::vector<std::pair<double, JunctionInfoConstPtr>> overlap_junctions;
+    double start_s = 0;
+    for (size_t x = 0; x < lane_ptr->junctions().size(); ++x) {
+      const auto overlap_ptr = lane_ptr->junctions()[x];
+      for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
+        const auto& overlap_object = overlap_ptr->overlap().object(i);
+        if (overlap_object.id().id() == lane_ptr->id().id()) {
+          start_s = overlap_object.lane_overlap_info().start_s();
+          continue;
+        }
+
+        const auto junction_ptr = GetJunctionById(overlap_object.id());
+        CHECK_NOTNULL(junction_ptr);
+        if (nearst_lane_id == lane_ptr->id().id()
+          && !junction_ptr->polygon().IsPointIn(target_point)) {
+          if (nearest_s > start_s) {
+            continue;
+          }
+        }
+
+        overlap_junctions.push_back(std::make_pair(start_s, junction_ptr));
+      }
+    }
+
+    std::sort(overlap_junctions.begin(), overlap_junctions.end());
+
+    std::set<std::string> duplicate_checker;
+    for (const auto& overlap_junction : overlap_junctions) {
+      const auto& junction = overlap_junction.second;
+      if (duplicate_checker.count(junction->id().id()) > 0) {
+        continue;
+      }
+      duplicate_checker.insert(junction->id().id());
+
+      for (const auto& overlap_id : junction->junction().overlap_id()) {
+        OverlapInfoConstPtr overlap_ptr = GetOverlapById(overlap_id);
+        CHECK_NOTNULL(overlap_ptr);
+        for (int i = 0; i < overlap_ptr->overlap().object_size(); ++i) {
+          const auto& overlap_object = overlap_ptr->overlap().object(i);
+          if (!overlap_object.has_rsu_overlap_info()) {
+            continue;
+          }
+
+          const auto rsu_ptr = GetRSUById(overlap_object.id());
+          if (rsu_ptr != nullptr) {
+            rsus->push_back(rsu_ptr);
+          }
+        }
+      }
+
+      if (!rsus->empty()) {
+          break;
+      }
+    }
+
+    if (!rsus->empty()) {
+        break;
+    }
+
+    for (const auto suc_lane_id : lane_ptr->lane().successor_id()) {
+      LaneInfoConstPtr suc_lane_ptr = GetLaneById(suc_lane_id);
+      if (lane_ptr->lane().successor_id_size() > 1) {
+        if (suc_lane_ptr->lane().turn() == apollo::hdmap::Lane::NO_TURN) {
+          lane_ptr = suc_lane_ptr;
+          break;
+        }
+      } else {
+        lane_ptr = suc_lane_ptr;
+        break;
+      }
+    }
+  }
+
+  if (rsus->empty()) {
+    return -1;
+  }
+
+  return 0;
+}
+
 template <class Table, class BoxTable, class KDTree>
 void HDMapImpl::BuildSegmentKDTree(const Table& table,
                                    const AABoxKDTreeParams& params,
@@ -1324,6 +1448,7 @@ void HDMapImpl::Clear() {
   stop_sign_table_.clear();
   yield_sign_table_.clear();
   overlap_table_.clear();
+  rsu_table_.clear();
   lane_segment_boxes_.clear();
   lane_segment_kdtree_.reset(nullptr);
   junction_polygon_boxes_.clear();

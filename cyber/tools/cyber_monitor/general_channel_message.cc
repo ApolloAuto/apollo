@@ -32,7 +32,7 @@ using apollo::cyber::record::kKB;
 using apollo::cyber::record::kMB;
 }  // namespace
 
-const char* GeneralChannelMessage::errCode2Str(
+const char* GeneralChannelMessage::ErrCode2Str(
     GeneralChannelMessage::ErrorCode errCode) {
   const char* ret;
   switch (errCode) {
@@ -66,7 +66,7 @@ const char* GeneralChannelMessage::errCode2Str(
   return ret;
 }
 
-bool GeneralChannelMessage::isErrorCode(void* ptr) {
+bool GeneralChannelMessage::IsErrorCode(void* ptr) {
   GeneralChannelMessage::ErrorCode err =
       (GeneralChannelMessage::ErrorCode)(reinterpret_cast<intptr_t>(ptr));
   switch (err) {
@@ -78,7 +78,8 @@ bool GeneralChannelMessage::isErrorCode(void* ptr) {
     case ErrorCode::NoCloseChannel:
       return true;
 
-    default: {}
+    default: {
+    }
   }
   return false;
 }
@@ -106,36 +107,36 @@ double GeneralChannelMessage::frame_ratio(void) {
 }
 
 GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
-    const std::string& channelName) {
-  if (channelName.empty() || node_name_.empty()) {
-    return castErrorCode2Ptr(ErrorCode::ChannelNameOrNodeNameIsEmpty);
+    const std::string& channel_name) {
+  if (channel_name.empty() || node_name_.empty()) {
+    return CastErrorCode2Ptr(ErrorCode::ChannelNameOrNodeNameIsEmpty);
   }
   if (channel_node_ != nullptr || channel_reader_ != nullptr) {
-    return castErrorCode2Ptr(ErrorCode::NoCloseChannel);
+    return CastErrorCode2Ptr(ErrorCode::NoCloseChannel);
   }
 
   channel_node_ = apollo::cyber::CreateNode(node_name_);
   if (channel_node_ == nullptr) {
-    return castErrorCode2Ptr(ErrorCode::CreateNodeFailed);
+    return CastErrorCode2Ptr(ErrorCode::CreateNodeFailed);
   }
 
-  auto callBack =
+  auto callback =
       [this](
-          const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
-        updateRawMessage(rawMsg);
+          const std::shared_ptr<apollo::cyber::message::RawMessage>& raw_msg) {
+        UpdateRawMessage(raw_msg);
       };
 
   channel_reader_ =
       channel_node_->CreateReader<apollo::cyber::message::RawMessage>(
-          channelName, callBack);
+          channel_name, callback);
   if (channel_reader_ == nullptr) {
     channel_node_.reset();
-    return castErrorCode2Ptr(ErrorCode::CreateReaderFailed);
+    return CastErrorCode2Ptr(ErrorCode::CreateReaderFailed);
   }
   return this;
 }
 
-void GeneralChannelMessage::Render(const Screen* s, int key) {
+int GeneralChannelMessage::Render(const Screen* s, int key) {
   switch (key) {
     case 'b':
     case 'B':
@@ -147,44 +148,46 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
       current_state_ = State::ShowInfo;
       break;
 
-    default: {}
+    default: {
+    }
   }
 
   clear();
 
-  unsigned lineNo = 0;
+  int line_no = 0;
 
   s->SetCurrentColor(Screen::WHITE_BLACK);
-  s->AddStr(0, lineNo++, "ChannelName: ");
+  s->AddStr(0, line_no++, "ChannelName: ");
   s->AddStr(channel_reader_->GetChannelName().c_str());
 
-  s->AddStr(0, lineNo++, "MessageType: ");
+  s->AddStr(0, line_no++, "MessageType: ");
   s->AddStr(message_type().c_str());
 
   if (is_enabled()) {
     switch (current_state_) {
       case State::ShowDebugString:
-        RenderDebugString(s, key, lineNo);
+        RenderDebugString(s, key, &line_no);
         break;
       case State::ShowInfo:
-        RenderInfo(s, key, lineNo);
+        RenderInfo(s, key, &line_no);
         break;
     }
   } else {
-    s->AddStr(0, lineNo++, "Channel has been closed");
+    s->AddStr(0, line_no++, "Channel has been closed");
   }
   s->ClearCurrentColor();
+
+  return line_no;
 }
 
-void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
-                                       unsigned lineNo) {
-  page_item_count_ = s->Height() - lineNo;
-  pages_ = static_cast<int>(readers_.size() + writers_.size() + lineNo) /
+void GeneralChannelMessage::RenderInfo(const Screen* s, int key, int* line_no) {
+  page_item_count_ = s->Height() - *line_no;
+  pages_ = static_cast<int>(readers_.size() + writers_.size() + *line_no) /
                page_item_count_ +
            1;
   SplitPages(key);
 
-  bool hasReader = true;
+  bool has_reader = true;
   std::vector<std::string>* vec = &readers_;
 
   auto iter = vec->cbegin();
@@ -202,28 +205,28 @@ void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
       --y;
     }
 
-    hasReader = false;
+    has_reader = false;
   }
 
-  if (hasReader) {
-    s->AddStr(0, lineNo++, "Readers:");
+  if (has_reader) {
+    s->AddStr(0, (*line_no)++, "Readers:");
     for (; iter != vec->cend(); ++iter) {
-      s->AddStr(ReaderWriterOffset, lineNo++, iter->c_str());
+      s->AddStr(ReaderWriterOffset, (*line_no)++, iter->c_str());
     }
 
-    ++lineNo;
+    ++(*line_no);
     vec = &writers_;
     iter = vec->cbegin();
   }
 
-  s->AddStr(0, lineNo++, "Writers:");
+  s->AddStr(0, (*line_no)++, "Writers:");
   for (; iter != vec->cend(); ++iter) {
-    s->AddStr(ReaderWriterOffset, lineNo++, iter->c_str());
+    s->AddStr(ReaderWriterOffset, (*line_no)++, iter->c_str());
   }
 }
 
 void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
-                                              unsigned lineNo) {
+                                              int* line_no) {
   if (has_message_come()) {
     if (raw_msg_class_ == nullptr) {
       auto rawFactory = apollo::cyber::message::ProtobufFactory::Instance();
@@ -231,50 +234,53 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
     }
 
     if (raw_msg_class_ == nullptr) {
-      s->AddStr(0, lineNo++, "Cannot Generate Message by Message Type");
+      s->AddStr(0, (*line_no)++, "Cannot Generate Message by Message Type");
     } else {
-      s->AddStr(0, lineNo++, "FrameRatio: ");
+      s->AddStr(0, (*line_no)++, "FrameRatio: ");
 
-      std::ostringstream outStr;
-      outStr << std::fixed << std::setprecision(FrameRatio_Precision)
-             << frame_ratio();
-      s->AddStr(outStr.str().c_str());
+      std::ostringstream out_str;
+      out_str << std::fixed << std::setprecision(FrameRatio_Precision)
+              << frame_ratio();
+      s->AddStr(out_str.str().c_str());
 
-      decltype(channel_message_) channelMsg = CopyMsgPtr();
+      decltype(channel_message_) channel_msg = CopyMsgPtr();
 
-      if (channelMsg->message.size()) {
-        s->AddStr(0, lineNo++, "RawMessage Size: ");
-        outStr.str("");
-        outStr << channelMsg->message.size() << " Bytes";
-        if (channelMsg->message.size() >= kGB) {
-          outStr << " (" << static_cast<float>(channelMsg->message.size()) / kGB
-                 << " GB)";
-        } else if (channelMsg->message.size() >= kMB) {
-          outStr << " (" << static_cast<float>(channelMsg->message.size()) / kMB
-                 << " MB)";
-        } else if (channelMsg->message.size() >= kKB) {
-          outStr << " (" << static_cast<float>(channelMsg->message.size()) / kKB
-                 << " KB)";
+      if (channel_msg->message.size()) {
+        s->AddStr(0, (*line_no)++, "RawMessage Size: ");
+        out_str.str("");
+        out_str << channel_msg->message.size() << " Bytes";
+        if (channel_msg->message.size() >= kGB) {
+          out_str << " ("
+                  << static_cast<float>(channel_msg->message.size()) / kGB
+                  << " GB)";
+        } else if (channel_msg->message.size() >= kMB) {
+          out_str << " ("
+                  << static_cast<float>(channel_msg->message.size()) / kMB
+                  << " MB)";
+        } else if (channel_msg->message.size() >= kKB) {
+          out_str << " ("
+                  << static_cast<float>(channel_msg->message.size()) / kKB
+                  << " KB)";
         }
-        s->AddStr(outStr.str().c_str());
-        if (raw_msg_class_->ParseFromString(channelMsg->message)) {
-          int lcount = lineCount(*raw_msg_class_, s->Width());
-          page_item_count_ = s->Height() - lineNo;
+        s->AddStr(out_str.str().c_str());
+        if (raw_msg_class_->ParseFromString(channel_msg->message)) {
+          int lcount = LineCount(*raw_msg_class_, s->Width());
+          page_item_count_ = s->Height() - *line_no;
           pages_ = lcount / page_item_count_ + 1;
           SplitPages(key);
-          int jumpLines = page_index_ * page_item_count_;
-          jumpLines <<= 2;
-          jumpLines /= 5;
-          GeneralMessageBase::PrintMessage(this, *raw_msg_class_, jumpLines, s,
-                                           lineNo, 0);
+          int jump_lines = page_index_ * page_item_count_;
+          jump_lines <<= 2;
+          jump_lines /= 5;
+          GeneralMessageBase::PrintMessage(this, *raw_msg_class_, &jump_lines,
+                                           s, line_no, 0);
         } else {
-          s->AddStr(0, lineNo++, "Cannot parse the raw message");
+          s->AddStr(0, (*line_no)++, "Cannot parse the raw message");
         }
       } else {
-        s->AddStr(0, lineNo++, "The size of this raw Message is Zero");
+        s->AddStr(0, (*line_no)++, "The size of this raw Message is Zero");
       }
     }
   } else {
-    s->AddStr(0, lineNo++, "No Message Came");
+    s->AddStr(0, (*line_no)++, "No Message Came");
   }
 }

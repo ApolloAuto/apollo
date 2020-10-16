@@ -205,39 +205,41 @@ void convertPoseToLoc(const Eigen::Affine3d& pose,
   localization->mutable_pose()->mutable_orientation()->set_qw(p.w());
 }
 
-void MlfEngine::AttachDebugInfo(
-    std::vector<std::shared_ptr<base::Object>>* foreground_objs) {
-  for (auto i : obstacle_container_.curr_frame_movable_obstacle_ids()) {
-    Obstacle* obj = obstacle_container_.GetObstacle(i);
-    for (size_t i = 0; i < (*foreground_objs).size(); ++i) {
-      if (obj->id() == (*foreground_objs)[static_cast<int>(i)]->track_id) {
-        (*foreground_objs)[static_cast<int>(i)]->feature.reset(
-            new Feature(obj->latest_feature()));
-        ADEBUG << "traj size is mlf engine is "
-               << (*foreground_objs)[static_cast<int>(i)]
-                      ->feature->predicted_trajectory_size()
-               << " track id "
-               << (*foreground_objs)[static_cast<int>(i)]->track_id
-               << " feature address is "
-               << static_cast<void*>(
-                      (*foreground_objs)[static_cast<int>(i)]->feature.get());
-      }
-    }
-  }
-}
+// TODO(all): semantic map related, for debugging
+// void MlfEngine::AttachDebugInfo(
+//    std::vector<std::shared_ptr<base::Object>>* foreground_objs) {
+//  for (auto i : obstacle_container_.curr_frame_movable_obstacle_ids()) {
+//    Obstacle* obj = obstacle_container_.GetObstacle(i);
+//    for (size_t i = 0; i < (*foreground_objs).size(); ++i) {
+//      if (obj->id() == (*foreground_objs)[static_cast<int>(i)]->track_id) {
+//        (*foreground_objs)[static_cast<int>(i)]->feature.reset(
+//            new Feature(obj->latest_feature()));
+//        ADEBUG << "traj size is mlf engine is "
+//               << (*foreground_objs)[static_cast<int>(i)]
+//                      ->feature->predicted_trajectory_size()
+//               << " track id "
+//               << (*foreground_objs)[static_cast<int>(i)]->track_id
+//               << " feature address is "
+//               << static_cast<void*>(
+//                      (*foreground_objs)[static_cast<int>(i)]->feature.get());
+//      }
+//    }
+//  }
+//}
 
-void MlfEngine::AttachSemanticPredictedTrajectory(
-    const std::vector<MlfTrackDataPtr>& tracks) {
-  for (auto i : obstacle_container_.curr_frame_movable_obstacle_ids()) {
-    Obstacle* obj = obstacle_container_.GetObstacle(i);
-    for (size_t j = 0; j < tracks.size(); ++j) {
-      MlfTrackDataPtr ptr = tracks[j];
-      if (obj->id() == ptr->track_id_) {
-        ptr->feature_.reset(new Feature(obj->latest_feature()));
-      }
-    }
-  }
-}
+// TODO(all): semantic map related, for debugging
+// void MlfEngine::AttachSemanticPredictedTrajectory(
+//    const std::vector<MlfTrackDataPtr>& tracks) {
+//  for (auto i : obstacle_container_.curr_frame_movable_obstacle_ids()) {
+//    Obstacle* obj = obstacle_container_.GetObstacle(i);
+//    for (size_t j = 0; j < tracks.size(); ++j) {
+//      MlfTrackDataPtr ptr = tracks[j];
+//      if (obj->id() == ptr->track_id_) {
+//        ptr->feature_.reset(new Feature(obj->latest_feature()));
+//      }
+//    }
+//  }
+//}
 
 void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   auto& tracked_objects = frame->tracked_objects;
@@ -263,31 +265,32 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   };
   collect(&foreground_track_data_);
   // update semantic map object container
-  if (use_semantic_map_) {
-    obstacle_container_.CleanUp();
-    // use msg serializer to convert object to perception obstacles
-    apollo::common::ErrorCode err = apollo::common::ErrorCode::OK;
-    apollo::perception::PerceptionObstacles obstacles;
-    double lidar_ts = frame->timestamp;
-    localization::LocalizationEstimate localization;
-    localization.mutable_header()->set_timestamp_sec(lidar_ts);
-    localization.mutable_header()->set_lidar_timestamp(lidar_ts * 1e9);
-    localization.mutable_pose()->mutable_linear_velocity()->set_x(0.0f);
-    localization.mutable_pose()->mutable_linear_velocity()->set_y(0.0f);
-    localization.mutable_pose()->mutable_linear_velocity()->set_z(0.0f);
-    convertPoseToLoc(frame->novatel2world_pose, &localization);
-    pose_container_.Insert(localization);
-    obstacle_container_.InsertPerceptionObstacle(
-        *(pose_container_.ToPerceptionObstacle()), lidar_ts);
-    std::vector<std::shared_ptr<base::Object>> foreground_objs(
-        tracked_objects.begin(), tracked_objects.begin() + pos);
-    serializer_.SerializeMsg(0, static_cast<uint64_t>(lidar_ts * 1e9), 0,
-                             foreground_objs, err, &obstacles);
-    obstacle_container_.Insert(obstacles);
-    evaluator_.Run(&obstacle_container_);
-    AttachDebugInfo(&foreground_objs);
-    AttachSemanticPredictedTrajectory(foreground_track_data_);
-  }
+// TODO(all): semantic map related, for debugging
+//  if (use_semantic_map_) {
+//    obstacle_container_.CleanUp();
+//    // use msg serializer to convert object to perception obstacles
+//    apollo::common::ErrorCode err = apollo::common::ErrorCode::OK;
+//    apollo::perception::PerceptionObstacles obstacles;
+//    double lidar_ts = frame->timestamp;
+//    localization::LocalizationEstimate localization;
+//    localization.mutable_header()->set_timestamp_sec(lidar_ts);
+//    localization.mutable_header()->set_lidar_timestamp(lidar_ts * 1e9);
+//    localization.mutable_pose()->mutable_linear_velocity()->set_x(0.0f);
+//    localization.mutable_pose()->mutable_linear_velocity()->set_y(0.0f);
+//    localization.mutable_pose()->mutable_linear_velocity()->set_z(0.0f);
+//    convertPoseToLoc(frame->novatel2world_pose, &localization);
+//    pose_container_.Insert(localization);
+//    obstacle_container_.InsertPerceptionObstacle(
+//        *(pose_container_.ToPerceptionObstacle()), lidar_ts);
+//    std::vector<std::shared_ptr<base::Object>> foreground_objs(
+//        tracked_objects.begin(), tracked_objects.begin() + pos);
+//    serializer_.SerializeMsg(0, static_cast<uint64_t>(lidar_ts * 1e9), 0,
+//                             foreground_objs, err, &obstacles);
+//    obstacle_container_.Insert(obstacles);
+//    evaluator_.Run(&obstacle_container_);
+//    AttachDebugInfo(&foreground_objs);
+//    AttachSemanticPredictedTrajectory(foreground_track_data_);
+//  }
 
   collect(&background_track_data_);
   if (num_predict != 0) {

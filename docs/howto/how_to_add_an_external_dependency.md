@@ -1,82 +1,158 @@
 # How to Add a New External Dependency
 
+The bazel files about third-party dependencies are all in the folder
+[third_party](../../third_party)
+which has a structure as following.
+
+```shell
+  third_party
+      ├── absl
+      │   ├── BUILD
+      │   └── workspace.bzl
+      ├── ACKNOWLEDGEMENT.txt
+      ├── adolc
+      │   ├── adolc.BUILD
+      │   ├── BUILD
+      │   └── workspace.bzl
+      ├── ad_rss_lib
+      │   ├── ad_rss_lib.BUILD
+      │   ├── BUILD
+      │   └── workspace.bzl
+      ├── benchmark
+      │   ├── benchmark.BUILD
+      │   ├── BUILD
+      │   └── workspace.bzl
+      ├── boost
+      │   ├── boost.BUILD
+      │   ├── BUILD
+      │   └── workspace.bzl
+      ├── BUILD
+  ......
+```
+
+For each external denpendency library, there is a seperate folder that contains
+a `BUILD` file with the contents of:
+
+```python
+package(
+    default_visibility = ["//visibility:public"],
+)
+```
+
+Further, libraries can be divided into several categories.
+
 ## 1. Library that supports bazel
 
 For example,
 
-* [Abseil](https://github.com/abseil/abseil-cpp)
-* [Google Test](https://github.com/google/googletest)
+- [Abseil](https://github.com/abseil/abseil-cpp)
+- [Google Test](https://github.com/google/googletest)
 
-Simply import it into WORKSPACE:
-
-```python
-git_repository(
-  name = "com_google_absl",
-  remote = "https://github.com/abseil/abseil-cpp",
-  tag = "20190808",
-)
-```
-
-## 2. Library that has third-party bazel rule
-
-Some popular libraries don't support bazel natively, but may be resolved by
-other developers.
-
-Try boost as an example:
+Import it into workspace.bzl:
 
 ```python
-git_repository(
-    name = "com_github_nelhage_rules_boost",
-    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
-    remote = "https://github.com/nelhage/rules_boost",
-    shallow_since = "1570056263 -0700",
-)
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
-boost_deps()
+def repo():
+    http_archive(
+        name = "com_google_absl",
+        sha256 = "f41868f7a938605c92936230081175d1eae87f6ea2c248f41077c8f88316f111",
+        strip_prefix = "abseil-cpp-20200225.2",
+        urls = [
+            "https://github.com/abseil/abseil-cpp/archive/20200225.2.tar.gz",
+        ],
+    )
 ```
 
-Now you can refer to it in BUILD files with `@boost//:system`, etc.
-
-## 3. Library with handcrafted BUILD file
+## 2. Library with handcrafted BUILD file
 
 It's pretty common to do so. But it needs very solid knowledge with bazel.
 
+[workspace.bzl](../../third_party/yaml_cpp/workspace.bzl):
+
 ```python
-new_http_archive(
-    name = "civetweb",
-    url = "https://github.com/civetweb/civetweb/archive/v1.11.tar.gz",
-    sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
-    build_file = "third_party/civetweb.BUILD",
-    strip_prefix = "civetweb-1.11",
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+def clean_dep(dep):
+    return str(Label(dep))
+
+def repo():
+    http_archive(
+        name = "com_github_jbeder_yaml_cpp",
+        build_file = clean_dep("//third_party/yaml_cpp:yaml_cpp.BUILD"),
+        sha256 = "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed",
+        strip_prefix = "yaml-cpp-yaml-cpp-0.6.3",
+        urls = [
+            "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz",
+        ],
+    )
+```
+
+[yaml.BUILD](../../third_party/yaml_cpp/yaml.BUILD):
+
+```python
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "yaml-cpp",
+    srcs = glob([
+        "src/*.cpp",
+    ]),
+    hdrs = glob([
+        "include/yaml-cpp/*.h",
+        "src/*.h",
+    ]),
+    includes = [
+        "include",
+        "src",
+    ],
+    visibility = ["//visibility:public"],
 )
 ```
 
-## 4. Library which is pre-installed into the operating system
+## 3. Library which is pre-installed into the operating system
 
 It's NOT recommended, as it breaks the rule of a self-contained bazel WORKSPACE.
 However, some libraries are very complicated to build with bazel, while the
 operating system, such as Ubuntu, provides easy installation.
 
+Please do raise a discussion before doing so. Then we can add it to the docker
+image.
+
 For example,
 
-* [OpenCV](https://github.com/opencv/opencv)
-* [Poco](https://github.com/pocoproject/poco)
+- [Poco](https://github.com/pocoproject/poco)
 
-Please do raise a discussion before doing so. Then we can add it to the docker
-image:
-
-```bash
-sudo apt install libopencv-dev libpoco-dev
-```
-
-Then add it as a third_party library in
-[third_party/BUILD](https://github.com/ApolloAuto/apollo/blob/master/third_party/BUILD).
+[workspace.bzl](../../third_party/poco/workspace.bzl):
 
 ```python
+def clean_dep(dep):
+    return str(Label(dep))
+
+def repo():
+    native.new_local_repository(
+        name = "poco",
+        build_file = clean_dep("//third_party/poco:poco.BUILD"),
+        path = "/opt/apollo/sysroot/include",
+    )
+```
+
+[poco.BUILD](../../third_party/poco/poco.BUILD):
+
+```python
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
 cc_library(
     name = "PocoFoundation",
-    linkopts = ["-lPocoFoundation"],
+    includes = ["."],
+    linkopts = [
+        "-L/opt/apollo/sysroot/lib",
+        "-lPocoFoundation",
+    ],
 )
 ```
 
@@ -84,8 +160,16 @@ Note that in such case, you should include the headers like
 `#include <Poco/SharedLibrary.h>` instead of `#include "Poco/SharedLibrary.h"`
 as they are in the system path.
 
+## Note
+
+For all of the above types of external dependencies, we also need to add them
+into
+[tools/workspace.bzl](../../tools/workspace.bzl)
+
 ## References
 
-For a detailed description on adding a dependency with Bazel, refer to the following:
-* [Workspace Rules](https://bazel.build/versions/master/docs/be/workspace.html)
-* [Working with external dependencies](https://docs.bazel.build/versions/master/external.html).
+For a detailed description on adding a dependency with Bazel, refer to the
+following:
+
+- [Workspace Rules](https://bazel.build/versions/master/docs/be/workspace.html)
+- [Working with external dependencies](https://docs.bazel.build/versions/master/external.html).

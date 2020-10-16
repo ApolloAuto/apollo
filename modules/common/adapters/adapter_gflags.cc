@@ -22,6 +22,8 @@ DEFINE_bool(enable_adapter_dump, false,
 DEFINE_string(gps_topic, "/apollo/sensor/gnss/odometry", "GPS topic name");
 DEFINE_string(imu_topic, "/apollo/sensor/gnss/corrected_imu", "IMU topic name");
 DEFINE_string(raw_imu_topic, "/apollo/sensor/gnss/imu", "Raw IMU topic name");
+DEFINE_string(audio_detection_topic, "/apollo/audio_detection",
+              "audio detection topic name");
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
 DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
@@ -204,14 +206,23 @@ DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");
 DEFINE_string(hmi_status_topic, "/apollo/hmi/status", "HMI status topic name.");
 DEFINE_string(audio_capture_topic, "/apollo/hmi/audio_capture",
               "HMI audio capture topic name.");
+DEFINE_string(v2x_obu_traffic_light_topic,
+              "/apollo/v2x/obu/internal/traffic_light",
+              "v2x obu traffic_light topic name");
+DEFINE_string(v2x_internal_obstacle_topic, "/apollo/v2x/obu/internal/obstacles",
+              "v2x internal obstacles topic name");
 DEFINE_string(v2x_obstacle_topic, "/apollo/v2x/obstacles",
               "v2x obstacles topic name");
-DEFINE_string(v2x_trafficlight_topic, "/apollo/v2x/traffic_light",
-              "v2x trafficlight topic name");
+DEFINE_string(v2x_traffic_light_topic, "/apollo/v2x/traffic_light",
+              "v2x traffic light topic name");
+DEFINE_string(v2x_traffic_light_for_hmi_topic,
+              "/apollo/v2x/traffic_light/for_hmi",
+              "v2x traffic light topic name for hmi");
+DEFINE_string(v2x_rsi_topic, "/apollo/v2x/rsi", "v2x rsi topic name");
+
 DEFINE_string(storytelling_topic, "/apollo/storytelling",
               "Storytelling topic.");
-DEFINE_string(audio_event_topic, "/apollo/audio_event",
-              "Audio event topic.");
+DEFINE_string(audio_event_topic, "/apollo/audio_event", "Audio event topic.");
 
 DEFINE_string(guardian_topic, "/apollo/guardian", "Guardian topic.");
 DEFINE_string(gnss_raw_data_topic, "/apollo/sensor/gnss/raw_data",

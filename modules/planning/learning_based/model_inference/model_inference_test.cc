@@ -14,17 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/file.h"
-#include "gflags/gflags.h"
 #include "gtest/gtest.h"
+
+#include "gflags/gflags.h"
+
+#include "modules/planning/proto/learning_data.pb.h"
+#include "modules/planning/proto/planning_semantic_map_config.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
 #include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
-#include "modules/planning/learning_based/model_inference/trajectory_imitation_tensorrt_inference.h"
-#include "modules/planning/proto/learning_data.pb.h"
-#include "modules/planning/proto/planning_semantic_map_config.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -81,50 +83,10 @@ TEST_F(ModelInferenceTest, trajectory_imitation_libtorch_inference) {
   std::unique_ptr<ModelInference> trajectory_imitation_libtorch_inference =
       std::unique_ptr<ModelInference>(
           new TrajectoryImitationLibtorchInference(config));
-  //   ACHECK(trajectory_imitation_libtorch_inference->LoadModel())
-  //       << "Failed to load model in libtorch inference";
-  //   ACHECK(trajectory_imitation_libtorch_inference->DoInference(&test_data_frame))
-  //       << "Failed to inference trajectory_imitation_model";
-}
-
-TEST_F(ModelInferenceTest, trajectory_imitation_tensorrt_inference) {
-  FLAGS_test_model_inference_task_config_file =
-      "/apollo/modules/planning/testdata/model_inference_test/"
-      "test_tensorrt_inference_task_config.pb.txt";
-  FLAGS_test_data_frame_file =
-      "/apollo/modules/planning/testdata/model_inference_test/"
-      "learning_data_sunnyvale_with_two_offices.bin";
-  FLAGS_planning_birdview_img_feature_renderer_config_file =
-      "/apollo/modules/planning/conf/planning_semantic_map_config.pb.txt";
-
-  LearningModelInferenceTaskConfig config;
-  ACHECK(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_test_model_inference_task_config_file, &config))
-      << "Failed to load config file "
-      << FLAGS_test_model_inference_task_config_file;
-
-  LearningDataFrame test_data_frame;
-  ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_test_data_frame_file,
-                                                 &test_data_frame))
-      << "Failed to load data frame file " << FLAGS_test_data_frame_file;
-
-  PlanningSemanticMapConfig renderer_config;
-  ACHECK(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_planning_birdview_img_feature_renderer_config_file,
-      &renderer_config))
-      << "Failed to load renderer config"
-      << FLAGS_planning_birdview_img_feature_renderer_config_file;
-
-  BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
-
-  //   std::unique_ptr<ModelInference> trajectory_imitation_tensorrt_inference =
-  //       std::unique_ptr<ModelInference>(
-  //           new TrajectoryImitationTensorRTInference(config));
-
-  //   ACHECK(trajectory_imitation_tensorrt_inference->LoadModel())
-  //       << "Failed to load model in tensorRT inference";
-  //   ACHECK(trajectory_imitation_tensorrt_inference->DoInference(&test_data_frame))
-  //       << "Failed to inference trajectory_imitation_model";
+  ACHECK(trajectory_imitation_libtorch_inference->LoadModel())
+      << "Failed to load model in libtorch inference";
+  ACHECK(trajectory_imitation_libtorch_inference->DoInference(&test_data_frame))
+      << "Failed to inference trajectory_imitation_model";
 }
 
 }  // namespace planning

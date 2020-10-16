@@ -19,22 +19,25 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-# shellcheck source=apollo/scripts/apollo.bashrc
+# shellcheck source=./apollo.bashrc
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 : ${STAGE:=dev}
+
+PYTHON_LINT_FLAG=0
+CPP_LINT_FLAG=0
+SHELL_LINT_FLAG=0
 
 function _cpp_lint_impl() {
   bazel test --config=cpplint "$@"
 }
 
 function run_cpp_lint() {
-  pushd "${APOLLO_ROOT_DIR}" > /dev/null
+  pushd "${APOLLO_ROOT_DIR}" >/dev/null
   local cpp_dirs="cyber"
   if [[ "${STAGE}" == "dev" ]]; then
     cpp_dirs="${cpp_dirs} modules"
   fi
-  # -not \( -path "modules/drivers/gnss/third_party" -prune \) \
   for prey in $(find ${cpp_dirs} -name BUILD \
     | xargs grep -l -E 'cc_library|cc_test|cc_binary|cuda_library' \
     | xargs grep -L 'cpplint()'); do
@@ -47,7 +50,7 @@ function run_cpp_lint() {
       ${buidifier} -lint=fix "${prey}"
     fi
   done
-  popd > /dev/null
+  popd >/dev/null
 
   local targets="//cyber/..."
   _cpp_lint_impl "${targets}"
@@ -75,10 +78,10 @@ function run_sh_lint() {
 
   sh_dirs=$(printf "${APOLLO_ROOT_DIR}/%s " ${sh_dirs})
   run find ${sh_dirs} -type f \( -name "*.sh" -or -name "*.bashrc" \) -exec \
-    shellcheck -x {} +
+    shellcheck -x --shell=bash {} +
 
   for script in ${APOLLO_ROOT_DIR}/*.sh; do
-    run shellcheck -x "${script}"
+    run shellcheck -x --shell=bash "${script}"
   done
 }
 
@@ -104,44 +107,62 @@ function run_py_lint() {
 function print_usage() {
   info "Usage: $0 [Options]"
   info "Options:"
+  info "${TAB}--py        Lint Python files"
+  info "${TAB}--sh        Lint Bash scripts"
+  info "${TAB}--cpp       Lint cpp source files"
+  info "${TAB}-a|--all    Lint all. Equivalent to \"--py --sh --cpp\""
   info "${TAB}-h|--help   Show this message and exit"
-  info "${TAB}py|python   Lint Python code"
-  info "${TAB}sh|shell    Lint Bash code"
-  info "${TAB}cpp         Lint cpp code"
-  info "${TAB}all         Lint all (C++/Python/Bash)"
-  info "${TAB}help        Same as '--help'"
 }
 
-function run_lint() {
-  local cmd="$1"
-  case "${cmd}" in
-    py | python)
-      run_py_lint
-      ;;
-    cpp)
-      run_cpp_lint
-      ;;
-    sh | shell)
-      run_sh_lint
-      ;;
-    all)
-      run_cpp_lint
-      run_py_lint
-      run_sh_lint
-      ;;
-    help)
-      print_usage
-      exit 0
-      ;;
-    *)
-      print_usage
-      exit 1
-      ;;
-  esac
+function parse_cmdline_args() {
+  if [[ "$#" -eq 0 ]]; then
+    CPP_LINT_FLAG=1
+    return 0
+  fi
+
+  while [[ "$#" -gt 0 ]]; do
+    local opt="$1"
+    shift
+    case "${opt}" in
+      --py)
+        PYTHON_LINT_FLAG=1
+        ;;
+      --cpp)
+        CPP_LINT_FLAG=1
+        ;;
+      --sh)
+        SHELL_LINT_FLAG=1
+        ;;
+      -a | --all)
+        PYTHON_LINT_FLAG=1
+        CPP_LINT_FLAG=1
+        SHELL_LINT_FLAG=1
+        ;;
+      -h | --help)
+        print_usage
+        exit 0
+        ;;
+      *)
+        warning "Unknown option: ${opt}"
+        print_usage
+        exit 1
+        ;;
+    esac
+  done
 }
 
 function main() {
-  run_lint "$@"
+  parse_cmdline_args "$@"
+  if [[ "${CPP_LINT_FLAG}" -eq 1 ]]; then
+    run_cpp_lint
+  fi
+  if [[ "${PYTHON_LINT_FLAG}" -eq 1 ]]; then
+    run_py_lint
+  fi
+
+  if [[ "${SHELL_LINT_FLAG}" -eq 1 ]]; then
+    run_sh_lint
+  fi
 }
 
 main "$@"

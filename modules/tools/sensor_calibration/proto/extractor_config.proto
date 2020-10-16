@@ -23,6 +23,7 @@ message IoConfig {
   required string output_path = 2 [default = "extracted_data"];
   optional string start_timestamp = 3 [default = "FLOAT_MIN"];
   optional string end_timestamp = 4 [default = "FLOAT_MAX"];
+  optional string main_sensor = 5;
 };
 
 message ChannelConfig {

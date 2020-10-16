@@ -1,7 +1,7 @@
 module_config {
   module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component_lidar.so"
 
- components {
+  components {
     class_name : "DetectionComponent"
     config {
       name: "Velodyne128Detection"
@@ -12,17 +12,6 @@ module_config {
         }
     }
   }
-
- components {
-    class_name : "DetectionComponent"
-    config {
-      name: "Velodyne16Detection"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_detection_conf.pb.txt"
-      readers {
-          channel: "/apollo/sensor/lidar16/compensator/PointCloud2"
-        }
-    }
- }
 
   components {
     class_name : "RecognitionComponent"
@@ -67,5 +56,21 @@ module_config {
         }
     }
   }
+}
 
+module_config {
+  module_library : "/apollo/bazel-bin/modules/v2x/fusion/apps/libv2x_fusion_component.so"
+
+  components {
+    class_name : "V2XFusionComponent"
+    config {
+      name : "v2x_fusion"
+      flag_file_path : "/apollo/modules/v2x/conf/v2x_fusion_tracker.conf"
+      readers: [
+        {
+          channel: "/perception/vehicle/obstacles"
+        }
+      ]
+    }
+  }
 }

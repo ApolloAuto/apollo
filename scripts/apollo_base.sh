@@ -108,13 +108,13 @@ function setup_device() {
 
 function decide_task_dir() {
   # Try to find largest NVMe drive.
-  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 | \
-    awk '{print substr($0, index($0, $6))}')"
+  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 \
+    | awk '{print substr($0, index($0, $6))}')"
 
   # Try to find largest external drive.
   if [ -z "${DISK}" ]; then
-    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 | \
-      awk '{print substr($0, index($0, $6))}')"
+    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 \
+      | awk '{print substr($0, index($0, $6))}')"
   fi
 
   if [ -z "${DISK}" ]; then
@@ -136,7 +136,7 @@ function decide_task_dir() {
 function is_stopped_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
-  NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE_PATH}/launch/${MODULE}.launch")"
+  NUM_PROCESSES="$(pgrep -f "modules/${MODULE_PATH}/launch/${MODULE}.launch" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     return 1
   else

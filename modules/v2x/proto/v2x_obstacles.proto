@@ -1,0 +1,52 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+import "modules/common/proto/header.proto";
+import "modules/common/proto/error_code.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+
+message Point {
+  optional double x = 1;  // in meters.
+  optional double y = 2;  // in meters.
+  optional double z = 3;  // height in meters.
+}
+
+message MiniAreaMap {
+  optional bytes rscu_id = 1;  // RSCU id.
+  optional Point feature_position = 2; // the centre of intersection or sstraight area
+  optional Point start_position = 3; // the centre of intersection or sstraight area
+  optional Point end_position = 4; // the centre of intersection or sstraight area
+}
+
+message AbnormalInformation {
+  optional double average_speed = 1;
+  optional double vehicle_density = 2;
+}
+
+message V2XInformation {
+  enum V2XType {
+      NONE = 0;
+      ZOMBIES_CAR = 1;
+      BLIND_ZONE = 2;
+  };
+  repeated V2XType v2x_type = 1;  // use case type
+  optional Point traffic_event_start = 3;  // congestion  or others initial position.
+  optional Point traffic_event_start_error = 4; // congestion or others initial position error.
+  optional Point traffic_event_end = 5;  // congestion or others end position.
+  optional Point traffic_event_end_error = 6; // congestion or others end position error.
+  optional AbnormalInformation abnormal_info = 7; // abnormal info
+}
+
+message V2XObstacle {
+  optional apollo.perception.PerceptionObstacle perception_obstacle = 1;  // obstacle.
+  optional V2XInformation v2x_info = 2; // v2x use case info
+}
+
+message V2XObstacles {
+  repeated V2XObstacle v2x_obstacle = 1;  // An array of obstacles
+  optional MiniAreaMap area_map = 2; // Mini area map
+  optional double traffic_flow = 3; // Traffic flow
+  optional apollo.common.Header header = 4;  // Header
+  optional apollo.common.ErrorCode error_code = 5 [default = OK]; // perception error code
+}

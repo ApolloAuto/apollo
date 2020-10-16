@@ -2,12 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "navi_task",
     srcs = ["navi_task.cc"],
     hdrs = ["navi_task.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/status",
@@ -25,7 +26,7 @@ cc_library(
     name = "navi_path_decider",
     srcs = ["navi_path_decider.cc"],
     hdrs = ["navi_path_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":navi_task",
         "//cyber/common:log",
@@ -52,7 +53,7 @@ cc_library(
         "navi_speed_decider.h",
         "navi_speed_ts_graph.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":navi_task",
         "//cyber/common:log",
@@ -73,7 +74,7 @@ cc_library(
     name = "navi_obstacle_decider",
     srcs = ["navi_obstacle_decider.cc"],
     hdrs = ["navi_obstacle_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":navi_task",
         "//cyber/common:log",

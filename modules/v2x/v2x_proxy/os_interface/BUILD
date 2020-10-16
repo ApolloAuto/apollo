@@ -12,7 +12,11 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/v2x/proto:v2x_obstacles_cc_proto",
+        "//modules/v2x/proto:v2x_obu_rsi_cc_proto",
+        "//modules/v2x/proto:v2x_obu_traffic_light_cc_proto",
         "//modules/v2x/proto:v2x_traffic_light_cc_proto",
     ],
 )

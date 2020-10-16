@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "traffic_rules",
@@ -29,7 +30,7 @@ cc_library(
         "traffic_rule.h",
         "yield_sign.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util:factory",
         "//modules/common/util:map_util",
@@ -50,7 +51,7 @@ cc_library(
     name = "traffic_decider",
     srcs = ["traffic_decider.cc"],
     hdrs = ["traffic_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":traffic_rules",
         "//modules/common/status",

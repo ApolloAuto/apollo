@@ -16,7 +16,6 @@
 #include "modules/bridge/udp_bridge_multi_receiver_component.h"
 
 #include "cyber/time/clock.h"
-
 #include "modules/bridge/common/bridge_proto_diser_buf_factory.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"

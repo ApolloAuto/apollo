@@ -88,7 +88,12 @@ fi
 ##----------------##
 sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g'
 
-##
+##----------------##
+## default shell  ##
+##----------------##
+chsh -s /bin/bash
+ln -s /bin/bash /bin/sh -f
+
 ##----------------##
 ## Python Setings |
 ##----------------##

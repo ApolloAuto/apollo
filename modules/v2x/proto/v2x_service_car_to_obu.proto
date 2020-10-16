@@ -1,17 +1,11 @@
-
 syntax = "proto2";
 
 package apollo.v2x;
 
-import "modules/perception/proto/perception_obstacle.proto";
-import "modules/v2x/proto/v2x_carstatus.proto";
+import "modules/v2x/proto/v2x_car_status.proto";
 
 service CarToObu {
-  rpc PushCarStatus(apollo.v2x.CarStatus) returns (UpdateStatus) {
-  }
-  rpc PushPerceptionResult(apollo.perception.PerceptionObstacles)
-      returns (UpdateStatus) {
-  }
+  rpc PushCarStatus(apollo.v2x.CarStatus) returns (UpdateStatus) {}
 }
 
 message UpdateStatus {

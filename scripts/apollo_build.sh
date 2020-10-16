@@ -55,8 +55,7 @@ function _determine_localization_disabled() {
 function _determine_planning_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} \
-        except //modules/planning/open_space/trajectory_smoother:planning_block \
-        except //modules/planning/learning_based/..."
+        except //modules/planning/open_space/trajectory_smoother:planning_block"
   fi
 }
 
@@ -248,26 +247,6 @@ function run_bazel_build() {
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 
-function build_simulator() {
-  local SIMULATOR_TOP_DIR="/apollo-simulator"
-  if [ -d "${SIMULATOR_TOP_DIR}" ] && [ -e "${SIMULATOR_TOP_DIR}/build.sh" ]; then
-    pushd "${SIMULATOR_TOP_DIR}"
-    local opt
-    if [ "${USE_GPU}" -eq 1 ]; then
-      opt="--config=gpu"
-    else
-      opt="--config=cpu"
-    fi
-
-    if bash build.sh build ${opt}; then
-      success "Done building Apollo simulator."
-    else
-      fail "Building Apollo simulator failed."
-    fi
-    popd >/dev/null
-  fi
-}
-
 function main() {
   if ! "${APOLLO_IN_DOCKER}"; then
     error "The build operation must be run from within docker container"
@@ -280,8 +259,8 @@ function main() {
 
   if [ -z "${SHORTHAND_TARGETS}" ]; then
     SHORTHAND_TARGETS="apollo"
-    build_simulator
   fi
+
   success "Done building ${SHORTHAND_TARGETS}. Enjoy!"
 }
 

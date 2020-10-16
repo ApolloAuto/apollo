@@ -41,10 +41,10 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
   // 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
   Brakecommand101* set_brake_dec(double brake_dec);
 
-  // config detail: {'name': 'CheckSum_111', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_101', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  Brakecommand101* set_checksum_111(int checksum_111);
+  Brakecommand101* set_checksum_101(int checksum_101);
 
   // config detail: {'name': 'Brake_Pedal_Target', 'offset': 0.0, 'precision':
   // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
@@ -64,14 +64,14 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
   // 15, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
   void set_p_brake_dec(uint8_t* data, double brake_dec);
 
-  // config detail: {'name': 'CheckSum_111', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_101', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_checksum_111(uint8_t* data, int checksum_111);
+  void set_p_checksum_101(uint8_t* data, int checksum_101);
 
   // config detail: {'name': 'Brake_Pedal_Target', 'offset': 0.0, 'precision':
   // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
   void set_p_brake_pedal_target(uint8_t* data, double brake_pedal_target);
 
   // config detail: {'name': 'Brake_EN_CTRL', 'enum': {0:
@@ -83,7 +83,7 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   double brake_dec_;
-  int checksum_111_;
+  int checksum_101_;
   double brake_pedal_target_;
   Brake_command_101::Brake_en_ctrlType brake_en_ctrl_;
 };

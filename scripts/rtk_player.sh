@@ -27,7 +27,7 @@ function setup() {
 }
 
 function start() {
-  NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_player")"
+  NUM_PROCESSES="$(pgrep -f "record_play/rtk_player" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
     pkill -SIGKILL -f rtk_player
   fi

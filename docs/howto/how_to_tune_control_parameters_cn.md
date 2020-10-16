@@ -22,7 +22,7 @@
 #### 横向控制器
 横向控制器是基于LQR的最优控制器。 该控制器的动力学模型是一个简单的带有侧滑的自行车模型。它被分为两类，包括闭环和开环。
 
-- 闭环提供具有4种状态的离散反馈LQR控制器： 
+- 闭环提供具有4种状态的离散反馈LQR控制器：
   - 横向误差
   - 横向误差率
   - 航向误差
@@ -42,7 +42,7 @@
 ## 控制器调谐
 
 ### 实用工具
-类似于[诊断](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/diagnostics) 和 [realtime_plot](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/realtime_plot) 可用于控制器调优，并且可以在`apollo/modules/tools/`中找到.
+类似于[诊断](../../modules/tools/diagnostics) 和 [realtime_plot](../../modules/tools/realtime_plot) 可用于控制器调优，并且可以在`apollo/modules/tools/`中找到.
 ### 横向控制器的整定
 横向控制器设计用于最小调谐力。“所有”车辆的基础横向控制器调谐步骤如下：
 
@@ -95,7 +95,7 @@ lat_controller_conf {
 ### 纵控制器的调谐
 纵向控制器由级联的PID控制器组成，该控制器包括一个站控制器和一个具有不同速度增益的高速/低速控制器。Apollo管理开环和闭环的调谐通过：
 
-- 开环: 校准表生成。请参阅[how_to_update_vehicle_calibration.md](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_update_vehicle_calibration.md)的详细步骤
+- 开环: 校准表生成。请参阅[how_to_update_vehicle_calibration.md](how_to_update_vehicle_calibration.md)的详细步骤
 - 闭环: 基于高速控制器->低速控制器->站控制器的顺序。
 
 #### 高/低速控制器的调谐

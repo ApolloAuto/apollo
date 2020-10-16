@@ -14,11 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/hesai/parser.h"
+#include "modules/drivers/hesai/hesai64_parser.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
+
+using Node = ::apollo::cyber::Node;
+using apollo::drivers::PointXYZIT;
 
 Hesai64Parser::Hesai64Parser(const std::shared_ptr<Node> &node,
                              const Config &conf)

@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -39,6 +40,7 @@ cc_library(
         ":general_message",
         ":general_message_base",
         ":screen",
+        "//cyber",
         "//cyber/message:raw_message",
         "//cyber/record:record_message",
     ],
@@ -75,4 +77,4 @@ cc_library(
     hdrs = ["screen.h"],
 )
 
-#cpplint()
+cpplint()

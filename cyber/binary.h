@@ -21,15 +21,10 @@
 
 namespace apollo {
 namespace cyber {
-class Binary {
- public:
-  static std::string GetName() { return GetNameRef(); }
-  static void SetName(const std::string& name) { GetNameRef() = name; }
-  static std::string& GetNameRef() {
-    static std::string binary_name;
-    return binary_name;
-  }
-};
+namespace binary {
+std::string GetName();
+void SetName(const std::string& name);
+}  // namespace binary
 }  // namespace cyber
 }  // namespace apollo
 

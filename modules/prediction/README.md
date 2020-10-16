@@ -66,7 +66,7 @@ There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cr
 
 * **Social Interaction evaluator**: this model is used for pedestrians, for short term trajectory prediction. It uses social LSTM. This evaluator was created for caution level obstacles
 
-* **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM
+* **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
 
 
 ### Predictor
@@ -92,3 +92,7 @@ The prediction module estimates the future motion trajectories for all perceived
 The prediction module also takes messages from both localization and planning as input. The structure is shown below:
 
 ![](images/architecture2.png)
+
+## Related Paper
+
+1. [Xu K, Xiao X, Miao J, Luo Q. "Data Driven Prediction Architecture for Autonomous Driving and its Application on Apollo Platform." *arXiv preprint arXiv:2006.06715.* ](https://arxiv.org/pdf/2006.06715.pdf)

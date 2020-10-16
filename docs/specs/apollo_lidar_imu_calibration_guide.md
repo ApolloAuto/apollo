@@ -28,7 +28,7 @@ In order to calibrate the sensors, it is important to prepare them first, using 
 
 2. Start up the 64-beams LiDAR and INS. The INS must be aligned when it is powered on. At this point, the car should be driven straight, then turned left and turned right in an open area, until the initialization is completed.
 
-3. Confirm that all sensor topics required by this service have the following output : [How to Check the Sensor Output?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
+3. Confirm that all sensor topics required by this service have the following output : [How to Check the Sensor Output?](../FAQs/Calibration_FAQs.md)
 
 The topics required by the calibration service are shown in the following Table 1:
 
@@ -41,7 +41,7 @@ Table 1. Sensor topics.
 | INS       | /apollo/sensor/gnss/ins_stat             | 2               |
 
 
-4. Confirm that the INS status is 56 when recording data. To learn how please go to : [How to Check INS Status?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
+4. Confirm that the INS status is 56 when recording data. To learn how please go to : [How to Check INS Status?](../FAQs/Calibration_FAQs.md)
 
 5. Choose an appropriate calibration field.
 
@@ -109,7 +109,7 @@ If validation fails, the corresponding error message is prompted as seen in the 
 
 7. When calibration succeeds, click the **View detail** button to display a stitched point cloud. You can confirm the quality verification by checking the sharpness of the point cloud. If you are satisfied with the calibration quality, you can click **Confirm** to keep the result and download the calibration results by clicking **Download**. This fulfills the completion of the calibration process.
 
-For additional information, see: [How to Check Point Cloud Quality?](https://github.com/ApolloAuto/apollo/blob/master/docs/FAQs/Calibration_FAQs.md)
+For additional information, see: [How to Check Point Cloud Quality?](../FAQs/Calibration_FAQs.md)
 
 ### Obtaining Calibration Results
 

@@ -1,0 +1,6 @@
+name : "DKIT"
+brand : DKIT
+model : DKIT
+license {
+    vin : "devkit01"
+}

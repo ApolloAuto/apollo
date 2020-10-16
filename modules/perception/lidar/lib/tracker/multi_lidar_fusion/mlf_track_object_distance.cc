@@ -154,9 +154,9 @@ float MlfTrackObjectDistance::ComputeDistance(
                                 time_diff, background_object_match_threshold_);
   }
   // for foreground, calculate semantic map based distance
-  if (!is_background) {
-    distance += weights->at(7) * SemanticMapDistance(*track, object);
-  }
+//  if (!is_background) {
+//    distance += weights->at(7) * SemanticMapDistance(*track, object);
+//  }
 
   return distance;
 }

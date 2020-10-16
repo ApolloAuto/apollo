@@ -6,12 +6,12 @@ import "modules/common/proto/header.proto";
 
 message CloseToCrosswalk {
   optional string id = 1;
-  optional double distance = 2  [default = nan];
+  optional double distance = 2 [default = nan];
 }
 
 message CloseToClearArea {
   optional string id = 1;
-  optional double distance = 2  [default = nan];
+  optional double distance = 2 [default = nan];
 }
 
 message CloseToJunction {
@@ -26,17 +26,17 @@ message CloseToJunction {
 
 message CloseToSignal {
   optional string id = 1;
-  optional double distance = 2  [default = nan];
+  optional double distance = 2 [default = nan];
 }
 
 message CloseToStopSign {
   optional string id = 1;
-  optional double distance = 2  [default = nan];
+  optional double distance = 2 [default = nan];
 }
 
 message CloseToYieldSign {
   optional string id = 1;
-  optional double distance = 2  [default = nan];
+  optional double distance = 2 [default = nan];
 }
 
 // Usage guide for action modules:
@@ -53,4 +53,3 @@ message Stories {
   optional CloseToStopSign close_to_stop_sign = 6;
   optional CloseToYieldSign close_to_yield_sign = 7;
 }
-

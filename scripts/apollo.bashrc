@@ -109,18 +109,19 @@ function determine_gpu_use_target() {
 }
 
 function file_ext() {
-  local __ext="${1##*.}"
-  if [ "${__ext}" == "$1" ]; then
-    __ext=""
+  local filename="$(basename $1)"
+  local actual_ext="${filename##*.}"
+  if [[ "${actual_ext}" == "${filename}" ]]; then
+    actual_ext=""
   fi
-  echo "${__ext}"
+  echo "${actual_ext}"
 }
 
 function c_family_ext() {
-  local __ext
-  __ext="$(file_ext $1)"
+  local actual_ext
+  actual_ext="$(file_ext $1)"
   for ext in "h" "hh" "hxx" "hpp" "cxx" "cc" "cpp" "cu"; do
-    if [ "${ext}" == "${__ext}" ]; then
+    if [[ "${ext}" == "${actual_ext}" ]]; then
       return 0
     fi
   done
@@ -137,6 +138,76 @@ function find_c_cpp_srcs() {
     -o -name "*.hxx" \
     -o -name "*.cxx" \
     -o -name "*.cu"
+}
+
+function proto_ext() {
+  if [[ "$(file_ext $1)" == "proto" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function find_proto_srcs() {
+  find "$@" -type f -name "*.proto"
+}
+
+function py_ext() {
+  if [[ "$(file_ext $1)" == "py" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function find_py_srcs() {
+  find "$@" -type f -name "*.py"
+}
+
+function bash_ext() {
+  local actual_ext
+  actual_ext="$(file_ext $1)"
+  for ext in "sh" "bash" "bashrc"; do
+    if [[ "${ext}" == "${actual_ext}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+function bazel_extended() {
+  local actual_ext="$(file_ext $1)"
+  if [[ -z "${actual_ext}" ]]; then
+    if [[ "${arg}" == "BUILD" || "${arg}" == "WORKSPACE" ]]; then
+      return 0
+    else
+      return 1
+    fi
+  else
+    for ext in "BUILD" "bazel" "bzl"; do
+      if [[ "${ext}" == "${actual_ext}" ]]; then
+        return 0
+      fi
+    done
+    return 1
+  fi
+}
+
+function prettier_ext() {
+  local actual_ext
+  actual_ext="$(file_ext $1)"
+  for ext in "md" "json" "yml"; do
+    if [[ "${ext}" == "${actual_ext}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+function find_prettier_srcs() {
+  find "$@" -type f -name "*.md" \
+    -or -name "*.json" \
+    -or -name "*.yml"
 }
 
 ## Prevent multiple entries of my_bin_path in PATH

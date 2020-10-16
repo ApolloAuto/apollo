@@ -23,8 +23,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning.pb.h"
+
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -75,6 +76,15 @@ Status PathReuseDecider::Process(Frame* const frame,
   if (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
       !FLAGS_enable_reuse_path_in_lane_follow) {
     ADEBUG << "skipping reusing path: not in lane_change";
+    reference_line_info->set_path_reusable(false);
+    return Status::OK();
+  }
+
+  // for hybrid model: skip reuse path for valid path reference
+  const bool valid_model_output =
+      reference_line_info->path_data().is_valid_path_reference();
+  if (valid_model_output) {
+    ADEBUG << "skipping reusing path: path reference is valid";
     reference_line_info->set_path_reusable(false);
     return Status::OK();
   }

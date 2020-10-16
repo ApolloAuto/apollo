@@ -30,8 +30,6 @@ apt_get_update_and_install \
 # More:
 # lrzsz
 
-bash ${CURR_DIR}/install_bosfs.sh
-
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*

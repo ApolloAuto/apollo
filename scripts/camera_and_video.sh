@@ -25,7 +25,7 @@ source "${DIR}/apollo_base.sh"
 function start() {
   LOG="${APOLLO_ROOT_DIR}/data/log/camera_and_video.out"
   CMD="cyber_launch start /apollo/modules/drivers/camera/launch/camera_and_video.launch"
-  NUM_PROCESSES=$(expr "$(pgrep -c -f "modules/drivers/camera/dag/camera.dag")" + "$(pgrep -c -f "modules/drivers/video/dag/video.dag")")
+  NUM_PROCESSES=$(expr "$(pgrep -f "modules/drivers/camera/dag/camera.dag" | grep -cv '^1$')" + "$(pgrep -f "modules/drivers/video/dag/video.dag" | grep -cv '^1$')")
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
   fi
@@ -55,7 +55,7 @@ function run() {
       sleep 2
       start_compensator
       ;;
-    esac
+  esac
 }
 
 run "$1"

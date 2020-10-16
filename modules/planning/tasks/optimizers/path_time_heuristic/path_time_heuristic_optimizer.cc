@@ -62,14 +62,14 @@ Status PathTimeHeuristicOptimizer::Process(
   init_point_ = init_point;
 
   if (path_data.discretized_path().empty()) {
-    std::string msg("Empty path data");
+    const std::string msg = "Empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!SearchPathTimeGraph(speed_data)) {
-    const std::string msg(Name() +
-                          ":Failed to search graph with dynamic programming.");
+    const std::string msg = absl::StrCat(
+        Name(), ": Failed to search graph with dynamic programming.");
     AERROR << msg;
     RecordDebugInfo(*speed_data, reference_line_info_->mutable_st_graph_data()
                                      ->mutable_st_graph_debug());

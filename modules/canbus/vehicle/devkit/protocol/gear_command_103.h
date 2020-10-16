@@ -51,10 +51,10 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   Gearcommand103* set_gear_en_ctrl(
       Gear_command_103::Gear_en_ctrlType gear_en_ctrl);
 
-  // config detail: {'name': 'CheckSum_114', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_103', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  Gearcommand103* set_checksum_114(int checksum_114);
+  Gearcommand103* set_checksum_103(int checksum_103);
 
  private:
   // config detail: {'name': 'Gear_Target', 'enum': {0: 'GEAR_TARGET_INVALID',
@@ -72,15 +72,15 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_gear_en_ctrl(uint8_t* data,
                           Gear_command_103::Gear_en_ctrlType gear_en_ctrl);
 
-  // config detail: {'name': 'CheckSum_114', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'CheckSum_103', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
-  void set_p_checksum_114(uint8_t* data, int checksum_114);
+  void set_p_checksum_103(uint8_t* data, int checksum_103);
 
  private:
   Gear_command_103::Gear_targetType gear_target_;
   Gear_command_103::Gear_en_ctrlType gear_en_ctrl_;
-  int checksum_114_;
+  int checksum_103_;
 };
 
 }  // namespace devkit

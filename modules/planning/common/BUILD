@@ -2,13 +2,12 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "indexed_list",
     hdrs = ["indexed_list.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util:map_util",
         "@boost",
@@ -30,9 +29,7 @@ cc_test(
 cc_library(
     name = "indexed_queue",
     hdrs = ["indexed_queue.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util:map_util",
     ],
@@ -60,9 +57,7 @@ cc_library(
     name = "obstacle",
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":indexed_list",
         "//modules/common/configs:vehicle_config_helper",
@@ -98,9 +93,7 @@ cc_library(
     name = "obstacle_blocking_analyzer",
     srcs = ["obstacle_blocking_analyzer.cc"],
     hdrs = ["obstacle_blocking_analyzer.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":frame",
         "//modules/common/configs:vehicle_config_helper",
@@ -118,9 +111,7 @@ cc_library(
     name = "planning_context",
     srcs = ["planning_context.cc"],
     hdrs = ["planning_context.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common",
         "//modules/planning/common/path:path_data",
@@ -133,9 +124,7 @@ cc_library(
     name = "path_decision",
     srcs = ["path_decision.cc"],
     hdrs = ["path_decision.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":obstacle",
         "//modules/planning/reference_line",
@@ -146,9 +135,7 @@ cc_library(
     name = "planning_gflags",
     srcs = ["planning_gflags.cc"],
     hdrs = ["planning_gflags.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "@com_github_gflags_gflags//:gflags",
     ],
@@ -158,9 +145,7 @@ cc_library(
     name = "reference_line_info",
     srcs = ["reference_line_info.cc"],
     hdrs = ["reference_line_info.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":ego_info",
         ":path_boundary",
@@ -198,9 +183,7 @@ cc_library(
     name = "speed_profile_generator",
     srcs = ["speed_profile_generator.cc"],
     hdrs = ["speed_profile_generator.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":frame",
         ":reference_line_info",
@@ -228,9 +211,7 @@ cc_test(
 cc_library(
     name = "local_view",
     hdrs = ["local_view.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
@@ -247,9 +228,7 @@ cc_library(
     name = "frame",
     srcs = ["frame.cc"],
     hdrs = ["frame.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":feature_output",
         ":local_view",
@@ -292,9 +271,7 @@ cc_library(
     name = "history",
     srcs = ["history.cc"],
     hdrs = ["history.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":planning_gflags",
         "//cyber/common",
@@ -318,9 +295,7 @@ cc_library(
     name = "speed_limit",
     srcs = ["speed_limit.cc"],
     hdrs = ["speed_limit.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math",
     ],
@@ -340,9 +315,7 @@ cc_library(
     name = "ego_info",
     srcs = ["ego_info.cc"],
     hdrs = ["ego_info.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":obstacle",
         "//cyber/common:log",
@@ -373,9 +346,7 @@ cc_test(
 
 cc_library(
     name = "planning_common",
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":ego_info",
         ":frame",
@@ -438,7 +409,7 @@ cc_library(
     name = "st_graph_data",
     srcs = ["st_graph_data.cc"],
     hdrs = ["st_graph_data.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":planning_gflags",
         ":speed_limit",
@@ -464,9 +435,7 @@ cc_library(
     name = "feature_output",
     srcs = ["feature_output.cc"],
     hdrs = ["feature_output.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber",
         "//modules/common/util",
@@ -479,9 +448,7 @@ cc_library(
     name = "message_process",
     srcs = ["message_process.cc"],
     hdrs = ["message_process.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":dependency_injector",
         ":feature_output",
@@ -509,9 +476,7 @@ cc_library(
     name = "trajectory_evaluator",
     srcs = ["trajectory_evaluator.cc"],
     hdrs = ["trajectory_evaluator.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber",
         "//modules/planning/common:planning_gflags",
@@ -524,9 +489,7 @@ cc_library(
 cc_library(
     name = "dependency_injector",
     hdrs = ["dependency_injector.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":ego_info",
         ":frame",
@@ -540,9 +503,7 @@ cc_library(
     name = "learning_based_data",
     srcs = ["learning_based_data.cc"],
     hdrs = ["learning_based_data.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common",
         "//modules/planning/proto:learning_data_cc_proto",

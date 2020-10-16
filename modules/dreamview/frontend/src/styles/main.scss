@@ -1497,6 +1497,55 @@ body {
     }
 }
 
+.notification-alert-center {
+    z-index: 10;
+    position: absolute;
+    max-width: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #B96E76;
+    padding: 7px 10px;
+
+    background-color: rgba(74, 5, 24, 0.5);
+
+    .icon {
+        position: relative;
+        height: 20px;
+        width: 20px;
+        padding-right: 5px;
+
+        @include small-screen {
+            height: 15px;
+            width: 15px;
+        }
+    }
+
+    .text {
+        position: relative;
+        padding-left: 5px;
+        color: rgb(185, 92, 118);
+
+        line-height: 150%;
+        font-size: 22px;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+
+        @include small-screen {
+            font-size: 18px;
+        }
+    }
+
+    animation: blinker 1.5s linear infinite alternate;
+    animation-play-state: running;
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+}
+
 .custom-react-tab {
     .react-tabs:not(:last-child) {
         border-bottom: 2px solid #000000;

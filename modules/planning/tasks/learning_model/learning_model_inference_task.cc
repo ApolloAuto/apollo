@@ -77,9 +77,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   ADEBUG << "LearningModelInferenceTask: frame_num["
          << learning_data_frame.frame_num() << "] adc_trajectory_point_size["
          << learning_data_frame.adc_trajectory_point_size() << "]";
-  // for (const auto& ob : learning_data_frame.obstacle()) {
-  //   AERROR << ob.DebugString();
-  // }
 
   if (learning_data_frame.adc_trajectory_point_size() <= 0) {
     const std::string msg =
@@ -101,9 +98,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
           .timestamp_sec();
 
   ADEBUG << "start_point_timestamp_sec: " << start_point_timestamp_sec;
-  // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
-  //   AERROR << "BEFORE: " << t.timestamp_sec();
-  // }
 
   TrajectoryEvaluator trajectory_evaluator;
 
@@ -111,10 +105,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   trajectory_evaluator.EvaluateADCTrajectory(start_point_timestamp_sec,
                                              config.trajectory_delta_t(),
                                              &learning_data_frame);
-
-  // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
-  //   AERROR << "AFTER: " << t.timestamp_sec();
-  // }
 
   // evaluate obstacle trajectory
   trajectory_evaluator.EvaluateObstacleTrajectory(start_point_timestamp_sec,
@@ -154,11 +144,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  // for (const auto& t :
-  //    learning_data_frame.output().adc_future_trajectory_point()) {
-  //   AERROR << "FUTURE orig: " << t.trajectory_point().relative_time();
-  // }
-
   // evaluate adc future trajectory
   // TODO(all): move to conf
   constexpr double kADCFutureTrajectoryDeltaTime = 0.02;
@@ -176,10 +161,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
       learning_data_frame.adc_trajectory_point(last).trajectory_point());
   future_trajectory.insert(future_trajectory.begin(), tp);
 
-  // for (const auto& t : future_trajectory) {
-  //   AERROR << "FUTURE stitched: " << t.trajectory_point().relative_time();
-  // }
-
   std::vector<TrajectoryPointFeature> evaluated_future_trajectory;
   trajectory_evaluator.EvaluateADCFutureTrajectory(
       learning_data_frame.frame_num(), future_trajectory,
@@ -191,9 +172,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   ConvertADCFutureTrajectory(evaluated_future_trajectory,
                              &adc_future_trajectory);
   ADEBUG << "adc_future_trajectory_size: " << adc_future_trajectory.size();
-  // for (const auto& t : adc_future_trajectory) {
-  //   AERROR << "FUTURE After: " << t.relative_time();
-  // }
 
   injector_->learning_based_data()
       ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);

@@ -39,27 +39,6 @@ constexpr double kDuplicatedPointsEpsilon = 1e-7;
 // Margin for comparation
 constexpr double kEpsilon = 0.1;
 
-// Maximum x-coordinate of utm
-// const double kMaxXCoordinate = 834000;
-// Minimum x-coordinate of utm
-// const double kMinXCoordinate = 166000;
-// Maximum y-coordinate of utm
-// const double kMaxYCoordinate = 10000000;
-// Minimum y-coordinate of utm
-// const double kMinYCoordinate = 0;
-
-bool IsPointValid(const PointENU &point) {
-  /* if (point.x() > kMaxXCoordinate || point.x() < kMinXCoordinate) {
-    return false;
-  }
-
-  if (point.y() > kMaxYCoordinate || point.y() < kMinYCoordinate) {
-    return false;
-  } */
-
-  return true;
-}
-
 void RemoveDuplicates(std::vector<Vec2d> *points) {
   RETURN_IF_NULL(points);
 
@@ -80,8 +59,6 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
       for (const auto &point : curve.line_segment().point()) {
-        ACHECK(IsPointValid(point))
-            << "invalid map point: " << point.DebugString();
         points->emplace_back(point.x(), point.y());
       }
     } else {
@@ -95,7 +72,6 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
   std::vector<Vec2d> points;
   points.reserve(polygon.point_size());
   for (const auto &point : polygon.point()) {
-    ACHECK(IsPointValid(point)) << "invalid map point:" << point.DebugString();
     points.emplace_back(point.x(), point.y());
   }
   RemoveDuplicates(&points);
@@ -710,6 +686,9 @@ void PNCJunctionInfo::Init() {
   for (const auto &overlap_id : junction_.overlap_id()) {
     overlap_ids_.emplace_back(overlap_id);
   }
+}
+
+RSUInfo::RSUInfo(const RSU& rsu) : _rsu(rsu) {
 }
 
 }  // namespace hdmap

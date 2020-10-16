@@ -75,7 +75,7 @@ function start_record() {
   MODULE="republish_msg"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
+  NUM_PROCESSES="$(pgrep -f "modules/calibration/${MODULE}" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${APOLLO_BIN_PREFIX}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
@@ -89,7 +89,7 @@ function start_record() {
   fi
 
   # start to record lidar calibration data
-  NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
+  NUM_PROCESSES="$(pgrep -f "rosbag record" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record -b 2048 -O lidar_calib.bag \
       /apollo/sensor/gnss/ins_stat \
@@ -123,7 +123,7 @@ function start_check_extrin() {
   MODULE="lidar_ex_checker"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
+  NUM_PROCESSES="$(pgrep -f "modules/calibration/${MODULE}" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Start program, Ctrl+C to exit."
     eval "${APOLLO_BIN_PREFIX}/modules/calibration/${MODULE}/${MODULE} \

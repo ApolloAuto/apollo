@@ -2,18 +2,22 @@ syntax = "proto2";
 
 package apollo.v2x;
 
-import "modules/perception/proto/perception_obstacle.proto";
-import "modules/v2x/proto/v2x_traffic_light.proto";
+import "modules/v2x/proto/v2x_obu_traffic_light.proto";
+import "modules/v2x/proto/v2x_monitor.proto";
+import "modules/v2x/proto/v2x_obu_rsi.proto";
+import "modules/v2x/proto/v2x_obstacles.proto";
 
 service ObuToCar {
   // for onboard unit send perception obstacles (from rsu) results to car end
-  rpc SendPerceptionObstacles(apollo.perception.PerceptionObstacles)
-      returns (StatusResponse) {
-  }
-  // for onboard unit send v2x trafficlights (from rsu) results to car end
-  rpc SendV2xTrafficLight(apollo.v2x.IntersectionTrafficLightData)
-      returns (StatusResponse) {
-  }
+  rpc SendPerceptionObstacles(apollo.v2x.V2XObstacles)
+      returns (StatusResponse) {}
+  // for onboard unit send v2x traffic_lights (from rsu) results to car end
+  rpc SendV2xTrafficLight(apollo.v2x.obu.ObuTrafficLight)
+      returns (StatusResponse) {}
+  // rsi message
+  rpc SendV2xRSI(apollo.v2x.obu.ObuRsi) returns (StatusResponse) {}
+  // v2x obu monitor
+  rpc SendObuAlarm(apollo.v2x.ObuAlarm) returns (StatusResponse) {}
 }
 
 // The response message containing the status.

@@ -22,11 +22,12 @@
 #include <cstdlib>
 #include <thread>
 
+#include "modules/canbus/proto/chassis.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/time/clock.h"
 #include "modules/bridge/common/bridge_proto_serialized_buf.h"
-#include "modules/canbus/proto/chassis.pb.h"
 
 using apollo::cyber::Clock;
 

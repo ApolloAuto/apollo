@@ -13,7 +13,7 @@ import "modules/routing/proto/routing.proto";
 message PolygonPoint {
   optional double x = 1;
   optional double y = 2;
-  optional double z = 3 [ default = 0.0 ];
+  optional double z = 3 [default = 0.0];
 
   // Gaussian probability information
   optional apollo.common.GaussianInfo gaussian_info = 4;
@@ -28,15 +28,15 @@ message Prediction {
 // Next-id: 13
 message Decision {
   enum Type {
-    IGNORE = 0;   // Ignore the object
-    STOP = 1;     // Stop at a distance from the object
-    NUDGE = 2;    // Go around the object
-    YIELD = 3;    // Go after the object
-    OVERTAKE = 4; // Go before the object
-    FOLLOW = 5;   // Follow the object in the same lane
-    SIDEPASS = 6; // Pass the object in neighboring lane
+    IGNORE = 0;    // Ignore the object
+    STOP = 1;      // Stop at a distance from the object
+    NUDGE = 2;     // Go around the object
+    YIELD = 3;     // Go after the object
+    OVERTAKE = 4;  // Go before the object
+    FOLLOW = 5;    // Follow the object in the same lane
+    SIDEPASS = 6;  // Pass the object in neighboring lane
   }
-  optional Type type = 1 [ default = IGNORE ];
+  optional Type type = 1 [default = IGNORE];
 
   // Shape Info
   // Can be used for corners of nudge region
@@ -49,9 +49,9 @@ message Decision {
   optional double longitude = 5;
   optional double position_x = 6;
   optional double position_y = 7;
-  optional double length = 8 [ default = 2.8 ];
-  optional double width = 9 [ default = 1.4 ];
-  optional double height = 10 [ default = 1.8 ];
+  optional double length = 8 [default = 2.8];
+  optional double width = 9 [default = 1.4];
+  optional double height = 10 [default = 1.8];
 
   enum StopReasonCode {
     STOP_REASON_HEAD_VEHICLE = 1;
@@ -74,10 +74,10 @@ message Decision {
 // Next-id: 38
 message Object {
   // ID
-  optional string id = 1; // primary identifier for each object
+  optional string id = 1;  // primary identifier for each object
 
   // Shape Info
-  repeated PolygonPoint polygon_point = 2; // corners of an object
+  repeated PolygonPoint polygon_point = 2;  // corners of an object
 
   // Position Info
   optional double heading = 3;
@@ -85,14 +85,14 @@ message Object {
   optional double longitude = 5;
   optional double position_x = 6;
   optional double position_y = 7;
-  optional double length = 8 [ default = 2.8 ];
-  optional double width = 9 [ default = 1.4 ];
-  optional double height = 10 [ default = 1.8 ];
+  optional double length = 8 [default = 2.8];
+  optional double width = 9 [default = 1.4];
+  optional double height = 10 [default = 1.8];
 
   // Motion Info
   // For objects with motion info such as ADC.
-  optional double speed = 11;              // in m/s, can be negative
-  optional double speed_acceleration = 12; // in m/s^2
+  optional double speed = 11;               // in m/s, can be negative
+  optional double speed_acceleration = 12;  // in m/s^2
   optional double speed_jerk = 13;
   optional double spin = 14;
   optional double spin_acceleration = 15;
@@ -112,7 +112,7 @@ message Object {
 
   // Decision Info
   repeated Decision decision = 22;
-  optional bool yielded_obstacle = 32 [ default = false ];
+  optional bool yielded_obstacle = 32 [default = false];
 
   // Chassis Info
   // For ADC
@@ -137,25 +137,25 @@ message Object {
     UNKNOWN = 0;
     UNKNOWN_MOVABLE = 1;
     UNKNOWN_UNMOVABLE = 2;
-    PEDESTRIAN = 3; // pedestrian, usually determined by moving behavior.
-    BICYCLE = 4;    // bike, motor bike.
-    VEHICLE = 5;    // passenger car or truck.
-    VIRTUAL = 6;    // virtual object created by decision module.
-    CIPV = 7;       // closest in-path vehicle determined by perception module.
+    PEDESTRIAN = 3;  // pedestrian, usually determined by moving behavior.
+    BICYCLE = 4;     // bike, motor bike.
+    VEHICLE = 5;     // passenger car or truck.
+    VIRTUAL = 6;     // virtual object created by decision module.
+    CIPV = 7;        // closest in-path vehicle determined by perception module.
   };
 
-  optional Type type = 29; // obstacle type
+  optional Type type = 29;  // obstacle type
   // obstacle sub-type
   optional apollo.perception.PerceptionObstacle.SubType sub_type = 34;
   repeated Prediction prediction = 30;
 
   // perception confidence level. Range: [0,1]
-  optional double confidence = 31 [ default = 1 ];
+  optional double confidence = 31 [default = 1];
   optional apollo.prediction.ObstaclePriority obstacle_priority = 33;
 
   // v2x for perception obstacle
   optional apollo.perception.PerceptionObstacle.Source source = 36
-      [ default = HOST_VEHICLE ]; // source type
+      [default = HOST_VEHICLE];  // source type
   // v2x use case info
   optional apollo.perception.V2XInformation v2x_info = 37;
 }
@@ -170,8 +170,8 @@ message DelaysInMs {
   optional double control = 9;
 }
 
-message RoutePath { 
-  repeated PolygonPoint point = 1; 
+message RoutePath {
+  repeated PolygonPoint point = 1;
 }
 
 message Latency {
@@ -207,11 +207,11 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-message SensorMeasurements { 
-  repeated Object sensor_measurement = 1; 
+message SensorMeasurements {
+  repeated Object sensor_measurement = 1;
 }
 
-// Next-id: 30
+// Next-id: 31
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -237,7 +237,7 @@ message SimulationWorld {
   repeated Object planning_trajectory = 8;
 
   // Main decision
-  optional Object main_stop = 9 [ deprecated = true ];
+  optional Object main_stop = 9 [deprecated = true];
   optional Object main_decision = 10;
 
   // Speed limit
@@ -248,7 +248,7 @@ message SimulationWorld {
 
   // Notification
   optional apollo.common.monitor.MonitorMessage monitor = 13
-      [ deprecated = true ];
+      [deprecated = true];
   repeated Notification notification = 14;
 
   // Engage advice from planning
@@ -277,7 +277,7 @@ message SimulationWorld {
   repeated apollo.common.Path navigation_path = 24;
 
   // RSS info
-  optional bool is_rss_safe = 25 [ default = true ];
+  optional bool is_rss_safe = 25 [default = true];
 
   // Shadow localization
   optional Object shadow_localization = 26;
@@ -290,4 +290,6 @@ message SimulationWorld {
 
   // A map from a sensor_id to a group of sensor_measurements
   map<string, SensorMeasurements> sensor_measurements = 29;
+
+  optional bool is_siren_on = 30 [default = false];
 }

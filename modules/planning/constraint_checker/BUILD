@@ -2,14 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "constraint_checker",
     srcs = ["constraint_checker.cc"],
     hdrs = ["constraint_checker.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_cc_proto",
@@ -23,9 +22,7 @@ cc_library(
     name = "constraint_checker1d",
     srcs = ["constraint_checker1d.cc"],
     hdrs = ["constraint_checker1d.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/planning/common:frame",
@@ -39,9 +36,7 @@ cc_library(
     name = "collision_checker",
     srcs = ["collision_checker.cc"],
     hdrs = ["collision_checker.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",

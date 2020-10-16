@@ -203,7 +203,6 @@ Status MPCController::Init(std::shared_ptr<DependencyInjector> injector,
   matrix_bd_ = matrix_b_ * ts_;
 
   matrix_c_ = Matrix::Zero(basic_state_size_, 1);
-  matrix_c_(5, 0) = 1.0;
   matrix_cd_ = Matrix::Zero(basic_state_size_, 1);
 
   matrix_state_ = Matrix::Zero(basic_state_size_, 1);
@@ -581,7 +580,7 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
 
   matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
   matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
-  matrix_cd_ = matrix_c_ * debug->heading_error_rate() * ts_;
+  matrix_cd_ = matrix_c_ * debug->ref_heading_rate() * ts_;
 }
 
 void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {

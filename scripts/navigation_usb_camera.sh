@@ -25,7 +25,7 @@ source "${DIR}/apollo_base.sh"
 function start() {
   LOG="${APOLLO_ROOT_DIR}/data/log/usb_cam.out"
   CMD="roslaunch usb_cam start_obstacle_camera.launch"
-  NUM_PROCESSES="$(pgrep -c -f "camera_nodelet_manager")"
+  NUM_PROCESSES="$(pgrep -f "camera_nodelet_manager" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
   fi

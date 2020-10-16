@@ -43,7 +43,7 @@ The longitudinal controller is configured as a cascaded PID + Calibration table.
 ## Controller Tuning
 
 ### Useful tools
-Tool like [diagnostics](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/diagnostics) and [realtime_plot](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/realtime_plot) are useful for controller tuning and can be found under `apollo/modules/tools/`.
+Tool like [diagnostics](../../modules/tools/diagnostics) and [realtime_plot](../../modules/tools/realtime_plot) are useful for controller tuning and can be found under `apollo/modules/tools/`.
 ### Lateral Controller Tuning
 The lateral controller is designed for minimal tuning effort.  The basic lateral controller tuning steps for *all* vehicles are:
 
@@ -96,7 +96,7 @@ lat_controller_conf {
 ### Longitudinal Controller Tuning
 The longitudinal controller is composed of Cascaded PID controllers that include one station controller and a high/low speed controller with different gains for different speeds.  Apollo manages tuning in open loop and closed loop by:
 
-- OpenLoop: Calibration table generation. Please refer to [how_to_update_vehicle_calibration.md](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_update_vehicle_calibration.md) for detailed steps.
+- OpenLoop: Calibration table generation. Please refer to [how_to_update_vehicle_calibration.md](how_to_update_vehicle_calibration.md) for detailed steps.
 - Closeloop: Based on the order of High Speed Controller -> Low Speed Controller -> Station Controller.
 
 #### High/Low Speed Controller Tuning

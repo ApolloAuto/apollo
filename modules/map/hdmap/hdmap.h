@@ -78,6 +78,7 @@ class HDMap {
   RoadInfoConstPtr GetRoadById(const Id& id) const;
   ParkingSpaceInfoConstPtr GetParkingSpaceById(const Id& id) const;
   PNCJunctionInfoConstPtr GetPNCJunctionById(const Id& id) const;
+  RSUInfoConstPtr GetRSUById(const Id& id) const;
 
   /**
    * @brief get all lanes in certain range
@@ -296,6 +297,20 @@ class HDMap {
    */
   int GetLocalMap(const apollo::common::PointENU& point,
                   const std::pair<double, double>& range, Map* local_map) const;
+
+  /**
+   * @brief get forward nearest rsus within certain range
+   * @param point the target position
+   * @param distance the forward search distance
+   * @param central_heading the base heading
+   * @param max_heading_difference the heading range
+   * @param rsus all rsus that match search conditions
+   * @return 0:success, otherwise failed
+   */
+  int GetForwardNearestRSUs(const apollo::common::PointENU& point,
+                    double distance, double central_heading,
+                    double max_heading_difference,
+                    std::vector<RSUInfoConstPtr>* rsus) const;
 
  private:
   HDMapImpl impl_;

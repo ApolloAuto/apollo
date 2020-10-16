@@ -1,14 +1,19 @@
-# How to Build and Run(Test) your Python Application
+# How to Build, Test and Run your Python Application
 
-Everything managed by pure [Bazel](https://docs.bazel.build/versions/master/be/python.html) in Apollo 6.0.
+Starting from Apollo 6.0, building and testing Python applications in Apollo is
+done using [Bazel](https://docs.bazel.build/versions/master/be/python.html)
+exclusively. We use Bazel Python rules to build, run, and test Python programs.
+This not only frees us from hand-crafting Protobuf dependencies and managing
+Python related Env variables manually, but also helps with managing third party
+Python module dependency.
 
 ## Create the BUILD file
 
 Generally you need a BUILD target for each python file, which could be one of
 
-* `py_library(name="lib_target", ...)`
-* `py_binary(name="bin_target", ...)`
-* `py_test(name="test_target", ...)`
+- `py_library(name="lib_target", ...)`
+- `py_binary(name="bin_target", ...)`
+- `py_test(name="test_target", ...)`
 
 ### Example
 
@@ -48,7 +53,12 @@ py_test(
 )
 ```
 
-## Build & Run commands
+Above is a BUILD file template, you can also use the
+[BUILD](../../cyber/python/BUILD) and
+[BUILD](../../cyber/python/cyber_py3/examples/BUILD)
+file as examples.
+
+## Build, Test and Run commands
 
 1. To build any target:
 
@@ -65,5 +75,5 @@ py_test(
 1. To run a unit test target:
 
    ```bash
-   bazel test //path/to:test_target
+   bazel test //path/to:target_test
    ```

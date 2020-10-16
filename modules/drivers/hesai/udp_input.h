@@ -17,13 +17,7 @@
 #ifndef LIDAR_HESAI_SRC_INPUT_H_
 #define LIDAR_HESAI_SRC_INPUT_H_
 
-#include <netinet/in.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string>
-
-#include "cyber/cyber.h"
-#include "modules/drivers/hesai/const_var.h"
+#include <cstdint>
 #include "modules/drivers/hesai/type_defs.h"
 
 namespace apollo {

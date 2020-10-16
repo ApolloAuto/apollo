@@ -129,9 +129,6 @@ __global__ void make_pillar_feature_kernel(
 
   float coor_x = static_cast<float>(x_ind);
   float coor_y = static_cast<float>(y_ind);
-  // TODO(chenjiahao): replace '4' with hyper-parameter vars
-  // TODO(chenjiahao): batch idx and z need to be specified after
-  //  voxels are utilized
   dev_pillar_coors[ith_pillar * 4 + 0] = 0;  // batch idx
   dev_pillar_coors[ith_pillar * 4 + 1] = 0;  // z
   dev_pillar_coors[ith_pillar * 4 + 2] = coor_y;

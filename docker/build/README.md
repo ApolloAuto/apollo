@@ -3,7 +3,7 @@
 ## Introduction
 As you may already know, Apollo was run inside Docker container, and there are two flavors of Apollo docker images,  `CyberRT` (`Cyber` for short) and `Dev` . `Cyber` images were for developers who want to play with the `CyberRT` framework only, while `Dev` images were used to build the whole Apollo project.
 
-Currently, Apollo comes with support for two CPU architectures, namely, `x86_64` and `aarch64`.  (Please note that till the time this document was updated, the `dev.aarch64` image  was not complete. Hope we can make it ready in the next few months.)
+Currently, Apollo comes with support for two CPU architectures, namely, `x86_64` and `aarch64`.  (Please note that till the time this document was updated, the `dev-aarch64` image  was not complete. Hope we can make it ready in the next few months.)
 
 In the next section, I will describe briefly the steps to build these Docker images.
 
@@ -86,27 +86,6 @@ nohup python3 -m http.server 8388 &
 > missing or broken, it can still be downloaded from the original URL.
 
 3. Rerun `build_cyber.sh` or `build_dev.sh`.
-
-## Understand the Dependencies
-
-To help users understand the dependencies, we are trying to compile a high
-level [dependency graph](dependencies.dot). You can build your own Dockerfile or
-ISO package according to it.
-
-To view the graph, please run:
-
-```bash
-sudo apt -y install xdot
-xdot dependencies.dot
-```
-
-## Add New Dependency
-
-When you need to add something to the Docker image or Bazel `WORKSPACE` file, it's
-defined as a new dependency. Before doing that, please add it as well as all its
-dependencies to the `dependencies.dot` first, so we understand all the
-dependencies and dependents, which helps us manage its lifecycle like upgrading
-and retiring in the future.
 
 ## Add New Installer
 

@@ -25,6 +25,7 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
@@ -53,6 +54,9 @@ static void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
       ai = msg_num - 1 - i;
     }
     auto msg = std::make_shared<RawMessage>(std::to_string(ai));
+    // Since writer is meant for real time operations at a set rate,
+    // we need to wait in the test. Otherwise, we should write synchronously
+    writer.WaitForWrite();
     writer.WriteMessage(kChannelName1, msg, begin_time + time_step * ai);
   }
   ASSERT_EQ(msg_num, writer.GetMessageNumber(kChannelName1));
@@ -84,28 +88,28 @@ TEST(RecordTest, iterator_test) {
 
   uint64_t i = 0;
   for (auto& msg : viewer) {
-    EXPECT_EQ(kChannelName1, msg.channel_name);
-    EXPECT_EQ(begin_time + step_time * i, msg.time);
-    EXPECT_EQ(std::to_string(i), msg.content);
-    i++;
+    ASSERT_EQ(kChannelName1, msg.channel_name);
+    ASSERT_EQ(begin_time + step_time * i, msg.time);
+    ASSERT_EQ(std::to_string(i), msg.content);
+    ++i;
   }
   EXPECT_EQ(msg_num, i);
 
   i = 0;
   std::for_each(viewer.begin(), viewer.end(), [&i](RecordMessage& msg) {
-    EXPECT_EQ(kChannelName1, msg.channel_name);
+    ASSERT_EQ(kChannelName1, msg.channel_name);
     // EXPECT_EQ(begin_time + step_time * i, msg.time);
-    EXPECT_EQ(std::to_string(i), msg.content);
-    i++;
+    ASSERT_EQ(std::to_string(i), msg.content);
+    ++i;
   });
   EXPECT_EQ(msg_num, i);
 
   i = 0;
   for (auto it = viewer.begin(); it != viewer.end(); ++it) {
-    EXPECT_EQ(kChannelName1, it->channel_name);
-    EXPECT_EQ(begin_time + step_time * i, it->time);
-    EXPECT_EQ(std::to_string(i), it->content);
-    i++;
+    ASSERT_EQ(kChannelName1, it->channel_name);
+    ASSERT_EQ(begin_time + step_time * i, it->time);
+    ASSERT_EQ(std::to_string(i), it->content);
+    ++i;
   }
   EXPECT_EQ(msg_num, i);
   ASSERT_FALSE(remove(kTestFile));
@@ -129,19 +133,19 @@ TEST(RecordTest, iterator_test_reverse) {
 
   uint64_t i = 0;
   for (auto& msg : viewer) {
-    EXPECT_EQ(kChannelName1, msg.channel_name);
-    EXPECT_EQ(begin_time + step_time * i, msg.time);
-    EXPECT_EQ(std::to_string(i), msg.content);
-    i++;
+    ASSERT_EQ(kChannelName1, msg.channel_name);
+    ASSERT_EQ(begin_time + step_time * i, msg.time);
+    ASSERT_EQ(std::to_string(i), msg.content);
+    ++i;
   }
   EXPECT_EQ(msg_num, i);
 
   i = 0;
   for (auto it = viewer.begin(); it != viewer.end(); ++it) {
-    EXPECT_EQ(kChannelName1, it->channel_name);
-    EXPECT_EQ(begin_time + step_time * i, it->time);
-    EXPECT_EQ(std::to_string(i), it->content);
-    i++;
+    ASSERT_EQ(kChannelName1, it->channel_name);
+    ASSERT_EQ(begin_time + step_time * i, it->time);
+    ASSERT_EQ(std::to_string(i), it->content);
+    ++i;
   }
   EXPECT_EQ(msg_num, i);
   ASSERT_FALSE(remove(kTestFile));
@@ -215,10 +219,10 @@ TEST(RecordTest, mult_iterator_test) {
 
   uint64_t i = 0;
   for (auto& msg : viewer) {  // #2 iterator
-    EXPECT_EQ(kChannelName1, msg.channel_name);
-    EXPECT_EQ(begin_time + step_time * i, msg.time);
-    EXPECT_EQ(std::to_string(i), msg.content);
-    i++;
+    ASSERT_EQ(kChannelName1, msg.channel_name);
+    ASSERT_EQ(begin_time + step_time * i, msg.time);
+    ASSERT_EQ(std::to_string(i), msg.content);
+    ++i;
   }
   EXPECT_EQ(msg_num, i);
   ASSERT_FALSE(remove(kTestFile));

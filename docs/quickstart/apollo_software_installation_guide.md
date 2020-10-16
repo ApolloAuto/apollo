@@ -1,118 +1,118 @@
-# Software Overview of Apollo
+# Apollo Software Installation Guide
 
-Apollo has been initiated to provide an open, comprehensive, and reliable software platform for its partners in the automotive and autonomous-driving industries. Partners can use the Apollo software platform and the reference hardware that Apollo has certified as a template to customize in the development of their own autonomous vehicles.
+This document describes the steps required to install Apollo on Ubuntu 18.04.5
+LTS (Bionic Beaver), the recommended Ubuntu release for Apollo 6.0.
 
-# Apollo Software Installation
+## Pre-requisites
 
-This section includes:
+Before getting started, please make sure all the pre-requisite steps were
+finished as described in the
+[Pre-requisite Software Installation Guide](../specs/prerequisite_software_installation_guide.md).
 
-- [Download the Apollo Release Package](#download-apollo-source)
-- [Set up the Docker environment](#Set-up-the-Docker-environment)
-- [Support a new Vehicle in DreamView](#Support-a-new-Vehicle-in-DreamView)
-- [Install Apollo Kernel](#Install-apollo-kernel)
-- [Run Apollo in Ubuntu 16](#Run-Apollo-in-Ubuntu-16)
+Please also make sure Docker is running. Type `systemctl status docker` to check
+the running status of Docker daemon, and type `systemctl start docker` to start
+Docker if needed.
 
-Before getting started, please make sure you have installed Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo core Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
+## Download Apollo Sources
 
-## Download Apollo Source
+Run the following commands to clone
+[Apollo's GitHub Repo](https://github.com/ApolloAuto/apollo.git).
 
-1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/) and check out the correct branch:
+```bash
+# Using SSH
+git clone git@github.com:ApolloAuto/apollo.git
 
-    ```
-    git clone git@github.com:ApolloAuto/apollo.git
-    cd apollo
-    git checkout [release_branch_name]
-    ```
+# Using HTTPS
+git clone https://github.com/ApolloAuto/apollo.git
 
-2. Set up environment variable `APOLLO_HOME` by the following command:
+```
 
-    ```
-    echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
-    ```
+And checkout the latest branch:
 
-3. Open a new terminal or run `source ~/.bashrc` in an existing terminal.
+```bash
+cd apollo
+git checkout master
+```
 
+For CN users, please refer to
+[How to Clone Apollo Repository from China](../howto/how_to_clone_apollo_repo_from_china.md)
+if your have difficulty cloning from GitHub.
 
-![tip](images/tip_icon.png) In the following sections, it is assumed that the Apollo directory is located in  `$APOLLO_HOME`.
+(Optional) For convenience, you can set up environment variable
+`APOLLO_ROOT_DIR` to refer to Apollo root directory by running:
 
-## Set Up the Docker Environment
+```bash
+echo "export APOLLO_ROOT_DIR=$(pwd)" >> ~/.bashrc  && source ~/.bashrc
+```
 
-The Docker container is the simplest way to set up the build environment for Apollo.
+![tip](images/tip_icon.png) In the following sections, we will refer to Apollo
+root directory as `$APOLLO_ROOT_DIR`
 
-For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
+## Start Apollo Development Docker Container
 
-1. Please follow the [official guide to install the docker-ce 19.03+](https://docs.docker.com/install/linux/docker-ce/ubuntu).
+From the `${APOLLO_ROOT_DIR}` directory, type
 
-Don't forget the [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+```bash
+bash docker/scripts/dev_start.sh
+```
 
-2. After the installation, log out and then log back into the system to enable Docker.
+to start Apollo development Docker container.
 
-3. (Optional) If you already have Docker installed (before you installed the Apollo Kernel), add the following line in `/etc/default/docker`:
+If successful, you will see the following messages at the bottom of your screen:
 
-    ```
-    DOCKER_OPTS = "-s overlay"
-    ```
+```bash
+[ OK ] Congratulations! You have successfully finished setting up Apollo Dev Environment.
+[ OK ] To login into the newly created apollo_dev_michael container, please run the following command:
+[ OK ]   bash docker/scripts/dev_into.sh
+[ OK ] Enjoy!
+```
 
-4. Install latest nvidia-container-toolkit by following the [official doc](https://github.com/NVIDIA/nvidia-docker).
+## Enter Apollo Development Docker Container
 
-We encourage you to continue the Build process using [Build the Dev docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#build_release) if you have not already set it up.
+Run the following command to login into the newly started container:
 
-## Support a new Vehicle in DreamView
+```bash
+bash docker/scripts/dev_into.sh
+```
+
+## Build Apollo inside Container
+
+From the `/apollo` directory inside Apollo Docker container, type:
+
+```bash
+./apollo.sh build
+```
+
+to build the whole Apollo project.
+
+Or type
+
+```bash
+./apollo.sh build_opt
+```
+
+for an optimized build.
+
+You can refer to
+[Apollo Build and Test Explained](../specs/apollo_build_and_test_explained.md)
+for a thorough understanding of Apollo builds and tests.
+
+## Launch and Run Apollo
+
+Please refer to the
+[Run Apollo](../howto/how_to_launch_and_run_apollo.md#run-apollo) section of
+[How to Launch And Run Apollo](../howto/how_to_launch_and_run_apollo.md).
+
+## (Optional) Support a new Vehicle in DreamView
 
 In order to support a new vehicle in DreamView, please follow the steps below:
 
 1. Create a new folder for your vehicle under `modules/calibration/data`
 
-2. There is already a sample file in the `modules/calibration/data` folder named `mkz_example`. Refer to this structure and include all necessary configuration files in the same file structure as “mkz_example”. Remember to update the configuration files with your own parameters if needed. 
+2. There is already a sample file in the `modules/calibration/data` folder named
+   `mkz_example`. Refer to this structure and include all necessary
+   configuration files in the same file structure as “mkz_example”. Remember to
+   update the configuration files with your own parameters if needed.
 
-3. Restart DreamView and you will be able to see your new vehicle (name is the same as your newly created folder) in the selected vehicle.
-
-## Install Apollo Kernel
-
-The Apollo runtime in the vehicle requires the [Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel). It is strongly recommended to install the pre-built kernel.
-
-### Use the pre-built Apollo Kernel
-
-You get access to and install the pre-built kernel using the following commands.
-
-1. Download the release packages from the release section on GitHub:
-
-```
-https://github.com/ApolloAuto/apollo-kernel/releases
-```
-
-2. Install the kernel after having downloaded the release package:
-
-```
-tar zxvf linux-4.4.32-apollo-1.5.0.tar.gz
-cd install
-sudo bash install_kernel.sh
-```
-
-3. Reboot your system using the `reboot` command.
-4. [Optional - if you are using CAN card for interface] Build the CAN driver source code, according to the vendor's instructions
-
-### Build your own kernel
-
-If you have modified the kernel, or the pre-built kernel is not the best for your platform, you can build your own kernel using the following steps:
-
-1. Clone the code from the repository
-
-```
-git clone https://github.com/ApolloAuto/apollo-kernel.git
-cd apollo-kernel
-```
-
-2. Add the CAN driver source code according to vendor's instruction
-3. Build the kernel using the following command:
-
-```
-bash build.sh
-```
-
-4. Install the kernel using the steps for a pre-built Apollo Kernel as described in the previous section.
-
-## Run Apollo in Ubuntu 16
-
-Please refer to
-[How to run Apollo with Ubuntu 16](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_apollo_2.5_with_ubuntu16.md)
+3. Restart DreamView and you will be able to see your new vehicle (name is the
+   same as your newly created folder) in the selected vehicle.

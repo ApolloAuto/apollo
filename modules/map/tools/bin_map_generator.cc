@@ -15,11 +15,11 @@ limitations under the License.
 
 #include "gflags/gflags.h"
 
+#include "modules/map/proto/map.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map.pb.h"
 
 /**
  * A map tool to transform .txt map to .bin map
@@ -27,7 +27,7 @@ limitations under the License.
 
 DEFINE_string(output_dir, "/tmp", "output map directory");
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_alsologtostderr = true;
 
@@ -35,18 +35,24 @@ int main(int argc, char **argv) {
 
   const auto map_filename = FLAGS_map_dir + "/base_map.txt";
   apollo::hdmap::Map pb_map;
-  ACHECK(apollo::cyber::common::GetProtoFromFile(map_filename, &pb_map))
-      << "fail to load data from : " << map_filename;
+  if (!apollo::cyber::common::GetProtoFromFile(map_filename, &pb_map)) {
+    AERROR << "Failed to load txt map from " << map_filename;
+    return -1;
+  } else {
+    AINFO << "Loaded txt map from " << map_filename;
+  }
 
   const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
-  ACHECK(apollo::cyber::common::SetProtoToBinaryFile(pb_map, output_bin_file))
-      << "failed to output binary format base map";
+  if (!apollo::cyber::common::SetProtoToBinaryFile(pb_map, output_bin_file)) {
+    AERROR << "Failed to generate binary base map";
+    return -1;
+  }
 
   pb_map.Clear();
   ACHECK(apollo::cyber::common::GetProtoFromFile(output_bin_file, &pb_map))
-      << "failed to load map,transform map failed";
+      << "Failed to load generated binary base map";
 
-  AINFO << "transform map into .bin map success";
+  AINFO << "Successfully converted .txt map to .bin map: " << output_bin_file;
 
   return 0;
 }
