@@ -28,7 +28,7 @@ cd apollo
 git checkout master
 ```
 
-对于中国用户, 如果你难以从GitHub克隆，请参考[如何在中国克隆Apollo仓库](../howto/how_to_clone_apollo_repo_from_cn.md)。
+对于中国用户, 如果从GitHub克隆仓库有困难，可参考[国内环境下如何克隆Apollo仓库](../howto/how_to_clone_apollo_repo_from_china_cn.md)。
 
 （可选）为方便起见，可以在Apollo的根目录运行以下命令来设置指向该目录的环境变量`APOLLO_ROOT_DIR`：
 
