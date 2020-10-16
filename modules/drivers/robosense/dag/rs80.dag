@@ -3,8 +3,8 @@ module_config {
     components {
         class_name : "RobosenseComponent"
         config {
-          name : "RSBP_Driver"
-          config_file_path : "/apollo/modules/drivers/robosense/conf/rsbp.pb.txt"
+          name : "RS80_Driver"
+          config_file_path : "/apollo/modules/drivers/robosense/conf/rs80.pb.txt"
         }
     }
 }
@@ -14,9 +14,9 @@ module_config {
     components {
       class_name : "CompensatorComponent"
       config {
-        name : "RSBP_Compensator"
-        config_file_path : "/apollo/modules/drivers/robosense/conf/rsbp_compensator.pb.txt"
-        readers {channel: "/apollo/sensor/rsbp/PointCloud2"}
+        name : "RS80_Compensator"
+        config_file_path : "/apollo/modules/drivers/robosense/conf/rs80_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/rs80/PointCloud2"}
       }
     }
 }

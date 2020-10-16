@@ -28,13 +28,14 @@ cc_library(
     name = "driver",
     srcs = [
         "driver/driver.cpp",
-        "driver/utility.cpp",
         "input/input.cpp",
     ],
     hdrs = [
         "driver/driver.h",
         "driver/utility.h",
         "input/input.h",
+        "driver/driver_param.h"
+
     ],
     copts = ROBOSENSE_COPTS,
     deps = [
@@ -55,6 +56,7 @@ cc_library(
     copts = ROBOSENSE_COPTS,
     deps = [
         ":decoder_128",
+        ":decoder_80",
         ":decoder_16",
         ":decoder_32",
         ":decoder_bp",
@@ -84,6 +86,15 @@ cc_library(
     ],
     copts = ROBOSENSE_COPTS,
 )
+
+cc_library(
+    name = "decoder_80",
+    hdrs = [
+        "decoder/decoder_80.hpp",
+    ],
+    copts = ROBOSENSE_COPTS,
+)
+
 
 cc_library(
     name = "decoder_bp",

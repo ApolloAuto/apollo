@@ -24,6 +24,7 @@
 #include "modules/drivers/robosense/proto/robosense.pb.h"
 
 #include "cyber/cyber.h"
+#include "cyber/base/thread_pool.h"
 #include "modules/drivers/robosense/decoder/decoder_16.hpp"
 #include "modules/drivers/robosense/decoder/decoder_factory.hpp"
 #include "modules/drivers/robosense/driver/utility.h"
@@ -79,6 +80,7 @@ class RobosenseDriver {
   uint32_t points_seq_;
   std::shared_ptr<PointCloud> point_cloud_ptr_;
   std::shared_ptr<RobosenseScan> scan_ptr_;
+  std::shared_ptr<cyber::base::ThreadPool> thread_pool_ptr_;
 };
 }  // namespace robosense
 }  // namespace drivers

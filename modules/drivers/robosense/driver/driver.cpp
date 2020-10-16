@@ -20,6 +20,7 @@ namespace drivers {
 namespace robosense {
 using apollo::cyber::Node;
 using apollo::cyber::Writer;
+using apollo::cyber::base::ThreadPool;
 using apollo::drivers::PointCloud;
 using apollo::drivers::PointXYZIT;
 using apollo::drivers::robosense::RobosenseScan;
@@ -36,28 +37,35 @@ bool RobosenseDriver::init() {
            << " create error, check cyber is inited.";
     return false;
   }
-  RS_Param param;
-  param.min_distance = conf_.min_distance();
-  param.max_distance = conf_.max_distance();
-  param.start_angle = conf_.start_angle();
-  param.end_angle = conf_.end_angle();
-  param.cut_angle = conf_.cut_angle();
-  param.use_lidar_clock = conf_.use_lidar_clock();
-  param.echo = RS_ECHO_MODE(conf_.echo_mode());
+  uint32_t split_frame_mode;
+  split_frame_mode = conf_.split_frame_mode();
+  RSDriverParam param;
+  param.decoder_param.min_distance = conf_.min_distance();
+  param.decoder_param.max_distance = conf_.max_distance();
+  param.decoder_param.start_angle = conf_.start_angle();
+  param.decoder_param.end_angle = conf_.end_angle();
+  param.decoder_param.use_lidar_clock = conf_.use_lidar_clock();
+  param.decoder_param.num_pkts_split = conf_.num_pkts_split();
+  param.decoder_param.cut_angle = conf_.cut_angle();
+  param.angle_path = conf_.angle_path();
+  LidarType lidar_type = param.strToLidarType(conf_.model());
+  param.lidar_type = lidar_type;
+  param.decoder_param.split_frame_mode = SplitFrameMode(split_frame_mode);
+
   if (conf_.model() != "RS16" && conf_.model() != "RS32" &&
-      conf_.model() != "RS128" && conf_.model() != "RSBP") {
+      conf_.model() != "RS128" && conf_.model() != "RSBP" &&
+      conf_.model() != "RS80") {
     AERROR << "Wrong input LiDAR Type!";
     return false;
   }
+
   lidar_decoder_ptr_ =
-      DecoderFactory<PointXYZIT>::createDecoder(conf_.model(), param);
+      DecoderFactory<PointXYZIT>::createDecoder(lidar_type, param);
   lidar_input_ptr_ =
       std::make_shared<Input>(conf_.msop_port(), conf_.difop_port());
-  lidar_decoder_ptr_->loadCalibrationFile(conf_.calibration_file());
-
-  point_cloud_ptr_.reset(new PointCloud);
-  scan_ptr_.reset(new RobosenseScan);
-
+  point_cloud_ptr_ = std::make_shared<PointCloud>();
+  scan_ptr_ = std::make_shared<RobosenseScan>();
+  thread_pool_ptr_ = std::make_shared<ThreadPool>(4);
   points_seq_ = 0;
   scan_seq_ = 0;
   thread_flag_ = true;
@@ -73,13 +81,13 @@ void RobosenseDriver::getPackets() {
       msop_pkt_queue_.push(pkt_msg);
       if (msop_pkt_queue_.is_task_finished.load()) {
         msop_pkt_queue_.is_task_finished.store(false);
-        ThreadPool::getInstance()->commit([this]() { processMsopPackets(); });
+        thread_pool_ptr_->Enqueue([this]() { processMsopPackets(); });
       }
     } else if (ret == INPUT_DIFOP) {
       difop_pkt_queue_.push(pkt_msg);
       if (difop_pkt_queue_.is_task_finished.load()) {
         difop_pkt_queue_.is_task_finished.store(false);
-        ThreadPool::getInstance()->commit([this]() { processDifopPackets(); });
+        thread_pool_ptr_->Enqueue([this]() { processDifopPackets(); });
       }
     } else if (ret == INPUT_ERROR || ret == INPUT_EXIT ||
                ret == INPUT_TIMEOUT) {
@@ -104,7 +112,8 @@ void RobosenseDriver::processMsopPackets() {
       ret = lidar_decoder_ptr_->processMsopPkt(pkt.packet.data(), point_vec_ptr,
                                                height_ptr);
     }
-    if (ret == E_DECODE_OK || ret == E_FRAME_SPLIT) {
+    if (ret == RSDecoderResult::DECODE_OK ||
+        ret == RSDecoderResult::FRAME_SPLIT) {
       for (auto iter : *point_vec_ptr) {
         if (std::isnan(iter.x()) || std::isnan(iter.y()) ||
             std::isnan(iter.z())) {
@@ -117,7 +126,7 @@ void RobosenseDriver::processMsopPackets() {
         point->set_intensity(iter.intensity());
         point->set_timestamp(iter.timestamp());
       }
-      if (ret == E_FRAME_SPLIT) {
+      if (ret == RSDecoderResult::FRAME_SPLIT) {
         std::shared_ptr<PointCloud> raw_cloud = point_cloud_ptr_;
         raw_cloud->set_height(*height_ptr);
         preparePointsMsg(raw_cloud);

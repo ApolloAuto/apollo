@@ -1,10 +1,10 @@
 # **Robosense LiDAR Driver**
 
-
+**Apollo 6.0**
 
 ## 1 Introduction
 
- **robosense**  is the lidar driver kit under Apollo platform. Now support *RS16，RS32，RSBP，RS128* . 
+ **robosense**  is the lidar driver kit under Apollo platform. Now support *RS16，RS32，RSBP，RS128, RS80*. 
 
 
 
@@ -87,9 +87,27 @@ mainboard -d /apollo/modules/drivers/robosenseag/rsbp.dag
 Default Channel Name：
 
 - Original point cloud -- /apollo/sensor/rsbp/PointCloud2
-
 - Scan--/apollo/sensor/rsbp/Scan
 - Compensation point cloud -- /apollo/sensor/rsbp/compensator/PointCloud2
+
+#### 2.5 RS80
+
+```sh
+cyber_launch start /apollo/modules/drivers/robosense/launch/rs80.launch
+```
+
+or
+
+```sh
+mainboard -d /apollo/modules/drivers/robosenseag/rs80.dag
+```
+
+Default Channel Name：
+
+- Original point cloud -- /apollo/sensor/rs80/PointCloud2
+
+- Scan--/apollo/sensor/rs80/Scan
+- Compensation point cloud -- /apollo/sensor/rs80/compensator/PointCloud2
 
 ## 3 Parameters Intro
 
