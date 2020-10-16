@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.drivers.robosense;
+
+import "modules/common/proto/header.proto";
+
+message RobosenseScanPacket {
+  optional uint64 stamp = 1;
+  optional bytes data = 2;
+}
+
+message RobosenseScan {
+  optional apollo.common.Header header = 1;
+  optional string model = 2;  // robosense device model
+  repeated RobosenseScanPacket firing_pkts = 3;
+  optional uint64 basetime = 4 [default = 0];
+}
