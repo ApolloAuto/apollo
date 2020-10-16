@@ -18,11 +18,11 @@ Several developers wrote in requesting that our Dreamland platform should suppor
 
 3. Once inside, you will have to complete the form on the screen as seen in the image below. As this app is in Beta testing, it is not open to all our developers.
 
-    ![](../../docs/specs/images/form.png)
+    ![](../specs/images/form.png)
 
 4. You should receive the following activation confirmation via email within 3 business days:
 
- ![](../../docs/specs/images/email.png)
+ ![](../specs/images/email.png)
 
 ## Using Scenario Editor
 
