@@ -17,4 +17,6 @@ Dreamview or Apollo's HMI module provides a web application that helps developer
 ## Output
   A web-based dynamic 3D rendering of the monitored messages in a simulated world.
 
+## Related Paper
 
+1. [Xu, J., Luo, Q., Xu, K., Xiao, X., Yu, S., Hu, J., Miao, J. and Wang, J., 2019, November. An Automated Learning-Based Procedure for Large-scale Vehicle Dynamics Modeling on Baidu Apollo Platform. In *2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) (pp. 5049-5056). IEEE.*](https://ieeexplore.ieee.org/document/8968102)
