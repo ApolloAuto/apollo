@@ -351,11 +351,14 @@ function setup_devices_and_mount_volumes() {
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
         16.04)
+            # Mount host devices into container (/dev)
             warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                     "in the near future. Please upgrade to ubuntu 18.04+."
+            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                volumes="${volumes} -v /dev:/dev"
+            fi
             ;;
         18.04|20.04|*)
-            ## Question(storypku): Any special considerations here ?
             if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
                 volumes="${volumes} -v /dev:/dev"
             fi
