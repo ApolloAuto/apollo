@@ -36,7 +36,10 @@ USER_VERSION_OPT=
 
 DOCKER_RUN="docker run"
 FAST_MODE="no"
-GEOLOC="none"
+
+GEOLOC=
+GEO_REGISTRY=
+
 USE_LOCAL_IMAGE="no"
 USE_GPU_HOST=0
 USER_AGREED="no"
@@ -147,49 +150,13 @@ function stop_all_apollo_containers_for_user() {
     fi
 }
 
-function _check_if_command_jq_exist() {
-    if [[ -x "$(command -v jq)" ]]; then
-        return 0
-    fi
-
-    warning "Command 'jq' (used for geolocation settings) not found on your Host."
-    warning "You can install it via 'sudo apt-get install jq' if on Ubuntu."
-    warning "Or visit jq at https://github.com/stedolan/jq for instructions."
-    warning "Exiting ..."
-    exit 1
-}
-
-function _geo_specific_config_for_cn() {
-    local docker_cfg="/etc/docker/daemon.json"
-    if [ -e "${docker_cfg}" ] && \
-        jq '."registry-mirrors"[]' "${docker_cfg}" &>/dev/null ; then
-        echo "Existing registry mirrors in found ${docker_cfg} and will be used."
-        return
-    fi
-
-    if [ ! -e "${docker_cfg}" ]; then
-        echo "{\"experimental\":true, \"registry-mirrors\":[ \
-               \"http://hub-mirror.c.163.com\", \
-               \"https://reg-mirror.qiniu.com\", \
-               \"https://dockerhub.azk8s.cn\" \
-           ]}" | jq -s ".[]" | sudo tee -a "${docker_cfg}"
-    else
-        local tmpfile="$(mktemp /tmp/docker.daemon.XXXXXX)"
-        jq '.+={"registry-mirrors":["http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]}' \
-            "${docker_cfg}" > "${tmpfile}"
-        sudo cp -f "${tmpfile}" "${docker_cfg}"
-    fi
-    service docker restart
-}
-
 function geo_specific_config() {
     local geo="$1"
-    if [ -z "${geo}" ] || [ "${geo}" = "none" ]; then
+    if [[ -z "${geo}" ]]; then
         info "Use default GeoLocation settings"
-    elif [ "${geo}" = "cn" ]; then
+    elif [[ "${geo}" == "cn" ]]; then
         info "GeoLocation settings for Mainland China"
-        _check_if_command_jq_exist
-        _geo_specific_config_for_cn
+        GEO_REGISTRY="registry.baidubce.com"
     else
         info "GeoLocation settings for ${geo} is not ready, fallback to default"
     fi
@@ -198,7 +165,7 @@ function geo_specific_config() {
 function parse_arguments() {
     local custom_version=""
     local shm_size=""
-    local geo="none"
+    local geo=""
 
     while [ $# -gt 0 ] ; do
         local opt="$1"; shift
@@ -305,11 +272,12 @@ function setup_devices_and_mount_local_volumes() {
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
-        14.04)
-            warning "[Deprecated] Support for Ubuntu 14.04 will be removed" \
+        16.04)
+            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                     "in the near future. Please upgrade to ubuntu 18.04+."
+            volumes="${volumes} -v /dev:/dev"
             ;;
-        16.04|18.04|20.04|*)
+        18.04|20.04|*)
             volumes="${volumes} -v /dev:/dev"
             ;;
     esac
@@ -371,11 +339,14 @@ function remove_existing_dev_container() {
 function docker_pull() {
     local img="$1"
     if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
-        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${img}" ; then
+        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "${img}" ; then
             info "Local image ${img} found and will be used."
             return
         fi
         warning "Image ${img} not found locally although local mode enabled. Trying to pull from remote registry."
+    fi
+    if [[ -n "${GEO_REGISTRY}" ]]; then
+        img="${GEO_REGISTRY}/${img}"
     fi
 
     info "Start pulling docker image ${img} ..."
