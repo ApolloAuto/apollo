@@ -28,6 +28,7 @@ function _create_user_account() {
     "${user_name}" --uid "${uid}" --gid "${gid}" # 2>/dev/null
 
   usermod -aG sudo "${user_name}"
+  usermod -aG video "${user_name}"
 }
 
 function setup_user_bashrc() {
