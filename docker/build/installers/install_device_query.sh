@@ -54,7 +54,7 @@ else
     exit 1
 fi
 
-DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${DEVICE_QUERY_BINARY}"
+DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${DEVICE_QUERY_BINARY}"
 download_if_not_cached "${DEVICE_QUERY_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 [[ -d "${DEMO_SUITE_DEST_DIR}" ]] || mkdir -p "${DEMO_SUITE_DEST_DIR}"
