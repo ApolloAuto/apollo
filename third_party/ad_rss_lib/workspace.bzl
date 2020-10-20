@@ -14,7 +14,7 @@ def repo():
         sha256 = "10c161733a06053f79120f389d2d28208c927eb65759799fb8d7142666b61b9f",
         strip_prefix = "ad-rss-lib-1.1.0",
         urls = [
-            "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/v1.1.0.tar.gz",
+            "https://apollo-system.cdn.bcebos.com/archive/6.0/v1.1.0.tar.gz",
             "https://github.com/intel/ad-rss-lib/archive/v1.1.0.tar.gz",
         ],
     )

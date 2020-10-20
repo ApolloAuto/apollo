@@ -25,7 +25,7 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # PKG_DOWNLOAD_ADDR="http://172.17.0.1:8388"
-PKG_DOWNLOAD_ADDR="https://apollo-platform-system.cdn.bcebos.com/archive/6.0"
+PKG_DOWNLOAD_ADDR="https://apollo-system.cdn.bcebos.com/archive/6.0"
 
 apt-get -y update && \
     apt-get -y install --no-install-recommends \

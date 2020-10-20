@@ -40,7 +40,7 @@ elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
         CHECKSUM="53056707081491123e705db30df6e38685f9661dc593e1790950c4ba399d3490"
         DECOMPRESSED_NAME="cmake-${VERSION}-aarch64-linux-gnu"
         PKG_NAME="${DECOMPRESSED_NAME}.tar.gz"
-        DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+        DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
         download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
         tar xzf "${PKG_NAME}"
         pushd ${DECOMPRESSED_NAME}

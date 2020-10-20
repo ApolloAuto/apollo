@@ -8,7 +8,7 @@ def repo():
         sha256 = "71030a04aedf9f612d2991c1c552317038c3c5a2b578ac4745267a45e7037c29",
         strip_prefix = "protobuf-3.12.3",
         urls = [
-            "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/v3.12.3.tar.gz",
+            "https://apollo-system.cdn.bcebos.com/archive/6.0/v3.12.3.tar.gz",
             "https://github.com/protocolbuffers/protobuf/archive/v3.12.3.tar.gz",
         ],
     )
