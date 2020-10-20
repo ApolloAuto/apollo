@@ -18,7 +18,7 @@ module_config {
       class_name : "CompensatorComponent"
       config {
         name : "lidar_compensator"
-        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_fusion_compensator.pb.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_fusion_compensator.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/PointCloud2"}
       }
     }
