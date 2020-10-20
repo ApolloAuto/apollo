@@ -41,6 +41,7 @@ USE_GPU_HOST=0
 USE_LOCAL_IMAGE=0
 CUSTOM_VERSION=
 GEOLOC=
+GEO_REGISTRY=
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -259,29 +260,6 @@ function determine_target_version_and_arch() {
     CUSTOM_VERSION="${version}"
 }
 
-function _geo_specific_config_for_cn() {
-    local docker_cfg="/etc/docker/daemon.json"
-    if [ -e "${docker_cfg}" ] && \
-        jq '."registry-mirrors"[]' "${docker_cfg}" &>/dev/null ; then
-        echo "Existing registry mirrors in found ${docker_cfg} and will be used."
-        return
-    fi
-
-    if [ ! -e "${docker_cfg}" ]; then
-        echo "{\"experimental\":true, \"registry-mirrors\":[ \
-               \"http://hub-mirror.c.163.com\", \
-               \"https://reg-mirror.qiniu.com\", \
-               \"https://dockerhub.azk8s.cn\" \
-           ]}" | jq -s ".[]" | sudo tee -a "${docker_cfg}"
-    else
-        local tmpfile="$(mktemp /tmp/docker.daemon.XXXXXX)"
-        jq '.+={"registry-mirrors":["http://hub-mirror.c.163.com","https://reg-mirror.qiniu.com","https://dockerhub.azk8s.cn"]}' \
-            "${docker_cfg}" > "${tmpfile}"
-        sudo cp -f "${tmpfile}" "${docker_cfg}"
-    fi
-    service docker restart
-}
-
 function geo_specific_config() {
     local geo="$1"
     if [[ -z "${geo}" ]]; then
@@ -289,7 +267,7 @@ function geo_specific_config() {
     fi
     info "Setup geolocation specific configurations for ${geo}"
     if [[ "${geo}" == "cn" ]]; then
-        _geo_specific_config_for_cn
+        GEO_REGISTRY="registry.baidubce.com"
     fi
 }
 
@@ -372,12 +350,15 @@ function setup_devices_and_mount_volumes() {
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
-        14.04)
-            warning "[Deprecated] Support for Ubuntu 14.04 will be removed" \
+        16.04)
+            # Mount host devices into container (/dev)
+            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                     "in the near future. Please upgrade to ubuntu 18.04+."
+            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                volumes="${volumes} -v /dev:/dev"
+            fi
             ;;
-        16.04|18.04|20.04|*)
-            ## Question(storypku): Any special considerations here ?
+        18.04|20.04|*)
             if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
                 volumes="${volumes} -v /dev:/dev"
             fi
@@ -420,9 +401,11 @@ function docker_pull_if_needed() {
         return
     fi
 
-    # Note(storypku): use may-be-modified ${DOCKER_REPO}
     image="${DOCKER_REPO}:${image##*:}"
     echo "Start pulling docker image: ${image}"
+    if [[ -n "${GEO_REGISTRY}" ]]; then
+        image="${GEO_REGISTRY}/${image}"
+    fi
     if ! ${DOCKER_PULL_CMD} "${image}"; then
         error "Failed to pull docker image: ${image}"
         exit 1
@@ -534,8 +517,6 @@ function main() {
 
     geo_specific_config "${GEOLOC}"
     docker_pull_if_needed "${image}" "${USE_LOCAL_IMAGE}"
-
-    image="${DOCKER_REPO}:${CUSTOM_VERSION}"
 
     remove_existing_cyber_container
 
