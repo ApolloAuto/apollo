@@ -840,6 +840,18 @@
         },
         "common": {
           "nested": {
+            "Direction": {
+              "values": {
+                "EAST": 0,
+                "WEST": 1,
+                "SOUTH": 2,
+                "NORTH": 3,
+                "NORTHEAST": 4,
+                "SOUTHEAST": 5,
+                "SOUTHWEST": 6,
+                "NORTHWEST": 7
+              }
+            },
             "DriveEvent": {
               "fields": {
                 "header": {
@@ -1430,7 +1442,8 @@
                 "WEY": 5,
                 "ZHONGYUN": 6,
                 "CH": 7,
-                "DKIT": 8
+                "DKIT": 8,
+                "NEOLIX": 9
               }
             },
             "VehicleID": {
@@ -7393,10 +7406,8 @@
               "nested": {
                 "ModelType": {
                   "values": {
-                    "CONV_RNN": 1,
-                    "CNN": 2,
-                    "SELF_CNN_LSTM": 3,
-                    "HISTORY_UNCONDITIONED_CNN_LSTM": 4
+                    "CNN": 1,
+                    "CNN_LSTM": 2
                   }
                 }
               }
@@ -10706,6 +10717,11 @@
                   "rule": "repeated",
                   "type": "PNCJunction",
                   "id": 13
+                },
+                "rsu": {
+                  "rule": "repeated",
+                  "type": "RSU",
+                  "id": 14
                 }
               }
             },
@@ -11071,6 +11087,9 @@
             "PNCJunctionOverlapInfo": {
               "fields": {}
             },
+            "RSUOverlapInfo": {
+              "fields": {}
+            },
             "RegionOverlapInfo": {
               "fields": {
                 "id": {
@@ -11097,7 +11116,8 @@
                     "clearAreaOverlapInfo",
                     "speedBumpOverlapInfo",
                     "parkingSpaceOverlapInfo",
-                    "pncJunctionOverlapInfo"
+                    "pncJunctionOverlapInfo",
+                    "rsuOverlapInfo"
                   ]
                 }
               },
@@ -11145,6 +11165,10 @@
                 "pncJunctionOverlapInfo": {
                   "type": "PNCJunctionOverlapInfo",
                   "id": 12
+                },
+                "rsuOverlapInfo": {
+                  "type": "RSUOverlapInfo",
+                  "id": 13
                 }
               }
             },
@@ -11382,6 +11406,23 @@
                     "CITY_ROAD": 2,
                     "PARK": 3
                   }
+                }
+              }
+            },
+            "RSU": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "junctionId": {
+                  "type": "Id",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
                 }
               }
             },

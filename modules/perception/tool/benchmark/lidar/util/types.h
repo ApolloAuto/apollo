@@ -78,17 +78,28 @@ struct PointXYZIL {
 }  // namespace perception
 }  // namespace apollo
 
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::benchmark::PointXYZIT,
-                                  (float, x, x)(float, y, y)(float, z, z)(
-                                      uint8_t, intensity,
-                                      intensity)(double, timestamp, timestamp))
-
-POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::benchmark::PointXYZL,
-                                  (float, x, x)(float, y, y)(float, z,
-                                                             z)(uint32_t, label,
-                                                                label))
+POINT_CLOUD_REGISTER_POINT_STRUCT(
+        apollo::perception::benchmark::PointXYZIT,
+        (float, x, x)
+        (float, y, y)
+        (float, z, z)
+        (std::uint8_t, intensity, intensity)
+        (double, timestamp, timestamp)
+)
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
-    apollo::perception::benchmark::PointXYZIL,
-    (float, x, x)(float, y, y)(float, z, z)(float, intensity,
-                                            intensity)(uint32_t, label, label))
+        apollo::perception::benchmark::PointXYZL,
+        (float, x, x)
+        (float, y, y)
+        (float, z, z)
+        (std::uint32_t, label, label)
+)
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(
+        apollo::perception::benchmark::PointXYZIL,
+        (float, x, x)
+        (float, y, y)
+        (float, z, z)
+        (float, intensity, intensity)
+        (std::uint32_t, label, label)
+)

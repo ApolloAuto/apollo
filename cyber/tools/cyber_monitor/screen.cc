@@ -14,19 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "screen.h"
-#include "cyber_topology_message.h"
-#include "general_channel_message.h"
-#include "renderable_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
-#include <ncurses.h>
 #include <unistd.h>
+
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <mutex>
-#include <string>
 #include <thread>
+
+#include "cyber/tools/cyber_monitor/cyber_topology_message.h"
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/renderable_message.h"
+
+#include <ncurses.h> // NOLINT
 
 namespace {
 constexpr double MinHalfFrameRatio = 12.5;
@@ -197,7 +199,8 @@ int Screen::SwitchState(int ch) {
         clear();
       }
       break;
-    default: {}
+    default: {
+    }
   }
   return ch;
 }

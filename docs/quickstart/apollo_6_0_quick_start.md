@@ -4,19 +4,21 @@ The following guide serves as a user manual for launching the Apollo upgraded so
 is similar to Apollo 5.5.
 
 This Quick Start Guide focuses on the new features. For general Apollo concepts, please refer to
-[Apollo 5.5 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_5_5_quick_start.md)
+[Apollo 5.5 Quick Start](apollo_5_5_quick_start.md)
 
 ## Contents
 
-- [Emergency Audio Detection](#emergency-audio-detection)
-- [New Deep Learning Models](#new-deep-learning-models)
-- [Hardware and Software Installation](#hardware-and-software-installation)
-- [Dreamview Usage Table](#dreamview-usage-table)
-- [Onboard Test](#onboard-test)
+- [Apollo 6.0 Quick Start Guide](#apollo-60-quick-start-guide)
+  - [Contents](#contents)
+  - [Emergency Audio Detection](#emergency-audio-detection)
+  - [New Deep Learning Models](#new-deep-learning-models)
+  - [Hardware and Software Installation](#hardware-and-software-installation)
+  - [Dreamview Usage Table](#dreamview-usage-table)
+  - [Onboard Test](#onboard-test)
 
 ## Emergency Audio Detection
 
-Apollo currently integrates emergency vehicle detection through audio devices. Microphones are installed on the vehicle to collect audio signals around the autonomous vehicle, and the recorded soundtracks will be analized and processed to detect emergency vehicles in the surroundings. The module detail is [here](https://github.com/ApolloAuto/apollo/tree/master/modules/audio).
+Apollo currently integrates emergency vehicle detection through audio devices. Microphones are installed on the vehicle to collect audio signals around the autonomous vehicle, and the recorded soundtracks will be analized and processed to detect emergency vehicles in the surroundings. The module detail is [here](../../modules/audio).
 
 ## New Deep Learning Models
 
@@ -32,8 +34,8 @@ for the steps to install the hardware components and the system software, as wel
 ## Dreamview Usage Table
 
 For questions regarding Dreamview icons refer to the
-[Dreamview Usage Table](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
-For questions regarding Dreamland and the scenario editor, please visit our [Dreamland Introduction guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Dreamland_introduction.md)
+[Dreamview Usage Table](../specs/dreamview_usage_table.md).
+For questions regarding Dreamland and the scenario editor, please visit our [Dreamland Introduction guide](../specs/Dreamland_introduction.md)
 
 ## Onboard Test
 
@@ -56,7 +58,7 @@ For questions regarding Dreamland and the scenario editor, please visit our [Dre
    Note\: You'll be required to setup profile before doing anything else. Click
    the dropdown menu to select **Navigation** mode, the HDMap and vehicle you
    want to use. The lists are defined in
-   [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf)
+   [HMI config file](../../modules/dreamview/conf/hmi_modes)
 
    Note\: It's also possible to change the profile on the right panel of the
    HMI, but just remember to click `Reset All` on the top-right corner to

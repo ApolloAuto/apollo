@@ -81,5 +81,29 @@ DEFINE_double(score_threshold, 0.5, "Classification score threshold.");
 DEFINE_double(nms_overlap_threshold, 0.5, "Nms overlap threshold.");
 DEFINE_int32(num_output_box_feature, 7, "Length of output box feature.");
 
+// emergency detection onnx
+DEFINE_string(onnx_obstacle_detector_model,
+              "/apollo/modules/perception/camera"
+              "/lib/obstacle/detector/yolov4/model/yolov4_1_3_416_416.onnx",
+              "The onnx model file for emergency detection");
+DEFINE_string(onnx_test_input_path,
+              "/apollo/modules/perception/inference"
+              "/onnx/testdata/dog.jpg",
+              "The test input image file for onnx inference");
+DEFINE_string(onnx_test_input_name_file,
+              "/apollo/modules/perception/inference"
+              "/onnx/testdata/coco.names",
+              "The test input coco name file for onnx inference");
+DEFINE_string(onnx_prediction_image_path,
+              "/apollo/modules/perception/inference"
+              "/onnx/testdata/prediction.jpg",
+              "The prediction output image file for onnx inference");
+DEFINE_int32(num_classes, 80, "number of classes for onnx inference");
+
+// emergency detection libtorch
+DEFINE_string(torch_detector_model,
+              "/apollo/modules/perception/camera"
+              "/lib/obstacle/detector/yolov4/model/yolov4.pt",
+              "The torch model file for emergency detection");
 }  // namespace perception
 }  // namespace apollo

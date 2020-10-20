@@ -28,8 +28,6 @@ namespace v2x {
 namespace ft {
 
 // config manager
-DECLARE_string(config_manager_path);
-DECLARE_string(work_root);
 DECLARE_string(config_path);
 DECLARE_string(v2x_module_name);
 DECLARE_string(v2x_fusion_obstacles_topic);

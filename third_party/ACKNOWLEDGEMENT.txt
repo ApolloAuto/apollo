@@ -2,11 +2,20 @@
 * Redistributions in binary form must reproduce all third party copyright notice
   in the documentation and/or other materials provided with the distribution.
 
+* Abseil
+    Apache License 2.0
+    https://github.com/abseil/abseil-cpp/blob/master/LICENSE
 * ADOL-C
     Eclipse Public License 1.0
-    https://projects.coin-or.org/ADOL-C
-* bazel:
-    Apache 2.0
+    https://github.com/coin-or/ADOL-C/blob/master/LICENSE
+* ad-rss-lib
+    GNU General Public License 2.1
+    https://github.com/intel/ad-rss-lib/blob/master/LICENSE
+* Benchmark
+    Apache License 2.0
+    https://github.com/google/benchmark/blob/master/LICENSE
+* Bazel:
+    Apache License 2.0
     https://github.com/bazelbuild/bazel/blob/master/LICENSE
 * Boost:
     Boost Software License 1.0
@@ -15,20 +24,21 @@
 * Bootstrap
     MIT License
     https://github.com/twbs/bootstrap/blob/master/LICENSE
-* Buildify
-    Apache 2.0
-    https://github.com/bazelbuild/bazel/blob/master/LICENSE
+* Buildifier
+    Apache License 2.0
+    https://github.com/bazelbuild/buildtools/blob/master/LICENSE
 * ColPack
-    GNU Lesser General Public License v3.0
+    GNU Lesser General Public License 3.0
     https://github.com/CSCsw/ColPack/blob/master/COPYING
-* civetweb
-    MIT
+* CivetWeb
+    MIT License
     https://github.com/civetweb/civetweb/blob/master/LICENSE.md
-* cpplint
+* Cpplint
     BSD 3-clause "New" or "Revised" License
     https://github.com/cpplint/cpplint/blob/master/LICENSE
-* curlpp
-    https://github.com/jpbarrette/curlpp/blob/master/doc/LICENSE
+* cuteci
+    MIT License
+    https://github.com/hasboeuf/cuteci/blob/master/LICENSE
 * Docker
     Apache License 2.0
     https://www.docker.com/components-licenses
@@ -41,44 +51,68 @@
 * Fast RTPS
     Apache License 2.0
     https://github.com/eProsima/Fast-RTPS/blob/release/1.4.0/LICENSE
-* gflags
+* FFmpeg
+    GNU Lesser General Public License 2.1+
+    https://github.com/FFmpeg/FFmpeg/blob/master/LICENSE.md
+* FFTW
+    GNU General Public License 2+
+    http://www.fftw.org/fftw3_doc/License-and-Copyright.html
+* Ipopt
+    Eclipse Public License 2.0
+    https://github.com/coin-or/Ipopt/blob/master/LICENSE
+* GFlags
     BSD 3-clause "New" or "Revised" License
     https://github.com/gflags/gflags/blob/master/COPYING.txt
-* glog
+* GLog
     BSD 3-Clause License
     https://github.com/google/glog/blob/master/COPYING
-* grpc
+* gRPC
     Apache License 2.0
     https://github.com/grpc/grpc/blob/master/LICENSE
-* gtest
+* GoogleTest
     https://github.com/google/googletest/blob/master/googletest/LICENSE
-* libcurl4-openssl-dev
-    MIT/X derivate license
-    https://curl.haxx.se/docs/copyright.html
 * jQuery
     MIT License
     https://jquery.org/license/
-* JSON
+* JSON for Modern C++
     MIT License
     https://github.com/nlohmann/json/blob/develop/LICENSE.MIT
-* KCFcpp
-    BSD 3-Clause "New" or "Revised" License
-    https://github.com/joaofaro/KCFcpp/blob/master/LICENSE
-* Protocol Buffer
-    https://github.com/google/protobuf/blob/master/LICENSE
-* Protobuf Rules
+* OpenCV
+    BSD 3-Clause License
+    https://opencv.org/license
+* OSQP
     Apache License 2.0
-    https://github.com/pubref/rules_protobuf/blob/master/LICENSE
-* python-eventlet
-    MIT
-    http://eventlet.net/
+    https://github.com/oxfordcontrol/osqp/blob/master/LICENSE
+* PCL
+    BSD License
+    https://github.com/PointCloudLibrary/pcl/blob/master/LICENSE.txt
+* PyTorch
+    https://github.com/pytorch/pytorch/blob/master/LICENSE
+* POCO C++ Libraries
+    Boost Software License 1.0
+    https://github.com/pocoproject/poco/blob/master/LICENSE
+* PROJ
+    MIT License
+    https://github.com/OSGeo/PROJ/blob/master/COPYING
+* Prettier
+    MIT License
+    https://github.com/prettier/prettier/blob/master/LICENSE
+* Protocol Buffer
+    https://github.com/protocolbuffers/protobuf/blob/master/LICENSE
 * python-requests
     Apache2 License
     http://docs.python-requests.org/en/master/user/intro/#apache2-license
-* ROS
-    Apache License 2.0
-    http://docs.ros.org/diamondback/api/licenses.html
+* Qt5
+    GNU Lesser General Public License 3
+    https://doc.qt.io/qt-5/licensing.html
+* shfmt
+    BSD 3-Clause "New" or "Revised" License
+    https://github.com/mvdan/sh/blob/master/LICENSE
 * socketio
     MIT License
     https://github.com/socketio/socket.io-client/blob/master/LICENSE
-
+* VTK
+    https://github.com/Kitware/VTK/blob/master/Copyright.txt
+* YAML-cpp
+    MIT License
+    https://github.com/jbeder/yaml-cpp/blob/master/LICENSE

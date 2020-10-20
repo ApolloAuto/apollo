@@ -12,6 +12,9 @@ APOLLO_ENV=""
 USE_ESD_CAN=false
 : ${STAGE:=dev}
 
+AVAILABLE_COMMANDS="config build build_dbg build_opt build_cpu build_gpu build_opt_gpu test coverage lint \
+                    buildify check build_fe build_teleop build_prof doc clean format usage -h --help"
+
 function check_architecture_support() {
     if [[ "${SUPPORTED_ARCHS}" != *" ${ARCH} "* ]]; then
         error "Unsupported CPU arch: ${ARCH}. Currently, Apollo only" \
@@ -23,7 +26,7 @@ function check_architecture_support() {
 
 function check_platform_support() {
     local platform="$(uname -s)"
-    if [ "$platform" != "Linux" ]; then
+    if [[ "${platform}" != "Linux" ]]; then
         error "Unsupported platform: ${platform}."
         error "${TAB}Apollo is expected to run on Linux systems (E.g., Debian/Ubuntu)."
         exit 1
@@ -42,8 +45,9 @@ function check_minimal_memory_requirement() {
 function determine_esdcan_use() {
     local esdcan_dir="${APOLLO_ROOT_DIR}/third_party/can_card_library/esd_can"
     local use_esd=false
-    if [ -f "${esdcan_dir}/include/ntcan.h" ] &&
-        [ -f "${esdcan_dir}/lib/libntcan.so.4" ]; then
+    if [[ "${ARCH}" == "x86_64" ]] &&
+        [[ -f "${esdcan_dir}/include/ntcan.h" ]] &&
+        [[ -f "${esdcan_dir}/lib/libntcan.so.4" ]]; then
         use_esd=true
     fi
     USE_ESD_CAN="${use_esd}"
@@ -82,6 +86,13 @@ function apollo_env_setup() {
     fi
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
     info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET}"
+
+    if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
+        source "${TOP_DIR}/cyber/setup.bash"
+    fi
+    if [[ ! -d "${APOLLO_BAZEL_DIST_DIR}" ]]; then
+        mkdir -p "${APOLLO_BAZEL_DIST_DIR}"
+    fi
 
     if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
         env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
@@ -128,6 +139,15 @@ function _usage() {
     "
 }
 
+function _check_command() {
+    local name="${BASH_SOURCE[0]}"
+    local commands="$(echo ${AVAILABLE_COMMANDS} | xargs)"
+    local help_msg="Run './apollo.sh --help' for usage."
+    local cmd="$@"
+
+    python scripts/command_checker.py --name "${name}" --command "${cmd}" --available "${commands}" --helpmsg "${help_msg}"
+}
+
 function main() {
     if [ "$#" -eq 0 ]; then
         _usage
@@ -141,7 +161,8 @@ function main() {
     local coverage_sh="${APOLLO_ROOT_DIR}/scripts/apollo_coverage.sh"
     local ci_sh="${APOLLO_ROOT_DIR}/scripts/apollo_ci.sh"
 
-    local cmd="$1"; shift
+    local cmd="$1"
+    shift
     case "${cmd}" in
         config)
             env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" "$@"
@@ -213,7 +234,7 @@ function main() {
             _usage
             ;;
         *)
-            _usage
+            _check_command "${cmd}"
             ;;
     esac
 }

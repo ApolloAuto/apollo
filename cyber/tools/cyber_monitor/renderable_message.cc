@@ -37,6 +37,7 @@ void RenderableMessage::SplitPages(int key) {
         page_index_ = 0;
       }
       break;
-    default: {}
+    default: {
+    }
   }
 }

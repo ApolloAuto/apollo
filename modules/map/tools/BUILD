@@ -75,7 +75,7 @@ cc_binary(
         "//cyber/common:file",
         "//cyber/common:log",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/map/hdmap/adapter:opendrive_adapter",
+        "//modules/map/proto:map_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

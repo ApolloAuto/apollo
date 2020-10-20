@@ -24,39 +24,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
 ARCH="$(uname -m)"
-if [ "${ARCH}" != "x86_64" ]; then
-    warning "adv_plat is not ready for ${ARCH}. Skipped."
-    exit 0
-fi
 
 DEST_DIR="${PKGS_DIR}/adv_plat"
 [[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
-
-if [ "${MY_MODE}" = "download" ]; then
-    PKG_NAME="adv_plat-3.0-x86_64.tar.gz"
-    CHECKSUM="1c4a0e205ab2940fc547e5c61b2e181688d4396db2a699f65539add6e10b8150"
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-
-    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-    tar xzf ${PKG_NAME}
-
-    mv adv_plat/include ${DEST_DIR}/include
-    mv adv_plat/lib     ${DEST_DIR}/lib
-
-    echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
-    ldconfig
-
-    rm -r ${PKG_NAME} adv_plat
-    exit 0
-fi
 
 #info "Git clone https://github.com/ApolloAuto/apollo-contrib.git"
 #git clone https://github.com/ApolloAuto/apollo-contrib.git
 
 PKG_NAME="apollo-contrib-baidu-1.0.tar.gz"
 CHECKSUM="cd385dae6d23c6fd70c2c0dcd0ce306241f84a638f50988c6ca52952c304bbec"
-DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
@@ -96,4 +73,3 @@ pushd ${OUT_DIR}
 popd
 
 rm -rf ${PKG_NAME} apollo-contrib
-

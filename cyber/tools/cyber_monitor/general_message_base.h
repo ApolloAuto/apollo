@@ -28,24 +28,25 @@ class Screen;
 class GeneralMessageBase : public RenderableMessage {
  protected:
   static void PrintMessage(GeneralMessageBase* baseMsg,
-                           const google::protobuf::Message& msg, int& jumpLines,
-                           const Screen* s, int& line_no, int indent);
+                           const google::protobuf::Message& msg,
+                           int* jump_lines, const Screen* s, int* line_no,
+                           int indent);
   static void PrintField(GeneralMessageBase* baseMsg,
-                         const google::protobuf::Message& msg, int& jumpLines,
-                         const Screen* s, int& line_no, int indent,
+                         const google::protobuf::Message& msg, int* jump_lines,
+                         const Screen* s, int* line_no, int indent,
                          const google::protobuf::Reflection* ref,
                          const google::protobuf::FieldDescriptor* field,
                          int index);
 
-  static int lineCount(const google::protobuf::Message& msg, int screenWidth);
-  static int lineCountOfField(const google::protobuf::Message& msg,
-                              int screenWidth,
+  static int LineCount(const google::protobuf::Message& msg, int screen_width);
+  static int LineCountOfField(const google::protobuf::Message& msg,
+                              int screen_width,
                               const google::protobuf::FieldDescriptor* field,
                               const google::protobuf::Reflection* reflection,
                               bool is_folded = true);
 
-  void insertRepeatedMessage(int line_no, GeneralMessageBase* item) {
-    children_map_.insert(std::make_pair(line_no, item));
+  void InsertRepeatedMessage(int line_no, GeneralMessageBase* item) {
+    children_map_.emplace(line_no, item);
   }
 
   RenderableMessage* Child(int line_no) const override;

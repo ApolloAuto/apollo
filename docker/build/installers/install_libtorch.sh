@@ -22,23 +22,50 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
 TARGET_ARCH="$(uname -m)"
-if [ "${TARGET_ARCH}" = "aarch64" ]; then
-    warning "libtorch for aarch64 not ready"
+if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+    # TODO(build): Docs on how to build libtorch on Jetson boards
+    # References:
+    #   https://github.com/ApolloAuto/apollo/blob/pre6/docker/build/installers/install_libtorch.sh
+    #   https://github.com/dusty-nv/jetson-containers/blob/master/Dockerfile.pytorch
+    #   https://forums.developer.nvidia.com/t/pytorch-for-jetson-version-1-6-0-now-available
+    #   https://github.com/pytorch/pytorch/blob/master/docker/caffe2/ubuntu-16.04-cpu-all-options/Dockerfile
+    VERSION="1.6.0"
+
+    # libtorch_cpu
+    PKG_NAME="libtorch_cpu-1.6.0-linux-aarch64.tar.gz"
+    CHECKSUM="712a33a416767de625a3f2da54ec384d50882b10e1b1fc5da8df4158ef6edd06"
+    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+    tar xzf "${PKG_NAME}"
+    mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_cpu
+    rm -f "${PKG_NAME}"
+    ok "Successfully installed libtorch_cpu ${VERSION}"
+
+    ##============================================================##
+    # libtorch_gpu
+    PKG_NAME="libtorch_gpu-1.6.0-linux-aarch64.tar.gz"
+    CHECKSUM="bf9495110641b0f0dda44e3c93f06f221b54af990688a9202a377ec9b3348666"
+    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+    tar xzf "${PKG_NAME}"
+    mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_gpu
+    rm -f "${PKG_NAME}"
+    ok "Successfully installed libtorch_gpu ${VERSION}"
     exit 0
 fi
 
-# Libtorch-gpu dependency
+##===============================================================##
+
+# Libtorch-gpu dependency for x86_64
 pip3_install mkl
 
-# PKG_NAME="libtorch-cxx11-abi-shared-with-deps-1.5.0.zip"
-# DOWNLOAD_LINK="https://download.pytorch.org/libtorch/cu102/${PKG_NAME}"
-# CHECKSUM="0efdd4e709ab11088fa75f0501c19b0e294404231442bab1d1fb953924feb6b5"
-
+# TODO(build): bump libtorch to 1.6.0
 PKG_NAME="libtorch-1.5.1-gpu-apollo.zip"
-DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 CHECKSUM="6e8aa94e2f7086d3ecc79484ade50cdcac69f1b51b1f04e4feda2f9384b4c380"
 
-#https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 unzip ${PKG_NAME}
 

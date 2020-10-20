@@ -22,7 +22,7 @@ Apollo 6.0 extended the technology to incorporate data-driven mothedologies to t
 
 ## E2E Mode
    ![](images/e2e_mode.png)
-### How to Enable 
+### How to Enable
 - Change the configuration "learning_mode" in apollo/modules/planning/conf/planning_config.pb.txt to be "E2E_TEST" if Apollo is run in simulation or "E2E" on real vehicle
 - Change the configuration "model_type" in apollo/modules/planning/conf/scenario/learning_model_sample_config.pb.txt to be either "CNN_LSTM" or "CNN" and adapt the following "cpu_model_file" and "gpu_model_file" file paths. "CNN_LSTM" is the preferred model for now.
 
@@ -48,9 +48,9 @@ The parameter `path_reference_l_weight` is for adjusting hybrid model path outpu
 
 ## Apollo 5.5 vs E2E Mode vs Hybrid Mode
 
-We demonstrate simulation results on a dynamic nudge scenario with Apollo 5.5, E2E mode, and Hybrid mode. 
+We demonstrate simulation results on a dynamic nudge scenario with Apollo 5.5, E2E mode, and Hybrid mode.
 
-- Apollo 5.5 
+- Apollo 5.5
 
 ![](images/sim_rule.gif)
 
@@ -190,10 +190,16 @@ The Emergency scenario is another newly introduced scenario in Apollo 5.5, devel
 
 In Apollo 5.5, the Planning module architecture has been modified to incorporate new curb-to-curb driving scenarios on urban roads. As seen in the figure below, we have 2 new complex scenarios Emergency and Park-and-go. In order to plan these scenarios effectively, we have 2 new Deciders - Path Reuse Decider and Speed Bound Decider and have updated existing deciders making the planning architecture robust and flexible enough to handle many different types of urban road driving scenarios.
 
-Each driving scenario has its set of driving parameters that are unique to that scenario making it safer, efficient, easier to customize and debug and more flexible. 
+Each driving scenario has its set of driving parameters that are unique to that scenario making it safer, efficient, easier to customize and debug and more flexible.
 
 > Note:
 >
 > > If you wish to include your own driving scenarios, please refer to existing scenarios as a reference. We currently do not have a template for writing your own planning scenario.
 
 ![](images/architecture_5.5.png)
+
+
+## Related Paper
+
+1. [He R, Zhou J, Jiang S, Wang Y, Tao J, Song S, Hu J, Miao J, Luo Q. "TDR-OBCA: A Reliable Planner for Autonomous Driving in Free-Space Environment." *arXiv preprint arXiv:2009.11345.* ](https://arxiv.org/pdf/2009.11345.pdf)
+2. [Zhou J, He R, Wang Y, Jiang S, Zhu Z, Hu J, Miao J, Luo Q. "DL-IAPS and PJSO: A Path/Speed Decoupled Trajectory Optimization and its Application in Autonomous Driving." *arXiv preprint arXiv:2009.11135.*](https://arxiv.org/pdf/2009.11135.pdf)

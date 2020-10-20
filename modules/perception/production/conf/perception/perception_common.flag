@@ -104,17 +104,19 @@
 # default: -1.5
 --ground_removal_height=-1.5
 
-# enable down-sample point cloud by beams
+# enable down-sampling point cloud by beams. Set false to use full cloud for
+# more accurate detection, but some obstacles in front of ego vehicle might
+# not be detected if you use 128c Lidar.
 # type: bool
-# default: false
---enable_downsample_beams=false
+# default: true
+--enable_downsample_beams=true
 
 # factor for down-sampling point cloud beams
 # type: int
 # default: 4
 --downsample_beams_factor=4
 
-# enable down-sample point cloud by voxelization
+# enable down-sampling point cloud by voxelization
 # type: bool
 # default: false
 --enable_downsample_pointcloud=false

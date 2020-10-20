@@ -6,10 +6,12 @@
 
 ## 内容
 
-- [车辆校准指南](#车辆校准指南)
-- [硬件和软件安装](#硬件和软件安装)
-- [DreamView的使用](#硬件和软件安装)
-- [上车测试](#上车测试)
+- [Apollo 3.0 快速入门指南](#apollo-30-快速入门指南)
+  - [内容](#内容)
+  - [车辆校准指南](#车辆校准指南)
+  - [硬件和软件安装](#硬件和软件安装)
+  - [DreamView的使用](#dreamview的使用)
+  - [上车测试](#上车测试)
 
 ## 车辆校准指南
 
@@ -17,7 +19,7 @@
 
 ## 硬件和软件安装
 
-请参考[Apollo 3.0 硬件与系统安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_hardware_system_installation_guide_cn.md)获取安装硬件组件的步骤，参考[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)获取软件安装步骤。
+请参考[Apollo 3.0 硬件与系统安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_hardware_system_installation_guide_cn.md)获取安装硬件组件的步骤，参考[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/apollo_software_installation_guide_cn.md)获取软件安装步骤。
 
 ## DreamView的使用
 
