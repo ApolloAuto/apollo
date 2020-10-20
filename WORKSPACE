@@ -9,7 +9,7 @@ http_archive(
     name = "bazel_skylib",
     sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
     urls = [
-        "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/bazel-skylib-1.0.3.tar.gz",
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/bazel-skylib-1.0.3.tar.gz",
         "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
     ],
 )
@@ -23,7 +23,7 @@ http_archive(
     sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
     strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
     urls = [
-        "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
         "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
     ],
 )
@@ -39,7 +39,7 @@ http_archive(
     sha256 = "b5668cde8bb6e3515057ef465a35ad712214962f0b3a314e551204266c7be90c",
     strip_prefix = "rules_python-0.0.2",
     urls = [
-        "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/rules_python-0.0.2.tar.gz",
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/rules_python-0.0.2.tar.gz",
         "https://github.com/bazelbuild/rules_python/releases/download/0.0.2/rules_python-0.0.2.tar.gz",
     ],
 )
@@ -66,7 +66,7 @@ http_archive(
     sha256 = "419dba362eaf8f1d36849ceee17c3e2ff8ff12ac666b42d3ff02a164ebe090e9",
     strip_prefix = "grpc-1.30.0",
     urls = [
-        "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/v1.30.0.tar.gz",
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/v1.30.0.tar.gz",
         "https://github.com/grpc/grpc/archive/v1.30.0.tar.gz",
     ],
 )

@@ -14,7 +14,7 @@ def repo():
         sha256 = "de7d5e7a2d9551d325898c71e41d437d5f7b51e754b242af897f7be96e713a42",
         strip_prefix = "civetweb-1.11",
         urls = [
-            "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/v1.11.tar.gz",
+            "https://apollo-system.cdn.bcebos.com/archive/6.0/v1.11.tar.gz",
             "https://github.com/civetweb/civetweb/archive/v1.11.tar.gz",
         ],
     )

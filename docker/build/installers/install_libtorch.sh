@@ -34,7 +34,7 @@ if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     # libtorch_cpu
     PKG_NAME="libtorch_cpu-1.6.0-linux-aarch64.tar.gz"
     CHECKSUM="712a33a416767de625a3f2da54ec384d50882b10e1b1fc5da8df4158ef6edd06"
-    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
     tar xzf "${PKG_NAME}"
@@ -46,7 +46,7 @@ if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     # libtorch_gpu
     PKG_NAME="libtorch_gpu-1.6.0-linux-aarch64.tar.gz"
     CHECKSUM="bf9495110641b0f0dda44e3c93f06f221b54af990688a9202a377ec9b3348666"
-    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
     tar xzf "${PKG_NAME}"
@@ -63,7 +63,7 @@ pip3_install mkl
 
 # TODO(build): bump libtorch to 1.6.0
 PKG_NAME="libtorch-1.5.1-gpu-apollo.zip"
-DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 CHECKSUM="6e8aa94e2f7086d3ecc79484ade50cdcac69f1b51b1f04e4feda2f9384b4c380"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
