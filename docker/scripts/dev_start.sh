@@ -412,12 +412,6 @@ function mount_other_volumes() {
     info "Mount other volumes ..."
     local volume_conf=
 
-    # LOCALIZATION
-    local localization_volume="apollo_localization_volume_${USER}"
-    local localization_image="${DOCKER_REPO}:localization_volume-${TARGET_ARCH}-latest"
-    docker_restart_volume "${localization_volume}" "${localization_image}"
-    volume_conf="${volume_conf} --volumes-from ${localization_volume}"
-
     # AUDIO
     local audio_volume="apollo_audio_volume_${USER}"
     local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
