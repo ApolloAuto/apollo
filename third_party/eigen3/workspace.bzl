@@ -14,7 +14,7 @@ def repo():
         sha256 = "a8d87c8df67b0404e97bcef37faf3b140ba467bc060e2b883192165b319cea8d",
         strip_prefix = "eigen-git-mirror-3.3.7",
         urls = [
-            "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/3.3.7.tar.gz",
+            "https://apollo-system.cdn.bcebos.com/archive/6.0/3.3.7.tar.gz",
             "https://github.com/eigenteam/eigen-git-mirror/archive/3.3.7.tar.gz",
         ],
     )

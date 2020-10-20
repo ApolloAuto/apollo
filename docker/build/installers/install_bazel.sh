@@ -71,8 +71,8 @@ elif [ "$TARGET_ARCH" == "aarch64" ]; then
 
   BUILDTOOLS_VERSION="3.3.0"
   PKG_NAME="buildifier-${BUILDTOOLS_VERSION}-linux-arm64"
-  CHECKSUM="11df20761f6a14adcc21ea684225e029d6a5f4a881eb3477ea8c24afda316bdf"
-  DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
+  CHECKSUM="19d5b358cb099e264086b26091661fd7548df0a2400e47fd98238cfe0a3e67f9"
+  DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
   download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
   cp -f ${PKG_NAME} "${SYSROOT_DIR}/bin/buildifier"

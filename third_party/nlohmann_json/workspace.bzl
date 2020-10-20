@@ -14,7 +14,7 @@ def repo():
         strip_prefix = "json-3.8.0",
         build_file = clean_dep("//third_party/nlohmann_json:json.BUILD"),
         urls = [
-            "https://apollo-platform-system.cdn.bcebos.com/archive/6.0/v3.8.0.tar.gz",
+            "https://apollo-system.cdn.bcebos.com/archive/6.0/v3.8.0.tar.gz",
             "https://github.com/nlohmann/json/archive/v3.8.0.tar.gz",
         ],
     )
