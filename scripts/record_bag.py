@@ -45,10 +45,15 @@ import psutil
 
 
 LARGE_TOPICS = [
+    '/apollo/sensor/camera/front_12mm/image',
     '/apollo/sensor/camera/front_12mm/image/compressed',
+    '/apollo/sensor/camera/front_6mm/image',
     '/apollo/sensor/camera/front_6mm/image/compressed',
+    '/apollo/sensor/camera/left_fisheye/image',
     '/apollo/sensor/camera/left_fisheye/image/compressed',
+    '/apollo/sensor/camera/rear_6mm/image',
     '/apollo/sensor/camera/rear_6mm/image/compressed',
+    '/apollo/sensor/camera/right_fisheye/image',
     '/apollo/sensor/camera/right_fisheye/image/compressed',
     '/apollo/sensor/camera/front_12mm/video/compressed',
     '/apollo/sensor/camera/front_6mm/video/compressed',
