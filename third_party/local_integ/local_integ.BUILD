@@ -13,7 +13,6 @@ cc_library(
         "include/*.h",
     ]),
     linkopts = [
-        "-L/usr/lib/x86_64-linux-gnu",
-        "-lz",
+        "-lm",
     ],
 )
