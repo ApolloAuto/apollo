@@ -42,7 +42,7 @@ using apollo::cyber::record::Recoverer;
 using apollo::cyber::record::Spliter;
 
 const char INFO_OPTIONS[] = "h";
-const char RECORD_OPTIONS[] = "o:ac:i:m:h";
+const char RECORD_OPTIONS[] = "o:ac:k:i:m:h";
 const char PLAY_OPTIONS[] = "f:ac:k:lr:b:e:s:d:p:h";
 const char SPLIT_OPTIONS[] = "f:o:c:k:b:e:h";
 const char RECOVER_OPTIONS[] = "f:o:h";
@@ -424,7 +424,8 @@ int main(int argc, char** argv) {
     }
     ::apollo::cyber::Init(argv[0]);
     auto recorder = std::make_shared<Recorder>(opt_output_vec[0], opt_all,
-                                               opt_white_channels, opt_header);
+                                               opt_white_channels,
+                                               opt_black_channels, opt_header);
     bool record_result = recorder->Start();
     if (record_result) {
       while (!::apollo::cyber::IsShutdown()) {
