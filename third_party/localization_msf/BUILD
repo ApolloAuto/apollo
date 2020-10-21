@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/platform/build_defs.bzl", "if_aarch64_mode", "if_x86_mode")
+load("//tools/platform:build_defs.bzl", "if_aarch64_mode", "if_x86_mode")
 
 package(default_visibility = ["//visibility:public"])
 
