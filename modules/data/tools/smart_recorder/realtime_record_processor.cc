@@ -128,13 +128,14 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   max_backward_time_ = trigger_conf.max_backward_time();
   min_restore_chunk_ = trigger_conf.min_restore_chunk();
   std::vector<std::string> all_channels;
+  std::vector<std::string> black_channels;
   const std::set<std::string>& all_channels_set =
       ChannelPool::Instance()->GetAllChannels();
   std::copy(all_channels_set.begin(), all_channels_set.end(),
             std::back_inserter(all_channels));
   recorder_ = std::make_shared<Recorder>(
       absl::StrCat(source_record_dir_, "/", default_output_filename_), false,
-      all_channels, HeaderBuilder::GetHeader());
+      all_channels, black_channels, HeaderBuilder::GetHeader());
   // Init base
   if (!RecordProcessor::Init(trigger_conf)) {
     AERROR << "base init failed";
