@@ -27,7 +27,7 @@ It lists all available disks mounted under /media, and prioritize them in order:
    - ...
 
 1. If we have NVME disk, it will be used to record all data.
-2. If we have Non-NVME disk, it will only record SMALL_TOPICS, unless '--all' is
+2. If we have Non-NVME disk, it will only record smaller topics (blacklist LARGE_TOPICS), unless '--all' is
    specified.
 3. If no external disks are available, we will take '/apollo' as a
    'Non-NVME disk' and follow the rule above.
@@ -43,46 +43,6 @@ import sys
 
 import psutil
 
-
-SMALL_TOPICS = [
-    '/apollo/canbus/chassis',
-    '/apollo/canbus/chassis_detail',
-    '/apollo/control',
-    '/apollo/control/pad',
-    '/apollo/drive_event',
-    '/apollo/guardian',
-    '/apollo/hmi/status',
-    '/apollo/localization/pose',
-    '/apollo/localization/msf_gnss',
-    '/apollo/localization/msf_lidar',
-    '/apollo/localization/msf_status',
-    '/apollo/monitor',
-    '/apollo/monitor/system_status',
-    '/apollo/navigation',
-    '/apollo/perception/obstacles',
-    '/apollo/perception/traffic_light',
-    '/apollo/planning',
-    '/apollo/prediction',
-    '/apollo/relative_map',
-    '/apollo/routing_request',
-    '/apollo/routing_response',
-    '/apollo/routing_response_history',
-    '/apollo/sensor/conti_radar',
-    '/apollo/sensor/delphi_esr',
-    '/apollo/sensor/gnss/best_pose',
-    '/apollo/sensor/gnss/corrected_imu',
-    '/apollo/sensor/gnss/gnss_status',
-    '/apollo/sensor/gnss/imu',
-    '/apollo/sensor/gnss/ins_stat',
-    '/apollo/sensor/gnss/odometry',
-    '/apollo/sensor/gnss/raw_data',
-    '/apollo/sensor/gnss/rtk_eph',
-    '/apollo/sensor/gnss/rtk_obs',
-    '/apollo/sensor/gnss/heading',
-    '/apollo/sensor/mobileye',
-    '/tf',
-    '/tf_static',
-]
 
 LARGE_TOPICS = [
     '/apollo/sensor/camera/front_12mm/image/compressed',
@@ -136,13 +96,11 @@ class ArgManager(object):
                                  help='Stop recorder.')
         self.parser.add_argument('--stop_signal', default="SIGTERM",
                                  help='Signal to stop the recorder.')
-        self.parser.add_argument('--additional_topics', action='append',
-                                 help='Record additional topics.')
         self.parser.add_argument('--all', default=False, action="store_true",
                                  help='Record all topics even without high '
                                  'performance disks.')
         self.parser.add_argument('--small', default=False, action="store_true",
-                                 help='Record samll topics only.')
+                                 help='Record small topics only.')
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
                                  'as parameter to "rosbag record --duration".')
@@ -203,31 +161,27 @@ class Recorder(object):
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
 
-        topics = list(SMALL_TOPICS)
-        if record_all:
-            topics.extend(LARGE_TOPICS)
-        if self.args.additional_topics:
-            topics.extend(self.args.additional_topics)
-        self.record_task(disk_to_use, SMALL_TOPICS, True)
-        self.record_task(disk_to_use, topics)
+        self.record_task(disk_to_use, record_all)
 
     def stop(self):
         """Stop recording."""
         shell_cmd('pkill --signal {} -f "cyber_recorder record"'.format(
             self.args.stop_signal))
 
-    def record_task(self, disk, topics, is_small_topic=False):
+    def record_task(self, disk, record_all):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        if is_small_topic:
+        if not record_all:
             task_id += "_s"
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
 
+        topics_str = "--all"
+
         log_file = '/apollo/data/log/apollo_record.out'
-        if is_small_topic:
+        if not record_all:
             log_file += "_s"
-        topics_str = ' -c '.join(topics)
+            topics_str += " -k {}".format(' -k '.join(list(LARGE_TOPICS)))
 
         if not os.path.exists(task_dir):
             os.makedirs(task_dir)
@@ -235,7 +189,7 @@ class Recorder(object):
             cd "{}"
             source /apollo/scripts/apollo_base.sh
             source /apollo/framework/install/setup.bash
-            nohup cyber_recorder record -c {} >{} 2>&1 &
+            nohup cyber_recorder record {} >{} 2>&1 &
         '''.format(task_dir, topics_str, log_file)
         shell_cmd(cmd)
 
