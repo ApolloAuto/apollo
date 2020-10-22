@@ -63,9 +63,6 @@ class MSFLocalizationComponent final
       gnss_heading_listener_ = nullptr;
   std::string gnss_heading_topic_ = "";
 
-  std::shared_ptr<cyber::Reader<Gps>> gps_listener_ = nullptr;
-  std::string gps_topic_ = "";
-
  private:
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
   MSFLocalization localization_;
