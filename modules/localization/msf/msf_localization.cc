@@ -185,6 +185,10 @@ void MSFLocalization::InitParams() {
       FLAGS_localization_std_x_threshold_2;
   localization_param_.localization_std_y_threshold_2 =
       FLAGS_localization_std_y_threshold_2;
+
+  localization_timer_.reset(new cyber::Timer(
+      10, [this]() { this->OnLocalizationTimer(); }, false));
+  localization_timer_->Start();
 }
 
 void MSFLocalization::OnPointCloud(
@@ -304,7 +308,7 @@ void MSFLocalization::OnGnssHeading(
   localization_integ_.GnssHeadingProcess(*gnss_heading_msg);
 }
 
-void MSFLocalization::OnGps() {
+void MSFLocalization::OnLocalizationTimer() {
   if (!raw_imu_msg_) {
     return;
   }

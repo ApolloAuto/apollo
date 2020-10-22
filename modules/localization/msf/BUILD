@@ -59,8 +59,7 @@ cc_binary(
 
 cc_test(
     name = "msf_localization_test",
-    size = "small",
-    timeout = "short",
+    size = "enormous",
     srcs = ["msf_localization_test.cc"],
     copts = [
         "-fno-access-control",

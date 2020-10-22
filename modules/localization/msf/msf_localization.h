@@ -75,9 +75,9 @@ class MSFLocalization {
       const std::shared_ptr<drivers::gnss::GnssBestPose> &bestgnsspos_msg);
   void OnGnssHeading(
       const std::shared_ptr<drivers::gnss::Heading> &gnss_heading_msg);
-  void OnGps();
 
   void SetPublisher(const std::shared_ptr<LocalizationMsgPublisher> &publisher);
+  void OnLocalizationTimer();
 
  private:
   bool LoadGnssAntennaExtrinsic(const std::string &file_path, double *offset_x,
@@ -105,6 +105,7 @@ class MSFLocalization {
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
   std::shared_ptr<drivers::gnss::Imu> raw_imu_msg_;
   std::mutex mutex_imu_msg_;
+  std::unique_ptr<cyber::Timer> localization_timer_ = nullptr;
 };
 
 }  // namespace localization
