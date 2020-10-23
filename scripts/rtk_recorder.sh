@@ -20,16 +20,16 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function setup() {
-  bash scripts/canbus.sh start
-  bash scripts/gps.sh start
-  bash scripts/localization.sh start
-  bash scripts/control.sh start
+  bash ${TOP_DIR}/scripts/canbus.sh start
+  bash ${TOP_DIR}/scripts/gps.sh start
+  bash ${TOP_DIR}/scripts/localization.sh start
+  bash ${TOP_DIR}/scripts/control.sh start
 }
 
 function start() {
   TIME="$(date +%F_%H_%M)"
-  if [ -e data/log/garage.csv ]; then
-    cp data/log/garage.csv data/log/garage-${TIME}.csv
+  if [ -f ${TOP_DIR}/data/log/garage.csv ]; then
+    cp ${TOP_DIR}/data/log/garage.csv ${TOP_DIR}/data/log/garage-${TIME}.csv
   fi
 
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"

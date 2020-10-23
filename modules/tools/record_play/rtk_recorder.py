@@ -172,15 +172,20 @@ def main(argv):
     """
     node = cyber.Node("rtk_recorder")
     argv = FLAGS(argv)
-    log_dir = os.path.dirname(os.path.abspath(
-        __file__)) + "/../../../data/log/"
+
+    log_dir = "/apollo/data/log"
+    if len(argv) > 1:
+        log_dir = argv[1]
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
+
     Logger.config(
         log_file=log_dir + "rtk_recorder.log",
         use_stdout=True,
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "rtk_recorder.log"))
+
     record_file = log_dir + "/garage.csv"
     recorder = RtkRecord(record_file)
     atexit.register(recorder.shutdown)
