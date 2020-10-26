@@ -99,7 +99,7 @@ class ArgManager(object):
                                  'that case, the False value is ignored.')
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
-        self.parser.add_argument('--stop_signal', default="SIGTERM",
+        self.parser.add_argument('--stop_signal', default="SIGINT",
                                  help='Signal to stop the recorder.')
         self.parser.add_argument('--all', default=False, action="store_true",
                                  help='Record all topics even without high '
