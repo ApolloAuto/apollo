@@ -180,8 +180,6 @@ bool RecordWriter::IsNewChannel(const std::string& channel_name) const {
          channel_message_number_map_.end();
 }
 
-void RecordWriter::WaitForWrite() { file_writer_->WaitForWrite(); }
-
 void RecordWriter::OnNewChannel(const std::string& channel_name,
                                 const std::string& message_type,
                                 const std::string& proto_desc) {

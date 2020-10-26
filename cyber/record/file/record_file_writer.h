@@ -19,9 +19,9 @@
 
 #include <condition_variable>
 #include <fstream>
-#include <future>
 #include <memory>
 #include <string>
+#include <thread>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -74,13 +74,10 @@ struct Chunk {
   std::unique_ptr<proto::ChunkBody> body_ = nullptr;
 };
 
-/**
-Writes cyber record files on an asynchronous task
-*/
 class RecordFileWriter : public RecordFileBase {
  public:
-  RecordFileWriter() = default;
-  ~RecordFileWriter();
+  RecordFileWriter();
+  virtual ~RecordFileWriter();
   bool Open(const std::string& path) override;
   void Close() override;
   bool WriteHeader(const proto::Header& header);
@@ -88,22 +85,19 @@ class RecordFileWriter : public RecordFileBase {
   bool WriteMessage(const proto::SingleMessage& message);
   uint64_t GetMessageNumber(const std::string& channel_name) const;
 
-  // For testing
-  void WaitForWrite();
-
  private:
   bool WriteChunk(const proto::ChunkHeader& chunk_header,
                   const proto::ChunkBody& chunk_body);
   template <typename T>
   bool WriteSection(const T& message);
   bool WriteIndex();
-  void Flush(const Chunk& chunk);
-  bool IsChunkFlushEmpty();
-  void BlockUntilSpaceAvailable();
-  // make moveable
-  std::unique_ptr<Chunk> chunk_active_;
-  // Initialize with a dummy value to simplify checking later
-  std::future<void> flush_task_ = std::async(std::launch::async, []() {});
+  void Flush();
+  bool is_writing_ = false;
+  std::unique_ptr<Chunk> chunk_active_ = nullptr;
+  std::unique_ptr<Chunk> chunk_flush_ = nullptr;
+  std::shared_ptr<std::thread> flush_thread_ = nullptr;
+  std::mutex flush_mutex_;
+  std::condition_variable flush_cv_;
   std::unordered_map<std::string, uint64_t> channel_message_number_map_;
 };
 
@@ -131,8 +125,7 @@ bool RecordFileWriter::WriteSection(const T& message) {
   Section section;
   /// zero out whole struct even if padded
   memset(&section, 0, sizeof(section));
-  section.type = type;
-  section.size = static_cast<int64_t>(message.ByteSizeLong());
+  section = {type, static_cast<int64_t>(message.ByteSizeLong())};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;

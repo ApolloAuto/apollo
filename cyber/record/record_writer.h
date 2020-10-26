@@ -170,11 +170,6 @@ class RecordWriter : public RecordBase {
    */
   bool IsNewChannel(const std::string& channel_name) const;
 
-  /**
-   * @brief Meant for testing
-   */
-  void WaitForWrite();
-
  private:
   bool WriteMessage(const proto::SingleMessage& single_msg);
   bool SplitOutfile();

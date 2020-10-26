@@ -222,56 +222,56 @@ TEST(RecordFileTest, TestOneChunkFile) {
 
 TEST(RecordFileTest, TestIndex) {
   {
-    RecordFileWriter rfw;
+    RecordFileWriter* rfw = new RecordFileWriter();
 
-    ASSERT_TRUE(rfw.Open(kTestFile2));
-    ASSERT_EQ(kTestFile2, rfw.GetPath());
+    ASSERT_TRUE(rfw->Open(kTestFile2));
+    ASSERT_EQ(kTestFile2, rfw->GetPath());
 
     Header header = HeaderBuilder::GetHeaderWithChunkParams(0, 0);
     header.set_segment_interval(0);
     header.set_segment_raw_size(0);
-    ASSERT_TRUE(rfw.WriteHeader(header));
-    ASSERT_FALSE(rfw.GetHeader().is_complete());
+    ASSERT_TRUE(rfw->WriteHeader(header));
+    ASSERT_FALSE(rfw->GetHeader().is_complete());
 
     Channel chan1;
     chan1.set_name(kChan1);
     chan1.set_message_type(kMsgType);
     chan1.set_proto_desc(kStr10B);
-    ASSERT_TRUE(rfw.WriteChannel(chan1));
+    ASSERT_TRUE(rfw->WriteChannel(chan1));
 
     Channel chan2;
     chan2.set_name(kChan2);
     chan2.set_message_type(kMsgType);
     chan2.set_proto_desc(kStr10B);
-    ASSERT_TRUE(rfw.WriteChannel(chan2));
+    ASSERT_TRUE(rfw->WriteChannel(chan2));
 
     SingleMessage msg1;
     msg1.set_channel_name(chan1.name());
     msg1.set_content(kStr10B);
     msg1.set_time(1e9);
-    ASSERT_TRUE(rfw.WriteMessage(msg1));
-    ASSERT_EQ(1, rfw.GetMessageNumber(chan1.name()));
+    ASSERT_TRUE(rfw->WriteMessage(msg1));
+    ASSERT_EQ(1, rfw->GetMessageNumber(chan1.name()));
 
     SingleMessage msg2;
     msg2.set_channel_name(chan2.name());
     msg2.set_content(kStr10B);
     msg2.set_time(2e9);
-    ASSERT_TRUE(rfw.WriteMessage(msg2));
-    ASSERT_EQ(1, rfw.GetMessageNumber(chan2.name()));
+    ASSERT_TRUE(rfw->WriteMessage(msg2));
+    ASSERT_EQ(1, rfw->GetMessageNumber(chan2.name()));
 
     SingleMessage msg3;
     msg3.set_channel_name(chan1.name());
     msg3.set_content(kStr10B);
     msg3.set_time(3e9);
-    ASSERT_TRUE(rfw.WriteMessage(msg3));
-    ASSERT_EQ(2, rfw.GetMessageNumber(chan1.name()));
+    ASSERT_TRUE(rfw->WriteMessage(msg3));
+    ASSERT_EQ(2, rfw->GetMessageNumber(chan1.name()));
 
-    rfw.Close();
-    ASSERT_TRUE(rfw.GetHeader().is_complete());
-    ASSERT_EQ(1, rfw.GetHeader().chunk_number());
-    ASSERT_EQ(1e9, rfw.GetHeader().begin_time());
-    ASSERT_EQ(3e9, rfw.GetHeader().end_time());
-    ASSERT_EQ(3, rfw.GetHeader().message_number());
+    rfw->Close();
+    ASSERT_TRUE(rfw->GetHeader().is_complete());
+    ASSERT_EQ(1, rfw->GetHeader().chunk_number());
+    ASSERT_EQ(1e9, rfw->GetHeader().begin_time());
+    ASSERT_EQ(3e9, rfw->GetHeader().end_time());
+    ASSERT_EQ(3, rfw->GetHeader().message_number());
   }
   {
     RecordFileReader reader;
@@ -304,7 +304,6 @@ TEST(RecordFileTest, TestIndex) {
       }
     }
   }
-  ASSERT_FALSE(remove(kTestFile2));
 }
 
 }  // namespace record
