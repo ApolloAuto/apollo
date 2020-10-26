@@ -60,26 +60,26 @@ void TransformCache::AddTransform(const StampedTransform& transform) {
   transforms_.push_back(transform);
 }
 
-Eigen::Quaterniond slerp(const Eigen::Quaterniond& source, const double& t,
+Eigen::Quaterniond Slerp(const Eigen::Quaterniond& source, const double& t,
                          const Eigen::Quaterniond& other) {
   const double one = 1.0 - std::numeric_limits<double>::epsilon();
   double d = source.x() * other.x() + source.y() * other.y() +
              source.z() * other.z() + source.w() * other.w();
-  double absD = std::abs(d);
+  double abs_d = std::abs(d);
 
   double scale0;
   double scale1;
 
-  if (absD >= one) {
+  if (abs_d >= one) {
     scale0 = 1.0 - t;
     scale1 = t;
   } else {
     // theta is the angle between the 2 quaternions
-    double theta = std::acos(absD);
-    double sinTheta = std::sin(theta);
+    double theta = std::acos(abs_d);
+    double sin_theta = std::sin(theta);
 
-    scale0 = std::sin((1.0 - t) * theta) / sinTheta;
-    scale1 = std::sin((t * theta)) / sinTheta;
+    scale0 = std::sin((1.0 - t) * theta) / sin_theta;
+    scale1 = std::sin((t * theta)) / sin_theta;
   }
   if (d < 0) scale1 = -scale1;
 
@@ -114,7 +114,7 @@ bool TransformCache::QueryTransform(double timestamp,
         (timestamp - transforms_[size - 2].timestamp) /
         (transforms_[size - 1].timestamp - transforms_[size - 2].timestamp);
 
-    transform->rotation = slerp(transforms_[size - 2].rotation, ratio,
+    transform->rotation = Slerp(transforms_[size - 2].rotation, ratio,
                                 transforms_[size - 1].rotation);
 
     transform->translation.x() =
