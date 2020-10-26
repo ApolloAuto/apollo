@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
+#include <limits>
+
 #include "cyber/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
