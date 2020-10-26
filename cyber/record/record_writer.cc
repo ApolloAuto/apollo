@@ -16,11 +16,8 @@
 
 #include "cyber/record/record_writer.h"
 
-#include <chrono>
-#include <future>
 #include <iomanip>
 #include <iostream>
-#include <utility>
 
 #include "cyber/common/log.h"
 
@@ -144,11 +141,8 @@ bool RecordWriter::WriteMessage(const SingleMessage& message) {
        message.time() - segment_begin_time_ > header_.segment_interval()) ||
       (header_.segment_raw_size() > 0 &&
        segment_raw_size_ > header_.segment_raw_size())) {
-    ACHECK(old_file_writer_closer_.wait_for(std::chrono::milliseconds(0)) ==
-           std::future_status::ready);
-    // Close the file via the destructor asynchronously
-    old_file_writer_closer_ = std::async(
-        std::launch::async, [](FileWriterPtr p) {}, std::move(file_writer_));
+    file_writer_backup_.swap(file_writer_);
+    file_writer_backup_->Close();
     if (!SplitOutfile()) {
       AERROR << "Split out file is failed.";
       return false;
