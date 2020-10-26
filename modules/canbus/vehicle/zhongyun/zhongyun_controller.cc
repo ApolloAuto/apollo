@@ -354,7 +354,7 @@ ErrorCode ZhongyunController::EnableSpeedOnlyMode() {
 
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
+    AERROR << "Failed to switch to AUTO_SPEED_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
