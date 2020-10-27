@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/common/junction_analyzer.h"
+
 #include <algorithm>
 #include <limits>
 #include <queue>
 #include <unordered_set>
 #include <utility>
 
-#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -51,14 +52,15 @@ void JunctionAnalyzer::Clear() {
 void JunctionAnalyzer::SetAllJunctionExits() {
   CHECK_NOTNULL(junction_info_ptr_);
   // Go through everything that the junction overlaps with.
-  for (const auto& overlap_id : junction_info_ptr_->junction().overlap_id()) {
+  for (const auto& overlap_id :
+       junction_info_ptr_->inner_object().overlap_id()) {
     auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
     if (overlap_info_ptr == nullptr) {
       continue;
     }
     // Find the lane-segments that are overlapping, yet also extends out of
     // the junction area. Those are the junction-exit-lanes.
-    for (const auto& object : overlap_info_ptr->overlap().object()) {
+    for (const auto& object : overlap_info_ptr->inner_object().object()) {
       if (object.has_lane_overlap_info()) {
         const std::string& lane_id = object.id().id();
         auto lane_info_ptr = PredictionMap::LaneById(lane_id);
@@ -107,7 +109,7 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     if (level >= max_search_level) {
       continue;
     }
-    for (const auto& succ_lane_id : curr_lane->lane().successor_id()) {
+    for (const auto& succ_lane_id : curr_lane->inner_object().successor_id()) {
       ConstLaneInfoPtr succ_lane_ptr =
           PredictionMap::LaneById(succ_lane_id.id());
       lane_info_queue.emplace(succ_lane_ptr, level + 1);
@@ -174,8 +176,8 @@ const std::string& JunctionAnalyzer::GetJunctionId() {
 
 double JunctionAnalyzer::ComputeJunctionRange() {
   CHECK_NOTNULL(junction_info_ptr_);
-  if (!junction_info_ptr_->junction().has_polygon() ||
-      junction_info_ptr_->junction().polygon().point_size() < 3) {
+  if (!junction_info_ptr_->inner_object().has_polygon() ||
+      junction_info_ptr_->inner_object().polygon().point_size() < 3) {
     AERROR << "Junction [" << GetJunctionId()
            << "] has not enough polygon points to compute range";
     return FLAGS_defualt_junction_range;
@@ -184,7 +186,8 @@ double JunctionAnalyzer::ComputeJunctionRange() {
   double x_max = -std::numeric_limits<double>::infinity();
   double y_min = std::numeric_limits<double>::infinity();
   double y_max = -std::numeric_limits<double>::infinity();
-  for (const auto& point : junction_info_ptr_->junction().polygon().point()) {
+  for (const auto& point :
+       junction_info_ptr_->inner_object().polygon().point()) {
     x_min = std::min(x_min, point.x());
     x_max = std::max(x_max, point.x());
     y_min = std::min(y_min, point.y());

@@ -99,14 +99,13 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
   auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
       ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
 
-  if (ptr_left_neighbor_lane == nullptr &&
-      ptr_ego_lane->lane().has_left_boundary() &&
-      ptr_ego_lane->lane().left_boundary().boundary_type_size() != 0 &&
-      ptr_ego_lane->lane().left_boundary().boundary_type(0).types_size() != 0 &&
-      ptr_ego_lane->lane().left_boundary().boundary_type(0).types(0) !=
+  const auto& ego_raw_lane = ptr_ego_lane->inner_object();
+  if (ptr_left_neighbor_lane == nullptr && ego_raw_lane.has_left_boundary() &&
+      ego_raw_lane.left_boundary().boundary_type_size() != 0 &&
+      ego_raw_lane.left_boundary().boundary_type(0).types_size() != 0 &&
+      ego_raw_lane.left_boundary().boundary_type(0).types(0) !=
           hdmap::LaneBoundaryType::CURB) {
-    const auto& reverse_lanes =
-        ptr_ego_lane->lane().left_neighbor_reverse_lane_id();
+    const auto& reverse_lanes = ego_raw_lane.left_neighbor_reverse_lane_id();
     std::for_each(
         reverse_lanes.begin(), reverse_lanes.end(),
         [&ptr_environment_features](decltype(*reverse_lanes.begin())& t) {
@@ -166,10 +165,11 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
   }
   // Only consider junction have overlap with signal or stop_sign
   bool need_consider = FLAGS_enable_all_junction;
-  for (const auto& overlap_id : junction->junction().overlap_id()) {
+  for (const auto& overlap_id : junction->inner_object().overlap_id()) {
     if (PredictionMap::OverlapById(overlap_id.id()) != nullptr) {
-      for (const auto& object :
-           PredictionMap::OverlapById(overlap_id.id())->overlap().object()) {
+      for (const auto& object : PredictionMap::OverlapById(overlap_id.id())
+                                    ->inner_object()
+                                    .object()) {
         if (object.has_signal_overlap_info() ||
             object.has_stop_sign_overlap_info()) {
           need_consider = true;

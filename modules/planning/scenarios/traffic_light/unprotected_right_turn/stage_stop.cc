@@ -148,7 +148,7 @@ bool TrafficLightUnprotectedRightTurnStageStop::
     return false;
   }
 
-  const auto& signal = traffic_light_ptr->signal();
+  const auto& signal = traffic_light_ptr->inner_object();
   for (int i = 0; i < signal.sign_info_size(); i++) {
     if (signal.sign_info(i).type() == hdmap::SignInfo::NO_RIGHT_TURN_ON_RED) {
       return true;

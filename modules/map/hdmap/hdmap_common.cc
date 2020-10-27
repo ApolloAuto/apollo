@@ -26,9 +26,9 @@ limitations under the License.
 
 namespace apollo {
 namespace hdmap {
-namespace {
-using apollo::common::PointENU;
-using apollo::common::math::Vec2d;
+
+using PointENU = apollo::common::PointENU;
+using Vec2d = apollo::common::math::Vec2d;
 
 // Minimum error in lane segmentation.
 // const double kSegmentationEpsilon = 0.2;
@@ -101,12 +101,10 @@ PointENU PointFromVec2d(const Vec2d &point) {
   return pt;
 }
 
-}  // namespace
-
-LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
+LaneInfo::LaneInfo(const Lane &lane) : BaseInfo<Lane>(lane) { Init(); }
 
 void LaneInfo::Init() {
-  PointsFromCurve(lane_.central_curve(), &points_);
+  PointsFromCurve(inner_object_.central_curve(), &points_);
   CHECK_GE(points_.size(), 2);
   segments_.clear();
   accumulated_s_.clear();
@@ -128,26 +126,26 @@ void LaneInfo::Init() {
   for (const auto &direction : unit_directions_) {
     headings_.push_back(direction.Angle());
   }
-  for (const auto &overlap_id : lane_.overlap_id()) {
+  for (const auto &overlap_id : inner_object_.overlap_id()) {
     overlap_ids_.emplace_back(overlap_id.id());
   }
   ACHECK(!segments_.empty());
 
   sampled_left_width_.clear();
   sampled_right_width_.clear();
-  for (const auto &sample : lane_.left_sample()) {
+  for (const auto &sample : inner_object_.left_sample()) {
     sampled_left_width_.emplace_back(sample.s(), sample.width());
   }
-  for (const auto &sample : lane_.right_sample()) {
+  for (const auto &sample : inner_object_.right_sample()) {
     sampled_right_width_.emplace_back(sample.s(), sample.width());
   }
 
-  if (lane_.has_type()) {
-    if (lane_.type() == Lane::CITY_DRIVING) {
+  if (inner_object_.has_type()) {
+    if (inner_object_.type() == Lane::CITY_DRIVING) {
       for (const auto &p : sampled_left_width_) {
         if (p.second < FLAGS_half_vehicle_width) {
           AERROR
-              << "lane[id = " << lane_.id().DebugString()
+              << "lane[id = " << inner_object_.id().DebugString()
               << "]. sampled_left_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
               << FLAGS_half_vehicle_width << "].";
@@ -156,25 +154,29 @@ void LaneInfo::Init() {
       for (const auto &p : sampled_right_width_) {
         if (p.second < FLAGS_half_vehicle_width) {
           AERROR
-              << "lane[id = " << lane_.id().DebugString()
+              << "lane[id = " << inner_object_.id().DebugString()
               << "]. sampled_right_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
               << FLAGS_half_vehicle_width << "].";
         }
       }
-    } else if (lane_.type() == Lane::NONE) {
-      AERROR << "lane_[id = " << lane_.id().DebugString() << "] type is NONE.";
+    } else if (inner_object_.type() == Lane::NONE) {
+      AERROR << "inner_object_[id = " << inner_object_.id().DebugString()
+             << "] type is NONE.";
     }
   } else {
-    AERROR << "lane_[id = " << lane_.id().DebugString() << "] has NO type.";
+    AERROR << "inner_object_[id = " << inner_object_.id().DebugString()
+           << "] has NO type.";
   }
 
   sampled_left_road_width_.clear();
   sampled_right_road_width_.clear();
-  for (const auto &sample : lane_.left_road_sample()) {
+  sampled_left_road_width_.reserve(inner_object_.left_road_sample().size());
+  sampled_right_road_width_.reserve(inner_object_.right_road_sample().size());
+  for (const auto &sample : inner_object_.left_road_sample()) {
     sampled_left_road_width_.emplace_back(sample.s(), sample.width());
   }
-  for (const auto &sample : lane_.right_road_sample()) {
+  for (const auto &sample : inner_object_.right_road_sample()) {
     sampled_right_road_width_.emplace_back(sample.s(), sample.width());
   }
 
@@ -446,9 +448,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       continue;
     }
     overlaps_.emplace_back(overlap_ptr);
-    for (const auto &object : overlap_ptr->overlap().object()) {
+    for (const auto &object : overlap_ptr->inner_object().object()) {
       const auto &object_id = object.id().id();
-      if (object_id == lane_.id().id()) {
+      if (object_id == inner_object_.id().id()) {
         continue;
       }
       const auto &object_map_id = MakeMapId(object_id);
@@ -501,19 +503,6 @@ void LaneInfo::CreateKDTree() {
   lane_segment_kdtree_.reset(new LaneSegmentKDTree(segment_box_list_, params));
 }
 
-JunctionInfo::JunctionInfo(const Junction &junction) : junction_(junction) {
-  Init();
-}
-
-void JunctionInfo::Init() {
-  polygon_ = ConvertToPolygon2d(junction_.polygon());
-  CHECK_GT(polygon_.num_points(), 2);
-
-  for (const auto &overlap_id : junction_.overlap_id()) {
-    overlap_ids_.emplace_back(overlap_id);
-  }
-}
-
 void JunctionInfo::PostProcess(const HDMapImpl &map_instance) {
   UpdateOverlaps(map_instance);
 }
@@ -521,61 +510,30 @@ void JunctionInfo::PostProcess(const HDMapImpl &map_instance) {
 void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
   for (const auto &overlap_id : overlap_ids_) {
     const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
-    if (overlap_ptr == nullptr) {
-      continue;
-    }
-
-    for (const auto &object : overlap_ptr->overlap().object()) {
-      const auto &object_id = object.id().id();
-      if (object_id == id().id()) {
-        continue;
-      }
-
-      if (object.has_stop_sign_overlap_info()) {
-        overlap_stop_sign_ids_.push_back(object.id());
+    if (overlap_ptr != nullptr) {
+      for (const auto &object : overlap_ptr->inner_object().object()) {
+        const auto &object_id = object.id().id();
+        if (object_id != id().id() && object.has_stop_sign_overlap_info()) {
+          overlap_stop_sign_ids_.push_back(object.id());
+        }
       }
     }
   }
 }
 
-SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
+SignalInfo::SignalInfo(const Signal &signal)
+    : SegmentBasedInfo<Signal>(signal) {
+  Init();
+}
 
 void SignalInfo::Init() {
-  for (const auto &stop_line : signal_.stop_line()) {
-    SegmentsFromCurve(stop_line, &segments_);
-  }
-  ACHECK(!segments_.empty());
   std::vector<Vec2d> points;
+  points.reserve(2 * segments_.size());
   for (const auto &segment : segments_) {
     points.emplace_back(segment.start());
     points.emplace_back(segment.end());
   }
   CHECK_GT(points.size(), 0);
-}
-
-CrosswalkInfo::CrosswalkInfo(const Crosswalk &crosswalk)
-    : crosswalk_(crosswalk) {
-  Init();
-}
-
-void CrosswalkInfo::Init() {
-  polygon_ = ConvertToPolygon2d(crosswalk_.polygon());
-  CHECK_GT(polygon_.num_points(), 2);
-}
-
-StopSignInfo::StopSignInfo(const StopSign &stop_sign) : stop_sign_(stop_sign) {
-  init();
-}
-
-void StopSignInfo::init() {
-  for (const auto &stop_line : stop_sign_.stop_line()) {
-    SegmentsFromCurve(stop_line, &segments_);
-  }
-  ACHECK(!segments_.empty());
-
-  for (const auto &overlap_id : stop_sign_.overlap_id()) {
-    overlap_ids_.emplace_back(overlap_id);
-  }
 }
 
 void StopSignInfo::PostProcess(const HDMapImpl &map_instance) {
@@ -585,67 +543,29 @@ void StopSignInfo::PostProcess(const HDMapImpl &map_instance) {
 void StopSignInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
   for (const auto &overlap_id : overlap_ids_) {
     const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
-    if (overlap_ptr == nullptr) {
-      continue;
-    }
-
-    for (const auto &object : overlap_ptr->overlap().object()) {
-      const auto &object_id = object.id().id();
-      if (object_id == id().id()) {
-        continue;
-      }
-
-      if (object.has_junction_overlap_info()) {
-        overlap_junction_ids_.push_back(object.id());
-      } else if (object.has_lane_overlap_info()) {
-        overlap_lane_ids_.push_back(object.id());
+    if (overlap_ptr != nullptr) {
+      for (const auto &object : overlap_ptr->inner_object().object()) {
+        const auto &object_id = object.id().id();
+        if (object_id != id().id()) {
+          if (object.has_junction_overlap_info()) {
+            overlap_junction_ids_.push_back(object.id());
+          } else if (object.has_lane_overlap_info()) {
+            overlap_lane_ids_.push_back(object.id());
+          }
+        }
       }
     }
   }
+
   if (overlap_junction_ids_.empty()) {
     AWARN << "stop sign " << id().id() << "has no overlap with any junction.";
   }
 }
 
-YieldSignInfo::YieldSignInfo(const YieldSign &yield_sign)
-    : yield_sign_(yield_sign) {
-  Init();
-}
-
-void YieldSignInfo::Init() {
-  for (const auto &stop_line : yield_sign_.stop_line()) {
-    SegmentsFromCurve(stop_line, &segments_);
-  }
-  // segments_from_curve(yield_sign_.stop_line(), &segments_);
-  ACHECK(!segments_.empty());
-}
-
-ClearAreaInfo::ClearAreaInfo(const ClearArea &clear_area)
-    : clear_area_(clear_area) {
-  Init();
-}
-
-void ClearAreaInfo::Init() {
-  polygon_ = ConvertToPolygon2d(clear_area_.polygon());
-  CHECK_GT(polygon_.num_points(), 2);
-}
-
-SpeedBumpInfo::SpeedBumpInfo(const SpeedBump &speed_bump)
-    : speed_bump_(speed_bump) {
-  Init();
-}
-
-void SpeedBumpInfo::Init() {
-  for (const auto &stop_line : speed_bump_.position()) {
-    SegmentsFromCurve(stop_line, &segments_);
-  }
-  ACHECK(!segments_.empty());
-}
-
-OverlapInfo::OverlapInfo(const Overlap &overlap) : overlap_(overlap) {}
+OverlapInfo::OverlapInfo(const Overlap &overlap) : BaseInfo<Overlap>(overlap) {}
 
 const ObjectOverlapInfo *OverlapInfo::GetObjectOverlapInfo(const Id &id) const {
-  for (const auto &object : overlap_.object()) {
+  for (const auto &object : inner_object_.object()) {
     if (object.id().id() == id.id()) {
       return &object;
     }
@@ -653,8 +573,8 @@ const ObjectOverlapInfo *OverlapInfo::GetObjectOverlapInfo(const Id &id) const {
   return nullptr;
 }
 
-RoadInfo::RoadInfo(const Road &road) : road_(road) {
-  for (const auto &section : road_.section()) {
+RoadInfo::RoadInfo(const Road &road) : BaseInfo<Road>(road) {
+  for (const auto &section : inner_object_.section()) {
     sections_.push_back(section);
     road_boundaries_.push_back(section.boundary());
   }
@@ -662,33 +582,6 @@ RoadInfo::RoadInfo(const Road &road) : road_(road) {
 
 const std::vector<RoadBoundary> &RoadInfo::GetBoundaries() const {
   return road_boundaries_;
-}
-
-ParkingSpaceInfo::ParkingSpaceInfo(const ParkingSpace &parking_space)
-    : parking_space_(parking_space) {
-  Init();
-}
-
-void ParkingSpaceInfo::Init() {
-  polygon_ = ConvertToPolygon2d(parking_space_.polygon());
-  CHECK_GT(polygon_.num_points(), 2);
-}
-
-PNCJunctionInfo::PNCJunctionInfo(const PNCJunction &pnc_junction)
-    : junction_(pnc_junction) {
-  Init();
-}
-
-void PNCJunctionInfo::Init() {
-  polygon_ = ConvertToPolygon2d(junction_.polygon());
-  CHECK_GT(polygon_.num_points(), 2);
-
-  for (const auto &overlap_id : junction_.overlap_id()) {
-    overlap_ids_.emplace_back(overlap_id);
-  }
-}
-
-RSUInfo::RSUInfo(const RSU& rsu) : _rsu(rsu) {
 }
 
 }  // namespace hdmap

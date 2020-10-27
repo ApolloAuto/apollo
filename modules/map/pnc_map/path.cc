@@ -22,6 +22,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -73,7 +74,7 @@ LaneBoundaryType::Type LeftBoundaryType(const LaneWaypoint& waypoint) {
     return LaneBoundaryType::UNKNOWN;
   }
   for (const auto& type :
-       waypoint.lane->lane().left_boundary().boundary_type()) {
+       waypoint.lane->inner_object().left_boundary().boundary_type()) {
     if (type.s() <= waypoint.s) {
       if (type.types_size() > 0) {
         return type.types(0);
@@ -90,7 +91,7 @@ LaneBoundaryType::Type RightBoundaryType(const LaneWaypoint& waypoint) {
     return LaneBoundaryType::UNKNOWN;
   }
   for (const auto& type :
-       waypoint.lane->lane().right_boundary().boundary_type()) {
+       waypoint.lane->inner_object().right_boundary().boundary_type()) {
     if (type.s() <= waypoint.s) {
       if (type.types_size() > 0) {
         return type.types(0);
@@ -111,7 +112,7 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
   auto map_ptr = HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(map_ptr);
   for (const auto& lane_id :
-       waypoint.lane->lane().left_neighbor_forward_lane_id()) {
+       waypoint.lane->inner_object().left_neighbor_forward_lane_id()) {
     auto lane = map_ptr->GetLaneById(lane_id);
     if (!lane) {
       return neighbor;
@@ -167,7 +168,7 @@ LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
   auto map_ptr = HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(map_ptr);
   for (const auto& lane_id :
-       waypoint.lane->lane().right_neighbor_forward_lane_id()) {
+       waypoint.lane->inner_object().right_neighbor_forward_lane_id()) {
     auto lane = map_ptr->GetLaneById(lane_id);
     if (!lane) {
       return neighbor;
@@ -515,7 +516,7 @@ void Path::GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
             std::max(lane_overlap_info.start_s(), lane_segment.start_s) + ref_s;
         const double adjusted_end_s =
             std::min(lane_overlap_info.end_s(), lane_segment.end_s) + ref_s;
-        for (const auto& object : overlap->overlap().object()) {
+        for (const auto& object : overlap->inner_object().object()) {
           if (object.id().id() != lane_segment.lane->id().id()) {
             overlaps_by_id[object.id().id()].emplace_back(adjusted_start_s,
                                                           adjusted_end_s);

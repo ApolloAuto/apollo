@@ -399,7 +399,7 @@ bool HDMapInput::GetSignalsFromHDMap(
   }
   signals->reserve(forward_signals.size());
   for (auto& signal_info : forward_signals) {
-    signals->push_back(signal_info->signal());
+    signals->push_back(signal_info->inner_object());
     ADEBUG << "Signal: " << signals->back().DebugString();
   }
   ADEBUG << "get_signal success. num_signals: " << signals->size()

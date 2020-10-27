@@ -20,10 +20,11 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -507,14 +508,14 @@ bool BirdviewImgFeatureRenderer::RenderTrafficLight(
     } else {
       color = cv::Scalar(128);
     }
-    for (const auto& overlap_id : traffic_light->signal().overlap_id()) {
+    for (const auto& overlap_id : traffic_light->inner_object().overlap_id()) {
       const auto& overlap =
           apollo::hdmap::HDMapUtil::BaseMap().GetOverlapById(overlap_id);
       if (overlap == nullptr) {
         AERROR << "overlap [" << overlap_id.id() << "] not found";
         return false;
       }
-      for (const auto& overlap_object : overlap->overlap().object()) {
+      for (const auto& overlap_object : overlap->inner_object().object()) {
         if (!overlap_object.has_lane_overlap_info()) {
           continue;
         }
@@ -524,7 +525,8 @@ bool BirdviewImgFeatureRenderer::RenderTrafficLight(
           AERROR << "lane [" << overlap_object.id().id() << "] not found";
           return false;
         }
-        for (const auto& segment : lane->lane().central_curve().segment()) {
+        for (const auto& segment :
+             lane->inner_object().central_curve().segment()) {
           const int segment_point_size = segment.line_segment().point_size();
           for (int i = 0; i < segment_point_size - 1; ++i) {
             const auto& p0 = GetAffinedPointImgIdx(
@@ -576,7 +578,7 @@ bool BirdviewImgFeatureRenderer::RenderRouting(
              << "] not found";
       return false;
     }
-    for (const auto& segment : lane->lane().central_curve().segment()) {
+    for (const auto& segment : lane->inner_object().central_curve().segment()) {
       const int segment_point_size = segment.line_segment().point_size();
       for (int i = 0; i < segment_point_size - 1; ++i) {
         const auto& p0 = GetAffinedPointImgIdx(

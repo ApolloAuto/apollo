@@ -81,9 +81,9 @@ void ADCTrajectoryContainer::SetJunction(const std::string& junction_id,
                                          const double distance) {
   std::shared_ptr<const JunctionInfo> junction_info =
       PredictionMap::JunctionById(junction_id);
-  if (junction_info != nullptr && junction_info->junction().has_polygon()) {
+  if (junction_info != nullptr && junction_info->inner_object().has_polygon()) {
     std::vector<Vec2d> vertices;
-    for (const auto& point : junction_info->junction().polygon().point()) {
+    for (const auto& point : junction_info->inner_object().polygon().point()) {
       vertices.emplace_back(point.x(), point.y());
     }
     if (vertices.size() >= 3) {
@@ -123,9 +123,9 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     }
   }
 
-  if (junction_info != nullptr && junction_info->junction().has_polygon()) {
+  if (junction_info != nullptr && junction_info->inner_object().has_polygon()) {
     std::vector<Vec2d> vertices;
-    for (const auto& point : junction_info->junction().polygon().point()) {
+    for (const auto& point : junction_info->inner_object().polygon().point()) {
       vertices.emplace_back(point.x(), point.y());
     }
     if (vertices.size() >= 3) {

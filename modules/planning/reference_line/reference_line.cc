@@ -27,6 +27,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "boost/math/tools/minima.hpp"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
@@ -808,8 +809,8 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
       continue;
     }
     speed_limit_found = true;
-    speed_limit =
-        std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
+    speed_limit = std::fmin(lane_waypoint.lane->inner_object().speed_limit(),
+                            speed_limit);
   }
 
   if (!speed_limit_found) {

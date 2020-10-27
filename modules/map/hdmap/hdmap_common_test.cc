@@ -14,6 +14,7 @@ limitations under the License.
 =========================================================================*/
 
 #include "gtest/gtest.h"
+
 #include "modules/map/hdmap/hdmap_impl.h"
 
 namespace apollo {
@@ -515,7 +516,7 @@ TEST_F(HDMapCommonTestSuite, TestSignalInfo) {
   InitSignalObj(&signal);
   SignalInfo signal_info(signal);
   EXPECT_EQ(signal.id().id(), signal_info.id().id());
-  EXPECT_EQ(4, signal_info.signal().boundary().point_size());
+  EXPECT_EQ(4, signal_info.inner_object().boundary().point_size());
 
   int segment_size = 0;
   for (const auto& stop_line : signal.stop_line()) {
@@ -532,7 +533,7 @@ TEST_F(HDMapCommonTestSuite, TestCrosswalkInfo) {
   InitCrosswalkObj(&crosswalk);
   CrosswalkInfo crosswalk_info(crosswalk);
   EXPECT_EQ(crosswalk.id().id(), crosswalk_info.id().id());
-  EXPECT_EQ(4, crosswalk_info.crosswalk().polygon().point_size());
+  EXPECT_EQ(4, crosswalk_info.inner_object().polygon().point_size());
   EXPECT_NEAR(170000.0, crosswalk_info.polygon().points()[0].x(), 1E-3);
   EXPECT_NEAR(170000.0, crosswalk_info.polygon().points()[0].y(), 1E-3);
   EXPECT_NEAR(170003.0, crosswalk_info.polygon().points()[1].x(), 1E-3);
@@ -572,7 +573,7 @@ TEST_F(HDMapCommonTestSuite, TestClearAreaInfo) {
   InitClearAreaObj(&clear_area);
   ClearAreaInfo clear_area_info(clear_area);
   EXPECT_EQ(clear_area.id().id(), clear_area_info.id().id());
-  EXPECT_EQ(4, clear_area_info.clear_area().polygon().point_size());
+  EXPECT_EQ(4, clear_area_info.inner_object().polygon().point_size());
   EXPECT_NEAR(170000.0, clear_area_info.polygon().points()[0].x(), 1E-3);
   EXPECT_NEAR(170000.0, clear_area_info.polygon().points()[0].y(), 1E-3);
   EXPECT_NEAR(170003.0, clear_area_info.polygon().points()[1].x(), 1E-3);
@@ -619,7 +620,7 @@ TEST_F(HDMapCommonTestSuite, TestParkingSpaceInfo) {
   InitParkingSpaceObj(&parking_space);
   ParkingSpaceInfo parking_space_info(parking_space);
   EXPECT_EQ(parking_space.id().id(), parking_space_info.id().id());
-  EXPECT_EQ(4, parking_space_info.parking_space().polygon().point_size());
+  EXPECT_EQ(4, parking_space_info.inner_object().polygon().point_size());
   EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[0].x(), 1E-3);
   EXPECT_NEAR(170000.0, parking_space_info.polygon().points()[0].y(), 1E-3);
   EXPECT_NEAR(170003.0, parking_space_info.polygon().points()[1].x(), 1E-3);

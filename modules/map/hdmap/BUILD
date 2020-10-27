@@ -10,11 +10,13 @@ cc_library(
     srcs = [
         "hdmap.cc",
         "hdmap_common.cc",
+        "hdmap_objects.cc",
         "hdmap_impl.cc",
     ],
     hdrs = [
         "hdmap.h",
         "hdmap_common.h",
+        "hdmap_objects.h",
         "hdmap_impl.h",
         "hdmap_util.h",
     ],

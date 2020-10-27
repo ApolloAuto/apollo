@@ -20,11 +20,6 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "modules/common/math/aabox2d.h"
-#include "modules/common/math/aaboxkdtree2d.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/map/proto/map_clear_area.pb.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
 #include "modules/map/proto/map_id.pb.h"
@@ -34,11 +29,17 @@ limitations under the License.
 #include "modules/map/proto/map_parking_space.pb.h"
 #include "modules/map/proto/map_pnc_junction.pb.h"
 #include "modules/map/proto/map_road.pb.h"
+#include "modules/map/proto/map_rsu.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_rsu.pb.h"
+
+#include "modules/common/math/aabox2d.h"
+#include "modules/common/math/aaboxkdtree2d.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::hdmap
@@ -73,21 +74,6 @@ class ObjectWithAABox {
   int id_;
 };
 
-class LaneInfo;
-class JunctionInfo;
-class CrosswalkInfo;
-class SignalInfo;
-class StopSignInfo;
-class YieldSignInfo;
-class OverlapInfo;
-class ClearAreaInfo;
-class SpeedBumpInfo;
-class RoadInfo;
-class ParkingSpaceInfo;
-class PNCJunctionInfo;
-class RSUInfo;
-class HDMapImpl;
-
 struct LineBoundary {
   std::vector<apollo::common::PointENU> line_points;
 };
@@ -118,6 +104,108 @@ struct RoadRoi {
   std::vector<PolygonBoundary> holes_boundary;
 };
 
+template <typename ProtoBufferObject>
+class BaseInfo {
+ public:
+  using InnerObject = ProtoBufferObject;
+
+  explicit BaseInfo(const InnerObject &inner_object)
+      : inner_object_(inner_object) {}
+
+  const Id &id() const noexcept { return inner_object_.id(); }
+  const InnerObject &inner_object() const noexcept { return inner_object_; }
+
+ protected:
+  const InnerObject &inner_object_;
+};
+
+apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon);
+
+template <typename InnerObject>
+class PolygonBasedInfo : public BaseInfo<InnerObject> {
+ public:
+  using Parent = BaseInfo<InnerObject>;
+
+  explicit PolygonBasedInfo(const InnerObject &inner_object)
+      : Parent(inner_object),
+        polygon_(ConvertToPolygon2d(inner_object_.polygon())) {
+    CHECK_GT(polygon_.num_points(), 2);
+  }
+
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+
+ protected:
+  using Parent::inner_object_;
+  apollo::common::math::Polygon2d polygon_;
+};
+
+void SegmentsFromCurve(
+    const Curve &curve,
+    std::vector<apollo::common::math::LineSegment2d> *segments);
+
+template <typename InnerObject>
+class SegmentBasedInfo : public BaseInfo<InnerObject> {
+ public:
+  using Parent = BaseInfo<InnerObject>;
+  using SegmentVector = std::vector<apollo::common::math::LineSegment2d>;
+
+  explicit SegmentBasedInfo(const InnerObject &inner_object)
+      : Parent(inner_object) {
+    for (const auto &stop_line : inner_object_.stop_line()) {
+      SegmentsFromCurve(stop_line, &segments_);
+    }
+
+    ACHECK(!segments_.empty());
+  }
+
+  explicit SegmentBasedInfo(const InnerObject &inner_object, bool)
+      : Parent(inner_object) {
+    for (const auto &stop_line : inner_object_.position()) {
+      SegmentsFromCurve(stop_line, &segments_);
+    }
+
+    ACHECK(!segments_.empty());
+  }
+
+  const SegmentVector &segments() const { return segments_; }
+
+ protected:
+  using Parent::inner_object_;
+  SegmentVector segments_;
+};
+
+template <typename ItemInfo>
+class OverlapBased : public ItemInfo {
+ public:
+  explicit OverlapBased(const typename ItemInfo::InnerObject &inner_object)
+      : ItemInfo(inner_object) {
+    overlap_ids_.reserve(inner_object_.overlap_id().size());
+    for (const auto &overlap_id : inner_object_.overlap_id()) {
+      overlap_ids_.emplace_back(overlap_id);
+    }
+  }
+
+ protected:
+  using ItemInfo::inner_object_;
+  std::vector<Id> overlap_ids_;
+};
+
+using ClearAreaInfo = PolygonBasedInfo<ClearArea>;
+using CrosswalkInfo = PolygonBasedInfo<Crosswalk>;
+using ParkingSpaceInfo = PolygonBasedInfo<ParkingSpace>;
+using PNCJunctionInfo = OverlapBased<PolygonBasedInfo<PNCJunction>>;
+using RSUInfo = BaseInfo<RSU>;
+using YieldSignInfo = SegmentBasedInfo<YieldSign>;
+
+class LaneInfo;
+class JunctionInfo;
+class SignalInfo;
+class StopSignInfo;
+class SpeedBumpInfo;
+class OverlapInfo;
+class RoadInfo;
+class HDMapImpl;
+
 using LaneSegmentBox =
     ObjectWithAABox<LaneInfo, apollo::common::math::LineSegment2d>;
 using LaneSegmentKDTree = apollo::common::math::AABoxKDTree2d<LaneSegmentBox>;
@@ -138,14 +226,22 @@ using RoadRoiPtr = std::shared_ptr<RoadRoi>;
 using PNCJunctionInfoConstPtr = std::shared_ptr<const PNCJunctionInfo>;
 using RSUInfoConstPtr = std::shared_ptr<const RSUInfo>;
 
-class LaneInfo {
+struct JunctionBoundary {
+  JunctionInfoConstPtr junction_info;
+};
+
+using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
+
+class LaneInfo : public BaseInfo<Lane> {
  public:
   explicit LaneInfo(const Lane &lane);
 
-  const Id &id() const { return lane_.id(); }
   const Id &road_id() const { return road_id_; }
+  void set_road_id(const Id &road_id) { road_id_ = road_id; }
+
   const Id &section_id() const { return section_id_; }
-  const Lane &lane() const { return lane_; }
+  void set_section_id(const Id &section_id) { section_id_ = section_id; }
+
   const std::vector<apollo::common::math::Vec2d> &points() const {
     return points_;
   }
@@ -223,20 +319,18 @@ class LaneInfo {
   bool GetProjection(const apollo::common::math::Vec2d &point,
                      double *accumulate_s, double *lateral) const;
 
+  void PostProcess(const HDMapImpl &map_instance);
+
  private:
   friend class HDMapImpl;
   friend class RoadInfo;
   void Init();
-  void PostProcess(const HDMapImpl &map_instance);
   void UpdateOverlaps(const HDMapImpl &map_instance);
   double GetWidthFromSample(const std::vector<LaneInfo::SampledWidth> &samples,
                             const double s) const;
   void CreateKDTree();
-  void set_road_id(const Id &road_id) { road_id_ = road_id; }
-  void set_section_id(const Id &section_id) { section_id_ = section_id; }
 
  private:
-  const Lane &lane_;
   std::vector<apollo::common::math::Vec2d> points_;
   std::vector<apollo::common::math::Vec2d> unit_directions_;
   std::vector<double> headings_;
@@ -254,281 +348,91 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> speed_bumps_;
   std::vector<OverlapInfoConstPtr> parking_spaces_;
   std::vector<OverlapInfoConstPtr> pnc_junctions_;
-  double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;
-
   std::vector<SampledWidth> sampled_left_road_width_;
   std::vector<SampledWidth> sampled_right_road_width_;
-
   std::vector<LaneSegmentBox> segment_box_list_;
   std::unique_ptr<LaneSegmentKDTree> lane_segment_kdtree_;
-
   Id road_id_;
   Id section_id_;
+  double total_length_ = 0.0;
 };
 
-class JunctionInfo {
+class JunctionInfo : public OverlapBased<PolygonBasedInfo<Junction>> {
  public:
-  explicit JunctionInfo(const Junction &junction);
-
-  const Id &id() const { return junction_.id(); }
-  const Junction &junction() const { return junction_; }
-  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+  using Parent = OverlapBased<PolygonBasedInfo<Junction>>;
+  using Parent::Parent;
 
   const std::vector<Id> &OverlapStopSignIds() const {
     return overlap_stop_sign_ids_;
   }
 
+  void PostProcess(const HDMapImpl &map_instance);
+
  private:
   friend class HDMapImpl;
-  void Init();
-  void PostProcess(const HDMapImpl &map_instance);
   void UpdateOverlaps(const HDMapImpl &map_instance);
 
- private:
-  const Junction &junction_;
-  apollo::common::math::Polygon2d polygon_;
-
   std::vector<Id> overlap_stop_sign_ids_;
-  std::vector<Id> overlap_ids_;
 };
-using JunctionPolygonBox =
-    ObjectWithAABox<JunctionInfo, apollo::common::math::Polygon2d>;
-using JunctionPolygonKDTree =
-    apollo::common::math::AABoxKDTree2d<JunctionPolygonBox>;
 
-class SignalInfo {
+class SignalInfo : public SegmentBasedInfo<Signal> {
  public:
   explicit SignalInfo(const Signal &signal);
 
-  const Id &id() const { return signal_.id(); }
-  const Signal &signal() const { return signal_; }
-  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return segments_;
-  }
-
  private:
   void Init();
-
- private:
-  const Signal &signal_;
-  std::vector<apollo::common::math::LineSegment2d> segments_;
 };
-using SignalSegmentBox =
-    ObjectWithAABox<SignalInfo, apollo::common::math::LineSegment2d>;
-using SignalSegmentKDTree =
-    apollo::common::math::AABoxKDTree2d<SignalSegmentBox>;
 
-class CrosswalkInfo {
+class StopSignInfo : public OverlapBased<SegmentBasedInfo<StopSign>> {
  public:
-  explicit CrosswalkInfo(const Crosswalk &crosswalk);
+  using Parent = OverlapBased<SegmentBasedInfo<StopSign>>;
+  using Parent::Parent;
 
-  const Id &id() const { return crosswalk_.id(); }
-  const Crosswalk &crosswalk() const { return crosswalk_; }
-  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
-
- private:
-  void Init();
-
- private:
-  const Crosswalk &crosswalk_;
-  apollo::common::math::Polygon2d polygon_;
-};
-using CrosswalkPolygonBox =
-    ObjectWithAABox<CrosswalkInfo, apollo::common::math::Polygon2d>;
-using CrosswalkPolygonKDTree =
-    apollo::common::math::AABoxKDTree2d<CrosswalkPolygonBox>;
-
-class StopSignInfo {
- public:
-  explicit StopSignInfo(const StopSign &stop_sign);
-
-  const Id &id() const { return stop_sign_.id(); }
-  const StopSign &stop_sign() const { return stop_sign_; }
-  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return segments_;
-  }
   const std::vector<Id> &OverlapLaneIds() const { return overlap_lane_ids_; }
   const std::vector<Id> &OverlapJunctionIds() const {
     return overlap_junction_ids_;
   }
 
- private:
-  friend class HDMapImpl;
-  void init();
   void PostProcess(const HDMapImpl &map_instance);
-  void UpdateOverlaps(const HDMapImpl &map_instance);
 
  private:
-  const StopSign &stop_sign_;
-  std::vector<apollo::common::math::LineSegment2d> segments_;
+  friend class HDMapImpl;
+  void UpdateOverlaps(const HDMapImpl &map_instance);
 
   std::vector<Id> overlap_lane_ids_;
   std::vector<Id> overlap_junction_ids_;
-  std::vector<Id> overlap_ids_;
 };
-using StopSignSegmentBox =
-    ObjectWithAABox<StopSignInfo, apollo::common::math::LineSegment2d>;
-using StopSignSegmentKDTree =
-    apollo::common::math::AABoxKDTree2d<StopSignSegmentBox>;
 
-class YieldSignInfo {
+class SpeedBumpInfo : public SegmentBasedInfo<SpeedBump> {
  public:
-  explicit YieldSignInfo(const YieldSign &yield_sign);
-
-  const Id &id() const { return yield_sign_.id(); }
-  const YieldSign &yield_sign() const { return yield_sign_; }
-  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return segments_;
-  }
-
- private:
-  void Init();
-
- private:
-  const YieldSign &yield_sign_;
-  std::vector<apollo::common::math::LineSegment2d> segments_;
+  explicit SpeedBumpInfo(const SpeedBump &inner_object)
+      : SegmentBasedInfo<SpeedBump>(inner_object, false) {}
 };
-using YieldSignSegmentBox =
-    ObjectWithAABox<YieldSignInfo, apollo::common::math::LineSegment2d>;
-using YieldSignSegmentKDTree =
-    apollo::common::math::AABoxKDTree2d<YieldSignSegmentBox>;
 
-class ClearAreaInfo {
- public:
-  explicit ClearAreaInfo(const ClearArea &clear_area);
-
-  const Id &id() const { return clear_area_.id(); }
-  const ClearArea &clear_area() const { return clear_area_; }
-  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
-
- private:
-  void Init();
-
- private:
-  const ClearArea &clear_area_;
-  apollo::common::math::Polygon2d polygon_;
-};
-using ClearAreaPolygonBox =
-    ObjectWithAABox<ClearAreaInfo, apollo::common::math::Polygon2d>;
-using ClearAreaPolygonKDTree =
-    apollo::common::math::AABoxKDTree2d<ClearAreaPolygonBox>;
-
-class SpeedBumpInfo {
- public:
-  explicit SpeedBumpInfo(const SpeedBump &speed_bump);
-
-  const Id &id() const { return speed_bump_.id(); }
-  const SpeedBump &speed_bump() const { return speed_bump_; }
-  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
-    return segments_;
-  }
-
- private:
-  void Init();
-
- private:
-  const SpeedBump &speed_bump_;
-  std::vector<apollo::common::math::LineSegment2d> segments_;
-};
-using SpeedBumpSegmentBox =
-    ObjectWithAABox<SpeedBumpInfo, apollo::common::math::LineSegment2d>;
-using SpeedBumpSegmentKDTree =
-    apollo::common::math::AABoxKDTree2d<SpeedBumpSegmentBox>;
-
-class OverlapInfo {
+class OverlapInfo : public BaseInfo<Overlap> {
  public:
   explicit OverlapInfo(const Overlap &overlap);
 
-  const Id &id() const { return overlap_.id(); }
-  const Overlap &overlap() const { return overlap_; }
   const ObjectOverlapInfo *GetObjectOverlapInfo(const Id &id) const;
-
- private:
-  const Overlap &overlap_;
 };
 
-class RoadInfo {
+class RoadInfo : public BaseInfo<Road> {
  public:
   explicit RoadInfo(const Road &road);
-  const Id &id() const { return road_.id(); }
-  const Road &road() const { return road_; }
   const std::vector<RoadSection> &sections() const { return sections_; }
 
-  const Id &junction_id() const { return road_.junction_id(); }
-  bool has_junction_id() const { return road_.has_junction_id(); }
+  const Id &junction_id() const { return inner_object_.junction_id(); }
+  bool has_junction_id() const { return inner_object_.has_junction_id(); }
 
   const std::vector<RoadBoundary> &GetBoundaries() const;
 
-  apollo::hdmap::Road_Type type() const { return road_.type(); }
+  apollo::hdmap::Road_Type type() const { return inner_object_.type(); }
 
  private:
-  Road road_;
   std::vector<RoadSection> sections_;
   std::vector<RoadBoundary> road_boundaries_;
-};
-
-class ParkingSpaceInfo {
- public:
-  explicit ParkingSpaceInfo(const ParkingSpace &parkingspace);
-  const Id &id() const { return parking_space_.id(); }
-  const ParkingSpace &parking_space() const { return parking_space_; }
-  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
-
- private:
-  void Init();
-
- private:
-  const ParkingSpace &parking_space_;
-  apollo::common::math::Polygon2d polygon_;
-};
-using ParkingSpacePolygonBox =
-    ObjectWithAABox<ParkingSpaceInfo, apollo::common::math::Polygon2d>;
-using ParkingSpacePolygonKDTree =
-    apollo::common::math::AABoxKDTree2d<ParkingSpacePolygonBox>;
-
-class PNCJunctionInfo {
- public:
-  explicit PNCJunctionInfo(const PNCJunction &pnc_junction);
-
-  const Id &id() const { return junction_.id(); }
-  const PNCJunction &pnc_junction() const { return junction_; }
-  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
-
- private:
-  void Init();
-
- private:
-  const PNCJunction &junction_;
-  apollo::common::math::Polygon2d polygon_;
-
-  std::vector<Id> overlap_ids_;
-};
-using PNCJunctionPolygonBox =
-    ObjectWithAABox<PNCJunctionInfo, apollo::common::math::Polygon2d>;
-using PNCJunctionPolygonKDTree =
-    apollo::common::math::AABoxKDTree2d<PNCJunctionPolygonBox>;
-
-struct JunctionBoundary {
-  JunctionInfoConstPtr junction_info;
-};
-
-using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
-
-class RSUInfo {
- public:
-  explicit RSUInfo(const RSU& rsu);
-
-  const Id& id() const {
-    return _rsu.id();
-  }
-  const RSU& rsu() const {
-    return _rsu;
-  }
-
- private:
-  RSU _rsu;
 };
 
 }  // namespace hdmap

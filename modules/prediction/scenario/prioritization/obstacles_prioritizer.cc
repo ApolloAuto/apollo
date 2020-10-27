@@ -512,7 +512,7 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       lane_info_ptr->cross_lanes();
   for (const auto overlap_ptr : cross_lanes) {
     bool consider_overlap = true;
-    for (const auto& object : overlap_ptr->overlap().object()) {
+    for (const auto& object : overlap_ptr->inner_object().object()) {
       if (object.id().id() == lane_info_ptr->id().id() &&
           object.lane_overlap_info().end_s() < ego_lane_s_) {
         consider_overlap = false;
@@ -523,7 +523,7 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       continue;
     }
 
-    for (const auto& object : overlap_ptr->overlap().object()) {
+    for (const auto& object : overlap_ptr->inner_object().object()) {
       const auto& object_id = object.id().id();
       if (object_id == lane_info_ptr->id().id()) {
         continue;
@@ -585,7 +585,7 @@ void ObstaclesPrioritizer::SetCautionBackward(
     if (cumu_distance > max_distance) {
       continue;
     }
-    for (const auto& pre_lane_id : curr_lane->lane().predecessor_id()) {
+    for (const auto& pre_lane_id : curr_lane->inner_object().predecessor_id()) {
       if (ego_back_lane_id_set_.find(pre_lane_id.id()) !=
           ego_back_lane_id_set_.end()) {
         continue;

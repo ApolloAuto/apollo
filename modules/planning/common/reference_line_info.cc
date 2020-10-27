@@ -23,14 +23,16 @@
 #include <algorithm>
 
 #include "absl/strings/str_cat.h"
+
+#include "modules/planning/proto/planning_status.pb.h"
+#include "modules/planning/proto/sl_boundary.pb.h"
+
 #include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -159,33 +161,34 @@ bool ReferenceLineInfo::GetNeighborLaneInfo(
     return false;
   }
 
+  const auto& raw_lane = ptr_lane_info->inner_object();
   switch (lane_type) {
     case LaneType::LeftForward: {
-      if (ptr_lane_info->lane().left_neighbor_forward_lane_id().empty()) {
+      if (raw_lane.left_neighbor_forward_lane_id().empty()) {
         return false;
       }
-      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
+      *ptr_lane_id = raw_lane.left_neighbor_forward_lane_id(0);
       break;
     }
     case LaneType::LeftReverse: {
-      if (ptr_lane_info->lane().left_neighbor_reverse_lane_id().empty()) {
+      if (raw_lane.left_neighbor_reverse_lane_id().empty()) {
         return false;
       }
-      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
+      *ptr_lane_id = raw_lane.left_neighbor_reverse_lane_id(0);
       break;
     }
     case LaneType::RightForward: {
-      if (ptr_lane_info->lane().right_neighbor_forward_lane_id().empty()) {
+      if (raw_lane.right_neighbor_forward_lane_id().empty()) {
         return false;
       }
-      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
+      *ptr_lane_id = raw_lane.right_neighbor_forward_lane_id(0);
       break;
     }
     case LaneType::RightReverse: {
-      if (ptr_lane_info->lane().right_neighbor_reverse_lane_id().empty()) {
+      if (raw_lane.right_neighbor_reverse_lane_id().empty()) {
         return false;
       }
-      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);
+      *ptr_lane_id = raw_lane.right_neighbor_reverse_lane_id(0);
       break;
     }
     default:
@@ -681,7 +684,7 @@ void ReferenceLineInfo::SetTurnSignalBasedOnLaneTurnType(
     if (route_s < adc_s) {
       continue;
     }
-    const auto& turn = seg.lane->lane().turn();
+    const auto& turn = seg.lane->inner_object().turn();
     if (turn == hdmap::Lane::LEFT_TURN) {
       vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
       break;
@@ -951,7 +954,7 @@ void ReferenceLineInfo::MakeEStopDecision(
 }
 
 hdmap::Lane::LaneTurn ReferenceLineInfo::GetPathTurnType(const double s) const {
-  const double forward_buffer = 20.0;
+  constexpr double forward_buffer = 20.0;
   double route_s = 0.0;
   for (const auto& seg : Lanes()) {
     if (route_s > s + forward_buffer) {
@@ -961,7 +964,7 @@ hdmap::Lane::LaneTurn ReferenceLineInfo::GetPathTurnType(const double s) const {
     if (route_s < s) {
       continue;
     }
-    const auto& turn_type = seg.lane->lane().turn();
+    auto turn_type = seg.lane->inner_object().turn();
     if (turn_type == hdmap::Lane::LEFT_TURN ||
         turn_type == hdmap::Lane::RIGHT_TURN ||
         turn_type == hdmap::Lane::U_TURN) {

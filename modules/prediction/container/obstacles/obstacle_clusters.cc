@@ -134,7 +134,7 @@ bool ObstacleClusters::BackwardNearbyObstacle(
   double relative_s = -std::numeric_limits<double>::infinity();
   double relative_l = 0.0;
   for (const auto& predecessor_lane_id :
-       lane_info_ptr->lane().predecessor_id()) {
+       lane_info_ptr->inner_object().predecessor_id()) {
     std::string lane_id = predecessor_lane_id.id();
     if (lane_obstacles_.find(lane_id) == lane_obstacles_.end() ||
         lane_obstacles_[lane_id].empty()) {
@@ -167,15 +167,15 @@ StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
   std::shared_ptr<const LaneInfo> lane_info_ptr =
       PredictionMap::LaneById(lane_id);
   CHECK_NOTNULL(lane_info_ptr);
-  for (const auto& overlap_id : lane_info_ptr->lane().overlap_id()) {
+  for (const auto& overlap_id : lane_info_ptr->inner_object().overlap_id()) {
     auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
     if (overlap_info_ptr == nullptr) {
       continue;
     }
-    for (const auto& object : overlap_info_ptr->overlap().object()) {
+    for (const auto& object : overlap_info_ptr->inner_object().object()) {
       // find the overlap with stop_sign
       if (object.has_stop_sign_overlap_info()) {
-        for (const auto& obj : overlap_info_ptr->overlap().object()) {
+        for (const auto& obj : overlap_info_ptr->inner_object().object()) {
           // find the obj of in the overlap
           if (obj.has_lane_overlap_info()) {
             if (!stop_sign.has_lane_s() ||

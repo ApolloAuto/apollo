@@ -16,6 +16,8 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/map/proto/map_geometry.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
@@ -23,7 +25,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map_geometry.pb.h"
 
 DEFINE_bool(xy_to_sl, false, "calculate xy to sl");
 DEFINE_bool(sl_to_xy, false, "calculate sl to xy");
@@ -91,6 +92,8 @@ class MapUtil {
   GET_ELEMENT_BY_ID(SpeedBump);
   GET_ELEMENT_BY_ID(StopSign);
   GET_ELEMENT_BY_ID(YieldSign);
+  GET_ELEMENT_BY_ID(PNCJunction);
+  GET_ELEMENT_BY_ID(RSU);
 
   template <class T>
   void Print(const T &t) {
@@ -140,6 +143,69 @@ class MapUtil {
     return 0;
   }
 
+  void PrintObjectOverlapInfo(const auto &object_info) {
+    const auto &raw_id = object_info.id().id();
+    switch (object_info.overlap_info_case()) {
+      case ObjectOverlapInfo::kLaneOverlapInfo: {
+        std::cout << "Lane : " << raw_id << std::endl;
+        PrintLane(GetLane(raw_id));
+        break;
+      }
+      case ObjectOverlapInfo::kSignalOverlapInfo: {
+        std::cout << "Signal: " << raw_id << std::endl;
+        Print(GetSignal(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kStopSignOverlapInfo: {
+        std::cout << "StopSign: " << raw_id << std::endl;
+        Print(GetStopSign(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kCrosswalkOverlapInfo: {
+        std::cout << "Crosswalk: " << raw_id << std::endl;
+        Print(GetCrosswalk(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kJunctionOverlapInfo: {
+        std::cout << "Junction: " << raw_id << std::endl;
+        Print(GetJunction(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kYieldSignOverlapInfo: {
+        std::cout << "YieldSign: " << raw_id << std::endl;
+        Print(GetYieldSign(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kClearAreaOverlapInfo: {
+        std::cout << "ClearArea: " << raw_id << std::endl;
+        Print(GetClearArea(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kSpeedBumpOverlapInfo: {
+        std::cout << "SpeedBump: " << raw_id << std::endl;
+        Print(GetSpeedBump(raw_id)->inner_object());
+        break;
+      }
+      case ObjectOverlapInfo::kParkingSpaceOverlapInfo: {
+        std::cout << "ParkingSpace: " << raw_id << std::endl;
+        break;
+      }
+      case ObjectOverlapInfo::kPncJunctionOverlapInfo: {
+        std::cout << "PncJunction: " << raw_id << std::endl;
+        Print(GetPNCJunction(raw_id)->inner_object());
+        break;
+      }
+      // case ObjectOverlapInfo::kRsuOverlapInfo: {
+      //   std::cout << "RSU: " << raw_id << std::endl;
+      //   Print(GetRSU(raw_id)->inner_object());
+      //   break;
+      // }
+      default: {
+        std::cout << "Unknown overlap type:  " << object_info.DebugString();
+      }
+    }
+  }
+
   void PrintOverlap(const std::string &overlap_id) {
     const auto *overlap_ptr = GetOverlap(FLAGS_overlap);
     if (overlap_ptr == nullptr) {
@@ -147,44 +213,15 @@ class MapUtil {
       return;
     }
     ADEBUG << "overlap[" << overlap_ptr->id().id() << "] info["
-           << overlap_ptr->overlap().DebugString() << "]" << std::endl;
-
-    for (const auto &object_info : overlap_ptr->overlap().object()) {
-      if (object_info.has_lane_overlap_info()) {
-        std::cout << "Lane : " << object_info.id().id() << std::endl;
-        PrintLane(GetLane(object_info.id().id()));
-      } else if (object_info.has_signal_overlap_info()) {
-        std::cout << "Signal: " << object_info.id().id() << std::endl;
-        Print(GetSignal(object_info.id().id())->signal());
-      } else if (object_info.has_stop_sign_overlap_info()) {
-        std::cout << "StopSign: " << object_info.id().id() << std::endl;
-        Print(GetStopSign(object_info.id().id())->stop_sign());
-      } else if (object_info.has_crosswalk_overlap_info()) {
-        std::cout << "Crosswalk: " << object_info.id().id() << std::endl;
-        Print(GetCrosswalk(object_info.id().id())->crosswalk());
-      } else if (object_info.has_junction_overlap_info()) {
-        std::cout << "Junction: " << object_info.id().id() << std::endl;
-        Print(GetJunction(object_info.id().id())->junction());
-      } else if (object_info.has_yield_sign_overlap_info()) {
-        std::cout << "YieldSign: " << object_info.id().id() << std::endl;
-        Print(GetYieldSign(object_info.id().id())->yield_sign());
-      } else if (object_info.has_clear_area_overlap_info()) {
-        std::cout << "ClearArea: " << object_info.id().id() << std::endl;
-        Print(GetClearArea(object_info.id().id())->clear_area());
-      } else if (object_info.has_speed_bump_overlap_info()) {
-        std::cout << "SpeedBump: " << object_info.id().id() << std::endl;
-        Print(GetSpeedBump(object_info.id().id())->speed_bump());
-      } else if (object_info.has_parking_space_overlap_info()) {
-        std::cout << "ParkingSpace: " << object_info.id().id() << std::endl;
-      } else {
-        std::cout << "Unknown overlap type:  " << object_info.DebugString();
-      }
+           << overlap_ptr->inner_object().DebugString() << "]" << std::endl;
+    for (const auto &object_info : overlap_ptr->inner_object().object()) {
+      PrintObjectOverlapInfo(object_info);
     }
   }
 
   void PrintLane(const std::string &lane_id) { PrintLane(GetLane(lane_id)); }
   void PrintLane(LaneInfoConstPtr lane_ptr) {
-    const auto &lane = lane_ptr->lane();
+    const auto &lane = lane_ptr->inner_object();
     PointENU start_point;
     double start_heading = 0.0;
     SLToPoint(lane_ptr, 0, 0, &start_point, &start_heading);
@@ -354,7 +391,7 @@ int main(int argc, char *argv[]) {
   }
   if (!FLAGS_signal_info.empty()) {
     std::cout << "Signal:  " << FLAGS_signal_info << std::endl;
-    map_util.Print(map_util.GetSignal(FLAGS_signal_info)->signal());
+    map_util.Print(map_util.GetSignal(FLAGS_signal_info)->inner_object());
     valid_arg = true;
   }
   if (!FLAGS_dump_txt_map.empty()) {
