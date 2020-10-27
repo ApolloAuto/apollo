@@ -45,7 +45,7 @@ class RecordFileBase {
   std::string path_;
   proto::Header header_;
   proto::Index index_;
-  int fd_;
+  int fd_ = -1;
 };
 
 }  // namespace record

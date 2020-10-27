@@ -92,7 +92,7 @@ class RecordFileWriter : public RecordFileBase {
   bool WriteSection(const T& message);
   bool WriteIndex();
   void Flush();
-  bool is_writing_ = false;
+  std::atomic_bool is_writing_;
   std::unique_ptr<Chunk> chunk_active_ = nullptr;
   std::unique_ptr<Chunk> chunk_flush_ = nullptr;
   std::shared_ptr<std::thread> flush_thread_ = nullptr;
