@@ -30,8 +30,8 @@ former building step was skipped.
 
 ### Start Apollo
 
-Running `scripts/bootstrap.sh` will start Dreamview backend with the Monitor module
-enabled.
+Running `scripts/bootstrap.sh` will start Dreamview backend with the monitor
+module enabled.
 
 ```
 # Startup modules monitor and dreamview, the default option is start.
@@ -41,16 +41,17 @@ enabled.
 ### Access Dreamview Web UI
 
 Open [http://localhost:8888](http://localhost:8888) in your favorite browser,
-e.g. Chrome, and you should see this screen. However, no module (except Monitor)
-is running in the background at this moment.
+e.g. Chrome, and you should see this screen. However, no module(s) except
+monitor is running in the background at this moment.
 
 ![Access Dreamview](images/apollo_bootstrap_screen.png)
 
-### Select Drive Mode
+### Select Drive Mode and Map
 
-From the dropdown box selet "Navigation" mode.
+From the dropdown box of Mode Setup, select "Mkz Standard Debug" mode. From the
+dropdown box of Map, select "Sunnyvale with Two Offices".
 
-![Navigation Mode](images/dreamview_2_5_setup_profile.png)
+![Drive Mode and Map Selection](images/dreamview_6_0_setup_profile.png)
 
 ### Replay Demo Record
 
@@ -68,10 +69,10 @@ cyber_recorder play -f docs/demo_guide/demo_3.5.record -l
 Dreamview should show a running vehicle now. (The following image might be
 different due to frontend code changes.)
 
-![Dreamview with Trajectory](images/dv_trajectory_2.5.png)
+![Dreamview with Trajectory](images/dv_trajectory_6.0.png)
 
 ### Congrats!
 
 You have successfully built Apollo! Now you can revisit
-[Apollo Readme](../../README.md) for
-additional guidelines on the neccessary hardware setup.
+[Apollo Readme](../../README.md) for additional guidelines on the neccessary
+hardware setup.
