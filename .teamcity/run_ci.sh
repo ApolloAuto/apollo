@@ -97,11 +97,12 @@ function setup_devices_and_mount_local_volumes() {
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
-        14.04)
-            warning "[Deprecated] Support for Ubuntu 14.04 will be removed" \
+        16.04)
+            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                 "in the near future. Please upgrade to ubuntu 18.04+."
+            volumes="${volumes} -v /dev:/dev"
             ;;
-        16.04 | 18.04 | 20.04 | *)
+        18.04 | 20.04 | *)
             volumes="${volumes} -v /dev:/dev"
             ;;
     esac
@@ -137,9 +138,6 @@ function determine_gpu_use_host() {
         DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
         if [ ! -z "$(which nvidia-docker)" ]; then
             DOCKER_RUN="nvidia-docker run"
-            warning "nvidia-docker is deprecated. Please install latest docker " \
-                "and nvidia-container-toolkit as described by:"
-            warning "  ${nv_docker_doc}"
         elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
             if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
                 DOCKER_RUN="docker run --gpus all"
@@ -219,12 +217,6 @@ function mount_other_volumes() {
         reuse_or_start_volume "${yolo3d_volume}" "${yolo3d_image}"
         volume_conf="${volume_conf} --volumes-from ${yolo3d_volume}"
     fi
-
-    # LOCALIZATION
-    local localization_volume="apollo_localization_volume_${USER}"
-    local localization_image="${DOCKER_REPO}:localization_volume-${TARGET_ARCH}-latest"
-    reuse_or_start_volume "${localization_volume}" "${localization_image}"
-    volume_conf="${volume_conf} --volumes-from ${localization_volume}"
 
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
