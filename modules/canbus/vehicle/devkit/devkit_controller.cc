@@ -184,11 +184,11 @@ Chassis DevkitController::chassis() {
       chassis_detail.devkit().vcu_report_505().has_speed()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.devkit().vcu_report_505().speed()));
-    chassis_.set_battery_soc(
+    chassis_.set_battery_soc_percentage(
         chassis_detail.devkit().vcu_report_505().battery_soc());
   } else {
     chassis_.set_speed_mps(0);
-    chassis_.set_battery_soc(0);
+    chassis_.set_battery_soc_percentage(0);
   }
   // 7 no odometer
   // chassis_.set_odometer_m(0);
