@@ -31,8 +31,8 @@ const int32_t Vcureport505::ID = 0x505;
 
 void Vcureport505::Parse(const std::uint8_t* bytes, int32_t length,
                          ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_vcu_report_505()->set_battary_soc(
-      battary_soc(bytes, length));
+  chassis->mutable_devkit()->mutable_vcu_report_505()->set_battery_soc(
+      battery_soc(bytes, length));
   chassis->mutable_devkit()->mutable_vcu_report_505()->set_vehicle_mode_state(
       vehicle_mode_state(bytes, length));
   chassis->mutable_devkit()->mutable_vcu_report_505()->set_frontcrash_state(
@@ -47,10 +47,10 @@ void Vcureport505::Parse(const std::uint8_t* bytes, int32_t length,
       speed(bytes, length));
 }
 
-// config detail: {'name': 'battary_soc', 'offset': 0.0, 'precision': 1.0,
+// config detail: {'name': 'battery_soc', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 47,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': '%'}
-int Vcureport505::battary_soc(const std::uint8_t* bytes, int32_t length) const {
+int Vcureport505::battery_soc(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
