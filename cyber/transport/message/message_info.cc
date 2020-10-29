@@ -16,7 +16,7 @@
 
 #include "cyber/transport/message/message_info.h"
 
-#include <arpa/inet.h>
+#include <cstring>
 
 #include "cyber/common/log.h"
 
@@ -67,26 +67,23 @@ bool MessageInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
 
   dst->assign(sender_id_.data(), ID_SIZE);
-  dst->append(reinterpret_cast<char*>(const_cast<uint64_t*>(&seq_num_)),
-              sizeof(seq_num_));
+  dst->append(reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   dst->append(spare_id_.data(), ID_SIZE);
 
   return true;
 }
 
 bool MessageInfo::SerializeTo(char* dst, std::size_t len) const {
-  RETURN_VAL_IF_NULL(dst, false);
-  if (len < kSize) {
+  if (dst == nullptr || len < kSize) {
     return false;
   }
 
   char* ptr = dst;
-  memcpy(ptr, sender_id_.data(), ID_SIZE);
+  std::memcpy(ptr, sender_id_.data(), ID_SIZE);
   ptr += ID_SIZE;
-  memcpy(ptr, reinterpret_cast<char*>(const_cast<uint64_t*>(&seq_num_)),
-         sizeof(seq_num_));
+  std::memcpy(ptr, reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   ptr += sizeof(seq_num_);
-  memcpy(ptr, spare_id_.data(), ID_SIZE);
+  std::memcpy(ptr, spare_id_.data(), ID_SIZE);
 
   return true;
 }
@@ -105,7 +102,7 @@ bool MessageInfo::DeserializeFrom(const char* src, std::size_t len) {
   char* ptr = const_cast<char*>(src);
   sender_id_.set_data(ptr);
   ptr += ID_SIZE;
-  memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
+  std::memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
   ptr += sizeof(seq_num_);
   spare_id_.set_data(ptr);
 
