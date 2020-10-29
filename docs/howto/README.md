@@ -63,6 +63,7 @@
 
 ## Others
 - [How to clone Apollo repository from China](how_to_clone_apollo_repo_from_china.md)
+- [How to Prepare Bazel Distribution Directory](how_to_prepare_bazel_dist_dir.md)
 
 ### Chinese versions
 - [国内环境下如何克隆Apollo 仓库](how_to_clone_apollo_repo_from_china_cn.md)
