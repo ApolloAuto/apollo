@@ -210,13 +210,24 @@ function mount_map_volumes() {
 function mount_other_volumes() {
     info "Mount other volumes ..."
     local volume_conf=
-    if [ "${FAST_MODE}" = "no" ]; then
-        # YOLO3D
-        local yolo3d_volume="apollo_yolo3d_volume_${USER}"
-        local yolo3d_image="${DOCKER_REPO}:yolo3d_volume-${TARGET_ARCH}-latest"
-        reuse_or_start_volume "${yolo3d_volume}" "${yolo3d_image}"
-        volume_conf="${volume_conf} --volumes-from ${yolo3d_volume}"
-    fi
+
+    # AUDIO
+    local audio_volume="apollo_audio_volume_${USER}"
+    local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
+    reuse_or_start_volume "${audio_volume}" "${audio_image}"
+    volume_conf="${volume_conf} --volumes-from ${audio_volume}"
+
+    # YOLOV4
+    local yolov4_volume="apollo_yolov4_volume_${USER}"
+    local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest"
+    reuse_or_start_volume "${yolov4_volume}" "${yolov4_image}"
+    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+
+    # FASTER_RCNN
+    local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
+    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
+    reuse_or_start_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
+    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
     if [ "${TARGET_ARCH}" = "x86_64" ]; then
         local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
