@@ -68,4 +68,5 @@
 ### Chinese versions
 - [国内环境下如何克隆Apollo 仓库](how_to_clone_apollo_repo_from_china_cn.md)
 - [How to solve slow pull from CN](how_to_solve_slow_pull_from_cn.md)
+- [How to Prepare Bazel Distribution Directory 中文版](how_to_prepare_bazel_dist_dir_cn.md)
 
