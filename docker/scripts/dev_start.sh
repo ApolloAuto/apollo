@@ -261,7 +261,7 @@ function setup_devices_and_mount_local_volumes() {
 
     [ -d "${CACHE_ROOT_DIR}" ] || mkdir -p "${CACHE_ROOT_DIR}"
 
-    source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
+    source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
