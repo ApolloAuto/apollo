@@ -1,7 +1,7 @@
-ARG BASE_IMAGE=nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ENV TENSORRT_VERSION 7.0.0-1+cuda10.2
+ARG TENSORRT_VERSION
 
 #For only running TensorRT C++ applications:
 #   sudo apt-get install libnvinfer7 libnvonnxparsers7 libnvparsers7 libnvinfer-plugin7
@@ -26,5 +26,5 @@ RUN apt-get -y update \
     && rm -f /etc/apt/sources.list.d/nvidia-ml.list \
     && rm -f /etc/apt/sources.list.d/cuda.list
 
-# NVIDIA apt sources.list removed to speed up build
-# Remove static TensorRT libraries
+# 1) NVIDIA apt sources.list removed to speed up build
+# 2) Static CUDA libraries removal ?
