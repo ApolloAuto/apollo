@@ -2,6 +2,7 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 ARG TENSORRT_VERSION
+# ENV TENSORRT_VERSION ${TENSORRT_VERSION}
 
 #For only running TensorRT C++ applications:
 #   sudo apt-get install libnvinfer7 libnvonnxparsers7 libnvparsers7 libnvinfer-plugin7
