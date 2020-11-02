@@ -155,7 +155,7 @@ function determine_images_for_aarch64() {
     local cudnn_ver=8
     local trt_ver=7
 
-    local BASE_FMT ="L4T-cuda${cuda_ver}-cudnn${cuda_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
+    local BASE_FMT="L4T-cuda${cuda_ver}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
     local CYBER_FMT="cyber-aarch64-${UBUNTU_LTS}"
 
     if [[ "${stage}" == "base" ]]; then
