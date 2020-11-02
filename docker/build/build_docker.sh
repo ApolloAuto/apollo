@@ -19,6 +19,7 @@ SUPPORTED_STAGES=(
 SUPPORTED_DIST=(
     stable
     testing
+    release
 )
 
 DOCKERFILE=
