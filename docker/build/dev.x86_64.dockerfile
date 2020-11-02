@@ -1,12 +1,9 @@
-FROM apolloauto/apollo:cyber-x86_64-18.04-20201029_0047
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
 ARG GEOLOC
-ARG BUILD_STAGE
 ARG INSTALL_MODE
 
-WORKDIR /apollo
-
-COPY archive /tmp/archive
 COPY installers /tmp/installers
 
 RUN bash /tmp/installers/install_geo_adjustment.sh ${GEOLOC}
@@ -25,4 +22,4 @@ RUN bash /tmp/installers/install_3rdparty_pept_deps.sh ${INSTALL_MODE}
 
 RUN bash /tmp/installers/install_release_deps.sh
 
-RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
+RUN bash /tmp/installers/post_install.sh dev

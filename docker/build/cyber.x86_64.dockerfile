@@ -1,7 +1,6 @@
-ARG BASE_IMAGE=apolloauto/apollo:cuda10.2-cudnn7-trt7-devel-18.04-x86_64
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ARG BUILD_STAGE
 ARG GEOLOC
 
 LABEL version="1.2"
@@ -22,6 +21,6 @@ RUN bash /tmp/installers/install_llvm_clang.sh
 RUN bash /tmp/installers/install_qa_tools.sh
 RUN bash /tmp/installers/install_visualizer_deps.sh
 RUN bash /tmp/installers/install_bazel.sh
-RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
+RUN bash /tmp/installers/post_install.sh cyber
 
 WORKDIR /apollo
