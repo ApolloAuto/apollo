@@ -1,5 +1,4 @@
 ARG BASE_IMAGE
-#=apolloauto/apollo:cyber-aarch64-18.04-20200929_0922
 FROM ${BASE_IMAGE}
 
 ARG GEOLOC
