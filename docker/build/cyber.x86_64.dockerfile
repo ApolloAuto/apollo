@@ -1,12 +1,14 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+ARG APOLLO_DIST
 ARG GEOLOC
 
 LABEL version="1.2"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH /opt/apollo/sysroot/bin:$PATH
+ENV APOLLO_DIST ${APOLLO_DIST}
 
 COPY installers /tmp/installers
 COPY rcfiles /opt/apollo/rcfiles

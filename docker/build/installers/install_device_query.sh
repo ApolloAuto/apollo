@@ -24,6 +24,11 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
+if [[ "${APOLLO_DIST}" != "stable" ]]; then
+    warning "APOLLO_DIST ${APOLLO_DIST} not supported."
+    exit 0
+fi
+
 VERSION="10.2.89-1"
 MAIN_VER_DOT="${VERSION%.*}"
 DEMO_SUITE_DEST_DIR="/usr/local/cuda-${MAIN_VER_DOT}/extras/demo_suite"
