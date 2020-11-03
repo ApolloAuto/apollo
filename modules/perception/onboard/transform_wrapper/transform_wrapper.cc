@@ -83,7 +83,10 @@ Eigen::Quaterniond Slerp(const Eigen::Quaterniond& source, const double& t,
   }
   if (d < 0) scale1 = -scale1;
 
-  return Eigen::Quaterniond(scale0 * source.coeffs() + scale1 * other.coeffs());
+  return Eigen::Quaterniond(scale0 * source.w() + scale1 * other.w(),
+                            scale0 * source.x() + scale1 * other.x(),
+                            scale0 * source.y() + scale1 * other.y(),
+                            scale0 * source.z() + scale1 * other.z());
 }
 
 bool TransformCache::QueryTransform(double timestamp,
