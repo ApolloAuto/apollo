@@ -21,6 +21,8 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 VERSION_X86_64="cyber-x86_64-18.04-20201029_0047"
+TESTING_VERSION_X86_64="cyber-x86_64-18.04-testing-20201103_1900"
+
 # ARMV8
 # VERSION_AARCH64="cyber-aarch64-18.04-20200717_0327"
 # L4T
@@ -39,6 +41,7 @@ TARGET_ARCH=""
 
 USE_GPU_HOST=0
 USE_LOCAL_IMAGE=0
+CUSTOM_DIST=
 CUSTOM_VERSION=
 GEOLOC=
 GEO_REGISTRY=
@@ -100,7 +103,8 @@ Usage: $0 [options] ...
 OPTIONS:
     -g <us|cn>             Pull docker image from mirror registry based on geolocation.
     -h, --help             Display this help and exit.
-    -t, --tag <version>    Specify which version of a docker image to pull.
+    -t, --tag <TAG>        Specify docker image with tag to start
+    -d, --dist             Specify docker image type (stable/testing)
     -l, --local            Use local docker image.
     -m <arch>              Specify docker image for a different CPU arch.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
@@ -138,6 +142,7 @@ function stop_all_apollo_containers_for_user() {
 function parse_arguments() {
     local use_local_image=0
     local custom_version=""
+    local custom_dist=""
     local target_arch=""
     local shm_size=""
     local geo=""
@@ -155,6 +160,10 @@ function parse_arguments() {
             fi
             custom_version="$1"; shift
             _optarg_check_for_opt "${opt}" "${custom_version}"
+            ;;
+        -d|--dist)
+            custom_dist="$1"; shift
+            _optarg_check_for_opt "${opt}" "${custom_dist}"
             ;;
         -h|--help)
             show_usage
@@ -189,6 +198,7 @@ function parse_arguments() {
     USE_LOCAL_IMAGE="${use_local_image}"
     [[ -n "${target_arch}" ]] && TARGET_ARCH="${target_arch}"
     [[ -n "${custom_version}" ]] && CUSTOM_VERSION="${custom_version}"
+    [[ -n "${custom_dist}" ]] && CUSTOM_DIST="${custom_dist}"
     [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
 }
 
@@ -226,7 +236,11 @@ function determine_target_version_and_arch() {
         fi
         _target_arch_check "${TARGET_ARCH}"
         if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-            version="${VERSION_X86_64}"
+            if [[ "${CUSTOM_DIST}" == "testing" ]]; then
+                version="${TESTING_VERSION_X86_64}"
+            else
+                version="${VERSION_X86_64}"
+            fi
         elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
             version="${VERSION_AARCH64}"
         else
