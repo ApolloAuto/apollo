@@ -86,7 +86,7 @@ fi
 
 # Note(storypku):
 # Used by `apollo.sh config` to determine native cuda compute capability.
-bash ${CURR_DIR}/install_device_query.sh
+bash ${CURR_DIR}/install_deviceQuery.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
