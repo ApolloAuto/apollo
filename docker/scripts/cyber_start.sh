@@ -35,7 +35,7 @@ DOCKER_RUN_CMD="docker run"
 DOCKER_PULL_CMD="docker pull"
 SHM_SIZE="2G"
 
-SUPPORTED_ARCHS=" x86_64 aarch64 "
+SUPPORTED_ARCHS=(x86_64 aarch64)
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH=""
 
@@ -91,10 +91,13 @@ function _optarg_check_for_opt() {
 
 function _target_arch_check() {
     local arch="$1"
-    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
-        error "Unsupported target architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
-        exit 1
-    fi
+    for k in "${SUPPORTED_ARCHS[@]}"; do
+        if [[ "${k}" == "${arch}" ]]; then
+            return
+        fi
+    done
+    error "Unsupported target architecture: ${arch}."
+    exit 1
 }
 
 function show_usage() {
@@ -202,7 +205,6 @@ function parse_arguments() {
     [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
 }
 
-# TODO(storypku): What does these do with apollo inside container
 # if [ ! -e /apollo ]; then
 #    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
 # fi
@@ -247,13 +249,6 @@ function determine_target_version_and_arch() {
             error "CAN'T REACH HERE"
             exit 1
         fi
-    elif [[ "${version}" =~ local* ]]; then
-        if [[ -z "${TARGET_ARCH}" ]]; then
-            TARGET_ARCH="${HOST_ARCH}"
-        fi
-        _target_arch_check "${TARGET_ARCH}"
-        info "Local image ${version} specified, indicating USE_LOCAL_IMAGE=1"
-        USE_LOCAL_IMAGE=1
     else # CUSTOM_VERSION specified
         local supposed_arch
         guess_arch_from_tag "${version}" supposed_arch
