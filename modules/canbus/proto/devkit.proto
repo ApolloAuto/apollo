@@ -219,6 +219,8 @@ message Vcu_report_505 {
   optional double acc = 5;
   // [m/s] [0|65.535]
   optional double speed = 6;
+  // [%] [0|100]
+  optional int32 battery_soc = 7;
 }
 
 message Steering_report_502 {

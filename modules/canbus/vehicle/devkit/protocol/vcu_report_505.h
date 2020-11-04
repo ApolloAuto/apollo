@@ -32,6 +32,11 @@ class Vcureport505 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
+  // config detail: {'name': 'Battery_Soc', 'offset': 0.0, 'precision': 1.0,
+  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 47,
+  // 'type': 'int', 'order': 'motorola', 'physical_unit': '%'}
+  int battery_soc(const std::uint8_t* bytes, const int32_t length) const;
+
   // config detail: {'name': 'Vehicle_Mode_State', 'enum': {0:
   // 'VEHICLE_MODE_STATE_MANUAL_REMOTE_MODE', 1: 'VEHICLE_MODE_STATE_AUTO_MODE',
   // 2: 'VEHICLE_MODE_STATE_EMERGENCY_MODE', 3:
