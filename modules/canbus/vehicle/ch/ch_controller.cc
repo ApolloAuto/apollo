@@ -246,6 +246,15 @@ Chassis ChController::chassis() {
         "CANBUS not ready, firmware error or emergency button pressed!");
   }
 
+  // 27 battery soc
+  if (chassis_detail.ch().has_ecu_status_2_516() &&
+      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.ch().ecu_status_2_516().battery_soc());
+  } else {
+    chassis_.set_battery_soc_percentage(0);
+  }
+
   return chassis_;
 }
 
