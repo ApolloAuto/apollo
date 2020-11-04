@@ -184,8 +184,11 @@ Chassis DevkitController::chassis() {
       chassis_detail.devkit().vcu_report_505().has_speed()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.devkit().vcu_report_505().speed()));
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.devkit().vcu_report_505().battery_soc());
   } else {
     chassis_.set_speed_mps(0);
+    chassis_.set_battery_soc_percentage(0);
   }
   // 7 no odometer
   // chassis_.set_odometer_m(0);
@@ -480,19 +483,11 @@ bool DevkitController::CheckChassisError() {
         devkit.steering_report_502().steer_flt1()) {
       return true;
     }
-    if (Steering_report_502::STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT ==
-        devkit.steering_report_502().steer_flt2()) {
-      return true;
-    }
   }
   // drive fault
   if (devkit.has_throttle_report_500()) {
     if (Throttle_report_500::THROTTLE_FLT1_DRIVE_SYSTEM_HARDWARE_FAULT ==
         devkit.throttle_report_500().throttle_flt1()) {
-      return true;
-    }
-    if (Throttle_report_500::THROTTLE_FLT2_DRIVE_SYSTEM_COMUNICATION_FAULT ==
-        devkit.throttle_report_500().throttle_flt2()) {
       return true;
     }
   }
@@ -502,25 +497,8 @@ bool DevkitController::CheckChassisError() {
         devkit.brake_report_501().brake_flt1()) {
       return true;
     }
-    if (Brake_report_501::BRAKE_FLT2_BRAKE_SYSTEM_COMUNICATION_FAULT ==
-        devkit.brake_report_501().brake_flt2()) {
-      return true;
-    }
   }
-  // gear fault
-  if (devkit.has_gear_report_503()) {
-    if (Gear_report_503::GEAR_FLT_FAULT ==
-        devkit.gear_report_503().gear_flt()) {
-      return true;
-    }
-  }
-  // park fault
-  if (devkit.has_park_report_504()) {
-    if (Park_report_504::PARK_FLT_FAULT ==
-        devkit.park_report_504().park_flt()) {
-      return true;
-    }
-  }
+
   return false;
 }
 

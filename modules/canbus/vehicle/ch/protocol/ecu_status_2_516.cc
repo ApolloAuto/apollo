@@ -30,10 +30,10 @@ const int32_t Ecustatus2516::ID = 0x516;
 
 void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
                           ChassisDetail* chassis) const {
-  chassis->mutable_ch()
-      ->mutable_ecu_status_2_516()
-      ->set_battery_remaining_capacity(
-          battery_remaining_capacity(bytes, length));
+  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_soc(
+      battery_soc(bytes, length));
+  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_capacity(
+      battery_capacity(bytes, length));
   chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_voltage(
       battery_voltage(bytes, length));
   chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_current(
@@ -43,18 +43,26 @@ void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 // config detail: {'description': 'Percentage of battery remaining (BMS
-// status)', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
-// 'battery_remaining_capacity', 'is_signed_var': False, 'physical_range':
-// '[0|100]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
-int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
-                                              int32_t length) const {
-  Byte t0(bytes + 1);
+// status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'battery_soc',
+// 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 0, 'type': 'int',
+// 'order': 'intel', 'physical_unit': '%'}
+int Ecustatus2516::battery_soc(const std::uint8_t* bytes,
+                               int32_t length) const {
+  Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Byte t1(bytes + 0);
-  int32_t t = t1.get_byte(0, 8);
-  x <<= 8;
-  x |= t;
+  int ret = x;
+  return ret;
+}
+
+// config detail: {'description': 'Battery full capacity (BMS status)',
+// 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'battery_capacity',
+// 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type': 'int',
+// 'order': 'intel', 'physical_unit': 'Ah'}
+int Ecustatus2516::battery_capacity(const std::uint8_t* bytes,
+                                    int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
   return ret;
@@ -62,7 +70,7 @@ int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
 
 // config detail: {'description': 'Current battery voltage (BMS status)',
 // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_voltage',
-// 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 16, 'type':
+// 'is_signed_var': False, 'physical_range': '[0|80]', 'bit': 16, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'V'}
 double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
                                       int32_t length) const {
@@ -80,7 +88,7 @@ double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
 
 // config detail: {'description': 'Current battery current (BMS status)',
 // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_current',
-// 'is_signed_var': True, 'physical_range': '[0|0]', 'bit': 32, 'type':
+// 'is_signed_var': True, 'physical_range': '[-60|60]', 'bit': 32, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'A'}
 double Ecustatus2516::battery_current(const std::uint8_t* bytes,
                                       int32_t length) const {
@@ -101,8 +109,8 @@ double Ecustatus2516::battery_current(const std::uint8_t* bytes,
 
 // config detail: {'description': 'Current battery temperature (BMS status)',
 // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'battery_temperature',
-// 'is_signed_var': True, 'physical_range': '[0|0]', 'bit': 48, 'type': 'int',
-// 'order': 'intel', 'physical_unit': '?'}
+// 'is_signed_var': True, 'physical_range': '[-40|110]', 'bit': 48, 'type':
+// 'int', 'order': 'intel', 'physical_unit': '℃'}
 int Ecustatus2516::battery_temperature(const std::uint8_t* bytes,
                                        int32_t length) const {
   Byte t0(bytes + 7);
