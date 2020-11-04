@@ -54,7 +54,7 @@ cc_library(
 
 cc_test(
     name = "sunnyvale_big_loop_test",
-    size = "small",
+    size = "medium",
     srcs = ["sunnyvale_big_loop_test.cc"],
     data = [
         "//modules/common/configs:config_gflags",
