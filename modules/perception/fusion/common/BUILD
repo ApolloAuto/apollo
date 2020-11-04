@@ -87,6 +87,7 @@ cc_test(
     name = "kalman_filter_test",
     size = "small",
     srcs = ["kalman_filter_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":kalman_filter",
         "//modules/perception/fusion/base",
