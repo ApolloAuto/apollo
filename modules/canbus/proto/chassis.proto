@@ -124,6 +124,8 @@ message Chassis {
   // replace this [id 23]
 
   optional apollo.common.VehicleID vehicle_id = 33;
+
+  optional int32 battery_soc_percentage = 34;
 }
 
 message ChassisGPS {
