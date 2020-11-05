@@ -1,6 +1,7 @@
 # NPP: NVIDIA 2D Image and Signal Processing Performance Primitives
 # Ref https://docs.nvidia.com/cuda/npp/index.html
-# TODO(all): merge this with @local_config_cuda
+
+# TODO(infra): merge this with @local_config_cuda and split
 
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
@@ -20,7 +21,6 @@ cc_library(
         "-lnppc",
         "-lnppial",
         "-lnppicc",
-        "-lnppicom",
         "-lnppidei",
         "-lnppif",
         "-lnppig",
