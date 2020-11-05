@@ -25,6 +25,7 @@ function ok() {
 
 export ARCHIVE_DIR="/tmp/archive"
 export RCFILES_DIR="/opt/apollo/rcfiles"
+export APOLLO_DIST="${APOLLO_DIST:-stable}"
 
 export PKGS_DIR="/opt/apollo/pkgs"
 export SYSROOT_DIR="/opt/apollo/sysroot"
@@ -34,8 +35,15 @@ export APOLLO_LD_FILE="/etc/ld.so.conf.d/apollo.conf"
 export DOWNLOAD_LOG="/opt/apollo/build.log"
 export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 
-# export SUPPORTED_NVIDIA_SMS="3.7 5.0 5.2 6.0 6.1 7.0 7.2 7.5"
-export SUPPORTED_NVIDIA_SMS="3.7 5.2 6.0 6.1 7.0 7.2 7.5"
+if [[ "$(uname -m)" == "x86_64" ]]; then
+    if [[ "${APOLLO_DIST}" == "stable" ]]; then
+        export SUPPORTED_NVIDIA_SMS="3.7 5.2 6.0 6.1 7.0 7.2 7.5"
+    else
+        export SUPPORTED_NVIDIA_SMS="5.2 6.0 6.1 7.0 7.2 7.5 8.0 8.6"
+    fi
+else # AArch64
+    export SUPPORTED_NVIDIA_SMS="5.3 6.2 7.2"
+fi
 
 function py3_version() {
     local version
