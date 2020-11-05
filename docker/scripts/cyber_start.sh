@@ -107,7 +107,7 @@ OPTIONS:
     -g <us|cn>             Pull docker image from mirror registry based on geolocation.
     -h, --help             Display this help and exit.
     -t, --tag <TAG>        Specify docker image with tag to start
-    -d, --dist             Specify docker image type (stable/testing)
+    -d, --dist             Specify Apollo distribution(stable/testing)
     -l, --local            Use local docker image.
     -m <arch>              Specify docker image for a different CPU arch.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
