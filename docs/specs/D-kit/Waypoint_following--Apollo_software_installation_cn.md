@@ -286,7 +286,7 @@ b.回放数据包
 在终端输入以下命令下载数据包：
 
 ```
-python docs/demo_guide/rosbag_helper.py demo_2.0.bag 
+python docs/demo_guide/record_helper.py demo_2.0.bag 
 ```
 
 输入以下命令可以回放数据包，在浏览器DreamView中可以看到回放画面。
