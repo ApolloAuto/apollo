@@ -92,6 +92,7 @@ proto_library(
     name = "simulation_world_proto",
     srcs = ["simulation_world.proto"],
     deps = [
+        "//modules/canbus/proto:chassis_proto",
         "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/perception/proto:perception_obstacle_proto",
