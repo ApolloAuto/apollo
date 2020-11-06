@@ -15,10 +15,10 @@
  *****************************************************************************/
 #pragma once
 
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
-#include <limits>
 
 #include "modules/perception/base/blob.h"
 
@@ -26,9 +26,9 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-static const int kMaxStrLen = 64;
-static const int kMinDim = 1;
-static const int kMaxDim = std::numeric_limits<int>::max();
+constexpr size_t kMaxStrLen = 64;
+constexpr int kMinDim = 1;
+constexpr int kMaxDim = std::numeric_limits<int>::max();
 
 size_t BinaryReadString(FILE *fp, char *name);
 size_t BinaryWriteString(FILE *fp, const std::string &str);

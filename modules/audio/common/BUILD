@@ -7,6 +7,9 @@ cc_library(
     name = "audio_gflags",
     srcs = ["audio_gflags.cc"],
     hdrs = ["audio_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(

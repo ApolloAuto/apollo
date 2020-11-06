@@ -27,7 +27,7 @@ namespace planning {
 
 PolynomialXd::PolynomialXd(const std::uint32_t order)
     : params_(order + 1, 0.0) {
-  CHECK_GE(order, 0);
+  CHECK_GE(order, 0U);
 }
 
 PolynomialXd::PolynomialXd(const std::vector<double>& params)

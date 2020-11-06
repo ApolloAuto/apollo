@@ -24,10 +24,11 @@
 #include <limits>
 #include <string>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -329,7 +330,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
 
   const auto& cost_init = cost_table_[0][0];
   if (c == 0) {
-    DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
+    DCHECK_EQ(r, 0U) << "Incorrect. Row should be 0 with col = 0. row: " << r;
     cost_cr.SetTotalCost(0.0);
     cost_cr.SetOptimalSpeed(init_point_.v());
     return;

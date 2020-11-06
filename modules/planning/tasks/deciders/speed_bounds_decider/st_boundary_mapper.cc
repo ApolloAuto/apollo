@@ -25,18 +25,19 @@
 #include <memory>
 #include <utility>
 
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/proto/decision.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/decision.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -194,7 +195,6 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
   // Sanity checks.
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
-  DCHECK_GT(path_points.size(), 0);
   if (path_points.empty()) {
     AERROR << "No points in path_data_.discretized_path().";
     return false;

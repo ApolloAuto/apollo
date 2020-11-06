@@ -102,7 +102,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       max_iter = 4000;
     }
 
-    CHECK_GT(path_boundary_size, 1);
+    CHECK_GT(path_boundary_size, 1U);
 
     std::vector<double> opt_l;
     std::vector<double> opt_dl;

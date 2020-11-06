@@ -1451,7 +1451,7 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
   Eigen::MatrixXi parking_boundaries_obstacles_edges_num(parking_boundaries_num,
                                                          1);
   for (size_t i = 0; i < parking_boundaries_num; i++) {
-    CHECK_GT(roi_parking_boundary[i].size(), 1);
+    CHECK_GT(roi_parking_boundary[i].size(), 1U);
     parking_boundaries_obstacles_edges_num(i, 0) =
         static_cast<int>(roi_parking_boundary[i].size()) - 1;
   }

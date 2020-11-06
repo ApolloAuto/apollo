@@ -23,8 +23,9 @@
 #include <memory>
 #include <string>
 
-#include "cyber/task/task.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+
+#include "cyber/task/task.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -289,7 +290,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose, double rotate_angle,
     const Vec2d& translate_origin) {
-  CHECK_EQ(end_pose.size(), 4);
+  CHECK_EQ(end_pose.size(), 4U);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
 
   end_pose_to_world_frame.SelfRotate(rotate_angle);

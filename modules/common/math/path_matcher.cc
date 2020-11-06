@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "glog/logging.h"
+
 #include "modules/common/math/linear_interpolation.h"
 
 namespace apollo {
@@ -33,7 +34,7 @@ namespace math {
 
 PathPoint PathMatcher::MatchToPath(const std::vector<PathPoint>& reference_line,
                                    const double x, const double y) {
-  CHECK_GT(reference_line.size(), 0);
+  CHECK_GT(reference_line.size(), 0U);
 
   auto func_distance_square = [](const PathPoint& point, const double x,
                                  const double y) {
