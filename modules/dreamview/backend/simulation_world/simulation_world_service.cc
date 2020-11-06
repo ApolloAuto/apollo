@@ -541,6 +541,9 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
+
+  auto_driving_car->set_battery_soc_percentage(chassis.battery_soc_percentage());
+  auto_driving_car->set_gear_localtion(chassis.gear_location());
 }
 
 template <>
