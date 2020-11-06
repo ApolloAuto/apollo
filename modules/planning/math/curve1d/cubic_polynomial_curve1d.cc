@@ -22,6 +22,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -46,7 +47,7 @@ CubicPolynomialCurve1d::CubicPolynomialCurve1d(const double x0,
 
 void CubicPolynomialCurve1d::DerivedFromQuarticCurve(
     const PolynomialCurve1d& other) {
-  CHECK_EQ(other.Order(), 4);
+  CHECK_EQ(other.Order(), 4U);
   param_ = other.ParamLength();
   for (size_t i = 1; i < 5; ++i) {
     coef_[i - 1] = other.Coef(i) * static_cast<double>(i);
@@ -92,7 +93,7 @@ void CubicPolynomialCurve1d::ComputeCoefficients(const double x0,
 }
 
 double CubicPolynomialCurve1d::Coef(const size_t order) const {
-  CHECK_GT(4, order);
+  CHECK_GT(4U, order);
   return coef_[order];
 }
 

@@ -38,7 +38,7 @@ bool SequencePredictor::Predict(
   Clear();
 
   CHECK_NOTNULL(obstacle);
-  CHECK_GT(obstacle->history_size(), 0);
+  CHECK_GT(obstacle->history_size(), 0U);
   return true;
 }
 
@@ -349,7 +349,7 @@ bool SequencePredictor::GetLongitudinalPolynomial(
     std::array<double, 5>* coefficients) {
   // Sanity check.
   CHECK_NOTNULL(coefficients);
-  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(obstacle.history_size(), 0U);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
 
@@ -403,7 +403,7 @@ bool SequencePredictor::GetLateralPolynomial(
     const double time_to_end_state, std::array<double, 4>* coefficients) {
   // Sanity check.
   CHECK_NOTNULL(coefficients);
-  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(obstacle.history_size(), 0U);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
 

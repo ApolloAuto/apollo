@@ -29,7 +29,7 @@ constexpr double kMaxVariableRange = 1.0e10;
 PiecewiseJerkProblem::PiecewiseJerkProblem(
     const size_t num_of_knots, const double delta_s,
     const std::array<double, 3>& x_init) {
-  CHECK_GE(num_of_knots, 2);
+  CHECK_GE(num_of_knots, 2U);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;

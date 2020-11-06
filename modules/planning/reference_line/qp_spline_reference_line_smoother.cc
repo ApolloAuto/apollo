@@ -22,9 +22,10 @@
 #include <algorithm>
 #include <utility>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve_math.h"
@@ -205,7 +206,7 @@ bool QpSplineReferenceLineSmoother::Solve() { return spline_solver_->Solve(); }
 
 void QpSplineReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
-  CHECK_GE(anchor_points.size(), 2);
+  CHECK_GE(anchor_points.size(), 2U);
   anchor_points_ = anchor_points;
 }
 

@@ -213,7 +213,7 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
   // Sanity check
   CHECK_NOTNULL(point2d);
   CHECK_GT(xWS.cols(), 1);
-  CHECK_GT(point2d->size(), 3);
+  CHECK_GT(point2d->size(), 3U);
 
   // Set initial heading and bounds
   const double initial_heading = xWS(2, 0);
@@ -798,7 +798,7 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
 
 double IterativeAnchoringSmoother::CalcHeadings(
     const DiscretizedPath& path_points, const size_t index) {
-  CHECK_GT(path_points.size(), 2);
+  CHECK_GT(path_points.size(), 2U);
   double dx = 0.0;
   double dy = 0.0;
   if (index == 0) {

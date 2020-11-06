@@ -81,7 +81,7 @@ int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
       }
       out = &((*dst)[dst_idx]);
     } while (stream_data.avail_out == 0);
-    DCHECK_EQ(stream_data.avail_in, 0); /* all input will be used */
+    DCHECK_EQ(stream_data.avail_in, 0U); /* all input will be used */
 
     /* done when last data in file processed */
   } while (flush != Z_FINISH);

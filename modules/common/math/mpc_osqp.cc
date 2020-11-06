@@ -56,7 +56,7 @@ void MpcOsqp::CalculateKernel(std::vector<c_float> *P_data,
   // col1:(row,val),...; col2:(row,val),....; ...
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(num_param_);
-  int value_index = 0;
+  size_t value_index = 0;
   // state and terminal state
   for (size_t i = 0; i <= horizon_; ++i) {
     for (size_t j = 0; j < state_dim_; ++j) {

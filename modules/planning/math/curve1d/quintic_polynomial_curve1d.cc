@@ -22,6 +22,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -96,7 +97,7 @@ void QuinticPolynomialCurve1d::SetParam(const double x0, const double dx0,
 
 void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(
     const PolynomialCurve1d& other, const double init_value) {
-  CHECK_EQ(other.Order(), 4);
+  CHECK_EQ(other.Order(), 4U);
   param_ = other.ParamLength();
   coef_[0] = init_value;
   for (size_t i = 0; i < 5; ++i) {
@@ -132,7 +133,7 @@ std::string QuinticPolynomialCurve1d::ToString() const {
 }
 
 double QuinticPolynomialCurve1d::Coef(const size_t order) const {
-  CHECK_GT(6, order);
+  CHECK_GT(6U, order);
   return coef_[order];
 }
 }  // namespace planning

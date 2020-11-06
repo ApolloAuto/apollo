@@ -50,7 +50,7 @@ Status LanesXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     sub_node = sub_node->NextSiblingElement("laneSection");
   }
 
-  CHECK_GT(sections->size(), 0);
+  CHECK_NE(sections->size(), 0U);
 
   return Status::OK();
 }

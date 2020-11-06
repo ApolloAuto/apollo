@@ -175,7 +175,7 @@ bool DiscretePointsReferenceLineSmoother::FemPosSmooth(
 
 void DiscretePointsReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
-  CHECK_GT(anchor_points.size(), 1);
+  CHECK_GT(anchor_points.size(), 1U);
   anchor_points_ = anchor_points;
 }
 
