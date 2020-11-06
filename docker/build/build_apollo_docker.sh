@@ -33,6 +33,8 @@ DIST="stable"
 BUILD_CLEAN=0
 DRY_RUN=0
 
+CUDA_LITE=""
+CUDNN_VERSION=""
 TENSORRT_VERSION=""
 UBUNTU_LTS="18.04"
 
@@ -114,19 +116,20 @@ function determine_images_for_x86_64() {
     local dist="$2"  # stable or testing
 
     if [[ "${dist}" == "stable" ]]; then
-        local cuda_ver=10.2
-        local cudnn_ver=7
-        TENSORRT_VERSION="7.0.0-1+cuda${cuda_ver}"
+        CUDA_LITE=10.2
+        CUDNN_VERSION="7.6.5.32"
+        TENSORRT_VERSION="7.0.0"
     else
-        local cuda_ver=11.1
-        local cudnn_ver=8
-        TENSORRT_VERSION="7.2.1-1+cuda${cuda_ver}"
+        CUDA_LITE=11.1
+        CUDNN_VERSION="8.0.4.30"
+        TENSORRT_VERSION="7.2.1"
     fi
+    local cudnn_ver="${CUDNN_VERSION%%.*}"
     local trt_ver="${TENSORRT_VERSION%%.*}"
 
-    local base_image="${APOLLO_REPO}:cuda${cuda_ver}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}-x86_64"
+    local base_image="${APOLLO_REPO}:cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}-x86_64"
     if [[ "${stage}" == "base" ]]; then
-        IMAGE_IN="nvidia/cuda:${cuda_ver}-cudnn${cudnn_ver}-devel-ubuntu${UBUNTU_LTS}"
+        IMAGE_IN="nvidia/cuda:${CUDA_LITE}-devel-ubuntu${UBUNTU_LTS}"
         IMAGE_OUT="${base_image}"
     elif [[ "${stage}" == "cyber" ]]; then
         IMAGE_IN="${base_image}"
@@ -151,11 +154,11 @@ function determine_images_for_x86_64() {
 
 function determine_images_for_aarch64() {
     local stage="$1"
-    local cuda_ver=10.2
+    CUDA_LITE=10.2
     local cudnn_ver=8
     local trt_ver=7
 
-    local BASE_FMT="L4T-cuda${cuda_ver}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
+    local BASE_FMT="L4T-cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
     local CYBER_FMT="cyber-aarch64-${UBUNTU_LTS}"
 
     if [[ "${stage}" == "base" ]]; then
@@ -300,6 +303,8 @@ function docker_build_run() {
         --build-arg GEOLOC="${GEOLOC}"     \
         --build-arg APOLLO_DIST="${DIST}"  \
         --build-arg BASE_IMAGE="${IMAGE_IN}" \
+        --build-arg CUDA_LITE="${CUDA_LITE}" \
+        --build-arg CUDNN_VERSION="${CUDNN_VERSION}" \
         --build-arg TENSORRT_VERSION="${TENSORRT_VERSION}" \
         -f "${DOCKERFILE}" \
         "${context}"
