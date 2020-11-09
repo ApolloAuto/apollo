@@ -23,8 +23,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
-apt-get -y update && \
-    apt-get -y install --no-install-recommends \
+apt_get_update_and_install \
     libasio-dev \
     libtinyxml2-dev
 
@@ -60,4 +59,5 @@ else # aarch64
 fi
 
 echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
-
+ldconfig
+apt_get_remove libasio-dev libtinyxml2-dev
