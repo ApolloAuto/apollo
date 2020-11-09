@@ -27,11 +27,10 @@ TARGET_ARCH="$(uname -m)"
 ## NOTE:
 ## buildifier/buildozer was moved into install_bazel.sh.
 
-apt-get -y update && \
-    apt-get -y install \
-    cppcheck    \
-    lcov        \
-    valgrind
+apt_get_update_and_install \
+    lcov
+#    cppcheck
+#    valgrind
 
 # libgoogle-perftools4  # gperftools
 # PROFILER_SO="/usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so"
