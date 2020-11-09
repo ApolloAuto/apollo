@@ -24,9 +24,8 @@
       - [3. 获取标定结果验证及标定外参文件](#3-获取标定结果验证及标定外参文件)
   - [NEXT](#next)
   - [常见问题](#常见问题)
-      - [1. 提交后，显示`UNAUTHORIZED`,如下图所示](#1-提交后显示unauthorized如下图所示)
-      - [2. 进行`Sensor Calibration`任务后，邮件显示任务失败](#2-进行sensor-calibration任务后邮件显示任务失败)
-      - [3. 标定结果效果较差](#3-标定结果效果较差)
+      - [1. 进行`Sensor Calibration`任务后，邮件显示任务失败](#1-进行sensor-calibration任务后邮件显示任务失败)
+      - [2. 标定结果效果较差](#2-标定结果效果较差)
 
 ## 概览
 该用户手册旨在帮助用户完成激光雷达的标定(Lidar-IMU)
@@ -131,7 +130,7 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 
 #### 1. 按照目录结构放置好Lidar-GNSS标定数据包
 
-复制[sensor_calibration目录](../../Apollo_Fuel/examples/)(路径为 docs/specs/Apollo_Fuel/examples/sensor_calibration/)并放置于apollo根目录下，其目录结构如下：
+复制[sensor_calibration目录](../../Apollo_Fuel/examples/)(路径为 docs/Apollo_Fuel/examples/sensor_calibration/)并放置于apollo根目录下，其目录结构如下：
 
 ```
 .
@@ -153,9 +152,14 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 
 #### 2. 修改抽取工具配置文件 lidar_to_gnss.config
 
-根据实际情况，修改配置文件`lidar_to_gnss.config`中预处理数据产出目录（output_path）和待处理数据包目录（record_path），参考下图：
+根据实际情况，修改配置文件`lidar_to_gnss.config`中预处理数据产出目录（output_path）和待处理数据包目录（record_path），单激光雷达标定文件配置参考下图：
 
 ![lidar_calibration_config](images/lidar_calibration_config.png)
+
+如果是多激光雷达标定，配置文件中还需要补充一下雷达点云channel信息，如下图所示(这里以3lidar标定为例)：
+
+
+![lidar_calibration_config](images/lidar_calibration_multi_lidar_config.jpg)
 
 **注意**：以上目录需要指定绝对路径。
 
@@ -170,13 +174,83 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 **注意**：--config参数指定了配置文件路径，必须为绝对路径，用户根据情况自行修改。
 
- 等待终端中显示`Data extraction is completed successfully!`的提示代表数据提取成功，提取出的数据被存储到配置文件中指定的`output_path`路径下。运行数据抽取工具后的目录如下图红框所示：
+ 等待终端中显示`Data extraction is completed successfully!`的提示代表数据提取成功，提取出的数据被存储到配置文件中指定的`output_path`路径下。运行数据抽取工具后的目录如下所示：
  
- ![lidar_calibration_tree2](images/lidar_calibration_tree2.png)
+单激光雷达运行数据提取提供工具后生成的目录结构如下所示：
+
+```
+lidar_to_gnss/
+├── extracted_data
+│   ├── lidar_to_gnss-2020-10-27-20-26
+│   │   ├── multi_lidar_to_gnss_calibration
+│   │   │   ├── _apollo_localization_pose
+│   │   │   ├── _apollo_sensor_velodyne16_PointCloud2
+│   │   │   └── sample_config.yaml
+│   │   └── tmp
+│   │       ├── _apollo_localization_pose
+│   │       ├── _apollo_sensor_velodyne16_PointCloud2
+│   │       └── velodyne16_sample_config.yaml
+│   └── readme.txt
+├── lidar_to_gnss.config
+└── records
+    ├── 20200723180717_multi_lidar.record.00000
+    └── readme.txt
+```
+
+多激光雷达运行数据提取提供工具后生成的目录结构示例如下所示(这里以3激光雷达标定为例)：
+
+```
+lidar_to_gnss/
+├── extracted_data
+│   ├── lidar_to_gnss-2020-10-27-20-26
+│   │   ├── multi_lidar_to_gnss_calibration
+│   │   │   ├── _apollo_localization_pose
+│   │   │   ├── _apollo_sensor_lidar16_back_PointCloud2
+│   │   │   ├── _apollo_sensor_lidar16_left_PointCloud2
+│   │   │   ├── _apollo_sensor_lidar16_right_PointCloud2
+│   │   │   └── sample_config.yaml
+│   │   └── tmp
+│   │       ├── _apollo_localization_pose
+│   │   │   ├── _apollo_sensor_lidar16_back_PointCloud2
+│   │   │   ├── _apollo_sensor_lidar16_left_PointCloud2
+│   │   │   ├── _apollo_sensor_lidar16_right_PointCloud2
+│   │       └── velodyne16_sample_config.yaml
+│   └── readme.txt
+├── lidar_to_gnss.config
+└── records
+    ├── 20200723180717_multi_lidar.record.00000
+    └── readme.txt
+```
+
+
  
 #### 4. 修改云标定配置文件 sample_config.yaml
 
-修改数据抽取工具生成的sample_config.yaml文件。把前面步骤手动测量的Lidar-GNSS标定初始外参信息填入，仅需要填写`translation`字段。修改完之后把`lidar16_to_gnss_calibration`目录准备后续待用。
+单激光雷达标定时`sample_config.yaml`文件的修改：
+- 添加`main_sensor`字段信息：`main_sensor`字段需要填写激光雷达的名称(单激光雷达标定的情况下，main_sensor与source_sensor相同)，参考示例如下图所示
+
+  ![lidar_calibration_set_main_sensor_1](images/lidar_calibration_set_main_sensor_1.jpg)
+
+- 填写`transform`信息
+把前面步骤手动测量的Lidar-GNSS标定初始外参信息填入，仅需要填写`translation`字段，`rotation`使用默认值即可
+  ![lidar_calibration_set_trans_1.jpg](images/lidar_calibration_set_trans_1.jpg)
+
+
+多激光雷达标定时`sample_config.yaml`文件的修改
+- 添加`main_sensor`字段信息：
+`main_sensor`字段需要填写主激光雷达的名称（一般默认车顶的激光雷达为主雷达,从`source_sensor`的雷达中将主激光雷达名称填入`main_sensor`字段），参考示例如下图所示
+
+  ![lidar_calibration_set_main_sensor_1.png](images/lidar_calibration_set_main_sensor_1.png)
+
+
+- 填写`transform`信息
+需要分别测量3个激光雷达和IMU之间的初始位置，并填入`transform`字段,一个示例如下所示：
+
+  ![lidar_calibration_set_trans_2.jpg](images/lidar_calibration_set_trans_2.jpg)
+
+
+
+
 
 ## 使用标定云服务生成外参文件
 
@@ -186,7 +260,25 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 在BOS bucket中新建目录sensor_calibration，作为后续云标定服务读取数据的`Input Data Path`，把前面预处理生成的数据拷贝至该目录。目录结构如下：
 
-![lidar_calibration_tree3](images/lidar_calibration_tree3.png)
+BOS bucket中单激光雷达的目录结构：
+```
+sensor_calibration/
+└── multi_lidar_to_gnss_calibration
+    ├── _apollo_localization_pose
+    ├── _apollo_sensor_velodyne16_PointCloud2
+    └── sample_config.yaml
+```
+
+BOS bucket中多激光雷达的目录结构(以三激光雷达为例)：
+```
+sensor_calibration/
+└── multi_lidar_to_gnss_calibration
+│   │   ├── _apollo_localization_pose
+│   │   ├── _apollo_sensor_lidar16_back_PointCloud2
+│   │   ├── _apollo_sensor_lidar16_left_PointCloud2
+│   │   ├── _apollo_sensor_lidar16_right_PointCloud2
+│   │   └── sample_config.yaml
+```
 
 #### 2. 提交云标定任务
 
@@ -215,21 +307,16 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 **Lidar-GNSS标定外参文件**：
  
-确认邮件得到的外参文件合理后，将邮件发送的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/dev_kit/velodyne_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`、不要直接替换文件。
+确认邮件得到的外参文件合理后，将邮件发送的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/dev_kit/lidar_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`、不要直接替换文件。
 
 ## NEXT
 现在，您已经完成激光雷达感知设备标定，接下来可以开始[封闭园区自动驾驶搭建--虚拟车道线制作](virtual_lane_generation_cn.md)
 
 ## 常见问题
-#### 1. 提交后，显示`UNAUTHORIZED`,如下图所示
-
-![lidar_calibration_unauthorized](images/lidar_calibration_unauthorized.png)
-
-出现该问题，一般是`Partner ID`输入有误 
-#### 2. 进行`Sensor Calibration`任务后，邮件显示任务失败
+#### 1. 进行`Sensor Calibration`任务后，邮件显示任务失败
 建议检查一下输入路径是否正确
 
-#### 3. 标定结果效果较差
+#### 2. 标定结果效果较差
 - 标定时，确保GNSS信号状态良好，周围有轮廓清晰的静态障碍物
 - 保证传感器的安装精度，安装误差超过要求精度时，标定结果不容易收敛
 - 标定时，不要距离有效静态障碍物太远
