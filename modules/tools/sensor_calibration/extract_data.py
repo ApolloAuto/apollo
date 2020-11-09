@@ -394,8 +394,7 @@ def get_substring(str, prefix, suffix):
 
 def reorganize_extracted_data(tmp_data_path,
                               task_name,
-                              remove_input_data_cache=False,
-                              main_sensor=None):
+                              remove_input_data_cache=False):
     root_path = os.path.dirname(os.path.normpath(tmp_data_path))
 
     config_yaml = ConfigYaml()
@@ -471,7 +470,7 @@ def reorganize_extracted_data(tmp_data_path,
         out_data['sensor_files_directory'] = sensor_files_directory_list
         out_data['source_sensor'] = source_sensor_list
         out_data['transform'] = transform_list
-        out_data['main_sensor'] = main_sensor
+        out_data['main_sensor'] = source_sensor_list[0]
         multi_lidar_yaml = os.path.join(multi_lidar_out_path,
                                         'sample_config.yaml')
         with open(multi_lidar_yaml, 'w') as f:
@@ -614,8 +613,7 @@ def main():
                        start_timestamp, end_timestamp, extraction_rates)
     # output_abs_path='/apollo/data/extracted_data/CoolHigh-2019-09-20/camera_to_lidar-2019-12-16-16-33/tmp'
     reorganize_extracted_data(tmp_data_path=output_abs_path,
-                              task_name=config.io_config.task_name,
-                              main_sensor=config.io_config.main_sensor)
+                              task_name=config.io_config.task_name)
     # generate_compressed_file(input_path=config.io_config.output_path,
     #                          input_name=output_relative_path,
     #                          output_path=config.io_config.output_path,
