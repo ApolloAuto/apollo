@@ -360,7 +360,7 @@ function remove_existing_dev_container() {
 
 function docker_pull() {
     local img="$1"
-    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
+    if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
         if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "${img}" ; then
             info "Local image ${img} found and will be used."
             return
