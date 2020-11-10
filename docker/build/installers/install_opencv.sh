@@ -21,7 +21,7 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
-if ldconfig -p | grep -q libopencv_core ; then
+if ldconfig -p | grep -q libopencv_core; then
     info "OpenCV was already installed"
     exit 0
 fi
@@ -46,17 +46,17 @@ BUILD_CONTRIB="no"
 # RTFM: https://src.fedoraproject.org/rpms/opencv/blob/master/f/opencv.spec
 
 apt_get_update_and_install \
-        libjpeg-dev \
-        libpng-dev \
-        libtiff-dev \
-        libv4l-dev \
-        libeigen3-dev \
-        libopenblas-dev \
-        libatlas-base-dev \
-        libxvidcore-dev \
-        libx264-dev \
-        libopenni-dev \
-        libwebp-dev
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libv4l-dev \
+    libeigen3-dev \
+    libopenblas-dev \
+    libatlas-base-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libopenni-dev \
+    libwebp-dev
 
 pip3_install numpy
 
@@ -107,49 +107,48 @@ fi
 
 # -DBUILD_LIST=core,highgui,improc
 pushd "opencv-${VERSION}"
-    mkdir build && cd build
-        cmake .. \
-            -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_SHARED_LIBS=ON          \
-            -DENABLE_PRECOMPILED_HEADERS=OFF \
-            -DOPENCV_GENERATE_PKGCONFIG=ON  \
-            -DBUILD_EXAMPLES=OFF \
-            -DBUILD_DOCS=OFF    \
-            -DBUILD_TESTS=OFF   \
-            -DBUILD_PERF_TESTS=OFF  \
-            -DBUILD_JAVA=OFF     \
-            -DBUILD_PROTOBUF=OFF \
-            -DPROTOBUF_UPDATE_FILES=ON \
-            -DINSTALL_C_EXAMPLES=OFF   \
-            -DWITH_GTK=OFF  \
-            -DWITH_IPP=OFF  \
-            -DWITH_ITT=OFF  \
-            -DWITH_TBB=OFF  \
-            -DWITH_EIGEN=ON \
-            -DWITH_FFMPEG=ON   \
-            -DWITH_LIBV4L=ON   \
-            -DWITH_OPENMP=ON   \
-            -DWITH_OPENNI=ON   \
-            -DWITH_OPENCL=ON   \
-            -DWITH_WEBP=ON     \
-            -DOpenGL_GL_PREFERENCE=GLVND \
-            -DBUILD_opencv_python2=OFF  \
-            -DBUILD_opencv_python3=ON   \
-            -DBUILD_NEW_PYTHON_SUPPORT=ON \
-            -DPYTHON_DEFAULT_EXECUTABLE="$(which python3)" \
-            -DOPENCV_PYTHON3_INSTALL_PATH="/usr/local/lib/python$(py3_version)/dist-packages" \
-            -DOPENCV_ENABLE_NONFREE=ON \
-            -DCV_TRACE=OFF      \
-            ${GPU_OPTIONS}    	\
-            ${EXTRA_OPTIONS}
+mkdir build && cd build
+cmake .. \
+    -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=ON \
+    -DENABLE_PRECOMPILED_HEADERS=OFF \
+    -DOPENCV_GENERATE_PKGCONFIG=ON \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_DOCS=OFF \
+    -DBUILD_TESTS=OFF \
+    -DBUILD_PERF_TESTS=OFF \
+    -DBUILD_JAVA=OFF \
+    -DBUILD_PROTOBUF=OFF \
+    -DPROTOBUF_UPDATE_FILES=ON \
+    -DINSTALL_C_EXAMPLES=OFF \
+    -DWITH_GTK=OFF \
+    -DWITH_IPP=OFF \
+    -DWITH_ITT=OFF \
+    -DWITH_TBB=OFF \
+    -DWITH_EIGEN=ON \
+    -DWITH_FFMPEG=ON \
+    -DWITH_LIBV4L=ON \
+    -DWITH_OPENMP=ON \
+    -DWITH_OPENNI=ON \
+    -DWITH_OPENCL=ON \
+    -DWITH_WEBP=ON \
+    -DOpenGL_GL_PREFERENCE=GLVND \
+    -DBUILD_opencv_python2=OFF \
+    -DBUILD_opencv_python3=ON \
+    -DBUILD_NEW_PYTHON_SUPPORT=ON \
+    -DPYTHON_DEFAULT_EXECUTABLE="$(which python3)" \
+    -DOPENCV_PYTHON3_INSTALL_PATH="/usr/local/lib/python$(py3_version)/dist-packages" \
+    -DOPENCV_ENABLE_NONFREE=ON \
+    -DCV_TRACE=OFF \
+    ${GPU_OPTIONS} \
+    ${EXTRA_OPTIONS}
 
-        make -j$(nproc)
-        make install
+make -j$(nproc)
+make install
 popd
 
 ldconfig
-
 ok "Successfully installed OpenCV ${VERSION}."
 
 rm -rf "${PKG_OCV}" "opencv-${VERSION}"
@@ -157,3 +156,15 @@ rm -rf "${PKG_OCV}" "opencv-${VERSION}"
 if [ "${BUILD_CONTRIB}" = "yes" ]; then
     rm -rf "${PKG_CONTRIB}" "opencv_contrib-${VERSION}"
 fi
+
+apt_get_remove \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libv4l-dev \
+    libeigen3-dev \
+    libopenblas-dev \
+    libatlas-base-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libopenni-dev

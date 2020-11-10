@@ -59,13 +59,20 @@ pushd "boost_${VERSION}"
         --without-icu
 
     ./b2 -d+2 -q -j$(nproc) \
+        --without-graph_parallel \
+        --without-mpi \
         variant=release \
         link=shared \
         threading=multi \
         install
-        # --user-config=user-config.jam
+        #--user-config=user-config.jam
 popd
 ldconfig
 
 # Clean up
 rm -rf "boost_${VERSION}" "${PKG_NAME}"
+apt_get_remove  \
+    liblzma-dev \
+    libbz2-dev \
+    libzstd-dev
+
