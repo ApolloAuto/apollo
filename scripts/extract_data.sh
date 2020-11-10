@@ -18,7 +18,7 @@
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-TARGET_DIR="/apollo/sensor_calibration/lidar_to_gnss/records/"
+TARGET_DIR="${TOP_DIR}/sensor_calibration/lidar_to_gnss"
 RECORD_FILES=()
 RECORD_DIRS=()
 
@@ -51,21 +51,36 @@ function parse_args() {
 }
 
 function _check_target_dir() {
-  if [[ ! -z $(ls -A ${TARGET_DIR} | grep -v "readme.txt") ]]; then
-    local warn="${TARGET_DIR} is not empty, do you want to delete the existing records? (Y/n)"
+  if [ ! -d "${TARGET_DIR}" ]; then
+    mkdir -p ${TARGET_DIR}
+    cp -R ${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration/lidar_to_gnss/* ${TARGET_DIR}
+  elif [[ ! -z "$(ls -A ${TARGET_DIR})" ]]; then
+    local warn="The ${TARGET_DIR} is not empty, do you want to delete it? (Y/n)"
     echo "${warn}"
     local answer
     typeset -l answer
-    read -n 1 answer
+    read answer
     if [ "${answer}" == "y" ];then
-      rm -rf ${TARGET_DIR}*
+      rm -rf ${TARGET_DIR}/*
+      cp -R ${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration/lidar_to_gnss/* ${TARGET_DIR}
     fi
+  else
+    cp -R ${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration/lidar_to_gnss/* ${TARGET_DIR}
   fi
 }
 
-function get_records() {
-  _check_target_dir
+# Since pypcd installed via `pip install` only works with python2.7,
+# we can only install it this way
+function _install_pypcd() {
+  git clone https://github.com/dimatura/pypcd --depth=1
+  pushd pypcd > /dev/null
+  git fetch origin pull/9/head:python3 && git checkout python3
+  python3 setup.py install --user
+  popd > /dev/null
+  rm -rf pypcd
+}
 
+function get_records() {
   for file in "${RECORD_FILES[@]}"; do
     if [ -f "${file}" ]; then
       cp "${file}" "${TARGET_DIR}"
@@ -79,10 +94,10 @@ function get_records() {
     if [ -d "${dir}" ]; then
       case "${dir}" in
         */)
-          cp ${dir}* "${TARGET_DIR}"
+          cp ${dir}* "${TARGET_DIR}/records"
           ;;
         *)
-          cp ${dir}/* "${TARGET_DIR}"
+          cp ${dir}/* "${TARGET_DIR}/records"
           ;;
       esac
     else
@@ -98,7 +113,11 @@ function install_if_not_exist() {
     shift
     pip show --files "${pkg}" >/dev/null
     if [ $? -ne 0 ]; then
-      sudo pip install --no-cache-dir "${pkg}"
+      if [[ "${pkg}" == "pypcd" ]]; then
+        _install_pypcd
+      else
+        sudo pip install --no-cache-dir "${pkg}"
+      fi
     fi
   done
 }
@@ -109,9 +128,7 @@ function main() {
     exit 1
   fi
 
-  if [ ! -d "${TOP_DIR}/sensor_calibration" ]; then
-    cp -r ${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration ${TOP_DIR}/sensor_calibration
-  fi
+  _check_target_dir
 
   parse_args "$@"
 
@@ -125,7 +142,9 @@ function main() {
   install_if_not_exist "pyyaml" "pypcd"
 
   bazel run //modules/tools/sensor_calibration:extract_data \
-    -- --config /apollo/sensor_calibration/lidar_to_gnss/lidar_to_gnss.config
+    -- --config ${TARGET_DIR}/lidar_to_gnss.config
+
+  rm -f ${TARGET_DIR}/records/*
 }
 
 main "$@"
