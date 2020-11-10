@@ -69,8 +69,7 @@ apt_get_update_and_install linux-libc-dev
 COMPONENT="modules/localization"
 info "Install support for [${COMPONENT}] ..."
 
-apt_get_update_and_install liblz4-dev
-
+ok "Good, no extra deps for localization. "
 #######################################################
 COMPONENT="modules/tools"
 info "Install support for [${COMPONENT}] ..."
