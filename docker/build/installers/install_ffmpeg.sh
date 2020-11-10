@@ -33,8 +33,7 @@ cd $( dirname "${BASH_SOURCE[0]}")
 # EOF
 # apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 374C7797FB006459
 
-apt-get -y update && \
-    apt-get -y install \
+apt_get_update_and_install \
     nasm \
     yasm \
     libx265-dev \
@@ -86,7 +85,29 @@ ldconfig
 
 rm -fr ${PKG_NAME} ffmpeg-${VERSION}
 
-apt_get_remove nasm yasm
+apt_get_remove \
+    nasm \
+    yasm \
+    libx265-dev \
+    libass-dev \
+    libfdk-aac-dev \
+    libmp3lame-dev \
+    libopus-dev \
+    libtheora-dev \
+    libvorbis-dev \
+    libvpx-dev \
+    libx264-dev
 
-# Don't remove libnuma-dev!
+# Don't remove libnuma-dev as it is required by coinor-libipopt1v5
 
+# install runtime-dependencies of ffmpeg
+apt_get_update_and_install \
+    libvpx5 \
+    libx264-152 \
+    libx265-146 \
+    libopus0   \
+    libmp3lame0 \
+    libvorbis0a \
+    libvorbisenc2 \
+    libfdk-aac1 \
+    libtheora0

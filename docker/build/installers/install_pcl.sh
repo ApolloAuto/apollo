@@ -53,6 +53,7 @@ fi
 # libpcap-dev
 # libopenmpi-dev
 # libboost-all-dev
+
 apt_get_update_and_install \
     libeigen3-dev \
     libflann-dev \
@@ -60,9 +61,13 @@ apt_get_update_and_install \
     libglfw3-dev \
     freeglut3-dev \
     libusb-1.0-0-dev \
+    libdouble-conversion-dev \
     libopenni-dev \
     libjpeg-dev \
     libpng-dev \
+    libtiff-dev \
+    liblz4-dev \
+    libfreetype6-dev \
     libpcap-dev
 
 # NOTE(storypku)
@@ -96,7 +101,6 @@ pushd pcl-pcl-${VERSION}/
         -DPCL_ENABLE_SSE=ON \
         -DWITH_DOCS=OFF \
         -DWITH_TUTORIALS=OFF \
-        -DBUILD_documentation=OFF \
         -DBUILD_global_tests=OFF \
         -DOPENNI_INCLUDE_DIR:PATH=/usr/include/ni \
         -DBoost_NO_SYSTEM_PATHS=TRUE \
@@ -110,8 +114,37 @@ popd
 
 ldconfig
 
-#clean up
+ok "Successfully installed PCL ${VERSION}"
+
+# Clean up
 rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
+
+# Remove build-deps for PCL
+# Note(storypku):
+# Please keep libflann-dev as it was required by local_config_pcl
+apt_get_remove \
+    libeigen3-dev \
+    libglew-dev \
+    libglfw3-dev \
+    freeglut3-dev \
+    libusb-1.0-0-dev \
+    libdouble-conversion-dev \
+    libopenni-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    liblz4-dev \
+    libfreetype6-dev \
+    libpcap-dev
+
+# Add runtime-deps for pcl
+apt_get_update_and_install \
+    libusb-1.0-0 \
+    libopenni0 \
+    libfreetype6 \
+    libtiff5 \
+    libdouble-conversion1 \
+    libpcap0.8
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

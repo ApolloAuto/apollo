@@ -22,14 +22,9 @@ set -e
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
 
-# apt-get -y update && \
-#    apt-get -y install \
-#    libxml2-dev
-
 # Dependency:
 # openmpi <- boost <- vtk <- pcl
-
-bash ${CURR_DIR}/install_mpi.sh
+# bash ${CURR_DIR}/install_mpi.sh
 bash ${CURR_DIR}/install_boost.sh
 
 bash ${CURR_DIR}/install_ffmpeg.sh
