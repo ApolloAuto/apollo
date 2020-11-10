@@ -28,15 +28,17 @@ CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 bash ${CURR_DIR}/install_boost.sh
 
 bash ${CURR_DIR}/install_ffmpeg.sh
-# Proj4 was required to install VTK
+
+# Proj was required to install VTK
 bash ${CURR_DIR}/install_proj.sh
 bash ${CURR_DIR}/install_vtk.sh
+
+# PCL is required by [ Perception Localization Dreamview ]
+bash ${CURR_DIR}/install_pcl.sh
 
 # OpenCV depends on ffmpeg and vtk
 bash ${CURR_DIR}/install_opencv.sh
 
-# PCL is required by [ Perception Localization Dreamview ]
-bash ${CURR_DIR}/install_pcl.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
