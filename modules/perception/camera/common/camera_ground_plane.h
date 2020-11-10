@@ -109,7 +109,7 @@ class CameraGroundPlaneDetector {
 
   void Init(const std::vector<float> &k_mat, int width, int height,
             float baseline, int max_nr_samples = 1080) {
-    CHECK_EQ(k_mat.size(), 9);
+    CHECK_EQ(k_mat.size(), 9U);
     memcpy(k_mat_, k_mat.data(), sizeof(float) * 9);
     width_ = width;
     height_ = height;
@@ -136,7 +136,7 @@ class CameraGroundPlaneDetector {
 
  private:
   void FillGroundModel(const std::vector<float> &ground3) {
-    CHECK_EQ(ground3.size(), 3);
+    CHECK_EQ(ground3.size(), 3U);
     l_[0] = ground3[0];
     l_[1] = ground3[1];
     l_[2] = ground3[2];

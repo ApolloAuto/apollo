@@ -28,8 +28,8 @@ namespace planning {
 
 CosThetaIpoptInterface::CosThetaIpoptInterface(
     std::vector<std::pair<double, double>> points, std::vector<double> bounds) {
-  CHECK_GT(points.size(), 1);
-  CHECK_GT(bounds.size(), 1);
+  CHECK_GT(points.size(), 1U);
+  CHECK_GT(bounds.size(), 1U);
   bounds_ = std::move(bounds);
   ref_points_ = std::move(points);
   num_of_points_ = ref_points_.size();
@@ -352,7 +352,7 @@ bool CosThetaIpoptInterface::eval_h(int n, const double* x, bool new_x,
         shift += 2;
       }
     }
-    CHECK_EQ(index, static_cast<size_t>(nele_hess));
+    CHECK_EQ(index, nele_hess);
   } else {
     std::fill(values, values + nele_hess, 0.0);
     // fill the included angle part of obj

@@ -38,7 +38,7 @@ bool ExtrapolationPredictor::Predict(
   Clear();
 
   CHECK_NOTNULL(obstacle);
-  CHECK_GT(obstacle->history_size(), 0);
+  CHECK_GT(obstacle->history_size(), 0U);
 
   obstacle->SetPredictorType(predictor_type_);
 

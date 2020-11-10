@@ -26,11 +26,13 @@ DOCKER_REPO="apolloauto/apollo"
 APOLLO_DEV="apollo_dev_${USER}"
 DEV_INSIDE="in-dev-docker"
 
-SUPPORTED_ARCHS=" x86_64 aarch64 "
+SUPPORTED_ARCHS=(x86_64 aarch64)
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20200926_1057"
+VERSION_X86_64="dev-x86_64-18.04-20201029_0431"
+TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20201105_0514"
+
 VERSION_AARCH64="dev-aarch64-18.04-20201006_0154"
 USER_VERSION_OPT=
 
@@ -40,7 +42,8 @@ FAST_MODE="no"
 GEOLOC=
 GEO_REGISTRY=
 
-USE_LOCAL_IMAGE="no"
+USE_LOCAL_IMAGE=0
+CUSTOM_DIST=
 USE_GPU_HOST=0
 USER_AGREED="no"
 
@@ -116,7 +119,8 @@ OPTIONS:
     -f, --fast             Fast mode without pulling all map volumes.
     -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
     -l, --local            Use local docker image.
-    -t, --tag <version>    Specify which version of a docker image to pull.
+    -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
+    -d, --dist             Specify Apollo distribution(stable/testing)
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
     -y                     Agree to Apollo License Agreement non-interactively.
     stop                   Stop all running Apollo containers.
@@ -164,6 +168,7 @@ function geo_specific_config() {
 
 function parse_arguments() {
     local custom_version=""
+    local custom_dist=""
     local shm_size=""
     local geo=""
 
@@ -176,6 +181,11 @@ function parse_arguments() {
             fi
             custom_version="$1"; shift
             _optarg_check_for_opt "${opt}" "${custom_version}"
+            ;;
+
+        -d|--dist)
+            custom_dist="$1"; shift
+            _optarg_check_for_opt "${opt}" "${custom_dist}"
             ;;
 
         -h|--help)
@@ -193,7 +203,7 @@ function parse_arguments() {
             ;;
 
         -l|--local)
-            USE_LOCAL_IMAGE="yes"
+            USE_LOCAL_IMAGE=1
             ;;
 
         --shm-size)
@@ -219,18 +229,23 @@ function parse_arguments() {
         esac
     done # End while loop
 
-    [ -n "${geo}" ] && GEOLOC="${geo}"
-    [ -n "${custom_version}" ] && USER_VERSION_OPT="${custom_version}"
-    [ -n "${shm_size}" ] && SHM_SIZE="${shm_size}"
+    [[ -n "${geo}" ]] && GEOLOC="${geo}"
+    [[ -n "${custom_version}" ]] && USER_VERSION_OPT="${custom_version}"
+    [[ -n "${custom_dist}" ]] && CUSTOM_DIST="${custom_dist}"
+    [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
 }
 
 function determine_dev_image() {
     local version="$1"
     # If no custom version specified
-    if [ -z "${version}" ]; then
-        if [ "${TARGET_ARCH}" = "x86_64" ]; then
-            version="${VERSION_X86_64}"
-        elif [ "${TARGET_ARCH}" = "aarch64" ]; then
+    if [[ -z "${version}" ]]; then
+        if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+            if [[ "${CUSTOM_DIST}" == "testing" ]]; then
+                version="${TESTING_VERSION_X86_64}"
+            else
+                version="${VERSION_X86_64}"
+            fi
+        elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
             version="${VERSION_AARCH64}"
         else
             error "Logic can't reach here! Please report this issue to Apollo@GitHub."
@@ -242,7 +257,7 @@ function determine_dev_image() {
 
 function check_host_environment() {
     local kernel="$(uname -s)"
-    if [ "${kernel}" != "Linux" ]; then
+    if [[ "${kernel}" != "Linux" ]]; then
         warning "Running Apollo dev container on ${kernel} is UNTESTED, exiting..."
         exit 1
     fi
@@ -250,10 +265,13 @@ function check_host_environment() {
 
 function check_target_arch() {
     local arch="${TARGET_ARCH}"
-    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
-        error "Unsupported target architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
-        exit 1
-    fi
+    for ent in "${SUPPORTED_ARCHS[@]}"; do
+        if [[ "${ent}" == "${TARGET_ARCH}" ]]; then
+            return 0
+        fi
+    done
+    error "Unsupported target architecture: ${TARGET_ARCH}."
+    exit 1
 }
 
 function setup_devices_and_mount_local_volumes() {
@@ -261,7 +279,7 @@ function setup_devices_and_mount_local_volumes() {
 
     [ -d "${CACHE_ROOT_DIR}" ] || mkdir -p "${CACHE_ROOT_DIR}"
 
-    source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
+    source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
@@ -342,7 +360,7 @@ function remove_existing_dev_container() {
 
 function docker_pull() {
     local img="$1"
-    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
+    if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
         if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "${img}" ; then
             info "Local image ${img} found and will be used."
             return
@@ -456,7 +474,7 @@ function main() {
     determine_dev_image "${USER_VERSION_OPT}"
     geo_specific_config "${GEOLOC}"
 
-    if [ "${USE_LOCAL_IMAGE}" = "yes" ];then
+    if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
         info "Start docker container based on local image : ${APOLLO_DEV_IMAGE}"
     fi
 

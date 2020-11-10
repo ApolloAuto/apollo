@@ -25,7 +25,7 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-const uint8_t ID_SIZE = 8;
+constexpr uint8_t ID_SIZE = 8;
 
 class Identity {
  public:
@@ -37,18 +37,16 @@ class Identity {
   bool operator==(const Identity& another) const;
   bool operator!=(const Identity& another) const;
 
-  const std::string& ToString() const;
+  std::string ToString() const;
   size_t Length() const;
   uint64_t HashValue() const;
 
-  // getter and setter
   const char* data() const { return data_; }
   void set_data(const char* data) {
     if (data == nullptr) {
       return;
     }
-    memset(data_, 0, sizeof(data_));
-    memcpy(data_, data, sizeof(data_));
+    std::memcpy(data_, data, sizeof(data_));
     Update();
   }
 
@@ -57,7 +55,6 @@ class Identity {
 
   char data_[ID_SIZE];
   uint64_t hash_value_;
-  std::string hash_value_str_;
 };
 
 }  // namespace transport

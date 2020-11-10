@@ -20,7 +20,9 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
-VERSION_X86_64="cyber-x86_64-18.04-20200926_0654"
+VERSION_X86_64="cyber-x86_64-18.04-20201029_0047"
+TESTING_VERSION_X86_64="cyber-x86_64-18.04-testing-20201103_1900"
+
 # ARMV8
 # VERSION_AARCH64="cyber-aarch64-18.04-20200717_0327"
 # L4T
@@ -33,12 +35,13 @@ DOCKER_RUN_CMD="docker run"
 DOCKER_PULL_CMD="docker pull"
 SHM_SIZE="2G"
 
-SUPPORTED_ARCHS=" x86_64 aarch64 "
+SUPPORTED_ARCHS=(x86_64 aarch64)
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH=""
 
 USE_GPU_HOST=0
 USE_LOCAL_IMAGE=0
+CUSTOM_DIST=
 CUSTOM_VERSION=
 GEOLOC=
 GEO_REGISTRY=
@@ -88,10 +91,13 @@ function _optarg_check_for_opt() {
 
 function _target_arch_check() {
     local arch="$1"
-    if [[ "${SUPPORTED_ARCHS}" != *" ${arch} "* ]]; then
-        error "Unsupported target architecture: ${arch}. Allowed values:${SUPPORTED_ARCHS}"
-        exit 1
-    fi
+    for k in "${SUPPORTED_ARCHS[@]}"; do
+        if [[ "${k}" == "${arch}" ]]; then
+            return
+        fi
+    done
+    error "Unsupported target architecture: ${arch}."
+    exit 1
 }
 
 function show_usage() {
@@ -100,7 +106,8 @@ Usage: $0 [options] ...
 OPTIONS:
     -g <us|cn>             Pull docker image from mirror registry based on geolocation.
     -h, --help             Display this help and exit.
-    -t, --tag <version>    Specify which version of a docker image to pull.
+    -t, --tag <TAG>        Specify docker image with tag to start
+    -d, --dist             Specify Apollo distribution(stable/testing)
     -l, --local            Use local docker image.
     -m <arch>              Specify docker image for a different CPU arch.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
@@ -138,6 +145,7 @@ function stop_all_apollo_containers_for_user() {
 function parse_arguments() {
     local use_local_image=0
     local custom_version=""
+    local custom_dist=""
     local target_arch=""
     local shm_size=""
     local geo=""
@@ -155,6 +163,10 @@ function parse_arguments() {
             fi
             custom_version="$1"; shift
             _optarg_check_for_opt "${opt}" "${custom_version}"
+            ;;
+        -d|--dist)
+            custom_dist="$1"; shift
+            _optarg_check_for_opt "${opt}" "${custom_dist}"
             ;;
         -h|--help)
             show_usage
@@ -189,10 +201,10 @@ function parse_arguments() {
     USE_LOCAL_IMAGE="${use_local_image}"
     [[ -n "${target_arch}" ]] && TARGET_ARCH="${target_arch}"
     [[ -n "${custom_version}" ]] && CUSTOM_VERSION="${custom_version}"
+    [[ -n "${custom_dist}" ]] && CUSTOM_DIST="${custom_dist}"
     [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
 }
 
-# TODO(storypku): What does these do with apollo inside container
 # if [ ! -e /apollo ]; then
 #    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
 # fi
@@ -226,20 +238,17 @@ function determine_target_version_and_arch() {
         fi
         _target_arch_check "${TARGET_ARCH}"
         if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-            version="${VERSION_X86_64}"
+            if [[ "${CUSTOM_DIST}" == "testing" ]]; then
+                version="${TESTING_VERSION_X86_64}"
+            else
+                version="${VERSION_X86_64}"
+            fi
         elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
             version="${VERSION_AARCH64}"
         else
             error "CAN'T REACH HERE"
             exit 1
         fi
-    elif [[ "${version}" =~ local* ]]; then
-        if [[ -z "${TARGET_ARCH}" ]]; then
-            TARGET_ARCH="${HOST_ARCH}"
-        fi
-        _target_arch_check "${TARGET_ARCH}"
-        info "Local image ${version} specified, indicating USE_LOCAL_IMAGE=1"
-        USE_LOCAL_IMAGE=1
     else # CUSTOM_VERSION specified
         local supposed_arch
         guess_arch_from_tag "${version}" supposed_arch

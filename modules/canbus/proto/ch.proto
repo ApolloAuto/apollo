@@ -3,26 +3,16 @@ syntax = "proto2";
 package apollo.canbus;
 
 // Coolhigh vehicle starts from here
-message Control_command_115 {
+message Throttle_command_110 {
   // Control Message
-  enum Ctrl_cmdType {
-    CTRL_CMD_OUT_OF_CONTROL = 0;
-    CTRL_CMD_UNDER_CONTROL = 1;
+  enum Throttle_pedal_en_ctrlType {
+    THROTTLE_PEDAL_EN_CTRL_DISABLE = 0;
+    THROTTLE_PEDAL_EN_CTRL_ENABLE = 1;
   }
-  // Take control(Command) [] [0|1]
-  optional Ctrl_cmdType ctrl_cmd = 1;
-}
-
-message Gear_command_114 {
-  // Control Message
-  enum Gear_cmdType {
-    GEAR_CMD_PARK = 1;
-    GEAR_CMD_REVERSE = 2;
-    GEAR_CMD_NEUTRAL = 3;
-    GEAR_CMD_DRIVE = 4;
-  }
-  // PRND control(Command) [] [1|4]
-  optional Gear_cmdType gear_cmd = 1;
+  // throttle pedal enable bit(Command) [] [0|1]
+  optional Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl = 1;
+  // Percentage of throttle pedal(Command) [%] [0|100]
+  optional int32 throttle_pedal_cmd = 2;
 }
 
 message Brake_command_111 {
@@ -37,16 +27,16 @@ message Brake_command_111 {
   optional int32 brake_pedal_cmd = 2;
 }
 
-message Throttle_command_110 {
+message Steer_command_112 {
   // Control Message
-  enum Throttle_pedal_en_ctrlType {
-    THROTTLE_PEDAL_EN_CTRL_DISABLE = 0;
-    THROTTLE_PEDAL_EN_CTRL_ENABLE = 1;
+  enum Steer_angle_en_ctrlType {
+    STEER_ANGLE_EN_CTRL_DISABLE = 0;
+    STEER_ANGLE_EN_CTRL_ENABLE = 1;
   }
-  // throttle pedal enable bit(Command) [] [0|1]
-  optional Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl = 1;
-  // Percentage of throttle pedal(Command) [%] [0|100]
-  optional int32 throttle_pedal_cmd = 2;
+  // steering angle enable bit(Command) [] [0|1]
+  optional Steer_angle_en_ctrlType steer_angle_en_ctrl = 1;
+  // Current steering angle(Command) [radian] [-0.524|0.524]
+  optional double steer_angle_cmd = 2;
 }
 
 message Turnsignal_command_113 {
@@ -60,16 +50,51 @@ message Turnsignal_command_113 {
   optional Turn_signal_cmdType turn_signal_cmd = 1;
 }
 
-message Steer_command_112 {
+message Gear_command_114 {
   // Control Message
-  enum Steer_angle_en_ctrlType {
-    STEER_ANGLE_EN_CTRL_DISABLE = 0;
-    STEER_ANGLE_EN_CTRL_ENABLE = 1;
+  enum Gear_cmdType {
+    GEAR_CMD_PARK = 1;
+    GEAR_CMD_REVERSE = 2;
+    GEAR_CMD_NEUTRAL = 3;
+    GEAR_CMD_DRIVE = 4;
   }
-  // steering angle enable bit(Command) [] [0|1]
-  optional Steer_angle_en_ctrlType steer_angle_en_ctrl = 1;
-  // Current steering angle(Command) [radian] [-0.524|0.524]
-  optional double steer_angle_cmd = 2;
+  // PRND control(Command) [] [1|4]
+  optional Gear_cmdType gear_cmd = 1;
+}
+
+message Control_command_115 {
+  // Control Message
+  enum Ctrl_cmdType {
+    CTRL_CMD_OUT_OF_CONTROL = 0;
+    CTRL_CMD_UNDER_CONTROL = 1;
+  }
+  // Take control(Command) [] [0|1]
+  optional Ctrl_cmdType ctrl_cmd = 1;
+}
+
+message Throttle_status__510 {
+  // Report Message
+  enum Throttle_pedal_en_stsType {
+    THROTTLE_PEDAL_EN_STS_DISABLE = 0;
+    THROTTLE_PEDAL_EN_STS_ENABLE = 1;
+    THROTTLE_PEDAL_EN_STS_TAKEOVER = 2;
+  }
+  enum Drive_motor_errType {
+    DRIVE_MOTOR_ERR_NOERR = 0;
+    DRIVE_MOTOR_ERR_DRV_MOTOR_ERR = 1;
+  }
+  enum Battery_bms_errType {
+    BATTERY_BMS_ERR_NOERR = 0;
+    BATTERY_BMS_ERR_BATTERY_ERR = 1;
+  }
+  // throttle pedal enable bit(Status) [] [0|2]
+  optional Throttle_pedal_en_stsType throttle_pedal_en_sts = 1;
+  // Percentage of throttle pedal(Status) [%] [0|100]
+  optional int32 throttle_pedal_sts = 2;
+  // [] [0|1]
+  optional Drive_motor_errType drive_motor_err = 3;
+  // [] [0|1]
+  optional Battery_bms_errType battery_bms_err = 4;
 }
 
 message Brake_status__511 {
@@ -99,7 +124,7 @@ message Brake_status__511 {
     OVERSPD_ENV_NOENV = 0;
     OVERSPD_ENV_OVERSPEED_ENV = 1;
   }
-  // brake pedal enable bit(Status) [] [0|1]
+  // brake pedal enable bit(Status) [] [0|2]
   optional Brake_pedal_en_stsType brake_pedal_en_sts = 1;
   // Percentage of brake pedal(Status) [%] [0|100]
   optional int32 brake_pedal_sts = 2;
@@ -113,42 +138,6 @@ message Brake_status__511 {
   optional Back_bump_envType back_bump_env = 6;
   // [] [0|1]
   optional Overspd_envType overspd_env = 7;
-}
-
-message Throttle_status__510 {
-  // Report Message
-  enum Throttle_pedal_en_stsType {
-    THROTTLE_PEDAL_EN_STS_DISABLE = 0;
-    THROTTLE_PEDAL_EN_STS_ENABLE = 1;
-    THROTTLE_PEDAL_EN_STS_TAKEOVER = 2;
-  }
-  enum Drive_motor_errType {
-    DRIVE_MOTOR_ERR_NOERR = 0;
-    DRIVE_MOTOR_ERR_DRV_MOTOR_ERR = 1;
-  }
-  enum Battery_bms_errType {
-    BATTERY_BMS_ERR_NOERR = 0;
-    BATTERY_BMS_ERR_BATTERY_ERR = 1;
-  }
-  // throttle pedal enable bit(Status) [] [0|1]
-  optional Throttle_pedal_en_stsType throttle_pedal_en_sts = 1;
-  // Percentage of throttle pedal(Status) [%] [0|100]
-  optional int32 throttle_pedal_sts = 2;
-  // [] [0|1]
-  optional Drive_motor_errType drive_motor_err = 3;
-  // [] [0|1]
-  optional Battery_bms_errType battery_bms_err = 4;
-}
-
-message Turnsignal_status__513 {
-  // Report Message
-  enum Turn_signal_stsType {
-    TURN_SIGNAL_STS_NONE = 0;
-    TURN_SIGNAL_STS_LEFT = 1;
-    TURN_SIGNAL_STS_RIGHT = 2;
-  }
-  // Lighting control(Status) [] [0|2]
-  optional Turn_signal_stsType turn_signal_sts = 1;
 }
 
 message Steer_status__512 {
@@ -166,7 +155,7 @@ message Steer_status__512 {
     SENSOR_ERR_NOERR = 0;
     SENSOR_ERR_STEER_SENSOR_ERR = 1;
   }
-  // steering angle enable bit(Status) [] [0|1]
+  // steering angle enable bit(Status) [] [0|2]
   optional Steer_angle_en_stsType steer_angle_en_sts = 1;
   // Current steering angle(Status) [radian] [-0.524|0.524]
   optional double steer_angle_sts = 2;
@@ -174,6 +163,29 @@ message Steer_status__512 {
   optional Steer_errType steer_err = 3;
   // [] [0|1]
   optional Sensor_errType sensor_err = 4;
+}
+
+message Turnsignal_status__513 {
+  // Report Message
+  enum Turn_signal_stsType {
+    TURN_SIGNAL_STS_NONE = 0;
+    TURN_SIGNAL_STS_LEFT = 1;
+    TURN_SIGNAL_STS_RIGHT = 2;
+  }
+  // Lighting control(Status) [] [0|2]
+  optional Turn_signal_stsType turn_signal_sts = 1;
+}
+
+message Gear_status_514 {
+  // Report Message
+  enum Gear_stsType {
+    GEAR_STS_PARK = 1;
+    GEAR_STS_REVERSE = 2;
+    GEAR_STS_NEUTRAL = 3;
+    GEAR_STS_DRIVE = 4;
+  }
+  // PRND control(Status) [] [1|4]
+  optional Gear_stsType gear_sts = 1;
 }
 
 message Ecu_status_1_515 {
@@ -194,64 +206,53 @@ message Ecu_status_1_515 {
   optional int32 chassis_err = 5;
 }
 
-message Gear_status_514 {
+message Ecu_status_2_516 {
   // Report Message
-  enum Gear_stsType {
-    GEAR_STS_PARK = 1;
-    GEAR_STS_REVERSE = 2;
-    GEAR_STS_NEUTRAL = 3;
-    GEAR_STS_DRIVE = 4;
-  }
-  // PRND control(Status) [] [1|4]
-  optional Gear_stsType gear_sts = 1;
+  // Percentage of battery remaining (BMS status) [%] [0|100]
+  optional int32 battery_soc = 1;
+  // Battery full capacity (BMS status) [Ah] [0|100]
+  optional int32 battery_capacity = 2;
+  // Current battery voltage (BMS status) [V] [0|80]
+  optional double battery_voltage = 3;
+  // Current battery current (BMS status) [A] [-60|60]
+  optional double battery_current = 4;
+  // Current battery temperature (BMS status) [℃] [-40|110]
+  optional int32 battery_temperature = 5;
 }
 
 message Ecu_status_3_517 {
   // Report Message
-  // Ultrasonic detection distance 1 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_1 = 1;
-  // Ultrasonic detection distance 2 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_2 = 2;
-  // Ultrasonic detection distance 3 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_3 = 3;
-  // Ultrasonic detection distance 4 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_4 = 4;
-  // Ultrasonic detection distance 5 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_5 = 5;
-  // Ultrasonic detection distance 6 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_6 = 6;
-  // Ultrasonic detection distance 7 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_7 = 7;
-  // Ultrasonic detection distance 8 (Ultrasound status) [cm] [0|0]
-  optional int32 ultrasound_dist_8 = 8;
-}
-
-message Ecu_status_2_516 {
-  // Report Message
-  // Percentage of battery remaining (BMS status) [%] [0|100]
-  optional int32 battery_remaining_capacity = 1;
-  // Current battery voltage (BMS status) [V] [0|80]
-  optional double battery_voltage = 2;
-  // Current battery current (BMS status) [A] [-60|60]
-  optional double battery_current = 3;
-  // Current battery temperature (BMS status) [?] [-40|110]
-  optional int32 battery_temperature = 4;
+  // Ultrasonic detection distance 1 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_1 = 1;
+  // Ultrasonic detection distance 2 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_2 = 2;
+  // Ultrasonic detection distance 3 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_3 = 3;
+  // Ultrasonic detection distance 4 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_4 = 4;
+  // Ultrasonic detection distance 5 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_5 = 5;
+  // Ultrasonic detection distance 6 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_6 = 6;
+  // Ultrasonic detection distance 7 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_7 = 7;
+  // Ultrasonic detection distance 8 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_8 = 8;
 }
 
 message Ch {
-  optional Control_command_115 control_command_115 = 1;    // control message
-  optional Gear_command_114 gear_command_114 = 2;          // control message
-  optional Brake_command_111 brake_command_111 = 3;        // control message
-  optional Throttle_command_110 throttle_command_110 = 4;  // control message
-  optional Turnsignal_command_113 turnsignal_command_113 =
-      5;                                                   // control message
-  optional Steer_command_112 steer_command_112 = 6;        // control message
-  optional Brake_status__511 brake_status__511 = 7;        // report message
-  optional Throttle_status__510 throttle_status__510 = 8;  // report message
-  optional Turnsignal_status__513 turnsignal_status__513 = 9;  // report message
-  optional Steer_status__512 steer_status__512 = 10;           // report message
-  optional Ecu_status_1_515 ecu_status_1_515 = 11;             // report message
-  optional Gear_status_514 gear_status_514 = 12;               // report message
-  optional Ecu_status_3_517 ecu_status_3_517 = 13;             // report message
-  optional Ecu_status_2_516 ecu_status_2_516 = 14;             // report message
+  optional Throttle_command_110 throttle_command_110 = 1; // control message
+  optional Brake_command_111 brake_command_111 = 2; // control message
+  optional Steer_command_112 steer_command_112 = 3; // control message
+  optional Turnsignal_command_113 turnsignal_command_113 = 4; // control message
+  optional Gear_command_114 gear_command_114 = 5; // control message
+  optional Control_command_115 control_command_115 = 6; // control message
+  optional Throttle_status__510 throttle_status__510 = 7; // report message
+  optional Brake_status__511 brake_status__511 = 8; // report message
+  optional Steer_status__512 steer_status__512 = 9; // report message
+  optional Turnsignal_status__513 turnsignal_status__513 = 10; // report message
+  optional Gear_status_514 gear_status_514 = 11; // report message
+  optional Ecu_status_1_515 ecu_status_1_515 = 12; // report message
+  optional Ecu_status_2_516 ecu_status_2_516 = 13; // report message
+  optional Ecu_status_3_517 ecu_status_3_517 = 14; // report message
 }

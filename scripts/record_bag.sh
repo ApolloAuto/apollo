@@ -29,42 +29,7 @@ function start() {
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -f "cyber_recorder record" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    nohup cyber_recorder record -a -i 60 -m 2048 /apollo/sensor/camera/obstacle/front_6mm \
-      /apollo/sensor/conti_radar \
-      /apollo/sensor/delphi_esr \
-      /apollo/sensor/gnss/best_pose \
-      /apollo/sensor/gnss/corrected_imu \
-      /apollo/sensor/gnss/gnss_status \
-      /apollo/sensor/gnss/imu \
-      /apollo/sensor/gnss/ins_stat \
-      /apollo/sensor/gnss/odometry \
-      /apollo/sensor/gnss/raw_data \
-      /apollo/sensor/gnss/rtk_eph \
-      /apollo/sensor/gnss/rtk_obs \
-      /apollo/sensor/gnss/heading \
-      /apollo/sensor/mobileye \
-      /apollo/canbus/chassis \
-      /apollo/canbus/chassis_detail \
-      /apollo/control \
-      /apollo/control/pad \
-      /apollo/perception/obstacles \
-      /apollo/perception/traffic_light \
-      /apollo/planning \
-      /apollo/prediction \
-      /apollo/routing_request \
-      /apollo/routing_response \
-      /apollo/localization/pose \
-      /apollo/localization/msf_gnss \
-      /apollo/localization/msf_lidar \
-      /apollo/localization/msf_status \
-      /apollo/navigation \
-      /apollo/relative_map \
-      /apollo/drive_event \
-      /tf \
-      /tf_static \
-      /apollo/monitor \
-      /apollo/monitor/system_status \
-      /apollo/monitor/static_info < /dev/null > "${LOG}" 2>&1 &
+    nohup cyber_recorder record -a -i 60 -m 2048 < /dev/null > "${LOG}" 2>&1 &
   fi
 }
 

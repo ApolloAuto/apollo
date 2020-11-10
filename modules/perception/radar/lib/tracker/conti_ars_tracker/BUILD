@@ -7,6 +7,7 @@ cc_test(
     name = "conti_ars_tracker_test",
     size = "small",
     srcs = ["conti_ars_tracker_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":conti_ars_tracker",
         "@com_google_googletest//:gtest_main",

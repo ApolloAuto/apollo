@@ -57,7 +57,7 @@ std::vector<Condition> EndConditionSampler::SampleLatEndConditions() const {
 
 std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForCruising(
     const double ref_cruise_speed) const {
-  CHECK_GT(FLAGS_num_velocity_sample, 1);
+  CHECK_GT(FLAGS_num_velocity_sample, 1U);
 
   // time interval is one second plus the last one 0.01
   static constexpr size_t num_of_time_samples = 9;
@@ -168,7 +168,7 @@ void EndConditionSampler::QueryFollowPathTimePoints(
     double s_upper = path_time_point.s() -
                      vehicle_config.vehicle_param().front_edge_to_center();
     double s_lower = s_upper - FLAGS_default_lon_buffer;
-    CHECK_GE(FLAGS_num_sample_follow_per_timestamp, 2);
+    CHECK_GE(FLAGS_num_sample_follow_per_timestamp, 2U);
     double s_gap =
         FLAGS_default_lon_buffer /
         static_cast<double>(FLAGS_num_sample_follow_per_timestamp - 1);

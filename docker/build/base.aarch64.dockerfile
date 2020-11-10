@@ -1,4 +1,6 @@
-FROM nvcr.io/nvidia/l4t-base:r32.4.3
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
 LABEL version="1.2"
 
 ENV DEBIAN_FRONTEND=noninteractive

@@ -24,7 +24,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
-VERSION="10.2.89-1"
+if [[ "${TARGET_ARCH}" == "x86_64" && "${APOLLO_DIST}" == "testing" ]]; then
+    VERSION="11.1.74-1"
+else
+    VERSION="10.2.89-1"
+fi
+
 MAIN_VER_DOT="${VERSION%.*}"
 DEMO_SUITE_DEST_DIR="/usr/local/cuda-${MAIN_VER_DOT}/extras/demo_suite"
 
@@ -45,7 +50,11 @@ CHECKSUM=
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     DEVICE_QUERY_BINARY="deviceQuery-${MAIN_VER}_${VERSION}_amd64.bin"
-    CHECKSUM="ed6add99a9c6eb0ff922b7f6a49334665d833bdfd416f5d1920c2b4a8dc14542"
+    if [[ "${APOLLO_DIST}" == "testing" ]]; then
+        CHECKSUM="da573cc68ad5fb227047064d73123a8a966df35be19b68163338b6dc0d576c84"
+    else
+        CHECKSUM="ed6add99a9c6eb0ff922b7f6a49334665d833bdfd416f5d1920c2b4a8dc14542"
+    fi
 elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     DEVICE_QUERY_BINARY="deviceQuery-${MAIN_VER}_${VERSION}_arm64.bin"
     CHECKSUM="fe55e0da8ec20dc13e778ddf7ba95bca45efd51d8f4e6c4fd05f2fb9856f4ac8"

@@ -10,9 +10,9 @@ cc_library(
     deps = [
         ":channel_manager",
         ":node_manager",
-        ":participant_listener",
         ":service_manager",
-        "//cyber/transport:participant",
+        "//cyber/service_discovery/communication:participant_listener",
+        "//cyber/transport/rtps:participant",
     ],
 )
 
@@ -23,28 +23,6 @@ cc_test(
     deps = [
         "//cyber",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "participant_listener",
-    srcs = ["communication/participant_listener.cc"],
-    hdrs = ["communication/participant_listener.h"],
-    deps = [
-        "//cyber/common:log",
-        "@fastrtps",
-    ],
-)
-
-cc_library(
-    name = "subscriber_listener",
-    srcs = ["communication/subscriber_listener.cc"],
-    hdrs = ["communication/subscriber_listener.h"],
-    deps = [
-        "//cyber/common:log",
-        "//cyber/transport:underlay_message",
-        "//cyber/transport:underlay_message_type",
-        "@fastrtps",
     ],
 )
 
@@ -138,7 +116,6 @@ cc_library(
     srcs = ["specific_manager/manager.cc"],
     hdrs = ["specific_manager/manager.h"],
     deps = [
-        ":subscriber_listener",
         "//cyber:state",
         "//cyber/base:signal",
         "//cyber/message:message_traits",
@@ -146,10 +123,12 @@ cc_library(
         "//cyber/proto:proto_desc_cc_proto",
         "//cyber/proto:role_attributes_cc_proto",
         "//cyber/proto:topology_change_cc_proto",
+        "//cyber/service_discovery/communication:subscriber_listener",
         "//cyber/time",
-        "//cyber/transport:attributes_filler",
-        "//cyber/transport:qos_profile_conf",
-        "//cyber/transport:underlay_message_type",
+        "//cyber/transport/qos",
+        "//cyber/transport/rtps:attributes_filler",
+        "//cyber/transport/rtps:underlay_message_type",
+        "@fastrtps",
     ],
 )
 

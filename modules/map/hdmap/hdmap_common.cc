@@ -105,7 +105,7 @@ LaneInfo::LaneInfo(const Lane &lane) : BaseInfo<Lane>(lane) { Init(); }
 
 void LaneInfo::Init() {
   PointsFromCurve(inner_object_.central_curve(), &points_);
-  CHECK_GE(points_.size(), 2);
+  CHECK_GE(points_.size(), 2U);
   segments_.clear();
   accumulated_s_.clear();
   unit_directions_.clear();
@@ -214,7 +214,7 @@ double LaneInfo::Heading(const double s) const {
 }
 
 double LaneInfo::Curvature(const double s) const {
-  if (points_.size() < 2) {
+  if (points_.size() < 2U) {
     AERROR << "Not enough points to compute curvature.";
     return 0.0;
   }
@@ -533,7 +533,7 @@ void SignalInfo::Init() {
     points.emplace_back(segment.start());
     points.emplace_back(segment.end());
   }
-  CHECK_GT(points.size(), 0);
+  CHECK_GT(points.size(), 0U);
 }
 
 void StopSignInfo::PostProcess(const HDMapImpl &map_instance) {
