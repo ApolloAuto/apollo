@@ -8,14 +8,14 @@
 
 ##  首先，从码云上克隆 Apollo 仓库
 
-[码云上的 Apollo仓库](https://gitee.com/baidu/apolloauto.git) 通常比[GitHub上的 Apollo仓库](https://github.com/ApolloAuto/apollo.git) 更新晚一个月左右。
+[码云上的 Apollo仓库](https://gitee.com/ApolloAuto/apollo.git) 通常比[GitHub上的 Apollo仓库](https://github.com/ApolloAuto/apollo.git) 更新晚一个月左右。
 
 我们可以以它为起点，克隆码云上的Apollo 仓库。
 
 执行命令：
 
 ```bash
-git clone https://gitee.com/baidu/apolloauto.git apollo
+git clone https://gitee.com/ApolloAuto/apollo.git
 ```
 
 这一步通常很快，只需十数分钟。在本文作者所在的百度内部，下载速度可达 10 多 MiB/s，终端输出如下：
