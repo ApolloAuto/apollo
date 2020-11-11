@@ -420,32 +420,31 @@ sudo docker run hello-world
 
 #### 下载Apollo源代码
 
-预装了Ubuntu18.04LTS的客户的当前home目录下已有apollo代码，可以跳过此步骤；自己安装的客户请参考以下操作来下载apollo源代码。
+a、预装了Ubuntu 18.04 LTS操作系统的客户的当前home目录下已有Apollo代码，请按照以下步骤来更新代码：
 
-在终端中输入以下命令：
+```
+cd ~/apollo
+git checkout .
+git pull
+```
+
+b、自己安装操作系统的客户请参考以下操作来下载Apollo源代码：
 
 ```
 cd ~
 sudo apt update
 sudo apt install git -y
 git init
-git clone https://github.com/ApolloAuto/apollo.git
+git clone -b r5.5.0 https://gitee.com/ApolloAuto/apollo.git
 ```
 
-代码下载的时间视网速的快慢而有所区别，请耐心等待；
-下载完成后的代码在~/apollo目录下，然后执行以下命令：
+代码下载的时间视网速的快慢而有所区别，请耐心等待；下载完成后的代码在~/apollo目录下，若您需要和Apollo代码保持完全同步，请接着执行以下命令：
 
 ```
-git checkout -b r5.5.0 origin/r5.5.0
+git remote set-url origin https://github.com/ApolloAuto/apollo.git
+git pull
 ```
 
-将代码切换到我们所需要的工作分支r5.5.0上。用以下命令检查代码是否已经切换成功：
-
-```
-git branch
-```
-
-若输出的内容有`* r5.5.0`，则表示代码已经成功的切换到了r5.5.0分支上了。
 
 #### 设置Apollo编译环境
 
