@@ -11,6 +11,7 @@ proto_library(
     name = "simulation_world_proto_lib",
     srcs = ["simulation_world.proto"],
     deps = [
+        "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/monitor_log/proto:monitor_log_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
