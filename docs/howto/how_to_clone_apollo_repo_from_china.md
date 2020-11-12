@@ -12,7 +12,7 @@ from China.
 
 ## First, clone Apollo from Gitee
 
-Apollo on Gitee was about one month later than Apollo on GitHub. We can use it
+Apollo on Gitee was one day later than Apollo on GitHub. We can use it
 as a good start.
 
 ```bash
