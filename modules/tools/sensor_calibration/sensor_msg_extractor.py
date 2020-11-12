@@ -25,8 +25,9 @@ import struct
 import sys
 
 import cv2
-import pypcd
 import numpy as np
+
+from pypcd import pypcd
 
 from modules.tools.sensor_calibration.data_file_object import TimestampFileObject, OdometryFileObject
 from modules.drivers.proto import conti_radar_pb2

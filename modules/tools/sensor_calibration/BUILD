@@ -2,6 +2,13 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "config",
+    srcs = glob([
+        "config/**",
+    ]),
+)
+
 py_library(
     name = "configuration_yaml_generator",
     srcs = ["configuration_yaml_generator.py"],
@@ -15,6 +22,7 @@ py_library(
 py_binary(
     name = "extract_data",
     srcs = ["extract_data.py"],
+    data = [":config"],
     deps = [
         ":configuration_yaml_generator",
         ":extract_static_data",
@@ -28,6 +36,7 @@ py_binary(
 py_binary(
     name = "extract_static_data",
     srcs = ["extract_static_data.py"],
+    data = [":config"],
     deps = [
         ":configuration_yaml_generator",
         ":data_file_object",
