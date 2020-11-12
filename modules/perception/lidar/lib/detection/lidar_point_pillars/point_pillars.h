@@ -53,13 +53,11 @@
 #include "NvInfer.h"
 #include "NvOnnxParser.h"
 
-#include "torch/script.h"
-#include "torch/torch.h"
-
 // headers in local files
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/anchor_mask_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/common.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/params.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/pfe_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/postprocess_cuda.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points_cuda.h"
@@ -118,6 +116,7 @@ class PointPillars {
   static const int kMaxNumPillars;
   static const int kMaxNumPointsPerPillar;
   static const int kNumPointFeature;
+  static const int kNumGatherPointFeature;
   static const int kGridXSize;
   static const int kGridYSize;
   static const int kGridZSize;
@@ -147,7 +146,7 @@ class PointPillars {
   const bool reproduce_result_mode_;
   const float score_threshold_;
   const float nms_overlap_threshold_;
-  const std::string pfe_torch_file_;
+  const std::string pfe_onnx_file_;
   const std::string rpn_onnx_file_;
   // end initializer list
 
@@ -182,7 +181,9 @@ class PointPillars {
   float* dev_box_anchors_max_y_;
   int* dev_anchor_mask_;
 
-  void* pfe_buffers_[3];
+  float* dev_pfe_gather_feature_;
+  void* pfe_buffers_[2];
+
   void* rpn_buffers_[4];
 
   float* dev_scattered_feature_;
@@ -204,17 +205,15 @@ class PointPillars {
   std::unique_ptr<PreprocessPoints> preprocess_points_ptr_;
   std::unique_ptr<PreprocessPointsCuda> preprocess_points_cuda_ptr_;
   std::unique_ptr<AnchorMaskCuda> anchor_mask_cuda_ptr_;
+  std::unique_ptr<PfeCuda> pfe_cuda_ptr_;
   std::unique_ptr<ScatterCuda> scatter_cuda_ptr_;
   std::unique_ptr<PostprocessCuda> postprocess_cuda_ptr_;
 
   Logger g_logger_;
-  int device_id_ = -1;
-  int gpu_id_ = 0;
-  torch::DeviceType device_type_;
-  torch::jit::script::Module pfe_net_;
-  nvinfer1::IExecutionContext* rpn_context_;
-  nvinfer1::IRuntime* rpn_runtime_;
+  nvinfer1::ICudaEngine* pfe_engine_;
   nvinfer1::ICudaEngine* rpn_engine_;
+  nvinfer1::IExecutionContext* pfe_context_;
+  nvinfer1::IExecutionContext* rpn_context_;
 
   /**
    * @brief Memory allocation for device memory
@@ -227,12 +226,6 @@ class PointPillars {
    * @details Called in the constructor
    */
   void InitAnchors();
-
-  /**
-   * @brief Initializing LibTorch net
-   * @details Called in the constructor
-   */
-  void InitTorch();
 
   /**
    * @brief Initializing TensorRT instances
@@ -266,11 +259,11 @@ class PointPillars {
   /**
    * @brief Convert ONNX to TensorRT model
    * @param[in] model_file ONNX model file path
-   * @param[out] trt_model_stream TensorRT model made out of ONNX model
+   * @param[out] engine_ptr TensorRT model engine made out of ONNX model
    * @details Load ONNX model, and convert it to TensorRT model
    */
   void OnnxToTRTModel(const std::string& model_file,
-                      nvinfer1::IHostMemory** trt_model_stream);
+                      nvinfer1::ICudaEngine** engine_ptr);
 
   /**
    * @brief Preproces points
@@ -332,13 +325,13 @@ class PointPillars {
    * reproducible for the same input
    * @param[in] score_threshold Score threshold for filtering output
    * @param[in] nms_overlap_threshold IOU threshold for NMS
-   * @param[in] pfe_torch_file Pillar Feature Extractor Torch file path
+   * @param[in] pfe_onnx_file Pillar Feature Extractor ONNX file path
    * @param[in] rpn_onnx_file Region Proposal Network ONNX file path
    * @details Variables could be changed through point_pillars_detection
    */
   PointPillars(const bool reproduce_result_mode, const float score_threshold,
                const float nms_overlap_threshold,
-               const std::string pfe_torch_file,
+               const std::string pfe_onnx_file,
                const std::string rpn_onnx_file);
   ~PointPillars();
 

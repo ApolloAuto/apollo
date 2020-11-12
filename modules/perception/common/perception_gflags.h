@@ -33,7 +33,7 @@ DECLARE_string(work_root);
 
 // lidar_point_pillars
 DECLARE_int32(gpu_id);
-DECLARE_string(pfe_torch_file);
+DECLARE_string(pfe_onnx_file);
 DECLARE_string(rpn_onnx_file);
 DECLARE_double(normalizing_factor);
 DECLARE_int32(num_point_feature);
