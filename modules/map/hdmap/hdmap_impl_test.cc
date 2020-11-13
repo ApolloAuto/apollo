@@ -16,6 +16,7 @@ limitations under the License.
 #include <chrono>
 
 #include "absl/strings/str_cat.h"
+#include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
