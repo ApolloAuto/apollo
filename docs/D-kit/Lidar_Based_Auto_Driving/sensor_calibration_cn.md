@@ -15,9 +15,8 @@
       - [2. 使用Apollo录制数据包的方法](#2-使用apollo录制数据包的方法)
       - [3. 开始录制数据包](#3-开始录制数据包)
   - [Lidar-GNSS标定数据预处理](#lidar-gnss标定数据预处理)
-      - [1. 修改抽取工具配置文件 lidar_to_gnss.config](#1-修改抽取工具配置文件-lidar_to_gnssconfig)
-      - [2. 运行数据抽取工具](#2-运行数据抽取工具)
-      - [3. 修改云标定配置文件 sample_config.yaml](#3-修改云标定配置文件-sample_configyaml)
+      - [1. 运行数据抽取工具](#1-运行数据抽取工具)
+      - [2. 修改云标定配置文件 sample_config.yaml](#2-修改云标定配置文件-sample_configyaml)
   - [使用标定云服务生成外参文件](#使用标定云服务生成外参文件)
       - [1. 上传预处理后的数据至BOS](#1-上传预处理后的数据至bos)
       - [2. 提交云标定任务](#2-提交云标定任务)
@@ -154,19 +153,9 @@ Lidar-GNSS标定数据包的相关文件位于[sensor_calibration目录](../../A
 
 本小节重点关注lidar_to_gnss目录。
 
-#### 1. 修改抽取工具配置文件 lidar_to_gnss.config
+**注意**: 不要修改该目录下的任何文件
 
-根据实际情况，修改配置文件`lidar_to_gnss.config`中的channel信息，将`name`修改为Lidar传感器数据实际对应的channel名称。单激光雷达标定文件默认配置参考下图：
-
-![lidar_calibration_config](images/lidar_calibration_config.png)
-
-如果是多激光雷达标定，需要完善配置文件中的雷达点云channel信息，如下图所示(这里以3lidar标定为例)：
-
-![lidar_calibration_config](images/lidar_calibration_multi_lidar_config.jpg)
-
-**注意**：其他配置无需修改
-
-#### 2. 运行数据抽取工具
+#### 1. 运行数据抽取工具
 
 假设你在[Lidar-GNSS标定数据包录制](#lidar-gnss标定数据包录制)步骤生成的数据包位于`/apollo/data/bag/test`目录
 
@@ -226,7 +215,7 @@ lidar_to_gnss/
 └── records
 ```
 
-#### 3. 修改云标定配置文件 sample_config.yaml
+#### 2. 修改云标定配置文件 sample_config.yaml
 
 单激光雷达标定时`sample_config.yaml`文件的修改：
 
