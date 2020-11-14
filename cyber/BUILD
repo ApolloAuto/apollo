@@ -106,7 +106,7 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport/rtps:participant",
         "//cyber/transport/rtps:sub_listener",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@com_google_protobuf//:protobuf",
         "@fastrtps",
     ],

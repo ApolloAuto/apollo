@@ -45,7 +45,7 @@ cc_library(
         "//modules/transform:transform_broadcaster",
         "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest",
     ],
 )
