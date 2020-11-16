@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/robosense/librobosense_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/librobosense_driver_component.so"
     components {
         class_name : "RobosenseComponent"
         config {
@@ -29,7 +29,7 @@ module_config {
 #                   fusion                      #
 ##################################################
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/fusion/libvelodyne_fusion_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/fusion/libvelodyne_fusion_component.so"
 
     components {
       class_name : "PriSecFusionComponent"
@@ -45,7 +45,7 @@ module_config {
 #                compensation                    #
 ##################################################
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
     components {
       class_name : "CompensatorComponent"
       config {
