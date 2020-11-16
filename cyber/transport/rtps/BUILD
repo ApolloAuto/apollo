@@ -62,7 +62,7 @@ cc_test(
     size = "small",
     srcs = ["rtps_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@com_google_googletest//:gtest_main",
         "@fastcdr",
     ],

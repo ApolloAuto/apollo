@@ -17,7 +17,7 @@ cc_library(
     srcs = ["py_cyber.cc"],
     hdrs = ["py_cyber.h"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
     ],
@@ -48,7 +48,7 @@ cc_library(
     srcs = ["py_record.cc"],
     hdrs = ["py_record.h"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "//cyber/message:py_message",
         "//cyber/record",
         "@local_config_python//:python_headers",
@@ -82,7 +82,7 @@ cc_library(
     srcs = ["py_time.cc"],
     hdrs = ["py_time.h"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@fastrtps",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
@@ -103,7 +103,7 @@ cc_library(
     srcs = ["py_timer.cc"],
     hdrs = ["py_timer.h"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
     ],
@@ -124,7 +124,7 @@ cc_library(
     hdrs = ["py_parameter.h"],
     deps = [
         ":py_cyber",
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
     ],

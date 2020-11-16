@@ -31,7 +31,7 @@ cc_test(
     size = "small",
     srcs = ["transport_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest",
     ],

@@ -8,7 +8,7 @@ cc_test(
     size = "small",
     srcs = ["sysmo_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "//cyber/scheduler:scheduler_factory",
         "@com_google_googletest//:gtest_main",
     ],

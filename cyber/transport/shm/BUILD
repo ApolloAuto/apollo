@@ -135,7 +135,7 @@ cc_test(
     size = "small",
     srcs = ["condition_notifier_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

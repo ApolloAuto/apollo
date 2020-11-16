@@ -19,7 +19,7 @@ cc_test(
     size = "small",
     srcs = ["endpoint_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -39,7 +39,7 @@ cc_test(
     size = "small",
     srcs = ["identity_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

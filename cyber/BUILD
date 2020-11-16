@@ -3,14 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "cyber",
-    linkstatic = False,
-    deps = [
-        "//cyber:cyber_core",
-    ],
-)
-
 cc_binary(
     name = "mainboard",
     srcs = [
@@ -21,9 +13,8 @@ cc_binary(
         "mainboard/module_controller.h",
     ],
     linkopts = ["-pthread"],
-    linkstatic = False,
     deps = [
-        ":cyber_core",
+        ":cyber",
         "//cyber/proto:dag_conf_cc_proto",
     ],
 )
@@ -61,7 +52,7 @@ cc_library(
 )
 
 cc_library(
-    name = "cyber_core",
+    name = "cyber",
     srcs = ["cyber.cc"],
     hdrs = ["cyber.h"],
     linkopts = ["-lrt"],

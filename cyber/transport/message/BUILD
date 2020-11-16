@@ -45,7 +45,7 @@ cc_test(
     size = "small",
     srcs = ["message_info_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -55,7 +55,7 @@ cc_test(
     size = "small",
     srcs = ["message_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

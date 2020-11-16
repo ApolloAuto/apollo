@@ -44,7 +44,7 @@ cc_test(
     size = "small",
     srcs = ["timer_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "//cyber:init",
         "@com_google_googletest//:gtest_main",
     ],
