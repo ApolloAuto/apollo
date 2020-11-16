@@ -194,19 +194,7 @@ bash setup_host.sh
 ```
 重启工控机，然后在/docker/外，/dev/下，就有`ttyACM0`，再进docker，再试gps，可以了。
 
-b.gps.sh打开后不正常，log提示Unable to load gnss conf file
-
-原因是gps配置文档不正确，检查每一行，是否有错误，尤其如下几行的#要去掉：
-```
-    #address: "111.111.111.111"
-    #port: 0000
-    #mount_point: "yourport"
-    #user: "username"
-    #password: "password"
-```
-另外，在程序运行的过程中，有可能会把modules/calibration/data/vehicle_name/gnss_params/gnss_conf.pb.txt拷贝到modules/drivers/gnss/conf/gnss_conf.pb.txt，那么我们也需要修改modules/calibration/data/vehicle_name/gnss_params/gnss_conf.pb.txt里面的基站配置信息和+zone=50才能保证gnss配置正确。
-
-c.GPS打开后，发现best_pose, imu, localization/pose 信号没有收到
+b.GPS打开后，发现best_pose, imu, localization/pose 信号没有收到
 
 运行bash gps.sh后，可以cyber_monitor中观察以下几个信号。(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))
 ```
@@ -217,7 +205,7 @@ c.GPS打开后，发现best_pose, imu, localization/pose 信号没有收到
 如果best_pose和imu没有，请检查gps和imu的配置。
 如果best_pose和imu有了，但是localization/pose没有信号，请等待2分钟，如果还是没有，请让车开动几分钟。
 
-d.GPS打开后，发现best_posed的sol_type为single，不是我们需要的NARROW_INT。
+c.GPS打开后，发现best_posed的sol_type为single，不是我们需要的NARROW_INT。
 
 首先，确认IMU设备里面和`modules/calibration/data/dev_kit/gnss_conf/gnss_conf.pb.txt`文件中已经配置好了基站信息。  
 其次，检查IMU的网络接口是否插好了网线连接上了路由器，并且可以在工控机的终端里ping通IMU，同时保证路由器里面插上了手机的sim卡并且工控机能通过路由器正常地访问互联网。  
