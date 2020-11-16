@@ -37,7 +37,7 @@ def write_to_file(file_path, topic_pb):
     write pb message to file
     """
     with open(file_path, 'w') as fp:
-        f.write(str(topic_pb))
+        fp.write(str(topic_pb))
 
 
 def dump_bag(in_bag, out_dir):
@@ -72,7 +72,7 @@ def dump_bag(in_bag, out_dir):
         dt1 = datetime.utcfromtimestamp(t/1000000000)
         dt2 = datetime.utcfromtimestamp(first_time/1000000000)
         relative_time = (dt1 - dt2).seconds - g_args.start_time
-        print "relative_time", relative_time
+        print ("relative_time", relative_time)
         if ((g_args.time_duration > 0) and
                 (relative_time < 0 or relative_time > g_args.time_duration)):
             continue
