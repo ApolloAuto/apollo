@@ -14,10 +14,8 @@
       - [2. 使用Apollo录制数据包的方法](#2-使用apollo录制数据包的方法)
       - [3. 开始录制数据包](#3-开始录制数据包)
   - [Lidar-GNSS标定数据预处理](#lidar-gnss标定数据预处理)
-      - [1. 按照目录结构放置好Lidar-GNSS标定数据包](#1-按照目录结构放置好lidar-gnss标定数据包)
-      - [2. 修改抽取工具配置文件 lidar_to_gnss.config](#2-修改抽取工具配置文件-lidar_to_gnssconfig)
-      - [3. 运行数据抽取工具](#3-运行数据抽取工具)
-      - [4. 修改云标定配置文件 sample_config.yaml](#4-修改云标定配置文件-sample_configyaml)
+      - [1. 运行数据抽取工具](#1-运行数据抽取工具)
+      - [2. 修改云标定配置文件 sample_config.yaml](#2-修改云标定配置文件-sample_configyaml)
   - [使用标定云服务生成外参文件](#使用标定云服务生成外参文件)
       - [1. 上传预处理后的数据至BOS](#1-上传预处理后的数据至bos)
       - [2. 提交云标定任务](#2-提交云标定任务)
@@ -129,9 +127,7 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 
 该步骤将通过提取工具将record数据包中的点云和定位数据进行预处理，以方便通过云服务进行在线标定。
 
-#### 1. 按照目录结构放置好Lidar-GNSS标定数据包
-
-复制[sensor_calibration目录](../../Apollo_Fuel/examples/)(路径为 docs/Apollo_Fuel/examples/sensor_calibration/)并放置于apollo根目录下，其目录结构如下：
+Lidar-GNSS标定数据包的相关文件位于[sensor_calibration目录](../../Apollo_Fuel/examples/)(路径为 docs/specs/Apollo_Fuel/examples/sensor_calibration/)其目录结构如下：
 
 ```
 .
@@ -149,37 +145,31 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 	    ├── lidar_to_gnss.config
 	    └── records
 ```
-本小节重点关lidar_to_gnss目录，把前面录制的Lidar-GNSS标定数据包放置于`sensor_calibration/lidar_to_gnss/records/`目录中。
+与本节相关的主要是lidar_to_gnss目录。
 
-#### 2. 修改抽取工具配置文件 lidar_to_gnss.config
+**注意**：不要修改该目录下的任何文件
 
-根据实际情况，修改配置文件`lidar_to_gnss.config`中预处理数据产出目录（output_path）和待处理数据包目录（record_path），单激光雷达标定文件配置参考下图：
+#### 1. 运行数据抽取工具
 
-![lidar_calibration_config](images/lidar_calibration_config.png)
-
-如果是多激光雷达标定，配置文件中还需要补充一下雷达点云channel信息，如下图所示(这里以3lidar标定为例)：
-
-
-![lidar_calibration_config](images/lidar_calibration_multi_lidar_config.jpg)
-
-**注意**：以上目录需要指定绝对路径。
-
-#### 3. 运行数据抽取工具
+假设你在[Lidar-GNSS标定数据包录制](#lidar-gnss标定数据包录制)步骤生成的数据包位于/apollo/data/bag/test目录
 
 **进入docker环境**，执行如下命令：
 
-```
-budaoshi@in_dev_docker:/apollo$ cd /apollo/modules/tools/sensor_calibration
-budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_data.py --config /apollo/sensor_calibration/lidar_to_gnss/lidar_to_gnss.config
+```bash
+budaoshi@in_dev_docker:/apollo$ ./scripts/extract_data.sh -d data/bag/test/
 ```
 
-**注意**：--config参数指定了配置文件路径，必须为绝对路径，用户根据情况自行修改。
+**注意**：-d选项指定数据包所在的文件夹（相对路径或者绝对路径）。也可以通过-f选项指定具体的数据包，比如：
 
- 等待终端中显示`Data extraction is completed successfully!`的提示代表数据提取成功，提取出的数据被存储到配置文件中指定的`output_path`路径下。运行数据抽取工具后的目录如下所示：
- 
+```bash
+budaoshi@in_dev_docker:/apollo$ ./scripts/extract_data.sh -f data/bag/test/20190325185008.record.00001 -f data/bag/test/20190325185008.record.00002
+```
+
+ 等待终端中显示`Data extraction is completed successfully!`的提示代表数据提取成功，提取出的数据默认被存储到`apollo`根目录下的`s`ensor_calibration/lidar_to_gnss`路径。。运行数据抽取工具后的目录如下所示：
+
 单激光雷达运行数据提取提供工具后生成的目录结构如下所示：
 
-```
+```bash
 lidar_to_gnss/
 ├── extracted_data
 │   ├── lidar_to_gnss-2020-10-27-20-26
@@ -200,7 +190,7 @@ lidar_to_gnss/
 
 多激光雷达运行数据提取提供工具后生成的目录结构示例如下所示(这里以3激光雷达标定为例)：
 
-```
+```bash
 lidar_to_gnss/
 ├── extracted_data
 │   ├── lidar_to_gnss-2020-10-27-20-26
@@ -223,9 +213,7 @@ lidar_to_gnss/
     └── readme.txt
 ```
 
-
- 
-#### 4. 修改云标定配置文件 sample_config.yaml
+#### 2. 修改云标定配置文件 sample_config.yaml
 
 单激光雷达标定时`sample_config.yaml`文件的修改：
 - 添加`main_sensor`字段信息：`main_sensor`字段需要填写激光雷达的名称(单激光雷达标定的情况下，main_sensor与source_sensor相同)，参考示例如下图所示
