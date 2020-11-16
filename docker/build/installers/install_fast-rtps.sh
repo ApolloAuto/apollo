@@ -51,11 +51,7 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
 else # aarch64
     PKG_NAME="fast-rtps-1.5.0.prebuilt.aarch64.tar.gz"
     CHECKSUM="061da391763949e39ed0ac4d0596112818e8692b938aa845d54fac1a1aa550db"
-<<<<<<< HEAD
-    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
-=======
     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
->>>>>>> 174836325e... Infra: update BOS urls
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
