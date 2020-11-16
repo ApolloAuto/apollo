@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>velodyne</name>
+        <dag_conf>/apollo/modules/drivers/lidar/velodyne/dag/velodyne_64_16.dag</dag_conf>
+        <process_name>velodyne</process_name>
+    </module>
+</cyber>
