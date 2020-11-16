@@ -3,11 +3,11 @@ Lidar是一种常用的环境感知传感器，利用脉冲激光来照射目标
 
 ## Velodyne驱动的主要部分
 
-1. [Driver](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/driver): 通过网络端口接收lidar硬件产生的UDP数据包，将每一帧封装成VelodyneScan格式后发送。
+1. [Driver](../../modules/drivers/lidar/velodyne/driver): 通过网络端口接收lidar硬件产生的UDP数据包，将每一帧封装成VelodyneScan格式后发送。
 
-2. [Parser](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/parser): 接收VelodyneScan数据，把VelodyneScan中的点由球面坐标系转换成空间直角坐标系下的pointcldoud点云格式后发送。
+2. [Parser](../../modules/drivers/lidar/velodyne/parser): 接收VelodyneScan数据，把VelodyneScan中的点由球面坐标系转换成空间直角坐标系下的pointcldoud点云格式后发送。
 
-3. [Compensator](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/compensator): 接收点云数据和pose数据，根据每个点的对应的pose信息把点转换到点云中最大时刻对应的坐标系下，减小由车辆自身的运动带来的误差。需要点云数据中包含每个点的时间戳信息。
+3. [Compensator](../../modules/drivers/lidar/velodyne/compensator): 接收点云数据和pose数据，根据每个点的对应的pose信息把点转换到点云中最大时刻对应的坐标系下，减小由车辆自身的运动带来的误差。需要点云数据中包含每个点的时间戳信息。
 
 
 
@@ -32,8 +32,8 @@ apollo已经预定义了点云的消息格式，所以只需要为新lidar定义
 	  repeated bytes raw_data = 5;               // raw scan data
 	}
 	```
-在velodyne驱动中，其扫描数据消息定义为[VelodyneScan](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/velodyne/proto/velodyne.proto#L29).
-	
+在velodyne驱动中，其扫描数据消息定义为[VelodyneScan](../../modules/drivers/lidar/velodyne/proto/velodyne.proto#L29).
+
 #### 3. 读取原始数据
 
 lidar每秒会产生大量数据，一般通过UDP协议来进行数据的高效传输。编写一个DriverComponent类，继承于无模版参数Component类；在Init函数中启动一个异步poll线程，不断从相应的端口读取lidar数据；然后根据需求如将一段时间内的数据打包为一帧ScanData，如扫描一圈为一帧；最后通过writer将ScanData写至相应的channel发送出去。
@@ -125,7 +125,7 @@ CYBER_REGISTER_COMPONENT(ParserComponent)
 ```python
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/driver/libxxx_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/driver/libxxx_driver_component.so"
     components {
       class_name : "DriverComponent"
       config {
@@ -136,7 +136,7 @@ module_config {
 }
 	
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/parser/libxxx_parser_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/parser/libxxx_parser_component.so"
     components {
       class_name : "ParserComponent"
       config {
@@ -148,12 +148,12 @@ module_config {
 }
 	
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/compensator/libxxx_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/compensator/libxxx_compensator_component.so"
     components {
       class_name : "CompensatorComponent"
       config {
         name : "pointcloud_compensator"
-        config_file_path : "/apollo/modules/drivers/xxx/conf/xxx_compensator_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/xxx/conf/xxx_compensator_conf.pb.txt"
         readers {channel: "/apollo/sensor/xxx/PointCloud2"}
       }
     }

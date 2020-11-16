@@ -1,0 +1,16 @@
+frame_id: "velodyne32"
+scan_channel: "/apollo/sensor/velodyne32/VelodyneScan"
+rpm: 600.0
+model: VLP32C
+mode: STRONGEST
+firing_data_port: 8308
+use_sensor_sync: false
+max_range: 200
+min_range: 0.4
+use_gps_time: true
+calibration_online: false
+calibration_file: "/apollo/modules/drivers/lidar/velodyne/params/VLP32C_calibration_example.yaml"
+organized: false
+convert_channel_name: "/apollo/sensor/velodyne32/PointCloud2"
+use_poll_sync: true
+is_main_frame: true

@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar_surestar/libsurestar_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lidar_surestar/libsurestar_driver_component.so"
 
     components {
       class_name : "CompSureStarDriver"
@@ -12,7 +12,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar_surestar/libsurestar_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lidar_surestar/libsurestar_driver_component.so"
 
     components {
       class_name : "CompSurestarConvert"
@@ -26,7 +26,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
 
     components {
       class_name : "CompensatorComponent"
