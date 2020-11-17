@@ -107,8 +107,6 @@ message Module {
   optional ProcessMonitorConfig process_monitor_config = 3;
   // Whether to trigger safe-mode if the module is down.
   optional bool required_for_safety = 4 [default = true];
-  // We use the config in ModuleMonitor to check if the module is running.
-  optional ModuleMonitorConfig module_monitor_config = 5;
 }
 
 // A CyberModule will be translated to a regular Module upon loading.
