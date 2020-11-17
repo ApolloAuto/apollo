@@ -10,7 +10,7 @@ max_distance: 70
 split_frame_mode: 1
 num_pkts_split: 1
 cut_angle: 0
-angle_path: "/apollo/modules/drivers/robosense/angle.csv"
+angle_path: "/apollo/modules/drivers/lidar/robosense/angle.csv"
 pointcloud_channel: "/apollo/sensor/lidar16/left/PointCloud2"
 scan_channel: "/apollo/sensor/lidar16/left/Scan"
 use_lidar_clock: false

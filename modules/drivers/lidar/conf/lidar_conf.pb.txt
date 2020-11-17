@@ -11,7 +11,7 @@ max_range: 100.0
 min_range: 0.9
 use_gps_time: true
 calibration_online: false
-calibration_file: "/apollo/modules/drivers/velodyne/params/VLP16_calibration.yaml"
+calibration_file: "/apollo/modules/drivers/lidar/velodyne/params/VLP16_calibration.yaml"
 organized: false
 convert_channel_name: "/apollo/sensor/lidar16/PointCloud2"
 use_poll_sync: true
