@@ -124,7 +124,7 @@ log com3 gprmc ontime 1 0.25
 
 ### GNSS配置
 
-将文档中的`proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"`这一行中的`zone=50`中的50换成自己的城市所在的utmzone数值；比如这里的数值50代表的是北京，若您在纽约，则用纽约的utmzone数值10替换掉这里的数值50，以此类推。
+将文档`modules/calibration/data/dev_kit/gnss_conf/gnss_conf.pb.txt`中的`proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"`这一行中的`zone=50`中的50换成自己的城市所在的utmzone数值；比如这里的数值50代表的是北京，若您在纽约，则用纽约的utmzone数值10替换掉这里的数值50，以此类推。
 
 ### `Localization.conf`文件的配置
 对`modules/calibration/data/dev_kit/localization_conf/localization.conf`文件进行配置。**如果该配置文件没有进行正确配置，可能会对之后的传感器标定、虚拟车道线制作等功能产生影响**
@@ -205,9 +205,9 @@ b.GPS打开后，发现best_pose, imu, localization/pose 信号没有收到
 如果best_pose和imu没有，请检查gps和imu的配置。
 如果best_pose和imu有了，但是localization/pose没有信号，请等待2分钟，如果还是没有，请让车开动几分钟。
 
-c.GPS打开后，发现best_posed的sol_type为single，不是我们需要的NARROW_INT。
+c.GPS打开后，发现best_pose的sol_type为single，不是我们需要的NARROW_INT。
 
-首先，确认IMU设备里面和`modules/calibration/data/dev_kit/gnss_conf/gnss_conf.pb.txt`文件中已经配置好了基站信息。  
+首先，确认IMU设备中已经配置好了基站信息。  
 其次，检查IMU的网络接口是否插好了网线连接上了路由器，并且可以在工控机的终端里ping通IMU，同时保证路由器里面插上了手机的sim卡并且工控机能通过路由器正常地访问互联网。  
 再次，联系商务的同事请他们提供刷新IMU的固件版本的教程和工具，刷新完IMU后请按照文档重新配置一遍IMU。  
 最后，联系商务的同事商讨将IMU返厂维修的事宜。
