@@ -2,6 +2,11 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "config",
+    srcs = glob(["*.yaml"]),
+)
+
 py_library(
     name = "parse_camera",
     srcs = ["parse_camera.py"],
@@ -35,7 +40,11 @@ py_library(
 py_binary(
     name = "record_parse_save",
     srcs = ["record_parse_save.py"],
+    data = [":config"],
     deps = [
+        ":parse_camera",
+        ":parse_lidar",
+        ":parse_radar",
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
     ],
