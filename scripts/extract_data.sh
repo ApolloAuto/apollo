@@ -22,6 +22,8 @@ TARGET_DIR="${TOP_DIR}/sensor_calibration/lidar_to_gnss"
 TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration/lidar_to_gnss"
 DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 
+NO_INTERACTIVE=0
+
 CHANNEL_TEMPLATE="${TEMPLATE_DIR}/channel_template.txt"
 EXTRACTION_RATE="5"
 
@@ -40,13 +42,16 @@ function print_usage() {
 
 function parse_args() {
   # read options
-  while getopts ':f:d:' flag; do
+  while getopts ':f:d:n' flag; do
     case "${flag}" in
       f)
         RECORD_FILES+=("${OPTARG}")
         ;;
       d)
         RECORD_DIRS+=("${OPTARG}")
+        ;;
+      n)
+        NO_INTERACTIVE=1
         ;;
       *)
         print_usage
@@ -57,19 +62,22 @@ function parse_args() {
 }
 
 function check_target_dir() {
-  if [ ! -d "${TARGET_DIR}" ]; then
+  if [[ ! -d "${TARGET_DIR}" ]]; then
     mkdir -p ${TARGET_DIR}
     cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
   elif [[ ! -z "$(ls -A ${TARGET_DIR})" ]]; then
-    local warn="The ${TARGET_DIR} is not empty, do you want to delete it? (Y/n)"
-    echo "${warn}"
-    local answer
-    typeset -l answer
-    read answer
-    if [ "${answer}" == "y" ]; then
+    if [[ "${NO_INTERACTIVE}" -eq 0 ]]; then
+      local warn="The ${TARGET_DIR} is not empty, do you want to delete it? (Y/n)"
+      echo "${warn}"
+      local answer
+      typeset -l answer && read answer
+      if [ "${answer}" == "y" ]; then
+        rm -rf ${TARGET_DIR}/*
+      fi
+    else
       rm -rf ${TARGET_DIR}/*
-      cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
     fi
+    cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
   else
     cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
   fi
@@ -89,7 +97,12 @@ function _install_pypcd() {
 function _get_latest() {
   local parent_dir=$1
   local latest=$(ls -lt ${parent_dir} | grep -m1 '^d' | awk '{print $NF}')
-  echo "${parent_dir}/${latest}"
+  if [[ -z "${latest}" ]]; then
+    echo "There is no reord directories in ${parent_dir}!"
+    exit 1
+  else
+    echo "${parent_dir}/${latest}"
+  fi
 }
 
 function get_records() {
@@ -98,7 +111,7 @@ function get_records() {
   fi
 
   for file in "${RECORD_FILES[@]}"; do
-    if [ -f "${file}" ]; then
+    if [[ -f "${file}" ]]; then
       if [[ "${file}" == *"record"* ]]; then
         cp "${file}" "${TARGET_DIR}/records"
       else
@@ -112,7 +125,7 @@ function get_records() {
   done
 
   for dir in "${RECORD_DIRS[@]}"; do
-    if [ -d "${dir}" ]; then
+    if [[ -d "${dir}" ]]; then
       if [[ -z "$(ls ${dir} | grep record)" ]]; then
         echo "There is no reord file in ${dir}!"
         exit 1
@@ -134,11 +147,11 @@ function get_records() {
 }
 
 function install_if_not_exist() {
-  while [ $# -gt 0 ]; do
+  while [[ $# -gt 0 ]]; do
     local pkg=$1
     shift
     pip show --files "${pkg}" >/dev/null
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
       if [[ "${pkg}" == "pypcd" ]]; then
         _install_pypcd
       else
@@ -175,9 +188,8 @@ function update_config() {
 }
 
 function main() {
-  check_target_dir
-
   parse_args "$@"
+  check_target_dir
 
   get_records
   update_config
