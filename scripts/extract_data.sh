@@ -20,6 +20,8 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 TARGET_DIR="${TOP_DIR}/sensor_calibration/lidar_to_gnss"
 TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration/lidar_to_gnss"
+DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
+
 CHANNEL_TEMPLATE="${TEMPLATE_DIR}/channel_template.txt"
 EXTRACTION_RATE="5"
 
@@ -54,7 +56,7 @@ function parse_args() {
   done
 }
 
-function _check_target_dir() {
+function check_target_dir() {
   if [ ! -d "${TARGET_DIR}" ]; then
     mkdir -p ${TARGET_DIR}
     cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
@@ -84,7 +86,17 @@ function _install_pypcd() {
   rm -rf pypcd
 }
 
+function _get_latest() {
+  local parent_dir=$1
+  local latest=$(ls -lt ${parent_dir} | grep -m1 '^d' | awk '{print $NF}')
+  echo "${parent_dir}/${latest}"
+}
+
 function get_records() {
+  if [[ ${#RECORD_FILES[*]} -eq 0 && ${#RECORD_DIRS[*]} -eq 0 ]]; then
+    RECORD_DIRS+=($(_get_latest ${DEFAULT_RECORD_DIR}))
+  fi
+
   for file in "${RECORD_FILES[@]}"; do
     if [ -f "${file}" ]; then
       if [[ "${file}" == *"record"* ]]; then
@@ -145,7 +157,7 @@ function update_config() {
     grep PointCloud2 | grep -v "fusion" | grep -v "compensator"))
 
   if [ "${#lidar_channels[*]}" -eq 0 ]; then
-    echo "There is no PointCloud messages in ${reocrd}, please check your record!"
+    echo "There is no PointCloud messages in ${record}, please check your record!"
     exit 1
   fi
 
@@ -163,27 +175,19 @@ function update_config() {
 }
 
 function main() {
-  if [ "$#" -eq 0 ]; then
-    print_usage
-    exit 1
-  fi
-
-  _check_target_dir
+  check_target_dir
 
   parse_args "$@"
-
-  if [[ ${#RECORD_FILES[*]} -eq 0 && ${#RECORD_DIRS[*]} -eq 0 ]]; then
-    print_usage
-    exit 1
-  fi
 
   get_records
   update_config
 
   install_if_not_exist "pyyaml" "pypcd"
 
-  ${APOLLO_ROOT_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data \
-    --config ${TARGET_DIR}/lidar_to_gnss.config
+  bazel run //modules/tools/sensor_calibration:extract_data \
+    -- --config ${TARGET_DIR}/lidar_to_gnss.config
+  bazel run //modules/tools/sensor_calibration:sanity_check \
+    -- --input_folder ${TARGET_DIR}/extracted_data
 
   rm -f ${TARGET_DIR}/records/*
 }
