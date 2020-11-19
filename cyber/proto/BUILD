@@ -158,24 +158,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "perception_cc_proto",
-    deps = [
-        ":perception_proto",
-    ],
-)
-
-proto_library(
-    name = "perception_proto",
-    srcs = ["perception.proto"],
-)
-
-py_proto_library(
-    name = "perception_py_pb2",
-    deps = [
-        ":perception_proto",
-    ],
-)
-cc_proto_library(
     name = "perf_conf_cc_proto",
     deps = [
         ":perf_conf_proto",
