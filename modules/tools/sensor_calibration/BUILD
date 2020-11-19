@@ -79,3 +79,8 @@ py_library(
         "//modules/localization/proto:localization_py_pb2",
     ],
 )
+
+py_binary(
+    name = "sanity_check",
+    srcs = ["sanity_check.py"],
+)
