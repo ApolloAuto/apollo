@@ -134,8 +134,12 @@ def missing_calibration_data_file(sample_config_files):
 
 
 def is_oversize_file(path):
-    if getInputDirDataSize(path) >= 1 * 1024 * 1024 * 1024:
-        print('The input file is oversize!')
+    dir_size = getInputDirDataSize(path)
+    if dir_size == 0:
+        print('The input dir is empty!')
+        return True
+    if dir_size >= 5 * 1024 * 1024 * 1024:
+        print('The record file is oversize!')
         return True
     return False
 

@@ -96,7 +96,8 @@ function _install_pypcd() {
 
 function _get_latest() {
   local parent_dir=$1
-  local latest=$(ls -lt ${parent_dir} | grep -m1 '^d' | awk '{print $NF}')
+  local latest=$(ls -lt ${parent_dir} | grep -v '_s' |
+    grep -m1 '^d' | awk '{print $NF}')
   if [[ -z "${latest}" ]]; then
     echo "There is no reord directories in ${parent_dir}!"
     exit 1
