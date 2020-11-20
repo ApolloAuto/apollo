@@ -170,3 +170,7 @@ data_files {
   source_path: "perception_conf/pointcloud_preprocessor.conf"
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
 }
+data_files {
+  source_path: "perception_conf/fusion_component_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+}
