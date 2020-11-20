@@ -46,7 +46,7 @@ export default class Meters {
 
     @observable steeringPercentage = 0;
 
-    @observable batterySocPercentage = 0;
+    @observable batteryPercentage = 0;
 
     @observable drivingMode = 'UNKNOWN';
 
@@ -68,8 +68,8 @@ export default class Meters {
           this.speed = world.autoDrivingCar.speed;
         }
 
-        if (world.autoDrivingCar.batterySocPercentage !== undefined) {
-            this.batterySocPercentage = world.autoDrivingCar.batterySocPercentage;
+        if (world.autoDrivingCar.batteryPercentage !== undefined) {
+            this.batteryPercentage = world.autoDrivingCar.batteryPercentage;
         }
 
         if (world.autoDrivingCar.steeringPercentage !== undefined
