@@ -27,14 +27,14 @@ apt_get_update_and_install \
     libasio-dev \
     libtinyxml2-dev
 
-# Note(storypku) & FIXME(all)
-# As FastRTPS installer in the master branch doesn't work well, we provide
-# prebuilt version here as a workaround. To be removed when ready.
-# Maybe the `cyber/transport/rtps` section needs a rewrite using more recent
-# FastRTPS implentations, e.g. 2.0.0
-#
+# Note(storypku)
+# The following binaries should be the same as those installed via
+# https://github.com/ApolloAuto/apollo/blob/r5.5.0/docker/build/installers/install_fast-rtps.sh
+
+# More recent Fast-DDS (formerly Fast-RTPS) implementations:
 # Ref: https://github.com/eProsima/Fast-DDS
 # Ref: https://github.com/ros2/rmw_fastrtps
+
 DEST_DIR="/usr/local/fast-rtps"
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
