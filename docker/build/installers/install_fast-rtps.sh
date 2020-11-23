@@ -20,14 +20,13 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-git clone --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/Fast-RTPS.git
-pushd Fast-RTPS
-git submodule init
-git submodule update
+git clone --single-branch --branch release/1.5.0 --depth 1 https://github.com/eProsima/Fast-RTPS.git
 
+pushd Fast-RTPS
+git submodule update --init
 mkdir -p build && cd build
 cmake -DEPROSIMA_BUILD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/fast-rtps ../
-make -j8 fastrtps
+make -j8
 make install
 popd
 
