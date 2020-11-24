@@ -53,6 +53,27 @@ class Vcupowerstatus214 : public ::apollo::drivers::canbus::ProtocolData<
   bool replacebatterystateindication(const std::uint8_t* bytes,
                                      const int32_t length) const;
 
+  // config detail: {'description': '0x0:Normal AEB;0x1:Forbidden', 'offset':
+  // 0.0, 'precision': 1.0, 'len': 1, 'name': 'forbidden_aeb_signal',
+  // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 15, 'type':
+  // 'bool', 'order': 'motorola', 'physical_unit': 'bit'}
+  bool forbidden_aeb_signal(const std::uint8_t* bytes,
+                            const int32_t length) const;
+
+  // config detail: {'description': ';', 'offset': -400, 'precision': 0.02,
+  // 'len': 16, 'name': 'chargedischargecurrent', 'is_signed_var': False,
+  // 'physical_range': '[-400|910.68]', 'bit': 40, 'type': 'double', 'order':
+  // 'motorola', 'physical_unit': ''}
+  float bcu_chargedischargecurrent(const std::uint8_t* bytes,
+                                   const int32_t length) const;
+
+  // config detail: {'description': ';', 'offset': 0, 'precision': 0.01,
+  // 'len': 16, 'name': 'batt_internalvoltage', 'is_signed_var': False,
+  // 'physical_range': '[0|655.35]', 'bit': 54, 'type': 'double', 'order':
+  // 'motorola', 'physical_unit': ''}
+  float bcu_batt_internalvoltage(const std::uint8_t* bytes,
+                                 const int32_t length) const;
+
   // config detail: {'name': 'VCU_DriverInfo_AliveCounter', 'offset': 0.0,
   // 'precision': 1.0, 'len': 4, 'is_signed_var': False, 'physical_range':
   // '[0|15]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit':
