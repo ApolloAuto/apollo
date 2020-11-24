@@ -115,7 +115,11 @@ function determine_build_targets() {
   for component in $@; do
     local build_targets
     if [ "${component}" = "cyber" ]; then
-      build_targets="//cyber/... union //modules/tools/visualizer/..."
+      if [[ "${HOST_OS}" == "Linux" ]]; then
+        build_targets="//cyber/... union //modules/tools/visualizer/..."
+      else
+        build_targets="//cyber/..."
+      fi
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
       build_targets="//modules/${component}/..."
     else

@@ -28,6 +28,7 @@ DEV_INSIDE="in-dev-docker"
 
 SUPPORTED_ARCHS=(x86_64 aarch64)
 HOST_ARCH="$(uname -m)"
+HOST_OS="$(uname -s)"
 TARGET_ARCH="$(uname -m)"
 
 VERSION_X86_64="dev-x86_64-18.04-20201110_0617"
@@ -262,9 +263,8 @@ function determine_dev_image() {
 }
 
 function check_host_environment() {
-    local kernel="$(uname -s)"
-    if [[ "${kernel}" != "Linux" ]]; then
-        warning "Running Apollo dev container on ${kernel} is UNTESTED, exiting..."
+    if [[ "${HOST_OS}" != "Linux" ]]; then
+        warning "Running Apollo dev container on ${HOST_OS} is UNTESTED, exiting..."
         exit 1
     fi
 }
@@ -523,6 +523,7 @@ function main() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
+        -e HOST_OS="${HOST_OS}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
