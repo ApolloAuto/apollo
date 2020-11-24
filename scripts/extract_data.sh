@@ -191,16 +191,25 @@ function update_config() {
 function main() {
   parse_args "$@"
   check_target_dir
-
   get_records
   update_config
-
   install_if_not_exist "pyyaml" "pypcd"
 
-  bazel run //modules/tools/sensor_calibration:extract_data \
-    -- --config ${TARGET_DIR}/lidar_to_gnss.config
-  bazel run //modules/tools/sensor_calibration:sanity_check \
-    -- --input_folder ${TARGET_DIR}/extracted_data
+  local extract_data_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data"
+  if [[ -f "${extract_data_bin}" ]]; then
+    "${extract_data_bin}" --config ${TARGET_DIR}/lidar_to_gnss.config
+  else
+    bazel run //modules/tools/sensor_calibration:extract_data \
+      -- --config ${TARGET_DIR}/lidar_to_gnss.config
+  fi
+
+  local sanity_check_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/sanity_check"
+  if [[ -f "${sanity_check_bin}" ]]; then
+    "${sanity_check_bin}" --input_folder ${TARGET_DIR}/extracted_data
+  else
+    bazel run //modules/tools/sensor_calibration:sanity_check \
+      -- --input_folder ${TARGET_DIR}/extracted_data
+  fi
 
   rm -f ${TARGET_DIR}/records/*
 }
