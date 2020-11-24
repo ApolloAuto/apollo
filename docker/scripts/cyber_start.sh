@@ -37,6 +37,7 @@ SHM_SIZE="2G"
 
 SUPPORTED_ARCHS=(x86_64 aarch64)
 HOST_ARCH="$(uname -m)"
+HOST_OS="$(uname -s)"
 TARGET_ARCH=""
 
 USE_GPU_HOST=0
@@ -351,38 +352,37 @@ function setup_devices_and_mount_volumes() {
     local volumes
     volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
 
-    local kernel="$(uname -s)"
-    if [[ "${kernel}" != "Linux" ]]; then
-        warning "Running Apollo cyber container on ${kernel} is UNTESTED, exiting..."
-        exit 1
+    if [[ "${HOST_OS}" != "Linux" ]]; then
+        warning "Running Cyber container on ${HOST_OS} is experimental!"
+    else
+        local os_release="$(lsb_release -rs)"
+        case "${os_release}" in
+            16.04)
+                # Mount host devices into container (/dev)
+                warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
+                        "in the near future. Please upgrade to ubuntu 18.04+."
+                if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                    volumes="${volumes} -v /dev:/dev"
+                fi
+                ;;
+            18.04|20.04|*)
+                if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                    volumes="${volumes} -v /dev:/dev"
+                fi
+                ;;
+        esac
     fi
-
-    local os_release="$(lsb_release -rs)"
-    case "${os_release}" in
-        16.04)
-            # Mount host devices into container (/dev)
-            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
-                    "in the near future. Please upgrade to ubuntu 18.04+."
-            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-                volumes="${volumes} -v /dev:/dev"
-            fi
-            ;;
-        18.04|20.04|*)
-            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-                volumes="${volumes} -v /dev:/dev"
-            fi
-            ;;
-    esac
 
     volumes="${volumes} -v /etc/localtime:/etc/localtime:ro"
     # volumes="${volumes} -v /usr/src:/usr/src"
-    if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-        volumes="${volumes} -v /dev/null:/dev/raw1394 \
+    if [[ "${kernel}" == "Linux" ]]; then
+        if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+            volumes="${volumes} -v /dev/null:/dev/raw1394 \
                             -v /media:/media \
                             -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                             -v /lib/modules:/lib/modules \
                     "
-
+        fi
     fi
     volumes="$(tr -s " " <<< "${volumes}")"
     eval "${__retval}='${volumes}'"
@@ -479,6 +479,7 @@ function start_cyber_container() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${image}" \
+        -e HOST_OS="${HOST_OS}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
