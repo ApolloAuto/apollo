@@ -54,15 +54,15 @@ MAP_VOLUMES_CONF=
 OTHER_VOLUMES_CONF=
 
 DEFAULT_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-  sunnyvale_with_two_offices
-  san_mateo
+    sunnyvale_big_loop
+    sunnyvale_loop
+    sunnyvale_with_two_offices
+    san_mateo
 )
 
 DEFAULT_TEST_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
+    sunnyvale_big_loop
+    sunnyvale_loop
 )
 
 # Check whether user has agreed license agreement
@@ -79,7 +79,7 @@ function check_agreement() {
 
     if [ "$USER_AGREED" = "yes" ]; then
         local progname="$(basename $0)"
-        cat "${AGREEMENT_FILE}" > "${agreement_record}"
+        cat "${AGREEMENT_FILE}" >"${agreement_record}"
         local msgtext="By specifying '-y' option when running ${progname}, \
 you have agreed to the license agreement above."
         echo "${msgtext}" | tee -a "${agreement_record}"
@@ -92,9 +92,9 @@ you have agreed to the license agreement above."
         echo
 
         if [[ "${user_agreed}" = "y" || "${user_agreed}" == "Y" ]]; then
-            cat "${AGREEMENT_FILE}" > "${agreement_record}"
-            echo "${tip}" >> "${agreement_record}"
-            echo "${user_agreed}" >> $agreement_record
+            cat "${AGREEMENT_FILE}" >"${agreement_record}"
+            echo "${tip}" >>"${agreement_record}"
+            echo "${user_agreed}" >>$agreement_record
         else
             exit 1
         fi
@@ -112,7 +112,7 @@ function _optarg_check_for_opt() {
 }
 
 function show_usage() {
-cat <<EOF
+    cat <<EOF
 Usage: $0 [options] ...
 OPTIONS:
     -h, --help             Display this help and exit.
@@ -131,8 +131,8 @@ function stop_all_apollo_containers_for_user() {
     local force="$1"
     local running_containers
     running_containers="$(docker ps -a --format '{{.Names}}')"
-    for container in ${running_containers[*]} ; do
-        if [[ "${container}" =~ apollo_.*_${USER} ]] ; then
+    for container in ${running_containers[*]}; do
+        if [[ "${container}" =~ apollo_.*_${USER} ]]; then
             #printf %-*s 70 "Now stop container: ${container} ..."
             #printf "\033[32m[DONE]\033[0m\n"
             #printf "\033[31m[FAILED]\033[0m\n"
@@ -172,60 +172,66 @@ function parse_arguments() {
     local shm_size=""
     local geo=""
 
-    while [ $# -gt 0 ] ; do
-        local opt="$1"; shift
+    while [ $# -gt 0 ]; do
+        local opt="$1"
+        shift
         case "${opt}" in
-        -t|--tag)
-            if [ -n "${custom_version}" ]; then
-                warning "Multiple option ${opt} specified, only the last one will take effect."
-            fi
-            custom_version="$1"; shift
-            _optarg_check_for_opt "${opt}" "${custom_version}"
-            ;;
+            -t | --tag)
+                if [ -n "${custom_version}" ]; then
+                    warning "Multiple option ${opt} specified, only the last one will take effect."
+                fi
+                custom_version="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${custom_version}"
+                ;;
 
-        -d|--dist)
-            custom_dist="$1"; shift
-            _optarg_check_for_opt "${opt}" "${custom_dist}"
-            ;;
+            -d | --dist)
+                custom_dist="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${custom_dist}"
+                ;;
 
-        -h|--help)
-            show_usage
-            exit 1
-            ;;
+            -h | --help)
+                show_usage
+                exit 1
+                ;;
 
-        -f|--fast)
-            FAST_MODE="yes"
-            ;;
+            -f | --fast)
+                FAST_MODE="yes"
+                ;;
 
-        -g|--geo)
-            geo="$1"; shift
-            _optarg_check_for_opt "${opt}" "${geo}"
-            ;;
+            -g | --geo)
+                geo="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${geo}"
+                ;;
 
-        -l|--local)
-            USE_LOCAL_IMAGE=1
-            ;;
+            -l | --local)
+                USE_LOCAL_IMAGE=1
+                ;;
 
-        --shm-size)
-            shm_size="$1"; shift
-            _optarg_check_for_opt "${opt}" "${shm_size}"
-            ;;
+            --shm-size)
+                shm_size="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${shm_size}"
+                ;;
 
-        --map)
-            map_name="$1"; shift
-            USER_SPECIFIED_MAPS="${USER_SPECIFIED_MAPS} ${map_name}"
-            ;;
-        -y)
-            USER_AGREED="yes"
-            ;;
-        stop)
-            stop_all_apollo_containers_for_user "-f"
-            exit 0
-            ;;
-        *)
-            warning "Unknown option: ${opt}"
-            exit 2
-            ;;
+            --map)
+                map_name="$1"
+                shift
+                USER_SPECIFIED_MAPS="${USER_SPECIFIED_MAPS} ${map_name}"
+                ;;
+            -y)
+                USER_AGREED="yes"
+                ;;
+            stop)
+                stop_all_apollo_containers_for_user "-f"
+                exit 0
+                ;;
+            *)
+                warning "Unknown option: ${opt}"
+                exit 2
+                ;;
         esac
     done # End while loop
 
@@ -292,10 +298,10 @@ function setup_devices_and_mount_local_volumes() {
     case "${os_release}" in
         16.04)
             warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
-                    "in the near future. Please upgrade to ubuntu 18.04+."
+                "in the near future. Please upgrade to ubuntu 18.04+."
             volumes="${volumes} -v /dev:/dev"
             ;;
-        18.04|20.04|*)
+        18.04 | 20.04 | *)
             volumes="${volumes} -v /dev:/dev"
             ;;
     esac
@@ -308,7 +314,7 @@ function setup_devices_and_mount_local_volumes() {
                         -v /etc/localtime:/etc/localtime:ro \
                         -v /usr/src:/usr/src \
                         -v /lib/modules:/lib/modules"
-    volumes="$(tr -s " " <<< "${volumes}")"
+    volumes="$(tr -s " " <<<"${volumes}")"
     eval "${__retval}='${volumes}'"
 }
 
@@ -320,9 +326,9 @@ function determine_gpu_use_host() {
     else
         # Check nvidia-driver and GPU device
         local nv_driver="nvidia-smi"
-        if [ ! -x "$(command -v ${nv_driver} )" ]; then
+        if [ ! -x "$(command -v ${nv_driver})" ]; then
             warning "No nvidia-driver found. CPU will be used"
-        elif [ -z "$(eval ${nv_driver} )" ]; then
+        elif [ -z "$(eval ${nv_driver})" ]; then
             warning "No GPU device found. CPU will be used."
         else
             USE_GPU_HOST=1
@@ -345,7 +351,7 @@ function determine_gpu_use_host() {
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install " \
-                    "latest Docker and NVIDIA Container Toolkit as described by: "
+                "latest Docker and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
@@ -361,7 +367,7 @@ function remove_existing_dev_container() {
 function docker_pull() {
     local img="$1"
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
-        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "${img}" ; then
+        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "${img}"; then
             info "Local image ${img} found and will be used."
             return
         fi
@@ -372,7 +378,7 @@ function docker_pull() {
     fi
 
     info "Start pulling docker image ${img} ..."
-    if ! docker pull "${img}" ; then
+    if ! docker pull "${img}"; then
         error "Failed to pull docker image : ${img}"
         exit 1
     fi
@@ -478,7 +484,7 @@ function main() {
         info "Start docker container based on local image : ${APOLLO_DEV_IMAGE}"
     fi
 
-    if ! docker_pull "${APOLLO_DEV_IMAGE}" ; then
+    if ! docker_pull "${APOLLO_DEV_IMAGE}"; then
         error "Failed to pull docker image ${APOLLO_DEV_IMAGE}"
         exit 1
     fi
@@ -507,34 +513,34 @@ function main() {
 
     set -x
 
-    ${DOCKER_RUN} -itd  \
-        --privileged    \
-        --name "${APOLLO_DEV}"      \
-        -e DISPLAY="${display}"     \
-        -e DOCKER_USER="${user}"    \
-        -e USER="${user}"           \
-        -e DOCKER_USER_ID="${uid}"  \
-        -e DOCKER_GRP="${group}"    \
-        -e DOCKER_GRP_ID="${gid}"   \
+    ${DOCKER_RUN} -itd \
+        --privileged \
+        --name "${APOLLO_DEV}" \
+        -e DISPLAY="${display}" \
+        -e DOCKER_USER="${user}" \
+        -e USER="${user}" \
+        -e DOCKER_USER_ID="${uid}" \
+        -e DOCKER_GRP="${group}" \
+        -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
-        -e USE_GPU_HOST="${USE_GPU_HOST}"   \
+        -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
-        ${MAP_VOLUMES_CONF}      \
-        ${OTHER_VOLUMES_CONF}    \
-        ${local_volumes}        \
+        ${MAP_VOLUMES_CONF} \
+        ${OTHER_VOLUMES_CONF} \
+        ${local_volumes} \
         --net host \
         -w /apollo \
         --add-host "${DEV_INSIDE}:127.0.0.1" \
         --add-host "${local_host}:127.0.0.1" \
         --hostname "${DEV_INSIDE}" \
-        --shm-size "${SHM_SIZE}"   \
-        --pid=host      \
+        --shm-size "${SHM_SIZE}" \
+        --pid=host \
         -v /dev/null:/dev/raw1394 \
         "${APOLLO_DEV_IMAGE}" \
         /bin/bash
 
-    if [ $? -ne 0 ];then
+    if [ $? -ne 0 ]; then
         error "Failed to start docker container \"${APOLLO_DEV}\" based on image: ${APOLLO_DEV_IMAGE}"
         exit 1
     fi
