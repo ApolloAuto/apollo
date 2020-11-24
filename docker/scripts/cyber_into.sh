@@ -27,17 +27,16 @@ xhost +local:root 1>/dev/null 2>&1
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(docker exec "${CYBER_CONTAINER}" uname -m)"
 
-
-IFS='' read -r -d '' NONROOT_SUDO_ERRMSG << EOF
+IFS='' read -r -d '' NONROOT_SUDO_ERRMSG <<EOF
 "sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the \
 'nosuid' option set or an NFS file system without root privileges?"
 EOF
 
 if [[ "${HOST_ARCH}" != "${TARGET_ARCH}" ]]; then
     warning "We only tested aarch containers running on x86_64 hosts." \
-            "And after we changed from ROOT to NON-ROOT users, executing" \
-            "sudo operations complains:\n  " \
-            "${NONROOT_SUDO_ERRMSG}"
+        "And after we changed from ROOT to NON-ROOT users, executing" \
+        "sudo operations complains:\n  " \
+        "${NONROOT_SUDO_ERRMSG}"
 fi
 
 if [[ "${TARGET_ARCH}" == "x86_64" || "${TARGET_ARCH}" == "aarch64" ]]; then
