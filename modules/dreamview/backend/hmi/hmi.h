@@ -17,9 +17,11 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -31,10 +33,13 @@
 namespace apollo {
 namespace dreamview {
 
+using FuelMonitorMap =
+    std::unordered_map<std::string, std::unique_ptr<FuelMonitor>>;
+
 class HMI {
  public:
   HMI(WebSocketHandler *websocket, MapService *map_service,
-      DataCollectionMonitor *data_collection_monitor_);
+      FuelMonitorMap *fuel_monitor);
   void Start();
   void Stop();
 
@@ -51,7 +56,8 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
-  DataCollectionMonitor *data_collection_monitor_;
+  FuelMonitorMap *monitors_;
+  FuelMonitor *current_monitor_ = nullptr;
 };
 
 }  // namespace dreamview

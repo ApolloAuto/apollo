@@ -31,13 +31,14 @@ import yaml
 from google.protobuf import text_format
 import numpy as np
 
+from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3.record import RecordReader
 from cyber.proto import record_pb2
+from modules.dreamview.proto import preprocess_table_pb2
 from modules.tools.sensor_calibration.configuration_yaml_generator import ConfigYaml
 from modules.tools.sensor_calibration.extract_static_data import get_subfolder_list, select_static_image_pcd
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
 from modules.tools.sensor_calibration.sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
-
 
 SMALL_TOPICS = [
     '/apollo/canbus/chassis',
@@ -113,7 +114,6 @@ def get_sensor_channel_list(record_file):
         if 'sensor' in channel_name or '/localization/pose' in channel_name)
 
 
-
 def validate_channel_list(channels, dictionary):
     ret = True
     for channel in channels:
@@ -148,8 +148,14 @@ def build_parser(channel, output_path):
     return parser
 
 
-def extract_data(record_files, output_path, channels,
-                 start_timestamp, end_timestamp, extraction_rates):
+def print_and_publish(str, writer, progress):
+    print(str)
+    progress.log_string = str
+    writer.write(progress)
+
+
+def extract_data(record_files, output_path, channels, start_timestamp,
+                 end_timestamp, extraction_rates):
     """
     Extract the desired channel messages if channel_list is specified.
     Otherwise extract all sensor calibration messages according to
@@ -178,6 +184,8 @@ def extract_data(record_files, output_path, channels,
     channel_output_path = {}
     # channel_messages = {}
     channel_parsers = {}
+    channel_message_number = {}
+    channel_processed_msg_num = {}
     for channel in channels:
         channel_success[channel] = True
         channel_occur_time[channel] = -1
@@ -186,9 +194,24 @@ def extract_data(record_files, output_path, channels,
         process_dir(channel_output_path[channel], operation='create')
         channel_parsers[channel] =\
             build_parser(channel, channel_output_path[channel])
+        channel_message_number[channel] = 0
+        for record_file in record_files:
+            record_reader = RecordReader(record_file)
+            channel_message_number[channel] += record_reader.get_messagenumber(
+                channel)
+        channel_message_number[channel] = channel_message_number[
+            channel] // extraction_rates[channel]
+        channel_message_number_total = 0
+        for num in channel_message_number.values():
+            channel_message_number_total += num
+        channel_processed_msg_num = 0
 
         # if channel in SMALL_TOPICS:
         # channel_messages[channel] = list()
+    extractor_node = cyber.Node("extractor")
+    writer = extractor_node.create_writer("/apollo/dreamview/progress",
+                                          preprocess_table_pb2.Progress, 6)
+    progress = preprocess_table_pb2.Progress()
 
     for record_file in record_files:
         record_reader = RecordReader(record_file)
@@ -207,7 +230,9 @@ def extract_data(record_files, output_path, channels,
                     continue
 
                 ret = channel_parsers[msg.topic].parse_sensor_message(msg)
-
+                channel_processed_msg_num += 1
+                progress.percentage = channel_processed_msg_num / \
+                    channel_message_number_total * 100.0
                 # Calculate parsing statistics
                 if not ret:
                     process_msg_failure_num += 1
@@ -215,9 +240,11 @@ def extract_data(record_files, output_path, channels,
                         channel_success[msg.topic] = False
                         process_channel_failure_num += 1
                         process_channel_success_num -= 1
-                        print(
-                            'Failed to extract data from channel: %s in record %s'
-                            % (msg.topic, record_file))
+                        log_string = F'Failed to extract data from channel: {msg.topic} in record {record_file}'
+                        print(log_string)
+                        progress.log_string = log_string
+
+                writer.write(progress)
 
     # traverse the dict, if any channel topic stored as a list
     # then save the list as a summary file, mostly binary file
@@ -225,13 +252,17 @@ def extract_data(record_files, output_path, channels,
         save_combined_messages_info(parser, channel)
 
     # Logging statics about channel extraction
-    print('Extracted sensor channel number [%d] from record files: %s' %
-          (len(channels), ' '.join(record_files)))
-    print('Successfully processed [%d] channels, and [%d] was failed.' %
-          (process_channel_success_num, process_channel_failure_num))
+    print_and_publish(
+        'Extracted sensor channel number [%d] from record files: %s' %
+        (len(channels), ' '.join(record_files)), writer, progress)
+    print_and_publish(
+        'Successfully processed [%d] channels, and [%d] was failed.' %
+        (process_channel_success_num, process_channel_failure_num), writer,
+        progress)
     if process_msg_failure_num > 0:
-        print('Channel extraction failure number is [%d].' %
-              process_msg_failure_num)
+        print_and_publish(
+            'Channel extraction failure number is [%d].' %
+            process_msg_failure_num, writer, progress)
 
     return True
 
@@ -410,7 +441,7 @@ def reorganize_extracted_data(tmp_data_path,
         lidar_subfolders = [x for x in subfolders if '_PointCloud2' in x]
         print(lidar_subfolders)
         print(odometry_subfolders)
-        if len(lidar_subfolders) is 0 or len(odometry_subfolders) is not 1:
+        if len(lidar_subfolders) == 0 or len(odometry_subfolders) != 1:
             raise ValueError(('one odometry and more than 0 lidar(s)'
                               'sensor are needed for sensor calibration'))
         odometry_subfolder = odometry_subfolders[0]
@@ -471,6 +502,18 @@ def reorganize_extracted_data(tmp_data_path,
         out_data['source_sensor'] = source_sensor_list
         out_data['transform'] = transform_list
         out_data['main_sensor'] = source_sensor_list[0]
+
+        table = preprocess_table_pb2.PreprocessTable()
+        user_config = os.path.join(os.path.dirname(__file__), 'config',
+                                   'lidar_to_gnss_user.config')
+        if os.path.exists(user_config):
+            with open(user_config, "r") as f:
+                proto_block = f.read()
+                text_format.Merge(proto_block, table)
+
+            if table.HasField("main_sensor"):
+                out_data['main_sensor'] = table.main_sensor
+
         multi_lidar_yaml = os.path.join(multi_lidar_out_path,
                                         'sample_config.yaml')
         with open(multi_lidar_yaml, 'w') as f:
@@ -569,8 +612,8 @@ def main():
         required=True,
         dest="config",
         help="protobuf text format configuration file abosolute path")
-    args = parser.parse_args()
 
+    args = parser.parse_args()
     config = extractor_config_pb2.DataExtractionConfig()
     with open(args.config, "r") as f:
         proto_block = f.read()
@@ -609,8 +652,12 @@ def main():
         raise ValueError('Failed to create extrated data directory: %s' %
                          output_abs_path)
 
+    cyber.init("data_extractor")
+
     ret = extract_data(valid_record_list, output_abs_path, channels,
                        start_timestamp, end_timestamp, extraction_rates)
+
+    cyber.shutdown()
     # output_abs_path='/apollo/data/extracted_data/CoolHigh-2019-09-20/camera_to_lidar-2019-12-16-16-33/tmp'
     reorganize_extracted_data(tmp_data_path=output_abs_path,
                               task_name=config.io_config.task_name)

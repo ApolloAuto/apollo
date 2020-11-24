@@ -12,6 +12,9 @@ filegroup(
 py_library(
     name = "configuration_yaml_generator",
     srcs = ["configuration_yaml_generator.py"],
+    deps = [
+        "//modules/dreamview/proto:preprocess_table_py_pb2",
+    ],
 )
 
 py_library(
@@ -28,7 +31,9 @@ py_binary(
         ":extract_static_data",
         ":sensor_msg_extractor",
         "//cyber/proto:record_py_pb2",
+        "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
+        "//modules/dreamview/proto:preprocess_table_py_pb2",
         "//modules/tools/sensor_calibration/proto:extractor_config_py_pb2",
     ],
 )

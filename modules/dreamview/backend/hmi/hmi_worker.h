@@ -24,8 +24,6 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
-#include "cyber/cyber.h"
-#include "cyber/time/time.h"
 #include "modules/audio/proto/audio_event.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
@@ -34,6 +32,10 @@
 #include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+
+#include "cyber/cyber.h"
+#include "cyber/time/time.h"
+#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::dreamview
@@ -80,6 +82,7 @@ class HMIWorker {
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
   static HMIMode LoadMode(const std::string& mode_config_path);
+  static void System(std::string_view cmd);
 
  private:
   void InitReadersAndWriters();
@@ -124,8 +127,7 @@ class HMIWorker {
       localization_reader_;
   std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
   std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
-  std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>>
-      audio_event_writer_;
+  std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>> audio_event_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;
 };

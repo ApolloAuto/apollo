@@ -21,6 +21,10 @@ import shutil
 
 import yaml
 
+from google.protobuf import text_format
+
+from modules.dreamview.proto import preprocess_table_pb2
+
 
 class ConfigYaml(object):
     """generate yaml configuration for next-step calibration service.
@@ -109,6 +113,24 @@ class ConfigYaml(object):
         if self._task_name == 'lidar_to_gnss':
             out_data = self._generate_lidar_to_gnss_calibration_yaml(
                 out_data, source_folder, dest_folder)
+
+            table = preprocess_table_pb2.PreprocessTable()
+            user_config = os.path.join(os.path.dirname(__file__), 'config',
+                                       'lidar_to_gnss_user.config')
+            if os.path.exists(user_config):
+                with open(user_config, "r") as f:
+                    proto_block = f.read()
+                    text_format.Merge(proto_block, table)
+
+                for lidar_config in table.lidar_config:
+                    if lidar_config.sensor_name == source_sensor:
+                        out_data['transform']['translation']['x'] = round(
+                            lidar_config.translation.x, 4)
+                        out_data['transform']["translation"]["y"] = round(
+                            lidar_config.translation.y, 4)
+                        out_data['transform']["translation"]["z"] = round(
+                            lidar_config.translation.z, 4)
+
         elif self._task_name == 'camera_to_lidar':
             if source_folder != dest_folder:
                 raise ValueError('camera frame and lidar frame should be in same folder')

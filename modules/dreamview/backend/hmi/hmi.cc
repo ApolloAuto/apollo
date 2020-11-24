@@ -19,6 +19,11 @@
 #include <string>
 #include <vector>
 
+#include "google/protobuf/util/json_util.h"
+
+#include "modules/dreamview/proto/preprocess_table.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
@@ -29,15 +34,17 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::util::JsonUtil;
+using apollo::cyber::common::SetProtoToBinaryFile;
+using google::protobuf::util::JsonStringToMessage;
 using Json = WebSocketHandler::Json;
 
 HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
-         DataCollectionMonitor* data_collection_monitor)
+         FuelMonitorMap* monitors)
     : hmi_worker_(new HMIWorker()),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
       map_service_(map_service),
-      data_collection_monitor_(data_collection_monitor) {
+      monitors_(monitors) {
   if (websocket_) {
     RegisterMessageHandlers();
   }
@@ -103,15 +110,22 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
-          if (data_collection_monitor_->IsEnabled()) {
-            data_collection_monitor_->Restart();
+          if (current_monitor_ != nullptr && current_monitor_->IsEnabled()) {
+            current_monitor_->Restart();
           }
         } else if (hmi_action == HMIAction::CHANGE_MODE) {
-          static constexpr char kCalibrationMode[] = "Vehicle Calibration";
-          if (value == kCalibrationMode) {
-            data_collection_monitor_->Start();
+          if (monitors_->find(value) != monitors_->end()) {
+            FuelMonitor* new_monitor = monitors_->at(value).get();
+            if (current_monitor_ != nullptr &&
+                current_monitor_ != new_monitor) {
+              current_monitor_->Stop();
+            }
+            current_monitor_ = new_monitor;
+            current_monitor_->Start();
           } else {
-            data_collection_monitor_->Stop();
+            if (current_monitor_ != nullptr) {
+              current_monitor_->Stop();
+            }
           }
         }
       });
@@ -170,6 +184,27 @@ void HMI::RegisterMessageHandlers() {
       "HMIStatus",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         SendStatus(conn);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "Preprocess",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        PreprocessTable preprocess_table;
+        if (!JsonStringToMessage(json.dump(), &preprocess_table).ok()) {
+          AERROR
+              << "Failed to get user configuration: invalid preprocess table."
+              << json.dump();
+        }
+        constexpr char kOutputFile[] =
+            "/apollo/modules/tools/sensor_calibration/config/"
+            "lidar_to_gnss_user.config";
+        if (!SetProtoToBinaryFile(preprocess_table, kOutputFile)) {
+          AERROR << "Failed to generate user confuguration file";
+        }
+
+        constexpr char kStartCommand[] =
+            "bash /apollo/scripts/extract_data.sh -n";
+        HMIWorker::System(kStartCommand);
       });
 }
 

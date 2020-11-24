@@ -182,3 +182,41 @@ py_proto_library(
         ":point_cloud_proto",
     ],
 )
+
+cc_proto_library(
+    name = "point_cloud_cc_proto",
+    deps = [
+        ":point_cloud_proto",
+    ],
+)
+
+proto_library(
+    name = "point_cloud_proto",
+    srcs = ["point_cloud.proto"],
+)
+
+py_proto_library(
+    name = "point_cloud_py_pb2",
+    deps = [
+        ":point_cloud_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "preprocess_table_cc_proto",
+    deps = [
+        ":preprocess_table_proto",
+    ],
+)
+
+proto_library(
+    name = "preprocess_table_proto",
+    srcs = ["preprocess_table.proto"],
+)
+
+py_proto_library(
+    name = "preprocess_table_py_pb2",
+    deps = [
+        ":preprocess_table_proto",
+    ],
+)

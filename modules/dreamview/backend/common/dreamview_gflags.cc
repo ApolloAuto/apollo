@@ -95,3 +95,7 @@ DEFINE_string(default_data_collection_config_path,
 
 DEFINE_int32(loop_routing_end_to_start_distance_threshold, 10,
              "Loop routing distance threshold: start to end");
+
+DEFINE_string(default_preprocess_config_path,
+              "/apollo/modules/dreamview/conf/preprocess_table.pb.txt",
+              "Sensor calibration preprocess table config path.");

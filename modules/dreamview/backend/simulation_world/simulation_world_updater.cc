@@ -46,8 +46,7 @@ using google::protobuf::util::MessageToJsonString;
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
     WebSocketHandler *camera_ws, SimControl *sim_control,
-    const MapService *map_service,
-    DataCollectionMonitor *data_collection_monitor,
+    const MapService *map_service, FuelMonitorMap *monitors,
     PerceptionCameraUpdater *perception_camera_updater, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
@@ -55,7 +54,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       map_ws_(map_ws),
       camera_ws_(camera_ws),
       sim_control_(sim_control),
-      data_collection_monitor_(data_collection_monitor),
+      monitors_(monitors),
       perception_camera_updater_(perception_camera_updater) {
   RegisterMessageHandlers();
 }
@@ -333,13 +332,27 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "RequestDataCollectionProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        if (!data_collection_monitor_->IsEnabled()) {
+        auto *monitor = monitors_->at("Vehicle Calibration").get();
+        if (!monitor->IsEnabled()) {
           return;
         }
 
         Json response;
         response["type"] = "DataCollectionProgress";
-        response["data"] = data_collection_monitor_->GetProgressAsJson();
+        response["data"] = monitor->GetProgressAsJson();
+        websocket_->SendData(conn, response.dump());
+      });
+  websocket_->RegisterMessageHandler(
+      "RequestPreprocessProgress",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto *monitor = monitors_->at("Lidar-IMU Sensor Calibration").get();
+        if (!monitor->IsEnabled()) {
+          return;
+        }
+
+        Json response;
+        response["type"] = "PreprocessProgress";
+        response["data"] = monitor->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
       });
 

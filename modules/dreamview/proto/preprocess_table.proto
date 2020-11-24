@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message Translation {
+  optional float x = 1;
+  optional float y = 2;
+  optional float z = 3;
+}
+
+message LidarConfig {
+  optional string sensor_name = 1;
+  optional Translation translation = 2;
+}
+
+message Progress {
+  optional float percentage = 1;
+  optional string log_string = 2;
+}
+
+message PreprocessTable {
+  repeated LidarConfig lidar_config = 1;
+  optional string main_sensor = 2;
+  optional Progress progress = 3;
+}

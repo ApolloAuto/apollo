@@ -20,8 +20,10 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 
-#include "cyber/common/file.h"
 #include "cyber/proto/dag_conf.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
@@ -30,7 +32,6 @@
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
-#include "modules/monitor/proto/system_status.pb.h"
 
 DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
               "HMI modes config path.");
@@ -123,15 +124,6 @@ void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
   }
 }
 
-void System(std::string_view cmd) {
-  const int ret = std::system(cmd.data());
-  if (ret == 0) {
-    AINFO << "SUCCESS: " << cmd;
-  } else {
-    AERROR << "FAILED(" << ret << "): " << cmd;
-  }
-}
-
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
@@ -155,6 +147,15 @@ void HMIWorker::Stop() {
   stop_ = true;
   if (thread_future_.valid()) {
     thread_future_.get();
+  }
+}
+
+void HMIWorker::System(std::string_view cmd) {
+  const int ret = std::system(cmd.data());
+  if (ret == 0) {
+    AINFO << "SUCCESS: " << cmd;
+  } else {
+    AERROR << "FAILED(" << ret << "): " << cmd;
   }
 }
 

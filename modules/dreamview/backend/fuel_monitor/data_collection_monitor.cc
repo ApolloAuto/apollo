@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/fuel_monitor/data_collection_monitor.h"
 
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
@@ -185,11 +185,9 @@ void DataCollectionMonitor::Start() {
   enabled_ = true;
 }
 
-void DataCollectionMonitor::Stop() { enabled_ = false; }
-
-void DataCollectionMonitor::Restart() {
-  Stop();
-  Start();
+void DataCollectionMonitor::Stop() {
+  enabled_ = false;
+  AINFO << "DataCollectionMonitor stopped";
 }
 
 void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
