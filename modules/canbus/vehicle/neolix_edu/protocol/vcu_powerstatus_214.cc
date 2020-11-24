@@ -44,6 +44,16 @@ void Vcupowerstatus214::Parse(const std::uint8_t* bytes, int32_t length,
           replacebatterystateindication(bytes, length));
   chassis->mutable_neolix_edu()
       ->mutable_vcu_powerstatus_214()
+      ->set_forbidden_aeb_signal(forbidden_aeb_signal(bytes, length));
+  chassis->mutable_neolix_edu()
+      ->mutable_vcu_powerstatus_214()
+      ->set_bcu_chargedischargecurrent(
+          bcu_chargedischargecurrent(bytes, length));
+  chassis->mutable_neolix_edu()
+      ->mutable_vcu_powerstatus_214()
+      ->set_bcu_batt_internalvoltage(bcu_batt_internalvoltage(bytes, length));
+  chassis->mutable_neolix_edu()
+      ->mutable_vcu_powerstatus_214()
       ->set_vcu_driverinfo_alivecounter(
           vcu_driverinfo_alivecounter(bytes, length));
   chassis->mutable_neolix_edu()
@@ -89,6 +99,37 @@ bool Vcupowerstatus214::replacebatterystateindication(const std::uint8_t* bytes,
   int32_t x = t0.get_byte(6, 1);
 
   bool ret = x;
+  return ret;
+}
+
+bool Vcupowerstatus214::forbidden_aeb_signal(const std::uint8_t* bytes,
+                                             const int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(7, 1);
+
+  bool ret = x;
+  return ret;
+}
+
+float Vcupowerstatus214::bcu_chargedischargecurrent(
+    const std::uint8_t* bytes, const int32_t length) const {
+  Byte t0(bytes + 2);
+  Byte t1(bytes + 3);
+  int32_t x1 = t0.get_byte(0, 8);
+  int32_t x2 = t1.get_byte(0, 8);
+
+  int ret = (x1 << 8 | x2) * 0.02 - 400;
+  return ret;
+}
+
+float Vcupowerstatus214::bcu_batt_internalvoltage(const std::uint8_t* bytes,
+                                                  const int32_t length) const {
+  Byte t0(bytes + 4);
+  Byte t1(bytes + 5);
+  int32_t x1 = t0.get_byte(0, 8);
+  int32_t x2 = t1.get_byte(0, 8);
+
+  int ret = (x1 << 8 | x2) * 0.01;
   return ret;
 }
 
