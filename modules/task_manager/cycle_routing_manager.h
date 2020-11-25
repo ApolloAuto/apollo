@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/task_manager/proto/task_manager.pb.h"
@@ -29,7 +30,7 @@ namespace task_manager {
 
 class CycleRoutingManager {
  public:
-  CycleRoutingManager();
+  CycleRoutingManager() = default;
 
   /**
    * @brief module initialization function

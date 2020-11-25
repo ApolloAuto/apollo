@@ -58,9 +58,11 @@ bool TaskManagerComponent::Init() {
 
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
     task_name_ = task->task_name();
-    if (task->task_type() == CYCLE_ROUTING) {
+    if (task->task_type() != CYCLE_ROUTING) {
+      AINFO << "Task type is not cycle_routing.";
       return false;
     }
+
     cycle_routing_manager_ = std::make_shared<CycleRoutingManager>();
     cycle_routing_manager_->Init(task->cycle_routing_task());
     routing_request_ = task->cycle_routing_task().routing_request();
@@ -69,6 +71,7 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
     while (cycle_routing_manager_->GetCycle() > 0) {
       if (cycle_routing_manager_->CheckIfReachDestination(
             localization_.pose())) {
+        common::util::FillHeader(node_->Name(), &routing_request_);
         request_writer_->Write(routing_request_);
         AINFO << "Reach destination: routing manager send a routing request";
         cycle_routing_manager_->MinusCycle();

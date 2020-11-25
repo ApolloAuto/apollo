@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.task_manager;
 
+import "modules/common/proto/header.proto";
 import "modules/routing/proto/routing.proto";
 
 enum TaskType {
@@ -14,7 +15,8 @@ message CycleRoutingTask {
 }
 
 message Task {
-  optional string task_name = 1;
-  optional TaskType task_type = 2;
-  optional CycleRoutingTask cycle_routing_task= 3;
+  optional apollo.common.Header header = 1;
+  optional string task_name = 2;
+  optional TaskType task_type = 3;
+  optional CycleRoutingTask cycle_routing_task= 4;
 }

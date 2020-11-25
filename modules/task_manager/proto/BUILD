@@ -16,6 +16,7 @@ proto_library(
     name = "task_manager_proto",
     srcs = ["task_manager.proto"],
     deps = [
+        "//modules/common/proto:header_proto",
         "//modules/routing/proto:routing_proto",
     ],
 )
@@ -24,6 +25,7 @@ py_proto_library(
     name = "task_manager_py_pb2",
     deps = [
         ":task_manager_proto",
+        "//modules/common/proto:header_py_pb2",
         "//modules/routing/proto:routing_py_pb2",
     ],
 )
