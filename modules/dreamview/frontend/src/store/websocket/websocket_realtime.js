@@ -13,6 +13,7 @@ export default class RealtimeWebSocketEndpoint {
     this.mapUpdatePeriodMs = 1000;
     this.mapLastUpdateTimestamp = 0;
     this.updatePOI = true;
+    this.updateDefaultRoutingPoints = true;
     this.routingTime = undefined;
     this.currentMode = null;
     this.worker = new Worker();
@@ -102,6 +103,12 @@ export default class RealtimeWebSocketEndpoint {
         case 'DefaultEndPoint':
           STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
           break;
+        case 'DefaultRoutings':
+          STORE.routeEditingManager.updateDefaultRoutingPoints(message);
+          break;
+        case 'AddDefaultRoutingPath':
+          STORE.routeEditingManager.addDefaultRoutingPath(message);
+          break;
         case 'RoutePath':
           RENDERER.updateRouting(message.routingTime, message.routePath);
           break;
@@ -144,6 +151,11 @@ export default class RealtimeWebSocketEndpoint {
         if (this.updatePOI) {
           this.requestDefaultRoutingEndPoint();
           this.updatePOI = false;
+        }
+        // Load default routing points user defined
+        if (this.updateDefaultRoutingPoints) {
+          this.requestDefaultRoutingPoints();
+          this.updateDefaultRoutingPoints = false;
         }
         if (this.pointcloudWS.isEnabled()) {
           this.pointcloudWS.requestPointCloud();
@@ -221,9 +233,26 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
+  requestDefaultCycleRouting(start,waypoint,end,cycleNumber) {
+    const request = {
+      type: 'SendDefaultCycleRoutingRequest',
+      start,
+      end,
+      waypoint,
+      cycleNumber
+    };
+    this.websocket.send(JSON.stringify(request));
+  }
+
   requestDefaultRoutingEndPoint() {
     this.websocket.send(JSON.stringify({
       type: 'GetDefaultEndPoint',
+    }));
+  }
+
+  requestDefaultRoutingPoints() {
+    this.websocket.send(JSON.stringify({
+      type: 'GetDefaultRoutings',
     }));
   }
 
@@ -254,6 +283,7 @@ export default class RealtimeWebSocketEndpoint {
       value: map,
     }));
     this.updatePOI = true;
+    this.updateDefaultRoutingPoints = true;
   }
 
   changeVehicle(vehicle) {
@@ -346,5 +376,14 @@ export default class RealtimeWebSocketEndpoint {
 
   setPointCloudWS(pointcloudws) {
     this.pointcloudWS = pointcloudws;
+  }
+
+  saveDefaultRouting(routingName,points) {
+    const request = {
+      type: 'SaveDefaultRouting',
+      name:routingName,
+      point:points,
+    };
+    this.websocket.send(JSON.stringify(request));
   }
 }

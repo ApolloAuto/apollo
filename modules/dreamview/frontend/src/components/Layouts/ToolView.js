@@ -4,7 +4,7 @@ import { inject, observer } from 'mobx-react';
 import DataRecorder from 'components/DataRecorder';
 import ModuleController from 'components/ModuleController';
 import Menu from 'components/SideBar/Menu';
-import POI from 'components/SideBar/POI';
+import DefaultRouting from 'components/DefaultRouting';
 import Tasks from 'components/Tasks';
 
 @inject('store') @observer
@@ -20,7 +20,7 @@ export default class ToolView extends React.Component {
                 {options.showModuleController && <ModuleController />}
                 {options.showMenu && <Menu options={options} />}
                 {options.showPOI && (
-                    <POI
+                    <DefaultRouting
                         routeEditingManager={routeEditingManager}
                         options={options}
                         inNavigationMode={hmi.inNavigationMode}
