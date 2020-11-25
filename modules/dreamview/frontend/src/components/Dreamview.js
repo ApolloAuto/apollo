@@ -36,7 +36,8 @@ export default class Dreamview extends React.Component {
     const { options, enableHMIButtonsOnly, hmi } = this.props.store;
 
     const optionName = HOTKEYS_CONFIG[event.key];
-    if (!optionName || options.showDataRecorder) {
+    if (!optionName || options.showDataRecorder
+      || options.showDefaultRoutingInput || options.showCycleNumberInput) {
       return;
     }
 

@@ -268,7 +268,7 @@
                   "id": 27
                 },
                 "batteryPercentage": {
-                  "type": "uint32",
+                  "type": "int32",
                   "id": 38
                 },
                 "gearLocation": {
@@ -2233,7 +2233,10 @@
                 },
                 "batterySocPercentage": {
                   "type": "int32",
-                  "id": 34
+                  "id": 34,
+                  "options": {
+                    "default": -1
+                  }
                 }
               },
               "nested": {
