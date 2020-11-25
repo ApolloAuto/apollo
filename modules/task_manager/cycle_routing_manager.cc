@@ -35,6 +35,11 @@ common::Status CycleRoutingManager::Init(
     begin_point_ = waypoints[0].pose();
     end_point_ = waypoints[waypoint_num_ - 1].pose();
     last_point_ = begin_point_;
+
+    AINFO << "New cycle routing task: cycle " << cycle_
+        << ", begin point " << begin_point_.x() << " " << begin_point_.y()
+        << ", end point " << end_point_.x() << " " << end_point_.y();
+
     return common::Status::OK();
 }
 

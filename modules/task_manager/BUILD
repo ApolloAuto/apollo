@@ -10,6 +10,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"task_manager\\"'],
     deps = [
         "//modules/common/status:status",
+        "//modules/common/monitor_log:monitor_log",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/task_manager/common:task_manager_gflags",
         "//modules/task_manager/proto:task_manager_cc_proto",
