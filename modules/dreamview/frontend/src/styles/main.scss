@@ -661,6 +661,47 @@ body {
         }
     }
 
+    .battery-and-gears {
+        position: absolute;
+        width: 224px;
+        height: 35px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+
+        font-size: 14px;
+
+        .left-div {
+            position: absolute;
+            width: 116px;
+            height: 35px;
+        }
+
+        .right-div {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 105px;
+            height: 35px;
+        }
+
+        .text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+
+            float: right;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+    }
+
+    .electricity-status {
+        top: 287px;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
     .auto-meter {
         position: absolute;
         width: 224px;
