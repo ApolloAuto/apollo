@@ -2,6 +2,8 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import AutoMeter from 'components/StatusBar/AutoMeter';
+import Electricity from 'components/StatusBar/Electricity';
+import Gears from 'components/StatusBar/Gears';
 import Notification from 'components/StatusBar/Notification';
 import TrafficLightIndicator from 'components/StatusBar/TrafficLightIndicator';
 import DrivingMode from 'components/StatusBar/DrivingMode';
@@ -43,6 +45,13 @@ export default class StatusBar extends React.Component {
                         isAutoMode={meters.isAutoMode}
                     />
                 </div>
+                <Electricity
+                    electricityPercentage={meters.batteryPercentage}
+                />
+                <Gears
+                    electricityPercentage={meters.batteryPercentage}
+                    currentGear={meters.gearLocation}
+                />
             </div>
     );
   }
