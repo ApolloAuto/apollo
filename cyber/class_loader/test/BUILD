@@ -5,11 +5,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "base",
+    testonly = True,
     hdrs = ["base.h"],
 )
 
 cc_library(
     name = "plugin1",
+    testonly = True,
     srcs = ["plugin1.cc"],
     deps = [
         ":base",
@@ -19,6 +21,7 @@ cc_library(
 
 cc_library(
     name = "plugin2",
+    testonly = True,
     srcs = ["plugin2.cc"],
     deps = [
         ":base",
