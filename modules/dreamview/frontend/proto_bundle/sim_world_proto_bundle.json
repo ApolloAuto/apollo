@@ -267,6 +267,14 @@
                   "type": "double",
                   "id": 27
                 },
+                "batteryPercentage": {
+                  "type": "uint32",
+                  "id": 36
+                },
+                "gearLocation": {
+                  "type": "apollo.canbus.Chassis.GearPosition",
+                  "id": 37
+                },
                 "disengageType": {
                   "type": "DisengageType",
                   "id": 28
@@ -1396,7 +1404,9 @@
                 "GE3": 4,
                 "WEY": 5,
                 "ZHONGYUN": 6,
-                "CH": 7
+                "CH": 7,
+                "DKIT": 8,
+                "NEOLIX": 9
               }
             },
             "VehicleID": {
@@ -2175,6 +2185,10 @@
                 "vehicleId": {
                   "type": "apollo.common.VehicleID",
                   "id": 33
+                },
+                "batterySocPercentage": {
+                  "type": "int32",
+                  "id": 34
                 }
               },
               "nested": {
