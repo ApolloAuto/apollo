@@ -606,3 +606,17 @@ function check_esd_files() {
 }
 ```
 不同的apollo版本可能对检查的库文件名称的要求不同，可根据实际情况建立软连接。
+
+d.`apollo`代码没有`git remote -v`、`git branch -a`和`git log`等相关的`git`信息。
+
+造成以上问题的原因是用户错误地使用了`git init`等相关的命令而导致的`apollo`代码的`git`信息丢失。依次输入以下命令即可恢复`apollo`代码的`git`信息，切记在操作之前备份自己的`apollo`代码。
+```
+cd ~/apollo
+git init
+git remote add origin https://gitee.com/ApolloAuto/apollo.git
+git clean -fd
+git pull origin master
+git pull
+git checkout -b r5.5.0 origin/r5.5.0
+git branch -D master
+```
