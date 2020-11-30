@@ -64,9 +64,9 @@ class CycleRoutingManager {
  private:
   int cycle_;
   int waypoint_num_;
+  bool is_allowed_to_route_;
   apollo::common::PointENU begin_point_;
   apollo::common::PointENU end_point_;
-  apollo::common::PointENU last_point_;
 };
 
 }  // namespace task_manager

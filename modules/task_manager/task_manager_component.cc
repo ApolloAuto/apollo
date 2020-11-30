@@ -38,7 +38,7 @@ bool TaskManagerComponent::Init() {
     localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       task_manager_conf.topic_config().localization_pose_topic(),
       [this](const std::shared_ptr<LocalizationEstimate>& localization) {
-        AINFO << "Received localization data: run localization callback.";
+        ADEBUG << "Received localization data: run localization callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         localization_.CopyFrom(*localization);
       });
@@ -73,7 +73,8 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
             localization_.pose())) {
         common::util::FillHeader(node_->Name(), &routing_request_);
         request_writer_->Write(routing_request_);
-        AINFO << "Reach destination: routing manager send a routing request";
+        AINFO << "Reach destination: routing manager send a routing request"
+        << "Remaining cycles: " << cycle_routing_manager_->GetCycle();
         cycle_routing_manager_->MinusCycle();
       }
       rate.Sleep();
