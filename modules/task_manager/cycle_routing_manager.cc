@@ -34,7 +34,7 @@ common::Status CycleRoutingManager::Init(
     waypoint_num_ = waypoints.size();
     begin_point_ = waypoints[0].pose();
     end_point_ = waypoints[waypoint_num_ - 1].pose();
-    last_point_ = begin_point_;
+    is_allowed_to_route_ = true;
 
     AINFO << "New cycle routing task: cycle " << cycle_
         << ", begin point " << begin_point_.x() << " " << begin_point_.y()
@@ -45,18 +45,26 @@ common::Status CycleRoutingManager::Init(
 
 bool CycleRoutingManager::CheckIfReachDestination(
         const localization::Pose &pose) {
-    if (CheckPointDistanceInThreshold(
-          last_point_,
+    ADEBUG << "Check if reach destination: localization_pose: "
+    << pose.position().x() << " " << pose.position().y()
+    << ", begin point " << begin_point_.x() << " " << begin_point_.y()
+    << ", end point " << end_point_.x() << " " << end_point_.y()
+    << ", threshold " << FLAGS_threshold_for_destination_check
+    << ", allowed_to_send_routing_request " << is_allowed_to_route_;
+
+    if (!CheckPointDistanceInThreshold(
           begin_point_,
-          FLAGS_threshold_for_destination_check)) {
-        last_point_ = pose.position();
+          pose.position(),
+          FLAGS_threshold_for_destination_check * 2)) {
+        is_allowed_to_route_ = true;
         return false;
     }
-    if (CheckPointDistanceInThreshold(
+
+    if (is_allowed_to_route_ && CheckPointDistanceInThreshold(
           pose.position(),
           begin_point_,
           FLAGS_threshold_for_destination_check)) {
-          last_point_ = pose.position();
+        is_allowed_to_route_ = false;
         return true;
     }
     return false;
