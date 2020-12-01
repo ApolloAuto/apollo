@@ -93,8 +93,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   EXPECT_TRUE(segmentation->InitClusterAndBackgroundSegmentation());
 
   std::string pcd_path =
-      "/apollo/modules/perception/testdata/lidar/app/data/perception/"
-      "lidar/files/";
+      "/apollo/modules/perception/testdata/lidar/app/data/";
   std::vector<std::string> pcd_file_names;
   common::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;
@@ -130,8 +129,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   // load pcd data
   auto pcl_ptr = std::shared_ptr<base::PointFCloud>(new base::PointFCloud);
   std::string filename =
-      "/apollo/modules/perception/testdata/lidar/app/data/perception/"
-      "lidar/files/0002_00.pcd";
+      "/apollo/modules/perception/testdata/lidar/app/data/0002_00.pcd";
   bool ret = LoadPCDFile(filename, pcl_ptr);
   ACHECK(ret) << "Failed to load " << filename;
   // load non ground indices
