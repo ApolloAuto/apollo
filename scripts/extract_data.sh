@@ -18,32 +18,35 @@
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-TARGET_DIR="${TOP_DIR}/sensor_calibration/lidar_to_gnss"
-TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration/lidar_to_gnss"
+TARGET_DIR="${TOP_DIR}/sensor_calibration"
+TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration"
 DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 
 NO_INTERACTIVE=0
 
-CHANNEL_TEMPLATE="${TEMPLATE_DIR}/channel_template.txt"
-EXTRACTION_RATE="5"
+TASK=""
+VALID_TASKS=("lidar_to_gnss" "camera_6mm_to_lidar")
 
 RECORD_FILES=()
 RECORD_DIRS=()
 
 function print_usage() {
   echo 'Usage:
-    ./extract_data.sh -f <path/to/record/file> -d <path/to/record/dir>
+    ./extract_data.sh -t [ lidar_to_gnss | camera_6mm_to_lidar ] -f <path/to/record/file> -d <path/to/record/dir>
   eg.
-    ./extract_data.sh -f xxx/yyy.record.00000 -f xxx/yyy.record.00001
+    ./extract_data.sh -t lidar_to_gnss -f xxx/yyy.record.00000 -f xxx/yyy.record.00001
   or
-    ./extract_data.sh -d xxx
+    ./extract_data.sh -t camera_6mm_to_lidar -d xxx
   '
 }
 
 function parse_args() {
   # read options
-  while getopts ':f:d:n' flag; do
+  while getopts ':t:f:d:n' flag; do
     case "${flag}" in
+      t)
+        TASK="${OPTARG}"
+        ;;
       f)
         RECORD_FILES+=("${OPTARG}")
         ;;
@@ -59,6 +62,14 @@ function parse_args() {
         ;;
     esac
   done
+
+  if [[ " ${VALID_TASKS[@]} " =~ " ${TASK} " ]]; then
+    TARGET_DIR="${TARGET_DIR}/${TASK}"
+    TEMPLATE_DIR="${TEMPLATE_DIR}/${TASK}"
+  else
+    print_usage
+    exit 1
+  fi
 }
 
 function check_target_dir() {
@@ -162,10 +173,12 @@ function install_if_not_exist() {
   done
 }
 
-function update_config() {
+function update_lidar_config() {
   local record
   local lidar_channels
   local tmp_file="${TARGET_DIR}/tmp.txt"
+  local channel_template="${TEMPLATE_DIR}/channel_template.txt"
+  local extraction_rate="5"
   record="${TARGET_DIR}/records/$(ls ${TARGET_DIR}/records | grep -m1 record)"
   lidar_channels=($(cyber_recorder info ${record} | awk '{print $1}' |
     grep PointCloud2 | grep -v "fusion" | grep -v "compensator"))
@@ -175,13 +188,13 @@ function update_config() {
     exit 1
   fi
 
-  sed -i "s|__RATE__|${EXTRACTION_RATE}|g" "${CHANNEL_TEMPLATE}"
+  sed -i "s|__RATE__|${extraction_rate}|g" "${channel_template}"
   for channel in "${lidar_channels[@]}"; do
-    sed -i "s|__NAME__|${channel}|g" "${CHANNEL_TEMPLATE}"
-    cat "${CHANNEL_TEMPLATE}" >>"${tmp_file}"
-    sed -i "s|${channel}|__NAME__|g" "${CHANNEL_TEMPLATE}"
+    sed -i "s|__NAME__|${channel}|g" "${channel_template}"
+    cat "${channel_template}" >>"${tmp_file}"
+    sed -i "s|${channel}|__NAME__|g" "${channel_template}"
   done
-  sed -i "s|${EXTRACTION_RATE}|__RATE__|g" "${CHANNEL_TEMPLATE}"
+  sed -i "s|${extraction_rate}|__RATE__|g" "${channel_template}"
 
   sed -i "/# channel of mulitple lidars/{n;N;N;N;N;d}" "${TARGET_DIR}/lidar_to_gnss.config"
   sed -i "/# channel of mulitple lidars/r ${tmp_file}" "${TARGET_DIR}/lidar_to_gnss.config"
@@ -192,15 +205,17 @@ function main() {
   parse_args "$@"
   check_target_dir
   get_records
-  update_config
+  if [[ "${TASK}" == "lidar_to_gnss" ]]; then
+    update_lidar_config
+  fi
   install_if_not_exist "pyyaml" "pypcd"
 
   local extract_data_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data"
   if [[ -f "${extract_data_bin}" ]]; then
-    "${extract_data_bin}" --config ${TARGET_DIR}/lidar_to_gnss.config
+    "${extract_data_bin}" --config "${TARGET_DIR}/${TASK}.config"
   else
     bazel run //modules/tools/sensor_calibration:extract_data \
-      -- --config ${TARGET_DIR}/lidar_to_gnss.config
+      -- --config "${TARGET_DIR}/${TASK}.config"
   fi
 
   local sanity_check_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/sanity_check"

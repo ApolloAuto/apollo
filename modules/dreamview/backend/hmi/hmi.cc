@@ -198,7 +198,7 @@ void HMI::RegisterMessageHandlers() {
         constexpr char kOutputFile[] =
             "/apollo/modules/tools/sensor_calibration/config/"
             "lidar_to_gnss_user.config";
-        if (!SetProtoToBinaryFile(preprocess_table, kOutputFile)) {
+        if (!SetProtoToASCIIFile(preprocess_table, kOutputFile)) {
           AERROR << "Failed to generate user confuguration file";
         }
 
