@@ -62,9 +62,9 @@ class CycleRoutingManager {
   virtual ~CycleRoutingManager() = default;
 
  private:
-  int cycle_;
-  int waypoint_num_;
-  bool is_allowed_to_route_;
+  int cycle_ = 0;
+  int waypoint_num_ = 0;
+  bool is_allowed_to_route_ = false;
   apollo::common::PointENU begin_point_;
   apollo::common::PointENU end_point_;
 };
