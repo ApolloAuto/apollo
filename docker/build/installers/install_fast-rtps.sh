@@ -24,9 +24,10 @@ git clone --single-branch --branch release/1.5.0 --depth 1 https://github.com/eP
 
 pushd Fast-RTPS
 git submodule update --init
+patch -p1 < ../FastRTPS_1.5.0.patch
 mkdir -p build && cd build
 cmake -DEPROSIMA_BUILD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/fast-rtps ../
-make -j8
+make -j$(nproc)
 make install
 popd
 
