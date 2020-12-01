@@ -10,7 +10,7 @@ export default class Gears extends React.Component {
       currentGear,
     } = this.props;
 
-    const gearAlphabet = (currentGear) ? currentGear.charAt(5) : 'None';
+    const gearAlphabet = (currentGear !== null && currentGear !== 'GEAR_NONE') ? currentGear.charAt(5) : 'None';
     const gearLabel = 'Gear';
 
     return (
