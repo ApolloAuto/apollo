@@ -55,7 +55,7 @@ bool CycleRoutingManager::CheckIfReachDestination(
     if (!CheckPointDistanceInThreshold(
           begin_point_,
           pose.position(),
-          FLAGS_threshold_for_destination_check * 2)) {
+          FLAGS_threshold_for_destination_check * FLAGS_magnify_times_for_threshold)) {
         is_allowed_to_route_ = true;
         return false;
     }
