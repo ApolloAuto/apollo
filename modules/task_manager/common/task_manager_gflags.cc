@@ -21,3 +21,4 @@ DEFINE_string(task_manager_node_name, "task_manager", "the name for this node");
 DEFINE_double(threshold_for_destination_check, 1.0,
               "meters, which is 100 feet.  This threshold is used to check if"
               "the vehicle reaches the destination");
+DEFINE_double(magnify_times_for_threshold, 2.0, "magnify times for threshold");
