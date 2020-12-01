@@ -454,13 +454,6 @@ function mount_other_volumes() {
     docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
     volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
-    if [ "${TARGET_ARCH}" = "x86_64" ]; then
-        local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
-        local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
-        docker_restart_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
-        volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
-    fi
-
     OTHER_VOLUMES_CONF="${volume_conf}"
 }
 

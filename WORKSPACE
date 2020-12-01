@@ -77,16 +77,3 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
-
-#new_local_repository(
-#    name = "mkldnn",
-#    build_file = "third_party/mkldnn.BUILD",
-#    path = "/usr/local/apollo/local_third_party/mkldnn",
-#)
-#
-# mklml
-# new_local_repository(
-#    name = "mklml",
-#    build_file = "third_party/mklml.BUILD",
-#    path = "/usr/local/apollo/local_third_party/mklml",
-# )
