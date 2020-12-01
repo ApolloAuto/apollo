@@ -16,6 +16,7 @@
 
 #include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"
 
+#include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
 #include "pcl/io/pcd_io.h"

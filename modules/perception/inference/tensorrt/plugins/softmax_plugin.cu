@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <vector>
+
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
 
 namespace apollo {
