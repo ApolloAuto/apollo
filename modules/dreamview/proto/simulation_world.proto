@@ -122,7 +122,7 @@ message Object {
   optional double steering_percentage = 25;
   optional double steering_angle = 26;
   optional double steering_ratio = 27;
-  optional uint32 battery_percentage = 38;
+  optional int32 battery_percentage = 38;
   optional apollo.canbus.Chassis.GearPosition gear_location = 39;
   enum DisengageType {
     DISENGAGE_NONE = 0;
