@@ -76,7 +76,7 @@ namespace apollo {
 namespace perception {
 namespace base {
 
-const int kMaxBlobAxes = 32;
+constexpr size_t kMaxBlobAxes = 32;
 
 /**
  * @brief A wrapper around SyncedMemory holders serving as the basic
@@ -242,7 +242,7 @@ class Blob {
   }
 
   inline int offset(const std::vector<int>& indices) const {
-    CHECK_LE(indices.size(), num_axes());
+    CHECK_LE(indices.size(), static_cast<size_t>(num_axes()));
     int offset = 0;
     for (int i = 0; i < num_axes(); ++i) {
       offset *= shape(i);

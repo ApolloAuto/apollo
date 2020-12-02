@@ -251,7 +251,7 @@ Status NaviSpeedDecider::MakeSpeedDecision(
     const std::function<const Obstacle*(const std::string&)>& find_obstacle,
     SpeedData* const speed_data) {
   CHECK_NOTNULL(speed_data);
-  CHECK_GE(path_points.size(), 2);
+  CHECK_GE(path_points.size(), 2U);
 
   auto start_s = path_points.front().has_s() ? path_points.front().s() : 0.0;
   auto end_s = path_points.back().has_s() ? path_points.back().s() : start_s;

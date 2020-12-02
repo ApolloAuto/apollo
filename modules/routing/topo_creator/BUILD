@@ -33,6 +33,7 @@ cc_test(
     name = "graph_creator_test",
     size = "small",
     srcs = ["graph_creator_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":graph_creator",
         "@com_google_googletest//:gtest_main",

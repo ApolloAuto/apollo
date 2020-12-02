@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["pyramid_map_config.h"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_config",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_matrix",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -38,7 +38,7 @@ cc_library(
         ":pyramid_map_config",
         ":pyramid_map_matrix",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_node",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -49,7 +49,7 @@ cc_library(
     hdrs = ["pyramid_map_node_config.h"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_node_config",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -65,7 +65,7 @@ cc_library(
         ":pyramid_map_node_config",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_node",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -83,7 +83,7 @@ cc_library(
         "//modules/localization/msf/common/util:base_map_cache",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_pool",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -98,7 +98,7 @@ cc_library(
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/common/util:base_map_cache",
         "//modules/localization/msf/local_pyramid_map/base_map",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )

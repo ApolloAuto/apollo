@@ -12,11 +12,11 @@ from China.
 
 ## First, clone Apollo from Gitee
 
-Apollo on Gitee was about one month later than Apollo on GitHub. We can use it
+Apollo on Gitee was one day later than Apollo on GitHub. We can use it
 as a good start.
 
 ```bash
-git clone https://gitee.com/baidu/apolloauto.git apollo
+git clone https://gitee.com/ApolloAuto/apollo.git
 ```
 
 This step takes only serveral minutes, as the download rate can reach up-to >

@@ -28,13 +28,14 @@ fi
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
 
+# freeglut3-dev
+# libgl1-mesa-dev
+# libegl1-mesa-dev
+# libgles2-mesa-dev
 apt_get_update_and_install \
-    freeglut3-dev \
     mesa-common-dev \
     libglvnd-dev \
-    libgl1-mesa-dev \
-    libegl1-mesa-dev \
-    libgles2-mesa-dev
+    libxcb1-dev
 
 # See Ref:
 # https://hub.docker.com/r/nvidia/cudagl
@@ -42,12 +43,10 @@ apt_get_update_and_install \
 # https://www.pugetsystems.com/labs/hpc/NVIDIA-Docker2-with-OpenGL-and-X-Display-Output-1527/
 
 # DON'T INSTALL THESE!!!
-# libnvidia-gl-440 # trouble maker for `nvidia-smi`
-
-# For test run
-# /usr/local/cuda/samples/5_Simulations/nbody
+# libnvidia-gl-440 # trouble-maker for `nvidia-smi`
 
 bash ${CURR_DIR}/install_qt.sh "${BUILD_TYPE}"
+
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

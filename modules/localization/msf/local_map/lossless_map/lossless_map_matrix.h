@@ -28,7 +28,7 @@ namespace msf {
 
 /**@brief The first layer (layer 0) includes all the intensities from any
  * layers. Other layers only include the samples from a layer. */
-#define IDL_CAR_NUM_RESERVED_MAP_LAYER 2
+#define IDL_CAR_NUM_RESERVED_MAP_LAYER 2U
 
 struct LosslessMapSingleCell {
   /**@brief The default constructor. */

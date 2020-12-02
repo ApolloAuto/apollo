@@ -18,6 +18,7 @@ limitations under the License.
 #include <unordered_set>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
@@ -74,7 +75,7 @@ void ProtoOrganizer::GetRoadElements(std::vector<RoadInternal>* roads) {
     for (auto& traffic_light_internal : road_internal.traffic_lights) {
       auto& traffic_light = traffic_light_internal.traffic_light;
       for (auto stop_line_id : traffic_light_internal.stop_line_ids) {
-        CHECK_GT(proto_data_.pb_stop_lines.count(stop_line_id), 0);
+        CHECK_GT(proto_data_.pb_stop_lines.count(stop_line_id), 0U);
         auto& stop_line_curve = proto_data_.pb_stop_lines[stop_line_id].curve;
         (*traffic_light.add_stop_line()) = stop_line_curve;
       }
@@ -84,7 +85,7 @@ void ProtoOrganizer::GetRoadElements(std::vector<RoadInternal>* roads) {
     for (auto& stop_sign_internal : road_internal.stop_signs) {
       auto& stop_sign = stop_sign_internal.stop_sign;
       for (auto stop_line_id : stop_sign_internal.stop_line_ids) {
-        CHECK_GT(proto_data_.pb_stop_lines.count(stop_line_id), 0);
+        CHECK_GT(proto_data_.pb_stop_lines.count(stop_line_id), 0U);
         auto& stop_line_curve = proto_data_.pb_stop_lines[stop_line_id].curve;
         (*stop_sign.add_stop_line()) = stop_line_curve;
       }
@@ -94,7 +95,7 @@ void ProtoOrganizer::GetRoadElements(std::vector<RoadInternal>* roads) {
     for (auto& yield_sign_internal : road_internal.yield_signs) {
       auto& yield_sign = yield_sign_internal.yield_sign;
       for (auto stop_line_id : yield_sign_internal.stop_line_ids) {
-        CHECK_GT(proto_data_.pb_stop_lines.count(stop_line_id), 0);
+        CHECK_GT(proto_data_.pb_stop_lines.count(stop_line_id), 0U);
         auto& stop_line_curve = proto_data_.pb_stop_lines[stop_line_id].curve;
         (*yield_sign.add_stop_line()) = stop_line_curve;
       }
@@ -224,8 +225,7 @@ void ProtoOrganizer::GetLaneSignalOverlapElements(
           overlap_id);
     } else if (proto_data_.pb_rsus.count(object_id) > 0) {
       object_overlap->mutable_rsu_overlap_info();
-      proto_data_.pb_rsus[object_id].add_overlap_id()->set_id(
-          overlap_id);
+      proto_data_.pb_rsus[object_id].add_overlap_id()->set_id(overlap_id);
     } else {
       AERROR << "unknown signal, signal id:" << object_id;
     }
@@ -349,10 +349,9 @@ void ProtoOrganizer::GetJunctionObjectOverlapElements(
       } else if (proto_data_.pb_signals.count(object_id) > 0) {
         object_overlap->mutable_signal_overlap_info();
         proto_data_.pb_signals[object_id].add_overlap_id()->set_id(overlap_id);
-    } else if (proto_data_.pb_rsus.count(object_id) > 0) {
+      } else if (proto_data_.pb_rsus.count(object_id) > 0) {
         object_overlap->mutable_rsu_overlap_info();
-        proto_data_.pb_rsus[object_id].add_overlap_id()->set_id(
-          overlap_id);
+        proto_data_.pb_rsus[object_id].add_overlap_id()->set_id(overlap_id);
       } else {
         continue;
       }

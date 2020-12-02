@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
+#include <limits>
+
 #include "cyber/common/log.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -58,6 +60,35 @@ void TransformCache::AddTransform(const StampedTransform& transform) {
   transforms_.push_back(transform);
 }
 
+Eigen::Quaterniond Slerp(const Eigen::Quaterniond& source, const double& t,
+                         const Eigen::Quaterniond& other) {
+  const double one = 1.0 - std::numeric_limits<double>::epsilon();
+  double d = source.x() * other.x() + source.y() * other.y() +
+             source.z() * other.z() + source.w() * other.w();
+  double abs_d = std::abs(d);
+
+  double scale0;
+  double scale1;
+
+  if (abs_d >= one) {
+    scale0 = 1.0 - t;
+    scale1 = t;
+  } else {
+    // theta is the angle between the 2 quaternions
+    double theta = std::acos(abs_d);
+    double sin_theta = std::sin(theta);
+
+    scale0 = std::sin((1.0 - t) * theta) / sin_theta;
+    scale1 = std::sin((t * theta)) / sin_theta;
+  }
+  if (d < 0) scale1 = -scale1;
+
+  return Eigen::Quaterniond(scale0 * source.w() + scale1 * other.w(),
+                            scale0 * source.x() + scale1 * other.x(),
+                            scale0 * source.y() + scale1 * other.y(),
+                            scale0 * source.z() + scale1 * other.z());
+}
+
 bool TransformCache::QueryTransform(double timestamp,
                                     StampedTransform* transform,
                                     double max_duration) {
@@ -86,8 +117,8 @@ bool TransformCache::QueryTransform(double timestamp,
         (timestamp - transforms_[size - 2].timestamp) /
         (transforms_[size - 1].timestamp - transforms_[size - 2].timestamp);
 
-    transform->rotation = transforms_[size - 2].rotation.slerp(
-        ratio, transforms_[size - 1].rotation);
+    transform->rotation = Slerp(transforms_[size - 2].rotation, ratio,
+                                transforms_[size - 1].rotation);
 
     transform->translation.x() =
         transforms_[size - 2].translation.x() * (1 - ratio) +

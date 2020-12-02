@@ -27,7 +27,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "include/sins_struct.h"
+#include "localization_msf/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/heading.pb.h"

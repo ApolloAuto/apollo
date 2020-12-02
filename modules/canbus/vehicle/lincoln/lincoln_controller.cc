@@ -457,7 +457,7 @@ ErrorCode LincolnController::EnableSpeedOnlyMode() {
 
   can_sender_->Update();
   if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
+    AERROR << "Failed to switch to AUTO_SPEED_ONLY mode.";
     CheckChassisError();
     Emergency();
     return ErrorCode::CANBUS_ERROR;

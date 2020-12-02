@@ -45,7 +45,7 @@ cc_library(
         "//modules/transform:transform_broadcaster",
         "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -59,8 +59,7 @@ cc_binary(
 
 cc_test(
     name = "msf_localization_test",
-    size = "small",
-    timeout = "short",
+    size = "enormous",
     srcs = ["msf_localization_test.cc"],
     copts = [
         "-fno-access-control",

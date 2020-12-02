@@ -38,31 +38,29 @@ namespace perception {
 namespace lidar {
 
 __global__ void scatter_kernel(int *x_coors, int *y_coors, float *pfe_output,
-                               float *scattered_feature,
-                               const int max_num_pillars_,
-                               const int grid_x_size, const int grid_y_size) {
+                               float *scattered_feature, const int grid_x_size,
+                               const int grid_y_size) {
   int i_pillar = blockIdx.x;
   int i_feature = threadIdx.x;
   int x_ind = x_coors[i_pillar];
   int y_ind = y_coors[i_pillar];
-  float feature = pfe_output[i_feature * max_num_pillars_ + i_pillar];
+  float feature = pfe_output[i_pillar * 64 + i_feature];
   scattered_feature[i_feature * grid_y_size * grid_x_size +
                     y_ind * grid_x_size + x_ind] = feature;
 }
 
-ScatterCuda::ScatterCuda(const int num_threads, const int max_num_pillars,
-                         const int grid_x_size, const int grid_y_size)
+ScatterCuda::ScatterCuda(const int num_threads, const int grid_x_size,
+                         const int grid_y_size)
     : num_threads_(num_threads),
-      max_num_pillars_(max_num_pillars),
       grid_x_size_(grid_x_size),
       grid_y_size_(grid_y_size) {}
 
 void ScatterCuda::DoScatterCuda(const int pillar_count, int *x_coors,
                                 int *y_coors, float *pfe_output,
                                 float *scattered_feature) {
-  scatter_kernel<<<pillar_count, num_threads_>>>(
-      x_coors, y_coors, pfe_output, scattered_feature, max_num_pillars_,
-      grid_x_size_, grid_y_size_);
+  scatter_kernel<<<pillar_count, num_threads_>>>(x_coors, y_coors, pfe_output,
+                                                 scattered_feature,
+                                                 grid_x_size_, grid_y_size_);
 }
 
 }  // namespace lidar

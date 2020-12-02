@@ -38,7 +38,7 @@ function run_ci_test() {
 }
 
 function run_ci_lint() {
-  env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_LINT_SH}" cpp
+  env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_LINT_SH}" --cpp
 }
 
 function main() {

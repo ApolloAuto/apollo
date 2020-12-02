@@ -23,25 +23,24 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
-apt-get -y update && \
-    apt-get -y install --no-install-recommends \
+apt_get_update_and_install \
     libasio-dev \
     libtinyxml2-dev
 
-# Note(storypku) & FIXME(all)
-# As FastRTPS installer in the master branch doesn't work well, we provide
-# prebuilt version here as a workaround. To be removed when ready.
-# Maybe the `cyber/transport/rtps` section needs a rewrite using more recent
-# FastRTPS implentations, e.g. 2.0.0
-#
+# Note(storypku)
+# The following binaries should be the same as those installed via
+# https://github.com/ApolloAuto/apollo/blob/r5.5.0/docker/build/installers/install_fast-rtps.sh
+
+# More recent Fast-DDS (formerly Fast-RTPS) implementations:
 # Ref: https://github.com/eProsima/Fast-DDS
 # Ref: https://github.com/ros2/rmw_fastrtps
+
 DEST_DIR="/usr/local/fast-rtps"
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
     CHECKSUM="ca0534db4f757cb41a9feaebac07a13dd4b63af0a217b2cb456e20b0836bc797"
-    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
@@ -51,7 +50,7 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
 else # aarch64
     PKG_NAME="fast-rtps-1.5.0.prebuilt.aarch64.tar.gz"
     CHECKSUM="061da391763949e39ed0ac4d0596112818e8692b938aa845d54fac1a1aa550db"
-    DOWNLOAD_LINK="https://apollo-platform-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
@@ -60,4 +59,5 @@ else # aarch64
 fi
 
 echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
-
+ldconfig
+apt_get_remove libasio-dev libtinyxml2-dev

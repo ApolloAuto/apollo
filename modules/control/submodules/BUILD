@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 PREPROCESS_SUB_COPTS = ["-DMODULE_NAME=\\\"preprocessor_submodule\\\""]
 
 cc_library(
@@ -44,7 +45,6 @@ cc_library(
         "//modules/control/proto:preprocessor_cc_proto",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/planning/proto:planning_cc_proto",
-        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

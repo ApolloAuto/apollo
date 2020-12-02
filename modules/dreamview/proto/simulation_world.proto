@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+import "modules/canbus/proto/chassis.proto";
 import "modules/common/monitor_log/proto/monitor_log.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
@@ -71,7 +72,7 @@ message Decision {
   optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
-// Next-id: 38
+// Next-id: 40
 message Object {
   // ID
   optional string id = 1;  // primary identifier for each object
@@ -121,6 +122,8 @@ message Object {
   optional double steering_percentage = 25;
   optional double steering_angle = 26;
   optional double steering_ratio = 27;
+  optional uint32 battery_percentage = 38;
+  optional apollo.canbus.Chassis.GearPosition gear_location = 39;
   enum DisengageType {
     DISENGAGE_NONE = 0;
     DISENGAGE_UNKNOWN = 1;

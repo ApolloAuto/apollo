@@ -86,10 +86,16 @@ message Vcu_powerstatus_214 {
   optional int32 vcu_powermodevalid = 2;
   // 0x0:NotActivate;0x1:Activate [bit] [0|1]
   optional bool replacebatterystateindication = 3;
+  // 0x0:Normal AEB;0x1:Forbidden [bit] [0|1]
+  optional bool forbidden_aeb_signal = 4;
+  // [A] [-400|910.68]
+  optional double bcu_chargedischargecurrent = 5;
+  // [V] [0|655.35]
+  optional double bcu_batt_internalvoltage = 6;
   // [bit] [0|15]
-  optional int32 vcu_driverinfo_alivecounter = 4;
+  optional int32 vcu_driverinfo_alivecounter = 7;
   // [bit] [0|255]
-  optional int32 vcu_driverinfo_checksum = 5;
+  optional int32 vcu_driverinfo_checksum = 8;
 }
 
 message Ads_light_horn_command_310 {

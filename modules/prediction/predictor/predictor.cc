@@ -27,7 +27,7 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
 int Predictor::NumOfTrajectories(const Obstacle& obstacle) {
-  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(obstacle.history_size(), 0U);
   return obstacle.latest_feature().predicted_trajectory_size();
 }
 

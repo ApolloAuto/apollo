@@ -30,13 +30,13 @@ info "Install support for [${COMPONENT}] ..."
 info "Install osqp ..."
 bash ${CURR_DIR}/install_osqp.sh
 
-apt_get_update_and_install libsqlite3-dev
+apt_get_update_and_install \
+    libsqlite3-dev
 
 ######################################################
 
 COMPONENT="modules/prediction"
 info "Install support for [${COMPONENT}] ..."
-# bash ${CURR_DIR}/install_libtorch.sh
 bash ${CURR_DIR}/install_opencv.sh
 
 #######################################################
@@ -44,10 +44,8 @@ bash ${CURR_DIR}/install_opencv.sh
 COMPONENT="modules/planning"
 info "Install support for [${COMPONENT}] ..."
 
-# bash ${CURR_DIR}/install_libtorch.sh
 bash ${CURR_DIR}/install_adolc.sh
 bash ${CURR_DIR}/install_ipopt.sh
-# [TO-BE-CONTINUED]
 
 #######################################################
 
@@ -60,16 +58,10 @@ apt_get_update_and_install \
 # CUDA & nlohmann/json
 #######################################################
 
-COMPONENT="modules/monitor"
-info "Install support for [${COMPONENT}] ..."
-
-apt_get_update_and_install linux-libc-dev
-
-#######################################################
 COMPONENT="modules/localization"
 info "Install support for [${COMPONENT}] ..."
 
-apt_get_update_and_install liblz4-dev
+ok "Good, no extra deps for localization. "
 
 #######################################################
 COMPONENT="modules/tools"
@@ -85,7 +77,6 @@ bash ${CURR_DIR}/install_python_modules.sh
 COMPONENT="modules/teleop"
 info "Install support for [${COMPONENT}] ..."
 bash ${CURR_DIR}/install_openh264.sh
-
 
 ######################################################
 COMPONENT="modules/audio"

@@ -131,7 +131,7 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
 
 if __name__ == '__main__':
     cyber.init()
-    parse_dict = read_parameters('parser_params.yaml')
+    parse_dict = read_parameters('modules/tools/record_parse_save/parser_params.yaml')
     dest_dict, parser_func = define_destinations(parse_dict)
     parse_apollo_record(parse_dict, dest_dict, parser_func)
 

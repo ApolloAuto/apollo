@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/inference/utils/binary_data.h"
+
 #include <vector>
 
 #include "cyber/common/log.h"
-#include "modules/perception/inference/utils/binary_data.h"
 
 namespace apollo {
 namespace perception {
@@ -59,16 +60,16 @@ std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
 
   // read dtype
   size_t nmemb = BinaryReadString(fp, dtype);
-  CHECK_GT(nmemb, 0);
+  CHECK_GT(nmemb, 0U);
   CHECK_EQ(get_dtype(*blob), dtype);
 
   // read dims
   nmemb = fread(&ndim, sizeof(ndim), 1, fp);
-  CHECK_EQ(nmemb, 1);
+  CHECK_EQ(nmemb, 1U);
   std::vector<int> shape(ndim);
   for (int i = 0; i < ndim; ++i) {
     nmemb = fread(&shape[i], sizeof(shape[i]), 1, fp);
-    CHECK_EQ(nmemb, 1);
+    CHECK_EQ(nmemb, 1U);
   }
   if (ndim == 0) {
     return blob;
@@ -80,7 +81,7 @@ std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
 
   // read data
   nmemb = fread(blob->mutable_cpu_data(), sizeof(Dtype), blob->count(), fp);
-  CHECK_EQ(nmemb, blob->count());
+  CHECK_EQ(static_cast<int>(nmemb), blob->count());
 
   return blob;
 }
@@ -164,8 +165,7 @@ BinaryReadFile(const char *file_path);
 
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string, std::shared_ptr<base::Blob<float>>>
-        &data_dict);
+    const std::map<std::string, std::shared_ptr<base::Blob<float>>> &data_dict);
 template bool BinaryWriteFile(
     const char *file_path,
     const std::map<std::string, std::shared_ptr<base::Blob<double>>>

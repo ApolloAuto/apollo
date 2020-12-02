@@ -45,7 +45,7 @@ AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
       stop_boundaries_(num_points, std::vector<std::array<double, 3>>()),
       nudge_boundaries_(num_points, std::vector<std::array<double, 3>>()),
       side_pass_boundaries_(num_points, std::vector<std::array<double, 3>>()) {
-  CHECK_GT(num_points, 0);
+  CHECK_GT(num_points, 0U);
   CHECK_GT(time_range, kMinTimeRange);
   double res = time_range / static_cast<double>(num_points);
   for (double t = 0; t < res + time_range; t += res) {
@@ -130,8 +130,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
     const std::vector<common::SpeedPoint>& speed_profile,
     autotuning::TrajectoryRawFeature* const trajectory_feature) const {
   if (speed_profile.size() != eval_time_.size()) {
-    const std::string msg =
-        "mismatched evaluated time and speed profile size";
+    const std::string msg = "mismatched evaluated time and speed profile size";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

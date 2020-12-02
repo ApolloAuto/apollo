@@ -27,8 +27,8 @@
 #include "Eigen/Geometry"
 
 // TODO(Localization): Fix the typo of "forecast".
-#include "include/pose_forcast.h"
-#include "include/sins_struct.h"
+#include "localization_msf/pose_forcast.h"
+#include "localization_msf/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"

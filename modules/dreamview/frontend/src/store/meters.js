@@ -46,6 +46,10 @@ export default class Meters {
 
     @observable steeringPercentage = 0;
 
+    @observable batteryPercentage = null;
+
+    @observable gearLocation = '';
+
     @observable drivingMode = 'UNKNOWN';
 
     @observable isAutoMode = false;
@@ -64,6 +68,16 @@ export default class Meters {
         if (world.autoDrivingCar.speed !== undefined) {
           // Convert the unit from m/s to mph.
           this.speed = world.autoDrivingCar.speed;
+        }
+
+        if (world.autoDrivingCar.batteryPercentage !== undefined
+                && world.autoDrivingCar.batteryPercentage >= 0
+                && world.autoDrivingCar.batteryPercentage <= 100) {
+          this.batteryPercentage = world.autoDrivingCar.batteryPercentage;
+        }
+
+        if (world.autoDrivingCar.gearLocation !== undefined) {
+          this.gearLocation = world.autoDrivingCar.gearLocation;
         }
 
         if (world.autoDrivingCar.steeringPercentage !== undefined
@@ -89,3 +103,4 @@ export default class Meters {
       }
     }
 }
+

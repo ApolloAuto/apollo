@@ -275,7 +275,7 @@ bool Obstacle::IsCloseToJunctionExit() const {
     AERROR << "No junction feature found";
     return false;
   }
-  CHECK_GT(history_size(), 0);
+  CHECK_GT(history_size(), 0U);
   const Feature& latest_feature = feature_history_.front();
   double position_x = latest_feature.position().x();
   double position_y = latest_feature.position().y();
@@ -1443,7 +1443,7 @@ void Obstacle::DiscardOutdatedHistory() {
 }
 
 void Obstacle::SetCaution() {
-  CHECK_GT(feature_history_.size(), 0);
+  CHECK_GT(feature_history_.size(), 0U);
   Feature* feature = mutable_latest_feature();
   feature->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
 }

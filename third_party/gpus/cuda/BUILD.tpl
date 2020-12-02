@@ -116,6 +116,13 @@ cc_library(
 )
 
 cc_library(
+    name = "cublasLt",
+    srcs = ["cuda/lib/%{cublasLt_lib}"],
+    data = ["cuda/lib/%{cublasLt_lib}"],
+    linkstatic = 1,
+)
+
+cc_library(
     name = "cusolver",
     srcs = ["cuda/lib/%{cusolver_lib}"],
     data = ["cuda/lib/%{cusolver_lib}"],
@@ -156,6 +163,7 @@ cc_library(
     name = "cuda",
     deps = [
         ":cublas",
+        ":cublasLt",
         ":cuda_headers",
         ":cudart",
         ":cudnn",

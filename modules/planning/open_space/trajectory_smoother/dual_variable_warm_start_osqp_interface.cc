@@ -350,13 +350,13 @@ void DualVariableWarmStartOSQPInterface::assemble_P(
     }
   }
 
-  CHECK_EQ(P_indptr->size(), lambda_horizon_);
+  CHECK_EQ(P_indptr->size(), static_cast<size_t>(lambda_horizon_));
   for (int i = lambda_horizon_; i < num_of_variables_ + 1; ++i) {
     P_indptr->emplace_back(first_row_location);
   }
 
   CHECK_EQ(P_data->size(), P_indices->size());
-  CHECK_EQ(P_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(P_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
 void DualVariableWarmStartOSQPInterface::assemble_constraint(
@@ -465,7 +465,7 @@ void DualVariableWarmStartOSQPInterface::assemble_constraint(
   A_indptr->emplace_back(first_row_location);
 
   CHECK_EQ(A_data->size(), A_indices->size());
-  CHECK_EQ(A_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(A_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
 void DualVariableWarmStartOSQPInterface::get_optimization_results(

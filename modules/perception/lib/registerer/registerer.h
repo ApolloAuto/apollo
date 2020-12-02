@@ -123,13 +123,13 @@ bool GetRegisteredClasses(
     static const ::std::string GetUniqInstanceName() {                \
       FactoryMap &map =                                               \
           ::apollo::perception::lib::GlobalFactoryMap()[#base_class]; \
-      CHECK_EQ(map.size(), 1) << map.size();                          \
+      CHECK_EQ(map.size(), 1U) << map.size();                         \
       return map.begin()->first;                                      \
     }                                                                 \
     static base_class *GetUniqInstance() {                            \
       FactoryMap &map =                                               \
           ::apollo::perception::lib::GlobalFactoryMap()[#base_class]; \
-      CHECK_EQ(map.size(), 1) << map.size();                          \
+      CHECK_EQ(map.size(), 1U) << map.size();                         \
       Any object = map.begin()->second->NewInstance();                \
       return *(object.AnyCast<base_class *>());                       \
     }                                                                 \

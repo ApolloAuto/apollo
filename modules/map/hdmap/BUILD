@@ -30,7 +30,7 @@ cc_library(
         "//modules/map/proto:map_cc_proto",
         "//modules/map/relative_map/proto:navigation_cc_proto",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_test(
     deps = [
         ":hdmap",
         "//cyber/common:file",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -85,7 +85,7 @@ cc_test(
     ],
     deps = [
         ":hdmap_util",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest_main",
     ],
 )

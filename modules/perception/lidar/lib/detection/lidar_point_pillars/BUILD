@@ -22,12 +22,12 @@ cc_library(
         ":common",
         ":nms_cuda",
         ":params",
+        ":pfe_cuda",
         ":postprocess_cuda",
         ":preprocess_points",
         ":scatter_cuda",
         "//cyber/common",
         "//modules/perception/common:perception_gflags",
-        "//third_party:libtorch",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
     ],
@@ -87,6 +87,16 @@ cuda_library(
     name = "nms_cuda",
     srcs = ["nms_cuda.cu"],
     hdrs = ["nms_cuda.h"],
+    deps = [
+        ":common",
+        "@local_config_cuda//cuda:cudart",
+    ],
+)
+
+cuda_library(
+    name = "pfe_cuda",
+    srcs = ["pfe_cuda.cu"],
+    hdrs = ["pfe_cuda.h"],
     deps = [
         ":common",
         "@local_config_cuda//cuda:cudart",

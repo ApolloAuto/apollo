@@ -22,7 +22,7 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
-if ldconfig -p | grep -q "libboost_mpi.so" ; then
+if ldconfig -p | grep -q "libboost_system.so" ; then
     info "Found existing Boost installation. Reinstallation skipped."
     exit 0
 fi
@@ -30,8 +30,7 @@ fi
 # PreReq for Unicode support for Boost.Regex
 #    icu-devtools \
 #    libicu-dev
-apt-get -y update &&    \
-    apt-get -y install  \
+apt_get_update_and_install \
     liblzma-dev \
     libbz2-dev \
     libzstd-dev
@@ -53,23 +52,27 @@ pushd "boost_${VERSION}"
     # A) For mpi built from source
     #  echo "using mpi : ${SYSROOT_DIR}/bin/mpicc ;" > user-config.jam
     # B) For mpi installed via apt
-    echo "using mpi ;" > user-config.jam
+    # echo "using mpi ;" > user-config.jam
     ./bootstrap.sh \
         --with-python-version=${py3_ver} \
         --prefix="${SYSROOT_DIR}" \
         --without-icu
 
     ./b2 -d+2 -q -j$(nproc) \
-        --user-config=user-config.jam \
+        --without-graph_parallel \
+        --without-mpi \
         variant=release \
         link=shared \
         threading=multi \
         install
-
-    #toolset=clang
+        #--user-config=user-config.jam
 popd
-
 ldconfig
 
-# clean up
+# Clean up
 rm -rf "boost_${VERSION}" "${PKG_NAME}"
+apt_get_remove  \
+    liblzma-dev \
+    libbz2-dev \
+    libzstd-dev
+

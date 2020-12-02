@@ -1,59 +1,68 @@
 # Apollo Docker Image Build Process
 
 ## Introduction
-As you may already know, Apollo was run inside Docker container, and there are two flavors of Apollo docker images,  `CyberRT` (`Cyber` for short) and `Dev` . `Cyber` images were for developers who want to play with the `CyberRT` framework only, while `Dev` images were used to build the whole Apollo project.
 
-Currently, Apollo comes with support for two CPU architectures, namely, `x86_64` and `aarch64`.  (Please note that till the time this document was updated, the `dev-aarch64` image  was not complete. Hope we can make it ready in the next few months.)
+As you may already know, Apollo runs inside Docker, and there are two types of
+Apollo Docker images: CyberRT and Dev. CyberRT images were for developers who
+want to play with the CyberRT framework only, while Dev images were used to
+build and run the whole Apollo project.
 
-In the next section, I will describe briefly the steps to build these Docker images.
+Currently, two CPU architectures are supported: `x86_64` and `aarch64`.
 
-## Build Apollo Cyber Image
+**Note**
 
-There is a dedicated bash script for this purpose, `build_cyber.sh`.
+> `dev.aarch64` image was still WIP as of today. It is expected to be ready in
+> the next few months.
 
-Type `./build_cyber.sh -h` and it will print its usage:
+In the next section, I will describe briefly the steps to build these Docker
+images.
+
+## Build CyberRT Image
+
+Type `./build_apollo_docker.sh -h` for help message:
 
 ```
-$ ./build_cyber.sh -h
-./build_cyber.sh -h
+$ ./build_apollo_docker.sh -h
 Usage:
-    build_cyber.sh [-l] [-c] -f <cyber_dockerfile> [-m <build|download>] [-g <us|cn>]
-    build_cyber.sh -h/--help    # Show this message
+    build_apollo_docker.sh -f <Dockerfile> [Options]
+Available options:
+    -c,--clean  Use "--no-cache=true" for docker build
+    -m,--mode   "build" for build everything from source if possible, "download" for using prebuilt ones
+    -g,--geo    Enable geo-specific mirrors to speed up build. Currently "cn" and "us" are supported.
+    -d,--dist   Whether to build stable("stable") or experimental("testing") Docker images
+    --dry       Dry run (for testing purpose)
+    -h,--help   Show this message and exit
 E.g.,
-    build_cyber.sh -f cyber.x86_64.dockerfile -m build
-    build_cyber.sh -l -f cyber.aarch64.dockerfile -m download
-
+    build_apollo_docker.sh -f cyber.x86_64.dockerfile -m build -g cn
+    build_apollo_docker.sh -f dev.aarch64.dockerfile -m download -b testing
 ```
 
-Here, `-g` stands for `geo`, an option for geolocation settings (E.g., APT/PYPI mirrors). At this moment, only two `geo` codes ( `us` & `cn`) are supported, and the default is `us`. Issues and PRs are welcome if you found your `geo` code missing.
+Here, the `-g/--geo` option is used to enable geo-location based settings (APT &
+PYPI mirrors, etc.). Two codes (`us` & `cn`) are supported now, and the default
+is `us`.
 
-To build the latest `Cyber` image, simply run
-
-```
-./build_cyber.sh -f cyber.<TARGET_ARCH>.dockerfile
-```
-
-For users in mainland China who want to speed up the build process:
+To build the latest CyberRT image, simply run:
 
 ```
-./build_cyber.sh -f cyber.<TARGET_ARCH>.dockerfile -g cn
+./build_apollo_docker.sh -f cyber.<TARGET_ARCH>.dockerfile
+```
+
+For users in mainland China to speed up the build process:
+
+```
+./build_apollo_docker.sh -f cyber.<TARGET_ARCH>.dockerfile -g cn
 ```
 
 ## Build Apollo Dev Image
 
-The script used to build Develop image is `build_dev.sh`, and its usage is similar to that of `build_cyber.sh`.
+Run the following command to build Apollo Dev image:
 
 ```
-$ ./build_dev.sh --help
-Usage:
-    build_dev.sh [-l] [-c] -f <dev_dockerfile> [-m <build|download>] [-g <us|cn>]
-    build_dev.sh -h/--help    # Show this message
-E.g.,
-    build_dev.sh -f dev.x86_64.dockerfile -m build
-    build_dev.sh -l -f dev.aarch64.dockerfile -m download
+build_apollo_docker.sh -f dev.<TARGET_ARCH>.dockerfile
 ```
 
-On success, output messages like the following will be shown at the end of your build.
+On success, output messages like the following will be shown at the bottom of
+your screen.
 
 ```
 Successfully built baca71e567e6
@@ -61,29 +70,31 @@ Successfully tagged apolloauto/apollo:dev-x86_64-18.04-20200824_0339
 Built new image apolloauto/apollo:dev-x86_64-18.04-20200824_0339
 ```
 
-> Note: Please don't forget to change the `FROM ...` line if you want to use the `Cyber` image freshly built.
-
 ## A Few More Words ...
 
 ### Build Log
 
-Once completed, there exists a log file located at `/opt/apollo/build.log` inside docker container recording package download links for your build.
+Once completed, there exists a log file located at `/opt/apollo/build.log`
+inside docker container recording package download links for your build.
 
 ### Enable Local HTTP Cache to Speed Up Build
 
-You can enable local HTTP cache to speed up package downloading phase by performing the following steps on your docker **host** (outside docker):
+You can enable local HTTP cache to speed up package downloading phase by
+performing the following steps on your docker **host** (outside docker):
 
-1. Download all prerequisite packages to a directory (say, `$HOME/archive`) with URLs listed in the build log. Pay attention to their checksum.
-2. Change to that archive directory and start your local HTTP cache server at port **8388**.
+1. Download all prerequisite packages to a directory (say, `$HOME/archive`) with
+   URLs listed in the build log. Pay attention to their checksum.
+2. Change to that archive directory and start your local HTTP cache server at
+   port **8388**.
 
 ```
 cd $HOME/archive
 nohup python3 -m http.server 8388 &
 ```
 
-> Note: Another advantage with the local HTTP cache mechanism is, it has
-> little influence on the final image size. Even if the cached package was
-> missing or broken, it can still be downloaded from the original URL.
+> Note: Another advantage with the local HTTP cache mechanism is, it has little
+> influence on the final image size. Even if the cached package was missing or
+> broken, it can still be downloaded from the original URL.
 
 3. Rerun `build_cyber.sh` or `build_dev.sh`.
 
@@ -99,8 +110,8 @@ The best practice of a new installer would be:
 1. Standalone.
 
    Have minimum assumption about the basement, which means, you can depend on
-   the base image and `installers/installer_base.sh`. Other than that, you should
-   install all the dependencies in your own installer.
+   the base image and `installers/installer_base.sh`. Other than that, you
+   should install all the dependencies in your own installer.
 
 1. Thin.
 
@@ -115,5 +126,5 @@ The best practice of a new installer would be:
 
 1. Cross-architecture.
 
-   It would be awesome to work perfectly for different architectures such as `x86_64` and `aarch64`.
-
+   It would be awesome to work perfectly for different architectures such as
+   `x86_64` and `aarch64`.

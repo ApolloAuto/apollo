@@ -36,6 +36,7 @@ cc_test(
     name = "probabilistic_fusion_test",
     size = "small",
     srcs = ["probabilistic_fusion_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":probabilistic_fusion",
         "@com_google_googletest//:gtest_main",

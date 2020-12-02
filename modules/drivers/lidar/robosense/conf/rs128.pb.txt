@@ -1,0 +1,15 @@
+model: "RS128"
+frame_id: "rslidar_128"
+ip: "192.168.1.200"
+msop_port: 6699
+difop_port: 7788
+echo_mode: 1
+start_angle: 0
+end_angle: 360
+min_distance: 0
+max_distance: 210
+cut_angle: 0
+pointcloud_channel: "/apollo/sensor/rs128/PointCloud2"
+scan_channel: "/apollo/sensor/rs128/Scan"
+calibration_file: "/apollo/modules/drivers/lidar/robosense/param/rs128"
+use_lidar_clock: false

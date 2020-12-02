@@ -49,7 +49,7 @@ class Block {
   void ReleaseWriteLock();
   void ReleaseReadLock();
 
-  volatile std::atomic<int32_t> lock_num_ = {0};
+  std::atomic<int32_t> lock_num_ = {0};
 
   uint64_t msg_size_;
   uint64_t msg_info_size_;

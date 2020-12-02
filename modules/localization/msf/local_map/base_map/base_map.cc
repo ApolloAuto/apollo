@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/local_map/base_map/base_map.h"
+
 #include <vector>
 
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/localization/msf/common/util/system_utility.h"
-#include "modules/localization/msf/local_map/base_map/base_map.h"
 
 namespace apollo {
 namespace localization {
@@ -117,7 +118,7 @@ void BaseMap::AddDataset(const std::string dataset_path) {
 }
 
 void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
-  CHECK_LE(static_cast<int>(map_ids->size()), map_node_cache_lvl1_->Capacity());
+  CHECK_LE(map_ids->size(), map_node_cache_lvl1_->Capacity());
   // check in cacheL1
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
   while (itr != map_ids->end()) {
@@ -184,8 +185,7 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
 }
 
 void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {
-  DCHECK_LE(static_cast<int>(map_ids->size()),
-            map_node_cache_lvl2_->Capacity());
+  DCHECK_LE(map_ids->size(), map_node_cache_lvl2_->Capacity());
   // check in cacheL2
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
   while (itr != map_ids->end()) {

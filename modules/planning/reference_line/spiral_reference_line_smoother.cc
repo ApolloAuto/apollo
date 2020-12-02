@@ -182,7 +182,7 @@ int SpiralReferenceLineSmoother::SmoothStandAlone(
     std::vector<double>* ptr_kappa, std::vector<double>* ptr_dkappa,
     std::vector<double>* ptr_s, std::vector<double>* ptr_x,
     std::vector<double>* ptr_y) const {
-  CHECK_GT(point2d.size(), 1);
+  CHECK_GT(point2d.size(), 1U);
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
 
@@ -240,7 +240,7 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
                                          std::vector<double>* ptr_s,
                                          std::vector<double>* ptr_x,
                                          std::vector<double>* ptr_y) const {
-  CHECK_GT(point2d.size(), 1);
+  CHECK_GT(point2d.size(), 1U);
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
 
@@ -373,7 +373,7 @@ void SpiralReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
   anchor_points_ = std::move(anchor_points);
 
-  CHECK_GT(anchor_points_.size(), 1);
+  CHECK_GT(anchor_points_.size(), 1U);
   zero_x_ = anchor_points_.front().path_point.x();
   zero_y_ = anchor_points_.front().path_point.y();
 

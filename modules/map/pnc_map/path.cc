@@ -22,6 +22,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -319,7 +320,7 @@ Path::Path(const std::vector<LaneSegment>& segments)
     path_points_.insert(path_points_.end(), points.begin(), points.end());
   }
   MapPathPoint::RemoveDuplicates(&path_points_);
-  CHECK_GE(path_points_.size(), 2);
+  CHECK_GE(path_points_.size(), 2U);
   Init();
 }
 
@@ -331,7 +332,7 @@ Path::Path(std::vector<LaneSegment>&& segments)
     path_points_.insert(path_points_.end(), points.begin(), points.end());
   }
   MapPathPoint::RemoveDuplicates(&path_points_);
-  CHECK_GE(path_points_.size(), 2);
+  CHECK_GE(path_points_.size(), 2U);
   Init();
 }
 
@@ -385,9 +386,9 @@ void Path::InitPoints() {
   num_sample_points_ = static_cast<int>(length_ / kSampleDistance) + 1;
   num_segments_ = num_points_ - 1;
 
-  CHECK_EQ(accumulated_s_.size(), num_points_);
-  CHECK_EQ(unit_directions_.size(), num_points_);
-  CHECK_EQ(segments_.size(), num_segments_);
+  CHECK_EQ(accumulated_s_.size(), static_cast<size_t>(num_points_));
+  CHECK_EQ(unit_directions_.size(), static_cast<size_t>(num_points_));
+  CHECK_EQ(segments_.size(), static_cast<size_t>(num_segments_));
 }
 
 void Path::InitLaneSegments() {
@@ -421,7 +422,8 @@ void Path::InitLaneSegments() {
       lane_segments_to_next_point_.push_back(LaneSegment());
     }
   }
-  CHECK_EQ(lane_segments_to_next_point_.size(), num_segments_);
+  CHECK_EQ(lane_segments_to_next_point_.size(),
+           static_cast<size_t>(num_segments_));
 }
 
 void Path::InitWidth() {
@@ -464,11 +466,13 @@ void Path::InitWidth() {
     }
     s += kSampleDistance;
   }
-  CHECK_EQ(lane_left_width_.size(), num_sample_points_);
-  CHECK_EQ(lane_right_width_.size(), num_sample_points_);
 
-  CHECK_EQ(road_left_width_.size(), num_sample_points_);
-  CHECK_EQ(road_right_width_.size(), num_sample_points_);
+  auto num_sample_points = static_cast<size_t>(num_sample_points_);
+  CHECK_EQ(lane_left_width_.size(), num_sample_points);
+  CHECK_EQ(lane_right_width_.size(), num_sample_points);
+
+  CHECK_EQ(road_left_width_.size(), num_sample_points);
+  CHECK_EQ(road_right_width_.size(), num_sample_points);
 }
 
 void Path::InitPointIndex() {
@@ -484,7 +488,7 @@ void Path::InitPointIndex() {
     last_point_index_.push_back(last_index);
     s += kSampleDistance;
   }
-  CHECK_EQ(last_point_index_.size(), num_sample_points_);
+  CHECK_EQ(last_point_index_.size(), static_cast<size_t>(num_sample_points_));
 }
 
 void Path::GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
@@ -652,7 +656,7 @@ InterpolatedIndex Path::GetLaneIndexFromS(double s) const {
   if (s <= 0.0) {
     return {0, 0.0};
   }
-  CHECK_GT(lane_segments_.size(), 0);
+  CHECK_GT(lane_segments_.size(), 0U);
   if (s >= length_) {
     return {static_cast<int>(lane_segments_.size() - 1),
             lane_segments_.back().Length()};
@@ -1081,7 +1085,7 @@ void PathApproximation::InitProjections(const Path& path) {
     proj += kSampleDistance;
   }
   CHECK_EQ(sampled_max_original_projections_to_left_.size(),
-           num_projection_samples_);
+           static_cast<size_t>(num_projection_samples_));
 }
 
 bool PathApproximation::GetProjection(const Path& path,
