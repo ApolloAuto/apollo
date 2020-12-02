@@ -43,7 +43,7 @@ cc_test(
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/map/hdmap:hdmap_input",
         "@com_google_googletest//:gtest_main",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

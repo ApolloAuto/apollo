@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <vector>
+
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 
 namespace apollo {

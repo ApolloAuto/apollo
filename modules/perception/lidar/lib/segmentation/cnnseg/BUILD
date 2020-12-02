@@ -16,7 +16,6 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
-        "//modules/perception/inference/caffe:caffe_net_lib",
         "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/config_manager",
@@ -76,7 +75,7 @@ cc_library(
 
 cc_test(
     name = "cnn_segmentation_test",
-    size = "small",
+    size = "large",
     srcs = ["cnn_segmentation_test.cc"],
     deps = [
         ":cnn_segmentation",

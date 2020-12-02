@@ -36,8 +36,9 @@ cc_test(
     copts = ["-fno-access-control"],
     deps = [
         ":spatio_temporal_ground_detector",
+        "@com_github_gflags_gflags//:gflags",
         "@com_google_googletest//:gtest_main",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

@@ -21,9 +21,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/proto/rt.pb.h"
+
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
-#include "modules/perception/proto/rt.pb.h"
 
 namespace apollo {
 namespace perception {

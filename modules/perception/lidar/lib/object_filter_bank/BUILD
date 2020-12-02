@@ -25,6 +25,7 @@ cc_test(
     srcs = ["object_filter_bank_test.cc"],
     deps = [
         ":object_filter_bank",
+        "@com_github_gflags_gflags//:gflags",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -45,7 +45,7 @@ bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
   services_.clear();
   for (int i = 0; i < config.service_name_size(); ++i) {
     const auto& name = config.service_name(i);
-    SceneService* service(SceneServiceRegisterer::GetInstanceByName(name));
+    SceneServicePtr service(SceneServiceRegisterer::GetInstanceByName(name));
     if (service == nullptr) {
       AINFO << "Failed to find scene service: " << name << ", skipped";
       continue;
