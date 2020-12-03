@@ -17,14 +17,16 @@
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 
 #include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
-#include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
 #include "modules/canbus/vehicle/devkit/protocol/gear_command_103.h"
-#include "modules/canbus/vehicle/devkit/protocol/gear_report_503.h"
 #include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
-#include "modules/canbus/vehicle/devkit/protocol/park_report_504.h"
 #include "modules/canbus/vehicle/devkit/protocol/steering_command_102.h"
-#include "modules/canbus/vehicle/devkit/protocol/steering_report_502.h"
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
+
+#include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
+#include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
+#include "modules/canbus/vehicle/devkit/protocol/gear_report_503.h"
+#include "modules/canbus/vehicle/devkit/protocol/park_report_504.h"
+#include "modules/canbus/vehicle/devkit/protocol/steering_report_502.h"
 #include "modules/canbus/vehicle/devkit/protocol/throttle_report_500.h"
 #include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_1_507.h"
 #include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_2_508.h"
@@ -47,6 +49,7 @@ DevkitMessageManager::DevkitMessageManager() {
   AddSendProtocolData<Throttlecommand100, true>();
 
   // Report Messages
+  AddRecvProtocolData<Bmsreport512, true>();
   AddRecvProtocolData<Brakereport501, true>();
   AddRecvProtocolData<Gearreport503, true>();
   AddRecvProtocolData<Parkreport504, true>();
