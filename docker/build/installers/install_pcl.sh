@@ -68,7 +68,8 @@ apt_get_update_and_install \
     libtiff-dev \
     liblz4-dev \
     libfreetype6-dev \
-    libpcap-dev
+    libpcap-dev \
+    libqhull-dev
 
 # NOTE(storypku)
 # libglfw3-dev depends on libglfw3,
@@ -135,7 +136,8 @@ apt_get_remove \
     libtiff-dev \
     liblz4-dev \
     libfreetype6-dev \
-    libpcap-dev
+    libpcap-dev \
+    libqhull-dev
 
 # Add runtime-deps for pcl
 apt_get_update_and_install \
@@ -144,7 +146,8 @@ apt_get_update_and_install \
     libfreetype6 \
     libtiff5 \
     libdouble-conversion1 \
-    libpcap0.8
+    libpcap0.8 \
+    libqhull7
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
