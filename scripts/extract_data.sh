@@ -25,19 +25,23 @@ DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 NO_INTERACTIVE=0
 
 TASK=""
-VALID_TASKS=("lidar_to_gnss" "camera_6mm_to_lidar")
+VALID_TASKS=("lidar_to_gnss" "camera_6mm_to_lidar" "camera_12mm_to_lidar")
 
 RECORD_FILES=()
 RECORD_DIRS=()
 
+function join_by() {
+  local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}";
+}
+
 function print_usage() {
-  echo 'Usage:
-    ./extract_data.sh -t [ lidar_to_gnss | camera_6mm_to_lidar ] -f <path/to/record/file> -d <path/to/record/dir>
+  echo "Usage:
+    ./extract_data.sh -t [ $(join_by ' | ' ${VALID_TASKS[@]}) ] -f <path/to/record/file> -d <path/to/record/dir>
   eg.
     ./extract_data.sh -t lidar_to_gnss -f xxx/yyy.record.00000 -f xxx/yyy.record.00001
   or
     ./extract_data.sh -t camera_6mm_to_lidar -d xxx
-  '
+  "
 }
 
 function parse_args() {
