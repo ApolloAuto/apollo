@@ -14,40 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/vcu_report_505.h"
+#include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
 
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
-class Vcureport505Test : public ::testing::Test {
+class Bmsreport512Test : public ::testing::Test {
  public:
   virtual void SetUp() {}
 };
 
-TEST_F(Vcureport505Test, General) {
-  uint8_t data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
+TEST_F(Bmsreport512Test, General) {
+  uint8_t data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
   int32_t length = 8;
   ChassisDetail cd;
-  Vcureport505 vcureport;
-  vcureport.Parse(data, length, &cd);
+  Bmsreport512 bmsreport;
+  bmsreport.Parse(data, length, &cd);
 
-  EXPECT_EQ(data[0], 0b00000111);
-  EXPECT_EQ(data[1], 0b00000001);
+  EXPECT_EQ(data[0], 0b00000001);
+  EXPECT_EQ(data[1], 0b00000000);
   EXPECT_EQ(data[2], 0b00000001);
-  EXPECT_EQ(data[3], 0b00000010);
-  EXPECT_EQ(data[4], 0b10001010);
-  EXPECT_EQ(data[5], 0b00000011);
-  EXPECT_EQ(data[6], 0b00000100);
-  EXPECT_EQ(data[7], 0b00000101);
+  EXPECT_EQ(data[3], 0b00000011);
+  EXPECT_EQ(data[4], 0b01010010);
+  EXPECT_EQ(data[5], 0b00000001);
+  EXPECT_EQ(data[6], 0b00000000);
+  EXPECT_EQ(data[7], 0b00000001);
 
-  EXPECT_EQ(cd.devkit().vcu_report_505().vehicle_mode_state(), 1);
-  EXPECT_EQ(cd.devkit().vcu_report_505().frontcrash_state(), 1);
-  EXPECT_EQ(cd.devkit().vcu_report_505().backcrash_state(), 0);
-  EXPECT_EQ(cd.devkit().vcu_report_505().aeb_state(), 0);
-  EXPECT_EQ(cd.devkit().vcu_report_505().acc(), 1.12);
-  EXPECT_EQ(cd.devkit().vcu_report_505().speed(), 0.258);
+  EXPECT_EQ(cd.devkit().bms_report_512().battery_current(), -3174.1);
+  EXPECT_EQ(cd.devkit().bms_report_512().battery_voltage(), 2.56);
+  EXPECT_EQ(cd.devkit().bms_report_512().battery_soc(), 82);
 }
 
 }  // namespace devkit

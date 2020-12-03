@@ -253,8 +253,6 @@ Chassis ChController::chassis() {
       chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
     chassis_.set_battery_soc_percentage(
         chassis_detail.ch().ecu_status_2_516().battery_soc());
-  } else {
-    chassis_.set_battery_soc_percentage(0);
   }
 
   return chassis_;
