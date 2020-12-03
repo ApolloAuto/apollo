@@ -89,18 +89,18 @@ def process_dir(path, operation):
     try:
         if operation == 'create':
             if os.path.exists(path):
-                print('folder: %s exists' % path)
+                print(f'folder: {path} exists')
             else:
-                print('create folder: %s' % path)
+                print(f'create folder: {path}')
                 os.makedirs(path)
         elif operation == 'remove':
             os.remove(path)
         else:
-            print('Error! Unsupported operation %s for directory.' % operation)
+            print(f'Error! Unsupported operation {operation} for directory.')
             return False
     except OSError as e:
-        print('Failed to %s directory: %s. Error: %s' %
-              (operation, path, six.text_type(e)))
+        print(f'Failed to {operation} directory: {path}. '
+              f'Error: {six.text_type(e)}')
         return False
 
     return True
@@ -118,9 +118,8 @@ def validate_channel_list(channels, dictionary):
     ret = True
     for channel in channels:
         if channel not in dictionary:
-            print(
-                'ERROR: channel %s does not exist in record sensor channels' %
-                channel)
+            print(f'ERROR: channel {channel} does not exist in '
+                  'record sensor channels')
             ret = False
     return ret
 
@@ -144,7 +143,7 @@ def build_parser(channel, output_path):
         parser = ContiRadarParser(output_path=output_path,
                                   instance_saving=True)
     else:
-        raise ValueError("Not Support this channel type: %s" % channel)
+        raise ValueError(f"Not Support this channel type: {channel}")
     return parser
 
 
@@ -186,6 +185,7 @@ def extract_data(record_files, output_path, channels, start_timestamp,
     channel_parsers = {}
     channel_message_number = {}
     channel_processed_msg_num = {}
+
     for channel in channels:
         channel_success[channel] = True
         channel_occur_time[channel] = -1
@@ -201,13 +201,14 @@ def extract_data(record_files, output_path, channels, start_timestamp,
                 channel)
         channel_message_number[channel] = channel_message_number[
             channel] // extraction_rates[channel]
-        channel_message_number_total = 0
-        for num in channel_message_number.values():
-            channel_message_number_total += num
-        channel_processed_msg_num = 0
 
-        # if channel in SMALL_TOPICS:
-        # channel_messages[channel] = list()
+    channel_message_number_total = 0
+    for num in channel_message_number.values():
+        channel_message_number_total += num
+    channel_processed_msg_num = 0
+
+    # if channel in SMALL_TOPICS:
+    # channel_messages[channel] = list()
     extractor_node = cyber.Node("extractor")
     writer = extractor_node.create_writer("/apollo/dreamview/progress",
                                           preprocess_table_pb2.Progress, 6)
@@ -240,7 +241,8 @@ def extract_data(record_files, output_path, channels, start_timestamp,
                         channel_success[msg.topic] = False
                         process_channel_failure_num += 1
                         process_channel_success_num -= 1
-                        log_string = F'Failed to extract data from channel: {msg.topic} in record {record_file}'
+                        log_string = ('Failed to extract data from channel: '
+                                      f'{msg.topic} in record {record_file}')
                         print(log_string)
                         progress.log_string = log_string
 
@@ -252,17 +254,16 @@ def extract_data(record_files, output_path, channels, start_timestamp,
         save_combined_messages_info(parser, channel)
 
     # Logging statics about channel extraction
+    print_and_publish((f"Extracted sensor channel number {len(channels)} "
+                       f"from record files: {' '.join(record_files)}"), writer,
+                      progress)
     print_and_publish(
-        'Extracted sensor channel number [%d] from record files: %s' %
-        (len(channels), ' '.join(record_files)), writer, progress)
-    print_and_publish(
-        'Successfully processed [%d] channels, and [%d] was failed.' %
-        (process_channel_success_num, process_channel_failure_num), writer,
-        progress)
+        (f'Successfully processed {process_channel_success_num} channels, '
+         f'and {process_channel_failure_num} was failed.'), writer, progress)
     if process_msg_failure_num > 0:
         print_and_publish(
-            'Channel extraction failure number is [%d].' %
-            process_msg_failure_num, writer, progress)
+            f'Channel extraction failure number is {process_msg_failure_num}.',
+            writer, progress)
 
     return True
 
@@ -270,10 +271,9 @@ def extract_data(record_files, output_path, channels, start_timestamp,
 def save_combined_messages_info(parser, channel):
     if not parser.save_messages_to_file():
         raise ValueError(
-            "cannot save combined messages into single file for : %s " %
-            channel)
+            f"cannot save combined messages into single file for : {channel} ")
     if not parser.save_timestamps_to_file():
-        raise ValueError("cannot save tiemstamp info for %s " % channel)
+        raise ValueError(f"cannot save tiemstamp info for {channel} ")
 
 
 def generate_compressed_file(input_path,
@@ -323,33 +323,32 @@ def validate_record(record_file):
     header_msg = record_reader.get_headerstring()
     header = record_pb2.Header()
     header.ParseFromString(header_msg)
-    print("header is {}".format(header))
+    print(f"header is {header}")
 
     if not header.is_complete:
-        print('Record file: %s is not completed.' % record_file)
+        print(f'Record file: {record_file} is not completed.')
         return False
     if header.size == 0:
-        print('Record file: %s. size is 0.' % record_file)
+        print(f'Record file: {record_file}. size is 0.')
         return False
     if header.major_version != 1 and header.minor_version != 0:
-        print('Record file: %s. version [%d:%d] is wrong.' %
-              (record_file, header.major_version, header.minor_version))
+        print(f'Record file: {record_file}. version [{header.major_version}:'
+              f'{header.minor_version}] is wrong.')
         return False
     if header.begin_time >= header.end_time:
-        print('Record file: %s. begin time [%s] is equal or larger than '
-              'end time [%s].' %
-              (record_file, header.begin_time, header.end_time))
+        print(f'Record file: {record_file}. begin time [{header.begin_time}] '
+              f'is equal or larger than end time [{header.end_time}].')
         return False
 
     if header.message_number < 1 or header.channel_number < 1:
-        print('Record file: %s. [message:channel] number [%d:%d] is invalid.' %
-              (record_file, header.message_number, header.channel_number))
+        print(f'Record file: {record_file}. [message:channel] number '
+              f'[{header.message_number}:{header.channel_number}] is invalid.')
         return False
 
     # There should be at least one sensor channel
     sensor_channels = get_sensor_channel_list(record_file)
     if len(sensor_channels) < 1:
-        print('Record file: %s. cannot find sensor channels.' % record_file)
+        print(f'Record file: {record_file}. cannot find sensor channels.')
         return False
 
     return True
@@ -363,25 +362,24 @@ def validate_record_files(record_files, kword='.record.'):
         raise ValueError("Record files must be in a list")
 
     if len(record_files) == 1 and os.path.isdir(record_files[0]):
-        print('Load cyber records from: %s' % record_files[0])
+        print(f'Load cyber records from: {record_files[0]}')
         for f in sorted(os.listdir(record_files[0])):
             if kword in f:
                 file_abs_path = os.path.join(record_files[0], f)
                 if validate_record(file_abs_path):
                     file_abs_paths.append(file_abs_path)
                 else:
-                    print('Invalid record file: %s' % file_abs_path)
+                    print(f'Invalid record file: {file_abs_path}')
     else:
         for f in record_files:
             if not os.path.isfile(f):
-                raise ValueError(
-                    "Input cyber record does not exist or not a regular file: %s"
-                    % f)
+                raise ValueError("Input cyber record does not exist "
+                                 f"or not a regular file: {f}")
 
             if validate_record(f):
                 file_abs_paths.append(f)
             else:
-                print('Invalid record file: %s' % f)
+                print(f'Invalid record file: {f}')
 
     if len(file_abs_paths) < 1:
         raise ValueError("All the input record files are invalid")
@@ -392,9 +390,9 @@ def validate_record_files(record_files, kword='.record.'):
     for i, f in enumerate(file_abs_paths[1:]):
         sensor_channels = get_sensor_channel_list(f)
         if sensor_channels != default_sensor_channels:
-            print('Default sensor channel list in %s is: ' % first_record_file)
+            print(f'Default sensor channel list in {first_record_file} is: ')
             print(default_sensor_channels)
-            print('but sensor channel list in %s is: ' % file_abs_paths[i])
+            print(f'but sensor channel list in {file_abs_paths[i]} is: ')
             print(sensor_channels)
             raise ValueError(
                 "The record files should contain the same channel list")
@@ -408,8 +406,7 @@ def parse_channel_config(channels):
 
     for channel in channels:
         if channel.name in channel_list:
-            raise ValueError("Duplicated channel config for : %s" %
-                             channel.name)
+            raise ValueError(f"Duplicated channel config for : {channel.name}")
         else:
             channel_list.add(channel.name)
             extraction_rate_dict[channel.name] = channel.extraction_rate
@@ -446,20 +443,22 @@ def reorganize_extracted_data(tmp_data_path,
                               'sensor are needed for sensor calibration'))
         odometry_subfolder = odometry_subfolders[0]
         yaml_list = []
+        gnss_name = 'novatel'
+        multi_lidar_out_path = os.path.join(root_path,
+                                            'multi_lidar_to_gnss_calibration')
+
         for lidar in lidar_subfolders:
             # get the lidar name from folder name string
             lidar_name = get_substring(str=lidar,
                                        prefix='_apollo_sensor_',
                                        suffix='_PointCloud2')
-            gnss_name = 'novatel'
 
             # reorganize folder structure: each lidar has its raw data,
             # corresponding odometry and configuration yaml file
-            multi_lidar_out_path = os.path.join(
-                root_path, 'multi_lidar_to_gnss_calibration')
+
             if not process_dir(multi_lidar_out_path, 'create'):
-                raise ValueError('Failed to create directory: %s' %
-                                 multi_lidar_out_path)
+                raise ValueError(
+                    f'Failed to create directory: {multi_lidar_out_path}')
             lidar_in_path = os.path.join(tmp_data_path, lidar)
             lidar_out_path = os.path.join(multi_lidar_out_path, lidar)
             if not os.path.exists(lidar_out_path):
@@ -478,8 +477,8 @@ def reorganize_extracted_data(tmp_data_path,
                 source_folder=lidar,
                 dest_folder=odometry_subfolder,
                 out_config_file=generated_config_yaml)
-            print('lidar {} calibration data and configuration'
-                  'are generated.'.format(lidar_name))
+            print(f'lidar {lidar_name} calibration data and configuration'
+                  ' are generated.')
             yaml_list.append(generated_config_yaml)
 
         print(odometry_subfolder)
@@ -542,7 +541,7 @@ def reorganize_extracted_data(tmp_data_path,
             out_path = os.path.join(
                 root_path, camera_name + '_to_' + lidar_name + '_calibration')
             if not process_dir(out_path, 'create'):
-                raise ValueError('Failed to create directory: %s' % out_path)
+                raise ValueError(f'Failed to create directory: {out_path}')
             # reorganize folder structure: each camera has its images,
             # corresponding lidar pointclouds, camera initial extrinsics,
             # intrinsics, and configuration yaml file
@@ -563,11 +562,10 @@ def reorganize_extracted_data(tmp_data_path,
     elif task_name == 'radar_to_gnss':
         print('not ready. stay tuned')
     else:
-        raise ValueError(
-            'Unsupported data extraction task for{}'.format(task_name))
+        raise ValueError(f'Unsupported data extraction task for {task_name}')
 
     if remove_input_data_cache:
-        print('removing the cache at {}'.format(tmp_data_path))
+        print(f'removing the cache at {tmp_data_path}')
         os.system('rm -rf {}'.tmp_data_path)
 
 
@@ -626,7 +624,7 @@ def main():
     valid_record_list = validate_record_files(records, kword='.record.')
 
     channels, extraction_rates = parse_channel_config(config.channels.channel)
-    print('parsing the following channels: %s' % channels)
+    print(f'parsing the following channels: {channels}')
 
     start_timestamp = -1
     end_timestamp = -1
@@ -649,8 +647,8 @@ def main():
 
     ret = process_dir(output_abs_path, 'create')
     if not ret:
-        raise ValueError('Failed to create extrated data directory: %s' %
-                         output_abs_path)
+        raise ValueError(
+            f'Failed to create extrated data directory: {output_abs_path}')
 
     cyber.init("data_extractor")
 

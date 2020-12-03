@@ -34,7 +34,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::util::JsonUtil;
-using apollo::cyber::common::SetProtoToBinaryFile;
+using apollo::cyber::common::SetProtoToASCIIFile;
 using google::protobuf::util::JsonStringToMessage;
 using Json = WebSocketHandler::Json;
 
