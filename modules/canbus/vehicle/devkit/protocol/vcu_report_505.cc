@@ -17,7 +17,6 @@
 #include "modules/canbus/vehicle/devkit/protocol/vcu_report_505.h"
 
 #include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -32,6 +31,8 @@ const int32_t Vcureport505::ID = 0x505;
 
 void Vcureport505::Parse(const std::uint8_t* bytes, int32_t length,
                          ChassisDetail* chassis) const {
+  chassis->mutable_devkit()->mutable_vcu_report_505()->set_battery_soc(
+      battery_soc(bytes, length));
   chassis->mutable_devkit()->mutable_vcu_report_505()->set_vehicle_mode_state(
       vehicle_mode_state(bytes, length));
   chassis->mutable_devkit()->mutable_vcu_report_505()->set_frontcrash_state(
@@ -46,12 +47,23 @@ void Vcureport505::Parse(const std::uint8_t* bytes, int32_t length,
       speed(bytes, length));
 }
 
-// config detail: {'bit': 36, 'enum': {0:
+// config detail: {'name': 'battery_soc', 'offset': 0.0, 'precision': 1.0,
+// 'len': 8, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 47,
+// 'type': 'int', 'order': 'motorola', 'physical_unit': '%'}
+int Vcureport505::battery_soc(const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 5);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
+}
+
+// config detail: {'name': 'vehicle_mode_state', 'enum': {0:
 // 'VEHICLE_MODE_STATE_MANUAL_REMOTE_MODE', 1: 'VEHICLE_MODE_STATE_AUTO_MODE',
 // 2: 'VEHICLE_MODE_STATE_EMERGENCY_MODE', 3:
-// 'VEHICLE_MODE_STATE_STANDBY_MODE'}, 'is_signed_var': False, 'len': 2, 'name':
-// 'vehicle_mode_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-// '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+// 'VEHICLE_MODE_STATE_STANDBY_MODE'}, 'precision': 1.0, 'len': 2,
+// 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 36,
+// 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 Vcu_report_505::Vehicle_mode_stateType Vcureport505::vehicle_mode_state(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
@@ -62,10 +74,11 @@ Vcu_report_505::Vehicle_mode_stateType Vcureport505::vehicle_mode_state(
   return ret;
 }
 
-// config detail: {'bit': 33, 'enum': {0: 'FRONTCRASH_STATE_NO_EVENT', 1:
-// 'FRONTCRASH_STATE_CRASH_EVENT'}, 'is_signed_var': False, 'len': 1, 'name':
-// 'frontcrash_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-// '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+// config detail: {'name': 'frontcrash_state', 'enum': {0:
+// 'FRONTCRASH_STATE_NO_EVENT', 1: 'FRONTCRASH_STATE_CRASH_EVENT'},
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|0]', 'bit': 33, 'type': 'enum', 'order': 'motorola',
+// 'physical_unit': ''}
 Vcu_report_505::Frontcrash_stateType Vcureport505::frontcrash_state(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
@@ -76,10 +89,11 @@ Vcu_report_505::Frontcrash_stateType Vcureport505::frontcrash_state(
   return ret;
 }
 
-// config detail: {'bit': 34, 'enum': {0: 'BACKCRASH_STATE_NO_EVENT', 1:
-// 'BACKCRASH_STATE_CRASH_EVENT'}, 'is_signed_var': False, 'len': 1, 'name':
-// 'backcrash_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-// '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+// config detail: {'name': 'backcrash_state', 'enum': {0:
+// 'BACKCRASH_STATE_NO_EVENT', 1: 'BACKCRASH_STATE_CRASH_EVENT'},
+// 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|0]', 'bit': 34, 'type': 'enum', 'order': 'motorola',
+// 'physical_unit': ''}
 Vcu_report_505::Backcrash_stateType Vcureport505::backcrash_state(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
@@ -90,10 +104,10 @@ Vcu_report_505::Backcrash_stateType Vcureport505::backcrash_state(
   return ret;
 }
 
-// config detail: {'bit': 32, 'enum': {0: 'AEB_STATE_INACTIVE', 1:
-// 'AEB_STATE_ACTIVE'}, 'is_signed_var': False, 'len': 1, 'name': 'aeb_state',
-// 'offset': 0.0, 'order': 'motorola', 'physical_range': '[0|0]',
-// 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+// config detail: {'name': 'aeb_state', 'enum': {0: 'AEB_STATE_INACTIVE', 1:
+// 'AEB_STATE_ACTIVE'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False,
+// 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 32, 'type': 'enum', 'order':
+// 'motorola', 'physical_unit': ''}
 Vcu_report_505::Aeb_stateType Vcureport505::aeb_state(const std::uint8_t* bytes,
                                                       int32_t length) const {
   Byte t0(bytes + 4);
@@ -104,9 +118,9 @@ Vcu_report_505::Aeb_stateType Vcureport505::aeb_state(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'bit': 7, 'is_signed_var': True, 'len': 12, 'name': 'acc',
-// 'offset': 0.0, 'order': 'motorola', 'physical_range': '[-10|10]',
-// 'physical_unit': 'm/s^2', 'precision': 0.01, 'type': 'double'}
+// config detail: {'name': 'acc', 'offset': 0.0, 'precision': 0.01, 'len': 12,
+// 'is_signed_var': True, 'physical_range': '[-10|10]', 'bit': 7, 'type':
+// 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
 double Vcureport505::acc(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
@@ -123,9 +137,9 @@ double Vcureport505::acc(const std::uint8_t* bytes, int32_t length) const {
   return ret;
 }
 
-// config detail: {'bit': 23, 'is_signed_var': False, 'len': 16, 'name':
-// 'speed', 'offset': 0.0, 'order': 'motorola', 'physical_range': '[0|65.535]',
-// 'physical_unit': 'm/s', 'precision': 0.001, 'type': 'double'}
+// config detail: {'name': 'speed', 'offset': 0.0, 'precision': 0.001, 'len':
+// 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 23,
+// 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
 double Vcureport505::speed(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
