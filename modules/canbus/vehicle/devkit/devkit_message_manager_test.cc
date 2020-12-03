@@ -17,6 +17,8 @@
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 
 #include "gtest/gtest.h"
+
+#include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
 #include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
 #include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
 #include "modules/canbus/vehicle/devkit/protocol/gear_command_103.h"
@@ -58,6 +60,7 @@ TEST_F(DevkitMessageManagerTest, GetSendProtocols) {
 }
 
 TEST_F(DevkitMessageManagerTest, GetRecvProtocols) {
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Bmsreport512::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Brakereport501::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Gearreport503::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Parkreport504::ID), nullptr);
