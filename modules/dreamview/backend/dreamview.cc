@@ -83,7 +83,10 @@ Status Dreamview::Init() {
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
   monitors_.emplace("Vehicle Calibration", new DataCollectionMonitor());
-  monitors_.emplace("Lidar-IMU Sensor Calibration", new PreprocessMonitor());
+  monitors_.emplace("Lidar-IMU Sensor Calibration",
+                    new PreprocessMonitor("lidar_to_gnss"));
+  monitors_.emplace("Camera-Lidar Sensor Calibration",
+                    new PreprocessMonitor("camera_to_lidar"));
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
 

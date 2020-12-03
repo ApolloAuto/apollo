@@ -52,7 +52,8 @@ class PreprocessMonitor : public FuelMonitor {
   /**
    * @brief Constructor of PreprocessMonitor.
    */
-  PreprocessMonitor();
+  PreprocessMonitor() = delete;
+  explicit PreprocessMonitor(const std::string& task_name);
   ~PreprocessMonitor();
 
   /**
@@ -77,6 +78,7 @@ class PreprocessMonitor : public FuelMonitor {
 
   PreprocessTable preprocess_table_;
 
+  std::string task_name_;
   std::unique_ptr<cyber::Node> node_;
 
   nlohmann::json current_status_json_;

@@ -88,7 +88,7 @@ class ConfigYaml(object):
     def _generate_camera_to_lidar_calibration_yaml(self, in_data):
         in_data['intrinsic'] = os.path.join('.', 'init_params',
                                             in_data['source_sensor'] + '_intrinsics.yaml')
-        in_data['extrinsic'] = os.path.join('.', 'init_params',  in_data['source_sensor'] +
+        in_data['extrinsic'] = os.path.join('.', 'init_params', in_data['source_sensor'] +
                                             '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
 
         return in_data

@@ -16,6 +16,7 @@
 
 #include "modules/dreamview/backend/fuel_monitor/preprocess_monitor.h"
 
+#include "absl/strings/str_cat.h"
 #include "gflags/gflags.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
@@ -39,8 +40,9 @@ using Json = nlohmann::json;
 DEFINE_string(progress_topic, "/apollo/dreamview/progress",
               "Sensor calibration preprocess progress topic name.");
 
-PreprocessMonitor::PreprocessMonitor()
-    : node_(cyber::CreateNode("progress_monitor")) {
+PreprocessMonitor::PreprocessMonitor(const std::string& task_name)
+    : task_name_(task_name),
+      node_(cyber::CreateNode(task_name + "_progress_monitor")) {
   InitReaders();
   LoadConfiguration();
 }
@@ -57,18 +59,18 @@ void PreprocessMonitor::InitReaders() {
 void PreprocessMonitor::LoadConfiguration() {
   const std::string& vehicle_dir =
       VehicleManager::Instance()->GetVehicleDataPath();
-  std::string preprocess_config_path =
-      vehicle_dir + "dreamview_conf/precrocess_table.pb.txt";
-  if (!PathExists(preprocess_config_path)) {
+  std::string config_path = absl::StrCat(vehicle_dir, "dreamview_conf/",
+                                         task_name_, "precrocess_table.pb.txt");
+  if (!PathExists(config_path)) {
     AWARN << "No corresponding data collection table file found in "
           << vehicle_dir << ". Using default one instead.";
-    preprocess_config_path = FLAGS_default_preprocess_config_path;
+    config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
+                               "preprocess_table.pb.txt");
   }
 
-  ACHECK(cyber::common::GetProtoFromFile(preprocess_config_path,
-                                         &preprocess_table_))
+  ACHECK(cyber::common::GetProtoFromFile(config_path, &preprocess_table_))
       << "Unable to parse preprocess configuration from file "
-      << preprocess_config_path;
+      << config_path;
 
   std::string json_string;
   MessageToJsonString(preprocess_table_, &json_string);
