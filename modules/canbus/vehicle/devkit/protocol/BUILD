@@ -30,9 +30,9 @@ cc_library(
     name = "bms_report_512",
     srcs = ["bms_report_512.cc"],
     hdrs = ["bms_report_512.h"],
-    copts = CANBUS_COPTS,
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -44,7 +44,7 @@ cc_test(
     srcs = ["bms_report_512_test.cc"],
     deps = [
         "//modules/canbus/vehicle/devkit/protocol:canbus_devkit_protocol",
-        "@com_google_googletest//:gtest_main",
+        "@gtest//:main",
     ],
 )
 
