@@ -318,10 +318,10 @@
 			"menuId": "mapLaneId"
 		},
 		"showDefaultRoutingInput": {
-			"default":false
+			"default": false
 		},
 		"showCycleNumberInput": {
-			"default":false
+			"default": false
 		}
 	},
 	"routingEditor": {
