@@ -31,7 +31,11 @@ RECORD_FILES=()
 RECORD_DIRS=()
 
 function join_by() {
-  local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}";
+  local d=$1
+  shift
+  echo -n "$1"
+  shift
+  printf "%s" "${@/#/$d}"
 }
 
 function print_usage() {
@@ -126,10 +130,13 @@ function get_records() {
     RECORD_DIRS+=($(_get_latest ${DEFAULT_RECORD_DIR}))
   fi
 
+  local tmp_file="${TARGET_DIR}/tmp.txt"
+
   for file in "${RECORD_FILES[@]}"; do
     if [[ -f "${file}" ]]; then
       if [[ "${file}" == *"record"* ]]; then
-        cp "${file}" "${TARGET_DIR}/records"
+        echo '  record_path: "'$(readlink -f ${file})'"' >>"${tmp_file}"
+        sed -i "/# records can be specified as a list/r ${tmp_file}" "${TARGET_DIR}/lidar_to_gnss.config"
       else
         echo "The input file ${file} is not a record!"
         exit 1
@@ -139,6 +146,7 @@ function get_records() {
       exit 1
     fi
   done
+  rm -f ${tmp_file}
 
   for dir in "${RECORD_DIRS[@]}"; do
     if [[ -d "${dir}" ]]; then
@@ -146,20 +154,14 @@ function get_records() {
         echo "There is no reord file in ${dir}!"
         exit 1
       fi
-
-      case "${dir}" in
-        */)
-          cp ${dir}* "${TARGET_DIR}/records"
-          ;;
-        *)
-          cp ${dir}/* "${TARGET_DIR}/records"
-          ;;
-      esac
+      echo '  record_path: "'$(readlink -f ${dir})'"' >>"${tmp_file}"
+      sed -i "/# or, records can be loaded from a directory/r ${tmp_file}" "${TARGET_DIR}/lidar_to_gnss.config"
     else
       echo "Directory ${dir} doesn't exist!"
       exit 1
     fi
   done
+  rm -f ${tmp_file}
 }
 
 function install_if_not_exist() {
@@ -183,7 +185,11 @@ function update_lidar_config() {
   local tmp_file="${TARGET_DIR}/tmp.txt"
   local channel_template="${TEMPLATE_DIR}/channel_template.txt"
   local extraction_rate="5"
-  record="${TARGET_DIR}/records/$(ls ${TARGET_DIR}/records | grep -m1 record)"
+  if [[ ${#RECORD_FILES[*]} -ne 0 ]]; then
+    record="$(readlink -f ${RECORD_FILES[0]})"
+  else
+    record="$(readlink -f ${RECORD_DIRS[0]})/$(ls ${RECORD_DIRS[0]} | grep -m1 record)"
+  fi
   lidar_channels=($(cyber_recorder info ${record} | awk '{print $1}' |
     grep PointCloud2 | grep -v "fusion" | grep -v "compensator"))
 
