@@ -184,8 +184,8 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   EXPECT_DOUBLE_EQ(50.0, car.throttle_percentage());
   EXPECT_DOUBLE_EQ(10.0, car.brake_percentage());
   EXPECT_DOUBLE_EQ(25.0, car.steering_percentage());
-  EXPECT_EQ(80, car.battery_soc_percentage());
-  EXPECT_EQ(Chassis::GEAR_DRIVE, car.gear_localtion());
+  EXPECT_EQ(80, car.battery_percentage());
+  EXPECT_EQ(Chassis::GEAR_DRIVE, car.gear_location());
   EXPECT_EQ("RIGHT", car.current_signal());
 }
 

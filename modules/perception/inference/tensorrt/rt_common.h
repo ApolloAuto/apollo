@@ -16,17 +16,18 @@
 
 #pragma once
 
-#include <cudnn.h>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "NvCaffeParser.h"
 #include "NvInfer.h"
+#include <cudnn.h>
+
+#include "modules/perception/proto/rt.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/common.h"
-#include "modules/perception/proto/rt.pb.h"
 
 namespace apollo {
 namespace perception {

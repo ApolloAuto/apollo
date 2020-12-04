@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
-
 #include <vector>
+
+#include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
 
 namespace apollo {
 namespace perception {

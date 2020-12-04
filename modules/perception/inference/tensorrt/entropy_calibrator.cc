@@ -15,8 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 
-#include <cuda_runtime_api.h>
 #include <fstream>
+
+#include <cuda_runtime_api.h>
 
 namespace nvinfer1 {
 DimsHW ICaffePoolOutputDimensionsFormula::compute(DimsHW input_dims,

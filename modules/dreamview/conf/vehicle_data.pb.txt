@@ -24,7 +24,7 @@ data_files {
 }
 data_files {
   source_path: "velodyne_params"
-  dest_path: "/apollo/modules/drivers/velodyne/params"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/params"
 }
 data_files {
   source_path: "velodyne_params"
@@ -72,7 +72,7 @@ data_files {
 }
 data_files {
   source_path: "velodyne_conf"
-  dest_path: "/apollo/modules/drivers/velodyne/conf"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/conf"
 }
 data_files {
   source_path: "camera_conf"
@@ -156,7 +156,7 @@ data_files {
 }
 data_files {
   source_path: "lidar_params"
-  dest_path: "/apollo/modules/drivers/velodyne/params"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/params"
 }
 data_files {
   source_path: "lidar_params"
@@ -165,4 +165,8 @@ data_files {
 data_files {
   source_path: "lidar_params"
   dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "perception_conf/pointcloud_preprocessor.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
 }

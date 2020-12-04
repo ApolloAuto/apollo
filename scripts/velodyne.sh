@@ -21,15 +21,15 @@ source "${DIR}/scripts/apollo_base.sh"
 
 function start() {
   LOG="${APOLLO_ROOT_DIR}/data/log/velodyne.out"
-  CMD="cyber_launch start /apollo/modules/drivers/velodyne/launch/velodyne.launch"
-  NUM_PROCESSES="$(pgrep -f "/apollo/modules/drivers/velodyne/dag/velodyne.dag" | grep -cv '^1$')"
+  CMD="cyber_launch start /apollo/modules/drivers/lidar/velodyne/launch/velodyne.launch"
+  NUM_PROCESSES="$(pgrep -f "/apollo/modules/drivers/lidar/velodyne/dag/velodyne.dag" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${CMD} </dev/null >${LOG} 2>&1 &"
   fi
 }
 
 function stop() {
-  eval "nohup cyber_launch stop /apollo/modules/drivers/velodyne/launch/velodyne.launch < /dev/null 2>&1 &"
+  eval "nohup cyber_launch stop /apollo/modules/drivers/lidar/velodyne/launch/velodyne.launch < /dev/null 2>&1 &"
 }
 
 # run command_name module_name

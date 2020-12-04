@@ -15,13 +15,15 @@
  *****************************************************************************/
 #include <limits>
 #include <vector>
+
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 namespace apollo {
 namespace perception {
 namespace inference {
 __global__ void cmp(const int nthreads, const float *in_data,
                     const int channels, const int height, const int width,
-                    const bool out_max_val, float *out_data) {
+                    const bool out_max_val, float *out_data,
+                    const float float_min) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < nthreads) {
     int w = idx % width;
@@ -34,7 +36,7 @@ __global__ void cmp(const int nthreads, const float *in_data,
       return;
     }
     int c_max = 0;
-    float v_max = std::numeric_limits<float>::min();
+    float v_max = float_min;
     for (int c = 0; c < channels; c++) {
       int in_idx = ((n * channels + c) * height + h) * width + w;
       if (v_max < in_data[in_idx]) {
@@ -61,7 +63,8 @@ int ArgMax1Plugin::enqueue(int batchSize, const void *const *inputs,
   cmp<<<block_size, thread_size>>>(
       input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize,
       (const float *)inputs[0], input_dims_.d[0], input_dims_.d[1],
-      input_dims_.d[2], out_max_val_, reinterpret_cast<float *>(outputs[0]));
+      input_dims_.d[2], out_max_val_, reinterpret_cast<float *>(outputs[0]),
+      float_min_);
   return 0;
 }
 

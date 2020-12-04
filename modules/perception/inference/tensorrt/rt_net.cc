@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
@@ -602,7 +603,7 @@ void RTNet::init_blob(std::vector<std::string> *names) {
   for (auto name : *names) {
     int bindingIndex =
         engine->getBindingIndex(tensor_modify_map_[name].c_str());
-    CHECK_LT(bindingIndex, buffers_.size());
+    CHECK_LT(static_cast<size_t>(bindingIndex), buffers_.size());
     CHECK_GE(bindingIndex, 0);
     nvinfer1::DimsCHW dims = static_cast<nvinfer1::DimsCHW &&>(
         engine->getBindingDimensions(bindingIndex));
@@ -710,7 +711,7 @@ void RTNet::parse_with_api(
              &weight_map_, network_, &tensor_map, &tensor_modify_map_);
   }
 
-  CHECK_NE(output_names_.size(), 0);
+  CHECK_NE(output_names_.size(), static_cast<size_t>(0));
   std::sort(output_names_.begin(), output_names_.end());
   auto last = std::unique(output_names_.begin(), output_names_.end());
   output_names_.erase(last, output_names_.end());

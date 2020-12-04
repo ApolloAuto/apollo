@@ -164,7 +164,7 @@ Chassis Neolix_eduController::chassis() {
   // 3
   chassis_.set_engine_started(true);
 
-  // 4 speed_mps
+  // 3 speed_mps
   if (chassis_detail.neolix_edu().has_aeb_frontwheelspeed_353() &&
       chassis_detail.neolix_edu().has_aeb_rearwheelspeed_354()) {
     auto wheelspeed = chassis_.mutable_wheel_speed();
@@ -185,7 +185,17 @@ Chassis Neolix_eduController::chassis() {
   } else {
     chassis_.set_speed_mps(0);
   }
-
+  // 4 SOC
+  if (chassis_detail.neolix_edu().has_vcu_vehicle_status_report_101() &&
+      chassis_detail.neolix_edu()
+          .vcu_vehicle_status_report_101()
+          .has_vcu_display_soc()) {
+    chassis_.set_battery_soc_percentage(chassis_detail.neolix_edu()
+                                            .vcu_vehicle_status_report_101()
+                                            .vcu_display_soc());
+  } else {
+    chassis_.set_battery_soc_percentage(0);
+  }
   // 5 steering
   if (chassis_detail.neolix_edu().has_vcu_eps_report_57() &&
       chassis_detail.neolix_edu().vcu_eps_report_57().has_vcu_real_angle()) {

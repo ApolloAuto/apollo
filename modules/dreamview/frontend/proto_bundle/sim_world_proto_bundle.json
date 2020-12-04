@@ -267,6 +267,14 @@
                   "type": "double",
                   "id": 27
                 },
+                "batteryPercentage": {
+                  "type": "int32",
+                  "id": 38
+                },
+                "gearLocation": {
+                  "type": "apollo.canbus.Chassis.GearPosition",
+                  "id": 39
+                },
                 "disengageType": {
                   "type": "DisengageType",
                   "id": 28
@@ -2222,6 +2230,13 @@
                 "vehicleId": {
                   "type": "apollo.common.VehicleID",
                   "id": 33
+                },
+                "batterySocPercentage": {
+                  "type": "int32",
+                  "id": 34,
+                  "options": {
+                    "default": -1
+                  }
                 }
               },
               "nested": {
@@ -3103,7 +3118,8 @@
                   "values": {
                     "LEFT_NUDGE": 1,
                     "RIGHT_NUDGE": 2,
-                    "NO_NUDGE": 3
+                    "DYNAMIC_LEFT_NUDGE": 3,
+                    "DYNAMIC_RIGHT_NUDGE": 4
                   }
                 }
               }

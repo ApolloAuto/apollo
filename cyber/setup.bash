@@ -15,7 +15,6 @@ node_path="${cyber_tool_path}/cyber_node"
 service_path="${cyber_tool_path}/cyber_service"
 monitor_path="${cyber_tool_path}/cyber_monitor"
 visualizer_path="${bazel_bin_path}/modules/tools/visualizer"
-rosbag_to_record_path="${bazel_bin_path}/modules/data/tools/rosbag_to_record"
 
 # TODO(all): place all these in one place and add_to_path
 for entry in "${cyber_bin_path}" \
@@ -23,8 +22,7 @@ for entry in "${cyber_bin_path}" \
     "${channel_path}" "${node_path}" \
     "${service_path}" \
     "${launch_path}" \
-    "${visualizer_path}" \
-    "${rosbag_to_record_path}" ; do
+    "${visualizer_path}" ; do
     add_to_path "${entry}"
 done
 

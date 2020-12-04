@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/robosense/librobosense_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/librobosense_driver_component.so"
 
     components {
       class_name : "RobosenseComponent"
@@ -12,7 +12,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
 
     components {
       class_name : "CompensatorComponent"

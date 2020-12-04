@@ -347,6 +347,55 @@ body {
 
         color: white;
     }
+
+    .default-routing-input {
+        z-index: 10;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #1D2226;
+        padding: 5px;
+
+        .name-label{
+            padding: 10px 0 10px 10px;
+        }
+
+        .name-input {
+            margin: 10px;
+            min-height: 20px;
+        }
+
+        .default-routing-input-btn{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        .input-button {
+            min-width: 100px;
+            display:inline-block;
+            margin:0 5px 5px 5px;
+            padding: 10px 10px;
+            border: 1px solid #383838;
+            background: #1D2226;
+            color: #FFFFFF;
+            vertical-align:middle;
+            text-align: center;
+
+            @include small-screen {
+                min-width: 125px;
+            }
+        }
+
+        .submit-button {
+            background: #000000;
+        }
+
+        .input-button:active {
+            background: #383838;
+        }
+        }
+    }
 }
 
 .hidden {
@@ -390,6 +439,23 @@ body {
                     font-size: 16px;
                 }
             }
+
+            .card-header-btn {
+                border: none;
+                border-bottom: 1px solid #999999;
+                padding: 10px 0px 10px 0px;
+                margin-right: 10px;
+                background: #1D2226;
+                color: #FFFFFF;
+                text-align: left;
+                white-space: nowrap;
+
+                font-size: 18px;
+
+                @include small-screen {
+                    font-size: 16px;
+                }
+            }
         }
 
         .card-content-row {
@@ -400,6 +466,21 @@ body {
             overflow-x: hidden;
             overflow-y: auto;
             height: 85%;
+
+            .cycle-input {
+                display: flex;
+                margin-left: auto;
+                justify-content: flex-start;
+                justify-content: space-between;
+
+                padding: 0px;
+                border: none;
+                background: #1D2226;
+
+                .cycle-input-item {
+                    margin: 10px;
+                }
+            }
         }
 
         .card-content-column {
@@ -496,7 +577,7 @@ body {
         }
     }
 
-    .poi-button {
+    .default-routing-button {
         min-width: 360px;
 
         @include small-screen {
@@ -659,6 +740,47 @@ body {
                 @include monitor-item-common-properties(calc(100% - 80px));
             }
         }
+    }
+
+    .battery-and-gears {
+        position: absolute;
+        width: 224px;
+        height: 35px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+
+        font-size: 14px;
+
+        .left-div {
+            position: absolute;
+            width: 116px;
+            height: 35px;
+        }
+
+        .right-div {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 105px;
+            height: 35px;
+        }
+
+        .text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+
+            float: right;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+    }
+
+    .electricity-status {
+        top: 287px;
+        background: rgba(0, 0, 0, 0.5);
     }
 
     .auto-meter {

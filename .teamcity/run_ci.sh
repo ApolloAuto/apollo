@@ -148,7 +148,7 @@ function determine_gpu_use_host() {
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install " \
-                "latest docker and nvidia-container-toolkit as described by: "
+                "latest Docker and nvidia-container-toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
@@ -228,13 +228,6 @@ function mount_other_volumes() {
     local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
     reuse_or_start_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
     volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
-
-    if [ "${TARGET_ARCH}" = "x86_64" ]; then
-        local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
-        local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
-        reuse_or_start_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
-        volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
-    fi
 
     OTHER_VOLUME_CONF="${volume_conf}"
 }

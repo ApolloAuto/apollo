@@ -195,7 +195,7 @@ void PolygonScanCvter<T>::ScanCvt(const T& scan_loc, DirectionMajor dir_major,
       }
     }
   }
-  CHECK_EQ(nodes.size() % 2, 0);
+  CHECK_EQ(nodes.size() % 2, static_cast<size_t>(0));
   std::sort(nodes.begin(), nodes.end());
   for (size_t i = 0; i < nodes.size(); i += 2) {
     scan_intervals->push_back(IntervalOut(nodes[i], nodes[i + 1]));
@@ -238,7 +238,7 @@ void PolygonScanCvter<T>::ScansCvt(
   }
   // sort
   std::sort(aet_.second.begin(), aet_.second.end());
-  CHECK_EQ(aet_.second.size() & 1, 0);
+  CHECK_EQ(aet_.second.size() & 1, static_cast<size_t>(0));
 
   // add aet to result
   for (size_t i = 0; i < aet_.second.size(); i += 2) {
@@ -406,7 +406,7 @@ void PolygonScanCvter<T>::UpdateAet(std::vector<IntervalOut>* scan_intervals) {
       scan_intervals->push_back(IntervalOut(edge.y, edge.max_y));
     }
   }
-  CHECK_EQ(valid_edges_num & 1, 0)
+  CHECK_EQ(valid_edges_num & 1, static_cast<size_t>(0))
       << boost::format(
              "valid edges num: %d x: %lf bottom_x: %lf \n vertices num: %d "
              "\n") %
@@ -472,7 +472,7 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
   edge.min_y = edge.y;
 
   // save top edge
-  if (x_id >= scans_size_) {
+  if (static_cast<size_t>(x_id) >= scans_size_) {
     std::pair<double, double> seg(low_vertex[op_dir_major_],
                                   high_vertex[op_dir_major_]);
     top_segments_.push_back(seg);

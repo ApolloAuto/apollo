@@ -30,6 +30,7 @@ namespace perception {
 namespace lidar {
 
 using DirectionMajor = Bitmap2D::DirectionMajor;
+using apollo::common::EigenVector;
 using apollo::cyber::common::GetAbsolutePath;
 using base::PolygonDType;
 
@@ -144,7 +145,7 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
 
 bool HdmapROIFilter::FilterWithPolygonMask(
     const base::PointFCloudPtr& cloud,
-    const std::vector<PolygonDType>& map_polygons,
+    const EigenVector<PolygonDType>& map_polygons,
     base::PointIndices* roi_indices) {
   std::vector<Polygon<double>> raw_polygons;
   // convert and obtain the major direction
@@ -185,8 +186,8 @@ bool HdmapROIFilter::FilterWithPolygonMask(
 
 void HdmapROIFilter::TransformFrame(
     const base::PointFCloudPtr& cloud, const Eigen::Affine3d& vel_pose,
-    const std::vector<PolygonDType*>& polygons_world,
-    std::vector<PolygonDType>* polygons_local,
+    const EigenVector<PolygonDType*>& polygons_world,
+    EigenVector<PolygonDType>* polygons_local,
     base::PointFCloudPtr* cloud_local) {
   Eigen::Vector3d vel_location = vel_pose.translation();
   Eigen::Matrix3d vel_rot = vel_pose.linear();

@@ -33,8 +33,8 @@ apt_get_update_and_install \
 # proj installed via apt was 4.9.3, incompatible with pyproj which
 # requres proj >= 6.2.0
 
-if ldconfig -p |grep -q "libproj.so"; then
-    warning "Proj was already installed. Reinstallation skipped"
+if ldconfig -p | grep -q "libproj.so"; then
+    warning "Proj was already installed. Reinstallation skipped."
     exit 0
 fi
 
@@ -47,15 +47,15 @@ download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 
 tar xzf "${PKG_NAME}"
 pushd proj-${VERSION} >/dev/null
-   mkdir build && cd build
-   cmake .. \
-       -DBUILD_SHARED_LIBS=ON \
-       -DBUILD_TESTING=OFF \
-       -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
-       -DCMAKE_BUILD_TYPE=Release
+mkdir build && cd build
+cmake .. \
+    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_TESTING=OFF \
+    -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+    -DCMAKE_BUILD_TYPE=Release
 
-   make -j$(nproc)
-   make install
+make -j$(nproc)
+make install
 popd >/dev/null
 
 ldconfig
@@ -64,7 +64,13 @@ ok "Successfully built proj = ${VERSION}"
 
 rm -fr "${PKG_NAME}" "proj-${VERSION}"
 
-apt_get_remove sqlite3
+# Remove build-deps for proj
+apt_get_remove \
+    libsqlite3-dev \
+    sqlite3 \
+    libtiff-dev \
+    libcurl4-openssl-dev
+
 # Clean up cache to reduce layer size.
-apt-get clean && \
+apt-get clean &&
     rm -rf /var/lib/apt/lists/*

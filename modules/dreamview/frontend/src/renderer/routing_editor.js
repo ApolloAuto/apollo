@@ -5,6 +5,9 @@ import routingPointPin from 'assets/images/routing/pin.png';
 import WS from 'store/websocket';
 import { drawImage } from 'utils/draw';
 
+const minDefaultRoutingPointsNum = 4;
+const maxDistance = 100;
+
 export default class RoutingEditor {
   constructor() {
     this.routePoints = [];
@@ -36,15 +39,18 @@ export default class RoutingEditor {
     this.pointId = 0;
   }
 
-  addRoutingPoint(point, coordinates, scene) {
-    const offsetPoint = coordinates.applyOffset({ x: point.x, y: point.y });
+  addRoutingPoint(point, coordinates, scene, offset = true) {
+    const offsetPoint = offset ? coordinates.applyOffset({ x: point.x, y: point.y }) : point;
     const pointMesh = drawImage(routingPointPin, 3.5, 3.5, offsetPoint.x, offsetPoint.y, 0.3);
     pointMesh.pointId = this.pointId;
     point.id = this.pointId;
     this.pointId += 1;
     this.routePoints.push(pointMesh);
     scene.add(pointMesh);
-    WS.checkRoutingPoint(point);
+    if (offset) {
+      // Default routing has been checked
+      WS.checkRoutingPoint(point);
+    }
   }
 
   setParkingInfo(info) {
@@ -106,5 +112,43 @@ export default class RoutingEditor {
     WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
 
     return true;
+  }
+
+  sendCycleRoutingRequest(routingName, cycleRoutingPoints, cycleNumber,
+    carOffsetPosition, carHeading, coordinates) {
+    const points = cycleRoutingPoints.map((point) => {
+      point.z = 0;
+      return coordinates.applyOffset(point, true);
+    });
+    const start = points[0];
+    const end = points[points.length - 1];
+    const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
+    WS.requestDefaultCycleRouting(start, waypoint, end, cycleNumber);
+    return true;
+  }
+
+  addDefaultRouting(routingName) {
+    if (this.routePoints.length <= minDefaultRoutingPointsNum) {
+      alert(`Please provide at least ${minDefaultRoutingPointsNum} end point.`);
+      return false;
+    }
+
+    const points = this.routePoints.map((object) => {
+      return object.position;
+    });
+    if (!this.checkDefaultRoutingAvailable(points[0], points[points.length - 1])) {
+      alert(`Please set the default routing reasonably,the distance from the start point to the end 
+point should not exceed ${maxDistance},otherwise it will not be able to form a closed loop.`);
+      return false;
+    }
+    WS.saveDefaultRouting(routingName, points);
+  }
+
+  checkDefaultRoutingAvailable(start, end) {
+    if (_.isEmpty(start) || _.isEmpty(end)) {
+      return false;
+    }
+    const distance = Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
+    return distance <= maxDistance;
   }
 }

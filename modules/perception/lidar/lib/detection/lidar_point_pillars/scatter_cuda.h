@@ -46,7 +46,6 @@ namespace lidar {
 class ScatterCuda {
  private:
   const int num_threads_;
-  const int max_num_pillars_;
   const int grid_x_size_;
   const int grid_y_size_;
 
@@ -54,13 +53,12 @@ class ScatterCuda {
   /**
    * @brief Constructor
    * @param[in] num_threads The number of threads to launch cuda kernel
-   * @param[in] max_num_pillars Maximum number of pillars
    * @param[in] grid_x_size Number of pillars in x-coordinate
    * @param[in] grid_y_size Number of pillars in y-coordinate
    * @details Captital variables never change after the compile
    */
-  ScatterCuda(const int num_threads, const int max_num_pillars,
-              const int grid_x_size, const int grid_y_size);
+  ScatterCuda(const int num_threads, const int grid_x_size,
+              const int grid_y_size);
 
   /**
    * @brief Call scatter cuda kernel

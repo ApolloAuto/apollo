@@ -16,6 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
+INSTALL_MODE="$1"; shift
+
+if [[ -z "${INSTALL_MODE}" ]]; then
+    INSTALL_MODE="download"
+fi
+
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -23,20 +29,36 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
-apt-get -y update && \
-    apt-get -y install --no-install-recommends \
+apt_get_update_and_install \
     libasio-dev \
     libtinyxml2-dev
 
-# Note(storypku) & FIXME(all)
-# As FastRTPS installer in the master branch doesn't work well, we provide
-# prebuilt version here as a workaround. To be removed when ready.
-# Maybe the `cyber/transport/rtps` section needs a rewrite using more recent
-# FastRTPS implentations, e.g. 2.0.0
-#
+# Note(storypku)
+# 1) More recent Fast-DDS (formerly Fast-RTPS) implementations:
 # Ref: https://github.com/eProsima/Fast-DDS
 # Ref: https://github.com/ros2/rmw_fastrtps
+# 2) How to create the diff
+# git diff --submodule=diff > /tmp/FastRTPS_1.5.0.patch
+# Ref: https://stackoverflow.com/questions/10757091/git-list-of-all-changed-files-including-those-in-submodules
+
 DEST_DIR="/usr/local/fast-rtps"
+
+if [[ "${INSTALL_MODE}" == "build" ]]; then
+    git clone --single-branch --branch release/1.5.0 --depth 1 https://github.com/eProsima/Fast-RTPS.git
+    pushd Fast-RTPS
+        git submodule update --init
+        patch -p1 < ../FastRTPS_1.5.0.patch
+
+        mkdir -p build && cd build
+        cmake -DEPROSIMA_BUILD=ON \
+            -DCMAKE_INSTALL_PREFIX=${DEST_DIR} ..
+        make -j$(nproc)
+        make install
+    popd
+
+    rm -fr Fast-RTPS
+    exit 0
+fi
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
@@ -60,4 +82,5 @@ else # aarch64
 fi
 
 echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
-
+ldconfig
+apt_get_remove libasio-dev libtinyxml2-dev

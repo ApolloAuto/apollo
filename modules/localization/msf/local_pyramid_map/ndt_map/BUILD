@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["ndt_map_config.h"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_config",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
     ],
 )
 
@@ -22,7 +22,7 @@ cc_library(
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_matrix",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -35,7 +35,7 @@ cc_library(
         ":ndt_map_config",
         ":ndt_map_matrix",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_node",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -46,7 +46,7 @@ cc_library(
     hdrs = ["ndt_map_node_config.h"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_node_config",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -62,7 +62,7 @@ cc_library(
         ":ndt_map_node_config",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_pyramid_map/base_map:base_map_node",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )

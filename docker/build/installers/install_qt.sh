@@ -30,15 +30,13 @@ CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 TARGET_ARCH="$(uname -m)"
 
-apt-get -y update && \
-    apt-get -y install \
+apt_get_update_and_install \
     libx11-xcb1 \
     libfreetype6 \
     libdbus-1-3 \
     libfontconfig1 \
     libxkbcommon0   \
     libxkbcommon-x11-0
-
 # Note(storypku)
 # The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 

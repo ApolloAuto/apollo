@@ -14,7 +14,7 @@ cc_library(
         "//modules/map/pnc_map",
         "@boost",
         "@com_github_nlohmann_json//:json",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
     ],
 )
 

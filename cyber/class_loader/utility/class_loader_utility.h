@@ -80,15 +80,15 @@ void RegisterClass(const std::string& class_name,
   AINFO << "registerclass:" << class_name << "," << base_class_name << ","
         << GetCurLoadingLibraryName();
 
-  utility::AbstractClassFactory<Base>* new_class_factrory_obj =
+  utility::AbstractClassFactory<Base>* new_class_factory_obj =
       new utility::ClassFactory<Derived, Base>(class_name, base_class_name);
-  new_class_factrory_obj->AddOwnedClassLoader(GetCurActiveClassLoader());
-  new_class_factrory_obj->SetRelativeLibraryPath(GetCurLoadingLibraryName());
+  new_class_factory_obj->AddOwnedClassLoader(GetCurActiveClassLoader());
+  new_class_factory_obj->SetRelativeLibraryPath(GetCurLoadingLibraryName());
 
   GetClassFactoryMapMapMutex().lock();
   ClassClassFactoryMap& factory_map =
       GetClassFactoryMapByBaseClass(typeid(Base).name());
-  factory_map[class_name] = new_class_factrory_obj;
+  factory_map[class_name] = new_class_factory_obj;
   GetClassFactoryMapMapMutex().unlock();
 }
 

@@ -60,11 +60,11 @@ license and copyright terms herein.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/inference/operators/roipooling_layer.h"
-
 #include <algorithm>
 #include <vector>
+
 #include "modules/perception/base/blob.h"
+#include "modules/perception/inference/operators/roipooling_layer.h"
 
 namespace apollo {
 namespace perception {
@@ -75,7 +75,8 @@ __global__ void ROIPoolForward(const int nthreads, const Dtype *bottom_data,
                                const int channels, const int height,
                                const int width, const int pooled_height,
                                const int pooled_width, const Dtype *bottom_rois,
-                               Dtype *top_data, int *argmax_data) {
+                               Dtype *top_data, int *argmax_data,
+                               const float float_max) {
   for (int index = blockIdx.x * blockDim.x + threadIdx.x; index < (nthreads);
        index += blockDim.x * gridDim.x) {
     // (n, c, ph, pw) is an element in the pooled output
@@ -124,7 +125,7 @@ __global__ void ROIPoolForward(const int nthreads, const Dtype *bottom_data,
     bool is_empty = (hend <= hstart) || (wend <= wstart);
 
     // Define an empty pooling region to be zero
-    Dtype maxval = is_empty ? 0 : -FLT_MAX;
+    Dtype maxval = is_empty ? 0 : -float_max;
     // If nothing is pooled, argmax = -1 causes nothing to be backprop'd
     int maxidx = -1;
     bottom_data += (roi_batch_ind * channels + c) * height * width;
@@ -163,8 +164,8 @@ void ROIPoolingLayer<Dtype>::ForwardGPU(
   int block_size = (count + thread_size - 1) / thread_size;
   ROIPoolForward<Dtype><<<block_size, thread_size>>>(
       count, bottom_data, use_floor_, spatial_scale_, channels_, height_,
-      width_, pooled_height_, pooled_width_, bottom_rois, top_data,
-      argmax_data);
+      width_, pooled_height_, pooled_width_, bottom_rois, top_data, argmax_data,
+      float_max_);
 }
 template void ROIPoolingLayer<double>::ForwardGPU(
     const std::vector<std::shared_ptr<base::Blob<double>>> &bottom,

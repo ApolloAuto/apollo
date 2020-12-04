@@ -42,15 +42,12 @@ else # aarch64
     fi
 fi
 
-apt-get -y update && \
-    apt-get install -y --no-install-recommends \
+apt_get_update_and_install \
     apt-utils
 
 # Disabled:
 #   apt-file
-
-apt-get -y update && \
-    apt-get -y install -y --no-install-recommends \
+apt_get_update_and_install \
     build-essential \
     autoconf \
     automake \
@@ -78,6 +75,13 @@ apt-get -y update && \
     wget    \
     zip     \
     xz-utils
+
+# Set to manually installed
+# libexpat1-dev was required by python3-dev
+# linux-libc-dev was required by bazel/clang/cuda/...
+apt_get_update_and_install \
+    libexpat1-dev \
+    linux-libc-dev
 
 if [[ "${ARCH}" == "aarch64" ]]; then
     apt-get -y install kmod

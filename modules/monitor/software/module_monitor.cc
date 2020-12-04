@@ -44,17 +44,6 @@ void ModuleMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
   const auto& mode = manager->GetHMIMode();
 
-  // Check HMI modules.
-  auto* hmi_modules = manager->GetStatus()->mutable_hmi_modules();
-  for (const auto& iter : mode.modules()) {
-    const std::string& module_name = iter.first;
-    const auto& component = iter.second;
-    if (component.has_module_monitor_config()) {
-      const auto& config = component.module_monitor_config();
-      UpdateStatus(config, module_name, &hmi_modules->at(module_name));
-    }
-  }
-
   // Check monitored components.
   auto* components = manager->GetStatus()->mutable_components();
   for (const auto& iter : mode.monitored_components()) {

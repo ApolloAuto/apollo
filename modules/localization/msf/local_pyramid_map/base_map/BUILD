@@ -14,7 +14,7 @@ cc_library(
         "//cyber/common",
         "//modules/common/util",
         "//modules/localization/msf/common/util",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -28,7 +28,7 @@ cc_library(
     ],
     deps = [
         "//cyber/common",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
         "@opencv//:imgcodecs",
         "@zlib",
@@ -46,7 +46,7 @@ cc_library(
     deps = [
         ":base_map_config",
         "//cyber/common",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -58,7 +58,7 @@ cc_library(
     deps = [
         ":base_map_node_index",
         "//cyber/common",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -80,7 +80,7 @@ cc_library(
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/common/util:compression",
         "//modules/localization/msf/common/util:file_utility",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -98,7 +98,7 @@ cc_library(
         ":base_map_node_index",
         "//cyber/common",
         "//modules/localization/msf/common/util",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )
@@ -119,7 +119,7 @@ cc_library(
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/common/util:base_map_cache",
         "//modules/localization/msf/common/util:file_utility",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
     ],
 )

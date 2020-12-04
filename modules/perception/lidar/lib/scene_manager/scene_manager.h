@@ -61,7 +61,7 @@ class SceneManager {
       const SceneManagerInitOptions& options = SceneManagerInitOptions());
 
  protected:
-  std::map<std::string, SceneService*> services_;
+  std::map<std::string, SceneServicePtr> services_;
   bool initialized_ = false;
   std::mutex mutex_;
 };

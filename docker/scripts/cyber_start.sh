@@ -20,8 +20,8 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
-VERSION_X86_64="cyber-x86_64-18.04-20201029_0047"
-TESTING_VERSION_X86_64="cyber-x86_64-18.04-testing-20201103_1900"
+VERSION_X86_64="cyber-x86_64-18.04-20201110_0322"
+TESTING_VERSION_X86_64="cyber-x86_64-18.04-testing-20201110_0629"
 
 # ARMV8
 # VERSION_AARCH64="cyber-aarch64-18.04-20200717_0327"
@@ -37,6 +37,7 @@ SHM_SIZE="2G"
 
 SUPPORTED_ARCHS=(x86_64 aarch64)
 HOST_ARCH="$(uname -m)"
+HOST_OS="$(uname -s)"
 TARGET_ARCH=""
 
 USE_GPU_HOST=0
@@ -68,8 +69,8 @@ or type any other key to exit:"
     if [[ "${user_agreed}" == "y" || "${user_agreed}" == "Y" ]]; then
         cp -f "${agreement_file}" "${agreement_record}"
         echo
-        echo "${tip}" >> "${agreement_record}"
-        echo "${user_agreed}" >> "${agreement_record}"
+        echo "${tip}" >>"${agreement_record}"
+        echo "${user_agreed}" >>"${agreement_record}"
     else
         exit 1
     fi
@@ -101,7 +102,7 @@ function _target_arch_check() {
 }
 
 function show_usage() {
-cat <<EOF
+    cat <<EOF
 Usage: $0 [options] ...
 OPTIONS:
     -g <us|cn>             Pull docker image from mirror registry based on geolocation.
@@ -119,8 +120,8 @@ function stop_all_apollo_containers_for_user() {
     local force="$1"
     local running_containers
     running_containers="$(docker ps -a --format '{{.Names}}')"
-    for container in ${running_containers[*]} ; do
-        if [[ "${container}" =~ apollo_.*_${USER} ]] ; then
+    for container in ${running_containers[*]}; do
+        if [[ "${container}" =~ apollo_.*_${USER} ]]; then
             #printf %-*s 70 "Now stop container: ${container} ..."
             #printf "\033[32m[DONE]\033[0m\n"
             #printf "\033[31m[FAILED]\033[0m\n"
@@ -150,50 +151,57 @@ function parse_arguments() {
     local shm_size=""
     local geo=""
 
-    while [[ $# -gt 0 ]] ; do
-        local opt="$1"; shift
+    while [[ $# -gt 0 ]]; do
+        local opt="$1"
+        shift
         case "${opt}" in
-        -g|--geo)
-            geo="$1"; shift
-            _optarg_check_for_opt "${opt}" "${geo}"
-            ;;
-        -t|--tag)
-            if [[ ! -z "${custom_version}" ]]; then
-                warning "Multiple option ${opt} specified, only the last one will take effect."
-            fi
-            custom_version="$1"; shift
-            _optarg_check_for_opt "${opt}" "${custom_version}"
-            ;;
-        -d|--dist)
-            custom_dist="$1"; shift
-            _optarg_check_for_opt "${opt}" "${custom_dist}"
-            ;;
-        -h|--help)
-            show_usage
-            exit 1
-            ;;
-        -l|--local)
-            use_local_image=1
-            ;;
-        -m)
-            target_arch="$1"; shift
-            _optarg_check_for_opt "${opt}" "${target_arch}"
-            _target_arch_check "${target_arch}"
-            ;;
-        --shm-size)
-            shm_size="$1"; shift
-            _optarg_check_for_opt "${opt}" "${shm_size}"
-            ;;
-        stop)
-            local force="$1"; shift
-            info "Now, stop all apollo containers created by ${USER} ..."
-            stop_all_apollo_containers_for_user "${force}"
-            exit 0
-            ;;
-        *)
-            warning "Unknown option: $1"
-            exit 2
-            ;;
+            -g | --geo)
+                geo="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${geo}"
+                ;;
+            -t | --tag)
+                if [[ ! -z "${custom_version}" ]]; then
+                    warning "Multiple option ${opt} specified, only the last one will take effect."
+                fi
+                custom_version="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${custom_version}"
+                ;;
+            -d | --dist)
+                custom_dist="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${custom_dist}"
+                ;;
+            -h | --help)
+                show_usage
+                exit 1
+                ;;
+            -l | --local)
+                use_local_image=1
+                ;;
+            -m)
+                target_arch="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${target_arch}"
+                _target_arch_check "${target_arch}"
+                ;;
+            --shm-size)
+                shm_size="$1"
+                shift
+                _optarg_check_for_opt "${opt}" "${shm_size}"
+                ;;
+            stop)
+                local force="$1"
+                shift
+                info "Now, stop all apollo containers created by ${USER} ..."
+                stop_all_apollo_containers_for_user "${force}"
+                exit 0
+                ;;
+            *)
+                warning "Unknown option: $1"
+                exit 2
+                ;;
         esac
     done # End while loop
 
@@ -217,7 +225,7 @@ function guess_arch_from_tag() {
     local __result="$2"
 
     local arch
-    IFS='-' read -ra __arr <<< "${tag}"
+    IFS='-' read -ra __arr <<<"${tag}"
     IFS=' ' # restore
     if [[ ${#__arr[@]} -lt 3 ]]; then
         warning "Unexpected image: ${tag}"
@@ -261,8 +269,8 @@ function determine_target_version_and_arch() {
             _target_arch_check "${supposed_arch}"
             TARGET_ARCH="${supposed_arch}"
         elif [[ "${TARGET_ARCH}" != "${supposed_arch}" ]]; then
-            error "Target arch (${TARGET_ARCH}) doesn't match supposed arch"\
-                  "(${supposed_arch}) from ${version}"
+            error "Target arch (${TARGET_ARCH}) doesn't match supposed arch" \
+                "(${supposed_arch}) from ${version}"
             exit 1
         fi
     fi
@@ -282,7 +290,7 @@ function geo_specific_config() {
 
 function determine_gpu_use_aarch64() {
     local use_gpu=0
-    if  lsmod | grep -q nvgpu ; then
+    if lsmod | grep -q nvgpu; then
         use_gpu=1
     fi
     if [[ "${use_gpu}" -eq 1 ]]; then
@@ -301,9 +309,9 @@ function determine_gpu_use_aarch64() {
 function determine_gpu_use_amd64() {
     # Check nvidia-driver and GPU device
     local nv_driver="nvidia-smi"
-    if [ ! -x "$(command -v ${nv_driver} )" ]; then
+    if [ ! -x "$(command -v ${nv_driver})" ]; then
         warning "No nvidia-driver found. CPU will be used"
-    elif [ -z "$(eval ${nv_driver} )" ]; then
+    elif [ -z "$(eval ${nv_driver})" ]; then
         warning "No GPU device found. CPU will be used."
     else
         USE_GPU_HOST=1
@@ -326,7 +334,7 @@ function determine_gpu_use_amd64() {
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install latest Docker" \
-                    "and NVIDIA Container Toolkit as described by: "
+                "and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
@@ -351,40 +359,39 @@ function setup_devices_and_mount_volumes() {
     local volumes
     volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
 
-    local kernel="$(uname -s)"
-    if [[ "${kernel}" != "Linux" ]]; then
-        warning "Running Apollo cyber container on ${kernel} is UNTESTED, exiting..."
-        exit 1
-    fi
-
-    local os_release="$(lsb_release -rs)"
-    case "${os_release}" in
-        16.04)
-            # Mount host devices into container (/dev)
-            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
+    if [[ "${HOST_OS}" != "Linux" ]]; then
+        warning "Running Cyber container on ${HOST_OS} is experimental!"
+    else
+        local os_release="$(lsb_release -rs)"
+        case "${os_release}" in
+            16.04)
+                # Mount host devices into container (/dev)
+                warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                     "in the near future. Please upgrade to ubuntu 18.04+."
-            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-                volumes="${volumes} -v /dev:/dev"
-            fi
-            ;;
-        18.04|20.04|*)
-            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-                volumes="${volumes} -v /dev:/dev"
-            fi
-            ;;
-    esac
+                if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                    volumes="${volumes} -v /dev:/dev"
+                fi
+                ;;
+            18.04 | 20.04 | *)
+                if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                    volumes="${volumes} -v /dev:/dev"
+                fi
+                ;;
+        esac
+    fi
 
     volumes="${volumes} -v /etc/localtime:/etc/localtime:ro"
     # volumes="${volumes} -v /usr/src:/usr/src"
-    if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
-        volumes="${volumes} -v /dev/null:/dev/raw1394 \
+    if [[ "${kernel}" == "Linux" ]]; then
+        if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+            volumes="${volumes} -v /dev/null:/dev/raw1394 \
                             -v /media:/media \
                             -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                             -v /lib/modules:/lib/modules \
                     "
-
+        fi
     fi
-    volumes="$(tr -s " " <<< "${volumes}")"
+    volumes="$(tr -s " " <<<"${volumes}")"
     eval "${__retval}='${volumes}'"
 }
 
@@ -401,8 +408,8 @@ function docker_pull_if_needed() {
     local use_local_image="$2"
     if [[ ${use_local_image} -eq 1 ]]; then
         info "Start cyber container based on local image: ${image}"
-    elif docker images -a --format '{{.Repository}}:{{.Tag}}' \
-        | grep -q "${image}"; then
+    elif docker images -a --format '{{.Repository}}:{{.Tag}}' |
+        grep -q "${image}"; then
         info "Image ${image} found locally, will be used."
         use_local_image=1
     fi
@@ -434,7 +441,7 @@ function check_multi_arch_support() {
     local qemu="multiarch/qemu-user-static"
     local refer="https://github.com/multiarch/qemu-user-static"
     local qemu_cmd="docker run --rm --privileged ${qemu} --reset -p yes"
-    if docker images --format "{{.Repository}}" |grep -q "${qemu}" ; then
+    if docker images --format "{{.Repository}}" | grep -q "${qemu}"; then
         info "Run: ${qemu_cmd}"
         ## docker run --rm --privileged "${qemu}" --reset -p yes >/dev/null
         eval "${qemu_cmd}" >/dev/null
@@ -479,6 +486,7 @@ function start_cyber_container() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${image}" \
+        -e HOST_OS="${HOST_OS}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
@@ -494,7 +502,7 @@ function start_cyber_container() {
         "${image}" \
         /bin/bash
 
-    if [ $? -ne 0 ];then
+    if [ $? -ne 0 ]; then
         error "Failed to start docker container \"${CYBER_CONTAINER}\" based on image: ${image}"
         exit 1
     fi
@@ -537,10 +545,9 @@ function main() {
     after_run_setup
 
     ok "Congrats, you have successfully finished setting up Apollo cyber docker environment." \
-       "To login into cyber container, please run the following command:"
+        "To login into cyber container, please run the following command:"
     ok "  bash docker/scripts/cyber_into.sh"
     ok "Enjoy!"
 }
 
 main "$@"
-

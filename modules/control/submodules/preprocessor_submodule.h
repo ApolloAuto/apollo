@@ -102,5 +102,6 @@ class PreprocessorSubmodule final : public cyber::Component<LocalView> {
 };
 
 CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);
+
 }  // namespace control
 }  // namespace apollo
