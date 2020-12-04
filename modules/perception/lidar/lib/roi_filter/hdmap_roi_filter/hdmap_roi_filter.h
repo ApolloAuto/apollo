@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/bitmap2d.h"
@@ -45,15 +46,15 @@ class HdmapROIFilter : public BaseROIFilter {
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
 
  private:
-  void TransformFrame(const base::PointFCloudPtr& cloud,
-                      const Eigen::Affine3d& vel_pose,
-                      const std::vector<base::PolygonDType*>& polygons_world,
-                      std::vector<base::PolygonDType>* polygons_local,
-                      base::PointFCloudPtr* cloud_local);
+  void TransformFrame(
+      const base::PointFCloudPtr& cloud, const Eigen::Affine3d& vel_pose,
+      const apollo::common::EigenVector<base::PolygonDType*>& polygons_world,
+      apollo::common::EigenVector<base::PolygonDType>* polygons_local,
+      base::PointFCloudPtr* cloud_local);
 
   bool FilterWithPolygonMask(
       const base::PointFCloudPtr& cloud,
-      const std::vector<base::PolygonDType>& map_polygons,
+      const apollo::common::EigenVector<base::PolygonDType>& map_polygons,
       base::PointIndices* roi_indices);
 
   bool Bitmap2dFilter(const base::PointFCloudPtr& in_cloud,
@@ -65,8 +66,8 @@ class HdmapROIFilter : public BaseROIFilter {
   double extend_dist_ = 0.0;
   bool no_edge_table_ = false;
   bool set_roi_service_ = false;
-  std::vector<base::PolygonDType*> polygons_world_;
-  std::vector<base::PolygonDType> polygons_local_;
+  apollo::common::EigenVector<base::PolygonDType*> polygons_world_;
+  apollo::common::EigenVector<base::PolygonDType> polygons_local_;
   Bitmap2D bitmap_;
   ROIServiceContent roi_service_content_;
 

@@ -44,6 +44,9 @@ TEST(EndpointTest, construction) {
     EXPECT_EQ(erole.host_name(), "123");
     EXPECT_EQ(erole.process_id(), 54321);
     EXPECT_NE(erole.id(), e0.id().HashValue());
+
+    auto id = std::string(e0.id().data(), ID_SIZE);
+    EXPECT_NE(std::string("endpoint"), id);
   }
 }
 

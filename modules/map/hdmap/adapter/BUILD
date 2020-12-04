@@ -25,6 +25,7 @@ cc_library(
     hdrs = ["coordinate_convert_tool.h"],
     deps = [
         "//modules/map/hdmap/adapter/xml_parser:status",
+        "@com_github_google_glog//:glog",
         "@proj",
     ],
 )

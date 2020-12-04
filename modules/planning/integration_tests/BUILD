@@ -7,6 +7,7 @@ cc_library(
     name = "planning_test_base",
     srcs = ["planning_test_base.cc"],
     hdrs = ["planning_test_base.h"],
+    copts = ["-fno-access-control"],
     data = [
         "//modules/planning:planning_conf",
         "//modules/planning:planning_testdata",
@@ -53,7 +54,7 @@ cc_library(
 
 cc_test(
     name = "sunnyvale_big_loop_test",
-    size = "small",
+    size = "medium",
     srcs = ["sunnyvale_big_loop_test.cc"],
     data = [
         "//modules/common/configs:config_gflags",

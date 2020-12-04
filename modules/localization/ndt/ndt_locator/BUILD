@@ -23,7 +23,7 @@ cc_library(
         "//modules/localization/msf/local_pyramid_map/ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
         "@local_config_pcl//:pcl",
     ],

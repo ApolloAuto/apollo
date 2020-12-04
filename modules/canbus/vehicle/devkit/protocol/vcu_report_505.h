@@ -32,51 +32,45 @@ class Vcureport505 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'Battary_Soc', 'offset': 0.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 47,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': '%'}
-  int battary_soc(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'name': 'Vehicle_Mode_State', 'enum': {0:
+  // config detail: {'bit': 36, 'enum': {0:
   // 'VEHICLE_MODE_STATE_MANUAL_REMOTE_MODE', 1: 'VEHICLE_MODE_STATE_AUTO_MODE',
   // 2: 'VEHICLE_MODE_STATE_EMERGENCY_MODE', 3:
-  // 'VEHICLE_MODE_STATE_STANDBY_MODE'}, 'precision': 1.0, 'len': 2,
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit':
-  // 36, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  // 'VEHICLE_MODE_STATE_STANDBY_MODE'}, 'is_signed_var': False, 'len': 2,
+  // 'name': 'Vehicle_Mode_State', 'offset': 0.0, 'order': 'motorola',
+  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
   Vcu_report_505::Vehicle_mode_stateType vehicle_mode_state(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'FrontCrash_State', 'enum': {0:
-  // 'FRONTCRASH_STATE_NO_EVENT', 1: 'FRONTCRASH_STATE_CRASH_EVENT'},
-  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|0]', 'bit': 33, 'type': 'enum', 'order': 'motorola',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 33, 'enum': {0: 'FRONTCRASH_STATE_NO_EVENT', 1:
+  // 'FRONTCRASH_STATE_CRASH_EVENT'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'FrontCrash_State', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Vcu_report_505::Frontcrash_stateType frontcrash_state(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'BackCrash_State', 'enum': {0:
-  // 'BACKCRASH_STATE_NO_EVENT', 1: 'BACKCRASH_STATE_CRASH_EVENT'},
-  // 'precision': 1.0, 'len': 1, 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|0]', 'bit': 34, 'type': 'enum', 'order': 'motorola',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 34, 'enum': {0: 'BACKCRASH_STATE_NO_EVENT', 1:
+  // 'BACKCRASH_STATE_CRASH_EVENT'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'BackCrash_State', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Vcu_report_505::Backcrash_stateType backcrash_state(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'AEB_State', 'enum': {0: 'AEB_STATE_INACTIVE', 1:
-  // 'AEB_STATE_ACTIVE'}, 'precision': 1.0, 'len': 1, 'is_signed_var': False,
-  // 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 32, 'type': 'enum',
-  // 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 32, 'enum': {0: 'AEB_STATE_INACTIVE', 1:
+  // 'AEB_STATE_ACTIVE'}, 'is_signed_var': False, 'len': 1, 'name': 'AEB_State',
+  // 'offset': 0.0, 'order': 'motorola', 'physical_range': '[0|0]',
+  // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Vcu_report_505::Aeb_stateType aeb_state(const std::uint8_t* bytes,
                                           const int32_t length) const;
 
-  // config detail: {'name': 'ACC', 'offset': 0.0, 'precision': 0.01, 'len': 12,
-  // 'is_signed_var': True, 'physical_range': '[-10|10]', 'bit': 7, 'type':
-  // 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
+  // config detail: {'bit': 7, 'is_signed_var': True, 'len': 12, 'name': 'ACC',
+  // 'offset': 0.0, 'order': 'motorola', 'physical_range': '[-10|10]',
+  // 'physical_unit': 'm/s^2', 'precision': 0.01, 'type': 'double'}
   double acc(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'SPEED', 'offset': 0.0, 'precision': 0.001, 'len':
-  // 16, 'is_signed_var': False, 'physical_range': '[0|65.535]', 'bit': 23,
-  // 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s'}
+  // config detail: {'bit': 23, 'is_signed_var': False, 'len': 16, 'name':
+  // 'SPEED', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|65.535]', 'physical_unit': 'm/s', 'precision': 0.001, 'type': 'double'}
   double speed(const std::uint8_t* bytes, const int32_t length) const;
 };
 

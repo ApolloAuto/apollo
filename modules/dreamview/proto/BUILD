@@ -6,63 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "hmi_mode_cc_proto",
-    deps = [
-        ":hmi_mode_proto",
-    ],
-)
-
-proto_library(
-    name = "hmi_mode_proto",
-    srcs = ["hmi_mode.proto"],
-)
-
-py_proto_library(
-    name = "hmi_mode_py_pb2",
-    deps = [
-        ":hmi_mode_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "point_cloud_cc_proto",
-    deps = [
-        ":point_cloud_proto",
-    ],
-)
-
-proto_library(
-    name = "point_cloud_proto",
-    srcs = ["point_cloud.proto"],
-)
-
-py_proto_library(
-    name = "point_cloud_py_pb2",
-    deps = [
-        ":point_cloud_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "camera_update_cc_proto",
-    deps = [
-        ":camera_update_proto",
-    ],
-)
-
-proto_library(
-    name = "camera_update_proto",
-    srcs = ["camera_update.proto"],
-)
-
-py_proto_library(
-    name = "camera_update_py_pb2",
-    deps = [
-        ":camera_update_proto",
-    ],
-)
-
-cc_proto_library(
     name = "data_collection_table_cc_proto",
     deps = [
         ":data_collection_table_proto",
@@ -78,39 +21,6 @@ py_proto_library(
     name = "data_collection_table_py_pb2",
     deps = [
         ":data_collection_table_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "simulation_world_cc_proto",
-    deps = [
-        ":simulation_world_proto",
-    ],
-)
-
-proto_library(
-    name = "simulation_world_proto",
-    srcs = ["simulation_world.proto"],
-    deps = [
-        "//modules/common/monitor_log/proto:monitor_log_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
-        "//modules/planning/proto:planning_internal_proto",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "simulation_world_py_pb2",
-    deps = [
-        ":simulation_world_proto",
-        "//modules/common/monitor_log/proto:monitor_log_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
-        "//modules/planning/proto:planning_internal_py_pb2",
-        "//modules/prediction/proto:feature_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
     ],
 )
 
@@ -134,6 +44,41 @@ py_proto_library(
     deps = [
         ":chart_proto",
         "//modules/common/proto:geometry_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "simulation_world_cc_proto",
+    deps = [
+        ":simulation_world_proto",
+    ],
+)
+
+proto_library(
+    name = "simulation_world_proto",
+    srcs = ["simulation_world.proto"],
+    deps = [
+        "//modules/canbus/proto:chassis_proto",
+        "//modules/common/monitor_log/proto:monitor_log_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/perception/proto:perception_obstacle_proto",
+        "//modules/planning/proto:planning_internal_proto",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/routing/proto:routing_proto",
+    ],
+)
+
+py_proto_library(
+    name = "simulation_world_py_pb2",
+    deps = [
+        ":simulation_world_proto",
+        "//modules/canbus/proto:chassis_py_pb2",
+        "//modules/common/monitor_log/proto:monitor_log_py_pb2",
+        "//modules/common/proto:pnc_point_py_pb2",
+        "//modules/perception/proto:perception_obstacle_py_pb2",
+        "//modules/planning/proto:planning_internal_py_pb2",
+        "//modules/prediction/proto:feature_py_pb2",
+        "//modules/routing/proto:routing_py_pb2",
     ],
 )
 
@@ -163,6 +108,44 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "hmi_mode_cc_proto",
+    deps = [
+        ":hmi_mode_proto",
+    ],
+)
+
+proto_library(
+    name = "hmi_mode_proto",
+    srcs = ["hmi_mode.proto"],
+)
+
+py_proto_library(
+    name = "hmi_mode_py_pb2",
+    deps = [
+        ":hmi_mode_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "camera_update_cc_proto",
+    deps = [
+        ":camera_update_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_update_proto",
+    srcs = ["camera_update.proto"],
+)
+
+py_proto_library(
+    name = "camera_update_py_pb2",
+    deps = [
+        ":camera_update_proto",
+    ],
+)
+
+cc_proto_library(
     name = "hmi_config_cc_proto",
     deps = [
         ":hmi_config_proto",
@@ -178,5 +161,24 @@ py_proto_library(
     name = "hmi_config_py_pb2",
     deps = [
         ":hmi_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "point_cloud_cc_proto",
+    deps = [
+        ":point_cloud_proto",
+    ],
+)
+
+proto_library(
+    name = "point_cloud_proto",
+    srcs = ["point_cloud.proto"],
+)
+
+py_proto_library(
+    name = "point_cloud_py_pb2",
+    deps = [
+        ":point_cloud_proto",
     ],
 )

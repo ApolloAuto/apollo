@@ -23,6 +23,7 @@
 #include <queue>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/time/clock.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/status/status.h"
@@ -149,7 +150,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     const auto& gear = partitioned_trajectories->at(i).second;
     const auto& trajectory = partitioned_trajectories->at(i).first;
     size_t trajectory_size = trajectory.size();
-    CHECK_GT(trajectory_size, 0);
+    CHECK_GT(trajectory_size, 0U);
 
     flag_change_to_next = CheckReachTrajectoryEnd(
         trajectory, gear, trajectories_size, i, &current_trajectory_index,
@@ -279,8 +280,8 @@ void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
   interpolated_trajectory->clear();
   size_t interpolated_pieces_num =
       open_space_trajectory_partition_config_.interpolated_pieces_num();
-  CHECK_GT(stitched_trajectory_result.size(), 0);
-  CHECK_GT(interpolated_pieces_num, 0);
+  CHECK_GT(stitched_trajectory_result.size(), 0U);
+  CHECK_GT(interpolated_pieces_num, 0U);
   size_t trajectory_to_be_partitioned_intervals_num =
       stitched_trajectory_result.size() - 1;
   size_t interpolated_points_num = interpolated_pieces_num - 1;
@@ -582,7 +583,7 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = partitioned_trajectories.at(i).first;
     size_t trajectory_size = trajectory.size();
-    CHECK_GT(trajectory_size, 0);
+    CHECK_GT(trajectory_size, 0U);
     std::priority_queue<std::pair<size_t, double>,
                         std::vector<std::pair<size_t, double>>, comp_>
         failsafe_closest_point;

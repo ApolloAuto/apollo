@@ -78,6 +78,7 @@ using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
+using apollo::task_manager::Task;
 
 using Json = nlohmann::json;
 using ::google::protobuf::util::MessageToJsonString;
@@ -310,6 +311,7 @@ void SimulationWorldService::InitReaders() {
         std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
         monitor_msgs_.push_back(monitor_message);
       });
+  task_reader_ = node_->CreateReader<Task>(FLAGS_task_topic);
 }
 
 void SimulationWorldService::InitWriters() {
@@ -334,6 +336,7 @@ void SimulationWorldService::InitWriters() {
 
   routing_response_writer_ =
       node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+  task_writer_ = node_->CreateWriter<Task>(FLAGS_task_topic);
 }
 
 void SimulationWorldService::Update() {
@@ -541,6 +544,10 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
+
+  auto_driving_car->set_battery_percentage(
+    chassis.battery_soc_percentage());
+  auto_driving_car->set_gear_location(chassis.gear_location());
 }
 
 template <>
@@ -1347,6 +1354,7 @@ void SimulationWorldService::DumpMessages() {
   DumpMessageFromReader(perception_traffic_light_reader_.get());
   DumpMessageFromReader(relative_map_reader_.get());
   DumpMessageFromReader(navigation_reader_.get());
+  DumpMessageFromReader(task_reader_.get());
 }
 
 void SimulationWorldService::PublishNavigationInfo(
@@ -1359,6 +1367,11 @@ void SimulationWorldService::PublishRoutingRequest(
     const std::shared_ptr<RoutingRequest> &routing_request) {
   FillHeader(FLAGS_dreamview_module_name, routing_request.get());
   routing_request_writer_->Write(routing_request);
+}
+
+void SimulationWorldService::PublishTask(const std::shared_ptr<Task> &task) {
+  FillHeader(FLAGS_dreamview_module_name, task.get());
+  task_writer_->Write(task);
 }
 
 void SimulationWorldService::PublishMonitorMessage(

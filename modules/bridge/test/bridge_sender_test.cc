@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
     count = 10000;
   } else {
     count = atoi(argv[1]);
-    CHECK_LE(count, 20000);
+    CHECK_LE(count, 20000U);
   }
   send("127.0.0.1", 8900, count);
   return 0;

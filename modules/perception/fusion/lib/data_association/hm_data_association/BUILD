@@ -112,6 +112,7 @@ cc_test(
     name = "track_object_test",
     size = "small",
     srcs = ["track_object_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":hm_tracks_objects_match",
         "//modules/perception/base:frame",

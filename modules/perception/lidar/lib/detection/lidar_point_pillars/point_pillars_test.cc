@@ -150,7 +150,7 @@ TestClass::TestClass()
 
   point_pillars_ptr_.reset(new PointPillars(
       reproduce_result_mode, score_threshold, nms_overlap_threshold,
-      FLAGS_pfe_torch_file, FLAGS_rpn_onnx_file));
+      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
 }
 
 TestClass::TestClass(const int num_class, const int max_num_pillars,
@@ -192,7 +192,7 @@ TestClass::TestClass(const int num_class, const int max_num_pillars,
 
   point_pillars_ptr_.reset(new PointPillars(
       reproduce_result_mode, score_threshold, nms_overlap_threshold,
-      FLAGS_pfe_torch_file, FLAGS_rpn_onnx_file));
+      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
 }
 
 void TestClass::Preprocess(const float* in_points_array, int in_num_points,

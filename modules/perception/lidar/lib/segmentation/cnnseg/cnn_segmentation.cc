@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
+
 #include <map>
+
+#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
-#include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
-#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
@@ -148,7 +149,8 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
       << "Failed to init ground detection.";
 
   // init roi filter
-  roi_filter_ = BaseROIFilterRegisterer::GetInstanceByName(cnnseg_param_.roi_filter());
+  roi_filter_ =
+      BaseROIFilterRegisterer::GetInstanceByName(cnnseg_param_.roi_filter());
   CHECK_NOTNULL(roi_filter_);
   ROIFilterInitOptions roi_filter_init_options;
   ACHECK(roi_filter_->Init(roi_filter_init_options))

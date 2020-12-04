@@ -30,8 +30,8 @@ cc_binary(
 
 cc_library(
     name = "binary",
-    hdrs = ["binary.h"],
     srcs = ["binary.cc"],
+    hdrs = ["binary.h"],
 )
 
 cc_library(
@@ -104,12 +104,11 @@ cc_library(
         "//cyber/time:rate",
         "//cyber/timer",
         "//cyber/transport",
-        "//cyber/transport:participant",
-        "//cyber/transport:sub_listener",
-        "@com_google_glog//:glog",
+        "//cyber/transport/rtps:participant",
+        "//cyber/transport/rtps:sub_listener",
+        "@com_github_google_glog//:glog",
         "@com_google_protobuf//:protobuf",
         "@fastrtps",
-        "@uuid",
     ],
 )
 

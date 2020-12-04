@@ -316,6 +316,12 @@
 		"showMapLaneId": {
 			"default": false,
 			"menuId": "mapLaneId"
+		},
+		"showDefaultRoutingInput": {
+			"default": false
+		},
+		"showCycleNumberInput": {
+			"default": false
 		}
 	},
 	"routingEditor": {

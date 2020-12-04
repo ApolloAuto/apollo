@@ -33,9 +33,6 @@ apt-get -y update && \
     libuuid1 \
     uuid-dev
 
-info "Install gflags & glog..."
-bash ${CURR_DIR}/install_gflags_glog.sh
-
 info "Install protobuf ..."
 bash ${CURR_DIR}/install_protobuf.sh
 

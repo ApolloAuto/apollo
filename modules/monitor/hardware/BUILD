@@ -9,8 +9,7 @@ cc_library(
     hdrs = ["gps_monitor.h"],
     deps = [
         "//cyber",
-        "//modules/drivers/gnss/proto:gnss_status_cc_proto",
-        "//modules/drivers/gnss/proto:ins_cc_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",

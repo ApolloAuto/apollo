@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/frame.h"
@@ -24,8 +22,7 @@
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
-
-#define private public
+#include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
 
 namespace apollo {
 namespace perception {

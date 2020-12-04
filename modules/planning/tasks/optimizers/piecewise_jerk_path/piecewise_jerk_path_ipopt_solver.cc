@@ -29,7 +29,7 @@ PiecewiseJerkPathIpoptSolver::PiecewiseJerkPathIpoptSolver(
     const double x_init, const double dx_init, const double ddx_init,
     const double delta_s, const double dddx_max,
     std::vector<std::pair<double, double>> d_bounds) {
-  CHECK_GT(d_bounds.size(), 1);
+  CHECK_GT(d_bounds.size(), 1U);
 
   x_init_ = x_init;
 

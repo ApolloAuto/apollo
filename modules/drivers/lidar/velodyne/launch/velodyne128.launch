@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>gnss</name>
+        <dag_conf>/apollo/modules/drivers/lidar/velodyne/dag/velodyne128.dag</dag_conf>
+        <process_name>gnss</process_name>
+    </module>
+</cyber>

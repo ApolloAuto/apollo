@@ -1,19 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+# Tailored from https://github.com/google/glog/blob/master/BUILD
 
-package(default_visibility = ["//visibility:public"])
+load(":bazel/glog.bzl", "glog_library")
 
-licenses(["notice"])
-
-cc_library(
-    name = "glog",
-    includes = [
-        ".",
-    ],
-    linkopts = [
-        "-L/usr/local/lib",
-        "-lglog",
-    ],
-    deps = [
-        "@com_github_gflags_gflags//:gflags",
-    ],
-)
+glog_library(with_gflags=0)

@@ -21,6 +21,8 @@ import PointCloud from 'renderer/point_cloud.js';
 
 const _ = require('lodash');
 
+const preventEditTag = ['BUTTON', 'INPUT'];
+
 class Renderer {
   constructor() {
     // Disable antialias for mobile devices.
@@ -323,10 +325,14 @@ class Renderer {
     }
   }
 
-  addDefaultEndPoint(points) {
+  addDefaultEndPoint(points, offset = true) {
     for (let i = 0; i < points.length; i++) {
-      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene);
+      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene, offset);
     }
+  }
+
+  addDefaultRouting(routingName) {
+    return this.routingEditor.addDefaultRouting(routingName);
   }
 
   removeInvalidRoutingPoint(pointId, error) {
@@ -351,7 +357,17 @@ class Renderer {
       this.coordinates);
   }
 
+  sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {
+    return this.routingEditor.sendCycleRoutingRequest
+    (defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
+      this.adc.mesh.rotation.y,
+      this.coordinates);
+  }
+
   editRoute(event) {
+    if (event.target && preventEditTag.includes(event.target.tagName)) {
+      return;
+    }
     if (!this.routingEditor.isInEditingMode() || event.button !== THREE.MOUSE.LEFT) {
       return;
     }

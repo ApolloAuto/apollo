@@ -22,7 +22,6 @@
 #include <cuda_runtime_api.h>
 
 #include "cyber/common/log.h"
-
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/base/point_cloud_util.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -55,7 +54,7 @@ PointPillarsDetection::PointPillarsDetection()
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   point_pillars_ptr_.reset(new PointPillars(
       FLAGS_reproduce_result_mode, FLAGS_score_threshold,
-      FLAGS_nms_overlap_threshold, FLAGS_pfe_torch_file, FLAGS_rpn_onnx_file));
+      FLAGS_nms_overlap_threshold, FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
   return true;
 }
 

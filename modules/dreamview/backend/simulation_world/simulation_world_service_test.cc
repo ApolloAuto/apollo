@@ -167,6 +167,8 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   chassis.set_throttle_percentage(50);
   chassis.set_brake_percentage(10);
   chassis.set_steering_percentage(25);
+  chassis.set_battery_soc_percentage(80);
+  chassis.set_gear_location(Chassis::GEAR_DRIVE);
   chassis.mutable_signal()->set_turn_signal(
       apollo::common::VehicleSignal::TURN_RIGHT);
 
@@ -182,6 +184,8 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   EXPECT_DOUBLE_EQ(50.0, car.throttle_percentage());
   EXPECT_DOUBLE_EQ(10.0, car.brake_percentage());
   EXPECT_DOUBLE_EQ(25.0, car.steering_percentage());
+  EXPECT_EQ(80, car.battery_percentage());
+  EXPECT_EQ(Chassis::GEAR_DRIVE, car.gear_location());
   EXPECT_EQ("RIGHT", car.current_signal());
 }
 

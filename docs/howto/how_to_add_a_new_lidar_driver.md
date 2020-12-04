@@ -10,17 +10,17 @@ As default, Apollo platform support multiple types of Lidar drivers, including 1
 
 Taking velodyne lidar driver as an example, there are three major components:
 
-1. [Driver](../../modules/drivers/velodyne/driver): Driver receives UDP data packets from lidar sensor, and packages the data packets into a frame of scanning data in the format of VelodyneScan. VelodyneScan is defined in file below:
+1. [Driver](../../modules/drivers/lidar/velodyne/driver): Driver receives UDP data packets from lidar sensor, and packages the data packets into a frame of scanning data in the format of VelodyneScan. VelodyneScan is defined in file below:
 ```
-modules/drivers/velodyne/proto/velodyne.proto
+modules/drivers/lidar/velodyne/proto/velodyne.proto
 ```
 
-2. [Parser](../../modules/drivers/velodyne/parser): Parser takes one frame data in format of VelodyneScan as input, converts the cloud points in the frame from spherical coordinate system to Cartesian coordinates system, then sends out the point cloud as output. The pointcloud format is defined in file below:
+2. [Parser](../../modules/drivers/lidar/velodyne/parser): Parser takes one frame data in format of VelodyneScan as input, converts the cloud points in the frame from spherical coordinate system to Cartesian coordinates system, then sends out the point cloud as output. The pointcloud format is defined in file below:
 ```
 modules/drivers/proto/pointcloud.proto
 ```
 
-3. [Compensator](../../modules/drivers/velodyne/compensator): Compensator takes pointcloud data and pose data as inputs. Based on the corresponding pose information for each cloud point, it converts each cloud point information aligned with the latest time in the current lidar scan frame, minimizing the motion error due the movement of the vehicle. Thus, each cloud point needs carry its own timestamp information.
+3. [Compensator](../../modules/drivers/lidar/velodyne/compensator): Compensator takes pointcloud data and pose data as inputs. Based on the corresponding pose information for each cloud point, it converts each cloud point information aligned with the latest time in the current lidar scan frame, minimizing the motion error due the movement of the vehicle. Thus, each cloud point needs carry its own timestamp information.
 
 ## Steps to add a new Lidar driver
 
@@ -45,7 +45,7 @@ message ScanData {
 }
 ```
 
-In velodyne driver, the scan data message is define as [VelodyneScan](../../modules/drivers/velodyne/proto/velodyne.proto#L29).
+In velodyne driver, the scan data message is define as [VelodyneScan](../../modules/drivers/lidar/velodyne/proto/velodyne.proto#L29).
 
 #### 3. Access the raw data
 
@@ -141,7 +141,7 @@ After done with each component, you just need to configure the DAG config file t
 ```python
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/driver/libxxx_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/driver/libxxx_driver_component.so"
     components {
       class_name : "DriverComponent"
       config {
@@ -152,7 +152,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/parser/libxxx_parser_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/parser/libxxx_parser_component.so"
     components {
       class_name : "ParserComponent"
       config {
@@ -164,12 +164,12 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/compensator/libxxx_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/compensator/libxxx_compensator_component.so"
     components {
       class_name : "CompensatorComponent"
       config {
         name : "pointcloud_compensator"
-        config_file_path : "/apollo/modules/drivers/xxx/conf/xxx_compensator_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/xxx/conf/xxx_compensator_conf.pb.txt"
         readers {channel: "/apollo/sensor/xxx/PointCloud2"}
       }
     }

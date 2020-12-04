@@ -16,11 +16,12 @@
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
 
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -245,6 +246,13 @@ Chassis ChController::chassis() {
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, firmware error or emergency button pressed!");
+  }
+
+  // 27 battery soc
+  if (chassis_detail.ch().has_ecu_status_2_516() &&
+      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.ch().ecu_status_2_516().battery_soc());
   }
 
   return chassis_;

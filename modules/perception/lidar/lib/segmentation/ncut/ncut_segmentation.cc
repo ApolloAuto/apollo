@@ -16,10 +16,11 @@
 
 #include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
-#include <omp.h>
 #include <algorithm>
 #include <limits>
 #include <map>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -44,7 +45,8 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
   }
 
   // init ground detector
-  ground_detector_ = BaseGroundDetectorRegisterer::GetInstanceByName(ground_detector_str_);
+  ground_detector_ =
+      BaseGroundDetectorRegisterer::GetInstanceByName(ground_detector_str_);
   CHECK_NOTNULL(ground_detector_);
   GroundDetectorInitOptions ground_detector_init_options;
   ACHECK(ground_detector_->Init(ground_detector_init_options))

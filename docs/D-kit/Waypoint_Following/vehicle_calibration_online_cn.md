@@ -88,8 +88,8 @@
 
 确认好上述标定条件后，通常情况下使用默认标定配置可以覆盖小车大部分踏板控制范围，如果需要修改配置文件，则需要将`apollo/modules/calibration/data/dev_kit/dreamview_conf/data_collection_table.pb.txt` 中`Go Straight`部分配置进行修改，其它部分配置代码无需修改，无需删除，通过启动dreamview后重新选择车辆后配置生效，具体修改代码如下：
 
-    frame_threshold: 20 //设置数据帧周期，当前为20ms
-    total_frames: 4000  //设置每一个标定case数据帧总量，当前设置为4000帧，可根据实际情况调整，数据量越大采集标定数据时间越长
+    frame_threshold: 20 // 帧有效阈值，连续满足标定条件的帧数大于等于该阈值时才会被记录
+    total_frames: 4000  // 设置每一个标定case数据帧总量，当前设置为4000帧，可根据实际情况调整，数据量越大采集标定数据时间越长
     scenario {
       key: "Go Straight"
       value {
@@ -248,7 +248,7 @@
 
 1）请将标定数据按照如下文件夹结构进行放置：
 
-![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure_1.png)
+![vehicle_calibration_online_structure](images/vehicle_calibration_online_structure_2.png)
 
 2）`Origin Folder`确保是**BOS的根目录**，确保`task001`目录是在BOS根目录下创建的（根目录：登录BOS存储服务器后首先看到的目录即为根目录，一般是`Bucket name`目录）；
 
@@ -257,7 +257,8 @@
 3） `Vehicle1、Vehicle2...`代表标定的车辆文件夹，可以根据实际情况，按照车辆名称+编号的形式命名，如`ch01`、`ch02`等。一个task文件夹下内可以包含多个Vehicle车辆文件夹，在一次任务提交中标定多个车辆；
 
 4）`Records`文件内导入采集的车辆标定数据，车辆的录制数据在`apollo/data/bag/`目录下；
-**需要注意：**`Records`文件夹下需要有2层子文件夹，第一层为大时间（年月任）文件夹结构需要图上图保持一致；
+
+**需要注意：**`Records`文件夹下需要有2层子文件夹，第一层为大时间（年-月-日），如上图`2019-04-19`，第二层文件夹是具体的record文件夹（年-月-日-时-分等），如上图`2019-04-19-12-45-01`等，提醒大家一定要注意`Records`文件夹下的文件夹结构还要有2层，不然后续会影响标定找不到文件数据，文件夹结构如上图所示；
 
 5） `Configuration File`即为`vehicle_param.pb.txt`（车辆配置文件），该文件在`apollo/modules/calition/data/dev_kit`文件夹内，将该文件夹下的`vehicle_param.pb.txt`拷贝至BOS对应的车辆标定文件夹下，如上图`Vehicle2`文件夹内；
  
@@ -268,7 +269,7 @@
 
 #### 2. 提交标定任务
 
-首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`控制评测`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`（因为“task001”在BOS的根目录）。如下图所示：
+首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`车辆标定`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`（因为“task001”在BOS的根目录）。如下图所示：
 
 ![vehicle_calibration_submit_task1](images/vehicle_calibration_submit_task1.jpg)
 

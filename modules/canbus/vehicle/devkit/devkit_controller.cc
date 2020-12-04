@@ -16,11 +16,12 @@
 
 #include "modules/canbus/vehicle/devkit/devkit_controller.h"
 
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -259,6 +260,14 @@ Chassis DevkitController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
+  // 14 battery soc
+  if (chassis_detail.devkit().has_bms_report_512() &&
+      chassis_detail.devkit().bms_report_512().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.devkit().bms_report_512().battery_soc());
+  } else {
+    chassis_.set_battery_soc_percentage(0);
+  }
 
   return chassis_;
 }
@@ -480,19 +489,11 @@ bool DevkitController::CheckChassisError() {
         devkit.steering_report_502().steer_flt1()) {
       return true;
     }
-    if (Steering_report_502::STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT ==
-        devkit.steering_report_502().steer_flt2()) {
-      return true;
-    }
   }
   // drive fault
   if (devkit.has_throttle_report_500()) {
     if (Throttle_report_500::THROTTLE_FLT1_DRIVE_SYSTEM_HARDWARE_FAULT ==
         devkit.throttle_report_500().throttle_flt1()) {
-      return true;
-    }
-    if (Throttle_report_500::THROTTLE_FLT2_DRIVE_SYSTEM_COMUNICATION_FAULT ==
-        devkit.throttle_report_500().throttle_flt2()) {
       return true;
     }
   }
@@ -502,25 +503,8 @@ bool DevkitController::CheckChassisError() {
         devkit.brake_report_501().brake_flt1()) {
       return true;
     }
-    if (Brake_report_501::BRAKE_FLT2_BRAKE_SYSTEM_COMUNICATION_FAULT ==
-        devkit.brake_report_501().brake_flt2()) {
-      return true;
-    }
   }
-  // gear fault
-  if (devkit.has_gear_report_503()) {
-    if (Gear_report_503::GEAR_FLT_FAULT ==
-        devkit.gear_report_503().gear_flt()) {
-      return true;
-    }
-  }
-  // park fault
-  if (devkit.has_park_report_504()) {
-    if (Park_report_504::PARK_FLT_FAULT ==
-        devkit.park_report_504().park_flt()) {
-      return true;
-    }
-  }
+
   return false;
 }
 

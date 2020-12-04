@@ -26,7 +26,7 @@ namespace math {
 
 double IntegrateBySimpson(const std::vector<double>& func, const double dx,
                           const std::size_t nsteps) {
-  CHECK_EQ(1, nsteps & 1);
+  CHECK_EQ(1U, nsteps & 1);
   double sum1 = 0.0;
   double sum2 = 0.0;
   for (std::size_t i = 1; i + 1 < nsteps; ++i) {

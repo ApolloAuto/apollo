@@ -90,18 +90,19 @@ function setup_devices_and_mount_local_volumes() {
 
     [ -d "${CACHE_ROOT_DIR}" ] || mkdir -p "${CACHE_ROOT_DIR}"
 
-    source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
+    source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
-        14.04)
-            warning "[Deprecated] Support for Ubuntu 14.04 will be removed" \
+        16.04)
+            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                 "in the near future. Please upgrade to ubuntu 18.04+."
+            volumes="${volumes} -v /dev:/dev"
             ;;
-        16.04 | 18.04 | 20.04 | *)
+        18.04 | 20.04 | *)
             volumes="${volumes} -v /dev:/dev"
             ;;
     esac
@@ -137,9 +138,6 @@ function determine_gpu_use_host() {
         DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
         if [ ! -z "$(which nvidia-docker)" ]; then
             DOCKER_RUN="nvidia-docker run"
-            warning "nvidia-docker is deprecated. Please install latest docker " \
-                "and nvidia-container-toolkit as described by:"
-            warning "  ${nv_docker_doc}"
         elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
             if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
                 DOCKER_RUN="docker run --gpus all"
@@ -150,7 +148,7 @@ function determine_gpu_use_host() {
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install " \
-                "latest docker and nvidia-container-toolkit as described by: "
+                "latest Docker and nvidia-container-toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
@@ -212,26 +210,24 @@ function mount_map_volumes() {
 function mount_other_volumes() {
     info "Mount other volumes ..."
     local volume_conf=
-    if [ "${FAST_MODE}" = "no" ]; then
-        # YOLO3D
-        local yolo3d_volume="apollo_yolo3d_volume_${USER}"
-        local yolo3d_image="${DOCKER_REPO}:yolo3d_volume-${TARGET_ARCH}-latest"
-        reuse_or_start_volume "${yolo3d_volume}" "${yolo3d_image}"
-        volume_conf="${volume_conf} --volumes-from ${yolo3d_volume}"
-    fi
 
-    # LOCALIZATION
-    local localization_volume="apollo_localization_volume_${USER}"
-    local localization_image="${DOCKER_REPO}:localization_volume-${TARGET_ARCH}-latest"
-    reuse_or_start_volume "${localization_volume}" "${localization_image}"
-    volume_conf="${volume_conf} --volumes-from ${localization_volume}"
+    # AUDIO
+    local audio_volume="apollo_audio_volume_${USER}"
+    local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
+    reuse_or_start_volume "${audio_volume}" "${audio_image}"
+    volume_conf="${volume_conf} --volumes-from ${audio_volume}"
 
-    if [ "${TARGET_ARCH}" = "x86_64" ]; then
-        local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
-        local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
-        reuse_or_start_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
-        volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
-    fi
+    # YOLOV4
+    local yolov4_volume="apollo_yolov4_volume_${USER}"
+    local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest"
+    reuse_or_start_volume "${yolov4_volume}" "${yolov4_image}"
+    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+
+    # FASTER_RCNN
+    local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
+    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
+    reuse_or_start_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
+    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
     OTHER_VOLUME_CONF="${volume_conf}"
 }

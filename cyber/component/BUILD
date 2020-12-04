@@ -30,11 +30,8 @@ cc_library(
         ":component_base",
         "//cyber/blocker:blocker_manager",
         "//cyber/timer",
-        "//cyber/transport:history",
-        "//cyber/transport:hybrid_transmitter",
-        "//cyber/transport:intra_transmitter",
-        "//cyber/transport:rtps_transmitter",
-        "//cyber/transport:shm_transmitter",
+        "//cyber/transport/message:history",
+        "//cyber/transport/transmitter",
     ],
 )
 
@@ -56,6 +53,7 @@ cc_library(
         "//cyber/base:thread_pool",
         "//cyber/class_loader",
         "//cyber/node",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

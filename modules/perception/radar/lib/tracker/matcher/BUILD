@@ -7,6 +7,7 @@ cc_test(
     name = "hm_matcher_test",
     size = "small",
     srcs = ["hm_matcher_test.cc"],
+    copts = ["-fno-access-control"],
     deps = [
         ":hm_matcher",
         "//modules/perception/radar/lib/tracker/common:radar_track_manager",

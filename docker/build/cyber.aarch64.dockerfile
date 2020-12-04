@@ -1,8 +1,7 @@
-ARG BASE_IMAGE=apolloauto/apollo:L4T-cuda10.2-cudnn8-trt7-devl-18.04-20200928_1000
+ARG BASE_IMAGE
 # ARG BASE_IMAGE=arm64v8/ubuntu:18.04
 FROM ${BASE_IMAGE}
 
-ARG BUILD_STAGE
 ARG GEOLOC
 ARG INSTALL_MODE
 
@@ -19,10 +18,10 @@ RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_cmake.sh ${INSTALL_MODE}
 
 RUN bash /tmp/installers/install_llvm_clang.sh
-RUN bash /tmp/installers/install_cyber_deps.sh
+RUN bash /tmp/installers/install_cyber_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_qa_tools.sh
 RUN bash /tmp/installers/install_visualizer_deps.sh ${INSTALL_MODE}
 
-RUN bash /tmp/installers/post_install.sh ${BUILD_STAGE}
+RUN bash /tmp/installers/post_install.sh cyber
 
 WORKDIR /apollo

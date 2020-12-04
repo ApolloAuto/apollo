@@ -249,6 +249,11 @@ options:
   showMapLaneId:
     default: false
     menuId: mapLaneId
+  showDefaultRoutingInput:
+    default: false
+  showCycleNumberInput:
+    default: false
+  
 
 routingEditor:
   radiusOfMapRequest: 2000.0 # meters

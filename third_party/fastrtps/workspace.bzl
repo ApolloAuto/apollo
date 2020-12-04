@@ -1,4 +1,4 @@
-"""Loads the fastrtps library"""
+"""Load the fastrtps library"""
 
 # Sanitize a dependency so that it works correctly from code that includes
 # Apollo as a submodule.

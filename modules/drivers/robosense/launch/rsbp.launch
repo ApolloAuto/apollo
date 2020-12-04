@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>RSBP</name>
-        <dag_conf>/apollo/modules/drivers/robosense/dag/rsbp.dag</dag_conf>
-        <process_name>robosense</process_name>
-    </module>
-</cyber>

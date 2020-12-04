@@ -84,7 +84,7 @@ bool HybridAStar::RSPCheck(
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   CHECK_NOTNULL(node);
-  CHECK_GT(node->GetStepSize(), 0);
+  CHECK_GT(node->GetStepSize(), 0U);
 
   if (obstacles_linesegments_vec_.empty()) {
     return true;
