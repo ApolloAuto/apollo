@@ -63,17 +63,20 @@ function setup_device_for_aarch64() {
 
 function setup_device_for_amd64() {
   # setup CAN device
-  for INDEX in $(seq 0 3); do
-    # soft link if sensorbox exist
-    if [ -e /dev/zynq_can${INDEX} ] && [ ! -e /dev/can${INDEX} ]; then
-      sudo ln -s /dev/zynq_can${INDEX} /dev/can${INDEX}
-    fi
-    if [ ! -e /dev/can${INDEX} ]; then
-      sudo mknod --mode=a+rw /dev/can${INDEX} c 52 $INDEX
+  local NUM_PORTS=8
+  for i in $(seq 0 $((${NUM_PORTS} - 1))); do
+    if [[ -e /dev/can${i} ]]; then
+      continue
+    elif [[ -e /dev/zynq_can${i} ]]; then
+      # soft link if sensorbox exist
+      sudo ln -s /dev/zynq_can${i} /dev/can${i}
+    else
+      break
+      # sudo mknod --mode=a+rw /dev/can${i} c 52 ${i}
     fi
   done
 
-  # setup nvidia device
+  # setup Nvidia device
   sudo /sbin/modprobe nvidia
   sudo /sbin/modprobe nvidia-uvm
   if [ ! -e /dev/nvidia0 ]; then
