@@ -41,6 +41,12 @@ bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
 
   port_ = parameter.channel_id();
   interface_ = parameter.interface();
+  auto num_ports = parameter.num_ports();
+  if (port_ > static_cast<int32_t>(num_ports) || port_ < 0) {
+    AERROR << "Can port number [" << port_ << "] is out of range [0, "
+           << num_ports << ") !";
+    return false;
+  }
   return true;
 }
 
@@ -62,12 +68,6 @@ ErrorCode SocketCanClientRaw::Start() {
   // if more than one card, when install driver u can specify the minior id
   // int32_t ret = canOpen(net, pCtx->mode, txbufsize, rxbufsize, 0, 0,
   // &dev_handler_);
-  if (port_ > MAX_CAN_PORT || port_ < 0) {
-    AERROR << "can port number [" << port_ << "] is out of the range [0,"
-           << MAX_CAN_PORT << "]";
-    return ErrorCode::CAN_CLIENT_ERROR_BASE;
-  }
-
   dev_handler_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (dev_handler_ < 0) {
     AERROR << "open device error code [" << dev_handler_ << "]: ";

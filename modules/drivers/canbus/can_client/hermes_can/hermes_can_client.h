@@ -20,12 +20,13 @@
 #include <vector>
 
 #include "gflags/gflags.h"
+
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/drivers/canbus/can_client/can_client.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
+#include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/hermes_can/bcan.h"
+#include "modules/drivers/canbus/common/canbus_consts.h"
 
 /**
  * @namespace apollo::drivers::canbus::can
@@ -106,9 +107,9 @@ class HermesCanClient : public CanClient {
   void SetInited(bool init);
 
  private:
-  bool _is_init = false;
-  bcan_hdl_t _dev_handler;
-  CANCardParameter::CANChannelId _card_port;
+  bool is_init_ = false;
+  bcan_hdl_t dev_handler_;
+  CANCardParameter::CANChannelId port_;
   bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];
   bcan_msg_t _recv_frames[MAX_CAN_RECV_FRAME_LEN];
 };
