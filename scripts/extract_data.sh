@@ -25,7 +25,7 @@ DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 NO_INTERACTIVE=0
 
 TASK=""
-VALID_TASKS=("lidar_to_gnss" "camera_6mm_to_lidar" "camera_12mm_to_lidar")
+VALID_TASKS=("lidar_to_gnss" "camera_to_lidar")
 
 RECORD_FILES=()
 RECORD_DIRS=()
@@ -44,7 +44,7 @@ function print_usage() {
   eg.
     ./extract_data.sh -t lidar_to_gnss -f xxx/yyy.record.00000 -f xxx/yyy.record.00001
   or
-    ./extract_data.sh -t camera_6mm_to_lidar -d xxx
+    ./extract_data.sh -t camera_to_lidar -d xxx
   "
 }
 
@@ -135,8 +135,8 @@ function get_records() {
   for file in "${RECORD_FILES[@]}"; do
     if [[ -f "${file}" ]]; then
       if [[ "${file}" == *"record"* ]]; then
-        echo '  record_path: "'$(readlink -f ${file})'"' >>"${tmp_file}"
-        sed -i "/# records can be specified as a list/r ${tmp_file}" "${TARGET_DIR}/lidar_to_gnss.config"
+        echo -e '  record_path: "'$(readlink -f ${file})'"\n' >>"${tmp_file}"
+        sed -i "/# records can be specified as a list/r ${tmp_file}" "${TARGET_DIR}/${TASK}.config"
       else
         echo "The input file ${file} is not a record!"
         exit 1
@@ -154,8 +154,8 @@ function get_records() {
         echo "There is no reord file in ${dir}!"
         exit 1
       fi
-      echo '  record_path: "'$(readlink -f ${dir})'"' >>"${tmp_file}"
-      sed -i "/# or, records can be loaded from a directory/r ${tmp_file}" "${TARGET_DIR}/lidar_to_gnss.config"
+      echo -e '  record_path: "'$(readlink -f ${dir})'"\n' >>"${tmp_file}"
+      sed -i "/# or, records can be loaded from a directory/r ${tmp_file}" "${TARGET_DIR}/${TASK}.config"
     else
       echo "Directory ${dir} doesn't exist!"
       exit 1
@@ -219,6 +219,8 @@ function main() {
     update_lidar_config
   fi
   install_if_not_exist "pyyaml" "pypcd"
+
+  set -e
 
   local extract_data_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data"
   if [[ -f "${extract_data_bin}" ]]; then

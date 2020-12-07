@@ -26,6 +26,7 @@ import os
 import shutil
 import six
 import sys
+import time
 import yaml
 
 from google.protobuf import text_format
@@ -151,6 +152,7 @@ def print_and_publish(str, writer, progress):
     print(str)
     progress.log_string = str
     writer.write(progress)
+    time.sleep(0.5)
 
 
 def extract_data(record_files, output_path, channels, start_timestamp,
