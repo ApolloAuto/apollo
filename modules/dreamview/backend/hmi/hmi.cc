@@ -28,6 +28,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 
 namespace apollo {
@@ -38,13 +39,11 @@ using apollo::cyber::common::SetProtoToASCIIFile;
 using google::protobuf::util::JsonStringToMessage;
 using Json = WebSocketHandler::Json;
 
-HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
-         FuelMonitorMap* monitors)
+HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
     : hmi_worker_(new HMIWorker()),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
-      map_service_(map_service),
-      monitors_(monitors) {
+      map_service_(map_service) {
   if (websocket_) {
     RegisterMessageHandlers();
   }
@@ -110,22 +109,9 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
-          if (current_monitor_ != nullptr && current_monitor_->IsEnabled()) {
-            current_monitor_->Restart();
-          }
-        } else if (hmi_action == HMIAction::CHANGE_MODE) {
-          if (monitors_->find(value) != monitors_->end()) {
-            FuelMonitor* new_monitor = monitors_->at(value).get();
-            if (current_monitor_ != nullptr &&
-                current_monitor_ != new_monitor) {
-              current_monitor_->Stop();
-            }
-            current_monitor_ = new_monitor;
-            current_monitor_->Start();
-          } else {
-            if (current_monitor_ != nullptr) {
-              current_monitor_->Stop();
-            }
+          auto* monitor = FuelMonitorManager::Instance()->GetCurrentMonitor();
+          if (monitor != nullptr && monitor->IsEnabled()) {
+            monitor->Restart();
           }
         }
       });

@@ -18,13 +18,11 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 
 #include "CivetServer.h"
 
 #include "cyber/cyber.h"
 #include "modules/common/status/status.h"
-#include "modules/dreamview/backend/fuel_monitor/fuel_monitor.h"
 #include "modules/dreamview/backend/handlers/image_handler.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
@@ -68,7 +66,6 @@ class Dreamview {
   std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
-  std::unordered_map<std::string, std::unique_ptr<FuelMonitor>> monitors_;
   std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
 #if WITH_TELEOP == 1
   std::unique_ptr<TeleopService> teleop_;

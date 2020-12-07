@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
-#include "modules/dreamview/backend/hmi/hmi_worker.h"
-#include "modules/dreamview/backend/map/map_service.h"
+#include "cyber/common/macros.h"
+#include "modules/common/util/future.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor.h"
 
 /**
  * @namespace apollo::dreamview
@@ -31,25 +31,27 @@
 namespace apollo {
 namespace dreamview {
 
-class HMI {
+// Centralized monitor config and status manager.
+class FuelMonitorManager {
  public:
-  HMI(WebSocketHandler *websocket, MapService *map_service);
-  void Start();
-  void Stop();
+  void Init();
+
+  void RegisterFuelMonitor(std::string_view mode,
+                           std::unique_ptr<FuelMonitor>&& fuel_monitor);
+
+  void SetCurrentMode(const std::string& mode);
+
+  // Getters
+  FuelMonitor* GetMonitorOfMode(const std::string& mode);
+  FuelMonitor* GetCurrentMonitor() const { return current_monitor_; }
+  std::string GetCurrenrMode() const { return current_mode_; }
 
  private:
-  // Send VehicleParam to the given conn, or broadcast if conn is null.
-  void SendVehicleParam(WebSocketHandler::Connection *conn = nullptr);
-  void SendStatus(WebSocketHandler::Connection *conn = nullptr);
+  std::unordered_map<std::string, std::unique_ptr<FuelMonitor>> monitors_;
+  FuelMonitor* current_monitor_ = nullptr;
+  std::string current_mode_;
 
-  void RegisterMessageHandlers();
-
-  std::unique_ptr<HMIWorker> hmi_worker_;
-  apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
-
-  // No ownership.
-  WebSocketHandler *websocket_;
-  MapService *map_service_;
+  DECLARE_SINGLETON(FuelMonitorManager)
 };
 
 }  // namespace dreamview

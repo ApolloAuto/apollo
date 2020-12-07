@@ -22,6 +22,7 @@
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -46,7 +47,7 @@ using google::protobuf::util::MessageToJsonString;
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
     WebSocketHandler *camera_ws, SimControl *sim_control,
-    const MapService *map_service, FuelMonitorMap *monitors,
+    const MapService *map_service,
     PerceptionCameraUpdater *perception_camera_updater, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
@@ -54,7 +55,6 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       map_ws_(map_ws),
       camera_ws_(camera_ws),
       sim_control_(sim_control),
-      monitors_(monitors),
       perception_camera_updater_(perception_camera_updater) {
   RegisterMessageHandlers();
 }
@@ -329,11 +329,13 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           }
         }
       });
+
   websocket_->RegisterMessageHandler(
       "RequestDataCollectionProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitor = monitors_->at("Vehicle Calibration").get();
-        if (!monitor->IsEnabled()) {
+        auto *monitor = FuelMonitorManager::Instance()->GetMonitorOfMode(
+            "Vehicle Calibration");
+        if (!monitor || !monitor->IsEnabled()) {
           return;
         }
 
@@ -342,16 +344,34 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         response["data"] = monitor->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
       });
+  // TODO(changsh726): Combine the following two handlers with
+  // RequestDataCollectionProgress handler
   websocket_->RegisterMessageHandler(
-      "RequestPreprocessProgress",
+      "RequestLidarProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitor = monitors_->at("Lidar-IMU Sensor Calibration").get();
-        if (!monitor->IsEnabled()) {
+        auto *monitor = FuelMonitorManager::Instance()->GetMonitorOfMode(
+            "Lidar-IMU Sensor Calibration");
+        if (!monitor || !monitor->IsEnabled()) {
           return;
         }
 
         Json response;
-        response["type"] = "PreprocessProgress";
+        response["type"] = "LidarPreprocessProgress";
+        response["data"] = monitor->GetProgressAsJson();
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "RequestCameraProgress",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto *monitor = FuelMonitorManager::Instance()->GetMonitorOfMode(
+            "Camera-Lidar Calibration");
+        if (!monitor || !monitor->IsEnabled()) {
+          return;
+        }
+
+        Json response;
+        response["type"] = "CameraPreprocessProgress";
         response["data"] = monitor->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
       });

@@ -31,6 +31,9 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/fuel_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/fuel_monitor/preprocess_monitor.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
@@ -221,7 +224,18 @@ void HMIWorker::InitStatus() {
   // Populate modes and current_mode.
   const auto& modes = config_.modes();
   for (const auto& iter : modes) {
-    status_.add_modes(iter.first);
+    const std::string& mode = iter.first;
+    status_.add_modes(mode);
+    if (mode == FLAGS_vehicle_calibration_mode) {
+      FuelMonitorManager::Instance()->RegisterFuelMonitor(
+          mode, std::make_unique<DataCollectionMonitor>());
+    } else if (mode == FLAGS_lidar_calibration_mode) {
+      FuelMonitorManager::Instance()->RegisterFuelMonitor(
+          mode, std::make_unique<PreprocessMonitor>("lidar_to_gnss"));
+    } else if (mode == FLAGS_camera_calibration_mode) {
+      FuelMonitorManager::Instance()->RegisterFuelMonitor(
+          mode, std::make_unique<PreprocessMonitor>("camera_to_lidar"));
+    }
   }
 
   // Populate maps and current_map.
@@ -548,6 +562,8 @@ void HMIWorker::ChangeMode(const std::string& mode_name) {
     }
     status_changed_ = true;
   }
+
+  FuelMonitorManager::Instance()->SetCurrentMode(mode_name);
   KVDB::Put(FLAGS_current_mode_db_key, mode_name);
 }
 
