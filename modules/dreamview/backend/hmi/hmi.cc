@@ -189,22 +189,34 @@ void HMI::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "Preprocess",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
+        // json should contain type and data.
+        std::string task_type;
+        if (!JsonUtil::GetString(json, "type", &task_type)) {
+          AERROR << "Truncated preprocess request.";
+          return;
+        }
+        const auto iter = json.find("data");
+        if (iter == json.end()) {
+          AERROR << "The json has no such key: data";
+          return;
+        }
         PreprocessTable preprocess_table;
-        if (!JsonStringToMessage(json.dump(), &preprocess_table).ok()) {
+        if (!JsonStringToMessage(json["data"].dump(), &preprocess_table).ok()) {
           AERROR
               << "Failed to get user configuration: invalid preprocess table."
               << json.dump();
         }
-        constexpr char kOutputFile[] =
-            "/apollo/modules/tools/sensor_calibration/config/"
-            "lidar_to_gnss_user.config";
-        if (!SetProtoToASCIIFile(preprocess_table, kOutputFile)) {
-          AERROR << "Failed to generate user confuguration file";
-        }
 
-        constexpr char kStartCommand[] =
-            "bash /apollo/scripts/extract_data.sh -n";
-        HMIWorker::System(kStartCommand);
+        // Gernerate user-specified configuration and run the preprocess script
+        std::string output_file =
+            absl::StrCat("/apollo/modules/tools/sensor_calibration/config/",
+                         task_type, "_user.config");
+        if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
+          AERROR << "Failed to generate user configuration file";
+        }
+        std::string start_command = absl::StrCat(
+            "bash /apollo/scripts/extract_data.sh -n -t ", task_type);
+        HMIWorker::System(start_command);
       });
 }
 
