@@ -1,0 +1,11 @@
+camera_config {
+  camera_name: "front_6mm"
+  translation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+progress {
+  percentage: 0.0
+}

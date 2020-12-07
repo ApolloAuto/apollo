@@ -25,6 +25,7 @@ message Progress {
 
 message PreprocessTable {
   repeated LidarConfig lidar_config = 1;
-  optional string main_sensor = 2;
-  optional Progress progress = 3;
+  repeated CameraConfig camera_config = 2;
+  optional string main_sensor = 3;
+  optional Progress progress = 4;
 }

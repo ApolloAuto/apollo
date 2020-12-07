@@ -59,18 +59,17 @@ void PreprocessMonitor::InitReaders() {
 void PreprocessMonitor::LoadConfiguration() {
   const std::string& vehicle_dir =
       VehicleManager::Instance()->GetVehicleDataPath();
-  std::string config_path = absl::StrCat(vehicle_dir, "dreamview_conf/",
-                                         task_name_, "precrocess_table.pb.txt");
+  std::string config_path = absl::StrCat(
+      vehicle_dir, "dreamview_conf/", task_name_, "_precrocess_table.pb.txt");
   if (!PathExists(config_path)) {
     AWARN << "No corresponding data collection table file found in "
           << vehicle_dir << ". Using default one instead.";
     config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
-                               "preprocess_table.pb.txt");
+                               "_preprocess_table.pb.txt");
   }
 
   ACHECK(cyber::common::GetProtoFromFile(config_path, &preprocess_table_))
-      << "Unable to parse preprocess configuration from file "
-      << config_path;
+      << "Unable to parse preprocess configuration from file " << config_path;
 
   std::string json_string;
   MessageToJsonString(preprocess_table_, &json_string);
