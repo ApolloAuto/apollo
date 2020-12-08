@@ -36,10 +36,11 @@ apt_get_update_and_install \
     libzstd-dev
 
 # Ref: https://www.boost.org/
-VERSION="1_73_0"
-PKG_NAME="boost_1_73_0.tar.bz2"
-DOWNLOAD_LINK="https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.bz2"
-CHECKSUM="4eb3b8d442b426dc35346235c8733b5ae35ba431690e38c6a8263dce9fcbb402"
+VERSION="1_74_0"
+
+PKG_NAME="boost_${VERSION}.tar.bz2"
+DOWNLOAD_LINK="https://dl.bintray.com/boostorg/release/${VERSION//_/.}/source/boost_${VERSION}.tar.bz2"
+CHECKSUM="83bfc1507731a0906e387fc28b7ef5417d591429e51e788417fe9ff025e116b1"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
