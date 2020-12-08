@@ -36,6 +36,8 @@ class ConfigYaml(object):
     def __init__(self, supported_calibrations=['lidar_to_gnss', 'camera_to_lidar']):
         self._task_name = 'unknown'
         self._supported_tasks = supported_calibrations
+        self._source_sensor = ''
+        self._table_info = preprocess_table_pb2.PreprocessTable()
         print('calibration service now support: {}'.format(self._supported_tasks))
 
     def load_sample_yaml_file(self, task_name, sample_file=None):
@@ -46,16 +48,28 @@ class ConfigYaml(object):
             with open(sample_file, 'r') as f:
                 data = yaml.safe_load(f)
         except IOError:
-            raise ValueError('cannot open the sample configure yaml file at {}'.format(sample_file))
+            raise ValueError(
+                'cannot open the sample configure yaml file at {}'.format(sample_file))
         return data
 
     def _generate_lidar_to_gnss_calibration_yaml(self, in_data, lidar_folder_name, gnss_folder_name):
-        in_data['sensor_files_directory'] = os.path.join('.', lidar_folder_name, "")
-        in_data['odometry_file'] = os.path.join('.', gnss_folder_name, 'odometry')
+        in_data['sensor_files_directory'] = os.path.join(
+            '.', lidar_folder_name, "")
+        in_data['odometry_file'] = os.path.join(
+            '.', gnss_folder_name, 'odometry')
+        for lidar_config in self._table_info.lidar_config:
+            if lidar_config.sensor_name == self._source_sensor:
+                in_data['transform']['translation']['x'] = round(
+                    lidar_config.translation.x, 4)
+                in_data['transform']["translation"]["y"] = round(
+                    lidar_config.translation.y, 4)
+                in_data['transform']["translation"]["z"] = round(
+                    lidar_config.translation.z, 4)
         return in_data
 
     def _generate_camera_init_param_yaml(self, root_path, in_data):
-        init_param_folder = os.path.join(os.path.dirname(__file__), 'config/init_params')
+        init_param_folder = os.path.join(
+            os.path.dirname(__file__), 'config/init_params')
         out_param_folder = os.path.join(root_path, 'init_params')
         if os.path.exists(out_param_folder):
             print('folder: %s exists' % out_param_folder)
@@ -64,32 +78,43 @@ class ConfigYaml(object):
             os.makedirs(out_param_folder)
         # copy sample intrinsic yaml file to correct location
         # wait for user input about intrinsics
-        sample_intrinsic_yaml = os.path.join(init_param_folder, 'sample_intrinsics.yaml')
+        sample_intrinsic_yaml = os.path.join(
+            init_param_folder, 'sample_intrinsics.yaml')
         out_intrinsic_yaml = os.path.join(out_param_folder,
                                           in_data['source_sensor'] + '_intrinsics.yaml')
         shutil.copyfile(sample_intrinsic_yaml, out_intrinsic_yaml)
         # load extrinsics sample yaml, rename source sensor and destination sensor
-        sample_extrinsic_yaml = os.path.join(init_param_folder, 'sample_extrinsics.yaml')
+        sample_extrinsic_yaml = os.path.join(
+            init_param_folder, 'sample_extrinsics.yaml')
         extrinsic_data = self.load_sample_yaml_file(self._task_name,
                                                     sample_file=sample_extrinsic_yaml)
         # set up the source_sensor(camera name) to dest sensor(lidar name)
         extrinsic_data['header']['frame_id'] = in_data['destination_sensor']
         extrinsic_data['child_frame_id'] = in_data['source_sensor']
+        for camera_config in self._table_info.camera_config:
+            if camera_config.camera_name == self._source_sensor:
+                extrinsic_data['transform']['translation']['x'] = round(
+                    camera_config.translation.x, 4)
+                extrinsic_data['transform']["translation"]["y"] = round(
+                    camera_config.translation.y, 4)
+                extrinsic_data['transform']["translation"]["z"] = round(
+                    camera_config.translation.z, 4)
         # dump the extrinsic yaml data
-        out_extrinsic_yaml = os.path.join(out_param_folder, in_data['source_sensor'] +
-                                          '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
+        out_extrinsic_yaml = os.path.join(out_param_folder, in_data['source_sensor']
+                                          + '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
+
         try:
             with open(out_extrinsic_yaml, 'w') as f:
                 yaml.safe_dump(extrinsic_data, f)
-        except:
+        except IOError:
             raise ValueError('cannot generate the task config yaml'
                              'file at {}'.format(out_extrinsic_yaml))
 
     def _generate_camera_to_lidar_calibration_yaml(self, in_data):
         in_data['intrinsic'] = os.path.join('.', 'init_params',
                                             in_data['source_sensor'] + '_intrinsics.yaml')
-        in_data['extrinsic'] = os.path.join('.', 'init_params', in_data['source_sensor'] +
-                                            '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
+        in_data['extrinsic'] = os.path.join('.', 'init_params', in_data['source_sensor']
+                                            + '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
 
         return in_data
 
@@ -103,46 +128,43 @@ class ConfigYaml(object):
                                   source_folder, dest_folder, out_config_file,
                                   in_config_file=None):
         self._task_name = task_name
-        out_data = self.load_sample_yaml_file(task_name=task_name, sample_file=in_config_file)
+        self._source_sensor = source_sensor
+        out_data = self.load_sample_yaml_file(
+            task_name=task_name, sample_file=in_config_file)
         out_data['source_sensor'] = source_sensor
         out_data['destination_sensor'] = dest_sensor
-        if not task_name in self._supported_tasks:
+        if task_name not in self._supported_tasks:
             raise ValueError('does not support the calibration task: {}'.format(
                 task_name))
+        user_config = os.path.join(os.path.os.path.dirname(__file__), 'config',
+                                   task_name + '_user.config')
+        if os.path.exists(user_config):
+            try:
+                with open(user_config, "r") as f:
+                    proto_block = f.read()
+                    text_format.Merge(proto_block, self._table_info)
+            except IOError:
+                raise ValueError('cannot open the user config file'
+                                 'at {}'.format(user_config))
 
         if self._task_name == 'lidar_to_gnss':
             out_data = self._generate_lidar_to_gnss_calibration_yaml(
                 out_data, source_folder, dest_folder)
 
-            table = preprocess_table_pb2.PreprocessTable()
-            user_config = os.path.join(os.path.dirname(__file__), 'config',
-                                       'lidar_to_gnss_user.config')
-            if os.path.exists(user_config):
-                with open(user_config, "r") as f:
-                    proto_block = f.read()
-                    text_format.Merge(proto_block, table)
-
-                for lidar_config in table.lidar_config:
-                    if lidar_config.sensor_name == source_sensor:
-                        out_data['transform']['translation']['x'] = round(
-                            lidar_config.translation.x, 4)
-                        out_data['transform']["translation"]["y"] = round(
-                            lidar_config.translation.y, 4)
-                        out_data['transform']["translation"]["z"] = round(
-                            lidar_config.translation.z, 4)
-
         elif self._task_name == 'camera_to_lidar':
             if source_folder != dest_folder:
-                raise ValueError('camera frame and lidar frame should be in same folder')
+                raise ValueError(
+                    'camera frame and lidar frame should be in same folder')
             out_root_path = os.path.dirname(out_config_file)
             self._generate_camera_init_param_yaml(out_root_path, out_data)
-            out_data = self._generate_camera_to_lidar_calibration_yaml(out_data)
+            out_data = self._generate_camera_to_lidar_calibration_yaml(
+                out_data)
 
         print(out_data)
         try:
             with open(out_config_file, 'w') as f:
                 yaml.safe_dump(out_data, f)
-        except:
+        except IOError:
             raise ValueError(
                 'cannot generate the task config yaml file at {}'.format(out_config_file))
         return True
