@@ -46,11 +46,11 @@ if [ "${TARGET_ARCH}" = "aarch64" ]; then
 fi
 
 QT_VERSION_A=5.12
-QT_VERSION_B=5.12.2
+QT_VERSION_B=5.12.9
 QT_VERSION_Z=$(echo "$QT_VERSION_B" | tr -d '.')
 
 QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
-CHECKSUM="384c833bfbccf596a00bb02bbad14b53201854c287daf2d99c23a93b8de4062a"
+CHECKSUM="63ef2b991d5fea2045b4e7058f86e36868cafae0738f36f8b0a88dc8de64ab2e"
 DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
 
 pip3_install cuteci
