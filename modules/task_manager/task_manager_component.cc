@@ -69,13 +69,14 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
     Rate rate(1.0);
 
     while (cycle_routing_manager_->GetCycle() > 0) {
-      if (cycle_routing_manager_->CheckIfReachDestination(
-            localization_.pose())) {
+      if (cycle_routing_manager_->GetNewRouting(
+            localization_.pose(),
+            &routing_request_)) {
         common::util::FillHeader(node_->Name(), &routing_request_);
         request_writer_->Write(routing_request_);
-        AINFO << "Reach destination: routing manager send a routing request"
+        AINFO << "Reach begin/end point: "
+        << "routing manager send a routing request. "
         << "Remaining cycles: " << cycle_routing_manager_->GetCycle();
-        cycle_routing_manager_->MinusCycle();
       }
       rate.Sleep();
     }

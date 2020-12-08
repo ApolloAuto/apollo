@@ -11,6 +11,7 @@ cc_library(
     deps = [
         "//modules/common/status:status",
         "//modules/common/monitor_log:monitor_log",
+        "//modules/dreamview/backend/map:map_service",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/task_manager/common:task_manager_gflags",
         "//modules/task_manager/proto:task_manager_cc_proto",

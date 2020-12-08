@@ -22,6 +22,7 @@
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
+#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/task_manager/proto/task_manager.pb.h"
 
@@ -39,22 +40,17 @@ class CycleRoutingManager {
   common::Status Init(const task_manager::CycleRoutingTask& cycle_routing_task);
 
   /**
-   * @brief check if the vehicle reaches the destination
+   * @brief Get new routing if the vehicle reaches the begin/end point
    * @return false/true
    */
-  bool CheckIfReachDestination(const localization::Pose &pose);
+  bool GetNewRouting(const localization::Pose &pose,
+      routing::RoutingRequest* routing_request_);
 
   /**
    * @brief get remaining cycle number
    * @return remaining cycle number
    */
   int GetCycle() const;
-
-  /**
-   * @brief make cycle number minus 1
-   * @return void
-   */
-  void MinusCycle();
 
   /**
    * @brief destructor
@@ -65,8 +61,10 @@ class CycleRoutingManager {
   int cycle_ = 0;
   int waypoint_num_ = 0;
   bool is_allowed_to_route_ = false;
-  apollo::common::PointENU begin_point_;
-  apollo::common::PointENU end_point_;
+  routing::LaneWaypoint begin_point_;
+  routing::LaneWaypoint end_point_;
+  std::unique_ptr<apollo::dreamview::MapService> map_service_;
+  routing::RoutingRequest original_routing_request_;
 };
 
 }  // namespace task_manager
