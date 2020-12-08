@@ -21,4 +21,3 @@
 DECLARE_string(task_manager_node_name);
 
 DECLARE_double(threshold_for_destination_check);
-DECLARE_double(magnify_times_for_threshold);
