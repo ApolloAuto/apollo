@@ -389,17 +389,17 @@ const float *get_gpu_data(bool flag, const base::Blob<float> &blob) {
 }
 
 int get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
-  const std::vector<base::ObjectSubType> &types,
-  const NMSParam &nms, const yolo::ModelParam &model_param,
-  float light_vis_conf_threshold,
-  float light_swt_conf_threshold,
-  base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
-  const std::map<base::ObjectSubType, std::vector<int>> &indices_const,
-  const std::map<base::ObjectSubType, std::vector<float>> &conf_scores_const) {
+    const std::vector<base::ObjectSubType> &types,
+    const NMSParam &nms, const yolo::ModelParam &model_param,
+    float light_vis_conf_threshold,
+    float light_swt_conf_threshold,
+    base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
+    const std::map<base::ObjectSubType, std::vector<int>> &indices_cns,
+    const std::map<base::ObjectSubType, std::vector<float>> &conf_scores_cns) {
   auto& indices = const_cast<std::map<base::ObjectSubType,
-                                    std::vector<int>>& >(indices_const);
+                      std::vector<int>>& >(indices_cns);
   auto& conf_scores = const_cast<std::map<base::ObjectSubType,
-                              std::vector<float>>& >(conf_scores_const);
+                      std::vector<float>>& >(conf_scores_cns);
 
   bool multi_scale = false;
   if (yolo_blobs.det2_obj_blob) {

@@ -164,12 +164,13 @@ void compute_overlapped_by_idx_gpu(const int nthreads, const float *bbox_data,
                                    const cudaStream_t &_stream);
 
 
-int get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
-              const std::vector<base::ObjectSubType> &types,
-              const NMSParam &nms, const yolo::ModelParam &model_param,
-              float light_vis_conf_threshold, float light_swt_conf_threshold,
-              base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
-              const std::map<base::ObjectSubType, std::vector<int>> &indices,
+int get_objects_gpu(
+        const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
+        const std::vector<base::ObjectSubType> &types,
+        const NMSParam &nms, const yolo::ModelParam &model_param,
+        float light_vis_conf_threshold, float light_swt_conf_threshold,
+        base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
+        const std::map<base::ObjectSubType, std::vector<int>> &indices,
         const std::map<base::ObjectSubType, std::vector<float>> &conf_scores);
 
 void get_objects_cpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,

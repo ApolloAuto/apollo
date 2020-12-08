@@ -429,9 +429,6 @@ void get_objects_cpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
   std::map<base::ObjectSubType, std::vector<float>> conf_scores;
   int num_kept = 0;
   int num_classes = types.size();
-
-
-
   num_kept = get_objects_gpu(yolo_blobs, stream, types, nms, model_param,
                   light_vis_conf_threshold, light_swt_conf_threshold,
                   overlapped, idx_sm, indices, conf_scores);

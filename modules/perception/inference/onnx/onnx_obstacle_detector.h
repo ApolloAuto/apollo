@@ -72,13 +72,13 @@ class Logger : public nvinfer1::ILogger {
 class OnnxObstacleDetector : public Inference {
  public:
   OnnxObstacleDetector(const std::string &model_file,
-                        const float score_threshold,
-                        const std::vector<std::string> &outputs,
-                        const std::vector<std::string> &inputs);
+                       const float score_threshold,
+                       const std::vector<std::string> &outputs,
+                       const std::vector<std::string> &inputs);
 
   OnnxObstacleDetector(const std::string &model_file,
-                        const std::vector<std::string> &outputs,
-                        const std::vector<std::string> &inputs);
+                       const std::vector<std::string> &outputs,
+                       const std::vector<std::string> &inputs);
 
   virtual ~OnnxObstacleDetector();
 

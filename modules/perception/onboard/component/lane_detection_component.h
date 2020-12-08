@@ -26,8 +26,8 @@
 #include "Eigen/StdVector"
 
 #include "cyber/component/component.h"
-#include "modules/common/util/util.h"
 #include "modules/common/util/eigen_defs.h"
+#include "modules/common/util/util.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
@@ -141,7 +141,6 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
   // fixed size camera frames
   int frame_capacity_ = 20;
   int frame_id_ = 0;
-  // std::vector<std::unique_ptr<camera::CameraFrame>> camera_frames_;
   EigenVector<camera::CameraFrame> camera_frames_;
 
   // image info.

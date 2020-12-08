@@ -25,8 +25,11 @@ namespace inference {
 using apollo::perception::base::Blob;
 
 ObstacleDetector::ObstacleDetector(const std::string &net_file,
-      const std::string &model_file, const std::vector<std::string> &outputs)
-    : net_file_(net_file), model_file_(model_file), output_names_(outputs) {}
+                                   const std::string &model_file,
+                                   const std::vector<std::string> &outputs):
+                                   net_file_(net_file),
+                                   model_file_(model_file),
+                                   output_names_(outputs) {}
 
 bool ObstacleDetector::Init(const std::map<std::string,
                             std::vector<int>> &shapes) {
@@ -76,11 +79,9 @@ bool ObstacleDetector::Init(const std::map<std::string,
 ObstacleDetector::ObstacleDetector(const std::string &net_file,
                    const std::string &model_file,
                    const std::vector<std::string> &outputs,
-                   const std::vector<std::string> &inputs)
-    : net_file_(net_file),
-      model_file_(model_file),
-      output_names_(outputs),
-      input_names_(inputs) {}
+                   const std::vector<std::string> &inputs):
+                   net_file_(net_file), model_file_(model_file),
+                   output_names_(outputs), input_names_(inputs) {}
 
 std::shared_ptr<Blob<float>> ObstacleDetector::get_blob(
     const std::string &name) {
@@ -127,7 +128,6 @@ void ObstacleDetector::Infer() {
   AINFO << "Start to do inference";
   auto outputs = net_.forward(torch_inputs).toTensor();
   AINFO << "Finished inference";
-  std::cout << outputs << std::endl;
 }
 
 }  // namespace inference

@@ -19,9 +19,9 @@
 #include <string>
 #include <vector>
 
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/app/cipv_camera.h"

@@ -29,10 +29,10 @@ cc_library(
     deps = [
         "//cyber",
         "//cyber/time:clock",
+        "//modules/common/math",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/proto:header_cc_proto",
-        "//modules/common/math",
         "//modules/common/util:eigen_defs",
         "//modules/common/util:time_util",
         "//modules/drivers/proto:sensor_image_cc_proto",
