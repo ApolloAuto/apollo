@@ -41,10 +41,10 @@ apt_get_update_and_install \
 
 bash ${CURR_DIR}/install_shellcheck.sh
 bash ${CURR_DIR}/install_gperftools.sh
-bash ${CURR_DIR}/install_benchmark.sh
-# TechDoc generation
-bash ${CURR_DIR}/install_doxygen.sh
 
+#bash ${CURR_DIR}/install_benchmark.sh
+# Generate Tech Docs
+# bash ${CURR_DIR}/install_doxygen.sh
 # sphinx ?
 
 ## Pylint
