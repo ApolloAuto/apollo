@@ -16,84 +16,118 @@
 
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 
-#include <utility>
-#include <vector>
-#include <omp.h>
-
 #include "cyber/common/log.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
-LibtorchObstacleDetection::LibtorchObstacleDetection() : device_(torch::kCPU) {
-  LoadModel();
-}
+using apollo::perception::base::Blob;
 
-bool LibtorchObstacleDetection::Evaluate(
-  const std::vector<std::vector<std::vector<double>>>& imageFrame) {
-  // Sanity checks.
-  omp_set_num_threads(1);
-  if (imageFrame.size() == 0) {
-    AERROR << "Got no channel in image frame!";
-    return false;
-  }
-  if (imageFrame[0].size() == 0) {
-    AERROR << "Got no image frame in channel 0!";
-    return false;
-  }
-  if (imageFrame[0].size() != 369664) {
-    AERROR << "imageFrame[0].size() = " << imageFrame[0].size() << ", skiping!";
-    return false;
-  }
-  // image imput size is 608 * 608 = 369664
-  torch::Tensor image_tensor = torch::empty(1 * 3 * 608 * 608);
-  float* data = image_tensor.data_ptr<float>();
+ObstacleDetector::ObstacleDetector(const std::string &net_file,
+      const std::string &model_file, const std::vector<std::string> &outputs)
+    : net_file_(net_file), model_file_(model_file), output_names_(outputs) {}
 
-  for (const auto& channel : imageFrame) {
-    for (const auto& i : channel) {
-      for (const auto& j : i) {
-        *data++ = static_cast<float>(j) / 255.0;
-      }
-    }
-  }
-
-  torch::Tensor torch_input = torch::from_blob(image_tensor.data_ptr<float>(),
-                                               {1, 3, 608, 608});
-  std::vector<torch::jit::IValue> torch_inputs;
-  torch_inputs.push_back(torch_input.to(device_));
-
-  auto start_time = std::chrono::system_clock::now();
-  at::Tensor torch_output_tensor = torch_model_.forward(torch_inputs).toTensor()
-                                               .to(torch::kCPU);
-
-  auto end_time = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time - start_time;
-  AINFO << "LibtorchDetection used time: " << diff.count() * 1000 << " ms.";
-  auto torch_output = torch_output_tensor.accessor<float, 2>();
-
-  // majority vote with 4 channels
-  float neg_score = torch_output[0][0] + torch_output[1][0] +
-                    torch_output[2][0] + torch_output[3][0];
-  float pos_score = torch_output[0][1] + torch_output[1][1] +
-                    torch_output[2][1] + torch_output[3][1];
-  ADEBUG << "neg_score = " << neg_score << ", pos_score = " << pos_score;
-  if (neg_score < pos_score) {
-    return true;
+bool ObstacleDetector::Init(const std::map<std::string,
+                            std::vector<int>> &shapes) {
+  if (gpu_id_ >= 0) {
+    device_type_ = torch::kCUDA;
+    device_id_ = gpu_id_;
   } else {
-    return false;
+    device_type_ = torch::kCPU;
+  }
+
+  // Init net
+  torch::Device device(device_type_, device_id_);
+  net_ = torch::jit::load(model_file_, device);
+  net_.eval();
+
+  // run a fake inference at init time as first inference is relative slow
+  torch::Tensor input_feature_tensor = torch::zeros({1, 3, 640, 960});
+  std::array<float, 2> down_ratio{8.0f, 8.0f};
+  torch::Tensor tensor_downratio = torch::from_blob(down_ratio.data(), {1, 2});
+  std::array<float, 9> K{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+  torch::Tensor tensor_K = torch::from_blob(K.data(), {1, 3, 3});
+
+  std::vector<torch::jit::IValue> torch_inputs;
+  // torch_inputs.push_back(std::make_tuple(input_feature_tensor.to(device),
+  //                       tensor_downratio.to(device)));
+  torch_inputs.push_back(input_feature_tensor.to(device));
+  torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
+                                         tensor_downratio.to(device)));
+  auto torch_output_tensor =
+      net_.forward(torch_inputs).toTensor();
+
+  for (const auto& name : output_names_) {
+    auto blob = std::make_shared<Blob<float>>(2, 6, 1, 1);
+    blobs_.emplace(name, blob);
+  }
+
+  for (const auto& name : input_names_) {
+    auto iter = shapes.find(name);
+    if (iter != shapes.end()) {
+      auto blob = std::make_shared<Blob<float>>(iter->second);
+      blobs_.emplace(name, blob);
+    }
   }
   return true;
 }
 
-void LibtorchObstacleDetection::LoadModel() {
-  if (torch::cuda::is_available()) {
-    AINFO << "CUDA is available";
-    device_ = torch::Device(torch::kCUDA);
+ObstacleDetector::ObstacleDetector(const std::string &net_file,
+                   const std::string &model_file,
+                   const std::vector<std::string> &outputs,
+                   const std::vector<std::string> &inputs)
+    : net_file_(net_file),
+      model_file_(model_file),
+      output_names_(outputs),
+      input_names_(inputs) {}
+
+std::shared_ptr<Blob<float>> ObstacleDetector::get_blob(
+    const std::string &name) {
+  auto iter = blobs_.find(name);
+  if (iter == blobs_.end()) {
+    return nullptr;
   }
-  torch::set_num_threads(1);
-  torch_model_ = torch::jit::load(FLAGS_torch_detector_model, device_);
+  return iter->second;
+}
+
+void ObstacleDetector::Infer() {
+  torch::Device device(device_type_, device_id_);
+  auto blob = blobs_[input_names_[0]];
+  auto input_K = blobs_[input_names_[1]];
+  auto input_ratio = blobs_[input_names_[2]];
+
+  torch::Tensor tensor_image = torch::from_blob(
+                              blob->data()->mutable_gpu_data(),
+                              {blob->shape(0), blob->shape(1), blob->shape(2),
+                              blob->shape(3)}, torch::kFloat32);
+  torch::Tensor tensor_K = torch::from_blob(
+                    input_K->data()->mutable_cpu_data(),
+                    {input_K->shape(0), input_K->shape(1), input_K->shape(2)},
+                    torch::kFloat32);
+  torch::Tensor tensor_ratio = torch::from_blob(
+                    input_ratio->data()->mutable_cpu_data(),
+                    {input_ratio->shape(0), input_ratio->shape(1)},
+                    torch::kFloat32);
+
+  std::vector<torch::jit::IValue> torch_inputs;
+  tensor_image = tensor_image.to(device);
+  tensor_image = tensor_image.permute({0, 3, 1, 2}).contiguous();
+
+  AINFO << tensor_image[0][0].sizes();
+  tensor_image[0][0] = tensor_image[0][0].div_(58.395);
+  tensor_image[0][1] = tensor_image[0][1].div_(57.12);
+  tensor_image[0][2] = tensor_image[0][2].div_(57.375);
+  AINFO << tensor_K[0][0];
+
+  torch_inputs.push_back(tensor_image);
+  torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
+                                         tensor_ratio.to(device)));
+
+  AINFO << "Start to do inference";
+  auto outputs = net_.forward(torch_inputs).toTensor();
+  AINFO << "Finished inference";
+  std::cout << outputs << std::endl;
 }
 
 }  // namespace inference

@@ -16,7 +16,6 @@ cc_library(
         "//modules/perception/camera/lib/lane/common/proto:denseline_cc_proto",
         "//modules/perception/camera/lib/lane/postprocessor/denseline/proto:denseline_postprocessor_cc_proto",
         "//modules/perception/lib/registerer",
-        "//modules/perception/lib/utils",
     ],
 )
 

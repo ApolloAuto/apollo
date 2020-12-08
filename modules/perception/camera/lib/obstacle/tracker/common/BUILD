@@ -47,6 +47,7 @@ cc_library(
     deps = [
         "//cyber",
         "@eigen",
+        "//modules/common/util:eigen_defs"
     ],
 )
 
