@@ -29,6 +29,14 @@ if [ "$(uname -m)" = "x86_64" ]; then
     pip3_install scipy grpcio-tools
 fi
 
+# Since pypcd installed via `pip install` only works with python2.7,
+# we can only install it this way
+git clone https://github.com/DanielPollithy/pypcd
+pushd pypcd >/dev/null
+make install
+popd >/dev/null
+rm -rf pypcd
+
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
