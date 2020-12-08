@@ -128,7 +128,7 @@ export default class RoutingEditor {
   }
 
   addDefaultRouting(routingName) {
-    if (this.routePoints.length <= minDefaultRoutingPointsNum) {
+    if (this.routePoints.length < minDefaultRoutingPointsNum) {
       alert(`Please provide at least ${minDefaultRoutingPointsNum} end point.`);
       return false;
     }
