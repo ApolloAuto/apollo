@@ -51,6 +51,7 @@ if [[ "${INSTALL_MODE}" == "build" ]]; then
 
         mkdir -p build && cd build
         cmake -DEPROSIMA_BUILD=ON \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${DEST_DIR} ..
         make -j$(nproc)
         make install
@@ -61,14 +62,14 @@ if [[ "${INSTALL_MODE}" == "build" ]]; then
 fi
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-    PKG_NAME="fast-rtps-1.5.0.prebuilt.x86_64.tar.gz"
-    CHECKSUM="ca0534db4f757cb41a9feaebac07a13dd4b63af0a217b2cb456e20b0836bc797"
+    PKG_NAME="fast-rtps-1.5.0-1.prebuilt.x86_64.tar.gz"
+    CHECKSUM="7f6cd1bee91f3c08149013b3d0d5ff46290fbed17b13a584fe8625d7553f603d"
     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
     tar xzf ${PKG_NAME}
-    mv fast-rtps-1.5.0 "${DEST_DIR}"
+    mv fast-rtps-1.5.0-1 "${DEST_DIR}"
     rm -rf ${PKG_NAME}
 else # aarch64
     PKG_NAME="fast-rtps-1.5.0.prebuilt.aarch64.tar.gz"
