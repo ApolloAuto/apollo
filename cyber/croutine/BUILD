@@ -46,10 +46,10 @@ cc_library(
     name = "swap",
     srcs = select(
         {
-            "//tools/platform:x86_mode": [
+            "@platforms//cpu:x86_64": [
                 "detail/swap_x86_64.S",
             ],
-            "//tools/platform:aarch64_mode": [
+            "@platforms//cpu:aarch64": [
                 "detail/swap_aarch64.S",
             ],
         },
