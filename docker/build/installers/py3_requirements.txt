@@ -26,6 +26,7 @@ matplotlib
 
 # Data format
 h5py
+pyyaml
 utm
 
 # Learning
