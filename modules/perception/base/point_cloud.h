@@ -174,17 +174,15 @@ class PointCloud {
     std::swap(sensor_to_world_pose_, rhs->sensor_to_world_pose_);
     std::swap(timestamp_, rhs->timestamp_);
   }
-  typedef typename EigenVector<PointT>::iterator iterator;
-  typedef typename EigenVector<PointT>::const_iterator const_iterator;
+  typedef typename std::vector<PointT>::iterator iterator;
+  typedef typename std::vector<PointT>::const_iterator const_iterator;
   // @brief vector iterator
   inline iterator begin() { return points_.begin(); }
   inline iterator end() { return points_.end(); }
   inline const_iterator begin() const { return points_.begin(); }
   inline const_iterator end() const { return points_.end(); }
-  typename std::vector<PointT, Eigen::aligned_allocator<PointT>>*
-  mutable_points() { return &points_; }
-  const typename std::vector<PointT, Eigen::aligned_allocator<PointT>>&
-  points() const { return points_; }
+  typename std::vector<PointT>* mutable_points() { return &points_; }
+  const typename std::vector<PointT>& points() const { return points_; }
 
   // @brief cloud timestamp setter
   void set_timestamp(const double timestamp) { timestamp_ = timestamp; }
@@ -252,7 +250,7 @@ class PointCloud {
   virtual bool CheckConsistency() const { return true; }
 
  protected:
-  EigenVector<PointT> points_;
+  std::vector<PointT> points_;
   size_t width_ = 0;
   size_t height_ = 0;
 
