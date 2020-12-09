@@ -21,7 +21,12 @@ This is a tool to sanity check the output files of extract_data.py
 
 import os
 import yaml
-import argparse
+
+from absl import app
+from absl import flags
+from absl import logging
+
+flags.DEFINE_string('input_folder', '', 'The folder stores extracted messages')
 
 
 def list_files(dir_path):
@@ -87,12 +92,13 @@ def missing_lidar_gnss_file(lidar_gnss_config):
     odometry_dir = os.path.join(yaml_dir, data['odometry_file'])
     point_cloud_dir = os.path.join(yaml_dir,
                                    list_to_str(data['sensor_files_directory']))
-    print(f"odometry_dir:{odometry_dir} , point_cloud_dir: {point_cloud_dir}")
+    logging.info(
+        f"odometry_dir:{odometry_dir} , point_cloud_dir: {point_cloud_dir}")
     if not os.access(odometry_dir, os.F_OK):
-        print('odometry file does not exist')
+        logging.info('odometry file does not exist')
         return True
     if not file_type_exist(point_cloud_dir, '.pcd'):
-        print('pcd file does not exist')
+        logging.info('pcd file does not exist')
         return True
     return False
 
@@ -107,13 +113,13 @@ def missing_camera_lidar_file(camera_lidar_configs):
     jpg_flag = file_type_exist(camera_lidar_pairs_dir, '.jpg')
     pcd_flag = file_type_exist(camera_lidar_pairs_dir, '.pcd')
     if not (jpg_flag and pcd_flag):
-        print('camera_lidar_pairs data error')
+        logging.info('camera_lidar_pairs data error')
         return True
     if not os.access(extrinsics_yaml_dir, os.F_OK):
-        print('extrinsics_yaml file does not exist')
+        logging.info('extrinsics_yaml file does not exist')
         return True
     if not os.access(intrinsics_yaml_dir, os.F_OK):
-        print('intrinsics_yaml file does not exist')
+        logging.info('intrinsics_yaml file does not exist')
         return True
     return False
 
@@ -136,10 +142,10 @@ def missing_calibration_data_file(sample_config_files):
 def is_oversize_file(path):
     dir_size = getInputDirDataSize(path)
     if dir_size == 0:
-        print('The input dir is empty!')
+        logging.error('The input dir is empty!')
         return True
     if dir_size >= 5 * 1024 * 1024 * 1024:
-        print('The record file is oversize!')
+        logging.error('The record file is oversize!')
         return True
     return False
 
@@ -149,16 +155,16 @@ def sanity_check(input_folder):
     camera_lidar_flag = False
     if is_oversize_file(input_folder):
         err_msg = "The input file is oversize(1G)!"
-        print(err_msg)
+        logging.error(err_msg)
         return False
     config_flag, config_files = missing_config_file(input_folder)
     if config_flag:
         err_msg = "Missing sample_config.yaml!"
-        print(err_msg)
+        logging.error(err_msg)
         return False
     if missing_calibration_task(config_files):
         err_msg = "The sample_config.yaml file miss calibration_task config!"
-        print(err_msg)
+        logging.error(err_msg)
         return False
     lidar_gnss_flag, camera_lidar_flag = missing_calibration_data_file(
         config_files)
@@ -169,27 +175,15 @@ def sanity_check(input_folder):
     elif lidar_gnss_flag and camera_lidar_flag:
         err_msg = "Missing lidar_gnss and camera_lidar files!"
     else:
-        print("%s Passed sanity check." % input_folder)
+        logging.info(f"{input_folder} Passed sanity check.")
         return True
-    print(err_msg)
+    logging.error(err_msg)
     return False
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-i",
-        "--input_folder",
-        action="store",
-        default="",
-        required=True,
-        dest='input_folder',
-        help="Specify the input folder where storing extracted sensor messages"
-    )
-    args = parser.parse_args()
-
-    sanity_check(input_folder=args.input_folder)
+def main(argv):
+    sanity_check(input_folder=flags.FLAGS.input_folder)
 
 
 if __name__ == "__main__":
-    main()
+    app.run(main)
