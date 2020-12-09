@@ -3,21 +3,21 @@ vehicle_param {
   vehicle_id {
       other_unique_id: "idriverplus"
   }
-  front_edge_to_center: 0.900
-  back_edge_to_center: 0.330
-  left_edge_to_center: 0.3475
-  right_edge_to_center: 0.3475
+  front_edge_to_center: 0.945
+  back_edge_to_center: 0.356
+  left_edge_to_center: 0.345
+  right_edge_to_center: 0.345
 
-  length: 1.230
+  length: 1.301
   width: 0.695
-  height: 0.760
-  min_turn_radius: 1.52
-  max_acceleration: 0.3
-  max_deceleration: -1.0
-  max_steer_angle: 0.5236
+  height: 0.616
+  min_turn_radius: 1.35
+  max_acceleration: 0.8
+  max_deceleration: -1.4
+  max_steer_angle: 3.2637
   max_steer_angle_rate: 4.363
   min_steer_angle_rate:0
-  steer_ratio: 1
+  steer_ratio: 7.5
   wheel_base: 0.620
   wheel_rolling_radius: 0.150
 

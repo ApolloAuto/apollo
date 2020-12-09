@@ -68,7 +68,7 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
       uint8_t* data, Steering_command_102::Steer_en_ctrlType steer_en_ctrl);
 
   // config detail: {'name': 'Steer_ANGLE_Target', 'offset': -500.0,
-  // 'precision': 0.1, 'len': 16, 'is_signed_var': False, 'physical_range':
+  // 'precision': 1.0, 'len': 16, 'is_signed_var': False, 'physical_range':
   // '[-500|500]', 'bit': 31, 'type': 'double', 'order': 'motorola',
   // 'physical_unit': 'deg'}
   void set_p_steer_angle_target(uint8_t* data, double steer_angle_target);
