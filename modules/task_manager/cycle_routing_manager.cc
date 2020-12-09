@@ -64,8 +64,8 @@ bool CycleRoutingManager::GetNewRouting(const localization::Pose &pose,
       AINFO << "GetNewRouting: reach begin point";
       new_routing_request->CopyFrom(original_routing_request_);
       auto cur_point = new_routing_request->mutable_waypoint(0);
-      if (!map_service_->ConstructLaneWayPoint(pose.position().x(),
-          pose.position().y(), cur_point)) {
+      if (!map_service_->ConstructLaneWayPointWithHeading(pose.position().x(),
+          pose.position().y(), pose.heading(), cur_point)) {
         AINFO << "GetNewRouting: construct begin lane way point fail!";
         return false;
       }
@@ -81,8 +81,8 @@ bool CycleRoutingManager::GetNewRouting(const localization::Pose &pose,
       AINFO << "GetNewRouting: reach end point";
       new_routing_request->clear_waypoint();
       auto cur_point = new_routing_request->add_waypoint();
-      if (!map_service_->ConstructLaneWayPoint(pose.position().x(),
-          pose.position().y(), cur_point)) {
+      if (!map_service_->ConstructLaneWayPointWithHeading(pose.position().x(),
+          pose.position().y(), pose.heading(), cur_point)) {
         AINFO << "GetNewRouting: construct end lane way point fail!";
         return false;
       }
