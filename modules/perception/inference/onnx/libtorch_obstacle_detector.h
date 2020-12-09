@@ -13,32 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #pragma once
 
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
+#include <torch/script.h>
+#include <torch/torch.h>
 
-#include "torch/script.h"
-#include "torch/torch.h"
+#include "modules/perception/inference/inference.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
-class LibtorchObstacleDetection {
+using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
+
+class ObstacleDetector : public Inference {
  public:
-  LibtorchObstacleDetection();
+  ObstacleDetector(const std::string &net_file, const std::string &model_file,
+           const std::vector<std::string> &outputs);
 
-  ~LibtorchObstacleDetection() = default;
+  ObstacleDetector(const std::string &net_file, const std::string &model_file,
+           const std::vector<std::string> &outputs,
+           const std::vector<std::string> &inputs);
 
-  bool Evaluate(
-    const std::vector<std::vector<std::vector<double>>>& imageFrame);
+  virtual ~ObstacleDetector() {}
+
+  bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
+
+  void Infer() override;
+  BlobPtr get_blob(const std::string &name) override;
+
+ protected:
+  bool shape(const std::string &name, std::vector<int> *res);
+  torch::jit::script::Module net_;
 
  private:
-  void LoadModel();
+  std::string net_file_;
+  std::string model_file_;
+  std::vector<std::string> output_names_;
+  std::vector<std::string> input_names_;
+  BlobMap blobs_;
 
- private:
-  torch::jit::script::Module torch_model_;
-  torch::Device device_;
+  torch::DeviceType device_type_;
+  int device_id_ = 0;
 };
 
 }  // namespace inference

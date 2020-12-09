@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <boost/circular_buffer.hpp>
@@ -30,8 +31,9 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-struct Target {
+struct alignas(16) Target {
  public:
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit Target(const omt::TargetParam &param);
   void Init(const omt::TargetParam &param);
   void Add(TrackObjectPtr object);
@@ -88,7 +90,7 @@ struct Target {
   void ClappingTrackVelocity(const base::ObjectPtr &obj);
   bool CheckStatic();
 
-  boost::circular_buffer<base::Object> history_world_states_;
+  boost::circular_buffer<std::shared_ptr<base::Object>> history_world_states_;
 
  protected:
   ObjectTemplateManager *object_template_manager_ = nullptr;

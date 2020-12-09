@@ -22,6 +22,7 @@
 
 #include <boost/circular_buffer.hpp>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"

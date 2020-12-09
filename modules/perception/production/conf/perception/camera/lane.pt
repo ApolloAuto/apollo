@@ -2,16 +2,32 @@ gpu_id: 0
 lane_param {
   lane_detector_param {
     plugin_param {
-      name : "DarkSCNNLaneDetector"
+      name : "DenselineLaneDetector"
       root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_detector/"
-      config_file : "config_darkSCNN.pt"
+      config_file : "config.pt"
     }
     camera_name : "front_6mm"
   }
   lane_postprocessor_param {
-      name : "DarkSCNNLanePostprocessor"
-      root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/darkSCNN/"
+    name : "DenselineLanePostprocessor"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/denseline/"
+    config_file : "config.pt"
+  }
+}
+
+lane_param {
+  lane_detector_param {
+    plugin_param {
+      name : "DenselineLaneDetector"
+      root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_detector/"
       config_file : "config.pt"
+    }
+    camera_name : "front_12mm"
+  }
+  lane_postprocessor_param {
+    name : "DenselineLanePostprocessor"
+    root_dir : "/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/denseline/"
+    config_file : "config.pt"
   }
 }
 

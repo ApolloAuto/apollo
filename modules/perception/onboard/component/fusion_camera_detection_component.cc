@@ -36,6 +36,7 @@ namespace perception {
 namespace onboard {
 
 using apollo::cyber::common::GetAbsolutePath;
+using ::apollo::cyber::Clock;
 
 static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
                           apollo::perception::LaneMarker *lane_marker) {
@@ -151,8 +152,8 @@ bool LoadExtrinsics(const std::string &yaml_file,
 // @description: get project matrix
 bool GetProjectMatrix(
     const std::vector<std::string> &camera_names,
-    const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
+    const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
+    const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
     Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
   // TODO(techoe): This condition should be removed.
   if (camera_names.size() != 2) {
@@ -278,7 +279,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
 
   // for e2e lantency statistics
   {
-    const double cur_time = apollo::common::time::Clock::NowInSeconds();
+    const double cur_time = Clock::NowInSeconds();
     const double start_latency = (cur_time - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:Start:msg_time[" << camera_name << "-"
           << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
@@ -318,7 +319,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   }
   // for e2e lantency statistics
   {
-    const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
+    const double end_timestamp = Clock::NowInSeconds();
     const double end_latency =
         (end_timestamp - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:End:msg_time[" << camera_name << "-"
@@ -834,7 +835,7 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
     const std::vector<base::LaneLine> &lane_objects,
     const apollo::common::ErrorCode error_code,
     apollo::perception::PerceptionObstacles *obstacles) {
-  double publish_time = apollo::common::time::Clock::NowInSeconds();
+  double publish_time = Clock::NowInSeconds();
   apollo::common::Header *header = obstacles->mutable_header();
   header->set_timestamp_sec(publish_time);
   header->set_module_name("perception_camera");

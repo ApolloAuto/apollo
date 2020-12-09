@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/similar.h"
@@ -30,7 +31,8 @@
 namespace apollo {
 namespace perception {
 namespace camera {
-struct Hypothesis {
+struct alignas(16) Hypothesis {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   int target;
   int object;
   float score;
@@ -59,6 +61,7 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   //                         width_(0.0f), height_(0.0f),
   //                         BaseObstacleTracker() {
   //  }
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   OMTObstacleTracker() : BaseObstacleTracker() {}
 
   ~OMTObstacleTracker() override = default;
@@ -113,7 +116,7 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   FrameList frame_list_;
   SimilarMap similar_map_;
   std::shared_ptr<BaseSimilar> similar_ = nullptr;
-  std::vector<Target> targets_;
+  apollo::common::EigenVector<Target> targets_;
   std::vector<bool> used_;
   ObstacleReference reference_;
   std::vector<std::vector<float>> kTypeAssociatedCost_;

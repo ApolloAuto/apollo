@@ -23,7 +23,11 @@
 
 #include "Eigen/Dense"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point.h"
+
+using apollo::common::EigenVector;
+using apollo::common::EigenMap;
 
 namespace apollo {
 namespace perception {

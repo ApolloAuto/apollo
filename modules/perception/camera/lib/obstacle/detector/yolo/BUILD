@@ -25,10 +25,12 @@ cc_library(
     ],
     hdrs = ["region_output.h"],
     deps = [
+        ":object_maintainer",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_cc_proto",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -39,6 +41,7 @@ cc_library(
     deps = [
         ":region_output",
         "//cyber/common:file",
+        "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe:external_feature_extractor",
@@ -49,14 +52,15 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "//modules/perception/lib/utils",
     ],
 )
 
 cc_library(
     name = "object_maintainer",
+    srcs = ["object_maintainer.cc"],
     hdrs = ["object_maintainer.h"],
     deps = [
+        "//cyber/common:file",
         "//modules/perception/base",
     ],
 )

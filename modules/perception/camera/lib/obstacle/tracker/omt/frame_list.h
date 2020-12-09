@@ -28,7 +28,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-struct PatchIndicator {
+struct alignas(16) PatchIndicator {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   PatchIndicator() {
     frame_id = patch_id = -1;
     sensor_name = "";
@@ -59,8 +60,9 @@ struct PatchIndicator {
   std::string sensor_name;
 };
 
-struct SimilarMap {
+struct alignas(16) SimilarMap {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   bool Init(int dim, int gpu_id = 0, int init_size = 128) {
     if (dim == 0) {
       return false;
@@ -102,6 +104,7 @@ struct SimilarMap {
 
 class FrameList {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   FrameList() { Init(1); }
 
   bool Init(int cap) {

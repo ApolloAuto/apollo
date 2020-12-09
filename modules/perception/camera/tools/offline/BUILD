@@ -13,10 +13,13 @@ cc_library(
     ],
     deps = [
         ":transform_server",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
         "//modules/perception/proto:motion_service_cc_proto",
-        "@opencv",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+        "@opencv//:highgui",
     ],
 )
 
@@ -45,12 +48,15 @@ cc_binary(
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",
-        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
-        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
-        "//modules/perception/lib/utils",
-        "//third_party:boost",
+        # "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
+        # "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
+        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "@boost",
         "@com_google_absl//absl/strings",
-        "@opencv",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+        "@opencv//:highgui",
     ],
 )
 

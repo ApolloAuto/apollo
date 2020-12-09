@@ -16,6 +16,35 @@ cc_library(
 )
 
 cc_library(
+    name = "obstacle_camera_perception",
+    srcs = ["obstacle_camera_perception.cc"],
+    hdrs = ["obstacle_camera_perception.h"],
+    deps = [
+        ":debug_info",
+        "//cyber",
+        "//external:gflags",
+        "//modules/common/util:perf_util",
+        "//modules/perception/camera/app/proto:perception_cc_proto",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
+        "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
+        "//modules/perception/camera/lib/feature_extractor/tfe:external_feature_extractor",
+        "//modules/perception/camera/lib/feature_extractor/tfe:project_feature",
+        "//modules/perception/camera/lib/feature_extractor/tfe:tracking_feat_extractor",
+        "//modules/perception/camera/lib/interface",
+        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
+        "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
+        "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
+        "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
+        "//modules/perception/inference/utils:inference_cuda_util_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+    ],
+)
+
+cc_library(
     name = "traffic_light_camera_perception",
     srcs = ["traffic_light_camera_perception.cc"],
     hdrs = ["traffic_light_camera_perception.h"],
@@ -32,6 +61,30 @@ cc_library(
         "//modules/perception/camera/lib/traffic_light/tracker/proto:semantic_cc_proto",
     ],
     alwayslink = True,
+)
+
+cc_library(
+    name = "lane_camera_perception",
+    srcs = ["lane_camera_perception.cc"],
+    hdrs = ["lane_camera_perception.h"],
+    deps = [
+        ":debug_info",
+        "//cyber",
+        "//external:gflags",
+        "//modules/common/util:perf_util",
+        "//modules/perception/base",
+        "//modules/perception/camera/app/proto:perception_cc_proto",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
+        "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
+        "//modules/perception/camera/lib/interface",
+        # "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
+        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
+        # "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
+        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/inference/utils:inference_cuda_util_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+    ],
 )
 
 cc_library(

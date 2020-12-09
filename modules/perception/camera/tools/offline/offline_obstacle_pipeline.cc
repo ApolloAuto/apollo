@@ -14,8 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+
 #include <fstream>
 #include <iomanip>
+#include <opencv2/highgui/highgui_c.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_split.h"
@@ -27,9 +31,7 @@
 #include "modules/perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/project_feature.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
-#include "modules/perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h"
 #include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
-#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
@@ -81,8 +83,8 @@ REGISTER_LANE_POSTPROCESSOR(DenselineLanePostprocessor);
 REGISTER_LANE_DETECTOR(DenselineLaneDetector);
 REGISTER_CALIBRATOR(LaneLineCalibrator);
 REGISTER_CALIBRATION_SERVICE(OnlineCalibrationService);
-REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);
-REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);
+// REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);
+// REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);
 
 static const float kDefaultPitchAngle = 0.0f;
 static const float kDefaultCameraHeight = 1.5f;
@@ -229,13 +231,13 @@ int work() {
     std::string image_path = FLAGS_image_root + image_name + FLAGS_image_ext;
     cv::Mat image;
     if (FLAGS_image_color == "gray") {
-      image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
+      image = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
       cv::cvtColor(image, image, CV_GRAY2RGB);
     } else if (FLAGS_image_color == "rgb") {
-      image = cv::imread(image_path, cv::IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMREAD_COLOR);
       cv::cvtColor(image, image, CV_BGR2RGB);
     } else if (FLAGS_image_color == "bgr") {
-      image = cv::imread(image_path, cv::IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMREAD_COLOR);
     } else {
       AERROR << "Invalid color: " << FLAGS_image_color;
     }

@@ -17,6 +17,7 @@
 #include "modules/perception/camera/lib/obstacle/detector/yolo/region_output.h"
 
 #include "cyber/common/log.h"
+#include "modules/perception/camera/lib/obstacle/detector/yolo/object_maintainer.h"
 
 namespace apollo {
 namespace perception {
@@ -411,6 +412,84 @@ int get_area_id(float visible_ratios[4]) {
     visible_ratios[right_face] = right_ratio / sum_ratio;
   }
   return area_id;
+}
+
+const float *get_cpu_data(bool flag, const base::Blob<float> &blob) {
+  return flag ? blob.cpu_data() : nullptr;
+}
+
+void get_objects_cpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
+                     const std::vector<base::ObjectSubType> &types,
+                     const NMSParam &nms, const yolo::ModelParam &model_param,
+                     float light_vis_conf_threshold,
+                     float light_swt_conf_threshold,
+                     base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
+                     std::vector<base::ObjectPtr> *objects) {
+  std::map<base::ObjectSubType, std::vector<int>> indices;
+  std::map<base::ObjectSubType, std::vector<float>> conf_scores;
+  int num_kept = 0;
+  int num_classes = types.size();
+  num_kept = get_objects_gpu(yolo_blobs, stream, types, nms, model_param,
+                  light_vis_conf_threshold, light_swt_conf_threshold,
+                  overlapped, idx_sm, indices, conf_scores);
+  objects->clear();
+
+  if (num_kept == 0) {
+    return;
+  }
+
+  objects->reserve(num_kept+static_cast<int>(objects->size()));
+  const float *cpu_box_data = yolo_blobs.res_box_blob->cpu_data();
+
+  ObjectMaintainer maintainer;
+  for (auto it = indices.begin(); it != indices.end(); ++it) {
+    base::ObjectSubType label = it->first;
+    if (conf_scores.find(label) == conf_scores.end()) {
+      // Something bad happened if there are no predictions for current label.
+      continue;
+    }
+    const std::vector<float> &scores = conf_scores.find(label)->second;
+    std::vector<int> &indice = it->second;
+    for (size_t j = 0; j < indice.size(); ++j) {
+      int idx = indice[j];
+      const float *bbox = cpu_box_data + idx * kBoxBlockSize;
+      if (scores[idx] < model_param.confidence_threshold()) {
+        continue;
+      }
+
+      base::ObjectPtr obj = nullptr;
+      obj.reset(new base::Object);
+      obj->type = base::kSubType2TypeMap.at(label);
+      obj->sub_type = label;
+      obj->type_probs.assign(
+          static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0);
+      obj->sub_type_probs.assign(
+          static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE), 0);
+      float total = 1e-5;
+      for (int k = 0; k < num_classes; ++k) {
+        auto &vis_type_k = types[k];
+        auto &obj_type_k = base::kSubType2TypeMap.at(vis_type_k);
+        auto &conf_score = conf_scores[vis_type_k][idx];
+        obj->type_probs[static_cast<int>(obj_type_k)] += conf_score;
+        obj->sub_type_probs[static_cast<int>(vis_type_k)] = conf_score;
+        total += conf_score;
+      }
+      obj->confidence = obj->type_probs[static_cast<int>(obj->type)];
+      for (size_t k = 0; k < obj->type_probs.size(); ++k) {
+        obj->type_probs[k] /= total;
+      }
+      fill_base(obj, bbox);
+      fill_bbox3d(model_param.with_box3d(), obj, bbox + 4);
+      fill_frbox(model_param.with_frbox(), obj, bbox + 8);
+      fill_lights(model_param.with_lights(), obj, bbox + 16);
+      fill_ratios(model_param.with_ratios(), obj, bbox + 22);
+      fill_area_id(model_param.num_areas() > 0, obj, bbox + 30);
+
+      if (maintainer.Add(idx, obj)) {
+        objects->push_back(obj);
+      }
+    }
+  }
 }
 
 }  // namespace camera

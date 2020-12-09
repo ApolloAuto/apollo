@@ -388,13 +388,19 @@ const float *get_gpu_data(bool flag, const base::Blob<float> &blob) {
   return flag ? blob.gpu_data() : nullptr;
 }
 
-void get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
-                     const std::vector<base::ObjectSubType> &types,
-                     const NMSParam &nms, const yolo::ModelParam &model_param,
-                     float light_vis_conf_threshold,
-                     float light_swt_conf_threshold,
-                     base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
-                     std::vector<base::ObjectPtr> *objects) {
+int get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
+    const std::vector<base::ObjectSubType> &types,
+    const NMSParam &nms, const yolo::ModelParam &model_param,
+    float light_vis_conf_threshold,
+    float light_swt_conf_threshold,
+    base::Blob<bool> *overlapped, base::Blob<int> *idx_sm,
+    const std::map<base::ObjectSubType, std::vector<int>> &indices_cns,
+    const std::map<base::ObjectSubType, std::vector<float>> &conf_scores_cns) {
+  auto& indices = const_cast<std::map<base::ObjectSubType,
+                      std::vector<int>>& >(indices_cns);
+  auto& conf_scores = const_cast<std::map<base::ObjectSubType,
+                      std::vector<float>>& >(conf_scores_cns);
+
   bool multi_scale = false;
   if (yolo_blobs.det2_obj_blob) {
     multi_scale = true;
@@ -522,9 +528,6 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
   std::iota(all_indices.begin(), all_indices.end(), 0);
   std::vector<int> rest_indices;
 
-  std::map<base::ObjectSubType, std::vector<int>> indices;
-  std::map<base::ObjectSubType, std::vector<float>> conf_scores;
-
   int top_k = idx_sm->count();
   int num_kept = 0;
   // inter-cls NMS
@@ -545,64 +548,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
     cudaStreamSynchronize(stream);
   }
 
-  objects->clear();
-
-  if (num_kept == 0) {
-    return;
-  }
-
-  objects->reserve(num_kept);
-  const float *cpu_box_data = yolo_blobs.res_box_blob->cpu_data();
-
-  ObjectMaintainer maintainer;
-  for (auto it = indices.begin(); it != indices.end(); ++it) {
-    base::ObjectSubType label = it->first;
-    if (conf_scores.find(label) == conf_scores.end()) {
-      // Something bad happened if there are no predictions for current label.
-      continue;
-    }
-    const std::vector<float> &scores = conf_scores.find(label)->second;
-    std::vector<int> &indice = it->second;
-    for (size_t j = 0; j < indice.size(); ++j) {
-      int idx = indice[j];
-      const float *bbox = cpu_box_data + idx * kBoxBlockSize;
-      if (scores[idx] < model_param.confidence_threshold()) {
-        continue;
-      }
-
-      base::ObjectPtr obj = nullptr;
-      obj.reset(new base::Object);
-      obj->type = base::kSubType2TypeMap.at(label);
-      obj->sub_type = label;
-      obj->type_probs.assign(
-          static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0);
-      obj->sub_type_probs.assign(
-          static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE), 0);
-      float total = 1e-5;
-      for (int k = 0; k < num_classes; ++k) {
-        auto &vis_type_k = types[k];
-        auto &obj_type_k = base::kSubType2TypeMap.at(vis_type_k);
-        auto &conf_score = conf_scores[vis_type_k][idx];
-        obj->type_probs[static_cast<int>(obj_type_k)] += conf_score;
-        obj->sub_type_probs[static_cast<int>(vis_type_k)] = conf_score;
-        total += conf_score;
-      }
-      obj->confidence = obj->type_probs[static_cast<int>(obj->type)];
-      for (int k = 0; k < obj->type_probs.size(); ++k) {
-        obj->type_probs[k] /= total;
-      }
-      fill_base(obj, bbox);
-      fill_bbox3d(model_param.with_box3d(), obj, bbox + 4);
-      fill_frbox(model_param.with_frbox(), obj, bbox + 8);
-      fill_lights(model_param.with_lights(), obj, bbox + 16);
-      fill_ratios(model_param.with_ratios(), obj, bbox + 22);
-      fill_area_id(model_param.num_areas() > 0, obj, bbox + 30);
-
-      if (maintainer.Add(idx, obj)) {
-        objects->push_back(obj);
-      }
-    }
-  }
+  return num_kept;
 }
 
 void get_intersect_bbox(const NormalizedBBox &bbox1,
@@ -820,131 +766,6 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
     if (keep && eta < 1 && adaptive_threshold > 0.5) {
       adaptive_threshold *= eta;
     }
-  }
-}
-
-void filter_bbox(const MinDims &min_dims,
-                 std::vector<base::ObjectPtr> *objects) {
-  size_t valid_obj_idx = 0;
-  size_t total_obj_idx = 0;
-  while (total_obj_idx < objects->size()) {
-    const auto &obj = (*objects)[total_obj_idx];
-    if ((obj->camera_supplement.box.ymax - obj->camera_supplement.box.ymin) >=
-            min_dims.min_2d_height &&
-        (min_dims.min_3d_height <= 0 ||
-         obj->size[2] >= min_dims.min_3d_height) &&
-        (min_dims.min_3d_width <= 0 || obj->size[1] >= min_dims.min_3d_width) &&
-        (min_dims.min_3d_length <= 0 ||
-         obj->size[0] >= min_dims.min_3d_length)) {
-      (*objects)[valid_obj_idx] = (*objects)[total_obj_idx];
-      ++valid_obj_idx;
-    }
-    ++total_obj_idx;
-  }
-  objects->resize(valid_obj_idx);
-}
-void recover_bbox(int roi_w, int roi_h, int offset_y,
-                  std::vector<base::ObjectPtr> *objects) {
-  for (auto &obj : *objects) {
-    float xmin = obj->camera_supplement.box.xmin;
-    float ymin = obj->camera_supplement.box.ymin;
-    float xmax = obj->camera_supplement.box.xmax;
-    float ymax = obj->camera_supplement.box.ymax;
-    int x = xmin * roi_w;
-    int w = (xmax - xmin) * roi_w;
-    int y = ymin * roi_h + offset_y;
-    int h = (ymax - ymin) * roi_h;
-    base::RectF rect_det(x, y, w, h);
-    base::RectF rect_img(0, 0, roi_w, roi_h + offset_y);
-    base::RectF rect = rect_det & rect_img;
-    obj->camera_supplement.box = rect;
-
-    double eps = 1e-2;
-
-    // Truncation assignment based on bbox positions
-    if ((ymin < eps) || (ymax >= 1.0 - eps)) {
-      obj->camera_supplement.truncated_vertical = 0.5;
-    } else {
-      obj->camera_supplement.truncated_vertical = 0.0;
-    }
-    if ((xmin < eps) || (xmax >= 1.0 - eps)) {
-      obj->camera_supplement.truncated_horizontal = 0.5;
-    } else {
-      obj->camera_supplement.truncated_horizontal = 0.0;
-    }
-
-    obj->camera_supplement.front_box.xmin *= roi_w;
-    obj->camera_supplement.front_box.ymin *= roi_h;
-    obj->camera_supplement.front_box.xmax *= roi_w;
-    obj->camera_supplement.front_box.ymax *= roi_h;
-
-    obj->camera_supplement.back_box.xmin *= roi_w;
-    obj->camera_supplement.back_box.ymin *= roi_h;
-    obj->camera_supplement.back_box.xmax *= roi_w;
-    obj->camera_supplement.back_box.ymax *= roi_h;
-
-    obj->camera_supplement.front_box.ymin += offset_y;
-    obj->camera_supplement.front_box.ymax += offset_y;
-    obj->camera_supplement.back_box.ymin += offset_y;
-    obj->camera_supplement.back_box.ymax += offset_y;
-  }
-}
-
-void fill_base(base::ObjectPtr obj, const float *bbox) {
-  obj->camera_supplement.box.xmin = bbox[0];
-  obj->camera_supplement.box.ymin = bbox[1];
-  obj->camera_supplement.box.xmax = bbox[2];
-  obj->camera_supplement.box.ymax = bbox[3];
-}
-
-void fill_bbox3d(bool with_box3d, base::ObjectPtr obj, const float *bbox) {
-  if (with_box3d) {
-    obj->camera_supplement.alpha = bbox[0];
-    obj->size[2] = bbox[1];
-    obj->size[1] = bbox[2];
-    obj->size[0] = bbox[3];
-  }
-}
-
-void fill_frbox(bool with_frbox, base::ObjectPtr obj, const float *bbox) {
-  if (with_frbox) {
-    obj->camera_supplement.front_box.xmin = bbox[0];
-    obj->camera_supplement.front_box.ymin = bbox[1];
-    obj->camera_supplement.front_box.xmax = bbox[2];
-    obj->camera_supplement.front_box.ymax = bbox[3];
-
-    obj->camera_supplement.back_box.xmin = bbox[4];
-    obj->camera_supplement.back_box.ymin = bbox[5];
-    obj->camera_supplement.back_box.xmax = bbox[6];
-    obj->camera_supplement.back_box.ymax = bbox[7];
-  }
-}
-
-void fill_lights(bool with_lights, base::ObjectPtr obj, const float *bbox) {
-  if (with_lights) {
-    obj->car_light.brake_visible = bbox[0];
-    obj->car_light.brake_switch_on = bbox[1];
-    obj->car_light.left_turn_visible = bbox[2];
-    obj->car_light.left_turn_switch_on = bbox[3];
-    obj->car_light.right_turn_visible = bbox[4];
-    obj->car_light.right_turn_switch_on = bbox[5];
-  }
-}
-
-void fill_ratios(bool with_ratios, base::ObjectPtr obj, const float *bbox) {
-  if (with_ratios) {
-    // visible ratios of face a/b/c/d
-    obj->camera_supplement.visible_ratios[0] = bbox[0];
-    obj->camera_supplement.visible_ratios[1] = bbox[1];
-    obj->camera_supplement.visible_ratios[2] = bbox[2];
-    obj->camera_supplement.visible_ratios[3] = bbox[3];
-
-    // cut off on width and length (3D)
-    obj->camera_supplement.cut_off_ratios[0] = bbox[4];
-    obj->camera_supplement.cut_off_ratios[1] = bbox[5];
-    // cut off on left and right side (2D)
-    obj->camera_supplement.cut_off_ratios[2] = bbox[6];
-    obj->camera_supplement.cut_off_ratios[3] = bbox[7];
   }
 }
 

@@ -18,7 +18,6 @@ cc_library(
         "//modules/perception/camera/lib/interface:base_init_options",
         "//modules/perception/camera/lib/motion",
         "//modules/perception/lib/registerer",
-        "//modules/perception/lib/utils",
         "//modules/perception/onboard/proto:motion_service_cc_proto",
         "//modules/perception/proto:motion_service_cc_proto",
     ],

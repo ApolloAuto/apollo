@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "cyber/component/component.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
@@ -41,6 +42,8 @@
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
+using apollo::common::EigenMap;
+using apollo::common::EigenVector;
 
 namespace apollo {
 namespace perception {
@@ -131,8 +134,8 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       data_providers_map_;
 
   // map for store params
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix4d> extrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> intrinsic_map_;
   Eigen::Matrix3d homography_im2car_;
 
   // camera obstacle pipeline
@@ -143,7 +146,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   // fixed size camera frames
   int frame_capacity_ = 20;
   int frame_id_ = 0;
-  std::vector<camera::CameraFrame> camera_frames_;
+  EigenVector<camera::CameraFrame> camera_frames_;
 
   // image info.
   int image_width_ = 1920;
