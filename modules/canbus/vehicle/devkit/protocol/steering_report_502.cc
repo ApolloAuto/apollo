@@ -106,7 +106,7 @@ Steering_report_502::Steer_en_stateType Steeringreport502::steer_en_state(
 }
 
 // config detail: {'name': 'steer_angle_actual', 'offset': -500.0, 'precision':
-// 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[-500|500]',
+// 1.0, 'len': 16, 'is_signed_var': False, 'physical_range': '[-500|500]',
 // 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
 double Steeringreport502::steer_angle_actual(const std::uint8_t* bytes,
                                              int32_t length) const {
@@ -118,7 +118,7 @@ double Steeringreport502::steer_angle_actual(const std::uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  double ret = x * 0.100000 + -500.000000;
+  double ret = x + -500.000000;
   return ret;
 }
 }  // namespace devkit
