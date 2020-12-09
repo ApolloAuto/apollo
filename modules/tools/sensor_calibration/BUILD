@@ -88,4 +88,7 @@ py_library(
 py_binary(
     name = "sanity_check",
     srcs = ["sanity_check.py"],
+    deps = [
+        "//modules/tools/common:file_utils",
+    ]
 )

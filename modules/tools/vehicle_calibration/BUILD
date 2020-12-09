@@ -33,6 +33,14 @@ py_binary(
     srcs = ["plot_results.py"],
 )
 
+py_binary(
+    name = "preprocess",
+    srcs = ["preprocess.py"],
+    deps = [
+        ":sanity_check",
+    ],
+)
+
 py_library(
     name = "process",
     srcs = ["process.py"],
@@ -52,6 +60,17 @@ py_binary(
     deps = [
         "//modules/control/proto:calibration_table_py_pb2",
         "//modules/control/proto:control_conf_py_pb2",
+        "//modules/tools/common:proto_utils",
+    ],
+)
+
+py_library(
+    name = "sanity_check",
+    srcs = ["sanity_check.py"],
+    deps = [
+        "//cyber/python/cyber_py3:record",
+        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/tools/common:file_utils",
         "//modules/tools/common:proto_utils",
     ],
 )

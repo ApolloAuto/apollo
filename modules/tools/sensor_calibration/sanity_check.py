@@ -26,24 +26,9 @@ from absl import app
 from absl import flags
 from absl import logging
 
+import modules.tools.common.file_utils as file_utils
+
 flags.DEFINE_string('input_folder', '', 'The folder stores extracted messages')
-
-
-def list_files(dir_path):
-    """List all sub-files in given dir_path."""
-    return [
-        os.path.join(root, f) for root, _, files in os.walk(dir_path)
-        for f in files
-    ]
-
-
-def getInputDirDataSize(path):
-    sumsize = 0
-    filelist = list_files(path)
-    for file in filelist:
-        size = os.path.getsize(file)
-        sumsize += size
-    return int(sumsize)
 
 
 def missing_config_file(path):
@@ -140,7 +125,7 @@ def missing_calibration_data_file(sample_config_files):
 
 
 def is_oversize_file(path):
-    dir_size = getInputDirDataSize(path)
+    dir_size = file_utils.getInputDirDataSize(path)
     if dir_size == 0:
         logging.error('The input dir is empty!')
         return True
