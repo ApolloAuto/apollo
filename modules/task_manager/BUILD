@@ -3,14 +3,16 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+TASK_MANAGER_COPTS = ['-DMODULE_NAME=\\"task_manager\\"']
+
 cc_library(
     name = "cycle_routing_manager_lib",
     srcs = ["cycle_routing_manager.cc"],
     hdrs = ["cycle_routing_manager.h"],
-    copts = ['-DMODULE_NAME=\\"task_manager\\"'],
+    copts = TASK_MANAGER_COPTS,
     deps = [
-        "//modules/common/status:status",
-        "//modules/common/monitor_log:monitor_log",
+        "//modules/common/monitor_log",
+        "//modules/common/status",
         "//modules/dreamview/backend/map:map_service",
         "//modules/localization/proto:localization_cc_proto",
         "//modules/task_manager/common:task_manager_gflags",
@@ -22,7 +24,7 @@ cc_library(
     name = "task_manager_component_lib",
     srcs = ["task_manager_component.cc"],
     hdrs = ["task_manager_component.h"],
-    copts = ['-DMODULE_NAME=\\"task_manager\\"'],
+    copts = TASK_MANAGER_COPTS,
     deps = [
         ":cycle_routing_manager_lib",
         "//cyber",
