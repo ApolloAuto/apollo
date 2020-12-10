@@ -1,6 +1,6 @@
 extrinsic_file {
     frame_id: "novatel"
-    child_frame_id: "velodyne16"
+    child_frame_id: "lidar16"
     file_path: "/apollo/modules/drivers/lidar/velodyne/params/velodyne16_novatel_extrinsics.yaml"
     enable: true
 }
@@ -13,21 +13,21 @@ extrinsic_file {
 }
 
 extrinsic_file {
-    frame_id: "velodyne16"
+    frame_id: "lidar16"
     child_frame_id: "front_6mm"
     file_path: "/apollo/modules/perception/data/params/front_6mm_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
-    frame_id: "velodyne16"
+    frame_id: "lidar16"
     child_frame_id: "front_12mm"
     file_path: "/apollo/modules/perception/data/params/front_12mm_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
-    frame_id: "velodyne16"
+    frame_id: "lidar16"
     child_frame_id: "radar_front"
     file_path: "/apollo/modules/perception/data/params/radar_front_extrinsics.yaml"
     enable: true

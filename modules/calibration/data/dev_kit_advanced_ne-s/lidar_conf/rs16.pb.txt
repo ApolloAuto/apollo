@@ -1,5 +1,5 @@
 model: "RS16"
-frame_id: "velodyne16"
+frame_id: "lidar16"
 ip: "192.168.10.16"
 msop_port: 2371
 difop_port: 8311

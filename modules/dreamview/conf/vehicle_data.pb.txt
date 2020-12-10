@@ -178,3 +178,7 @@ data_files {
   source_path: "perception_conf/perception_common.flag"
   dest_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
 }
+data_files {
+  source_path: "perception_conf/velodyne16_segmentation_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
+}

@@ -4,7 +4,7 @@ header:
     nsecs: 0
   seq: 0
   frame_id: novatel
-child_frame_id: velodyne16
+child_frame_id: lidar16
 transform:
   rotation:
     x: 0.00738980895243999
