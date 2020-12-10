@@ -77,6 +77,7 @@ cc_library(
         "//cyber/common:log",
         "//cyber/common:macros",
         "//modules/common/util:future",
+        "@boost",
     ],
 )
 

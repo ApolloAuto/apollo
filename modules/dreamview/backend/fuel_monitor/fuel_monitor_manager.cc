@@ -26,36 +26,45 @@ namespace dreamview {
 FuelMonitorManager::FuelMonitorManager() {}
 
 void FuelMonitorManager::RegisterFuelMonitor(
-    std::string_view mode, std::unique_ptr<FuelMonitor>&& fuel_monitor) {
-  if (monitors_.find(mode.data()) != monitors_.end()) {
-    AWARN << "FuelMonitor for mode: " << mode << " has been exist!";
-    return;
-  }
-  monitors_.emplace(mode, std::move(fuel_monitor));
-}
-
-FuelMonitor* FuelMonitorManager::GetMonitorOfMode(const std::string& mode) {
+    const std::string& mode, std::unique_ptr<FuelMonitor>&& fuel_monitor) {
+  const auto& class_name = fuel_monitor->GetClassName();
   if (monitors_.find(mode) != monitors_.end()) {
-    return monitors_[mode].get();
+    if (monitors_[mode].find(class_name) != monitors_[mode].end()) {
+      AWARN << class_name << " for mode: " << mode << " has been exist!";
+      return;
+    }
   } else {
-    return nullptr;
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    monitors_[mode].emplace(class_name, std::move(fuel_monitor));
   }
 }
 
 void FuelMonitorManager::SetCurrentMode(const std::string& mode) {
   current_mode_ = mode;
   if (monitors_.find(mode) != monitors_.end()) {
-    FuelMonitor* new_monitor = monitors_[mode].get();
-    if (current_monitor_ != nullptr && current_monitor_ != new_monitor) {
-      current_monitor_->Stop();
+    FuelMonitorMap* new_monitors = &monitors_[mode];
+    if (current_monitors_ != nullptr && current_monitors_ != new_monitors) {
+      for (const auto& monitor : *current_monitors_) {
+        monitor.second->Stop();
+      }
     }
-    current_monitor_ = new_monitor;
-    current_monitor_->Start();
-  } else {
-    if (current_monitor_ != nullptr) {
-      current_monitor_->Stop();
+    {
+      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+      current_monitors_ = new_monitors;
+    }
+    for (const auto& monitor : *current_monitors_) {
+      monitor.second->Start();
+    }
+  } else if (current_monitors_ != nullptr) {
+    for (const auto& monitor : *current_monitors_) {
+      monitor.second->Stop();
     }
   }
+}
+
+FuelMonitorMap* FuelMonitorManager::GetCurrentMonitors() {
+  boost::unique_lock<boost::shared_mutex> reader_lock(mutex_);
+  return current_monitors_;
 }
 
 }  // namespace dreamview

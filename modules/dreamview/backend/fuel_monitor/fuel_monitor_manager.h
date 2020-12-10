@@ -20,6 +20,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <boost/thread/shared_mutex.hpp>
+
 #include "cyber/common/macros.h"
 #include "modules/common/util/future.h"
 #include "modules/dreamview/backend/fuel_monitor/fuel_monitor.h"
@@ -31,25 +33,28 @@
 namespace apollo {
 namespace dreamview {
 
-// Centralized monitor config and status manager.
+using FuelMonitorMap =
+    std::unordered_map<std::string, std::unique_ptr<FuelMonitor>>;
+
 class FuelMonitorManager {
  public:
   void Init();
 
-  void RegisterFuelMonitor(std::string_view mode,
+  void RegisterFuelMonitor(const std::string& mode,
                            std::unique_ptr<FuelMonitor>&& fuel_monitor);
 
   void SetCurrentMode(const std::string& mode);
 
-  // Getters
-  FuelMonitor* GetMonitorOfMode(const std::string& mode);
-  FuelMonitor* GetCurrentMonitor() const { return current_monitor_; }
-  std::string GetCurrenrMode() const { return current_mode_; }
+  // Getter
+  FuelMonitorMap* GetCurrentMonitors();
 
  private:
-  std::unordered_map<std::string, std::unique_ptr<FuelMonitor>> monitors_;
-  FuelMonitor* current_monitor_ = nullptr;
+  std::unordered_map<std::string, FuelMonitorMap> monitors_;
+  FuelMonitorMap* current_monitors_ = nullptr;
   std::string current_mode_;
+  // Mutex to protect concurrent access to current_progress_json_.
+  // NOTE: Use boost until we have std version of rwlock support.
+  boost::shared_mutex mutex_;
 
   DECLARE_SINGLETON(FuelMonitorManager)
 };

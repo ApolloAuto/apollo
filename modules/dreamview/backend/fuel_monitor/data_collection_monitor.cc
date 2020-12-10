@@ -95,6 +95,7 @@ bool IsCompliedWithCriterion(float actual_value,
 
 DataCollectionMonitor::DataCollectionMonitor()
     : node_(cyber::CreateNode("data_collection_monitor")) {
+  class_name_ = "DataCollectionMonitor";
   InitReaders();
   LoadConfiguration();
 }

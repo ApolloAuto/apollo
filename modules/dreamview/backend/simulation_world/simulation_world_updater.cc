@@ -333,47 +333,31 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "RequestDataCollectionProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitor = FuelMonitorManager::Instance()->GetMonitorOfMode(
-            "Vehicle Calibration");
-        if (!monitor || !monitor->IsEnabled()) {
-          return;
+        auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
+        if (monitors) {
+          const auto iter = monitors->find("DataCollectionMonitor");
+          if (iter != monitors->end() && iter->second->IsEnabled()) {
+            Json response;
+            response["type"] = "DataCollectionProgress";
+            response["data"] = iter->second->GetProgressAsJson();
+            websocket_->SendData(conn, response.dump());
+          }
         }
-
-        Json response;
-        response["type"] = "DataCollectionProgress";
-        response["data"] = monitor->GetProgressAsJson();
-        websocket_->SendData(conn, response.dump());
-      });
-  // TODO(changsh726): Combine the following two handlers with
-  // RequestDataCollectionProgress handler
-  websocket_->RegisterMessageHandler(
-      "RequestLidarProgress",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitor = FuelMonitorManager::Instance()->GetMonitorOfMode(
-            "Lidar-IMU Sensor Calibration");
-        if (!monitor || !monitor->IsEnabled()) {
-          return;
-        }
-
-        Json response;
-        response["type"] = "LidarPreprocessProgress";
-        response["data"] = monitor->GetProgressAsJson();
-        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
-      "RequestCameraProgress",
+      "RequestPreprocessProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitor = FuelMonitorManager::Instance()->GetMonitorOfMode(
-            "Camera-Lidar Calibration");
-        if (!monitor || !monitor->IsEnabled()) {
-          return;
+        auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
+        if (monitors) {
+          const auto iter = monitors->find("PreprocessMonitor");
+          if (iter != monitors->end() && iter->second->IsEnabled()) {
+            Json response;
+            response["type"] = "PreprocessProgress";
+            response["data"] = iter->second->GetProgressAsJson();
+            websocket_->SendData(conn, response.dump());
+          }
         }
-
-        Json response;
-        response["type"] = "CameraPreprocessProgress";
-        response["data"] = monitor->GetProgressAsJson();
-        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(

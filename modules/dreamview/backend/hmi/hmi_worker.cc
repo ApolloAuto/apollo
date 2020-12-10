@@ -229,6 +229,8 @@ void HMIWorker::InitStatus() {
     if (mode == FLAGS_vehicle_calibration_mode) {
       FuelMonitorManager::Instance()->RegisterFuelMonitor(
           mode, std::make_unique<DataCollectionMonitor>());
+      FuelMonitorManager::Instance()->RegisterFuelMonitor(
+          mode, std::make_unique<PreprocessMonitor>());
     } else if (mode == FLAGS_lidar_calibration_mode) {
       FuelMonitorManager::Instance()->RegisterFuelMonitor(
           mode, std::make_unique<PreprocessMonitor>("lidar_to_gnss"));

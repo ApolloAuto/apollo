@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "nlohmann/json.hpp"
 
@@ -56,6 +57,12 @@ class FuelMonitor {
   virtual void Stop() = 0;
 
   /**
+   * @brief get class name
+   *
+   */
+  std::string GetClassName() const { return class_name_; }
+
+  /**
    * @brief restart monitoring
    */
   void Restart() {
@@ -71,6 +78,7 @@ class FuelMonitor {
  protected:
   // Whether the fuel monitor is enabled.
   bool enabled_ = false;
+  std::string class_name_;
 };
 
 }  // namespace dreamview

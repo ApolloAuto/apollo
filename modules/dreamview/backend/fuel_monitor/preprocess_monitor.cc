@@ -42,6 +42,7 @@ DEFINE_string(progress_topic, "/apollo/dreamview/progress",
 
 PreprocessMonitor::PreprocessMonitor()
     : node_(cyber::CreateNode("progress_monitor")) {
+  class_name_ = "PreprocessMonitor";
   InitReaders();
   LoadConfiguration();
 }
@@ -49,6 +50,7 @@ PreprocessMonitor::PreprocessMonitor()
 PreprocessMonitor::PreprocessMonitor(const std::string& task_name)
     : task_name_(task_name),
       node_(cyber::CreateNode(task_name + "_progress_monitor")) {
+  class_name_ = "PreprocessMonitor";
   InitReaders();
   LoadConfiguration();
 }
