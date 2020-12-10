@@ -8,4 +8,5 @@ camera_config {
 }
 progress {
   percentage: 0.0
+  log_string: "Press the button to start preprocessing"
 }

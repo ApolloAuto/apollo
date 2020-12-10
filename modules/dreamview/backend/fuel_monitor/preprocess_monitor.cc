@@ -40,6 +40,12 @@ using Json = nlohmann::json;
 DEFINE_string(progress_topic, "/apollo/dreamview/progress",
               "Sensor calibration preprocess progress topic name.");
 
+PreprocessMonitor::PreprocessMonitor()
+    : node_(cyber::CreateNode("progress_monitor")) {
+  InitReaders();
+  LoadConfiguration();
+}
+
 PreprocessMonitor::PreprocessMonitor(const std::string& task_name)
     : task_name_(task_name),
       node_(cyber::CreateNode(task_name + "_progress_monitor")) {
@@ -57,19 +63,25 @@ void PreprocessMonitor::InitReaders() {
 }
 
 void PreprocessMonitor::LoadConfiguration() {
-  const std::string& vehicle_dir =
-      VehicleManager::Instance()->GetVehicleDataPath();
-  std::string config_path = absl::StrCat(
-      vehicle_dir, "dreamview_conf/", task_name_, "_precrocess_table.pb.txt");
-  if (!PathExists(config_path)) {
-    AWARN << "No corresponding data collection table file found in "
-          << vehicle_dir << ". Using default one instead.";
-    config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
-                               "_preprocess_table.pb.txt");
-  }
+  if (!task_name_.empty()) {
+    const std::string& vehicle_dir =
+        VehicleManager::Instance()->GetVehicleDataPath();
+    std::string config_path = absl::StrCat(
+        vehicle_dir, "dreamview_conf/", task_name_, "_precrocess_table.pb.txt");
+    if (!PathExists(config_path)) {
+      AWARN << "No corresponding data collection table file found in "
+            << vehicle_dir << ". Using default one instead.";
+      config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
+                                 "_preprocess_table.pb.txt");
+    }
 
-  ACHECK(cyber::common::GetProtoFromFile(config_path, &preprocess_table_))
-      << "Unable to parse preprocess configuration from file " << config_path;
+    ACHECK(cyber::common::GetProtoFromFile(config_path, &preprocess_table_))
+        << "Unable to parse preprocess configuration from file " << config_path;
+  } else {
+    auto* progress = preprocess_table_.mutable_progress();
+    progress->set_percentage(0.0);
+    progress->set_log_string("Press the button to start preprocessing");
+  }
 
   std::string json_string;
   MessageToJsonString(preprocess_table_, &json_string);
@@ -94,8 +106,8 @@ void PreprocessMonitor::OnProgress(const std::shared_ptr<Progress>& progress) {
 
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    current_status_json_["progress"] = progress->percentage();
-    current_status_json_["logString"] = progress->log_string();
+    current_status_json_["progress"]["percentage"] = progress->percentage();
+    current_status_json_["progress"]["logString"] = progress->log_string();
   }
 }
 

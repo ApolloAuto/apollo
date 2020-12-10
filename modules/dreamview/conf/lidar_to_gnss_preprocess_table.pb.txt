@@ -9,4 +9,5 @@ lidar_config {
 main_sensor: "lidar16"
 progress {
   percentage: 0.0
+  log_string: "Press the button to start preprocessing"
 }
