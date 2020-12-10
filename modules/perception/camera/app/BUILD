@@ -22,10 +22,9 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//external:gflags",
         "//modules/common/util:perf_util",
-        "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/base",
+        "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
@@ -41,6 +40,7 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -70,7 +70,6 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//external:gflags",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
@@ -84,6 +83,7 @@ cc_library(
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
