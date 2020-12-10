@@ -173,7 +173,7 @@ void HMI::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
-      "Preprocess",
+      "SensorCalibrationPreprocess",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain type and data.
         std::string task_type;
@@ -200,9 +200,13 @@ void HMI::RegisterMessageHandlers() {
         if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
           AERROR << "Failed to generate user configuration file";
         }
-        std::string start_command = absl::StrCat(
-            "bash /apollo/scripts/extract_data.sh -n -t ", task_type);
-        HMIWorker::System(start_command);
+        hmi_worker_->SensorCalibrationPreprocess(task_type);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "VehicleCalibrationPreprocess",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        hmi_worker_->VehicleCalibrationPreprocess();
       });
 }
 

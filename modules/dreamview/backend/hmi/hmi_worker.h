@@ -76,13 +76,18 @@ class HMIWorker {
                         const std::vector<std::string>& event_types,
                         const bool is_reportable);
 
+  // Run sensor calibration preprocess
+  void SensorCalibrationPreprocess(const std::string& task_type);
+
+  // Run vehicle calibration preprocess
+  void VehicleCalibrationPreprocess();
+
   // Get current HMI status.
   HMIStatus GetStatus() const;
 
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
   static HMIMode LoadMode(const std::string& mode_config_path);
-  static void System(std::string_view cmd);
 
  private:
   void InitReadersAndWriters();
@@ -117,6 +122,7 @@ class HMIWorker {
   size_t last_status_fingerprint_{};
   bool stop_ = false;
   mutable boost::shared_mutex status_mutex_;
+  mutable size_t record_count_ = 0;
   std::future<void> thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
 

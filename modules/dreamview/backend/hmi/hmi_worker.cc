@@ -127,6 +127,15 @@ void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
   }
 }
 
+void System(std::string_view cmd) {
+  const int ret = std::system(cmd.data());
+  if (ret == 0) {
+    AINFO << "SUCCESS: " << cmd;
+  } else {
+    AERROR << "FAILED(" << ret << "): " << cmd;
+  }
+}
+
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
@@ -150,15 +159,6 @@ void HMIWorker::Stop() {
   stop_ = true;
   if (thread_future_.valid()) {
     thread_future_.get();
-  }
-}
-
-void HMIWorker::System(std::string_view cmd) {
-  const int ret = std::system(cmd.data());
-  if (ret == 0) {
-    AINFO << "SUCCESS: " << cmd;
-  } else {
-    AERROR << "FAILED(" << ret << "): " << cmd;
   }
 }
 
@@ -217,7 +217,7 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
 }
 
 void HMIWorker::InitStatus() {
-  static const std::string kDockerImageEnv = "DOCKER_IMG";
+  static constexpr char kDockerImageEnv[] = "DOCKER_IMG";
   status_.set_docker_image(cyber::common::GetEnv(kDockerImageEnv));
   status_.set_utm_zone_id(FLAGS_local_utm_zone_id);
 
@@ -445,6 +445,20 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
   drive_event_writer_->Write(drive_event);
 }
 
+void HMIWorker::SensorCalibrationPreprocess(const std::string& task_type) {
+  std::string start_command =
+      absl::StrCat("bash /apollo/scripts/extract_data.sh -n -t ", task_type);
+  System(start_command);
+}
+
+void HMIWorker::VehicleCalibrationPreprocess() {
+  std::string start_command = absl::StrCat(
+      "bash /apollo/modules/tools/vehicle_calibration/preprocess.sh "
+      "--vehicle_type=\"",
+      status_.current_vehicle(), "\" --record_num=", record_count_);
+  System(start_command);
+}
+
 bool HMIWorker::ChangeDrivingMode(const Chassis::DrivingMode mode) {
   // Always reset to MANUAL mode before changing to other mode.
   const std::string mode_name = Chassis::DrivingMode_Name(mode);
@@ -574,6 +588,10 @@ void HMIWorker::StartModule(const std::string& module) const {
   } else {
     AERROR << "Cannot find module " << module;
   }
+
+  if (module == "Recorder") {
+    ++record_count_;
+  }
 }
 
 void HMIWorker::StopModule(const std::string& module) const {
@@ -600,6 +618,7 @@ void HMIWorker::ResetMode() const {
   for (const auto& iter : current_mode_.modules()) {
     System(iter.second.stop_command());
   }
+  record_count_ = 0;
 }
 
 void HMIWorker::StatusUpdateThreadLoop() {
