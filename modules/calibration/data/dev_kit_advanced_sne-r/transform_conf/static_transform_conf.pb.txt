@@ -1,7 +1,7 @@
 extrinsic_file {
     frame_id: "novatel"
     child_frame_id: "lidar16"
-    file_path: "/apollo/modules/drivers/lidar/velodyne/params/velodyne16_novatel_extrinsics.yaml"
+    file_path: "/apollo/modules/drivers/lidar/velodyne/params/lidar16_novatel_extrinsics.yaml"
     enable: true
 }
 
