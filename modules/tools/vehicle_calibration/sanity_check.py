@@ -177,7 +177,8 @@ def sanity_check(input_folder):
             'Messages are missing in records channels apollo/chassis or '
             f'apollo/localization/pose, records are {channel_result}')
     else:
-        logging.info(f'{input_folder} Passed sanity check.')
-        return True
+        info_msg = f'{input_folder} Passed sanity check.'
+        logging.info(info_msg)
+        return True, info_msg
     logging.error(err_msg)
-    return False
+    return False, err_msg

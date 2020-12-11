@@ -38,6 +38,8 @@ py_binary(
     srcs = ["preprocess.py"],
     deps = [
         ":sanity_check",
+        "//cyber/python/cyber_py3:cyber",
+        "//modules/dreamview/proto:preprocess_table_py_pb2",
     ],
 )
 
