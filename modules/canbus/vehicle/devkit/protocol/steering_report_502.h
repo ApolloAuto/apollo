@@ -32,44 +32,44 @@ class Steeringreport502 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'name': 'Steer_ANGLE_SPD_Actual', 'offset': 0.0,
-  // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'physical_range':
-  // '[0|0]', 'bit': 55, 'type': 'int', 'order': 'motorola', 'physical_unit':
-  // 'deg/s'}
+  // config detail: {'bit': 55, 'is_signed_var': False, 'len': 8, 'name':
+  // 'Steer_ANGLE_SPD_Actual', 'offset': 0.0, 'order': 'motorola',
+  // 'physical_range': '[0|0]', 'physical_unit': 'deg/s', 'precision': 1.0,
+  // 'type': 'int'}
   int steer_angle_spd_actual(const std::uint8_t* bytes,
                              const int32_t length) const;
 
-  // config detail: {'description': 'Steer system communication fault', 'enum':
-  // {0: 'STEER_FLT2_NO_FAULT', 1:
-  // 'STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT'}, 'precision': 1.0, 'len': 8,
-  // 'name': 'Steer_FLT2', 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum', 'order': 'motorola',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 23, 'description': 'Steer system communication
+  // fault', 'enum': {0: 'STEER_FLT2_NO_FAULT', 1:
+  // 'STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT'}, 'is_signed_var': False,
+  // 'len': 8, 'name': 'Steer_FLT2', 'offset': 0.0, 'order': 'motorola',
+  // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
   Steering_report_502::Steer_flt2Type steer_flt2(const std::uint8_t* bytes,
                                                  const int32_t length) const;
 
-  // config detail: {'description': 'Steer system hardware fault', 'enum': {0:
-  // 'STEER_FLT1_NO_FAULT', 1: 'STEER_FLT1_STEER_SYSTEM_HARDWARE_FAULT'},
-  // 'precision': 1.0, 'len': 8, 'name': 'Steer_FLT1', 'is_signed_var': False,
-  // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 15, 'type': 'enum',
-  // 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 15, 'description': 'Steer system hardware fault',
+  // 'enum': {0: 'STEER_FLT1_NO_FAULT', 1:
+  // 'STEER_FLT1_STEER_SYSTEM_HARDWARE_FAULT'}, 'is_signed_var': False, 'len':
+  // 8, 'name': 'Steer_FLT1', 'offset': 0.0, 'order': 'motorola',
+  // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
   Steering_report_502::Steer_flt1Type steer_flt1(const std::uint8_t* bytes,
                                                  const int32_t length) const;
 
-  // config detail: {'name': 'Steer_EN_state', 'enum': {0:
-  // 'STEER_EN_STATE_MANUAL', 1: 'STEER_EN_STATE_AUTO', 2:
-  // 'STEER_EN_STATE_TAKEOVER', 3: 'STEER_EN_STATE_STANDBY'}, 'precision': 1.0,
-  // 'len': 2, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|2]',
-  // 'bit': 1, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 1, 'enum': {0: 'STEER_EN_STATE_MANUAL', 1:
+  // 'STEER_EN_STATE_AUTO', 2: 'STEER_EN_STATE_TAKEOVER', 3:
+  // 'STEER_EN_STATE_STANDBY'}, 'is_signed_var': False, 'len': 2, 'name':
+  // 'Steer_EN_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|2]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Steering_report_502::Steer_en_stateType steer_en_state(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'Steer_ANGLE_Actual', 'offset': -500.0,
-  // 'precision': 0.1, 'len': 16, 'is_signed_var': False, 'physical_range':
-  // '[-500|500]', 'bit': 31, 'type': 'double', 'order': 'motorola',
-  // 'physical_unit': 'deg'}
-  double steer_angle_actual(const std::uint8_t* bytes,
-                            const int32_t length) const;
+  // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
+  // 'Steer_ANGLE_Actual', 'offset': -500.0, 'order': 'motorola',
+  // 'physical_range': '[-500|500]', 'physical_unit': 'deg', 'precision': 1.0,
+  // 'type': 'int'}
+  int steer_angle_actual(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace devkit

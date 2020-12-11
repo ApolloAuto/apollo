@@ -47,7 +47,7 @@ void Steeringcommand102::UpdateData(uint8_t* data) {
 void Steeringcommand102::Reset() {
   // TODO(All) :  you should check this manually
   steer_en_ctrl_ = Steering_command_102::STEER_EN_CTRL_DISABLE;
-  steer_angle_target_ = 0.0;
+  steer_angle_target_ = 0;
   steer_angle_spd_ = 0;
   checksum_102_ = 0;
 }
@@ -58,10 +58,10 @@ Steeringcommand102* Steeringcommand102::set_steer_en_ctrl(
   return this;
 }
 
-// config detail: {'name': 'Steer_EN_CTRL', 'enum': {0: 'STEER_EN_CTRL_DISABLE',
-// 1: 'STEER_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 1, 'is_signed_var':
-// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-// 'order': 'motorola', 'physical_unit': ''}
+// config detail: {'bit': 0, 'enum': {0: 'STEER_EN_CTRL_DISABLE', 1:
+// 'STEER_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
+// 'Steer_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
 void Steeringcommand102::set_p_steer_en_ctrl(
     uint8_t* data, Steering_command_102::Steer_en_ctrlType steer_en_ctrl) {
   int x = steer_en_ctrl;
@@ -71,19 +71,20 @@ void Steeringcommand102::set_p_steer_en_ctrl(
 }
 
 Steeringcommand102* Steeringcommand102::set_steer_angle_target(
-    double steer_angle_target) {
+    int steer_angle_target) {
   steer_angle_target_ = steer_angle_target;
   return this;
 }
 
-// config detail: {'name': 'Steer_ANGLE_Target', 'offset': -500.0, 'precision':
-// 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[-500|500]',
-// 'bit': 31, 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
+// config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
+// 'Steer_ANGLE_Target', 'offset': -500.0, 'order': 'motorola',
+// 'physical_range': '[-500|500]', 'physical_unit': 'deg', 'precision': 1.0,
+// 'type': 'int'}
 void Steeringcommand102::set_p_steer_angle_target(uint8_t* data,
-                                                  double steer_angle_target) {
+                                                  int steer_angle_target) {
   steer_angle_target =
-      ProtocolData::BoundedValue(-500.0, 500.0, steer_angle_target);
-  int x = (steer_angle_target - -500.000000) / 0.100000;
+      ProtocolData::BoundedValue(-500, 500, steer_angle_target);
+  int x = (steer_angle_target - -500.000000);
   uint8_t t = 0;
 
   t = x & 0xFF;
@@ -102,9 +103,9 @@ Steeringcommand102* Steeringcommand102::set_steer_angle_spd(
   return this;
 }
 
-// config detail: {'name': 'Steer_ANGLE_SPD', 'offset': 0.0, 'precision': 1.0,
-// 'len': 8, 'is_signed_var': False, 'physical_range': '[0|250]', 'bit': 15,
-// 'type': 'int', 'order': 'motorola', 'physical_unit': 'deg/s'}
+// config detail: {'bit': 15, 'is_signed_var': False, 'len': 8, 'name':
+// 'Steer_ANGLE_SPD', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0, 'type': 'int'}
 void Steeringcommand102::set_p_steer_angle_spd(uint8_t* data,
                                                int steer_angle_spd) {
   steer_angle_spd = ProtocolData::BoundedValue(0, 250, steer_angle_spd);
@@ -119,9 +120,9 @@ Steeringcommand102* Steeringcommand102::set_checksum_102(int checksum_102) {
   return this;
 }
 
-// config detail: {'name': 'CheckSum_102', 'offset': 0.0, 'precision': 1.0,
-// 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
-// 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+// config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
+// 'CheckSum_102', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
 void Steeringcommand102::set_p_checksum_102(uint8_t* data, int checksum_102) {
   checksum_102 = ProtocolData::BoundedValue(0, 255, checksum_102);
   int x = checksum_102;

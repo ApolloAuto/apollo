@@ -20,6 +20,10 @@ message Throttle_command_100 {
 
 message Brake_command_101 {
 // Control Message
+  enum Aeb_en_ctrlType {
+    AEB_EN_CTRL_DISABLE_AEB = 0;
+    AEB_EN_CTRL_ENABLE_AEB = 1;
+  }
   enum Brake_en_ctrlType {
     BRAKE_EN_CTRL_DISABLE = 0;
     BRAKE_EN_CTRL_ENABLE = 1;
@@ -32,6 +36,8 @@ message Brake_command_101 {
   optional double brake_pedal_target = 3;
   // [] [0|1]
   optional Brake_en_ctrlType brake_en_ctrl = 4;
+  // [] [0|0]
+  optional Aeb_en_ctrlType aeb_en_ctrl = 5;
 }
 
 message Steering_command_102 {

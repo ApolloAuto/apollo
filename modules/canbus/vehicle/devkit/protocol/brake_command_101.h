@@ -36,52 +36,67 @@ class Brakecommand101 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'name': 'Brake_Dec', 'offset': 0.0, 'precision': 0.01,
-  // 'len': 10, 'is_signed_var': False, 'physical_range': '[0|10.00]', 'bit':
-  // 15, 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
+  // config detail: {'bit': 1, 'enum': {0: 'AEB_EN_CTRL_DISABLE_AEB', 1:
+  // 'AEB_EN_CTRL_ENABLE_AEB'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'AEB_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Brakecommand101* set_aeb_en_ctrl(
+      Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl);
+
+  // config detail: {'bit': 15, 'is_signed_var': False, 'len': 10, 'name':
+  // 'Brake_Dec', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|10]', 'physical_unit': 'm/s^2', 'precision': 0.01, 'type': 'double'}
   Brakecommand101* set_brake_dec(double brake_dec);
 
-  // config detail: {'name': 'CheckSum_101', 'offset': 0.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
+  // 'CheckSum_101', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   Brakecommand101* set_checksum_101(int checksum_101);
 
-  // config detail: {'name': 'Brake_Pedal_Target', 'offset': 0.0, 'precision':
-  // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
+  // 'Brake_Pedal_Target', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|100]', 'physical_unit': '%', 'precision': 0.1, 'type': 'double'}
   Brakecommand101* set_brake_pedal_target(double brake_pedal_target);
 
-  // config detail: {'name': 'Brake_EN_CTRL', 'enum': {0:
-  // 'BRAKE_EN_CTRL_DISABLE', 1: 'BRAKE_EN_CTRL_ENABLE'}, 'precision': 1.0,
-  // 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
-  // 'bit': 0, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 0, 'enum': {0: 'BRAKE_EN_CTRL_DISABLE', 1:
+  // 'BRAKE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'Brake_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Brakecommand101* set_brake_en_ctrl(
       Brake_command_101::Brake_en_ctrlType brake_en_ctrl);
 
  private:
-  // config detail: {'name': 'Brake_Dec', 'offset': 0.0, 'precision': 0.01,
-  // 'len': 10, 'is_signed_var': False, 'physical_range': '[0|10]', 'bit':
-  // 15, 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 1, 'enum': {0: 'AEB_EN_CTRL_DISABLE_AEB', 1:
+  // 'AEB_EN_CTRL_ENABLE_AEB'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'AEB_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  void set_p_aeb_en_ctrl(uint8_t* data,
+                         Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl);
+
+  // config detail: {'bit': 15, 'is_signed_var': False, 'len': 10, 'name':
+  // 'Brake_Dec', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|10]', 'physical_unit': 'm/s^2', 'precision': 0.01, 'type': 'double'}
   void set_p_brake_dec(uint8_t* data, double brake_dec);
 
-  // config detail: {'name': 'CheckSum_101', 'offset': 0.0, 'precision': 1.0,
-  // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
-  // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
+  // 'CheckSum_101', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   void set_p_checksum_101(uint8_t* data, int checksum_101);
 
-  // config detail: {'name': 'Brake_Pedal_Target', 'offset': 0.0, 'precision':
-  // 0.1, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|100]', 'bit':
-  // 31, 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
+  // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
+  // 'Brake_Pedal_Target', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|100]', 'physical_unit': '%', 'precision': 0.1, 'type': 'double'}
   void set_p_brake_pedal_target(uint8_t* data, double brake_pedal_target);
 
-  // config detail: {'name': 'Brake_EN_CTRL', 'enum': {0:
-  // 'BRAKE_EN_CTRL_DISABLE', 1: 'BRAKE_EN_CTRL_ENABLE'}, 'precision': 1.0,
-  // 'len': 1, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
-  // 'bit': 0, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
+  // config detail: {'bit': 0, 'enum': {0: 'BRAKE_EN_CTRL_DISABLE', 1:
+  // 'BRAKE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'Brake_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   void set_p_brake_en_ctrl(uint8_t* data,
                            Brake_command_101::Brake_en_ctrlType brake_en_ctrl);
 
  private:
+  Brake_command_101::Aeb_en_ctrlType aeb_en_ctrl_;
   double brake_dec_;
   int checksum_101_;
   double brake_pedal_target_;
