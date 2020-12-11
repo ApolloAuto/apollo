@@ -293,6 +293,10 @@ ErrorCode DevkitController::EnableAutoMode() {
   gear_command_103_->set_gear_en_ctrl(Gear_command_103::GEAR_EN_CTRL_ENABLE);
   park_command_104_->set_park_en_ctrl(Park_command_104::PARK_EN_CTRL_ENABLE);
 
+  // set AEB enable
+  brake_command_101_->set_aeb_en_ctrl(
+      Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
+
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;

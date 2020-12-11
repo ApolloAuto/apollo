@@ -34,11 +34,11 @@ TEST_F(Steeringcommand102Test, simple) {
   EXPECT_EQ(data[0], 0b01110000);
   EXPECT_EQ(data[1], 0b00000000);
   EXPECT_EQ(data[2], 0b01110011);
-  EXPECT_EQ(data[3], 0b00010011);
-  EXPECT_EQ(data[4], 0b10001000);
+  EXPECT_EQ(data[3], 0b00000001);
+  EXPECT_EQ(data[4], 0b11110100);
   EXPECT_EQ(data[5], 0b01110110);
   EXPECT_EQ(data[6], 0b01110111);
-  EXPECT_EQ(data[7], 0b10011001);
+  EXPECT_EQ(data[7], 0b11110111);
 }
 
 }  // namespace devkit
