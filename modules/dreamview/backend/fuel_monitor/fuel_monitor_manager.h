@@ -38,8 +38,6 @@ using FuelMonitorMap =
 
 class FuelMonitorManager {
  public:
-  void Init();
-
   void RegisterFuelMonitor(const std::string& mode,
                            std::unique_ptr<FuelMonitor>&& fuel_monitor);
 

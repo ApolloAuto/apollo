@@ -29,11 +29,13 @@ py_binary(
     deps = [
         ":configuration_yaml_generator",
         ":extract_static_data",
+        ":sanity_check",
         ":sensor_msg_extractor",
         "//cyber/proto:record_py_pb2",
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
         "//modules/dreamview/proto:preprocess_table_py_pb2",
+        "//modules/tools/common:proto_utils",
         "//modules/tools/sensor_calibration/proto:extractor_config_py_pb2",
     ],
 )
@@ -90,5 +92,5 @@ py_binary(
     srcs = ["sanity_check.py"],
     deps = [
         "//modules/tools/common:file_utils",
-    ]
+    ],
 )

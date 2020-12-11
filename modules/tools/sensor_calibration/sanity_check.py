@@ -136,21 +136,17 @@ def is_oversize_file(path):
 
 
 def sanity_check(input_folder):
+    err_msg = None
     lidar_gnss_flag = False
     camera_lidar_flag = False
     if is_oversize_file(input_folder):
         err_msg = "The input file is oversize(1G)!"
-        logging.error(err_msg)
-        return False
+
     config_flag, config_files = missing_config_file(input_folder)
     if config_flag:
         err_msg = "Missing sample_config.yaml!"
-        logging.error(err_msg)
-        return False
     if missing_calibration_task(config_files):
         err_msg = "The sample_config.yaml file miss calibration_task config!"
-        logging.error(err_msg)
-        return False
     lidar_gnss_flag, camera_lidar_flag = missing_calibration_data_file(
         config_files)
     if lidar_gnss_flag and not camera_lidar_flag:
@@ -160,10 +156,11 @@ def sanity_check(input_folder):
     elif lidar_gnss_flag and camera_lidar_flag:
         err_msg = "Missing lidar_gnss and camera_lidar files!"
     else:
-        logging.info(f"{input_folder} Passed sanity check.")
-        return True
+        info_msg = f"{input_folder} Passed sanity check."
+        logging.info(info_msg)
+        return True, info_msg
     logging.error(err_msg)
-    return False
+    return False, err_msg
 
 
 def main(argv):

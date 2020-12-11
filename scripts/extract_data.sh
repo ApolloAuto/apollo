@@ -230,14 +230,6 @@ function main() {
       -- --config "${TARGET_DIR}/${TASK}.config"
   fi
 
-  local sanity_check_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/sanity_check"
-  if [[ -f "${sanity_check_bin}" ]]; then
-    "${sanity_check_bin}" --input_folder ${TARGET_DIR}/extracted_data
-  else
-    bazel run //modules/tools/sensor_calibration:sanity_check \
-      -- --input_folder ${TARGET_DIR}/extracted_data
-  fi
-
   rm -f ${TARGET_DIR}/records/*
 }
 
