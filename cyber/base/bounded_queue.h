@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <utility>
 
 #include "cyber/base/macros.h"
 #include "cyber/base/wait_strategy.h"
@@ -141,7 +142,7 @@ bool BoundedQueue<T>::Enqueue(T&& element) {
   } while (!tail_.compare_exchange_weak(old_tail, new_tail,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
-  pool_[GetIndex(old_tail)] = element;
+  pool_[GetIndex(old_tail)] = std::move(element);
   do {
     old_commit = old_tail;
   } while (cyber_unlikely(!commit_.compare_exchange_weak(
@@ -186,7 +187,7 @@ bool BoundedQueue<T>::WaitEnqueue(const T& element) {
 template <typename T>
 bool BoundedQueue<T>::WaitEnqueue(T&& element) {
   while (!break_all_wait_) {
-    if (Enqueue(element)) {
+    if (Enqueue(std::move(element))) {
       return true;
     }
     if (wait_strategy_->EmptyWait()) {
