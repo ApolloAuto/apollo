@@ -36,6 +36,7 @@ DECLARE_string(control_preprocessor_topic);
 DECLARE_string(control_local_view_topic);
 DECLARE_string(control_core_command_topic);
 DECLARE_string(pointcloud_topic);
+DECLARE_string(pointcloud_16_topic);
 DECLARE_string(pointcloud_16_front_up_topic);
 DECLARE_string(pointcloud_64_topic);
 DECLARE_string(pointcloud_128_topic);
