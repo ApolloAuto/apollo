@@ -181,7 +181,7 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain type and data.
         std::string task_type;
-        if (!JsonUtil::GetString(json, "type", &task_type)) {
+        if (!JsonUtil::GetString(json, "task_type", &task_type)) {
           AERROR << "Truncated preprocess request.";
           return;
         }

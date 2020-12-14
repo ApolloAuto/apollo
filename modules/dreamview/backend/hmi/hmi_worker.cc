@@ -449,7 +449,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
 
 void HMIWorker::SensorCalibrationPreprocess(const std::string& task_type) {
   std::string start_command =
-      absl::StrCat("bash /apollo/scripts/extract_data.sh -n -t ", task_type);
+      absl::StrCat("bash /apollo/scripts/extract_data.sh -t ", task_type);
   System(start_command);
 }
 

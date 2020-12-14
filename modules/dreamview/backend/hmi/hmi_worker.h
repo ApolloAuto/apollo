@@ -35,7 +35,6 @@
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
-#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::dreamview

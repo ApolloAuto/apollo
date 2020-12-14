@@ -61,6 +61,7 @@ docker/build/archive/
 
 # calibration files
 modules/calibration/data/
+sensor_calibration
 
 # Data bag
 docs/demo_guide/*.bag

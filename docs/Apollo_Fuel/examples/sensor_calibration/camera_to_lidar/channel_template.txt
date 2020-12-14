@@ -1,0 +1,4 @@
+  channel: {
+		name: "/apollo/sensor/camera/__NAME__/image"
+		extraction_rate: __RATE__
+	}

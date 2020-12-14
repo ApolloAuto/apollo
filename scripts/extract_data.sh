@@ -22,10 +22,9 @@ TARGET_DIR="${TOP_DIR}/sensor_calibration"
 TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration"
 DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 
-NO_INTERACTIVE=0
-
 TASK=""
 VALID_TASKS=("lidar_to_gnss" "camera_to_lidar")
+CAMERA_NAME=""
 
 RECORD_FILES=()
 RECORD_DIRS=()
@@ -40,34 +39,34 @@ function join_by() {
 
 function print_usage() {
   echo "Usage:
-    ./extract_data.sh -t [ $(join_by ' | ' ${VALID_TASKS[@]}) ] -f <path/to/record/file> -d <path/to/record/dir>
+    ./extract_data.sh -t [ $(join_by ' | ' ${VALID_TASKS[@]}) ] (-c <camera name>) -f <path/to/record/file> -d <path/to/record/dir>
   eg.
     ./extract_data.sh -t lidar_to_gnss -f xxx/yyy.record.00000 -f xxx/yyy.record.00001
   or
-    ./extract_data.sh -t camera_to_lidar -d xxx
+    ./extract_data.sh -t camera_to_lidar -d xxx -c front_6mm
   "
 }
 
 function parse_args() {
   # read options
-  while getopts ':t:f:d:n' flag; do
+  while getopts ':t:c:f:d:' flag; do
     case "${flag}" in
-      t)
-        TASK="${OPTARG}"
-        ;;
-      f)
-        RECORD_FILES+=("${OPTARG}")
-        ;;
-      d)
-        RECORD_DIRS+=("${OPTARG}")
-        ;;
-      n)
-        NO_INTERACTIVE=1
-        ;;
-      *)
-        print_usage
-        exit 1
-        ;;
+    t)
+      TASK="${OPTARG}"
+      ;;
+    c)
+      CAMERA_NAME="${OPTARG}"
+      ;;
+    f)
+      RECORD_FILES+=("${OPTARG}")
+      ;;
+    d)
+      RECORD_DIRS+=("${OPTARG}")
+      ;;
+    *)
+      print_usage
+      exit 1
+      ;;
     esac
   done
 
@@ -83,34 +82,20 @@ function parse_args() {
 function check_target_dir() {
   if [[ ! -d "${TARGET_DIR}" ]]; then
     mkdir -p ${TARGET_DIR}
-    cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
   elif [[ ! -z "$(ls -A ${TARGET_DIR})" ]]; then
-    if [[ "${NO_INTERACTIVE}" -eq 0 ]]; then
-      local warn="The ${TARGET_DIR} is not empty, do you want to delete it? (Y/n)"
-      echo "${warn}"
-      local answer
-      typeset -l answer && read answer
-      if [ "${answer}" == "y" ]; then
-        rm -rf ${TARGET_DIR}/*
-      fi
-    else
-      rm -rf ${TARGET_DIR}/*
-    fi
-    cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
-  else
-    cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
+    rm -rf ${TARGET_DIR}/*
   fi
+  cp -R ${TEMPLATE_DIR}/* ${TARGET_DIR}
 }
 
 # Since pypcd installed via `pip install` only works with python2.7,
 # we can only install it this way
 function _install_pypcd() {
-  git clone https://github.com/dimatura/pypcd --depth=1
+  git clone https://github.com/DanielPollithy/pypcd
   pushd pypcd >/dev/null
-  git fetch origin pull/9/head:python3 && git checkout python3
-  python3 setup.py install --user
+  sudo make install
   popd >/dev/null
-  rm -rf pypcd
+  sudo rm -rf pypcd
 }
 
 function _get_latest() {
@@ -211,12 +196,25 @@ function update_lidar_config() {
   rm -f ${tmp_file}
 }
 
+function update_camera_config() {
+  local channel_template="${TEMPLATE_DIR}/channel_template.txt"
+  local extraction_rate=5
+  sed -i "s|__RATE__|${extraction_rate}|g" "${channel_template}"
+  sed -i "s|__NAME__|${CAMERA_NAME}|g" "${channel_template}"
+  sed -i "/# channel of camera image channels/{n;N;N;N;N;d}" "${TARGET_DIR}/camera_to_lidar.config"
+  sed -i "/# channel of camera image channels/r ${channel_template}" "${TARGET_DIR}/camera_to_lidar.config"
+  git checkout -- "${channel_template}"
+}
+
 function main() {
   parse_args "$@"
   check_target_dir
   get_records
   if [[ "${TASK}" == "lidar_to_gnss" ]]; then
     update_lidar_config
+  fi
+  if [[ "${TASK}" == "camera_to_lidar" ]] && [[ ! -z "${CAMERA_NAME}" ]]; then
+    update_camera_config
   fi
   install_if_not_exist "pyyaml" "pypcd"
 
