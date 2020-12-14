@@ -45,7 +45,7 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "GPS"
+  key: "GNSS"
   value: {
     process {
       command_keywords: "mainboard"

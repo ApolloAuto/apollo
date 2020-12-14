@@ -88,6 +88,8 @@ ReaderAndMessagePair GetReaderAndLatestMessage(const std::string& channel) {
            &CreateReaderAndLatestsMessage<relative_map::MapMsg>},
           {FLAGS_pointcloud_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
+          {FLAGS_pointcloud_16_topic,
+           &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_pointcloud_128_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_pointcloud_16_front_up_topic,
