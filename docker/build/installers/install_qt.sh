@@ -37,8 +37,10 @@ apt_get_update_and_install \
     libfontconfig1 \
     libxkbcommon0   \
     libxkbcommon-x11-0
+
 # Note(storypku)
-# The last two was required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
+# 1) libicu6X: required by uic
+# 2) libxkbcommonX required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
 if [ "${TARGET_ARCH}" = "aarch64" ]; then
     bash ${CURR_DIR}/install_qt5_qtbase.sh "${BUILD_TYPE}"
