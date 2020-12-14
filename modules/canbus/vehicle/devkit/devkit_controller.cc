@@ -16,9 +16,8 @@
 
 #include "modules/canbus/vehicle/devkit/devkit_controller.h"
 
-#include "modules/common/proto/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
+#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
@@ -294,8 +293,10 @@ ErrorCode DevkitController::EnableAutoMode() {
   park_command_104_->set_park_en_ctrl(Park_command_104::PARK_EN_CTRL_ENABLE);
 
   // set AEB enable
-  brake_command_101_->set_aeb_en_ctrl(
-      Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
+  if (FLAGS_enable_devkit_standard_aeb) {
+    brake_command_101_->set_aeb_en_ctrl(
+        Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
+  }
 
   can_sender_->Update();
   const int32_t flag =

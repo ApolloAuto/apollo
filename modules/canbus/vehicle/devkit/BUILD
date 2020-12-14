@@ -63,6 +63,7 @@ cc_library(
     ],
     deps = [
         ":devkit_message_manager",
+        "//modules/canbus/common:canbus_common",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",

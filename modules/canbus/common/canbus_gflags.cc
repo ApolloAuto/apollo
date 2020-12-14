@@ -46,3 +46,7 @@ DEFINE_int32(guardian_cmd_pending_queue_size, 10,
              "Max guardian cmd pending queue size");
 DEFINE_int32(control_cmd_pending_queue_size, 10,
              "Max control cmd pending queue size");
+
+// enable D-KIT Standard forward Ultrasonic AEB
+DEFINE_bool(enable_devkit_standard_aeb, true,
+            "Enable D-KIT Standard forward Ultrasonic AEB");
