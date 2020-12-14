@@ -43,7 +43,7 @@ build --cxxopt="-Werror=reorder"
 build --define=PREFIX=/usr
 build --define=LIBDIR=$(PREFIX)/lib
 build --define=INCLUDEDIR=$(PREFIX)/include
-
+build --define=use_fast_cpp_protos=true
 
 # dbg config, as a shorthand for '--config=optimize -c dbg'
 build:dbg -c dbg
