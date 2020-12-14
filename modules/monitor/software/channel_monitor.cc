@@ -112,6 +112,7 @@ GetReaderAndLatestMessage(const std::string& channel) {
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
   } else if (channel == FLAGS_pointcloud_topic ||
+             channel == FLAGS_pointcloud_16_topic ||
              channel == FLAGS_pointcloud_128_topic ||
              channel == FLAGS_pointcloud_16_front_up_topic) {
     const auto reader = manager->CreateReader<drivers::PointCloud>(channel);
