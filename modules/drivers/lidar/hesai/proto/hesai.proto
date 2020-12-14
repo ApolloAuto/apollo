@@ -5,7 +5,7 @@ package apollo.drivers.hesai;
 import "modules/common/proto/header.proto";
 
 enum Model {
-  UNKOWN = 0;
+  UNKNOWN = 0;
   HESAI40P = 1;
   HESAI64 = 2;
 }

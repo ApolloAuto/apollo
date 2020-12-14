@@ -5,7 +5,7 @@ package apollo.drivers.velodyne;
 import "modules/common/proto/header.proto";
 
 enum Model {
-  UNKOWN = 0;
+  UNKNOWN = 0;
   HDL64E_S3S = 1;
   HDL64E_S3D = 2;
   HDL64E_S2 = 3;

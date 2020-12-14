@@ -103,7 +103,7 @@ void DstExistenceFusion::UpdateWithMeasurement(
   Dst existence_evidence(fused_existence_.Name());
   existence_evidence.SetBba(
       {{ExistenceDstMaps::EXIST, obj_exist_prob},
-       {ExistenceDstMaps::EXISTUNKOWN, 1 - obj_exist_prob}});
+       {ExistenceDstMaps::EXISTUNKNOWN, 1 - obj_exist_prob}});
   // TODO(all) hard code for fused exist bba
   const double exist_fused_w = 1.0;
   ADEBUG << " before update exist prob: " << GetExistenceProbability();
@@ -147,7 +147,7 @@ void DstExistenceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     double obj_unexist_prob = unexist_factor * dist_decay;
     existence_evidence.SetBba(
         {{ExistenceDstMaps::NEXIST, obj_unexist_prob},
-         {ExistenceDstMaps::EXISTUNKOWN, 1 - obj_unexist_prob}});
+         {ExistenceDstMaps::EXISTUNKNOWN, 1 - obj_unexist_prob}});
     // TODO(all) hard code for fused exist bba
     const double unexist_fused_w = 1.0;
     double min_match_dist_score = min_match_dist;
@@ -283,7 +283,7 @@ void DstExistenceFusion::UpdateToicWithoutCameraMeasurement(
 
   Dst toic_evidence(fused_toic_.Name());
   toic_evidence.SetBba({{ToicDstMaps::NTOIC, 1 - dist_score},
-                        {ToicDstMaps::TOICUNKOWN, dist_score}});
+                        {ToicDstMaps::TOICUNKNOWN, dist_score}});
   // TODO(yuantingrong): hard code for fused toic bba
   const double toic_fused_w = 1.0;
   fused_toic_ = fused_toic_ + toic_evidence * in_view_ratio * toic_fused_w;
@@ -334,7 +334,7 @@ void DstExistenceFusion::UpdateToicWithCameraMeasurement(
 
   Dst toic_evidence(fused_toic_.Name());
   toic_evidence.SetBba({{ToicDstMaps::TOIC, association_prob},
-                        {ToicDstMaps::TOICUNKOWN, 1 - association_prob}});
+                        {ToicDstMaps::TOICUNKNOWN, 1 - association_prob}});
   // TODO(yuantingrong): hard code for fused toic bba
   const double toic_fused_w = 0.7;
   fused_toic_ = fused_toic_ + toic_evidence * toic_fused_w * in_view_ratio;

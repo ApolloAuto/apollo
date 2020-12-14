@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.drivers.microphone.config;
 
 enum ChannelType {
-  UNKOWN = 0;
+  UNKNOWN = 0;
   ASR = 1;  // Automatic Speech Recognition
   RAW = 2;
   PLAYBACK = 3;
@@ -11,7 +11,7 @@ enum ChannelType {
 
 message MicrophoneConfig {
   enum MicrophoneModel {
-    UNKOWN = 0;
+    UNKNOWN = 0;
     RESPEAKER = 1;
   }
   optional MicrophoneModel microphone_model = 2;
