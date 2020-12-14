@@ -182,8 +182,8 @@ function main() {
 
   install_if_not_exist "pyyaml" "pypcd"
 
-  bazel run //modules/tools/sensor_calibration:extract_data \
-    -- --config ${TARGET_DIR}/lidar_to_gnss.config
+  ${APOLLO_ROOT_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data \
+    --config ${TARGET_DIR}/lidar_to_gnss.config
 
   rm -f ${TARGET_DIR}/records/*
 }
