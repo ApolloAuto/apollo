@@ -2,6 +2,12 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+enum Status {
+  SUCCESS = 0;
+  FAIL = 1;
+  UNKNOWN = 2;
+}
+
 message Translation {
   optional float x = 1;
   optional float y = 2;
@@ -21,6 +27,7 @@ message CameraConfig {
 message Progress {
   optional float percentage = 1;
   optional string log_string = 2;
+  optional Status status = 3;
 }
 
 message PreprocessTable {

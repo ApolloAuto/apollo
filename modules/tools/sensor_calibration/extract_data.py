@@ -184,9 +184,13 @@ class Extractor(object):
             raise ValueError(f"Not Support this channel type: {channel}")
         return parser
 
-    def print_and_publish(self, str):
+    def print_and_publish(self,
+                          str,
+                          status=preprocess_table_pb2.Status.UNKNOWN):
+        """status: 0 for success, 1 for fail, 2 for unknown"""
         print(str)
         self.progress.log_string = str
+        self.progress.status = status
         self.writer.write(self.progress)
         time.sleep(0.5)
 
@@ -247,7 +251,7 @@ class Extractor(object):
 
         # if channel in SMALL_TOPICS:
         # channel_messages[channel] = list()
-
+        self.progress.log_string = "Start preprocessing..."
         for record_file in record_files:
             record_reader = RecordReader(record_file)
             for msg in record_reader.read_messages():
@@ -298,8 +302,8 @@ class Extractor(object):
              f'and {process_channel_failure_num} was failed.'))
         if process_msg_failure_num > 0:
             self.print_and_publish(
-                f'Channel extraction failure number is {process_msg_failure_num}.'
-            )
+                f'Channel extraction failure number is {process_msg_failure_num}.',
+                preprocess_table_pb2.Status.FAIL)
 
         return True
 
@@ -624,6 +628,9 @@ class Extractor(object):
         result, log_str = sanity_check(path)
         if result is True:
             self.progress.percentage = 100.0
+            self.progress.status = preprocess_table_pb2.Status.SUCCESS
+        else:
+            self.progress.status = preprocess_table_pb2.Status.FAIL
         self.progress.log_string = log_str
         self.writer.write(self.progress)
         time.sleep(0.5)

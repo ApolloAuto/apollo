@@ -18,7 +18,7 @@
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-TARGET_DIR="${TOP_DIR}/sensor_calibration"
+TARGET_DIR="${TOP_DIR}/output/sensor_calibration"
 TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration"
 DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 
@@ -51,22 +51,22 @@ function parse_args() {
   # read options
   while getopts ':t:c:f:d:' flag; do
     case "${flag}" in
-    t)
-      TASK="${OPTARG}"
-      ;;
-    c)
-      CAMERA_NAME="${OPTARG}"
-      ;;
-    f)
-      RECORD_FILES+=("${OPTARG}")
-      ;;
-    d)
-      RECORD_DIRS+=("${OPTARG}")
-      ;;
-    *)
-      print_usage
-      exit 1
-      ;;
+      t)
+        TASK="${OPTARG}"
+        ;;
+      c)
+        CAMERA_NAME="${OPTARG}"
+        ;;
+      f)
+        RECORD_FILES+=("${OPTARG}")
+        ;;
+      d)
+        RECORD_DIRS+=("${OPTARG}")
+        ;;
+      *)
+        print_usage
+        exit 1
+        ;;
     esac
   done
 

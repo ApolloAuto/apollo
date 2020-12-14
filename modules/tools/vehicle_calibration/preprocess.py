@@ -111,7 +111,10 @@ class Preprocessor(object):
                      reverse=True)[:self.record_num]
         return res
 
-    def log_and_publish(self, str, logging_level="info"):
+    def log_and_publish(self,
+                        str,
+                        logging_level="info",
+                        status=preprocess_table_pb2.Status.UNKNOWN):
         """Publish the str by cyber writer"""
         if logging_level == 'info':
             logging.info(str)
@@ -125,6 +128,7 @@ class Preprocessor(object):
             logging.info(str)
 
         self.progress.log_string = str
+        self.progress.status = status
         self.writer.write(self.progress)
         time.sleep(0.5)
 
@@ -140,6 +144,7 @@ class Preprocessor(object):
         shutil.copy(self.config_file, vehicle_dir)
         records_info = self.get_records_info()
         finished_records = 0
+        self.progress.log_string = 'Start preprocessing...'
 
         for iter in records_info:
             sub_dir = self.create_if_not_exists(
@@ -160,6 +165,9 @@ class Preprocessor(object):
         result, log_str = sanity_check(path)
         if result is True:
             self.progress.percentage = 100.0
+            self.progress.status = preprocess_table_pb2.Status.SUCCESS
+        else:
+            self.progress.status = preprocess_table_pb2.Status.FAIL
         self.progress.log_string = log_str
         self.writer.write(self.progress)
         time.sleep(0.5)

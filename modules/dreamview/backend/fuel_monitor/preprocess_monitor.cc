@@ -69,7 +69,7 @@ void PreprocessMonitor::LoadConfiguration() {
     const std::string& vehicle_dir =
         VehicleManager::Instance()->GetVehicleDataPath();
     std::string config_path = absl::StrCat(
-        vehicle_dir, "dreamview_conf/", task_name_, "_precrocess_table.pb.txt");
+        vehicle_dir, "dreamview_conf/", task_name_, "_preprocess_table.pb.txt");
     if (!PathExists(config_path)) {
       AWARN << "No corresponding data collection table file found in "
             << vehicle_dir << ". Using default one instead.";
