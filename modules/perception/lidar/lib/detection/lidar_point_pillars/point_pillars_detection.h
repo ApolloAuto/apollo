@@ -48,8 +48,7 @@ class PointPillarsDetection {
   std::string Name() const { return "PointPillarsDetection"; }
 
  private:
-  void CloudToArray(const base::PointFCloudPtr& pc_ptr,
-                    float* out_points_array,
+  void CloudToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
                     float normalizing_factor);
 
   void FuseCloud(const base::PointFCloudPtr& out_cloud_ptr,
