@@ -37,9 +37,12 @@
  * @date 2019/02/26
  */
 
+
+
 #include <vector>
 
 #include "gtest/gtest.h"
+
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
 
@@ -148,9 +151,11 @@ TestClass::TestClass()
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
 
-  point_pillars_ptr_.reset(new PointPillars(
-      reproduce_result_mode, score_threshold, nms_overlap_threshold,
-      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(
+      new PointPillars(reproduce_result_mode, score_threshold,
+                       nms_overlap_threshold, FLAGS_pfe_torch_file,
+                       FLAGS_scattered_torch_file, FLAGS_backbone_torch_file,
+                       FLAGS_fpn_torch_file, FLAGS_bbox_head_torch_file));
 }
 
 TestClass::TestClass(const int num_class, const int max_num_pillars,
@@ -190,9 +195,11 @@ TestClass::TestClass(const int num_class, const int max_num_pillars,
   float score_threshold = 0.5;
   float nms_overlap_threshold = 0.5;
 
-  point_pillars_ptr_.reset(new PointPillars(
-      reproduce_result_mode, score_threshold, nms_overlap_threshold,
-      FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(
+      new PointPillars(reproduce_result_mode, score_threshold,
+                       nms_overlap_threshold, FLAGS_pfe_torch_file,
+                       FLAGS_scattered_torch_file, FLAGS_backbone_torch_file,
+                       FLAGS_fpn_torch_file, FLAGS_bbox_head_torch_file));
 }
 
 void TestClass::Preprocess(const float* in_points_array, int in_num_points,
@@ -313,7 +320,7 @@ void TestClass::DoInference(const float* in_points_array,
   return point_pillars_ptr_->DoInference(in_points_array, in_num_points,
                                          out_detections, out_labels);
 }
-
+/*
 TEST(TestSuite, CheckPreprocessPointsCPU) {
   const int kNumClass = 1;
   const int kMaxNumPillars = 12000;
@@ -508,6 +515,7 @@ TEST(TestSuite, CheckPreprocessGPU) {
   delete[] pillar_point_feature;
   delete[] pillar_coors;
 }
+*/
 /*
 // TODO(chenjiahao): should be changed to multi-anchor for multi-class
 TEST(TestSuite, CheckGenerateAnchors) {

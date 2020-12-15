@@ -52,9 +52,11 @@ PointPillarsDetection::PointPillarsDetection()
 // TODO(chenjiahao):
 //  specify score threshold and nms over lap threshold for each class.
 bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
-  point_pillars_ptr_.reset(new PointPillars(
-      FLAGS_reproduce_result_mode, FLAGS_score_threshold,
-      FLAGS_nms_overlap_threshold, FLAGS_pfe_onnx_file, FLAGS_rpn_onnx_file));
+  point_pillars_ptr_.reset(
+      new PointPillars(FLAGS_reproduce_result_mode, FLAGS_score_threshold,
+                       FLAGS_nms_overlap_threshold, FLAGS_pfe_torch_file,
+                       FLAGS_scattered_torch_file, FLAGS_backbone_torch_file,
+                       FLAGS_fpn_torch_file, FLAGS_bbox_head_torch_file));
   return true;
 }
 
@@ -113,10 +115,9 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
     pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(
         new pcl::PointCloud<pcl::PointXYZI>());
     TransformToPCLXYZI(*cur_cloud_ptr_, pcl_cloud_ptr);
-    DownSampleCloudByVoxelGrid(pcl_cloud_ptr, filtered_cloud_ptr,
-                               FLAGS_downsample_voxel_size_x,
-                               FLAGS_downsample_voxel_size_y,
-                               FLAGS_downsample_voxel_size_z);
+    DownSampleCloudByVoxelGrid(
+        pcl_cloud_ptr, filtered_cloud_ptr, FLAGS_downsample_voxel_size_x,
+        FLAGS_downsample_voxel_size_y, FLAGS_downsample_voxel_size_z);
 
     // transform pcl point cloud to apollo point cloud
     base::PointFCloudPtr downsample_voxel_cloud_ptr(new base::PointFCloud());
@@ -197,7 +198,8 @@ bool PointPillarsDetection::Detect(const DetectionOptions& options,
              &out_detections, &out_labels);
   collect_time_ = timer.toc(true);
 
-  AINFO << "PointPillars: " << "\n"
+  AINFO << "PointPillars: "
+        << "\n"
         << "down sample: " << downsample_time_ << "\t"
         << "fuse: " << fuse_time_ << "\t"
         << "shuffle: " << shuffle_time_ << "\t"
@@ -353,23 +355,11 @@ void PointPillarsDetection::GetObjects(
 base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
   switch (label) {
     case 0:
-      return base::ObjectSubType::BUS;
-    case 1:
       return base::ObjectSubType::CAR;
-    case 2:  // construction vehicle
-      return base::ObjectSubType::UNKNOWN_MOVABLE;
-    case 3:
-      return base::ObjectSubType::TRUCK;
-    case 4:  // barrier
-      return base::ObjectSubType::UNKNOWN_UNMOVABLE;
-    case 5:
-      return base::ObjectSubType::CYCLIST;
-    case 6:
-      return base::ObjectSubType::MOTORCYCLIST;
-    case 7:
+    case 1:
       return base::ObjectSubType::PEDESTRIAN;
-    case 8:
-      return base::ObjectSubType::TRAFFICCONE;
+    case 2:  // construction vehicle
+      return base::ObjectSubType::CYCLIST;
     default:
       return base::ObjectSubType::UNKNOWN;
   }
