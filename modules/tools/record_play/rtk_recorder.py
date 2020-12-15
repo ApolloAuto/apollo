@@ -30,6 +30,7 @@ from cyber.python.cyber_py3 import cyber
 from gflags import FLAGS
 
 from modules.tools.common.logger import Logger
+import modules.tools.common.proto_utils as proto_utils
 from modules.canbus.proto import chassis_pb2
 from modules.common.configs.proto import vehicle_config_pb2
 from modules.localization.proto import localization_pb2
@@ -133,8 +134,8 @@ class RtkRecord(object):
         carmax_steer_angle = self.vehicle_param.max_steer_angle
         carsteer_ratio = self.vehicle_param.steer_ratio
         carwheel_base = self.vehicle_param.wheel_base
-        curvature = math.tan(math.radians(carsteer / 100 * \
-                            math.degrees(carmax_steer_angle)) / carsteer_ratio) / carwheel_base
+        curvature = math.tan(math.radians(carsteer / 100
+                                          * math.degrees(carmax_steer_angle)) / carsteer_ratio) / carwheel_base
         if abs(carspeed) >= speed_epsilon:
             carcurvature_change_rate = (curvature - self.carcurvature) / (
                 carspeed * 0.01)
