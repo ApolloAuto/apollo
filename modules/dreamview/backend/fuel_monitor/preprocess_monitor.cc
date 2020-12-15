@@ -71,7 +71,7 @@ void PreprocessMonitor::LoadConfiguration() {
     std::string config_path = absl::StrCat(
         vehicle_dir, "dreamview_conf/", task_name_, "_preprocess_table.pb.txt");
     if (!PathExists(config_path)) {
-      AWARN << "No corresponding data collection table file found in "
+      AWARN << "No corresponding preprocess table file found in "
             << vehicle_dir << ". Using default one instead.";
       config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
                                  "_preprocess_table.pb.txt");

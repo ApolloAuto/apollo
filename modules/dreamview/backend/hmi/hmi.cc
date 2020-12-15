@@ -180,11 +180,21 @@ void HMI::RegisterMessageHandlers() {
       "SensorCalibrationPreprocess",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain type and data.
-        std::string task_type;
-        if (!JsonUtil::GetString(json, "task_type", &task_type)) {
+        std::string current_mode;
+        if (!JsonUtil::GetString(json, "current_mode", &current_mode)) {
           AERROR << "Truncated preprocess request.";
           return;
         }
+        std::string task_type;
+        if (current_mode == FLAGS_lidar_calibration_mode) {
+          task_type = "lidar_to_gnss";
+        } else if (current_mode == FLAGS_camera_calibration_mode) {
+          task_type = "camera_to_lidar";
+        } else {
+          AERROR << "Unsupported mode:" << current_mode;
+          return;
+        }
+
         const auto iter = json.find("data");
         if (iter == json.end()) {
           AERROR << "The json has no such key: data";
