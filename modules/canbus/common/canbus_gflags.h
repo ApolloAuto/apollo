@@ -41,5 +41,5 @@ DECLARE_bool(receive_guardian);
 DECLARE_int32(guardian_cmd_pending_queue_size);
 DECLARE_int32(control_cmd_pending_queue_size);
 
-// enable D-KIT Standard forward Ultrasonic AEB
-DECLARE_bool(enable_devkit_standard_aeb);
+// enable forward Ultrasonic AEB
+DECLARE_bool(enable_aeb);
