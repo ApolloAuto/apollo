@@ -404,9 +404,10 @@ export default class RealtimeWebSocketEndpoint {
     }));
   }
 
-  startPreProcessData(data) {
+  startPreProcessData(data,current_mode) {
     this.websocket.send(JSON.stringify({
       type: 'SensorCalibrationPreprocess',
+      current_mode,
       data,
     }));
   }

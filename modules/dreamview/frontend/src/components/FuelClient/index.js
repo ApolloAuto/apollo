@@ -41,9 +41,8 @@ export default class FuelClient extends React.Component {
         });
       });
       _.set(data, 'lidar_config', lidar_configs);
-      _.set(data, 'task_type', hmi.currentMode);
       _.set(data, 'main_sensor', hmi.mainSensor);
-      WS.startPreProcessData(data);
+      WS.startPreProcessData(data,hmi.currentMode);
     }
   }
 
