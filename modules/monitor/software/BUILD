@@ -35,6 +35,21 @@ cc_library(
 )
 
 cc_library(
+    name = "camera_monitor",
+    srcs = ["camera_monitor.cc"],
+    hdrs = ["camera_monitor.h"],
+    deps = [
+        ":summary_monitor",
+        "//cyber/common:log",
+        "//modules/dreamview/proto:hmi_mode_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/monitor/common:monitor_manager",
+        "//modules/monitor/common:recurrent_runner",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
     name = "channel_monitor",
     srcs = ["channel_monitor.cc"],
     hdrs = ["channel_monitor.h"],

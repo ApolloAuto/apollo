@@ -16,6 +16,7 @@ cc_library(
         "//modules/monitor/hardware:gps_monitor",
         "//modules/monitor/hardware:resource_monitor",
         "//modules/monitor/hardware:socket_can_monitor",
+        "//modules/monitor/software:camera_monitor",
         "//modules/monitor/software:channel_monitor",
         "//modules/monitor/software:functional_safety_monitor",
         "//modules/monitor/software:latency_monitor",
