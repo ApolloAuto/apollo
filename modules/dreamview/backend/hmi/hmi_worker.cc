@@ -448,16 +448,16 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
 }
 
 void HMIWorker::SensorCalibrationPreprocess(const std::string& task_type) {
-  std::string start_command =
-      absl::StrCat("bash /apollo/scripts/extract_data.sh -t ", task_type);
+  std::string start_command = absl::StrCat(
+      "nohup bash /apollo/scripts/extract_data.sh -t ", task_type, " &");
   System(start_command);
 }
 
 void HMIWorker::VehicleCalibrationPreprocess() {
   std::string start_command = absl::StrCat(
-      "bash /apollo/modules/tools/vehicle_calibration/preprocess.sh "
+      "nohup bash /apollo/modules/tools/vehicle_calibration/preprocess.sh "
       "--vehicle_type=\"",
-      status_.current_vehicle(), "\" --record_num=", record_count_);
+      status_.current_vehicle(), "\" --record_num=", record_count_, " &");
   System(start_command);
 }
 

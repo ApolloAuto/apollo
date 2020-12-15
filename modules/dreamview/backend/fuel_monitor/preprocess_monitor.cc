@@ -95,6 +95,7 @@ void PreprocessMonitor::LoadConfiguration() {
 void PreprocessMonitor::Start() {
   if (!enabled_) {
     current_status_json_.clear();
+    LoadConfiguration();
   }
   enabled_ = true;
 }
@@ -110,6 +111,7 @@ void PreprocessMonitor::OnProgress(const std::shared_ptr<Progress>& progress) {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     current_status_json_["progress"]["percentage"] = progress->percentage();
     current_status_json_["progress"]["logString"] = progress->log_string();
+    current_status_json_["progress"]["status"] = progress->status();
   }
 }
 

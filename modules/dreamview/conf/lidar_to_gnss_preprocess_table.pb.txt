@@ -26,4 +26,5 @@ main_sensor: "lidar16_back"
 progress {
   percentage: 0.0
   log_string: "Press the button to start preprocessing"
+  status: UNKNOWN
 }

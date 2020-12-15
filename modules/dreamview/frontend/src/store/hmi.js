@@ -81,7 +81,7 @@ export default class HMI {
 
     @observable endPreProcess=false;//不能end
 
-    @pbservable preProcessStatus = 2;//正常通知图标
+    @observable preProcessStatus = 2;//正常通知图标
 
     @observable logString='';
 

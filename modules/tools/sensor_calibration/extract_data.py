@@ -98,6 +98,8 @@ class Extractor(object):
         self.config = extractor_config_pb2.DataExtractionConfig()
         self.progress = preprocess_table_pb2.Progress()
         self.progress.percentage = 0.0
+        self.progress.log_string = "Preprocessing in progress..."
+        self.progress.status = preprocess_table_pb2.Status.UNKNOWN
         try:
             get_pb_from_text_file(FLAGS.config, self.config)
         except text_format.ParseError:
@@ -251,7 +253,6 @@ class Extractor(object):
 
         # if channel in SMALL_TOPICS:
         # channel_messages[channel] = list()
-        self.progress.log_string = "Start preprocessing..."
         for record_file in record_files:
             record_reader = RecordReader(record_file)
             for msg in record_reader.read_messages():
