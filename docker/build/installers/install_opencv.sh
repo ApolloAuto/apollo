@@ -157,14 +157,16 @@ if [ "${BUILD_CONTRIB}" = "yes" ]; then
     rm -rf "${PKG_CONTRIB}" "opencv_contrib-${VERSION}"
 fi
 
-apt_get_remove \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
-    libv4l-dev \
-    libeigen3-dev \
-    libopenblas-dev \
-    libatlas-base-dev \
-    libxvidcore-dev \
-    libx264-dev \
-    libopenni-dev
+if [[ -n "${CLEAN_DEPS}" ]]; then
+    apt_get_remove \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libv4l-dev \
+        libeigen3-dev \
+        libopenblas-dev \
+        libatlas-base-dev \
+        libxvidcore-dev \
+        libx264-dev \
+        libopenni-dev
+fi

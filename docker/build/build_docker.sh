@@ -307,6 +307,7 @@ function docker_build_run() {
         --build-arg CUDA_LITE="${CUDA_LITE}" \
         --build-arg CUDNN_VERSION="${CUDNN_VERSION}" \
         --build-arg TENSORRT_VERSION="${TENSORRT_VERSION}" \
+        --build-arg CLEAN_DEPS="yes" \
         -f "${DOCKERFILE}" \
         "${context}"
     set +x
