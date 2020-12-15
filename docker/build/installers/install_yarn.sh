@@ -22,13 +22,12 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-
 # Ref https://classic.yarnpkg.com/en/docs/install/#debian-stable
 # Don't use tee here. It complains
 # "Warning: apt-key output should not be parsed (stdout is not a terminal)"
 # otherwise.
 
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
 
 apt_get_update_and_install yarn
