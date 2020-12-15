@@ -21,6 +21,7 @@
 #include "modules/monitor/hardware/gps_monitor.h"
 #include "modules/monitor/hardware/resource_monitor.h"
 #include "modules/monitor/hardware/socket_can_monitor.h"
+#include "modules/monitor/software/camera_monitor.h"
 #include "modules/monitor/software/channel_monitor.h"
 #include "modules/monitor/software/functional_safety_monitor.h"
 #include "modules/monitor/software/latency_monitor.h"
@@ -59,6 +60,8 @@ bool Monitor::Init() {
   runners_.emplace_back(new ChannelMonitor(latency_monitor));
   // Monitor if resources are sufficient.
   runners_.emplace_back(new ResourceMonitor());
+  // Monitor if only one camera is recorded.
+  runners_.emplace_back(new CameraMonitor());
 
   // Monitor all changes made by each sub-monitor, and summarize to a final
   // overall status.
