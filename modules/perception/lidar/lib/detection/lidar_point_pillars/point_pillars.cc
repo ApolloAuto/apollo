@@ -392,8 +392,6 @@ void PointPillars::ConvertAnchors2BoxAnchors(float* anchors_px,
                                              float* box_anchors_max_x_,
                                              float* box_anchors_max_y_) {
   // flipping box's dimension
-  // float flipped_anchors_dx[kNumAnchor] = {};
-  // float flipped_anchors_dy[kNumAnchor] = {};
   float* flipped_anchors_dx = new float[kNumAnchor]();
   float* flipped_anchors_dy = new float[kNumAnchor]();
 
@@ -675,9 +673,9 @@ void PointPillars::DoInference(const float* in_points_array,
 
   GPU_CHECK(cudaMemset(dev_filter_count_, 0, sizeof(int)));
   postprocess_cuda_ptr_->DoPostprocessCuda(
-      reinterpret_cast<float*>(bbox_pred.data_ptr<float>()),
-      reinterpret_cast<float*>(cls_score.data_ptr<float>()),
-      reinterpret_cast<float*>(dir_cls_preds.data_ptr<float>()),
+      bbox_pred.data_ptr<float>(),
+      cls_score.data_ptr<float>(),
+      dir_cls_preds.data_ptr<float>(),
       dev_anchor_mask_, dev_anchors_px_, dev_anchors_py_, dev_anchors_pz_,
       dev_anchors_dx_, dev_anchors_dy_, dev_anchors_dz_, dev_anchors_ro_,
       dev_filtered_box_, dev_filtered_score_, dev_filtered_label_,

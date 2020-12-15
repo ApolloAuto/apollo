@@ -108,7 +108,7 @@
 # more accurate detection, but some obstacles in front of ego vehicle might
 # not be detected if you use 128c Lidar.
 # type: bool
-# default: true
+# default: false
 --enable_downsample_beams=false
 
 # factor for down-sampling point cloud beams

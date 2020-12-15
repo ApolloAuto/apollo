@@ -37,7 +37,7 @@
  * @date 2019/02/26
  */
 
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h"
+
 
 #include <vector>
 
@@ -47,6 +47,7 @@
 #include "pcl/point_types.h"
 
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/preprocess_points.h"
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
 
