@@ -5,8 +5,8 @@ import routingPointPin from 'assets/images/routing/pin.png';
 import WS from 'store/websocket';
 import { drawImage } from 'utils/draw';
 
-const minDefaultRoutingPointsNum = 4;
-const maxDistance = 100;
+const minDefaultRoutingPointsNum = 1;
+const maxDistance = 5;
 
 export default class RoutingEditor {
   constructor() {
@@ -120,10 +120,11 @@ export default class RoutingEditor {
       point.z = 0;
       return coordinates.applyOffset(point, true);
     });
-    const start = points[0];
+    const start = coordinates.applyOffset(carOffsetPosition, true);
+    const start_heading = carHeading;
     const end = points[points.length - 1];
-    const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
-    WS.requestDefaultCycleRouting(start, waypoint, end, cycleNumber);
+    const waypoint = (points.length > 1) ? points.slice(0, -1) : [];
+    WS.requestDefaultCycleRouting(start, start_heading, waypoint, end, cycleNumber);
     return true;
   }
 

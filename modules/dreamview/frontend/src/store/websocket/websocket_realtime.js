@@ -233,7 +233,7 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  requestDefaultCycleRouting(start,waypoint,end,cycleNumber) {
+  requestDefaultCycleRouting(start, start_heading, waypoint, end, cycleNumber) {
     const request = {
       type: 'SendDefaultCycleRoutingRequest',
       start,
@@ -241,6 +241,9 @@ export default class RealtimeWebSocketEndpoint {
       waypoint,
       cycleNumber
     };
+    if (start_heading) {
+      request.start.heading = start_heading;
+    }
     this.websocket.send(JSON.stringify(request));
   }
 
