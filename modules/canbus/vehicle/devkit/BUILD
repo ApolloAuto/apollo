@@ -56,6 +56,7 @@ cc_library(
     hdrs = ["devkit_controller.h"],
     deps = [
         ":devkit_message_manager",
+        "//modules/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/canbus/proto:vehicle_parameter_cc_proto",
