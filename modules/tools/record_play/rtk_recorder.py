@@ -33,6 +33,7 @@ from modules.tools.common.logger import Logger
 from modules.canbus.proto import chassis_pb2
 from modules.common.configs.proto import vehicle_config_pb2
 from modules.localization.proto import localization_pb2
+import modules.tools.common.proto_utils as proto_utils
 
 
 class RtkRecord(object):
