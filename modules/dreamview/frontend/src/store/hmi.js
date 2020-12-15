@@ -81,6 +81,8 @@ export default class HMI {
 
     @observable endPreProcess=false;//不能end
 
+    @pbservable preProcessStatus = 2;//正常通知图标
+
     @observable logString='';
 
     @observable preProcessProgress=0;
@@ -241,6 +243,7 @@ export default class HMI {
       this.lidars.clear();
       this.cameras.clear();
       this.canStartPreProcess = true;
+      this.preProcessStatus = 2;//正常就是通知的模式
       this.logString = '';
       this.endPreProcess = false;
       this.preProcessProgress = 0;
@@ -285,7 +288,9 @@ export default class HMI {
         this.logString = _.get(data, 'progress.logString');
         //这个地方去读状态只要发现是SUCCESS 或者FATAL 则endPreProcess置为true 该end了
         console.log(_.get(data, 'progress.status'));
-        this.endPreProcess = ['SUCCESS', 'FAIL'].includes(_.get(data, 'progress.status'));
+        this.preProcessStatus = _.get(data, 'progress.status');
+        this.endPreProcess = (this.preProcessStatus === 1) || (this.preProcessStatus === 0);
+        //this.endPreProcess = ['SUCCESS', 'FAIL'].includes(_.get(data, 'progress.status'));
         if (!this.canStartPreProcess && this.endPreProcess) {
           //已经进入这个过程 需要监管是否可以end
           this.canStartPreProcess = true;
