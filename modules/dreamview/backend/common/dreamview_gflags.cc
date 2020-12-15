@@ -106,5 +106,5 @@ DEFINE_string(vehicle_calibration_mode, "Vehicle Calibration",
 DEFINE_string(lidar_calibration_mode, "Lidar-IMU Sensor Calibration",
               "Name of lidar_to_gnss calibration mode.");
 
-DEFINE_string(camera_calibration_mode, "Camera-Lidar Calibration",
+DEFINE_string(camera_calibration_mode, "Camera-Lidar Sensor Calibration",
               "Name of camera_to_lidar calibration mode.");

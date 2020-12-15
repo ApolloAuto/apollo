@@ -13,6 +13,7 @@ import DataCollectionMonitor from 'components/DataCollectionMonitor';
 import PNCMonitor from 'components/PNCMonitor';
 import ConsoleTeleOp from 'components/TeleopMonitor/ConsoleTeleop';
 import CarTeleOp from 'components/TeleopMonitor/CarTeleop';
+import FuelClient from 'components/FuelClient';
 
 export default class MonitorPanel extends React.Component {
   renderMonitor() {
@@ -34,6 +35,20 @@ export default class MonitorPanel extends React.Component {
         );
       case MONITOR_MENU.PNC_MONITOR:
         return <PNCMonitor />;
+      case MONITOR_MENU.FUEL_CLIENT:
+        //一个组件夹带的参数多应该怎么做  这个地方必须优化
+        return (
+          <FuelClient
+            lidars={hmi.lidars}
+            cameras={hmi.cameras}
+            mainSensor={hmi.mainSensor}
+            mode={hmi.currentMode}
+            inLidarIMUSensorCalibrationMode={hmi.inLidarIMUSensorCalibrationMode}
+            inCameraLidarSensorCalibrationMode={hmi.inCameraLidarSensorCalibrationMode}
+            preProcessProgress={hmi.preProcessProgress}
+            toggleTranslationChange={hmi.toggleTranslationChange}
+          />
+        );
       default:
         return null;
     }

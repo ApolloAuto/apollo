@@ -6,6 +6,22 @@ lidar_config {
     z: 0.0
   }
 }
+lidar_config {
+  sensor_name: "lidar17"
+  translation {
+    x: 1.1
+    y: 2.2
+    z: 0.0
+  }
+}
+lidar_config {
+  sensor_name: "lidar18"
+  translation {
+    x: 1.9
+    y: 0.9
+    z: 0.0
+  }
+}
 main_sensor: "lidar16"
 progress {
   percentage: 0.0

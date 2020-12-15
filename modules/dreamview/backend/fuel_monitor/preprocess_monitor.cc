@@ -115,6 +115,8 @@ void PreprocessMonitor::OnProgress(const std::shared_ptr<Progress>& progress) {
 
 nlohmann::json PreprocessMonitor::GetProgressAsJson() {
   boost::unique_lock<boost::shared_mutex> reader_lock(mutex_);
+  LoadConfiguration();
+  //仅为了调试前端 后端逻辑写好之后删除
   return current_status_json_;
 }
 

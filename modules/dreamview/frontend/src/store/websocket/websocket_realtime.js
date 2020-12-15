@@ -122,6 +122,11 @@ export default class RealtimeWebSocketEndpoint {
             STORE.hmi.updateDataCollectionProgress(message.data);
           }
           break;
+        case 'PreprocessProgress':
+          if (message) {
+            STORE.hmi.updatePreprocessProgress(message.data);
+          }
+          break;
       }
     };
     this.websocket.onclose = (event) => {
@@ -163,6 +168,9 @@ export default class RealtimeWebSocketEndpoint {
         this.requestSimulationWorld(STORE.options.showPNCMonitor);
         if (STORE.hmi.isCalibrationMode) {
           this.requestDataCollectionProgress();
+        }
+        if (STORE.hmi.isSensorCalibrationMode) {
+          this.requestPreprocessProgress();
         }
       }
     }, this.simWorldUpdatePeriodMs);
@@ -388,5 +396,18 @@ export default class RealtimeWebSocketEndpoint {
       point: points,
     };
     this.websocket.send(JSON.stringify(request));
+  }
+
+  requestPreprocessProgress() {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestPreprocessProgress',
+    }));
+  }
+
+  startPreProcessData(data) {
+    this.websocket.send(JSON.stringify({
+      type: 'SensorCalibrationPreprocess',
+      data,
+    }));
   }
 }

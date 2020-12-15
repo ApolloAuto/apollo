@@ -10,14 +10,17 @@ export default class ModuleController extends React.Component {
   render() {
     const {
       modes, currentMode, moduleStatus, componentStatus,
+      allMonitoredComponentSuccess, isCalibrationMode, preConditionModule,
     } = this.props.store.hmi;
+    //recorder控制逻辑 三个标定都要用
 
     const moduleEntries = Array.from(moduleStatus.keys()).sort().map((key) => (
             <CheckboxItem
                 key={key}
                 id={key}
                 title={key}
-                disabled={false}
+                disabled={isCalibrationMode && (key === preConditionModule)
+                  ? !allMonitoredComponentSuccess : false}
                 isChecked={moduleStatus.get(key)}
                 onClick={() => {
                   this.props.store.hmi.toggleModule(key);
