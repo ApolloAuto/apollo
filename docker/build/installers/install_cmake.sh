@@ -26,6 +26,10 @@ VERSION="3.16.8"
 
 TARGET_ARCH="$(uname -m)"
 
+function symlink() {
+    ln -s ${SYSROOT_DIR}/bin/cmake /usr/local/bin/cmake
+}
+
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     CMAKE_SH="cmake-${VERSION}-Linux-x86_64.sh"
     SHA256SUM="0241a05bee0dcdf60e912057cc86cbedba21b9b0d67ec11bc67ad4834f182a23"
@@ -33,6 +37,7 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     download_if_not_cached $CMAKE_SH $SHA256SUM $DOWLOAD_LINK
     chmod a+x ${CMAKE_SH}
     ./${CMAKE_SH} --skip-license --prefix="${SYSROOT_DIR}"
+    symlink
     rm -fr ${CMAKE_SH}
 
 elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
@@ -46,6 +51,7 @@ elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
         pushd ${DECOMPRESSED_NAME}
             DEST=${SYSROOT_DIR} bash install.sh
         popd
+        symlink
         rm -rf "${DECOMPRESSED_NAME}" "${PKG_NAME}"
         exit 0
     fi
@@ -68,9 +74,12 @@ elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
         make -j$(nproc)
         make install
     popd
+    symlink
 
     rm -rf "CMake-${VERSION}" "${PKG_NAME}"
-    apt_get_remove libssl-dev libcurl4-openssl-dev
+    if [[ -n "${CLEAN_DEPS}" ]]; then
+        apt_get_remove libssl-dev libcurl4-openssl-dev
+    fi
 fi
 
 # Clean up cache to reduce layer size.
