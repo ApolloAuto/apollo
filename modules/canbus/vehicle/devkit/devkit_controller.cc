@@ -293,7 +293,7 @@ ErrorCode DevkitController::EnableAutoMode() {
   park_command_104_->set_park_en_ctrl(Park_command_104::PARK_EN_CTRL_ENABLE);
 
   // set AEB enable
-  if (FLAGS_enable_devkit_standard_aeb) {
+  if (FLAGS_enable_aeb) {
     brake_command_101_->set_aeb_en_ctrl(
         Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
   }
