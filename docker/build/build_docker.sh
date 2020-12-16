@@ -153,19 +153,21 @@ function determine_images_for_x86_64() {
 
 function determine_images_for_aarch64() {
     local stage="$1"
-    CUDA_LITE=10.2
-    local cudnn_ver=8
-    local trt_ver=7
+    CUDA_LITE="10.2"
+    CUDNN_VERSION="8.0.0.180"
+    TENSORRT_VERSION="7.1.3"
+    local cudnn_ver="${CUDNN_VERSION%%.*}"
+    local trt_ver="${TENSORRT_VERSION%%.*}"
 
-    local BASE_FMT="L4T-cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
+    local BASE_FMT="l4t-cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
     local CYBER_FMT="cyber-aarch64-${UBUNTU_LTS}"
 
     if [[ "${stage}" == "base" ]]; then
         # Ref: https://developer.nvidia.com/embedded/linux-tegra
-        IMAGE_IN="nvcr.io/nvidia/l4t-base:r32.4.3"
+        IMAGE_IN="nvcr.io/nvidia/l4t-base:r32.4.4"
         IMAGE_OUT="${APOLLO_REPO}:${BASE_FMT}-${TIMESTAMP}"
     elif [[ "${stage}" == "cyber" ]]; then
-        IMAGE_IN="${APOLLO_REPO}:${BASE_FMT}-20200928_1000"
+        IMAGE_IN="${APOLLO_REPO}:${BASE_FMT}-20201217_0752"
         IMAGE_OUT="${APOLLO_REPO}:${CYBER_FMT}-${TIMESTAMP}"
     elif [[ "${stage}" == "dev" ]]; then
         IMAGE_IN="${APOLLO_REPO}:${CYBER_FMT}-20200929_0922"
