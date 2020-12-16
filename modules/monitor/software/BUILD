@@ -3,10 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+MONITOR_COPTS = ['-DMODULE_NAME=\\"monitor\\"']
+
 cc_library(
     name = "process_monitor",
     srcs = ["process_monitor.cc"],
     hdrs = ["process_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
@@ -20,6 +23,7 @@ cc_library(
     name = "module_monitor",
     srcs = ["module_monitor.cc"],
     hdrs = ["module_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
         "//cyber/service_discovery:node_manager",
@@ -34,6 +38,7 @@ cc_library(
     name = "channel_monitor",
     srcs = ["channel_monitor.cc"],
     hdrs = ["channel_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":latency_monitor",
         ":summary_monitor",
@@ -57,6 +62,7 @@ cc_library(
     name = "localization_monitor",
     srcs = ["localization_monitor.cc"],
     hdrs = ["localization_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
         "//modules/common/adapters:adapter_gflags",
@@ -70,6 +76,7 @@ cc_library(
     name = "functional_safety_monitor",
     srcs = ["functional_safety_monitor.cc"],
     hdrs = ["functional_safety_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
@@ -80,6 +87,7 @@ cc_library(
     name = "summary_monitor",
     srcs = ["summary_monitor.cc"],
     hdrs = ["summary_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//modules/common/adapters:adapter_gflags",
         "//modules/monitor/common:monitor_manager",
@@ -92,6 +100,7 @@ cc_library(
     name = "recorder_monitor",
     srcs = ["recorder_monitor.cc"],
     hdrs = ["recorder_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
         "//modules/common/adapters:adapter_gflags",
@@ -105,6 +114,7 @@ cc_library(
     name = "latency_monitor",
     srcs = ["latency_monitor.cc"],
     hdrs = ["latency_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
         "//modules/common/adapters:adapter_gflags",
