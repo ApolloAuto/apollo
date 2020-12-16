@@ -51,6 +51,7 @@
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/storytelling/proto/story.pb.h"
+#include "modules/task_manager/proto/task_manager.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -146,6 +147,7 @@ class SimulationWorldService {
       const std::shared_ptr<apollo::relative_map::NavigationInfo> &);
   void PublishRoutingRequest(
       const std::shared_ptr<apollo::routing::RoutingRequest> &);
+  void PublishTask(const std::shared_ptr<apollo::task_manager::Task> &);
 
   void GetMapElementIds(double radius, MapElementIds *ids) const;
 
@@ -374,6 +376,7 @@ class SimulationWorldService {
       routing_response_reader_;
   std::shared_ptr<cyber::Reader<apollo::storytelling::Stories>>
       storytelling_reader_;
+  std::shared_ptr<cyber::Reader<apollo::task_manager::Task>> task_reader_;
 
   // Writers.
   std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>
@@ -382,6 +385,7 @@ class SimulationWorldService {
       routing_request_writer_;
   std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>
       routing_response_writer_;
+  std::shared_ptr<cyber::Writer<apollo::task_manager::Task>> task_writer_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

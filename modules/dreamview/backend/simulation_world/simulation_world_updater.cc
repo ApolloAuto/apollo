@@ -28,10 +28,15 @@ namespace dreamview {
 
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::ContainsKey;
+using apollo::common::util::JsonUtil;
 using apollo::cyber::common::GetProtoFromASCIIFile;
+using apollo::cyber::common::SetProtoToASCIIFile;
+using apollo::hdmap::DefaultRoutingFile;
 using apollo::hdmap::EndWayPointFile;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
+using apollo::task_manager::CycleRoutingTask;
+using apollo::task_manager::Task;
 
 using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
@@ -158,6 +163,35 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
               MonitorMessageItem::ERROR, "Failed to send a routing request.");
         }
       });
+  
+   websocket_->RegisterMessageHandler(
+      "SendDefaultCycleRoutingRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto task = std::make_shared<Task>();
+        auto *cycle_routing_task = task->mutable_cycle_routing_task();
+        auto *routing_request = cycle_routing_task->mutable_routing_request();
+        if (!ContainsKey(json, "cycleNumber") ||
+            !json.find("cycleNumber")->is_number()) {
+          AERROR << "Failed to prepare a cycle routing request: Invalid cycle "
+                    "number";
+          return;
+        }
+        bool succeed = ConstructRoutingRequest(json, routing_request);
+        if (succeed) {
+          cycle_routing_task->set_cycle_num(
+              static_cast<int>(json["cycleNumber"]));
+          task->set_task_name("cycle_routing_task");
+          task->set_task_type(apollo::task_manager::TaskType::CYCLE_ROUTING);
+          sim_world_service_.PublishTask(task);
+          AINFO << task->DebugString();
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO, "Default cycle routing request sent.");
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to send a default cycle routing request.");
+        }
+      });
 
   websocket_->RegisterMessageHandler(
       "RequestSimulationWorld",
@@ -236,6 +270,42 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         websocket_->SendData(conn, response.dump());
       });
 
+   websocket_->RegisterMessageHandler(
+      "GetDefaultRoutings",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "DefaultRoutings";
+        response["threshold"] =
+            FLAGS_loop_routing_end_to_start_distance_threshold;
+
+        Json default_routing_list = Json::array();
+        if (LoadDefaultRoutings()) {
+          for (const auto &defaultrouting :
+               default_routings_.defaultrouting()) {
+            Json drouting;
+            drouting["name"] = defaultrouting.name();
+            Json point_list;
+            for (const auto &point : defaultrouting.point()) {
+              Json point_json;
+              point_json["x"] = point.x();
+              point_json["y"] = point.y();
+              point_list.push_back(point_json);
+            }
+            drouting["point"] = point_list;
+            default_routing_list.push_back(drouting);
+          }
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to load default "
+              "routing. Please make sure the "
+              "file exists at " +
+                  DefaultRoutingFile());
+        }
+        response["defaultRoutings"] = default_routing_list;
+        websocket_->SendData(conn, response.dump());
+      });
+
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
@@ -270,6 +340,24 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         response["type"] = "DataCollectionProgress";
         response["data"] = data_collection_monitor_->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
+      });
+   websocket_->RegisterMessageHandler(
+      "SaveDefaultRouting",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        bool succeed = AddDefaultRouting(json);
+        if (succeed) {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO, "Successfully add default routing.");
+          if (!default_routing_) {
+            AERROR << "Failed to add a default routing" << std::endl;
+          }
+          Json response = JsonUtil::ProtoToTypedJson("AddDefaultRoutingPath",
+                                                     *default_routing_);
+          websocket_->SendData(conn, response.dump());
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR, "Failed to add a default routing.");
+        }
       });
   camera_ws_->RegisterMessageHandler(
       "RequestCameraData",
@@ -427,6 +515,58 @@ bool SimulationWorldUpdater::LoadPOI() {
 
   AWARN << "Failed to load default list of POI from " << EndWayPointFile();
   return false;
+}
+
+bool SimulationWorldUpdater::LoadDefaultRoutings() {
+  if (GetProtoFromASCIIFile(DefaultRoutingFile(), &default_routings_)) {
+    return true;
+  }
+
+  AWARN << "Failed to load default routings of DefaultRoutings from "
+        << DefaultRoutingFile();
+  return false;
+}
+
+bool SimulationWorldUpdater::AddDefaultRouting(const Json &json) {
+  if (!ContainsKey(json, "name")) {
+    AERROR << "Failed to save a default routing: routing name not found.";
+    return false;
+  }
+
+  if (!ContainsKey(json, "point")) {
+    AERROR << "Failed to save a default routing: default routing points not "
+              "found.";
+    return false;
+  }
+
+  std::string name = json["name"];
+  auto iter = json.find("point");
+  default_routing_ = default_routings_.add_defaultrouting();
+  default_routing_->clear_name();
+  default_routing_->clear_point();
+  default_routing_->set_name(name);
+  auto *waypoint = default_routing_->mutable_point();
+  if (iter != json.end() && iter->is_array()) {
+    for (size_t i = 0; i < iter->size(); ++i) {
+      auto &point = (*iter)[i];
+      auto *p = waypoint->Add();
+      if (!ValidateCoordinate(point)) {
+        AERROR << "Failed to save a default routing: invalid waypoint.";
+        return false;
+      }
+      p->set_x(static_cast<double>(point["x"]));
+      p->set_y(static_cast<double>(point["y"]));
+    }
+  }
+  AINFO << "Default Routing Points to be saved:\n";
+  std::string file_name = DefaultRoutingFile();
+  if (!SetProtoToASCIIFile(default_routings_, file_name)) {
+    AERROR << "Failed to set proto to ascii file " << file_name;
+    return false;
+  }
+  AINFO << "Success in setting proto to cycle_routing file" << file_name;
+
+  return true;
 }
 
 }  // namespace dreamview

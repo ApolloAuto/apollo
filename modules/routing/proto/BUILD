@@ -22,3 +22,18 @@ proto_library(
         "//modules/map/proto:map_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "default_routing_proto",
+    deps = [
+        ":default_routing_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "default_routing_proto_lib",
+    srcs = ["default_routing.proto"],
+    deps = [
+       "//modules/common/proto:geometry_proto_lib",
+    ],
+)

@@ -7,6 +7,12 @@ cyber_modules {
   }
 }
 cyber_modules {
+  key: "TaskManager"
+  value: {
+    dag_files: "/apollo/modules/task_manager/dag/task_manager.dag"
+  }
+}
+cyber_modules {
   key: "Lidar"
   value: {
     dag_files: "/apollo/modules/drivers/lidar/dag/lidar.dag"
