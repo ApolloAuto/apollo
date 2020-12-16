@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-
-#include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
 

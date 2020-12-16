@@ -38,6 +38,7 @@ cc_library(
     name = "camera_monitor",
     srcs = ["camera_monitor.cc"],
     hdrs = ["camera_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
         "//cyber/common:log",
