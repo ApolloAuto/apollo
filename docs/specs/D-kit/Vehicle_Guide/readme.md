@@ -5,8 +5,8 @@
 
 ## 根据车辆型号，查询车辆使用手册
 
-- 如果您购买的是[**D-KIT Lite**](https://apollo.auto/apollo_d_kit.html)开发套件，请您点击[D-KIT Lite车辆使用说明书](D-KIT_Lite/readme.md)，查询相应的车辆使用说明文档。
+- 如果您购买的是[**D-KIT Lite**（点击查看介绍）](https://apollo.auto/apollo_d_kit.html)开发套件，请您点击[D-KIT Lite车辆使用说明书（点击进入）](D-KIT_Lite/readme.md)，查询相应的车辆使用说明文档。
 
-- 如果您购买的是[**D-KIT Standard**](https://apollo.auto/apollo_d_kit.html)开发套件，请您点击[D-KIT Standard车辆使用说明书](D-KIT_Standard/Quick_Start_V01)，查询相应的车辆使用说明文档。
+- 如果您购买的是[**D-KIT Standard**（点击查看介绍）](https://apollo.auto/apollo_d_kit.html)开发套件，请您点击[D-KIT Standard车辆使用说明书（点击进入）](D-KIT_Standard/Quick_Start_V01.md)，查询相应的车辆使用说明文档。
 
-- 如果您购买的是[**D-KIT Advanced**](https://apollo.auto/apollo_d_kit.html)开发套件，请您点击[D-KIT Advanced车辆使用说明书](D-KIT_Advanced/Quick_Start_V01)，查询相应的车辆使用说明文档。
+- 如果您购买的是[**D-KIT Advanced**（点击查看介绍）](https://apollo.auto/apollo_d_kit.html)开发套件，请您点击[D-KIT Advanced车辆使用说明书（点击进入）](D-KIT_Advanced/Quick_Start_V01.md)，查询相应的车辆使用说明文档。
