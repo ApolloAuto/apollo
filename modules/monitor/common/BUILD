@@ -2,10 +2,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+MONITOR_COPTS = ['-DMODULE_NAME=\\"monitor\\"']
+
 cc_library(
     name = "recurrent_runner",
     srcs = ["recurrent_runner.cc"],
     hdrs = ["recurrent_runner.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//cyber",
     ],
@@ -15,6 +18,7 @@ cc_test(
     name = "recurrent_runner_test",
     size = "small",
     srcs = ["recurrent_runner_test.cc"],
+    copts = MONITOR_COPTS,
     deps = [
         ":recurrent_runner",
         "@gtest//:main",
@@ -25,6 +29,7 @@ cc_library(
     name = "monitor_manager",
     srcs = ["monitor_manager.cc"],
     hdrs = ["monitor_manager.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",

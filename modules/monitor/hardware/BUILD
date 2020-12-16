@@ -2,10 +2,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+MONITOR_COPTS = ['-DMODULE_NAME=\\"monitor\\"']
+
 cc_library(
     name = "gps_monitor",
     srcs = ["gps_monitor.cc"],
     hdrs = ["gps_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//cyber",
         "//modules/drivers/gnss/proto:gnss_proto",
@@ -19,6 +22,7 @@ cc_library(
     name = "resource_monitor",
     srcs = ["resource_monitor.cc"],
     hdrs = ["resource_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//modules/common/util",
         "//modules/dreamview/proto:hmi_mode_proto",
@@ -33,6 +37,7 @@ cc_library(
     name = "esdcan_monitor",
     srcs = ["esdcan_monitor.cc"],
     hdrs = ["esdcan_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//modules/common/util",
         "//modules/monitor/common:monitor_manager",
@@ -50,6 +55,7 @@ cc_library(
     name = "socket_can_monitor",
     srcs = ["socket_can_monitor.cc"],
     hdrs = ["socket_can_monitor.h"],
+    copts = MONITOR_COPTS,
     deps = [
         "//modules/common/util",
         "//modules/monitor/common:monitor_manager",
