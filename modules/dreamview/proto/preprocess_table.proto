@@ -20,8 +20,10 @@ message LidarConfig {
 }
 
 message CameraConfig {
-  optional string camera_name = 1;
-  optional Translation translation = 2;
+  optional Translation translation = 1;
+  repeated float D = 2;
+  repeated float K = 3;
+  repeated float R = 4;
 }
 
 message Progress {
@@ -32,7 +34,7 @@ message Progress {
 
 message PreprocessTable {
   repeated LidarConfig lidar_config = 1;
-  repeated CameraConfig camera_config = 2;
+  optional CameraConfig camera_config = 2;
   optional string main_sensor = 3;
   optional Progress progress = 4;
 }

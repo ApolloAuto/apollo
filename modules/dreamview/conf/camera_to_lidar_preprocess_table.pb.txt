@@ -1,37 +1,13 @@
-camera_config {
-  camera_name: "front_6mm"
+lidar_config {
+  sensor_name: "lidar16"
   translation {
     x: 0.0
     y: 0.0
     z: 0.0
   }
 }
-camera_config {
-  camera_name: "back_6mm"
-  translation {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-lidar_config {
-  sensor_name: "lidar1"
-  translation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-}
-lidar_config {
-  sensor_name: "lidar2"
-  translation {
-    x: 1.1
-    y: 2.2
-    z: 3.3
-  }
-}
-main_sensor: "lidar1"
 progress {
   percentage: 0.0
   log_string: "Press the button to start preprocessing"
+  status: UNKNOWN
 }
