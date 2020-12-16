@@ -24,7 +24,6 @@ DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 
 TASK=""
 VALID_TASKS=("lidar_to_gnss" "camera_to_lidar")
-CAMERA_NAME=""
 
 RECORD_FILES=()
 RECORD_DIRS=()
@@ -39,7 +38,7 @@ function join_by() {
 
 function print_usage() {
   echo "Usage:
-    ./extract_data.sh -t [ $(join_by ' | ' ${VALID_TASKS[@]}) ] (-c <camera name>) -f <path/to/record/file> -d <path/to/record/dir>
+    ./extract_data.sh -t [ $(join_by ' | ' ${VALID_TASKS[@]}) ] -f <path/to/record/file> -d <path/to/record/dir>
   eg.
     ./extract_data.sh -t lidar_to_gnss -f xxx/yyy.record.00000 -f xxx/yyy.record.00001
   or
@@ -53,9 +52,6 @@ function parse_args() {
     case "${flag}" in
       t)
         TASK="${OPTARG}"
-        ;;
-      c)
-        CAMERA_NAME="${OPTARG}"
         ;;
       f)
         RECORD_FILES+=("${OPTARG}")
@@ -176,7 +172,7 @@ function update_lidar_config() {
     record="$(readlink -f ${RECORD_DIRS[0]})/$(ls ${RECORD_DIRS[0]} | grep -m1 record)"
   fi
   lidar_channels=($(cyber_recorder info ${record} | awk '{print $1}' |
-    grep PointCloud2 | grep -v "fusion" | grep -v "compensator"))
+    grep "PointCloud2" | grep -v "fusion" | grep -v "compensator"))
 
   if [ "${#lidar_channels[*]}" -eq 0 ]; then
     echo "There is no PointCloud messages in ${record}, please check your record!"
@@ -199,8 +195,18 @@ function update_lidar_config() {
 function update_camera_config() {
   local channel_template="${TEMPLATE_DIR}/channel_template.txt"
   local extraction_rate=5
+  if [[ ${#RECORD_FILES[*]} -ne 0 ]]; then
+    record="$(readlink -f ${RECORD_FILES[0]})"
+  else
+    record="$(readlink -f ${RECORD_DIRS[0]})/$(ls ${RECORD_DIRS[0]} | grep -m1 record)"
+  fi
+  camera_channels=($(cyber_recorder info ${record} | grep "image" | grep -v "compressed" | awk '$2>0{print $1}'))
+  if [ "${#camera_channels[*]}" -ne 1 ]; then
+    echo "There should be only one camera channel in ${record}, please check your record!"
+    exit 1
+  fi
   sed -i "s|__RATE__|${extraction_rate}|g" "${channel_template}"
-  sed -i "s|__NAME__|${CAMERA_NAME}|g" "${channel_template}"
+  sed -i "s|__NAME__|${camera_channels[0]}|g" "${channel_template}"
   sed -i "/# channel of camera image channels/{n;N;N;N;N;d}" "${TARGET_DIR}/camera_to_lidar.config"
   sed -i "/# channel of camera image channels/r ${channel_template}" "${TARGET_DIR}/camera_to_lidar.config"
   git checkout -- "${channel_template}"
@@ -213,7 +219,7 @@ function main() {
   if [[ "${TASK}" == "lidar_to_gnss" ]]; then
     update_lidar_config
   fi
-  if [[ "${TASK}" == "camera_to_lidar" ]] && [[ ! -z "${CAMERA_NAME}" ]]; then
+  if [[ "${TASK}" == "camera_to_lidar" ]]; then
     update_camera_config
   fi
   install_if_not_exist "pyyaml" "pypcd"
