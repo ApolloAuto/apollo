@@ -13,7 +13,7 @@
 
 |**车辆铭牌产品编号范围**|**车辆使用手册**|
 |---|---|
-|2019001~2019016|[D-KIT Lite车辆使用手册V01批次](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Quick_Start_V01.md)|
-|2019017~2019050|[D-KIT Lite车辆使用手册V02批次](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Quick_Start_V02.md)|
-|2019051~2019090|[D-KIT Lite车辆使用手册V03批次](./Quick_Start_V03.md)|
-|2019091-2019095<br>2020001及以后|[D-KIT Lite车辆使用手册V04批次](./Quick_Start_V04.md)<br>[D-KIT Lite传感器集成说明V04批次](./Apollo_D-kit_sensor_integration_V04.md)|
+|2019001~2019016|[D-KIT Lite车辆使用手册V01批次（点击进入）](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Quick_Start_V01.md)|
+|2019017~2019050|[D-KIT Lite车辆使用手册V02批次（点击进入）](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Quick_Start_V02.md)|
+|2019051~2019090|[D-KIT Lite车辆使用手册V03批次（点击进入）](./Quick_Start_V03.md)|
+|2019091-2019095<br>2020001及以后|[D-KIT Lite车辆使用手册V04批次（点击进入）](./Quick_Start_V04.md)<br>[D-KIT Lite传感器集成说明V04批次（点击进入）](./Apollo_D-kit_sensor_integration_V04.md)|
