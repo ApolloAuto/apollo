@@ -30,6 +30,9 @@ apt_get_update_and_install \
     libgeos-dev \
     libhdf5-dev
 
+# libc6-dev
+[[ -f /usr/include/xlocale.h ]] || ln -s /usr/include/locale.h /usr/include/xlocale.h
+
 pip3_install -r py3_requirements.txt
 
 # Since pypcd installed via `pip install` only works with python2.7,
