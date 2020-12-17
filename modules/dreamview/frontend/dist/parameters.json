@@ -301,11 +301,11 @@
 			"default": false,
 			"menuId": "mapLaneId"
 		},
-		"showDefaultRoutingInput":{
-			"default":false
+		"showDefaultRoutingInput": {
+			"default": false
 		},
 		"showCycleNumberInput": {
-			"default":false
+			"default": false
 		}
 	},
 	"routingEditor": {
