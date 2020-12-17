@@ -1,0 +1,21 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/task_manager/libtask_manager_component.so"
+    components {
+        class_name : "TaskManagerComponent"
+        config {
+            name : "task_manager"
+            config_file_path: "/apollo/modules/task_manager/conf/task_manager_config.pb.txt"
+            flag_file_path: "/apollo/modules/task_manager/conf/task_manager.conf"
+            readers: [
+                {
+                    channel: "/apollo/task_manager"
+                    qos_profile: {
+                        depth : 15
+                    }
+                    pending_queue_size: 50
+                }
+            ]
+        }
+    }
+}

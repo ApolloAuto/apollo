@@ -73,6 +73,7 @@ using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
+using apollo::task_manager::Task;
 
 using Json = nlohmann::json;
 using ::google::protobuf::util::MessageToJsonString;
@@ -294,6 +295,7 @@ void SimulationWorldService::InitReaders() {
         std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
         monitor_msgs_.push_back(monitor_message);
       });
+  task_reader_ = node_->CreateReader<Task>(FLAGS_task_topic);
 }
 
 void SimulationWorldService::InitWriters() {
@@ -314,6 +316,7 @@ void SimulationWorldService::InitWriters() {
         apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
     routing_request_writer_ =
         node_->CreateWriter<RoutingRequest>(routing_request_attr);
+    task_writer_ = node_->CreateWriter<Task>(FLAGS_task_topic);
   }
 
   routing_response_writer_ =
@@ -1286,6 +1289,7 @@ void SimulationWorldService::DumpMessages() {
   DumpMessageFromReader(perception_traffic_light_reader_.get());
   DumpMessageFromReader(relative_map_reader_.get());
   DumpMessageFromReader(navigation_reader_.get());
+  DumpMessageFromReader(task_reader_.get());
 }
 
 void SimulationWorldService::PublishNavigationInfo(
@@ -1306,5 +1310,11 @@ void SimulationWorldService::PublishMonitorMessage(
   monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
   monitor_logger_buffer_.Publish();
 }
+
+void SimulationWorldService::PublishTask(const std::shared_ptr<Task> &task) {
+  FillHeader(FLAGS_dreamview_module_name, task.get());
+  task_writer_->Write(task);
+}
+
 }  // namespace dreamview
 }  // namespace apollo

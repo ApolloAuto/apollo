@@ -37,6 +37,8 @@
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 #include "modules/routing/proto/poi.pb.h"
+#include "modules/routing/proto/default_routing.pb.h"
+#include "modules/task_manager/proto/task_manager.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -112,6 +114,21 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
+   /**
+   * @brief Tries to load the user-defined default routings from the txt file
+   * @return False if failed to load from file,file doesn't exist
+   * true otherwise or if it's already loaded.
+   */
+  bool LoadDefaultRoutings();
+
+  /**
+   * @brief Tries to save the points to a fixed location file
+   * @param json that contains routing name and point's coordinate x and y
+   * @return False if failed to save,
+   * true otherwise or if it's already saved.
+   */
+  bool AddDefaultRouting(const nlohmann::json &json);
+
   void RegisterMessageHandlers();
 
   std::unique_ptr<cyber::Timer> timer_;
@@ -127,6 +144,10 @@ class SimulationWorldUpdater {
 
   // End point for requesting default route
   apollo::routing::POI poi_;
+
+  // default routings
+  apollo::routing::DefaultRoutings default_routings_;
+  apollo::routing::DefaultRouting *default_routing_;
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.

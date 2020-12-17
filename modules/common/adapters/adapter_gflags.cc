@@ -248,3 +248,5 @@ DEFINE_string(latency_recording_topic, "/apollo/common/latency_records",
               "Latency recording topic.");
 DEFINE_string(latency_reporting_topic, "/apollo/common/latency_reports",
               "Latency reporting topic.");
+DEFINE_string(task_topic, "/apollo/task_manager",
+              "task manager topic name");

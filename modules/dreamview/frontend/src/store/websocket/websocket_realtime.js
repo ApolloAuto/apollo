@@ -13,6 +13,7 @@ export default class RealtimeWebSocketEndpoint {
         this.mapUpdatePeriodMs = 1000;
         this.mapLastUpdateTimestamp = 0;
         this.updatePOI = true;
+        this.updateDefaultRoutingPoints = true;
         this.routingTime = undefined;
         this.currentMode = null;
         this.worker = new Worker();
@@ -101,6 +102,12 @@ export default class RealtimeWebSocketEndpoint {
                 case "DefaultEndPoint":
                     STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
                     break;
+                case 'DefaultRoutings':
+                    STORE.routeEditingManager.updateDefaultRoutingPoints(message);
+                    break;
+                case 'AddDefaultRoutingPath':
+                    STORE.routeEditingManager.addDefaultRoutingPath(message);
+                    break;
                 case "RoutePath":
                     RENDERER.updateRouting(message.routingTime, message.routePath);
                     break;
@@ -145,6 +152,11 @@ export default class RealtimeWebSocketEndpoint {
                     this.updatePOI = false;
                 }
 
+                  // Load default routing points user defined
+                if (this.updateDefaultRoutingPoints) {
+                    this.requestDefaultRoutingPoints();
+                    this.updateDefaultRoutingPoints = false;
+                }
                 this.requestSimulationWorld(STORE.options.showPNCMonitor);
                 if (STORE.hmi.isCalibrationMode) {
                     this.requestDataCollectionProgress();
@@ -218,9 +230,29 @@ export default class RealtimeWebSocketEndpoint {
         this.websocket.send(JSON.stringify(request));
     }
 
+    requestDefaultCycleRouting(start, start_heading, waypoint, end, cycleNumber) {
+        const request = {
+          type: 'SendDefaultCycleRoutingRequest',
+          start,
+          end,
+          waypoint,
+          cycleNumber
+        };
+        if (start_heading) {
+            request.start.heading = start_heading;
+        }
+        this.websocket.send(JSON.stringify(request));
+    }
+
     requestDefaultRoutingEndPoint() {
         this.websocket.send(JSON.stringify({
             type: "GetDefaultEndPoint",
+        }));
+    }
+
+    requestDefaultRoutingPoints() {
+        this.websocket.send(JSON.stringify({
+          type: 'GetDefaultRoutings',
         }));
     }
 
@@ -251,6 +283,7 @@ export default class RealtimeWebSocketEndpoint {
             value: map,
         }));
         this.updatePOI = true;
+        this.updateDefaultRoutingPoints = true;
     }
 
     changeVehicle(vehicle) {
@@ -327,5 +360,13 @@ export default class RealtimeWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "RequestDataCollectionProgress",
         }));
+    }
+    saveDefaultRouting(routingName,points) {
+        const request = {
+          type: 'SaveDefaultRouting',
+          name: routingName,
+          point: points,
+        };
+        this.websocket.send(JSON.stringify(request));
     }
 }
