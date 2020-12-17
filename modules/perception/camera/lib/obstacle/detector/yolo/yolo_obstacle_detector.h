@@ -20,13 +20,14 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/camera/proto/yolo.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
-#include "modules/perception/camera/lib/obstacle/detector/yolo/proto/yolo.pb.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/region_output.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/resize.h"
