@@ -12,7 +12,7 @@ cuda_library(
         ":object_maintainer",
         "//modules/perception/base",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_cc_proto",
+        "//modules/perception/camera/proto:yolo_cc_proto",
         "@local_config_cuda//cuda:cudart",
     ],
 )
@@ -29,7 +29,7 @@ cc_library(
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_cc_proto",
+        "//modules/perception/camera/proto:yolo_cc_proto",
         "@local_config_cuda//cuda:cudart",
     ],
 )

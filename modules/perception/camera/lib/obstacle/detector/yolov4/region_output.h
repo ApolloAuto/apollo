@@ -21,13 +21,14 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/camera/proto/yolo.pb.h"
+
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/lib/obstacle/detector/yolov4/proto/yolov4.pb.h"
 
 namespace apollo {
 namespace perception {
