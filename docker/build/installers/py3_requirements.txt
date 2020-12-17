@@ -1,17 +1,20 @@
 ## Ref:
 ## 1) https://www.python.org/dev/peps/pep-0508/#environment-markers
 
-# system utils
+# System utils
 supervisor
 psutil
 
 # Google infras
 absl-py
-# Use protobuf installed from source
+
+# Note(infra): Use protobuf installed from source
 # protobuf
+
 # Note(infra): to be retired by absl-py
 python-gflags
 glog
+
 grpcio-tools; platform_machine == 'x86_64'
 
 # Web
@@ -30,13 +33,12 @@ matplotlib
 
 # Learning
 # opencv-python
-## install numpy before h5py
+## Note(infra): install numpy before h5py
 numpy
-scipy ; platform_machine == 'x86_64'
+scipy
 
 # Data format
 h5py
-
 pyyaml
 utm
 
