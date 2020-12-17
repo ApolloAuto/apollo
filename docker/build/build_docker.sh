@@ -170,7 +170,7 @@ function determine_images_for_aarch64() {
         IMAGE_IN="${APOLLO_REPO}:${BASE_FMT}-20201217_0752"
         IMAGE_OUT="${APOLLO_REPO}:${CYBER_FMT}-${TIMESTAMP}"
     elif [[ "${stage}" == "dev" ]]; then
-        IMAGE_IN="${APOLLO_REPO}:${CYBER_FMT}-20200929_0922"
+        IMAGE_IN="${APOLLO_REPO}:${CYBER_FMT}-20201217_1302"
         IMAGE_OUT="${APOLLO_REPO}:dev-aarch64-${UBUNTU_LTS}-${TIMESTAMP}"
     else
         echo "Unknown build stage: ${stage}. Exiting..."
