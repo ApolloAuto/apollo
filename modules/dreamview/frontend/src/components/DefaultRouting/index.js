@@ -25,12 +25,8 @@ export default class DefaultRouting extends React.Component {
         <div className="card data-recorder">
           <Tabs>
             <TabList>
-              <Tab><div className="card-header">
-                    <span>Point of Interest</span>
-                </div></Tab>
-              <Tab><div className="card-header">
-                    <span>Default Routings</span>
-                </div></Tab>
+              <Tab>Point of Interest</Tab>
+              <Tab>Default Routings</Tab>
             </TabList>
             <TabPanel>
               <POI
