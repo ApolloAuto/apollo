@@ -76,13 +76,30 @@ class ConfigYaml(object):
         else:
             print('create folder: %s' % out_param_folder)
             os.makedirs(out_param_folder)
+        camera_config = self._table_info.camera_config
         # copy sample intrinsic yaml file to correct location
         # wait for user input about intrinsics
         sample_intrinsic_yaml = os.path.join(
             init_param_folder, 'sample_intrinsics.yaml')
+        intrinsic_data = self.load_sample_yaml_file(self._task_name,
+                                                    sample_file=sample_intrinsic_yaml)
+        for iter, data in enumerate(camera_config.D):
+            intrinsic_data['D'][iter] = data
+        for iter, data in enumerate(camera_config.K):
+            intrinsic_data['K'][iter] = data
+        for iter, data in enumerate(camera_config.R):
+            intrinsic_data['R'][iter] = data
+        # dump the intrinsic yaml data
         out_intrinsic_yaml = os.path.join(out_param_folder,
                                           in_data['source_sensor'] + '_intrinsics.yaml')
-        shutil.copyfile(sample_intrinsic_yaml, out_intrinsic_yaml)
+        try:
+            with open(out_intrinsic_yaml, 'w') as f:
+                yaml.safe_dump(intrinsic_data, f)
+        except IOError:
+            raise ValueError('cannot generate the task config yaml '
+                             'file at {}'.format(out_intrinsic_yaml))
+
+
         # load extrinsics sample yaml, rename source sensor and destination sensor
         sample_extrinsic_yaml = os.path.join(
             init_param_folder, 'sample_extrinsics.yaml')
@@ -91,23 +108,20 @@ class ConfigYaml(object):
         # set up the source_sensor(camera name) to dest sensor(lidar name)
         extrinsic_data['header']['frame_id'] = in_data['destination_sensor']
         extrinsic_data['child_frame_id'] = in_data['source_sensor']
-        for camera_config in self._table_info.camera_config:
-            if camera_config.camera_name == self._source_sensor:
-                extrinsic_data['transform']['translation']['x'] = round(
-                    camera_config.translation.x, 4)
-                extrinsic_data['transform']["translation"]["y"] = round(
-                    camera_config.translation.y, 4)
-                extrinsic_data['transform']["translation"]["z"] = round(
-                    camera_config.translation.z, 4)
+        extrinsic_data['transform']['translation']['x'] = round(
+            camera_config.translation.x, 4)
+        extrinsic_data['transform']["translation"]["y"] = round(
+            camera_config.translation.y, 4)
+        extrinsic_data['transform']["translation"]["z"] = round(
+            camera_config.translation.z, 4)
         # dump the extrinsic yaml data
         out_extrinsic_yaml = os.path.join(out_param_folder, in_data['source_sensor']
                                           + '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
-
         try:
             with open(out_extrinsic_yaml, 'w') as f:
                 yaml.safe_dump(extrinsic_data, f)
         except IOError:
-            raise ValueError('cannot generate the task config yaml'
+            raise ValueError('cannot generate the task config yaml '
                              'file at {}'.format(out_extrinsic_yaml))
 
     def _generate_camera_to_lidar_calibration_yaml(self, in_data):
