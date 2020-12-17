@@ -542,8 +542,16 @@ void HMIWorker::ChangeVehicle(const std::string& vehicle_name) {
     status_changed_ = true;
   }
   ResetMode();
-
   ACHECK(VehicleManager::Instance()->UseVehicle(*vehicle_dir));
+  // Restart Fuel Monitor
+  auto* monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
+  if (monitors != nullptr) {
+    for (const auto& monitor : *monitors) {
+      if (monitor.second->IsEnabled()) {
+        monitor.second->Restart();
+      }
+    }
+  }
 }
 
 void HMIWorker::ChangeMode(const std::string& mode_name) {
@@ -575,6 +583,11 @@ void HMIWorker::ChangeMode(const std::string& mode_name) {
     status_.clear_monitored_components();
     for (const auto& iter : current_mode_.monitored_components()) {
       status_.mutable_monitored_components()->insert({iter.first, {}});
+    }
+
+    status_.clear_other_components();
+    for (const auto& iter : current_mode_.other_components()) {
+      status_.mutable_other_components()->insert({iter.first, {}});
     }
     status_changed_ = true;
   }

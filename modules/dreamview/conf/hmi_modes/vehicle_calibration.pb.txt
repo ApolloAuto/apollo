@@ -60,3 +60,10 @@ monitored_components {
     # Special LocalizationMonitor.
   }
 }
+other_components {
+  key: "Preprocess"
+  value: {
+    command_keywords: "bash"
+    command_keywords: "preprocess.sh"
+  }
+}

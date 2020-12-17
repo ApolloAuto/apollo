@@ -109,14 +109,6 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
-          auto* monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
-          if (monitors != nullptr) {
-            for (const auto& monitor : *monitors) {
-              if (monitor.second->IsEnabled()) {
-                monitor.second->Restart();
-              }
-            }
-          }
         }
       });
 

@@ -1,5 +1,4 @@
-lidar_config {
-  sensor_name: "lidar16"
+camera_config {
   translation {
     x: 0.0
     y: 0.0
