@@ -10,9 +10,9 @@
         - [启动计算机](#启动计算机)
         - [连接电源](#连接电源)
     - [工控机软件系统安装](#工控机软件系统安装)
-      - [安装Linux系统](#安装Linux系统)
+      - [配置Linux系统](#配置Linux系统)
         - [安装并降级GCC和G++](#安装并降级GCC和G++)
-      - [下载Apollo源代码](#下载Apollo源代码)
+      - [升级Apollo源代码](#升级Apollo源代码)
       - [设置Apollo编译环境](#设置Apollo编译环境)
       - [编译Apollo源代码](#编译Apollo源代码)
       - [运行DreamView](#运行DreamView)
@@ -160,7 +160,7 @@
 
 ![tip_icon](images/tip_icon.png) 在本小节中，开发套件的客户的工控机已经预装了Ubuntu18.04LTS操作系统和apollo运行所需的环境，我们可以直接编译apollo开启我们的自动驾驶之旅了。若您需要自己重装系统，请点击[循迹搭建--Apollo系统重装](reinstall_my_apollo_system_cn.md)查看重新安装Apollo系统的方法。
 
-#### 安装Linux系统
+#### 配置Linux系统
 
 开发套件的客户的工控机已经预装了Ubuntu18.04LTS操作系统和apollo运行所需的环境，预装系统的IPC的用户名和密码均为apollo。
 
@@ -185,23 +185,15 @@ g++ --version
 
 ![warning_icon](images/warning_icon.png)**WARNING**：在以下模块的操作中，如非本文档或操作系统要求，禁用一切`sudo`操作，切记！
 
-#### 下载Apollo源代码
+#### 升级Apollo源代码
 
-a、当前用户的home目录下已有Apollo代码，请按照以下步骤来更新代码：
+当前用户的home目录下已有Apollo代码，请按照以下步骤来更新代码：
 
 ```
 cd ~/apollo
 git checkout .
-git pull
+git pull origin r5.5.0
 ```
-
-b、若您需要和Apollo代码保持完全同步，请接着执行以下命令：
-
-```
-git remote set-url origin https://github.com/ApolloAuto/apollo.git
-git pull
-```
-
 
 #### 设置Apollo编译环境
 
