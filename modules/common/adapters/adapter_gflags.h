@@ -105,6 +105,7 @@ DECLARE_string(audio_capture_topic);
 DECLARE_string(v2x_obstacle_topic);
 DECLARE_string(v2x_trafficlight_topic);
 DECLARE_string(storytelling_topic);
+DECLARE_string(task_topic);
 // For pandora.
 DECLARE_string(pandora_pointcloud_topic);
 DECLARE_string(pandora_camera_front_color_topic);

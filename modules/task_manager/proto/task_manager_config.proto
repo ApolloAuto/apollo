@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.task_manager;
+
+message TopicConfig {
+  optional string routing_request_topic = 1;
+  optional string localization_pose_topic = 2;
+}
+
+message TaskManagerConfig {
+  optional TopicConfig topic_config = 1;
+}
