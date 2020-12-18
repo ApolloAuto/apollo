@@ -46,11 +46,10 @@ class BoundedQueue {
   ~BoundedQueue();
   bool Init(uint64_t size);
   bool Init(uint64_t size, WaitStrategy* strategy);
-  bool Enqueue(const T& element);
-  bool Enqueue(T&& element);
+  bool Enqueue(const T& element, bool need_notify = true);
+  bool Enqueue(T&& element, bool need_notify = true);
   bool WaitEnqueue(const T& element);
-  bool WaitEnqueue(T&& element);
-  bool Dequeue(T* element);
+  bool Dequeue(T* element, bool need_notify = true);
   bool WaitDequeue(T* element);
   uint64_t Size();
   bool Empty();
@@ -107,7 +106,7 @@ bool BoundedQueue<T>::Init(uint64_t size, WaitStrategy* strategy) {
 }
 
 template <typename T>
-bool BoundedQueue<T>::Enqueue(const T& element) {
+bool BoundedQueue<T>::Enqueue(const T& element, bool need_notify) {
   uint64_t new_tail = 0;
   uint64_t old_commit = 0;
   uint64_t old_tail = tail_.load(std::memory_order_acquire);
@@ -125,12 +124,15 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
   } while (cyber_unlikely(!commit_.compare_exchange_weak(
       old_commit, new_tail, std::memory_order_acq_rel,
       std::memory_order_relaxed)));
-  wait_strategy_->NotifyOne();
+  // default true
+  if (need_notify) {
+    wait_strategy_->NotifyOne();
+  }
   return true;
 }
 
 template <typename T>
-bool BoundedQueue<T>::Enqueue(T&& element) {
+bool BoundedQueue<T>::Enqueue(T&& element, bool need_notify) {
   uint64_t new_tail = 0;
   uint64_t old_commit = 0;
   uint64_t old_tail = tail_.load(std::memory_order_acquire);
@@ -148,12 +150,15 @@ bool BoundedQueue<T>::Enqueue(T&& element) {
   } while (cyber_unlikely(!commit_.compare_exchange_weak(
       old_commit, new_tail, std::memory_order_acq_rel,
       std::memory_order_relaxed)));
-  wait_strategy_->NotifyOne();
+  // default true
+  if (need_notify) {
+    wait_strategy_->NotifyOne();
+  }
   return true;
 }
 
 template <typename T>
-bool BoundedQueue<T>::Dequeue(T* element) {
+bool BoundedQueue<T>::Dequeue(T* element, bool need_notify) {
   uint64_t new_head = 0;
   uint64_t old_head = head_.load(std::memory_order_acquire);
   do {
@@ -165,29 +170,16 @@ bool BoundedQueue<T>::Dequeue(T* element) {
   } while (!head_.compare_exchange_weak(old_head, new_head,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
+  if (need_notify) {
+    wait_strategy_->NotifyOne();
+  }
   return true;
 }
 
 template <typename T>
 bool BoundedQueue<T>::WaitEnqueue(const T& element) {
   while (!break_all_wait_) {
-    if (Enqueue(element)) {
-      return true;
-    }
-    if (wait_strategy_->EmptyWait()) {
-      continue;
-    }
-    // wait timeout
-    break;
-  }
-
-  return false;
-}
-
-template <typename T>
-bool BoundedQueue<T>::WaitEnqueue(T&& element) {
-  while (!break_all_wait_) {
-    if (Enqueue(std::move(element))) {
+    if (Enqueue(element, false)) {
       return true;
     }
     if (wait_strategy_->EmptyWait()) {
@@ -203,7 +195,7 @@ bool BoundedQueue<T>::WaitEnqueue(T&& element) {
 template <typename T>
 bool BoundedQueue<T>::WaitDequeue(T* element) {
   while (!break_all_wait_) {
-    if (Dequeue(element)) {
+    if (Dequeue(element, false)) {
       return true;
     }
     if (wait_strategy_->EmptyWait()) {
