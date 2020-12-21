@@ -109,7 +109,7 @@ def gen_proto_file(config_file, work_dir):
     if not os.path.exists(work_dir):
         os.makedirs(work_dir)
     with open(config_file, 'r') as fp:
-        content = yaml.load(fp)
+        content = yaml.safe_load(fp)
         protocols = content["protocols"]
         car_type = content["car_type"]
         with open("%s/%s.proto" % (work_dir, car_type.lower()), 'w') as pb_fp:
