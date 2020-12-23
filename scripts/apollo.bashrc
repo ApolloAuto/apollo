@@ -95,11 +95,10 @@ function determine_gpu_use_target() {
       fi
     fi
   else ## x86_64 mode
-    # Check nvidia-driver and GPU device
-    local nv_driver="nvidia-smi"
-    if [ ! -x "$(command -v ${nv_driver})" ]; then
-      warning "No nvidia-driver found. CPU will be used."
-    elif [ -z "$(eval ${nv_driver})" ]; then
+    # Check the existence of nvidia-smi
+    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+      warning "nvidia-smi not found. CPU will be used."
+    elif [[ -z "$(nvidia-smi)" ]]; then
       warning "No GPU device found. CPU will be used."
     else
       use_gpu=1
