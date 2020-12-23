@@ -9,22 +9,17 @@ lidar_config {
 lidar_config {
   sensor_name: "lidar16_right"
   translation {
-    x: 1.1
-    y: 2.2
+    x: 0.0
+    y: 0.0
     z: 0.0
   }
 }
 lidar_config {
   sensor_name: "lidar16_back"
   translation {
-    x: 1.9
-    y: 0.9
+    x: 0.0
+    y: 0.0
     z: 0.0
   }
 }
 main_sensor: "lidar16_back"
-progress {
-  percentage: 0.0
-  log_string: "Press the button to start preprocessing"
-  status: UNKNOWN
-}

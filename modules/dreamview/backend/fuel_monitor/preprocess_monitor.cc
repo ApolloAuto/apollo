@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,19 +71,19 @@ void PreprocessMonitor::LoadConfiguration() {
     std::string config_path = absl::StrCat(
         vehicle_dir, "dreamview_conf/", task_name_, "_preprocess_table.pb.txt");
     if (!PathExists(config_path)) {
-      AWARN << "No corresponding preprocess table file found in "
-            << vehicle_dir << ". Using default one instead.";
+      AWARN << "No corresponding preprocess table file found in " << vehicle_dir
+            << ". Using default one instead.";
       config_path = absl::StrCat("/apollo/modules/dreamview/conf/", task_name_,
                                  "_preprocess_table.pb.txt");
     }
 
     ACHECK(cyber::common::GetProtoFromFile(config_path, &preprocess_table_))
         << "Unable to parse preprocess configuration from file " << config_path;
-  } else {
-    auto* progress = preprocess_table_.mutable_progress();
-    progress->set_percentage(0.0);
-    progress->set_log_string("Press the button to start preprocessing");
   }
+  auto* progress = preprocess_table_.mutable_progress();
+  progress->set_percentage(0.0);
+  progress->set_log_string("Click on the button to start preprocessing");
+  progress->set_status(Status::UNKNOWN);
 
   std::string json_string;
   MessageToJsonString(preprocess_table_, &json_string);
@@ -107,11 +107,11 @@ void PreprocessMonitor::OnProgress(const std::shared_ptr<Progress>& progress) {
     return;
   }
 
+  std::string json_string;
+  MessageToJsonString(*progress, &json_string);
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    current_status_json_["progress"]["percentage"] = progress->percentage();
-    current_status_json_["progress"]["logString"] = progress->log_string();
-    current_status_json_["progress"]["status"] = progress->status();
+    current_status_json_["progress"] = Json::parse(json_string);
   }
 }
 
