@@ -20,52 +20,50 @@
 namespace apollo {
 namespace task_manager {
 bool CheckPointDistanceInThreshold(common::PointENU point_a,
-                                   common::PointENU point_b,
-                                   double distance) {
-    double x_dis = point_a.x() - point_b.x();
-    double y_dis = point_a.y() - point_b.y();
-    return x_dis * x_dis + y_dis * y_dis < distance * distance;
+                                   common::PointENU point_b, double distance) {
+  double x_dis = point_a.x() - point_b.x();
+  double y_dis = point_a.y() - point_b.y();
+  return x_dis * x_dis + y_dis * y_dis < distance * distance;
 }
 
 common::Status CycleRoutingManager::Init(
-        const CycleRoutingTask& cycle_routing_task) {
-    cycle_ = cycle_routing_task.cycle_num();
-    auto waypoints = cycle_routing_task.routing_request().waypoint();
-    waypoint_num_ = waypoints.size();
-    begin_point_ = waypoints[0];
-    end_point_ = waypoints[waypoint_num_ - 1];
-    is_allowed_to_route_ = true;
-    original_routing_request_ = cycle_routing_task.routing_request();
-    map_service_.reset(new apollo::dreamview::MapService());
+    const CycleRoutingTask& cycle_routing_task) {
+  cycle_ = cycle_routing_task.cycle_num();
+  auto waypoints = cycle_routing_task.routing_request().waypoint();
+  waypoint_num_ = waypoints.size();
+  begin_point_ = waypoints[0];
+  end_point_ = waypoints[waypoint_num_ - 1];
+  is_allowed_to_route_ = true;
+  original_routing_request_ = cycle_routing_task.routing_request();
+  map_service_.reset(new apollo::dreamview::MapService());
 
-    AINFO << "New cycle routing task: cycle " << cycle_ << ", begin point "
+  AINFO << "New cycle routing task: cycle " << cycle_ << ", begin point "
         << begin_point_.pose().x() << " " << begin_point_.pose().y()
         << ", end point " << end_point_.pose().x() << " "
         << end_point_.pose().y();
 
-    return common::Status::OK();
+  return common::Status::OK();
 }
 
-bool CycleRoutingManager::GetNewRouting(const localization::Pose &pose,
+bool CycleRoutingManager::GetNewRouting(
+    const localization::Pose& pose,
     routing::RoutingRequest* new_routing_request) {
-  AINFO << "GetNewRouting: localization_pose: "
-  << pose.position().x() << " " << pose.position().y()
-  << ", begin point " << begin_point_.pose().x()
-  << " " << begin_point_.pose().y()
-  << ", end point " << end_point_.pose().x() << " " << end_point_.pose().y()
-  << ", threshold " << FLAGS_threshold_for_destination_check
-  << ", allowed_to_send_routing_request " << is_allowed_to_route_;
+  AINFO << "GetNewRouting: localization_pose: " << pose.position().x() << " "
+        << pose.position().y() << ", begin point " << begin_point_.pose().x()
+        << " " << begin_point_.pose().y() << ", end point "
+        << end_point_.pose().x() << " " << end_point_.pose().y()
+        << ", threshold " << FLAGS_threshold_for_destination_check
+        << ", allowed_to_send_routing_request " << is_allowed_to_route_;
 
   if (is_allowed_to_route_) {
-    if (CheckPointDistanceInThreshold(
-        begin_point_.pose(),
-        pose.position(),
-        FLAGS_threshold_for_destination_check)) {
+    if (CheckPointDistanceInThreshold(begin_point_.pose(), pose.position(),
+                                      FLAGS_threshold_for_destination_check)) {
       AINFO << "GetNewRouting: reach begin point";
       new_routing_request->CopyFrom(original_routing_request_);
       auto cur_point = new_routing_request->mutable_waypoint(0);
-      if (!map_service_->ConstructLaneWayPointWithHeading(pose.position().x(),
-          pose.position().y(), pose.heading(), cur_point)) {
+      if (!map_service_->ConstructLaneWayPointWithHeading(
+              pose.position().x(), pose.position().y(), pose.heading(),
+              cur_point)) {
         AINFO << "GetNewRouting: construct begin lane way point fail!";
         return false;
       }
@@ -74,15 +72,14 @@ bool CycleRoutingManager::GetNewRouting(const localization::Pose &pose,
       return true;
     }
   } else {
-    if (CheckPointDistanceInThreshold(
-        end_point_.pose(),
-        pose.position(),
-        FLAGS_threshold_for_destination_check)) {
+    if (CheckPointDistanceInThreshold(end_point_.pose(), pose.position(),
+                                      FLAGS_threshold_for_destination_check)) {
       AINFO << "GetNewRouting: reach end point";
       new_routing_request->clear_waypoint();
       auto cur_point = new_routing_request->add_waypoint();
-      if (!map_service_->ConstructLaneWayPointWithHeading(pose.position().x(),
-          pose.position().y(), pose.heading(), cur_point)) {
+      if (!map_service_->ConstructLaneWayPointWithHeading(
+              pose.position().x(), pose.position().y(), pose.heading(),
+              cur_point)) {
         AINFO << "GetNewRouting: construct end lane way point fail!";
         return false;
       }
@@ -94,10 +91,6 @@ bool CycleRoutingManager::GetNewRouting(const localization::Pose &pose,
   }
 
   return false;
-}
-
-int CycleRoutingManager::GetCycle() const {
-    return cycle_;
 }
 
 }  // namespace task_manager
