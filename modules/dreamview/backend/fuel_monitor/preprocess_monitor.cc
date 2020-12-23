@@ -37,20 +37,23 @@ using google::protobuf::util::MessageToJsonString;
 
 using Json = nlohmann::json;
 
+DEFINE_string(preprocess_monitor_name, "PreprocessMonitor",
+              "Name of the preprocess monitor");
+
 DEFINE_string(progress_topic, "/apollo/dreamview/progress",
               "Sensor calibration preprocess progress topic name.");
 
 PreprocessMonitor::PreprocessMonitor()
-    : node_(cyber::CreateNode("progress_monitor")) {
-  class_name_ = "PreprocessMonitor";
+    : FuelMonitor(FLAGS_preprocess_monitor_name),
+      node_(cyber::CreateNode("progress_monitor")) {
   InitReaders();
   LoadConfiguration();
 }
 
 PreprocessMonitor::PreprocessMonitor(const std::string& task_name)
-    : task_name_(task_name),
+    : FuelMonitor(FLAGS_preprocess_monitor_name),
+      task_name_(task_name),
       node_(cyber::CreateNode(task_name + "_progress_monitor")) {
-  class_name_ = "PreprocessMonitor";
   InitReaders();
   LoadConfiguration();
 }

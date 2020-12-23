@@ -16,6 +16,7 @@
 
 #include "modules/dreamview/backend/fuel_monitor/data_collection_monitor.h"
 
+#include "gflags/gflags.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
 
@@ -33,6 +34,10 @@ using apollo::common::VehicleConfigHelper;
 using cyber::common::PathExists;
 using google::protobuf::FieldDescriptor;
 using Json = nlohmann::json;
+
+DEFINE_string(data_collection_monitor_name, "DataCollectionMonitor",
+              "Name of the data collection monitor");
+
 namespace {
 
 /*
@@ -94,8 +99,8 @@ bool IsCompliedWithCriterion(float actual_value,
 }  // namespace
 
 DataCollectionMonitor::DataCollectionMonitor()
-    : node_(cyber::CreateNode("data_collection_monitor")) {
-  class_name_ = "DataCollectionMonitor";
+    : FuelMonitor(FLAGS_data_collection_monitor_name),
+      node_(cyber::CreateNode("data_collection_monitor")) {
   InitReaders();
   LoadConfiguration();
 }

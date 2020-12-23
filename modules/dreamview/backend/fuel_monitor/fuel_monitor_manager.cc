@@ -34,7 +34,6 @@ void FuelMonitorManager::RegisterFuelMonitor(
       return;
     }
   } else {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     monitors_[mode].emplace(class_name, std::move(fuel_monitor));
   }
 }

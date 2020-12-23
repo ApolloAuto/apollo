@@ -27,6 +27,7 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/hmi:vehicle_manager",
         "//modules/dreamview/proto:data_collection_table_cc_proto",
+        "@com_github_gflags_gflags//:gflags",
         "@com_github_nlohmann_json//:json",
         "@com_google_googletest//:gtest",
     ],

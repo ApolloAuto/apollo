@@ -39,9 +39,9 @@ namespace dreamview {
 class FuelMonitor {
  public:
   /**
-   * @brief Constructor of DataCollectionMonitor.
+   * @brief Constructor of FuelMonitor.
    */
-  FuelMonitor() = default;
+  explicit FuelMonitor(const std::string& name) : class_name_(name) {}
   virtual ~FuelMonitor() = default;
 
   bool IsEnabled() const { return enabled_; }
