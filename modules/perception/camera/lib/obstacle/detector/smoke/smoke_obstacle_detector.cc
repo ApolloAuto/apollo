@@ -192,6 +192,7 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
 }
 
 bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
+<<<<<<< HEAD
   FeatureExtractorInitOptions feature_options;
   feature_options.conf_file = smoke_param_.model_param().feature_file();
   feature_options.root_dir = root_dir;
@@ -203,6 +204,19 @@ bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   feature_extractor_.reset(BaseFeatureExtractorRegisterer::GetInstanceByName(
       "TrackingFeatureExtractor"));
   if (!feature_extractor_->Init(feature_options)) {
+=======
+  FeatureExtractorInitOptions feat_options;
+  feat_options.conf_file = smoke_param_.model_param().feature_file();
+  feat_options.root_dir = root_dir;
+  feat_options.gpu_id = gpu_id_;
+  auto feat_blob_name = smoke_param_.net_param().feat_blob();
+  feat_options.feat_blob = inference_->get_blob(feat_blob_name);
+  feat_options.input_height = height_;
+  feat_options.input_width = width_;
+  feature_extractor_.reset(BaseFeatureExtractorRegisterer::GetInstanceByName(
+      "TrackingFeatureExtractor"));
+  if (!feature_extractor_->Init(feat_options)) {
+>>>>>>> Perception: change darkscnn caffe model to tensorrt & add new obstacle module
     return false;
   }
   return true;
