@@ -172,11 +172,7 @@ void HMI::RegisterMessageHandlers() {
       "SensorCalibrationPreprocess",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain type and data.
-        std::string current_mode;
-        if (!JsonUtil::GetString(json, "current_mode", &current_mode)) {
-          AERROR << "Truncated preprocess request.";
-          return;
-        }
+        std::string current_mode = hmi_worker_->GetStatus().current_mode();
         std::string task_type;
         if (current_mode == FLAGS_lidar_calibration_mode) {
           task_type = "lidar_to_gnss";
