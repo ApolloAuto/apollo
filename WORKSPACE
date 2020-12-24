@@ -47,22 +47,7 @@ http_archive(
     ],
 )
 
-load("@rules_python//python:repositories.bzl", "py_repositories")
-
-py_repositories()
-
-# Only needed if using the packaging rules.
-# load("@rules_python//python:pip.bzl", "pip_repositories")
-# pip_repositories()
-
 # load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-# See https://github.com/bazelbuild/bazel/issues/11406
-# maybe(
-#    http_archive,
-#    name = "boringssl",
-#    sha256 = "fb236ae74676dba515e1230aef4cc69ab265af72fc08784a6755a319dd013ca6",
-#    urls = ["https://apollo-platform-system.bj.bcebos.com/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
-# )
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
