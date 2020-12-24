@@ -14,6 +14,7 @@ py_library(
     srcs = ["configuration_yaml_generator.py"],
     deps = [
         "//modules/dreamview/proto:preprocess_table_py_pb2",
+        "//modules/tools/common:proto_utils",
     ],
 )
 

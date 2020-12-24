@@ -24,6 +24,7 @@ import yaml
 from google.protobuf import text_format
 
 from modules.dreamview.proto import preprocess_table_pb2
+from modules.tools.common.proto_utils import get_pb_from_text_file
 
 
 class ConfigYaml(object):
@@ -154,12 +155,9 @@ class ConfigYaml(object):
                                    task_name + '_user.config')
         if os.path.exists(user_config):
             try:
-                with open(user_config, "r") as f:
-                    proto_block = f.read()
-                    text_format.Merge(proto_block, self._table_info)
-            except IOError:
-                raise ValueError('cannot open the user config file'
-                                 'at {}'.format(user_config))
+                get_pb_from_text_file(user_config, self._table_info)
+            except text_format.ParseError:
+                print(f'Error: Cannot parse {user_config} as text proto')
 
         if self._task_name == 'lidar_to_gnss':
             out_data = self._generate_lidar_to_gnss_calibration_yaml(
