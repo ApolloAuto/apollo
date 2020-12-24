@@ -30,8 +30,8 @@ bool SmokeObjectMaintainer::Add(int idx, base::ObjectPtr obj) {
   }
 
   auto prev_obj = obj_it->second;
-  const auto &&curr_type = static_cast<int>(obj->sub_type);
-  const auto &&prev_type = static_cast<int>(prev_obj->sub_type);
+  const int curr_type = static_cast<int>(obj->sub_type);
+  const int prev_type = static_cast<int>(prev_obj->sub_type);
 
   if (obj->sub_type_probs[curr_type] > prev_obj->sub_type_probs[prev_type]) {
     *prev_obj = *obj;

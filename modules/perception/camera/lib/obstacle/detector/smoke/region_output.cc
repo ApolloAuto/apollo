@@ -53,12 +53,11 @@ void recover_smoke_bbox(int roi_w, int roi_h, int offset_y,
     float ymin = obj->camera_supplement.box.ymin;
     float xmax = obj->camera_supplement.box.xmax;
     float ymax = obj->camera_supplement.box.ymax;
-    int x = static_cast<int>(xmin * static_cast<float>(roi_w));
-    int w = static_cast<int>((xmax - xmin) * static_cast<float>(roi_w));
-    int y = static_cast<int>(ymin * static_cast<float>(roi_h)) + offset_y;
-    int h = static_cast<int>((ymax - ymin) * static_cast<float>(roi_h));
-    base::RectF rect_det(static_cast<float>(x), static_cast<float>(y),
-                         static_cast<float>(w), static_cast<float>(h));
+    float x = xmin * static_cast<float>(roi_w);
+    float w = (xmax - xmin) * static_cast<float>(roi_w);
+    float y = ymin * static_cast<float>(roi_h) + static_cast<float>(offset_y);
+    float h = (ymax - ymin) * static_cast<float>(roi_h);
+    base::RectF rect_det(x, y, w, h);
     base::RectF rect_img(0, 0, static_cast<float>(roi_w),
                          static_cast<float>(roi_h + offset_y));
     base::RectF rect = rect_det & rect_img;

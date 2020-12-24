@@ -25,21 +25,6 @@ layer {
     }
 }
 
-# layer {
-#   name: "cls_reshape"
-#   type: "Reshape"
-#   bottom: "data"
-#   top: "data"
-#   reshape_param {
-#     shape {
-#       dim: 1
-#       dim: 3
-#       dim: 64
-#       dim: 64
-#     }
-#   }
-# }
-
 #layer {
 #  name: "distort"
 #  type: "ImageDistort"
@@ -120,7 +105,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -190,7 +175,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -260,7 +245,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -330,7 +315,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -398,7 +383,7 @@ layer {
     kernel_h: 4
     stride_w: 4
     stride_h: 4
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer {

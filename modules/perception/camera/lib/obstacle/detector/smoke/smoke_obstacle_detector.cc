@@ -192,17 +192,17 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
 }
 
 bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
-  FeatureExtractorInitOptions feat_options;
-  feat_options.conf_file = smoke_param_.model_param().feature_file();
-  feat_options.root_dir = root_dir;
-  feat_options.gpu_id = gpu_id_;
+  FeatureExtractorInitOptions feature_options;
+  feature_options.conf_file = smoke_param_.model_param().feature_file();
+  feature_options.root_dir = root_dir;
+  feature_options.gpu_id = gpu_id_;
   auto feat_blob_name = smoke_param_.net_param().feat_blob();
-  feat_options.feat_blob = inference_->get_blob(feat_blob_name);
-  feat_options.input_height = height_;
-  feat_options.input_width = width_;
+  feature_options.feat_blob = inference_->get_blob(feat_blob_name);
+  feature_options.input_height = height_;
+  feature_options.input_width = width_;
   feature_extractor_.reset(BaseFeatureExtractorRegisterer::GetInstanceByName(
       "TrackingFeatureExtractor"));
-  if (!feature_extractor_->Init(feat_options)) {
+  if (!feature_extractor_->Init(feature_options)) {
     return false;
   }
   return true;
@@ -265,10 +265,10 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
 
   AINFO << "GetObj: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   filter_bbox(min_dims_, &(frame->detected_objects));
-  FeatureExtractorOptions feat_options;
-  feat_options.normalized = true;
+  FeatureExtractorOptions feature_options;
+  feature_options.normalized = true;
   AINFO << "Post1: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  feature_extractor_->Extract(feat_options, frame);
+  feature_extractor_->Extract(feature_options, frame);
   AINFO << "Extract: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   recover_smoke_bbox(frame->data_provider->src_width(),
                frame->data_provider->src_height() - offset_y_, offset_y_,
