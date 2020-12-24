@@ -168,6 +168,7 @@ export default class RealtimeWebSocketEndpoint {
         this.requestSimulationWorld(STORE.options.showPNCMonitor);
         if (STORE.hmi.isVehicleCalibrationMode) {
           this.requestDataCollectionProgress();
+          this.requestPreprocessProgress();
         }
         if (STORE.hmi.isSensorCalibrationMode) {
           this.requestPreprocessProgress();

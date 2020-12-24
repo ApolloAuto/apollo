@@ -28,13 +28,12 @@ FuelMonitorManager::FuelMonitorManager() {}
 void FuelMonitorManager::RegisterFuelMonitor(
     const std::string& mode, std::unique_ptr<FuelMonitor>&& fuel_monitor) {
   const auto& class_name = fuel_monitor->GetClassName();
-  if (monitors_.find(mode) != monitors_.end()) {
-    if (monitors_[mode].find(class_name) != monitors_[mode].end()) {
-      AWARN << class_name << " for mode: " << mode << " has been exist!";
-      return;
-    }
+  if (monitors_.find(mode) != monitors_.end() &&
+      monitors_[mode].find(class_name) != monitors_[mode].end()) {
+    AWARN << class_name << " for mode: " << mode << " has been exist!";
   } else {
     monitors_[mode].emplace(class_name, std::move(fuel_monitor));
+    AINFO << "Registered " << class_name << " for mode: " << mode;
   }
 }
 
