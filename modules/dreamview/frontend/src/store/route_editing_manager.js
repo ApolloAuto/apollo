@@ -120,16 +120,17 @@ export default class RouteEditingManager {
       }
 
     addDefaultRouting(routingName) {
-        return RENDERER.addDefaultRouting(routingName,this.defaultRoutingDistanceThreshold);
+        return RENDERER.addDefaultRouting(routingName);
     }
 
     toggleDefaultRoutingMode() {
         this.inDefaultRoutingMode = !this.inDefaultRoutingMode;
     }
 
-    sendRoutingRequest(inNavigationMode) {
+    sendRoutingRequest(inNavigationMode, defaultRoutingName = '') {
         if (!inNavigationMode) {
-            const success = RENDERER.sendRoutingRequest();
+            const success = _.isEmpty(defaultRoutingName) ? RENDERER.sendRoutingRequest()
+            : RENDERER.sendRoutingRequest(this.defaultRoutings[defaultRoutingName]);
             if (success) {
                 this.disableRouteEditing();
             }
@@ -139,15 +140,28 @@ export default class RouteEditingManager {
         }
     }
 
-    sendCycleRoutingRequest(defaultRoutingName, cycleNumber) {
-        const points = this.defaultRoutings[defaultRoutingName];
+    sendCycleRoutingRequest(cycleNumber) {
+        const points = this.defaultRoutings[this.currentDefaultRouting];
         if (!isNaN(cycleNumber) || !points) {
-          const success = RENDERER.sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber);
+          const success = RENDERER.sendCycleRoutingRequest
+                (this.currentDefaultRouting, points, cycleNumber);
           if (success) {
             this.disableRouteEditing();
           }
           return success;
         }
         return false;
+    }
+
+    checkCycleRoutingAvailable() {
+        const points = this.defaultRoutings[this.currentDefaultRouting];
+        const start = points[0];
+        const end = points[points.length - 1];
+        if (_.isEmpty(start) || _.isEmpty(end)) {
+            return false;
+        }
+        const distance =
+            Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
+        return distance <= this.defaultRoutingDistanceThreshold;
     }
 }
