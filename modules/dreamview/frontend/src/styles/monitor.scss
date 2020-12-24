@@ -137,6 +137,11 @@ $monitor-header-height: 32px;
     position: relative;
     width: 100%;
 
+    .prepProcess{
+        position:absolute;
+        bottom:0;
+    }
+
     .scenario-container {
         position: absolute;
     }
@@ -207,6 +212,11 @@ $monitor-header-height: 32px;
         max-width: 80px;
         width:auto;
     }
+}
+
+.vehicle-calibration-panel{
+    height:85%;
+    margin-bottom: 10px;
 }
 
 .camera-param {

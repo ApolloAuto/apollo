@@ -3,7 +3,6 @@ import { inject, observer } from 'mobx-react';
 
 import CheckboxItem from 'components/common/CheckboxItem';
 import StatusDisplay from 'components/ModuleController/StatusDisplay';
-import WS from 'store/websocket';
 
 @inject('store') @observer
 export default class ModuleController extends React.Component {
@@ -12,7 +11,6 @@ export default class ModuleController extends React.Component {
       modes, currentMode, moduleStatus, componentStatus,
       allMonitoredComponentSuccess, isCalibrationMode, preConditionModule,
     } = this.props.store.hmi;
-    //recorder控制逻辑 三个标定都要用
 
     const moduleEntries = Array.from(moduleStatus.keys()).sort().map((key) => (
             <CheckboxItem

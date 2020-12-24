@@ -5,12 +5,10 @@ import {
 import { inject,observer } from 'mobx-react';
 
 import WS from 'store/websocket';
-import ScenarioCollectionMonitor from 'components/DataCollectionMonitor/ScenarioCollectionMonitor';
 import GuideText from 'components/common/GuideText';
 import SensorCalibrationConfiguration from './SensorCalibrationConfiguration';
 import { MonitorItem } from '../Tasks/Console';
 import { timestampMsToTimeString } from 'utils/misc';
-import Selector from 'components/Header/Selector';
 
 @inject('store') @observer
 export default class FuelClient extends React.Component {
@@ -27,27 +25,38 @@ export default class FuelClient extends React.Component {
       hmi.canStartPreProcess = false;
       const data = {};
       //不考虑是否改变 每次都发
+      //这个地方原来要传选中camera的config（name和translation）
+      //
       if (hmi.inCameraLidarSensorCalibrationMode) {
-        const select = document.getElementsByClassName('camera-selector')[0];
-        const key = select.options[select.selectedIndex].value;
-        _.set(data, 'camera_config.camera_name', key);
-        _.set(data, 'camera_config.translation', this.props.store.hmi.cameras.get(key));
+        const internal_conf_input = _.map(document.getElementsByClassName('camera-internal-configuration-d'),'value');
+        const camera_internal_conf = internal_conf_input.map(x => parseFloat(x));
+        if (_.findIndex(camera_internal_conf, (x) => isNaN(x)) !== -1) {
+          alert('Please input all camera internal configurations');
+          hmi.canStartPreProcess = true;
+          return;
+        }
+        _.set(data, 'camera_config.D', _.slice(camera_internal_conf, 0, 5));
+        _.set(data, 'camera_config.K', _.slice(camera_internal_conf, 5, 14));
+        _.set(data, 'camera_config.R', _.slice(camera_internal_conf, 14, 26));
+        _.set(data, 'camera_config.translation', hmi.camera.translation);
       }
-      const lidar_configs = [];
-      this.props.store.hmi.lidars.forEach((value, key) => {
-        lidar_configs.push({
-          sensor_name: key,
-          translation: value,
+      if (!_.isEmpty(this.props.store.hmi.lidars)) {
+        const lidar_configs = [];
+        this.props.store.hmi.lidars.forEach((value, key) => {
+          lidar_configs.push({
+            sensor_name: key,
+            translation: value,
+          });
         });
-      });
-      _.set(data, 'lidar_config', lidar_configs);
+        _.set(data, 'lidar_config', lidar_configs);
+      }
       _.set(data, 'main_sensor', hmi.mainSensor);
-      WS.startPreProcessData(data);
+      WS.startPreProcessData(data, 'SensorCalibrationPreprocess');
     }
   }
 
   render() {
-    const { mode, preProcessProgress, cameras,lidars,mainSensor,
+    const { mode, preProcessProgress, camera,lidars,mainSensor,
       toggleTranslationChange, inCameraLidarSensorCalibrationMode } = this.props;
     const hmi = this.props.store.hmi;
 
@@ -62,24 +71,49 @@ export default class FuelClient extends React.Component {
         <GuideText mode={mode}></GuideText>
         </TabPanel>
           <TabPanel>
-         {inCameraLidarSensorCalibrationMode && (!_.isEmpty(cameras)) && (
-          <Selector
-            className="camera-selector"
-            name="choose calibration camera"
-            options={cameras.keys()}
-            currentOption={cameras.keys()[0]}
-            onChange={(event) => {
-              //WS.changeSetupMode(event.target.value);
-              console.log(event);
-            }}
-          />
-         )}
         <SensorCalibrationConfiguration
           lidars={hmi.lidars}
           mainSensor={hmi.mainSensor}
-          cameras={hmi.cameras}
+          camera={hmi.camera}
         >
-        </SensorCalibrationConfiguration>
+            </SensorCalibrationConfiguration>
+            {inCameraLidarSensorCalibrationMode &&
+               (<div>
+              Camera-Lidar内参设定
+              <div>D:
+              <input type="number" className="camera-internal-configuration-d"></input>
+              <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                 </div>
+              <div> K:
+              <input type="number" className="camera-internal-configuration-d"></input>
+              <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+              <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+               </div>
+              <div>P:
+              <input type="number" className="camera-internal-configuration-d"></input>
+              <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+              <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+              <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                <input type="number" className="camera-internal-configuration-d"></input>
+                 </div>
+             </div>)
+        }
         <div className="preprocess-bar category">
           <div className="category-description">
             <button
@@ -101,7 +135,7 @@ export default class FuelClient extends React.Component {
           <ul className="preprocess-console">
             <MonitorItem
               text={hmi.logString}
-              level="ERROR"//level等加了status字段改进一下
+              level={hmi.preProcessStatus}
               time={timestampMsToTimeString(Date.now() / 1000)}
             >
             </MonitorItem>

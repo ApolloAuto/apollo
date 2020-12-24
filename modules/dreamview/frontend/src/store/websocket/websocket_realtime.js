@@ -166,7 +166,7 @@ export default class RealtimeWebSocketEndpoint {
           this.pointcloudWS.requestPointCloud();
         }
         this.requestSimulationWorld(STORE.options.showPNCMonitor);
-        if (STORE.hmi.isCalibrationMode) {
+        if (STORE.hmi.isVehicleCalibrationMode) {
           this.requestDataCollectionProgress();
         }
         if (STORE.hmi.isSensorCalibrationMode) {
@@ -404,10 +404,15 @@ export default class RealtimeWebSocketEndpoint {
     }));
   }
 
-  startPreProcessData(data) {
-    this.websocket.send(JSON.stringify({
-      type: 'SensorCalibrationPreprocess',
-      data,
-    }));
+  startPreProcessData(data, type) {
+    //type ① 'SensorCalibrationPreprocess' ② "VehicleCalibrationPreprocess"
+    //console.log(data);
+    const request = {
+      type,
+    };
+    if (data) {
+      request.data = data;
+    }
+    this.websocket.send(request);
   }
 }

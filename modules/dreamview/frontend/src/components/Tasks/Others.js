@@ -57,34 +57,22 @@ export default class Others extends React.Component {
                                 }}
                             />
                         )}
-                    {hmi.isCalibrationMode
-                        && (
-                            <CheckboxItem
-                                id="showDataCollectionMonitor"
-                                title="Data Collection Monitor"
-                                isChecked={options.showDataCollectionMonitor}
-                                disabled={disablePanel || !hmi.isCalibrationMode}
-                                extraClasses="others-checkbox"
-                                onClick={() => {
-                                  this.props.store.handleOptionToggle(
-                                    'showDataCollectionMonitor',
-                                  );
-                                }}
-                            />
-                        )}
-          {hmi.isSensorCalibrationMode
+          {hmi.isCalibrationMode
             && (
               <CheckboxItem
                 id="showFuelClient"
                 title="Fuel Client"
-                isChecked={options.showFuelClient}
-                disabled={disablePanel || !hmi.isSensorCalibrationMode}
+              isChecked={hmi.isSensorCalibrationMode ? options.showFuelClient
+                : options.showDataCollectionMonitor}
+                disabled={disablePanel || !hmi.isCalibrationMode}
                 extraClasses="others-checkbox"
-                onClick={() => {
-                  this.props.store.handleOptionToggle(
-                    'showFuelClient',
-                  );
-                }}
+              onClick={() => {
+                const showParam = (hmi.isSensorCalibrationMode) ? 'showFuelClient' : 'showDataCollectionMonitor';
+                console.log(showParam);
+                this.props.store.handleOptionToggle(
+                  showParam
+                );
+              }}
               />
             )}
                     <CheckboxItem

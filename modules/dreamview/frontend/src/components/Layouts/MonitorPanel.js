@@ -31,6 +31,7 @@ export default class MonitorPanel extends React.Component {
                     <DataCollectionMonitor
                         dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
                         dataCollectionProgress={hmi.dataCollectionProgress}
+                        canStartDataCollectionPreProcess={hmi.canStartDataCollectionPreProcess}
                     />
         );
       case MONITOR_MENU.PNC_MONITOR:
@@ -40,7 +41,7 @@ export default class MonitorPanel extends React.Component {
         return (
           <FuelClient
             lidars={hmi.lidars}
-            cameras={hmi.cameras}
+            camera={hmi.camera}
             mainSensor={hmi.mainSensor}
             mode={hmi.currentMode}
             inLidarIMUSensorCalibrationMode={hmi.inLidarIMUSensorCalibrationMode}

@@ -1,5 +1,5 @@
 import {
-  observable, action, computed, extendObservable,
+  observable, action, computed,
 } from 'mobx';
 import _ from 'lodash';
 
@@ -61,7 +61,9 @@ export default class HMI {
 
     //@observable translationChanged=false;//默认没有changed
 
-    @observable isCalibrationMode = false;
+    //@observable isCalibrationMode = false;
+
+    @observable isVehicleCalibrationMode = false;
 
     @observable isSensorCalibrationMode = false;
 
@@ -69,9 +71,9 @@ export default class HMI {
 
     @observable dataCollectionProgress = observable.map();
 
-    @observable lidars=observable.map();
+    @observable lidars = observable.map();
 
-    @observable cameras=observable.map();
+    @observable camera = {};
 
     @observable mainSensor = 'none';
 
@@ -79,24 +81,27 @@ export default class HMI {
 
     @observable canStartPreProcess=true;//随时可以start
 
+    //@observable inDataPreProcess = false;//正常情况并没有进入pre process
+    //初始化：reset函数里 外面开始 结束继续初始化为false 在哪整结束呢
+
     @observable endPreProcess=false;//不能end
 
-    @observable preProcessStatus = 2;//正常通知图标
+    @observable preProcessStatus = 'UNKNOWN';//正常通知图标
 
     @observable logString='';
 
     @observable preProcessProgress=0;
 
-    @action toggleCoDriverFlag() {
+  @action toggleCoDriverFlag() {
       this.isCoDriver = !this.isCoDriver;
     }
 
-    @action toggleMuteFlag() {
+  @action toggleMuteFlag() {
       this.isMute = !this.isMute;
       UTTERANCE.setMute(this.isMute);
     }
 
-    @action updateStatus(newStatus) {
+  @action updateStatus(newStatus) {
       if (newStatus.dockerImage) {
         this.dockerImage = newStatus.dockerImage;
       }
@@ -108,19 +113,20 @@ export default class HMI {
         this.modes = newStatus.modes.sort();
       }
       if (newStatus.currentMode) {
-        this.isCalibrationMode = (newStatus.currentMode.toLowerCase().includes('calibration'));
+        this.isVehicleCalibrationMode = (newStatus.currentMode.toLowerCase().includes('vehicle calibration'));
         this.isSensorCalibrationMode = (newStatus.currentMode.toLowerCase().includes('sensor calibration'));
         if (this.currentMode !== newStatus.currentMode) {
           this.resetDataCollectionProgress();
+          this.resetSensorCalibrationConfiguration();
           this.resetPreProcessProgress();
           this.currentMode = newStatus.currentMode;
           if (this.isSensorCalibrationMode) {
             this.updateConfiguration = true;
-            //this.updateLidarConfiguration = this.inLidarIMUSensorCalibrationMode;
-            //this.updateCameraLidarConfiguration = this.inCameraLidarSensorCalibrationMode;
-            //this.translationChanged = false;
-            //this.preConditionModule = 'Recorder';
-            //这个Record这么写不优美 待细化
+          //this.updateLidarConfiguration = this.inLidarIMUSensorCalibrationMode;
+          //this.updateCameraLidarConfiguration = this.inCameraLidarSensorCalibrationMode;
+          //this.translationChanged = false;
+          //this.preConditionModule = 'Recorder';
+          //这个Record这么写不优美 待细化
           }
         }
       }
@@ -136,13 +142,15 @@ export default class HMI {
         this.vehicles = newStatus.vehicles.sort();
       }
       if (newStatus.currentVehicle) {
-        if (this.isCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
+        if (this.isVehicleCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
           this.resetDataCollectionProgress();
+          this.resetPreProcessProgress();//主要是进度条相关
         }
         if (this.isSensorCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
-          //this.updateLidarConfiguration = true;
-          //this.updateCameraLidarConfiguration = true;
+        //this.updateLidarConfiguration = true;
+        //this.updateCameraLidarConfiguration = true;
           this.updateConfiguration = true;
+          this.resetSensorCalibrationConfiguration();
           //this.translationChanged = false;
           this.resetPreProcessProgress();//有的地方可以归在标定的地方
         }
@@ -169,8 +177,8 @@ export default class HMI {
         for (const key in newStatus.monitoredComponents) {
           this.componentStatus.set(key, newStatus.monitoredComponents[key]);
         }
-        if (this.startMonitorRecorderProcess && ! this.allMonitoredComponentSuccess) {
-          //正在检测且检测出非success 不报错误信息  直接关
+        if (this.startMonitorRecorderProcess && !this.allMonitoredComponentSuccess) {
+        //正在检测且检测出非success 不报错误信息  直接关
           this.toggleModule(this.preConditionModule);
         }
       }
@@ -180,7 +188,7 @@ export default class HMI {
       }
     }
 
-    @action update(world) {
+  @action update(world) {
       this.enableStartAuto = world.engageAdvice === 'READY_TO_ENGAGE';
     }
 
@@ -191,65 +199,77 @@ export default class HMI {
         this.vehicleParam.height / this.defaultVehicleSize.height);
     }
 
-    @action toggleModule(id) {
+  @action toggleModule(id) {
       this.moduleStatus.set(id, !this.moduleStatus.get(id));
       const command = this.moduleStatus.get(id) ? 'START_MODULE' : 'STOP_MODULE';
       WS.executeModuleCommand(id, command);
     }
 
-    @computed get inNavigationMode() {
+  @computed get inNavigationMode() {
       return this.currentMode === 'Navigation';
     }
 
-    @computed get inCarTeleopMode() {
+  @computed get inCarTeleopMode() {
       return this.currentMode === TELEOP_MODE.CAR;
     }
 
-    @computed get inConsoleTeleopMode() {
+  @computed get inConsoleTeleopMode() {
       return this.currentMode === TELEOP_MODE.CONSOLE;
     }
 
-    @computed get inTeleopMode() {
+  @computed get inTeleopMode() {
       return Object.values(TELEOP_MODE).includes(this.currentMode);
     }
 
-    @computed get inCameraLidarSensorCalibrationMode() {
+  @computed get inCameraLidarSensorCalibrationMode() {
       return this.currentMode === 'Camera-Lidar Sensor Calibration';
     }
 
-    @computed get shouldDisplayNavigationMap() {
+  @computed get isCalibrationMode() {
+      return this.isSensorCalibrationMode || this.isVehicleCalibrationMode;
+    }
+
+  @computed get shouldDisplayNavigationMap() {
       return this.inNavigationMode || this.inTeleopMode;
     }
 
-    @computed get allMonitoredComponentSuccess() {
+  @computed get allMonitoredComponentSuccess() {
       //这个地方打印一下 componentstatus看一下是true Or false
+      //所有标定都需要的
       return this.isCalibrationMode && _.every(this.componentStatus, ['status', 'SUCCESS']);
     }
 
-    @computed get preConditionModule() {
-      return (this.isSensorCalibrationMode) ? 'Recorder' : 'none';
+  @computed get preConditionModule() {
+      return (this.isCalibrationMode) ? 'Recorder' : 'none';
     }
 
-    @computed get startMonitorRecorderProcess() {
+  @computed get startMonitorRecorderProcess() {
       return this.isSensorCalibrationMode && this.moduleStatus.get('Recorder');
     }
 
-    @action resetDataCollectionProgress() {
+  @computed get canStartDataCollectionPreProcess() {
+      return this.isVehicleCalibrationMode && _.every(this.dataCollectionProgress.get('Go Straight').values(), (x) => (x === 100));
+    }
+
+  @action resetDataCollectionProgress() {
       this.dataCollectionUpdateStatus.clear();
       this.dataCollectionProgress.clear();
     }
 
-    @action resetPreProcessProgress() {
+  @action resetSensorCalibrationConfiguration() {
       this.lidars.clear();
-      this.cameras.clear();
+      this.camera = {};
+    }
+
+  @action resetPreProcessProgress() {
       this.canStartPreProcess = true;
-      this.preProcessStatus = 2;//正常就是通知的模式
+      this.preProcessStatus = 'UNKNOWN';//正常就是通知的模式
       this.logString = '';
       this.endPreProcess = false;
       this.preProcessProgress = 0;
     }
 
-    @action updateDataCollectionProgress(data) {
+  @action updateDataCollectionProgress(data) {
       Object.keys(data).sort().forEach((scenarioName) => {
         if (!this.dataCollectionProgress.has(scenarioName)) {
           this.dataCollectionProgress.set(scenarioName, observable.map());
@@ -274,34 +294,28 @@ export default class HMI {
           });
         }
         if (data.cameraConfig) {
-          data.cameraConfig.map(camera => {
-            this.cameras.set(camera.cameraName, camera.translation);
-          });
+          this.camera = data.cameraConfig;
         }
-        //数据Ok Main sensor名字唯一
         this.mainSensor = data.mainSensor;
         this.updateConfiguration = false;
       }
       if (data.progress) {
-        //有进度更新进度 有logString 更新logString 状态进行捕获 如果是success 或者failed
         this.preProcessProgress = _.get(data, 'progress.percentage');
         this.logString = _.get(data, 'progress.logString');
-        //这个地方去读状态只要发现是SUCCESS 或者FATAL 则endPreProcess置为true 该end了
-        console.log(_.get(data, 'progress.status'));
         this.preProcessStatus = _.get(data, 'progress.status');
-        this.endPreProcess = (this.preProcessStatus === 1) || (this.preProcessStatus === 0);
-        //this.endPreProcess = ['SUCCESS', 'FAIL'].includes(_.get(data, 'progress.status'));
+        this.endPreProcess = ['SUCCESS', 'FAIL'].includes(this.preProcessStatus);
         if (!this.canStartPreProcess && this.endPreProcess) {
-          //已经进入这个过程 需要监管是否可以end
+        //已经进入这个过程 需要监管是否可以end
           this.canStartPreProcess = true;
         }
       }
     }
 
-    @action changeTranslation(name, index, val, isLidar) {
-    isLidar ? _.set(this.lidars.get(name), index, val)
-      : _.set(this.cameras.get(name), index, val);
-  }
+  // name:{x y z}
+  @action changeTranslation(name, index, val, isLidar) {
+      isLidar ? _.set(this.lidars.get(name), index, val)
+        : _.set(this.camera, `translation.${index}`, val);
+    }
 
     rotate2DPoint({ x, y }, rotationInRad) {
       return {

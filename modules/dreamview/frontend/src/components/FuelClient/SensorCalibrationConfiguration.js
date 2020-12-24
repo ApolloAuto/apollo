@@ -34,19 +34,20 @@ class TranslationInput extends React.Component {
   }
 }
 
-@observer
+//待优化 是inject store还是props 传递
+@inject('store') @observer
 export default class SensorCalibrationConfiguration extends React.Component {
-  renderSensorConfiguration(sensorName, translation,isLidar) {
+  renderSensorConfiguration(sensorName, translation) {
     return (
       <tr className="lidar-configuration-tr" key={sensorName}>
         <td className={(sensorName === this.props.mainSensor) ? 'main-sensor' : null}>{sensorName}</td>
         <td>
           <div className="lidar-configuration-translation">
             <div className="lidar-configuration-xyz">
-              x:<TranslationInput belong={sensorName} index='x' value={translation.x} isLidar={isLidar}></TranslationInput>
+              x:<TranslationInput belong={sensorName} index='x' value={translation.x} isLidar={true}></TranslationInput>
             </div>
-            <div className="lidar-configuration-xyz">y:<TranslationInput value={translation.y} belong={sensorName} index='y' isLidar={isLidar}></TranslationInput></div>
-            <div className="lidar-configuration-xyz">z:<TranslationInput value={translation.z} index='z' belong={sensorName} isLidar={isLidar}></TranslationInput></div>
+            <div className="lidar-configuration-xyz">y:<TranslationInput value={translation.y} belong={sensorName} index='y' isLidar={true}></TranslationInput></div>
+            <div className="lidar-configuration-xyz">z:<TranslationInput value={translation.z} index='z' belong={sensorName} isLidar={true}></TranslationInput></div>
           </div>
         </td>
       </tr>
@@ -54,32 +55,48 @@ export default class SensorCalibrationConfiguration extends React.Component {
   }
 
   render() {
-    const { lidars, cameras } = this.props;
+    const { lidars, camera } = this.props;
     const lidarConfigurations = [];
     lidars.forEach((trans, sensorName) => {
-      lidarConfigurations.push(this.renderSensorConfiguration(sensorName, trans,true));
+      lidarConfigurations.push(this.renderSensorConfiguration(sensorName, trans));
     });
-    const cameraConfigurations = [];
-    cameras.forEach((trans, cameraName) => {
-      cameraConfigurations.push(this.renderSensorConfiguration(cameraName, trans,false));
-    });
+    const cameraConfiguration = [];
+    if (camera) {
+      console.log('this is camera');
+      console.log(camera);
+      const translation = _.get(camera, 'translation');
+      cameraConfiguration.push(
+        <tr className="lidar-configuration-tr" key='camera'>
+          <td>{_.get(this.props.store.hmi.componentStatus.get('Camera'),'message')}</td>
+        <td>
+          <div className="lidar-configuration-translation">
+            <div className="lidar-configuration-xyz">
+                x:<TranslationInput belong={'camera'} index='x' value={_.get(translation, 'x')} isLidar={false}></TranslationInput>
+            </div>
+            <div className="lidar-configuration-xyz">y:<TranslationInput value={_.get(translation, 'y')} belong={'camera'} index='y' isLidar={false}></TranslationInput></div>
+            <div className="lidar-configuration-xyz">z:<TranslationInput value={_.get(translation, 'z')} index='z' belong={'camera'} isLidar={false}></TranslationInput></div>
+          </div>
+        </td>
+      </tr>
+      );
+    }
     return (
       <React.Fragment>
         <div className="lidar-configuration-table">
-          {!_.isEmpty(cameraConfigurations) && (<div>
-          <div>Camera Translation</div>
-          <table>
+          {!_.isEmpty(cameraConfiguration) &&
+          (<table>
               <tbody>
-                 {cameraConfigurations}
+                 {cameraConfiguration}
+              </tbody>
+            </table>)}
+          {!_.isEmpty(lidarConfigurations) && (<div>
+            <div>Lidar Translation</div>
+            <table>
+              <tbody>
+                {lidarConfigurations}
               </tbody>
             </table>
           </div>)}
-          <div>Lidar Translation</div>
-          <table>
-              <tbody>
-                 {lidarConfigurations}
-              </tbody>
-          </table>
       </div>
   </React.Fragment>
     );
