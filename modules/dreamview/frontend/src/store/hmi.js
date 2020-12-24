@@ -81,9 +81,6 @@ export default class HMI {
 
     @observable canStartPreProcess=true;//随时可以start
 
-    //@observable inDataPreProcess = false;//正常情况并没有进入pre process
-    //初始化：reset函数里 外面开始 结束继续初始化为false 在哪整结束呢
-
     @observable endPreProcess=false;//不能end
 
     @observable preProcessStatus = 'UNKNOWN';//正常通知图标
@@ -234,8 +231,6 @@ export default class HMI {
     }
 
   @computed get allMonitoredComponentSuccess() {
-      //这个地方打印一下 componentstatus看一下是true Or false
-      //所有标定都需要的
       return this.isCalibrationMode && _.every(this.componentStatus, ['status', 'SUCCESS']);
     }
 

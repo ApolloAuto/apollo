@@ -405,8 +405,6 @@ export default class RealtimeWebSocketEndpoint {
   }
 
   startPreProcessData(data, type) {
-    //type ① 'SensorCalibrationPreprocess' ② "VehicleCalibrationPreprocess"
-    //console.log(data);
     const request = {
       type,
     };
