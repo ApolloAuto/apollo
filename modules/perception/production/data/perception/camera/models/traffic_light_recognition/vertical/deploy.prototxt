@@ -105,7 +105,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -175,7 +175,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -245,7 +245,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -315,7 +315,7 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer{
@@ -383,7 +383,7 @@ layer {
     kernel_h: 6
     stride_w: 2
     stride_h: 6
-    cmp_out_shape_floor_as_conv: true
+    round_mode: 1
   }
 }
 layer {
