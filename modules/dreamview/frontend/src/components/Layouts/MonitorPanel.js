@@ -31,23 +31,16 @@ export default class MonitorPanel extends React.Component {
                     <DataCollectionMonitor
                         dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
                         dataCollectionProgress={hmi.dataCollectionProgress}
-                        canStartDataCollectionPreProcess={hmi.canStartDataCollectionPreProcess}
+                        canStartDataCollectionPreprocess={hmi.canStartDataCollectionPreprocess}
                     />
         );
       case MONITOR_MENU.PNC_MONITOR:
         return <PNCMonitor />;
       case MONITOR_MENU.FUEL_CLIENT:
-        //一个组件夹带的参数多应该怎么做  这个地方必须优化
         return (
           <FuelClient
-            lidars={hmi.lidars}
-            camera={hmi.camera}
-            mainSensor={hmi.mainSensor}
             mode={hmi.currentMode}
-            inLidarIMUSensorCalibrationMode={hmi.inLidarIMUSensorCalibrationMode}
             inCameraLidarSensorCalibrationMode={hmi.inCameraLidarSensorCalibrationMode}
-            preProcessProgress={hmi.preProcessProgress}
-            toggleTranslationChange={hmi.toggleTranslationChange}
           />
         );
       default:

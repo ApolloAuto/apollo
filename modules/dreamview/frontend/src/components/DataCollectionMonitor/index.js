@@ -20,15 +20,15 @@ export default class DataCollectionMonitor extends React.Component {
   handlePreprocess() {
     //多次点击
     const hmi = this.props.store.hmi;
-    if (hmi.canStartPreProcess) {
-      hmi.canStartPreProcess = false;
-      WS.startPreProcessData([], 'VehicleCalibrationPreprocess');
+    if (hmi.canStartPreprocess) {
+      hmi.canStartPreprocess = false;
+      WS.startPreprocessData([], 'VehicleCalibrationPreprocess');
     }
   }
 
   render() {
     const { dataCollectionUpdateStatus, dataCollectionProgress,
-      canStartDataCollectionPreProcess } = this.props;
+      canStartDataCollectionPreprocess } = this.props;
     const hmi = this.props.store.hmi;
 
     if (!dataCollectionProgress || dataCollectionUpdateStatus.size === 0) {
@@ -62,7 +62,7 @@ export default class DataCollectionMonitor extends React.Component {
           <div className="category-description">
             <button
               className="preprocess-btn"
-              disabled={!canStartDataCollectionPreProcess}
+              disabled={!canStartDataCollectionPreprocess}
               onClick={this.handlePreprocess}
             >
               Preprocess
@@ -72,7 +72,7 @@ export default class DataCollectionMonitor extends React.Component {
             <span
               className={true
                 ? 'category-completed' : 'category-in-progress'}
-              style={{ width: `${hmi.preProcessProgress}%` }}
+              style={{ width: `${hmi.preprocessProgress}%` }}
             />
           </div>
         </div>
@@ -80,7 +80,7 @@ export default class DataCollectionMonitor extends React.Component {
           <ul className="preprocess-console">
             <MonitorItem
               text={hmi.logString}
-              level={hmi.preProcessStatus}
+              level={hmi.preprocessStatus}
               time={timestampMsToTimeString(Date.now() / 1000)}
             >
             </MonitorItem>

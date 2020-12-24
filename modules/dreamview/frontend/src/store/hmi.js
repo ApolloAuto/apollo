@@ -81,15 +81,15 @@ export default class HMI {
 
     @observable updateConfiguration = false;
 
-    @observable canStartPreProcess=true;//随时可以start
+    @observable canStartPreprocess=true;//随时可以start
 
-    @observable endPreProcess=false;//不能end
+    @observable endPreprocess=false;//不能end
 
-    @observable preProcessStatus = 'UNKNOWN';//正常通知图标
+    @observable preprocessStatus = 'UNKNOWN';//正常通知图标
 
     @observable logString='';
 
-    @observable preProcessProgress=0;
+    @observable preprocessProgress=0;
 
   @action toggleCoDriverFlag() {
       this.isCoDriver = !this.isCoDriver;
@@ -119,7 +119,7 @@ export default class HMI {
       if (this.currentMode !== newStatus.currentMode) {
         this.resetDataCollectionProgress();
         this.resetSensorCalibrationConfiguration();
-        this.resetPreProcessProgress();
+        this.resetPreprocessProgress();
         //this.otherComponents
         this.currentMode = newStatus.currentMode;
         if (this.isSensorCalibrationMode) {
@@ -146,7 +146,7 @@ export default class HMI {
     if (newStatus.currentVehicle) {
       if (this.isVehicleCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
         this.resetDataCollectionProgress();
-        this.resetPreProcessProgress();//主要是进度条相关
+        this.resetPreprocessProgress();//主要是进度条相关
       }
       if (this.isSensorCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
         //this.updateLidarConfiguration = true;
@@ -154,7 +154,7 @@ export default class HMI {
         this.updateConfiguration = true;
         this.resetSensorCalibrationConfiguration();
         //this.translationChanged = false;
-        this.resetPreProcessProgress();//有的地方可以归在标定的地方
+        this.resetPreprocessProgress();//有的地方可以归在标定的地方
       }
       this.currentVehicle = newStatus.currentVehicle;
     }
@@ -247,11 +247,11 @@ export default class HMI {
     return this.isSensorCalibrationMode && this.moduleStatus.get('Recorder');
   }
 
-  @computed get canStartDataCollectionPreProcess() {
+  @computed get canStartDataCollectionPreprocess() {
     return this.isVehicleCalibrationMode && _.every(this.dataCollectionProgress.get('Go Straight').values(), (x) => (x === 100));
   }
 
-  @computed get monitorPreProcess() {
+  @computed get monitorPreprocess() {
     return this.isCalibrationMode && this.otherComponents && _.get(this.otherComponents,'Preprocess.status') === 'FATAL';
   }
 
@@ -265,12 +265,12 @@ export default class HMI {
     this.camera = {};
   }
 
-  @action resetPreProcessProgress() {
-    this.canStartPreProcess = true;
-    this.preProcessStatus = 'UNKNOWN';//正常就是通知的模式
+  @action resetPreprocessProgress() {
+    this.canStartPreprocess = true;
+    this.preprocessStatus = 'UNKNOWN';//正常就是通知的模式
     this.logString = '';
-    this.endPreProcess = false;
-    this.preProcessProgress = 0;
+    this.endPreprocess = false;
+    this.preprocessProgress = 0;
   }
 
   @action updateDataCollectionProgress(data) {
@@ -304,13 +304,13 @@ export default class HMI {
       this.updateConfiguration = false;
     }
     if (data.progress) {
-      this.preProcessProgress = _.get(data, 'progress.percentage');
+      this.preprocessProgress = _.get(data, 'progress.percentage');
       this.logString = _.get(data, 'progress.logString');
-      this.preProcessStatus = _.get(data, 'progress.status');
-      this.endPreProcess = ['SUCCESS', 'FAIL'].includes(this.preProcessStatus) || this.monitorPreProcess;
-      if (!this.canStartPreProcess && this.endPreProcess) {
+      this.preprocessStatus = _.get(data, 'progress.status');
+      this.endPreprocess = ['SUCCESS', 'FAIL'].includes(this.preprocessStatus) || this.monitorPreprocess;
+      if (!this.canStartPreprocess && this.endPreprocess) {
         //已经进入这个过程 需要监管是否可以end
-        this.canStartPreProcess = true;
+        this.canStartPreprocess = true;
       }
     }
   }

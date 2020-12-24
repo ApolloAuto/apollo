@@ -21,8 +21,8 @@ export default class FuelClient extends React.Component {
   handlePreprocess() {
     // 出错 成功 初始化
     const hmi = this.props.store.hmi;
-    if (hmi.canStartPreProcess) {
-      hmi.canStartPreProcess = false;
+    if (hmi.canStartPreprocess) {
+      hmi.canStartPreprocess = false;
       const data = {};
       //不考虑是否改变 每次都发
       //这个地方原来要传选中camera的config（name和translation）
@@ -32,7 +32,7 @@ export default class FuelClient extends React.Component {
         const camera_internal_conf = internal_conf_input.map(x => parseFloat(x));
         if (_.findIndex(camera_internal_conf, (x) => isNaN(x)) !== -1) {
           alert('Please input all camera internal configurations');
-          hmi.canStartPreProcess = true;
+          hmi.canStartPreprocess = true;
           return;
         }
         _.set(data, 'camera_config.D', _.slice(camera_internal_conf, 0, 5));
@@ -51,7 +51,7 @@ export default class FuelClient extends React.Component {
         _.set(data, 'lidar_config', lidar_configs);
       }
       _.set(data, 'main_sensor', hmi.mainSensor);
-      WS.startPreProcessData(data, 'SensorCalibrationPreprocess');
+      WS.startPreprocessData(data, 'SensorCalibrationPreprocess');
     }
   }
 
@@ -64,8 +64,7 @@ export default class FuelClient extends React.Component {
   }
 
   render() {
-    const { mode, preProcessProgress, camera,lidars,mainSensor,
-      toggleTranslationChange, inCameraLidarSensorCalibrationMode } = this.props;
+    const { mode, inCameraLidarSensorCalibrationMode } = this.props;
     const hmi = this.props.store.hmi;
 
     return (
@@ -112,7 +111,7 @@ export default class FuelClient extends React.Component {
             <span
               className={true
                 ? 'category-completed' : 'category-in-progress'}
-              style={{ width: `${hmi.preProcessProgress}%` }}
+              style={{ width: `${hmi.preprocessProgress}%` }}
             />
           </div>
         </div>
@@ -120,7 +119,7 @@ export default class FuelClient extends React.Component {
           <ul className="preprocess-console">
             <MonitorItem
               text={hmi.logString}
-              level={hmi.preProcessStatus}
+              level={hmi.preprocessStatus}
               time={timestampMsToTimeString(Date.now() / 1000)}
             >
             </MonitorItem>

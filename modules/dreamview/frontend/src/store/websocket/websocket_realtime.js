@@ -405,7 +405,7 @@ export default class RealtimeWebSocketEndpoint {
     }));
   }
 
-  startPreProcessData(data, type) {
+  startPreprocessData(data, type) {
     const request = {
       type,
     };
