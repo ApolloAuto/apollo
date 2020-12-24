@@ -4,6 +4,7 @@ import {
 } from 'react-tabs';
 import { inject, observer } from 'mobx-react';
 
+import WS from 'store/websocket';
 import ScenarioCollectionMonitor from 'components/DataCollectionMonitor/ScenarioCollectionMonitor';
 import { MonitorItem } from '../Tasks/Console';
 import { timestampMsToTimeString } from 'utils/misc';
@@ -50,7 +51,7 @@ export default class DataCollectionMonitor extends React.Component {
     });
 
     return (
-      <div className="monitor">
+      <div className="monitor data-collection-monitor">
             <div className="monitor data-collection-monitor vehicle-calibration-panel">
                 <Tabs>
                     <TabList>{tabs}</TabList>

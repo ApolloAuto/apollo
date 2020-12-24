@@ -136,6 +136,7 @@ $monitor-header-height: 32px;
 .data-collection-monitor {
     position: relative;
     width: 100%;
+    overflow-y: hidden;
 
     .prepProcess{
         position:absolute;
@@ -215,8 +216,9 @@ $monitor-header-height: 32px;
 }
 
 .vehicle-calibration-panel{
-    height:85%;
+    height:80%;
     margin-bottom: 10px;
+    overflow-y: scroll;
 }
 
 .camera-param {
