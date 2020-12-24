@@ -92,16 +92,20 @@ export default class RoutingEditor {
         }
     }
 
-    sendRoutingRequest(carOffsetPosition, carHeading, coordinates) {
-        if (this.routePoints.length === 0) {
+    sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
+        if (this.routePoints.length === 0 && routingPoints.length === 0) {
             alert("Please provide at least an end point.");
             return false;
         }
 
-        const points = this.routePoints.map((object) => {
-            object.position.z = 0;
-            return coordinates.applyOffset(object.position, true);
-        });
+        const points = _.isEmpty(routingPoints) ?
+            this.routePoints.map((object) => {
+                object.position.z = 0;
+                return coordinates.applyOffset(object.position, true);
+            }) : routingPoints.map((point) => {
+                point.z = 0;
+                return coordinates.applyOffset(point, true);
+            });
         const start    = (points.length > 1) ? points[0]
                          : coordinates.applyOffset(carOffsetPosition, true);
         const start_heading  = (points.length > 1) ? null : carHeading;
@@ -126,7 +130,7 @@ export default class RoutingEditor {
         return true;
       }
 
-      addDefaultRouting(routingName, threshold) {
+      addDefaultRouting(routingName) {
         if (this.routePoints.length < minDefaultRoutingPointsNum) {
           alert(`Please provide at least ${minDefaultRoutingPointsNum} end point.`);
           return false;
@@ -135,20 +139,6 @@ export default class RoutingEditor {
         const points = this.routePoints.map((object) => {
           return object.position;
         });
-        if (!this.checkDefaultRoutingAvailable(points[0], points[points.length - 1], threshold)) {
-            alert(`Please set the default routing reasonably,the distance from the start point 
-          to the end point should not exceed ${threshold},
-          otherwise it will not be able to form a closed loop.`);
-          return false;
-        }
         WS.saveDefaultRouting(routingName, points);
-      }
-
-      checkDefaultRoutingAvailable(start, end, threshold) {
-        if (_.isEmpty(start) || _.isEmpty(end)) {
-          return false;
-        }
-        const distance = Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
-        return distance <= threshold;
       }
 }
