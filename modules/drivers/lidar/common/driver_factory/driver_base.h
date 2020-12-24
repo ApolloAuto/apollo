@@ -14,46 +14,57 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file
+ * @brief Defines the CanFrame struct and CanClient interface.
+ */
+
 #pragma once
 
-#include <memory>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
 #include <string>
 #include <vector>
 
-#include "modules/drivers/lidar/proto/velodyne.pb.h"
-
+#include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/velodyne/parser/calibration.h"
-
+/**
+ * @namespace apollo::drivers::canbus
+ * @brief apollo::drivers::canbus
+ */
 namespace apollo {
 namespace drivers {
-namespace velodyne {
+namespace lidar {
 
-using apollo::drivers::velodyne::VelodynePacket;
-using apollo::drivers::velodyne::VelodyneScan;
-
-constexpr double DEGRESS_TO_RADIANS = 3.1415926535897 / 180.0;
-
-class OnlineCalibration {
+/**
+ * @class LidarDriver
+ * @brief The class which defines the lidar driver .
+ */
+class LidarDriver {
  public:
-  OnlineCalibration() {}
-  ~OnlineCalibration() {}
+  /**
+   * @brief Constructor
+   */
+  LidarDriver(){};
+  LidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node){};
 
-  int decode(const std::shared_ptr<VelodyneScan>& scan_msgs);
-  void dump(const std::string& file_path);
-  void get_unit_index();
-  bool inited() const { return inited_; }
-  Calibration calibration() const { return calibration_; }
+  /**
+   * @brief Destructor
+   */
+  virtual ~LidarDriver() = default;
 
- private:
-  bool inited_;
-  Calibration calibration_;
-  std::vector<uint8_t> status_types_;
-  std::vector<uint8_t> status_values_;
-  // store first two "unit#" value index
-  std::vector<int> unit_indexs_;
+  /**
+   * @brief Initialize the CAN client by specified CAN card parameters.
+   * @param parameter CAN card parameters to initialize the CAN client.
+   * @return If the initialization is successful.
+   */
+  virtual bool Init() = 0;
+
+ protected:
+  std::shared_ptr<cyber::Node> node_;
 };
 
-}  // namespace velodyne
+}  // namespace lidar
 }  // namespace drivers
 }  // namespace apollo

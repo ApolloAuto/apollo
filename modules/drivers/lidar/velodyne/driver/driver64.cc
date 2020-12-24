@@ -18,14 +18,20 @@
 #include <ctime>
 #include <string>
 
+#include "modules/common/util/message_util.h"
 #include "modules/drivers/lidar/velodyne/driver/driver.h"
 // #include "ros/ros.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
+Velodyne64Driver::~Velodyne64Driver() {
+  if (poll_thread_.joinable()) {
+    poll_thread_.join();
+  }
+};
 
-void Velodyne64Driver::Init() {
+bool Velodyne64Driver::Init() {
   const double frequency = config_.rpm() / 60.0;  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
@@ -35,6 +41,14 @@ void Velodyne64Driver::Init() {
 
   input_.reset(new SocketInput());
   input_->init(config_.firing_data_port());
+
+  if (node_ == NULL) {
+    AERROR << "node is NULL";
+    return false;
+  }
+  writer_ = node_->CreateWriter<VelodyneScan>(config_.scan_channel());
+  poll_thread_ = std::thread(&Velodyne64Driver::device_poll, this);
+  return true;
 }
 
 /** poll the device
@@ -114,6 +128,22 @@ int Velodyne64Driver::PollStandardSync(std::shared_ptr<VelodyneScan> scan) {
     }
   }
   return 0;
+}
+
+void Velodyne64Driver::device_poll() {
+  while (!apollo::cyber::IsShutdown()) {
+    // poll device until end of file
+    std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
+    bool ret = Poll(scan);
+    if (ret) {
+      apollo::common::util::FillHeader("velodyne", scan.get());
+      writer_->Write(scan);
+    } else {
+      AWARN << "device poll failed";
+    }
+  }
+
+  AERROR << "CompVelodyneDriver thread exit";
 }
 
 }  // namespace velodyne

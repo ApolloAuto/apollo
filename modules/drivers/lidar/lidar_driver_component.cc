@@ -13,44 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
-#include <list>
-#include <memory>
-#include <string>
-#include <thread>
-
-#include "cyber/cyber.h"
-#include "modules/drivers/lidar/robosense/driver/driver.h"
+#include "modules/drivers/lidar/lidar_driver_component.h"
+#include "modules/drivers/lidar/proto/lidar_parameter.pb.h"
 
 namespace apollo {
 namespace drivers {
-namespace robosense {
-
-using apollo::cyber::Component;
-
-class RobosenseComponent : public Component<> {
- public:
-  ~RobosenseComponent() {}
-  bool Init() override {
-    if (!GetProtoConfig(&conf_)) {
-      AERROR << "load config error, file:" << config_file_path_;
-      return false;
-    }
-    driver_.reset(new RobosenseDriver(node_, conf_));
-    if (!driver_->Init()) {
-      AERROR << "driver init error";
-      return false;
-    }
-    return true;
+namespace lidar {
+LidarDriverComponent::LidarDriverComponent(){};
+bool LidarDriverComponent::Init() {
+  if (!GetProtoConfig(&conf_)) {
+    AERROR << "load config error, file:" << config_file_path_;
+    return false;
   }
-
- private:
-  std::shared_ptr<RobosenseDriver> driver_;
-  Config conf_;
+  node_ = apollo::cyber::CreateNode("drivers_lidar");
+  AERROR << "conf:" << conf_.DebugString();
+  LidarDriverFactory::Instance()->RegisterLidarClients();
+  auto driver = LidarDriverFactory::Instance()->CreateLidarDriver(node_, conf_);
+  if (!driver->Init()) {
+    AERROR << "driver init error";
+    return false;
+  }
+  return true;
 };
 
-CYBER_REGISTER_COMPONENT(RobosenseComponent)
-
-}  // namespace robosense
+}  // namespace lidar
 }  // namespace drivers
 }  // namespace apollo

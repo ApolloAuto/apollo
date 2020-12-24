@@ -46,7 +46,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/proto:pointcloud_cc_proto",
-        "//modules/drivers/lidar/velodyne/proto:config_cc_proto",
+        "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
     ],

@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar;
+
+import "modules/drivers/lidar/proto/hesai_config.proto";
+import "modules/drivers/lidar/proto/velodyne_config.proto";
+import "modules/drivers/lidar/proto/lidar_parameter.proto";
+import "modules/drivers/lidar/proto/robosense_config.proto";
+
+message config {
+    optional LidarParameter.LidarBrand brand = 1;
+    optional apollo.drivers.hesai.Config hesai = 2;
+    optional apollo.drivers.robosense.Config robosense = 3;
+    optional apollo.drivers.velodyne.Config velodyne = 4;
+}

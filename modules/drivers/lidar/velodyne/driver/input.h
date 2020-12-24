@@ -23,7 +23,7 @@
 #include "cyber/cyber.h"
 
 // #include "velodyne_msgs/VelodyneScanUnified.h"
-#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
+#include "modules/drivers/lidar/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {

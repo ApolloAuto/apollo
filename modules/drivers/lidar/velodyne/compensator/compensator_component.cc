@@ -21,7 +21,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
-#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
+#include "modules/drivers/lidar/proto/velodyne.pb.h"
 
 using apollo::cyber::Time;
 

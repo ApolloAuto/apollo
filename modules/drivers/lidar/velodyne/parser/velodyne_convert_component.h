@@ -21,12 +21,12 @@
 #include <string>
 #include <thread>
 
+#include "modules/drivers/lidar/proto/velodyne.pb.h"
+#include "modules/drivers/lidar/proto/velodyne_config.pb.h"
+
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
-
 #include "modules/drivers/lidar/velodyne/parser/convert.h"
-#include "modules/drivers/lidar/velodyne/proto/config.pb.h"
-#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {

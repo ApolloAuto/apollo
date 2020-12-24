@@ -10,7 +10,7 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [
-        ":hesai_component",
+        "//modules/drivers/lidar/hesai/driver:hesai_component",
         ":hesai_convert_component",
     ],
 )
@@ -21,38 +21,13 @@ cc_library(
     hdrs = ["parser/hesai_convert_component.h"],
     copts = HESAI_COPTS,
     deps = [
-        ":driver",
-        ":parser_factory",
         "//cyber",
-        "//modules/drivers/lidar/hesai/proto:config_cc_proto",
+        "//modules/drivers/lidar/hesai/driver:driver",
+        "//modules/drivers/lidar/proto:hesai_config_cc_proto",
+        ":parser_factory",
     ],
 )
 
-cc_library(
-    name = "hesai_component",
-    srcs = ["driver/hesai_component.cc"],
-    hdrs = ["driver/hesai_component.h"],
-    copts = HESAI_COPTS,
-    deps = [
-        ":driver",
-        ":parser_factory",
-        "//cyber",
-        "//modules/drivers/lidar/hesai/proto:config_cc_proto",
-    ],
-)
-
-cc_library(
-    name = "driver",
-    srcs = ["driver/driver.cc"],
-    hdrs = ["driver/driver.h"],
-    copts = HESAI_COPTS,
-    deps = [
-        ":parser",
-        ":type_defs",
-        ":udp_input",
-        "//cyber",
-    ],
-)
 
 cc_library(
     name = "parser_factory",
@@ -98,8 +73,8 @@ cc_library(
         ":tcp_cmd_client",
         ":type_defs",
         "//cyber",
-        "//modules/drivers/lidar/hesai/proto:config_cc_proto",
-        "//modules/drivers/lidar/hesai/proto:hesai_cc_proto",
+        "//modules/drivers/lidar/proto:hesai_config_cc_proto",
+        "//modules/drivers/lidar/proto:hesai_cc_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
     ],
 )
