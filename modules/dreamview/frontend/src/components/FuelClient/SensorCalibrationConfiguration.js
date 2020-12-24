@@ -61,9 +61,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
       lidarConfigurations.push(this.renderSensorConfiguration(sensorName, trans));
     });
     const cameraConfiguration = [];
-    if (camera) {
-      console.log('this is camera');
-      console.log(camera);
+    if (_.get(camera,'values')) {
       const translation = _.get(camera, 'translation');
       cameraConfiguration.push(
         <tr className="lidar-configuration-tr" key='camera'>

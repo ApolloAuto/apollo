@@ -411,6 +411,6 @@ export default class RealtimeWebSocketEndpoint {
     if (data) {
       request.data = data;
     }
-    this.websocket.send(request);
+    this.websocket.send(JSON.stringify(request));
   }
 }
