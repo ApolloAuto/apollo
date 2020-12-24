@@ -55,6 +55,14 @@ export default class FuelClient extends React.Component {
     }
   }
 
+  renderCameraInternalInput(number) {
+    const result = [];
+    for (let i = 0; i < number; i++) {
+      result.push(<input type="number" className="camera-internal-configuration-d" key={`camera${i}`}></input>);
+    }
+    return result;
+  }
+
   render() {
     const { mode, preProcessProgress, camera,lidars,mainSensor,
       toggleTranslationChange, inCameraLidarSensorCalibrationMode } = this.props;
@@ -81,36 +89,13 @@ export default class FuelClient extends React.Component {
                (<div>
               Camera-Lidar内参设定
               <div>D:
-              <input type="number" className="camera-internal-configuration-d"></input>
-              <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
+              {this.renderCameraInternalInput(5)}
                  </div>
               <div> K:
-              <input type="number" className="camera-internal-configuration-d"></input>
-              <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-              <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
+              {this.renderCameraInternalInput(9)}
                </div>
-              <div>P:
-              <input type="number" className="camera-internal-configuration-d"></input>
-              <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-              <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-              <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
-                <input type="number" className="camera-internal-configuration-d"></input>
+              <div>R:
+              {this.renderCameraInternalInput(9)}
                  </div>
              </div>)
         }
