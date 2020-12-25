@@ -23,6 +23,7 @@
 namespace apollo {
 namespace drivers {
 namespace lidar {
+
 LidarDriverFactory::LidarDriverFactory(){};
 LidarDriverFactory::LidarDriverFactory(
     const apollo::drivers::lidar::config& config){};
