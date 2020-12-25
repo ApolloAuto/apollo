@@ -97,16 +97,11 @@ export default class SensorCalibrationConfiguration extends React.Component {
     if (_.get(camera, 'translation')) {
       const translation = _.get(camera, 'translation');
       cameraConfiguration.push(
-        <tr className="lidar-configuration-tr" key="camera">
+        <tr className="camera-configuration-tr" key="camera">
           <td>
-            {_.get(
-              this.props.store.hmi.componentStatus.get('Camera'),
-              'message',
-            )}
-          </td>
-          <td>
-            <div className="lidar-configuration-translation">
-              <div className="lidar-configuration-xyz">
+            <div className="camera-configuration-translation">
+              <div>Lidar-Camera Translation</div>
+              <div className="camera-configuration-xyz">
                 x:
                 <TranslationInput
                   belong={'camera'}
@@ -115,21 +110,21 @@ export default class SensorCalibrationConfiguration extends React.Component {
                   isLidar={false}
                 ></TranslationInput>
               </div>
-              <div className="lidar-configuration-xyz">
+              <div className="camera-configuration-xyz">
                 y:
                 <TranslationInput
-                  value={_.get(translation, 'y')}
                   belong={'camera'}
                   index="y"
+                  value={_.get(translation, 'y')}
                   isLidar={false}
                 ></TranslationInput>
               </div>
-              <div className="lidar-configuration-xyz">
+              <div className="camera-configuration-xyz">
                 z:
                 <TranslationInput
-                  value={_.get(translation, 'z')}
-                  index="z"
                   belong={'camera'}
+                  index="z"
+                  value={_.get(translation, 'z')}
                   isLidar={false}
                 ></TranslationInput>
               </div>
@@ -143,7 +138,12 @@ export default class SensorCalibrationConfiguration extends React.Component {
         <div className="lidar-configuration-table">
           {!_.isEmpty(cameraConfiguration) && (
             <div>
-              <div>Lidar-Camera Translation</div>
+              <div>
+                {_.get(
+                  this.props.store.hmi.componentStatus.get('Camera'),
+                  'message',
+                )}
+              </div>
               <table>
                 <tbody>{cameraConfiguration}</tbody>
               </table>
