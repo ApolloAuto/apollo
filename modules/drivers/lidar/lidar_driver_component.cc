@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/drivers/lidar/lidar_driver_component.h"
+
 #include "modules/drivers/lidar/proto/lidar_parameter.pb.h"
 
 namespace apollo {
@@ -26,10 +27,10 @@ bool LidarDriverComponent::Init() {
     return false;
   }
   node_ = apollo::cyber::CreateNode("drivers_lidar");
-  AERROR << "conf:" << conf_.DebugString();
+  AINFO << "conf:" << conf_.DebugString();
   LidarDriverFactory::Instance()->RegisterLidarClients();
-  auto driver = LidarDriverFactory::Instance()->CreateLidarDriver(node_, conf_);
-  if (!driver->Init()) {
+  driver_ = LidarDriverFactory::Instance()->CreateLidarDriver(node_, conf_);
+  if (!driver_->Init()) {
     AERROR << "driver init error";
     return false;
   }

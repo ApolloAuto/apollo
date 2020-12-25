@@ -37,7 +37,6 @@ bool CompensatorComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
-
   compensator_.reset(new Compensator(config));
   compensator_pool_.reset(new CCObjectPool<PointCloud>(pool_size_));
   compensator_pool_->ConstructAll();

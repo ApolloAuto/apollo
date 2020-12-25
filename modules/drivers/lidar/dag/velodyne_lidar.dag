@@ -1,5 +1,4 @@
 # Define all coms in DAG streaming.
-
 module_config {                                             
   module_library : "/apollo/bazel-bin/modules/drivers/lidar/liblidar_driver_component.so"
   components {
@@ -19,7 +18,7 @@ module_config {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_convert"
-        config_file_path : "/apollo/modules/drivers/lidar/conf/velodyne_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_center_conf.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/Scan"}
       }
     }

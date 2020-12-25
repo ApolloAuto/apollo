@@ -35,6 +35,7 @@ class LidarDriverComponent : public ::apollo::cyber::Component<> {
   std::shared_ptr<LidarDriverFactory> lidar_factory_;
   apollo::drivers::lidar::config conf_;
   std::shared_ptr<::apollo::cyber::Node> node_;
+  std::unique_ptr<LidarDriver> driver_;
 };
 
 CYBER_REGISTER_COMPONENT(LidarDriverComponent)
