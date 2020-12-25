@@ -47,7 +47,7 @@ export default class HMI {
 
     @observable componentStatus = observable.map();
 
-    @observable otherComponents = observable.map();
+    @observable otherComponentStatus = observable.map();
 
     @observable enableStartAuto = false;
 
@@ -101,7 +101,6 @@ export default class HMI {
   }
 
   @action updateStatus(newStatus) {
-    this.otherComponents = newStatus.otherComponents;
     if (newStatus.dockerImage) {
       this.dockerImage = newStatus.dockerImage;
     }
@@ -185,6 +184,17 @@ export default class HMI {
       }
     }
 
+    if (newStatus.otherComponents) {
+      const newKeyList = JSON.stringify(Object.keys(newStatus.otherComponents).sort());
+      const curKeyList = JSON.stringify(this.otherComponentStatus.keys().sort());
+      if (newKeyList !== curKeyList) {
+        this.otherComponentStatus.clear();
+      }
+      for (const key in newStatus.otherComponents) {
+        this.otherComponentStatus.set(key, newStatus.otherComponents[key]);
+      }
+    }
+
     if (typeof newStatus.passengerMsg === 'string') {
       UTTERANCE.speakRepeatedly(newStatus.passengerMsg);
     }
@@ -252,7 +262,7 @@ export default class HMI {
   }
 
   @computed get monitorPreprocess() {
-    return this.isCalibrationMode && this.otherComponents && _.get(this.otherComponents,'Preprocess.status') === 'FATAL';
+    return this.isCalibrationMode && this.otherComponentStatus && _.get(this.otherComponentStatus.get('Preprocess'), 'status') !== 'OK';
   }
 
   @action resetDataCollectionProgress() {

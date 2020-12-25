@@ -302,11 +302,23 @@ void HMIWorker::InitReadersAndWriters() {
                 status != nullptr && status->status() == ComponentStatus::OK;
           }
         }
-        // Update other components status.
+        // Update monitored components status.
         for (auto& iter : *status_.mutable_monitored_components()) {
           auto* status = FindOrNull(system_status->components(), iter.first);
           if (status != nullptr) {
             iter.second = status->summary();
+          } else {
+            iter.second.set_status(ComponentStatus::UNKNOWN);
+            iter.second.set_message("Status not reported by Monitor.");
+          }
+        }
+
+        // Update other components status.
+        for (auto& iter : *status_.mutable_other_components()) {
+          auto* status =
+              FindOrNull(system_status->other_components(), iter.first);
+          if (status != nullptr) {
+            iter.second.CopyFrom(*status);
           } else {
             iter.second.set_status(ComponentStatus::UNKNOWN);
             iter.second.set_message("Status not reported by Monitor.");
