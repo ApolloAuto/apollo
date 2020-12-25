@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import warnIcon from 'assets/images/icons/warning.png';
 import errorIcon from 'assets/images/icons/error.png';
+import successIcon from 'assets/images/icons/success.png';
+import notificationIcon from 'assets/images/icons/notification.png';
 import { timestampMsToTimeString } from 'utils/misc';
 
 const LEVEL_CLASS = Object.freeze({
@@ -18,10 +20,10 @@ const LEVEL_ICON = Object.freeze({
   ERROR: errorIcon,
   FATAL: errorIcon,
   FAIL: errorIcon,
-  SUCCESS: warnIcon,//待补充success icon
-  UNKNOWN: warnIcon,//待补充notification icon
+  SUCCESS: successIcon,
+  UNKNOWN: notificationIcon,
 });
-//待设置语句不同样式
+//Todo:level statement style
 
 @observer
 export class MonitorItem extends React.Component {
