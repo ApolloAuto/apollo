@@ -369,14 +369,18 @@ void RTNet::addPermuteLayer(const LayerParameter &layer_param,
                             nvinfer1::INetworkDefinition *net,
                             TensorMap *tensor_map,
                             TensorModifyMap *tensor_modify_map) {
-  nvinfer1::IPluginLayer *permuteLayer;
-  nvinfer1::plugin::Quadruple permuteOrder;
-  CHECK_EQ(layer_param.permute_param().order_size(), 4);
-  for (int i = 0; i < 4; i++) {
-    permuteOrder.data[i] = layer_param.permute_param().order(i);
+  CHECK_LE(layer_param.permute_param().order_size(), nvinfer1::Dims::MAX_DIMS);
+  nvinfer1::IShuffleLayer *permuteLayer = net->addShuffle(*inputs[0]);
+  nvinfer1::Permutation permutation;
+
+  // For loading Caffe's permute param,
+  // e.g. Caffe: [0, 2, 1, 3] -> TensorRT: [1, 0, 2], omitting 1st dim N.
+  ACHECK(layer_param.permute_param().order(0) == 0);
+  for (int i = 1; i < layer_param.permute_param().order_size(); ++i) {
+    int order = layer_param.permute_param().order(i);
+    permutation.order[i - 1] = order - 1;
   }
-  nvinfer1::IPlugin *mplugin = createSSDPermutePlugin(permuteOrder);
-  permuteLayer = net->addPlugin(inputs, nbInputs, *mplugin);
+  permuteLayer->setFirstTranspose(permutation);
 
   permuteLayer->setName(layer_param.name().c_str());
   ConstructMap(layer_param, permuteLayer, tensor_map, tensor_modify_map);
