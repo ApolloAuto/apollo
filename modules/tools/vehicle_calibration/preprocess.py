@@ -33,7 +33,7 @@ from modules.dreamview.proto import preprocess_table_pb2
 from modules.tools.vehicle_calibration.sanity_check import sanity_check
 
 flags.DEFINE_string('vehicle_type', '', 'The vehicle type to be calibrated')
-flags.DEFINE_string('data_path', '/apollo/data', 'Default apollo data path')
+flags.DEFINE_string('data_path', '/apollo/output', 'Default output data path')
 flags.DEFINE_string('calibration_data_path',
                     '/apollo/modules/calibration/data',
                     'Default vehicle configuration file directory')
