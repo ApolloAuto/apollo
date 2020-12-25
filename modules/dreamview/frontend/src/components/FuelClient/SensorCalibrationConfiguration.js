@@ -42,7 +42,7 @@ class TranslationInput extends React.Component {
 export default class SensorCalibrationConfiguration extends React.Component {
   renderSensorConfiguration(sensorName, translation) {
     return (
-      <tr className="lidar-configuration-tr" key={sensorName}>
+      <tr className="sensor-configuration-tr" key={sensorName}>
         <td
           className={
             sensorName === this.props.mainSensor ? 'main-sensor' : null
@@ -51,8 +51,8 @@ export default class SensorCalibrationConfiguration extends React.Component {
           {sensorName}
         </td>
         <td>
-          <div className="lidar-configuration-translation">
-            <div className="lidar-configuration-xyz">
+          <div className="sensor-configuration-translation">
+            <div className="sensor-configuration-xyz">
               x:
               <TranslationInput
                 belong={sensorName}
@@ -61,7 +61,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                 isLidar={true}
               ></TranslationInput>
             </div>
-            <div className="lidar-configuration-xyz">
+            <div className="sensor-configuration-xyz">
               y:
               <TranslationInput
                 value={translation.y}
@@ -70,7 +70,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                 isLidar={true}
               ></TranslationInput>
             </div>
-            <div className="lidar-configuration-xyz">
+            <div className="sensor-configuration-xyz">
               z:
               <TranslationInput
                 value={translation.z}
@@ -97,11 +97,11 @@ export default class SensorCalibrationConfiguration extends React.Component {
     if (_.get(camera, 'translation')) {
       const translation = _.get(camera, 'translation');
       cameraConfiguration.push(
-        <tr className="camera-configuration-tr" key="camera">
+        <tr className="sensor-configuration-tr" key="camera">
           <td>
-            <div className="camera-configuration-translation">
+            <div className="sensor-configuration-translation">
               <div>Lidar-Camera Translation</div>
-              <div className="camera-configuration-xyz">
+              <div className="sensor-configuration-xyz">
                 x:
                 <TranslationInput
                   belong={'camera'}
@@ -110,7 +110,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                   isLidar={false}
                 ></TranslationInput>
               </div>
-              <div className="camera-configuration-xyz">
+              <div className="sensor-configuration-xyz">
                 y:
                 <TranslationInput
                   belong={'camera'}
@@ -119,7 +119,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                   isLidar={false}
                 ></TranslationInput>
               </div>
-              <div className="camera-configuration-xyz">
+              <div className="sensor-configuration-xyz">
                 z:
                 <TranslationInput
                   belong={'camera'}
@@ -135,7 +135,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
     }
     return (
       <React.Fragment>
-        <div className="lidar-configuration-table">
+        <div className="sensor-configuration-table">
           {!_.isEmpty(cameraConfiguration) && (
             <div>
               <div>

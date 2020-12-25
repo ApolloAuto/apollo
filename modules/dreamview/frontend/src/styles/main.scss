@@ -1745,10 +1745,10 @@ body {
     }
 }
 
-.lidar-configuration-table{
+.sensor-configuration-table{
     margin:20px;
 
-    .lidar-configuration-tr{
+    .sensor-configuration-tr{
         padding:10px;
 
         .main-sensor{
@@ -1756,14 +1756,14 @@ body {
         }
     }
 
-    .lidar-configuration-translation{
+    .sensor-configuration-translation{
         display:flex;
         width:100%;
         flex-flow:row nowrap;
         justify-content: flex-start;
         align-items: center;
 
-        .lidar-configuration-xyz{
+        .sensor-configuration-xyz{
             flex:1;
             padding:5px 15px 0 0;
             //padding-right:20px;
@@ -1786,7 +1786,7 @@ body {
         @include small-screen {
             min-width: 40px;
         }
-    } 
+    }
 }
 
 .preprocess-console {
