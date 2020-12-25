@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/drivers/lidar/proto/config.pb.h"
 
 #include "cyber/cyber.h"
@@ -28,7 +30,7 @@ namespace lidar {
 class LidarDriverComponent : public ::apollo::cyber::Component<> {
  public:
   LidarDriverComponent();
-  ~LidarDriverComponent(){};
+  ~LidarDriverComponent() {}
   bool Init() override;
 
  private:

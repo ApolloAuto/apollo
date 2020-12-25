@@ -58,7 +58,7 @@ bool VelodyneDriver::Init() {
   // raw data output topic
   positioning_thread_ =
       std::thread(&VelodyneDriver::PollPositioningPacket, this);
-  poll_thread_ = std::thread(&VelodyneDriver::device_poll, this);
+  poll_thread_ = std::thread(&VelodyneDriver::DevicePoll, this);
   return true;
 }
 
@@ -230,7 +230,8 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-VelodyneDriver* VelodyneDriverFactory::CreateDriver(const std::shared_ptr<::apollo::cyber::Node>& node, const Config& config) {
+VelodyneDriver* VelodyneDriverFactory::CreateDriver(
+    const std::shared_ptr<::apollo::cyber::Node>& node, const Config& config) {
   auto new_config = config;
   if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
@@ -285,7 +286,7 @@ VelodyneDriver* VelodyneDriverFactory::CreateDriver(const std::shared_ptr<::apol
   return driver;
 }
 
-void VelodyneDriver::device_poll() {
+void VelodyneDriver::DevicePoll() {
   while (!apollo::cyber::IsShutdown()) {
     // poll device until end of file
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();

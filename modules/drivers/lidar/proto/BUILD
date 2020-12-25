@@ -1,5 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
 load("//tools:cpplint.bzl", "cpplint")
 
@@ -100,8 +100,8 @@ cc_proto_library(
 proto_library(
     name = "robosense_proto_lib",
     srcs = [
-        "robosense_config.proto",
         "robosense.proto",
+        "robosense_config.proto",
     ],
     deps = [
         "//modules/common/proto:header_proto",
@@ -135,12 +135,11 @@ proto_library(
         "config.proto",
     ],
     deps = [
-        "//modules/common/proto:header_proto",
-        ":velodyne_config_proto",
         ":hesai_config_proto",
         ":lidar_parameter_proto_lib",
         ":robosense_proto_lib",
-
+        ":velodyne_config_proto",
+        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -150,6 +149,7 @@ cc_proto_library(
         ":config_proto_lib",
     ],
 )
+
 cc_library(
     name = "config",
     deps = [

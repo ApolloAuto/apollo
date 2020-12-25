@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -30,8 +31,8 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 /**
- * @namespace apollo::drivers::canbus
- * @brief apollo::drivers::canbus
+ * @namespace apollo::drivers::lidar
+ * @brief apollo::drivers::lidar
  */
 namespace apollo {
 namespace drivers {
@@ -46,8 +47,8 @@ class LidarDriver {
   /**
    * @brief Constructor
    */
-  LidarDriver(){};
-  LidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node){};
+  LidarDriver() {}
+  explicit LidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node) {}
 
   /**
    * @brief Destructor
@@ -55,8 +56,7 @@ class LidarDriver {
   virtual ~LidarDriver() = default;
 
   /**
-   * @brief Initialize the CAN client by specified CAN card parameters.
-   * @param parameter CAN card parameters to initialize the CAN client.
+   * @brief Initialize the lidar driver.
    * @return If the initialization is successful.
    */
   virtual bool Init() = 0;

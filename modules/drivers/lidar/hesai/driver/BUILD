@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,8 +12,8 @@ cc_library(
     copts = HESAI_COPTS,
     deps = [
         ":driver",
-        "//modules/drivers/lidar/hesai:parser_factory",
         "//cyber",
+        "//modules/drivers/lidar/hesai:parser_factory",
         "//modules/drivers/lidar/proto:hesai_config_cc_proto",
     ],
 )
@@ -26,11 +26,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/lidar/common/driver_factory:driver_base",
-        "//modules/drivers/lidar/proto:config_proto",
-        "//modules/drivers/lidar/hesai:parser_factory",
         "//modules/drivers/lidar/hesai:parser",
+        "//modules/drivers/lidar/hesai:parser_factory",
         "//modules/drivers/lidar/hesai:type_defs",
         "//modules/drivers/lidar/hesai:udp_input",
+        "//modules/drivers/lidar/proto:config_proto",
     ],
 )
 

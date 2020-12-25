@@ -45,7 +45,7 @@ class RobosenseDriver : public lidar::LidarDriver {
  public:
   RobosenseDriver(const std::shared_ptr<cyber::Node> &node,
                   const ::apollo::drivers::lidar::config &config)
-      : node_(node), conf_(config.robosense()){};
+      : node_(node), conf_(config.robosense()) {}
   RobosenseDriver(const std::shared_ptr<cyber::Node> &node, const Config &conf)
       : node_(node), conf_(conf) {}
   ~RobosenseDriver() { stop(); }

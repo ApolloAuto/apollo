@@ -43,20 +43,20 @@ constexpr double PACKET_RATE_VLP32C = 1507.0;
 
 class VelodyneDriver : public lidar::LidarDriver {
  public:
-  explicit VelodyneDriver(){};
-  explicit VelodyneDriver(const Config &config) : config_(config){};
-  explicit VelodyneDriver(const std::shared_ptr<cyber::Node> &node,
+  VelodyneDriver() {}
+  explicit VelodyneDriver(const Config &config) : config_(config) {}
+  VelodyneDriver(const std::shared_ptr<cyber::Node> &node,
                           const Config &config)
       : config_(config) {
     node_ = node;
-  };
+  }
   virtual ~VelodyneDriver();
 
   virtual bool Poll(const std::shared_ptr<VelodyneScan> &scan);
   bool Init() override;
   virtual void PollPositioningPacket();
   void SetPacketRate(const double packet_rate) { packet_rate_ = packet_rate; }
-  void device_poll();
+  void DevicePoll();
 
  protected:
   std::thread poll_thread_;
@@ -81,17 +81,17 @@ class VelodyneDriver : public lidar::LidarDriver {
 
 class Velodyne64Driver : public VelodyneDriver {
  public:
-  explicit Velodyne64Driver(const Config &config) : VelodyneDriver(config){};
-  explicit Velodyne64Driver(const std::shared_ptr<cyber::Node> &node,
+  explicit Velodyne64Driver(const Config &config) : VelodyneDriver(config) {}
+  Velodyne64Driver(const std::shared_ptr<cyber::Node> &node,
                             const Config &config) {
     node_ = node;
     config_ = config;
-  };
+  }
   ~Velodyne64Driver();
 
   bool Init() override;
   bool Poll(const std::shared_ptr<VelodyneScan> &scan) override;
-  void device_poll();
+  void DevicePoll();
 
  private:
   bool CheckAngle(const VelodynePacket &packet);

@@ -20,7 +20,8 @@
 namespace apollo {
 namespace drivers {
 namespace lidar {
-LidarDriverComponent::LidarDriverComponent(){};
+
+LidarDriverComponent::LidarDriverComponent() {}
 bool LidarDriverComponent::Init() {
   if (!GetProtoConfig(&conf_)) {
     AERROR << "load config error, file:" << config_file_path_;
@@ -35,7 +36,7 @@ bool LidarDriverComponent::Init() {
     return false;
   }
   return true;
-};
+}
 
 }  // namespace lidar
 }  // namespace drivers

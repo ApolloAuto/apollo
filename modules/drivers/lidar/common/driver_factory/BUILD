@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,14 +8,14 @@ cc_library(
     srcs = ["lidar_driver_factory.cc"],
     hdrs = ["lidar_driver_factory.h"],
     deps = [
+        ":driver_base",
         "//cyber",
         "//modules/common/util:factory",
-        ":driver_base",
-        "//modules/drivers/lidar/proto:lidar_parameter",
+        "//modules/drivers/lidar/hesai/driver",
         "//modules/drivers/lidar/proto:config",
-        "//modules/drivers/lidar/hesai/driver:driver",
-        "//modules/drivers/lidar/robosense/driver:driver",
-        "//modules/drivers/lidar/velodyne/driver:driver",
+        "//modules/drivers/lidar/proto:lidar_parameter",
+        "//modules/drivers/lidar/robosense/driver",
+        "//modules/drivers/lidar/velodyne/driver",
     ],
 )
 

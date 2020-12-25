@@ -48,7 +48,6 @@ class LidarDriverFactory
           LidarDriver* (*)(const std::shared_ptr<::apollo::cyber::Node>& node,
                            const apollo::drivers::lidar::config& config)> {
  public:
-  // LidarDriverFactory();
   LidarDriverFactory(const apollo::drivers::lidar::config& config);
   /**
    * @brief Register the lidar driver of all brands. This function call the

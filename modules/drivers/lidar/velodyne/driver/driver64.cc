@@ -29,7 +29,7 @@ Velodyne64Driver::~Velodyne64Driver() {
   if (poll_thread_.joinable()) {
     poll_thread_.join();
   }
-};
+}
 
 bool Velodyne64Driver::Init() {
   const double frequency = config_.rpm() / 60.0;  // expected Hz rate
@@ -47,7 +47,7 @@ bool Velodyne64Driver::Init() {
     return false;
   }
   writer_ = node_->CreateWriter<VelodyneScan>(config_.scan_channel());
-  poll_thread_ = std::thread(&Velodyne64Driver::device_poll, this);
+  poll_thread_ = std::thread(&Velodyne64Driver::DevicePoll, this);
   return true;
 }
 
@@ -130,7 +130,7 @@ int Velodyne64Driver::PollStandardSync(std::shared_ptr<VelodyneScan> scan) {
   return 0;
 }
 
-void Velodyne64Driver::device_poll() {
+void Velodyne64Driver::DevicePoll() {
   while (!apollo::cyber::IsShutdown()) {
     // poll device until end of file
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();

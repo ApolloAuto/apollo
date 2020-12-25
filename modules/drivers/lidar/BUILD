@@ -13,6 +13,7 @@ cc_library(
         "//modules/drivers/lidar/proto:config",
     ],
 )
+
 cc_binary(
     name = "liblidar_driver_component.so",
     linkshared = True,

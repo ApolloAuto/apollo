@@ -24,9 +24,9 @@ namespace apollo {
 namespace drivers {
 namespace lidar {
 
-LidarDriverFactory::LidarDriverFactory(){};
+LidarDriverFactory::LidarDriverFactory() {}
 LidarDriverFactory::LidarDriverFactory(
-    const apollo::drivers::lidar::config& config){};
+    const apollo::drivers::lidar::config& config) {}
 void LidarDriverFactory::RegisterLidarClients() {
   Register(LidarParameter::HESAI,
            [](const std::shared_ptr<::apollo::cyber::Node>& node,
@@ -55,7 +55,7 @@ std::unique_ptr<LidarDriver> LidarDriverFactory::CreateLidarDriver(
            << parameter.DebugString();
   }
   return factory;
-};
+}
 
 }  // namespace lidar
 }  // namespace drivers
