@@ -64,6 +64,12 @@ monitored_components {
     }
   }
 }
+monitored_components {
+  key: "Camera"
+  value: {
+    # Special CameraMonitor.
+  }
+}
 other_components {
   key: "Preprocess"
   value: {
