@@ -20,8 +20,7 @@ export default class FuelClient extends React.Component {
   handlePreprocess() {
     // 出错 成功 初始化
     const hmi = this.props.store.hmi;
-    if (hmi.canStartPreprocess) {
-      hmi.canStartPreprocess = false;
+    if (!hmi.preprocessIsRunning) {
       const data = {};
       //不考虑是否改变 每次都发
       //这个地方原来要传选中camera的config（name和translation）
@@ -36,7 +35,6 @@ export default class FuelClient extends React.Component {
         );
         if (_.findIndex(camera_internal_conf, (x) => isNaN(x)) !== -1) {
           alert('Please input all camera internal configurations');
-          hmi.canStartPreprocess = true;
           return;
         }
         _.set(data, 'camera_config.D', _.slice(camera_internal_conf, 0, 5));
@@ -56,6 +54,8 @@ export default class FuelClient extends React.Component {
       }
       _.set(data, 'main_sensor', hmi.mainSensor);
       WS.startPreprocessData(data, 'SensorCalibrationPreprocess');
+      hmi.startedPreprocess = true;
+      hmi.unexpectedAborted = false;
     }
   }
 

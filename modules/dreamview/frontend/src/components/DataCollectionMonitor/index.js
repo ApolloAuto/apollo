@@ -20,9 +20,10 @@ export default class DataCollectionMonitor extends React.Component {
   handlePreprocess() {
     //多次点击
     const hmi = this.props.store.hmi;
-    if (hmi.canStartPreprocess) {
-      hmi.canStartPreprocess = false;
+    if (!hmi.preprocessIsRunning) {
       WS.startPreprocessData([], 'VehicleCalibrationPreprocess');
+      hmi.startedPreprocess = true;
+      hmi.unexpectedAborted = false;
     }
   }
 
