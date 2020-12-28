@@ -88,9 +88,6 @@
     https://github.com/PointCloudLibrary/pcl/blob/master/LICENSE.txt
 * PyTorch
     https://github.com/pytorch/pytorch/blob/master/LICENSE
-* POCO C++ Libraries
-    Boost Software License 1.0
-    https://github.com/pocoproject/poco/blob/master/LICENSE
 * PROJ
     MIT License
     https://github.com/OSGeo/PROJ/blob/master/COPYING

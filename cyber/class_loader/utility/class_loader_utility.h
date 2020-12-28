@@ -28,8 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "Poco/SharedLibrary.h"
-
+#include "cyber/class_loader/utility/shared_library.h"
 #include "cyber/class_loader/utility/class_factory.h"
 #include "cyber/common/log.h"
 
@@ -44,18 +43,18 @@ class ClassLoader;
 
 namespace utility {
 
-using PocoLibraryPtr = std::shared_ptr<Poco::SharedLibrary>;
+using SharedLibraryPtr = std::shared_ptr<SharedLibrary>;
 using ClassClassFactoryMap =
     std::map<std::string, utility::AbstractClassFactoryBase*>;
 using BaseToClassFactoryMapMap = std::map<std::string, ClassClassFactoryMap>;
-using LibpathPocolibVector =
-    std::vector<std::pair<std::string, PocoLibraryPtr>>;
+using LibpathSharedlibVector =
+    std::vector<std::pair<std::string, SharedLibraryPtr>>;
 using ClassFactoryVector = std::vector<AbstractClassFactoryBase*>;
 
 BaseToClassFactoryMapMap& GetClassFactoryMapMap();
 std::recursive_mutex& GetClassFactoryMapMapMutex();
-LibpathPocolibVector& GetLibPathPocoShareLibVector();
-std::recursive_mutex& GetLibPathPocoShareLibMutex();
+LibpathSharedlibVector& GetLibPathShareLibVector();
+std::recursive_mutex& GetLibPathShareLibMutex();
 ClassClassFactoryMap& GetClassFactoryMapByBaseClass(
     const std::string& typeid_base_class_name);
 std::string GetCurLoadingLibraryName();
