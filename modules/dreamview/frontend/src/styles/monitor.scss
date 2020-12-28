@@ -136,6 +136,12 @@ $monitor-header-height: 32px;
 .data-collection-monitor {
     position: relative;
     width: 100%;
+    overflow-y: hidden;
+
+    .prepProcess{
+        position:absolute;
+        bottom:0;
+    }
 
     .scenario-container {
         position: absolute;
@@ -202,7 +208,19 @@ $monitor-header-height: 32px;
             }
         }
     }
+
+    .translation-input {
+    max-width: 80px;
+    width: auto;
+    }
 }
+
+.vehicle-calibration-panel {
+    height: 80%;
+    margin-bottom: 10px;
+    overflow-y: scroll;
+}
+
 
 .camera-param {
     overflow: auto;

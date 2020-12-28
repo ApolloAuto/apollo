@@ -9,6 +9,7 @@ export const MONITOR_MENU = Object.freeze({
     CONSOLE_TELEOP_MONITOR: 'showConsoleTeleopMonitor',
     CAR_TELEOP_MONITOR: 'showCarTeleopMonitor',
     CAMERA_PARAM: 'showCameraView',
+    FUEL_CLIENT: 'showFuelClient',
 });
 
 export default class Options {
@@ -89,6 +90,8 @@ export default class Options {
             return MONITOR_MENU.DATA_COLLECTION_MONITOR;
         } else if (this.showPNCMonitor) {
             return MONITOR_MENU.PNC_MONITOR;
+        } else if (this.showFuelClient) {
+            return MONITOR_MENU.FUEL_CLIENT;
         } else {
             return null;
         }
