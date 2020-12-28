@@ -254,7 +254,7 @@ class ProcessMonitor(object):
             try:
                 if not pw.is_alive():
                     if pw.exception_handler == "respawn":
-                        logger.warn(
+                        logger.warning(
                             'child process [%s][%d] exit, respawn!' % (pw.name, pw.pid))
                         result = pw.start()
                         if result != 0:
@@ -262,7 +262,7 @@ class ProcessMonitor(object):
                                 'respawn process [%s] failed, stop all!' % (pw.name))
                             stop()
                     elif pw.exception_handler == "exit":
-                        logger.warn(
+                        logger.warning(
                             'child process [%s][%d] exit, stop all' % (pw.name, pw.pid))
                         stop()
                     dead_cnt += 1
@@ -298,7 +298,7 @@ class ProcessMonitor(object):
 
         for p in self.procs:
             if p.is_alive():
-                logger.warn('Waiting for [%s][%s] exit.' % (p.name, p.pid))
+                logger.warning('Waiting for [%s][%s] exit.' % (p.name, p.pid))
                 p.wait()
                 logger.info(
                     'Process [%s] has been stopped. dag_file: %s' % (p.name, p.dag_list))
