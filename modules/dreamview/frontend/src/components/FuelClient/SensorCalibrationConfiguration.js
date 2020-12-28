@@ -2,7 +2,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import _ from 'lodash';
 
-// the component show the lidar configure and camera configure
+// The component show the lidar configure and camera configure
 @inject('store') @observer
 class TranslationInput extends React.Component {
   constructor(props) {
@@ -37,15 +37,14 @@ class TranslationInput extends React.Component {
   }
 }
 
-//待优化 是inject store还是props 传递
-@inject('store') @observer
+@observer
 export default class SensorCalibrationConfiguration extends React.Component {
-  renderSensorConfiguration(sensorName, translation) {
+  renderSensorConfiguration(sensorName, translation, isLidar) {
     return (
       <tr className="sensor-configuration-tr" key={sensorName}>
         <td
           className={
-            sensorName === this.props.mainSensor ? 'main-sensor' : null
+            sensorName === isLidar && this.props.mainSensor ? 'main-sensor' : null
           }
         >
           {sensorName}
@@ -57,26 +56,26 @@ export default class SensorCalibrationConfiguration extends React.Component {
               <TranslationInput
                 belong={sensorName}
                 index="x"
-                value={translation.x}
-                isLidar={true}
+                value={_.get(translation,'x')}
+                isLidar
               ></TranslationInput>
             </div>
             <div className="sensor-configuration-xyz">
               y:
               <TranslationInput
-                value={translation.y}
+                value={_.get(translation,'y')}
                 belong={sensorName}
                 index="y"
-                isLidar={true}
+                isLidar
               ></TranslationInput>
             </div>
             <div className="sensor-configuration-xyz">
               z:
               <TranslationInput
-                value={translation.z}
+                value={_.get(translation,'z')}
                 index="z"
                 belong={sensorName}
-                isLidar={true}
+                isLidar
               ></TranslationInput>
             </div>
           </div>
@@ -86,51 +85,18 @@ export default class SensorCalibrationConfiguration extends React.Component {
   }
 
   render() {
-    const { lidars, camera } = this.props;
+    const { lidars, camera, componentStatus} = this.props;
     const lidarConfigurations = [];
     lidars.forEach((trans, sensorName) => {
       lidarConfigurations.push(
-        this.renderSensorConfiguration(sensorName, trans),
+        this.renderSensorConfiguration(sensorName, trans, true),
       );
     });
     const cameraConfiguration = [];
     if (_.get(camera, 'translation')) {
       const translation = _.get(camera, 'translation');
       cameraConfiguration.push(
-        <tr className="sensor-configuration-tr" key="camera">
-          <td>
-            <div className="sensor-configuration-translation">
-              <div>Lidar-Camera Translation</div>
-              <div className="sensor-configuration-xyz">
-                x:
-                <TranslationInput
-                  belong={'camera'}
-                  index="x"
-                  value={_.get(translation, 'x')}
-                  isLidar={false}
-                ></TranslationInput>
-              </div>
-              <div className="sensor-configuration-xyz">
-                y:
-                <TranslationInput
-                  belong={'camera'}
-                  index="y"
-                  value={_.get(translation, 'y')}
-                  isLidar={false}
-                ></TranslationInput>
-              </div>
-              <div className="sensor-configuration-xyz">
-                z:
-                <TranslationInput
-                  belong={'camera'}
-                  index="z"
-                  value={_.get(translation, 'z')}
-                  isLidar={false}
-                ></TranslationInput>
-              </div>
-            </div>
-          </td>
-        </tr>,
+        this.renderSensorConfiguration('Lidar-Camera Translation', translation, false),
       );
     }
     return (
@@ -140,7 +106,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
             <div>
               <div>
                 {_.get(
-                  this.props.store.hmi.componentStatus.get('Camera'),
+                  componentStatus.get('Camera'),
                   'message',
                 )}
               </div>

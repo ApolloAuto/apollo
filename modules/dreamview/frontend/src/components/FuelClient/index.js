@@ -18,13 +18,9 @@ export default class FuelClient extends React.Component {
   }
 
   handlePreprocess() {
-    // 出错 成功 初始化
     const hmi = this.props.store.hmi;
     if (!hmi.preprocessIsRunning) {
       const data = {};
-      //不考虑是否改变 每次都发
-      //这个地方原来要传选中camera的config（name和translation）
-      //
       if (hmi.inCameraLidarSensorCalibrationMode) {
         const internal_conf_input = _.map(
           document.getElementsByClassName('camera-internal-configuration-d'),
@@ -40,11 +36,11 @@ export default class FuelClient extends React.Component {
         _.set(data, 'camera_config.D', _.slice(camera_internal_conf, 0, 5));
         _.set(data, 'camera_config.K', _.slice(camera_internal_conf, 5, 14));
         _.set(data, 'camera_config.R', _.slice(camera_internal_conf, 14, 26));
-        _.set(data, 'camera_config.translation', hmi.camera.translation);
+        _.set(data, 'camera_config.translation', _.get(hmi.camera, 'translation'));
       }
-      if (!_.isEmpty(this.props.store.hmi.lidars)) {
+      if (!_.isEmpty(hmi.lidars)) {
         const lidar_configs = [];
-        this.props.store.hmi.lidars.forEach((value, key) => {
+        hmi.lidars.forEach((value, key) => {
           lidar_configs.push({
             sensor_name: key,
             translation: value,
@@ -74,7 +70,6 @@ export default class FuelClient extends React.Component {
   }
 
   render() {
-    const { mode, inCameraLidarSensorCalibrationMode } = this.props;
     const hmi = this.props.store.hmi;
 
     return (
@@ -85,15 +80,16 @@ export default class FuelClient extends React.Component {
             <Tab>Configuration</Tab>
           </TabList>
           <TabPanel>
-            <GuideText mode={mode}></GuideText>
+            <GuideText mode={hmi.currentMode}></GuideText>
           </TabPanel>
           <TabPanel>
             <SensorCalibrationConfiguration
               lidars={hmi.lidars}
               mainSensor={hmi.mainSensor}
               camera={hmi.camera}
+              componentStatus={hmi.componentStatus}
             ></SensorCalibrationConfiguration>
-            {inCameraLidarSensorCalibrationMode && (
+            {hmi.inCameraLidarSensorCalibrationMode && (
               <div>
                 Camera Intrinsics
                 <div>

@@ -27,21 +27,12 @@ export default class MonitorPanel extends React.Component {
       case MONITOR_MENU.CAMERA_PARAM:
         return <CameraParam />;
       case MONITOR_MENU.DATA_COLLECTION_MONITOR:
-        return (
-                    <DataCollectionMonitor
-                        dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
-                        dataCollectionProgress={hmi.dataCollectionProgress}
-                        canStartDataCollectionPreprocess={hmi.canStartDataCollectionPreprocess}
-                    />
-        );
+        return <DataCollectionMonitor />;
       case MONITOR_MENU.PNC_MONITOR:
         return <PNCMonitor />;
       case MONITOR_MENU.FUEL_CLIENT:
         return (
-          <FuelClient
-            mode={hmi.currentMode}
-            inCameraLidarSensorCalibrationMode={hmi.inCameraLidarSensorCalibrationMode}
-          />
+          <FuelClient />
         );
       default:
         return null;

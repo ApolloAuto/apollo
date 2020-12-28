@@ -2,7 +2,7 @@ import React from 'react';
 import lidarImuIMG from 'assets/images/lidar_imu.png';
 import cameraLidarPositionIMG from 'assets/images/camera_lidar_position.png';
 
-//数据录制文字说明 用来标定
+// For sensor calibration mode instruction
 export default class GuideText extends React.Component {
   render() {
     const { mode } = this.props;

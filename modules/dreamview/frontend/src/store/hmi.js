@@ -59,10 +59,6 @@ export default class HMI {
 
   utmZoneId = 10;
 
-  //@observable translationChanged=false;//默认没有changed
-
-  //@observable isCalibrationMode = false;
-
   @observable isVehicleCalibrationMode = false;
 
   @observable isSensorCalibrationMode = false;
@@ -83,7 +79,7 @@ export default class HMI {
 
   @observable unexpectedAborted = false;
 
-  @observable preprocessStatus = 'UNKNOWN'; //正常通知图标
+  @observable preprocessStatus = 'UNKNOWN'; // Under normal situation
 
   @observable logString = '';
 
@@ -112,7 +108,6 @@ export default class HMI {
       this.modes = newStatus.modes.sort();
     }
     if (newStatus.currentMode) {
-      //每次换模式
       this.isVehicleCalibrationMode = newStatus.currentMode
         .toLowerCase()
         .includes('vehicle calibration');
@@ -123,15 +118,9 @@ export default class HMI {
         this.resetDataCollectionProgress();
         this.resetSensorCalibrationConfiguration();
         this.resetPreprocessProgress();
-        //this.otherComponents
         this.currentMode = newStatus.currentMode;
         if (this.isSensorCalibrationMode) {
           this.updateConfiguration = true;
-          //this.updateLidarConfiguration = this.inLidarIMUSensorCalibrationMode;
-          //this.updateCameraLidarConfiguration = this.inCameraLidarSensorCalibrationMode;
-          //this.translationChanged = false;
-          //this.preConditionModule = 'Recorder';
-          //这个Record这么写不优美 待细化
         }
       }
     }
@@ -152,18 +141,15 @@ export default class HMI {
         this.currentVehicle !== newStatus.currentVehicle
       ) {
         this.resetDataCollectionProgress();
-        this.resetPreprocessProgress(); //主要是进度条相关
+        this.resetPreprocessProgress();
       }
       if (
         this.isSensorCalibrationMode &&
         this.currentVehicle !== newStatus.currentVehicle
       ) {
-        //this.updateLidarConfiguration = true;
-        //this.updateCameraLidarConfiguration = true;
         this.updateConfiguration = true;
         this.resetSensorCalibrationConfiguration();
-        //this.translationChanged = false;
-        this.resetPreprocessProgress(); //有的地方可以归在标定的地方
+        this.resetPreprocessProgress();
       }
       this.currentVehicle = newStatus.currentVehicle;
     }
@@ -194,7 +180,6 @@ export default class HMI {
         this.startMonitorRecorderProcess &&
         !this.allMonitoredComponentSuccess
       ) {
-        //正在检测且检测出非success 不报错误信息  直接关
         this.toggleModule(this.preConditionModule);
       }
     }
@@ -321,7 +306,7 @@ export default class HMI {
   @action resetPreprocessProgress() {
     this.startedPreprocess = false;
     this.unexpectedAborted = false;
-    this.preprocessStatus = 'UNKNOWN'; //正常就是通知的模式
+    this.preprocessStatus = 'UNKNOWN';
     this.logString = '';
     this.preprocessProgress = 0;
   }

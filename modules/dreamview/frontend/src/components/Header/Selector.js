@@ -40,7 +40,7 @@ export default class Selector extends React.Component {
     return (
             <div className="header-item selector">
                 <span className="arrow" />
-                <select onChange={this.onChangeHandler} value={this.state.value} className={this.props.className ? this.props.className : 'custom-selector'}>
+                <select onChange={this.onChangeHandler} value={this.state.value}>
                     {this.entries}
                 </select>
             </div>
