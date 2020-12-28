@@ -48,7 +48,8 @@ class LidarDriver {
    * @brief Constructor
    */
   LidarDriver() {}
-  explicit LidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node) {}
+  explicit LidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node)
+      : node_(node) {}
 
   /**
    * @brief Destructor
