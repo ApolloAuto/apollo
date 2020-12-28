@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/fuel_monitor/data_collection_monitor.h"
 
+#include "gflags/gflags.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
 
@@ -33,6 +34,10 @@ using apollo::common::VehicleConfigHelper;
 using cyber::common::PathExists;
 using google::protobuf::FieldDescriptor;
 using Json = nlohmann::json;
+
+DEFINE_string(data_collection_monitor_name, "DataCollectionMonitor",
+              "Name of the data collection monitor");
+
 namespace {
 
 /*
@@ -94,7 +99,8 @@ bool IsCompliedWithCriterion(float actual_value,
 }  // namespace
 
 DataCollectionMonitor::DataCollectionMonitor()
-    : node_(cyber::CreateNode("data_collection_monitor")) {
+    : FuelMonitor(FLAGS_data_collection_monitor_name),
+      node_(cyber::CreateNode("data_collection_monitor")) {
   InitReaders();
   LoadConfiguration();
 }
@@ -185,11 +191,9 @@ void DataCollectionMonitor::Start() {
   enabled_ = true;
 }
 
-void DataCollectionMonitor::Stop() { enabled_ = false; }
-
-void DataCollectionMonitor::Restart() {
-  Stop();
-  Start();
+void DataCollectionMonitor::Stop() {
+  enabled_ = false;
+  AINFO << "DataCollectionMonitor stopped";
 }
 
 void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {

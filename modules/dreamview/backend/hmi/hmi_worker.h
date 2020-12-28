@@ -23,13 +23,15 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
-#include "cyber/cyber.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
+
+#include "cyber/cyber.h"
+#include "cyber/time/time.h"
 
 /**
  * @namespace apollo::dreamview
@@ -65,6 +67,12 @@ class HMIWorker {
                         const std::vector<std::string>& event_types,
                         const bool is_reportable);
 
+  // Run sensor calibration preprocess
+  void SensorCalibrationPreprocess(const std::string& task_type);
+
+  // Run vehicle calibration preprocess
+  void VehicleCalibrationPreprocess();
+
   // Get current HMI status.
   HMIStatus GetStatus() const;
 
@@ -99,6 +107,7 @@ class HMIWorker {
   bool status_changed_ = false;
   bool stop_ = false;
   mutable boost::shared_mutex status_mutex_;
+  mutable size_t record_count_ = 0;
   std::future<void> thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
 

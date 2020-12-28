@@ -1,15 +1,19 @@
 cyber_modules {
-  key: "Sensors"
+  key: "GPS"
   value: {
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
-    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
-    process_group: "compute_sched"
   }
 }
 cyber_modules {
-  key: "Canbus"
+  key: "Lidar"
   value: {
-    dag_files: "/apollo/modules/canbus/dag/canbus.dag"
+    dag_files: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+  }
+}
+cyber_modules {
+  key: "Localization"
+  value: {
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
 modules {
@@ -64,6 +68,6 @@ other_components {
   key: "Preprocess"
   value: {
     command_keywords: "bash"
-    command_keywords: "preprocess.sh"
+    command_keywords: "extract_data.sh"
   }
 }

@@ -21,6 +21,7 @@
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -46,7 +47,6 @@ SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
     WebSocketHandler *camera_ws, SimControl *sim_control,
     const MapService *map_service,
-    DataCollectionMonitor *data_collection_monitor,
     PerceptionCameraUpdater *perception_camera_updater, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
@@ -54,7 +54,6 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       map_ws_(map_ws),
       camera_ws_(camera_ws),
       sim_control_(sim_control),
-      data_collection_monitor_(data_collection_monitor),
       perception_camera_updater_(perception_camera_updater) {
   RegisterMessageHandlers();
 }
@@ -329,17 +328,35 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           }
         }
       });
+
   websocket_->RegisterMessageHandler(
       "RequestDataCollectionProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        if (!data_collection_monitor_->IsEnabled()) {
-          return;
+        auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
+        if (monitors) {
+          const auto iter = monitors->find("DataCollectionMonitor");
+          if (iter != monitors->end() && iter->second->IsEnabled()) {
+            Json response;
+            response["type"] = "DataCollectionProgress";
+            response["data"] = iter->second->GetProgressAsJson();
+            websocket_->SendData(conn, response.dump());
+          }
         }
+      });
 
-        Json response;
-        response["type"] = "DataCollectionProgress";
-        response["data"] = data_collection_monitor_->GetProgressAsJson();
-        websocket_->SendData(conn, response.dump());
+  websocket_->RegisterMessageHandler(
+      "RequestPreprocessProgress",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
+        if (monitors) {
+          const auto iter = monitors->find("PreprocessMonitor");
+          if (iter != monitors->end() && iter->second->IsEnabled()) {
+            Json response;
+            response["type"] = "PreprocessProgress";
+            response["data"] = iter->second->GetProgressAsJson();
+            websocket_->SendData(conn, response.dump());
+          }
+        }
       });
   websocket_->RegisterMessageHandler(
       "SaveDefaultRouting",
