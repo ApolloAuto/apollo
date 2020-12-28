@@ -50,7 +50,7 @@ export default class FuelClient extends React.Component {
       }
       _.set(data, 'main_sensor', hmi.mainSensor);
       WS.startPreprocessData(data, 'SensorCalibrationPreprocess');
-      hmi.startedPreprocess = true;
+      hmi.preprocessStarted = true;
       hmi.unexpectedAborted = false;
     }
   }

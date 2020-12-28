@@ -75,7 +75,9 @@ export default class HMI {
 
   @observable updateConfiguration = false;
 
-  @observable startedPreprocess = false;
+  @observable preprocessStarted = false;
+
+  @observable preprocessFinished = false;
 
   @observable unexpectedAborted = false;
 
@@ -201,12 +203,14 @@ export default class HMI {
       }
     }
 
-    if (this.startedPreprocess && !this.preprocessIsRunning) {
+    if (this.preprocessStarted && !this.preprocessIsRunning) {
       this.counter += 1; // use counter to delay time
       if (this.counter > 1) {
-        this.unexpectedAborted = true;
+        if (!this.preprocessFinished) {
+          this.unexpectedAborted = true;
+        }
         this.counter = 0;
-        this.startedPreprocess = false;
+        this.preprocessStarted = false;
       }
     }
 
@@ -306,7 +310,8 @@ export default class HMI {
   }
 
   @action resetPreprocessProgress() {
-    this.startedPreprocess = false;
+    this.preprocessStarted = false;
+    this.preprocessFinished = false;
     this.unexpectedAborted = false;
     this.preprocessStatus = 'UNKNOWN';
     this.logString = '';
@@ -361,6 +366,11 @@ export default class HMI {
         this.preprocessProgress = _.get(data, 'progress.percentage');
         this.logString = _.get(data, 'progress.logString');
         this.preprocessStatus = _.get(data, 'progress.status');
+        if (['SUCCESS', 'FAIL'].includes(this.preprocessStatus)) {
+          this.preprocessFinished = true;
+        } else {
+          this.preprocessFinished = false;
+        }
       }
     }
   }
