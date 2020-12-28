@@ -103,6 +103,8 @@ options:
     default: false
   showDataCollectionMonitor:
     default: false
+  showFuelClient:
+    default: false
   enableSimControl:
     default: false
   lockTaskPanel:
@@ -252,8 +254,6 @@ options:
   showDefaultRoutingInput:
     default: false
   showCycleNumberInput:
-    default: false
-  showFuelClient:
     default: false
 
 routingEditor:

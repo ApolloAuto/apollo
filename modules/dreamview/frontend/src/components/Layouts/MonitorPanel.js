@@ -17,7 +17,7 @@ import FuelClient from 'components/FuelClient';
 
 export default class MonitorPanel extends React.Component {
   renderMonitor() {
-    const { viewName, hmi } = this.props;
+    const { viewName } = this.props;
 
     switch (viewName) {
       case MONITOR_MENU.CONSOLE_TELEOP_MONITOR:
@@ -31,9 +31,7 @@ export default class MonitorPanel extends React.Component {
       case MONITOR_MENU.PNC_MONITOR:
         return <PNCMonitor />;
       case MONITOR_MENU.FUEL_CLIENT:
-        return (
-          <FuelClient />
-        );
+        return <FuelClient />;
       default:
         return null;
     }

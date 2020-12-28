@@ -8,8 +8,8 @@ import StatusDisplay from 'components/ModuleController/StatusDisplay';
 export default class ModuleController extends React.Component {
   render() {
     const {
-      modes, currentMode, moduleStatus, componentStatus,
-      allMonitoredComponentSuccess, isCalibrationMode, preConditionModule,
+      moduleStatus, componentStatus, allMonitoredComponentSuccess,
+      isCalibrationMode, preConditionModule,
     } = this.props.store.hmi;
 
     const moduleEntries = Array.from(moduleStatus.keys()).sort().map((key) => (
