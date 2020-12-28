@@ -85,6 +85,8 @@ export default class HMI {
 
   @observable preprocessProgress = 0;
 
+  @observable preprocessMonitorItemTimeStamp = null;
+
   @observable counter = 0;
 
   @action toggleCoDriverFlag() {
@@ -309,6 +311,7 @@ export default class HMI {
     this.preprocessStatus = 'UNKNOWN';
     this.logString = '';
     this.preprocessProgress = 0;
+    this.preprocessMonitorItemTimeStamp = null;
   }
 
   @action updateDataCollectionProgress(data) {
@@ -349,6 +352,7 @@ export default class HMI {
       this.updateConfiguration = false;
     }
     if (data.progress) {
+      this.preprocessMonitorItemTimeStamp = new Date().getTime();
       if (this.unexpectedAborted) {
         this.preprocessStatus = 'FAIL';
         this.logString =

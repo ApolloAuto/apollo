@@ -79,7 +79,9 @@ export default class DataCollectionMonitor extends React.Component {
             <MonitorItem
               text={hmi.logString}
               level={hmi.preprocessStatus}
-              time={timestampMsToTimeString(Date.now() / 1000)}
+              time={hmi.preprocessMonitorItemTimeStamp
+                ? timestampMsToTimeString(hmi.preprocessMonitorItemTimeStamp)
+                : hmi.preprocessMonitorItemTimeStamp}
             >
             </MonitorItem>
           </ul>
