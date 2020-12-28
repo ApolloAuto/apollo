@@ -6,7 +6,7 @@ module_config {
     class_name : "LidarDriverComponent"
     config {
       name : "lidar_driver"
-      config_file_path : "/apollo/modules/drivers/lidar/conf/robosense_config.pb.txt"
+      config_file_path : "/apollo/modules/drivers/lidar/conf/lidar_config.pb.txt"
       readers {channel: "/apollo/sensor/lidar/driver"}
     }
   }
