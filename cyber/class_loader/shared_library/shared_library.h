@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_CLASS_LOADER_UTILITY_SHARED_LIBRARY_H_
-#define CYBER_CLASS_LOADER_UTILITY_SHARED_LIBRARY_H_
+#ifndef CYBER_CLASS_LOADER_SHARED_LIBRARY_H_
+#define CYBER_CLASS_LOADER_SHARED_LIBRARY_H_
 
 #include <string>
 #include <mutex>
 
-#include "cyber/class_loader/utility/exception.h"
+#include "cyber/class_loader/shared_library/exceptions.h"
 
 namespace apollo {
 namespace cyber {
 namespace class_loader {
-namespace utility {
 
 class SharedLibrary {
  public:
@@ -36,15 +35,15 @@ class SharedLibrary {
 
   SharedLibrary();
 
-  explicit SharedLibrary(const std::string& filename);
+  explicit SharedLibrary(const std::string& path);
 
-  SharedLibrary(const std::string& filename, int flags);
+  SharedLibrary(const std::string& path, int flags);
 
   virtual ~SharedLibrary();
 
-  void Load(const std::string& filename);
+  void Load(const std::string& path);
 
-  void Load(const std::string& filename, int flags);
+  void Load(const std::string& path, int flags);
 
   void Unload();
 
@@ -54,21 +53,20 @@ class SharedLibrary {
 
   void* GetSymbol(const std::string& name);
 
-  inline const std::string& GetPath() const { return filename_; }
+  inline const std::string& GetPath() const { return path_; }
 
   SharedLibrary(const SharedLibrary&) = delete;
   SharedLibrary& operator=(const SharedLibrary&) = delete;
 
  private:
-  void* handle_;
-  std::string filename_;
+  void* handle_ = nullptr;
+  std::string path_;
 
   std::mutex mutex_;
 };
 
-}  // namespace utility
 }  // namespace class_loader
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_CLASS_LOADER_UTILITY_SHARED_LIBRARY_H_
+#endif  // CYBER_CLASS_LOADER_SHARED_LIBRARY_H_
