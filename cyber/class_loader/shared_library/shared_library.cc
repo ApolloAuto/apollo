@@ -13,7 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+//
+// Adapted from poco/Foundation/src/SharedLibrary_UNIX.cpp
+//
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 #include "cyber/class_loader/shared_library/shared_library.h"
 
 #include <dlfcn.h>
@@ -22,19 +29,13 @@ namespace apollo {
 namespace cyber {
 namespace class_loader {
 
-SharedLibrary::SharedLibrary() : handle_(nullptr) {}
-
-SharedLibrary::SharedLibrary(const std::string& path) {
-  Load(path, 0);
-}
+SharedLibrary::SharedLibrary(const std::string& path) { Load(path, 0); }
 
 SharedLibrary::SharedLibrary(const std::string& path, int flags) {
   Load(path, flags);
 }
 
-void SharedLibrary::Load(const std::string& path) {
-  Load(path, 0);
-}
+void SharedLibrary::Load(const std::string& path) { Load(path, 0); }
 
 void SharedLibrary::Load(const std::string& path, int flags) {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -84,11 +85,8 @@ void* SharedLibrary::GetSymbol(const std::string& name) {
   return result;
 }
 
-SharedLibrary::~SharedLibrary() {
-  Unload();
-}
+SharedLibrary::~SharedLibrary() {}
 
-
-}  // namespace shared_library
+}  // namespace class_loader
 }  // namespace cyber
 }  // namespace apollo
