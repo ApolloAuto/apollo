@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/class_loader/utility/shared_library.h"
+#include "cyber/class_loader/shared_library/shared_library.h"
 #include "cyber/class_loader/utility/class_factory.h"
 #include "cyber/common/log.h"
 
@@ -47,14 +47,14 @@ using SharedLibraryPtr = std::shared_ptr<SharedLibrary>;
 using ClassClassFactoryMap =
     std::map<std::string, utility::AbstractClassFactoryBase*>;
 using BaseToClassFactoryMapMap = std::map<std::string, ClassClassFactoryMap>;
-using LibpathSharedlibVector =
+using LibPathSharedLibVector =
     std::vector<std::pair<std::string, SharedLibraryPtr>>;
 using ClassFactoryVector = std::vector<AbstractClassFactoryBase*>;
 
 BaseToClassFactoryMapMap& GetClassFactoryMapMap();
 std::recursive_mutex& GetClassFactoryMapMapMutex();
-LibpathSharedlibVector& GetLibPathShareLibVector();
-std::recursive_mutex& GetLibPathShareLibMutex();
+LibPathSharedLibVector& GetLibPathSharedLibVector();
+std::recursive_mutex& GetLibPathSharedLibMutex();
 ClassClassFactoryMap& GetClassFactoryMapByBaseClass(
     const std::string& typeid_base_class_name);
 std::string GetCurLoadingLibraryName();

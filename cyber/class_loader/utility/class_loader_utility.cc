@@ -28,7 +28,7 @@ std::recursive_mutex& GetClassFactoryMapMapMutex() {
   return m;
 }
 
-std::recursive_mutex& GetLibPathShareLibMutex() {
+std::recursive_mutex& GetLibPathSharedLibMutex() {
   static std::recursive_mutex m;
   return m;
 }
@@ -38,8 +38,8 @@ BaseToClassFactoryMapMap& GetClassFactoryMapMap() {
   return instance;
 }
 
-LibpathSharedlibVector& GetLibPathShareLibVector() {
-  static LibpathSharedlibVector instance;
+LibPathSharedLibVector& GetLibPathSharedLibVector() {
+  static LibPathSharedLibVector instance;
   return instance;
 }
 
@@ -127,7 +127,7 @@ void DestroyClassFactoryObjectsOfLibrary(
     if (class_factory_object->GetRelativeLibraryPath() == library_path &&
         class_factory_object->IsOwnedBy(class_loader)) {
       class_factory_object->RemoveOwnedClassLoader(class_loader);
-      // when no anybody owner,delete && erase
+      // when no anybody owner, delete && erase
       if (!class_factory_object->IsOwnedByAnybody()) {
         itr = class_factory_map->erase(itr);
         delete class_factory_object;
@@ -151,10 +151,10 @@ void DestroyClassFactoryObjectsOfLibrary(const std::string& library_path,
   }
 }
 
-LibpathSharedlibVector::iterator FindLoadedLibrary(
+LibPathSharedLibVector::iterator FindLoadedLibrary(
     const std::string& library_path) {
-  LibpathSharedlibVector& opened_libraries = GetLibPathShareLibVector();
-  LibpathSharedlibVector::iterator itr;
+  LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
+  LibPathSharedLibVector::iterator itr;
   for (itr = opened_libraries.begin(); itr != opened_libraries.end(); ++itr) {
     if (itr->first == library_path) {
       break;
@@ -164,10 +164,10 @@ LibpathSharedlibVector::iterator FindLoadedLibrary(
 }
 
 bool IsLibraryLoadedByAnybody(const std::string& library_path) {
-  std::lock_guard<std::recursive_mutex> lck(GetLibPathShareLibMutex());
+  std::lock_guard<std::recursive_mutex> lck(GetLibPathSharedLibMutex());
 
-  LibpathSharedlibVector& opened_libraries = GetLibPathShareLibVector();
-  LibpathSharedlibVector::iterator itr = FindLoadedLibrary(library_path);
+  LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
+  LibPathSharedLibVector::iterator itr = FindLoadedLibrary(library_path);
   return itr != opened_libraries.end();
 }
 
@@ -222,10 +222,10 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
       AERROR << "LibraryAlreadyLoadedException: " << e.what();
-    } catch (const NotFoundException& e) {
+    } catch (const SymbolNotFoundException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AERROR << "NotFoundException: " << e.what();
+      AERROR << "SymbolNotFoundException: " << e.what();
     }
 
     SetCurLoadingLibraryName("");
@@ -242,8 +242,8 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     AWARN << "Class factory objs counts is 0, maybe registerclass failed.";
   }
 
-  std::lock_guard<std::recursive_mutex> lck(GetLibPathShareLibMutex());
-  LibpathSharedlibVector& opened_libraries = GetLibPathShareLibVector();
+  std::lock_guard<std::recursive_mutex> lck(GetLibPathSharedLibMutex());
+  LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
   opened_libraries.emplace_back(
       std::pair<std::string, SharedLibraryPtr>(library_path, shared_library));
   return true;
@@ -251,9 +251,9 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
 
 void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
   {
-    std::lock_guard<std::recursive_mutex> lck(GetLibPathShareLibMutex());
-    LibpathSharedlibVector& opened_libraries = GetLibPathShareLibVector();
-    LibpathSharedlibVector::iterator itr = FindLoadedLibrary(library_path);
+    std::lock_guard<std::recursive_mutex> lck(GetLibPathSharedLibMutex());
+    LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
+    LibPathSharedLibVector::iterator itr = FindLoadedLibrary(library_path);
     if (itr == opened_libraries.end()) {
       AERROR << "Attempt to UnloadLibrary lib, but can't find lib: "
              << library_path;
@@ -268,12 +268,12 @@ void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
         itr->second->Unload();
         itr = opened_libraries.erase(itr);
       } else {
-        AWARN << "ClassFactory Objects still remain in memory,meaning other "
-                 "ClassLoaders are still using library:"
+        AWARN << "ClassFactory objects still remain in memory, meaning other"
+                 "class loaders are still using library:"
               << library_path;
       }
-    } catch (const std::exception& e) {
-      AERROR << "library unLoad error: " << e.what();
+    } catch (const std::runtime_error& e) {
+      AERROR << "Library unload error: " << e.what();
     }
   }
 }

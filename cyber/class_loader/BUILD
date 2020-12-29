@@ -4,18 +4,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "shared_library",
-    srcs = [
-        "utility/shared_library.cc",
-    ],
-    hdrs = [
-        "utility/shared_library.h",
-        "utility/exception.h",
-    ],
-    linkopts = ['-ldl'],
-)
-
-cc_library(
     name = "class_loader",
     srcs = [
         "class_loader.cc",
@@ -31,7 +19,7 @@ cc_library(
     deps = [
         "//cyber:init",
         "//cyber/common:log",
-        "//cyber/class_loader:shared_library",
+        "//cyber/class_loader/shared_library",
     ],
 )
 
