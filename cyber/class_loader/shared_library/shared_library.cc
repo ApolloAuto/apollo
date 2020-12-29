@@ -19,7 +19,7 @@
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 #include "cyber/class_loader/shared_library/shared_library.h"
 
