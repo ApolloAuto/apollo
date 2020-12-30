@@ -1,9 +1,13 @@
 cyber_modules {
-  key: "Sensors"
+  key: "GPS"
   value: {
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+  }
+}
+cyber_modules {
+  key: "Localization"
+  value: {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
-    process_group: "compute_sched"
   }
 }
 cyber_modules {
