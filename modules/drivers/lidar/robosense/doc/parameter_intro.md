@@ -2,13 +2,13 @@
 
 
 
-This document will give you a introduction to each parameter in the configuration file.  
+This document will give you a introduction to  parameters in the configuration file.  
 
 
 
-## 1 driver parameter
+## Driver parameter
 
-For convenient, we take rs16.pb.txt as an example.
+For convenience, we take rs16.pb.txt as an example.
 
 ```yaml
 model: "RS16"	
@@ -21,7 +21,10 @@ start_angle: 0
 end_angle: 360
 min_distance: 0
 max_distance: 200
+split_frame_mode: 1
+num_pkts_split: 1
 cut_angle: 0
+angle_path: "/apollo/modules/drivers/robosense/angle.csv"
 pointcloud_channel: "/apollo/sensor/rs16/PointCloud2"
 scan_channel: "/apollo/sensor/rs16/Scan"
 use_lidar_clock: false
@@ -57,12 +60,6 @@ This is the difop port number of lidar. The default value is 7788.
 
 
 
-*echo_mode*
-
-This is the echo_mode of lidar. 
-
-
-
 *start_angle*
 
 The start angle of point cloud.
@@ -87,9 +84,33 @@ The maximum distance of point cloud.
 
 
 
+*split_frame_mode*
+
+The mode to split the LiDAR frames. Default value is 1.
+
+- 1 -- Spliting frames depends on the cut_angle
+
+- 2 -- Spliting frames depends on a fixed number of packets
+
+- 3 -- Spliting frames depends on num_pkts_split
+
+
+
+*num_pkts_split*
+
+The number of packets in one frame. Only be used when split_frame_mode = 3
+
+
+
 *cut_angle*
 
-The angle to split frames.
+ The angle(degree) to split frames. Only be used when split_frame_mode = 1. The default value is 0.
+
+
+
+*angle_path*
+
+The path of the angle calibration file. For latest version of LiDAR, this one can be ignored.
 
 
 
