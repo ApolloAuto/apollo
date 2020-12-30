@@ -28,6 +28,7 @@ cc_library(
     hdrs = ["inference.h"],
     deps = [
         "//modules/perception/base:blob",
+        "@boost",
     ],
 )
 
