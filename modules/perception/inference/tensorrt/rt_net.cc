@@ -189,6 +189,9 @@ void RTNet::addConcatLayer(const LayerParameter &layer_param,
   ConcatParameter concat = layer_param.concat_param();
   nvinfer1::IConcatenationLayer *concatLayer =
       net->addConcatenation(inputs, nbInputs);
+  // tensorrt ignore the first channel(batch channel), so when load caffe
+  // model axis should -1
+  concatLayer->setAxis(concat.axis()-1);
   concatLayer->setName(layer_param.name().c_str());
   CHECK_EQ(nbInputs, layer_param.bottom_size());
 

@@ -124,7 +124,7 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
 
     data_provider_image_option_.crop_roi = light->region.detection_roi;
     data_provider_image_option_.do_crop = true;
-    data_provider_image_option_.target_color = base::Color::RGB;
+    data_provider_image_option_.target_color = base::Color::BGR;
     frame->data_provider->GetImage(data_provider_image_option_, image_.get());
 
     AINFO << "get img done";
@@ -149,9 +149,9 @@ void ClassifyBySimple::Prob2Color(const float* out_put_data, float threshold,
                                   base::TrafficLightPtr light) {
   int max_color_id = 0;
   std::vector<base::TLColor> status_map = {
-      base::TLColor::TL_GREEN, base::TLColor::TL_RED, base::TLColor::TL_YELLOW,
-      base::TLColor::TL_BLACK};
-  std::vector<std::string> name_map = {"Green", "Red", "Yellow", "Black"};
+      base::TLColor::TL_BLACK, base::TLColor::TL_RED, base::TLColor::TL_YELLOW,
+      base::TLColor::TL_GREEN};
+  std::vector<std::string> name_map = {"Black", "Red", "Yellow", "Green"};
   std::vector<float> prob(out_put_data, out_put_data + status_map.size());
   auto max_prob = std::max_element(prob.begin(), prob.end());
   max_color_id = (*max_prob > threshold)

@@ -1096,6 +1096,8 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
   for (const auto &object : frame.tracked_objects) {
     // plot 2D box on image_2D
     base::RectF rect(object->camera_supplement.box);
+    AINFO << "Draw box xmin: " << object->camera_supplement.box.xmin;
+    AINFO << "Draw box ymin: " << object->camera_supplement.box.ymin;
     cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
                static_cast<int>(rect.width), static_cast<int>(rect.height));
     cv::Scalar color = colorlistobj[object->track_id % colorlistobj.size()];
@@ -1369,7 +1371,9 @@ void Visualizer::ShowResult_all_info_single_camera(
   if (frame.timestamp - last_timestamp_ < 0.02) return;
 
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, black_color);
-
+  if (frame.data_provider->sensor_name() == "front_6mm") {
+    cv::imwrite("./test.png", img);
+  }
   // draw results on visulization panel
   int line_pos = 0;
   cv::Mat image = img.clone();
