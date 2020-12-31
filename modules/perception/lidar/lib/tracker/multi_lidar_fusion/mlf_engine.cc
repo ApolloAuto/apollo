@@ -73,7 +73,6 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   tracker_.reset(new MlfTracker);
   MlfTrackerInitOptions tracker_init_options;
   ACHECK(tracker_->Init(tracker_init_options));
-  evaluator_.Init();
   return true;
 }
 

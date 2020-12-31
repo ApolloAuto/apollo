@@ -321,6 +321,13 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
       base::RectF rect(objects[i]->object->camera_supplement.box);
       auto &min_tmplt = kMinTemplateHWL.at(sub_type);
       if (OutOfValidRegion(rect, width_, height_, omt_param_.border())) {
+        AINFO << "Out of valid region";
+        AINFO << "Rect x: " << rect.x
+              << " Rect y: " << rect.y
+              << " Rect height: " << rect.height
+              << " Rect width: " << rect.width
+              << " GT height_: " << height_
+              << " GT width_: " << width_;
         continue;
       }
       for (auto &&target_rect : target_rects) {

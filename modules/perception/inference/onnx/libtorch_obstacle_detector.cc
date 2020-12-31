@@ -59,11 +59,14 @@ bool ObstacleDetector::Init(const std::map<std::string,
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_downratio.to(device)));
   auto torch_output_tensor =
-      net_.forward(torch_inputs).toTensor();
+      net_.forward(torch_inputs);
 
   for (const auto& name : output_names_) {
-    auto blob = std::make_shared<Blob<float>>(2, 6, 1, 1);
-    blobs_.emplace(name, blob);
+    auto iter = shapes.find(name);
+    if (iter != shapes.end()) {
+      auto blob = std::make_shared<Blob<float>>(iter->second);
+      blobs_.emplace(name, blob);
+    }
   }
 
   for (const auto& name : input_names_) {
@@ -119,15 +122,18 @@ void ObstacleDetector::Infer() {
   tensor_image[0][0] = tensor_image[0][0].div_(58.395);
   tensor_image[0][1] = tensor_image[0][1].div_(57.12);
   tensor_image[0][2] = tensor_image[0][2].div_(57.375);
-  AINFO << tensor_K[0][0];
 
   torch_inputs.push_back(tensor_image);
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_ratio.to(device)));
 
   AINFO << "Start to do inference";
-  auto outputs = net_.forward(torch_inputs).toTensor();
+  auto outputs = net_.forward(torch_inputs).toTuple()->elements();
+  auto results = outputs[0].toTensor();
+  auto feat_map = outputs[1].toTensor();
   AINFO << "Finished inference";
+  blobs_[output_names_[0]]->data()->set_gpu_data(results.data_ptr());
+  blobs_[output_names_[1]]->data()->set_gpu_data(feat_map.data_ptr());
 }
 
 }  // namespace inference

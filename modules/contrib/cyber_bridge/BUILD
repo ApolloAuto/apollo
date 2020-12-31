@@ -28,6 +28,7 @@ cc_library(
     deps = [
         ":bridge_clients",
         ":bridge_node",
+        "@boost",
     ],
 )
 
@@ -37,6 +38,7 @@ cc_library(
     hdrs = ["clients.h"],
     deps = [
         ":bridge_client_header",
+        "@boost",
     ],
 )
 
@@ -54,6 +56,7 @@ cc_library(
     hdrs = ["client.h"],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 
