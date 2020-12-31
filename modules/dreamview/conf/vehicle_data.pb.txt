@@ -182,3 +182,11 @@ data_files {
   source_path: "perception_conf/velodyne16_segmentation_conf.pb.txt"
   dest_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
 }
+data_files {
+  source_path: "perception_conf/recognition_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/recognition_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/mlf_engine.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
+}
