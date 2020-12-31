@@ -66,9 +66,11 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Localization"
+  key: "Localization Pose"
   value: {
-    # Special LocalizationMonitor.
+    channel {
+      name: "/apollo/localization/pose"
+    }
   }
 }
 other_components {
