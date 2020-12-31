@@ -9,41 +9,7 @@ cc_binary(
     name = "librobosense_driver_component.so",
     linkshared = True,
     linkstatic = False,
-    deps = [":robosense_driver_component_lib"],
-)
-
-cc_library(
-    name = "robosense_driver_component_lib",
-    srcs = [
-        "driver/robosense_driver_component.cc",
-    ],
-    hdrs = [
-        "driver/robosense_driver_component.h",
-    ],
-    copts = ROBOSENSE_COPTS,
-    deps = [":driver"],
-)
-
-cc_library(
-    name = "driver",
-    srcs = [
-        "driver/driver.cpp",
-        "driver/utility.cpp",
-        "input/input.cpp",
-    ],
-    hdrs = [
-        "driver/driver.h",
-        "driver/utility.h",
-        "input/input.h",
-    ],
-    copts = ROBOSENSE_COPTS,
-    deps = [
-        ":decoder_factory",
-        "//cyber",
-        "//modules/common/util",
-        "//modules/drivers/proto:pointcloud_cc_proto",
-        "//modules/drivers/lidar/robosense/proto:robosense_proto",
-    ],
+    deps = ["//modules/drivers/lidar/robosense/driver:robosense_driver_component_lib"],
 )
 
 cc_library(

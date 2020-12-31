@@ -13,44 +13,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+/**
+ * @file
+ * @brief Defines the CanFrame struct and CanClient interface.
+ */
+
 #pragma once
-#include <list>
+
+#include <cstdint>
+#include <cstring>
 #include <memory>
+#include <sstream>
 #include <string>
-#include <thread>
+#include <vector>
 
+#include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/robosense/driver/driver.h"
-
+/**
+ * @namespace apollo::drivers::lidar
+ * @brief apollo::drivers::lidar
+ */
 namespace apollo {
 namespace drivers {
-namespace robosense {
+namespace lidar {
 
-using apollo::cyber::Component;
-
-class RobosenseComponent : public Component<> {
+/**
+ * @class LidarDriver
+ * @brief The class which defines the lidar driver .
+ */
+class LidarDriver {
  public:
-  ~RobosenseComponent() {}
-  bool Init() override {
-    if (!GetProtoConfig(&conf_)) {
-      AERROR << "load config error, file:" << config_file_path_;
-      return false;
-    }
-    driver_.reset(new RobosenseDriver(node_, conf_));
-    if (!driver_->Init()) {
-      AERROR << "driver init error";
-      return false;
-    }
-    return true;
-  }
+  /**
+   * @brief Constructor
+   */
+  LidarDriver() {}
+  explicit LidarDriver(const std::shared_ptr<::apollo::cyber::Node>& node)
+      : node_(node) {}
 
- private:
-  std::shared_ptr<RobosenseDriver> driver_;
-  Config conf_;
+  /**
+   * @brief Destructor
+   */
+  virtual ~LidarDriver() = default;
+
+  /**
+   * @brief Initialize the lidar driver.
+   * @return If the initialization is successful.
+   */
+  virtual bool Init() = 0;
+
+ protected:
+  std::shared_ptr<cyber::Node> node_;
 };
 
-CYBER_REGISTER_COMPONENT(RobosenseComponent)
-
-}  // namespace robosense
+}  // namespace lidar
 }  // namespace drivers
 }  // namespace apollo

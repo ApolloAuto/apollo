@@ -13,44 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #pragma once
-#include <list>
+
 #include <memory>
-#include <string>
-#include <thread>
+
+#include "modules/drivers/lidar/proto/config.pb.h"
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/robosense/driver/driver.h"
+#include "modules/drivers/lidar/common/driver_factory/lidar_driver_factory.h"
 
 namespace apollo {
 namespace drivers {
-namespace robosense {
+namespace lidar {
 
-using apollo::cyber::Component;
-
-class RobosenseComponent : public Component<> {
+class LidarDriverComponent : public ::apollo::cyber::Component<> {
  public:
-  ~RobosenseComponent() {}
-  bool Init() override {
-    if (!GetProtoConfig(&conf_)) {
-      AERROR << "load config error, file:" << config_file_path_;
-      return false;
-    }
-    driver_.reset(new RobosenseDriver(node_, conf_));
-    if (!driver_->Init()) {
-      AERROR << "driver init error";
-      return false;
-    }
-    return true;
-  }
+  LidarDriverComponent();
+  ~LidarDriverComponent() {}
+  bool Init() override;
 
  private:
-  std::shared_ptr<RobosenseDriver> driver_;
-  Config conf_;
+  std::shared_ptr<LidarDriverFactory> lidar_factory_;
+  apollo::drivers::lidar::config conf_;
+  std::shared_ptr<::apollo::cyber::Node> node_;
+  std::unique_ptr<LidarDriver> driver_;
 };
 
-CYBER_REGISTER_COMPONENT(RobosenseComponent)
+CYBER_REGISTER_COMPONENT(LidarDriverComponent)
 
-}  // namespace robosense
+}  // namespace lidar
 }  // namespace drivers
 }  // namespace apollo
