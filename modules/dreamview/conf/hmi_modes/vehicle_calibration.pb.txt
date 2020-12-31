@@ -27,6 +27,13 @@ modules {
   }
 }
 monitored_components {
+  key: "Canbus"
+  process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+}
+monitored_components {
   key: "Recorder"
   value: {
     process {
