@@ -1,15 +1,35 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/librobosense_driver_component.so"
-
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lidar_robosense/libsuteng_driver_component.so"
+    
+    ##################################################
+    #                   drivers                      #
+    ##################################################
     components {
-      class_name : "RobosenseComponent"
+      class_name : "CompRoboDriver"
       config {
-        name : "RS16_driver"
-        config_file_path : "/apollo/modules/drivers/lidar/conf/rs16.pb.txt"
+        name : "robo_back_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
+      }
+    }
+    ##################################################
+    #                   convert                      #
+    ##################################################
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_back_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
+        readers {
+          channel: "/apollo/sensor/lidar16/back/Scan"
+        }
       }
     }
 }
+
+##################################################
+#                compensation                    #
+##################################################
 
 module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
@@ -17,11 +37,9 @@ module_config {
     components {
       class_name : "CompensatorComponent"
       config {
-        name : "lidar_compensator"
-        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_fusion_compensator.pb.txt"
-        readers {channel: "/apollo/sensor/lidar16/PointCloud2"}
+        name : "velodyne16_fusion_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/back_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
       }
     }
 }
-
-
