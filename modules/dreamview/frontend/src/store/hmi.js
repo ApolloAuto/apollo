@@ -235,7 +235,7 @@ export default class HMI {
       return (
         this.isCalibrationMode &&
         _.every(this.componentStatus.keys(), (key) => {
-          return key === 'Recorder' || _.get(this.componentStatus.get(key), 'status') === 'SUCCESS';
+          return key === 'Recorder' || _.get(this.componentStatus.get(key), 'status') === 'OK';
           })
       );
     }
