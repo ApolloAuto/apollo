@@ -368,11 +368,11 @@ inline double DecoderBase<T_Point>::getLidarTemperature() {
 template <typename T_Point>
 inline void DecoderBase<T_Point>::loadCalibrationFile(
     const std::string& angle_path) {
-  std::cout<<"path! "<<angle_path<<std::endl;
+  std::cout << "path! " << angle_path << std::endl;
   std::string line_str;
   std::ifstream fd_angle(angle_path.c_str(), std::ios::in);
   if (fd_angle.is_open()) {
-      std::cout<<"oepn! "<<std::endl;
+      std::cout << "open! " << std::endl;
 
     unsigned int row_index = 0;
     while (std::getline(fd_angle, line_str)) {

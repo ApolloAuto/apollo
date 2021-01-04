@@ -236,7 +236,7 @@ export default class RealtimeWebSocketEndpoint {
           start,
           end,
           waypoint,
-          cycleNumber
+          cycleNumber,
         };
         if (start_heading) {
             request.start.heading = start_heading;

@@ -163,8 +163,8 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
               MonitorMessageItem::ERROR, "Failed to send a routing request.");
         }
       });
-  
-   websocket_->RegisterMessageHandler(
+
+  websocket_->RegisterMessageHandler(
       "SendDefaultCycleRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto task = std::make_shared<Task>();
@@ -270,7 +270,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         websocket_->SendData(conn, response.dump());
       });
 
-   websocket_->RegisterMessageHandler(
+  websocket_->RegisterMessageHandler(
       "GetDefaultRoutings",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         Json response;
@@ -341,7 +341,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         response["data"] = data_collection_monitor_->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
       });
-   websocket_->RegisterMessageHandler(
+  websocket_->RegisterMessageHandler(
       "SaveDefaultRouting",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         bool succeed = AddDefaultRouting(json);
