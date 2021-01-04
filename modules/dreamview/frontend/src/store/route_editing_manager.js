@@ -22,7 +22,7 @@ export default class RouteEditingManager {
 
     currentDefaultRouting = 'none';
 
-  @action updateDefaultRoutingEndPoint(data) {
+    @action updateDefaultRoutingEndPoint(data) {
       if (data.poi === undefined) {
         return;
       }
@@ -45,7 +45,7 @@ export default class RouteEditingManager {
       }
     }
 
-  @action addDefaultEndPoint(poiName, inNavigationMode) {
+    @action addDefaultEndPoint(poiName, inNavigationMode) {
       if (_.isEmpty(this.defaultRoutingEndPoint)) {
         alert("Failed to get default routing end point, make sure there's "
                 + 'a default end point file under the map data directory.');
@@ -66,7 +66,7 @@ export default class RouteEditingManager {
       }
     }
 
-  @action addDefaultRoutingPoint(defaultRoutingName) {
+    @action addDefaultRoutingPoint(defaultRoutingName) {
       if (_.isEmpty(this.defaultRoutings)) {
         alert("Failed to get default routing, make sure there's "
                 + 'a default routing file under the map data directory.');
@@ -81,7 +81,7 @@ export default class RouteEditingManager {
       RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName], false);
     }
 
-  @action updateDefaultRoutingPoints(data) {
+    @action updateDefaultRoutingPoints(data) {
       if (data.threshold) {
         this.defaultRoutingDistanceThreshold = data.threshold;
       }
