@@ -16,6 +16,12 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
+cyber_modules {
+  key: "Transform"
+  value: {
+    dag_files: "/apollo/modules/transform/dag/static_transform.dag"
+  }
+}
 modules {
   key: "Recorder"
   value: {
@@ -56,6 +62,15 @@ monitored_components {
       command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     }
     # We also have a special GPSMonitor to check message status.
+  }
+}
+monitored_components {
+  key: "Lidar"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+    }
   }
 }
 monitored_components {
