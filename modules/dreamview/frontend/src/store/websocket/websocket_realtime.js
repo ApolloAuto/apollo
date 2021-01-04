@@ -239,7 +239,7 @@ export default class RealtimeWebSocketEndpoint {
       start,
       end,
       waypoint,
-      cycleNumber
+      cycleNumber,
     };
     if (start_heading) {
       request.start.heading = start_heading;
@@ -384,8 +384,8 @@ export default class RealtimeWebSocketEndpoint {
   saveDefaultRouting(routingName,points) {
     const request = {
       type: 'SaveDefaultRouting',
-      name:routingName,
-      point:points,
+      name: routingName,
+      point: points,
     };
     this.websocket.send(JSON.stringify(request));
   }

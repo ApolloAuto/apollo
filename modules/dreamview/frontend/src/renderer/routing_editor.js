@@ -6,7 +6,6 @@ import WS from 'store/websocket';
 import { drawImage } from 'utils/draw';
 
 const minDefaultRoutingPointsNum = 1;
-const maxDistance = 5;
 
 export default class RoutingEditor {
   constructor() {
@@ -48,7 +47,6 @@ export default class RoutingEditor {
     this.routePoints.push(pointMesh);
     scene.add(pointMesh);
     if (offset) {
-      // Default routing has been checked
       WS.checkRoutingPoint(point);
     }
   }
@@ -94,23 +92,25 @@ export default class RoutingEditor {
     }
   }
 
-  sendRoutingRequest(carOffsetPosition, carHeading, coordinates) {
-    if (this.routePoints.length === 0) {
+  sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
+    if (this.routePoints.length === 0 && routingPoints.length === 0) {
       alert('Please provide at least an end point.');
       return false;
     }
-
-    const points = this.routePoints.map((object) => {
-      object.position.z = 0;
-      return coordinates.applyOffset(object.position, true);
-    });
+    const points = _.isEmpty(routingPoints) ?
+      this.routePoints.map((object) => {
+        object.position.z = 0;
+        return coordinates.applyOffset(object.position, true);
+      }) : routingPoints.map((point) => {
+        point.z = 0;
+        return coordinates.applyOffset(point, true);
+      });
     const start = (points.length > 1) ? points[0]
       : coordinates.applyOffset(carOffsetPosition, true);
     const start_heading = (points.length > 1) ? null : carHeading;
     const end = points[points.length - 1];
     const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
     WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
-
     return true;
   }
 
@@ -137,19 +137,6 @@ export default class RoutingEditor {
     const points = this.routePoints.map((object) => {
       return object.position;
     });
-    if (!this.checkDefaultRoutingAvailable(points[0], points[points.length - 1])) {
-      alert(`Please set the default routing reasonably,the distance from the start point to the end 
-point should not exceed ${maxDistance},otherwise it will not be able to form a closed loop.`);
-      return false;
-    }
     WS.saveDefaultRouting(routingName, points);
-  }
-
-  checkDefaultRoutingAvailable(start, end) {
-    if (_.isEmpty(start) || _.isEmpty(end)) {
-      return false;
-    }
-    const distance = Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
-    return distance <= maxDistance;
   }
 }
