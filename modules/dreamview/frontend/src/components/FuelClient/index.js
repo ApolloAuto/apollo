@@ -35,7 +35,6 @@ export default class FuelClient extends React.Component {
         }
         _.set(data, 'camera_config.D', _.slice(camera_internal_conf, 0, 5));
         _.set(data, 'camera_config.K', _.slice(camera_internal_conf, 5, 14));
-        _.set(data, 'camera_config.R', _.slice(camera_internal_conf, 14, 26));
         _.set(data, 'camera_config.translation', _.get(hmi.camera, 'translation'));
       }
       if (!_.isEmpty(hmi.lidars)) {
@@ -98,10 +97,6 @@ export default class FuelClient extends React.Component {
                 </div>
                 <div>
                   K:
-                  {this.renderCameraInternalInput(9)}
-                </div>
-                <div>
-                  R:
                   {this.renderCameraInternalInput(9)}
                 </div>
               </div>
