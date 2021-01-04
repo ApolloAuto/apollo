@@ -12,6 +12,8 @@ export default class RouteEditingManager {
 
     @observable defaultRoutings = {};
 
+    @observable defaultRoutingDistanceThreshold = 10;
+
     @observable currentPOI = 'none';
 
     @observable inDefaultRoutingMode = false;
@@ -20,7 +22,7 @@ export default class RouteEditingManager {
 
     currentDefaultRouting = 'none';
 
-    @action updateDefaultRoutingEndPoint(data) {
+  @action updateDefaultRoutingEndPoint(data) {
       if (data.poi === undefined) {
         return;
       }
@@ -43,7 +45,7 @@ export default class RouteEditingManager {
       }
     }
 
-    @action addDefaultEndPoint(poiName, inNavigationMode) {
+  @action addDefaultEndPoint(poiName, inNavigationMode) {
       if (_.isEmpty(this.defaultRoutingEndPoint)) {
         alert("Failed to get default routing end point, make sure there's "
                 + 'a default end point file under the map data directory.');
@@ -64,7 +66,7 @@ export default class RouteEditingManager {
       }
     }
 
-    @action addDefaultRoutingPoint(defaultRoutingName) {
+  @action addDefaultRoutingPoint(defaultRoutingName) {
       if (_.isEmpty(this.defaultRoutings)) {
         alert("Failed to get default routing, make sure there's "
                 + 'a default routing file under the map data directory.');
@@ -79,7 +81,10 @@ export default class RouteEditingManager {
       RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName], false);
     }
 
-    @action updateDefaultRoutingPoints(data) {
+  @action updateDefaultRoutingPoints(data) {
+      if (data.threshold) {
+        this.defaultRoutingDistanceThreshold = data.threshold;
+      }
       if (data.defaultRoutings === undefined) {
         return;
       }
@@ -122,9 +127,10 @@ export default class RouteEditingManager {
       RENDERER.removeAllRoutingPoints();
     }
 
-    sendRoutingRequest(inNavigationMode) {
+    sendRoutingRequest(inNavigationMode, defaultRoutingName = '') {
       if (!inNavigationMode) {
-        const success = RENDERER.sendRoutingRequest();
+        const success = _.isEmpty(defaultRoutingName) ? RENDERER.sendRoutingRequest()
+          : RENDERER.sendRoutingRequest(this.defaultRoutings[defaultRoutingName]);
         if (success) {
           this.disableRouteEditing();
         }
@@ -133,16 +139,28 @@ export default class RouteEditingManager {
       return MAP_NAVIGATOR.sendRoutingRequest();
     }
 
-    sendCycleRoutingRequest(defaultRoutingName, cycleNumber) {
-      const points = this.defaultRoutings[defaultRoutingName];
+    sendCycleRoutingRequest(cycleNumber) {
+      const points = this.defaultRoutings[this.currentDefaultRouting];
       if (!isNaN(cycleNumber) || !points) {
         const success = RENDERER.sendCycleRoutingRequest
-        (defaultRoutingName, points, cycleNumber);
+        (this.currentDefaultRouting, points, cycleNumber);
         if (success) {
           this.disableRouteEditing();
         }
         return success;
       }
       return false;
+    }
+
+    checkCycleRoutingAvailable() {
+      const points = this.defaultRoutings[this.currentDefaultRouting];
+      const start = points[0];
+      const end = points[points.length - 1];
+      if (_.isEmpty(start) || _.isEmpty(end)) {
+        return false;
+      }
+      const distance =
+          Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
+      return distance <= this.defaultRoutingDistanceThreshold;
     }
 }

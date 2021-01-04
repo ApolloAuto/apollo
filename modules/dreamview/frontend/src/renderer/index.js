@@ -351,10 +351,10 @@ class Renderer {
     this.routingEditor.removeLastRoutingPoint(this.scene);
   }
 
-  sendRoutingRequest() {
+  sendRoutingRequest(points = []) {
     return this.routingEditor.sendRoutingRequest(this.adc.mesh.position,
       this.adc.mesh.rotation.y,
-      this.coordinates);
+      this.coordinates, points);
   }
 
   sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {

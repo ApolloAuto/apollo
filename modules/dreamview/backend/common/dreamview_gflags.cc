@@ -92,3 +92,6 @@ DEFINE_int32(monitor_msg_pending_queue_size, 10,
 DEFINE_string(default_data_collection_config_path,
               "/apollo/modules/dreamview/conf/data_collection_table.pb.txt",
               "Data collection table config path.");
+
+DEFINE_int32(loop_routing_end_to_start_distance_threshold, 10,
+             "Loop routing distance threshold: start to end");

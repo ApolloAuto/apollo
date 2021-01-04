@@ -276,6 +276,8 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         Json response;
         response["type"] = "DefaultRoutings";
+        response["threshold"] =
+            FLAGS_loop_routing_end_to_start_distance_threshold;
 
         Json default_routing_list = Json::array();
         if (LoadDefaultRoutings()) {
