@@ -27,6 +27,15 @@ modules {
   }
 }
 monitored_components {
+  key: "Canbus"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+  }
+}
+monitored_components {
   key: "Recorder"
   value: {
     process {
@@ -59,9 +68,11 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Localization"
+  key: "Localization Pose"
   value: {
-    # Special LocalizationMonitor.
+    channel {
+      name: "/apollo/localization/pose"
+    }
   }
 }
 other_components {
