@@ -68,8 +68,6 @@ class ConfigYaml(object):
             intrinsic_data['D'][iter] = data
         for iter, data in enumerate(camera_config.K):
             intrinsic_data['K'][iter] = data
-        for iter, data in enumerate(camera_config.R):
-            intrinsic_data['R'][iter] = data
         # dump the intrinsic yaml data
         out_intrinsic_yaml = os.path.join(out_param_folder,
                                           in_data['source_sensor'] + '_intrinsics.yaml')

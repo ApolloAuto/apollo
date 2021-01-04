@@ -23,7 +23,6 @@ message CameraConfig {
   optional Translation translation = 1;
   repeated float D = 2;
   repeated float K = 3;
-  repeated float R = 4;
 }
 
 message Progress {
