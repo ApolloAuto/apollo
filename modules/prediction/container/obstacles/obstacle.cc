@@ -130,6 +130,9 @@ bool Obstacle::IsNearJunction() {
   if (feature_history_.empty()) {
     return false;
   }
+  if (latest_feature().has_is_near_junction()) {
+    return latest_feature().is_near_junction();
+  }
   double pos_x = latest_feature().position().x();
   double pos_y = latest_feature().position().y();
   return PredictionMap::NearJunction({pos_x, pos_y},
