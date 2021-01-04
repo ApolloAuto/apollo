@@ -57,7 +57,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                 belong={sensorName}
                 index="x"
                 value={_.get(translation,'x')}
-                isLidar
+                isLidar={isLidar}
               ></TranslationInput>
             </div>
             <div className="sensor-configuration-xyz">
@@ -66,7 +66,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                 value={_.get(translation,'y')}
                 belong={sensorName}
                 index="y"
-                isLidar
+                isLidar={isLidar}
               ></TranslationInput>
             </div>
             <div className="sensor-configuration-xyz">
@@ -75,7 +75,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
                 value={_.get(translation,'z')}
                 index="z"
                 belong={sensorName}
-                isLidar
+                isLidar={isLidar}
               ></TranslationInput>
             </div>
           </div>
