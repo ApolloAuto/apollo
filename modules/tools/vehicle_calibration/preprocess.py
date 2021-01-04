@@ -94,7 +94,8 @@ class Preprocessor(object):
         """Get records required for calibration"""
         res = []
         for dir in os.listdir(FLAGS.record_root_path):
-            match = re.match(r'(^\d{4}-\d{2}-\d{2})-(\d{2}-\d{2}-\d{2}$)', dir)
+            match = re.match(r'(^\d{4}-\d{2}-\d{2})-(\d{2}-\d{2}-\d{2}_s$)',
+                             dir)
             if match is not None:
                 record_info = {}
                 record_info['rel_path'] = match.group()
