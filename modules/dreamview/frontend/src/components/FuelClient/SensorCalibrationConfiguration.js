@@ -15,14 +15,16 @@ class TranslationInput extends React.Component {
   }
 
   handleTranslationChange(event) {
+    this.setState({ translationValue: event.target.value });
     const val = parseFloat(event.target.value);
-    this.setState({ translationValue: val });
-    this.props.store.hmi.changeTranslation(
-      this.props.belong,
-      this.props.index,
-      val,
-      this.props.isLidar,
-    );
+    if (!isNaN(val)) {
+      this.props.store.hmi.changeTranslation(
+        this.props.belong,
+        this.props.index,
+        val,
+        this.props.isLidar,
+      );
+    }
   }
 
   render() {
