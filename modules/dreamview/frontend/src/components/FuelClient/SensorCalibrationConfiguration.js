@@ -44,7 +44,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
       <tr className="sensor-configuration-tr" key={sensorName}>
         <td
           className={
-            sensorName === isLidar && this.props.mainSensor ? 'main-sensor' : null
+            isLidar && sensorName === this.props.mainSensor ? 'main-sensor' : null
           }
         >
           {sensorName}
