@@ -111,6 +111,7 @@ bool PbfGatekeeper::RadarAbleToPublish(const TrackPtr &track, bool is_night) {
   if (params_.publish_if_has_radar && visible_in_radar &&
       radar_object != nullptr) {
     if (radar_object->GetSensorId() == "radar_front") {
+      // TODO(henjiahao): enable radar front
       return false;
       // if (radar_object->GetBaseObject()->radar_supplement.range >
       //         params_.min_radar_confident_distance &&

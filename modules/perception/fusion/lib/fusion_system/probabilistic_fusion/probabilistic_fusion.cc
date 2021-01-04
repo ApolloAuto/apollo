@@ -43,7 +43,7 @@ ProbabilisticFusion::ProbabilisticFusion() {}
 ProbabilisticFusion::~ProbabilisticFusion() {}
 
 bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
-  main_sensor_ = init_options.main_sensor;
+  main_sensors_ = init_options.main_sensors;
 
   BaseInitOptions options;
   if (!GetFusionInitOptions("ProbabilisticFusion", &options)) {
@@ -166,16 +166,13 @@ std::string ProbabilisticFusion::Name() const { return "ProbabilisticFusion"; }
 bool ProbabilisticFusion::IsPublishSensor(
     const base::FrameConstPtr& sensor_frame) const {
   std::string sensor_id = sensor_frame->sensor_info.name;
-  return sensor_id == main_sensor_;
-  // const std::vector<std::string>& pub_sensors =
-  //   params_.publish_sensor_ids;
-  // const auto& itr = std::find(
-  //   pub_sensors.begin(), pub_sensors.end(), sensor_id);
-  // if (itr != pub_sensors.end()) {
-  //   return true;
-  // } else {
-  //   return false;
-  // }
+  const auto& itr = std::find(
+      main_sensors_.begin(), main_sensors_.end(), sensor_id);
+  if (itr != main_sensors_.end()) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
@@ -352,7 +349,7 @@ void ProbabilisticFusion::RemoveLostTrack() {
     }
   }
   AINFO << "Remove " << foreground_tracks.size() - foreground_track_count
-        << " foreground tracks";
+        << " foreground tracks. " << foreground_track_count << " tracks left.";
   foreground_tracks.resize(foreground_track_count);
   trackers_.resize(foreground_track_count);
 
