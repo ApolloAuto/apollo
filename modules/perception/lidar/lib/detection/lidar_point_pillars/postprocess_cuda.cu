@@ -134,7 +134,7 @@ __global__ void filter_kernel(
 
       xmin = fminf(xmin, offset_corners[i * 2 + 0]);
       ymin = fminf(ymin, offset_corners[i * 2 + 1]);
-      xmax = fmaxf(xmin, offset_corners[i * 2 + 0]);
+      xmax = fmaxf(xmax, offset_corners[i * 2 + 0]);
       ymax = fmaxf(ymax, offset_corners[i * 2 + 1]);
     }
     // box_for_nms(num_box, 4)
