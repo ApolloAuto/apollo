@@ -25,7 +25,6 @@
 #include "cyber/common/macros.h"
 #include "modules/common/util/future.h"
 #include "modules/dreamview/backend/fuel_monitor/fuel_monitor.h"
-#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_gflags.h"
 
 /**
  * @namespace apollo::dreamview
