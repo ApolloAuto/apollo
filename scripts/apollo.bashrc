@@ -31,6 +31,9 @@ export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
 export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
 export TAB="    " # 4 spaces
+
+source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
+
 : ${VERBOSE:=yes}
 
 BOLD='\033[1m'
@@ -209,17 +212,6 @@ function find_prettier_srcs() {
     -or -name "*.yml"
 }
 
-## Prevent multiple entries of my_bin_path in PATH
-function add_to_path() {
-  if [ -z "$1" ]; then
-    return
-  fi
-  local my_bin_path="$1"
-  if [ -n "${PATH##*${my_bin_path}}" ] && [ -n "${PATH##*${my_bin_path}:*}" ]; then
-    export PATH=$PATH:${my_bin_path}
-  fi
-}
-
 ## Prevent multiple entries of my_libdir in LD_LIBRARY_PATH
 function add_to_ld_library_path() {
   if [ -z "$1" ]; then
@@ -290,7 +282,7 @@ function optarg_check_for_opt() {
 
 function setup_gpu_support() {
   if [ -e /usr/local/cuda/ ]; then
-    add_to_path "/usr/local/cuda/bin"
+    pathprepend /usr/local/cuda/bin
   fi
 
   determine_gpu_use_target
