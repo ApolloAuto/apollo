@@ -51,16 +51,26 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Localization"
+  key: "MSF Gnss"
   value: {
-    # Special LocalizationMonitor.
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    channel {
+      name: "/apollo/localization/msf_gnss"
+    }
   }
 }
 monitored_components {
   key: "Lidar 16"
   value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+    }
     channel {
-      name: "/apollo/sensor/lidar16/compensator/PointCloud2"
+      name: "/apollo/sensor/lidar16/PointCloud2"
     }
   }
 }

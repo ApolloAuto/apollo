@@ -74,9 +74,15 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Localization"
+  key: "MSF Gnss"
   value: {
-    # Special LocalizationMonitor.
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    channel {
+      name: "/apollo/localization/msf_gnss"
+    }
   }
 }
 other_components {
