@@ -85,7 +85,6 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":fuel_monitor",
-        ":fuel_monitor_gflags",
         "//cyber/common:log",
         "//cyber/common:macros",
         "//modules/common/util:future",
