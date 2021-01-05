@@ -251,9 +251,9 @@ export default class HMI {
     @computed get canStartDataCollectionPreprocess() {
       return (
         this.isVehicleCalibrationMode &&
-        _.every(
+        _.some(
           this.dataCollectionProgress.get('Go Straight').values(),
-          (x) => x === 100,
+          (x) => x > 0,
         )
       );
     }
@@ -264,6 +264,10 @@ export default class HMI {
         this.otherComponentStatus &&
         _.get(this.otherComponentStatus.get('Preprocess'), 'status') === 'OK'
       );
+    }
+
+    @computed get startUpdateDataCollectionProgress() {
+        return this.isVehicleCalibrationMode && this.moduleStatus.get('Recorder');
     }
 
     @action resetDataCollectionProgress() {
