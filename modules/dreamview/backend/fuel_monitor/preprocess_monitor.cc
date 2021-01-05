@@ -26,6 +26,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 namespace apollo {
@@ -36,12 +37,6 @@ using cyber::common::PathExists;
 using google::protobuf::util::MessageToJsonString;
 
 using Json = nlohmann::json;
-
-DEFINE_string(preprocess_monitor_name, "PreprocessMonitor",
-              "Name of the preprocess monitor");
-
-DEFINE_string(progress_topic, "/apollo/dreamview/progress",
-              "Sensor calibration preprocess progress topic name.");
 
 PreprocessMonitor::PreprocessMonitor()
     : FuelMonitor(FLAGS_preprocess_monitor_name),

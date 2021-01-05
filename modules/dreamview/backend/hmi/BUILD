@@ -81,6 +81,7 @@ cc_library(
         "//modules/control/proto:pad_msg_cc_proto",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/fuel_monitor:data_collection_monitor",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_gflags",
         "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
         "//modules/dreamview/backend/fuel_monitor:preprocess_monitor",
         "//modules/dreamview/proto:hmi_config_cc_proto",
