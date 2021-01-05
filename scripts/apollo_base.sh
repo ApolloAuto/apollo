@@ -24,15 +24,9 @@ HOST_ARCH="$(uname -m)"
 function set_lib_path() {
   local CYBER_SETUP="${APOLLO_ROOT_DIR}/cyber/setup.bash"
   [ -e "${CYBER_SETUP}" ] && . "${CYBER_SETUP}"
-
-  # TODO(storypku):
-  # /usr/local/apollo/local_integ/lib
-
-  # FIXME(all): remove PYTHONPATH settings
-  export PYTHONPATH="${APOLLO_ROOT_DIR}/modules/tools:${PYTHONPATH}"
-  # Set teleop paths
-  export PYTHONPATH="${APOLLO_ROOT_DIR}/modules/teleop/common:${PYTHONPATH}"
-  add_to_path "/apollo/modules/teleop/common/scripts"
+  pathprepend ${APOLLO_ROOT_DIR}/modules/tools PYTHONPATH
+  pathprepend ${APOLLO_ROOT_DIR}/modules/teleop/common PYTHONPATH
+  pathprepend /apollo/modules/teleop/common/scripts
 }
 
 function create_data_dir() {
