@@ -172,6 +172,7 @@ export default class HMI {
     if (newStatus.monitoredComponents) {
       const newKeyList = JSON.stringify(
         Object.keys(newStatus.monitoredComponents).sort(),
+
       );
       const curKeyList = JSON.stringify(this.componentStatus.keys().sort());
       if (newKeyList !== curKeyList) {
@@ -284,9 +285,9 @@ export default class HMI {
   @computed get canStartDataCollectionPreprocess() {
     return (
       this.isVehicleCalibrationMode &&
-      _.every(
+      _.some(
         this.dataCollectionProgress.get('Go Straight').values(),
-        (x) => x === 100,
+        (x) => x > 0,
       )
     );
   }
@@ -297,6 +298,10 @@ export default class HMI {
       this.otherComponentStatus &&
       _.get(this.otherComponentStatus.get('Preprocess'), 'status') === 'OK'
     );
+  }
+
+  @computed get startUpdateDataCollectionProgress() {
+    return this.isVehicleCalibrationMode && this.moduleStatus.get('Recorder');
   }
 
   @action resetDataCollectionProgress() {
