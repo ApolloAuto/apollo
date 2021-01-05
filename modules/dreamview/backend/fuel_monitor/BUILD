@@ -19,6 +19,7 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":fuel_monitor",
+        ":fuel_monitor_gflags",
         "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
@@ -54,6 +55,7 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":fuel_monitor",
+        ":fuel_monitor_gflags",
         "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
@@ -68,12 +70,22 @@ cc_library(
 )
 
 cc_library(
+    name = "fuel_monitor_gflags",
+    srcs = ["fuel_monitor_gflags.cc"],
+    hdrs = ["fuel_monitor_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
+)
+
+cc_library(
     name = "fuel_monitor_manager",
     srcs = ["fuel_monitor_manager.cc"],
     hdrs = ["fuel_monitor_manager.h"],
     copts = DREAMVIEW_COPTS,
     deps = [
         ":fuel_monitor",
+        ":fuel_monitor_gflags",
         "//cyber/common:log",
         "//cyber/common:macros",
         "//modules/common/util:future",

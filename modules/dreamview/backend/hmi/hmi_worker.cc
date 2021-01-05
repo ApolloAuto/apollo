@@ -28,6 +28,7 @@
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/fuel_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_gflags.h"
 #include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/dreamview/backend/fuel_monitor/preprocess_monitor.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
@@ -510,7 +511,11 @@ void HMIWorker::ChangeVehicle(const std::string& vehicle_name) {
   if (monitors != nullptr) {
     for (const auto& monitor : *monitors) {
       if (monitor.second->IsEnabled()) {
-        monitor.second->Restart();
+        if (monitor.first == FLAGS_data_collection_monitor_name) {
+          monitor.second->Stop();
+        } else {
+          monitor.second->Restart();
+        }
       }
     }
   }
@@ -568,6 +573,14 @@ void HMIWorker::StartModule(const std::string& module) const {
 
   if (module == "Recorder") {
     ++record_count_;
+    auto* monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
+    auto iter = monitors->find(FLAGS_data_collection_monitor_name);
+    if (iter != monitors->end()) {
+      auto* data_collection_monitor = iter->second.get();
+      if (!data_collection_monitor->IsEnabled()) {
+        data_collection_monitor->Start();
+      }
+    }
   }
 }
 

@@ -51,7 +51,9 @@ void FuelMonitorManager::SetCurrentMode(const std::string& mode) {
       current_monitors_ = new_monitors;
     }
     for (const auto& monitor : *current_monitors_) {
-      monitor.second->Start();
+      if (monitor.first != FLAGS_data_collection_monitor_name) {
+        monitor.second->Start();
+      }
     }
   } else if (current_monitors_ != nullptr) {
     for (const auto& monitor : *current_monitors_) {

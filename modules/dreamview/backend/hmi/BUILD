@@ -78,6 +78,7 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/fuel_monitor:data_collection_monitor",
         "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_gflags",
         "//modules/dreamview/backend/fuel_monitor:preprocess_monitor",
         "//modules/dreamview/proto:hmi_config_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
