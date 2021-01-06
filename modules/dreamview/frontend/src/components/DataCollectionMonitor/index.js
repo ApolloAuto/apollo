@@ -28,12 +28,6 @@ export default class DataCollectionMonitor extends React.Component {
 
   render() {
     const hmi = this.props.store.hmi;
-
-    // if (!hmi.dataCollectionProgress || hmi.dataCollectionUpdateStatus.size === 0) {
-    //   return <div className="no-data">No Data Found</div>;
-    // }
-
-    console.log(hmi.dataCollectionProgress);
     const tabs = [];
     const tabPanels = [];
     hmi.dataCollectionProgress.entries().forEach(([scenarioName, categories]) => {
