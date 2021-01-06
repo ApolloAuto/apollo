@@ -33,6 +33,9 @@ monitored_components {
       command_keywords: "mainboard"
       command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
     }
+    channel {
+      name: "/apollo/canbus/chassis_detail"
+    }
   }
 }
 monitored_components {
