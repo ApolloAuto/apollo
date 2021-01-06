@@ -82,8 +82,6 @@ void recover_smoke_bbox(int roi_w, int roi_h, int offset_y,
 void fill_smoke_base(base::ObjectPtr obj, const float *bbox,
                      int width, int height) {
   obj->camera_supplement.box.xmin = bbox[0]/width;
-  AINFO << "object camera_supplement box xmin: " << bbox[0];
-  AINFO << "object camera_supplement box ymin: " << bbox[1];
   obj->camera_supplement.box.ymin = bbox[1]/height;
   obj->camera_supplement.box.xmax = bbox[2]/width;
   obj->camera_supplement.box.ymax = bbox[3]/height;
@@ -96,6 +94,10 @@ void fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
     obj->size[2] = bbox[6];
     obj->size[1] = bbox[7];
     obj->size[0] = bbox[8];
+
+    obj->camera_supplement.local_center[0] = bbox[9];
+    obj->camera_supplement.local_center[1] = bbox[10];
+    obj->camera_supplement.local_center[2] = bbox[11];
   }
 }
 
