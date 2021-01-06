@@ -18,8 +18,8 @@
 
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. ./installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 # TODO(build): Docs on how to build libtorch on Jetson boards
 # References:
@@ -27,36 +27,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #   https://github.com/dusty-nv/jetson-containers/blob/master/Dockerfile.pytorch
 #   https://forums.developer.nvidia.com/t/pytorch-for-jetson-version-1-6-0-now-available
 #   https://github.com/pytorch/pytorch/blob/master/docker/caffe2/ubuntu-16.04-cpu-all-options/Dockerfile
+bash ${CURR_DIR}/install_mkl.sh
 
 TARGET_ARCH="$(uname -m)"
-
-if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-    # Libtorch-gpu dependency for x86_64
-    pip3_install mkl==2021.1.1
-
-    # Workaround for duplicate entries in mkl installation
-    MKL_LIBDIR="/usr/local/lib"
-    for so in ${MKL_LIBDIR}/libmkl*.so; do
-        so1="${so}.1"
-        if [[ "$(basename ${so})" == "libmkl_sycl.so" ]]; then
-            if [[ -f "${so1}" ]]; then
-                rm -f ${so1}
-            fi
-            rm -f ${so}
-            continue
-        fi
-        if [[ -f "${so}.1" ]]; then
-            cs1=$(sha256sum ${so1} | awk '{print $1}')
-            cs0=$(sha256sum ${so} | awk '{print $1}')
-            if [[ "${cs1}" == "${cs0}" ]]; then
-                so1_name="$(basename $so1)"
-                warning "Duplicate so ${so} with ${so1_name} found, re-symlinking..."
-                info "Now perform: rm -f ${so} && ln -s ${so1_name} ${so}"
-                rm -f ${so} && ln -s ${so1_name} ${so}
-            fi
-        fi
-    done
-fi
 
 ##============================================================##
 # libtorch_cpu
@@ -64,8 +37,8 @@ fi
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     if [[ "${APOLLO_DIST}" == "stable" ]]; then
         # https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip
-        VERSION="1.6.0"
-        CHECKSUM="2bc75f4b38e7c23f99a2e0367b64c8626cac1442e87b7ab9878859bbf10973fe"
+        VERSION="1.6.0-1"
+        CHECKSUM="4931fe651f2098ee3f0c4147099bd5dddcc15c0e9108e49a5ffdf46d98a7092a"
     else # testing
         VERSION="1.7.0"
         CHECKSUM="1baccc141347ce33cd998513f5cfdb0b5c359d66cd2b59b055c9eadc9e954d19"
@@ -92,9 +65,9 @@ ok "Successfully installed libtorch_cpu ${VERSION}"
 # libtorch_gpu
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     if [[ "${APOLLO_DIST}" == "stable" ]]; then
-        VERSION="1.6.0"
-        CHECKSUM="ab540c8d6c088ca5eda0e861bb39e985b046f363c3a1fbd65176090c202f8af3"
-        PKG_NAME="libtorch_gpu-1.6.0-cu102-linux-x86_64.tar.gz"
+        VERSION="1.6.0-1"
+        CHECKSUM="8ca52235cb91aba6d39fb144ec5414bebf0e94a2ee03115ae83650fc4d421719"
+        PKG_NAME="libtorch_gpu-${VERSION}-cu102-linux-x86_64.tar.gz"
     else
         VERSION="1.7.0"
         CHECKSUM="d2356b641d78e33d5decebf8c32f726b831045d5a0aff276545b40a259225885"
