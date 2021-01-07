@@ -67,7 +67,8 @@ GetReaderAndLatestMessage(const std::string& channel) {
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
-  } else if (channel == FLAGS_localization_topic) {
+  } else if (channel == FLAGS_localization_topic ||
+             channel == FLAGS_localization_gnss_topic) {
     const auto reader =
         manager->CreateReader<localization::LocalizationEstimate>(channel);
     reader->Observe();
@@ -114,6 +115,7 @@ GetReaderAndLatestMessage(const std::string& channel) {
                                                                  message);
   } else if (channel == FLAGS_pointcloud_topic ||
              channel == FLAGS_pointcloud_16_topic ||
+             channel == FLAGS_pointcloud_16_raw_topic ||
              channel == FLAGS_pointcloud_128_topic ||
              channel == FLAGS_pointcloud_16_front_up_topic) {
     const auto reader = manager->CreateReader<drivers::PointCloud>(channel);
