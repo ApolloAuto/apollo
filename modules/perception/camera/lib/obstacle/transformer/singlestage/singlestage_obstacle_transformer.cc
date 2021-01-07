@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/camera/lib/obstacle/transformer/signlestage/signlestage_obstacle_transformer.h"
+#include "modules/perception/camera/lib/obstacle/transformer/singlestage/singlestage_obstacle_transformer.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -23,19 +23,19 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool SignleStageObstacleTransformer::Init(
+bool SingleStageObstacleTransformer::Init(
     const ObstacleTransformerInitOptions &options) {
   std::string transformer_config =
       cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
 
   if (!cyber::common::GetProtoFromFile(transformer_config,
-                                      &signlestage_param_)) {
+                                      &singlestage_param_)) {
     AERROR << "Read config failed: " << transformer_config;
     return false;
   }
   AINFO << "Load transformer parameters from " << transformer_config
-        << " \nmin dimension: " << signlestage_param_.min_dimension_val()
-        << " \ndo template search: " << signlestage_param_.check_dimension();
+        << " \nmin dimension: " << singlestage_param_.min_dimension_val()
+        << " \ndo template search: " << singlestage_param_.check_dimension();
 
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();
@@ -43,7 +43,7 @@ bool SignleStageObstacleTransformer::Init(
   return true;
 }
 
-int SignleStageObstacleTransformer::MatchTemplates(
+int SingleStageObstacleTransformer::MatchTemplates(
     base::ObjectSubType sub_type, float *dimension_hwl) {
   const TemplateMap &kMinTemplateHWL =
       object_template_manager_->MinTemplateHWL();
@@ -105,8 +105,8 @@ int SignleStageObstacleTransformer::MatchTemplates(
           kLookUpTableMinVolumeIndex.at(TemplateIndex::BUS_MIN_VOLUME_INDEX);
       break;
     default:
-      if (min_dimension_val < signlestage_param_.min_dimension_val()) {
-        common::IScale3(dimension_hwl, signlestage_param_.min_dimension_val() *
+      if (min_dimension_val < singlestage_param_.min_dimension_val()) {
+        common::IScale3(dimension_hwl, singlestage_param_.min_dimension_val() *
                                            common::IRec(min_dimension_val));
       }
       break;
@@ -114,7 +114,7 @@ int SignleStageObstacleTransformer::MatchTemplates(
   return type_min_vol_index;
 }
 
-void SignleStageObstacleTransformer::FillResults(
+void SingleStageObstacleTransformer::FillResults(
     float object_center[3], float dimension_hwl[3], float rotation_y,
     Eigen::Affine3d camera2world_pose, float theta_ray, base::ObjectPtr obj) {
   if (obj == nullptr) {
@@ -159,7 +159,7 @@ void SignleStageObstacleTransformer::FillResults(
   ADEBUG << "Obj center from transformer: " << obj->center.transpose();
 }
 
-bool SignleStageObstacleTransformer::Transform(
+bool SingleStageObstacleTransformer::Transform(
     const ObstacleTransformerOptions &options, CameraFrame *frame) {
   if (frame->detected_objects.empty()) {
     ADEBUG << "No object input to transformer.";
@@ -214,12 +214,12 @@ bool SignleStageObstacleTransformer::Transform(
   return nr_transformed_obj > 0;
 }
 
-std::string SignleStageObstacleTransformer::Name() const {
-  return "SignleStageObstacleTransformer";
+std::string SingleStageObstacleTransformer::Name() const {
+  return "SingleStageObstacleTransformer";
 }
 
 // Register plugin.
-REGISTER_OBSTACLE_TRANSFORMER(SignleStageObstacleTransformer);
+REGISTER_OBSTACLE_TRANSFORMER(SingleStageObstacleTransformer);
 
 }  // namespace camera
 }  // namespace perception

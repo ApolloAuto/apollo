@@ -39,7 +39,7 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
-        "//modules/perception/camera/lib/obstacle/transformer/signlestage:signlestage_obstacle_transformer",
+        "//modules/perception/camera/lib/obstacle/transformer/singlestage:singlestage_obstacle_transformer",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@com_github_gflags_gflags//:gflags",

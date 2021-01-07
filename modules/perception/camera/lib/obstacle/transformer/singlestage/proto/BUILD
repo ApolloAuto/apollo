@@ -6,20 +6,20 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "signlestage_cc_proto",
+    name = "singlestage_cc_proto",
     deps = [
-        ":signlestage_proto",
+        ":singlestage_proto",
     ],
 )
 
 proto_library(
-    name = "signlestage_proto",
-    srcs = ["signlestage.proto"],
+    name = "singlestage_proto",
+    srcs = ["singlestage.proto"],
 )
 
 py_proto_library(
-    name = "signlestage_py_pb2",
+    name = "singlestage_py_pb2",
     deps = [
-        ":signlestage_proto",
+        ":singlestage_proto",
     ],
 )

@@ -23,18 +23,18 @@
 
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
 #include "modules/perception/camera/common/object_template_manager.h"
-#include "modules/perception/camera/lib/obstacle/transformer/signlestage/proto/signlestage.pb.h"
+#include "modules/perception/camera/lib/obstacle/transformer/singlestage/proto/singlestage.pb.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class SignleStageObstacleTransformer : public BaseObstacleTransformer {
+class SingleStageObstacleTransformer : public BaseObstacleTransformer {
  public:
-  SignleStageObstacleTransformer() : BaseObstacleTransformer() {}
+  SingleStageObstacleTransformer() : BaseObstacleTransformer() {}
 
-  virtual ~SignleStageObstacleTransformer() {}
+  virtual ~SingleStageObstacleTransformer() {}
   bool Init(const ObstacleTransformerInitOptions &options =
                 ObstacleTransformerInitOptions()) override;
 
@@ -53,7 +53,7 @@ class SignleStageObstacleTransformer : public BaseObstacleTransformer {
                    float theta_ray, base::ObjectPtr obj);
 
  private:
-  signlestage::SignlestageParam signlestage_param_;
+  singlestage::SinglestageParam singlestage_param_;
   int image_width_ = 0;
   int image_height_ = 0;
 

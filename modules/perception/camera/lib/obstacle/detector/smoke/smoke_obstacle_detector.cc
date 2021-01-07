@@ -231,7 +231,7 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
     size_t i3 = i * 3;
     for (size_t j = 0; j < 3; j++) {
       if (frame->data_provider->sensor_name() == "front_12mm") {
-        K_data[i3 + j] = camera_k_matrix(i, j)*2.f;
+        K_data[i3 + j] = camera_k_matrix(i, j) * 2.f;
       } else {
         K_data[i3 + j] = camera_k_matrix(i, j);
       }
