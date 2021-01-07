@@ -30,6 +30,7 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/latency_recorder/proto/latency_record.pb.h"
 #include "modules/common/util/map_util.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -116,6 +117,13 @@ GetReaderAndLatestMessage(const std::string& channel) {
              channel == FLAGS_pointcloud_128_topic ||
              channel == FLAGS_pointcloud_16_front_up_topic) {
     const auto reader = manager->CreateReader<drivers::PointCloud>(channel);
+    reader->Observe();
+    const auto message = reader->GetLatestObserved();
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
+  } else if (channel == FLAGS_chassis_detail_topic) {
+    const auto reader = manager->CreateReader<canbus::ChassisDetail>(channel);
     reader->Observe();
     const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,

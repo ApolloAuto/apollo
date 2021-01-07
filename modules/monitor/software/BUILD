@@ -42,6 +42,7 @@ cc_library(
     deps = [
         ":latency_monitor",
         ":summary_monitor",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/latency_recorder/proto:latency_record_proto",
         "//modules/control/proto:control_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
