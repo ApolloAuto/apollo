@@ -142,7 +142,7 @@ function determine_images_for_x86_64() {
             IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-20210106_1538"
             IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-${TIMESTAMP}"
         else
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-20201208_2246"
+            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-20210108_1510"
             IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-testing-${TIMESTAMP}"
         fi
     else
