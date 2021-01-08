@@ -230,15 +230,21 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   for (size_t i = 0; i < 3; i++) {
     size_t i3 = i * 3;
     for (size_t j = 0; j < 3; j++) {
-      K_data[i3 + j] = camera_k_matrix(i, j);
+      if (frame->data_provider->sensor_name() == "front_12mm") {
+        K_data[i3 + j] = camera_k_matrix(i, j) * 2.f;
+      } else {
+        K_data[i3 + j] = camera_k_matrix(i, j);
+      }
     }
   }
   AINFO << "Camera k matrix input to obstacle postprocessor: \n"
         << K_data[0] << ", " << K_data[1] << ", " << K_data[2] << "\n"
         << K_data[3] << ", " << K_data[4] << ", " << K_data[5] << "\n"
         << K_data[6] << ", " << K_data[7] << ", " << K_data[8] << "\n";
-  ratio_data[0] = static_cast<float>(8);
-  ratio_data[1] = static_cast<float>(6.75);
+  ratio_data[0] = 4.f * static_cast<float>(frame->data_provider->src_width())
+                  / static_cast<float>(width_);
+  ratio_data[1] = 4.f * static_cast<float>(frame->data_provider->src_height())
+                  / static_cast<float>(height_);
 
   AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   DataProvider::ImageOptions image_options;
@@ -253,6 +259,7 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
                        0);
   AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
+  AINFO << "Camera type: " << frame->data_provider->sensor_name();
   /////////////////////////// detection part ///////////////////////////
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
