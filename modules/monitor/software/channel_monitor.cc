@@ -211,6 +211,14 @@ void ChannelMonitor::UpdateStatus(
     return;
   }
 
+  if (message == nullptr || message->ByteSize() == 0) {
+    SummaryMonitor::EscalateStatus(
+        ComponentStatus::FATAL,
+        absl::StrCat("the message ", config.name(), " reseived is empty."),
+        status);
+    return;
+  }
+
   // Check channel delay
   const double delay = reader->GetDelaySec();
   if (delay < 0 || delay > config.delay_fatal()) {
