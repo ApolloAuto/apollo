@@ -56,12 +56,12 @@ if [[ "${INSTALL_MODE}" == "download" ]]; then
             CHECKSUM="962447d0f4dfbfade34d4b1dd8658a97b6fdeb88340637581566f24861a60812"
             PKG_NAME="magma-${VERSION}-cu102-x86_64.tar.gz"
         else
-            CHECKSUM="TODO"
+            CHECKSUM="546f7739109ba6cf93696882d8b18c0e35e68e0c8531ce9f9ca8fa345a1f227c"
             PKG_NAME="magma-${VERSION}-cu111-x86_64.tar.gz"
         fi
     else # AArch64
-        CHECKSUM="TODO"
-        PKG_NAME="magma-${VERSION}-aarch64.tar.gz"
+        CHECKSUM="95b9cc9a42e05af3572fe22210230bdbeec023c9481eaeae1f9de051d1171893"
+        PKG_NAME="magma-${VERSION}-cu102-aarch64.tar.gz"
     fi
     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
@@ -97,6 +97,7 @@ else
     rm -rf magma-${VERSION} ${PKG_NAME}
 fi
 
+info "Successfully built Magma for CUDA SMs=${GPU_ARCHS}"
 ldconfig
 
 if [[ -n "${CLEAN_DEPS}" ]]; then
