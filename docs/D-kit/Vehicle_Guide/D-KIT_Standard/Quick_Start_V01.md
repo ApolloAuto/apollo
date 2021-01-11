@@ -556,7 +556,7 @@ b. devkit
 
 - 整车线束实物图片：
 
-  
+  ![vehicles_ee_4](images/vehicles_ee_4.png)
 
 ## 2.传感器电源接口介绍
 ### 1.工控机电源接口
@@ -565,19 +565,35 @@ b. devkit
 
 <img src="images/nuvo_3.png" alt="nuvo_3" style="zoom: 50%;" />
 
-<img src="images/nuvo_4.png" alt="nuvo_4" style="zoom: 40%;" />
+<img src="images/nuvo_4.png" alt="nuvo_4" style="zoom: 38%;" />
+
+<img src="images/nuvo_5.png" alt="nuvo_5" style="zoom:85%;" />
 
 ### 2.星网宇达M2电源接口
 
-M2自带数据/电源线缆为1分8线缆，一端为与M2主机相连的航插接头，另一端为M2供电接口、CAN接口、激光雷达授时输出接口（PPS）、网口、USB输出接口、GPS_COM3接口（与激光雷达连接）、COM0（M2配置接口）、RS422（预留），如下图所示：
+- M2自带数据/电源线缆为1分8线缆，一端为与M2主机相连的航插接头，另一端为M2供电接口、CAN接口、激光雷达授时输出接口（PPS）、网口、USB输出接口、GPS_COM3接口（与激光雷达连接）、COM0（M2配置接口）、RS422（预留），如下图所示：
 
+  <img src="images/m2_6.png" alt="m2_6" style="zoom: 67%;" />
 
+<img src="images/m2_3.png" alt="m2_3" style="zoom:60%;" />
+
+![m2_4](images/m2_4.png)
+
+- 星网宇达整车线束端对接示意图如下：
+
+<img src="images/m2_2.png" alt="m2_2" style="zoom:80%;" />
 
 ### 3.激光雷达、屏幕、4G路由器电源接口
 
 激光雷达、屏幕与4G路由器的线束端供电插头均为DC5.5直流插头，如下图所示：
 
 ![dc5.5_bat](images/dc5.5_bat.png)
+
+<img src="images/lidar_3.png" alt="lidar_3" style="zoom: 60%;" />
+
+<img src="images/screen_1.png" alt="screen_1" style="zoom:43%;" />
+
+<img src="images/4g_route_3.png" alt="4g_route_3" style="zoom:75%;" />
 
 ## 3.传感器固定介绍
 
@@ -592,6 +608,8 @@ M2自带数据/电源线缆为1分8线缆，一端为与M2主机相连的航插�
 - 安装
 
   首先将工控机与固定支架可靠紧固之后，利用4个螺栓将其整体固定到车身上，其具体形式如下图所示：
+  
+  ![gongkongjigudingtupain](images/gongkongjigudingtupain.PNG)
 
 ![nuvo_2](images/nuvo_2.png)
 
@@ -610,17 +628,19 @@ M2自带数据/电源线缆为1分8线缆，一端为与M2主机相连的航插�
 1. 惯导IMU
 
 - 安装与拆卸：
-将数据线连接器、GNSSS天线射频线束连接器与M2主机本体可靠对接之后，通过4个螺栓，将IMU固定到车身上。拆卸可参考以上安装步骤，产品示意图如下所示：
+  将数据线连接器与M2主机本体可靠对接之后，通过4个M5X14的螺栓，将IMU固定到车身上。拆卸可参考以上安装步骤，示意图如下所示：
 
-<img src="images/m2_1.png" alt="m2_1" style="zoom:80%;" />
+  ![m2_5](images/m2_5.PNG)
 
 2. GNSS天线
 
 - 安装与拆卸：
 
-  首先，将强磁安装底座与GPS天线可靠连接后，将GPS天线整体吸附到整车安装支架的限位结构内，如下图所示：
+  首先，将强磁安装底座与GPS天线安装到一起后，将GPS天线整体吸附到天线支架的限位结构内，如下图所示：
 
-  ![gnss_1](images/gnss_1.png)
+  ![tianxiangudingweizhi](images/tianxiangudingweizhi.PNG)
+
+  ![gnss_2](images/gnss_2.PNG)
 
   之后，再将射频线束与天线可靠连接，电缆另一端穿过车身上的过线孔，与舱内M2主机天线接口对接。
 
@@ -632,25 +652,41 @@ M2自带数据/电源线缆为1分8线缆，一端为与M2主机相连的航插�
 
 - 安装与拆卸：
 
-1. 雷达本体：将激光雷达直接通过螺栓，可靠固定到雷达支架上。
+1. 激光雷达支架：通过7个M8X20的螺栓，固定到车架中部。
 
-2. 雷达控制盒：通过2个螺栓将控制盒可靠固定到车身上，再将将供电、时间同步连接器与控制盒连接，最后用网线将控制盒与工控机的相应网口连接。
+   ![jiguangleidaanzhuangweizhi](images/jiguangleidaanzhuangweizhi.PNG)
 
-![lidar_1](images/lidar_1.png)
+   ![jiguangleidazhijiagudingtupian](images/jiguangleidazhijiagudingtupian.PNG)
+
+   2.雷达本体：将激光雷达直接通过1个12#-24X1/2的螺栓，可靠固定到雷达支架上。
+
+   ![jigguangleidagudingtupian](images/jigguangleidagudingtupian.PNG)
+
+​     3.激光雷达控制盒：通过2个M5X14的螺栓将控制盒可靠固定到车身上，再将将供电、时间同步连接器与控制盒连接，最后用网线将控制盒与工控机的相应网口连接。
+
+![lidar_2](images/lidar_2.PNG)
 
 ### 4.摄像头
 
-- 安装：通过3个螺栓，先将摄像头固定到摄像头安装支架上，再将安装支架固定到车身上，最后将连接线与工控机相应USB接口可靠连接。
+- 安装：通过3个M3X5的螺栓，先将摄像头固定到摄像头安装支架上，再将安装支架固定到车身上，最后将连接线与工控机相应USB接口可靠连接。
 
 - 拆卸：参考以上步骤操作。
+
+  ![shexiangtouanzhuangweizhi](images/shexiangtouanzhuangweizhi.PNG)
 
 <img src="images/camera_1.png" alt="camera_1" style="zoom:60%;" />
 
 ### 5.4G路由器
 
-- 安装：利用支架，将4G路由器可靠的固定到车身上，路由器侧面可以方便的插换SIM卡。
+- 安装：利用2个支架，将4G路由器可靠的固定到车身上，每个支架使用2个M5X14的螺栓固定。路由器侧面可以方便的插换SIM卡。
 
-![4g_route_1](images/4g_route_1.png)
+  ![luyouqigudingtupian-1](images/luyouqigudingtupian-1.PNG)
+
+  ![luyouqigudingtupian-2](images/luyouqigudingtupian-2.PNG)
+
+- 4G卡插换：取出4G卡（该路由器需要大卡，整体插换卡操作大致同手机插换卡操作），将4G卡的方向调整至与路由器卡槽处4G卡的示意方向相同，轻轻将卡推入卡槽，听见“咔嗒”声后即安装到位。具体安装位置如下图所示：
+
+  <img src="images/4g_route_2.png" alt="4g_route_2" style="zoom:50%;" />
 
 ### 6.自动驾驶供电电源介绍
 
