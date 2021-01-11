@@ -258,3 +258,7 @@ DEFINE_string(latency_recording_topic, "/apollo/common/latency_records",
 DEFINE_string(latency_reporting_topic, "/apollo/common/latency_reports",
               "Latency reporting topic.");
 DEFINE_string(task_topic, "/apollo/task_manager", "task manager topic name");
+// value: velodyne128, velodyne64, velodyne16
+DEFINE_string(lidar_model_version, "",
+              "It determins which lidar model(16 ,64 or 128) to load, "
+              "if not to set, the model will be loaded by the sensor name.");
