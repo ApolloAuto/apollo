@@ -75,13 +75,13 @@ struct DstTypeFusionOptions {
       {"camera_front_narrow", 150},
   };
   std::map<std::string, double> sensor_reliability_ = {
-      {"velodyne64", 0.5},          {"velodyne_64", 0.5},
+      {"velodyne16", 0.5}, {"velodyne64", 0.5}, {"velodyne_64", 0.5},
       {"velodyne128", 0.5},         {"camera_smartereye", 0.95},
       {"front_6mm", 0.95},          {"camera_front_obstacle", 0.95},
       {"camera_front_narrow", 0.5},
   };
   std::map<std::string, double> sensor_reliability_for_unknown_ = {
-      {"velodyne64", 0.5},          {"velodyne_64", 0.5},
+      {"velodyne16", 0.5}, {"velodyne64", 0.5}, {"velodyne_64", 0.5},
       {"velodyne128", 0.5},         {"camera_smartereye", 0.2},
       {"front_6mm", 0.2},           {"camera_front_obstacle", 0.2},
       {"camera_front_narrow", 0.2},
