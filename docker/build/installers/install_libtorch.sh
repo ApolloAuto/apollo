@@ -40,8 +40,8 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         VERSION="1.6.0-1"
         CHECKSUM="4931fe651f2098ee3f0c4147099bd5dddcc15c0e9108e49a5ffdf46d98a7092a"
     else # testing
-        VERSION="1.7.0"
-        CHECKSUM="1baccc141347ce33cd998513f5cfdb0b5c359d66cd2b59b055c9eadc9e954d19"
+        VERSION="1.7.0-1"
+        CHECKSUM="9c99005f4335c9e8d21cf243eed557284998592e1f8b157fb659c5c887dfb9e6"
     fi
 elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     VERSION="1.6.0-1"
@@ -69,9 +69,9 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         CHECKSUM="8ca52235cb91aba6d39fb144ec5414bebf0e94a2ee03115ae83650fc4d421719"
         PKG_NAME="libtorch_gpu-${VERSION}-cu102-linux-x86_64.tar.gz"
     else
-        VERSION="1.7.0"
-        CHECKSUM="d2356b641d78e33d5decebf8c32f726b831045d5a0aff276545b40a259225885"
-        PKG_NAME="libtorch_gpu-1.7.0-cu111-linux-x86_64.tar.gz"
+        VERSION="1.7.0-1"
+        CHECKSUM="08932dddd0a8551e6d94397560257eefe4e209f11ac4fa6172b28def0a1d7da9"
+        PKG_NAME="libtorch_gpu-${VERSION}-cu111-linux-x86_64.tar.gz"
     fi
 else # AArch64
     VERSION="1.6.0-1"
