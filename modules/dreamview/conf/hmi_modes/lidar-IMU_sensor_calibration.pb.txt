@@ -68,7 +68,7 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Localization Pose"
+  key: "RTK"
   value: {
     process {
       command_keywords: "mainboard"
