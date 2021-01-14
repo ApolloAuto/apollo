@@ -25,7 +25,11 @@ CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 apt_get_update_and_install \
     git \
     vim \
+    patchelf \
     silversearcher-ag
+
+# Note(storypku):
+# patchelf was required for release build.
 
 # More:
 # lrzsz
