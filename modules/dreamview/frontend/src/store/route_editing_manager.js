@@ -15,7 +15,7 @@ export default class RouteEditingManager {
 
     @observable defaultRoutings = {};
 
-    @observable defaultRoutingDistanceThreshold = 10;
+    @observable defaultRoutingDistanceThreshold = 5;
 
     defaultParkingInfo = {};
 
@@ -154,14 +154,7 @@ export default class RouteEditingManager {
     }
 
     checkCycleRoutingAvailable() {
-        const points = this.defaultRoutings[this.currentDefaultRouting];
-        const start = points[0];
-        const end = points[points.length - 1];
-        if (_.isEmpty(start) || _.isEmpty(end)) {
-            return false;
-        }
-        const distance =
-            Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
-        return distance <= this.defaultRoutingDistanceThreshold;
+        return RENDERER.checkCycleRoutingAvailable(this.defaultRoutings[this.currentDefaultRouting],
+            this.defaultRoutingDistanceThreshold);
     }
 }
