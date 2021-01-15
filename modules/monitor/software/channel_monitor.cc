@@ -27,6 +27,7 @@
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/latency_recorder/proto/latency_record.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -93,7 +94,9 @@ ReaderAndMessagePair GetReaderAndLatestMessage(const std::string& channel) {
           {FLAGS_pointcloud_128_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_pointcloud_16_front_up_topic,
-           &CreateReaderAndLatestsMessage<drivers::PointCloud>}
+           &CreateReaderAndLatestsMessage<drivers::PointCloud>},
+          {FLAGS_chassis_detail_topic,
+           &CreateReaderAndLatestsMessage<canbus::ChassisDetail>},
           // Add more channels here if you want to monitor.
       };
 
