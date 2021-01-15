@@ -9,6 +9,10 @@ licenses(["notice"])
 cc_library(
     name = "perception_inference_tensorrt_plugins",
     srcs = [
+        ":dfmb_psroi_align_plugin",
+        ":kernels_cuda",
+        ":rcnn_proposal_plugin",
+        ":rpn_proposal_ssd_plugin",
         ":perception_inference_tensorrt_plugins_argmax_cuda",
         ":perception_inference_tensorrt_plugins_leakyrelu_cuda",
         ":perception_inference_tensorrt_plugins_slice_cuda",
@@ -22,6 +26,57 @@ cc_library(
         "@local_config_cuda//cuda:cublas",
         "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn",
+    ],
+)
+
+
+cuda_library(
+    name = "kernels_cuda",
+    srcs = [
+        "kernels.cu",
+        "nms_cuda.cu",
+    ],
+    hdrs = ["kernels.h"],
+    deps = [
+        "//modules/perception/base:common",
+        "@local_config_cuda//cuda:cudart",
+    ],
+)
+
+cuda_library(
+    name = "dfmb_psroi_align_plugin",
+    srcs = ["dfmb_psroi_align_plugin.cu"],
+    hdrs = ["dfmb_psroi_align_plugin.h"],
+    deps = [
+        ":kernels_cuda",
+        "//cyber/common:log",
+        "//modules/perception/inference/tensorrt:rt_common",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_tensorrt//:tensorrt",
+    ],
+)
+
+cuda_library(
+    name = "rcnn_proposal_plugin",
+    srcs = ["rcnn_proposal_plugin.cu"],
+    hdrs = ["rcnn_proposal_plugin.h"],
+    deps = [
+        ":kernels_cuda",
+        "//modules/perception/inference/tensorrt:rt_common",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_tensorrt//:tensorrt",
+    ],
+)
+
+cuda_library(
+    name = "rpn_proposal_ssd_plugin",
+    srcs = ["rpn_proposal_ssd_plugin.cu"],
+    hdrs = ["rpn_proposal_ssd_plugin.h"],
+    deps = [
+        ":kernels_cuda",
+        "//modules/perception/inference/tensorrt:rt_common",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 

@@ -129,10 +129,10 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
 
     AINFO << "get img done";
 
-    const float* mean = mean_->cpu_data();
+    const float* mean = mean_.get()->cpu_data();
     inference::ResizeGPU(*image_, input_blob_recog,
-                         frame->data_provider->src_width(), 0, mean[0],
-                         mean[1], mean[2], true, scale_);
+                         frame->data_provider->src_width(), 0, mean[0], mean[1],
+                         mean[2], true, scale_);
 
     AINFO << "resize gpu finish.";
     cudaDeviceSynchronize();
