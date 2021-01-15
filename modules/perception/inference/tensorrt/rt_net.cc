@@ -17,13 +17,17 @@
 #include "modules/perception/inference/tensorrt/rt_net.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #include "absl/strings/str_cat.h"
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
+#include "modules/perception/inference/tensorrt/plugins/dfmb_psroi_align_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
+#include "modules/perception/inference/tensorrt/plugins/rcnn_proposal_plugin.h"
+#include "modules/perception/inference/tensorrt/plugins/rpn_proposal_ssd_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
 
@@ -67,18 +71,54 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
                          nvinfer1::INetworkDefinition *net,
                          TensorMap *tensor_map,
                          TensorModifyMap *tensor_modify_map) {
-  ConvolutionParameter conv = layer_param.convolution_param();
-  ConvParam param;
-  ACHECK(ParserConvParam(conv, &param));
-  nvinfer1::IConvolutionLayer *convLayer = nullptr;
-  int size = conv.num_output() * param.kernel_w * param.kernel_h *
-             inputs[0]->getDimensions().d[0];
+  ConvolutionParameter p = layer_param.convolution_param();
 
-  auto wt = loadLayerWeights(conv.weight_filler().value(), size);
+  int nbOutputs = p.num_output();
+
+  int kernelH = p.has_kernel_h() ? p.kernel_h() : p.kernel_size(0);
+  int kernelW = p.has_kernel_w() ? p.kernel_w()
+                                 : p.kernel_size_size() > 1 ? p.kernel_size(1)
+                                                            : p.kernel_size(0);
+  int C = getCHW(inputs[0]->getDimensions()).c();
+  int G = p.has_group() ? p.group() : 1;
+
+  int size = nbOutputs * kernelW * kernelH * C;
+  auto wt = loadLayerWeights(p.weight_filler().value(), size);
   nvinfer1::Weights bias_weight{nvinfer1::DataType::kFLOAT, nullptr, 0};
-  convLayer = net->addConvolution(
-      *inputs[0], static_cast<int>((conv.num_output())),
-      nvinfer1::DimsHW{param.kernel_h, param.kernel_w}, wt, bias_weight);
+
+  auto inTensor = inputs[0];
+  auto convLayer =
+      net->addConvolution(*inTensor, nbOutputs,
+                          nvinfer1::DimsHW{kernelH, kernelW}, wt, bias_weight);
+
+  if (convLayer) {
+    int strideH =
+        p.has_stride_h() ? p.stride_h() : p.stride_size() > 0 ? p.stride(0) : 1;
+    int strideW = p.has_stride_w()
+                      ? p.stride_w()
+                      : p.stride_size() > 1
+                            ? p.stride(1)
+                            : p.stride_size() > 0 ? p.stride(0) : 1;
+
+    int padH = p.has_pad_h() ? p.pad_h() : p.pad_size() > 0 ? p.pad(0) : 0;
+    int padW =
+        p.has_pad_w()
+            ? p.pad_w()
+            : p.pad_size() > 1 ? p.pad(1) : p.pad_size() > 0 ? p.pad(0) : 0;
+
+    int dilationH = p.dilation_size() > 0 ? p.dilation(0) : 1;
+    int dilationW = p.dilation_size() > 1
+                        ? p.dilation(1)
+                        : p.dilation_size() > 0 ? p.dilation(0) : 1;
+
+    convLayer->setStride(nvinfer1::DimsHW{strideH, strideW});
+    convLayer->setPadding(nvinfer1::DimsHW{padH, padW});
+    convLayer->setPaddingMode(nvinfer1::PaddingMode::kCAFFE_ROUND_DOWN);
+    convLayer->setDilation(nvinfer1::DimsHW{dilationH, dilationW});
+
+    convLayer->setNbGroups(G);
+  }
+
   if ((*weight_map)[layer_param.name().c_str()].size() > 0) {
     convLayer->setKernelWeights((*weight_map)[layer_param.name().c_str()][0]);
 
@@ -92,11 +132,7 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
   lw[1] = convLayer->getBiasWeights();
   (*weight_map)[layer_param.name().c_str()] = lw;
 
-  convLayer->setStride(nvinfer1::DimsHW{param.stride_h, param.stride_w});
-  convLayer->setPadding(nvinfer1::DimsHW{param.padding_h, param.padding_w});
-  convLayer->setNbGroups(conv.group());
   convLayer->setName(layer_param.name().c_str());
-  convLayer->setDilation(nvinfer1::DimsHW{param.dilation, param.dilation});
   ConstructMap(layer_param, convLayer, tensor_map, tensor_modify_map);
 
 #if LOAD_DEBUG
@@ -139,8 +175,10 @@ void RTNet::addDeconvLayer(const LayerParameter &layer_param,
   }
   deconvLayer->setStride(nvinfer1::DimsHW{param.stride_h, param.stride_w});
   deconvLayer->setPadding(nvinfer1::DimsHW{param.padding_h, param.padding_w});
-  deconvLayer->setName(layer_param.name().c_str());
+  deconvLayer->setPaddingMode(nvinfer1::PaddingMode::kCAFFE_ROUND_DOWN);
   deconvLayer->setNbGroups(conv.group());
+
+  deconvLayer->setName(layer_param.name().c_str());
   ConstructMap(layer_param, deconvLayer, tensor_map, tensor_modify_map);
 
 #if LOAD_DEBUG
@@ -191,7 +229,7 @@ void RTNet::addConcatLayer(const LayerParameter &layer_param,
       net->addConcatenation(inputs, nbInputs);
   // tensorrt ignore the first channel(batch channel), so when load caffe
   // model axis should -1
-  concatLayer->setAxis(concat.axis()-1);
+  concatLayer->setAxis(concat.axis() - 1);
   concatLayer->setName(layer_param.name().c_str());
   CHECK_EQ(nbInputs, layer_param.bottom_size());
 
@@ -219,6 +257,19 @@ void RTNet::addPoolingLayer(const LayerParameter &layer_param,
       (pool.pool() == PoolingParameter_PoolMethod_MAX)
           ? nvinfer1::PoolingType::kMAX
           : nvinfer1::PoolingType::kAVERAGE;
+  nvinfer1::PaddingMode padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_UP;
+  if (pool.has_round_mode()) {
+    switch (static_cast<int>(pool.round_mode())) {
+      case 0:
+        padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_UP;
+        break;
+      case 1:
+        padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_DOWN;
+        break;
+      default:
+        padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_UP;
+    }
+  }
   ACHECK(modify_pool_param(&pool));
   nvinfer1::IPoolingLayer *poolLayer = net->addPooling(
       *inputs[0], pool_type,
@@ -227,6 +278,9 @@ void RTNet::addPoolingLayer(const LayerParameter &layer_param,
                                         static_cast<int>(pool.stride_w())});
   poolLayer->setPadding(nvinfer1::DimsHW{static_cast<int>(pool.pad_h()),
                                          static_cast<int>(pool.pad_w())});
+  poolLayer->setPaddingMode(padding_mode);
+  // unlike other frameworks, caffe use inclusive counting for padded averaging
+  poolLayer->setAverageCountExcludesPadding(false);
   poolLayer->setName(layer_param.name().c_str());
   ConstructMap(layer_param, poolLayer, tensor_map, tensor_modify_map);
 }
@@ -419,6 +473,72 @@ void RTNet::addPaddingLayer(const LayerParameter &layer_param,
   ConstructMap(layer_param, padding_layer, tensor_map, tensor_modify_map);
 }
 
+void RTNet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
+                                   nvinfer1::ITensor *const *inputs,
+                                   int nbInputs,
+                                   nvinfer1::INetworkDefinition *net,
+                                   TensorMap *tensor_map,
+                                   TensorModifyMap *tensor_modify_map) {
+  std::shared_ptr<DFMBPSROIAlignPlugin> dfmb_psroi_align_plugin;
+  nvinfer1::Dims input_dims[3];
+  for (int i = 0; i < nbInputs && i < 3; ++i) {
+    input_dims[i] = inputs[i]->getDimensions();
+  }
+  dfmb_psroi_align_plugin.reset(new DFMBPSROIAlignPlugin(
+      layer_param.dfmb_psroi_pooling_param(), input_dims, nbInputs));
+  dfmb_psroi_align_plugins_.push_back(dfmb_psroi_align_plugin);
+  nvinfer1::IPluginLayer *dfmb_psroi_align_layer =
+      net->addPlugin(inputs, nbInputs, *dfmb_psroi_align_plugin);
+  dfmb_psroi_align_layer->setName(layer_param.name().c_str());
+
+  ConstructMap(layer_param, dfmb_psroi_align_layer, tensor_map,
+               tensor_modify_map);
+}
+
+void RTNet::addRCNNProposalLayer(const LayerParameter &layer_param,
+                                 nvinfer1::ITensor *const *inputs, int nbInputs,
+                                 nvinfer1::INetworkDefinition *net,
+                                 TensorMap *tensor_map,
+                                 TensorModifyMap *tensor_modify_map) {
+  std::shared_ptr<RCNNProposalPlugin> rcnn_proposal_plugin;
+  nvinfer1::Dims input_dims[4];
+  for (int i = 0; i < nbInputs && i < 4; ++i) {
+    input_dims[i] = inputs[i]->getDimensions();
+  }
+  rcnn_proposal_plugin.reset(new RCNNProposalPlugin(
+      layer_param.bbox_reg_param(), layer_param.detection_output_ssd_param(),
+      input_dims));
+  rcnn_proposal_plugins_.push_back(rcnn_proposal_plugin);
+  nvinfer1::IPluginLayer *rcnn_proposal_layer =
+      net->addPlugin(inputs, nbInputs, *rcnn_proposal_plugin);
+  rcnn_proposal_layer->setName(layer_param.name().c_str());
+
+  ConstructMap(layer_param, rcnn_proposal_layer, tensor_map, tensor_modify_map);
+}
+
+void RTNet::addRPNProposalSSDLayer(const LayerParameter &layer_param,
+                                   nvinfer1::ITensor *const *inputs,
+                                   int nbInputs,
+                                   nvinfer1::INetworkDefinition *net,
+                                   TensorMap *tensor_map,
+                                   TensorModifyMap *tensor_modify_map) {
+  std::shared_ptr<RPNProposalSSDPlugin> rpn_proposal_ssd_plugin;
+  nvinfer1::Dims input_dims[3];
+  for (int i = 0; i < nbInputs && i < 3; ++i) {
+    input_dims[i] = inputs[i]->getDimensions();
+  }
+  rpn_proposal_ssd_plugin.reset(new RPNProposalSSDPlugin(
+      layer_param.bbox_reg_param(), layer_param.detection_output_ssd_param(),
+      input_dims));
+  rpn_proposal_ssd_plugins_.push_back(rpn_proposal_ssd_plugin);
+  nvinfer1::IPluginLayer *rpn_proposal_ssd_layer =
+      net->addPlugin(inputs, nbInputs, *rpn_proposal_ssd_plugin);
+  rpn_proposal_ssd_layer->setName(layer_param.name().c_str());
+
+  ConstructMap(layer_param, rpn_proposal_ssd_layer, tensor_map,
+               tensor_modify_map);
+}
+
 void RTNet::addLayer(const LayerParameter &layer_param,
                      nvinfer1::ITensor *const *inputs, int nbInputs,
                      WeightMap *weight_map, nvinfer1::INetworkDefinition *net,
@@ -471,6 +591,15 @@ void RTNet::addLayer(const LayerParameter &layer_param,
   } else if (layer_param.type() == "Power") {
     addScaleLayer(layer_param, inputs, weight_map, net, tensor_map,
                   tensor_modify_map);
+  } else if (layer_param.type() == "DFMBPSROIAlign") {
+    addDFMBPSROIAlignLayer(layer_param, inputs, nbInputs, net, tensor_map,
+                           tensor_modify_map);
+  } else if (layer_param.type() == "RCNNProposal") {
+    addRCNNProposalLayer(layer_param, inputs, nbInputs, net, tensor_map,
+                         tensor_modify_map);
+  } else if (layer_param.type() == "RPNProposalSSD") {
+    addRPNProposalSSDLayer(layer_param, inputs, nbInputs, net, tensor_map,
+                           tensor_modify_map);
   } else {
     AWARN << "unknown layer type:" << layer_param.type();
   }
@@ -636,8 +765,6 @@ bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
 
   builder_ = nvinfer1::createInferBuilder(rt_gLogger);
   network_ = builder_->createNetwork();
-  nvinfer1::ICaffePoolOutputDimensionsFormula poolFormula;
-  network_->setPoolingOutputDimensionsFormula(&poolFormula);
 
   parse_with_api(shapes);
   builder_->setMaxBatchSize(max_batch_size_);

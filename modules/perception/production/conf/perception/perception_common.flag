@@ -45,6 +45,11 @@
 # default: false
 --obs_save_fusion_supplement=true
 
+# Enable saving result images for visualization
+# type: bool
+# default: false
+--start_visualizer=true
+
 ###########################################################################
 # Flags from transform_wrapper
 
@@ -84,7 +89,6 @@
 --obs_max_local_pose_extrapolation_latency=0.15
 
 --config_manager_path=./
---start_visualizer=false
 
 ###########################################################################
 # Flags from lidar_point_pillars

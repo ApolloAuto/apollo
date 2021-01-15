@@ -16,12 +16,9 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cmath>
 #include <string>
 #include <vector>
 
-#include "NvCaffeParser.h"
 #include "NvInfer.h"
 #include "NvInferPlugin.h"
 
@@ -29,15 +26,6 @@
 #include "modules/perception/inference/tensorrt/rt_utils.h"
 
 namespace nvinfer1 {
-class ICaffePoolOutputDimensionsFormula : public IOutputDimensionsFormula {
- public:
-  virtual DimsHW compute(DimsHW input_dims, DimsHW kernel_size, DimsHW stride,
-                         DimsHW padding, DimsHW dilation,
-                         const char *layerName) const;
-  ICaffePoolOutputDimensionsFormula() = default;
-  ~ICaffePoolOutputDimensionsFormula() = default;
-};
-
 class Int8EntropyCalibrator : public IInt8EntropyCalibrator {
  public:
   Int8EntropyCalibrator(
