@@ -41,6 +41,28 @@ modules {
   }
 }
 monitored_components {
+  key: "Recorder"
+  value: {
+    process {
+      command_keywords: "cyber_recorder record"
+    }
+    resource {
+      disk_spaces {
+        # For logs.
+        path: "/apollo/data"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        # For records.
+        path: "/media/apollo/internal_nvme"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
   key: "GPS"
   value: {
     process {
@@ -63,7 +85,7 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Lidar 16"
+  key: "Lidar"
   value: {
     process {
       command_keywords: "mainboard"
