@@ -15,6 +15,20 @@ export default class FuelClient extends React.Component {
     super(props);
 
     this.handlePreprocess = this.handlePreprocess.bind(this);
+    this.state = {
+      six: 0.0,
+      seven: 0.0,
+      eight: 1.0,
+    };
+    this.handleSixInput = (event) => {
+      this.setState({ six: event.target.value });
+    };
+    this.handleSevenInput = (event) => {
+      this.setState({ seven: event.target.value });
+    };
+    this.handleEightInput = (event) => {
+      this.setState({ eight: event.target.value });
+    };
   }
 
   handlePreprocess() {
@@ -53,17 +67,54 @@ export default class FuelClient extends React.Component {
       hmi.unexpectedAborted = false;
     }
   }
-
-  renderCameraInternalInput(number) {
+  renderCameraInternalInput(label, number) {
     const result = [];
+    let isDefault = false;
+    let onChangeFunc = null;
+    let inputValue = 0;
     for (let i = 0; i < number; i++) {
+      if (label === "camera-intrinsics-D" && i === 6){
+          onChangeFunc = this.handleSixInput;
+	  inputValue = this.state.six;
+          isDefault = true;
+      } else if (label === "camera-intrinsics-D" && i === 7) {
+          onChangeFunc = this.handleSevenInput;
+	  inputValue = this.state.seven;
+          isDefault = true;
+      } else if (label === "camera-intrinsics-D" && i === 8) {
+      	  onChangeFunc = this.handleEightInput;
+	  inputValue = this.state.eight;
+          isDefault = true;
+      }
+
+      if (isDefault) {
       result.push(
+        <div className="camera-internal-configuration-div">
+        <div>
+	{i + 1}:
+	</div>
         <input
-          type="number"
-          className="camera-internal-configuration-d"
-          key={`camera${i}`}
-        ></input>,
-      );
+         type="number"
+         className="camera-internal-configuration-d"
+	 key={`camera${i}`}
+         value={inputValue}
+         onChange={onChangeFunc}
+	></input>
+	</div>,
+      );} else {
+      result.push(
+        <div className="camera-internal-configuration-div">
+        <div>
+        {i + 1}:
+        </div>
+        <input
+         type="number"
+         className="camera-internal-configuration-d"
+         key={`camera${i}`}
+        ></input>
+        </div>,
+	);
+      }
     }
     return result;
   }
@@ -89,15 +140,18 @@ export default class FuelClient extends React.Component {
               componentStatus={hmi.componentStatus}
             ></SensorCalibrationConfiguration>
             {hmi.inCameraLidarSensorCalibrationMode && (
-              <div>
+              <div className="camera-intrinsics">
                 Camera Intrinsics
-                <div>
+                <div className="camera-intrinsics-D">
                   D:
-                  {this.renderCameraInternalInput(5)}
+		  <br/>
+                  {this.renderCameraInternalInput("camera-intrinsics-D", 5)}
                 </div>
-                <div>
+		<br/>
+                <div className="camera-intrinsics-K">
                   K:
-                  {this.renderCameraInternalInput(9)}
+		  <br/>
+                  {this.renderCameraInternalInput("camera-intrinsics-D", 9)}
                 </div>
               </div>
             )}
