@@ -220,7 +220,7 @@ def gen_build_file(content, output_dir):
 def gen_vehicle_controller_and_manager(config_file, output_dir):
     print("Generating controller and manager")
     with open(config_file, 'r') as fp:
-        content = yaml.load(fp)
+        content = yaml.safe_load(fp)
         gen_vehicle_controller_header(content, output_dir)
         gen_vehicle_controller_cpp(content, output_dir)
         gen_message_manager_header(content, output_dir)
@@ -236,7 +236,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 
     output_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower() + \

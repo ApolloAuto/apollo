@@ -140,7 +140,7 @@ if __name__ == "__main__":
         print("usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 
     work_dir = conf["output_dir"] + "proto/"
