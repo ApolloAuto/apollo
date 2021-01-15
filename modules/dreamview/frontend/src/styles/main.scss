@@ -1746,11 +1746,16 @@ body {
 }
 
 .sensor-configuration-table{
-    margin:20px;
+    //margin:20px;
+    .camera-message{
+        margin-left: 22px;
+        color: #D7466F;
+    }
 
     .sensor-configuration-tr{
-        padding:10px;
-
+        //padding:10px;
+	margin-left: 20px;
+	margin-top: 10px;
         .main-sensor{
             color:red;
         }
@@ -1772,12 +1777,12 @@ body {
 }
 
 .preprocess-bar{
+     clear:left;
     .preprocess-btn {
         min-width: 40px;
         margin-right: 5px;
         padding: 10px 10px;//原来是35
         border: 1px solid #383838;
-
         background: #1D2226;
         color: #FFFFFF;
 

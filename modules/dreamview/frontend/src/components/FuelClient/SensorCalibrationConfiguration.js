@@ -43,18 +43,19 @@ class TranslationInput extends React.Component {
 export default class SensorCalibrationConfiguration extends React.Component {
   renderSensorConfiguration(sensorName, translation, isLidar) {
     return (
-      <tr className="sensor-configuration-tr" key={sensorName}>
-        <td
+      <div className="sensor-configuration-tr" key={sensorName}>
+        <div
           className={
             isLidar && sensorName === this.props.mainSensor ? 'main-sensor' : null
           }
         >
           {sensorName}
-        </td>
-        <td>
+        </div>
+        <div>
           <div className="sensor-configuration-translation">
             <div className="sensor-configuration-xyz">
               x:
+	      <br/>
               <TranslationInput
                 belong={sensorName}
                 index="x"
@@ -64,6 +65,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
             </div>
             <div className="sensor-configuration-xyz">
               y:
+	      <br/>
               <TranslationInput
                 value={_.get(translation,'y')}
                 belong={sensorName}
@@ -73,6 +75,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
             </div>
             <div className="sensor-configuration-xyz">
               z:
+	      <br/>
               <TranslationInput
                 value={_.get(translation,'z')}
                 index="z"
@@ -81,8 +84,8 @@ export default class SensorCalibrationConfiguration extends React.Component {
               ></TranslationInput>
             </div>
           </div>
-        </td>
-      </tr>
+        </div>
+      </div>
     );
   }
 
@@ -106,7 +109,7 @@ export default class SensorCalibrationConfiguration extends React.Component {
         <div className="sensor-configuration-table">
           {!_.isEmpty(cameraConfiguration) && (
             <div>
-              <div>
+              <div className="camera-message">
                 {_.get(
                   componentStatus.get('Camera'),
                   'message',
