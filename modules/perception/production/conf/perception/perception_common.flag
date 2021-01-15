@@ -48,7 +48,7 @@
 # Enable saving result images for visualization
 # type: bool
 # default: false
---start_visualizer=true
+--start_visualizer=false
 
 ###########################################################################
 # Flags from transform_wrapper
