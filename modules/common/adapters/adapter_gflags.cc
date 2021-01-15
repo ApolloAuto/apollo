@@ -52,6 +52,9 @@ DEFINE_string(pointcloud_topic,
 DEFINE_string(pointcloud_16_topic,
               "/apollo/sensor/lidar16/compensator/PointCloud2",
               "16 beam Lidar pointcloud topic name");
+DEFINE_string(pointcloud_16_raw_topic,
+              "/apollo/sensor/lidar16/PointCloud2",
+              "16 beam Lidar raw pointcloud topic name");
 DEFINE_string(pointcloud_16_front_up_topic,
               "/apollo/sensor/lidar16/front/up/compensator/PointCloud2",
               "Front up 16 beam Lidar pointcloud topic name");
