@@ -270,7 +270,9 @@ export default class HMI {
   @computed get allMonitoredComponentSuccess() {
     return (
       this.isCalibrationMode &&
-      _.every(this.componentStatus, ['status', 'SUCCESS'])
+      _.every(this.componentStatus.keys(), (key) => {
+        return key === 'Recorder' || _.get(this.componentStatus.get(key), 'status') === 'OK';
+      })
     );
   }
 
