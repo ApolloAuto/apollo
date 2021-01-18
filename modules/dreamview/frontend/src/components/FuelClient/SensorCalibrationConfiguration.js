@@ -130,9 +130,10 @@ export default class SensorCalibrationConfiguration extends React.Component {
     );
   }
 
-  renderCameraIntrinsics(name, number, params) {
+  renderCameraIntrinsics(name, params) {
     const result = [];
-    for (let i = 0; i < number; i++) {
+    const len = params.length;
+    for (let i = 0; i < len; i++) {
       result.push(
         <div className="camera-internal-configuration-div">
           <div>{i + 1}:</div>
@@ -163,13 +164,13 @@ export default class SensorCalibrationConfiguration extends React.Component {
           <div className="camera-intrinsics-D">
             D:
             <br />
-            {this.renderCameraIntrinsics('D', 5, D)}
+            {this.renderCameraIntrinsics('D', D)}
           </div>
           <br />
           <div className="camera-intrinsics-K">
             K:
             <br />
-            {this.renderCameraIntrinsics('K', 9, K)}
+            {this.renderCameraIntrinsics('K', K)}
           </div>
         </div>
       </div>
