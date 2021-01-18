@@ -10,12 +10,10 @@ export default class GuideText extends React.Component {
       case 'Lidar-IMU Sensor Calibration':
         return (<div className="guide-text">
         <p className="pane-text">
-          Start record while localization and lidar component status are green.
-          Drive the vehicle following a ∞ symbol path,
-          using a controlled speed less than 1m/s,
-          and making the turning radius as small as possible.
-          The total time length
-          should be within 3 minutes,
+          Start recorder while localization and lidar component status are green.
+          Drive the vehicle following a ∞ symbol path at a speed within 1m/s,
+          and keep the turning radius as small as possible.
+          The total time length should be within 3 minutes,
           and the drive should contain at least 2 full ∞ symbol paths.
         </p>
         <img className="pane-img" src={lidarImuIMG}></img>
@@ -23,9 +21,9 @@ export default class GuideText extends React.Component {
       case 'Camera-Lidar Sensor Calibration':
         return (<div className="guide-text">
           <p className="pane-text">
-            Start record while GNSS、localization and lidar component status are green.
-            During recording, drive in a straight line and slowly, drive for 10 seconds
-            and then stop for 5 seconds, and repeat this 5 times.
+            Start recorder while GNSS、localization and lidar component status are green.
+            During recording, drive slowly in a straight line for 10 seconds
+            and then stop for 5 seconds. Repeat this 5 times.
           </p>
           <p className="pane-text">
           Sensor coordinate system picture
