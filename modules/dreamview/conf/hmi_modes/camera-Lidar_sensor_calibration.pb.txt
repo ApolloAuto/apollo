@@ -24,12 +24,6 @@ cyber_modules {
     required_for_safety: false
   }
 }
-cyber_modules {
-  key: "Transform"
-  value: {
-    dag_files: "/apollo/modules/transform/dag/static_transform.dag"
-  }
-}
 modules {
   key: "Recorder"
   value: {
