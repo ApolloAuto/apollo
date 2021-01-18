@@ -85,20 +85,20 @@ export default class HMI {
             this.modes = newStatus.modes.sort();
         }
         if (newStatus.currentMode) {
-          this.isVehicleCalibrationMode = newStatus.currentMode
-          .toLowerCase()
-          .includes('vehicle calibration');
+            this.isVehicleCalibrationMode = newStatus.currentMode
+            .toLowerCase()
+            .includes('vehicle calibration');
         this.isSensorCalibrationMode = newStatus.currentMode
-          .toLowerCase()
-          .includes('sensor calibration');
-          if (this.currentMode !== newStatus.currentMode) {
-            this.resetDataCollectionProgress();
-            this.resetSensorCalibrationConfiguration();
-            this.resetPreprocessProgress();
-            this.currentMode = newStatus.currentMode;
-            if (this.isSensorCalibrationMode) {
-              this.updateConfiguration = true;
-            }
+            .toLowerCase()
+            .includes('sensor calibration');
+            if (this.currentMode !== newStatus.currentMode) {
+                this.resetDataCollectionProgress();
+                this.resetSensorCalibrationConfiguration();
+                this.resetPreprocessProgress();
+                this.currentMode = newStatus.currentMode;
+                if (this.isSensorCalibrationMode) {
+                    this.updateConfiguration = true;
+                }
           }
         }
 
@@ -113,21 +113,21 @@ export default class HMI {
             this.vehicles = newStatus.vehicles.sort();
         }
         if (newStatus.currentVehicle) {
-          if (
-            this.isVehicleCalibrationMode &&
-            this.currentVehicle !== newStatus.currentVehicle
-          ) {
-            this.resetDataCollectionProgress();
-            this.resetPreprocessProgress();
-          }
-          if (
-            this.isSensorCalibrationMode &&
-            this.currentVehicle !== newStatus.currentVehicle
-          ) {
-            this.updateConfiguration = true;
-            this.resetSensorCalibrationConfiguration();
-            this.resetPreprocessProgress();
-          }
+            if (
+                this.isVehicleCalibrationMode &&
+                this.currentVehicle !== newStatus.currentVehicle
+            ) {
+                this.resetDataCollectionProgress();
+                this.resetPreprocessProgress();
+            }
+            if (
+                this.isSensorCalibrationMode &&
+                this.currentVehicle !== newStatus.currentVehicle
+            ) {
+                this.updateConfiguration = true;
+                this.resetSensorCalibrationConfiguration();
+                this.resetPreprocessProgress();
+            }
             this.currentVehicle = newStatus.currentVehicle;
         }
 
@@ -159,29 +159,29 @@ export default class HMI {
             }
         }
 
-      if (newStatus.otherComponents) {
-        const newKeyList = JSON.stringify(
-          Object.keys(newStatus.otherComponents).sort(),
-        );
-        const curKeyList = JSON.stringify(
-          this.otherComponentStatus.keys().sort(),
-        );
-        if (newKeyList !== curKeyList) {
-          this.otherComponentStatus.clear();
+        if (newStatus.otherComponents) {
+            const newKeyList = JSON.stringify(
+                Object.keys(newStatus.otherComponents).sort(),
+            );
+            const curKeyList = JSON.stringify(
+                this.otherComponentStatus.keys().sort(),
+            );
+            if (newKeyList !== curKeyList) {
+                this.otherComponentStatus.clear();
+            }
+            for (const key in newStatus.otherComponents) {
+                this.otherComponentStatus.set(key, newStatus.otherComponents[key]);
+            }
         }
-        for (const key in newStatus.otherComponents) {
-          this.otherComponentStatus.set(key, newStatus.otherComponents[key]);
-        }
-      }
 
-      if (this.preprocessStarted && !this.preprocessIsRunning) {
-        if (!this.preprocessFinished) {
-          this.unexpectedAborted = true;
+        if (this.preprocessStarted && !this.preprocessIsRunning) {
+            if (!this.preprocessFinished) {
+                this.unexpectedAborted = true;
+            }
+            this.preprocessStarted = false;
         }
-        this.preprocessStarted = false;
-      }
 
-      if (typeof newStatus.passengerMsg === "string") {
+        if (typeof newStatus.passengerMsg === "string") {
             UTTERANCE.speakRepeatedly(newStatus.passengerMsg);
         }
     }
@@ -220,11 +220,11 @@ export default class HMI {
     }
 
     @computed get inCameraLidarSensorCalibrationMode() {
-      return this.currentMode === 'Camera-Lidar Sensor Calibration';
+        return this.currentMode === 'Camera-Lidar Sensor Calibration';
     }
 
     @computed get isCalibrationMode() {
-      return this.isSensorCalibrationMode || this.isVehicleCalibrationMode;
+        return this.isSensorCalibrationMode || this.isVehicleCalibrationMode;
     }
 
     @computed get shouldDisplayNavigationMap() {
@@ -233,36 +233,36 @@ export default class HMI {
 
     @computed get allMonitoredComponentSuccess() {
       return (
-        this.isCalibrationMode &&
-        _.every(this.componentStatus.keys(), (key) => {
-          return key === 'Recorder' || _.get(this.componentStatus.get(key), 'status') === 'OK';
+          this.isCalibrationMode &&
+          _.every(this.componentStatus.keys(), (key) => {
+              return key === 'Recorder' || _.get(this.componentStatus.get(key), 'status') === 'OK';
           })
       );
     }
 
     @computed get preConditionModule() {
-      return this.isCalibrationMode ? 'Recorder' : 'none';
+        return this.isCalibrationMode ? 'Recorder' : 'none';
     }
 
     @computed get startMonitorRecorderProcess() {
-      return this.isSensorCalibrationMode && this.moduleStatus.get('Recorder');
+        return this.isSensorCalibrationMode && this.moduleStatus.get('Recorder');
     }
 
     @computed get canStartDataCollectionPreprocess() {
-      return (
-        this.isVehicleCalibrationMode &&
-        _.some(
-          this.dataCollectionProgress.get('Go Straight').values(),
-          (x) => x > 0,
-        )
-      );
+        return (
+            this.isVehicleCalibrationMode &&
+            _.some(
+                this.dataCollectionProgress.get('Go Straight').values(),
+                (x) => x > 0,
+            )
+        );
     }
 
     @computed get preprocessIsRunning() {
       return (
-        this.isCalibrationMode &&
-        this.otherComponentStatus &&
-        _.get(this.otherComponentStatus.get('Preprocess'), 'status') === 'OK'
+          this.isCalibrationMode &&
+          this.otherComponentStatus &&
+          _.get(this.otherComponentStatus.get('Preprocess'), 'status') === 'OK'
       );
     }
 
@@ -276,18 +276,18 @@ export default class HMI {
     }
 
     @action resetSensorCalibrationConfiguration() {
-      this.lidars.clear();
-      this.camera = {};
+        this.lidars.clear();
+        this.camera = {};
     }
 
     @action resetPreprocessProgress() {
-      this.preprocessStarted = false;
-      this.preprocessFinished = false;
-      this.unexpectedAborted = false;
-      this.preprocessStatus = 'UNKNOWN';
-      this.logString = '';
-      this.preprocessProgress = 0;
-      this.preprocessMonitorItemTimeStamp = null;
+        this.preprocessStarted = false;
+        this.preprocessFinished = false;
+        this.unexpectedAborted = false;
+        this.preprocessStatus = 'UNKNOWN';
+        this.logString = '';
+        this.preprocessProgress = 0;
+        this.preprocessMonitorItemTimeStamp = null;
     }
 
     @action updateDataCollectionProgress(data) {
@@ -307,44 +307,44 @@ export default class HMI {
         });
     }
 
-  @action updatePreprocessProgress(data) {
-    if (this.updateConfiguration) {
-      if (data.lidarConfig) {
-        data.lidarConfig.map((lidar) => {
-          this.lidars.set(lidar.sensorName, lidar.translation);
-        });
-      }
-      if (data.cameraConfig) {
-        this.camera = data.cameraConfig;
-      }
-      this.mainSensor = data.mainSensor;
-      this.updateConfiguration = false;
-    }
-    if (data.progress) {
-      this.preprocessMonitorItemTimeStamp = new Date().getTime();
-      if (this.unexpectedAborted) {
-        this.preprocessStatus = 'FAIL';
-        this.logString =
-          'The preprocessing process has been aborted unexpectedly, please check nohup.out for reasons or try again.';
-      } else {
-        this.preprocessProgress = _.get(data, 'progress.percentage');
-        this.logString = _.get(data, 'progress.logString');
-        this.preprocessStatus = _.get(data, 'progress.status');
-        if (['SUCCESS', 'FAIL'].includes(this.preprocessStatus)) {
-          this.preprocessFinished = true;
-        } else {
-          this.preprocessFinished = false;
+    @action updatePreprocessProgress(data) {
+        if (this.updateConfiguration) {
+            if (data.lidarConfig) {
+                data.lidarConfig.map((lidar) => {
+                  this.lidars.set(lidar.sensorName, lidar.translation);
+                });
+            }
+            if (data.cameraConfig) {
+                this.camera = data.cameraConfig;
+            }
+            this.mainSensor = data.mainSensor;
+            this.updateConfiguration = false;
         }
-      }
+        if (data.progress) {
+            this.preprocessMonitorItemTimeStamp = new Date().getTime();
+            if (this.unexpectedAborted) {
+                this.preprocessStatus = 'FAIL';
+                this.logString =
+                  'The preprocessing process has been aborted unexpectedly, please check nohup.out for reasons or try again.';
+            } else {
+                this.preprocessProgress = _.get(data, 'progress.percentage');
+                this.logString = _.get(data, 'progress.logString');
+                this.preprocessStatus = _.get(data, 'progress.status');
+                if (['SUCCESS', 'FAIL'].includes(this.preprocessStatus)) {
+                    this.preprocessFinished = true;
+                } else {
+                    this.preprocessFinished = false;
+                }
+            }
+        }
     }
-  }
 
-  // name:{x y z}
-  @action changeTranslation(name, index, val, isLidar) {
-    isLidar
-      ? _.set(this.lidars.get(name), index, val)
-      : _.set(this.camera, `translation.${index}`, val);
-  }
+    // name:{x y z}
+    @action changeTranslation(name, index, val, isLidar) {
+        isLidar
+          ? _.set(this.lidars.get(name), index, val)
+          : _.set(this.camera, `translation.${index}`, val);
+    }
 
     rotate2DPoint({ x, y }, rotationInRad) {
         return {
