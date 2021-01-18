@@ -39,50 +39,137 @@ class TranslationInput extends React.Component {
   }
 }
 
+@inject('store') @observer
+class IntrinsicInput extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      intrinsicValue: props.value,
+    };
+    this.handleIntrinsicChange = this.handleIntrinsicChange.bind(this);
+  }
+
+  handleIntrinsicChange(event) {
+    this.setState({ intrinsicValue: event.target.value });
+    const val = parseFloat(event.target.value);
+    if (!isNaN(val)) {
+      this.props.store.hmi.changeIntrinsic(
+        this.props.belong,
+        this.props.index,
+        val,
+      );
+    }
+  }
+
+  render() {
+    return (
+      <input
+        className="camera-internal-configuration-d"
+        type="number"
+        value={this.state.intrinsicValue}
+        onChange={this.handleIntrinsicChange}
+      ></input>
+    );
+  }
+}
+
 @observer
 export default class SensorCalibrationConfiguration extends React.Component {
-  renderSensorConfiguration(sensorName, translation, isLidar) {
+  renderTranslation(sensorName, translation, isLidar) {
+    return (
+      <div className="sensor-configuration-translation">
+        <div className="sensor-configuration-xyz">
+          x:
+          <br />
+          <TranslationInput
+            belong={sensorName}
+            index='x'
+            value={_.get(translation, 'x')}
+            isLidar={isLidar}
+          ></TranslationInput>
+        </div>
+        <div className="sensor-configuration-xyz">
+          y:
+          <br />
+          <TranslationInput
+            value={_.get(translation, 'y')}
+            belong={sensorName}
+            index='y'
+            isLidar={isLidar}
+          ></TranslationInput>
+        </div>
+        <div className="sensor-configuration-xyz">
+          z:
+          <br />
+          <TranslationInput
+            value={_.get(translation, 'z')}
+            index='z'
+            belong={sensorName}
+            isLidar={isLidar}
+          ></TranslationInput>
+        </div>
+      </div>
+    );
+  }
+
+  renderLidarConfiguration(sensorName, translation) {
     return (
       <div className="sensor-configuration-tr" key={sensorName}>
         <div
           className={
-            isLidar && sensorName === this.props.mainSensor ? 'main-sensor' : null
+            sensorName === this.props.mainSensor ? 'main-sensor' : null
           }
         >
           {sensorName}
         </div>
         <div>
-          <div className="sensor-configuration-translation">
-            <div className="sensor-configuration-xyz">
-              x:
-	      <br/>
-              <TranslationInput
-                belong={sensorName}
-                index="x"
-                value={_.get(translation,'x')}
-                isLidar={isLidar}
-              ></TranslationInput>
-            </div>
-            <div className="sensor-configuration-xyz">
-              y:
-	      <br/>
-              <TranslationInput
-                value={_.get(translation,'y')}
-                belong={sensorName}
-                index="y"
-                isLidar={isLidar}
-              ></TranslationInput>
-            </div>
-            <div className="sensor-configuration-xyz">
-              z:
-	      <br/>
-              <TranslationInput
-                value={_.get(translation,'z')}
-                index="z"
-                belong={sensorName}
-                isLidar={isLidar}
-              ></TranslationInput>
-            </div>
+          {this.renderTranslation(sensorName, translation, true)}
+        </div>
+      </div>
+    );
+  }
+
+  renderCameraIntrinsics(name, number, params) {
+    const result = [];
+    for (let i = 0; i < number; i++) {
+      result.push(
+        <div className="camera-internal-configuration-div">
+          <div>{i + 1}:</div>
+          <IntrinsicInput
+            belong={name}
+            index={i}
+            value={params[i]}
+          ></IntrinsicInput>
+        </div>
+      );
+    }
+    return result;
+  }
+
+  renderCameraConfiguration(sensorName, translation, D, K) {
+    return (
+      <div>
+        <div className="sensor-configuration-tr" key={sensorName}>
+          <div className={null}>
+            {sensorName}
+          </div>
+          <div>
+            {this.renderTranslation(sensorName, translation, false)}
+          </div>
+        </div>
+        <div className="camera-intrinsics">
+          Camera Intrinsics
+          <div className="camera-intrinsics-D">
+            D:
+            <br />
+            {this.renderCameraIntrinsics('D', 5, D)}
+          </div>
+          <br />
+          <div className="camera-intrinsics-K">
+            K:
+            <br />
+            {this.renderCameraIntrinsics('K', 9, K)}
           </div>
         </div>
       </div>
@@ -90,18 +177,20 @@ export default class SensorCalibrationConfiguration extends React.Component {
   }
 
   render() {
-    const { lidars, camera, componentStatus} = this.props;
+    const { lidars, camera, componentStatus } = this.props;
     const lidarConfigurations = [];
     lidars.forEach((trans, sensorName) => {
       lidarConfigurations.push(
-        this.renderSensorConfiguration(sensorName, trans, true),
+        this.renderLidarConfiguration(sensorName, trans, true)
       );
     });
     const cameraConfiguration = [];
     if (_.get(camera, 'translation')) {
       const translation = _.get(camera, 'translation');
+      const D = _.get(camera, 'D');
+      const K = _.get(camera, 'K');
       cameraConfiguration.push(
-        this.renderSensorConfiguration('Lidar-Camera Translation', translation, false),
+        this.renderCameraConfiguration('Lidar-Camera Translation', translation, D, K),
       );
     }
     return (
@@ -116,7 +205,11 @@ export default class SensorCalibrationConfiguration extends React.Component {
                 )}
               </div>
               <table>
-                <tbody>{cameraConfiguration}</tbody>
+                <tbody>
+                  <tr>
+                    <td>{cameraConfiguration}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           )}
@@ -124,7 +217,11 @@ export default class SensorCalibrationConfiguration extends React.Component {
             <div>
               <div>IMU-Lidar Translation</div>
               <table>
-                <tbody>{lidarConfigurations}</tbody>
+                <tbody>
+                  <tr>
+                    <td>{lidarConfigurations}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           )}

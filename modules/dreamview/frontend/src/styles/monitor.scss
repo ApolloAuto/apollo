@@ -208,18 +208,18 @@ $monitor-header-height: 32px;
             }
         }
     }
-  
-    .camera-intrinsics {	
+
+    .camera-intrinsics {
         margin-left: 20px;
-	margin-top: 10px;
-    
+	    margin-top: 10px;
+
         .camera-intrinsics-D {
             margin-top: 10px;
-	    clear: both;
-	
+	        clear: both;
+
             .camera-internal-configuration-div {
                 float: left;
-        
+
                 .camera-internal-configuration-d {
                     max-width: 80px;
                     width: auto;
@@ -228,11 +228,11 @@ $monitor-header-height: 32px;
                 }
             }
         }
-    
+
         .camera-intrinsics-K {
             margin-top: 10px;
-	    clear: both;
-        
+	        clear: both;
+
             .camera-internal-configuration-div {
                 float: left;
 
@@ -248,7 +248,7 @@ $monitor-header-height: 32px;
 
     .translation-input {
         max-width: 80px;
-        width:auto;
+        width: auto;
     }
 }
 
