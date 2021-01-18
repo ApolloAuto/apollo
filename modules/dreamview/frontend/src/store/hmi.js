@@ -346,6 +346,10 @@ export default class HMI {
           : _.set(this.camera, `translation.${index}`, val);
     }
 
+    @action changeIntrinsic(name, index, val) {
+        _.set(this.camera, `${name}[${index}]`, val);
+    }
+
     rotate2DPoint({ x, y }, rotationInRad) {
         return {
             x: x * Math.cos(rotationInRad) - y * Math.sin(rotationInRad),

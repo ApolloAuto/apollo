@@ -211,11 +211,11 @@ $monitor-header-height: 32px;
   
     .camera-intrinsics {	
         margin-left: 20px;
-	margin-top: 10px;
+	    margin-top: 10px;
     
         .camera-intrinsics-D {
             margin-top: 10px;
-	    clear: both;
+	        clear: both;
 	
             .camera-internal-configuration-div {
                 float: left;
@@ -231,7 +231,7 @@ $monitor-header-height: 32px;
     
         .camera-intrinsics-K {
             margin-top: 10px;
-	    clear: both;
+	        clear: both;
         
             .camera-internal-configuration-div {
                 float: left;
@@ -247,8 +247,8 @@ $monitor-header-height: 32px;
     }
 
     .translation-input {
-    max-width: 80px;
-    width: auto;
+        max-width: 80px;
+        width: auto;
     }
 }
 
