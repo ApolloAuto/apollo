@@ -133,6 +133,6 @@ DECLARE_string(latency_recording_topic);
 // Latency reporting topic
 DECLARE_string(latency_reporting_topic);
 
-// It determins which lidar model(16 or 128) to load, if not to set, 
+// It determins which lidar model(16 or 128) to load, if not to set,
 // the model will be loaded by the sensor name. Mainly for D-kit.
 DECLARE_string(lidar_model_version);

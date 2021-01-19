@@ -361,6 +361,7 @@ export default class RealtimeWebSocketEndpoint {
             type: "RequestDataCollectionProgress",
         }));
     }
+
     saveDefaultRouting(routingName,points) {
         const request = {
           type: 'SaveDefaultRouting',
@@ -368,5 +369,13 @@ export default class RealtimeWebSocketEndpoint {
           point: points,
         };
         this.websocket.send(JSON.stringify(request));
+    }
+
+    sendParkingRequest(points, parkingSpace) {
+        this.websocket.send(JSON.stringify({
+            type: 'SendParkingRoutingRequest',
+            points,
+            parkingSpace,
+        }));
     }
 }

@@ -4,6 +4,7 @@ import routingPointPin from "assets/images/routing/pin.png";
 
 import WS from "store/websocket";
 import { drawImage } from "utils/draw";
+import { IsPointInRectangle } from 'utils/misc';
 
 const minDefaultRoutingPointsNum = 1;
 
@@ -13,6 +14,7 @@ export default class RoutingEditor {
     this.parkingInfo = null;
     this.inEditingMode = false;
     this.pointId = 0;
+    this.parkingSpaceInfo = [];
   }
 
   isInEditingMode() {
@@ -40,6 +42,7 @@ export default class RoutingEditor {
 
   addRoutingPoint(point, coordinates, scene, offset = true) {
     const offsetPoint = offset ? coordinates.applyOffset({ x: point.x, y: point.y }) : point;
+    const selectedParkingSpaceIndex = this.isPointInParkingSpace(offsetPoint);
     const pointMesh = drawImage(routingPointPin, 3.5, 3.5, offsetPoint.x, offsetPoint.y, 0.3);
     pointMesh.pointId = this.pointId;
     point.id = this.pointId;
@@ -48,56 +51,100 @@ export default class RoutingEditor {
     scene.add(pointMesh);
     if (offset) {
       WS.checkRoutingPoint(point);
-      }
+    }
+    return selectedParkingSpaceIndex;
   }
 
   setParkingInfo(info) {
     this.parkingInfo = info;
   }
 
+  setParkingSpaceInfo(parkingSpaceInfo, adjustOrder, coordinates) {
+    this.parkingSpaceInfo = parkingSpaceInfo;
+    this.parkingSpaceInfo.forEach((item, index) => {
+      const offsetPoints = item.polygon.point.map(point => {
+        return coordinates.applyOffset({ x: point.x, y: point.y });
+      });
+      const adjustPoints = adjustOrder[index].map(order => {
+        return offsetPoints[order];
+      });
+      item.polygon.point = adjustPoints;
+    });
+  }
+
   removeInvalidRoutingPoint(pointId, msg, scene) {
+    let index = -1;
     alert(msg);
     if (pointId) {
       this.routePoints = this.routePoints.filter((point) => {
         if (point.pointId === pointId) {
-          this.removeRoutingPoint(scene, point);
+          index = this.removeRoutingPoint(scene, point);
           return false;
         }
         return true;
       });
-      }
+    }
+    return index;
   }
 
   removeLastRoutingPoint(scene) {
     const lastPoint = this.routePoints.pop();
+    let index = -1;
     if (lastPoint) {
-      this.removeRoutingPoint(scene, lastPoint);
-      }
+      index=this.removeRoutingPoint(scene, lastPoint);
+    }
+    return index;
   }
 
   removeAllRoutePoints(scene) {
+    let index = -1;
+    const indexArr = [];
     this.routePoints.forEach((object) => {
-        this.removeRoutingPoint(scene, object);
+      index = this.removeRoutingPoint(scene, object);
+      if (index !== -1) {
+        indexArr.push(index);
+      }
     });
     this.routePoints = [];
+    return indexArr;
   }
 
   removeRoutingPoint(scene, object) {
     scene.remove(object);
+    const index = this.isPointInParkingSpace(_.get(object, 'position'));
     if (object.geometry) {
       object.geometry.dispose();
     }
     if (object.material) {
       object.material.dispose();
     }
+    return index;
   }
 
   sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
+    // parking routing request vs common routing request
     if (this.routePoints.length === 0 && routingPoints.length === 0) {
       alert("Please provide at least an end point.");
         return false;
     }
-
+    const index = _.isEmpty(this.routePoints) ?
+      -1 : this.isPointInParkingSpace(this.routePoints[this.routePoints.length - 1].position);
+    const parkingRoutingRequest = (index !== -1);
+    if (parkingRoutingRequest) {
+      const lastPoint = this.routePoints.pop();
+      const parkingRequestPoints = this.routePoints.map((object) => {
+        object.position.z = 0;
+        return coordinates.applyOffset(object.position, true);
+      });
+      this.routePoints.push(lastPoint);
+      this.parkingSpaceInfo[index].polygon.point.forEach(vertex => {
+        vertex.z = 0;
+        parkingRequestPoints.push(coordinates.applyOffset(vertex, true));
+      });
+      const parkingSpace = _.pick(this.parkingSpaceInfo[index], ['heading', 'id', 'overlapId', 'polygon']);
+      WS.sendParkingRequest(parkingRequestPoints, parkingSpace);
+      return true;
+    }
     const points = _.isEmpty(routingPoints) ?
     this.routePoints.map((object) => {
       object.position.z = 0;
@@ -151,4 +198,12 @@ export default class RoutingEditor {
       Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
     return distance > threshold;
 }
+  isPointInParkingSpace(offsetPoint) {
+    let index = -1;
+    if (!_.isEmpty(this.parkingSpaceInfo)&& !_.isEmpty(offsetPoint)) {
+      index = _.findIndex(this.parkingSpaceInfo, item =>
+        IsPointInRectangle(item.polygon.point, offsetPoint));
+    }
+    return index;
+  }
 }
