@@ -55,6 +55,8 @@ export default class HMI {
 
   @observable isMute = false;
 
+  @observable isPreprocess = false;
+
   displayName = {};
 
   utmZoneId = 10;
