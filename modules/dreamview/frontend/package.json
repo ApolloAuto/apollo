@@ -66,7 +66,7 @@
         "html-webpack-plugin": "4.0.0",
         "image-webpack-loader": "^5.0.0",
         "json-loader": "^0.5.4",
-        "node-sass": "^4.5.3",
+        "node-sass": "^4.12.0",
         "progress-bar-webpack-plugin": "^1.9.3",
         "sass-loader": "^6.0.5",
         "style-loader": "^0.18.1",
@@ -83,9 +83,9 @@
         "**/kind-of": "^6.0.3",
         "**/resize-img": "^2.0.0",
         "@babel/parser": "7.7.5",
-        "webpack-dev-server/selfsigned/node-forge":"^0.10.0",
-        "react/fbjs/isomorphic-fetch/node-fetch":"^2.6.1",
-        "**/bl":"^4.0.3",
-        "**/jpeg-js":"^0.4.0"
+        "webpack-dev-server/selfsigned/node-forge": "^0.10.0",
+        "react/fbjs/isomorphic-fetch/node-fetch": "^2.6.1",
+        "**/bl": "^4.0.3",
+        "**/jpeg-js": "^0.4.0"
     }
 }
