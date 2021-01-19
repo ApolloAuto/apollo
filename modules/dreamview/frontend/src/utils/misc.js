@@ -84,3 +84,52 @@ export function calculateLaneMarkerPoints(autoDrivingCar, laneMarkerData) {
   }
   return points;
 }
+
+function GetCross(p1, p2, p) {
+  return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y);
+}
+
+export function IsPointInRectangle(points, p) {
+  const isPointIn = GetCross(points[0], points[1], p) * GetCross(points[2], points[3], p) >= 0
+    && GetCross(points[1], points[2], p) * GetCross(points[3], points[0], p) >= 0;
+  return isPointIn;
+}
+
+export function pointWithDirectionVector(p, p1, p2) {
+  const p1p2 = {
+    x: p2.x - p1.x,
+    y: p2.y - p1.y,
+  };
+  const p1p = {
+    x: p.x - p1.x,
+    y: p.y - p1.y,
+  };
+  return (directionVectorCrossProduct(p1p, p1p2)) > 0;
+}
+
+export function directionVectorCrossProduct(p1, p2, abs = false) {
+  //p1*p2
+  let crossProduct = p1.x * p2.y - p1.y * p2.x;
+  if (abs) {
+    crossProduct = Math.abs(crossProduct);
+  }
+  return crossProduct;
+}
+
+export function getIntersectionPoint(line1, line2) {
+  // sure solution
+  // a1x+b1y+c1=0  a2x+b2y+c2=0
+  const denominator = line2.a * line1.b - line2.b * line1.a;
+  return {
+    x: (line1.c * line2.b - line2.c * line1.b) / denominator,
+    y: (line1.c * line2.a - line2.c * line1.a) / denominator,
+  };
+}
+
+export function getLineEquation(normalVector, point) {
+  return {
+    a: normalVector.x,
+    b: normalVector.y,
+    c: -1 * (normalVector.x * point.x + normalVector.y * point.y),
+  };
+}

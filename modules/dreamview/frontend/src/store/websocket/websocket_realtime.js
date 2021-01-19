@@ -414,4 +414,11 @@ export default class RealtimeWebSocketEndpoint {
     }
     this.websocket.send(JSON.stringify(request));
   }
+  sendParkingRequest(points, parkingSpace) {
+    this.websocket.send(JSON.stringify({
+      type: 'SendParkingRoutingRequest',
+      points,
+      parkingSpace,
+    }));
+  }
 }

@@ -39,6 +39,7 @@ using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
 using apollo::task_manager::CycleRoutingTask;
 using apollo::task_manager::Task;
+using apollo::task_manager::ParkingRoutingTask;
 
 using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
@@ -190,6 +191,26 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           sim_world_service_.PublishMonitorMessage(
               MonitorMessageItem::ERROR,
               "Failed to send a default cycle routing request.");
+        }
+      });
+
+  websocket_->RegisterMessageHandler(
+      "SendParkingRoutingRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto task = std::make_shared<Task>();
+        auto *parking_routing_task = task->mutable_parking_routing_task();
+        bool succeed = ConstructParkingRoutingTask(json, parking_routing_task);
+        if (succeed) {
+          task->set_task_name("parking_routing_task");
+          task->set_task_type(apollo::task_manager::TaskType::PARKING_ROUTING);
+          sim_world_service_.PublishTask(task);
+          AINFO << task->DebugString();
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO, "parking routing task sent.");
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to send a parking routing task to task manager module.");
         }
       });
 
@@ -495,6 +516,43 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
         << routing_request->DebugString();
 
   return true;
+}
+
+bool SimulationWorldUpdater::ConstructParkingRoutingTask(
+    const Json &json, ParkingRoutingTask *parking_routing_task) {
+  parking_routing_task->clear_routing_point();
+  // set parking Space
+  if (!ContainsKey(json, "parkingSpace")) {
+    AERROR << "Failed to prepare a parking routing task: "
+           << "parking space not found.";
+    return false;
+  }
+  auto *requested_parking_space = parking_routing_task->mutable_parking_space();
+  if (!JsonStringToMessage(json["parkingSpace"].dump(), requested_parking_space)
+  .ok()) {
+    AERROR << "Failed to prepare a parking routing task: invalid parking space."
+           << json["parkingSpace"].dump();
+             return false;
+  }
+  auto iter = json.find("points");
+  if (iter == json.end() || !iter->is_array()) {
+    AERROR << "Failed to prepare a parking routing task: invalid points.";
+    return false;
+  }
+    auto *routing_point = parking_routing_task->mutable_routing_point();
+    for (size_t i = 0; i < iter->size(); ++i) {
+      auto &point = (*iter)[i];
+      if (!ValidateCoordinate(point)) {
+        AERROR << "Failed to prepare a parking routing task: invalid point.";
+        return false;
+      }
+      if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
+                                               routing_point->Add())) {
+        AERROR << "Failed to construct a LaneWayPoint, skipping.";
+        routing_point->RemoveLast();
+      }
+    }
+    return true;
 }
 
 bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {

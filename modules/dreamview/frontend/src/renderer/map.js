@@ -7,7 +7,14 @@ import {
   drawSegmentsFromPoints,
   drawDashedLineFromPoints,
   drawShapeFromPoints,
+  changeMaterial,
 } from 'utils/draw';
+import {
+  pointWithDirectionVector,
+  directionVectorCrossProduct,
+  getIntersectionPoint,
+  getLineEquation
+} from 'utils/misc';
 import Text3D, { TEXT_ALIGN } from 'renderer/text3d';
 import TrafficSigns from 'renderer/traffic_controls/traffic_signs';
 import TrafficSignals from 'renderer/traffic_controls/traffic_signals';
@@ -31,6 +38,20 @@ const colorMapping = {
   DEFAULT: 0xC0C0C0,
 };
 
+// parallel=1 0-1 2-3
+const order1 = [
+  [0, 1, 2, 3],
+  [1, 0, 3, 2],
+  [2, 3, 0, 1],
+  [3, 2, 1, 0],
+];
+// parallel=2 0-3 1-2
+const order2 = [
+  [0, 3, 2, 1],
+  [1, 2, 3, 0],
+  [2, 1, 0, 3],
+  [3, 0, 1, 2],
+];
 export default class Map {
   constructor() {
     this.textRender = new Text3D();
@@ -339,6 +360,7 @@ export default class Map {
   // side. This also means that the server should maintain a state of
   // (possibly) visible elements, presummably in the global store.
   appendMapData(newData, coordinates, scene) {
+    const adjustOrder = [];
     for (const kind in newData) {
       if (!newData[kind]) {
         continue;
@@ -422,6 +444,8 @@ export default class Map {
               ),
               text: this.addParkingSpaceId(newData[kind][i], coordinates, scene),
             }));
+            const result = this.adjustPointOrder(newData[kind][i], coordinates);
+            adjustOrder.push(result);
             break;
           case 'speedBump':
             this.data[kind].push(Object.assign(newData[kind][i], {
@@ -436,6 +460,8 @@ export default class Map {
         }
       }
     }
+    console.log(adjustOrder);
+    return adjustOrder;
   }
 
   shouldDrawObjectOfThisElementKind(kind) {
@@ -512,5 +538,164 @@ export default class Map {
 
   update(world) {
     this.trafficSignals.updateTrafficLightStatus(world.perceivedSignal);
+  }
+
+  changeSelectedParkingSpaceColor(index, color = 0xff0000) {
+    this.data['parkingSpace'][index].drewObjects.forEach(mesh => {
+      changeMaterial(mesh, color);
+    });
+  }
+
+  // find parking space based which lane
+  getLaneBasedOverlapId(overlapId, coordinates) {
+    // Default based one lane if overlapId.length>=2 only choose the first
+    let result = [];
+    if (overlapId.length !== 0) {
+      const laneIndex = _.findIndex(this.data['lane'], item => {
+        return _.findIndex(item.overlapId, { 'id': overlapId[0].id }) !== -1;
+      });
+      if (laneIndex !== -1) {
+        const centralLine = _.get(this.data['lane'][laneIndex], 'centralCurve.segment');
+        if (centralLine.length !== 0) {
+          const points = coordinates.applyOffsetToArray(centralLine[0].lineSegment.point);
+          result = points;
+        }
+      }
+    }
+    return result;
+  }
+
+  adjustPointOrder(parkingSpace, coordinates) {
+    const border = coordinates.applyOffsetToArray(parkingSpace.polygon.point);
+    const basedLane = this.getLaneBasedOverlapId(parkingSpace.overlapId, coordinates);
+    let result = [];
+    const laneVector = {
+      x: basedLane[1].x - basedLane[0].x,
+      y: basedLane[1].y - basedLane[0].y,
+    };
+    const vector01 = {
+      x: border[1].x - border[0].x,
+      y: border[1].y - border[0].y,
+    };
+    const vector12 = {
+      x: border[1].x - border[2].x,
+      y: border[1].y - border[2].y,
+    };
+    const parallel = directionVectorCrossProduct(laneVector, vector01, true)
+        > directionVectorCrossProduct(laneVector, vector12, true) ? 2 : 1;
+    let orderIndex = -1;
+    if (parallel === 1) {
+      const mid01 = {
+        x: (border[0].x + border[1].x) / 2,
+        y: (border[0].y + border[1].y) / 2,
+      };
+      const mid23 = {
+        x: (border[2].x + border[3].x) / 2,
+        y: (border[2].y + border[3].y) / 2,
+      };
+      const normalVector = {
+        x: mid23.x - mid01.x,
+        y: mid23.y - mid01.y,
+      };
+      const laneLine = getLineEquation(normalVector, basedLane[0]);
+      const normalLine = getLineEquation(normalVector, mid01);
+      const intersectionPoint = getIntersectionPoint(laneLine, normalLine);
+      if (intersectionPoint.x === mid01.x || intersectionPoint.x === mid23.x
+        || mid01.x === mid23.x) {
+        // equal x situation
+        if (intersectionPoint.y < mid01.y) {
+          if (mid01.y < mid23.y) {
+            //01->23
+            orderIndex = pointWithDirectionVector(border[3], mid01, mid23) ? 3 : 2;
+          } else {
+            //23->01
+            orderIndex = pointWithDirectionVector(border[0], mid23, mid01) ? 0 : 1;
+          }
+        } else {
+          if (mid01.y < mid23.y) {
+            //23->01
+            orderIndex = pointWithDirectionVector(border[0], mid23, mid01) ? 0 : 1;
+          } else {
+            //01->23
+            orderIndex = pointWithDirectionVector(border[3], mid01, mid23) ? 3 : 2;
+          }
+        }
+      } else {
+        if (intersectionPoint.x < mid01.x) {
+          if (mid01.x < mid23.x) {
+            orderIndex = pointWithDirectionVector(border[3], mid01, mid23) ? 3 : 2;
+          } else {
+            //32 -> 01
+            orderIndex = pointWithDirectionVector(border[0], mid23, mid01) ? 0 : 1;
+          }
+        } else {
+          if (mid01.x < mid23.x) {
+            //32->01
+            orderIndex = pointWithDirectionVector(border[0], mid23, mid01) ? 0 : 1;
+          } else {
+            //01->32
+            orderIndex = pointWithDirectionVector(border[3], mid01, mid23) ? 3 : 2;
+          }
+        }
+      }
+      result = order1[orderIndex];
+    } else {
+      const mid12 = {
+        x: (border[2].x + border[1].x) / 2,
+        y: (border[2].y + border[1].y) / 2,
+      };
+      const mid03 = {
+        x: (border[0].x + border[3].x) / 2,
+        y: (border[0].x + border[3].x) / 2,
+      };
+      const normalVector = {
+        //12->03
+        x: mid12.x - mid03.x,
+        y: mid12.y - mid03.y,
+      };
+      const laneLine = getLineEquation(normalVector, basedLane[0]);
+      const normalLine = getLineEquation(laneVector, mid12);
+      const intersectionPoint = getIntersectionPoint(laneLine, normalLine);
+      if (intersectionPoint.x === mid12.x || intersectionPoint.x === mid03.x
+        || mid12.x === mid03.x) {
+        if (intersectionPoint.y < mid12.y) {
+          if (mid12.y < mid03.y) {
+            //12->03
+            orderIndex = pointWithDirectionVector(border[0], mid12, mid03) ? 0 : 3;
+          } else {
+            //03->12
+            orderIndex = pointWithDirectionVector(border[1], mid03, mid12) ? 1 : 2;
+          }
+        } else {
+          if (mid12.y < mid03.y) {
+            //03->12
+            orderIndex = pointWithDirectionVector(border[1], mid03, mid12) ? 1 : 2;
+          } else {
+            //12->03
+            orderIndex = pointWithDirectionVector(border[0], mid12, mid03) ? 0 : 3;
+          }
+        }
+      } else {
+        if (intersectionPoint.x < mid12.x) {
+          if (mid12.x < mid03.x) {
+            //12->03
+            orderIndex = pointWithDirectionVector(border[0], mid12, mid03) ? 0 : 3;
+          } else {
+            //03 -> 12
+            orderIndex = pointWithDirectionVector(border[1], mid03, mid12) ? 1 : 2;
+          }
+        } else {
+          if (mid12.x < mid03.x) {
+            //03->12
+            orderIndex = pointWithDirectionVector(border[1], mid03, mid12) ? 1 : 2;
+          } else {
+            //12->03
+            orderIndex = pointWithDirectionVector(border[0], mid12, mid03) ? 0 : 3;
+          }
+        }
+      }
+      result = order2[orderIndex];
+    }
+    return result;
   }
 }
