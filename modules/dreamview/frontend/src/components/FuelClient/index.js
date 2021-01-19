@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { inject, observer } from 'mobx-react';
+import classNames from "classnames";
 import _ from 'lodash';
 
 import WS from 'store/websocket';
@@ -19,6 +20,7 @@ export default class FuelClient extends React.Component {
 
   handlePreprocess() {
     const hmi = this.props.store.hmi;
+    hmi.isPreprocess = !hmi.isPreprocess;
     if (!hmi.preprocessIsRunning) {
       const data = {};
       if (hmi.inCameraLidarSensorCalibrationMode) {
@@ -77,7 +79,10 @@ export default class FuelClient extends React.Component {
             <div className="preprocess-bar category">
               <div className="category-description">
                 <button
-                  className="preprocess-btn"
+                  className={classNames({
+                    "preprocess-btn": true,
+                    "button-active": hmi.isPreprocess,
+                  })}
                   onClick={this.handlePreprocess}
                 >
                   Preprocess

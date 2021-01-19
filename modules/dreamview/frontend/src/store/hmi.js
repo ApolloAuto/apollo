@@ -44,6 +44,7 @@ export default class HMI {
     @observable dockerImage = 'unknown';
     @observable isCoDriver = false;
     @observable isMute = false;
+    @observable isPreprocess = false;
 
     displayName = {};
     utmZoneId = 10;
