@@ -444,8 +444,7 @@ export default class Map {
               ),
               text: this.addParkingSpaceId(newData[kind][i], coordinates, scene),
             }));
-            const result = this.adjustPointOrder(newData[kind][i], coordinates);
-            adjustOrder.push(result);
+            adjustOrder.push(this.adjustPointOrder(newData[kind][i], coordinates));
             break;
           case 'speedBump':
             this.data[kind].push(Object.assign(newData[kind][i], {
@@ -460,7 +459,6 @@ export default class Map {
         }
       }
     }
-    console.log(adjustOrder);
     return adjustOrder;
   }
 
