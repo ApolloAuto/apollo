@@ -64,8 +64,8 @@ class RobosenseParser {
   virtual void order(
       const std::shared_ptr<apollo::drivers::PointCloud>& cloud) = 0;
 
-  const Calibration& get_calibration() { return _calibration; }
-  double get_last_timestamp() { return _last_time_stamp; }
+  const Calibration& get_calibration() { return calibration_; }
+  double get_last_timestamp() { return last_time_stamp_; }
 
   // suteng
   float CalibIntensity(float intensity, int cal_idx, int distance,
@@ -83,17 +83,17 @@ class RobosenseParser {
   /**
    * \brief Calibration file
    */
-  Calibration _calibration;
-  float _sin_rot_table[ROTATION_MAX_UNITS];
-  float _cos_rot_table[ROTATION_MAX_UNITS];
-  apollo::drivers::suteng::SutengConfig _config;
-  std::set<std::string> _filter_set;
-  int _filter_grading;
+  Calibration calibration_;
+  float sin_rot_table_[ROTATION_MAX_UNITS];
+  float cos_rot_table_[ROTATION_MAX_UNITS];
+  apollo::drivers::suteng::SutengConfig config_;
+  std::set<std::string> filter_set_;
+  int filter_grading_;
   // Last suteng packet time stamp. (Full time)
-  double _last_time_stamp;
-  bool _need_two_pt_correction;
+  double last_time_stamp_;
+  bool need_two_pt_correction_;
   uint32_t point_index_ = 0;
-  Mode _mode;
+  Mode mode_;
 
   apollo::drivers::PointXYZIT get_nan_point(uint64_t timestamp);
   void init_angle_params(double view_direction, double view_width);
@@ -150,8 +150,8 @@ class Robosense16Parser : public RobosenseParser {
       uint32_t* index);
 
   // Previous suteng packet time stamp. (offset to the top hour)
-  double _previous_packet_stamp;
-  uint64_t _gps_base_usec;  // full time
+  double previous_packet_stamp_;
+  uint64_t gps_base_usec_;  // full time
   std::map<uint32_t, uint32_t> order_map_;
   uint32_t getOrderIndex(uint32_t index);
   void init_orderindex();

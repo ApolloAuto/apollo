@@ -40,8 +40,8 @@ class Convert {
   uint32_t GetPointSize();
 
  private:
-  RobosenseParser* _parser;
-  apollo::drivers::suteng::SutengConfig _config;
+  RobosenseParser* parser_;
+  apollo::drivers::suteng::SutengConfig config_;
 };
 
 }  // namespace robosense

@@ -28,14 +28,14 @@ RobosenseStatus::RobosenseStatus() {}
 
 void RobosenseStatus::get_status(
     const std::shared_ptr<apollo::drivers::suteng::SutengScan const> &scan) {
-  _status.clear();
+  status_.clear();
   // temp hard code for byte position
   for (auto &packet : scan->firing_pkts()) {
     uint8_t status_type = *(reinterpret_cast<uint8_t *>(
         const_cast<char *>(packet.data().data() + STATUS_TYPE_INDEX)));
     uint8_t status_value = *(reinterpret_cast<uint8_t *>(
         const_cast<char *>(packet.data().data() + STATUS_VALUE_INDEX)));
-    _status.emplace_back(std::make_pair(status_type, status_value));
+    status_.emplace_back(std::make_pair(status_type, status_value));
   }
 
   check_warningbit();
@@ -43,23 +43,23 @@ void RobosenseStatus::get_status(
 }
 
 void RobosenseStatus::check_warningbit() {
-  for (auto &status : _status) {
+  for (auto &status : status_) {
     if (status.first == STATUS_WARNING) {
-      _warning_bits = reinterpret_cast<WarningBits *>(&status.second);
-      ADEBUG << "gps:" << _warning_bits->gps_signal
-             << "clean:" << _warning_bits->lens_ontamination
-             << "hot:" << _warning_bits->unit_hot
-             << "cold:" << _warning_bits->unit_cold;
-      if (_warning_bits->gps_signal == 0) {
+      warning_bits_ = reinterpret_cast<WarningBits *>(&status.second);
+      ADEBUG << "gps:" << warning_bits_->gps_signal
+             << "clean:" << warning_bits_->lens_ontamination
+             << "hot:" << warning_bits_->unit_hot
+             << "cold:" << warning_bits_->unit_cold;
+      if ( warning_bits_->gps_signal == 0) {
         AINFO << "suteng no gps signal";
       }
-      if (_warning_bits->lens_ontamination == 1) {
+      if ( warning_bits_->lens_ontamination == 1) {
         AINFO << "suteng need clean";
       }
-      if (_warning_bits->unit_hot == 1) {
+      if ( warning_bits_->unit_hot == 1) {
         AINFO << "suteng unit is too hot:>58";
       }
-      if (_warning_bits->unit_cold == 1) {
+      if ( warning_bits_->unit_cold == 1) {
         AINFO << "suteng unit is too cold:<5";
       }
       break;
@@ -68,15 +68,15 @@ void RobosenseStatus::check_warningbit() {
 }
 
 void RobosenseStatus::check_motor_speed() {
-  int length = _status.size();
+  int length = status_.size();
   for (int i = 0; i < length - 1; ++i) {
-    if (_status[i].first == STATUS_SPEED_LOW &&
-        _status[i + 1].first == STATUS_SPEED_HIGH) {
-      _motor_speed.speed_low = _status[i].second;
-      _motor_speed.speed_high = _status[i + 1].second;
-      ADEBUG << "speed:" << _motor_speed.speed;
-      if (_motor_speed.speed < SPEED_TOL) {
-        AINFO << "suteng unit speed is slow:" << _motor_speed.speed << "<"
+    if ( status_[i].first == STATUS_SPEED_LOW &&
+        status_[i + 1].first == STATUS_SPEED_HIGH) {
+      motor_speed_.speed_low = status_[i].second;
+      motor_speed_.speed_high = status_[i + 1].second;
+      ADEBUG << "speed:" << motor_speed_.speed;
+      if ( motor_speed_.speed < SPEED_TOL) {
+        AINFO << "suteng unit speed is slow:" << motor_speed_.speed << "<"
               << SPEED_TOL;
       }
       break;

@@ -30,46 +30,46 @@ namespace robosense {
 Robosense16Driver::Robosense16Driver(
     const apollo::drivers::suteng::SutengConfig& robo_config)
     : RobosenseDriver() {
-  _config = robo_config;
+  config_ = robo_config;
 }
 
 Robosense16Driver::~Robosense16Driver() {
-  _running.store(false);
+  running_.store(false);
   if (positioning_thread_.joinable()) {
     positioning_thread_.join();
   }
 }
 
 void Robosense16Driver::init() {
-  _running.store(true);
+  running_.store(true);
   double packet_rate =
       750;  // 840.0;          //每秒packet的数目   packet frequency (Hz)
             // robosense-754  beike v6k-781.25  v6c-833.33
-  double frequency = (_config.rpm() / 60.0);  //  每秒的圈数  expected Hz rate
+  double frequency = ( config_.rpm() / 60.0);  //  每秒的圈数  expected Hz rate
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  _config.set_npackets(
+  config_.set_npackets(
       ceil(packet_rate / frequency));  // 每frame，即转一圈packet的数目
   AINFO << "Time Synchronized is using time of pakcet";
-  AINFO << "_config.npackets() == " << _config.npackets();
-  if (_config.has_pcap_file()) {
-    AINFO << "_config.pcap_file(): " << _config.pcap_file();
-    _input.reset(
-        new robosense::PcapInput(packet_rate, _config.pcap_file(), false));
-    _input->init();
+  AINFO << "_config.npackets() == " << config_.npackets();
+  if ( config_.has_pcap_file()) {
+    AINFO << "_config.pcap_file(): " << config_.pcap_file();
+    input_.reset(
+        new robosense::PcapInput(packet_rate, config_.pcap_file(), false));
+    input_->init();
 
-    AINFO << "_config.pcap_file(): " << _config.pcap_file();
-    _positioning_input.reset(new robosense::PcapInput(
-        packet_rate, _config.accurate_vehicle_config_path(), false));
-    _positioning_input->init();
+    AINFO << "_config.pcap_file(): " << config_.pcap_file();
+    positioning_input_.reset(new robosense::PcapInput(
+        packet_rate, config_.accurate_vehicle_config_path(), false));
+    positioning_input_->init();
     AINFO << "driver16-inited----";
   } else {
-    _input.reset(new robosense::SocketInput());
-    _input->init(_config.firing_data_port());
+    input_.reset(new robosense::SocketInput());
+    input_->init( config_.firing_data_port());
 
-    _positioning_input.reset(new robosense::SocketInput());
-    _positioning_input->init(_config.positioning_data_port());
+    positioning_input_.reset(new robosense::SocketInput());
+    positioning_input_->init( config_.positioning_data_port());
   }
   positioning_thread_ =
       std::thread(&Robosense16Driver::poll_positioning_packet, this);
@@ -84,7 +84,7 @@ bool Robosense16Driver::poll(
   int poll_result = SOCKET_TIMEOUT;
 
   // Synchronizing all laser radars
-  if (_config.main_frame()) {
+  if ( config_.main_frame()) {
     poll_result = poll_sync_count(scan, true);
   } else {
     poll_result = poll_sync_count(scan, false);
@@ -99,17 +99,17 @@ bool Robosense16Driver::poll(
   }
 
   if (scan->firing_pkts_size() == 0) {
-    AINFO << "Get a empty scan from port: " << _config.firing_data_port();
+    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
     return false;
   }
 
-  scan->set_model(_config.model());
-  scan->set_mode(_config.mode());
-  scan->mutable_header()->set_frame_id(_config.frame_id());
+  scan->set_model( config_.model());
+  scan->set_mode( config_.mode());
+  scan->mutable_header()->set_frame_id( config_.frame_id());
   scan->mutable_header()->set_lidar_timestamp(
       apollo::cyber::Time().Now().ToNanosecond());
 
-  scan->set_basetime(_basetime);
+  scan->set_basetime( basetime_);
   AINFO << "time: " << apollo::cyber::Time().Now().ToNanosecond();
   return true;
 }
@@ -119,10 +119,10 @@ bool Robosense16Driver::poll(
  *  @returns true unless end of file reached
  */
 void Robosense16Driver::poll_positioning_packet(void) {
-  while (!apollo::cyber::IsShutdown() && _running.load()) {
+  while (!apollo::cyber::IsShutdown() && running_.load()) {
     NMEATimePtr nmea_time(new NMEATime);
-    if (!_config.use_gps_time()) {
-      _basetime = 1;  // temp
+    if (!config_.use_gps_time()) {
+      basetime_ = 1;  // temp
       time_t t = time(NULL);
       struct tm ptm;
       struct tm* current_time = localtime_r(&t, &ptm);
@@ -132,19 +132,19 @@ void Robosense16Driver::poll_positioning_packet(void) {
       nmea_time->hour = current_time->tm_hour;
       nmea_time->min = current_time->tm_min;
       nmea_time->sec = current_time->tm_sec;
-      AINFO << "frame_id:" << _config.frame_id() << "-F(local-time):"
+      AINFO << "frame_id:" << config_.frame_id() << "-F(local-time):"
             << "year:" << nmea_time->year << "mon:" << nmea_time->mon
             << "day:" << nmea_time->day << "hour:" << nmea_time->hour
             << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
-      while (true && _running.load()) {
+      while (true && running_.load()) {
         // AINFO<<"11111->gps timeing...";
-        if (_positioning_input == nullptr) {
-          AERROR << " _positioning_input uninited.";
+        if ( positioning_input_ == nullptr) {
+          AERROR << " positioning_input_ uninited.";
           return;
         }
 
-        int rc = _positioning_input->get_positioning_data_packtet(nmea_time);
+        int rc = positioning_input_->get_positioning_data_packtet(nmea_time);
         AINFO << "gprmc data rc: " << rc << "---rc is normal when it is 0";
 
         tm pkt_time;
@@ -163,8 +163,8 @@ void Robosense16Driver::poll_positioning_packet(void) {
                 1e3 +
             timestamp_sec;  // ns
         AINFO << "first POS-GPS-timestamp: [" << timestamp_nsec << "]";
-        _basetime = timestamp_nsec;
-        AINFO << "frame_id:" << _config.frame_id()
+        basetime_ = timestamp_nsec;
+        AINFO << "frame_id:" << config_.frame_id()
               << "-T(gps-time):" << nmea_time->year << "-" << nmea_time->mon
               << "-" << nmea_time->day << "  " << nmea_time->hour << "-"
               << nmea_time->min << "-" << nmea_time->sec;
@@ -173,17 +173,17 @@ void Robosense16Driver::poll_positioning_packet(void) {
               << nmea_time->hour << "/" << nmea_time->min << "/"
               << nmea_time->sec << "-" << nmea_time->msec << "/"
               << nmea_time->usec << "]";
-        _start_time = apollo::cyber::Time().Now().ToNanosecond();
-        AINFO << "first _start_time:[" << _start_time << "]";
+        start_time_ = apollo::cyber::Time().Now().ToNanosecond();
+        AINFO << "first start_time_:[" << start_time_ << "]";
         if (rc == 0) {
           break;  // got a full packet
         }
       }
     }
-    if (_basetime != 0) break;  // temp
-    // if (_basetime == 0 && ret) {
-    //   set_base_time_from_nmea_time(nmea_time, _basetime,
-    //   _config.use_gps_time()); AINFO<<"basetime(outer): ";//<<basetime;
+    if ( basetime_ != 0) break;  // temp
+    // if ( basetime_ == 0 && ret) {
+    //   set_base_time_from_nmea_time(nmea_time, basetime_,
+    //   config_.use_gps_time()); AINFO<<"basetime(outer): ";//<<basetime;
     //   break;
     // }
   }

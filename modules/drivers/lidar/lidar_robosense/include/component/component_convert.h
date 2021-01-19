@@ -43,8 +43,8 @@ class CompRoboConvert : public Component<apollo::drivers::suteng::SutengScan> {
     }
     AINFO << "config:" << config.DebugString();
 
-    _conv.reset(new Convert(config));
-    if (!_conv->Init()) {
+    conv_.reset(new Convert(config));
+    if (!conv_->Init()) {
       return false;
     }
 
@@ -81,7 +81,7 @@ class CompRoboConvert : public Component<apollo::drivers::suteng::SutengScan> {
     point_cloud_send->mutable_header()->Clear();
     point_cloud_send->Clear();
 
-    _conv->convert_robosense_to_pointcloud(scan, point_cloud_send);
+    conv_->convert_robosense_to_pointcloud(scan, point_cloud_send);
     if (point_cloud_send == nullptr || point_cloud_send->point_size() == 0) {
       AINFO << "discard null point cloud";
       return false;
@@ -101,7 +101,7 @@ class CompRoboConvert : public Component<apollo::drivers::suteng::SutengScan> {
   }
 
  private:
-  std::unique_ptr<Convert> _conv = nullptr;
+  std::unique_ptr<Convert> conv_ = nullptr;
   std::deque<std::shared_ptr<apollo::drivers::PointCloud>> point_cloud_deque_;
   uint64_t index_ = 0;
   uint64_t seq_ = 0;

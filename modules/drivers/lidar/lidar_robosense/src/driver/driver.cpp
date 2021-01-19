@@ -28,7 +28,7 @@ namespace drivers {
 namespace robosense {
 
 RobosenseDriver::RobosenseDriver()
-    : _basetime(0), _last_gps_time(0), _last_count(0) {}
+    : basetime_(0), last_gps_time_(0), last_count_(0) {}
 
 void RobosenseDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
                                                    uint64_t* basetime,
@@ -39,12 +39,12 @@ void RobosenseDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
   time.tm_year = nmea_time->year + (2000 - 1900);
   time.tm_mon = nmea_time->mon - 1;
   time.tm_mday = nmea_time->day;
-  time.tm_hour = nmea_time->hour;  //+ _config.time_zone();
+  time.tm_hour = nmea_time->hour;  //+ config_.time_zone();
   time.tm_min = 0;
   time.tm_sec = 0;
 
   // set last gps time using gps socket packet
-  _last_gps_time = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
+  last_gps_time_ = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
 
   AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-"
         << time.tm_mday << " " << time.tm_hour << ":" << time.tm_min << ":"
@@ -64,9 +64,9 @@ void RobosenseDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
 
 bool RobosenseDriver::set_base_time() {
   NMEATimePtr nmea_time(new NMEATime);
-  if (_config.use_gps_time()) {
+  if (config_.use_gps_time()) {
     while (true) {
-      int rc = _input->get_positioning_data_packtet(nmea_time);
+      int rc = input_->get_positioning_data_packtet(nmea_time);
       if (rc == 0) {
         break;  // got a full packet
       }
@@ -85,8 +85,8 @@ bool RobosenseDriver::set_base_time() {
     nmea_time->min = current_time->tm_min;
     nmea_time->sec = current_time->tm_sec;
   }
-  set_base_time_from_nmea_time(nmea_time, &_basetime);
-  _input->init(_config.firing_data_port());
+  set_base_time_from_nmea_time(nmea_time, &basetime_);
+  input_->init(config_.firing_data_port());
   return true;
 }
 
@@ -94,12 +94,12 @@ int RobosenseDriver::poll_standard(
     const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan) {
   // Since the suteng delivers data at a very high rate, keep
   // reading and publishing scans as fast as possible.
-  for (int32_t i = 0; i < _config.npackets(); ++i) {
+  for (int32_t i = 0; i < config_.npackets(); ++i) {
     while (true) {
       apollo::drivers::suteng::SutengPacket* packet;
       // keep reading until full packet received
       packet = scan->add_firing_pkts();
-      int rc = _input->get_firing_data_packet(packet, i, _start_time);
+      int rc = input_->get_firing_data_packet(packet, i, start_time_);
       if (rc == 0) {
         break;  // got a full packet?
       }
@@ -117,15 +117,15 @@ int RobosenseDriver::poll_sync_count(
     const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan,
     bool main_frame) {
   static std::atomic_ullong sync_counter(0);
-  int time_zone = _config.time_zone();
+  int time_zone = config_.time_zone();
   // apollo::drivers::suteng::SutengPacket* tmp_packet;
   if (main_frame) {
-    for (int32_t i = 0; i < _config.npackets(); ++i) {
+    for (int32_t i = 0; i < config_.npackets(); ++i) {
       while (true) {
         apollo::drivers::suteng::SutengPacket* packet;
         // keep reading until full packet received
         packet = scan->add_firing_pkts();
-        int rc = _input->get_firing_data_packet(packet, time_zone, _start_time);
+        int rc = input_->get_firing_data_packet(packet, time_zone, start_time_);
         // tmp_packet = packet;
         if (rc == 0) {
           break;  // got a full packet?
@@ -139,12 +139,12 @@ int RobosenseDriver::poll_sync_count(
     sync_counter++;
   } else {
     int pk_i = 0;
-    while (scan->firing_pkts_size() < _config.npackets()) {
+    while (scan->firing_pkts_size() < config_.npackets()) {
       while (true) {
         apollo::drivers::suteng::SutengPacket* packet;
         // keep reading until full packet received
         packet = scan->add_firing_pkts();
-        int rc = _input->get_firing_data_packet(packet, time_zone, _start_time);
+        int rc = input_->get_firing_data_packet(packet, time_zone, start_time_);
         // tmp_packet = packet;
         pk_i++;
         if (rc == 0) {
@@ -156,7 +156,7 @@ int RobosenseDriver::poll_sync_count(
       }
       // if(!cute_angle(tmp_packet)) break;
     }
-    _last_count = sync_counter;
+    last_count_ = sync_counter;
   }
 
   return 0;
@@ -183,32 +183,32 @@ bool RobosenseDriver::cute_angle(
 void RobosenseDriver::update_gps_top_hour(uint32_t current_time) {
   if (!flags) {
     AINFO << "init current_time:" << current_time
-          << ", last_gps_time:" << _last_gps_time;
+          << ", last_gps_time:" << last_gps_time_;
     flags = true;
   }
-  if (_last_gps_time == 0) {
-    _last_gps_time = current_time;
+  if ( last_gps_time_ == 0) {
+    last_gps_time_ = current_time;
     return;
   }
-  if (_last_gps_time > current_time) {
-    if (std::fabs(_last_gps_time - current_time) > 3599000000) {
-      _basetime += 3600;
+  if ( last_gps_time_ > current_time) {
+    if (std::fabs( last_gps_time_ - current_time) > 3599000000) {
+      basetime_ += 3600;
       AINFO << "update_gps_top_hour. current:" << current_time
-            << ", last time:" << _last_gps_time;
+            << ", last time:" << last_gps_time_;
     } else {
       // ROS_WARN_STREAM("[driver.cpp] Currrnt stamp:" << std::fixed <<
       // current_time
-      //         << " less than previous statmp:" << _last_gps_time
+      //         << " less than previous statmp:" << last_gps_time_
       //         << ". GPS time stamp maybe incorrect!");
     }
   }
-  _last_gps_time = current_time;
+  last_gps_time_ = current_time;
 }
 
 RobosenseDriver* RobosenseDriverFactory::create_driver(
-    const apollo::drivers::suteng::SutengConfig& robo_config) {
-  if (robo_config.model() == apollo::drivers::suteng::Model::VLP16) {
-    return new Robosense16Driver(robo_config);
+    const apollo::drivers::suteng::SutengConfig& roboconfig_) {
+  if (roboconfig_.model() == apollo::drivers::suteng::Model::VLP16) {
+    return new Robosense16Driver(roboconfig_);
   } else {
     AERROR << "Invalid model, must be VLP16";
     return nullptr;

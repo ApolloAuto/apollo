@@ -27,7 +27,7 @@ namespace robosense {
 /**
  * Raw suteng packet constants and structures.
  */
-// static uint64_t _pkts_stamp[84]={0};
+// static uint64_t pkts_stamp_[84]={0};
 
 static const int BLOCK_SIZE = 100;
 static const int RAW_SCAN_SIZE = 3;

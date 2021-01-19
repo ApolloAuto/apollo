@@ -48,12 +48,12 @@ struct LaserCorrection {
 
 class Calibration {
  public:
-  std::map<int, LaserCorrection> _laser_corrections;
-  int _num_lasers;
-  bool _initialized;
+  std::map<int, LaserCorrection> laser_corrections_;
+  int num_lasers_;
+  bool initialized_;
 
  public:
-  Calibration() : _initialized(false) {}
+  Calibration() : initialized_(false) {}
   explicit Calibration(const std::string& calibration_file) {
     read(calibration_file);
   }

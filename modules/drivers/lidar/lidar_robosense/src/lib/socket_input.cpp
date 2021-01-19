@@ -38,22 +38,22 @@ namespace robosense {
  *  @param private_nh private node handle for driver
  *  @param udp_port UDP port number to connect
  */
-SocketInput::SocketInput() : Input(), _sockfd(-1), _port(0) {}
+SocketInput::SocketInput() : Input(), sockfd_(-1), port_(0) {}
 
 /** @brief destructor */
-SocketInput::~SocketInput(void) { (void)close(_sockfd); }
+SocketInput::~SocketInput(void) { (void)close( sockfd_); }
 
 void SocketInput::init(uint32_t port) {
-  if (_sockfd != -1) {
-    (void)close(_sockfd);
+  if ( sockfd_ != -1) {
+    (void)close( sockfd_);
   }
 
   // connect to suteng UDP port
   AINFO << "Opening UDP socket: port " << uint16_t(port);
-  _port = port;
-  _sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+  port_ = port;
+  sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 
-  if (_sockfd == -1) {
+  if ( sockfd_ == -1) {
     AERROR << " Init socket failed, UDP port is " << port;
   }
 
@@ -66,31 +66,31 @@ void SocketInput::init(uint32_t port) {
   AINFO << "SocketInput::init " << my_addr.sin_addr.s_addr;
 
   const int opt = -1;
-  int rtn = setsockopt(_sockfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
+  int rtn = setsockopt( sockfd_, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
   if (rtn < 0) {
     AINFO << "setsockopt failed !!!!!!!!!!";
     return;
   }
 
-  // if (bind(_sockfd, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
-  if (bind(_sockfd, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
+  // if (bind( sockfd_, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
+  if (bind( sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
       -1) {
-    AERROR << " Socket bind failed! Port " << _port;
+    AERROR << " Socket bind failed! Port " << port_;
     return;
   }
 
-  if (fcntl(_sockfd, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
-    AERROR << " non-block! Port " << _port;
+  if (fcntl( sockfd_, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
+    AERROR << " non-block! Port " << port_;
     return;
   }
 
-  AINFO << "suteng socket fd is " << _sockfd << ", port " << _port;
+  AINFO << "suteng socket fd is " << sockfd_ << ", port " << port_;
 }
 
 /** @brief Get one suteng packet. */
 int SocketInput::get_firing_data_packet(
     apollo::drivers::suteng::SutengPacket *pkt, int time_zone,
-    uint64_t _start_time) {
+    uint64_t start_time_) {
   // double time1 = ros::Time::Now().toSec();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
@@ -101,25 +101,25 @@ int SocketInput::get_firing_data_packet(
     // socket using a blocking read.
     uint8_t bytes[FIRING_DATA_PACKET_SIZE];
     ssize_t nbytes =
-        recvfrom(_sockfd, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
+        recvfrom( sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
-        AERROR << " recvfail from port " << _port;
+        AERROR << " recvfail from port " << port_;
         return RECIEVE_FAIL;
       }
     }
 
     if ((size_t)nbytes == FIRING_DATA_PACKET_SIZE) {
       pkt->set_data(bytes, FIRING_DATA_PACKET_SIZE);
-      // uint64_t _temp_stamp = apollo::cyber::Time().Now().ToNanosecond();
-      // uint64_t _pkt_start_diff = _temp_stamp -  _start_time;
-      // AINFO<<"pkt _start_time:["<<_start_time<<"]";
-      // AINFO<<"_pkt_start_diff:"<<apollo::cyber::Time(_pkt_start_diff -
+      // uint64_t temp_stamp_ = apollo::cyber::Time().Now().ToNanosecond();
+      // uint64_t pkt_start_diff_ = temp_stamp_ -  start_time_;
+      // AINFO<<"pkt start_time_:["<<_start_time<<"]";
+      // AINFO<<"_pkt_start_diff:"<<apollo::cyber::Time( pkt_start_diff_ -
       // last_pkt_stamp).ToSecond()*1000<<" ms"; last_pkt_stamp =
-      // _pkt_start_diff;
+      // pkt_start_diff_;
 
-      // pkt->set_stamp(_pkt_start_diff);
+      // pkt->set_stamp( pkt_start_diff_);
       //// NMEATimePtr nmea_time(new NMEATime);
       //// exract_nmea_time_from_packet(nmea_time, bytes+20);
       //
@@ -174,7 +174,7 @@ int SocketInput::get_firing_data_packet(
     }
 
     AERROR << " Incomplete suteng rising data packet read: " << nbytes
-           << " bytes from port " << _port;
+           << " bytes from port " << port_;
   }
   return 0;
 }
@@ -189,11 +189,11 @@ int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
     // Last 234 bytes not use
     uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
     ssize_t nbytes =
-        recvfrom(_sockfd, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
+        recvfrom( sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
-        AERROR << " recvfail from port " << _port;
+        AERROR << " recvfail from port " << port_;
         return 1;
       }
     }
@@ -208,7 +208,7 @@ int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
     }
 
     AINFO << "incomplete suteng packet read: " << nbytes << " bytes from port "
-          << _port;
+          << port_;
   }
 
   return 0;
@@ -217,27 +217,27 @@ int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
 bool SocketInput::input_available(int timeout) {
   (void)timeout;
   struct pollfd fds[1];
-  fds[0].fd = _sockfd;
+  fds[0].fd = sockfd_;
   fds[0].events = POLLIN;
   do {
     int retval = poll(fds, 1, POLL_TIMEOUT);
 
     if (retval < 0) {  // poll() error?
       if (errno != EINTR) {
-        AERROR << " suteng port " << _port
+        AERROR << " suteng port " << port_
                << "poll() error: " << strerror(errno);
       }
       return false;
     }
 
     if (retval == 0) {  // poll() timeout?
-      AERROR << " suteng port " << _port << " poll() timeout";
+      AERROR << " suteng port " << port_ << " poll() timeout";
       return false;
     }
 
     if ((fds[0].revents & POLLERR) || (fds[0].revents & POLLHUP) ||
         (fds[0].revents & POLLNVAL)) {  // device error?
-      AERROR << " suteng port " << _port << "poll() reports suteng error";
+      AERROR << " suteng port " << port_ << "poll() reports suteng error";
       return false;
     }
   } while ((fds[0].revents & POLLIN) == 0);

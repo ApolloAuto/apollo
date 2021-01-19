@@ -38,23 +38,23 @@ class RobosenseDriver {
     return true;
   }
   virtual void init() = 0;
-  uint64_t start_time() { return _start_time; }
+  uint64_t start_time() { return start_time_; }
 
  protected:
-  apollo::drivers::suteng::SutengConfig _config;
-  std::shared_ptr<Input> _input;
+  apollo::drivers::suteng::SutengConfig config_;
+  std::shared_ptr<Input> input_;
 
   bool flags = false;
 
-  uint64_t _basetime;
-  uint32_t _last_gps_time;
-  uint64_t _start_time;
+  uint64_t basetime_;
+  uint32_t last_gps_time_;
+  uint64_t start_time_;
   int poll_standard(
       const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
   int poll_sync_count(
       const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan,
       bool main_frame);
-  uint64_t _last_count;
+  uint64_t last_count_;
   bool set_base_time();
   void set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
                                     uint64_t* basetime,
@@ -74,9 +74,9 @@ class Robosense16Driver : public RobosenseDriver {
   void poll_positioning_packet();
 
  private:
-  std::shared_ptr<Input> _positioning_input;
+  std::shared_ptr<Input> positioning_input_;
   std::thread positioning_thread_;
-  std::atomic<bool> _running = {true};
+  std::atomic<bool> running_ = {true};
 };
 
 class RobosenseDriverFactory {

@@ -27,34 +27,34 @@ namespace robosense {
 
 /** @brief Constructor. */
 Convert::Convert(const apollo::drivers::suteng::SutengConfig& robo_config) {
-  _config = robo_config;
-  _config.set_view_direction(0.0);
-  _config.set_view_width(2.0 * M_PI);
+  config_ = robo_config;
+  config_.set_view_direction(0.0);
+  config_.set_view_width(2.0 * M_PI);
 }
 
 bool Convert::Init() {
-  _parser = RobosenseParserFactory::create_parser(_config);
-  if (_parser == nullptr) {
+  parser_ = RobosenseParserFactory::create_parser( config_);
+  if ( parser_ == nullptr) {
     AERROR << " can not create velodyen parser";
     return false;
   }
-  _parser->setup();
+  parser_->setup();
   return true;
 }
 
 Convert::~Convert() {
-  if (_parser != nullptr) {
-    delete _parser;
+  if ( parser_ != nullptr) {
+    delete parser_;
   }
 }
 
-uint32_t Convert::GetPointSize() { return _parser->GetPointSize(); }
+uint32_t Convert::GetPointSize() { return parser_->GetPointSize(); }
 
 /** @brief Callback for raw scan messages. */
 void Convert::convert_robosense_to_pointcloud(
     const std::shared_ptr<apollo::drivers::suteng::SutengScan const>& scan_msg,
     const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud) {
-  _parser->generate_pointcloud(scan_msg, point_cloud);
+  parser_->generate_pointcloud(scan_msg, point_cloud);
 
   if (point_cloud == nullptr || point_cloud->point_size() == 0) {
     AERROR << " point cloud has no point";

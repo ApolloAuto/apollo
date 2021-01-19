@@ -50,7 +50,7 @@ class Input {
    *          > 0 if incomplete packet (is this possible?)
    */
   virtual int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                                     int time_zone, uint64_t _start_time) = 0;
+                                     int time_zone, uint64_t start_time_) = 0;
   virtual int get_positioning_data_packtet(const NMEATimePtr& nmea_time) = 0;
   virtual void init() {}
   virtual void init(uint32_t port) { (void)port; }

@@ -35,75 +35,75 @@ namespace robosense {
 
 PcapInput::PcapInput(double packet_rate, const std::string& filename,
                      bool read_once, bool read_fast, double repeat_delay)
-    : Input(), _packet_rate(packet_rate) {
-  _filename = filename;
-  _fp = NULL;
-  _pcap = NULL;
-  _empty = true;
-  _read_once = read_once;
-  _read_fast = read_fast;
-  _repeat_delay = repeat_delay;
+    : Input(), packet_rate_(packet_rate) {
+  filename_ = filename;
+  fp_ = NULL;
+  pcap_ = NULL;
+  empty_ = true;
+  read_once_ = read_once;
+  read_fast_ = read_fast;
+  repeat_delay_ = repeat_delay;
 }
 
 void PcapInput::init() {
-  if (_pcap != NULL) {
+  if ( pcap_ != NULL) {
     return;
   }
 
-  if (_read_once) {
+  if ( read_once_) {
     AINFO << "Read input file only once.";
   }
 
-  if (_read_fast) {
+  if ( read_fast_) {
     AINFO << "Read input file as quickly as possible.";
   }
 
-  if (_repeat_delay > 0.0) {
-    AINFO << "Delay %.3f seconds before repeating input file." << _repeat_delay;
+  if ( repeat_delay_ > 0.0) {
+    AINFO << "Delay %.3f seconds before repeating input file." << repeat_delay_;
   }
 
-  if ((_pcap = pcap_open_offline(_filename.c_str(), _errbuf)) == NULL) {
+  if (( pcap_ = pcap_open_offline( filename_.c_str(), errbuf_)) == NULL) {
     AERROR << " Error opening suteng socket dump file.";
   }
 }
 
 /** destructor */
-PcapInput::~PcapInput(void) { pcap_close(_pcap); }
+PcapInput::~PcapInput(void) { pcap_close( pcap_); }
 // static uint64_t last_pkt_stamp = 0;
 /** @brief Get one suteng packet. */
 int PcapInput::get_firing_data_packet(
     apollo::drivers::suteng::SutengPacket* pkt, int time_zone,
-    uint64_t _start_time) {
+    uint64_t start_time_) {
   struct pcap_pkthdr* header;
   const u_char* pkt_data;
 
   while (true) {
     int res = 0;
 
-    if (_pcap == nullptr) {
+    if ( pcap_ == nullptr) {
       return -1;
     }
 
-    if ((res = pcap_next_ex(_pcap, &header, &pkt_data)) >= 0) {
+    if ((res = pcap_next_ex( pcap_, &header, &pkt_data)) >= 0) {
       if (header->len != FIRING_DATA_PACKET_SIZE + ETHERNET_HEADER_SIZE) {
         continue;
       }
 
       // Keep the reader from blowing through the file.
-      if (_read_fast == false) {
+      if ( read_fast_ == false) {
         sleep(0.3);
       }
       usleep(1000);
       pkt->set_data(pkt_data + ETHERNET_HEADER_SIZE, FIRING_DATA_PACKET_SIZE);
 
-      // uint64_t _temp_stamp = apollo::cyber::Time().Now().ToNanosecond();
-      // uint64_t _pkt_start_diff = _temp_stamp -  _start_time;
-      // // AINFO<<"pkt _start_time:["<<_start_time<<"]";
-      // // AINFO<<"_pkt_start_diff:"<<apollo::cyber::Time(_pkt_start_diff -
+      // uint64_t temp_stamp_ = apollo::cyber::Time().Now().ToNanosecond();
+      // uint64_t pkt_start_diff_ = temp_stamp_ -  start_time_;
+      // // AINFO<<"pkt start_time_:["<<_start_time<<"]";
+      // // AINFO<<"_pkt_start_diff:"<<apollo::cyber::Time( pkt_start_diff_ -
       // last_pkt_stamp).ToSecond()*1000<<" ms";
-      // // last_pkt_stamp = _pkt_start_diff;
+      // // last_pkt_stamp = pkt_start_diff_;
 
-      // pkt->set_stamp(_pkt_start_diff);
+      // pkt->set_stamp( pkt_start_diff_);
 
       // NMEATimePtr nmea_time(new NMEATime);
       // exract_nmea_time_from_packet(nmea_time, reinterpret_cast<const uint8_t
@@ -161,29 +161,29 @@ int PcapInput::get_firing_data_packet(
       //        nmea_time->sec<<"-" << nmea_time->msec
       //        <<"/"<< nmea_time->usec<< "]";
 
-      _empty = false;
+      empty_ = false;
       return 0;  // success
     }
 
-    if (_empty) {  // no data in file?
+    if ( empty_) {  // no data in file?
       AINFO << "Error %d reading suteng packet: %s" << res
-            << pcap_geterr(_pcap);
+            << pcap_geterr( pcap_);
       return -1;
     }
 
-    if (_read_once) {
+    if ( read_once_) {
       AINFO << "end of file reached -- done reading.";
       return PCAP_FILE_END;
     }
 
-    if (_repeat_delay > 0.0) {
-      AINFO << "end of file reached -- delaying %.3f seconds." << _repeat_delay;
-      usleep(static_cast<int>(_repeat_delay * 1000000.0));
+    if ( repeat_delay_ > 0.0) {
+      AINFO << "end of file reached -- delaying %.3f seconds." << repeat_delay_;
+      usleep(static_cast<int>( repeat_delay_ * 1000000.0));
     }
 
-    pcap_close(_pcap);
-    _pcap = pcap_open_offline(_filename.c_str(), _errbuf);
-    _empty = true;  // maybe the file disappeared?
+    pcap_close( pcap_);
+    pcap_ = pcap_open_offline( filename_.c_str(), errbuf_);
+    empty_ = true;  // maybe the file disappeared?
   }                 // loop back and try again
 }
 
@@ -194,18 +194,18 @@ int PcapInput::get_positioning_data_packtet(const NMEATimePtr& nmea_time) {
   while (true) {
     int res = 0;
 
-    if (_pcap == nullptr) {
+    if ( pcap_ == nullptr) {
       return -1;
     }
 
-    if ((res = pcap_next_ex(_pcap, &header, &pkt_data)) >= 0) {
+    if ((res = pcap_next_ex( pcap_, &header, &pkt_data)) >= 0) {
       if (header->len != POSITIONING_DATA_PACKET_SIZE + ETHERNET_HEADER_SIZE) {
         continue;
       }
 
       // Keep the reader from blowing through the file.
-      if (_read_fast == false) {
-        // _packet_rate.sleep();
+      if ( read_fast_ == false) {
+        // packet_rate_.sleep();
       }
       uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
 
@@ -213,35 +213,35 @@ int PcapInput::get_positioning_data_packtet(const NMEATimePtr& nmea_time) {
              POSITIONING_DATA_PACKET_SIZE);
       // read successful, exract nmea time
       if (exract_nmea_time_from_packet(nmea_time, bytes + 303)) {
-        _empty = false;
+        empty_ = false;
         return 0;  // success
       } else {
-        _empty = false;
+        empty_ = false;
         return -1;
       }
     }
 
-    if (_empty) {  // no data in file?
+    if ( empty_) {  // no data in file?
       AINFO << "Error %d reading suteng packet: %s" << res
-            << pcap_geterr(_pcap);
+            << pcap_geterr( pcap_);
       return -1;
     }
 
-    if (_read_once) {
+    if ( read_once_) {
       AINFO << "end of file reached -- done reading.";
       return PCAP_FILE_END;
     }
 
-    if (_repeat_delay > 0.0) {
-      AINFO << "end of file reached -- delaying %.3f seconds." << _repeat_delay;
-      usleep(static_cast<int>(_repeat_delay * 1000000.0));
+    if ( repeat_delay_ > 0.0) {
+      AINFO << "end of file reached -- delaying %.3f seconds." << repeat_delay_;
+      usleep(static_cast<int>( repeat_delay_ * 1000000.0));
     }
     // I can't figure out how to rewind the file, because it
     // starts with some kind of header.  So, close the file
     // and reopen it with pcap.
-    pcap_close(_pcap);
-    _pcap = pcap_open_offline(_filename.c_str(), _errbuf);
-    _empty = true;  // maybe the file disappeared?
+    pcap_close( pcap_);
+    pcap_ = pcap_open_offline( filename_.c_str(), errbuf_);
+    empty_ = true;  // maybe the file disappeared?
   }                 // loop back and try again
 }
 

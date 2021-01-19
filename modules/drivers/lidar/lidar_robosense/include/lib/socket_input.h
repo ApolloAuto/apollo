@@ -35,12 +35,12 @@ class SocketInput : public Input {
   virtual ~SocketInput();
   void init(uint32_t port);
   int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int time_zone, uint64_t _start_time);
+                             int time_zone, uint64_t start_time_);
   int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
 
  private:
-  int _sockfd;
-  int _port;
+  int sockfd_;
+  int port_;
   bool input_available(int timeout);
 };
 }  // namespace robosense

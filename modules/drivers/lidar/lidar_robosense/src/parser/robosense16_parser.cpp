@@ -28,8 +28,8 @@ namespace robosense {
 
 Robosense16Parser::Robosense16Parser(
     const apollo::drivers::suteng::SutengConfig& config)
-    : RobosenseParser(config), _previous_packet_stamp(0), _gps_base_usec(0) {
-  _need_two_pt_correction = false;
+    : RobosenseParser(config), previous_packet_stamp_(0), gps_base_usec_(0) {
+  need_two_pt_correction_ = false;
 }
 
 void Robosense16Parser::setup() {
@@ -63,7 +63,7 @@ void Robosense16Parser::generate_pointcloud(
   out_msg->mutable_header()->set_timestamp_sec(
       apollo::cyber::Time().Now().ToSecond());
   out_msg->set_height(1);
-  _gps_base_usec = scan_msg->basetime();  // * 1000000UL;
+  gps_base_usec_ = scan_msg->basetime();  // * 1000000UL;
 
   point_index_ = 0;
   // bool finish_packets_parse = false;
@@ -75,12 +75,12 @@ void Robosense16Parser::generate_pointcloud(
     //  finish_packets_parse = true;
     // }
     unpack_robosense(scan_msg->firing_pkts(i), out_msg, &nan_pts);
-    _last_time_stamp = out_msg->header().timestamp_sec();
+    last_time_stamp_ = out_msg->header().timestamp_sec();
   }
 
   if (out_msg->point_size() == 0) {
     // we discard this pointcloud if empty
-    AERROR << " All points is NAN!Please check suteng:" << _config.model();
+    AERROR << " All points is NAN!Please check suteng:" << config_.model();
   } else {
     // auto size = out_msg->point_size();
     // AINFO<<"points per frame:"<<point_index_;
@@ -108,8 +108,8 @@ uint64_t Robosense16Parser::get_timestamp(double base_time, float time_offset,
       base_time -
       time_offset;  //时秒 base_time 0-1h us微妙    time_offset 0-1278.72us
   uint64_t timestamp = Robosense16Parser::get_gps_stamp(
-      t, &_previous_packet_stamp,
-      &_gps_base_usec);  // _gps_base_usec gps基准时间 精度s
+      t, &previous_packet_stamp_,
+      &gps_base_usec_);  // gps_base_usec_ gps基准时间 精度s
   // AINFO<<"timestamp       : "<<timestamp;
   return timestamp;
 }
@@ -129,7 +129,7 @@ void Robosense16Parser::unpack_robosense(
 
   if (pkt_start) {
     pkt_start = false;
-    base_stamp = _gps_base_usec;
+    base_stamp = gps_base_usec_;
     AINFO << "base_stamp timestamp: [" << base_stamp
           << "], which is same as first POS-GPS-timestamp";
   }
@@ -218,9 +218,9 @@ void Robosense16Parser::unpack_robosense(
           cloud->set_measurement_time(static_cast<double>((timestamp) / 1e9));
         }
 
-        if (raw_dist.uint == 0 || distance2 < _config.min_range() ||
-            distance2 > _config.max_range()) {
-          if (_config.organized()) {
+        if (raw_dist.uint == 0 || distance2 < config_.min_range() ||
+            distance2 > config_.max_range()) {
+          if ( config_.organized()) {
             apollo::drivers::PointXYZIT* point = cloud->add_point();
             point->set_x(nan);
             point->set_y(nan);
@@ -244,12 +244,12 @@ void Robosense16Parser::unpack_robosense(
             static_cast<float>(-distance2 * cos(arg_vert) * sin(arg_hori));
         float x = static_cast<float>(distance2 * cos(arg_vert) * cos(arg_hori));
         float z = static_cast<float>(distance2 * sin(arg_vert));
-        if (_filter_set.size() > 0) {
+        if ( filter_set_.size() > 0) {
           std::string key =
-              std::to_string(static_cast<float>(x * 100 / _filter_grading)) +
+              std::to_string(static_cast<float>(x * 100 / filter_grading_)) +
               "+" +
-              std::to_string(static_cast<float>(y * 100 / _filter_grading));
-          if (_filter_set.find(key) != _filter_set.end()) {
+              std::to_string(static_cast<float>(y * 100 / filter_grading_));
+          if ( filter_set_.find(key) != filter_set_.end()) {
             x = NAN;
             y = NAN;
             z = NAN;

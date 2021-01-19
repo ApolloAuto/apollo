@@ -35,19 +35,19 @@ class PcapInput : public Input {
 
   void init();
   int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int _pkt_index, uint64_t _start_time);
+                             int pkt_index_, uint64_t start_time_);
   int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
 
  private:
-  std::string _filename;
-  FILE* _fp;
-  pcap* _pcap;
-  char _errbuf[PCAP_ERRBUF_SIZE];
-  bool _empty;
-  bool _read_once;
-  bool _read_fast;
-  double _repeat_delay;
-  double _packet_rate;
+  std::string filename_;
+  FILE* fp_;
+  pcap* pcap_;
+  char errbuf_[PCAP_ERRBUF_SIZE];
+  bool empty_;
+  bool read_once_;
+  bool read_fast_;
+  double repeat_delay_;
+  double packet_rate_;
 };
 }  // namespace robosense
 }  // namespace drivers

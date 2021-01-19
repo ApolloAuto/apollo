@@ -67,7 +67,7 @@ apollo::drivers::PointXYZIT RobosenseParser::get_nan_point(uint64_t timestamp) {
 
 RobosenseParser::RobosenseParser(
     const apollo::drivers::suteng::SutengConfig& config)
-    : _config(config), _last_time_stamp(0), _mode(STRONGEST) {}
+    : config_(config), last_time_stamp_(0), mode_(STRONGEST) {}
 
 void RobosenseParser::init_angle_params(double view_direction,
                                         double view_width) {
@@ -81,46 +81,46 @@ void RobosenseParser::init_angle_params(double view_direction,
 
   // converting into the hardware suteng ref (negative yaml and degrees)
   // adding 0.5 perfomrs a centered double to int conversion
-  _config.set_min_angle(100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5);
-  _config.set_max_angle(100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5);
-  if (_config.min_angle() == _config.max_angle()) {
+  config_.set_min_angle(100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5);
+  config_.set_max_angle(100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5);
+  if ( config_.min_angle() == config_.max_angle()) {
     // avoid returning empty cloud if min_angle = max_angle
-    _config.set_min_angle(0);
-    _config.set_max_angle(36000);
+    config_.set_min_angle(0);
+    config_.set_max_angle(36000);
   }
 }
 
 /** Set up for on-line operation. */
 void RobosenseParser::setup() {
-  _calibration.read(_config.calibration_file());
+  calibration_.read( config_.calibration_file());
 
-  if (!_calibration._initialized) {
+  if (!calibration_.initialized_) {
     AERROR << " Unable to open calibration file: "
-           << _config.calibration_file();
+           << config_.calibration_file();
   }
 
   // setup angle parameters.
-  init_angle_params(_config.view_direction(), _config.view_width());
-  init_sin_cos_rot_table(_sin_rot_table, _cos_rot_table, ROTATION_MAX_UNITS,
+  init_angle_params( config_.view_direction(), config_.view_width());
+  init_sin_cos_rot_table( sin_rot_table_, cos_rot_table_, ROTATION_MAX_UNITS,
                          ROTATION_RESOLUTION);
 
-  // get lidars_filter_config and put them into _filter_set
-  if (!_config.lidars_filter_config_path().empty()) {
+  // get lidars_filter_config and put them into filter_set_
+  if (!config_.lidars_filter_config_path().empty()) {
     // read config file
     apollo::drivers::suteng::LidarsFilter lidarsFilter;
     if (!apollo::cyber::common::GetProtoFromFile(
-            _config.lidars_filter_config_path(), &lidarsFilter)) {
+            config_.lidars_filter_config_path(), &lidarsFilter)) {
       AERROR << "Failed to load config file";
       return;
     }
     AINFO << "lidarsFilter Config:" << lidarsFilter.DebugString();
 
     for (int i = 0; i < lidarsFilter.lidar_size(); i++) {
-      if (lidarsFilter.lidar(i).frame_id() == _config.frame_id()) {
+      if (lidarsFilter.lidar(i).frame_id() == config_.frame_id()) {
         apollo::drivers::suteng::Lidar lidar(lidarsFilter.lidar(i));
-        _filter_grading = lidar.grading();
+        filter_grading_ = lidar.grading();
         for (int j = 0; j < lidar.point_size(); j++) {
-          _filter_set.insert(lidar.point(j));
+          filter_set_.insert(lidar.point(j));
         }
         break;
       }
@@ -130,7 +130,7 @@ void RobosenseParser::setup() {
 
 bool RobosenseParser::is_scan_valid(int rotation, float range) {
   // check range first
-  if (range < _config.min_range() || range > _config.max_range()) {
+  if (range < config_.min_range() || range > config_.max_range()) {
     return false;
   }
   (void)rotation;

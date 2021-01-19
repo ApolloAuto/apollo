@@ -76,16 +76,16 @@ class RobosenseStatus {
   void check_warningbit();
   void check_motor_speed();
 
-  std::string _topic_packets;
-  std::string _model;
+  std::string topic_packets_;
+  std::string model_;
 
-  std::vector<std::pair<uint8_t, uint8_t>> _status;
+  std::vector<std::pair<uint8_t, uint8_t>> status_;
 
   // queue size for ros node pub
-  int _queue_size;
+  int queue_size_;
 
-  WarningBits* _warning_bits;
-  MotorSpeed _motor_speed;
+  WarningBits* warning_bits_;
+  MotorSpeed motor_speed_;
 };
 
 }  // namespace robosense
