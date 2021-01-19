@@ -22,6 +22,8 @@ export default class RouteEditingManager {
 
     currentDefaultRouting = 'none';
 
+    parkingRoutingDistanceThreshold = 20.0;
+
     @action updateDefaultRoutingEndPoint(data) {
       if (data.poi === undefined) {
         return;
@@ -162,5 +164,11 @@ export default class RouteEditingManager {
       const distance =
           Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
       return distance <= this.defaultRoutingDistanceThreshold;
+    }
+
+    updateParkingRoutingDistance(data) {
+      if (data.threshold) {
+        this.parkingRoutingDistanceThreshold = data.threshold;
+      }
     }
 }

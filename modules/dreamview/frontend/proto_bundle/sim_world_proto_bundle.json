@@ -10474,6 +10474,12 @@
                 }
               }
             },
+            "ParkingSpotType": {
+              "values": {
+                "VERTICAL_PLOT": 0,
+                "PARALLEL_PLOT": 1
+              }
+            },
             "ParkingInfo": {
               "fields": {
                 "parkingSpaceId": {
@@ -10483,6 +10489,14 @@
                 "parkingPoint": {
                   "type": "apollo.common.PointENU",
                   "id": 2
+                },
+                "parkingSpotType": {
+                  "type": "ParkingSpotType",
+                  "id": 3
+                },
+                "cornerPoint": {
+                  "type": "apollo.hdmap.Polygon",
+                  "id": 4
                 }
               }
             },
