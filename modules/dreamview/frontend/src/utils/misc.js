@@ -104,7 +104,7 @@ export function pointWithDirectionVector(p, p1, p2) {
         x: p.x - p1.x,
         y: p.y - p1.y,
     };
-    return (directionVectorCrossProduct(p1p,p1p2))>0;
+    return (directionVectorCrossProduct(p1p, p1p2)) > 0;
 }
 
 export function directionVectorCrossProduct(p1, p2, abs = false) {

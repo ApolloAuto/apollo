@@ -14,8 +14,8 @@ proto_library(
     srcs = ["task_manager.proto"],
     deps = [
         "//modules/common/proto:header_proto_lib",
-        "//modules/routing/proto:routing_proto_lib",
         "//modules/map/proto:map_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
     ],
 )
 

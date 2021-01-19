@@ -91,7 +91,7 @@ export default class RoutingEditor {
     const lastPoint = this.routePoints.pop();
     let index = -1;
     if (lastPoint) {
-      index=this.removeRoutingPoint(scene, lastPoint);
+      index = this.removeRoutingPoint(scene, lastPoint);
     }
     return index;
   }
@@ -125,7 +125,7 @@ export default class RoutingEditor {
     // parking routing request vs common routing request
     if (this.routePoints.length === 0 && routingPoints.length === 0) {
       alert("Please provide at least an end point.");
-        return false;
+      return false;
     }
     const index = _.isEmpty(this.routePoints) ?
       -1 : this.isPointInParkingSpace(this.routePoints[this.routePoints.length - 1].position);

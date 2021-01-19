@@ -509,30 +509,30 @@ bool SimulationWorldUpdater::ConstructParkingRoutingTask(
   }
   auto *requested_parking_space = parking_routing_task->mutable_parking_space();
   if (!JsonStringToMessage(json["parkingSpace"].dump(), requested_parking_space)
-  .ok()) {
+           .ok()) {
     AERROR << "Failed to prepare a parking routing task: invalid parking space."
-             << json["parkingSpace"].dump();
-             return false;
+           << json["parkingSpace"].dump();
+    return false;
   }
   auto iter = json.find("points");
   if (iter == json.end() || !iter->is_array()) {
     AERROR << "Failed to prepare a parking routing task: invalid points.";
     return false;
   }
-    auto *routing_point = parking_routing_task->mutable_routing_point();
-    for (size_t i = 0; i < iter->size(); ++i) {
-      auto &point = (*iter)[i];
-      if (!ValidateCoordinate(point)) {
-        AERROR << "Failed to prepare a parking routing task: invalid point.";
-        return false;
-      }
-      if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
-                                               routing_point->Add())) {
-        AERROR << "Failed to construct a LaneWayPoint, skipping.";
-        routing_point->RemoveLast();
-      }
+  auto *routing_point = parking_routing_task->mutable_routing_point();
+  for (size_t i = 0; i < iter->size(); ++i) {
+    auto &point = (*iter)[i];
+    if (!ValidateCoordinate(point)) {
+      AERROR << "Failed to prepare a parking routing task: invalid point.";
+      return false;
     }
-    return true;
+    if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
+                                               routing_point->Add())) {
+      AERROR << "Failed to construct a LaneWayPoint, skipping.";
+      routing_point->RemoveLast();
+    }
+  }
+  return true;
 }
 
 bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {

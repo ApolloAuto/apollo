@@ -426,8 +426,7 @@ export default class Map {
                                 newData[kind][i], colorMapping.YELLOW, coordinates, scene),
                             text: this.addParkingSpaceId(newData[kind][i], coordinates, scene)
                         }));
-                        const result = this.adjustPointOrder(newData[kind][i], coordinates);
-                        adjustOrder.push(result);
+                        adjustOrder.push(this.adjustPointOrder(newData[kind][i], coordinates));
                         break;
                     case "speedBump":
                         this.data[kind].push(Object.assign(newData[kind][i], {
@@ -533,7 +532,6 @@ export default class Map {
         if (overlapId.length !== 0) {
             const laneIndex = _.findIndex(this.data['lane'], item => {
                 return _.findIndex(item.overlapId, { 'id': overlapId[0].id }) !== -1;
-
             });
             if (laneIndex !== -1) {
                 const centralLine = _.get(this.data['lane'][laneIndex], 'centralCurve.segment');
@@ -681,7 +679,6 @@ export default class Map {
             }
             result = order2[orderIndex];
         }
-        console.log(result);
         return result;
     }
 }

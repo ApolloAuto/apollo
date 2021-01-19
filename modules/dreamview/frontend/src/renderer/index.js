@@ -336,7 +336,7 @@ class Renderer {
 
     removeInvalidRoutingPoint(pointId, error) {
         const index = this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
-        if ( index!== -1) {
+        if ( index !== -1) {
             this.map.changeSelectedParkingSpaceColor(index, 0xDAA520);
         }
     }
@@ -496,9 +496,9 @@ class Renderer {
         if (removeOldMap) {
             this.map.removeAllElements(this.scene);
         }
-        const adjustOrder=this.map.appendMapData(newData, this.coordinates, this.scene);
+        const adjustOrder = this.map.appendMapData(newData, this.coordinates, this.scene);
         if (newData['parkingSpace'] && !_.isEmpty(adjustOrder)) {
-            this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'],adjustOrder,this.coordinates);
+            this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], adjustOrder, this.coordinates);
         }
     }
 
