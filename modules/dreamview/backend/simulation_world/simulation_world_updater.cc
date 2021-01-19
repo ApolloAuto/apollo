@@ -527,7 +527,7 @@ bool SimulationWorldUpdater::ConstructParkingRoutingTask(
       return false;
     }
     if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
-                                               routing_point->Add())) {
+                                             routing_point->Add())) {
       AERROR << "Failed to construct a LaneWayPoint, skipping.";
       routing_point->RemoveLast();
     }
