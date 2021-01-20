@@ -16,8 +16,6 @@
 
 #include "cyber/class_loader/utility/class_loader_utility.h"
 
-#include "cyber/class_loader/class_loader.h"
-
 namespace apollo {
 namespace cyber {
 namespace class_loader {
