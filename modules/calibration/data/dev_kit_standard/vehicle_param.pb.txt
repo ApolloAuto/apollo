@@ -20,6 +20,7 @@ vehicle_param {
   steer_ratio: 7.5
   wheel_base: 0.620
   wheel_rolling_radius: 0.150
+  max_abs_speed_when_stopped: 0.1
 
   brake_deadzone: 10.0
   throttle_deadzone: 12.0
