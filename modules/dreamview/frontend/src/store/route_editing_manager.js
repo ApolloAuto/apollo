@@ -15,7 +15,7 @@ export default class RouteEditingManager {
 
     @observable defaultRoutings = {};
 
-    @observable defaultRoutingDistanceThreshold = 5;
+    @observable defaultRoutingDistanceThreshold = 10.0;
 
     defaultParkingInfo = {};
 
