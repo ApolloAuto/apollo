@@ -75,6 +75,10 @@ data_files {
   dest_path: "/apollo/modules/drivers/lidar/velodyne/conf"
 }
 data_files {
+  source_path: "hesai_conf"
+  dest_path: "/apollo/modules/drivers/lidar/hesai/conf"
+}
+data_files {
   source_path: "camera_conf"
   dest_path: "/apollo/modules/drivers/camera/conf"
 }
@@ -173,14 +177,6 @@ data_files {
 data_files {
   source_path: "canbus_conf/canbus_conf.pb.txt"
   dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
-}
-data_files {
-  source_path: "hmi_mode/mkz109_debug.pb.txt"
-  dest_path: "/apollo/modules/dreamview/conf/hmi_modes/mkz_standard_debug.pb.txt"
-}
-data_files {
-  source_path: "lidar_conf/hesai/conf/hesai40p.pb.txt"
-  dest_path: "/apollo/modules/drivers/lidar/hesai/conf/hesai40p.pb.txt"
 }
 data_files {
   source_path: "perception_camera_params"
