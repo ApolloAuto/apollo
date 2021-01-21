@@ -170,3 +170,24 @@ data_files {
   source_path: "perception_conf/pointcloud_preprocessor.conf"
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
 }
+data_files {
+  source_path: "canbus_conf/canbus_conf.pb.txt"
+  dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
+}
+data_files {
+  source_path: "hmi_mode/mkz109_debug.pb.txt"
+  dest_path: "/apollo/modules/dreamview/conf/hmi_modes/mkz_standard_debug.pb.txt"
+}
+data_files {
+  source_path: "lidar_conf/hesai/conf/hesai40p.pb.txt"
+  dest_path: "/apollo/modules/drivers/lidar/hesai/conf/hesai40p.pb.txt"
+}
+data_files {
+  source_path: "perception_camera_params"
+  dest_path: "/apollo/modules/perception/production/data/perception/camera/params"
+}
+data_files {
+  source_path: "perception_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+
