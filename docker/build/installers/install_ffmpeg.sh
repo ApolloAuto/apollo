@@ -111,6 +111,7 @@ if [[ -n "${CLEAN_DEPS}" ]]; then
         libvorbis0a \
         libvorbisenc2 \
         libfdk-aac1 \
+        libass9     \
         libtheora0
 fi
 
