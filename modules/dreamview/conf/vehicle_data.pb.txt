@@ -179,6 +179,10 @@ data_files {
   dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
 }
 data_files {
+  source_path: "hmi_mode/mkz109_debug.pb.txt"
+  dest_path: "/apollo/modules/dreamview/conf/hmi_modes/mkz_standard_debug.pb.txt"
+}
+data_files {
   source_path: "perception_camera_params"
   dest_path: "/apollo/modules/perception/production/data/perception/camera/params"
 }
