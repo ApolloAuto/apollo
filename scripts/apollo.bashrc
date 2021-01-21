@@ -212,21 +212,6 @@ function find_prettier_srcs() {
     -or -name "*.yml"
 }
 
-## Prevent multiple entries of my_libdir in LD_LIBRARY_PATH
-function add_to_ld_library_path() {
-  if [ -z "$1" ]; then
-    return
-  fi
-  local my_libdir="$1"
-  local result="${LD_LIBRARY_PATH}"
-  if [ -z "${result}" ]; then
-    result="${my_libdir}"
-  elif [ -n "${result##*${my_libdir}}" ] && [ -n "${result##*${my_libdir}:*}" ]; then
-    result="${result}:${my_libdir}"
-  fi
-  export LD_LIBRARY_PATH="${result}"
-}
-
 # Exits the script if the command fails.
 function run() {
   if [ "${VERBOSE}" = yes ]; then
@@ -287,17 +272,16 @@ function setup_gpu_support() {
 
   determine_gpu_use_target
 
-  local dev=
-  if [ "${USE_GPU_TARGET}" -eq 0 ]; then
-    dev="cpu"
-  else
+  # TODO(infra): revisit this for CPU builds on GPU capable machines
+  local dev="cpu"
+  if [ "${USE_GPU_TARGET}" -gt 0 ]; then
     dev="gpu"
   fi
 
   local torch_path="/usr/local/libtorch_${dev}/lib"
   if [ -d "${torch_path}" ]; then
     # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
-    export LD_LIBRARY_PATH="${torch_path}:$LD_LIBRARY_PATH"
+    pathprepend ${torch_path} LD_LIBRARY_PATH
   fi
 }
 
