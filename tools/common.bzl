@@ -1,5 +1,3 @@
-load("@bazel_skylib//lib:paths.bzl", "paths")
-
 # Sanitize a dependency so that it works correctly from code that includes
 # TensorFlow as a submodule.
 def clean_dep(dep):
@@ -36,6 +34,47 @@ def dirname(p):
         # If there are multiple consecutive slashes, strip them all out as Python's
         # os.path.dirname does.
         return prefix.rstrip("/")
+
+def _path_is_absolute(path):
+    """Returns `True` if `path` is an absolute path.
+
+    Args:
+      path: A path (which is a string).
+
+    Returns:
+      `True` if `path` is an absolute path.
+    """
+    return path.startswith("/") or (len(path) > 2 and path[1] == ":")
+
+def join_paths(path, *others):
+    """Joins one or more path components intelligently.
+
+    This function mimics the behavior of Python's `os.path.join` function on POSIX
+    platform. It returns the concatenation of `path` and any members of `others`,
+    inserting directory separators before each component except the first. The
+    separator is not inserted if the path up until that point is either empty or
+    already ends in a separator.
+
+    If any component is an absolute path, all previous components are discarded.
+
+    Args:
+      path: A path segment.
+      *others: Additional path segments.
+
+    Returns:
+      A string containing the joined paths.
+    """
+    result = path
+
+    for p in others:
+        if _path_is_absolute(p):
+            result = p
+        elif not result or result.endswith("/"):
+            result += p
+        else:
+            result += "/" + p
+
+    return result
 
 ## Adapted from RobotLocomotion/drake:tools/skylark/pathutils.bzl
 # Remove prefix from path.
@@ -164,7 +203,7 @@ def output_path(ctx, input_file, strip_prefix, package_root = None):
 
     if package_root == None:
         # Determine base path of invoking context.
-        package_root = paths.join(ctx.label.workspace_root, ctx.label.package)
+        package_root = join_paths(ctx.label.workspace_root, ctx.label.package)
 
     # Determine effective path by removing path of invoking context and any
     # Bazel output-files path.
@@ -172,7 +211,7 @@ def output_path(ctx, input_file, strip_prefix, package_root = None):
     if input_file.is_source:
         input_path = _remove_prefix(input_path, package_root)
     else:
-        out_root = paths.join("bazel-out/*/*", package_root)
+        out_root = join_paths("bazel-out/*/*", package_root)
         input_path = _remove_prefix(input_path, out_root)
 
     # Deal with possible case of file outside the package root.
