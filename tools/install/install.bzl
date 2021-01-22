@@ -1,8 +1,6 @@
 # -*- python -*-
 # Adapted from RobotLocomotion/drake:tools/install/install.bzl
-load("@rules_python//python:defs.bzl", "py_binary")
-load("@bazel_skylib//lib:paths.bzl", "paths")
-load("//tools:common.bzl", "dirname", "output_path")
+load("//tools:common.bzl", "dirname", "join_paths", "output_path")
 
 InstallInfo = provider()
 
@@ -30,7 +28,7 @@ def _rename(file_dest, rename):
     """Compute file name if file renamed."""
     if file_dest in rename:
         renamed = rename[file_dest]
-        return paths.join(dirname(file_dest), renamed)
+        return join_paths(dirname(file_dest), renamed)
     return file_dest
 
 def _depset_to_list(x):
@@ -57,7 +55,7 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
     # to resolve against the list of allowed externals.
     if path == None and hasattr(ctx.attr, "allowed_externals"):
         for x in ctx.attr.allowed_externals:
-            package_root = paths.join(x.label.workspace_root, x.label.package)
+            package_root = join_paths(x.label.workspace_root, x.label.package)
             path = output_path(ctx, input_file, strip_prefix, package_root)
             if path != None:
                 return path
@@ -127,7 +125,7 @@ def _install_action(
     else:
         strip_prefix = strip_prefixes
 
-    file_dest = paths.join(
+    file_dest = join_paths(
         dest,
         _output_path(ctx, artifact, strip_prefix, warn_foreign),
     )
@@ -255,18 +253,6 @@ def _install_cc_actions(ctx, target):
     return actions
 
 #------------------------------------------------------------------------------
-# Compute install actions for a py_library or py_binary.
-# TODO(jamiesnape): Install native shared libraries that the target may use.
-def _install_py_actions(ctx, target):
-    return _install_actions(
-        ctx,
-        [target],
-        ctx.attr.py_dest,
-        ctx.attr.py_strip_prefix,
-        rename = ctx.attr.rename,
-    )
-
-#------------------------------------------------------------------------------
 # Compute install actions for a script or an executable.
 def _install_runtime_actions(ctx, target):
     return _install_actions(
@@ -324,7 +310,7 @@ def _install_impl(ctx):
         if CcInfo in t:
             actions += _install_cc_actions(ctx, t)
         elif PyInfo in t:
-            actions += _install_py_actions(ctx, t)
+            pass
         elif hasattr(t, "files_to_run") and t.files_to_run.executable:
             # Executable scripts copied from source directory.
             actions += _install_runtime_actions(ctx, t)
@@ -359,7 +345,7 @@ def _install_impl(ctx):
 
     # Return actions.
     files = ctx.runfiles(
-        files = [a.src for a in actions]
+        files = [a.src for a in actions],
     )
     return [
         InstallInfo(
@@ -396,8 +382,6 @@ _install_rule = rule(
         "library_strip_prefix": attr.string_list(),
         "runtime_dest": attr.string(default = "bin"),
         "runtime_strip_prefix": attr.string_list(),
-        "py_dest": attr.string(default = "@PYTHON_SITE_PACKAGES@"),
-        "py_strip_prefix": attr.string_list(),
         "rename": attr.string_dict(),
         "workspace": attr.string(),
         "allowed_externals": attr.label_list(allow_files = True),
@@ -489,9 +473,6 @@ Args:
     library_strip_prefix: List of prefixes to remove from shared library paths.
     runtime_dest: Destination for executable targets (default = "bin").
     runtime_strip_prefix: List of prefixes to remove from executable paths.
-    py_dest: Destination for Python targets
-        (default = "lib/python{MAJOR}.{MINOR}/site-packages").
-    py_strip_prefix: List of prefixes to remove from Python paths.
     rename: Mapping of install paths to alternate file names, used to rename
       files upon installation.
     workspace: Workspace name to use in default paths (overrides built-in
