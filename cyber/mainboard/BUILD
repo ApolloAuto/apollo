@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,6 +19,11 @@ cc_binary(
         "//cyber:cyber_core",
         "//cyber/proto:dag_conf_cc_proto",
     ],
+)
+
+install(
+    name = "install",
+    targets = [":mainboard"],
 )
 
 cpplint()

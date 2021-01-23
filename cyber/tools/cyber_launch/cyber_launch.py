@@ -54,7 +54,6 @@ COLORS = {
     'CRITICAL': YELLOW
 }
 
-
 class ColoredFormatter(logging.Formatter):
 
     def __init__(self, msg):
