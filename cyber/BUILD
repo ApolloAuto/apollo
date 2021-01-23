@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,7 +8,18 @@ cc_library(
     name = "cyber",
     linkstatic = False,
     deps = [
-        "//cyber:cyber_core",
+        ":cyber_core",
+    ],
+)
+
+install(
+    name = "install",
+    targets = [
+        ":cyber_core",
+    ],
+    deps = [
+        ":install_cyber_conf",
+        "//cyber/mainboard:install",
     ],
 )
 
@@ -100,6 +112,14 @@ filegroup(
     srcs = glob([
         "conf/*.conf",
     ]),
+)
+
+install(
+    name = "install_cyber_conf",
+    data = [
+        ":cyber_conf",
+    ],
+    data_dest = "cyber",
 )
 
 cpplint()
