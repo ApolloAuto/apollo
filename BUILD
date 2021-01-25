@@ -14,6 +14,7 @@ install(
     deps = [
         "//cyber:install",
         "//cyber/examples:install",
+        "//scripts:install",
         # "//modules/control:install",
         # "//modules/drivers:install",
     ],
