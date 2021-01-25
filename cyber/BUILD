@@ -20,6 +20,7 @@ install(
     deps = [
         ":install_cyber_conf",
         "//cyber/mainboard:install",
+        "//cyber/tools:install",
     ],
 )
 
