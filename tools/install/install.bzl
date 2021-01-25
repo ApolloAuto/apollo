@@ -253,6 +253,18 @@ def _install_cc_actions(ctx, target):
     return actions
 
 #------------------------------------------------------------------------------
+# Compute install actions for a py_library or py_binary.
+# TODO(jamiesnape): Install native shared libraries that the target may use.
+def _install_py_actions(ctx, target):
+    return _install_actions(
+        ctx,
+        [target],
+        ctx.attr.py_dest,
+        ctx.attr.py_strip_prefix,
+        rename = ctx.attr.rename,
+    )
+
+#------------------------------------------------------------------------------
 # Compute install actions for a script or an executable.
 def _install_runtime_actions(ctx, target):
     return _install_actions(
@@ -310,7 +322,7 @@ def _install_impl(ctx):
         if CcInfo in t:
             actions += _install_cc_actions(ctx, t)
         elif PyInfo in t:
-            pass
+            actions += _install_py_actions(ctx, t)
         elif hasattr(t, "files_to_run") and t.files_to_run.executable:
             # Executable scripts copied from source directory.
             actions += _install_runtime_actions(ctx, t)
@@ -382,6 +394,8 @@ _install_rule = rule(
         "library_strip_prefix": attr.string_list(),
         "runtime_dest": attr.string(default = "bin"),
         "runtime_strip_prefix": attr.string_list(),
+        "py_dest": attr.string(default = "lib/python"),
+        "py_strip_prefix": attr.string_list(),
         "rename": attr.string_dict(),
         "workspace": attr.string(),
         "allowed_externals": attr.label_list(allow_files = True),
@@ -473,6 +487,9 @@ Args:
     library_strip_prefix: List of prefixes to remove from shared library paths.
     runtime_dest: Destination for executable targets (default = "bin").
     runtime_strip_prefix: List of prefixes to remove from executable paths.
+    py_dest: Destination for Python targets
+        (default = "lib/python").
+    py_strip_prefix: List of prefixes to remove from Python paths.
     rename: Mapping of install paths to alternate file names, used to rename
       files upon installation.
     workspace: Workspace name to use in default paths (overrides built-in
