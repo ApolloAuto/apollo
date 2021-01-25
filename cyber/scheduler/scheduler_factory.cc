@@ -60,7 +60,8 @@ Scheduler* Instance() {
       if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
         policy = cfg.scheduler_conf().policy();
       } else {
-        AWARN << "No sched conf found, use default conf.";
+        AWARN << "Scheduler conf named " << cfg_file
+              << " not found, use default.";
       }
       if (!policy.compare("classic")) {
         obj = new SchedulerClassic();
