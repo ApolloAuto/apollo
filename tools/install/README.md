@@ -16,13 +16,22 @@ TimerComponentExample in CyberRT works.
 Approach 2:
 
 ```bash
-bazel run //:install -- /tmp
-# To just view what will be installed
-bazel run //:install -- --list /tmp
+./apollo.sh release
+cd /tmp/apollo
+source cyber/setup.bash
 ```
 
-The current issue with Approach 2 is that only `mainboard` was installed. Shared
-libraries it links didn't get installed automatically.
+The current issue with Approach 2 is that shared libraries which `mainboard` links
+to didn't get installed automatically.
 
 Need to figure out how [Drake](https://github.com/RobotLocomotion/drake) project
 handles this.
+
+## Known Issues
+
+```text
+warning: working around a Linux kernel bug by creating a hole of 2183168 bytes in ‘/tmp/apollo/cyber/examples/common_component_example/channel_prediction_writer’
+warning: working around a Linux kernel bug by creating a hole of 2183168 bytes in ‘/tmp/apollo/cyber/examples/common_component_example/channel_test_writer’
+warning: working around a Linux kernel bug by creating a hole of 2183168 bytes in ‘/tmp/apollo/cyber/examples/talker’
+warning: working around a Linux kernel bug by creating a hole of 2183168 bytes in ‘/tmp/apollo/cyber/examples/listener’
+```
