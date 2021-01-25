@@ -114,15 +114,10 @@ function determine_images_for_x86_64() {
     local stage="$1" # Build stage, base/cyber/dev
     local dist="$2"  # stable or testing
 
-    if [[ "${dist}" == "stable" ]]; then
-        CUDA_LITE=10.2
-        CUDNN_VERSION="7.6.5.32"
-        TENSORRT_VERSION="7.0.0"
-    else
-        CUDA_LITE=11.1
-        CUDNN_VERSION="8.0.4.30"
-        TENSORRT_VERSION="7.2.1"
-    fi
+    CUDA_LITE=11.1
+    CUDNN_VERSION="8.0.4.30"
+    TENSORRT_VERSION="7.2.1"
+
     local cudnn_ver="${CUDNN_VERSION%%.*}"
     local trt_ver="${TENSORRT_VERSION%%.*}"
 
@@ -139,7 +134,7 @@ function determine_images_for_x86_64() {
         fi
     elif [[ "${stage}" == "dev" ]]; then
         if [[ "${dist}" == "stable" ]]; then
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-20210106_1538"
+            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-20210125_1121"
             IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-${TIMESTAMP}"
         else
             IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-20210108_1510"

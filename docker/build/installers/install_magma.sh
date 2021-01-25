@@ -26,7 +26,7 @@ if ldconfig -p | grep -q magma ; then
 fi
 
 : ${INSTALL_MODE:=download}
-: ${APOLLO_DIST:=stable}
+# : ${APOLLO_DIST:=stable} # re-enable this if differentiation is needed.
 
 GPU_ARCHS=
 function determine_gpu_targets() {
@@ -52,13 +52,8 @@ VERSION="2.5.4"
 
 if [[ "${INSTALL_MODE}" == "download" ]]; then
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-        if [[ "${APOLLO_DIST}" == "stable" ]]; then
-            CHECKSUM="962447d0f4dfbfade34d4b1dd8658a97b6fdeb88340637581566f24861a60812"
-            PKG_NAME="magma-${VERSION}-cu102-x86_64.tar.gz"
-        else
-            CHECKSUM="546f7739109ba6cf93696882d8b18c0e35e68e0c8531ce9f9ca8fa345a1f227c"
-            PKG_NAME="magma-${VERSION}-cu111-x86_64.tar.gz"
-        fi
+        CHECKSUM="546f7739109ba6cf93696882d8b18c0e35e68e0c8531ce9f9ca8fa345a1f227c"
+        PKG_NAME="magma-${VERSION}-cu111-x86_64.tar.gz"
     else # AArch64
         CHECKSUM="95b9cc9a42e05af3572fe22210230bdbeec023c9481eaeae1f9de051d1171893"
         PKG_NAME="magma-${VERSION}-cu102-aarch64.tar.gz"
