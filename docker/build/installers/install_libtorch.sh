@@ -36,8 +36,8 @@ TARGET_ARCH="$(uname -m)"
 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     # https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip
-    VERSION="1.7.0-1"
-    CHECKSUM="fad449b3352467d13308f1793745fc28b069acfb2d05c8020898a19fef0ccf38"
+    VERSION="1.7.0-2"
+    CHECKSUM="02fd4f30e97ce8911ef933d0516660892392e95e6768b50f591f4727f6224390"
 elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
     VERSION="1.6.0-1"
     CHECKSUM="6d1fba522e746213c209fbf6275fa6bac68e360bcd11cbd4d3bdbddb657bee82"
@@ -58,8 +58,8 @@ ok "Successfully installed libtorch_cpu ${VERSION}"
 ##============================================================##
 # libtorch_gpu
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-    VERSION="1.7.0-1"
-    CHECKSUM="08932dddd0a8551e6d94397560257eefe4e209f11ac4fa6172b28def0a1d7da9"
+    VERSION="1.7.0-2"
+    CHECKSUM="b64977ca4a13ab41599bac8a846e8782c67ded8d562fdf437f0e606cd5a3b588"
     PKG_NAME="libtorch_gpu-${VERSION}-cu111-linux-x86_64.tar.gz"
 else # AArch64
     VERSION="1.6.0-1"
