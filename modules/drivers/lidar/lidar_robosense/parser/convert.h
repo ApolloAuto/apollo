@@ -15,40 +15,35 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string>
+#include <memory>
 
-#include "modules/drivers/lidar/lidar_robosense/include/lib/data_type.h"
-#include "modules/drivers/lidar/lidar_robosense/include/lib/input.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
+
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-class PcapInput : public Input {
+// convert suteng data to pointcloud and republish
+class Convert {
  public:
-  PcapInput(double packet_rate, const std::string& filename,
-            bool read_once = false, bool read_fast = false,
-            double repeat_delay = 0.0);
-  virtual ~PcapInput();
+  explicit Convert(const apollo::drivers::suteng::SutengConfig& robo_config);
+  ~Convert();
 
-  void init();
-  int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int pkt_index_, uint64_t start_time_);
-  int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
+  void convert_robosense_to_pointcloud(
+      const std::shared_ptr<apollo::drivers::suteng::SutengScan const>&
+          scan_msg,
+      const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud);
+
+  bool Init();
+  uint32_t GetPointSize();
 
  private:
-  std::string filename_;
-  FILE* fp_;
-  pcap* pcap_;
-  char errbuf_[PCAP_ERRBUF_SIZE];
-  bool empty_;
-  bool read_once_;
-  bool read_fast_;
-  double repeat_delay_;
-  double packet_rate_;
+  RobosenseParser* parser_;
+  apollo::drivers::suteng::SutengConfig config_;
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

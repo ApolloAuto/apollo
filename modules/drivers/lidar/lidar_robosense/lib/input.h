@@ -16,11 +16,11 @@
 
 #pragma once
 #include <pcap.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/lidar_robosense/include/lib/data_type.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 
 namespace apollo {

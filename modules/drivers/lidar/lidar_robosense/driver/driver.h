@@ -18,9 +18,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/drivers/lidar/lidar_robosense/include/lib/data_type.h"
-#include "modules/drivers/lidar/lidar_robosense/include/lib/pcap_input.h"
-#include "modules/drivers/lidar/lidar_robosense/include/lib/socket_input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/pcap_input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/socket_input.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 

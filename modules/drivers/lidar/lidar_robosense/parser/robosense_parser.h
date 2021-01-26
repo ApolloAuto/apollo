@@ -17,16 +17,15 @@
 #pragma once
 #include <errno.h>
 #include <stdint.h>
-
-#include <boost/format.hpp>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
+#include "boost/format.hpp"
+#include "modules/drivers/lidar/lidar_robosense/lib/calibration.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/const_variables.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
 
-#include "modules/drivers/lidar/lidar_robosense/include/lib/calibration.h"
-#include "modules/drivers/lidar/lidar_robosense/include/lib/const_variables.h"
-#include "modules/drivers/lidar/lidar_robosense/include/lib/data_type.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/lidars_filter_config.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"

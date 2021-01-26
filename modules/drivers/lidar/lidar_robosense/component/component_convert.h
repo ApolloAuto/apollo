@@ -15,16 +15,14 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-
 #include <deque>
 #include <memory>
 #include <string>
 #include <thread>
-
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/lidar_robosense/include/parser/convert.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/convert.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 

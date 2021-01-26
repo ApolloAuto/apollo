@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#include "modules/drivers/lidar/lidar_robosense/include/lib/calibration.h"
-
-#include <yaml-cpp/yaml.h>
-
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -25,16 +20,8 @@
 #include <map>
 #include <string>
 #include <utility>
-
-namespace YAML {
-
-// The >> operator disappeared in yaml-cpp 0.5, so this function is
-// added to provide support for code written under the yaml-cpp 0.3 API.
-template <typename T>
-void operator>>(const YAML::Node& node, T& i) {
-  i = node.as<T>();
-}
-}  // namespace YAML
+#include <yaml-cpp/yaml.h>
+#include "modules/drivers/lidar/lidar_robosense/lib/calibration.h"
 
 namespace apollo {
 namespace drivers {
@@ -56,6 +43,12 @@ const char MIN_INTENSITY[] = "min_intensity";
 const char FOCAL_DISTANCE[] = "focal_distance";
 const char FOCAL_SLOPE[] = "focal_slope";
 
+// The >> operator disappeared in yaml-cpp 0.5, so this function is
+// added to provide support for code written under the yaml-cpp 0.3 API.
+template <typename T>
+void operator>>(const YAML::Node& node, T& i) {
+  i = node.as<T>();
+}
 void operator>>(const YAML::Node& node,
                 std::pair<int, LaserCorrection>& correction) {
   node[LASER_ID] >> correction.first;

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/lidar_robosense/include/parser/robosense_status.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_status.h"
 
 #include <memory>
 #include <utility>

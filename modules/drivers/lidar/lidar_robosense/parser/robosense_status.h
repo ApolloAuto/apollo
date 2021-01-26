@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 #pragma once
+#include <cmath>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
@@ -29,10 +29,8 @@ namespace apollo {
 namespace drivers {
 namespace robosense {
 
-constexpr double RADIANS_TO_DEGREES = 180.0 / 3.1415926535897;
-constexpr double DEGRESS_TO_RADIANS = 3.1415926535897 / 180.0;
-
-#pragma pack(push, 1)  // Turn off struct padding.
+constexpr double RADIANS_TO_DEGREES = 180.0 / M_PI;
+constexpr double DEGRESS_TO_RADIANS = M_PI / 180.0;
 
 const uint8_t STATUS_WARNING = 87;
 const uint8_t STATUS_SPEED_LOW = 254;
@@ -43,7 +41,7 @@ const uint32_t STATUS_TYPE_INDEX = 1204;
 const uint32_t STATUS_VALUE_INDEX = 1205;
 
 // 64e s3 warning
-struct WarningBits {
+struct alignas(8) WarningBits {
   uint8_t lens_ontamination : 1;  // 1: need clean, 0: not
   uint8_t unit_hot : 1;           // 1:>58C 0: not
   uint8_t unit_cold : 1;          // 1:<5C 0: not
@@ -54,15 +52,13 @@ struct WarningBits {
 };
 
 // 64e S3 speed
-union MotorSpeed {
-  struct {
+union alignas(8) MotorSpeed {
+  struct alignas(8) {
     uint8_t speed_low;
     uint8_t speed_high;
   };
   uint16_t speed;
 };
-
-#pragma pack(pop)  // Back to whatever the previous packing mode was.
 
 // get suteng status from packet by suteng Manual
 class RobosenseStatus {

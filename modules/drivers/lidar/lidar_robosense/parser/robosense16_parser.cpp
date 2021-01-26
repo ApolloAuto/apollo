@@ -20,7 +20,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/lidar_robosense/include/parser/robosense_parser.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
 
 namespace apollo {
 namespace drivers {

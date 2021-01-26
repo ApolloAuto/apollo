@@ -12,10 +12,10 @@ cc_binary(
 cc_library(
     name = "driver",
     srcs = glob(
-        ["src/**/*.cpp"]
+        ["**/*.cpp"]
     ),
     hdrs = glob(
-        ["include/**/*.h"]
+        ["**/*.h"]
     ),
     copts = ['-DMODULE_NAME=\\"suteng\\"'],
     deps = [

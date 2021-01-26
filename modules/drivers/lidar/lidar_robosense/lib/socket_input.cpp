@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/lidar_robosense/include/lib/socket_input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/socket_input.h"
 
 #include <arpa/inet.h>
 #include <errno.h>

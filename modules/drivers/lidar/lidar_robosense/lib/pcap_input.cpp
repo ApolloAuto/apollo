@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/lidar_robosense/include/lib/pcap_input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/pcap_input.h"
 
 #include <arpa/inet.h>
 #include <errno.h>

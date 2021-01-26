@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/lidar_robosense/include/lib/input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/input.h"
 
 #include "cyber/cyber.h"
 

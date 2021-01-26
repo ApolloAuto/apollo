@@ -20,7 +20,7 @@
 #include <thread>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/lidar_robosense/include/driver/driver.h"
+#include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 
 namespace apollo {
@@ -56,13 +56,12 @@ class CompRoboDriver : public Component<> {
     writer_ = node_->CreateWriter<apollo::drivers::suteng::SutengScan>(
         config.scan_channel());
 
-    dvr_.reset(driver);
-    dvr_->init();
+    driver_.reset(driver);
+    driver_->init();
     // spawn device poll thread
     runing_ = true;
     device_thread_ = std::shared_ptr<std::thread>(
         new std::thread(std::bind(&CompRoboDriver::device_poll, this)));
-    device_thread_->detach();
     AINFO << "CompRoboDriver Init SUCC"
           << ", frame_id:" << config.frame_id();
     return true;
@@ -73,7 +72,7 @@ class CompRoboDriver : public Component<> {
     while (!apollo::cyber::IsShutdown()) {
       std::shared_ptr<apollo::drivers::suteng::SutengScan> scan(
           new apollo::drivers::suteng::SutengScan);
-      if (dvr_->poll(scan)) {
+      if (driver_->poll(scan)) {
         writer_->Write(scan);
       } else {
         AWARN << "device poll failed";
@@ -84,7 +83,7 @@ class CompRoboDriver : public Component<> {
   }
 
   // variable
-  std::shared_ptr<RobosenseDriver> dvr_;
+  std::shared_ptr<RobosenseDriver> driver_;
   volatile bool runing_;  ///< device thread is running
   uint32_t seq_ = 0;
   std::shared_ptr<std::thread> device_thread_;

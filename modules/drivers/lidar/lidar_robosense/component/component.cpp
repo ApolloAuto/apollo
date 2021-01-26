@@ -14,5 +14,5 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/lidar_robosense/include/component/component_convert.h"
-#include "modules/drivers/lidar/lidar_robosense/include/component/component_driver.h"
+#include "modules/drivers/lidar/lidar_robosense/component/component_convert.h"
+#include "modules/drivers/lidar/lidar_robosense/component/component_driver.h"

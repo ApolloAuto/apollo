@@ -15,35 +15,33 @@
  *****************************************************************************/
 
 #pragma once
-#include <memory>
-
-#include "modules/drivers/lidar/lidar_robosense/include/parser/robosense_parser.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include <cstdio>
+#include <unistd.h>
+#include <pcap.h>
+#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/input.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-// convert suteng data to pointcloud and republish
-class Convert {
+static const int POLL_TIMEOUT = 1000;  // one second (in msec)
+
+/** @brief Live suteng input from socket. */
+class SocketInput : public Input {
  public:
-  explicit Convert(const apollo::drivers::suteng::SutengConfig& robo_config);
-  ~Convert();
-
-  void convert_robosense_to_pointcloud(
-      const std::shared_ptr<apollo::drivers::suteng::SutengScan const>&
-          scan_msg,
-      const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud);
-
-  bool Init();
-  uint32_t GetPointSize();
+  SocketInput();
+  virtual ~SocketInput();
+  void init(uint32_t port);
+  int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
+                             int time_zone, uint64_t start_time_);
+  int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
 
  private:
-  RobosenseParser* parser_;
-  apollo::drivers::suteng::SutengConfig config_;
+  int sockfd_;
+  int port_;
+  bool input_available(int timeout);
 };
-
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

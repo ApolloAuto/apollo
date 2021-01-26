@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/lidar_robosense/include/driver/driver.h"
+#include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
 
-#include <time.h>
+#include <ctime>
 
 #include <atomic>
 #include <cmath>
@@ -186,12 +186,12 @@ void RobosenseDriver::update_gps_top_hour(uint32_t current_time) {
           << ", last_gps_time:" << last_gps_time_;
     flags = true;
   }
-  if ( last_gps_time_ == 0) {
+  if (last_gps_time_ == 0) {
     last_gps_time_ = current_time;
     return;
   }
-  if ( last_gps_time_ > current_time) {
-    if (std::fabs( last_gps_time_ - current_time) > 3599000000) {
+  if (last_gps_time_ > current_time) {
+    if (std::fabs(last_gps_time_ - current_time) > 3599000000) {
       basetime_ += 3600;
       AINFO << "update_gps_top_hour. current:" << current_time
             << ", last time:" << last_gps_time_;

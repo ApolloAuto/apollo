@@ -21,7 +21,7 @@
 #include <string>
 #include <thread>
 
-#include "modules/drivers/lidar/lidar_robosense/include/driver/driver.h"
+#include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
 
 namespace apollo {
 namespace drivers {
@@ -132,10 +132,6 @@ void Robosense16Driver::poll_positioning_packet(void) {
       nmea_time->hour = current_time->tm_hour;
       nmea_time->min = current_time->tm_min;
       nmea_time->sec = current_time->tm_sec;
-      AINFO << "frame_id:" << config_.frame_id() << "-F(local-time):"
-            << "year:" << nmea_time->year << "mon:" << nmea_time->mon
-            << "day:" << nmea_time->day << "hour:" << nmea_time->hour
-            << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
       while (true && running_.load()) {
         // AINFO<<"11111->gps timeing...";
@@ -164,15 +160,6 @@ void Robosense16Driver::poll_positioning_packet(void) {
             timestamp_sec;  // ns
         AINFO << "first POS-GPS-timestamp: [" << timestamp_nsec << "]";
         basetime_ = timestamp_nsec;
-        AINFO << "frame_id:" << config_.frame_id()
-              << "-T(gps-time):" << nmea_time->year << "-" << nmea_time->mon
-              << "-" << nmea_time->day << "  " << nmea_time->hour << "-"
-              << nmea_time->min << "-" << nmea_time->sec;
-        AINFO << "first POS-GPS-time: [" << nmea_time->year << "/"
-              << nmea_time->mon << "/" << nmea_time->day << "-"
-              << nmea_time->hour << "/" << nmea_time->min << "/"
-              << nmea_time->sec << "-" << nmea_time->msec << "/"
-              << nmea_time->usec << "]";
         start_time_ = apollo::cyber::Time().Now().ToNanosecond();
         AINFO << "first start_time_:[" << start_time_ << "]";
         if (rc == 0) {
@@ -180,12 +167,7 @@ void Robosense16Driver::poll_positioning_packet(void) {
         }
       }
     }
-    if ( basetime_ != 0) break;  // temp
-    // if ( basetime_ == 0 && ret) {
-    //   set_base_time_from_nmea_time(nmea_time, basetime_,
-    //   config_.use_gps_time()); AINFO<<"basetime(outer): ";//<<basetime;
-    //   break;
-    // }
+    if ( basetime_ ) break;  // temp
   }
 }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/drivers/lidar/lidar_robosense/include/parser/robosense_parser.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
 
 #include <pcl/common/time.h>
 
