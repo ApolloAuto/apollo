@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2020 The Apollo Authors. All Rights Reserved.
+# Copyright 2021 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,26 +19,28 @@
 # Fail on first error.
 set -e
 
-CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-. ${CURR_DIR}/installer_base.sh
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-apt_get_update_and_install \
-    git \
-    vim \
-    silversearcher-ag
+# shellcheck source=./installer_base.sh
+. ./installer_base.sh
 
-# More:
-# lrzsz
+# Build doxygen from source to reduce image size
 
+VERSION="0.12"
+PKG_NAME="patchelf-${VERSION}.tar.gz"
+CHECKSUM="3dca33fb862213b3541350e1da262249959595903f559eae0fbc68966e9c3f56"
+DOWNLOAD_LINK="https://github.com/NixOS/patchelf/archive/${VERSION}.tar.gz"
 
-# Note(storypku):
-# patchelf was required for release build. We choose to build patchelf
-# from source, as the apt-provided version 0.9-1 will create holes in
-# binaries which causes size bloating. Will revisit this once the
-# apt-provided patchelf get updated.
-#
-bash ${CURR_DIR}/install_patchelf.sh
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+tar xzf "${PKG_NAME}"
+pushd "patchelf-${VERSION}" >/dev/null
+    ./bootstrap.sh
+    ./configure --prefix="${SYSROOT_DIR}"
+    make -j "$(nproc)"
+    make install
+popd
+
+rm -rf "${PKG_NAME}" "patchelf-${VERSION}"
+
+ok "Done installing patchelf-${VERSION}"
