@@ -220,7 +220,7 @@
 
 ![vehicle_calibration_launch_modules](images/vehicle_calibratio_launch_modules.png)
 
-通过左侧`Components`查看`Canbus`、`GPS`、`Localization Pose`状态，直到信号都达到`OK`才能够进行下一步。
+通过左侧`Components`查看`Canbus`、`GPS`、`RTK`状态，直到信号都达到`OK`才能够进行下一步。`Localization`启动后，需要等待1~2分钟，`RTK`状态才能变成OK。
 
 ![vehicle_calibration_check_components.png](images/vehicle_calibration_check_components.png)
 
