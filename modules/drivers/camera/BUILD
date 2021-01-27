@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "if_x86_64")
 
@@ -19,6 +20,28 @@ cc_binary(
         "@ffmpeg//:avcodec",
         "@ffmpeg//:avformat",
         "@ffmpeg//:swscale",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
+
+install(
+    name = "install",
+    data = [
+      ":runtime_data",
+    ],
+    targets = [
+      ":libcamera_component.so",
+    ],
+    deps = [
+        "//cyber:install",
     ],
 )
 
