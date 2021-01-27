@@ -4,8 +4,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-CURRENT_PKG = "cyber/examples/common_component_example"
-
 cc_binary(
     name = "libcommon_component_example.so",
     linkshared = True,
@@ -17,11 +15,11 @@ cc_library(
     name = "common_component_example_lib",
     srcs = ["common_component_example.cc"],
     hdrs = ["common_component_example.h"],
+    visibility = ["//visibility:private"],
     deps = [
         "//cyber",
         "//cyber/examples/proto:examples_cc_proto",
     ],
-    visibility = ["//visibility:private"],
 )
 
 cc_binary(
@@ -55,14 +53,14 @@ install(
     data = [
         ":conf",
     ],
-    data_dest = CURRENT_PKG,
+    # We want to install channel_*_writer into runtime_dest
+    # rather than bin/
+    runtime_dest = "cyber/examples/common_component_example",
     targets = [
         ":channel_prediction_writer",
         ":channel_test_writer",
         ":libcommon_component_example.so",
     ],
-    library_dest = CURRENT_PKG,
-    runtime_dest = CURRENT_PKG,
 )
 
 cpplint()

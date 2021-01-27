@@ -1,4 +1,4 @@
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -6,16 +6,16 @@ package(
 
 install(
     name = "install",
-    deps = [
-        ":install_bashrc",
+    data = [
+        ":base_files"
     ],
 )
 
-install_files(
-    name = "install_bashrc",
-    dest = "scripts",
-    files = [
+filegroup(
+    name = "base_files",
+    srcs = [
         ":apollo.bashrc",
         ":common.bashrc",
+        ":apollo_base.sh",
     ],
 )
