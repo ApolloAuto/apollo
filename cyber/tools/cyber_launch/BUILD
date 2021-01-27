@@ -11,6 +11,8 @@ py_binary(
     srcs = ["cyber_launch.py"],
 )
 
+# Note(storypku):
+# Workaround for install support of Python not ready.
 install_files(
     name = "install",
     dest = "bin",
@@ -21,4 +23,3 @@ install_files(
         "bin/cyber_launch.py": "cyber_launch",
     },
 )
-

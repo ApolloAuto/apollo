@@ -17,6 +17,7 @@ install(
         "//modules/dreamview:install",
         "//modules/drivers:install",
         "//modules/monitor:install",
+        "//modules/perception:install",
         "//modules/planning:install",
         "//modules/prediction:install",
         "//scripts:install",
