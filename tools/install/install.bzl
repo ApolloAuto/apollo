@@ -11,6 +11,11 @@ InstallInfo = provider()
 def _workspace(ctx):
     """Compute name of current workspace."""
 
+    # Check for override
+    if hasattr(ctx.attr, "workspace"):
+        if len(ctx.attr.workspace):
+            return ctx.attr.workspace
+
     # Check for meaningful workspace_root
     workspace = ctx.label.workspace_root.split("/")[-1]
     if len(workspace):
@@ -309,20 +314,26 @@ def _install_impl(ctx):
     installed_files = {}
 
     for a in actions:
-        src = None
-        if hasattr(a, "src"):
-            src = a.src
+        if not hasattr(a, "src"):
+            fail("Action(dst={}) has no 'src' attribute".format(a.dst))
+        src = a.src
         if a.dst not in installed_files:
-            if src:
-                script_actions.append(_install_code(a))
-            else:
-                pass
+            script_actions.append(_install_code(a))
             installed_files[a.dst] = src
         elif src != installed_files[a.dst]:
-            fail("Install conflict detected:\n" +
-                 "\n  src1 = " + repr(installed_files[a.dst]) +
-                 "\n  src2 = " + repr(src) +
-                 "\n  dst = " + repr(a.dst))
+            orig = installed_files[a.dst]
+            # Note(storypku):
+            # Workaround for detected conflict betwen
+            # <generated file external/local_config_cuda/cuda/cuda/lib/libcudart.so.11.0> and
+            # <generated file _solib_local/_U@local_Uconfig_Ucuda_S_Scuda_Ccudart___Uexternal_Slocal_Uconfig_Ucuda_Scuda_Scuda_Slib/libcudart.so.11.0>
+            # They share the same external workspace_root ("external/local_config_cuda") and package ("cuda")
+            if src.basename != orig.basename or \
+               src.owner.workspace_root != orig.owner.workspace_root or \
+               src.owner.package != orig.owner.package:
+                fail("Warning: Install conflict detected:\n" +
+                     "\n  src1 = " + repr(orig) +
+                     "\n  src2 = " + repr(src) +
+                     "\n  dst = " + repr(a.dst))
 
     # Generate install script.
     # TODO(mwoehlke-kitware): Figure out a better way to generate this and run
