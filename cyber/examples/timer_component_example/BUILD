@@ -4,7 +4,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-CURRENT_PKG = "cyber/examples/timer_component_example"
 
 cc_binary(
     name = "libtimer_component_example.so",
@@ -37,11 +36,9 @@ install(
     data = [
         ":conf",
     ],
-    data_dest = CURRENT_PKG,
     targets = [
         ":libtimer_component_example.so",
     ],
-    library_dest = CURRENT_PKG,
 )
 
 cpplint()
