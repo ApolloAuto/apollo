@@ -1,14 +1,28 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
-PERCEPTION_COPTS = [ '-DMODULE_NAME=\\"perception\\"' ]
+
+PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
 cc_binary(
     name = "libperception_component_camera.so",
     linkshared = True,
     linkstatic = False,
     deps = [":perception_component_inner_camera"],
+)
+
+install(
+    name = "install",
+    targets = [
+        ":libperception_component_camera.so",
+        ":libperception_component_lidar.so",
+    ],
+    deps = [
+        "//cyber:install",
+        "//modules/perception/production:install",
+    ],
 )
 
 cc_library(
@@ -45,8 +59,8 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/motion_service:motion_service_lib",
         "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
-        "//modules/perception/camera/tools/offline:visualizer",
         "//modules/perception/camera/tools/offline:transform_server",
+        "//modules/perception/camera/tools/offline:visualizer",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/map/hdmap:hdmap_input",
         "//modules/perception/onboard/common_flags",
