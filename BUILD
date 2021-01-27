@@ -15,8 +15,9 @@ install(
         "//cyber:install",
         "//cyber/examples:install",
         "//modules/drivers:install",
-        "//modules/planning:install",
         "//modules/monitor:install",
+        "//modules/planning:install",
+        "//modules/prediction:install",
         "//scripts:install",
     ],
 )
