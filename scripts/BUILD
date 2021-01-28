@@ -7,7 +7,15 @@ package(
 install(
     name = "install",
     data = [
-        ":base_files"
+        ":base_files",
+        ":docker_files",
+    ],
+)
+
+filegroup(
+    name = "docker_files",
+    srcs = [
+        ":docker_start_user.sh",
     ],
 )
 

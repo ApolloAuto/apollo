@@ -18,7 +18,6 @@ cc_library(
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
-    visibility = ["//visibility:private"],
     deps = [
         ":navi_planning",
         ":on_lane_planning",
