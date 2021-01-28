@@ -41,6 +41,7 @@ DECLARE_string(pointcloud_16_raw_topic);
 DECLARE_string(pointcloud_16_front_up_topic);
 DECLARE_string(pointcloud_64_topic);
 DECLARE_string(pointcloud_128_topic);
+DECLARE_string(pointcloud_hesai_40p_topic);
 DECLARE_string(pointcloud_raw_topic);
 DECLARE_string(velodyne_raw_topic);
 DECLARE_string(pointcloud_fusion_topic);

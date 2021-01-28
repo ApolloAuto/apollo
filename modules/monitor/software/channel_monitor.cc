@@ -99,6 +99,8 @@ ReaderAndMessagePair GetReaderAndLatestMessage(const std::string& channel) {
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_chassis_detail_topic,
            &CreateReaderAndLatestsMessage<canbus::ChassisDetail>},
+          {FLAGS_pointcloud_hesai_40p_topic,
+           &CreateReaderAndLatestsMessage<drivers::PointCloud>}
           // Add more channels here if you want to monitor.
       };
 

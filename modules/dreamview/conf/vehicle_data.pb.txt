@@ -79,6 +79,10 @@ data_files {
   dest_path: "/apollo/modules/drivers/lidar/velodyne/conf"
 }
 data_files {
+  source_path: "hesai_conf"
+  dest_path: "/apollo/modules/drivers/lidar/hesai/conf"
+}
+data_files {
   source_path: "camera_conf"
   dest_path: "/apollo/modules/drivers/camera/conf"
 }
@@ -173,4 +177,16 @@ data_files {
 data_files {
   source_path: "perception_conf/pointcloud_preprocessor.conf"
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
+}
+data_files {
+  source_path: "canbus_conf/canbus_conf.pb.txt"
+  dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_camera_params"
+  dest_path: "/apollo/modules/perception/production/data/perception/camera/params"
+}
+data_files {
+  source_path: "perception_params"
+  dest_path: "/apollo/modules/perception/data/params"
 }

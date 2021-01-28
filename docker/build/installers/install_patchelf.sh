@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2020 The Apollo Authors. All Rights Reserved.
+# Copyright 2021 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,27 +20,27 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# shellcheck source=./installer_base.sh
 . ./installer_base.sh
 
-# Install clang via apt to reduce image size
-apt_get_update_and_install \
-    clang-10 \
-    clang-format-10
+# Build doxygen from source to reduce image size
 
-#    clang-tidy-10 \
-#    clang-tools-10
+VERSION="0.12"
+PKG_NAME="patchelf-${VERSION}.tar.gz"
+CHECKSUM="3dca33fb862213b3541350e1da262249959595903f559eae0fbc68966e9c3f56"
+DOWNLOAD_LINK="https://github.com/NixOS/patchelf/archive/${VERSION}.tar.gz"
 
-sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 100
-sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10 100
-sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-10 100
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-# Clean up cache to reduce layer size.
-apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+tar xzf "${PKG_NAME}"
+pushd "patchelf-${VERSION}" >/dev/null
+    ./bootstrap.sh
+    ./configure --prefix="${SYSROOT_DIR}"
+    make -j "$(nproc)"
+    make install
+popd
 
-# Install from source
-# Ref:
-# https://releases.llvm.org/download.html
-# https://github.com/llvm/llvm-project/releases
+rm -rf "${PKG_NAME}" "patchelf-${VERSION}"
 
-ok "Done installing LLVM Clang-10."
+ok "Done installing patchelf-${VERSION}"
