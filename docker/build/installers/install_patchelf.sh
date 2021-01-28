@@ -24,7 +24,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=./installer_base.sh
 . ./installer_base.sh
 
-# Build doxygen from source to reduce image size
+# Note(storypku):
+# Build patchelf from source to avoid the patchelf-creating-holes-in-binaries-
+# thus-causing-size-bloating problem.
 
 VERSION="0.12"
 PKG_NAME="patchelf-${VERSION}.tar.gz"
