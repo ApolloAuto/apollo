@@ -114,3 +114,15 @@ proto_library(
     name = "camera_update_proto_lib",
     srcs = ["camera_update.proto"],
 )
+
+cc_proto_library(
+    name = "preprocess_table_proto",
+    deps = [
+        ":preprocess_table_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "preprocess_table_proto_lib",
+    srcs = ["preprocess_table.proto"],
+)

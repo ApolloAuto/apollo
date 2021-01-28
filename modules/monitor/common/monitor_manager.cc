@@ -16,9 +16,11 @@
 
 #include "modules/monitor/common/monitor_manager.h"
 
-#include "cyber/common/file.h"
 #include "gflags/gflags.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -63,6 +65,10 @@ bool MonitorManager::StartFrame(const double current_time) {
     status_.clear_components();
     for (const auto& iter : mode_config_.monitored_components()) {
       status_.mutable_components()->insert({iter.first, {}});
+    }
+    status_.clear_other_components();
+    for (const auto& iter : mode_config_.other_components()) {
+      status_.mutable_other_components()->insert({iter.first, {}});
     }
   } else {
     // Mode not changed, clear component summary from the last frame.

@@ -1,4 +1,5 @@
-import { observable, action, computed, extendObservable } from "mobx";
+import { observable, action, computed } from "mobx";
+import _ from 'lodash';
 
 import WS from "store/websocket";
 import UTTERANCE from "store/utterance";
@@ -38,17 +39,31 @@ export default class HMI {
 
     @observable moduleStatus = observable.map();
     @observable componentStatus = observable.map();
+    @observable otherComponentStatus = observable.map();
     @observable enableStartAuto = false;
     @observable dockerImage = 'unknown';
     @observable isCoDriver = false;
     @observable isMute = false;
+    @observable isPreprocess = false;
 
     displayName = {};
     utmZoneId = 10;
 
-    @observable isCalibrationMode = false;
+    @observable isVehicleCalibrationMode = false;
+    @observable isSensorCalibrationMode = false;
     @observable dataCollectionUpdateStatus = observable.map();
     @observable dataCollectionProgress = observable.map();
+    @observable lidars = observable.map();
+    @observable camera = {};
+    @observable mainSensor = 'none';
+    @observable updateConfiguration = false;
+    @observable preprocessStarted = false;
+    @observable preprocessFinished = false;
+    @observable unexpectedAborted = false;
+    @observable preprocessStatus = 'UNKNOWN'; // Under normal situation
+    @observable logString = '';
+    @observable preprocessProgress = 0;
+    @observable preprocessMonitorItemTimeStamp = null;
 
     @action toggleCoDriverFlag() {
         this.isCoDriver = !this.isCoDriver;
@@ -71,11 +86,21 @@ export default class HMI {
             this.modes = newStatus.modes.sort();
         }
         if (newStatus.currentMode) {
-            this.isCalibrationMode = (newStatus.currentMode.toLowerCase().includes('calibration'));
+            this.isVehicleCalibrationMode = newStatus.currentMode
+            .toLowerCase()
+            .includes('vehicle calibration');
+        this.isSensorCalibrationMode = newStatus.currentMode
+            .toLowerCase()
+            .includes('sensor calibration');
             if (this.currentMode !== newStatus.currentMode) {
                 this.resetDataCollectionProgress();
-            }
-            this.currentMode = newStatus.currentMode;
+                this.resetSensorCalibrationConfiguration();
+                this.resetPreprocessProgress();
+                this.currentMode = newStatus.currentMode;
+                if (this.isSensorCalibrationMode) {
+                    this.updateConfiguration = true;
+                }
+          }
         }
 
         if (newStatus.maps) {
@@ -89,8 +114,20 @@ export default class HMI {
             this.vehicles = newStatus.vehicles.sort();
         }
         if (newStatus.currentVehicle) {
-            if (this.isCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
+            if (
+                this.isVehicleCalibrationMode &&
+                this.currentVehicle !== newStatus.currentVehicle
+            ) {
                 this.resetDataCollectionProgress();
+                this.resetPreprocessProgress();
+            }
+            if (
+                this.isSensorCalibrationMode &&
+                this.currentVehicle !== newStatus.currentVehicle
+            ) {
+                this.updateConfiguration = true;
+                this.resetSensorCalibrationConfiguration();
+                this.resetPreprocessProgress();
             }
             this.currentVehicle = newStatus.currentVehicle;
         }
@@ -113,8 +150,36 @@ export default class HMI {
                 this.componentStatus.clear();
             }
             for (const key in newStatus.monitoredComponents) {
-                this.componentStatus.set(key, newStatus.monitoredComponents[key]);
+              this.componentStatus.set(key, newStatus.monitoredComponents[key]);
             }
+            if (
+              this.startMonitorRecorderProcess &&
+              !this.allMonitoredComponentSuccess
+            ) {
+              this.toggleModule(this.preConditionModule);
+            }
+        }
+
+        if (newStatus.otherComponents) {
+            const newKeyList = JSON.stringify(
+                Object.keys(newStatus.otherComponents).sort(),
+            );
+            const curKeyList = JSON.stringify(
+                this.otherComponentStatus.keys().sort(),
+            );
+            if (newKeyList !== curKeyList) {
+                this.otherComponentStatus.clear();
+            }
+            for (const key in newStatus.otherComponents) {
+                this.otherComponentStatus.set(key, newStatus.otherComponents[key]);
+            }
+        }
+
+        if (this.preprocessStarted && !this.preprocessIsRunning) {
+            if (!this.preprocessFinished) {
+                this.unexpectedAborted = true;
+            }
+            this.preprocessStarted = false;
         }
 
         if (typeof newStatus.passengerMsg === "string") {
@@ -155,13 +220,75 @@ export default class HMI {
         return Object.values(TELEOP_MODE).includes(this.currentMode);
     }
 
+    @computed get inCameraLidarSensorCalibrationMode() {
+        return this.currentMode === 'Camera-Lidar Sensor Calibration';
+    }
+
+    @computed get isCalibrationMode() {
+        return this.isSensorCalibrationMode || this.isVehicleCalibrationMode;
+    }
+
     @computed get shouldDisplayNavigationMap() {
         return this.inNavigationMode || this.inTeleopMode;
+    }
+
+    @computed get allMonitoredComponentSuccess() {
+      return (
+          this.isCalibrationMode &&
+          _.every(this.componentStatus.keys(), (key) => {
+              return key === 'Recorder' || _.get(this.componentStatus.get(key), 'status') === 'OK';
+          })
+      );
+    }
+
+    @computed get preConditionModule() {
+        return this.isCalibrationMode ? 'Recorder' : 'none';
+    }
+
+    @computed get startMonitorRecorderProcess() {
+        return this.isSensorCalibrationMode && this.moduleStatus.get('Recorder');
+    }
+
+    @computed get canStartDataCollectionPreprocess() {
+        return (
+            this.isVehicleCalibrationMode &&
+            _.some(
+                this.dataCollectionProgress.get('Go Straight').values(),
+                (x) => x > 0,
+            )
+        );
+    }
+
+    @computed get preprocessIsRunning() {
+      return (
+          this.isCalibrationMode &&
+          this.otherComponentStatus &&
+          _.get(this.otherComponentStatus.get('Preprocess'), 'status') === 'OK'
+      );
+    }
+
+    @computed get startUpdateDataCollectionProgress() {
+        return this.isVehicleCalibrationMode && this.moduleStatus.get('Recorder');
     }
 
     @action resetDataCollectionProgress() {
         this.dataCollectionUpdateStatus.clear();
         this.dataCollectionProgress.clear();
+    }
+
+    @action resetSensorCalibrationConfiguration() {
+        this.lidars.clear();
+        this.camera = {};
+    }
+
+    @action resetPreprocessProgress() {
+        this.preprocessStarted = false;
+        this.preprocessFinished = false;
+        this.unexpectedAborted = false;
+        this.preprocessStatus = 'UNKNOWN';
+        this.logString = '';
+        this.preprocessProgress = 0;
+        this.preprocessMonitorItemTimeStamp = null;
     }
 
     @action updateDataCollectionProgress(data) {
@@ -179,6 +306,49 @@ export default class HMI {
                 categoryStatus.set(categoryName, isUpdated);
             });
         });
+    }
+
+    @action updatePreprocessProgress(data) {
+        if (this.updateConfiguration) {
+            if (data.lidarConfig) {
+                data.lidarConfig.map((lidar) => {
+                  this.lidars.set(lidar.sensorName, lidar.translation);
+                });
+            }
+            if (data.cameraConfig) {
+                this.camera = data.cameraConfig;
+            }
+            this.mainSensor = data.mainSensor;
+            this.updateConfiguration = false;
+        }
+        if (data.progress) {
+            this.preprocessMonitorItemTimeStamp = new Date().getTime();
+            if (this.unexpectedAborted) {
+                this.preprocessStatus = 'FAIL';
+                this.logString =
+                  'The preprocessing process has been aborted unexpectedly, please check nohup.out for reasons or try again.';
+            } else {
+                this.preprocessProgress = _.get(data, 'progress.percentage');
+                this.logString = _.get(data, 'progress.logString');
+                this.preprocessStatus = _.get(data, 'progress.status');
+                if (['SUCCESS', 'FAIL'].includes(this.preprocessStatus)) {
+                    this.preprocessFinished = true;
+                } else {
+                    this.preprocessFinished = false;
+                }
+            }
+        }
+    }
+
+    // name:{x y z}
+    @action changeTranslation(name, index, val, isLidar) {
+        isLidar
+          ? _.set(this.lidars.get(name), index, val)
+          : _.set(this.camera, `translation.${index}`, val);
+    }
+
+    @action changeIntrinsic(name, index, val) {
+        _.set(this.camera, `${name}[${index}]`, val);
     }
 
     rotate2DPoint({ x, y }, rotationInRad) {

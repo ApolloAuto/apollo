@@ -60,6 +60,7 @@ py_proto
 
 # calibration files
 modules/calibration/data/
+/output
 
 # Package archive
 docker/build/archive/

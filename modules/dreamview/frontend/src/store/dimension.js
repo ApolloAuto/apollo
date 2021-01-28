@@ -30,6 +30,10 @@ const MONITOR_WIDTH_IN_PX = {
         small: 400,
         large: 450,
     },
+    [MONITOR_MENU.FUEL_CLIENT]: {
+        small: 400,
+        large: 450,
+      },
     'default': {
         small: 200,
         large: 240,

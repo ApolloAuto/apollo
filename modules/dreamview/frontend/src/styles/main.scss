@@ -1701,3 +1701,96 @@ body {
         }
     }
 }
+
+.guide-text{
+    .pane-text {
+    font-size: 15px;
+    text-indent: 30px;
+    //padding:10px;
+    margin-bottom: 20px;
+    //display:block;
+    }
+
+    .pane-img {
+    //width:200px;
+    //height:100px;
+    //display:flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    //padding:15px;
+    max-width: 80%;
+    max-height: 40%;
+    }
+}
+
+.sensor-configuration-table{
+    //margin:20px;
+    .camera-message{
+        margin-left: 22px;
+        color: #D7466F;
+    }
+
+    .sensor-configuration-tr{
+        //padding:10px;
+	    margin-left: 20px;
+	    margin-top: 10px;
+        .main-sensor{
+            color:red;
+        }
+    }
+
+    .sensor-configuration-translation{
+        display:flex;
+        width:100%;
+        flex-flow:row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+
+        .sensor-configuration-xyz{
+            flex:1;
+            padding:5px 15px 0 0;
+            //padding-right:20px;
+        }
+    }
+}
+
+.preprocess-bar{
+     clear:left;
+    .preprocess-btn {
+        min-width: 40px;
+        margin-right: 5px;
+        padding: 10px 10px;//原来是35
+        border: 1px solid #383838;
+        background: #1D2226;
+        color: #FFFFFF;
+
+        cursor: pointer;
+
+        @include small-screen {
+            min-width: 40px;
+        }
+    }
+    .button-active {
+        color: #30A5FF;
+    }
+}
+
+.preprocess-console {
+    z-index: 10;
+    position: relative;
+    min-width: 230px;
+    margin: 0px;
+    border: none;
+    padding: 0px;
+
+    overflow: hidden;
+
+    .monitor-item {
+        @include monitor-item-common-properties(calc(100% - 82px));
+    }
+}
+
+.edit-tip{
+    background-color: #1D2226;
+}

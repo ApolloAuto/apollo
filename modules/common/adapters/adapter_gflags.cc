@@ -48,6 +48,9 @@ DEFINE_string(pointcloud_topic,
 DEFINE_string(pointcloud_16_topic,
               "/apollo/sensor/lidar16/compensator/PointCloud2",
               "16 beam Lidar pointcloud topic name");
+DEFINE_string(pointcloud_16_raw_topic,
+              "/apollo/sensor/lidar16/PointCloud2",
+              "16 beam Lidar raw pointcloud topic name");
 DEFINE_string(pointcloud_16_front_up_topic,
               "/apollo/sensor/lidar16/front/up/compensator/PointCloud2",
               "Front up 16 beam Lidar pointcloud topic name");
@@ -154,6 +157,13 @@ DEFINE_string(camera_image_long_topic, "/apollo/sensor/camera/image_long",
               "long camera image topic name");
 DEFINE_string(camera_image_short_topic, "/apollo/sensor/camera/image_short",
               "short camera image topic name");
+DEFINE_string(camera_front_6mm_topic, "/apollo/sensor/camera/front_6mm/image",
+              "front 6mm camera topic name");
+DEFINE_string(camera_front_6mm_2_topic,
+              "/apollo/sensor/camera/front_6mm_2/image",
+              "front 6mm camera topic name 2");
+DEFINE_string(camera_front_12mm_topic, "/apollo/sensor/camera/front_12mm/image",
+              "front 12mm camera topic name");
 DEFINE_string(camera_front_6mm_compressed_topic,
               "/apollo/sensor/camera/front_6mm/image/compressed",
               "front 6mm camera compressed topic name");
