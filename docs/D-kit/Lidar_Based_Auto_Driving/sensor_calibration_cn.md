@@ -10,13 +10,11 @@
       - [3. IMU坐标系原点在传感器的位置](#3-imu坐标系原点在传感器的位置)
       - [4. 手动测量Lidar-GNSS的初始化外参](#4-手动测量lidar-gnss的初始化外参)
   - [标定场地选择](#标定场地选择)
-  - [Lidar-GNSS标定数据包录制](#lidar-gnss标定数据包录制)
-      - [1. 标定所需channel](#1-标定所需channel)
-      - [2. 使用Apollo录制数据包的方法](#2-使用apollo录制数据包的方法)
-      - [3. 开始录制数据包](#3-开始录制数据包)
-  - [Lidar-GNSS标定数据预处理](#lidar-gnss标定数据预处理)
-      - [1. 运行数据抽取工具](#1-运行数据抽取工具)
-      - [2. 修改云标定配置文件 sample_config.yaml](#2-修改云标定配置文件-sample_configyaml)
+  - [使用Fuel-Client采集数据](#使用fuel-client采集数据)
+      - [1. 选择正确的模式、车型](#1-选择正确的模式车型)
+      - [2. 启动`Fuel Client`，并启动相应模块](#2-启动fuel-client并启动相应模块)
+      - [3. 启动`Recorder`模块并开始采集](#3-启动recorder模块并开始采集)
+  - [使用`Fuel Client`进行数据预处理](#使用fuel-client进行数据预处理)
   - [使用标定云服务生成外参文件](#使用标定云服务生成外参文件)
       - [1. 上传预处理后的数据至BOS](#1-上传预处理后的数据至bos)
       - [2. 提交云标定任务](#2-提交云标定任务)
@@ -28,7 +26,7 @@
 
 ## 概览
 
-该用户手册旨在帮助用户完成激光雷达的标定(Lidar-IMU)
+该用户手册旨在帮助用户完成激光雷达的标定(Lidar-GNSS)
 
 ## 前提条件
 
@@ -42,11 +40,14 @@
 
 |修改文件名称 | 修改内容 |
 |---|---|
-| `modules/localization/conf/localization.conf`|`enable_lidar_localization`设置为`false`|
+| `modules/calibration/data/车型目录/localization_conf/localization.conf`|`enable_lidar_localization`设置为`false`|
 
-![lidar_calibration_localization_config](images/lidar_calibration_localization_config.jpg)
+**注意：** 上表中`车型目录`需要用户根据自身车型确认。lite用户为`dev_kit`，standard用户为`dev_kit_standard`，单激光雷达的advanced用户为`dev_kit_advanced_ne-s`，3激光雷达的advanced用户为`dev_kit_advanced_sne-r`
 
-**注意**：所有传感器标定完成后，如果用户要使用msf定位，则需要再改为`true`。
+![sensor_calibration_modify_localization_file](images/sensor_calibration_modify_localization_file.png)
+
+
+**注意：**所有传感器标定完成后，如果用户要使用msf定位，则需要再改为`true`。
 
 ## Lidar-GNSS标定初始外参测量
 
@@ -82,7 +83,7 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
       z: 0.7071
   ```
 
-- translation:用户需要手动测量以IMU坐标系为基坐标系，以Velodyne16坐标系为目标坐标系的位移变换，一个IMU-Velodyne16位移变换的示例如下所示：
+- translation:用户需要手动测量以IMU坐标系为基坐标系，以激光雷达坐标系为目标坐标系的位移变换，一个IMU-Velodyne16位移变换的示例如下所示：
 
   ```txt
     translation:
@@ -99,191 +100,62 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 - 确保路面平坦
 - 能确保GNSS信号良好，不要有过多的干扰
 
-## Lidar-GNSS标定数据包录制
+## 使用Fuel-Client采集数据
 
-#### 1. 标定所需channel
+#### 1. 选择正确的模式、车型
+- 选择`Lidar-GNSS Sensor Calibration`模式
+- 根据实际情况选择正确的车型(lite用户选择`Dev Kit`车型，standard用户选择`Dev Kit Standard`，单雷达的advanced用户选择`Dev Kit Standard Ne-s`，3雷达的advanced用户选择`Dev Kit Standard Sne-r`)
+![lidar_calibration_select_mode_vehicle.png](images/lidar_calibration_select_mode_vehicle.png)
 
- 进行Lidar-GNSS的标定，需要录制包含传感器信息的数据包作为数据输入，所需的`channel`及`channel频率`如下表所示：
+#### 2. 启动`Fuel Client`，并启动相应模块
 
-| 模块       | channel名称                                  | channel频率（Hz） |
-| --------- | ---------------------------------------- | ------------- |
-| VLP-16    |  /apollo/sensor/lidar16/PointCloud2   | 10            |
-| Localization       | /apollo/localization/pose             | 100           |
+- 在dreamview的`Tasks`标签下，首先打开`Sim Control`，然后打开`Fuel Client`，`Fuel Client`打开后务必关闭`Sim Control`
+![lidar_calibration_open_fuel_client](images/lidar_calibration_open_fuel_client.png)
+  
+- 在dreamview的`Module Controllers`标签下，启动`GPS`、`Lidar`、`Localization`模块，等待左侧状显示模块中的`GPS`、`Lidar`、`RTK`均为绿色时，代表模块启动成功(Localization启动后，需要等待1~2分钟才能正常输出数据)。
+![lidar_calibration_start_modules.png](images/lidar_calibration_start_modules.png)
 
-为获取上述`channel`，需要正确启动Apollo环境及dreamview，在dreamview中选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，并在dreamview中启动启动`GPS`、`Localization`、`lidar`三个模块，可参考[基于激光雷达的封闭园区自动驾驶搭建--感知设备集成](../Lidar_Based_Auto_Driving/sensor_integration_cn.md)
+#### 3. 启动`Recorder`模块并开始采集
 
-**注意**：在正式开始录制前，务必确保以上channel能正常输出数据。
-
-#### 2. 使用Apollo录制数据包的方法
-
-- 在dreamview中，启动`recorder`模块即开始录制数据包，关闭`recorder`模块即停止录制数据包
-
-  ![sensor_calibration_recorder](images/sensor_calibration_recorder.png)
-
-- 如果工控机没有插入移动硬盘，则数据包会存储到工控机的`apollo/data/bag/`路径下(注意，apollo为代码目录);如果工控机插入了移动硬盘，则系统会将数据包存储到可用容量较大的硬盘中，如果移动硬盘可用容量较大，则存储路径为移动硬盘的`data/bag/`目录。
-
-#### 3. 开始录制数据包
-
-待channel数据正常输出后，可以开始录制数据包。录制期间，需要控制车辆以8字形轨迹缓慢行驶，并使转弯半径尽量小 ，包含2~3圈完整的8字轨迹数据。
-
+- 当左侧左侧状显示模块中的`GPS`、`Lidar`、`RTK`均为绿色时，打开Recorder模块，并开始采集数据，需要控制车辆以8字形轨迹缓慢行驶，并使转弯半径尽量小 ，包含2~3圈完整的8字轨迹数据。
 ![lidar_calibration_turn_around](images/lidar_calibration_turn_around.png)
+- 数据采集完成后，关闭`Recorder`模块停止数据录制
 
-## Lidar-GNSS标定数据预处理
+## 使用`Fuel Client`进行数据预处理
+![lidar_calibration_preprocess](images/lidar_calibration_preprocess.png)
+- 点击右上角的`Configuration`进入预处理界面
+- 填入测量的初始化外参
+- 点击`Preprocess`进行预处理
+- 等待预处理完成,提示`Data extraction is completed successfully!`代表预处理完成
 
-该步骤将通过提取工具将record数据包中的点云和定位数据进行预处理，以方便通过云服务进行在线标定。
+**注意** 对于使用3激光雷达的advanced用户，需要填入3个雷达的初始化外参，其中红色的`lidar16_back`参数为main_sensor(主激光雷达)的外参
 
-Lidar-GNSS标定数据包的相关文件位于[sensor_calibration目录](../../Apollo_Fuel/examples/)下(路径为 docs/Apollo_Fuel/examples/sensor_calibration/)，其目录结构如下：
-
-```bash
-.
-└── sensor_calibration
-  ├── camera_12mm_to_lidar
-  │   ├── camera_12mm_to_lidar.config
-  │   ├── extracted_data
-  │   └── records
-  ├── camera_6mm_to_lidar
-  │   ├── camera_6mm_to_lidar.config
-  │   ├── extracted_data
-  │   └── records
-  └── lidar_to_gnss
-      ├── extracted_data
-      ├── lidar_to_gnss.config
-      └── records
-```
-
-本小节重点关注lidar_to_gnss目录。
-
-**注意**: 不要修改该目录下的任何文件
-
-#### 1. 运行数据抽取工具
-
-假设你在[Lidar-GNSS标定数据包录制](#lidar-gnss标定数据包录制)步骤生成的数据包位于`/apollo/data/bag/test`目录
-
-**进入docker环境**，执行如下命令来运行数据抽取工具：
-
-```bash
-budaoshi@in_dev_docker:/apollo$ ./scripts/extract_data.sh -d data/bag/test/
-```
-
-**注意**：-d选项指定数据包所在的文件夹（相对路径或者绝对路径）。也可以通过-f选项指定具体的数据包，比如：
-
-```bash
-budaoshi@in_dev_docker:/apollo$ ./scripts/extract_data.sh -f data/bag/test/20190325185008.record.00001 -f data/bag/test/20190325185008.record.00002
-```
-
- 等待终端中显示`Data extraction is completed successfully!`的提示代表数据提取成功，提取出的数据默认被存储到`apollo`根目录下的`sensor_calibration/lidar_to_gnss`路径。运行数据抽取工具后的目录如下所示：
-
-单激光雷达运行数据提取提供工具后生成的目录结构如下所示：
-
-```bash
-lidar_to_gnss/
-├── extracted_data
-│   ├── lidar_to_gnss-2020-10-27-20-26
-│   │   ├── multi_lidar_to_gnss_calibration
-│   │   │   ├── _apollo_localization_pose
-│   │   │   ├── _apollo_sensor_velodyne16_PointCloud2
-│   │   │   └── sample_config.yaml
-│   │   └── tmp
-│   │       ├── _apollo_localization_pose
-│   │       ├── _apollo_sensor_velodyne16_PointCloud2
-│   │       └── velodyne16_sample_config.yaml
-│   └── readme.txt
-├── lidar_to_gnss.config
-└── records
-```
-
-多激光雷达运行数据提取提供工具后生成的目录结构示例如下所示(这里以3激光雷达标定为例)：
-
-```bash
-lidar_to_gnss/
-├── extracted_data
-│   ├── lidar_to_gnss-2020-10-27-20-26
-│   │   ├── multi_lidar_to_gnss_calibration
-│   │   │   ├── _apollo_localization_pose
-│   │   │   ├── _apollo_sensor_lidar16_back_PointCloud2
-│   │   │   ├── _apollo_sensor_lidar16_left_PointCloud2
-│   │   │   ├── _apollo_sensor_lidar16_right_PointCloud2
-│   │   │   └── sample_config.yaml
-│   │   └── tmp
-│   │       ├── _apollo_localization_pose
-│   │   │   ├── _apollo_sensor_lidar16_back_PointCloud2
-│   │   │   ├── _apollo_sensor_lidar16_left_PointCloud2
-│   │   │   ├── _apollo_sensor_lidar16_right_PointCloud2
-│   │       └── velodyne16_sample_config.yaml
-│   └── readme.txt
-├── lidar_to_gnss.config
-└── records
-```
-
-#### 2. 修改云标定配置文件 sample_config.yaml
-
-单激光雷达标定时`sample_config.yaml`文件的修改：
-
-- 添加`main_sensor`字段信息：`main_sensor`字段需要填写激光雷达的名称(单激光雷达标定的情况下，main_sensor与source_sensor相同)，参考示例如下图所示
-
-  ![lidar_calibration_set_main_sensor_1](images/lidar_calibration_set_main_sensor_1.jpg)
-
-- 填写`transform`信息
-把前面步骤手动测量的Lidar-GNSS标定初始外参信息填入，仅需要填写`translation`字段，`rotation`使用默认值即可
-  ![lidar_calibration_set_trans_1.jpg](images/lidar_calibration_set_trans_1.jpg)
-
-多激光雷达标定时`sample_config.yaml`文件的修改
-
-- 添加`main_sensor`字段信息：
-`main_sensor`字段需要填写主激光雷达的名称（一般默认车顶的激光雷达为主雷达,从`source_sensor`的雷达中将主激光雷达名称填入`main_sensor`字段），参考示例如下图所示
-
-  ![lidar_calibration_set_main_sensor_1.png](images/lidar_calibration_set_main_sensor_1.png)
-
-- 填写`transform`信息
-需要分别测量3个激光雷达和IMU之间的初始位置，并填入`transform`字段,一个示例如下所示：
-
-  ![lidar_calibration_set_trans_2.jpg](images/lidar_calibration_set_trans_2.jpg)
+![lidar_calibration_preprocess_3_lidar](images/lidar_calibration_preprocess_3_lidar.png)
+- 保存生成的预处理文件。切换到`apollo/output/sensor_calibration/lidar_to_gnss/extracted_data/`目录，保存该目录下的`lidar_to_gnss-xxx`文件(`xxx`为数据包录制的时间)，这里和下文以`lidar_to_gnss-2021-01-12-14-10`为例
 
 ## 使用标定云服务生成外参文件
+
 
 #### 1. 上传预处理后的数据至BOS
 
 **注意：** 必须使用开通过权限的 bucket，确认`Bucket名称`、`所属地域`和提交商务注册时的Bucket名称和所属区域保持一致。
 
-在BOS bucket中新建目录sensor_calibration，作为后续云标定服务读取数据的`Input Data Path`，把前面预处理生成的数据拷贝至该目录。目录结构如下：
-
-BOS bucket中单激光雷达的目录结构：
-
-```bash
-sensor_calibration/
-└── multi_lidar_to_gnss_calibration
-    ├── _apollo_localization_pose
-    ├── _apollo_sensor_velodyne16_PointCloud2
-    └── sample_config.yaml
-```
-
-BOS bucket中多激光雷达的目录结构(以三激光雷达为例)：
-
-```bash
-sensor_calibration/
-└── multi_lidar_to_gnss_calibration
-│   │   ├── _apollo_localization_pose
-│   │   ├── _apollo_sensor_lidar16_back_PointCloud2
-│   │   ├── _apollo_sensor_lidar16_left_PointCloud2
-│   │   ├── _apollo_sensor_lidar16_right_PointCloud2
-│   │   └── sample_config.yaml
-```
+将`lidar_to_gnss-2021-01-12-14-10`目录上传到BOS的根目录下，作为后续云标定服务读取数据的`输入数据路径`。
 
 #### 2. 提交云标定任务
 
-打开Apollo云服务页面，如下图：
+打开Apollo云服务页面，新建一个任务，如下图所示：
+![fuel_new_task](images/fuel_new_task.png)
 
-![lidar_calibration_fuel](images/lidar_calibration_fuel.jpg)
-
-点击`新建任务`，在下拉框中选择`感知标定`选项，根据实际情况填写输入数据路径(Input Data Path)、输出数据路径(Output Data Path),最后点击`提交任务`(Submit Job)按钮提交。
-
+点击`新建任务`后，在下拉框中选择`感知标定`选项，根据实际情况填写输入`输入数据路径`，这里以`lidar_to_gnss-2021-01-12-14-10`为例，指定`输出数据路径`后，点击`提交任务`(Submit Job)按钮提交。
+![sensor_calibration_fuel](images/sensor_calibration_fuel.jpg)
 #### 3. 获取标定结果验证及标定外参文件
 
 云标定任务完成后，将在注册的邮箱中收到一封标定结果邮件。如果标定任务成功，将包含标定外参文件。
 
 **Lidar-GNSS标定结果验证**：
 
-- BOS中用户指定的Output Data Path路径下包含了后缀名为.pcd的点云文件，使用点云查看工具检查pcd文件，如果点云文件中周围障碍物清晰、锐利，边缘整齐表示标定结果准确，否则请重新标定。
+- BOS中用户指定的`输出文件路径`下包含了后缀名为.pcd的点云文件，使用点云查看工具检查pcd文件，如果点云文件中周围障碍物清晰、锐利，边缘整齐表示标定结果准确，否则请重新标定。
 
 ![lidar_calibration_point_cloud](images/lidar_calibration_point_cloud.png)
 
@@ -297,7 +169,7 @@ sensor_calibration/
 
 **Lidar-GNSS标定外参文件**：
 
-确认邮件得到的外参文件合理后，将邮件发送的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/dev_kit/lidar_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`、不要直接替换文件。
+确认得到的外参文件合理后，将获取的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/车型目录/lidar_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`、不要直接替换文件。
 
 ## NEXT
 
