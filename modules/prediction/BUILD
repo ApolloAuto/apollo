@@ -11,7 +11,6 @@ cc_library(
     srcs = ["prediction_component.cc"],
     hdrs = ["prediction_component.h"],
     copts = PREDICTION_COPTS,
-    visibility = ["//visibility:private"],
     deps = [
         "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
