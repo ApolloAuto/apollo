@@ -6,16 +6,16 @@ ARG CLEAN_DEPS
 ARG APOLLO_DIST
 ARG INSTALL_MODE
 
-COPY installers /tmp/installers
+COPY installers /opt/apollo/installers
 
-RUN bash /tmp/installers/install_geo_adjustment.sh ${GEOLOC}
+RUN bash /opt/apollo/installers/install_geo_adjustment.sh ${GEOLOC}
 
-RUN bash /tmp/installers/install_modules_base.sh
-RUN bash /tmp/installers/install_ordinary_modules.sh ${INSTALL_MODE}
-RUN bash /tmp/installers/install_drivers_deps.sh ${INSTALL_MODE}
-RUN bash /tmp/installers/install_dreamview_deps.sh ${GEOLOC}
-RUN bash /tmp/installers/install_contrib_deps.sh ${INSTALL_MODE}
-RUN bash /tmp/installers/install_gpu_support.sh
-RUN bash /tmp/installers/install_release_deps.sh
+RUN bash /opt/apollo/installers/install_modules_base.sh
+RUN bash /opt/apollo/installers/install_ordinary_modules.sh ${INSTALL_MODE}
+RUN bash /opt/apollo/installers/install_drivers_deps.sh ${INSTALL_MODE}
+RUN bash /opt/apollo/installers/install_dreamview_deps.sh ${GEOLOC}
+RUN bash /opt/apollo/installers/install_contrib_deps.sh ${INSTALL_MODE}
+RUN bash /opt/apollo/installers/install_gpu_support.sh
+RUN bash /opt/apollo/installers/install_release_deps.sh
 
-RUN bash /tmp/installers/post_install.sh dev
+RUN bash /opt/apollo/installers/post_install.sh dev
