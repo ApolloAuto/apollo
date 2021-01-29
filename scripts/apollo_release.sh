@@ -5,7 +5,7 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 export OPT_APOLLO="$(dirname "${APOLLO_SYSROOT_DIR}")"
-export PREFIX_DIR=/tmp/apollo
+export PREFIX_DIR=/apollo/output
 
 LIST_ONLY=0
 RESOLVE_DEPS=0
@@ -15,7 +15,7 @@ BAZEL_OPTS="--config=opt --config=gpu"
 function _usage() {
     info "Usage: $0 [Options]"
     info "Options:"
-    info "${TAB} -p, --prefix <DIR> Use absolute path <DIR> as install prefix instead of '/tmp/apollo'"
+    info "${TAB} -p, --prefix <DIR> Use absolute path <DIR> as install prefix instead of '/apollo/output'"
     info "${TAB} -l, --list         Print the list of installed files; don't install anything"
     info "${TAB} -c, --clean        Ensure clean install by removing prefix dir if exist before installing"
     info "${TAB} -r, --resolve      Also resolve APT packages on which this release build depends"

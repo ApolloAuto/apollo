@@ -74,5 +74,8 @@ docs/demo_guide/*.record
 .apollo.bazelrc
 .errors.log
 
+# Directory for binary distribution
+output
+
 # Flamegraph files
 tools/FlameGraph
