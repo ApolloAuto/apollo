@@ -7,23 +7,23 @@ package(
 install(
     name = "install",
     data = [
-        ":base_files",
-        ":docker_files",
+        ":apollo_base",
+        ":docker_utils",
     ],
 )
 
 filegroup(
-    name = "docker_files",
+    name = "docker_utils",
     srcs = [
         ":docker_start_user.sh",
     ],
 )
 
 filegroup(
-    name = "base_files",
+    name = "apollo_base",
     srcs = [
-        ":apollo.bashrc",
-        ":common.bashrc",
-        ":apollo_base.sh",
+        "apollo.bashrc",
+        "common.bashrc",
+        "apollo_base.sh",
     ],
 )

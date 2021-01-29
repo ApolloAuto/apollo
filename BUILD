@@ -20,6 +20,7 @@ install(
         "//modules/perception:install",
         "//modules/planning:install",
         "//modules/prediction:install",
+        "//docker/scripts:install",
         "//scripts:install",
     ],
 )
