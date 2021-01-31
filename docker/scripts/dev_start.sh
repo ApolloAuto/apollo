@@ -140,7 +140,7 @@ function stop_all_apollo_containers_for_user() {
             info "Now stop container ${container} ..."
             if docker stop "${container}" >/dev/null; then
                 if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
-                    docker rm -f "${container}" >/dev/null
+                    docker rm -f "${container}" 2>/dev/null
                 fi
                 info "Done."
             else
