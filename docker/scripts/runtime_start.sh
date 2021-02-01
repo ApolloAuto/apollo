@@ -15,28 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+source "${CURR_DIR}/docker_base.sh"
 
 DOCKER_REPO="apolloauto/apollo"
-APOLLO_RUNTIME="apollo_runtime_${USER}"
-PROD_INSIDE="in-runtime-docker"
+RUNTIME_CONTAINER="apollo_runtime_${USER}"
+RUNTIME_INSIDE="in-runtime-docker"
 
-HOST_ARCH="$(uname -m)"
-HOST_OS="$(uname -s)"
 TARGET_ARCH="$(uname -m)"
 
 VERSION_X86_64="dev-x86_64-18.04-20210204_2153"
 USER_VERSION_OPT=
 
-DOCKER_RUN="docker run"
 FAST_MODE="no"
 
 GEOLOC=
-GEO_REGISTRY=
 
 USE_LOCAL_IMAGE=0
-USE_GPU_HOST=0
 
 VOLUME_VERSION="latest"
 SHM_SIZE="2G"
@@ -56,16 +51,6 @@ DEFAULT_TEST_MAPS=(
     sunnyvale_loop
 )
 
-function _optarg_check_for_opt() {
-    local opt="$1"
-    local optarg="$2"
-
-    if [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]; then
-        error "Missing argument for ${opt}. Exiting..."
-        exit 2
-    fi
-}
-
 function show_usage() {
     cat <<EOF
 Usage: $0 [options] ...
@@ -77,18 +62,6 @@ OPTIONS:
     -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
 EOF
-}
-
-function geo_specific_config() {
-    local geo="$1"
-    if [[ -z "${geo}" ]]; then
-        info "Use default GeoLocation settings"
-    elif [[ "${geo}" == "cn" ]]; then
-        info "GeoLocation settings for Mainland China"
-        GEO_REGISTRY="registry.baidubce.com"
-    else
-        info "GeoLocation settings for ${geo} is not ready, fallback to default"
-    fi
 }
 
 function parse_arguments() {
@@ -106,7 +79,7 @@ function parse_arguments() {
                 fi
                 custom_version="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${custom_version}"
+                optarg_check_for_opt "${opt}" "${custom_version}"
                 ;;
 
             -h | --help)
@@ -121,7 +94,7 @@ function parse_arguments() {
             -g | --geo)
                 geo="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${geo}"
+                optarg_check_for_opt "${opt}" "${geo}"
                 ;;
 
             -l | --local)
@@ -131,7 +104,7 @@ function parse_arguments() {
             --shm-size)
                 shm_size="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${shm_size}"
+                optarg_check_for_opt "${opt}" "${shm_size}"
                 ;;
             --map)
                 map_name="$1"
@@ -153,13 +126,13 @@ function parse_arguments() {
 function determine_runtime_image() {
     local version="$1"
     if [[ -n "${version}" ]]; then
-        APOLLO_RUNTIME_IMAGE="${DOCKER_REPO}:${version}"
+        RUNTIME_IMAGE="${DOCKER_REPO}:${version}"
         return
     fi
 
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         version="${VERSION_X86_64}"
-        APOLLO_RUNTIME_IMAGE="${DOCKER_REPO}:${version}"
+        RUNTIME_IMAGE="${DOCKER_REPO}:${version}"
     else
         error "Runtime Docker for ${TARGET_ARCH} Not Ready. Exiting..."
         exit 3
@@ -203,46 +176,6 @@ function setup_devices_and_mount_local_volumes() {
                         -v /lib/modules:/lib/modules"
     volumes="$(tr -s " " <<<"${volumes}")"
     eval "${__retval}='${volumes}'"
-}
-
-function determine_gpu_use_host() {
-    # Check nvidia-driver and GPU device
-    local nv_driver="nvidia-smi"
-    if [ ! -x "$(command -v ${nv_driver})" ]; then
-        warning "nvidia-smi not found. CPU will be used."
-    elif [ -z "$(eval ${nv_driver})" ]; then
-        warning "No GPU device found. CPU will be used."
-    else
-        USE_GPU_HOST=1
-    fi
-
-    # Try to use GPU inside container
-    local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [ ${USE_GPU_HOST} -eq 1 ]; then
-        DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
-            if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
-                DOCKER_RUN="docker run --gpus all"
-            else
-                warning "You must upgrade to Docker-CE 19.03+ to access GPU from container!"
-                USE_GPU_HOST=0
-            fi
-        elif [[ -x "$(which nvidia-docker)" ]]; then
-            DOCKER_RUN="nvidia-docker run"
-        else
-            USE_GPU_HOST=0
-            warning "Cannot access GPU from within container. Please install " \
-                "latest Docker and NVIDIA Container Toolkit as described by: "
-            warning "  ${nv_docker_doc}"
-        fi
-    fi
-}
-
-function remove_existing_container() {
-    if docker ps -a --format '{{.Names}}' | grep -q "${APOLLO_RUNTIME}"; then
-        docker stop "${APOLLO_RUNTIME}" >/dev/null
-        docker rm -v -f "${APOLLO_RUNTIME}" >/dev/null
-    fi
 }
 
 function docker_pull() {
@@ -346,12 +279,6 @@ function mount_other_volumes() {
     OTHER_VOLUMES_CONF="${volume_conf}"
 }
 
-function post_run_setup() {
-    if [ "${USER}" != "root" ]; then
-        docker exec -u root "${APOLLO_RUNTIME}" bash -c '/apollo/scripts/docker_start_user.sh'
-    fi
-}
-
 function main() {
     check_host_environment
 
@@ -361,16 +288,16 @@ function main() {
     geo_specific_config "${GEOLOC}"
 
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
-        info "Start Runtime container based on local image : ${APOLLO_RUNTIME_IMAGE}"
+        info "Start Runtime container based on local image : ${RUNTIME_IMAGE}"
     fi
 
-    if ! docker_pull "${APOLLO_RUNTIME_IMAGE}"; then
-        error "Failed to pull docker image ${APOLLO_RUNTIME_IMAGE}"
+    if ! docker_pull "${RUNTIME_IMAGE}"; then
+        error "Failed to pull docker image ${RUNTIME_IMAGE}"
         exit 1
     fi
 
     info "Check and remove existing Apollo Runtime container ..."
-    remove_existing_container
+    remove_container_if_exists "${RUNTIME_CONTAINER}"
 
     info "Determine whether host GPU is available ..."
     determine_gpu_use_host
@@ -382,7 +309,7 @@ function main() {
     # mount_map_volumes
     # mount_other_volumes
 
-    info "Starting docker container \"${APOLLO_RUNTIME}\" ..."
+    info "Starting docker container \"${RUNTIME_CONTAINER}\" ..."
 
     local local_host="$(hostname)"
     local display="${DISPLAY:-:0}"
@@ -392,42 +319,41 @@ function main() {
     local gid="$(id -g)"
 
     set -x
-    ${DOCKER_RUN} -itd \
+    ${DOCKER_RUN_CMD} -itd \
         --privileged \
-        --name "${APOLLO_RUNTIME}" \
+        --name "${RUNTIME_CONTAINER}" \
         -e DISPLAY="${display}" \
         -e DOCKER_USER="${user}" \
         -e USER="${user}" \
         -e DOCKER_USER_ID="${uid}" \
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
-        -e DOCKER_IMG="${APOLLO_RUNTIME_IMAGE}" \
-        -e HOST_OS="${HOST_OS}" \
+        -e DOCKER_IMG="${RUNTIME_IMAGE}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${local_volumes} \
         --net host \
         -w /apollo \
-        --add-host "${PROD_INSIDE}:127.0.0.1" \
+        --add-host "${RUNTIME_INSIDE}:127.0.0.1" \
         --add-host "${local_host}:127.0.0.1" \
-        --hostname "${PROD_INSIDE}" \
+        --hostname "${RUNTIME_INSIDE}" \
         --shm-size "${SHM_SIZE}" \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
-        "${APOLLO_RUNTIME_IMAGE}" \
+        "${RUNTIME_IMAGE}" \
         /bin/bash
 
     if [ $? -ne 0 ]; then
-        error "Failed to start docker container \"${APOLLO_RUNTIME}\" based on image: ${APOLLO_RUNTIME_IMAGE}"
+        error "Failed to start docker container \"${RUNTIME_CONTAINER}\" based on image: ${RUNTIME_IMAGE}"
         exit 1
     fi
     set +x
 
-    post_run_setup
+    postrun_start_user ${RUNTIME_CONTAINER}
 
     ok "Congratulations! You have successfully finished setting up Apollo Runtime Environment."
-    ok "To login into the newly created ${APOLLO_RUNTIME} container, please run the following command:"
+    ok "To login into the newly created ${RUNTIME_CONTAINER} container, please run the following command:"
     ok "  bash docker/scripts/runtime_into.sh"
     ok "Enjoy!"
 }
