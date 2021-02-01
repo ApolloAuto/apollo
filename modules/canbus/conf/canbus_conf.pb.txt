@@ -8,6 +8,7 @@ can_card_parameter {
   brand: ESD_CAN
   type: PCI_CARD
   channel_id: CHANNEL_ID_ZERO
+  max_ports: 4
   interface: NATIVE
 }
 

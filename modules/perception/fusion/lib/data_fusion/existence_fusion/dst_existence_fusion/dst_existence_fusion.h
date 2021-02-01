@@ -28,15 +28,15 @@ namespace fusion {
 
 struct ToicDstMaps {
   // for (N)TOIC: (not)target of interest in camera judgement
-  enum { TOIC = (1 << 0), NTOIC = (1 << 1), TOICUNKOWN = (TOIC | NTOIC) };
-  std::vector<uint64_t> fod_subsets_ = {TOIC, NTOIC, TOICUNKOWN};
-  std::vector<std::string> subset_names_ = {"TOIC", "NTOIC", "TOICUNKOWN"};
+  enum { TOIC = (1 << 0), NTOIC = (1 << 1), TOICUNKNOWN = (TOIC | NTOIC) };
+  std::vector<uint64_t> fod_subsets_ = {TOIC, NTOIC, TOICUNKNOWN};
+  std::vector<std::string> subset_names_ = {"TOIC", "NTOIC", "TOICUNKNOWN"};
 };
 
 struct ExistenceDstMaps {
-  enum { EXIST = (1 << 0), NEXIST = (1 << 1), EXISTUNKOWN = (EXIST | NEXIST) };
-  std::vector<uint64_t> fod_subsets_ = {EXIST, NEXIST, EXISTUNKOWN};
-  std::vector<std::string> subset_names_ = {"EXIST", "NEXIST", "EXISTUNKOWN"};
+  enum { EXIST = (1 << 0), NEXIST = (1 << 1), EXISTUNKNOWN = (EXIST | NEXIST) };
+  std::vector<uint64_t> fod_subsets_ = {EXIST, NEXIST, EXISTUNKNOWN};
+  std::vector<std::string> subset_names_ = {"EXIST", "NEXIST", "EXISTUNKNOWN"};
 };
 
 struct DstExistenceFusionOptions {

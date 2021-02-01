@@ -16,6 +16,8 @@
 
 #include "modules/perception/inference/libtorch/torch_det.h"
 
+#include <c10/cuda/CUDACachingAllocator.h>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -113,6 +115,7 @@ void TorchDet::Infer() {
     result = torch::zeros({1, 9}, torch::kFloat).to(device);
   }
   blobs_[output_names_[0]]->data()->set_gpu_data(result.data_ptr());
+  c10::cuda::CUDACachingAllocator::emptyCache();
 }
 
 }  // namespace inference

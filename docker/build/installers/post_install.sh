@@ -18,7 +18,8 @@
 
 # Fail on first error.
 set -e
-build_stage="$1"; shift
+
+build_stage="${1:-dev}"
 
 [ -d /tmp/archive ] && rm -rf /tmp/archive
 [ -d /tmp/installers ] && rm -rf /tmp/installers

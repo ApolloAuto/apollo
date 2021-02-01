@@ -10,9 +10,17 @@ export default class RouteEditingManager {
     // e.g. {POI-1: [{x: 1.0, y: 1.2}, {x: 101.0, y: 10.2}]}
     @observable defaultRoutingEndPoint = {};
 
+    @observable defaultRoutings = {};
+
+    @observable defaultRoutingDistanceThreshold = 10;
+
     @observable currentPOI = 'none';
 
+    @observable inDefaultRoutingMode = false;
+
     defaultParkingInfo = {};
+
+    currentDefaultRouting = 'none';
 
     @action updateDefaultRoutingEndPoint(data) {
       if (data.poi === undefined) {
@@ -58,6 +66,51 @@ export default class RouteEditingManager {
       }
     }
 
+    @action addDefaultRoutingPoint(defaultRoutingName) {
+      if (_.isEmpty(this.defaultRoutings)) {
+        alert("Failed to get default routing, make sure there's "
+                + 'a default routing file under the map data directory.');
+        return;
+      }
+      if (defaultRoutingName === undefined || defaultRoutingName === ''
+            || !(defaultRoutingName in this.defaultRoutings)) {
+        alert('Please select a valid default routing.');
+        return;
+      }
+
+      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName], false);
+    }
+
+    @action updateDefaultRoutingPoints(data) {
+      if (data.threshold) {
+        this.defaultRoutingDistanceThreshold = data.threshold;
+      }
+      if (data.defaultRoutings === undefined) {
+        return;
+      }
+      this.defaultRoutings = {};
+      for (let i = 0; i < data.defaultRoutings.length; ++i) {
+        const drouting = data.defaultRoutings[i];
+        this.defaultRoutings[drouting.name] = drouting.point;
+      }
+    }
+
+    addDefaultRoutingPath(message) {
+      if (message.data === undefined) {
+        return;
+      }
+      const drouting = message.data;
+      this.defaultRoutings[drouting.name] = drouting.point;
+    }
+
+    addDefaultRouting(routingName) {
+      return RENDERER.addDefaultRouting(routingName);
+    }
+
+    toggleDefaultRoutingMode() {
+      this.inDefaultRoutingMode = !this.inDefaultRoutingMode;
+    }
+
     enableRouteEditing() {
       RENDERER.enableRouteEditing();
     }
@@ -74,14 +127,40 @@ export default class RouteEditingManager {
       RENDERER.removeAllRoutingPoints();
     }
 
-    sendRoutingRequest(inNavigationMode) {
+    sendRoutingRequest(inNavigationMode, defaultRoutingName = '') {
       if (!inNavigationMode) {
-        const success = RENDERER.sendRoutingRequest();
+        const success = _.isEmpty(defaultRoutingName) ? RENDERER.sendRoutingRequest()
+          : RENDERER.sendRoutingRequest(this.defaultRoutings[defaultRoutingName]);
         if (success) {
           this.disableRouteEditing();
         }
         return success;
       }
       return MAP_NAVIGATOR.sendRoutingRequest();
+    }
+
+    sendCycleRoutingRequest(cycleNumber) {
+      const points = this.defaultRoutings[this.currentDefaultRouting];
+      if (!isNaN(cycleNumber) || !points) {
+        const success = RENDERER.sendCycleRoutingRequest
+        (this.currentDefaultRouting, points, cycleNumber);
+        if (success) {
+          this.disableRouteEditing();
+        }
+        return success;
+      }
+      return false;
+    }
+
+    checkCycleRoutingAvailable() {
+      const points = this.defaultRoutings[this.currentDefaultRouting];
+      const start = points[0];
+      const end = points[points.length - 1];
+      if (_.isEmpty(start) || _.isEmpty(end)) {
+        return false;
+      }
+      const distance =
+          Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
+      return distance <= this.defaultRoutingDistanceThreshold;
     }
 }

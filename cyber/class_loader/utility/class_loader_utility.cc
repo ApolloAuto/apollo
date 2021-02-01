@@ -16,8 +16,6 @@
 
 #include "cyber/class_loader/utility/class_loader_utility.h"
 
-#include "cyber/class_loader/class_loader.h"
-
 namespace apollo {
 namespace cyber {
 namespace class_loader {
@@ -28,7 +26,7 @@ std::recursive_mutex& GetClassFactoryMapMapMutex() {
   return m;
 }
 
-std::recursive_mutex& GetLibPathPocoShareLibMutex() {
+std::recursive_mutex& GetLibPathSharedLibMutex() {
   static std::recursive_mutex m;
   return m;
 }
@@ -38,8 +36,8 @@ BaseToClassFactoryMapMap& GetClassFactoryMapMap() {
   return instance;
 }
 
-LibpathPocolibVector& GetLibPathPocoShareLibVector() {
-  static LibpathPocolibVector instance;
+LibPathSharedLibVector& GetLibPathSharedLibVector() {
+  static LibPathSharedLibVector instance;
   return instance;
 }
 
@@ -127,7 +125,7 @@ void DestroyClassFactoryObjectsOfLibrary(
     if (class_factory_object->GetRelativeLibraryPath() == library_path &&
         class_factory_object->IsOwnedBy(class_loader)) {
       class_factory_object->RemoveOwnedClassLoader(class_loader);
-      // when no anybody owner,delete && erase
+      // when no anybody owner, delete && erase
       if (!class_factory_object->IsOwnedByAnybody()) {
         itr = class_factory_map->erase(itr);
         delete class_factory_object;
@@ -151,10 +149,10 @@ void DestroyClassFactoryObjectsOfLibrary(const std::string& library_path,
   }
 }
 
-LibpathPocolibVector::iterator FindLoadedLibrary(
+LibPathSharedLibVector::iterator FindLoadedLibrary(
     const std::string& library_path) {
-  LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
-  LibpathPocolibVector::iterator itr;
+  LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
+  LibPathSharedLibVector::iterator itr;
   for (itr = opened_libraries.begin(); itr != opened_libraries.end(); ++itr) {
     if (itr->first == library_path) {
       break;
@@ -164,10 +162,10 @@ LibpathPocolibVector::iterator FindLoadedLibrary(
 }
 
 bool IsLibraryLoadedByAnybody(const std::string& library_path) {
-  std::lock_guard<std::recursive_mutex> lck(GetLibPathPocoShareLibMutex());
+  std::lock_guard<std::recursive_mutex> lck(GetLibPathSharedLibMutex());
 
-  LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
-  LibpathPocolibVector::iterator itr = FindLoadedLibrary(library_path);
+  LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
+  LibPathSharedLibVector::iterator itr = FindLoadedLibrary(library_path);
   return itr != opened_libraries.end();
 }
 
@@ -205,7 +203,7 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     return true;
   }
 
-  PocoLibraryPtr poco_library = nullptr;
+  SharedLibraryPtr shared_library = nullptr;
   static std::recursive_mutex loader_mutex;
   {
     std::lock_guard<std::recursive_mutex> lck(loader_mutex);
@@ -213,27 +211,27 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     try {
       SetCurActiveClassLoader(loader);
       SetCurLoadingLibraryName(library_path);
-      poco_library = PocoLibraryPtr(new Poco::SharedLibrary(library_path));
-    } catch (const Poco::LibraryLoadException& e) {
+      shared_library = SharedLibraryPtr(new SharedLibrary(library_path));
+    } catch (const LibraryLoadException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AERROR << "poco LibraryLoadException: " << e.message();
-    } catch (const Poco::LibraryAlreadyLoadedException& e) {
+      AERROR << "LibraryLoadException: " << e.what();
+    } catch (const LibraryAlreadyLoadedException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AERROR << "poco LibraryAlreadyLoadedException: " << e.message();
-    } catch (const Poco::NotFoundException& e) {
+      AERROR << "LibraryAlreadyLoadedException: " << e.what();
+    } catch (const SymbolNotFoundException& e) {
       SetCurLoadingLibraryName("");
       SetCurActiveClassLoader(nullptr);
-      AERROR << "poco NotFoundException: " << e.message();
+      AERROR << "SymbolNotFoundException: " << e.what();
     }
 
     SetCurLoadingLibraryName("");
     SetCurActiveClassLoader(nullptr);
   }
 
-  if (poco_library == nullptr) {
-    AERROR << "poco shared library failed: " << library_path;
+  if (shared_library == nullptr) {
+    AERROR << "shared library failed: " << library_path;
     return false;
   }
 
@@ -242,18 +240,18 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     AWARN << "Class factory objs counts is 0, maybe registerclass failed.";
   }
 
-  std::lock_guard<std::recursive_mutex> lck(GetLibPathPocoShareLibMutex());
-  LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
+  std::lock_guard<std::recursive_mutex> lck(GetLibPathSharedLibMutex());
+  LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
   opened_libraries.emplace_back(
-      std::pair<std::string, PocoLibraryPtr>(library_path, poco_library));
+      std::pair<std::string, SharedLibraryPtr>(library_path, shared_library));
   return true;
 }
 
 void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
   {
-    std::lock_guard<std::recursive_mutex> lck(GetLibPathPocoShareLibMutex());
-    LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
-    LibpathPocolibVector::iterator itr = FindLoadedLibrary(library_path);
+    std::lock_guard<std::recursive_mutex> lck(GetLibPathSharedLibMutex());
+    LibPathSharedLibVector& opened_libraries = GetLibPathSharedLibVector();
+    LibPathSharedLibVector::iterator itr = FindLoadedLibrary(library_path);
     if (itr == opened_libraries.end()) {
       AERROR << "Attempt to UnloadLibrary lib, but can't find lib: "
              << library_path;
@@ -265,15 +263,15 @@ void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
       DestroyClassFactoryObjectsOfLibrary(library_path, loader);
 
       if (GetAllClassFactoryObjectsOfLibrary(library_path).empty()) {
-        itr->second->unload();
+        itr->second->Unload();
         itr = opened_libraries.erase(itr);
       } else {
-        AWARN << "ClassFactory Objects still remain in memory,meaning other "
-                 "ClassLoaders are still using library:"
+        AWARN << "ClassFactory objects still remain in memory, meaning other"
+                 "class loaders are still using library:"
               << library_path;
       }
-    } catch (const Poco::RuntimeException& e) {
-      AERROR << "library unLoad error: Poco::RuntimeException: " << e.message();
+    } catch (const std::runtime_error& e) {
+      AERROR << "Library unload error: " << e.what();
     }
   }
 }

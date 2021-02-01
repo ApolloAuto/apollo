@@ -341,7 +341,7 @@ bool YoloObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";
-  get_objects_gpu(yolo_blobs_, stream_, types_, nms_, yolo_param_.model_param(),
+  get_objects_cpu(yolo_blobs_, stream_, types_, nms_, yolo_param_.model_param(),
                   light_vis_conf_threshold_, light_swt_conf_threshold_,
                   overlapped_.get(), idx_sm_.get(), &(frame->detected_objects));
 

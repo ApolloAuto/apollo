@@ -2590,7 +2590,7 @@ layer {
   bottom: "cls_score"
   top: "cls_score_softmax"
   softmax_param {
-    axis: 1
+    axis: 2 # if use CaffeNet, change to 1
   }
 }
 layer {

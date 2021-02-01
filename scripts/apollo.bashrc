@@ -31,6 +31,9 @@ export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
 export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
 export TAB="    " # 4 spaces
+
+source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
+
 : ${VERBOSE:=yes}
 
 BOLD='\033[1m'
@@ -95,11 +98,10 @@ function determine_gpu_use_target() {
       fi
     fi
   else ## x86_64 mode
-    # Check nvidia-driver and GPU device
-    local nv_driver="nvidia-smi"
-    if [ ! -x "$(command -v ${nv_driver})" ]; then
-      warning "No nvidia-driver found. CPU will be used."
-    elif [ -z "$(eval ${nv_driver})" ]; then
+    # Check the existence of nvidia-smi
+    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+      warning "nvidia-smi not found. CPU will be used."
+    elif [[ -z "$(nvidia-smi)" ]]; then
       warning "No GPU device found. CPU will be used."
     else
       use_gpu=1
@@ -210,32 +212,6 @@ function find_prettier_srcs() {
     -or -name "*.yml"
 }
 
-## Prevent multiple entries of my_bin_path in PATH
-function add_to_path() {
-  if [ -z "$1" ]; then
-    return
-  fi
-  local my_bin_path="$1"
-  if [ -n "${PATH##*${my_bin_path}}" ] && [ -n "${PATH##*${my_bin_path}:*}" ]; then
-    export PATH=$PATH:${my_bin_path}
-  fi
-}
-
-## Prevent multiple entries of my_libdir in LD_LIBRARY_PATH
-function add_to_ld_library_path() {
-  if [ -z "$1" ]; then
-    return
-  fi
-  local my_libdir="$1"
-  local result="${LD_LIBRARY_PATH}"
-  if [ -z "${result}" ]; then
-    result="${my_libdir}"
-  elif [ -n "${result##*${my_libdir}}" ] && [ -n "${result##*${my_libdir}:*}" ]; then
-    result="${result}:${my_libdir}"
-  fi
-  export LD_LIBRARY_PATH="${result}"
-}
-
 # Exits the script if the command fails.
 function run() {
   if [ "${VERBOSE}" = yes ]; then
@@ -291,22 +267,21 @@ function optarg_check_for_opt() {
 
 function setup_gpu_support() {
   if [ -e /usr/local/cuda/ ]; then
-    add_to_path "/usr/local/cuda/bin"
+    pathprepend /usr/local/cuda/bin
   fi
 
   determine_gpu_use_target
 
-  local dev=
-  if [ "${USE_GPU_TARGET}" -eq 0 ]; then
-    dev="cpu"
-  else
+  # TODO(infra): revisit this for CPU builds on GPU capable machines
+  local dev="cpu"
+  if [ "${USE_GPU_TARGET}" -gt 0 ]; then
     dev="gpu"
   fi
 
   local torch_path="/usr/local/libtorch_${dev}/lib"
   if [ -d "${torch_path}" ]; then
     # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
-    export LD_LIBRARY_PATH="${torch_path}:$LD_LIBRARY_PATH"
+    pathprepend ${torch_path} LD_LIBRARY_PATH
   fi
 }
 

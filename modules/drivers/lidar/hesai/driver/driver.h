@@ -28,21 +28,28 @@
 #include <thread>
 #include <vector>
 
+#include "modules/drivers/lidar/proto/config.pb.h"
+
 #include "cyber/cyber.h"
-#include "modules/drivers/lidar/hesai/parser/parser.h"
+#include "modules/drivers/lidar/common/driver_factory/driver_base.h"
 #include "modules/drivers/lidar/hesai/input/udp_input.h"
+#include "modules/drivers/lidar/hesai/parser/parser.h"
+#include "modules/drivers/lidar/hesai/parser/parser_factory.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
 
-class HesaiDriver {
+class HesaiDriver : public apollo::drivers::lidar::LidarDriver {
  public:
   HesaiDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
-              const Config& conf, const std::shared_ptr<Parser>& parser)
-      : node_(node), conf_(conf), parser_(parser) {}
+              const ::apollo::drivers::lidar::config& conf)
+      : node_(node), conf_(conf.hesai()) {}
+  HesaiDriver(const std::shared_ptr<::apollo::cyber::Node>& node,
+              const ::apollo::drivers::hesai::Config& conf)
+      : node_(node), conf_(conf) {}
   ~HesaiDriver() { Stop(); }
-  bool Init();
+  bool Init() override;
 
  private:
   std::shared_ptr<::apollo::cyber::Node> node_ = nullptr;

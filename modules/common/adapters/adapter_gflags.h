@@ -36,9 +36,11 @@ DECLARE_string(control_preprocessor_topic);
 DECLARE_string(control_local_view_topic);
 DECLARE_string(control_core_command_topic);
 DECLARE_string(pointcloud_topic);
+DECLARE_string(pointcloud_16_topic);
 DECLARE_string(pointcloud_16_front_up_topic);
 DECLARE_string(pointcloud_64_topic);
 DECLARE_string(pointcloud_128_topic);
+DECLARE_string(pointcloud_hesai_40p_topic);
 DECLARE_string(pointcloud_raw_topic);
 DECLARE_string(velodyne_raw_topic);
 DECLARE_string(pointcloud_fusion_topic);
@@ -115,6 +117,7 @@ DECLARE_string(stream_status_topic);
 DECLARE_string(heading_topic);
 DECLARE_string(rtcm_data_topic);
 DECLARE_string(audio_event_topic);
+DECLARE_string(task_topic);
 
 // Guardian topic
 DECLARE_string(guardian_topic);

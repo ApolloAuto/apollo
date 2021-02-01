@@ -36,11 +36,7 @@ export DOWNLOAD_LOG="/opt/apollo/build.log"
 export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 
 if [[ "$(uname -m)" == "x86_64" ]]; then
-    if [[ "${APOLLO_DIST}" == "stable" ]]; then
-        export SUPPORTED_NVIDIA_SMS="3.7 5.2 6.0 6.1 7.0 7.2 7.5"
-    else
-        export SUPPORTED_NVIDIA_SMS="5.2 6.0 6.1 7.0 7.2 7.5 8.0 8.6"
-    fi
+    export SUPPORTED_NVIDIA_SMS="5.2 6.0 6.1 7.0 7.5 8.0 8.6"
 else # AArch64
     export SUPPORTED_NVIDIA_SMS="5.3 6.2 7.2"
 fi
@@ -53,7 +49,7 @@ function py3_version() {
 }
 
 function pip3_install() {
-    python3 -m pip install --no-cache-dir $@
+    python3 -m pip install --timeout 30 --no-cache-dir $@
 }
 
 function apt_get_update_and_install() {

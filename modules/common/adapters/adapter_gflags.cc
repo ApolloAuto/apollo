@@ -49,6 +49,9 @@ DEFINE_string(control_core_command_topic, "/apollo/control/controlcore",
 DEFINE_string(pointcloud_topic,
               "/apollo/sensor/lidar128/compensator/PointCloud2",
               "pointcloud topic name");
+DEFINE_string(pointcloud_16_topic,
+              "/apollo/sensor/lidar16/compensator/PointCloud2",
+              "16 beam Lidar pointcloud topic name");
 DEFINE_string(pointcloud_16_front_up_topic,
               "/apollo/sensor/lidar16/front/up/compensator/PointCloud2",
               "Front up 16 beam Lidar pointcloud topic name");
@@ -58,6 +61,9 @@ DEFINE_string(pointcloud_64_topic,
 DEFINE_string(pointcloud_128_topic,
               "/apollo/sensor/lidar128/compensator/PointCloud2",
               "pointcloud topic name for 128 beam lidar");
+DEFINE_string(pointcloud_hesai_40p_topic,
+              "/apollo/sensor/hesai40/compensator/PointCloud2",
+              "pointcloud topic name for hesai40p lidar");
 DEFINE_string(pointcloud_raw_topic, "/apollo/sensor/velodyne64/PointCloud2",
               "pointcloud raw topic name");
 DEFINE_string(velodyne_raw_topic,
@@ -241,3 +247,5 @@ DEFINE_string(latency_recording_topic, "/apollo/common/latency_records",
               "Latency recording topic.");
 DEFINE_string(latency_reporting_topic, "/apollo/common/latency_reports",
               "Latency reporting topic.");
+DEFINE_string(task_topic, "/apollo/task_manager",
+              "task manager topic name");

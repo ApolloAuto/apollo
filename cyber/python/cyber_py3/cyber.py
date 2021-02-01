@@ -290,7 +290,9 @@ class Node(object):
         return Client(c, response_data_type)
 
     def service_callback(self, name):
-        v = self.services[name]
+        # Temporary workaround for cyber_py3 examples: service & client
+        v = self.services[name.decode("utf-8")]
+
         msg_str = _CYBER.PyService_read(v[0])
         if (len(msg_str) > 0):
             proto = v[3]()

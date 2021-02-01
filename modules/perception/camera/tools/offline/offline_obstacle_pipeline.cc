@@ -14,8 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+
 #include <fstream>
 #include <iomanip>
+#include <opencv2/highgui/highgui_c.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_split.h"
@@ -32,6 +36,7 @@
 #include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
@@ -71,6 +76,7 @@ namespace perception {
 namespace camera {
 
 REGISTER_OBSTACLE_DETECTOR(YoloObstacleDetector);
+REGISTER_OBSTACLE_DETECTOR(SmokeObstacleDetector);
 REGISTER_OBSTACLE_TRACKER(OMTObstacleTracker);
 REGISTER_FEATURE_EXTRACTOR(TrackingFeatureExtractor);
 REGISTER_OBSTACLE_TRANSFORMER(MultiCueObstacleTransformer);
@@ -229,13 +235,13 @@ int work() {
     std::string image_path = FLAGS_image_root + image_name + FLAGS_image_ext;
     cv::Mat image;
     if (FLAGS_image_color == "gray") {
-      image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
+      image = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
       cv::cvtColor(image, image, CV_GRAY2RGB);
     } else if (FLAGS_image_color == "rgb") {
-      image = cv::imread(image_path, cv::IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMREAD_COLOR);
       cv::cvtColor(image, image, CV_BGR2RGB);
     } else if (FLAGS_image_color == "bgr") {
-      image = cv::imread(image_path, cv::IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMREAD_COLOR);
     } else {
       AERROR << "Invalid color: " << FLAGS_image_color;
     }

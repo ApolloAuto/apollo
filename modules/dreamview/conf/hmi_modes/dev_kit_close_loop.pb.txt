@@ -79,6 +79,12 @@ cyber_modules {
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
   }
 }
+cyber_modules {
+  key: "TaskManager"
+  value: {
+    dag_files: "/apollo/modules/task_manager/dag/task_manager.dag"
+  }
+}
 modules {
   key: "Recorder"
   value: {
@@ -112,7 +118,7 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "GPS"
+  key: "GNSS"
   value: {
     process {
       command_keywords: "mainboard"

@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import Geolocation from 'components/Scene/Geolocation';
 import RENDERER from 'renderer';
 import STORE from 'store';
+import DefaultRoutingInput from '../RouteEditingBar/DefaultRoutingInput';
+import CycleNumberInput from '../DefaultRouting/CycleNumberInput';
 
 @inject('store') @observer
 export default class Scene extends React.Component {
@@ -24,6 +26,7 @@ export default class Scene extends React.Component {
 
   render() {
     const { options, shouldDisplayOnRight } = this.props;
+    const { routeEditingManager } = this.props.store;
 
     const shouldDisplayCameraImage = options.showCameraView && !options.showRouteEditingBar;
     const leftPosition = shouldDisplayOnRight ? '50%' : '0%';
@@ -40,6 +43,16 @@ export default class Scene extends React.Component {
                       STORE.setGeolocation(geo);
                     }}
                 >
+                    {options.showRouteEditingBar && options.showDefaultRoutingInput
+                        && <DefaultRoutingInput
+                            routeEditingManager={routeEditingManager}
+                            options={options}
+                        />}
+                    {!options.showRouteEditingBar && options.showCycleNumberInput
+                        && <CycleNumberInput
+                            routeEditingManager={routeEditingManager}
+                            options={options}
+                      />}
                     {options.showGeo && <Geolocation />}
                 </div>
             </React.Fragment>

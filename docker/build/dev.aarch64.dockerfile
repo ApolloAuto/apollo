@@ -2,6 +2,7 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 ARG GEOLOC
+ARG CLEAN_DEPS
 ARG INSTALL_MODE
 
 WORKDIR /apollo
@@ -16,7 +17,6 @@ RUN bash /tmp/installers/install_gpu_support.sh
 RUN bash /tmp/installers/install_ordinary_modules.sh
 RUN bash /tmp/installers/install_drivers_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_dreamview_deps.sh ${GEOLOC}
-
 RUN bash /tmp/installers/install_contrib_deps.sh
 
 RUN bash /tmp/installers/install_release_deps.sh

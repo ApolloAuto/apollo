@@ -64,12 +64,14 @@ ok "Successfully built proj = ${VERSION}"
 
 rm -fr "${PKG_NAME}" "proj-${VERSION}"
 
-# Remove build-deps for proj
-apt_get_remove \
-    libsqlite3-dev \
-    sqlite3 \
-    libtiff-dev \
-    libcurl4-openssl-dev
+if [[ -n "${CLEAN_DEPS}" ]]; then
+    # Remove build-deps for proj
+    apt_get_remove \
+        libsqlite3-dev \
+        sqlite3 \
+        libtiff-dev \
+        libcurl4-openssl-dev
+fi
 
 # Clean up cache to reduce layer size.
 apt-get clean &&

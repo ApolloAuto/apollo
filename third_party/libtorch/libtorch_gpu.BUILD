@@ -13,6 +13,7 @@ cc_library(
     linkopts = [
         "-L/usr/local/libtorch_gpu/lib",
         "-lc10",
+        "-lc10_cuda",
         "-ltorch",
         "-ltorch_cpu",
         "-ltorch_cuda",

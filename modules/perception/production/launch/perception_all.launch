@@ -15,14 +15,6 @@
         <version>1.0.0</version>
     </module>
     <module>
-        <name>perception_camera</name>
-        <dag_conf>/apollo/modules/perception/production/dag/dag_streaming_perception_camera.dag</dag_conf>
-        <!-- if not set, use default process -->
-        <process_name>perception</process_name>
-        <version>1.0.0</version>
-    </module>
-
-    <module>
         <name>perception_traffic_light</name>
         <dag_conf>/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag</dag_conf>
         <!-- if not set, use default process -->

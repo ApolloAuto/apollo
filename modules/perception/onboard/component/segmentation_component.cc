@@ -23,6 +23,8 @@
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 
+using ::apollo::cyber::Clock;
+
 namespace apollo {
 namespace perception {
 namespace onboard {
@@ -57,7 +59,7 @@ bool SegmentationComponent::Proc(
   AINFO << std::setprecision(16)
         << "Enter segmentation component, message timestamp: "
         << message->measurement_time() << " current timestamp: "
-        << apollo::common::time::Clock::NowInSeconds();
+        << Clock::NowInSeconds();
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
                                                      LidarFrameMessage);
@@ -103,7 +105,7 @@ bool SegmentationComponent::InternalProc(
     s_seq_num_++;
   }
   const double timestamp = in_message->measurement_time();
-  const double cur_time = apollo::common::time::Clock::NowInSeconds();
+  const double cur_time = Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
   AINFO << std::setprecision(16) << "FRAME_STATISTICS:Lidar:Start:msg_time["
         << timestamp << "]:sensor[" << sensor_name_ << "]:cur_time[" << cur_time

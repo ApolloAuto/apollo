@@ -16,21 +16,16 @@
 
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
-#include <fstream>
-#include <cuda_runtime_api.h>
 
 #include "NvInfer.h"
 #include "NvOnnxParser.h"
 #include "NvInferVersion.h"
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/inference/inference.h"
@@ -41,44 +36,62 @@ namespace inference {
 
 using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
+// Logger for TensorRT info/warning/errors
+class Logger : public nvinfer1::ILogger {
+ public:
+  explicit Logger(Severity severity = Severity::kWARNING)
+      : reportable_severity(severity) {}
+
+  void log(Severity severity, const char* msg) override {
+    // suppress messages with severity enum value greater than the reportable
+    if (severity > reportable_severity) return;
+
+    switch (severity) {
+      case Severity::kINTERNAL_ERROR:
+        std::cerr << "INTERNAL_ERROR: ";
+        break;
+      case Severity::kERROR:
+        std::cerr << "ERROR: ";
+        break;
+      case Severity::kWARNING:
+        std::cerr << "WARNING: ";
+        break;
+      case Severity::kINFO:
+        std::cerr << "INFO: ";
+        break;
+      default:
+        std::cerr << "UNKNOWN: ";
+        break;
+    }
+    std::cerr << msg << std::endl;
+  }
+
+  Severity reportable_severity;
+};
+
 class OnnxObstacleDetector : public Inference {
  public:
   OnnxObstacleDetector(const std::string &model_file,
-                        const int num_classes,
-                        const std::string &input_image_file,
-                        const std::string &input_name_file,
-                        const std::string &prediction_image_path);
+                       const float score_threshold,
+                       const std::vector<std::string> &outputs,
+                       const std::vector<std::string> &inputs);
 
   OnnxObstacleDetector(const std::string &model_file,
-                        const std::vector<std::string> &outputs,
-                        const std::vector<std::string> &inputs);
+                       const std::vector<std::string> &outputs,
+                       const std::vector<std::string> &inputs);
 
   virtual ~OnnxObstacleDetector();
 
+  /**
+   * @brief Convert ONNX to TensorRT model
+   * @param[in] model_file ONNX model file path
+   * @param[out] engine_ptr TensorRT model engine made out of ONNX model
+   * @details Load ONNX model, and convert it to TensorRT model
+   */
   void OnnxToTRTModel(const std::string& model_file,
-    nvinfer1::IHostMemory** trt_model_stream);
+                      nvinfer1::ICudaEngine** engine_ptr);
 
-  void TRTStreamToContext(
-  const nvinfer1::IHostMemory* yolov4_trt_model_stream,
-  nvinfer1::IExecutionContext** context_ptr);
-
-  void TRTStreamToContext(
-  const std::vector<char>& trt_model_stream,
-  nvinfer1::IExecutionContext** context_ptr);
-
-  void postProcessing(
-  const cv::Mat& img,
-  float* output, int row_cnt,
-  int num_classes,
-  const std::vector<std::string>& names);
-
-  void inference(nvinfer1::IExecutionContext* yolov4_context_,
-  int num_classes, const std::vector<std::string>& names,
-  const std::string& image_path, const std::string& prediction_image_path);
-
-  void readNames(
-  const std::string& names_file_path,
-  std::vector<std::string>* names);
+  void inference();
 
   bool Init(const std::map<std::string, std::vector<int>> &shapes) override;
   void Infer() override;
@@ -86,15 +99,16 @@ class OnnxObstacleDetector : public Inference {
 
  private:
   std::string model_file_;
+  float score_threshold_;
   std::vector<std::string> output_names_;
   std::vector<std::string> input_names_;
   BlobMap blobs_;
+  nvinfer1::ICudaEngine* engine_;
   nvinfer1::IExecutionContext* context_;
+  Logger g_logger_;
 
   int num_classes_;
-  std::string image_path_;
-  std::string names_file_path_;  // coco.names
-  std::string prediction_image_path_;
+  int kBatchSize;
 };
 
 }  // namespace inference

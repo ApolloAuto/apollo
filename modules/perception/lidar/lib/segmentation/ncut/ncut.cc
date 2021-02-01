@@ -14,10 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <omp.h>
+#include "modules/perception/lidar/lib/segmentation/ncut/ncut.h"
+
 #include <algorithm>
 #include <ctime>
 #include <functional>
+#include <limits>
 #include <queue>
 #include <stack>
 #include <string>
@@ -25,14 +27,11 @@
 #include <utility>
 #include <vector>
 
+#include <omp.h>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/point_cloud_util.h"
-#include "modules/perception/lidar/lib/segmentation/ncut/ncut.h"
-/*#include "lib/graph_felzenszwalb/filter.h"
-#include "lib/graph_felzenszwalb/image.h"
-#include "lib/graph_felzenszwalb/misc.h"
-#include "lib/graph_felzenszwalb/segment_image.h"*/
 
 namespace apollo {
 namespace perception {

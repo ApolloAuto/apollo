@@ -19,16 +19,19 @@
 #include <thread>
 #include <vector>
 
+#include "modules/drivers/lidar/proto/config.pb.h"
+#include "modules/drivers/lidar/proto/robosense.pb.h"
+#include "modules/drivers/lidar/proto/robosense_config.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/lidar/robosense/proto/config.pb.h"
-#include "modules/drivers/lidar/robosense/proto/robosense.pb.h"
 
 #include "cyber/cyber.h"
+#include "modules/drivers/lidar/common/driver_factory/driver_base.h"
 #include "modules/drivers/lidar/robosense/decoder/decoder_16.hpp"
 #include "modules/drivers/lidar/robosense/decoder/decoder_factory.hpp"
 #include "modules/drivers/lidar/robosense/driver/utility.h"
 #include "modules/drivers/lidar/robosense/input/input.h"
 #define PKT_DATA_LENGTH 1248
+
 namespace apollo {
 namespace drivers {
 namespace robosense {
@@ -38,12 +41,15 @@ struct alignas(16) LidarPacketMsg {
   std::array<uint8_t, PKT_DATA_LENGTH> packet{};  ///< lidar single packet
 };
 
-class RobosenseDriver {
+class RobosenseDriver : public lidar::LidarDriver {
  public:
+  RobosenseDriver(const std::shared_ptr<cyber::Node> &node,
+                  const ::apollo::drivers::lidar::config &config)
+      : node_(node), conf_(config.robosense()) {}
   RobosenseDriver(const std::shared_ptr<cyber::Node> &node, const Config &conf)
       : node_(node), conf_(conf) {}
   ~RobosenseDriver() { stop(); }
-  bool init();
+  bool Init() override;
 
  private:
   void getPackets();

@@ -21,6 +21,7 @@
 #include "Eigen/Dense"
 #include "gtest/gtest_prod.h"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
@@ -68,7 +69,7 @@ class ROIBoundaryFilter : public BaseObjectFilter {
  private:
   FRIEND_TEST(ROIBoundaryFilterTest, roi_boundary_filter_test);
 
-  std::vector<perception::base::AttributePointCloud<perception::base::PointD>>
+  apollo::common::EigenVector<apollo::perception::base::PointDCloud>
       polygons_in_world_;
   std::vector<bool> objects_cross_roi_;
   std::vector<bool> objects_valid_flag_;

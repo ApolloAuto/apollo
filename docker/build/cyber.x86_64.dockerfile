@@ -3,6 +3,8 @@ FROM ${BASE_IMAGE}
 
 ARG APOLLO_DIST
 ARG GEOLOC
+ARG CLEAN_DEPS
+ARG INSTALL_MODE
 
 LABEL version="1.2"
 
@@ -18,7 +20,7 @@ COPY rcfiles /opt/apollo/rcfiles
 
 RUN bash /tmp/installers/install_minimal_environment.sh ${GEOLOC}
 RUN bash /tmp/installers/install_cmake.sh
-RUN bash /tmp/installers/install_cyber_deps.sh
+RUN bash /tmp/installers/install_cyber_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_llvm_clang.sh
 RUN bash /tmp/installers/install_qa_tools.sh
 RUN bash /tmp/installers/install_visualizer_deps.sh

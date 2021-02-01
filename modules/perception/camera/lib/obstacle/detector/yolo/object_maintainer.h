@@ -18,6 +18,7 @@
 #include <map>
 
 #include "modules/perception/base/object.h"
+#include "modules/perception/base/object_pool_types.h"
 
 namespace apollo {
 namespace perception {
@@ -27,23 +28,7 @@ class ObjectMaintainer {
  public:
   ObjectMaintainer() {}
   ~ObjectMaintainer() {}
-  // @brief: return true if new object added
-  bool Add(int idx, base::ObjectPtr obj) {
-    auto obj_it = assigned_index_.find(idx);
-    if (obj_it == assigned_index_.end()) {
-      assigned_index_[idx] = obj;
-      return true;
-    }
-
-    auto prev_obj = obj_it->second;
-    const auto &&curr_type = static_cast<int>(obj->sub_type);
-    const auto &&prev_type = static_cast<int>(prev_obj->sub_type);
-    if (obj->sub_type_probs[curr_type] > prev_obj->sub_type_probs[prev_type]) {
-      *prev_obj = *obj;
-    }
-    return false;
-  }
-
+  bool Add(int idx, base::ObjectPtr obj);
  protected:
   std::map<int, base::ObjectPtr> assigned_index_;
 };

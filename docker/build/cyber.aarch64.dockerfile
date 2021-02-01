@@ -3,6 +3,7 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 ARG GEOLOC
+ARG CLEAN_DEPS
 ARG INSTALL_MODE
 
 LABEL version="1.2"
@@ -18,7 +19,7 @@ RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_cmake.sh ${INSTALL_MODE}
 
 RUN bash /tmp/installers/install_llvm_clang.sh
-RUN bash /tmp/installers/install_cyber_deps.sh
+RUN bash /tmp/installers/install_cyber_deps.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_qa_tools.sh
 RUN bash /tmp/installers/install_visualizer_deps.sh ${INSTALL_MODE}
 

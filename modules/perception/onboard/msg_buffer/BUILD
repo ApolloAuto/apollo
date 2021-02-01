@@ -13,6 +13,7 @@ cc_library(
     hdrs = ["msg_buffer.h"],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 

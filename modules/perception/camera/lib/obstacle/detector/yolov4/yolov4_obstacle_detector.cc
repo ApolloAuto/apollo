@@ -31,7 +31,7 @@ namespace camera {
 using cyber::common::GetAbsolutePath;
 
 void Yolov4ObstacleDetector::LoadInputShape(
-  const yolo::ModelParam &model_param) {
+    const yolo::ModelParam &model_param) {
   float offset_ratio = model_param.offset_ratio();
   float cropped_ratio = model_param.cropped_ratio();
   int resized_width = model_param.resized_width();
@@ -80,7 +80,7 @@ void Yolov4ObstacleDetector::LoadParam(const yolo::YoloParam &yolo_param) {
 }
 
 bool Yolov4ObstacleDetector::InitNet(const yolo::YoloParam &yolo_param,
-                                   const std::string &model_root) {
+                                     const std::string &model_root) {
   const auto &model_param = yolo_param.model_param();
 
   std::string proto_file =
@@ -313,7 +313,7 @@ bool Yolov4ObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
 }
 
 bool Yolov4ObstacleDetector::Detect(const ObstacleDetectorOptions &options,
-                                  CameraFrame *frame) {
+                                    CameraFrame *frame) {
   if (frame == nullptr) {
     return false;
   }

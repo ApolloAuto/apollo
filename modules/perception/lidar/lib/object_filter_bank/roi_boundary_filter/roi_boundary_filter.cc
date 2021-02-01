@@ -24,6 +24,8 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/proto/roi_boundary_filter_config.pb.h"
 
+using apollo::common::EigenVector;
+
 namespace {
 constexpr double kDoubleMax = std::numeric_limits<double>::max();
 }  // namespace
@@ -152,7 +154,7 @@ void ROIBoundaryFilter::FillObjectRoiFlag(const ObjectFilterOptions& options,
 void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
     const ObjectFilterOptions& options, LidarFrame* frame,
     std::vector<bool>* objects_valid_flag) {
-  const std::vector<base::RoadBoundary>& road_boundary =
+  const EigenVector<base::RoadBoundary>& road_boundary =
       frame->hdmap_struct->road_boundary;
   auto& objects = frame->segmented_objects;
   double dist_to_boundary = 0.0;
@@ -194,7 +196,7 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
 void ROIBoundaryFilter::FilterObjectsInsideBoundary(
     const ObjectFilterOptions& options, LidarFrame* frame,
     std::vector<bool>* objects_valid_flag) {
-  const std::vector<base::RoadBoundary>& road_boundary =
+  const EigenVector<base::RoadBoundary>& road_boundary =
       frame->hdmap_struct->road_boundary;
   auto& objects = frame->segmented_objects;
   double dist_to_boundary = 0.0;

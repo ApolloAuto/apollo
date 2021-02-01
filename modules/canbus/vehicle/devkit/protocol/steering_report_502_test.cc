@@ -47,8 +47,7 @@ TEST_F(Steeringreport502Test, General) {
   EXPECT_EQ(cd.devkit().steering_report_502().steer_flt2(), 1);
   EXPECT_EQ(cd.devkit().steering_report_502().steer_flt1(), 1);
   EXPECT_EQ(cd.devkit().steering_report_502().steer_en_state(), 0);
-  EXPECT_NEAR(cd.devkit().steering_report_502().steer_angle_actual(), 15,
-              1.0e-10);
+  EXPECT_EQ(cd.devkit().steering_report_502().steer_angle_actual(), 4650);
 }
 
 }  // namespace devkit

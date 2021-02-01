@@ -21,14 +21,18 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/proto/rt.pb.h"
+
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
-#include "modules/perception/proto/rt.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 class ArgMax1Plugin;
+class DFMBPSROIAlignPlugin;
+class RCNNProposalPlugin;
+class RPNProposalSSDPlugin;
 class ReLUPlugin;
 class SLICEPlugin;
 class SoftmaxPlugin;
@@ -166,6 +170,25 @@ class RTNet : public Inference {
                        nvinfer1::ITensor *const *inputs,
                        nvinfer1::INetworkDefinition *net, TensorMap *tensor_map,
                        TensorModifyMap *tensor_modify_map);
+
+  void addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
+                              nvinfer1::ITensor *const *inputs, int nbInputs,
+                              nvinfer1::INetworkDefinition *net,
+                              TensorMap *tensor_map,
+                              TensorModifyMap *tensor_modify_map);
+
+  void addRCNNProposalLayer(const LayerParameter &layer_param,
+                            nvinfer1::ITensor *const *inputs, int nbInputs,
+                            nvinfer1::INetworkDefinition *net,
+                            TensorMap *tensor_map,
+                            TensorModifyMap *tensor_modify_map);
+
+  void addRPNProposalSSDLayer(const LayerParameter &layer_param,
+                              nvinfer1::ITensor *const *inputs, int nbInputs,
+                              nvinfer1::INetworkDefinition *net,
+                              TensorMap *tensor_map,
+                              TensorModifyMap *tensor_modify_map);
+
   bool checkInt8(const std::string &gpu_name,
                  nvinfer1::IInt8Calibrator *calibrator);
   void mergeBN(int index, LayerParameter *layer_param);
@@ -179,6 +202,9 @@ class RTNet : public Inference {
   nvinfer1::IExecutionContext *context_ = nullptr;
   cudaStream_t stream_ = 0;
   std::vector<std::shared_ptr<ArgMax1Plugin>> argmax_plugins_;
+  std::vector<std::shared_ptr<DFMBPSROIAlignPlugin>> dfmb_psroi_align_plugins_;
+  std::vector<std::shared_ptr<RCNNProposalPlugin>> rcnn_proposal_plugins_;
+  std::vector<std::shared_ptr<RPNProposalSSDPlugin>> rpn_proposal_ssd_plugins_;
   std::vector<std::shared_ptr<SoftmaxPlugin>> softmax_plugins_;
   std::vector<std::shared_ptr<SLICEPlugin>> slice_plugins_;
   std::vector<std::shared_ptr<ReLUPlugin>> relu_plugins_;

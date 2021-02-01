@@ -6,6 +6,25 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "task_manager_config_cc_proto",
+    deps = [
+        ":task_manager_config_proto",
+    ],
+)
+
+proto_library(
+    name = "task_manager_config_proto",
+    srcs = ["task_manager_config.proto"],
+)
+
+py_proto_library(
+    name = "task_manager_config_py_pb2",
+    deps = [
+        ":task_manager_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "task_manager_cc_proto",
     deps = [
         ":task_manager_proto",
@@ -27,24 +46,5 @@ py_proto_library(
         ":task_manager_proto",
         "//modules/common/proto:header_py_pb2",
         "//modules/routing/proto:routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "task_manager_config_cc_proto",
-    deps = [
-        ":task_manager_config_proto",
-    ],
-)
-
-proto_library(
-    name = "task_manager_config_proto",
-    srcs = ["task_manager_config.proto"],
-)
-
-py_proto_library(
-    name = "task_manager_config_py_pb2",
-    deps = [
-        ":task_manager_config_proto",
     ],
 )

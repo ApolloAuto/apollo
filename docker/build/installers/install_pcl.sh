@@ -68,7 +68,8 @@ apt_get_update_and_install \
     libtiff-dev \
     liblz4-dev \
     libfreetype6-dev \
-    libpcap-dev
+    libpcap-dev \
+    libqhull-dev
 
 # NOTE(storypku)
 # libglfw3-dev depends on libglfw3,
@@ -119,32 +120,36 @@ ok "Successfully installed PCL ${VERSION}"
 # Clean up
 rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
 
-# Remove build-deps for PCL
-# Note(storypku):
-# Please keep libflann-dev as it was required by local_config_pcl
-apt_get_remove \
-    libeigen3-dev \
-    libglew-dev \
-    libglfw3-dev \
-    freeglut3-dev \
-    libusb-1.0-0-dev \
-    libdouble-conversion-dev \
-    libopenni-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
-    liblz4-dev \
-    libfreetype6-dev \
-    libpcap-dev
+if [[ -n "${CLEAN_DEPS}" ]]; then
+    # Remove build-deps for PCL
+    # Note(storypku):
+    # Please keep libflann-dev as it was required by local_config_pcl
+    apt_get_remove \
+        libeigen3-dev \
+        libglew-dev \
+        libglfw3-dev \
+        freeglut3-dev \
+        libusb-1.0-0-dev \
+        libdouble-conversion-dev \
+        libopenni-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        liblz4-dev \
+        libfreetype6-dev \
+        libpcap-dev \
+        libqhull-dev
 
-# Add runtime-deps for pcl
-apt_get_update_and_install \
-    libusb-1.0-0 \
-    libopenni0 \
-    libfreetype6 \
-    libtiff5 \
-    libdouble-conversion1 \
-    libpcap0.8
+    # Add runtime-deps for pcl
+    apt_get_update_and_install \
+        libusb-1.0-0 \
+        libopenni0 \
+        libfreetype6 \
+        libtiff5 \
+        libdouble-conversion1 \
+        libpcap0.8 \
+        libqhull7
+fi
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

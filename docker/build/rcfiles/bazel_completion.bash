@@ -858,7 +858,7 @@ BAZEL_COMMAND_ANALYZE_PROFILE_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -868,6 +868,8 @@ BAZEL_COMMAND_ANALYZE_PROFILE_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
 --noincompatible_always_check_depset_elements
@@ -887,8 +889,6 @@ BAZEL_COMMAND_ANALYZE_PROFILE_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -901,8 +901,6 @@ BAZEL_COMMAND_ANALYZE_PROFILE_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_require_linker_input_cc_api
@@ -932,8 +930,6 @@ BAZEL_COMMAND_ANALYZE_PROFILE_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --repository_cache=path
 --show_progress
 --noshow_progress
@@ -1040,6 +1036,7 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -1153,10 +1150,10 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -1173,8 +1170,6 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -1261,7 +1256,7 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -1273,6 +1268,9 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -1288,6 +1286,7 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -1296,8 +1295,11 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -1359,8 +1361,6 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -1379,8 +1379,6 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -1485,6 +1483,7 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -1498,7 +1497,6 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -1524,12 +1522,17 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto:default_values
 --noproto:default_values
+--proto:definition_stack
+--noproto:definition_stack
 --proto:flatten_selects
 --noproto:flatten_selects
 --proto:include_synthetic_attribute_hash
 --noproto:include_synthetic_attribute_hash
+--proto:instantiation_stack
+--noproto:instantiation_stack
 --proto:locations
 --noproto:locations
 --proto:output_rule_attrs=
@@ -1546,8 +1549,6 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --relative_locations
 --norelative_locations
 --remote_accept_cached
@@ -1560,6 +1561,7 @@ BAZEL_COMMAND_AQUERY_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -1787,6 +1789,7 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -1900,10 +1903,10 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -1920,8 +1923,6 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -2008,7 +2009,7 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -2020,6 +2021,9 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -2035,6 +2039,7 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -2043,8 +2048,11 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -2096,8 +2104,6 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -2116,8 +2122,6 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -2218,6 +2222,7 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -2229,7 +2234,6 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -2254,6 +2258,7 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -2265,8 +2270,6 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -2277,6 +2280,7 @@ BAZEL_COMMAND_BUILD_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -2512,7 +2516,7 @@ BAZEL_COMMAND_CANONICALIZE_FLAGS_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -2527,6 +2531,8 @@ BAZEL_COMMAND_CANONICALIZE_FLAGS_FLAGS="
 --graph:factored
 --nograph:factored
 --graph:node_limit=
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --implicit_deps
 --noimplicit_deps
@@ -2550,8 +2556,6 @@ BAZEL_COMMAND_CANONICALIZE_FLAGS_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -2564,8 +2568,6 @@ BAZEL_COMMAND_CANONICALIZE_FLAGS_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_prefer_unordered_output
@@ -2619,18 +2621,20 @@ BAZEL_COMMAND_CANONICALIZE_FLAGS_FLAGS="
 --project_id=
 --proto:default_values
 --noproto:default_values
+--proto:definition_stack
+--noproto:definition_stack
 --proto:flatten_selects
 --noproto:flatten_selects
 --proto:include_synthetic_attribute_hash
 --noproto:include_synthetic_attribute_hash
+--proto:instantiation_stack
+--noproto:instantiation_stack
 --proto:locations
 --noproto:locations
 --proto:output_rule_attrs=
 --proto:rule_inputs_and_outputs
 --noproto:rule_inputs_and_outputs
 --query_file=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --relative_locations
 --norelative_locations
 --remote_accept_cached
@@ -2643,6 +2647,7 @@ BAZEL_COMMAND_CANONICALIZE_FLAGS_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -2781,6 +2786,7 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -2894,10 +2900,10 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -2914,8 +2920,6 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -3002,7 +3006,7 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -3014,6 +3018,9 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -3032,6 +3039,7 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -3040,8 +3048,11 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -3093,8 +3104,6 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -3113,8 +3122,6 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -3215,6 +3222,7 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -3226,7 +3234,6 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -3251,6 +3258,7 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -3262,8 +3270,6 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -3274,6 +3280,7 @@ BAZEL_COMMAND_CLEAN_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -3496,6 +3503,7 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -3611,10 +3619,10 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -3631,8 +3639,6 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -3719,7 +3725,7 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -3731,6 +3737,9 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -3746,6 +3755,7 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -3754,8 +3764,11 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -3807,8 +3820,6 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -3827,8 +3838,6 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -3929,6 +3938,7 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -3940,7 +3950,6 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -3966,6 +3975,7 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -3977,8 +3987,6 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -3989,6 +3997,7 @@ BAZEL_COMMAND_CONFIG_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -4211,6 +4220,7 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -4324,10 +4334,10 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -4344,8 +4354,6 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -4432,7 +4440,7 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -4444,6 +4452,9 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -4459,6 +4470,7 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -4467,8 +4479,11 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -4520,8 +4535,6 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -4540,8 +4553,6 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -4642,6 +4653,7 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -4653,7 +4665,6 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -4680,6 +4691,7 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -4691,8 +4703,6 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -4703,6 +4713,7 @@ BAZEL_COMMAND_COVERAGE_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -4930,6 +4941,7 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -5043,10 +5055,10 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -5063,8 +5075,6 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -5151,7 +5161,7 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -5163,6 +5173,9 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -5178,6 +5191,7 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -5186,8 +5200,11 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -5243,8 +5260,6 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -5263,8 +5278,6 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -5367,6 +5380,7 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -5380,7 +5394,6 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -5406,14 +5419,19 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto:default_values
 --noproto:default_values
+--proto:definition_stack
+--noproto:definition_stack
 --proto:flatten_selects
 --noproto:flatten_selects
 --proto:include_configurations
 --noproto:include_configurations
 --proto:include_synthetic_attribute_hash
 --noproto:include_synthetic_attribute_hash
+--proto:instantiation_stack
+--noproto:instantiation_stack
 --proto:locations
 --noproto:locations
 --proto:output_rule_attrs=
@@ -5430,8 +5448,6 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --relative_locations
 --norelative_locations
 --remote_accept_cached
@@ -5444,6 +5460,7 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -5503,6 +5520,7 @@ BAZEL_COMMAND_CQUERY_FLAGS="
 --spawn_strategy=
 --stamp
 --nostamp
+--starlark:expr=
 --starlark_cpu_profile=
 --strategy=
 --strategy_regexp=
@@ -5678,7 +5696,7 @@ BAZEL_COMMAND_DUMP_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -5688,6 +5706,8 @@ BAZEL_COMMAND_DUMP_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
 --noincompatible_always_check_depset_elements
@@ -5707,8 +5727,6 @@ BAZEL_COMMAND_DUMP_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -5721,8 +5739,6 @@ BAZEL_COMMAND_DUMP_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_require_linker_input_cc_api
@@ -5754,8 +5770,6 @@ BAZEL_COMMAND_DUMP_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --repository_cache=path
 --rule_classes
 --norule_classes
@@ -5874,7 +5888,7 @@ BAZEL_COMMAND_FETCH_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -5884,6 +5898,8 @@ BAZEL_COMMAND_FETCH_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
 --noincompatible_always_check_depset_elements
@@ -5903,8 +5919,6 @@ BAZEL_COMMAND_FETCH_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -5917,8 +5931,6 @@ BAZEL_COMMAND_FETCH_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_remote_results_ignore_disk
@@ -5956,8 +5968,6 @@ BAZEL_COMMAND_FETCH_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -5968,6 +5978,7 @@ BAZEL_COMMAND_FETCH_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -6094,7 +6105,7 @@ BAZEL_COMMAND_HELP_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -6104,6 +6115,8 @@ BAZEL_COMMAND_HELP_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --help_verbosity={long,medium,short}
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
@@ -6124,8 +6137,6 @@ BAZEL_COMMAND_HELP_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -6138,8 +6149,6 @@ BAZEL_COMMAND_HELP_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_require_linker_input_cc_api
@@ -6170,8 +6179,6 @@ BAZEL_COMMAND_HELP_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --repository_cache=path
 --short
 --show_progress
@@ -6278,6 +6285,7 @@ BAZEL_COMMAND_INFO_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -6391,10 +6399,10 @@ BAZEL_COMMAND_INFO_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -6411,8 +6419,6 @@ BAZEL_COMMAND_INFO_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -6499,7 +6505,7 @@ BAZEL_COMMAND_INFO_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -6511,6 +6517,9 @@ BAZEL_COMMAND_INFO_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -6526,6 +6535,7 @@ BAZEL_COMMAND_INFO_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -6534,8 +6544,11 @@ BAZEL_COMMAND_INFO_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -6587,8 +6600,6 @@ BAZEL_COMMAND_INFO_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -6607,8 +6618,6 @@ BAZEL_COMMAND_INFO_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -6709,6 +6718,7 @@ BAZEL_COMMAND_INFO_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -6720,7 +6730,6 @@ BAZEL_COMMAND_INFO_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -6745,6 +6754,7 @@ BAZEL_COMMAND_INFO_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -6756,8 +6766,6 @@ BAZEL_COMMAND_INFO_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -6768,6 +6776,7 @@ BAZEL_COMMAND_INFO_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -6991,7 +7000,7 @@ BAZEL_COMMAND_LICENSE_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -7001,6 +7010,8 @@ BAZEL_COMMAND_LICENSE_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
 --noincompatible_always_check_depset_elements
@@ -7020,8 +7031,6 @@ BAZEL_COMMAND_LICENSE_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -7034,8 +7043,6 @@ BAZEL_COMMAND_LICENSE_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_require_linker_input_cc_api
@@ -7065,8 +7072,6 @@ BAZEL_COMMAND_LICENSE_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --repository_cache=path
 --show_progress
 --noshow_progress
@@ -7174,6 +7179,7 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -7289,10 +7295,10 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -7309,8 +7315,6 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -7397,7 +7401,7 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -7409,6 +7413,9 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -7424,6 +7431,7 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -7432,8 +7440,11 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -7485,8 +7496,6 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -7505,8 +7514,6 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -7610,6 +7617,7 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -7622,7 +7630,6 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -7647,6 +7654,7 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -7658,8 +7666,6 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -7670,6 +7676,7 @@ BAZEL_COMMAND_MOBILE_INSTALL_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -7896,6 +7903,7 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -8009,10 +8017,10 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -8029,8 +8037,6 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -8117,7 +8123,7 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -8129,6 +8135,9 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -8144,6 +8153,7 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -8152,8 +8162,11 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -8205,8 +8218,6 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -8225,8 +8236,6 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -8327,6 +8336,7 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -8338,7 +8348,6 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -8364,6 +8373,7 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -8375,8 +8385,6 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -8387,6 +8395,7 @@ BAZEL_COMMAND_PRINT_ACTION_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -8621,7 +8630,7 @@ BAZEL_COMMAND_QUERY_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -8635,6 +8644,8 @@ BAZEL_COMMAND_QUERY_FLAGS="
 --graph:factored
 --nograph:factored
 --graph:node_limit=
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --implicit_deps
 --noimplicit_deps
@@ -8658,8 +8669,6 @@ BAZEL_COMMAND_QUERY_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -8672,8 +8681,6 @@ BAZEL_COMMAND_QUERY_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_prefer_unordered_output
@@ -8726,18 +8733,20 @@ BAZEL_COMMAND_QUERY_FLAGS="
 --project_id=
 --proto:default_values
 --noproto:default_values
+--proto:definition_stack
+--noproto:definition_stack
 --proto:flatten_selects
 --noproto:flatten_selects
 --proto:include_synthetic_attribute_hash
 --noproto:include_synthetic_attribute_hash
+--proto:instantiation_stack
+--noproto:instantiation_stack
 --proto:locations
 --noproto:locations
 --proto:output_rule_attrs=
 --proto:rule_inputs_and_outputs
 --noproto:rule_inputs_and_outputs
 --query_file=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --relative_locations
 --norelative_locations
 --remote_accept_cached
@@ -8750,6 +8759,7 @@ BAZEL_COMMAND_QUERY_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -8885,6 +8895,7 @@ BAZEL_COMMAND_RUN_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -8998,10 +9009,10 @@ BAZEL_COMMAND_RUN_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -9018,8 +9029,6 @@ BAZEL_COMMAND_RUN_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -9106,7 +9115,7 @@ BAZEL_COMMAND_RUN_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -9118,6 +9127,9 @@ BAZEL_COMMAND_RUN_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -9133,6 +9145,7 @@ BAZEL_COMMAND_RUN_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -9141,8 +9154,11 @@ BAZEL_COMMAND_RUN_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -9194,8 +9210,6 @@ BAZEL_COMMAND_RUN_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -9214,8 +9228,6 @@ BAZEL_COMMAND_RUN_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -9316,6 +9328,7 @@ BAZEL_COMMAND_RUN_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -9327,7 +9340,6 @@ BAZEL_COMMAND_RUN_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -9352,6 +9364,7 @@ BAZEL_COMMAND_RUN_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -9363,8 +9376,6 @@ BAZEL_COMMAND_RUN_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -9375,6 +9386,7 @@ BAZEL_COMMAND_RUN_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -9597,7 +9609,7 @@ BAZEL_COMMAND_SHUTDOWN_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -9607,6 +9619,8 @@ BAZEL_COMMAND_SHUTDOWN_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --iff_heap_size_greater_than=
 --incompatible_always_check_depset_elements
@@ -9627,8 +9641,6 @@ BAZEL_COMMAND_SHUTDOWN_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -9641,8 +9653,6 @@ BAZEL_COMMAND_SHUTDOWN_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_require_linker_input_cc_api
@@ -9672,8 +9682,6 @@ BAZEL_COMMAND_SHUTDOWN_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --repository_cache=path
 --show_progress
 --noshow_progress
@@ -9787,7 +9795,7 @@ BAZEL_COMMAND_SYNC_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -9797,6 +9805,8 @@ BAZEL_COMMAND_SYNC_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
 --noincompatible_always_check_depset_elements
@@ -9816,8 +9826,6 @@ BAZEL_COMMAND_SYNC_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -9830,8 +9838,6 @@ BAZEL_COMMAND_SYNC_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_remote_results_ignore_disk
@@ -9870,8 +9876,6 @@ BAZEL_COMMAND_SYNC_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -9882,6 +9886,7 @@ BAZEL_COMMAND_SYNC_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -10008,6 +10013,7 @@ BAZEL_COMMAND_TEST_FLAGS="
 --nobuild_tests_only
 --cache_test_results={auto,yes,no}
 --nocache_test_results
+--catalyst_cpus=
 --cc_output_directory_tag=
 --cc_proto_library_header_suffixes=
 --cc_proto_library_source_suffixes=
@@ -10121,10 +10127,10 @@ BAZEL_COMMAND_TEST_FLAGS="
 --noexperimental_enable_android_migration_apis
 --experimental_enable_docker_sandbox
 --noexperimental_enable_docker_sandbox
+--experimental_enable_flag_alias
+--noexperimental_enable_flag_alias
 --experimental_enable_objc_cc_deps
 --noexperimental_enable_objc_cc_deps
---experimental_enable_shorthand_aliases
---noexperimental_enable_shorthand_aliases
 --experimental_execution_log_file=path
 --experimental_extra_action_filter=
 --experimental_extra_action_top_level_only
@@ -10141,8 +10147,6 @@ BAZEL_COMMAND_TEST_FLAGS="
 --noexperimental_google_legacy_api
 --experimental_guard_against_concurrent_changes
 --noexperimental_guard_against_concurrent_changes
---experimental_ignore_deprecated_instrumentation_spec
---noexperimental_ignore_deprecated_instrumentation_spec
 --experimental_import_deps_checking={off,warning,error}
 --experimental_inmemory_dotd_files
 --noexperimental_inmemory_dotd_files
@@ -10229,7 +10233,7 @@ BAZEL_COMMAND_TEST_FLAGS="
 --experimental_strict_fileset_output
 --noexperimental_strict_fileset_output
 --experimental_strict_java_deps={off,warn,error,strict,default}
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_use_llvm_covmap
 --noexperimental_use_llvm_covmap
@@ -10241,6 +10245,9 @@ BAZEL_COMMAND_TEST_FLAGS="
 --experimental_windows_sandbox_path=
 --experimental_windows_watchfs
 --noexperimental_windows_watchfs
+--experimental_worker_max_multiplex_instances=
+--experimental_worker_multiplex
+--noexperimental_worker_multiplex
 --experimental_workspace_rules_log_file=path
 --explain=path
 --explicit_java_test_deps
@@ -10256,6 +10263,7 @@ BAZEL_COMMAND_TEST_FLAGS="
 --fdo_profile=label
 --features=
 --fission=
+--flag_alias=
 --flaky_test_attempts=
 --force_pic
 --noforce_pic
@@ -10264,8 +10272,11 @@ BAZEL_COMMAND_TEST_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --grte_top=label
 --high_priority_workers=
+--host_action_env=
 --host_compilation_mode={fastbuild,dbg,opt}
 --host_compiler=
 --host_conlyopt=
@@ -10317,8 +10328,6 @@ BAZEL_COMMAND_TEST_FLAGS="
 --noincompatible_dont_enable_host_nonhost_crosstool_features
 --incompatible_enable_android_toolchain_resolution
 --noincompatible_enable_android_toolchain_resolution
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_force_strict_header_check_from_starlark
 --noincompatible_force_strict_header_check_from_starlark
 --incompatible_java_common_parameters
@@ -10337,8 +10346,6 @@ BAZEL_COMMAND_TEST_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_compile_info_migration
 --noincompatible_objc_compile_info_migration
 --incompatible_objc_provider_remove_compile_info
@@ -10439,6 +10446,7 @@ BAZEL_COMMAND_TEST_FLAGS="
 --nomaterialize_param_files
 --max_computation_steps=
 --max_config_changes_to_show=
+--max_test_output_bytes=
 --memory_profile_stable_heap_parameters=
 --message_translations=
 --minimum_os_version=
@@ -10450,7 +10458,6 @@ BAZEL_COMMAND_TEST_FLAGS="
 --noobjc_enable_binary_stripping
 --objc_generate_linkmap
 --noobjc_generate_linkmap
---objc_header_scanner_tool=label
 --objc_use_dotd_pruning
 --noobjc_use_dotd_pruning
 --objccopt=
@@ -10477,6 +10484,7 @@ BAZEL_COMMAND_TEST_FLAGS="
 --progress_report_interval=
 --proguard_top=label
 --project_id=
+--propeller_optimize=label
 --proto_compiler=label
 --proto_toolchain_for_cc=label
 --proto_toolchain_for_j2objc=label
@@ -10488,8 +10496,6 @@ BAZEL_COMMAND_TEST_FLAGS="
 --python_path=
 --python_top=label
 --python_version={py2,py3,py2and3,py2only,py3only,_internal_sentinel}
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --remote_accept_cached
 --noremote_accept_cached
 --remote_allow_symlink_upload
@@ -10500,6 +10506,7 @@ BAZEL_COMMAND_TEST_FLAGS="
 --remote_default_platform_properties=
 --remote_download_minimal
 --remote_download_outputs={all,minimal,toplevel}
+--remote_download_symlink_template=
 --remote_download_toplevel
 --remote_downloader_header=
 --remote_exec_header=
@@ -10725,7 +10732,7 @@ BAZEL_COMMAND_VERSION_FLAGS="
 --noexperimental_starlark_config_transitions
 --experimental_stream_log_file_uploads
 --noexperimental_stream_log_file_uploads
---experimental_ui_limit_console_output=
+--experimental_ui_max_stdouterr_bytes=
 --experimental_ui_mode={oldest_actions,mnemonic_histogram}
 --experimental_verify_repository_rules=
 --experimental_windows_watchfs
@@ -10737,6 +10744,8 @@ BAZEL_COMMAND_VERSION_FLAGS="
 --google_credentials=
 --google_default_credentials
 --nogoogle_default_credentials
+--grpc_keepalive_time=
+--grpc_keepalive_timeout=
 --http_timeout_scaling=
 --incompatible_always_check_depset_elements
 --noincompatible_always_check_depset_elements
@@ -10756,8 +10765,6 @@ BAZEL_COMMAND_VERSION_FLAGS="
 --noincompatible_disallow_struct_provider_syntax
 --incompatible_do_not_split_linking_cmdline
 --noincompatible_do_not_split_linking_cmdline
---incompatible_enable_profile_by_default
---noincompatible_enable_profile_by_default
 --incompatible_java_common_parameters
 --noincompatible_java_common_parameters
 --incompatible_linkopts_to_linklibs
@@ -10770,8 +10777,6 @@ BAZEL_COMMAND_VERSION_FLAGS="
 --noincompatible_no_implicit_file_export
 --incompatible_no_rule_outputs_param
 --noincompatible_no_rule_outputs_param
---incompatible_no_support_tools_in_action_inputs
---noincompatible_no_support_tools_in_action_inputs
 --incompatible_objc_provider_remove_compile_info
 --noincompatible_objc_provider_remove_compile_info
 --incompatible_require_linker_input_cc_api
@@ -10801,8 +10806,6 @@ BAZEL_COMMAND_VERSION_FLAGS="
 --progress_in_terminal_title
 --noprogress_in_terminal_title
 --project_id=
---record_rule_instantiation_callstack
---norecord_rule_instantiation_callstack
 --repository_cache=path
 --show_progress
 --noshow_progress

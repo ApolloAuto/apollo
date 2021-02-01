@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/common/proto/geometry.proto";
+
+message DefaultRouting {
+  optional string name = 1;
+  repeated apollo.common.PointENU point = 2;
+}
+
+message DefaultRoutings {
+  repeated DefaultRouting defaultrouting = 1;
+}

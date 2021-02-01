@@ -19,13 +19,18 @@
 #include <string>
 #include <vector>
 
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/proto/motion_service.pb.h"
+
+using apollo::common::EigenMap;
 
 namespace apollo {
 namespace perception {
@@ -41,8 +46,8 @@ class Visualizer {
   bool Init_all_info_single_camera(
       const std::vector<std::string> &camera_names,
       const std::string &visual_camera,
-      const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
-      const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
+      const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
+      const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
       const Eigen::Matrix4d &ex_lidar2imu, const double pitch_adj,
       const double yaw_adj, const double roll_adj, const int image_height,
       const int image_width);
@@ -148,10 +153,10 @@ class Visualizer {
   std::vector<std::string> camera_names_;
   std::string visual_camera_ = "front_6mm";
   // map for store params
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix4d> extrinsic_map_;
   Eigen::Matrix4d ex_lidar2imu_;
-  std::map<std::string, Eigen::Matrix4d> ex_camera2lidar_;
+  EigenMap<std::string, Eigen::Matrix4d> ex_camera2lidar_;
   Eigen::Matrix4d ex_camera2imu_;
   Eigen::Matrix4d ex_imu2camera_;
   Eigen::Matrix4d ex_car2camera_;
@@ -160,7 +165,7 @@ class Visualizer {
   Eigen::Matrix4d adjusted_camera2car_ = Eigen::Matrix4d::Identity();
 
   Eigen::Matrix4d projection_matrix_;
-  std::map<std::string, Eigen::Matrix3d> K_;
+  EigenMap<std::string, Eigen::Matrix3d> K_;
 
   // Visualization related variables
   bool use_class_color_ = true;

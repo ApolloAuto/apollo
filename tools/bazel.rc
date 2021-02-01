@@ -43,7 +43,7 @@ build --cxxopt="-Werror=reorder"
 build --define=PREFIX=/usr
 build --define=LIBDIR=$(PREFIX)/lib
 build --define=INCLUDEDIR=$(PREFIX)/include
-
+build --define=use_fast_cpp_protos=true
 
 # dbg config, as a shorthand for '--config=optimize -c dbg'
 build:dbg -c dbg
@@ -53,7 +53,6 @@ build --config=optimize
 # Instruction set optimizations
 build:optimize --copt=-march=native
 build:optimize --host_copt=-march=native
-build:optimize --define with_default_optimizations=true
 
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures

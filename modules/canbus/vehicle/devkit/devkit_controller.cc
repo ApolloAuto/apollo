@@ -16,11 +16,13 @@
 
 #include "modules/canbus/vehicle/devkit/devkit_controller.h"
 
+#include "modules/common/proto/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -184,11 +186,8 @@ Chassis DevkitController::chassis() {
       chassis_detail.devkit().vcu_report_505().has_speed()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.devkit().vcu_report_505().speed()));
-    chassis_.set_battery_soc_percentage(
-        chassis_detail.devkit().vcu_report_505().battery_soc());
   } else {
     chassis_.set_speed_mps(0);
-    chassis_.set_battery_soc_percentage(0);
   }
   // 7 no odometer
   // chassis_.set_odometer_m(0);
@@ -262,6 +261,14 @@ Chassis DevkitController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
+  // 14 battery soc
+  if (chassis_detail.devkit().has_bms_report_512() &&
+      chassis_detail.devkit().bms_report_512().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.devkit().bms_report_512().battery_soc());
+  } else {
+    chassis_.set_battery_soc_percentage(0);
+  }
 
   return chassis_;
 }
@@ -285,6 +292,12 @@ ErrorCode DevkitController::EnableAutoMode() {
       Steering_command_102::STEER_EN_CTRL_ENABLE);
   gear_command_103_->set_gear_en_ctrl(Gear_command_103::GEAR_EN_CTRL_ENABLE);
   park_command_104_->set_park_en_ctrl(Park_command_104::PARK_EN_CTRL_ENABLE);
+
+  // set AEB enable
+  if (FLAGS_enable_aeb) {
+    brake_command_101_->set_aeb_en_ctrl(
+        Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
+  }
 
   can_sender_->Update();
   const int32_t flag =

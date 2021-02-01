@@ -31,10 +31,10 @@ HOST_ARCH="$(uname -m)"
 HOST_OS="$(uname -s)"
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20201110_0617"
-TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20201110_0646"
+VERSION_X86_64="dev-x86_64-18.04-20210126_2027"
+TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
-VERSION_AARCH64="dev-aarch64-18.04-20201006_0154"
+VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
 USER_VERSION_OPT=
 
 DOCKER_RUN="docker run"
@@ -454,11 +454,12 @@ function mount_other_volumes() {
     docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
     volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
-    if [ "${TARGET_ARCH}" = "x86_64" ]; then
-        local local_3rdparty_volume="apollo_local_third_party_volume_${USER}"
-        local local_3rdparty_image="${DOCKER_REPO}:local_third_party_volume-${TARGET_ARCH}-latest"
-        docker_restart_volume "${local_3rdparty_volume}" "${local_3rdparty_image}"
-        volume_conf="${volume_conf} --volumes-from ${local_3rdparty_volume}"
+    # SMOKE
+    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        local smoke_volume="apollo_smoke_volume_${USER}"
+        local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-latest"
+        docker_restart_volume "${smoke_volume}" "${smoke_image}"
+        volume_conf="${volume_conf} --volumes-from ${smoke_volume}"
     fi
 
     OTHER_VOLUMES_CONF="${volume_conf}"

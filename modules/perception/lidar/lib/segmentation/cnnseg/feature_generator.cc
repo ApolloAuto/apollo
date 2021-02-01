@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/feature_generator.h"
 
+#include <limits>
+
 #include "modules/perception/base/common.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
 

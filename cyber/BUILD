@@ -1,4 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,24 +8,22 @@ cc_library(
     name = "cyber",
     linkstatic = False,
     deps = [
-        "//cyber:cyber_core",
+        ":cyber_core",
     ],
 )
 
-cc_binary(
-    name = "mainboard",
-    srcs = [
-        "mainboard/mainboard.cc",
-        "mainboard/module_argument.cc",
-        "mainboard/module_argument.h",
-        "mainboard/module_controller.cc",
-        "mainboard/module_controller.h",
+install(
+    name = "install",
+    data = [
+        ":.release.bash",
+        ":cyber_conf",
     ],
-    linkopts = ["-pthread"],
-    linkstatic = False,
+    rename = {
+        "cyber/.release.bash": "setup.bash",
+    },
     deps = [
-        ":cyber_core",
-        "//cyber/proto:dag_conf_cc_proto",
+        "//cyber/mainboard:install",
+        "//cyber/tools:install",
     ],
 )
 

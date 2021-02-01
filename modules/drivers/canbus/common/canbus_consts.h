@@ -35,7 +35,6 @@ const int32_t MAX_CAN_SEND_FRAME_LEN = 1;
 const int32_t MAX_CAN_RECV_FRAME_LEN = 10;
 
 const int32_t CANBUS_MESSAGE_LENGTH = 8;  // according to ISO-11891-1
-const int32_t MAX_CAN_PORT = 3;
 
 }  // namespace canbus
 }  // namespace drivers

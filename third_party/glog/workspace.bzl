@@ -16,6 +16,9 @@ def repo():
         name = "com_github_google_glog",
         sha256 = "f28359aeba12f30d73d9e4711ef356dc842886968112162bc73002645139c39c",
         strip_prefix = "glog-0.4.0",
-        url = "https://github.com/google/glog/archive/v0.4.0.tar.gz",
+        urls = [
+            "https://apollo-system.cdn.bcebos.com/archive/6.0/v0.4.0.tar.gz",
+            "https://github.com/google/glog/archive/v0.4.0.tar.gz",
+        ],
         build_file = clean_dep("//third_party/glog:glog.BUILD"),
     )

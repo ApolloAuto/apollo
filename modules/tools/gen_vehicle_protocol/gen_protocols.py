@@ -441,7 +441,7 @@ def gen_protocols(protocol_conf_file, protocol_dir):
     if not os.path.exists(protocol_dir):
         os.makedirs(protocol_dir)
     with open(protocol_conf_file, 'r') as fp:
-        content = yaml.load(fp)
+        content = yaml.safe_load(fp)
         protocols = content["protocols"]
         car_type = content["car_type"]
         for p_name in protocols:
@@ -475,7 +475,7 @@ if __name__ == "__main__":
         print("Usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 
     protocol_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower(
