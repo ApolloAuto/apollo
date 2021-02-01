@@ -69,8 +69,10 @@ if [[ "${ARCH}" == "aarch64" ]]; then
     apt-get -y install kmod
 fi
 
-MY_STAGE="$(awk -F '=' '/^stage=/ {print $2}' /etc/apollo.conf 2>/dev/null)"
-info "Current STAGE: ${MY_STAGE}"
+MY_STAGE=
+if [[ -f /etc/apollo.conf ]]; then
+    MY_STAGE="$(awk -F '=' '/^stage=/ {print $2}' /etc/apollo.conf 2>/dev/null)"
+fi
 
 if [[ "${MY_STAGE}" != "runtime" ]]; then
     apt_get_update_and_install \
