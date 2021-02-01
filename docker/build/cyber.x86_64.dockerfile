@@ -15,8 +15,6 @@ ENV APOLLO_DIST ${APOLLO_DIST}
 COPY installers /opt/apollo/installers
 COPY rcfiles /opt/apollo/rcfiles
 
-# COPY archive /tmp/archive
-
 RUN bash /opt/apollo/installers/install_minimal_environment.sh ${GEOLOC}
 RUN bash /opt/apollo/installers/install_cmake.sh
 RUN bash /opt/apollo/installers/install_cyber_deps.sh ${INSTALL_MODE}

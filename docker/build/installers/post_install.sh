@@ -21,8 +21,6 @@ set -e
 
 build_stage="${1:-dev}"
 
-[ -d /tmp/archive ] && rm -rf /tmp/archive
-
 echo "stage=${build_stage}" > /etc/apollo.conf
 
 if [[ "${build_stage}" == "cyber" ]]; then
