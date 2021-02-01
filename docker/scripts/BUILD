@@ -12,6 +12,7 @@ install(
 filegroup(
     name = "runtime",
     srcs = [
+        "docker_base.sh",
         "runtime_start.sh",
         "runtime_into.sh",
     ],
