@@ -262,7 +262,10 @@ function read_one_char_from_stdin() {
 function optarg_check_for_opt() {
   local opt="$1"
   local optarg="$2"
-  ! [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]
+  if [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]; then
+      error "Missing parameter for ${opt}. Exiting..."
+      exit 3
+  fi
 }
 
 function setup_gpu_support() {
@@ -285,4 +288,6 @@ function setup_gpu_support() {
   fi
 }
 
-setup_gpu_support
+if ${APOLLO_IN_DOCKER} ; then
+    setup_gpu_support
+fi
