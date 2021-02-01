@@ -87,7 +87,7 @@ function remove_container_if_exists() {
     if docker ps -a --format '{{.Names}}' | grep -q "${container}"; then
         info "Removing existing Apollo container: ${container}"
         docker stop "${container}" >/dev/null
-        docker rm -v -f "${container}" >/dev/null
+        docker rm -v -f "${container}" 2>/dev/null
     fi
 }
 
@@ -111,7 +111,7 @@ function stop_all_apollo_containers() {
             info "Now stop container ${container} ..."
             if docker stop "${container}" >/dev/null; then
                 if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
-                    docker rm -f "${container}" >/dev/null
+                    docker rm -f "${container}" 2>/dev/null
                 fi
                 info "Done."
             else
