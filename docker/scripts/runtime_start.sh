@@ -24,7 +24,7 @@ RUNTIME_INSIDE="in-runtime-docker"
 
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="runtime-x86_64-18.04-20210129_0240"
+VERSION_X86_64="runtime-x86_64-18.04-20210202_1232"
 USER_VERSION_OPT=
 
 FAST_MODE="no"
@@ -148,6 +148,12 @@ function check_host_environment() {
     if [[ "${HOST_ARCH}" != "x86_64" ]]; then
         warning "Apollo Runtime Docker supports x86_64 ONLY!"
         exit 2
+    fi
+
+    if [[ -f "${CURR_DIR}/dev_start.sh" ]]; then
+        warning "${CURR_DIR}/dev_start.sh detected."
+        warning "Apollo Runtime Docker is expected to run with release builds."
+        exit 3
     fi
 }
 
