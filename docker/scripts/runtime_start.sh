@@ -149,6 +149,12 @@ function check_host_environment() {
         warning "Apollo Runtime Docker supports x86_64 ONLY!"
         exit 2
     fi
+
+    if [[ -f "${CURR_DIR}/dev_start.sh" ]]; then
+        warning "${CURR_DIR}/dev_start.sh detected."
+        warning "Apollo Runtime Docker is expected to run with release builds."
+        exit 3
+    fi
 }
 
 function setup_devices_and_mount_local_volumes() {
