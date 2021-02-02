@@ -126,6 +126,9 @@
 		"showDataCollectionMonitor": {
 			"default": false
 		},
+		"showFuelClient": {
+			"default": false
+		},
 		"enableSimControl": {
 			"default": false
 		},

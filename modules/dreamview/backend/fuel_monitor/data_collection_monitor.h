@@ -26,12 +26,16 @@
 #include <vector>
 
 #include <boost/thread/shared_mutex.hpp>
+
 #include "gtest/gtest_prod.h"
+
 #include "nlohmann/json.hpp"
 
-#include "cyber/cyber.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/dreamview/proto/data_collection_table.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor.h"
 
 /**
  * @namespace apollo::dreamview
@@ -47,7 +51,7 @@ typedef std::vector<Range> Category;
  * @brief A module that monitor data collection progress for calibration
  * purpose.
  */
-class DataCollectionMonitor {
+class DataCollectionMonitor : public FuelMonitor {
  public:
   /**
    * @brief Constructor of DataCollectionMonitor.
@@ -55,17 +59,15 @@ class DataCollectionMonitor {
   DataCollectionMonitor();
   ~DataCollectionMonitor();
 
-  bool IsEnabled() const { return enabled_; }
-
   /**
    * @brief start monitoring collection progress
    */
-  void Start();
+  void Start() override;
 
   /**
    * @brief stop monitoring collection progress
    */
-  void Stop();
+  void Stop() override;
 
   /**
    * @brief restart monitoring collection progress
@@ -75,7 +77,7 @@ class DataCollectionMonitor {
   /**
    * @brief return collection progress of categories and overall as json
    */
-  nlohmann::json GetProgressAsJson();
+  nlohmann::json GetProgressAsJson() override;
 
  private:
   void InitReaders();
@@ -91,9 +93,6 @@ class DataCollectionMonitor {
       const Category& category);
 
   std::unique_ptr<cyber::Node> node_;
-
-  // Whether the calibration monitor is enabled.
-  bool enabled_ = false;
 
   // The table defines data collection requirements for calibration
   DataCollectionTable data_collection_table_;

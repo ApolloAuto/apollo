@@ -25,6 +25,7 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+
 #include "absl/strings/str_cat.h"
 
 #include "modules/routing/proto/default_routing.pb.h"
@@ -33,7 +34,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
@@ -67,7 +67,6 @@ class SimulationWorldUpdater {
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
                          WebSocketHandler *camera_ws, SimControl *sim_control,
                          const MapService *map_service,
-                         DataCollectionMonitor *data_collection_monitor,
                          PerceptionCameraUpdater *perception_camera_updater,
                          bool routing_from_file = false);
 
@@ -139,7 +138,6 @@ class SimulationWorldUpdater {
   WebSocketHandler *map_ws_ = nullptr;
   WebSocketHandler *camera_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
-  DataCollectionMonitor *data_collection_monitor_ = nullptr;
   PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 
   // End point for requesting default route

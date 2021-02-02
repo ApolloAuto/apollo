@@ -52,5 +52,9 @@ message SystemStatus {
   // so subscribers could identify it from the recorded messages.
   optional bool is_realtime_in_simulation = 9;
 
+  // In some modes, other processes besides modules and monitored components may
+  // need to be monitored
+  map<string, ComponentStatus> other_components = 10;
+
   reserved 2, 3;
 }

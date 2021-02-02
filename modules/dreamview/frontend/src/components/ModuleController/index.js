@@ -3,13 +3,13 @@ import { inject, observer } from 'mobx-react';
 
 import CheckboxItem from 'components/common/CheckboxItem';
 import StatusDisplay from 'components/ModuleController/StatusDisplay';
-import WS from 'store/websocket';
 
 @inject('store') @observer
 export default class ModuleController extends React.Component {
   render() {
     const {
-      modes, currentMode, moduleStatus, componentStatus,
+      moduleStatus, componentStatus, allMonitoredComponentSuccess,
+      isCalibrationMode, preConditionModule,
     } = this.props.store.hmi;
 
     const moduleEntries = Array.from(moduleStatus.keys()).sort().map((key) => (
@@ -17,7 +17,8 @@ export default class ModuleController extends React.Component {
                 key={key}
                 id={key}
                 title={key}
-                disabled={false}
+                disabled={isCalibrationMode && (key === preConditionModule)
+                  ? !allMonitoredComponentSuccess : false}
                 isChecked={moduleStatus.get(key)}
                 onClick={() => {
                   this.props.store.hmi.toggleModule(key);

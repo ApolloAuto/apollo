@@ -19,8 +19,9 @@
 #include <vector>
 
 #include "modules/dreamview/proto/hmi_mode.pb.h"
-#include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
+
+#include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
 namespace monitor {

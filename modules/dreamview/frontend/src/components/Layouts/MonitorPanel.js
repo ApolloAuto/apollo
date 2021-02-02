@@ -13,10 +13,11 @@ import DataCollectionMonitor from 'components/DataCollectionMonitor';
 import PNCMonitor from 'components/PNCMonitor';
 import ConsoleTeleOp from 'components/TeleopMonitor/ConsoleTeleop';
 import CarTeleOp from 'components/TeleopMonitor/CarTeleop';
+import FuelClient from 'components/FuelClient';
 
 export default class MonitorPanel extends React.Component {
   renderMonitor() {
-    const { viewName, hmi } = this.props;
+    const { viewName } = this.props;
 
     switch (viewName) {
       case MONITOR_MENU.CONSOLE_TELEOP_MONITOR:
@@ -26,14 +27,11 @@ export default class MonitorPanel extends React.Component {
       case MONITOR_MENU.CAMERA_PARAM:
         return <CameraParam />;
       case MONITOR_MENU.DATA_COLLECTION_MONITOR:
-        return (
-                    <DataCollectionMonitor
-                        dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
-                        dataCollectionProgress={hmi.dataCollectionProgress}
-                    />
-        );
+        return <DataCollectionMonitor />;
       case MONITOR_MENU.PNC_MONITOR:
         return <PNCMonitor />;
+      case MONITOR_MENU.FUEL_CLIENT:
+        return <FuelClient />;
       default:
         return null;
     }
