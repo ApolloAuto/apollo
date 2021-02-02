@@ -151,7 +151,7 @@ function determine_images_in_out_x86_64() {
         fi
     elif [[ "${stage}" == "dev" ]]; then
         if [[ "${dist}" == "stable" ]]; then
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-20210129_0235"
+            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-20210202_1105"
             IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-${timestamp}"
         else
             IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-20210108_1510"
@@ -160,7 +160,7 @@ function determine_images_in_out_x86_64() {
     elif [[ "${stage}" == "runtime" ]]; then
         if [[ "${dist}" == "stable" ]]; then
             IMAGE_IN="nvidia/cuda:${CUDA_LITE}-runtime-ubuntu${UBUNTU_LTS}"
-            DEV_IMAGE_IN="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-20210129_0240"
+            DEV_IMAGE_IN="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-20210202_1125"
             IMAGE_OUT="${APOLLO_REPO}:runtime-x86_64-${UBUNTU_LTS}-${timestamp}"
         else
             echo "Testing Runtime Docker for Apollo not supported. Exiting..."
