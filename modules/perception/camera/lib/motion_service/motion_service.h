@@ -23,14 +23,14 @@
 
 #include "Eigen/Core"
 
-#include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/proto/motion_service.pb.h"
+
+#include "cyber/component/component.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/motion/plane_motion.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/onboard/proto/motion_service.pb.h"
-#include "modules/perception/proto/motion_service.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -72,7 +72,8 @@ class MotionService : public apollo::cyber::Component<> {
   std::mutex mutex_;
   //   std::mutex image_mutex_;
   std::mutex motion_mutex_;
-  std::shared_ptr<apollo::cyber::Writer<apollo::perception::Motion_Service>>
+  std::shared_ptr<
+      apollo::cyber::Writer<apollo::perception::MotionServiceMessage>>
       writer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };

@@ -386,3 +386,117 @@ py_proto_library(
         ":sensor_meta_schema_proto",
     ],
 )
+
+cc_proto_library(
+    name = "traffic_light_submodule_cc_proto",
+    deps = [
+        ":traffic_light_submodule_proto",
+    ],
+)
+
+proto_library(
+    name = "traffic_light_submodule_proto",
+    srcs = ["traffic_light_submodule.proto"],
+)
+
+py_proto_library(
+    name = "traffic_light_submodule_py_pb2",
+    deps = [
+        ":traffic_light_submodule_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "radar_submodule_config_cc_proto",
+    deps = [
+        ":radar_submodule_config_proto",
+    ],
+)
+
+proto_library(
+    name = "radar_submodule_config_proto",
+    srcs = ["radar_submodule_config.proto"],
+)
+
+py_proto_library(
+    name = "radar_submodule_config_py_pb2",
+    deps = [
+        ":radar_submodule_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "camera_detection_submodule_cc_proto",
+    deps = [
+        ":camera_detection_submodule_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_detection_submodule_proto",
+    srcs = ["camera_detection_submodule.proto"],
+)
+
+py_proto_library(
+    name = "camera_detection_submodule_py_pb2",
+    deps = [
+        ":camera_detection_submodule_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "lane_detection_submodule_cc_proto",
+    deps = [
+        ":lane_detection_submodule_proto",
+    ],
+)
+
+proto_library(
+    name = "lane_detection_submodule_proto",
+    srcs = ["lane_detection_submodule.proto"],
+)
+
+py_proto_library(
+    name = "lane_detection_submodule_py_pb2",
+    deps = [
+        ":lane_detection_submodule_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "lidar_submodule_config_cc_proto",
+    deps = [
+        ":lidar_submodule_config_proto",
+    ],
+)
+
+proto_library(
+    name = "lidar_submodule_config_proto",
+    srcs = ["lidar_submodule_config.proto"],
+)
+
+py_proto_library(
+    name = "lidar_submodule_config_py_pb2",
+    deps = [
+        ":lidar_submodule_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "fusion_submodule_config_cc_proto",
+    deps = [
+        ":fusion_submodule_config_proto",
+    ],
+)
+
+proto_library(
+    name = "fusion_submodule_config_proto",
+    srcs = ["fusion_submodule_config.proto"],
+)
+
+py_proto_library(
+    name = "fusion_submodule_config_py_pb2",
+    deps = [
+        ":fusion_submodule_config_proto",
+    ],
+)
