@@ -38,6 +38,7 @@ nohup.out
 /data
 modules/tools/ota/update.ini
 modules/tools/ota/vehicle_info.pb.txt
+docker/build/syspkgs.txt
 
 # Localization
 modules/localization/msf/local_map/test_data/ndt_map/map_data/
