@@ -36,7 +36,7 @@ bool MotionService::Init() {
   vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_);
 
   // the macro READ_CONF would return cyber::FAIL if config not exists
-  apollo::perception::onboard::MotionService motion_service_param;
+  apollo::perception::MotionServiceParam motion_service_param;
   if (!GetProtoConfig(&motion_service_param)) {
     AINFO << "load lane detection component proto param failed";
     return false;
@@ -73,7 +73,7 @@ bool MotionService::Init() {
       node_->CreateReader(channel_name_local, localization_callback);
 
   // initialize writer to output channel
-  writer_ = node_->CreateWriter<Motion_Service>(
+  writer_ = node_->CreateWriter<MotionServiceMessage>(
       motion_service_param.output_topic_channel_name());
   AINFO << "init MotionService success.";
   return true;
@@ -162,8 +162,8 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
 // which is at camera timestamp
 void MotionService::PublishEvent(const double timestamp) {
   // protobuf msg
-  std::shared_ptr<apollo::perception::Motion_Service> motion_service_msg(
-      new (std::nothrow) apollo::perception::Motion_Service);
+  std::shared_ptr<apollo::perception::MotionServiceMessage> motion_service_msg(
+      new (std::nothrow) apollo::perception::MotionServiceMessage);
   apollo::common::Header *header = motion_service_msg->mutable_header();
 
   // output camera_time when motion service last proceesed

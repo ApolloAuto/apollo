@@ -47,7 +47,7 @@
 
 using apollo::common::EigenMap;
 using apollo::common::EigenVector;
-typedef std::shared_ptr<apollo::perception::Motion_Service>
+typedef std::shared_ptr<apollo::perception::MotionServiceMessage>
     MotionServiceMsgType;
 
 namespace apollo {
