@@ -40,7 +40,7 @@
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
-typedef std::shared_ptr<apollo::perception::Motion_Service>
+typedef std::shared_ptr<apollo::perception::MotionServiceMessage>
     MotionServiceMsgType;
 using apollo::common::EigenMap;
 using apollo::common::EigenVector;
