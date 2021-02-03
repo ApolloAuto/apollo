@@ -127,10 +127,6 @@ void get_smoke_objects_cpu(const SmokeBlobs &smoke_blobs,
   int len_pred = 14;
   for (int i = 0; i < 50; i++) {
     const float* bbox = detect_result + i * len_pred;
-    // for (int j = 0; j < 14; j++) {
-    //   std::cout << bbox[j] << " ";
-    // }
-    // std::cout << std::endl;
     float score = bbox[13];
     if (score < model_param.confidence_threshold()) {
       continue;

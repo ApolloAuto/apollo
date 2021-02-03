@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/transformer/singlestage/singlestage_obstacle_transformer.h"
 
+#include <limits>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/global_config.h"
@@ -22,6 +24,13 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
+void TransformerParams::set_default() {
+  max_nr_iter = 10;
+  learning_rate = 0.7f;
+  k_min_cost = 4 * sqrtf(2.0f);
+  eps_cost = 1e-5f;
+}
 
 bool SingleStageObstacleTransformer::Init(
     const ObstacleTransformerInitOptions &options) {
@@ -180,6 +189,8 @@ bool SingleStageObstacleTransformer::Transform(
          << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
   const auto &camera2world_pose = frame->camera2world_pose;
 
+  int height = frame->data_provider->src_height();
+  int width = frame->data_provider->src_width();
   int nr_transformed_obj = 0;
   const float PI = common::Constant<float>::PI();
   for (auto &obj : frame->detected_objects) {
@@ -205,6 +216,16 @@ bool SingleStageObstacleTransformer::Transform(
       rotation_y -= 2 * PI;
     }
 
+    // adjust center point
+    float bbox[4] = {0};
+    bbox[0] = obj->camera_supplement.box.xmin;
+    bbox[1] = obj->camera_supplement.box.ymin;
+    bbox[2] = obj->camera_supplement.box.xmax;
+    bbox[3] = obj->camera_supplement.box.ymax;
+    float cneter2d[3] = {0};
+
+    CenterPointFromBbox(bbox, dimension_hwl, rotation_y, object_center,
+                        cneter2d, k_mat, height, width);
     // fill back results
     FillResults(object_center, dimension_hwl, rotation_y, camera2world_pose,
                 theta_ray, obj);
@@ -212,6 +233,149 @@ bool SingleStageObstacleTransformer::Transform(
     ++nr_transformed_obj;
   }
   return nr_transformed_obj > 0;
+}
+
+float SingleStageObstacleTransformer::CenterPointFromBbox(const float *bbox,
+                                                         const float *hwl,
+                                                         float ry,
+                                                         float *center,
+                                                         float *center_2d,
+                                                         const float* k_mat,
+                                                         int height,
+                                                         int width) {
+  float height_bbox = bbox[3] - bbox[1];
+  float width_bbox = bbox[2] - bbox[0];
+  if (width_bbox <= 0.0f || height_bbox <= 0.0f) {
+    AERROR << "Check predict bounding box, width or height is 0";
+    return false;
+  }
+
+  float f = k_mat[4] / 2;
+  float depth = f * hwl[0] * common::IRec(height_bbox);
+
+  // Compensate from the nearest vertical edge to center
+  const float PI = common::Constant<float>::PI();
+  float theta_bbox = static_cast<float>(atan(hwl[1] * common::IRec(hwl[2])));
+  float radius_bbox =
+      common::ISqrt(common::ISqr(hwl[2] / 2) + common::ISqr(hwl[1] / 2));
+
+  float abs_ry = fabsf(ry);
+  float theta_z = std::min(abs_ry, PI - abs_ry) + theta_bbox;
+  theta_z = std::min(theta_z, PI - theta_z);
+  depth += static_cast<float>(fabs(radius_bbox * sin(theta_z)));
+
+  // Back-project to solve center
+  float location[3] = {center[0], center[1] - hwl[0]/2, center[2]};
+  common::IProjectThroughIntrinsic(k_mat, location, center_2d);
+  center_2d[0] *= common::IRec(center_2d[2]);
+  center_2d[1] *= common::IRec(center_2d[2]);
+  if (fabsf(depth - center[2]) * common::IRec(center[2]) > 0.1) {
+    ConstraintCenterPoint(bbox, center[2], ry, hwl, k_mat,
+                          center, center_2d, height, width);
+  }
+  return depth;
+}
+
+void SingleStageObstacleTransformer::ConstraintCenterPoint(const float *bbox,
+                                                           const float &z_ref,
+                                                           const float &ry,
+                                                           const float *hwl,
+                                                           const float *k_mat,
+                                                           float *center,
+                                                           float *x,
+                                                           int height,
+                                                           int width) {
+  float center_2d_target[2] =
+                {(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2};
+  const float K_MIN_COST = params_.k_min_cost;
+  const float EPS_COST_DELTA = params_.eps_cost;
+  const float LEARNING_RATE = params_.learning_rate;
+  const int MAX_ITERATION = params_.max_nr_iter;
+
+  float cost_pre = 2.0f * static_cast<float>(width);
+  float cost_delta = 0.0f;
+  float center_temp[3] = {0};
+  float rot_y[9] = {0};
+
+  // Get rotation matrix rot_y
+  /*
+      cos(ry)   0   sin(ry)
+  R =    0      1     0  
+      -sin(ry)  0   cos(ry)
+  */
+  GenRotMatrix(ry, rot_y);
+
+  int iter = 1;
+  bool stop = false;
+  float h = hwl[0];
+  float w = hwl[1];
+  float l = hwl[2];
+  float x_corners[8] = {0};
+  float y_corners[8] = {0};
+  float z_corners[8] = {0};
+
+  float x_upper_bound = static_cast<float>(width - 1);
+  float y_upper_bound = static_cast<float>(height - 1);
+
+  // Get dimension matrix
+  /*
+      l/2  l/2  -l/2  -l/2  l/2  l/2  -l/2  -l/2
+  D =  0    0     0     0    -h   -h    -h    -h
+      w/2  -w/2 -w/2   w/2  w/2  -w/2 -w/2  -w/2
+  */
+  GenCorners(h, w, l, x_corners, y_corners, z_corners);
+  while (!stop) {
+    // Back project 3D center from image x and depth z_ref to camera center_temp
+    common::IBackprojectCanonical(x, k_mat, z_ref, center_temp);
+    // From center to location
+    center_temp[1] += hwl[0] / 2;
+    float x_min = std::numeric_limits<float>::max();
+    float x_max = -std::numeric_limits<float>::max();
+    float y_min = std::numeric_limits<float>::max();
+    float y_max = -std::numeric_limits<float>::max();
+    float x_images[3] = {0};
+
+    for (int i = 0; i < 8; ++i) {
+      // Bbox from x_images
+      float x_box[3] = {x_corners[i], y_corners[i], z_corners[i]};
+      common::IProjectThroughKRt(k_mat, rot_y, center_temp, x_box, x_images);
+      x_images[0] *= common::IRec(x_images[2]);
+      x_images[1] *= common::IRec(x_images[2]);
+      x_min = std::min(x_min, x_images[0]);
+      x_max = std::max(x_max, x_images[0]);
+      y_min = std::min(y_min, x_images[1]);
+      y_max = std::max(y_max, x_images[1]);
+    }
+
+    // Clamp bounding box from 0~boundary
+    x_min = std::min(std::max(x_min, 0.0f), x_upper_bound);
+    x_max = std::min(std::max(x_max, 0.0f), x_upper_bound);
+    y_min = std::min(std::max(y_min, 0.0f), y_upper_bound);
+    y_max = std::min(std::max(y_max, 0.0f), y_upper_bound);
+
+    // Calculate 2D center point and get cost
+    // cost = (center_gt - center_cal)**2
+    float center_cur[2] = {(x_min + x_max) / 2, (y_min + y_max) / 2};
+    float cost_cur = common::ISqrt(
+                     common::ISqr(center_cur[0] - center_2d_target[0]) +
+                     common::ISqr(center_cur[1] - center_2d_target[1]));
+
+    // Stop or continue
+    if (cost_cur >= cost_pre) {
+      stop = true;
+    } else {
+      memcpy(center, center_temp, sizeof(float) * 3);
+      cost_delta = (cost_pre - cost_cur) / cost_pre;
+      cost_pre = cost_cur;
+      // Update 2D center point by descent method
+      x[0] += (center_2d_target[0] - center_cur[0]) * LEARNING_RATE;
+      x[1] += (center_2d_target[1] - center_cur[1]) * LEARNING_RATE;
+      ++iter;
+      // Termination condition
+      stop = iter >= MAX_ITERATION || cost_delta < EPS_COST_DELTA ||
+             cost_pre < K_MIN_COST;
+    }
+  }
 }
 
 std::string SingleStageObstacleTransformer::Name() const {
