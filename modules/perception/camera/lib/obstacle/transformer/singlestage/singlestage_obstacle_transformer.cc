@@ -222,10 +222,10 @@ bool SingleStageObstacleTransformer::Transform(
     bbox[1] = obj->camera_supplement.box.ymin;
     bbox[2] = obj->camera_supplement.box.xmax;
     bbox[3] = obj->camera_supplement.box.ymax;
-    float cneter2d[3] = {0};
+    float center2d[3] = {0};
 
     CenterPointFromBbox(bbox, dimension_hwl, rotation_y, object_center,
-                        cneter2d, k_mat, height, width);
+                        center2d, k_mat, height, width);
     // fill back results
     FillResults(object_center, dimension_hwl, rotation_y, camera2world_pose,
                 theta_ray, obj);
@@ -236,13 +236,13 @@ bool SingleStageObstacleTransformer::Transform(
 }
 
 float SingleStageObstacleTransformer::CenterPointFromBbox(const float *bbox,
-                                                         const float *hwl,
-                                                         float ry,
-                                                         float *center,
-                                                         float *center_2d,
-                                                         const float* k_mat,
-                                                         int height,
-                                                         int width) {
+                                                          const float *hwl,
+                                                          float ry,
+                                                          float *center,
+                                                          float *center_2d,
+                                                          const float* k_mat,
+                                                          int height,
+                                                          int width) {
   float height_bbox = bbox[3] - bbox[1];
   float width_bbox = bbox[2] - bbox[0];
   if (width_bbox <= 0.0f || height_bbox <= 0.0f) {
