@@ -74,9 +74,8 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
                                               &routing_request_)) {
       common::util::FillHeader(node_->Name(), &routing_request_);
       request_writer_->Write(routing_request_);
-      AINFO << "Reach begin/end point: "
-            << "routing manager send a routing request. "
-            << "Remaining cycles: " << cycle_routing_manager_->GetCycle();
+      AINFO << "[TaskManagerComponent]Reach begin/end point: "
+            << "routing manager send a routing request. ";
     }
     rate.Sleep();
   }
