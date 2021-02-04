@@ -29,6 +29,8 @@ namespace apollo {
 namespace cyber {
 namespace class_loader {
 
+std::mutex SharedLibrary::mutex_;
+
 SharedLibrary::SharedLibrary(const std::string& path) { Load(path, 0); }
 
 SharedLibrary::SharedLibrary(const std::string& path, int flags) {
@@ -43,9 +45,9 @@ void SharedLibrary::Load(const std::string& path, int flags) {
 
   int real_flag = RTLD_LAZY;
   if (flags & SHLIB_LOCAL) {
-    real_flag |= SHLIB_LOCAL;
+    real_flag |= RTLD_LOCAL;
   } else {
-    real_flag |= SHLIB_GLOBAL;
+    real_flag |= RTLD_GLOBAL;
   }
   handle_ = dlopen(path.c_str(), real_flag);
   if (!handle_) {

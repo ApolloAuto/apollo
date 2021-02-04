@@ -114,7 +114,7 @@ class SharedLibrary {
  private:
   void* handle_ = nullptr;
   std::string path_;
-  std::mutex mutex_;
+  static std::mutex mutex_;
 };
 
 }  // namespace class_loader
