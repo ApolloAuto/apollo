@@ -2,11 +2,11 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 CONTROL_COPTS = ['-DMODULE_NAME=\\"control\\"']
 
 cc_library(
     name = "control_lib",
-    srcs = [],
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
@@ -54,15 +54,16 @@ cc_test(
     name = "control_component_test",
     size = "small",
     srcs = ["control_component_test.cc"],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":control_component_lib",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
+# TODO(storypku): split test_data
 filegroup(
-    name = "control_testdata",
+    name = "test_data",
     srcs = glob([
         "testdata/**",
     ]),

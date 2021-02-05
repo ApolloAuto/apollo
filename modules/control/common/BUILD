@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 CONTROL_COPTS = ['-DMODULE_NAME=\\"control\\"']
 
 cc_library(
@@ -150,7 +151,7 @@ cc_test(
     name = "interpolation_1d_test",
     size = "small",
     srcs = ["interpolation_1d_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":interpolation_1d",
         "//cyber",
@@ -173,7 +174,7 @@ cc_test(
     name = "interpolation_2d_test",
     size = "small",
     srcs = ["interpolation_2d_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":interpolation_2d",
         "//cyber",
@@ -187,7 +188,7 @@ cc_test(
     name = "leadlag_controller_test",
     size = "small",
     srcs = ["leadlag_controller_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":leadlag_controller",
         "//cyber/common:file",
@@ -215,7 +216,7 @@ cc_test(
     name = "mrac_controller_test",
     size = "small",
     srcs = ["mrac_controller_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":mrac_controller",
         "//modules/canbus/proto:chassis_cc_proto",
@@ -239,7 +240,7 @@ cc_test(
     name = "pid_controller_test",
     size = "small",
     srcs = ["pid_controller_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":pid_controller",
         "//cyber/common:file",
@@ -267,7 +268,7 @@ cc_test(
     name = "pid_BC_controller_test",
     size = "small",
     srcs = ["pid_BC_controller_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":pid_BC_controller",
         "//modules/canbus/proto:chassis_cc_proto",
@@ -294,7 +295,7 @@ cc_test(
     name = "pid_IC_controller_test",
     size = "small",
     srcs = ["pid_IC_controller_test.cc"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":pid_IC_controller",
         "//modules/canbus/proto:chassis_cc_proto",
