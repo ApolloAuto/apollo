@@ -21,6 +21,7 @@ install(
         "//modules/dreamview:install",
         "//modules/drivers/camera:install",
         "//modules/drivers/gnss:install",
+        "//modules/drivers/microphone:install",
         "//modules/guardian:install",
         "//modules/monitor:install",
         "//modules/perception:install",
