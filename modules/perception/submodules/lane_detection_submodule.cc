@@ -36,8 +36,8 @@
 #include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/submodules/common_flags.h"
 #include "modules/perception/submodules/camera_perception_viz_message.h"
+#include "modules/perception/submodules/common_flags.h"
 
 namespace apollo {
 namespace perception {
@@ -45,13 +45,13 @@ using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
 using ::apollo::cyber::Clock;
 
-FunInfoType LaneDetectionComponent::init_func_arry_[] = {
-    {&LaneDetectionComponent::InitSensorInfo, "InitSensorInfo"},
-    {&LaneDetectionComponent::InitAlgorithmPlugin, "InitAlgorithmPlugin"},
-    {&LaneDetectionComponent::InitCameraFrames, "InitCameraFrames"},
-    {&LaneDetectionComponent::InitProjectMatrix, "InitProjectMatrix"},
-    {&LaneDetectionComponent::InitMotionService, "InitMotionService"},
-    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"}};
+FunInfoType LaneDetectionSubmodule::init_func_arry_[] = {
+    {&LaneDetectionSubmodule::InitSensorInfo, "InitSensorInfo"},
+    {&LaneDetectionSubmodule::InitAlgorithmPlugin, "InitAlgorithmPlugin"},
+    {&LaneDetectionSubmodule::InitCameraFrames, "InitCameraFrames"},
+    {&LaneDetectionSubmodule::InitProjectMatrix, "InitProjectMatrix"},
+    {&LaneDetectionSubmodule::InitMotionService, "InitMotionService"},
+    {&LaneDetectionSubmodule::InitCameraListeners, "InitCameraListeners"}};
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
@@ -181,17 +181,17 @@ static bool GetProjectMatrix(
   return true;
 }
 
-LaneDetectionComponent::~LaneDetectionComponent() {}
+LaneDetectionSubmodule::~LaneDetectionSubmodule() {}
 
-bool LaneDetectionComponent::Init() {
+bool LaneDetectionSubmodule::Init() {
   if (InitConfig() != cyber::SUCC) {
     AERROR << "InitConfig() failed.";
     return false;
   }
 
   writer_ = node_->CreateWriter<PerceptionLanes>(output_lanes_channel_name_);
-  if (!EXEC_ALL_FUNS(LaneDetectionComponent, this,
-                     LaneDetectionComponent::init_func_arry_)) {
+  if (!EXEC_ALL_FUNS(LaneDetectionSubmodule, this,
+                     LaneDetectionSubmodule::init_func_arry_)) {
     return false;
   }
   SetCameraHeightAndPitch();
@@ -229,7 +229,7 @@ bool LaneDetectionComponent::Init() {
 }
 
 // On receiving motion service input, convert it to motion_buff_
-void LaneDetectionComponent::OnMotionService(
+void LaneDetectionSubmodule::OnMotionService(
     const MotionServiceMsgType &message) {
   // Comment: use the circular buff to do it smartly, only push the latest
   // circular_buff only saves only the incremental motion between frames.
@@ -269,12 +269,12 @@ void LaneDetectionComponent::OnMotionService(
   // TODO(@yg13): output motion in text file
 }
 
-void LaneDetectionComponent::OnReceiveImage(
+void LaneDetectionSubmodule::OnReceiveImage(
     const std::shared_ptr<apollo::drivers::Image> &message,
     const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double msg_timestamp = message->measurement_time() + timestamp_offset_;
-  AINFO << "Enter LaneDetectionComponent::Proc(), camera_name: " << camera_name
+  AINFO << "Enter LaneDetectionSubmodule::Proc(), camera_name: " << camera_name
         << " image ts: " << msg_timestamp;
   // timestamp should be almost monotonic
   if (last_timestamp_ - msg_timestamp > ts_diff_) {
@@ -322,7 +322,7 @@ void LaneDetectionComponent::OnReceiveImage(
   }
 }
 
-int LaneDetectionComponent::InitConfig() {
+int LaneDetectionSubmodule::InitConfig() {
   // the macro READ_CONF would return cyber::FAIL if config not exists
   apollo::perception::LaneDetection lane_detection_param;
   if (!GetProtoConfig(&lane_detection_param)) {
@@ -334,7 +334,7 @@ int LaneDetectionComponent::InitConfig() {
   boost::algorithm::split(camera_names_, camera_names_str,
                           boost::algorithm::is_any_of(","));
   if (camera_names_.size() != 2) {
-    AERROR << "Now LaneDetectionComponent only support 2 cameras";
+    AERROR << "Now LaneDetectionSubmodule only support 2 cameras";
     return cyber::FAIL;
   }
 
@@ -371,7 +371,7 @@ int LaneDetectionComponent::InitConfig() {
   write_visual_img_ = lane_detection_param.write_visual_img();
 
   std::string format_str = R"(
-      LaneDetectionComponent InitConfig success
+      LaneDetectionSubmodule InitConfig success
       camera_names:    %s, %s
       camera_lane_perception_conf_dir:    %s
       camera_lane_perception_conf_file:    %s
@@ -395,7 +395,7 @@ int LaneDetectionComponent::InitConfig() {
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::InitSensorInfo() {
+int LaneDetectionSubmodule::InitSensorInfo() {
   if (camera_names_.size() != 2) {
     AERROR << "invalid camera_names_.size(): " << camera_names_.size();
     return cyber::FAIL;
@@ -445,7 +445,7 @@ int LaneDetectionComponent::InitSensorInfo() {
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::InitAlgorithmPlugin() {
+int LaneDetectionSubmodule::InitAlgorithmPlugin() {
   camera_lane_pipeline_.reset(new camera::LaneCameraPerception);
   if (!camera_lane_pipeline_->Init(camera_perception_init_options_)) {
     AERROR << "camera_lane_pipeline_->Init() failed";
@@ -455,7 +455,7 @@ int LaneDetectionComponent::InitAlgorithmPlugin() {
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::InitCameraFrames() {
+int LaneDetectionSubmodule::InitCameraFrames() {
   if (camera_names_.size() != 2) {
     AERROR << "invalid camera_names_.size(): " << camera_names_.size();
     return cyber::FAIL;
@@ -521,7 +521,7 @@ int LaneDetectionComponent::InitCameraFrames() {
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::InitProjectMatrix() {
+int LaneDetectionSubmodule::InitProjectMatrix() {
   if (!GetProjectMatrix(camera_names_, extrinsic_map_, intrinsic_map_,
                         &project_matrix_, &pitch_diff_)) {
     AERROR << "GetProjectMatrix failed";
@@ -536,10 +536,10 @@ int LaneDetectionComponent::InitProjectMatrix() {
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::InitMotionService() {
+int LaneDetectionSubmodule::InitMotionService() {
   const std::string &channel_name_local = "/apollo/perception/motion_service";
   std::function<void(const MotionServiceMsgType &)> motion_service_callback =
-      std::bind(&LaneDetectionComponent::OnMotionService, this,
+      std::bind(&LaneDetectionSubmodule::OnMotionService, this,
                 std::placeholders::_1);
   auto motion_service_reader =
       node_->CreateReader(channel_name_local, motion_service_callback);
@@ -552,7 +552,7 @@ int LaneDetectionComponent::InitMotionService() {
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::InitCameraListeners() {
+int LaneDetectionSubmodule::InitCameraListeners() {
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     const std::string &camera_name = camera_names_[i];
     const std::string &channel_name = input_camera_channel_names_[i];
@@ -561,20 +561,20 @@ int LaneDetectionComponent::InitCameraListeners() {
 
     typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
     std::function<void(const ImageMsgType &)> camera_callback =
-        std::bind(&LaneDetectionComponent::OnReceiveImage, this,
+        std::bind(&LaneDetectionSubmodule::OnReceiveImage, this,
                   std::placeholders::_1, camera_name);
     auto camera_reader = node_->CreateReader(channel_name, camera_callback);
   }
   return cyber::SUCC;
 }
 
-void LaneDetectionComponent::SetCameraHeightAndPitch() {
+void LaneDetectionSubmodule::SetCameraHeightAndPitch() {
   camera_lane_pipeline_->SetCameraHeightAndPitch(
       camera_height_map_, name_camera_pitch_angle_diff_map_,
       default_camera_pitch_);
 }
 
-int LaneDetectionComponent::InternalProc(
+int LaneDetectionSubmodule::InternalProc(
     const std::shared_ptr<apollo::drivers::Image const> &in_message,
     const std::string &camera_name, apollo::common::ErrorCode *error_code,
     SensorFrameMessage *prefused_message,
@@ -691,7 +691,7 @@ int LaneDetectionComponent::InternalProc(
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::ConvertLaneToCameraLaneline(
+int LaneDetectionSubmodule::ConvertLaneToCameraLaneline(
     const base::LaneLine &lane_line,
     apollo::perception::camera::CameraLaneLine *camera_laneline) {
   if (camera_laneline == nullptr) {
@@ -768,7 +768,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
   return cyber::SUCC;
 }
 
-int LaneDetectionComponent::MakeProtobufMsg(
+int LaneDetectionSubmodule::MakeProtobufMsg(
     double msg_timestamp, const std::string &camera_name,
     const camera::CameraFrame &camera_frame,
     apollo::perception::PerceptionLanes *lanes_msg) {

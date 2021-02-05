@@ -55,18 +55,18 @@ namespace apollo {
 namespace perception {
 
 
-class LaneDetectionComponent;
-typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
-class LaneDetectionComponent : public apollo::cyber::Component<> {
+class LaneDetectionSubmodule;
+typedef FunctionInfo<LaneDetectionSubmodule> FunInfoType;
+class LaneDetectionSubmodule : public apollo::cyber::Component<> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  LaneDetectionComponent() : seq_num_(0) {}
-  ~LaneDetectionComponent();
+  LaneDetectionSubmodule() : seq_num_(0) {}
+  ~LaneDetectionSubmodule();
 
-  LaneDetectionComponent(const LaneDetectionComponent&) = delete;
-  LaneDetectionComponent& operator=(const LaneDetectionComponent&) = delete;
+  LaneDetectionSubmodule(const LaneDetectionSubmodule&) = delete;
+  LaneDetectionSubmodule& operator=(const LaneDetectionSubmodule&) = delete;
 
   bool Init() override;
 
@@ -180,7 +180,7 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
   static FunInfoType init_func_arry_[];
 };
 
-CYBER_REGISTER_COMPONENT(LaneDetectionComponent);
+CYBER_REGISTER_COMPONENT(LaneDetectionSubmodule);
 
 }  // namespace perception
 }  // namespace apollo
