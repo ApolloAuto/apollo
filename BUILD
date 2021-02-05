@@ -21,10 +21,12 @@ install(
         "//modules/dreamview:install",
         "//modules/drivers/camera:install",
         "//modules/drivers/gnss:install",
+        "//modules/guardian:install",
         "//modules/monitor:install",
         "//modules/perception:install",
         "//modules/planning:install",
         "//modules/prediction:install",
+        "//modules/storytelling:install",
         "//scripts:install",
     ],
 )
