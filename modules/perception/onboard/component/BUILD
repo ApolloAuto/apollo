@@ -57,7 +57,6 @@ cc_library(
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/camera/app:traffic_light_camera_perception",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/motion_service:motion_service_lib",
         "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
         "//modules/perception/camera/tools/offline:transform_server",
         "//modules/perception/camera/tools/offline:visualizer",
