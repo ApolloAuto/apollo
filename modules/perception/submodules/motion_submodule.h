@@ -34,15 +34,15 @@
 
 namespace apollo {
 namespace perception {
-namespace camera {
 
 typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
 typedef std::shared_ptr<localization::LocalizationEstimate> LocalizationMsgType;
+typedef std::shared_ptr<apollo::perception::camera::PlaneMotion> PlaneMotionPtr;
 
-class MotionService : public apollo::cyber::Component<> {
+class MotionSubmodule : public apollo::cyber::Component<> {
  public:
-  MotionService() = default;
-  virtual ~MotionService() { delete vehicle_planemotion_; }
+  MotionSubmodule() = default;
+  virtual ~MotionSubmodule() {}
 
   bool Init() override;
   bool GetMotionInformation(double timestamp, base::VehicleStatus *vs);
@@ -57,7 +57,7 @@ class MotionService : public apollo::cyber::Component<> {
   void ConvertVehicleMotionToMsgOut(
       base::VehicleStatus vs, apollo::perception::VehicleStatus *v_status_msg);
 
-  PlaneMotion *vehicle_planemotion_ = nullptr;
+  PlaneMotionPtr vehicle_planemotion_;
   std::string device_id_;
   double pre_azimuth = 0;  // a invalid value
   double pre_timestamp_ = 0;
@@ -75,11 +75,10 @@ class MotionService : public apollo::cyber::Component<> {
   std::shared_ptr<
       apollo::cyber::Writer<apollo::perception::MotionServiceMessage>>
       writer_;
-  DISALLOW_COPY_AND_ASSIGN(MotionService);
+  DISALLOW_COPY_AND_ASSIGN(MotionSubmodule);
 };
 
-CYBER_REGISTER_COMPONENT(MotionService);
+CYBER_REGISTER_COMPONENT(MotionSubmodule);
 
-}  // namespace camera
 }  // namespace perception
 }  // namespace apollo

@@ -6,6 +6,53 @@ package(default_visibility = ["//visibility:public"])
 
 PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
+install(
+    name = "install",
+    targets = [
+        ":libperception_submodule_camera.so",
+        ":libperception_submodule_lidar.so",
+    ],
+    deps = [
+        "//cyber:install",
+        "//modules/perception/production:install",
+    ],
+)
+
+cc_binary(
+    name = "libperception_submodule_camera.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":perception_submodule_inner_camera"],
+)
+
+cc_library(
+    name = "perception_submodule_inner_camera",
+    copts = PERCEPTION_COPTS,
+    deps = [
+        ":motion_submodule",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "motion_submodule",
+    srcs = ["motion_submodule.cc"],
+    hdrs = ["motion_submodule.h"],
+    deps = [
+        "//cyber",
+        "//modules/common/math",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/localization/proto:localization_status_cc_proto",
+        "//modules/localization/proto:pose_cc_proto",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/interface:base_init_options",
+        "//modules/perception/camera/lib/motion",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/proto:motion_service_cc_proto",
+    ],
+)
+
 cc_binary(
     name = "libperception_submodule_lidar.so",
     linkshared = True,
@@ -15,9 +62,7 @@ cc_binary(
 
 cc_library(
     name = "perception_submodule_inner_lidar",
-    copts = [
-        '-DMODULE_NAME=\\"perception\\"',
-    ],
+    copts = PERCEPTION_COPTS,
     deps = [
         ":lidar_detection_submodule",
     ],

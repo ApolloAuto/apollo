@@ -25,25 +25,26 @@
 #include "Eigen/Dense"
 #include "Eigen/StdVector"
 
+#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
+#include "modules/perception/onboard/proto/lane_perception_component.pb.h"
+#include "modules/perception/proto/motion_service.pb.h"
+#include "modules/perception/proto/perception_lane.pb.h"
+
 #include "cyber/component/component.h"
 #include "modules/common/util/eigen_defs.h"
 #include "modules/common/util/util.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/lane_camera_perception.h"
-#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
-#include "modules/perception/camera/lib/motion_service/motion_service.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/onboard/component/camera_perception_viz_message.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
-#include "modules/perception/onboard/proto/lane_perception_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
-#include "modules/perception/proto/motion_service.pb.h"
-#include "modules/perception/proto/perception_lane.pb.h"
 
 using apollo::common::EigenMap;
 using apollo::common::EigenVector;
