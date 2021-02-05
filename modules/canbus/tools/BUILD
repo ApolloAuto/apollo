@@ -8,7 +8,7 @@ cc_binary(
     srcs = ["canbus_tester.cc"],
     deps = [
         "//cyber",
-        "//modules/canbus:canbus_lib",
+        "//modules/canbus:canbus_component_lib",
         "//modules/canbus/common:canbus_common",
         "//modules/common/adapters:adapter_gflags",
         "@com_github_gflags_gflags//:gflags",

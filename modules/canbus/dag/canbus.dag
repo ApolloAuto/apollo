@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/canbus/libcanbus.so"
+    module_library : "/apollo/bazel-bin/modules/canbus/libcanbus_component.so"
     timer_components {
         class_name : "CanbusComponent"
         config {

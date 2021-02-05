@@ -5,10 +5,10 @@ vehicle_parameter {
 }
 
 can_card_parameter {
-  brand: ESD_CAN
+  brand: HERMES_CAN
   type: PCI_CARD
   channel_id: CHANNEL_ID_ZERO
-  max_ports: 4
+  num_ports: 8
   interface: NATIVE
 }
 

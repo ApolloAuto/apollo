@@ -66,7 +66,7 @@ cc_test(
     name = "wey_controller_test",
     size = "small",
     srcs = ["wey_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":wey_controller",
         "//modules/common/util",

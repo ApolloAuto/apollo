@@ -52,7 +52,7 @@ cc_test(
     name = "lincoln_controller_test",
     size = "small",
     srcs = ["lincoln_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         "//modules/canbus/vehicle/lincoln:lincoln_controller",
         "@com_google_googletest//:gtest_main",
