@@ -1,7 +1,10 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+GNSS_COPTS = ['-DMODULE_NAME=\\"gnss\\"']
 
 cc_binary(
     name = "libgnss_component.so",
@@ -14,7 +17,7 @@ cc_library(
     name = "gnss_component_lib",
     srcs = ["gnss_component.cc"],
     hdrs = ["gnss_component.h"],
-    copts = ['-DMODULE_NAME=\\"gnss\\"'],
+    copts = GNSS_COPTS,
     deps = [
         "//cyber",
         "//modules/canbus/proto:chassis_cc_proto",
@@ -26,6 +29,28 @@ cc_library(
         "//modules/drivers/gnss/proto:ins_cc_proto",
         "//modules/drivers/gnss/stream:gnss_stream",
     ],
+)
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libgnss_component.so",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
 )
 
 cpplint()
