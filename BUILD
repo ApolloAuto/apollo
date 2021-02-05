@@ -27,6 +27,7 @@ install(
         "//modules/planning:install",
         "//modules/prediction:install",
         "//modules/storytelling:install",
+        "//modules/transform:install",
         "//scripts:install",
     ],
 )
