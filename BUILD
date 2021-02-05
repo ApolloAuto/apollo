@@ -14,13 +14,14 @@ install(
     deps = [
         "//cyber:install",
         "//cyber/examples:install",
+        "//docker/scripts:install",
+        "//modules/audio:install",
         "//modules/dreamview:install",
         "//modules/drivers:install",
         "//modules/monitor:install",
         "//modules/perception:install",
         "//modules/planning:install",
         "//modules/prediction:install",
-        "//docker/scripts:install",
         "//scripts:install",
     ],
 )
