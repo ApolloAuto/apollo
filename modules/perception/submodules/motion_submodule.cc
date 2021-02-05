@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/camera/lib/motion_service/motion_service.h"
+#include "modules/perception/submodules/motion_submodule.h"
 
 #include <limits>
 #include <string>
@@ -28,12 +28,12 @@
 
 namespace apollo {
 namespace perception {
-namespace camera {
 
-bool MotionService::Init() {
-  AINFO << "start to init MotionService.";
-  // node_.reset(new cyber::Node("MotionService"));
-  vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_);
+bool MotionSubmodule::Init() {
+  AINFO << "start to init MotionSubmodule.";
+  // node_.reset(new cyber::Node("MotionSubmodule"));
+  vehicle_planemotion_.reset(
+      new apollo::perception::camera::PlaneMotion(motion_buffer_size_));
 
   // the macro READ_CONF would return cyber::FAIL if config not exists
   apollo::perception::MotionServiceParam motion_service_param;
@@ -60,28 +60,29 @@ bool MotionService::Init() {
   // initialize image listener
   const std::string &channel_name_img = input_camera_channel_names_[0];
   const std::string &camera_name = camera_names_[0];
-  std::function<void(const ImageMsgType &)> camera_callback = std::bind(
-      &MotionService::OnReceiveImage, this, std::placeholders::_1, camera_name);
+  std::function<void(const ImageMsgType &)> camera_callback =
+      std::bind(&MotionSubmodule::OnReceiveImage, this, std::placeholders::_1,
+                camera_name);
   auto camera_reader = node_->CreateReader(channel_name_img, camera_callback);
 
   // initialize localization listener
   const std::string &channel_name_local =
       motion_service_param.input_localization_channel_name();
   std::function<void(const LocalizationMsgType &)> localization_callback =
-      std::bind(&MotionService::OnLocalization, this, std::placeholders::_1);
+      std::bind(&MotionSubmodule::OnLocalization, this, std::placeholders::_1);
   auto localization_reader =
       node_->CreateReader(channel_name_local, localization_callback);
 
   // initialize writer to output channel
   writer_ = node_->CreateWriter<MotionServiceMessage>(
       motion_service_param.output_topic_channel_name());
-  AINFO << "init MotionService success.";
+  AINFO << "init MotionSubmodule success.";
   return true;
 }
 
 // On receiving image input, just need to record its timestamp
-void MotionService::OnReceiveImage(const ImageMsgType &message,
-                                   const std::string &camera_name) {
+void MotionSubmodule::OnReceiveImage(const ImageMsgType &message,
+                                     const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double curr_timestamp = message->measurement_time() + timestamp_offset_;
   ADEBUG << "image received: camera_name: " << camera_name
@@ -91,7 +92,7 @@ void MotionService::OnReceiveImage(const ImageMsgType &message,
 
 // On reveiving localization input, register it to camera timestamp,
 // compute motion between camera time stamps
-void MotionService::OnLocalization(const LocalizationMsgType &message) {
+void MotionSubmodule::OnLocalization(const LocalizationMsgType &message) {
   std::lock_guard<std::mutex> lock(mutex_);
   ADEBUG << "localization received: localization ts: "
          << message->measurement_time();
@@ -139,19 +140,21 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
         std::numeric_limits<double>::epsilon()) {
       ADEBUG << "Motion_status: accum";
       vehicle_planemotion_->add_new_motion(
-          pre_camera_timestamp_, camera_timestamp, PlaneMotion::ACCUM_MOTION,
+          pre_camera_timestamp_, camera_timestamp,
+          apollo::perception::camera::PlaneMotion::ACCUM_MOTION,
           &vehicle_status);
     } else if (camera_timestamp > pre_camera_timestamp_) {
       ADEBUG << "Motion_status: accum_push";
       vehicle_planemotion_->add_new_motion(
           pre_camera_timestamp_, camera_timestamp,
-          PlaneMotion::ACCUM_PUSH_MOTION, &vehicle_status);
+          apollo::perception::camera::PlaneMotion::ACCUM_PUSH_MOTION,
+          &vehicle_status);
       PublishEvent(camera_timestamp);
     } else {
       ADEBUG << "Motion_status: pop";
-      vehicle_planemotion_->add_new_motion(pre_camera_timestamp_,
-                                           camera_timestamp, PlaneMotion::RESET,
-                                           &vehicle_status);
+      vehicle_planemotion_->add_new_motion(
+          pre_camera_timestamp_, camera_timestamp,
+          apollo::perception::camera::PlaneMotion::RESET, &vehicle_status);
     }
   }
 
@@ -160,7 +163,7 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
 
 // pubulish vehicle status buffer to output channel
 // which is at camera timestamp
-void MotionService::PublishEvent(const double timestamp) {
+void MotionSubmodule::PublishEvent(const double timestamp) {
   // protobuf msg
   std::shared_ptr<apollo::perception::MotionServiceMessage> motion_service_msg(
       new (std::nothrow) apollo::perception::MotionServiceMessage);
@@ -171,7 +174,7 @@ void MotionService::PublishEvent(const double timestamp) {
   header->set_module_name("motion_service");
 
   // convert vehicle status buffer to output message
-  auto motion_buffer = MotionService::GetMotionBuffer();
+  auto motion_buffer = MotionSubmodule::GetMotionBuffer();
   for (int k = static_cast<int>(motion_buffer.size()) - 1; k >= 0; k--) {
     apollo::perception::VehicleStatus *v_status_msg =
         motion_service_msg->add_vehicle_status();
@@ -181,7 +184,7 @@ void MotionService::PublishEvent(const double timestamp) {
 }
 
 // convert vehicle status buffer to output message
-void MotionService::ConvertVehicleMotionToMsgOut(
+void MotionSubmodule::ConvertVehicleMotionToMsgOut(
     base::VehicleStatus vs, apollo::perception::VehicleStatus *v_status_msg) {
   v_status_msg->set_roll_rate(vs.roll_rate);
   v_status_msg->set_pitch_rate(vs.pitch_rate);
@@ -212,22 +215,21 @@ void MotionService::ConvertVehicleMotionToMsgOut(
 }
 
 // load vehicle status buffer from vehicle_planemotion_
-base::MotionBuffer MotionService::GetMotionBuffer() {
+base::MotionBuffer MotionSubmodule::GetMotionBuffer() {
   std::lock_guard<std::mutex> lock(motion_mutex_);
   return vehicle_planemotion_->get_buffer();
 }
 
-double MotionService::GetLatestTimestamp() {
+double MotionSubmodule::GetLatestTimestamp() {
   // std::lock_guard<std::mutex> lock(image_mutex_);
   return pre_camera_timestamp_;
 }
 
 // retrieve vehiclestattus at the closeset cameratimestamp
-bool MotionService::GetMotionInformation(double timestamp,
-                                         base::VehicleStatus *vs) {
+bool MotionSubmodule::GetMotionInformation(double timestamp,
+                                           base::VehicleStatus *vs) {
   return vehicle_planemotion_->find_motion_with_timestamp(timestamp, vs);
 }
 
-}  // namespace camera
 }  // namespace perception
 }  // namespace apollo
