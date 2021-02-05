@@ -45,7 +45,7 @@ cc_test(
     name = "zhongyun_message_manager_test",
     size = "small",
     srcs = ["zhongyun_message_manager_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":zhongyun_message_manager",
         "@com_google_googletest//:gtest_main",
@@ -56,7 +56,7 @@ cc_test(
     name = "zhongyun_vehicle_factory_test",
     size = "small",
     srcs = ["zhongyun_vehicle_factory_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":zhongyun_vehicle_factory",
         "@com_google_googletest//:gtest_main",
@@ -67,7 +67,7 @@ cc_test(
     name = "zhongyun_controller_test",
     size = "small",
     srcs = ["zhongyun_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":zhongyun_controller",
         "//modules/common/util",

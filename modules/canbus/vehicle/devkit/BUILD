@@ -71,7 +71,7 @@ cc_test(
     name = "devkit_controller_test",
     size = "small",
     srcs = ["devkit_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":devkit_controller",
         "@com_google_googletest//:gtest_main",
