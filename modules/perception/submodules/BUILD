@@ -35,6 +35,42 @@ cc_library(
 )
 
 cc_library(
+    name = "lane_detection_submodule",
+    srcs = ["lane_detection_submodule.cc"],
+    hdrs = ["lane_detection_submodule.h"],
+    deps = [
+        ":camera_perception_viz_message",
+        ":common_flags",
+        ":inner_submodule_messages",
+        ":transform_wrapper",
+        "//cyber",
+        "//cyber/time:clock",
+        "//modules/common/math",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:geometry_cc_proto",
+        "//modules/common/proto:header_cc_proto",
+        "//modules/common/util",
+        "//modules/common/util:eigen_defs",
+        "//modules/common/util:time_util",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/map/proto:map_cc_proto",
+        "//modules/perception/base",
+        "//modules/perception/camera/app:lane_camera_perception",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/motion_service:motion_service_lib",
+        "//modules/perception/camera/tools/offline:transform_server",
+        "//modules/perception/camera/tools/offline:visualizer",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/proto:lane_detection_submodule_cc_proto",
+        "//modules/perception/proto:perception_lane_cc_proto",
+        "//modules/transform/proto:transform_cc_proto",
+        "@eigen",
+        "@opencv//:highgui",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "motion_submodule",
     srcs = ["motion_submodule.cc"],
     hdrs = ["motion_submodule.h"],
@@ -51,6 +87,19 @@ cc_library(
         "//modules/perception/lib/registerer",
         "//modules/perception/proto:motion_service_cc_proto",
     ],
+)
+
+cc_library(
+    name = "camera_perception_viz_message",
+    srcs = ["camera_perception_viz_message.cc"],
+    hdrs = ["camera_perception_viz_message.h"],
+    deps = [
+        "//cyber",
+        "//modules/common/math",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/perception/base",
+    ],
+    alwayslink = True,
 )
 
 cc_binary(
