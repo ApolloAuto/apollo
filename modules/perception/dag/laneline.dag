@@ -1,0 +1,15 @@
+module_config {
+  module_library : "/apollo/bazel-bin/modules/perception/submodules/libperception_submodule_camera.so"
+
+ components {
+    class_name : "LaneDetectionSubmodule"
+    config {
+      name: "LaneSubmodule"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/camera/lane_detection_component.config"
+      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      readers {
+        channel: "/apollo/perception/lane_status"
+      }
+    }
+  }
+}

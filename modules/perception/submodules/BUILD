@@ -29,6 +29,7 @@ cc_library(
     name = "perception_submodule_inner_camera",
     copts = PERCEPTION_COPTS,
     deps = [
+        ":lane_detection_submodule",
         ":motion_submodule",
     ],
     alwayslink = True,
