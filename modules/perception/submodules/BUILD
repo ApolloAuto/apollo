@@ -29,10 +29,41 @@ cc_library(
     name = "perception_submodule_inner_camera",
     copts = PERCEPTION_COPTS,
     deps = [
+        ":camera_detection_submodule",
         ":lane_detection_submodule",
         ":motion_submodule",
     ],
     alwayslink = True,
+)
+
+cc_library(
+  name = "camera_detection_submodule",
+  srcs = ["camera_detection_submodule.cc"],
+  hdrs = ["camera_detection_submodule.h"],
+  deps = [
+        ":camera_perception_viz_message",
+        ":common_flags",
+        ":inner_submodule_messages",
+        ":transform_wrapper",
+        "//cyber",
+        "//modules/common/math:math_utils",
+        "//modules/common/util:eigen_defs",
+        "//modules/common/util:string_util",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/perception/base",
+        "//modules/perception/camera/app:cipv_camera",
+        "//modules/perception/camera/app:obstacle_camera_perception",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/interface:base_camera_perception",
+        "//modules/perception/camera/tools/offline:visualizer",
+        "//modules/perception/common:perception_gflags",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/proto:camera_detection_submodule_cc_proto",
+        "//modules/perception/proto:motion_service_cc_proto",
+        "//modules/perception/proto:perception_camera_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
+  ],
+  alwayslink = True,
 )
 
 cc_library(
