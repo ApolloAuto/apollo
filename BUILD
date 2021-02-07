@@ -27,6 +27,7 @@ install(
         "//modules/perception:install",
         "//modules/planning:install",
         "//modules/prediction:install",
+        "//modules/routing:install",
         "//modules/storytelling:install",
         "//modules/task_manager:install",
         "//modules/transform:install",
