@@ -2,10 +2,11 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 ROUTING_COPTS = ['-DMODULE_NAME=\\"routing\\"']
 
 cc_library(
-    name = "routing_lib",
+    name = "routing",
     srcs = ["routing.cc"],
     hdrs = ["routing.h"],
     copts = ROUTING_COPTS,
@@ -25,7 +26,7 @@ cc_library(
     hdrs = ["routing_component.h"],
     copts = ROUTING_COPTS,
     deps = [
-        ":routing_lib",
+        ":routing",
         "//cyber/time:clock",
     ],
 )
@@ -35,13 +36,6 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [":routing_component_lib"],
-)
-
-filegroup(
-    name = "routing_testdata",
-    srcs = glob([
-        "testdata/**",
-    ]),
 )
 
 cpplint()

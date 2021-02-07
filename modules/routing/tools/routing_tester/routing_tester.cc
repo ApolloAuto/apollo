@@ -25,7 +25,7 @@ DEFINE_bool(enable_remove_lane_id, true,
             "True to remove lane id in routing request");
 
 DEFINE_string(routing_test_file,
-              "modules/routing/testdata/routing_tester/routing_test.pb.txt",
+              "modules/routing/tools/routing_tester/routing_test.pb.txt",
               "Used for sending routing request to routing node.");
 
 using apollo::cyber::Rate;
