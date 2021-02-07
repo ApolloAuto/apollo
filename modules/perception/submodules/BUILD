@@ -30,6 +30,7 @@ cc_library(
     copts = PERCEPTION_COPTS,
     deps = [
         ":motion_submodule",
+        ":lane_detection_submodule",
     ],
     alwayslink = True,
 )
