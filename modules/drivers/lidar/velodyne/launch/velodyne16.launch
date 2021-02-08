@@ -1,6 +1,6 @@
 <cyber>
     <module>
-        <name>gnss</name>
+        <name>velodyne16</name>
         <dag_conf>/apollo/modules/drivers/lidar/velodyne/dag/velodyne16.dag</dag_conf>
         <process_name>velodyne</process_name>
     </module>
