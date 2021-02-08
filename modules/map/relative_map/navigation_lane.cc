@@ -678,7 +678,7 @@ void NavigationLane::ConvertLaneMarkerToPath(
   double path_c3 = (left_lane.c3_curvature_derivative() +
                     right_lane.c3_curvature_derivative()) /
                    2.0;
-  
+
   const double current_speed =
       vehicle_state_provider_->vehicle_state().linear_velocity();
   double path_range =
