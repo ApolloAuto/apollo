@@ -670,11 +670,11 @@ void NavigationLane::ConvertLaneMarkerToPath(
 
   double path_c0 = (left_lane.c0_position() + right_lane.c0_position()) / 2.0;
 
-  double path_c1 = left_lane.c1_heading_angle() + right_lane.c1_heading_angle();
+  double path_c1 = (left_lane.c1_heading_angle() + right_lane.c1_heading_angle())/2.0;
 
-  double path_c2 = left_lane.c2_curvature() + right_lane.c2_curvature();
+  double path_c2 = (left_lane.c2_curvature() + right_lane.c2_curvature())/2.0;
 
-  double path_c3 = left_lane.c3_curvature_derivative() + right_lane.c3_curvature_derivative();
+  double path_c3 = (left_lane.c3_curvature_derivative() + right_lane.c3_curvature_derivative())/2.0;
 
   const double current_speed =
       vehicle_state_provider_->vehicle_state().linear_velocity();
