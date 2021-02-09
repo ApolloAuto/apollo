@@ -16,6 +16,7 @@
 #include <opencv2/opencv.hpp>
 #include "gtest/gtest.h"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 
 DEFINE_int32(height, 1080, "image height");
@@ -98,7 +99,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
   ASSERT_TRUE(perception.Init(init_option));
 
   const int FRAME_CAPACITY = 20;
-  std::vector<CameraFrame> frame_list(FRAME_CAPACITY);
+  apollo::common::EigenVector<CameraFrame> frame_list(FRAME_CAPACITY);
   DataProvider::InitOptions data_options;
   data_options.image_height = FLAGS_height;
   data_options.image_width = FLAGS_width;
@@ -135,7 +136,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
         "camera/app/images/" +
         image_name + ".jpg";
     cv::Mat image;
-    image = cv::imread(image_path, cv::IMAGE_COLOR);
+    image = cv::imread(image_path, cv::IMREAD_COLOR);
     ASSERT_TRUE(image.data);
     frame_id++;
     CameraFrame &frame = frame_list[frame_id % FRAME_CAPACITY];

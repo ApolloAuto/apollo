@@ -21,6 +21,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
@@ -169,8 +170,8 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   double yaw_adj = 0;
   double roll_adj = 0;
   std::string visual_camera = "onsemi_obstacle";
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map;
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix4d> extrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> intrinsic_map;
   Eigen::Matrix4d ex_camera2lidar;
   Eigen::Matrix4d ex_lidar2imu;
   Eigen::Matrix3d homography_im2car_;
@@ -189,7 +190,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   intrinsic_map["onsemi_obstacle"] = frame.camera_k_matrix;
   extrinsic_map["onsemi_obstacle"] = ex_camera2lidar;
   std::vector<std::string> camera_names;
-  camera_names[0] = visual_camera;
+  camera_names.push_back(visual_camera);
 
   EXPECT_TRUE(visualize_.Init_all_info_single_camera(
       camera_names, visual_camera, intrinsic_map, extrinsic_map, ex_lidar2imu,

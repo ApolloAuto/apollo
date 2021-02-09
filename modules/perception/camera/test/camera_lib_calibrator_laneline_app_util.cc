@@ -117,12 +117,12 @@ bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
 //   }
 // }
 
-void write_text_on_image(cv::Mat *image, float left, float top,
-                         const char *text, const CvFont &font,
+void write_text_on_image(const cv::Mat &image, float left, float top,
+                         const char *text, int fontFace,
                          const cv::Scalar &color) {
-  IplImage ipl_img = *image;
-  cvPutText(&ipl_img, text, cvPoint(common::IRound(left), common::IRound(top)),
-            &font, color);
+  cv::Mat img = image.clone();
+  cv::putText(img, text, cv::Point(common::IRound(left), common::IRound(top)),
+            fontFace, 1, color, 2);
 }
 
 // void add_noise_to_vector_radius(float *x, int n, float radius, bool set_seed)

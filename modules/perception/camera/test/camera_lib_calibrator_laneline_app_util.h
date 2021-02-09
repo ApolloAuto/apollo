@@ -20,6 +20,8 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "modules/perception/common/i_lib/core/i_blas.h"
@@ -46,8 +48,8 @@ bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
 // void draw_2d_face(cv::Mat *image, const float corners_2d[16],
 //                   const int idx_points[4], const cv::Scalar &color);
 
-void write_text_on_image(cv::Mat *image, float left, float top,
-                         const char *text, const CvFont &font,
+void write_text_on_image(const cv::Mat &image, float left, float top,
+                         const char *text, int fontFace,
                          const cv::Scalar &color);
 
 // void add_noise_to_vector_radius(float *x, int n, float radius,
