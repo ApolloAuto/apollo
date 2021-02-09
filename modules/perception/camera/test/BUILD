@@ -375,259 +375,270 @@ cc_test(
     ],
 )
 
-# cc_test(
-#     name = "camera_lib_obstacle_detector_yolo_region_output_test",
-#     size = "small",
-#     srcs = ["camera_lib_obstacle_detector_yolo_region_output_test.cc"],
-#     deps = [
-#         "//modules/perception/base",
-#         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
-#         "//modules/perception/common/io:io_util",
-#         "//modules/perception/inference/utils:inference_cuda_util_lib",
-#         "//modules/perception/inference/utils:inference_gemm_lib",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "camera_lib_obstacle_detector_yolo_region_output_test",
+    size = "small",
+    srcs = ["camera_lib_obstacle_detector_yolo_region_output_test.cc"],
+    deps = [
+        "//modules/perception/base",
+        "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/inference/utils:inference_cuda_util_lib",
+        "//modules/perception/inference/utils:inference_gemm_lib",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
+cc_test(
+    name = "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test",
+    size = "medium",
+    srcs = ["camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc"],
+    deps = [
+        "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/inference/utils:inference_cuda_util_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_googletest//:gtest_main",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
+)
+
+cc_test(
+    name = "camera_lib_obstacle_postprocessor_location_refiner_test",
+    size = "small",
+    srcs = ["camera_lib_obstacle_postprocessor_location_refiner_test.cc"],
+    deps = [
+        "//cyber",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
+        "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
+        "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
+        "//modules/perception/common/io:io_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "camera_lib_obstacle_tracker_common_test",
+    size = "small",
+    srcs = ["camera_lib_obstacle_tracker_common_test.cc"],
+    deps = [
+        "//cyber",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/obstacle/tracker/common",
+        "//modules/perception/inference/operators:perception_inference_operators",
+        "//modules/perception/inference/utils:inference_cuda_util_lib",
+        "//modules/perception/inference/utils:inference_gemm_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "@com_google_googletest//:gtest_main",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "camera_lib_obstacle_tracker_omt_frame_list_test",
+    size = "small",
+    srcs = ["camera_lib_obstacle_tracker_omt_frame_list_test.cc"],
+    deps = [
+        "//modules/common/util:eigen_defs",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
+        "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cuda_headers",
+    ],
+)
+
+# TODO(private)
 # cc_test(
-#     name = "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test",
-#     size = "medium",
-#     srcs = ["camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc"],
+#     name = "camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test",
+#     srcs = ["camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test.cc"],
 #     deps = [
-#         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
+#         "//cyber",
+#         "//modules/perception/base:base",
+#         "//modules/perception/camera/common:common",
+#         "//modules/perception/camera/lib/interface:interface",
+#         "//modules/perception/common/geometry:common",
 #         "//modules/perception/common/io:io_util",
-#         "//modules/perception/inference/utils:inference_cuda_util_lib",
-#         "//modules/perception/inference/utils:inference_util_lib",
 #         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#         "@com_google_absl//absl/strings",
 #         "@com_google_googletest//:gtest_main",
 #         "@opencv",
 #     ],
 # )
 
+# TODO(private)
 # cc_test(
-#     name = "camera_lib_obstacle_postprocessor_location_refiner_test",
-#     size = "small",
-#     srcs = ["camera_lib_obstacle_postprocessor_location_refiner_test.cc"],
-#     deps = [
-#         "//cyber",
-#         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
-#         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
-#         "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
-#         "//modules/perception/common/io:io_util",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
-
-# cc_test(
-#     name = "camera_lib_obstacle_tracker_common_test",
-#     size = "small",
-#     srcs = ["camera_lib_obstacle_tracker_common_test.cc"],
-#     deps = [
-#         "//cyber",
-#         "//modules/perception/camera/common",
-#         "//modules/perception/camera/lib/obstacle/tracker/common",
-#         "//modules/perception/inference/operators:perception_inference_operators",
-#         "//modules/perception/inference/utils:inference_cuda_util_lib",
-#         "//modules/perception/inference/utils:inference_gemm_lib",
-#         "//modules/perception/inference/utils:inference_util_lib",
-#         "@com_google_googletest//:gtest_main",
-#         "@eigen",
-#     ],
-# )
-
-# cc_test(
-#     name = "camera_lib_obstacle_tracker_omt_frame_list_test",
-#     size = "small",
-#     srcs = ["camera_lib_obstacle_tracker_omt_frame_list_test.cc"],
-#     deps = [
-#         "//modules/perception/camera/common",
-#         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
-#         "@com_google_googletest//:gtest_main",
-#         "@local_config_cuda//cuda:cuda_headers",
-#     ],
-# )
-
-# # TODO(private)
-# # cc_test(
-# #     name = "camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test",
-# #     srcs = ["camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test.cc"],
-# #     deps = [
-# #         "//cyber",
-# #         "//modules/perception/base:base",
-# #         "//modules/perception/camera/common:common",
-# #         "//modules/perception/camera/lib/interface:interface",
-# #         "//modules/perception/common/geometry:common",
-# #         "//modules/perception/common/io:io_util",
-# #         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-# #         "@com_google_absl//absl/strings",
-# #         "@com_google_googletest//:gtest_main",
-# #         "@opencv",
-# #     ],
-# # )
-
-# # TODO(private)
-# # cc_test(
-# #     name = "camera_lib_obstacle_tracker_omt_reference_test",
-# #     srcs = ["camera_lib_obstacle_tracker_omt_reference_test.cc"],
-# #     deps = [
-# #         "//cyber/common:file",
-# #         "//modules/perception/base:base",
-# #         "//modules/perception/camera/common:common",
-# #         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:frame_list",
-# #         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_proto",
-# #         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:target",
-# #         "@com_google_googletest//:gtest_main",
-# #     ],
-# # )
-
-# cc_test(
-#     name = "camera_lib_obstacle_tracker_omt_target_test",
-#     size = "small",
-#     srcs = ["camera_lib_obstacle_tracker_omt_target_test.cc"],
+#     name = "camera_lib_obstacle_tracker_omt_reference_test",
+#     srcs = ["camera_lib_obstacle_tracker_omt_reference_test.cc"],
 #     deps = [
 #         "//cyber/common:file",
-#         "//modules/perception/base",
-#         "//modules/perception/camera/common",
-#         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
-#         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
-#         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
-#         "//modules/perception/inference/utils:inference_gemm_lib",
+#         "//modules/perception/base:base",
+#         "//modules/perception/camera/common:common",
+#         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:frame_list",
+#         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_proto",
+#         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:target",
 #         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 
-# cc_test(
-#     name = "camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test",
-#     size = "small",
-#     srcs = ["camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test.cc"],
-#     deps = [
-#         "//modules/perception/base",
-#         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
-#         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
-#         "//modules/perception/common/io:io_util",
-#         "//modules/perception/inference/utils:inference_cuda_util_lib",
-#         "//modules/perception/inference/utils:inference_resize_lib",
-#         "//modules/perception/inference/utils:inference_util_lib",
-#         "@com_google_googletest//:gtest_main",
-#         "@opencv",
-#     ],
-# )
+cc_test(
+    name = "camera_lib_obstacle_tracker_omt_target_test",
+    size = "small",
+    srcs = ["camera_lib_obstacle_tracker_omt_target_test.cc"],
+    deps = [
+        "//cyber/common:file",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
+        "//modules/perception/camera/lib/obstacle/tracker/omt:target",
+        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
+        "//modules/perception/inference/utils:inference_gemm_lib",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test",
+    size = "small",
+    srcs = ["camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test.cc"],
+    deps = [
+        "//modules/perception/base",
+        "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
+        "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/inference/utils:inference_cuda_util_lib",
+        "//modules/perception/inference/utils:inference_resize_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "@com_google_googletest//:gtest_main",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
+)
+
+cc_test(
+    name = "camera_lib_traffic_light_detector_crop_test",
+    size = "small",
+    srcs = ["camera_lib_traffic_light_detector_crop_test.cc"],
+    deps = [
+        "//modules/perception/camera/lib/traffic_light/detector/detection:cropbox",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_protobuf//:protobuf",
+        "@local_config_cuda//cuda",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
+)
 
 # cc_test(
-#     name = "camera_lib_traffic_light_detector_crop_test",
-#     size = "small",
-#     srcs = ["camera_lib_traffic_light_detector_crop_test.cc"],
+#     name = "camera_lib_traffic_light_detector_detection_test",
+#     srcs = ["camera_lib_traffic_light_detector_detection_test.cc"],
 #     deps = [
-#         "//modules/perception/camera/lib/traffic_light/detector/detection:cropbox",
-#         "@caffe",
-#         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-#         "@com_google_googletest//:gtest_main",
-#         "@com_google_protobuf//:protobuf",
-#         "@local_config_cuda//cuda",
-#         "@local_config_tensorrt//:tensorrt",
-#         "@opencv",
-#     ],
-# )
-
-# # cc_test(
-# #     name = "camera_lib_traffic_light_detector_detection_test",
-# #     srcs = ["camera_lib_traffic_light_detector_detection_test.cc"],
-# #     deps = [
-# #         "//modules/perception/camera/lib/traffic_light/detector/detection:detection",
-# #         "//modules/perception/inference:inference_factory",
-# #         "//modules/perception/inference/operators:perception_inference_operators",
-# #         "@caffe",
-# #         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-# #         "@com_google_googletest//:gtest_main",
-# #         "@com_google_protobuf//:protobuf",
-# #         "@opencv",
-# #         "@local_config_tensorrt//:tensorrt",
-# #     ],
-# # )
-
-# #cc_test(
-# #    name = "camera_lib_traffic_light_detector_recognition_test",
-# #    srcs = ["camera_lib_traffic_light_detector_recognition_test.cc"],
-# #    deps = [
-# #        "//modules/perception/camera/lib/traffic_light/detector/recognition:recognition",
-# #        "//modules/perception/inference:inference_factory",
-# #        "//modules/perception/inference/operators:perception_inference_operators",
-# #        "@caffe",
-# #        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-# #        "@com_google_googletest//:gtest_main",
-# #        "@com_google_protobuf//:protobuf",
-# #        "@opencv",
-# #        "@local_config_tensorrt//:tensorrt",
-# #    ],
-# #)
-# cc_test(
-#     name = "camera_lib_traffic_light_detector_select_test",
-#     size = "small",
-#     srcs = ["camera_lib_traffic_light_detector_select_test.cc"],
-#     deps = [
-#         "//modules/perception/camera/lib/traffic_light/detector/detection:select",
-#         "//modules/perception/inference:inference_factory",
-#         "//modules/perception/inference/operators:perception_inference_operators",
-#         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-#         "@com_google_googletest//:gtest_main",
-#         "@com_google_protobuf//:protobuf",
-#         "@local_config_cuda//cuda:cudart",
-#         "@local_config_tensorrt//:tensorrt",
-#         "@opencv",
-#     ],
-# )
-
-# # TODO(private)
-# #cc_test(
-# #    name = "camera_lib_traffic_light_preprocessor_test",
-# #    srcs = ["camera_lib_traffic_light_preprocessor_test.cc"],
-# #    deps = [
-# #        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
-# #        "//modules/perception/common/sensor_manager:sensor_manager",
-# #        "//modules/perception/inference:inference_factory",
-# #        "//modules/perception/inference/operators:perception_inference_operators",
-# #        "@caffe",
-# #        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-# #        "@com_google_googletest//:gtest_main",
-# #        "@com_google_protobuf//:protobuf",
-# #        "@opencv",
-# #        "@local_config_tensorrt//:tensorrt",
-# #    ],
-# #)
-
-# cc_test(
-#     name = "camera_lib_traffic_light_tracker_test",
-#     size = "small",
-#     srcs = ["camera_lib_traffic_light_tracker_test.cc"],
-#     deps = [
-#         "//cyber",
-#         "//modules/perception/base:distortion_model",
-#         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
-#         "//modules/perception/common/io:io_util",
+#         "//modules/perception/camera/lib/traffic_light/detector/detection:detection",
 #         "//modules/perception/inference:inference_factory",
 #         "//modules/perception/inference/operators:perception_inference_operators",
 #         "@caffe",
 #         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
 #         "@com_google_googletest//:gtest_main",
 #         "@com_google_protobuf//:protobuf",
-#         "@local_config_tensorrt//:tensorrt",
 #         "@opencv",
+#         "@local_config_tensorrt//:tensorrt",
 #     ],
 # )
 
-# cc_test(
-#     name = "camera_app_cipv_camera_test",
-#     size = "small",
-#     srcs = ["camera_app_cipv_camera_test.cc"],
-#     deps = [
-#         "//cyber",
-#         "//modules/perception/base:distortion_model",
-#         "//modules/perception/camera/app:cipv_camera",
-#         "//modules/perception/common/io:io_util",
-#         "@com_google_googletest//:gtest_main",
-#         "@local_config_tensorrt//:tensorrt",
-#         "@opencv",
-#     ],
-# )
+#cc_test(
+#    name = "camera_lib_traffic_light_detector_recognition_test",
+#    srcs = ["camera_lib_traffic_light_detector_recognition_test.cc"],
+#    deps = [
+#        "//modules/perception/camera/lib/traffic_light/detector/recognition:recognition",
+#        "//modules/perception/inference:inference_factory",
+#        "//modules/perception/inference/operators:perception_inference_operators",
+#        "@caffe",
+#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#        "@com_google_googletest//:gtest_main",
+#        "@com_google_protobuf//:protobuf",
+#        "@opencv",
+#        "@local_config_tensorrt//:tensorrt",
+#    ],
+#)
+cc_test(
+    name = "camera_lib_traffic_light_detector_select_test",
+    size = "small",
+    srcs = ["camera_lib_traffic_light_detector_select_test.cc"],
+    deps = [
+        "//modules/perception/camera/lib/traffic_light/detector/detection:select",
+        "//modules/perception/inference:inference_factory",
+        "//modules/perception/inference/operators:perception_inference_operators",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_protobuf//:protobuf",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
+)
+
+# TODO(private)
+#cc_test(
+#    name = "camera_lib_traffic_light_preprocessor_test",
+#    srcs = ["camera_lib_traffic_light_preprocessor_test.cc"],
+#    deps = [
+#        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
+#        "//modules/perception/common/sensor_manager:sensor_manager",
+#        "//modules/perception/inference:inference_factory",
+#        "//modules/perception/inference/operators:perception_inference_operators",
+#        "@caffe",
+#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#        "@com_google_googletest//:gtest_main",
+#        "@com_google_protobuf//:protobuf",
+#        "@opencv",
+#        "@local_config_tensorrt//:tensorrt",
+#    ],
+#)
+
+cc_test(
+    name = "camera_lib_traffic_light_tracker_test",
+    size = "small",
+    srcs = ["camera_lib_traffic_light_tracker_test.cc"],
+    deps = [
+        "//cyber",
+        "//modules/perception/base:distortion_model",
+        "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
+        "//modules/perception/common/io:io_util",
+        "//modules/perception/inference:inference_factory",
+        "//modules/perception/inference/operators:perception_inference_operators",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_protobuf//:protobuf",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
+)
+
+cc_test(
+    name = "camera_app_cipv_camera_test",
+    size = "small",
+    srcs = ["camera_app_cipv_camera_test.cc"],
+    deps = [
+        "//cyber",
+        "//modules/perception/base:distortion_model",
+        "//modules/perception/camera/app:cipv_camera",
+        "//modules/perception/common/io:io_util",
+        "@com_google_googletest//:gtest_main",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
+)
 
 cpplint()
