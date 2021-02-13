@@ -24,6 +24,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
+if [[ -z "${CUDA_VERSION}" ]]
+then
+    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        CUDA_VERSION="11.1.74-1"
+    else
+        CUDA_VERSION="10.2.89-1"
+    fi
+fi
+
 MAIN_VER_DOT="${CUDA_VERSION%.*}"
 CUDA_SAMPLES="cuda-samples"
 
