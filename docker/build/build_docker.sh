@@ -25,6 +25,7 @@ DOCKERFILE=
 TARGET_STAGE=
 IMAGE_IN=
 IMAGE_OUT=
+CYBER_IMAGE_TIMESTAMP=
 
 GEOLOC="us"
 MODE="download"
@@ -111,8 +112,18 @@ function determine_target_arch_and_stage() {
 }
 
 function determine_images_for_x86_64() {
-    local stage="$1" # Build stage, base/cyber/dev
-    local dist="$2"  # stable or testing
+    local stage="$1" # base/cyber/dev
+    local dist="$2"  # stable/testing
+    local cyber_image_timestamp="$3" # cyber image timestamp
+
+    if [[ "${stage}" == "dev" && -z "${cyber_image_timestamp}" ]]
+    then
+        if [[ "${dist}" == "stable" ]]; then
+            cyber_image_timestamp="20210202_1105"
+        else
+            cyber_image_timestamp="20210108_1510"
+        fi
+    fi
 
     CUDA_LITE=11.1
     CUDNN_VERSION="8.0.4.30"
@@ -134,10 +145,10 @@ function determine_images_for_x86_64() {
         fi
     elif [[ "${stage}" == "dev" ]]; then
         if [[ "${dist}" == "stable" ]]; then
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-20210202_1105"
+            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-${cyber_image_timestamp}"
             IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-${TIMESTAMP}"
         else
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-20210108_1510"
+            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-${cyber_image_timestamp}"
             IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-testing-${TIMESTAMP}"
         fi
     else
@@ -147,7 +158,15 @@ function determine_images_for_x86_64() {
 }
 
 function determine_images_for_aarch64() {
-    local stage="$1"
+    local stage="$1" # base/cyber/dev
+    local dist="$2"  # stable/testing
+    local cyber_image_timestamp="$3" # cyber image timestamp
+
+    if [[ "${stage}" == "dev" && -z "${cyber_image_timestamp}" ]]
+    then
+        cyber_image_timestamp="20201217_1302"
+    fi
+
     CUDA_LITE="10.2"
     CUDNN_VERSION="8.0.0.180"
     TENSORRT_VERSION="7.1.3"
@@ -165,7 +184,7 @@ function determine_images_for_aarch64() {
         IMAGE_IN="${APOLLO_REPO}:${BASE_FMT}-20201217_0752"
         IMAGE_OUT="${APOLLO_REPO}:${CYBER_FMT}-${TIMESTAMP}"
     elif [[ "${stage}" == "dev" ]]; then
-        IMAGE_IN="${APOLLO_REPO}:${CYBER_FMT}-20201217_1302"
+        IMAGE_IN="${APOLLO_REPO}:${CYBER_FMT}-${cyber_image_timestamp}"
         IMAGE_OUT="${APOLLO_REPO}:dev-aarch64-${UBUNTU_LTS}-${TIMESTAMP}"
     else
         echo "Unknown build stage: ${stage}. Exiting..."
@@ -178,12 +197,13 @@ function print_usage() {
     echo "Usage:"
     echo "${TAB}${prog} -f <Dockerfile> [Options]"
     echo "Available options:"
-    echo "${TAB}-c,--clean  Use \"--no-cache=true\" for docker build"
-    echo "${TAB}-m,--mode   \"build\" for build everything from source if possible, \"download\" for using prebuilt ones"
-    echo "${TAB}-g,--geo    Enable geo-specific mirrors to speed up build. Currently \"cn\" and \"us\" are supported."
-    echo "${TAB}-d,--dist   Whether to build stable(\"stable\") or experimental(\"testing\") Docker images"
-    echo "${TAB}--dry       Dry run (for testing purpose)"
-    echo "${TAB}-h,--help   Show this message and exit"
+    echo "${TAB}-c,--clean      Use \"--no-cache=true\" for docker build"
+    echo "${TAB}-m,--mode       \"build\" for build everything from source if possible, \"download\" for using prebuilt ones"
+    echo "${TAB}-g,--geo        Enable geo-specific mirrors to speed up build. Currently \"cn\" and \"us\" are supported."
+    echo "${TAB}-d,--dist       Whether to build stable(\"stable\") or experimental(\"testing\") Docker images"
+    echo "${TAB}-t,--timestamp  Specify Cyber image timestamp to build Dev image from it. Format: yyyymmdd_hhmm (e.g 20210205_1520)"
+    echo "${TAB}--dry           Dry run (for testing purpose)"
+    echo "${TAB}-h,--help       Show this message and exit"
     echo "E.g.,"
     echo "${TAB}${prog} -f cyber.x86_64.dockerfile -m build -g cn"
     echo "${TAB}${prog} -f dev.aarch64.dockerfile -m download -d testing"
@@ -228,6 +248,11 @@ function parse_arguments() {
             -d|--dist)
                 check_opt_arg "${opt}" "$1"
                 DIST="$1"
+                shift
+                ;;
+            -t|--timestamp)
+                check_opt_arg "${opt}" "$1"
+                CYBER_IMAGE_TIMESTAMP="$1"
                 shift
                 ;;
             --dry)
@@ -313,9 +338,9 @@ function main() {
     check_arguments
     check_experimental_docker
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-        determine_images_for_x86_64 "${TARGET_STAGE}" "${DIST}"
+        determine_images_for_x86_64 "${TARGET_STAGE}" "${DIST}" "${CYBER_IMAGE_TIMESTAMP}"
     elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-        determine_images_for_aarch64 "${TARGET_STAGE}" "${DIST}"
+        determine_images_for_aarch64 "${TARGET_STAGE}" "${DIST}" "${CYBER_IMAGE_TIMESTAMP}"
     fi
     docker_build_preview
     if [[ "${DRY_RUN}" -eq 0 ]]; then
