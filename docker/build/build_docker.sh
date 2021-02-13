@@ -186,7 +186,7 @@ function print_usage() {
     echo "${TAB}-h,--help   Show this message and exit"
     echo "E.g.,"
     echo "${TAB}${prog} -f cyber.x86_64.dockerfile -m build -g cn"
-    echo "${TAB}${prog} -f dev.aarch64.dockerfile -m download -b testing"
+    echo "${TAB}${prog} -f dev.aarch64.dockerfile -m download -d testing"
 }
 
 function check_opt_arg() {
