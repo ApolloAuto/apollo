@@ -24,47 +24,31 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 TARGET_ARCH="$(uname -m)"
 
-if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-    VERSION="11.1.74-1"
-else
-    VERSION="10.2.89-1"
-fi
+MAIN_VER_DOT="${CUDA_VERSION%.*}"
+CUDA_SAMPLES="cuda-samples"
 
-MAIN_VER_DOT="${VERSION%.*}"
-DEMO_SUITE_DEST_DIR="/usr/local/cuda-${MAIN_VER_DOT}/extras/demo_suite"
+git clone -b v${MAIN_VER_DOT} --single-branch https://github.com/NVIDIA/${CUDA_SAMPLES}.git ${CUDA_SAMPLES}
+pushd ${CUDA_SAMPLES}/Samples/deviceQuery/
+    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        make
+    elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+        make TARGET_ARCH=aarch64
+    else
+        error "Support for ${TARGET_ARCH} not ready yet."
+        exit 1
+    fi
 
-if [[ -x "${DEMO_SUITE_DEST_DIR}/deviceQuery" ]]; then
-    info "Found existing deviceQuery under ${DEMO_SUITE_DEST_DIR}, do nothing."
-    exit 0
-fi
+    DEMO_SUITE_DEST_DIR="/usr/local/cuda-${MAIN_VER_DOT}/extras/demo_suite"
 
-# VERSION="10.2.89-1"
-function main_cuda_version() {
-    local ver="${1%.*}"
-    echo "${ver//./-}"
-}
+    if [[ -x "${DEMO_SUITE_DEST_DIR}/deviceQuery" ]]; then
+        info "Found existing deviceQuery under ${DEMO_SUITE_DEST_DIR}, do nothing."
+        exit 0
+    fi
 
-MAIN_VER="$(main_cuda_version ${VERSION})"
-DEVICE_QUERY_BINARY=
-CHECKSUM=
-
-if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-    DEVICE_QUERY_BINARY="deviceQuery-${MAIN_VER}_${VERSION}_amd64.bin"
-    CHECKSUM="da573cc68ad5fb227047064d73123a8a966df35be19b68163338b6dc0d576c84"
-elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-    DEVICE_QUERY_BINARY="deviceQuery-${MAIN_VER}_${VERSION}_arm64.bin"
-    CHECKSUM="fe55e0da8ec20dc13e778ddf7ba95bca45efd51d8f4e6c4fd05f2fb9856f4ac8"
-else
-    error "Support for ${TARGET_ARCH} not ready yet."
-    exit 1
-fi
-
-DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${DEVICE_QUERY_BINARY}"
-download_if_not_cached "${DEVICE_QUERY_BINARY}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-[[ -d "${DEMO_SUITE_DEST_DIR}" ]] || mkdir -p "${DEMO_SUITE_DEST_DIR}"
-cp ${DEVICE_QUERY_BINARY} "${DEMO_SUITE_DEST_DIR}/deviceQuery"
-chmod a+x "${DEMO_SUITE_DEST_DIR}/deviceQuery"
+    [[ -d "${DEMO_SUITE_DEST_DIR}" ]] || mkdir -p "${DEMO_SUITE_DEST_DIR}"
+    cp deviceQuery "${DEMO_SUITE_DEST_DIR}/"
+    chmod a+x "${DEMO_SUITE_DEST_DIR}/deviceQuery"
+popd
 
 # clean up
-rm -rf "${DEVICE_QUERY_BINARY}"
+rm -rf "${CUDA_SAMPLES}"
