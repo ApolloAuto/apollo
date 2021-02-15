@@ -32,7 +32,7 @@ apt_get_update_and_install \
 # Build doxygen from source to reduce image size
 VERSION="1.9.1"
 PKG_NAME="doxygen-${VERSION}.src.tar.gz"
-CHECKSUM="da8a393b7f8b7442653475a0a4bc6eaa9ce60623440d14a82fef4e8d99da4b85"
+CHECKSUM="67aeae1be4e1565519898f46f1f7092f1973cce8a767e93101ee0111717091d1"
 DOWNLOAD_LINK="http://doxygen.nl/files/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
