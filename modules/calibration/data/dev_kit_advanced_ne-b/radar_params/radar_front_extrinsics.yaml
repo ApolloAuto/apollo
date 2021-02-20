@@ -3,7 +3,7 @@ header:
   stamp:
     secs: 0
     nsecs: 0
-  frame_id: velodyne128
+  frame_id: lidar16
 transform:
   rotation:
     x: 0.0
