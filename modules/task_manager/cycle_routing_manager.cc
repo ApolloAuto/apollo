@@ -61,7 +61,7 @@ bool CycleRoutingManager::GetNewRouting(const localization::Pose &pose,
         begin_point_.pose(),
         pose.position(),
         FLAGS_threshold_for_destination_check)) {
-      AINFO << "GetNewRouting: reach begin point"
+      AINFO << "GetNewRouting: reach begin point. "
       << "Remaining cycles: " << cycle_;
       new_routing_request->CopyFrom(original_routing_request_);
       auto cur_point = new_routing_request->mutable_waypoint(0);
