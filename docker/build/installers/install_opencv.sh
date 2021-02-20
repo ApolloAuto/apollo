@@ -18,8 +18,8 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-. ./installer_base.sh
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
 if ldconfig -p | grep -q libopencv_core; then
     info "OpenCV was already installed"
@@ -88,11 +88,19 @@ else
 fi
 
 if [ "${BUILD_CONTRIB}" = "yes" ]; then
+    FACE_MODEL_DATA="face_landmark_model.dat"
+    CHECKSUM="eeab592db2861a6c94d592a48456cf59945d31483ce94a6bc4d3a4e318049ba3"
+    DOWNLOAD_LINK="https://raw.githubusercontent.com/opencv/opencv_3rdparty/8afa57abc8229d611c4937165d20e2a2d9fc5a12/${FACE_MODEL_DATA}"
+    download_if_not_cached "${FACE_MODEL_DATA}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
     PKG_CONTRIB="opencv_contrib-${VERSION}.tar.gz"
     CHECKSUM="a69772f553b32427e09ffbfd0c8d5e5e47f7dab8b3ffc02851ffd7f912b76840"
     DOWNLOAD_LINK="https://github.com/opencv/opencv_contrib/archive/${VERSION}.tar.gz"
     download_if_not_cached "${PKG_CONTRIB}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_CONTRIB}
+
+    sed -i "s|https://raw.githubusercontent.com/opencv/opencv_3rdparty/.*|file://${CURR_DIR}/\"|g" \
+        opencv_contrib-${VERSION}/modules/face/CMakeLists.txt
 fi
 
 TARGET_ARCH="$(uname -m)"
@@ -104,13 +112,13 @@ fi
 
 if [ "${BUILD_CONTRIB}" = "yes" ]; then
     EXTRA_OPTIONS="${EXTRA_OPTIONS} -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-${VERSION}/modules"
-else 
+else
     EXTRA_OPTIONS="${EXTRA_OPTIONS} -DBUILD_opencv_world=OFF"
 fi
 
 # -DBUILD_LIST=core,highgui,improc
 pushd "opencv-${VERSION}"
-    [[ ! -e build ]] && mkdir build 
+    [[ ! -e build ]] && mkdir build
     pushd build
         cmake .. \
             -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
@@ -156,6 +164,9 @@ ldconfig
 ok "Successfully installed OpenCV ${VERSION}."
 
 rm -rf opencv*
+if [[ "${BUILD_CONTRIB}" == "yes" ]]; then
+    rm -rf ${CURR_DIR}/${FACE_MODEL_DATA}
+fi
 
 if [[ -n "${CLEAN_DEPS}" ]]; then
     apt_get_remove \
