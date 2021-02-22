@@ -1,4 +1,4 @@
-model_type : "CaffeNet"
+model_type : "RTNet"
 proto_file : "deploy_new.pt"
 weight_file : "deploy_new.caffemodel"
 input_blob : "roi_feature"
