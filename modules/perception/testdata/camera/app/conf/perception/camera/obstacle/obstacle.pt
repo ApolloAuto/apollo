@@ -28,13 +28,6 @@ postprocessor_param {
     config_file: "config.pt"
   }
 }
-#feature_param {
-# plugin_param{
-#    name: "ProjectFeature"
-#    root_dir: "/apollo/modules/perception/production/data/perception/camera/models/external_feature_extractor"
-#    config_file: "config.pt"
-#  }
-#}
 lane_param {
   lane_detector_param {
     plugin_param {

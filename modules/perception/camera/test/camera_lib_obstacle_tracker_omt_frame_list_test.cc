@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "gtest/gtest.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 
@@ -101,7 +102,7 @@ TEST(FrameListTest, FrameList_test) {
   ASSERT_FALSE(frame_list.Init(-1));
   ASSERT_TRUE(frame_list.Init(5));
   ASSERT_EQ(frame_list.OldestFrameId(), 0);
-  std::vector<CameraFrame> frames(6);
+  apollo::common::EigenVector<CameraFrame> frames(6);
   for (int i = 0; i < 6; i++) {
     frames[i].frame_id = i;
     frame_list.Add(&frames[i]);

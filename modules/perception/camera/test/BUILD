@@ -8,34 +8,38 @@ cc_test(
     size = "medium",
     srcs = ["camera_app_obstacle_camera_perception_test.cc"],
     deps = [
+        "//modules/common/util:eigen_defs",
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
-#cc_test(
-#    name = "camera_app_traffic_light_camera_perception_test",
-#    srcs = ["camera_app_traffic_light_camera_perception_test.cc"],
-#    deps = [
-#        "//modules/perception/camera/app:traffic_light_camera_perception",
-#        "//modules/perception/inference:inference_factory",
-#        "//modules/perception/inference/operators:perception_inference_operators",
-#        "@caffe",
-#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-#        "@com_google_googletest//:gtest_main",
-#        "@com_google_protobuf//:protobuf",
-#        "@opencv",
-#        "@local_config_tensorrt//:tensorrt",
-#    ],
-#)
+# cc_test(
+#     name = "camera_app_traffic_light_camera_perception_test",
+#     srcs = ["camera_app_traffic_light_camera_perception_test.cc"],
+#     deps = [
+#         "//modules/perception/camera/app:traffic_light_camera_perception",
+#         "//modules/perception/inference:inference_factory",
+#         "//modules/perception/inference/operators:perception_inference_operators",
+#         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#         "@com_google_googletest//:gtest_main",
+#         "@com_google_protobuf//:protobuf",
+#         "@opencv//:imgcodecs",
+#         "@opencv//:imgproc",
+#         "@opencv//:highgui",
+#         "@local_config_tensorrt//:tensorrt",
+#     ],
+# )
+
 cc_test(
     name = "camera_common_camera_ground_plane_test",
     size = "small",
@@ -64,12 +68,13 @@ cc_test(
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -82,12 +87,13 @@ cc_test(
         "//modules/perception/common/i_lib/algorithm:i_sort",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -97,9 +103,11 @@ cc_library(
     hdrs = ["camera_common_undistortion.h"],
     deps = [
         "//modules/perception/base",
-        "//third_party:boost",
+        "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -134,12 +142,13 @@ cc_test(
         "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -151,12 +160,13 @@ cc_test(
         "//modules/perception/camera/common:object_template_manager",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -192,8 +202,10 @@ cc_library(
     deps = [
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
-        "//third_party:boost",
-        "@opencv",
+        "@boost",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -205,7 +217,9 @@ cc_library(
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
         "@eigen",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -281,7 +295,9 @@ cc_test(
         "//modules/perception/common/io:io_util",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -295,13 +311,15 @@ cc_test(
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/common/io:io_util",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
 cc_test(
     name = "camera_lib_lane_postprocessor_denseline_lane_postprocessor_test",
-    size = "small",
+    size = "medium",
     srcs = ["camera_lib_lane_postprocessor_denseline_lane_postprocessor_test.cc"],
     deps = [
         "//cyber",
@@ -313,7 +331,9 @@ cc_test(
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -327,7 +347,9 @@ cc_test(
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/common/io:io_util",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -337,6 +359,7 @@ cc_test(
     srcs = ["camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test.cc"],
     deps = [
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
@@ -346,7 +369,9 @@ cc_test(
         "//modules/perception/camera/tools/offline:visualizer",
         "//modules/perception/common/io:io_util",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -375,7 +400,9 @@ cc_test(
         "//modules/perception/inference/utils:inference_util_lib",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -415,6 +442,7 @@ cc_test(
     size = "small",
     srcs = ["camera_lib_obstacle_tracker_omt_frame_list_test.cc"],
     deps = [
+        "//modules/common/util:eigen_defs",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
         "@com_google_googletest//:gtest_main",
@@ -484,7 +512,9 @@ cc_test(
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@com_google_googletest//:gtest_main",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -494,13 +524,14 @@ cc_test(
     srcs = ["camera_lib_traffic_light_detector_crop_test.cc"],
     deps = [
         "//modules/perception/camera/lib/traffic_light/detector/detection:cropbox",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_cuda//cuda",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -543,13 +574,14 @@ cc_test(
         "//modules/perception/camera/lib/traffic_light/detector/detection:select",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -582,12 +614,13 @@ cc_test(
         "//modules/perception/common/io:io_util",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -602,7 +635,9 @@ cc_test(
         "//modules/perception/common/io:io_util",
         "@com_google_googletest//:gtest_main",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
