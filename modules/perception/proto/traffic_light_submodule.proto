@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.perception;
 
-message TrafficLight {
+message TrafficLightParam {
   optional string tl_tf2_frame_id = 1 [default = "world"];
   optional string tl_tf2_child_frame_id = 2
       [default = "perception_localization_100hz"];

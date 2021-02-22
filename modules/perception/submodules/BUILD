@@ -32,6 +32,7 @@ cc_library(
         ":camera_detection_submodule",
         ":lane_detection_submodule",
         ":motion_submodule",
+        ":traffic_light_submodule",
     ],
     alwayslink = True,
 )
@@ -118,6 +119,38 @@ cc_library(
         "//modules/perception/camera/lib/motion",
         "//modules/perception/lib/registerer",
         "//modules/perception/proto:motion_service_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "traffic_light_submodule",
+    srcs = ["traffic_light_submodule.cc"],
+    hdrs = ["traffic_light_submodule.h"],
+    deps = [
+        ":common_flags",
+        ":transform_wrapper",
+        "//cyber",
+        "//modules/common/math:math_utils",
+        "//modules/common/util:util",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/map/proto:map_geometry_cc_proto",
+        "//modules/map/proto:map_signal_cc_proto",
+        "//modules/perception/camera/app:traffic_light_camera_perception",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/map/hdmap:hdmap_input",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/perception/proto:traffic_light_submodule_cc_proto",
+        "//modules/transform:buffer",
+        "//modules/transform/proto:transform_cc_proto",
+        "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/v2x/proto:v2x_traffic_light_cc_proto",
+        "@boost",
+        "@com_google_absl//absl/strings",
+        "@opencv//:highgui",
+        "@opencv//:imgproc",
     ],
 )
 
