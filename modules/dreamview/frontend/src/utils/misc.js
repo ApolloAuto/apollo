@@ -95,7 +95,7 @@ export function IsPointInRectangle(points, p) {
   return isPointIn;
 }
 
-export function pointWithDirectionVector(p, p1, p2) {
+export function pointOnVectorRight(p, p1, p2) {
   const p1p2 = {
     x: p2.x - p1.x,
     y: p2.y - p1.y,
@@ -104,11 +104,11 @@ export function pointWithDirectionVector(p, p1, p2) {
     x: p.x - p1.x,
     y: p.y - p1.y,
   };
-  return (directionVectorCrossProduct(p1p, p1p2)) > 0;
+  return (directionVectorCrossProduct(p1p2, p1p)) < 0;
 }
 
 export function directionVectorCrossProduct(p1, p2, abs = false) {
-  //p1*p2
+  //p1 X p2
   let crossProduct = p1.x * p2.y - p1.y * p2.x;
   if (abs) {
     crossProduct = Math.abs(crossProduct);
@@ -116,20 +116,85 @@ export function directionVectorCrossProduct(p1, p2, abs = false) {
   return crossProduct;
 }
 
-export function getIntersectionPoint(line1, line2) {
-  // sure solution
-  // a1x+b1y+c1=0  a2x+b2y+c2=0
-  const denominator = line2.a * line1.b - line2.b * line1.a;
+function directionVectorDotProduct(p1, p2) {
+  // The same direction :p1·p2 >0 The opposite direction: <0
+  return p1.x * p2.x + p1.y * p2.y;
+}
+
+export function getIntersectionPoint(p0, p1, p2) {
+  // Projection of point p on vector p1p2(p1->p2)
+  const vector12 = {
+    x: p2.x - p1.x,
+    y: p2.y - p1.y,
+  };
+  const normalizeVector12 = {
+    x: vector12.x / Math.hypot(vector12.x, vector12.y),
+    y: vector12.y / Math.hypot(vector12.x, vector12.y),
+  };
+  const vector10 = {
+    x: p0.x - p1.x,
+    y: p0.y - p1.y,
+  };
+  const vectorLength = Math.abs(directionVectorDotProduct(vector10, normalizeVector12));
+  const vector1p = {
+    x: normalizeVector12.x * vectorLength,
+    y: normalizeVector12.y * vectorLength,
+  };
   return {
-    x: (line1.c * line2.b - line2.c * line1.b) / denominator,
-    y: (line1.c * line2.a - line2.c * line1.a) / denominator,
+    x: vector1p.x + p1.x,
+    y: vector1p.y + p1.y,
   };
 }
 
-export function getLineEquation(normalVector, point) {
-  return {
-    a: normalVector.x,
-    b: normalVector.y,
-    c: -1 * (normalVector.x * point.x + normalVector.y * point.y),
-  };
+export function getPointDistance(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+export function directionSameWithVector(p0, p1,vector) {
+  return directionVectorDotProduct(vector, {
+    x: p1.x - p0.x,
+    y: p1.y - p0.y,
+  }) > 0;
+}
+
+function getPointInFrontOf(points, p,vector) {
+  return _.findIndex(points, point =>
+    directionVectorDotProduct({
+      x: point.x - p.x,
+      y: point.y - p.y
+    }, vector) > 0);
+}
+
+function getPointBehind(points, p, vector) {
+  return  _.findLastIndex(points, point =>
+    directionVectorDotProduct({
+      x: p.x - point.x,
+      y: p.y - point.y
+    }, vector) > 0);
+}
+
+export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector) {
+  let index = getPointInFrontOf(points, p, vector);
+  if (index !== -1) {
+    while (index <= points.length - 1) {
+      if (getPointDistance(p, points[index]) >= threshold) {
+        break;
+      }
+      index++;
+    }
+  }
+  return index;
+}
+
+export function getBehindPointIndexDistanceApart(threshold, points, p, vector) {
+  let index = getPointBehind(points, p, vector);
+  if (index !== -1) {
+    while (index >= 0) {
+      if (getPointDistance(p, points[index]) >= threshold) {
+        break;
+      }
+      index--;
+    }
+  }
+  return index;
 }

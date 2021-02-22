@@ -17,8 +17,8 @@ message CycleRoutingTask {
 }
 
 message ParkingRoutingTask {
-  repeated apollo.routing.LaneWaypoint routing_point = 1;
-  optional apollo.hdmap.ParkingSpace parking_space = 2;
+  optional double lane_width = 1;
+  optional apollo.routing.RoutingRequest routing_request = 2;
 } 
 
 message Task {

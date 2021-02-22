@@ -495,9 +495,9 @@ class Renderer {
     if (removeOldMap) {
       this.map.removeAllElements(this.scene);
     }
-    const adjustOrder = this.map.appendMapData(newData, this.coordinates, this.scene);
-    if (newData['parkingSpace'] && !_.isEmpty(adjustOrder)) {
-      this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], adjustOrder, this.coordinates);
+    const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
+    if (newData['parkingSpace'] && !_.isEmpty(extraInfo)) {
+      this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], extraInfo, this.coordinates,this.scene);
     }
   }
 

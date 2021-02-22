@@ -38,8 +38,8 @@ using apollo::hdmap::EndWayPointFile;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
 using apollo::task_manager::CycleRoutingTask;
-using apollo::task_manager::Task;
 using apollo::task_manager::ParkingRoutingTask;
+using apollo::task_manager::Task;
 
 using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
@@ -367,6 +367,15 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
+      "GetParkingRoutingDistance",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "ParkingRoutingDistance";
+        response["threshold"] = FLAGS_parking_routing_distance_threshold;
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
       "RequestPreprocessProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
@@ -510,6 +519,23 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
              << json["parkingInfo"].dump();
       return false;
     }
+    if (ContainsKey(json, "cornerPoints")) {
+      auto point_iter = json.find("cornerPoints");
+      auto *points =
+          requested_parking_info->mutable_corner_point()->mutable_point();
+      if (point_iter != json.end() && point_iter->is_array()) {
+        for (size_t i = 0; i < point_iter->size(); ++i) {
+          auto &point = (*point_iter)[i];
+          auto *p = points->Add();
+          if (!ValidateCoordinate(point)) {
+            AERROR << "Failed to add a corner point: invalid corner point.";
+            return false;
+          }
+          p->set_x(static_cast<double>(point["x"]));
+          p->set_y(static_cast<double>(point["y"]));
+        }
+      }
+    }
   }
 
   AINFO << "Constructed RoutingRequest to be sent:\n"
@@ -520,39 +546,20 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
 bool SimulationWorldUpdater::ConstructParkingRoutingTask(
     const Json &json, ParkingRoutingTask *parking_routing_task) {
-  parking_routing_task->clear_routing_point();
+  auto *routing_request = parking_routing_task->mutable_routing_request();
   // set parking Space
-  if (!ContainsKey(json, "parkingSpace")) {
+  if (!ContainsKey(json, "laneWidth")) {
     AERROR << "Failed to prepare a parking routing task: "
-           << "parking space not found.";
+           << "lane width not found.";
     return false;
   }
-  auto *requested_parking_space = parking_routing_task->mutable_parking_space();
-  if (!JsonStringToMessage(json["parkingSpace"].dump(), requested_parking_space)
-           .ok()) {
-    AERROR << "Failed to prepare a parking routing task: invalid parking space."
-           << json["parkingSpace"].dump();
-    return false;
+  bool succeed = ConstructRoutingRequest(json, routing_request);
+  if (succeed) {
+    parking_routing_task->set_lane_width(
+        static_cast<double>(json["laneWidth"]));
+    return true;
   }
-  auto iter = json.find("points");
-  if (iter == json.end() || !iter->is_array()) {
-    AERROR << "Failed to prepare a parking routing task: invalid points.";
-    return false;
-  }
-  auto *routing_point = parking_routing_task->mutable_routing_point();
-  for (size_t i = 0; i < iter->size(); ++i) {
-    auto &point = (*iter)[i];
-    if (!ValidateCoordinate(point)) {
-      AERROR << "Failed to prepare a parking routing task: invalid point.";
-      return false;
-    }
-    if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
-                                             routing_point->Add())) {
-      AERROR << "Failed to construct a LaneWayPoint, skipping.";
-      routing_point->RemoveLast();
-    }
-  }
-  return true;
+  return false;
 }
 
 bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
