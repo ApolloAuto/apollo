@@ -44,6 +44,7 @@ install(
     targets = ["dreamview"],
     deps = [
         "//cyber:install",
+        "//modules/calibration:install",
         "//modules/common/data:install",
     ],
 )
