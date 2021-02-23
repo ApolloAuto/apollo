@@ -23,7 +23,7 @@
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
-#include "modules/perception/onboard/msg_serializer/msg_serializer.h"
+#include "modules/perception/submodules/msg_serializer.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -117,7 +117,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   // semantic map
   apollo::prediction::ObstaclesContainer obstacle_container_;
   apollo::prediction::PoseContainer pose_container_;
-  apollo::perception::onboard::MsgSerializer serializer_;
+  apollo::perception::MsgSerializer serializer_;
   bool use_semantic_map_ = false;
 //  apollo::perception::EvaluatorManager evaluator_;
 };
