@@ -8,7 +8,17 @@ install(
     name = "install",
     data = [
         ":apollo_base",
+        ":bootstrap",
         ":docker_utils",
+    ],
+)
+
+filegroup(
+    name = "bootstrap",
+    srcs = [
+        "bootstrap.sh",
+        "dreamview.sh",
+        "monitor.sh",
     ],
 )
 
@@ -23,7 +33,7 @@ filegroup(
     name = "apollo_base",
     srcs = [
         "apollo.bashrc",
-        "common.bashrc",
         "apollo_base.sh",
+        "common.bashrc",
     ],
 )

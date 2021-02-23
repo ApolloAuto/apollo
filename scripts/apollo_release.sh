@@ -147,7 +147,7 @@ function main() {
     fi
 
     info "Resolve directory path for Apollo binary distribution..."
-    find "${PREFIX_DIR}" -name "*.dag" -exec \
+    find "${PREFIX_DIR}" \( -name "*.dag" -or -name "*.launch" \) -exec \
         sed -i 's@/apollo/bazel-bin@/apollo@g' {} \;
     ok "Done."
     if [[ "${RESOLVE_DEPS}" -gt 0 ]]; then

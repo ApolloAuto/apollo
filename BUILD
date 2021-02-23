@@ -17,6 +17,7 @@ install(
         "//docker/scripts:install",
         "//modules/audio:install",
         "//modules/canbus:install",
+        "//modules/common/data:install",
         "//modules/control:install",
         "//modules/dreamview:install",
         "//modules/drivers/camera:install",
