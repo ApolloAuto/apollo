@@ -81,6 +81,7 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
   while (cycle_routing_manager_->GetCycle() > 0) {
     if (routing_response_.status().error_code() != ErrorCode::OK) {
       AINFO << "[TaskManagerComponent]Routing request fail.";
+      routing_response_.Clear();
       return false;
     }
     if (cycle_routing_manager_->GetNewRouting(localization_.pose(),
