@@ -29,6 +29,8 @@ namespace drivers {
 namespace canbus {
 namespace can {
 
+#define CAN_ID_MASK 0x1FFFF800U  // can_filter mask
+
 using apollo::common::ErrorCode;
 
 bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
@@ -79,11 +81,10 @@ ErrorCode SocketCanClientRaw::Start() {
 
   // 1. for non virtual busses, set receive message_id filter, ie white list
   if (interface_ != CANCardParameter::VIRTUAL) {
-    struct can_filter filter[2048];
-    for (int i = 0; i < 2048; ++i) {
-      filter[i].can_id = 0x000 + i;
-      filter[i].can_mask = CAN_SFF_MASK;
-    }
+    // set a scope for each EID instead of a single filter rule for each EID
+    struct can_filter filter[1];
+    filter[0].can_id = 0x000;
+    filter[0].can_mask = CAN_ID_MASK;
 
     ret = setsockopt(dev_handler_, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
                      sizeof(filter));
