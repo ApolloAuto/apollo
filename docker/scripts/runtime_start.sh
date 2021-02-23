@@ -312,8 +312,8 @@ function main() {
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
 
-    # mount_map_volumes
-    # mount_other_volumes
+    mount_map_volumes
+    mount_other_volumes
 
     info "Starting docker container \"${RUNTIME_CONTAINER}\" ..."
 
@@ -338,6 +338,8 @@ function main() {
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
+        ${MAP_VOLUMES_CONF} \
+        ${OTHER_VOLUMES_CONF} \
         ${local_volumes} \
         --net host \
         -w /apollo \
