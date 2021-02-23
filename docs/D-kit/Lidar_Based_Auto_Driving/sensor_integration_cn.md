@@ -35,7 +35,8 @@
  - 完成了[循迹搭建--车辆循迹演示](../Waypoint_Following/start_waypoint_following_cn.md)
   
 ## 激光雷达安装与数据验证
-
+ 
+ **注意：** 针对Standard、Advanced用户，激光雷达默认已集成好，直接从`激光雷达数据的验证`章节开始进行数据验证即可
  - 激光雷达型号：80-VLP-16（velodyne 16线激光雷达）
  
  - 更多详细参数可参考：[https://velodynelidar.com/vlp-16.html](https://velodynelidar.com/vlp-16.html)
@@ -43,7 +44,7 @@
 ![lidar_integration_look](images/lidar_integration_look.png)
 
 ### 激光雷达的安装固定
- 
+
  - 16线激光雷达要牢靠固定安装在车顶部，建议激光雷达对地高度1.5～1.8米，水平放置，精度在2度以内。安装位置如下图：
  
 ![lidar_integration_installation](images/lidar_integration_installation.png)
@@ -51,6 +52,7 @@
  - 安装激光雷达时线缆方向朝向车辆的正后方。
 
 ### 激光雷达与车辆的接线
+
 
 请按照以下步骤进行激光雷达一拖三线缆的安装。
 
@@ -98,7 +100,8 @@
 
  - 请务必再次确认正确执行了上述安装步骤，电源线接反会烧毁激光雷达，确认无误后才可以上电，至此激光雷达线束接线完成
 
-### 激光雷达的配置及启动
+### 激光雷达的配置
+
  
 #### 1.修改工控机IP地址
 
@@ -123,7 +126,14 @@
 
 ####  2. 启动所需模块
 
-- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动GPS、Localization、Transform模块。
+- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 根据车辆铭牌信息选择对应的车型(详情见下表)，在Module Controller标签页启动GPS、Localization、Transform模块。
+
+  | 铭牌信息 | 车型选择 | 
+	|---|---|
+	| Apollo D-KIT Lite | dev_kit |
+	| Apollo D-KIT Standard  | dev_kit_standard |
+	| Apollo D-KIT Advanced(NE-S)| dev_kit_advanced_ne-s |
+	| Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r  |
 
   ![lidar_adaption_start_localization](images/lidar_adaption_start_localization.png)
 
@@ -136,11 +146,27 @@
  
 ####  3. 检查lidar数据是否正确
 
- - 使用`cyber_monitor`，查看是否有`/apollo/sensor/lidar16/PointCloud2`、`/apollo/sensor/lidar16/Scan`、`/apollo/sensor/lidar16/compensator/PointCloud2`三个channel，并使用上下方向键选择channel，使用右方向键查看channel详细数据，数据无异常则说明激光雷达适配成功
+ - 使用`cyber_monitor`，查看激光雷达数据是否正常输出，并使用上下方向键选择channel，使用右方向键查看channel详细数据，数据无异常则说明激光雷达适配成功
  
-    ![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
+- 单激光雷达用户用户，请检查如下channel是否正常输出
 
-    ![lidar_integration_channel](images/lidar_integration_channel.png)
+  |序号 | channel | 帧率 | 
+  |---|---|---|
+  |  1 | `/apollo/sensor/lidar16/PointCloud2` | 10Hz |
+  |  2 | `/apollo/sensor/lidar16/Scan` | 10Hz |
+  |  3 | `/apollo/sensor/lidar16/compensator/PointCloud2` | 10Hz |
+ 
+![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
+
+- 三激光雷达用户用户，请检查如下channel是否正常输出
+
+  |序号 | channel | 帧率 | 
+  |---|---|---|
+  |  1 | `/apollo/sensor/lidar16/back/PointCloud2` | 10Hz |
+  |  2 | `/apollo/sensor/lidar16/left/PointCloud2` | 10Hz |
+  |  3 | `/apollo/sensor/lidar16/right/PointCloud2` | 10Hz |
+  |  4 | `/apollo/sensor/lidar16/fusion/PointCloud2` | 10HZ |
+  |  5 | `/apollo/sensor/lidar16/compensator/PointCloud2` | 10Hz |
 
 ## 毫米波雷达安装与数据验证(根据自身需求配置)
  **注意：** 在目前的感知方案中，没有融合毫米波雷达数据，对于没有二次开发需求的用户可以不配置毫米波；对于有二次开发需求的用户，可按照本章节内容配置毫米波雷达
