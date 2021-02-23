@@ -179,6 +179,9 @@ cc_library(
     copts = PERCEPTION_COPTS,
     deps = [
         ":lidar_detection_submodule",
+        ":lidar_segmentation_submodule",
+        ":lidar_tracking_submodule",
+        ":fusion_submodule",
     ],
     alwayslink = True,
 )
@@ -198,6 +201,83 @@ cc_library(
         "//modules/perception/lidar/app:lidar_obstacle_detection",
         "//modules/perception/lidar/common",
         "//modules/perception/proto:lidar_submodule_config_cc_proto",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "lidar_segmentation_submodule",
+    srcs = ["lidar_segmentation_submodule.cc"],
+    hdrs = ["lidar_segmentation_submodule.h"],
+    deps = [
+        ":common_flags",
+        ":lidar_inner_submodule_messages",
+        ":transform_wrapper",
+        "//cyber/time:clock",
+        "//modules/common/util:string_util",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/app:lidar_obstacle_segmentation",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/lidar/lib/object_builder",
+        "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
+        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
+        "//modules/perception/lidar/lib/scene_manager/ground_service",
+        "//modules/perception/lidar/lib/scene_manager/roi_service",
+        "//modules/perception/lidar/lib/segmentation/cnnseg:cnn_segmentation",
+        "//modules/perception/lidar/lib/segmentation/ncut:ncut_segmentation",
+        "//modules/perception/proto:lidar_submodule_config_cc_proto",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "lidar_tracking_submodule",
+    srcs = [
+        "lidar_tracking_submodule.cc",
+    ],
+    hdrs = [
+        "lidar_tracking_submodule.h",
+    ],
+    deps = [
+        ":lidar_inner_submodule_messages",
+        "//cyber/time:clock",
+        "//modules/common/util:perf_util",
+        "//modules/perception/base",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/app:lidar_obstacle_tracking",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
+        "//modules/perception/proto:lidar_submodule_config_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "fusion_submodule",
+    srcs = ["fusion_submodule.cc"],
+    hdrs = ["fusion_submodule.h"],
+    deps = [
+        ":common_flags",
+        ":inner_submodule_messages",
+        ":msg_serializer",
+        "//cyber/time:clock",
+        "//modules/common/util:perf_util",
+        "//modules/perception/base",
+        "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",
+        "//modules/perception/fusion/lib/dummy:dummy_algorithms",
+        "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
+        "//modules/perception/fusion/lib/interface",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/lib/classifier/fused_classifier",
+        "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
+        "//modules/perception/map/hdmap:hdmap_input",
+        "//modules/perception/proto:fusion_submodule_config_cc_proto",
         "@eigen",
     ],
 )
@@ -237,6 +317,20 @@ cc_library(
         "//modules/perception/common/sensor_manager",
         "//modules/transform:buffer",
         "@com_github_gflags_gflags//:gflags",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "msg_serializer",
+    srcs = ["msg_serializer.cc"],
+    hdrs = ["msg_serializer.h"],
+    deps = [
+        ":common_flags",
+        "//cyber/time:clock",
+        "//modules/perception/base",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/prediction/proto:feature_cc_proto",
         "@eigen",
     ],
 )
