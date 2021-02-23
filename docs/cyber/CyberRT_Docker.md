@@ -17,7 +17,7 @@ To start the official Cyber RT docker, you need to run the command below first:
 **Note**:  You will lose all your previous changes in the docker if you have ran this command before. Unless you would like to start a fresh docker environment.
 
 ``` bash
-./docker/scripts/cyber_start.sh
+./docker/scripts/cyber_start.sh -g cn
 ```
 
 To enter the docker you just started:
@@ -31,7 +31,7 @@ To enter the docker you just started:
 To build Cyber RT only and test it:
 
 ``` bash
-./apollo.sh build_cyber
+./apollo.sh build cyber
 bazel test cyber/...
 ```
 
