@@ -1,0 +1,25 @@
+lidar_config {
+  sensor_name: "lidar16_left"
+  translation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+lidar_config {
+  sensor_name: "lidar16_right"
+  translation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+lidar_config {
+  sensor_name: "lidar16_back"
+  translation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+main_sensor: "lidar16_back"
