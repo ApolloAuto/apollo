@@ -619,14 +619,16 @@ void HMIWorker::StartModule(const std::string& module) const {
 
   if (module == "Recorder") {
     auto* monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
-    auto iter = monitors->find(FLAGS_data_collection_monitor_name);
-    if (iter != monitors->end()) {
-      auto* data_collection_monitor = iter->second.get();
-      if (data_collection_monitor->IsEnabled() && record_count_ == 0) {
-        data_collection_monitor->Restart();
+    if (monitors != nullptr) {
+      auto iter = monitors->find(FLAGS_data_collection_monitor_name);
+      if (iter != monitors->end()) {
+        auto* data_collection_monitor = iter->second.get();
+        if (data_collection_monitor->IsEnabled() && record_count_ == 0) {
+          data_collection_monitor->Restart();
+        }
       }
+      ++record_count_;
     }
-    ++record_count_;
   }
 }
 
