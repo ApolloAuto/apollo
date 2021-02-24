@@ -58,8 +58,8 @@ bool LidarSegmentationSubmodule::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
   AINFO << std::setprecision(16)
         << "Enter lidar segmentation submodule, message timestamp: "
-        << message->measurement_time() << " current timestamp: "
-        << Clock::NowInSeconds();
+        << message->measurement_time()
+        << " current timestamp: " << Clock::NowInSeconds();
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
                                                      LidarFrameMessage);

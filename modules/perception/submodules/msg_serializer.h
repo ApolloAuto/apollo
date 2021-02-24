@@ -17,8 +17,9 @@
 
 #include <vector>
 
-#include "modules/perception/base/object.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/perception/base/object.h"
 
 namespace apollo {
 namespace perception {

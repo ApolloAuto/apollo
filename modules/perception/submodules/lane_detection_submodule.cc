@@ -41,9 +41,9 @@
 
 namespace apollo {
 namespace perception {
+using ::apollo::cyber::Clock;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
-using ::apollo::cyber::Clock;
 
 FunInfoType LaneDetectionSubmodule::init_func_arry_[] = {
     {&LaneDetectionSubmodule::InitSensorInfo, "InitSensorInfo"},

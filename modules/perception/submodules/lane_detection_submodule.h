@@ -54,7 +54,6 @@ typedef std::shared_ptr<apollo::perception::MotionServiceMessage>
 namespace apollo {
 namespace perception {
 
-
 class LaneDetectionSubmodule;
 typedef FunctionInfo<LaneDetectionSubmodule> FunInfoType;
 class LaneDetectionSubmodule : public apollo::cyber::Component<> {
