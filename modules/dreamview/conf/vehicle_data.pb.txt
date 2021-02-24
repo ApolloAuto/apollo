@@ -19,6 +19,10 @@ data_files {
   dest_path: "/apollo/modules/dreamview/conf/preprocess_table.pb.txt"
 }
 data_files {
+  source_path: "dreamview_conf/lidar_to_gnss_preprocess_table.pb.txt"
+  dest_path: "/apollo/modules/dreamview/conf/lidar_to_gnss_preprocess_table.pb.txt"
+}
+data_files {
   source_path: "navigation_lincoln.pb.txt"
   dest_path: "/apollo/modules/control/conf/navigation_lincoln.pb.txt"
 }
