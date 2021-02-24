@@ -178,10 +178,11 @@ cc_library(
     name = "perception_submodule_inner_lidar",
     copts = PERCEPTION_COPTS,
     deps = [
+        ":fusion_submodule",
         ":lidar_detection_submodule",
         ":lidar_segmentation_submodule",
         ":lidar_tracking_submodule",
-        ":fusion_submodule",
+        ":radar_detection_submodule",
     ],
     alwayslink = True,
 )
@@ -283,6 +284,47 @@ cc_library(
 )
 
 cc_library(
+    name = "radar_detection_submodule",
+    srcs = [
+        "radar_detection_submodule.cc",
+    ],
+    hdrs = [
+        "radar_detection_submodule.h",
+    ],
+    deps = [
+        ":common_flags",
+        ":inner_submodule_messages",
+        ":msg_buffer",
+        ":transform_wrapper",
+        "//cyber/time:clock",
+        "//modules/common/util:perf_util",
+        "//modules/perception/base",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/map/hdmap:hdmap_input",
+        "//modules/perception/proto:radar_submodule_config_cc_proto",
+        "//modules/perception/radar/app:radar_obstacle_perception",
+        "//modules/perception/radar/common:radar_util",
+        "//modules/perception/radar/lib/detector/conti_ars_detector",
+        "//modules/perception/radar/lib/dummy:dummy_algorithms",
+        "//modules/perception/radar/lib/interface:base_detector",
+        "//modules/perception/radar/lib/interface:base_filter",
+        "//modules/perception/radar/lib/interface:base_matcher",
+        "//modules/perception/radar/lib/interface:base_preprocessor",
+        "//modules/perception/radar/lib/interface:base_radar_obstacle_perception",
+        "//modules/perception/radar/lib/interface:base_roi_filter",
+        "//modules/perception/radar/lib/interface:base_tracker",
+        "//modules/perception/radar/lib/preprocessor/conti_ars_preprocessor",
+        "//modules/perception/radar/lib/roi_filter/hdmap_radar_roi_filter",
+        "//modules/perception/radar/lib/tracker/common:radar_track",
+        "//modules/perception/radar/lib/tracker/common:radar_track_manager",
+        "//modules/perception/radar/lib/tracker/conti_ars_tracker",
+        "//modules/perception/radar/lib/tracker/filter:adaptive_kalman_filter",
+        "//modules/perception/radar/lib/tracker/matcher:hm_matcher",
+    ],
+)
+
+cc_library(
     name = "common_flags",
     srcs = ["common_flags.cc"],
     hdrs = ["common_flags.h"],
@@ -318,6 +360,16 @@ cc_library(
         "//modules/transform:buffer",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
+    ],
+)
+
+cc_library(
+    name = "msg_buffer",
+    srcs = ["msg_buffer.cc"],
+    hdrs = ["msg_buffer.h"],
+    deps = [
+        "//cyber",
+        "@boost",
     ],
 )
 

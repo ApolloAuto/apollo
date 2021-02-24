@@ -19,13 +19,14 @@
 #include <string>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/lane_struct.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {

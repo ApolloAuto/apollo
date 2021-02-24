@@ -13,41 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
-
-#include <memory>
-#include <string>
-
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
-#include "cyber/cyber.h"
-#include "modules/perception/lidar/common/lidar_frame.h"
-#include "modules/perception/submodules/inner_submodule_messages.h"
+#include "modules/perception/submodules/msg_buffer.h"
 
 namespace apollo {
 namespace perception {
 
-class LidarFrameMessage {
- public:
-  LidarFrameMessage() : lidar_frame_(nullptr) {
-    type_name_ = "LidarFrameMessage";
-  }
-
-  ~LidarFrameMessage() = default;
-
-  std::string GetTypeName() const { return type_name_; }
-
-  LidarFrameMessage* New() const { return new LidarFrameMessage; }
-
- public:
-  double timestamp_ = 0.0;
-  uint64_t lidar_timestamp_ = 0;
-  uint32_t seq_num_ = 0;
-  std::string type_name_;
-  ProcessStage process_stage_ = ProcessStage::UNKNOWN_STAGE;
-  apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;
-  std::shared_ptr<lidar::LidarFrame> lidar_frame_;
-};
+DEFINE_int32(obs_msg_buffer_size, 200, "buffer size for odometry_subscriber");
+DEFINE_double(obs_buffer_match_precision, 0.01,
+              "match_precision for odometry_subscriber");
 
 }  // namespace perception
 }  // namespace apollo

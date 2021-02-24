@@ -34,8 +34,8 @@
 namespace apollo {
 namespace perception {
 
-using apollo::cyber::common::GetAbsolutePath;
 using ::apollo::cyber::Clock;
+using apollo::cyber::common::GetAbsolutePath;
 
 static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
                           apollo::perception::LaneMarker *lane_marker) {
@@ -300,8 +300,7 @@ void CameraDetectionSubmodule::OnReceiveImage(
 
 int CameraDetectionSubmodule::InitConfig() {
   // the macro READ_CONF would return cyber::FAIL if config not exists
-  apollo::perception::CameraDetection
-      camera_detection_param;
+  apollo::perception::CameraDetection camera_detection_param;
   if (!GetProtoConfig(&camera_detection_param)) {
     AINFO << "load camera detection submodule proto param failed";
     return false;
@@ -340,31 +339,27 @@ int CameraDetectionSubmodule::InitConfig() {
   output_obstacles_channel_name_ =
       camera_detection_param.output_obstacles_channel_name();
   camera_perception_viz_message_channel_name_ =
-      camera_detection_param
-          .camera_perception_viz_message_channel_name();
+      camera_detection_param.camera_perception_viz_message_channel_name();
   visual_debug_folder_ = camera_detection_param.visual_debug_folder();
   visual_camera_ = camera_detection_param.visual_camera();
-  output_final_obstacles_ =
-      camera_detection_param.output_final_obstacles();
-  prefused_channel_name_ =
-      camera_detection_param.prefused_channel_name();
+  output_final_obstacles_ = camera_detection_param.output_final_obstacles();
+  prefused_channel_name_ = camera_detection_param.prefused_channel_name();
   default_camera_pitch_ =
       static_cast<float>(camera_detection_param.default_camera_pitch());
   default_camera_height_ =
       static_cast<float>(camera_detection_param.default_camera_height());
-  output_camera_debug_msg_ =
-      camera_detection_param.output_camera_debug_msg();
+  output_camera_debug_msg_ = camera_detection_param.output_camera_debug_msg();
   camera_debug_channel_name_ =
       camera_detection_param.camera_debug_channel_name();
   ts_diff_ = camera_detection_param.ts_diff();
   write_visual_img_ = camera_detection_param.write_visual_img();
 
-  min_laneline_length_for_cipv_ = static_cast<float>(
-      camera_detection_param.min_laneline_length_for_cipv());
-  average_lane_width_in_meter_ = static_cast<float>(
-      camera_detection_param.average_lane_width_in_meter());
-  max_vehicle_width_in_meter_ = static_cast<float>(
-      camera_detection_param.max_vehicle_width_in_meter());
+  min_laneline_length_for_cipv_ =
+      static_cast<float>(camera_detection_param.min_laneline_length_for_cipv());
+  average_lane_width_in_meter_ =
+      static_cast<float>(camera_detection_param.average_lane_width_in_meter());
+  max_vehicle_width_in_meter_ =
+      static_cast<float>(camera_detection_param.max_vehicle_width_in_meter());
   average_frame_rate_ =
       static_cast<float>(camera_detection_param.average_frame_rate());
 
@@ -1110,21 +1105,19 @@ int CameraDetectionSubmodule::MakeCameraDebugMsg(
   return cyber::SUCC;
 }
 
-bool CameraDetectionSubmodule::SetCameraHeight(
-     const std::string &sensor_name,
-     const std::string &params_dir, float default_camera_height,
-     float *camera_height) {
+bool CameraDetectionSubmodule::SetCameraHeight(const std::string &sensor_name,
+                                               const std::string &params_dir,
+                                               float default_camera_height,
+                                               float *camera_height) {
   float base_height = default_camera_height;
   float camera_offset = 0.0f;
 
-  apollo::perception::CameraDetection
-  camera_detection_param;
+  apollo::perception::CameraDetection camera_detection_param;
   if (!GetProtoConfig(&camera_detection_param)) {
     AINFO << "load camera detection submodule proto param failed";
     return false;
   }
-  std::string lidar_type =
-      camera_detection_param.lidar_type();
+  std::string lidar_type = camera_detection_param.lidar_type();
   try {
     YAML::Node lidar_height =
         YAML::LoadFile(params_dir + "/" + lidar_type + "_height.yaml");
