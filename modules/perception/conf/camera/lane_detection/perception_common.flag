@@ -1,0 +1,151 @@
+###########################################################################
+# Flags from sensor_manager
+
+--flagfile=/apollo/modules/common/data/global_flagfile.txt
+# config file work root
+# type: string
+# default:
+--work_root=/apollo/modules/perception/production
+
+# SensorManager config file
+# type: string
+# default:
+--obs_sensor_meta_path=/apollo/modules/perception/production/data/perception/common/sensor_meta.pt
+
+# The intrinsics/extrinsics dir
+# type: string
+# default:
+--obs_sensor_intrinsic_path=/apollo/modules/perception/data/params
+
+###########################################################################
+# Flags from common_flags
+
+# enable hdmap input for roi filter.
+# type: bool
+# default: true
+--obs_enable_hdmap_input=true
+
+# whether to send message for visualization.
+# type: bool
+# default: false
+--obs_enable_visualization=false
+
+# where to save screenshots of visualization
+# type: string
+# default: ./
+--obs_screen_output_dir=./
+
+# whether switch to benchmark output mode
+# type: bool
+# default: false
+--obs_benchmark_mode=false
+
+# whether save fusion supplement data
+# type: bool
+# default: false
+--obs_save_fusion_supplement=true
+
+# Enable saving result images for visualization
+# type: bool
+# default: false
+--start_visualizer=false
+
+###########################################################################
+# Flags from transform_wrapper
+
+# sensor to novatel frame id.
+# type: string
+# default:
+--obs_sensor2novatel_tf2_frame_id=novatel
+
+# novatel to world frame id.
+# type: string
+# default:
+--obs_novatel2world_tf2_frame_id=world
+
+# novatel to world child frame id.
+# type: string
+# default:
+--obs_novatel2world_tf2_child_frame_id=novatel
+
+# query Cyber TF buffer size in second.
+# type: double
+# default: 0.01
+--obs_tf2_buff_size=0.01
+
+# enabled state of local pose extrapolation when failed to query pose
+# type: bool
+# default: false
+--obs_enable_local_pose_extrapolation=true
+
+# local pose cache size
+# type: double
+# default: 1.0
+--obs_transform_cache_size=1.0
+
+# max local pose extrapolation latency
+# type: double
+# default: 0.15
+--obs_max_local_pose_extrapolation_latency=0.15
+
+--config_manager_path=./
+
+###########################################################################
+# Flags from lidar_point_pillars
+
+# classification score threshold
+# type: double
+# default: 0.5
+--score_threshold=0.5
+
+# enable ground removal
+# type: bool
+# default: false
+--enable_ground_removal=false
+
+# remove point cloud that under this height
+# type: double
+# default: -1.5
+--ground_removal_height=-1.5
+
+# enable down-sampling point cloud by beams. Set false to use full cloud for
+# more accurate detection, but some obstacles in front of ego vehicle might
+# not be detected if you use 128c Lidar.
+# type: bool
+# default: false
+--enable_downsample_beams=false
+
+# factor for down-sampling point cloud beams
+# type: int
+# default: 4
+--downsample_beams_factor=4
+
+# enable down-sampling point cloud by voxelization
+# type: bool
+# default: false
+--enable_downsample_pointcloud=false
+
+# down-sample voxel size along x-axis
+# type: double
+# default: 0.01
+--downsample_voxel_size_x=0.1
+
+# down-sample voxel size along y-axis
+# type: double
+# default: 0.01
+--downsample_voxel_size_y=0.1
+
+# down-sample voxel size along z-axis
+# type: double
+# default: 0.01
+--downsample_voxel_size_z=0.1
+
+# enable fusing point cloud of preceding frames
+# type: bool
+# default: false
+--enable_fuse_frames=false
+
+# number of frames (including current frame) for fusing point cloud
+# type: int
+# default: 5
+--num_fuse_frames=5

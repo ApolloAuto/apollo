@@ -4,8 +4,8 @@ module_config {
     class_name : "CameraDetectionSubmodule"
     config {
       name: "CameraObstacleSubmodule"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt"
-      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      config_file_path: "/apollo/modules/perception/conf/camera/obstacle_detection/fusion_camera_detection_component.pb.txt"
+      flag_file_path: "/apollo/modules/perception/conf/camera/obstacle_detection/perception_common.flag"
     }
   }
 }
