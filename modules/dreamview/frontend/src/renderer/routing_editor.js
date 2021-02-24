@@ -139,4 +139,15 @@ export default class RoutingEditor {
     });
     WS.saveDefaultRouting(routingName, points);
   }
+
+  checkCycleRoutingAvailable(cycleRoutingPoints, carPosition, threshold) {
+    const start = carPosition;
+    const end = cycleRoutingPoints[cycleRoutingPoints.length - 1];
+    if (_.isEmpty(start) || _.isEmpty(end)) {
+      return false;
+    }
+    const distance =
+      Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
+    return distance > threshold;
+  }
 }
