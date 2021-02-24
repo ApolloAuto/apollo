@@ -19,11 +19,12 @@
 #include <memory>
 #include <string>
 
-#include "cyber/cyber.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/perception/proto/lidar_submodule_config.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/perception/lidar/app/lidar_obstacle_detection.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
-#include "modules/perception/proto/lidar_submodule_config.pb.h"
 #include "modules/perception/submodules/lidar_inner_submodule_messages.h"
 #include "modules/perception/submodules/transform_wrapper.h"
 
