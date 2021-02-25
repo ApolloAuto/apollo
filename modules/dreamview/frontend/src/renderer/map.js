@@ -837,7 +837,7 @@ export default class Map {
     const successor = directionSameWithVector(border[result[0]],border[result[1]],laneVector);
     const projectionPointOnLane = getIntersectionPoint(border[result[2]], centerLine[0],
       laneCenterLineEndPoint);
-    const laneWidth = getPointDistance(border[result[2]],projectionPointOnLane);
+    const laneWidth = getPointDistance(border[result[2]], projectionPointOnLane) * 4;
     const id = successor ? basedLane.successorId : basedLane.predecessorId;
     routingPoint = this.getRoutingPoint(successor, projectionPointOnLane,
       STORE.routeEditingManager.parkingRoutingDistanceThreshold,
