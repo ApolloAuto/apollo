@@ -158,7 +158,7 @@ export default class RoutingEditor {
       const start = (parkingRequestPoints.length > 1) ? parkingRequestPoints[0]
         : coordinates.applyOffset(carOffsetPosition, true);
       const end = parkingRequestPoints[parkingRequestPoints.length - 1];
-      const waypoint = (parkingRequestPoints.length > 1) ? parkingRequestPoints.slice(0, -1) : [];
+      const waypoint = (parkingRequestPoints.length > 1) ? parkingRequestPoints.slice(1, -1) : [];
       this.routePoints.push(lastPoint);
       this.parkingSpaceInfo[index].polygon.point.forEach(vertex => {
         vertex.z = 0;
