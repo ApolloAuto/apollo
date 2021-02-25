@@ -10,7 +10,7 @@
 # SensorManager config file
 # type: string
 # default:
---obs_sensor_meta_path=/apollo/modules/perception/production/data/perception/common/sensor_meta.pt
+--obs_sensor_meta_path=/apollo/modules/perception/conf/common/sensor_meta.pt
 
 # The intrinsics/extrinsics dir
 # type: string
