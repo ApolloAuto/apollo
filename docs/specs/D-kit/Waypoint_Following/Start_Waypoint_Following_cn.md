@@ -47,7 +47,7 @@
 ## 车辆配置文件准备
 
 - 在`/apollo/modules/calibration/data/`目录下列出了Apollo支持车型的配置参数。
-- 在`/apollo/modules/calibration/data/dev_kit`文件夹下，我们为开发套件提供了默认的参数，请务必按照前述**前提条件**的步骤进行配置，否则会导致循迹启动失败。在完成前提条件准备工作后，下面开始启动循迹操作。
+- 在`/apollo/modules/calibration/data/`文件夹下，我们为开发套件提供了默认的参数，请务必按照前述**前提条件**的步骤进行配置，否则会导致循迹启动失败。在完成前提条件准备工作后，下面开始启动循迹操作。
 
 ## 循迹启动
 
@@ -73,7 +73,15 @@
 
 ### 3. 启动所需模块
 
-在浏览器中打开`(http://localhost:8888)`，在`--setup mode--`内，选择模式为`Rtk`， 在`--vehicle--`选择车型`Dev Kit`。
+在浏览器中打开`(http://localhost:8888)`，在`--setup mode--`内，选择模式为`Rtk`， 在`--vehicle--`选择车型，根据车辆铭牌信息选择对应的车型(见下表)，如使用Apollo D-KIT Lite，则在`--vehicle--`选择车型`Dev Kit`。
+
+  | 铭牌信息 | 选择车型 |
+  |---|---|
+  | Apollo D-KIT Lite | dev_kit |
+  | Apollo D-KIT Standard | dev_kit_standard |
+  | Apollo D-KIT Advanced(NE-B) | dev_kit_advanced_ne-b |
+  | Apollo D-KIT Advanced(NE-S) | dev_kit_advanced_ne-s |
+  | Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r |
 
 ![dreamview_select_mode_car_type](images/dreamview_select_mode_car_type1.png)
 
@@ -153,9 +161,9 @@
 
 ![stop_rtk_player](images/stop_rtk_player.png)
 
-**注意事项**：一定要在宽阔的场地进行测试，确保周围没有人，循迹测试之前做好应急接管准备，有问题随时遥控器接管。不要轻易尝试速度大于4m/s(16km/h）的循迹。
+**注意事项**：一定要在宽阔的场地进行测试，确保周围没有人，循迹测试之前做好应急接管准备，有问题随时遥控器接管。不要轻易尝试速度大于4m/s（16km/h）的循迹。
 
-5）记录循迹自动驾驶`Record数据包`，可以在第（3）步开始钱，在`Dreamview`页面`Module Controller`标签页内，点击`Data Recorder`按钮,录制循迹自动驾驶的`Record数据包`，车辆循迹结束后，**记得再次点击`Data Recorder`按钮关闭录制**（**注意**：如果只打开不关闭，可能会导致录制的数据包不完整，造成后续使用该数据包失败！），该数据包可以用于后续在实验室查看循迹数据、回放循迹来使用。
+5）记录循迹自动驾驶`Record数据包`，可以在第（3）步开始钱，在`Dreamview`页面`Module Controller`标签页内，点击`Data Recorder`按钮，录制循迹自动驾驶的`Record数据包`，车辆循迹结束后，**记得再次点击`Data Recorder`按钮关闭录制**（**注意**：如果只打开不关闭，可能会导致录制的数据包不完整，造成后续使用该数据包失败！），该数据包可以用于后续在实验室查看循迹数据、回放循迹来使用。
 
 ![lanuch_data_recorder](images/lanuch_data_recorder.png)
 
