@@ -20,14 +20,19 @@ namespace drivers {
 namespace hesai {
 
 bool HesaiComponent::Init() {
-  if (!GetProtoConfig(&hesai_conf_)) {
+  if (!GetProtoConfig(&conf_)) {
     AERROR << "load config error, file:" << config_file_path_;
     return false;
   }
 
-  AINFO << "conf:" << hesai_conf_.DebugString();
-
-  driver_.reset(new HesaiDriver(node_, hesai_conf_));
+  AINFO << "conf:" << conf_.DebugString();
+  Parser* parser = ParserFactory::CreateParser(node_, conf_);
+  if (parser == nullptr) {
+    AERROR << "create parser error";
+    return false;
+  }
+  parser_.reset(parser);
+  driver_.reset(new HesaiDriver(node_, conf_, parser_));
 
   if (!driver_->Init()) {
     AERROR << "driver init error";

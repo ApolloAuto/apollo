@@ -19,12 +19,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/drivers/lidar/proto/config.pb.h"
-#include "modules/drivers/lidar/proto/velodyne.pb.h"
-#include "modules/drivers/lidar/proto/velodyne_config.pb.h"
-
-#include "modules/drivers/lidar/common/driver_factory/driver_base.h"
 #include "modules/drivers/lidar/velodyne/driver/socket_input.h"
+#include "modules/drivers/lidar/velodyne/proto/config.pb.h"
+#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -41,27 +38,18 @@ constexpr double PACKET_RATE_HDL64E_S3D = 5789;
 constexpr double PACKET_RATE_VLS128 = 6250.0;
 constexpr double PACKET_RATE_VLP32C = 1507.0;
 
-class VelodyneDriver : public lidar::LidarDriver {
+class VelodyneDriver {
  public:
-  VelodyneDriver() {}
   explicit VelodyneDriver(const Config &config) : config_(config) {}
-  VelodyneDriver(const std::shared_ptr<cyber::Node> &node,
-                          const Config &config)
-      : config_(config) {
-    node_ = node;
-  }
   virtual ~VelodyneDriver();
 
   virtual bool Poll(const std::shared_ptr<VelodyneScan> &scan);
-  bool Init() override;
+  virtual void Init();
   virtual void PollPositioningPacket();
   void SetPacketRate(const double packet_rate) { packet_rate_ = packet_rate; }
-  void DevicePoll();
 
  protected:
-  std::thread poll_thread_;
   Config config_;
-  std::shared_ptr<apollo::cyber::Writer<VelodyneScan>> writer_;
   std::unique_ptr<Input> input_ = nullptr;
   std::unique_ptr<Input> positioning_input_ = nullptr;
   std::string topic_;
@@ -73,6 +61,7 @@ class VelodyneDriver : public lidar::LidarDriver {
   static uint64_t sync_counter;
 
   std::thread positioning_thread_;
+
   virtual int PollStandard(std::shared_ptr<VelodyneScan> scan);
   bool SetBaseTime();
   void SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time, uint64_t *basetime);
@@ -82,16 +71,10 @@ class VelodyneDriver : public lidar::LidarDriver {
 class Velodyne64Driver : public VelodyneDriver {
  public:
   explicit Velodyne64Driver(const Config &config) : VelodyneDriver(config) {}
-  Velodyne64Driver(const std::shared_ptr<cyber::Node> &node,
-                            const Config &config) {
-    node_ = node;
-    config_ = config;
-  }
-  ~Velodyne64Driver();
+  ~Velodyne64Driver() {}
 
-  bool Init() override;
+  void Init() override;
   bool Poll(const std::shared_ptr<VelodyneScan> &scan) override;
-  void DevicePoll();
 
  private:
   bool CheckAngle(const VelodynePacket &packet);
@@ -100,8 +83,7 @@ class Velodyne64Driver : public VelodyneDriver {
 
 class VelodyneDriverFactory {
  public:
-  static VelodyneDriver *CreateDriver(
-      const std::shared_ptr<::apollo::cyber::Node> &node, const Config &config);
+  static VelodyneDriver *CreateDriver(const Config &config);
 };
 
 }  // namespace velodyne

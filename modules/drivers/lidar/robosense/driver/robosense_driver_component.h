@@ -19,6 +19,8 @@
 #include <string>
 #include <thread>
 
+#include "modules/drivers/lidar/robosense/proto/config.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/robosense/driver/driver.h"
 
@@ -37,7 +39,7 @@ class RobosenseComponent : public Component<> {
       return false;
     }
     driver_.reset(new RobosenseDriver(node_, conf_));
-    if (!driver_->Init()) {
+    if (!driver_->init()) {
       AERROR << "driver init error";
       return false;
     }

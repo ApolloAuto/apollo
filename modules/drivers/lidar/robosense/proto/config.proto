@@ -19,3 +19,4 @@ message Config {
   optional string calibration_file=15;
   optional bool use_lidar_clock = 16;
 }
+

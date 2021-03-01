@@ -23,7 +23,8 @@
 #include <thread>
 
 #include "cyber/cyber.h"
-#include "modules/common/util/message_util.h"
+#include "modules/drivers/lidar/velodyne/proto/config.pb.h"
+#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -32,15 +33,12 @@ namespace velodyne {
 uint64_t VelodyneDriver::sync_counter = 0;
 
 VelodyneDriver::~VelodyneDriver() {
-  if (poll_thread_.joinable()) {
-    poll_thread_.join();
-  }
   if (positioning_thread_.joinable()) {
     positioning_thread_.join();
   }
 }
 
-bool VelodyneDriver::Init() {
+void VelodyneDriver::Init() {
   double frequency = (config_.rpm() / 60.0);  // expected Hz rate
 
   // default number of packets for each scan is a single revolution
@@ -51,7 +49,6 @@ bool VelodyneDriver::Init() {
   // open Velodyne input device
 
   input_.reset(new SocketInput());
-  writer_ = node_->CreateWriter<VelodyneScan>(config_.scan_channel());
   positioning_input_.reset(new SocketInput());
   input_->init(config_.firing_data_port());
   positioning_input_->init(config_.positioning_data_port());
@@ -59,8 +56,6 @@ bool VelodyneDriver::Init() {
   // raw data output topic
   positioning_thread_ =
       std::thread(&VelodyneDriver::PollPositioningPacket, this);
-  poll_thread_ = std::thread(&VelodyneDriver::DevicePoll, this);
-  return true;
 }
 
 void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
@@ -230,8 +225,7 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-VelodyneDriver* VelodyneDriverFactory::CreateDriver(
-    const std::shared_ptr<::apollo::cyber::Node>& node, const Config& config) {
+VelodyneDriver* VelodyneDriverFactory::CreateDriver(const Config& config) {
   auto new_config = config;
   if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
     AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
@@ -244,37 +238,37 @@ VelodyneDriver* VelodyneDriverFactory::CreateDriver(
   VelodyneDriver* driver = nullptr;
   switch (config.model()) {
     case HDL64E_S2: {
-      driver = new Velodyne64Driver(node, config);
+      driver = new Velodyne64Driver(config);
       driver->SetPacketRate(PACKET_RATE_HDL64E_S2);
       break;
     }
     case HDL64E_S3S: {
-      driver = new Velodyne64Driver(node, config);
+      driver = new Velodyne64Driver(config);
       driver->SetPacketRate(PACKET_RATE_HDL64E_S3S);
       break;
     }
     case HDL64E_S3D: {
-      driver = new Velodyne64Driver(node, config);
+      driver = new Velodyne64Driver(config);
       driver->SetPacketRate(PACKET_RATE_HDL64E_S3D);
       break;
     }
     case HDL32E: {
-      driver = new VelodyneDriver(node, config);
+      driver = new VelodyneDriver(config);
       driver->SetPacketRate(PACKET_RATE_HDL32E);
       break;
     }
     case VLP32C: {
-      driver = new VelodyneDriver(node, config);
+      driver = new VelodyneDriver(config);
       driver->SetPacketRate(PACKET_RATE_VLP32C);
       break;
     }
     case VLP16: {
-      driver = new VelodyneDriver(node, config);
+      driver = new VelodyneDriver(config);
       driver->SetPacketRate(PACKET_RATE_VLP16);
       break;
     }
     case VLS128: {
-      driver = new VelodyneDriver(node, config);
+      driver = new VelodyneDriver(config);
       driver->SetPacketRate(PACKET_RATE_VLS128);
       break;
     }
@@ -284,20 +278,6 @@ VelodyneDriver* VelodyneDriverFactory::CreateDriver(
       break;
   }
   return driver;
-}
-
-void VelodyneDriver::DevicePoll() {
-  while (!apollo::cyber::IsShutdown()) {
-    // poll device until end of file
-    std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
-    bool ret = Poll(scan);
-    if (ret) {
-      apollo::common::util::FillHeader("velodyne", scan.get());
-      writer_->Write(scan);
-    } else {
-      AWARN << "device poll failed";
-    }
-  }
 }
 
 }  // namespace velodyne
