@@ -63,7 +63,6 @@ class VelodyneDriver {
   std::thread positioning_thread_;
 
   virtual int PollStandard(std::shared_ptr<VelodyneScan> scan);
-  bool SetBaseTime();
   void SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time, uint64_t *basetime);
   void UpdateGpsTopHour(uint32_t current_time);
 };

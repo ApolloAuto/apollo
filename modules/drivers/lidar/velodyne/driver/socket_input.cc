@@ -59,7 +59,7 @@ void SocketInput::init(const int &port) {
   }
 
   // connect to Velodyne UDP port
-  AINFO << "Opening UDP socket: port " << uint16_t(port);
+  AINFO << "Opening UDP socket: port " << port;
   port_ = port;
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 

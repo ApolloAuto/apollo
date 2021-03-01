@@ -54,16 +54,6 @@ uint64_t VelodyneParser::GetGpsStamp(double current_packet_stamp,
   return gps_stamp;
 }
 
-PointXYZIT VelodyneParser::get_nan_point(uint64_t timestamp) {
-  PointXYZIT nan_point;
-  nan_point.set_timestamp(timestamp);
-  nan_point.set_x(nan);
-  nan_point.set_y(nan);
-  nan_point.set_z(nan);
-  nan_point.set_intensity(0);
-  return nan_point;
-}
-
 VelodyneParser::VelodyneParser(const Config &config)
     : last_time_stamp_(0), config_(config), mode_(STRONGEST) {}
 
@@ -126,7 +116,6 @@ bool VelodyneParser::is_scan_valid(int rotation, float range) {
 void VelodyneParser::ComputeCoords(const float &raw_distance,
                                    const LaserCorrection &corrections,
                                    const uint16_t rotation, PointXYZIT *point) {
-  // ROS_ASSERT_MSG(rotation < 36000, "rotation must between 0 and 35999");
   assert(rotation <= 36000);
   double x = 0.0;
   double y = 0.0;

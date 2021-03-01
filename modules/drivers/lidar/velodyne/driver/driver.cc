@@ -78,23 +78,6 @@ void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
   *basetime = unix_base * static_cast<uint64_t>(1e6);
 }
 
-bool VelodyneDriver::SetBaseTime() {
-  NMEATimePtr nmea_time(new NMEATime);
-  while (true) {
-    int rc = input_->get_positioning_data_packet(nmea_time);
-    if (rc == 0) {
-      break;  // got a full packet
-    }
-    if (rc < 0) {
-      return false;  // end of file reached
-    }
-  }
-
-  SetBaseTimeFromNmeaTime(nmea_time, &basetime_);
-  input_->init(config_.firing_data_port());
-  return true;
-}
-
 /** poll the device
  *
  *  @returns true unless end of file reached

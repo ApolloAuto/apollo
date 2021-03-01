@@ -258,7 +258,6 @@ class VelodyneParser {
   bool need_two_pt_correction_;
   Mode mode_;
 
-  PointXYZIT get_nan_point(uint64_t timestamp);
   void init_angle_params(double view_direction, double view_width);
   /**
    * \brief Compute coords with the data in block
