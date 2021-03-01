@@ -47,10 +47,10 @@ bool PbfTracker::InitParams() {
     return false;
   }
 
-  std::string woork_root_config = GetAbsolutePath(
+  std::string work_root_config = GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), options.root_dir);
 
-  std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
+  std::string config = GetAbsolutePath(work_root_config, options.conf_file);
   AINFO << "Config file : " << config;
   PbfTrackerConfig params;
   if (!cyber::common::GetProtoFromFile(config, &params)) {

@@ -1,0 +1,13 @@
+use_lidar: true
+use_radar: true
+use_camera: true
+tracker_method: "PbfTracker"
+data_association_method: "HMAssociation"
+gate_keeper_method: "PbfGatekeeper"
+prohibition_sensors: "radar_front"
+
+max_lidar_invisible_period: 0.25
+max_radar_invisible_period: 0.50
+max_camera_invisible_period: 0.75
+
+max_cached_frame_num: 50

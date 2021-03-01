@@ -64,7 +64,7 @@ module_config {
     class_name: "FusionSubmodule"
     config {
       name: "SensorFusion"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+      config_file_path: "/apollo/modules/perception/conf/fusion/fusion_submodule.conf"
       readers {
         channel: "/perception/inner/PrefusedObjects"
       }
