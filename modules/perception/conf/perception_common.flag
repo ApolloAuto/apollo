@@ -5,7 +5,7 @@
 # config file work root
 # type: string
 # default:
---work_root=/apollo/modules/perception/production
+--work_root=/apollo/modules/perception
 
 # SensorManager config file
 # type: string
