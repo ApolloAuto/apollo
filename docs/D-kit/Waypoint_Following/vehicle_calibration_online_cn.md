@@ -59,7 +59,19 @@
 
 ## 修改配置文件
 
-在开始标定前，需要根据实际车辆的最大速度、速度、油门、刹车踏板的限制，进行用于车辆踏板标定的数据采集配置，来适配车辆的标定，满足标定数据能够尽可能多的覆盖车辆踏板的有效范围。我们设置了开发套件的默认车辆标定数据采集配置文件，在文件`apollo/modules/calibration/data/dev_kit/dreamview_conf/data_collection_table.pb.txt`内，开发者在了解了标定文件构成后，如有需要可以自行修改需要的数据采集配置文件，通常情况下使用默认标定配置可以覆盖小车大部分踏板控制范围，**建议开发者不需要单独修改此配置文件，使用默认标定配置即可**。默认标定配置文件内主要设计了小车的标定条件如下：
+在开始标定前，需要根据实际车辆的最大速度、速度、油门、刹车踏板的限制，进行用于车辆踏板标定的数据采集配置，来适配车辆的标定，满足标定数据能够尽可能多的覆盖车辆踏板的有效范围。我们设置了开发套件的默认车辆标定数据采集配置文件，在文件`apollo/modules/calibration/data/$vehicle_type/dreamview_conf/data_collection_table.pb.txt`内。对于不同的车型，配置文件的位置不同，主要由车型参数`$vehicle_type`决定，根据车辆铭牌信息选择对应的车型，如下表所示。
+
+  | 铭牌信息 | $vehicle_type |
+  |---|---|
+  | Apollo D-KIT Lite | dev_kit |
+  | Apollo D-KIT Standard | dev_kit_standard |
+  | Apollo D-KIT Advanced(NE-B) | dev_kit_advanced_ne-b |
+  | Apollo D-KIT Advanced(NE-S) | dev_kit_advanced_ne-s |
+  | Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r |
+
+**下面以Apollo D-KIT Lite（dev_kit)举例说明。**，Apollo D-KIT Lite标定配置文件在`apollo/modules/calibration/data/dev_kit/dreamview_conf/data_collection_table.pb.txt`内。
+
+开发者在了解了标定文件构成后，如有需要可以自行修改需要的数据采集配置文件，通常情况下使用默认标定配置可以覆盖小车大部分踏板控制范围，**建议开发者不需要单独修改此配置文件，使用默认标定配置即可**。默认标定配置文件内主要设计了小车的标定条件如下：
 
 车辆前进模型
 
@@ -206,11 +218,19 @@
     bash apollo.sh build_opt
     bash scripts/bootstrap.sh 
 ```
-在浏览器打开`DreamView`，进行下述步骤：
+在浏览器打开`DreamView(http://localhost:8888)`，进行下述步骤：
 
 ##### 1、选择模式，选择车型
 
-在`--setup mode--`内，选择`vehicle calibration`（车辆标定）选项，在`--vehicle--`根据使用车型，选择对应车型，如`Dev_Kit`等；
+在`--setup mode--`内，选择`vehicle calibration`（车辆标定）选项， 在`--vehicle--`选择车型，根据车辆铭牌信息选择对应的车型(见下表)，如使用Apollo D-KIT Lite，则在`--vehicle--`选择车型`Dev Kit`；
+
+  | 铭牌信息 | 选择车型 |
+  |---|---|
+  | Apollo D-KIT Lite | dev_kit |
+  | Apollo D-KIT Standard | dev_kit_standard |
+  | Apollo D-KIT Advanced(NE-B) | dev_kit_advanced_ne-b |
+  | Apollo D-KIT Advanced(NE-S) | dev_kit_advanced_ne-s |
+  | Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r |
 
 ![vehicle_calibration_select_vehicle](images/vehicle_calibration_select_vehicle.png)
 
