@@ -7,23 +7,33 @@ package(
 install(
     name = "install",
     data = [
-        ":base_files",
-        ":docker_files",
+        ":apollo_base",
+        ":bootstrap",
+        ":docker_utils",
     ],
 )
 
 filegroup(
-    name = "docker_files",
+    name = "bootstrap",
+    srcs = [
+        "bootstrap.sh",
+        "dreamview.sh",
+        "monitor.sh",
+    ],
+)
+
+filegroup(
+    name = "docker_utils",
     srcs = [
         ":docker_start_user.sh",
     ],
 )
 
 filegroup(
-    name = "base_files",
+    name = "apollo_base",
     srcs = [
-        ":apollo.bashrc",
-        ":common.bashrc",
-        ":apollo_base.sh",
+        "apollo.bashrc",
+        "apollo_base.sh",
+        "common.bashrc",
     ],
 )

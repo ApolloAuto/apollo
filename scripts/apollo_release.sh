@@ -117,7 +117,7 @@ function solib_locate() {
     fi
 }
 
-PKGS_TXT="${PREFIX_DIR}/pkgs.txt"
+PKGS_TXT="${PREFIX_DIR}/syspkgs.txt"
 function generate_apt_pkgs() {
     sudo apt-get -y update
     listing="$(mktemp /tmp/syslibs.XXXXXX)"
@@ -147,7 +147,7 @@ function main() {
     fi
 
     info "Resolve directory path for Apollo binary distribution..."
-    find "${PREFIX_DIR}" -name "*.dag" -exec \
+    find "${PREFIX_DIR}" \( -name "*.dag" -or -name "*.launch" \) -exec \
         sed -i 's@/apollo/bazel-bin@/apollo@g' {} \;
     ok "Done."
     if [[ "${RESOLVE_DEPS}" -gt 0 ]]; then

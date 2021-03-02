@@ -120,4 +120,5 @@ message HMIMode {
   map<string, CyberModule> cyber_modules = 1;
   map<string, Module> modules = 2;
   map<string, MonitoredComponent> monitored_components = 3;
+  map<string, ProcessMonitorConfig> other_components = 4;
 }

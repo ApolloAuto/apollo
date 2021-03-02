@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -37,6 +38,28 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [":task_manager_component_lib"],
+)
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libtask_manager_component.so",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.conf",
+        "conf/*.txt",
+        "dag/*.dag",
+    ]),
 )
 
 cpplint()

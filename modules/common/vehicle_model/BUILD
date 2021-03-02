@@ -21,13 +21,20 @@ cc_test(
     size = "small",
     srcs = ["vehicle_model_test.cc"],
     data = [
-        "//modules/common/testdata:vehicle_model_testdata",
+        ":test_data",
     ],
     deps = [
         ":vehicle_model",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "@com_google_googletest//:gtest_main",
     ],
+)
+
+filegroup(
+    name = "test_data",
+    srcs = glob([
+        "testdata/*.txt",
+    ]),
 )
 
 cpplint()

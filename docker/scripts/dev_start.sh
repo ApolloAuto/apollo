@@ -15,37 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+source "${CURR_DIR}/docker_base.sh"
 
-APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
-
-AGREEMENT_FILE="${APOLLO_ROOT_DIR}/scripts/AGREEMENT.txt"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 DOCKER_REPO="apolloauto/apollo"
-APOLLO_DEV="apollo_dev_${USER}"
+DEV_CONTAINER="apollo_dev_${USER}"
 DEV_INSIDE="in-dev-docker"
 
 SUPPORTED_ARCHS=(x86_64 aarch64)
-HOST_ARCH="$(uname -m)"
-HOST_OS="$(uname -s)"
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20210129_0240"
+VERSION_X86_64="dev-x86_64-18.04-20210204_2153"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
 VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
 USER_VERSION_OPT=
 
-DOCKER_RUN="docker run"
 FAST_MODE="no"
 
 GEOLOC=
-GEO_REGISTRY=
 
 USE_LOCAL_IMAGE=0
 CUSTOM_DIST=
-USE_GPU_HOST=0
 USER_AGREED="no"
 
 VOLUME_VERSION="latest"
@@ -66,52 +59,6 @@ DEFAULT_TEST_MAPS=(
     sunnyvale_loop
 )
 
-# Check whether user has agreed license agreement
-function check_agreement() {
-    local agreement_record="${HOME}/.apollo_agreement.txt"
-    if [ -e "$agreement_record" ]; then
-        return
-    fi
-
-    if [ ! -e "$AGREEMENT_FILE" ]; then
-        error "AGREEMENT $AGREEMENT_FILE does not exist."
-        exit 1
-    fi
-
-    if [ "$USER_AGREED" = "yes" ]; then
-        local progname="$(basename $0)"
-        cat "${AGREEMENT_FILE}" >"${agreement_record}"
-        local msgtext="By specifying '-y' option when running ${progname}, \
-you have agreed to the license agreement above."
-        echo "${msgtext}" | tee -a "${agreement_record}"
-    else
-        cat "${AGREEMENT_FILE}"
-        local tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-
-        echo -n "${tip}"
-        read -r -n 1 user_agreed
-        echo
-
-        if [[ "${user_agreed}" = "y" || "${user_agreed}" == "Y" ]]; then
-            cat "${AGREEMENT_FILE}" >"${agreement_record}"
-            echo "${tip}" >>"${agreement_record}"
-            echo "${user_agreed}" >>$agreement_record
-        else
-            exit 1
-        fi
-    fi
-}
-
-function _optarg_check_for_opt() {
-    local opt="$1"
-    local optarg="$2"
-
-    if [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]; then
-        error "Missing argument for ${opt}. Exiting..."
-        exit 2
-    fi
-}
-
 function show_usage() {
     cat <<EOF
 Usage: $0 [options] ...
@@ -126,45 +73,6 @@ OPTIONS:
     -y                     Agree to Apollo License Agreement non-interactively.
     stop                   Stop all running Apollo containers.
 EOF
-}
-
-function stop_all_apollo_containers_for_user() {
-    local force="$1"
-    local running_containers
-    running_containers="$(docker ps -a --format '{{.Names}}')"
-    for container in ${running_containers[*]}; do
-        if [[ "${container}" =~ apollo_.*_${USER} ]]; then
-            #printf %-*s 70 "Now stop container: ${container} ..."
-            #printf "\033[32m[DONE]\033[0m\n"
-            #printf "\033[31m[FAILED]\033[0m\n"
-            info "Now stop container ${container} ..."
-            if docker stop "${container}" >/dev/null; then
-                if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
-                    docker rm -f "${container}" >/dev/null
-                fi
-                info "Done."
-            else
-                warning "Failed."
-            fi
-        fi
-    done
-    if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
-        info "OK. Done stop and removal"
-    else
-        info "OK. Done stop."
-    fi
-}
-
-function geo_specific_config() {
-    local geo="$1"
-    if [[ -z "${geo}" ]]; then
-        info "Use default GeoLocation settings"
-    elif [[ "${geo}" == "cn" ]]; then
-        info "GeoLocation settings for Mainland China"
-        GEO_REGISTRY="registry.baidubce.com"
-    else
-        info "GeoLocation settings for ${geo} is not ready, fallback to default"
-    fi
 }
 
 function parse_arguments() {
@@ -183,13 +91,13 @@ function parse_arguments() {
                 fi
                 custom_version="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${custom_version}"
+                optarg_check_for_opt "${opt}" "${custom_version}"
                 ;;
 
             -d | --dist)
                 custom_dist="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${custom_dist}"
+                optarg_check_for_opt "${opt}" "${custom_dist}"
                 ;;
 
             -h | --help)
@@ -204,7 +112,7 @@ function parse_arguments() {
             -g | --geo)
                 geo="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${geo}"
+                optarg_check_for_opt "${opt}" "${geo}"
                 ;;
 
             -l | --local)
@@ -214,7 +122,7 @@ function parse_arguments() {
             --shm-size)
                 shm_size="$1"
                 shift
-                _optarg_check_for_opt "${opt}" "${shm_size}"
+                optarg_check_for_opt "${opt}" "${shm_size}"
                 ;;
 
             --map)
@@ -226,7 +134,8 @@ function parse_arguments() {
                 USER_AGREED="yes"
                 ;;
             stop)
-                stop_all_apollo_containers_for_user "-f"
+                info "Now, stop all Apollo containers created by ${USER} ..."
+                stop_all_apollo_containers "-f"
                 exit 0
                 ;;
             *)
@@ -259,7 +168,7 @@ function determine_dev_image() {
             exit 3
         fi
     fi
-    APOLLO_DEV_IMAGE="${DOCKER_REPO}:${version}"
+    DEV_IMAGE="${DOCKER_REPO}:${version}"
 }
 
 function check_host_environment() {
@@ -316,52 +225,6 @@ function setup_devices_and_mount_local_volumes() {
                         -v /lib/modules:/lib/modules"
     volumes="$(tr -s " " <<<"${volumes}")"
     eval "${__retval}='${volumes}'"
-}
-
-function determine_gpu_use_host() {
-    if [ "${HOST_ARCH}" = "aarch64" ]; then
-        if lsmod | grep -q "^nvgpu"; then
-            USE_GPU_HOST=1
-        fi
-    else
-        # Check nvidia-driver and GPU device
-        local nv_driver="nvidia-smi"
-        if [ ! -x "$(command -v ${nv_driver})" ]; then
-            warning "No nvidia-driver found. CPU will be used"
-        elif [ -z "$(eval ${nv_driver})" ]; then
-            warning "No GPU device found. CPU will be used."
-        else
-            USE_GPU_HOST=1
-        fi
-    fi
-
-    # Try to use GPU inside container
-    local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [ ${USE_GPU_HOST} -eq 1 ]; then
-        DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
-            if dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
-                DOCKER_RUN="docker run --gpus all"
-            else
-                warning "You must upgrade to Docker-CE 19.03+ to access GPU from container!"
-                USE_GPU_HOST=0
-            fi
-        elif [[ -x "$(which nvidia-docker)" ]]; then
-            DOCKER_RUN="nvidia-docker run"
-        else
-            USE_GPU_HOST=0
-            warning "Cannot access GPU from within container. Please install " \
-                "latest Docker and NVIDIA Container Toolkit as described by: "
-            warning "  ${nv_docker_doc}"
-        fi
-    fi
-}
-
-function remove_existing_dev_container() {
-    if docker ps -a --format '{{.Names}}' | grep -q "${APOLLO_DEV}"; then
-        docker stop "${APOLLO_DEV}" >/dev/null
-        docker rm -v -f "${APOLLO_DEV}" >/dev/null
-    fi
 }
 
 function docker_pull() {
@@ -465,33 +328,30 @@ function mount_other_volumes() {
     OTHER_VOLUMES_CONF="${volume_conf}"
 }
 
-function post_run_setup() {
-    if [ "${USER}" != "root" ]; then
-        docker exec -u root "${APOLLO_DEV}" bash -c '/apollo/scripts/docker_start_user.sh'
-    fi
-}
-
 function main() {
     check_host_environment
     check_target_arch
 
     parse_arguments "$@"
-    check_agreement
+
+    if [[ "${USER_AGREED}" != "yes" ]]; then
+        check_agreement
+    fi
 
     determine_dev_image "${USER_VERSION_OPT}"
     geo_specific_config "${GEOLOC}"
 
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
-        info "Start docker container based on local image : ${APOLLO_DEV_IMAGE}"
+        info "Start docker container based on local image : ${DEV_IMAGE}"
     fi
 
-    if ! docker_pull "${APOLLO_DEV_IMAGE}"; then
-        error "Failed to pull docker image ${APOLLO_DEV_IMAGE}"
+    if ! docker_pull "${DEV_IMAGE}"; then
+        error "Failed to pull docker image ${DEV_IMAGE}"
         exit 1
     fi
 
-    info "Check and remove existing Apollo dev container ..."
-    remove_existing_dev_container
+    info "Remove existing Apollo Development container ..."
+    remove_container_if_exists ${DEV_CONTAINER}
 
     info "Determine whether host GPU is available ..."
     determine_gpu_use_host
@@ -503,7 +363,7 @@ function main() {
     mount_map_volumes
     mount_other_volumes
 
-    info "Starting docker container \"${APOLLO_DEV}\" ..."
+    info "Starting Docker container \"${DEV_CONTAINER}\" ..."
 
     local local_host="$(hostname)"
     local display="${DISPLAY:-:0}"
@@ -514,17 +374,16 @@ function main() {
 
     set -x
 
-    ${DOCKER_RUN} -itd \
+    ${DOCKER_RUN_CMD} -itd \
         --privileged \
-        --name "${APOLLO_DEV}" \
+        --name "${DEV_CONTAINER}" \
         -e DISPLAY="${display}" \
         -e DOCKER_USER="${user}" \
         -e USER="${user}" \
         -e DOCKER_USER_ID="${uid}" \
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
-        -e DOCKER_IMG="${APOLLO_DEV_IMAGE}" \
-        -e HOST_OS="${HOST_OS}" \
+        -e DOCKER_IMG="${DEV_IMAGE}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
@@ -539,19 +398,19 @@ function main() {
         --shm-size "${SHM_SIZE}" \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
-        "${APOLLO_DEV_IMAGE}" \
+        "${DEV_IMAGE}" \
         /bin/bash
 
     if [ $? -ne 0 ]; then
-        error "Failed to start docker container \"${APOLLO_DEV}\" based on image: ${APOLLO_DEV_IMAGE}"
+        error "Failed to start docker container \"${DEV_CONTAINER}\" based on image: ${DEV_IMAGE}"
         exit 1
     fi
     set +x
 
-    post_run_setup
+    postrun_start_user "${DEV_CONTAINER}"
 
     ok "Congratulations! You have successfully finished setting up Apollo Dev Environment."
-    ok "To login into the newly created ${APOLLO_DEV} container, please run the following command:"
+    ok "To login into the newly created ${DEV_CONTAINER} container, please run the following command:"
     ok "  bash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }

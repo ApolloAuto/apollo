@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/storytelling/libstorytelling.so"
+    module_library : "/apollo/bazel-bin/modules/storytelling/libstorytelling_component.so"
     timer_components {
         class_name : "Storytelling"
         config {

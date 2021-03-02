@@ -24,7 +24,7 @@ cc_test(
     size = "small",
     srcs = ["vehicle_state_provider_test.cc"],
     data = [
-        "//modules/canbus:canbus_testdata",
+        "//modules/canbus:test_data",
         "//modules/localization:localization_testdata",
     ],
     deps = [

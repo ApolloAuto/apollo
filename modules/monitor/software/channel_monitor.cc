@@ -27,6 +27,7 @@
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
 
+#include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/common/latency_recorder/proto/latency_record.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -90,10 +91,14 @@ ReaderAndMessagePair GetReaderAndLatestMessage(const std::string& channel) {
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_pointcloud_16_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
+          {FLAGS_pointcloud_16_raw_topic,
+           &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_pointcloud_128_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
           {FLAGS_pointcloud_16_front_up_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>},
+          {FLAGS_chassis_detail_topic,
+           &CreateReaderAndLatestsMessage<canbus::ChassisDetail>},
           {FLAGS_pointcloud_hesai_40p_topic,
            &CreateReaderAndLatestsMessage<drivers::PointCloud>}
           // Add more channels here if you want to monitor.
@@ -176,6 +181,14 @@ void ChannelMonitor::UpdateStatus(
     SummaryMonitor::EscalateStatus(
         ComponentStatus::UNKNOWN,
         absl::StrCat(config.name(), " is not registered in ChannelMonitor."),
+        status);
+    return;
+  }
+
+  if (message == nullptr || message->ByteSize() == 0) {
+    SummaryMonitor::EscalateStatus(
+        ComponentStatus::FATAL,
+        absl::StrCat("the message ", config.name(), " reseived is empty."),
         status);
     return;
   }

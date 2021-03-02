@@ -37,7 +37,11 @@
 - 更多详细参数可参考：[leopard数据手册](https://leopardimaging.com/product/li-usb30-ar023zwdrb/)。
 
 ## 摄像头安装配置与数据验证
+
+**注意** 针对Standard、Advanced用户，默认已经对相机进行了安装和集成，直接从`摄像头的启动`这一章节开始进行数据的验证即可
+
 ### 相机的安装固定
+
 - 牢固安装在小车结构架前端横梁处，水平安装，俯仰角向下0-2度（向下倾斜小于2度，不能上仰），翻滚角误差±1度（左右两侧的平齐程度），航向角误差±2度，镜头保持清洁，避免影响图像采集。安装位置如下图所示：
 
 	![camera_integration_installation](images/camera_integration_installation.png)
@@ -107,7 +111,14 @@
 #### 4. 启动camera模块
 
 
- - 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动`Camera`模块
+ - 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 根据车辆铭牌信息选择对应的车型(详情见下表)，在Module Controller标签页启动`Camera`模块
+
+	| 铭牌信息 | 车型选择 | 
+	|---|---|
+	| Apollo D-KIT Lite | dev_kit |
+	| Apollo D-KIT Standard  | dev_kit_standard |
+	| Apollo D-KIT Advanced(NE-S)| dev_kit_advanced_ne-s |
+	| Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r  |
  
 	![camera_integration_dreamview1](images/camera_integration_dreamview1.png)
 

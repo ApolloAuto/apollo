@@ -30,10 +30,9 @@ apt_get_update_and_install \
     graphviz
 
 # Build doxygen from source to reduce image size
-
-VERSION="1.8.19"
+VERSION="1.9.1"
 PKG_NAME="doxygen-${VERSION}.src.tar.gz"
-CHECKSUM="ac15d111615251ec53d3f0e54ac89c9d707538f488be57184245adef057778d3"
+CHECKSUM="67aeae1be4e1565519898f46f1f7092f1973cce8a767e93101ee0111717091d1"
 DOWNLOAD_LINK="http://doxygen.nl/files/${PKG_NAME}"
 
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"

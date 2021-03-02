@@ -4,16 +4,34 @@ import classNames from 'classnames';
 
 import warnIcon from 'assets/images/icons/warning.png';
 import errorIcon from 'assets/images/icons/error.png';
+import successIcon from 'assets/images/icons/success.png';
+import notificationIcon from 'assets/images/icons/notification.png';
 import { timestampMsToTimeString } from 'utils/misc';
+
+const LEVEL_CLASS = Object.freeze({
+  ERROR: 'alert',
+  FATAL: 'alert',
+  FAIL: 'alert',
+  SUCCESS: 'success',
+  UNKNOWN: 'notification',
+});
+
+const LEVEL_ICON = Object.freeze({
+  ERROR: errorIcon,
+  FATAL: errorIcon,
+  FAIL: errorIcon,
+  SUCCESS: successIcon,
+  UNKNOWN: notificationIcon,
+});
+//Todo:level statement style
 
 @observer
 export class MonitorItem extends React.Component {
   render() {
     const { level, text, time } = this.props;
 
-    const levelClass = (level === 'ERROR' || level === 'FATAL')
-      ? 'alert' : 'warn';
-    const icon = levelClass === 'alert' ? errorIcon : warnIcon;
+    const levelClass = LEVEL_CLASS[level] ? LEVEL_CLASS[level] : 'warn';
+    const icon = LEVEL_ICON[level] ? LEVEL_ICON[level] : warnIcon;
 
     return (
             <li className="monitor-item">

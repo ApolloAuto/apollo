@@ -11,7 +11,7 @@
          ./conf/dag_streaming.conf -->
 
     <module>
-        <name>perception_traffic_light</name>
+        <name>perception_trafficlights</name>
         <dag_conf>/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag</dag_conf>
         <!-- if not set, use default process -->
         <process_name>perception_trafficlights</process_name>

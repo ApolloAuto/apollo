@@ -9,10 +9,10 @@
          ./conf/dag_streaming_0.conf -->
 
     <module>
-        <name>perception</name>
+        <name>perception_lidar</name>
         <dag_conf>/apollo/modules/perception/production/dag/dag_streaming_perception_lidar.dag</dag_conf>
         <!-- if not set, use default process -->
-        <process_name>lidar_perception</process_name>
+        <process_name>perception_lidar</process_name>
         <version>1.0.0</version>
     </module> 
 </cyber>
