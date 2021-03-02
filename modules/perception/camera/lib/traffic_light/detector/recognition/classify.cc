@@ -52,11 +52,11 @@ void ClassifyBySimple::Init(
       GetAbsolutePath(work_root, model_config.model_name());
 
   std::string proto_file =
-      GetAbsolutePath(work_root, model_config.proto_file());
+      GetAbsolutePath(model_root, model_config.proto_file());
   AINFO << "proto_file " << proto_file;
 
   std::string weight_file =
-      GetAbsolutePath(work_root, model_config.weight_file());
+      GetAbsolutePath(model_root, model_config.weight_file());
 
   AINFO << "model_root" << model_root;
 
