@@ -27,37 +27,38 @@ DEFINE_string(obs_sensor_intrinsic_path,
               "The intrinsics/extrinsics dir.");
 
 DEFINE_string(obs_sensor_meta_path,
-              "/apollo/modules/perception/production"
-              "/data/perception/common/sensor_meta.pt",
+              "/apollo/modules/perception/conf/common/sensor_meta.pt",
               "The SensorManager config file.");
 
 DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");
 
 // config_manager
-DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
-DEFINE_string(work_root, "", "Project work root direcotry.");
+DEFINE_string(config_manager_path, "/apollo/modules/perception/conf",
+              "The ModelConfig config paths.");
+DEFINE_string(work_root, "/apollo/modules/perception",
+              "Project work root directory.");
 
 // lidar_point_pillars
 DEFINE_int32(gpu_id, 0, "The id of gpu used for inference.");
 DEFINE_string(pfe_torch_file,
-              "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_voxel_encoder.zip",
+              "/apollo/modules/perception/models/lidar/detection"
+              "/point_pillars/pts_voxel_encoder.zip",
               "The path of pillars feature extractor torch file.");
 DEFINE_string(scattered_torch_file,
-              "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_middle_encoder.zip",
+              "/apollo/modules/perception/models/lidar/detection"
+              "/point_pillars/pts_middle_encoder.zip",
               "The path of pillars feature scatter torch file.");
 DEFINE_string(backbone_torch_file,
-              "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_backbone.zip",
+              "/apollo/modules/perception/models/lidar/detection"
+              "/point_pillars/pts_backbone.zip",
               "The path of pillars backbone torch file.");
 DEFINE_string(fpn_torch_file,
-              "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_neck.zip",
+              "/apollo/modules/perception/models/lidar/detection"
+              "/point_pillars/pts_neck.zip",
               "The path of pillars fpn torch file.");
 DEFINE_string(bbox_head_torch_file,
-              "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_bbox_head.zip",
+              "/apollo/modules/perception//models/lidar/detection"
+              "/point_pillars/pts_bbox_head.zip",
               "The path of pillars bbox head torch file.");
 DEFINE_double(normalizing_factor, 255,
               "Normalize intensity range to [0, 1] by this factor.");

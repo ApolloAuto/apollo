@@ -10,10 +10,24 @@ filegroup(
     ]),
 )
 
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/**",
+        "dag/*.dag",
+        "data/**",
+        "launch/*.launch",
+        "models/**",
+    ]),
+)
+
 install(
     name = "install",
+    data = [
+        ":runtime_data",
+    ],
     deps = [
-        "//modules/perception/onboard/component:install",
+        "//modules/perception/submodules:install",
     ],
 )
 
