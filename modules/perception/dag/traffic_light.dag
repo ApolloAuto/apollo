@@ -5,7 +5,7 @@ module_config {
     class_name : "TrafficLightSubmodule"
     config {
       name: "TrafficLightSubmodule"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/camera/trafficlights_perception_component.config"
+      config_file_path: "/apollo/modules/perception/conf/camera/traffic_light_detection/trafficlights_perception_submodule.conf"
       flag_file_path: "/apollo/modules/perception/conf/perception_common.flag"
     }
   }
