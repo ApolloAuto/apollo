@@ -88,7 +88,7 @@
 # default: 0.15
 --obs_max_local_pose_extrapolation_latency=0.15
 
---config_manager_path=./
+--config_manager_path=/apollo/modules/perception/conf/
 
 ###########################################################################
 # Flags from lidar_point_pillars

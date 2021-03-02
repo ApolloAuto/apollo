@@ -4,8 +4,8 @@ module_config {
     class_name : "CameraDetectionSubmodule"
     config {
       name: "CameraObstacleSubmodule"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt"
-      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      config_file_path: "/apollo/modules/perception/conf/camera/obstacle_detection/camera_detection_submodule.conf"
+      flag_file_path: "/apollo/modules/perception/conf/perception_common.flag"
     }
   }
 }
@@ -17,8 +17,8 @@ module_config {
     class_name : "LidarSegmentationSubmodule"
     config {
       name: "Velodyne128Segmentation"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne128_segmentation_conf.pb.txt"
-      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      config_file_path: "/apollo/modules/perception/conf/lidar/velodyne128_segmentation_conf.pb.txt"
+      flag_file_path: "/apollo/modules/perception/conf/perception_common.flag"
       readers {
         channel: "/apollo/sensor/lidar128/compensator/PointCloud2"
       }
@@ -29,8 +29,8 @@ module_config {
     class_name: "RadarDetectionSubmodule"
     config {
       name: "FrontRadarDetection"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/radar/front_radar_component_conf.pb.txt"
-      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      config_file_path: "/apollo/modules/perception/conf/radar/front_radar_submodule.conf"
+      flag_file_path: "/apollo/modules/perception/conf/perception_common.flag"
       readers {
         channel: "/apollo/sensor/radar/front"
       }
@@ -41,8 +41,8 @@ module_config {
     class_name: "RadarDetectionSubmodule"
     config {
       name: "RearRadarDetection"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt"
-      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      config_file_path: "/apollo/modules/perception/conf/radar/rear_radar_submodule.conf"
+      flag_file_path: "/apollo/modules/perception/conf/perception_common.flag"
       readers {
         channel: "/apollo/sensor/radar/rear"
       }
@@ -53,7 +53,7 @@ module_config {
     class_name : "LidarTrackingSubmodule"
     config {
       name: "LidarTrackingSubmodule"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/recognition_conf.pb.txt"
+      config_file_path: "/apollo/modules/perception/conf/lidar/recognition_conf.pb.txt"
       readers {
         channel: "/perception/inner/SegmentationObjects"
       }
