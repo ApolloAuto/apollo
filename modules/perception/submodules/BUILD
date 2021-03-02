@@ -14,7 +14,6 @@ install(
     ],
     deps = [
         "//cyber:install",
-        "//modules/perception/production:install",
     ],
 )
 
