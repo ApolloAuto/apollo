@@ -4,8 +4,8 @@ module_config {
  components {
     class_name : "SegmentationComponent"
     config {
-      name: "Velodyne128Segmentation"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne128_segmentation_conf.pb.txt"
+      name: "Velodyne16Segmentation"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
       flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
       readers {
           channel: "/apollo/sensor/lidar16/compensator/PointCloud2"

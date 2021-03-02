@@ -1,0 +1,2 @@
+main_sensor_name: "velodyne16"
+output_channel_name: "/perception/inner/PrefusedObjects"
