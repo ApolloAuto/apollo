@@ -1,5 +1,5 @@
 header:
-  frame_id: velodyne128
+  frame_id: lidar16
   stamp:
     secs: 0
     nsecs: 0

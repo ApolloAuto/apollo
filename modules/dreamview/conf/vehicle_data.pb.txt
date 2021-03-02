@@ -194,3 +194,22 @@ data_files {
   source_path: "perception_params"
   dest_path: "/apollo/modules/perception/data/params"
 }
+  source_path: "perception_conf/fusion_component_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/perception_common.flag"
+  dest_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+}
+data_files {
+  source_path: "perception_conf/velodyne16_segmentation_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/recognition_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/recognition_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/mlf_engine.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
+}
