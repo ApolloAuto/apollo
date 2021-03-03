@@ -1,0 +1,17 @@
+header:
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: front_6mm
+  seq: 0
+child_frame_id: onsemi_traffic
+transform:
+  rotation:
+    z: 0.0008354999007627417
+    x: 0.03155274086485915
+    y: -0.00761718996296211
+    w: 0.9994727134348886
+  translation:
+    x: 0.09551907578371321
+    y: -0.01225007213040394
+    z: 0.1632426237476726
