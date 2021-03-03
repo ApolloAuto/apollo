@@ -11,7 +11,7 @@
   - [控制评测云服务任务提交](#控制评测云服务任务提交)
     - [文件夹结构要求](#文件夹结构要求)
       - [1. 上传预处理后的数据至BOS](#1-上传预处理后的数据至bos)
-      - [2. 提交标定任务据至BOS](#2-提交标定任务据至bos)
+      - [2. 提交控制评测任务数据至BOS](#2-提交控制评测任务数据至bos)
       - [3. 获取评测结果](#3-获取评测结果)
   - [评测结果说明](#评测结果说明)
 
@@ -38,7 +38,7 @@
 
 - 评测数据采集
 
-- 标定任务提交
+- 控制评测任务提交
 
 - 结果分析
 
@@ -79,7 +79,7 @@
 
 在上传数据之前，请注意以下几点：
 
-1）请将标定数据按照如下文件夹结构进行放置：
+1）请将数据按照如下文件夹结构进行放置：
 
 ![profiling_folder_structure](images/profiling_folder_structure.png)
 
@@ -87,18 +87,18 @@
 
 3）`task001、task002...`代表一次评测任务的文件夹，即每提交一次评测任务时，只能输入一个task目录的路径地址，云端会对该文件内的数据进行分析评分，一个task文件内可以包含多个车辆文件夹，在一次任务提交文件夹内可以包含多个车辆；`task001`如果在BOS根目录，则提交任务时，只需要填写输入目录路径为`task001`；如果在其它目录下，则需要填写输入目录路径为从根目录开始的绝对路径，如`xxx/task001`；
 
-4） `Vehicle1、Vehicle2...`代表标定的车辆文件夹，可以根据实际情况，按照车辆名称+编号的形式命名，如`devkit01`、`devkit02`等。每一个`Vehicle文件夹`下包含评测自动驾驶数据文件夹和该车辆的配置文件。
+4） `Vehicle1、Vehicle2...`代表评测的车辆文件夹，可以根据实际情况，按照车辆名称+编号的形式命名，如`devkit01`、`devkit02`等。每一个`Vehicle文件夹`下包含评测自动驾驶数据文件夹和该车辆的配置文件。
 
 **需要注意：**自动驾驶数据文件夹下需要有2层子文件夹，record数据文件放在第二层的文件夹内，如上图文件夹结构图所示，可以根据自动驾驶的场景不同，分成`straight`（直行）、`left`（左转）、`right`（右转）……，每一个场景下也可以根据速度等维度区分，如`1m/s`、`2m/s`、`3m/s` ……，速度维度的文件夹内即是该场景速度条件下的自动驾驶数据。
 
-5） `Configuration File`即为`vehicle_param.pb.txt`（车辆配置文件），该文件在`apollo/modules/calition/data/dev_kit`文件夹内，将该文件夹下的`vehicle_param.pb.txt`拷贝至BOS对应的车辆标定文件夹下，例如上图`Vehicle2`文件夹内；
+5） `Configuration File`即为`vehicle_param.pb.txt`（车辆配置文件），该文件在`apollo/modules/calition/data/dev_kit`文件夹内，将该文件夹下的`vehicle_param.pb.txt`拷贝至BOS对应的车辆控制评测文件夹下，例如上图`Vehicle2`文件夹内；
 
 6）总结上述文件夹结构：
 
     BOS根目录 -> 任务文件夹 -> 车型文件夹 -> 具体的自动驾驶数据包 + vehicle_param.pb.txt
 
 
-#### 2. 提交标定任务据至BOS
+#### 2. 提交控制评测任务数据至BOS
 
 首先进入[Apollo云服务任务页面](http://bce.apollo.auto/login)，选择使用百度账号登录，在左侧框中选择`Apollo Fuel-->任务`，点击`新建任务`，然后在下拉框内选择`控制评测`，然后输入相应要评测的数据路径，在`输入数据路径`中填写到根目录，在本示例中填写为`task001`。如下图所示：
 
@@ -134,13 +134,13 @@
 
   数据图表展示的附件与评分附件相同，主要根据上述各评分结果对应的数据包进行相应的数据展示，图表附件如下图所示：
 
-  ![profiling_plot_folder](images/profiling_plot_folder.png)  
+  ![profiling_plot_folder](images/profiling_plot_folder.png)
 
   图表附件是pdf文件，文件内描述了上述评价指标的对应真实数据变化过程（自动驾驶过程中），从而方便直观的查看各指标的变化情况，还会针对一些数据变化较大的指标，进行90%的数据描绘，横轴代表数据的数值，纵轴代表数据的数量；如果是`100%data`描绘，则会展示该指标随采样时间轴的变化情况，即描述了自动驾驶过程中的真实变化情况。
 
-  ![profiling_90data](images/profiling_90data.png) 
+  ![profiling_90data](images/profiling_90data.png)
 
-  ![profiling_100data](images/profiling_100data.png) 
+  ![profiling_100data](images/profiling_100data.png)
 
   以上只是2张图表的示例图，图表结果内展示约50张图表，数据展示量非常丰富，方便开发者对控制过程的数据变化进行查看。
 
