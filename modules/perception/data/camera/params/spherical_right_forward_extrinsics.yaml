@@ -1,0 +1,17 @@
+header:
+  frame_id: velodyne64
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+child_frame_id: spherical_right_forward
+transform:
+  rotation:
+    z: 0.6950555277069874
+    x: 0.1331163445381593
+    w: -0.1316697814438849
+    y: -0.6941476218177793
+  translation:
+    x: 0.08237005364750707
+    z: -0.01919797801298715
+    y: -0.2432948502362278

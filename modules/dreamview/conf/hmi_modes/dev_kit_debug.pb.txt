@@ -44,19 +44,19 @@ cyber_modules {
 cyber_modules {
   key: "Lidar Perception"
   value: {
-    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_dev_kit_lidar.dag"
+    dag_files: "/apollo/modules/perception/dag/dag_streaming_perception_dev_kit_lidar.dag"
   }
 }
 cyber_modules {
   key: "Camera Perception"
   value: {
-    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_dev_kit_camera.dag"
+    dag_files: "/apollo/modules/perception/dag/dag_streaming_perception_dev_kit_camera.dag"
   }
 }
 cyber_modules {
   key: "Traffic Light"
   value: {
-    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
+    dag_files: "/apollo/modules/perception/dag/traffic_light.dag"
   }
 }
 cyber_modules {

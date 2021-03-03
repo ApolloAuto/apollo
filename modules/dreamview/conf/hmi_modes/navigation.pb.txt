@@ -10,7 +10,7 @@ cyber_modules {
 cyber_modules {
   key: "Perception"
   value: {
-    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
+    dag_files: "/apollo/modules/perception/dag/perception.dag"
   }
 }
 cyber_modules {

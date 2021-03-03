@@ -148,15 +148,15 @@ data_files {
 }
 data_files {
   source_path: "perception_dag"
-  dest_path: "/apollo/modules/perception/production/dag"
+  dest_path: "/apollo/modules/perception/dag"
 }
 data_files {
   source_path: "perception_launch"
-  dest_path: "/apollo/modules/perception/production/launch"
+  dest_path: "/apollo/modules/perception/launch"
 }
 data_files {
   source_path: "perception_conf"
-  dest_path: "/apollo/modules/perception/production/conf/perception"
+  dest_path: "/apollo/modules/perception/conf"
 }
 data_files {
   source_path: "lidar_dag"
@@ -180,7 +180,7 @@ data_files {
 }
 data_files {
   source_path: "perception_conf/pointcloud_preprocessor.conf"
-  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
+  dest_path: "/apollo/modules/perception/conf/lidar/modules/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
 }
 data_files {
   source_path: "canbus_conf/canbus_conf.pb.txt"
@@ -188,7 +188,7 @@ data_files {
 }
 data_files {
   source_path: "perception_camera_params"
-  dest_path: "/apollo/modules/perception/production/data/perception/camera/params"
+  dest_path: "/apollo/modules/perception/data/camera/params"
 }
 data_files {
   source_path: "perception_params"
