@@ -21,3 +21,7 @@ DEFINE_string(task_manager_node_name, "task_manager", "the name for this node");
 DEFINE_double(threshold_for_destination_check, 1.0,
               "meters, which is 100 feet.  This threshold is used to check if"
               "the vehicle reaches the destination");
+
+DEFINE_double(plot_size_buffer, 0.2, "the size buffer of parking plot");
+
+DEFINE_double(road_width_buffer, 0.0, "the size buffer of road width");
