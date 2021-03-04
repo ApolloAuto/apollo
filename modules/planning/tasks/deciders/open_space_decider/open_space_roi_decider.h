@@ -147,6 +147,7 @@ class OpenSpaceRoiDecider : public Decider {
 
   // @brief if not close enough to parking spot, return false
   bool CheckDistanceToParkingSpot(
+      Frame *const frame,
       const hdmap::Path &nearby_path,
       const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot);
 
