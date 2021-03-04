@@ -97,6 +97,10 @@ bool OpenSpacePreStopDecider::CheckPullOverPreStop(
 bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
     Frame* const frame, ReferenceLineInfo* const reference_line_info,
     double* target_s) {
+  const auto &routing_request =
+      frame->local_view().routing->routing_request();
+  auto corner_point =
+      routing_request.parking_info().corner_point();
   const auto& target_parking_spot_id =
       frame->open_space_info().target_parking_spot_id();
   const auto& nearby_path = reference_line_info->reference_line().map_path();
@@ -122,6 +126,10 @@ bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
           target_parking_spot_ptr->polygon().points().at(0);
       Vec2d right_bottom_point =
           target_parking_spot_ptr->polygon().points().at(1);
+      left_bottom_point.set_x(corner_point.point().at(0).x());
+      left_bottom_point.set_y(corner_point.point().at(0).y());
+      right_bottom_point.set_x(corner_point.point().at(1).x());
+      right_bottom_point.set_y(corner_point.point().at(1).y());
       double left_bottom_point_s = 0.0;
       double left_bottom_point_l = 0.0;
       double right_bottom_point_s = 0.0;
