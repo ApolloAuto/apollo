@@ -107,6 +107,13 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   for (size_t i = check_start_index; i < node_step_size; ++i) {
     if (traversed_x[i] > XYbounds_[1] || traversed_x[i] < XYbounds_[0] ||
         traversed_y[i] > XYbounds_[3] || traversed_y[i] < XYbounds_[2]) {
+      AERROR << "traversed_x[i] is: " << traversed_x[i];
+      AERROR << "XYbounds_[1] is: " << XYbounds_[1];
+      AERROR << "XYbounds_[0] is: " << XYbounds_[0];
+      AERROR << "traversed_y[i] is: " << traversed_y[i];
+      AERROR << "XYbounds_[3] is: " << XYbounds_[3];
+      AERROR << "XYbounds_[2] is: " << XYbounds_[2];
+      AERROR << "enter false 1";
       return false;
     }
     Box2d bounding_box = Node3d::GetBoundingBox(
@@ -115,10 +122,11 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
       for (const common::math::LineSegment2d& linesegment :
            obstacle_linesegments) {
         if (bounding_box.HasOverlap(linesegment)) {
-          ADEBUG << "collision start at x: " << linesegment.start().x();
-          ADEBUG << "collision start at y: " << linesegment.start().y();
-          ADEBUG << "collision end at x: " << linesegment.end().x();
-          ADEBUG << "collision end at y: " << linesegment.end().y();
+          AERROR << "enter false 2";
+          AERROR << "collision start at x: " << linesegment.start().x();
+          AERROR << "collision start at y: " << linesegment.start().y();
+          AERROR << "collision end at x: " << linesegment.end().x();
+          AERROR << "collision end at y: " << linesegment.end().y();
           return false;
         }
       }
@@ -642,21 +650,53 @@ bool HybridAStar::Plan(
   close_set_.clear();
   open_pq_ = decltype(open_pq_)();
   final_node_ = nullptr;
-
+  // add
+  size_t segment_num = obstacles_vertices_vec.size();
+  std::ofstream pointx, pointy;
+  pointx.open("pointx.txt");
+  pointy.open("pointy.txt");
+  // end
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec;
+  std::vector<common::math::LineSegment2d> obstacle_linesegments;
   for (const auto& obstacle_vertices : obstacles_vertices_vec) {
     size_t vertices_num = obstacle_vertices.size();
-    std::vector<common::math::LineSegment2d> obstacle_linesegments;
+    // std::vector<common::math::LineSegment2d> obstacle_linesegments;
     for (size_t i = 0; i < vertices_num - 1; ++i) {
       common::math::LineSegment2d line_segment = common::math::LineSegment2d(
           obstacle_vertices[i], obstacle_vertices[i + 1]);
+      // add
+      if (pointx.is_open() && pointy.is_open()) {
+        pointx << obstacle_vertices[i].x();
+        pointx << std::endl;
+        pointy << obstacle_vertices[i].y();
+        pointy << std::endl;
+        pointx << obstacle_vertices[i + 1].x();
+        pointx << std::endl;
+        pointy << obstacle_vertices[i + 1].y();
+        pointy << std::endl;
+      }
+      // end
       obstacle_linesegments.emplace_back(line_segment);
     }
     obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
   }
+  // add
+  common::math::LineSegment2d line_segment = common::math::LineSegment2d(
+    obstacles_vertices_vec[segment_num - 1].back(),
+    obstacles_vertices_vec[0].front());
+  obstacle_linesegments.emplace_back(line_segment);
+  obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
+  pointx << obstacles_vertices_vec[segment_num - 1].back().x();
+  pointx << std::endl;
+  pointy << obstacles_vertices_vec[segment_num - 1].back().y();
+  pointy << std::endl;
+  pointx << obstacles_vertices_vec[0].front().x();
+  pointx << std::endl;
+  pointy << obstacles_vertices_vec[0].front().y();
+  pointy << std::endl;
+  // end
   obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
-
   // load XYbounds
   XYbounds_ = XYbounds;
   // load nodes and obstacles
@@ -664,12 +704,50 @@ bool HybridAStar::Plan(
       new Node3d({sx}, {sy}, {sphi}, XYbounds_, planner_open_space_config_));
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
+
+  Box2d start_point = Node3d::GetBoundingBox(
+        vehicle_param_, sx, sy, sphi);
+  Box2d end_point = Node3d::GetBoundingBox(
+        vehicle_param_, ex, ey, ephi);
+  std::vector<Vec2d> s_vector = start_point.GetAllCorners();
+  std::vector<Vec2d> e_vector = end_point.GetAllCorners();
+  // add
+  std::ofstream startx, starty, endx, endy, currentx, currenty, currentphi;
+  currentx.open("currentx.txt");
+  currenty.open("currenty.txt");
+  currentphi.open("currentphi.txt");
+  startx.open("startx.txt");
+  starty.open("starty.txt");
+  endx.open("endx.txt");
+  endy.open("endy.txt");
+  if (startx.is_open() && endx.is_open()) {
+    for (size_t m = 0; m < s_vector.size(); ++m) {
+      startx << s_vector.at(m).x();
+      startx << std::endl;
+      starty << s_vector.at(m).y();
+      starty << std::endl;
+
+      endx << e_vector.at(m).x();
+      endx << std::endl;
+      endy << e_vector.at(m).y();
+      endy << std::endl;
+    }
+    startx << s_vector.at(0).x();
+    startx << std::endl;
+    starty << s_vector.at(0).y();
+    starty << std::endl;
+    endx << e_vector.at(0).x();
+    endx << std::endl;
+    endy << e_vector.at(0).y();
+    endy << std::endl;
+  }
+  // end
   if (!ValidityCheck(start_node_)) {
-    ADEBUG << "start_node in collision with obstacles";
+    AERROR << "start_node in collision with obstacles";
     return false;
   }
   if (!ValidityCheck(end_node_)) {
-    ADEBUG << "end_node in collision with obstacles";
+    AERROR << "end_node in collision with obstacles";
     return false;
   }
   double map_time = Clock::NowInSeconds();
@@ -679,7 +757,6 @@ bool HybridAStar::Plan(
   // load open set, pq
   open_set_.emplace(start_node_->GetIndex(), start_node_);
   open_pq_.emplace(start_node_->GetIndex(), start_node_->GetCost());
-
   // Hybrid A* begins
   size_t explored_node_num = 0;
   double astar_start_time = Clock::NowInSeconds();
@@ -690,6 +767,24 @@ bool HybridAStar::Plan(
     const std::string current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
+    Box2d current_point = Node3d::GetBoundingBox(
+        vehicle_param_, current_node->GetX(),
+        current_node->GetY(), current_node->GetPhi());
+    std::vector<Vec2d> current_vector = current_point.GetAllCorners();
+    if (currentx.is_open() && currenty.is_open() && currentphi.is_open()) {
+      for (size_t m = 0; m < current_vector.size(); ++m) {
+        currentx << current_vector.at(m).x();
+        currentx << std::endl;
+        currenty << current_vector.at(m).y();
+        currenty << std::endl;
+      }
+      currentx << current_vector.at(0).x();
+      currentx << std::endl;
+      currenty << current_vector.at(0).y();
+      currenty << std::endl;
+      // currentphi << current_node->GetPhi();
+      // currentphi << std::endl;
+  }
     // check if an analystic curve could be connected from current
     // configuration to the end configuration without collision. if so, search
     // ends.
