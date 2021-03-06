@@ -590,7 +590,7 @@ export default class Map {
         return null;
       }
       else if (res.x) {
-        return res;
+        return [res, _.get(id,'0.id')];
       }
       else {
         totalLength += res.length;
@@ -684,7 +684,7 @@ export default class Map {
         if (index === -1) {
           return null;
         }
-        return points[index];
+        return [points[index], _.get(id,'0.id')];
       } else {
         if (_.isEmpty(id)) {
           return null;
@@ -700,7 +700,7 @@ export default class Map {
         if (index === -1) {
           return null;
         }
-        return points[index];
+        return [points[index], _.get(id,'0.id')];
       } else {
         return this.getRoutingPointAlongLane(id,
           distance, coordinates, threshold, false);
@@ -839,12 +839,13 @@ export default class Map {
       laneCenterLineEndPoint);
     const laneWidth = getPointDistance(border[result[2]], projectionPointOnLane) * 4;
     const id = successor ? basedLane.successorId : basedLane.predecessorId;
-    routingPoint = this.getRoutingPoint(successor, projectionPointOnLane,
+    const routingRes = this.getRoutingPoint(successor, projectionPointOnLane,
       STORE.routeEditingManager.parkingRoutingDistanceThreshold,
       centerLine, laneVector, coordinates, id);
-    if (_.isEmpty(routingPoint)) {
+    if (!_.isArray(routingRes) || routingRes.length !== 2) {
       return null;
     }
+    routingPoint = routingRes[0];
     const type = getPointDistance(border[result[0]],
       border[result[1]]) < getPointDistance(border[result[2]], border[result[1]]) ? 0 : 1;
     return {
@@ -852,6 +853,7 @@ export default class Map {
       type,
       laneWidth,
       routingEndPoint: routingPoint,
+      laneId: routingRes[1],
     };
   }
 }

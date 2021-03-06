@@ -80,6 +80,7 @@ export default class RoutingEditor {
       item.routingEndPoint = extraInfo.routingEndPoint;
       item.laneWidth = extraInfo.laneWidth;
       item.selectedCounts = 0;
+      item.laneId = extraInfo.laneId;
     });
   }
 
@@ -149,12 +150,12 @@ export default class RoutingEditor {
     const parkingRoutingRequest = (index !== -1);
     if (parkingRoutingRequest) {
       const lastPoint = this.routePoints.pop();
+      const { routingEndPoint, id, type, laneWidth, laneId } = this.parkingSpaceInfo[index];
       const parkingRequestPoints = this.routePoints.map((object) => {
         object.position.z = 0;
         return coordinates.applyOffset(object.position, true);
       });
-      parkingRequestPoints.push(coordinates.applyOffset(
-        this.parkingSpaceInfo[index]['routingEndPoint'], true));
+      parkingRequestPoints.push(coordinates.applyOffset(routingEndPoint, true));
       const start = (parkingRequestPoints.length > 1) ? parkingRequestPoints[0]
         : coordinates.applyOffset(carOffsetPosition, true);
       const end = parkingRequestPoints[parkingRequestPoints.length - 1];
@@ -166,11 +167,11 @@ export default class RoutingEditor {
       });
       const cornerPoints = parkingRequestPoints.slice(-4);
       const parkingInfo = {
-        parkingSpaceId: _.get(this.parkingSpaceInfo[index], 'id.id'),
+        parkingSpaceId: _.get(id, 'id'),
         parkingPoint: coordinates.applyOffset(lastPoint.position,true),
-        parkingSpotType: _.get(this.parkingSpaceInfo[index], 'type'),
+        parkingSpotType: type,
       };
-      WS.sendParkingRequest(start, waypoint, end, parkingInfo, _.get(this.parkingSpaceInfo[index],'laneWidth'),cornerPoints);
+      WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints,laneId);
       return true;
     }
     const points = _.isEmpty(routingPoints) ?

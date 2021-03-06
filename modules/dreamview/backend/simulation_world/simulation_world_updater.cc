@@ -200,6 +200,17 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         auto task = std::make_shared<Task>();
         auto *parking_routing_task = task->mutable_parking_routing_task();
         bool succeed = ConstructParkingRoutingTask(json, parking_routing_task);
+        // For test routing
+        auto routing_request = std::make_shared<RoutingRequest>();
+        bool suc = ConstructRoutingRequest(json, routing_request.get());
+        if (suc) {
+          sim_world_service_.PublishRoutingRequest(routing_request);
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
+                                                   "Routing request sent.");
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR, "Failed to send a routing request.");
+        }
         if (succeed) {
           task->set_task_name("parking_routing_task");
           task->set_task_type(apollo::task_manager::TaskType::PARKING_ROUTING);
@@ -503,11 +514,20 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     AERROR << "Failed to prepare a routing request: invalid end point.";
     return false;
   }
-  if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
+  if (ContainsKey(end, "id")) {
+    if (!map_service_->ConstructLaneWayPointWithLaneId(
+            end["x"], end["y"], end["id"], routing_request->add_waypoint())) {
+      AERROR << "Failed to prepare a routing request with lane id: "
+             << end["id"] << " cannot locate end point on map.";
+      return false;
+    }
+  } else {
+    if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
                                            routing_request->add_waypoint())) {
     AERROR << "Failed to prepare a routing request:"
            << " cannot locate end point on map.";
     return false;
+    }
   }
 
   // set parking info
