@@ -16,6 +16,7 @@ install(
         "//cyber/examples:install",
         "//docker/scripts:install",
         "//modules/audio:install",
+        "//modules/bridge:install",
         "//modules/canbus:install",
         "//modules/common/data:install",
         "//modules/control:install",

@@ -9,6 +9,7 @@ install(
     data = [
         ":apollo_base",
         ":bootstrap",
+        ":bridge",
         ":docker_utils",
     ],
 )
@@ -19,6 +20,13 @@ filegroup(
         "bootstrap.sh",
         "dreamview.sh",
         "monitor.sh",
+    ],
+)
+
+filegroup(
+    name = "bridge",
+    srcs = [
+        "bridge.sh",
     ],
 )
 
