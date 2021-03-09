@@ -3,6 +3,10 @@
 # Copyright (c) 2021 LG Electronics, Inc. All Rights Reserved
 
 DOCKER_REPO=apolloauto/apollo
+DOCKER_USER=apollo
+DOCKER_USER_ID=1001
+DOCKER_GRP=apollo
+DOCKER_GRP_ID=1001
 TARGET_ARCH=x86_64
 IMAGE_VERSION=18.04-20210315_2158
 DEV_IMAGE=${DOCKER_REPO}:dev-${TARGET_ARCH}-${IMAGE_VERSION}
@@ -53,12 +57,16 @@ cp scripts/{common.bashrc,apollo_base.sh,apollo.bashrc} docker/build/output/stan
 
 docker build \
     --build-arg BASE_IMAGE=${RUNTIME_IMAGE} \
+    --build-arg DOCKER_USER=${DOCKER_USER} \
+    --build-arg DOCKER_USER_ID=${DOCKER_USER_ID} \
+    --build-arg DOCKER_GRP=${DOCKER_GRP} \
+    --build-arg DOCKER_GRP_ID=${DOCKER_GRP_ID} \
     -f docker/build/standalone.x86_64.dockerfile \
     docker/build/ \
     -t ${STANDALONE_IMAGE}
 
 /bin/echo -e "Docker image with prebuilt files was built and tagged as ${STANDALONE_IMAGE}, you can start it with: \n\
   cd docker/build/output/standalone-scripts
-  docker/scripts/runtime_start.sh --standalone --local --tag standalone-${TARGET_ARCH}-${IMAGE_VERSION}\n\
+  RUNTIME_STANDALONE_USER=${DOCKER_USER} RUNTIME_STANDALONE_GROUP=${DOCKER_GRP} RUNTIME_STANDALONE_UID=${DOCKER_USER_ID} RUNTIME_STANDALONE_GID=${DOCKER_GRP_ID} docker/scripts/runtime_start.sh --standalone --local --tag standalone-${TARGET_ARCH}-${IMAGE_VERSION}\n\
 and switch into it with:\n\
-  docker/scripts/runtime_into_standalone.sh"
+  RUNTIME_STANDALONE_USER=${DOCKER_USER} docker/scripts/runtime_into_standalone.sh"

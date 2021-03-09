@@ -17,6 +17,7 @@
 
 DOCKER_USER="${USER}"
 RUNTIME_CONTAINER="apollo_runtime_standalone_${USER}"
+[ -n "${RUNTIME_STANDALONE_USER}" ] && DOCKER_USER="${RUNTIME_STANDALONE_USER}"
 
 xhost +local:root 1>/dev/null 2>&1
 
