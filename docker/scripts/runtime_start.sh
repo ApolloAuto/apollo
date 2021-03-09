@@ -335,21 +335,27 @@ function main() {
 
     local local_host="$(hostname)"
     local display="${DISPLAY:-:0}"
-    local user="${USER}"
-    local uid="$(id -u)"
-    local group="$(id -g -n)"
-    local gid="$(id -g)"
+    local docker_user="${USER}"
+    local docker_uid="$(id -u)"
+    local docker_group="$(id -g -n)"
+    local docker_gid="$(id -g)"
 
+    if $RUNTIME_STANDALONE; then
+        [ -n "${RUNTIME_STANDALONE_USER}" ] && docker_user="${RUNTIME_STANDALONE_USER}"
+        [ -n "${RUNTIME_STANDALONE_UID}" ] && docker_uid="${RUNTIME_STANDALONE_UID}"
+        [ -n "${RUNTIME_STANDALONE_GROUP}" ] && docker_group="${RUNTIME_STANDALONE_GROUP}"
+        [ -n "${RUNTIME_STANDALONE_GID}" ] && docker_gid="${RUNTIME_STANDALONE_GID}"
+    fi
     set -x
     ${DOCKER_RUN_CMD} -itd \
         --privileged \
         --name "${RUNTIME_CONTAINER}" \
         -e DISPLAY="${display}" \
-        -e DOCKER_USER="${user}" \
-        -e USER="${user}" \
-        -e DOCKER_USER_ID="${uid}" \
-        -e DOCKER_GRP="${group}" \
-        -e DOCKER_GRP_ID="${gid}" \
+        -e USER="${USER}" \
+        -e DOCKER_USER="${docker_user}" \
+        -e DOCKER_USER_ID="${docker_uid}" \
+        -e DOCKER_GRP="${docker_group}" \
+        -e DOCKER_GRP_ID="${docker_gid}" \
         -e DOCKER_IMG="${RUNTIME_IMAGE}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
