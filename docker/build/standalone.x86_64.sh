@@ -59,6 +59,6 @@ docker build \
 
 /bin/echo -e "Docker image with prebuilt files was built and tagged as ${STANDALONE_IMAGE}, you can start it with: \n\
   cd docker/build/output/standalone-scripts
-  docker/scripts/runtime_start.sh --local --tag standalone-${TARGET_ARCH}-${IMAGE_VERSION}\n\
+  docker/scripts/runtime_start.sh --standalone --local --tag standalone-${TARGET_ARCH}-${IMAGE_VERSION}\n\
 and switch into it with:\n\
-  docker/scripts/runtime_into.sh"
+  docker/scripts/runtime_into_standalone.sh"
