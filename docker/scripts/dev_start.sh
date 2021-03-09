@@ -313,14 +313,14 @@ function mount_other_volumes() {
 
     # FASTER_RCNN
     local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
-    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
+    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-1.0.2"
     docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
     volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
 
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         local smoke_volume="apollo_smoke_volume_${USER}"
-        local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-latest"
+        local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-1.0.1"
         docker_restart_volume "${smoke_volume}" "${smoke_image}"
         volume_conf="${volume_conf} --volumes-from ${smoke_volume}"
     fi
