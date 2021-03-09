@@ -21,6 +21,7 @@ source "${CURR_DIR}/docker_base.sh"
 DOCKER_REPO="apolloauto/apollo"
 RUNTIME_CONTAINER="apollo_runtime_${USER}"
 RUNTIME_INSIDE="in-runtime-docker"
+RUNTIME_STANDALONE="false"
 
 TARGET_ARCH="$(uname -m)"
 
@@ -59,6 +60,7 @@ OPTIONS:
     -f, --fast             Fast mode without pulling all map volumes.
     -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
     -l, --local            Use local docker image.
+    -s, --standalone       Create standalone container with all volumes and apollo itself.
     -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
 EOF
@@ -99,6 +101,10 @@ function parse_arguments() {
 
             -l | --local)
                 USE_LOCAL_IMAGE=1
+                ;;
+
+            -s | --standalone)
+                RUNTIME_STANDALONE="true"
                 ;;
 
             --shm-size)
@@ -208,19 +214,27 @@ function docker_restart_volume() {
     local volume="$1"
     local image="$2"
     local path="$3"
-    info "Create volume ${volume} from image: ${image}"
-    docker_pull "${image}"
-    docker volume rm "${volume}" >/dev/null 2>&1
-    docker run -v "${volume}":"${path}" --rm "${image}" true
+    local copy="$4"
+    if [ "$copy" != "copy" ] ; then
+      info "Create volume ${volume} from image: ${image}"
+      docker_pull "${image}"
+      docker volume rm "${volume}" >/dev/null 2>&1
+      docker run -v "${volume}":"${path}" --rm "${image}" true
+    else
+      info "Copy content of volume ${volume} from container ${RUNTIME_CONTAINER}"
+      docker exec -u $USER apollo_runtime_standalone_$USER mkdir `dirname $path` >/dev/null 2>&1 || true
+      docker cp ${RUNTIME_CONTAINER}:${path} - | docker cp -a - apollo_runtime_standalone_$USER:`dirname $path`
+    fi
 }
 
 function restart_map_volume_if_needed() {
     local map_name="$1"
     local map_version="$2"
+    local map_copy="$3"
     local map_volume="apollo_map_volume-${map_name}_${USER}"
     local map_path="/apollo/modules/map/data/${map_name}"
 
-    if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* ]]; then
+    if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* && "${map_copy}" != "copy" ]]; then
         info "Map ${map_name} has already been included."
     else
         local map_image=
@@ -229,28 +243,30 @@ function restart_map_volume_if_needed() {
         else
             map_image="${DOCKER_REPO}:map_volume-${map_name}-${map_version}"
         fi
-        info "Load map ${map_name} from image: ${map_image}"
+        [[ "${map_copy}" != "copy" ]] && info "Load map ${map_name} from image: ${map_image}"
 
-        docker_restart_volume "${map_volume}" "${map_image}" "${map_path}"
+        docker_restart_volume "${map_volume}" "${map_image}" "${map_path}" ${map_copy}
         MAP_VOLUMES_CONF="${MAP_VOLUMES_CONF} --volume ${map_volume}:${map_path}"
     fi
 }
 
 function mount_map_volumes() {
+    local map_copy="$1"
+
     info "Starting mounting map volumes ..."
     if [ -n "${USER_SPECIFIED_MAPS}" ]; then
         for map_name in ${USER_SPECIFIED_MAPS}; do
-            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}" ${map_copy}
         done
     fi
 
     if [[ "$FAST_MODE" == "no" ]]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
-            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}" ${map_copy}
         done
     else
         for map_name in ${DEFAULT_TEST_MAPS[@]}; do
-            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
+            restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}" ${map_copy}
         done
     fi
 }
@@ -263,21 +279,21 @@ function mount_other_volumes() {
     local audio_volume="apollo_audio_volume_${USER}"
     local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
     local audio_path="/apollo/modules/audio/data/"
-    docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
+    docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}" $1
     volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
 
     # YOLOV4
     local yolov4_volume="apollo_yolov4_volume_${USER}"
     local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest"
     local yolov4_path="/apollo/modules/perception/camera/lib/obstacle/detector/yolov4/model/"
-    docker_restart_volume "${yolov4_volume}" "${yolov4_image}" "${yolov4_path}"
+    docker_restart_volume "${yolov4_volume}" "${yolov4_image}" "${yolov4_path}" $1
     volume_conf="${volume_conf} --volume ${yolov4_volume}:${yolov4_path}"
 
     # FASTER_RCNN
     local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
     local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
     local faster_rcnn_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/faster_rcnn_model"
-    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}" "${faster_rcnn_path}"
+    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}" "${faster_rcnn_path}" $1
     volume_conf="${volume_conf} --volume ${faster_rcnn_volume}:${faster_rcnn_path}"
 
     # SMOKE
@@ -285,7 +301,7 @@ function mount_other_volumes() {
         local smoke_volume="apollo_smoke_volume_${USER}"
         local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-latest"
         local smoke_path="/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/smoke_libtorch_model"
-        docker_restart_volume "${smoke_volume}" "${smoke_image}" "${smoke_path}"
+        docker_restart_volume "${smoke_volume}" "${smoke_image}" "${smoke_path}" $1
         volume_conf="${volume_conf} --volume ${smoke_volume}:${smoke_path}"
     fi
 
@@ -347,6 +363,7 @@ function main() {
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${MAP_VOLUMES_CONF} \
         ${OTHER_VOLUMES_CONF} \
+        ${LOCAL_VOLUMES_CONF} \
         ${local_volumes} \
         --net host \
         -w /apollo \
@@ -371,6 +388,43 @@ function main() {
     ok "To login into the newly created ${RUNTIME_CONTAINER} container, please run the following command:"
     ok "  bash docker/scripts/runtime_into.sh"
     ok "Enjoy!"
+
+    if ${RUNTIME_STANDALONE} ; then
+        info "Creating standalone (includes all volumes and Apollo itself) runtime container based on local image : ${RUNTIME_IMAGE}"
+        docker stop apollo_runtime_standalone_$USER || true
+        docker rm apollo_runtime_standalone_$USER || true
+        ${DOCKER_RUN_CMD} -itd \
+            --name apollo_runtime_standalone_$USER \
+            -e DOCKER_USER="${user}" \
+            -e DOCKER_USER_ID="${uid}" \
+            -e DOCKER_GRP="${group}" \
+            -e DOCKER_GRP_ID="${gid}" \
+            "${RUNTIME_IMAGE}" \
+            /bin/bash
+
+        docker commit -m "Without volumes and Apollo" apollo_runtime_standalone_$USER
+
+        # Copy apollo
+        docker exec apollo_runtime_standalone_$USER mkdir /apollo
+        tar -cf - . | docker cp -a - apollo_runtime_standalone_$USER:/apollo
+        docker commit -m "Without volumes" apollo_runtime_standalone_$USER
+
+        # Cannot run postrun_start_user until /apollo is copied above, because
+        # it uses /apollo/scripts/docker_start_user.sh in target image and would fail with:
+        # bash: /apollo/scripts/docker_start_user.sh: No such file or directory
+        postrun_start_user apollo_runtime_standalone_$USER
+        # but now I also need to chown /apollo created above without "-u $USER", because
+        # that would fail as well before postrun_start_user with:
+        # unable to find user martin: no matching entries in passwd file
+        docker exec apollo_runtime_standalone_$USER chown $user /apollo
+
+        # Copy maps and other volumes
+        mount_map_volumes copy
+        mount_other_volumes copy
+        docker commit -m "With volumes and Apollo" apollo_runtime_standalone_$USER ${RUNTIME_IMAGE}_standalone
+
+        ok "Congratulations! You have successfully finished setting up standalone Apollo Runtime Environment as well."
+    fi
 }
 
 main "$@"
