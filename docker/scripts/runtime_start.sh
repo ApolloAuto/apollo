@@ -21,6 +21,7 @@ source "${CURR_DIR}/docker_base.sh"
 DOCKER_REPO="apolloauto/apollo"
 RUNTIME_CONTAINER="apollo_runtime_${USER}"
 RUNTIME_INSIDE="in-runtime-docker"
+RUNTIME_RUN_STANDALONE="false"
 RUNTIME_STANDALONE="false"
 
 TARGET_ARCH="$(uname -m)"
@@ -60,6 +61,7 @@ OPTIONS:
     -f, --fast             Fast mode without pulling all map volumes.
     -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
     -l, --local            Use local docker image.
+    -r, --run              Run standalone container with all volumes and apollo itself.
     -s, --standalone       Create standalone container with all volumes and apollo itself.
     -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
@@ -103,6 +105,10 @@ function parse_arguments() {
                 USE_LOCAL_IMAGE=1
                 ;;
 
+            -r | --run)
+                RUNTIME_RUN_STANDALONE="true"
+                ;;
+
             -s | --standalone)
                 RUNTIME_STANDALONE="true"
                 ;;
@@ -131,14 +137,16 @@ function parse_arguments() {
 
 function determine_runtime_image() {
     local version="$1"
+    local standalone_suffix=""
+    $RUNTIME_RUN_STANDALONE && standalone_suffix="_standalone"
     if [[ -n "${version}" ]]; then
-        RUNTIME_IMAGE="${DOCKER_REPO}:${version}"
+        RUNTIME_IMAGE="${DOCKER_REPO}:${version}${standalone_suffix}"
         return
     fi
 
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         version="${VERSION_X86_64}"
-        RUNTIME_IMAGE="${DOCKER_REPO}:${version}"
+        RUNTIME_IMAGE="${DOCKER_REPO}:${version}${standalone_suffix}"
     else
         error "Runtime Docker for ${TARGET_ARCH} Not Ready. Exiting..."
         exit 3
@@ -169,7 +177,8 @@ function setup_devices_and_mount_local_volumes() {
     source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
     setup_device
 
-    local volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
+    local volumes=""
+    $RUNTIME_RUN_STANDALONE || volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
@@ -325,6 +334,8 @@ function main() {
         exit 1
     fi
 
+    $RUNTIME_RUN_STANDALONE && RUNTIME_CONTAINER="apollo_runtime_standalone_$USER"
+
     info "Check and remove existing Apollo Runtime container ..."
     remove_container_if_exists "${RUNTIME_CONTAINER}"
 
@@ -335,8 +346,8 @@ function main() {
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
 
-    mount_map_volumes
-    mount_other_volumes
+    $RUNTIME_RUN_STANDALONE || mount_map_volumes
+    $RUNTIME_RUN_STANDALONE || mount_other_volumes
 
     info "Starting docker container \"${RUNTIME_CONTAINER}\" ..."
 
@@ -386,10 +397,13 @@ function main() {
 
     ok "Congratulations! You have successfully finished setting up Apollo Runtime Environment."
     ok "To login into the newly created ${RUNTIME_CONTAINER} container, please run the following command:"
-    ok "  bash docker/scripts/runtime_into.sh"
+    $RUNTIME_RUN_STANDALONE || ok "  bash docker/scripts/runtime_into.sh"
+    $RUNTIME_RUN_STANDALONE && ok "  bash docker/scripts/runtime_into_standalone.sh"
     ok "Enjoy!"
 
     if ${RUNTIME_STANDALONE} ; then
+        $RUNTIME_RUN_STANDALONE && error "--run cannot be used together with --standalone" && exit 1
+
         info "Creating standalone (includes all volumes and Apollo itself) runtime container based on local image : ${RUNTIME_IMAGE}"
         docker stop apollo_runtime_standalone_$USER || true
         docker rm apollo_runtime_standalone_$USER || true
@@ -424,6 +438,10 @@ function main() {
         docker commit -m "With volumes and Apollo" apollo_runtime_standalone_$USER ${RUNTIME_IMAGE}_standalone
 
         ok "Congratulations! You have successfully finished setting up standalone Apollo Runtime Environment as well."
+        ok "To login into the newly created ${RUNTIME_CONTAINER}_standalone container, please run the following command:"
+        ok "  bash docker/scripts/runtime_start --run --local"
+        ok "  bash docker/scripts/runtime_into_standalone.sh"
+        ok "Enjoy!"
     fi
 }
 
