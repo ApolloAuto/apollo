@@ -7,6 +7,7 @@ install(
     name = "install",
     deps = [
         "//cyber/tools/cyber_launch:install",
+        "//cyber/tools/cyber_recorder:install",
     ],
 )
 
