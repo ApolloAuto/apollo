@@ -46,13 +46,21 @@ function determine_bin_prefix() {
 
 function setup_device_for_aarch64() {
   local can_dev="/dev/can0"
+  local socket_can_dev="can0"
   if [ ! -e "${can_dev}" ]; then
     warning "No CAN device named ${can_dev}. "
-    return
   fi
 
-  sudo ip link set can0 type can bitrate 500000
-  sudo ip link set can0 up
+  if [[ -x "$(command -v ip)" ]]; then
+    if ! ip link show type can | grep "${socket_can_dev}" &>/dev/null; then
+      warning "No SocketCAN device named ${socket_can_dev}."
+    else
+      sudo ip link set can0 type can bitrate 500000
+      sudo ip link set can0 up
+    fi
+  else
+    warning "ip command not found."
+  fi
 }
 
 function setup_device_for_amd64() {
