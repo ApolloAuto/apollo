@@ -83,7 +83,7 @@ void RobosenseParser::init_angle_params(double view_direction,
   // adding 0.5 perfomrs a centered double to int conversion
   config_.set_min_angle(100 * (2 * M_PI - tmp_min_angle) * 180 / M_PI + 0.5);
   config_.set_max_angle(100 * (2 * M_PI - tmp_max_angle) * 180 / M_PI + 0.5);
-  if ( config_.min_angle() == config_.max_angle()) {
+  if (config_.min_angle() == config_.max_angle()) {
     // avoid returning empty cloud if min_angle = max_angle
     config_.set_min_angle(0);
     config_.set_max_angle(36000);
@@ -92,7 +92,7 @@ void RobosenseParser::init_angle_params(double view_direction,
 
 /** Set up for on-line operation. */
 void RobosenseParser::setup() {
-  calibration_.read( config_.calibration_file());
+  calibration_.read(config_.calibration_file());
 
   if (!calibration_.initialized_) {
     AERROR << " Unable to open calibration file: "
@@ -100,8 +100,8 @@ void RobosenseParser::setup() {
   }
 
   // setup angle parameters.
-  init_angle_params( config_.view_direction(), config_.view_width());
-  init_sin_cos_rot_table( sin_rot_table_, cos_rot_table_, ROTATION_MAX_UNITS,
+  init_angle_params(config_.view_direction(), config_.view_width());
+  init_sin_cos_rot_table(sin_rot_table_, cos_rot_table_, ROTATION_MAX_UNITS,
                          ROTATION_RESOLUTION);
 
   // get lidars_filter_config and put them into filter_set_
@@ -171,65 +171,65 @@ int RobosenseParser::EstimateTemperature(float temperature) {
 float RobosenseParser::CalibIntensity(float intensity,
                                       int calIdx,  // 1-16
                                       int distance, float temper) {
-  int algDist;
-  int sDist;
-  int uplimitDist;
-  float realPwr;
-  float refPwr;
-  float tempInten;
+  int alg_dist;
+  int sdist;
+  int uplimit_dist;
+  float real_pwr;
+  float ref_pwr;
+  float temp_inten;
   float distance_f;
-  float endOfSection1;
+  float end_of_section1;
 
   int temp = EstimateTemperature(temper);
-  realPwr = std::max(
+  real_pwr = std::max(
       static_cast<float>(
           intensity / (1 + static_cast<float>(temp - TEMPERATURE_MIN) / 24.0f)),
       1.0f);
 
-  if (static_cast<int>(realPwr < 126)) {
-    realPwr = realPwr * 4.0f;
+  if (static_cast<int>(real_pwr < 126)) {
+    real_pwr = real_pwr * 4.0f;
   } else {
-    if (static_cast<int>(realPwr >= 126) && static_cast<int>(realPwr < 226)) {
-      realPwr = (realPwr - 125.0f) * 16.0f + 500.0f;
+    if (static_cast<int>(real_pwr >= 126) && static_cast<int>(real_pwr < 226)) {
+      real_pwr = (real_pwr - 125.0f) * 16.0f + 500.0f;
     } else {
-      realPwr = (realPwr - 225.0f) * 256.0f + 2100.0f;
+      real_pwr = (real_pwr - 225.0f) * 256.0f + 2100.0f;
     }
   }
 
   int indexTemper = EstimateTemperature(temper) - TEMPERATURE_MIN;
-  uplimitDist = CHANNEL_NUM[calIdx][indexTemper] + 20000;
-  // limit sDist
-  sDist = (distance > CHANNEL_NUM[calIdx][indexTemper])
+  uplimit_dist = CHANNEL_NUM[calIdx][indexTemper] + 20000;
+  // limit sdist
+  sdist = (distance > CHANNEL_NUM[calIdx][indexTemper])
               ? distance
               : CHANNEL_NUM[calIdx][indexTemper];
-  sDist = (sDist < uplimitDist) ? sDist : uplimitDist;
+  sdist = (sdist < uplimit_dist) ? sdist : uplimit_dist;
   // minus the static offset (this data is For the intensity cal useage only)
-  algDist = sDist - CHANNEL_NUM[calIdx][indexTemper];
+  alg_dist = sdist - CHANNEL_NUM[calIdx][indexTemper];
 
   // calculate intensity ref curves
-  float refPwr_temp = 0.0f;
+  float ref_pwr_temp = 0.0f;
   int order = 3;
-  endOfSection1 = 500.0f;
-  distance_f = static_cast<float>(algDist);
-  if (distance_f <= endOfSection1) {
-    refPwr_temp = INTENSITY_CAL[0][calIdx] *
+  end_of_section1 = 500.0f;
+  distance_f = static_cast<float>(alg_dist);
+  if (distance_f <= end_of_section1) {
+    ref_pwr_temp = INTENSITY_CAL[0][calIdx] *
                       static_cast<float>(
                           exp(INTENSITY_CAL[1][calIdx] -
                               INTENSITY_CAL[2][calIdx] * distance_f / 100.0f)) +
                   INTENSITY_CAL[3][calIdx];
   } else {
     for (int i = 0; i < order; i++) {
-      refPwr_temp +=
+      ref_pwr_temp +=
           static_cast<float>(INTENSITY_CAL[i + 4][calIdx] *
                              pow(distance_f / 100.0f, order - 1 - i));
     }
   }
 
-  refPwr = std::max(std::min(refPwr_temp, 500.0f), 4.0f);
-  tempInten = (51 * refPwr) / realPwr;
+  ref_pwr = std::max(std::min(ref_pwr_temp, 500.0f), 4.0f);
+  temp_inten = (51 * ref_pwr) / real_pwr;
 
-  tempInten = static_cast<int>(tempInten > 255 ? 255.0f : tempInten);
-  return tempInten;
+  temp_inten = static_cast<int>(temp_inten > 255 ? 255.0f : temp_inten);
+  return temp_inten;
 }
 float RobosenseParser::PixelToDistance(int pixelValue, int passageway,
                                        float temper) {
@@ -247,17 +247,17 @@ float RobosenseParser::PixelToDistance(int pixelValue, int passageway,
 
 float RobosenseParser::compute_temperature(unsigned char bit1,
                                            unsigned char bit2) {
-  float Temp;
+  float temp;
   float bitneg = bit2 & 128;   // 10000000
   float highbit = bit2 & 127;  // 01111111
   float lowbit = bit1 >> 3;
   if (bitneg == 128) {
-    Temp = -1 * (highbit * 32 + lowbit) * 0.0625f;
+    temp = -1 * (highbit * 32 + lowbit) * 0.0625f;
   } else {
-    Temp = (highbit * 32 + lowbit) * 0.0625f;
+    temp = (highbit * 32 + lowbit) * 0.0625f;
   }
 
-  return Temp;
+  return temp;
 }
 }  // namespace robosense
 }  // namespace drivers

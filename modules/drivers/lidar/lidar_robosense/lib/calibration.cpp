@@ -89,7 +89,6 @@ void operator>>(const YAML::Node& node,
 
 void operator>>(const YAML::Node& node, Calibration& calibration) {
   int num_lasers = 0;
-  // node[NUM_LASERS] >> num_lasers;
   node[NUM_LASERS] >> num_lasers;
   const YAML::Node& lasers = node[LASERS];
   calibration.laser_corrections_.clear();
@@ -125,8 +124,6 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
       // store this ring number with its corresponding laser number
       calibration.laser_corrections_[next_index].laser_ring = ring;
       next_angle = min_seen;
-      //        ROS_INFO_STREAM("laser_ring[" << next_index << "] = " << ring
-      //                         << ", angle = " << next_angle);
     }
   }
 }

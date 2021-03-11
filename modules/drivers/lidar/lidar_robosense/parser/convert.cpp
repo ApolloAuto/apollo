@@ -33,8 +33,8 @@ Convert::Convert(const apollo::drivers::suteng::SutengConfig& robo_config) {
 }
 
 bool Convert::Init() {
-  parser_ = RobosenseParserFactory::create_parser( config_);
-  if ( parser_ == nullptr) {
+  parser_ = RobosenseParserFactory::create_parser(config_);
+  if (parser_ == nullptr) {
     AERROR << " can not create velodyen parser";
     return false;
   }
@@ -43,7 +43,7 @@ bool Convert::Init() {
 }
 
 Convert::~Convert() {
-  if ( parser_ != nullptr) {
+  if (parser_ != nullptr) {
     delete parser_;
   }
 }

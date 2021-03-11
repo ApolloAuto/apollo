@@ -119,8 +119,6 @@ enum StatusType {
  */
 struct RawPacket {
   RawBlock blocks[BLOCKS_PER_PACKET];
-  // uint16_t revolution;
-  // uint8_t status[PACKET_STATUS_SIZE];
   unsigned int gps_timestamp;
   unsigned char status_type;
   unsigned char status_value;

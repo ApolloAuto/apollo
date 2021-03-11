@@ -41,11 +41,11 @@ namespace robosense {
 SocketInput::SocketInput() : Input(), sockfd_(-1), port_(0) {}
 
 /** @brief destructor */
-SocketInput::~SocketInput(void) { (void)close( sockfd_); }
+SocketInput::~SocketInput(void) { (void)close(sockfd_); }
 
 void SocketInput::init(uint32_t port) {
-  if ( sockfd_ != -1) {
-    (void)close( sockfd_);
+  if (sockfd_ != -1) {
+    (void)close(sockfd_);
   }
 
   // connect to suteng UDP port
@@ -53,7 +53,7 @@ void SocketInput::init(uint32_t port) {
   port_ = port;
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 
-  if ( sockfd_ == -1) {
+  if (sockfd_ == -1) {
     AERROR << " Init socket failed, UDP port is " << port;
   }
 
@@ -62,24 +62,22 @@ void SocketInput::init(uint32_t port) {
   my_addr.sin_family = AF_INET;              // host byte order
   my_addr.sin_port = htons(uint16_t(port));  // short, in network byte order
   my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
-  // my_addr.sin_addr.s_addr = inet_addr("255.255.255.255");
   AINFO << "SocketInput::init " << my_addr.sin_addr.s_addr;
 
   const int opt = -1;
-  int rtn = setsockopt( sockfd_, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
+  int rtn = setsockopt(sockfd_, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
   if (rtn < 0) {
     AINFO << "setsockopt failed !!!!!!!!!!";
     return;
   }
 
-  // if (bind( sockfd_, (sockaddr *)&my_addr, sizeof(sockaddr)) == -1) {
-  if (bind( sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
+  if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
       -1) {
     AERROR << " Socket bind failed! Port " << port_;
     return;
   }
 
-  if (fcntl( sockfd_, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
+  if (fcntl(sockfd_, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
     AERROR << " non-block! Port " << port_;
     return;
   }
@@ -91,7 +89,6 @@ void SocketInput::init(uint32_t port) {
 int SocketInput::get_firing_data_packet(
     apollo::drivers::suteng::SutengPacket *pkt, int time_zone,
     uint64_t start_time_) {
-  // double time1 = ros::Time::Now().toSec();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
       AINFO << "SocketInput::get_firing_data_packet---SOCKET_TIMEOUT";
@@ -101,7 +98,7 @@ int SocketInput::get_firing_data_packet(
     // socket using a blocking read.
     uint8_t bytes[FIRING_DATA_PACKET_SIZE];
     ssize_t nbytes =
-        recvfrom( sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
+        recvfrom(sockfd_, bytes, FIRING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
@@ -112,25 +109,6 @@ int SocketInput::get_firing_data_packet(
 
     if ((size_t)nbytes == FIRING_DATA_PACKET_SIZE) {
       pkt->set_data(bytes, FIRING_DATA_PACKET_SIZE);
-      // uint64_t temp_stamp_ = apollo::cyber::Time().Now().ToNanosecond();
-      // uint64_t pkt_start_diff_ = temp_stamp_ -  start_time_;
-      // AINFO<<"pkt start_time_:["<<_start_time<<"]";
-      // AINFO<<"_pkt_start_diff:"<<apollo::cyber::Time( pkt_start_diff_ -
-      // last_pkt_stamp).ToSecond()*1000<<" ms"; last_pkt_stamp =
-      // pkt_start_diff_;
-
-      // pkt->set_stamp( pkt_start_diff_);
-      //// NMEATimePtr nmea_time(new NMEATime);
-      //// exract_nmea_time_from_packet(nmea_time, bytes+20);
-      //
-      //// tm pkt_time;
-      //// memset(&pkt_time, 0, sizeof(pkt_time));
-      //// pkt_time.tm_year = nmea_time->year + 100;
-      //// pkt_time.tm_mon = nmea_time->mon - 1;
-      //// pkt_time.tm_mday = nmea_time->day;
-      //// pkt_time.tm_hour = nmea_time->hour + time_zone;
-      //// pkt_time.tm_min = nmea_time->min;
-      //// pkt_time.tm_sec = 0;
       tm pkt_time;
       memset(&pkt_time, 0, sizeof(pkt_time));
       pkt_time.tm_year = static_cast<int>(bytes[20] + 100);
@@ -141,13 +119,6 @@ int SocketInput::get_firing_data_packet(
       pkt_time.tm_sec = static_cast<int>(bytes[25]);
 
       uint64_t timestamp_sec = static_cast<uint64_t>((mktime(&pkt_time)) * 1e9);
-      // uint64_t timestamp_nsec = static_cast<uint64_t>(nmea_time->sec*1e6 +
-      // nmea_time->msec*1e3 + nmea_time->usec)*1e3
-      //                           + timestamp_sec; //ns
-
-      // uint64_t timestamp_nsec = mktime(&stm) + 0.001 * (256 * pkt.data[26] +
-      // pkt.data[27]) +
-      //                       0.000001 * (256 * pkt.data[28] + pkt.data[29]);
       uint64_t timestamp_nsec =
           static_cast<uint64_t>(1000 * (256 * bytes[26] + bytes[27]) +
                                 (256 * bytes[28] + bytes[29])) *
@@ -157,19 +128,8 @@ int SocketInput::get_firing_data_packet(
 
       if (!flags) {
         AINFO << "robo first PPS-GPS-timestamp: [" << timestamp_nsec << "]";
-        // AINFO << "first PPS-GPS-time: [" <<
-        // nmea_time->year<<"/"<<nmea_time->mon<<"/"<<nmea_time->day<<"-"
-        //      <<nmea_time->hour<<"/"<< nmea_time->min<<"/"<<
-        //      nmea_time->sec<<"-" << nmea_time->msec
-        //      <<"/"<< nmea_time->usec<< "]";
         flags = true;
       }
-      // AINFO << "PPS-GPS-time: [" <<
-      // nmea_time->year<<"/"<<nmea_time->mon<<"/"<<nmea_time->day<<"-"
-      //        <<nmea_time->hour<<"/"<< nmea_time->min<<"/"<<
-      //        nmea_time->sec<<"-" << nmea_time->msec
-      //        <<"/"<< nmea_time->usec<< "]";
-      // AINFO<<"timestamp_nsec:["<<timestamp_nsec<<"]";
       break;
     }
 
@@ -189,7 +149,7 @@ int SocketInput::get_positioning_data_packtet(const NMEATimePtr &nmea_time) {
     // Last 234 bytes not use
     uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
     ssize_t nbytes =
-        recvfrom( sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
+        recvfrom(sockfd_, bytes, POSITIONING_DATA_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {

@@ -58,7 +58,6 @@ void RobosenseDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
     AINFO << "gps time---------------------------";
     unix_base = static_cast<uint64_t>(timegm(&time));
   }
-  // AINFO<<"basetime(inner): "<<static_cast<double>(unix_base) * 1e9 ;
   *basetime = unix_base;  //* static_cast<uint64_t>(1e6);
 }
 
@@ -134,7 +133,6 @@ int RobosenseDriver::poll_sync_count(
           return rc;
         }
       }
-      // if(!cute_angle(tmp_packet)) break;
     }
     sync_counter++;
   } else {
@@ -145,7 +143,6 @@ int RobosenseDriver::poll_sync_count(
         // keep reading until full packet received
         packet = scan->add_firing_pkts();
         int rc = input_->get_firing_data_packet(packet, time_zone, start_time_);
-        // tmp_packet = packet;
         pk_i++;
         if (rc == 0) {
           break;
@@ -154,7 +151,6 @@ int RobosenseDriver::poll_sync_count(
           return rc;
         }
       }
-      // if(!cute_angle(tmp_packet)) break;
     }
     last_count_ = sync_counter;
   }
@@ -166,9 +162,6 @@ static int last_azimuth = ANGLE_HEAD;
 bool RobosenseDriver::cute_angle(
     apollo::drivers::suteng::SutengPacket* packet) {
   int azimuth = 256 * packet->data().c_str()[44] + packet->data().c_str()[45];
-  // int azimuth = *( (u_int16_t*) (&tmp_packet.data[azimuth_data_pos]));
-  // AINFO<<"azimuth:"<<azimuth<<"azimuth/100:"<<azimuth/100;
-  // Handle overflow 35999->0
   if (azimuth < last_azimuth) {
     last_azimuth -= 36000;
   }
@@ -195,11 +188,6 @@ void RobosenseDriver::update_gps_top_hour(uint32_t current_time) {
       basetime_ += 3600;
       AINFO << "update_gps_top_hour. current:" << current_time
             << ", last time:" << last_gps_time_;
-    } else {
-      // ROS_WARN_STREAM("[driver.cpp] Currrnt stamp:" << std::fixed <<
-      // current_time
-      //         << " less than previous statmp:" << last_gps_time_
-      //         << ". GPS time stamp maybe incorrect!");
     }
   }
   last_gps_time_ = current_time;

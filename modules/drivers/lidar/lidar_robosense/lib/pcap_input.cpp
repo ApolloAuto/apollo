@@ -46,29 +46,29 @@ PcapInput::PcapInput(double packet_rate, const std::string& filename,
 }
 
 void PcapInput::init() {
-  if ( pcap_ != NULL) {
+  if (pcap_ != NULL) {
     return;
   }
 
-  if ( read_once_) {
+  if (read_once_) {
     AINFO << "Read input file only once.";
   }
 
-  if ( read_fast_) {
+  if (read_fast_) {
     AINFO << "Read input file as quickly as possible.";
   }
 
-  if ( repeat_delay_ > 0.0) {
+  if (repeat_delay_ > 0.0) {
     AINFO << "Delay %.3f seconds before repeating input file." << repeat_delay_;
   }
 
-  if (( pcap_ = pcap_open_offline( filename_.c_str(), errbuf_)) == NULL) {
+  if ((pcap_ = pcap_open_offline(filename_.c_str(), errbuf_)) == NULL) {
     AERROR << " Error opening suteng socket dump file.";
   }
 }
 
 /** destructor */
-PcapInput::~PcapInput(void) { pcap_close( pcap_); }
+PcapInput::~PcapInput(void) { pcap_close(pcap_); }
 // static uint64_t last_pkt_stamp = 0;
 /** @brief Get one suteng packet. */
 int PcapInput::get_firing_data_packet(
@@ -80,35 +80,21 @@ int PcapInput::get_firing_data_packet(
   while (true) {
     int res = 0;
 
-    if ( pcap_ == nullptr) {
+    if (pcap_ == nullptr) {
       return -1;
     }
 
-    if ((res = pcap_next_ex( pcap_, &header, &pkt_data)) >= 0) {
+    if ((res = pcap_next_ex(pcap_, &header, &pkt_data)) >= 0) {
       if (header->len != FIRING_DATA_PACKET_SIZE + ETHERNET_HEADER_SIZE) {
         continue;
       }
 
       // Keep the reader from blowing through the file.
-      if ( read_fast_ == false) {
+      if (read_fast_ == false) {
         sleep(0.3);
       }
       usleep(1000);
       pkt->set_data(pkt_data + ETHERNET_HEADER_SIZE, FIRING_DATA_PACKET_SIZE);
-
-      // uint64_t temp_stamp_ = apollo::cyber::Time().Now().ToNanosecond();
-      // uint64_t pkt_start_diff_ = temp_stamp_ -  start_time_;
-      // // AINFO<<"pkt start_time_:["<<_start_time<<"]";
-      // // AINFO<<"_pkt_start_diff:"<<apollo::cyber::Time( pkt_start_diff_ -
-      // last_pkt_stamp).ToSecond()*1000<<" ms";
-      // // last_pkt_stamp = pkt_start_diff_;
-
-      // pkt->set_stamp( pkt_start_diff_);
-
-      // NMEATimePtr nmea_time(new NMEATime);
-      // exract_nmea_time_from_packet(nmea_time, reinterpret_cast<const uint8_t
-      // *>(&(pkt->data().c_str()[20])));
-      //------------------------------------------
       tm pkt_time;
       memset(&pkt_time, 0, sizeof(pkt_time));
       pkt_time.tm_year = static_cast<int>(pkt->data().c_str()[20] + 100);
@@ -125,64 +111,34 @@ int PcapInput::get_firing_data_packet(
               1e3 +
           timestamp_sec);  // ns
       pkt->set_stamp(timestamp_nsec);
-      //==========================================
-      // tm pkt_time;
-      // memset(&pkt_time, 0, sizeof(pkt_time));
-      // pkt_time.tm_year = nmea_time->year + 100;
-      // pkt_time.tm_mon = nmea_time->mon - 1;
-      // pkt_time.tm_mday = nmea_time->day;
-      // pkt_time.tm_hour = nmea_time->hour + time_zone;
-      // pkt_time.tm_min = nmea_time->min;
-      // pkt_time.tm_sec = 0;
-
-      // uint64_t timestamp_sec = static_cast<uint64_t>(mktime(&pkt_time))*1e9;
-      // uint64_t timestamp_nsec = static_cast<uint64_t>(nmea_time->sec*1e6 +
-      // nmea_time->msec*1e3 + nmea_time->usec)*1e3
-      //                           + timestamp_sec; //ns
-      // pkt->set_stamp(timestamp_nsec);
-
-      // // AINFO<<"_pkt_stamp_diff:"<<apollo::cyber::Time(timestamp_nsec -
-      // last_pkt_stamp).ToSecond()*1000<<" ms";
-      // // last_pkt_stamp = timestamp_nsec;
-
       if (!flags) {
         AINFO << "pcap robo first PPS-GPS-timestamp: [" << timestamp_nsec
               << "]";
-        // AINFO << "first PPS-GPS-time: [" <<
-        // nmea_time->year<<"/"<<nmea_time->mon<<"/"<<nmea_time->day<<"-"
-        //      <<nmea_time->hour<<"/"<< nmea_time->min<<"/"<<
-        //      nmea_time->sec<<"-" << nmea_time->msec
-        //      <<"/"<< nmea_time->usec<< "]";
         flags = true;
       }
-      // AINFO << "PPS-GPS-time: [" <<
-      // nmea_time->year<<"/"<<nmea_time->mon<<"/"<<nmea_time->day<<"-"
-      //        <<nmea_time->hour<<"/"<< nmea_time->min<<"/"<<
-      //        nmea_time->sec<<"-" << nmea_time->msec
-      //        <<"/"<< nmea_time->usec<< "]";
 
       empty_ = false;
       return 0;  // success
     }
 
-    if ( empty_) {  // no data in file?
+    if (empty_) {  // no data in file?
       AINFO << "Error %d reading suteng packet: %s" << res
-            << pcap_geterr( pcap_);
+            << pcap_geterr(pcap_);
       return -1;
     }
 
-    if ( read_once_) {
+    if (read_once_) {
       AINFO << "end of file reached -- done reading.";
       return PCAP_FILE_END;
     }
 
-    if ( repeat_delay_ > 0.0) {
+    if (repeat_delay_ > 0.0) {
       AINFO << "end of file reached -- delaying %.3f seconds." << repeat_delay_;
-      usleep(static_cast<int>( repeat_delay_ * 1000000.0));
+      usleep(static_cast<int>(repeat_delay_ * 1000000.0));
     }
 
-    pcap_close( pcap_);
-    pcap_ = pcap_open_offline( filename_.c_str(), errbuf_);
+    pcap_close(pcap_);
+    pcap_ = pcap_open_offline(filename_.c_str(), errbuf_);
     empty_ = true;  // maybe the file disappeared?
   }                 // loop back and try again
 }
@@ -194,19 +150,15 @@ int PcapInput::get_positioning_data_packtet(const NMEATimePtr& nmea_time) {
   while (true) {
     int res = 0;
 
-    if ( pcap_ == nullptr) {
+    if (pcap_ == nullptr) {
       return -1;
     }
 
-    if ((res = pcap_next_ex( pcap_, &header, &pkt_data)) >= 0) {
+    if ((res = pcap_next_ex(pcap_, &header, &pkt_data)) >= 0) {
       if (header->len != POSITIONING_DATA_PACKET_SIZE + ETHERNET_HEADER_SIZE) {
         continue;
       }
 
-      // Keep the reader from blowing through the file.
-      if ( read_fast_ == false) {
-        // packet_rate_.sleep();
-      }
       uint8_t bytes[POSITIONING_DATA_PACKET_SIZE];
 
       memcpy(bytes, pkt_data + ETHERNET_HEADER_SIZE,
@@ -221,26 +173,26 @@ int PcapInput::get_positioning_data_packtet(const NMEATimePtr& nmea_time) {
       }
     }
 
-    if ( empty_) {  // no data in file?
+    if (empty_) {  // no data in file?
       AINFO << "Error %d reading suteng packet: %s" << res
-            << pcap_geterr( pcap_);
+            << pcap_geterr(pcap_);
       return -1;
     }
 
-    if ( read_once_) {
+    if (read_once_) {
       AINFO << "end of file reached -- done reading.";
       return PCAP_FILE_END;
     }
 
-    if ( repeat_delay_ > 0.0) {
+    if (repeat_delay_ > 0.0) {
       AINFO << "end of file reached -- delaying %.3f seconds." << repeat_delay_;
-      usleep(static_cast<int>( repeat_delay_ * 1000000.0));
+      usleep(static_cast<int>(repeat_delay_ * 1000000.0));
     }
     // I can't figure out how to rewind the file, because it
     // starts with some kind of header.  So, close the file
     // and reopen it with pcap.
-    pcap_close( pcap_);
-    pcap_ = pcap_open_offline( filename_.c_str(), errbuf_);
+    pcap_close(pcap_);
+    pcap_ = pcap_open_offline(filename_.c_str(), errbuf_);
     empty_ = true;  // maybe the file disappeared?
   }                 // loop back and try again
 }

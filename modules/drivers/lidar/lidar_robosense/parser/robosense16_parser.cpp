@@ -66,14 +66,9 @@ void Robosense16Parser::generate_pointcloud(
   gps_base_usec_ = scan_msg->basetime();  // * 1000000UL;
 
   point_index_ = 0;
-  // bool finish_packets_parse = false;
-
   uint32_t nan_pts = 0;
 
   for (int i = 0; i < scan_msg->firing_pkts_size(); ++i) {  // 84pkts 0-83
-    // if (i == (scan_msg->firing_pkts_size() - 1)) {
-    //  finish_packets_parse = true;
-    // }
     unpack_robosense(scan_msg->firing_pkts(i), out_msg, &nan_pts);
     last_time_stamp_ = out_msg->header().timestamp_sec();
   }
@@ -82,15 +77,8 @@ void Robosense16Parser::generate_pointcloud(
     // we discard this pointcloud if empty
     AERROR << " All points is NAN!Please check suteng:" << config_.model();
   } else {
-    // auto size = out_msg->point_size();
-    // AINFO<<"points per frame:"<<point_index_;
-
     uint64_t timestamp = out_msg->point(point_index_ - 1).timestamp();
     double d_time = apollo::cyber::Time(timestamp).ToSecond();
-    // AINFO<<"d_time: "<<d_time;
-
-    // out_msg->set_ratio_pass(static_cast<double>(point_index_ - nan_pts) /
-    // point_index_);
     out_msg->set_height(point_index_ / RS16_SCANS_PER_FIRING);
     out_msg->set_width(RS16_SCANS_PER_FIRING);
     out_msg->set_is_dense(false);
@@ -110,7 +98,6 @@ uint64_t Robosense16Parser::get_timestamp(double base_time, float time_offset,
   uint64_t timestamp = Robosense16Parser::get_gps_stamp(
       t, &previous_packet_stamp_,
       &gps_base_usec_);  // gps_base_usec_ gps基准时间 精度s
-  // AINFO<<"timestamp       : "<<timestamp;
   return timestamp;
 }
 
@@ -136,7 +123,6 @@ void Robosense16Parser::unpack_robosense(
   pkt_stamp = pkt.stamp() + static_cast<uint64_t>(1e9);
 
   for (int block = 0; block < BLOCKS_PER_PACKET; ++block) {
-    // AINFO<<"------block: "<<block;
     if (UPPER_BANK != raw->blocks[block].header) {
       AINFO << "skipping Suteng_liar DIFOP packet！";
       break;
@@ -151,8 +137,6 @@ void Robosense16Parser::unpack_robosense(
     }
     azimuth = static_cast<float>(256 * raw->blocks[block].rotation_1 +
                                  raw->blocks[block].rotation_2);
-    // AINFO<<"azimuth: "<<azimuth;
-
     if (block < (BLOCKS_PER_PACKET - 1)) {
       int azi1, azi2;
       azi1 = 256 * raw->blocks[block + 1].rotation_1 +
@@ -160,8 +144,6 @@ void Robosense16Parser::unpack_robosense(
       azi2 =
           256 * raw->blocks[block].rotation_1 + raw->blocks[block].rotation_2;
       azimuth_diff = static_cast<float>((36000 + azi1 - azi2) % 36000);
-
-      // AINFO<<"azimuth_diff: "<<azimuth_diff;
       if (azimuth_diff <= 0.0 || azimuth_diff > 75.0) {
         continue;
       }
@@ -172,7 +154,6 @@ void Robosense16Parser::unpack_robosense(
       azi2 = 256 * raw->blocks[block - 1].rotation_1 +
              raw->blocks[block - 1].rotation_2;
       azimuth_diff = static_cast<float>((36000 + azi1 - azi2) % 36000);
-      // AINFO<<"azimuth_diff last : "<<azimuth_diff;
       if (azimuth_diff <= 0.0 || azimuth_diff > 75.0) {
         continue;
       }
@@ -189,8 +170,6 @@ void Robosense16Parser::unpack_robosense(
         azimuth_corrected = (static_cast<int>(round(azimuth_corrected_f))) %
                             36000;  // convert to integral
                                     // value... //use
-
-        // AINFO<<"azimuth_corrected:"<<azimuth_corrected/100;
         union two_bytes raw_dist;
         raw_dist.bytes[1] = raw->blocks[block].data[k];
         raw_dist.bytes[0] = raw->blocks[block].data[k + 1];
@@ -199,18 +178,12 @@ void Robosense16Parser::unpack_robosense(
         // read intensity
 
         intensity = raw->blocks[block].data[k + 2];
-        // intensity = CalibIntensity(intensity, dsr, distance, temper); //use
-        // AINFO<<"intensity: "<<intensity;
-        // distance
-        // float distance2 = PixelToDistance(distance, dsr, temper);
         float distance2 = distance;
         distance2 = distance2 * DISTANCE_RESOLUTION;  // * 6.4/5.4; //use
-        // AINFO<<"distance2: "<<distance2;
         // time of each point
         // block 0-11  firing 0-1   dsr 0-15
         uint64_t time_pt = (block * 2 + firing) * 50 + dsr * 3;  // us
         uint64_t timestamp = pkt_stamp + time_pt * 1e3;
-        // uint64_t timestamp = get_poitn_timestamp(basetime, time_pt);
         if (block == BLOCKS_PER_PACKET - 1 &&
             firing == RS16_FIRINGS_PER_BLOCK - 1 &&
             dsr == RS16_SCANS_PER_FIRING - 1) {
@@ -220,7 +193,7 @@ void Robosense16Parser::unpack_robosense(
 
         if (raw_dist.uint == 0 || distance2 < config_.min_range() ||
             distance2 > config_.max_range()) {
-          if ( config_.organized()) {
+          if (config_.organized()) {
             apollo::drivers::PointXYZIT* point = cloud->add_point();
             point->set_x(nan);
             point->set_y(nan);
@@ -232,7 +205,6 @@ void Robosense16Parser::unpack_robosense(
           }
           continue;
         }
-        // AINFO<<"timestamp: "<<timestamp;
         apollo::drivers::PointXYZIT* point = cloud->add_point();
         point->set_timestamp(timestamp);
         point->set_intensity(intensity);
@@ -244,12 +216,12 @@ void Robosense16Parser::unpack_robosense(
             static_cast<float>(-distance2 * cos(arg_vert) * sin(arg_hori));
         float x = static_cast<float>(distance2 * cos(arg_vert) * cos(arg_hori));
         float z = static_cast<float>(distance2 * sin(arg_vert));
-        if ( filter_set_.size() > 0) {
+        if (filter_set_.size() > 0) {
           std::string key =
               std::to_string(static_cast<float>(x * 100 / filter_grading_)) +
               "+" +
               std::to_string(static_cast<float>(y * 100 / filter_grading_));
-          if ( filter_set_.find(key) != filter_set_.end()) {
+          if (filter_set_.find(key) != filter_set_.end()) {
             x = NAN;
             y = NAN;
             z = NAN;
@@ -261,9 +233,6 @@ void Robosense16Parser::unpack_robosense(
         point->set_z(z);
         point->set_intensity(intensity);
         ++point_index_;
-        // AINFO << "RoboUnpack->point x:" << point->x() << "  y:" << point->y()
-        //   << "  z:" << point->z()
-        //   << "  intensity:" << int(point->intensity());
       }
     }
   }
