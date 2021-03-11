@@ -193,6 +193,7 @@ void HMI::RegisterMessageHandlers() {
           AERROR
               << "Failed to get user configuration: invalid preprocess table."
               << json.dump();
+          return;
         }
 
         // Gernerate user-specified configuration and run the preprocess script
@@ -201,6 +202,7 @@ void HMI::RegisterMessageHandlers() {
                          task_type, "_user.config");
         if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
           AERROR << "Failed to generate user configuration file";
+          return;
         }
         hmi_worker_->SensorCalibrationPreprocess(task_type);
       });
