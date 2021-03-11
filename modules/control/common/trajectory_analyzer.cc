@@ -130,7 +130,7 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
 
   *ptr_d_dot = v * sin_delta_theta;
 
-  double one_minus_kappa_r_d = 1 - ref_point.kappa() * (*ptr_d);
+  double one_minus_kappa_r_d = 1 + ref_point.kappa() * (*ptr_d);
   if (one_minus_kappa_r_d <= 0.0) {
     AERROR << "TrajectoryAnalyzer::ToTrajectoryFrame "
               "found fatal reference and actual difference. "
