@@ -687,24 +687,6 @@ bool HybridAStar::Plan(
     const std::string current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
-    Box2d current_point = Node3d::GetBoundingBox(
-        vehicle_param_, current_node->GetX(),
-        current_node->GetY(), current_node->GetPhi());
-    std::vector<Vec2d> current_vector = current_point.GetAllCorners();
-    if (currentx.is_open() && currenty.is_open() && currentphi.is_open()) {
-      for (size_t m = 0; m < current_vector.size(); ++m) {
-        currentx << current_vector.at(m).x();
-        currentx << std::endl;
-        currenty << current_vector.at(m).y();
-        currenty << std::endl;
-      }
-      currentx << current_vector.at(0).x();
-      currentx << std::endl;
-      currenty << current_vector.at(0).y();
-      currenty << std::endl;
-      // currentphi << current_node->GetPhi();
-      // currentphi << std::endl;
-  }
     // check if an analystic curve could be connected from current
     // configuration to the end configuration without collision. if so, search
     // ends.
