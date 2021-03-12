@@ -38,7 +38,7 @@ using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
-using apollo::routing::ParkingSpotType;
+using apollo::routing::ParkingSpaceType;
 
 OpenSpaceRoiDecider::OpenSpaceRoiDecider(
     const TaskConfig &config,
@@ -268,7 +268,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
                                parking_depth_buffer);
     }
   }
-  if (plot_type == ParkingSpotType::PARALLEL_PLOT) {
+  if (plot_type == ParkingSpaceType::PARALLEL_PLOT) {
     double parllel_park_end_x_buffer =
         config_.open_space_roi_decider_config().parallel_park_end_x_buffer();
     parking_spot_heading = (left_down - right_down).Angle();
@@ -1225,10 +1225,8 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   if (previous_open_space_info.target_parking_lane() != nullptr &&
       previous_open_space_info.target_parking_spot_id() ==
           frame->open_space_info().target_parking_spot_id()) {
-    AERROR << "enter the 1";
     nearest_lane = previous_open_space_info.target_parking_lane();
   } else {
-    AERROR << "enter the 2";
     int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
         point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
         &vehicle_lane_s, &vehicle_lane_l);
@@ -1274,7 +1272,6 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
       }
     }
   } else {
-    AERROR << "outer the loop";
     segments_vector.push_back(nearest_lanesegment);
     *nearby_path = Path(segments_vector);
     SearchTargetParkingSpotOnPath(*nearby_path, &target_parking_spot);
@@ -1298,12 +1295,11 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   Vec2d left_down = target_parking_spot->polygon().points().at(0);
   Vec2d right_down = target_parking_spot->polygon().points().at(1);
   Vec2d right_top = target_parking_spot->polygon().points().at(2);
-  if (plot_type == ParkingSpotType::PARALLEL_PLOT) {
+  if (plot_type == ParkingSpaceType::PARALLEL_PLOT) {
     const auto &routing_request =
       frame->local_view().routing->routing_request();
     auto corner_point =
         routing_request.parking_info().corner_point();
-    // 156 parallel
     left_top.set_x(corner_point.point().at(3).x());
     left_top.set_y(corner_point.point().at(3).y());
     left_down.set_x(corner_point.point().at(0).x());
@@ -1320,11 +1316,6 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
     left_top.set_x(left_top.x() - extend_left_x_buffer);
     left_down.set_x(left_down.x() - extend_left_x_buffer);
     right_down.set_x(right_down.x() + extend_right_x_buffer);
-    // 155 parallel
-    // Vec2d left_top = target_parking_spot->polygon().points().at(2);
-    // Vec2d left_down = target_parking_spot->polygon().points().at(3);
-    // Vec2d right_down = target_parking_spot->polygon().points().at(0);
-    // Vec2d right_top = target_parking_spot->polygon().points().at(1);
   }
   std::array<Vec2d, 4> parking_vertices{left_top, left_down, right_down,
                                         right_top};

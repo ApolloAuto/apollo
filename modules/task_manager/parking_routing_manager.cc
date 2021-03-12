@@ -26,7 +26,7 @@ namespace task_manager {
 using apollo::common::math::Vec2d;
 using apollo::common::PointENU;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
-using apollo::routing::ParkingSpotType;
+using apollo::routing::ParkingSpaceType;
 
 common::Status ParkingRoutingManager::Init(
         const ParkingRoutingTask& parking_routing_task) {
@@ -41,7 +41,6 @@ common::Status ParkingRoutingManager::Init(
 
 bool ParkingRoutingManager::SizeVerification(
         const ParkingRoutingTask& parking_routing_task) {
-    AERROR << "the FLAGS_plot_size_buffer is: " << FLAGS_plot_size_buffer;
     auto plot_type =
       parking_routing_task.routing_request().parking_info().parking_spot_type();
     const auto& vehicle_config =
@@ -66,13 +65,13 @@ bool ParkingRoutingManager::SizeVerification(
                         (right_bottom_point.y() - left_bottom_point.y()) *
                         (right_bottom_point.y() - left_bottom_point.y()));
     // judge by spot type
-    if (plot_type == ParkingSpotType::VERTICAL_PLOT) {
+    if (plot_type == ParkingSpaceType::VERTICAL_PLOT) {
         if (length + FLAGS_plot_size_buffer < ego_length ||
             width + FLAGS_plot_size_buffer < ego_width) {
             AERROR << "The veritical plot is small";
             return false;
         }
-    } else if (plot_type == ParkingSpotType::PARALLEL_PLOT) {
+    } else if (plot_type == ParkingSpaceType::PARALLEL_PLOT) {
         if (width + FLAGS_plot_size_buffer < ego_length ||
             length + FLAGS_plot_size_buffer < ego_width) {
             AERROR << "The parallel plot is small";
@@ -87,9 +86,7 @@ bool ParkingRoutingManager::RoadWidthVerification(
     const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
     double ego_width = vehicle_config.vehicle_param().width();
-    AERROR << "the vehicle width is: " << ego_width;
     double road_width = parking_routing_task.lane_width();
-    AERROR << "the road width is: " << road_width;
     if (!has_space_ || !has_space_id_) {
         AERROR << "No Valid park plot exits!";
         return false;

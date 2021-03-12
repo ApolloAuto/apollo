@@ -63,7 +63,6 @@ class ParkingRoutingManager {
   bool has_space_ = false;
   bool has_space_id_ = false;
   std::string id_ = "";
-//  ParkingRoutingConfig config_;
 };
 
 }  // namespace task_manager
