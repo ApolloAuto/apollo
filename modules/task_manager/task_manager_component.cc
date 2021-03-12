@@ -28,7 +28,6 @@ using apollo::localization::LocalizationEstimate;
 using apollo::routing::RoutingRequest;
 
 bool TaskManagerComponent::Init() {
-  AERROR << "enter the TaskManagerComponent init";
   TaskManagerConfig task_manager_conf;
   ACHECK(cyber::ComponentBase::GetProtoConfig(&task_manager_conf))
       << "Unable to load task_manager conf file: "
@@ -48,7 +47,6 @@ bool TaskManagerComponent::Init() {
   cyber::proto::RoleAttributes attr;
   attr.set_channel_name(
       task_manager_conf.topic_config().routing_request_topic());
-  AERROR << "the channel name is: " << attr.channel_name();
   auto qos = attr.mutable_qos_profile();
   qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_reliability(
@@ -56,17 +54,14 @@ bool TaskManagerComponent::Init() {
   qos->set_durability(
       apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
   request_writer_ = node_->CreateWriter<RoutingRequest>(attr);
-  AERROR << "end the init";
   return true;
 }
 
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
-  AERROR << "enter the TaskManagerComponent proc";
   task_name_ = task->task_name();
-  AERROR << "the task type is: " << task->task_type();
   if (task->task_type() != CYCLE_ROUTING &&
       task->task_type() != PARKING_ROUTING) {
-    AINFO << "Task type is not cycle_routing.";
+    AERROR << "Task type is not cycle_routing.";
     return false;
   }
   if (task->task_type() == CYCLE_ROUTING) {

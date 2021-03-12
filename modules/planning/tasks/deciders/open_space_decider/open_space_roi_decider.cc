@@ -268,7 +268,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
                                parking_depth_buffer);
     }
   }
-  if (plot_type == ParkingSpaceType::PARALLEL_PLOT) {
+  if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
     double parllel_park_end_x_buffer =
         config_.open_space_roi_decider_config().parallel_park_end_x_buffer();
     parking_spot_heading = (left_down - right_down).Angle();

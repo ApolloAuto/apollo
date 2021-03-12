@@ -85,8 +85,8 @@ bool ParkingRoutingManager::RoadWidthVerification(
         const ParkingRoutingTask& parking_routing_task) {
     const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
-    double ego_width = vehicle_config.vehicle_param().width();
-    double road_width = parking_routing_task.lane_width();
+    const double ego_width = vehicle_config.vehicle_param().width();
+    const double road_width = parking_routing_task.lane_width();
     if (!has_space_ || !has_space_id_) {
         AERROR << "No Valid park plot exits!";
         return false;
