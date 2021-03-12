@@ -41,7 +41,7 @@ class ParkingRoutingManager {
                       parking_routing_task);
 
   /**
-   * @brief check if the size of vehicle is smaller than size of plot
+   * @brief check if the size of vehicle is smaller than size of parking space
    * @return false/true
    */
   bool SizeVerification(const task_manager::ParkingRoutingTask&
