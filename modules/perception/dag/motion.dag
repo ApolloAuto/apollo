@@ -4,7 +4,7 @@ module_config {
     class_name : "MotionSubmodule"
     config {
       name : "camera_motion_service"
-      config_file_path : "/apollo/modules/perception/production/conf/perception/camera/motion_service.config"
+      config_file_path : "/apollo/modules/perception/conf/camera/motion_service/motion_service.conf"
       flag_file_path: "/apollo/modules/perception/conf/perception_common.flag"
     }
   }
