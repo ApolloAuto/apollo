@@ -10474,7 +10474,7 @@
                 }
               }
             },
-            "ParkingSpotType": {
+            "ParkingSpaceType": {
               "values": {
                 "VERTICAL_PLOT": 0,
                 "PARALLEL_PLOT": 1
@@ -10490,8 +10490,8 @@
                   "type": "apollo.common.PointENU",
                   "id": 2
                 },
-                "parkingSpotType": {
-                  "type": "ParkingSpotType",
+                "parkingSpaceType": {
+                  "type": "ParkingSpaceType",
                   "id": 3
                 },
                 "cornerPoint": {

@@ -20,7 +20,7 @@ message LaneSegment {
   optional double end_s = 3;
 }
 
-enum ParkingSpotType {
+enum ParkingSpaceType {
   VERTICAL_PLOT = 0;
   PARALLEL_PLOT = 1;
 }
@@ -28,7 +28,7 @@ enum ParkingSpotType {
 message ParkingInfo {
   optional string parking_space_id = 1;
   optional apollo.common.PointENU parking_point = 2;
-  optional ParkingSpotType parking_spot_type = 3;
+  optional ParkingSpaceType parking_spot_type = 3;
   // The four corner points are in order.
   optional apollo.hdmap.Polygon corner_point = 4;
 }

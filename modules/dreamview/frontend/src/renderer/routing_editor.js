@@ -169,7 +169,7 @@ export default class RoutingEditor {
       const parkingInfo = {
         parkingSpaceId: _.get(id, 'id'),
         parkingPoint: coordinates.applyOffset(lastPoint.position,true),
-        parkingSpotType: type,
+        parkingSpaceType: type,
       };
       WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints,laneId);
       return true;
