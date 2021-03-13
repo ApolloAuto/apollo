@@ -1270,7 +1270,28 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   Vec2d left_down = target_parking_spot->polygon().points().at(0);
   Vec2d right_down = target_parking_spot->polygon().points().at(1);
   Vec2d right_top = target_parking_spot->polygon().points().at(2);
-
+  if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
+    const auto &routing_request =
+      frame->local_view().routing->routing_request();
+    auto corner_point =
+        routing_request.parking_info().corner_point();
+    left_top.set_x(corner_point.point().at(3).x());
+    left_top.set_y(corner_point.point().at(3).y());
+    left_down.set_x(corner_point.point().at(0).x());
+    left_down.set_y(corner_point.point().at(0).y());
+    right_down.set_x(corner_point.point().at(1).x());
+    right_down.set_y(corner_point.point().at(1).y());
+    right_top.set_x(corner_point.point().at(2).x());
+    right_top.set_y(corner_point.point().at(2).y());
+    double extend_right_x_buffer =
+      config_.open_space_roi_decider_config().extend_right_x_buffer();
+    double extend_left_x_buffer =
+      config_.open_space_roi_decider_config().extend_left_x_buffer();
+    right_top.set_x(right_top.x() + extend_right_x_buffer);
+    left_top.set_x(left_top.x() - extend_left_x_buffer);
+    left_down.set_x(left_down.x() - extend_left_x_buffer);
+    right_down.set_x(right_down.x() + extend_right_x_buffer);
+  }
   std::array<Vec2d, 4> parking_vertices{left_top, left_down, right_down,
                                         right_top};
 
