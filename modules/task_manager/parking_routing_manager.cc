@@ -71,7 +71,7 @@ bool ParkingRoutingManager::SizeVerification(
             AERROR << "The veritical plot is small";
             return false;
         }
-    } else if (plot_type == ParkingSpaceType::PARALLEL_PLOT) {
+    } else if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
         if (width + FLAGS_plot_size_buffer < ego_length ||
             length + FLAGS_plot_size_buffer < ego_width) {
             AERROR << "The parallel plot is small";

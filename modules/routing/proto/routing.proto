@@ -22,7 +22,7 @@ message LaneSegment {
 
 enum ParkingSpaceType {
   VERTICAL_PLOT = 0;
-  PARALLEL_PLOT = 1;
+  PARALLEL_PARKING = 1;
 }
 
 message ParkingInfo {

@@ -4191,6 +4191,27 @@
                   "options": {
                     "default": 10
                   }
+                },
+                "parallelParkEndXBuffer": {
+                  "type": "double",
+                  "id": 15,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "extendRightXBuffer": {
+                  "type": "double",
+                  "id": 16,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "extendLeftXBuffer": {
+                  "type": "double",
+                  "id": 17,
+                  "options": {
+                    "default": 0
+                  }
                 }
               },
               "nested": {
@@ -10477,7 +10498,7 @@
             "ParkingSpaceType": {
               "values": {
                 "VERTICAL_PLOT": 0,
-                "PARALLEL_PLOT": 1
+                "PARALLEL_PARKING": 1
               }
             },
             "ParkingInfo": {
@@ -10490,7 +10511,7 @@
                   "type": "apollo.common.PointENU",
                   "id": 2
                 },
-                "parkingSpaceType": {
+                "parkingSpotType": {
                   "type": "ParkingSpaceType",
                   "id": 3
                 },
