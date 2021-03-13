@@ -430,8 +430,8 @@ bool MapService::ConstructLaneWayPointWithHeading(
 }
 
 bool MapService::ConstructLaneWayPointWithLaneId(
-      const double x, const double y, const std::string id,
-      routing::LaneWaypoint *laneWayPoint) const {
+    const double x, const double y, const std::string id,
+    routing::LaneWaypoint *laneWayPoint) const {
   LaneInfoConstPtr lane = HDMap()->GetLaneById(hdmap::MakeMapId(id));
   if (!lane) {
     return false;
@@ -446,7 +446,7 @@ bool MapService::ConstructLaneWayPointWithLaneId(
   point.set_x(x);
   point.set_y(y);
 
-  if (!lane->GetProjection({point.x(),point.y()}, &s, &l)) {
+  if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
     return false;
   }
 
