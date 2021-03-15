@@ -64,12 +64,12 @@ COPY --from=devel /etc/profile.d/apollo.sh /etc/profile.d/apollo.sh
 COPY --from=devel /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo.conf
 
 COPY syspkgs.txt /opt/apollo/syspkgs.txt
-RUN apt-get -y update && \
-    apt-get -y install --no-install-recommends \
+RUN apt-get -y update \
+    && apt-get -y install --no-install-recommends \
         silversearcher-ag \
-        $(cat /opt/apollo/syspkgs.txt) && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+        $(cat /opt/apollo/syspkgs.txt) \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Restore
 RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
