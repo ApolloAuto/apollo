@@ -97,7 +97,7 @@ function generate_solibs() {
     )
 
     for libdir in ${SYSLIB_DIRS[@]}; do
-        find ${libdir} -name "*.so" \
+        find ${libdir} \( -type f -or -type l \) -name "*.so" \
             -exec bash -c 'retrieve_so_deps "$0"' {} \
                 >> ${listing} \;
     done
@@ -106,6 +106,9 @@ function generate_solibs() {
 
 function solib_locate() {
     solib="$1"
+    if [[ ${solib} != "/"* || ! -e ${solib} ]]; then
+        return
+    fi
     dest="$2"
     # https://superuser.com/questions/363444
     # /how-do-i-get-the-output-and-exit-value-of-a-subshell-when-using-bash-e
