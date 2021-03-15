@@ -28,6 +28,28 @@ ARCH="$(uname -m)"
 DEST_DIR="${PKGS_DIR}/adv_plat"
 [[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
 
+if [[ "${MY_MODE}" == "download" ]]; then
+    if [[ "${ARCH}" == "x86_64" ]]; then
+        PKG_NAME="adv_plat-3.0-x86_64.tar.gz"
+        CHECKSUM="647197f3f222a26dbc5c94a3e5143872b8c1359387bfb439e9f3dcd5064601e0"
+        DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+        download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+        tar xzf ${PKG_NAME}
+
+        # Note(storypku): workaround for the issue that adv_plat built on ubuntu 20.04 host
+        # can't work properly for camera driver
+        EXTRACTED_PKG="${PKG_NAME%%.tar.gz}"
+        mv -f  ${EXTRACTED_PKG}/* ${DEST_DIR}/
+        echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+        ldconfig
+
+        # cleanup
+        rm -rf ${EXTRACTED_PKG} ${PKG_NAME}
+        exit 0
+    fi
+fi
+
 #info "Git clone https://github.com/ApolloAuto/apollo-contrib.git"
 #git clone https://github.com/ApolloAuto/apollo-contrib.git
 
