@@ -98,6 +98,17 @@ class SimulationWorldUpdater {
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
 
+  /**
+   * @brief The function to construct a parking routing task from the given
+   * json,
+   * @param json that contains start, end, waypoint, parking info, lane width,
+   * @param parking_routing_task
+   * @return True if parking routing task is constructed successfully
+   */
+  bool ConstructParkingRoutingTask(
+      const nlohmann::json &json,
+      apollo::task_manager::ParkingRoutingTask *parking_routing_task);
+
   bool ValidateCoordinate(const nlohmann::json &json);
 
   /**

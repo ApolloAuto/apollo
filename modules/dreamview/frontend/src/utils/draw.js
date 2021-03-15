@@ -243,3 +243,17 @@ export function disposeMesh(mesh) {
   mesh.geometry.dispose();
   mesh.material.dispose();
 }
+
+export function changeMaterial(mesh, color = 0xff0000, linewidth = 2,
+  transparent = false, opacity = 1) {
+  if (!mesh) {
+    return;
+  }
+  mesh.material.dispose();
+  mesh.material = new THREE.LineBasicMaterial({
+    color,
+    linewidth,
+    transparent,
+    opacity,
+  });
+}

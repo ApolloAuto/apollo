@@ -429,6 +429,36 @@ bool MapService::ConstructLaneWayPointWithHeading(
   return true;
 }
 
+bool MapService::ConstructLaneWayPointWithLaneId(
+    const double x, const double y, const std::string id,
+    routing::LaneWaypoint *laneWayPoint) const {
+  LaneInfoConstPtr lane = HDMap()->GetLaneById(hdmap::MakeMapId(id));
+  if (!lane) {
+    return false;
+  }
+
+  if (!CheckRoutingPointLaneType(lane)) {
+    return false;
+  }
+
+  double s, l;
+  PointENU point;
+  point.set_x(x);
+  point.set_y(y);
+
+  if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+    return false;
+  }
+
+  laneWayPoint->set_id(id);
+  laneWayPoint->set_s(s);
+  auto *pose = laneWayPoint->mutable_pose();
+  pose->set_x(x);
+  pose->set_y(y);
+
+  return true;
+}
+
 bool MapService::CheckRoutingPoint(const double x, const double y) const {
   double s, l;
   LaneInfoConstPtr lane;

@@ -38,6 +38,7 @@ using apollo::hdmap::EndWayPointFile;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
 using apollo::task_manager::CycleRoutingTask;
+using apollo::task_manager::ParkingRoutingTask;
 using apollo::task_manager::Task;
 
 using Json = nlohmann::json;
@@ -194,6 +195,37 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
+      "SendParkingRoutingRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto task = std::make_shared<Task>();
+        auto *parking_routing_task = task->mutable_parking_routing_task();
+        bool succeed = ConstructParkingRoutingTask(json, parking_routing_task);
+        // For test routing
+        auto routing_request = std::make_shared<RoutingRequest>();
+        bool suc = ConstructRoutingRequest(json, routing_request.get());
+        if (suc) {
+          sim_world_service_.PublishRoutingRequest(routing_request);
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
+                                                   "Routing request sent.");
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR, "Failed to send a routing request.");
+        }
+        if (succeed) {
+          task->set_task_name("parking_routing_task");
+          task->set_task_type(apollo::task_manager::TaskType::PARKING_ROUTING);
+          sim_world_service_.PublishTask(task);
+          AINFO << task->DebugString();
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO, "parking routing task sent.");
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to send a parking routing task to task manager module.");
+        }
+      });
+
+  websocket_->RegisterMessageHandler(
       "RequestSimulationWorld",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         if (!sim_world_service_.ReadyToPush()) {
@@ -346,6 +378,15 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
+      "GetParkingRoutingDistance",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "ParkingRoutingDistance";
+        response["threshold"] = FLAGS_parking_routing_distance_threshold;
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
       "RequestPreprocessProgress",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
@@ -473,11 +514,20 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     AERROR << "Failed to prepare a routing request: invalid end point.";
     return false;
   }
-  if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
+  if (ContainsKey(end, "id")) {
+    if (!map_service_->ConstructLaneWayPointWithLaneId(
+            end["x"], end["y"], end["id"], routing_request->add_waypoint())) {
+      AERROR << "Failed to prepare a routing request with lane id: "
+             << end["id"] << " cannot locate end point on map.";
+      return false;
+    }
+  } else {
+    if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
                                            routing_request->add_waypoint())) {
     AERROR << "Failed to prepare a routing request:"
            << " cannot locate end point on map.";
     return false;
+    }
   }
 
   // set parking info
@@ -489,12 +539,47 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
              << json["parkingInfo"].dump();
       return false;
     }
+    if (ContainsKey(json, "cornerPoints")) {
+      auto point_iter = json.find("cornerPoints");
+      auto *points =
+          requested_parking_info->mutable_corner_point()->mutable_point();
+      if (point_iter != json.end() && point_iter->is_array()) {
+        for (size_t i = 0; i < point_iter->size(); ++i) {
+          auto &point = (*point_iter)[i];
+          auto *p = points->Add();
+          if (!ValidateCoordinate(point)) {
+            AERROR << "Failed to add a corner point: invalid corner point.";
+            return false;
+          }
+          p->set_x(static_cast<double>(point["x"]));
+          p->set_y(static_cast<double>(point["y"]));
+        }
+      }
+    }
   }
 
   AINFO << "Constructed RoutingRequest to be sent:\n"
         << routing_request->DebugString();
 
   return true;
+}
+
+bool SimulationWorldUpdater::ConstructParkingRoutingTask(
+    const Json &json, ParkingRoutingTask *parking_routing_task) {
+  auto *routing_request = parking_routing_task->mutable_routing_request();
+  // set parking Space
+  if (!ContainsKey(json, "laneWidth")) {
+    AERROR << "Failed to prepare a parking routing task: "
+           << "lane width not found.";
+    return false;
+  }
+  bool succeed = ConstructRoutingRequest(json, routing_request);
+  if (succeed) {
+    parking_routing_task->set_lane_width(
+        static_cast<double>(json["laneWidth"]));
+    return true;
+  }
+  return false;
 }
 
 bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
