@@ -297,7 +297,7 @@ default_task_config: {
           delta_t: 0.2
         }
         delta_t: 0.5
-        is_near_destination_threshold: 0.1
+        is_near_destination_threshold: 0.2
         enable_check_parallel_trajectory: false
         enable_linear_interpolation: false
         is_near_destination_theta_threshold: 0.05
@@ -337,6 +337,9 @@ default_task_config: {
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
     curb_heading_tangent_change_upper_limit: 0.4
+    parallel_park_end_x_buffer: 0.2
+    extend_right_x_buffer: 0.0
+    extend_left_x_buffer: 0.6
   }
 }
 default_task_config: {
