@@ -215,7 +215,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
     Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices) {
   const auto &routing_request =
         frame->local_view().routing->routing_request();
-  auto plot_type = routing_request.parking_info().parking_spot_type();
+  auto plot_type = routing_request.parking_info().parking_space_type();
   auto left_top = vertices[0];
   auto left_down = vertices[1];
   auto right_down = vertices[2];
@@ -1202,7 +1202,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
                                          Path *nearby_path) {
   const auto &routing_request =
         frame->local_view().routing->routing_request();
-  auto plot_type = routing_request.parking_info().parking_spot_type();
+  auto plot_type = routing_request.parking_info().parking_space_type();
   if (frame == nullptr) {
     AERROR << "Invalid frame, fail to GetParkingSpotFromMap from frame. ";
     return false;
