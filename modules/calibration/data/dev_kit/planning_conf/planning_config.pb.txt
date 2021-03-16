@@ -297,7 +297,7 @@ default_task_config: {
           delta_t: 0.2
         }
         delta_t: 0.5
-        is_near_destination_threshold: 0.1
+        is_near_destination_threshold: 0.2
         enable_check_parallel_trajectory: false
         enable_linear_interpolation: false
         is_near_destination_theta_threshold: 0.05
