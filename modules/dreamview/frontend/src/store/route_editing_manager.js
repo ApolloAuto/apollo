@@ -163,7 +163,7 @@ export default class RouteEditingManager {
       }
       const distance =
           Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
-      return distance <= this.defaultRoutingDistanceThreshold;
+      return distance > this.defaultRoutingDistanceThreshold;
     }
 
     updateParkingRoutingDistance(data) {

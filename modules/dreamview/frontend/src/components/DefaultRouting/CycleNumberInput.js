@@ -34,7 +34,7 @@ export default class CycleNumberInput extends React.Component {
       }
       else if (!routeEditingManager.checkCycleRoutingAvailable()) {
         alert(`Please set the default routing reasonably,the distance from the start point
-          to the end point should not exceed ${routeEditingManager.defaultRoutingDistanceThreshold},
+          to the end point should exceed ${routeEditingManager.defaultRoutingDistanceThreshold},
           otherwise it will not be able to form a closed loop.`);
       }
       else {
