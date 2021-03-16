@@ -42,7 +42,7 @@ common::Status ParkingRoutingManager::Init(
 bool ParkingRoutingManager::SizeVerification(
         const ParkingRoutingTask& parking_routing_task) {
     auto plot_type =
-      parking_routing_task.routing_request().parking_info().parking_spot_type();
+      parking_routing_task.routing_request().parking_info().parking_space_type();
     const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
     double ego_length = vehicle_config.vehicle_param().length();
