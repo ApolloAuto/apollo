@@ -82,6 +82,6 @@ Apollo 的论坛和空间旨在提供专业交流之所，任何可以被合理�
 
 ## 来源
 
-本行为准则改编自贡献者公约 1.4 版，地址
-：https://contributor-covenant.org/version/1/4 , 同时包含女性极客行为准则的若干
-方面。
+本行为准则改编自贡献者公约 1.4 版，地址：
+https://contributor-covenant.org/version/1/4 , 同时包含
+[女性极客行为准则](https://geekfeminismdotorg.wordpress.com) 的若干方面。
