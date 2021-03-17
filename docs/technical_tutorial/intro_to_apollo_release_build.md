@@ -6,7 +6,7 @@ For quite some time, binary distribution was unavailable for CyberRT-based
 Apollo. Users have to build the whole project themselves inside Apollo Dev
 container before they can run various modules and tools. This incapability of
 deployment causes trouble in certain situations. For example, people from
-Lgsvl-Simulator find that the total size of all Docker images, volumes and Bazel
+SVL Simulator find that the total size of all Docker images, volumes and Bazel
 caches and build artifacts sums up to 40+ GB, which was rather inconvenient for
 their use case.
 
