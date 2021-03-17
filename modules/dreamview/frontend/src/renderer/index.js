@@ -564,6 +564,11 @@ class Renderer {
     const names = intersects.map((intersect) => intersect.object.name);
     return names;
   }
+
+  checkCycleRoutingAvailable(points, threshold) {
+    return this.routingEditor.checkCycleRoutingAvailable(points,
+      this.adc.mesh.position, threshold);
+  }
 }
 
 const RENDERER = new Renderer();
