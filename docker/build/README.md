@@ -70,17 +70,39 @@ Successfully tagged apolloauto/apollo:dev-x86_64-18.04-20200824_0339
 Built new image apolloauto/apollo:dev-x86_64-18.04-20200824_0339
 ```
 
+## Build Apollo Runtime Docker Image
+
+Apollo Runtime Docker was used in combination with Release Build output for easy
+deployment. You can run the following commands to build Apollo Runtime Docker
+image on your own.
+
+```
+# Generate required APT packages
+./apollo.sh release -c -r
+
+cd docker/build
+# Copy the generated package list for docker build
+cp /apollo/output/syspkgs.txt .
+
+cp runtime.x86_64.dockerfile.sample runtime.x86_64.dockerfile
+bash build_docker.sh -f runtime.x86_64.dockerfile
+```
+
+> Note: Apollo Runtime Docker supports x86_64 only as Release Build was not
+> ready for Aarch64 yet.
+
 ## Tips
 
 ### Build Log
 
-The build log for the image built was located at `/opt/apollo/build.log` when
-running. It records download links of dependent packages for this image.
+The build log for CyberRT and Dev Docker images was located at
+`/opt/apollo/build.log`, which contains download links and checksums of
+dependent packages during Docker build.
 
 ### Enable Local HTTP Cache to Speed Up Build
 
-You can enable local HTTP cache to speed up package downloading phase by
-performing the following steps on your docker **host** (outside docker):
+You can enable local HTTP cache to speed up package downloading by performing
+the following steps on your **host** running Docker:
 
 1. Download all prerequisite packages to a directory (say, `$HOME/archive`) with
    URLs listed in the build log. Pay attention to their checksum.
