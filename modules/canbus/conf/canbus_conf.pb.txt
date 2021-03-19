@@ -1,5 +1,5 @@
 vehicle_parameter {
-  brand: KIA_NIRO
+  brand: KIA
   max_enable_fail_attempt: 5
   driving_mode: COMPLETE_AUTO_DRIVE
 }
