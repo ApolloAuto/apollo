@@ -79,6 +79,8 @@ function grant_device_permissions() {
 
   # setup audio device
   [ -e /dev/snd ] && usermod -a -G audio "$1"
+
+  true
 }
 
 function setup_apollo_directories() {
