@@ -15,10 +15,10 @@ guide there.
 
 Note:
 
-> Please replace "YOUR USERNAME" with your GitHub account in the descriptions
+> Please replace "YOUR_USERNAME" with your GitHub account in the descriptions
 > below.
 
-Open a terminal, type the following:
+Open a terminal, type either of the following commands:
 
 ```
 # Using SSH
