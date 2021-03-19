@@ -58,7 +58,7 @@ bool CycleRoutingManager::GetNewRouting(
   if (is_allowed_to_route_) {
     if (CheckPointDistanceInThreshold(begin_point_.pose(), pose.position(),
                                       FLAGS_threshold_for_destination_check)) {
-      AINFO << "GetNewRouting: reach begin point"
+      AINFO << "GetNewRouting: reach begin point."
             << "Remaining cycles: " << cycle_;
       new_routing_request->CopyFrom(original_routing_request_);
       auto cur_point = new_routing_request->mutable_waypoint(0);
@@ -74,7 +74,7 @@ bool CycleRoutingManager::GetNewRouting(
   } else {
     if (CheckPointDistanceInThreshold(end_point_.pose(), pose.position(),
                                       FLAGS_threshold_for_destination_check)) {
-      AINFO << "GetNewRouting: reach end point"
+      AINFO << "GetNewRouting: reach end point. "
             << "Remaining cycles: " << cycle_;
       new_routing_request->clear_waypoint();
       auto cur_point = new_routing_request->add_waypoint();
