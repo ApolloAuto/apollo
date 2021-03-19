@@ -26,9 +26,9 @@ def talker():
 
 		msg.theta = 1.70768520645
 		
-		msg.length = 10.0
-		msg.width = 10.0
-		msg.height = 10.0
+		msg.length = 5.0
+		msg.width = 5.0
+		msg.height = 5.0
 
 		pub.publish(msg1)
 		rate.sleep()
