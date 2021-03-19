@@ -7,7 +7,7 @@ def talker():
 	pub = rospy.Publisher('/apollo/perception/obstacles', PerceptionObstacles, queue_size = 10)
 
 	rospy.init_node('talker', anonymous = True)
-	# define the time of refresh
+	# define the frequency of refresh (Hz)
 	rate = rospy.Rate(0.5)
 	 
 	# define the coordinates of the start and end points
@@ -35,9 +35,9 @@ def talker():
 	msg1 = PerceptionObstacles()
 	
 	while not rospy.is_shutdown():
-
+		# create PerceptionObstacles object
 		msg_obstacles = PerceptionObstacles()
-		# generate various obstacles
+
 		for obs in range(n_obstacles):
 			msg = msg_obstacles.perception_obstacle.add()
 			msg.id = obs
@@ -48,12 +48,17 @@ def talker():
 			msg.position.y = y
 			msg.position.z = 0
 
-			msg.theta = random.uniform(1, 2)
+			# assign random theta to the obstacle
+			# theta represents the heading direction of the obstacle
+			# msg.theta = random.uniform(1, 2)
+			msg.theta = 2.0
 		
+			# custom obstacle dimentions
 			msg.length = 2.0
 			msg.width = 2.0
 			msg.height = 2.0
 
+		# publish the obstacles to ROS topic '/apollo/perception/obstacles'
 		pub.publish(msg_obstacles)
 		rate.sleep()
 		
