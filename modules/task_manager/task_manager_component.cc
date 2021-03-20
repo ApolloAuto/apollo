@@ -94,7 +94,21 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
       request_writer_->Write(routing_request_);
       AINFO << "send a auto parking task";
     } else {
+      auto last_routing_response_ = routing_response_;
+      if (!routing_response_.has_header()) {
+           AINFO << "[TaskManagerComponent]parking routing failed";
+           return false;
+         }
+         if (last_routing_response_.has_header()) {
+           if (last_routing_response_.header().sequence_num() ==
+               routing_response_.header().sequence_num()) {
+             AINFO << "[TaskManagerComponent]No parking routing response: "
+                   << "new parking routing failed";
+             return false;
+           }
+         }
       AERROR << "plot verification failed, please select suitable plot!";
+      return false;
     }
   }
   return true;
