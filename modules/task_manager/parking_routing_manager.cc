@@ -28,6 +28,10 @@ using apollo::common::PointENU;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::routing::ParkingSpaceType;
 
+ParkingRoutingManager::ParkingRoutingManager()
+: monitor_logger_buffer_(apollo::common::monitor::
+                         MonitorMessageItem::TASK_MANAGER) {}
+
 common::Status ParkingRoutingManager::Init(
         const ParkingRoutingTask& parking_routing_task) {
     // get the message form routing
@@ -66,14 +70,16 @@ bool ParkingRoutingManager::SizeVerification(
                         (right_bottom_point.y() - left_bottom_point.y()));
     // judge by spot type
     if (plot_type == ParkingSpaceType::VERTICAL_PLOT) {
-        if (length + FLAGS_plot_size_buffer < ego_length ||
-            width + FLAGS_plot_size_buffer < ego_width) {
+        if (length - FLAGS_plot_size_buffer < ego_length ||
+            width - FLAGS_plot_size_buffer < ego_width) {
+            monitor_logger_buffer_.WARN("veritical plot is not suit!");
             AERROR << "The veritical plot is small";
             return false;
         }
     } else if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
-        if (width + FLAGS_plot_size_buffer < ego_length ||
-            length + FLAGS_plot_size_buffer < ego_width) {
+        if (width - FLAGS_plot_size_buffer < ego_length ||
+            length - FLAGS_plot_size_buffer < ego_width) {
+            monitor_logger_buffer_.WARN("parallel plot is not suit!");
             AERROR << "The parallel plot is small";
             return false;
         }

@@ -31,8 +31,7 @@ namespace task_manager {
 
 class ParkingRoutingManager {
  public:
-  ParkingRoutingManager() = default;
-
+  ParkingRoutingManager();
   /**
    * @brief module initialization function
    * @return initialization status
@@ -63,6 +62,7 @@ class ParkingRoutingManager {
   bool has_space_ = false;
   bool has_space_id_ = false;
   std::string id_ = "";
+  apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
 }  // namespace task_manager
