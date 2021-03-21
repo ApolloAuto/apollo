@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from modules.perception.proto import perception_obstacle_pb2
+from modules.planning.proto import planning_pb2
 
 
 def callback(data):
@@ -9,8 +9,8 @@ def callback(data):
     print '-----------------'
 
 def listener():
-    rospy.init_node('perception_sub', anonymous=True)
-    rospy.Subscriber('/apollo/perception/obstacles',perception_obstacle_pb2.PerceptionObstacles, callback)
+    rospy.init_node('collision_detect', anonymous=True)
+    rospy.Subscriber('/apollo/planning',planning_pb2.ADCTrajectoryPoint, callback)
     rospy.spin()
 
 if __name__ == '__main__':
