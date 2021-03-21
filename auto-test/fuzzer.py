@@ -8,7 +8,7 @@ def talker():
 
 	rospy.init_node('talker', anonymous = True)
 	# define the frequency of refresh (Hz)
-	rate = rospy.Rate(0.5)
+	rate = rospy.Rate(0.2)
 	 
 	# define the coordinates of the start and end points
 	# can be optimised to read from files
@@ -59,7 +59,11 @@ def talker():
 			msg.height = 2.0
 
 			# define the type of the obstacle (default 10: general obstacle)
-			msg.type = 10
+			msg.type = random.randrange(0, 5)	
+
+			# define the velocity of the obstacle
+			# msg.velocity.x = 5
+			# msg.velocity.y = 5
 
 		# publish the obstacles to ROS topic '/apollo/perception/obstacles'
 		pub.publish(msg_obstacles)
