@@ -58,6 +58,9 @@ def talker():
 			msg.width = 2.0
 			msg.height = 2.0
 
+			# define the type of the obstacle (default 10: general obstacle)
+			msg.type = 10
+
 		# publish the obstacles to ROS topic '/apollo/perception/obstacles'
 		pub.publish(msg_obstacles)
 		rate.sleep()
