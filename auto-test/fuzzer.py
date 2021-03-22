@@ -32,7 +32,6 @@ def talker():
 	# define number of obstacles
 	n_obstacles = int(obstacle_density * area_region)
 
-	msg1 = PerceptionObstacles()
 	
 	while not rospy.is_shutdown():
 		# create PerceptionObstacles object
