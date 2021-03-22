@@ -3,7 +3,6 @@
 import rospy
 from modules.perception.proto import perception_obstacle_pb2
 
-
 def callback(data):
     print data
     print '-----------------'
