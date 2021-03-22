@@ -129,7 +129,7 @@ bool UDPBridgeMultiReceiverComponent::MsgHandle(int fd) {
   size_t offset = HEADER_FLAG_SIZE + 1;
 
   const char *cursor = total_buf + offset;
-  hsize header_size = *(reinterpret_cast<hsize *>(cursor));
+  hsize header_size = *(reinterpret_cast<const hsize *>(cursor));
   offset += sizeof(hsize) + 1;
 
   if (header_size < offset || header_size > FRAME_SIZE) {
