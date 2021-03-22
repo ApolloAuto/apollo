@@ -45,15 +45,15 @@ struct LidarVisFrame {
 };
 
 struct LocalizationMsg {
-  double timestamp;
-  double x;
-  double y;
-  double z;
+  double timestamp = 0.0;
+  double x = 0;
+  double y = 0;
+  double z = 0;
 
-  double qx;
-  double qy;
-  double qz;
-  double qw;
+  double qx = 0.0;
+  double qy = 0.0;
+  double qz = 0.0;
+  double qw = 0.0;
 
   double std_x = 0;
   double std_y = 0;
