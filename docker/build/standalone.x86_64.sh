@@ -12,6 +12,7 @@ IMAGE_VERSION=18.04-20210315_2158
 DEV_IMAGE=${DOCKER_REPO}:dev-${TARGET_ARCH}-${IMAGE_VERSION}
 RUNTIME_IMAGE=${DOCKER_REPO}:runtime-${TARGET_ARCH}-${IMAGE_VERSION}
 STANDALONE_IMAGE=${DOCKER_REPO}:standalone-${TARGET_ARCH}-${IMAGE_VERSION}
+STANDALONE_IMAGE_LATEST=${DOCKER_REPO}:standalone-${TARGET_ARCH}-18.04-6.1-latest
 
 set -e
 
@@ -64,6 +65,8 @@ docker build \
     -f docker/build/standalone.x86_64.dockerfile \
     docker/build/ \
     -t ${STANDALONE_IMAGE}
+
+docker tag ${STANDALONE_IMAGE} ${STANDALONE_IMAGE_LATEST}
 
 /bin/echo -e "Docker image with prebuilt files was built and tagged as ${STANDALONE_IMAGE}, you can start it with: \n\
   cd docker/build/output/standalone-scripts
