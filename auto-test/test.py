@@ -1,8 +1,6 @@
 import numpy as np
 
-for i in range(10):
+obstacle_data = [[123,1,2,4,56,7,8,8,9,9,9,6,5,5]]
 
-    if (np.random.rand() > .5):
-        print(i, 'high')
-    else:
-        print(i, 'low')
+with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
+    np.savetxt(csv, obstacle_data, fmt='%.4f', delimiter=',')
