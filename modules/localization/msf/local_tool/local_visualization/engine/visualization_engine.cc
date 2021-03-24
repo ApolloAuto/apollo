@@ -695,6 +695,10 @@ bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
   inf >> x_min >> y_min >> x_max >> y_max >> level >> path;
   inf.close();
 
+  if (level > 5) {
+    level = 5;
+  }
+
   InitOtherParams(x_min, y_min, x_max, y_max, level, path);
 
   return true;
