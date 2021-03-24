@@ -16,6 +16,8 @@
 
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 
+#include <c10/cuda/CUDACachingAllocator.h>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -40,6 +42,8 @@ bool ObstacleDetector::Init(const std::map<std::string,
     device_type_ = torch::kCPU;
   }
 
+  // Load model without grad, equal to torch.no_grad()
+  // torch::NoGradGuard no_grad;
   // Init net
   torch::Device device(device_type_, device_id_);
   net_ = torch::jit::load(model_file_, device);
@@ -76,6 +80,7 @@ bool ObstacleDetector::Init(const std::map<std::string,
       blobs_.emplace(name, blob);
     }
   }
+  c10::cuda::CUDACachingAllocator::emptyCache();
   return true;
 }
 
@@ -129,11 +134,16 @@ void ObstacleDetector::Infer() {
 
   AINFO << "Start to do inference";
   auto outputs = net_.forward(torch_inputs).toTuple()->elements();
-  auto results = outputs[0].toTensor();
-  auto feat_map = outputs[1].toTensor();
   AINFO << "Finished inference";
-  blobs_[output_names_[0]]->data()->set_gpu_data(results.data_ptr());
-  blobs_[output_names_[1]]->data()->set_gpu_data(feat_map.data_ptr());
+
+  for (u_int i = 0; i < output_names_.size(); i++) {
+    torch::Tensor output_tensor = outputs[i].toTensor();
+    std::vector<int64_t> output_size_ = output_tensor.sizes().vec();
+    std::vector<int> output_size(begin(output_size_), end(output_size_));
+    blobs_[output_names_[i]]->Reshape(output_size);
+    blobs_[output_names_[i]]->set_gpu_data(output_tensor.data_ptr<float>());
+  }
+  c10::cuda::CUDACachingAllocator::emptyCache();
 }
 
 }  // namespace inference
