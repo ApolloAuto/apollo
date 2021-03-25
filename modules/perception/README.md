@@ -1,7 +1,8 @@
 # Perception
 
-The Perception module is now capable of detecting and classifying obstacles within only one
-component named Detection component.
+The Perception module has added new models for obstacle detection. 
+Now Camera and Lidar submodules both have two alternatives of obstacle detection model.
+Besides, sensor fusion is also available now.
 
 ## Introduction
 Apollo 6.0 Perception has following new features:
@@ -9,16 +10,15 @@ Apollo 6.0 Perception has following new features:
  * **PointPillars Obstacle Detection**
  * **Online PointPillars Model Training Service**
 
-The perception module incorporates the capability of using multiple cameras, radars (front and rear) and LiDARs to recognize obstacles and fuse their individual tracks to obtain a final track list.
+The perception module incorporates the capability of using multiple cameras, 
+radars (front and rear) and LiDARs to recognize obstacles and fuse their 
+individual tracks to obtain a final track list.
 The obstacle sub-module detects, classifies and tracks obstacles.
 This sub-module also predicts obstacle motion and position information (e.g., heading and velocity).
 Besides, we provide an online service for training PointPillars models using your own data
 (https://github.com/ApolloAuto/apollo/blob/master/docs/Apollo_Fuel/Perception_Lidar_Model_Training/README.md).
-For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
-
-***\**Note: Camera obstacle detection is not available so far due to the in-process model upgrading.
-We are still working on refactoring the camera detection module. However, camera traffic light detection
-still works.***
+For lane line, we construct lane instances by postprocessing lane parsing pixels
+and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
 
 ## Architecture
 
@@ -27,6 +27,11 @@ The general architecture of the perception module is shown:
 
 The detailed perception modules are displayed below.
 ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo6.0_perception_detail.png)
+
+### Submodules
+Perception module has renamed components to "submodule", after refactoring to Lego architecture.
+Definition of submodules are explained in
+[Perception Submodules](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/submodules/README.md)
 
 ## Input
 
