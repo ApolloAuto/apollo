@@ -431,6 +431,17 @@ DEFINE_double(default_city_road_speed_limit, 15.67,
 DEFINE_double(default_highway_speed_limit, 29.06,
               "default speed limit (m/s) for highway. 65 mph.");
 
+// pnc map
+DEFINE_double(look_backward_distance, 50,
+              "look backward this distance when creating reference line "
+              "from routing");
+DEFINE_double(look_forward_short_distance, 180,
+              "short look forward this distance when creating reference line "
+              "from routing when ADC is slow");
+DEFINE_double(look_forward_long_distance, 250,
+              "look forward this distance when creating reference line "
+              "from routing");
+
 // navigation mode
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");

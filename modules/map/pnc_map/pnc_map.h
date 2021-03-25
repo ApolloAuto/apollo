@@ -35,10 +35,6 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/route_segments.h"
 
-DECLARE_double(look_backward_distance);
-DECLARE_double(look_forward_short_distance);
-DECLARE_double(look_forward_long_distance);
-
 namespace apollo {
 namespace hdmap {
 

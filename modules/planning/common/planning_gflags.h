@@ -286,3 +286,8 @@ DECLARE_int32(min_past_history_points_len);
 // hybrid model
 DECLARE_bool(skip_path_reference_in_side_pass);
 DECLARE_bool(skip_path_reference_in_change_lane);
+
+// pnc map
+DECLARE_double(look_backward_distance);
+DECLARE_double(look_forward_short_distance);
+DECLARE_double(look_forward_long_distance);
