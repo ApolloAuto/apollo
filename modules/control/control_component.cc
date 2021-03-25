@@ -412,7 +412,16 @@ bool ControlComponent::Proc() {
         local_view_.trajectory().header().lidar_timestamp(), start_time,
         end_time);
   }
-
+  // Wheel alignment
+  AERROR << "the cp is: " << latest_trajectory_.complete_parking();
+  AERROR << "the complete_parking is: " << local_view_.trajectory().complete_parking();
+  if (local_view_.trajectory().complete_parking()) {
+    control_command.set_brake(0.0);
+    control_command.set_throttle(0.0);
+    control_command.set_steering_target(0.0);
+    control_command.set_steering_rate(0.0);
+  }
+  
   control_cmd_writer_->Write(control_command);
   return true;
 }
