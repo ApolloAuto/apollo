@@ -34,16 +34,11 @@
 |3|/apollo/sensor/gnss/ins_stat|
 |4|/apollo/sensor/lidar16/compensator/PointCloud2|
 
-- 为获取上述`channel`，需要启动`GPS`、`Localization`、`Velodyne`三个模块，`GPS`、`Localization`模块的启动请参考定位模块配置文档，`Velodyne`模块的启动请参考感知传感器集成文档。由于GNSS设备的限制，`/apollo/sensor/gnss/odometry`、`/apollo/sensor/gnss/ins_stat`这两个`channel`不能由GNSS设备直接给出，需要借助`/apollo/modules/tools/sensor_calibration/`下的两个脚本工具。在`localization`模块正常启动且输出`/apollo/localization/pose`数据时，另外开启两个不同终端进入docker后在/apollo根目录下分别执行
-```bash
-  bazel build modules/tools/sensor_calibration:ins_stat_publisher
-  bazel run modules/tools/sensor_calibration:ins_stat_publisher
-```
-```bash
-  bazel build modules/tools/sensor_calibration:odom_publisher
-  bazel run modules/tools/sensor_calibration:odom_publisher
-```  
-便可以分别产生`/apollo/sensor/gnss/ins_stat`、`/apollo/sensor/gnss/odometry`这两个`channel`。
+- 为获取上述`channel`，需要启动`GPS`、`Localization`、`Lidar`三个模块，`GPS`、`Localization`模块的启动请参考定位模块配置文档，`Lidar`模块的启动请参考感知传感器集成文档。由于GNSS设备的限制，`/apollo/sensor/gnss/odometry`、`/apollo/sensor/gnss/ins_stat`这两个`channel`不能由GNSS设备直接给出，需要借助`/apollo/modules/tools/sensor_calibration/`下的两个脚本工具。在`localization`模块正常启动且输出`/apollo/localization/pose`数据时，另外开启两个不同终端进入docker后在/apollo根目录下分别执行
+`./bazel-bin/module/tools/sensor_calibration/ins_stat_publisher`、
+`./bazel-bin/module/tools/sensor_calibration/odom_publisher`两个脚本便可以产生`/apollo/sensor/gnss/ins_stat`、`/apollo/sensor/gnss/odometry`这两个`channel`。
+
+  **注**： 如果上述任一脚本找不到，请执行`./apollo.sh build tools`来生成它们。
 
 - 为了节省数据空间，这里建议用户在docker环境使用命令行录制数据包，不要使用Recorder模块录制，录制命令如下
 ‘‘‘
