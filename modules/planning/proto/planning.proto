@@ -119,4 +119,6 @@ message ADCTrajectory {
 
   // output related to RSS
   optional RSSInfo rss_info = 100;
+  // set the steering, throttle, brake zero when complete the parking
+  optional bool complete_parking = 25;
 }
