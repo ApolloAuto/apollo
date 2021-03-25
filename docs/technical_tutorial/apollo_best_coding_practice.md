@@ -14,7 +14,7 @@
    foobar_test.cc
    ```
 
-1. A bazel target should contain at most one header and one source file.
+1. A Bazel target should contain at most one header and one source file.
 
    ```python
    cc_library(
@@ -36,13 +36,13 @@
    )
    ```
 
-   You can use `scripts/buildifier.sh <path/to/BUILD>` to fix BUILD file style
+   You can use `./apollo.sh format <path/to/BUILD>` to fix BUILD file style
    issues.
 
 1. In general, Apollo follows
    [Google C++ coding style](https://google.github.io/styleguide/cppguide.html).
-   You should run `scripts/clang_format.sh <path/to/cpp/dirs/or/files>` to fix
-   C++ style issues.
+   You should run `scripts/clang_format.sh <path/to/cpp/dirs/or/files>` or
+   `./apollo.sh format -c <path/to/cpp/dirs/or/files>` to fix C++ style issues.
 
 1. Simple and unified function signature.
 
@@ -50,11 +50,11 @@
    // 1. For input objects, const reference guarantes that it is valid, while
    //    pointers might be NULL or wild. Don't give others the chance to break
    //    you.
-   // 2. For input scalas, just pass by value, which gives better locality and
+   // 2. For input scalars, just pass by value, which gives better locality and
    //    thus performance.
-   // 3. For output, it's callers' responsibility to make sure the pointers are
-   //    valid. No need to do sanity check, and also no need to mark as
-   //    "OutputType* const", because pointer redirection is never allowed.
+   // 3. For output, it's the caller's responsibility to make sure the pointer
+   //    is valid. No need to do sanity check or mark it as "OutputType* const",
+   //    as pointer redirection is never allowed.
    void FooBar(const InputObjectType& input1, const InputScalaType input2, ...,
                OutputType* output1, ...);
 
@@ -67,7 +67,7 @@
 
    ```C++
    // Variables that don't change.
-   const int current_size = vec.size();
+   const size_t current_size = vec.size();
    // Functions that have no side effect.
    const std::string& name() const;
    ```
@@ -80,7 +80,8 @@
 1. Include necessary headers **only**. No more, no less.
 
    Please also pay attention to header orders. Again, you can use
-   `scripts/clang_format.sh` to fix header order issues.
+   `apollo.sh format -c` or `scripts/clang_format.sh` to fix header order
+   issues.
 
 1. List only direct dependencies in `deps` section of a Bazel target.
 
