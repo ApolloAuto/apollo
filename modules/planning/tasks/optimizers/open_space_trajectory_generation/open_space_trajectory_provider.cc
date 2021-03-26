@@ -138,7 +138,6 @@ Status OpenSpaceTrajectoryProvider::Process() {
   }
   // Get open_space_info from current frame
   const auto& open_space_info = frame_->open_space_info();
-  AERROR << "the FLAGS_enable_open_space_planner_thread is: " << FLAGS_enable_open_space_planner_thread;
   ADCTrajectory &temp_trajectory =
     const_cast<ADCTrajectory&> (frame_->current_frame_planned_trajectory());
   if (FLAGS_enable_open_space_planner_thread) {
@@ -171,8 +170,6 @@ Status OpenSpaceTrajectoryProvider::Process() {
       GenerateStopTrajectory(trajectory_data);
       is_generation_thread_stop_.store(true);
       temp_trajectory.set_complete_parking(true);
-      AERROR << "the complete parking is: " << frame_->current_frame_planned_trajectory().complete_parking();
-      AERROR << "Vehicle is near to destination1";
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
@@ -236,7 +233,6 @@ Status OpenSpaceTrajectoryProvider::Process() {
     // Check vehicle state
     if (IsVehicleNearDestination(vehicle_state, end_pose, rotate_angle,
                                  translate_origin)) {
-      AERROR << "Vehicle is near to destination２";
       GenerateStopTrajectory(trajectory_data);
       temp_trajectory.set_complete_parking(true);
       return Status(ErrorCode::OK, "Vehicle is near to destination");
