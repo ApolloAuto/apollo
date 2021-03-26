@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -20,23 +20,27 @@
 This module creates a node and fake perception data based
 on json configurations
 """
-
 import argparse
 import math
 import time
-
+import scipy.interpolate
+from scipy.interpolate import interp1d
+import numpy as np
 import simplejson
-
-from cyber.python.cyber_py3 import cyber
-from cyber.python.cyber_py3 import cyber_time
-from modules.common.proto.geometry_pb2 import Point3D
+from cyber_py import cyber
+from cyber_py import cyber_time
+from shapely.geometry import LineString, Point
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-
+from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
+from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle
+import modules.common.proto.pnc_point_pb2 as pnc_point
+from modules.common.proto.geometry_pb2 import Point3D
 
 _s_seq_num = 0
 _s_delta_t = 0.1
 _s_epsilon = 1e-8
+is_static = False
 
 
 def get_seq_num():
@@ -86,6 +90,37 @@ def generate_polygon(point, heading, length, width):
     return points
 
 
+def generate_fix_step_pathpoint(x0, y0):
+    points = []
+    for i in range(0, len(x0)):
+        points.append((x0[i], y0[i]))
+    path = LineString(points)
+    length = path.length
+    x0 = []
+    y0 = []
+    for i in np.arange(0, length, 0.5):
+        p = path.interpolate(i)
+        x0.append(p.x)
+        y0.append(p.y)
+    return x0, y0
+
+
+def expand(trace):
+    x0 = [tra[0] for tra in trace]
+    y0 = [tra[1] for tra in trace]
+    xx = np.array(x0)
+    yy = np.array(y0)
+    res = np.arange(xx.min(), xx.max(), 0.01)
+    f = interp1d(xx, yy, kind='cubic')
+    x0 = res
+    y0 = f(x0)
+    x0, y0 = generate_fix_step_pathpoint(x0, y0)
+    trace = []
+    for i in range(0, len(x0)):
+        trace.append([x0[i], y0[i]])
+    return trace
+
+
 def load_descrptions(files):
     """
     Load description files
@@ -100,16 +135,20 @@ def load_descrptions(files):
                     trace = obstacle.get('trace', [])
                     for i in range(1, len(trace)):
                         if same_point(trace[i], trace[i - 1]):
-                            print('same trace point found in obstacle: %s' % obstacle["id"])
+                            print('same trace point found in obstacle: %s' %
+                                  obstacle["id"])
                             return None
+                    obstacle['trace'] = expand(trace)
                     objects.append(obstacle)
             else:  # Default case. handles only one obstacle
                 obstacle = obstacles
                 trace = obstacle.get('trace', [])
                 for i in range(1, len(trace)):
                     if same_point(trace[i], trace[i - 1]):
-                        print('same trace point found in obstacle: %s' % obstacle["id"])
+                        print('same trace point found in obstacle: %s' %
+                              obstacle["id"])
                         return None
+                obstacle['trace'] = expand(trace)
                 objects.append(obstacle)
 
     return objects
@@ -122,7 +161,7 @@ def get_point(a, b, ratio):
     p = Point3D()
     p.x = a[0] + ratio * (b[0] - a[0])
     p.y = a[1] + ratio * (b[1] - a[1])
-    p.z = a[2] + ratio * (b[2] - a[2])
+    p.z = 0
     return p
 
 
@@ -132,12 +171,16 @@ def init_perception(description):
     """
     perception = PerceptionObstacle()
     perception.id = description["id"]
-    perception.position.x = description["position"][0]
-    perception.position.y = description["position"][1]
-    perception.position.z = description["position"][2]
-    perception.theta = description["theta"]
+    tmp = description["trace"]
+    perception.position.x = tmp[0][0]
+    perception.position.y = tmp[0][1]
+    perception.position.z = 0
+    perception.theta = math.atan2(tmp[1][1]-tmp[0][1], tmp[1][0]-tmp[0][0])
+   # print("id ",perception.id, "theta ",perception.theta,tmp[1][1]-tmp[0][1],tmp[1][0]-tmp[0][0])
+   # print(tmp)
+    # perception.theta = description["theta"]
     perception.velocity.CopyFrom(get_velocity(
-        description["theta"], description["speed"]))
+        perception.theta, description["speed"]))
     perception.length = description["length"]
     perception.width = description["width"]
     perception.height = description["height"]
@@ -164,7 +207,7 @@ def inner_product(a, b):
     """
     Get the a, b inner product
     """
-    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+    return a[0] * b[0] + a[1] * b[1]
 
 
 def cross_product(a, b):
@@ -178,7 +221,7 @@ def distance(a, b):
     """
     Return distance between a and b
     """
-    return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2 + (b[2] - a[2])**2)
+    return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
 
 
 def is_within(a, b, c):
@@ -194,12 +237,39 @@ def on_segment(a, b, c):
     """
     Test if c is in line segment a-b
     """
-    ab = (b[0] - a[0], b[1] - a[1], b[2] - a[2])
-    ac = (c[0] - a[0], c[1] - a[1], c[2] - a[2])
+    ab = (b[0] - a[0], b[1] - a[1])
+    ac = (c[0] - a[0], c[1] - a[1])
     if math.fabs(cross_product(ac, ab)) > _s_epsilon:
         return False
-    return is_within(a[0], b[0], c[0]) and is_within(a[1], b[1], c[1]) \
-        and is_within(a[2], b[2], c[2])
+    return is_within(a[0], b[0], c[0]) and is_within(a[1], b[1], c[1])
+
+
+def generate_prediction_traj(perception, trace, start):
+    prediction = PredictionObstacle()
+    prediction.timestamp = cyber_time.Time.now().to_sec()
+
+    prediction.is_static = 0
+    traj = prediction.trajectory.add()
+    traj.probability = 1
+    traj_points = traj.trajectory_point
+    dist = 0
+    end_time = 0
+    for t in range(start, len(trace)-1):
+        pt = traj_points.add()
+        pt.path_point.x = trace[t][0]
+        pt.path_point.y = trace[t][1]
+        dist = dist+distance(trace[t-1], trace[t])
+        pt.path_point.z = 0
+        pt.path_point.theta = math.atan2(trace[t+1][1] - trace[t][1],
+                                         trace[t+1][0] - trace[t][0])
+        pt.v = (perception.velocity.x**2 +
+                perception.velocity.x**2)**0.5
+        pt.a = 0
+        pt.relative_time = dist/pt.v
+        end_time = pt.relative_time
+    prediction.predicted_period = end_time
+    prediction.perception_obstacle.CopyFrom(perception)
+    return prediction
 
 
 def linear_project_perception(description, prev_perception):
@@ -212,9 +282,16 @@ def linear_project_perception(description, prev_perception):
     if "trace" not in description:
         return perception
     trace = description["trace"]
+    prediction = PredictionObstacle()
+    prediction.timestamp = cyber_time.Time.now().to_sec()
+    prediction = generate_prediction_traj(perception, trace, 1)
     prev_point = (prev_perception.position.x, prev_perception.position.y,
                   prev_perception.position.z)
-    delta_s = description["speed"] * _s_delta_t
+    global is_static
+    if is_static:
+        delta_s = description["speed"] * 0
+    else:
+        delta_s = description["speed"] / 3.6 * _s_delta_t
     for i in range(1, len(trace)):
         if on_segment(trace[i - 1], trace[i], prev_point):
             dist = distance(trace[i - 1], trace[i])
@@ -225,19 +302,25 @@ def linear_project_perception(description, prev_perception):
                 if i < len(trace):
                     dist = distance(trace[i - 1], trace[i])
                 else:
-                    return init_perception(description)
+                    perception = init_perception(description)
+                    prediction = generate_prediction_traj(perception, trace, 1)
+                    return perception, prediction
             ratio = delta_s / dist
             perception.position.CopyFrom(
                 get_point(trace[i - 1], trace[i], ratio))
             perception.theta = math.atan2(trace[i][1] - trace[i - 1][1],
                                           trace[i][0] - trace[i - 1][0])
-
+            perception.velocity.x = description["speed"] * \
+                math.cos(perception.theta)
+            perception.velocity.y = description["speed"] * \
+                math.sin(perception.theta)
             perception.ClearField("polygon_point")
             perception.polygon_point.extend(generate_polygon(perception.position, perception.theta,
                                                              perception.length, perception.width))
-            return perception
+            prediction = generate_prediction_traj(perception, trace, i)
+            return perception, prediction
 
-    return perception
+    return perception.prediciton
 
 
 def generate_perception(perception_description, prev_perception):
@@ -248,20 +331,28 @@ def generate_perception(perception_description, prev_perception):
     perceptions.header.sequence_num = get_seq_num()
     perceptions.header.module_name = "perception"
     perceptions.header.timestamp_sec = cyber_time.Time.now().to_sec()
+    predicitons = PredictionObstacles()
+    predicitons.header.sequence_num = perceptions.header.sequence_num
+    predicitons.header.module_name = "prediction"
+    predicitons.header.timestamp_sec = cyber_time.Time.now().to_sec()
+    predicitons.header.lidar_timestamp = cyber_time.Time.now().to_nsec()
+    predicitons.perception_error_code = 0
     if not perception_description:
-        return perceptions
+        return perceptions, predicitons
     if prev_perception is None:
         for description in perception_description:
             p = perceptions.perception_obstacle.add()
             p.CopyFrom(init_perception(description))
-        return perceptions
+        return perceptions, predicitons
     # Linear projection
     description_dict = {desc["id"]: desc for desc in perception_description}
     for obstacle in prev_perception.perception_obstacle:
         description = description_dict[obstacle.id]
-        next_obstacle = linear_project_perception(description, obstacle)
+        next_obstacle, next_prediction = linear_project_perception(
+            description, obstacle)
         perceptions.perception_obstacle.add().CopyFrom(next_obstacle)
-    return perceptions
+        predicitons.prediction_obstacle.add().CopyFrom(next_prediction)
+    return perceptions, predicitons
 
 
 def perception_publisher(perception_channel, files, period):
@@ -270,16 +361,24 @@ def perception_publisher(perception_channel, files, period):
     """
     cyber.init()
     node = cyber.Node("perception")
-    writer = node.create_writer(perception_channel, PerceptionObstacles)
+    writer_prediction = node.create_writer(
+        "/apollo/prediction", PredictionObstacles)
+    writer_perception = node.create_writer(
+        perception_channel, PerceptionObstacles)
     perception_description = load_descrptions(files)
-    sleep_time = int(1.0 / period)  # 10Hz
-    global _s_delta_t
+    sleep_time = float(period)  # 10Hz
+    global _s_delta_t, is_static, pub_prediction
     _s_delta_t = period
     perception = None
+    prediction = None
     while not cyber.is_shutdown():
-        perception = generate_perception(perception_description, perception)
+        perception, prediction = generate_perception(
+            perception_description, perception)
         print(str(perception))
-        writer.write(perception)
+        writer_perception.write(perception)
+        print(str(prediction))
+        if pub_prediction:
+            writer_prediction.write(prediction)
         time.sleep(sleep_time)
 
 
@@ -293,6 +392,12 @@ if __name__ == '__main__':
                         help="set the perception channel")
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
                         help="set the perception channel publish time duration")
+    parser.add_argument("-s", "--static", action="store_true",  default=False,
+                        help="set static obstacles")
+    parser.add_argument("--prediction", action="store_true",  default=False,
+                        help="publish prediction")
     args = parser.parse_args()
-
+    global is_static, pub_prediction
+    is_static = args.static
+    pub_prediction = args.prediction
     perception_publisher(args.channel, args.files, args.period)
