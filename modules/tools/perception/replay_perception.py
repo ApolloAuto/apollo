@@ -27,8 +27,8 @@ import scipy.interpolate
 from scipy.interpolate import interp1d
 import numpy as np
 import simplejson
-from cyber_py import cyber
-from cyber_py import cyber_time
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber_time
 from shapely.geometry import LineString, Point
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
@@ -41,6 +41,7 @@ _s_seq_num = 0
 _s_delta_t = 0.1
 _s_epsilon = 1e-8
 is_static = False
+pub_prediction = False
 
 
 def get_seq_num():
@@ -274,7 +275,7 @@ def generate_prediction_traj(perception, trace, start):
 
 def linear_project_perception(description, prev_perception):
     """
-    Get perception from linear projection of description
+    Get perception and prediction from linear projection of description
     """
     perception = PerceptionObstacle()
     perception = prev_perception
@@ -287,7 +288,6 @@ def linear_project_perception(description, prev_perception):
     prediction = generate_prediction_traj(perception, trace, 1)
     prev_point = (prev_perception.position.x, prev_perception.position.y,
                   prev_perception.position.z)
-    global is_static
     if is_static:
         delta_s = description["speed"] * 0
     else:
@@ -325,25 +325,25 @@ def linear_project_perception(description, prev_perception):
 
 def generate_perception(perception_description, prev_perception):
     """
-    Generate perception data
+    Generate perception and prediction data
     """
     perceptions = PerceptionObstacles()
     perceptions.header.sequence_num = get_seq_num()
     perceptions.header.module_name = "perception"
     perceptions.header.timestamp_sec = cyber_time.Time.now().to_sec()
-    predicitons = PredictionObstacles()
-    predicitons.header.sequence_num = perceptions.header.sequence_num
-    predicitons.header.module_name = "prediction"
-    predicitons.header.timestamp_sec = cyber_time.Time.now().to_sec()
-    predicitons.header.lidar_timestamp = cyber_time.Time.now().to_nsec()
-    predicitons.perception_error_code = 0
+    predictions = PredictionObstacles()
+    predictions.header.sequence_num = perceptions.header.sequence_num
+    predictions.header.module_name = "prediction"
+    predictions.header.timestamp_sec = cyber_time.Time.now().to_sec()
+    predictions.header.lidar_timestamp = cyber_time.Time.now().to_nsec()
+    predictions.perception_error_code = 0
     if not perception_description:
-        return perceptions, predicitons
+        return perceptions, predictions
     if prev_perception is None:
         for description in perception_description:
             p = perceptions.perception_obstacle.add()
             p.CopyFrom(init_perception(description))
-        return perceptions, predicitons
+        return perceptions, predictions
     # Linear projection
     description_dict = {desc["id"]: desc for desc in perception_description}
     for obstacle in prev_perception.perception_obstacle:
@@ -351,8 +351,8 @@ def generate_perception(perception_description, prev_perception):
         next_obstacle, next_prediction = linear_project_perception(
             description, obstacle)
         perceptions.perception_obstacle.add().CopyFrom(next_obstacle)
-        predicitons.prediction_obstacle.add().CopyFrom(next_prediction)
-    return perceptions, predicitons
+        predictions.prediction_obstacle.add().CopyFrom(next_prediction)
+    return perceptions, predictions
 
 
 def perception_publisher(perception_channel, files, period):
@@ -383,7 +383,7 @@ def perception_publisher(perception_channel, files, period):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="create fake perception obstacles",
+    parser = argparse.ArgumentParser(description="create fake perception(prediction ) obstacles",
                                      prog="replay_perception.py")
     parser.add_argument("files", action="store", type=str, nargs="*",
                         help="obstacle description files")
@@ -393,11 +393,11 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
                         help="set the perception channel publish time duration")
     parser.add_argument("-s", "--static", action="store_true",  default=False,
-                        help="set static obstacles")
+                        help="obstacles will not move if set true")
     parser.add_argument("--prediction", action="store_true",  default=False,
-                        help="publish prediction")
+                        help="publish prediction at the same time if set true")
     args = parser.parse_args()
-    global is_static, pub_prediction
+    is_static, pub_prediction
     is_static = args.static
     pub_prediction = args.prediction
     perception_publisher(args.channel, args.files, args.period)
