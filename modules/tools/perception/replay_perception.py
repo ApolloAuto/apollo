@@ -176,7 +176,7 @@ def init_perception(description):
     perception.position.x = tmp[0][0]
     perception.position.y = tmp[0][1]
     perception.position.z = 0
-    perception.theta = math.atan2(tmp[1][1]-tmp[0][1], tmp[1][0]-tmp[0][0])
+    perception.theta = math.atan2(tmp[1][1] - tmp[0][1], tmp[1][0] - tmp[0][0])
    # print("id ",perception.id, "theta ",perception.theta,tmp[1][1]-tmp[0][1],tmp[1][0]-tmp[0][0])
    # print(tmp)
     # perception.theta = description["theta"]
@@ -255,18 +255,18 @@ def generate_prediction_traj(perception, trace, start):
     traj_points = traj.trajectory_point
     dist = 0
     end_time = 0
-    for t in range(start, len(trace)-1):
+    for t in range(start, len(trace) - 1):
         pt = traj_points.add()
         pt.path_point.x = trace[t][0]
         pt.path_point.y = trace[t][1]
-        dist = dist+distance(trace[t-1], trace[t])
+        dist = dist + distance(trace[t - 1], trace[t])
         pt.path_point.z = 0
-        pt.path_point.theta = math.atan2(trace[t+1][1] - trace[t][1],
-                                         trace[t+1][0] - trace[t][0])
-        pt.v = (perception.velocity.x**2 +
-                perception.velocity.x**2)**0.5
+        pt.path_point.theta = math.atan2(trace[t + 1][1] - trace[t][1],
+                                         trace[t + 1][0] - trace[t][0])
+        pt.v = (perception.velocity.x**2
+                + perception.velocity.x**2)**0.5
         pt.a = 0
-        pt.relative_time = dist/pt.v
+        pt.relative_time = dist / pt.v
         end_time = pt.relative_time
     prediction.predicted_period = end_time
     prediction.perception_obstacle.CopyFrom(perception)
@@ -392,9 +392,9 @@ if __name__ == '__main__':
                         help="set the perception channel")
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
                         help="set the perception channel publish time duration")
-    parser.add_argument("-s", "--static", action="store_true",  default=False,
+    parser.add_argument("-s", "--static", action="store_true", default=False,
                         help="obstacles will not move if set true")
-    parser.add_argument("--prediction", action="store_true",  default=False,
+    parser.add_argument("--prediction", action="store_true", default=False,
                         help="publish prediction at the same time if set true")
     args = parser.parse_args()
     is_static, pub_prediction
