@@ -5,6 +5,7 @@ from numpy import genfromtxt
 obstacles_data = genfromtxt('/apollo/auto-test/data/obstacles.csv', delimiter=',')
 collision_data = genfromtxt('/apollo/auto-test/data/collision.csv', delimiter=',')
 
+print(obstacles_data.shape)
 # remove duplicated data in collision_data
 collision_data = np.unique(collision_data)
 collision_size = collision_data.size
@@ -27,5 +28,7 @@ print("General Collision Rate (#collision / #scenerio): %.4f%%" % (general_rate 
 
 collision_analysis = np.array([[obstacles_data.size, scenario_number, collision_size, general_rate]])
 with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
-    np.savetxt(csv, collision_analysis, fmt='%.4f', delimiter=',')
+    np.savetxt(csv, collision_analysis, 
+               fmt=['%d','%d'.'%d','%.6f'], 
+               delimiter=',')
 

@@ -80,7 +80,7 @@ def talker():
 			# add new obstacle data into the csv file
             with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
                 np.savetxt(csv, obstacle_data, 
-						   fmt='%d, %d, %.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %d', 
+						   fmt= ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], 
 						   delimiter=',')
 
             # define the velocity of the obstacle
