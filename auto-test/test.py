@@ -1,6 +1,8 @@
 import numpy as np
 
-obstacle_data = [[123,1,2,4,56,7,8,8,9,9,9,6,5,5]]
+array = np.array([(1,0,0,0),
+                  (1,2,3,4),
+                  (1,1,1,1),
+                  (0,1,2,3)])
 
-with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
-    np.savetxt(csv, obstacle_data, fmt='%.4f', delimiter=',')
+print(array[array[:,1] == 1])
