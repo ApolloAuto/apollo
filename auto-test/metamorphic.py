@@ -14,5 +14,18 @@ for c in range(collision_size):
     obstacle_info = obstacles_data[obstacles_data[:,0] == collision_data[c]]
     collision_obstacle_data[c] = obstacle_info[0]
 
-print collision_data
-print collision_obstacle_data
+
+
+# print collision rate
+# get the number of scenarios generated
+scenario_number = obstacles_data[-1][1]
+general_rate = float(collision_size) / float(scenario_number)
+print("Total Obstacle Generated: %d" % obstacles_data.size)
+print("Total Round of Scenario: %d" % scenario_number)
+print("Number of Collision Detected: %d" % collision_size)
+print("General Collision Rate (#collision / #scenerio): %.4f%%" % (general_rate * 100))
+
+collision_analysis = np.array([[obstacles_data.size, scenario_number, collision_size, general_rate]])
+with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
+    np.savetxt(csv, collision_analysis, fmt='%.4f', delimiter=',')
+

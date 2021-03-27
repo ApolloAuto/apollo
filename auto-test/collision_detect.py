@@ -27,7 +27,7 @@ def monitorCallback(monitorMessage):
 
         # add new obstacle data into the csv file
         with open('/apollo/auto-test/data/collision.csv', 'a') as csv:
-            np.savetxt(csv, obstacle, fmt='%.4f', delimiter=',')
+            np.savetxt(csv, obstacle, fmt='%d', delimiter=',')
        
         # need to remove redundant ids 
         # non-trivial in this script, temporarily implement id remove
