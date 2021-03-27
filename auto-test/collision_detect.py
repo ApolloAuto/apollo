@@ -34,7 +34,6 @@ def monitorCallback(monitorMessage):
         # in metamorphic.py and can be optimised later 
 
 def listener():
-    previous_id = 
     rospy.init_node('collision_detect', anonymous=True)
     rospy.Subscriber('/apollo/monitor', MonitorMessage, monitorCallback)
     rospy.spin()
