@@ -13,11 +13,13 @@ def transform(x, y, angle, x_center, y_center):
 	
 	# compress the width of the region
 	x = 0.3 * x
+	y = 1.0 * y
 
-	# rotation
+	# apply rotation
 	x = x * cos(angle) - y * sin(angle)
 	y = x * sin(angle) + y * cos(angle)
 
+	# translate back to the previous position
 	x_transform = x + x_center
 	y_transform = y + y_center
 
@@ -57,9 +59,22 @@ def talker():
     center_y = 0.5 * (start_y + end_y)
 
     # get the angle of the road according to the horizontal line
-    tan_value = float(end_y-start_y) / float(end_x-start_x)
-    angle = -arctan(1/tan_value)
+    tan_value = abs(float(end_y-start_y) / float(end_x-start_x))
+    
+    # determine whether the region is general horizontal or vertical
+    if abs(start_x-end_x) > abs(start_y-end_y):
+    	angle = arctan(tan_value)
+		# negate the angle if counter-clockwise
+		if (start_x-end_x)*(start_y-end_y) > 0:
+			angle = -angle;
+    else:
+		angle = arctan(1/tan_value)
+		# negate the angle if counter-clockwise
+		if (start_x-end_x)*(start_y-end_y) < 0:
+			angle = -angle;
 
+    # determine whether the 	
+	
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
     # define the obstacle density (0 - 1)
@@ -84,6 +99,7 @@ def talker():
             x = random.uniform(bound_left, bound_right)
             y = random.uniform(bound_down, bound_up)
 
+	    # apply transformation to fit the region to the routing
             x_, y_ = transform(x, y, angle, center_x, center_y)
 	   
             msg.position.x = x_
@@ -106,18 +122,18 @@ def talker():
             # id, scenario_id, position_x, position_y, position_z, direction, length, width, height, type
             obstacle_data = np.array([[msg.id, scenario_id, msg.position.x, msg.position.y,
                              msg.position.z, msg.theta, msg.length, msg.width, msg.height, msg.type]])
-			# the reason why obstacle_data is a 2D array is that using a 1D array will insert a column of data 
-			# to the file rather than a row. Thus, this is a hack to fix the bug.
+	    # the reason why obstacle_data is a 2D array is that using a 1D array will insert a column of data 
+	    # to the file rather than a row. Thus, this is a hack to fix the bug.
             
-			# add new obstacle data into the csv file
-            with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
-                np.savetxt(csv, obstacle_data, 
-						   fmt= ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], 
-						   delimiter=',')
+	    # add new obstacle data into the csv file
+        with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
+        	np.savetxt(csv, obstacle_data, 
+				fmt = ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], 
+			   	delimiter=',')
 
-            # define the velocity of the obstacle
-            # msg.velocity.x = 5
-            # msg.velocity.y = 5
+		# define the velocity of the obstacle
+		# msg.velocity.x = 5
+		# msg.velocity.y = 5
 
         # increment the scenario counter
         scenario_id = scenario_id + 1
