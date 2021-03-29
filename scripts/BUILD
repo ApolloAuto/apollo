@@ -18,6 +18,7 @@ filegroup(
     name = "bootstrap",
     srcs = [
         "bootstrap.sh",
+        "bootstrap_lgsvl.sh",
         "dreamview.sh",
         "monitor.sh",
     ],
