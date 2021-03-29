@@ -1,8 +1,25 @@
 import random
 import numpy as np
+from numpy import arctan, cos, sin
 import rospy
 from pb_msgs.msg import PerceptionObstacles
 
+# calculate the tansformed coordinates of x and y
+# according to the angle and distance between center to origin
+def transform(x, y, angle, x_center, y_center):
+	x = x - x_center
+	y = y - y_center
+	
+	y = 0.3 * y
+
+	x = x * cos(angle) - y * sin(angle)
+	y = x * sin(angle) + y * cos(angle)
+
+	x_transform = x + x_center
+	y_transform = y + y_center
+
+	return x_transform, y_transform
+	
 
 def talker():
     pub = rospy.Publisher('/apollo/perception/obstacles',
@@ -13,7 +30,7 @@ def talker():
     rate = rospy.Rate(0.2)
 
     # define the coordinates of the start and end points
-    # can be optimised to read from files
+    # can be optimised to be reading from files
     start_x = 587701
     start_y = 4141470
     end_x = 587065
@@ -26,10 +43,16 @@ def talker():
     bound_up = end_y
     bound_down = start_y
 
+    center_x = 0.5 * (start_x + end_x)
+    center_y = 0.5 * (start_y + end_y)
+
+	# get the angle of the road according to the horizontal line
+    angle = arctan(float(end_y-start_y) / float(end_x-start_x))
+
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
     # define the obstacle density (0 - 1)
-    obstacle_density = 0.005
+    obstacle_density = 0.002
 
     # define number of obstacles
     n_obstacles = int(obstacle_density * area_region)
@@ -49,13 +72,14 @@ def talker():
             # randomly assign x and y coordinates to the obstacle
             x = random.uniform(bound_left, bound_right)
             y = random.uniform(bound_down, bound_up)
-			
+
+            x_, y_ = transform(x, y, angle, center_x, center_y)
 			# current obstacle generation region is a rectangle 
 			# whose edges are parallel to the coordinate axis
             # does not fit a routing that is not parallel to axis
 			# can be optimised using transformation matrix to rotate the region
-            msg.position.x = x
-            msg.position.y = y
+            msg.position.x = x_
+            msg.position.y = y_
             msg.position.z = 0
 
             # assign random theta to the obstacle
