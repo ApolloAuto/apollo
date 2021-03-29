@@ -22,15 +22,14 @@ def monitorCallback(monitorMessage):
         # extract the obstacle id from the message
         obstacle_id = int(msg.replace(collisionMessage, ''))
         obstacle = [obstacle_id]
-        print(obstacle_id)
-
+        #print(obstacle_id)
 
         # add new obstacle data into the csv file
         with open('/apollo/auto-test/data/collision.csv', 'a') as csv:
             np.savetxt(csv, obstacle, fmt='%d', delimiter=',')
        
         # need to remove redundant ids 
-        # non-trivial in this script, temporarily implement id remove
+        # non-trivial in this script, temporarily implement id removal
         # in metamorphic.py and can be optimised later 
 
 def listener():
