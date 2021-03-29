@@ -32,13 +32,13 @@ def talker():
     # define the frequency of refresh (Hz)
     rate = rospy.Rate(0.2)
 
-	# read data from routings.csv
+    # read data from routings.csv
     routings = genfromtxt('/apollo/auto-test/data/routings.csv', dtype=int, delimiter=',')
-	# select the routing by id
+    # select the routing by id
     routing_id = 5 # 'Sv sunrise loop'
     # routing = routings[routings[:,0] == routing_id]
     routing = routings[routings[:,0] == routing_id][0]
-	# extract the start and end coordinates from the list
+    # extract the start and end coordinates from the list
     start_x = routing[1]
     start_y = routing[2]
     end_x = routing[3]
@@ -56,7 +56,7 @@ def talker():
     center_x = 0.5 * (start_x + end_x)
     center_y = 0.5 * (start_y + end_y)
 
-	# get the angle of the road according to the horizontal line
+    # get the angle of the road according to the horizontal line
     tan_value = float(end_y-start_y) / float(end_x-start_x)
     angle = -arctan(1/tan_value)
 
@@ -70,7 +70,7 @@ def talker():
 
     # set scenario id to 1
     scenario_id = 1
-	# add a large number to obstacle id to make them unique among all simulation scenarios
+    # add a large number to obstacle id to make them unique among all simulation scenarios
     id_prefix = 10000
 
     while not rospy.is_shutdown():
@@ -85,10 +85,7 @@ def talker():
             y = random.uniform(bound_down, bound_up)
 
             x_, y_ = transform(x, y, angle, center_x, center_y)
-			# current obstacle generation region is a rectangle 
-			# whose edges are parallel to the coordinate axis
-            # does not fit a routing that is not parallel to axis
-			# can be optimised using transformation matrix to rotate the region
+	   
             msg.position.x = x_
             msg.position.y = y_
             msg.position.z = 0
