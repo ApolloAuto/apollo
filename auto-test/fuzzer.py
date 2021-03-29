@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from numpy import arctan, cos, sin
+from numpy import arctan, cos, sin, genfromtxt
 import rospy
 from pb_msgs.msg import PerceptionObstacles
 
@@ -29,12 +29,19 @@ def talker():
     # define the frequency of refresh (Hz)
     rate = rospy.Rate(0.2)
 
-    # define the coordinates of the start and end points
-    # can be optimised to be reading from files
-    start_x = 587701
-    start_y = 4141470
-    end_x = 587065
-    end_y = 4141583
+	# read data from routings.csv
+    routings = genfromtxt('/apollo/auto-test/data/routings.csv', dtype=int, delimiter=',')
+    print(routings)
+	# select the routing by name
+    routing_id = 6 # 'Sv sunrise loop'
+    # routing = routings[routings[:,0] == routing_id]
+    print(routings[routings[:,0] == 6])
+	# extract the start and end coordinates from the list
+    start_x = routing[1]
+    start_y = routing[2]
+    end_x = routing[3]
+    end_y = routing[4]
+
 
     # define the boundary of region where obstacles are generated
     # using the start and end points in this case
