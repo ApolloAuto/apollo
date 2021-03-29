@@ -291,6 +291,7 @@ void PathLaneBorrowDecider::CheckLaneBorrow(
     if (*left_neighbor_lane_borrowable) {
       lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
       if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
+          lane_boundary_type == hdmap::LaneBoundaryType::DOUBLE_YELLOW ||
           lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
         *left_neighbor_lane_borrowable = false;
       }
