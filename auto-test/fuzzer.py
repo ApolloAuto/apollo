@@ -7,11 +7,14 @@ from pb_msgs.msg import PerceptionObstacles
 # calculate the tansformed coordinates of x and y
 # according to the angle and distance between center to origin
 def transform(x, y, angle, x_center, y_center):
+	# first translate to the origin
 	x = x - x_center
 	y = y - y_center
 	
-	y = 0.3 * y
+	# compress the width of the region
+	x = 0.3 * x
 
+	# rotation
 	x = x * cos(angle) - y * sin(angle)
 	y = x * sin(angle) + y * cos(angle)
 
@@ -31,30 +34,31 @@ def talker():
 
 	# read data from routings.csv
     routings = genfromtxt('/apollo/auto-test/data/routings.csv', dtype=int, delimiter=',')
-    print(routings)
-	# select the routing by name
-    routing_id = 6 # 'Sv sunrise loop'
+	# select the routing by id
+    routing_id = 5 # 'Sv sunrise loop'
     # routing = routings[routings[:,0] == routing_id]
-    print(routings[routings[:,0] == 6])
+    routing = routings[routings[:,0] == routing_id][0]
 	# extract the start and end coordinates from the list
     start_x = routing[1]
     start_y = routing[2]
     end_x = routing[3]
     end_y = routing[4]
+    print(start_x, start_y, end_x, end_y)
 
 
     # define the boundary of region where obstacles are generated
     # using the start and end points in this case
-    bound_left = end_x
-    bound_right = start_x
-    bound_up = end_y
-    bound_down = start_y
+    bound_left = min(end_x, start_x)
+    bound_right = max(end_x, start_x)
+    bound_up = max(end_y, start_y)
+    bound_down = min(end_y, start_y)
 
     center_x = 0.5 * (start_x + end_x)
     center_y = 0.5 * (start_y + end_y)
 
 	# get the angle of the road according to the horizontal line
-    angle = arctan(float(end_y-start_y) / float(end_x-start_x))
+    tan_value = float(end_y-start_y) / float(end_x-start_x)
+    angle = -arctan(1/tan_value)
 
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
