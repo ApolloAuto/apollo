@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import genfromtxt
+import os
 
 # load data from data/obstacles.csv and data/collision.csv
 obstacles_data = genfromtxt('/apollo/auto-test/data/obstacles.csv', delimiter=',')
@@ -32,3 +33,5 @@ with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
                fmt=['%d','%d','%d','%.6f'], 
                delimiter=',')
 
+os.remove('/apollo/auto-test/data/obstacles.csv')
+os.remove('/apollo/auto-test/data/collision.csv')
