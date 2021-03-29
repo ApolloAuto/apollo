@@ -25,6 +25,7 @@ install(
         "//modules/drivers/camera:install",
         "//modules/drivers/gnss:install",
         "//modules/drivers/microphone:install",
+        "//modules/drivers/tools/image_decompress:install",
         "//modules/guardian:install",
         "//modules/monitor:install",
         "//modules/perception:install",
