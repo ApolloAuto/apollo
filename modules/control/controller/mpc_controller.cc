@@ -515,7 +515,6 @@ Status MPCController::ComputeControlCommand(
 
   if (std::fabs(vehicle_state->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
-      chassis->gear_location() == planning_published_trajectory->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(planning_published_trajectory->gear());
   } else {
