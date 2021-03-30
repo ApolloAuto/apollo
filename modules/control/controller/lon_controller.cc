@@ -359,7 +359,6 @@ Status LonController::ComputeControlCommand(
 
   if (std::fabs(injector_->vehicle_state()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
-      chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
   } else {
