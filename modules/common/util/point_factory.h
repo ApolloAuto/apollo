@@ -71,6 +71,7 @@ class PointFactory {
                                       const double& kappa = 0,
                                       const double& dkappa = 0,
                                       const double& ddkappa = 0) {
+    
     PathPoint path_point;
     path_point.set_x(x);
     path_point.set_y(y);
