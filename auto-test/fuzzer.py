@@ -6,14 +6,16 @@ from pb_msgs.msg import PerceptionObstacles
 
 # calculate the tansformed coordinates of x and y
 # according to the angle and distance between center to origin
-def transform(x, y, angle, x_center, y_center):
+def transform(x, y, angle, x_center, y_center, compress_x_y):
 	# first translate to the origin
 	x = x - x_center
 	y = y - y_center
 	
 	# compress the width of the region
-	x = 0.3 * x
-	y = 1.0 * y
+	if (compress_x_y == 0):
+		x = 0.3 * x
+	if (compress_x_y == 1):
+		y = 0.3 * y
 
 	# apply rotation
 	x = x * cos(angle) - y * sin(angle)
@@ -45,7 +47,6 @@ def talker():
     start_y = routing[2]
     end_x = routing[3]
     end_y = routing[4]
-    print(start_x, start_y, end_x, end_y)
 
 
     # define the boundary of region where obstacles are generated
@@ -63,14 +64,16 @@ def talker():
     
     # determine whether the region is general horizontal or vertical
     if abs(start_x-end_x) > abs(start_y-end_y):
+    	compress = 1
     	angle = arctan(tan_value)
 		# negate the angle if counter-clockwise
-		if (start_x-end_x)*(start_y-end_y) > 0:
+        if (start_x-end_x)*(start_y-end_y) < 0:
 			angle = -angle;
     else:
-		angle = arctan(1/tan_value)
+    	compress = 0
+        angle = arctan(1/tan_value)
 		# negate the angle if counter-clockwise
-		if (start_x-end_x)*(start_y-end_y) < 0:
+        if (start_x-end_x)*(start_y-end_y) > 0:
 			angle = -angle;
 
     # determine whether the 	
@@ -100,7 +103,7 @@ def talker():
             y = random.uniform(bound_down, bound_up)
 
 	    # apply transformation to fit the region to the routing
-            x_, y_ = transform(x, y, angle, center_x, center_y)
+            x_, y_ = transform(x, y, angle, center_x, center_y, compress)
 	   
             msg.position.x = x_
             msg.position.y = y_
