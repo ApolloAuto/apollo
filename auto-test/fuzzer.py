@@ -102,7 +102,7 @@ def talker():
             x = random.uniform(bound_left, bound_right)
             y = random.uniform(bound_down, bound_up)
 
-	    # apply transformation to fit the region to the routing
+	        # apply transformation to fit the region to the routing
             x_, y_ = transform(x, y, angle, center_x, center_y, compress)
 	   
             msg.position.x = x_
@@ -125,21 +125,21 @@ def talker():
             # id, scenario_id, position_x, position_y, position_z, direction, length, width, height, type
             obstacle_data = np.array([[msg.id, scenario_id, msg.position.x, msg.position.y,
                              msg.position.z, msg.theta, msg.length, msg.width, msg.height, msg.type]])
-	    # the reason why obstacle_data is a 2D array is that using a 1D array will insert a column of data 
-	    # to the file rather than a row. Thus, this is a hack to fix the bug.
-            
-	    # add new obstacle data into the csv file
-        with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
-        	np.savetxt(csv, obstacle_data, 
-				fmt = ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], 
-			   	delimiter=',')
+	    
+			# the reason why obstacle_data is a 2D array is that using a 1D array will insert a column of data 
+			# to the file rather than a row. Thus, this is a hack to fix the bug.
+				
+			# add new obstacle data into the csv file
+            with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
+				np.savetxt(csv, obstacle_data, fmt = ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], delimiter=',')
 
-		# define the velocity of the obstacle
-		# msg.velocity.x = 5
-		# msg.velocity.y = 5
+			# define the velocity of the obstacle
+			# msg.velocity.x = 5
+			# msg.velocity.y = 5
 
-        # increment the scenario counter
+		# increment the scenario counter
         scenario_id = scenario_id + 1
+
         # publish the obstacles to ROS topic '/apollo/perception/obstacles'
         pub.publish(msg_obstacles)
         rate.sleep()
