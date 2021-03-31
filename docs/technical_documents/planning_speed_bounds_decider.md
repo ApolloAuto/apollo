@@ -1,7 +1,5 @@
 # Planning Speed Bounds Decider Introduction
 
-_**Tip**: to read the equations in the document, you are recommended to use Chrome with [a plugin](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn) or copy the latex equation to [an online editor](http://www.hostmath.com/)_
-
 # Introduction
 
 This document describes the process of speed bounds decider. Speed bounds decider contains three main parts: 1.Map obstacles into st graph 2.Create speed limit along path 3.Get path_length & time_duration as search bound in st graph. After these three steps, generated st_graph is loaded back to the frame.
@@ -27,7 +25,3 @@ While the input params of the unified api are frame and reference_line_info, the
 The time duration is from speed bound config.
 3. Output. 
 `st_graph_data->LoadData()` The boundaries/speed_limit are stored in st_graph_data of reference_line_info.
-
-# Algorithm Detail
-
-There is no complex algorithm about this decider.
