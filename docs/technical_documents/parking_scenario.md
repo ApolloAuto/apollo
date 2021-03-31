@@ -26,6 +26,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 1. This scenario consists of four stages, check stage, adjust stage, pre cruise stage and cruise stage. 
 
 2. check stage:
+ 
  1. In check stage, by calling checkadcreadytocruise function to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements;
   ```cpp
     bool CheckADCReadyToCruise(
@@ -36,23 +37,23 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
 3. adjust stage:
   
-  1. In adjust stage, we run open space planning algorithms to adjust ADC position;
+ 1. In adjust stage, we run open space planning algorithms to adjust ADC position;
    ```cpp
     bool ExecuteTaskOnOpenSpace(Frame* frame);
    ```
-  2. Once position adjustment is done, we check whether ADC reaches the end of trajectory;
+ 2. Once position adjustment is done, we check whether ADC reaches the end of trajectory;
 
-  3. Then check whether ADC is ready to cruise by call CheckADCReadyToCruise function;
+ 3. Then check whether ADC is ready to cruise by call CheckADCReadyToCruise function;
 
-  4. If ADC is ready to cruise and reaches the end of trajectory, adjust stage finished;
+ 4. If ADC is ready to cruise and reaches the end of trajectory, adjust stage finished;
+ 
+  1. If steering percentage within the threshold, switching to cruise stage;
 
-    1. If steering percentage within the threshold, switching to cruise stage;
-
-    2. Else we reset init position of ADC and switch to pre cruise stage;
-     ```cpp
+  2. Else we reset init position of ADC and switch to pre cruise stage;
+   ```cpp
       void ResetInitPostion();
-     ```
-  5. Else stay in adjust stage to adjust ADC position;
+   ```
+ 5. Else stay in adjust stage to adjust ADC position;
 
 4. pre cruise stage:
   

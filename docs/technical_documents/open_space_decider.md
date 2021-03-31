@@ -149,10 +149,10 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                                   double* target_s);
     ```
 
-  ```cpp
+    ```cpp
         void SetPullOverStopFence(const double target_s, Frame* const frame,
                                 ReferenceLineInfo* const reference_line_info);
-  ```
+    ```
 2. Return process status
 
 3. Output: pre stop fence for open space planner
