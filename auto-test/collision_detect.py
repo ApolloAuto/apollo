@@ -20,6 +20,7 @@ def monitorCallback(monitorMessage):
     if (collisionMessage in msg):
 
         # extract the obstacle id from the message
+        # need to consider when id has '_0' suffixes which cannot be convert to int directly
         obstacle_id = int(msg.replace(collisionMessage, ''))
         obstacle = [obstacle_id]
         #print(obstacle_id)

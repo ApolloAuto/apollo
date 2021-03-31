@@ -22,7 +22,7 @@ for c in range(collision_size):
 # get the number of scenarios generated
 scenario_number = obstacles_data[-1][1]
 general_rate = float(collision_size) / float(scenario_number)
-print("Total Obstacle Generated: %d" % obstacles_data.size)
+print("Total Obstacle Generated: %d" % obstacles_data.shape[0])
 print("Total Round of Scenario: %d" % scenario_number)
 print("Number of Collision Detected: %d" % collision_size)
 print("General Collision Rate (#collision / #scenerio): %.4f%%" % (general_rate * 100))
