@@ -1,12 +1,17 @@
 import numpy as np
 from numpy import genfromtxt
-import os
+import os, sys
 
 # load data from data/obstacles.csv and data/collision.csv
 obstacles_data = genfromtxt('/apollo/auto-test/data/obstacles.csv', delimiter=',')
+
+# check whether collision.csv exists, it should not exist if no collision is detected
+if (not os.path.isdir('/apollo/auto-test/data/collision.csv')):
+    print('No collision detected in the simulation!')
+    sys.exit()
+
 collision_data = genfromtxt('/apollo/auto-test/data/collision.csv', delimiter=',')
 
-print(obstacles_data.shape)
 # remove duplicated data in collision_data
 collision_data = np.unique(collision_data)
 collision_size = collision_data.size
@@ -33,6 +38,4 @@ with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
                fmt=['%d','%d','%d','%.6f'], 
                delimiter=',')
 
-# remove old data for new testing
-os.remove('/apollo/auto-test/data/obstacles.csv')
-os.remove('/apollo/auto-test/data/collision.csv')
+
