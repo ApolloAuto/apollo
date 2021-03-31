@@ -18,103 +18,103 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 
 1. Input : obstacles info \ vehicle info \ road info \ parking space info
 
-    - IN PARKING STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARKING)
+  - IN PARKING STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARKING)
 
-      1. Check parking space id and parking space boundary,then get parking spot;
-      ```cpp
-          bool GetParkingSpot(Frame *const frame,
-                              std::array<common::math::Vec2d, 4> *vertices,
-                              hdmap::Path *nearby_path);
-      ```
-      2. Search target parking spot on path and check whether the distance between ADC and target parking spot is appropriate;
-      ```cpp
-          void SearchTargetParkingSpotOnPath(
-              const hdmap::Path &nearby_path,
-              hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
-      ``` 
-      3. Set ADC origin state,include ADC position and heading;
-      ```cpp
-          void SetOrigin(Frame *const frame,
-                          const std::array<common::math::Vec2d, 4> &vertices);
-      ```
-
-      4. Get parking spot(left top \ left down \ right down \ right top) points info, convert parking spot points coordinates to vehicle coorinates, according to the relative position and parking direction(inward or outward) to set parking end pose;
-
-      ```cpp  
-          void SetParkingSpotEndPose(
-              Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
-      ```
-
-      ![Diagram](images/open_space_decider_fig_2.png)   
-
-      5. Get parking boundary: convert parking spot points coordinates to vehicle coorinates and get points' projections on reference line;
-      
-      ```cpp
-          bool GetParkingBoundary(Frame *const frame,
-                                  const std::array<common::math::Vec2d, 4> &vertices,
-                                  const hdmap::Path &nearby_path,
-                                  std::vector<std::vector<common::math::Vec2d>>
-                                  *const roi_parking_boundary);
-      ```
-      6. Get road boundary: it starts from parking space center line(center_line_s) and extends a distance(roi longitudinal range) to both side along the s direction to get start_s and end_s; search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range; those key points, anchor points is called boundary points and the line segements between those points is called roi parking boundary; 
-      
-      ```cpp
-          void GetRoadBoundary(
-              const hdmap::Path &nearby_path, const double center_line_s,
-              const common::math::Vec2d &origin_point, const double origin_heading,
-              std::vector<common::math::Vec2d> *left_lane_boundary,
-              std::vector<common::math::Vec2d> *right_lane_boundary,
-              std::vector<common::math::Vec2d> *center_lane_boundary_left,
-              std::vector<common::math::Vec2d> *center_lane_boundary_right,
-              std::vector<double> *center_lane_s_left,
-              std::vector<double> *center_lane_s_right,
-              std::vector<double> *left_lane_road_width,
-              std::vector<double> *right_lane_road_width);
-      ```
-      ![Diagram](images/open_space_roi_decider_fig_1.png)
-
-      7. Fuse line segements: remove repeat points of roi parking boundary to meet the requirements of open space algorithm
-
-      ```cpp
-          bool FuseLineSegments(
-              std::vector<std::vector<common::math::Vec2d>> *line_segments_vec);
-      ```
-
-    - IN PULL OVER STAGE (roi_type == OpenSpaceRoiDeciderConfig::PULL_OVER) 
-
-    1. The main process is same as parking stage, get pull over spot -> set origin -> set pull over spot end pose -> get pull over boundary 
-
-    ```cpp 
-          void SetPullOverSpotEndPose(Frame *const frame);
+    1. Check parking space id and parking space boundary,then get parking spot;
+    ```cpp
+        bool GetParkingSpot(Frame *const frame,
+                            std::array<common::math::Vec2d, 4> *vertices,
+                            hdmap::Path *nearby_path);
+    ```
+    2. Search target parking spot on path and check whether the distance between ADC and target parking spot is appropriate;
+    ```cpp
+        void SearchTargetParkingSpotOnPath(
+            const hdmap::Path &nearby_path,
+            hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
+    ``` 
+    3. Set ADC origin state,include ADC position and heading;
+    ```cpp
+        void SetOrigin(Frame *const frame,
+                        const std::array<common::math::Vec2d, 4> &vertices);
     ```
 
-    ```cpp
-          bool GetPullOverBoundary(Frame *const frame,
-                                    const std::array<common::math::Vec2d, 4> &vertices,
-                                    const hdmap::Path &nearby_path,
-                                    std::vector<std::vector<common::math::Vec2d>>
-                                    *const roi_parking_boundary);  
-    ```                                                   
+    4. Get parking spot(left top \ left down \ right down \ right top) points info, convert parking spot points coordinates to vehicle coorinates, according to the relative position and parking direction(inward or outward) to set parking end pose;
 
-    - IN PARK AND GO STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO)
-
-    1. The main process is same as parking stage, set orgin from adc -> set park and go end pose -> get park and go boundary 
-
-    ```cpp
-          void SetOriginFromADC(Frame *const frame, const hdmap::Path &nearby_path);
+    ```cpp  
+        void SetParkingSpotEndPose(
+            Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
     ```
 
-    ```cpp
-          void SetParkAndGoEndPose(Frame *const frame);
-    ```
+    ![Diagram](images/open_space_decider_fig_2.png)   
 
+    5. Get parking boundary: convert parking spot points coordinates to vehicle coorinates and get points' projections on reference line;
+    
     ```cpp
-          bool GetParkAndGoBoundary(Frame *const frame, const hdmap::Path &nearby_path,
+        bool GetParkingBoundary(Frame *const frame,
+                                const std::array<common::math::Vec2d, 4> &vertices,
+                                const hdmap::Path &nearby_path,
                                 std::vector<std::vector<common::math::Vec2d>>
                                 *const roi_parking_boundary);
     ```
+    6. Get road boundary: it starts from parking space center line(center_line_s) and extends a distance(roi longitudinal range) to both side along the s direction to get start_s and end_s; search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range; those key points, anchor points is called boundary points and the line segements between those points is called roi parking boundary; 
+    
+    ```cpp
+        void GetRoadBoundary(
+            const hdmap::Path &nearby_path, const double center_line_s,
+            const common::math::Vec2d &origin_point, const double origin_heading,
+            std::vector<common::math::Vec2d> *left_lane_boundary,
+            std::vector<common::math::Vec2d> *right_lane_boundary,
+            std::vector<common::math::Vec2d> *center_lane_boundary_left,
+            std::vector<common::math::Vec2d> *center_lane_boundary_right,
+            std::vector<double> *center_lane_s_left,
+            std::vector<double> *center_lane_s_right,
+            std::vector<double> *left_lane_road_width,
+            std::vector<double> *right_lane_road_width);
+    ```
+    ![Diagram](images/open_space_roi_decider_fig_1.png)
 
-5. By calling formulateboundaryconstraints function to gather vertice needed by warm start and distance approach, then transform vertices into the form of Ax > b;
+    7. Fuse line segements: remove repeat points of roi parking boundary to meet the requirements of open space algorithm
+
+    ```cpp
+        bool FuseLineSegments(
+            std::vector<std::vector<common::math::Vec2d>> *line_segments_vec);
+    ```
+
+  - IN PULL OVER STAGE (roi_type == OpenSpaceRoiDeciderConfig::PULL_OVER) 
+
+  1. The main process is same as parking stage, get pull over spot -> set origin -> set pull over spot end pose -> get pull over boundary 
+
+  ```cpp 
+        void SetPullOverSpotEndPose(Frame *const frame);
+  ```
+
+  ```cpp
+        bool GetPullOverBoundary(Frame *const frame,
+                                  const std::array<common::math::Vec2d, 4> &vertices,
+                                  const hdmap::Path &nearby_path,
+                                  std::vector<std::vector<common::math::Vec2d>>
+                                  *const roi_parking_boundary);  
+  ```                                                   
+
+  - IN PARK AND GO STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO)
+
+  1. The main process is same as parking stage, set orgin from adc -> set park and go end pose -> get park and go boundary 
+
+  ```cpp
+        void SetOriginFromADC(Frame *const frame, const hdmap::Path &nearby_path);
+  ```
+
+  ```cpp
+        void SetParkAndGoEndPose(Frame *const frame);
+  ```
+
+  ```cpp
+        bool GetParkAndGoBoundary(Frame *const frame, const hdmap::Path &nearby_path,
+                              std::vector<std::vector<common::math::Vec2d>>
+                              *const roi_parking_boundary);
+  ```
+
+2. By calling formulateboundaryconstraints function to gather vertice needed by warm start and distance approach, then transform vertices into the form of Ax > b;
 
 ```cpp
     bool FormulateBoundaryConstraints(
@@ -122,9 +122,9 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         Frame *const frame);
 ```
 
-6. Return process status;
+3. Return process status;
 
-7. Output: open space roi boundary and boundary constraints 
+4. Output: open space roi boundary and boundary constraints 
 
 ## Open space pre stop decider
 
@@ -160,9 +160,9 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                                 ReferenceLineInfo* const reference_line_info);
   ```
 
-4. Return process status
+2. Return process status
 
-5. Output: pre stop fence for open space planner
+3. Output: pre stop fence for open space planner
 
 ## Open space fallback decider 
 1. Input: obstacles info \ vehicle info \ road info \ parking space info
