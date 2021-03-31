@@ -29,9 +29,9 @@ All three scenarios contain specific stages, the function of scenarios are reali
  
    1. In check stage, by calling checkadcreadytocruise function to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements;
    ```cpp
-    bool CheckADCReadyToCruise(
-        const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
-        const ScenarioParkAndGoConfig& scenario_config);
+        bool CheckADCReadyToCruise(
+            const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
+            const ScenarioParkAndGoConfig& scenario_config);
    ```
    2. If ADC is ready to cruise, check stage finished and switching to cruise stage; else switch to adjust stage;
 
@@ -39,7 +39,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
   
    1. In adjust stage, we run open space planning algorithms to adjust ADC position;
    ```cpp
-    bool ExecuteTaskOnOpenSpace(Frame* frame);
+        bool ExecuteTaskOnOpenSpace(Frame* frame);
    ```
    2. Once position adjustment is done, we check whether ADC reaches the end of trajectory;
 
@@ -51,7 +51,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
      2. Else we reset init position of ADC and switch to pre cruise stage;
      ```cpp
-      void ResetInitPostion();
+          void ResetInitPostion();
      ```
    5. Else stay in adjust stage to adjust ADC position;
 
@@ -68,13 +68,13 @@ All three scenarios contain specific stages, the function of scenarios are reali
 5. cruise stage: 
    1. Running on lane planning algorithms to adjust ADC position;
    ```cpp
-    bool ExecuteTaskOnReferenceLine(
-        const common::TrajectoryPoint& planning_start_point, Frame* frame);         
+        bool ExecuteTaskOnReferenceLine(
+            const common::TrajectoryPoint& planning_start_point, Frame* frame);         
    ```
    2. Then check whether ADC's lateral error with target line within the threshold;
    ```cpp
-    ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
-        const ReferenceLineInfo& reference_line_info);
+        ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
+            const ReferenceLineInfo& reference_line_info);
    ```
    3. If so, cruise stage finished and quit park and go scenario;
 
@@ -97,18 +97,18 @@ All three scenarios contain specific stages, the function of scenarios are reali
         const common::PathPoint& path_point,
         const PlanningContext* planning_context);
    ```
-     1. If so, the pull over status will be set to PARK_COMPLETE;
+       1. If so, the pull over status will be set to PARK_COMPLETE;
 
-     2. Else we add a stop fence for adc to pause at a better position;
+       2. Else we add a stop fence for adc to pause at a better position;
 
-     3. However, if we couldn't get a suitable new stop fence, approach stage will finish and switch to retry appoach parking stage. 
+       3. However, if we couldn't get a suitable new stop fence, approach stage will finish and switch to retry appoach parking stage. 
    3. Then we check whether adc parked properly;
    ```cpp
-    PullOverStatus CheckADCPullOver(
-        const common::VehicleStateProvider* vehicle_state_provider,
-        const ReferenceLineInfo& reference_line_info,
-        const ScenarioPullOverConfig& scenario_config,
-        const PlanningContext* planning_context);
+        PullOverStatus CheckADCPullOver(
+            const common::VehicleStateProvider* vehicle_state_provider,
+            const ReferenceLineInfo& reference_line_info,
+            const ScenarioPullOverConfig& scenario_config,
+            const PlanningContext* planning_context);
    ```
      1. If ADC pass the destination or park properly, approach stage finished and quit pull over scenario;
 
@@ -119,7 +119,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
    2. Check whether ADC stop properly;
    ```cpp
-    bool CheckADCStop(const Frame& frame);
+        bool CheckADCStop(const Frame& frame);
    ```
    3. If so, retry approach parking stage finished and switch to retry parking stage;
  
@@ -128,7 +128,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
    2. Check whether ADC park properly(check distance ahnd theta diff);  
    ```cpp
-    bool CheckADCPullOverOpenSpace();
+        bool CheckADCPullOverOpenSpace();
    ```
    3. If so, retry parking stage finished and quit pull over scenario;
   
@@ -145,7 +145,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
    2. Cruise to a halt once it has found the right stopping point required in order to reverse into the parking spot;
    ```cpp
-    bool CheckADCStop(const Frame& frame);
+        bool CheckADCStop(const Frame& frame);
    ```
    3. If stop properly, approach parking spot stage finished and switch to parking stage;
 

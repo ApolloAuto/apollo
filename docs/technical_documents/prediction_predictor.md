@@ -78,19 +78,19 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
         std::vector<bool>* enable_lane_sequence);  
  ```
 3. If there is a stop sign on the lane, check whether ADC supposed to stop;
-```cpp 
+     ```cpp
     bool SupposedToStop(const Feature& feature, const double stop_distance,
                         double* acceleration); 
-```
- 1. If ADC is about to stop, produce trajectroy with constant-acceleration module;
-     ```cpp
+     ```
+     1. If ADC is about to stop, produce trajectroy with constant-acceleration module;
+      ```cpp
         void DrawConstantAccelerationTrajectory(
             const Obstacle& obstacle, const LaneSequence& lane_sequence,
             const double total_time, const double period, const double acceleration,
             std::vector<apollo::common::TrajectoryPoint>* points);
-     ```
- 2. Else, produce trajectory by obstacle's kinetic pattern;
-     ```cpp
+      ```
+     2. Else, produce trajectory by obstacle's kinetic pattern;
+      ```cpp
         bool DrawMoveSequenceTrajectoryPoints(
             const Obstacle& obstacle, const LaneSequence& lane_sequence,
             const double total_time, const double period,
@@ -109,7 +109,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
  ```
     total_cost = w_acc * cost_acc + w_centri * cost_centri + w_collision * cost_collision
  ```
-Note that, the collsion cost is calucalated by the distance between ADC and obstacles;
+    Note that, the collsion cost is calucalated by the distance between ADC and obstacles;
  ```cpp
     double ComputeTrajectoryCost(
         const Obstacle& obstacle, const LaneSequence& lane_sequence,
