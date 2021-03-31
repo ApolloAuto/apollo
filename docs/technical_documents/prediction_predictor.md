@@ -31,35 +31,35 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
 
 2. There are two main kinds of extrapolation, extrapolate by lane and extrapolate by free move;
      1. Base on a search radium and an angle threshold, which can be modified by changing perdiction parameters, to get most likely lane that best matches the short-term predicted trajectory obtained from Semantic LSTM evaluator;
- ```cpp
-    LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
-                                                const int num_tail_point);
- ```
- 2. If we found the matching lane, we extend short-term predicted trajectory by lane;
-  1. Firstly, we remove points those are not in the matching lane;
-  2. Then, we project the modified short-term predicted trajectory onto the matching lane to get SL info;
-   ```cpp
-        static bool GetProjection(
-           const Eigen::Vector2d& position,
-           const std::shared_ptr<const hdmap::LaneInfo> lane_info, double* s,double* l);
-   ```
-  3. According to prediction horizon, we extend the modified short-term predicted trajectory along the mathcing lane with a  constant-velocity module and get smooth points from lane;
-   ```cpp
-       static bool SmoothPointFromLane(const std::string& id, const double s,
-                                       const double l, Eigen::Vector2d* point,
-                                       double* heading);
-   ```
-  4. Note that the extraplation speed, which is used in constant-velocity module, is calculated by calling ComputeExtraplationSpeed function.
-   ```cpp 
-    void ExtrapolateByLane(const LaneSearchResult& lane_search_result,
-                            const double extrapolation_speed,
-                            Trajectory* trajectory_ptr,
-                            ObstacleClusters* clusters_ptr);
-   ```
-   ```cpp 
-    double ComputeExtraplationSpeed(const int num_tail_point,
-                                    const Trajectory& trajectory);                    
-   ```
+     ```cpp
+        LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
+                                                    const int num_tail_point);
+     ```
+     2. If we found the matching lane, we extend short-term predicted trajectory by lane;
+         1. Firstly, we remove points those are not in the matching lane;
+         2. Then, we project the modified short-term predicted trajectory onto the matching lane to get SL info;
+         ```cpp
+                static bool GetProjection(
+                const Eigen::Vector2d& position,
+                const std::shared_ptr<const hdmap::LaneInfo> lane_info, double* s,double* l);
+         ```
+         3. According to prediction horizon, we extend the modified short-term predicted trajectory along the mathcing lane with a  constant-velocity module and get smooth points from lane;
+         ```cpp
+            static bool SmoothPointFromLane(const std::string& id, const double s,
+                                            const double l, Eigen::Vector2d* point,
+                                            double* heading);
+         ```
+         4. Note that the extraplation speed, which is used in constant-velocity module, is calculated by calling ComputeExtraplationSpeed function.
+         ```cpp 
+            void ExtrapolateByLane(const LaneSearchResult& lane_search_result,
+                                    const double extrapolation_speed,
+                                    Trajectory* trajectory_ptr,
+                                    ObstacleClusters* clusters_ptr);
+         ```
+         ```cpp 
+            double ComputeExtraplationSpeed(const int num_tail_point,
+                                            const Trajectory& trajectory);                    
+         ```
  3. Otherwise, we use free move module to extend.
   ```cpp
     void ExtrapolateByFreeMove(const int num_tail_point,
@@ -82,20 +82,20 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
     bool SupposedToStop(const Feature& feature, const double stop_distance,
                         double* acceleration); 
  ```
- 1. If ADC is about to stop, produce trajectroy with constant-acceleration module;
-  ```cpp
+     1. If ADC is about to stop, produce trajectroy with constant-acceleration module;
+     ```cpp
         void DrawConstantAccelerationTrajectory(
             const Obstacle& obstacle, const LaneSequence& lane_sequence,
             const double total_time, const double period, const double acceleration,
             std::vector<apollo::common::TrajectoryPoint>* points);
-  ```
- 2. Else, produce trajectory by obstacle's kinetic pattern;
-  ```cpp
+     ```
+     2. Else, produce trajectory by obstacle's kinetic pattern;
+     ```cpp
         bool DrawMoveSequenceTrajectoryPoints(
             const Obstacle& obstacle, const LaneSequence& lane_sequence,
             const double total_time, const double period,
             std::vector<apollo::common::TrajectoryPoint>* points);  
-  ```
+     ```
 ## Interaction predictor
 1. Compute the likelihood to create posterier prediction results after all evaluators have run. This predictor was created for caution level obstacles.
 
