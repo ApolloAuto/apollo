@@ -20,28 +20,28 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 
 - IN PARKING STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARKING)
 
-  1. Check parking space id and parking space boundary,then get parking spot;
+   1. Check parking space id and parking space boundary,then get parking spot;
   
-```cpp
+ ```cpp
       bool GetParkingSpot(Frame *const frame,
                         std::array<common::math::Vec2d, 4> *vertices,
                         hdmap::Path *nearby_path);
-```
-  2. Search target parking spot on path and check whether the distance between ADC and target parking spot is appropriate;
+ ```
+   2. Search target parking spot on path and check whether the distance between ADC and target parking spot is appropriate;
   
 ```cpp
       void SearchTargetParkingSpotOnPath(
         const hdmap::Path &nearby_path,
         hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
 ``` 
-  3. Set ADC origin state,include ADC position and heading;
+   3. Set ADC origin state,include ADC position and heading;
   
 ```cpp
       void SetOrigin(Frame *const frame,
                    const std::array<common::math::Vec2d, 4> &vertices);
 ```
 
-  4. Get parking spot(left top \ left down \ right down \ right top) points info, convert parking spot points coordinates to vehicle coorinates, according to the relative position and parking direction(inward or outward) to set parking end pose;
+   4. Get parking spot(left top \ left down \ right down \ right top) points info, convert parking spot points coordinates to vehicle coorinates, according to the relative position and parking direction(inward or outward) to set parking end pose;
 
 ```cpp  
     void SetParkingSpotEndPose(
@@ -50,7 +50,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 
   ![Diagram](images/open_space_decider_fig_2.png)   
   
-  5. Get parking boundary: convert parking spot points coordinates to vehicle coorinates and get points' projections on reference line;
+   5. Get parking boundary: convert parking spot points coordinates to vehicle coorinates and get points' projections on reference line;
     
 ```cpp
     bool GetParkingBoundary(Frame *const frame,
@@ -59,7 +59,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                             std::vector<std::vector<common::math::Vec2d>>
                             *const roi_parking_boundary);
 ```
-  6. Get road boundary: it starts from parking space center line(center_line_s) and extends a distance(roi longitudinal range) to both side along the s direction to get start_s and end_s; search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range; those key points, anchor points is called boundary points and the line segements between those points is called roi parking boundary; 
+   6. Get road boundary: it starts from parking space center line(center_line_s) and extends a distance(roi longitudinal range) to both side along the s direction to get start_s and end_s; search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range; those key points, anchor points is called boundary points and the line segements between those points is called roi parking boundary; 
     
 ```cpp
     void GetRoadBoundary(
@@ -76,7 +76,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 ```
   ![Diagram](images/open_space_roi_decider_fig_1.png)
   
-  7. Fuse line segements: remove repeat points of roi parking boundary to meet the requirements of open space algorithm
+   7. Fuse line segements: remove repeat points of roi parking boundary to meet the requirements of open space algorithm
 
 ```cpp
     bool FuseLineSegments(
