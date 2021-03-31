@@ -42,61 +42,61 @@ Please refer [open space trajectory parition](https://github.com/ApolloAuto/apol
    
    1. Based on ADC position, heading, body size and velocity info to get vehicle center point info and  moving direction;
     ```cpp
-    void UpdateVehicleInfo();
+        void UpdateVehicleInfo();
     ```
    2. Encode partitioned trajectories;
     ```cpp
-    bool EncodeTrajectory(const DiscretizedTrajectory& trajectory,
-                          std::string* const encoding);     
+        bool EncodeTrajectory(const DiscretizedTrajectory& trajectory,
+                            std::string* const encoding);     
     ```
    3. To find the closest point on trajectory, a search range needed to be determined, it required the distance between path end point and ADC enter point, the heading search difference and the head track difference all within the threshold;
    Based on ADC box and path point box, the IOU(intersection over union) is computed for each path point in the search range; 
    If the IOU of the trajectory end point is bigger than threshold and partitioned trajectories group has other trajectory can be used, it means ADC reach the end of a trajectory, need to switch to next one;
    Then update trajectory history to store which trajectory has been used;
     ```cpp
-    bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
-                                 const canbus::Chassis::GearPosition& gear,
-                                 const size_t trajectories_size,
-                                 const size_t trajectories_index,
-                                 size_t* current_trajectory_index,
-                                 size_t* current_trajectory_point_index);
+        bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
+                                    const canbus::Chassis::GearPosition& gear,
+                                    const size_t trajectories_size,
+                                    const size_t trajectories_index,
+                                    size_t* current_trajectory_index,
+                                    size_t* current_trajectory_point_index);
     ```
     ```cpp
-    bool CheckTrajTraversed(const std::string& trajectory_encoding_to_check);
+        bool CheckTrajTraversed(const std::string& trajectory_encoding_to_check);
     ```
     ```cpp
-    void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
+        void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
     ```
    4. When there is no need for ADC to switch to next trajectory, use IOU info mentioned above to find the closest trajectory point(the biggest IOU point) to follow;
 
    5. If the closest trajectory point doesn't belong to current trajectory or couldn't find closest trajectory point due to some unnormal cases, calling UseFailSafeSearch function to get a safe trajectory to follow;
    When using this function, the closest point search range only care about distance between path end point and ADC enter point, no more limitation about angle difference compare to step 5-3;
     ```cpp
-    bool UseFailSafeSearch(
-        const std::vector<TrajGearPair>& partitioned_trajectories,
-        const std::vector<std::string>& trajectories_encodings,
-        size_t* current_trajectory_index, size_t* current_trajectory_point_index);
+        bool UseFailSafeSearch(
+            const std::vector<TrajGearPair>& partitioned_trajectories,
+            const std::vector<std::string>& trajectories_encodings,
+            size_t* current_trajectory_index, size_t* current_trajectory_point_index);
     ```
    6. If the FLAGS_use_gear_shift_trajectory set to be true, a small part trajectory obtained by calling GenerateGearShiftTrajectory function will be added to make vehicle moving smoothly when gear shifting;
    Else calling AdjustRelativeTimeAndS to adjust partitioned trajectory;
     ```cpp
-    bool InsertGearShiftTrajectory(
-        const bool flag_change_to_next, const size_t current_trajectory_index,
-        const std::vector<TrajGearPair>& partitioned_trajectories,
-        TrajGearPair* gear_switch_idle_time_trajectory);
+        bool InsertGearShiftTrajectory(
+            const bool flag_change_to_next, const size_t current_trajectory_index,
+            const std::vector<TrajGearPair>& partitioned_trajectories,
+            TrajGearPair* gear_switch_idle_time_trajectory);
     ```
     ```cpp
-    void GenerateGearShiftTrajectory(
-        const canbus::Chassis::GearPosition& gear_position,
-        TrajGearPair* gear_switch_idle_time_trajectory);
+        void GenerateGearShiftTrajectory(
+            const canbus::Chassis::GearPosition& gear_position,
+            TrajGearPair* gear_switch_idle_time_trajectory);
     ```
     ```cpp
-    void AdjustRelativeTimeAndS(
-        const std::vector<TrajGearPair>& partitioned_trajectories,
-        const size_t current_trajectory_index,
-        const size_t closest_trajectory_point_index,
-        DiscretizedTrajectory* stitched_trajectory_result,
-        TrajGearPair* current_partitioned_trajectory);
+        void AdjustRelativeTimeAndS(
+            const std::vector<TrajGearPair>& partitioned_trajectories,
+            const size_t current_trajectory_index,
+            const size_t closest_trajectory_point_index,
+            DiscretizedTrajectory* stitched_trajectory_result,
+            TrajGearPair* current_partitioned_trajectory);
     ```
 6. Return process status;    
 
