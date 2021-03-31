@@ -22,24 +22,26 @@ Please refer [code](https://github.com/ApolloAuto/apollo/modules/planning/scenar
 
 All three scenarios contain specific stages, the function of scenarios are realized through the conversion of stages. Thus, figure out the process of stages conversion is the key to understand this code.  
 
-PARK AND GO SCENARIO
+## PARK AND GO SCENARIO
 1. This scenario consists of four stages, check stage, adjust stage, pre cruise stage and cruise stage. 
 
 2. check stage:
   2-1 In check stage, by calling checkadcreadytocruise function to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements;
-
+    
+    ```cpp
      bool CheckADCReadyToCruise(
          const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
          const ScenarioParkAndGoConfig& scenario_config);
+    ```
 
   2-2 If ADC is ready to cruise, check stage finished and switching to cruise stage; else switch to adjust stage;
-
-  2-3 The conversion of stages can be seen in fig 1.
 
 3. adjust stage:
   3-1 In adjust stage, we run open space planning algorithms to adjust ADC position;
   
+    ```cpp
      bool ExecuteTaskOnOpenSpace(Frame* frame);
+    ```
 
   3-2 Once position adjustment is done, we check whether ADC reaches the end of trajectory;
 
@@ -51,11 +53,10 @@ PARK AND GO SCENARIO
 
     3-3-2 Else we reset init position of ADC and switch to pre cruise stage;
 
+       ```cpp
        void ResetInitPostion();
-
+       ```
   3-4 Else stay in adjust stage to adjust ADC position;
-
-  3-5 The conversion of stages can be seen in fig 1.
 
 4. pre cruise stage:
   4-1 In pre cruise stage, we run open space planning algorithms to adjust ADC with the init position;
@@ -66,26 +67,29 @@ PARK AND GO SCENARIO
 
   4-4 Else stay in pre cruise stage;
 
-  4-5 The conversion of stages can be seen in fig 1.
-
 5. cruise stage: 
   5-1 Running on lane planning algorithms to adjust ADC position;
 
+     ```cpp
      bool ExecuteTaskOnReferenceLine(
          const common::TrajectoryPoint& planning_start_point, Frame* frame);         
+     ```
 
   5-2 Then check whether ADC's lateral error with target line within the threshold;
 
+     ```cpp
      ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
          const ReferenceLineInfo& reference_line_info);
+     ```
 
   5-3 If so, cruise stage finished and quit park and go scenario;
 
   5-4 Else, stay in cruise stage until ADC cruises to a desired position;
 
-  5-5 The conversion of stages can be seen in fig 1.          
+  5-5 The conversion of stages can be seen in 
+  ![Diagram](images/parking_scenairo_fig_1.png).          
 
-PULL OVER SCENARIO
+## PULL OVER SCENARIO
 1. This scenario consists of three stages, approach stage, retry approach parking stage and retry parking stage.
 
 2. approach stage:
@@ -93,11 +97,13 @@ PULL OVER SCENARIO
 
   2-2 At first, we check path points data to see whether the s, l and theta error between ADC position and the target path point within the threshold;
 
+     ```cpp
      PullOverStatus CheckADCPullOverPathPoint(
          const ReferenceLineInfo& reference_line_info,
          const ScenarioPullOverConfig& scenario_config,
          const common::PathPoint& path_point,
          const PlanningContext* planning_context);
+     ```
 
     2-2-1 If so, the pull over status will be set to PARK_COMPLETE;
 
@@ -107,43 +113,46 @@ PULL OVER SCENARIO
 
   2-3 Then we check whether adc parked properly;
 
+     ```cpp
      PullOverStatus CheckADCPullOver(
          const common::VehicleStateProvider* vehicle_state_provider,
          const ReferenceLineInfo& reference_line_info,
          const ScenarioPullOverConfig& scenario_config,
          const PlanningContext* planning_context);
+     ```
 
     2-3-1 If ADC pass the destination or park properly, approach stage finished and quit pull over scenario;
 
     2-3-2 Else if adc park failed, approach stage finished and switch to retry appoach parking stage.
-
-  2-4 The conversion of stages can be seen in fig 2.
 
 3. retry approach parking stage:    
   3-1 Running on lane planning algorithms to reach the stop line of open space planner;
 
   3-2 Check whether ADC stop properly;
 
+     ```cpp
      bool CheckADCStop(const Frame& frame);
+     ```
 
   3-3 If so, retry approach parking stage finished and switch to retry parking stage;
-
-  3-4 The conversion of stages can be seen in fig 2.
 
 4. retry parking stage:     
   4-1 Running open space planning algorithms to park;
 
   4-2 Check whether ADC park properly(check distance ahnd theta diff);
 
+     ```cpp
      bool CheckADCPullOverOpenSpace();
+     ```
 
   4-3 If so, retry parking stage finished and quit pull over scenario;
   
   4-4 Else stay in the stage until ADC park properly
 
-  4-5 The conversion of stages can be seen in fig 2.    
+  4-5 The conversion of stages can be seen in 
+  ![Diagram](images/parking_scenairo_fig_2.png).    
 
-VALET PARKING SCENARIO
+## VALET PARKING SCENARIO
 1. This scenario consists of two stages, approach parking spot stage and parking stage;
 
 2. approach parking spot stage:
@@ -151,13 +160,16 @@ VALET PARKING SCENARIO
 
   2-2 Cruise to a halt once it has found the right stopping point required in order to reverse into the parking spot;
 
+     ```cpp
      bool CheckADCStop(const Frame& frame);
+     ```
 
   2-3 If stop properly, approach parking spot stage finished and switch to parking stage;
 
   2-4 Else stay in the stage until ADC approaches to desired parking spot;
 
-  2-5 The conversion of stages can be seen in fig 3.
-
  3. parking stage:
   3-1 Open Space Planner algorithm is used to generate a zig-zag trajectory which involves both forward and reverse driving (gear changes) in order to safely park the ego car.
+
+  3-2 The conversion of stages can be seen in 
+  ![Diagram](images/parking_scenairo_fig_3.png).
