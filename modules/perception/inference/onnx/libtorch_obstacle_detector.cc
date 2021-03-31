@@ -17,8 +17,6 @@
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 
 #include <c10/cuda/CUDACachingAllocator.h>
-#include <c10/cuda/CUDAStream.h>
-#include <ATen/cuda/CUDAContext.h>
 
 #include "cyber/common/log.h"
 
@@ -151,7 +149,6 @@ void ObstacleDetector::Infer() {
     blobs_[output_names_[i]]->Reshape(output_size);
     blobs_[output_names_[i]]->set_gpu_data(output_tensor.data_ptr<float>());
   }
-  // c10::cuda::CUDACachingAllocator::emptyCache();
 }
 
 }  // namespace inference
