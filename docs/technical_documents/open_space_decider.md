@@ -21,12 +21,11 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 - IN PARKING STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARKING)
 
    1. Check parking space id and parking space boundary,then get parking spot;
-  
- ```cpp
+   ```cpp
       bool GetParkingSpot(Frame *const frame,
                         std::array<common::math::Vec2d, 4> *vertices,
                         hdmap::Path *nearby_path);
- ```
+   ```
    2. Search target parking spot on path and check whether the distance between ADC and target parking spot is appropriate;
   
 ```cpp
