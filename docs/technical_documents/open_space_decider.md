@@ -23,23 +23,21 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
   1. Check parking space id and parking space boundary,then get parking spot;
   
 ```cpp
-    bool GetParkingSpot(Frame *const frame,
+      bool GetParkingSpot(Frame *const frame,
                         std::array<common::math::Vec2d, 4> *vertices,
                         hdmap::Path *nearby_path);
 ```
-
   2. Search target parking spot on path and check whether the distance between ADC and target parking spot is appropriate;
   
 ```cpp
-    void SearchTargetParkingSpotOnPath(
+      void SearchTargetParkingSpotOnPath(
         const hdmap::Path &nearby_path,
         hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
 ``` 
-
   3. Set ADC origin state,include ADC position and heading;
   
 ```cpp
-    void SetOrigin(Frame *const frame,
+      void SetOrigin(Frame *const frame,
                    const std::array<common::math::Vec2d, 4> &vertices);
 ```
 
