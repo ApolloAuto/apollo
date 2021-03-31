@@ -44,13 +44,10 @@ Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules
     ```
 
 3. Using social LSTM module to predict short-term trajectory by following steps:
-  1. Get social embedding;
-
-  2. Get position embedding;
-  
-  3. Conduct single LSTM and update hidden states;
-  
-  4. Get a predicted trajectory
+  - Get social embedding;
+  - Get position embedding;
+  - Conduct single LSTM and update hidden states;
+  - Get a predicted trajectory
 
 ## Semantic LSTM evaluator
 1. Get and process feature map by obstacles'id;

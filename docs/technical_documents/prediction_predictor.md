@@ -30,7 +30,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
 1. This predictor is used to extend the Semantic LSTM evaluator's results to crean a long-term trajectroy(which is 8 sec).
 
 2. There are two main kinds of extrapolation, extrapolate by lane and extrapolate by free move;
- 1. Base on a search radium and an angle threshold, which can be modified by changing perdiction parameters, to get most likely lane that best matches the short-term predicted trajectory obtained from Semantic LSTM evaluator;
+     1. Base on a search radium and an angle threshold, which can be modified by changing perdiction parameters, to get most likely lane that best matches the short-term predicted trajectory obtained from Semantic LSTM evaluator;
  ```cpp
     LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
                                                 const int num_tail_point);
