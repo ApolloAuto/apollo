@@ -10,26 +10,26 @@ The Evaluator predicts path and speed separately for any given obstacle. An eval
 
 The list of available evaluators include:
 
-    Cost evaluator: probability is calculated by a set of cost functions
+- Cost evaluator: probability is calculated by a set of cost functions
 
-    MLP evaluator: probability is calculated using an MLP model
+- MLP evaluator: probability is calculated using an MLP model
 
-    RNN evaluator: probability is calculated using an RNN model
+- RNN evaluator: probability is calculated using an RNN model
 
-    Cruise MLP + CNN-1d evaluator: probability is calculated using a mix of MLP and CNN-1d models for the cruise scenario
+- Cruise MLP + CNN-1d evaluator: probability is calculated using a mix of MLP and CNN-1d models for the cruise scenario
 
-    Junction MLP evaluator: probability is calculated using a MLP model for junction scenario
+- Junction MLP evaluator: probability is calculated using a MLP model for junction scenario
 
-    Junction Map evaluator: probability is calculated using an semantic map-based CNN model for junction scenario. This evaluator was created for caution level obstacles
+- Junction Map evaluator: probability is calculated using an semantic map-based CNN model for junction scenario. This evaluator was created for caution level obstacles
 
-    Social Interaction evaluator: this model is used for pedestrians, for short term trajectory prediction. It uses social LSTM. This evaluator was created for caution level obstacles
+- Social Interaction evaluator: this model is used for pedestrians, for short term trajectory prediction. It uses social LSTM. This evaluator was created for caution level obstacles
 
-    Semantic LSTM evaluator: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
+- Semantic LSTM evaluator: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
 
 
 # Where is the code
 
-Please refer [code](https://github.com/ApolloAuto/apollo/modules/prediction/evaluator)
+Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules/prediction/evaluator)
 
 # Code Reading
 
@@ -44,13 +44,13 @@ Please refer [code](https://github.com/ApolloAuto/apollo/modules/prediction/eval
     ```
 
 3. Using social LSTM module to predict short-term trajectory by following steps:
-  3-1 Get social embedding;
+  1. Get social embedding;
 
-  3-2 Get position embedding;
+  2. Get position embedding;
   
-  3-3 Conduct single LSTM and update hidden states;
+  3. Conduct single LSTM and update hidden states;
   
-  3-4 Get a predicted trajectory
+  4. Get a predicted trajectory
 
 ## Semantic LSTM evaluator
 1. Get and process feature map by obstacles'id;
@@ -62,8 +62,8 @@ Please refer [code](https://github.com/ApolloAuto/apollo/modules/prediction/eval
 ## Junction map evaluator
 1. Only care about obstalces at intersections, to those obstacles are not closed to any junction exit cannot be evaluated by this evaluator; 
 
-2. Taking the obstacle as the center and the orientation as the reference direction, 12 fan-shaped areas are divided(which can be seen in);
-![Diagram](images/prediction_evaluator_fig_1.png)
+2. Taking the obstacle as the center and the orientation as the reference direction, 12 fan-shaped areas are divided;
+  ![Diagram](images/prediction_evaluator_fig_1.png)
 
 3. Since the juction exit is associated with these 12 fan-shaped areas, the probability can be calculated by solving the fan-shaped areas classification problem;
 

@@ -79,41 +79,38 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         bool FuseLineSegments(
             std::vector<std::vector<common::math::Vec2d>> *line_segments_vec);
     ```
-
   - IN PULL OVER STAGE (roi_type == OpenSpaceRoiDeciderConfig::PULL_OVER) 
 
-  1. The main process is same as parking stage, get pull over spot -> set origin -> set pull over spot end pose -> get pull over boundary 
+    1. The main process is same as parking stage, get pull over spot -> set origin -> set pull over spot end pose -> get pull over boundary 
 
-  ```cpp 
-        void SetPullOverSpotEndPose(Frame *const frame);
-  ```
+    ```cpp 
+          void SetPullOverSpotEndPose(Frame *const frame);
+    ```
 
-  ```cpp
-        bool GetPullOverBoundary(Frame *const frame,
-                                  const std::array<common::math::Vec2d, 4> &vertices,
-                                  const hdmap::Path &nearby_path,
-                                  std::vector<std::vector<common::math::Vec2d>>
-                                  *const roi_parking_boundary);  
-  ```                                                   
-
+    ```cpp
+          bool GetPullOverBoundary(Frame *const frame,
+                                    const std::array<common::math::Vec2d, 4> &vertices,
+                                    const hdmap::Path &nearby_path,
+                                    std::vector<std::vector<common::math::Vec2d>>
+                                    *const roi_parking_boundary);  
+    ```                                                   
   - IN PARK AND GO STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO)
 
-  1. The main process is same as parking stage, set orgin from adc -> set park and go end pose -> get park and go boundary 
+    1. The main process is same as parking stage, set orgin from adc -> set park and go end pose -> get park and go boundary 
 
-  ```cpp
-        void SetOriginFromADC(Frame *const frame, const hdmap::Path &nearby_path);
-  ```
+    ```cpp
+          void SetOriginFromADC(Frame *const frame, const hdmap::Path &nearby_path);
+    ```
 
-  ```cpp
-        void SetParkAndGoEndPose(Frame *const frame);
-  ```
+    ```cpp
+          void SetParkAndGoEndPose(Frame *const frame);
+    ```
 
-  ```cpp
-        bool GetParkAndGoBoundary(Frame *const frame, const hdmap::Path &nearby_path,
-                              std::vector<std::vector<common::math::Vec2d>>
-                              *const roi_parking_boundary);
-  ```
-
+    ```cpp
+          bool GetParkAndGoBoundary(Frame *const frame, const hdmap::Path &nearby_path,
+                                std::vector<std::vector<common::math::Vec2d>>
+                                *const roi_parking_boundary);
+    ```
 2. By calling formulateboundaryconstraints function to gather vertice needed by warm start and distance approach, then transform vertices into the form of Ax > b;
 
 ```cpp
@@ -121,7 +118,6 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         const std::vector<std::vector<common::math::Vec2d>> &roi_parking_boundary,
         Frame *const frame);
 ```
-
 3. Return process status;
 
 4. Output: open space roi boundary and boundary constraints 
@@ -138,14 +134,12 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                                     ReferenceLineInfo* const reference_line_info,
                                     double* target_s);
     ```
-
     2. Base on ADC position, stop distance to target parking space and obstacle positon to set stop fence
       
     ```cpp
         void SetParkingSpotStopFence(const double target_s, Frame* const frame,
                                     ReferenceLineInfo* const reference_line_info);
     ```
-
   - IN PULL OVER STAGE (OpenSpacePreStopDeciderConfig::PULL_OVER)
     1. Same with parking stage, check pull over pre stop -> set pull over stop fence
 
@@ -159,7 +153,6 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         void SetPullOverStopFence(const double target_s, Frame* const frame,
                                 ReferenceLineInfo* const reference_line_info);
   ```
-
 2. Return process status
 
 3. Output: pre stop fence for open space planner
@@ -168,15 +161,12 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 1. Input: obstacles info \ vehicle info \ road info \ parking space info
 
 2. Based on the prdicted trajectory of obstacles, the bounding box info of obstacles in each time interval is obtained,then add into predicted_bounding_rectangles
-
 ```cpp
     void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles,
                                    std::vector<std::vector<common::math::Box2d>>&
                                    predicted_bounding_rectangles);
 ```
-
 3. Calling IsCollisonFreeTrajectory function to determine whether it will intersect with obstacles;
-
 ```cpp
     bool IsCollisionFreeTrajectory(
         const TrajGearPair& trajectory_pb,
@@ -184,9 +174,8 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         predicted_bounding_rectangles,
         size_t* current_idx, size_t* first_collision_idx);
 ```
-
 4. If ADC trajectroy is collision free, the chosen partitioned trajectory can be used directly, else a fallback trajectroy base on current partition trajectroy will be gererated;
-   The fallback trajectory leads ADC stop inside safety distance;
+The fallback trajectory leads ADC stop inside safety distance;
 
 5. Return process status    
 
