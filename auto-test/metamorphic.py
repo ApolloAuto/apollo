@@ -6,7 +6,7 @@ import os, sys
 obstacles_data = genfromtxt('/apollo/auto-test/data/obstacles.csv', delimiter=',')
 
 # check whether collision.csv exists, it should not exist if no collision is detected
-if (not os.path.isdir('/apollo/auto-test/data/collision.csv')):
+if (not os.path.exists('/apollo/auto-test/data/collision.csv')):
     print('No collision detected in the simulation!')
     sys.exit()
 
