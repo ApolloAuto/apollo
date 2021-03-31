@@ -21,6 +21,11 @@ def monitorCallback(monitorMessage):
 
         # extract the obstacle id from the message
         # need to consider when id has '_0' suffixes which cannot be convert to int directly
+        if ('_' in msg):
+            # find the index of of '_' in the msg
+            position = msg.find('_')
+            # drop the chars include and after '_' to get a proper int
+            msg = msg[:position]
         obstacle_id = int(msg.replace(collisionMessage, ''))
         obstacle = [obstacle_id]
         #print(obstacle_id)

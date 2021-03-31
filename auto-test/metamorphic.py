@@ -27,7 +27,7 @@ print("Total Round of Scenario: %d" % scenario_number)
 print("Number of Collision Detected: %d" % collision_size)
 print("General Collision Rate (#collision / #scenerio): %.4f%%" % (general_rate * 100))
 
-collision_analysis = np.array([[obstacles_data.size, scenario_number, collision_size, general_rate]])
+collision_analysis = np.array([[obstacles_data.shape[0], scenario_number, collision_size, general_rate]])
 with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
     np.savetxt(csv, collision_analysis, 
                fmt=['%d','%d','%d','%.6f'], 

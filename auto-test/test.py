@@ -1,8 +1,9 @@
 import numpy as np
 
-array = np.array([(1,0,0,0),
-                  (1,2,3,4),
-                  (1,1,1,1),
-                  (0,1,2,3)])
+msg = 'Hello World_0'
+print(msg)
+length = len(msg)
+position = msg.find('_')
 
-print(array[array[:,1] == 1])
+msg = msg[:position]
+print(msg)
