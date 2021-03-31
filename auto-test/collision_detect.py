@@ -37,6 +37,7 @@ def monitorCallback(monitorMessage):
         # need to remove redundant ids 
         # non-trivial in this script, temporarily implement id removal
         # in metamorphic.py and can be optimised later 
+    print('Process has not finish yet...')
 
 def listener():
     rospy.init_node('collision_detect', anonymous=True)
