@@ -45,9 +45,9 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
    4. If ADC is ready to cruise and reaches the end of trajectory, adjust stage is finished.
  
-     1. If steering percentage within the threshold, we switch to cruise stage.
+      1. If steering percentage within the threshold, we switch to cruise stage.
 
-     2. Otherwise we reset init position of ADC and switch to pre cruise stage.
+      2. Otherwise we reset init position of ADC and switch to pre cruise stage.
      ```cpp
           void ResetInitPostion();
      ```
@@ -88,6 +88,11 @@ All three scenarios contain specific stages, the function of scenarios are reali
    1. We run an on lane planning algorithms to approach pull over target position. 
 
    2. At first, we check path points data to see whether the s, l and theta error between ADC and the target path point within the threshold.
+      1. If so, the pull over status is set to PARK_COMPLETE.
+
+      2. Otherwise we add a stop fence for adc to pause at a better position.
+
+      3. However, if we can't find a suitable new stop fence, approach stage is finished and we switch to retry appoach parking stage. 
      ```cpp
           PullOverStatus CheckADCPullOverPathPoint(
                const ReferenceLineInfo& reference_line_info,
@@ -95,22 +100,17 @@ All three scenarios contain specific stages, the function of scenarios are reali
                const common::PathPoint& path_point,
                const PlanningContext* planning_context);
      ```
-          1. If so, the pull over status is set to PARK_COMPLETE.
-
-          2. Otherwise we add a stop fence for adc to pause at a better position.
-
-          3. However, if we can't find a suitable new stop fence, approach stage is finished and we switch to retry appoach parking stage. 
    3. Then we check whether adc parked properly.
-   ```cpp
+      1. If ADC pass the destination or park properly, approach stage is finished and pull over scenario is done.
+
+      2. If adc park failed, approach stage is finished and we switch to retry appoach parking stage.
+     ```cpp
         PullOverStatus CheckADCPullOver(
             const common::VehicleStateProvider* vehicle_state_provider,
             const ReferenceLineInfo& reference_line_info,
             const ScenarioPullOverConfig& scenario_config,
             const PlanningContext* planning_context);
-   ```
-           1. If ADC pass the destination or park properly, approach stage is finished and pull over scenario is done.
-
-           2. If adc park failed, approach stage is finished and we switch to retry appoach parking stage.
+     ```
 
 3. retry approach parking stage:
    1. We run an on lane planning algorithms to reach the stop line of open space planner.
