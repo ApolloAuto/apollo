@@ -173,9 +173,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         predicted_bounding_rectangles,
         size_t* current_idx, size_t* first_collision_idx);
 ```
-4. If ADC trajectroy is collision free, the chosen partitioned trajectory can be used directly, otherwise a fallback trajectroy base on current partition trajectroy will be gererated.
-   
-   The fallback trajectory leads ADC stop inside safety distance.
+4. If ADC trajectroy is collision free, the chosen partitioned trajectory can be used directly, otherwise a fallback trajectroy base on current partition trajectroy will be gererated, which leads ADC stop inside safety distance.
 
 5. Return process status.    
 

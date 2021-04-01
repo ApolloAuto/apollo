@@ -107,7 +107,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
  ```
     total_cost = w_acc * cost_acc + w_centri * cost_centri + w_collision * cost_collision
  ```
-     Note that, the collsion cost is calucalated by the distance between ADC and obstacles.
+Note that, the collsion cost is calucalated by the distance between ADC and obstacles.
  ```cpp
     double ComputeTrajectoryCost(
         const Obstacle& obstacle, const LaneSequence& lane_sequence,
