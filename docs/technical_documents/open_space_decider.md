@@ -8,7 +8,7 @@ Open space decider is used to process related infomation and provide information
 
 # Where is the code
 
-Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.cc)
+Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.cc).
 
 # Code Reading
 
@@ -52,10 +52,10 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                                 *const roi_parking_boundary);
     ```
     6. Get road boundary: it starts from parking space center line(center_line_s) and extends a distance(roi longitudinal range) to both sides along the s direction to get start_s and end_s. 
-    
-    Search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range. 
-    
-    Those key points and anchor points are called boundary points. The line segements between those points are called roi parking boundarys. 
+       
+       Search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range. 
+       
+       Those key points and anchor points are called boundary points. The line segements between those points are called roi parking boundarys. 
     
     ```cpp
         void GetRoadBoundary(
@@ -125,8 +125,8 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 
   - IN PARKING STAGE (OpenSpacePreStopDeciderConfig::PARKING)
     1. Check parking space info(parking spot id and parking spot points), fill those info into target_parking_spot_ptr. 
-    
-    Take the s info of parking space center line as target_s.
+       
+       Take the s info of parking space center line as target_s.
 
     ```cpp
         bool CheckParkingSpotPreStop(Frame* const frame,
@@ -165,7 +165,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                                    std::vector<std::vector<common::math::Box2d>>&
                                    predicted_bounding_rectangles);
 ```
-3. By calling ```IsCollisonFreeTrajectory``` to determine whether it will intersect with obstacles.
+3. By calling ```IsCollisonFreeTrajectory()``` to determine whether it will intersect with obstacles.
 ```cpp
     bool IsCollisionFreeTrajectory(
         const TrajGearPair& trajectory_pb,
@@ -174,8 +174,8 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         size_t* current_idx, size_t* first_collision_idx);
 ```
 4. If ADC trajectroy is collision free, the chosen partitioned trajectory can be used directly, otherwise a fallback trajectroy base on current partition trajectroy will be gererated.
-
-The fallback trajectory leads ADC stop inside safety distance.
+   
+   The fallback trajectory leads ADC stop inside safety distance.
 
 5. Return process status.    
 

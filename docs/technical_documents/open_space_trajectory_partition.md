@@ -8,13 +8,13 @@ Open space trajectory partition task is used to partition and optimize stiched t
 
 # Where is the code
 
-Please refer [open space trajectory parition](https://github.com/ApolloAuto/apollo/modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.cc)
+Please refer [open space trajectory parition](https://github.com/ApolloAuto/apollo/modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.cc).
 
 # Code Reading
 
 1. Input : stitched trajectory(without optimization) / vehicle position info.
 
-2. The interpolated trajectory is obtained by calling ```InterpolateTrajectory``` to increase stitched trajectory points.
+2. The interpolated trajectory is obtained by calling ```InterpolateTrajectory()``` to increase stitched trajectory points.
     ```cpp
     void InterpolateTrajectory(
         const DiscretizedTrajectory& stitched_trajectory_result,
@@ -28,7 +28,7 @@ Please refer [open space trajectory parition](https://github.com/ApolloAuto/apol
     ```
 4. If replan due to fallback stop, the position init staus will be set to false.
    
-   When replan success, we use ```AdjustRelativeTimeAndS``` to adjust partitioned trajectories obtained from step 3.
+   When replan success, we use ```AdjustRelativeTimeAndS()``` to adjust partitioned trajectories obtained from step 3.
     ```cpp
     void AdjustRelativeTimeAndS(
         const std::vector<TrajGearPair>& partitioned_trajectories,
@@ -50,11 +50,11 @@ Please refer [open space trajectory parition](https://github.com/ApolloAuto/apol
     ```
    3. To find the closest point on trajectory, a search range needed to be determined. It requires the distance between path end point and ADC enter point, the heading search difference and the head track difference all within the threshold.
 
-   Base on ADC box and path point box, the IOU(intersection over union) is computed for each path point in the search range. 
+      Base on ADC box and path point box, the IOU(intersection over union) is computed for each path point in the search range. 
 
-   If the IOU of the trajectory end point is bigger than threshold and partitioned trajectories group has other trajectory can be used, it means ADC reach the end of a trajectory, another trajectory to be used.
+      If the IOU of the trajectory end point is bigger than threshold and partitioned trajectories group has other trajectory can be used, it means ADC reach the end of a trajectory, another trajectory to be used.
 
-   Then update trajectory history to store which trajectory has been used.
+      Then update trajectory history to store which trajectory has been used.
     ```cpp
         bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
                                     const canbus::Chassis::GearPosition& gear,
@@ -71,17 +71,17 @@ Please refer [open space trajectory parition](https://github.com/ApolloAuto/apol
     ```
    4. When there is no need for ADC to switch to next trajectory, use IOU info mentioned above to find the closest trajectory point(the biggest IOU point) to follow.
 
-   5. If the closest trajectory point doesn't belong to current trajectory or couldn't find closest trajectory point due to some unnormal cases, we use ```UseFailSafeSearch``` to get a safe trajectory to follow.
+   5. If the closest trajectory point doesn't belong to current trajectory or couldn't find closest trajectory point due to some unnormal cases, we use ```UseFailSafeSearch()``` to get a safe trajectory to follow.
 
-   When using this function, we only care about distance between path end point and ADC enter point to find the search range, no more limitation on angle difference.
+      When using this function, we only care about distance between path end point and ADC enter point to find the search range, no more limitation on angle difference.
     ```cpp
         bool UseFailSafeSearch(
             const std::vector<TrajGearPair>& partitioned_trajectories,
             const std::vector<std::string>& trajectories_encodings,
             size_t* current_trajectory_index, size_t* current_trajectory_point_index);
     ```
-   6. If ```FLAGS_use_gear_shift_trajectory``` set to be true, a small part trajectory obtained by calling ```GenerateGearShiftTrajectory``` will be added to make vehicle moving smoothly during gear shifting.
-   Otherwise we use ```AdjustRelativeTimeAndS``` to adjust partitioned trajectory.
+   6. If ```FLAGS_use_gear_shift_trajectory()``` set to be true, a small part trajectory obtained by calling ```GenerateGearShiftTrajectory()``` will be added to make vehicle moving smoothly during gear shifting.
+   Otherwise we use ```AdjustRelativeTimeAndS()``` to adjust partitioned trajectory.
     ```cpp
         bool InsertGearShiftTrajectory(
             const bool flag_change_to_next, const size_t current_trajectory_index,

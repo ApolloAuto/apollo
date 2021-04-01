@@ -14,7 +14,7 @@ There are three scenairos, park and go, pull over and valet parking, which relat
 
 # Where is the code
 
-Please refer [park](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park/) & [park and go](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park_and_go/)
+Please refer [park](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park/) & [park and go](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park_and_go/).
 
 # Code Reading
 
@@ -25,7 +25,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
 2. check stage:
  
-   1. In check stage, by calling ```checkadcreadytocruise```to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements.
+   1. In check stage, by calling ```checkadcreadytocruise()```to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements.
    ```cpp
         bool CheckADCReadyToCruise(
             const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
@@ -41,7 +41,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
    ```
    2. Once position adjustment is done, we check whether ADC reaches the end of trajectory.
 
-   3. Then we check whether ADC is ready to cruise by calling ```CheckADCReadyToCruise```.
+   3. Then we check whether ADC is ready to cruise by calling ```CheckADCReadyToCruise()```.
 
    4. If ADC is ready to cruise and reaches the end of trajectory, adjust stage is finished.
  
@@ -88,13 +88,13 @@ All three scenarios contain specific stages, the function of scenarios are reali
    1. We run an on lane planning algorithms to approach pull over target position. 
 
    2. At first, we check path points data to see whether the s, l and theta error between ADC and the target path point within the threshold.
-   ```cpp
+     ```cpp
     PullOverStatus CheckADCPullOverPathPoint(
         const ReferenceLineInfo& reference_line_info,
         const ScenarioPullOverConfig& scenario_config,
         const common::PathPoint& path_point,
         const PlanningContext* planning_context);
-   ```
+     ```
        1. If so, the pull over status is set to PARK_COMPLETE.
 
        2. Otherwise we add a stop fence for adc to pause at a better position.
@@ -108,9 +108,9 @@ All three scenarios contain specific stages, the function of scenarios are reali
             const ScenarioPullOverConfig& scenario_config,
             const PlanningContext* planning_context);
    ```
-     1. If ADC pass the destination or park properly, approach stage is finished and pull over scenario is done.
+      1. If ADC pass the destination or park properly, approach stage is finished and pull over scenario is done.
 
-     2. If adc park failed, approach stage is finished and we switch to retry appoach parking stage.
+      2. If adc park failed, approach stage is finished and we switch to retry appoach parking stage.
 
 3. retry approach parking stage:
    1. We run an on lane planning algorithms to reach the stop line of open space planner.
