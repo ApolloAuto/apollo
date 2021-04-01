@@ -32,9 +32,9 @@ Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules
 # Code Reading
 
 ## Solcial interaction evaluator
-1. The evaluator uses social LSTM to predict short-term trajectroy for pedestrians with caution level. In the code, the evaluator is named by pedestrain interaction evalutor;
+1. The evaluator uses social LSTM to predict short-term trajectroy for pedestrians with caution level. In the code, the evaluator is named by pedestrain interaction evalutor.
 
-2. Extract features from obstacles;
+2. Extract features from obstacles.
 
     ```cpp 
     bool ExtractFeatures(const Obstacle* obstacle_ptr,
@@ -42,25 +42,25 @@ Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules
     ```
 
 3. Using social LSTM module to predict short-term trajectory by following steps:
-  - Get social embedding;
-  - Get position embedding;
-  - Conduct single LSTM and update hidden states;
+  - Get social embedding
+  - Get position embedding
+  - Conduct single LSTM and update hidden states
   - Get a predicted trajectory
 
 ## Semantic LSTM evaluator
-1. Get and process feature map by obstacles'id;
+1. Get and process feature map by obstacles'id.
 
-2. Build input features for torch;
+2. Build input features for torch.
 
-3. Get predicted trajectory with different parameters for different types of obstacles;
+3. Get predicted trajectory with different parameters for different types of obstacles.
 
 ## Junction map evaluator
-1. Only care about obstalces at intersections, to those obstacles are not closed to any junction exit cannot be evaluated by this evaluator; 
+1. Only care about obstalces at intersections. Obstacles are not closed to any junction exit cannot be evaluated by this evaluator. 
 
-2. Taking the obstacle as the center and the orientation as the reference direction, 12 fan-shaped areas are divided;
+2. Take the obstacle as the center and the orientation as the reference direction, 12 fan-shaped areas are divided.
   ![Diagram](images/prediction_evaluator_fig_1.png)
 
-3. Since the juction exit is associated with these 12 fan-shaped areas, the probability can be calculated by solving the fan-shaped areas classification problem;
+3. Since the juction exit is associated with these 12 fan-shaped areas, the probability can be calculated by solving the fan-shaped areas classification problem.
 
 4. Assign all lane sequence probability.
 
