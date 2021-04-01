@@ -1,6 +1,4 @@
-# Title(replace it)
-
-_**Tip**: to read the equations in the document, you are recommended to use Chrome with [a plugin](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn) or copy the latex equation to [an online editor](http://www.hostmath.com/)_
+# Planning Piecewise Jerk Nonlinear Speed Optimizer Introduction
 
 # Introduction
 
