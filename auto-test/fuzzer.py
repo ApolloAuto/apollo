@@ -7,30 +7,29 @@ from pb_msgs.msg import PerceptionObstacles
 # calculate the tansformed coordinates of x and y
 # according to the angle and distance between center to origin
 def transform(x, y, angle, x_center, y_center, compress_x_y):
-	# first translate to the origin
-	x = x - x_center
-	y = y - y_center
+    # first translate to the origin
+    x = x - x_center
+    y = y - y_center
 	
-	# compress the width of the region
-	if (compress_x_y == 0):
-		x = 0.3 * x
-	if (compress_x_y == 1):
-		y = 0.3 * y
+    # compress the width of the region
+    if (compress_x_y == 0):
+        x = 0.3 * x
+    if (compress_x_y == 1):
+        y = 0.3 * y
 
-	# apply rotation
-	x = x * cos(angle) - y * sin(angle)
-	y = x * sin(angle) + y * cos(angle)
+    # apply rotation
+    x = x * cos(angle) - y * sin(angle)
+    y = x * sin(angle) + y * cos(angle)
 
-	# translate back to the previous position
-	x_transform = x + x_center
-	y_transform = y + y_center
+    # translate back to the previous position
+    x_transform = x + x_center
+    y_transform = y + y_center
 
-	return x_transform, y_transform
+    return x_transform, y_transform
 	
 
 def talker():
-    pub = rospy.Publisher('/apollo/perception/obstacles',
-                          PerceptionObstacles, queue_size=10)
+    pub = rospy.Publisher('/apollo/perception/obstacles', PerceptionObstacles, queue_size=10)
 
     rospy.init_node('talker', anonymous=True)
     # define the frequency of refresh (Hz)
@@ -66,15 +65,15 @@ def talker():
     if abs(start_x-end_x) > abs(start_y-end_y):
     	compress = 1
     	angle = arctan(tan_value)
-		# negate the angle if counter-clockwise
+        # negate the angle if counter-clockwise
         if (start_x-end_x)*(start_y-end_y) < 0:
-			angle = -angle;
+            angle = -angle;
     else:
     	compress = 0
         angle = arctan(1/tan_value)
-		# negate the angle if counter-clockwise
+        # negate the angle if counter-clockwise
         if (start_x-end_x)*(start_y-end_y) > 0:
-			angle = -angle;
+            angle = -angle;
 
     # determine whether the 	
 	
@@ -101,8 +100,8 @@ def talker():
             # randomly assign x and y coordinates to the obstacle
             x = random.uniform(bound_left, bound_right)
             y = random.uniform(bound_down, bound_up)
-
-	        # apply transformation to fit the region to the routing
+			
+            # apply transformation to fit the region to the routing
             x_, y_ = transform(x, y, angle, center_x, center_y, compress)
 	   
             msg.position.x = x_
@@ -126,18 +125,18 @@ def talker():
             obstacle_data = np.array([[msg.id, scenario_id, msg.position.x, msg.position.y,
                              msg.position.z, msg.theta, msg.length, msg.width, msg.height, msg.type]])
 	    
-			# the reason why obstacle_data is a 2D array is that using a 1D array will insert a column of data 
-			# to the file rather than a row. Thus, this is a hack to fix the bug.
+            # the reason why obstacle_data is a 2D array is that using a 1D array will insert a column of data 
+            # to the file rather than a row. Thus, this is a hack to fix the bug.
 				
-			# add new obstacle data into the csv file
+            # add new obstacle data into the csv file
             with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
-				np.savetxt(csv, obstacle_data, fmt = ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], delimiter=',')
+                np.savetxt(csv, obstacle_data, fmt = ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], delimiter=',')
 
-			# define the velocity of the obstacle
-			# msg.velocity.x = 5
-			# msg.velocity.y = 5
+            # define the velocity of the obstacle
+            # msg.velocity.x = 5
+            # msg.velocity.y = 5
 
-		# increment the scenario counter
+        # increment the scenario counter
         scenario_id = scenario_id + 1
 
         # publish the obstacles to ROS topic '/apollo/perception/obstacles'
