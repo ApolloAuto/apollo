@@ -231,19 +231,22 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 ### （1）轨迹平滑
 
 ![平滑](../images/task/piecewise_jerk_path/smooth.png)
-
+<div>
 $$
-min \sum_{k=1}^{n-2} ||2P_k - P_{k-1} + P_{k+1}||_2^2 +\\
-\sum_{k=0}^{n-1} ||2P_k - P_{k-ref}||_2^2 +\\
+min \sum_{k=1}^{n-2} ||2P_k - P_{k-1} + P_{k+1}||_2^2 +
+\sum_{k=0}^{n-1} ||2P_k - P_{k-ref}||_2^2 +
 \sum_{k=0}^{n-2} ||P_{k+1} - P_k||_2^2
 $$
+<div>
 
 subject to:
+<div>
 $$
 P_k \in B, for: k = 0,...,n-1 \\
-||2P_k - P_{k-1} - P_{k+1}||_2 < \frac{d_{ref}^2}{R_{min}} \\
+||2P_k - P_{k-1} - P_{k+1}||_2 < \frac{d_{ref}^2}{R_{min}} 
 for: k=1,...,n-2 
 $$
+ <div>
 
 其中
 - $P_k$是$(x_k, y_k)$
@@ -264,14 +267,16 @@ $$
 ### （3）约束条件
 
 - 连续性约束
-
+- 
+<div>
 $$
 l_{i+1}^{'''} = l_i^{''} + \int_0^{\Delta{s}} l_{i\rightarrow{i+1}}^{'''} ds = l_i^{''} + l_{i\rightarrow{i+1}}^{'''} * \Delta{s} \\
 l_{i+1}^{'} = l_i^{'} + \int_0^{\Delta{s}}l^{''}(s)ds = l_i^{'} + l_i^{''}*\Delta{s} + \frac{1}{2} * l_{i\rightarrow{i+1}}^{'''} * \Delta{s^2} \\
 l_{i+1} = l_i + \int_0^{\Delta{s}}l^{'}(s)ds \\
 = l_i + l_i^{'}*\Delta(s^2) + \frac{1}{6}*l_{i\rightarrow{i+1}}*\Delta{s^3}
 $$
-
+<div>
+  
 - 安全性约束
 
 $l$方向的点需要在边界内。
@@ -284,8 +289,10 @@ $$
 
 自车的转角不能超过最大转角。
 
+<div>
 $$
 tan(\alpha_{max})*k_r*l - tan(\alpha_{max}) + |k_r|*L \leqslant 0
 $$
-
+<div>
+  
 优化方法采用[OSQP](https://osqp.org/)方法。
