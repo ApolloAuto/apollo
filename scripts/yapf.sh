@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2020 The Apollo Authors. All Rights Reserved.
+# Copyright 2021 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 ###############################################################################
 
 # Usage:
-#   autopep8.sh <path/to/src/dir/or/files>
+#   yapf.sh <path/to/python/dir/or/files>
 
 # Fail on error
 set -e
@@ -25,27 +25,26 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
-AUTOPEP8_CMD="autopep8"
-
-function check_autopep8() {
-  if [ -z "$(command -v autopep8)" ]; then
-    error "Oops, autopep8 missing..."
-    error "Please make sure autopep8 is installed and check your PATH" \
+function check_yapf() {
+  if [ -z "$(command -v yapf)" ]; then
+    error "Oops, yapf missing..."
+    error "Please make sure yapf is installed and check your PATH" \
       "settings. For Debian/Ubuntu, you can run the following command:"
-    error "  sudo pip install --upgrade --no-cache-dir autopep8"
+    error "  sudo pip3 install --upgrade --no-cache-dir yapf"
     exit 1
   fi
 }
 
-function autopep8_run() {
-  ${AUTOPEP8_CMD} -i "$@"
+function yapf_run() {
+  # TODO(storypku): yapf has a '--recursive' option.
+  yapf -i --style='{based_on_style: google}' "$@"
 }
 
-function run_autopep8() {
+function run_yapf() {
   for target in "$@"; do
     if [ -f "${target}" ]; then
       if py_ext "${target}"; then
-        autopep8_run "${target}"
+        yapf_run "${target}"
         info "Done formatting ${target}"
       else
         warning "Do nothing. ${target} is not a Python file."
@@ -57,21 +56,21 @@ function run_autopep8() {
         warning "Do nothing. No Python files found under ${target} ."
         continue
       fi
-      autopep8_run ${srcs}
+      yapf_run ${srcs}
       ok "Done formatting Python files under ${target}"
     fi
   done
 }
 
 function main() {
-  check_autopep8
+  check_yapf
 
   if [ "$#" -eq 0 ]; then
-    error "Usage: $0 <path/to/dirs/or/files>"
+    error "Usage: $0 <path/to/python/dirs/or/files>"
     exit 1
   fi
 
-  run_autopep8 "$@"
+  run_yapf "$@"
 }
 
 main "$@"
