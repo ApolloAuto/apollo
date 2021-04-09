@@ -37,14 +37,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "hermite_spline",
-    hdrs = [
-        "hermite_spline.h",
-    ],
-    deps = [
-        "//modules/common:log",
-    ],
-)
-
 cpplint()

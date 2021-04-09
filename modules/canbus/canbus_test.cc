@@ -21,8 +21,6 @@
 namespace apollo {
 namespace canbus {
 
-using apollo::common::ErrorCode;
-
 TEST(CanbusTest, Simple) {
   Canbus cb;
   EXPECT_EQ(cb.Name(), "canbus");

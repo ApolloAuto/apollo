@@ -42,8 +42,10 @@ void MonitorLogger::Publish(const std::vector<MessageItem> &messages) const {
 }
 
 void MonitorLogger::DoPublish(MonitorMessage *message) const {
-  DCHECK(AdapterManager::Initialized())
+  CHECK(AdapterManager::Initialized())
       << "AdapterManager must be initialized before using monitor.";
+  CHECK(AdapterManager::GetMonitor() != nullptr)
+      << "Must register monitor in AdapterManager config.";
   AdapterManager::FillMonitorHeader("monitor", message);
   AdapterManager::PublishMonitor(*message);
 }

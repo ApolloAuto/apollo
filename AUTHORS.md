@@ -30,3 +30,6 @@
 | zhoudawen | David Zhou |
 | aiguo159 | Aiguo Fei |
 | unacao | Yu Cao |
+| HongyiSun | Hongyi Sun |
+| JasonZhou404 | Jinyun Zhou |
+| JasonXu12 | Jiaxuan Xu |

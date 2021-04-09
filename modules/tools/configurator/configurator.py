@@ -21,6 +21,8 @@ Tool to modify configuration files
 import curses
 import os
 import traceback
+import six
+from six.moves import xrange  # pylint: disable=redefined-builtin
 
 from ModuleConf import ModuleConf
 

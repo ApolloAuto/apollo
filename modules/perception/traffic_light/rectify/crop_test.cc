@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/traffic_light/rectify/cropbox.h"
 
 #include "gtest/gtest.h"
-#include "modules/perception/traffic_light/rectify/cropbox.h"
 
 namespace apollo {
 namespace perception {
@@ -24,18 +24,16 @@ namespace traffic_light {
 class CropBoxTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    _crop_scale = 3;
-    _min_crop_size = 270;
-    _crop_local = new CropBox(_crop_scale, _min_crop_size);
+    crop_scale_ = 3;
+    min_crop_size_ = 270;
+    crop_local_ = new CropBox(crop_scale_, min_crop_size_);
   }
-  ~CropBoxTest() {
-    delete (_crop_local);
-  }
+  ~CropBoxTest() { delete (crop_local_); }
 
  protected:
-  IGetBox *_crop_local;
-  float _crop_scale;
-  int _min_crop_size;
+  IGetBox *crop_local_;
+  float crop_scale_;
+  int min_crop_size_;
 };
 
 TEST_F(CropBoxTest, crop0) {
@@ -44,7 +42,7 @@ TEST_F(CropBoxTest, crop0) {
   hd_box[0]->region.projection_roi = cv::Rect(1920, 1080, 21, 177);
   cv::Size size(1920, 1080);
   cv::Rect cbox;
-  _crop_local->GetCropBox(size, hd_box, &cbox);
+  crop_local_->GetCropBox(size, hd_box, &cbox);
   cv::Rect rect(0, 0, 0, 0);
   ASSERT_TRUE(rect == cbox);
 }
@@ -55,12 +53,12 @@ TEST_F(CropBoxTest, crop1) {
   hd_box[0]->region.projection_roi = cv::Rect(1898, 798, 21, 177);
   cv::Size size(1920, 1080);
   cv::Rect cbox;
-  _crop_local->GetCropBox(size, hd_box, &cbox);
+  crop_local_->GetCropBox(size, hd_box, &cbox);
   cv::Rect rect(1643, 621, 276, 458);
   ASSERT_TRUE(rect == cbox) << rect << cbox;
 
   hd_box[0]->region.projection_roi = cv::Rect(1011, 503, 21, 177);
-  _crop_local->GetCropBox(size, hd_box, &cbox);
+  crop_local_->GetCropBox(size, hd_box, &cbox);
   rect = cv::Rect(756, 326, 531, 531);
   ASSERT_TRUE(rect == cbox) << rect << cbox;
 }
@@ -73,10 +71,11 @@ TEST_F(CropBoxTest, crop2) {
   hd_box[1]->region.projection_roi = cv::Rect(1620, 743, 27, 192);
   cv::Size size(1920, 1080);
   cv::Rect cbox;
-  _crop_local->GetCropBox(size, hd_box, &cbox);
+  crop_local_->GetCropBox(size, hd_box, &cbox);
   cv::Rect rect(1231, 527, 624, 552);
   ASSERT_TRUE(rect == cbox) << rect << cbox;
 }
+
 }  // namespace traffic_light
 }  // namespace perception
 }  // namespace apollo

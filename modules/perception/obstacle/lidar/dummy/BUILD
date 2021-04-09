@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_lidar_dummy",
+    name = "dummy",
     srcs = [
         "dummy_algorithms.cc",
     ],
@@ -12,10 +12,11 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "//modules/perception/obstacle/lidar/interface:perception_obstacle_lidar_interface",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "//modules/perception/common/sequence_type_fuser",
+        "//modules/perception/obstacle/common",
+        "//modules/perception/obstacle/lidar/interface",
+        "@eigen",
+        "@pcl",
     ],
 )
 

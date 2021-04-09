@@ -8,6 +8,7 @@ cc_library(
     defines = ["PCL_NO_PRECOMPILE"],
     includes = ["."],
     linkopts = [
+        "-L/usr/local/lib",
         "-lboost_system",
         "-lpcl_common",
         "-lpcl_features",

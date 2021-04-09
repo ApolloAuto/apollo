@@ -92,8 +92,8 @@ void QuarticPolynomialCurve1d::ComputeCoefficients(
   double p2 = p * p;
   double p3 = p2 * p;
 
-  coef_[3] = b0 / p2 - b1 / 3.0 / p;
-  coef_[4] = -0.5 / p3 * b0 + 0.25 / p2 * b1;
+  coef_[3] = (3 * b0 - b1 * p) / (3 * p2);
+  coef_[4] = (-2 * b0 + b1 * p) / (4 * p3);
 }
 
 std::string QuarticPolynomialCurve1d::ToString() const {

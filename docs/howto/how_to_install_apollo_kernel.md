@@ -1,6 +1,6 @@
 # Installing the Apollo Kernel
 ## Helpful hints before you begin
-* The Apollo runtime in the vehicle requires the Apollo Kernel. You are strongly recommended to install the pre-built kernel.
+* The Apollo runtime environment in the vehicle requires the Apollo Kernel. You are strongly recommended to install the pre-built kernel.
 
 ## Installing Apollo Kernel
 
@@ -10,5 +10,5 @@ https://github.com/ApolloAuto/apollo-kernel/releases
     * ```tar zxvf linux-4.4.32-apollo-1.5.0.tar.gz```
     * ```cd install```
     * ```sudo bash install_kernel.sh```
-3.  Reboot your system by the reboot command
-4.  After rebooting, build the ESD CAN driver source code. How to build the ESD CAN driver source code can be found at [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
+3.  Reboot your system using the reboot command
+4.  After rebooting, build the ESD CAN driver source code. Resources to build the ESD CAN driver source code can be found here: [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)

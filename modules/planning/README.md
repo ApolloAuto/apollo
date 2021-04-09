@@ -24,4 +24,4 @@
     * routing
 
 ## Output
-  * A collision-free and comfortable trajectory for control module to execute.
+  * A collision-free and comfortable trajectory for the control module to execute.

@@ -18,12 +18,15 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_OBJECT_TRACK_H_
 
 #include <deque>
+#include <memory>
 #include <queue>
 #include <string>
 #include <vector>
 
 #include "Eigen/Core"
 #include "boost/shared_ptr.hpp"
+
+#include "modules/perception/proto/tracker_config.pb.h"
 
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -35,92 +38,88 @@ namespace perception {
 
 class ObjectTrack {
  public:
-  explicit ObjectTrack(TrackedObjectPtr obj);
+  explicit ObjectTrack(std::shared_ptr<TrackedObject> obj);
   ~ObjectTrack();
 
-  // @brief set filter method for all the object track objects
-  // @params[IN] filter_method: method name of filtering algorithm
-  // @return true if set successfully, otherwise return false
-  static bool SetFilterMethod(const std::string& filter_method_name);
-
   // @brief set track cached history size maximum
-  // @params[IN] track_cached_history_size_maximum: track cached history size
+  // @param[IN] track_cached_history_size_maximum: track cached history size
   // maximum
   // @return true if set successfully, otherwise return false
   static bool SetTrackCachedHistorySizeMaximum(
-      const int& track_cached_history_size_maximum);
+      const int track_cached_history_size_maximum);
 
   // @brief set acceleration noise maximum
-  // @params[IN] acceleration_noise_maximum: acceleration noise maximum
+  // @param[IN] acceleration_noise_maximum: acceleration noise maximum
   // @return true if set successfully, otherwise return false
   static bool SetAccelerationNoiseMaximum(
-      const double& acceleration_noise_maximum);
+      const double acceleration_noise_maximum);
 
   // @brief set speed noise maximum
-  // @params[IN] speed noise maximum: speed noise maximum
+  // @param[IN] speed noise maximum: speed noise maximum
   // @return true if set successfully, otherwise return false
-  static bool SetSpeedNoiseMaximum(const double& speed_noise_maximum);
+  static bool SetSpeedNoiseMaximum(const double speed_noise_maximum);
 
-  // @brief get next avaiable track id
-  // @return next avaiable track id
+  // @brief get next available track id
+  // @return next available track id
   static int GetNextTrackId();
 
   // @brief predict the state of track
-  // @params[IN] time_diff: time interval for predicting
+  // @param[IN] time_diff: time interval for predicting
   // @return predicted states of track
-  Eigen::VectorXf Predict(const double& time_diff);
+  Eigen::VectorXf Predict(const double time_diff);
 
   // @brief update track with object
-  // @params[IN] new_object: recent detected object for current updating
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] new_object: recent detected object for current updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithObject(TrackedObjectPtr* new_object, const double& time_diff);
+  void UpdateWithObject(std::shared_ptr<TrackedObject>* new_object,
+                        const double time_diff);
 
   // @brief update track without object
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
-  void UpdateWithoutObject(const double& time_diff);
+  void UpdateWithoutObject(const double time_diff);
 
   // @brief update track without object with given predicted state
-  // @params[IN] predict_state: given predicted state of track
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] predict_state: given predicted state of track
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
   void UpdateWithoutObject(const Eigen::VectorXf& predict_state,
-                           const double& time_diff);
+                           const double time_diff);
 
  protected:
   // @brief smooth velocity over track history
-  // @params[IN] new_object: new detected object for updating
-  // @params[IN] time_diff: time interval from last updating
+  // @param[IN] new_object: new detected object for updating
+  // @param[IN] time_diff: time interval from last updating
   // @return nothing
-  void SmoothTrackVelocity(const TrackedObjectPtr& new_object,
-                           const double& time_diff);
+  void SmoothTrackVelocity(const std::shared_ptr<TrackedObject>& new_object,
+                           const double time_diff);
 
   // @brief smooth orientation over track history
   // @return nothing
   void SmoothTrackOrientation();
 
   // @brief check whether track is static or not
-  // @params[IN] new_object: new detected object just updated
-  // @params[IN] time_diff: time interval between last two updating
+  // @param[IN] new_object: new detected object just updated
+  // @param[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
-  bool CheckTrackStaticHypothesis(const ObjectPtr& new_object,
-                                  const double& time_diff);
+  bool CheckTrackStaticHypothesis(const std::shared_ptr<Object>& new_object,
+                                  const double time_diff);
 
   // @brief sub strategy of checking whether track is static or not via
   // considering the velocity angle change
-  // @params[IN] new_object: new detected object just updated
-  // @params[IN] time_diff: time interval between last two updating
+  // @param[IN] new_object: new detected object just updated
+  // @param[IN] time_diff: time interval between last two updating
   // @return true if track is static, otherwise return false
   bool CheckTrackStaticHypothesisByVelocityAngleChange(
-      const ObjectPtr& new_object, const double& time_diff);
+      const std::shared_ptr<Object>& new_object, const double time_diff);
 
  private:
   ObjectTrack();
 
  public:
   // algorithm setup
-  static FilterType s_filter_method_;
+  static tracker_config::ModelConfigs::FilterType s_filter_method_;
   BaseFilter* filter_;
 
   // basic info
@@ -130,10 +129,10 @@ class ObjectTrack {
   int consecutive_invisible_count_;
   double period_;
 
-  TrackedObjectPtr current_object_;
+  std::shared_ptr<TrackedObject> current_object_;
 
   // history
-  std::deque<TrackedObjectPtr> history_objects_;
+  std::deque<std::shared_ptr<TrackedObject>> history_objects_;
 
   // states
   // NEED TO NOTICE: All the states would be collected mainly based on states
@@ -163,42 +162,34 @@ class ObjectTrackSet {
   ~ObjectTrackSet();
 
   // @brief set track consecutive invisible maximum
-  // @params[IN] track_consecutive_invisible_maximum: track consecutive
+  // @param[IN] track_consecutive_invisible_maximum: track consecutive
   // invisible maximum
   // @return true if set successfully, otherwise return false
   static bool SetTrackConsecutiveInvisibleMaximum(
-      const int& track_consecutive_invisible_maximum);
+      const int track_consecutive_invisible_maximum);
 
   // @brief set track visible ratio minimum
-  // @params[IN] track_visible_ratio_minimum: track visible ratio minimum
+  // @param[IN] track_visible_ratio_minimum: track visible ratio minimum
   // @return true if set successfully, otherwise return false
   static bool SetTrackVisibleRatioMinimum(
-      const float& track_visible_ratio_minimum);
+      const float track_visible_ratio_minimum);
 
   // @brief get maintained tracks
   // @return maintained tracks
-  inline std::vector<ObjectTrackPtr>& GetTracks() {
-    return tracks_;
-  }
+  std::vector<ObjectTrackPtr>& GetTracks() { return tracks_; }
 
   // @brief get maintained tracks
   // @return maintained tracks
-  inline const std::vector<ObjectTrackPtr>& GetTracks() const {
-    return tracks_;
-  }
+  const std::vector<ObjectTrackPtr>& GetTracks() const { return tracks_; }
 
   // @brief get size of maintained tracks
   // @return size of maintained tracks
-  inline int Size() const {
-    return tracks_.size();
-  }
+  int Size() const { return tracks_.size(); }
 
   // @brief add track to current set of maintained tracks
-  // @params[IN] track: adding track
+  // @param[IN] track: adding track
   // @return nothing
-  void AddTrack(const ObjectTrackPtr& track) {
-    tracks_.push_back(track);
-  }
+  void AddTrack(ObjectTrackPtr track) { tracks_.push_back(track); }
 
   // @brief remove lost tracks
   // @return number of removed tracks

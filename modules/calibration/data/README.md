@@ -13,9 +13,8 @@ For a well functioning vehicle, generally you need the following config files:
       - velodyne64_novatel_extrinsics_example.yaml
   - start_velodyne.launch     # Velodyne launch file for ROS.
   - gnss_params               # Params for GNSS
-      - gnss_conf_mkz.txt     # GNSS config file
-      - gnss_driver.launch    # GNSS launch file for ROS.
+      - gnss_conf.pb.txt     # GNSS config file
 ```
 
 Take mkz8 as an example, but don't forget to fill the rtk_from.ntrip in
-gnss_params/gnss_conf_mkz.txt.
+gnss_params/gnss_conf.pb.txt.

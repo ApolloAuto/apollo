@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- start nodelet manager and load driver nodelet -->
+  <node pkg="nodelet" type="nodelet"
+    name="lslidar_nodelet_manager"
+    args="manager" output="screen"/>
+
+  <node pkg="nodelet" type="nodelet"
+    name="lslidar_driver_nodelet"
+    args="load lslidar_driver/LslidarDriverNodelet
+    lslidar_nodelet_manager" >
+    <param name="frame_id" value="lslidar"/>
+    <param name="device_ip" value="192.168.1.200"/>
+  </node>
+
+</launch>

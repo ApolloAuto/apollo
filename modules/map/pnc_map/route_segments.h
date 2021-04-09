@@ -31,7 +31,7 @@
 #include "gflags/gflags.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
@@ -150,6 +150,9 @@ class RouteSegments : public std::vector<LaneSegment> {
   bool IsOnSegment() const;
   void SetIsOnSegment(bool on_segment);
 
+  bool IsNeighborSegment() const;
+  void SetIsNeighborSegment(bool is_neighbor);
+
   void SetId(const std::string &id);
   const std::string &Id() const;
 
@@ -186,6 +189,9 @@ class RouteSegments : public std::vector<LaneSegment> {
   static bool WithinLaneSegment(const LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
 
+  static bool WithinLaneSegment(const LaneSegment &lane_segment,
+                                const routing::LaneWaypoint &waypoint);
+
   static bool WithinLaneSegment(const routing::LaneSegment &lane_segment,
                                 const LaneWaypoint &waypoint);
 
@@ -206,6 +212,12 @@ class RouteSegments : public std::vector<LaneSegment> {
    * Indicates whether the vehicle is on current RouteSegment.
    **/
   bool is_on_segment_ = false;
+
+  /**
+   * Indicates whether current routeSegment is the neighbor of vehicle
+   * routeSegment.
+   **/
+  bool is_neighbor_ = false;
 
   routing::ChangeLaneType next_action_ = routing::FORWARD;
 

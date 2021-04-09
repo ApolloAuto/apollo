@@ -1,29 +1,32 @@
 import { observable, action, computed } from "mobx";
 
 import PARAMETERS from "store/config/parameters.yml";
+import MENU_DATA from 'store/config/MenuData';
 
 export default class Options {
     // Side Bar options
     @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
     @observable showMenu = PARAMETERS.options.defaults.showMenu;
-    @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
     @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
     @observable showPOI = PARAMETERS.options.defaults.showPOI;
+    @observable enableAudioCapture = PARAMETERS.options.defaults.enableAudioCapture;
+    @observable showDataRecorder = PARAMETERS.options.defaults.showDataRecorder;
     @observable showVideo = PARAMETERS.options.defaults.showVideo;
     @observable showTasks =
         OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showTasks;
 
-    mutuallyExclusiveOptions = ['showTasks', 'showModuleController',
-        'showMenu', 'showRouteEditingBar'];
 
     // Layer Menu options
+    @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
     @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
     @observable showDecisionObstacle = PARAMETERS.options.defaults.showDecisionObstacle;
     @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
+    @observable showPlanningCar = PARAMETERS.options.defaults.showPlanningCar;
     @observable showPlanningReference = PARAMETERS.options.defaults.showPlanningReference;
-    @observable showPlaningDpOptimizer = PARAMETERS.options.defaults.showPlaningDpOptimizer;
+    @observable showPlanningDpOptimizer = PARAMETERS.options.defaults.showPlanningDpOptimizer;
     @observable showPlanningQpOptimizer = PARAMETERS.options.defaults.showPlanningQpOptimizer;
     @observable showRouting = PARAMETERS.options.defaults.showRouting;
+    @observable showPerceptionLaneMarker = PARAMETERS.options.defaults.showPerceptionLaneMarker;
     @observable showPredictionMajor = PARAMETERS.options.defaults.showPredictionMajor;
     @observable showPredictionMinor = PARAMETERS.options.defaults.showPredictionMinor;
     @observable showObstaclesVehicle = PARAMETERS.options.defaults.showObstaclesVehicle;
@@ -37,26 +40,52 @@ export default class Options {
         PARAMETERS.options.defaults.showObstaclesUnknown;
     @observable showObstaclesVirtual =
         PARAMETERS.options.defaults.showObstaclesVirtual;
+    @observable showObstaclesCipv =
+        PARAMETERS.options.defaults.showObstaclesCipv;
     @observable showObstaclesVelocity =
         PARAMETERS.options.defaults.showObstaclesVelocity;
     @observable showObstaclesHeading =
         PARAMETERS.options.defaults.showObstaclesHeading;
     @observable showObstaclesId =
         PARAMETERS.options.defaults.showObstaclesId;
-    @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
+    @observable showObstaclesInfo =
+        PARAMETERS.options.defaults.showObstaclesInfo;
+    @observable showPointCloud = PARAMETERS.options.defaults.showPointCloud;
+    @observable showPositionGps = PARAMETERS.options.defaults.showPositionGps;
+    @observable showPositionLocalization = PARAMETERS.options.defaults.showPositionLocalization;
+    @observable showMapCrosswalk = PARAMETERS.options.defaults.showMapCrosswalk;
+    @observable showMapClearArea = PARAMETERS.options.defaults.showMapClearArea;
+    @observable showMapJunction = PARAMETERS.options.defaults.showMapJunction;
+    @observable showMapLane = PARAMETERS.options.defaults.showMapLane;
+    @observable showMapRoad = PARAMETERS.options.defaults.showMapRoad;
+    @observable showMapSignal = PARAMETERS.options.defaults.showMapSignal;
+    @observable showMapStopSign = PARAMETERS.options.defaults.showMapStopSign;
 
-    @observable hideOptions = {
+    // Others
+    @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
+    @observable simControlEnabled = PARAMETERS.options.defaults.enableSimControl;
+    @observable tasksPanelLocked = false;
+
+    @observable hideOptionToggle = {
+        'planningCar': true,
         'planningQpOptimizer': true,
-        'planingDpOptimizer': true,
+        'planningDpOptimizer': true,
         'planningReference': true,
+        'perceptionPointCloud': OFFLINE_PLAYBACK,
+        'perceptionLaneMarker': OFFLINE_PLAYBACK,
     };
 
+    cameraAngleNames = null;
+    mainSideBarOptions = ['showTasks', 'showModuleController',
+        'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
+    secondarySideBarOptions = ['showPOI', 'enableAudioCapture'];
 
     @computed get showTools() {
         return this.showTasks ||
                this.showModuleController ||
                this.showMenu ||
-               this.showPOI;
+               this.showPOI ||
+               this.showDataRecorder;
     }
 
     @computed get showGeo() {
@@ -66,12 +95,12 @@ export default class Options {
                this.cameraAngle === 'Monitor';
     }
 
-    @action toggleSideBar(option) {
+    @action toggle(option) {
         this[option] = !this[option];
 
         // Disable other mutually exclusive options
-        if (this[option] && this.mutuallyExclusiveOptions.includes(option)) {
-            for (const other of this.mutuallyExclusiveOptions) {
+        if (this[option] && this.mainSideBarOptions.includes(option)) {
+            for (const other of this.mainSideBarOptions) {
                 if (other !== option) {
                     this[other] = false;
                 }
@@ -79,17 +108,49 @@ export default class Options {
         }
 
         if (option === "showPNCMonitor") {
-            this.hideOptions['planningQpOptimizer'] = !this[option];
-            this.hideOptions['planingDpOptimizer'] = !this[option];
-            this.hideOptions['planningReference'] = !this[option];
+            Object.keys(this.hideOptionToggle).map((toggle) => {
+                if (toggle.startsWith("planning")) {
+                    this.hideOptionToggle[toggle] = !this[option];
+                }
+            });
         }
     }
 
-    @action toggle(option) {
-        this[option] = !this[option];
+    isSideBarButtonDisabled(option, enableHMIButtonsOnly, inNavigationMode) {
+        if (!this.mainSideBarOptions.includes(option) &&
+            !this.secondarySideBarOptions.includes(option)) {
+            console.warn(`Disable logic for ${option} is not defined, return false.`);
+            return false;
+        }
+
+        if (option === "showTasks" ||
+            option === "showModuleController" ||
+            option === "enableAudioCapture"
+        ) {
+            return false;
+        } else if (option === "showRouteEditingBar") {
+            return enableHMIButtonsOnly || inNavigationMode;
+        } else if (option === "showPOI") {
+            return enableHMIButtonsOnly || this.showRouteEditingBar;
+        } else {
+            return enableHMIButtonsOnly;
+        }
     }
 
-    @action selectCamera(option) {
-        this.cameraAngle = option;
+    rotateCameraAngle() {
+        if (!this.cameraAngleNames) {
+            const cameraData = MENU_DATA.find(data => {
+                return data.id === "camera";
+            });
+            this.cameraAngleNames = Object.values(cameraData.data);
+        }
+
+        const currentIndex = this.cameraAngleNames.findIndex(name => name === this.cameraAngle);
+        const nextIndex = (currentIndex + 1) % this.cameraAngleNames.length;
+        this.selectCamera(this.cameraAngleNames[nextIndex]);
+    }
+
+    @action selectCamera(angleName) {
+        this.cameraAngle = angleName;
     }
 }

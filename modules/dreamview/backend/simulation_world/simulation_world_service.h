@@ -25,6 +25,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "gtest/gtest_prod.h"
 
@@ -36,6 +37,7 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -70,22 +72,25 @@ class SimulationWorldService {
    * @brief Get a read-only view of the SimulationWorld.
    * @return Constant reference to the SimulationWorld object.
    */
-  inline const SimulationWorld &world() const {
-    return world_;
-  }
+  inline const SimulationWorld &world() const { return world_; }
 
   /**
    * @brief Returns the json representation of the SimulationWorld object.
+   *        This is a public API used by offline dreamview.
    * @param radius the search distance from the current car location
    * @return Json object equivalence of the SimulationWorld object.
    */
   nlohmann::json GetUpdateAsJson(double radius) const;
 
   /**
-   * @brief Returns the json representation of the planning debug data.
-   * @return Json object equivalence of the PlanningData object.
+   * @brief Returns the binary representation of the SimulationWorld object.
+   * @param radius the search distance from the current car location.
+   * @param sim_world output of binary format sim_world string.
+   * @param sim_world_with_planning_data output of binary format sim_world
+   * string with planning_data.
    */
-  nlohmann::json GetPlanningData() const;
+  void GetWireFormatString(double radius, std::string *sim_world,
+                           std::string *sim_world_with_planning_data);
 
   /**
    * @brief Returns the json representation of the map element Ids and hash
@@ -105,20 +110,14 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() {
-    to_clear_ = true;
-  }
+  void SetToClear() { to_clear_ = true; }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
    * The backend won't push the SimulationWorld to frontend if it is not ready.
    * @return True if the object is ready to push.
    */
-  bool ReadyToPush() const {
-    return world_.has_auto_driving_car() &&
-           world_.auto_driving_car().has_position_x() &&
-           world_.auto_driving_car().has_position_y();
-  }
+  bool ReadyToPush() const { return ready_to_push_.load(); }
 
   /**
    * @brief Publish message to the monitor
@@ -132,6 +131,12 @@ class SimulationWorldService {
     apollo::common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
     buffer.AddMonitorMsgItem(log_level, msg);
   }
+
+  void GetMapElementIds(double radius, MapElementIds *ids) const;
+
+  const apollo::hdmap::Map &GetRelativeMap() const;
+
+  nlohmann::json GetRoutePathAsJson() const;
 
  private:
   /**
@@ -156,12 +161,37 @@ class SimulationWorldService {
                        const Object &world_obj, Decision *world_decision);
   void UpdateDecision(const apollo::planning::DecisionResult &decision_res,
                       double header_time);
-  void UpdateMainDecision(const apollo::planning::MainDecision &main_decision,
-                          double update_timestamp_sec, Object *world_main_stop);
+  void UpdateMainStopDecision(
+      const apollo::planning::MainDecision &main_decision,
+      double update_timestamp_sec, Object *world_main_stop);
+
+  template <typename MainDecision>
+  void UpdateMainChangeLaneDecision(const MainDecision &decision,
+                                    Object *world_main_decision) {
+    if (decision.has_change_lane_type() &&
+        (decision.change_lane_type() == apollo::routing::ChangeLaneType::LEFT ||
+         decision.change_lane_type() ==
+             apollo::routing::ChangeLaneType::RIGHT)) {
+      auto *change_lane_decision = world_main_decision->add_decision();
+      change_lane_decision->set_change_lane_type(decision.change_lane_type());
+
+      const auto &adc = world_.auto_driving_car();
+      change_lane_decision->set_position_x(adc.position_x());
+      change_lane_decision->set_position_y(adc.position_y());
+      change_lane_decision->set_heading(adc.heading());
+    }
+  }
+
   void CreatePredictionTrajectory(
-      Object *world_object,
-      const apollo::prediction::PredictionObstacle &obstacle);
+      const apollo::prediction::PredictionObstacle &obstacle,
+      Object *world_object);
+
+  void DownsamplePath(const apollo::common::Path &paths,
+                      apollo::common::Path *downsampled_path);
+
   void UpdatePlanningData(const apollo::planning_internal::PlanningData &data);
+
+  void PopulateMapInfo(double radius);
 
   /**
    * @brief Get the latest observed data from the adapter manager to update the
@@ -169,10 +199,12 @@ class SimulationWorldService {
    */
   template <typename AdapterType>
   void UpdateWithLatestObserved(const std::string &adapter_name,
-                                AdapterType *adapter) {
+                                AdapterType *adapter, bool logging = true) {
     if (adapter->Empty()) {
-      AINFO_EVERY(100) << adapter_name
-                       << " adapter has not received any data yet.";
+      if (logging) {
+        AINFO_EVERY(100) << adapter_name
+                         << " adapter has not received any data yet.";
+      }
       return;
     }
 
@@ -188,15 +220,31 @@ class SimulationWorldService {
   template <typename Points>
   void DownsampleSpeedPointsByInterval(const Points &points,
                                        size_t downsampleInterval,
-                                       Points *downsampled_points);
+                                       Points *downsampled_points) {
+    if (points.size() == 0) {
+      return;
+    }
+
+    for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
+      auto *point = downsampled_points->Add();
+      point->set_s(points[i].s());
+      point->set_t(points[i].t());
+      point->set_v(points[i].v());
+    }
+
+    // add the last point
+    auto *point = downsampled_points->Add();
+    point->set_s(points[points.size() - 1].s());
+    point->set_t(points[points.size() - 1].t());
+    point->set_v(points[points.size() - 1].v());
+  }
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
   SimulationWorld world_;
 
-  // The downsampled planning debugging data, owned by the
-  // SimulationWorldService instance.
-  apollo::planning_internal::PlanningData planning_data_;
+  // Downsampled route paths to be rendered in frontend.
+  std::vector<RoutePath> route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
   const MapService *map_service_;
@@ -211,6 +259,12 @@ class SimulationWorldService {
   // frontend request.
   bool to_clear_ = false;
 
+  // Relative map used/retrieved in navigation mode
+  apollo::hdmap::Map relative_map_;
+
+  // Whether the sim_world is ready to push to frontend
+  std::atomic<bool> ready_to_push_;
+
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorTruncate);
@@ -221,6 +275,10 @@ class SimulationWorldService {
   FRIEND_TEST(SimulationWorldServiceTest, UpdateDecision);
   FRIEND_TEST(SimulationWorldServiceTest, UpdatePrediction);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateRouting);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateGps);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateControlCommandWithSimpleLonLat);
+  FRIEND_TEST(SimulationWorldServiceTest, UpdateControlCommandWithSimpleMpc);
+  FRIEND_TEST(SimulationWorldServiceTest, DownsampleSpeedPointsByInterval);
 };
 
 }  // namespace dreamview

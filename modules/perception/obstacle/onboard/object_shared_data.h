@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
-#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H_
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H_
 
 #include <string>
+
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/onboard/common_shared_data.h"
 
@@ -29,9 +30,7 @@ namespace perception {
    public:                                                   \
     data_name() : CommonSharedData<SensorObjects>() {}       \
     virtual ~data_name() {}                                  \
-    std::string name() const override {                      \
-      return #data_name;                                     \
-    }                                                        \
+    std::string name() const override { return #data_name; } \
                                                              \
    private:                                                  \
     DISALLOW_COPY_AND_ASSIGN(data_name);                     \
@@ -39,11 +38,17 @@ namespace perception {
 
 OBJECT_SHARED_DATA(LidarObjectData);
 OBJECT_SHARED_DATA(RadarObjectData);
+OBJECT_SHARED_DATA(CameraObjectData);
+OBJECT_SHARED_DATA(CIPVObjectData);
+OBJECT_SHARED_DATA(UltrasonicObjectData);
 
 REGISTER_SHAREDDATA(LidarObjectData);
 REGISTER_SHAREDDATA(RadarObjectData);
+REGISTER_SHAREDDATA(CameraObjectData);
+REGISTER_SHAREDDATA(CIPVObjectData);
+REGISTER_SHAREDDATA(UltrasonicObjectData);
 
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBJECT_SHARED_DATA_H_

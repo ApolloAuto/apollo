@@ -1,0 +1,4 @@
+data_files {
+  source_path: "vehicle_data.pb.txt"
+  dest_path: "/tmp/vehicle/vehicle_data.pb.txt"
+}

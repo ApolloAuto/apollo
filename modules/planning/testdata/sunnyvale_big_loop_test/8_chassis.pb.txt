@@ -1,0 +1,95 @@
+engine_started: true
+engine_rpm: 1642
+speed_mps: 15.347222
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 24.373236
+brake_percentage: 13.876554
+steering_percentage: -0.42553192
+steering_torque_nm: -0.125
+parking_brake: false
+driving_mode: COMPLETE_AUTO_DRIVE
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1532019646.3993268
+  module_name: "chassis"
+  sequence_num: 101642
+}
+signal {
+  turn_signal: TURN_NONE
+  high_beam: false
+  horn: false
+}
+chassis_gps {
+  latitude: 37.409472
+  longitude: -122.00440533333332
+  gps_valid: true
+  year: 18
+  month: 7
+  day: 19
+  hours: 17
+  minutes: 0
+  seconds: 46
+  compass_direction: 180
+  pdop: 1
+  is_gps_fault: false
+  is_inferred: false
+  altitude: -42.5
+  heading: 194.62
+  hdop: 0.60000000000000009
+  vdop: 0.8
+  quality: FIX_3D
+  num_satellites: 16
+  gps_speed: 15.19936
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+wheel_speed {
+  is_wheel_spd_rr_valid: true
+  wheel_direction_rr: FORWARD
+  wheel_spd_rr: 46.64
+  is_wheel_spd_rl_valid: true
+  wheel_direction_rl: FORWARD
+  wheel_spd_rl: 46.6
+  is_wheel_spd_fr_valid: true
+  wheel_direction_fr: FORWARD
+  wheel_spd_fr: 46.72
+  is_wheel_spd_fl_valid: true
+  wheel_direction_fl: FORWARD
+  wheel_spd_fl: 46.76
+}
+surround {
+  cross_traffic_alert_left: false
+  cross_traffic_alert_left_enabled: true
+  blind_spot_left_alert: false
+  blind_spot_left_alert_enabled: true
+  cross_traffic_alert_right: false
+  blind_spot_right_alert: false
+  blind_spot_right_alert_enabled: true
+  sonar00: 100
+  sonar01: 100
+  sonar02: 100
+  sonar03: 100
+  sonar04: 100
+  sonar05: 100
+  sonar06: 100
+  sonar07: 100
+  sonar08: 100
+  sonar09: 100
+  sonar10: 100
+  sonar11: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+}

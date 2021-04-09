@@ -1,20 +1,19 @@
-# How to add a new evaluator in prediction module
+# How to add a new evaluator in Prediction module
 
 ## Introduction
-Evaluator generates features (from the raw information of obstacles and the ego vehicle) to get the model output by applying the pre-trained deep learning model.
+The Evaluator generates features (from the raw information of obstacles and the ego vehicle) to get the model output by applying the pre-trained deep learning model.
 
 ## Steps to add a new evaluator
 Please follow the steps to add a new evaluator named `NewEvaluator`.
-* Add a field in proto
-* Define a class that inherits `Evaluator`
-* Implement the class `NewEvaluator`
-* Update prediction conf
-* Upate evaluator manager
+1. Add a field in proto
+2. Define a class that inherits `Evaluator`
+3. Implement the class `NewEvaluator`
+4. Update prediction conf
+5. Upate the evaluator manager
 
-### Step 1: Define a class that inherits `Evaluator`
+### Define a class that inherits `Evaluator`
 Create a new file named `new_evaluator.h` in the folder  `modules/prediction/evaluator/vehicle`. And define it like this:
 ```cpp
-
 #include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
@@ -32,8 +31,8 @@ class NewEvaluator : public Evaluator {
 }  // namespace apollo
 ```
 
-### Step 2 Implement the class `NewEvaluator`
-Create a new file named `new_evaluator.cc` in the same folder of `new_evaluator.h`. Implement it like this:
+### Implement the class `NewEvaluator`
+Create a new file named `new_evaluator.cc` in the same folder as that of `new_evaluator.h`. Implement it like this:
 ```cpp
 #include "modules/prediction/evaluator/vehicle/new_evaluator.h"
 
@@ -60,7 +59,7 @@ NewEvaluator::Evaluate(Obstacle* obstacle_ptr)() {
 
 ```
 
-### Step 3: Add a new evaluator in proto
+### Add a new evaluator in proto
 Add a new type of evaluator in `prediction_conf.proto`:
 ```cpp
   enum EvaluatorType {
@@ -69,7 +68,7 @@ Add a new type of evaluator in `prediction_conf.proto`:
   }
 ```
 
-### Step 4: Update prediction conf
+### Update prediction_conf file
 In the file `modules/prediction/conf/prediction_conf.pb.txt`, update the field `evaluator_type` like this:
 ```
 obstacle_conf {
@@ -80,7 +79,7 @@ obstacle_conf {
 }
 ```
 
-### Step 5: Upate evaluator manager
+### Step 5: Upate the evaluator manager
 Update `CreateEvluator( ... )` like this:
 ```cpp
   case ObstacleConf::NEW_EVALUATOR: {
@@ -93,10 +92,10 @@ Update `RegisterEvaluators()` like this:
   RegisterEvaluator(ObstacleConf::NEW_EVALUATOR);
 ```
 
-After this procedure, the new evaluator will be created.
+After following the steps above, the new evaluator should be created.
 
-## Add new features
-If you would like to add new features, please follow the instructions below:
+## Adding new features
+If you would like to add new features, follow the instructions that follow:
 ### Add a field in proto
 Assume the new evaluating result named `new_output` and also assume its type is `int32`. If the output is related directly to the obstacles, you can add it into `modules/prediction/proto/feature.proto` like this:
 ```cpp

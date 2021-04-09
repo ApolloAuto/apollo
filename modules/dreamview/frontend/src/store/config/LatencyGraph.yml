@@ -1,0 +1,16 @@
+options:
+    legend:
+        display: false
+    axes:
+        x:
+            labelString: 'timestampe (sec)'
+        y:
+            labelString: 'latency (ms)'
+properties:
+    lines:
+        data:
+            color: 'rgba(27, 249, 105, 0.5)' # green
+            borderWidth: 2
+            pointRadius: 0
+            fill: false
+            showLine: true

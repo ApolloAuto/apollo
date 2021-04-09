@@ -1,0 +1,9 @@
+dbc_file: gem.dbc
+protocol_conf: gem.yml
+car_type: gem
+sender_list: []
+sender: MAB
+black_list: []
+
+output_dir: output/
+

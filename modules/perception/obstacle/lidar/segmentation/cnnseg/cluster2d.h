@@ -18,19 +18,26 @@
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_SEGMENTATION_CNNSEG_CLUSTER2D_H_
 
 #include <algorithm>
+#include <memory>
 #include <vector>
+
 #include "caffe/caffe.hpp"
+
 #include "modules/common/log.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/common/util/disjoint_set.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
-#include "modules/perception/obstacle/common/disjoint_set.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/util.h"
 
 namespace apollo {
 namespace perception {
 namespace cnnseg {
 
-enum MetaType {
+using apollo::common::util::DisjointSetFind;
+using apollo::common::util::DisjointSetMakeSet;
+using apollo::common::util::DisjointSetUnion;
+
+enum class MetaType {
   META_UNKNOWN,
   META_SMALLMOT,
   META_BIGMOT,
@@ -47,20 +54,16 @@ struct Obstacle {
   MetaType meta_type;
   std::vector<float> meta_type_probs;
 
-  Obstacle() {
-    grids.clear();
+  Obstacle() : score(0.0), height(-5.0), meta_type(MetaType::META_UNKNOWN) {
     cloud.reset(new apollo::perception::pcl_util::PointCloud);
-    score = 0.0;
-    height = -5.0;
-    meta_type = META_UNKNOWN;
-    meta_type_probs.assign(MAX_META_TYPE, 0.0);
+    meta_type_probs.assign(static_cast<int>(MetaType::MAX_META_TYPE), 0.0);
   }
 };
 
 class Cluster2D {
  public:
-  Cluster2D() {}
-  ~Cluster2D() {}
+  Cluster2D() = default;
+  ~Cluster2D() = default;
 
   bool Init(int rows, int cols, float range) {
     rows_ = rows;
@@ -80,7 +83,7 @@ class Cluster2D {
 
   void Cluster(const caffe::Blob<float>& category_pt_blob,
                const caffe::Blob<float>& instance_pt_blob,
-               const apollo::perception::pcl_util::PointCloudPtr& pc_ptr,
+               apollo::perception::pcl_util::PointCloudPtr pc_ptr,
                const apollo::perception::pcl_util::PointIndices& valid_indices,
                float objectness_thresh, bool use_all_grids_for_clustering) {
     const float* category_pt_data = category_pt_blob.cpu_data();
@@ -116,11 +119,11 @@ class Cluster2D {
     }
 
     // construct graph with center offset prediction and objectness
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         int grid = RowCol2Grid(row, col);
         Node* node = &nodes[row][col];
-        apollo::perception::DisjointSetMakeSet(node);
+        DisjointSetMakeSet(node);
         node->is_object =
             (use_all_grids_for_clustering || nodes[row][col].point_num > 0) &&
             (*(category_pt_data + grid) >= objectness_thresh);
@@ -133,26 +136,26 @@ class Cluster2D {
     }
 
     // traverse nodes
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         Node* node = &nodes[row][col];
         if (node->is_object && node->traversed == 0) {
           Traverse(node);
         }
       }
     }
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         Node* node = &nodes[row][col];
         if (!node->is_center) {
           continue;
         }
-        for (int row2 = row - 1; row2 <= row + 1; row2++) {
-          for (int col2 = col - 1; col2 <= col + 1; col2++) {
+        for (int row2 = row - 1; row2 <= row + 1; ++row2) {
+          for (int col2 = col - 1; col2 <= col + 1; ++col2) {
             if ((row2 == row || col2 == col) && IsValidRowCol(row2, col2)) {
               Node* node2 = &nodes[row2][col2];
               if (node2->is_center) {
-                apollo::perception::DisjointSetUnion(node, node2);
+                DisjointSetUnion(node, node2);
               }
             }
           }
@@ -163,13 +166,13 @@ class Cluster2D {
     int count_obstacles = 0;
     obstacles_.clear();
     id_img_.assign(grids_, -1);
-    for (int row = 0; row < rows_; row++) {
-      for (int col = 0; col < cols_; col++) {
+    for (int row = 0; row < rows_; ++row) {
+      for (int col = 0; col < cols_; ++col) {
         Node* node = &nodes[row][col];
         if (!node->is_object) {
           continue;
         }
-        Node* root = apollo::perception::DisjointSetFind(node);
+        Node* root = DisjointSetFind(node);
         if (root->obstacle_id < 0) {
           root->obstacle_id = count_obstacles++;
           CHECK_EQ(static_cast<int>(obstacles_.size()), count_obstacles - 1);
@@ -181,17 +184,51 @@ class Cluster2D {
         obstacles_[root->obstacle_id].grids.push_back(grid);
       }
     }
-    CHECK_EQ(static_cast<int>(count_obstacles), obstacles_.size());
+    CHECK_EQ(static_cast<size_t>(count_obstacles), obstacles_.size());
+  }
+
+  void FilterNoise(std::vector<int> *grids,
+                    const float* count_pt_ptr,
+                    const float enable_filter_thresh,
+                    const float filter_thresh) {
+      int ngrid = static_cast<int>(grids->size());
+      float max_pt_num = 0;
+      for (int j = ngrid-1; j >= 0; j--) {
+        max_pt_num = std::max(max_pt_num, count_pt_ptr[(*grids)[j]]);
+      }
+      max_pt_num = std::exp(max_pt_num);
+      if (max_pt_num < enable_filter_thresh)
+        return;
+
+      for (int j = ngrid-1; j >= 0; j--) {
+        float grid_pt_num = std::exp(count_pt_ptr[(*grids)[j]]);
+
+        if (grid_pt_num < filter_thresh) {
+          id_img_[(*grids)[j]] = -1;  //  reset to background
+          (*grids)[j] = grids->back();
+          grids->pop_back();
+        }
+      }
   }
 
   void Filter(const caffe::Blob<float>& confidence_pt_blob,
-              const caffe::Blob<float>& height_pt_blob) {
+              const caffe::Blob<float>& height_pt_blob,
+              const float* count_pt_ptr,
+              const float filter_thresh,
+              const float enable_filter_thresh) {
     const float* confidence_pt_data = confidence_pt_blob.cpu_data();
     const float* height_pt_data = height_pt_blob.cpu_data();
     for (size_t obstacle_id = 0; obstacle_id < obstacles_.size();
          obstacle_id++) {
       Obstacle* obs = &obstacles_[obstacle_id];
       CHECK_GT(obs->grids.size(), 0);
+
+      auto& grids = obs->grids;
+      FilterNoise(&grids,
+                  count_pt_ptr,
+                  enable_filter_thresh,
+                  filter_thresh);
+
       double score = 0.0;
       double height = 0.0;
       for (int grid : obs->grids) {
@@ -207,7 +244,7 @@ class Cluster2D {
   void Classify(const caffe::Blob<float>& classify_pt_blob) {
     const float* classify_pt_data = classify_pt_blob.cpu_data();
     int num_classes = classify_pt_blob.channels();
-    CHECK_EQ(num_classes, MAX_META_TYPE);
+    CHECK_EQ(num_classes, static_cast<int>(MetaType::MAX_META_TYPE));
     for (size_t obs_id = 0; obs_id < obstacles_.size(); obs_id++) {
       Obstacle* obs = &obstacles_[obs_id];
       for (size_t grid_id = 0; grid_id < obs->grids.size(); grid_id++) {
@@ -228,7 +265,9 @@ class Cluster2D {
   }
 
   void GetObjects(const float confidence_thresh, const float height_thresh,
-                  const int min_pts_num, std::vector<ObjectPtr>* objects) {
+                  const int min_pts_num,
+                  std::vector<std::shared_ptr<Object>>* objects,
+                  const float* count_pt_ptr) {
     CHECK(valid_indices_in_pc_ != nullptr);
 
     for (size_t i = 0; i < point2grid_.size(); ++i) {
@@ -261,14 +300,21 @@ class Cluster2D {
       if (static_cast<int>(obs->cloud->size()) < min_pts_num) {
         continue;
       }
-      apollo::perception::ObjectPtr out_obj(new apollo::perception::Object);
+
+  //    ADEBUG << "cnnseg cluster id: " << obstacle_id << " pt_number: ";
+  //    for (auto &grid : obs->grids) {
+  //      ADEBUG << static_cast<int>(std::exp(count_pt_ptr[grid])) << " ";
+  //    }
+  //    ADEBUG << std::endl;
+      std::shared_ptr<Object> out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;
-      out_obj->score_type = SCORE_CNN;
+      out_obj->score_type = PerceptionObstacle::CONFIDENCE_CNN;
       out_obj->type = GetObjectType(obs->meta_type);
       out_obj->type_probs = GetObjectTypeProbs(obs->meta_type_probs);
       objects->push_back(out_obj);
     }
+    ADEBUG << "objects->size() is: " << objects->size() << std::endl;
   }
 
  private:
@@ -298,17 +344,11 @@ class Cluster2D {
     return IsValidRow(row) && IsValidCol(col);
   }
 
-  inline bool IsValidRow(int row) const {
-    return row >= 0 && row < rows_;
-  }
+  inline bool IsValidRow(int row) const { return row >= 0 && row < rows_; }
 
-  inline bool IsValidCol(int col) const {
-    return col >= 0 && col < cols_;
-  }
+  inline bool IsValidCol(int col) const { return col >= 0 && col < cols_; }
 
-  inline int RowCol2Grid(int row, int col) const {
-    return row * cols_ + col;
-  }
+  inline int RowCol2Grid(int row, int col) const { return row * cols_ + col; }
 
   void Traverse(Node* x) {
     std::vector<Node*> p;
@@ -333,31 +373,36 @@ class Cluster2D {
 
   ObjectType GetObjectType(const MetaType meta_type_id) {
     switch (meta_type_id) {
-      case META_UNKNOWN:
-        return UNKNOWN;
-      case META_SMALLMOT:
-        return VEHICLE;
-      case META_BIGMOT:
-        return VEHICLE;
-      case META_NONMOT:
-        return BICYCLE;
-      case META_PEDESTRIAN:
-        return PEDESTRIAN;
+      case MetaType::META_UNKNOWN:
+        return ObjectType::UNKNOWN;
+      case MetaType::META_SMALLMOT:
+        return ObjectType::VEHICLE;
+      case MetaType::META_BIGMOT:
+        return ObjectType::VEHICLE;
+      case MetaType::META_NONMOT:
+        return ObjectType::BICYCLE;
+      case MetaType::META_PEDESTRIAN:
+        return ObjectType::PEDESTRIAN;
       default: {
         AERROR << "Undefined ObjectType output by CNNSeg model.";
-        return UNKNOWN;
+        return ObjectType::UNKNOWN;
       }
     }
   }
 
   std::vector<float> GetObjectTypeProbs(
       const std::vector<float>& meta_type_probs) {
-    std::vector<float> object_type_probs(MAX_OBJECT_TYPE, 0.0);
-    object_type_probs[UNKNOWN] = meta_type_probs[META_UNKNOWN];
-    object_type_probs[VEHICLE] =
-        meta_type_probs[META_SMALLMOT] + meta_type_probs[META_BIGMOT];
-    object_type_probs[BICYCLE] = meta_type_probs[META_NONMOT];
-    object_type_probs[PEDESTRIAN] = meta_type_probs[META_PEDESTRIAN];
+    std::vector<float> object_type_probs(
+        static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0.0);
+    object_type_probs[static_cast<int>(ObjectType::UNKNOWN)] =
+        meta_type_probs[static_cast<int>(MetaType::META_UNKNOWN)];
+    object_type_probs[static_cast<int>(ObjectType::VEHICLE)] =
+        meta_type_probs[static_cast<int>(MetaType::META_SMALLMOT)] +
+        meta_type_probs[static_cast<int>(MetaType::META_BIGMOT)];
+    object_type_probs[static_cast<int>(ObjectType::BICYCLE)] =
+        meta_type_probs[static_cast<int>(MetaType::META_NONMOT)];
+    object_type_probs[static_cast<int>(ObjectType::PEDESTRIAN)] =
+        meta_type_probs[static_cast<int>(MetaType::META_PEDESTRIAN)];
     return object_type_probs;
   }
 

@@ -7,24 +7,32 @@
     <arg name="max_range_16" default="70.0" />
     <arg name="rpm" default="600"/>
     <arg name="model" default="VLP16" />
+    <arg name="firing_data_port" default="2369"/>
+    <arg name="positioning_data_port" default="8309"/>
     <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
+    <arg name="nodelet_manager_name" value="velodyne16_nodelet_manager" />
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
   </include>
     <!--  VLP16 -->
     <!--  driver nodelets -->
   <include file="$(find velodyne_driver)/launch/driver_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne16_driver"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="frame_id" value="$(arg velodyne16_frame_id)"/>
-    <arg name="topic" value="/apollo/sensor/velodyne16/VelodyneScanUnified"/>    
+    <arg name="topic" value="/apollo/sensor/velodyne16/VelodyneScanUnified"/>
+    <arg name="firing_data_port" value="$(arg firing_data_port)"/>
+    <arg name="positioning_data_port" value="$(arg positioning_data_port)"/>
   </include>
   
   <!-- start cloud nodelet using test calibration file -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne16_convert"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="calibration" default="$(arg velodyne16_calibration_file)" />
     <arg name="organized" default="$(arg organized)"/>
@@ -37,6 +45,7 @@
    <!-- start 16 compensator nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/compensator_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne16_compensator"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="child_frame_id" value="$(arg velodyne16_frame_id)"/>
     <arg name="tf_query_timeout" value="$(arg tf_query_timeout)"/>
     <arg name="topic_pointcloud" value="/apollo/sensor/velodyne16/PointCloud2"/>

@@ -17,9 +17,11 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
 #define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_OBJECT_BUILDER_H_
 
-#include <Eigen/Core>
-#include <map>
 #include <memory>
+#include <unordered_map>
+
+#include "Eigen/Core"
+
 #include "modules/common/log.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -28,11 +30,11 @@
 
 namespace apollo {
 namespace perception {
+
 class ObjectBuilder {
  public:
-  ObjectBuilder(): delay_frames_(4), use_fp_filter_(true) {
-  }
-  ~ObjectBuilder() {}
+  ObjectBuilder() = default;
+  ~ObjectBuilder() = default;
 
   // @brief: build radar objects
   // @param [in]: raw obstacles from radar driver.
@@ -40,27 +42,22 @@ class ObjectBuilder {
   // @param [in]: host car velocity from localization
   // @param [out]: built radar objects
   // @return nothing
-  void Build(const ContiRadar &raw_obstacles,
-             const Eigen::Matrix4d &radar_pose,
+  bool Build(const ContiRadar &raw_obstacles, const Eigen::Matrix4d &radar_pose,
              const Eigen::Vector2d &main_velocity,
              SensorObjects *radar_objects);
 
-  void SetDelayFrame(int delay_frames) {
-    delay_frames_ = delay_frames;
-  }
+  void SetDelayFrame(int delay_frames) { delay_frames_ = delay_frames; }
 
-  void SetUseFpFilter(bool use_fp_filter) {
-    use_fp_filter_ = use_fp_filter;
-  }
+  void SetUseFpFilter(bool use_fp_filter) { use_fp_filter_ = use_fp_filter; }
 
   void SetContiParams(const ContiParams &conti_params) {
     conti_params_ = conti_params;
   }
 
  private:
-  std::map<int, int> continuous_ids_;
-  int delay_frames_;
-  bool use_fp_filter_;
+  std::unordered_map<int, int> continuous_ids_;
+  int delay_frames_ = 4;
+  bool use_fp_filter_ = true;
   ContiParams conti_params_;
 };
 

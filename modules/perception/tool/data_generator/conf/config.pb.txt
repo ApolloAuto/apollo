@@ -1,0 +1,66 @@
+roi {
+  polygon_point {
+    x: 1.0
+    y: 0.0
+    z: 0.0
+  }
+  polygon_point {
+    x: 100.0
+    y: 0.0
+    z: 0.0
+  }
+  polygon_point {
+    x: 100.0
+    y: 50.0
+    z: 0.0
+  }
+  polygon_point {
+    x: 0.0
+    y: 50.0
+    z: 0.0
+  }
+}
+obstacle : {
+  id: "obstacle_01"
+  position {
+    x: 1.5
+    y: 1.5
+  }
+  theta: 0.02
+  velocity {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  length: 0.5
+  width: 0.5
+  height: 1.0
+
+  polygon_point {
+    x: 10.0
+    y: 0.0
+    z: 0.0
+  }
+  polygon_point {
+    x: 12.0
+    y: 0.0
+    z: 0.0
+  }
+  polygon_point {
+    x: 12.0
+    y: 5.0
+    z: 0.0
+  }
+  polygon_point {
+    x: 10.0
+    y: 5.0
+    z: 0.0
+  }
+
+  type: SEDAN
+}
+config : {
+  id: VELODYNE64
+  sensor_frame_name: "velodyne64"
+}
+

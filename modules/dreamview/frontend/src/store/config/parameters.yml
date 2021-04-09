@@ -19,14 +19,22 @@ camera:
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
-  mpp: 400
-  xres: 8192
-  yres: 8192
-  xorigin: 4096
-  yorigin: 4096
-  xyoffset: 0
-  type: default # default or tile
-  tileRange: 4
+  defaults:
+    mpp: 0.125
+    xres: 8192
+    yres: 8192
+    xorigin: 4096
+    yorigin: 4096
+    type: default # default or tile
+    tileRange: 4
+  sunnyvale_big_loop:
+    mpp: 0.125
+    xres: 24576
+    yres: 16384
+    xorigin: 587392
+    yorigin: 4140800
+    type: default # default or tile
+    tileRange: 4
 planning:
   # The minimum interval between two consecutive
   minInterval: 0.1
@@ -34,13 +42,17 @@ planning:
     width: 1.4
 options:
   defaults:
+    enableSimControl: false
     showModuleController: false
     showMenu: false
     showPOI: false
+    enableAudioCapture: false
     showPNCMonitor: false
     showRouteEditingBar: false
+    showDataRecorder: false
     showTasks: true
     showVideo: false
+    showPlanningCar: false
     showPlanningReference: false
     showPlaningDpOptimizer: false
     showPlanningQpOptimizer: false
@@ -48,6 +60,7 @@ options:
     showDecisionMain: true
     showDecisionObstacle: true
     showRouting: true
+    showPerceptionLaneMarker: false
     showPredictionMajor: true
     showPredictionMinor: true
     showObstaclesVehicle: true
@@ -57,12 +70,34 @@ options:
     showObstaclesUnknownUnmovable: true
     showObstaclesUnknown: true
     showObstaclesVirtual: false
+    showObstaclesCipv: true
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
+    showObstaclesInfo: true
+    showPointCloud: false
+    showPositionGps: false
+    showPositionLocalization: true
+    showMapCrosswalk: true
+    showMapClearArea: true
+    showMapJunction: false
+    showMapLane: true
+    showMapRoad: false
+    showMapSignal: true
+    showMapStopSign: true
     cameraAngle: Default
+
+navigation:
+  # possible options: BaiduMap or GoogleMap
+  map: "BaiduMap"
+
+  # Google Map API: "https://maps.google.com/maps/api/js"
+  # Baidu Map API: "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"
+  mapAPiUrl: "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"
+
 debug:
   # Turn this on for monitor related debugging
   autoMonitorMessage: false
   performanceMonitor: false
-
+server:
+  port: 8888

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,8 @@
 #include "modules/perception/onboard/subnode.h"
 
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "modules/common/log.h"
-#include "modules/perception/onboard/event_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -33,10 +30,10 @@ using std::string;
 using std::ostringstream;
 
 bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
-                   EventManager *event_manager,
-                   SharedDataManager *shared_data_manager,
                    const vector<EventID> &sub_events,
-                   const vector<EventID> &pub_events) {
+                   const vector<EventID> &pub_events,
+                   EventManager *event_manager,
+                   SharedDataManager *shared_data_manager) {
   name_ = subnode_config.name();
   id_ = subnode_config.id();
   reserve_ = subnode_config.reserve();
@@ -44,9 +41,9 @@ bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
     type_ = subnode_config.type();
   }
 
-  CHECK(event_manager != NULL) << "event_manager == NULL";
+  CHECK(event_manager != nullptr) << "event_manager == nullptr";
   event_manager_ = event_manager;
-  CHECK(shared_data_manager != NULL) << "shared_data_manager == NULL";
+  CHECK(shared_data_manager != nullptr) << "shared_data_manager == nullptr";
   shared_data_manager_ = shared_data_manager;
 
   // fill sub and pub meta events.
@@ -139,9 +136,9 @@ Status CommonSubnode::ProcEvents() {
 
   // user defined logic api.
   if (!HandleEvent(sub_event, &pub_event)) {
-    AWARN << "failed to call _handle_event. sub_event: <"
+    AWARN << "failed to call handle_event_. sub_event: <"
           << sub_event.to_string() << "> pub_event: <" << pub_event.to_string();
-    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call _handle_event.");
+    return Status(ErrorCode::PERCEPTION_ERROR, "Failed to call handle_event_.");
   }
 
   if (!event_manager_->Publish(pub_event)) {

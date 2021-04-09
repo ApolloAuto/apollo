@@ -24,9 +24,6 @@ namespace apollo {
 namespace perception {
 namespace cnnseg {
 
-#define CV_PI 3.1415926535897932384626433832795
-#define EPS 1e-6
-
 template <typename Dtype>
 bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
                                    caffe::Blob<Dtype>* out_blob) {
@@ -37,10 +34,10 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
                ? static_cast<int>(feature_param.point_cloud_range())
                : 60;
   width_ =
-      feature_param.has_width() ? static_cast<int>(feature_param.width()) : 512;
+      feature_param.has_width() ? static_cast<int>(feature_param.width()) : 640;
   height_ = feature_param.has_height()
                 ? static_cast<int>(feature_param.height())
-                : 512;
+                : 640;
   min_height_ =
       feature_param.has_min_height() ? feature_param.min_height() : -5.0;
   max_height_ =
@@ -53,7 +50,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 
   log_table_.resize(256);
   for (size_t i = 0; i < log_table_.size(); ++i) {
-    log_table_[i] = std::log(static_cast<Dtype>(1 + i));
+    log_table_[i] = std::log1p(static_cast<Dtype>(i));
   }
 
   Dtype* out_blob_data = nullptr;
@@ -81,8 +78,9 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
       // * row <-> x, column <-> y
       float center_x = Pixel2Pc(row, height_, range_);
       float center_y = Pixel2Pc(col, width_, range_);
+      constexpr double K_CV_PI = 3.1415926535897932384626433832795;
       direction_data[idx] =
-          static_cast<Dtype>(std::atan2(center_y, center_x) / (2.0 * CV_PI));
+          static_cast<Dtype>(std::atan2(center_y, center_x) / (2.0 * K_CV_PI));
       distance_data[idx] =
           static_cast<Dtype>(std::hypot(center_x, center_y) / 60.0 - 0.5);
     }
@@ -95,7 +93,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 
 template <typename Dtype>
 void FeatureGenerator<Dtype>::Generate(
-    const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr) {
+    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr) {
   const auto& points = pc_ptr->points;
 
   // DO NOT remove this line!!!
@@ -145,6 +143,7 @@ void FeatureGenerator<Dtype>::Generate(
   }
 
   for (int i = 0; i < siz; ++i) {
+    constexpr double EPS = 1e-6;
     if (count_data_[i] < EPS) {
       max_height_data_[i] = Dtype(0);
     } else {
@@ -160,13 +159,13 @@ template bool FeatureGenerator<float>::Init(const FeatureParam& feature_param,
                                             caffe::Blob<float>* blob);
 
 template void FeatureGenerator<float>::Generate(
-    const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
 
 template bool FeatureGenerator<double>::Init(const FeatureParam& feature_param,
                                              caffe::Blob<double>* blob);
 
 template void FeatureGenerator<double>::Generate(
-    const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
 
 }  // namespace cnnseg
 }  // namespace perception

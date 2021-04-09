@@ -83,9 +83,6 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   if (feature.has_speed()) {
     speed = feature.speed();
   }
-  if (FLAGS_enable_kf_tracking && feature.has_t_speed()) {
-    speed = feature.t_speed();
-  }
   if (speed > FLAGS_still_speed) {
     GenerateMovingTrajectory(obstacle, 1.0);
   } else {
@@ -107,7 +104,7 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
   }
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double heading = feature.theta();
+  double heading = feature.velocity_heading();
   const double total_time = FLAGS_prediction_pedestrian_total_time;
   const int start_index = NumOfTrajectories();
 
@@ -134,15 +131,8 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(0.0, 0.0);
-  if (FLAGS_enable_kf_tracking) {
-    velocity[0] = feature.t_velocity().x();
-    velocity[1] = feature.t_velocity().y();
-  }
   if (FLAGS_enable_pedestrian_acc) {
     acc = {feature.acceleration().x(), feature.acceleration().y()};
-    if (FLAGS_enable_kf_tracking) {
-      acc = {feature.t_acceleration().x(), feature.t_acceleration().y()};
-    }
   }
 
   const double total_time = FLAGS_prediction_pedestrian_total_time;

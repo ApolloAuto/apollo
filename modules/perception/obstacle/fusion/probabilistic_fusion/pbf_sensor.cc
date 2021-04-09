@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -17,37 +16,34 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_sensor.h"
 
-#include <string>
-#include <vector>
+#include <memory>
 
 namespace apollo {
 namespace perception {
 
 size_t PbfSensor::s_max_cached_frame_number_ = 10;
 
-PbfSensor::PbfSensor(const SensorType &type, const std::string &sensor_id)
-    : sensor_id_(sensor_id), sensor_type_(type), latest_query_timestamp_(0.0) {}
+PbfSensor::PbfSensor(const std::string &sensor_id, const SensorType &type)
+    : sensor_id_(sensor_id), sensor_type_(type) {}
 
 PbfSensor::~PbfSensor() {}
 
-void PbfSensor::QueryLatestFrames(double time_stamp,
+void PbfSensor::QueryLatestFrames(const double time_stamp,
                                   std::vector<PbfSensorFramePtr> *frames) {
-  if (frames == nullptr) {
-    return;
-  }
+  CHECK_NOTNULL(frames);
   frames->clear();
-  for (size_t i = 0; i < frames_.size(); i++) {
+  for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->timestamp > latest_query_timestamp_ &&
         frames_[i]->timestamp <= time_stamp) {
-      (*frames).push_back(frames_[i]);
+      frames->push_back(frames_[i]);
     }
   }
   latest_query_timestamp_ = time_stamp;
 }
 
-PbfSensorFramePtr PbfSensor::QueryLatestFrame(double time_stamp) {
+PbfSensorFramePtr PbfSensor::QueryLatestFrame(const double time_stamp) {
   PbfSensorFramePtr latest_frame = nullptr;
-  for (size_t i = 0; i < frames_.size(); i++) {
+  for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->timestamp > latest_query_timestamp_ &&
         frames_[i]->timestamp <= time_stamp) {
       latest_frame = frames_[i];
@@ -67,8 +63,8 @@ void PbfSensor::AddFrame(const SensorObjects &frame) {
   pbf_frame->seq_num = frame.seq_num;
 
   pbf_frame->objects.resize(frame.objects.size());
-  for (size_t i = 0; i < frame.objects.size(); i++) {
-    PbfSensorObjectPtr obj(new PbfSensorObject());
+  for (size_t i = 0; i < frame.objects.size(); ++i) {
+    std::shared_ptr<PbfSensorObject> obj(new PbfSensorObject());
     obj->timestamp = frame.timestamp;
     obj->sensor_type = frame.sensor_type;
     obj->object->clone(*(frame.objects[i]));
@@ -81,21 +77,19 @@ void PbfSensor::AddFrame(const SensorObjects &frame) {
   frames_.push_back(pbf_frame);
 }
 
-bool PbfSensor::GetPose(double time_stamp, Eigen::Matrix4d *pose) {
-  if (pose == nullptr) {
-    AERROR << "parameter pose is nullptr for output";
-    return false;
-  }
+bool PbfSensor::GetPose(const double time_stamp, const double time_range,
+                        Eigen::Matrix4d *pose) {
+  CHECK_NOTNULL(pose);
+  CHECK_GE(time_range, 0.0);
 
-  for (int i = frames_.size() - 1; i >= 0; i--) {
-    double time_diff = time_stamp - frames_[i]->timestamp;
-    if (fabs(time_diff) < 1.0e-3) {
-      *pose = frames_[i]->sensor2world_pose;
+  for (auto rit = frames_.rbegin(); rit != frames_.rend(); ++rit) {
+    const double time_diff = time_stamp - (*rit)->timestamp;
+    if (fabs(time_diff) < time_range) {
+      *pose = (*rit)->sensor2world_pose;
       return true;
     }
   }
   AERROR << "Failed to find velodyne2world pose for timestamp: " << time_stamp;
-
   return false;
 }
 

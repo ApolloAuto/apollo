@@ -64,6 +64,13 @@ namespace adapter {
   static AdapterConfig &Get##name##Config() {                                  \
     return instance()->name##config_;                                          \
   }                                                                            \
+  static void Feed##name##Data(const name##Adapter::DataType &data) {          \
+    if (!instance()->name##_) {                                                \
+      AERROR << "Initialize adapter before feeding protobuf";                  \
+      return;                                                                  \
+    }                                                                          \
+    Get##name()->FeedData(data);                                               \
+  }                                                                            \
   static bool Feed##name##File(const std::string &proto_file) {                \
     if (!instance()->name##_) {                                                \
       AERROR << "Initialize adapter before feeding protobuf";                  \
@@ -113,7 +120,7 @@ namespace adapter {
     if (config.mode() != AdapterConfig::PUBLISH_ONLY && IsRos()) {             \
       name##subscriber_ =                                                      \
           node_handle_->subscribe(topic_name, config.message_history_limit(),  \
-                                  &name##Adapter::OnReceive, name##_.get());   \
+                                  &name##Adapter::RosCallback, name##_.get()); \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY && IsRos()) {             \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
@@ -160,7 +167,7 @@ namespace adapter {
 class AdapterManager {
  public:
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration. The configuration is specified by the
    * file path.
    * @param adapter_config_filename the path to the proto file that
@@ -169,15 +176,15 @@ class AdapterManager {
   static void Init(const std::string &adapter_config_filename);
 
   /**
-   * @brief Initialize the /class AdapterManager singleton with the
+   * @brief Initialize the \class AdapterManager singleton with the
    * provided configuration.
    * @param configs the adapter manager configuration proto.
    */
   static void Init(const AdapterManagerConfig &configs);
 
   /**
-   * @brief Resets the /class AdapterManager so that it could be
-   * re-initiailized.
+   * @brief Resets the \class AdapterManager so that it could be
+   * re-initialized.
    */
   static void Reset();
 
@@ -224,7 +231,7 @@ class AdapterManager {
   }
 
  private:
-  /// The node handler of ROS, owned by the /class AdapterManager
+  /// The node handler of ROS, owned by the \class AdapterManager
   /// singleton.
   std::unique_ptr<ros::NodeHandle> node_handle_;
 
@@ -246,9 +253,32 @@ class AdapterManager {
   REGISTER_ADAPTER(Pad);
   REGISTER_ADAPTER(PerceptionObstacles);
   REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(PlanningPad);
   REGISTER_ADAPTER(PointCloud);
+  REGISTER_ADAPTER(VLP16PointCloud);
+
+  // velodyne fusion sensors
+  // hdl-64e or vls-128
+  REGISTER_ADAPTER(PointCloudDense);
+  REGISTER_ADAPTER(PointCloudDenseRaw);
+  REGISTER_ADAPTER(VelodyneScanDense);
+
+  // vlp-16
+  REGISTER_ADAPTER(PointCloudSparse1);
+  REGISTER_ADAPTER(PointCloudSparseRaw1);
+  REGISTER_ADAPTER(VelodyneScanSparse1);
+  REGISTER_ADAPTER(PointCloudSparse2);
+  REGISTER_ADAPTER(PointCloudSparseRaw2);
+  REGISTER_ADAPTER(VelodyneScanSparse2);
+  REGISTER_ADAPTER(PointCloudSparse3);
+  REGISTER_ADAPTER(PointCloudSparseRaw3);
+  REGISTER_ADAPTER(VelodyneScanSparse3);
+
+  REGISTER_ADAPTER(ImageFront);
   REGISTER_ADAPTER(ImageShort);
   REGISTER_ADAPTER(ImageLong);
+  REGISTER_ADAPTER(CameraImageLong);
+  REGISTER_ADAPTER(CameraImageShort);
   REGISTER_ADAPTER(Prediction);
   REGISTER_ADAPTER(TrafficLightDetection);
   REGISTER_ADAPTER(RoutingRequest);
@@ -262,6 +292,8 @@ class AdapterManager {
   REGISTER_ADAPTER(Mobileye);
   REGISTER_ADAPTER(DelphiESR);
   REGISTER_ADAPTER(ContiRadar);
+  REGISTER_ADAPTER(RacobitRadar);
+  REGISTER_ADAPTER(Ultrasonic);
   REGISTER_ADAPTER(CompressedImage);
   REGISTER_ADAPTER(GnssRtkObs);
   REGISTER_ADAPTER(GnssRtkEph);
@@ -270,6 +302,25 @@ class AdapterManager {
   REGISTER_ADAPTER(LocalizationMsfLidar);
   REGISTER_ADAPTER(LocalizationMsfSinsPva);
   REGISTER_ADAPTER(LocalizationMsfStatus);
+  REGISTER_ADAPTER(DriveEvent);
+  REGISTER_ADAPTER(RelativeMap);
+  REGISTER_ADAPTER(Navigation);
+  REGISTER_ADAPTER(AudioCapture);
+  // for pandora
+  REGISTER_ADAPTER(PandoraPointCloud);
+  REGISTER_ADAPTER(PandoraCameraFrontColor);
+  REGISTER_ADAPTER(PandoraCameraRightGray);
+  REGISTER_ADAPTER(PandoraCameraLeftGray);
+  REGISTER_ADAPTER(PandoraCameraFrontGray);
+  REGISTER_ADAPTER(PandoraCameraBackGray);
+  // for lane mask
+  REGISTER_ADAPTER(PerceptionLaneMask)
+
+  REGISTER_ADAPTER(Guardian)
+  REGISTER_ADAPTER(GnssRawData);
+  REGISTER_ADAPTER(StreamStatus);
+  REGISTER_ADAPTER(GnssHeading);
+  REGISTER_ADAPTER(RtcmData);
 
   DECLARE_SINGLETON(AdapterManager);
 };

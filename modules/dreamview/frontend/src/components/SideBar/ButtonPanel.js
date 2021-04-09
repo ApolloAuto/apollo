@@ -6,8 +6,9 @@ import TasksIcon from "assets/images/sidebar/tasks.png";
 import ModuleControllerIcon from "assets/images/sidebar/module_controller.png";
 import LayerMenuIcon from "assets/images/sidebar/layer_menu.png";
 import RouteEditingIcon from "assets/images/sidebar/route_editing.png";
+import DataRecorderIcon from "assets/images/sidebar/data_recorder.png";
 
-class SideBarButton extends React.Component {
+class SideBarButton extends React.PureComponent {
     render() {
         const { disabled, onClick, active, label, extraClasses, iconSrc } = this.props;
         return (
@@ -24,36 +25,37 @@ class SideBarButton extends React.Component {
     }
 }
 
-export default class ButtonPanel extends React.Component {
+export default class ButtonPanel extends React.PureComponent {
     render() {
-        const { enableHMIButtonsOnly,
-                onTasks, showTasks,
-                onModuleController, showModuleController,
-                onMenu, showMenu,
-                onRouteEditingBar, showRouteEditingBar } = this.props;
+        const { settings } = this.props;
 
         return (
             <div className="main-panel">
                 <SideBarButton label="Tasks"
-                               disabled={false}
+                               disabled={settings.showTasks.disabled}
                                iconSrc={TasksIcon}
-                               onClick={onTasks}
-                               active={showTasks}/>
+                               onClick={settings.showTasks.onClick}
+                               active={settings.showTasks.active} />
                 <SideBarButton label="Module Controller"
-                               disabled={false}
+                               disabled={settings.showModuleController.disabled}
                                iconSrc={ModuleControllerIcon}
-                               onClick={onModuleController}
-                               active={showModuleController}/>
+                               onClick={settings.showModuleController.onClick}
+                               active={settings.showModuleController.active} />
                 <SideBarButton label="Layer Menu"
-                               disabled={enableHMIButtonsOnly}
+                               disabled={settings.showMenu.disabled}
                                iconSrc={LayerMenuIcon}
-                               onClick={onMenu}
-                               active={showMenu} />
+                               onClick={settings.showMenu.onClick}
+                               active={settings.showMenu.active} />
                 <SideBarButton label="Route Editing"
-                               disabled={enableHMIButtonsOnly}
+                               disabled={settings.showRouteEditingBar.disabled}
                                iconSrc={RouteEditingIcon}
-                               onClick={onRouteEditingBar}
-                               active={showRouteEditingBar} />
+                               onClick={settings.showRouteEditingBar.onClick}
+                               active={settings.showRouteEditingBar.active} />
+                <SideBarButton label="Data Recorder"
+                               disabled={settings.showDataRecorder.disabled}
+                               iconSrc={DataRecorderIcon}
+                               onClick={settings.showDataRecorder.onClick}
+                               active={settings.showDataRecorder.active} />
             </div>
         );
     }

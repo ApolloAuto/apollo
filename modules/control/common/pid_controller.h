@@ -77,6 +77,12 @@ class PIDController {
    */
   bool IntegratorHold() const;
 
+  /**
+   * @brief set whether to hold integrator component at its current value.
+   * @param hold
+   */
+  void SetIntegratorHold(bool hold);
+
  protected:
   double kp_ = 0.0;
   double ki_ = 0.0;

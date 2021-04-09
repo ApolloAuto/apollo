@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include <vector>
+
+#include "boost/filesystem.hpp"
+#include "boost/program_options.hpp"
+
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/system_utility.h"
@@ -47,11 +49,10 @@ bool ParseCommandLine(int argc, char* argv[],
       // ("use_plane_fitting_ransac",
       // boost::program_options::value<bool>()->required(),
       //  "use plane fitting ransac")
-      ("pcd_folders",
-       boost::program_options::value<std::vector<std::string>>()
-           ->multitoken()
-           ->composing()
-           ->required(),
+      ("pcd_folders", boost::program_options::value<std::vector<std::string>>()
+                          ->multitoken()
+                          ->composing()
+                          ->required(),
        "pcd folders(repeated)")(
           "pose_files",
           boost::program_options::value<std::vector<std::string>>()
@@ -269,9 +270,9 @@ int main(int argc, char** argv) {
       const Eigen::Affine3d& pcd_pose = poses[trial_frame_idx];
       apollo::localization::msf::velodyne::LoadPcds(
           pcd_file_path, trial_frame_idx, pcd_pose, &velodyne_frame, false);
-      std::cout << "Loaded " << velodyne_frame.pt3ds.size()
-                << "3D Points at Trial: " << trial
-                << " Frame: " << trial_frame_idx << "." << std::endl;
+      AERROR << "Loaded " << velodyne_frame.pt3ds.size()
+             << "3D Points at Trial: " << trial << " Frame: " << trial_frame_idx
+             << ".";
 
       for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
         Eigen::Vector3d& pt3d_local = velodyne_frame.pt3ds[i];
@@ -324,19 +325,16 @@ int main(int argc, char** argv) {
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
         if (layer_counts.size() == 0) {
-          std::cerr << "[FATAL ERROR] Map node should at least have one layer."
-                    << std::endl;
+          AERROR << "No ground layer, skip.";
+          continue;
         }
-        assert(layer_counts.size() > 0);
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
           map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
-          if (layer_alts.size() == 0) {
-            std::cerr
-                << "[FATAL ERROR] Map node should at least have one layer."
-                << std::endl;
+          if (layer_alts.empty()) {
+            AERROR << "No ground points, skip.";
+            continue;
           }
-          assert(layer_alts.size() > 0);
           float alt = layer_alts[layer_id];
           double height_diff = pt3d[2] - alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
@@ -358,8 +356,6 @@ int main(int argc, char** argv) {
   map.GetConfig().map_ground_height_offset_ = mean_height_diff;
   std::string config_path = map.GetConfig().map_folder_path_ + "/config.xml";
   map.GetConfig().Save(config_path);
-  std::cout << "Mean: " << mean_height_diff << ", Var: " << var_height_diff
-            << "." << std::endl;
-
+  ADEBUG << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";
   return 0;
 }

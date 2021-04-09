@@ -11,8 +11,6 @@ cc_library(
         "trajectory_point_collector.h",
     ],
     deps = [
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math",
         "//modules/dreamview/proto:simulation_world_proto",
         "//modules/planning/proto:planning_proto",
     ],

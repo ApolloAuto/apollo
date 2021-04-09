@@ -1,0 +1,8 @@
+<launch>
+  <node  name="convert_node" pkg="rslidar_pointcloud" type="convert_node" output="screen" >
+    <param name="model" value="RS16"/>
+    <param name="curves_path" value="$(find rslidar_pointcloud)/data/rs_lidar_16/curves.csv"/>
+    <param name="angle_path" value="$(find rslidar_pointcloud)/data/rs_lidar_16/angle.csv"/>
+    <param name="channel_path" value="$(find rslidar_pointcloud)/data/rs_lidar_16/ChannelNum.csv"/>
+  </node>
+</launch>

@@ -31,10 +31,8 @@ from std_msgs.msg import String
 
 def write_to_file(file_path, topic_pb):
     """write pb message to file"""
-    f = file(file_path, 'w')
-    f.write(str(topic_pb))
-    f.close()
-
+    with open(file_path, 'w') as f:
+        f.write(str(topic_pb))
 
 def dump_bag(in_bag, out_dir, start_time, duration, filter_topic):
     """out_bag = in_bag + routing_bag"""
@@ -43,15 +41,15 @@ def dump_bag(in_bag, out_dir, start_time, duration, filter_topic):
     for topic, msg, t in bag.read_messages():
         t_sec = t.secs + t.nsecs / 1.0e9
         if start_time and t_sec < start_time:
-            print "not yet reached the start time"
+            print("not yet reached the start time")
             continue
         if start_time and t_sec >= start_time + duration:
-            print "done"
+            print("done")
             break
         if topic == "/apollo/sensor/mobileye":
             continue
         if not filter_topic or topic == filter_topic:
-            print "export at time ", t
+            print("export at time %s" % t)
             message_file = topic.replace("/", "_")
             file_path = os.path.join(out_dir,
                                      str(seq) + message_file + ".pb.txt")

@@ -1,7 +1,5 @@
 import React from "react";
 
-import WS from "store/websocket";
-
 export default class Selector extends React.Component {
     constructor(props) {
         super(props);
@@ -40,7 +38,7 @@ export default class Selector extends React.Component {
         );
 
         return (
-            <div className="selector">
+            <div className="header-item selector">
                 <span className="arrow"></span>
                 <select onChange={this.onChangeHandler} value={this.state.value}>
                     {this.entries}

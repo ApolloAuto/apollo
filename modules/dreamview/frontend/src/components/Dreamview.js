@@ -7,7 +7,10 @@ import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
 import SideBar from "components/SideBar";
-import WS from "store/websocket";
+import AudioCapture from "components/AudioCapture";
+
+import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
+import WS, {MAP_WS, POINT_CLOUD_WS} from "store/websocket";
 
 
 @inject("store") @observer
@@ -15,6 +18,8 @@ export default class Dreamview extends React.Component {
     constructor(props) {
         super(props);
         this.handleDrag = this.handleDrag.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.updateDimension = this.props.store.updateDimension.bind(this.props.store);
     }
 
     handleDrag(masterViewWidth) {
@@ -25,15 +30,39 @@ export default class Dreamview extends React.Component {
         }
     }
 
+    handleKeyPress(event) {
+        const { options, enableHMIButtonsOnly, hmi } = this.props.store;
+
+        const optionName = HOTKEYS_CONFIG[event.key];
+        if (!optionName || options.showDataRecorder) {
+            return;
+        }
+
+        event.preventDefault();
+        if (optionName === "cameraAngle") {
+            options.rotateCameraAngle();
+        } else if (
+            !options.isSideBarButtonDisabled(optionName, enableHMIButtonsOnly, hmi.inNavigationMode)
+        ) {
+            this.props.store.handleOptionToggle(optionName);
+        }
+    }
+
     componentWillMount() {
         this.props.store.updateDimension();
     }
 
     componentDidMount() {
         WS.initialize();
-        window.addEventListener("resize", () => {
-            this.props.store.updateDimension();
-        });
+        MAP_WS.initialize();
+        POINT_CLOUD_WS.initialize();
+        window.addEventListener("resize", this.updateDimension, false);
+        window.addEventListener("keypress", this.handleKeyPress, false);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimension, false);
+        window.removeEventListener("keypress", this.handleKeyPress, false);
     }
 
     render() {
@@ -58,6 +87,9 @@ export default class Dreamview extends React.Component {
                             {options.showPNCMonitor && <PNCMonitor />}
                         </div>
                     </SplitPane>
+                </div>
+                <div className="hidden">
+                    {options.enableAudioCapture && <AudioCapture />}
                 </div>
             </div>
         );

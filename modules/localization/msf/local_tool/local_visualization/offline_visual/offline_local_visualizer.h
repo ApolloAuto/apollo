@@ -24,8 +24,9 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
+
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
 namespace localization {

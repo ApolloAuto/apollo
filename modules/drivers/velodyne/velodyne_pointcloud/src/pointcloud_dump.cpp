@@ -42,7 +42,7 @@ PointCloudDump::PointCloudDump(ros::NodeHandle node,
       ros::TransportHints().tcpNoDelay(true));
 }
 
-void PointCloudDump::save_callback(const VPointCloud::ConstPtr &msg) {
+void PointCloudDump::save_callback(VPointCloud::ConstPtr msg) {
   std::string ordered_file_path =
       save_folder_ + "/" + file_prefix_ +
       boost::lexical_cast<std::string>(msg->header.seq) + ".msg";

@@ -14,4 +14,4 @@ header:
     nsecs: 0
   frame_id: velodyne64
   seq: 0
-child_frame_id: short_camera
+child_frame_id: camera

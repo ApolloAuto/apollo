@@ -21,7 +21,7 @@ namespace perception {
 bool DummyRadarDetector::Detect(const ContiRadar &raw_obstacles,
                                 const std::vector<PolygonDType> &map_polygons,
                                 const RadarDetectorOptions &options,
-                                std::vector<ObjectPtr> *objects) {
+                                std::vector<std::shared_ptr<Object>> *objects) {
   return result_detect_;
 }
 

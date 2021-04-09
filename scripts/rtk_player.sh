@@ -21,8 +21,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${DIR}/.."
 
-set -x
-
 function setup() {
   bash scripts/canbus.sh start
   bash scripts/gps.sh start
@@ -33,14 +31,14 @@ function setup() {
 function start() {
   NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_player.py")"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
-    pkill -f rtk_player.py
+    pkill -SIGKILL -f rtk_player.py
   fi
 
   python modules/tools/record_play/rtk_player.py
 }
 
 function stop() {
-  pkill -f rtk_player.py
+  pkill -SIGKILL -f rtk_player.py
 }
 
 case $1 in

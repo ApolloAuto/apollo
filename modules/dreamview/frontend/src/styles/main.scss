@@ -1,7 +1,7 @@
 @import "media-queries";
 
 
-@mixin monitor-item-common-properties() {
+@mixin monitor-item-common-properties($text-width: calc(100% - 17px)) {
     display: flex;
     list-style-type: none;
     flex-direction: row;
@@ -27,11 +27,19 @@
 
     .text {
         position: relative;
-        width: 100%;
+        width: $text-width;
+        padding-left: 5px;
+
         line-height: 150%;
         font-size: 12px;
-        character: 0px;
-        line: 20px;
+        word-wrap: break-word;
+    }
+
+    .time {
+        position: absolute;
+        right: 5px;
+
+        font-size: 12px;
     }
 
     .alert {
@@ -50,7 +58,15 @@ body {
     background-color: #14171A !important;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
     color: #FFFFFF;
+
+    * {
+        font-size: 16px;
+        @include small-screen {
+            font-size: 14px;
+        }
+    }
 }
+
 
 
 /* Adjust the scrollbar style. */
@@ -88,12 +104,10 @@ body {
 
     background: #000000;
     color: #ffffff;
-    font-size: 16px;
     text-align: left;
 
     @include small-screen {
         height: 55px;
-        font-size: 14px;
     }
 
     /* The Apollo logo on the header. */
@@ -115,13 +129,16 @@ body {
         }
     }
 
-    .selector {
+
+    .header-item {
         flex: 0 0 auto;
 
         position: relative;
         margin: 5px;
         border: 1px solid #383838;
+    }
 
+    .selector {
         select {
             display: block;
 
@@ -163,6 +180,23 @@ body {
             pointer-events: none;
         }
     }
+
+    .header-button {
+        min-width: 125px;
+        padding: 0.5em 0em;
+
+        background: #181818;
+        color: #ffffff;
+        text-align: center;
+
+        @include small-screen {
+            min-width: 110px;
+        }
+    }
+
+    .header-button-active {
+        color: #30A5FF;
+    }
 }
 
 .pane-container {
@@ -194,6 +228,7 @@ body {
             .main-view {
                 flex: 0 0 auto;
                 position: relative;
+                min-width: 600px;
             }
         }
     }
@@ -204,6 +239,11 @@ body {
         width: 100%;
         height: 100%;
         overflow: hidden;
+
+
+         ::-webkit-scrollbar {
+            width: 6px;
+        }
     }
 
     .SplitPane {
@@ -261,6 +301,7 @@ body {
     }
 }
 
+
 /* This is the styles for the main canvas of the dreamview container.
    It is applied to the major <div> of <Dreamview>. */
 
@@ -296,7 +337,7 @@ body {
         flex: 1 1 auto;
 
         border-right: 3px solid #000000;
-        padding: 25px 10px 25px 20px;
+        padding: 15px 10px 25px 20px;
         background: #1D2226;
 
         @include small-screen {
@@ -306,16 +347,17 @@ body {
         .card-header {
             width: 100%;
             padding-bottom: 15px;
-            font-size: 18px;
 
             span {
                 width: 200px;
                 border-bottom: 1px solid #999999;
                 padding: 10px 10px 10px 0px;
-            }
 
-            @include small-screen {
-                font-size: 16px;
+                font-size: 18px;
+
+                @include small-screen {
+                    font-size: 16px;
+                }
             }
         }
 
@@ -335,14 +377,14 @@ body {
 
             overflow-x: hidden;
             overflow-y: auto;
-            height: 85%;
+            height: 89%;
         }
     }
 
     ul {
         flex: 0 0 auto;
 
-        margin: 0;
+        margin: 0px 2px 0px 0px;
         padding-left: 0px;
         padding-right: 5px;
 
@@ -350,7 +392,6 @@ body {
         color: #999999;
         list-style: none;
         cursor: pointer;
-        font-size: 12px;
 
         li {
             line-height: 40px;
@@ -424,7 +465,7 @@ body {
         }
     }
 
-    .nav-side-menu {
+    .tool-view-menu {
         display: flex;
         flex-flow: row nowrap;
         align-items: stretch;
@@ -437,7 +478,6 @@ body {
         overflow-y: hidden;
         overflow-x: auto;
         background: #1D2226;
-        font-size: 14px;
         color: #FFFFFF;
         text-align: left;
         white-space: nowrap;
@@ -456,8 +496,8 @@ body {
                 transform: translate(-30%, 25%);
 
                 @include small-screen {
-                    width: 15px;
-                    height: 15px;
+                    width: 20px;
+                    height: 20px;
                     transform: translate(-50%, 10%);
                 }
             }
@@ -502,16 +542,19 @@ body {
         border: none;
         padding: 0px;
 
-        overflow-y: auto;
-        overflow-x: hidden;
+        overflow: hidden;
 
         .monitor-item {
-            @include monitor-item-common-properties();
+            @include monitor-item-common-properties(calc(100% - 80px));
         }
     }
 
     .poi-button {
-        min-width: 250px;
+        min-width: 310px;
+
+        @include small-screen {
+            min-width: 280px;
+        }
     }
 }
 
@@ -531,17 +574,12 @@ body {
         margin-bottom: auto;
     }
 
-    button:focus {
-        outline: 0;
-    }
-
     .button {
         display: block;
         width: 90px;
         border: none;
         padding: 20px 10px;
 
-        font-size: 14px;
         text-align: center;
         background: #1D2226;
         color: #FFFFFF;
@@ -549,15 +587,19 @@ body {
         cursor: pointer;
 
         @include small-screen {
-            font-size: 12px;
             width: 80px;
             padding-top: 10px;
         }
 
         .icon {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             margin: auto;
+
+            @include small-screen {
+                width: 30px;
+                height: 30px;
+            }
         }
 
         .label {
@@ -597,26 +639,25 @@ body {
         width: 90px;
         height: 80px;
         border: none;
-        padding: 20px;
+        padding: 10px;
 
-        font-size: 14px;
         text-align: center;
         background: #3E4041;
         color: #999999;
         cursor: pointer;
 
         @include small-screen {
-            font-size: 12px;
             width: 80px;
             height: 60px;
         }
     }
-
+    .sub-button:not(:last-child) {
+        border-bottom: 1px solid #1D2226;
+    }
     .sub-button:disabled {
         cursor: not-allowed;
         opacity: 0.3;
     }
-
     .sub-button-active {
         background: #30A5FF;
         color: #FFFFFF;
@@ -764,7 +805,7 @@ body {
         }
     }
 
-    .traffic-light-indicator {
+    .traffic-light-and-driving-mode {
         position: absolute;
         top: 246px;
         right: 20px;
@@ -792,6 +833,7 @@ body {
                 top: 10px;
                 right: 8px;
 
+                font-size: 14px;
                 color: #FFFFFF;
             }
         }
@@ -811,6 +853,7 @@ body {
                 float: right;
                 transform: translate(-50%, -50%);
                 text-align: center;
+                font-size: 14px;
             }
         }
 
@@ -869,9 +912,10 @@ body {
         flex-flow: row nowrap;
         justify-content: flex-start;
 
-        flex: 1 1 auto;
+        flex: 1 1 0;
+
         min-height: 45px;
-        max-height: 85px;
+        min-width: 130px;
 
         .name {
             width: 40px;
@@ -879,8 +923,22 @@ body {
         }
     }
 
+    .start-auto-command {
+        flex: 2 2 0;
+
+        .start-auto-button {
+            max-height: unset;
+        }
+    }
+
     .others {
-        min-width: 165px;
+        min-width: 200px;
+        max-width: 280px;
+
+        @include small-screen {
+            min-width: 180px;
+            max-width: 260px;
+        }
     }
 
     .delay {
@@ -890,8 +948,6 @@ body {
         .delay-item {
             position: relative;
             margin: 0px 10px;
-
-            font-size: 16px;
 
             .name {
                 display: inline-block;
@@ -908,14 +964,19 @@ body {
                 min-width: 70px;
                 text-align: right;
             }
+
+            .warning {
+                color: rgb(180, 49, 49);
+            }
         }
     }
 
     button {
-        flex: 1 1 auto;
+        flex: 1 1 0;
 
         margin: 5px;
         border: 0px;
+
         min-width: 75px;
         min-height: 40px;
         max-height: 60px;
@@ -935,7 +996,7 @@ body {
     }
 
     button:active {
-        background: rgba(21, 30, 27, 0.6);
+        background: rgba(35, 51, 45, 0.6);
     }
 
     button:disabled {
@@ -1051,13 +1112,8 @@ body {
 
             span {
                 font-family: PingFangSC-Light;
-                font-size: 14px;
-                color: #d8d8d8;
+                color: #D8D8D8;
                 text-align: center;
-
-                @include small-screen {
-                    font-size: 12px;
-                }
             }
         }
 
@@ -1076,14 +1132,11 @@ body {
             margin-left: auto;
             border: none;
 
-            color: #d8d8d8;
-            font-size: 35px;
+            color: #D8D8D8;
 
             @include small-screen {
                 height: 60px;
                 width: 60px;
-
-                font-size: 20px;
             }
 
 
@@ -1097,7 +1150,6 @@ body {
 
                 background-color: #FFFFFF;
                 color: #999999;
-                font-size: 14px;
                 text-align: left;
                 white-space: pre-wrap;
 
@@ -1128,6 +1180,106 @@ body {
     }
 }
 
+.data-recorder {
+    table {
+        width: 100%;
+        height: 100%;
+        min-width: 550px;
+
+        tr, td {
+            border: 2px solid #1D2226;
+        }
+        td:first-child {
+            width: 100px;
+            border: none;
+
+            box-sizing: border-box;
+            white-space: nowrap;
+
+            @include small-screen {
+                width: 60px;
+            }
+        }
+
+        .drive-event-time-row {
+            span {
+                position: relative;
+                padding: 10px 5px 10px 10px;
+                background: #101315;
+                white-space: nowrap;
+
+                .timestamp-button {
+                    position: relative;
+                    top: 0px;
+                    right: 0px;
+                    padding: 5px 20px;
+                    border: 5px solid #101315;
+                    margin-left: 10px;
+
+                    background: #006AFF;
+                    color: #FFFFFF;
+                }
+
+                .timestamp-button:hover {
+                    background: #49a9ee;
+                }
+            }
+
+        }
+        .drive-event-msg-row {
+            width: 70%;
+            height: 70%;
+
+            textarea {
+                height: 100%;
+                width: 100%;
+                max-width: 500px;
+                color: #FFFFFF;
+
+                border: 1px solid #383838;
+                background: #101315;
+
+                resize: none;
+            }
+        }
+
+        %drive-event-button {
+            margin-right: 5px;
+            padding: 10px 35px;
+            border: none;
+
+            background: #1D2226;
+            color: #FFFFFF;
+
+            cursor: pointer;
+        }
+
+        .drive-event-type-button {
+            @extend %drive-event-button;
+            background: #181818;
+            padding: 10px 25px;
+        }
+
+        .drive-event-type-button-active {
+            color: #30A5FF;
+        }
+
+        .cancel-button {
+            @extend %drive-event-button;
+        }
+
+        .submit-button {
+            @extend %drive-event-button;
+            background: #000000;
+        }
+
+        .submit-button:active {
+            @extend %drive-event-button;
+            background: #383838;
+        }
+    }
+}
+
 .loader {
     flex: 0 0 auto;
 
@@ -1138,7 +1290,7 @@ body {
 
     .img-container {
         position: relative;
-        top: 50%;
+        top: 55%;
         left: 50%;
         width: 40%;
         transform: translate(-50%, -50%);
@@ -1266,13 +1418,72 @@ body {
 
 .pnc-monitor {
     height: 100%;
+    border: 1px solid #000000;
+    box-sizing: border-box;
 
     background-color: #1D2226;
     overflow: auto;
 
     .scatter-graph {
-        margin: 5px;
-        border: 1px solid #54585A;
-        box-shadow: 4px 4px 2px #54585A;
+        margin: 0px;
+        border: 1px #000000;
+        border-style: solid none;
+    }
+
+    .react-tabs {
+        &__tab-list {
+            display: table;
+            width: 100%;
+            margin: 0px;
+            border-bottom: 1px solid #000000;
+            padding: 0;
+        }
+
+        &__tab {
+            display: table-cell;
+
+            position: relative;
+            border: 1px solid transparent;
+            border-bottom: none;
+            padding: 6px 12px;
+
+            background: #1D2226;
+            color: #999999;
+            list-style: none;
+            cursor: pointer;
+
+            &--selected {
+                background: #2A3238;
+                color: #FFFFFF;
+            }
+        }
+
+        &__tab-panel {
+            display: none;
+
+            &--selected {
+                display: block;
+            }
+        }
+    }
+}
+
+.navigation-view {
+    z-index: 20;
+    position: relative;
+
+    #map_canvas {
+        width: 100%;
+        height: 100%;
+
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .window-resize-control {
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        width: 30px;
+        height: 30px;
     }
 }

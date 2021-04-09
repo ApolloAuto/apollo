@@ -49,6 +49,14 @@ class KVDB(object):
         db.close()
         return value
 
+    @staticmethod
+    def List():
+        """List values from DB."""
+        db = plyvel.DB(gflags.FLAGS.kv_db_path, create_if_missing=True)
+        for key, value in db:
+            print(key, ":", value)
+        db.close()
+
 
 if __name__ == '__main__':
     def _help():
@@ -56,20 +64,24 @@ if __name__ == '__main__':
             {0} put <key> <value>
             {0} del <key>
             {0} get <key>
+            {0} list
         """.format(sys.argv[0])
         sys.exit(0)
 
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         _help()
 
     gflags.FLAGS(sys.argv)
     op = sys.argv[1]
-    key = sys.argv[2]
+    if len(sys.argv) >= 3:
+        key = sys.argv[2]
     if op == 'put':
         KVDB.Put(key, sys.argv[3]) if len(sys.argv) == 4 else _help()
     elif op == 'del':
         KVDB.Delete(key)
     elif op == 'get':
         print KVDB.Get(key)
+    elif op == 'list':
+        KVDB.List()
     else:
         _help()

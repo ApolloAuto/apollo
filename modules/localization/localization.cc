@@ -19,9 +19,11 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/localization/common/localization_gflags.h"
+#ifdef __x86_64__
 #include "modules/localization/msf/msf_localization.h"
+#endif
+#include "modules/localization/lmd/lmd_localization.h"
 #include "modules/localization/rtk/rtk_localization.h"
-
 namespace apollo {
 namespace localization {
 
@@ -38,8 +40,14 @@ void Localization::RegisterLocalizationMethods() {
       []() -> LocalizationBase* { return new RTKLocalization(); });
 
   localization_factory_.Register(
+      LocalizationConfig::LMD,
+      []() -> LocalizationBase* { return new LMDLocalization(); });
+
+#ifdef __x86_64__
+  localization_factory_.Register(
       LocalizationConfig::MSF,
       []() -> LocalizationBase* { return new MSFLocalization(); });
+#endif
 }
 
 Status Localization::Init() {
@@ -69,9 +77,7 @@ Status Localization::Start() {
   return Status::OK();
 }
 
-void Localization::Stop() {
-  localization_->Stop();
-}
+void Localization::Stop() { localization_->Stop(); }
 
 }  // namespace localization
 }  // namespace apollo

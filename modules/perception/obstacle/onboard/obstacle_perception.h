@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
-#define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
 
 #include <memory>
 #include <vector>
@@ -64,7 +64,8 @@ class ObstaclePerception {
    * @param out_objects The obstacle perception results
    * @return True if process successfully, false otherwise
    */
-  bool Process(SensorRawFrame* frame, std::vector<ObjectPtr>* out_objects);
+  bool Process(SensorRawFrame* frame,
+               std::vector<std::shared_ptr<Object>>* out_objects);
 
  private:
   /**
@@ -89,4 +90,4 @@ class ObstaclePerception {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_OBSTACLE_PERCEPTION_H_

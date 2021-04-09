@@ -1,0 +1,62 @@
+major_version: "local"
+minor_version: ""
+default_target_cpu: "local"
+
+default_toolchain {
+  cpu: "k8"
+  toolchain_identifier: "local_clang"
+}
+
+toolchain {
+  abi_version: "local"
+  abi_libc_version: "local"
+  builtin_sysroot: ""
+  compiler: "compiler"
+  host_system_name: "local"
+  needsPic: true
+  supports_gold_linker: false
+  supports_incremental_linker: false
+  supports_fission: false
+  supports_interface_shared_objects: false
+  supports_normalizing_ar: false
+  supports_start_end_lib: false
+  target_libc: "local"
+  target_cpu: "local"
+  target_system_name: "local"
+  toolchain_identifier: "local_clang"
+
+  tool_path { name: "ar" path: "/usr/bin/ar" }
+  tool_path { name: "compat-ld" path: "/usr/bin/ld" }
+  tool_path { name: "cpp" path: "CXX" }
+  tool_path { name: "dwp" path: "/usr/bin/dwp" }
+  tool_path { name: "gcc" path: "CC" }
+  tool_path { name: "gcov" path: "/usr/bin/gcov" }
+  tool_path { name: "ld" path: "/usr/bin/ld" }
+  tool_path { name: "nm" path: "/usr/bin/nm" }
+  tool_path { name: "objcopy" path: "/usr/bin/objcopy" }
+  tool_path { name: "objdump" path: "/usr/bin/objdump" }
+  tool_path { name: "strip" path: "/usr/bin/strip" }
+
+  compiler_flag: "-O3"
+  compiler_flag: "-Wall"
+  compiler_flag: "-Wno-everything"
+  compiler_flag: "-g"
+
+  cxx_flag: "-std=c++14"
+
+  linker_flag: "-g"
+  linker_flag: "-lstdc++"
+  linker_flag: "-L/usr/local/lib64"
+
+  cxx_builtin_include_directory: "/usr/lib/clang/6.0/include"
+  cxx_builtin_include_directory: "/usr/lib/llvm-6.0/lib/clang/6.0.1/include"
+  cxx_builtin_include_directory: "/usr/lib/gcc/x86_64-linux-gnu/4.9/include"
+  cxx_builtin_include_directory: "/usr/local/include"
+  cxx_builtin_include_directory: "/usr/include"
+
+  objcopy_embed_flag: "-I"
+  objcopy_embed_flag: "binary"
+
+  linking_mode_flags { mode: DYNAMIC }
+}
+

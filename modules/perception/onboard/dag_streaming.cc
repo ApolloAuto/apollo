@@ -17,13 +17,8 @@
 #include "modules/perception/onboard/dag_streaming.h"
 
 #include <unistd.h>
-#include <map>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include "gflags/gflags.h"
-#include "google/protobuf/text_format.h"
+#include <utility>
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
@@ -36,14 +31,15 @@ using std::string;
 using std::map;
 using std::vector;
 
-using google::protobuf::TextFormat;
-
 DEFINE_int32(max_allowed_congestion_value, 0,
              "When DAGStreaming event_queues max length greater than "
              "max_allowed_congestion_value, reset DAGStreaming."
              "(default is 0, disable this feature.)");
 DEFINE_bool(enable_timing_remove_stale_data, true,
             "whether timing clean shared data");
+
+SubnodeMap DAGStreaming::subnode_map_;
+std::map<std::string, SubnodeID> DAGStreaming::subnode_name_map_;
 
 DAGStreaming::DAGStreaming()
     : Thread(true, "DAGStreamingThread"),
@@ -59,16 +55,8 @@ bool DAGStreaming::Init(const string& dag_config_path) {
   }
 
   DAGConfig dag_config;
-  string content;
-  if (!apollo::common::util::GetContent(dag_config_path, &content)) {
-    AERROR << "failed to laod DAGConfig file: " << dag_config_path;
-    return false;
-  }
-
-  if (!TextFormat::ParseFromString(content, &dag_config)) {
-    AERROR << "failed to Parse DAGConfig proto: " << dag_config_path;
-    return false;
-  }
+  CHECK(apollo::common::util::GetProtoFromFile(dag_config_path, &dag_config))
+      << "failed to load DAGConfig file: " << dag_config_path;
 
   if (!event_manager_.Init(dag_config.edge_config())) {
     AERROR << "failed to Init EventManager. file: " << dag_config_path;
@@ -131,8 +119,7 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
 
   for (auto& subnode_proto : subnode_config.subnodes()) {
     std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool> result =
-        subnode_config_map.insert(
-            std::make_pair(subnode_proto.id(), subnode_proto));
+        subnode_config_map.emplace(subnode_proto.id(), subnode_proto);
     if (!result.second) {
       AERROR << "duplicate SubnodeID: " << subnode_proto.id();
       return false;
@@ -162,21 +149,23 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
     const SubnodeID subnode_id = pair.first;
     Subnode* inst = SubnodeRegisterer::GetInstanceByName(subnode_config.name());
 
-    if (inst == NULL) {
+    //    AINFO << "subnode_name: " << subnode_config.name();
+    //    AINFO << "subnode_id: " << subnode_id;
+    if (inst == nullptr) {
       AERROR << "failed to get subnode instance. name: "
              << subnode_config.name();
       return false;
     }
 
-    bool result = inst->Init(
-        subnode_config, &event_manager_, &shared_data_manager_,
-        subnode_sub_events_map[subnode_id], subnode_pub_events_map[subnode_id]);
+    bool result = inst->Init(subnode_config, subnode_sub_events_map[subnode_id],
+                             subnode_pub_events_map[subnode_id],
+                             &event_manager_, &shared_data_manager_);
     if (!result) {
       AERROR << "failed to Init subnode. name: " << inst->name();
       return false;
     }
     subnode_map_.emplace(subnode_id, std::unique_ptr<Subnode>(inst));
-
+    subnode_name_map_[subnode_config.name()] = subnode_id;
     AINFO << "Init subnode succ. " << inst->DebugString();
   }
 
@@ -190,9 +179,7 @@ bool DAGStreaming::InitSharedData(
   return shared_data_manager_.Init(data_config);
 }
 
-void DAGStreaming::Run() {
-  Schedule();
-}
+void DAGStreaming::Run() { Schedule(); }
 
 void DAGStreaming::Reset() {
   event_manager_.Reset();
@@ -230,6 +217,15 @@ void DAGStreamingMonitor::Run() {
     }
     sleep(1);
   }
+}
+
+Subnode* DAGStreaming::GetSubnodeByName(const std::string& name) {
+  std::map<std::string, SubnodeID>::iterator iter =
+      subnode_name_map_.find(name);
+  if (iter != subnode_name_map_.end()) {
+    return subnode_map_[iter->second].get();
+  }
+  return nullptr;
 }
 
 }  // namespace perception

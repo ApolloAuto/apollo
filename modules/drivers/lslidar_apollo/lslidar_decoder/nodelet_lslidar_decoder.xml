@@ -1,0 +1,10 @@
+<library path="lib/liblslidar_decoder_nodelet">
+  <class name="lslidar_decoder/LslidarDecoderNodelet"
+         type="apollo::drivers::lslidar_decoder::LslidarDecoderNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      Aggregates points from multiple packets, publishing LslidarSweep msg defined
+      in lslidar_msgs.
+    </description>
+  </class>
+</library>

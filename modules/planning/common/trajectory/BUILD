@@ -24,9 +24,26 @@ cc_library(
     ],
     deps = [
         ":trajectory",
+        "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:planning_util",
+        "//modules/planning/common:planning_context",
         "@eigen//:eigen",
+    ],
+)
+
+cc_test(
+    name = "discretized_trajectory_test",
+    size = "small",
+    srcs = [
+        "discretized_trajectory_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":discretized_trajectory",
+        "//modules/common/util",
+        "@gtest//:main",
     ],
 )
 
@@ -44,6 +61,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "publishable_trajectory_test",
+    size = "small",
+    srcs = [
+        "publishable_trajectory_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":publishable_trajectory",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "trajectory_stitcher",
     srcs = [
@@ -56,8 +89,9 @@ cc_library(
         ":publishable_trajectory",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/reference_line",
     ],
 )
 

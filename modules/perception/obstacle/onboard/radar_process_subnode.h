@@ -28,8 +28,9 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/object.h"
+#include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/interface/base_roi_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
@@ -41,7 +42,6 @@
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/obstacle/common/pose_util.h"
 
 namespace apollo {
 namespace perception {
@@ -56,14 +56,14 @@ class RadarProcessSubnode : public Subnode {
   }
 
  private:
-  typedef std::pair<double,
-    apollo::localization::LocalizationEstimate> LocalizationPair;
+  typedef std::pair<double, apollo::localization::LocalizationEstimate>
+      LocalizationPair;
   bool InitInternal() override;
 
   void OnRadar(const ContiRadar &radar_obs);
 
   void OnLocalization(
-    const apollo::localization::LocalizationEstimate &localization);
+      const apollo::localization::LocalizationEstimate &localization);
 
   void RegistAllAlgorithm();
 
@@ -85,9 +85,9 @@ class RadarProcessSubnode : public Subnode {
   Eigen::Matrix4d short_camera_extrinsic_;
 
   boost::circular_buffer<LocalizationPair> localization_buffer_;
-  ContiRadarIDExpansion _conti_id_expansion;
+  ContiRadarIDExpansion conti_id_expansion_;
   std::unique_ptr<BaseRadarDetector> radar_detector_;
-  HDMapInput *hdmap_input_ = NULL;
+  HDMapInput *hdmap_input_ = nullptr;
   // here we use HdmapROIFilter
   std::unique_ptr<HdmapROIFilter> roi_filter_;
   Mutex mutex_;

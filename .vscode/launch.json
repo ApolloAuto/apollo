@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "C++ Launch",
+        "type": "cppdbg",
+        "request": "launch",
+        // You can change the "planning" to your module name, but it should be 
+        // same as those in gdbserver of the docker container. 
+        "program": "${workspaceRoot}/bazel-bin/modules/planning/planning",
+        // You can change "localhost:1111" to another "IP:port" name, but it 
+        // should be same as those in gdbserver of the docker container.  
+        "miDebuggerServerAddress": "localhost:1111",
+        // You can change the task to meet your demands in the 
+        // ".vscode/tasks.json" file (search the label:  
+        // "start gdbserver"), but the module name and the port 
+        // number should be consistent with this file.        
+        "preLaunchTask": "start gdbserver",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceRoot}",
+        "environment": [],
+        "externalConsole": true,
+        "linux": {
+            "MIMode": "gdb"
+        },
+        "osx": {
+            "MIMode": "gdb"
+        },
+        "windows": {
+            "MIMode": "gdb"
+        }
+    }
+    ]
+}

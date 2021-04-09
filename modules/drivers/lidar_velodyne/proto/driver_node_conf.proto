@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar_velodyne;
+
+message DriverNodeConf {
+  optional string device_ip = 1;
+  optional string frame_id = 2 [default = "velodyne"];
+  optional string model = 3 [default = "VLS128"];
+  optional string pcap = 4 [default = ""];
+  optional int32 port = 5 [default = 2368];
+  optional int32 npackets = 6 [default = 1507];
+  optional bool read_fast = 7 [default = false];
+  optional bool read_once = 8 [default = false];
+  optional double repeat_delay = 9 [default = 0.0];
+  optional double rpm = 10 [default = 600.0];
+}

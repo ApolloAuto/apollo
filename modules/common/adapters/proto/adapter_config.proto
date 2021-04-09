@@ -6,6 +6,7 @@ package apollo.common.adapter;
 message AdapterConfig {
   enum MessageType {
     POINT_CLOUD = 1;
+    VLP16_POINT_CLOUD = 58;
     GPS = 2;
     IMU = 3;
     CHASSIS = 4;
@@ -44,6 +45,45 @@ message AdapterConfig {
     RAW_IMU = 37;
     LOCALIZATION_MSF_STATUS = 38;
     STATIC_INFO = 39;
+    RELATIVE_MAP = 40;
+    NAVIGATION = 41;
+    ULTRASONIC_RADAR = 42;
+    AUDIO_CAPTURE = 43;
+    IMAGE_FRONT = 45;
+    PANDORA_POINT_CLOUD = 46;
+    PANDORA_CAMERA_FRONT_COLOR = 47;
+    PANDORA_CAMERA_RIGHT_GRAY = 48;
+    PANDORA_CAMERA_LEFT_GRAY = 49;
+    PANDORA_CAMERA_FRONT_GRAY = 50;
+    PANDORA_CAMERA_BACK_GRAY = 51;
+    PERCEPTION_LANE_MASK = 52;
+    GUARDIAN = 53;
+    GNSS_RAW_DATA = 54;
+    STREAM_STATUS = 55;
+    GNSS_HEADING = 56;
+    RTCM_DATA = 57;
+    RACOBIT_RADAR = 59;
+    // veldoyne fusion configs
+    POINT_CLOUD_DENSE = 60;
+    POINT_CLOUD_DENSE_RAW = 61;
+    VELODYNE_SCAN_DENSE = 62;
+
+    POINT_CLOUD_SPARSE_1 = 63;
+    POINT_CLOUD_SPARSE_RAW_1 = 64;
+    VELODYNE_SCAN_SPARSE_1 = 65;
+
+    POINT_CLOUD_SPARSE_2 = 66;
+    POINT_CLOUD_SPARSE_RAW_2 = 67;
+    VELODYNE_SCAN_SPARSE_2 = 68;
+
+    POINT_CLOUD_SPARSE_3 = 69;
+    POINT_CLOUD_SPARSE_RAW_3 = 70;
+    VELODYNE_SCAN_SPARSE_3 = 71;
+
+    CAMERA_IMAGE_LONG = 72;
+    CAMERA_IMAGE_SHORT = 73;
+
+    PLANNING_PAD = 74;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
@@ -56,6 +96,7 @@ message AdapterConfig {
   // is not useful for PUBLISH_ONLY mode messages.
   optional int32 message_history_limit = 3 [default = 10];
   optional bool latch = 4 [default=false];
+  optional string topic = 5;
 }
 
 // A config to specify which messages a certain module would consume and

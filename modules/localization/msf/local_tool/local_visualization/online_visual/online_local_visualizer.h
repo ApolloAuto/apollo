@@ -75,7 +75,7 @@ class OnlineLocalVisualizer : public apollo::common::ApolloApp {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init();
+  apollo::common::Status Init() override;
 
   /**
    * @brief module stop function

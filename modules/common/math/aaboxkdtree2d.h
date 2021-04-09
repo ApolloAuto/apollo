@@ -329,13 +329,16 @@ class AABoxKDTree2dNode {
     max_x_ = -std::numeric_limits<double>::infinity();
     max_y_ = -std::numeric_limits<double>::infinity();
     for (ObjectPtr object : objects) {
-      min_x_ = std::min(min_x_, object->aabox().min_x());
-      max_x_ = std::max(max_x_, object->aabox().max_x());
-      min_y_ = std::min(min_y_, object->aabox().min_y());
-      max_y_ = std::max(max_y_, object->aabox().max_y());
+      min_x_ = std::fmin(min_x_, object->aabox().min_x());
+      max_x_ = std::fmax(max_x_, object->aabox().max_x());
+      min_y_ = std::fmin(min_y_, object->aabox().min_y());
+      max_y_ = std::fmax(max_y_, object->aabox().max_y());
     }
     mid_x_ = (min_x_ + max_x_) / 2.0;
     mid_y_ = (min_y_ + max_y_) / 2.0;
+    CHECK(!std::isinf(max_x_) && !std::isinf(max_y_) && !std::isinf(min_x_) &&
+          !std::isinf(min_y_))
+        << "the provided object box size is infinity";
   }
 
   void ComputePartition() {

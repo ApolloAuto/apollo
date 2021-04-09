@@ -28,15 +28,15 @@ std::ostream &operator<<(std::ostream &os, const Light &light) {
   return os;
 }
 
-double Distance2Stopline(const Eigen::Matrix4d &car_pose,
-                         const google::protobuf::RepeatedPtrField<
-                             ::apollo::hdmap::Curve> &stoplines) {
+double Distance2Stopline(
+    const Eigen::Matrix4d &car_pose,
+    const google::protobuf::RepeatedPtrField<hdmap::Curve> &stoplines) {
   if (stoplines.size() == 0) {
     AWARN << "compute car to stopline's distance failed(no stopline). "
           << "car_pose:" << car_pose;
     return -1;
   }
-  const ::apollo::hdmap::Curve &stopline = stoplines.Get(0);
+  const hdmap::Curve &stopline = stoplines.Get(0);
   if (stopline.segment_size() == 0) {
     AWARN
         << "compute distance to stopline failed(stopline has no segment line)."

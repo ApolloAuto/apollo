@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
+
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,7 @@ bool OpenglVisualizer::Init() {
     return false;
   }
 
-  if (opengl_vs_->Initialize() == false) {
+  if (!opengl_vs_->Initialize()) {
     AERROR << "Failed to initialize opengl viewer";
     return false;
   }
@@ -58,17 +59,13 @@ void OpenglVisualizer::Render(const FrameContent &content) {
   opengl_vs_->SpinOnce();
 }
 
-void OpenglVisualizer::SetSize(int w, int h) {
-  opengl_vs_->SetSize(w, h);
-}
+void OpenglVisualizer::SetSize(int w, int h) { opengl_vs_->SetSize(w, h); }
 
 void OpenglVisualizer::SetBackgroundColor(float r, float g, float b, float a) {
   opengl_vs_->SetBackgroundColor(Eigen::Vector3d(r, g, b));
 }
 
-void OpenglVisualizer::SetVelodyneHeight(float h) {
-  velodyne_height_ = h;
-}
+void OpenglVisualizer::SetVelodyneHeight(float h) { velodyne_height_ = h; }
 
 void OpenglVisualizer::SetCameraPosition() {
   up_velodyne_.x = 0;
@@ -122,14 +119,14 @@ void OpenglVisualizer::SetMainCarPoints() {
 void OpenglVisualizer::UpdateCameraSystem(FrameContent *content) {
   Eigen::Matrix4d pose_v2w = content->GetPoseV2w();
 
-  TransformPoint<pcl_util::Point>(camera_center_velodyne_,
-                                  &camera_center_world_, pose_v2w);
+  TransformPoint<pcl_util::Point>(camera_center_velodyne_, pose_v2w,
+                                  &camera_center_world_);
 
-  TransformPoint<pcl_util::Point>(view_point_velodyne_, &view_point_world_,
-                                  pose_v2w);
+  TransformPoint<pcl_util::Point>(view_point_velodyne_, pose_v2w,
+                                  &view_point_world_);
 
-  TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_,
-                                       &main_car_points_world_, pose_v2w);
+  TransformPointCloud<pcl_util::Point>(main_car_points_velodyne_, pose_v2w,
+                                       &main_car_points_world_);
 
   Eigen::Vector4d up_w(up_velodyne_.x, up_velodyne_.y, up_velodyne_.z, 0);
 

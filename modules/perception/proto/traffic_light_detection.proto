@@ -4,7 +4,7 @@ package apollo.perception;
 
 import "modules/common/proto/header.proto";
 
-message TrafficLightBox{
+message TrafficLightBox {
     optional int32 x = 1;
     optional int32 y = 2;
     optional int32 width = 3;
@@ -12,7 +12,8 @@ message TrafficLightBox{
     optional TrafficLight.Color color = 5;
     optional bool selected = 6;
 }
-message TrafficLightDebug{
+
+message TrafficLightDebug {
     optional TrafficLightBox cropbox = 1;
     repeated TrafficLightBox box = 2;
     optional int32 signal_num = 3;
@@ -23,6 +24,7 @@ message TrafficLightDebug{
     optional double distance_to_stop_line = 8;
     optional int32 camera_id = 9;
 }
+
 message TrafficLight {
     enum Color {
         UNKNOWN = 0;
@@ -39,6 +41,7 @@ message TrafficLight {
     // Duration of the traffic light since detected.
     optional double tracking_time = 4;
 }
+
 message TrafficLightDetection {
     optional apollo.common.Header header = 2;
     repeated TrafficLight traffic_light = 1;

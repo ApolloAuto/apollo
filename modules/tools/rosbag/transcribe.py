@@ -33,7 +33,6 @@ import common.proto_utils as proto_utils
 from common.message_manager import PbMessageManager
 
 g_message_manager = PbMessageManager()
-
 g_args = None
 
 
@@ -51,9 +50,7 @@ if __name__ == "__main__":
         description=
         "A tool to transcribe received protobuf messages into text files")
     parser.add_argument(
-        "topic",
-        action="store",
-        help="""the topic that you want to transcribe.""")
+        "topic", action="store", help="the topic that you want to transcribe.")
     parser.add_argument(
         "--out_dir",
         action="store",

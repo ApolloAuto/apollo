@@ -80,10 +80,10 @@ TEST(MPCSolverTest, MPC) {
   R1 << 1;
 
   Eigen::MatrixXd lower_bound1(CONTROLS, 1);
-  lower_bound1 << -10;
+  lower_bound1 << -5;
 
   Eigen::MatrixXd upper_bound1(CONTROLS, 1);
-  upper_bound1 << 10;
+  upper_bound1 << 5;
 
   Eigen::MatrixXd initial_state1(STATES, 1);
   initial_state1 << 30, 30, 0, 0;
@@ -102,7 +102,7 @@ TEST(MPCSolverTest, MPC) {
     }
     SolveLinearMPC(A, B1, C, Q, R1, lower_bound1, upper_bound1, initial_state1,
                    reference1, EPS, MAX_ITER, &control1);
-    EXPECT_FLOAT_EQ(lower_bound(0), control1[0](0));
+    EXPECT_FLOAT_EQ(lower_bound1(0), control1[0](0));
   }
 
   Eigen::MatrixXd B2(STATES, CONTROLS);

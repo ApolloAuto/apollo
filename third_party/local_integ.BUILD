@@ -5,9 +5,13 @@ licenses(["notice"])
 cc_library(
     name = "local_integ",
     srcs = [
-        "lib/liblocalization_msf_local_integ.so",
+        "lib/liblocalization_msf.so",
     ],
-    hdrs = [
-        "include/localization_integ.h",
+    hdrs = glob([
+        "include/*.h",
+    ]),
+    linkopts = [
+        "-L/usr/lib/x86_64-linux-gnu",
+        "-lz",
     ],
 )

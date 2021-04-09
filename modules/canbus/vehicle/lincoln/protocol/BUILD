@@ -20,6 +20,7 @@ cc_library(
         "misc_69.cc",
         "steering_64.cc",
         "steering_65.cc",
+        "surround_73.cc",
         "throttle_62.cc",
         "throttle_63.cc",
         "throttleinfo_75.cc",
@@ -44,6 +45,7 @@ cc_library(
         "misc_69.h",
         "steering_64.h",
         "steering_65.h",
+        "surround_73.h",
         "throttle_62.h",
         "throttle_63.h",
         "throttleinfo_75.h",
@@ -304,6 +306,18 @@ cc_test(
     size = "small",
     srcs = [
         "wheelspeed_6a_test.cc",
+    ],
+    deps = [
+        "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "surround_73_test",
+    size = "small",
+    srcs = [
+        "surround_73_test.cc",
     ],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",

@@ -28,10 +28,10 @@ import secure_upgrade_export as sec_api
 
 root_config_path = "/home/caros/secure_upgrade/config/secure_config.json"
 returnCode = sec_api.init_secure_upgrade(root_config_path)
-if returnCode == True:
-    print 'Security environment init successfully!'
+if returnCode is True:
+    print('Security environment init successfully!')
 else:
-    print 'Security environment init fail!'
+    print('Security environment init failed!')
     sys.exit(1)
 
 def verify():
@@ -44,8 +44,8 @@ def verify():
     returnCode = sec_api.sec_upgrade_verify_package(auth_token,
                                                     sec_package,
                                                     orig_package)
-    if returnCode == True:
-        print 'verify package  successfully!'
+    if returnCode is True:
+        print 'verify package successfully!'
         sys.exit(0)
     else:
         print 'verify package failed!!!'

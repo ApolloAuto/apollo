@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
-#define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
+#ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_
+#define MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_
+
+#include <memory>
 
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/types.h"
@@ -27,31 +29,34 @@ namespace perception {
 
 struct TrackObjectDistanceOptions {
   Eigen::Vector3d *ref_point = nullptr;
+  const Eigen::Matrix4d *sensor_world_pose = nullptr;
 };
+
 class PbfTrackObjectDistance {
  public:
-  PbfTrackObjectDistance();
-  virtual ~PbfTrackObjectDistance();
+  PbfTrackObjectDistance() = default;
+  virtual ~PbfTrackObjectDistance() = default;
 
-  float Compute(const PbfTrackPtr &fused_track,
-                const PbfSensorObjectPtr &sensor_object,
+  float Compute(PbfTrackPtr fused_track,
+                const std::shared_ptr<PbfSensorObject> &sensor_object,
                 const TrackObjectDistanceOptions &options);
 
  protected:
-  float ComputeVelodyne64Velodyne64(const PbfSensorObjectPtr &fused_object,
-                                    const PbfSensorObjectPtr &sensor_object,
-                                    const Eigen::Vector3d &ref_pos,
-                                    int range = 3);
-  float ComputeVelodyne64Radar(const PbfSensorObjectPtr &fused_object,
-                               const PbfSensorObjectPtr &sensor_object,
-                               const Eigen::Vector3d &ref_pos, int range = 3);
-  float ComputeRadarRadar(const PbfSensorObjectPtr &fused_object,
-                          const PbfSensorObjectPtr &sensor_object,
+  float ComputeVelodyne64Velodyne64(
+      const std::shared_ptr<PbfSensorObject> &fused_object,
+      const std::shared_ptr<PbfSensorObject> &sensor_object,
+      const Eigen::Vector3d &ref_pos, int range = 3);
+  float ComputeVelodyne64Radar(
+      const std::shared_ptr<PbfSensorObject> &fused_object,
+      const std::shared_ptr<PbfSensorObject> &sensor_object,
+      const Eigen::Vector3d &ref_pos, int range = 3);
+  float ComputeRadarRadar(const std::shared_ptr<PbfSensorObject> &fused_object,
+                          const std::shared_ptr<PbfSensorObject> &sensor_object,
                           const Eigen::Vector3d &ref_pos, int range = 3);
 
-  float ComputeDistance3D(const PbfSensorObjectPtr &fused_object,
-                          const PbfSensorObjectPtr &sensor_object,
-                          const Eigen::Vector3d &ref_pos, int range);
+  float ComputeDistance3D(const std::shared_ptr<PbfSensorObject> &fused_object,
+                          const std::shared_ptr<PbfSensorObject> &sensor_object,
+                          const Eigen::Vector3d &ref_pos, const int range);
   float ComputeEuclideanDistance(const Eigen::Vector3d &des,
                                  const Eigen::Vector3d &src);
   bool ComputePolygonCenter(const PolygonDType &polygon,
@@ -59,6 +64,15 @@ class PbfTrackObjectDistance {
   bool ComputePolygonCenter(const PolygonDType &polygon,
                             const Eigen::Vector3d &ref_pos, int range,
                             Eigen::Vector3d *center);
+  float ComputeDistanceAngleMatchProb(
+      const std::shared_ptr<PbfSensorObject> &fused_object,
+      const std::shared_ptr<PbfSensorObject> &sensor_object,
+      const TrackObjectDistanceOptions &options);
+
+  float GetAngle(const Eigen::Vector3d &sensor_center, SensorType type);
+  Eigen::Vector3d GetCenter(const std::shared_ptr<PbfSensorObject> &obj,
+                            const Eigen::Matrix4d &world_sensor_pose,
+                            SensorType sensor_type);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(PbfTrackObjectDistance);
@@ -66,4 +80,4 @@ class PbfTrackObjectDistance {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_TRACK_OBJECT_DISTANCE_H_ // NOLINT
+#endif  // MODULES_PERCEPTION_OBSTACLE_FUSION_PBF_PBF_TRACK_OBJECT_DISTANCE_H_

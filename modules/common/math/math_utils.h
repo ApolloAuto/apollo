@@ -168,6 +168,42 @@ double Gaussian(const double u, const double std, const double x);
 // Sigmoid
 double Sigmoid(const double x);
 
+// Rotate Axis (2D):
+// convert a point (x0, y0) in axis1 to a point (x1, y1) in axis2 where the
+// angle from axis1 to axis2 is theta (counter clockwise)
+void RotateAxis(const double theta, const double x0, const double y0,
+                double *x1, double *y1);
+
+inline std::pair<double, double> RFUToFLU(const double x, const double y) {
+  return std::make_pair(y, -x);
+}
+
+inline std::pair<double, double> FLUToRFU(const double x, const double y) {
+  return std::make_pair(-y, x);
+}
+
+inline void L2Norm(int feat_dim, float *feat_data) {
+  if (feat_dim == 0) {
+    return;
+  }
+  // feature normalization
+  float l2norm = 0.0;
+  for (int i = 0; i < feat_dim; ++i) {
+    l2norm += feat_data[i] * feat_data[i];
+  }
+  if (l2norm == 0) {
+    float val = 1.0 / std::sqrt(feat_dim);
+    for (int i = 0; i < feat_dim; ++i) {
+      feat_data[i] = val;
+    }
+  } else {
+    l2norm = std::sqrt(l2norm);
+    for (int i = 0; i < feat_dim; ++i) {
+      feat_data[i] /= l2norm;
+    }
+  }
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

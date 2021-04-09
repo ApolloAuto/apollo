@@ -15,6 +15,7 @@ message ObstacleConf {
   enum EvaluatorType {
     MLP_EVALUATOR = 0;
     RNN_EVALUATOR = 1;
+    COST_EVALUATOR = 2;    // navi mode can only support this evaluator
   }
 
   enum PredictorType {
@@ -22,6 +23,8 @@ message ObstacleConf {
     FREE_MOVE_PREDICTOR = 1;
     REGIONAL_PREDICTOR = 2;
     MOVE_SEQUENCE_PREDICTOR = 3;
+    EMPTY_PREDICTOR = 4;
+    SINGLE_LANE_PREDICTOR = 5;
   }
 
   optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;

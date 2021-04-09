@@ -13,13 +13,17 @@
     <!-- 100ms -->
     <arg name="tf_query_timeout" default="0.1"/>
     <arg name="pcd_folder" value="/apollo/data/pcd" />
+    <arg name="nodelet_manager_name" value="velodyne16_nodelet_manager"/>
+
 
   <include file="$(find velodyne_pointcloud)/launch/nodelet_manager.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
   </include>
     <!--  HDL16E -->
     <!--  driver nodelets -->
   <include file="$(find velodyne_driver)/launch/driver_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne16_driver"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="frame_id" value="$(arg velodyne16_frame_id)"/>
@@ -29,6 +33,7 @@
   <!-- start convert nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne16_convert"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="calibration_online" value="$(arg velodyne16_calibration_online)" />
     <arg name="calibration" value="$(arg velodyne16_calibration_file)" />
@@ -40,6 +45,7 @@
   </include>
 
   <include file="$(find velodyne_pointcloud)/launch/pcd_exporter_nodelet.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
     <arg name="pcd_folder" value="$(arg pcd_folder)"/>
     <arg name="skip_static_frames" default="false"/>
     <arg name="child_frame_id" default="velodyne16"/>

@@ -40,8 +40,8 @@ class TransformListener {
   ~TransformListener();
 
   /// Callback function for ros message subscription
-  void TfCallback(const tf2_msgs::TFMessage::ConstPtr& tf);
-  void TfStaticCallback(const tf2_msgs::TFMessage::ConstPtr& tf_static);
+  void TfCallback(tf2_msgs::TFMessage::ConstPtr tf);
+  void TfStaticCallback(tf2_msgs::TFMessage::ConstPtr tf_static);
 
  private:
   void Init();
@@ -49,7 +49,7 @@ class TransformListener {
 
   void DedicatedListenerThread();
 
-  void CallbackImpl(const tf2_msgs::TFMessage::ConstPtr& tf, bool is_static);
+  void CallbackImpl(tf2_msgs::TFMessage::ConstPtr tf, bool is_static);
 
   ros::CallbackQueue tf_message_callback_queue_;
   std::unique_ptr<std::thread> dedicated_listener_thread_;

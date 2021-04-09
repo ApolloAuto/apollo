@@ -90,7 +90,7 @@ void PCDExporter::init() {
   }
 }
 
-void PCDExporter::write_pcd_file(const sensor_msgs::PointCloud2::ConstPtr &msg,
+void PCDExporter::write_pcd_file(sensor_msgs::PointCloud2::ConstPtr msg,
                                  const std::string &filename) {
   ROS_INFO_STREAM("export pcd filename :" << filename);
   pcl::PCLPointCloud2 pcl_cloud;
@@ -99,7 +99,7 @@ void PCDExporter::write_pcd_file(const sensor_msgs::PointCloud2::ConstPtr &msg,
 }
 
 int PCDExporter::write_pcd_pose_file(
-    const sensor_msgs::PointCloud2::ConstPtr &msg, int index) {
+    sensor_msgs::PointCloud2::ConstPtr msg, int index) {
   double time = msg->header.stamp.toSec();
 
   Eigen::Matrix4d pose;
@@ -163,7 +163,7 @@ bool PCDExporter::get_pose(const ros::Time &time, Eigen::Matrix4d &pose) {
 }
 
 void PCDExporter::pcd_writer_callback(
-    const sensor_msgs::PointCloud2::ConstPtr &cloud) {
+    sensor_msgs::PointCloud2::ConstPtr cloud) {
   queue_.push_back(cloud);
   for (auto iter = queue_.begin(); iter != queue_.end();) {
     sensor_msgs::PointCloud2ConstPtr &msg = *iter;

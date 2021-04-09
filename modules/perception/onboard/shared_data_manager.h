@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
-#define MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#define MODULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
+
+#include "modules/perception/onboard/proto/dag_config.pb.h"
 
 #include "modules/common/macro.h"
-#include "modules/perception/onboard/proto/dag_config.pb.h"
 #include "modules/perception/onboard/shared_data.h"
 
 namespace apollo {
@@ -43,9 +44,7 @@ class SharedDataManager {
   void RemoveStaleData();
 
  private:
-  using SharedDataMap = std::map<std::string, std::unique_ptr<SharedData>>;
-
-  SharedDataMap shared_data_map_;
+  std::unordered_map<std::string, std::unique_ptr<SharedData>> shared_data_map_;
   bool inited_ = false;
   DISALLOW_COPY_AND_ASSIGN(SharedDataManager);
 };
@@ -53,4 +52,4 @@ class SharedDataManager {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_SHARED_DATA_MANAGER_H_

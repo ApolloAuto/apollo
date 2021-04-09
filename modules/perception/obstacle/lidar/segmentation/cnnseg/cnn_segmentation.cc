@@ -17,28 +17,23 @@
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 
-using apollo::common::util::GetAbsolutePath;
-using std::string;
-using std::vector;
+using apollo::common::util::GetProtoFromFile;
 
 bool CNNSegmentation::Init() {
-  string config_file;
-  string proto_file;
-  string weight_file;
-  if (!GetConfigs(&config_file, &proto_file, &weight_file)) {
+  if (!GetProtoFromFile(FLAGS_cnn_segmentation_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_geometry_camera_converter_config;
     return false;
   }
-  AINFO << "--    config_file: " << config_file;
-  AINFO << "--     proto_file: " << proto_file;
-  AINFO << "--    weight_file: " << weight_file;
 
-  if (!apollo::common::util::GetProtoFromFile(config_file, &cnnseg_param_)) {
+  if (!GetProtoFromFile(config_.config_file(), &cnnseg_param_)) {
     AERROR << "Failed to load config file of CNNSegmentation.";
+    return false;
   }
 
   /// set parameters
@@ -53,18 +48,20 @@ bool CNNSegmentation::Init() {
   if (feature_param.has_width()) {
     width_ = static_cast<int>(feature_param.width());
   } else {
-    width_ = 512;
+    width_ = 640;
   }
   if (feature_param.has_height()) {
     height_ = static_cast<int>(feature_param.height());
   } else {
-    height_ = 512;
+    height_ = 640;
   }
 
 /// Instantiate Caffe net
-#ifndef USE_CAFFE_GPU
+#ifndef USE_GPU
+  AINFO << "using Caffe CPU mode";
   caffe::Caffe::set_mode(caffe::Caffe::CPU);
 #else
+  AINFO << "using Caffe GPU mode";
   int gpu_id =
       cnnseg_param_.has_gpu_id() ? static_cast<int>(cnnseg_param_.gpu_id()) : 0;
   CHECK_GE(gpu_id, 0);
@@ -73,54 +70,48 @@ bool CNNSegmentation::Init() {
   caffe::Caffe::DeviceQuery();
 #endif
 
-  caffe_net_.reset(new caffe::Net<float>(proto_file, caffe::TEST));
-  caffe_net_->CopyTrainedLayersFrom(weight_file);
-
-#ifndef USE_CAFFE_GPU
-  AINFO << "using Caffe CPU mode";
-#else
-  AINFO << "using Caffe GPU mode";
-#endif
+  caffe_net_.reset(new caffe::Net<float>(config_.proto_file(), caffe::TEST));
+  caffe_net_->CopyTrainedLayersFrom(config_.weight_file());
 
   /// set related Caffe blobs
   // center offset prediction
-  string instance_pt_blob_name = network_param.has_instance_pt_blob()
-                                     ? network_param.instance_pt_blob()
-                                     : "instance_pt";
+  std::string instance_pt_blob_name = network_param.has_instance_pt_blob()
+                                          ? network_param.instance_pt_blob()
+                                          : "instance_pt";
   instance_pt_blob_ = caffe_net_->blob_by_name(instance_pt_blob_name);
   CHECK(instance_pt_blob_ != nullptr) << "`" << instance_pt_blob_name
                                       << "` not exists!";
   // objectness prediction
-  string category_pt_blob_name = network_param.has_category_pt_blob()
-                                     ? network_param.category_pt_blob()
-                                     : "category_score";
+  std::string category_pt_blob_name = network_param.has_category_pt_blob()
+                                          ? network_param.category_pt_blob()
+                                          : "category_score";
   category_pt_blob_ = caffe_net_->blob_by_name(category_pt_blob_name);
   CHECK(category_pt_blob_ != nullptr) << "`" << category_pt_blob_name
                                       << "` not exists!";
   // positiveness (foreground object probability) prediction
-  string confidence_pt_blob_name = network_param.has_confidence_pt_blob()
-                                       ? network_param.confidence_pt_blob()
-                                       : "confidence_score";
+  std::string confidence_pt_blob_name = network_param.has_confidence_pt_blob()
+                                            ? network_param.confidence_pt_blob()
+                                            : "confidence_score";
   confidence_pt_blob_ = caffe_net_->blob_by_name(confidence_pt_blob_name);
   CHECK(confidence_pt_blob_ != nullptr) << "`" << confidence_pt_blob_name
                                         << "` not exists!";
   // object height prediction
-  string height_pt_blob_name = network_param.has_height_pt_blob()
-                                   ? network_param.height_pt_blob()
-                                   : "height_pt";
+  std::string height_pt_blob_name = network_param.has_height_pt_blob()
+                                        ? network_param.height_pt_blob()
+                                        : "height_pt";
   height_pt_blob_ = caffe_net_->blob_by_name(height_pt_blob_name);
   CHECK(height_pt_blob_ != nullptr) << "`" << height_pt_blob_name
                                     << "` not exists!";
   // raw feature data
-  string feature_blob_name =
+  std::string feature_blob_name =
       network_param.has_feature_blob() ? network_param.feature_blob() : "data";
   feature_blob_ = caffe_net_->blob_by_name(feature_blob_name);
   CHECK(feature_blob_ != nullptr) << "`" << feature_blob_name
                                   << "` not exists!";
   // class prediction
-  string class_pt_blob_name = network_param.has_class_pt_blob()
-                                  ? network_param.class_pt_blob()
-                                  : "class_score";
+  std::string class_pt_blob_name = network_param.has_class_pt_blob()
+                                       ? network_param.class_pt_blob()
+                                       : "class_score";
   class_pt_blob_ = caffe_net_->blob_by_name(class_pt_blob_name);
   CHECK(class_pt_blob_ != nullptr) << "`" << class_pt_blob_name
                                    << "` not exists!";
@@ -139,10 +130,10 @@ bool CNNSegmentation::Init() {
   return true;
 }
 
-bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
+bool CNNSegmentation::Segment(pcl_util::PointCloudPtr pc_ptr,
                               const pcl_util::PointIndices& valid_indices,
                               const SegmentationOptions& options,
-                              vector<ObjectPtr>* objects) {
+                              std::vector<std::shared_ptr<Object>>* objects) {
   objects->clear();
   int num_pts = static_cast<int>(pc_ptr->points.size());
   if (num_pts == 0) {
@@ -154,6 +145,10 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
       (cnnseg_param_.has_use_full_cloud() ? cnnseg_param_.use_full_cloud()
                                           : false) &&
       (options.origin_cloud != nullptr);
+  float filter_thresh = static_cast<float>(cnnseg_param_.filter_thresh());
+  float enable_filter_thresh =
+      static_cast<float>(cnnseg_param_.enable_filter_thresh());
+
   PERF_BLOCK_START();
 
   // generate raw features
@@ -165,7 +160,7 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   PERF_BLOCK_END("[CNNSeg] feature generation");
 
 // network forward process
-#ifdef USE_CAFFE_GPU
+#ifdef USE_GPU
   caffe::Caffe::set_mode(caffe::Caffe::GPU);
 #endif
   caffe_net_->Forward();
@@ -184,7 +179,12 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
                       use_all_grids_for_clustering);
   PERF_BLOCK_END("[CNNSeg] clustering");
 
-  cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_);
+  caffe::Blob<float>* input_data_blob = feature_blob_.get();
+  const float* input_data = input_data_blob->cpu_data();
+  const float* input_count_data = input_data + input_data_blob->offset(0, 2);
+
+  cluster2d_->Filter(*confidence_pt_blob_, *height_pt_blob_, input_count_data,
+                     filter_thresh, enable_filter_thresh);
 
   cluster2d_->Classify(*class_pt_blob_);
 
@@ -196,41 +196,9 @@ bool CNNSegmentation::Segment(const pcl_util::PointCloudPtr& pc_ptr,
   int min_pts_num = cnnseg_param_.has_min_pts_num()
                         ? static_cast<int>(cnnseg_param_.min_pts_num())
                         : 3;
-  cluster2d_->GetObjects(confidence_thresh, height_thresh, min_pts_num,
-                         objects);
+  cluster2d_->GetObjects(confidence_thresh, height_thresh, min_pts_num, objects,
+                         input_count_data);
   PERF_BLOCK_END("[CNNSeg] post-processing");
-
-  return true;
-}
-
-bool CNNSegmentation::GetConfigs(string* config_file, string* proto_file,
-                                 string* weight_file) {
-  ConfigManager* config_manager = ConfigManager::instance();
-
-  const ModelConfig* model_config = nullptr;
-  if (!config_manager->GetModelConfig("CNNSegmentation", &model_config)) {
-    AERROR << "Failed to get model config for CNNSegmentation";
-    return false;
-  }
-  const string& work_root = config_manager->work_root();
-
-  if (!model_config->GetValue("config_file", config_file)) {
-    AERROR << "Failed to get value of config_file.";
-    return false;
-  }
-  config_file->assign(GetAbsolutePath(work_root, *config_file));
-
-  if (!model_config->GetValue("proto_file", proto_file)) {
-    AERROR << "Failed to get value of proto_file.";
-    return false;
-  }
-  proto_file->assign(GetAbsolutePath(work_root, *proto_file));
-
-  if (!model_config->GetValue("weight_file", weight_file)) {
-    AERROR << "Failed to get value of weight_file.";
-    return false;
-  }
-  weight_file->assign(GetAbsolutePath(work_root, *weight_file));
 
   return true;
 }

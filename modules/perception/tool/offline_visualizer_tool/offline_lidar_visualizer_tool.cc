@@ -23,10 +23,9 @@
 
 #include "pcl/io/pcd_io.h"
 
+#include "modules/common/util/file.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/frame_content.h"
 #include "modules/perception/obstacle/lidar/visualizer/opengl_visualizer/opengl_visualizer.h"
@@ -34,7 +33,6 @@
 
 DECLARE_string(flagfile);
 DECLARE_bool(enable_visualization);
-DECLARE_string(config_manager_path);
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "./pose/", "pose path");
 DEFINE_string(output_path, "./output/", "output path");
@@ -48,11 +46,6 @@ DEFINE_int32(start_frame, 1, "start frame");
 class OfflineLidarPerceptionTool {
  public:
   bool Init(bool use_visualization = false) {
-    if (!ConfigManager::instance()->Init()) {
-      AERROR << "failed to Init ConfigManager";
-      return false;
-    }
-
     lidar_process_.reset(new LidarProcess());
     if (!lidar_process_->Init()) {
       AERROR << "failed to Init lidar_process.";
@@ -62,7 +55,7 @@ class OfflineLidarPerceptionTool {
     if (use_visualization) {
       visualizer_.reset(new OpenglVisualizer());
       if (!visualizer_->Init()) {
-        AERROR << "Init visialuzer failed" << std::endl;
+        AERROR << "Init visualizer failed" << std::endl;
       }
     }
     return true;
@@ -75,8 +68,9 @@ class OfflineLidarPerceptionTool {
     std::vector<std::string> pcd_file_names;
     std::vector<std::string> pose_file_names;
     AINFO << "starting to run";
-    GetFileNamesInFolderById(pose_folder, ".pose", &pose_file_names);
-    GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
+    common::util::GetFileNamesInFolderById(pose_folder, ".pose",
+                                           &pose_file_names);
+    common::util::GetFileNamesInFolderById(pcd_folder, ".pcd", &pcd_file_names);
     AINFO << " pose size " << pose_file_names.size();
     AINFO << " pcd size " << pcd_file_names.size();
     if (pose_file_names.size() != pcd_file_names.size()) {
@@ -107,7 +101,8 @@ class OfflineLidarPerceptionTool {
       auto velodyne_trans = std::make_shared<Eigen::Matrix4d>(pose);
       lidar_process_->Process(time_stamp, cloud, velodyne_trans);
 
-      std::vector<ObjectPtr> result_objects = lidar_process_->GetObjects();
+      std::vector<std::shared_ptr<Object>> result_objects =
+          lidar_process_->GetObjects();
       const pcl_util::PointIndicesPtr roi_indices =
           lidar_process_->GetROIIndices();
 
@@ -139,17 +134,17 @@ class OfflineLidarPerceptionTool {
     }
   }
 
-  void SaveTrackingInformation(std::vector<ObjectPtr>* objects,
+  void SaveTrackingInformation(std::vector<std::shared_ptr<Object>>* objects,
                                const Eigen::Matrix4d& pose_v2w,
-                               const int& frame_id,
-                               const pcl_util::PointCloudPtr& cloud,
+                               const int frame_id,
+                               pcl_util::PointCloudPtr cloud,
                                const std::string& filename) {
     std::ofstream fout(filename.c_str(), std::ios::out);
     if (!fout) {
       AERROR << filename << " is not exist!";
       return;
     }
-    // write frame id & number of objects at the beignning
+    // write frame id & number of objects at the beginning
     fout << frame_id << " " << objects->size() << std::endl;
 
     typename pcl::PointCloud<pcl_util::Point>::Ptr trans_cloud(
@@ -175,11 +170,11 @@ class OfflineLidarPerceptionTool {
       Eigen::Vector3f dir_velo3(dir_velo[0], dir_velo[1], dir_velo[2]);
       double theta = VectorTheta2dXy(coord_dir, dir_velo3);
       std::string type = "unknown";
-      if (obj->type == PEDESTRIAN) {
-        type = "pedestrain";
-      } else if (obj->type == VEHICLE) {
+      if (obj->type == ObjectType::PEDESTRIAN) {
+        type = "pedestrian";
+      } else if (obj->type == ObjectType::VEHICLE) {
         type = "smallMot";
-      } else if (obj->type == BICYCLE) {
+      } else if (obj->type == ObjectType::BICYCLE) {
         type = "nonMot";
       }
       // write tracking details
@@ -217,7 +212,7 @@ int main(int argc, char* argv[]) {
   FLAGS_flagfile =
       "./modules/perception/tool/offline_visualizer_tool/conf/"
       "offline_lidar_perception_test.flag";
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   apollo::perception::OfflineLidarPerceptionTool tool;
   tool.Init(FLAGS_enable_visualization);
   tool.Run(FLAGS_pcd_path, FLAGS_pose_path, FLAGS_output_path);

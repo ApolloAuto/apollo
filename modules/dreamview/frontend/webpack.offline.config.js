@@ -40,6 +40,7 @@ module.exports = {
             utils: path.resolve(__dirname, "src/utils"),
             renderer: path.resolve(__dirname, "src/renderer"),
             assets: path.resolve(__dirname, "assets"),
+            proto_bundle: path.resolve(__dirname, "proto_bundle"),
         }
     },
 
@@ -103,10 +104,12 @@ module.exports = {
                     }, {
                         loader: "image-webpack-loader",
                         options: {
-                            progressive: true,
                             pngquant: {
                                 quality: "65-90",
                                 speed: 4,
+                            },
+                            mozjpeg: {
+                                progressive: true,
                             }
                         }
                     }
@@ -145,7 +148,22 @@ module.exports = {
                 // For font-awesome (ttf)
                 test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader",
-            }
+            }, {
+                test: /webworker\.js$/,
+                use: [
+                {
+                    loader: 'worker-loader',
+                    options: {
+                        name: 'worker.bundle.js'
+                    },
+                },
+                {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["es2015"],
+                    }
+                }]
+            },
         ]
     },
 
@@ -170,7 +188,7 @@ module.exports = {
         // use the IgnorePlugin to stop any locale being bundled with moment:
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-        // Configure global constant at "compile" time 
+        // Configure global constant at "compile" time
         // to allow different behavior between offline or realtime
         new webpack.DefinePlugin({
             OFFLINE_PLAYBACK: JSON.stringify(true),

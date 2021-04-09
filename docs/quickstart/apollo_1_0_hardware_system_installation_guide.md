@@ -490,7 +490,7 @@ The following two diagrams indicate the locations of where the three major compo
 
 
 
-![major_compoment_side_view](images/major_compoment_side_view.png)
+![major_component_side_view](images/major_component_side_view.png)
 
 
 

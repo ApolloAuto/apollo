@@ -32,7 +32,8 @@
 //              const std::vector<Object>& objects,
 //              double timestamp,
 //              const TrackerOptions& options,
-//              std::vector<ObjectPtr>* tracked_objects) override {
+//              std::vector<std::shared_ptr<Object>>* tracked_objects) override
+//              {
 //          // Do something.
 //          return true;
 //      }
@@ -58,8 +59,8 @@
 #include <vector>
 
 #include "modules/common/macro.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/lib/base/registerer.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/onboard/hdmap_input.h"
@@ -88,9 +89,9 @@ class BaseTracker {
   // @param [in]: timestamp.
   // @param [in]: options.
   // @param [out]: current tracked objects.
-  virtual bool Track(const std::vector<ObjectPtr> &objects, double timestamp,
-                     const TrackerOptions &options,
-                     std::vector<ObjectPtr> *tracked_objects) = 0;
+  virtual bool Track(const std::vector<std::shared_ptr<Object>> &objects,
+                     double timestamp, const TrackerOptions &options,
+                     std::vector<std::shared_ptr<Object>> *tracked_objects) = 0;
 
   virtual std::string name() const = 0;
 

@@ -14,16 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include <fstream>
 #include <map>
 #include <vector>
+
+#include "boost/filesystem.hpp"
+#include "boost/program_options.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
+
+static bool LoadGnssAntennaExtrinsic(
+    const std::string &file_path, Eigen::Vector3d *imu_ant_offset) {
+  CHECK_NOTNULL(imu_ant_offset);
+
+  YAML::Node config = YAML::LoadFile(file_path);
+  if (config["leverarm"]) {
+    if (config["leverarm"]["primary"]["offset"]) {
+      (*imu_ant_offset)[0] =
+          config["leverarm"]["primary"]["offset"]["x"].as<double>();
+      (*imu_ant_offset)[1] =
+          config["leverarm"]["primary"]["offset"]["y"].as<double>();
+      (*imu_ant_offset)[2] =
+          config["leverarm"]["primary"]["offset"]["z"].as<double>();
+    }
+    return true;
+  }
+  return false;
+}
 
 int main(int argc, char **argv) {
   boost::program_options::options_description boost_desc("Allowed options");
@@ -39,7 +60,10 @@ int main(int argc, char **argv) {
       "provide lidar localization file.")(
       "compare_file",
       boost::program_options::value<std::string>(),
-      "provide compare file.");
+      "provide compare file.")(
+      "imu_to_ant_offset_file",
+      boost::program_options::value<std::string>()->default_value(""),
+      "provide imu to ant offset file.");
 
   boost::program_options::variables_map boost_args;
   boost::program_options::store(
@@ -62,6 +86,17 @@ int main(int argc, char **argv) {
       boost_args["loc_file_b"].as<std::string>();
   const std::string compare_file = in_folder + "/" +
       boost_args["compare_file"].as<std::string>();
+  const std::string imu_to_ant_offset_file =
+      boost_args["imu_to_ant_offset_file"].as<std::string>();
+
+  Eigen::Vector3d imu_ant_offset = Eigen::Vector3d::Zero();
+  if (imu_to_ant_offset_file != "") {
+    bool suc = LoadGnssAntennaExtrinsic(
+        imu_to_ant_offset_file, &imu_ant_offset);
+    if (suc == false) {
+      return 0;
+    }
+  }
 
   std::vector<Eigen::Affine3d> poses_a;
   std::vector<Eigen::Vector3d> stds_a;
@@ -131,6 +166,11 @@ int main(int argc, char **argv) {
         double roll_b = euler_b.roll();
         double pitch_b = euler_b.pitch();
         double yaw_b = euler_b.yaw();
+
+        Eigen::Vector3d offset = quatd_b * imu_ant_offset;
+        transd_a.x() = transd_a.x() - offset[0];
+        transd_a.y() = transd_a.y() - offset[1];
+        transd_a.z() = transd_a.z() - offset[2];
 
         double x_diff = fabs(transd_a.x() - transd_b.x());
         double y_diff = fabs(transd_a.y() - transd_b.y());

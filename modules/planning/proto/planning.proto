@@ -2,10 +2,12 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/header.proto";
-import "modules/common/proto/vehicle_signal.proto";
-import "modules/common/proto/pnc_point.proto";
 import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/header.proto";
+import "modules/common/proto/pnc_point.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/map/proto/map_id.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
@@ -71,7 +73,7 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
-// next id: 19
+// next id: 21
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -106,11 +108,31 @@ message ADCTrajectory {
   repeated ADCTrajectoryPoint adc_trajectory_point = 4 [deprecated=true];
   optional apollo.common.VehicleSignal signal = 11 [deprecated=true];
   enum RightOfWayStatus {
-        UNPROTECTED = 0;
-        PROTECTED = 1;
+    UNPROTECTED = 0;
+    PROTECTED = 1;
   }
   optional RightOfWayStatus right_of_way_status = 17;
 
   // lane id along reference line
   repeated apollo.hdmap.Id lane_id = 18;
+
+  // set the engage advice for based on current planning result.
+  optional apollo.common.EngageAdvice engage_advice = 19;
+
+  // the region where planning cares most
+  message CriticalRegion {
+    repeated apollo.common.Polygon region = 1;
+  }
+
+  // critial region will be empty when planning is NOT sure which region is critical
+  // critial regions may or may not overlap
+  optional CriticalRegion critical_region = 20;
+
+  enum TrajectoryType {
+    UNKNOWN = 0;
+    NORMAL = 1;
+    PATH_FALLBACK = 2;
+    SPEED_FALLBACK = 3;
+  }
+  optional TrajectoryType trajectory_type = 21 [ default = UNKNOWN];
 }

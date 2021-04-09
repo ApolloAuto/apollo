@@ -25,6 +25,7 @@
 #include <cmath>
 
 #include "modules/common/log.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::common::math
@@ -45,7 +46,7 @@ namespace math {
  * @return Interpolated point.
  */
 template <typename T>
-T lerp(const T& x0, const double t0, const T& x1, const double t1,
+T lerp(const T &x0, const double t0, const T &x1, const double t1,
        const double t) {
   if (std::abs(t1 - t0) <= 1.0e-6) {
     AERROR << "input time difference is too small";
@@ -69,6 +70,17 @@ T lerp(const T& x0, const double t0, const T& x1, const double t1,
  */
 double slerp(const double a0, const double t0, const double a1, const double t1,
              const double t);
+
+SLPoint InterpolateUsingLinearApproximation(const SLPoint &p0,
+                                            const SLPoint &p1, const double w);
+
+PathPoint InterpolateUsingLinearApproximation(const PathPoint &p0,
+                                              const PathPoint &p1,
+                                              const double s);
+
+TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
+                                                    const TrajectoryPoint &tp1,
+                                                    const double t);
 
 }  // namespace math
 }  // namespace common

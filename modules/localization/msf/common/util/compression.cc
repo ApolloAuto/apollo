@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/compression.h"
-#include <assert.h>
+
 #include <zlib.h>
 #include <cstdio>
+
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace localization {
@@ -69,7 +71,7 @@ unsigned int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
       stream_data.avail_out = zlib_chunk;
       stream_data.next_out = out;
       ret = deflate(&stream_data, flush); /* no bad return value */
-      assert(ret != Z_STREAM_ERROR);      /* state not clobbered */
+      DCHECK_NE(ret, Z_STREAM_ERROR);     /* state not clobbered */
       have = zlib_chunk - stream_data.avail_out;
       dst_idx += have;
       if (dst_idx + zlib_chunk > dst->size()) {
@@ -77,11 +79,11 @@ unsigned int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
       }
       out = &((*dst)[dst_idx]);
     } while (stream_data.avail_out == 0);
-    assert(stream_data.avail_in == 0); /* all input will be used */
+    DCHECK_EQ(stream_data.avail_in, 0); /* all input will be used */
 
     /* done when last data in file processed */
   } while (flush != Z_FINISH);
-  assert(ret == Z_STREAM_END); /* stream will be complete */
+  DCHECK_EQ(ret, Z_STREAM_END); /* stream will be complete */
 
   /* clean up and return */
   (void)deflateEnd(&stream_data);
@@ -125,7 +127,7 @@ unsigned int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
       stream_data.avail_out = zlib_chunk;
       stream_data.next_out = out;
       ret = inflate(&stream_data, Z_NO_FLUSH);
-      assert(ret != Z_STREAM_ERROR); /* state not clobbered */
+      DCHECK_NE(ret, Z_STREAM_ERROR); /* state not clobbered */
       switch (ret) {
         case Z_NEED_DICT:
           ret = Z_DATA_ERROR; /* and fall through */

@@ -27,7 +27,7 @@
 #include "modules/common/macro.h"
 #include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/lib/pcl_util/pcl_types.h"
+#include "modules/perception/common/pcl_types.h"
 #include "modules/perception/obstacle/base/hdmap_struct.h"
 #include "modules/perception/obstacle/base/types.h"
 
@@ -37,11 +37,9 @@ namespace perception {
 // Singleton HDMapInput, interfaces are thread-safe.
 class HDMapInput {
  public:
-  bool Init();
-
   // @brief: get roi polygon
   //         all points are in the world frame
-  bool GetROI(const pcl_util::PointD& pointd, const double& map_radius,
+  bool GetROI(const pcl_util::PointD& pointd, const double map_radius,
               HdmapStructPtr* mapptr);
 
   // @brief: get nearest lane direction
@@ -57,15 +55,11 @@ class HDMapInput {
       const std::vector<hdmap::JunctionBoundaryPtr>& junctions,
       HdmapStructPtr* mapptr);
 
-  std::mutex mutex_;  // multi-thread init safe.
-
   FRIEND_TEST(HDMapInputTest, test_Init);
   FRIEND_TEST(HDMapInputTest, test_GetROI);
 
   DECLARE_SINGLETON(HDMapInput);
 };
-
-typedef typename std::shared_ptr<HDMapInput> HDMapInputPtr;
 
 }  // namespace perception
 }  // namespace apollo

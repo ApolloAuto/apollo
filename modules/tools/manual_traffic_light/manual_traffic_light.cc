@@ -39,19 +39,19 @@
 #include "modules/map/hdmap/hdmap_util.h"
 
 using apollo::common::PointENU;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::adapter::AdapterManagerConfig;
+using apollo::common::color::ANSI_GREEN;
+using apollo::common::color::ANSI_RED;
+using apollo::common::color::ANSI_RESET;
+using apollo::common::util::PrintIter;
 using apollo::hdmap::HDMap;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::SignalInfoConstPtr;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManagerConfig;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::TrafficLight;
 using apollo::perception::TrafficLightDetection;
-using apollo::common::util::PrintIter;
-using apollo::common::color::ANSI_RED;
-using apollo::common::color::ANSI_GREEN;
-using apollo::common::color::ANSI_RESET;
 
 DEFINE_bool(all_lights, false, "set all lights on the map");
 
@@ -78,6 +78,10 @@ bool GetAllTrafficLights(std::vector<SignalInfoConstPtr> *traffic_lights) {
     }
     for (const auto &signal : map_proto.signal()) {
       const auto *hdmap = HDMapUtil::BaseMapPtr();
+      if (!hdmap) {
+        AERROR << "Invalid HD Map.";
+        return false;
+      }
       map_traffic_lights.push_back(hdmap->GetSignalById(signal.id()));
     }
   }
@@ -90,10 +94,14 @@ bool GetTrafficLightsWithinDistance(
   CHECK_NOTNULL(traffic_lights);
   AdapterManager::Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
-    ADEBUG << "No localization received";
+    AERROR << "No localization received";
     return false;
   }
   const auto *hdmap = HDMapUtil::BaseMapPtr();
+  if (!hdmap) {
+    AERROR << "Invalid HD Map.";
+    return false;
+  }
   auto position =
       AdapterManager::GetLocalization()->GetLatestObserved().pose().position();
   int ret = hdmap->GetForwardNearestSignalsOnLane(

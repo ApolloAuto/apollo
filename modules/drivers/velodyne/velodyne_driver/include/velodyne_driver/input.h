@@ -58,12 +58,12 @@ class Input {
    *          > 0 if incomplete packet (is this possible?)
    */
   virtual int get_firing_data_packet(velodyne_msgs::VelodynePacket* pkt) = 0;
-  virtual int get_positioning_data_packtet(const NMEATimePtr& nmea_time) = 0;
+  virtual int get_positioning_data_packet(NMEATimePtr nmea_time) = 0;
   virtual void init() {}
   virtual void init(int& port) {}
 
  protected:
-  bool exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
+  bool exract_nmea_time_from_packet(NMEATimePtr nmea_time,
                                     const uint8_t* bytes);
 };
 

@@ -21,6 +21,7 @@
 #ifndef MODULES_COMMON_UTIL_FILE_H_
 #define MODULES_COMMON_UTIL_FILE_H_
 
+#include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -46,9 +47,9 @@ namespace util {
 
 template <typename MessageType>
 bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {
-  using google::protobuf::io::ZeroCopyOutputStream;
-  using google::protobuf::io::FileOutputStream;
   using google::protobuf::TextFormat;
+  using google::protobuf::io::FileOutputStream;
+  using google::protobuf::io::ZeroCopyOutputStream;
   if (file_descriptor < 0) {
     AERROR << "Invalid file descriptor.";
     return false;
@@ -88,9 +89,9 @@ bool SetProtoToASCIIFile(const MessageType &message,
  */
 template <typename MessageType>
 bool GetProtoFromASCIIFile(const std::string &file_name, MessageType *message) {
-  using google::protobuf::io::ZeroCopyInputStream;
-  using google::protobuf::io::FileInputStream;
   using google::protobuf::TextFormat;
+  using google::protobuf::io::FileInputStream;
+  using google::protobuf::io::ZeroCopyInputStream;
   int file_descriptor = open(file_name.c_str(), O_RDONLY);
   if (file_descriptor < 0) {
     AERROR << "Failed to open file " << file_name << " in text mode.";
@@ -159,11 +160,11 @@ bool GetProtoFromFile(const std::string &file_name, MessageType *message) {
   // Try the binary parser first if it's much likely a binary proto.
   if (EndWith(file_name, ".bin")) {
     return GetProtoFromBinaryFile(file_name, message) ||
-        GetProtoFromASCIIFile(file_name, message);
+           GetProtoFromASCIIFile(file_name, message);
   }
 
   return GetProtoFromASCIIFile(file_name, message) ||
-      GetProtoFromBinaryFile(file_name, message);
+         GetProtoFromBinaryFile(file_name, message);
 }
 
 /**
@@ -187,11 +188,12 @@ std::string TranslatePath(const std::string &src_path);
  * @brief Get absolute path by concatenating prefix and relative_path.
  * @return The absolute path.
  */
-std::string GetAbsolutePath(const std::string& prefix,
-                            const std::string& relative_path);
+std::string GetAbsolutePath(const std::string &prefix,
+                            const std::string &relative_path);
 
 /**
  * @brief Check if the path exists.
+ * @param path a file name, such as /a/b/c.txt
  * @return If the path exists.
  */
 bool PathExists(const std::string &path);
@@ -204,6 +206,13 @@ bool PathExists(const std::string &path);
  *         and is indeed a directory.
  */
 bool DirectoryExists(const std::string &directory_path);
+
+/**
+ * @brief Expand path pattern to matched pathes.
+ * @param pattern Path pattern, which may contain wildcards [?*].
+ * @return Matched path list.
+ */
+std::vector<std::string> Glob(const std::string& pattern);
 
 /**
  * @brief Copy a file.
@@ -246,11 +255,18 @@ bool EnsureDirectory(const std::string &directory_path);
 bool RemoveAllFiles(const std::string &directory_path);
 
 /**
- * @brief List sub-directories.
+ * @brief List sub-paths.
  * @param directory_path Directory path.
- * @return A vector of sub-directories, without the directory_path prefix.
+ * @param d_type Sub-path type, DT_DIR for directory, or DT_REG for file.
+ * @return A vector of sub-paths, without the directory_path prefix.
  */
-std::vector<std::string> ListSubDirectories(const std::string &directory_path);
+std::vector<std::string> ListSubPaths(const std::string &directory_path,
+                                      const unsigned char d_type = DT_DIR);
+
+std::string GetFileName(const std::string &path);
+
+void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
+                              std::vector<std::string> *ret);
 
 }  // namespace util
 }  // namespace common

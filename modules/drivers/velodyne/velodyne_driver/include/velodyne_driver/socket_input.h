@@ -40,7 +40,7 @@ class SocketInput : public Input {
   virtual ~SocketInput();
   void init(int &port);
   int get_firing_data_packet(velodyne_msgs::VelodynePacket *pkt);
-  int get_positioning_data_packtet(const NMEATimePtr &nmea_time);
+  int get_positioning_data_packet(NMEATimePtr nmea_time);
 
  private:
   int sockfd_;

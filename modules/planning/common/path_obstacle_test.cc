@@ -25,10 +25,12 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
-#include "modules/common/util/util.h"
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+
+#include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -60,7 +62,7 @@ TEST(IsLateralDecision, AllDecisions) {
 
   ObjectDecisionType decision_sidepass;
   decision_sidepass.mutable_sidepass();
-  EXPECT_FALSE(PathObstacle::IsLateralDecision(decision_sidepass));
+  EXPECT_TRUE(PathObstacle::IsLateralDecision(decision_sidepass));
 }
 
 TEST(IsLongitudinalDecision, AllDecisions) {
@@ -376,6 +378,26 @@ TEST(PathObstacleTest, add_decision_test) {
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_overtake());
   }
 
+  // follow and ignore
+  {
+    PathObstacle path_obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_follow();
+    path_obstacle.AddLongitudinalDecision("test_follow", decision);
+
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
+    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_follow());
+
+    decision.mutable_ignore();
+    path_obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
+    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(path_obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_follow());
+  }
+
   // yield and ignore
   {
     PathObstacle path_obstacle;
@@ -415,7 +437,25 @@ TEST(PathObstacleTest, add_decision_test) {
     EXPECT_TRUE(path_obstacle.LateralDecision().has_nudge());
     EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
   }
-}
 
+  // stop and yield
+  {
+    PathObstacle path_obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_stop();
+    path_obstacle.AddLongitudinalDecision("test_stop", decision);
+
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
+    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
+
+    decision.mutable_yield();
+    path_obstacle.AddLongitudinalDecision("test_yield", decision);
+    EXPECT_FALSE(path_obstacle.HasLateralDecision());
+    EXPECT_TRUE(path_obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(path_obstacle.LongitudinalDecision().has_stop());
+  }
+}
 }  // namespace planning
 }  // namespace apollo

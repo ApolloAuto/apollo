@@ -39,7 +39,7 @@ TEST(constraint_test, test_suit_one) {
 
   std::vector<double> et{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
   std::vector<double> bound(11, 0.2);
-  std::vector<std::vector<double> > constraint_data{
+  std::vector<std::vector<double>> constraint_data{
       {-1.211566924, 434592.7844, 4437011.568},
       {-1.211572116, 434594.6884, 4437006.498},
       {-1.21157766, 434596.5923, 4437001.428},
@@ -138,12 +138,12 @@ TEST(constraint_test, test_suit_one) {
         spline_solver.spline().SecondDerivativeX(t),
         spline_solver.spline().DerivativeY(t),
         spline_solver.spline().SecondDerivativeY(t));
-    EXPECT_NEAR(heading, gold_res(i, 0), 1e-6);
-    EXPECT_NEAR(xy.first, gold_res(i, 1), 1e-6);
-    EXPECT_NEAR(xy.second, gold_res(i, 2), 1e-6);
-    EXPECT_NEAR(spline_solver.spline().DerivativeX(t), gold_res(i, 3), 1e-6);
-    EXPECT_NEAR(spline_solver.spline().DerivativeY(t), gold_res(i, 4), 1e-6);
-    EXPECT_NEAR(kappa, gold_res(i, 5), 1e-6);
+    EXPECT_NEAR(heading, gold_res(i, 0), 1e-4);
+    EXPECT_NEAR(xy.first, gold_res(i, 1), 1e-4);
+    EXPECT_NEAR(xy.second, gold_res(i, 2), 1e-4);
+    EXPECT_NEAR(spline_solver.spline().DerivativeX(t), gold_res(i, 3), 1e-4);
+    EXPECT_NEAR(spline_solver.spline().DerivativeY(t), gold_res(i, 4), 1e-4);
+    EXPECT_NEAR(kappa, gold_res(i, 5), 1e-4);
     t += 0.1;
   }
 }

@@ -16,7 +16,8 @@
 
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
+
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -26,26 +27,26 @@ namespace apollo {
 namespace perception {
 
 TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
-  FLAGS_work_root = "modules/perception";
-  FLAGS_config_manager_path = "./conf/config_manager.config";
   AINFO << "start probabilistic_fusion_test\n";
   ProbabilisticFusion *probabilistic_fusion = new ProbabilisticFusion();
   EXPECT_TRUE(probabilistic_fusion->Init());
   AINFO << "After fusion init";
   std::vector<SensorObjects> sensor_objects;
-  std::vector<ObjectPtr> fused_objects;
+  std::vector<std::shared_ptr<Object>> fused_objects;
   sensor_objects.resize(1);
-  sensor_objects[0].sensor_type = VELODYNE_64;
+  sensor_objects[0].sensor_type = SensorType::VELODYNE_64;
   sensor_objects[0].seq_num = 0;
   sensor_objects[0].timestamp = 0.0;
   sensor_objects[0].sensor2world_pose = Eigen::Matrix4d::Identity();
-  EXPECT_TRUE(probabilistic_fusion->Fuse(sensor_objects, &fused_objects));
-  double timestamp = 0;
-  ObjectPtr moc_obj(new Object());
+  FusionOptions options;
+  EXPECT_TRUE(
+      probabilistic_fusion->Fuse(sensor_objects, &fused_objects, &options));
+  double timestamp = 0.0;
+  std::shared_ptr<Object> moc_obj(new Object());
   Eigen::Vector3d position(20, 0, 0);
   Eigen::Vector3d dir(1, 0, 0);
   Eigen::Vector3d velocity(10, 0, 0);
-  ObjectType type = VEHICLE;
+  ObjectType type = ObjectType::VEHICLE;
   moc_obj->center = position;
   moc_obj->anchor_point = position;
   moc_obj->length = 4;
@@ -61,11 +62,11 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
 
   std::vector<SensorObjects> sensor_objects2;
   sensor_objects2.resize(1);
-  sensor_objects2[0].sensor_type = RADAR;
+  sensor_objects2[0].sensor_type = SensorType::RADAR;
   sensor_objects2[0].seq_num = 0;
   sensor_objects2[0].sensor2world_pose = Eigen::Matrix4d::Identity();
-  ObjectPtr obj(new Object());
-  ObjectPtr radar_obj(new Object());
+  std::shared_ptr<Object> obj(new Object());
+  std::shared_ptr<Object> radar_obj(new Object());
   obj->clone(*moc_obj);
   for (int i = 0; i < 10; i++) {
     position = position + velocity * 0.05;
@@ -81,7 +82,8 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
     sensor_objects2[0].timestamp = timestamp;
     sensor_objects2[0].objects.resize(1);
     sensor_objects2[0].objects[0] = radar_obj;
-    EXPECT_TRUE(probabilistic_fusion->Fuse(sensor_objects2, &fused_objects));
+    EXPECT_TRUE(
+        probabilistic_fusion->Fuse(sensor_objects2, &fused_objects, &options));
     obj->clone(*moc_obj);
     position = position + velocity * 0.05;
     timestamp += 0.05;
@@ -93,7 +95,8 @@ TEST(ProbabilisticFusionTest, probabilistic_fusion_test) {
     obj->polygon.points[0].z = position(2);
     sensor_objects[0].objects.resize(1);
     sensor_objects[0].objects[0] = obj;
-    EXPECT_TRUE(probabilistic_fusion->Fuse(sensor_objects, &fused_objects));
+    EXPECT_TRUE(
+        probabilistic_fusion->Fuse(sensor_objects, &fused_objects, &options));
     EXPECT_EQ(fused_objects.size(), 1);
     EXPECT_DOUBLE_EQ(fused_objects[0]->length, obj->length);
     EXPECT_DOUBLE_EQ(fused_objects[0]->width, obj->width);

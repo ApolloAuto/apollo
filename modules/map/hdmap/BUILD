@@ -35,6 +35,7 @@ cc_library(
         ":hdmap",
         "//modules/common:log",
         "//modules/common:macro",
+        "//modules/common/adapters:adapter_manager",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:string_util",
@@ -61,6 +62,24 @@ cc_test(
     ],
     deps = [
         ":hdmap",
+        "@glog//:glog",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "hdmap_util_test",
+    size = "medium",
+    timeout = "short",
+    srcs = [
+        "hdmap_util_test.cc",
+    ],
+    data = [
+        ":testdata",
+    ],
+    deps = [
+        ":hdmap_util",
+        "//modules/common/adapters:adapter_manager",
         "@glog//:glog",
         "@gtest//:main",
     ],

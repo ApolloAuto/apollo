@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file visualization_engine.h
+ * @file
  * @brief The engine for localization visualization.
  */
 #ifndef MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_ENGINE_H_

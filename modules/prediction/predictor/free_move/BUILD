@@ -8,13 +8,13 @@ cc_library(
     hdrs = ["free_move_predictor.h"],
     deps = [
         "//modules/common:log",
-        "//modules/common/math:math_utils",
+        "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",
         "//modules/prediction/proto:feature_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -29,7 +29,6 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",

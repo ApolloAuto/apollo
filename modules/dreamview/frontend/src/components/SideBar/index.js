@@ -2,40 +2,45 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 
 import ButtonPanel from "components/SideBar/ButtonPanel";
-import SubButtonPanel from "components/SideBar/SubButtonPanel";
+import SecondaryButton from "components/SideBar/SecondaryButton";
 import WS from "store/websocket";
 
 @inject("store") @observer
 export default class SideBar extends React.Component {
     render() {
-        const { options, enableHMIButtonsOnly } = this.props.store;
+        const { options, enableHMIButtonsOnly, hmi } = this.props.store;
+
+        const settings = {};
+        const optionNames = [...options.mainSideBarOptions, ...options.secondarySideBarOptions];
+        optionNames.forEach(optionName => {
+            settings[optionName] = {
+                active: options[optionName],
+                onClick: () => {
+                    this.props.store.handleOptionToggle(optionName);
+                },
+                disabled: options.isSideBarButtonDisabled(
+                    optionName,
+                    enableHMIButtonsOnly,
+                    hmi.inNavigationMode
+                ),
+            };
+        });
 
         return (
             <div className="side-bar">
-                <ButtonPanel enableHMIButtonsOnly={enableHMIButtonsOnly}
-                             onTasks={() => {
-                                this.props.store.handleSideBarClick('showTasks');
-                             }}
-                             showTasks={options.showTasks}
-                             onModuleController={() => {
-                                this.props.store.handleSideBarClick('showModuleController');
-                             }}
-                             showModuleController={options.showModuleController}
-                             onMenu={() => {
-                                    this.props.store.handleSideBarClick('showMenu');
-                                 }}
-                             showMenu={options.showMenu}
-                             onRouteEditingBar={() => {
-                                    this.props.store.handleSideBarClick('showRouteEditingBar');
-                                 }}
-                             showRouteEditingBar={options.showRouteEditingBar} />
-                <SubButtonPanel enablePOI={
-                                    !enableHMIButtonsOnly && !options.showRouteEditingBar
-                                }
-                                onPOI={() => {
-                                    this.props.store.handleSideBarClick('showPOI');
-                                }}
-                                showPOI={!options.showRouteEditingBar && options.showPOI} />
+                <ButtonPanel settings={settings} />
+                <div className="sub-button-panel">
+                    <SecondaryButton
+                        panelLabel="Audio Capture"
+                        disabled={settings.enableAudioCapture.disabled}
+                        onClick={settings.enableAudioCapture.onClick}
+                        active={settings.enableAudioCapture.active} />
+                    <SecondaryButton
+                        panelLabel="Default Routing"
+                        disabled={settings.showPOI.disabled}
+                        onClick={settings.showPOI.onClick}
+                        active={!options.showRouteEditingBar && options.showPOI} />
+                </div>
             </div>
         );
     }

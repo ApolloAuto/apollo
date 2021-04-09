@@ -21,14 +21,15 @@
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 
-DEFINE_string(summary_cleaner_name, "SummaryCleaner",
-              "Name of the summary cleaner.");
-
 DEFINE_string(summary_monitor_name, "SummaryMonitor",
               "Name of the summary monitor.");
 
 DEFINE_double(broadcast_max_interval, 8,
               "Max interval of broadcasting runtime status.");
+
+DEFINE_bool(enable_safety_mode, true,
+            "Whether to enable safety mode which may take over the vehicle on "
+            "system failures.");
 
 namespace apollo {
 namespace monitor {
@@ -65,38 +66,28 @@ void SummarizeOnTopicStatus(const TopicStatus &topic_status, Status *status) {
   if (topic_status.message_delay() < 0) {
     UpdateStatusSummary(Summary::ERROR, "No message", status);
   } else {
-    UpdateStatusSummary(Summary::WARN, "Notable delay", status);
+    UpdateStatusSummary(Summary::ERROR, "Notable delay", status);
   }
 }
 
 }  // namespace
 
 // Set interval to 0, so it runs every time when ticking.
-SummaryCleaner::SummaryCleaner()
-    : RecurrentRunner(FLAGS_summary_cleaner_name, 0) {
-}
-
-void SummaryCleaner::RunOnce(const double current_time) {
-  for (auto &module : *MonitorManager::GetStatus()->mutable_modules()) {
-    module.second.set_summary(Summary::UNKNOWN);
-    module.second.clear_msg();
-  }
-  for (auto &hardware : *MonitorManager::GetStatus()->mutable_hardware()) {
-    hardware.second.set_summary(Summary::UNKNOWN);
-    hardware.second.clear_msg();
-  }
-}
-
-// Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
     : RecurrentRunner(FLAGS_summary_monitor_name, 0) {
   CHECK(AdapterManager::GetSystemStatus())
       << "SystemStatusAdapter is not initialized.";
+  if (FLAGS_enable_safety_mode) {
+    safety_manager_.reset(new SafetyManager());
+  }
 }
 
 void SummaryMonitor::RunOnce(const double current_time) {
   SummarizeModules();
   SummarizeHardware();
+  if (safety_manager_ != nullptr) {
+    safety_manager_->CheckSafety(current_time);
+  }
   // Get fingerprint of current status.
   // Don't use DebugString() which has known bug on Map field. The string
   // doesn't change though the value has changed.
@@ -148,16 +139,25 @@ void SummaryMonitor::SummarizeHardware() {
     if (status->has_status()) {
       switch (status->status()) {
         case HardwareStatus::NOT_PRESENT:
-          UpdateStatusSummary(Summary::FATAL, "", status);
+          UpdateStatusSummary(Summary::FATAL, status->detailed_msg(), status);
           break;
-        case HardwareStatus::NOT_READY:
-          UpdateStatusSummary(Summary::WARN, "", status);
+        case HardwareStatus::NOT_READY:  // Fall through.
+        case HardwareStatus::WARN:  // Fall through.
+        case HardwareStatus::GPS_UNSTABLE_WARNING:  // Fall through.
+        case HardwareStatus::GPS_UNSTABLE_ERROR:
+          // GPS instability could be a fatal error if it's the only
+          // localization source. As currently we have other sources like
+          // PointCloud, we take it as a warning.
+          //
+          // TODO(xiaoxq & Localization team): Add stability metric in final
+          // localization pose and trigger WARN or ERROR accordingly.
+          UpdateStatusSummary(Summary::WARN, status->detailed_msg(), status);
           break;
         case HardwareStatus::OK:
-          UpdateStatusSummary(Summary::OK, "", status);
+          UpdateStatusSummary(Summary::OK, status->detailed_msg(), status);
           break;
         default:
-          UpdateStatusSummary(Summary::ERROR, "", status);
+          UpdateStatusSummary(Summary::ERROR, status->detailed_msg(), status);
           break;
       }
     }

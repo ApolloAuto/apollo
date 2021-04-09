@@ -30,12 +30,12 @@
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
+#include "modules/common/filters/mean_filter.h"
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
-#include "modules/control/filters/digital_filter.h"
-#include "modules/control/filters/digital_filter_coefficients.h"
-#include "modules/control/filters/mean_filter.h"
 
 /**
  * @namespace apollo::control
@@ -102,17 +102,13 @@ class LatController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug *debug);
 
   void UpdateMatrix();
 
   void UpdateMatrixCompound();
 
   double ComputeFeedForward(double ref_curvature) const;
-
-  double GetLateralError(
-      const common::math::Vec2d &point,
-      apollo::common::TrajectoryPoint *trajectory_point) const;
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
@@ -151,7 +147,7 @@ class LatController : public Controller {
   // rotational inertia
   double iz_ = 0.0;
   // the ratio between the turn of the steering wheel and the turn of the wheels
-  double steer_transmission_ratio_ = 0.0;
+  double steer_ratio_ = 0.0;
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
 
@@ -188,45 +184,41 @@ class LatController : public Controller {
   // 4 by 1 matrix; state matrix
   Eigen::MatrixXd matrix_state_;
 
-  // heading error
-  // double heading_error_ = 0.0;
-  // lateral distance to reference trajectory
-  // double lateral_error_ = 0.0;
-
-  // reference heading
-  // double ref_heading_ = 0.0;
-  // reference trajectory curvature
-  // double ref_curvature_ = 0.0;
-
-  // heading error of last control cycle
-  double previous_heading_error_ = 0.0;
-  // lateral distance to reference trajectory of last control cycle
-  double previous_lateral_error_ = 0.0;
-
-  // heading error change rate over time, i.e. d(heading_error) / dt
-  // double heading_error_rate_ = 0.0;
-  // lateral error change rate over time, i.e. d(lateral_error) / dt
-  // double lateral_error_rate_ = 0.0;
-
   // parameters for lqr solver; number of iterations
   int lqr_max_iteration_ = 0;
   // parameters for lqr solver; threshold for computation
   double lqr_eps_ = 0.0;
 
-  DigitalFilter digital_filter_;
+  common::DigitalFilter digital_filter_;
 
   std::unique_ptr<Interpolation1D> lat_err_interpolation_;
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
   // MeanFilter heading_rate_filter_;
-  MeanFilter lateral_error_filter_;
-  MeanFilter heading_error_filter_;
+  common::MeanFilter lateral_error_filter_;
+  common::MeanFilter heading_error_filter_;
 
   // for logging purpose
   std::ofstream steer_log_file_;
 
   const std::string name_;
+
+  double query_relative_time_;
+
+  double pre_steer_angle_ = 0.0;
+
+  double minimum_speed_protection_ = 0.1;
+
+  double current_trajectory_timestamp_ = -1.0;
+
+  double init_vehicle_x_ = 0.0;
+
+  double init_vehicle_y_ = 0.0;
+
+  double init_vehicle_heading_ = 0.0;
+
+  double min_turn_radius_ = 0.0;
 };
 
 }  // namespace control

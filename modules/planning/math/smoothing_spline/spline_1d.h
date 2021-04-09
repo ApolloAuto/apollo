@@ -15,16 +15,16 @@
  *****************************************************************************/
 
 /**
-* @file : spline_1d.h
-* @brief: piecewise smoothing spline class
-*       1. Model description: piecewise smoothing spline are made by pieces of
-*smoothing splines
-*          joint at knots;
-*       2. To guarantee smoothness, pieces value at knots should joint together
-*with
-*           same value, derivative, and etc. Higher the order, More smoothness
-*the piecewise spline;
-**/
+ * @file : spline_1d.h
+ * @brief: piecewise smoothing spline class
+ *       1. Model description: piecewise smoothing spline are made by pieces of
+ *smoothing splines
+ *          joint at knots;
+ *       2. To guarantee smoothness, pieces value at knots should joint together
+ *with
+ *           same value, derivative, and etc. Higher the order, More smoothness
+ *the piecewise spline;
+ **/
 
 #ifndef MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_H_
 #define MODULES_PLANNING_MATH_SMOOTHING_SPLINE_SPLINE_1D_H_

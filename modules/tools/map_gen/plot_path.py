@@ -19,17 +19,20 @@
 import sys
 import matplotlib.pyplot as plt
 
-f = open(sys.argv[1], 'r')
-xs = []
-ys = []
-for line in f:
-    line = line.replace("\n", '')
-    data = line.split(',')
-    x = float(data[0])
-    y = float(data[1])
-    xs.append(x)
-    ys.append(y)
-f.close()
+if len(sys.argv) < 2:
+    print("Usage: %s <plot_file>" % sys.argv[0])
+    sys.exit(1)
+
+with open(sys.argv[1], 'r') as f:
+    xs = []
+    ys = []
+    for line in f:
+        line = line.replace("\n", '')
+        data = line.split(',')
+        x = float(data[0])
+        y = float(data[1])
+        xs.append(x)
+        ys.append(y)
 
 fig = plt.figure()
 ax = plt.subplot2grid((1, 1), (0, 0))

@@ -31,10 +31,10 @@ RadarTrack::RadarTrack() {
   tracking_time_ = 0.0;
 }
 
-RadarTrack::RadarTrack(const Object &obs, const double &timestamp) {
+RadarTrack::RadarTrack(const Object &obs, const double timestamp) {
   s_current_idx_ %= MAX_RADAR_IDX;
   obs_id_ = s_current_idx_++;
-  obs_radar_ = ObjectPtr(new Object);
+  obs_radar_ = std::shared_ptr<Object>(new Object);
   *obs_radar_ = obs;
   timestamp_ = timestamp;
   tracked_times_ = 1;
@@ -61,35 +61,26 @@ RadarTrack &RadarTrack::operator=(const RadarTrack &track) {
   return *this;
 }
 
-void RadarTrack::UpdataObsRadar(ObjectPtr obs_radar, const double timestamp) {
+void RadarTrack::UpdataObsRadar(std::shared_ptr<Object> obs_radar,
+                                const double timestamp) {
   obs_radar_ = obs_radar;
   tracking_time_ += timestamp - timestamp_;
   timestamp_ = timestamp;
 }
 
-void RadarTrack::SetObsRadar(ObjectPtr obs_radar) {
+void RadarTrack::SetObsRadar(std::shared_ptr<Object> obs_radar) {
   obs_radar_ = obs_radar;
 }
 
-void RadarTrack::IncreaseTrackedTimes() {
-  tracked_times_++;
-}
+void RadarTrack::IncreaseTrackedTimes() { tracked_times_++; }
 
-int RadarTrack::GetObsId() const {
-  return obs_id_;
-}
+int RadarTrack::GetObsId() const { return obs_id_; }
 
-ObjectPtr RadarTrack::GetObsRadar() {
-  return obs_radar_;
-}
+std::shared_ptr<Object> RadarTrack::GetObsRadar() { return obs_radar_; }
 
-double RadarTrack::GetTimestamp() {
-  return timestamp_;
-}
+double RadarTrack::GetTimestamp() { return timestamp_; }
 
-double RadarTrack::GetTrackingTime() {
-  return tracking_time_;
-}
+double RadarTrack::GetTrackingTime() { return tracking_time_; }
 
 }  // namespace perception
 }  // namespace apollo

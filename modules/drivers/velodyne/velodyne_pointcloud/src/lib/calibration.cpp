@@ -153,7 +153,7 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
 }
 
 YAML::Emitter& operator<<(YAML::Emitter& out,
-                          const std::pair<int, LaserCorrection> correction) {
+                          const std::pair<int, LaserCorrection>& correction) {
   out << YAML::BeginMap;
   out << YAML::Key << LASER_ID << YAML::Value << correction.first;
   out << YAML::Key << ROT_CORRECTION << YAML::Value
@@ -190,7 +190,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Calibration& calibration) {
 
   for (std::map<int, LaserCorrection>::const_iterator it =
            calibration.laser_corrections_.begin();
-       it != calibration.laser_corrections_.end(); it++) {
+       it != calibration.laser_corrections_.end(); ++it) {
     out << *it;
   }
 

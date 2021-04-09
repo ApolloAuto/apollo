@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_TYPES_H_
-#define MODEULES_PERCEPTION_ONBOARD_TYPES_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_TYPES_H_
+#define MODULES_PERCEPTION_ONBOARD_TYPES_H_
 
 #include <sstream>
 #include <string>
 
+#include "modules/common/time/time_util.h"
 #include "modules/perception/lib/base/concurrent_queue.h"
-#include "modules/perception/lib/base/time_util.h"
 
 namespace apollo {
 namespace perception {
 
 using EventID = int;
 using SubnodeID = int;
+using apollo::common::time::TimeUtil;
 
 struct Event {
   EventID event_id = 0;
@@ -36,9 +37,7 @@ struct Event {
   // TODO(Yangguang Li):
   double local_timestamp = 0.0;  // local timestamp to compute process delay.
 
-  Event() {
-    local_timestamp = TimeUtil::GetCurrentTime();
-  }
+  Event() { local_timestamp = TimeUtil::GetCurrentTime(); }
 
   std::string to_string() const {
     std::ostringstream oss;
@@ -80,4 +79,4 @@ enum IoStreamType {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_TYPES_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_TYPES_H_

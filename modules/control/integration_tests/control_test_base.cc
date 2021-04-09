@@ -33,8 +33,7 @@ DEFINE_string(test_localization_file, "", "localization input file");
 DEFINE_string(test_monitor_file, "", "montor input file");
 DEFINE_string(test_pad_file, "", "pad message input file");
 DEFINE_string(test_planning_file, "", "planning input file");
-DEFINE_bool(test_update_golden_log, false,
-            "true to update decision golden log file.");
+DEFINE_bool(test_update_golden_log, false, "true to update golden log file.");
 
 namespace apollo {
 namespace control {

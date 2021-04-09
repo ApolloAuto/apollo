@@ -34,9 +34,7 @@ class DerivedClass1 : BaseClass {
  public:
   DerivedClass1() = default;
   ~DerivedClass1() = default;
-  virtual std::string name() const {
-    return "DerivedClass1";
-  }
+  virtual std::string name() const { return "DerivedClass1"; }
 };
 REGISTER_TEST(DerivedClass1);
 
@@ -44,9 +42,7 @@ class DerivedClass2 : BaseClass {
  public:
   DerivedClass2() = default;
   ~DerivedClass2() = default;
-  virtual std::string name() const {
-    return "DerivedClass2";
-  }
+  virtual std::string name() const { return "DerivedClass2"; }
 };
 REGISTER_TEST(DerivedClass2);
 

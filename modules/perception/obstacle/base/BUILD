@@ -3,39 +3,42 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_base",
+    name = "base",
     srcs = [
         "object.cc",
+        "object_supplement.cc",
         "types.cc",
-        "object_supplement.cc"
     ],
     hdrs = [
         "hdmap_struct.h",
         "object.h",
-        "types.h",
         "object_supplement.h",
+        "types.h",
     ],
     deps = [
         "//modules/common",
-        "//modules/common/util:string_util",
         "//modules/common/proto:error_code_proto",
-        "//modules/perception/common:perception_common",
-        "//modules/perception/lib/pcl_util",
+        "//modules/common/time",
+        "//modules/common/util:string_util",
+        "//modules/perception/common",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
+        "//modules/perception/obstacle/camera/lane_post_process/common:type",
         "//modules/perception/proto:perception_proto",
-        "@eigen//:eigen",
+        "@eigen",
+        "@opencv2//:core",
     ],
 )
 
 cc_test(
-    name = "perception_obstacle_base_test",
+    name = "base_test",
     size = "small",
     srcs = [
         "object_test.cc",
         "types_test.cc",
     ],
     deps = [
-        ":perception_obstacle_base",
+        ":base",
         "@gtest//:main",
     ],
 )

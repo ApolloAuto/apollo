@@ -12,6 +12,7 @@ cc_proto_library(
 proto_library(
     name = "planning_proto_lib",
     srcs = [
+        "pad_msg.proto",
         "planning.proto",
     ],
     deps = [
@@ -19,6 +20,7 @@ proto_library(
         ":planning_internal_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
@@ -63,6 +65,23 @@ proto_library(
     srcs = [
         "dp_poly_path_config.proto",
     ],
+    deps = [
+        ":waypoint_sampler_config_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "waypoint_sampler_config_proto",
+    deps = [
+        ":waypoint_sampler_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "waypoint_sampler_config_proto_lib",
+    srcs = [
+        "waypoint_sampler_config.proto",
+    ],
 )
 
 cc_proto_library(
@@ -83,6 +102,48 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "navi_path_decider_config_proto",
+    deps = [
+        ":navi_path_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navi_path_decider_config_proto_lib",
+    srcs = [
+        "navi_path_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "navi_speed_decider_config_proto",
+    deps = [
+        ":navi_speed_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navi_speed_decider_config_proto_lib",
+    srcs = [
+        "navi_speed_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "navi_obstacle_decider_config_proto",
+    deps = [
+        ":navi_obstacle_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navi_obstacle_decider_config_proto_lib",
+    srcs = [
+        "navi_obstacle_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "planning_config_proto",
     deps = [
         ":planning_config_proto_lib",
@@ -97,10 +158,14 @@ proto_library(
     deps = [
         ":dp_poly_path_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
+        ":navi_obstacle_decider_config_proto_lib",
+        ":navi_path_decider_config_proto_lib",
+        ":navi_speed_decider_config_proto_lib",
+        ":planner_open_space_config_proto_lib",
         ":poly_st_speed_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
-        ":qp_spline_reference_line_smoother_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
+        ":reference_line_smoother_config_proto_lib",
     ],
 )
 
@@ -116,7 +181,9 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/localization/proto:localization_proto_lib",
+        "//modules/map/relative_map/proto:navigation_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:prediction_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
     ],
 )
@@ -143,16 +210,16 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "qp_spline_reference_line_smoother_config_proto",
+    name = "reference_line_smoother_config_proto",
     deps = [
-        ":qp_spline_reference_line_smoother_config_proto_lib",
+        ":reference_line_smoother_config_proto_lib",
     ],
 )
 
 proto_library(
-    name = "qp_spline_reference_line_smoother_config_proto_lib",
+    name = "reference_line_smoother_config_proto_lib",
     srcs = [
-        "qp_spline_reference_line_smoother_config.proto",
+        "reference_line_smoother_config.proto",
     ],
 )
 
@@ -198,6 +265,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "traffic_rule_config_proto",
+    deps = [
+        ":traffic_rule_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "traffic_rule_config_proto_lib",
+    srcs = [
+        "traffic_rule_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "spiral_curve_config_proto",
     deps = [
         ":spiral_curve_config_proto_lib",
@@ -222,6 +303,106 @@ proto_library(
     name = "st_boundary_config_proto_lib",
     srcs = [
         "st_boundary_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "planning_status_proto",
+    deps = [
+        ":planning_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planning_status_proto_lib",
+    srcs = [
+        "planning_status.proto",
+    ],
+    deps = [
+        ":decision_proto_lib",
+        ":planning_proto_lib",
+        "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_sampling_config_proto",
+    deps = [
+        ":lattice_sampling_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lattice_sampling_config_proto_lib",
+    srcs = [
+        "lattice_sampling_config.proto",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_structure_proto",
+    deps = [
+        ":lattice_structure_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lattice_structure_proto_lib",
+    srcs = [
+        "lattice_structure.proto",
+    ],
+    deps = [
+        ":lattice_sampling_config_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "planner_open_space_config_proto_lib",
+    srcs = [
+        "planner_open_space_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "planner_open_space_config_proto",
+    deps = [
+        ":planner_open_space_config_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "auto_tuning_raw_feature_proto",
+    deps = [
+        ":auto_tuning_raw_feature_lib",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_raw_feature_lib",
+    srcs = [
+        "auto_tuning_raw_feature.proto",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "auto_tuning_model_input_proto",
+    deps = [
+        ":auto_tuning_model_input_lib",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_model_input_lib",
+    srcs = [
+        "auto_tuning_model_input.proto",
     ],
 )
 

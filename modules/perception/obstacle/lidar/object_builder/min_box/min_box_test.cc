@@ -27,9 +27,7 @@ class MinBoxObjectBuilderTest : public testing::Test {
  protected:
   MinBoxObjectBuilderTest() {}
   ~MinBoxObjectBuilderTest() {}
-  void SetUp() {
-    min_box_object_builder_ = new MinBoxObjectBuilder();
-  }
+  void SetUp() { min_box_object_builder_ = new MinBoxObjectBuilder(); }
   void TearDown() {
     delete min_box_object_builder_;
     min_box_object_builder_ = nullptr;
@@ -39,7 +37,7 @@ class MinBoxObjectBuilderTest : public testing::Test {
   MinBoxObjectBuilder* min_box_object_builder_ = nullptr;
 };
 
-bool ConstructPointCloud(std::vector<ObjectPtr>* objects) {
+bool ConstructPointCloud(std::vector<std::shared_ptr<Object>>* objects) {
   std::string pcd_data(
       "modules/perception/data/min_box_object_builder_test/"
       "QB9178_3_1461381834_1461382134_30651.pcd");
@@ -62,7 +60,7 @@ bool ConstructPointCloud(std::vector<ObjectPtr>* objects) {
       p.intensity = static_cast<uint8_t>(intensity);
       cluster_cloud->points.push_back(p);
     }
-    ObjectPtr object(new Object);
+    std::shared_ptr<Object> object(new Object);
     object->cloud = cluster_cloud;
     objects->push_back(object);
   }
@@ -70,7 +68,7 @@ bool ConstructPointCloud(std::vector<ObjectPtr>* objects) {
 }
 
 TEST_F(MinBoxObjectBuilderTest, build) {
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   ConstructPointCloud(&objects);
   EXPECT_EQ(5, objects.size());
   ObjectBuilderOptions options;

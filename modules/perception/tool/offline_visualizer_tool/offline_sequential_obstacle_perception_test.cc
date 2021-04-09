@@ -20,17 +20,18 @@
 #include <string>
 
 #include "Eigen/Core"
+#include "pcl/io/pcd_io.h"
+
+#include "modules/common/time/timer.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/timer.h"
-#include "modules/perception/obstacle/common/file_system_util.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/obstacle/onboard/obstacle_perception.h"
-#include "pcl/io/pcd_io.h"
 
 DECLARE_string(flagfile);
 DEFINE_string(lidar_path, "/apollo/data/lidar/", "lidar path");
 DEFINE_string(radar_path, "/apollo/data/radar/", "radar path");
+DEFINE_int32(start_frame, 0, "start frame");
 
 namespace apollo {
 namespace perception {
@@ -78,8 +79,8 @@ bool LoadOdometry(const std::string& filepath, Eigen::Vector3f* velocity) {
   }
   double timestamp = 0.0;
   int frame_id;
-  fin >> frame_id >> timestamp
-      >> (*velocity)(0) >> (*velocity)(1) >> (*velocity)(2);
+  fin >> frame_id >> timestamp >> (*velocity)(0) >> (*velocity)(1) >>
+      (*velocity)(2);
   bool state = true;
   if (!fin.good()) {
     state = false;
@@ -141,8 +142,9 @@ class SequentialPerceptionTest {
     Eigen::Matrix4d pose;
     int frame_id = 0;
     double timestamp = 0.0;
-    std::string pose_filename = FLAGS_lidar_path + "/" +
-                    file_path.substr(0, file_path.find_last_of('.')) + ".pose";
+    std::string pose_filename =
+        FLAGS_lidar_path + "/" +
+        file_path.substr(0, file_path.find_last_of('.')) + ".pose";
     if (!ReadPoseFile(pose_filename, &pose, &frame_id, &timestamp)) {
       AERROR << "Failed to read pose file: " << pose_filename;
       return false;
@@ -151,8 +153,9 @@ class SequentialPerceptionTest {
     /// read pcd
     pcl::PointCloud<pcl_util::PointXYZIT>::Ptr cloud_raw(
         new pcl::PointCloud<pcl_util::PointXYZIT>);
-    std::string pcd_filename = FLAGS_lidar_path + "/" +
-                     file_path.substr(0, file_path.find_last_of('.')) + ".pcd";
+    std::string pcd_filename =
+        FLAGS_lidar_path + "/" +
+        file_path.substr(0, file_path.find_last_of('.')) + ".pcd";
     pcl::io::loadPCDFile<pcl_util::PointXYZIT>(pcd_filename, *cloud_raw);
     pcl_util::PointCloudPtr cloud(new pcl_util::PointCloud);
     for (size_t i = 0; i < cloud_raw->points.size(); ++i) {
@@ -170,7 +173,7 @@ class SequentialPerceptionTest {
         dynamic_cast<VelodyneRawFrame*>(frame->get());
     velodyne_frame->timestamp_ = timestamp;
     velodyne_frame->pose_ = pose;
-    velodyne_frame->sensor_type_ = VELODYNE_64;
+    velodyne_frame->sensor_type_ = SensorType::VELODYNE_64;
     velodyne_frame->cloud_ = cloud;
     return true;
   }
@@ -189,8 +192,9 @@ class SequentialPerceptionTest {
     Eigen::Matrix4d pose;
     int frame_id = 0;
     double timestamp = 0.0;
-    std::string pose_filename = FLAGS_radar_path + "/" +
-                    file_path.substr(0, file_path.find_last_of('.')) + ".pose";
+    std::string pose_filename =
+        FLAGS_radar_path + "/" +
+        file_path.substr(0, file_path.find_last_of('.')) + ".pose";
     if (!ReadPoseFile(pose_filename, &pose, &frame_id, &timestamp)) {
       AERROR << "Failed to read pose file: " << pose_filename;
       return false;
@@ -198,8 +202,9 @@ class SequentialPerceptionTest {
 
     /// read radar obstacle
     ContiRadar radar_obs_proto;
-    std::string radar_filename = FLAGS_radar_path + "/" +
-                   file_path.substr(0, file_path.find_last_of('.')) + ".radar";
+    std::string radar_filename =
+        FLAGS_radar_path + "/" +
+        file_path.substr(0, file_path.find_last_of('.')) + ".radar";
     if (!LoadRadarProto(radar_filename, &radar_obs_proto)) {
       AERROR << "Failed to load radar proto " << radar_filename;
       return false;
@@ -209,8 +214,9 @@ class SequentialPerceptionTest {
 
     /// read host vehicle velocity
     Eigen::Vector3f velocity;
-    std::string odometry_filename = FLAGS_radar_path + "/" +
-                file_path.substr(0, file_path.find_last_of('.')) + ".velocity";
+    std::string odometry_filename =
+        FLAGS_radar_path + "/" +
+        file_path.substr(0, file_path.find_last_of('.')) + ".velocity";
     if (!LoadOdometry(odometry_filename, &velocity)) {
       AERROR << "Failed to load odometry " << odometry_filename;
       return false;
@@ -221,7 +227,7 @@ class SequentialPerceptionTest {
     RadarRawFrame* radar_frame = dynamic_cast<RadarRawFrame*>(frame->get());
     radar_frame->timestamp_ = timestamp;
     radar_frame->pose_ = pose;
-    radar_frame->sensor_type_ = RADAR;
+    radar_frame->sensor_type_ = SensorType::RADAR;
     radar_frame->raw_obstacles_ = radar_obs_proto;
     radar_frame->car_linear_speed_ = velocity;
     return true;
@@ -229,7 +235,7 @@ class SequentialPerceptionTest {
 
   void GetSequentialSensorsDataFiles(std::vector<SensorFile>* sensors_files) {
     PERF_BLOCK_START();
-    std::map<std::string, std::vector<SensorFile> > sensors_files_lists;
+    std::map<std::string, std::vector<SensorFile>> sensors_files_lists;
     size_t total_sensor_files_num = 0;
     for (const auto& sensor_files_source : sensors_files_sources_) {
       std::string sensor_key = sensor_files_source.first;
@@ -242,15 +248,16 @@ class SequentialPerceptionTest {
       /// get files with specified extension
       std::string ext = std::string(".") + source.extension;
       std::vector<std::string> files_list;
-      GetFileNamesInFolderById(source.folder_path, ext, &files_list);
+      common::util::GetFileNamesInFolderById(source.folder_path, ext,
+                                             &files_list);
       /// get sensor files
       std::vector<SensorFile>& sensor_files_list =
           sensors_files_lists[sensor_key];
       sensor_files_list.reserve(files_list.size());
       for (const auto& file_name : files_list) {
         /// get timestamp
-        std::string timestamp_str = file_name.substr(
-                                    0, file_name.find_last_of('.'));
+        std::string timestamp_str =
+            file_name.substr(0, file_name.find_last_of('.'));
         double timestamp = 0.0;
         std::stringstream ss(timestamp_str);
         ss >> timestamp;
@@ -281,7 +288,7 @@ class SequentialPerceptionTest {
       AERROR << "SensorRawFrame is nullptr";
       return;
     }
-    std::vector<ObjectPtr> fused_objs;
+    std::vector<std::shared_ptr<Object>> fused_objs;
     obstacle_perception_.Process(frame, &fused_objs);
   }
 
@@ -302,7 +309,7 @@ int main(int argc, char** argv) {
       "offline_sequential_obstacle_perception_test.flag";
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  /// initiaize SequentialPerceptionTest
+  /// initialize SequentialPerceptionTest
   apollo::perception::SequentialPerceptionTest test;
   if (!test.Init()) {
     AERROR << "Failed to init SequentialPerceptionTest.";
@@ -319,7 +326,7 @@ int main(int argc, char** argv) {
   AINFO << "Total sensors files num: " << sensors_files.size();
 
   /// process each sensor file
-  for (size_t i = 0; i < sensors_files.size(); ++i) {
+  for (size_t i = FLAGS_start_frame; i < sensors_files.size(); ++i) {
     AINFO << "Process frame " << sensors_files[i];
     std::shared_ptr<apollo::perception::SensorRawFrame> raw_frame(
         new apollo::perception::SensorRawFrame);

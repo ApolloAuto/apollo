@@ -36,11 +36,11 @@ namespace traffic_light {
  */
 class ClassifyBySimple : public IRefine {
  public:
-  ClassifyBySimple(const std::string &_class_net,
-                   const std::string &_class_model, float threshold,
+  ClassifyBySimple(const std::string &class_net_,
+                   const std::string &class_model_, float threshold,
                    unsigned int resize_width, unsigned int resize_height);
 
-  void Init(const std::string &_class_net, const std::string &_class_model,
+  void Init(const std::string &class_net_, const std::string &class_model_,
             float threshold, unsigned int resize_width,
             unsigned int resize_height);
 

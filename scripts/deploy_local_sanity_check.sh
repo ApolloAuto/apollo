@@ -89,7 +89,7 @@ if [ ! -e "$APOLLO_ROOT/.git/hooks/post-commit" ];then
     if [ $? -eq 0 ];then
         ok "Deploy sanity check done."
     else
-        error "Failed to deploy sannity check."
+        error "Failed to deploy sanity check."
     fi
     popd >/dev/null
 elif [ -L "$APOLLO_ROOT/.git/hooks/post-commit" ];then

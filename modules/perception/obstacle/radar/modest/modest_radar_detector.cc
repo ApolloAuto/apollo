@@ -16,143 +16,54 @@
 
 #include "modules/perception/obstacle/radar/modest/modest_radar_detector.h"
 
-#include <memory>
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/obstacle/radar/modest/conti_radar_util.h"
 #include "modules/perception/obstacle/radar/modest/object_builder.h"
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
-#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
+
 bool ModestRadarDetector::Init() {
-  using apollo::perception::ConfigManager;
-  using apollo::perception::ModelConfig;
-  const ModelConfig *model_config = nullptr;
-  if (!ConfigManager::instance()->GetModelConfig(name(), &model_config)) {
-    AERROR << "not found model config: " << name();
-    return false;
+  GetProtoFromFile(FLAGS_modest_radar_detector_config, &config_);
+
+  if (FLAGS_use_navigation_mode) {
+    config_.set_use_had_map(false);
   }
-  if (!model_config->GetValue("use_had_map", &use_had_map_)) {
+
+  if (!FLAGS_use_navigation_mode && !config_.has_use_had_map()) {
     AERROR << "use_had_map not found.";
     return false;
   }
-  if (!model_config->GetValue("max_theta", &max_theta_)) {
-    AERROR << "max_theta not found.";
-    return false;
-  }
-  if (!model_config->GetValue("delay_frames", &delay_frames_)) {
-    AERROR << "delay_frame not found.";
-    return false;
-  }
-  RadarTrack::SetTrackedTimesThreshold(delay_frames_);
-  object_builder_.SetDelayFrame(delay_frames_);
-  if (!model_config->GetValue("use_fp_filter", &use_fp_filter_)) {
-    AERROR << "use_fp_filter is not found.";
-    return false;
-  }
-  object_builder_.SetUseFpFilter(use_fp_filter_);
-  if (!model_config->GetValue("probexist_vehicle",
-                              &(conti_params_.probexist_vehicle))) {
-    AERROR << "probexist_vehicle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("probexist_pedestrian",
-                              &(conti_params_.probexist_pedestrian))) {
-    AERROR << "probexist_pedestrian not found.";
-    return false;
-  }
-  if (!model_config->GetValue("probexist_bicycle",
-                              &(conti_params_.probexist_bicycle))) {
-    AERROR << "probexist_bicycle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("probexist_unknown",
-                              &(conti_params_.probexist_unknown))) {
-    AERROR << "probexist_unknown not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_vel_rms_vehicle",
-                              &(conti_params_.lo_vel_rms_vehicle))) {
-    AERROR << "lo_vel_rms_vehicle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_vel_rms_vehicle",
-                              &(conti_params_.la_vel_rms_vehicle))) {
-    AERROR << "la_vel_rms_vehicle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_dist_rms_vehicle",
-                              &(conti_params_.lo_dist_rms_vehicle))) {
-    AERROR << "lo_dist_rms_vehicle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_dist_rms_vehicle",
-                              &(conti_params_.la_dist_rms_vehicle))) {
-    AERROR << "la_vel_dist_vehicle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_vel_rms_pedestrian",
-                              &(conti_params_.lo_vel_rms_pedestrian))) {
-    AERROR << "lo_vel_rms_pedestrian not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_vel_rms_pedestrian",
-                              &(conti_params_.la_vel_rms_pedestrian))) {
-    AERROR << "la_vel_rms_vehicle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_dist_rms_pedestrian",
-                              &(conti_params_.lo_dist_rms_pedestrian))) {
-    AERROR << "lo_dist_rms_pedestrian not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_dist_rms_pedestrian",
-                              &(conti_params_.la_dist_rms_pedestrian))) {
-    AERROR << "la_vel_dist_pedestrian not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_vel_rms_bicycle",
-                              &(conti_params_.lo_vel_rms_bicycle))) {
-    AERROR << "lo_vel_rms_bicycle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_vel_rms_bicycle",
-                              &(conti_params_.la_vel_rms_bicycle))) {
-    AERROR << "la_vel_rms_bicycle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_dist_rms_bicycle",
-                              &(conti_params_.lo_dist_rms_bicycle))) {
-    AERROR << "lo_dist_rms_bicycle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_dist_rms_bicycle",
-                              &(conti_params_.la_dist_rms_bicycle))) {
-    AERROR << "la_vel_dist_bicycle not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_vel_rms_unknown",
-                              &(conti_params_.lo_vel_rms_unknown))) {
-    AERROR << "lo_vel_rms_unknown not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_vel_rms_unknown",
-                              &(conti_params_.la_vel_rms_unknown))) {
-    AERROR << "la_vel_rms_unkown not found.";
-    return false;
-  }
-  if (!model_config->GetValue("lo_dist_rms_unknown",
-                              &(conti_params_.lo_dist_rms_unknown))) {
-    AERROR << "lo_dist_rms_unknown not found.";
-    return false;
-  }
-  if (!model_config->GetValue("la_dist_rms_unknown",
-                              &(conti_params_.la_dist_rms_unknown))) {
-    AERROR << "la_vel_dist_unknown not found.";
-    return false;
-  }
+
+  RadarTrack::SetTrackedTimesThreshold(config_.delay_frames());
+  object_builder_.SetDelayFrame(config_.delay_frames());
+  object_builder_.SetUseFpFilter(config_.use_fp_filter());
+
+  conti_params_.probexist_vehicle = config_.probexist_vehicle();
+  conti_params_.probexist_pedestrian = config_.probexist_pedestrian();
+  conti_params_.probexist_bicycle = config_.probexist_bicycle();
+  conti_params_.probexist_unknown = config_.probexist_unknown();
+  conti_params_.lo_vel_rms_vehicle = config_.lo_vel_rms_vehicle();
+  conti_params_.la_vel_rms_vehicle = config_.la_vel_rms_vehicle();
+  conti_params_.lo_dist_rms_vehicle = config_.lo_dist_rms_vehicle();
+  conti_params_.la_dist_rms_vehicle = config_.la_dist_rms_vehicle();
+  conti_params_.lo_vel_rms_pedestrian = config_.lo_vel_rms_pedestrian();
+  conti_params_.la_vel_rms_pedestrian = config_.la_vel_rms_pedestrian();
+  conti_params_.lo_dist_rms_pedestrian = config_.lo_dist_rms_pedestrian();
+  conti_params_.la_dist_rms_pedestrian = config_.la_dist_rms_pedestrian();
+  conti_params_.lo_vel_rms_bicycle = config_.lo_vel_rms_bicycle();
+  conti_params_.la_vel_rms_bicycle = config_.la_vel_rms_bicycle();
+  conti_params_.lo_dist_rms_bicycle = config_.lo_dist_rms_bicycle();
+  conti_params_.la_dist_rms_bicycle = config_.la_dist_rms_bicycle();
+  conti_params_.lo_vel_rms_unknown = config_.lo_vel_rms_unknown();
+  conti_params_.la_vel_rms_unknown = config_.la_vel_rms_unknown();
+  conti_params_.lo_dist_rms_unknown = config_.lo_dist_rms_unknown();
+  conti_params_.la_dist_rms_unknown = config_.la_dist_rms_unknown();
+
   object_builder_.SetContiParams(conti_params_);
   radar_tracker_.reset(new RadarTrackManager());
 
@@ -160,15 +71,16 @@ bool ModestRadarDetector::Init() {
   return true;
 }
 
-bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
-                                 const std::vector<PolygonDType> &map_polygons,
-                                 const RadarDetectorOptions &options,
-                                 std::vector<ObjectPtr> *objects) {
+bool ModestRadarDetector::Detect(
+    const ContiRadar &raw_obstacles,
+    const std::vector<PolygonDType> &map_polygons,
+    const RadarDetectorOptions &options,
+    std::vector<std::shared_ptr<Object>> *objects) {
   if (objects == nullptr) {
     AERROR << "Objects is nullptr";
     return false;
   }
-  AINFO << "Modest radar detector.";
+  ADEBUG << "Modest radar detector.";
   Eigen::Matrix4d radar_pose;
   if (options.radar2world_pose == nullptr) {
     AERROR << "radar2world_pose is nullptr.";
@@ -177,38 +89,60 @@ bool ModestRadarDetector::Detect(const ContiRadar &raw_obstacles,
     radar_pose = *(options.radar2world_pose);
   }
   Eigen::Vector2d main_velocity;
-  main_velocity[0] = options.car_linear_speed[0];
-  main_velocity[1] = options.car_linear_speed[1];
+  if (FLAGS_use_navigation_mode) {
+    main_velocity[0] = 0;
+    main_velocity[1] = 0;
+  } else {
+    main_velocity[0] = options.car_linear_speed[0];
+    main_velocity[1] = options.car_linear_speed[1];
+  }
   // preparation
 
   SensorObjects radar_objects;
-  object_builder_.Build(
-    raw_obstacles, radar_pose, main_velocity, &radar_objects);
-  radar_objects.timestamp = static_cast<double>(
-    raw_obstacles.header().timestamp_sec());
-  radar_objects.sensor_type = RADAR;
+  object_builder_.Build(raw_obstacles, radar_pose, main_velocity,
+                        &radar_objects);
+  radar_objects.timestamp =
+      static_cast<double>(raw_obstacles.header().timestamp_sec());
+  radar_objects.sensor_type = SensorType::RADAR;
 
   // roi filter
   auto &filter_objects = radar_objects.objects;
   RoiFilter(map_polygons, &filter_objects);
   // treatment
   radar_tracker_->Process(radar_objects);
-  AINFO << "After process, object size: " << radar_objects.objects.size();
+  ADEBUG << "After process, object size: " << radar_objects.objects.size();
   CollectRadarResult(objects);
-  AINFO << "radar object size: " << objects->size();
+  ADEBUG << "radar object size: " << objects->size();
+
+  if (!RadarFrameSupplement::state_vars.initialized_) {
+    RadarFrameSupplement::state_vars.process_noise(0, 0) *= 10;
+    RadarFrameSupplement::state_vars.process_noise(1, 1) *= 10;
+    RadarFrameSupplement::state_vars.process_noise(2, 2) *= 10;
+    RadarFrameSupplement::state_vars.process_noise(3, 3) *= 10;
+
+    RadarFrameSupplement::state_vars.trans_matrix.block(0, 0, 1, 4) << 1.0f,
+        0.0f, 0.33f, 0.0f;
+    RadarFrameSupplement::state_vars.trans_matrix.block(1, 0, 1, 4) << 0.0f,
+        1.0f, 0.0f, 0.33f;
+    ADEBUG << "state trans matrix in RadarFrameSupplement is \n"
+           << RadarFrameSupplement::state_vars.trans_matrix << std::endl;
+    RadarFrameSupplement::state_vars.initialized_ = true;
+  }
   return true;
 }
 
-bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
+bool ModestRadarDetector::CollectRadarResult(
+    std::vector<std::shared_ptr<Object>> *objects) {
   std::vector<RadarTrack> &obs_track = radar_tracker_->GetTracks();
   if (objects == nullptr) {
     AERROR << "objects is nullptr";
     return false;
   }
   for (size_t i = 0; i < obs_track.size(); ++i) {
-    ObjectPtr object_ptr = ObjectPtr(new Object());
-    const ObjectPtr &object_radar_ptr = obs_track[i].GetObsRadar();
-    if (use_fp_filter_ && object_radar_ptr->is_background) {
+    std::shared_ptr<Object> object_ptr = std::shared_ptr<Object>(new Object());
+    const std::shared_ptr<Object> &object_radar_ptr =
+        obs_track[i].GetObsRadar();
+    if (config_.use_fp_filter() && object_radar_ptr->is_background) {
       continue;
     }
     object_ptr->clone(*object_radar_ptr);
@@ -222,10 +156,10 @@ bool ModestRadarDetector::CollectRadarResult(std::vector<ObjectPtr> *objects) {
 
 void ModestRadarDetector::RoiFilter(
     const std::vector<PolygonDType> &map_polygons,
-    std::vector<ObjectPtr>* filter_objects) {
-  AINFO << "Before using hdmap, object size:" << filter_objects->size();
+    std::vector<std::shared_ptr<Object>> *filter_objects) {
+  ADEBUG << "Before using hdmap, object size:" << filter_objects->size();
   // use new hdmap
-  if (use_had_map_) {
+  if (config_.use_had_map()) {
     if (!map_polygons.empty()) {
       int obs_number = 0;
       for (size_t i = 0; i < filter_objects->size(); i++) {
@@ -240,12 +174,12 @@ void ModestRadarDetector::RoiFilter(
         }
       }
       filter_objects->resize(obs_number);
-      AINFO << "query hdmap sucessfully!";
+      ADEBUG << "query hdmap sucessfully!";
     } else {
-      AINFO << "query hdmap unsuccessfully!";
+      ADEBUG << "query hdmap unsuccessfully!";
     }
   }
-  AINFO << "After using hdmap, object size:" << filter_objects->size();
+  ADEBUG << "After using hdmap, object size:" << filter_objects->size();
 }
 
 }  // namespace perception

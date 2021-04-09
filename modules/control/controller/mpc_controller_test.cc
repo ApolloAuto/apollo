@@ -44,7 +44,6 @@ class MPCControllerTest : public ::testing::Test, MPCController {
  public:
   virtual void SetupTestCase() {
     FLAGS_v = 4;
-    FLAGS_use_mpc = true;
     FLAGS_control_conf_file =
         "modules/control/testdata/mpc_controller_test/lincoln.pb.txt ";
     ControlConf control_conf;
@@ -69,7 +68,7 @@ class MPCControllerTest : public ::testing::Test, MPCController {
     CHECK(apollo::common::util::GetProtoFromFile(filename, &localization_pb))
         << "Failed to open file " << filename;
     localization_pb.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(localization_pb);
+    return localization_pb;
   }
 
   ChassisPb LoadChassisPb(const std::string &filename) {
@@ -77,7 +76,7 @@ class MPCControllerTest : public ::testing::Test, MPCController {
     CHECK(apollo::common::util::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(chassis_pb);
+    return chassis_pb;
   }
 
   PlanningTrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
@@ -86,7 +85,7 @@ class MPCControllerTest : public ::testing::Test, MPCController {
                                                  &planning_trajectory_pb))
         << "Failed to open file " << filename;
     planning_trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
-    return std::move(planning_trajectory_pb);
+    return planning_trajectory_pb;
   }
 
   MPCControllerConf mpc_conf_;

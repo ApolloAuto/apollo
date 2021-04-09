@@ -199,12 +199,13 @@ int RNNEvaluator::SetupObstacleFeature(
     dist_lb = p_lane_fea->dist_to_left_boundary();
     dist_rb = p_lane_fea->dist_to_right_boundary();
 
-    if (!fea->has_speed() || !fea->has_theta()) {
-      ADEBUG << "Fail to access speed from " << i << "-the feature";
+    if (!fea->has_speed() || !fea->velocity_heading()) {
+      ADEBUG << "Fail to access speed and velocity heading from " << i
+             << "-the feature";
       continue;
     }
     speed = fea->speed();
-    heading = fea->theta();
+    heading = fea->velocity_heading();
     success_setup = true;
     ADEBUG << "Success to setup obstacle feature!";
 
@@ -242,6 +243,7 @@ int RNNEvaluator::SetupObstacleFeature(
 int RNNEvaluator::SetupLaneFeature(const Feature& feature,
                                    const LaneSequence& lane_sequence,
                                    std::vector<float>* const feature_values) {
+  CHECK_LE(LENGTH_LANE_POINT_SEQUENCE, FLAGS_max_num_lane_point);
   feature_values->clear();
   feature_values->reserve(static_cast<size_t>(DIM_LANE_POINT_FEATURE) *
                           static_cast<size_t>(LENGTH_LANE_POINT_SEQUENCE));
@@ -287,12 +289,11 @@ int RNNEvaluator::SetupLaneFeature(const Feature& feature,
 
 bool RNNEvaluator::IsCutinInHistory(const std::string& curr_lane_id,
                                     const std::string& prev_lane_id) {
-  PredictionMap* p_map = PredictionMap::instance();
   std::shared_ptr<const LaneInfo> curr_lane_info =
-      p_map->LaneById(curr_lane_id);
+      PredictionMap::LaneById(curr_lane_id);
   std::shared_ptr<const LaneInfo> prev_lane_info =
-      p_map->LaneById(prev_lane_id);
-  if (!p_map->IsSuccessorLane(curr_lane_info, prev_lane_info)) {
+      PredictionMap::LaneById(prev_lane_id);
+  if (!PredictionMap::IsSuccessorLane(curr_lane_info, prev_lane_info)) {
     return true;
   }
   return false;

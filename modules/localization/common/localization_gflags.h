@@ -32,6 +32,9 @@ DECLARE_string(localization_config_file);
 DECLARE_string(rtk_adapter_config_file);
 DECLARE_string(msf_adapter_config_file);
 DECLARE_string(msf_visual_adapter_config_file);
+DECLARE_string(lmd_adapter_config_file);
+DECLARE_string(lmd_rawinput_bag_file);
+DECLARE_string(lmd_rawinput_bin_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
 DECLARE_bool(enable_map_reference_unify);
@@ -50,6 +53,11 @@ DECLARE_double(report_gps_imu_time_diff_threshold);
 
 DECLARE_bool(enable_gps_timestamp);
 
+DECLARE_bool(enable_lmd_premapping);
+DECLARE_bool(enable_lmd_mapping);
+DECLARE_bool(enable_lmd_imu_filter);
+DECLARE_bool(enable_lmd_chassis_speed);
+
 // lidar module
 DECLARE_string(local_map_name);
 DECLARE_string(lidar_extrinsics_file);
@@ -58,7 +66,6 @@ DECLARE_double(lidar_height_default);
 DECLARE_int32(lidar_localization_mode);
 DECLARE_int32(lidar_yaw_align_mode);
 DECLARE_int32(lidar_filter_size);
-DECLARE_int32(lidar_thread_num);
 DECLARE_double(lidar_imu_max_delay_time);
 DECLARE_double(lidar_map_coverage_theshold);
 DECLARE_bool(lidar_debug_log_flag);
@@ -70,13 +77,11 @@ DECLARE_bool(integ_sins_align_with_vel);
 DECLARE_bool(integ_sins_state_check);
 DECLARE_double(integ_sins_state_span_time);
 DECLARE_double(integ_sins_state_pos_std);
-DECLARE_bool(using_raw_gnsspos);
+
 DECLARE_double(vel_threshold_get_yaw);
-DECLARE_bool(integ_debug_log_flag);
 
 // gnss module
 DECLARE_bool(enable_ins_aid_rtk);
-DECLARE_bool(enable_auto_save_eph_file);
 DECLARE_string(eph_buffer_path);
 DECLARE_string(ant_imu_leverarm_file);
 DECLARE_bool(gnss_debug_log_flag);
@@ -90,15 +95,20 @@ DECLARE_double(imu_to_ant_offset_uz);
 
 // common
 DECLARE_double(imu_rate);
-DECLARE_int32(local_utm_zone_id);
+DECLARE_bool(if_utm_zone_id_from_folder);
 DECLARE_bool(trans_gpstime_to_utctime);
 DECLARE_int32(gnss_mode);
 DECLARE_bool(imu_coord_rfu);
 DECLARE_bool(gnss_only_init);
 DECLARE_bool(enable_lidar_localization);
 
-// Debug
-DECLARE_bool(use_visualize);
+// imu vehicle extrinsic
+DECLARE_string(vehicle_imu_file);
+DECLARE_bool(if_vehicle_imu_from_file);
+DECLARE_double(imu_vehicle_qx);
+DECLARE_double(imu_vehicle_qy);
+DECLARE_double(imu_vehicle_qz);
+DECLARE_double(imu_vehicle_qw);
 
 // visualization
 DECLARE_string(map_visual_dir);

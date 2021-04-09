@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <sys/resource.h>
+#include <sys/time.h>
+
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 
 #include "gtest/gtest.h"
@@ -61,6 +64,10 @@ TEST_F(MonitorBufferTest, PrintLog) {
               testing::internal::GetCapturedStderr().find("WARN_msg"));
   }
   {
+    rlimit core_limit;
+    core_limit.rlim_cur = 0;
+    core_limit.rlim_max = 0;
+    setrlimit(RLIMIT_CORE, &core_limit);
     buffer_->FATAL("FATAL_msg");
     EXPECT_DEATH(buffer_->PrintLog(), "");
   }

@@ -1,0 +1,119 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/decision.proto";
+import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/geometry.proto";
+
+/*
+  This file defines the data types that represents the internal state of the planning module.
+  It will not be refreshed in each planning cycle.
+*/
+
+message ChangeLaneStatus {
+  enum Status {
+    IN_CHANGE_LANE = 1; // during change lane state
+    CHANGE_LANE_FAILED = 2; // change lane failed
+    CHANGE_LANE_SUCCESS = 3; // change lane failed
+  }
+  optional Status status = 1;
+  // the id of the route segment that the vehicle is driving on
+  optional string path_id = 2;
+  // the time stamp when the state started.
+  optional double timestamp = 3;
+}
+
+message StopTimer {
+  optional string obstacle_id = 1;
+  // the timestamp when start stopping for the crosswalk
+  optional double stop_time = 2;
+}
+
+message CrosswalkStatus {
+  optional string crosswalk_id = 1;
+  // the timestamp when start stopping for the crosswalk
+  repeated StopTimer stop_timers = 2;
+}
+
+message PullOverStatus {
+  enum Reason {
+    DESTINATION = 1; // upon arriving destination
+  }
+  enum Status {
+    UNKNOWN = 1;
+    IN_OPERATION = 2;
+    DONE = 3;
+    DISABLED = 4;
+  }
+
+  optional bool in_pull_over = 1 [default=false];
+  optional Status status = 2;
+  optional apollo.common.PointENU inlane_dest_point = 3;
+  optional apollo.common.PointENU start_point = 4;
+  optional apollo.common.PointENU stop_point = 5;
+  optional double stop_point_heading = 6;
+  optional Reason reason = 7;
+  optional double status_set_time = 8;
+}
+
+message ReroutingStatus {
+  optional double last_rerouting_time = 1;
+}
+
+message RightOfWayStatus {
+  // whether the vehicle has right of way in junction
+  map<string, bool> junction = 1;
+}
+
+message SidePassStatus {
+  // a sidepass sequence includes:
+  // driving -> wait -> sidepass -> driving
+  enum Status {
+    UNKNOWN = 0;
+    DRIVE = 1;
+    WAIT = 2;
+    SIDEPASS = 3;
+  }
+  optional Status status = 1;
+  optional double wait_start_time = 2;
+  optional string pass_obstacle_id = 3;
+  optional apollo.planning.ObjectSidePass.Type pass_side = 4;
+}
+
+message StopSignStatus {
+  enum Status {
+    UNKNOWN = 0;
+    DRIVE = 1;
+    STOP = 2;
+    WAIT = 3;
+    CREEP = 4;
+    STOP_DONE = 5;
+  }
+  message LaneWatchVehicles {
+    optional string lane_id = 1;
+    repeated string watch_vehicles = 2;
+  }
+
+  optional string stop_sign_id = 1;
+  optional Status status = 2;
+  optional double stop_start_time = 3;
+  repeated LaneWatchVehicles lane_watch_vehicles = 4;
+}
+
+message DestinationStatus {
+    optional bool has_passed_destination = 1 [default = false];
+}
+
+message PlanningStatus {
+  optional ChangeLaneStatus change_lane = 1;
+  optional CrosswalkStatus crosswalk = 2;
+  optional apollo.common.EngageAdvice engage_advice = 3;
+  optional ReroutingStatus rerouting = 4;
+  optional RightOfWayStatus right_of_way = 5;
+  optional SidePassStatus side_pass = 6;
+  optional StopSignStatus stop_sign = 7;
+  optional DestinationStatus destination  = 8;
+  optional PullOverStatus pull_over = 9;
+}
+

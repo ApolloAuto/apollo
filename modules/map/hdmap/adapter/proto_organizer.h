@@ -45,6 +45,7 @@ struct ProtoData {
   std::unordered_map<std::string, PbOverlap> pb_overlaps;
   std::unordered_map<std::string, PbJunction> pb_junctions;
   std::unordered_map<std::string, StopLineInternal> pb_stop_lines;
+  std::unordered_map<std::string, PbParkingSpace> pb_parking_spaces;
 };
 
 class ProtoOrganizer {

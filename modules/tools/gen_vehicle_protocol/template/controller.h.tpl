@@ -44,8 +44,8 @@ class %(car_type_cap)sController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender* const can_sender,
-      MessageManager* const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) override;
 
   bool Start() override;
 
@@ -111,7 +111,6 @@ class %(car_type_cap)sController final : public VehicleController {
   // control protocol
 %(control_protocol_ptr_list)s
 
-  CanSender* can_sender_;
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;
   bool is_chassis_error_ = false;

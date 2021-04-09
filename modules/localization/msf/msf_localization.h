@@ -30,21 +30,20 @@
 #include "gtest/gtest_prod.h"
 
 #include "ros/include/ros/ros.h"
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "sensor_msgs/PointCloud2.h"
-#include "tf2_ros/transform_broadcaster.h"
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/measure.pb.h"
-#include "modules/localization/proto/sins_pva.pb.h"
 
-#include "include/localization_integ.h"
 #include "modules/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/localization_base.h"
+#include "modules/localization/msf/local_integ/localization_integ.h"
 
 /**
  * @namespace apollo::localization
@@ -79,30 +78,34 @@ class MSFLocalization : public LocalizationBase {
   void InitParams();
   void OnPointCloud(const sensor_msgs::PointCloud2 &message);
   void OnRawImu(const drivers::gnss::Imu &imu_msg);
-  void OnGnssRtkObs(const EpochObservation &raw_obs_msg);
-  void OnGnssRtkEph(const GnssEphemeris &gnss_orbit_msg);
-  void OnGnssBestPose(const GnssBestPose &bestgnsspos_msg);
-
-  void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
+  void OnGnssRtkObs(const drivers::gnss::EpochObservation &raw_obs_msg);
+  void OnGnssRtkEph(const drivers::gnss::GnssEphemeris &gnss_orbit_msg);
+  void OnGnssBestPose(const drivers::gnss::GnssBestPose &bestgnsspos_msg);
 
  private:
-  bool LoadGnssAntennaExtrinsic(const std::string &file_path,
-                                double *offset_x, double *offset_y,
-                                double *offset_z, double *uncertainty_x,
-                                double *uncertainty_y, double *uncertainty_z);
+  bool LoadGnssAntennaExtrinsic(const std::string &file_path, double *offset_x,
+                                double *offset_y, double *offset_z,
+                                double *uncertainty_x, double *uncertainty_y,
+                                double *uncertainty_z);
+  bool LoadImuVehicleExtrinsic(const std::string &file_path,
+                                double *quat_qx, double *quat_qy,
+                                double *quat_qz, double *quat_qw);
+  bool LoadZoneIdFromFolder(const std::string &folder_path, int *zone_id);
 
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
-  LocalizationInteg localization_integ_;
-  LocalizationIntegParam localizaiton_param_;
-  std::unique_ptr<tf2_ros::TransformBroadcaster> tf2_broadcaster_;
-  LocalizationMeasureState localization_state_;
+  msf::LocalizationInteg localization_integ_;
+  msf::LocalizationIntegParam localizaiton_param_;
+  msf::LocalizationMeasureState localization_state_;
   uint64_t pcd_msg_index_;
 
   MeasureState latest_lidar_localization_status_;
   MeasureState latest_gnss_localization_status_;
 
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
+
+  // rotation from the vehicle coord to imu coord
+  Eigen::Quaternion<double> imu_vehicle_quat_;
 };
 
 }  // namespace localization

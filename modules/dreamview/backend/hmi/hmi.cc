@@ -17,153 +17,38 @@
 #include "modules/dreamview/backend/hmi/hmi.h"
 
 #include <cstdlib>
-#include <thread>
+#include <string>
 #include <vector>
 
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/kv_db/kv_db.h"
-#include "modules/common/util/http_client.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
-#include "modules/common/util/string_tokenizer.h"
-#include "modules/common/util/string_util.h"
-#include "modules/common/util/util.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "modules/data/proto/static_info.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/hmi/vehicle_manager.h"
+#include "modules/dreamview/backend/hmi/hmi_worker.h"
+#include "modules/dreamview/proto/audio_capture.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
-
-DEFINE_string(global_flagfile, "modules/common/data/global_flagfile.txt",
-              "Global flagfile shared by all modules.");
-
-DEFINE_string(map_data_path, "modules/map/data", "Path to map data.");
-
-DEFINE_string(vehicle_data_path, "modules/calibration/data",
-              "Path to vehicle data.");
-
-DEFINE_string(ota_service_url, "http://180.76.145.202:5000/query",
-              "OTA service url. [Attention! It's still in experiment.]");
-DEFINE_string(ota_vehicle_info_file, "modules/tools/ota/vehicle_info.pb.txt",
-              "Vehicle info to request OTA.");
 
 namespace apollo {
 namespace dreamview {
-namespace {
 
 using apollo::canbus::Chassis;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::util::FindOrNull;
-using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::common::time::Clock;
 using apollo::common::util::JsonUtil;
-using apollo::common::util::StringTokenizer;
-using apollo::control::DrivingAction;
-using apollo::data::VehicleInfo;
-using google::protobuf::Map;
 using Json = WebSocketHandler::Json;
-
-// Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
-std::string TitleCase(const std::string &origin,
-                      const std::string &delimiter = "_") {
-  std::vector<std::string> parts = StringTokenizer::Split(origin, delimiter);
-  for (auto &part : parts) {
-    if (!part.empty()) {
-      // Upper case the first char.
-      part[0] = toupper(part[0]);
-    }
-  }
-
-  return apollo::common::util::PrintIter(parts);
-}
-
-// List subdirs and return a dict of {subdir_title: subdir_path}.
-Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
-  Map<std::string, std::string> result;
-  const auto subdirs = apollo::common::util::ListSubDirectories(dir);
-  for (const auto &subdir : subdirs) {
-    const auto subdir_title = TitleCase(subdir);
-    const auto subdir_path = apollo::common::util::StrCat(dir, "/", subdir);
-    result.insert({subdir_title, subdir_path});
-  }
-  return result;
-}
-
-// Send PadMessage to change driving mode to target mode.
-// Retry for several times to try to guarantee the result.
-bool GuaranteeDrivingMode(const Chassis::DrivingMode target_mode,
-                          const bool reset_first) {
-  if (reset_first) {
-    if (!GuaranteeDrivingMode(Chassis::COMPLETE_MANUAL, false)) {
-      return false;
-    }
-  }
-
-  control::PadMessage pad;
-  switch (target_mode) {
-    case Chassis::COMPLETE_MANUAL:
-      pad.set_action(DrivingAction::RESET);
-      break;
-    case Chassis::COMPLETE_AUTO_DRIVE:
-      pad.set_action(DrivingAction::START);
-      break;
-    default:
-      AFATAL << "Unknown action to change driving mode to " << target_mode;
-  }
-
-  constexpr int kMaxTries = 3;
-  constexpr auto kTryInterval = std::chrono::milliseconds(500);
-  auto* chassis = CHECK_NOTNULL(AdapterManager::GetChassis());
-  for (int i = 0; i < kMaxTries; ++i) {
-    // Send driving action periodically until entering target driving mode.
-    AdapterManager::FillPadHeader("HMI", &pad);
-    AdapterManager::PublishPad(pad);
-
-    std::this_thread::sleep_for(kTryInterval);
-    chassis->Observe();
-    if (chassis->Empty()) {
-      AERROR << "No Chassis message received!";
-    } else if (chassis->GetLatestObserved().driving_mode() == target_mode) {
-      return true;
-    }
-  }
-  AERROR << "Failed to change driving mode to " << target_mode;
-  return false;
-}
-
-}  // namespace
+using RLock = boost::shared_lock<boost::shared_mutex>;
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : websocket_(websocket), map_service_(map_service) {
-  CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
-      << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
-  // If the module path doesn't exist, remove it from list.
-  auto *modules = config_.mutable_modules();
-  for (auto iter = modules->begin(); iter != modules->end();) {
-    const auto &conf = iter->second;
-    if (conf.has_path() && !common::util::PathExists(conf.path())) {
-      iter = modules->erase(iter);
-    } else {
-      ++iter;
-    }
-  }
-
-  // If the default mode is unavailable, select the first one.
-  const auto &modes = config_.modes();
-  if (!ContainsKey(modes, status_.current_mode())) {
-    CHECK(!modes.empty());
-    status_.set_current_mode(modes.begin()->first);
-  }
-
-  // Get available maps and vehicles by listing data directory.
-  *config_.mutable_available_maps() = ListDirAsDict(FLAGS_map_data_path);
-  *config_.mutable_available_vehicles() =
-      ListDirAsDict(FLAGS_vehicle_data_path);
-  ADEBUG << "Loaded HMI config: " << config_.DebugString();
-
+    : websocket_(websocket),
+      map_service_(map_service),
+      logger_(apollo::common::monitor::MonitorMessageItem::HMI) {
   // Register websocket message handlers.
   if (websocket_) {
     RegisterMessageHandlers();
+    StartBroadcastHMIStatusThread();
   }
 }
 
@@ -171,10 +56,31 @@ void HMI::RegisterMessageHandlers() {
   // Send current config and status to new HMI client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
+        const auto &config = HMIWorker::instance()->GetConfig();
         websocket_->SendData(
-            conn, JsonUtil::ProtoToTypedJson("HMIConfig", config_).dump());
+            conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
         websocket_->SendData(
-            conn, JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
+            conn, JsonUtil::ProtoToTypedJson("HMIStatus",
+                                             HMIWorker::instance()->GetStatus())
+                      .dump());
+
+        SendVehicleParam(conn);
+      });
+
+  // HMI client sends audio data, publish to AudioCapture topic.
+  websocket_->RegisterMessageHandler(
+      "AudioPiece",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {data: "<base64 encoded audio/wav piece>"}.
+        std::string data;
+        if (JsonUtil::GetStringFromJson(json, "data", &data)) {
+          AudioCapture audio;
+          audio.set_connection_id(reinterpret_cast<uint64_t>(conn));
+          audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
+          AdapterManager::PublishAudioCapture(audio);
+        } else {
+          AERROR << "Truncated audio piece.";
+        }
       });
 
   // HMI client asks for executing module command.
@@ -187,7 +93,7 @@ void HMI::RegisterMessageHandlers() {
         std::string command;
         if (JsonUtil::GetStringFromJson(json, "module", &module) &&
             JsonUtil::GetStringFromJson(json, "command", &command)) {
-          RunComponentCommand(config_.modules(), module, command);
+          HMIWorker::instance()->RunModuleCommand(module, command);
         } else {
           AERROR << "Truncated module command.";
         }
@@ -202,7 +108,7 @@ void HMI::RegisterMessageHandlers() {
         std::string command;
         if (JsonUtil::GetStringFromJson(json, "tool", &tool) &&
             JsonUtil::GetStringFromJson(json, "command", &command)) {
-          RunComponentCommand(config_.tools(), tool, command);
+          HMIWorker::instance()->RunToolCommand(tool, command);
         } else {
           AERROR << "Truncated tool command.";
         }
@@ -216,7 +122,7 @@ void HMI::RegisterMessageHandlers() {
         // Supported commands are: "start", "stop".
         std::string command;
         if (JsonUtil::GetStringFromJson(json, "command", &command)) {
-          RunModeCommand(command);
+          HMIWorker::instance()->RunModeCommand(command);
         } else {
           AERROR << "Truncated mode command.";
         }
@@ -231,13 +137,26 @@ void HMI::RegisterMessageHandlers() {
         // For now it is either COMPLETE_MANUAL or COMPLETE_AUTO_DRIVE.
         std::string new_mode;
         if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
-          ChangeDrivingModeTo(new_mode);
+          Chassis::DrivingMode mode;
+          if (Chassis::DrivingMode_Parse(new_mode, &mode)) {
+            HMIWorker::ChangeToDrivingMode(mode);
+          } else {
+            AERROR << "Unknown driving mode " << new_mode;
+          }
         } else {
           AERROR << "Truncated ChangeDrivingMode request.";
         }
       });
 
   // HMI client asks for changing map.
+  HMIWorker::instance()->RegisterChangeMapHandler(
+      [this](const std::string &new_map) {
+        // Reload simulation map after changing map.
+        CHECK(map_service_->ReloadMap(true))
+            << "Failed to load new simulation map: " << new_map;
+        // And then broadcast new HMIStatus to all clients.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMap",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -245,13 +164,19 @@ void HMI::RegisterMessageHandlers() {
         // MapName should be a key of config_.available_maps.
         std::string new_map;
         if (JsonUtil::GetStringFromJson(json, "new_map", &new_map)) {
-          ChangeMapTo(new_map);
+          HMIWorker::instance()->ChangeToMap(new_map);
         } else {
           AERROR << "Truncated ChangeMap request.";
         }
       });
 
   // HMI client asks for changing vehicle.
+  HMIWorker::instance()->RegisterChangeVehicleHandler(
+      [this](const std::string &new_vehicle) {
+        // Broadcast new HMIStatus and VehicleParam.
+        DeferredBroadcastHMIStatus();
+        SendVehicleParam();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeVehicle",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -259,13 +184,18 @@ void HMI::RegisterMessageHandlers() {
         // VehicleName should be a key of config_.available_vehicles.
         std::string new_vehicle;
         if (JsonUtil::GetStringFromJson(json, "new_vehicle", &new_vehicle)) {
-          ChangeVehicleTo(new_vehicle);
+          HMIWorker::instance()->ChangeToVehicle(new_vehicle);
         } else {
           AERROR << "Truncated ChangeVehicle request.";
         }
       });
 
   // HMI client asks for changing mode.
+  HMIWorker::instance()->RegisterChangeModeHandler(
+      [this](const std::string &new_mode) {
+        // Broadcast new HMIStatus.
+        DeferredBroadcastHMIStatus();
+      });
   websocket_->RegisterMessageHandler(
       "ChangeMode",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -273,152 +203,108 @@ void HMI::RegisterMessageHandlers() {
         // ModeName should be a key of config_.modes.
         std::string new_mode;
         if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
-          ChangeModeTo(new_mode);
+          HMIWorker::instance()->ChangeToMode(new_mode);
         } else {
           AERROR << "Truncated ChangeMode request.";
+        }
+      });
+
+  // HMI client asks for adding new DriveEvent.
+  websocket_->RegisterMessageHandler(
+      "SubmitDriveEvent",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain event_time_ms and event_msg.
+        uint64_t event_time_ms;
+        std::string event_msg;
+        std::vector<std::string> event_types;
+        apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+        if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
+                                        &event_time_ms) &&
+            JsonUtil::GetStringFromJson(json, "event_msg", &event_msg) &&
+            JsonUtil::GetStringVectorFromJson(json, "event_type",
+                                              &event_types)) {
+          HMIWorker::SubmitDriveEvent(event_time_ms, event_msg, event_types);
+          log_buffer.INFO("Drive event added.");
+        } else {
+          AERROR << "Truncated SubmitDriveEvent request.";
+          log_buffer.WARN("Failed to submit a drive event.");
         }
       });
 
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
       [this](const monitor::SystemStatus &system_status) {
-        *status_.mutable_system_status() = system_status;
-        BroadcastHMIStatus();
+        if (Clock::NowInSeconds() - system_status.header().timestamp_sec() <
+            FLAGS_system_status_lifetime_seconds) {
+          HMIWorker::instance()->UpdateSystemStatus(system_status);
+          DeferredBroadcastHMIStatus();
+        }
       });
-}
 
-void HMI::BroadcastHMIStatus() const {
-  // In unit tests, we may leave websocket_ as NULL and skip broadcasting.
-  if (websocket_) {
-    websocket_->BroadcastData(
-        JsonUtil::ProtoToTypedJson("HMIStatus", status_).dump());
-  }
-}
-
-int HMI::RunComponentCommand(const Map<std::string, Component> &components,
-                             const std::string &component_name,
-                             const std::string &command_name) {
-  const auto *component = FindOrNull(components, component_name);
-  if (component == nullptr) {
-    AERROR << "Cannot find component " << component_name;
-    return -1;
-  }
-  const auto *cmd = FindOrNull(component->supported_commands(), command_name);
-  if (cmd == nullptr) {
-    AERROR << "Cannot find command " << component_name << "." << command_name;
-    return -1;
-  }
-  AINFO << "Execute system command: " << *cmd;
-  const int ret = std::system(cmd->c_str());
-
-  AERROR_IF(ret != 0) << "Command returns " << ret << ": " << *cmd;
-  return ret;
-}
-
-void HMI::RunModeCommand(const std::string &command_name) {
-  RunModeCommand(status_.current_mode(), command_name);
-}
-
-void HMI::RunModeCommand(const std::string &mode,
-                         const std::string &command_name) {
-  const Mode &mode_conf = config_.modes().at(mode);
-  if (command_name == "start" || command_name == "stop") {
-    // Run the command on all live modules.
-    for (const auto &module : mode_conf.live_modules()) {
-      RunComponentCommand(config_.modules(), module, command_name);
+  // Received Chassis, trigger action if there is high beam signal.
+  AdapterManager::AddChassisCallback([this](const Chassis &chassis) {
+    if (Clock::NowInSeconds() - chassis.header().timestamp_sec() <
+        FLAGS_system_status_lifetime_seconds) {
+      if (chassis.signal().high_beam()) {
+        const bool ret = HMIWorker::instance()->Trigger(
+            HMIWorker::instance()->GetConfig().chassis_high_beam_action());
+        AERROR_IF(!ret) << "Failed to execute high_beam action.";
+      }
     }
-  }
+  });
 }
 
-void HMI::ChangeDrivingModeTo(const std::string &new_mode) {
-  Chassis::DrivingMode mode;
-  if (!Chassis::DrivingMode_Parse(new_mode, &mode)) {
-    AERROR << "Unknown driving mode " << new_mode;
-    return;
-  }
-  const bool reset_first = (mode != Chassis::COMPLETE_MANUAL);
-  GuaranteeDrivingMode(mode, reset_first);
+void HMI::StartBroadcastHMIStatusThread() {
+  constexpr int kMinBroadcastIntervalMs = 200;
+  broadcast_hmi_status_thread_.reset(new std::thread([this]() {
+    while (true) {
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(kMinBroadcastIntervalMs));
+
+      {
+        std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+        if (!need_broadcast_) {
+          continue;
+        }
+        // Reset to false.
+        need_broadcast_ = false;
+      }
+
+      // Get a copy of status.
+      const auto status = HMIWorker::instance()->GetStatus();
+      websocket_->BroadcastData(
+          JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
+
+      // Broadcast messages.
+      apollo::common::monitor::MonitorLogBuffer log_buffer(&logger_);
+      if (status.current_map().empty()) {
+        log_buffer.WARN("You haven't selected a map yet!");
+      }
+      if (status.current_vehicle().empty()) {
+        log_buffer.WARN("You haven't selected a vehicle yet!");
+      }
+    }
+  }));
 }
 
-void HMI::ChangeMapTo(const std::string &map_name) {
-  if (status_.current_map() == map_name) {
-    return;
-  }
-  const auto *map_dir = FindOrNull(config_.available_maps(), map_name);
-  if (map_dir == nullptr) {
-    AERROR << "Unknown map " << map_name;
-    return;
-  }
-  status_.set_current_map(map_name);
-  apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
-
-  FLAGS_map_dir = *map_dir;
-  // Append new map_dir flag to global flagfile.
-  std::ofstream fout(FLAGS_global_flagfile, std::ios_base::app);
-  CHECK(fout) << "Fail to open " << FLAGS_global_flagfile;
-  fout << "\n--map_dir=" << *map_dir << std::endl;
-  // Also reload simulation map.
-  CHECK(map_service_->ReloadMap(true)) << "Failed to load map from "
-                                       << *map_dir;
-  RunModeCommand("stop");
-  BroadcastHMIStatus();
+void HMI::DeferredBroadcastHMIStatus() {
+  std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+  need_broadcast_ = true;
 }
 
-void HMI::ChangeVehicleTo(const std::string &vehicle_name) {
-  if (status_.current_vehicle() == vehicle_name) {
-    return;
-  }
-  const auto *vehicle = FindOrNull(config_.available_vehicles(), vehicle_name);
-  if (vehicle == nullptr) {
-    AERROR << "Unknown vehicle " << vehicle_name;
-    return;
-  }
-  status_.set_current_vehicle(vehicle_name);
-  apollo::common::KVDB::Put("apollo:dreamview:vehicle", vehicle_name);
-
-  CHECK(VehicleManager::instance()->UseVehicle(*vehicle));
-  RunModeCommand("stop");
-  // Check available updates for current vehicle.
-  // CheckOTAUpdates();
-  BroadcastHMIStatus();
-}
-
-void HMI::ChangeModeTo(const std::string &mode_name) {
-  if (status_.current_mode() == mode_name) {
-    return;
-  }
-  if (!ContainsKey(config_.modes(), mode_name)) {
-    AERROR << "Unknown mode " << mode_name;
-    return;
-  }
-  const std::string previous_mode = status_.current_mode();
-  status_.set_current_mode(mode_name);
-  apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
-
-  RunModeCommand(previous_mode, "stop");
-  BroadcastHMIStatus();
-}
-
-void HMI::CheckOTAUpdates() {
-  VehicleInfo vehicle_info;
-  if (!GetProtoFromASCIIFile(FLAGS_ota_vehicle_info_file, &vehicle_info)) {
+void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
+  if (websocket_ == nullptr) {
     return;
   }
 
-  Json ota_request;
-  ota_request["car_type"] = apollo::common::util::StrCat(
-      VehicleInfo::Brand_Name(vehicle_info.brand()),
-      ".", VehicleInfo::Model_Name(vehicle_info.model()));
-  ota_request["vin"] = vehicle_info.license().vin();
-  ota_request["tag"] = std::getenv("DOCKER_IMG");
-
-  Json ota_response;
-  const auto status = apollo::common::util::HttpClient::Post(
-      FLAGS_ota_service_url, ota_request, &ota_response);
-  if (status.ok()) {
-    CHECK(JsonUtil::GetStringFromJson(ota_response, "tag",
-                                      status_.mutable_ota_update()));
-    AINFO << "Found available OTA update: " << status_.ota_update();
+  const auto json_str =
+      JsonUtil::ProtoToTypedJson(
+          "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param())
+          .dump();
+  if (conn != nullptr) {
+    websocket_->SendData(conn, json_str);
+  } else {
+    websocket_->BroadcastData(json_str);
   }
 }
 

@@ -1,9 +1,9 @@
 # How to document source code for doxygen
 
-Developers who are not familiar with doxygen can get more information from its official website [http://www.stack.nl/~dimitri/doxygen/](http://www.stack.nl/~dimitri/doxygen/).
+Developers who are not familiar with doxygen can get more information from its [official website](http://www.stack.nl/~dimitri/doxygen/).
 
-We use [time.h](https://github.com/ApolloAuto/apollo/blob/master/modules/common/time/time.h) as an example to explain how to document.
-## file
+We use [time.h](https://github.com/ApolloAuto/apollo/blob/master/modules/common/time/time.h) as an example to explain how to successfully document code.
+### File
 ```
 /**
  * @file
@@ -14,7 +14,7 @@ We use [time.h](https://github.com/ApolloAuto/apollo/blob/master/modules/common/
  */
 ```
 
-## namespace
+### Namespace
 ```
 /**
  * @namespace apollo::common::time
@@ -25,7 +25,7 @@ namespace common {
 namespace time {
 ```
 
-## class
+### Class
 ```
 /**
  * @class Clock
@@ -39,7 +39,7 @@ class Clock {
  ...
 ```
 
-## function
+### Function
 ```
 /**
   * @brief Set the behavior of the \class Clock.
@@ -52,7 +52,7 @@ class Clock {
  }
 ```
 
-## public / protected class member variables
+### Public / protected class member variables
 ```
 /// Stores the currently set timestamp, which serves mock clock
 /// queries.

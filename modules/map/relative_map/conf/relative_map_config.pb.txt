@@ -1,0 +1,10 @@
+map_param {
+  default_left_width: 1.85
+  default_right_width: 1.85
+  default_speed_limit : 29.06 # 65 mph
+}
+
+navigation_lane {
+  min_lane_marker_quality: 0.49
+  lane_source: OFFLINE_GENERATED
+}

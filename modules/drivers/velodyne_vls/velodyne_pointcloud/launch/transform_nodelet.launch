@@ -1,0 +1,17 @@
+<!-- -*- mode: XML -*- -->
+<!-- run velodyne_pointcloud/TransformNodelet in a nodelet manager -->
+
+<launch>
+  <arg name="calibration" default="" />
+  <arg name="frame_id" default="odom" />
+  <arg name="manager" default="velodyne_nodelet_manager" />
+  <arg name="max_range" default="130.0" />
+  <arg name="min_range" default="0.9" />
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)_transform"
+        args="load velodyne_pointcloud/TransformNodelet $(arg manager)" >
+    <param name="calibration" value="$(arg calibration)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="max_range" value="$(arg max_range)"/>
+    <param name="min_range" value="$(arg min_range)"/>
+  </node>
+</launch>

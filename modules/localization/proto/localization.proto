@@ -21,6 +21,7 @@ package apollo.localization;
 import "modules/common/proto/header.proto";
 import "modules/localization/proto/pose.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
 
 message Uncertainty {
   // Standard deviation of position, east/north/up in meters.
@@ -50,6 +51,9 @@ message LocalizationEstimate {
 
   // The time of pose measurement, seconds since the GPS epoch (Jan 6, 1980).
   optional double measurement_time = 4;  // In seconds.
+
+  // Future trajectory acturally driven by the drivers
+  repeated apollo.common.TrajectoryPoint trajectory_point = 5;
 }
 
 enum MeasureState {

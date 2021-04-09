@@ -1,0 +1,41 @@
+<launch>
+
+  <arg name="topic_packet" default="/apollo/sensor/lslidar/LslidarPacket"/>
+  <arg name="topic_pointcloud" default="/apollo/sensor/lslidar/PointCloud2"/>
+  <arg name="topic_scan_unified" default="/apollo/sensor/lslidar/VelodyneScanUnified"/>
+  <arg name="topic_compensated_pointcloud" default="/apollo/sensor/lslidar/compensator/PointCloud2"/>
+  <arg name="child_frame_id" value="lslidar"/>
+
+  <node pkg="lslidar_driver" type="lslidar_driver_node" name="lslidar_driver_node" output="screen">
+    <param name="frame_id" value="$(arg child_frame_id)"/>
+    <param name="device_ip" value="192.168.1.200"/>
+    <param name="device_port" value="2368"/>
+    <remap from="lslidar_packet" to="$(arg topic_packet)"/>>
+  </node>
+
+  <node pkg="lslidar_decoder" type="lslidar_decoder_node" name="lslidar_decoder_node" output="screen">
+    <param name="child_frame_id" value="$(arg child_frame_id)"/>
+    <param name="point_num" value="2000"/>
+    <param name="channel_num" value="8"/>
+    <param name="angle_disable_min" value="0"/>
+    <param name="angle_disable_max" value="0"/>
+    <param name="min_range" value="0.15"/>
+    <param name="max_range" value="150.0"/>
+    <param name="frequency" value="10.0"/>
+    <param name="publish_point_cloud" value="true"/>
+    <param name="publish_channels" value="true"/>
+    <remap from="lslidar_packet" to="$(arg topic_packet)"/>
+    <remap from="lslidar_point_cloud" to="$(arg topic_pointcloud)"/>
+  </node>
+
+  <node pkg="lslidar_compensator" type="lslidar_compensator_node" name="lslidar_compensator_node"
+output="screen">
+    <param name="lslidar_point_cloud" value="$(arg topic_pointcloud)"/>
+    <param name="topic_compensated_pointcloud" value="$(arg topic_compensated_pointcloud)"/>
+    <param name="child_frame_id" value="$(arg child_frame_id)"/>
+    <param name="tf_query_timeout" value="0.5"/>
+  </node>
+
+  <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find lslidar_decoder)/launch/lslidar.rviz" output="screen"/-->
+
+</launch>

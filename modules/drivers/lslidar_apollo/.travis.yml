@@ -1,0 +1,35 @@
+sudo: required
+dist: trusty
+language: generic # Force travis to use its minimal image with default Python settings
+compiler:
+  - gcc
+notifications:
+  email:
+    recipients:
+      - shaohuashu@lslidar.com
+before_install: # Use this to prepare the system to install prerequisites or dependencies
+  # Define some config vars
+  - export ROS_DISTRO=jade
+  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+  - sudo apt-get update -qq
+install: # Use this to install any prerequisites or dependencies necessary to run your build
+  - sudo apt-get install -q -y python-rosdep
+  # Setup rosdep
+  - sudo rosdep init
+  - rosdep update
+before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.
+  - export CI_SOURCE_PATH=$(pwd)
+  - export REPOSITORY_NAME=${PWD##*/}
+  - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+  # Create workspace
+  - mkdir -p ~/ros/catkin_ws/src
+  - cd ~/ros/catkin_ws/src
+  - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace
+  - rosdep install --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+  - catkin_init_workspace
+  - cd ../
+  - export ROS_PARALLEL_JOBS='-j2 -l2' # Limit parallel jobs
+script: # All commands must exit with code 0 on success. Anything else is considered failure.
+  - catkin_make -DCMAKE_BUILD_TYPE=Release

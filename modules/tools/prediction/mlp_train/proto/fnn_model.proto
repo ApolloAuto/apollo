@@ -1,0 +1,31 @@
+syntax="proto2";
+
+message Vector {
+    repeated double columns = 1;
+}
+
+message Matrix {
+    repeated Vector rows = 1;
+}
+
+message Layer {
+    enum ActivationFunc {
+        RELU = 0;
+        TANH = 1;
+        SIGMOID = 2;
+    }
+    optional int32 layer_input_dim = 1;
+    optional int32 layer_output_dim = 2;
+    optional Matrix layer_input_weight = 3;  // weight matrix of |input_dim| x |output_dim|
+    optional Vector layer_bias = 4;  // vector of bias, size of |output_dim|
+    optional ActivationFunc layer_activation_func = 5;
+}
+
+message FnnModel {
+    optional int32 dim_input = 1;
+    optional Vector samples_mean = 2;
+    optional Vector samples_std = 3;
+    optional int32 num_layer = 4;
+    repeated Layer layer = 5;  // num_layer must equal to first layer layer_input_dim
+    optional int32 dim_output = 6;  // dim_ouput must equal to last layer layer_output_dim
+}

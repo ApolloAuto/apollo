@@ -1,6 +1,6 @@
 #! /bin/bash
-if [ $# -lt 3 ]; then
-    echo "[pcd folder] [pose file] [zone id] [map folder]"
+if [ $# -lt 4 ]; then
+    echo "Usage: msf_local_map_creator.sh [pcd folder] [pose file] [zone id] [map folder]"
     exit 1;
 fi
 

@@ -21,8 +21,14 @@ namespace apollo {
 namespace hdmap {
 
 int HDMap::LoadMapFromFile(const std::string& map_filename) {
-  AINFO << "Loading HDMap: " << map_filename << "...";
+  AINFO << "Loading HDMap: " << map_filename << " ...";
   return impl_.LoadMapFromFile(map_filename);
+}
+
+int HDMap::LoadMapFromProto(const Map& map_proto) {
+  ADEBUG << "Loading HDMap with header: "
+         << map_proto.header().ShortDebugString();
+  return impl_.LoadMapFromProto(map_proto);
 }
 
 LaneInfoConstPtr HDMap::GetLaneById(const Id& id) const {
@@ -63,6 +69,10 @@ OverlapInfoConstPtr HDMap::GetOverlapById(const Id& id) const {
 
 RoadInfoConstPtr HDMap::GetRoadById(const Id& id) const {
   return impl_.GetRoadById(id);
+}
+
+ParkingSpaceInfoConstPtr HDMap::GetParkingSpaceById(const Id& id) const {
+  return impl_.GetParkingSpaceById(id);
 }
 
 int HDMap::GetLanes(const apollo::common::PointENU& point, double distance,
@@ -113,6 +123,12 @@ int HDMap::GetRoads(const apollo::common::PointENU& point, double distance,
   return impl_.GetRoads(point, distance, roads);
 }
 
+int HDMap::GetParkingSpaces(
+    const apollo::common::PointENU& point, double distance,
+    std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
+  return impl_.GetParkingSpaces(point, distance, parking_spaces);
+}
+
 int HDMap::GetNearestLane(const common::PointENU& point,
                           LaneInfoConstPtr* nearest_lane, double* nearest_s,
                           double* nearest_l) const {
@@ -148,10 +164,19 @@ int HDMap::GetRoadBoundaries(
 }
 
 int HDMap::GetForwardNearestSignalsOnLane(
-            const apollo::common::PointENU& point,
-            const double distance,
-            std::vector<SignalInfoConstPtr>* signals) const {
+    const apollo::common::PointENU& point, const double distance,
+    std::vector<SignalInfoConstPtr>* signals) const {
   return impl_.GetForwardNearestSignalsOnLane(point, distance, signals);
+}
+
+int HDMap::GetStopSignAssociatedStopSigns(
+    const Id& id, std::vector<StopSignInfoConstPtr>* stop_signs) const {
+  return impl_.GetStopSignAssociatedStopSigns(id, stop_signs);
+}
+
+int HDMap::GetStopSignAssociatedLanes(
+    const Id& id, std::vector<LaneInfoConstPtr>* lanes) const {
+  return impl_.GetStopSignAssociatedLanes(id, lanes);
 }
 
 }  // namespace hdmap

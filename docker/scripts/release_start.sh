@@ -25,7 +25,7 @@ source $APOLLO_ROOT_DIR/scripts/apollo_base.sh
 
 echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern
 
-VERSION="release-${MACHINE_ARCH}-v2.0.0"
+VERSION="release-${MACHINE_ARCH}-v2.0.1"
 if [[ $# == 1 ]];then
     VERSION=$1
 fi
@@ -64,19 +64,7 @@ function main() {
 
     setup_device
 
-    local devices=""
-    devices="${devices} $(find_device ttyUSB*)"
-    devices="${devices} $(find_device ttyS*)"
-    devices="${devices} $(find_device can*)"
-    devices="${devices} $(find_device ram*)"
-    devices="${devices} $(find_device loop*)"
-    devices="${devices} $(find_device nvidia*)"
-    devices="${devices} $(find_device camera*)"
-    devices="${devices} -v /dev/camera/obstacle:/dev/camera/obstacle "
-    devices="${devices} -v /dev/camera/trafficlights:/dev/camera/trafficlights "
-    devices="${devices} -v /dev/novatel0:/dev/novatel0"
-    devices="${devices} -v /dev/novatel1:/dev/novatel1"
-    devices="${devices} -v /dev/novatel2:/dev/novatel2"
+    local devices=" -v /dev:/dev"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -95,7 +83,12 @@ function main() {
     if [ ! -d "$HOME/.cache" ];then
         mkdir "$HOME/.cache"
     fi
-    docker run -it \
+
+    DOCKER_CMD="nvidia-docker"
+    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
+        DOCKER_CMD="docker"
+    fi
+    ${DOCKER_CMD} run -it \
         -d --privileged \
         --name apollo_release \
         --net host \
@@ -118,7 +111,7 @@ function main() {
         --add-host in_release_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
         --hostname in_release_docker \
-        --shm-size 512M \
+        --shm-size 2G \
         $IMG
     if [ "${USER}" != "root" ]; then
       docker exec apollo_release bash -c "/apollo/scripts/docker_adduser.sh"
@@ -131,8 +124,7 @@ function main() {
                  "/apollo/modules/localization/msf/params/velodyne_params"
                  "/apollo/modules/perception/data/params"
                  "/apollo/modules/tools/ota"
-                 "/apollo/ros/share/gnss_driver/conf"
-                 "/apollo/ros/share/gnss_driver/launch"
+                 "/apollo/modules/drivers/gnss/conf"
                  "/apollo/ros/share/velodyne/launch"
                  "/apollo/ros/share/velodyne_driver/launch"
                  "/apollo/ros/share/velodyne_pointcloud/launch"

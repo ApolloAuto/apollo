@@ -1,0 +1,15 @@
+multi_camera_projection_config: {
+  name: "MultiCamerasProjection"
+  version: "1.0.0"
+  single_projection: "BoundaryProjection"
+  camera_focus_config: {
+    name: "camera_25mm_focus"
+    camera_extrinsic_file: "modules/perception/data/params/long_camera_extrinsics.yaml"
+    camera_intrinsic_file: "modules/perception/data/params/long_camera_intrinsics.yaml"
+  }
+  camera_focus_config: {
+    name: "camera_6mm_focus"
+    camera_extrinsic_file: "modules/perception/data/params/short_camera_extrinsics.yaml"
+    camera_intrinsic_file: "modules/perception/data/params/short_camera_intrinsics.yaml"
+  }
+}

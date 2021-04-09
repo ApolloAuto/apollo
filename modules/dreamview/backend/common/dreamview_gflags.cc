@@ -18,10 +18,17 @@
 
 DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
+DEFINE_bool(dreamview_profiling_mode, false, "Run dreamview in profiling mode");
+
+DEFINE_double(
+    dreamview_profiling_duration, -1.0,
+    "Dreamview profiling duration. Negative value will not restrict the "
+    "profiling time");
+
 DEFINE_string(dreamview_adapter_config_filename,
               "modules/dreamview/conf/adapter.conf", "The adapter config file");
 
-DEFINE_string(hmi_config_filename, "modules/dreamview/conf/hmi.conf",
+DEFINE_string(hmi_config_filename, "/apollo/modules/dreamview/conf/hmi.conf",
               "The HMI config file");
 
 DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
@@ -32,10 +39,6 @@ DEFINE_string(server_ports, "8888",
               "Comma-separated list of ports to listen on. If the port is SSL, "
               "a letter s must be appended, for example, 80,443s will open "
               "port 80 and port 443.");
-
-DEFINE_bool(enable_sim_control, false,
-            "Whether to enable SimControl to publish localization and chassis "
-            "message.");
 
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");
@@ -57,6 +60,31 @@ DEFINE_string(ssl_certificate, "",
               "be in PEM format, and it must have both, private key and "
               "certificate");
 
-DEFINE_double(sim_map_radius, 300.0,
+DEFINE_double(sim_map_radius, 200.0,
               "The radius within which Dreamview will find all the map "
               "elements around the car.");
+
+DEFINE_int32(dreamview_worker_num, 1, "number of dreamview thread workers");
+
+DEFINE_bool(enable_update_size_check, true,
+            "True to check if the update byte number is less than threshold");
+
+DEFINE_uint32(max_update_size, 1000000,
+              "Number of max update bytes allowed to push to dreamview FE");
+
+DEFINE_bool(sim_world_with_routing_path, false,
+            "Whether the routing_path is included in sim_world proto.");
+
+DEFINE_string(
+    request_timeout_ms, "2000",
+    "Timeout for network read and network write operations, in milliseconds.");
+
+DEFINE_double(voxel_filter_size, 0.3, "VoxelGrid pointcloud filter leaf size");
+
+DEFINE_double(voxel_filter_height, 0.2,
+              "VoxelGrid pointcloud filter leaf height");
+
+DEFINE_double(system_status_lifetime_seconds, 30,
+              "Lifetime of a valid SystemStatus message. It's more like a "
+              "replay message if the timestamp is old, where we should ignore "
+              "the status change.");

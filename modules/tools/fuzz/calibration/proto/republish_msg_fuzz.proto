@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.tools.fuzz.calibration;
+
+import "modules/localization/proto/gps.proto";
+import "modules/drivers/gnss/proto/ins.proto";
+
+message RepublishMsgFuzzMessage {
+    required apollo.localization.Gps gps = 1;
+    required apollo.drivers.gnss.InsStat ins_stat = 2;
+}

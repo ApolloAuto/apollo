@@ -70,7 +70,7 @@ class SocketCanClientRaw : public CanClient {
   /**
    * @brief Destructor
    */
-  virtual ~SocketCanClientRaw() = default;
+  virtual ~SocketCanClientRaw();
 
   /**
    * @brief Start the ESD CAN client.

@@ -54,7 +54,8 @@ ErrorCode LincolnController::Init(
     AINFO << "LincolnController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
   }
-
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -170,11 +171,45 @@ Chassis LincolnController::chassis() {
   if (chassis_detail.has_vehicle_spd() &&
       chassis_detail.vehicle_spd().has_vehicle_spd()) {
     chassis_.set_speed_mps(chassis_detail.vehicle_spd().vehicle_spd());
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_rr_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
+        chassis_detail.vehicle_spd().wheel_direction_rr());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
+        chassis_detail.vehicle_spd().wheel_spd_rr());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_rl_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
+        chassis_detail.vehicle_spd().wheel_direction_rl());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
+        chassis_detail.vehicle_spd().wheel_spd_rl());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_fr_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
+        chassis_detail.vehicle_spd().wheel_direction_fr());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
+        chassis_detail.vehicle_spd().wheel_spd_fr());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_fl_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
+        chassis_detail.vehicle_spd().wheel_direction_fl());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
+        chassis_detail.vehicle_spd().wheel_spd_fl());
+
   } else {
     chassis_.set_speed_mps(0);
   }
   // 6
-  chassis_.set_odometer_m(0);
+  if (chassis_detail.has_basic() && chassis_detail.basic().has_odo_meter()) {
+    // odo_meter is in km
+    chassis_.set_odometer_m(chassis_detail.basic().odo_meter() * 1000);
+  } else {
+    chassis_.set_odometer_m(0);
+  }
+
   // 7
   // lincoln only has fuel percentage
   // to avoid confusing, just don't set
@@ -200,7 +235,8 @@ Chassis LincolnController::chassis() {
   // 11
   if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
     chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
-                                     100.0 / params_.max_steer_angle());
+                                     100.0 / vehicle_params_.max_steer_angle() *
+                                     M_PI / 180);
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -218,8 +254,15 @@ Chassis LincolnController::chassis() {
   } else {
     chassis_.set_parking_brake(false);
   }
-  // TODO(Authors): lincoln beam
+
   // 14, 15
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_lincoln_lamp_type()) {
+    chassis_.mutable_signal()->set_high_beam(
+        chassis_detail.light().lincoln_lamp_type() == Light::BEAM_HIGH);
+  } else {
+    chassis_.mutable_signal()->set_high_beam(false);
+  }
 
   // 16, 17
   if (chassis_detail.has_light() &&
@@ -298,14 +341,34 @@ Chassis LincolnController::chassis() {
     chassis_.mutable_chassis_gps()->set_gps_valid(false);
   }
 
-  // last vin number will be written into KVDB once.
-  if (chassis_detail.has_license() && chassis_detail.license().has_vin() &&
-      !received_vin_) {
-    apollo::common::KVDB::Put("apollo:canbus:vin",
-                              chassis_detail.license().vin());
-    received_vin_ = true;
+  // vin number will be written into KVDB once.
+  if (chassis_detail.license().has_vin()) {
+    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
+    if (!received_vin_) {
+      apollo::common::KVDB::Put("apollo:canbus:vin",
+                                chassis_detail.license().vin());
+      received_vin_ = true;
+    }
   }
 
+  if (chassis_detail.has_surround()) {
+    chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
+  }
+  // give engage_advice based on error_code and canbus feedback
+  if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
+      (chassis_.brake_percentage() == 0.0)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason("Chassis error!");
+  } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Vehicle is not in a safe state to engage!");
+  } else {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  }
   return chassis_;
 }
 
@@ -478,7 +541,8 @@ void LincolnController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   // reverse sign
   steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
 }
@@ -492,11 +556,14 @@ void LincolnController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   const double real_angle_spd =
       ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-          params_.max_steer_angle_spd() * angle_spd / 100.0);
+          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
+              100.0);
   steering_64_->set_steering_angle(real_angle)
       ->set_steering_angle_speed(real_angle_spd);
 }
@@ -724,7 +791,8 @@ void LincolnController::SecurityDogThreadFunc() {
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
-      start += (default_period - elapsed).count();
+      start = common::time::AsInt64<common::time::micros>(
+          common::time::Clock::Now());
     } else {
       AERROR_EVERY(100)
           << "Too much time consumption in LincolnController looping process:"
@@ -802,6 +870,21 @@ void LincolnController::set_chassis_error_code(
     const Chassis::ErrorCode &error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
+}
+
+bool LincolnController::CheckSafetyError(
+    const ::apollo::canbus::ChassisDetail &chassis_detail) {
+  bool safety_error =
+      chassis_detail.safety().is_passenger_door_open() ||
+      chassis_detail.safety().is_rearleft_door_open() ||
+      chassis_detail.safety().is_rearright_door_open() ||
+      chassis_detail.safety().is_hood_open() ||
+      chassis_detail.safety().is_trunk_open() ||
+      (chassis_detail.safety().is_passenger_detected() &&
+       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
+        !chassis_detail.safety().is_passenger_buckled()));
+  ADEBUG << "Vehicle safety error status is : " << safety_error;
+  return safety_error;
 }
 
 }  // namespace lincoln

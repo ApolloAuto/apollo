@@ -23,20 +23,34 @@ from modules.map.proto import map_overlap_pb2
 from google.protobuf import text_format
 from shapely.geometry import LineString, Point
 
+if len(sys.argv) < 3:
+    print("Usage: %s <map_data> <signal_data>" % sys.argv[0])
+    sys.exit(1)
+
 fmap = sys.argv[1]
 fsignal = sys.argv[2]
 
-map_data = open(fmap, 'r').read()
-map = map_pb2.Map()
-text_format.Parse(map_data, map)
+try:
+    with open(fmap, 'r') as map_data:
+        map_data.read()
+except Exception:
+    raise
 
-signal_data = open(fsignal, 'r').read()
+    _map = map_pb2.Map()
+    text_format.Parse(map_data, _map)
+
+try:
+    with open(fsignal, 'r') as signal_data:
+        signal_data.read()
+except Exception:
+    raise
+
 signal = map_signal_pb2.Signal()
 text_format.Parse(signal_data, signal)
 
 lanes = {}
 lanes_map = {}
-for lane in map.lane:
+for lane in _map.lane:
     lane_points = []
     lanes_map[lane.id.id] = lane
     for segment in lane.central_curve.segment:
@@ -44,8 +58,6 @@ for lane in map.lane:
             lane_points.append((point.x, point.y))
     lane_string = LineString(lane_points)
     lanes[lane.id.id] = lane_string
-
-lines = {}
 
 for stop_line in signal.stop_line:
     stop_line_points = []
@@ -57,7 +69,7 @@ for stop_line in signal.stop_line:
         p = stop_line_string.intersection(lane_string)
         if type(p) == Point:
             s = lane_string.project(p)
-            overlap = map.overlap.add()
+            overlap = _map.overlap.add()
             overlap.id.id = str(lane_id) + "_" + str(signal.id.id)
             obj = overlap.object.add()
             obj.id.id = signal.id.id
@@ -71,7 +83,7 @@ for stop_line in signal.stop_line:
 
             signal.overlap_id.add().id = overlap.id.id
             lanes_map[lane_id].overlap_id.add().id = overlap.id.id
-map.signal.add().CopyFrom(signal)
-fmap = open(fmap + "_" + fsignal, 'w')
-fmap.write(str(map))
-fmap.close()
+_map.signal.add().CopyFrom(signal)
+
+with open(fmap + "_" + fsignal, 'w') as fmap:
+    fmap.write(str(_map))

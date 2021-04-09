@@ -16,9 +16,11 @@
 
 #ifndef MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
 #define MODULES_PERCEPTION_OBSTACLE_FUSION_PROBABILISTIC_FUSION_PBF_SENSOR_H_
+
 #include <deque>
 #include <string>
 #include <vector>
+
 #include "modules/common/log.h"
 #include "modules/common/macro.h"
 #include "modules/perception/obstacle/base/object.h"
@@ -29,25 +31,31 @@ namespace perception {
 
 class PbfSensor {
  public:
-  explicit PbfSensor(const SensorType &type, const std::string &sensor_id);
+  explicit PbfSensor(const std::string &sensor_id, const SensorType &type);
   ~PbfSensor();
 
-  /**@brief query frames whose time stamp is in range (_latest_fused_time_stamp,
-   * time_stamp]*/
+  /*
+   * @brief query frames whose time stamp is in range (latest_fused_time_stamp_,
+   * time_stamp); update latest_query_timestamp_ by time_stamp.
+   */
   void QueryLatestFrames(double time_stamp,
                          std::vector<PbfSensorFramePtr> *frames);
 
-  /**@brief query latest frame whose time stamp is in range
-   * (_latest_fused_time_stamp, time_stamp]*/
-  PbfSensorFramePtr QueryLatestFrame(double time_stamp);
+  /*
+   * @brief query latest frame whose time stamp is in range
+   * (latest_fused_time_stamp_, time_stamp]; update latest_query_timestamp_ by
+   * time_stamp
+   */
+  PbfSensorFramePtr QueryLatestFrame(const double time_stamp);
 
   /**@brief add a frame objects*/
   void AddFrame(const SensorObjects &frame);
 
   /**@brief query pose at time_stamp, return false if not found*/
-  bool GetPose(double time_stamp, Eigen::Matrix4d *pose);
+  bool GetPose(const double time_stamp, const double time_range,
+               Eigen::Matrix4d *pose);
 
-  static void SetMaxCachedFrameNumber(int number) {
+  static void SetMaxCachedFrameNumber(const int number) {
     s_max_cached_frame_number_ = number;
   }
 
@@ -58,10 +66,10 @@ class PbfSensor {
   std::string sensor_id_;
   SensorType sensor_type_;
 
-  /**@brief max size of _frames*/
+  /**@brief max size of frames_*/
   static size_t s_max_cached_frame_number_;
 
-  double latest_query_timestamp_;
+  double latest_query_timestamp_ = 0.0;
 
  private:
   PbfSensor();

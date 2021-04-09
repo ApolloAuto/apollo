@@ -64,7 +64,7 @@ class RadarUtil {
   static bool IsXyPointInHdmap(const PointT &p,
                                const std::vector<PolygonDType> &polygons) {
     bool in_flag = false;
-    for (int j = 0; j < polygons.size(); j++) {
+    for (std::size_t j = 0; j < polygons.size(); j++) {
       if (IsXyPointIn2dXyPolygon<PointT>(p, polygons[j])) {
         in_flag = true;
         break;
@@ -73,11 +73,9 @@ class RadarUtil {
     return in_flag;
   }
 
-  static void MockRadarPolygon(
-    const Eigen::Vector3d &center, const double length,
-    const double width,
-    const double theta,
-    PolygonDType *polygon);
+  static void MockRadarPolygon(const Eigen::Vector3d &center,
+                               const double length, const double width,
+                               const double theta, PolygonDType *polygon);
 };
 
 }  // namespace perception

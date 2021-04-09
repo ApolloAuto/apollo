@@ -28,8 +28,8 @@ class SpeedDecider:
         obstacles = mobileye_provider.obstacles
         for obs in obstacles:
             if obs.lane == 1:
-                if (obs.x + obs.length / 2.0) < obstacle_closest_lon:
-                    obstacle_closest_lon = obs.x + obs.length / 2.0
+                if (obs.x - obs.length / 2.0) < obstacle_closest_lon:
+                    obstacle_closest_lon = obs.x - obs.length / 2.0
                     obstacle_speed = obs.rel_speed + \
                                      chassis_provider.get_speed_mps()
 

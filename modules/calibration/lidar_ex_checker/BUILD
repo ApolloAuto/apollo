@@ -15,8 +15,8 @@ cc_library(
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
         "//modules/localization/proto:gps_proto",
-        "//modules/perception/lib/pcl_util",
-        "@vtk//:vtk",
+        "//modules/perception/common:pcl_util",
+        "@vtk",
     ],
 )
 
@@ -26,11 +26,11 @@ cc_binary(
     data = [
         "//modules/calibration/lidar_ex_checker/conf:lidar_ex_checker_adapter_manager_config",
     ],
-    linkstatic = 0,
     deps = [
         ":lidar_ex_checker_lib",
         "//external:gflags",
         "//modules/common:log",
+        "@pcl",
         "@ros//:ros_common",
     ],
 )

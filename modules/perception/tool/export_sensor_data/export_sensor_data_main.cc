@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   FLAGS_flagfile =
       "./modules/perception/tool/export_sensor_data/conf/"
       "export_sensor_data.flag";
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   apollo::perception::ExportSensorData export_sensor_data;
   export_sensor_data.Init();
   spinner.start();

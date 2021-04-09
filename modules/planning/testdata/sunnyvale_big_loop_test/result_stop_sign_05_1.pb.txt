@@ -1,0 +1,63 @@
+header {
+  module_name: "std_planning"
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    cruise {
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+    decision {
+      id: "1955_0"
+      perception_id: 1955
+      object_decision {
+        yield {
+          distance_s: -3
+          fence_point {
+            x: 586703.857383444
+            y: 4140216.4874115638
+            z: 0
+          }
+          fence_heading: -2.8572964697014562
+        }
+      }
+    }
+  }
+  vehicle_signal {
+    turn_signal: TURN_NONE
+  }
+}
+routing_header {
+  timestamp_sec: 1522098262.7042248
+  module_name: "routing"
+  sequence_num: 449
+}
+right_of_way_status: PROTECTED
+lane_id {
+  id: "828_1_-1"
+}
+lane_id {
+  id: "459_1_-1"
+}
+lane_id {
+  id: "10779_1_-1"
+}
+lane_id {
+  id: "10778_1_-1"
+}
+lane_id {
+  id: "867_1_-1"
+}
+lane_id {
+  id: "446_1_-1"
+}
+lane_id {
+  id: "447_1_-1"
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+trajectory_type: NORMAL

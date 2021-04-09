@@ -24,6 +24,22 @@ namespace apollo {
 namespace common {
 namespace util {
 
+TEST(StringUtilTest, split) {
+  {
+    auto result = std::vector<std::string>();
+    split("abc.def", '.', &result);
+    EXPECT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0], "abc");
+    EXPECT_EQ(result[1], "def");
+  }
+  {
+    auto result = std::vector<std::string>();
+    split("abc.def", 'x', &result);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], "abc.def");
+  }
+}
+
 TEST(StringUtilTest, EndWith) {
   EXPECT_TRUE(EndWith("abc.def", "def"));
   EXPECT_TRUE(EndWith("abc.def", ".def"));
@@ -46,6 +62,26 @@ TEST(StringUtilTest, IterPrinter) {
   EXPECT_EQ("0 1 2", PrintIter(data));
   EXPECT_EQ("0, 1", PrintIter(data, data + 2, ", "));
   EXPECT_EQ("1", PrintIter(data + 1, data + 2, ", "));
+}
+
+TEST(StringUtilTest, DecodeBase64) {
+  EXPECT_EQ("", DecodeBase64(""));
+  EXPECT_EQ("f", DecodeBase64("Zg=="));
+  EXPECT_EQ("fo", DecodeBase64("Zm8="));
+  EXPECT_EQ("foo", DecodeBase64("Zm9v"));
+  EXPECT_EQ("foob", DecodeBase64("Zm9vYg=="));
+  EXPECT_EQ("fooba", DecodeBase64("Zm9vYmE="));
+  EXPECT_EQ("foobar", DecodeBase64("Zm9vYmFy"));
+}
+
+TEST(StringUtilTest, EncodeBase64) {
+  EXPECT_EQ("", EncodeBase64(""));
+  EXPECT_EQ("Zg==", EncodeBase64("f"));
+  EXPECT_EQ("Zm8=", EncodeBase64("fo"));
+  EXPECT_EQ("Zm9v", EncodeBase64("foo"));
+  EXPECT_EQ("Zm9vYg==", EncodeBase64("foob"));
+  EXPECT_EQ("Zm9vYmE=", EncodeBase64("fooba"));
+  EXPECT_EQ("Zm9vYmFy", EncodeBase64("foobar"));
 }
 
 }  // namespace util

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_OBSTACLE_ONBOARD_SENSOR_RAW_FRAME_H_
-#define MODEULES_PERCEPTION_OBSTACLE_ONBOARD_SENSOR_RAW_FRAME_H_
+#ifndef MODULES_PERCEPTION_OBSTACLE_ONBOARD_SENSOR_RAW_FRAME_H_
+#define MODULES_PERCEPTION_OBSTACLE_ONBOARD_SENSOR_RAW_FRAME_H_
 
 #include "Eigen/Core"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -28,7 +28,7 @@ namespace perception {
 class SensorRawFrame {
  public:
   SensorRawFrame()
-      : sensor_type_(UNKNOWN_SENSOR_TYPE),
+      : sensor_type_(SensorType::UNKNOWN_SENSOR_TYPE),
         timestamp_(0.0),
         pose_(Eigen::Matrix4d::Identity()) {}
   virtual ~SensorRawFrame() {}
@@ -61,4 +61,4 @@ class RadarRawFrame : public SensorRawFrame {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_OBSTACLE_ONBOARD_SENSOR_RAW_FRAME_H_
+#endif  // MODULES_PERCEPTION_OBSTACLE_ONBOARD_SENSOR_RAW_FRAME_H_

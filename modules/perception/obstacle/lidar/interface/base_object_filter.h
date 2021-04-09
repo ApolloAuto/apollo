@@ -30,7 +30,7 @@
 //
 //     virtual bool filter(
 //             const ObjectFilterOptions& obj_filter_options,
-//             std::vector<ObjectPtr>& objects) override {
+//             std::vector<std::shared_ptr<Object>>& objects) override {
 //
 //          // Do something.
 //          return true;
@@ -66,12 +66,11 @@ namespace perception {
 
 struct ObjectFilterOptions {
   ObjectFilterOptions() = default;
-  explicit ObjectFilterOptions(Eigen::Matrix4d *pose)
-      : velodyne2world_pose(pose) {}
+  explicit ObjectFilterOptions(Eigen::Matrix4d *pose) : velodyne_trans(pose) {}
 
-  std::shared_ptr<const Eigen::Matrix4d> velodyne2world_pose = nullptr;
+  std::shared_ptr<const Eigen::Matrix4d> velodyne_trans = nullptr;
 
-  HdmapStructConstPtr hdmap_input = nullptr;
+  HdmapStructConstPtr hdmap = nullptr;
 };
 
 class BaseObjectFilter {
@@ -82,7 +81,7 @@ class BaseObjectFilter {
   virtual bool Init() = 0;
 
   virtual bool Filter(const ObjectFilterOptions &obj_filter_options,
-                      std::vector<ObjectPtr> *objects) = 0;
+                      std::vector<std::shared_ptr<Object>> *objects) = 0;
 
   virtual std::string name() const = 0;
 

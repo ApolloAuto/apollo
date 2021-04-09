@@ -62,6 +62,9 @@ TEST(TimeTest, MockTime) {
   Clock::SetNow(micros(123));
 
   EXPECT_EQ(123, AsInt64<micros>(Clock::Now()));
+
+  Clock::SetNowInSeconds(123.456);
+  EXPECT_EQ(123.456, Clock::NowInSeconds());
 }
 
 }  // namespace time

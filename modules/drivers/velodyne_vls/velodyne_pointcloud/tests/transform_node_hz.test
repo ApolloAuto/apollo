@@ -1,0 +1,33 @@
+<!-- -*- mode: XML -*- -->
+<!-- rostest of publishing a transformed PointCloud from PCAP data. -->
+
+<launch>
+
+  <!-- define transforms for static vehicle -->
+  <include file="$(find velodyne_pointcloud)/tests/static_vehicle_tf.launch" />
+
+  <!-- start driver with example PCAP file -->
+  <node pkg="velodyne_driver" type="velodyne_node" name="velodyne_node">
+    <param name="pcap" value="$(find velodyne_pointcloud)/tests/class.pcap"/>
+  </node>
+
+  <!-- start transform node with test calibration file -->
+  <node pkg="velodyne_pointcloud" type="transform_node" name="transform_node">
+    <param name="calibration"
+           value="$(find velodyne_pointcloud)/tests/angles.yaml"/>
+  </node>
+
+  <!-- Verify PointCloud2 publication rate.  Unfortunately,
+       transformed clouds run very slowly, they spend too much time
+       waiting for the /velodyne to /odom transform to be available.
+  -->
+  <test test-name="transform_node_hz_test" pkg="rostest"
+        type="hztest" name="hztest_transform_node_64e" >
+    <param name="hz" value="10.0" />
+    <param name="hzerror" value="7.0" />
+    <param name="test_duration" value="5.0" />    
+    <param name="topic" value="velodyne_points" />  
+    <param name="wait_time" value="2.0" />  
+  </test>
+
+</launch>

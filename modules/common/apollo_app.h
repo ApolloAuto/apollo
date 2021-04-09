@@ -41,7 +41,7 @@ namespace common {
  * @class ApolloApp
  *
  * @brief The base module class to define the interface of an Apollo app.
- * An Apollo app runs infinitely until being shutdown by SIGINT or ROS. Many
+ * An Apollo app runs indefinitely until being shutdown by SIGINT or ROS. Many
  * essential components in Apollo, such as localization and control are examples
  * of Apollo apps. The APOLLO_MAIN macro helps developer to setup glog, gflag
  * and ROS in one line.
@@ -70,7 +70,6 @@ class ApolloApp {
    */
   void SetCallbackThreadNumber(uint32_t callback_thread_num);
 
- protected:
   /**
    * @brief The module initialization function. This is the first function being
    * called when the App starts. Usually this function loads the configurations,
@@ -83,9 +82,9 @@ class ApolloApp {
    * @brief The module start function. Apollo app usually triggered to execute
    * in two ways: 1. Triggered by upstream messages, or 2. Triggered by timer.
    * If an app is triggered by upstream messages, the Start() function usually
-   * register a call back function that will be called when an upstream message
+   * registers a call back function that will be called when an upstream message
    * is received. If an app is triggered by timer, the Start() function usually
-   * register a timer callback function.
+   * registers a timer callback function.
    * @return Status start status
    */
   virtual apollo::common::Status Start() = 0;
@@ -97,6 +96,7 @@ class ApolloApp {
    */
   virtual void Stop() = 0;
 
+ protected:
   /** The callback thread number
    */
   uint32_t callback_thread_num_ = 1;

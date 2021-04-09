@@ -26,9 +26,9 @@ cc_library(
         "%(car_type_lower)s_message_manager.h",
     ],
     deps = [
-        "//modules/canbus/common:canbus_common",
+        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle:message_manager_base",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/%(car_type_lower)s/protocol:canbus_%(car_type_lower)s_protocol",
     ],
 )
@@ -43,10 +43,10 @@ cc_library(
     ],
     deps = [
         ":%(car_type_lower)s_message_manager",
-        "//modules/canbus/can_comm:can_sender",
-        "//modules/canbus/common:canbus_common",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle:message_manager_base",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/%(car_type_lower)s/protocol:canbus_%(car_type_lower)s_protocol",
     ],

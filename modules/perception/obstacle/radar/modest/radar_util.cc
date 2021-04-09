@@ -15,13 +15,14 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/radar/modest/radar_util.h"
+
 #include "modules/common/log.h"
 
 namespace apollo {
 namespace perception {
-void RadarUtil::MockRadarPolygon(
-  const Eigen::Vector3d &center, const double length,
-  const double width, const double theta, PolygonDType *polygon) {
+void RadarUtil::MockRadarPolygon(const Eigen::Vector3d &center,
+                                 const double length, const double width,
+                                 const double theta, PolygonDType *polygon) {
   if (polygon == nullptr) {
     AERROR << "polygon is nullptr";
     return;

@@ -54,6 +54,7 @@ class Obstacle {
            const prediction::Trajectory &trajectory);
 
   const std::string &Id() const;
+  void SetId(const std::string &id) { id_ = id; }
 
   std::int32_t PerceptionId() const;
 

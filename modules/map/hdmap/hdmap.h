@@ -25,16 +25,17 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
+#include "modules/map/proto/map_clear_area.pb.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
 #include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
+#include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_clear_area.pb.h"
-#include "modules/map/proto/map_speed_bump.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -57,6 +58,13 @@ class HDMap {
    */
   int LoadMapFromFile(const std::string& map_filename);
 
+  /**
+   * @brief load map from a given protobuf message.
+   * @param map_proto map data in protobuf format
+   * @return 0:success, otherwise failed
+   */
+  int LoadMapFromProto(const Map& map_proto);
+
   LaneInfoConstPtr GetLaneById(const Id& id) const;
   JunctionInfoConstPtr GetJunctionById(const Id& id) const;
   SignalInfoConstPtr GetSignalById(const Id& id) const;
@@ -67,6 +75,7 @@ class HDMap {
   SpeedBumpInfoConstPtr GetSpeedBumpById(const Id& id) const;
   OverlapInfoConstPtr GetOverlapById(const Id& id) const;
   RoadInfoConstPtr GetRoadById(const Id& id) const;
+  ParkingSpaceInfoConstPtr GetParkingSpaceById(const Id& id) const;
 
   /**
    * @brief get all lanes in certain range
@@ -150,6 +159,17 @@ class HDMap {
   int GetRoads(const apollo::common::PointENU& point, double distance,
                std::vector<RoadInfoConstPtr>* roads) const;
   /**
+   * @brief get all parking spaces in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param parking spaces store all clear areas in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetParkingSpaces(const apollo::common::PointENU& point,
+                       double distance,
+                       std::vector<ParkingSpaceInfoConstPtr>*
+                       parking_spaces) const;
+  /**
    * @brief get nearest lane from target point,
    * @param point the target point
    * @param nearest_lane the nearest lane that match search conditions
@@ -158,8 +178,8 @@ class HDMap {
    * @return 0:success, otherwise, failed.
    */
   int GetNearestLane(const apollo::common::PointENU& point,
-                     LaneInfoConstPtr* nearest_lane,
-                     double* nearest_s, double* nearest_l) const;
+                     LaneInfoConstPtr* nearest_lane, double* nearest_s,
+                     double* nearest_l) const;
   /**
    * @brief get the nearest lane within a certain range by pose
    * @param point the target position
@@ -187,8 +207,7 @@ class HDMap {
    * @return 0:success, otherwise, failed.
    */
   int GetLanesWithHeading(const apollo::common::PointENU& point,
-                          const double distance,
-                          const double central_heading,
+                          const double distance, const double central_heading,
                           const double max_heading_difference,
                           std::vector<LaneInfoConstPtr>* lanes) const;
   /**
@@ -204,7 +223,7 @@ class HDMap {
                         std::vector<JunctionBoundaryPtr>* junctions) const;
   /**
    * @brief get forward nearest signals within certain range on the lane
-   *        if there are two signals related to one stop line, 
+   *        if there are two signals related to one stop line,
    *        return both signals.
    * @param point the target position
    * @param distance the forward search distance
@@ -212,9 +231,27 @@ class HDMap {
    * @return 0:success, otherwise failed
    */
   int GetForwardNearestSignalsOnLane(
-             const apollo::common::PointENU& point,
-             const double distance,
-             std::vector<SignalInfoConstPtr>* signals) const;
+      const apollo::common::PointENU& point, const double distance,
+      std::vector<SignalInfoConstPtr>* signals) const;
+
+  /**
+   * @brief get all other stop signs associated with a stop sign
+   *        in the same junction
+   * @param id id of stop sign
+   * @param stop_signs stop signs associated
+   * @return 0:success, otherwise failed
+   */
+  int GetStopSignAssociatedStopSigns(
+      const Id& id, std::vector<StopSignInfoConstPtr>* stop_signs) const;
+
+  /**
+   * @brief get all lanes associated with a stop sign in the same junction
+   * @param id id of stop sign
+   * @param lanes all lanes match conditions
+   * @return 0:success, otherwise failed
+   */
+  int GetStopSignAssociatedLanes(const Id& id,
+                                 std::vector<LaneInfoConstPtr>* lanes) const;
 
  private:
   HDMapImpl impl_;

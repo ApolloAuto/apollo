@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message WaypointSamplerConfig {
+  optional uint32 sample_points_num_each_level = 1 [default = 9];
+  optional double step_length_max = 2 [default = 15.0];
+  optional double step_length_min = 3 [default = 8.0];
+  optional double lateral_sample_offset = 4 [default = 0.5];
+  optional double lateral_adjust_coeff = 5 [default = 0.5];
+  optional double sidepass_distance = 6;
+  optional uint32 navigator_sample_num_each_level = 7;
+}

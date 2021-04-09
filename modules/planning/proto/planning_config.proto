@@ -7,51 +7,95 @@ import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/poly_st_speed_config.proto";
-import "modules/planning/proto/qp_spline_reference_line_smoother_config.proto";
+import "modules/planning/proto/navi_path_decider_config.proto";
+import "modules/planning/proto/navi_speed_decider_config.proto";
+import "modules/planning/proto/navi_obstacle_decider_config.proto";
+import "modules/planning/proto/planner_open_space_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
   DP_ST_SPEED_OPTIMIZER = 1;
   QP_SPLINE_PATH_OPTIMIZER = 2;
   QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
-  TRAFFIC_DECIDER = 4;
-  PATH_DECIDER = 5;
-  SPEED_DECIDER = 6;
-  POLY_ST_SPEED_OPTIMIZER = 7;
+  PATH_DECIDER = 4;
+  SPEED_DECIDER = 5;
+  POLY_ST_SPEED_OPTIMIZER = 6;
+  NAVI_PATH_DECIDER = 7;
+  NAVI_SPEED_DECIDER = 8;
+  NAVI_OBSTACLE_DECIDER = 9;
 };
 
-message RuleConfig {
-  enum RuleId {
-    BACKSIDE_VEHICLE = 1;
-    SIGNAL_LIGHT = 2;
-    CROSSWALK = 3;
-    CLEAR_ZONE = 4;
-    REROUTING = 5;
-    REFERENCE_LINE_END = 6;
-    DESTINATION = 7;
-    STOP_SIGN = 8;
-    CHANGE_LANE = 9;
-  }
-  optional RuleId rule_id = 1;
+message PathDeciderConfig {
+  // place holder
 }
 
-message EMPlannerConfig {
+message ScenarioConfig {
+  enum ScenarioType {
+    LANE_FOLLOW = 0;  // default scenario
+    CHANGE_LANE = 1;
+    SIDE_PASS = 2;  // go around an object when it blocks the road
+    APPROACH = 3;  // approach to an intersection
+    INTERSECTION_STOP_SIGN_FOUR_WAY = 4;
+    INTERSECTION_STOP_SIGN_ONE_OR_TWO_WAY = 5;
+    INTERSECTION_TRAFFIC_LIGHT_LEFT_TURN = 6;
+    INTERSECTION_TRAFFIC_LIGHT_RIGHT_TURN = 7;
+    INTERSECTION_TRAFFIC_LIGHT_GO_THROUGH = 8;
+  }
+  optional ScenarioType scenario_type = 1;
+
+  message ScenarioTaskConfig {
+    optional TaskType task = 1;
+    oneof task_config {
+      DpPolyPathConfig dp_poly_path_config = 2;
+      DpStSpeedConfig dp_st_speed_config = 3;
+      QpSplinePathConfig qp_spline_path_config = 4;
+      QpStSpeedConfig qp_st_speed_config = 5;
+      PolyStSpeedConfig poly_st_speed_config = 6;
+      PathDeciderConfig path_decider_config = 7;
+    }
+  }
+  repeated ScenarioTaskConfig scenario_task_config = 2;
+}
+
+message PlannerOnRoadConfig {
+  // supported scenario types
+  repeated ScenarioConfig.ScenarioType scenario_type = 1;
+}
+
+message PlannerNaviConfig {
   repeated TaskType task = 1;
-  optional apollo.planning.DpPolyPathConfig dp_poly_path_config = 2;
-  optional apollo.planning.DpStSpeedConfig dp_st_speed_config = 3;
-  optional apollo.planning.QpSplinePathConfig qp_spline_path_config = 4;
-  optional apollo.planning.QpStSpeedConfig qp_st_speed_config = 5;
-  optional apollo.planning.PolyStSpeedConfig poly_st_speed_config = 6;
+  optional NaviPathDeciderConfig  navi_path_decider_config = 2;
+  optional NaviSpeedDeciderConfig  navi_speed_decider_config = 3;
+  optional NaviObstacleDeciderConfig  navi_obstacle_decider_config = 4;
+}
+
+enum PlannerType {
+  RTK = 0;
+  ONROAD = 1;  // expectation maximization
+  OPENSPACE = 2; // open space planner
+  NAVI = 3; // navigation planner
+}
+
+message RtkPlanningConfig {
+  optional PlannerType planner_type = 1;
+}
+
+message StandardPlanningConfig {
+  repeated PlannerType planner_type = 1; // supported planners
+  optional PlannerOnRoadConfig planner_onroad_config = 2;
+}
+
+message NavigationPlanningConfig {
+  repeated PlannerType planner_type = 1; // supported planners
+  optional PlannerNaviConfig planner_navi_config = 4;
 }
 
 message PlanningConfig {
-  enum PlannerType {
-    RTK = 0;
-    EM = 1;  // expectation maximization
-  };
-  optional PlannerType planner_type = 1 [default = EM];
-
-  optional EMPlannerConfig em_planner_config = 2;
-  optional apollo.planning.QpSplineReferenceLineSmootherConfig qp_spline_reference_line_smoother_config = 3;
-  repeated RuleConfig rule_config = 4;
+  optional PlannerType planner_type = 1 [deprecated=true];
+  optional PlannerNaviConfig planner_navi_config = 2;
+  oneof planning_config {
+    RtkPlanningConfig rtk_planning_config = 3;
+    StandardPlanningConfig standard_planning_config = 4;
+    NavigationPlanningConfig navigation_planning_config = 5;
+  }
 }

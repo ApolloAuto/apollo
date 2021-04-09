@@ -20,11 +20,14 @@ namespace apollo {
 namespace perception {
 
 PbfSensorObject::PbfSensorObject()
-    : sensor_type(UNKNOWN_SENSOR_TYPE), timestamp(0.0), invisible_period(0.0) {
+    : sensor_type(SensorType::UNKNOWN_SENSOR_TYPE),
+      timestamp(0.0),
+      invisible_period(0.0) {
   object.reset(new Object());
 }
 
-PbfSensorObject::PbfSensorObject(ObjectPtr obj3d, SensorType type, double time)
+PbfSensorObject::PbfSensorObject(std::shared_ptr<Object> obj3d, SensorType type,
+                                 double time)
     : sensor_type(type),
       timestamp(time),
       object(obj3d),

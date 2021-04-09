@@ -1,0 +1,22 @@
+<package>
+
+  <name>lslidar_apollo</name>
+  <version>2.0.0</version>
+  <description>
+    Basic ROS and Apollo support for the Leishen C16 LIDARs.
+  </description>
+  <maintainer email="yutongyan@lslidar.com">yutongyan</maintainer>
+  <author>yutongyan</author>
+  <license>Licensed under the Apache License, Version 2.0 </license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>lslidar_driver</run_depend>
+  <run_depend>lslidar_msgs</run_depend>
+  <run_depend>lslidar_decoder</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+
+</package>

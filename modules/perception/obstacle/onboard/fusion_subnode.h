@@ -17,20 +17,25 @@
 #define MODULES_PERCEPTION_OBSTACLE_ONBOARD_FUSION_SUBNODE_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
-#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
-
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time_util.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/time_util.h"
-#include "modules/perception/lib/base/timer.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/base/types.h"
+#include "modules/perception/obstacle/camera/cipv/cipv.h"
+#include "modules/perception/obstacle/fusion/async_fusion/async_fusion.h"
 #include "modules/perception/obstacle/fusion/interface/base_fusion.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/probabilistic_fusion.h"
+#include "modules/perception/obstacle/onboard/fusion_shared_data.h"
+#include "modules/perception/obstacle/onboard/lane_shared_data.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -54,26 +59,55 @@ class FusionSubnode : public Subnode {
   bool SubscribeEvents(const EventMeta &event_meta,
                        std::vector<Event> *events) const;
   bool BuildSensorObjs(const std::vector<Event> &events,
-                       std::vector<SensorObjects> *multi_sensor_objs) const;
+                       std::vector<SensorObjects> *multi_sensor_objs);
   bool ProducePbMsg(double timestamp, SeqId seq_num,
-                    const std::vector<ObjectPtr> &fused_objs,
+                    const std::vector<std::shared_ptr<Object>> &fused_objs,
                     std::string *pb_msg) const;
   bool GetSharedData(const Event &event,
-                     std::shared_ptr<SensorObjects> *sensor_objects) const;
+                     std::shared_ptr<SensorObjects> *sensor_objects);
   apollo::common::Status Process(const EventMeta &event_meta,
                                  const std::vector<Event> &events);
   void RegistAllAlgorithm();
 
-  double timestamp_;
-  std::vector<ObjectPtr> objects_;
+  void OnChassis(const apollo::canbus::Chassis &message);
+
+  void PublishDataAndEvent(const double timestamp, const std::string &device_id,
+                           const SharedDataPtr<FusionItem> &data);
+  double lidar_timestamp_;
+  double radar_timestamp_;
+  double camera_timestamp_;
+
+  std::vector<std::shared_ptr<Object>> objects_;
   common::ErrorCode error_code_ = common::OK;
   std::unique_ptr<BaseFusion> fusion_;
   LidarObjectData *lidar_object_data_ = nullptr;
   RadarObjectData *radar_object_data_ = nullptr;
+  CameraObjectData *camera_object_data_ = nullptr;
+  FusionSharedData *fusion_data_ = nullptr;
+  LaneSharedData *lane_shared_data_ = nullptr;
+  std::shared_ptr<LaneObjects> lane_objects_;
+  // CIPV related variables
+  CIPVObjectData *cipv_object_data_ = nullptr;
+  Cipv cipv_;
+  MotionService *motion_service_ = nullptr;
+  MotionBuffer motion_buffer_;
+
   // lidar perception subnode event controls the publishing behavior
   EventID pub_driven_event_id_;
   EventID lidar_event_id_;
   EventID radar_event_id_;
+  EventID camera_event_id_;
+  EventID lane_event_id_;
+  EventID motion_event_id_;
+  std::mutex fusion_subnode_mutex_;
+  apollo::canbus::Chassis chassis_;
+  volatile float chassis_speed_mps_;
+
+  uint64_t min_processing_time_ = UINT64_MAX;
+  uint64_t max_processing_time_ = 0;
+  uint64_t tot_processing_time_ = 0;
+  uint64_t seq_num_ = 0;
+
   DISALLOW_COPY_AND_ASSIGN(FusionSubnode);
 };
 

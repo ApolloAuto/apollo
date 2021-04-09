@@ -92,14 +92,14 @@ def create_lane(map, id):
 
 
 fpath = sys.argv[1]
-f = open(fpath, 'r')
 points = []
-for line in f:
-    line = line.replace("\n", '')
-    data = line.split(',')
-    x = float(data[0])
-    y = float(data[1])
-    points.append((x, y))
+with open(fpath, 'r') as f:
+    for line in f:
+        line = line.replace("\n", '')
+        data = line.split(',')
+        x = float(data[0])
+        y = float(data[1])
+        points.append((x, y))
 
 path = LineString(points)
 length = int(path.length)

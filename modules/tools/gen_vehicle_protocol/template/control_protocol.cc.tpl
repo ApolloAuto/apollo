@@ -16,11 +16,13 @@
 
 #include "modules/canbus/vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
 
-#include "modules/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
 namespace canbus {
 namespace %(car_type_lower)s {
+
+using ::apollo::drivers::canbus::Byte;
 
 const int32_t %(classname)s::ID = 0x%(id_upper)s;
 

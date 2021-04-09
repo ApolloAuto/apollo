@@ -1,0 +1,156 @@
+header {
+  timestamp_sec: 1532459103.387177
+  module_name: "routing"
+  sequence_num: 3
+}
+road {
+  id: "938"
+  passage {
+    segment {
+      id: "938_1_-1"
+      start_s: 8.1266693216761325
+      end_s: 9.84604
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "1345a"
+  passage {
+    segment {
+      id: "1345a_1_-1"
+      start_s: 0
+      end_s: 43.9978
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "195"
+  passage {
+    segment {
+      id: "195_1_-1"
+      start_s: 0
+      end_s: 74.8829
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "241"
+  passage {
+    segment {
+      id: "241_1_-1"
+      start_s: 0
+      end_s: 31.4114
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "188"
+  passage {
+    segment {
+      id: "188_1_-1"
+      start_s: 0
+      end_s: 6.46255
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "2726"
+  passage {
+    segment {
+      id: "2726_1_-1"
+      start_s: 0
+      end_s: 48.709
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "382"
+  passage {
+    segment {
+      id: "382_1_-1"
+      start_s: 0
+      end_s: 3.47013
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10898"
+  passage {
+    segment {
+      id: "10898_1_-1"
+      start_s: 0
+      end_s: 45.1067
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "300"
+  passage {
+    segment {
+      id: "300_1_-1"
+      start_s: 0
+      end_s: 7.51243
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+road {
+  id: "10771"
+  passage {
+    segment {
+      id: "10771_1_-1"
+      start_s: 0
+      end_s: 9.4397883765974377
+    }
+    can_exit: true
+    change_lane_type: FORWARD
+  }
+}
+measurement {
+  distance: 272.7120690549213
+}
+routing_request {
+  header {
+    timestamp_sec: 1532459103.3858683
+    module_name: "dreamview"
+    sequence_num: 4
+  }
+  waypoint {
+    id: "938_1_-1"
+    s: 8.1266693216761325
+    pose {
+      x: 586330.39322967734
+      y: 4141483.6140746782
+    }
+  }
+  waypoint {
+    id: "10771_1_-1"
+    s: 9.4397883765974377
+    pose {
+      x: 586293.46988274017
+      y: 4141262.270079622
+    }
+  }
+}
+map_version: "1.500000"
+status {
+  error_code: OK
+  msg: "Success!"
+}

@@ -18,7 +18,7 @@ message PerceptionMapROI {
 
   // Partition the map into cells of grid.
   optional double grid_size = 4;  // in meters.
-  optional int32 num_rows = 5;  // repsect to x.
+  optional int32 num_rows = 5;  // respect to x.
   optional int32 num_columns = 6;  // respect to y.
 
   // ROI regions on the grid.

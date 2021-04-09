@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
+
 #include <algorithm>
 #include <vector>
 
 #include "modules/common/log.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
-#include "modules/perception/obstacle/lidar/tracker/hm_tracker/track_object_distance.h"
+#include "modules/perception/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,7 @@ double TrackObjectDistance::s_point_num_distance_weight_ = 0.1;
 double TrackObjectDistance::s_histogram_distance_weight_ = 0.5;
 
 bool TrackObjectDistance::SetLocationDistanceWeight(
-    const float& location_distance_weight) {
+    const float location_distance_weight) {
   if (location_distance_weight >= 0) {
     s_location_distance_weight_ = location_distance_weight;
     AINFO << "location distance weight of TrackObjectDistance is "
@@ -43,7 +44,7 @@ bool TrackObjectDistance::SetLocationDistanceWeight(
 }
 
 bool TrackObjectDistance::SetDirectionDistanceWeight(
-    const float& direction_distance_weight) {
+    const float direction_distance_weight) {
   if (direction_distance_weight >= 0) {
     s_direction_distance_weight_ = direction_distance_weight;
     AINFO << "direction distance weight of TrackObjectDistance is "
@@ -55,7 +56,7 @@ bool TrackObjectDistance::SetDirectionDistanceWeight(
 }
 
 bool TrackObjectDistance::SetBboxSizeDistanceWeight(
-    const float& bbox_size_distance_weight) {
+    const float bbox_size_distance_weight) {
   if (bbox_size_distance_weight >= 0) {
     s_bbox_size_distance_weight_ = bbox_size_distance_weight;
     AINFO << "bbox size distance weight of TrackObjectDistance is "
@@ -67,7 +68,7 @@ bool TrackObjectDistance::SetBboxSizeDistanceWeight(
 }
 
 bool TrackObjectDistance::SetPointNumDistanceWeight(
-    const float& point_num_distance_weight) {
+    const float point_num_distance_weight) {
   if (point_num_distance_weight >= 0) {
     s_point_num_distance_weight_ = point_num_distance_weight;
     AINFO << "point num distance weight of TrackObjectDistance is "
@@ -79,7 +80,7 @@ bool TrackObjectDistance::SetPointNumDistanceWeight(
 }
 
 bool TrackObjectDistance::SetHistogramDistanceWeight(
-    const float& histogram_distance_weight) {
+    const float histogram_distance_weight) {
   if (histogram_distance_weight >= 0) {
     s_histogram_distance_weight_ = histogram_distance_weight;
     AINFO << "histogram distance weight of TrackObjectDistance is "
@@ -90,10 +91,10 @@ bool TrackObjectDistance::SetHistogramDistanceWeight(
   return false;
 }
 
-float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
-                                           const Eigen::VectorXf& track_predict,
-                                           const TrackedObjectPtr& new_object) {
-  // Compute distance for given trakc & object
+float TrackObjectDistance::ComputeDistance(
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
+    const std::shared_ptr<TrackedObject>& new_object) {
+  // Compute distance for given track & object
   float location_distance =
       ComputeLocationDistance(track, track_predict, new_object);
   float direction_distance =
@@ -111,11 +112,11 @@ float TrackObjectDistance::ComputeDistance(const ObjectTrackPtr& track,
 }
 
 float TrackObjectDistance::ComputeLocationDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object) {
-  // Compute locatin distance for given track & object
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
+    const std::shared_ptr<TrackedObject>& new_object) {
+  // Compute location distance for given track & object
   // range from 0 to positive infinity
-  const TrackedObjectPtr& last_object = track->current_object_;
+  const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
   Eigen::Vector2f measured_anchor_point = new_object->anchor_point.head(2);
   Eigen::Vector2f predicted_anchor_point = track_predict.head(2);
   Eigen::Vector2f measurement_predict_diff =
@@ -145,11 +146,11 @@ float TrackObjectDistance::ComputeLocationDistance(
 }
 
 float TrackObjectDistance::ComputeDirectionDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
-    const TrackedObjectPtr& new_object) {
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
+    const std::shared_ptr<TrackedObject>& new_object) {
   // Compute direction distance for given track & object
   // range from 0 to 2
-  const TrackedObjectPtr& last_object = track->current_object_;
+  const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
   Eigen::Vector3f old_anchor_point = last_object->anchor_point;
   Eigen::Vector3f new_anchor_point = new_object->anchor_point;
   Eigen::Vector3f anchor_point_shift = new_anchor_point - old_anchor_point;
@@ -167,10 +168,10 @@ float TrackObjectDistance::ComputeDirectionDistance(
 }
 
 float TrackObjectDistance::ComputeBboxSizeDistance(
-    const ObjectTrackPtr& track, const TrackedObjectPtr& new_object) {
+    ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object) {
   // Compute bbox size distance for given track & object
   // range from 0 to 1
-  const TrackedObjectPtr& last_object = track->current_object_;
+  const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
   Eigen::Vector3f old_bbox_dir = last_object->direction;
   Eigen::Vector3f new_bbox_dir = new_object->direction;
   Eigen::Vector3f old_bbox_size = last_object->size;
@@ -200,22 +201,23 @@ float TrackObjectDistance::ComputeBboxSizeDistance(
 }
 
 float TrackObjectDistance::ComputePointNumDistance(
-    const ObjectTrackPtr& track, const TrackedObjectPtr& new_object) {
+    ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object) {
   // Compute point num distance for given track & object
   // range from 0 and 1
-  const TrackedObjectPtr& last_object = track->current_object_;
+  const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
   int old_point_number = last_object->object_ptr->cloud->size();
   int new_point_number = new_object->object_ptr->cloud->size();
-  float point_num_distance = fabs(old_point_number - new_point_number) * 1.0f /
+  float point_num_distance = std::abs(old_point_number - new_point_number) *
+                             1.0f /
                              std::max(old_point_number, new_point_number);
   return point_num_distance;
 }
 
 float TrackObjectDistance::ComputeHistogramDistance(
-    const ObjectTrackPtr& track, const TrackedObjectPtr& new_object) {
+    ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object) {
   // Compute histogram distance for given track & object
   // range from 0 to 3
-  const TrackedObjectPtr& last_object = track->current_object_;
+  const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
   std::vector<float>& old_object_shape_features =
       last_object->object_ptr->shape_features;
   std::vector<float>& new_object_shape_features =

@@ -19,20 +19,14 @@
 
 #include <memory>
 #include <string>
-#include <utility>
-#include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/planner/planner.h"
-#include "modules/planning/planning_interface.h"
+#include "modules/common/apollo_app.h"
+#include "modules/common/configs/config_gflags.h"
+#include "modules/common/util/thread_pool.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/navi_planning.h"
+#include "modules/planning/planning_base.h"
+#include "modules/planning/std_planning.h"
 
 /**
  * @namespace apollo::planning
@@ -47,80 +41,43 @@ namespace planning {
  * @brief Planning module main class. It processes GPS and IMU as input,
  * to generate planning info.
  */
-class Planning : public PlanningInterface {
+class Planning : public apollo::common::ApolloApp {
  public:
+  Planning() {
+    if (FLAGS_use_navigation_mode) {
+      planning_base_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
+    } else {
+      planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    }
+  }
+  virtual ~Planning() = default;
   /**
    * @brief module name
    * @return module name
    */
-  std::string Name() const override;
+  std::string Name() const override { return planning_base_->Name(); }
+
+  virtual void RunOnce() { planning_base_->RunOnce(); }
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  apollo::common::Status Init() override { return planning_base_->Init(); }
 
   /**
    * @brief module start function
    * @return start status
    */
-  apollo::common::Status Start() override;
+  apollo::common::Status Start() override { return planning_base_->Start(); }
 
   /**
    * @brief module stop function
    */
-  void Stop() override;
-
-  /**
-   * @brief main logic of the planning module, runs periodically triggered by
-   * timer.
-   */
-  void RunOnce() override;
-
-  /**
-   * @brief record last planning trajectory
-   */
-  void SetLastPublishableTrajectory(const ADCTrajectory& adc_trajectory);
+  void Stop() override { return planning_base_->Stop(); }
 
  private:
-  // Watch dog timer
-  void OnTimer(const ros::TimerEvent&);
-
-  void PublishPlanningPb(ADCTrajectory* trajectory_pb, double timestamp);
-
-  void RegisterPlanners();
-
-  /**
-   * @brief Plan the trajectory given current vehicle state
-   */
-  common::Status Plan(
-      const double current_time_stamp,
-      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
-      ADCTrajectory* trajectory);
-
-  common::Status InitFrame(const uint32_t sequence_num,
-                           const common::TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const common::VehicleState& vehicle_state);
-
-  bool IsVehicleStateValid(const common::VehicleState& vehicle_state);
-  void ExportReferenceLineDebug(planning_internal::Debug* debug);
-
-  apollo::common::util::Factory<PlanningConfig::PlannerType, Planner>
-      planner_factory_;
-
-  PlanningConfig config_;
-
-  const hdmap::HDMap* hdmap_ = nullptr;
-
-  std::unique_ptr<Frame> frame_;
-
-  std::unique_ptr<Planner> planner_;
-
-  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
-
-  ros::Timer timer_;
+  std::unique_ptr<PlanningBase> planning_base_;
 };
 
 }  // namespace planning

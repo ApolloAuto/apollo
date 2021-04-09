@@ -60,7 +60,17 @@ export default class Text3D {
                 }
                 this.charMeshes[idx].push(mesh);
             }
-            mesh.position.set((j - charIndices.length / 2) * letterOffset, 0, 0);
+
+            let additionalOffset = 0;
+            switch (text[j]) {
+                case ',':
+                    additionalOffset = 0.35;
+                    break;
+                case '/':
+                    additionalOffset = 0.15;
+                    break;
+            }
+            mesh.position.set((j - charIndices.length / 2) * letterOffset + additionalOffset, 0, 0);
             this.charPointers[idx]++;
             textMesh.add(mesh);
         }

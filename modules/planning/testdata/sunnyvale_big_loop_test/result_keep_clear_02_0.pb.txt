@@ -1,0 +1,113 @@
+header {
+  module_name: "std_planning"
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    stop {
+      reason_code: STOP_REASON_CLEAR_ZONE
+      reason: "stop by KC_1254"
+      stop_point {
+        x: 586424.1553915285
+        y: 4140676.1709626503
+      }
+      stop_heading: 1.3030688337003014
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+    decision {
+      id: "9830"
+      perception_id: 9830
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -6
+          stop_point {
+            x: 586427.42409684742
+            y: 4140689.4706909908
+          }
+          stop_heading: 1.3460085746193724
+        }
+      }
+    }
+    decision {
+      id: "KC_1254"
+      perception_id: -1540021536
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_CLEAR_ZONE
+          distance_s: -1
+          stop_point {
+            x: 586424.1553915285
+            y: 4140676.1709626503
+            z: 0
+          }
+          stop_heading: 1.3030688337003014
+        }
+      }
+    }
+  }
+  vehicle_signal {
+    turn_signal: TURN_NONE
+  }
+}
+routing_header {
+  timestamp_sec: 1533844120.2057884
+  module_name: "routing"
+  sequence_num: 1
+}
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "2849_1_-1"
+}
+lane_id {
+  id: "10591a_1_-1"
+}
+lane_id {
+  id: "2906_1_-1"
+}
+lane_id {
+  id: "10590_1_-1"
+}
+lane_id {
+  id: "10589_1_-1"
+}
+lane_id {
+  id: "2912_1_-1"
+}
+lane_id {
+  id: "2911_1_-1"
+}
+lane_id {
+  id: "2914_1_-1"
+}
+lane_id {
+  id: "2919_1_-1"
+}
+lane_id {
+  id: "2918_1_-1"
+}
+lane_id {
+  id: "338_1_-1"
+}
+lane_id {
+  id: "10557_1_-1"
+}
+lane_id {
+  id: "11044_1_-1"
+}
+lane_id {
+  id: "373_1_-1"
+}
+lane_id {
+  id: "2923_1_-1"
+}
+lane_id {
+  id: "2922_1_-1"
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+trajectory_type: NORMAL

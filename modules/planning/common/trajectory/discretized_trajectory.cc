@@ -25,7 +25,8 @@
 #include <utility>
 
 #include "modules/common/log.h"
-#include "modules/planning/common/planning_util.h"
+#include "modules/common/math/linear_interpolation.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -46,27 +47,6 @@ DiscretizedTrajectory::DiscretizedTrajectory(const ADCTrajectory& trajectory) {
 
 TrajectoryPoint DiscretizedTrajectory::Evaluate(
     const double relative_time) const {
-  CHECK(!trajectory_points_.empty());
-  CHECK(trajectory_points_.front().relative_time() <= relative_time &&
-        trajectory_points_.back().relative_time() <= relative_time)
-      << "Invalid relative time input!";
-
-  auto comp = [](const TrajectoryPoint& p, const double relative_time) {
-    return p.relative_time() < relative_time;
-  };
-
-  auto it_lower =
-      std::lower_bound(trajectory_points_.begin(), trajectory_points_.end(),
-                       relative_time, comp);
-
-  if (it_lower == trajectory_points_.begin()) {
-    return trajectory_points_.front();
-  }
-  return util::interpolate(*(it_lower - 1), *it_lower, relative_time);
-}
-
-TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
-    const double relative_time) const {
   auto comp = [](const TrajectoryPoint& p, const double relative_time) {
     return p.relative_time() < relative_time;
   };
@@ -82,11 +62,11 @@ TrajectoryPoint DiscretizedTrajectory::EvaluateUsingLinearApproximation(
           << ") is too large";
     return trajectory_points_.back();
   }
-  return util::InterpolateUsingLinearApproximation(*(it_lower - 1), *it_lower,
-                                                   relative_time);
+  return common::math::InterpolateUsingLinearApproximation(
+      *(it_lower - 1), *it_lower, relative_time);
 }
 
-std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
+std::uint32_t DiscretizedTrajectory::QueryLowerBoundPoint(
     const double relative_time) const {
   CHECK(!trajectory_points_.empty());
 
@@ -140,16 +120,17 @@ TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
   return trajectory_points_.front();
 }
 
-std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
-  return trajectory_points_.size();
+double DiscretizedTrajectory::GetTemporalLength() const {
+  CHECK(!trajectory_points_.empty());
+  return trajectory_points_.back().relative_time() -
+         trajectory_points_.front().relative_time();
 }
 
-const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
-    const {
-  return trajectory_points_;
+double DiscretizedTrajectory::GetSpatialLength() const {
+  CHECK(!trajectory_points_.empty());
+  return trajectory_points_.back().path_point().s() -
+         trajectory_points_.front().path_point().s();
 }
-
-void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo

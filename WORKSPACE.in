@@ -6,15 +6,14 @@ new_http_archive(
     build_file = "third_party/gtest.BUILD",
     sha256 = "58a6f4277ca2bc8565222b3bbd58a177609e9c488e8a72649359ba51450db7d8",
     strip_prefix = "googletest-release-1.8.0",
-    url = "https://github.com/google/googletest/archive/release-1.8.0.tar.gz",
+    url = "file:///home/tmp/googletest-release-1.8.0.tar.gz",
 )
 
 # gflags
-http_archive(
+new_local_repository(
     name = "com_github_gflags_gflags",
-    sha256 = "466c36c6508a451734e4f4d76825cf9cd9b8716d2b70ef36479ae40f08271f88",
-    strip_prefix = "gflags-2.2.0",
-    url = "https://github.com/gflags/gflags/archive/v2.2.0.tar.gz",
+    build_file = "third_party/gflags.BUILD",
+    path = "/usr/local/include/gflags",
 )
 
 bind(
@@ -23,12 +22,10 @@ bind(
 )
 
 # glog
-new_http_archive(
+new_local_repository(
     name = "glog",
     build_file = "third_party/glog.BUILD",
-    sha256 = "7580e408a2c0b5a89ca214739978ce6ff480b5e7d8d7698a2aa92fadc484d1e0",
-    strip_prefix = "glog-0.3.5",
-    url = "https://github.com/google/glog/archive/v0.3.5.tar.gz",
+    path = "/usr/local/include/glog",
 )
 
 # Google Benchmark
@@ -37,7 +34,15 @@ new_http_archive(
     build_file = "third_party/benchmark.BUILD",
     sha256 = "e7334dd254434c6668e33a54c8f839194c7c61840d52f4b6258eee28e9f3b20e",
     strip_prefix = "benchmark-1.1.0",
-    url = "https://github.com/google/benchmark/archive/v1.1.0.tar.gz",
+    url = "file:///home/tmp/benchmark-1.1.0.tar.gz",
+)
+
+new_http_archive(
+    name = "ctpl",
+    build_file = "third_party/ctpl.BUILD",
+    sha256 = "8c1cec7c570d6d84be1d29283af5039ea27c3e69703bd446d396424bf619816e",
+    strip_prefix = "CTPL-ctpl_v.0.0.2",
+    url = "https://github.com/vit-vit/CTPL/archive/ctpl_v.0.0.2.tar.gz",
 )
 
 # cpplint from google style guide
@@ -54,16 +59,16 @@ new_http_archive(
     build_file = "third_party/eigen.BUILD",
     sha256 = "04f8a4fa4afedaae721c1a1c756afeea20d3cdef0ce3293982cf1c518f178502",
     strip_prefix = "eigen-eigen-b9cd8366d4e8",
-    url = "https://bitbucket.org/eigen/eigen/get/3.2.10.tar.gz",
+    url = "file:///home/tmp/eigen-3.2.10.tar.gz",
 )
 
 # CivetWeb (web server)
 new_http_archive(
     name = "civetweb",
     build_file = "third_party/civetweb.BUILD",
-    sha256 = "880d741724fd8de0ebc77bc5d98fa673ba44423dc4918361c3cd5cf80955e36d",
-    strip_prefix = "civetweb-1.9.1",
-    url = "https://github.com/civetweb/civetweb/archive/v1.9.1.tar.gz",
+    sha256 = "e6958f005aa01b02645bd3ff9760dd085e83d30530cdd97b584632419195bea5",
+    strip_prefix = "civetweb-1.10",
+    url = "file:///home/tmp/civetweb-1.10.tar.gz",
 )
 
 # curlpp
@@ -72,7 +77,7 @@ new_http_archive(
     build_file = "third_party/curlpp.BUILD",
     sha256 = "97e3819bdcffc3e4047b6ac57ca14e04af85380bd93afe314bee9dd5c7f46a0a",
     strip_prefix = "curlpp-0.8.1",
-    url = "https://github.com/jpbarrette/curlpp/archive/v0.8.1.tar.gz",
+    url = "file:///home/tmp/curlpp-0.8.1.tar.gz",
 )
 
 #ros
@@ -87,7 +92,7 @@ new_http_archive(
     name = "opencv2",
     build_file = "third_party/opencv2.BUILD",
     strip_prefix = "opencv-2.4.13.2",
-    url = "https://github.com/opencv/opencv/archive/2.4.13.2.zip",
+    url = "file:///home/tmp/opencv-2.4.13.2.zip",
 )
 
 # PCL 1.7
@@ -135,7 +140,15 @@ new_http_archive(
     name = "yaml_cpp",
     build_file = "third_party/yaml_cpp.BUILD",
     strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
-    url = "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip",
+    url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
+)
+
+new_http_archive(
+    name = "qpOASES",
+    build_file = "third_party/qpOASES.BUILD",
+    sha256 = "e70b49586b58b8f5fd348e951f3c3094ed0ad371a96097a499f343a7aeec7dbe",
+    strip_prefix = "qp-oases-3.2.1-1",
+    url = "file:///home/tmp/qp-oases-3.2.1-1.zip",
 )
 
 # IpOpt
@@ -145,11 +158,18 @@ new_local_repository(
     path = "/usr/local/ipopt/include/coin",
 )
 
+# Cuda
+new_local_repository(
+    name = "cuda",
+    build_file = "third_party/cuda.BUILD",
+    path = "/usr/local/cuda",
+)
+
 # Local-integ
 new_local_repository(
     name = "local_integ",
     build_file = "third_party/local_integ.BUILD",
-    path = "/usr/local/local_integ",
+    path = "/usr/local/apollo/local_integ",
 )
 
 # Proj.4
@@ -157,7 +177,7 @@ new_http_archive(
     name = "proj4",
     build_file = "third_party/proj4.BUILD",
     strip_prefix = "proj.4-4.9.3",
-    url = "https://github.com/OSGeo/proj.4/archive/4.9.3.zip",
+    url = "file:///home/tmp/proj.4-4.9.3.zip",
 )
 
 # tinyxml2
@@ -165,12 +185,36 @@ new_http_archive(
     name = "tinyxml2",
     build_file = "third_party/tinyxml2.BUILD",
     strip_prefix = "tinyxml2-5.0.1",
-    url = "https://github.com/leethomason/tinyxml2/archive/5.0.1.zip",
+    url = "file:///home/tmp/tinyxml2-5.0.1.zip",
 )
 
 #protobuf 3.3
 http_archive(
     name = "com_google_protobuf",
     strip_prefix = "protobuf-3.3.0",
-    url = "https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.tar.gz",
+    url = "file:///home/tmp/protobuf-3.3.0.tar.gz",
+)
+
+#jsoncpp .so for adv_plat
+new_local_repository(
+    name = "jsoncpp",
+    build_file = "third_party/jsoncpp.BUILD",
+    path = "/usr/local/apollo/jsoncpp/",
+)
+
+#adv_plat
+new_http_archive(
+    name = "adv_plat",
+    build_file = "third_party/adv_plat.BUILD",
+    sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
+    url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
+)
+
+#libprotobuf-mutator
+new_http_archive(
+    name = "libprotobuf_mutator",
+    build_file = "third_party/libprotobuf_mutator.BUILD",
+    sha256 = "9e8c92b4e70c2639d355eb5e99c89f9f5f760ca9cb87a400e3c38e10711e58b6",
+    strip_prefix = "libprotobuf-mutator-1.0",
+    url = "https://github.com/BaiduXLab/libprotobuf-mutator/archive/v1.0.tar.gz",
 )

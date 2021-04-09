@@ -1,0 +1,1512 @@
+perception_obstacle {
+  id: 5
+  position {
+    x: 76.184221246053838
+    y: -8.74886039049188
+  }
+  theta: -1
+  velocity {
+    x: -0.84422235291896841
+    y: 1.3147984137623383
+  }
+  length: 5
+  width: 1.4000000000000001
+  height: 3
+  polygon_point {
+    x: 76.945947321358659
+    y: -11.230749466619319
+  }
+  polygon_point {
+    x: 78.124006700089723
+    y: -10.474326238403922
+  }
+  polygon_point {
+    x: 75.422495170749016
+    y: -6.26697131436444
+  }
+  polygon_point {
+    x: 74.244435792017953
+    y: -7.0233945425798368
+  }
+  type: VEHICLE
+  confidence: 0.5
+}
+perception_obstacle {
+  id: 1000
+  position {
+    x: 77.600000000000023
+    y: -3.7999999999999829
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 78.109284779862477
+    y: -6.4439797678878641
+  }
+  polygon_point {
+    x: 79.792226749478274
+    y: -5.3633751561515837
+  }
+  polygon_point {
+    x: 77.090715220137568
+    y: -1.1560202321121018
+  }
+  polygon_point {
+    x: 75.407773250521771
+    y: -2.2366248438483813
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1003
+  position {
+    x: 193.20000000000005
+    y: -19.199999999999989
+  }
+  theta: -1
+  velocity {
+    x: -14
+    y: -4.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 193.70928477986249
+    y: -21.84397976788787
+  }
+  polygon_point {
+    x: 195.39222674947828
+    y: -20.763375156151593
+  }
+  polygon_point {
+    x: 192.69071522013761
+    y: -16.556020232112107
+  }
+  polygon_point {
+    x: 191.00777325052181
+    y: -17.636624843848384
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1006
+  position {
+    x: 98
+    y: -0.39999999999997726
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 98.509284779862455
+    y: -3.0439797678878584
+  }
+  polygon_point {
+    x: 100.19222674947825
+    y: -1.9633751561515789
+  }
+  polygon_point {
+    x: 97.490715220137545
+    y: 2.2439797678879039
+  }
+  polygon_point {
+    x: 95.807773250521748
+    y: 1.1633751561516243
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1009
+  position {
+    x: 142.40000000000009
+    y: -8.9999999999999716
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 142.90928477986253
+    y: -11.643979767887853
+  }
+  polygon_point {
+    x: 144.59222674947833
+    y: -10.563375156151572
+  }
+  polygon_point {
+    x: 141.89071522013765
+    y: -6.35602023211209
+  }
+  polygon_point {
+    x: 140.20777325052185
+    y: -7.4366248438483709
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1012
+  position {
+    x: 115.80000000000007
+    y: 11.000000000000028
+  }
+  theta: -1
+  velocity {
+    x: 2.75
+    y: 3.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 116.30928477986252
+    y: 8.3560202321121473
+  }
+  polygon_point {
+    x: 117.99222674947832
+    y: 9.4366248438484277
+  }
+  polygon_point {
+    x: 115.29071522013761
+    y: 13.64397976788791
+  }
+  polygon_point {
+    x: 113.60777325052182
+    y: 12.563375156151629
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1015
+  position {
+    x: 246.60000000000002
+    y: 21.400000000000006
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 247.10928477986246
+    y: 18.756020232112125
+  }
+  polygon_point {
+    x: 248.79222674947826
+    y: 19.8366248438484
+  }
+  polygon_point {
+    x: 246.09071522013758
+    y: 24.043979767887887
+  }
+  polygon_point {
+    x: 244.40777325052179
+    y: 22.96337515615161
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1018
+  position {
+    x: 45.800000000000068
+    y: -33.799999999999983
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 46.309284779862516
+    y: -36.443979767887861
+  }
+  polygon_point {
+    x: 47.992226749478313
+    y: -35.363375156151584
+  }
+  polygon_point {
+    x: 45.290715220137621
+    y: -31.156020232112102
+  }
+  polygon_point {
+    x: 43.607773250521824
+    y: -32.236624843848382
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1021
+  position {
+    x: 22.399999999999977
+    y: -3.9999999999999716
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 22.909284779862432
+    y: -6.6439797678878527
+  }
+  polygon_point {
+    x: 24.592226749478222
+    y: -5.5633751561515723
+  }
+  polygon_point {
+    x: 21.890715220137523
+    y: -1.3560202321120904
+  }
+  polygon_point {
+    x: 20.207773250521733
+    y: -2.43662484384837
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1024
+  position {
+    x: 59.600000000000023
+    y: -3.5999999999999943
+  }
+  theta: -1
+  velocity {
+    x: -14
+    y: 1
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 60.10928477986247
+    y: -6.2439797678878755
+  }
+  polygon_point {
+    x: 61.792226749478267
+    y: -5.163375156151595
+  }
+  polygon_point {
+    x: 59.090715220137575
+    y: -0.95602023211211318
+  }
+  polygon_point {
+    x: 57.407773250521778
+    y: -2.0366248438483927
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1027
+  position {
+    x: 27.800000000000068
+    y: -4.3999999999999773
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 28.309284779862523
+    y: -7.0439797678878584
+  }
+  polygon_point {
+    x: 29.992226749478313
+    y: -5.963375156151578
+  }
+  polygon_point {
+    x: 27.290715220137614
+    y: -1.7560202321120961
+  }
+  polygon_point {
+    x: 25.607773250521824
+    y: -2.8366248438483757
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1036
+  position {
+    x: 212.60000000000002
+    y: 23.000000000000028
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 213.10928477986246
+    y: 20.356020232112147
+  }
+  polygon_point {
+    x: 214.79222674947826
+    y: 21.436624843848424
+  }
+  polygon_point {
+    x: 212.09071522013758
+    y: 25.64397976788791
+  }
+  polygon_point {
+    x: 210.40777325052179
+    y: 24.563375156151633
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1051
+  position {
+    x: 64.200000000000045
+    y: 30.600000000000023
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -1
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 64.7092847798625
+    y: 27.956020232112142
+  }
+  polygon_point {
+    x: 66.3922267494783
+    y: 29.036624843848418
+  }
+  polygon_point {
+    x: 63.6907152201376
+    y: 33.2439797678879
+  }
+  polygon_point {
+    x: 62.0077732505218
+    y: 32.163375156151623
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1054
+  position {
+    x: 112
+    y: 13.600000000000023
+  }
+  theta: -1
+  velocity {
+    x: 7.25
+    y: 4.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 112.50928477986245
+    y: 10.956020232112142
+  }
+  polygon_point {
+    x: 114.19222674947825
+    y: 12.036624843848422
+  }
+  polygon_point {
+    x: 111.49071522013755
+    y: 16.243979767887904
+  }
+  polygon_point {
+    x: 109.80777325052175
+    y: 15.163375156151623
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1002
+  position {
+    x: 37.200000000000045
+    y: -26.999999999999972
+  }
+  theta: -1
+  velocity {
+    x: -0.25
+    y: 14.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 37.709284779862493
+    y: -29.643979767887853
+  }
+  polygon_point {
+    x: 39.39222674947829
+    y: -28.563375156151576
+  }
+  polygon_point {
+    x: 36.6907152201376
+    y: -24.35602023211209
+  }
+  polygon_point {
+    x: 35.0077732505218
+    y: -25.436624843848367
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1005
+  position {
+    x: 168.20000000000005
+    y: 11.200000000000017
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 1.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 168.70928477986249
+    y: 8.5560202321121359
+  }
+  polygon_point {
+    x: 170.39222674947828
+    y: 9.6366248438484163
+  }
+  polygon_point {
+    x: 167.69071522013761
+    y: 13.843979767887898
+  }
+  polygon_point {
+    x: 166.00777325052181
+    y: 12.763375156151618
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1008
+  position {
+    x: 108.80000000000007
+    y: 0.80000000000001137
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 109.30928477986252
+    y: -1.8439797678878698
+  }
+  polygon_point {
+    x: 110.99222674947832
+    y: -0.76337515615159024
+  }
+  polygon_point {
+    x: 108.29071522013761
+    y: 3.4439797678878925
+  }
+  polygon_point {
+    x: 106.60777325052182
+    y: 2.363375156151613
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1011
+  position {
+    x: 97.200000000000045
+    y: -3.5999999999999943
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 97.7092847798625
+    y: -6.2439797678878755
+  }
+  polygon_point {
+    x: 99.3922267494783
+    y: -5.163375156151595
+  }
+  polygon_point {
+    x: 96.690715220137591
+    y: -0.95602023211211318
+  }
+  polygon_point {
+    x: 95.0077732505218
+    y: -2.0366248438483927
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1014
+  position {
+    x: 3.8000000000000114
+    y: -10.199999999999989
+  }
+  theta: -1
+  velocity {
+    x: -14
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 4.3092847798624643
+    y: -12.84397976788787
+  }
+  polygon_point {
+    x: 5.9922267494782577
+    y: -11.763375156151589
+  }
+  polygon_point {
+    x: 3.2907152201375585
+    y: -7.5560202321121075
+  }
+  polygon_point {
+    x: 1.6077732505217652
+    y: -8.6366248438483879
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1017
+  position {
+    x: 15
+    y: -5.1999999999999886
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 15.509284779862453
+    y: -7.84397976788787
+  }
+  polygon_point {
+    x: 17.192226749478245
+    y: -6.7633751561515894
+  }
+  polygon_point {
+    x: 14.490715220137547
+    y: -2.5560202321121075
+  }
+  polygon_point {
+    x: 12.807773250521754
+    y: -3.636624843848387
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1020
+  position {
+    x: 209.40000000000009
+    y: -7.3999999999999773
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 209.90928477986253
+    y: -10.043979767887858
+  }
+  polygon_point {
+    x: 211.59222674947833
+    y: -8.963375156151578
+  }
+  polygon_point {
+    x: 208.89071522013765
+    y: -4.7560202321120961
+  }
+  polygon_point {
+    x: 207.20777325052185
+    y: -5.8366248438483765
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1023
+  position {
+    x: 167.20000000000005
+    y: 0.60000000000002274
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 1
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 167.70928477986249
+    y: -2.0439797678878584
+  }
+  polygon_point {
+    x: 169.39222674947828
+    y: -0.96337515615157887
+  }
+  polygon_point {
+    x: 166.69071522013761
+    y: 3.2439797678879039
+  }
+  polygon_point {
+    x: 165.00777325052181
+    y: 2.1633751561516243
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1026
+  position {
+    x: 217.20000000000005
+    y: 7.2000000000000171
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 2.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 217.70928477986249
+    y: 4.5560202321121359
+  }
+  polygon_point {
+    x: 219.39222674947828
+    y: 5.6366248438484163
+  }
+  polygon_point {
+    x: 216.69071522013761
+    y: 9.8439797678878982
+  }
+  polygon_point {
+    x: 215.00777325052181
+    y: 8.7633751561516178
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1029
+  position {
+    x: 31.800000000000068
+    y: -6.3999999999999773
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 32.309284779862516
+    y: -9.0439797678878584
+  }
+  polygon_point {
+    x: 33.992226749478313
+    y: -7.963375156151578
+  }
+  polygon_point {
+    x: 31.290715220137614
+    y: -3.7560202321120966
+  }
+  polygon_point {
+    x: 29.607773250521824
+    y: -4.8366248438483765
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1032
+  position {
+    x: 38.399999999999977
+    y: -34.199999999999989
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 38.909284779862425
+    y: -36.843979767887866
+  }
+  polygon_point {
+    x: 40.592226749478222
+    y: -35.763375156151589
+  }
+  polygon_point {
+    x: 37.89071522013753
+    y: -31.556020232112111
+  }
+  polygon_point {
+    x: 36.207773250521733
+    y: -32.636624843848388
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1038
+  position {
+    x: 118.60000000000002
+    y: 8.6000000000000227
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 1
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 119.10928477986248
+    y: 5.9560202321121416
+  }
+  polygon_point {
+    x: 120.79222674947827
+    y: 7.036624843848422
+  }
+  polygon_point {
+    x: 118.09071522013757
+    y: 11.243979767887904
+  }
+  polygon_point {
+    x: 116.40777325052177
+    y: 10.163375156151623
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1044
+  position {
+    x: 25
+    y: 9.2000000000000171
+  }
+  theta: -1
+  velocity {
+    x: -13.5
+    y: -0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 25.509284779862455
+    y: 6.5560202321121359
+  }
+  polygon_point {
+    x: 27.192226749478245
+    y: 7.6366248438484163
+  }
+  polygon_point {
+    x: 24.490715220137545
+    y: 11.843979767887898
+  }
+  polygon_point {
+    x: 22.807773250521755
+    y: 10.763375156151618
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1050
+  position {
+    x: 61.800000000000068
+    y: -8.9999999999999716
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -1.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 62.309284779862516
+    y: -11.643979767887853
+  }
+  polygon_point {
+    x: 63.992226749478313
+    y: -10.563375156151572
+  }
+  polygon_point {
+    x: 61.290715220137621
+    y: -6.35602023211209
+  }
+  polygon_point {
+    x: 59.607773250521824
+    y: -7.4366248438483709
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1053
+  position {
+    x: 95
+    y: -21.999999999999972
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 95.509284779862455
+    y: -24.643979767887853
+  }
+  polygon_point {
+    x: 97.192226749478252
+    y: -23.563375156151576
+  }
+  polygon_point {
+    x: 94.490715220137545
+    y: -19.35602023211209
+  }
+  polygon_point {
+    x: 92.807773250521748
+    y: -20.436624843848367
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1001
+  position {
+    x: 84.200000000000045
+    y: 14.800000000000011
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 84.7092847798625
+    y: 12.15602023211213
+  }
+  polygon_point {
+    x: 86.3922267494783
+    y: 13.236624843848411
+  }
+  polygon_point {
+    x: 83.690715220137591
+    y: 17.443979767887893
+  }
+  polygon_point {
+    x: 82.0077732505218
+    y: 16.363375156151616
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1004
+  position {
+    x: 132.60000000000002
+    y: -3.9999999999999716
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 1.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 133.10928477986246
+    y: -6.6439797678878527
+  }
+  polygon_point {
+    x: 134.79222674947826
+    y: -5.5633751561515723
+  }
+  polygon_point {
+    x: 132.09071522013758
+    y: -1.3560202321120904
+  }
+  polygon_point {
+    x: 130.40777325052179
+    y: -2.43662484384837
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1007
+  position {
+    x: 3.8000000000000114
+    y: -7.9999999999999716
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -1.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 4.3092847798624643
+    y: -10.643979767887853
+  }
+  polygon_point {
+    x: 5.9922267494782577
+    y: -9.5633751561515723
+  }
+  polygon_point {
+    x: 3.2907152201375585
+    y: -5.35602023211209
+  }
+  polygon_point {
+    x: 1.6077732505217652
+    y: -6.4366248438483709
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1010
+  position {
+    x: 63.800000000000068
+    y: -6.5999999999999943
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -2
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 64.309284779862523
+    y: -9.2439797678878755
+  }
+  polygon_point {
+    x: 65.99222674947832
+    y: -8.163375156151595
+  }
+  polygon_point {
+    x: 63.290715220137621
+    y: -3.9560202321121136
+  }
+  polygon_point {
+    x: 61.607773250521824
+    y: -5.0366248438483936
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1013
+  position {
+    x: 5.6000000000000227
+    y: -4.3999999999999773
+  }
+  theta: -1
+  velocity {
+    x: -14.25
+    y: -0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 6.1092847798624756
+    y: -7.0439797678878584
+  }
+  polygon_point {
+    x: 7.7922267494782691
+    y: -5.963375156151578
+  }
+  polygon_point {
+    x: 5.09071522013757
+    y: -1.7560202321120961
+  }
+  polygon_point {
+    x: 3.4077732505217764
+    y: -2.8366248438483757
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1016
+  position {
+    x: 24
+    y: -27.599999999999994
+  }
+  theta: -1
+  velocity {
+    x: 0
+    y: 9.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 24.509284779862455
+    y: -30.243979767887875
+  }
+  polygon_point {
+    x: 26.192226749478245
+    y: -29.1633751561516
+  }
+  polygon_point {
+    x: 23.490715220137545
+    y: -24.956020232112113
+  }
+  polygon_point {
+    x: 21.807773250521755
+    y: -26.03662484384839
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1019
+  position {
+    x: 225.40000000000009
+    y: -12.599999999999994
+  }
+  theta: -1
+  velocity {
+    x: -13.5
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 225.90928477986253
+    y: -15.243979767887875
+  }
+  polygon_point {
+    x: 227.59222674947833
+    y: -14.163375156151595
+  }
+  polygon_point {
+    x: 224.89071522013765
+    y: -9.9560202321121132
+  }
+  polygon_point {
+    x: 223.20777325052185
+    y: -11.036624843848394
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1022
+  position {
+    x: 91
+    y: -2.1999999999999886
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 91.509284779862455
+    y: -4.84397976788787
+  }
+  polygon_point {
+    x: 93.192226749478252
+    y: -3.76337515615159
+  }
+  polygon_point {
+    x: 90.490715220137545
+    y: 0.44397976788789251
+  }
+  polygon_point {
+    x: 88.807773250521748
+    y: -0.636624843848387
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1025
+  position {
+    x: 180.80000000000007
+    y: 18.200000000000017
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.75
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 181.30928477986251
+    y: 15.556020232112134
+  }
+  polygon_point {
+    x: 182.99222674947831
+    y: 16.636624843848413
+  }
+  polygon_point {
+    x: 180.29071522013763
+    y: 20.843979767887898
+  }
+  polygon_point {
+    x: 178.60777325052183
+    y: 19.763375156151621
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1028
+  position {
+    x: 8.6000000000000227
+    y: -17.399999999999977
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -1
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 9.1092847798624756
+    y: -20.043979767887858
+  }
+  polygon_point {
+    x: 10.792226749478269
+    y: -18.963375156151582
+  }
+  polygon_point {
+    x: 8.09071522013757
+    y: -14.756020232112096
+  }
+  polygon_point {
+    x: 6.4077732505217764
+    y: -15.836624843848377
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1031
+  position {
+    x: 63
+    y: -23.999999999999972
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: -0.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 63.509284779862455
+    y: -26.643979767887853
+  }
+  polygon_point {
+    x: 65.192226749478252
+    y: -25.563375156151576
+  }
+  polygon_point {
+    x: 62.490715220137552
+    y: -21.35602023211209
+  }
+  polygon_point {
+    x: 60.807773250521755
+    y: -22.436624843848367
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1034
+  position {
+    x: 197.60000000000002
+    y: 25.000000000000028
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 198.10928477986246
+    y: 22.356020232112147
+  }
+  polygon_point {
+    x: 199.79222674947826
+    y: 23.436624843848424
+  }
+  polygon_point {
+    x: 197.09071522013758
+    y: 27.64397976788791
+  }
+  polygon_point {
+    x: 195.40777325052179
+    y: 26.563375156151633
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1037
+  position {
+    x: 29.600000000000023
+    y: 29.200000000000017
+  }
+  theta: -1
+  velocity {
+    x: -13.5
+    y: 0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 30.109284779862477
+    y: 26.556020232112136
+  }
+  polygon_point {
+    x: 31.792226749478267
+    y: 27.636624843848413
+  }
+  polygon_point {
+    x: 29.090715220137568
+    y: 31.843979767887898
+  }
+  polygon_point {
+    x: 27.407773250521778
+    y: 30.763375156151621
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1043
+  position {
+    x: 120.80000000000007
+    y: -0.59999999999999432
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 1.5
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 121.30928477986252
+    y: -3.2439797678878755
+  }
+  polygon_point {
+    x: 122.99222674947832
+    y: -2.1633751561515959
+  }
+  polygon_point {
+    x: 120.29071522013761
+    y: 2.0439797678878868
+  }
+  polygon_point {
+    x: 118.60777325052182
+    y: 0.96337515615160729
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1049
+  position {
+    x: 41.800000000000068
+    y: 9.8000000000000114
+  }
+  theta: -1
+  velocity {
+    x: -13.75
+    y: 0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 42.309284779862516
+    y: 7.15602023211213
+  }
+  polygon_point {
+    x: 43.992226749478313
+    y: 8.23662484384841
+  }
+  polygon_point {
+    x: 41.290715220137621
+    y: 12.443979767887893
+  }
+  polygon_point {
+    x: 39.607773250521824
+    y: 11.363375156151612
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+perception_obstacle {
+  id: 1052
+  position {
+    x: 36.200000000000045
+    y: 10.600000000000023
+  }
+  theta: -1
+  velocity {
+    x: -13.5
+    y: 0.25
+  }
+  length: 5
+  width: 2
+  height: 3
+  polygon_point {
+    x: 36.709284779862493
+    y: 7.9560202321121416
+  }
+  polygon_point {
+    x: 38.39222674947829
+    y: 9.036624843848422
+  }
+  polygon_point {
+    x: 35.6907152201376
+    y: 13.243979767887904
+  }
+  polygon_point {
+    x: 34.0077732505218
+    y: 12.163375156151623
+  }
+  type: VEHICLE
+  confidence: 0.01
+}
+header {
+  timestamp_sec: 1520482621.3659558
+  module_name: "third_party_perception"
+  sequence_num: 35441
+}
+lane_marker {
+  left_lane_marker {
+    lane_type: DOTTED_YELLOW
+    quality: 0.75
+    model_degree: 3
+    c0_position: 1.765625
+    c1_heading_angle: -0.01171875
+    c2_curvature: 0.00016308593799999743
+    c3_curvature_derivative: 6.1169266691875042e-06
+    view_range: 31.40234375
+  }
+  right_lane_marker {
+    lane_type: SOLID_YELLOW
+    quality: 0.75
+    model_degree: 3
+    c0_position: -1.30078125
+    c1_heading_angle: -0.01171875
+    c2_curvature: 0.00016308593799999743
+    c3_curvature_derivative: 6.1169266691875042e-06
+    view_range: 58.58984375
+  }
+}

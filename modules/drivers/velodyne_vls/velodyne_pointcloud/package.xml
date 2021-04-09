@@ -1,0 +1,57 @@
+<package>
+
+  <name>velodyne_pointcloud</name>
+  <version>1.3.0</version>
+  <description>
+    Point cloud conversions for Velodyne 3D LIDARs.
+  </description>
+  <maintainer email="jwhitley@autonomoustuff.com">Josh Whitley</maintainer>
+  <author>Jack O'Quin</author>
+  <author>Piyush Khandelwal</author>
+  <author>Jesse Vera</author>
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/velodyne_pointcloud</url>
+  <url type="repository">https://github.com/ros-drivers/velodyne</url>
+  <url type="bugtracker">https://github.com/ros-drivers/velodyne/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>angles</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>velodyne_driver</build_depend>
+  <build_depend>velodyne_msgs</build_depend>
+  <build_depend>yaml-cpp</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+
+  <!-- these build dependencies are only needed for unit testing -->
+  <build_depend>roslaunch</build_depend>
+  <build_depend>rostest</build_depend>
+  <build_depend>tf2_ros</build_depend>
+
+  <run_depend>angles</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>pcl_ros</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>python-yaml</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>velodyne_driver</run_depend>
+  <run_depend>velodyne_msgs</run_depend>
+  <run_depend>yaml-cpp</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>velodyne_laserscan</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelets.xml"/>
+  </export>
+
+</package>

@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODEULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
-#define MODEULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
+#ifndef MODULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
+#define MODULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/common/macro.h"
@@ -31,9 +31,10 @@ class SubnodeHelper {
  public:
   // subnode has a field named reserve
   // when reserve like "source_name:./data;source_param:.fsi"
-  // you can use this func to get the map
-  static bool ParseReserveField(const std::string &reserve,
-                                std::map<std::string, std::string> *result_map);
+  // you can use this func to get the unordered_map
+  static bool ParseReserveField(
+      const std::string &reserve,
+      std::unordered_map<std::string, std::string> *result_map);
 
   // produce key for shared data which is always map
   // key = device_id + stamp * 100
@@ -81,4 +82,4 @@ class FrameSkiper {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODEULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_
+#endif  // MODULES_PERCEPTION_ONBOARD_SUBNODE_HELPER_H_

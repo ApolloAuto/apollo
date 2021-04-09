@@ -27,16 +27,23 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
-#include "modules/common/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
+#include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
@@ -55,13 +62,13 @@ namespace planning {
  */
 class ReferenceLineProvider {
  public:
+  ReferenceLineProvider() = default;
+  explicit ReferenceLineProvider(const hdmap::HDMap* base_map);
+
   /**
    * @brief Default destructor.
    */
   ~ReferenceLineProvider();
-
-  void Init(const hdmap::HDMap* base_map,
-            const QpSplineReferenceLineSmootherConfig& smoother_config);
 
   bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
@@ -77,8 +84,6 @@ class ReferenceLineProvider {
   double LastTimeDelay();
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
-
-  static double LookForwardDistance(const common::VehicleState& state);
 
  private:
   /**
@@ -101,12 +106,8 @@ class ReferenceLineProvider {
   void GenerateThread();
   void IsValidReferenceLine();
   void PrioritzeChangeLane(std::list<hdmap::RouteSegments>* route_segments);
-  bool IsAllowChangeLane(const common::math::Vec2d& point,
-                         const std::list<hdmap::RouteSegments>& route_segments);
 
   bool CreateRouteSegments(const common::VehicleState& vehicle_state,
-                           const double look_forward_distance,
-                           const double look_backward_distance,
                            std::list<hdmap::RouteSegments>* segments);
 
   bool IsReferenceLineSmoothValid(const ReferenceLine& raw,
@@ -136,15 +137,27 @@ class ReferenceLineProvider {
   AnchorPoint GetAnchorPoint(const ReferenceLine& reference_line,
                              double s) const;
 
- private:
-  DECLARE_SINGLETON(ReferenceLineProvider);
+  bool GetReferenceLinesFromRelativeMap(
+      const relative_map::MapMsg& relative_map,
+      std::list<ReferenceLine>* reference_lines,
+      std::list<hdmap::RouteSegments>* segments);
 
+  /**
+   * @brief This function get adc lane info from navigation path and map
+   * by vehicle state.
+   */
+  bool GetNearestWayPointFromNavigationPath(
+      const common::VehicleState& state,
+      const std::unordered_set<std::string>& navigation_lane_ids,
+      hdmap::LaneWaypoint* waypoint);
+
+ private:
   bool is_initialized_ = false;
   bool is_stop_ = false;
   std::unique_ptr<std::thread> thread_;
+
   std::unique_ptr<ReferenceLineSmoother> smoother_;
-  std::unique_ptr<Spline2dSolver> spline_solver_;
-  QpSplineReferenceLineSmootherConfig smoother_config_;
+  ReferenceLineSmootherConfig smoother_config_;
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
@@ -156,20 +169,13 @@ class ReferenceLineProvider {
   routing::RoutingResponse routing_;
   bool has_routing_ = false;
 
-  struct SegmentHistory {
-    double min_l = 0.0;
-    double accumulate_s = 0.0;
-    common::math::Vec2d last_point;
-  };
-
-  std::mutex segment_history_mutex_;
-  std::unordered_map<std::string, SegmentHistory> segment_history_;
-  std::list<std::string> segment_history_id_;
-
   std::mutex reference_lines_mutex_;
   std::list<ReferenceLine> reference_lines_;
   std::list<hdmap::RouteSegments> route_segments_;
   double last_calculation_time_ = 0.0;
+
+  std::queue<std::list<ReferenceLine>> reference_line_history_;
+  std::queue<std::list<hdmap::RouteSegments>> route_segments_history_;
 };
 
 }  // namespace planning

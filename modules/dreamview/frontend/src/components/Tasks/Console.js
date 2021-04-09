@@ -4,11 +4,12 @@ import classNames from "classnames";
 
 import warnIcon from "assets/images/icons/warning.png";
 import errorIcon from "assets/images/icons/error.png";
+import { timestampMsToTime } from "utils/misc";
 
 @observer
 class MonitorItem extends React.Component {
     render() {
-        const { level, text } = this.props;
+        const { level, text, time } = this.props;
 
         const levelClass = (level === "ERROR" || level === "FATAL") ?
                            "alert" : "warn";
@@ -20,6 +21,7 @@ class MonitorItem extends React.Component {
                 <span className={classNames("text", levelClass)}>
                     {text}
                 </span>
+                <span className={classNames("time", levelClass)}>{time}</span>
             </li>
         );
     }
@@ -31,13 +33,14 @@ export default class Console extends React.Component {
         const { monitor } = this.props.store;
 
         return (
-            <div className="card">
+            <div className="card" style={{maxWidth: '50%'}}>
                 <div className="card-header"><span>Console</span></div>
                 <div className="card-content-column">
                     <ul className="console">
                         {monitor.items.map((item, index) => (
-                             <MonitorItem key={index} text={item.msg}
-                                          level={item.logLevel} />
+                            <MonitorItem key={index} text={item.msg}
+                                         level={item.logLevel}
+                                         time={timestampMsToTime(item.timestampMs)} />
                          ))}
                     </ul>
                 </div>

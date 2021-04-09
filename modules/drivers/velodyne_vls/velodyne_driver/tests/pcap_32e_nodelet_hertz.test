@@ -1,0 +1,31 @@
+<!-- -*- mode: XML -*- -->
+<!-- rostest of publishing a PointCloud from 32E PCAP data. -->
+
+<launch>
+
+  <!-- start nodelet manager, driver and pointcloud nodelets -->
+  <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
+    <arg name="model" value="32E"/>
+    <arg name="pcap" value="$(find velodyne_driver)/tests/32e.pcap"/>
+  </include>
+
+  <!-- verify PointCloud publication rate -->
+  <test test-name="pcap_32e_nodelet_hertz_test" pkg="rostest"
+        type="hztest" name="hztest_packets_nodelet_32e" >
+    <param name="hz" value="10.0" />
+    <param name="hzerror" value="3.0" />
+    <param name="test_duration" value="5.0" />    
+    <param name="topic" value="velodyne_packets" />  
+    <param name="wait_time" value="2.0" />  
+  </test>
+
+  <test test-name="nodelet_diagnostics_test"
+        pkg="rostest" type="hztest" name="hztest_diag_nodelet_32e" >
+    <param name="hz" value="1.0" />
+    <param name="hzerror" value="0.5" />
+    <param name="test_duration" value="5.0" />    
+    <param name="topic" value="diagnostics" />  
+    <param name="wait_time" value="2.0" />  
+  </test>
+
+</launch>

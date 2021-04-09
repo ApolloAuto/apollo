@@ -41,7 +41,6 @@ TEST_F(LincolnVehicleFactoryTest, InitVehicleController) {
 }
 
 TEST_F(LincolnVehicleFactoryTest, InitMessageManager) {
-  LincolnVehicleFactory lincoln_factory;
   EXPECT_TRUE(lincoln_factory_.CreateMessageManager() != nullptr);
 }
 

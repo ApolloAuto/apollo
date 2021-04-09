@@ -27,7 +27,9 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::Point;
 
 void PoseContainer::Insert(const ::google::protobuf::Message& message) {
-  Update(dynamic_cast<const LocalizationEstimate&>(message));
+  localization::LocalizationEstimate localization;
+  localization.CopyFrom(dynamic_cast<const LocalizationEstimate&>(message));
+  Update(localization);
 }
 
 void PoseContainer::Update(
@@ -51,6 +53,8 @@ void PoseContainer::Update(
   if (obstacle_ptr_.get() == nullptr) {
     obstacle_ptr_.reset(new PerceptionObstacle());
   }
+  obstacle_ptr_->Clear();
+
   obstacle_ptr_->set_id(ID);
   Point position;
   position.set_x(localization.pose().position().x());
@@ -68,7 +72,7 @@ void PoseContainer::Update(
     double qx = localization.pose().orientation().qx();
     double qy = localization.pose().orientation().qy();
     double qz = localization.pose().orientation().qz();
-    theta = ::apollo::common::math::QuaternionToHeading(qw, qx, qy, qz);
+    theta = common::math::QuaternionToHeading(qw, qx, qy, qz);
   }
   obstacle_ptr_->set_theta(theta);
 
@@ -94,6 +98,20 @@ double PoseContainer::GetTimestamp() {
 
 PerceptionObstacle* PoseContainer::ToPerceptionObstacle() {
   return obstacle_ptr_.get();
+}
+
+double PoseContainer::GetSpeed() const {
+  double velocity_x = obstacle_ptr_->velocity().x();
+  double velocity_y = obstacle_ptr_->velocity().y();
+  return std::hypot(velocity_x, velocity_y);
+}
+
+double PoseContainer::GetTheta() const {
+  return obstacle_ptr_->theta();
+}
+
+Point PoseContainer::GetPosition() const {
+  return obstacle_ptr_->position();
 }
 
 }  // namespace prediction

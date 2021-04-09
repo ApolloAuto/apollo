@@ -71,6 +71,7 @@ message Lane {
     BIKING = 3;
     SIDEWALK = 4;
     PARKING = 5;
+    SHOULDER = 6;
   };
   optional LaneType type = 12;
 
@@ -97,5 +98,9 @@ message Lane {
     BIDIRECTION = 3;
   }
   optional LaneDirection direction = 19;
+
+  // Association between central point to closest road boundary.
+  repeated LaneSampleAssociation left_road_sample = 20;
+  repeated LaneSampleAssociation right_road_sample = 21;
 }
 

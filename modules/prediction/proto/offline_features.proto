@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/prediction/proto/feature.proto";
+
+message Features {
+	repeated Feature feature = 1;
+}

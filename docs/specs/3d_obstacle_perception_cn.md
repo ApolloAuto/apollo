@@ -157,7 +157,7 @@ Apollo 使用深度卷积神经网络提高障碍物识别与分割的精度，�
  |feature_param {height}             |2D网格的Y轴上的单元格数。                     |512        |
  |feature_param {range}              |2D格栅相对于原点（LiDAR传感器）的范围。             |60 meters  |
 
-
+**注意：提供的模型是一个样例，仅限于实验所用。**
 
 MinBox 障碍物边框构建
 --------------

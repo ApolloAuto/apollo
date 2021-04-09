@@ -24,41 +24,45 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/base/timer.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
+#include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/obstacle/lidar/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/obstacle/lidar/tracker/hm_tracker/hm_tracker.h"
-#include "modules/perception/obstacle/lidar/type_fuser/sequence_type_fuser/sequence_type_fuser.h"
 
 namespace apollo {
 namespace perception {
 
 using apollo::common::adapter::AdapterManager;
+using Eigen::Affine3d;
+using Eigen::Matrix4d;
 using pcl_util::Point;
-using pcl_util::PointD;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
+using pcl_util::PointD;
 using pcl_util::PointIndices;
 using pcl_util::PointIndicesPtr;
-using Eigen::Matrix4d;
-using Eigen::Affine3d;
 
 bool LidarProcess::Init() {
+  AERROR << "I";
   if (inited_) {
+    AERROR << "Init() function has been called.";
     return true;
   }
 
   RegistAllAlgorithm();
 
+  AERROR << "II";
   if (!InitFrameDependence()) {
     AERROR << "failed to Init frame dependence.";
     return false;
   }
 
+  AERROR << "III";
   if (!InitAlgorithmPlugin()) {
     AERROR << "failed to Init algorithm plugin.";
     return false;
@@ -135,7 +139,7 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
   PERF_BLOCK_END("lidar_roi_filter");
 
   /// call segmentor
-  std::vector<ObjectPtr> objects;
+  std::vector<std::shared_ptr<Object>> objects;
   if (segmentor_ != nullptr) {
     SegmentationOptions segmentation_options;
     segmentation_options.origin_cloud = point_cloud;
@@ -154,6 +158,23 @@ bool LidarProcess::Process(const double timestamp, PointCloudPtr point_cloud,
   }
   ADEBUG << "call segmentation succ. The num of objects is: " << objects.size();
   PERF_BLOCK_END("lidar_segmentation");
+
+  /// call object filter
+  if (object_filter_ != nullptr) {
+    ObjectFilterOptions object_filter_options;
+    object_filter_options.velodyne_trans.reset(new Eigen::Matrix4d);
+    object_filter_options.velodyne_trans = velodyne_trans;
+    // object_filter_options.hdmap_struct_ptr = hdmap;
+
+    if (!object_filter_->Filter(object_filter_options, &objects)) {
+      AERROR << "failed to call object filter.";
+      error_code_ = common::PERCEPTION_ERROR_PROCESS;
+      return false;
+    }
+  }
+  ADEBUG << "call object filter succ. The num of objects is: "
+         << objects.size();
+  PERF_BLOCK_END("lidar_object_filter");
 
   /// call object builder
   if (object_builder_ != nullptr) {
@@ -203,35 +224,24 @@ void LidarProcess::RegistAllAlgorithm() {
   RegisterFactoryDummyROIFilter();
   RegisterFactoryDummySegmentation();
   RegisterFactoryDummyObjectBuilder();
+  RegisterFactoryDummyObjectFilter();
   RegisterFactoryDummyTracker();
   RegisterFactoryDummyTypeFuser();
 
   RegisterFactoryHdmapROIFilter();
   RegisterFactoryCNNSegmentation();
   RegisterFactoryMinBoxObjectBuilder();
+  RegisterFactoryLowObjectFilter();
   RegisterFactoryHmObjectTracker();
   RegisterFactorySequenceTypeFuser();
 }
 
 bool LidarProcess::InitFrameDependence() {
-  /// init config manager
-  ConfigManager* config_manager = ConfigManager::instance();
-  if (!config_manager->Init()) {
-    AERROR << "failed to Init ConfigManager";
-    return false;
-  }
-  AINFO << "Init config manager successfully, work_root: "
-        << config_manager->work_root();
-
   /// init hdmap
   if (FLAGS_enable_hdmap_input) {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "failed to get HDMapInput instance.";
-      return false;
-    }
-    if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
       return false;
     }
     AINFO << "get and Init hdmap_input succ.";
@@ -286,6 +296,20 @@ bool LidarProcess::InitAlgorithmPlugin() {
   AINFO << "Init algorithm plugin successfully, object builder: "
         << object_builder_->name();
 
+  /// init pre object filter
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
+      FLAGS_onboard_object_filter));
+  if (!object_filter_) {
+    AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
+    return false;
+  }
+  if (!object_filter_->Init()) {
+    AERROR << "Failed to Init object filter: " << object_filter_->name();
+    return false;
+  }
+  AINFO << "Init algorithm plugin successfully, object filter: "
+        << object_filter_->name();
+
   /// init tracker
   tracker_.reset(
       BaseTrackerRegisterer::GetInstanceByName(FLAGS_onboard_tracker));
@@ -333,12 +357,13 @@ void LidarProcess::TransPointCloudToPCL(const sensor_msgs::PointCloud2& in_msg,
   size_t points_num = 0;
   for (size_t idx = 0; idx < in_cloud.size(); ++idx) {
     pcl_util::PointXYZIT& pt = in_cloud.points[idx];
-    if (!isnan(pt.x) && !isnan(pt.y) && !isnan(pt.z) && !isnan(pt.intensity)) {
+    if (!std::isnan(pt.x) && !std::isnan(pt.y) && !std::isnan(pt.z) &&
+        !std::isnan(pt.intensity)) {
       cloud->points[points_num].x = pt.x;
       cloud->points[points_num].y = pt.y;
       cloud->points[points_num].z = pt.z;
       cloud->points[points_num].intensity = pt.intensity;
-      points_num++;
+      ++points_num;
     }
   }
   cloud->points.resize(points_num);

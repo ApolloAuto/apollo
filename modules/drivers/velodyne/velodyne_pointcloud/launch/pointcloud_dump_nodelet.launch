@@ -2,8 +2,10 @@
   <arg name="save_folder" default="$(find velodyne_pointcloud)/tests/velodyne_test_msg_files" />
   <arg name="topic_name" default="/apollo/sensor/velodyne64/PointCloud2" />
   <arg name="file_prefix" default="64e_out_msg_" />
+  <arg name="nodelet_manager_name" default="velodyne_nodelet_manager" />
+
   <node pkg="nodelet" type="nodelet" name="pointcloud_dump_nodelet"
-        args="load velodyne_pointcloud/PointCloudDumpNodelet velodyne_nodelet_manager">
+        args="load velodyne_pointcloud/PointCloudDumpNodelet $(arg nodelet_manager_name)">
     <param name="save_folder" value="$(arg save_folder)"/>
     <param name="topic_name" value="$(arg topic_name)"/>
     <param name="file_prefix" value="$(arg file_prefix)"/>

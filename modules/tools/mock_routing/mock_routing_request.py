@@ -44,19 +44,17 @@ def main():
     routing_request.header.sequence_num = sequence_num
     sequence_num = sequence_num + 1
 
-    start_point = routing_request.start
-    end_point = routing_request.end
+    waypoint = routing_request.waypoint.add()
+    waypoint.pose.x = 587696.82286
+    waypoint.pose.y = 4141446.66696
+    waypoint.id = '1-1'
+    waypoint.s = 1
 
-    """
-    start_point.id = '94_1_0'
-    start_point.s = 53
-    end_point.id = '94_1_0'
-    end_point.s = 50
-    """
-    start_point.id = '1_-1'
-    start_point.s = 1
-    end_point.id = '1_-1'
-    end_point.s = 80
+    waypoint = routing_request.waypoint.add()
+    waypoint.pose.x = 586948.740120
+    waypoint.pose.y = 4141171.118641
+    waypoint.id = '1-1'
+    waypoint.s = 80
 
     request_publisher = rospy.Publisher(
             '/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=1)

@@ -58,7 +58,7 @@ TEST(RTKReplayPlannerTest, ComputeTrajectory) {
   state.set_y(point.y());
   state.set_z(point.z());
   ReferenceLineInfo info(state, start_point, ref, segments);
-  auto status = planner.Plan(start_point, nullptr, &info);
+  auto status = planner.PlanOnReferenceLine(start_point, nullptr, &info);
 
   const auto& trajectory = info.trajectory();
   EXPECT_TRUE(status.ok());
@@ -106,7 +106,9 @@ TEST(RTKReplayPlannerTest, ErrorTest) {
   state.set_y(point.y());
   state.set_z(point.z());
   ReferenceLineInfo info(state, start_point, ref, segments);
-  EXPECT_TRUE(!(planner_with_error_csv.Plan(start_point, nullptr, &info)).ok());
+  EXPECT_TRUE(
+      !(planner_with_error_csv.PlanOnReferenceLine(start_point, nullptr, &info))
+           .ok());
 }
 
 }  // namespace planning

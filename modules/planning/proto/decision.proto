@@ -18,17 +18,21 @@ message ObjectIgnore {
 }
 
 enum StopReasonCode {
-  STOP_REASON_UNKNOWN = 0;
   STOP_REASON_HEAD_VEHICLE = 1;
   STOP_REASON_DESTINATION = 2;
   STOP_REASON_PEDESTRIAN = 3;
   STOP_REASON_OBSTACLE = 4;
   STOP_REASON_PREPARKING = 5;
-  STOP_REASON_SIGNAL = 100;
+  STOP_REASON_SIGNAL = 100; // only for red signal
   STOP_REASON_STOP_SIGN = 101;
   STOP_REASON_YIELD_SIGN = 102;
   STOP_REASON_CLEAR_ZONE = 103;
   STOP_REASON_CROSSWALK = 104;
+  STOP_REASON_CREEPER = 105;
+  STOP_REASON_REFERENCE_END = 106; // end of the reference_line
+  STOP_REASON_YELLOW_SIGNAL = 107; // yellow signal
+  STOP_REASON_PULL_OVER = 108; // pull over
+
 }
 
 message ObjectStop {
@@ -38,6 +42,7 @@ message ObjectStop {
   optional apollo.common.PointENU stop_point =3;
   // When stopped, the heading of the vehicle should be stop_heading.
   optional double stop_heading = 4;
+  repeated string wait_for_obstacle = 5;
 }
 
 // dodge the obstacle in lateral direction when driving
@@ -74,6 +79,11 @@ message ObjectOvertake {
 }
 
 message ObjectSidePass {
+  enum Type {
+    LEFT = 1;
+    RIGHT = 2;
+  };
+  optional Type type = 1;
 }
 
 // unified object decision while estop

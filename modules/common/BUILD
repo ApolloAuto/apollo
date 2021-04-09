@@ -24,7 +24,7 @@ cc_library(
         "log.h",
     ],
     deps = [
-        "@glog//:glog",
+        "@glog",
     ],
 )
 

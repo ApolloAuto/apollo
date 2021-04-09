@@ -16,10 +16,11 @@
 
 #include "driver.h"
 
-#include <ros/ros.h>
-#include <time.h>
 #include <cmath>
+#include <ctime>
 #include <string>
+
+#include "ros/ros.h"
 
 namespace apollo {
 namespace drivers {
@@ -27,7 +28,7 @@ namespace velodyne {
 
 VelodyneDriver::VelodyneDriver() : basetime_(0), last_gps_time_(0) {}
 
-void VelodyneDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
+void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
                                                   uint64_t& basetime) {
   tm time;
   time.tm_year = nmea_time->year + (2000 - 1900);
@@ -48,15 +49,16 @@ void VelodyneDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
 
 bool VelodyneDriver::set_base_time() {
   NMEATimePtr nmea_time(new NMEATime);
-  while (true) {
-    int rc = input_->get_positioning_data_packtet(nmea_time);
+
+  do {
+    int rc = input_->get_positioning_data_packet(nmea_time);
     if (rc == 0) {
       break;  // got a full packet
     }
     if (rc < 0) {
       return false;  // end of file reached
     }
-  }
+  } while (true);
 
   set_base_time_from_nmea_time(nmea_time, basetime_);
   input_->init(config_.firing_data_port);
@@ -64,24 +66,21 @@ bool VelodyneDriver::set_base_time() {
 }
 
 int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
-  // Since the velodyne delivers data at a very high rate, keep
-  // reading and publishing scans as fast as possible.
+  // Since the velodyne delivers data at a very high rate, keep reading and
+  // publishing scans as fast as possible.
   scan->packets.resize(config_.npackets);
   for (int i = 0; i < config_.npackets; ++i) {
-    while (true) {
+    do {
       // keep reading until full packet received
       int rc = input_->get_firing_data_packet(&scan->packets[i]);
 
       if (rc == 0) {
         break;  // got a full packet?
-      }
-
-      if (rc < 0) {
+      } else if (rc < 0) {
         return rc;
       }
-    }
+    } while (true);
   }
-
   return 0;
 }
 
@@ -97,8 +96,8 @@ void VelodyneDriver::update_gps_top_hour(uint32_t current_time) {
                       << config_.model << std::fixed << ". current:"
                       << current_time << ", last time:" << last_gps_time_);
     } else {
-      ROS_WARN_STREAM("Currrnt stamp:" << std::fixed << current_time
-                                       << " less than previous statmp:"
+      ROS_WARN_STREAM("Current stamp:" << std::fixed << current_time
+                                       << " less than previous stamp:"
                                        << last_gps_time_
                                        << ". GPS time stamp maybe incorrect!");
     }
@@ -118,16 +117,32 @@ VelodyneDriver* VelodyneDriverFactory::create_driver(
   private_nh.param("positioning_data_port", config.positioning_data_port,
                    POSITIONING_DATA_PORT);
   private_nh.param("rpm", config.rpm, 600.0);
+  private_nh.param("prefix_angle", config.prefix_angle, 18000);
+
+  if (config.prefix_angle > 35900 || config.prefix_angle < 100) {
+    ROS_WARN_STREAM(
+        "invalid prefix angle, prefix_angle must be between 100 and 35900");
+    if (config.prefix_angle > 35900) {
+      config.prefix_angle = 35900;
+    } else if (config.prefix_angle < 100) {
+      config.prefix_angle = 100;
+    }
+  }
+
+  private_nh.param("use_sensor_sync", config.use_sensor_sync);
 
   if (config.model == "64E_S2" || config.model == "64E_S3S" ||
       config.model == "64E_S3D_STRONGEST" || config.model == "64E_S3D_LAST" ||
       config.model == "64E_S3D_DUAL") {
     return new Velodyne64Driver(config);
+  } else if (config.model == "HDL32E") {
+    return new Velodyne32Driver(config);
   } else if (config.model == "VLP16") {
     return new Velodyne16Driver(config);
   } else {
-    ROS_ERROR_STREAM("invalid model, must be 64E_S2|64E_S3S"
-                     << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16");
+    ROS_ERROR_STREAM(
+        "invalid model, must be 64E_S2|64E_S3S"
+        << "|64E_S3D_STRONGEST|64E_S3D_LAST|64E_S3D_DUAL|VLP16|HDL32E");
     return nullptr;
   }
 }

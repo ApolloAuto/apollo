@@ -17,7 +17,7 @@
 | ![info](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果。 |
 | ![tip](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于完成任务的快捷方式。 |
 | ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息。 |
-| ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，或者执行某个任务或步骤时，您将面临风险。 |
+| ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，否则执行某个任务或步骤时，您将面临风险。 |
 
 ## 引言
 阿波罗计划是为汽车和自主驾驶行业的合作伙伴提供开放，完整和可靠的软件平台。该项目的目的是使合作伙伴能够基于Apollo软件堆栈开发自己的自动驾驶系统。
@@ -342,7 +342,7 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 
 2. 开始安装
 ```
-sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s
+sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s --no-kernel-module
 ```
 
 ##### 可选项: 测试ESD CAN硬件节点
@@ -555,7 +555,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
       [http://www.compuphase.com/software_termite.htm](http://www.compuphase.com/software_termite.htm)
 
    5. HDL-64E S3和笔记本电脑之间的COM端口连接
-      ![Serial cable connected to laptop.png](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Serial cable connected to laptop.png)
+      ![Serial cable connected to laptop.png](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Serial_cable_connected_to_laptop.png)
 
    6. 在笔记本运行 **Termite 3.2**
 
@@ -700,7 +700,7 @@ SETIMUTOANTOFFSET -0.05 0.5 0.8 0.05 0.05 0.08
 
 ### 建立网络
 本节提供了一种建立网络的建议。
-运行阿波罗软件的IPC必须访问互联网获取实时运动学（RTK）数据，以便精确定位。移动设备还需要连接到IPC来运行阿波罗软件。
+运行Apollo软件的IPC必须访问互联网获取实时运动学（RTK）数据，以便精确定位。移动设备还需要连接到IPC来运行Apollo软件。
 
 #### 推荐配置
 建议您根据下图设置网络：

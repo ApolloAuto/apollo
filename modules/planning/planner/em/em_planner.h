@@ -28,10 +28,11 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
-#include "modules/planning/tasks/task.h"
+#include "modules/planning/toolkits/optimizers/task.h"
 
 /**
  * @namespace apollo::planning
@@ -45,7 +46,7 @@ namespace planning {
  * @brief EMPlanner is an expectation maximization planner.
  */
 
-class EMPlanner : public Planner {
+class EMPlanner : public PlannerWithReferenceLine {
  public:
   /**
    * @brief Constructor
@@ -57,39 +58,19 @@ class EMPlanner : public Planner {
    */
   virtual ~EMPlanner() = default;
 
+  std::string Name() override { return "EM"; }
+
   common::Status Init(const PlanningConfig& config) override;
 
   /**
-   * @brief Overrode function Plan in parent class Planner.
+   * @brief Override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.
    * @param frame Current planning frame.
-   * @param reference_line_info The computed reference line.
    * @return OK if planning succeeds; error otherwise.
    */
-  common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame,
-                      ReferenceLineInfo* reference_line_info) override;
-
- private:
-  void RegisterTasks();
-
-  std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
+  apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
-      const ReferenceLineInfo* reference_line_info);
-
-  std::vector<common::SpeedPoint> DummyHotStart(
-      const common::TrajectoryPoint& planning_init_point);
-
-  std::vector<common::SpeedPoint> GenerateSpeedHotStart(
-      const common::TrajectoryPoint& planning_init_point);
-
-  void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
-
-  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
-                       const std::string& name, const double time_diff_ms);
-
-  apollo::common::util::Factory<TaskType, Task> task_factory_;
-  std::vector<std::unique_ptr<Task>> tasks_;
+      Frame* frame) override;
 };
 
 }  // namespace planning

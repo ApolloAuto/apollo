@@ -25,9 +25,9 @@ message Pose {
   // The VRP is the center of rear axle.
   optional apollo.common.PointENU position = 1;
 
-  // A quaternion that represents the rotation from the map coordinate
-  // (East/North/Up) to the
-  // vehicle coordinate (Right/Forward/Up).
+  // A quaternion that represents the rotation from the IMU coordinate
+  // (Right/Forward/Up) to the
+  // world coordinate (East/North/Up).
   optional apollo.common.Quaternion orientation = 2;
 
   // Linear velocity of the VRP in the map reference frame.
@@ -42,19 +42,23 @@ message Pose {
   // Around east/north/up axes in radians per second.
   optional apollo.common.Point3D angular_velocity = 5;
 
-  // heading
+  // Heading
+  // The heading is zero when the car is facing East and positive when facing North.
   optional double heading = 6;
 
   // Linear acceleration of the VRP in the vehicle reference frame.
   // Right/forward/up in meters per square second.
   optional apollo.common.Point3D linear_acceleration_vrf = 7;
 
-  // Angular velocity of the vehicle in the vehicle reference frame.
+  // Angular velocity of the VRP in the vehicle reference frame.
   // Around right/forward/up axes in radians per second.
   optional apollo.common.Point3D angular_velocity_vrf = 8;
 
-  // Roll/pitch/yaw that represents a rotation of the intrinsic sequence z-y-x.
-
-  // Roll/pitch/yaw in radians.
+  // Roll/pitch/yaw that represents a rotation with intrinsic sequence z-x-y.
+  // in world coordinate (East/North/Up)
+  // The roll, in (-pi/2, pi/2), corresponds to a rotation around the y-axis.
+  // The pitch, in [-pi, pi), corresponds to a rotation around the x-axis.
+  // The yaw, in [-pi, pi), corresponds to a rotation around the z-axis.
+  // The direction of rotation follows the right-hand rule.
   optional apollo.common.Point3D euler_angles = 9;
 }

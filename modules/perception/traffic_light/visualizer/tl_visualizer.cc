@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "ros/ros.h"
-#include "sensor_msgs/Image.h"
-#include "modules/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/log.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/perception/traffic_light/base/image_lights.h"
+#include "ros/ros.h"
+#include "sensor_msgs/Image.h"
 
-using apollo::perception::traffic_light::Image;
-using apollo::perception::traffic_light::CameraId;
 using apollo::perception::TrafficLightDetection;
+using apollo::perception::traffic_light::CameraId;
+using apollo::perception::traffic_light::Image;
 
-std::map<std::string, cv::Scalar> kColorTable = {
+std::unordered_map<std::string, cv::Scalar> kColorTable = {
     {std::string("red_light_box"), cv::Scalar(0, 0, 255)},
     {std::string("green_light_box"), cv::Scalar(0, 255, 0)},
     {std::string("yellow_light_box"), cv::Scalar(0, 255, 255)},
@@ -38,19 +38,21 @@ std::vector<std::shared_ptr<Image>> cached_images;
 const int kMaxCachedImageNum = 100;
 
 void SubDebugCallback(const TrafficLightDetection &);
-void SubLongFocusCallback(const sensor_msgs::ImagePtr &);
-void SubShortFocusCallback(const sensor_msgs::ImagePtr &);
+void SubLongFocusCallback(sensor_msgs::ImagePtr);
+void SubShortFocusCallback(sensor_msgs::ImagePtr);
 
 int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   ros::init(argc, argv, "traffic_light_viz_listener");
   ros::NodeHandle n;
 
   ros::Subscriber sub_tl_debug =
       n.subscribe(FLAGS_traffic_light_detection_topic, 1000, SubDebugCallback);
-  ros::Subscriber sub_tl_image_long = n.subscribe(
-      FLAGS_image_long_topic, 1000, SubLongFocusCallback);
-  ros::Subscriber sub_tl_image_short = n.subscribe(
-      FLAGS_image_short_topic, 1000, SubShortFocusCallback);
+  ros::Subscriber sub_tl_image_long =
+      n.subscribe(FLAGS_image_long_topic, 1000, SubLongFocusCallback);
+  ros::Subscriber sub_tl_image_short =
+      n.subscribe(FLAGS_image_short_topic, 1000, SubShortFocusCallback);
 
   ros::spin();
   return 0;
@@ -98,8 +100,7 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
       cv::Rect cv_projection_box(projection_box.x(), projection_box.y(),
                                  projection_box.width(),
                                  projection_box.height());
-      cv::rectangle(img, cv_projection_box, kColorTable["projection_roi"],
-                    2);
+      cv::rectangle(img, cv_projection_box, kColorTable["projection_roi"], 2);
     }
 
     // rectified roi
@@ -108,17 +109,19 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
       cv::Rect cv_rectified_box(rectified_box.x(), rectified_box.y(),
                                 rectified_box.width(), rectified_box.height());
       cv::Scalar color;
+
+      using apollo::perception::TrafficLight;
       switch (rectified_box.color()) {
-        case apollo::perception::TrafficLight::RED:
+        case TrafficLight::RED:
           color = kColorTable["red_light_box"];
           break;
-        case apollo::perception::TrafficLight::GREEN:
+        case TrafficLight::GREEN:
           color = kColorTable["green_light_box"];
           break;
-        case apollo::perception::TrafficLight::BLACK:
+        case TrafficLight::BLACK:
           color = kColorTable["black_light_box"];
           break;
-        case apollo::perception::TrafficLight::YELLOW:
+        case TrafficLight::YELLOW:
           color = kColorTable["yellow_light_box"];
           break;
         default:
@@ -140,8 +143,8 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
   double distance = tl_debug_msg.distance_to_stop_line();
   if (signals_num > 0) {
     std::string dis2sl_text = cv::format("dis2sl=%lf", distance);
-    cv::putText(img, dis2sl_text, cv::Point(30, pos_y),
-                cv::FONT_HERSHEY_PLAIN, 3.0, CV_RGB(128, 255, 0), 2);
+    cv::putText(img, dis2sl_text, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
+                3.0, CV_RGB(128, 255, 0), 2);
   }
 
   // draw "Signals Num"
@@ -176,8 +179,8 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
   {
     std::string signal_txt =
         "camera id: " +
-            apollo::perception::traffic_light::kCameraIdToStr.at(tl_debug_msg
-                .camera_id());
+        apollo::perception::traffic_light::kCameraIdToStr.at(
+            tl_debug_msg.camera_id());
     cv::putText(img, signal_txt, cv::Point(30, pos_y), cv::FONT_HERSHEY_PLAIN,
                 3.0, CV_RGB(255, 0, 0), 2);
   }
@@ -194,11 +197,10 @@ void SubDebugCallback(const TrafficLightDetection &tl_result) {
   cv::imshow("tl_debug_image", img);
   cv::waitKey(10);
 }
-void SubImage(CameraId camera_id,
-              const sensor_msgs::ImagePtr &msg) {
-  std::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
+void SubImage(CameraId camera_id, sensor_msgs::ImagePtr msg) {
+  boost::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
   *img = *msg;
-  std::shared_ptr<const sensor_msgs::Image> img_msg(img);
+  boost::shared_ptr<const sensor_msgs::Image> img_msg(img);
   std::shared_ptr<Image> image(new Image);
   if (!image->Init(img_msg->header.stamp.toSec(), camera_id, img_msg)) {
     std::cerr << "tl_visualizer load image failed.";
@@ -209,12 +211,10 @@ void SubImage(CameraId camera_id,
     cached_images.erase(cached_images.begin());
   }
 }
-void SubLongFocusCallback(const sensor_msgs::ImagePtr &msg) {
+void SubLongFocusCallback(sensor_msgs::ImagePtr msg) {
   SubImage(CameraId::LONG_FOCUS, msg);
 }
 
-void SubShortFocusCallback(const sensor_msgs::ImagePtr &msg) {
+void SubShortFocusCallback(sensor_msgs::ImagePtr msg) {
   SubImage(CameraId::SHORT_FOCUS, msg);
 }
-
-

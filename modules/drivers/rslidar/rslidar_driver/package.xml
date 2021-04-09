@@ -1,0 +1,30 @@
+<package>
+
+  <name>rslidar_driver</name>
+  <version>1.0.0</version>
+  <description>
+    ROS device driver for Robosense LiDAR.
+  </description>
+  <maintainer email="tony.zhang@robosense.cn">Tony Zhang</maintainer>
+  <license>Licensed under the Apache License, Version 2.0 </license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rslidar_msgs</build_depend>
+
+  <!-- these build dependencies are only needed for unit testing -->
+  <build_depend>roslaunch</build_depend>
+  <build_depend>rostest</build_depend>
+
+  <run_depend>nodelet</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rslidar_msgs</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_rslidar.xml"/>
+  </export>
+
+</package>

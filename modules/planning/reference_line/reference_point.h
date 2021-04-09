@@ -36,16 +36,12 @@ class ReferencePoint : public hdmap::MapPathPoint {
   ReferencePoint() = default;
 
   ReferencePoint(const MapPathPoint& map_path_point, const double kappa,
-                 const double dkappa, const double lower_bound,
-                 const double upper_bound);
+                 const double dkappa);
 
   common::PathPoint ToPathPoint(double s) const;
 
   double kappa() const;
   double dkappa() const;
-
-  double lower_bound() const;
-  double upper_bound() const;
 
   std::string DebugString() const;
 
@@ -54,9 +50,6 @@ class ReferencePoint : public hdmap::MapPathPoint {
  private:
   double kappa_ = 0.0;
   double dkappa_ = 0.0;
-  // boundary relative to the reference point
-  double lower_bound_ = 0.0;
-  double upper_bound_ = 0.0;
 };
 
 }  // namespace planning

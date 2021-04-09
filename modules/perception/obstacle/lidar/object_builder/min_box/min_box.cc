@@ -17,11 +17,10 @@
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 
 #include <limits>
-#include <vector>
 
-#include "modules/perception/lib/pcl_util/pcl_types.h"
-#include "modules/perception/obstacle/common/convex_hullxy.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
+#include "modules/perception/common/convex_hullxy.h"
+#include "modules/perception/common/geometry_util.h"
+#include "modules/perception/common/pcl_types.h"
 
 namespace apollo {
 namespace perception {
@@ -32,8 +31,8 @@ using pcl_util::PointCloudPtr;
 const float EPSILON = 1e-6;
 
 bool MinBoxObjectBuilder::Build(const ObjectBuilderOptions& options,
-                                std::vector<ObjectPtr>* objects) {
-  if (objects == NULL) {
+                                std::vector<std::shared_ptr<Object>>* objects) {
+  if (objects == nullptr) {
     return false;
   }
 
@@ -48,7 +47,7 @@ bool MinBoxObjectBuilder::Build(const ObjectBuilderOptions& options,
 }
 
 double MinBoxObjectBuilder::ComputeAreaAlongOneEdge(
-    ObjectPtr obj, size_t first_in_point, Eigen::Vector3d* center,
+    std::shared_ptr<Object> obj, size_t first_in_point, Eigen::Vector3d* center,
     double* lenth, double* width, Eigen::Vector3d* dir) {
   std::vector<Eigen::Vector3d> ns;
   Eigen::Vector3d v(0.0, 0.0, 0.0);
@@ -128,7 +127,7 @@ double MinBoxObjectBuilder::ComputeAreaAlongOneEdge(
 }
 
 void MinBoxObjectBuilder::ReconstructPolygon(const Eigen::Vector3d& ref_ct,
-                                             ObjectPtr obj) {
+                                             std::shared_ptr<Object> obj) {
   if (obj->polygon.points.size() <= 0) {
     return;
   }
@@ -309,7 +308,7 @@ void MinBoxObjectBuilder::ReconstructPolygon(const Eigen::Vector3d& ref_ct,
   obj->direction.normalize();
 }
 
-void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
+void MinBoxObjectBuilder::ComputePolygon2dxy(std::shared_ptr<Object> obj) {
   Eigen::Vector4f min_pt;
   Eigen::Vector4f max_pt;
   pcl_util::PointCloudPtr cloud = obj->cloud;
@@ -322,10 +321,10 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
   const double min_eps = 10 * std::numeric_limits<double>::epsilon();
   // double min_eps = 0.1;
   // if ((max_pt[0] - min_pt[0]) < min_eps) {
-  //     _cloud->points[0].x += min_eps;
+  //     cloud_->points[0].x += min_eps;
   // }
   // if ((max_pt[1] - min_pt[1]) < min_eps) {
-  //     _cloud->points[0].y += min_eps;
+  //     cloud_->points[0].y += min_eps;
   // }
   const double diff_x = cloud->points[1].x - cloud->points[0].x;
   const double diff_y = cloud->points[1].y - cloud->points[0].y;
@@ -382,13 +381,13 @@ void MinBoxObjectBuilder::ComputePolygon2dxy(ObjectPtr obj) {
 }
 
 void MinBoxObjectBuilder::ComputeGeometricFeature(const Eigen::Vector3d& ref_ct,
-                                                  ObjectPtr obj) {
+                                                  std::shared_ptr<Object> obj) {
   ComputePolygon2dxy(obj);
   ReconstructPolygon(ref_ct, obj);
 }
 
 void MinBoxObjectBuilder::BuildObject(ObjectBuilderOptions options,
-                                      ObjectPtr object) {
+                                      std::shared_ptr<Object> object) {
   ComputeGeometricFeature(options.ref_center, object);
 }
 

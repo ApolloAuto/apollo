@@ -26,8 +26,10 @@
 #include <queue>
 #include <string>
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
+#include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -52,19 +54,24 @@ class ThirdPartyPerception : public apollo::common::ApolloApp {
  private:
   // Upon receiving mobileye data
   void OnMobileye(const apollo::drivers::Mobileye& message);
-  // Upon receiving radar data
+  // Upon receiving esr radar data
   void OnDelphiESR(const apollo::drivers::DelphiESR& message);
+  // Upon receiving conti radar data
+  void OnContiRadar(const apollo::drivers::ContiRadar& message);
   // Upon receiving localization data
   void OnLocalization(
       const apollo::localization::LocalizationEstimate& message);
+  // Upont receiving chassis data
+  void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
   void OnTimer(const ros::TimerEvent&);
 
   ros::Timer timer_;
   std::mutex third_party_perception_mutex_;
   apollo::perception::PerceptionObstacles mobileye_obstacles_;
-  apollo::perception::PerceptionObstacles delphi_esr_obstacles_;
+  apollo::perception::PerceptionObstacles radar_obstacles_;
   apollo::localization::LocalizationEstimate localization_;
+  apollo::canbus::Chassis chassis_;
   RadarObstacles current_radar_obstacles_;
   RadarObstacles last_radar_obstacles_;
 };

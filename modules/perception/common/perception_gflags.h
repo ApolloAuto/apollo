@@ -18,12 +18,8 @@
 #define MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
 
 #include "gflags/gflags.h"
-
+#include "modules/common/configs/config_gflags.h"
 DECLARE_string(perception_adapter_config_filename);
-
-/// lib/config_manager/config_manager.cc
-DECLARE_string(config_manager_path);
-DECLARE_string(work_root);
 
 /// obstacle/base/object.cc
 DECLARE_bool(is_serialize_point_cloud);
@@ -37,11 +33,14 @@ DECLARE_bool(enable_hdmap_input);
 DECLARE_string(onboard_roi_filter);
 DECLARE_string(onboard_segmentor);
 DECLARE_string(onboard_object_builder);
+DECLARE_string(onboard_object_filter);
 DECLARE_string(onboard_tracker);
 DECLARE_string(onboard_type_fuser);
 DECLARE_int32(tf2_buff_in_ms);
 DECLARE_string(lidar_tf2_frame_id);
 DECLARE_string(lidar_tf2_child_frame_id);
+DECLARE_string(camera_tf2_frame_id);
+DECLARE_string(camera_tf2_child_frame_id);
 DECLARE_string(obstacle_module_name);
 DECLARE_bool(enable_visualization);
 
@@ -53,6 +52,14 @@ DECLARE_string(radar_tf2_frame_id);
 DECLARE_string(radar_tf2_child_frame_id);
 DECLARE_string(radar_extrinsic_file);
 DECLARE_string(short_camera_extrinsic_file);
+
+/// obstacle/onboard/camera_process_subnode.cc
+DECLARE_string(image_file_path);
+DECLARE_bool(image_file_debug);
+
+/// camera config
+DECLARE_string(front_camera_extrinsics_file);
+DECLARE_string(front_camera_intrinsics_file);
 
 /// obstacle/onboard/fusion_subnode.cc
 DECLARE_string(onboard_fusion);
@@ -71,4 +78,61 @@ DECLARE_double(p_matrix_amplifier);
 DECLARE_double(a_matrix_covariance_coeffcient_1);
 DECLARE_double(a_matrix_covariance_coeffcient_2);
 
-#endif /* MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_ */
+/// calibration_config_manager.cc
+DECLARE_int32(obs_camera_detector_gpu);
+
+// obstacle/onboard/lane_post_processing_subnode.cc
+DECLARE_string(onboard_lane_post_processor);
+
+/// visualization
+DECLARE_bool(show_camera_objects);
+DECLARE_bool(show_radar_objects);
+
+DECLARE_bool(show_fused_objects);
+DECLARE_bool(show_fusion_association);
+DECLARE_bool(capture_screen);
+DECLARE_string(screen_output_dir);
+
+DECLARE_bool(show_camera_objects2d);
+DECLARE_bool(show_camera_parsing);
+DECLARE_string(frame_visualizer);
+
+DECLARE_bool(show_motion);
+
+// async fusion using imf
+DECLARE_bool(async_fusion);
+DECLARE_bool(use_distance_angle_fusion);
+DECLARE_bool(publish_fusion_event);
+DECLARE_bool(bag_mode);
+DECLARE_bool(skip_camera_frame);
+DECLARE_int32(camera_hz);
+DECLARE_string(fusion_publish_sensor_id);
+
+DECLARE_int32(pbf_fusion_assoc_distance_percent);
+DECLARE_double(pbf_distance_speed_cos_diff);
+
+DECLARE_string(cc_lane_post_processor_config_file);
+DECLARE_string(probabilistic_fusion_config_file);
+DECLARE_string(yolo_config_filename);
+DECLARE_string(yolo_camera_detector_config);
+DECLARE_bool(use_whole_lane_line);
+DECLARE_string(modest_radar_detector_config);
+DECLARE_string(tracker_config);
+DECLARE_string(sequence_type_fuser_config);
+DECLARE_string(async_fusion_config);
+DECLARE_string(geometry_camera_converter_config);
+DECLARE_string(cnn_segmentation_config);
+DECLARE_string(hdmap_roi_filter_config);
+DECLARE_string(low_object_filter_config);
+DECLARE_string(traffic_light_multi_camera_projection_config);
+DECLARE_string(traffic_light_recognizer_config);
+DECLARE_string(traffic_light_preprocessor_config);
+DECLARE_string(traffic_light_rectifier_config);
+DECLARE_string(traffic_light_reviser_config);
+DECLARE_string(traffic_light_subnode_config);
+DECLARE_double(light_height_adjust);
+DECLARE_string(traffic_light_rectifier);
+DECLARE_string(traffic_light_recognizer);
+DECLARE_string(traffic_light_reviser);
+
+#endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_

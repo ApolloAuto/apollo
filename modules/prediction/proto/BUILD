@@ -1,6 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "scenario_feature_proto",
+    deps = [
+        ":scenario_feature_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "scenario_feature_proto_lib",
+    srcs = [
+        "scenario_feature.proto",
+    ],
+    deps = [
+        "//modules/map/proto:map_proto_lib",
+    ],
+)
+
+cc_proto_library(
     name = "prediction_conf_proto",
     deps = [
         ":prediction_conf_proto_lib",
@@ -35,6 +52,7 @@ proto_library(
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/common/proto:scenario_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
     ],
 )
@@ -53,6 +71,7 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:common_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
 
@@ -70,7 +89,25 @@ proto_library(
     ],
     deps = [
         "//modules/common/proto:common_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
         "//modules/prediction/proto:lane_graph_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "offline_features_proto",
+    deps = [
+        ":offline_features_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "offline_features_proto_lib",
+    srcs = [
+        "offline_features.proto",
+    ],
+    deps = [
+        "//modules/prediction/proto:feature_proto_lib",
     ],
 )
 

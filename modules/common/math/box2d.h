@@ -23,8 +23,10 @@
 #ifndef MODULES_COMMON_MATH_BOX2D_H_
 #define MODULES_COMMON_MATH_BOX2D_H_
 
+#include <limits>
 #include <string>
 #include <vector>
+
 #include "modules/common/math/aabox2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -50,6 +52,7 @@ namespace math {
  */
 class Box2d {
  public:
+  Box2d() = default;
   /**
    * @brief Constructor which takes the center, heading, length and width.
    * @param center The center of the rectangular bounding box.
@@ -163,6 +166,12 @@ class Box2d {
   void GetAllCorners(std::vector<Vec2d> *const corners) const;
 
   /**
+   * @brief Getter of the corners of the box
+   * @param corners The vector where the corners are listed
+   */
+  std::vector<Vec2d> GetAllCorners() const;
+
+  /**
    * @brief Tests points for membership in the box
    * @param point A point that we wish to test for membership in the box
    * @return True iff the point is contained in the box
@@ -230,10 +239,25 @@ class Box2d {
   void Shift(const Vec2d &shift_vec);
 
   /**
+   * @brief Extend the box longitudinally
+   * @param extension_length the length to extend
+   */
+  void LongitudinalExtend(const double extension_length);
+
+  void LateralExtend(const double extension_length);
+
+  /**
    * @brief Gets a human-readable description of the box
    * @return A debug-string
    */
   std::string DebugString() const;
+
+  void InitCorners();
+
+  double max_x() const { return max_x_; }
+  double min_x() const { return min_x_; }
+  double max_y() const { return max_y_; }
+  double min_y() const { return min_y_; }
 
  private:
   Vec2d center_;
@@ -244,6 +268,13 @@ class Box2d {
   double heading_ = 0.0;
   double cos_heading_ = 1.0;
   double sin_heading_ = 0.0;
+
+  std::vector<Vec2d> corners_;
+
+  double max_x_ = std::numeric_limits<double>::min();
+  double min_x_ = std::numeric_limits<double>::max();
+  double max_y_ = std::numeric_limits<double>::min();
+  double min_y_ = std::numeric_limits<double>::max();
 };
 
 }  // namespace math

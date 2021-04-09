@@ -21,9 +21,7 @@ namespace perception {
 
 PbfSensorMonitor::PbfSensorMonitor() {}
 
-bool PbfSensorMonitor::Init() {
-  return true;
-}
+bool PbfSensorMonitor::Init() { return true; }
 
 void PbfSensorMonitor::Update(const std::string &sensor_id, double capture_time,
                               double detection_time) {

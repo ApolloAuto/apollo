@@ -13,10 +13,14 @@
  *****************************************************************************/
 #include "modules/perception/obstacle/lidar/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 
+#include "modules/common/util/file.h"
+
 namespace apollo {
 namespace perception {
 
-bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
+using apollo::common::util::GetProtoFromFile;
+
+bool HdmapROIFilter::Filter(pcl_util::PointCloudPtr cloud,
                             const ROIFilterOptions& roi_filter_options,
                             pcl_util::PointIndices* roi_indices) {
   if (roi_filter_options.hdmap == nullptr ||
@@ -42,8 +46,7 @@ bool HdmapROIFilter::Filter(const pcl_util::PointCloudPtr& cloud,
 }
 
 bool HdmapROIFilter::FilterWithPolygonMask(
-    const pcl_util::PointCloudPtr& cloud,
-    const std::vector<PolygonType>& map_polygons,
+    pcl_util::PointCloudPtr cloud, const std::vector<PolygonType>& map_polygons,
     pcl_util::PointIndices* roi_indices) {
   // 2. Get Major Direction as X direction and convert map_polygons to raw
   // polygons
@@ -132,8 +135,7 @@ void HdmapROIFilter::MergeRoadBoundariesToPolygons(
 }
 
 void HdmapROIFilter::MergeHdmapStructToPolygons(
-    const HdmapStructConstPtr& hdmap_struct_ptr,
-    std::vector<PolygonDType>* polygons) {
+    HdmapStructConstPtr hdmap_struct_ptr, std::vector<PolygonDType>* polygons) {
   std::vector<PolygonDType> road_polygons;
   MergeRoadBoundariesToPolygons(hdmap_struct_ptr->road_boundary,
                                 &road_polygons);
@@ -148,31 +150,19 @@ void HdmapROIFilter::MergeHdmapStructToPolygons(
 }
 
 bool HdmapROIFilter::Init() {
-  // load model config
-  std::string model_name = name();
-  const ModelConfig* model_config = nullptr;
-  if (!ConfigManager::instance()->GetModelConfig(model_name, &model_config)) {
-    AERROR << "Failed to get model: " << model_name;
+  if (!GetProtoFromFile(FLAGS_hdmap_roi_filter_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_hdmap_roi_filter_config;
     return false;
-  } else {
-    if (!model_config->GetValue("range", &range_)) {
-      AERROR << "Can not find range in model: " << model_name;
-      return false;
-    }
-    if (!model_config->GetValue("cell_size", &cell_size_)) {
-      AERROR << "Can not find cell_size in model: " << model_name;
-      return false;
-    }
-    if (!model_config->GetValue("extend_dist", &extend_dist_)) {
-      AERROR << "Can not find extend_dist_ in model: " << model_name;
-      return false;
-    }
   }
+  range_ = config_.range();
+  cell_size_ = config_.cell_size();
+  extend_dist_ = config_.extend_dist();
   return true;
 }
 
 void HdmapROIFilter::TransformFrame(
-    const pcl_util::PointCloudConstPtr& cloud, const Eigen::Affine3d& vel_pose,
+    pcl_util::PointCloudConstPtr cloud, const Eigen::Affine3d& vel_pose,
     const std::vector<PolygonDType>& polygons_world,
     std::vector<PolygonType>* polygons_local,
     pcl_util::PointCloudPtr cloud_local) {

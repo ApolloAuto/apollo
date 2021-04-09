@@ -12,11 +12,12 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_util",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:validation_checker",
         "//modules/prediction/predictor/sequence:sequence_predictor",
         "//modules/prediction/proto:lane_graph_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -31,7 +32,6 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",

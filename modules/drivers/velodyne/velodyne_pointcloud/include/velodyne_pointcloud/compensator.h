@@ -33,26 +33,26 @@ namespace velodyne {
 
 class Compensator {
  public:
-  Compensator(ros::NodeHandle node, ros::NodeHandle private_nh);
-  virtual ~Compensator() {}
+  Compensator(ros::NodeHandle& node, ros::NodeHandle& private_nh);
+  virtual ~Compensator() = default;
 
  private:
   /**
   * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
   * compensator
   */
-  void pointcloud_callback(const sensor_msgs::PointCloud2ConstPtr& msg);
+  void pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg);
   /**
   * @brief get pose affine from tf2 by gps timestamp
   *   novatel-preprocess broadcast the tf2 transfrom.
   */
-  bool query_pose_affine_from_tf2(const double& timestamp,
+  bool query_pose_affine_from_tf2(const double timestamp,
                                   Eigen::Affine3d& pose);
   /**
-  * @brief check if message is valid, check width, height, timesatmp.
+  * @brief check if message is valid, check width, height, timestamp.
   *   set timestamp_offset and point data type
   */
-  bool check_message(const sensor_msgs::PointCloud2ConstPtr& msg);
+  bool check_message(sensor_msgs::PointCloud2ConstPtr msg);
   /**
   * @brief motion compensation for point cloud
   */
@@ -66,14 +66,14 @@ class Compensator {
   * @brief get min timestamp and max timestamp from points in pointcloud2
   */
   inline void get_timestamp_interval(
-      const sensor_msgs::PointCloud2ConstPtr& msg, double& timestamp_min,
+      sensor_msgs::PointCloud2ConstPtr msg, double& timestamp_min,
       double& timestamp_max);
   /**
   * @brief get point field size by sensor_msgs::datatype
   */
   inline uint get_field_size(const int data_type);
 
-  // subsrcibe velodyne pointcloud2 msg.
+  // subscribe velodyne pointcloud2 msg.
   ros::Subscriber pointcloud_sub_;
   // publish point cloud2 after motion compensation
   ros::Publisher compensation_pub_;
@@ -82,11 +82,11 @@ class Compensator {
   tf2_ros::Buffer tf2_buffer_;
   // tf2 transform listener to get transform by gps timestamp.
   tf2_ros::TransformListener tf2_transform_listener_;
-  // transform child frame id(world -> child frame)
+  // transform child frame id(child frame -> world)
   std::string child_frame_id_;
   float tf_timeout_;
 
-  // varibes for point fields value, we get point x,y,z by these offset
+  // variables for point fields value, we get point x,y,z by these offset
   int x_offset_;
   int y_offset_;
   int z_offset_;

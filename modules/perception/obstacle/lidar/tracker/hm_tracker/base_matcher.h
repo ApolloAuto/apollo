@@ -17,6 +17,7 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_MATCHER_H_
 #define MODULES_PERCEPTION_OBSTACLE_LIDAR_TRACKER_HM_TRACKER_BASE_MATCHER_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,29 +30,23 @@
 namespace apollo {
 namespace perception {
 
-enum MatcherType {
-  HUNGARIAN_MATCHER = 0,
-};
-
 class BaseMatcher {
  public:
-  typedef std::pair<int, int> TrackObjectPair;
-
   BaseMatcher() {}
   virtual ~BaseMatcher() {}
 
   // @brief match detected objects to maintained tracks
-  // @params[IN] objects: detected objects
-  // @params[IN] tracks: maintained tracks
-  // @params[IN] tracks_predict: predicted states of maintained tracks
-  // @params[OUT] assignments: matched pair of <track, object>
-  // @params[OUT] unassigned_tracks: unmatched tracks
-  // @params[OUT] unassigned_objects: unmatched objects
+  // @param[IN] objects: detected objects
+  // @param[IN] tracks: maintained tracks
+  // @param[IN] tracks_predict: predicted states of maintained tracks
+  // @param[OUT] assignments: matched pair of <track, object>
+  // @param[OUT] unassigned_tracks: unmatched tracks
+  // @param[OUT] unassigned_objects: unmatched objects
   // @return nothing
-  virtual void Match(std::vector<TrackedObjectPtr>* objects,
+  virtual void Match(std::vector<std::shared_ptr<TrackedObject>>* objects,
                      const std::vector<ObjectTrackPtr>& tracks,
                      const std::vector<Eigen::VectorXf>& tracks_predict,
-                     std::vector<TrackObjectPair>* assignments,
+                     std::vector<std::pair<int, int>>* assignments,
                      std::vector<int>* unassigned_tracks,
                      std::vector<int>* unassigned_objects) = 0;
 

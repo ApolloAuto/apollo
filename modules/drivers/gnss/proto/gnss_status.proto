@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.common.gnss_status;
+package apollo.drivers.gnss_status;
 
 import "modules/common/proto/header.proto";
 

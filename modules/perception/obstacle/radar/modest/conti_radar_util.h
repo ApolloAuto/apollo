@@ -14,32 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
-#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
+#ifndef MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H_
+#define MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H_
 
+#include "modules/perception/common/geometry_util.h"
 #include "modules/perception/obstacle/radar/interface/base_radar_detector.h"
-#include "modules/perception/obstacle/common/geometry_util.h"
 
 namespace apollo {
 namespace perception {
 
 class ContiRadarUtil {
  public:
-  static bool IsFp(const ContiRadarObs &contiobs, const ContiParams &params,
+  static bool IsFp(const ContiRadarObs& contiobs, const ContiParams& params,
                    const int delay_frames, const int tracking_times);
 
   static bool IsConflict(const Eigen::Vector3f& main_velocity,
-          const Eigen::Vector3f& velocity) {
+                         const Eigen::Vector3f& velocity) {
     Eigen::Vector3f vector_temp1 = main_velocity;
     Eigen::Vector3f vector_temp2 = velocity;
     const float velocity_threshold = 1e-1;
-    if (vector_temp1.head(2).norm() > velocity_threshold
-        && vector_temp2.head(2).norm() > velocity_threshold) {
-        double theta = VectorTheta2dXy(vector_temp1, vector_temp2);
-        if ((theta > 1.0 / 4.0 * M_PI && theta < 3.0 / 4.0 * M_PI) ||
-            (theta > -3.0 / 4.0 * M_PI && theta < -1.0 / 4.0 * M_PI)) {
-          return true;
-        }
+    if (vector_temp1.head(2).norm() > velocity_threshold &&
+        vector_temp2.head(2).norm() > velocity_threshold) {
+      double theta = VectorTheta2dXy(vector_temp1, vector_temp2);
+      if ((theta > 1.0 / 4.0 * M_PI && theta < 3.0 / 4.0 * M_PI) ||
+          (theta > -3.0 / 4.0 * M_PI && theta < -1.0 / 4.0 * M_PI)) {
+        return true;
+      }
     }
     return false;
   }
@@ -48,5 +48,4 @@ class ContiRadarUtil {
 }  // namespace perception
 }  // namespace apollo
 
-#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H
-
+#endif  // MODULES_PERCEPTION_OBSTACLE_RADAR_MODEST_CONTI_RADAR_UTIL_H_

@@ -16,9 +16,10 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
-#include <stdio.h>
-#include <boost/filesystem.hpp>
+#include <cstdio>
 #include <fstream>
+
+#include "boost/filesystem.hpp"
 
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
@@ -35,10 +36,9 @@ using apollo::common::util::EnsureDirectory;
 unsigned char color_table[3][3] = {{0, 0, 255}, {0, 255, 0}, {255, 0, 0}};
 
 const char car_img_path[3][1024] = {
-  "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
-  "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
-  "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"
-};
+    "modules/localization/msf/local_tool/local_visualization/img/red_car.png",
+    "modules/localization/msf/local_tool/local_visualization/img/green_car.png",
+    "modules/localization/msf/local_tool/local_visualization/img/blue_car.png"};
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
@@ -90,8 +90,7 @@ VisualizationEngine::VisualizationEngine()
     : map_image_cache_(20),
       image_window_(1024, 1024, CV_8UC3, cv::Scalar(0, 0, 0)),
       big_window_(3072, 3072, CV_8UC3),
-      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {
-}
+      tips_window_(48, 1024, CV_8UC3, cv::Scalar(0, 0, 0)) {}
 
 bool VisualizationEngine::Init(const std::string &map_folder,
                                const std::string &map_visual_folder,
@@ -196,12 +195,22 @@ void VisualizationEngine::Preprocess(const std::string &map_folder,
   std::string image_resolution_path = image_path + buf;
   AINFO << "image_resolution_path: " << image_resolution_path;
 
-  EnsureDirectory(image_visual_path);
-
-  if (DirectoryExists(image_visual_resolution_path_)) {
+  if (!EnsureDirectory(image_visual_path)) {
+    AERROR << "image_visual_path: " << image_visual_path
+           << " cannot be created.";
     return;
   }
-  EnsureDirectory(image_visual_resolution_path_);
+
+  if (DirectoryExists(image_visual_resolution_path_)) {
+    AINFO << "image_visual_resolution_path: " << image_visual_resolution_path_
+          << "already exists.";
+    return;
+  }
+  if (!EnsureDirectory(image_visual_resolution_path_)) {
+    AERROR << "image_visual_resolution_path: " << image_visual_resolution_path_
+           << " cannot be created.";
+    return;
+  }
 
   boost::filesystem::path image_resolution_path_boost(image_resolution_path);
   // push path of map's images to vector
@@ -743,9 +752,9 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
     Eigen::Vector3d pt_global = cur_pose * velodyne_extrinsic * pt;
 
     int col = static_cast<int>((pt_global[0] - cloud_img_lt_coord_[0]) /
-                   map_param_.map_resolutions[resolution_id_]);
+                               map_param_.map_resolutions[resolution_id_]);
     int row = static_cast<int>((pt_global[1] - cloud_img_lt_coord_[1]) /
-                   map_param_.map_resolutions[resolution_id_]);
+                               map_param_.map_resolutions[resolution_id_]);
     if (col < 0 || row < 0 ||
         col >= static_cast<int>(map_param_.map_node_size_x) ||
         row >= static_cast<int>(map_param_.map_node_size_y)) {
@@ -764,7 +773,7 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
                                           MapImageKey *key) {
   key->level = cur_level_;
 
-  assert(resolution_id_ < map_param_.map_resolutions.size());
+  DCHECK_LT(resolution_id_, map_param_.map_resolutions.size());
   key->zone_id = zone_id_;
   int n = static_cast<int>((coord[0] - map_param_.map_min_x) /
                            (map_param_.map_node_size_x *
@@ -784,7 +793,7 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
     key->node_north_id = m;
     key->node_east_id = n;
   } else {
-    assert(0 == 1);  // should never reach here
+    DCHECK(false);  // should never reach here
   }
 
   m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
@@ -870,9 +879,7 @@ void VisualizationEngine::UpdateViewCenter(const double move_x,
   _view_center[1] += move_y;
 }
 
-void VisualizationEngine::SetScale(const double scale) {
-  cur_scale_ = scale;
-}
+void VisualizationEngine::SetScale(const double scale) { cur_scale_ = scale; }
 
 void VisualizationEngine::UpdateScale(const double factor) {
   cur_scale_ *= factor;

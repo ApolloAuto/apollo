@@ -1,16 +1,17 @@
-# How to Add a New Vehicle
+# How to Add a New Vehicle to Apollo
 
 ## Introduction
 The instructions below demonstrate how to add a new vehicle to Apollo.
-
-*Note:*  The Apollo control algorithm is configured for the default vehicle, which is a Lincoln MKZ.
+```
+Note:  The Apollo control algorithm is configured for the default vehicle, which is a Lincoln MKZ.
+```
 
 When adding a new vehicle, if your vehicle requires different attributes from those offered by the Apollo control algorithm, consider:
 
 - Using a different control algorithm that is appropriate for your vehicle.
-- Modifying the existing algorithm parameters to achieve better results.
+- Modifying the existing algorithm's parameters to achieve better results.
 
-## Add a New Vehicle
+## Adding a New Vehicle
 Complete the following task sequence to add a new vehicle:
 
 * Implement the new vehicle controller.

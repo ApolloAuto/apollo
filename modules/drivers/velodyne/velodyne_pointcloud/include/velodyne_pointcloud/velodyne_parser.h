@@ -88,7 +88,7 @@ static const int BLOCK_DATA_SIZE = (SCANS_PER_BLOCK * RAW_SCAN_SIZE);
 static const float ROTATION_RESOLUTION = 0.01f; /**< degrees */
 // static const uint16_t ROTATION_MAX_UNITS = 36000; [>*< hundredths of degrees
 // <]
-// because angle_rang is [0, 36000], so thie size is 36001
+// because angle_rang is [0, 36000], so the size is 36001
 static const uint16_t ROTATION_MAX_UNITS = 36001; /**< hundredths of degrees */
 
 /** According to Bruce Hall DISTANCE_MAX is 65.0, but we noticed
@@ -168,7 +168,7 @@ struct RawPacket {
 };
 
 // Convert related config, get value from private_nh param server, used by
-// velodyne rawdata
+// velodyne raw data
 struct Config {
   double max_range;  ///< maximum range to publish
   double min_range;  ///< minimum range to publish
@@ -205,18 +205,14 @@ class VelodyneParser {
    *           errno value for failure
    */
   virtual void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg) = 0;
   virtual void setup();
   // order point cloud fod IDL by velodyne model
   virtual void order(VPointCloud::Ptr &cloud) = 0;
 
-  const Calibration &get_calibration() {
-    return calibration_;
-  }
-  const double get_last_timestamp() {
-    return last_time_stamp_;
-  }
+  const Calibration &get_calibration() { return calibration_; }
+  const double get_last_timestamp() { return last_time_stamp_; }
 
  protected:
   const float (*inner_time_)[12][32];
@@ -235,12 +231,12 @@ class VelodyneParser {
   /**
    * \brief Compute coords with the data in block
    *
-   * @param tmp A two bytes union store the value of laser distance infomation
+   * @param tmp A two bytes union store the value of laser distance information
    * @param index The index of block
    */
   void compute_coords(const union RawDistance &raw_distance,
                       const LaserCorrection &corrections,
-                      const uint16_t &rotation, VPoint &point);
+                      const uint16_t rotation, VPoint &point);
 
   bool is_scan_valid(int rotation, float distance);
 
@@ -265,7 +261,7 @@ class Velodyne64Parser : public VelodyneParser {
   ~Velodyne64Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
   void setup() override;
@@ -278,7 +274,7 @@ class Velodyne64Parser : public VelodyneParser {
   void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
   void init_offsets();
   int intensity_compensate(const LaserCorrection &corrections,
-                           const uint16_t &raw_distance, int intensity);
+                           const uint16_t raw_distance, int intensity);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_[4];
   uint64_t gps_base_usec_[4];  // full time
@@ -289,13 +285,33 @@ class Velodyne64Parser : public VelodyneParser {
 
 };  // class Velodyne64Parser
 
+class Velodyne32Parser : public VelodyneParser {
+ public:
+  Velodyne32Parser(Config config);
+  ~Velodyne32Parser() {}
+
+  void generate_pointcloud(
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
+      VPointCloud::Ptr &out_msg);
+  void order(VPointCloud::Ptr &cloud);
+
+ private:
+  double get_timestamp(double base_time, float time_offset,
+                       uint16_t laser_block_id);
+  void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
+  // Previous Velodyne packet time stamp. (offset to the top hour)
+  double previous_packet_stamp_;
+  uint64_t gps_base_usec_;  // full time
+
+};  // class Velodyne32Parser
+
 class Velodyne16Parser : public VelodyneParser {
  public:
   Velodyne16Parser(Config config);
   ~Velodyne16Parser() {}
 
   void generate_pointcloud(
-      const velodyne_msgs::VelodyneScanUnified::ConstPtr &scan_msg,
+      velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msg,
       VPointCloud::Ptr &out_msg);
   void order(VPointCloud::Ptr &cloud);
 

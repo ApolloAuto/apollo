@@ -15,7 +15,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

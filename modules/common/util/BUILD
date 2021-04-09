@@ -10,9 +10,13 @@ cc_library(
         "util.cc",
     ],
     hdrs = [
+        "blocking_queue.h",
         "file.h",
         "string_tokenizer.h",
         "util.h",
+    ],
+    linkopts = [
+        "-lboost_filesystem",
     ],
     deps = [
         ":string_util",
@@ -31,6 +35,25 @@ cc_test(
     ],
     deps = [
         ":util",
+        "//modules/common/util/testdata:simple_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "disjoint_set",
+    hdrs = ["disjoint_set.h"],
+)
+
+cc_test(
+    name = "disjoint_set_test",
+    size = "small",
+    srcs = [
+        "disjoint_set_test.cc",
+    ],
+    deps = [
+        ":disjoint_set",
+        "//modules/common:log",
         "@gtest//:main",
     ],
 )
@@ -47,6 +70,9 @@ cc_library(
 
 cc_library(
     name = "string_util",
+    srcs = [
+        "string_util.cc",
+    ],
     hdrs = [
         "string_util.h",
     ],
@@ -111,35 +137,14 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "dropbox",
-    hdrs = [
-        "dropbox.h",
-    ],
-    deps = [
-        "//modules/common:log",
-    ],
-)
-
-cc_test(
-    name = "dropbox_test",
-    size = "small",
-    srcs = [
-        "dropbox_test.cc",
-    ],
-    deps = [
-        ":dropbox",
-        "//modules/common",
-        "//modules/common:log",
-        "@gtest//:main",
-    ],
-)
-
 cc_test(
     name = "file_test",
     size = "small",
     srcs = [
         "file_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
     ],
     tags = [
         "external",
@@ -170,7 +175,7 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "//modules/common/math:vec2d",
+        "//modules/common/math:geometry",
     ],
 )
 
@@ -209,7 +214,7 @@ cc_test(
     ],
     deps = [
         ":json_util",
-         "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:error_code_proto",
         "@gtest//:main",
     ],
 )
@@ -221,8 +226,23 @@ cc_library(
     deps = [
         "//modules/common:log",
         "//modules/common/status",
+        "//modules/common/util:string_util",
         "//third_party/json",
-        "@curlpp//:curlpp",
+        "@curlpp",
+    ],
+)
+
+cc_library(
+    name = "thread_pool",
+    hdrs = [
+        "thread_pool.h",
+    ],
+    srcs = [
+        "thread_pool.cc",
+    ],
+    deps = [
+        "//modules/common:macro",
+        "@ctpl",
     ],
 )
 

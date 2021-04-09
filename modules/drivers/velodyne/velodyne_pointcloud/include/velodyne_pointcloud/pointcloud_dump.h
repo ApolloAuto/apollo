@@ -35,7 +35,7 @@ class PointCloudDump {
   ~PointCloudDump() {}
 
  private:
-  void save_callback(const VPointCloud::ConstPtr &msg);
+  void save_callback(VPointCloud::ConstPtr msg);
 
   // save msg folder
   std::string save_folder_;

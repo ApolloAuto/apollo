@@ -59,6 +59,8 @@ class UsbCamWrapper {
   int focus_;
   int white_balance_;
   int gain_;
+  int trigger_internal_;
+  int trigger_fps_;
 
   bool autofocus_;
   bool autoexposure_;

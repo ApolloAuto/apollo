@@ -22,7 +22,6 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
-#include "modules/planning/planning.h"
 
 DECLARE_bool(reckless_change_lane);
 
@@ -37,10 +36,15 @@ namespace planning {
 class SunnyvaleLoopTest : public PlanningTestBase {
  public:
   virtual void SetUp() {
+    FLAGS_use_navigation_mode = false;
     FLAGS_map_dir = "modules/map/data/sunnyvale_loop";
     FLAGS_test_base_map_filename = "base_map_test.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
+    FLAGS_use_multi_thread_to_add_obstacles = false;
+    ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
+    ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
   }
 };
 
@@ -55,12 +59,15 @@ TEST_F(SunnyvaleLoopTest, cruise) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
  * stop case to trigger QP ST failed to solve
  */
+// TODO(all): need fix test data.
+// the existing obstacle is not along reference line and gets ignored
+/*
 TEST_F(SunnyvaleLoopTest, stop) {
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -69,8 +76,9 @@ TEST_F(SunnyvaleLoopTest, stop) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
+*/
 
 /*
  * test follow a vehicle with medium distance
@@ -83,7 +91,7 @@ TEST_F(SunnyvaleLoopTest, follow_01) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -97,7 +105,7 @@ TEST_F(SunnyvaleLoopTest, nudge) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -111,7 +119,7 @@ TEST_F(SunnyvaleLoopTest, follow_02) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -125,7 +133,7 @@ TEST_F(SunnyvaleLoopTest, follow_03) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -139,7 +147,7 @@ TEST_F(SunnyvaleLoopTest, slowdown_01) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -152,9 +160,9 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  FLAGS_enable_traffic_light = false;
+  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -170,7 +178,7 @@ TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_traffic_light_file = seq_num + "_traffic_light.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -180,24 +188,30 @@ TEST_F(SunnyvaleLoopTest, rightturn_with_red_light) {
 TEST_F(SunnyvaleLoopTest, change_lane) {
   std::string seq_num = "9";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_enable_prediction = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
  * test mission complete
  */
 TEST_F(SunnyvaleLoopTest, mission_complete) {
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
+
   std::string seq_num = "10";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
-  FLAGS_enable_prediction = false;
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+
+  // set config
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -211,7 +225,7 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -220,12 +234,11 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
 TEST_F(SunnyvaleLoopTest, qp_path_failure) {
   std::string seq_num = "12";
   FLAGS_reckless_change_lane = true;
-  FLAGS_enable_prediction = false;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 /*
@@ -245,13 +258,12 @@ TEST_F(SunnyvaleLoopTest, change_lane_failback) {
   }
   std::string seq_num = "13";
   FLAGS_reckless_change_lane = true;
-  FLAGS_enable_prediction = true;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
-  RUN_GOLDEN_TEST;
+  RUN_GOLDEN_TEST(0);
 }
 
 }  // namespace planning

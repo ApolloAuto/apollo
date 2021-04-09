@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#ifndef MODULES_PREDICTION_NETWORK_NET_MODEL_H_
+#define MODULES_PREDICTION_NETWORK_NET_MODEL_H_
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,9 +27,6 @@
 
 #include "modules/prediction/network/net_layer.h"
 #include "modules/prediction/network/net_util.h"
-
-#ifndef MODULES_PREDICTION_NETWORK_NET_MODEL_H_
-#define MODULES_PREDICTION_NETWORK_NET_MODEL_H_
 
 /**
  * @namespace apollo::prediction::network
@@ -40,7 +40,7 @@ namespace network {
  * @class NetModel
  * @brief NetModel is a base class for specific network model
  *        It contains a pure virtual function Run which must be implemented
- *        in derived class
+ *        in the derived class(es)
  */
 class NetModel {
  public:
@@ -75,8 +75,7 @@ class NetModel {
   virtual void State(std::vector<Eigen::MatrixXf>* states) const {}
 
   /**
-   * @brief Set the internal state of a model
-   * @param A specified internal state in a vector of Eigen::MatrixXf
+   * @brief Reset the internal state of a network model
    */
   virtual void ResetState() const {}
 

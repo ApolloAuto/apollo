@@ -18,9 +18,11 @@
  * @file publishable_trajectory.cpp
  **/
 
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
+
 #include <utility>
 
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/common/log.h"
 
 namespace apollo {
 namespace planning {
@@ -39,6 +41,7 @@ double PublishableTrajectory::header_time() const { return header_time_; }
 
 void PublishableTrajectory::PopulateTrajectoryProtobuf(
     ADCTrajectory* trajectory_pb) const {
+  CHECK_NOTNULL(trajectory_pb);
   trajectory_pb->mutable_header()->set_timestamp_sec(header_time_);
   trajectory_pb->mutable_trajectory_point()->CopyFrom(
       {trajectory_points_.begin(), trajectory_points_.end()});

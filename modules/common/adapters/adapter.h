@@ -42,8 +42,10 @@
 #include "modules/common/util/util.h"
 
 #include "sensor_msgs/CompressedImage.h"
-#include "sensor_msgs/PointCloud2.h"
 #include "sensor_msgs/Image.h"
+#include "sensor_msgs/PointCloud2.h"
+#include "std_msgs/String.h"
+#include "velodyne_msgs/VelodyneScanUnified.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -129,8 +131,9 @@ class Adapter : public AdapterBase {
   /// The user can use Adapter::DataType to get the type of the
   /// underlying data.
   typedef D DataType;
+  typedef boost::shared_ptr<D const> DataPtr;
 
-  typedef typename std::list<std::shared_ptr<D>>::const_iterator Iterator;
+  typedef typename std::list<DataPtr>::const_iterator Iterator;
   typedef typename std::function<void(const D&)> Callback;
 
   /**
@@ -141,7 +144,7 @@ class Adapter : public AdapterBase {
    * @param topic_name the topic that the adapter listens to.
    * @param message_num the number of historical messages that the
    * adapter stores. Older messages will be removed upon calls to
-   * Adapter::OnReceive().
+   * Adapter::RosCallback().
    */
   Adapter(const std::string& adapter_name, const std::string& topic_name,
           size_t message_num, const std::string& dump_dir = "/tmp")
@@ -187,17 +190,18 @@ class Adapter : public AdapterBase {
    * the adapter.
    * @param data the input data.
    */
-  void FeedData(const D& data) { EnqueueData(data); }
+  void FeedData(const D& data) {
+    EnqueueData(boost::make_shared<D const>(data));
+  }
 
   /**
-   * @brief the callback that will be invoked whenever a new
-   * message is received.
-   * @param message the newly received message.
+   * @brief Data callback when receiving a message. Under the hood it calls
+   * the callback ROS would invoke, useful when trying to emulate the callback
+   * behavior when there's not a ROS.
+   * @param message the input data.
    */
   void OnReceive(const D& message) {
-    last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
-    EnqueueData(message);
-    FireCallbacks(message);
+    RosCallback(boost::make_shared<D const>(message));
   }
 
   /**
@@ -228,9 +232,9 @@ class Adapter : public AdapterBase {
   /**
    * @brief returns the most recent message in the observing queue.
    *
-   * /note
+   * \note
    * Please call Empty() to make sure that there is data in the
-   * queue before calling GetOldestObserved().
+   * queue before calling GetLatestObserved().
    */
   const D& GetLatestObserved() const {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -247,12 +251,12 @@ class Adapter : public AdapterBase {
    * Please call Empty() to make sure that there is data in the
    * queue before calling GetLatestObservedPtr().
    */
-  std::shared_ptr<const D> GetLatestObservedPtr() const {
+  DataPtr GetLatestObservedPtr() const {
     std::lock_guard<std::mutex> lock(mutex_);
     DCHECK(!observed_queue_.empty())
-    << "The view of data queue is empty. No data is received yet or you "
-        "forgot to call Observe()"
-    << ":" << topic_name_;
+        << "The view of data queue is empty. No data is received yet or you "
+           "forgot to call Observe()"
+        << ":" << topic_name_;
     return observed_queue_.front();
   }
   /**
@@ -326,7 +330,7 @@ class Adapter : public AdapterBase {
     latest_published_data_.reset(new D(data));
   }
 
-  const D* GetLatestPublished() { return latest_published_data_.get(); }
+  const D* GetLatestPublished() const { return latest_published_data_.get(); }
 
   /**
    * @brief Gets message delay.
@@ -385,8 +389,16 @@ class Adapter : public AdapterBase {
                 IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
-  bool FeedFile(const std::string &message_file,
+  bool FeedFile(const std::string& message_file,
                 IdentifierType<::sensor_msgs::Image>) {
+    return false;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<::std_msgs::String>) {
+    return false;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<velodyne_msgs::VelodyneScanUnified>) {
     return false;
   }
   // HasSequenceNumber returns false for non-proto-message data types.
@@ -457,6 +469,17 @@ class Adapter : public AdapterBase {
   }
 
   /**
+   * @brief the ROS callback that will be invoked whenever a new
+   * message is received.
+   * @param message the newly received message.
+   */
+  void RosCallback(DataPtr message) {
+    last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
+    EnqueueData(message);
+    FireCallbacks(*message);
+  }
+
+  /**
    * @brief proactively invokes the callbacks one by one registered with the
    * specified data.
    * @param data the specified data.
@@ -471,9 +494,9 @@ class Adapter : public AdapterBase {
    * @brief push the shared-pointer-guarded data to the data queue of
    * the adapter.
    */
-  void EnqueueData(const D& data) {
+  void EnqueueData(DataPtr data) {
     if (enable_dump_) {
-      DumpMessage<D>(data);
+      DumpMessage<D>(*data);
     }
 
     // Don't try to copy data and enqueue if the message_num is 0
@@ -486,7 +509,7 @@ class Adapter : public AdapterBase {
     if (data_queue_.size() + 1 > message_num_) {
       data_queue_.pop_back();
     }
-    data_queue_.push_front(std::make_shared<D>(data));
+    data_queue_.push_front(data);
   }
 
   /// The topic name that the adapter listens to.
@@ -496,11 +519,11 @@ class Adapter : public AdapterBase {
   size_t message_num_ = 0;
 
   /// The received data. Its size is no more than message_num_
-  std::list<std::shared_ptr<D>> data_queue_;
+  std::list<DataPtr> data_queue_;
 
   /// It is the snapshot of the data queue. The snapshot is taken when
   /// Observe() is called.
-  std::list<std::shared_ptr<D>> observed_queue_;
+  std::list<DataPtr> observed_queue_;
 
   /// User defined function when receiving a message
   std::vector<Callback> receive_callbacks_;
@@ -522,7 +545,20 @@ class Adapter : public AdapterBase {
   std::unique_ptr<D> latest_published_data_;
 
   double last_receive_time_ = 0;
+
+  friend class AdapterManager;
 };
+
+#define CHECK_ADAPTER(NAME)                                               \
+  if (AdapterManager::Get##NAME() == nullptr) {                           \
+    AERROR << #NAME << " is not registered";                              \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
+  }
+
+#define CHECK_ADAPTER_IF(CONDITION, NAME) \
+  if (CONDITION) {                        \
+    CHECK_ADAPTER(NAME);                  \
+  }
 
 }  // namespace adapter
 }  // namespace common

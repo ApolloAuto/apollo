@@ -43,3 +43,33 @@ Figure 1 shows the comparison between the stitched point clouds with good (a) an
 <p align="center">
 Figure 1. (a) a high quality calibration result (b) an insufficient one.
 </p>
+
+## How to solve the permission error of calibration tools?
+
+Output path needs `write` permission to be created folders and saved results. If the path is missing the relevant permissions, you will receive the following error:
+
+
+```bash
+terminate called after throwing an instance of ‘boost::filesystem::filesystem_error’ what(): boost::filesystem::create_directories: permission denied: “***” 
+```
+
+Enter the following command to add `write` permission:
+
+```bash
+# add write permission to output path(e.g. /apollo/modules/calibration/data/mkz8)
+sudo chmod a+w /apollo/modules/calibration/data/mkz8 -R
+```
+
+## How to solve permission error when running sensor_calibration.sh?
+
+Log path needs `write` permission to be created log files. If it is missing the relevant permissions, you will receive the following error:
+
+```bash
+tee: /apollo/data/log/***.out: permission denied
+```
+
+Enter the following command to add `write` permission:
+
+```bash
+sudo chmod a+w /apollo/data/log
+```

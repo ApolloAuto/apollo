@@ -1,0 +1,17 @@
+<!-- -*- mode: XML -*- -->
+<!-- rostest of the lazy subscriber -->
+
+<launch>
+
+  <!-- Select log or screen output -->
+  <arg name="output" default="log"/> <!-- screen/log -->
+
+  <!-- Start the laserscan node -->
+  <node pkg="velodyne_laserscan" type="velodyne_laserscan_node" name="laserscan" output="$(arg output)" />
+
+  <!-- Start the rostest -->
+  <test test-name="test_lazy_subscriber_node" pkg="velodyne_laserscan"
+        type="test_lazy_subscriber_node" name="test_lazy_subscriber">
+  </test>
+
+</launch>

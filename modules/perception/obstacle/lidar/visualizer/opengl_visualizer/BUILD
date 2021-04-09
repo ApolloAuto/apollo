@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "perception_obstacle_lidar_opengl_visualizer",
+    name = "opengl_visualizer",
     srcs = [
         "camera.cc",
         "frame_content.cc",
@@ -22,15 +22,15 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
+        "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/pcl_util",
-        "//modules/perception/obstacle/base:perception_obstacle_base",
-        "//modules/perception/obstacle/common:perception_obstacle_common",
-        "@eigen//:eigen",
-        "@glew//:glew",
-        "@glfw//:glfw",
-        "@pcl//:pcl",
-        "@vtk//:vtk",
+        "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/common",
+        "@eigen",
+        "@glew",
+        "@glfw",
+        "@pcl",
+        "@vtk",
     ],
 )
 
