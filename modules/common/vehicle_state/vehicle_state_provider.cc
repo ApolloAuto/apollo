@@ -143,8 +143,8 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
   }
 
   if (localization.pose().has_euler_angles()) {
-    vehicle_state_.set_roll(localization.pose().euler_angles().x());
-    vehicle_state_.set_pitch(localization.pose().euler_angles().y());
+    vehicle_state_.set_roll(localization.pose().euler_angles().y());
+    vehicle_state_.set_pitch(localization.pose().euler_angles().x());
     vehicle_state_.set_yaw(localization.pose().euler_angles().z());
   } else {
     math::EulerAnglesZXYd euler_angle(orientation.qw(), orientation.qx(),
