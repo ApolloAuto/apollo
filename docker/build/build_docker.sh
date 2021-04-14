@@ -146,7 +146,7 @@ function determine_prev_image_timestamp() {
             fi
         elif [[ "${stage}" == "runtime" ]]; then
             if [[ "${dist}" == "stable" ]]; then
-                result="20210315_2158"
+                result="20210414_1711"
             fi
         fi
     else # aarch64
