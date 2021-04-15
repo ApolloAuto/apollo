@@ -110,7 +110,70 @@ function determine_target_arch_and_stage() {
     TARGET_STAGE="${stage}"
 }
 
-function determine_images_for_x86_64() {
+CUDA_LITE=
+CUDNN_VERSION=
+TENSORRT_VERSION=
+function determine_cuda_versions() {
+    local arch="$1"
+    local dist="$2"
+    if [[ "${arch}" == "x86_64" ]]; then
+        if [[ "${dist}" == "stable" ]]; then
+            CUDA_LITE=11.1
+            CUDNN_VERSION="8.0.4.30"
+            TENSORRT_VERSION="7.2.1"
+        else # testing
+            CUDA_LITE=11.1
+            CUDNN_VERSION="8.0.4.30"
+            TENSORRT_VERSION="7.2.1"
+        fi
+    else # aarch64
+        CUDA_LITE="10.2"
+        CUDNN_VERSION="8.0.0.180"
+        TENSORRT_VERSION="7.1.3"
+    fi
+}
+
+function determine_prev_image_timestamp() {
+    if [[ ! -z "${PREV_IMAGE_TIMESTAMP}" ]]; then
+        return
+    fi
+
+    local arch="$1" # x86_64 / aarch64
+    local stage="$2" # base/cyber/dev/runtime
+    local dist="$3" # stable/testing
+
+    local result=
+    if [[ "${arch}" == "x86_64" ]]; then
+        if [[ "${stage}" == "dev" ]]; then
+            if [[ "${dist}" == "stable" ]]; then
+                result="20210315_1535"
+            else
+                result="20210108_1510"
+            fi
+        elif [[ "${stage}" == "runtime" ]]; then
+            if [[ "${dist}" == "stable" ]]; then
+                result="20210414_1711"
+            fi
+        fi
+    else # aarch64
+        if [[ "${stage}" == "cyber" ]]; then
+            if [[ "${dist}" == "stable" ]]; then
+                result="20201217_0752"
+            fi
+        elif [[ "${stage}" == "dev" ]]; then
+            if [[ "${dist}" == "stable" ]]; then
+                result="20201217_1302"
+            fi
+        fi
+    fi
+    PREV_IMAGE_TIMESTAMP="${result}"
+}
+
+IMAGE_IN=
+IMAGE_OUT=
+DEV_IMAGE_IN=
+
+function determine_images_in_out_x86_64() {
     local stage="$1" # Build stage, base/cyber/dev
     local dist="$2"  # stable or testing
 
