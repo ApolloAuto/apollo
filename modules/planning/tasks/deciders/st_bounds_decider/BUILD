@@ -13,6 +13,7 @@ cc_library(
         ":st_driving_limits",
         ":st_guide_line",
         ":st_obstacles_processor",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
