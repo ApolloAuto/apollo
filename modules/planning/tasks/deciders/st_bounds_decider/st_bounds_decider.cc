@@ -18,7 +18,7 @@
 
 #include <limits>
 #include <memory>
-
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
@@ -114,8 +114,10 @@ void STBoundsDecider::InitSTBoundsDecider(
   } else {
     st_guide_line_.Init(desired_speed);
   }
-  static constexpr double max_acc = 2.5;
-  static constexpr double max_dec = 5.0;
+  auto& veh_param =
+    common::VehicleConfigHelper::GetConfig().vehicle_param();
+  static const double max_acc = std::abs(veh_param.max_acceleration());
+  static const double max_dec = std::abs(veh_param.max_deceleration());
   static constexpr double max_v = desired_speed * 1.5;
   st_driving_limits_.Init(max_acc, max_dec, max_v,
                           frame.PlanningStartPoint().v());
