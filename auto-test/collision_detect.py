@@ -4,8 +4,6 @@ import rospy
 from pb_msgs.msg import MonitorMessage
 # from modules.common.monitor_log.proto.monitor_log_pb2 import MonitorMessage
 
-
-
 def monitorCallback(monitorMessage):
     # get the monitor message item
     monitorMessageItem = monitorMessage.item[0]
@@ -14,11 +12,8 @@ def monitorCallback(monitorMessage):
     # expected message when collision is detected
     collisionMessage = 'Found collision with obstacle: '
 
-    
-
     # check if the message contains collision information
     if (collisionMessage in msg):
-
         # extract the obstacle id from the message
         # need to consider when id has '_0' suffixes which cannot be convert to int directly
         if ('_' in msg):
