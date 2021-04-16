@@ -75,8 +75,6 @@ def talker():
         if (start_x-end_x)*(start_y-end_y) > 0:
             angle = -angle;
 
-    # determine whether the 	
-	
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
     # define the obstacle density (0 - 1)
