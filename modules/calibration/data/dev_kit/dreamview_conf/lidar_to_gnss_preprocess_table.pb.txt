@@ -1,9 +1,0 @@
-lidar_config {
-  sensor_name: "lidar16"
-  translation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-}
-main_sensor: "lidar16"
