@@ -4,19 +4,24 @@ trap "kill 0" EXIT # kill all background process on exit
 python auto-test/collision_detect.py src &
 DETECTPID=$!
 python auto-test/fuzzer.py &
-FUZZERPID=$!   
+FUZZERPID=$!
+
+echo $DETECTPID   
+echo $FUZZERPID
 
 # let the 2 scripts run for certain time
-sleep 30; kill $DETECTPID; kill $FUZZERPID
+sleep 40; kill $DETECTPID; kill $FUZZERPID
 
 python auto-test/collision_detect.py follow &
 DETECTPID=$!
 python auto-test/metamorphic.py &
 METAID=$!   
 
+echo $DETECTPID   
+echo $METAPID
 # let the 2 scripts run for certain time
-sleep 30; kill $DETECTPID; kill $METAPID
+sleep 40; kill $DETECTPID; kill $METAPID
 
 # remove the old csv files
-rm /apollo/auto-test/data/obstacles.csv /apollo/auto-test/data/collision.csv
+# rm /apollo/auto-test/data/obstacles.csv /apollo/auto-test/data/collision.csv
 

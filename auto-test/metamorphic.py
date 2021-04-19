@@ -38,7 +38,6 @@ if (obstacle_number % scenario_number != 0):
 obstacle_per_scenario = obstacle_number / scenario_number
 print("Obstacle per scenario: %d" % obstacle_per_scenario)
 print("Total Obstacle Generated: %d" % obstacle_number)
-print(type(scenario_number))
 print("Scenario Number: %d" % scenario_number)
 print("Number of Collision Detected: %d" % collision_size)
 print("General Collision Rate (#collision / #scenerio): %.4f%%" % (general_rate * 100))
@@ -47,13 +46,13 @@ collision_analysis = np.array([[obstacles_data.shape[0], scenario_number, collis
 with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
     np.savetxt(csv, collision_analysis, fmt=['%d','%d','%d','%.6f'], delimiter=',')
 
-# # prompt to start the vehicle at Dreamview frontend
-# countdown = 5
-# for i in range(countdown):
-#     sys.stdout.write("\rPlease choose a routing and start the vehicle at Dreamview. {} seconds remaining.".format(countdown-i))
-#     sys.stdout.flush()
-#     time.sleep(1)
-# print '\n'
+# prompt to start the vehicle at Dreamview frontend
+countdown = 5
+for i in range(countdown):
+    sys.stdout.write("\rPlease choose a routing and start the vehicle at Dreamview. {} seconds remaining.".format(countdown-i))
+    sys.stdout.flush()
+    time.sleep(1)
+print '\n'
 
 # regenerate the follow-up scenarios based on the obstacle data and MR
 # MR: Suppose that in a driving scenario,S, a car collided with a static obstacle O at location L, 

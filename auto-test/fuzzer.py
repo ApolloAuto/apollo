@@ -13,9 +13,9 @@ def transform(x, y, angle, x_center, y_center, compress_x_y):
 	
     # compress the width of the region
     if (compress_x_y == 0):
-        x = 0.3 * x
+        x = 0.2 * x
     if (compress_x_y == 1):
-        y = 0.3 * y
+        y = 0.2 * y
 
     # apply rotation
     x = x * cos(angle) - y * sin(angle)
@@ -136,7 +136,8 @@ def talker():
 
         # increment the scenario counter
         scenario_id = scenario_id + 1
-
+        # print(msg_obstacles)
+        # print("========================================")
         # publish the obstacles to ROS topic '/apollo/perception/obstacles'
         pub.publish(msg_obstacles)
         rate.sleep()

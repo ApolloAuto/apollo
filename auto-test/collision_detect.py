@@ -46,7 +46,7 @@ if __name__ == '__main__':
     elif (sys.argv[1] == 'follow'):
         file_dest = '/apollo/auto-test/data/collision_new.csv'
     else:
-        print("Invalid arguments for collision_Detect.py")
+        print("Invalid arguments for collision_detect.py")
         sys.exit()
 
     listener()
