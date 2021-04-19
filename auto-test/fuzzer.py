@@ -67,13 +67,13 @@ def talker():
     	angle = arctan(tan_value)
         # negate the angle if counter-clockwise
         if (start_x-end_x)*(start_y-end_y) < 0:
-            angle = -angle;
+            angle = -angle
     else:
     	compress = 0
         angle = arctan(1/tan_value)
         # negate the angle if counter-clockwise
         if (start_x-end_x)*(start_y-end_y) > 0:
-            angle = -angle;
+            angle = -angle
 
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)

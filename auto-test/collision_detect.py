@@ -2,6 +2,7 @@
 import numpy as np
 import rospy
 from pb_msgs.msg import MonitorMessage
+import sys
 # from modules.common.monitor_log.proto.monitor_log_pb2 import MonitorMessage
 
 def monitorCallback(monitorMessage):
@@ -25,8 +26,8 @@ def monitorCallback(monitorMessage):
         obstacle = [obstacle_id]
         #print(obstacle_id)
 
-        # add new obstacle data into the csv file
-        with open('/apollo/auto-test/data/collision.csv', 'a') as csv:
+        # add new obstacle data into the csv file, path is determined at the start of main
+        with open(file_dest, 'a') as csv:
             np.savetxt(csv, obstacle, fmt='%d', delimiter=',')
        
         # need to remove redundant ids 
@@ -39,4 +40,13 @@ def listener():
     rospy.spin()
 
 if __name__ == '__main__':
+    # check the argument vector to obtain the destination of the output file 
+    if (sys.argv[1] == 'src'):
+        file_dest = '/apollo/auto-test/data/collision.csv'
+    elif (sys.argv[1] == 'follow'):
+        file_dest = '/apollo/auto-test/data/collision_new.csv'
+    else:
+        print("Invalid arguments for collision_Detect.py")
+        sys.exit()
+
     listener()
