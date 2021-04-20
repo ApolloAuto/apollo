@@ -32,6 +32,7 @@ install(
         "//modules/routing:install",
         "//modules/storytelling:install",
         "//modules/task_manager:install",
+        "//modules/tools:install",
         "//modules/transform:install",
         "//scripts:install",
     ],
