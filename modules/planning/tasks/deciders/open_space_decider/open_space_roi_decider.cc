@@ -1295,7 +1295,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   Vec2d left_down = target_parking_spot->polygon().points().at(0);
   Vec2d right_down = target_parking_spot->polygon().points().at(1);
   Vec2d right_top = target_parking_spot->polygon().points().at(2);
-  if (plot_type == ParkingSpaceType::PARALLEL_PLOT) {
+  if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
     const auto &routing_request =
       frame->local_view().routing->routing_request();
     auto corner_point =

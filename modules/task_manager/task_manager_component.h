@@ -43,6 +43,7 @@ class TaskManagerComponent final : public cyber::Component<task_manager::Task> {
   std::shared_ptr<CycleRoutingManager> cycle_routing_manager_;
   std::shared_ptr<ParkingRoutingManager> parking_routing_manager_;
   routing::RoutingRequest routing_request_;
+  routing::RoutingResponse routing_response_;
   LocalizationEstimate localization_;
   std::mutex mutex_;
   std::string task_name_;

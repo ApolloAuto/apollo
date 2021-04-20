@@ -28,7 +28,7 @@ enum ParkingSpaceType {
 message ParkingInfo {
   optional string parking_space_id = 1;
   optional apollo.common.PointENU parking_point = 2;
-  optional ParkingSpaceType parking_space_type = 3;
+  optional ParkingSpaceType parking_spot_type = 3;
   // The four corner points are in order.
   optional apollo.hdmap.Polygon corner_point = 4;
 }
