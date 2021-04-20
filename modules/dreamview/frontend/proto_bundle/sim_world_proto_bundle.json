@@ -1708,7 +1708,8 @@
                         "ULTRASONIC_RADAR": 17,
                         "MOBILEYE": 18,
                         "DELPHI_ESR": 19,
-                        "STORYTELLING": 20
+                        "STORYTELLING": 20,
+                        "TASK_MANAGER": 21
                       }
                     },
                     "LogLevel": {
@@ -5512,6 +5513,10 @@
                 "rssInfo": {
                   "type": "RSSInfo",
                   "id": 100
+                },
+                "completeParking": {
+                  "type": "bool",
+                  "id": 25
                 }
               },
               "nested": {
