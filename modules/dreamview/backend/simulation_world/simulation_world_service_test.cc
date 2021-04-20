@@ -23,7 +23,6 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
-
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 using apollo::canbus::Chassis;

@@ -22,7 +22,7 @@
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "modules/task_manager/cycle_routing_manager.h"
-
+#include "modules/task_manager/parking_routing_manager.h"
 namespace apollo {
 namespace task_manager {
 
@@ -41,7 +41,9 @@ class TaskManagerComponent final : public cyber::Component<task_manager::Task> {
   std::shared_ptr<cyber::Reader<LocalizationEstimate>> localization_reader_;
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> request_writer_;
   std::shared_ptr<CycleRoutingManager> cycle_routing_manager_;
+  std::shared_ptr<ParkingRoutingManager> parking_routing_manager_;
   routing::RoutingRequest routing_request_;
+  routing::RoutingResponse routing_response_;
   LocalizationEstimate localization_;
   std::mutex mutex_;
   std::string task_name_;

@@ -19,6 +19,7 @@ export default class RealtimeWebSocketEndpoint {
     this.worker = new Worker();
     this.pointcloudWS = null;
     this.requestHmiStatus = this.requestHmiStatus.bind(this);
+    this.updateParkingRoutingDistance = true;
   }
 
   initialize() {
@@ -127,6 +128,11 @@ export default class RealtimeWebSocketEndpoint {
             STORE.hmi.updatePreprocessProgress(message.data);
           }
           break;
+        case 'ParkingRoutingDistance':
+          if (message) {
+            STORE.routeEditingManager.updateParkingRoutingDistance(message.threshold);
+          }
+          break;
       }
     };
     this.websocket.onclose = (event) => {
@@ -166,6 +172,10 @@ export default class RealtimeWebSocketEndpoint {
           this.pointcloudWS.requestPointCloud();
         }
         this.requestSimulationWorld(STORE.options.showPNCMonitor);
+        if (this.updateParkingRoutingDistance) {
+          this.requestParkingRoutingDistance();
+          this.updateParkingRoutingDistance = false;
+        }
         if (STORE.hmi.isVehicleCalibrationMode) {
           this.requestDataCollectionProgress();
           this.requestPreprocessProgress();
@@ -265,6 +275,12 @@ export default class RealtimeWebSocketEndpoint {
   requestDefaultRoutingPoints() {
     this.websocket.send(JSON.stringify({
       type: 'GetDefaultRoutings',
+    }));
+  }
+
+  requestParkingRoutingDistance() {
+    this.websocket.send(JSON.stringify({
+      type: 'GetParkingRoutingDistance',
     }));
   }
 
@@ -411,6 +427,22 @@ export default class RealtimeWebSocketEndpoint {
     };
     if (data) {
       request.data = data;
+    }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  sendParkingRequest(start,waypoint,end, parkingInfo, laneWidth,cornerPoints,id) {
+    const request = {
+      type: 'SendParkingRoutingRequest',
+      start,
+      end,
+      waypoint,
+      parkingInfo,
+      laneWidth,
+      cornerPoints,
+    };
+    if (id) {
+      request.end.id = id;
     }
     this.websocket.send(JSON.stringify(request));
   }

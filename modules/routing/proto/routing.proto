@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/error_code.proto";
 import "modules/map/proto/map_parking_space.proto";
+import "modules/map/proto/map_geometry.proto";
 
 message LaneWaypoint {
   optional string id = 1;
@@ -19,9 +20,17 @@ message LaneSegment {
   optional double end_s = 3;
 }
 
+enum ParkingSpaceType {
+  VERTICAL_PLOT = 0;
+  PARALLEL_PARKING = 1;
+}
+
 message ParkingInfo {
   optional string parking_space_id = 1;
   optional apollo.common.PointENU parking_point = 2;
+  optional ParkingSpaceType parking_space_type = 3;
+  // The four corner points are in order.
+  optional apollo.hdmap.Polygon corner_point = 4;
 }
 
 message RoutingRequest {

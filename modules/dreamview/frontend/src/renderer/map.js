@@ -7,7 +7,17 @@ import {
   drawSegmentsFromPoints,
   drawDashedLineFromPoints,
   drawShapeFromPoints,
+  changeMaterial,
 } from 'utils/draw';
+import {
+  pointOnVectorRight,
+  directionVectorCrossProduct,
+  getIntersectionPoint,
+  directionSameWithVector,
+  getBehindPointIndexDistanceApart,
+  getInFrontOfPointIndexDistanceApart,
+  getPointDistance,
+} from 'utils/misc';
 import Text3D, { TEXT_ALIGN } from 'renderer/text3d';
 import TrafficSigns from 'renderer/traffic_controls/traffic_signs';
 import TrafficSignals from 'renderer/traffic_controls/traffic_signals';
@@ -31,6 +41,20 @@ const colorMapping = {
   DEFAULT: 0xC0C0C0,
 };
 
+// parallel=1 0-1 2-3
+const order1 = [
+  [0, 1, 2, 3],
+  [1, 0, 3, 2],
+  [2, 3, 0, 1],
+  [3, 2, 1, 0],
+];
+// parallel=2 0-3 1-2
+const order2 = [
+  [0, 3, 2, 1],
+  [1, 2, 3, 0],
+  [2, 1, 0, 3],
+  [3, 0, 1, 2],
+];
 export default class Map {
   constructor() {
     this.textRender = new Text3D();
@@ -232,7 +256,7 @@ export default class Map {
 
       text.position.set(textPosition.x, textPosition.y, textPosition.z);
       text.rotation.set(0, 0, textRotationZ);
-      text.visible = false;
+      text.visible = true;
       scene.add(text);
     }
     return text;
@@ -339,6 +363,7 @@ export default class Map {
   // side. This also means that the server should maintain a state of
   // (possibly) visible elements, presummably in the global store.
   appendMapData(newData, coordinates, scene) {
+    const parkingSpaceCalcInfo = [];
     for (const kind in newData) {
       if (!newData[kind]) {
         continue;
@@ -422,6 +447,8 @@ export default class Map {
               ),
               text: this.addParkingSpaceId(newData[kind][i], coordinates, scene),
             }));
+            parkingSpaceCalcInfo.push(this.calcParkingSpaceExtraInfo(newData[kind][i],
+              coordinates));
             break;
           case 'speedBump':
             this.data[kind].push(Object.assign(newData[kind][i], {
@@ -436,6 +463,7 @@ export default class Map {
         }
       }
     }
+    return parkingSpaceCalcInfo;
   }
 
   shouldDrawObjectOfThisElementKind(kind) {
@@ -512,5 +540,320 @@ export default class Map {
 
   update(world) {
     this.trafficSignals.updateTrafficLightStatus(world.perceivedSignal);
+  }
+
+  changeSelectedParkingSpaceColor(index, color = 0xff0000) {
+    this.data['parkingSpace'][index].drewObjects.forEach(mesh => {
+      changeMaterial(mesh, color);
+    });
+  }
+
+  // find parking space based which lane
+  getLaneBasedOverlapId(overlapId, coordinates) {
+    // Default based one lane if overlapId.length>=2 only choose the first
+    if (_.isEmpty(overlapId)) {
+      return null;
+    }
+    const laneIndex = _.findIndex(this.data['lane'], item => {
+      return _.findIndex(item.overlapId, { 'id': overlapId[0].id }) !== -1;
+    });
+    if (laneIndex === -1) {
+      return null;
+    }
+    const lane = this.data['lane'][laneIndex];
+    const centralLine = _.get(lane, 'centralCurve.segment');
+    if (_.isEmpty(centralLine)) {
+      return null;
+    }
+    let arrs = [];
+    if (centralLine.length !== 1) {
+      for (const segment of centralLine) {
+        arrs.push(_.get(segment, 'lineSegment.point'));
+      }
+      arrs = _.uniq(_.flattenDeep(arrs));
+    }
+    let points = _.isEmpty(arrs) ? _.get(centralLine[0], 'lineSegment.point') : arrs;
+    points = coordinates.applyOffsetToArray(points);
+    return {
+      centerLine: points,
+      length:_.get(lane, 'length'),
+      successorId:_.get(lane, 'successorId'),
+      predecessorId: _.get(lane, 'predecessorId'),
+    };
+  }
+
+  getRoutingPointAlongLane(id, totalLength, coordinates,threshold,backward = true) {
+    while (totalLength < threshold) {
+      const res = this.findFixedDistancePointOnLane(threshold - totalLength, id,
+        coordinates,backward);
+      if (_.isEmpty(res)) {
+        return null;
+      }
+      else if (res.x) {
+        return [res, _.get(id,'0.id')];
+      }
+      else {
+        totalLength += res.length;
+        id = res.nextId;
+      }
+    }
+  }
+
+  findFixedDistancePointOnLane(distance, laneId, coordinates, backward = true) {
+    const laneIndex = _.findIndex(this.data['lane'], item => {
+      return _.isEqual(item.id, laneId[0]);
+    });
+    if (laneIndex === -1) {
+      return null;
+    }
+    const lane = this.data['lane'][laneIndex];
+    let totalLength = distance;
+    if (lane.length >= totalLength) {
+      const centerLine = _.get(lane, 'centralCurve.segment');
+      if (_.isEmpty(centerLine)) {
+        return null;
+      }
+      let index = backward ? 0 : centerLine.length - 1;
+      let result = null;
+      if (backward) {
+        //
+        while (index <= centerLine.length - 1) {
+          if (totalLength > centerLine[index].length) {
+            totalLength -= centerLine[index].length;
+            index++;
+          } else {
+            result = this.findFixedDistancePointOnSegment(totalLength,
+              centerLine[index], coordinates, backward);
+            break;
+          }
+        }
+      } else {
+        while (index >= 0) {
+          if (totalLength > centerLine[index].length) {
+            totalLength -= centerLine[index].length;
+            index--;
+          } else {
+            result = this.findFixedDistancePointOnSegment(totalLength,
+              centerLine[index], coordinates, backward);
+            break;
+          }
+        }
+      }
+      return result;
+    } else {
+      return {
+        length: lane.length,
+        nextId: backward ? lane.successorId : lane.predecessorId,
+      };
+    }
+  }
+  //onSegment
+  findFixedDistancePointOnSegment(distance, segmentPoints, coordinates, backward = true) {
+    let points = _.get(segmentPoints, 'lineSegment.point');
+    if (_.isEmpty(points) || points.length < 2) {
+      return null;
+    }
+    points = coordinates.applyOffsetToArray(points);
+    const startPoint = backward ? points[0] : points[points.length - 1];
+    let index = backward ? 1 : points.length - 2;
+    if (backward) {
+      while (index <= points.length - 1) {
+        if (getPointDistance(startPoint, points[index]) >= distance) {
+          break;
+        }
+        index++;
+      }
+    } else {
+      while (index >= 0) {
+        if (getPointDistance(startPoint, points[index]) >= distance) {
+          break;
+        }
+        index--;
+      }
+    }
+    return points[index];
+  }
+
+  getRoutingPoint(successor, startPoint, threshold,
+    points, laneVector, coordinates, id) {
+    if (successor) {
+      const distance = getPointDistance(startPoint, points[points.length - 1]);
+      if (distance >= threshold) {
+        const index = getInFrontOfPointIndexDistanceApart(threshold,
+          points, startPoint, laneVector);
+        if (index === -1) {
+          return null;
+        }
+        return [points[index], _.get(id,'0.id')];
+      } else {
+        if (_.isEmpty(id)) {
+          return null;
+        }
+        return this.getRoutingPointAlongLane(id, distance, coordinates, threshold);
+      }
+    }
+    else {
+      const distance = getPointDistance(startPoint, points[0]);
+      if (distance >= threshold) {
+        const index = getBehindPointIndexDistanceApart(threshold,
+          points,startPoint, laneVector);
+        if (index === -1) {
+          return null;
+        }
+        return [points[index], _.get(id,'0.id')];
+      } else {
+        return this.getRoutingPointAlongLane(id,
+          distance, coordinates, threshold, false);
+      }
+    }
+  }
+
+  calcParkingSpaceExtraInfo(parkingSpace, coordinates) {
+    const border = coordinates.applyOffsetToArray(parkingSpace.polygon.point);
+    const basedLane = this.getLaneBasedOverlapId(parkingSpace.overlapId, coordinates);
+    let routingPoint = null;
+    if (_.isEmpty(basedLane)) {
+      return null;
+    }
+    const centerLine = basedLane['centerLine'];
+    let result = [];
+    const laneCenterLineEndPoint = centerLine[centerLine.length - 1];
+    let intersectionPoint = null;
+    const laneVector = {
+      x: laneCenterLineEndPoint.x - centerLine[0].x,
+      y: laneCenterLineEndPoint.y - centerLine[0].y,
+    };
+    const vector01 = {
+      x: border[1].x - border[0].x,
+      y: border[1].y - border[0].y,
+    };
+    const vector12 = {
+      x: border[1].x - border[2].x,
+      y: border[1].y - border[2].y,
+    };
+    const parallel = directionVectorCrossProduct(laneVector, vector01, true)
+      > directionVectorCrossProduct(laneVector, vector12, true) ? 2 : 1;
+    let orderIndex = -1;
+    if (parallel === 1) {
+      const mid01 = {
+        x: (border[0].x + border[1].x) / 2,
+        y: (border[0].y + border[1].y) / 2,
+      };
+      const mid23 = {
+        x: (border[2].x + border[3].x) / 2,
+        y: (border[2].y + border[3].y) / 2,
+      };
+      intersectionPoint = getIntersectionPoint(mid01, centerLine[0], laneCenterLineEndPoint);
+      if (intersectionPoint.x === mid01.x || intersectionPoint.x === mid23.x
+        || mid01.x === mid23.x) {
+        // equal x situation
+        if (intersectionPoint.y < mid01.y) {
+          if (mid01.y < mid23.y) {
+            //01->23
+            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
+          } else {
+            //23->01
+            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
+          }
+        } else {
+          if (mid01.y < mid23.y) {
+            //23->01
+            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
+          } else {
+            //01->23
+            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
+          }
+        }
+      } else {
+        if (intersectionPoint.x < mid01.x) {
+          if (mid01.x < mid23.x) {
+            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
+          } else {
+            //32 -> 01
+            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
+          }
+        } else {
+          if (mid01.x < mid23.x) {
+            //32->01
+            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
+          } else {
+            //01->32
+            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
+          }
+        }
+      }
+      result = order1[orderIndex];
+      //到这个地方平行已经完成--
+    } else {
+      const mid12 = {
+        x: (border[2].x + border[1].x) / 2,
+        y: (border[2].y + border[1].y) / 2,
+      };
+      const mid03 = {
+        x: (border[0].x + border[3].x) / 2,
+        y: (border[0].y + border[3].y) / 2,
+      };
+      intersectionPoint = getIntersectionPoint(mid12, centerLine[0], laneCenterLineEndPoint);
+      if (intersectionPoint.x === mid12.x || intersectionPoint.x === mid03.x
+        || mid12.x === mid03.x) {
+        if (intersectionPoint.y < mid12.y) {
+          if (mid12.y < mid03.y) {
+            //12->03
+            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
+          } else {
+            //03->12
+            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
+          }
+        } else {
+          if (mid12.y < mid03.y) {
+            //03->12
+            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
+          } else {
+            //12->03
+            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
+          }
+        }
+      } else {
+        if (intersectionPoint.x < mid12.x) {
+          if (mid12.x < mid03.x) {
+            //12->03
+            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
+          } else {
+            //03 -> 12
+            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
+          }
+        } else {
+          if (mid12.x < mid03.x) {
+            //03->12
+            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
+          } else {
+            //12->03
+            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
+          }
+        }
+      }
+      result = order2[orderIndex];
+    }
+    const successor = directionSameWithVector(border[result[0]],border[result[1]],laneVector);
+    const projectionPointOnLane = getIntersectionPoint(border[result[2]], centerLine[0],
+      laneCenterLineEndPoint);
+    const laneWidth = getPointDistance(border[result[2]], projectionPointOnLane) * 4;
+    const id = successor ? basedLane.successorId : basedLane.predecessorId;
+    const routingRes = this.getRoutingPoint(successor, projectionPointOnLane,
+      STORE.routeEditingManager.parkingRoutingDistanceThreshold,
+      centerLine, laneVector, coordinates, id);
+    if (!_.isArray(routingRes) || routingRes.length !== 2) {
+      return null;
+    }
+    routingPoint = routingRes[0];
+    const type = getPointDistance(border[result[0]],
+      border[result[1]]) < getPointDistance(border[result[2]], border[result[1]]) ? 0 : 1;
+    return {
+      order: result,
+      type,
+      laneWidth,
+      routingEndPoint: routingPoint,
+      laneId: routingRes[1],
+    };
   }
 }
