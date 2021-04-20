@@ -10516,7 +10516,7 @@
                   "type": "apollo.common.PointENU",
                   "id": 2
                 },
-                "parkingSpotType": {
+                "parkingSpaceType": {
                   "type": "ParkingSpaceType",
                   "id": 3
                 },
