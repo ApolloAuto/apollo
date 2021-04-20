@@ -235,15 +235,6 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         bool succeed = ConstructParkingRoutingTask(json, parking_routing_task);
         // For test routing
         auto routing_request = std::make_shared<RoutingRequest>();
-        bool suc = ConstructRoutingRequest(json, routing_request.get());
-        if (suc) {
-          sim_world_service_.PublishRoutingRequest(routing_request);
-          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Routing request sent.");
-        } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to send a routing request.");
-        }
         if (succeed) {
           task->set_task_name("parking_routing_task");
           task->set_task_type(apollo::task_manager::TaskType::PARKING_ROUTING);
