@@ -1,7 +1,8 @@
-import random
+import random, time
 import numpy as np
 from numpy import arctan, cos, sin, genfromtxt
 import rospy
+from routing_pub import talker as rtalker
 from pb_msgs.msg import PerceptionObstacles
 
 # calculate the tansformed coordinates of x and y
@@ -29,6 +30,7 @@ def transform(x, y, angle, x_center, y_center, compress_x_y):
 	
 
 def talker():
+    start = time.time()
     pub = rospy.Publisher('/apollo/perception/obstacles', PerceptionObstacles, queue_size=10)
 
     rospy.init_node('talker', anonymous=True)
@@ -78,7 +80,7 @@ def talker():
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
     # define the obstacle density (0 - 1)
-    obstacle_density = 0.002
+    obstacle_density = 0.001
 
     # define number of obstacles
     n_obstacles = int(obstacle_density * area_region)
@@ -87,6 +89,10 @@ def talker():
     scenario_id = 1
     # add a large number to obstacle id to make them unique among all simulation scenarios
     id_prefix = 10000
+
+    # executive external script routing_pub.py to send routing request
+    # rtalker()
+    print("Fuzzer start to before obs gen: ", time.time() - start)
 
     while not rospy.is_shutdown():
         # create PerceptionObstacles object
@@ -136,8 +142,7 @@ def talker():
 
         # increment the scenario counter
         scenario_id = scenario_id + 1
-        # print(msg_obstacles)
-        # print("========================================")
+        
         # publish the obstacles to ROS topic '/apollo/perception/obstacles'
         pub.publish(msg_obstacles)
         rate.sleep()

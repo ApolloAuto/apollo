@@ -1,8 +1,11 @@
 import numpy as np
 from numpy import genfromtxt
 import os, sys, time
+from routing_pub import talker as rtalker
 import rospy
 from pb_msgs.msg import PerceptionObstacles
+
+start = time.time()
 
 # load data from data/obstacles.csv and data/collision.csv
 obstacles_data = genfromtxt('/apollo/auto-test/data/obstacles.csv', delimiter=',')
@@ -46,14 +49,6 @@ collision_analysis = np.array([[obstacles_data.shape[0], scenario_number, collis
 with open('/apollo/auto-test/data/collision_analysis.csv', 'a') as csv:
     np.savetxt(csv, collision_analysis, fmt=['%d','%d','%d','%.6f'], delimiter=',')
 
-# prompt to start the vehicle at Dreamview frontend
-countdown = 5
-for i in range(countdown):
-    sys.stdout.write("\rPlease choose a routing and start the vehicle at Dreamview. {} seconds remaining.".format(countdown-i))
-    sys.stdout.flush()
-    time.sleep(1)
-print '\n'
-
 # regenerate the follow-up scenarios based on the obstacle data and MR
 # MR: Suppose that in a driving scenario,S, a car collided with a static obstacle O at location L, 
 #     Construct a follow-up driving scenario,S', that is identical to S except that O is repositioned 
@@ -65,6 +60,10 @@ pub = rospy.Publisher('/apollo/perception/obstacles', PerceptionObstacles, queue
 rospy.init_node('talker', anonymous=True)
 # define the frequency of refresh (Hz)
 rate = rospy.Rate(0.2)
+
+# executive external script routing_pub.py to send routing request
+# rtalker()
+print("Fuzzer2 start to before obs gen: ", time.time() - start)
 
 # generate the same number of scenarios 
 for scenario in range(1, scenario_number+1):
