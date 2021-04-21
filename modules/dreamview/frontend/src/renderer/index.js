@@ -336,10 +336,7 @@ class Renderer {
   }
 
   removeInvalidRoutingPoint(pointId, error) {
-    const index = this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
-    if (index !== -1) {
-      this.map.changeSelectedParkingSpaceColor(index, 0xDAA520);
-    }
+    this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
   }
 
   setParkingInfo(info) {
@@ -347,19 +344,11 @@ class Renderer {
   }
 
   removeAllRoutingPoints() {
-    const indexArr = this.routingEditor.removeAllRoutePoints(this.scene);
-    if (!_.isEmpty(indexArr)) {
-      indexArr.forEach(item => {
-        this.map.changeSelectedParkingSpaceColor(item, 0xDAA520);
-      });
-    }
+    this.routingEditor.removeAllRoutePoints(this.scene);
   }
 
   removeLastRoutingPoint() {
-    const index = this.routingEditor.removeLastRoutingPoint(this.scene);
-    if (index !== -1) {
-      this.map.changeSelectedParkingSpaceColor(index, 0xDAA520);
-    }
+    this.routingEditor.removeLastRoutingPoint(this.scene);
   }
 
   sendRoutingRequest(points = []) {
@@ -389,11 +378,7 @@ class Renderer {
     }
 
     const point = this.getGeolocation(event);
-    const selectedParkingSpaceIndex =
-            this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
-    if (selectedParkingSpaceIndex !== -1) {
-      this.map.changeSelectedParkingSpaceColor(selectedParkingSpaceIndex);
-    }
+    this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
   }
 
   // Render one frame. This supports the main draw/render loop.
@@ -495,10 +480,7 @@ class Renderer {
     if (removeOldMap) {
       this.map.removeAllElements(this.scene);
     }
-    const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
-    if (newData['parkingSpace'] && !_.isEmpty(extraInfo)) {
-      this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], extraInfo, this.coordinates,this.scene);
-    }
+    this.map.appendMapData(newData, this.coordinates, this.scene);
   }
 
   updatePointCloud(pointCloud) {

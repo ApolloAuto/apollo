@@ -26,11 +26,9 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
-#include "nlohmann/json.hpp"
-
 #include "modules/dreamview/proto/simulation_world.pb.h"
-
 #include "modules/map/pnc_map/pnc_map.h"
+#include "nlohmann/json.hpp"
 
 /**
  * @namespace apollo::dreamview
@@ -76,10 +74,6 @@ class MapService {
 
   bool ConstructLaneWayPointWithHeading(
       const double x, const double y, const double heading,
-      routing::LaneWaypoint *laneWayPoint) const;
-
-  bool ConstructLaneWayPointWithLaneId(
-      const double x, const double y, const std::string id,
       routing::LaneWaypoint *laneWayPoint) const;
 
   bool CheckRoutingPoint(const double x, const double y) const;
