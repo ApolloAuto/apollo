@@ -6,9 +6,9 @@ from modules.routing.proto import routing_pb2
 
 def talker():
     pub = rospy.Publisher('/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=1)
-    rospy.init_node('routing_request', anonymous=True)
+    # rospy.init_node('routing_request', anonymous=True)
 
-    sequence_num = 7
+    sequence_num = 0
 
     msg_routing_request = routing_pb2.RoutingRequest()
     msg_routing_request.header.timestamp_sec = rospy.get_time()

@@ -4,6 +4,8 @@ from numpy import arctan, cos, sin, genfromtxt
 import rospy
 from routing_pub import talker as rtalker
 from pb_msgs.msg import PerceptionObstacles
+from modules.routing.proto import routing_pb2
+
 
 # calculate the tansformed coordinates of x and y
 # according to the angle and distance between center to origin
@@ -30,10 +32,37 @@ def transform(x, y, angle, x_center, y_center, compress_x_y):
 	
 
 def talker():
-    start = time.time()
-    pub = rospy.Publisher('/apollo/perception/obstacles', PerceptionObstacles, queue_size=10)
+    pub_obstacle = rospy.Publisher('/apollo/perception/obstacles', PerceptionObstacles, queue_size=10)
+    pub_routing = rospy.Publisher('/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=10)
 
     rospy.init_node('talker', anonymous=True)
+
+    sequence_num = 0
+
+    msg_routing_request = routing_pb2.RoutingRequest()
+    msg_routing_request.header.timestamp_sec = rospy.get_time()
+    msg_routing_request.header.module_name = 'routing_request'
+    msg_routing_request.header.sequence_num = sequence_num
+    sequence_num = sequence_num + 1
+
+    # load data from data/waypoints.csv
+    routing_data = genfromtxt('/apollo/auto-test/data/waypoints.csv', delimiter=',',dtype=None)
+    len_waypoints = len(routing_data)
+
+    for point in range(len_waypoints):
+        curr_point = routing_data[point]
+        msg = msg_routing_request.waypoint.add()
+        msg.id = curr_point[0]
+        msg.s = curr_point[1]
+        msg.pose.x = curr_point[2]
+        msg.pose.y = curr_point[3]
+
+    # print(msg_routing_request)
+    # wait for 2 seconds to let the message published successfully
+    # if time is too short, the message may be ommited by the system
+    time.sleep(2.0)
+    pub_routing.publish(msg_routing_request)
+
     # define the frequency of refresh (Hz)
     rate = rospy.Rate(0.2)
 
@@ -80,21 +109,19 @@ def talker():
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
     # define the obstacle density (0 - 1)
-    obstacle_density = 0.001
+    obstacle_density = 0.006
 
     # define number of obstacles
     n_obstacles = int(obstacle_density * area_region)
 
     # set scenario id to 1
-    scenario_id = 1
+    # scenario_id = 1
     # add a large number to obstacle id to make them unique among all simulation scenarios
     id_prefix = 10000
+    # denfine number of scenarios
+    scenario_num = 6
 
-    # executive external script routing_pub.py to send routing request
-    # rtalker()
-    print("Fuzzer start to before obs gen: ", time.time() - start)
-
-    while not rospy.is_shutdown():
+    for scenario_id in range(1, scenario_num+1):
         # create PerceptionObstacles object
         msg_obstacles = PerceptionObstacles()
 
@@ -136,15 +163,11 @@ def talker():
             with open('/apollo/auto-test/data/obstacles.csv', 'a') as csv:
                 np.savetxt(csv, obstacle_data, fmt = ['%d','%d','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%.4f','%d'], delimiter=',')
 
-            # define the velocity of the obstacle
-            # msg.velocity.x = 5
-            # msg.velocity.y = 5
-
         # increment the scenario counter
         scenario_id = scenario_id + 1
         
         # publish the obstacles to ROS topic '/apollo/perception/obstacles'
-        pub.publish(msg_obstacles)
+        pub_obstacle.publish(msg_obstacles)
         rate.sleep()
 
 

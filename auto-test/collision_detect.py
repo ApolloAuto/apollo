@@ -2,7 +2,7 @@
 import numpy as np
 import rospy
 from pb_msgs.msg import MonitorMessage
-import sys
+import sys, os, time
 # from modules.common.monitor_log.proto.monitor_log_pb2 import MonitorMessage
 
 def monitorCallback(monitorMessage):
@@ -24,15 +24,19 @@ def monitorCallback(monitorMessage):
             msg = msg[:position]
         obstacle_id = int(msg.replace(collisionMessage, ''))
         obstacle = [obstacle_id]
+
         #print(obstacle_id)
 
         # add new obstacle data into the csv file, path is determined at the start of main
         with open(file_dest, 'a') as csv:
             np.savetxt(csv, obstacle, fmt='%d', delimiter=',')
        
-        # need to remove redundant ids 
-        # non-trivial in this script, temporarily implement id removal
-        # in metamorphic.py and can be optimised later 
+        print("Collision detect.")
+
+        # terminate fuzzer or metamorphic script
+
+        # exit once collision is detected
+        os._exit(1)
 
 def listener():
     rospy.init_node('collision_detect', anonymous=True)
@@ -49,4 +53,5 @@ if __name__ == '__main__':
         print("Invalid arguments for collision_detect.py")
         sys.exit()
 
+    time.sleep(2)
     listener()
