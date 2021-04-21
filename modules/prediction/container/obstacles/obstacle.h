@@ -228,6 +228,13 @@ class Obstacle {
 
   bool IsCaution() const;
 
+  /**
+   * @brief Set the obstacle as caution level
+   */
+  void SetInteractiveTag();
+
+  bool IsInteractiveObstacle() const;
+
   void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
 
   void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);

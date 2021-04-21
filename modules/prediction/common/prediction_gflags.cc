@@ -70,6 +70,8 @@ DEFINE_bool(enable_all_pedestrian_caution_in_front, false,
             "If true, then all pedestrian in front of ADC are marked caution.");
 DEFINE_bool(enable_rank_caution_obstacles, true,
             "Rank the caution-level obstacles.");
+DEFINE_bool(enable_rank_interactive_obstacles, true,
+            "Rank the interactive obstacles.");
 DEFINE_int32(caution_obs_max_nums, 6,
              "The max number of caution-level obstacles");
 DEFINE_double(caution_distance_threshold, 60.0,
@@ -86,6 +88,20 @@ DEFINE_double(caution_search_distance_backward_for_overlap, 30.0,
               "in the case of overlap");
 DEFINE_double(caution_pedestrian_approach_time, 3.0,
               "The time for a pedestrian to approach adc trajectory");
+DEFINE_int32(interactive_obs_max_nums, 6,
+             "The max number of interactive obstacles");
+DEFINE_double(interaction_distance_threshold, 60.0,
+              "Distance threshold for interactive obstacles");
+DEFINE_double(interaction_search_distance_ahead, 50.0,
+              "The distance ahead to search interactive obstacles");
+DEFINE_double(interaction_search_distance_backward, 50.0,
+              "The distance backward to search interactive obstacles");
+DEFINE_double(interaction_search_distance_backward_for_merge, 60.0,
+              "The distance backward to search interactive obstacles "
+              "in the case of merging");
+DEFINE_double(interaction_search_distance_backward_for_overlap, 30.0,
+              "The distance backward to search interactive obstacles "
+              "in the case of overlap");
 
 // Obstacle features
 DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");

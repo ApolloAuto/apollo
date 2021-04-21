@@ -66,6 +66,13 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
+message ObstacleInteractiveTag {
+  enum InteractiveTag {
+    INTERACTION = 1;
+    NONINTERACTION = 2;
+  }
+  optional InteractiveTag interactive_tag = 37 [default = NONINTERACTION];
+}
 message Trajectory {
   optional double probability = 1;  // probability of this trajectory
   repeated apollo.common.TrajectoryPoint trajectory_point = 2;
@@ -110,6 +117,7 @@ message Feature {
   optional double label_update_time_delta = 24;
 
   optional ObstaclePriority priority = 25;
+  optional ObstacleInteractiveTag interactive_tag = 37;
 
   optional bool is_near_junction = 29 [default = false];
 
