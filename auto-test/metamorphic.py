@@ -19,8 +19,7 @@ collision_data = genfromtxt('/apollo/auto-test/data/collision.csv', delimiter=',
 
 # remove duplicated data in collision_data
 collision_data = np.unique(collision_data)
-print('collision obstacle id: %d'% collision_data)
-print(type(collision_data))
+collision_id = collision_data[0]
 
 # # find the information of all the collision obstacles in obstacle_data
 # collision_obstacle_data = np.zeros([collision_size, 10])
@@ -33,10 +32,12 @@ print(type(collision_data))
 # print collision rate
 # get the number of scenarios generated
 scenario_number = int(obstacles_data[-1][1])
+obstacle_number = int(obstacles_data.shape[0])
 # check whether Obstacle number is divisable by scenario number
 if (obstacle_number % scenario_number != 0):
     print("Error: Obstacle number is not divisable by scenario number! Something goes wrong!")
     sys.exit()
+
 
 obstacle_per_scenario = obstacle_number / scenario_number
 
@@ -98,6 +99,12 @@ for scenario in range(1, scenario_number+1):
         msg.position.x = obs_info_one[2]
         msg.position.y = obs_info_one[3]
         msg.position.z = obs_info_one[4]
+        # todo move obstacle further away
+        # if (int(obs_info_one[0]) == collision_id):
+        #     msg.position.x = msg.position.x
+        #     msg.position.y = msg.position.y
+        #     msg.position.z = msg.position.z
+
         msg.theta = obs_info_one[5]
         msg.length = obs_info_one[6]
         msg.width = obs_info_one[7]
@@ -114,6 +121,3 @@ if (not os.path.exists('/apollo/auto-test/data/collision_new.csv')):
     sys.exit()
 # remove duplicated data in collision_data
 collision_data_new = np.unique(collision_data_new)
-
-print('collosions 1: ', collision_data)
-print('collosions 2: ', collision_data_new)

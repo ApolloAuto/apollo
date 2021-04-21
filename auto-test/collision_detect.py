@@ -36,7 +36,7 @@ def monitorCallback(monitorMessage):
         # terminate fuzzer or metamorphic script
 
         # exit once collision is detected
-        os._exit(1)
+        # os._exit(1)
 
 def listener():
     rospy.init_node('collision_detect', anonymous=True)
