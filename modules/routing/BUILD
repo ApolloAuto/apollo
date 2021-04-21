@@ -59,6 +59,7 @@ install(
     ],
     deps = [
         "//cyber:install",
+        "//modules/routing/topo_creator:install",
     ],
 )
 

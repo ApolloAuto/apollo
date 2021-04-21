@@ -1,7 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+        ":topo_creator",
+    ],
+    runtime_dest = "modules/routing/topo_creator",
+)
 
 cc_library(
     name = "edge_creator",
