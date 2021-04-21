@@ -1,7 +1,7 @@
 # trap "kill 0" EXIT # kill all background process on exit
 
 # run collision_detect.py and fuzzer.py in parallel 
-round=5
+round=50
 curr_round=1
 
 while [ $curr_round -le $round ]

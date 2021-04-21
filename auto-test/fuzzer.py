@@ -109,7 +109,7 @@ def talker():
     # calculate the area of the region
     area_region = (bound_right - bound_left) * (bound_up - bound_down)
     # define the obstacle density (0 - 1)
-    obstacle_density = 0.006
+    obstacle_density = 0.003
 
     # define number of obstacles
     n_obstacles = int(obstacle_density * area_region)
@@ -144,9 +144,9 @@ def talker():
             msg.theta = 1.0
 
             # custom obstacle dimentions
-            msg.length = 2.0
-            msg.width = 2.0
-            msg.height = 2.0
+            msg.length = random.uniform(1, 4)
+            msg.width = random.uniform(1, 4)
+            msg.height = random.uniform(1, 4)
 
             # define the type of the obstacle (default 10: general obstacle)
             msg.type = random.randrange(0, 5)

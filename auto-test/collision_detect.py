@@ -31,7 +31,7 @@ def monitorCallback(monitorMessage):
         with open(file_dest, 'a') as csv:
             np.savetxt(csv, obstacle, fmt='%d', delimiter=',')
        
-        print("Collision detect.")
+        # print("Collision detect.")
 
         # terminate fuzzer or metamorphic script
 

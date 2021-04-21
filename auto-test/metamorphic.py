@@ -114,10 +114,16 @@ for scenario in range(1, scenario_number+1):
     pub_obstacle.publish(msg_obstacles)    
     rate.sleep()
 
-collision_data_new = genfromtxt('/apollo/auto-test/data/collision_new.csv', delimiter=',')
-
 if (not os.path.exists('/apollo/auto-test/data/collision_new.csv')):
     print('No collision detected in the follow-up simulation!')
     sys.exit()
+
+collision_data_new = genfromtxt('/apollo/auto-test/data/collision_new.csv', delimiter=',')
+
 # remove duplicated data in collision_data
 collision_data_new = np.unique(collision_data_new)
+
+print('collosions 1: ', collision_data)
+print('collosions 2: ', collision_data_new)
+if (np.array_equal(collision_data, collision_data_new)):
+    print('Identical repruduction!')
