@@ -14,18 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/lidar/velodyne/driver/velodyne_driver_component.h"
+
 #include <memory>
 #include <string>
 #include <thread>
 
 #include "cyber/cyber.h"
-
 #include "modules/common/util/message_util.h"
-#include "modules/drivers/lidar/velodyne/driver/velodyne_driver_component.h"
 
 namespace apollo {
 namespace drivers {
 namespace velodyne {
+
+VelodyneDriverComponent::~VelodyneDriverComponent() {
+  if (device_thread_ && device_thread_->joinable()) {
+    device_thread_->join();
+  }
+}
 
 bool VelodyneDriverComponent::Init() {
   AINFO << "Velodyne driver component init";
@@ -40,13 +46,11 @@ bool VelodyneDriverComponent::Init() {
   if (driver == nullptr) {
     return false;
   }
-  dvr_.reset(driver);
-  dvr_->Init();
+  driver_.reset(driver);
+  driver_->Init();
   // spawn device poll thread
-  runing_ = true;
-  device_thread_ = std::shared_ptr<std::thread>(
-      new std::thread(std::bind(&VelodyneDriverComponent::device_poll, this)));
-  device_thread_->detach();
+  device_thread_ = std::make_shared<std::thread>(
+      std::bind(&VelodyneDriverComponent::device_poll, this));
 
   return true;
 }
@@ -55,8 +59,8 @@ bool VelodyneDriverComponent::Init() {
 void VelodyneDriverComponent::device_poll() {
   while (!apollo::cyber::IsShutdown()) {
     // poll device until end of file
-    std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
-    bool ret = dvr_->Poll(scan);
+    auto scan = std::make_shared<VelodyneScan>();
+    bool ret = driver_->Poll(scan);
     if (ret) {
       common::util::FillHeader("velodyne", scan.get());
       writer_->Write(scan);
@@ -66,7 +70,6 @@ void VelodyneDriverComponent::device_poll() {
   }
 
   AERROR << "CompVelodyneDriver thread exit";
-  runing_ = false;
 }
 
 }  // namespace velodyne

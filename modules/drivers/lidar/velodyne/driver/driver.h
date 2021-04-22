@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
 #include <memory>
 #include <string>
 
-#include "modules/drivers/lidar/velodyne/driver/socket_input.h"
 #include "modules/drivers/lidar/velodyne/proto/config.pb.h"
 #include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
+
+#include "modules/drivers/lidar/velodyne/driver/socket_input.h"
 
 namespace apollo {
 namespace drivers {
