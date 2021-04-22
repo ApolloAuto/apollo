@@ -122,20 +122,20 @@ To configure the DAG file (`common.dag` here), specify the following items:
 
 ```protobuf
 # Define all components in DAG streaming.
-component_config {
-    component_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
-    components {
-        class_name : "CommonComponentSample"
-        config {
-            name : "common"
-            readers {
-                channel: "/apollo/prediction"
-            }
-            readers {
-                channel: "/apollo/test"
-            }
+module_config {
+module_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
+components {
+    class_name : "CommonComponentSample"
+    config {
+        name : "common"
+        readers {
+            channel: "/apollo/prediction"
+        }
+        readers {
+            channel: "/apollo/test"
         }
     }
+  }
 }
 ```
 
