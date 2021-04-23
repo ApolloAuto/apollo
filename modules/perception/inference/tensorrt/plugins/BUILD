@@ -37,6 +37,7 @@ cuda_library(
         "nms_cuda.cu",
     ],
     hdrs = ["kernels.h"],
+    alwayslink = True,
     deps = [
         "//modules/perception/base:common",
         "@local_config_cuda//cuda:cudart",
