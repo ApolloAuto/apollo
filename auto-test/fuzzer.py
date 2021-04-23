@@ -73,7 +73,7 @@ def talker():
     # routing = routings[routings[:,0] == routing_id]
     routing = routings[routings[:,0] == routing_id][0]
     # extract the start and end coordinates from the list
-    start_x = routing[1]
+    start_x = routing[1.1]
     start_y = routing[2]
     end_x = routing[3]
     end_y = routing[4]
@@ -89,9 +89,12 @@ def talker():
     center_x = 0.5 * (start_x + end_x)
     center_y = 0.5 * (start_y + end_y)
 
-    # get the angle of the road according to the horizontal line
+    # get the tan value of angle of the road according to the horizontal line
     tan_value = abs(float(end_y-start_y) / float(end_x-start_x))
-    
+    # get the angle 
+    # road_angle = arctan(tan_value)
+    # print(road_angle)
+
     # determine whether the region is general horizontal or vertical
     if abs(start_x-end_x) > abs(start_y-end_y):
     	compress = 1
@@ -124,7 +127,7 @@ def talker():
     for scenario_id in range(1, scenario_num+1):
         # create PerceptionObstacles object
         msg_obstacles = PerceptionObstacles()
-
+        # print('Scenario/ ID: %d' % scenario_id)
         for obs in range(n_obstacles):
             msg = msg_obstacles.perception_obstacle.add()
             msg.id = obs + scenario_id * id_prefix
@@ -169,6 +172,11 @@ def talker():
         # publish the obstacles to ROS topic '/apollo/perception/obstacles'
         pub_obstacle.publish(msg_obstacles)
         rate.sleep()
+
+    # # publish an empty set of obstacles to reset the scenario for the next test case
+    # msg_obstacles = PerceptionObstacles()
+    # pub_obstacle.publish(msg_obstacles)
+
 
 
 if __name__ == '__main__':

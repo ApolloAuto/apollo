@@ -53,5 +53,5 @@ if __name__ == '__main__':
         print("Invalid arguments for collision_detect.py")
         sys.exit()
 
-    time.sleep(2)
+    time.sleep(3)
     listener()

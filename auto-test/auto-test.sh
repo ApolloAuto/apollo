@@ -6,6 +6,7 @@ curr_round=1
 
 while [ $curr_round -le $round ]
 do
+    echo "================================================================"
     echo "Test round: $curr_round"
     echo "Source test case generating..."
     python auto-test/collision_detect.py src &

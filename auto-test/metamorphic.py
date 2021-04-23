@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import genfromtxt
+from numpy import genfromtxt, arctan, cos, sin
 import os, sys, time
 from routing_pub import talker as rtalker
 import rospy
@@ -20,6 +20,7 @@ collision_data = genfromtxt('/apollo/auto-test/data/collision.csv', delimiter=',
 # remove duplicated data in collision_data
 collision_data = np.unique(collision_data)
 collision_id = collision_data[0]
+print(collision_id)
 
 # # find the information of all the collision obstacles in obstacle_data
 # collision_obstacle_data = np.zeros([collision_size, 10])
@@ -85,9 +86,11 @@ for point in range(len_waypoints):
 time.sleep(2.0)
 pub_routing.publish(msg_routing_request)
 
+road_angle = 1.33015289662
 
 # generate the same number of scenarios 
 for scenario in range(1, scenario_number+1):
+    # print('Scenario ID: %d' % scenario)
     # create PerceptionObstacles object
     msg_obstacles = PerceptionObstacles()
     # obtain the data for the scenario of the loop
@@ -101,9 +104,8 @@ for scenario in range(1, scenario_number+1):
         msg.position.z = obs_info_one[4]
         # todo move obstacle further away
         # if (int(obs_info_one[0]) == collision_id):
-        #     msg.position.x = msg.position.x
-        #     msg.position.y = msg.position.y
-        #     msg.position.z = msg.position.z
+        #     msg.position.x = msg.position.x - 4.0 * cos(road_angle)
+        #     msg.position.y = msg.position.y - 4.0 * sin(road_angle)
 
         msg.theta = obs_info_one[5]
         msg.length = obs_info_one[6]
@@ -113,6 +115,10 @@ for scenario in range(1, scenario_number+1):
 
     pub_obstacle.publish(msg_obstacles)    
     rate.sleep()
+
+# # publish an empty set of obstacles to reset the scenario for the next test case
+# msg_obstacles = PerceptionObstacles()
+# pub_obstacle.publish(msg_obstacles)
 
 if (not os.path.exists('/apollo/auto-test/data/collision_new.csv')):
     print('No collision detected in the follow-up simulation!')
@@ -125,5 +131,13 @@ collision_data_new = np.unique(collision_data_new)
 
 print('collosions 1: ', collision_data)
 print('collosions 2: ', collision_data_new)
+
+collision_cmp = np.array([collision_data, collision_data_new])
+# add new obstacle data into the csv file, path is determined at the start of main
+with open('/apollo/auto-test/data/collision_compare.csv', 'a') as csv:
+    np.savetxt(csv, collision_cmp, fmt='%d', delimiter=',')
+
 if (np.array_equal(collision_data, collision_data_new)):
     print('Identical repruduction!')
+    
+print('================================================================')
