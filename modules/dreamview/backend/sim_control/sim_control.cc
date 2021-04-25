@@ -109,7 +109,7 @@ void SimControl::InitTimerAndIO() {
 
 void SimControl::Init(bool set_start_point, double start_velocity,
                       double start_acceleration) {
-  if (set_start_point && !FLAGS_use_navigation_mode) {
+  if (!FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
 }
