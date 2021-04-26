@@ -49,6 +49,7 @@ apt_get_update_and_install \
     libjpeg-dev \
     libpng-dev \
     libtiff-dev \
+    libgtk2.0-dev \
     libv4l-dev \
     libeigen3-dev \
     libopenblas-dev \
@@ -134,7 +135,9 @@ pushd "opencv-${VERSION}"
             -DBUILD_PROTOBUF=OFF \
             -DPROTOBUF_UPDATE_FILES=ON \
             -DINSTALL_C_EXAMPLES=OFF \
-            -DWITH_GTK=OFF \
+            -DWITH_GTK=ON \
+            -DWITH_GTK_2_X=ON \
+            -DWITH_QT=ON \
             -DWITH_IPP=OFF \
             -DWITH_ITT=OFF \
             -DWITH_TBB=OFF \
@@ -179,5 +182,6 @@ if [[ -n "${CLEAN_DEPS}" ]]; then
         libatlas-base-dev \
         libxvidcore-dev \
         libx264-dev \
+        libgtk2.0-dev \
         libopenni-dev
 fi
