@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
-#include <cstdio>
 #include <unistd.h>
+#include <cstdio>
+#include <pcap.h>
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"

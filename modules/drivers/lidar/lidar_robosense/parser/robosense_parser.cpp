@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
-
-#include <pcl/common/time.h>
-
 #include <algorithm>
 #include <fstream>
-
+#include <pcl/common/time.h>
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
 #include "cyber/cyber.h"
 
 namespace apollo {
@@ -30,8 +27,8 @@ uint64_t RobosenseParser::get_gps_stamp(double current_packet_stamp,
                                         double* previous_packet_stamp,
                                         uint64_t* gps_base_usec) {
   if (std::abs(*previous_packet_stamp - current_packet_stamp) >
-      3599000000) {                                       //微妙 us
-    *gps_base_usec += static_cast<uint64_t>(3600 * 1e6);  //+ 1小时   单位微妙
+      3599000000) {                                       // 微妙 us
+    *gps_base_usec += static_cast<uint64_t>(3600 * 1e6);  // + 1小时   单位微妙
     AINFO << "gps_base+1---current_stamp:" << current_packet_stamp
           << "previous_stamp:" << previous_packet_stamp;
   }

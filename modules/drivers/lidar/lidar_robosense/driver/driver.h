@@ -18,11 +18,11 @@
 #include <memory>
 #include <string>
 
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/pcap_input.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/socket_input.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -66,7 +66,8 @@ class RobosenseDriver {
 
 class Robosense16Driver : public RobosenseDriver {
  public:
-  Robosense16Driver(const apollo::drivers::suteng::SutengConfig& robo_config);
+  explicit Robosense16Driver(
+      const apollo::drivers::suteng::SutengConfig& robo_config);
   ~Robosense16Driver();
 
   void init();

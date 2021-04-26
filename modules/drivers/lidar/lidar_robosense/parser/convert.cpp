@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/drivers/lidar/lidar_robosense/parser/convert.h"
-
-#include <pcl/common/time.h>
-
 #include <memory>
-
+#include <pcl/common/time.h>
+#include "modules/drivers/lidar/lidar_robosense/parser/convert.h"
 #include "cyber/cyber.h"
 
 namespace apollo {

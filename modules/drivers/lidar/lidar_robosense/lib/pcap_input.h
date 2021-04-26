@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #pragma once
-#include <cstdio>
 #include <unistd.h>
+#include <cstdio>
 #include <string>
 #include <pcap.h>
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
