@@ -1,4 +1,4 @@
-ARG DEV_IMAGE_IN=apolloauto/apollo:dev-x86_64-18.04-20210414_1711
+ARG DEV_IMAGE_IN=apolloauto/apollo:dev-x86_64-18.04-20210426_0123
 
 ARG BASE_IMAGE=nvidia/cuda:11.1-runtime-ubuntu18.04
 
