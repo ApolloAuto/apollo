@@ -48,6 +48,8 @@ message PredictionObstacle {
 
   optional ObstaclePriority priority = 6;
 
+  optional ObstacleInteractiveTag interactive_tag = 9;
+
   optional bool is_static = 7 [default = false];
 
   // Feature history latest -> earliest sequence

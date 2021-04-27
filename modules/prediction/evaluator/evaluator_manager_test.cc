@@ -49,6 +49,9 @@ TEST_F(EvaluatorManagerTest, General) {
 
   ContainerManager container_manager;
   container_manager.Init(adapter_conf_);
+  auto adc_trajectory_container =
+      container_manager.GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
   auto obstacles_container =
       container_manager.GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -58,7 +61,8 @@ TEST_F(EvaluatorManagerTest, General) {
   EvaluatorManager evaluator_manager;
 
   evaluator_manager.Init(prediction_conf_);
-  evaluator_manager.Run(obstacles_container);
+  evaluator_manager.Run(adc_trajectory_container,
+      obstacles_container);
 
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);

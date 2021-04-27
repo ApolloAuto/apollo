@@ -229,9 +229,13 @@ class Obstacle {
   bool IsCaution() const;
 
   /**
-   * @brief Set the obstacle as caution level
+   * @brief Set the obstacle as interactive obstacle.
    */
   void SetInteractiveTag();
+  /**
+   * @brief Set the obstacle as noninteractive obstacle.
+   */
+  void SetNonInteractiveTag();
 
   bool IsInteractiveObstacle() const;
 

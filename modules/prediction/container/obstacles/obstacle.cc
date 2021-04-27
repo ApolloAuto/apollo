@@ -1459,8 +1459,15 @@ bool Obstacle::IsCaution() const {
 void Obstacle::SetInteractiveTag() {
   CHECK_GT(feature_history_.size(), 0U);
   Feature* feature = mutable_latest_feature();
-  feature->mutable_interactive_tag()->
-           set_interactive_tag(ObstacleInteractiveTag::INTERACTION);
+  feature->mutable_interactive_tag()
+      ->set_interactive_tag(ObstacleInteractiveTag::INTERACTION);
+}
+
+void Obstacle::SetNonInteractiveTag() {
+  CHECK_GT(feature_history_.size(), 0U);
+  Feature* feature = mutable_latest_feature();
+  feature->mutable_interactive_tag()
+      ->set_interactive_tag(ObstacleInteractiveTag::NONINTERACTION);
 }
 
 bool Obstacle::IsInteractiveObstacle() const {

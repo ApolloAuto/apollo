@@ -182,4 +182,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "jointly_prediction_planning_evaluator",
+    srcs = ["jointly_prediction_planning_evaluator.cc"],
+    hdrs = ["jointly_prediction_planning_evaluator.h"],
+    copts = PREDICTION_FOPENMP_COPTS,
+    deps = [
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:semantic_map",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator",
+        "//third_party:libtorch",
+        "@eigen",
+    ],
+)
 cpplint()

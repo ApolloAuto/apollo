@@ -45,6 +45,7 @@ DECLARE_double(surrounding_lane_search_radius);
 
 // Semantic Map
 DECLARE_double(base_image_half_range);
+DECLARE_bool(enable_draw_adc_trajectory);
 DECLARE_bool(img_show_semantic_map);
 
 // Scenario
@@ -104,6 +105,8 @@ DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_max_acc);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
+DECLARE_string(torch_vehicle_jointly_model_file);
+DECLARE_string(torch_vehicle_jointly_model_cpu_file);
 DECLARE_string(torch_vehicle_junction_mlp_file);
 DECLARE_string(torch_vehicle_junction_map_file);
 DECLARE_string(torch_vehicle_semantic_lstm_file);

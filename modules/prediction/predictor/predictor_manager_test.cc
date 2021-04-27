@@ -71,7 +71,7 @@ TEST_F(PredictorManagerTest, General) {
       container_manager_->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
 
-  evaluator_manager_->Run(obstacles_container);
+  evaluator_manager_->Run(adc_trajectory_container, obstacles_container);
   predictor_manager_->Run(perception_obstacles_, adc_trajectory_container,
                           obstacles_container);
 

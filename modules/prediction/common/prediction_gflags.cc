@@ -58,6 +58,8 @@ DEFINE_double(surrounding_lane_search_radius, 3.0,
 
 // Semantic Map
 DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");
+DEFINE_bool(enable_draw_adc_trajectory, false,
+            "If draw adc trajectory in semantic map");
 DEFINE_bool(img_show_semantic_map, false, "If show the image of semantic map.");
 
 // Scenario
@@ -167,6 +169,16 @@ DEFINE_string(evaluator_vehicle_mlp_file,
 DEFINE_string(evaluator_vehicle_rnn_file,
               "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
+DEFINE_string(
+    torch_vehicle_jointly_model_file,
+    "/apollo/modules/prediction/data/"
+    "jointly_prediction_planning_vehicle_model.pt",
+    "Vehicle jointly prediction and planning model file");
+DEFINE_string(
+    torch_vehicle_jointly_model_cpu_file,
+    "/apollo/modules/prediction/data/"
+    "jointly_prediction_planning_vehicle_cpu_model.pt",
+    "Vehicle jointly prediction and planning cpu model file");
 DEFINE_string(torch_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
               "Vehicle junction MLP model file");

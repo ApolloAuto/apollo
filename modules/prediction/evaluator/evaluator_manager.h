@@ -66,9 +66,11 @@ class EvaluatorManager {
   /**
    * @brief Run evaluators
    */
-  void Run(ObstaclesContainer* obstacles_container);
+  void Run(const ADCTrajectoryContainer* adc_trajectory_container,
+           ObstaclesContainer* obstacles_container);
 
-  void EvaluateObstacle(Obstacle* obstacle,
+  void EvaluateObstacle(const ADCTrajectoryContainer* adc_trajectory_container,
+                        Obstacle* obstacle,
                         ObstaclesContainer* obstacles_container,
                         std::vector<Obstacle*> dynamic_env);
 
@@ -126,6 +128,9 @@ class EvaluatorManager {
 
   ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;
+
+  ObstacleConf::EvaluatorType interaction_evaluator_ =
+      ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR;
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
 

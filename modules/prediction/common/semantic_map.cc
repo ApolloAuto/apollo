@@ -88,6 +88,12 @@ void SemanticMap::RunCurrFrame(
     }
   }
 
+  // Draw ADC trajectory
+  if (FLAGS_enable_draw_adc_trajectory) {
+    DrawADCTrajectory(cv::Scalar(0, 255, 255),
+                curr_base_x_, curr_base_y_, &curr_img_);
+  }
+
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
     DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
@@ -339,6 +345,19 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
       }
       DrawPoly(feature, decay_color, base_x, base_y, img);
     }
+  }
+}
+
+void SemanticMap::DrawADCTrajectory(const cv::Scalar& color,
+                              const double base_x,
+                              const double base_y,
+                              cv::Mat* img) {
+  size_t traj_num = ego_feature_.adc_trajectory_point().size();
+  for (size_t i = 0; i < traj_num; ++i) {
+    double time_decay = ego_feature_.adc_trajectory_point(i).relative_time() -
+                        ego_feature_.adc_trajectory_point(0).relative_time();
+    cv::Scalar decay_color = color * time_decay;
+    DrawPoly(ego_feature_, decay_color, base_x, base_y, img);
   }
 }
 

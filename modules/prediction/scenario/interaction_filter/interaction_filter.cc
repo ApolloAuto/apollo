@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,23 @@ void InteractionFilter::AssignInteractiveTag() {
   if (ego_vehicle->history_size() == 0) {
     AERROR << "Ego vehicle has no history";
     return;
+  }
+
+  const auto& obstacle_ids =
+    obstacles_container->curr_frame_movable_obstacle_ids();
+  for (const int obstacle_id : obstacle_ids) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
+    if (obstacle_ptr->history_size() == 0) {
+      AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
+      continue;
+    }
+    Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+    latest_feature_ptr->mutable_interactive_tag()->set_interactive_tag(
+          ObstacleInteractiveTag::NONINTERACTION);
   }
   auto storytelling_container =
       container_manager_->GetContainer<StoryTellingContainer>(
@@ -444,6 +461,8 @@ void InteractionFilter::SetInteractiveIfCloseToEgo(
   if (distance < distance_threshold &&
       obstacle_ptr->latest_feature().type() == PerceptionObstacle::VEHICLE) {
     obstacle_ptr->SetInteractiveTag();
+  } else {
+    obstacle_ptr->SetNonInteractiveTag();
   }
 }
 
