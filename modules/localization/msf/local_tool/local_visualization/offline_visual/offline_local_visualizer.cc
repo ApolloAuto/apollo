@@ -16,7 +16,10 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
 
+#include <utility>
+
 #include <boost/filesystem.hpp>
+
 #include "absl/strings/str_cat.h"
 
 #include "cyber/common/log.h"
@@ -164,18 +167,15 @@ void OfflineLocalVisualizer::Visualize() {
                           "Fusion.", pcd_timestamps_[idx], idx + 1);
     }
 
-    std::vector<LocalizatonInfo> loc_infos;
-    loc_infos.push_back(lidar_loc_info);
-    loc_infos.push_back(gnss_loc_info);
-    loc_infos.push_back(fusion_loc_info);
-
     std::string pcd_file_path = absl::StrCat(pcd_folder_, "/", idx + 1, ".pcd");
     ::apollo::common::EigenVector3dVec pt3ds;
     std::vector<unsigned char> intensities;
     apollo::localization::msf::velodyne::LoadPcds(
         pcd_file_path, idx, lidar_loc_info.pose, &pt3ds, &intensities, false);
 
-    visual_engine_.Visualize(loc_infos, pt3ds);
+    ::apollo::common::EigenVector<LocalizatonInfo> loc_infos{
+        lidar_loc_info, gnss_loc_info, fusion_loc_info};
+    visual_engine_.Visualize(std::move(loc_infos), pt3ds);
   }
 }
 
