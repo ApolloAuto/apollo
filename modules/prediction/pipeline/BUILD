@@ -19,4 +19,19 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "vector_net",
+    srcs = ["vector_net.cc"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    linkopts = [
+        "-lgomp",
+    ],
+    deps = [
+        "//models/map/hdmap:hdmap_util",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
 cpplint()
