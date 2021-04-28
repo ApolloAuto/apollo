@@ -19,7 +19,7 @@
 OBSTACLE_X=$1
 OBSTACLE_Y=$2
 OBSTACLE_PHI=$3
-TARGET_DIR=$4
+TARGET_FILE=$4
 
 set -e
 
@@ -32,11 +32,9 @@ else
     MAP_DIR=$5
 fi
 
-/apollo/bazel-bin/modules/prediction/pipeline/vector_net \
-    --flagfile=/apollo/modules/prediction/conf/prediction.conf \
+/apollo/bazel-bin/modules/prediction/pipeline/vector_net_feature \
     --map_dir=/apollo/modules/map/data/${MAP_DIR} \
-    --prediction_data_dir=${TARGET_DIR} \
+    --prediction_target_file=${TARGET_FILE} \
     --obstacle_x=${OBSTACLE_X} \
     --obstacle_y=${OBSTACLE_Y} \
-    --obatacle_phi=${OBSTACLE_PHI}
-
+    --obstacle_phi=${OBSTACLE_PHI}

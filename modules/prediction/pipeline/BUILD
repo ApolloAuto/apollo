@@ -19,9 +19,24 @@ cc_binary(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "vector_net",
     srcs = ["vector_net.cc"],
+    hdrs = ["vector_net.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/prediction/common:prediction_system_gflags",
+        "//modules/prediction/proto:vector_net_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_binary(
+    name = "vector_net_feature",
+    srcs = ["vector_net_feature.cc"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -29,7 +44,7 @@ cc_binary(
         "-lgomp",
     ],
     deps = [
-        "//models/map/hdmap:hdmap_util",
+        ":vector_net",
         "@com_google_absl//absl/strings",
     ],
 )
