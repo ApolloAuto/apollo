@@ -66,13 +66,15 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
 }
 
 bool SetCameraHeight(const std::string &sensor_name,
-                     const std::string &params_dir, float default_camera_height,
+                     const std::string &params_dir,
+                     const std::string &lidar_sensor_name,
+                     float default_camera_height,
                      float *camera_height) {
   float base_h = default_camera_height;
   float camera_offset = 0.0f;
   try {
     YAML::Node lidar_height =
-        YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
+        YAML::LoadFile(params_dir + "/" + lidar_sensor_name + "_height.yaml");    
     base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
     AINFO << base_h;
     YAML::Node camera_ex =
@@ -232,9 +234,9 @@ bool FusionCameraDetectionComponent::Init() {
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                     "velodyne128_novatel_extrinsics.yaml",
+                     FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml",
                  &ex_lidar2imu);
-  AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
+  AINFO << FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml" << ex_lidar2imu;
 
   ACHECK(visualize_.Init_all_info_single_camera(
       camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
@@ -552,7 +554,8 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
   for (const auto &camera_name : camera_names_) {
     float height = 0.0f;
     SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
-                    default_camera_height_, &height);
+                    FLAGS_lidar_sensor_name, default_camera_height_,
+                    &height);
     camera_height_map_[camera_name] = height;
   }
 
