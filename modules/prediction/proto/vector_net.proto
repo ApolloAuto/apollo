@@ -1,31 +1,21 @@
 syntax = "proto2";
 
-import "modules/common/proto/geometry.proto";
-
 package apollo.prediction;
 
-message Edge {
-  enum Type {
-    UNKNOWN = 0;
-    NORMAL = 1;
-    LEFT_BOUNDARY = 2;
-    RIGHT_BOUNDARY = 3;
-  };
-  optional Type type = 1;
-  optional apollo.common.PointENU start_point = 2;
-  optional apollo.common.PointENU end_point = 3; 
+message Vector {
+  repeated double element = 1;
 }
 
-message Road {
-  optional string id = 1;
-  repeated Edge edge = 2;
+message Polyline {
+  repeated Vector vector = 1;
 }
 
 message CarPosition {
   optional double x = 1;
   optional double y = 2;
 }
+
 message VectorNetFeature {
   optional CarPosition car_position = 1;
-  repeated Road road = 2;
+  repeated Polyline polyline = 2;
 }

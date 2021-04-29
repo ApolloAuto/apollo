@@ -282,15 +282,11 @@ cc_proto_library(
 proto_library(
     name = "vector_net_proto",
     srcs = ["vector_net.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-    ],
 )
 
 py_proto_library(
     name = "vector_net_py_pb2",
     deps = [
         ":vector_net_proto",
-        "//modules/common/proto:geometry_py_pb2",
     ],
 )

@@ -20,9 +20,8 @@ using apollo::prediction::VectorNet;
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::unique_ptr<VectorNet> vector_net(new VectorNet());
-  vector_net->query_nearby_map(FLAGS_obstacle_x,
-                               FLAGS_obstacle_y,
-                               FLAGS_obstacle_phi);
+  VectorNet vector_net = VectorNet();
+  vector_net.offline_query(FLAGS_obstacle_x, FLAGS_obstacle_y,
+                              FLAGS_obstacle_phi);
   return 0;
 }

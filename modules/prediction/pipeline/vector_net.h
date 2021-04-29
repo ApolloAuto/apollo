@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,39 @@
 
 #pragma once
 
-#include "modules/prediction/proto/vector_net.pb.h"
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/proto/vector_net.pb.h"
 
 namespace apollo {
 namespace prediction {
+
+using FeatureVector = std::vector<std::vector<std::vector<double>>>;
 
 class VectorNet {
  public:
   VectorNet() = default;
 
-  virtual ~VectorNet() = default;
+  ~VectorNet() = default;
 
-  bool query_nearby_map(const double obstacle_x, const double obstacle_y,
-                        const double obstacle_phi);
+  bool query(const double obstacle_x, const double obstacle_y,
+             const double obstacle_phi,
+             std::shared_ptr<FeatureVector> feature_ptr);
+
+  bool offline_query(const double obstacle_x, const double obstacle_y,
+                     const double obstacle_phi);
 
  private:
   void GetRoads(const double base_x, const double base_y);
 
  private:
   apollo::prediction::VectorNetFeature vector_net_pb_;
+  std::shared_ptr<FeatureVector> feature_ptr_ = nullptr;
+  std::unordered_map<std::string, int> id_map_;
 };
 
 }  // namespace prediction
