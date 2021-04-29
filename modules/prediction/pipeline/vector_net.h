@@ -24,19 +24,19 @@ namespace apollo {
 namespace prediction {
 
 class VectorNet {
-    public:
-    VectorNet() = default;
+ public:
+  VectorNet() = default;
 
-    virtual ~VectorNet() = default;
+  virtual ~VectorNet() = default;
 
-    bool query_nearby_map(const double obstacle_x, const double obstacle_y,
+  bool query_nearby_map(const double obstacle_x, const double obstacle_y,
                         const double obstacle_phi);
 
-    private:
-    void GetRoads(const double base_x, const double base_y);
+ private:
+  void GetRoads(const double base_x, const double base_y);
 
-    private:
-    apollo::prediction::VectorNetFeature vector_net_pb_;
+ private:
+  apollo::prediction::VectorNetFeature vector_net_pb_;
 };
 
 }  // namespace prediction

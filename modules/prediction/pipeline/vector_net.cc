@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "cyber/common/file.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -31,16 +32,14 @@ bool VectorNet::query_nearby_map(const double obstacle_x,
   GetRoads(obstacle_x, obstacle_y);
   cyber::common::SetProtoToASCIIFile(vector_net_pb_,
                                      FLAGS_prediction_target_file);
-  AINFO << "Obstacle heading." << obstacle_phi;
+  AINFO << "Obstacle heading: " << obstacle_phi;
 
   return true;
 }
 
 void VectorNet::GetRoads(const double base_x, const double base_y) {
-  common::PointENU center_point;
-  center_point.set_x(base_x);
-  center_point.set_y(base_x);
-
+  common::PointENU center_point =
+      common::util::PointFactory::ToPointENU(base_x, base_y);
   std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
   apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point, 141.4, &roads);
   AINFO << "Road Size: " << roads.size();
