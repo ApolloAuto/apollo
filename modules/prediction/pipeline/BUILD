@@ -27,11 +27,11 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        "//cyber/common:file",
         "//modules/common/util:point_factory",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:prediction_system_gflags",
         "//modules/prediction/proto:vector_net_cc_proto",
-        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -41,12 +41,8 @@ cc_binary(
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
-    linkopts = [
-        "-lgomp",
-    ],
     deps = [
         ":vector_net",
-        "@com_google_absl//absl/strings",
     ],
 )
 

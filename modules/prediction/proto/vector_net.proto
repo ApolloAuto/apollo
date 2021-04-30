@@ -13,6 +13,7 @@ message Polyline {
 message CarPosition {
   optional double x = 1;
   optional double y = 2;
+  optional double phi = 3;
 }
 
 message VectorNetFeature {

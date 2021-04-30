@@ -25,83 +25,86 @@ namespace apollo {
 namespace prediction {
 bool VectorNet::query(const double obstacle_x, const double obstacle_y,
                       const double obstacle_phi,
-                      std::shared_ptr<FeatureVector> feature_ptr) {
-  feature_ptr_ = feature_ptr;
+                      FeatureVector* const feature_ptr) {
+  CHECK_NOTNULL(feature_ptr);
+  count_ = 0;
   apollo::hdmap::HDMapUtil::ReloadMaps();
-  GetRoads(obstacle_x, obstacle_y);
+  GetRoads(obstacle_x, obstacle_y, obstacle_phi, feature_ptr);
 
   return true;
 }
 
 bool VectorNet::offline_query(const double obstacle_x, const double obstacle_y,
                               const double obstacle_phi) {
-  std::shared_ptr<FeatureVector> offline_feature_ptr =
-      std::make_shared<FeatureVector>();
-  query(obstacle_x, obstacle_y, obstacle_phi, offline_feature_ptr);
+  FeatureVector offline_feature;
+  query(obstacle_x, obstacle_y, obstacle_phi, &offline_feature);
 
+  apollo::prediction::VectorNetFeature vector_net_pb_;
   vector_net_pb_.mutable_car_position()->set_x(obstacle_x);
   vector_net_pb_.mutable_car_position()->set_y(obstacle_y);
-  for (const auto& polyline : *offline_feature_ptr) {
-    auto polyline_ = vector_net_pb_.add_polyline();
+  vector_net_pb_.mutable_car_position()->set_phi(obstacle_phi);
+
+  for (const auto& polyline : offline_feature) {
+    auto* polyline_pb = vector_net_pb_.add_polyline();
     for (const auto& vector : polyline) {
-      auto vector_ = polyline_->add_vector();
+      auto* vector_pb = polyline_pb->add_vector();
       for (const auto& element : vector) {
-        vector_->add_element(element);
+        vector_pb->add_element(element);
       }
     }
   }
   cyber::common::SetProtoToASCIIFile(vector_net_pb_,
                                      FLAGS_prediction_target_file);
-  AINFO << "Obstacle heading: " << obstacle_phi;
 
   return true;
 }
 
-// make std::vectors here
-void VectorNet::GetRoads(const double base_x, const double base_y) {
+void VectorNet::GetRoads(const double base_x, const double base_y,
+                         const double obstacle_phi,
+                         FeatureVector* const feature_ptr) {
   common::PointENU center_point =
       common::util::PointFactory::ToPointENU(base_x, base_y);
   std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
-  apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point, 141.4, &roads);
-  AINFO << "Road Size: " << roads.size();
+  apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point,
+                                               FLAGS_road_distance, &roads);
 
   for (const auto& road : roads) {
-    std::vector<std::vector<double>> one_polyline;
-    const auto& str_id = road->id().id();
-    if (id_map_.find(str_id) == id_map_.end()) {
-      id_map_[str_id] = static_cast<int>(id_map_.size());
-    }
-    int int_id = id_map_[str_id];
-
     for (const auto& section : road->road().section()) {
       for (const auto& edge : section.boundary().outer_polygon().edge()) {
+        std::vector<std::vector<double>> one_polyline;
         for (const auto& segment : edge.curve().segment()) {
           auto last_point = segment.line_segment().point(0);
+          auto last_point_after_rotate = common::math::RotateVector2d(
+              {last_point.x() - base_x, last_point.y() - base_y},
+              M_PI_2 - obstacle_phi);
           size_t size = segment.line_segment().point().size();
           for (size_t i = 1; i < size; ++i) {
-            auto point = segment.line_segment().point(i);
+            // TODO(Yiqun):
+            // check the segments are discretized with the same interval
             std::vector<double> one_vector;
+
             // d_s, d_e
-            one_vector.push_back(last_point.x() - base_x);
-            one_vector.push_back(last_point.y() - base_y);
-            one_vector.push_back(point.x() - base_x);
-            one_vector.push_back(point.y() - base_y);
-            last_point = std::move(point);
+            one_vector.push_back(last_point_after_rotate.x());
+            one_vector.push_back(last_point_after_rotate.y());
+            auto point = segment.line_segment().point(i);
+            Eigen::Vector2d point_after_rotate = common::math::RotateVector2d(
+                {point.x() - base_x, point.y() - base_y},
+                M_PI_2 - obstacle_phi);
+            one_vector.push_back(point_after_rotate.x());
+            one_vector.push_back(point_after_rotate.y());
+            last_point_after_rotate = std::move(point_after_rotate);
+
             // attribute
-            if (edge.type() == 2) {  // left edge
-              one_vector.push_back(1);
-              one_vector.push_back(0);
-            } else if (edge.type() == 3) {  // right edge
-              one_vector.push_back(0);
-              one_vector.push_back(1);
-            }
-            one_vector.push_back(int_id);
+            one_vector.insert(one_vector.end(), {1, 0, 0, 0});
+
+            one_vector.push_back(count_);
             one_polyline.push_back(std::move(one_vector));
           }
         }
+        feature_ptr->push_back(std::move(one_polyline));
+        ++count_;
       }
     }
-    feature_ptr_.get()->push_back(std::move(one_polyline));
   }
 }
 }  // namespace prediction

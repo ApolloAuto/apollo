@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -36,19 +33,15 @@ class VectorNet {
   ~VectorNet() = default;
 
   bool query(const double obstacle_x, const double obstacle_y,
-             const double obstacle_phi,
-             std::shared_ptr<FeatureVector> feature_ptr);
+             const double obstacle_phi, FeatureVector* const feature_ptr);
 
   bool offline_query(const double obstacle_x, const double obstacle_y,
                      const double obstacle_phi);
 
  private:
-  void GetRoads(const double base_x, const double base_y);
-
- private:
-  apollo::prediction::VectorNetFeature vector_net_pb_;
-  std::shared_ptr<FeatureVector> feature_ptr_ = nullptr;
-  std::unordered_map<std::string, int> id_map_;
+  void GetRoads(const double base_x, const double base_y,
+                const double obstacle_phi, FeatureVector* const feature_ptr);
+  int count_ = 0;
 };
 
 }  // namespace prediction

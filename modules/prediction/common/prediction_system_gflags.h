@@ -57,3 +57,4 @@ DECLARE_string(prediction_target_file);
 DECLARE_double(obstacle_x);
 DECLARE_double(obstacle_y);
 DECLARE_double(obstacle_phi);
+DECLARE_double(road_distance);
