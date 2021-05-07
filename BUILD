@@ -24,6 +24,7 @@ install(
         "//modules/dreamview:install",
         "//modules/drivers:install",
         "//modules/guardian:install",
+        "//modules/localization:install",
         "//modules/map:install",
         "//modules/monitor:install",
         "//modules/perception:install",
