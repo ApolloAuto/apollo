@@ -38,7 +38,7 @@ class SimControlInterface {
   /**
    * @brief Initialization.
    */
-  virtual void Init(bool set_start_point, double start_velocity = 0.0,
+  virtual void Init(double start_velocity = 0.0,
                     double start_acceleration = 0.0) = 0;
 
   /**
