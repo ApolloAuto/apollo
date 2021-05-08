@@ -29,6 +29,8 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::TrajectoryPoint;
+
 class JointlyPredictionPlanningEvaluator : public Evaluator {
  public:
   /**
@@ -81,7 +83,7 @@ class JointlyPredictionPlanningEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the obstacle history
    */
   bool ExtractADCTrajectory(
-      const ADCTrajectoryContainer* adc_trajectory_container,
+      std::vector<TrajectoryPoint>* trajectory_points,
       Obstacle* obstacle_ptr,
       std::vector<std::pair<double, double>>* acd_traj_curr_pos);
 
