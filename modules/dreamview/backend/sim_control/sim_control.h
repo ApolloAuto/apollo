@@ -62,7 +62,7 @@ class SimControl : SimControlInterface {
    * @brief setup callbacks and timer
    * @param set_start_point initialize localization.
    */
-  void Init(bool set_start_point, double start_velocity = 0.0,
+  void Init(double start_velocity = 0.0,
             double start_acceleration = 0.0) override;
 
   /**
