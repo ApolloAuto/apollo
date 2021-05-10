@@ -25,6 +25,7 @@ namespace apollo {
 namespace prediction {
 
 using FeatureVector = std::vector<std::vector<std::vector<double>>>;
+using PidVector = std::vector<std::vector<double>>;
 
 class VectorNet {
  public:
@@ -33,14 +34,16 @@ class VectorNet {
   ~VectorNet() = default;
 
   bool query(const double obstacle_x, const double obstacle_y,
-             const double obstacle_phi, FeatureVector* const feature_ptr);
+             const double obstacle_phi, FeatureVector* const feature_ptr,
+             PidVector* p_id_ptr);
 
   bool offline_query(const double obstacle_x, const double obstacle_y,
                      const double obstacle_phi);
 
  private:
   void GetRoads(const double base_x, const double base_y,
-                const double obstacle_phi, FeatureVector* const feature_ptr);
+                const double obstacle_phi, FeatureVector* const feature_ptr,
+                PidVector* p_id_ptr);
   int count_ = 0;
 };
 

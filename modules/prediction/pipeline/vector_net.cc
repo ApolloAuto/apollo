@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/prediction/pipeline/vector_net.h"
 
+#include <limits>
 #include <utility>
 
 #include "cyber/common/file.h"
@@ -25,11 +26,11 @@ namespace apollo {
 namespace prediction {
 bool VectorNet::query(const double obstacle_x, const double obstacle_y,
                       const double obstacle_phi,
-                      FeatureVector* const feature_ptr) {
+                      FeatureVector* const feature_ptr, PidVector* p_id_ptr) {
   CHECK_NOTNULL(feature_ptr);
   count_ = 0;
   apollo::hdmap::HDMapUtil::ReloadMaps();
-  GetRoads(obstacle_x, obstacle_y, obstacle_phi, feature_ptr);
+  GetRoads(obstacle_x, obstacle_y, obstacle_phi, feature_ptr, p_id_ptr);
 
   return true;
 }
@@ -37,15 +38,20 @@ bool VectorNet::query(const double obstacle_x, const double obstacle_y,
 bool VectorNet::offline_query(const double obstacle_x, const double obstacle_y,
                               const double obstacle_phi) {
   FeatureVector offline_feature;
-  query(obstacle_x, obstacle_y, obstacle_phi, &offline_feature);
+  PidVector p_id;
+  query(obstacle_x, obstacle_y, obstacle_phi, &offline_feature, &p_id);
 
   apollo::prediction::VectorNetFeature vector_net_pb_;
   vector_net_pb_.mutable_car_position()->set_x(obstacle_x);
   vector_net_pb_.mutable_car_position()->set_y(obstacle_y);
   vector_net_pb_.mutable_car_position()->set_phi(obstacle_phi);
 
+  size_t i = 0;
   for (const auto& polyline : offline_feature) {
     auto* polyline_pb = vector_net_pb_.add_polyline();
+    polyline_pb->set_p_id_x(p_id[i][0]);
+    polyline_pb->set_p_id_y(p_id[i][1]);
+    i++;
     for (const auto& vector : polyline) {
       auto* vector_pb = polyline_pb->add_vector();
       for (const auto& element : vector) {
@@ -61,7 +67,8 @@ bool VectorNet::offline_query(const double obstacle_x, const double obstacle_y,
 
 void VectorNet::GetRoads(const double base_x, const double base_y,
                          const double obstacle_phi,
-                         FeatureVector* const feature_ptr) {
+                         FeatureVector* const feature_ptr,
+                         PidVector* p_id_ptr) {
   common::PointENU center_point =
       common::util::PointFactory::ToPointENU(base_x, base_y);
   std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
@@ -72,6 +79,9 @@ void VectorNet::GetRoads(const double base_x, const double base_y,
     for (const auto& section : road->road().section()) {
       for (const auto& edge : section.boundary().outer_polygon().edge()) {
         std::vector<std::vector<double>> one_polyline;
+        std::vector<double> one_p_id{std::numeric_limits<float>::max(),
+                                     std::numeric_limits<float>::max()};
+
         for (const auto& segment : edge.curve().segment()) {
           auto last_point = segment.line_segment().point(0);
           auto last_point_after_rotate = common::math::RotateVector2d(
@@ -79,6 +89,13 @@ void VectorNet::GetRoads(const double base_x, const double base_y,
               M_PI_2 - obstacle_phi);
           size_t size = segment.line_segment().point().size();
           for (size_t i = 1; i < size; ++i) {
+            if (abs(one_p_id[0]) > abs(last_point_after_rotate.x())) {
+              one_p_id[0] = last_point_after_rotate.x();
+            }
+            if (abs(one_p_id[1]) > abs(last_point_after_rotate.y())) {
+              one_p_id[1] = last_point_after_rotate.y();
+            }
+
             // TODO(Yiqun):
             // check the segments are discretized with the same interval
             std::vector<double> one_vector;
@@ -102,6 +119,7 @@ void VectorNet::GetRoads(const double base_x, const double base_y,
           }
         }
         feature_ptr->push_back(std::move(one_polyline));
+        p_id_ptr->push_back(std::move(one_p_id));
         ++count_;
       }
     }
