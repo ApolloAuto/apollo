@@ -33,8 +33,6 @@ namespace prediction {
 
 using apollo::common::Point3D;
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::OverlapInfo;
 using apollo::perception::PerceptionObstacle;
