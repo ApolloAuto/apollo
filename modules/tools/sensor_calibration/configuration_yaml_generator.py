@@ -26,6 +26,7 @@ from google.protobuf import text_format
 from modules.dreamview.proto import preprocess_table_pb2
 from modules.tools.common.proto_utils import get_pb_from_text_file
 
+ROOT_DIR = '/apollo/modules/tools/sensor_calibration'
 
 class ConfigYaml(object):
     """generate yaml configuration for next-step calibration service.
@@ -149,7 +150,7 @@ class ConfigYaml(object):
         if task_name not in self._supported_tasks:
             raise ValueError('does not support the calibration task: {}'.format(
                 task_name))
-        user_config = os.path.join(os.path.os.path.dirname(__file__), 'config',
+        user_config = os.path.join(ROOT_DIR, 'config',
                                    task_name + '_user.config')
         if os.path.exists(user_config):
             try:

@@ -36,15 +36,7 @@ USE_CACHE=1
 DRY_RUN_ONLY=0
 
 function check_experimental_docker() {
-    local jq_cmd="$(command -v jq)"
-    if [ -z "${jq_cmd}" ]; then
-        echo "Oops, command 'jq' not found."
-        echo "For Ubuntu, you can install it via:"
-        echo "  sudo apt-get -y update && sudo apt-get -y install jq"
-        exit 1
-    fi
-    local daemon_cfg="/etc/docker/daemon.json"
-    local enabled="$(jq '.experimental' ${daemon_cfg} )"
+    local enabled="$(docker version -f '{{.Server.Experimental}}')"
     if [ "${enabled}" != "true" ]; then
         echo "Experimental features should be enabled to run Apollo docker build."
         echo "Please perform the following two steps to have it enabled:"
@@ -146,7 +138,7 @@ function determine_prev_image_timestamp() {
             fi
         elif [[ "${stage}" == "runtime" ]]; then
             if [[ "${dist}" == "stable" ]]; then
-                result="20210315_2158"
+                result="20210428_1718"
             fi
         fi
     else # aarch64

@@ -47,13 +47,11 @@ bash ${CURR_DIR}/install_gperftools.sh
 # bash ${CURR_DIR}/install_doxygen.sh
 # sphinx ?
 
-## Pylint
+## Linters and formatters for Python
+# pylint/autopep8/pyflakes
 pip3_install pycodestyle \
-    pyflakes \
     flake8 \
-    yapf \
-    autopep8
-# pylint
+    yapf
 
 # shfmt
 bash ${CURR_DIR}/install_shfmt.sh

@@ -18,7 +18,7 @@
 # Fail on first error.
 set -e
 
-MY_MODE="${1:-build}"
+MY_MODE="${1:-download}"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
@@ -26,7 +26,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 ARCH="$(uname -m)"
 
 DEST_DIR="${PKGS_DIR}/adv_plat"
-[[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
+[[ -d ${DEST_DIR} ]] && rm -rf ${DEST_DIR}
+mkdir -p ${DEST_DIR}
 
 if [[ "${MY_MODE}" == "download" ]]; then
     if [[ "${ARCH}" == "x86_64" ]]; then

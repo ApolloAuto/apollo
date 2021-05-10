@@ -1,6 +1,0 @@
-name : "CH"
-brand : CH
-model : CH
-license {
-    vin : "ch05"
-}

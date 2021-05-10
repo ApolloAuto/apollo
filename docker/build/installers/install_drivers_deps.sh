@@ -27,10 +27,14 @@ bash ${CURR_DIR}/install_opencv.sh
 bash ${CURR_DIR}/install_adv_plat.sh "${MY_MODE}"
 bash ${CURR_DIR}/install_proj.sh
 
-# Required by python audio driver
+# Required by Python audio driver
 apt_get_update_and_install \
     python3-pyaudio \
     portaudio19-dev
+
+# Required by LiDAR drivers for packets captured via pcap
+apt_get_update_and_install \
+    libpcap-dev
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

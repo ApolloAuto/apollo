@@ -1,4 +1,5 @@
 load("//tools/install:install.bzl", "install")
+
 package(
     default_visibility = ["//visibility:public"],
 )
@@ -6,6 +7,7 @@ package(
 install(
     name = "install",
     deps = [
-        "//modules/map/tools:install",
+        "//modules/tools/create_map:install",
+        "//modules/tools/map_gen:install",
     ],
 )

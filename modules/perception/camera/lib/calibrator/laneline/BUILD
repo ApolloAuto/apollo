@@ -31,6 +31,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/common/i_lib/core",
     ],
+    alwayslink = True,
 )
 
 cpplint()

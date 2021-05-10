@@ -86,6 +86,8 @@ SMALL_TOPICS = [
 
 flags.DEFINE_string('config', '',
                     'protobuf text format configuration file abosolute path')
+flags.DEFINE_string('root_dir', '/apollo/modules/tools/sensor_calibration',
+                    'program root dir')
 
 FLAGS = flags.FLAGS
 
@@ -553,7 +555,7 @@ class Extractor(object):
             out_data['main_sensor'] = source_sensor_list[0]
 
             table = preprocess_table_pb2.PreprocessTable()
-            user_config = os.path.join(os.path.dirname(__file__), 'config',
+            user_config = os.path.join(FLAGS.root_dir, 'config',
                                        'lidar_to_gnss_user.config')
             if os.path.exists(user_config):
                 try:
