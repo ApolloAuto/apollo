@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "modules/common/util/point_factory.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/proto/vector_net.pb.h"
 
@@ -33,17 +34,28 @@ class VectorNet {
 
   ~VectorNet() = default;
 
-  bool query(const double obstacle_x, const double obstacle_y,
-             const double obstacle_phi, FeatureVector* const feature_ptr,
-             PidVector* p_id_ptr);
+  bool query(const common::PointENU& center_point, const double obstacle_phi,
+             FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
 
   bool offline_query(const double obstacle_x, const double obstacle_y,
                      const double obstacle_phi);
 
  private:
-  void GetRoads(const double base_x, const double base_y,
-                const double obstacle_phi, FeatureVector* const feature_ptr,
-                PidVector* p_id_ptr);
+  void GetRoads(const common::PointENU& center_point,
+                const double obstacle_phi,
+                FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
+  void GetLanes(const common::PointENU& center_point,
+                           const double obstacle_phi,
+                           FeatureVector* const feature_ptr,
+                           PidVector* const p_id_ptr);
+  void GetJunctions(const common::PointENU& center_point,
+                    const double obstacle_phi,
+                    FeatureVector* const feature_ptr,
+                    PidVector* const p_id_ptr);
+  void GetCrosswalks(const common::PointENU& center_point,
+                    const double obstacle_phi,
+                    FeatureVector* const feature_ptr,
+                    PidVector* const p_id_ptr);
   int count_ = 0;
 };
 
