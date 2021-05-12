@@ -18,7 +18,7 @@
         "lint-fix": "./node_modules/eslint/bin/eslint.js --fix src"
     },
     "dependencies": {
-        "chart.js": "^2.7.0",
+        "chart.js": "^2.9.4",
         "chncrs": "^0.1.6",
         "classnames": "^2.2.5",
         "compute-polynomial": "^1.1.0",
