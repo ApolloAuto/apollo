@@ -269,6 +269,7 @@ class RtkPlayer(object):
         planningdata.gear = int(self.data['gear'][self.closest_time()])
         planningdata.engage_advice.advice = \
             drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
+        planningdata.trajectory_type = planning_pb2.ADCTrajectory.NORMAL
 
         for i in range(self.start, self.end):
             adc_point = pnc_point_pb2.TrajectoryPoint()
