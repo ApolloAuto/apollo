@@ -65,6 +65,39 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   return perception_param.gpu_id();
 }
 
+bool SetCameraHeight(const std::string &sensor_name,
+                     const std::string &params_dir,
+                     const std::string &lidar_sensor_name,
+                     float default_camera_height,
+                     float *camera_height) {
+  float base_h = default_camera_height;
+  float camera_offset = 0.0f;
+  try {
+    YAML::Node lidar_height =
+        YAML::LoadFile(
+          params_dir + "/" + lidar_sensor_name + "_height.yaml");
+    base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
+    AINFO << base_h;
+    YAML::Node camera_ex =
+        YAML::LoadFile(params_dir + "/" + sensor_name + "_extrinsics.yaml");
+    camera_offset = camera_ex["transform"]["translation"]["z"].as<float>();
+    AINFO << camera_offset;
+    *camera_height = base_h + camera_offset;
+  } catch (YAML::InvalidNode &in) {
+    AERROR << "load camera extrisic file error, YAML::InvalidNode exception";
+    return false;
+  } catch (YAML::TypedBadConversion<float> &bc) {
+    AERROR << "load camera extrisic file error, "
+           << "YAML::TypedBadConversion exception";
+    return false;
+  } catch (YAML::Exception &e) {
+    AERROR << "load camera extrisic file "
+           << " error, YAML exception:" << e.what();
+    return false;
+  }
+  return true;
+}
+
 // @description: load camera extrinsics from yaml file
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
@@ -202,9 +235,9 @@ bool FusionCameraDetectionComponent::Init() {
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                     "velodyne128_novatel_extrinsics.yaml",
+                     FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml",
                  &ex_lidar2imu);
-  AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
+  AINFO << FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml" << ex_lidar2imu;
 
   ACHECK(visualize_.Init_all_info_single_camera(
       camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
@@ -522,7 +555,8 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
   for (const auto &camera_name : camera_names_) {
     float height = 0.0f;
     SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
-                    default_camera_height_, &height);
+                    FLAGS_lidar_sensor_name, default_camera_height_,
+                    &height);
     camera_height_map_[camera_name] = height;
   }
 
@@ -1109,46 +1143,6 @@ int FusionCameraDetectionComponent::MakeCameraDebugMsg(
   float pitch_angle = camera_frame.calibration_service->QueryPitchAngle();
   camera_debug_msg->mutable_camera_calibrator()->set_pitch_angle(pitch_angle);
   return cyber::SUCC;
-}
-
-bool FusionCameraDetectionComponent::SetCameraHeight(
-     const std::string &sensor_name,
-     const std::string &params_dir, float default_camera_height,
-     float *camera_height) {
-  float base_height = default_camera_height;
-  float camera_offset = 0.0f;
-
-  apollo::perception::onboard::FusionCameraDetection
-  fusion_camera_detection_param;
-  if (!GetProtoConfig(&fusion_camera_detection_param)) {
-    AINFO << "load fusion camera detection component proto param failed";
-    return false;
-  }
-  std::string lidar_type =
-      fusion_camera_detection_param.lidar_type();
-  try {
-    YAML::Node lidar_height =
-        YAML::LoadFile(params_dir + "/" + lidar_type + "_height.yaml");
-    base_height = lidar_height["vehicle"]["parameters"]["height"].as<float>();
-    AINFO << base_height;
-    YAML::Node camera_ex =
-        YAML::LoadFile(params_dir + "/" + sensor_name + "_extrinsics.yaml");
-    camera_offset = camera_ex["transform"]["translation"]["z"].as<float>();
-    AINFO << camera_offset;
-    *camera_height = base_height + camera_offset;
-  } catch (YAML::InvalidNode &in) {
-    AERROR << "load camera extrisic file error, YAML::InvalidNode exception";
-    return false;
-  } catch (YAML::TypedBadConversion<float> &bc) {
-    AERROR << "load camera extrisic file error, "
-           << "YAML::TypedBadConversion exception";
-    return false;
-  } catch (YAML::Exception &e) {
-    AERROR << "load camera extrisic file "
-           << " error, YAML exception:" << e.what();
-    return false;
-  }
-  return true;
 }
 
 }  // namespace onboard
