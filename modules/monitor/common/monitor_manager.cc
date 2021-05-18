@@ -101,6 +101,11 @@ bool MonitorManager::CheckAutonomousDriving(const double current_time) {
     return false;
   }
 
+  // If SimControl is used, return false to ignore safety check.
+  if (chassis->header().module_name() == "SimControl") {
+    return false;
+  }
+
   // Ignore old messages which are likely from playback.
   const double msg_time = chassis->header().timestamp_sec();
   if (msg_time + FLAGS_system_status_lifetime_seconds < current_time) {
