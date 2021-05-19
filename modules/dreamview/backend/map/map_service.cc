@@ -450,10 +450,10 @@ bool MapService::ConstructLaneWayPointWithLaneId(
     return false;
   }
 
+  // Limit s with max value of the length of the lane, or not the laneWayPoint may be invalid.
   if (s > lane->lane().length()) {
     s = lane->lane().length();
   }
-
 
   laneWayPoint->set_id(id);
   laneWayPoint->set_s(s);
