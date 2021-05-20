@@ -229,9 +229,9 @@ export default class HMI {
   updateVehicleParam(vehicleParam) {
     this.vehicleParam = vehicleParam;
     RENDERER.adc.resizeCarScale(
-      this.vehicleParam.length / this.defaultVehicleSize.length,
-      this.vehicleParam.width / this.defaultVehicleSize.width,
       this.vehicleParam.height / this.defaultVehicleSize.height,
+      this.vehicleParam.width / this.defaultVehicleSize.width,
+      this.vehicleParam.length / this.defaultVehicleSize.length,
     );
   }
 
