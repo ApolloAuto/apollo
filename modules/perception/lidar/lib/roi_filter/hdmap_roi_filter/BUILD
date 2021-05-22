@@ -10,6 +10,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/lidar/common:lidar_log",
+        "@boost",
         "@eigen",
     ],
 )

@@ -21,7 +21,6 @@ from modules.tools.record_analyzer.common.error_msg_analyzer import ErrorMsgAnal
 from modules.tools.record_analyzer.common.statistical_analyzer import PrintColors
 from modules.tools.record_analyzer.common.statistical_analyzer import StatisticalAnalyzer
 
-
 class ControlAnalyzer:
     """control analyzer"""
 

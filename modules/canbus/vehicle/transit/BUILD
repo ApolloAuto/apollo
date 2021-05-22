@@ -59,7 +59,7 @@ cc_test(
     name = "transit_controller_test",
     size = "small",
     srcs = ["transit_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":transit_controller",
         "//modules/common/util",

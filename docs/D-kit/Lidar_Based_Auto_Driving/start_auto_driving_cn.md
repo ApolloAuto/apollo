@@ -47,7 +47,14 @@
 
 ####  3. 启动所需模块
 
-- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Closeloop`， 选择车型为`Dev Kit`，选择对应的虚拟车道线或高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
+- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 根据车辆铭牌信息选择对应的车型(详情见下表)，选择对应的虚拟车道线或高精地图，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
+
+  | 铭牌信息 | 车型选择 | 
+	|---|---|
+	| Apollo D-KIT Lite | dev_kit |
+	| Apollo D-KIT Standard  | dev_kit_standard |
+	| Apollo D-KIT Advanced(NE-S)| dev_kit_advanced_ne-s |
+	| Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r  |
 
   ![lidar_adaption_closeloop](images/lidar_adaption_closeloop.png)
 
@@ -60,16 +67,35 @@
  
 ####  4. 检查lidar数据是否正确
 
- - 使用`cyber_monitor`，查看是否有`/apollo/sensor/lidar16/PointCloud2`、`/apollo/sensor/lidar16/Scan`、`/apollo/sensor/lidar16/compensator/PointCloud2`三个channel，并使用上下方向键选择channel，使用右方向键查看channel详细数据，数据无异常则说明激光雷达适配成功。(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))
+ - 使用`cyber_monitor`，查看激光雷达数据是否正常输出，并使用上下方向键选择channel，使用右方向键查看channel详细数据，数据无异常则说明激光雷达启动成功。(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))
  
-    ![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
+- 单激光雷达用户用户，请检查如下channel是否正常输出
 
-    ![lidar_integration_channel](images/lidar_integration_channel.png)
+  |序号 | channel | 帧率 | 
+  |---|---|---|
+  |  1 | `/apollo/sensor/lidar16/PointCloud2` | 10Hz |
+  |  2 | `/apollo/sensor/lidar16/Scan` | 10Hz |
+  |  3 | `/apollo/sensor/lidar16/compensator/PointCloud2` | 10Hz |
+ 
+![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
+
+- 三激光雷达用户用户，请检查如下channel是否正常输出
+
+  |序号 | channel | 帧率 | 
+  |---|---|---|
+  |  1 | `/apollo/sensor/lidar16/back/PointCloud2` | 10Hz |
+  |  2 | `/apollo/sensor/lidar16/left/PointCloud2` | 10Hz |
+  |  3 | `/apollo/sensor/lidar16/right/PointCloud2` | 10Hz |
+  |  4 | `/apollo/sensor/lidar16/fusion/PointCloud2` | 10HZ |
+  |  5 | `/apollo/sensor/lidar16/compensator/PointCloud2` | 10Hz |
+ 
 
 ####  5. 检查各模块channel是否正确
 
 在docker中输入`cyber_monitor`命令并检查以下channel（使用`上下方向键`选择channel，使用`右方向键`查看channel详细信息）：
-	
+
+- 单激光雷达用户用户，请检查如下channel是否正常输出	
+
 |channel_name | 检查项目 | 
 |---|---|
 | `/apollo/localization/pose`| 确保能正常输出数据 | 
@@ -77,6 +103,22 @@
 |`/apollo/sensor/lidar16/PointCloud2` | 确保能正常输出数据|
 |`/apollo/sensor/lidar16/Scan`| 确保能正常输出数据|
 | `/apollo/sensor/lidar16/compensator/PointCloud2`  | 确保能正常输出数据 |
+|`/tf`|确保能正常输出数据|
+|`/tf_static`|确保能正常输出数据|
+|`/apollo/canbus/chassis`|确保能正常输出数据|
+|`/apollo/canbus/chassis_detail`|确保能正常输出数据|
+
+- 三激光雷达用户用户，请检查如下channel是否正常输出
+
+|channel_name | 检查项目 | 
+|---|---|
+| `/apollo/localization/pose`| 确保能正常输出数据 | 
+|`/apollo/sensor/gnss/best_pose` | 确保能正常输出数据、`sol_type:` 选项显示为`NARROW_INT`   |
+| `/apollo/sensor/lidar16/back/PointCloud2` |确保能正常输出数据|
+| `/apollo/sensor/lidar16/left/PointCloud2` |确保能正常输出数据|
+| `/apollo/sensor/lidar16/right/PointCloud2` |确保能正常输出数据|
+| `/apollo/sensor/lidar16/fusion/PointCloud2` |确保能正常输出数据|
+| `/apollo/sensor/lidar16/compensator/PointCloud2` |确保能正常输出数据|
 |`/tf`|确保能正常输出数据|
 |`/tf_static`|确保能正常输出数据|
 |`/apollo/canbus/chassis`|确保能正常输出数据|

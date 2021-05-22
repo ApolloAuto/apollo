@@ -16,9 +16,11 @@
 
 #include "modules/common/vehicle_model/vehicle_model.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
@@ -31,18 +33,18 @@ class VehicleModelTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string localization_pre_file =
-        "modules/common/testdata/localization_pre.pb.txt";
+        "modules/common/vehicle_model/testdata/localization_pre.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(localization_pre_file,
                                            &localization_pre_));
     std::string localization_post_file =
-        "modules/common/testdata/localization_post.pb.txt";
+        "modules/common/vehicle_model/testdata/localization_post.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(localization_post_file,
                                            &localization_post_));
     const std::string chassis_pre_file =
-        "modules/common/testdata/chassis_pre.pb.txt";
+        "modules/common/vehicle_model/testdata/chassis_pre.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
     const std::string chassis_post_file =
-        "modules/common/testdata/chassis_post.pb.txt";
+        "modules/common/vehicle_model/testdata/chassis_post.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(chassis_post_file, &chassis_post_));
   }
 

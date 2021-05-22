@@ -31,6 +31,8 @@
  */
 
 // headers in CUDA
+#include <thrust/device_ptr.h>
+#include <thrust/host_vector.h>
 #include <thrust/sort.h>
 
 // headers in local files
@@ -134,7 +136,7 @@ __global__ void filter_kernel(
 
       xmin = fminf(xmin, offset_corners[i * 2 + 0]);
       ymin = fminf(ymin, offset_corners[i * 2 + 1]);
-      xmax = fmaxf(xmin, offset_corners[i * 2 + 0]);
+      xmax = fmaxf(xmax, offset_corners[i * 2 + 0]);
       ymax = fmaxf(ymax, offset_corners[i * 2 + 1]);
     }
     // box_for_nms(num_box, 4)
@@ -245,11 +247,25 @@ void PostprocessCuda::DoPostprocessCuda(
   GPU_CHECK(
       cudaMalloc(reinterpret_cast<void**>(&dev_sorted_box_for_nms),
                  num_box_corners_ * host_filter_count[0] * sizeof(float)));
-  thrust::sequence(thrust::device, dev_indexes,
-                   dev_indexes + host_filter_count[0]);
-  thrust::sort_by_key(thrust::device, dev_filtered_score,
-                      dev_filtered_score + size_t(host_filter_count[0]),
-                      dev_indexes, thrust::greater<float>());
+
+  thrust::device_ptr<float> dev_ptr_filtered_score(dev_filtered_score);
+  thrust::host_vector<float> host_filtered_score(host_filter_count[0]);
+  thrust::copy(dev_ptr_filtered_score,
+               dev_ptr_filtered_score + size_t(host_filter_count[0]),
+               host_filtered_score.begin());
+
+  thrust::host_vector<int> host_indexes(host_filter_count[0]);
+  thrust::sequence(host_indexes.begin(), host_indexes.end());
+
+  // TODO(chenjiahao): using GPU may cause crash, so use CPU here to sort,
+  //  temporarily. Will change to GPU after upgrading CUDA in the future.
+  thrust::sort_by_key(host_filtered_score.begin(),
+                      host_filtered_score.end(),
+                      host_indexes.begin(), thrust::greater<float>());
+  GPU_CHECK(cudaMemcpy(dev_indexes,
+                       thrust::raw_pointer_cast(host_indexes.data()),
+                       host_filter_count[0] * sizeof(int),
+                       cudaMemcpyHostToDevice));
 
   const int num_blocks = DIVUP(host_filter_count[0], num_threads_);
   sort_boxes_by_indexes_kernel<<<num_blocks, num_threads_>>>(

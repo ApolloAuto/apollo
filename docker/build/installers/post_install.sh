@@ -21,14 +21,12 @@ set -e
 
 build_stage="${1:-dev}"
 
-[ -d /tmp/archive ] && rm -rf /tmp/archive
-[ -d /tmp/installers ] && rm -rf /tmp/installers
-
-
 echo "stage=${build_stage}" > /etc/apollo.conf
 
 if [[ "${build_stage}" == "cyber" ]]; then
-    # https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
+    #TODO(storypku): revisit this later
+    # https://stackoverflow.com/questions/25193161
+    # /chfn-pam-system-error-intermittently-in-docker-hub-builds
     ln -s -f /bin/true /usr/bin/chfn
 else
     echo "Nothing else need to be done in stage ${build_stage}"

@@ -31,9 +31,12 @@
 #include "modules/perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/project_feature.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
+#include "modules/perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h"
 #include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
+#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
@@ -73,6 +76,7 @@ namespace perception {
 namespace camera {
 
 REGISTER_OBSTACLE_DETECTOR(YoloObstacleDetector);
+REGISTER_OBSTACLE_DETECTOR(SmokeObstacleDetector);
 REGISTER_OBSTACLE_TRACKER(OMTObstacleTracker);
 REGISTER_FEATURE_EXTRACTOR(TrackingFeatureExtractor);
 REGISTER_OBSTACLE_TRANSFORMER(MultiCueObstacleTransformer);
@@ -83,8 +87,8 @@ REGISTER_LANE_POSTPROCESSOR(DenselineLanePostprocessor);
 REGISTER_LANE_DETECTOR(DenselineLaneDetector);
 REGISTER_CALIBRATOR(LaneLineCalibrator);
 REGISTER_CALIBRATION_SERVICE(OnlineCalibrationService);
-// REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);
-// REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);
+REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);
+REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);
 
 static const float kDefaultPitchAngle = 0.0f;
 static const float kDefaultCameraHeight = 1.5f;

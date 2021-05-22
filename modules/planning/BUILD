@@ -1,7 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "libplanning_component.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":planning_component_lib"],
+)
 
 cc_library(
     name = "planning_component_lib",
@@ -25,13 +33,6 @@ cc_library(
         "//modules/prediction/proto:prediction_obstacle_cc_proto",
         "//modules/storytelling/proto:story_cc_proto",
     ],
-)
-
-cc_binary(
-    name = "libplanning_component.so",
-    linkshared = True,
-    linkstatic = False,
-    deps = [":planning_component_lib"],
 )
 
 cc_library(
@@ -107,6 +108,27 @@ filegroup(
     srcs = glob([
         "conf/**",
     ]),
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "dag/*.dag",
+        "launch/*.launch",
+    ]) + [":planning_conf"],
+)
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libplanning_component.so",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
 )
 
 cpplint()

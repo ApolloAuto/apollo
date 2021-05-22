@@ -67,5 +67,8 @@ DECLARE_int32(num_classes);
 
 // emergency detection libtorch
 DECLARE_string(torch_detector_model);
+
+// lidar sensor name
+DECLARE_string(lidar_sensor_name);
 }  // namespace perception
 }  // namespace apollo

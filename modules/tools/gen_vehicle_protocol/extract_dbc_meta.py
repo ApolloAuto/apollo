@@ -166,7 +166,7 @@ if __name__ == "__main__":
         print("Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     dbc_file = conf["dbc_file"]
     protocol_conf_file = conf["protocol_conf"]
     car_type = conf["car_type"]

@@ -117,5 +117,9 @@ DEFINE_string(torch_detector_model,
               "/apollo/modules/perception/camera"
               "/lib/obstacle/detector/yolov4/model/yolov4.pt",
               "The torch model file for emergency detection");
+
+// lidar sensor name
+DEFINE_string(lidar_sensor_name, "velodyne128",
+              "lidar sensor name");
 }  // namespace perception
 }  // namespace apollo

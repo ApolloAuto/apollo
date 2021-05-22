@@ -351,10 +351,10 @@ class Renderer {
     this.routingEditor.removeLastRoutingPoint(this.scene);
   }
 
-  sendRoutingRequest() {
+  sendRoutingRequest(points = []) {
     return this.routingEditor.sendRoutingRequest(this.adc.mesh.position,
       this.adc.mesh.rotation.y,
-      this.coordinates);
+      this.coordinates, points);
   }
 
   sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {
@@ -545,6 +545,11 @@ class Renderer {
     const intersects = raycaster.intersectObjects(objects);
     const names = intersects.map((intersect) => intersect.object.name);
     return names;
+  }
+
+  checkCycleRoutingAvailable(points, threshold) {
+    return this.routingEditor.checkCycleRoutingAvailable(points,
+      this.adc.mesh.position, threshold);
   }
 }
 

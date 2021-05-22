@@ -55,7 +55,14 @@
 
 ####  3. 启动所需模块
 
-- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
+- 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 根据车辆铭牌信息选择对应的车型(详情见下表)，在Module Controller标签页启动Canbus、GPS、Localization、Transform模块。
+
+	| 铭牌信息 | 车型选择 | 
+	|---|---|
+	| Apollo D-KIT Lite | dev_kit |
+	| Apollo D-KIT Standard  | dev_kit_standard |
+	| Apollo D-KIT Advanced(NE-S)| dev_kit_advanced_ne-s |
+	| Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r  |
 
   ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview4.png)
 
@@ -68,11 +75,28 @@
  
 ####  4. 检查lidar数据是否正确
 
- - 使用`cyber_monitor`，查看是否有`/apollo/sensor/lidar16/PointCloud2`、`/apollo/sensor/lidar16/Scan`、`/apollo/sensor/lidar16/compensator/PointCloud2`三个channel，并使用上下方向键选择channel，使用右方向键查看channel详细数据。(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))
- 
-    ![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
+ - 使用`cyber_monitor`，查看激光雷达相关channel是否正常输出，并使用上下方向键选择channel，使用右方向键查看channel详细数据。(关于cyber_monitor更详细使用，请参考[CyberRT_Developer_Tools](../../cyber/CyberRT_Developer_Tools.md))
 
-    ![lidar_integration_channel](images/lidar_integration_channel.png)
+- 单激光雷达用户用户，请检查如下channel是否正常输出
+
+  |序号 | channel | 帧率 | 
+  |---|---|---|
+  |  1 | `/apollo/sensor/lidar16/PointCloud2` | 10Hz |
+  |  2 | `/apollo/sensor/lidar16/Scan` | 10Hz |
+  |  3 | `/apollo/sensor/lidar16/compensator/PointCloud2` | 10Hz |
+ 
+![lidar_integration_cyber_monitor](images/lidar_integration_cyber_monitor.png)
+
+- 三激光雷达用户用户，请检查如下channel是否正常输出
+
+  |序号 | channel | 帧率 | 
+  |---|---|---|
+  |  1 | `/apollo/sensor/lidar16/back/PointCloud2` | 10Hz |
+  |  2 | `/apollo/sensor/lidar16/left/PointCloud2` | 10Hz |
+  |  3 | `/apollo/sensor/lidar16/right/PointCloud2` | 10Hz |
+  |  4 | `/apollo/sensor/lidar16/fusion/PointCloud2` | 10HZ |
+  |  5 | `/apollo/sensor/lidar16/compensator/PointCloud2` | 10Hz |
+    
 
 #### 5. 启动Lidar感知
 在dreamview中启动`lidar perception`模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：

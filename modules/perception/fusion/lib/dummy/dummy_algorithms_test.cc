@@ -29,7 +29,7 @@ namespace fusion {
 
 TEST(DummyFusionSystemTest, test) {
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
+  init_options.main_sensors = std::vector<std::string>{"velodyne64"};
   DummyFusionSystem system;
   EXPECT_TRUE(system.Init(init_options));
 

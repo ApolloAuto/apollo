@@ -59,6 +59,12 @@ struct ConvParam {
 
 bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param);
 
+inline nvinfer1::DimsCHW getCHW(const nvinfer1::Dims &d) {
+  assert(d.nbDims >= 3);
+  return nvinfer1::DimsCHW(d.d[d.nbDims - 3], d.d[d.nbDims - 2],
+                           d.d[d.nbDims - 1]);
+}
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo

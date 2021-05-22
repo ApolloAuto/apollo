@@ -8,10 +8,10 @@ cc_library(
     name = "hermes_can",
     srcs = select(
         {
-            "//tools/platform:x86_mode": [
+            "@platforms//cpu:x86_64": [
                 "lib_x86_64/libbcan.so",
             ],
-            "//tools/platform:aarch64_mode": [
+            "@platforms//cpu:aarch64": [
                 "lib_aarch64/libbcan.so",
             ],
         },

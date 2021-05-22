@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -23,6 +24,31 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [":audio_component_lib"],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/**",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
+
+# Data->Models:
+# modules/audio/data/torch_siren_detection_model.pt
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libaudio_component.so",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
 )
 
 cpplint()

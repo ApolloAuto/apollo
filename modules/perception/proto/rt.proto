@@ -334,6 +334,7 @@ message LayerParameter {
   optional AnnotatedDataParameter annotated_data_param = 200;
   optional ArgMaxParameter argmax_param = 103;
   optional BatchNormParameter batch_norm_param = 139;
+  optional BBoxRegParameter bbox_reg_param = 209;
   optional BiasParameter bias_param = 141;
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
@@ -342,6 +343,8 @@ message LayerParameter {
   optional DataParameter data_param = 107;
   optional DetectionEvaluateParameter detection_evaluate_param = 205;
   optional DetectionOutputParameter detection_output_param = 204;
+  optional DetectionOutputSSDParameter detection_output_ssd_param = 210;
+  optional DFMBPSROIAlignParameter dfmb_psroi_pooling_param = 208;
   optional DropoutParameter dropout_param = 108;
   optional DummyDataParameter dummy_data_param = 109;
   optional EltwiseParameter eltwise_param = 110;
@@ -1268,7 +1271,12 @@ message PoolingParameter {
   // If global_pooling then it will pool over the size of the bottom by doing
   // kernel_h = bottom->height and kernel_w = bottom->width
   optional bool global_pooling = 12 [default = false];
-  optional bool cmp_out_shape_floor_as_conv = 13 [default = false];
+  // How to calculate the output size - using ceil (default) or floor rounding.
+  enum RoundMode {
+    CEIL = 0;
+    FLOOR = 1;
+  }
+  optional RoundMode round_mode = 13 [default = CEIL];
 }
 
 message PowerParameter {
@@ -1932,4 +1940,75 @@ message AnchorBox {
 }
 message ReorgParameter {
   optional uint32 stride = 1;
+}
+
+message BBoxRegParameter {
+  // Normalization value for box's mean.
+  repeated float bbox_mean = 1;
+  // Normalization value for box's std.
+  repeated float bbox_std = 2;
+}
+message DFMBPSROIAlignParameter {
+  // Parameters for DeForMaBle Position Sensitive ROI Align.
+  optional float heat_map_a = 1;
+  optional int32 output_dim = 2;
+  optional int32 group_height = 3;
+  optional int32 group_width = 4;
+  optional int32 pooled_height = 5;
+  optional int32 pooled_width = 6;
+  optional float pad_ratio = 7;
+  optional int32 sample_per_part = 8;
+
+  optional float trans_std = 9 [default = 0];
+  optional int32 part_height = 10 [default = 0];
+  optional int32 part_width = 11 [default = 0];
+  optional float heat_map_b = 12 [default = 0];
+}
+message DetectionOutputSSDParameter {
+  // Feature map stride for generating anchors.
+  optional float heat_map_a = 1;
+  // Minimum height size for filtering boxes.
+  optional float min_size_h = 2 [default = 2.0];
+  // Minimum weight size for filtering boxes.
+  optional float min_size_w = 3 [default = 2.0];
+  // Based on which size to filtering boxes.
+  enum MIN_SIZE_MODE {
+    HEIGHT_AND_WIDTH = 0;
+    HEIGHT_OR_WIDTH = 1;
+  }
+  optional MIN_SIZE_MODE min_size_mode = 4 [default = HEIGHT_AND_WIDTH];
+  // Threshold for objectness.
+  optional float threshold_objectness = 5 [default = 0.0];
+  optional GenAnchorParameter gen_anchor_param = 6;
+  // Whether to refine boxes that are out of feature map.
+  optional bool refine_out_of_map_bbox = 7  [default = false];
+  optional NMSSSDParameter nms_param = 8;
+  // Number of object classes.
+  optional uint32 num_class = 9 [default = 1];
+  // Whether to output scores of rpn proposals.
+  optional bool rpn_proposal_output_score = 10 [default = false];
+  // Whether to regress agnostic proposals.
+  optional bool regress_agnostic = 11;
+  // Threshold of each class.
+  repeated float threshold = 12;
+}
+message NMSSSDParameter {
+  optional bool     need_nms = 1 [default = true];
+  repeated float    overlap_ratio = 2 ;
+  repeated uint32   top_n = 3 ;
+  optional bool     add_score = 4 [default = false];
+  repeated int32    max_candidate_n = 5;
+  repeated bool     use_soft_nms = 6;
+  optional bool     nms_among_classes = 7 [default = false];
+  repeated bool     voting = 8;
+  repeated float    vote_iou = 9;
+  // Thresholds for learning nms.
+  optional float    force_identity_iou_thr = 10 [default = 1.0];
+  optional float    force_imparity_iou_thr = 11 [default = 0.0];
+  optional int32   nms_gpu_max_n_per_time = 12 [default = -1];
+}
+message GenAnchorParameter {
+  // Widths and heights for generating anchors.
+  repeated float anchor_width = 1;
+  repeated float anchor_height = 2;
 }

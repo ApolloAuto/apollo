@@ -72,8 +72,11 @@ ldconfig
 
 # Clean up
 rm -rf "boost_${VERSION}" "${PKG_NAME}"
-apt_get_remove  \
-    liblzma-dev \
-    libbz2-dev \
-    libzstd-dev
+
+if [[ -n "${CLEAN_DEPS}" ]]; then
+    apt_get_remove  \
+        liblzma-dev \
+        libbz2-dev \
+        libzstd-dev
+fi
 

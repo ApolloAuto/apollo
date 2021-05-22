@@ -24,9 +24,6 @@ CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 TARGET_ARCH="$(uname -m)"
 
-info "Install poco ..."
-bash ${CURR_DIR}/install_poco.sh
-
 apt-get -y update && \
     apt-get -y install \
     ncurses-dev \

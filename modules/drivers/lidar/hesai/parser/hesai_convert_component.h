@@ -19,8 +19,9 @@
 #include <memory>
 #include <string>
 
-#include "modules/drivers/lidar/hesai/proto/config.pb.h"
-#include "modules/drivers/lidar/hesai/proto/hesai.pb.h"
+#include "modules/drivers/lidar/proto/hesai.pb.h"
+#include "modules/drivers/lidar/proto/hesai_config.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/hesai/parser/parser_factory.h"
 

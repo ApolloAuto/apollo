@@ -55,8 +55,9 @@ ReaderAndMessagePair CreateReaderAndLatestsMessage(const std::string& camera) {
 }
 
 static const auto camera_topic_set = std::set<std::string>{
-    FLAGS_image_front_topic, FLAGS_image_long_topic,
-    FLAGS_camera_image_long_topic, FLAGS_camera_image_short_topic,
+    FLAGS_image_long_topic,         FLAGS_camera_image_long_topic,
+    FLAGS_camera_image_short_topic, FLAGS_camera_front_6mm_topic,
+    FLAGS_camera_front_6mm_2_topic, FLAGS_camera_front_12mm_topic,
     // Add more cameras here if you want to monitor.
 };
 

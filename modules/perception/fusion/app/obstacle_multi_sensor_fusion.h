@@ -25,7 +25,7 @@ namespace perception {
 namespace fusion {
 
 struct ObstacleMultiSensorFusionParam {
-  std::string main_sensor;
+  std::vector<std::string> main_sensors;
   std::string fusion_method;
 };
 

@@ -13,6 +13,7 @@ cc_library(
         ":feature_generator",
         ":util",
         "//cyber",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",

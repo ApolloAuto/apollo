@@ -1,7 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+      ":cyber_bridge",
+    ],
+    runtime_dest = "modules/contrib/cyber_bridge",
+    deps = [
+        "//cyber:install",
+    ],
+)
 
 cc_binary(
     name = "cyber_bridge",
@@ -28,6 +40,7 @@ cc_library(
     deps = [
         ":bridge_clients",
         ":bridge_node",
+        "@boost",
     ],
 )
 
@@ -37,6 +50,7 @@ cc_library(
     hdrs = ["clients.h"],
     deps = [
         ":bridge_client_header",
+        "@boost",
     ],
 )
 
@@ -54,6 +68,7 @@ cc_library(
     hdrs = ["client.h"],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 

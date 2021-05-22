@@ -21,6 +21,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -45,8 +46,14 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   std::string proto_file;
   std::string weight_file;
   std::string engine_file;
-  sensor_name_ = options.sensor_name;
-  ACHECK(GetConfigs(&param_file, &proto_file, &weight_file, &engine_file));
+
+  if (!FLAGS_lidar_model_version.empty()) {
+    sensor_name_ = FLAGS_lidar_model_version;
+  } else {
+    sensor_name_ = options.sensor_name;
+  }
+
+  CHECK(GetConfigs(&param_file, &proto_file, &weight_file, &engine_file));
   AINFO << "--    param_file: " << param_file;
   AINFO << "--    proto_file: " << proto_file;
   AINFO << "--    weight_file: " << weight_file;

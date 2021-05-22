@@ -35,6 +35,7 @@
 #include <limits>
 #include <string>
 #include <utility>
+
 #include "yaml-cpp/yaml.h"
 
 namespace YAML {
@@ -116,6 +117,11 @@ void operator>>(const YAML::Node& node, Calibration& calibration) {
   const YAML::Node& lasers = node[LASERS];
   calibration.laser_corrections_.clear();
   calibration.num_lasers_ = num_lasers;
+
+  if (static_cast<int>(lasers.size()) != num_lasers) {
+    std::cerr << "num_lasers didn't match";
+    return;
+  }
 
   for (int i = 0; i < num_lasers; i++) {
     std::pair<int, LaserCorrection> correction;

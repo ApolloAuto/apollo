@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
+
 #include "absl/strings/str_cat.h"
 
 #include "modules/localization/msf/common/io/velodyne_utility.h"
@@ -89,20 +90,23 @@ int main(int argc, char** argv) {
   }
 
   float single_resolution_map = boost_args["resolution"].as<float>();
-  if (fabs(single_resolution_map - 0.03125) > 1e-8 &&
-      fabs(single_resolution_map - 0.0625) > 1e-8 &&
-      fabs(single_resolution_map - 0.125) < 1e-8 &&
-      fabs(single_resolution_map - 0.25) < 1e-8 &&
-      fabs(single_resolution_map - 0.5) < 1e-8 &&
-      fabs(single_resolution_map - 1.0) < 1e-8 &&
-      fabs(single_resolution_map - 2.0) < 1e-8 &&
-      fabs(single_resolution_map - 4.0) < 1e-8 &&
-      fabs(single_resolution_map - 8.0) < 1e-8 &&
-      fabs(single_resolution_map - 16.0) < 1e-8) {
+  constexpr double epsilon = 1e-8;
+  if (std::fabs(single_resolution_map - 0.03125) > epsilon &&
+      std::fabs(single_resolution_map - 0.0625) > epsilon &&
+      std::fabs(single_resolution_map - 0.125) > epsilon &&
+      std::fabs(single_resolution_map - 0.25) > epsilon &&
+      std::fabs(single_resolution_map - 0.5) > epsilon &&
+      std::fabs(single_resolution_map - 1.0) > epsilon &&
+      std::fabs(single_resolution_map - 2.0) > epsilon &&
+      std::fabs(single_resolution_map - 4.0) > epsilon &&
+      std::fabs(single_resolution_map - 8.0) > epsilon &&
+      std::fabs(single_resolution_map - 16.0) > epsilon) {
     std::cerr << "map resolution can only be: 0.03125, "
               << "0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, "
               << "4.0, 8.0 or 16.0." << std::endl;
+    return -1;
   }
+
   float single_resolution_map_z = boost_args["resolution_z"].as<float>();
   std::cout << "single_resolution_map_z: " << single_resolution_map_z
             << std::endl;

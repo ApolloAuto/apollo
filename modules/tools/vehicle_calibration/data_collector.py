@@ -99,6 +99,7 @@ class DataCollector(object):
         self.controlcmd.gear_location = chassis_pb2.Chassis.GEAR_DRIVE
 
         self.canmsg_received = False
+        self.case = 'a'
 
         while self.in_session:
             now = cyber_time.Time.now().to_sec()

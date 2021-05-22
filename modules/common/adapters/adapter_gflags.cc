@@ -52,6 +52,9 @@ DEFINE_string(pointcloud_topic,
 DEFINE_string(pointcloud_16_topic,
               "/apollo/sensor/lidar16/compensator/PointCloud2",
               "16 beam Lidar pointcloud topic name");
+DEFINE_string(pointcloud_16_raw_topic,
+              "/apollo/sensor/lidar16/PointCloud2",
+              "16 beam Lidar raw pointcloud topic name");
 DEFINE_string(pointcloud_16_front_up_topic,
               "/apollo/sensor/lidar16/front/up/compensator/PointCloud2",
               "Front up 16 beam Lidar pointcloud topic name");
@@ -61,6 +64,9 @@ DEFINE_string(pointcloud_64_topic,
 DEFINE_string(pointcloud_128_topic,
               "/apollo/sensor/lidar128/compensator/PointCloud2",
               "pointcloud topic name for 128 beam lidar");
+DEFINE_string(pointcloud_hesai_40p_topic,
+              "/apollo/sensor/hesai40/compensator/PointCloud2",
+              "pointcloud topic name for hesai40p lidar");
 DEFINE_string(pointcloud_raw_topic, "/apollo/sensor/velodyne64/PointCloud2",
               "pointcloud raw topic name");
 DEFINE_string(velodyne_raw_topic,
@@ -158,6 +164,13 @@ DEFINE_string(camera_image_long_topic, "/apollo/sensor/camera/image_long",
               "long camera image topic name");
 DEFINE_string(camera_image_short_topic, "/apollo/sensor/camera/image_short",
               "short camera image topic name");
+DEFINE_string(camera_front_6mm_topic, "/apollo/sensor/camera/front_6mm/image",
+              "front 6mm camera topic name");
+DEFINE_string(camera_front_6mm_2_topic,
+              "/apollo/sensor/camera/front_6mm_2/image",
+              "front 6mm camera topic name 2");
+DEFINE_string(camera_front_12mm_topic, "/apollo/sensor/camera/front_12mm/image",
+              "front 12mm camera topic name");
 DEFINE_string(camera_front_6mm_compressed_topic,
               "/apollo/sensor/camera/front_6mm/image/compressed",
               "front 6mm camera compressed topic name");
@@ -244,5 +257,8 @@ DEFINE_string(latency_recording_topic, "/apollo/common/latency_records",
               "Latency recording topic.");
 DEFINE_string(latency_reporting_topic, "/apollo/common/latency_reports",
               "Latency reporting topic.");
-DEFINE_string(task_topic, "/apollo/task_manager",
-              "task manager topic name");
+DEFINE_string(task_topic, "/apollo/task_manager", "task manager topic name");
+// value: velodyne128, velodyne64, velodyne16
+DEFINE_string(lidar_model_version, "",
+              "It determins which lidar model(16 ,64 or 128) to load, "
+              "if not to set, the model will be loaded by the sensor name.");

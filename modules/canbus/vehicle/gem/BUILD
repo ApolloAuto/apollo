@@ -72,7 +72,7 @@ cc_test(
     name = "gem_controller_test",
     size = "small",
     srcs = ["gem_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         ":gem_controller",
         "//modules/common/util",

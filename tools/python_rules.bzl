@@ -4,6 +4,7 @@ Tailored from @com_github_grpc_grpc:bazel/python_rules.bzl
 
 load("@rules_python//python:defs.bzl", "py_library")
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
     "@com_github_grpc_grpc//bazel:protobuf.bzl",
     "declare_out_files",
@@ -26,8 +27,8 @@ def _generate_py_impl(context):
 
     out_dir = get_out_dir(protos, context)
     real_out_dir = out_dir.path
-    if context.build_file_path.startswith("external"):
-        real_out_dir = real_out_dir + "/external/apollo/"
+    if context.build_file_path.startswith("apollo/"):
+        real_out_dir = paths.join(real_out_dir, "external/apollo")
 
     arguments = ([
         "--python_out={}".format(real_out_dir),

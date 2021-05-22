@@ -26,6 +26,8 @@
 
 #include "absl/strings/str_cat.h"
 
+#include "modules/transform/proto/transform.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
@@ -35,15 +37,14 @@
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
-#include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
 using TLCamID = apollo::perception::TrafficLightDetection::CameraID;
-using apollo::cyber::common::GetAbsolutePath;
 using apollo::cyber::Clock;
+using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::common::SensorManager;
 
 class TLInfo {
@@ -342,10 +343,12 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   // skipping frame according to last proc image timestamp
   if (last_proc_image_ts_ > 0.0 &&
       receive_img_timestamp - last_proc_image_ts_ < proc_interval_seconds_) {
-    AINFO << "skip current image, img_ts: " << image_msg_ts
-          << " , receive_img_timestamp: " << receive_img_timestamp
-          << " ,_last_proc_image_ts: " << last_proc_image_ts_
-          << " , _proc_interval_seconds: " << proc_interval_seconds_;
+    AINFO << "skip current image, img_ts: " << FORMAT_TIMESTAMP(image_msg_ts)
+          << " , receive_img_timestamp: "
+          << FORMAT_TIMESTAMP(receive_img_timestamp)
+          << " ,_last_proc_image_ts: " << FORMAT_TIMESTAMP(last_proc_image_ts_)
+          << " , _proc_interval_seconds: "
+          << FORMAT_TIMESTAMP(proc_interval_seconds_);
     return;
   }
   // sync image with cached projections
@@ -530,8 +533,8 @@ bool TrafficLightsPerceptionComponent::UpdateCameraSelection(
   const double current_ts = Clock::NowInSeconds();
   if (last_query_tf_ts_ > 0.0 &&
       current_ts - last_query_tf_ts_ < query_tf_interval_seconds_) {
-    AINFO << "skip current tf msg, img_ts: " << timestamp
-          << " , last_query_tf_ts_: " << last_query_tf_ts_;
+    AINFO << "skip current tf msg, img_ts: " << FORMAT_TIMESTAMP(timestamp)
+          << " , last_query_tf_ts_: " << FORMAT_TIMESTAMP(last_query_tf_ts_);
     return true;
   }
   AINFO << "start select camera";
@@ -539,7 +542,8 @@ bool TrafficLightsPerceptionComponent::UpdateCameraSelection(
   camera::CarPose pose;
   std::vector<apollo::hdmap::Signal> signals;
   if (!QueryPoseAndSignals(timestamp, &pose, &signals)) {
-    AINFO << "query_pose_and_signals failed, ts: " << timestamp;
+    AINFO << "query_pose_and_signals failed, ts: "
+          << FORMAT_TIMESTAMP(timestamp);
     return false;
   }
   last_query_tf_ts_ = current_ts;
@@ -549,9 +553,11 @@ bool TrafficLightsPerceptionComponent::UpdateCameraSelection(
 
   if (!preprocessor_->UpdateCameraSelection(pose, option,
                                             &frame->traffic_lights)) {
-    AERROR << "add_cached_lights_projections failed, ts: " << timestamp;
+    AERROR << "add_cached_lights_projections failed, ts: "
+           << FORMAT_TIMESTAMP(timestamp);
   } else {
-    AINFO << "add_cached_lights_projections succeed, ts: " << timestamp;
+    AINFO << "add_cached_lights_projections succeed, ts: "
+          << FORMAT_TIMESTAMP(timestamp);
   }
 
   for (auto& light : frame->traffic_lights) {
@@ -575,8 +581,8 @@ bool TrafficLightsPerceptionComponent::CheckCameraImageStatus(
     if (last_sub_camera_ts < 1.0 || timestamp - last_sub_camera_ts > interval) {
       preprocessor_->SetCameraWorkingFlag(cam_name, false);
       AWARN << "camera is probably not working"
-            << " , current ts: " << timestamp
-            << " , last_sub_camera_ts: " << last_sub_camera_ts
+            << " , current ts: " << FORMAT_TIMESTAMP(timestamp)
+            << " , last_sub_camera_ts: " << FORMAT_TIMESTAMP(last_sub_camera_ts)
             << " , camera_name: " << cam_name;
       camera_ok = false;
       AINFO << "camera status:" << camera_ok;
@@ -586,13 +592,13 @@ bool TrafficLightsPerceptionComponent::CheckCameraImageStatus(
 
   bool is_camera_working = false;
   if (!preprocessor_->GetCameraWorkingFlag(camera_name, &is_camera_working)) {
-    AERROR << "get_camera_is_working_flag ts: " << timestamp
+    AERROR << "get_camera_is_working_flag ts: " << FORMAT_TIMESTAMP(timestamp)
            << " camera_name: " << camera_name;
     return false;
   }
   if (!is_camera_working) {
     if (!preprocessor_->SetCameraWorkingFlag(camera_name, true)) {
-      AERROR << "set_camera_is_working_flag ts: " << timestamp
+      AERROR << "set_camera_is_working_flag ts: " << FORMAT_TIMESTAMP(timestamp)
              << " camera_name: " << camera_name;
       return false;
     }
@@ -641,7 +647,7 @@ bool TrafficLightsPerceptionComponent::GetPoseFromTF(
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  static_cast<float>(tf2_timeout_second_),
                                  &err_string)) {
-    AERROR << "Can not find transform. " << timestamp
+    AERROR << "Can not find transform. " << FORMAT_TIMESTAMP(timestamp)
            << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
            << " Error info: " << err_string;
     return false;
@@ -681,7 +687,7 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   auto* header = (*out_msg)->mutable_header();
   double publish_time = Clock::NowInSeconds();
   header->set_timestamp_sec(publish_time);  // message publishing time
-  AINFO << "set header time sec:" << frame->timestamp;
+  AINFO << "set header time sec:" << FORMAT_TIMESTAMP(frame->timestamp);
 
   // Set traffic light color to unknown before the process
   detected_trafficlight_color_ = base::TLColor::TL_UNKNOWN_COLOR;
@@ -1011,10 +1017,9 @@ void TrafficLightsPerceptionComponent::Visualize(
               1.5, cv::Scalar(255, 255, 255), 3);
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
-  cv::imshow("Traffic Light", output_image);
-  cv::imwrite(absl::StrCat("/apollo/debug_vis/", frame.timestamp, ".jpg"),
+  cv::imwrite(absl::StrCat("/apollo/debug_vis/",
+                           std::to_string(frame.timestamp), ".jpg"),
               output_image);
-  cv::waitKey(30);
 }
 
 void TrafficLightsPerceptionComponent::SyncV2XTrafficLights(

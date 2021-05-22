@@ -23,7 +23,7 @@ using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
 using apollo::drivers::PointXYZIT;
 using apollo::drivers::robosense::RobosenseScan;
-bool RobosenseDriver::init() {
+bool RobosenseDriver::Init() {
   if (node_ == nullptr) {
     AERROR << "node is nullptr";
     return false;

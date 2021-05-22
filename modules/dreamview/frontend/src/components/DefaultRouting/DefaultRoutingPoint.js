@@ -5,19 +5,6 @@ import RadioItem from 'components/common/RadioItem';
 
 @observer
 export default class DefaultRoutingPoint extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      startCycling: false,
-    };
-    this.handleInput = this.handleInput.bind(this);
-  }
-
-  handleInput() {
-    this.setState((prevState) => ({ startCycling: !prevState.startCycling }));
-  }
-
   render() {
     //Navigation mode not considered
     const { routeEditingManager, options } = this.props;

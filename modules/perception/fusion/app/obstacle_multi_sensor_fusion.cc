@@ -28,7 +28,7 @@ bool ObstacleMultiSensorFusion::Init(
   fusion_ = BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
 
   FusionInitOptions init_options;
-  init_options.main_sensor = param.main_sensor;
+  init_options.main_sensors = param.main_sensors;
   if (fusion_ == nullptr || !fusion_->Init(init_options)) {
     AINFO << "Failed to Get Instance or Initialize " << param.fusion_method;
     return false;

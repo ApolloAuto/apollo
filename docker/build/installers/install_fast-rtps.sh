@@ -72,16 +72,19 @@ if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     mv fast-rtps-1.5.0-1 "${DEST_DIR}"
     rm -rf ${PKG_NAME}
 else # aarch64
-    PKG_NAME="fast-rtps-1.5.0.prebuilt.aarch64.tar.gz"
-    CHECKSUM="061da391763949e39ed0ac4d0596112818e8692b938aa845d54fac1a1aa550db"
+    PKG_NAME="fast-rtps-1.5.0-1.prebuilt.aarch64.tar.gz"
+    CHECKSUM="4c02a60ab114dafecb6bfc9c54bb9250f39fc44529253268138df1abddd5a011"
     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
     tar xzf ${PKG_NAME}
-    mv fast-rtps-1.5.0 "${DEST_DIR}"
+    mv fast-rtps-1.5.0-1 "${DEST_DIR}"
     rm -rf ${PKG_NAME}
 fi
 
 echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
 ldconfig
-apt_get_remove libasio-dev libtinyxml2-dev
+
+if [[ -n "${CLEAN_DEPS}" ]] ; then
+    apt_get_remove libasio-dev libtinyxml2-dev
+fi

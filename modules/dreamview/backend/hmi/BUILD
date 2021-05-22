@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
 cc_library(
@@ -47,12 +48,13 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":hmi_worker",
+        "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
         "//modules/common/util:json_util",
         "//modules/common/util:map_util",
-        "//modules/dreamview/backend/data_collection_monitor",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/point_cloud:point_cloud_updater",
@@ -73,10 +75,15 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/kv_db",
         "//modules/common/proto:drive_event_cc_proto",
+        "//modules/common/util:future",
         "//modules/common/util:map_util",
         "//modules/common/util:message_util",
         "//modules/control/proto:pad_msg_cc_proto",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/dreamview/backend/fuel_monitor:data_collection_monitor",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_gflags",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
+        "//modules/dreamview/backend/fuel_monitor:preprocess_monitor",
         "//modules/dreamview/proto:hmi_config_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/dreamview/proto:hmi_status_cc_proto",

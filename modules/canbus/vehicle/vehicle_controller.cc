@@ -120,7 +120,6 @@ ErrorCode VehicleController::Update(const ControlCommand &control_command) {
     auto error_code = SetDrivingMode(mode);
     if (error_code != ErrorCode::OK) {
       AERROR << "Failed to set driving mode.";
-      return error_code;
     }
   }
 

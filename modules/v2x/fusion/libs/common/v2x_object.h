@@ -83,8 +83,8 @@ class Info {
   Var Variance() const { return variance_; }
 
  protected:
-  Val value_;
-  Var variance_;
+  Val value_ = {};
+  Var variance_ = {};
 };
 
 class Info3f : public Info<Eigen::Vector3f, Eigen::Matrix3f> {

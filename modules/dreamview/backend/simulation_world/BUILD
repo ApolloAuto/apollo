@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
 cc_library(
@@ -11,8 +12,8 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         "//cyber",
-        "//modules/audio/proto:audio_event_cc_proto",
         "//modules/audio/proto:audio_cc_proto",
+        "//modules/audio/proto:audio_event_cc_proto",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
@@ -63,7 +64,7 @@ cc_library(
         ":simulation_world_service",
         "//modules/common/util:map_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
-        "//modules/dreamview/backend/data_collection_monitor",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/perception_camera_updater",

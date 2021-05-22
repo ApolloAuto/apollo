@@ -17,4 +17,4 @@ transform:
     y: 0.00327669
     z: 0.7157
     w: 0.698332
-child_frame_id: velodyne16
+child_frame_id: lidar16

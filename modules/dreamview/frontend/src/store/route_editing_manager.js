@@ -12,6 +12,8 @@ export default class RouteEditingManager {
 
     @observable defaultRoutings = {};
 
+    @observable defaultRoutingDistanceThreshold = 10.0;
+
     @observable currentPOI = 'none';
 
     @observable inDefaultRoutingMode = false;
@@ -80,6 +82,9 @@ export default class RouteEditingManager {
     }
 
     @action updateDefaultRoutingPoints(data) {
+      if (data.threshold) {
+        this.defaultRoutingDistanceThreshold = data.threshold;
+      }
       if (data.defaultRoutings === undefined) {
         return;
       }
@@ -122,9 +127,10 @@ export default class RouteEditingManager {
       RENDERER.removeAllRoutingPoints();
     }
 
-    sendRoutingRequest(inNavigationMode) {
+    sendRoutingRequest(inNavigationMode, defaultRoutingName = '') {
       if (!inNavigationMode) {
-        const success = RENDERER.sendRoutingRequest();
+        const success = _.isEmpty(defaultRoutingName) ? RENDERER.sendRoutingRequest()
+          : RENDERER.sendRoutingRequest(this.defaultRoutings[defaultRoutingName]);
         if (success) {
           this.disableRouteEditing();
         }
@@ -133,16 +139,21 @@ export default class RouteEditingManager {
       return MAP_NAVIGATOR.sendRoutingRequest();
     }
 
-    sendCycleRoutingRequest(defaultRoutingName, cycleNumber) {
-      const points = this.defaultRoutings[defaultRoutingName];
+    sendCycleRoutingRequest(cycleNumber) {
+      const points = this.defaultRoutings[this.currentDefaultRouting];
       if (!isNaN(cycleNumber) || !points) {
         const success = RENDERER.sendCycleRoutingRequest
-        (defaultRoutingName, points, cycleNumber);
+        (this.currentDefaultRouting, points, cycleNumber);
         if (success) {
           this.disableRouteEditing();
         }
         return success;
       }
       return false;
+    }
+
+    checkCycleRoutingAvailable() {
+      return RENDERER.checkCycleRoutingAvailable(this.defaultRoutings[this.currentDefaultRouting],
+        this.defaultRoutingDistanceThreshold);
     }
 }

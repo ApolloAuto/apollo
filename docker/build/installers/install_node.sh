@@ -19,7 +19,7 @@
 # Fail on first error.
 set -e
 
-geo="$1"; shift
+geo="${1:-us}"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
@@ -34,6 +34,10 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf "${PKG_NAME}"
 
 info "Install Node for $geo ..."
+
+if [[ "${geo}" == "cn" ]]; then
+    export N_NODE_MIRROR=https://npm.taobao.org/mirrors/node
+fi
 
 pushd n-${VERSION}
     make install

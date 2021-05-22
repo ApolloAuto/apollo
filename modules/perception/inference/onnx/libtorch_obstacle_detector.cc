@@ -16,6 +16,8 @@
 
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 
+#include <c10/cuda/CUDACachingAllocator.h>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -40,6 +42,8 @@ bool ObstacleDetector::Init(const std::map<std::string,
     device_type_ = torch::kCPU;
   }
 
+  // Load model without grad, equal to torch.no_grad()
+  // torch::NoGradGuard no_grad;
   // Init net
   torch::Device device(device_type_, device_id_);
   net_ = torch::jit::load(model_file_, device);
@@ -59,11 +63,14 @@ bool ObstacleDetector::Init(const std::map<std::string,
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_downratio.to(device)));
   auto torch_output_tensor =
-      net_.forward(torch_inputs).toTensor();
+      net_.forward(torch_inputs);
 
   for (const auto& name : output_names_) {
-    auto blob = std::make_shared<Blob<float>>(2, 6, 1, 1);
-    blobs_.emplace(name, blob);
+    auto iter = shapes.find(name);
+    if (iter != shapes.end()) {
+      auto blob = std::make_shared<Blob<float>>(iter->second);
+      blobs_.emplace(name, blob);
+    }
   }
 
   for (const auto& name : input_names_) {
@@ -73,6 +80,7 @@ bool ObstacleDetector::Init(const std::map<std::string,
       blobs_.emplace(name, blob);
     }
   }
+  c10::cuda::CUDACachingAllocator::emptyCache();
   return true;
 }
 
@@ -119,15 +127,23 @@ void ObstacleDetector::Infer() {
   tensor_image[0][0] = tensor_image[0][0].div_(58.395);
   tensor_image[0][1] = tensor_image[0][1].div_(57.12);
   tensor_image[0][2] = tensor_image[0][2].div_(57.375);
-  AINFO << tensor_K[0][0];
 
   torch_inputs.push_back(tensor_image);
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_ratio.to(device)));
 
   AINFO << "Start to do inference";
-  auto outputs = net_.forward(torch_inputs).toTensor();
+  auto outputs = net_.forward(torch_inputs).toTuple()->elements();
   AINFO << "Finished inference";
+
+  for (u_int i = 0; i < output_names_.size(); i++) {
+    torch::Tensor output_tensor = outputs[i].toTensor();
+    std::vector<int64_t> output_size_ = output_tensor.sizes().vec();
+    std::vector<int> output_size(begin(output_size_), end(output_size_));
+    blobs_[output_names_[i]]->Reshape(output_size);
+    blobs_[output_names_[i]]->set_gpu_data(output_tensor.data_ptr<float>());
+  }
+  c10::cuda::CUDACachingAllocator::emptyCache();
 }
 
 }  // namespace inference

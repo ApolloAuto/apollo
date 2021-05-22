@@ -1,7 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+      ":cyber_recorder",
+    ],
+)
 
 cc_binary(
     name = "cyber_recorder",

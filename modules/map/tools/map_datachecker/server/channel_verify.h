@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
+
 #include "modules/map/tools/map_datachecker/server/common.h"
 
 namespace apollo {
@@ -44,7 +45,7 @@ struct CyberRecordInfo {
 
 struct OneRecordChannelCheckResult {
   std::string record_path;
-  uint64_t start_time;
+  uint64_t start_time = 0;
   std::vector<std::string> lack_channels;
   // inadequate_rate: channel_name <---> (expected_rate, actual_rate)
   std::map<std::string, std::pair<double, double>> inadequate_rate;

@@ -23,7 +23,7 @@ cc_test(
     size = "small",
     srcs = ["simple_control_test.cc"],
     copts = ["-fno-access-control"],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":control_test_base",
         "@com_google_googletest//:gtest",
@@ -35,7 +35,7 @@ cc_test(
     size = "small",
     srcs = ["relative_position_test.cc"],
     copts = ["-fno-access-control"],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":control_test_base",
         "@com_google_googletest//:gtest",
@@ -47,7 +47,7 @@ cc_test(
     size = "small",
     srcs = ["mpc_controller_test.cc"],
     copts = ["-fno-access-control"],
-    data = ["//modules/control:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":control_test_base",
         "@com_google_googletest//:gtest",

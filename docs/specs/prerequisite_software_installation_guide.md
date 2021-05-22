@@ -30,11 +30,10 @@ sudo apt-get update
 sudo apt-get upgrade
 ```
 
-![tip_icon](images/tip_icon.png) Internet access is needed for successful
-software updates. Make sure either WiFi or Ethernet cable is connected to a
-network with Internet access. You might need to configure the network for your
-host if the connected network is not using the Dynamic Host Configuration
-Protocol (DHCP).
+![](images/tip_icon.png) Internet access is needed for successful software
+updates. Make sure either WiFi or Ethernet cable is connected to a network with
+Internet access. You might need to configure the network for your host if the
+connected network is not using the Dynamic Host Configuration Protocol (DHCP).
 
 ## Installing NVIDIA GPU Driver
 
@@ -52,7 +51,7 @@ For Ubuntu 18.04+, you can simply run:
 sudo apt-get update
 sudo apt-add-repository multiverse
 sudo apt-get update
-sudo apt-get install nvidia-driver-440
+sudo apt-get install nvidia-driver-455
 ```
 
 You can type `nvidia-smi` to check if NVIDIA GPU works fine on your host. (You
@@ -61,26 +60,29 @@ message will be shown.
 
 ```
 Prompt> nvidia-smi
-Thu Sep  3 16:01:19 2020
+Mon Jan 25 15:51:08 2021
 +-----------------------------------------------------------------------------+
-| NVIDIA-SMI 440.33.01    Driver Version: 440.33.01    CUDA Version: 10.2     |
+| NVIDIA-SMI 460.27.04    Driver Version: 460.27.04    CUDA Version: 11.2     |
 |-------------------------------+----------------------+----------------------+
 | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
 | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
 |===============================+======================+======================|
-|   0  GeForce GTX 1070    On   | 00000000:01:00.0  On |                  N/A |
-| 26%   38C    P8    11W / 151W |    890MiB /  8114MiB |      0%      Default |
+|   0  GeForce RTX 3090    On   | 00000000:65:00.0  On |                  N/A |
+| 32%   29C    P8    18W / 350W |    682MiB / 24234MiB |      7%      Default |
+|                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
 
 +-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID   Type   Process name                             Usage      |
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
 |=============================================================================|
-|    0      1290      G   /usr/lib/xorg/Xorg                            40MiB |
-|    0      1426      G   /usr/bin/gnome-shell                          51MiB |
-|    0      2411      G   /usr/lib/xorg/Xorg                           293MiB |
-|    0      2571      G   /usr/bin/gnome-shell                         227MiB |
-|    0      7071      G   ...AAAAAAAAAAAACAAAAAAAAAA= --shared-files   272MiB |
+|    0   N/A  N/A      1286      G   /usr/lib/xorg/Xorg                 40MiB |
+|    0   N/A  N/A      1517      G   /usr/bin/gnome-shell              120MiB |
+|    0   N/A  N/A      1899      G   /usr/lib/xorg/Xorg                342MiB |
+|    0   N/A  N/A      2037      G   /usr/bin/gnome-shell               69MiB |
+|    0   N/A  N/A      4148      G   ...gAAAAAAAAA --shared-files      105MiB |
 +-----------------------------------------------------------------------------+
 ```
 
@@ -106,9 +108,9 @@ and
 [Configure Docker to Start on Boot](https://docs.docker.com/engine/install/linux-postinstall/#configure-docker-to-start-on-boot).
 
 There is also a
-[dedicated bash script](../../docker/setup_host/install_docker.sh)
-Apollo provides to ease Docker installation, which works both for X86_64 and
-AArch64 platforms.
+[dedicated bash script](../../docker/setup_host/install_docker.sh) Apollo
+provides to ease Docker installation, which works both for X86_64 and AArch64
+platforms.
 
 ## Installing NVIDIA Container Toolkit
 

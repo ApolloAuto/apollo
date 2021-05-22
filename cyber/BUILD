@@ -1,4 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,7 +8,22 @@ cc_library(
     name = "cyber",
     linkstatic = False,
     deps = [
-        "//cyber:cyber_core",
+        ":cyber_core",
+    ],
+)
+
+install(
+    name = "install",
+    data = [
+        ":.release.bash",
+        ":cyber_conf",
+    ],
+    rename = {
+        "cyber/.release.bash": "setup.bash",
+    },
+    deps = [
+        "//cyber/mainboard:install",
+        "//cyber/tools:install",
     ],
 )
 

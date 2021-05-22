@@ -20,6 +20,7 @@ cc_library(
         ":fusion_tracker_gflags",
         "//cyber",
         "//modules/v2x/proto:fusion_params_cc_proto",
+        "@boost",
     ],
 )
 

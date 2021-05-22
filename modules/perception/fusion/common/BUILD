@@ -39,6 +39,7 @@ cc_library(
     hdrs = ["dst_evidence.h"],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 

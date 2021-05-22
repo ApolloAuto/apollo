@@ -1,6 +1,19 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+      ":add_signal",
+      ":extract_path",
+      ":map_gen_single_lane",
+      ":map_gen_two_lanes_right_ext",
+      ":map_gen",
+    ],
+    runtime_dest = "modules/tools/map_gen",
+)
 
 py_binary(
     name = "add_signal",

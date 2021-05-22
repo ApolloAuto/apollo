@@ -28,8 +28,7 @@ namespace task_manager {
 
 using apollo::localization::LocalizationEstimate;
 
-class TaskManagerComponent final
-    : public cyber::Component<task_manager::Task> {
+class TaskManagerComponent final : public cyber::Component<task_manager::Task> {
  public:
   TaskManagerComponent() = default;
   ~TaskManagerComponent() = default;

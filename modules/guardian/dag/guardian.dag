@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/guardian/libguardian.so"
+    module_library : "/apollo/bazel-bin/modules/guardian/libguardian_component.so",
     timer_components {
         class_name : "GuardianComponent"
         config {

@@ -32,3 +32,8 @@ py_library(
     name = "proto_utils",
     srcs = ["proto_utils.py"],
 )
+
+py_library(
+    name = "file_utils",
+    srcs = ["file_utils.py"],
+)

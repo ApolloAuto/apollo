@@ -27,10 +27,9 @@ apt_get_update_and_install \
     libatlas-base-dev \
     liblapack-dev
 
-TARGET_ARCH="$(uname -m)"
-
-# Note(storypku):
-# 1) cublas was already installed before this installer runs
+# Note(infra): build magma before mkl
+info "Install Magma ..."
+bash ${CURR_DIR}/install_magma.sh
 
 info "Install libtorch ..."
 bash ${CURR_DIR}/install_libtorch.sh

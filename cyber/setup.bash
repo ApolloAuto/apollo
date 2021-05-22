@@ -16,18 +16,17 @@ service_path="${cyber_tool_path}/cyber_service"
 monitor_path="${cyber_tool_path}/cyber_monitor"
 visualizer_path="${bazel_bin_path}/modules/tools/visualizer"
 
-# TODO(all): place all these in one place and add_to_path
+# TODO(all): place all these in one place and pathprepend
 for entry in "${mainboard_path}" \
     "${recorder_path}" "${monitor_path}"  \
     "${channel_path}" "${node_path}" \
     "${service_path}" \
     "${launch_path}" \
     "${visualizer_path}" ; do
-    add_to_path "${entry}"
+    pathprepend "${entry}"
 done
 
-# ${CYBER_PATH}/python
-export PYTHONPATH=${bazel_bin_path}/cyber/python/internal:${PYTHONPATH}
+pathprepend ${bazel_bin_path}/cyber/python/internal PYTHONPATH
 
 export CYBER_DOMAIN_ID=80
 export CYBER_IP=127.0.0.1

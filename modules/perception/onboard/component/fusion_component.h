@@ -49,7 +49,7 @@ class FusionComponent : public cyber::Component<SensorFrameMessage> {
   static uint32_t s_seq_num_;
 
   std::string fusion_method_;
-  std::string fusion_main_sensor_;
+  std::vector<std::string> fusion_main_sensors_;
   bool object_in_roi_check_ = false;
   double radius_for_roi_object_check_ = 0;
 

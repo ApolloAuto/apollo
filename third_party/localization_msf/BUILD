@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/platform:build_defs.bzl", "if_aarch64_mode", "if_x86_mode")
+load("//tools/platform:build_defs.bzl", "if_aarch64", "if_x86_64")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,14 +7,14 @@ licenses(["notice"])
 
 cc_library(
     name = "localization_msf",
-    srcs = if_x86_mode([
+    srcs = if_x86_64([
         "x86_64/lib/liblocalization_msf.so",
-    ]) + if_aarch64_mode([
+    ]) + if_aarch64([
         "aarch64/lib/liblocalization_msf.so",
     ]),
-    hdrs = if_x86_mode(glob([
+    hdrs = if_x86_64(glob([
         "x86_64/include/*.h",
-    ])) + if_aarch64_mode(glob([
+    ])) + if_aarch64(glob([
         "aarch64/include/*.h",
     ])),
     include_prefix = "localization_msf",
@@ -22,7 +22,7 @@ cc_library(
         "-lm",
     ],
     strip_include_prefix = select({
-        "//tools/platform:x86_mode": "x86_64/include",
-        "//tools/platform:aarch64_mode": "aarch64/include",
+        "@platforms//cpu:x86_64": "x86_64/include",
+        "@platforms//cpu:aarch64": "aarch64/include",
     }),
 )

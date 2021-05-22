@@ -29,7 +29,7 @@ namespace perception {
 namespace fusion {
 
 struct FusionInitOptions {
-  std::string main_sensor;
+  std::vector<std::string> main_sensors;
 };
 
 struct FusionOptions {};
@@ -54,7 +54,7 @@ class BaseFusionSystem {
   virtual std::string Name() const = 0;
 
  protected:
-  std::string main_sensor_;
+  std::vector<std::string> main_sensors_;
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseFusionSystem);

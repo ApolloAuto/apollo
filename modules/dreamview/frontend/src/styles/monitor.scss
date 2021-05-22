@@ -136,6 +136,12 @@ $monitor-header-height: 32px;
 .data-collection-monitor {
     position: relative;
     width: 100%;
+    overflow-y: hidden;
+
+    .prepProcess{
+        position:absolute;
+        bottom:0;
+    }
 
     .scenario-container {
         position: absolute;
@@ -202,6 +208,54 @@ $monitor-header-height: 32px;
             }
         }
     }
+
+    .camera-intrinsics {
+        margin-left: 20px;
+	    margin-top: 10px;
+
+        .camera-intrinsics-D {
+            margin-top: 10px;
+	        clear: both;
+
+            .camera-internal-configuration-div {
+                float: left;
+
+                .camera-internal-configuration-d {
+                    max-width: 80px;
+                    width: auto;
+                    margin-right: 15px;
+                    margin-top: 5px;
+                }
+            }
+        }
+
+        .camera-intrinsics-K {
+            margin-top: 10px;
+	        clear: both;
+
+            .camera-internal-configuration-div {
+                float: left;
+
+                .camera-internal-configuration-d {
+                    max-width: 80px;
+                    width: auto;
+                    margin-right: 15px;
+                    margin-top: 5px;
+                }
+            }
+        }
+    }
+
+    .translation-input {
+        max-width: 80px;
+        width: auto;
+    }
+}
+
+.vehicle-calibration-panel{
+    height:80%;
+    margin-bottom: 10px;
+    overflow-y: scroll;
 }
 
 .camera-param {

@@ -11,7 +11,6 @@ cc_library(
         "i_blas.h",
         "i_constant.h",
         "i_rand.h",
-        "i_struct.h",
     ],
 )
 

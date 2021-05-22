@@ -26,16 +26,15 @@ export default class ScenarioCollectionMonitor extends React.Component {
   }
 
   render() {
-    const { statusMap, progressMap } = this.props;
+    const { statusMap, progressMap, startUpdateProgress } = this.props;
 
     const inProgressCategories = [];
     const completedCategories = [];
     statusMap.forEach((isUpdated, description) => {
-      const progressInPercentage = progressMap.get(description);
+      const progressInPercentage = startUpdateProgress ? progressMap.get(description) : 0;
       const isCompleted = progressInPercentage >= 100.0;
       const element = this.renderCategoryProgress(
-        description, progressInPercentage, isUpdated, isCompleted,
-      );
+        description, progressInPercentage, isUpdated && startUpdateProgress, isCompleted);
 
       if (isCompleted) {
         completedCategories.push(element);

@@ -25,12 +25,13 @@
 // Eigen 3.3.7: #define ALIVE (0)
 // fastrtps: enum ChangeKind_t { ALIVE, ... };
 #if defined(ALIVE)
-#   undef ALIVE
+#undef ALIVE
 #endif
 
-#include "cyber/cyber.h"
+#include "modules/drivers/lidar/proto/velodyne_config.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/lidar/velodyne/proto/config.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/transform/buffer.h"
 
 namespace apollo {

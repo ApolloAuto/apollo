@@ -35,6 +35,31 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 ## Prerequisites
 
+**[New 2021-01]** The Apollo platform (stable version) is now upgraded with
+software packages and library dependencies of newer versions including:
+
+1. CUDA upgraded to version 11.1 to support Nvidia Ampere (30x0 series) GPUs,
+   with NVIDIA driver >= 455.32
+2. LibTorch (both CPU and GPU version) bumped to version 1.7.0 accordingly.
+
+We do not expect a disruption to your current work, but to ease your life of
+migratation, you would need to: 
+
+1. Update NVIDIA driver on your host to version >= 455.32.
+  ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
+2. Pull latest code and run the following commands after restarting and
+  logging into Apollo Development container:
+
+```bash
+# Remove Bazel output of previous builds
+rm -rf /apollo/.cache/{bazel,build,repos}
+# Re-configure bazelrc.
+./apollo.sh config --noninteractive
+```
+
+---
+
+
 * The vehicle equipped with the by-wire system, including but not limited to brake-by-wire, steering-by-wire, throttle-by-wire and shift-by-wire (Apollo is currently tested on Lincoln MKZ)
 
 * A machine with a 8-core processor and 16GB memory minimum 
@@ -43,7 +68,7 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 * Ubuntu 18.04
 
-* NVIDIA driver version 440.33.01 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
+* NVIDIA driver version 455.32.00 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
 
 * Docker-CE version 19.03 and above ([Official doc](https://docs.docker.com/engine/install/ubuntu/))
 

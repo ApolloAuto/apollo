@@ -1,0 +1,48 @@
+syntax = "proto2";
+
+package apollo.drivers.velodyne;
+
+import "modules/drivers/lidar/proto/velodyne.proto";
+
+message Config {
+  optional string frame_id = 1;
+  optional string scan_channel = 2;
+  optional double rpm = 3 [default = 600.0];
+  optional Model model = 4;
+  optional Mode mode = 21;
+  optional string pcap = 5;
+  optional int32 prefix_angle = 6;
+  optional int32 firing_data_port = 7;
+  optional int32 positioning_data_port = 8;
+  optional bool use_sensor_sync = 9;
+  optional double max_range = 10;
+  optional double min_range = 11;
+  optional double max_angle = 12;
+  optional double min_angle = 13;
+  optional double view_direction = 14;
+  optional double view_width = 15;
+  optional bool calibration_online = 16;
+  optional string calibration_file = 17;
+  optional bool organized = 18;
+  optional string convert_channel_name = 19;
+  optional int32 npackets = 20;
+  optional bool use_gps_time = 23;
+  optional bool use_poll_sync = 24;
+  optional bool is_main_frame = 25;
+}
+
+message FusionConfig {
+  optional uint32 max_interval_ms = 1;
+  optional bool drop_expired_data = 2;
+  optional string fusion_channel = 3;
+  repeated string input_channel = 4;
+  optional float wait_time_s = 5;
+}
+
+message CompensatorConfig {
+  optional string output_channel = 1;
+  optional float transform_query_timeout = 2 [default = 0.02];
+  optional string world_frame_id = 3 [default = "world"];
+  optional string target_frame_id = 4;
+  optional uint32 point_cloud_size = 5;
+}

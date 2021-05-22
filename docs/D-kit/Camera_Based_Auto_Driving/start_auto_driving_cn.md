@@ -57,7 +57,14 @@
     bash scripts/bootstrap.sh
  
 #### 3. 启动所需模块
-在浏览器中打开`(http://localhost:8888)`,选择模式为`Dev Kit Debug`， 选择车型为`dev_kit`并选择相应高精地图，在module Controller标签页启动Canbus、Camera、GPS、Localization、Transform模块。
+在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 根据车辆铭牌信息选择对应的车型(详情见下表)，并选择相应高精地图，在module Controller标签页启动Canbus、Camera、GPS、Localization、Transform模块。
+
+| 铭牌信息 | 车型选择 | 
+|---|---|
+| Apollo D-KIT Lite | dev_kit |
+| Apollo D-KIT Standard  | dev_kit_standard |
+| Apollo D-KIT Advanced(NE-S)| dev_kit_advanced_ne-s |
+| Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r  |
 
 ![camera_adaptation_dreamview](images/camera_adaptation_dreamview.png)
 

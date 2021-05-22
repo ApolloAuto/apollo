@@ -142,7 +142,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
 }
 
 void VisualizationEngine::Visualize(
-    const std::vector<LocalizatonInfo> &loc_infos,
+    ::apollo::common::EigenVector<LocalizatonInfo> &&loc_infos,
     const ::apollo::common::EigenVector3dVec &cloud) {
   if (!is_init_) {
     AERROR << "Visualziation should be init first.";
@@ -154,7 +154,7 @@ void VisualizationEngine::Visualize(
     return;
   }
 
-  cur_loc_infos_ = loc_infos;
+  cur_loc_infos_ = std::move(loc_infos);
 
   if (!UpdateCarLocId(expected_car_loc_id_)) {
     if (!UpdateCarLocId(car_loc_id_)) {
@@ -694,6 +694,10 @@ bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
 
   inf >> x_min >> y_min >> x_max >> y_max >> level >> path;
   inf.close();
+
+  if (level > 5) {
+    level = 5;
+  }
 
   InitOtherParams(x_min, y_min, x_max, y_max, level, path);
 

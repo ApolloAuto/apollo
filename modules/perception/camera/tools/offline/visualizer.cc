@@ -1369,7 +1369,9 @@ void Visualizer::ShowResult_all_info_single_camera(
   if (frame.timestamp - last_timestamp_ < 0.02) return;
 
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, black_color);
-
+  if (frame.data_provider->sensor_name() == "front_6mm") {
+    cv::imwrite("./test.png", img);
+  }
   // draw results on visulization panel
   int line_pos = 0;
   cv::Mat image = img.clone();

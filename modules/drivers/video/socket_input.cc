@@ -127,7 +127,7 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
     if (pdu_len < 0) {
       if (errno != EWOULDBLOCK) {
         AERROR << "Failed to receive package from port: " << port_;
-        return RECIEVE_FAIL;
+        return RECEIVE_FAIL;
       }
     }
 

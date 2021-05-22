@@ -122,6 +122,11 @@ export default class RealtimeWebSocketEndpoint {
             STORE.hmi.updateDataCollectionProgress(message.data);
           }
           break;
+        case 'PreprocessProgress':
+          if (message) {
+            STORE.hmi.updatePreprocessProgress(message.data);
+          }
+          break;
       }
     };
     this.websocket.onclose = (event) => {
@@ -161,8 +166,12 @@ export default class RealtimeWebSocketEndpoint {
           this.pointcloudWS.requestPointCloud();
         }
         this.requestSimulationWorld(STORE.options.showPNCMonitor);
-        if (STORE.hmi.isCalibrationMode) {
+        if (STORE.hmi.isVehicleCalibrationMode) {
           this.requestDataCollectionProgress();
+          this.requestPreprocessProgress();
+        }
+        if (STORE.hmi.isSensorCalibrationMode) {
+          this.requestPreprocessProgress();
         }
       }
     }, this.simWorldUpdatePeriodMs);
@@ -239,7 +248,7 @@ export default class RealtimeWebSocketEndpoint {
       start,
       end,
       waypoint,
-      cycleNumber
+      cycleNumber,
     };
     if (start_heading) {
       request.start.heading = start_heading;
@@ -384,9 +393,25 @@ export default class RealtimeWebSocketEndpoint {
   saveDefaultRouting(routingName,points) {
     const request = {
       type: 'SaveDefaultRouting',
-      name:routingName,
-      point:points,
+      name: routingName,
+      point: points,
     };
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  requestPreprocessProgress() {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestPreprocessProgress',
+    }));
+  }
+
+  startPreprocessData(data, type) {
+    const request = {
+      type,
+    };
+    if (data) {
+      request.data = data;
+    }
     this.websocket.send(JSON.stringify(request));
   }
 }

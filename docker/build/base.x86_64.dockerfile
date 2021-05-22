@@ -12,9 +12,8 @@ RUN M="${CUDNN_VERSION%%.*}" \
     libcudnn${M}="${CUDNN_VERSION}${PATCH}" \
     libcudnn${M}-dev="${CUDNN_VERSION}${PATCH}" \
     && apt-mark hold libcudnn${M} \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN echo "Delete static cuDNN libraries..." \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "Delete static cuDNN libraries..." \
     && find /usr/lib/$(uname -m)-linux-gnu -name "libcudnn_*.a" -delete -print
 
 ENV CUDNN_VERSION ${CUDNN_VERSION}

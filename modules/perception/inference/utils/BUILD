@@ -10,6 +10,7 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
+        "@boost",
         "@local_config_cuda//cuda:cudart",
     ],
 )

@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "cyber/class_loader/utility/class_factory.h"
 
-#include "cyber/class_loader/class_loader.h"
+#include <algorithm>
 
 namespace apollo {
 namespace cyber {

@@ -48,7 +48,7 @@ def read_parameters(yaml_file):
     function to read YAML parameter file and define output destinations
     """
     with open(yaml_file, 'r') as f:
-        params = yaml.load(f)
+        params = yaml.safe_load(f)
     # record file params
     RECORD_FOLDER = params['records']['filepath']
     parse_type = params['parse']

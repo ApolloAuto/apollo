@@ -24,7 +24,6 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
-        "//modules/perception/lidar/lib/tracker/semantic_map:perception_evaluator_manager",
         "//modules/perception/onboard/msg_serializer",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",

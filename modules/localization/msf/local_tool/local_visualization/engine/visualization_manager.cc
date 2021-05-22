@@ -435,11 +435,9 @@ void VisualizationManager::DoVisualize() {
                           lidar_frame.frame_id);
       }
 
-      std::vector<LocalizatonInfo> loc_infos;
-      loc_infos.push_back(lidar_loc_info);
-      loc_infos.push_back(fusion_loc_info);
-      loc_infos.push_back(gnss_loc_info);
-      visual_engine_.Visualize(loc_infos, lidar_frame.pt3ds);
+      ::apollo::common::EigenVector<LocalizatonInfo> loc_infos{
+          lidar_loc_info, fusion_loc_info, gnss_loc_info};
+      visual_engine_.Visualize(std::move(loc_infos), lidar_frame.pt3ds);
     }
   }
 }

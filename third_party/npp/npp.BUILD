@@ -12,8 +12,8 @@ package(
 cc_library(
     name = "npp",
     includes = select({
-        "@apollo//tools/platform:x86_mode": ["targets/x86_64-linux/include"],
-        "@apollo//tools/platform:aarch64_mode": ["targets/aarch64-linux/include"],
+        "@platforms//cpu:x86_64": ["targets/x86_64-linux/include"],
+        "@platforms//cpu:aarch64": ["targets/aarch64-linux/include"],
         "//conditions:default": [],
     }),
     linkopts = [

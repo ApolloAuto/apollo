@@ -19,25 +19,31 @@
 #include <string>
 #include <vector>
 
+#include "google/protobuf/util/json_util.h"
+
+#include "modules/dreamview/proto/preprocess_table.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::util::JsonUtil;
+using apollo::cyber::common::SetProtoToASCIIFile;
+using google::protobuf::util::JsonStringToMessage;
 using Json = WebSocketHandler::Json;
 
-HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
-         DataCollectionMonitor* data_collection_monitor)
+HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
     : hmi_worker_(new HMIWorker()),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
-      map_service_(map_service),
-      data_collection_monitor_(data_collection_monitor) {
+      map_service_(map_service) {
   if (websocket_) {
     RegisterMessageHandlers();
   }
@@ -103,16 +109,6 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
-          if (data_collection_monitor_->IsEnabled()) {
-            data_collection_monitor_->Restart();
-          }
-        } else if (hmi_action == HMIAction::CHANGE_MODE) {
-          static constexpr char kCalibrationMode[] = "Vehicle Calibration";
-          if (value == kCalibrationMode) {
-            data_collection_monitor_->Start();
-          } else {
-            data_collection_monitor_->Stop();
-          }
         }
       });
 
@@ -170,6 +166,49 @@ void HMI::RegisterMessageHandlers() {
       "HMIStatus",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         SendStatus(conn);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "SensorCalibrationPreprocess",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        // json should contain type and data.
+        std::string current_mode = hmi_worker_->GetStatus().current_mode();
+        std::string task_type;
+        if (current_mode == FLAGS_lidar_calibration_mode) {
+          task_type = "lidar_to_gnss";
+        } else if (current_mode == FLAGS_camera_calibration_mode) {
+          task_type = "camera_to_lidar";
+        } else {
+          AERROR << "Unsupported mode:" << current_mode;
+          return;
+        }
+
+        const auto iter = json.find("data");
+        if (iter == json.end()) {
+          AERROR << "The json has no such key: data";
+          return;
+        }
+        PreprocessTable preprocess_table;
+        if (!JsonStringToMessage(json["data"].dump(), &preprocess_table).ok()) {
+          AERROR
+              << "Failed to get user configuration: invalid preprocess table."
+              << json.dump();
+        }
+
+        // Gernerate user-specified configuration and run the preprocess script
+        std::string output_file =
+            absl::StrCat("/apollo/modules/tools/sensor_calibration/config/",
+                         task_type, "_user.config");
+        if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
+          AERROR << "Failed to generate user configuration file";
+        }
+        hmi_worker_->SensorCalibrationPreprocess(task_type);
+      });
+
+  websocket_->RegisterMessageHandler(
+      "VehicleCalibrationPreprocess",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        hmi_worker_->VehicleCalibrationPreprocess();
       });
 }
 

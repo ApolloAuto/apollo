@@ -1,0 +1,48 @@
+brand: ROBOSENSE
+velodyne {
+  frame_id: "velodyne128"
+  scan_channel: "/apollo/sensor/lidar16/Scan"
+  rpm: 600
+  model: VLP16
+  prefix_angle: 18000
+  firing_data_port: 2369
+  positioning_data_port: 8309
+  use_sensor_sync: false
+  max_range: 100
+  min_range: 0.9
+  calibration_online: false
+  calibration_file: "/apollo/modules/drivers/lidar/velodyne/params/VLP16_calibration.yaml"
+  organized: false
+  convert_channel_name: "/apollo/sensor/lidar16/PointCloud2"
+  mode: STRONGEST
+  use_gps_time: true
+  use_poll_sync: true
+  is_main_frame: true
+}
+hesai {
+  model: HESAI64
+  ip: "192.168.20.13"
+  lidar_recv_port: 2368
+  gps_recv_port: 10110
+  start_angle: 0
+  pointcloud_channel: "/apollo/sensor/hesai64/PointCloud2"
+  time_zone: 8
+  frame_id: "hesai64"
+  scan_channel: "/apollo/sensor/hesai64/Scan"
+}
+robosense {
+model: "RS32"
+frame_id: "rslidar_32"
+ip: "192.168.1.200"
+msop_port: 6699
+difop_port: 7788
+echo_mode: 1
+start_angle: 0
+end_angle: 360
+min_distance: 0
+max_distance: 200
+cut_angle: 0
+pointcloud_channel: "/apollo/sensor/rs32/PointCloud2"
+scan_channel: "/apollo/sensor/rs32/Scan"
+use_lidar_clock: false
+}

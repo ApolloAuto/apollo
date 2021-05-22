@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 CONTROL_COPTS = ['-DMODULE_NAME=\\"control\\"']
 
 cc_library(
@@ -161,7 +162,7 @@ cc_test(
     size = "small",
     srcs = ["lon_controller_test.cc"],
     copts = ["-fno-access-control"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":lon_controller",
         "//cyber",
@@ -180,7 +181,7 @@ cc_test(
     size = "small",
     srcs = ["lat_controller_test.cc"],
     copts = ["-fno-access-control"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":lat_controller",
         "//cyber",
@@ -198,7 +199,7 @@ cc_test(
     size = "small",
     srcs = ["mpc_controller_test.cc"],
     copts = ["-fno-access-control"],
-    data = ["//modules/control/testdata:control_testdata"],
+    data = ["//modules/control:test_data"],
     deps = [
         ":mpc_controller",
         "//cyber",

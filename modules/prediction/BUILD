@@ -1,15 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
 
 cc_library(
     name = "prediction_component_lib",
     srcs = ["prediction_component.cc"],
     hdrs = ["prediction_component.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
+    copts = PREDICTION_COPTS,
     deps = [
         "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
@@ -23,7 +24,6 @@ cc_library(
         "//modules/prediction/submodules:submodule_output",
         "//modules/prediction/util:data_extraction",
     ],
-    alwayslink = True,
 )
 
 cc_test(
@@ -50,14 +50,44 @@ cc_binary(
     deps = [":prediction_component_lib"],
 )
 
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libprediction_component.so",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = [
+        ":prediction_data",
+        ":prediction_conf",
+    ] + glob([
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
+
 filegroup(
     name = "prediction_data",
-    srcs = glob(["data/**"]),
+    srcs = glob([
+        "data/*.pt",
+        "data/*.bin",
+    ]),
 )
 
 filegroup(
     name = "prediction_conf",
-    srcs = glob(["conf/**"]),
+    srcs = glob([
+        "conf/*.conf",
+        "conf/*.txt",
+    ]),
 )
 
 filegroup(

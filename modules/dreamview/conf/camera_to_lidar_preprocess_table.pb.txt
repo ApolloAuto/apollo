@@ -1,0 +1,21 @@
+camera_config {
+  translation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  D: 0
+  D: 0
+  D: 0
+  D: 0
+  D: 0
+  K: 0
+  K: 0
+  K: 0
+  K: 0
+  K: 0
+  K: 0
+  K: 0
+  K: 0
+  K: 1
+}

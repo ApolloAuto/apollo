@@ -21,6 +21,6 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${DIR}/apollo_base.sh"
 
 # generate routing_map.bin in map directory.
-/apollo/bazel-bin/modules/routing/topo_creator/topo_creator \
+${APOLLO_BIN_PREFIX}/modules/routing/topo_creator/topo_creator \
   --flagfile=modules/routing/conf/routing.conf \
-  -alsologtostderr $@
+  $@

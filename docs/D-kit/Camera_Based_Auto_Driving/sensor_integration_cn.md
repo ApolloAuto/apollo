@@ -8,7 +8,6 @@
 		- [相机的安装固定](#相机的安装固定)
 		- [摄像头与工控机连接](#摄像头与工控机连接)
 		- [摄像头规则文件的配置](#摄像头规则文件的配置)
-		- [Apollo配置的修改](#apollo配置的修改)
 		- [摄像头的启动](#摄像头的启动)
 			- [1. 检查摄像头是否被系统识别](#1-检查摄像头是否被系统识别)
 			- [2. 检查是否存在摄像头软连接文件](#2-检查是否存在摄像头软连接文件)
@@ -17,7 +16,7 @@
 			- [5. 验证camera是否工作正常](#5-验证camera是否工作正常)
 	- [NEXT](#next)
 	- [常见问题](#常见问题)
-		- [1. 规则文件修改后不显示软连接](#1-规则文件修改后不显示软连接)
+			- [1. 规则文件修改后不显示软连接](#1-规则文件修改后不显示软连接)
 
 ## 前提条件
 
@@ -38,7 +37,11 @@
 - 更多详细参数可参考：[leopard数据手册](https://leopardimaging.com/product/li-usb30-ar023zwdrb/)。
 
 ## 摄像头安装配置与数据验证
+
+**注意** 针对Standard、Advanced用户，默认已经对相机进行了安装和集成，直接从`摄像头的启动`这一章节开始进行数据的验证即可
+
 ### 相机的安装固定
+
 - 牢固安装在小车结构架前端横梁处，水平安装，俯仰角向下0-2度（向下倾斜小于2度，不能上仰），翻滚角误差±1度（左右两侧的平齐程度），航向角误差±2度，镜头保持清洁，避免影响图像采集。安装位置如下图所示：
 
 	![camera_integration_installation](images/camera_integration_installation.png)
@@ -59,16 +62,16 @@
  
  摄像头规则文件的作用是，当linux启动时，根据规则文件设置的规则，自动生成对应的软链接文件。
  
- - 在docker环境外，执行如下命令，打开默认的规则文件
+ - 在docker环境外，执行如下命令，创建并编辑相机规则文件
 
 	```
-	vim  ~/apollp/docker/setup_host/etc/udev/rules.d/99-webcam.rules 
+	sudo vim /etc/udev/rules.d/99-webcam.rules 
 	```
  
  - 根据自身情况，修改rules文件，摄像头的rules文件示例如下所示(这里只包含了两个摄像头的规则文件，如需用到3个摄像头，可参照格式自行添加)：
 	```
-	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", MODE="0666", SYMLINK+="camera/front_6mm", OWNER="apollo", GROUP="apollo"
-	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-2:1.0", MODE="0666", SYMLINK+="camera/front_12mm", OWNER="apollo", GROUP="apollo"
+	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", ATTR{index}=="0", MODE="0666", SYMLINK+="camera/front_6mm", OWNER="apollo", GROUP="apollo"
+	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-2:1.0", ATTR{index}=="0", MODE="0666", SYMLINK+="camera/front_12mm", OWNER="apollo", GROUP="apollo"
 	```
 其中，第一条代表连接到USB端口号为`2-1:1.0`的摄像头对应的软链接文件为`camera/front_6mm`；第二条代表连接到USB端口号为`2-2:1.0`的摄像头对应的软链接文件为`camera/front_12mm`。
 
@@ -89,7 +92,10 @@
  
 ### 摄像头的启动
 #### 1. 检查摄像头是否被系统识别  
-在摄像头与工控机正常连接的基础上，执行`ls /dev/video*`指令，查看摄像头是否被识别， 如果摄像头设备已经被识别，则会显示以`video`开头的设备名称，否则的话，请检查摄像头与工控机的连线是否可靠。
+- 在摄像头与工控机正常连接的基础上，执行`ls /dev/video*`指令，查看摄像头是否被识别， 如果摄像头设备已经被识别，则会显示以`video`开头的设备名称，否则的话，请检查摄像头与工控机的连线是否可靠。
+- 在linux系统终端中输入`cheese`命令，打卡cheese工具查看图像是否正常输出。注意设置正确的相机分辨率。在屏幕左上角选择`cheese->preferences->webcam`来设置分辨率。开发套件相机默认的分辨率为1920*1080
+
+	![camera_integration_cheese](images/camera_integration_cheese.png)
 
 
 #### 2. 检查是否存在摄像头软连接文件
@@ -108,7 +114,14 @@
 #### 4. 启动camera模块
 
 
- - 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 选择车型为`Dev Kit`，在Module Controller标签页启动`Camera`模块
+ - 在浏览器中打开`(http://localhost:8888)`，选择模式为`Dev Kit Debug`， 根据车辆铭牌信息选择对应的车型(详情见下表)，在Module Controller标签页启动`Camera`模块
+
+	| 铭牌信息 | 车型选择 | 
+	|---|---|
+	| Apollo D-KIT Lite | dev_kit |
+	| Apollo D-KIT Standard  | dev_kit_standard |
+	| Apollo D-KIT Advanced(NE-S)| dev_kit_advanced_ne-s |
+	| Apollo D-KIT Advanced(SNE-R) | dev_kit_advanced_sne-r  |
  
 	![camera_integration_dreamview1](images/camera_integration_dreamview1.png)
 

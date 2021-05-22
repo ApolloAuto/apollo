@@ -31,7 +31,7 @@ namespace drivers {
 namespace video {
 
 static const int SOCKET_TIMEOUT = -2;
-static const int RECIEVE_FAIL = -3;
+static const int RECEIVE_FAIL = -3;
 static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 static const size_t H265_FRAME_PACKAGE_SIZE = 4 * 1024 * 1024;
 static const size_t H265_PDU_SIZE = 1500;

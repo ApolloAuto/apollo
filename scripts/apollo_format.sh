@@ -55,8 +55,8 @@ function run_buildifier() {
   bash "${TOP_DIR}/scripts/buildifier.sh" "$@"
 }
 
-function run_autopep8() {
-  bash "${TOP_DIR}/scripts/autopep8.sh" "$@"
+function run_yapf() {
+  bash "${TOP_DIR}/scripts/yapf.sh" "$@"
 }
 
 function run_shfmt() {
@@ -73,7 +73,7 @@ function run_apollo_format() {
       if c_family_ext "${arg}" || proto_ext "${arg}"; then
         run_clang_format "${arg}"
       elif py_ext "${arg}"; then
-        run_autopep8 "${arg}"
+        run_yapf "${arg}"
       elif prettier_ext "${arg}"; then
         run_prettier "${arg}"
       elif bazel_extended "${arg}"; then
@@ -89,7 +89,7 @@ function run_apollo_format() {
         run_clang_format "${arg}"
       fi
       if [ "${FORMAT_PYTHON}" -eq 1 ]; then
-        run_autopep8 "${arg}"
+        run_yapf "${arg}"
       fi
       if [ "${FORMAT_SHELL}" -eq 1 ]; then
         run_shfmt "${arg}"

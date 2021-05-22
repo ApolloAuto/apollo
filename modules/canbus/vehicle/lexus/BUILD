@@ -52,7 +52,7 @@ cc_test(
     name = "lexus_controller_test",
     size = "small",
     srcs = ["lexus_controller_test.cc"],
-    data = ["//modules/canbus:canbus_testdata"],
+    data = ["//modules/canbus:test_data"],
     deps = [
         "//modules/canbus/vehicle/lexus:lexus_controller",
         "@com_google_googletest//:gtest_main",

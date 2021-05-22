@@ -1,6 +1,6 @@
 # How to Install Low-Latency / Realtime Kernel
 
-This document describes the steps to install low-latency/realtime kernel with
+This document describes the steps to install low-latency/realtime kernels with
 Nvidia driver on Ubuntu 18.04.
 
 ## Before You Begin
@@ -8,7 +8,7 @@ Nvidia driver on Ubuntu 18.04.
 Low-Latency/Realtime kernel is only required for running Apollo software stack
 in the vehicle. If your sole purpose was to develop/test your algorithms or to
 run simulation software (e.g., LGSVL simulator) on top of Apollo, then maybe you
-don't need to install low-latency/real-time kernels described at all.
+don't need to install low-latency/real-time kernels described here at all.
 
 ## Ubuntu Low-Latency Kernel
 

@@ -38,8 +38,10 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util",
-        "//modules/drivers/lidar/velodyne/proto:config_cc_proto",
+        "//modules/common/util:message_util",
+        "//modules/drivers/lidar/common/driver_factory:driver_base",
+        "//modules/drivers/lidar/proto:config",
+        "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
     ],
 )
 

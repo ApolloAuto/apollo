@@ -20,11 +20,12 @@
 #include <string>
 #include <vector>
 
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/task_manager/proto/task_manager.pb.h"
+
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/dreamview/backend/map/map_service.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
 
 namespace apollo {
 namespace task_manager {
@@ -43,14 +44,14 @@ class CycleRoutingManager {
    * @brief Get new routing if the vehicle reaches the begin/end point
    * @return false/true
    */
-  bool GetNewRouting(const localization::Pose &pose,
-      routing::RoutingRequest* routing_request_);
+  bool GetNewRouting(const localization::Pose& pose,
+                     routing::RoutingRequest* routing_request_);
 
   /**
    * @brief get remaining cycle number
    * @return remaining cycle number
    */
-  int GetCycle() const;
+  int GetCycle() const { return cycle_; }
 
   /**
    * @brief destructor

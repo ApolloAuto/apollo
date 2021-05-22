@@ -113,40 +113,35 @@ bool UDPBridgeMultiReceiverComponent::IsTimeout(double time_stamp) {
 bool UDPBridgeMultiReceiverComponent::MsgHandle(int fd) {
   struct sockaddr_in client_addr;
   socklen_t sock_len = static_cast<socklen_t>(sizeof(client_addr));
-  int bytes = 0;
   int total_recv = 2 * FRAME_SIZE;
   char total_buf[2 * FRAME_SIZE] = {0};
-  bytes =
+  int bytes =
       static_cast<int>(recvfrom(fd, total_buf, total_recv, 0,
                                 (struct sockaddr *)&client_addr, &sock_len));
-  ADEBUG << "total recv " << bytes;
   if (bytes <= 0 || bytes > total_recv) {
     return false;
   }
-  char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-  size_t offset = 0;
-  memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
-  if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
-    AINFO << "header flag not match!";
-    return false;
-  }
-  offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
 
-  char header_size_buf[sizeof(hsize) + 1] = {0};
-  const char *cursor = total_buf + offset;
-  memcpy(header_size_buf, cursor, sizeof(hsize));
-  hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
-  if (header_size > FRAME_SIZE) {
-    AINFO << "header size is more than FRAME_SIZE!";
+  if (strncmp(total_buf, BRIDGE_HEADER_FLAG, HEADER_FLAG_SIZE) != 0) {
+    AERROR << "Header flag didn't match!";
     return false;
   }
+  size_t offset = HEADER_FLAG_SIZE + 1;
+
+  const char *cursor = total_buf + offset;
+  hsize header_size = *(reinterpret_cast<const hsize *>(cursor));
   offset += sizeof(hsize) + 1;
 
-  BridgeHeader header;
-  size_t buf_size = header_size - offset;
+  if (header_size < offset || header_size > FRAME_SIZE) {
+    AERROR << "header size is more than FRAME_SIZE!";
+    return false;
+  }
+
   cursor = total_buf + offset;
+  size_t buf_size = header_size - offset;
+  BridgeHeader header;
   if (!header.Diserialize(cursor, buf_size)) {
-    AINFO << "header diserialize failed!";
+    AERROR << "header diserialize failed!";
     return false;
   }
 
