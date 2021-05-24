@@ -36,16 +36,20 @@ void CyberRecordReader::Subscribe(
   topics_.push_back(topic);
 }
 
+void CyberRecordReader::Read(const std::string &file_name) {
+  RecordReader reader(file_name);
+  cyber::record::RecordMessage message;
+  while (reader.ReadMessage(&message)) {
+    auto itr = call_back_map_.find(message.channel_name);
+    if (itr != call_back_map_.end()) {
+      itr->second(message.content);
+    }
+  }
+}
+
 void CyberRecordReader::Read(const std::vector<std::string> &file_names) {
   for (const std::string &file_name : file_names) {
-    RecordReader reader(file_name);
-    cyber::record::RecordMessage message;
-    while (reader.ReadMessage(&message)) {
-      auto itr = call_back_map_.find(message.channel_name);
-      if (itr != call_back_map_.end()) {
-        itr->second(message.content);
-      }
-    }
+    Read(file_name);
   }
 }
 
