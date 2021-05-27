@@ -18,7 +18,7 @@ install(
         "//modules/audio:install",
         "//modules/bridge:install",
         "//modules/canbus:install",
-        "//modules/common/data:install",
+        "//modules/common:install",
         "//modules/contrib/cyber_bridge:install",
         "//modules/control:install",
         "//modules/dreamview:install",
