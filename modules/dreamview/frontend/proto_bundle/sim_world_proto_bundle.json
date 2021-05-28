@@ -1708,7 +1708,8 @@
                         "ULTRASONIC_RADAR": 17,
                         "MOBILEYE": 18,
                         "DELPHI_ESR": 19,
-                        "STORYTELLING": 20
+                        "STORYTELLING": 20,
+                        "TASK_MANAGER": 21
                       }
                     },
                     "LogLevel": {
@@ -10890,6 +10891,22 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 4
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "IN_ROAD": 1,
+                    "CROSS_ROAD": 2,
+                    "FORK_ROAD": 3,
+                    "MAIN_SIDE": 4,
+                    "DEAD_END": 5
+                  }
                 }
               }
             },

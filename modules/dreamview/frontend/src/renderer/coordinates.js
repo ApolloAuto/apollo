@@ -52,6 +52,9 @@ export default class Coordinates {
   }
 
   applyOffsetToArray(points) {
+    if (!_.isArray(points)) {
+      return null;
+    }
     return points.map((point) => this.applyOffset(point));
   }
 }

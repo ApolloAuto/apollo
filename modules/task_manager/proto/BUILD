@@ -38,6 +38,7 @@ proto_library(
         "//modules/common/proto:header_proto",
         "//modules/map/proto:map_parking_space_proto",
         "//modules/routing/proto:routing_proto",
+         "//modules/map/proto:map_junction_proto",
     ],
 )
 
@@ -48,5 +49,6 @@ py_proto_library(
         "//modules/common/proto:header_py_pb2",
         "//modules/map/proto:map_parking_space_py_pb2",
         "//modules/routing/proto:routing_py_pb2",
+         "//modules/map/proto:map_junction_py_pb2",
     ],
 )

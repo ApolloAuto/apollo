@@ -471,6 +471,23 @@ bool MapService::CheckRoutingPoint(const double x, const double y) const {
   return true;
 }
 
+bool MapService::CheckRoutingPointLaneId(
+    const double x, const double y, std::vector<std::string> idsArr) const {
+  if (idsArr.empty()) {
+    return false;
+  }
+  double s, l;
+  LaneInfoConstPtr lane;
+  if (!GetNearestLane(x, y, &lane, &s, &l)) {
+    return false;
+  }
+  if (!CheckRoutingPointLaneType(lane)) {
+    return false;
+  }
+  return std::find(idsArr.begin(), idsArr.end(), lane->id().id()) !=
+         idsArr.end();
+}
+
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
   if (lane->lane().type() != Lane::CITY_DRIVING) {
     AERROR

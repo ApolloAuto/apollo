@@ -496,8 +496,11 @@ class Renderer {
       this.map.removeAllElements(this.scene);
     }
     const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
-    if (newData['parkingSpace'] && !_.isEmpty(extraInfo)) {
-      this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], extraInfo, this.coordinates,this.scene);
+    if (newData.parkingSpace && !_.isEmpty(extraInfo[0])) {
+      this.routingEditor.setParkingSpaceInfo(newData.parkingSpace, extraInfo, this.coordinates, this.scene);
+    }
+    if (!_.isEmpty(extraInfo[1])) {
+      this.routingEditor.setDeadJunctionInfo(extraInfo[1]);
     }
   }
 

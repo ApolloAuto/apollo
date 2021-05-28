@@ -446,4 +446,22 @@ export default class RealtimeWebSocketEndpoint {
     }
     this.websocket.send(JSON.stringify(request));
   }
+
+  // requ
+  sendDeadEndJunctionRoutingRequest(
+    start1, end1, start2, end2, inLaneIds, outLaneIds, junctionId, junctionPoints,
+  ) {
+    const request = {
+      type: 'SendDeadEndJunctionRoutingRequest',
+      start1,
+      end1,
+      start2,
+      end2,
+      inLaneIds,
+      outLaneIds,
+      junctionPoints,
+      junctionId,
+    };
+    this.websocket.send(JSON.stringify(request));
+  }
 }

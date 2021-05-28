@@ -15,6 +15,7 @@ export default class RoutingEditor {
     this.inEditingMode = false;
     this.pointId = 0;
     this.parkingSpaceInfo = [];
+    this.deadJunctionInfo = [];
   }
 
   isInEditingMode() {
@@ -62,7 +63,7 @@ export default class RoutingEditor {
     this.parkingInfo = info;
   }
 
-  setParkingSpaceInfo(parkingSpaceInfo, extraInformation, coordinates,scene) {
+  setParkingSpaceInfo(parkingSpaceInfo, extraInformation, coordinates, scene) {
     this.parkingSpaceInfo = parkingSpaceInfo;
     this.parkingSpaceInfo.forEach((item, index) => {
       const extraInfo = extraInformation[index];
@@ -140,6 +141,8 @@ export default class RoutingEditor {
 
   sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
     // parking routing request vs common routing request
+    // add dead end junction routing request when select three points
+    // and the second point is in dead end junction.
     if (this.routePoints.length === 0 && routingPoints.length === 0) {
       alert('Please provide at least an end point.');
       return false;
@@ -168,10 +171,10 @@ export default class RoutingEditor {
       const cornerPoints = parkingRequestPoints.slice(-4);
       const parkingInfo = {
         parkingSpaceId: _.get(id, 'id'),
-        parkingPoint: coordinates.applyOffset(lastPoint.position,true),
+        parkingPoint: coordinates.applyOffset(lastPoint.position, true),
         parkingSpaceType: type,
       };
-      WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints,laneId);
+      WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, laneId);
       return true;
     }
     const points = _.isEmpty(routingPoints) ?
@@ -182,6 +185,18 @@ export default class RoutingEditor {
         point.z = 0;
         return coordinates.applyOffset(point, true);
       });
+    if (points.length === 3 && !_.isEmpty(this.deadJunctionInfo)) {
+      const deadJunctionIdx = this.determinDeadEndJunctionRequest(points);
+      if (deadJunctionIdx !== -1) {
+        const deadJunction = this.deadJunctionInfo[deadJunctionIdx];
+        WS.sendDeadEndJunctionRoutingRequest(
+          points[0], deadJunction.inStartPoint, deadJunction.outRoutingPoint,
+          points[2], deadJunction.inLaneIds, deadJunction.outLaneIds,
+          deadJunction.deadJunctionId, deadJunction.deadJunctionPoints,
+        );
+        return true;
+      }
+    }
     const start = (points.length > 1) ? points[0]
       : coordinates.applyOffset(carOffsetPosition, true);
     const start_heading = (points.length > 1) ? null : carHeading;
@@ -235,5 +250,15 @@ export default class RoutingEditor {
         IsPointInRectangle(item.polygon.point, offsetPoint));
     }
     return index;
+  }
+
+  determinDeadEndJunctionRequest(offsetPoints) {
+    const index = _.findIndex(this.deadJunctionInfo, deadJunction =>
+      IsPointInRectangle(deadJunction.deadJunctionPoints, offsetPoints[1]));
+    return index;
+  }
+
+  setDeadJunctionInfo(deadJunctionInfos) {
+    this.deadJunctionInfo = deadJunctionInfos;
   }
 }
