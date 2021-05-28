@@ -395,6 +395,14 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
   if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
     double parllel_park_end_x_buffer =
         config_.open_space_roi_decider_config().parallel_park_end_x_buffer();
+    // Check the validity of parllel_park_end_x_buffer
+    double max_parllel_park_end_x_buffer =
+        (std::abs(left_top.x() - right_top.x()) - vehicle_params_.length()) /
+        2.0;
+    if (parllel_park_end_x_buffer > max_parllel_park_end_x_buffer) {
+      parllel_park_end_x_buffer = max_parllel_park_end_x_buffer;
+    }
+
     parking_spot_heading = (left_down - right_down).Angle();
     end_y = (left_top.y() + left_down.y()) / 2.0;
     end_x = left_top.x() + vehicle_params_.back_edge_to_center() +
@@ -1728,14 +1736,6 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
     right_down.set_y(corner_point.point().at(1).y());
     right_top.set_x(corner_point.point().at(2).x());
     right_top.set_y(corner_point.point().at(2).y());
-    double extend_right_x_buffer =
-      config_.open_space_roi_decider_config().extend_right_x_buffer();
-    double extend_left_x_buffer =
-      config_.open_space_roi_decider_config().extend_left_x_buffer();
-    right_top.set_x(right_top.x() + extend_right_x_buffer);
-    left_top.set_x(left_top.x() - extend_left_x_buffer);
-    left_down.set_x(left_down.x() - extend_left_x_buffer);
-    right_down.set_x(right_down.x() + extend_right_x_buffer);
   }
   std::array<Vec2d, 4> parking_vertices{left_top, left_down, right_down,
                                         right_top};

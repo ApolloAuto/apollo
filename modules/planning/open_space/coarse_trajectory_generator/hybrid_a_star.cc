@@ -723,11 +723,11 @@ bool HybridAStar::Plan(
     }
   }
   if (final_node_ == nullptr) {
-    ADEBUG << "Hybrid A searching return null ptr(open_set ran out)";
+    AERROR << "Hybrid A searching return null ptr(open_set ran out)";
     return false;
   }
   if (!GetResult(result)) {
-    ADEBUG << "GetResult failed";
+    AERROR << "GetResult failed";
     return false;
   }
   ADEBUG << "explored node num is " << explored_node_num;

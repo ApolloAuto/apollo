@@ -78,10 +78,6 @@ message OpenSpaceRoiDeciderConfig {
   optional double end_pose_s_distance = 14 [default = 10.0];
   // end pose x to parallel parking
   optional double parallel_park_end_x_buffer = 15 [default = 0.2];
-  // extend right spot width size 
-  optional double extend_right_x_buffer = 16 [default = 0.0];
-  // extend left spot width size
-  optional double extend_left_x_buffer = 17 [default = 0.0];
 }
 
 //////////////////////////////////
