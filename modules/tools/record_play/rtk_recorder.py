@@ -134,8 +134,8 @@ class RtkRecord(object):
         carmax_steer_angle = self.vehicle_param.max_steer_angle
         carsteer_ratio = self.vehicle_param.steer_ratio
         carwheel_base = self.vehicle_param.wheel_base
-		curvature = math.tan(math.radians(carsteer / 100
-                    * math.degrees(carmax_steer_angle)) / carsteer_ratio) / carwheel_base
+        curvature = math.tan(math.radians(carsteer / 100
+                     * math.degrees(carmax_steer_angle)) / carsteer_ratio) / carwheel_base
 
         if abs(carspeed) >= speed_epsilon:
             carcurvature_change_rate = (curvature - self.carcurvature) / (
