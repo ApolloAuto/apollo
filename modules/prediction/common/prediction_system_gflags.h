@@ -58,3 +58,4 @@ DECLARE_double(obstacle_x);
 DECLARE_double(obstacle_y);
 DECLARE_double(obstacle_phi);
 DECLARE_double(road_distance);
+DECLARE_double(point_distance);

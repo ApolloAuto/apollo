@@ -28,6 +28,7 @@ cc_library(
     ],
     deps = [
         "//cyber/common:file",
+        "//modules/common/math:linear_interpolation",
         "//modules/common/util:point_factory",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:prediction_system_gflags",

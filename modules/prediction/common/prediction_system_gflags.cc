@@ -93,3 +93,5 @@ DEFINE_double(obstacle_y, 0.0, "obstacle position y");
 DEFINE_double(obstacle_phi, 0.0, "obstacle heading phi");
 DEFINE_double(road_distance, 141.4,
               "road distance within which the points are got");
+DEFINE_double(point_distance, 5.0,
+              "sampling distance of two points");
