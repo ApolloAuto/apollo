@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import ThreeLine2D from 'three-line-2d';
 import ThreeLine2DBasicShader from 'three-line-2d/shaders/basic';
+import { copyProperty } from './misc';
 
 const _ = require('lodash');
 
@@ -178,12 +179,15 @@ export function drawDashedBox(dimension, color, linewidth, dashSize = 0.01, gapS
   return cube;
 }
 
-export function drawArrow(length, linewidth, conelength, conewidth, color) {
+export function drawArrow(length, linewidth, conelength, conewidth, color, thickBand = false) {
   const end = new THREE.Vector3(0, length, 0);
   const begin = new THREE.Vector3(0, 0, 0);
   const left = new THREE.Vector3(conewidth / 2, length - conelength, 0);
   const right = new THREE.Vector3(-conewidth / 2, length - conelength, 0);
-  const arrow = drawSegmentsFromPoints([begin, end, left, end, right], color, linewidth, 1);
+
+  const arrow = (thickBand)
+    ? drawThickBandFromPoints([begin, end, left, right, end], 0.3, color)
+    : drawSegmentsFromPoints([begin, end, left, end, right], color, linewidth, 1);
   return arrow;
 }
 
@@ -256,4 +260,13 @@ export function changeMaterial(mesh, color = 0xff0000, linewidth = 2,
     transparent,
     opacity,
   });
+}
+
+export function drawRoutingPointArrow(origin, color, heading, length = 3) {
+  const position = new THREE.Vector3(origin.x, origin.y, 0);
+  const arrowMesh = drawArrow(length, 3, 0.5, 0.5, color, true);
+  arrowMesh.rotation.set(0, 0, -Math.PI / 2);
+  copyProperty(arrowMesh.position, position);
+  arrowMesh.rotation.set(0, 0, -(Math.PI / 2 - heading));
+  return arrowMesh;
 }

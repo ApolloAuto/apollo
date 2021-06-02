@@ -10476,6 +10476,10 @@
                 "pose": {
                   "type": "apollo.common.PointENU",
                   "id": 3
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             },
