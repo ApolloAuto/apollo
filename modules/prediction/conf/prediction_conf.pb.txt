@@ -74,5 +74,5 @@ obstacle_conf {
   obstacle_type: VEHICLE
   interactive_tag: INTERACTION
   evaluator_type: JOINTLY_PREDICTION_PLANNING_EVALUATOR
-  predictor_type: EMPTY_PREDICTOR
+  predictor_type: EXTRAPOLATION_PREDICTOR
 }

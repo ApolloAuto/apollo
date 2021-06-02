@@ -299,6 +299,18 @@ export default class PerceptionObstacles {
         lineCount++;
       }
     }
+    if (STORE.options.showPredictionInteractiveTag) {
+      const interactiveTag = _.get(obstacle, 'interactiveTag.interactiveTag');
+      if (interactiveTag && interactiveTag !== 'NONINTERACTION') {
+        const textPosition = {
+          x: initPosition.x + (lineCount * deltaX),
+          y: initPosition.y + (lineCount * deltaY),
+          z: initPosition.z + (lineCount * deltaZ),
+        };
+        this.drawTexts(interactiveTag, textPosition, scene);
+        lineCount++;
+      }
+    }
     if (isV2X) {
       _.get(obstacle,'v2xInfo.v2xType',[]).forEach((t) => {
         const textPosition = {

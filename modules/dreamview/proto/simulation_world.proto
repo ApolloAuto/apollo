@@ -72,7 +72,7 @@ message Decision {
   optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
-// Next-id: 40
+// Next-id: 41
 message Object {
   // ID
   optional string id = 1;  // primary identifier for each object
@@ -155,6 +155,7 @@ message Object {
   // perception confidence level. Range: [0,1]
   optional double confidence = 31 [default = 1];
   optional apollo.prediction.ObstaclePriority obstacle_priority = 33;
+  optional apollo.prediction.ObstacleInteractiveTag interactive_tag = 40;
 
   // v2x for perception obstacle
   optional apollo.perception.PerceptionObstacle.Source source = 36

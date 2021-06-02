@@ -45,6 +45,7 @@ export default [
       predictionMinor: 'Minor Prediction Line',
       predictionGaussianInfo: 'Gaussian Info',
       predictionPriority: 'Priority',
+      predictionInteractiveTag: 'Interactive Tag',
     },
     supportInOfflineView: true,
   }, {
