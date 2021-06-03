@@ -9,5 +9,6 @@ install(
     deps = [
         "//modules/tools/create_map:install",
         "//modules/tools/map_gen:install",
+        "//modules/tools/visualizer:install",
     ],
 )
