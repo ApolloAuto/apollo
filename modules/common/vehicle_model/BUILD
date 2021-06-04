@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -35,6 +36,18 @@ filegroup(
     srcs = glob([
         "testdata/*.txt",
     ]),
+)
+
+filegroup(
+    name = "vehicle_model_config_data",
+    srcs = ["conf/vehicle_model_config.pb.txt"],
+)
+
+install(
+    name = "install",
+    data = [
+        ":vehicle_model_config_data",
+    ],
 )
 
 cpplint()

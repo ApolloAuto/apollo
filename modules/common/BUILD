@@ -7,8 +7,7 @@ package(
 install(
     name = "install",
     deps = [
-        "//cyber/tools/cyber_launch:install",
-        "//cyber/tools/cyber_monitor:install",
-        "//cyber/tools/cyber_recorder:install",
+        "//modules/common/data:install",
+        "//modules/common/vehicle_model:install",
     ],
 )

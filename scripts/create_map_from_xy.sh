@@ -90,7 +90,7 @@ generate_map() {
   python ${APOLLO_ROOT_DIR}/modules/tools/map_gen/map_gen_single_lane.py $xy_file $dir_name/base_map.txt 1.0
   echo "--map_dir=${dir_name}" >> modules/common/data/global_flagfile.txt
   bash ${APOLLO_ROOT_DIR}/scripts/generate_routing_topo_graph.sh
-  ${APOLLO_ROOT_DIR}/bazel-bin/modules/map/tools/sim_map_generator --map_dir=${dir_name} --output_dir=${dir_name}
+  ${APOLLO_BIN_PREFIX}/modules/map/tools/sim_map_generator --map_dir=${dir_name} --output_dir=${dir_name}
 }
 
 generate_map $g_xy_file $map_name $left_lane_num $right_lane_num
