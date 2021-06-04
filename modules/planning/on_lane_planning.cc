@@ -142,6 +142,16 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
 
+  // Get the parking space information from routing request of local view.
+  auto& routing_request = local_view_.routing->routing_request();
+  if (routing_request.has_parking_info() &&
+      routing_request.parking_info().has_parking_space_id()) {
+    *(frame_->mutable_open_space_info()->mutable_target_parking_spot_id()) =
+        routing_request.parking_info().parking_space_id();
+  } else {
+    ADEBUG << "No parking space id from routing";
+  }
+
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
   if (!reference_line_provider_->GetReferenceLines(&reference_lines,
