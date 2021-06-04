@@ -122,6 +122,16 @@ class SimulationWorldUpdater {
       apollo::task_manager::DeadEndRoutingTask
           *dead_end_routing_task);
 
+  /**
+   * @brief The function to construct a lane waypoint from the given json,
+   * @param json that contains x, y, heading
+   * @param lanewaypoint, description
+   * @return True if lane waypoint is constructed successfully
+   */
+  bool ConstructLaneWayPoint(
+      const nlohmann::json &point,
+      apollo::routing::LaneWaypoint *laneWayPoint, std::string description);
+
   bool ValidateCoordinate(const nlohmann::json &json);
 
   /**
@@ -145,6 +155,13 @@ class SimulationWorldUpdater {
    * true otherwise or if it's already loaded.
    */
   bool LoadPOI();
+  /**
+   * @brief get point from lanewaypoint in poi or default routings
+   * @param lanewaypoint
+   * @return json that contains point's coordinate x and y
+   */
+  nlohmann::json GetPointJsonFromLaneWaypoint(
+      const apollo::routing::LaneWaypoint &waypoint);
 
     /**
    * @brief get point from lanewaypoint in poi or default routings

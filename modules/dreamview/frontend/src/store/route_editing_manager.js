@@ -80,7 +80,7 @@ export default class RouteEditingManager {
         return;
       }
 
-      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName], false);
+      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName]);
     }
 
     @action updateDefaultRoutingPoints(data) {
@@ -102,8 +102,9 @@ export default class RouteEditingManager {
         return;
       }
       const drouting = message.data;
-      const waypoints = drouting.waypoint.map(point => point.pose);
-      this.defaultRoutings[drouting.name] = waypoints;
+      // const waypoints = drouting.waypoint.map(point => point.pose);
+      // this.defaultRoutings[drouting.name] = waypoints;
+      this.defaultRoutings[drouting.name] = drouting.waypoint;
     }
 
     addDefaultRouting(routingName) {

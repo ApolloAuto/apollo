@@ -493,6 +493,20 @@ bool MapService::CheckRoutingPointLaneId(
          idsArr.end();
 }
 
+bool MapService::CheckRoutingPointWithHeading(
+  const double x, const double y, const double heading) const {
+  double s, l;
+  LaneInfoConstPtr lane;
+  if (!GetNearestLaneWithHeading(x, y, &lane, &s, &l, heading)) {
+    return false;
+  }
+  if (!CheckRoutingPointLaneType(lane)) {
+    return false;
+  }
+  return true;
+}
+
+
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
   if (lane->lane().type() != Lane::CITY_DRIVING) {
     AERROR
