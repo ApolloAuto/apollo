@@ -80,7 +80,7 @@ export default class RouteEditingManager {
         return;
       }
 
-      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName], false);
+      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName]);
     }
 
     @action updateDefaultRoutingPoints(data) {

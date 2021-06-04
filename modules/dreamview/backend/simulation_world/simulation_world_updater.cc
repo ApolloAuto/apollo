@@ -339,6 +339,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           for (const auto &landmark : default_routings_.landmark()) {
             Json drouting;
             drouting["name"] = landmark.name();
+
             Json point_list;
             for (const auto &point : landmark.waypoint()) {
               point_list.push_back(GetPointJsonFromLaneWaypoint(point));
@@ -481,10 +482,19 @@ Json SimulationWorldUpdater::CheckRoutingPoint(const Json &json) {
     AERROR << result["error"];
     return result;
   }
-  if (!map_service_->CheckRoutingPoint(point["x"], point["y"])) {
-    result["pointId"] = point["id"];
-    result["error"] = "Selected point cannot be a routing point.";
-    AWARN << result["error"];
+  if (!ContainsKey(point, "heading")) {
+    if (!map_service_->CheckRoutingPoint(point["x"], point["y"])) {
+      result["pointId"] = point["id"];
+      result["error"] = "Selected point cannot be a routing point.";
+      AWARN << result["error"];
+    }
+  } else {
+    if (!map_service_->CheckRoutingPointWithHeading(point["x"], point["y"],
+                                                    point["heading"])) {
+      result["pointId"] = point["id"];
+      result["error"] = "Selected point cannot be a routing point.";
+      AWARN << result["error"];
+    }
   }
   return result;
 }
@@ -550,6 +560,28 @@ Json SimulationWorldUpdater::CheckDeadEndJunctionPoints(const Json &json) {
   return result;
 }
 
+bool SimulationWorldUpdater::ConstructLaneWayPoint(const Json &point,
+                                                   LaneWaypoint *laneWayPoint,
+                                                   std::string description) {
+  if (ContainsKey(point, "heading")) {
+    if (!map_service_->ConstructLaneWayPointWithHeading(
+            point["x"], point["y"], point["heading"], laneWayPoint)) {
+      AERROR << "Failed to prepare a routing request with heading: "
+             << point["heading"] << " cannot locate " << description
+             << " on map.";
+      return false;
+    }
+  } else {
+    if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
+                                             laneWayPoint)) {
+      AERROR << "Failed to prepare a routing request:"
+             << " cannot locate " << description << " on map.";
+      return false;
+    }
+  }
+  return true;
+}
+
 bool SimulationWorldUpdater::ConstructRoutingRequest(
     const Json &json, RoutingRequest *routing_request) {
   routing_request->clear_waypoint();
@@ -564,29 +596,9 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     AERROR << "Failed to prepare a routing request: invalid start point.";
     return false;
   }
-  if (ContainsKey(start, "heading")) {
-    if (!map_service_->ConstructLaneWayPointWithHeading(
-            start["x"], start["y"], start["heading"],
-            routing_request->add_waypoint())) {
-      AERROR << "Failed to prepare a routing request with heading: "
-             << start["heading"] << " cannot locate start point on map.";
-      return false;
-    }
-  } else if (ContainsKey(start, "id")) {
-    if (!map_service_->ConstructLaneWayPointWithLaneId(
-            start["x"], start["y"], start["id"],
-            routing_request->add_waypoint())) {
-      AERROR << "Failed to prepare a routing request with lane id: "
-             << start["id"] << " cannot locate end point on map.";
-      return false;
-    }
-  } else {
-    if (!map_service_->ConstructLaneWayPoint(start["x"], start["y"],
-                                             routing_request->add_waypoint())) {
-      AERROR << "Failed to prepare a routing request:"
-             << " cannot locate start point on map.";
-      return false;
-    }
+  if (!ConstructLaneWayPoint(start, routing_request->add_waypoint(),
+                             "start point")) {
+    return false;
   }
 
   // set way point(s) if any
@@ -600,8 +612,7 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
         return false;
       }
 
-      if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
-                                               waypoint->Add())) {
+      if (!ConstructLaneWayPoint(point, waypoint->Add(), "point")) {
         AERROR << "Failed to construct a LaneWayPoint, skipping.";
         waypoint->RemoveLast();
       }
@@ -627,10 +638,8 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
       return false;
     }
   } else {
-    if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
-                                             routing_request->add_waypoint())) {
-      AERROR << "Failed to prepare a routing request:"
-             << " cannot locate end point on map.";
+    if (!ConstructLaneWayPoint(end, routing_request->add_waypoint(),
+                               "end point")) {
       return false;
     }
   }
