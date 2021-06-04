@@ -197,6 +197,15 @@ class OpenSpaceRoiDecider : public Decider {
   void GetParkSpotFromMap(hdmap::ParkingSpaceInfoConstPtr parking_lot,
                           std::array<common::math::Vec2d, 4> *vertices);
 
+  /**
+   * @brief Collect all the lane segments in the routing reponse.
+   *
+   * @param routing_response The routing response containing the lane segments.
+   * @param routing_segments The output vector of lane segments.
+   */
+  void GetAllLaneSegments(const routing::RoutingResponse &routing_response,
+                          std::vector<routing::LaneSegment> &routing_segments);
+
  private:
   // @brief parking_spot_id from routing
   std::string target_parking_spot_id_;
