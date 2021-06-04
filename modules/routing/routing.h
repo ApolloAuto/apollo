@@ -68,6 +68,23 @@ class Routing {
 
   bool FillParkingID(RoutingResponse *routing_response);
 
+  /**
+   * @brief Add the lane nearest to the parking spot if it is not contained in
+   *  the routing response.
+   * @param routing_response The routing response to be modified.
+   * @return Return true if no error occurs; return false otherwise.
+   */
+  bool SupplementParkingRequest(RoutingResponse *const routing_response) const;
+
+  /**
+   * @brief Get all the objects that overlap with the parking spot.
+   * @param parking_spot_id The id of the parking spot.
+   * @param lane_ids The id list of all the objects overlap with the parking
+   * spot.
+   */
+  void GetAllOverlapObjectIds(const hdmap::Id &parking_spot_id,
+                              std::vector<std::string> &lane_ids) const;
+
  private:
   std::unique_ptr<Navigator> navigator_ptr_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
