@@ -1708,7 +1708,8 @@
                         "ULTRASONIC_RADAR": 17,
                         "MOBILEYE": 18,
                         "DELPHI_ESR": 19,
-                        "STORYTELLING": 20
+                        "STORYTELLING": 20,
+                        "TASK_MANAGER": 21
                       }
                     },
                     "LogLevel": {
@@ -4198,20 +4199,6 @@
                   "options": {
                     "default": 0.2
                   }
-                },
-                "extendRightXBuffer": {
-                  "type": "double",
-                  "id": 16,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "extendLeftXBuffer": {
-                  "type": "double",
-                  "id": 17,
-                  "options": {
-                    "default": 0
-                  }
                 }
               },
               "nested": {
@@ -5512,6 +5499,10 @@
                 "rssInfo": {
                   "type": "RSSInfo",
                   "id": 100
+                },
+                "completeParking": {
+                  "type": "bool",
+                  "id": 25
                 }
               },
               "nested": {
@@ -10476,6 +10467,10 @@
                 "pose": {
                   "type": "apollo.common.PointENU",
                   "id": 3
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 4
                 }
               }
             },

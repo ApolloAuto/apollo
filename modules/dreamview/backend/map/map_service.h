@@ -84,6 +84,9 @@ class MapService {
 
   bool CheckRoutingPoint(const double x, const double y) const;
 
+  bool CheckRoutingPointWithHeading(
+    const double x, const double y, const double heading) const;
+
   bool CheckRoutingPointLaneType(apollo::hdmap::LaneInfoConstPtr lane) const;
 
   // Reload map from current FLAGS_map_dir.
