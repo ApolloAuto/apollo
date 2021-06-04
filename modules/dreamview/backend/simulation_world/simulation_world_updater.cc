@@ -630,7 +630,7 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     AERROR << "Failed to prepare a routing request: invalid end point.";
     return false;
   }
-  if (ContainsKey(end, "id")) {
+  if (ContainsKey(end, "id") && !ContainsKey(end, "heading")) {
     if (!map_service_->ConstructLaneWayPointWithLaneId(
             end["x"], end["y"], end["id"], routing_request->add_waypoint())) {
       AERROR << "Failed to prepare a routing request with lane id: "
