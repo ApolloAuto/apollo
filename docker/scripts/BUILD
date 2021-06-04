@@ -15,5 +15,6 @@ filegroup(
         "docker_base.sh",
         "runtime_start.sh",
         "runtime_into.sh",
+        "runtime_into_standalone.sh",
     ],
 )
