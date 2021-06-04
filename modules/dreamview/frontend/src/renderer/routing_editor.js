@@ -78,10 +78,10 @@ export default class RoutingEditor {
     scene.add(arrowMesh);
   }
 
-  drawRoutingPointArrow(currTarget, origin, coordinates, scene, hex = 0xff0000) {
-    const lastArrow = this.arrows.pop();
+  drawRoutingPointArrow(currTarget, origin, coordinates, scene, notFirst, hex = 0xff0000) {
     // remove arrows generated during drag and drop
-    if (lastArrow) {
+    if (notFirst) {
+      const lastArrow = this.arrows.pop();
       disposeMesh(lastArrow);
       scene.remove(lastArrow);
     }
@@ -158,7 +158,6 @@ export default class RoutingEditor {
   }
 
   removeRoutingPoint(scene, object) {
-    scene.remove(object);
     let index = this.isPointInParkingSpace(_.get(object, 'position'));
     if (index !== -1) {
       if (--this.parkingSpaceInfo[index].selectedCounts > 0) {
@@ -169,6 +168,7 @@ export default class RoutingEditor {
       scene.remove(object.arrowMesh);
       disposeMesh(object.arrowMesh);
     }
+    scene.remove(object);
     if (object.geometry) {
       object.geometry.dispose();
     }

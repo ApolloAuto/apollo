@@ -341,6 +341,7 @@ class Renderer {
         this.onMouseMoveHandler,
         false);
       this.startMove = false;
+      this.routingPoint = null;
     }
   }
 
@@ -412,9 +413,10 @@ class Renderer {
 
   onMouseMoveHandler(event) {
     if (this.routingPoint) {
-      this.startMove = true;
       this.routingEditor.drawRoutingPointArrow(
-        this.getGeolocation(event), this.routingPoint, this.coordinates, this.scene);
+        this.getGeolocation(event), this.routingPoint, this.coordinates, this.scene, this.startMove,
+      );
+      this.startMove = true;
     }
   }
 
