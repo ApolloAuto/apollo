@@ -159,6 +159,7 @@ function check_host_environment() {
     if [[ -f "${CURR_DIR}/dev_start.sh" ]]; then
         warning "${CURR_DIR}/dev_start.sh detected."
         warning "Apollo Runtime Docker is expected to run with release builds."
+        exit 3
     fi
 }
 
@@ -169,11 +170,7 @@ function setup_devices_and_mount_local_volumes() {
     setup_device
 
     local volumes=""
-    if $RUNTIME_STANDALONE; then
-        volumes="-v ${APOLLO_ROOT_DIR}/data:/apollo/data"
-    else
-        volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
-    fi
+    $RUNTIME_STANDALONE || volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
@@ -343,6 +340,12 @@ function main() {
     local docker_group="$(id -g -n)"
     local docker_gid="$(id -g)"
 
+    if $RUNTIME_STANDALONE; then
+        [ -n "${RUNTIME_STANDALONE_USER}" ] && docker_user="${RUNTIME_STANDALONE_USER}"
+        [ -n "${RUNTIME_STANDALONE_UID}" ] && docker_uid="${RUNTIME_STANDALONE_UID}"
+        [ -n "${RUNTIME_STANDALONE_GROUP}" ] && docker_group="${RUNTIME_STANDALONE_GROUP}"
+        [ -n "${RUNTIME_STANDALONE_GID}" ] && docker_gid="${RUNTIME_STANDALONE_GID}"
+    fi
     set -x
     ${DOCKER_RUN_CMD} -itd \
         --privileged \
@@ -359,6 +362,7 @@ function main() {
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${MAP_VOLUMES_CONF} \
         ${OTHER_VOLUMES_CONF} \
+        ${LOCAL_VOLUMES_CONF} \
         ${local_volumes} \
         --net host \
         -w /apollo \
@@ -378,8 +382,6 @@ function main() {
     set +x
 
     postrun_start_user ${RUNTIME_CONTAINER}
-
-    $RUNTIME_STANDALONE && docker exec -u root "${RUNTIME_CONTAINER}" bash -c "chown -R ${docker_uid}:${docker_gid} /apollo"
 
     ok "Congratulations! You have successfully finished setting up Apollo Runtime Environment."
     ok "To login into the newly created ${RUNTIME_CONTAINER} container, please run the following command:"
