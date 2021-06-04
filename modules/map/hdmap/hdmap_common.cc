@@ -192,14 +192,17 @@ void LaneInfo::GetWidth(const double s, double *left_width,
 }
 
 double LaneInfo::Heading(const double s) const {
-  const double kEpsilon = 0.001;
-  if (s + kEpsilon < accumulated_s_.front()) {
-    AERROR << "s:" << s << " should be >= " << accumulated_s_.front();
+  if (accumulated_s_.empty()) {
     return 0.0;
   }
+  const double kEpsilon = 0.001;
+  if (s + kEpsilon < accumulated_s_.front()) {
+    AWARN << "s:" << s << " should be >= " << accumulated_s_.front();
+    return headings_.front();
+  }
   if (s - kEpsilon > accumulated_s_.back()) {
-    AERROR << "s:" << s << " should be <= " << accumulated_s_.back();
-    return 0.0;
+    AWARN << "s:" << s << " should be <= " << accumulated_s_.back();
+    return headings_.back();
   }
 
   auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
