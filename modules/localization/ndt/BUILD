@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -71,6 +72,13 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
         "@eigen",
+    ],
+)
+
+install(
+    name = "install",
+    targets = [
+        ":libndt_localization_component.so",
     ],
 )
 

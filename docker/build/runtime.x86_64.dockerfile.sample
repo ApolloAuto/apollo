@@ -54,9 +54,11 @@ RUN ln -s -f /bin/true /usr/bin/chfn \
 RUN bash /opt/apollo/installers/install_mkl.sh
 #RUN bash /opt/apollo/installers/install_node.sh
 
-# TODO(storypku): Qt-5.12.9 and NodeJS
+# TODO(storypku): NodeJS
 COPY --from=devel /usr/local/fast-rtps  /usr/local/fast-rtps
 COPY --from=devel /usr/local/libtorch_gpu /usr/local/libtorch_gpu
+COPY --from=devel /usr/local/qt5 /usr/local/qt5
+COPY --from=devel /etc/ld.so.conf.d/qt.conf /etc/ld.so.conf.d/qt.conf
 COPY --from=devel /opt/apollo/pkgs /opt/apollo/pkgs
 COPY --from=devel /opt/apollo/sysroot/lib /opt/apollo/sysroot/lib
 #COPY --from=devel /opt/apollo/sysroot/bin /opt/apollo/sysroot/bin

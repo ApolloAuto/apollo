@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2021 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +15,12 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RUNTIME_CONTAINER="apollo_runtime_standalone_${USER}"
 
-source "${DIR}/apollo_base.sh"
+xhost +local:root 1>/dev/null 2>&1
 
-# generate routing_map.bin in map directory.
-${APOLLO_BIN_PREFIX}/modules/routing/topo_creator/topo_creator \
-  --flagfile=modules/routing/conf/routing.conf \
-  $@
+docker exec -u "${USER}" \
+    -it "${RUNTIME_CONTAINER}" \
+    /bin/bash
+
+xhost -local:root 1>/dev/null 2>&1
