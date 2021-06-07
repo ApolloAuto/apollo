@@ -170,7 +170,9 @@ function setup_devices_and_mount_local_volumes() {
 
     local volumes=""
     if $RUNTIME_STANDALONE; then
-        volumes="-v ${APOLLO_ROOT_DIR}/data:/apollo/data"
+        volumes="-v ${APOLLO_ROOT_DIR}/data:/apollo/data \
+                 -v ${APOLLO_ROOT_DIR}/modules/calibration/data:/apollo/modules/calibration/data \
+                 -v ${APOLLO_ROOT_DIR}/modules/map/data:/apollo/modules/map/data"
     else
         volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
     fi
@@ -331,7 +333,7 @@ function main() {
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
 
-    $RUNTIME_STANDALONE || mount_map_volumes
+    mount_map_volumes
     $RUNTIME_STANDALONE || mount_other_volumes
 
     info "Starting docker container \"${RUNTIME_CONTAINER}\" ..."
