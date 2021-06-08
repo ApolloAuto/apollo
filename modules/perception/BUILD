@@ -13,7 +13,9 @@ filegroup(
 install(
     name = "install",
     deps = [
+        "//modules/perception/data:install",
         "//modules/perception/onboard/component:install",
+        "//modules/perception/production:install",
     ],
 )
 

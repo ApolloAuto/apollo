@@ -1,7 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+        ":engine",
+    ],
+)
 
 cc_library(
     name = "engine",
