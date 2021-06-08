@@ -12,6 +12,17 @@ install(
         ":bridge",
         ":docker_utils",
         ":map_generation",
+        ":recorder",
+        ":tools",
+    ],
+)
+
+filegroup(
+    name = "tools",
+    srcs = [
+        "rtk_player.sh",
+        "rtk_recorder.sh",
+        "extract_data.sh",
     ],
 )
 
@@ -22,6 +33,14 @@ filegroup(
         "bootstrap_lgsvl.sh",
         "dreamview.sh",
         "monitor.sh",
+    ],
+)
+
+filegroup(
+    name = "recorder",
+    srcs = [
+        "record_bag.py",
+        "record_bag.sh",
     ],
 )
 
@@ -42,8 +61,8 @@ filegroup(
 filegroup(
     name = "map_generation",
     srcs = [
-        ":create_map_from_xy.sh",
         ":create_map_from_mobileye.sh",
+        ":create_map_from_xy.sh",
         ":generate_routing_topo_graph.sh",
     ],
 )
