@@ -76,3 +76,12 @@ py_library(
         "//modules/tools/common:proto_utils",
     ],
 )
+
+filegroup(
+    name = "runtime_files",
+    srcs = glob([
+        "calibration_data_sample/**",
+        "*.py",
+        "*.sh",
+    ]),
+)

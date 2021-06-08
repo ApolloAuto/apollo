@@ -1,7 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "modules/localization/msf/local_tool/local_visualization/offline_visual",
+    targets = [
+        ":offline_local_visualizer",
+    ],
+)
 
 cc_library(
     name = "offline_local_visualizer_lib",
