@@ -26,7 +26,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "libstorytelling_component.so",
+    name = "libstorytelling.so",
     linkshared = True,
     linkstatic = False,
     deps = [":storytelling_lib"],
@@ -38,7 +38,7 @@ install(
         ":runtime_data",
     ],
     targets = [
-        ":libstorytelling_component.so",
+        ":libstorytelling.so",
     ],
 )
 

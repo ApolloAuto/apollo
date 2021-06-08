@@ -54,6 +54,9 @@ RUN ln -s -f /bin/true /usr/bin/chfn \
 RUN bash /opt/apollo/installers/install_mkl.sh
 #RUN bash /opt/apollo/installers/install_node.sh
 
+RUN python3 -m pip install --timeout 30 --no-cache-dir -r \
+    /opt/apollo/installers/py3_requirements.txt
+
 # TODO(storypku): NodeJS
 COPY --from=devel /usr/local/fast-rtps  /usr/local/fast-rtps
 COPY --from=devel /usr/local/libtorch_gpu /usr/local/libtorch_gpu
