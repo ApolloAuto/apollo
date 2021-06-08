@@ -7,13 +7,14 @@ package(
 install(
     name = "install",
     data = [
-        ":record_helper",
+        ":run_files",
     ],
 )
 
 filegroup(
-    name = "record_helper",
-    srcs = [
-        "record_helper.py",
-    ],
+    name = "run_files",
+    srcs = glob([
+        "demo_guide/*.py",
+        "Apollo_Fuel/examples/**",
+    ]),
 )

@@ -1,7 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//cyber/python/cyber_py3:__pkg__"])
+package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+        ":_cyber_wrapper.so",
+        ":_cyber_record_wrapper.so",
+        ":_cyber_time_wrapper.so",
+        ":_cyber_timer_wrapper.so",
+        ":_cyber_parameter_wrapper.so",
+    ],
+)
 
 cc_binary(
     name = "_cyber_wrapper.so",

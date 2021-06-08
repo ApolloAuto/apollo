@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,13 +17,24 @@ install(
     data = [
         ":.release.bash",
         ":cyber_conf",
+        "//cyber/python/cyber_py3:runtime_files",
     ],
     rename = {
         "cyber/.release.bash": "setup.bash",
     },
     deps = [
+        ":pb_cyber",
         "//cyber/mainboard:install",
+        "//cyber/python/internal:install",
         "//cyber/tools:install",
+    ],
+)
+
+install_files(
+    name = "pb_cyber",
+    dest = "cyber",
+    files = [
+        "//cyber/proto:record_py_pb2",
     ],
 )
 

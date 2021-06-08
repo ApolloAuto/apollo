@@ -1,7 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+        ":libv2x_fusion_component.so",
+    ]
+)
 
 cc_library(
     name = "v2x_fusion_component_lib",

@@ -9,6 +9,13 @@ filegroup(
     ]),
 )
 
+filegroup(
+    name = "py_files",
+    srcs = glob([
+        "*.py",
+    ]),
+)
+
 py_library(
     name = "configuration_yaml_generator",
     srcs = ["configuration_yaml_generator.py"],

@@ -45,8 +45,8 @@ cc_library(
         "//modules/localization/proto:sins_pva_cc_proto",
         "//modules/transform:transform_broadcaster",
         "@boost",
-        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_github_google_glog//:glog",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -80,7 +80,10 @@ install(
         ":libmsf_localization_component.so",
     ],
     deps = [
+        "//modules/localization/msf/local_tool/data_extraction:install",
+        "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
+        "//modules/localization/msf/params:install",
     ],
 )
 

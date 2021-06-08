@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -58,6 +58,17 @@ install(
     ],
     targets = [
         ":libcontrol_component.so",
+    ],
+    deps = [
+        ":pb_control",
+    ],
+)
+
+install_files(
+    name = "pb_control",
+    dest = "modules/control",
+    files = [
+        "//modules/control/proto:pad_msg_py_pb2",
     ],
 )
 

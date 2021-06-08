@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -56,7 +56,16 @@ install(
         ":libcanbus_component.so",
     ],
     deps = [
+        ":pb_canbus",
         "//cyber:install",
+    ],
+)
+
+install_files(
+    name = "pb_canbus",
+    dest = "modules/canbus",
+    files = [
+        "//modules/canbus/proto:chassis_py_pb2",
     ],
 )
 
@@ -68,7 +77,6 @@ filegroup(
         "launch/*.launch",
     ]),
 )
-
 
 #TODO(storypku):
 # split test_data for each vehicle
