@@ -90,9 +90,9 @@ class VectorNet {
                      std::vector<std::vector<double>>* const one_polyline,
                      std::vector<double>* const one_p_id);
 
-  // void GetRoads(const common::PointENU& center_point,
-  //               const double obstacle_phi,
-  //               FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
+  void GetRoads(const common::PointENU& center_point,
+                const double obstacle_phi,
+                FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
 
   void GetLaneQueue(const std::vector<hdmap::LaneInfoConstPtr>& lanes,
     std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr);
@@ -101,14 +101,14 @@ class VectorNet {
                            const double obstacle_phi,
                            FeatureVector* const feature_ptr,
                            PidVector* const p_id_ptr);
-  // void GetJunctions(const common::PointENU& center_point,
-  //                   const double obstacle_phi,
-  //                   FeatureVector* const feature_ptr,
-  //                   PidVector* const p_id_ptr);
-  // void GetCrosswalks(const common::PointENU& center_point,
-  //                   const double obstacle_phi,
-  //                   FeatureVector* const feature_ptr,
-  //                   PidVector* const p_id_ptr);
+  void GetJunctions(const common::PointENU& center_point,
+                    const double obstacle_phi,
+                    FeatureVector* const feature_ptr,
+                    PidVector* const p_id_ptr);
+  void GetCrosswalks(const common::PointENU& center_point,
+                    const double obstacle_phi,
+                    FeatureVector* const feature_ptr,
+                    PidVector* const p_id_ptr);
   int count_ = 0;
 };
 

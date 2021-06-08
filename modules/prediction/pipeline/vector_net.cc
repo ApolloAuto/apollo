@@ -110,10 +110,10 @@ bool VectorNet::query(const common::PointENU& center_point,
   CHECK_NOTNULL(feature_ptr);
   count_ = 0;
   apollo::hdmap::HDMapUtil::ReloadMaps();
-  // GetRoads(center_point, obstacle_phi, feature_ptr, p_id_ptr);
+  GetRoads(center_point, obstacle_phi, feature_ptr, p_id_ptr);
   GetLanes(center_point, obstacle_phi, feature_ptr, p_id_ptr);
-  // GetJunctions(center_point, obstacle_phi, feature_ptr, p_id_ptr);
-  // GetCrosswalks(center_point, obstacle_phi, feature_ptr, p_id_ptr);
+  GetJunctions(center_point, obstacle_phi, feature_ptr, p_id_ptr);
+  GetCrosswalks(center_point, obstacle_phi, feature_ptr, p_id_ptr);
   return true;
 }
 
@@ -149,37 +149,35 @@ bool VectorNet::offline_query(const double obstacle_x, const double obstacle_y,
   return true;
 }
 
-// void VectorNet::GetRoads(const common::PointENU& center_point,
-//                          const double obstacle_phi,
-//                          FeatureVector* const feature_ptr,
-//                          PidVector* const p_id_ptr) {
-//   std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
-//   apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point,
-//                                                FLAGS_road_distance, &roads);
-//
-//   for (const auto& road : roads) {
-//     std::vector<std::vector<double>> one_polyline;
-//     std::vector<double> one_p_id{std::numeric_limits<float>::max(),
-//                                  std::numeric_limits<float>::max()};
-//
-//     for (const auto& section : road->road().section()) {
-//       std::cout << "road_type: " << road->road().type() << std::endl;
-//       for (const auto& edge : section.boundary().outer_polygon().edge()) {
-//         for (const auto& segment : edge.curve().segment()) {
-//           GetOnePolyline(segment.line_segment().point(), segment.length(),
-//                          center_point, obstacle_phi, ROAD, count_,
-//                          &one_polyline, &one_p_id);
-//         }
-//       }
-//     }
-//     if (one_polyline.size() == 0) continue;
-//
-//     std::cout << "road_len: " << one_polyline.size() << std::endl;
-//     feature_ptr->push_back(std::move(one_polyline));
-//     p_id_ptr->push_back(std::move(one_p_id));
-//     ++count_;
-//   }
-// }
+void VectorNet::GetRoads(const common::PointENU& center_point,
+                         const double obstacle_phi,
+                         FeatureVector* const feature_ptr,
+                         PidVector* const p_id_ptr) {
+  std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
+  apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point,
+                                               FLAGS_road_distance, &roads);
+
+  for (const auto& road : roads) {
+    for (const auto& section : road->road().section()) {
+      for (const auto& edge : section.boundary().outer_polygon().edge()) {
+        std::vector<std::vector<double>> one_polyline;
+        std::vector<double> one_p_id{std::numeric_limits<float>::max(),
+                                     std::numeric_limits<float>::max()};
+        double start_length = 0;
+        for (const auto& segment : edge.curve().segment()) {
+          GetOnePolyline(segment.line_segment().point(), &start_length,
+                         center_point, obstacle_phi, ROAD, count_,
+                         &one_polyline, &one_p_id);
+        }
+        if (one_polyline.size() == 0) continue;
+
+        feature_ptr->push_back(std::move(one_polyline));
+        p_id_ptr->push_back(std::move(one_p_id));
+        ++count_;
+      }
+    }
+  }
+}
 
 void VectorNet::GetLaneQueue(const std::vector<hdmap::LaneInfoConstPtr>& lanes,
   std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr) {
@@ -247,7 +245,6 @@ void VectorNet::GetLanes(const common::PointENU& center_point,
                        count_, &left_polyline, &left_p_id);
       }
     }
-    std::cout << "<<<<<size>>>>>>>" << lane_deque.size() <<std::endl;
 
     if (left_polyline.size() < 2) continue;
     feature_ptr->push_back(std::move(left_polyline));
@@ -276,48 +273,50 @@ void VectorNet::GetLanes(const common::PointENU& center_point,
     p_id_ptr->push_back(std::move(right_p_id));
     ++count_;
   }
-  std::cout << "polyline_num:" << p_id_ptr->size() << std::endl;
 }
 
-// void VectorNet::GetJunctions(const common::PointENU& center_point,
-//                              const double obstacle_phi,
-//                              FeatureVector* const feature_ptr,
-//                              PidVector* const p_id_ptr) {
-//   std::vector<apollo::hdmap::JunctionInfoConstPtr> junctions;
-//   apollo::hdmap::HDMapUtil::BaseMap().GetJunctions(
-//       center_point, FLAGS_road_distance, &junctions);
-//   for (const auto& junction : junctions) {
-//     std::vector<std::vector<double>> one_polyline;
-//     std::vector<double> one_p_id{std::numeric_limits<float>::max(),
-//                                  std::numeric_limits<float>::max()};
-//     GetOnePolyline(junction->junction().polygon().point(), center_point,
-//                    obstacle_phi, JUNCTION, count_, &one_polyline, &one_p_id);
-//
-//     feature_ptr->push_back(std::move(one_polyline));
-//     p_id_ptr->push_back(std::move(one_p_id));
-//     ++count_;
-//   }
-// }
+void VectorNet::GetJunctions(const common::PointENU& center_point,
+                             const double obstacle_phi,
+                             FeatureVector* const feature_ptr,
+                             PidVector* const p_id_ptr) {
+  std::vector<apollo::hdmap::JunctionInfoConstPtr> junctions;
+  apollo::hdmap::HDMapUtil::BaseMap().GetJunctions(
+      center_point, FLAGS_road_distance, &junctions);
+  for (const auto& junction : junctions) {
+    std::vector<std::vector<double>> one_polyline;
+    std::vector<double> one_p_id{std::numeric_limits<float>::max(),
+                                 std::numeric_limits<float>::max()};
+    double start_length = 0;
+    GetOnePolyline(junction->junction().polygon().point(), &start_length,
+                   center_point, obstacle_phi, JUNCTION, count_,
+                   &one_polyline, &one_p_id);
 
-// void VectorNet::GetCrosswalks(const common::PointENU& center_point,
-//                               const double obstacle_phi,
-//                               FeatureVector* const feature_ptr,
-//                               PidVector* const p_id_ptr) {
-//   std::vector<apollo::hdmap::CrosswalkInfoConstPtr> crosswalks;
-//   apollo::hdmap::HDMapUtil::BaseMap().GetCrosswalks(
-//       center_point, FLAGS_road_distance, &crosswalks);
-//   for (const auto& crosswalk : crosswalks) {
-//     std::vector<std::vector<double>> one_polyline;
-//     std::vector<double> one_p_id{std::numeric_limits<float>::max(),
-//                                  std::numeric_limits<float>::max()};
-//     GetOnePolyline(crosswalk->crosswalk().polygon().point(), center_point,
-//                    obstacle_phi, CROSSWALK, count_, &one_polyline,
-//                    &one_p_id);
-//
-//     feature_ptr->push_back(std::move(one_polyline));
-//     p_id_ptr->push_back(std::move(one_p_id));
-//     ++count_;
-//   }
-// }
+    feature_ptr->push_back(std::move(one_polyline));
+    p_id_ptr->push_back(std::move(one_p_id));
+    ++count_;
+  }
+}
+
+void VectorNet::GetCrosswalks(const common::PointENU& center_point,
+                              const double obstacle_phi,
+                              FeatureVector* const feature_ptr,
+                              PidVector* const p_id_ptr) {
+  std::vector<apollo::hdmap::CrosswalkInfoConstPtr> crosswalks;
+  apollo::hdmap::HDMapUtil::BaseMap().GetCrosswalks(
+      center_point, FLAGS_road_distance, &crosswalks);
+  for (const auto& crosswalk : crosswalks) {
+    std::vector<std::vector<double>> one_polyline;
+    std::vector<double> one_p_id{std::numeric_limits<float>::max(),
+                                 std::numeric_limits<float>::max()};
+    double start_length = 0;
+    GetOnePolyline(crosswalk->crosswalk().polygon().point(), &start_length,
+                   center_point, obstacle_phi, CROSSWALK, count_,
+                   &one_polyline, &one_p_id);
+
+    feature_ptr->push_back(std::move(one_polyline));
+    p_id_ptr->push_back(std::move(one_p_id));
+    ++count_;
+  }
+}
 }  // namespace prediction
 }  // namespace apollo
