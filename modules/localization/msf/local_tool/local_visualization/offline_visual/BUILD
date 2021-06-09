@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    runtime_dest = "modules/localization/msf/local_tool/local_visualization/offline_visual",
     targets = [
         ":offline_local_visualizer",
     ],
