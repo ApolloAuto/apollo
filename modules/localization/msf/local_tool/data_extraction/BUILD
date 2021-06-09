@@ -6,8 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    runtime_dest = "modules/localization/msf/local_tool/data_extraction",
     targets = [
-        ":data_extraction",
+        ":compare_poses",
     ],
 )
 
