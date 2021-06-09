@@ -209,7 +209,8 @@ function update_camera_config() {
   sed -i "s|__NAME__|${camera_channels[0]}|g" "${channel_template}"
   sed -i "/# channel of camera image channels/{n;N;N;N;N;d}" "${TARGET_DIR}/camera_to_lidar.config"
   sed -i "/# channel of camera image channels/r ${channel_template}" "${TARGET_DIR}/camera_to_lidar.config"
-  git checkout -- "${channel_template}"
+  sed -i "s|${extraction_rate}|__RATE__|g" "${channel_template}"
+  sed -i "s|${camera_channels[0]}|__NAME__|g" "${channel_template}"
 }
 
 function main() {

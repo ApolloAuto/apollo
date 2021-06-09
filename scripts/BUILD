@@ -13,6 +13,16 @@ install(
         ":docker_utils",
         ":map_generation",
         ":recorder",
+        ":tools",
+    ],
+)
+
+filegroup(
+    name = "tools",
+    srcs = [
+        "rtk_player.sh",
+        "rtk_recorder.sh",
+        "extract_data.sh",
     ],
 )
 

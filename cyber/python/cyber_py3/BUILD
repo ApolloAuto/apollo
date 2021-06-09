@@ -2,6 +2,13 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "runtime_files",
+    srcs = glob([
+        "*.py",
+    ])
+)
+
 py_library(
     name = "cyber_time",
     srcs = ["cyber_time.py"],

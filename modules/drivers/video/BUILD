@@ -1,7 +1,27 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    data = [
+        ":runtime_files",
+    ],
+    targets = [
+        "libvideo_driver_component.so",
+    ],
+)
+
+filegroup(
+    name = "runtime_files",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ])
+)
 
 cc_binary(
     name = "libvideo_driver_component.so",
