@@ -44,7 +44,6 @@ bool LidarObstacleSegmentation::Init(
 
   LidarObstacleSegmentationConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  segmentor_name_ = config.segmentor();
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();
 
@@ -52,10 +51,6 @@ bool LidarObstacleSegmentation::Init(
 
   SceneManagerInitOptions scene_manager_init_options;
   ACHECK(SceneManager::Instance().Init(scene_manager_init_options));
-
-  PointCloudPreprocessorInitOptions preprocessor_init_options;
-  preprocessor_init_options.sensor_name = sensor_name;
-  ACHECK(cloud_preprocessor_.Init(preprocessor_init_options));
 
   if (use_map_manager_) {
     MapManagerInitOptions map_manager_init_options;
@@ -65,11 +60,21 @@ bool LidarObstacleSegmentation::Init(
     }
   }
 
-  segmentor_ = BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_);
-  CHECK_NOTNULL(segmentor_);
+  BasePointCloudPreprocessor* preprocessor =
+      BasePointCloudPreprocessorRegisterer::GetInstanceByName(config.preprocessor());
+  CHECK_NOTNULL(preprocessor);
+  cloud_preprocessor_.reset(preprocessor);
+  PointCloudPreprocessorInitOptions preprocessor_init_options;
+  preprocessor_init_options.sensor_name = sensor_name;
+  ACHECK(cloud_preprocessor_->Init(preprocessor_init_options)) << "lidar preprocessor init error";
+
+  BaseSegmentation* segmentor =
+      BaseSegmentationRegisterer::GetInstanceByName(config.segmentor());
+  CHECK_NOTNULL(segmentor);
+  segmentor_.reset(segmentor);
   SegmentationInitOptions segmentation_init_options;
   segmentation_init_options.sensor_name = sensor_name;
-  ACHECK(segmentor_->Init(segmentation_init_options));
+  ACHECK(segmentor_->Init(segmentation_init_options)) << "lidar segmentor init error";
 
   ObjectBuilderInitOptions builder_init_options;
   ACHECK(builder_.Init(builder_init_options));
@@ -88,7 +93,7 @@ LidarProcessResult LidarObstacleSegmentation::Process(
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
-  if (cloud_preprocessor_.Preprocess(preprocessor_options, frame)) {
+  if (cloud_preprocessor_->Preprocess(preprocessor_options, frame)) {
     return ProcessCommon(options, frame);
   }
   return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
@@ -108,7 +113,7 @@ LidarProcessResult LidarObstacleSegmentation::Process(
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
   PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
-  if (cloud_preprocessor_.Preprocess(preprocessor_options, message, frame)) {
+  if (cloud_preprocessor_->Preprocess(preprocessor_options, message, frame)) {
     return ProcessCommon(options, frame);
   }
   return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
