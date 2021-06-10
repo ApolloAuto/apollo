@@ -36,6 +36,16 @@ cc_library(
 )
 
 cc_library(
+    name = "base_pointcloud_preprocessor",
+    hdrs = ["base_pointcloud_preprocessor.h"],
+    deps = [
+        "//modules/perception/lib/registerer",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/perception/lidar/common:lidar_frame",
+    ],
+)
+
+cc_library(
     name = "base_classifier",
     hdrs = ["base_classifier.h"],
     deps = [

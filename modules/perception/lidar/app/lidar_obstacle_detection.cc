@@ -43,11 +43,14 @@ bool LidarObstacleDetection::Init(
 
   LidarObstacleDetectionConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  detector_name_ = config.detector();
 
+  BasePointCloudPreprocessor* preprocessor =
+      BasePointCloudPreprocessorRegisterer::GetInstanceByName(config.preprocessor());
+  CHECK_NOTNULL(preprocessor);
+  cloud_preprocessor_.reset(preprocessor);
   PointCloudPreprocessorInitOptions preprocessor_init_options;
   preprocessor_init_options.sensor_name = sensor_name;
-  ACHECK(cloud_preprocessor_.Init(preprocessor_init_options));
+  ACHECK(cloud_preprocessor_->Init(preprocessor_init_options)) << "lidar preprocessor init error";
 
   detector_.reset(new PointPillarsDetection);
   // detector_.reset(
@@ -65,7 +68,7 @@ LidarProcessResult LidarObstacleDetection::Process(
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
-  if (cloud_preprocessor_.Preprocess(preprocessor_options, frame)) {
+  if (cloud_preprocessor_->Preprocess(preprocessor_options, frame)) {
     return ProcessCommon(options, frame);
   }
   return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
@@ -85,7 +88,7 @@ LidarProcessResult LidarObstacleDetection::Process(
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
   PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
-  if (cloud_preprocessor_.Preprocess(preprocessor_options, message, frame)) {
+  if (cloud_preprocessor_->Preprocess(preprocessor_options, message, frame)) {
     return ProcessCommon(options, frame);
   }
   return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
