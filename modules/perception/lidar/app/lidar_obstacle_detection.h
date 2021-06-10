@@ -22,7 +22,7 @@
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
+#include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
 
 namespace apollo {
 namespace perception {
@@ -62,10 +62,8 @@ class LidarObstacleDetection {
                                    LidarFrame* frame);
 
  private:
-  PointCloudPreprocessor cloud_preprocessor_;
-  std::unique_ptr<PointPillarsDetection> detector_;
-  // params
-  std::string detector_name_;
+  std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
+  std::shared_ptr<PointPillarsDetection> detector_;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

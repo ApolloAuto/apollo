@@ -19,9 +19,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:perf_util",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/app/proto:lidar_obstacle_detection_config_cc_proto",
         "//modules/perception/lidar/lib/detection/lidar_point_pillars:point_pillars_detection",
-        "//modules/perception/lidar/lib/pointcloud_preprocessor",
+        "//modules/perception/lidar/lib/interface:base_pointcloud_preprocessor",
         "@eigen",
     ],
 )
@@ -33,11 +35,13 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:perf_util",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/app/proto:lidar_obstacle_segmentation_config_cc_proto",
         "//modules/perception/lidar/lib/map_manager",
         "//modules/perception/lidar/lib/object_builder",
         "//modules/perception/lidar/lib/object_filter_bank",
-        "//modules/perception/lidar/lib/pointcloud_preprocessor",
+        "//modules/perception/lidar/lib/interface:base_pointcloud_preprocessor",
         "//modules/perception/lidar/lib/scene_manager",
         "@eigen",
     ],
