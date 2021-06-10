@@ -88,6 +88,8 @@ class SimControl : SimControlInterface {
       const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
   void OnRoutingResponse(
       const std::shared_ptr<apollo::routing::RoutingResponse> &routing);
+  void OnRoutingRequest(
+      const std::shared_ptr<apollo::routing::RoutingRequest> &routing_request);
   void OnReceiveNavigationInfo(
       const std::shared_ptr<apollo::relative_map::NavigationInfo>
           &navigation_info);
@@ -133,6 +135,8 @@ class SimControl : SimControlInterface {
       planning_reader_;
   std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
       routing_response_reader_;
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
+      routing_request_reader_;
   std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>
       navigation_reader_;
   std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
