@@ -207,13 +207,12 @@ bool Buffer::canTransform(const std::string& target_frame,
     if (retval) {
       return true;
     } else {
+      if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+        break;
+      }
       const int sleep_time_ms = 3;
       AWARN << "BufferCore::canTransform failed: " << *errstr;
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-      if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
-        Clock::SetNow(Time(Clock::Now().ToNanosecond() +
-                           sleep_time_ms * kMilliToNanoFactor));
-      }
     }
   }
   *errstr = *errstr + ":timeout";
