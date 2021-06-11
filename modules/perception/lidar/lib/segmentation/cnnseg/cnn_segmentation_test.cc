@@ -81,13 +81,13 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
       "lidar/lib/segmentation/cnnseg/";
 
   auto segmentation = std::shared_ptr<CNNSegmentation>(new CNNSegmentation);
-  SegmentationOptions options;
-  EXPECT_FALSE(segmentation->Segment(options, nullptr));
+  LidarDetectorOptions options;
+  EXPECT_FALSE(segmentation->Detect(options, nullptr));
   LidarFrame frame_data;
-  EXPECT_FALSE(segmentation->Segment(options, &frame_data));
+  EXPECT_FALSE(segmentation->Detect(options, &frame_data));
   frame_data.cloud = base::PointFCloudPool::Instance().Get();
   frame_data.world_cloud = base::PointDCloudPool::Instance().Get();
-  EXPECT_FALSE(segmentation->Segment(options, &frame_data));
+  EXPECT_FALSE(segmentation->Detect(options, &frame_data));
 
   EXPECT_TRUE(segmentation->Init());
   EXPECT_TRUE(segmentation->InitClusterAndBackgroundSegmentation());
@@ -115,7 +115,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
       continue;
     }
     frame->world_cloud->resize(frame->cloud->size());
-    EXPECT_TRUE(segmentation->Segment(options, frame.get()));
+    EXPECT_TRUE(segmentation->Detect(options, frame.get()));
   }
 }
 
@@ -149,13 +149,13 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
 
   // test segment
   using base::ObjectType;
-  SegmentationOptions options;
+  LidarDetectorOptions options;
   LidarFrame frame_data;
   frame_data.cloud = pcl_ptr;
   frame_data.world_cloud = base::PointDCloudPool::Instance().Get();
   frame_data.world_cloud->resize(pcl_ptr->size());
   frame_data.non_ground_indices = non_ground_indices;
-  segmentation->Segment(options, &frame_data);
+  segmentation->Detect(options, &frame_data);
   std::vector<base::ObjectPtr>& objects = frame_data.segmented_objects;
   //  EXPECT_LE(4, objects.size());
   EXPECT_GT(objects[0]->lidar_supplement.cloud.size(), 0);
@@ -171,7 +171,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
 
   segmentation->cnnseg_param_.set_do_classification(false);
   segmentation->cnnseg_param_.set_do_heading(false);
-  segmentation->Segment(options, &frame_data);
+  segmentation->Detect(options, &frame_data);
   objects = frame_data.segmented_objects;
   //  EXPECT_LE(4, objects.size());
   EXPECT_GT(objects[0]->lidar_supplement.cloud.size(), 0);
@@ -184,7 +184,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   PrintObjects(objects);
 
   segmentation->InitClusterAndBackgroundSegmentation();
-  segmentation->Segment(options, &frame_data);
+  segmentation->Detect(options, &frame_data);
   objects = frame_data.segmented_objects;
   //  EXPECT_EQ(4, objects.size());
   EXPECT_GT(objects[0]->lidar_supplement.cloud.size(), 0);
@@ -192,7 +192,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   PrintObjects(objects);
 
   EXPECT_TRUE(segmentation->InitClusterAndBackgroundSegmentation());
-  EXPECT_TRUE(segmentation->Segment(options, &frame_data));
+  EXPECT_TRUE(segmentation->Detect(options, &frame_data));
   objects = frame_data.segmented_objects;
   //  EXPECT_LE(4, objects.size());
 }
