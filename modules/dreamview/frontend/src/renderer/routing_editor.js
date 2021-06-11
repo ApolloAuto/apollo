@@ -180,6 +180,18 @@ export default class RoutingEditor {
     return index;
   }
 
+  // handle object.position or point
+  handleRoutingPointObject(object, coordinates, path = null) {
+    const point = path ? object[path] : object;
+    point.z = 0;
+    const offsetPoint = coordinates.applyOffset(point, true);
+    const heading = path ? _.get(object, 'arrowMesh.heading', null) : point.heading;
+    if (_.isNumber(heading)) {
+      offsetPoint.heading = heading;
+    }
+    return offsetPoint;
+  }
+
   sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
     // parking routing request vs common routing request
     // add dead end junction routing request when select three points
@@ -191,21 +203,21 @@ export default class RoutingEditor {
 
     const index = _.isEmpty(this.routePoints) ?
       -1 : this.isPointInParkingSpace(this.routePoints[this.routePoints.length - 1].position);
+    const points = _.isEmpty(routingPoints) ?
+      this.routePoints.map(object =>
+        this.handleRoutingPointObject(object, coordinates, 'position'))
+      : routingPoints.map(point => this.handleRoutingPointObject(point, coordinates));
     const parkingRoutingRequest = (index !== -1);
     if (parkingRoutingRequest) {
-      const lastPoint = this.routePoints.pop();
+      const lastPoint = _.last(this.routePoints);
       const { routingEndPoint, id, type, laneWidth, laneId } = this.parkingSpaceInfo[index];
-      const parkingRequestPoints = this.routePoints.map((object) => {
-        object.position.z = 0;
-        return coordinates.applyOffset(object.position, true);
-      });
+      const parkingRequestPoints = points.slice(0, -1);
       parkingRequestPoints.push(coordinates.applyOffset(routingEndPoint, true));
       const start = (parkingRequestPoints.length > 1) ? parkingRequestPoints[0]
         : coordinates.applyOffset(carOffsetPosition, true);
       const startHeading = (parkingRequestPoints.length > 1) ? null : carHeading;
       const end = parkingRequestPoints[parkingRequestPoints.length - 1];
       const waypoint = (parkingRequestPoints.length > 1) ? parkingRequestPoints.slice(1, -1) : [];
-      this.routePoints.push(lastPoint);
       this.parkingSpaceInfo[index].polygon.point.forEach(vertex => {
         vertex.z = 0;
         parkingRequestPoints.push(coordinates.applyOffset(vertex, true));
