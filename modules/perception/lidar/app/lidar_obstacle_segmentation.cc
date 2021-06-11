@@ -68,11 +68,11 @@ bool LidarObstacleSegmentation::Init(
   preprocessor_init_options.sensor_name = sensor_name;
   ACHECK(cloud_preprocessor_->Init(preprocessor_init_options)) << "lidar preprocessor init error";
 
-  BaseSegmentation* segmentor =
-      BaseSegmentationRegisterer::GetInstanceByName(config.segmentor());
+  BaseLidarDetector* segmentor =
+      BaseLidarDetectorRegisterer::GetInstanceByName(config.segmentor());
   CHECK_NOTNULL(segmentor);
   segmentor_.reset(segmentor);
-  SegmentationInitOptions segmentation_init_options;
+  LidarDetectorInitOptions segmentation_init_options;
   segmentation_init_options.sensor_name = sensor_name;
   ACHECK(segmentor_->Init(segmentation_init_options)) << "lidar segmentor init error";
 
@@ -134,8 +134,8 @@ LidarProcessResult LidarObstacleSegmentation::ProcessCommon(
   }
   PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "map_manager");
 
-  SegmentationOptions segmentation_options;
-  if (!segmentor_->Segment(segmentation_options, frame)) {
+  LidarDetectorOptions segmentation_options;
+  if (!segmentor_->Detect(segmentation_options, frame)) {
     return LidarProcessResult(LidarErrorCode::SegmentationError,
                               "Failed to segment.");
   }

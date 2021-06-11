@@ -22,7 +22,7 @@
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
-#include "modules/perception/lidar/lib/interface/base_segmentation.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
@@ -69,7 +69,7 @@ class LidarObstacleSegmentation {
  private:
   std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
   MapManager map_manager_;
-  std::shared_ptr<BaseSegmentation> segmentor_;
+  std::shared_ptr<BaseLidarDetector> segmentor_;
   ObjectBuilder builder_;
   ObjectFilterBank filter_bank_;
   // params

@@ -21,8 +21,8 @@
 #include "Eigen/Dense"
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 
 namespace apollo {
 namespace perception {
@@ -63,7 +63,7 @@ class LidarObstacleDetection {
 
  private:
   std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
-  std::shared_ptr<PointPillarsDetection> detector_;
+  std::shared_ptr<BaseLidarDetector> detector_;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

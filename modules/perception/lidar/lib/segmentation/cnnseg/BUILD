@@ -28,6 +28,7 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_cc_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/spp_engine",
         "//modules/perception/lidar/lib/segmentation/ncut:ncut_segmentation",
+        "//modules/perception/lidar/lib/interface:base_lidar_detector",
         "//modules/perception/proto:perception_config_schema_cc_proto",
         "@com_google_absl//absl/strings",
     ],

@@ -52,13 +52,13 @@ bool LidarObstacleDetection::Init(
   preprocessor_init_options.sensor_name = sensor_name;
   ACHECK(cloud_preprocessor_->Init(preprocessor_init_options)) << "lidar preprocessor init error";
 
-  detector_.reset(new PointPillarsDetection);
-  // detector_.reset(
-  //    BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_));
-  CHECK_NOTNULL(detector_.get());
-  DetectionInitOptions detection_init_options;
-  // segmentation_init_options.sensor_name = sensor_name;
-  ACHECK(detector_->Init(detection_init_options));
+  BaseLidarDetector* detector =
+      BaseLidarDetectorRegisterer::GetInstanceByName(config.detector());
+  CHECK_NOTNULL(detector);
+  detector_.reset(detector);
+  LidarDetectorInitOptions detection_init_options;
+  detection_init_options.sensor_name = sensor_name;
+  ACHECK(detector_->Init(detection_init_options)) << "lidar detector init error";
 
   return true;
 }
@@ -100,7 +100,7 @@ LidarProcessResult LidarObstacleDetection::ProcessCommon(
   const auto& sensor_name = options.sensor_name;
 
   PERF_BLOCK_START();
-  DetectionOptions detection_options;
+  LidarDetectorOptions detection_options;
   if (!detector_->Detect(detection_options, frame)) {
     return LidarProcessResult(LidarErrorCode::DetectionError,
                               "Failed to detect.");

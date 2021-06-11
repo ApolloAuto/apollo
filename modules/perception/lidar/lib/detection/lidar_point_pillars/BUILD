@@ -49,6 +49,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/interface:base_lidar_detector",
         "@eigen",
         "@local_config_pcl//:pcl",
     ],

@@ -34,7 +34,7 @@ using apollo::cyber::common::GetAbsolutePath;
 using apollo::cyber::common::GetProtoFromFile;
 using Eigen::MatrixXf;
 
-bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
+bool NCutSegmentation::Init(const LidarDetectorInitOptions& options) {
   std::string param_file;
   ACHECK(GetConfigs(&param_file));
   AINFO << "--    param_file: " << param_file;
@@ -171,7 +171,7 @@ bool NCutSegmentation::GetConfigs(std::string* param_file) {
   return true;
 }
 
-bool NCutSegmentation::Segment(const SegmentationOptions& options,
+bool NCutSegmentation::Detect(const LidarDetectorOptions& options,
                                LidarFrame* frame) {
   // check input
   if (frame == nullptr) {
@@ -631,7 +631,7 @@ void NCutSegmentation::VisualizeComponents(
 }
 #endif
 
-PERCEPTION_REGISTER_SEGMENTATION(NCutSegmentation);
+PERCEPTION_REGISTER_LIDARDETECTOR(NCutSegmentation);
 
 }  // namespace lidar
 }  // namespace perception

@@ -40,7 +40,7 @@ using base::AttributePointCloud;
 using base::Object;
 using base::PointF;
 
-bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
+bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
   // get configs
   std::string param_file;
   std::string proto_file;
@@ -263,7 +263,7 @@ void CNNSegmentation::MapPointToGrid(
   }
 }
 
-bool CNNSegmentation::Segment(const SegmentationOptions& options,
+bool CNNSegmentation::Detect(const LidarDetectorOptions& options,
                               LidarFrame* frame) {
   // check input
   if (frame == nullptr) {
@@ -494,7 +494,7 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   return true;
 }
 
-PERCEPTION_REGISTER_SEGMENTATION(CNNSegmentation);
+PERCEPTION_REGISTER_LIDARDETECTOR(CNNSegmentation);
 
 }  // namespace lidar
 }  // namespace perception
