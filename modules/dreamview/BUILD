@@ -54,6 +54,7 @@ install_files(
     name = "pb_dreamview",
     dest = "modules/dreamview",
     files = [
+        "//modules/dreamview/proto:chart_py_pb2",
         "//modules/dreamview/proto:preprocess_table_py_pb2",
     ],
 )

@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -58,8 +58,17 @@ install(
         ":librouting_component.so",
     ],
     deps = [
+        ":pb_routing",
         "//cyber:install",
         "//modules/routing/topo_creator:install",
+    ],
+)
+
+install_files(
+    name = "pb_routing",
+    dest = "modules/routing",
+    files = [
+        "//modules/routing/proto:routing_py_pb2",
     ],
 )
 
