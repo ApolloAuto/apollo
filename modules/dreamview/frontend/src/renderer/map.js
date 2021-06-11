@@ -896,7 +896,8 @@ export default class Map {
     let targetLane = lane;
     const direction = reverse ? 'successorId' : 'predecessorId';
     while (isLaneCompleteInRectangle(junctionPoints, laneEndPoint)) {
-      targetLane = _.find(this.data.lane, item => _.isEqual(item.id, _.get(lane, `${direction}.0`)));// lane.predecessorId[0]
+      targetLane = _.find(this.data.lane,
+        item => _.isEqual(item.id, _.get(lane, `${direction}.0`)));// lane.predecessorId[0]
       if (_.isEmpty(targetLane)) {
         return null;
       }
@@ -1078,7 +1079,8 @@ export default class Map {
     }
     const lanes = [];
     overlapId.forEach(overlap => {
-      const overlapLane = _.find(this.data.lane, lane => _.findIndex(lane.overlapId, overlap) !== -1);
+      const overlapLane = _.find(this.data.lane,
+        lane => _.findIndex(lane.overlapId, overlap) !== -1);
       if (!_.isEmpty(overlapLane)) {
         lanes.push(overlapLane);
       }
@@ -1131,7 +1133,8 @@ export default class Map {
     deadJunctionInfo.out = deadJunctionInfo.out[0];
     const laneDistanceThreshold = 20;
     deadJunctionInfo.inStartPoint =
-      this.getPointClosestToTheJunctionOnLane(deadJunctionInfo.in, deadEndJunctionPoints, coordinates);
+      this.getPointClosestToTheJunctionOnLane(
+        deadJunctionInfo.in, deadEndJunctionPoints, coordinates);
     deadJunctionInfo.inLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.inStartPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');
     const routingPointThreshold = 20;
