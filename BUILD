@@ -37,6 +37,7 @@ install(
         "//modules/third_party_perception:install",
         "//modules/tools:install",
         "//modules/transform:install",
+        "//modules/v2x:install",
         "//scripts:install",
     ],
 )

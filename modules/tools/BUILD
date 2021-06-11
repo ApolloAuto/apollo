@@ -13,10 +13,13 @@ install(
         "//modules/tools/record_play:py_files",
         "//modules/tools/sensor_calibration:config",
         "//modules/tools/sensor_calibration:py_files",
+        "//modules/tools/vehicle_calibration:runtime_files",
     ],
     rename = {
         "modules/tools/sensor_calibration/extract_data.py": "extract_data",
         "modules/tools/record_play/rtk_recorder.py": "rtk_recorder",
+        "modules/tools/record_play/rtk_player.py": "rtk_player",
+        "modules/tools/vehicle_calibration/preprocess.py": "preprocess",
     },
     deps = [
         ":pb_tools",
