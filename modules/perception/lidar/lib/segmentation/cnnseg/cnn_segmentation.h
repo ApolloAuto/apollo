@@ -30,7 +30,7 @@
 #include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
-#include "modules/perception/lidar/lib/interface/base_segmentation.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/feature_generator.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_engine.h"
 
@@ -38,15 +38,15 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class CNNSegmentation : public BaseSegmentation {
+class CNNSegmentation : public BaseLidarDetector {
  public:
   CNNSegmentation() = default;
   ~CNNSegmentation() = default;
 
-  bool Init(const SegmentationInitOptions& options =
-                SegmentationInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options =
+                LidarDetectorInitOptions()) override;
 
-  bool Segment(const SegmentationOptions& options, LidarFrame* frame) override;
+  bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "CNNSegmentation"; }
 
@@ -122,7 +122,7 @@ class CNNSegmentation : public BaseSegmentation {
 
   // secondary segmentation to improve miss detection
   // not found by neural networks !
-  std::shared_ptr<BaseSegmentation> secondary_segmentor;
+  std::shared_ptr<BaseLidarDetector> secondary_segmentor;
 
  private:
   const int kDefaultPointCloudSize = 120000;

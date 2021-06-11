@@ -51,7 +51,7 @@ PointPillarsDetection::PointPillarsDetection()
 
 // TODO(chenjiahao):
 //  specify score threshold and nms over lap threshold for each class.
-bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
+bool PointPillarsDetection::Init(const LidarDetectorInitOptions& options) {
   point_pillars_ptr_.reset(
       new PointPillars(FLAGS_reproduce_result_mode, FLAGS_score_threshold,
                        FLAGS_nms_overlap_threshold, FLAGS_pfe_torch_file,
@@ -60,7 +60,7 @@ bool PointPillarsDetection::Init(const DetectionInitOptions& options) {
   return true;
 }
 
-bool PointPillarsDetection::Detect(const DetectionOptions& options,
+bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
                                    LidarFrame* frame) {
   // check input
   if (frame == nullptr) {
@@ -364,6 +364,8 @@ base::ObjectSubType PointPillarsDetection::GetObjectSubType(const int label) {
       return base::ObjectSubType::UNKNOWN;
   }
 }
+
+PERCEPTION_REGISTER_LIDARDETECTOR(PointPillarsDetection);
 
 }  // namespace lidar
 }  // namespace perception

@@ -12,7 +12,7 @@ cc_library(
         ":base_multi_target_tracker",
         ":base_object_filter",
         ":base_roi_filter",
-        ":base_segmentation",
+        ":base_lidar_detector",
     ],
 )
 
@@ -27,9 +27,10 @@ cc_library(
 )
 
 cc_library(
-    name = "base_segmentation",
-    hdrs = ["base_segmentation.h"],
+    name = "base_lidar_detector",
+    hdrs = ["base_lidar_detector.h"],
     deps = [
+        "//cyber/common:macros",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
     ],
@@ -39,6 +40,7 @@ cc_library(
     name = "base_pointcloud_preprocessor",
     hdrs = ["base_pointcloud_preprocessor.h"],
     deps = [
+        "//cyber/common:macros",
         "//modules/perception/lib/registerer",
         "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/perception/lidar/common:lidar_frame",

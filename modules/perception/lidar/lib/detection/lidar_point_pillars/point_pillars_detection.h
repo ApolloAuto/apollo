@@ -27,25 +27,22 @@
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct DetectionInitOptions {};
-
-struct DetectionOptions {};
-
-class PointPillarsDetection {
+class PointPillarsDetection : public BaseLidarDetector {
  public:
   PointPillarsDetection();
   ~PointPillarsDetection() = default;
 
-  bool Init(const DetectionInitOptions& options = DetectionInitOptions());
+  bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
 
-  bool Detect(const DetectionOptions& options, LidarFrame* frame);
+  bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const { return "PointPillarsDetection"; }
+  std::string Name() const override { return "PointPillarsDetection"; }
 
  private:
   void CloudToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,

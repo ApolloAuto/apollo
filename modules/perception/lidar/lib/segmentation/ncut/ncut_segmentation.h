@@ -28,7 +28,7 @@
 #include "modules/perception/lidar/common/pcl_util.h"
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
-#include "modules/perception/lidar/lib/interface/base_segmentation.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/ncut.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/proto/ncut_param.pb.h"
 
@@ -38,15 +38,15 @@ namespace lidar {
 
 using base::ObjectPtr;
 
-class NCutSegmentation : public BaseSegmentation {
+class NCutSegmentation : public BaseLidarDetector {
  public:
   NCutSegmentation() = default;
   ~NCutSegmentation() = default;
 
-  bool Init(const SegmentationInitOptions& options =
-                SegmentationInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options =
+                LidarDetectorInitOptions()) override;
 
-  bool Segment(const SegmentationOptions& options, LidarFrame* frame) override;
+  bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "NCutSegmentation"; }
 

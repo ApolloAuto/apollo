@@ -39,6 +39,7 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/ncut/common:flood_fill",
         "//modules/perception/lidar/lib/segmentation/ncut/common:lr_classifier",
         "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_cc_proto",
+        "//modules/perception/lidar/lib/interface:base_lidar_detector",
         "@local_config_pcl//:pcl",
         "@local_config_vtk//:vtk",
     ],

@@ -25,38 +25,38 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct SegmentationInitOptions {
+struct LidarDetectorInitOptions {
   std::string sensor_name = "velodyne64";
 };
 
-struct SegmentationOptions {};
+struct LidarDetectorOptions {};
 
-class BaseSegmentation {
+class BaseLidarDetector {
  public:
-  BaseSegmentation() = default;
+  BaseLidarDetector() = default;
 
-  virtual ~BaseSegmentation() = default;
+  virtual ~BaseLidarDetector() = default;
 
   virtual bool Init(
-      const SegmentationInitOptions& options = SegmentationInitOptions()) = 0;
+      const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) = 0;
 
-  // @brief: segment point cloud and get objects.
+  // @brief: process point cloud and get objects.
   // @param [in]: options
   // @param [in/out]: frame
-  // segmented_objects should be filled, required,
+  // objects should be filled, required,
   // label field of point cloud can be filled, optional,
-  virtual bool Segment(const SegmentationOptions& options,
+  virtual bool Detect(const LidarDetectorOptions& options,
                        LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(BaseSegmentation);
-};  // class BaseSegmentation
+  DISALLOW_COPY_AND_ASSIGN(BaseLidarDetector);
+};  // class BaseLidarDetector
 
-PERCEPTION_REGISTER_REGISTERER(BaseSegmentation);
-#define PERCEPTION_REGISTER_SEGMENTATION(name) \
-  PERCEPTION_REGISTER_CLASS(BaseSegmentation, name)
+PERCEPTION_REGISTER_REGISTERER(BaseLidarDetector);
+#define PERCEPTION_REGISTER_LIDARDETECTOR(name) \
+  PERCEPTION_REGISTER_CLASS(BaseLidarDetector, name)
 
 }  // namespace lidar
 }  // namespace perception
