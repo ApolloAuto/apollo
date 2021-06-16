@@ -21,6 +21,7 @@
 #include "modules/perception/lidar/app/proto/lidar_obstacle_segmentation_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 #include <vector>
 

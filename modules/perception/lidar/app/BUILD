@@ -19,6 +19,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:perf_util",
+        "//modules/perception/lib/registerer",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/app/proto:lidar_obstacle_detection_config_cc_proto",
@@ -27,6 +28,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_lidar_obstacle_detection",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -36,6 +38,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:perf_util",
+        "//modules/perception/lib/registerer",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/app/proto:lidar_obstacle_segmentation_config_cc_proto",
@@ -48,6 +51,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -66,6 +70,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()
