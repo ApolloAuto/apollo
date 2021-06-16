@@ -41,6 +41,7 @@ cc_library(
     hdrs = ["planning_base.h"],
     copts = [
         "-fopenmp",
+        "-DMODULE_NAME=\\\"planning\\\""
     ],
     deps = [
         "//cyber",
@@ -76,6 +77,7 @@ cc_library(
     hdrs = ["navi_planning.h"],
     copts = [
         "-fopenmp",
+        "-DMODULE_NAME=\\\"planning\\\""
     ],
     deps = [
         ":planning_base",
