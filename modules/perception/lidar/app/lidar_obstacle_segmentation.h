@@ -16,55 +16,39 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
-#include "Eigen/Dense"
-
-#include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lidar/lib/interface/base_classifier.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_obstacle_detection.h"
+#include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
-#include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct LidarObstacleSegmentationInitOptions {
-  std::string sensor_name = "velodyne64";
-  bool enable_hdmap_input = true;
-};
-
-struct LidarObstacleSegmentationOptions {
-  std::string sensor_name;
-  Eigen::Affine3d sensor2novatel_extrinsics;
-
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-} EIGEN_ALIGN16;
-
-class LidarObstacleSegmentation {
+class LidarObstacleSegmentation : public BaseLidarObstacleDetection{
  public:
   LidarObstacleSegmentation() = default;
   ~LidarObstacleSegmentation() = default;
 
-  bool Init(const LidarObstacleSegmentationInitOptions& options =
-                LidarObstacleSegmentationInitOptions());
+  bool Init(const LidarObstacleDetectionInitOptions& options =
+                LidarObstacleDetectionInitOptions()) override;
 
   LidarProcessResult Process(
-      const LidarObstacleSegmentationOptions& options,
+      const LidarObstacleDetectionOptions& options,
       const std::shared_ptr<apollo::drivers::PointCloud const>& message,
-      LidarFrame* frame);
+      LidarFrame* frame) override;
 
-  LidarProcessResult Process(const LidarObstacleSegmentationOptions& options,
-                             LidarFrame* frame);
+  LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
+                             LidarFrame* frame) override;
 
-  std::string Name() const { return "LidarObstacleSegmentation"; }
+  std::string Name() const override { return "LidarObstacleSegmentation"; }
 
  private:
   LidarProcessResult ProcessCommon(
-      const LidarObstacleSegmentationOptions& options, LidarFrame* frame);
+      const LidarObstacleDetectionOptions& options, LidarFrame* frame);
 
  private:
   std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;

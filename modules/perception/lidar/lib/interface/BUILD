@@ -37,6 +37,19 @@ cc_library(
 )
 
 cc_library(
+    name = "base_lidar_obstacle_detection",
+    hdrs = ["base_lidar_obstacle_detection.h"],
+    deps = [
+        "//cyber/common:macros",
+        "//modules/perception/lidar/common:lidar_error_code",
+        "//modules/perception/lib/registerer",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/perception/lidar/common:lidar_frame",
+        "@eigen",
+    ],
+)
+
+cc_library(
     name = "base_pointcloud_preprocessor",
     hdrs = ["base_pointcloud_preprocessor.h"],
     deps = [

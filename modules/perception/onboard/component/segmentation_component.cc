@@ -82,7 +82,7 @@ bool SegmentationComponent::InitAlgorithmPlugin() {
            << "Failed to get segmentation instance";
     return false;
   }
-  lidar::LidarObstacleSegmentationInitOptions init_options;
+  lidar::LidarObstacleDetectionInitOptions init_options;
   init_options.sensor_name = sensor_name_;
   init_options.enable_hdmap_input =
       FLAGS_obs_enable_hdmap_input && enable_hdmap_;
@@ -140,7 +140,7 @@ bool SegmentationComponent::InternalProc(
   frame->lidar2world_pose = pose;
   frame->novatel2world_pose = pose_novatel;
 
-  lidar::LidarObstacleSegmentationOptions segment_opts;
+  lidar::LidarObstacleDetectionOptions segment_opts;
   segment_opts.sensor_name = sensor_name_;
   lidar2world_trans_.GetExtrinsics(&segment_opts.sensor2novatel_extrinsics);
   lidar::LidarProcessResult ret =
