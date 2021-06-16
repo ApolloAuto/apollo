@@ -19,6 +19,7 @@ cc_library(
         "//modules/perception/lidar/lib/pointcloud_preprocessor/proto:pointcloud_preprocessor_config_cc_proto",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

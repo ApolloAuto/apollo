@@ -22,6 +22,8 @@
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
+#include <vector>
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -59,6 +61,12 @@ bool LidarObstacleSegmentation::Init(
       use_map_manager_ = false;
     }
   }
+  
+  // For Debug
+  std::vector<BasePointCloudPreprocessor *> vec = BasePointCloudPreprocessorRegisterer::GetAllInstances();
+  std::cout<<"Size of Preprocessor Map: "<<vec.size()<<std::endl;
+
+  // End Debug
 
   BasePointCloudPreprocessor* preprocessor =
       BasePointCloudPreprocessorRegisterer::GetInstanceByName(config.preprocessor());
