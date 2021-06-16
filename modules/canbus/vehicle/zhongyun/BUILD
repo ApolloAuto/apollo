@@ -3,10 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 cc_library(
     name = "zhongyun_vehicle_factory",
     srcs = ["zhongyun_vehicle_factory.cc"],
     hdrs = ["zhongyun_vehicle_factory.h"],
+    copts = CANBUS_COPTS,
     deps = [
         ":zhongyun_controller",
         ":zhongyun_message_manager",
@@ -18,6 +21,7 @@ cc_library(
     name = "zhongyun_message_manager",
     srcs = ["zhongyun_message_manager.cc"],
     hdrs = ["zhongyun_message_manager.h"],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/zhongyun/protocol:canbus_zhongyun_protocol",
@@ -30,6 +34,7 @@ cc_library(
     name = "zhongyun_controller",
     srcs = ["zhongyun_controller.cc"],
     hdrs = ["zhongyun_controller.h"],
+    copts = CANBUS_COPTS,
     deps = [
         ":zhongyun_message_manager",
         "//modules/canbus/proto:chassis_detail_cc_proto",
