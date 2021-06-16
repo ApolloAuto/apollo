@@ -20,7 +20,6 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_detection_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
 namespace perception {
