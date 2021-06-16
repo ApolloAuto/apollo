@@ -110,6 +110,8 @@ LidarProcessResult LidarObstacleDetection::ProcessCommon(
   return LidarProcessResult(LidarErrorCode::Succeed);
 }
 
+PERCEPTION_REGISTER_LIDAROBSTACLEDETECTION(LidarObstacleDetection);
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

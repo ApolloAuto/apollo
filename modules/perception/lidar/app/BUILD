@@ -24,6 +24,7 @@ cc_library(
         "//modules/perception/lidar/app/proto:lidar_obstacle_detection_config_cc_proto",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
         "//modules/perception/lidar/lib/interface:base_pointcloud_preprocessor",
+        "//modules/perception/lidar/lib/interface:base_lidar_obstacle_detection",
         "@eigen",
     ],
 )
@@ -43,6 +44,7 @@ cc_library(
         "//modules/perception/lidar/lib/object_filter_bank",
         "//modules/perception/lidar/lib/interface:base_pointcloud_preprocessor",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
+        "//modules/perception/lidar/lib/interface:base_lidar_obstacle_detection",
         "//modules/perception/lidar/lib/scene_manager",
         "@eigen",
     ],

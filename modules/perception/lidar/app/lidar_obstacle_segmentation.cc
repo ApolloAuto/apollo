@@ -27,7 +27,7 @@ namespace perception {
 namespace lidar {
 
 bool LidarObstacleSegmentation::Init(
-    const LidarObstacleSegmentationInitOptions& options) {
+    const LidarObstacleDetectionInitOptions& options) {
   auto& sensor_name = options.sensor_name;
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
@@ -89,7 +89,7 @@ bool LidarObstacleSegmentation::Init(
 }
 
 LidarProcessResult LidarObstacleSegmentation::Process(
-    const LidarObstacleSegmentationOptions& options, LidarFrame* frame) {
+    const LidarObstacleDetectionOptions& options, LidarFrame* frame) {
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
@@ -101,7 +101,7 @@ LidarProcessResult LidarObstacleSegmentation::Process(
 }
 
 LidarProcessResult LidarObstacleSegmentation::Process(
-    const LidarObstacleSegmentationOptions& options,
+    const LidarObstacleDetectionOptions& options,
     const std::shared_ptr<apollo::drivers::PointCloud const>& message,
     LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;
@@ -121,7 +121,7 @@ LidarProcessResult LidarObstacleSegmentation::Process(
 }
 
 LidarProcessResult LidarObstacleSegmentation::ProcessCommon(
-    const LidarObstacleSegmentationOptions& options, LidarFrame* frame) {
+    const LidarObstacleDetectionOptions& options, LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;
 
   PERF_BLOCK_START();
@@ -157,6 +157,8 @@ LidarProcessResult LidarObstacleSegmentation::ProcessCommon(
 
   return LidarProcessResult(LidarErrorCode::Succeed);
 }
+
+PERCEPTION_REGISTER_LIDAROBSTACLEDETECTION(LidarObstacleSegmentation);
 
 }  // namespace lidar
 }  // namespace perception
