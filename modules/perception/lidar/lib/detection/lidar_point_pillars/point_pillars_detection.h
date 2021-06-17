@@ -36,7 +36,7 @@ namespace lidar {
 class PointPillarsDetection : public BaseLidarDetector {
  public:
   PointPillarsDetection();
-  ~PointPillarsDetection() = default;
+  virtual ~PointPillarsDetection() = default;
 
   bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
 

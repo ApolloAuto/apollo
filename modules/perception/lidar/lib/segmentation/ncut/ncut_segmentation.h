@@ -41,7 +41,7 @@ using base::ObjectPtr;
 class NCutSegmentation : public BaseLidarDetector {
  public:
   NCutSegmentation() = default;
-  ~NCutSegmentation() = default;
+  virtual ~NCutSegmentation() = default;
 
   bool Init(const LidarDetectorInitOptions& options =
                 LidarDetectorInitOptions()) override;
