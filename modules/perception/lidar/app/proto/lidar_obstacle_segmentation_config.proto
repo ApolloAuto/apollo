@@ -1,9 +1,0 @@
-syntax = "proto2";
-package apollo.perception.lidar;
-
-message LidarObstacleSegmentationConfig {
-  optional string preprocessor = 1 [default = "PointCloudPreprocessor"];
-  optional string segmentor = 2 [default = "DummySegmentation"];
-  optional bool use_map_manager = 3 [default = true];
-  optional bool use_object_filter_bank = 4 [default = true];
-}
