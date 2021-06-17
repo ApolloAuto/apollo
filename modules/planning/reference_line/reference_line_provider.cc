@@ -216,6 +216,7 @@ void ReferenceLineProvider::GenerateThread() {
     const double end_time = Clock::NowInSeconds();
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     last_calculation_time_ = end_time - start_time;
+    is_reference_line_updated_ = true;
   }
 }
 
