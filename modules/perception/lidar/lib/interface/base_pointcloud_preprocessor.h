@@ -40,7 +40,7 @@ class BasePointCloudPreprocessor {
  public:
   BasePointCloudPreprocessor() = default;
 
-  ~BasePointCloudPreprocessor() = default;
+  virtual ~BasePointCloudPreprocessor() = default;
 
   virtual bool Init(const PointCloudPreprocessorInitOptions& options =
                 PointCloudPreprocessorInitOptions()) = 0;
