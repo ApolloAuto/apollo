@@ -262,6 +262,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
   }
 
+  // Update reference line provider and reset pull over if necessary
+  reference_line_provider_->UpdateVehicleState(vehicle_state);
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
     ADEBUG << "last_routing_:" << last_routing_.ShortDebugString();
@@ -288,9 +290,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     GenerateStopTrajectory(ptr_trajectory_pb);
     return;
   }
-
-  // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
