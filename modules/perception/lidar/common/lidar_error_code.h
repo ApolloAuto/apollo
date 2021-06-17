@@ -26,12 +26,11 @@ enum class LidarErrorCode {
   InitError = 1,
   PointCloudPreprocessorError = 2,
   MapManagerError = 3,
-  SegmentationError = 4,
+  DetectionError = 4,
   ObjectBuilderError = 5,
   ObjectFilterError = 6,
   ClassifierError = 7,
   TrackerError = 8,
-  DetectionError = 9,
 };
 
 struct LidarProcessResult {

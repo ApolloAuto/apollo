@@ -20,6 +20,9 @@
 #include "modules/perception/lidar/lib/interface/base_lidar_obstacle_detection.h"
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/lidar/lib/map_manager/map_manager.h"
+#include "modules/perception/lidar/lib/object_builder/object_builder.h"
+#include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 
 namespace apollo {
 namespace perception {
@@ -50,6 +53,13 @@ class LidarObstacleDetection : public BaseLidarObstacleDetection{
  private:
   std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
   std::shared_ptr<BaseLidarDetector> detector_;
+  MapManager map_manager_;
+  ObjectBuilder builder_;
+  ObjectFilterBank filter_bank_;
+  // params
+  bool use_map_manager_ = true;
+  bool use_object_filter_bank_ = true;
+  bool use_object_builder_ = true;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

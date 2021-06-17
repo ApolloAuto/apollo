@@ -25,25 +25,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "lidar_obstacle_segmentation_config_cc_proto",
-    deps = [
-        ":lidar_obstacle_segmentation_config_proto",
-    ],
-)
-
-proto_library(
-    name = "lidar_obstacle_segmentation_config_proto",
-    srcs = ["lidar_obstacle_segmentation_config.proto"],
-)
-
-py_proto_library(
-    name = "lidar_obstacle_segmentation_config_py_pb2",
-    deps = [
-        ":lidar_obstacle_segmentation_config_proto",
-    ],
-)
-
-cc_proto_library(
     name = "lidar_obstacle_tracking_config_cc_proto",
     deps = [
         ":lidar_obstacle_tracking_config_proto",
