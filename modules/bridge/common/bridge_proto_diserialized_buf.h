@@ -137,6 +137,8 @@ template <typename T>
 bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
   total_size_ = header.GetMsgSize();
   total_frames_ = header.GetTotalFrames();
+  proto_name_ = header.GetMsgName();
+  sequence_num_ = header.GetMsgID();
   if (total_frames_ == 0) {
     return false;
   }
