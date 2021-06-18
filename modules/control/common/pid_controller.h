@@ -54,7 +54,7 @@ class PIDController {
    * @brief reset variables for pid controller
    */
   void Reset();
-
+  void Reset_integral();
   /**
    * @brief compute control value based on the error
    * @param error error value, the difference between
