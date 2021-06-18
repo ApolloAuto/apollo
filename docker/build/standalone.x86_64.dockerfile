@@ -34,6 +34,8 @@ RUN mkdir -p /apollo/bazel-bin \
     && ln -s /apollo/cyber /apollo/bazel-bin/cyber \
     && ln -s /apollo/modules /apollo/bazel-bin/modules
 
-RUN for DIR in $(find /apollo -type d); do \
+WORKDIR /apollo
+RUN touch __init__.py && \
+    for DIR in $(find cyber modules -type d); do \
       touch $DIR/__init__.py; \
     done
