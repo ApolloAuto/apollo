@@ -256,7 +256,11 @@ Status LonController::ComputeControlCommand(
     debug->set_leadlag_saturation_status(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
-
+  if(chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL)
+  {
+    speed_pid_controller_.Reset_integral();
+    station_pid_controller_.Reset_integral();
+  }
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
