@@ -190,9 +190,9 @@ export default class RoutingEditor {
       if (deadJunctionIdx !== -1) {
         const deadJunction = this.deadJunctionInfo[deadJunctionIdx];
         WS.sendDeadEndJunctionRoutingRequest(
-          points[0], deadJunction.inStartPoint, deadJunction.outRoutingPoint,
+          points[0], deadJunction.inEndPoint, deadJunction.outStartPoint,
           points[2], deadJunction.inLaneIds, deadJunction.outLaneIds,
-          deadJunction.deadJunctionId, deadJunction.deadJunctionPoints,
+          [deadJunction.routingPoint],
         );
         return true;
       }

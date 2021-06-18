@@ -183,7 +183,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           if (succeed) {
             task->set_task_name("dead_end_junction_routing_task");
             task->set_task_type(
-                apollo::task_manager::TaskType::DEAD_JUNCTION_ROUTING);
+                apollo::task_manager::TaskType::DEAD_END_ROUTING);
             sim_world_service_.PublishTask(task);
             AINFO << task->DebugString();
             sim_world_service_.PublishMonitorMessage(
@@ -531,8 +531,7 @@ Json SimulationWorldUpdater::CheckDeadEndJunctionPoints(const Json &json) {
   result["routing1"]["end"] = json["end1"];
   result["routing2"]["start"] = json["start2"];
   result["routing2"]["end"] = json["end2"];
-  result["junctionPoints"] = json["junctionPoints"];
-  result["junctionId"] = json["junctionId"];
+  result["routing2"]["waypoint"] = json["routingPoint"];
   return result;
 }
 
@@ -556,6 +555,14 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
             routing_request->add_waypoint())) {
       AERROR << "Failed to prepare a routing request with heading: "
              << start["heading"] << " cannot locate start point on map.";
+      return false;
+    }
+  } else if (ContainsKey(start, "id")) {
+    if (!map_service_->ConstructLaneWayPointWithLaneId(
+            start["x"], start["y"], start["id"],
+            routing_request->add_waypoint())) {
+      AERROR << "Failed to prepare a routing request with lane id: "
+             << start["id"] << " cannot locate end point on map.";
       return false;
     }
   } else {
@@ -683,29 +690,6 @@ bool SimulationWorldUpdater::ConstructDeadJunctionRoutingTask(
               "junction routing task";
     return false;
   }
-  auto iter = json.find("junctionPoints");
-  if (iter == json.end() || !iter->is_array() ||
-      !ContainsKey(json, "junctionId")) {
-    AERROR << "Failed to construct the dead end junction for dead end "
-              "junction routing task";
-    return false;
-  }
-  auto *dead_end_junction =
-      dead_junction_routing_task->mutable_dead_end_junction();
-  auto *polygon = dead_end_junction->mutable_polygon();
-  auto *points = polygon->mutable_point();
-  for (size_t i = 0; i < iter->size(); i++) {
-    auto &point = (*iter)[i];
-    auto *p = points->Add();
-    if (!ValidateCoordinate(point)) {
-      AERROR << "Failed to construct the dead end junction: invalid waypoint.";
-      return false;
-    }
-    p->set_x(static_cast<double>(point["x"]));
-    p->set_y(static_cast<double>(point["y"]));
-  }
-  auto *id = dead_end_junction->mutable_id();
-  id->set_id(json["junctionId"]);
   return true;
 }
 

@@ -5,12 +5,11 @@ package apollo.task_manager;
 import "modules/common/proto/header.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/map/proto/map_parking_space.proto";
-import "modules/map/proto/map_junction.proto";
 
 enum TaskType {
   CYCLE_ROUTING = 0;
   PARKING_ROUTING = 1;
-  DEAD_JUNCTION_ROUTING = 3;
+  DEAD_END_ROUTING = 3;
 }
 
 message CycleRoutingTask {
@@ -24,7 +23,6 @@ message ParkingRoutingTask {
 } 
 
 message DeadEndJunctionRoutingTask {
-  optional apollo.hdmap.Junction dead_end_junction = 1;
   optional apollo.routing.RoutingRequest routing_request_in = 2;
   optional apollo.routing.RoutingRequest routing_request_out = 3;
 }

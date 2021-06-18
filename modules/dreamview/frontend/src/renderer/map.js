@@ -23,6 +23,8 @@ import {
   isLaneCompleteInRectangle,
   getLaneFirstAndLastPoint,
   getLaneLastPoint,
+  IsPointInRectangle,
+  getLaneFirstPoint,
 } from 'utils/misc';
 
 import Text3D, { TEXT_ALIGN } from 'renderer/text3d';
@@ -33,7 +35,6 @@ import stopSignMaterial from 'assets/models/stop_sign.mtl';
 import stopSignObject from 'assets/models/stop_sign.obj';
 import yieldSignMaterial from 'assets/models/yield_sign.mtl';
 import yieldSignObject from 'assets/models/yield_sign.obj';
-import { IsPointInRectangle } from '../utils/misc';
 
 const STOP_SIGN_SCALE = 0.01;
 const YIELD_SIGN_SCALE = 1.5;
@@ -578,6 +579,17 @@ export default class Map {
       return null;
     }
     const lane = this.data['lane'][laneIndex];
+    const points = this.getPointsFromLane(lane, coordinates);
+    return {
+      centerLine: points,
+      length: _.get(lane, 'length'),
+      successorId: _.get(lane, 'successorId'), // array
+      predecessorId: _.get(lane, 'predecessorId'), // array
+    };
+  }
+
+  // get all offset points from the lane's segements
+  getPointsFromLane(lane, coordinates, offset = true) {
     const centralLine = _.get(lane, 'centralCurve.segment');
     if (_.isEmpty(centralLine)) {
       return null;
@@ -590,15 +602,11 @@ export default class Map {
       arrs = _.uniq(_.flattenDeep(arrs));
     }
     let points = _.isEmpty(arrs) ? _.get(centralLine[0], 'lineSegment.point') : arrs;
-    points = coordinates.applyOffsetToArray(points);
-    return {
-      centerLine: points,
-      length: _.get(lane, 'length'),
-      successorId: _.get(lane, 'successorId'),
-      predecessorId: _.get(lane, 'predecessorId'),
-    };
+    if (offset) {
+      points = coordinates.applyOffsetToArray(points);
+    }
+    return points;
   }
-
   // id: lane id
   // totalLength: the distance from start point to the lane's end point
   // backward: direction,find forward or reverse.
@@ -698,6 +706,7 @@ export default class Map {
   // the threshold
   // successor: the direction
   // points: the points on lane
+  // if laneVector = null，means start point 0 or end point based direction
   getRoutingPoint(successor, startPoint, threshold,
     points, laneVector, coordinates, id) {
     if (successor) {
@@ -1052,12 +1061,13 @@ export default class Map {
   // the lane is within a certain threshold from the starting point
   // direction: predecessorId(in) successorId(out)
   getRangeLaneIds(startPoint, lane, threshold, direction) {
-    const laneLastPoint = getLaneLastPoint(lane);
-    if (_.isEmpty(laneLastPoint)) {
+    const laneEndPoint = (direction === 'predecessorId') ? getLaneFirstPoint(lane)
+      : getLaneLastPoint(lane);
+    if (_.isEmpty(laneEndPoint)) {
       return null;
     }
     const idsArr = [_.get(lane, 'id.id')];
-    let distance = getPointDistance(startPoint, laneLastPoint);
+    let distance = getPointDistance(startPoint, laneEndPoint);
     let nextLaneId = _.get(lane, `${direction}.0.id`);
     while (distance < threshold && nextLaneId) {
       const nextLane = _.find(this.data.lane, item => _.isEqual(_.get(item, 'id.id'), nextLaneId));
@@ -1132,22 +1142,26 @@ export default class Map {
     deadJunctionInfo.in = deadJunctionInfo.in[0];
     deadJunctionInfo.out = deadJunctionInfo.out[0];
     const laneDistanceThreshold = 20;
-    deadJunctionInfo.inStartPoint =
-      this.getPointClosestToTheJunctionOnLane(
-        deadJunctionInfo.in, deadEndJunctionPoints, coordinates);
+    deadJunctionInfo.inEndPoint = getLaneLastPoint(deadJunctionInfo.in);
     deadJunctionInfo.inLaneIds = this.getRangeLaneIds(
-      deadJunctionInfo.inStartPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');
+      deadJunctionInfo.inEndPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');
     const routingPointThreshold = 20;
-    // the distance threshold between out lane start point and the routing point
-    const outLanePoints = this.getPointsOnJunctionOutLane(
-      deadJunctionInfo.out, deadEndJunctionPoints, routingPointThreshold, coordinates);
-    if (_.isEmpty(outLanePoints)) {
+    deadJunctionInfo.outStartPoint = getLaneFirstPoint(deadJunctionInfo.out);
+    const lanePoints = this.getPointsFromLane(deadJunctionInfo.out, coordinates, false);
+    if (!_.isArray(lanePoints) || lanePoints.length < 2) {
       return null;
     }
-    deadJunctionInfo.outRoutingPoint = outLanePoints[1];
+    const routingPointInfo = this.getRoutingPoint(
+      true, deadJunctionInfo.outStartPoint, routingPointThreshold,
+      lanePoints, null, coordinates, _.get(deadJunctionInfo.out,'successorId'),
+    );
+    if (!_.isArray(routingPointInfo) || routingPointInfo.length !== 2) {
+      return null;
+    }
+    deadJunctionInfo.routingPoint = routingPointInfo[0];
     deadJunctionInfo.deadJunctionPoints = deadJunction.polygon.point;
     deadJunctionInfo.outLaneIds = this.getRangeLaneIds(
-      outLanePoints[0], deadJunctionInfo.out, laneDistanceThreshold, 'successorId');
+      deadJunctionInfo.outStartPoint, deadJunctionInfo.out, laneDistanceThreshold, 'successorId');
     deadJunctionInfo.deadJunctionId = deadJunction.id.id;
     let validDeadJunctionInfo = true;
     Object.keys(deadJunctionInfo).forEach(key => {

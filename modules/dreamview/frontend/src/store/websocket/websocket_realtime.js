@@ -447,9 +447,8 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  // requ
   sendDeadEndJunctionRoutingRequest(
-    start1, end1, start2, end2, inLaneIds, outLaneIds, junctionId, junctionPoints,
+    start1, end1, start2, end2, inLaneIds, outLaneIds, routingPoint,
   ) {
     const request = {
       type: 'SendDeadEndJunctionRoutingRequest',
@@ -459,9 +458,12 @@ export default class RealtimeWebSocketEndpoint {
       end2,
       inLaneIds,
       outLaneIds,
-      junctionPoints,
-      junctionId,
+      routingPoint,
     };
+    // construct lane way point with lane id for end1 start2
+    // are intersection point may get error lane id
+    request.end1.id = inLaneIds[0];
+    request.start2.id = outLaneIds[0];
     this.websocket.send(JSON.stringify(request));
   }
 }

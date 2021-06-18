@@ -174,8 +174,8 @@ function getPointBehind(points, p, vector) {
     }, vector) > 0);
 }
 
-export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector) {
-  let index = getPointInFrontOf(points, p, vector);
+export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector = null) {
+  let index = _.isEmpty(vector) ? 0 : getPointInFrontOf(points, p, vector);
   if (index !== -1) {
     while (index <= points.length - 1) {
       if (getPointDistance(p, points[index]) >= threshold) {
@@ -187,8 +187,8 @@ export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector
   return index;
 }
 
-export function getBehindPointIndexDistanceApart(threshold, points, p, vector) {
-  let index = getPointBehind(points, p, vector);
+export function getBehindPointIndexDistanceApart(threshold, points, p, vector = null) {
+  let index = _.isEmpty(vector) ? points.length - 1 : getPointBehind(points, p, vector);
   if (index !== -1) {
     while (index >= 0) {
       if (getPointDistance(p, points[index]) >= threshold) {
