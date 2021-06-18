@@ -29,7 +29,8 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
       planner_open_space_config_(open_space_conf) {
   max_kappa_ = std::tan(vehicle_param_.max_steer_angle() /
                         vehicle_param_.steer_ratio()) /
-               vehicle_param_.wheel_base();
+               (vehicle_param_.wheel_base() *
+                vehicle_param_.turning_radius_scale_factor());
   AINFO_IF(FLAGS_enable_parallel_hybrid_a) << "parallel REEDShepp";
 }
 

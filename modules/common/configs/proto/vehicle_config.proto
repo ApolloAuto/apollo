@@ -81,22 +81,24 @@ message VehicleParam {
   optional double steer_ratio = 16 [default = nan];
   // the distance between the front and back wheels
   optional double wheel_base = 17 [default = nan];
+  // the scale factor of minimum radius for turning for parking trajectory planning
+  optional double turning_radius_scale_factor = 18 [default = 1.0];
   // Tire effective rolling radius (vertical distance between the wheel center
   // and the ground).
-  optional double wheel_rolling_radius = 18 [default = nan];
+  optional double wheel_rolling_radius = 19 [default = nan];
 
   // minimum differentiable vehicle speed, in m/s
-  optional float max_abs_speed_when_stopped = 19 [default = nan];
+  optional float max_abs_speed_when_stopped = 20 [default = nan];
 
   // minimum value get from chassis.brake, in percentage
-  optional double brake_deadzone = 20 [default = nan];
+  optional double brake_deadzone = 21 [default = nan];
   // minimum value get from chassis.throttle, in percentage
-  optional double throttle_deadzone = 21 [default = nan];
+  optional double throttle_deadzone = 22 [default = nan];
 
   // vehicle latency parameters
-  optional LatencyParam steering_latency_param = 22;
-  optional LatencyParam throttle_latency_param = 23;
-  optional LatencyParam brake_latency_param = 24;
+  optional LatencyParam steering_latency_param = 23;
+  optional LatencyParam throttle_latency_param = 24;
+  optional LatencyParam brake_latency_param = 25;
 }
 
 message VehicleConfig {
