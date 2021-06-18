@@ -292,6 +292,8 @@ Status LonController::ComputeControlCommand(
                        lon_controller_conf.standstill_acceleration());
     ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
+    speed_pid_controller_.Reset_integral();
+    station_pid_controller_.Reset_integral();
   }
 
   double throttle_lowerbound =
