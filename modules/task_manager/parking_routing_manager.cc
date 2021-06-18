@@ -45,15 +45,16 @@ common::Status ParkingRoutingManager::Init(
 
 bool ParkingRoutingManager::SizeVerification(
         const ParkingRoutingTask& parking_routing_task) {
-    auto plot_type =
-      parking_routing_task.routing_request().parking_info().parking_space_type();
-    const auto& vehicle_config =
+  auto plot_type = parking_routing_task.routing_request()
+                       .parking_info()
+                       .parking_space_type();
+  const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
-    double ego_length = vehicle_config.vehicle_param().length();
-    double ego_width = vehicle_config.vehicle_param().width();
-    if (!has_space_ || !has_space_id_) {
-        AERROR << "No Valid park plot exits!";
-        return false;
+  double ego_length = vehicle_config.vehicle_param().length();
+  double ego_width = vehicle_config.vehicle_param().width();
+  if (!has_space_ || !has_space_id_) {
+    AERROR << "No Valid park plot exits!";
+    return false;
     }
     auto corner_point =
         parking_routing_task.routing_request().parking_info().corner_point();
