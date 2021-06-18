@@ -1145,7 +1145,7 @@ export default class Map {
     deadJunctionInfo.inEndPoint = getLaneLastPoint(deadJunctionInfo.in);
     deadJunctionInfo.inLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.inEndPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');
-    const routingPointThreshold = 20;
+    const routingPointThreshold = 10;
     deadJunctionInfo.outStartPoint = getLaneFirstPoint(deadJunctionInfo.out);
     const lanePoints = this.getPointsFromLane(deadJunctionInfo.out, coordinates, false);
     if (!_.isArray(lanePoints) || lanePoints.length < 2) {
@@ -1153,7 +1153,7 @@ export default class Map {
     }
     const routingPointInfo = this.getRoutingPoint(
       true, deadJunctionInfo.outStartPoint, routingPointThreshold,
-      lanePoints, null, coordinates, _.get(deadJunctionInfo.out,'successorId'),
+      lanePoints, null, coordinates, _.get(deadJunctionInfo.out, 'successorId'),
     );
     if (!_.isArray(routingPointInfo) || routingPointInfo.length !== 2) {
       return null;
