@@ -101,6 +101,9 @@ function generate_solibs() {
             -exec bash -c 'retrieve_so_deps "$0"' {} \
                 >> ${listing} \;
     done
+    find /usr/local/qt5/ -name "*.so" -exec bash -c 'retrieve_so_deps "$0"' {}  \
+            >> ${listing} \;
+
     cat ${listing} | sort -u
 }
 

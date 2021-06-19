@@ -15,13 +15,11 @@
 # limitations under the License.
 ###############################################################################
 
-DOCKER_USER="${USER}"
 RUNTIME_CONTAINER="apollo_runtime_standalone_${USER}"
-[ -n "${RUNTIME_STANDALONE_USER}" ] && DOCKER_USER="${RUNTIME_STANDALONE_USER}"
 
 xhost +local:root 1>/dev/null 2>&1
 
-docker exec -u "${DOCKER_USER}" \
+docker exec -u "${USER}" \
     -it "${RUNTIME_CONTAINER}" \
     /bin/bash
 

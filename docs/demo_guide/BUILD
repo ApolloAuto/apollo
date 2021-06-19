@@ -6,8 +6,14 @@ package(
 
 install(
     name = "install",
-    deps = [
-        "//modules/map/data:install",
-        "//modules/map/tools:install",
+    data = [
+        ":record_helper",
+    ],
+)
+
+filegroup(
+    name = "record_helper",
+    srcs = [
+        "record_helper.py",
     ],
 )
