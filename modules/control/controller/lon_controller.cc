@@ -218,8 +218,10 @@ Status LonController::ComputeControlCommand(
     }
   } else if (injector_->vehicle_state()->linear_velocity() <=
              lon_controller_conf.switch_speed()) {
+    station_pid_controller_.SetPID(lon_controller_conf.station_pid_conf());
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
   } else {
+    station_pid_controller_.SetPID(lon_controller_conf.station_pid_conf());
     speed_pid_controller_.SetPID(lon_controller_conf.high_speed_pid_conf());
   }
 
