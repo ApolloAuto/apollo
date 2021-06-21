@@ -58,6 +58,11 @@ double PIDController::Control(const double error, const double dt) {
   return output;
 }
 
+void PIDController::Reset_integral() {
+  integral_ = 0.0;
+  integrator_saturation_status_ = 0;
+}
+
 void PIDController::Reset() {
   previous_error_ = 0.0;
   previous_output_ = 0.0;
