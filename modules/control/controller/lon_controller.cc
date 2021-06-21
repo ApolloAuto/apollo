@@ -257,7 +257,13 @@ Status LonController::ComputeControlCommand(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
 
-  double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
+  if(chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL)
+  {
+    speed_pid_controller_.Reset_integral();
+    station_pid_controller_.Reset_integral();
+  }
+  
+  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
   if (std::isnan(slope_offset_compensation)) {
@@ -290,6 +296,8 @@ Status LonController::ComputeControlCommand(
                        lon_controller_conf.standstill_acceleration());
     ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
+    speed_pid_controller_.Reset_integral();
+    station_pid_controller_.Reset_integral();
   }
 
   double throttle_lowerbound =
