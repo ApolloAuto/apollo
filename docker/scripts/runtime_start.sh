@@ -167,7 +167,8 @@ function setup_devices_and_mount_local_volumes() {
     if $RUNTIME_STANDALONE; then
         volumes="-v ${APOLLO_ROOT_DIR}/data:/apollo/data \
                  -v ${APOLLO_ROOT_DIR}/modules/calibration/data:/apollo/modules/calibration/data \
-                 -v ${APOLLO_ROOT_DIR}/modules/map/data:/apollo/modules/map/data"
+                 -v ${APOLLO_ROOT_DIR}/modules/map/data:/apollo/modules/map/data \
+                 -v ${APOLLO_ROOT_DIR}/output:/apollo/output"
     else
         volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
     fi
