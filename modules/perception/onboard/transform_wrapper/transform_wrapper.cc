@@ -248,19 +248,34 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
                                   const std::string& child_frame_id) {
   cyber::Time query_time(timestamp);
   std::string err_string;
+  double target_time = timestamp;
+  bool look_up_flag = false;
+  apollo::transform::TransformStamped stamped_transform;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  static_cast<float>(FLAGS_obs_tf2_buff_size),
                                  &err_string)) {
-    AERROR << "Can not find transform. " << FORMAT_TIMESTAMP(timestamp)
-           << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
-           << " Error info: " << err_string;
-    return false;
+    apollo::transform::TransformStamped latest_transform =
+        tf2_buffer_->lookupTransform(frame_id, child_frame_id,
+                                     apollo::cyber::Time(0));
+    double latest_buffer_time = latest_transform.header().timestamp_sec();
+    if ((target_time - latest_buffer_time < 0.015) &&
+        (target_time - latest_buffer_time > 0)) {
+      // query_time = apollo::cyber::Time(0);
+      stamped_transform =
+          tf2_buffer_->lookupTransform(frame_id, child_frame_id, query_time);
+      look_up_flag = true;
+    } else {
+      AERROR << "Can not find transform. " << FORMAT_TIMESTAMP(timestamp)
+             << " frame_id: " << frame_id
+             << " child_frame_id: " << child_frame_id
+             << " Error info: " << err_string;
+      return false;
+    }
   }
-
-  apollo::transform::TransformStamped stamped_transform;
   try {
-    stamped_transform =
-        tf2_buffer_->lookupTransform(frame_id, child_frame_id, query_time);
+    if (!look_up_flag)
+      stamped_transform =
+          tf2_buffer_->lookupTransform(frame_id, child_frame_id, query_time);
 
     trans->translation =
         Eigen::Translation3d(stamped_transform.transform().translation().x(),
