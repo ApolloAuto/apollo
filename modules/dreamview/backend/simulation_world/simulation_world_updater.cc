@@ -38,7 +38,7 @@ using apollo::hdmap::EndWayPointFile;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;
 using apollo::task_manager::CycleRoutingTask;
-using apollo::task_manager::DeadEndJunctionRoutingTask;
+using apollo::task_manager::DeadEndRoutingTask;
 using apollo::task_manager::ParkingRoutingTask;
 using apollo::task_manager::Task;
 
@@ -177,7 +177,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         } else {
           auto task = std::make_shared<Task>();
           auto *dead_junction_routing_task =
-              task->mutable_dead_junction_routing_task();
+              task->mutable_dead_end_routing_task();
           bool succeed = ConstructDeadJunctionRoutingTask(
               result, dead_junction_routing_task);
           if (succeed) {
@@ -673,7 +673,7 @@ bool SimulationWorldUpdater::ConstructParkingRoutingTask(
 }
 
 bool SimulationWorldUpdater::ConstructDeadJunctionRoutingTask(
-    const Json &json, DeadEndJunctionRoutingTask *dead_junction_routing_task) {
+    const Json &json, DeadEndRoutingTask *dead_junction_routing_task) {
   auto *routing_request_in =
       dead_junction_routing_task->mutable_routing_request_in();
   bool succeed = ConstructRoutingRequest(json["routing1"], routing_request_in);

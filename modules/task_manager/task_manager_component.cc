@@ -69,7 +69,8 @@ bool TaskManagerComponent::Init() {
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
   task_name_ = task->task_name();
   if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING) {
+      task->task_type() != PARKING_ROUTING &&
+      task->task_type() != DEAD_END_ROUTING) {
     AERROR << "Task type is not cycle_routing or parking_routing.";
     return false;
   }
@@ -135,6 +136,13 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
       AERROR << "plot verification failed, please select suitable plot!";
       return false;
     }
+  } else if (task->task_type() == DEAD_END_ROUTING) {
+    AERROR << "enter the turn around task";
+    dead_end_routing_manager_ = std::make_shared<DeadEndRoutingManager>();
+    dead_end_routing_manager_->Init(task->dead_end_routing_task());
+    routing_request_in_ = task->dead_end_routing_task().routing_request_in();
+    common::util::FillHeader(node_->Name(), &routing_request_in_);
+    request_writer_->Write(routing_request_in_);
   }
   return true;
 }

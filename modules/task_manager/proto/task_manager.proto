@@ -22,7 +22,7 @@ message ParkingRoutingTask {
   optional apollo.routing.RoutingRequest routing_request = 2;
 } 
 
-message DeadEndJunctionRoutingTask {
+message DeadEndRoutingTask {
   optional apollo.routing.RoutingRequest routing_request_in = 2;
   optional apollo.routing.RoutingRequest routing_request_out = 3;
 }
@@ -34,6 +34,6 @@ message Task {
   oneof routing_task {
     CycleRoutingTask cycle_routing_task = 4;
     ParkingRoutingTask parking_routing_task = 5;
-    DeadEndJunctionRoutingTask dead_junction_routing_task = 6;
+    DeadEndRoutingTask dead_end_routing_task = 6;
   }
 }

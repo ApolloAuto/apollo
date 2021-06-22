@@ -120,8 +120,8 @@ class SimulationWorldUpdater {
    */
   bool ConstructDeadJunctionRoutingTask(
       const nlohmann::json &json,
-      apollo::task_manager::DeadEndJunctionRoutingTask
-          *dead_junction_routing_task);
+      apollo::task_manager::DeadEndRoutingTask
+          *dead_end_routing_task);
 
   bool ValidateCoordinate(const nlohmann::json &json);
 
