@@ -202,6 +202,7 @@ export default class RoutingEditor {
       parkingRequestPoints.push(coordinates.applyOffset(routingEndPoint, true));
       const start = (parkingRequestPoints.length > 1) ? parkingRequestPoints[0]
         : coordinates.applyOffset(carOffsetPosition, true);
+      const startHeading = (parkingRequestPoints.length > 1) ? null : carHeading;
       const end = parkingRequestPoints[parkingRequestPoints.length - 1];
       const waypoint = (parkingRequestPoints.length > 1) ? parkingRequestPoints.slice(1, -1) : [];
       this.routePoints.push(lastPoint);
@@ -215,7 +216,9 @@ export default class RoutingEditor {
         parkingPoint: coordinates.applyOffset(lastPoint.position, true),
         parkingSpaceType: type,
       };
-      WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, laneId);
+      WS.sendParkingRequest(
+        start, waypoint, end, parkingInfo, laneWidth, cornerPoints, laneId, startHeading
+      );
       return true;
     }
     const points = _.isEmpty(routingPoints) ?
