@@ -65,7 +65,10 @@ export default class AutoDrivingCar {
       return;
     }
 
-    this.mesh.position.set(position.x, position.y, 0);
+    const kTranslation = -0.8;
+    const dx = kTranslation * Math.cos(pose.heading);
+    const dy = kTranslation * Math.sin(pose.heading);
+    this.mesh.position.set(position.x + dx, position.y + dy, 0);
     this.mesh.rotation.y = pose.heading;
   }
 
