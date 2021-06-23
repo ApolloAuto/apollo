@@ -1605,45 +1605,52 @@
                     "default": null
                   }
                 },
-                "wheelRollingRadius": {
+                "turningRadiusScaleFactor": {
                   "type": "double",
                   "id": 18,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "wheelRollingRadius": {
+                  "type": "double",
+                  "id": 19,
                   "options": {
                     "default": null
                   }
                 },
                 "maxAbsSpeedWhenStopped": {
                   "type": "float",
-                  "id": 19,
+                  "id": 20,
                   "options": {
                     "default": null
                   }
                 },
                 "brakeDeadzone": {
                   "type": "double",
-                  "id": 20,
+                  "id": 21,
                   "options": {
                     "default": null
                   }
                 },
                 "throttleDeadzone": {
                   "type": "double",
-                  "id": 21,
+                  "id": 22,
                   "options": {
                     "default": null
                   }
                 },
                 "steeringLatencyParam": {
                   "type": "LatencyParam",
-                  "id": 22
+                  "id": 23
                 },
                 "throttleLatencyParam": {
                   "type": "LatencyParam",
-                  "id": 23
+                  "id": 24
                 },
                 "brakeLatencyParam": {
                   "type": "LatencyParam",
-                  "id": 24
+                  "id": 25
                 }
               }
             },
