@@ -63,10 +63,10 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       const FusionCameraDetectionComponent&) = delete;
 
   bool Init() override;
-
- private:
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
                       const std::string& camera_name);
+
+ private:
   int InitConfig();
   int InitSensorInfo();
   int InitAlgorithmPlugin();
