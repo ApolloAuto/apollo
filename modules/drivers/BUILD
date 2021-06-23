@@ -23,10 +23,11 @@ install_files(
     name = "pb_drivers",
     dest = "modules/drivers",
     files = [
+        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
+        "//modules/drivers/gnss/proto:ins_py_pb2",
         "//modules/drivers/proto:conti_radar_py_pb2",
         "//modules/drivers/proto:pointcloud_py_pb2",
         "//modules/drivers/proto:sensor_image_py_pb2",
         "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_py_pb2",
-        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
     ],
 )
