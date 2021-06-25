@@ -86,7 +86,7 @@ class MSFLocalization {
                                 double *uncertainty_z);
   bool LoadImuVehicleExtrinsic(const std::string &file_path, double *quat_qx,
                                double *quat_qy, double *quat_qz,
-                               double *quat_qw);
+                               double *quat_qw, Eigen::Vector3d &translation);
   bool LoadZoneIdFromFolder(const std::string &folder_path, int *zone_id);
   void CompensateImuVehicleExtrinsic(LocalizationEstimate *local_result);
 
@@ -101,6 +101,7 @@ class MSFLocalization {
 
   // rotation from the vehicle coord to imu coord
   Eigen::Quaternion<double> imu_vehicle_quat_;
+  Eigen::Vector3d imu_vehicle_translation_;
 
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
   std::shared_ptr<drivers::gnss::Imu> raw_imu_msg_;
