@@ -19,8 +19,8 @@
 #include <string>
 #include <thread>
 
-#include "modules/drivers/lidar/proto/velodyne.pb.h"
-#include "modules/drivers/lidar/proto/velodyne_config.pb.h"
+#include "modules/drivers/lidar/velodyne/proto/config.pb.h"
+#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/velodyne/driver/driver.h"
@@ -36,13 +36,14 @@ using apollo::drivers::velodyne::VelodyneScan;
 
 class VelodyneDriverComponent : public Component<> {
  public:
-  ~VelodyneDriverComponent() {}
+  ~VelodyneDriverComponent();
   bool Init() override;
 
  private:
-  volatile bool runing_;  ///< device thread is running
-  uint32_t seq_ = 0;
-  std::shared_ptr<VelodyneDriver> dvr_;  ///< driver implementation class
+  void device_poll();
+  std::shared_ptr<std::thread> device_thread_;
+  std::shared_ptr<VelodyneDriver> driver_;  ///< driver implementation class
+  std::shared_ptr<apollo::cyber::Writer<VelodyneScan>> writer_;
 };
 
 CYBER_REGISTER_COMPONENT(VelodyneDriverComponent)

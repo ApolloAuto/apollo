@@ -68,10 +68,9 @@ bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
       static_cast<uint16_t>((bytes[time_field_index + 4] - '0') * 10 +
                             (bytes[time_field_index + 5] - '0'));
 
-  if (nmea_time->year < 0 || nmea_time->year > 99 || nmea_time->mon > 12 ||
-      nmea_time->mon < 1 || nmea_time->day > 31 || nmea_time->day < 1 ||
-      nmea_time->hour > 23 || nmea_time->hour < 0 || nmea_time->min > 59 ||
-      nmea_time->min < 0 || nmea_time->sec > 59 || nmea_time->sec < 0) {
+  if (nmea_time->year > 99 || nmea_time->mon > 12 || nmea_time->mon < 1 ||
+      nmea_time->day > 31 || nmea_time->day < 1 || nmea_time->hour > 23 ||
+      nmea_time->min > 59 || nmea_time->sec > 59) {
     AERROR << "Invalid GPS time:  " << nmea_time->year << "-" << nmea_time->mon
            << "-" << nmea_time->day << " " << nmea_time->hour << ":"
            << nmea_time->min << ":" << nmea_time->sec

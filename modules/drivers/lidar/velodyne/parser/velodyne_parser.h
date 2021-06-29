@@ -59,13 +59,12 @@
 
 #include <boost/format.hpp>
 
-#include "modules/drivers/lidar/proto/velodyne.pb.h"
-#include "modules/drivers/lidar/proto/velodyne_config.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
-
 #include "modules/drivers/lidar/velodyne/parser/calibration.h"
 #include "modules/drivers/lidar/velodyne/parser/const_variables.h"
 #include "modules/drivers/lidar/velodyne/parser/online_calibration.h"
+#include "modules/drivers/lidar/velodyne/proto/config.pb.h"
+#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -259,7 +258,6 @@ class VelodyneParser {
   bool need_two_pt_correction_;
   Mode mode_;
 
-  PointXYZIT get_nan_point(uint64_t timestamp);
   void init_angle_params(double view_direction, double view_width);
   /**
    * \brief Compute coords with the data in block

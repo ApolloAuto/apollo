@@ -23,8 +23,8 @@
 #include <thread>
 #include <vector>
 
-#include "modules/drivers/lidar/proto/hesai_config.pb.h"
-#include "modules/drivers/lidar/proto/hesai.pb.h"
+#include "modules/drivers/lidar/hesai/proto/config.pb.h"
+#include "modules/drivers/lidar/hesai/proto/hesai.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 
 #include "cyber/cyber.h"

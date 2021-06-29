@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.drivers.velodyne;
 
-import "modules/drivers/lidar/proto/velodyne.proto";
+import "modules/drivers/lidar/velodyne/proto/velodyne.proto";
 
 message Config {
   optional string frame_id = 1;

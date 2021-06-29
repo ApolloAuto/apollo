@@ -22,8 +22,7 @@
 
 #include "cyber/cyber.h"
 
-// #include "velodyne_msgs/VelodyneScanUnified.h"
-#include "modules/drivers/lidar/proto/velodyne.pb.h"
+#include "modules/drivers/lidar/velodyne/proto/velodyne.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -31,7 +30,6 @@ namespace velodyne {
 
 static const size_t FIRING_DATA_PACKET_SIZE = 1206;
 static const size_t POSITIONING_DATA_PACKET_SIZE = 512;
-static const size_t ETHERNET_HEADER_SIZE = 42;
 static const int SOCKET_TIMEOUT = -2;
 static const int RECEIVE_FAIL = -3;
 
@@ -45,18 +43,15 @@ struct NMEATime {
 };
 typedef std::shared_ptr<NMEATime> NMEATimePtr;
 
-/** @brief Pure virtual Velodyne input base class */
 class Input {
  public:
   Input() {}
   virtual ~Input() {}
 
-  /** @brief Read one Velodyne packet.
-   *
+  /**
+   * @brief Read one Velodyne packet.
    * @param pkt points to VelodynePacket message
-   *
-   * @returns 0 if successful,
-   *          -1 if end of file
+   * @returns 0 if successful, -1 if EOF encountered,
    *          > 0 if incomplete packet (is this possible?)
    */
   virtual int get_firing_data_packet(VelodynePacket* pkt) = 0;

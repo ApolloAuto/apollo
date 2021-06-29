@@ -32,6 +32,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cerrno>
+#include <cstring>
 
 #include "modules/drivers/lidar/velodyne/driver/socket_input.h"
 
@@ -59,7 +60,7 @@ void SocketInput::init(const int &port) {
   }
 
   // connect to Velodyne UDP port
-  AINFO << "Opening UDP socket: port " << uint16_t(port);
+  AINFO << "Opening UDP socket: port " << port;
   port_ = port;
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -73,16 +74,15 @@ void SocketInput::init(const int &port) {
   my_addr.sin_family = AF_INET;              // host byte order
   my_addr.sin_port = htons(uint16_t(port));  // short, in network byte order
   my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
-  //    my_addr.sin_addr.s_addr = inet_addr("192.168.1.100");
 
   if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr), sizeof(sockaddr)) ==
       -1) {
-    AERROR << "Socket bind failed! Port " << port_;
+    AERROR << "Error binding to socket: " << std::strerror(errno) << ", port=" << port;
     return;
   }
 
   if (fcntl(sockfd_, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
-    AERROR << "non-block! Port " << port_;
+    AERROR << "Error setting socket to non-block: " << std::strerror(errno) << ", port=" << port_;
     return;
   }
 
@@ -91,7 +91,6 @@ void SocketInput::init(const int &port) {
 
 /** @brief Get one velodyne packet. */
 int SocketInput::get_firing_data_packet(VelodynePacket *pkt) {
-  // double time1 = ros::Time::now().toSec();
   double time1 = apollo::cyber::Time().Now().ToSecond();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {

@@ -25,11 +25,6 @@ bool HesaiDriver::Init() {
     AERROR << "node is nullptr";
     return false;
   }
-  Parser* hesai_parser = ParserFactory::CreateParser(node_, conf_);
-  if (hesai_parser == nullptr) {
-    AERROR << "create parser error";
-  }
-  parser_.reset(hesai_parser);
   scan_writer_ = node_->CreateWriter<HesaiScan>(conf_.scan_channel());
   if (scan_writer_ == nullptr) {
     AERROR << "writer:" << conf_.scan_channel()
