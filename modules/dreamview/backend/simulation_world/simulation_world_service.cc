@@ -328,9 +328,9 @@ void SimulationWorldService::InitWriters() {
     // reliable transfer
     qos->set_reliability(
         apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-    // when writer find new readers, send all its history messsage
+    // Don't send the history message when new readers are found.
     qos->set_durability(
-        apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
+        apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_SYSTEM_DEFAULT);
     routing_request_writer_ =
         node_->CreateWriter<RoutingRequest>(routing_request_attr);
   }
