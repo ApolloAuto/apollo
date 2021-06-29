@@ -395,20 +395,19 @@ bool MSFLocalization::LoadImuVehicleExtrinsic(const std::string &file_path,
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
     if (config["transform"]["rotation"]) {
-        *quat_qx = config["transform"]["rotation"]["x"].as<double>();
-        *quat_qy = config["transform"]["rotation"]["y"].as<double>();
-        *quat_qz = config["transform"]["rotation"]["z"].as<double>();
-        *quat_qw = config["transform"]["rotation"]["w"].as<double>();
-      }
-      else {
-        return false;
-      }
-      if (config["transform"]["translation"]) {
-        translation[0] = config["transform"]["translation"]["x"].as<double>();
-        translation[1] = config["transform"]["translation"]["y"].as<double>();
-        translation[2] = config["transform"]["translation"]["z"].as<double>();
-        return true;
-      }
+      *quat_qx = config["transform"]["rotation"]["x"].as<double>();
+      *quat_qy = config["transform"]["rotation"]["y"].as<double>();
+      *quat_qz = config["transform"]["rotation"]["z"].as<double>();
+      *quat_qw = config["transform"]["rotation"]["w"].as<double>();
+    } else {
+      return false;
+    }
+    if (config["transform"]["translation"]) {
+      translation[0] = config["transform"]["translation"]["x"].as<double>();
+      translation[1] = config["transform"]["translation"]["y"].as<double>();
+      translation[2] = config["transform"]["translation"]["z"].as<double>();
+      return true;
+    }
   }
   return false;
 }
