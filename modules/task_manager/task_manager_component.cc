@@ -61,8 +61,9 @@ bool TaskManagerComponent::Init() {
   qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_reliability(
       apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+  // Don't send the history message when new readers are found.
   qos->set_durability(
-      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
+      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_SYSTEM_DEFAULT);
   request_writer_ = node_->CreateWriter<RoutingRequest>(attr);
   return true;
 }
