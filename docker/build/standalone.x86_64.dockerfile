@@ -10,8 +10,6 @@ FROM ${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-la
 
 FROM ${BASE_IMAGE}
 
-ENV PYTHONPATH /apollo:$PYTHONPATH
-
 COPY output /apollo
 
 COPY --from=apollo_audio_volume \
@@ -29,13 +27,3 @@ COPY --from=apollo_faster_rcnn_volume \
 COPY --from=apollo_smoke_volume \
     /apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector \
     /apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector
-
-RUN mkdir -p /apollo/bazel-bin \
-    && ln -s /apollo/cyber /apollo/bazel-bin/cyber \
-    && ln -s /apollo/modules /apollo/bazel-bin/modules
-
-WORKDIR /apollo
-RUN touch __init__.py && \
-    for DIR in $(find cyber modules -type d); do \
-      touch $DIR/__init__.py; \
-    done
