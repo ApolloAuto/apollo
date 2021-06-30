@@ -1,0 +1,47 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message CNNSegParam {
+  // for cnnseg algorithm
+  optional string model_type = 1 [default = "CaffeNet"];
+  optional NetworkParam network_param = 2;
+  optional FeatureParam feature_param = 3;
+  optional bool do_classification = 4 [default = true];
+  optional bool do_heading = 5 [default = true];
+  optional uint32 gpu_id = 6 [default = 0];
+
+  // for method SppEngine
+  optional string ground_detector = 7
+      [default = "SpatioTemporalGroundDetector"];
+  optional string roi_filter = 8 [default = "HdmapROIFilter"];
+  optional bool remove_ground_points = 9 [default = false];
+
+  // for both clustering methods
+  optional float objectness_thresh = 10 [default = 0.5];
+  optional float confidence_thresh = 11 [default = 0.1];
+  optional float height_thresh = 12 [default = 0.5];
+  optional uint32 min_pts_num = 13 [default = 3];
+  optional float confidence_range = 14 [default = 60];
+}
+
+message NetworkParam {
+  optional string instance_pt_blob = 1 [default = "instance_pt"];
+  optional string category_pt_blob = 2 [default = "category_score"];
+  optional string confidence_pt_blob = 3 [default = "confidence_score"];
+  optional string height_pt_blob = 4 [default = "height_pt"];
+  optional string class_pt_blob = 5 [default = "class_score"];
+  optional string heading_pt_blob = 6 [default = "heading_pt"];
+  optional string feature_blob = 7 [default = "data"];
+}
+
+message FeatureParam {
+  optional float point_cloud_range = 1 [default = 60.0];
+  optional uint32 width = 2 [default = 512];
+  optional uint32 height = 3 [default = 512];
+
+  optional float min_height = 4 [default = -5.0];
+  optional float max_height = 5 [default = 5.0];
+
+  optional bool use_intensity_feature = 6 [default = true];
+  optional bool use_constant_feature = 7 [default = true];
+}

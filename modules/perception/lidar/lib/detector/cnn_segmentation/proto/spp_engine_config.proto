@@ -1,0 +1,6 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message SppEngineConfig {
+  optional float height_gap = 8 [default = 0.5];
+}
