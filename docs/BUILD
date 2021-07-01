@@ -15,6 +15,5 @@ filegroup(
     name = "run_files",
     srcs = glob([
         "demo_guide/*.py",
-        "Apollo_Fuel/examples/**",
     ]),
 )
