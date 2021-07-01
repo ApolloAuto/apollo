@@ -31,7 +31,7 @@ bool LidarDriverComponent::Init() {
   AINFO << "conf:" << conf_.DebugString();
   LidarDriverFactory::Instance()->RegisterLidarClients();
   driver_ = LidarDriverFactory::Instance()->CreateLidarDriver(node_, conf_);
-  if (!driver_->Init()) {
+  if (driver_ == nullptr || !driver_->Init()) {
     AERROR << "driver init error";
     return false;
   }
