@@ -22,7 +22,6 @@ filegroup(
     srcs = [
         "rtk_player.sh",
         "rtk_recorder.sh",
-        "extract_data.sh",
     ],
 )
 

@@ -16,10 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 
 TARGET_DIR="${TOP_DIR}/output/sensor_calibration"
-TEMPLATE_DIR="${TOP_DIR}/docs/Apollo_Fuel/examples/sensor_calibration"
+TEMPLATE_DIR="${TOP_DIR}/modules/tools/sensor_calibration/template"
 DEFAULT_RECORD_DIR="${TOP_DIR}/data/bag"
 
 TASK=""
