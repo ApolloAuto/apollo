@@ -45,6 +45,13 @@ enum ATTRIBUTE_TYPE {
   CROSSWALK,
 };
 
+enum BOUNDARY_TYPE {
+  UNKNOW,
+  NORMAL,
+  LEFT_BOUNDARY,
+  RIGHT_BOUNDARY,
+};
+
 class VectorNet {
  public:
   VectorNet() = default;
@@ -59,17 +66,24 @@ class VectorNet {
 
  private:
   // TODO(Yiqun): 1.Left/Right boundary 2.Ordinal Encoding
-  const std::map<ATTRIBUTE_TYPE, std::vector<double>> attribute_map{
-    {ROAD, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {LANE_UNKOWN, {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {LANE_DOTTED_YELLOW, {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {LANE_DOTTED_WHITE, {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}},
-    {LANE_SOLID_YELLOW, {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}},
-    {LANE_SOLID_WHITE, {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}},
-    {LANE_DOUBLE_YELLOW, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0}},
-    {LANE_CURB, {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}},
-    {JUNCTION, {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}},
-    {CROSSWALK, {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}},
+  const std::map<ATTRIBUTE_TYPE, double> attribute_map{
+    {ROAD, 0.0},
+    {LANE_UNKOWN, 1.0},
+    {LANE_DOTTED_YELLOW, 2.0},
+    {LANE_DOTTED_WHITE, 3.0},
+    {LANE_SOLID_YELLOW, 4.0},
+    {LANE_SOLID_WHITE, 5.0},
+    {LANE_DOUBLE_YELLOW, 6.0},
+    {LANE_CURB, 7.0},
+    {JUNCTION, 8.0},
+    {CROSSWALK, 9.0},
+  };
+
+  const std::map<BOUNDARY_TYPE, double> boundary_map{
+    {UNKNOW, 0.0},
+    {NORMAL, 1.0},
+    {LEFT_BOUNDARY, 2.0},
+    {RIGHT_BOUNDARY, 3.0},
   };
 
   const std::map<hdmap::LaneBoundaryType::Type, ATTRIBUTE_TYPE> lane_attr_map{
@@ -85,8 +99,8 @@ class VectorNet {
   template <typename Points>
   void GetOnePolyline(const Points& points, double *start_length,
                      const common::PointENU& center_point,
-                     const double obstacle_phi,
-                     ATTRIBUTE_TYPE attr_type, const int count,
+                     const double obstacle_phi, ATTRIBUTE_TYPE attr_type,
+                     BOUNDARY_TYPE bound_type, const int count,
                      std::vector<std::vector<double>>* const one_polyline,
                      std::vector<double>* const one_p_id);
 

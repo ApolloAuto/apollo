@@ -29,8 +29,8 @@ template <typename Points>
 void VectorNet::GetOnePolyline(
                           const Points& points, double *start_length,
                           const common::PointENU& center_point,
-                          const double obstacle_phi,
-                          ATTRIBUTE_TYPE attr_type, const int count,
+                          const double obstacle_phi, ATTRIBUTE_TYPE attr_type,
+                          BOUNDARY_TYPE bound_type, const int count,
                           std::vector<std::vector<double>>* const one_polyline,
                           std::vector<double>* const one_p_id) {
   size_t size = points.size();
@@ -68,7 +68,8 @@ void VectorNet::GetOnePolyline(
 
   *start_length = cur_length - s[size - 1];
   if (point_size == 0) return;
-  const std::vector<double>& attr = attribute_map.at(attr_type);
+  const double attr = attribute_map.at(attr_type);
+  const double bound = boundary_map.at(bound_type);
   auto last_point_after_rotate = common::math::RotateVector2d(
     {x[0] - center_point.x(), y[0] - center_point.y()},
     M_PI_2 - obstacle_phi);
@@ -96,7 +97,7 @@ void VectorNet::GetOnePolyline(
     last_point_after_rotate = std::move(point_after_rotate);
 
     // attribute
-    one_vector.insert(one_vector.end(), attr.begin(), attr.end());
+    one_vector.insert(one_vector.end(), {0.0, 0.0, attr, bound});
 
     one_vector.push_back(count);
     one_polyline->push_back(std::move(one_vector));
@@ -164,10 +165,21 @@ void VectorNet::GetRoads(const common::PointENU& center_point,
         std::vector<double> one_p_id{std::numeric_limits<float>::max(),
                                      std::numeric_limits<float>::max()};
         double start_length = 0;
+        BOUNDARY_TYPE bound_type = UNKNOW;
+        if (edge.type() == hdmap::BoundaryEdge::LEFT_BOUNDARY) {
+          bound_type = LEFT_BOUNDARY;
+        } else if (edge.type() == hdmap::BoundaryEdge::RIGHT_BOUNDARY) {
+          bound_type = RIGHT_BOUNDARY;
+        } else if (edge.type() == hdmap::BoundaryEdge::NORMAL) {
+          bound_type = NORMAL;
+        } else {
+          bound_type = UNKNOW;
+        }
+
         for (const auto& segment : edge.curve().segment()) {
           GetOnePolyline(segment.line_segment().point(), &start_length,
-                         center_point, obstacle_phi, ROAD, count_,
-                         &one_polyline, &one_p_id);
+                         center_point, obstacle_phi, ROAD, bound_type,
+                         count_, &one_polyline, &one_p_id);
         }
         if (one_polyline.size() == 0) continue;
 
@@ -242,7 +254,7 @@ void VectorNet::GetLanes(const common::PointENU& center_point,
           lane->lane().left_boundary().boundary_type(0).types(0);
         GetOnePolyline(segment.line_segment().point(), &start_length,
                        center_point, obstacle_phi, lane_attr_map.at(bound_type),
-                       count_, &left_polyline, &left_p_id);
+                       LEFT_BOUNDARY, count_, &left_polyline, &left_p_id);
       }
     }
 
@@ -264,7 +276,7 @@ void VectorNet::GetLanes(const common::PointENU& center_point,
           lane->lane().left_boundary().boundary_type(0).types(0);
         GetOnePolyline(segment.line_segment().point(), &start_length,
                        center_point, obstacle_phi, lane_attr_map.at(bound_type),
-                       count_, &right_polyline, &right_p_id);
+                       RIGHT_BOUNDARY, count_, &right_polyline, &right_p_id);
       }
     }
 
@@ -288,7 +300,7 @@ void VectorNet::GetJunctions(const common::PointENU& center_point,
                                  std::numeric_limits<float>::max()};
     double start_length = 0;
     GetOnePolyline(junction->junction().polygon().point(), &start_length,
-                   center_point, obstacle_phi, JUNCTION, count_,
+                   center_point, obstacle_phi, JUNCTION, UNKNOW, count_,
                    &one_polyline, &one_p_id);
 
     feature_ptr->push_back(std::move(one_polyline));
@@ -310,7 +322,7 @@ void VectorNet::GetCrosswalks(const common::PointENU& center_point,
                                  std::numeric_limits<float>::max()};
     double start_length = 0;
     GetOnePolyline(crosswalk->crosswalk().polygon().point(), &start_length,
-                   center_point, obstacle_phi, CROSSWALK, count_,
+                   center_point, obstacle_phi, CROSSWALK, UNKNOW, count_,
                    &one_polyline, &one_p_id);
 
     feature_ptr->push_back(std::move(one_polyline));
