@@ -205,10 +205,10 @@ export default class RosWebSocketEndpoint {
         this.updatePOI = true;
     }
 
-    changeVehicle(vehcile) {
+    changeVehicle(vehicle) {
         this.websocket.send(JSON.stringify({
             type: "ChangeVehicle",
-            new_vehicle: vehcile,
+            new_vehicle: vehicle,
         }));
     }
 
