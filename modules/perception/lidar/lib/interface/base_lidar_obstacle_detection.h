@@ -47,16 +47,18 @@ class BaseLidarObstacleDetection {
   BaseLidarObstacleDetection() = default;
   virtual ~BaseLidarObstacleDetection() = default;
 
-  virtual bool Init(const LidarObstacleDetectionInitOptions& options =
-                LidarObstacleDetectionInitOptions()) = 0;
+  virtual bool Init(
+      const LidarObstacleDetectionInitOptions& options =
+      LidarObstacleDetectionInitOptions()) = 0;
 
   virtual LidarProcessResult Process(
       const LidarObstacleDetectionOptions& options,
       const std::shared_ptr<apollo::drivers::PointCloud const>& message,
       LidarFrame* frame) = 0;
 
-  virtual LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
-                             LidarFrame* frame) = 0;
+  virtual LidarProcessResult Process(
+      const LidarObstacleDetectionOptions& options,
+      LidarFrame* frame) = 0;
 
   virtual std::string Name() const = 0;
 

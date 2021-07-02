@@ -40,16 +40,18 @@ class BaseLidarObstacleTracking {
   BaseLidarObstacleTracking() = default;
   virtual ~BaseLidarObstacleTracking() = default;
 
-  virtual bool Init(const LidarObstacleTrackingInitOptions& options =
-                LidarObstacleTrackingInitOptions()) = 0;
+  virtual bool Init(
+            const LidarObstacleTrackingInitOptions& options =
+            LidarObstacleTrackingInitOptions()) = 0;
 
-  virtual LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
-                             LidarFrame* frame) = 0;
+  virtual LidarProcessResult Process(
+            const LidarObstacleTrackingOptions& options,
+            LidarFrame* frame) = 0;
 
   virtual std::string Name() const  = 0;
 
  private:
- DISALLOW_COPY_AND_ASSIGN(BaseLidarObstacleTracking);
+  DISALLOW_COPY_AND_ASSIGN(BaseLidarObstacleTracking);
 };  // class BaseLidarObstacleTracking
 
 PERCEPTION_REGISTER_REGISTERER(BaseLidarObstacleTracking);

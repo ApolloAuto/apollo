@@ -45,18 +45,21 @@ bool LidarObstacleTracking::Init(
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   BaseMultiTargetTracker* multi_target_tracker =
-      BaseMultiTargetTrackerRegisterer::GetInstanceByName(config.multi_target_tracker());
+      BaseMultiTargetTrackerRegisterer::
+      GetInstanceByName(config.multi_target_tracker());
   CHECK_NOTNULL(multi_target_tracker);
   multi_target_tracker_.reset(multi_target_tracker);
   MultiTargetTrackerInitOptions tracker_init_options;
-  ACHECK(multi_target_tracker_->Init(tracker_init_options)) << "lidar multi_target_tracker init error";
+  ACHECK(multi_target_tracker_->Init(tracker_init_options)) <<
+                              "lidar multi_target_tracker init error";
 
   BaseClassifier* fusion_classifier =
       BaseClassifierRegisterer::GetInstanceByName(config.fusion_classifier());
   CHECK_NOTNULL(fusion_classifier);
   fusion_classifier_.reset(fusion_classifier);
   ClassifierInitOptions fusion_classifier_init_options;
-  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options)) << "lidar classifier init error";
+  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options)) <<
+                              "lidar classifier init error";
   return true;
 }
 

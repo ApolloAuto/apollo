@@ -62,12 +62,14 @@ bool LidarObstacleDetection::Init(
   }
 
   BasePointCloudPreprocessor* preprocessor =
-      BasePointCloudPreprocessorRegisterer::GetInstanceByName(config.preprocessor());
+      BasePointCloudPreprocessorRegisterer::
+      GetInstanceByName(config.preprocessor());
   CHECK_NOTNULL(preprocessor);
   cloud_preprocessor_.reset(preprocessor);
   PointCloudPreprocessorInitOptions preprocessor_init_options;
   preprocessor_init_options.sensor_name = sensor_name;
-  ACHECK(cloud_preprocessor_->Init(preprocessor_init_options)) << "lidar preprocessor init error";
+  ACHECK(cloud_preprocessor_->Init(preprocessor_init_options)) <<
+                            "lidar preprocessor init error";
 
   BaseLidarDetector* detector =
       BaseLidarDetectorRegisterer::GetInstanceByName(config.detector());
@@ -75,9 +77,10 @@ bool LidarObstacleDetection::Init(
   detector_.reset(detector);
   LidarDetectorInitOptions detection_init_options;
   detection_init_options.sensor_name = sensor_name;
-  ACHECK(detector_->Init(detection_init_options)) << "lidar detector init error";
+  ACHECK(detector_->Init(detection_init_options)) <<
+                            "lidar detector init error";
 
-  if(use_object_builder_) {
+  if (use_object_builder_) {
     ObjectBuilderInitOptions builder_init_options;
     ACHECK(builder_.Init(builder_init_options));
   }

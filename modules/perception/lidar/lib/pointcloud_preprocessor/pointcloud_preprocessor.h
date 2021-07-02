@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <string>
 #include <memory>
 
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
