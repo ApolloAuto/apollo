@@ -38,7 +38,8 @@ class PointPillarsDetection : public BaseLidarDetector {
   PointPillarsDetection();
   virtual ~PointPillarsDetection() = default;
 
-  bool Init(const LidarDetectorInitOptions& options = LidarDetectorInitOptions()) override;
+  bool Init(const LidarDetectorInitOptions& options =
+                LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
