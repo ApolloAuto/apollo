@@ -125,6 +125,22 @@ TEST(BoundedQueueTest, block_wait) {
   t.join();
 }
 
+TEST(BoundedQueueTest, block_wait_enqueue) {
+  BoundedQueue<int> queue;
+  queue.Init(2, new BlockWaitStrategy());
+  queue.WaitEnqueue(100);
+  queue.WaitEnqueue(98);
+  std::thread t([&]() {
+    int value = 0;
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    queue.Dequeue(&value);
+    EXPECT_EQ(100, value);
+  });
+  queue.WaitEnqueue(100);
+  EXPECT_EQ(2, queue.Size());
+  t.join();
+}
+
 TEST(BoundedQueueTest, yield_wait) {
   BoundedQueue<int> queue;
   queue.Init(100, new YieldWaitStrategy());
