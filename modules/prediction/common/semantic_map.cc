@@ -132,7 +132,7 @@ void SemanticMap::DrawRoads(const common::PointENU& center_point,
   std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
   apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point, 141.4, &roads);
   for (const auto& road : roads) {
-    for (const auto& section : road->road().section()) {
+    for (const auto& section : road->inner_object().section()) {
       std::vector<cv::Point> polygon;
       for (const auto& edge : section.boundary().outer_polygon().edge()) {
         if (edge.type() == 2) {  // left edge
@@ -167,7 +167,7 @@ void SemanticMap::DrawJunctions(const common::PointENU& center_point,
                                                    &junctions);
   for (const auto& junction : junctions) {
     std::vector<cv::Point> polygon;
-    for (const auto& point : junction->junction().polygon().point()) {
+    for (const auto& point : junction->inner_object().polygon().point()) {
       polygon.push_back(
           std::move(GetTransPoint(point.x(), point.y(), base_x, base_y)));
     }
@@ -185,7 +185,7 @@ void SemanticMap::DrawCrosswalks(const common::PointENU& center_point,
                                                     &crosswalks);
   for (const auto& crosswalk : crosswalks) {
     std::vector<cv::Point> polygon;
-    for (const auto& point : crosswalk->crosswalk().polygon().point()) {
+    for (const auto& point : crosswalk->inner_object().polygon().point()) {
       polygon.push_back(
           std::move(GetTransPoint(point.x(), point.y(), base_x, base_y)));
     }
@@ -202,7 +202,7 @@ void SemanticMap::DrawLanes(const common::PointENU& center_point,
   apollo::hdmap::HDMapUtil::BaseMap().GetLanes(center_point, 141.4, &lanes);
   for (const auto& lane : lanes) {
     // Draw lane_central first
-    for (const auto& segment : lane->lane().central_curve().segment()) {
+    for (const auto& segment : lane->inner_object().central_curve().segment()) {
       for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
         const auto& p0 =
             GetTransPoint(segment.line_segment().point(i).x(),
@@ -227,12 +227,13 @@ void SemanticMap::DrawLanes(const common::PointENU& center_point,
       }
     }
     // Not drawing boundary for virtual city_driving lane
-    if (lane->lane().type() == 2 && lane->lane().left_boundary().virtual_() &&
-        lane->lane().right_boundary().virtual_()) {
+    const auto& raw_lane = lane->inner_object();
+    if (raw_lane.type() == 2 && raw_lane.left_boundary().virtual_() &&
+        raw_lane.right_boundary().virtual_()) {
       continue;
     }
     // Draw lane's left_boundary
-    for (const auto& segment : lane->lane().left_boundary().curve().segment()) {
+    for (const auto& segment : raw_lane.left_boundary().curve().segment()) {
       for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
         const auto& p0 =
             GetTransPoint(segment.line_segment().point(i).x(),
@@ -245,7 +246,7 @@ void SemanticMap::DrawLanes(const common::PointENU& center_point,
     }
     // Draw lane's right_boundary
     for (const auto& segment :
-         lane->lane().right_boundary().curve().segment()) {
+         lane->inner_object().right_boundary().curve().segment()) {
       for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
         const auto& p0 =
             GetTransPoint(segment.line_segment().point(i).x(),

@@ -1230,10 +1230,11 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
       LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
                   nearest_lane->accumulate_s().back());
   std::vector<LaneSegment> segments_vector;
-  int next_lanes_num = nearest_lane->lane().successor_id_size();
+  const auto &nearest_raw_lane = nearest_lane->inner_object();
+  int next_lanes_num = nearest_raw_lane.successor_id_size();
   if (next_lanes_num != 0) {
     for (int i = 0; i < next_lanes_num; ++i) {
-      auto next_lane_id = nearest_lane->lane().successor_id(i);
+      auto next_lane_id = nearest_raw_lane.successor_id(i);
       segments_vector.push_back(nearest_lanesegment);
       auto next_lane = hdmap_->GetLaneById(next_lane_id);
       LaneSegment next_lanesegment =

@@ -811,8 +811,8 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
       continue;
     }
     speed_limit_found = true;
-    speed_limit =
-        std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
+    speed_limit = std::fmin(lane_waypoint.lane->inner_object().speed_limit(),
+                            speed_limit);
   }
 
   if (!speed_limit_found) {

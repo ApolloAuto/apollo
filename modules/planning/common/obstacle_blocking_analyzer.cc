@@ -223,7 +223,7 @@ bool IsParkedVehicle(const ReferenceLine& reference_line,
       std::min(obstacle_box.width(), obstacle_box.length()), &lanes);
   bool is_on_parking_lane = false;
   if (lanes.size() == 1 &&
-      lanes.front()->lane().type() == apollo::hdmap::Lane::PARKING) {
+      lanes.front()->inner_object().type() == apollo::hdmap::Lane::PARKING) {
     is_on_parking_lane = true;
   }
 

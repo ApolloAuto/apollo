@@ -18,10 +18,13 @@
 
 #include <string>
 
-#include "absl/strings/str_cat.h"
 #include "gtest/gtest.h"
-#include "modules/map/hdmap/hdmap.h"
+
+#include "absl/strings/str_cat.h"
+
 #include "modules/routing/proto/routing.pb.h"
+
+#include "modules/map/hdmap/hdmap.h"
 
 using Point = apollo::common::PointENU;
 using AABox2d = apollo::common::math::AABox2d;
@@ -819,7 +822,7 @@ TEST(TestSuite, lane_info) {
   // LaneInfo lane_info(lane);
   LaneInfoConstPtr lane_info(new LaneInfo(lane));
   EXPECT_EQ("test-id", lane_info->id().id());
-  EXPECT_EQ("test-id", lane_info->lane().id().id());
+  EXPECT_EQ("test-id", lane_info->inner_object().id().id());
   EXPECT_EQ(6, lane_info->points().size());
   EXPECT_EQ(5, lane_info->segments().size());
   EXPECT_EQ(6, lane_info->accumulate_s().size());

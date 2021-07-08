@@ -354,11 +354,11 @@ bool FindAllRoadId(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
   result_id_set->insert(start_laneinfo->road_id().id());
   ::apollo::hdmap::LaneInfoConstPtr start_laneinfo_tmp = start_laneinfo;
   while (true) {
-    if (0 == start_laneinfo_tmp->lane().successor_id_size()) {
+    if (0 == start_laneinfo_tmp->inner_object().successor_id_size()) {
       AINFO << "The lane has no successor";
       return false;
     }
-    id = start_laneinfo_tmp->lane().successor_id(0);
+    id = start_laneinfo_tmp->inner_object().successor_id(0);
     AINFO << "Lane id " << id.id();
     start_laneinfo_tmp = hdmap->GetLaneById(id);
     if (start_laneinfo_tmp == nullptr) {
@@ -395,11 +395,11 @@ bool CheckCarInSet(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
       AINFO << "find the car is in the speed limit region";
       return true;
     }
-    if (car_laneinfo_tmp->lane().successor_id_size() == 0) {
+    if (car_laneinfo_tmp->inner_object().successor_id_size() == 0) {
       AWARN << "The lane of the card no successor";
       return false;
     }
-    id = car_laneinfo_tmp->lane().successor_id(0);
+    id = car_laneinfo_tmp->inner_object().successor_id(0);
     AINFO << "Lane id " << id.id();
     car_laneinfo_tmp = hdmap->GetLaneById(id);
     if (car_laneinfo_tmp == nullptr) {
@@ -464,8 +464,10 @@ bool GetRsuInfo(const std::shared_ptr<::apollo::hdmap::HDMap> &hdmap,
     return false;
   }
   AINFO << "This RSU is in the white list";
-  AINFO << "Junction id " << rsus[0]->rsu().junction_id().id();
-  auto junction_info = hdmap->GetJunctionById(rsus[0]->rsu().junction_id());
+
+  const auto &junction_id = rsus[0]->inner_object().junction_id();
+  AINFO << "Junction id " << junction_id.id();
+  auto junction_info = hdmap->GetJunctionById(junction_id);
   if (nullptr == junction_info) {
     return false;
   }

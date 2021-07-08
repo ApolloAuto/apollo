@@ -78,7 +78,8 @@ void CruiseScenarioFeatures::BuildCruiseScenarioFeatures(
   for (const std::string& reverse_lane_id : reverse_lane_ids) {
     std::shared_ptr<const LaneInfo> reverse_lane_info =
         PredictionMap::LaneById(reverse_lane_id);
-    for (const auto& prede_id : reverse_lane_info->lane().predecessor_id()) {
+    for (const auto& prede_id :
+         reverse_lane_info->inner_object().predecessor_id()) {
       lane_ids_of_interest_.insert(prede_id.id());
     }
   }
@@ -98,7 +99,7 @@ void CruiseScenarioFeatures::SearchForwardAndInsert(
     double accumulated_s = lane_queue.front().second;
     lane_queue.pop();
     InsertLaneOfInterest(lane_info->id().id());
-    const Lane& lane = lane_info->lane();
+    const Lane& lane = lane_info->inner_object();
     for (const auto prede_lane_id : lane.predecessor_id()) {
       InsertLaneOfInterest(prede_lane_id.id());
     }

@@ -377,14 +377,14 @@ std::vector<int> PncMap::GetNeighborPassages(const routing::RoadSegment &road,
   if (source_passage.change_lane_type() == routing::LEFT) {
     for (const auto &segment : source_segments) {
       for (const auto &left_id :
-           segment.lane->lane().left_neighbor_forward_lane_id()) {
+           segment.lane->inner_object().left_neighbor_forward_lane_id()) {
         neighbor_lanes.insert(left_id.id());
       }
     }
   } else if (source_passage.change_lane_type() == routing::RIGHT) {
     for (const auto &segment : source_segments) {
       for (const auto &right_id :
-           segment.lane->lane().right_neighbor_forward_lane_id()) {
+           segment.lane->inner_object().right_neighbor_forward_lane_id()) {
         neighbor_lanes.insert(right_id.id());
       }
     }
@@ -511,12 +511,14 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
   std::vector<LaneInfoConstPtr> valid_lanes;
   std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
                [&](LaneInfoConstPtr ptr) {
-                 return range_lane_ids_.count(ptr->lane().id().id()) > 0;
+                 return range_lane_ids_.count(ptr->inner_object().id().id()) >
+                        0;
                });
   if (valid_lanes.empty()) {
     std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
                  [&](LaneInfoConstPtr ptr) {
-                   return all_lane_ids_.count(ptr->lane().id().id()) > 0;
+                   return all_lane_ids_.count(ptr->inner_object().id().id()) >
+                          0;
                  });
   }
 
@@ -563,11 +565,11 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
 }
 
 LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
-  if (lane->lane().successor_id().empty()) {
+  if (lane->inner_object().successor_id().empty()) {
     return nullptr;
   }
-  hdmap::Id preferred_id = lane->lane().successor_id(0);
-  for (const auto &lane_id : lane->lane().successor_id()) {
+  hdmap::Id preferred_id = lane->inner_object().successor_id(0);
+  for (const auto &lane_id : lane->inner_object().successor_id()) {
     if (range_lane_ids_.count(lane_id.id()) != 0) {
       preferred_id = lane_id;
       break;
@@ -577,16 +579,16 @@ LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
 }
 
 LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
-  if (lane->lane().predecessor_id().empty()) {
+  if (lane->inner_object().predecessor_id().empty()) {
     return nullptr;
   }
 
   std::unordered_set<std::string> predecessor_ids;
-  for (const auto &lane_id : lane->lane().predecessor_id()) {
+  for (const auto &lane_id : lane->inner_object().predecessor_id()) {
     predecessor_ids.insert(lane_id.id());
   }
 
-  hdmap::Id preferred_id = lane->lane().predecessor_id(0);
+  hdmap::Id preferred_id = lane->inner_object().predecessor_id(0);
   for (size_t i = 1; i < route_indices_.size(); ++i) {
     auto &lane = route_indices_[i].segment.lane->id();
     if (predecessor_ids.count(lane.id()) != 0) {

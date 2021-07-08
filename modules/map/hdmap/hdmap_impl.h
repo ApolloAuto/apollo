@@ -15,18 +15,10 @@ limitations under the License.
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include "modules/common/math/aabox2d.h"
-#include "modules/common/math/aaboxkdtree2d.h"
-#include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/proto/map.pb.h"
 #include "modules/map/proto/map_clear_area.pb.h"
 #include "modules/map/proto/map_crosswalk.pb.h"
@@ -40,6 +32,9 @@ limitations under the License.
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+
+#include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/hdmap/hdmap_objects.h"
 
 /**
  * @namespace apollo::hdmap
@@ -55,32 +50,10 @@ namespace hdmap {
  */
 class HDMapImpl {
  public:
-  using LaneTable = std::unordered_map<std::string, std::shared_ptr<LaneInfo>>;
-  using JunctionTable =
-      std::unordered_map<std::string, std::shared_ptr<JunctionInfo>>;
-  using SignalTable =
-      std::unordered_map<std::string, std::shared_ptr<SignalInfo>>;
-  using CrosswalkTable =
-      std::unordered_map<std::string, std::shared_ptr<CrosswalkInfo>>;
-  using StopSignTable =
-      std::unordered_map<std::string, std::shared_ptr<StopSignInfo>>;
-  using YieldSignTable =
-      std::unordered_map<std::string, std::shared_ptr<YieldSignInfo>>;
-  using ClearAreaTable =
-      std::unordered_map<std::string, std::shared_ptr<ClearAreaInfo>>;
-  using SpeedBumpTable =
-      std::unordered_map<std::string, std::shared_ptr<SpeedBumpInfo>>;
-  using OverlapTable =
-      std::unordered_map<std::string, std::shared_ptr<OverlapInfo>>;
-  using RoadTable = std::unordered_map<std::string, std::shared_ptr<RoadInfo>>;
-  using ParkingSpaceTable =
-      std::unordered_map<std::string, std::shared_ptr<ParkingSpaceInfo>>;
-  using PNCJunctionTable =
-      std::unordered_map<std::string, std::shared_ptr<PNCJunctionInfo>>;
-  using RSUTable =
-      std::unordered_map<std::string, std::shared_ptr<RSUInfo>>;
-
- public:
+  /**
+   * @brief Default constructor
+   */
+  HDMapImpl();
   /**
    * @brief load map from local file
    * @param map_filename path of map data file
@@ -340,9 +313,9 @@ class HDMapImpl {
    * @return 0:success, otherwise failed
    */
   int GetForwardNearestRSUs(const apollo::common::PointENU& point,
-                    double distance, double central_heading,
-                    double max_heading_difference,
-                    std::vector<RSUInfoConstPtr>* rsus) const;
+                            double distance, double central_heading,
+                            double max_heading_difference,
+                            std::vector<RSUInfoConstPtr>* rsus) const;
 
  private:
   int GetLanes(const apollo::common::math::Vec2d& point, double distance,
@@ -382,80 +355,23 @@ class HDMapImpl {
                           std::vector<LaneInfoConstPtr>* lanes) const;
   int GetRoads(const apollo::common::math::Vec2d& point, double distance,
                std::vector<RoadInfoConstPtr>* roads) const;
-
-  template <class Table, class BoxTable, class KDTree>
-  static void BuildSegmentKDTree(
-      const Table& table, const apollo::common::math::AABoxKDTreeParams& params,
-      BoxTable* const box_table, std::unique_ptr<KDTree>* const kdtree);
-
-  template <class Table, class BoxTable, class KDTree>
-  static void BuildPolygonKDTree(
-      const Table& table, const apollo::common::math::AABoxKDTreeParams& params,
-      BoxTable* const box_table, std::unique_ptr<KDTree>* const kdtree);
-
-  void BuildLaneSegmentKDTree();
-  void BuildJunctionPolygonKDTree();
-  void BuildCrosswalkPolygonKDTree();
-  void BuildSignalSegmentKDTree();
-  void BuildStopSignSegmentKDTree();
-  void BuildYieldSignSegmentKDTree();
-  void BuildClearAreaPolygonKDTree();
-  void BuildSpeedBumpSegmentKDTree();
-  void BuildParkingSpacePolygonKDTree();
-  void BuildPNCJunctionPolygonKDTree();
-
-  template <class KDTree>
-  static int SearchObjects(const apollo::common::math::Vec2d& center,
-                           const double radius, const KDTree& kdtree,
-                           std::vector<std::string>* const results);
-
   void Clear();
 
  private:
   Map map_;
-  LaneTable lane_table_;
-  JunctionTable junction_table_;
-  CrosswalkTable crosswalk_table_;
-  SignalTable signal_table_;
-  StopSignTable stop_sign_table_;
-  YieldSignTable yield_sign_table_;
-  ClearAreaTable clear_area_table_;
-  SpeedBumpTable speed_bump_table_;
-  OverlapTable overlap_table_;
-  RoadTable road_table_;
-  ParkingSpaceTable parking_space_table_;
-  PNCJunctionTable pnc_junction_table_;
-  RSUTable rsu_table_;
-
-  std::vector<LaneSegmentBox> lane_segment_boxes_;
-  std::unique_ptr<LaneSegmentKDTree> lane_segment_kdtree_;
-
-  std::vector<JunctionPolygonBox> junction_polygon_boxes_;
-  std::unique_ptr<JunctionPolygonKDTree> junction_polygon_kdtree_;
-
-  std::vector<CrosswalkPolygonBox> crosswalk_polygon_boxes_;
-  std::unique_ptr<CrosswalkPolygonKDTree> crosswalk_polygon_kdtree_;
-
-  std::vector<SignalSegmentBox> signal_segment_boxes_;
-  std::unique_ptr<SignalSegmentKDTree> signal_segment_kdtree_;
-
-  std::vector<StopSignSegmentBox> stop_sign_segment_boxes_;
-  std::unique_ptr<StopSignSegmentKDTree> stop_sign_segment_kdtree_;
-
-  std::vector<YieldSignSegmentBox> yield_sign_segment_boxes_;
-  std::unique_ptr<YieldSignSegmentKDTree> yield_sign_segment_kdtree_;
-
-  std::vector<ClearAreaPolygonBox> clear_area_polygon_boxes_;
-  std::unique_ptr<ClearAreaPolygonKDTree> clear_area_polygon_kdtree_;
-
-  std::vector<SpeedBumpSegmentBox> speed_bump_segment_boxes_;
-  std::unique_ptr<SpeedBumpSegmentKDTree> speed_bump_segment_kdtree_;
-
-  std::vector<ParkingSpacePolygonBox> parking_space_polygon_boxes_;
-  std::unique_ptr<ParkingSpacePolygonKDTree> parking_space_polygon_kdtree_;
-
-  std::vector<PNCJunctionPolygonBox> pnc_junction_polygon_boxes_;
-  std::unique_ptr<PNCJunctionPolygonKDTree> pnc_junction_polygon_kdtree_;
+  objects::Signals signals_;
+  objects::Overlaps overlaps_;
+  objects::Lanes lanes_;
+  objects::Junctions junctions_;
+  objects::Crosswalks crosswalks_;
+  objects::StopSigns stop_signs_;
+  objects::YieldSigns yield_signs_;
+  objects::ClearAreas clear_areas_;
+  objects::SpeedBumps speed_bumps_;
+  objects::ParkingSpaces parking_spaces_;
+  objects::PNCJunctions pnc_junctions_;
+  objects::Roads roads_;
+  objects::RSUs rsus_;
 };
 
 }  // namespace hdmap

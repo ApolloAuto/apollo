@@ -129,11 +129,12 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
     lane_s += speed * period;
     while (lane_s > PredictionMap::LaneById(lane_id)->total_length()) {
       lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
-      if (PredictionMap::LaneById(lane_id)->lane().successor_id_size() < 1) {
+      const auto& raw_lane = PredictionMap::LaneById(lane_id)->inner_object();
+      if (raw_lane.successor_id_size() < 1) {
         return;
       }
       // TODO(all) consider the logic to choose successor_id
-      lane_id = PredictionMap::LaneById(lane_id)->lane().successor_id(0).id();
+      lane_id = raw_lane.successor_id(0).id();
     }
     t += period;
   }

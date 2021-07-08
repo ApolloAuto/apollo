@@ -19,11 +19,12 @@
 #include <string>
 #include <vector>
 
+#include "modules/map/proto/map_lane.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
@@ -265,13 +266,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
         continue;
       }
       const hdmap::LaneInfoConstPtr lane = lanes[0];
-      const std::string lane_id = lane->lane().id().id();
+      const std::string lane_id = lane->inner_object().id().id();
       ADEBUG << "check_s[" << check_s << "] lane[" << lane_id << "]";
 
       // check neighbor lanes type: NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
       bool rightmost_driving_lane = true;
       for (const auto& neighbor_lane_id :
-           lane->lane().right_neighbor_forward_lane_id()) {
+           lane->inner_object().right_neighbor_forward_lane_id()) {
         const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
         CHECK_NOTNULL(hdmap_ptr);
         const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
@@ -280,7 +281,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
                  << "]";
           continue;
         }
-        const auto& lane_type = neighbor_lane->lane().type();
+        const auto& lane_type = neighbor_lane->inner_object().type();
         if (lane_type == hdmap::Lane::CITY_DRIVING) {
           ADEBUG << "lane[" << lane_id << "]'s right neighbor forward lane["
                  << neighbor_lane_id.id() << "] type["
@@ -768,7 +769,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
       (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
            adc_point, 2.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s,
            &l) != 0 ||
-       lane->lane().type() != hdmap::Lane::CITY_DRIVING)) {
+       lane->inner_object().type() != hdmap::Lane::CITY_DRIVING)) {
     park_and_go = true;
   }
 
@@ -812,8 +813,8 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   if (injector_->learning_based_data() &&
       injector_->learning_based_data()->GetLatestLearningDataFrame()) {
     history_points_len = injector_->learning_based_data()
-                                  ->GetLatestLearningDataFrame()
-                                  ->adc_trajectory_point_size();
+                             ->GetLatestLearningDataFrame()
+                             ->adc_trajectory_point_size();
   }
   if ((planning_config_.learning_mode() == PlanningConfig::E2E ||
        planning_config_.learning_mode() == PlanningConfig::E2E_TEST) &&

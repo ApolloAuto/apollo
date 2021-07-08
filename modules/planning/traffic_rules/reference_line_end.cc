@@ -22,8 +22,9 @@
 
 #include <memory>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -42,7 +43,7 @@ Status ReferenceLineEnd::ApplyRule(
 
   ADEBUG << "ReferenceLineEnd length[" << reference_line.Length() << "]";
   for (const auto& segment : reference_line_info->Lanes()) {
-    ADEBUG << "   lane[" << segment.lane->lane().id().id() << "]";
+    ADEBUG << "   lane[" << segment.lane->inner_object().id().id() << "]";
   }
   // check
   double remain_s =

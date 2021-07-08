@@ -237,7 +237,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetLaneById(map_id);
     if (element) {
-      auto lane = element->lane();
+      auto lane = element->inner_object();
       lane.clear_left_sample();
       lane.clear_right_sample();
       lane.clear_left_road_sample();
@@ -250,7 +250,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetClearAreaById(map_id);
     if (element) {
-      *result.add_clear_area() = element->clear_area();
+      *result.add_clear_area() = element->inner_object();
     }
   }
 
@@ -258,7 +258,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetCrosswalkById(map_id);
     if (element) {
-      *result.add_crosswalk() = element->crosswalk();
+      *result.add_crosswalk() = element->inner_object();
     }
   }
 
@@ -266,7 +266,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetJunctionById(map_id);
     if (element) {
-      *result.add_junction() = element->junction();
+      *result.add_junction() = element->inner_object();
     }
   }
 
@@ -274,7 +274,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetSignalById(map_id);
     if (element) {
-      *result.add_signal() = element->signal();
+      *result.add_signal() = element->inner_object();
     }
   }
 
@@ -282,7 +282,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetStopSignById(map_id);
     if (element) {
-      *result.add_stop_sign() = element->stop_sign();
+      *result.add_stop_sign() = element->inner_object();
     }
   }
 
@@ -290,7 +290,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetYieldSignById(map_id);
     if (element) {
-      *result.add_yield() = element->yield_sign();
+      *result.add_yield() = element->inner_object();
     }
   }
 
@@ -298,7 +298,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetRoadById(map_id);
     if (element) {
-      *result.add_road() = element->road();
+      *result.add_road() = element->inner_object();
     }
   }
 
@@ -306,7 +306,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetParkingSpaceById(map_id);
     if (element) {
-      *result.add_parking_space() = element->parking_space();
+      *result.add_parking_space() = element->inner_object();
     }
   }
 
@@ -314,7 +314,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetSpeedBumpById(map_id);
     if (element) {
-      *result.add_speed_bump() = element->speed_bump();
+      *result.add_speed_bump() = element->inner_object();
     }
   }
 
@@ -322,7 +322,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     map_id.set_id(id);
     auto element = SimMap()->GetPNCJunctionById(map_id);
     if (element) {
-      *result.add_pnc_junction() = element->pnc_junction();
+      *result.add_pnc_junction() = element->inner_object();
     }
   }
 
@@ -442,11 +442,11 @@ bool MapService::CheckRoutingPoint(const double x, const double y) const {
 }
 
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
-  if (lane->lane().type() != Lane::CITY_DRIVING) {
+  if (lane->inner_object().type() != Lane::CITY_DRIVING) {
     AERROR
         << "Failed to construct LaneWayPoint for RoutingRequest: Expected lane "
         << lane->id().id() << " to be CITY_DRIVING, but was "
-        << apollo::hdmap::Lane::LaneType_Name(lane->lane().type());
+        << apollo::hdmap::Lane::LaneType_Name(lane->inner_object().type());
     return false;
   }
   return true;

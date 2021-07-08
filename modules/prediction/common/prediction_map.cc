@@ -120,7 +120,7 @@ bool PredictionMap::IsVirtualLane(const std::string& lane_id) {
   if (lane_info == nullptr) {
     return false;
   }
-  const hdmap::Lane& lane = lane_info->lane();
+  const hdmap::Lane& lane = lane_info->inner_object();
   bool left_virtual = lane.has_left_boundary() &&
                       lane.left_boundary().has_virtual_() &&
                       lane.left_boundary().virtual_();
@@ -312,11 +312,12 @@ bool PredictionMap::InJunction(const Eigen::Vector2d& point,
     return false;
   }
   for (const auto junction_info : junction_infos) {
-    if (junction_info == nullptr || !junction_info->junction().has_polygon()) {
+    if (junction_info == nullptr ||
+        !junction_info->inner_object().has_polygon()) {
       continue;
     }
     std::vector<Vec2d> vertices;
-    for (const auto& point : junction_info->junction().polygon().point()) {
+    for (const auto& point : junction_info->inner_object().polygon().point()) {
       vertices.emplace_back(point.x(), point.y());
     }
     if (vertices.size() < 3) {
@@ -338,13 +339,14 @@ bool PredictionMap::IsLaneInJunction(
   }
 
   // first, check whether the lane is virtual
-  if (!PredictionMap::IsVirtualLane(lane_info->lane().id().id())) {
+  if (!PredictionMap::IsVirtualLane(lane_info->inner_object().id().id())) {
     return false;
   }
 
   // second, use junction from lane
-  if (lane_info->lane().has_junction_id() &&
-      lane_info->lane().junction_id().id() == junction_id) {
+  auto& raw_lane = lane_info->inner_object();
+  if (raw_lane.has_junction_id() &&
+      raw_lane.junction_id().id() == junction_id) {
     return true;
   }
 
@@ -398,7 +400,8 @@ void PredictionMap::NearbyLanesByCurrentLanes(
       if (lane_ptr == nullptr) {
         continue;
       }
-      for (auto& lane_id : lane_ptr->lane().left_neighbor_forward_lane_id()) {
+      for (auto& lane_id :
+           lane_ptr->inner_object().left_neighbor_forward_lane_id()) {
         const std::string& id = lane_id.id();
         if (lane_ids.find(id) != lane_ids.end()) {
           continue;
@@ -414,7 +417,8 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         lane_ids.insert(id);
         nearby_lanes->push_back(nearby_lane);
       }
-      for (auto& lane_id : lane_ptr->lane().right_neighbor_forward_lane_id()) {
+      for (auto& lane_id :
+           lane_ptr->inner_object().right_neighbor_forward_lane_id()) {
         const std::string& id = lane_id.id();
         if (lane_ids.find(id) != lane_ids.end()) {
           continue;
@@ -439,7 +443,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::GetLeftNeighborLane(
     const Eigen::Vector2d& ego_position, const double threshold) {
   std::vector<std::string> neighbor_ids;
   for (const auto& lane_id :
-       ptr_ego_lane->lane().left_neighbor_forward_lane_id()) {
+       ptr_ego_lane->inner_object().left_neighbor_forward_lane_id()) {
     neighbor_ids.push_back(lane_id.id());
   }
 
@@ -451,7 +455,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::GetRightNeighborLane(
     const Eigen::Vector2d& ego_position, const double threshold) {
   std::vector<std::string> neighbor_ids;
   for (const auto& lane_id :
-       ptr_ego_lane->lane().right_neighbor_forward_lane_id()) {
+       ptr_ego_lane->inner_object().right_neighbor_forward_lane_id()) {
     neighbor_ids.push_back(lane_id.id());
   }
 
@@ -512,7 +516,7 @@ bool PredictionMap::IsLeftNeighborLane(
     return false;
   }
   for (const auto& left_lane_id :
-       curr_lane->lane().left_neighbor_forward_lane_id()) {
+       curr_lane->inner_object().left_neighbor_forward_lane_id()) {
     if (target_lane->id().id() == left_lane_id.id()) {
       return true;
     }
@@ -544,7 +548,7 @@ bool PredictionMap::IsRightNeighborLane(
     return false;
   }
   for (auto& right_lane_id :
-       curr_lane->lane().right_neighbor_forward_lane_id()) {
+       curr_lane->inner_object().right_neighbor_forward_lane_id()) {
     if (target_lane->id().id() == right_lane_id.id()) {
       return true;
     }
@@ -574,7 +578,8 @@ bool PredictionMap::IsSuccessorLane(std::shared_ptr<const LaneInfo> target_lane,
   if (target_lane == nullptr) {
     return false;
   }
-  for (const auto& successor_lane_id : curr_lane->lane().successor_id()) {
+  for (const auto& successor_lane_id :
+       curr_lane->inner_object().successor_id()) {
     if (target_lane->id().id() == successor_lane_id.id()) {
       return true;
     }
@@ -605,7 +610,8 @@ bool PredictionMap::IsPredecessorLane(
   if (target_lane == nullptr) {
     return false;
   }
-  for (const auto& predecessor_lane_id : curr_lane->lane().predecessor_id()) {
+  for (const auto& predecessor_lane_id :
+       curr_lane->inner_object().predecessor_id()) {
     if (target_lane->id().id() == predecessor_lane_id.id()) {
       return true;
     }
@@ -652,7 +658,7 @@ bool PredictionMap::IsIdenticalLane(
 int PredictionMap::LaneTurnType(const std::string& lane_id) {
   std::shared_ptr<const LaneInfo> lane = LaneById(lane_id);
   if (lane != nullptr) {
-    return static_cast<int>(lane->lane().turn());
+    return static_cast<int>(lane->inner_object().turn());
   }
   return 1;
 }

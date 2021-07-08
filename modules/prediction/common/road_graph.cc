@@ -72,10 +72,12 @@ int ConvertTurnTypeToDegree(const Lane& lane) {
 
 bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
               std::shared_ptr<const LaneInfo> lane2) {
-  if (lane1->lane().has_turn() && lane2->lane().has_turn() &&
-      lane1->lane().turn() != lane2->lane().turn()) {
-    int degree_to_left_1 = ConvertTurnTypeToDegree(lane1->lane());
-    int degree_to_left_2 = ConvertTurnTypeToDegree(lane2->lane());
+  const auto& raw_lane1 = lane1->inner_object();
+  const auto& raw_lane2 = lane2->inner_object();
+  if (raw_lane1.has_turn() && raw_lane2.has_turn() &&
+      raw_lane1.turn() != raw_lane2.turn()) {
+    int degree_to_left_1 = ConvertTurnTypeToDegree(raw_lane1);
+    int degree_to_left_2 = ConvertTurnTypeToDegree(raw_lane2);
     return degree_to_left_1 > degree_to_left_2;
   }
   return HeadingIsAtLeft(lane1->headings(), lane2->headings(), 0);
@@ -252,7 +254,7 @@ void RoadGraph::ConstructLaneSequence(
   // or if there is no more successor lane_segment.
   if (search_forward_direction) {
     if (lane_segments->back().end_s() < lane_info_ptr->total_length() ||
-        lane_info_ptr->lane().successor_id().empty()) {
+        lane_info_ptr->inner_object().successor_id().empty()) {
       LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
       for (const auto& it : *lane_segments) {
         *(sequence->add_lane_segment()) = it;
@@ -262,7 +264,7 @@ void RoadGraph::ConstructLaneSequence(
     }
   } else {
     if (lane_segments->front().start_s() > 0.0 ||
-        lane_info_ptr->lane().predecessor_id().empty()) {
+        lane_info_ptr->inner_object().predecessor_id().empty()) {
       LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
       for (const auto& it : *lane_segments) {
         *(sequence->add_lane_segment()) = it;
@@ -280,7 +282,8 @@ void RoadGraph::ConstructLaneSequence(
   if (search_forward_direction) {
     new_accumulated_s = accumulated_s + lane_info_ptr->total_length() - curr_s;
     // Reundancy removal.
-    for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
+    for (const auto& successor_lane_id :
+         lane_info_ptr->inner_object().successor_id()) {
       set_lane_ids.insert(successor_lane_id.id());
     }
     for (const auto& unique_id : set_lane_ids) {
@@ -298,7 +301,7 @@ void RoadGraph::ConstructLaneSequence(
     new_lane_seg_s = -0.1;
     // Redundancy removal.
     for (const auto& predecessor_lane_id :
-         lane_info_ptr->lane().predecessor_id()) {
+         lane_info_ptr->inner_object().predecessor_id()) {
       set_lane_ids.insert(predecessor_lane_id.id());
     }
     for (const auto& unique_id : set_lane_ids) {

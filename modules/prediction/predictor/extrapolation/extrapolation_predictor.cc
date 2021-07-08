@@ -16,10 +16,11 @@
 
 #include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 
+#include "modules/prediction/proto/lane_graph.pb.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -96,7 +97,7 @@ ExtrapolationPredictor::SearchExtrapolationLane(const Trajectory& trajectory,
         point_enu, radius, heading, angle_diff_threshold);
     if (lane_info_ptr != nullptr) {
       lane_search_result.found = true;
-      lane_search_result.lane_id = lane_info_ptr->lane().id().id();
+      lane_search_result.lane_id = lane_info_ptr->inner_object().id().id();
       lane_search_result.point_index = i;
       break;
     }

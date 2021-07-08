@@ -683,7 +683,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane_feature->set_lane_heading(nearest_point_heading);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
-    lane_feature->set_lane_type(current_lane->lane().type());
+    lane_feature->set_lane_type(current_lane->inner_object().type());
     if (std::fabs(angle_diff) < min_heading_diff) {
       lane.mutable_lane_feature()->CopyFrom(*lane_feature);
       min_heading_diff = std::fabs(angle_diff);
@@ -725,10 +725,10 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     }
 
     // Ignore bike and sidewalk lanes for vehicles
-    if (type_ == PerceptionObstacle::VEHICLE &&
-        nearby_lane->lane().has_type() &&
-        (nearby_lane->lane().type() == ::apollo::hdmap::Lane::BIKING ||
-         nearby_lane->lane().type() == ::apollo::hdmap::Lane::SIDEWALK)) {
+    const auto& nearby_raw_lane = nearby_lane->inner_object();
+    if (type_ == PerceptionObstacle::VEHICLE && nearby_raw_lane.has_type() &&
+        (nearby_raw_lane.type() == ::apollo::hdmap::Lane::BIKING ||
+         nearby_raw_lane.type() == ::apollo::hdmap::Lane::SIDEWALK)) {
       ADEBUG << "Obstacle [" << id_ << "] ignores disqualified lanes.";
       continue;
     }
@@ -761,7 +761,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     lane_feature->set_angle_diff(angle_diff);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
-    lane_feature->set_lane_type(nearby_lane->lane().type());
+    lane_feature->set_lane_type(nearby_lane->inner_object().type());
     ADEBUG << "Obstacle [" << id_ << "] has nearby lanes ["
            << lane_feature->ShortDebugString() << "]";
   }
@@ -936,7 +936,7 @@ void Obstacle::GetNeighborLaneSegments(
   if (is_left) {
     std::vector<std::string> curr_left_lane_ids;
     for (const auto& left_lane_id :
-         center_lane_info->lane().left_neighbor_forward_lane_id()) {
+         center_lane_info->inner_object().left_neighbor_forward_lane_id()) {
       if (left_lane_id.has_id()) {
         const std::string& lane_id = left_lane_id.id();
         // If haven't seen this lane id before.
@@ -956,7 +956,7 @@ void Obstacle::GetNeighborLaneSegments(
   } else {
     std::vector<std::string> curr_right_lane_ids;
     for (const auto& right_lane_id :
-         center_lane_info->lane().right_neighbor_forward_lane_id()) {
+         center_lane_info->inner_object().right_neighbor_forward_lane_id()) {
       if (right_lane_id.has_id()) {
         const std::string& lane_id = right_lane_id.id();
         // If haven't seen this lane id before.
@@ -1034,7 +1034,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   int seq_id = 0;
   for (const std::string& lane_id : lane_ids_ordered) {
     // Construct the local lane_graph based on the current lane_segment.
-    bool vehicle_is_on_lane = (lane_id == center_lane_info->lane().id().id());
+    bool vehicle_is_on_lane =
+        (lane_id == center_lane_info->inner_object().id().id());
     std::shared_ptr<const LaneInfo> curr_lane_info =
         PredictionMap::LaneById(lane_id);
     LaneGraph local_lane_graph = clusters_ptr_->GetLaneGraphWithoutMemorizing(
