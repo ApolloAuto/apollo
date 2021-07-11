@@ -11,3 +11,12 @@ py_binary(
     name = "viewer_smooth",
     srcs = ["viewer_smooth.py"],
 )
+
+py_binary(
+    name = "record_extractor",
+    srcs = ["record_extractor.py"],
+    deps = [
+        "//cyber/python/cyber_py3:record",
+        "//modules/localization/proto:localization_py_pb2",
+    ],
+)
