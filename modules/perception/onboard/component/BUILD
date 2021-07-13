@@ -54,6 +54,7 @@ cc_library(
         "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/map/proto:map_cc_proto",
         "//modules/perception/base",
+        "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/app:lane_camera_perception",
         "//modules/perception/camera/app:obstacle_camera_perception",

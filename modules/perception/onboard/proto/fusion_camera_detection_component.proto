@@ -45,4 +45,5 @@ message FusionCameraDetection {
   optional bool image_based_cipv = 30 [default = false];
   optional int32 debug_level = 31 [default = 0];
   optional bool enable_cipv = 32 [default = false];
+  optional string cipv = 33 [default = "Cipv"];
 }
