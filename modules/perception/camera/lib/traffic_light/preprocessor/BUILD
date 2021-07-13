@@ -40,6 +40,7 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/interface:base_init_options",
+        "//modules/perception/camera/lib/interface:base_tl_preprocessor",
         "//modules/perception/lib/config_manager",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
