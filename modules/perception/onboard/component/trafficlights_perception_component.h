@@ -111,10 +111,11 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
  private:
   std::mutex mutex_;
 
-  std::shared_ptr<camera::TLPreprocessor> preprocessor_;
+  std::shared_ptr<camera::BaseTLPreprocessor> preprocessor_;
   apollo::perception::map::HDMapInput* hd_map_ = nullptr;
 
   camera::TrafficLightPreprocessorInitOptions preprocessor_init_options_;
+  std::string tl_preprocessor_name_;
 
   std::string tf2_frame_id_;
   std::string tf2_child_frame_id_;
