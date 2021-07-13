@@ -2,20 +2,13 @@ syntax = "proto2";
 
 package apollo.perception.onboard;
 
-message LidarSegmentationComponentConfig {
-  optional string sensor_name = 1;
-  optional bool enable_hdmap = 2;
-  optional double lidar_query_tf_offset = 3;
-  optional string lidar2novatel_tf2_child_frame_id = 4;
-  optional string output_channel_name = 5;
-}
-
 message LidarDetectionComponentConfig {
   optional string sensor_name = 1;
-  optional bool enable_hdmap = 2;
-  optional double lidar_query_tf_offset = 3;
-  optional string lidar2novatel_tf2_child_frame_id = 4;
-  optional string output_channel_name = 5;
+  optional string detector_name = 2;
+  optional bool enable_hdmap = 3;
+  optional double lidar_query_tf_offset = 4;
+  optional string lidar2novatel_tf2_child_frame_id = 5;
+  optional string output_channel_name = 6;
 }
 
 message LidarRecognitionComponentConfig {

@@ -23,5 +23,6 @@ ts_diff : 0.1
 visual_debug_folder : "/apollo/debug_output"
 visual_camera : "front_6mm"
 write_visual_img : false
-enable_cipv : false
+enable_cipv : true
 debug_level : 0
+cipv : "Cipv"
