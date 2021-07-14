@@ -1,3 +1,4 @@
+fuisont_name: "ObstacleMultiSensorFusion"
 fusion_method: "ProbabilisticFusion"
 fusion_main_sensors: "velodyne128"
 fusion_main_sensors: "front_6mm"
