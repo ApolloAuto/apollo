@@ -46,6 +46,7 @@ cc_library(
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()
