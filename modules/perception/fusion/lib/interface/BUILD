@@ -14,8 +14,10 @@ cc_library(
         "base_shape_fusion.h",
         "base_tracker.h",
         "base_type_fusion.h",
+        "base_multisensor_fusion.h"
     ],
     deps = [
+        "//cyber/common:macros",
         "//modules/perception/fusion/base:base_forward_declaration",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/lib/registerer",

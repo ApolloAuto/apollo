@@ -48,12 +48,13 @@ class FusionComponent : public cyber::Component<SensorFrameMessage> {
   static std::mutex s_mutex_;
   static uint32_t s_seq_num_;
 
+  std::string fusion_name_;
   std::string fusion_method_;
   std::vector<std::string> fusion_main_sensors_;
   bool object_in_roi_check_ = false;
   double radius_for_roi_object_check_ = 0;
 
-  std::unique_ptr<fusion::ObstacleMultiSensorFusion> fusion_;
+  std::unique_ptr<fusion::BaseMultiSensorFusion> fusion_;
   map::HDMapInput* hdmap_input_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<PerceptionObstacles>> writer_;
   std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>> inner_writer_;

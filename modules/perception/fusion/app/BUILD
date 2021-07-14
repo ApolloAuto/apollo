@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/lib/registerer",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()
