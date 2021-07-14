@@ -188,6 +188,9 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   // init preprocessor
   camera::BaseTLPreprocessor* preprocessor = camera::BaseTLPreprocessorRegisterer::
         GetInstanceByName(tl_preprocessor_name_);
+  std::vector<camera::BaseTLPreprocessor*> vec = camera::BaseTLPreprocessorRegisterer::
+        GetAllInstances();
+  std::cout << "Size of TLPreprocessor Map: " << vec.size() << std::endl;
   CHECK_NOTNULL(preprocessor);
   preprocessor_.reset(preprocessor);
 
