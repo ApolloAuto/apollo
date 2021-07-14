@@ -87,6 +87,7 @@ cc_library(
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
+        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
         "//modules/perception/camera/lib/traffic_light/detector/detection",
         "//modules/perception/camera/lib/traffic_light/detector/recognition",
         "//modules/perception/camera/lib/traffic_light/proto:detection_cc_proto",
