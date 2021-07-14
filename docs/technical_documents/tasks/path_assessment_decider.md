@@ -1,66 +1,66 @@
-# 路径评估决策
+# Path Assessment Decider
 
-### *目录*
+### *Contents*
 
-- [概览](#概览)
-- [路径评估决策相关代码及对应版本](#路径评估决策相关代码及对应版本)
-- [路径评估决策代码流程及框架](#路径评估决策代码流程及框架)
-  - [路径重复使用](#路径重复使用)
-  - [去掉无效路径](#去掉无效路径)
-  - [分析并加入重要信息](#分析并加入重要信息)
-  - [排序并选出最有路径](#排序并选出最有路径)
-  - [更新必要信息](#更新必要信息)
-- [路径排序算法解析](#路径排序算法解析)
+- [Introduction](#introduction)
+- [Where is the code](#where-is-the-code)
+- [Code Reading](#code-reading)
+  + [Path reuse](#path-reuse)
+  + [Remove invalid path](#remove-invalid-path)
+  + [Analyze and add import info](#analyze-and-add-import-info)
+  + [Sort and choose the best path](#sort-and-choose-the-best-path)
+  + [Update necessary info](#update-necessary-info)
+- [Algorithm Detail of Sorting](#algorithm-detail-of-sorting)
 
-# 概览
+# Introduction
 
-`路径评估决策`是规划模块的任务，属于task中的decider类别。
+`Path assessment decider` is the task of planning module,belongs to `decider`.
 
-规划模块的运动总体流程图如下：
+The overall flow chart of the planning module:
 
-![总体流程图](../images/task/lane_follow.png)
+![Planning Diagram](../images/task/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
+The overall flow chart is illustrated with [lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt) scenario as an example.The main function of tasks is located in `Process` method.
 
-Fig.1的具体运行过程可以参考[path_bounds_decider]()。
+The specific running process of Fig.1 can be referred to [path_bounds_decider]()。
 
-# 路径评估决策相关代码及对应版本
+# Where is the code
 
-本节说明path assessment decider的代码流程。
+This section describes the code flow of path assessment decider.
 
-请参考代码[Apollo r6.0.0 path_assessment_decider](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/deciders/path_assessment_decider)
+Please refer to the codes [Apollo r6.0.0 path_assessment_decider](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/deciders/path_assessment_decider).
 
-- 输入
+- Input
 
 `Status PathAssessmentDecider::Process(Frame* const frame, ReferenceLineInfo* const reference_line_info)`
 
-输入Frame，reference_line_info。具体解释可以参考[path_bounds_decider]()。
+The input is `frame` and `reference_line_info`,specific information can refer to [path_bounds_decider]().
 
-- 输出
+- Output
 
-路径排序之后，选择第一个路径。结果保存在reference_line_info中。
+After sorting paths,choose the best one.Save results to `reference_line_info`.
 
-# 路径评估决策代码流程及框架
+# Code Reading
 
-代码主体流程如下图：
+The main process of codes:
 
-![流程图](../images/task/path_assessment/path_assessment_cn.png)
+![diagram](../images/task/path_assessment/path_assessment.png)
 
-## 路径重复使用
+## Path reuse
 
 ```C++
   ... ...
-  // 如果路径重复使用则跳过
+  // skip if path is reusable
   if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
     return Status::OK();
   ... ...
 ```
 
-## 去掉无效路径
+## Remove invalid path
 
 ```C++
   ... ...
-  // 1. 删掉无效路径.
+  // 1.remove invalid paths.
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
@@ -81,13 +81,16 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
          << " msec.";
   ... ...
 ```
-其中fallback的无效路径是偏离参考线以及道路的路径。regular的无效路径是偏离参考线、道路，碰撞，停在相邻的逆向车道的路径。
 
-## 分析并加入重要信息
+The invalid path of fallback is the path that deviates from reference line and road.
+
+The invalid path of regular is the path that deviates from the reference line,road,collides and stops in the adjacent reverse lane.
+
+## Analyze and add import info
 
 ```C++
   ... ...
-  // 2. 分析并加入重要信息给speed决策
+  // 2. Analyze and add import info to speed decider.
   size_t cnt = 0;
   const Obstacle* blocking_obstacle_on_selflane = nullptr;
   for (size_t i = 0; i != valid_path_data.size(); ++i) {
@@ -103,19 +106,19 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
       continue;
     }
     SetPathInfo(*reference_line_info, &curr_path_data);
-    // 修剪所有的借道路径，使其能够以in-lane结尾
+    // Trim all the bypass paths so that they end in lane.
     if (curr_path_data.path_label().find("pullover") == std::string::npos) {
       TrimTailingOutLanePoints(&curr_path_data);
     }
 
-    // 找到 blocking_obstacle_on_selflane, 为下一步选择车道做准备
+    // find blocking_obstacle_on_selflane,prepare for lane choosing.
     if (curr_path_data.path_label().find("self") != std::string::npos) {
       const auto blocking_obstacle_id = curr_path_data.blocking_obstacle_id();
       blocking_obstacle_on_selflane =
           reference_line_info->path_decision()->Find(blocking_obstacle_id);
     }
 
-    // 删掉空路径
+    // remove empty path.
     if (!curr_path_data.Empty()) {
       if (cnt != i) {
         valid_path_data[cnt] = curr_path_data;
@@ -129,7 +132,7 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
            << "path length = " << curr_path_data.frenet_frame_path().size();
   }
   valid_path_data.resize(cnt);
-  // 如果没有有效路径，退出
+  // if there is no valid path, return error code.
   if (valid_path_data.empty()) {
     const std::string msg = "Neither regular nor fallback path is valid.";
     AERROR << msg;
@@ -141,20 +144,21 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
   ADEBUG << "Time for path info labeling: " << diff.count() * 1000 << " msec.";
   ... ...
 ```
-这一步骤的代码执行流程如下：
-1). 去掉空的路径
-2). 从尾部开始剪掉lane-borrow路径，从尾部开始向前搜索，剪掉如下类型path_point：
+
+The process of this step is:
+1). Remove empty path
+2). Trim lane borrow path from the end,search forward from the tail and cut out the following types of path_point:
 &emsp; (1) OUT_ON_FORWARD_LANE
 &emsp; (2) OUT_ON_REVERSE_LANE
-&emsp; (3) 未知类型
-3). 找到自车道的障碍物id，用于车道选择
-4). 如果没有有效路径，返回错误码
+&emsp; (3) UNKNOWN
+3). Find the obstacle ID of self lane for lane selection
+4). If there if no valid path,return error code
 
-## 排序并选出最有路径
+## Sort and choose the best path
 
-这一步请看最后一章`相关算法解析`
+Please refer to last section [Path sorting algorithm](#path-sorting-algorithm).
 
-## 更新必要信息
+## Update necessary info
 
 ```C++
   // 4. Update necessary info for lane-borrow decider's future uses.
@@ -238,15 +242,17 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
   return Status::OK();
 ```
 
-更新必要信息：
+Update necessary information:
 
-1.更新adc前方静态障碍物的信息
-2.更新自车道使用信息3.更新旁车道的方向
-(1) 根据PathDeciderStatus是RIGHT_BORROW或LEFT_BORROW判断是从左侧借道，还是从右侧借道
+1.Update static obstacles info in front of adc.
+2.Update self lane usage information.
+3.Update the direction of the side lane
+(1) According to `PathDeciderStatus` is RIGHT_BORROW or LEFT_BORROW,decide whether to borrow from the left or from the right.
 
-# 路径排序算法解析
+# Algorithm Detail of Sorting
 
-最后这里说明排序算法。
+This section describes sorting algorithm.
+
 ```C++
   ... ...
   // 3. Pick the optimal path.
@@ -271,21 +277,21 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
   reference_line_info->SetCandidatePathData(std::move(valid_path_data));
   ... ...
 ```
-排序算法的流程具体如下：
+The flow of sorting algorigthm is as follow:
 
 `ComparePathData(lhs, rhs, …)`
 
-路径排序：（道路评估的优劣通过排序获得）
-- 1.空的路径永远排在后面
+Path Sorting:（The quality of road can be obtained by sorting）
+- 1.Empty paths are always behind
 - 2.regular > fallback
-- 3.如果self-lane有一个存在，选择那个。如果都存在，选择较长的.如果长度接近，选择self-lane如果self-lane都不存在，选择较长的路径
-- 4.如果路径长度接近，且都要借道:
-    - (1) 都要借逆向车道，选择距离短的
-    - (2) 针对具有两个借道方向的情况:
-      + 有障碍物，选择合适的方向，左或右借道
-      + 无障碍物，根据adc的位置选择借道方向
-    - (3) 路径长度相同，相邻车道都是前向的，选择较早返回自车道的路径
-    - (4) 如果路径长度相同，前向借道，返回自车道时间相同，选择从左侧借道的路径
-- 5.最后如果两条路径相同，则 lhs is not < rhl
+- 3.If there is one self lane,choose that one.If both exist,choose the longer one.If the length is close,choose self lane.If self lane does not exist,choose a longer path
+- 4.If the length of the paths is close to each other and they all need to borrow lane:
+    - (1) If all have to borrow the reverse lane,choose the one with short distance;
+    - (2) For the case with two borrowing directions:
+      + with obstacle,choose proper direction, left or right
+      + without obstacle,borrow lane according to adc's postion
+    - (3) If the length of the path is the same,the adjacent lanes are all forward,choose the path that returns earlier to the self lane
+    - (4) If the length of the path is the same and return time is the same,choose the path borrow from the left
+- 5.If the two path are the same,lhs is not < rhl
 
-排序之后：选择最优路径，即第一个路径
+After sorting: choose the first one.(the first path is the best path)
