@@ -21,7 +21,7 @@
 
 #include "cyber/component/component.h"
 #include "modules/perception/base/object.h"
-#include "modules/perception/fusion/app/obstacle_multi_sensor_fusion.h"
+#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
