@@ -11,6 +11,7 @@ cc_library(
         "//cyber",
         "//modules/perception/fusion/base",
         "//modules/perception/fusion/lib/interface",
+        "//modules/perception/fusion/lib/interface:base_fusion_system",
         "@eigen",
     ],
 )
@@ -22,6 +23,7 @@ cc_test(
     deps = [
         ":dummy_algorithms",
         "@com_google_googletest//:gtest_main",
+        "//modules/perception/fusion/lib/interface:base_fusion_system",
     ],
 )
 
