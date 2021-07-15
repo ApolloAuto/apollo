@@ -160,6 +160,7 @@ cc_library(
         "//modules/perception/fusion/lib/dummy:dummy_algorithms",
         "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
         "//modules/perception/fusion/lib/interface",
+        "//modules/perception/fusion/lib/interface:base_multisensor_fusion",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/lib/classifier/fused_classifier",
         "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",

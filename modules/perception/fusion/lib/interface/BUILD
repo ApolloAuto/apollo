@@ -8,13 +8,11 @@ cc_library(
     hdrs = [
         "base_data_association.h",
         "base_existence_fusion.h",
-        "base_fusion_system.h",
         "base_gatekeeper.h",
         "base_motion_fusion.h",
         "base_shape_fusion.h",
         "base_tracker.h",
         "base_type_fusion.h",
-        "base_multisensor_fusion.h"
     ],
     deps = [
         "//cyber/common:macros",
@@ -23,5 +21,27 @@ cc_library(
         "//modules/perception/lib/registerer",
     ],
 )
+
+cc_library(
+    name = "base_multisensor_fusion",
+    hdrs = ["base_multisensor_fusion.h"],
+    deps = [
+        "//cyber/common:macros",
+        "//modules/perception/fusion/base",
+        "//modules/perception/lib/registerer",
+    ],
+)
+
+cc_library(
+    name = "base_fusion_system",
+    hdrs = ["base_fusion_system.h"],
+    deps = [
+        "//cyber/common:macros",
+        "//modules/perception/base:frame",
+        "//modules/perception/fusion/base",
+        "//modules/perception/lib/registerer",
+    ],
+)
+
 
 cpplint()
