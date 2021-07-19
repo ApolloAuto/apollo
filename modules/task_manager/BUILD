@@ -46,6 +46,7 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/status",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/dreamview/backend/map:map_service",
         "//modules/task_manager/common:task_manager_gflags",
         "//modules/task_manager/proto:task_manager_cc_proto",
@@ -64,6 +65,7 @@ cc_library(
         ":dead_end_routing_manager_lib",
         "//cyber",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
     ],
 )
 

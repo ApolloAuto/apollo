@@ -22,8 +22,12 @@
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/hdmap/hdmap_util.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/task_manager/proto/task_manager.pb.h"
 #include "modules/task_manager/proto/task_manager_config.pb.h"
+#include "modules/task_manager/common/task_manager_gflags.h"
 
 namespace apollo {
 namespace task_manager {
@@ -42,8 +46,21 @@ class DeadEndRoutingManager {
    */
   virtual ~DeadEndRoutingManager() = default;
 
+  int GetNumber() const { return cycle_; }
+
+  bool GetNewRouting(const localization::Pose& pose,
+                     routing::RoutingRequest* routing_request);
+
+  bool JudgeCarInDeadEndJunction(const common::math::Vec2d& car_position,
+                                 const common::PointENU& target_point);
+
  private:
+  int cycle_ = 0;
+  bool routing_in_flag_ = true;
+  bool routing_out_flag_ = true;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+  routing::RoutingRequest routing_request_in_;
+  routing::RoutingRequest routing_request_out_;
 };
 
 }  // namespace task_manager
