@@ -93,6 +93,28 @@ DEFINE_double(score_threshold, 0.5, "Classification score threshold.");
 DEFINE_double(nms_overlap_threshold, 0.5, "Nms overlap threshold.");
 DEFINE_int32(num_output_box_feature, 7, "Length of output box feature.");
 
+// lidar_mask_pillars
+DEFINE_string(mask_pfe_torch_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/mask_pillars/pts_voxel_encoder.zip",
+              "The path of pillars feature extractor torch file.");
+DEFINE_string(mask_scattered_torch_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/mask_pillars/pts_middle_encoder.zip",
+              "The path of pillars feature scatter torch file.");
+DEFINE_string(mask_backbone_torch_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/mask_pillars/pts_backbone.zip",
+              "The path of pillars backbone torch file.");
+DEFINE_string(mask_fpn_torch_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/mask_pillars/pts_neck.zip",
+              "The path of pillars fpn torch file.");
+DEFINE_string(mask_bbox_head_torch_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/mask_pillars/pts_bbox_head.zip",
+              "The path of pillars bbox head torch file.");
+
 // emergency detection onnx
 DEFINE_string(onnx_obstacle_detector_model,
               "/apollo/modules/perception/camera"

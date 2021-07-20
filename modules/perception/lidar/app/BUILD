@@ -30,6 +30,7 @@ cc_library(
         "//modules/perception/lidar/lib/pointcloud_preprocessor:pointcloud_preprocessor",
         "//modules/perception/lidar/lib/detector/point_pillars_detection:point_pillars_detection",
         "//modules/perception/lidar/lib/detector/cnn_segmentation:cnn_segmentation",
+        "//modules/perception/lidar/lib/detector/mask_pillars_detection:mask_pillars_detection",
         "//modules/perception/lidar/lib/detector/ncut_segmentation:ncut_segmentation",
         "//modules/perception/lidar/lib/scene_manager",
         "@eigen",
