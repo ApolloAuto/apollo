@@ -58,6 +58,13 @@ DECLARE_double(score_threshold);
 DECLARE_double(nms_overlap_threshold);
 DECLARE_int32(num_output_box_feature);
 
+// lidar_mask_pillars
+DECLARE_string(mask_pfe_torch_file);
+DECLARE_string(mask_scattered_torch_file);
+DECLARE_string(mask_backbone_torch_file);
+DECLARE_string(mask_fpn_torch_file);
+DECLARE_string(mask_bbox_head_torch_file);
+
 // emergency detection onnx
 DECLARE_string(onnx_obstacle_detector_model);
 DECLARE_string(onnx_test_input_path);
