@@ -207,7 +207,7 @@ def setup_common_dirs(environ_cp):
 
     write_to_bazelrc('startup --output_user_root="{}/bazel"'.format(cache_dir))
     write_to_bazelrc('common --distdir="{}"'.format(dist_dir))
-    write_to_bazelrc('build --repository_cache="{}/repos"'.format(cache_dir))
+    write_to_bazelrc('common --repository_cache="{}/repos"'.format(cache_dir))
     write_to_bazelrc('build --disk_cache="{}/build"'.format(cache_dir))
     write_to_bazelrc('')
 
