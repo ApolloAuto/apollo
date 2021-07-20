@@ -1,6 +1,6 @@
 # How to add a new lidar detector algorithm
 
-Apollo has provided two lidar detector algorithms -- PointPillars and CNN （NCut is no longer used）. Both of them could be easily changed or replaced by other algorithms. The input of algorithm should be original points cloud data, while the output should be obastacle object data. This document will introduce how to add a new lidar detector algorithm, the basic task sequence is listed below：
+Apollo has provided two lidar detector algorithms -- PointPillars and CNN （NCut will no longer be updated）. Both of them could be easily changed or replaced by other algorithms. The input of algorithm should be original points cloud data, while the output should be obastacle object data. This document will introduce how to add a new lidar detector algorithm, the basic task sequence is listed below：
 
 1. Define a class that inherits `base_lidar_detector`
 2. Implement the class `NewLidarDetector`
@@ -63,7 +63,7 @@ std::string NewLidarDetector::Name() const {
     */
 }
 
-PERCEPTION_REGISTER_LIDARDETECTOR(NCutSegmentation); //register the new detector
+PERCEPTION_REGISTER_LIDARDETECTOR(NewLidarDetector); //register the new detector
 
 }  // namespace lidar
 }  // namespace perception

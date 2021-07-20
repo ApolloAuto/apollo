@@ -64,7 +64,7 @@ std::string NewLidarTracker::Name() const {
     */
 }
 
-PERCEPTION_REGISTER_MULTITARGET_TRACKER(MlfEngine); //注册新的lidar_tracker
+PERCEPTION_REGISTER_MULTITARGET_TRACKER(NewLidarTracker); //注册新的lidar_tracker
 
 }  // namespace lidar
 }  // namespace perception
