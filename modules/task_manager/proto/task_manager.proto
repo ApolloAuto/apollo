@@ -12,6 +12,15 @@ enum TaskType {
   DEAD_END_ROUTING = 3;
 }
 
+enum JunctionType {
+  UNKNOWN = 0;
+  IN_ROAD = 1;
+  CROSS_ROAD = 2;
+  FORK_ROAD = 3;
+  MAIN_SIDE = 4;
+  DEAD_END = 5;
+}
+
 message CycleRoutingTask {
   optional int32 cycle_num = 1;
   optional apollo.routing.RoutingRequest routing_request = 2;
