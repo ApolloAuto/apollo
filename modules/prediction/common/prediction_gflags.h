@@ -104,6 +104,8 @@ DECLARE_string(torch_vehicle_semantic_lstm_cpu_file);
 DECLARE_string(torch_vehicle_cruise_go_file);
 DECLARE_string(torch_vehicle_cruise_cutin_file);
 DECLARE_string(torch_vehicle_lane_scanning_file);
+DECLARE_string(torch_vehicle_vectornet_file);
+DECLARE_string(torch_vehicle_vectornet_cpu_file);
 DECLARE_string(torch_pedestrian_interaction_position_embedding_file);
 DECLARE_string(torch_pedestrian_interaction_social_embedding_file);
 DECLARE_string(torch_pedestrian_interaction_single_lstm_file);

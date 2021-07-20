@@ -173,6 +173,12 @@ DEFINE_string(torch_vehicle_cruise_cutin_file,
 DEFINE_string(torch_vehicle_lane_scanning_file,
               "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
               "Vehicle lane scanning model file");
+DEFINE_string(torch_vehicle_vectornet_file,
+              "/apollo/modules/prediction/data/vectornet_vehicle_model.pt",
+              "Vehicle vectornet model file");
+DEFINE_string(torch_vehicle_vectornet_cpu_file,
+              "/apollo/modules/prediction/data/vectornet_vehicle_cpu_model.pt",
+              "Vehicle vectornet cpu model file");
 DEFINE_string(torch_pedestrian_interaction_position_embedding_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_position_embedding.pt",
@@ -260,7 +266,7 @@ DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
               "The default s value if no obstacle in the lane sequence.");
 DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,
               "The default l value if no obstacle in the lane sequence.");
-DEFINE_bool(enable_semantic_map, true, "If enable semantic map on prediction");
+DEFINE_bool(enable_semantic_map, false, "If enable semantic map on prediction");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,

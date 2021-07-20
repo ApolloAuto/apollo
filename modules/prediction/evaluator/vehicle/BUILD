@@ -182,4 +182,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "vectornet_evaluator",
+    srcs = ["vectornet_evaluator.cc"],
+    hdrs = ["vectornet_evaluator.h"],
+    copts = PREDICTION_FOPENMP_COPTS,
+    deps = [
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator",
+        "//modules/prediction/pipeline:vector_net",
+        "//third_party:libtorch",
+        "@eigen",
+    ],
+)
+
 cpplint()

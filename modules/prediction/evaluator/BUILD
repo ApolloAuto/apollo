@@ -26,7 +26,9 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:semantic_lstm_evaluator",
+        "//modules/prediction/evaluator/vehicle:vectornet_evaluator",
         "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//modules/prediction/pipeline:vector_net",
         "//third_party:libtorch",
     ],
 )
