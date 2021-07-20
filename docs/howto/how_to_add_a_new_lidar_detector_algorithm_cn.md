@@ -45,7 +45,7 @@ class NewLidarDetector : public BaseLidarDetector {
 }  // namespace apollo
 ```
 
-基类`base_lidar_detector`已定义好各虚函数签名，接口信息如下：
+基类 `base_lidar_detector` 已定义好各虚函数签名，接口信息如下：
 
 ```c++
 struct LidarDetectorInitOptions {
