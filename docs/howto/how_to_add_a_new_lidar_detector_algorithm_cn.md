@@ -1,6 +1,6 @@
 # 如何添加新的lidar检测算法
 
-Apollo默认提供了2种lidar检测算法--PointPillars和CNN（NCut已弃用），可以轻松更改或替换为不同的算法。每种算法的输入都是原始点云信息，输出都是目标级障碍物信息。本篇文档将介绍如何引入新的lidar检测算法，添加新算法的步骤如下：
+Apollo默认提供了2种lidar检测算法--PointPillars和CNN（NCut不再维护），可以轻松更改或替换为不同的算法。每种算法的输入都是原始点云信息，输出都是目标级障碍物信息。本篇文档将介绍如何引入新的lidar检测算法，添加新算法的步骤如下：
 
 1. 定义一个继承基类 `base_lidar_detector` 的类
 2. 实现新类 `NewLidarDetector`
@@ -63,7 +63,7 @@ std::string NewLidarDetector::Name() const {
     */
 }
 
-PERCEPTION_REGISTER_LIDARDETECTOR(NCutSegmentation); //注册新的lidar_detector
+PERCEPTION_REGISTER_LIDARDETECTOR(NewLidarDetector); //注册新的lidar_detector
 
 }  // namespace lidar
 }  // namespace perception
