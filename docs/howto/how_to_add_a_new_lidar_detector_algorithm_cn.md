@@ -1,5 +1,14 @@
 # 如何添加新的lidar检测算法
 
+Perception中的lidar数据流如下：
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+
+本篇文档所介绍的lidar检测算法位于图中的Detection Component中。当前Detection Component的架构如下：
+![lidar detection high-level](images/lidar_detection_1.png)
+![lidar detection](images/lidar_detection_2.png)
+
+从以上结构中可以清楚地看到lidar检测算法是位于Detection Component的 `base_lidar_obstacle_detection` 中的抽象成员类 `base_lidar_detector` 的派生类。下面将详细介绍如何基于当前结构添加新的lidar检测算法。
+
 Apollo默认提供了2种lidar检测算法--PointPillars和CNN（NCut不再维护），可以轻松更改或替换为不同的算法。每种算法的输入都是原始点云信息，输出都是目标级障碍物信息。本篇文档将介绍如何引入新的lidar检测算法，添加新算法的步骤如下：
 
 1. 定义一个继承基类 `base_lidar_detector` 的类
@@ -34,6 +43,50 @@ class NewLidarDetector : public BaseLidarDetector {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
+```
+
+基类`base_lidar_detector`已定义好各虚函数签名，接口信息如下：
+
+```c++
+struct LidarDetectorInitOptions {
+  std::string sensor_name = "velodyne64";
+};
+
+struct LidarDetectorOptions {};
+
+struct LidarFrame {
+  // point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> cloud;
+  // world point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> world_cloud;
+  // timestamp
+  double timestamp = 0.0;
+  // lidar to world pose
+  Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
+  // lidar to world pose
+  Eigen::Affine3d novatel2world_pose = Eigen::Affine3d::Identity();
+  // hdmap struct
+  std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
+  // segmented objects
+  std::vector<std::shared_ptr<base::Object>> segmented_objects;
+  // tracked objects
+  std::vector<std::shared_ptr<base::Object>> tracked_objects;
+  // point cloud roi indices
+  base::PointIndices roi_indices;
+  // point cloud non ground indices
+  base::PointIndices non_ground_indices;
+  // secondary segmentor indices
+  base::PointIndices secondary_indices;
+  // sensor info
+  base::SensorInfo sensor_info;
+  // reserve string
+  std::string reserve;
+
+  void Reset();
+
+  void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,
+                        const std::vector<uint32_t> &indices);
+};
 ```
 
 ## 实现新类 `NewLidarDetector`
