@@ -1,5 +1,13 @@
 # How to add a new lidar tracker algorithm
 
+The processing flow of lidar perception module is shown below: ：
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+
+The tracker algorithm introduced by this document is located at Recognition Component listed below. Current architecture of Recognition Component is shown：
+![lidar recognition](images/lidar_recognition.png)
+
+As we can see from above structure, lidar tracker algorithm, such as MlfEngine, is the derived class of `base_multi_target_tracker` which acts as a abstract class member of `base_lidar_obstacle_tracking` located in Recognition Component. Next, We will introduce how to add a new lidar tracker algorithm.
+
 The default tracking algorithm of Apollo is MlfEngine，which cloud be easily changed or replaced by other algorithms. This document will introduce how to add a new lidar tracker algorithm, the basic task sequence is listed below：
 
 1. Define a class that inherits `base_multi_target_tracker` 
@@ -35,6 +43,48 @@ class NewLidarTracker : public BaseMultiTargetTracker {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
+```
+
+The function signature of `base_multi_target_tracker` is pre-defined：
+
+```c++
+struct MultiTargetTrackerInitOptions {};
+
+struct MultiTargetTrackerOptions {};
+
+struct LidarFrame {
+  // point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> cloud;
+  // world point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> world_cloud;
+  // timestamp
+  double timestamp = 0.0;
+  // lidar to world pose
+  Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
+  // lidar to world pose
+  Eigen::Affine3d novatel2world_pose = Eigen::Affine3d::Identity();
+  // hdmap struct
+  std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
+  // segmented objects
+  std::vector<std::shared_ptr<base::Object>> segmented_objects;
+  // tracked objects
+  std::vector<std::shared_ptr<base::Object>> tracked_objects;
+  // point cloud roi indices
+  base::PointIndices roi_indices;
+  // point cloud non ground indices
+  base::PointIndices non_ground_indices;
+  // secondary segmentor indices
+  base::PointIndices secondary_indices;
+  // sensor info
+  base::SensorInfo sensor_info;
+  // reserve string
+  std::string reserve;
+
+  void Reset();
+
+  void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,
+                        const std::vector<uint32_t> &indices);
+};
 ```
 
 ## Implement the class `NewLidarTracker`
