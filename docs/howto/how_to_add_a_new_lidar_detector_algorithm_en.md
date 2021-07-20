@@ -1,5 +1,14 @@
 # How to add a new lidar detector algorithm
 
+The processing flow of lidar perception module is shown below: ：
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+
+The detector algorithm introduced by this document is located at Detection Component listed below. Current architecture of Detection Component is shown：
+![lidar detection high-level](images/lidar_detection_1.png)
+![lidar detection](images/lidar_detection_2.png)
+
+As we can see from above structure, lidar detector algorithm, such as PointPillars, is the derived class of `base_lidar_detector` which acts as a abstract class member of `base_lidar_obstacle_detection` located in Detection Component. Next, We will introduce how to add a new lidar detector algorithm.
+
 Apollo has provided two lidar detector algorithms -- PointPillars and CNN （NCut will no longer be updated）. Both of them could be easily changed or replaced by other algorithms. The input of algorithm should be original points cloud data, while the output should be obastacle object data. This document will introduce how to add a new lidar detector algorithm, the basic task sequence is listed below：
 
 1. Define a class that inherits `base_lidar_detector`
@@ -34,6 +43,50 @@ class NewLidarDetector : public BaseLidarDetector {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
+```
+
+The function signature of `base_lidar_detector` is pre-defined：
+
+```c++
+struct LidarDetectorInitOptions {
+  std::string sensor_name = "velodyne64";
+};
+
+struct LidarDetectorOptions {};
+
+struct LidarFrame {
+  // point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> cloud;
+  // world point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> world_cloud;
+  // timestamp
+  double timestamp = 0.0;
+  // lidar to world pose
+  Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
+  // lidar to world pose
+  Eigen::Affine3d novatel2world_pose = Eigen::Affine3d::Identity();
+  // hdmap struct
+  std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
+  // segmented objects
+  std::vector<std::shared_ptr<base::Object>> segmented_objects;
+  // tracked objects
+  std::vector<std::shared_ptr<base::Object>> tracked_objects;
+  // point cloud roi indices
+  base::PointIndices roi_indices;
+  // point cloud non ground indices
+  base::PointIndices non_ground_indices;
+  // secondary segmentor indices
+  base::PointIndices secondary_indices;
+  // sensor info
+  base::SensorInfo sensor_info;
+  // reserve string
+  std::string reserve;
+
+  void Reset();
+
+  void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,
+                        const std::vector<uint32_t> &indices);
+};
 ```
 
 ## Implement the class `NewLidarDetector`
