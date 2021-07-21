@@ -46,20 +46,22 @@ class TLPreprocessor : public BaseTLPreprocessor {
   std::string Name() const override;
 
   bool UpdateCameraSelection(const CarPose& pose,
-                             const TLPreprocessorOption& option,
-                             std::vector<base::TrafficLightPtr>* lights) override;
+                    const TLPreprocessorOption& option,
+                    std::vector<base::TrafficLightPtr>* lights) override;
 
   bool SyncInformation(const double ts, const std::string& camera_name);
   bool UpdateLightsProjection(const CarPose& pose,
-                              const TLPreprocessorOption& option,
-                              const std::string& camera_name,
-                              std::vector<base::TrafficLightPtr>* lights) override;
+                    const TLPreprocessorOption& option,
+                    const std::string& camera_name,
+                    std::vector<base::TrafficLightPtr>* lights) override;
 
-  bool SetCameraWorkingFlag(const std::string& camera_name, bool is_working) override;
+  bool SetCameraWorkingFlag(const std::string& camera_name,
+                    bool is_working) override;
   bool GetCameraWorkingFlag(const std::string& camera_name,
                             bool* is_working) const override;
 
-  const std::vector<std::string>& GetCameraNamesByDescendingFocalLen() const override {
+  const std::vector<std::string>&
+    GetCameraNamesByDescendingFocalLen() const override {
     return projection_.getCameraNamesByDescendingFocalLen();
   }
   bool GetAlllightsOutsideFlag() const;

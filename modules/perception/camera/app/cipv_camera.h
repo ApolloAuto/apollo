@@ -35,7 +35,7 @@
 
 namespace apollo {
 namespace perception {
-namespace camera{
+namespace camera {
 
 constexpr float kMinVelocity = 10.0f;  // in m/s
 constexpr float kMaxDistObjectToLaneInMeter = 70.0f;
@@ -55,7 +55,7 @@ class Cipv : public BaseCipv {
   ~Cipv() = default;
 
   bool Init(const Eigen::Matrix3d &homography_im2car,
-            const CipvInitOptions &options =CipvInitOptions()) override;
+            const CipvInitOptions &options = CipvInitOptions()) override;
 
   bool Process(CameraFrame *frame,
                const CipvOptions &options,
