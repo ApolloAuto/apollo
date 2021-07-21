@@ -578,8 +578,8 @@ int PathBoundsDecider::IsPointWithinPathBound(
   }else{
     ADEBUG << "The idx_after = " << idx_after;
     ADEBUG << "The boundary is: "
-          << "[" << std::get<1>(path_bound[idx_after]) << ", "
-          << std::get<2>(path_bound[idx_after]) << "].";
+           << "[" << std::get<1>(path_bound[idx_after]) << ", "
+           << std::get<2>(path_bound[idx_after]) << "].";
     ADEBUG << "The point is at: " << point_sl.l();
     int idx_before = idx_after - 1;
     if (std::get<1>(path_bound[idx_before]) <= point_sl.l() &&
