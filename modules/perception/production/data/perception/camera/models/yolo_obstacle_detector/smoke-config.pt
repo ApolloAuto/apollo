@@ -1,8 +1,8 @@
 model_param {
   model_name: "./3d-r4-half"
   model_type: "Obstacle"
-  weight_file: "../smoke_libtorch_model.pth"
-  proto_file: "../smoke_libtorch_model.pth"
+  weight_file: "../smoke_libtorch_model/smoke_libtorch_model.pth"
+  proto_file: "../smoke_libtorch_model/smoke_libtorch_model.pth"
   anchors_file: "anchors.txt"
   types_file: "types.txt"
   calibratetable_root: "./3d-r4-half"

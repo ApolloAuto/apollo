@@ -65,11 +65,11 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   return perception_param.gpu_id();
 }
 
-bool SetCameraHeight(const std::string &sensor_name,
-                     const std::string &params_dir,
-                     const std::string &lidar_sensor_name,
-                     float default_camera_height,
-                     float *camera_height) {
+static bool SetCameraHeight(const std::string &sensor_name,
+                            const std::string &params_dir,
+                            const std::string &lidar_sensor_name,
+                            float default_camera_height,
+                            float *camera_height) {
   float base_h = default_camera_height;
   float camera_offset = 0.0f;
   try {
@@ -99,8 +99,8 @@ bool SetCameraHeight(const std::string &sensor_name,
 }
 
 // @description: load camera extrinsics from yaml file
-bool LoadExtrinsics(const std::string &yaml_file,
-                    Eigen::Matrix4d *camera_extrinsic) {
+static bool LoadExtrinsics(const std::string &yaml_file,
+                           Eigen::Matrix4d *camera_extrinsic) {
   if (!apollo::cyber::common::PathExists(yaml_file)) {
     AINFO << yaml_file << " does not exist!";
     return false;
@@ -153,10 +153,10 @@ bool LoadExtrinsics(const std::string &yaml_file,
 }
 
 // @description: get project matrix
-bool GetProjectMatrix(
-    const std::vector<std::string> &camera_names,
-    const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
+static bool GetProjectMatrix(
+      const std::vector<std::string> &camera_names,
+      const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
+      const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
     Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
   // TODO(techoe): This condition should be removed.
   if (camera_names.size() != 2) {

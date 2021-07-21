@@ -28,12 +28,14 @@ install(
 cc_library(
     name = "perception_component_inner_camera",
     srcs = [
+        "camera_obstacle_detection_component.cc",
         "camera_perception_viz_message.cc",
         "fusion_camera_detection_component.cc",
         "lane_detection_component.cc",
         "trafficlights_perception_component.cc",
     ],
     hdrs = [
+        "camera_obstacle_detection_component.h",
         "camera_perception_viz_message.h",
         "fusion_camera_detection_component.h",
         "lane_detection_component.h",
@@ -55,6 +57,7 @@ cc_library(
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/app:lane_camera_perception",
         "//modules/perception/camera/app:obstacle_camera_perception",
+        "//modules/perception/camera/app:obstacle_detection_camera",
         "//modules/perception/camera/app:traffic_light_camera_perception",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/motion_service:motion_service_lib",
