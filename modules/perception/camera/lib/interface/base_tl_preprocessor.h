@@ -66,9 +66,10 @@ class BaseTLPreprocessor {
   virtual bool GetCameraWorkingFlag(const std::string& camera_name,
                             bool* is_working) const = 0;
 
-  virtual const std::vector<std::string>& GetCameraNamesByDescendingFocalLen() const = 0;
+  virtual const std::vector<std::string>&
+                GetCameraNamesByDescendingFocalLen() const = 0;
 
-  private:
+ private:
   DISALLOW_COPY_AND_ASSIGN(BaseTLPreprocessor);
 };
 

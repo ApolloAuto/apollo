@@ -47,7 +47,7 @@ class BaseMultiSensorFusion {
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseMultiSensorFusion);
-}; // Class BaseMultiSensorFusion
+};  // Class BaseMultiSensorFusion
 
 PERCEPTION_REGISTER_REGISTERER(BaseMultiSensorFusion);
 #define PERCEPTION_REGISTER_MULTISENSORFUSION(name) \
