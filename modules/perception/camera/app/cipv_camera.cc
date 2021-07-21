@@ -25,13 +25,13 @@
 
 namespace apollo {
 namespace perception {
-namespace camera{
+namespace camera {
 
 bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
                 const CipvInitOptions &options) {
   b_image_based_cipv_ = options.image_based_cipv;
   debug_level_ =
-      options.debug_level;  
+      options.debug_level;
                     // 0: no debug message
                     // 1: minimal output
                     // 2: some important output
@@ -60,8 +60,7 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
 bool Cipv::Process(CameraFrame *frame,
                const CipvOptions &options,
                const Eigen::Affine3d &world2camera,
-               const base::MotionBufferPtr &motion_buffer){
-
+               const base::MotionBufferPtr &motion_buffer) {
   DetermineCipv(frame->lane_objects, options, world2camera,
                           &frame->tracked_objects);
 

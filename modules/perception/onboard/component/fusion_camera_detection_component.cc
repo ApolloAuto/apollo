@@ -408,7 +408,8 @@ int FusionCameraDetectionComponent::InitConfig() {
   cipv_init_options_.image_based_cipv =
       static_cast<float>(fusion_camera_detection_param.image_based_cipv());
 
-  cipv_init_options_.debug_level = static_cast<int>(fusion_camera_detection_param.debug_level());
+  cipv_init_options_.debug_level =
+      static_cast<int>(fusion_camera_detection_param.debug_level());
   enable_cipv_ = fusion_camera_detection_param.enable_cipv();
 
   cipv_name_ = fusion_camera_detection_param.cipv();
@@ -501,7 +502,6 @@ int FusionCameraDetectionComponent::InitAlgorithmPlugin() {
   }
   AINFO << "camera_obstacle_pipeline_->Init() succeed";
   return cyber::SUCC;
-
 }
 
 int FusionCameraDetectionComponent::InitCameraFrames() {

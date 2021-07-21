@@ -164,7 +164,7 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   preprocessor_init_options_.sync_interval_seconds =
       static_cast<float>(traffic_light_param.sync_interval_seconds());
   tl_preprocessor_name_ = traffic_light_param.tl_preprocessor_name();
-  
+
   camera_perception_init_options_.root_dir =
       traffic_light_param.camera_traffic_light_perception_conf_dir();
   camera_perception_init_options_.conf_file =
@@ -186,8 +186,9 @@ int TrafficLightsPerceptionComponent::InitConfig() {
 
 int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   // init preprocessor
-  camera::BaseTLPreprocessor* preprocessor = camera::BaseTLPreprocessorRegisterer::
-        GetInstanceByName(tl_preprocessor_name_);
+  camera::BaseTLPreprocessor* preprocessor =
+            camera::BaseTLPreprocessorRegisterer::
+            GetInstanceByName(tl_preprocessor_name_);
   CHECK_NOTNULL(preprocessor);
   preprocessor_.reset(preprocessor);
 

@@ -25,7 +25,7 @@ bool ObstacleMultiSensorFusion::Init(
     AINFO << "Already inited";
     return true;
   }
-  BaseFusionSystem* fusion = 
+  BaseFusionSystem* fusion =
           BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
   fusion_.reset(fusion);
 

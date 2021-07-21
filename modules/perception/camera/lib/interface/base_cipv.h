@@ -30,7 +30,7 @@
 
 namespace apollo {
 namespace perception {
-namespace camera{
+namespace camera {
 
 struct CipvInitOptions : public BaseInitOptions {
   float min_laneline_length_for_cipv = 2.0f;
@@ -57,7 +57,7 @@ class BaseCipv {
   virtual ~BaseCipv() = default;
 
   virtual bool Init(const Eigen::Matrix3d &homography_im2car,
-      const CipvInitOptions &options =CipvInitOptions()) = 0;
+      const CipvInitOptions &options = CipvInitOptions()) = 0;
 
   virtual bool Process(CameraFrame *frame,
                     const CipvOptions &options,
