@@ -66,12 +66,19 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
+message ObstacleInteractiveTag {
+  enum InteractiveTag {
+    INTERACTION = 1;
+    NONINTERACTION = 2;
+  }
+  optional InteractiveTag interactive_tag = 37 [default = NONINTERACTION];
+}
 message Trajectory {
   optional double probability = 1;  // probability of this trajectory
   repeated apollo.common.TrajectoryPoint trajectory_point = 2;
 }
 
-// next id = 37
+// next id = 39
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -110,6 +117,7 @@ message Feature {
   optional double label_update_time_delta = 24;
 
   optional ObstaclePriority priority = 25;
+  optional ObstacleInteractiveTag interactive_tag = 37;
 
   optional bool is_near_junction = 29 [default = false];
 
@@ -123,8 +131,9 @@ message Feature {
   // Obstacle predicted trajectories
   repeated Trajectory predicted_trajectory = 33;
 
-  // ADC trajectory at the same frame
+  // ADC trajectory at the same frame, and ADC trajectory timestamp
   repeated apollo.common.TrajectoryPoint adc_trajectory_point = 34;
+  optional double adc_timestamp = 38;
 
   // Surrounding lanes
   repeated string surrounding_lane_id = 35;

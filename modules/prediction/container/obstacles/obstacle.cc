@@ -1456,6 +1456,29 @@ bool Obstacle::IsCaution() const {
   return feature.priority().priority() == ObstaclePriority::CAUTION;
 }
 
+void Obstacle::SetInteractiveTag() {
+  CHECK_GT(feature_history_.size(), 0U);
+  Feature* feature = mutable_latest_feature();
+  feature->mutable_interactive_tag()
+      ->set_interactive_tag(ObstacleInteractiveTag::INTERACTION);
+}
+
+void Obstacle::SetNonInteractiveTag() {
+  CHECK_GT(feature_history_.size(), 0U);
+  Feature* feature = mutable_latest_feature();
+  feature->mutable_interactive_tag()
+      ->set_interactive_tag(ObstacleInteractiveTag::NONINTERACTION);
+}
+
+bool Obstacle::IsInteractiveObstacle() const {
+  if (feature_history_.empty()) {
+    return false;
+  }
+  const Feature& feature = latest_feature();
+  return feature.interactive_tag().interactive_tag() ==
+                 ObstacleInteractiveTag::INTERACTION;
+}
+
 void Obstacle::SetEvaluatorType(
     const ObstacleConf::EvaluatorType& evaluator_type) {
   obstacle_conf_.set_evaluator_type(evaluator_type);

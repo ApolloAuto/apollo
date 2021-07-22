@@ -28,6 +28,7 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 /**
  * @namespace apollo::prediction
@@ -71,6 +72,17 @@ class Evaluator {
     return Evaluate(obstacle, obstacles_container);
   }
 
+  /**
+   * @brief Evaluate an obstacle
+   * @param ADC trajectory container
+   * @param Obstacle pointer
+   * @param Obstacles container
+   */
+  virtual bool Evaluate(const ADCTrajectoryContainer* adc_trajectory_container,
+                        Obstacle* obstacle,
+                        ObstaclesContainer* obstacles_container) {
+    return Evaluate(obstacle, obstacles_container);
+  }
   /**
    * @brief Get the name of evaluator
    */

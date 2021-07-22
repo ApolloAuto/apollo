@@ -26,7 +26,10 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:semantic_lstm_evaluator",
+        "//modules/prediction/evaluator/vehicle:jointly_prediction_planning_evaluator",
+        "//modules/prediction/evaluator/vehicle:vectornet_evaluator",
         "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//modules/prediction/pipeline:vector_net",
         "//third_party:libtorch",
     ],
 )
@@ -53,6 +56,7 @@ cc_library(
     hdrs = ["evaluator.h"],
     deps = [
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
     ],
 )
 
