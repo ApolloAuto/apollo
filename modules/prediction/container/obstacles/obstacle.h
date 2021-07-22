@@ -228,6 +228,17 @@ class Obstacle {
 
   bool IsCaution() const;
 
+  /**
+   * @brief Set the obstacle as interactive obstacle.
+   */
+  void SetInteractiveTag();
+  /**
+   * @brief Set the obstacle as noninteractive obstacle.
+   */
+  void SetNonInteractiveTag();
+
+  bool IsInteractiveObstacle() const;
+
   void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
 
   void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);
