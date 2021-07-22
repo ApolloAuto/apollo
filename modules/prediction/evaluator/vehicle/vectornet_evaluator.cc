@@ -106,14 +106,13 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   auto start_time_query = std::chrono::system_clock::now();
 
-  VectorNet vector_net = VectorNet();
-  if (!vector_net.query(center_point, heading, &map_feature, &map_p_id)) {
+  if (!vector_net_.query(center_point, heading, &map_feature, &map_p_id)) {
     return false;
   }
 
   auto end_time_query = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_query = end_time_query - start_time_query;
-  ADEBUG << "vectors query used time: " << diff.count() * 1000 << " ms.";
+  ADEBUG << "vectors query used time: " << diff_query.count() * 1000 << " ms.";
 
   auto start_time_data_prep = std::chrono::system_clock::now();
 

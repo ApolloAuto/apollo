@@ -24,21 +24,20 @@
 
 namespace apollo {
 namespace prediction {
-
 template <typename Points>
 void VectorNet::GetOnePolyline(
-                          const Points& points, double *start_length,
-                          const common::PointENU& center_point,
-                          const double obstacle_phi, ATTRIBUTE_TYPE attr_type,
-                          BOUNDARY_TYPE bound_type, const int count,
-                          std::vector<std::vector<double>>* const one_polyline,
-                          std::vector<double>* const one_p_id) {
+    const Points& points, double* start_length,
+    const common::PointENU& center_point, const double obstacle_phi,
+    ATTRIBUTE_TYPE attr_type, BOUNDARY_TYPE bound_type, const int count,
+    std::vector<std::vector<double>>* const one_polyline,
+    std::vector<double>* const one_p_id) {
   size_t size = points.size();
   std::vector<double> s(size, 0);
 
   for (size_t i = 1; i < size; ++i) {
     s[i] = std::hypot(points.at(i).x() - points.at(i - 1).x(),
-                      points.at(i).y() - points.at(i - 1).y()) + s[i - 1];
+                      points.at(i).y() - points.at(i - 1).y()) +
+           s[i - 1];
   }
 
   std::vector<double> x;
@@ -53,12 +52,10 @@ void VectorNet::GetOnePolyline(
     } else {
       const auto distance = std::distance(s.begin(), it_lower);
       x.push_back(common::math::lerp(points.at(distance - 1).x(),
-                                     s[distance - 1],
-                                     points.at(distance).x(),
+                                     s[distance - 1], points.at(distance).x(),
                                      s[distance], cur_length));
       y.push_back(common::math::lerp(points.at(distance - 1).y(),
-                                     s[distance - 1],
-                                     points.at(distance).y(),
+                                     s[distance - 1], points.at(distance).y(),
                                      s[distance], cur_length));
     }
     cur_length += FLAGS_point_distance;
@@ -71,8 +68,8 @@ void VectorNet::GetOnePolyline(
   const double attr = attribute_map.at(attr_type);
   const double bound = boundary_map.at(bound_type);
   auto last_point_after_rotate = common::math::RotateVector2d(
-    {x[0] - center_point.x(), y[0] - center_point.y()},
-    M_PI_2 - obstacle_phi);
+      {x[0] - center_point.x(), y[0] - center_point.y()},
+      M_PI_2 - obstacle_phi);
 
   for (size_t i = 1; i < point_size; ++i) {
     if (one_p_id->at(0) > last_point_after_rotate.x()) {
@@ -89,8 +86,8 @@ void VectorNet::GetOnePolyline(
     one_vector.push_back(last_point_after_rotate.y());
 
     Eigen::Vector2d point_after_rotate = common::math::RotateVector2d(
-      {x[i] - center_point.x(), y[i] - center_point.y()},
-      M_PI_2 - obstacle_phi);
+        {x[i] - center_point.x(), y[i] - center_point.y()},
+        M_PI_2 - obstacle_phi);
 
     one_vector.push_back(point_after_rotate.x());
     one_vector.push_back(point_after_rotate.y());
@@ -110,7 +107,6 @@ bool VectorNet::query(const common::PointENU& center_point,
                       PidVector* const p_id_ptr) {
   CHECK_NOTNULL(feature_ptr);
   count_ = 0;
-  apollo::hdmap::HDMapUtil::ReloadMaps();
   GetRoads(center_point, obstacle_phi, feature_ptr, p_id_ptr);
   GetLanes(center_point, obstacle_phi, feature_ptr, p_id_ptr);
   GetJunctions(center_point, obstacle_phi, feature_ptr, p_id_ptr);
@@ -178,8 +174,8 @@ void VectorNet::GetRoads(const common::PointENU& center_point,
 
         for (const auto& segment : edge.curve().segment()) {
           GetOnePolyline(segment.line_segment().point(), &start_length,
-                         center_point, obstacle_phi, ROAD, bound_type,
-                         count_, &one_polyline, &one_p_id);
+                         center_point, obstacle_phi, ROAD, bound_type, count_,
+                         &one_polyline, &one_p_id);
         }
         if (one_polyline.size() == 0) continue;
 
@@ -191,8 +187,9 @@ void VectorNet::GetRoads(const common::PointENU& center_point,
   }
 }
 
-void VectorNet::GetLaneQueue(const std::vector<hdmap::LaneInfoConstPtr>& lanes,
-  std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr) {
+void VectorNet::GetLaneQueue(
+    const std::vector<hdmap::LaneInfoConstPtr>& lanes,
+    std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr) {
   std::unordered_set<hdmap::LaneInfoConstPtr> lane_set(lanes.begin(),
                                                        lanes.end());
 
@@ -249,9 +246,9 @@ void VectorNet::GetLanes(const common::PointENU& center_point,
       std::cout << lane->lane().id().id() << " ";
       // if (lane->lane().left_boundary().virtual_()) continue;
       for (const auto& segment :
-             lane->lane().left_boundary().curve().segment()) {
+           lane->lane().left_boundary().curve().segment()) {
         auto bound_type =
-          lane->lane().left_boundary().boundary_type(0).types(0);
+            lane->lane().left_boundary().boundary_type(0).types(0);
         GetOnePolyline(segment.line_segment().point(), &start_length,
                        center_point, obstacle_phi, lane_attr_map.at(bound_type),
                        LEFT_BOUNDARY, count_, &left_polyline, &left_p_id);
@@ -271,9 +268,9 @@ void VectorNet::GetLanes(const common::PointENU& center_point,
     for (const auto& lane : lane_deque) {
       // if (lane->lane().right_boundary().virtual_()) continue;
       for (const auto& segment :
-             lane->lane().right_boundary().curve().segment()) {
+           lane->lane().right_boundary().curve().segment()) {
         auto bound_type =
-          lane->lane().left_boundary().boundary_type(0).types(0);
+            lane->lane().left_boundary().boundary_type(0).types(0);
         GetOnePolyline(segment.line_segment().point(), &start_length,
                        center_point, obstacle_phi, lane_attr_map.at(bound_type),
                        RIGHT_BOUNDARY, count_, &right_polyline, &right_p_id);

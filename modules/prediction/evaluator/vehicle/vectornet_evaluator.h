@@ -20,10 +20,10 @@
 #include <utility>
 #include <vector>
 
-#include "modules/prediction/evaluator/evaluator.h"
-#include "modules/prediction/pipeline/vector_net.h"
 #include "torch/extension.h"
 #include "torch/script.h"
+#include "modules/prediction/evaluator/evaluator.h"
+#include "modules/prediction/pipeline/vector_net.h"
 
 namespace apollo {
 namespace prediction {
@@ -59,8 +59,7 @@ class VectornetEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the obstacle history
    */
   bool ExtractObstaclesHistory(
-      Obstacle* obstacle_ptr,
-      ObstaclesContainer* obstacles_container,
+      Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
       std::vector<std::pair<double, double>>* curr_pos_history,
       std::vector<std::pair<double, double>>* all_obs_length,
       std::vector<std::vector<std::pair<double, double>>>* all_obs_pos_history);
@@ -80,6 +79,7 @@ class VectornetEvaluator : public Evaluator {
   torch::jit::script::Module torch_vehicle_model_;
   at::Tensor torch_default_output_tensor_;
   torch::Device device_;
+  VectorNet vector_net_;
 };
 
 }  // namespace prediction

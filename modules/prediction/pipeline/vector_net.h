@@ -20,11 +20,11 @@
 #include <map>
 #include <vector>
 
+#include "modules/prediction/proto/vector_net.pb.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
-#include "modules/prediction/proto/vector_net.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -54,7 +54,7 @@ enum BOUNDARY_TYPE {
 
 class VectorNet {
  public:
-  VectorNet() = default;
+  VectorNet() { apollo::hdmap::HDMapUtil::ReloadMaps(); };
 
   ~VectorNet() = default;
 
@@ -67,62 +67,56 @@ class VectorNet {
  private:
   // TODO(Yiqun): 1.Left/Right boundary 2.Ordinal Encoding
   const std::map<ATTRIBUTE_TYPE, double> attribute_map{
-    {ROAD, 0.0},
-    {LANE_UNKOWN, 1.0},
-    {LANE_DOTTED_YELLOW, 2.0},
-    {LANE_DOTTED_WHITE, 3.0},
-    {LANE_SOLID_YELLOW, 4.0},
-    {LANE_SOLID_WHITE, 5.0},
-    {LANE_DOUBLE_YELLOW, 6.0},
-    {LANE_CURB, 7.0},
-    {JUNCTION, 8.0},
-    {CROSSWALK, 9.0},
+      {ROAD, 0.0},
+      {LANE_UNKOWN, 1.0},
+      {LANE_DOTTED_YELLOW, 2.0},
+      {LANE_DOTTED_WHITE, 3.0},
+      {LANE_SOLID_YELLOW, 4.0},
+      {LANE_SOLID_WHITE, 5.0},
+      {LANE_DOUBLE_YELLOW, 6.0},
+      {LANE_CURB, 7.0},
+      {JUNCTION, 8.0},
+      {CROSSWALK, 9.0},
   };
 
   const std::map<BOUNDARY_TYPE, double> boundary_map{
-    {UNKNOW, 0.0},
-    {NORMAL, 1.0},
-    {LEFT_BOUNDARY, 2.0},
-    {RIGHT_BOUNDARY, 3.0},
+      {UNKNOW, 0.0}, {NORMAL, 1.0}, {LEFT_BOUNDARY, 2.0}, {RIGHT_BOUNDARY, 3.0},
   };
 
   const std::map<hdmap::LaneBoundaryType::Type, ATTRIBUTE_TYPE> lane_attr_map{
-    {hdmap::LaneBoundaryType::UNKNOWN, LANE_UNKOWN},
-    {hdmap::LaneBoundaryType::DOTTED_YELLOW, LANE_DOTTED_YELLOW},
-    {hdmap::LaneBoundaryType::DOTTED_WHITE, LANE_DOTTED_WHITE},
-    {hdmap::LaneBoundaryType::SOLID_YELLOW, LANE_SOLID_YELLOW},
-    {hdmap::LaneBoundaryType::SOLID_WHITE, LANE_SOLID_WHITE},
-    {hdmap::LaneBoundaryType::DOUBLE_YELLOW, LANE_DOUBLE_YELLOW},
-    {hdmap::LaneBoundaryType::CURB, LANE_CURB},
+      {hdmap::LaneBoundaryType::UNKNOWN, LANE_UNKOWN},
+      {hdmap::LaneBoundaryType::DOTTED_YELLOW, LANE_DOTTED_YELLOW},
+      {hdmap::LaneBoundaryType::DOTTED_WHITE, LANE_DOTTED_WHITE},
+      {hdmap::LaneBoundaryType::SOLID_YELLOW, LANE_SOLID_YELLOW},
+      {hdmap::LaneBoundaryType::SOLID_WHITE, LANE_SOLID_WHITE},
+      {hdmap::LaneBoundaryType::DOUBLE_YELLOW, LANE_DOUBLE_YELLOW},
+      {hdmap::LaneBoundaryType::CURB, LANE_CURB},
   };
 
   template <typename Points>
-  void GetOnePolyline(const Points& points, double *start_length,
-                     const common::PointENU& center_point,
-                     const double obstacle_phi, ATTRIBUTE_TYPE attr_type,
-                     BOUNDARY_TYPE bound_type, const int count,
-                     std::vector<std::vector<double>>* const one_polyline,
-                     std::vector<double>* const one_p_id);
+  void GetOnePolyline(const Points& points, double* start_length,
+                      const common::PointENU& center_point,
+                      const double obstacle_phi, ATTRIBUTE_TYPE attr_type,
+                      BOUNDARY_TYPE bound_type, const int count,
+                      std::vector<std::vector<double>>* const one_polyline,
+                      std::vector<double>* const one_p_id);
 
-  void GetRoads(const common::PointENU& center_point,
-                const double obstacle_phi,
+  void GetRoads(const common::PointENU& center_point, const double obstacle_phi,
                 FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
 
-  void GetLaneQueue(const std::vector<hdmap::LaneInfoConstPtr>& lanes,
-    std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr);
+  void GetLaneQueue(
+      const std::vector<hdmap::LaneInfoConstPtr>& lanes,
+      std::vector<std::deque<hdmap::LaneInfoConstPtr>>* const lane_deque_ptr);
 
-  void GetLanes(const common::PointENU& center_point,
-                           const double obstacle_phi,
-                           FeatureVector* const feature_ptr,
-                           PidVector* const p_id_ptr);
+  void GetLanes(const common::PointENU& center_point, const double obstacle_phi,
+                FeatureVector* const feature_ptr, PidVector* const p_id_ptr);
   void GetJunctions(const common::PointENU& center_point,
-                    const double obstacle_phi,
-                    FeatureVector* const feature_ptr,
+                    const double obstacle_phi, FeatureVector* const feature_ptr,
                     PidVector* const p_id_ptr);
   void GetCrosswalks(const common::PointENU& center_point,
-                    const double obstacle_phi,
-                    FeatureVector* const feature_ptr,
-                    PidVector* const p_id_ptr);
+                     const double obstacle_phi,
+                     FeatureVector* const feature_ptr,
+                     PidVector* const p_id_ptr);
   int count_ = 0;
 };
 
