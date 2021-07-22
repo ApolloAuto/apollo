@@ -18,27 +18,32 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
-class ObstacleMultiSensorFusion : public BaseMultiSensorFusion {
+struct ObstacleMultiSensorFusionParam {
+  std::vector<std::string> main_sensors;
+  std::string fusion_method;
+};
+
+class ObstacleMultiSensorFusion {
  public:
   ObstacleMultiSensorFusion() = default;
   ~ObstacleMultiSensorFusion() = default;
-
-  bool Init(const ObstacleMultiSensorFusionParam& param) override;
-
+  ObstacleMultiSensorFusion(const ObstacleMultiSensorFusion&) = delete;
+  ObstacleMultiSensorFusion& operator=(const ObstacleMultiSensorFusion&) =
+      delete;
+  bool Init(const ObstacleMultiSensorFusionParam& param);
   bool Process(const base::FrameConstPtr& frame,
-               std::vector<base::ObjectPtr>* objects) override;
+               std::vector<base::ObjectPtr>* objects);
 
-  std::string Name() const override { return "ObstacleMultiSensorFusion"; }
+  std::string Name() const { return "ObstacleMultiSensorFusion"; }
 
  protected:
-  std::unique_ptr<BaseFusionSystem> fusion_;
+  BaseFusionSystem* fusion_ = nullptr;
 };
 
 }  // namespace fusion
