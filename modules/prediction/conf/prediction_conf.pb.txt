@@ -70,3 +70,9 @@ obstacle_conf {
   obstacle_status: OFF_LANE
   predictor_type: FREE_MOVE_PREDICTOR
 }
+obstacle_conf {
+  obstacle_type: VEHICLE
+  interactive_tag: INTERACTION
+  evaluator_type: JOINTLY_PREDICTION_PLANNING_EVALUATOR
+  predictor_type: EXTRAPOLATION_PREDICTOR
+}

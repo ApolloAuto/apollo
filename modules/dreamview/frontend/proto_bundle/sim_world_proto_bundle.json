@@ -303,6 +303,10 @@
                   "type": "apollo.prediction.ObstaclePriority",
                   "id": 33
                 },
+                "interactiveTag": {
+                  "type": "apollo.prediction.ObstacleInteractiveTag",
+                  "id": 40
+                },
                 "source": {
                   "type": "apollo.perception.PerceptionObstacle.Source",
                   "id": 36,
@@ -11795,6 +11799,25 @@
                 }
               }
             },
+            "ObstacleInteractiveTag": {
+              "fields": {
+                "interactiveTag": {
+                  "type": "InteractiveTag",
+                  "id": 37,
+                  "options": {
+                    "default": "NONINTERACTION"
+                  }
+                }
+              },
+              "nested": {
+                "InteractiveTag": {
+                  "values": {
+                    "INTERACTION": 1,
+                    "NONINTERACTION": 2
+                  }
+                }
+              }
+            },
             "Trajectory": {
               "fields": {
                 "probability": {
@@ -11941,6 +11964,10 @@
                   "type": "ObstaclePriority",
                   "id": 25
                 },
+                "interactiveTag": {
+                  "type": "ObstacleInteractiveTag",
+                  "id": 37
+                },
                 "isNearJunction": {
                   "type": "bool",
                   "id": 29,
@@ -11967,6 +11994,10 @@
                   "rule": "repeated",
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 34
+                },
+                "adcTimestamp": {
+                  "type": "double",
+                  "id": 38
                 },
                 "surroundingLaneId": {
                   "rule": "repeated",
@@ -12445,6 +12476,10 @@
                 "priority": {
                   "type": "ObstaclePriority",
                   "id": 6
+                },
+                "interactiveTag": {
+                  "type": "ObstacleInteractiveTag",
+                  "id": 9
                 },
                 "isStatic": {
                   "type": "bool",
