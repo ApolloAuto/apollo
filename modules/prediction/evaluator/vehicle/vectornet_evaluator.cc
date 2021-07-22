@@ -16,10 +16,11 @@
 
 #include "modules/prediction/evaluator/vehicle/vectornet_evaluator.h"
 
-#include <omp.h>
 #include <limits>
+#include <omp.h>
 
 #include "Eigen/Dense"
+
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"

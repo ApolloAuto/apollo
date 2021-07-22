@@ -54,7 +54,7 @@ enum BOUNDARY_TYPE {
 
 class VectorNet {
  public:
-  VectorNet() { apollo::hdmap::HDMapUtil::ReloadMaps(); };
+  VectorNet() { apollo::hdmap::HDMapUtil::ReloadMaps(); }
 
   ~VectorNet() = default;
 
