@@ -178,6 +178,9 @@ class PredictorManager {
   ObstacleConf::PredictorType vehicle_default_caution_predictor_ =
       ObstacleConf::EXTRAPOLATION_PREDICTOR;
 
+  ObstacleConf::PredictorType vehicle_interactive_predictor_ =
+      ObstacleConf::EMPTY_PREDICTOR;
+
   PredictionObstacles prediction_obstacles_;
 };
 

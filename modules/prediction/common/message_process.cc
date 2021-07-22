@@ -32,6 +32,7 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/offline_features.pb.h"
+#include "modules/prediction/scenario/interaction_filter/interaction_filter.h"
 #include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
 #include "modules/prediction/scenario/right_of_way/right_of_way.h"
 #include "modules/prediction/util/data_extraction.h"
@@ -150,8 +151,14 @@ void MessageProcess::ContainerProcess(
   ptr_obstacles_container->Insert(perception_obstacles);
 
   ObstaclesPrioritizer obstacles_prioritizer(container_manager);
+
+  InteractionFilter interaction_filter(container_manager);
+
   // Ignore some obstacles
   obstacles_prioritizer.AssignIgnoreLevel();
+
+  // Add interactive tag
+  interaction_filter.AssignInteractiveTag();
 
   // Scenario analysis
   scenario_manager->Run(container_manager.get());
@@ -207,10 +214,14 @@ void MessageProcess::OnPerception(
       }
       // TODO(all): the adc trajectory should be part of features for learning
       //            algorithms rather than part of the feature.proto
-      /*
       *obstacle_ptr->mutable_latest_feature()->mutable_adc_trajectory_point() =
           ptr_ego_trajectory_container->adc_trajectory().trajectory_point();
-      */
+
+      // adc trajectory timestamp
+      obstacle_ptr->mutable_latest_feature()->set_adc_timestamp(
+          ptr_ego_trajectory_container->adc_trajectory()
+          .header().timestamp_sec());
+
       FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";
     }
@@ -219,7 +230,8 @@ void MessageProcess::OnPerception(
   }
 
   // Make evaluations
-  evaluator_manager->Run(ptr_obstacles_container);
+  evaluator_manager->Run(ptr_ego_trajectory_container,
+                         ptr_obstacles_container);
   if (FLAGS_prediction_offline_mode ==
           PredictionConstants::kDumpDataForLearning ||
       FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
