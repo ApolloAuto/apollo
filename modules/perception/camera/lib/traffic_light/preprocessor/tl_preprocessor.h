@@ -29,36 +29,45 @@
 
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
-#include "modules/perception/camera/lib/interface/base_tl_preprocessor.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class TLPreprocessor : public BaseTLPreprocessor {
+struct TrafficLightPreprocessorInitOptions : public BaseInitOptions {
+  int gpu_id = 0;
+  float sync_interval_seconds;
+  std::vector<std::string> camera_names;
+};
+
+struct TLPreprocessorOption {
+  std::map<std::string, int>* image_borders_size = nullptr;
+};
+
+class TLPreprocessor {
  public:
   TLPreprocessor() = default;
   ~TLPreprocessor() = default;
 
-  bool Init(const TrafficLightPreprocessorInitOptions& options) override;
+  bool Init(const TrafficLightPreprocessorInitOptions& options);
 
-  std::string Name() const override;
+  std::string Name() const;
 
   bool UpdateCameraSelection(const CarPose& pose,
                              const TLPreprocessorOption& option,
-                             std::vector<base::TrafficLightPtr>* lights) override;
+                             std::vector<base::TrafficLightPtr>* lights);
 
   bool SyncInformation(const double ts, const std::string& camera_name);
   bool UpdateLightsProjection(const CarPose& pose,
                               const TLPreprocessorOption& option,
                               const std::string& camera_name,
-                              std::vector<base::TrafficLightPtr>* lights) override;
+                              std::vector<base::TrafficLightPtr>* lights);
 
-  bool SetCameraWorkingFlag(const std::string& camera_name, bool is_working) override;
+  bool SetCameraWorkingFlag(const std::string& camera_name, bool is_working);
   bool GetCameraWorkingFlag(const std::string& camera_name,
-                            bool* is_working) const override;
+                            bool* is_working) const;
 
-  const std::vector<std::string>& GetCameraNamesByDescendingFocalLen() const override {
+  const std::vector<std::string>& GetCameraNamesByDescendingFocalLen() const {
     return projection_.getCameraNamesByDescendingFocalLen();
   }
   bool GetAlllightsOutsideFlag() const;

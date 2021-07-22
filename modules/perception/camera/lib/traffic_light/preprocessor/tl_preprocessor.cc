@@ -352,8 +352,6 @@ std::string TLPreprocessor::GetMaxFocalLenWorkingCameraName() const {
   return "";
 }
 
-PERCEPTION_REGISTER_TLPREPROCESSOR(TLPreprocessor);
-
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo
