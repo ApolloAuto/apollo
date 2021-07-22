@@ -120,7 +120,6 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   // process v_mask for obs
   int obs_his_size = obstacle_ptr->history_size();
   torch::Tensor vector_mask = torch::zeros({450, 50});
-  // torch::Tensor obs_p_id = torch::zeros({obs_num, 2});
   for (int i = 0; i < obs_num; ++i) {
     if (obs_his_size > 1 && obs_his_size <= 20) {
       vector_mask.index_put_({i, torch::indexing::Slice(torch::indexing::None,
@@ -150,9 +149,8 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   for (int i = 0; i < map_polyline_num && i < 450; ++i) {
     int one_polyline_vector_num = map_feature[i].size();
     for (int j = 0; j < one_polyline_vector_num && j < 50; ++j) {
-      for (int k = 0; k < 9; ++k) {
-        map_data[i][j][k] = map_feature[i][j][k];
-      }
+      map_data.index_put_({i, j},
+                          torch::from_blob(map_feature[i][j].data(), {9}));
     }
   }
 
