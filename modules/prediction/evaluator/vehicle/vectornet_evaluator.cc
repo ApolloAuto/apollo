@@ -207,7 +207,8 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   torch::Tensor obs_attr_agent =
       torch::tensor({11.0, 4.0}).unsqueeze(0).unsqueeze(0).repeat({1, 19, 1});
   torch::Tensor obs_attr_other =
-      torch::tensor({10.0, 4.0}).unsqueeze(0).unsqueeze(0).repeat({1, 19, 1});
+      torch::tensor({10.0, 4.0}).unsqueeze(0).unsqueeze(0).repeat(
+        {(obs_num - 1), 19, 1});
   torch::Tensor obs_attr = torch::cat({obs_attr_agent, obs_attr_other}, 0);
   // ADD obs id
   torch::Tensor obs_id =
@@ -237,15 +238,17 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   // Empty rand mask as placeholder
   torch::Tensor rand_mask = torch::zeros({0});
-
+  // Change mask type to bool
+  auto bool_vector_mask = vector_mask.toType(at::kBool);
+  auto bool_polyline_mask = polyline_mask.toType(at::kBool);
   // Build input features for torch
   std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(target_obstacle_pos.unsqueeze(0).to(device_)),
        std::move(target_obstacle_pos_step.unsqueeze(0).to(device_)),
        std::move(vector_data.unsqueeze(0).to(device_)),
-       std::move(vector_mask.unsqueeze(0).to(device_)),
-       std::move(polyline_mask.unsqueeze(0).to(device_)),
+       std::move(bool_vector_mask.unsqueeze(0).to(device_)),
+       std::move(bool_polyline_mask.unsqueeze(0).to(device_)),
        std::move(rand_mask.unsqueeze(0).to(device_)),
        std::move(polyline_id.unsqueeze(0).to(device_))}));
 
@@ -392,8 +395,8 @@ void VectornetEvaluator::LoadModel() {
   torch::Tensor target_obstacle_pos = torch::zeros({1, 20, 2});
   torch::Tensor target_obstacle_pos_step = torch::zeros({1, 20, 2});
   torch::Tensor vector_data = torch::zeros({1, 450, 50, 9});
-  torch::Tensor vector_mask = torch::zeros({1, 450, 50});
-  torch::Tensor polyline_mask = torch::zeros({1, 450});
+  torch::Tensor vector_mask = torch::randn({1, 450, 50}) > 0.9;
+  torch::Tensor polyline_mask = torch::randn({1, 450}) > 0.9;
   torch::Tensor rand_mask = torch::zeros({0});
   torch::Tensor polyline_id = torch::zeros({1, 450, 2});
   std::vector<torch::jit::IValue> torch_inputs;
