@@ -268,6 +268,12 @@ DECLARE_bool(use_front_axe_center_in_path_planning);
 
 DECLARE_bool(use_road_boundary_from_map);
 
+DECLARE_double(threshold_distance_for_destination);
+
+DECLARE_double(buffer_in_routing);
+
+DECLARE_double(buffer_out_routing);
+
 // learning related
 DECLARE_bool(planning_offline_learning);
 DECLARE_string(planning_data_dir);

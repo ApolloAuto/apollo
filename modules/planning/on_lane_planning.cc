@@ -60,6 +60,10 @@ using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
+using apollo::routing::RoutingRequest;
+using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::common::math::Polygon2d;
+using apollo::common::PointENU;
 
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
@@ -105,7 +109,6 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(
       injector_->vehicle_state(), hdmap_);
   reference_line_provider_->Start();
-
   // dispatch planner
   planner_ = planner_dispatcher_->DispatchPlanner(config_, injector_);
   if (!planner_) {
@@ -202,6 +205,56 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
   }
 }
 
+bool OnLanePlanning::JudgeCarInDeadEndJunction(
+    std::vector<JunctionInfoConstPtr>* junctions,
+    const Vec2d& car_position,
+    JunctionInfoConstPtr* target_junction) {
+  // warning: the car only be the one junction
+  size_t junction_num = junctions->size();
+  if (junction_num <= 0) {
+    return false;
+  }
+  for (size_t i = 0; i < junction_num; ++i) {
+    if (junctions->at(i)->junction().type() == DEAD_END) {
+      Polygon2d polygon = junctions->at(i)->polygon();
+      // judge dead end point in the select junction
+      if (polygon.IsPointIn(car_position)) {
+        *target_junction = junctions->at(i);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool OnLanePlanning::DeadEndHandle(
+  const PointENU& dead_end_point,
+  const VehicleState& vehicle_state) {
+  const hdmap::HDMap* base_map_ptr = hdmap::HDMapUtil::BaseMapPtr();
+  std::vector<JunctionInfoConstPtr> junctions;
+  JunctionInfoConstPtr junction;
+  if (base_map_ptr->GetJunctions(dead_end_point, 1.0, &junctions) != 0) {
+    ADEBUG << "Fail to get junctions from base_map.";
+    return false;
+  }
+  if (junctions.size() <= 0) {
+    ADEBUG << "No junction from map";
+    return false;
+  }
+  Vec2d car_position;
+  car_position.set_x(vehicle_state.x());
+  car_position.set_y(vehicle_state.y());
+  if (!JudgeCarInDeadEndJunction(&junctions, car_position, &junction)) {
+    ADEBUG << "Target Dead End not found";
+    return false;
+  }
+  return true;
+}
+
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
   // when rerouting, reference line might not be updated. In this case, planning
@@ -213,7 +266,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
           .count();
-
   // localization
   ADEBUG << "Get localization:"
          << local_view_.localization_estimate->DebugString();
@@ -225,6 +277,21 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       *local_view_.localization_estimate, *local_view_.chassis);
 
   VehicleState vehicle_state = injector_->vehicle_state()->vehicle_state();
+  size_t waypoint_num =
+    local_view_.routing->routing_request().waypoint().size();
+  if (local_view_.routing->routing_request().dead_end_info().
+    dead_end_routing_type() == routing::ROUTING_IN) {
+    dead_end_point_ = local_view_.routing->routing_request()
+                    .waypoint().at(waypoint_num - 1).pose();
+  } else if (local_view_.routing->routing_request().dead_end_info().
+    dead_end_routing_type() == routing::ROUTING_OUT) {
+    dead_end_point_ = local_view_.routing->routing_request()
+                    .waypoint().at(0).pose();
+  }
+  if (DeadEndHandle(dead_end_point_, vehicle_state) && !wait_flag_) {
+    // do not use reference line
+    reference_line_provider_->Wait();
+  }
   const double vehicle_state_timestamp = vehicle_state.timestamp();
   DCHECK_GE(start_timestamp, vehicle_state_timestamp)
       << "start_timestamp is behind vehicle_state_timestamp by "
@@ -263,7 +330,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   failed_to_update_reference_line =
       (!reference_line_provider_->UpdatedReferenceLine());
-
   // early return when reference line fails to update after rerouting
   if (failed_to_update_reference_line) {
     const std::string msg = "Failed to update reference line after rerouting.";
@@ -278,7 +344,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     GenerateStopTrajectory(ptr_trajectory_pb);
     return;
   }
-
   // Update reference line provider and reset pull over if necessary
   reference_line_provider_->UpdateVehicleState(vehicle_state);
 
@@ -349,9 +414,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
             << " traffic decider failed";
     }
   }
-
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
-
   for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
     ADEBUG << p.DebugString();
   }
@@ -408,6 +471,13 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
   }
 
+  // reference line recovery only one frame
+  bool complete_dead_end =
+    frame_.get()->open_space_info().destination_reached();
+  if (complete_dead_end) {
+    reference_line_provider_->Start();
+    wait_flag_ = true;
+  }
   const uint32_t n = frame_->SequenceNum();
   injector_->frame_history()->Add(n, std::move(frame_));
 }

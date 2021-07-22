@@ -5,7 +5,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
-
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 cuda_library(
     name = "cuda_pnc_util",
     srcs = ["cuda_util.cu"],
@@ -38,7 +38,7 @@ cc_library(
     name = "path",
     srcs = ["path.cc"],
     hdrs = ["path.h"],
-    copts = MAP_COPTS,
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math",
         "//modules/map/hdmap",
@@ -65,7 +65,9 @@ cc_library(
     name = "pnc_map",
     srcs = ["pnc_map.cc"],
     hdrs = ["pnc_map.h"],
-    copts = MAP_COPTS,
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":path",
         ":route_segments",
