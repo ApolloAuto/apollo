@@ -248,12 +248,9 @@ bool CameraObstacleDetectionComponent::Init() {
   camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
 
   if (enable_cipv_) {
-    camera::BaseCipv* cipv = camera::BaseCipvRegisterer::
-        GetInstanceByName(cipv_name_);
-    CHECK_NOTNULL(cipv);
-    cipv_.reset(cipv);
-    ACHECK(cipv_->Init(homography_im2car_, cipv_init_options_))
-               << "camera cipv init error";
+    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
+               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+               average_frame_rate_, image_based_cipv_, debug_level_);
   }
 
   if (enable_visualization_) {
@@ -396,23 +393,20 @@ int CameraObstacleDetectionComponent::InitConfig() {
   ts_diff_ = fusion_camera_detection_param.ts_diff();
   write_visual_img_ = fusion_camera_detection_param.write_visual_img();
 
-  cipv_init_options_.min_laneline_length_for_cipv = static_cast<float>(
+  min_laneline_length_for_cipv_ = static_cast<float>(
       fusion_camera_detection_param.min_laneline_length_for_cipv());
-  cipv_init_options_.average_lane_width_in_meter = static_cast<float>(
+  average_lane_width_in_meter_ = static_cast<float>(
       fusion_camera_detection_param.average_lane_width_in_meter());
-  cipv_init_options_.max_vehicle_width_in_meter = static_cast<float>(
+  max_vehicle_width_in_meter_ = static_cast<float>(
       fusion_camera_detection_param.max_vehicle_width_in_meter());
-  cipv_init_options_.average_frame_rate =
+  average_frame_rate_ =
       static_cast<float>(fusion_camera_detection_param.average_frame_rate());
 
-  cipv_init_options_.image_based_cipv =
+  image_based_cipv_ =
       static_cast<float>(fusion_camera_detection_param.image_based_cipv());
 
-  cipv_init_options_.debug_level =
-      static_cast<int>(fusion_camera_detection_param.debug_level());
+  debug_level_ = static_cast<int>(fusion_camera_detection_param.debug_level());
   enable_cipv_ = fusion_camera_detection_param.enable_cipv();
-
-  cipv_name_ = fusion_camera_detection_param.cipv();
 
   std::string format_str = R"(
       CameraObstacleDetectionComponent InitConfig success
@@ -768,7 +762,7 @@ int CameraObstacleDetectionComponent::InternalProc(
 
   //  Determine CIPV
   if (enable_cipv_) {
-    camera::CipvOptions cipv_options;
+    CipvOptions cipv_options;
     if (motion_buffer_ != nullptr) {
       if (motion_buffer_->size() == 0) {
         AWARN << "motion_buffer_ is empty";
@@ -780,8 +774,16 @@ int CameraObstacleDetectionComponent::InternalProc(
       }
       ADEBUG << "[CIPV] velocity " << cipv_options.velocity
              << ", yaw rate: " << cipv_options.yaw_rate;
+      cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options, world2camera,
+                          &camera_frame.tracked_objects);
 
-      cipv_->Process(&camera_frame, cipv_options, world2camera, motion_buffer_);
+      // Get Drop points
+      if (motion_buffer_->size() > 0) {
+        cipv_.CollectDrops(motion_buffer_, world2camera,
+                           &camera_frame.tracked_objects);
+      } else {
+        AWARN << "motion_buffer is empty";
+      }
     }
   }
 
