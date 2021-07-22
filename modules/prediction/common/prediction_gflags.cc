@@ -201,6 +201,12 @@ DEFINE_string(torch_vehicle_cruise_cutin_file,
 DEFINE_string(torch_vehicle_lane_scanning_file,
               "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
               "Vehicle lane scanning model file");
+DEFINE_string(torch_vehicle_vectornet_file,
+              "/apollo/modules/prediction/data/vectornet_vehicle_model.pt",
+              "Vehicle vectornet model file");
+DEFINE_string(torch_vehicle_vectornet_cpu_file,
+              "/apollo/modules/prediction/data/vectornet_vehicle_cpu_model.pt",
+              "Vehicle vectornet cpu model file");
 DEFINE_string(torch_pedestrian_interaction_position_embedding_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_position_embedding.pt",

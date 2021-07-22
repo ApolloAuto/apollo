@@ -31,6 +31,7 @@
 #include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/pipeline/vector_net.h"
 
 /**
  * @namespace apollo::prediction
@@ -125,6 +126,9 @@ class EvaluatorManager {
 
   ObstacleConf::EvaluatorType pedestrian_evaluator_ =
       ObstacleConf::SEMANTIC_LSTM_EVALUATOR;
+
+  ObstacleConf::EvaluatorType vectornet_evaluator_ =
+      ObstacleConf::VECTORNET_EVALUATOR;
 
   ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;

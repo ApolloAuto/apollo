@@ -84,3 +84,14 @@ DEFINE_string(evaluator_submodule_name, "evaluator_submodule",
 DEFINE_string(perception_obstacles_topic_name,
               "/apollo/prediction/perception_obstacles",
               "Internal topic of perception obstacles");
+
+// VectorNet
+DEFINE_string(prediction_target_file, "/apollo/data/train/test.pb.txt",
+              "VectorNet target pb file name");
+DEFINE_double(obstacle_x, 0.0, "obstacle position x");
+DEFINE_double(obstacle_y, 0.0, "obstacle position y");
+DEFINE_double(obstacle_phi, 0.0, "obstacle heading phi");
+DEFINE_double(road_distance, 141.4,
+              "road distance within which the points are got");
+DEFINE_double(point_distance, 5.0,
+              "sampling distance of two points");

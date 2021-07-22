@@ -36,6 +36,7 @@
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/jointly_prediction_planning_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/vectornet_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -106,6 +107,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::SEMANTIC_LSTM_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::VECTORNET_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
@@ -437,6 +439,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     case ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR: {
       evaluator_ptr.reset(new JointlyPredictionPlanningEvaluator(
           semantic_map_.get()));
+      break;
+    }
+    case ObstacleConf::VECTORNET_EVALUATOR: {
+      evaluator_ptr.reset(new VectornetEvaluator());
       break;
     }
     default: {
