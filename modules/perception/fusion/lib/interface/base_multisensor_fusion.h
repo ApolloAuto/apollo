@@ -38,10 +38,10 @@ class BaseMultiSensorFusion {
   BaseMultiSensorFusion() = default;
   virtual ~BaseMultiSensorFusion() = default;
 
-  virtual bool Init(const ObstacleMultiSensorFusionParam& param) = 0;
+  virtual bool Init(const ObstacleMultiSensorFusionParam& param);
 
   virtual bool Process(const base::FrameConstPtr& frame,
-               std::vector<base::ObjectPtr>* objects) = 0;
+               std::vector<base::ObjectPtr>* objects);
 
   virtual std::string Name() const = 0;
 

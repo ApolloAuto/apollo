@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -29,7 +28,7 @@ namespace fusion {
 class ObstacleMultiSensorFusion : public BaseMultiSensorFusion {
  public:
   ObstacleMultiSensorFusion() = default;
-  virtual ~ObstacleMultiSensorFusion() = default;
+  ~ObstacleMultiSensorFusion() = default;
 
   bool Init(const ObstacleMultiSensorFusionParam& param) override;
 
