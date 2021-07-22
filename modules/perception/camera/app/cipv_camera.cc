@@ -25,52 +25,41 @@
 
 namespace apollo {
 namespace perception {
-namespace camera{
+
+Cipv::Cipv() {}
+
+Cipv::~Cipv() {}
 
 bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
-                const CipvInitOptions &options) {
-  b_image_based_cipv_ = options.image_based_cipv;
+                const float min_laneline_length_for_cipv,
+                const float average_lane_width_in_meter,
+                const float max_vehicle_width_in_meter,
+                const float average_frame_rate, const bool image_based_cipv,
+                const int debug_devel) {
+  b_image_based_cipv_ = image_based_cipv;
   debug_level_ =
-      options.debug_level;  
-                    // 0: no debug message
+      debug_devel;  // 0: no debug message
                     // 1: minimal output
                     // 2: some important output
                     // 3: verbose message
                     // 4: visualization
                     // 5: all
                     // -x: specific debugging, where x is the specific number
-  time_unit_ = options.average_frame_rate;
+  time_unit_ = average_frame_rate;
   homography_im2car_ = homography_im2car;
   homography_car2im_ = homography_im2car.inverse();
 
-  min_laneline_length_for_cipv_ = options.min_laneline_length_for_cipv;
-  average_lane_width_in_meter_ = options.average_lane_width_in_meter;
-  max_vehicle_width_in_meter_ = options.max_vehicle_width_in_meter;
+  min_laneline_length_for_cipv_ = min_laneline_length_for_cipv;
+  average_lane_width_in_meter_ = average_lane_width_in_meter;
+  max_vehicle_width_in_meter_ = max_vehicle_width_in_meter;
   margin_vehicle_to_lane_ =
-      (average_lane_width_in_meter_ - max_vehicle_width_in_meter_) * 0.5f;
-  single_virtual_egolane_width_in_meter_ = max_vehicle_width_in_meter_;
-  half_vehicle_width_in_meter_ = max_vehicle_width_in_meter_ * 0.5f;
+      (average_lane_width_in_meter - max_vehicle_width_in_meter) * 0.5f;
+  single_virtual_egolane_width_in_meter_ = max_vehicle_width_in_meter;
+  half_vehicle_width_in_meter_ = max_vehicle_width_in_meter * 0.5f;
   half_virtual_egolane_width_in_meter_ =
       single_virtual_egolane_width_in_meter_ * 0.5f;
   old_cipv_track_id_ = -2;
 
-  return true;
-}
-
-bool Cipv::Process(CameraFrame *frame,
-               const CipvOptions &options,
-               const Eigen::Affine3d &world2camera,
-               const base::MotionBufferPtr &motion_buffer){
-
-  DetermineCipv(frame->lane_objects, options, world2camera,
-                          &frame->tracked_objects);
-
-  // Get Drop points
-  if (motion_buffer->size() > 0) {
-  CollectDrops(motion_buffer, world2camera, &frame->tracked_objects);
-  } else {
-    AWARN << "motion_buffer is empty";
-  }
   return true;
 }
 
@@ -79,8 +68,8 @@ bool Cipv::DistanceFromPointToLineSegment(const Point2Df &point,
                                           const Point2Df &line_seg_start_point,
                                           const Point2Df &line_seg_end_point,
                                           float *distance) {
-  apollo::common::math::Vec2d p = {point(0), point(1)};
-  apollo::common::math::LineSegment2d line_seg(
+  common::math::Vec2d p = {point(0), point(1)};
+  common::math::LineSegment2d line_seg(
       {line_seg_start_point(0), line_seg_start_point(1)},
       {line_seg_end_point(0), line_seg_end_point(1)});
   if (line_seg.length_sqr() <= kFloatEpsilon) {
@@ -1119,8 +1108,5 @@ std::string Cipv::Name() const { return "Cipv"; }
 // Register plugin.
 // REGISTER_CIPV(Cipv);
 
-PERCEPTION_REGISTER_CIPV(Cipv);
-
-}  // namespace camera
 }  // namespace perception
 }  // namespace apollo

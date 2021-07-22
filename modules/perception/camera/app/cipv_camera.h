@@ -31,11 +31,15 @@
 #include "modules/perception/base/lane_struct.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/lane_object.h"
-#include "modules/perception/camera/lib/interface/base_cipv.h"
 
 namespace apollo {
 namespace perception {
-namespace camera{
+
+struct CipvOptions {
+  float velocity = 5.0f;
+  float yaw_rate = 0.0f;
+  float yaw_angle = 0.0f;
+};
 
 constexpr float kMinVelocity = 10.0f;  // in m/s
 constexpr float kMaxDistObjectToLaneInMeter = 70.0f;
@@ -49,20 +53,23 @@ static constexpr uint32_t kMaxNumVirtualLanePoint = 25;
 // TODO(All) average image frame rate should come from other header file.
 static constexpr float kAverageFrameRate = 0.05f;
 
-class Cipv : public BaseCipv {
+class Cipv {
  public:
-  Cipv() = default;
-  ~Cipv() = default;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool Init(const Eigen::Matrix3d &homography_im2car,
-            const CipvInitOptions &options =CipvInitOptions()) override;
+  // Member functions
+ public:
+  Cipv(void);
+  virtual ~Cipv(void);
 
-  bool Process(CameraFrame *frame,
-               const CipvOptions &options,
-               const Eigen::Affine3d &world2camera,
-               const base::MotionBufferPtr &motion_buffer) override;
-
-  std::string Name() const override;
+  virtual bool Init(
+      const Eigen::Matrix3d &homography_im2car,
+      const float min_laneline_length_for_cipv = kMinLaneLineLengthForCIPV,
+      const float average_lane_width_in_meter = kAverageLaneWidthInMeter,
+      const float max_vehicle_width_in_meter = kMaxVehicleWidthInMeter,
+      const float average_frame_rate = kAverageFrameRate,
+      const bool image_based_cipv = false, const int debug_level = 0);
+  virtual std::string Name() const;
 
   // Determine CIPV among multiple objects
   bool DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
@@ -207,6 +214,5 @@ class Cipv : public BaseCipv {
   int32_t old_cipv_track_id_ = -2;
 };
 
-}  // namespace camera
 }  // namespace perception
 }  // namespace apollo
